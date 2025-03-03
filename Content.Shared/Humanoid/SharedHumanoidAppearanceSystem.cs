@@ -3,6 +3,9 @@ using System.Linq;
 using System.Numerics;
 using Content.Corvax.Interfaces.Shared;
 using Content.Shared._EE.Contractors.Prototypes;
+using Content.Shared._White.Humanoid.Prototypes;
+// using Content.Shared._White.TTS;
+using Content.Shared.Decals;
 using Content.Shared.Examine;
 using Content.Shared.Humanoid.Markings;
 using Content.Shared.Humanoid.Prototypes;
@@ -53,6 +56,7 @@ public abstract class SharedHumanoidAppearanceSystem : EntitySystem
 
     [ValidatePrototypeId<EmployerPrototype>]
     public const string DefaultEmployer = "NanoTrasen";
+    // WD EDIT START
 
     [ValidatePrototypeId<NationalityPrototype>]
     public const string DefaultNationality = "Bieselite";
@@ -348,6 +352,59 @@ public abstract class SharedHumanoidAppearanceSystem : EntitySystem
         if (sync)
             Dirty(uid, humanoid);
     }
+
+    // WD EDIT START
+    /// <summary>
+    ///     Set a humanoid mob's voice type.
+    /// </summary>
+    /// <param name="uid">The humanoid mob's UID.</param>
+    /// <param name="voiceId">The tts voice to set the mob to.</param>
+    /// <param name="sync">Whether to immediately synchronize this to the humanoid mob, or not.</param>
+    /// <param name="humanoid">Humanoid component of the entity</param>
+    // ReSharper disable once InconsistentNaming
+    // public void SetTTSVoice(
+    //     EntityUid uid,
+    //     ProtoId<TTSVoicePrototype> voiceId,
+    //     bool sync = true,
+    //     HumanoidAppearanceComponent? humanoid = null)
+    // {
+    //     if (!TryComp<TTSComponent>(uid, out var comp)
+    //         || !Resolve(uid, ref humanoid))
+    //         return;
+
+    //     humanoid.Voice = voiceId;
+    //     comp.VoicePrototypeId = voiceId;
+
+    //     if (sync)
+    //         Dirty(uid, humanoid);
+    // }
+
+    /// <summary>
+    ///     Set a humanoid mob's body tupe. This will change their base sprites.
+    /// </summary>
+    /// <param name="uid">The humanoid mob's UID.</param>
+    /// <param name="bodyType">The body type to set the mob to. Will return if the body type prototype was invalid.</param>
+    /// <param name="sync">Whether to immediately synchronize this to the humanoid mob, or not.</param>
+    /// <param name="humanoid">Humanoid component of the entity</param>
+    public void SetBodyType(
+        EntityUid uid,
+        ProtoId<BodyTypePrototype> bodyType,
+        bool sync = true,
+        HumanoidAppearanceComponent? humanoid = null)
+    {
+        if (!Resolve(uid, ref humanoid))
+            return;
+
+        var speciesPrototype = _proto.Index<SpeciesPrototype>(humanoid.Species);
+        if (speciesPrototype.BodyTypes.Contains(bodyType))
+            humanoid.BodyType = bodyType;
+        else
+            humanoid.BodyType = speciesPrototype.BodyTypes.First();
+
+        if (sync)
+            Dirty(uid, humanoid);
+    }
+    // WD EDIT END
 
     /// <summary>
     ///     Set the height of a humanoid mob

@@ -310,10 +310,12 @@ public sealed partial class HumanoidCharacterProfile : ICharacterProfile
 
         var sex = Sex.Unsexed;
         var age = 18;
+        var bodyType = SharedHumanoidAppearanceSystem.DefaultBodyType; // WD EDIT
         if (prototypeManager.TryIndex<SpeciesPrototype>(species, out var speciesPrototype))
         {
             sex = random.Pick(speciesPrototype.Sexes);
             age = random.Next(speciesPrototype.MinAge, speciesPrototype.OldAge); // people don't look and keep making 119 year old characters with zero rp, cap it at middle aged
+            bodyType = speciesPrototype.BodyTypes.First(); // WD EDIT
         }
 
         var gender = Gender.Epicene;
@@ -343,6 +345,8 @@ public sealed partial class HumanoidCharacterProfile : ICharacterProfile
             Sex = sex,
             Age = age,
             Gender = gender,
+            // Voice = voiceId, // WD EDIT
+            BodyType = bodyType, // WD EDIT
             Species = species,
             Appearance = HumanoidCharacterAppearance.Random(species, sex),
             Nationality = SharedHumanoidAppearanceSystem.DefaultNationality,
@@ -564,6 +568,8 @@ public sealed partial class HumanoidCharacterProfile : ICharacterProfile
             _ => Gender.Epicene // Invalid enum values.
         };
 
+        var bodyType = speciesPrototype.BodyTypes.Contains(BodyType) ? BodyType : speciesPrototype.BodyTypes.First(); // WD EDIT
+
         string name;
         if (string.IsNullOrEmpty(Name))
         {
@@ -674,6 +680,7 @@ public sealed partial class HumanoidCharacterProfile : ICharacterProfile
         Age = age;
         Sex = sex;
         Gender = gender;
+        BodyType = bodyType; // WD EDIT
         Appearance = appearance;
         SpawnPriority = spawnPriority;
 
