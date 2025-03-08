@@ -21,5 +21,6 @@
   # Специфические виды парковых станций
   <Box>
   <GuideEntityEmbed Entity="MobIPCDummy" Caption="КПБ"/>
+  <GuideEntityEmbed Entity="MobFeroxi" Caption="Feroxi"/>
   </Box>
 </Document>
