@@ -223,10 +223,10 @@
   - Lavafauna # Goob - Lavaland
 
 # Balloons Factions Edit:
-- type: npcFaction  
+- type: npcFaction
   id: Balloon
   # Balloons can't attack
-  
+
 - type: npcFaction
   id: Monkey
   hostile:
@@ -248,7 +248,7 @@
   - Xeno # rivalry
 
   # cause they are hostile to them
-  - SimpleHostile 
+  - SimpleHostile
   - AllHostile
   - Blob # Goobstation - Blob
   - Shadowling # Einstein Engines - Shadowlings
@@ -295,3 +295,19 @@
   - PirateFaction # goob - pirates
   friendly:
   - Dragon
+
+- type: npcFaction
+  id: Vampire
+  hostile:
+  - NanoTrasen
+  - Syndicate
+  - Zombie
+  - Revolutionary
+  - Xeno
+  - Blob
+  - Changeling
+  - Heretic
+  - PirateFaction
+  - Wizard
+  - SimpleHostile
+  - AllHostile

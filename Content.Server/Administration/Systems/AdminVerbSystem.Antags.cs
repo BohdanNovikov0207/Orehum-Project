@@ -43,6 +43,7 @@
 // SPDX-FileCopyrightText: 2024 Rainfall <rainfey0+git@gmail.com>
 // SPDX-FileCopyrightText: 2024 Rainfey <rainfey0+github@gmail.com>
 // SPDX-FileCopyrightText: 2024 Redfire1331 <125223432+Redfire1331@users.noreply.github.com>
+// SPDX-FileCopyrightText: 2024 Rinary <72972221+Rinary1@users.noreply.github.com>
 // SPDX-FileCopyrightText: 2024 Rouge2t7 <81053047+Sarahon@users.noreply.github.com>
 // SPDX-FileCopyrightText: 2024 Tayrtahn <tayrtahn@gmail.com>
 // SPDX-FileCopyrightText: 2024 Truoizys <153248924+Truoizys@users.noreply.github.com>
@@ -116,6 +117,24 @@ public sealed partial class AdminVerbSystem
 
     private static readonly EntProtoId ParadoxCloneRuleId = "ParadoxCloneSpawn";
 
+    [ValidatePrototypeId<EntityPrototype>]
+    private const string DefaultInitialInfectedRule = "Zombie";
+
+    [ValidatePrototypeId<EntityPrototype>]
+    private const string DefaultNukeOpRule = "LoneOpsSpawn";
+
+    [ValidatePrototypeId<EntityPrototype>]
+    private const string DefaultRevsRule = "Revolutionary";
+
+    [ValidatePrototypeId<EntityPrototype>]
+    private const string DefaultThiefRule = "Thief";
+
+    [ValidatePrototypeId<EntityPrototype>]
+    private const string DefaultVampireRule = "Vampire";
+
+    [ValidatePrototypeId<StartingGearPrototype>]
+    private const string PirateGearId = "PirateGear";
+
     // All antag verbs have names so invokeverb works.
     private void AddAntagVerbs(GetVerbsEvent<Verb> args)
     {
@@ -143,7 +162,7 @@ public sealed partial class AdminVerbSystem
                 _antag.ForceMakeAntag<TraitorRuleComponent>(targetPlayer, DefaultTraitorRule);
             },
             Impact = LogImpact.High,
-            Message = string.Join(": ", traitorName,  Loc.GetString("admin-verb-make-traitor")),
+            Message = string.Join(": ", traitorName, Loc.GetString("admin-verb-make-traitor")),
         };
         args.Verbs.Add(traitor);
 
@@ -310,5 +329,19 @@ public sealed partial class AdminVerbSystem
         };
         args.Verbs.Add(cosmiccult);
         // End DeltaV Additions
+
+        Verb vampire = new()
+        {
+            Text = Loc.GetString("admin-verb-text-make-vampire"),
+            Category = VerbCategory.Antag,
+            Icon = new SpriteSpecifier.Rsi(new ResPath("/Textures/Interface/Actions/actions_vampire.rsi"), "unholystrength"),
+            Act = () =>
+            {
+                _antag.ForceMakeAntag<VampireRuleComponent>(targetPlayer, DefaultVampireRule);
+            },
+            Impact = LogImpact.High,
+            Message = Loc.GetString("admin-verb-make-vampire"),
+        };
+        args.Verbs.Add(vampire);
     }
 }
