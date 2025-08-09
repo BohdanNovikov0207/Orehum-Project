@@ -28,7 +28,7 @@
       Igniter:
         Amount: 1
         DefaultPrototype: Igniter
-        ExamineName: Igniter
+        ExamineName: Зажигалка
   - type: ReverseEngineering # Delta
     difficulty: 2
     recipes:
@@ -49,7 +49,7 @@
         GlassBeaker:
           Amount: 2
           DefaultPrototype: Beaker
-          ExamineName: Glass Beaker
+          ExamineName: Мензурка
 
 - type: entity
   parent: BaseMachineCircuitboard
@@ -65,11 +65,11 @@
       GlassBeaker:
         Amount: 2
         DefaultPrototype: Beaker
-        ExamineName: Glass Beaker
+        ExamineName: Мензурка
       Igniter:
         Amount: 1
         DefaultPrototype: Igniter
-        ExamineName: Igniter
+        ExamineName: Зажигалка
   - type: ReverseEngineering # Delta
     difficulty: 2
     recipes:
@@ -109,7 +109,7 @@
         GlassBeaker:
           Amount: 2
           DefaultPrototype: Beaker
-          ExamineName: Glass Beaker
+          ExamineName: Мензурка
 
 - type: entity
   id: AmmoTechFabCircuitboard
@@ -142,7 +142,7 @@
         GlassBeaker:
           Amount: 2
           DefaultPrototype: Beaker
-          ExamineName: Glass Beaker
+          ExamineName: Мензурка
     - type: StealTarget
       stealGroup: MedicalTechFabCircuitboard
 
@@ -162,7 +162,7 @@
       GlassBeaker:
         Amount: 2
         DefaultPrototype: Beaker
-        ExamineName: Glass Beaker
+        ExamineName: Мензурка 
 
 - type: entity
   parent: BaseMachineCircuitboard
@@ -180,11 +180,11 @@
       GlassBeaker:
         Amount: 2
         DefaultPrototype: Beaker
-        ExamineName: Glass Beaker
+        ExamineName: Мензурка
       Igniter:
         Amount: 1
         DefaultPrototype: Igniter
-        ExamineName: Igniter
+        ExamineName: Зажигалка
 
 - type: entity
   id: ExosuitFabricatorMachineCircuitboard
@@ -251,7 +251,7 @@
         GlassBeaker:
           Amount: 1
           DefaultPrototype: Beaker
-          ExamineName: Glass Beaker
+          ExamineName: Мензурка
   - type: ReverseEngineering # Nyano
     difficulty: 2
     recipes:
@@ -272,12 +272,12 @@
       GlassBeaker:
         Amount: 1
         DefaultPrototype: Beaker
-        ExamineName: Glass Beaker
+        ExamineName: Мензурка
     componentRequirements:
       DiseaseSwab:
         Amount: 1
         DefaultPrototype: DiseaseSwab
-        ExamineName: Swab
+        ExamineName: Стерильная палочка
   - type: ReverseEngineering # Nyano
     difficulty: 2
     recipes:
@@ -655,7 +655,7 @@
         GlassBeaker:
           Amount: 2
           DefaultPrototype: Beaker
-          ExamineName: Glass Beaker
+          ExamineName: Мензурка
 
 - type: entity
   id: ChemDispenserMachineCircuitboard
@@ -676,7 +676,7 @@
         GlassBeaker:
           Amount: 2
           DefaultPrototype: Beaker
-          ExamineName: Glass Beaker
+          ExamineName: Мензурка
 
 - type: entity
   id: BiomassReclaimerMachineCircuitboard
@@ -693,7 +693,7 @@
         Knife:
           Amount: 2
           DefaultPrototype: KitchenKnife
-          ExamineName: Knife
+          ExamineName: Нож
       materialRequirements:
         Steel: 5
     - type: ReverseEngineering # Nyano
@@ -719,7 +719,7 @@
         GlassBeaker:
           Amount: 2
           DefaultPrototype: Beaker
-          ExamineName: Glass Beaker
+          ExamineName: Мензурка
     - type: ReverseEngineering # Nyano
       difficulty: 2
       recipes:
@@ -931,23 +931,23 @@
        KeyedInstrument:
           Amount: 1
           DefaultPrototype: SynthesizerInstrument
-          ExamineName: Keyed Instrument
+          ExamineName: Инструмент с клавишным управлением
        StringInstrument:
           Amount: 1
           DefaultPrototype: AcousticGuitarInstrument
-          ExamineName: String Instrument
+          ExamineName: Струнный инструмент
        PercussionInstrument:
           Amount: 1
           DefaultPrototype: GlockenspielInstrument
-          ExamineName: Percussion Instrument
+          ExamineName: Ударный инструмент
        BrassInstrument:
           Amount: 1
           DefaultPrototype: TrumpetInstrument
-          ExamineName: Brass Instrument
+          ExamineName: Медный инструмент
        WoodwindInstrument:
           Amount: 1
           DefaultPrototype: SaxophoneInstrument
-          ExamineName: Woodwind Instrument
+          ExamineName: Деревянный духовой инструмент
     - type: ReverseEngineering # Nyano
       difficulty: 2
       recipes:
@@ -1076,7 +1076,7 @@
         GlassBeaker:
           Amount: 1
           DefaultPrototype: Beaker
-          ExamineName: Glass Beaker
+          ExamineName: Мензурка
     - type: ReverseEngineering # Nyano
       difficulty: 2
       recipes:
@@ -1279,7 +1279,7 @@
         Utensil:
           Amount: 1
           DefaultPrototype: ForkPlastic
-          ExamineName: Utensil
+          ExamineName: Посуда
     - type: ReverseEngineering # Delta
       difficulty: 2
       recipes:
@@ -1419,7 +1419,7 @@
           GlassBeaker:
             Amount: 1
             DefaultPrototype: Beaker
-            ExamineName: Glass Beaker
+            ExamineName: Мензурка
 
 - type: entity
   id: CargoTelepadMachineCircuitboard
@@ -1457,7 +1457,7 @@
           GlassBeaker:
             Amount: 1
             DefaultPrototype: Beaker
-            ExamineName: Glass Beaker
+            ExamineName: Мензурка
 
 - type: entity
   id: TelecomServerCircuitboard
