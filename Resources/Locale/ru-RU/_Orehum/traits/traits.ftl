@@ -332,7 +332,7 @@ trait-description-Dwarf =
 trait-name-Kobold = Обмен: Кобольд
 trait-description-Kobold =
     Ты не просто короткий и здоровый... Ты кобольд.
-    Вы получаете исцеление от алкоголя, вы устойчивы к яду, вы также не блевотите, когда пьяны.
+    Вы получаете исцеление от алкоголя, вы устойчивы к яду, а также вас не тошнит, когда пьяны.
 
 trait-name-SuperiorRadiationShielding = Превосходная радиационная защита
 trait-description-SuperiorRadiationShielding =
