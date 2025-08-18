@@ -1409,14 +1409,14 @@ namespace Content.Client.Lobby.UI
         private void SetProfileHeight(float height)
         {
             Profile = Profile?.WithHeight(height);
-            SetDirty();
+            IsDirty = true;
             ReloadProfilePreview();
         }
 
         private void SetProfileWidth(float width)
         {
             Profile = Profile?.WithWidth(width);
-            SetDirty();
+            IsDirty = true;
             ReloadProfilePreview();
         }
 

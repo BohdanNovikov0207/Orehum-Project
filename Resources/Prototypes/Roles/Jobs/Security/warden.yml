@@ -10,7 +10,6 @@
   - !type:CharacterPlaytimeRequirement
     tracker: JobDetective
     min: 14400 # DeltaV - 4 hours
-  - !type:CharacterWhitelistRequirement
   - !type:CharacterTraitRequirement
     inverted: true
     traits:
