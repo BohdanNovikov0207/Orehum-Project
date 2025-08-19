@@ -63,7 +63,7 @@ public sealed class LightDetectionSystem : EntitySystem
         var query = EntityQueryEnumerator<PointLightComponent>();
         while (query.MoveNext(out var point, out var pointLight))
         {
-            if (!pointLight.Enabled)
+            if (!pointLight.Enabled || pointLight.Energy <= 0.00001f)
                 continue;
 
             var lightPos = _transformSystem.GetWorldPosition(point);
