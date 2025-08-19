@@ -62,5 +62,5 @@
     head: ClothingHeadHatBeretSecurity
     outerClothing: ClothingOuterArmorPlateCarrier
     id: SeniorOfficerPDA
-    ears: ClothingHeadsetSecurity
+    ears: ClothingHeadsetAltSecurityRegular
     belt: ClothingBeltSecurityFilled

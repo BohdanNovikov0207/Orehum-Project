@@ -441,6 +441,8 @@
     - ClothingEyesNightVisionGoggles
     - ClothingEyesNightVisionDiagnosticGoggles
     - ClothingEyesThermalVisionGoggles
+    - ClothingEyesMinerVisionGoggles # Orehum
+    - ClothingEyesMesonVisionGoggles # Orehum
     - RCDAmmo #DeltaV
     - RCD #EE
     - RPD

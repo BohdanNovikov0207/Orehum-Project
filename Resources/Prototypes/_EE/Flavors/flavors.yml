@@ -1,8 +1,8 @@
 
-- type: flavor
-  id: xelthia
-  flavorType: Complex
-  description: flavor-complex-xelthia
+#- type: flavor
+#  id: xelthia
+#  flavorType: Complex
+#  description: flavor-complex-xelthia
 
 - type: flavor
   id: sportyyellow

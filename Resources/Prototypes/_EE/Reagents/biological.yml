@@ -50,28 +50,28 @@
 #        type: Xelthia
 #        shouldHave: false
 
-- type: reagent
-  id: XelthiaArmJuice
-  name: reagent-name-armjuice
-  group: Biological
-  desc: reagent-desc-armjuice
-  flavor: acid
-  color: "#00FF69"
-  physicalDesc: reagent-physical-desc-viscous
-  metabolisms:
-    Medicine:
-      effects:
-      - !type:SatiateThirst
-        factor: -4
-      - !type:SatiateHunger
-        factor: -4
-      - !type:HealthChange 
-        conditions:
-        - !type:TotalDamage
-          max: 50
-        damage:
-          groups:
-            Brute: -1.5
-          types:
-            Heat: -0.4
+#- type: reagent
+#  id: XelthiaArmJuice
+#  name: reagent-name-armjuice
+#  group: Biological
+#  desc: reagent-desc-armjuice
+#  flavor: acid
+#  color: "#00FF69"
+#  physicalDesc: reagent-physical-desc-viscous
+#  metabolisms:
+#    Medicine:
+#      effects:
+#      - !type:SatiateThirst
+#        factor: -4
+#      - !type:SatiateHunger
+#        factor: -4
+#      - !type:HealthChange 
+#        conditions:
+#        - !type:TotalDamage
+#          max: 50
+#        damage:
+#          groups:
+#            Brute: -1.5
+#          types:
+#            Heat: -0.4
             
