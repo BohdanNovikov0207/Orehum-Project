@@ -170,6 +170,12 @@
   parent: UnsensoredClothingUniformBase
   id: UnsensoredClothingUniformEnvirosuitBase
   components:
+  - type: PressureProtection # Orehum Start костюм плазмолюдов защищает от давления
+    highPressureMultiplier: 0.3
+    lowPressureMultiplier: 1000 
+  - type: TemperatureProtection
+    heatingCoefficient: 0.2
+    coolingCoefficient: 0.2 # Orehum End
   - type: IgniteFromGasImmunity
     parts:
     - Torso

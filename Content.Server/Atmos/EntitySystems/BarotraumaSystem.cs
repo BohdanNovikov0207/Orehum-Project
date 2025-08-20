@@ -72,7 +72,7 @@ namespace Content.Server.Atmos.EntitySystems
             if (!TryComp<BarotraumaComponent>(protectionTarget, out var barotrauma))
                 return;
 
-            if (slotTarget != null && !barotrauma.ProtectionSlots.Contains(slotTarget))
+            if (slotTarget != null && !(barotrauma.ProtectionSlots.Contains(slotTarget) || barotrauma.AlternativeProtectionSlots.Contains(slotTarget))) // Orehum
                 return;
 
             UpdateCachedResistances(protectionTarget, barotrauma);
@@ -91,7 +91,7 @@ namespace Content.Server.Atmos.EntitySystems
 
         private void OnPressureProtectionEquipped(EntityUid uid, PressureProtectionComponent pressureProtection, GotEquippedEvent args)
         {
-            if (TryComp<BarotraumaComponent>(args.Equipee, out var barotrauma) && barotrauma.ProtectionSlots.Contains(args.Slot))
+            if (TryComp<BarotraumaComponent>(args.Equipee, out var barotrauma) && (barotrauma.ProtectionSlots.Contains(args.Slot) || barotrauma.AlternativeProtectionSlots.Contains(args.Slot))) // Orehum
             {
                 UpdateCachedResistances(args.Equipee, barotrauma);
             }
@@ -99,7 +99,7 @@ namespace Content.Server.Atmos.EntitySystems
 
         private void OnPressureProtectionUnequipped(EntityUid uid, PressureProtectionComponent pressureProtection, GotUnequippedEvent args)
         {
-            if (TryComp<BarotraumaComponent>(args.Equipee, out var barotrauma) && barotrauma.ProtectionSlots.Contains(args.Slot))
+            if (TryComp<BarotraumaComponent>(args.Equipee, out var barotrauma) && (barotrauma.ProtectionSlots.Contains(args.Slot) || barotrauma.AlternativeProtectionSlots.Contains(args.Slot))) // Orehum
             {
                 UpdateCachedResistances(args.Equipee, barotrauma);
             }
@@ -112,7 +112,7 @@ namespace Content.Server.Atmos.EntitySystems
         private void UpdateCachedResistances(EntityUid uid, BarotraumaComponent barotrauma)
         {
 
-            if (barotrauma.ProtectionSlots.Count != 0)
+            if (barotrauma.ProtectionSlots.Count != 0 || barotrauma.AlternativeProtectionSlots.Count != 0) // Orehum
             {
                 if (!TryComp(uid, out InventoryComponent? inv) || !TryComp(uid, out ContainerManagerComponent? contMan))
                 {
@@ -122,7 +122,7 @@ namespace Content.Server.Atmos.EntitySystems
                 var hPMultiplier = float.MinValue;
                 var lPModifier = float.MaxValue;
                 var lPMultiplier = float.MaxValue;
-
+                bool fuckedCheck = false; // Orehum
                 foreach (var slot in barotrauma.ProtectionSlots)
                 {
                     if (!_inventorySystem.TryGetSlotEntity(uid, slot, out var equipment, inv, contMan)
@@ -137,6 +137,7 @@ namespace Content.Server.Atmos.EntitySystems
                         hPMultiplier = 1f;
                         lPModifier = 0f;
                         lPMultiplier = 1f;
+                        fuckedCheck = true; // Orehum
                         break;
                     }
 
@@ -146,6 +147,39 @@ namespace Content.Server.Atmos.EntitySystems
                     lPModifier = Math.Min(lPModifier, itemLowModifier.Value);
                     lPMultiplier = Math.Min(lPMultiplier, itemLowMultiplier.Value);
                 }
+
+                // Orehum Start проверяем на альтернативный набор предметов для защиты от атмосферы. Надо для одежды плазмолюдов
+                if (fuckedCheck)
+                {
+                    hPModifier = float.MinValue;
+                    hPMultiplier = float.MinValue;
+                    lPModifier = float.MaxValue;
+                    lPMultiplier = float.MaxValue;
+                    foreach (var slot in barotrauma.AlternativeProtectionSlots)
+                    {
+                        if (!_inventorySystem.TryGetSlotEntity(uid, slot, out var equipment, inv, contMan)
+                            || !TryGetPressureProtectionValues(equipment.Value,
+                                out var itemHighMultiplier,
+                                out var itemHighModifier,
+                                out var itemLowMultiplier,
+                                out var itemLowModifier))
+                        {
+                            // Missing protection, skin is exposed.
+                            hPModifier = 0f;
+                            hPMultiplier = 1f;
+                            lPModifier = 0f;
+                            lPMultiplier = 1f;
+                            break;
+                        }
+
+                        // The entity is as protected as its weakest part protection
+                        hPModifier = Math.Max(hPModifier, itemHighModifier.Value);
+                        hPMultiplier = Math.Max(hPMultiplier, itemHighMultiplier.Value);
+                        lPModifier = Math.Min(lPModifier, itemLowModifier.Value);
+                        lPMultiplier = Math.Min(lPMultiplier, itemLowMultiplier.Value);
+                    }
+                }
+                // Orehum end
 
                 barotrauma.HighPressureModifier = hPModifier;
                 barotrauma.HighPressureMultiplier = hPMultiplier;

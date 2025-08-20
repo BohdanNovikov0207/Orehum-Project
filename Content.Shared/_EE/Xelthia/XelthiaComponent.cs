@@ -3,7 +3,7 @@ using Robust.Shared.GameStates;
 
 namespace Content.Shared._EE.Xelthia;
 
-
+/*
 /// <summary>
 /// This is eventually going to be used for the arm regrowth action the Xelthia have. I have no idea how to code this.
 /// </summary>
@@ -16,3 +16,4 @@ public sealed partial class XelthiaComponent : Component
     [DataField]
     public EntityUid? XelthiaRegenerateAction;
 }
+*/

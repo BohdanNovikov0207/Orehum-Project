@@ -1,6 +1,5 @@
 using Content.Server.Body.Components;
 using Content.Server.Body.Systems;
-using Content.Shared._EE.Xelthia;
 using Content.Shared.Abilities.Psionics;
 using Content.Shared.Humanoid;
 using Content.Shared.Humanoid.Markings;
@@ -29,7 +28,7 @@ using Content.Shared.Chemistry.Components;
 
 namespace Content.Server._EE.Xelthia;
 
-
+/*
 /// <summary>
 /// Xelthia Arm Regrowth stuff
 /// </summary>
@@ -104,3 +103,4 @@ public sealed class XelthiaSystem : EntitySystem
         _bloodstreamSystem.TryAddToChemicals(uid, solution, stream);
     }
 }
+*/

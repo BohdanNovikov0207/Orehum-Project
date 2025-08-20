@@ -527,7 +527,6 @@
     - Reptilian
     - Vulpkanin
     - Shadowkin
-    - Xelthia
     - Felinid
     - Oni
     - Tajaran
@@ -600,7 +599,6 @@
     - Reptilian
     - Vulpkanin
     - Shadowkin
-    - Xelthia
     - Felinid
     - Oni
     - Tajaran
@@ -672,7 +670,6 @@
     - Reptilian
     - Vulpkanin
     - Shadowkin
-    - Xelthia
     - Felinid
     - Oni
     - Tajaran
@@ -745,7 +742,6 @@
     - Reptilian
     - Vulpkanin
     - Shadowkin
-    - Xelthia
     - Felinid
     - Oni
     - Tajaran
@@ -817,7 +813,6 @@
     - Reptilian
     - Vulpkanin
     - Shadowkin
-    - Xelthia
     - Felinid
     - Oni
     - Tajaran
@@ -889,7 +884,6 @@
     - Reptilian
     - Vulpkanin
     - Shadowkin
-    - Xelthia
     - Felinid
     - Oni
     - Tajaran
@@ -961,7 +955,6 @@
     - Reptilian
     - Vulpkanin
     - Shadowkin
-    - Xelthia
     - Felinid
     - Oni
     - Tajaran
@@ -1033,7 +1026,6 @@
     - Reptilian
     - Vulpkanin
     - Shadowkin
-    - Xelthia
     - Felinid
     - Oni
     - Tajaran
@@ -1105,7 +1097,6 @@
     - Reptilian
     - Vulpkanin
     - Shadowkin
-    - Xelthia
     - Felinid
     - Oni
     - Tajaran
@@ -1177,7 +1168,6 @@
     - Reptilian
     - Vulpkanin
     - Shadowkin
-    - Xelthia
     - Felinid
     - Oni
     - Tajaran
@@ -1250,7 +1240,6 @@
     - Vulpkanin
     - Vulpkanin
     - Shadowkin
-    - Xelthia
     - Felinid
     - Oni
     - Tajaran
@@ -1322,7 +1311,6 @@
     - Reptilian
     - Vulpkanin
     - Shadowkin
-    - Xelthia
     - Felinid
     - Oni
     - Tajaran
@@ -1394,7 +1382,6 @@
     - Reptilian
     - Vulpkanin
     - Shadowkin
-    - Xelthia
     - Felinid
     - Oni
     - Tajaran
@@ -1466,7 +1453,6 @@
     - Reptilian
     - Vulpkanin
     - Shadowkin
-    - Xelthia
     - Felinid
     - Oni
     - Tajaran
@@ -1538,7 +1524,6 @@
     - Reptilian
     - Vulpkanin
     - Shadowkin
-    - Xelthia
     - Felinid
     - Oni
     - Tajaran
@@ -1657,7 +1642,6 @@
     - Reptilian
     - Vulpkanin
     - Shadowkin
-    - Xelthia
     - Felinid
     - Oni
     - Tajaran
@@ -1686,6 +1670,12 @@
         collection: SoldierDeath
         params:
           volume: -4
+    - type: GhostRole
+      name: ghost-role-information-ert-leader-name
+      description: ghost-role-information-ert-leader-description
+      rules: ghost-role-information-nonantagonist-rules
+      raffle:
+        settings: short
       job: ERTLeader
     - type: Loadout
       prototypes: [ ERTLeaderORHMGear ]
@@ -1762,7 +1752,6 @@
     - Reptilian
     - Vulpkanin
     - Shadowkin
-    - Xelthia
     - Felinid
     - Oni
     - Tajaran
@@ -1791,6 +1780,12 @@
         collection: SoldierDeath
         params:
           volume: -4
+    - type: GhostRole
+      name: ghost-role-information-ert-security-name
+      description: ghost-role-information-ert-security-description
+      rules: ghost-role-information-nonantagonist-rules
+      raffle:
+        settings: short
       job: ERTSecurity
     - type: RandomMetadata
       nameSegments:
@@ -1866,7 +1861,6 @@
     - Reptilian
     - Vulpkanin
     - Shadowkin
-    - Xelthia
     - Felinid
     - Oni
     - Tajaran
@@ -1893,6 +1887,12 @@
         collection: SoldierDeath
         params:
           volume: 3
+    - type: GhostRole
+      name: ghost-role-information-ert-medical-name
+      description: ghost-role-information-ert-medical-description
+      rules: ghost-role-information-nonantagonist-rules
+      raffle:
+        settings: short
       job: ERTMedical
     - type: RandomMetadata
       nameSegments:
@@ -1962,7 +1962,6 @@
     - Reptilian
     - Vulpkanin
     - Shadowkin
-    - Xelthia
     - Felinid
     - Oni
     - Tajaran
@@ -1989,6 +1988,12 @@
         collection: SoldierDeath
         params:
           volume: -4
+    - type: GhostRole
+      name: ghost-role-information-ert-medical-name
+      description: ghost-role-information-ert-medical-description
+      rules: ghost-role-information-nonantagonist-rules
+      raffle:
+        settings: short
       job: ERTMedical
     - type: RandomMetadata
       nameSegments:

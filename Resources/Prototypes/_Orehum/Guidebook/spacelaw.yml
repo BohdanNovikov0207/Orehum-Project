@@ -1,5 +1,5 @@
 - type: guideEntry
-  id: SpaceLaw Initial
+  id: SpaceLawInitial
   name: guide-entry-spacelaw-folder
   text: "/ServerInfo/Guidebook/SpaceLaw/SpaceLaw_Initial.xml"
   priority: 0

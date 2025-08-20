@@ -30,6 +30,11 @@ namespace Content.Server.Atmos.Components
         [DataField("protectionSlots")]
         public List<string> ProtectionSlots = new() { "head", "outerClothing" };
 
+        // Orehum Start Необходимо для того, чтобы одежда плазмолюдов защищала от давления
+        [DataField("altProtectionSlots")]
+        public List<string> AlternativeProtectionSlots = new() { "head", "jumpsuit" };
+        // Orehum End
+
         /// <summary>
         /// Cached pressure protection values
         /// </summary>
