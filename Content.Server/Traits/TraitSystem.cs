@@ -113,7 +113,7 @@ public sealed class TraitSystem : EntitySystem
 
             if (_playerManager.TryGetSessionByEntity(uid, out var targetPlayer))
             {
-                var feedbackMessage = "You have attempted to spawn with an illegal trait list. None of your traits will be applied. If you think this is in error, please return to the lobby and correct your trait selections.";
+                var feedbackMessage = "Вы попытались появиться с недопустимым списком черт персонажа. Ни одна из них не будет применена. Если вы считаете, что это ошибка, вернитесь в лобби и исправьте черты.";
                 _chatManager.ChatMessageToOne(
                     ChatChannel.Emotes,
                     feedbackMessage,
@@ -162,7 +162,7 @@ public sealed class TraitSystem : EntitySystem
     {
         _adminSystem.Erase(targetPlayer.UserId);
 
-        var feedbackMessage = $"[font size=24][color=#ff0000]{"You have spawned in with an illegal trait point total. If this was a result of cheats, then your nonexistence is a skill issue. Otherwise, feel free to click 'Return To Lobby', and fix your trait selections."}[/color][/font]";
+        var feedbackMessage = $"[font size=24][color=#ff0000]{"Вы появились с недопустимым количеством очков черт персонажа. Если это произошло из-за использования читов - ваша несуществующая жизнь это ваша проблема. В противном случае нажмите 'Вернуться в лобби' и исправьте выбор черт."}[/color][/font]";
         _chatManager.ChatMessageToOne(
             ChatChannel.Emotes,
             feedbackMessage,
