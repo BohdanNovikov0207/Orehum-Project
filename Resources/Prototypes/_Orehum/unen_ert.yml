@@ -2083,7 +2083,7 @@
       rules: ghost-role-information-nonantagonist-rules
       raffle:
         settings: short
-      job: JobCBURN
+      job: CBURN
     - type: GhostTakeoverAvailable
     - type: RandomMetadata
       nameSegments:
