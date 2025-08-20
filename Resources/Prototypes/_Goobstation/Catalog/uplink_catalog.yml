@@ -285,3 +285,13 @@
     Telecrystal: 70
   categories:
   - UplinkDeception
+
+- type: listing
+  id: UplinkTelecrystalMiner
+  name: uplink-tcminer-name
+  description: uplink-tcminer-desc
+  productEntity: TCminerFlatpack
+  cost:
+    Telecrystal: 75
+  categories:
+    - UplinkDisruption
