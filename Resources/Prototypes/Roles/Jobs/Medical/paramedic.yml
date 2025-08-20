@@ -38,7 +38,7 @@
     back: ClothingBackpackMedical
     shoes: ClothingShoesColorBlue
     id: ParamedicPDA
-    ears: ClothingBackpackMedical
+    ears: ClothingHeadsetMedical
     belt: ClothingBeltMedicalEMTFilled
     pocket1: HandheldGPSBasic
     pocket2: HandheldCrewMonitor
