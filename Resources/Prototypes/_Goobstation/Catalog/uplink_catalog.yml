@@ -292,6 +292,6 @@
   description: uplink-tcminer-desc
   productEntity: TCminerFlatpack
   cost:
-    Telecrystal: 75
+    Telecrystal: 46
   categories:
     - UplinkDisruption
