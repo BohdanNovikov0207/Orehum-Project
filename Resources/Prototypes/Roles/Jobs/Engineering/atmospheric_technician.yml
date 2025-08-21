@@ -31,6 +31,7 @@
     back: ClothingBackpackAtmospherics
     shoes: ClothingShoesColorWhite
     id: AtmosPDA
+    belt: ClothingBeltUtilityEngineering
     ears: ClothingHeadsetEngineering
 
 - type: startingGear

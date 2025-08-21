@@ -352,7 +352,7 @@
     id: ERTJanitorPDA
     ears: ClothingHeadsetAltCentCom
     belt: ClothingBeltJanitorFilled
-    pocket1: WeaponPulsePistol
+    pocket1: WeaponEnergyGunPistolSecurity
     pocket2: GlowstickBlue
   storage:
     back:
@@ -417,7 +417,7 @@
     id: ERTSecurityPDA
     ears: ClothingHeadsetAltCentCom
     belt: ClothingBeltSecurityWebbingFilled
-    pocket1: WeaponPulsePistol
+    pocket1: WeaponEnergyGunPistolSecurity
     pocket2: GlowstickBlue
   storage:
     back:
@@ -444,7 +444,7 @@
     id: ERTEngineerPDA
     ears: ClothingHeadsetAltCentCom
     belt: ClothingBeltChiefEngineerFilled
-    pocket1: WeaponPulsePistol
+    pocket1: WeaponEnergyGunPistolSecurity
     pocket2: GlowstickBlue
   storage:
     back:
@@ -477,7 +477,7 @@
     id: ERTMedicPDA
     ears: ClothingHeadsetAltCentCom
     belt: ClothingBeltMedicalFilled
-    pocket1: WeaponPulsePistol
+    pocket1: WeaponEnergyGunPistolSecurity
     pocket2: GlowstickBlue
   storage:
     back:
@@ -2001,3 +2001,108 @@
       - NamesLastMilitary
     - type: Loadout
       prototypes: [ ERTEngineerORHMGear ]
+
+# CBURN
+
+- type: startingGear
+  id: CBURNGearUnen
+  equipment:
+    jumpsuit: ClothingUniformJumpsuitColorBrown
+    back: ClothingBackpackDuffelCBURN
+    mask: ClothingMaskNeckGaiter
+    eyes: ClothingEyesGlassesSecurity
+    ears: ClothingHeadsetAltCentCom
+    gloves: ClothingHandsGlovesCombat
+    outerClothing: ClothingOuterHardsuitCBURN
+    shoes: ClothingShoesBootsMagSec
+    id: CBURNPDA
+    pocket1: GlowstickYellow
+    pocket2: ExtendedEmergencyOxygenTankFilled
+    belt: ClothingBeltUtilityEngineering
+  storage:
+    back:
+    - BoxShotgunIncendiary
+    - BoxShotgunIncendiary
+    - GrenadeIncendiary
+    - GrenadeIncendiary
+    - PillAmbuzolPlus
+    - PillAmbuzol
+    - Flare
+    - Flare
+    - EmergencyMedipen
+    - EmergencyMedipen
+    - MedicatedSuture
+    - RegenerativeMesh
+    - Truncheon
+  inhand:
+  - WeaponShotgunEnforcer
+
+- type: randomHumanoidSettings
+  id: CBURNUnen
+  speciesBlacklist:
+    - Diona
+    - Moth
+    - Arachnid
+    - Dwarf
+    - Vox
+    - Reptilian
+    - Vulpkanin
+    - Shadowkin
+    - Xelthia
+    - Felinid
+    - Oni
+    - Tajaran
+    - Resomi
+    - Harpy
+    - Arachne
+    - IPC
+    - Chitinid
+    - Plasmaman
+    - Thaven
+  components:
+    - type: RandomHumanoidAppearance
+      randomizeName: false
+    - type: AutoImplant
+      implants:
+      - TrackingImplant
+      - MindShieldImplant
+    - type: Speech
+      speechSounds: Soldier
+      soundCooldownTime: 0.1
+    - type: TriggerOnMobstateChange
+      mobState:
+      - Critical
+    - type: EmitSoundOnTrigger
+      sound:
+        collection: SoldierDeath
+        params:
+          volume: 3
+    - type: GhostRole
+      name: ghost-role-information-cburn-agent-name
+      description: ghost-role-information-cburn-agent-description
+      rules: ghost-role-information-nonantagonist-rules
+      raffle:
+        settings: short
+      job: JobCBURN
+    - type: GhostTakeoverAvailable
+    - type: RandomMetadata
+      nameSegments:
+      - NamesFirstMilitary
+      - NamesLastMilitary
+    - type: Loadout
+      prototypes: [ CBURNGearUnen ]
+
+- type: entity
+  id: RandomHumanoidSpawnerCBURNUnen
+  parent: RandomHumanoidSpawnerERTLeaderGamma
+  name: Оперативник РХБЗЗ [Unen]
+  components:
+    - type: Sprite
+      sprite: Markers/jobs.rsi
+      state: ertmedicaleva
+    - type: RandomMetadata
+      nameSegments:
+      - NamesFirstMilitary
+      - NamesLastMilitary
+    - type: RandomHumanoidSpawner
+      settings: CBURNUnen

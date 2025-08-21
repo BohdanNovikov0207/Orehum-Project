@@ -27,7 +27,7 @@ public sealed partial class CCVars
     ///     Changes how loud the announcers are for the client
     /// </summary>
     public static readonly CVarDef<float> AnnouncerVolume =
-        CVarDef.Create("announcer.volume", 0.5f, CVar.ARCHIVE | CVar.CLIENTONLY);
+        CVarDef.Create("announcer.volume", 1f, CVar.ARCHIVE | CVar.CLIENTONLY);
 
     /// <summary>
     ///     Disables multiple announcement sounds from playing at once

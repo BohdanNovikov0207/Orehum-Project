@@ -33,7 +33,7 @@
   id: SurvivalHellshift
   alias:
   - hellshift
-  showInVote: true
+  showInVote: false
   name: hellshift-title
   description: hellshift-description
   rules:

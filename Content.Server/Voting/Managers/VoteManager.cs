@@ -2,10 +2,12 @@ using System.Collections;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Threading.Tasks;
 using Content.Server.Administration;
 using Content.Server.Administration.Logs;
 using Content.Server.Administration.Managers;
 using Content.Server.Chat.Managers;
+using Content.Server.Database;
 using Content.Server.GameTicking;
 using Content.Server.Maps;
 using Content.Shared.Administration;
@@ -38,6 +40,7 @@ namespace Content.Server.Voting.Managers
         [Dependency] private readonly IGameMapManager _gameMapManager = default!;
         [Dependency] private readonly IEntityManager _entityManager = default!;
         [Dependency] private readonly IAdminLogManager _adminLogger = default!;
+        [Dependency] private readonly IServerDbManager _dbManager = default!;
 
         private int _nextVoteId = 1;
 
@@ -48,6 +51,11 @@ namespace Content.Server.Voting.Managers
         private readonly Dictionary<NetUserId, TimeSpan> _voteTimeout = new();
         private readonly HashSet<ICommonSession> _playerCanCallVoteDirty = new();
         private readonly StandardVoteType[] _standardVoteTypeValues = Enum.GetValues<StandardVoteType>();
+
+        private bool _syncedWithDb = false;
+        private readonly List<string> _whitelistedPresets = ["Secret", "Traitor", "Survival", "Greenshift", "Extended"]; // Orehum
+
+        public List<string> GetWhitelistedPresets() => _whitelistedPresets;
 
         public void Initialize()
         {
@@ -71,6 +79,25 @@ namespace Content.Server.Voting.Managers
                 });
             }
         }
+
+        // Orehum start
+        private async void CheckWhitelistedPresets()
+        {
+            var result = await _dbManager.GetWhitelistedPresets();
+            if (result.Count == 0) // если нема пресетов
+            {
+                foreach (var preset in _whitelistedPresets)
+                {
+                    await _dbManager.AddWhitelistedPreset(preset); // регаем дефолтные пресетики
+                }
+            }
+            else // если есть уже разрешенные пресеты в дб
+            {
+                _whitelistedPresets.Clear();
+                _whitelistedPresets.AddRange(result);
+            }
+        }
+        // Orehum end
 
         private void ReceiveVoteMenu(MsgVoteMenu message)
         {
@@ -138,6 +165,12 @@ namespace Content.Server.Voting.Managers
 
         public void Update()
         {
+            if (_syncedWithDb == false) // orehum shit code check ИСПРАВИТЬ В БУДУЩЕМ НА НОРМАЛЬНЫЙ ЗАПРОС К ДБ ААААААААААААААААААААААААААААААААААААААА
+            {
+                _syncedWithDb = true;
+                CheckWhitelistedPresets();
+            }
+
             // Handle active votes.
             var remQueue = new RemQueue<int>();
             foreach (var v in _votes.Values)
@@ -226,6 +259,30 @@ namespace Content.Server.Voting.Managers
 
             return handle;
         }
+
+        // Orehum Start
+        public void AddWhitelistedPreset(string preset)
+        {
+            if (!_whitelistedPresets.Contains(preset))
+            {
+                _whitelistedPresets.Add(preset);
+                AddWhitelistedPresetToDb(preset);
+            }
+        }
+
+        private async void AddWhitelistedPresetToDb(string preset) => await _dbManager.AddWhitelistedPreset(preset);
+
+        public void RemoveWhitelistedPreset(string preset)
+        {
+            if (_whitelistedPresets.Contains(preset))
+            {
+                _whitelistedPresets.Remove(preset);
+                RemoveWhitelistedPresetToDb(preset);
+            }
+        }
+
+        private async void RemoveWhitelistedPresetToDb(string preset) => await _dbManager.RemoveWhitelistedPreset(preset);
+        // Orehum End
 
         private void SendUpdates(VoteReg v)
         {

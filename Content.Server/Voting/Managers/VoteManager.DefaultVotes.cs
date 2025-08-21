@@ -57,7 +57,7 @@ namespace Content.Server.Voting.Managers
 
             var ghostVotePercentageRequirement = _cfg.GetCVar(CCVars.VoteRestartGhostPercentage);
             var ghostCount = 0;
-            
+
             foreach (var player in _playerManager.Sessions)
             {
                 _playerManager.UpdateState(player);
@@ -289,6 +289,9 @@ namespace Content.Server.Voting.Managers
             foreach (var preset in _prototypeManager.EnumeratePrototypes<GamePresetPrototype>())
             {
                 if(!preset.ShowInVote)
+                    continue;
+
+                if (!_whitelistedPresets.Contains(preset.ID))
                     continue;
 
                 if(_playerManager.PlayerCount < (preset.MinPlayers ?? int.MinValue))

@@ -60,6 +60,14 @@ namespace Content.Server.Voting.Managers
         /// <returns>A handle to the created vote.</returns>
         IVoteHandle CreateVote(VoteOptions options);
 
+        // Orehum Start
+        void AddWhitelistedPreset(string preset);
+
+        void RemoveWhitelistedPreset(string preset);
+
+        List<string> GetWhitelistedPresets();
+        // Orehum Emd
+
         void Initialize();
         void Update();
     }

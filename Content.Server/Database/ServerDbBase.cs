@@ -1591,6 +1591,36 @@ INSERT INTO player_round (players_id, rounds_id) VALUES ({players[player]}, {id}
 
         #endregion
 
+        // Orehum start
+        #region Orehum
+        public async Task<List<string>> GetWhitelistedPresets()
+        {
+            await using var db = await GetDb();
+            var presets = db.DbContext.WhiteListedPresets;
+            if (!presets.Any())
+                return [];
+
+            return presets.Select(p => p.PresetId).ToList();
+        }
+
+        public async Task AddWhitelistedPreset(string preset)
+        {
+            await using var db = await GetDb();
+            db.DbContext.WhiteListedPresets.Add(new() { PresetId = preset, });
+            await db.DbContext.SaveChangesAsync();
+        }
+
+        public async Task RemoveWhitelistedPreset(string preset)
+        {
+            await using var db = await GetDb();
+            var p = new WhiteListedPreset() { PresetId = preset, };
+            if (db.DbContext.WhiteListedPresets.Contains(p))
+                db.DbContext.WhiteListedPresets.Remove(p);
+            await db.DbContext.SaveChangesAsync();
+        }
+        #endregion
+        // Orehum end
+
         // SQLite returns DateTime as Kind=Unspecified, Npgsql actually knows for sure it's Kind=Utc.
         // Normalize DateTimes here so they're always Utc. Thanks.
         protected abstract DateTime NormalizeDatabaseTime(DateTime time);

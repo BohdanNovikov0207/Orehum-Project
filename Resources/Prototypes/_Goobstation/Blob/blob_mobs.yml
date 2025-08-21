@@ -6,6 +6,9 @@
   parent: SimpleSpaceMobBase
   categories: [ HideSpawnMenu ]
   components:
+    - type: IgniteFromGasImmunity # Orehum start блоб поджигает плазмаменов bruh
+      parts:
+      - Head # Orehum end
     - type: ZombieImmune
     - type: TriggerOnMobstateChange
       mobState:

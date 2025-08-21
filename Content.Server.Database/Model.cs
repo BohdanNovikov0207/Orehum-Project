@@ -50,6 +50,10 @@ namespace Content.Server.Database
         public DbSet<RoleWhitelist> RoleWhitelists { get; set; } = null!;
         public DbSet<BanTemplate> BanTemplate { get; set; } = null!;
 
+        // Orehum Start
+        public DbSet<WhiteListedPreset> WhiteListedPresets { get; set; } = null!;
+        // Orehum End
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Preference>()
@@ -1225,4 +1229,12 @@ namespace Content.Server.Database
             return new ImmutableTypedHwid(hwid.Hwid.ToImmutableArray(), hwid.Type);
         }
     }
+
+    // Orehum Start
+    public sealed class WhiteListedPreset
+    {
+        [Key]
+        public string PresetId { get; set; } = default!;
+    }
+    // Orehum end
 }

@@ -333,6 +333,19 @@ namespace Content.Server.Database
         void InjectTestNotification(DatabaseNotification notification);
 
         #endregion
+
+        // Orehum Start
+        #region Orehum
+
+        Task<List<string>> GetWhitelistedPresets();
+
+        Task AddWhitelistedPreset(string preset);
+
+        Task RemoveWhitelistedPreset(string preset);
+
+        #endregion
+
+        // Orehum End
     }
 
     /// <summary>
@@ -990,6 +1003,26 @@ namespace Content.Server.Database
             DbWriteOpsMetric.Inc();
             return RunDbCommand(() => _db.RemoveJobWhitelist(player, job));
         }
+
+        // Orehum Start
+        public async Task<List<string>> GetWhitelistedPresets()
+        {
+            DbReadOpsMetric.Inc();
+            return await RunDbCommand(() => _db.GetWhitelistedPresets());
+        }
+
+        public Task AddWhitelistedPreset(string preset)
+        {
+            DbWriteOpsMetric.Inc();
+            return RunDbCommand(() => _db.AddWhitelistedPreset(preset));
+        }
+
+        public Task RemoveWhitelistedPreset(string preset)
+        {
+            DbWriteOpsMetric.Inc();
+            return RunDbCommand(() => _db.RemoveWhitelistedPreset(preset));
+        }
+        // Orehum End
 
         public void SubscribeToNotifications(Action<DatabaseNotification> handler)
         {
