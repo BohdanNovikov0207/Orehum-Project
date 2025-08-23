@@ -443,6 +443,6 @@ portableChemicalMixer: null
 
 WallRockBasaltBSCrystal: WallRockBasaltBluespace
 AirlockHydroponics: AirlockHydroponicsLocked
-Biogenerator: null
+# Biogenerator: null # orehum нафига
 FloraGreyStalagmite: null
 FelinidCube: TajaranCube
