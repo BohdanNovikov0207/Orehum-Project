@@ -180,7 +180,7 @@ namespace Content.Server.Chemistry.EntitySystems
             if (fromBuffer)
             {
                 if (_solutionContainerSystem.TryGetSolution(chemMaster.Owner, SharedChemMaster.BufferSolutionName, out _, out var bufferSolution) &&
-                    _solutionContainerSystem.TryGetSolution(chemMaster.Owner, SharedChemMaster.PillSolutionName, out _, out var pillBufferSolution))
+                    _solutionContainerSystem.TryGetSolution(chemMaster.Owner, SharedChemMaster.PillBufferSolutionName, out _, out var pillBufferSolution))
                 {
                     var solution = isOutput ? pillBufferSolution : bufferSolution;
                     solution.RemoveReagent(id, amount, preserveOrder: true);
