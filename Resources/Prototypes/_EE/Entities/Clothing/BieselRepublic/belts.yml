@@ -13,6 +13,6 @@
     soundCollection:
       collection: FootstepTacticalWebbing
       params:
-        volume: -10
+        volume: -12.5
     distanceWalking: 2
     distanceSprinting: 3

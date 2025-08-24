@@ -39,6 +39,7 @@
         path: /Audio/Effects/beep_landmine.ogg
         params:
             maxDistance: 10
+  - type: PreventableStepTrigger
   - type: StepTrigger
     triggerGroups:
       types:

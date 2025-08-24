@@ -136,6 +136,9 @@ namespace Content.Client.Chemistry.UI
             BufferTransferButton.OnPressed += HandleDiscardTransferPress;
             BufferDiscardButton.OnPressed += HandleDiscardTransferPress;
 
+            PillBufferTransferButton.OnPressed += HandleDiscardTransferPressForPills; // Orehum fix pills menu
+            PillBufferDiscardButton.OnPressed += HandleDiscardTransferPressForPills; // Orehum fix pills menu
+
             CreateAmountButtons();
 
             OnAmountButtonPressed += amount => SetAmountText(amount.ToString());
@@ -193,6 +196,21 @@ namespace Content.Client.Chemistry.UI
                 button.Text = Loc.GetString($"chem-master-window-{text}-button-text");
             }
         }
+
+        // Orehum start fix pill menu
+        private void HandleDiscardTransferPressForPills(BaseButton.ButtonEventArgs args)
+        {
+            var buttons = PillBufferInfo.Children
+                .Where(c => c is Button)
+                .Cast<Button>();
+
+            foreach (var button in buttons)
+            {
+                var text = PillBufferTransferButton.Pressed ? "transfer" : "discard";
+                button.Text = Loc.GetString($"chem-master-window-{text}-button-text");
+            }
+        }
+        // Orehum end fix pill menu
 
         private void HandleSortMethodChange(int newSortMethod)
         {
@@ -298,7 +316,8 @@ namespace Content.Client.Chemistry.UI
             HandleSortMethodChange(castState.SortMethod);
             SetAmountText(castState.TransferringAmount.ToString(), false);
 
-            if (_amounts != castState.Amounts)
+            // Orehum fix custom amount always resets.
+            if (_amounts.Count == 0)
             {
                 _amounts = castState.Amounts;
                 _amounts.Sort();

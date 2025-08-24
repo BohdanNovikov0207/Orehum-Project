@@ -4,7 +4,7 @@ meta:
   engineVersion: 261.2.0
   forkId: ""
   forkVersion: ""
-  time: 08/23/2025 15:42:09
+  time: 08/24/2025 09:54:40
   entityCount: 13634
 maps:
 - 1
@@ -73533,7 +73533,7 @@ entities:
     components:
     - type: Transform
       rot: 1.5707963267948966 rad
-      pos: 19.5,-0.5
+      pos: 19.5,0.5
       parent: 2
     - type: SurveillanceCamera
       setupAvailableNetworks:

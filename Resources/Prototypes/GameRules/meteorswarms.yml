@@ -57,10 +57,10 @@
   components:
   - type: GameRule
   - type: BasicStationEventScheduler
-    minimumTimeUntilFirstEvent: 300 # 5 min
+    minimumTimeUntilFirstEvent: 450 # 7.5 min Orehum rebalanced
     minMaxEventTiming:
-      min: 750 # 12.5 min
-      max: 930 # 17.5 min
+      min: 900 # 15 min Orehum rebalanced
+      max: 1800 # 30 max Orehum rebalanced
     scheduledGameRules: !type:NestedSelector
       tableId: BasicMeteorSwarmEventsTable
 
