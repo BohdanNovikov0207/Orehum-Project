@@ -92,7 +92,7 @@ ent-ClothingUniformEnvirosuitBoxing = Защитный костюм боксер
      .desc = Используется боксерами плазмаменами
 ent-ClothingUniformEnvirosuitAdminAssistant = Защитный костюм помощника администратора
      .desc = Защитный костюм, который носит помощник администратора. Пахнет подгоревшим кофе.
-ent-ClothingUniformEnvirosuitBlackPink - черно-розовый Защитный костюм
+ent-ClothingUniformEnvirosuitBlackPink = черно-розовый Защитный костюм
      .desc = Черно-розовый защитный костюм в вашем районе!
 ent-ClothingUniformEnvirosuitBlackPinkAlt = Альтернативный черно-розовый Защитный костюм
      .desc Альтернативный черно-розовый защитный костюм в вашем районе!
