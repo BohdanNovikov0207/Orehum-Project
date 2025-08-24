@@ -251,4 +251,24 @@
 - files: ["tpbreathe.ogg"]
   license: "CC-BY-SA-3.0"
   copyright: "The Prodigy - Breathe."
-  source: "https://youtu.be/rmHDhAohJlQ?si=IDL3MvdmZbSfZs76"
+  sorce: "https://youtu.be/rmHDhAohJlQ?si=IDL3MvdmZbSfZs76"
+
+- files: ["Soviet-WW2.ogg"]
+  license: "CC-BY-SA-3.0"
+  copyright: "Soviet WW2 - Dark is the Night"
+  sorce: "https://www.youtube.com/watch?v=750QGi3RO0"
+
+- files: ["Paid-To-Party.ogg"]
+  license: "CC-BY-SA-3.0"
+  copyright: "Party Hard - Paid To Party by Felipe Adorno Vassao"
+  sorce: "https://www.youtube.com/watch?v=mybpH8K6K1o"
+
+- files: ["Party-Killer.ogg"]
+  license: "CC-BY-SA-3.0"
+  copyright: "Party Hard - Party Killer"
+  sorce: "https://www.youtube.com/watch?v=V9l4YLVUEtE"
+
+- files: ["PHLucky.ogg"]
+  license: "CC-BY-SA-3.0"
+  copyright: "Party Hard - Lucky"
+  sorce: "https://www.youtube.com/watch?v=Xef-kx_55kY"

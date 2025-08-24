@@ -89,6 +89,12 @@
     path: /Audio/_Orehum/Jukebox/crystals.ogg
 
 - type: jukebox
+  id: darknight
+  name: Soviet - Тёмная ночь
+  path:
+    path: /Audio/_Orehum/Jukebox/Soviet-WW2.ogg
+
+- type: jukebox
   id: disco
   name: Surf Curse - Disco
   path:
@@ -291,3 +297,21 @@
   name: Firelake - Dirge for Planet
   path:
     path: /Audio/_Orehum/Jukebox/dirgeforplanet.ogg
+
+- type: jukebox
+  id: paidtoparty
+  name: Party Hard - Paid to Party
+  path:
+    path: /Audio/_Orehum/Jukebox/Paid-To-Party.ogg
+
+- type: jukebox
+  id: partykiller
+  name: Party Hard - Party Killer
+  path:
+    path: /Audio/_Orehum/Jukebox/Party-Killer.ogg
+
+- type: jukebox
+  id: phlucky
+  name: Party Hard - Lucky
+  path:
+    path: /Audio/_Orehum/Jukebox/PHLucky.ogg
