@@ -6,6 +6,10 @@
   placement:
     mode: AlignTileAny
   components:
+  - type: Electrified # corvaxgoob
+    mediumVoltageNode: input
+    mediumVoltageDamageMultiplier: 10
+    requirePower: true
   - type: StationAiWhitelist
   - type: BluespaceHarvester
   - type: Appearance
@@ -69,10 +73,12 @@
   - type: NodeContainer
     examinable: true
     nodes:
-      input: !type:CableDeviceNode
-        nodeGroupID: HVPower
+      input:
+        !type:CableDeviceNode
+        nodeGroupID: MVPower
   - type: PowerConsumer
-    voltage: High
+    voltage: Medium
+  - type: LitOnPowered
   - type: AmbientSound
     enabled: false
     volume: -1
