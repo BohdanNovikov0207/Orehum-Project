@@ -102,7 +102,7 @@ public sealed class AntiMeteorShieldSystem : EntitySystem
         //var dmg = structDmg.Float() / shieldGenerator.DamageReducerModifier;
         var dmg = damage.GetTotal().Float() / shieldGenerator.DamageReducerModifier;
 
-        if (dmg <= 1.6f) // скип удары руками щиткод стайл
+        if (dmg <= shieldGenerator.IgnoreDamage) // скип удары руками щиткод стайл
             return false;
 
         if (shieldGenerator.Health <= dmg)

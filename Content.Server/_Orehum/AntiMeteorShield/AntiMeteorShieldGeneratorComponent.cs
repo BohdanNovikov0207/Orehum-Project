@@ -10,23 +10,26 @@ public sealed partial class AntiMeteorShieldGeneratorComponent : Component
     public bool Shutdown = false;
 
     [DataField]
-    public float ShutdownOnHealth = 20f;
+    public float ShutdownOnHealth = 10f;
 
     [DataField]
-    public float EnableOnHealth = 100f;
+    public float EnableOnHealth = 200f;
 
     [DataField]
-    public float Health = 360f; // TODO: Health должен быть FixedPoint
+    public float Health = 400f; // TODO: Health должен быть FixedPoint
 
     [DataField]
-    public float MaxHealth = 360f; // TODO: MaxHealth должен быть FixedPoint
+    public float MaxHealth = 400f; // TODO: MaxHealth должен быть FixedPoint
 
     [DataField]
-    public float DamageReducerModifier = 16f;
+    public float DamageReducerModifier = 20f;
+
+    [DataField]
+    public float IgnoreDamage = 2f;
 
     [DataField]
     public float Accumulated = 0f;
 
     [DataField]
-    public float SecondsToHealOneHp = 5f;
+    public float SecondsToHealOneHp = 4.5f;
 }
