@@ -26,6 +26,8 @@ using Content.Shared.Popups;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Toolshed.TypeParsers;
 using System.Linq;
+using Content.Shared.Silicon.Components;
+
 
 namespace Content.Shared._Shitmed.Medical.Surgery;
 
@@ -165,7 +167,7 @@ public abstract partial class SharedSurgerySystem
         }
 
 
-        if (!HasComp<ForcedSleepingComponent>(args.Body) && !HasComp<NoScreamComponent>(args.Body))
+        if (!HasComp<ForcedSleepingComponent>(args.Body) && !HasComp<NoScreamComponent>(args.Body) && !HasComp<SiliconComponent>(args.Body)) // Orehum fix silicons
             RaiseLocalEvent(args.Body, new MoodEffectEvent("SurgeryPain"));
         // Morphine - reenable this :)
         if (!_inventory.TryGetSlotEntity(args.User, "gloves", out var _)
