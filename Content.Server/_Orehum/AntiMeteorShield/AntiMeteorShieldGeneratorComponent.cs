@@ -22,7 +22,7 @@ public sealed partial class AntiMeteorShieldGeneratorComponent : Component
     public float MaxHealth = 400f; // TODO: MaxHealth должен быть FixedPoint
 
     [DataField]
-    public float DamageReducerModifier = 20f;
+    public float DamageReducerModifier = 23f;
 
     [DataField]
     public float IgnoreDamage = 2f;

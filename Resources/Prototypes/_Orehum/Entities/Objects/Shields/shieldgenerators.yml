@@ -7,7 +7,7 @@
   - type: Anchorable
   - type: AntiMeteorShieldGenerator
   - type: ApcPowerReceiver
-    powerLoad: 400000 # 400 kW
+    powerLoad: 350000 # 350 kW
   - type: ExtensionCableReceiver
     receptionRange: 1
   - type: Sprite
