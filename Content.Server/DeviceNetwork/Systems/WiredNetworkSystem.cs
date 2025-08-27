@@ -1,3 +1,4 @@
+using Content.Server._Orehum.Generic;
 using Content.Server.DeviceNetwork.Components;
 using JetBrains.Annotations;
 
@@ -17,7 +18,7 @@ namespace Content.Server.DeviceNetwork.Systems
         /// </summary>
         private void OnBeforePacketSent(EntityUid uid, WiredNetworkComponent component, BeforePacketSentEvent args)
         {
-            if (Transform(uid).GridUid != args.SenderTransform.GridUid)
+            if (Transform(uid).GridUid != args.SenderTransform.GridUid && !HasComp<WirelessAccessToWiredComponent>(args.Sender)) // Orehum fix listening post
             {
                 args.Cancel();
             }

@@ -3412,7 +3412,7 @@ entities:
       maxRange: 2048
     - type: WorldLoader
       radius: 2048
-- proto: ComputerSurveillanceCameraMonitor
+- proto: SyndicateComputerSurveillanceCameraMonitor
   entities:
   - uid: 991
     components:
