@@ -9,8 +9,8 @@ public sealed partial class GunSystem
     protected override void Cycle(EntityUid uid, BallisticAmmoProviderComponent component, MapCoordinates coordinates, GunComponent? gunComponent)
     {
         EntityUid? ent = null;
-        if (!Resolve(uid, ref gunComponent, false))
-            return;
+        //if (!Resolve(uid, ref gunComponent, false))
+        //    return;
 
         // TODO: Combine with TakeAmmo
         if (component.Entities.Count > 0)
