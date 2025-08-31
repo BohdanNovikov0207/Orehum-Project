@@ -35,8 +35,13 @@ public sealed partial class TraitStatModifierSystem : EntitySystem
             return;
 
         var critThreshold = _threshold.GetThresholdForState(uid, Mobs.MobState.Critical, threshold);
+        var deadThreshold = _threshold.GetThresholdForState(uid, Mobs.MobState.Dead, threshold); // orehum fix immortality
         if (critThreshold != 0)
             _threshold.SetMobStateThreshold(uid, critThreshold + component.CritThresholdModifier, Mobs.MobState.Critical);
+
+        critThreshold = _threshold.GetThresholdForState(uid, Mobs.MobState.Critical, threshold); // orehum fix immortality
+        if (deadThreshold <= critThreshold) // orehum fix immortality
+            _threshold.SetMobStateThreshold(uid, deadThreshold - 1, Mobs.MobState.Critical); // orehum fix immortality
     }
 
     private void OnDeadStartup(EntityUid uid, DeadModifierComponent component, ComponentStartup args)
@@ -44,9 +49,15 @@ public sealed partial class TraitStatModifierSystem : EntitySystem
         if (!TryComp<MobThresholdsComponent>(uid, out var threshold))
             return;
 
+        var critThreshold = _threshold.GetThresholdForState(uid, Mobs.MobState.Critical, threshold); // orehum fix immortality
         var deadThreshold = _threshold.GetThresholdForState(uid, Mobs.MobState.Dead, threshold);
+
         if (deadThreshold != 0)
             _threshold.SetMobStateThreshold(uid, deadThreshold + component.DeadThresholdModifier, Mobs.MobState.Dead);
+
+        deadThreshold = _threshold.GetThresholdForState(uid, Mobs.MobState.Dead, threshold); // orehum fix immortality
+        if (deadThreshold <= critThreshold) // orehum fix immortality
+            _threshold.SetMobStateThreshold(uid, deadThreshold - 1, Mobs.MobState.Critical); // orehum fix immortality
     }
 
     private void OnStaminaCritStartup(EntityUid uid, StaminaCritModifierComponent component, ComponentStartup args)
