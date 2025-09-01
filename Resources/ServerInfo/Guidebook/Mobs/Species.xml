@@ -16,7 +16,6 @@
   <GuideEntityEmbed Entity="MobShadowkinDummy" Caption="Шадовкин"/>
   <GuideEntityEmbed Entity="MobChitinid" Caption="Хитинид"/>
   <GuideEntityEmbed Entity="MobThaven" Caption="Тавен"/>
-  <GuideEntityEmbed Entity="MobResomi" Caption="Резоми"/>
   </Box>
 
   # Специфические виды парковых станций
