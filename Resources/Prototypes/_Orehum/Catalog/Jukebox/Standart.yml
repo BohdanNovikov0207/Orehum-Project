@@ -315,3 +315,27 @@
   name: Party Hard - Lucky
   path:
     path: /Audio/_Orehum/Jukebox/PHLucky.ogg
+
+- type: jukebox
+  id: harddrive
+  name: Griffinilla - Hard Drive
+  path:
+    path: /Audio/_Orehum/Jukebox/HARD-DRIVE.ogg
+
+- type: jukebox
+  id: badboys
+  name: BadBoysOfReggae - Bad Boys
+  path:
+    path: /Audio/_Orehum/Jukebox/BadBoys.ogg
+
+- type: jukebox
+  id: tfptows
+  name: The Stupendium - The Fine Print
+  path:
+    path: /Audio/_Orehum/Jukebox/TFPTOWS.ogg
+
+- type: jukebox
+  id: myway
+  name: Frank Sinatra - My Way
+  path:
+    path: /Audio/_Orehum/Jukebox/MyWay.ogg

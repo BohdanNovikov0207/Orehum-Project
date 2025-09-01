@@ -21,3 +21,12 @@
 - files: ["rubber_pig_5.ogg"]
   license: "CC-BY-4.0"
   copyright: "MattRuthSound from Freesound"
+
+- files: ["jeff.ogg"]
+  license: "CC-BY-4.0"
+  copyright: "NN from Freesound"
+
+- files: ["pAkva.ogg"]
+  license: "CC-BY-3.0"
+  copyright: "pony4 from Myinstants"
+  source: "https://www.myinstants.com/ru/instant/nya-button-13252/"

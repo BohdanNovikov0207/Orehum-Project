@@ -1,10 +1,9 @@
-using Content.Server.Body.Components;
-using Content.Shared.Nutrition.Components;
 using Content.Shared.FixedPoint;
 using Robust.Shared.Audio;
 using Robust.Shared.Prototypes;
 
-namespace Content.Server.Nutrition.Components;
+
+namespace Content.Shared.Nutrition.Components;
 
 [RegisterComponent]
 public sealed partial class FoodComponent : Component
@@ -35,7 +34,7 @@ public sealed partial class FoodComponent : Component
 
     /// <summary>
     ///     If this is set to true, food can only be eaten if you have a stomach with a
-    ///     <see cref="StomachComponent.SpecialDigestible"/> that includes this entity in its whitelist,
+    ///     <see cref="Content.Server.Body.Components.StomachComponent.SpecialDigestible"/> that includes this entity in its whitelist,
     ///     rather than just being digestible by anything that can eat food.
     ///     Whitelist the food component to allow eating of normal food.
     /// </summary>

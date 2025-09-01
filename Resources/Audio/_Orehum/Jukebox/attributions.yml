@@ -272,3 +272,23 @@
   license: "CC-BY-SA-3.0"
   copyright: "Party Hard - Lucky"
   sorce: "https://www.youtube.com/watch?v=Xef-kx_55kY"
+
+- files: ["HARD-DRIVE.ogg"]
+  license: "CC-BY-SA-3.0"
+  copyright: "Griffinilla - Hard Drive"
+  source: "https://www.youtube.com/watch?v=rdSXXwkuaT0"
+
+- files: ["BadBoys.ogg"]
+  license: "CC-BY-SA-3.0"
+  copyright: "BadBoysOfReggae - Bad Boys"
+  source: "https://www.youtube.com/watch?v=2Q3dGZPguSM"
+
+- files: ["TFPTOWS.ogg"]
+  license: "CC-BY-SA-3.0"
+  copyright: "The Stupendium - The fine print"
+  source: "https://www.youtube.com/watch?v=vvANy49Kqhw"
+
+- files: ["MyWay.ogg"]
+  license: "CC-BY-SA-3.0"
+  copyright: "Frank Sinatra - My Way"
+  source: "https://www.youtube.com/watch?v=qQzdAsjWGPg"

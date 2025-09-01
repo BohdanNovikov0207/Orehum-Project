@@ -1,0 +1,22 @@
+- type: department
+  id: Orehum
+  name: department-Orehum
+  description: department-Orehum-description
+  color: "#800080"
+  editorHidden: true
+
+- type: department
+  id: Exclusive
+  name: Эксклюзив
+  description: Для нубасиков
+  color: "#82CAFF"
+  editorHidden: true
+  roles:
+  - BestyExclusive
+
+- type: job
+  id: BestyExclusive
+  name: Эксклюзивный доступ (Sakuraq1)
+  description: Discord - sakuraq1
+  playTimeTracker: JobBestyExclusive
+  setPreference: false

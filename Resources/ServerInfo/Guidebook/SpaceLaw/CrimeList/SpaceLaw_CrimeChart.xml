@@ -11,13 +11,10 @@
 
   <ColorBox>
     <Box HorizontalAlignment="Center" VerticalAlignment="Center">
-      Преступления суммируются, если они не относятся к одной и той же категории, обозначенной цветом и скобками. Применяется высшая категория.
-      Для определения срока наказания в зависимости от степени тяжести.
+      Коды преступлений организованы по коду категории (_XX), 
+      который представляет собой набор не складываемых вместе преступлений в строке с префиксом тяжести (X__).
     </Box>
   </ColorBox>
-
-  [italic] Любые преступления [bold]не[/bold] отмеченные скобкой/цветом, считаются преступлениями без категории и могут быть объединены с конкретными исключениями.
-  Они описаны в отдельных разделах.[/italic]
 
   <Table Columns="6">
     <ColorBox>
@@ -25,38 +22,68 @@
         Код
       </Box>
     </ColorBox>
-    <ColorBox>
+    <ColorBox Color="#008000">
       <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
         1-XX:
-        \nЛёгкие преступления
+        \nЛёгкие нарушения
       </Box>
     </ColorBox>
-    <ColorBox>
+    <ColorBox Color="#808000">
       <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
         2-XX:
-        \nНезначительные
-        \nПреступления
+        \nСредние
+        \nНарушения
       </Box>
     </ColorBox>
-    <ColorBox>
+    <ColorBox Color="#804000">
       <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
         3-XX:
-        \nСредние
-        \nПреступления
+        \nТяжкие
+        \nНарушения
       </Box>
     </ColorBox>
-    <ColorBox>
+    <ColorBox Color="#800000">
       <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
         4-XX:
-        \nТяжкие
-        \nПреступления
+        \nОсобо тяжкие
+        \nНарушения
       </Box>
     </ColorBox>
-    <ColorBox>
+    <ColorBox Color="#121212">
       <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
         5-XX:
         \nКритические
-        \nПреступления
+        \nНарушения
+      </Box>
+    </ColorBox>
+    <ColorBox>
+      <Box HorizontalAlignment="Center" VerticalAlignment="Stretch" Margin="2">
+        X-00
+      </Box>
+    </ColorBox>
+    <ColorBox Color="#006000">
+      <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
+        Оскорбление должностного лица
+      </Box>
+    </ColorBox>
+    <ColorBox Color="#606000">
+      <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
+        Сопротивление органам власти
+      </Box>
+    </ColorBox>
+    <ColorBox Color="#603000">
+      <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
+        Нападение на должностное лицо
+      </Box>
+    </ColorBox>
+    <ColorBox Color="#600000">
+      <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
+        Восстание
+      </Box>
+    </ColorBox>
+    <ColorBox Color="#191919">
+      <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
+        Убийство должностного лица
       </Box>
     </ColorBox>
     <ColorBox>
@@ -64,31 +91,29 @@
         X-01
       </Box>
     </ColorBox>
-    <ColorBox Color="#c02c2c">
+    <ColorBox Color="#006000">
       <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-        Нарушение порядка. (V)
+        Харассмент
       </Box>
     </ColorBox>
-    <ColorBox Color="#c02c2c">
+    <ColorBox Color="#606000">
       <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-        Нападение (V)
+        Нападение
       </Box>
     </ColorBox>
-    <ColorBox Color="#c02c2c">
+    <ColorBox Color="#603000">
       <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-        Отягч.
-        \nНападение (V)
+        Нанесение увечий
       </Box>
     </ColorBox>
-    <ColorBox Color="#c02c2c">
+    <ColorBox Color="#600000">
       <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-        Убийство (V)
+        Убийство
       </Box>
     </ColorBox>
-    <ColorBox Color="#c02c2c">
+    <ColorBox Color="#191919">
       <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-        Массовое
-        \nУбийство (V)
+        Уничтожение тела
       </Box>
     </ColorBox>
     <ColorBox>
@@ -96,31 +121,27 @@
         X-02
       </Box>
     </ColorBox>
-    <ColorBox>
-      <Box HorizontalAlignment="Center" VerticalAlignment="Stretch" Margin="2">
+    <ColorBox Color="#006000">
+      <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
       </Box>
     </ColorBox>
-    <ColorBox Color="#707c84">
+    <ColorBox Color="#606000">
       <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-        Карманное воровство (F)
+        Оборот наркотиков
       </Box>
     </ColorBox>
-    <ColorBox Color="#707c84">
+    <ColorBox Color="#603000">
       <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-        Малое
-        \nВоровство (F)
+        Оборот контрабанды
       </Box>
     </ColorBox>
-    <ColorBox Color="#707c84">
+    <ColorBox Color="#600000">
       <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-        Умеренное
-        \nВоровство (F)
+        Эксплуатация опасных веществ
       </Box>
     </ColorBox>
-    <ColorBox Color="#707c84">
+    <ColorBox Color="#191919">
       <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-        Крупное (F)
-        \nВоровство
       </Box>
     </ColorBox>
     <ColorBox>
@@ -128,33 +149,28 @@
         X-03
       </Box>
     </ColorBox>
-    <ColorBox Color="#c5a252">
+    <ColorBox Color="#006000">
       <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-        Незначительный
-        \nВандализм (S)
+        Злоупотребление экипировкой
       </Box>
     </ColorBox>
-    <ColorBox Color="#c5a252">
+    <ColorBox Color="#606000">
       <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-        Малый
-        \nВандализм (S)
+        Владение боевым приспособлением
       </Box>
     </ColorBox>
-    <ColorBox Color="#c5a252">
+    <ColorBox Color="#603000">
       <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-        Крупный
-        \nВандализм (S)
+        Владение боевым оружием
       </Box>
     </ColorBox>
-    <ColorBox Color="#c5a252">
+    <ColorBox Color="#600000">
       <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-        Саботаж (S)
+        Распространение оружия
       </Box>
     </ColorBox>
-    <ColorBox Color="#c5a252">
+    <ColorBox Color="#191919">
       <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-        Крупный
-        \nСаботаж (S)
       </Box>
     </ColorBox>
     <ColorBox>
@@ -162,34 +178,28 @@
         X-04
       </Box>
     </ColorBox>
-    <ColorBox Color="#707c9c">
+    <ColorBox Color="#006000">
       <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-        Владение
-        \nНаркотиками. (D)
+        Хулиганство
       </Box>
     </ColorBox>
-    <ColorBox Color="#707c9c">
+    <ColorBox Color="#606000">
       <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-        Нелегальное
-        \nРаспространение. (D)
+        Порча имущества
       </Box>
     </ColorBox>
-    <ColorBox Color="#58181F">
+    <ColorBox Color="#603000">
       <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-        Враждебный
-        \nАгент (H)
+        Мошенничество
       </Box>
     </ColorBox>
-    <ColorBox Color="#58181F">
+    <ColorBox Color="#600000">
       <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-        Враждебная
-        \nАктивность (H)
       </Box>
     </ColorBox>
-    <ColorBox Color="#58181F">
+    <ColorBox Color="#191919">
       <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-        Враг
-        \nСтанции (H)
+        Теракт
       </Box>
     </ColorBox>
     <ColorBox>
@@ -197,34 +207,29 @@
         X-05
       </Box>
     </ColorBox>
-    <ColorBox Color="#daa520">
+    <ColorBox Color="#006000">
       <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-        Нарушение
-        \nКоммуникации (X)
+      Мелкая кража
       </Box>
     </ColorBox>
-    <ColorBox Color="#daa520">
+    <ColorBox Color="#606000">
       <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-        Нарушение общ.
-        \nПорядка (X)
+      Персональная кража
       </Box>
     </ColorBox>
-    <ColorBox Color="#bd5419">
+    <ColorBox Color="#603000">
       <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-        Незначительная
-        \nКонтрабанда (C)
+        Кража
       </Box>
     </ColorBox>
-    <ColorBox Color="#bd5419">
+    <ColorBox Color="#600000">
       <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-        Значительная
-        \nКонтрабанда (C)
+        Разбой
       </Box>
     </ColorBox>
-    <ColorBox Color="#bd5419">
+    <ColorBox Color="#191919">
       <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-        Корпоративная
-        \nКонтрабанда (C)
+        Особо крупное хищение
       </Box>
     </ColorBox>
     <ColorBox>
@@ -232,30 +237,29 @@
         X-06
       </Box>
     </ColorBox>
-    <ColorBox>
+    <ColorBox Color="#006000">
+      <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
+        Проникновение
+      </Box>
+    </ColorBox>
+    <ColorBox Color="#606000">
       <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
       </Box>
     </ColorBox>
-    <ColorBox>
+    <ColorBox Color="#603000">
       <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-      Вигилантизм
+        Проникновение 
+        \nв стратегическую точку
       </Box>
     </ColorBox>
-    <ColorBox Color="#2e195b">
+    <ColorBox Color="#600000">
       <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-        Бунт (R)
       </Box>
     </ColorBox>
-    <ColorBox Color="#2e195b">
+    <ColorBox Color="#191919">
       <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-        Подстрекательство
-        \nк Бунту (R)
-      </Box>
-    </ColorBox>
-    <ColorBox Color="#2e195b">
-      <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-        Подрыв (R)
-        \nКомандования (R)
+        Проникновение в защищённую
+        \nстратегическую точку
       </Box>
     </ColorBox>
     <ColorBox>
@@ -263,192 +267,28 @@
         X-07
       </Box>
     </ColorBox>
-    <ColorBox Color="#555555">
-      <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-        Малая
-        \nХалатность (N)
-      </Box>
-    </ColorBox>
-    <ColorBox Color="#555555">
-      <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-        Большая
-        \nХалатность (N)
-      </Box>
-    </ColorBox>
-    <ColorBox Color="#555555">
-      <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-        Пренебрежение
-        \nОбязанностями (N)
-      </Box>
-    </ColorBox>
-    <ColorBox Color="#775555">
-      <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-        Непредумышленное убийство
-        \n(V/N)
-      </Box>
-    </ColorBox>
-    <ColorBox Color="#775555">
-      <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-        Биологический
-        \nТерроризм
-        \n(V/N)
-      </Box>
-    </ColorBox>
-    <ColorBox>
-      <Box HorizontalAlignment="Center" VerticalAlignment="Stretch" Margin="2">
-        X-08
-      </Box>
-    </ColorBox>
-    <ColorBox>
+    <ColorBox Color="#006000">
       <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
       </Box>
     </ColorBox>
-    <ColorBox Color="#ba8e23">
+    <ColorBox Color="#606000">
       <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-        Проникновение не в охраняемые зоны (T)
+        Халатность
       </Box>
     </ColorBox>
-    <ColorBox Color="#ba8e23">
+    <ColorBox Color="#603000">
       <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-        Проникновение в
-        \nОхраняемое зону (T)
+        Саботаж
       </Box>
     </ColorBox>
-    <ColorBox Color="#ba8e23">
+    <ColorBox Color="#600000">
       <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-        Проникновение в особо
-        \nОхраняемое зону (T)
+        Грубая халатность
       </Box>
     </ColorBox>
-    <ColorBox>
+    <ColorBox Color="#191919">
       <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-        Отказ от
-        \nМентальной
-        \nЗащиты
-      </Box>
-    </ColorBox>
-    <ColorBox>
-      <Box HorizontalAlignment="Center" VerticalAlignment="Stretch" Margin="2">
-        X-09
-      </Box>
-    </ColorBox>
-    <ColorBox>
-      <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-      </Box>
-    </ColorBox>
-    <ColorBox>
-      <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-        Дискриминационный
-        \nЯзык
-      </Box>
-    </ColorBox>
-    <ColorBox>
-      <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-        \nНеповиновение
-      </Box>
-    </ColorBox>
-    <ColorBox Color="#555555">
-      <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-        Пренебрежение (N)
-      </Box>
-    </ColorBox>
-    <ColorBox>
-      <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-      Шпионаж
-      </Box>
-    </ColorBox>
-    <ColorBox>
-      <Box HorizontalAlignment="Center" VerticalAlignment="Stretch" Margin="2">
-        X-10
-      </Box>
-    </ColorBox>
-    <ColorBox>
-      <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-      </Box>
-    </ColorBox>
-    <ColorBox Color="#84a070">
-      <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-      Причинение вреда
-      \nЖивотным (A)
-      </Box>
-    </ColorBox>
-    <ColorBox Color="#84a070">
-      <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-        Жестокое обращение
-        \nс Животными (A)
-      </Box>
-    </ColorBox>
-    <ColorBox>
-      <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-        Кража/
-        \nПохижение Личности
-      </Box>
-    </ColorBox>
-    <ColorBox>
-      <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-      </Box>
-    </ColorBox>
-    <ColorBox>
-      <Box HorizontalAlignment="Center" VerticalAlignment="Stretch" Margin="2">
-        X-11
-      </Box>
-    </ColorBox>
-    <ColorBox Color="#db7093">
-      <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-        Незарегистрированный
-        \nПсионик (E)
-      </Box>
-    </ColorBox>
-    <ColorBox Color="#db7093">
-      <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-      Ложная информация
-      \nО псиониках (E)
-      </Box>
-    </ColorBox>
-    <ColorBox>
-      <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-      </Box>
-    </ColorBox>
-    <ColorBox Color="#db7093">
-      <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-        Ломка сознания (E)
-      </Box>
-    </ColorBox>
-    <ColorBox>
-      <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-      </Box>
-    </ColorBox>
-    <ColorBox>
-      <Box HorizontalAlignment="Center" VerticalAlignment="Stretch" Margin="2">
-        X-12
-      </Box>
-    </ColorBox>
-    <ColorBox>
-      <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-      </Box>
-    </ColorBox>
-    <ColorBox Color="#db7093">
-      <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-        Мелкое злоупотребление
-        \nПсионикой (E)
-      </Box>
-    </ColorBox>
-    <ColorBox Color="#db7093">
-      <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-        Вредоносное
-        \nИспользование
-        \nПсионики (E)
-      </Box>
-    </ColorBox>
-    <ColorBox Color="#db7093">
-      <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
-        Опасное
-        \nИспользование
-        \nПсионики (E)
-      </Box>
-    </ColorBox>
-    <ColorBox>
-      <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="2">
+        Особо крупный саботаж
       </Box>
     </ColorBox>
   </Table>

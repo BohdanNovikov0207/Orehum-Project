@@ -25,6 +25,8 @@ using Content.Shared.Movement.Pulling.Systems;
 using Content.Shared.Overlays.Switchable;
 using Robust.Shared.Utility;
 using Robust.Shared.Physics.Components;
+using FoodComponent = Content.Shared.Nutrition.Components.FoodComponent;
+
 
 namespace Content.Server.Changeling;
 

@@ -12,6 +12,8 @@ using Content.Shared.Players;
 using Content.Shared.Station.Components;
 using Robust.Server.Player;
 using Robust.Shared.Player;
+using FoodComponent = Content.Shared.Nutrition.Components.FoodComponent;
+
 
 namespace Content.Server.StationEvents.Events;
 

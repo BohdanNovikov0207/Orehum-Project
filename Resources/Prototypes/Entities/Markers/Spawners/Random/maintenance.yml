@@ -121,6 +121,8 @@
       - id: MysteryFigureBox
       - id: RubberChicken
       - id: RubberPig
+      - id: PlushieJeff
+      - id: PlushieAkva
       # Cult
       - !type:AllSelector
         children:
