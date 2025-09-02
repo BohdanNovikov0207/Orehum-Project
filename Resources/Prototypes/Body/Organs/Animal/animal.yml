@@ -119,6 +119,11 @@
   - type: Item
     size: Small
     heldPrefix: stomach
+  - type: Tag # goob edit
+    tags:
+    - Meat
+    - Organ
+    - Stomach
 
 - type: entity
   id: OrganAnimalLiver
@@ -192,3 +197,8 @@
   - type: Item
     size: Small
     heldPrefix: kidneys
+  - type: Tag # goob edit
+    tags:
+    - Meat
+    - Organ
+    - Kidneys

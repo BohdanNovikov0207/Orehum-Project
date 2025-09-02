@@ -60,6 +60,8 @@
   - type: Tag # goob edit
     tags:
     - Meat
+    - Organ
+    - Liver
   - type: Item
     size: Small
     heldPrefix: liver

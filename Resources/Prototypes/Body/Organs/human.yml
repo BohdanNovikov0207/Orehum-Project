@@ -28,7 +28,6 @@
       - Meat
       - Organ
 
-
 - type: entity
   id: BaseHumanOrgan
   parent: BaseHumanOrganUnGibbable
@@ -82,7 +81,7 @@
 
 - type: entity
   id: OrganHumanEyes
-  parent: [BaseHumanOrgan, OrganEyesTag] # fix heretic
+  parent: BaseHumanOrgan
   name: eyes
   description: "I see you!"
   components:
@@ -93,6 +92,11 @@
     layers:
       - state: eyeball-l
       - state: eyeball-r
+  - type: Tag # goob edit
+    tags:
+    - Meat
+    - Organ
+    - Eyes
 
 - type: entity
   id: OrganHumanTongue
@@ -126,7 +130,7 @@
 
 - type: entity
   id: OrganHumanLungs
-  parent: [BaseHumanOrgan, OrganLungsTag] # fix heretic
+  parent: BaseHumanOrgan
   name: lungs
   description: "Filters oxygen from an atmosphere, which is then sent into the bloodstream to be used as an electron carrier."
   components:
@@ -159,10 +163,15 @@
         reagents:
         - ReagentId: UncookedAnimalProteins
           Quantity: 5
+  - type: Tag # goob edit
+    tags:
+    - Meat
+    - Organ
+    - Lungs
 
 - type: entity
   id: OrganHumanHeart
-  parent: [BaseHumanOrgan, OrganHeartTag] # fix heretic
+  parent: BaseHumanOrgan
   name: heart
   description: "I feel bad for the heartless bastard who lost this."
   components:
@@ -181,10 +190,15 @@
     - id: Medicine
     - id: Poison
     - id: Narcotic
+  - type: Tag # goob edit
+    tags:
+    - Meat
+    - Organ
+    - Heart
 
 - type: entity
   id: OrganHumanStomach
-  parent: [BaseHumanOrgan, OrganStomachTag] # fix heretic
+  parent: BaseHumanOrgan
   name: stomach
   description: "Gross. This is hard to stomach."
   components:
@@ -212,10 +226,15 @@
     groups:
     - id: Food
     - id: Drink
+  - type: Tag # goob edit
+    tags:
+    - Meat
+    - Organ
+    - Stomach
 
 - type: entity
   id: OrganHumanLiver
-  parent: [BaseHumanOrgan, OrganLiverTag] # fix heretic
+  parent: BaseHumanOrgan
   name: liver
   description: "Pairing suggestion: chianti and fava beans."
   components:
@@ -230,10 +249,15 @@
     groups:
     - id: Alcohol
       rateModifier: 0.1 # removes alcohol very slowly along with the stomach removing it as a drink
+  - type: Tag # goob edit
+    tags:
+    - Meat
+    - Organ
+    - Liver
 
 - type: entity
   id: OrganHumanKidneys
-  parent: [BaseHumanOrgan, OrganKidneysTag] # fix heretic
+  parent: BaseHumanOrgan
   name: kidneys
   description: "Filters toxins from the bloodstream."
   components:
@@ -248,3 +272,8 @@
     maxReagents: 5
     metabolizerTypes: [Human]
     removeEmpty: true
+  - type: Tag # goob edit
+    tags:
+    - Meat
+    - Organ
+    - Kidneys

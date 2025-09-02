@@ -57,3 +57,10 @@
     - Meat
     - Organ
     - Liver
+
+
+  - type: Tag
+    tags:
+    - Meat
+    - Organ
+    - Brain

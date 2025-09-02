@@ -69,7 +69,7 @@
 
 - type: entity
   id: OrganDionaEyes
-  parent: [BaseDionaOrgan, OrganEyesTag] # fix heretic
+  parent: BaseDionaOrgan
   name: eyes
   description: "I see you!"
   components:
@@ -80,10 +80,15 @@
   - type: Organ # Shitmed
     slotId: eyes
   - type: Eyes
+  - type: Tag # goob edit
+    tags:
+    - Meat
+    - Organ
+    - Eyes
 
 - type: entity
   id: OrganDionaStomach
-  parent: [BaseDionaOrgan, OrganStomachTag] # fix heretic
+  parent: BaseDionaOrgan
   name: stomach
   description: "The diona's equivalent of a stomach, it reeks of asparagus and vinegar."
   components:
@@ -116,10 +121,15 @@
   - type: Item
     size: Small
     heldPrefix: stomach
+  - type: Tag # goob edit
+    tags:
+    - Meat
+    - Organ
+    - Stomach
 
 - type: entity
   id: OrganDionaLungs
-  parent: [BaseDionaOrgan, OrganLungsTag] # fix heretic
+  parent: BaseDionaOrgan
   name: lungs
   description: "A spongy mess of slimy, leaf-like structures. Capable of breathing both carbon dioxide and oxygen."
   components:
@@ -149,6 +159,11 @@
       Lung:
         maxVol: 100
         canReact: False
+  - type: Tag # goob edit
+    tags:
+    - Meat
+    - Organ
+    - Lungs
 
 # Organs that turn into nymphs on removal
 - type: entity
@@ -165,13 +180,18 @@
 
 - type: entity
   id: OrganDionaStomachNymph
-  parent: [OrganDionaStomach, OrganStomachTag] # fix heretic
+  parent: OrganDionaStomach
   categories: [ HideSpawnMenu ]
   name: stomach
   description: "Gross. This is hard to stomach."
   components:
   - type: Nymph
     entityPrototype: OrganDionaNymphStomach
+  - type: Tag # goob edit
+    tags:
+    - Meat
+    - Organ
+    - Stomach
 
 - type: entity
   id: OrganDionaLungsNymph
@@ -182,6 +202,11 @@
   components:
   - type: Nymph
     entityPrototype: OrganDionaNymphLungs
+  - type: Tag # goob edit
+    tags:
+    - Meat
+    - Organ
+    - Lungs
 
 # Nymphs that the organs will turn into
 - type: entity
