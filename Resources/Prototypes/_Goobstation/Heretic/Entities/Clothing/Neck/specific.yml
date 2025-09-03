@@ -26,6 +26,7 @@
   - type: ThermalVision
     isEquipment: true
     isActive: true
+    pulseTime: -9999999.0 # Orehum fix thermalvision АААААААААААААААААААААААААААААААА
     color: white
     drawOverlay: false
     lightRadius: 0
