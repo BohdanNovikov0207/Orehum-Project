@@ -40,6 +40,35 @@
   - type: MidRoundAntagRule
     spawner: SpawnPointGhostParadoxAnomaly
 
+# glimmer event sheduler
+- type: entity
+  parent: BaseGameRule
+  id: GlimmerEventScheduler
+  components:
+  - type: BasicStationEventScheduler
+    minMaxEventTiming:
+      min: 300
+      max: 1500
+    scheduledGameRules: !type:NestedSelector
+      tableId: GlimmerEventsTable
+
+# glimmer event table
+- type: entityTable
+  id: GlimmerEventsTable
+  table: !type:AllSelector # we need to pass a list of rules, since rules have further restrictions to consider via StationEventComp and GlimmerEventComp
+    children:
+    - id: MundaneDischarge
+    - id: NoosphericZap
+    - id: NoosphericFry
+    - id: PsionicCatGotYourTongue
+    - id: MassMindSwap
+    - id: GlimmerWispSpawn
+    - id: FreeProber
+    - id: GlimmerRevenantSpawn
+    - id: GlimmerMiteSpawn
+    - id: GlimmerRandomSentience
+    #- id: ThavenMoodUpset
+
 # Base glimmer event
 - type: entity
   id: BaseGlimmerEvent

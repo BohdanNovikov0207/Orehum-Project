@@ -13,6 +13,7 @@
     - SpaceTrafficControlEventScheduler
     - BasicRoundstartVariation
     - LavalandStormScheduler
+    - GlimmerEventScheduler # fix glimmer events
 
 - type: gamePreset
   id: Heretic
@@ -28,3 +29,5 @@
   - SubGamemodesRule
   - BasicStationEventScheduler
   - MeteorSwarmScheduler
+  - LavalandStormScheduler
+  - GlimmerEventScheduler # fix glimmer events

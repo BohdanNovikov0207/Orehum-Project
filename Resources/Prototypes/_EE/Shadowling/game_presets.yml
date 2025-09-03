@@ -16,3 +16,4 @@
   - SpaceTrafficControlEventScheduler
   - BasicRoundstartVariation
   - LavalandStormScheduler
+  - GlimmerEventScheduler # fix glimmer events
