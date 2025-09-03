@@ -284,7 +284,7 @@
       color: "#fcdf74"
   - type: Tag
     tags:
-    - Book
+    
   - type: GuideHelp
     openOnActivation: true
     guides:
