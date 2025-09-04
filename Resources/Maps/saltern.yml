@@ -4,8 +4,8 @@ meta:
   engineVersion: 261.2.0
   forkId: ""
   forkVersion: ""
-  time: 08/25/2025 13:23:06
-  entityCount: 13102
+  time: 09/04/2025 14:25:11
+  entityCount: 13106
 maps:
 - 1
 grids:
@@ -5497,7 +5497,7 @@ entities:
       pos: -16.5,2.5
       parent: 2
     - type: Door
-      secondsUntilStateChange: -110.97486
+      secondsUntilStateChange: -271.79523
       state: Opening
     - type: DeviceLinkSource
       lastSignals:
@@ -6036,7 +6036,7 @@ entities:
       pos: -16.5,-3.5
       parent: 2
     - type: Door
-      secondsUntilStateChange: -113.87486
+      secondsUntilStateChange: -274.69522
       state: Opening
     - type: DeviceLinkSource
       lastSignals:
@@ -67989,6 +67989,34 @@ entities:
     components:
     - type: Transform
       pos: -11.5,14.5
+      parent: 2
+- proto: SpawnPointSeniorEngineer
+  entities:
+  - uid: 13105
+    components:
+    - type: Transform
+      pos: 30.5,-1.5
+      parent: 2
+- proto: SpawnPointSeniorOfficer
+  entities:
+  - uid: 13103
+    components:
+    - type: Transform
+      pos: -13.5,15.5
+      parent: 2
+- proto: SpawnPointSeniorPhysician
+  entities:
+  - uid: 13104
+    components:
+    - type: Transform
+      pos: 21.5,-5.5
+      parent: 2
+- proto: SpawnPointSeniorResearcher
+  entities:
+  - uid: 13106
+    components:
+    - type: Transform
+      pos: -5.5,-31.5
       parent: 2
 - proto: SpawnPointServiceWorker
   entities:
