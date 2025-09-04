@@ -1,0 +1,17 @@
+- type: entity
+  id: XenoArtifactIncreaseGlimmer
+  parent: BaseXenoArtifactEffect
+  description: Увеличивает сияние
+  components:
+  - type: XAEGlimmer
+    min: 50.0
+    max: 500.0
+
+- type: entity
+  id: XenoArtifactDeсreaseGlimmer
+  parent: BaseXenoArtifactEffect
+  description: Уменьшает сияние
+  components:
+  - type: XAEGlimmer
+    min: -500.0
+    max: -50.0

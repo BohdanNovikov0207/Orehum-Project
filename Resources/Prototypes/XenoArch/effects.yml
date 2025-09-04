@@ -125,6 +125,12 @@
       weight: 4.0
     - id: XenoArtifactEffectCreationGasCarbonDioxide
       weight: 4.0
+    # orehum start new effects
+    - id: XenoArtifactIncreaseGlimmer
+      weight: 1.0
+    - id: XenoArtifactDeсreaseGlimmer
+      weight: 1.0
+    # orehum end new effects
 
 - type: entityTable
   id: XenoArtifactEffectsHandheldOnlyTable
