@@ -56,6 +56,7 @@ public abstract class SharedBarkSystem : EntitySystem
                     job ?? default!,
                     profile,
                     new Dictionary<string, TimeSpan>(),
+                    [],
                     false,
                     prototype,
                     EntityManager,
@@ -134,6 +135,7 @@ public abstract class SharedBarkSystem : EntitySystem
         return currBark;
     }
 
+<<<<<<< HEAD
     public void Bark(Entity<BarkComponent> entity, string text, bool isWhisper)
     {
         var ev = new TransformSpeakerBarkEvent(entity, entity.Comp.VoiceData);
@@ -151,3 +153,10 @@ public sealed class TransformSpeakerBarkEvent(EntityUid sender, BarkVoiceData vo
     public EntityUid Sender = sender;
     public BarkVoiceData VoiceData = voiceData;
 }
+=======
+    public void Bark(Entity<BarkComponent> entity, string text, bool isWhisper) =>
+        Bark(entity, GenBarkData(entity.Comp.VoiceData, text, isWhisper));
+
+    public abstract void Bark(Entity<BarkComponent> entity, List<BarkData> barks);
+}
+>>>>>>> 916d889fc42 (- add: Bark (#827))

@@ -22,8 +22,9 @@ using Robust.Shared.Serialization.Markdown;
 using Robust.Shared.Utility;
 using YamlDotNet.RepresentationModel;
 using Content.Shared._EE.GenderChange;
+using Content.Shared._White.Bark.Systems;
 
-namespace Content.Shared.Humanoid;
+ namespace Content.Shared.Humanoid;
 
 /// <summary>
 ///     HumanoidSystem. Primarily deals with the appearance and visual data
@@ -43,6 +44,7 @@ public abstract class SharedHumanoidAppearanceSystem : EntitySystem
     [Dependency] private readonly ISerializationManager _serManager = default!;
     [Dependency] private readonly HeightAdjustSystem _heightAdjust = default!;
     [Dependency] private readonly ISharedPlayerManager _sharedPlayerManager = default!;
+    [Dependency] private readonly SharedBarkSystem _barkSystem = default!; // WWDP EDIT
 
     private ISharedSponsorsManager? _sponsors;
 
@@ -57,6 +59,21 @@ public abstract class SharedHumanoidAppearanceSystem : EntitySystem
 
     [ValidatePrototypeId<LifepathPrototype>]
     public const string DefaultLifepath = "Spacer";
+
+    // WD EDIT START
+    [ValidatePrototypeId<BodyTypePrototype>]
+    public const string DefaultBodyType = "HumanNormal";
+
+    // public const string DefaultVoice = "Aidar";
+    public const string DefaultBarkVoice = "Txt1";
+
+    // public static readonly Dictionary<Sex, string> DefaultSexVoice = new()
+    // {
+    //     { Sex.Male, "Aidar" },
+    //     { Sex.Female, "Kseniya" },
+    //     { Sex.Unsexed, "Baya" },
+    // };
+    // WD EDIT END
 
     public override void Initialize()
     {
@@ -410,6 +427,9 @@ public abstract class SharedHumanoidAppearanceSystem : EntitySystem
 
         SetSpecies(uid, profile.Species, false, humanoid);
         SetSex(uid, profile.Sex, false, humanoid);
+        // SetTTSVoice(uid, profile.Voice, false, humanoid); // WD EDIT
+        SetBodyType(uid, profile.BodyType, false, humanoid); // WD EDIT
+        _barkSystem.ApplyBark(uid, profile.BarkVoice, profile.BarkSettings); // WD EDIT
 
         humanoid.Gender = profile.Gender;
         if (TryComp<GrammarComponent>(uid, out var grammar))
