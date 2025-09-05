@@ -1,3 +1,4 @@
+advertisement-cigs-0 = Никотиновый рай.
 advertisement-cigs-1 = Космические сигареты приятны на вкус, как и положено сигаретам.
 advertisement-cigs-2 = Я лучше умру, чем брошу.
 advertisement-cigs-3 = Затянись!

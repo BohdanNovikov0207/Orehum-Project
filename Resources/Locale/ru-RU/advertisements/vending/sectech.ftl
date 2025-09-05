@@ -1,3 +1,4 @@
+advertisement-sectech-0 = Не забывайте: вред — это хорошо!
 advertisement-sectech-1 = Крушите черепа агентов Синдиката!
 advertisement-sectech-2 = Пробейте несколько голов!
 advertisement-sectech-3 = Не забывайте: вред — это хорошо!

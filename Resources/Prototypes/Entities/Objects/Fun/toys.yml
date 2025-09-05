@@ -179,6 +179,7 @@
     equippedPrefix: bee
     slots:
     - HEAD
+    - Pocket
 
 - type: entity
   parent: BasePlushie

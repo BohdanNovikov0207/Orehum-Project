@@ -1,3 +1,4 @@
+advertisement-bruiseomat-0 = Я жажду крови!
 advertisement-bruiseomat-1 = Я ГОЛОСУЮ ЗА ОБЪЯВЛЕНИЕ ВОЙНЫ!!!
 advertisement-bruiseomat-2 = Есть у кого ТК?
 advertisement-bruiseomat-3 = Кто-нибудь купил ЕМАГ?

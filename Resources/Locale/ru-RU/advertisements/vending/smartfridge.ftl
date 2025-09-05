@@ -1,3 +1,4 @@
+advertisement-smartfridge-0 = Доступно новое обновление прошивки.
 advertisement-smartfridge-1 = Hello world!
 advertisement-smartfridge-2 = ПОЖАЛУЙСТА, ВЫПУСТИТЕ МЕНЯ
 advertisement-smartfridge-3 = Я могу производить квинтиллион вычислений в секунду. Теперь я холодильник.
