@@ -23,6 +23,21 @@
   copyright: "From Katana ZERO."
   source: "https://www.youtube.com/watch?v=EO2lkMIxvUU"
 
+- files: ["LetItSnow.ogg"]
+  license: "CC-BY-SA-3.0"
+  copyright: "Let It Snow by Frank Sinatra"
+  source: "https://youtu.be/y5F_CUFuuto?si=mkXxUZJqw0up6zzN"
+
+- files: ["SixteenTons.ogg"]
+  license: "CC-BY-SA-3.0"
+  copyright: "Sixteen Tons by Tennessee Ford"
+  source: "https://youtu.be/BSvORvIjZiU?si=CawYv5gKDbcvNGBG"
+
+- files: ["SweetGreen.ogg"]
+  license: "CC-BY-SA-3.0"
+  copyright: "Sweet Ginder Green by Barrelhouse"
+  source: "https://www.youtube.com/watch?v=tvIo2ndPr68"
+
 - files: ["Caramelldansen.ogg"]
   license: "CC-BY-SA-3.0"
   copyright: "Caramelldansen by Caramella Girls."

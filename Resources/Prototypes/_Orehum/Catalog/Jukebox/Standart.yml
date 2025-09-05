@@ -17,6 +17,24 @@
     path: /Audio/_Orehum/Jukebox/avcehyegonet.ogg
 
 - type: jukebox
+  id: sweetgreen
+  name: Barrelhouse - Sweet Ginder Green
+  path:
+    path: /Audio/_Orehum/Jukebox/SweetGreen.ogg
+
+- type: jukebox
+  id: sixteentons
+  name: Tennessee - Sixteen Tons
+  path:
+    path: /Audio/_Orehum/Jukebox/SixteenTons.ogg
+
+- type: jukebox
+  id: letitsnow
+  name: Frank Sinatra - Let It Snow!
+  path:
+    path: /Audio/_Orehum/Jukebox/LetItSnow.ogg
+
+- type: jukebox
   id: becauseigothigh
   name: Afroman - Because I Got High
   path:
