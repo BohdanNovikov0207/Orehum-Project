@@ -1,6 +1,6 @@
 - type: entity
   id: XenoArtifactIncreaseGlimmer
-  parent: BaseXenoArtifactEffect
+  parent: BaseOneTimeXenoArtifactEffect
   description: Увеличивает сияние
   components:
   - type: XAEGlimmer
@@ -9,7 +9,7 @@
 
 - type: entity
   id: XenoArtifactDeсreaseGlimmer
-  parent: BaseXenoArtifactEffect
+  parent: BaseOneTimeXenoArtifactEffect
   description: Уменьшает сияние
   components:
   - type: XAEGlimmer
