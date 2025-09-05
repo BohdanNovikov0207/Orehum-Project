@@ -128,7 +128,7 @@
     # orehum start new effects
     - id: XenoArtifactIncreaseGlimmer
       weight: 1.0
-    - id: XenoArtifactDeсreaseGlimmer
+    - id: XenoArtifactDecreaseGlimmer
       weight: 1.0
     # orehum end new effects
 

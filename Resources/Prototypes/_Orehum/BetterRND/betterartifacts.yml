@@ -8,7 +8,7 @@
     max: 500.0
 
 - type: entity
-  id: XenoArtifactDeсreaseGlimmer
+  id: XenoArtifactDecreaseGlimmer
   parent: BaseOneTimeXenoArtifactEffect
   description: Уменьшает сияние
   components:

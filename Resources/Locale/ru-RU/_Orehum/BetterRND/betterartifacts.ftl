@@ -1,4 +1,4 @@
 ent-XenoArtifactIncreaseGlimmer = { ent-BaseXenoArtifactEffect }
     .desc = Увеличивает сияние
-ent-XenoArtifactDeсreaseGlimmer = { ent-BaseXenoArtifactEffect }
+ent-XenoArtifactDecreaseGlimmer = { ent-BaseXenoArtifactEffect }
     .desc = Уменьшает сияние
