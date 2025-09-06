@@ -15,7 +15,8 @@
     TelekineticPulsePower: 0.35
     PyrokineticFlare: 0.6 # Leads to summon imp and pyrokenisis
     NoosphericZapPower: 0.35
-    EatPsionicPower: 1.5 # orehum new psionic
+    EatPsionicPower: 3 # orehum new psionic
+    PoisonFoodPower: 1.5 # orehum new psionic
 
 - type: weightedRandom
   id: PsychoHistorianPowerPool # Significantly trimmed down pool, MUCH faster power generation. Free Telepathy.
