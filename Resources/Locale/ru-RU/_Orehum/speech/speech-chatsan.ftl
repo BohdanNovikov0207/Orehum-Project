@@ -33,3 +33,18 @@ orehum-chatsan-replacement-11 = вот как
 
 orehum-chatsan-word-12 = пж
 orehum-chatsan-replacement-12 = пожалуйста
+
+orehum-chatsan-word-13 = прив
+orehum-chatsan-replacement-13 = привет
+
+orehum-chatsan-word-14 = спс
+orehum-chatsan-replacement-14 = спасибо
+
+orehum-chatsan-word-15 = норм
+orehum-chatsan-replacement-15 = нормально
+
+orehum-chatsan-word-16 = пон
+orehum-chatsan-replacement-16 = понятно
+
+orehum-chatsan-word-17 = хз
+orehum-chatsan-replacement-17 = не знаю
