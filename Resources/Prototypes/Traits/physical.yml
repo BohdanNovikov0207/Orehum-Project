@@ -1346,9 +1346,9 @@
         - type: LiquorLifeline
         - type: LightweightDrunk
           boozeStrengthMultiplier: 0.5
-    #- !type:TraitAddComponent
-    #  components:
-    #    - type: ScottishAccent
+    - !type:TraitAddComponent
+      components:
+        - type: ScottishAccent
     - !type:TraitAddArmor
       damageModifierSets:
         - ExtremePoisonResistance
