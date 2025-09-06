@@ -1010,6 +1010,8 @@
     - Kelotane
     - Dexalin
     - Omnizine
+    - PsionicRegenerationEssence # orehum
+    - LotophagoiOil # orehum
 
 - type: entity
   id: XenoArtifactFoamDangerous
@@ -1032,6 +1034,8 @@
     - ChloralHydrate
     - Mold
     - Amatoxin
+    - OusianaDust # orehum
+    - SoulbreakerToxin # orehum
 
 - type: entity
   id: XenoArtifactPuddleRare

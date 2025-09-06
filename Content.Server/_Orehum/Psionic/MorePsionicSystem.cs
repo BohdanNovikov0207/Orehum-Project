@@ -8,7 +8,6 @@ using Content.Shared.Mobs.Systems;
 using Content.Shared.Popups;
 using Content.Shared.Psionics.Glimmer;
 
-
 namespace Content.Server._Orehum.Psionic;
 
 public sealed class MorePsionicSystem : EntitySystem
@@ -39,8 +38,7 @@ public sealed class MorePsionicSystem : EntitySystem
             foreach (var targetPsionicActivePower in targetPsionic.ActivePowers)
                 _psionicAbilities.InitializePsionicPower(args.Performer, targetPsionicActivePower, performerPsionic, true);
 
-            _psionicAbilities.RemoveAllPsionicPowers(args.Target, true);
-            RemCompDeferred<PsionicComponent>(args.Target);
+            _psionicAbilities.MindBreak(args.Target);
 
             var half = _threshold.GetThresholdForState(args.Target, MobState.Critical).Int() / 2;
             _damageable.TryChangeDamage(
