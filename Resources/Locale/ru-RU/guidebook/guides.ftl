@@ -196,3 +196,4 @@ guide-entry-rules-ban-types = Типы запретов
 guide-entry-rules-ban-durations = Длительность запрета
 guide-entry-writing = Разметка письма
 guide-entry-glossary = Словарь терминов
+guide-entry-martial-arts = Боевые искусства

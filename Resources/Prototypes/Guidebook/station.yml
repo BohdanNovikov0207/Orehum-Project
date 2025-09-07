@@ -11,6 +11,7 @@
   - LoadoutInfo
   - SettingLore
   - Psionics
+  - MartialArts
 
 - type: guideEntry
   id: Glossary
@@ -21,3 +22,8 @@
   id: Survival
   name: guide-entry-survival
   text: "/ServerInfo/Guidebook/Survival.xml"
+  
+- type: guideEntry
+  id: MartialArts
+  name: guide-entry-martial-arts
+  text: "/ServerInfo/Guidebook/MartialArts.xml"
