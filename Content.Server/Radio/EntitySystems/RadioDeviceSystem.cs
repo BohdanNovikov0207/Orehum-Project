@@ -211,7 +211,7 @@ public sealed class RadioDeviceSystem : EntitySystem
         }
     }
 
-    private void OnListen(EntityUid uid, RadioMicrophoneComponent component, ListenEvent args)
+    private void OnListen(EntityUid uid, RadioMicrophoneComponent component, ref ListenEvent args)
     {
         if (HasComp<RadioSpeakerComponent>(args.Source))
             return; // no feedback loops please.
@@ -220,7 +220,7 @@ public sealed class RadioDeviceSystem : EntitySystem
             _radio.SendRadioMessage(args.Source, args.Message, _protoMan.Index<RadioChannelPrototype>(component.BroadcastChannel), uid, /*Nuclear-14-start*/ frequency: component.Frequency /*Nuclear-14-end*/);
     }
 
-    private void OnAttemptListen(EntityUid uid, RadioMicrophoneComponent component, ListenAttemptEvent args)
+    private void OnAttemptListen(EntityUid uid, RadioMicrophoneComponent component, ref ListenAttemptEvent args)
     {
         if (component.PowerRequired && !this.IsPowered(uid, EntityManager)
             || component.UnobstructedRequired && !_interaction.InRangeUnobstructed(args.Source, uid, 0))

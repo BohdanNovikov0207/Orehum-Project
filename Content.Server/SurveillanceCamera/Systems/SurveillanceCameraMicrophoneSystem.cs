@@ -58,14 +58,14 @@ public sealed class SurveillanceCameraMicrophoneSystem : EntitySystem
             RemCompDeferred<ActiveListenerComponent>(uid);
     }
 
-    public void CanListen(EntityUid uid, SurveillanceCameraMicrophoneComponent microphone, ListenAttemptEvent args)
+    public void CanListen(EntityUid uid, SurveillanceCameraMicrophoneComponent microphone, ref ListenAttemptEvent args)
     {
         // TODO maybe just make this a part of ActiveListenerComponent?
         if (_whitelistSystem.IsBlacklistPass(microphone.Blacklist, args.Source))
             args.Cancel();
     }
 
-    public void RelayEntityMessage(EntityUid uid, SurveillanceCameraMicrophoneComponent component, ListenEvent args)
+    public void RelayEntityMessage(EntityUid uid, SurveillanceCameraMicrophoneComponent component, ref ListenEvent args)
     {
         if (!TryComp(uid, out SurveillanceCameraComponent? camera))
             return;

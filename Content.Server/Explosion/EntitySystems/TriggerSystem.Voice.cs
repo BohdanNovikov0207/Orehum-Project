@@ -33,7 +33,7 @@ namespace Content.Server.Explosion.EntitySystems
             if (component.IsRecording)
             {
                 var ev = new ListenAttemptEvent(args.Source);
-                RaiseLocalEvent(ent, ev);
+                RaiseLocalEvent(ent, ref ev);
 
                 if (ev.Cancelled)
                     return;
