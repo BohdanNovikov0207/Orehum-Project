@@ -171,7 +171,7 @@ public sealed class SacrificialAltarSystem : SharedSacrificialAltarSystem
     protected override void StopServiceToGod(Entity<SacrificialAltarComponent> ent, EntityUid user)
     {
         ent.Comp.StartedServiceToGod = false;
-        _popup.PopupEntity("Вы начали свое служение!", user);
+        _popup.PopupEntity("Вы окончили свое служение.", user);
         DirtyField(ent.AsNullable(), nameof(ent.Comp.StartedServiceToGod));
     }
     // Orehum End
