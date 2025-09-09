@@ -64,7 +64,7 @@ public sealed class ShadowkinSystem : EntitySystem
             _stamina.TakeStaminaDamage(uid, stamina.CritThreshold, stamina, uid);
     }
 
-    private void OnRejuvenate(EntityUid uid, ShadowkinComponent component, RejuvenateEvent args)
+    private void OnRejuvenate(EntityUid uid, ShadowkinComponent component, ref RejuvenateEvent args)
     {
         if (!HasComp<MindbrokenComponent>(uid))
             return;

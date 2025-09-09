@@ -247,7 +247,7 @@ namespace Content.Server.Atmos.EntitySystems
                 _fireEvents[ent] = tempDelta;
         }
 
-        private void OnRejuvenate(EntityUid uid, FlammableComponent component, RejuvenateEvent args)
+        private void OnRejuvenate(EntityUid uid, FlammableComponent component, ref RejuvenateEvent args)
         {
             Extinguish(uid, component);
         }

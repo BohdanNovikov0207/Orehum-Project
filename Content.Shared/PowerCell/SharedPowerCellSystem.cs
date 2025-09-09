@@ -29,7 +29,7 @@ public abstract class SharedPowerCellSystem : EntitySystem
         QueueUpdate((ent, ent.Comp));
     }
 
-    private void OnRejuvenate(EntityUid uid, PowerCellSlotComponent component, RejuvenateEvent args)
+    private void OnRejuvenate(EntityUid uid, PowerCellSlotComponent component, ref RejuvenateEvent args)
     {
         if (!_itemSlots.TryGetSlot(uid, component.CellSlotId, out var itemSlot) || !itemSlot.Item.HasValue)
             return;

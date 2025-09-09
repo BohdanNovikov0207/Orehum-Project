@@ -77,7 +77,7 @@ public abstract class SharedRottingSystem : EntitySystem
         RemCompDeferred(uid, component);
     }
 
-    private void OnRejuvenate(EntityUid uid, RottingComponent component, RejuvenateEvent args)
+    private void OnRejuvenate(EntityUid uid, RottingComponent component, ref RejuvenateEvent args)
     {
         RemCompDeferred<RottingComponent>(uid);
     }

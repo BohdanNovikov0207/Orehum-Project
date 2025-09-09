@@ -320,7 +320,7 @@ namespace Content.Shared.Damage
             TryChangeDamage(uid, damage, interruptsDoAfters: false, origin: args.Origin);
         }
 
-        private void OnRejuvenate(EntityUid uid, DamageableComponent component, RejuvenateEvent args)
+        private void OnRejuvenate(EntityUid uid, DamageableComponent component, ref RejuvenateEvent args)
         {
             TryComp<MobThresholdsComponent>(uid, out var thresholds);
             _mobThreshold.SetAllowRevives(uid, true, thresholds); // do this so that the state changes when we set the damage

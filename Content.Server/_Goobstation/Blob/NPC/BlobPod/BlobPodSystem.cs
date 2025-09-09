@@ -109,7 +109,7 @@ public sealed class BlobPodSystem : SharedBlobPodSystem
         _audioSystem.PlayPvs(ent.Comp.ZombifyFinishSoundPath, ent);
 
         var rejEv = new RejuvenateEvent();
-        RaiseLocalEvent(target, rejEv);
+        RaiseLocalEvent(target, ref rejEv);
 
         ent.Comp.ZombifiedEntityUid = target;
 

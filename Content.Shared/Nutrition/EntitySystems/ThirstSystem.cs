@@ -75,7 +75,7 @@ public sealed class ThirstSystem : EntitySystem
         args.ModifySpeed(mod, mod);
     }
 
-    private void OnRejuvenate(EntityUid uid, ThirstComponent component, RejuvenateEvent args)
+    private void OnRejuvenate(EntityUid uid, ThirstComponent component, ref RejuvenateEvent args)
     {
         SetThirst(uid, component, component.ThirstThresholds[ThirstThreshold.Okay]);
     }

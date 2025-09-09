@@ -205,7 +205,7 @@ public sealed class TemperatureSystem : EntitySystem
         comp.Temperature = temp.CurrentTemperature;
     }
 
-    private void OnRejuvenate(EntityUid uid, TemperatureComponent comp, RejuvenateEvent args)
+    private void OnRejuvenate(EntityUid uid, TemperatureComponent comp, ref RejuvenateEvent args)
     {
         ForceChangeTemperature(uid, Atmospherics.T20C, comp);
     }
@@ -342,7 +342,7 @@ public sealed class TemperatureSystem : EntitySystem
 
     private void ChangeTemperatureOnCollide(Entity<ChangeTemperatureOnCollideComponent> ent, ref ProjectileHitEvent args)
     {
-        _temperature.ChangeHeat(args.Target, ent.Comp.Heat, ent.Comp.IgnoreHeatResistance);// adjust the temperature 
+        _temperature.ChangeHeat(args.Target, ent.Comp.Heat, ent.Comp.IgnoreHeatResistance);// adjust the temperature
     }
 
     private void OnParentChange(EntityUid uid, TemperatureComponent component,

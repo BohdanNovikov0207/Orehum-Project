@@ -35,12 +35,12 @@ namespace Content.Server.Power.EntitySystems
             SubscribeLocalEvent<NetworkBatteryPostSync>(PostSync);
         }
 
-        private void OnNetBatteryRejuvenate(EntityUid uid, PowerNetworkBatteryComponent component, RejuvenateEvent args)
+        private void OnNetBatteryRejuvenate(EntityUid uid, PowerNetworkBatteryComponent component, ref RejuvenateEvent args)
         {
             component.NetworkBattery.CurrentStorage = component.NetworkBattery.Capacity;
         }
 
-        private void OnBatteryRejuvenate(EntityUid uid, BatteryComponent component, RejuvenateEvent args)
+        private void OnBatteryRejuvenate(EntityUid uid, BatteryComponent component, ref RejuvenateEvent args)
         {
             SetCharge(uid, component.MaxCharge, component);
         }

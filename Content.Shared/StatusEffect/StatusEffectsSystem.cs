@@ -87,7 +87,7 @@ namespace Content.Shared.StatusEffect
             }
         }
 
-        private void OnRejuvenate(EntityUid uid, StatusEffectsComponent component, RejuvenateEvent args)
+        private void OnRejuvenate(EntityUid uid, StatusEffectsComponent component, ref RejuvenateEvent args)
         {
             TryRemoveAllStatusEffects(uid, component);
         }

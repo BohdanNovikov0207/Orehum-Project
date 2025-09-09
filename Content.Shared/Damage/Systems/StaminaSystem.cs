@@ -110,7 +110,7 @@ public sealed partial class StaminaSystem : EntitySystem
         return MathF.Max(0f, component.StaminaDamage - MathF.Max(0f, (float) (curTime - (component.NextUpdate + pauseTime)).TotalSeconds * component.Decay));
     }
 
-    private void OnRejuvenate(EntityUid uid, StaminaComponent component, RejuvenateEvent args)
+    private void OnRejuvenate(EntityUid uid, StaminaComponent component, ref RejuvenateEvent args)
     {
         if (component.StaminaDamage >= component.CritThreshold)
         {

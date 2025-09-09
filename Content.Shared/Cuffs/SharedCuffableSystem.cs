@@ -153,7 +153,7 @@ namespace Content.Shared.Cuffs
             component.Container = _container.EnsureContainer<Container>(uid, _componentFactory.GetComponentName(component.GetType()));
         }
 
-        private void OnRejuvenate(EntityUid uid, CuffableComponent component, RejuvenateEvent args)
+        private void OnRejuvenate(EntityUid uid, CuffableComponent component, ref RejuvenateEvent args)
         {
             _container.EmptyContainer(component.Container, true);
         }

@@ -72,7 +72,7 @@ public sealed class HungerSystem : EntitySystem
         args.ModifySpeed(component.StarvingSlowdownModifier, component.StarvingSlowdownModifier);
     }
 
-    private void OnRejuvenate(EntityUid uid, HungerComponent component, RejuvenateEvent args)
+    private void OnRejuvenate(EntityUid uid, HungerComponent component, ref RejuvenateEvent args)
     {
         SetHunger(uid, component.Thresholds[HungerThreshold.Okay], component);
     }
