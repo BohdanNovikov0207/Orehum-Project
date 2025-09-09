@@ -40,7 +40,7 @@ public abstract class SharedAdminFrozenSystem : EntitySystem
         args.Cancelled = true;
     }
 
-    private void OnSpeakAttempt(EntityUid uid, AdminFrozenComponent component, SpeakAttemptEvent args)
+    private void OnSpeakAttempt(EntityUid uid, AdminFrozenComponent component, ref SpeakAttemptEvent args)
     {
         if (!component.Muted)
             return;

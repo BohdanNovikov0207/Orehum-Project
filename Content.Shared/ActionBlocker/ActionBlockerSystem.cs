@@ -150,7 +150,7 @@ namespace Content.Shared.ActionBlocker
         {
             // This one is used as broadcast
             var ev = new SpeakAttemptEvent(uid);
-            RaiseLocalEvent(uid, ev, true);
+            RaiseLocalEvent(uid, ref ev, true);
 
             return !ev.Cancelled;
         }

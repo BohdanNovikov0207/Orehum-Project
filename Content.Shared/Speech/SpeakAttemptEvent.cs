@@ -1,12 +1,16 @@
 ﻿namespace Content.Shared.Speech
 {
-    public sealed class SpeakAttemptEvent : CancellableEntityEventArgs
+    [ByRefEvent]
+    public record struct SpeakAttemptEvent(EntityUid Uid, bool Cancelled = false)
     {
-        public SpeakAttemptEvent(EntityUid uid)
-        {
-            Uid = uid;
-        }
+        /// <summary>
+        ///     Cancels the event.
+        /// </summary>
+        public void Cancel() => Cancelled = true;
 
-        public EntityUid Uid { get; }
+        /// <summary>
+        ///     Uncancels the event. Don't call this unless you know what you're doing.
+        /// </summary>
+        public void Uncancel() => Cancelled = false;
     }
 }

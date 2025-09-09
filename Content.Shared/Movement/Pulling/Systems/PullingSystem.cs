@@ -1083,7 +1083,7 @@ public sealed class PullingSystem : EntitySystem
 
     }
 
-    private void OnGrabbedSpeakAttempt(EntityUid uid, PullableComponent component, SpeakAttemptEvent args)
+    private void OnGrabbedSpeakAttempt(EntityUid uid, PullableComponent component, ref SpeakAttemptEvent args)
     {
         if (component.GrabStage != GrabStage.Suffocate)
             return;
