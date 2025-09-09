@@ -106,7 +106,7 @@ namespace Content.Shared.Examine
             if (examined != null)
             {
                 var ev = new ExamineAttemptEvent(examiner);
-                RaiseLocalEvent(examined.Value, ev);
+                RaiseLocalEvent(examined.Value, ref ev);
                 if (ev.Cancelled)
                     return false;
             }
@@ -532,13 +532,17 @@ namespace Content.Shared.Examine
     /// <summary>
     ///     Event raised directed at an entity that someone is attempting to examine
     /// </summary>
-    public sealed class ExamineAttemptEvent : CancellableEntityEventArgs
+    [ByRefEvent]
+    public record struct ExamineAttemptEvent(EntityUid Examiner, bool Cancelled = false)
     {
-        public readonly EntityUid Examiner;
+        /// <summary>
+        ///     Cancels the event.
+        /// </summary>
+        public void Cancel() => Cancelled = true;
 
-        public ExamineAttemptEvent(EntityUid examiner)
-        {
-            Examiner = examiner;
-        }
+        /// <summary>
+        ///     Uncancels the event. Don't call this unless you know what you're doing.
+        /// </summary>
+        public void Uncancel() => Cancelled = false;
     }
 }
