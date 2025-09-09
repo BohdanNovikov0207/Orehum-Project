@@ -62,7 +62,7 @@ namespace Content.Server.Forensics
             }
         }
 
-        private void OnInteract(EntityUid uid, FingerprintComponent component, ContactInteractionEvent args)
+        private void OnInteract(EntityUid uid, FingerprintComponent component, ref ContactInteractionEvent args)
         {
             ApplyEvidence(uid, args.Other);
         }

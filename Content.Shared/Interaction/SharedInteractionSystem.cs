@@ -1368,12 +1368,12 @@ namespace Content.Shared.Interaction
             if (!TryComp(uidB, out MetaDataComponent? metaB) || metaB.EntityPaused)
                 return ;
 
-            // TODO Struct event
+
             var ev = new ContactInteractionEvent(uidB.Value);
-            RaiseLocalEvent(uidA, ev);
+            RaiseLocalEvent(uidA, ref ev);
 
             ev.Other = uidA;
-            RaiseLocalEvent(uidB.Value, ev);
+            RaiseLocalEvent(uidB.Value, ref ev);
         }
 
 
