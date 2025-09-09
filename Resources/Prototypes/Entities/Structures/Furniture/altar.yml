@@ -33,6 +33,8 @@
   - type: GuideHelp
     guides:
     - AltarsGolemancy
+  - type: ActiveListener # orehum
+    range: 10 # orehum
 
 - type: entity
   id: AltarNanotrasen
