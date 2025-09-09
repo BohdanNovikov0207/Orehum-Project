@@ -35,7 +35,7 @@ public abstract class SharedPowerCellSystem : EntitySystem
             return;
 
         // charge entity batteries and remove booby traps.
-        RaiseLocalEvent(itemSlot.Item.Value, args);
+        RaiseLocalEvent(itemSlot.Item.Value, ref args);
     }
 
     private void OnCellInsertAttempt(EntityUid uid, PowerCellSlotComponent component, ContainerIsInsertingAttemptEvent args)
