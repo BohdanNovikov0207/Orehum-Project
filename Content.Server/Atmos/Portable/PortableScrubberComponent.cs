@@ -31,6 +31,8 @@ namespace Content.Server.Atmos.Portable
             Gas.Ammonia,
             Gas.NitrousOxide,
             Gas.Frezon,
+            Gas.HyperNoblium,
+            Gas.AntiNoblium
         };
 
         [ViewVariables(VVAccess.ReadWrite)]

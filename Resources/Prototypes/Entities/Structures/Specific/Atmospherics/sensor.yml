@@ -25,6 +25,8 @@
         Ammonia: stationAmmonia
         NitrousOxide: stationNO
         Frezon: danger
+        HyperNoblium: unwanted
+        AntiNoblium: danger
     - type: Tag
       tags:
         - AirSensor

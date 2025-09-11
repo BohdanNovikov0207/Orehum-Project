@@ -424,3 +424,23 @@
         - !type:ReagentThreshold
           reagent: Frezon
           min: 1
+
+- type: reagent
+  id: Hyper-Noblium
+  name: reagent-name-hyper-nob
+  desc: reagent-desc-hyper-nob
+  physicalDesc: reagent-physical-desc-gaseous
+  flavor: bitter
+  color: "#33cccc"
+  boilingPoint: -253.8
+  meltingPoint: -259.0
+
+- type: reagent
+  id: Anti-Noblium
+  name: reagent-name-hyper-anti-nob
+  desc: reagent-desc-hyper-anti-nob
+  physicalDesc: reagent-physical-desc-gaseous
+  flavor: bitter
+  color: "#525151"
+  boilingPoint: -253.8
+  meltingPoint: -259.0
