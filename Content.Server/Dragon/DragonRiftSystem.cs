@@ -15,6 +15,7 @@ using System.Numerics;
 using Robust.Shared.Audio;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Utility;
+using Robust.Shared.Random;
 
 namespace Content.Server.Dragon;
 
@@ -30,6 +31,7 @@ public sealed class DragonRiftSystem : EntitySystem
     [Dependency] private readonly NPCSystem _npc = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly AnnouncerSystem _announcer = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
 
     public override void Initialize()
     {
@@ -65,8 +67,6 @@ public sealed class DragonRiftSystem : EntitySystem
                 comp.Accumulator += frameTime;
             }
 
-            comp.SpawnAccumulator += frameTime;
-
             if (comp.State < DragonRiftState.AlmostFinished && comp.Accumulator > comp.MaxAccumulator / 2f)
             {
                 comp.State = DragonRiftState.AlmostFinished;
@@ -77,12 +77,16 @@ public sealed class DragonRiftSystem : EntitySystem
                 _navMap.SetBeaconEnabled(uid, true);
             }
 
-            if (comp.SpawnAccumulator > comp.SpawnCooldown)
+            comp.SpawnAccumulator += frameTime;
+            if (comp.SpawnAccumulator > comp.SpawnCooldown && comp.SpawnPrototypes.Count > 0)
             {
                 comp.SpawnAccumulator -= comp.SpawnCooldown;
-                var ent = Spawn(comp.SpawnPrototype, xform.Coordinates);
 
-                // Update their look to match the leader.
+                // Pick a random mob prototype from the list
+                var proto = _random.Pick(comp.SpawnPrototypes);
+                var ent = Spawn(proto, xform.Coordinates);
+
+                // Copy random sprite from the dragon to the spawned mob (if any)
                 if (TryComp<RandomSpriteComponent>(comp.Dragon, out var randomSprite))
                 {
                     var spawnedSprite = EnsureComp<RandomSpriteComponent>(ent);

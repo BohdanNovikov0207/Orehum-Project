@@ -61,6 +61,11 @@
   - type: PointLight
     enabled: true
     radius: 10
+  - type: InteractionPopup
+    successChance: 0.2
+    interactSuccessString: petting-success-singularity
+    interactFailureString: petting-failure-singularity
+    interactSuccessSpawn: EffectHearts
   - type: Appearance
   - type: GuideHelp
     guides: [ Singularity, Power ] # uhhh.. I would hoped they'd  have read the manual before ever getting in viewing distance...

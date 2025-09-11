@@ -1266,6 +1266,26 @@
   categories:
   - UplinkDisruption
 
+- type: listing
+  id: UplinkNuclearPhysicistKit
+  name: uplink-agent-nuclear-physicist-kit-name
+  description: uplink-agent-nuclear-physicist-kit-desc
+  productEntity: ClothingBackpackDuffelSyndicateCascade
+  cost:
+    Telecrystal: 4
+  categories:
+  - UplinkDisruption
+
+- type: listing
+  id: UplinkSyndicateSupermatterScalpel
+  name: uplink-supermatter-scalpel-name
+  description: uplink-supermatter-scalpel-desc
+  productEntity: ADTSupermatterScalpel
+  categories:
+    - UplinkDisruption
+  conditions:
+  - !type:ListingLimitedStockCondition
+    stock: 1
 # Allies
 
 - type: listing

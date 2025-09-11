@@ -572,7 +572,7 @@
   materials:
      Steel: 100
      Glass: 900
-     
+
 - type: latheRecipe
   parent: BaseGoldCircuitboardRecipe
   id: ShuttleGunPerforatorCircuitboard
@@ -587,7 +587,7 @@
   materials:
      Steel: 100
      Glass: 900
-     
+
 - type: latheRecipe
   parent: BaseGoldCircuitboardRecipe
   id: ShuttleGunFriendshipCircuitboard
@@ -597,7 +597,7 @@
      Steel: 100
      Glass: 900
      Gold: 50
-     
+
 - type: latheRecipe
   parent: BaseGoldCircuitboardRecipe
   id: ShuttleGunDusterCircuitboard
@@ -673,3 +673,8 @@
   parent: BaseGoldCircuitboardRecipe
   id: MaterialSiloCircuitboard
   result: MaterialSiloCircuitboard
+
+- type: latheRecipe
+  parent: BaseCircuitboardRecipe
+  id: SupermatterComputerCircuitboardRecipe
+  result: SupermatterComputerCircuitboard

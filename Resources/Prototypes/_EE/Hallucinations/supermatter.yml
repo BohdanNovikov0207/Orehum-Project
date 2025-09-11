@@ -1,0 +1,4 @@
+- type: hallucinationsPack
+  id: Supermatter
+  entities:
+  - MassHallucinations

@@ -112,6 +112,7 @@
   - type: SupermatterImmune
   - type: BypassInteractionChecks
   - type: PsionicInsulation
+  - type: SupermatterImmune
 
 - type: entity
   id: ActionAGhostShowSolar

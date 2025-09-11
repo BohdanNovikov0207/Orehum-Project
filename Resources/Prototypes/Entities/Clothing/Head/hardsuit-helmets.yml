@@ -368,6 +368,7 @@
   - type: PressureProtection
     highPressureMultiplier: 0.08
     lowPressureMultiplier: 1000
+  - type: SupermatterImmune
 
 #Chief Medical Officer's Hardsuit
 - type: entity
@@ -650,6 +651,7 @@
         Heat: 0.9
   - type: FlashImmunity # Goobstation
   - type: FlashSoundSuppression # Goobstation
+  - type: SupermatterImmune
 
 #Cybersun Juggernaut Hardsuit
 - type: entity
@@ -851,6 +853,7 @@
         Slash: 0.9
         Piercing: 0.9
         Heat: 0.9
+  - type: SupermatterImmune
 
 #ERT Medical Hardsuit
 - type: entity
@@ -1011,6 +1014,7 @@
   - type: FlashImmunity # Goobstation
   - type: FlashSoundSuppression # Goobstation
     protectionRange: 0
+  - type: SupermatterImmune
 
 #MISC. HARDSUITS
 #Clown Hardsuit
