@@ -18,26 +18,60 @@
       - MobState
 
 - type: entity
-  id: RandomAshWalkerEmptySpawn
-  name: Пеплоходец новорожденный
+  id: AshWalkerEmptyEgg
+  name: Яйцо
   components:
   - type: Sprite
-    sprite: Markers/cross.rsi
-    state: green
+    sprite: _Orehum/Objects/egg.rsi
+    state: egg1
+  - type: GhostRole
+    name: ghost-role-information-ashwalker-name
+    description: ghost-role-information-ashwalker-desc
+    rules: ghost-role-information-ashwalker-rules
+    raffle:
+      settings: short
+  - type: GhostRoleMobSpawner
+    prototype: RandomAshWalkerEmptySpawn
+  - type: Transform
+    noRot: true
+  - type: Physics
+    bodyType: KinematicController
+  - type: Clickable
+  - type: InteractionOutline
+  - type: Pullable
+  - type: Fixtures # я хз как это работает
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeAabb
+          bounds: "-0.25,-0.4,0.25,0.1"
+        density: 20
+        mask:
+        - SmallMobMask
+        layer:
+        - SmallMobLayer
+
+- type: entity
+  id: AshWalkerEgg
+  parent: AshWalkerEmptyEgg
+  name: Яйцо
+  components:
+  - type: GhostRoleMobSpawner
+    prototype: RandomAshWalkerSpawn
+  - type: Sprite
+    state: egg2
+
+- type: entity
+  id: RandomAshWalkerEmptySpawn
+  parent: MobAshWalker
+  name: Пеплоходец новорожденный
+  components:
+  - type: RandomHumanoidAppearance
+    randomizeName: false
   - type: RandomMetadata
     nameSegments:
     - names_reptilian_male
     - names_shadowkin # sounds fun
-  - type: RandomHumanoidSpawner
-    settings: AshWalkerEmptySettings
-
-- type: randomHumanoidSettings
-  id: AshWalkerEmptySettings
-  speciesWhitelist:
-  - AshWalker
-  components:
-  - type: RandomHumanoidAppearance
-    randomizeName: false
   - type: GhostRole
     name: ghost-role-information-ashwalker-name
     description: ghost-role-information-ashwalker-desc
@@ -45,24 +79,11 @@
     raffle:
       settings: short
   - type: GhostTakeoverAvailable
-  - type: RandomMetadata
-    nameSegments:
-    - names_reptilian_male
-    - names_shadowkin # sounds fun
 
 - type: entity
   id: RandomAshWalkerSpawn
   parent: RandomAshWalkerEmptySpawn
-  name: Пеплоходец
-  components:
-  - type: RandomHumanoidSpawner
-    settings: AshWalkerSettings
-
-- type: randomHumanoidSettings
-  id: AshWalkerSettings
-  parent: AshWalkerEmptySettings
-  speciesWhitelist:
-  - AshWalker
+  name: Пеплоходец настроенный
   components:
   - type: Loadout
     prototypes: [ AshWalker ]

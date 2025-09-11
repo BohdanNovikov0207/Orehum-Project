@@ -41,7 +41,7 @@ public sealed class AshWalkersNestSystem : EntitySystem
         if (component.Accumulator >= 2)
         {
             component.Accumulator = 0;
-            Spawn("RandomAshWalkerEmptySpawn", Transform(uid).Coordinates);
+            Spawn("AshWalkerEmptyEgg", Transform(uid).Coordinates);
         }
     }
 }

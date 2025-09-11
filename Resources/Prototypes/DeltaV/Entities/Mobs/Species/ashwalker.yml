@@ -9,11 +9,11 @@
     prototype: AshWalker
   - type: AshStormImmune
   # Orehum start
-  - type: LanguageKnowledge 
+  - type: LanguageKnowledge
     speaks:
-    - Azaziba
+    - Draconic # unathi basic lang
     understands:
-    - Azaziba
+    - Draconic
   - type: HumanoidAppearance
     species: AshWalker
     hideLayersOnEquip:
@@ -29,7 +29,7 @@
   sprites: MobReptilianSprites
   defaultSkinTone: "#34a223"
   markingLimits: MobReptilianMarkingLimits
-  dollPrototype: MobReptilianDummy
+  dollPrototype: MobAshWalker
   skinColoration: Hues
   maleFirstNames: names_reptilian_male
   femaleFirstNames: names_reptilian_female

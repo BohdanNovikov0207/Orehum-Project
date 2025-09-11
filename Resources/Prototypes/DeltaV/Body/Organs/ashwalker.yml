@@ -6,4 +6,6 @@
   components:
   - type: Lung
     saturationLoss: 0.5
+  - type: Metabolizer # orehum
+    metabolizerTypes: [ AshWalker ] # orehum
   # TODO SHITMED: add AshStormImmune when transplanted

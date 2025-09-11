@@ -14,6 +14,10 @@
         conditions:
         - !type:OrganType
           type: Human
+      - !type:Oxygenate # orehum start 
+        conditions:
+        - !type:OrganType
+          type: AshWalker # orehum end
       - !type:Oxygenate
         conditions:
         - !type:OrganType
@@ -224,6 +228,10 @@
   metabolisms:
     Gas:
       effects:
+      - !type:Oxygenate # orehum start 
+        conditions:
+        - !type:OrganType
+          type: AshWalker # orehum end
       - !type:Oxygenate
         conditions:
         - !type:OrganType
@@ -236,6 +244,9 @@
         - !type:OrganType
           type: Vox
           shouldHave: false
+        - !type:OrganType # orehum start 
+          type: AshWalker 
+          shouldHave: false # orehum end
         # Don't want people to get toxin damage from the gas they just
         # exhaled, right?
         - !type:ReagentThreshold
@@ -251,6 +262,9 @@
         - !type:OrganType
           type: Plant
           shouldHave: false
+        - !type:OrganType # orehum start 
+          type: AshWalker 
+          shouldHave: false # orehum end
         factor: -4
       # We need a metabolism effect on reagent removal
       #- !type:AdjustAlert
