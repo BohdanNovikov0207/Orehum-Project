@@ -45,6 +45,8 @@ public sealed class LavalandWeatherSystem : EntitySystem
 
     private void ProcessLavalandDamage(Entity<DamageableComponent> entity, Entity<LavalandStormedMapComponent> lavaland)
     {
+		if (HasComp<AshStormImmuneComponent>(entity))
+            return;
         var xform = Transform(entity);
         // Do the damage to all poor people on lava that are not on outpost/big ruins
         if (xform.GridUid != lavaland.Owner)
