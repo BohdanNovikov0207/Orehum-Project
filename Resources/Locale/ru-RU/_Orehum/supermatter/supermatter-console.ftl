@@ -6,14 +6,14 @@ supermatter-console-window-no-supermatters = [font size=16][color=white]Супе
 supermatter-console-window-label-sm = {CAPITALIZE($name)}
 
 supermatter-console-window-label-alert-types = Статус суперматерии:
-supermatter-console-window-error-status = Ошибка
-supermatter-console-window-inactive-status = Неактивен
-supermatter-console-window-normal-status = Норма
-supermatter-console-window-caution-status = Осторожно
-supermatter-console-window-warning-status = Предупреждение
-supermatter-console-window-danger-status = Опасность
-supermatter-console-window-emergency-status = Аварийное состояние
-supermatter-console-window-delaminating-status = Расслоение
+supermatter-console-window-status-error-status = Ошибка
+supermatter-console-window-status-inactive = Неактивен
+supermatter-console-window-status-normal = Норма
+supermatter-console-window-status-caution = Осторожно
+supermatter-console-window-status-warning = Предупреждение
+supermatter-console-window-status-danger = Опасность
+supermatter-console-window-status-emergency = Аварийное состояние
+supermatter-console-window-status-delaminating = Расслоение
 
 supermatter-console-window-label-show-all-gas = Показать все газы
 

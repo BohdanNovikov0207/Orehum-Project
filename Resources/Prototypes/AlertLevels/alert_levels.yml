@@ -73,7 +73,7 @@
       announcement: alert-level-delta-announcement
       selectable: false
       sound:
-        path: /Audio/Misc/delta_alt.ogg
+        path: /Audio/_EE/Supermatter/altdelta.ogg
         params:
           volume: -1 # ADT-Tweak
       disableSelection: true

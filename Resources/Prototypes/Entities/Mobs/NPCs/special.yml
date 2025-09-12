@@ -44,15 +44,13 @@
         - MobMask
         layer:
         - MobLayer
-  # ADT-CollectiveMind-Tweak-Start
-  - type: CollectiveMindRank
-    rankName: collective-mind-spitter-rank
-  # ADT-CollectiveMind-Tweak-End
 
 - type: entity
   name: burrower
-  id: ADTMobSupermatter
-  parent: SimpleSpaceMobBase
+  id: MobSupermatter
+  parent:
+    - SimpleSpaceMobBase
+    - MobDamageable
   description: They mostly come at night. Mostly.
   components:
   - type: Insulated
@@ -74,10 +72,8 @@
   - type: ComplexInteraction
   - type: Sprite
     drawdepth: Mobs
-    sprite: /_EE/Mobs/supermatter.rsi
-    layers:
-    - map: ["enum.DamageStateVisualLayers.Base"]
-      state: supermatter
+    sprite: _EE/Mobs/supermatter.rsi
+    state: supermatter
   - type: Fixtures
     fixtures:
       fix1:
@@ -113,5 +109,3 @@
       - DoorBumpOpener
       - FootstepSound
   - type: NoSlip
-  - type: CollectiveMindRank
-    rankName: collective-mind-burrower-rank

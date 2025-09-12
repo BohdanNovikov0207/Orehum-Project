@@ -1280,7 +1280,7 @@
   id: UplinkSyndicateSupermatterScalpel
   name: uplink-supermatter-scalpel-name
   description: uplink-supermatter-scalpel-desc
-  productEntity: ADTSupermatterScalpel
+  productEntity: SupermatterScalpel
   categories:
     - UplinkDisruption
   conditions:

@@ -523,9 +523,6 @@
     coolingCoefficient: 0.001
   - type: FireProtection
     reduction: 1
-  - type: ClothingGrantComponent
-    component:
-    - type: SupermatterImmune
   -type: SupermatterImmune
 
 #Chief Medical Officer's Hardsuit

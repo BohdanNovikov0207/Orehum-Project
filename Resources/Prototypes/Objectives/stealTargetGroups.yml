@@ -406,10 +406,3 @@
   sprite:
     sprite: Mobs/Animals/crab.rsi
     state: crab
-
-- type: stealTargetGroup
-  id: SupermatterSliver
-  name: objective-condition-steal-smsliver-title
-  sprite:
-    sprite: _EE/Objects/Misc/supermatter_silver.rsi
-    state: shard
