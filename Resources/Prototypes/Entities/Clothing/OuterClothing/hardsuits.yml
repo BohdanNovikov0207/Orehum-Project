@@ -523,7 +523,7 @@
     coolingCoefficient: 0.001
   - type: FireProtection
     reduction: 1
-  -type: SupermatterImmune
+  - type: SupermatterImmune
 
 #Chief Medical Officer's Hardsuit
 - type: entity
@@ -1104,7 +1104,7 @@
   - type: ClothingGrantComponent
     component:
     - type: SupermatterImmune
-  -type: SupermatterImmune
+  - type: SupermatterImmune
 
 #ERT Medic Hardsuit
 - type: entity
@@ -1199,7 +1199,7 @@
   - type: ClothingGrantComponent
     component:
     - type: SupermatterImmune
-  -type: SupermatterImmune
+  - type: SupermatterImmune
 
 #CBURN Hardsuit
 - type: entity

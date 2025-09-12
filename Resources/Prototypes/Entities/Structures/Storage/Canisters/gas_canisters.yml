@@ -885,7 +885,6 @@
 - type: entity
   parent: GasCanisterBrokenBase
   id: HyperNobliumCanisterBroken
-  noSpawn: true
   components:
   - type: Sprite
     state: nob-1
@@ -893,7 +892,6 @@
 - type: entity
   parent: GasCanisterBrokenBase
   id: AntiNobliumCanisterBroken
-  noSpawn: true
   components:
   - type: Sprite
     state: antinob-1
