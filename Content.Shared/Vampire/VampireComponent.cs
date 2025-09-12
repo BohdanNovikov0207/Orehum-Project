@@ -28,7 +28,7 @@ public sealed partial class VampireComponent : Component
 {
     //Static prototype references
     [ValidatePrototypeId<StatusEffectPrototype>]
-    public static readonly string SleepStatusEffectProto = "ForcedSleep";
+    public static readonly string SleepStatusEffectProto = "StatusEffectForcedSleeping";
     [ValidatePrototypeId<EmotePrototype>]
     public static readonly string ScreamEmoteProto = "Scream";
     [ValidatePrototypeId<CurrencyPrototype>]

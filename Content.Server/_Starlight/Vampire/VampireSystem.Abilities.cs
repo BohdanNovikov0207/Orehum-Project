@@ -13,10 +13,7 @@ using Content.Server.Flash;
 using Content.Shared.Flash.Components;
 using Content.Server.Speech.Components;
 using Content.Server.Storage.Components;
-using Content.Server.Store.Components;
-using Content.Shared.Actions;
 using Content.Server.Objectives.Components;
-using Content.Shared.Bed.Sleep;
 using Content.Shared.Body.Components;
 using Content.Shared.Chat.Prototypes;
 using Content.Shared.Chemistry.Components;
@@ -34,8 +31,6 @@ using Content.Shared.Popups;
 using Content.Shared.Polymorph;
 using Content.Shared.Prying.Components;
 using Content.Shared.Stealth.Components;
-using Content.Shared.Store.Events;
-using Content.Shared.Store.Components;
 using Content.Shared.Stunnable;
 using Content.Shared.Vampire;
 using Content.Shared.Vampire.Components;
@@ -477,7 +472,7 @@ public sealed partial class VampireSystem
             return false;
 
         var attempt = new FlashAttemptEvent(target.Value, vampire.Owner, vampire.Owner);
-        RaiseLocalEvent(target.Value, attempt, true);
+        RaiseLocalEvent(target.Value, ref attempt, true);
 
         if (attempt.Cancelled)
             return false;
@@ -514,7 +509,7 @@ public sealed partial class VampireSystem
         if (args.Cancelled)
             return;
 
-        _statusEffects.TryAddStatusEffect<ForcedSleepingComponent>(args.Target.Value, VampireComponent.SleepStatusEffectProto, args.Duration ?? TimeSpan.FromSeconds(30), false);
+        _statusEffects.TryAddStatusEffectDuration(args.Target.Value, VampireComponent.SleepStatusEffectProto, out _, args.Duration ?? TimeSpan.FromSeconds(30));
 
         // Aplica cooldown da habilidade Hypnotise somente após sucesso
         if (TryGetPowerDefinition("Hypnotise", out var def))

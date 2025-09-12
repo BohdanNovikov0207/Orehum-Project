@@ -52,6 +52,8 @@ using Robust.Shared.Containers;
 using Robust.Shared.Map;
 using Robust.Shared.Prototypes;
 using System.Linq;
+using Content.Shared.Actions.Components;
+using Content.Shared.StatusEffectNew;
 
 namespace Content.Server.Vampire;
 
@@ -80,7 +82,7 @@ public sealed partial class VampireSystem : EntitySystem
     [Dependency] private readonly SharedBodySystem _body = default!;
     [Dependency] private readonly SharedSolutionContainerSystem _solution = default!;
     [Dependency] private readonly SharedStunSystem _stun = default!;
-    [Dependency] private readonly StatusEffectsSystem _statusEffects = default!;
+    [Dependency] private readonly SharedStatusEffectsSystem _statusEffects = default!;
     [Dependency] private readonly DamageableSystem _damageableSystem = default!;
     [Dependency] private readonly MobThresholdSystem _mobThreshold = default!;
     [Dependency] private readonly MobStateSystem _mobState = default!;
@@ -90,6 +92,7 @@ public sealed partial class VampireSystem : EntitySystem
     [Dependency] private readonly UserInterfaceSystem _uiSystem = default!;
     [Dependency] private readonly SharedVampireSystem _vampire = default!;
     [Dependency] private readonly SharedChargesSystem _sharedChargesSystem = default!;
+    [Dependency] private readonly TurfSystem _turf = default!;
 
     private Dictionary<string, EntityUid> _actionEntities = new();
 
@@ -441,7 +444,9 @@ public sealed partial class VampireSystem : EntitySystem
         if (!_mapSystem.TryGetTileRef(vampireUid, grid, vampireTransform.Coordinates, out var tileRef))
             return true;
 
-        return tileRef.Tile.IsEmpty || tileRef.IsSpace() || tileRef.Tile.GetContentTileDefinition().ID == "Lattice";
+        return tileRef.Tile.IsEmpty
+            || _turf.IsSpace(tileRef)
+            || _turf.GetContentTileDefinition(tileRef.Tile).ID == "Lattice";
     }
 
     private bool IsNearPrayable(EntityUid vampireUid)
