@@ -16,6 +16,8 @@ public sealed partial class HyperNobliumProductionReaction : IGasReactionEffect
 
         var initialNitrogen = mixture.GetMoles(Gas.Nitrogen);
         var initialTritium = mixture.GetMoles(Gas.Tritium);
+        var initialNitrousOxide = mixture.GetMoles(Gas.NitrousOxide);
+
 
         var nobFormed = Math.Min((initialNitrogen + initialTritium) * 0.01f, Math.Min(initialTritium * 5f, initialNitrogen * 10f));
         if (nobFormed <= 0 || (initialTritium - 5f) * nobFormed < 0 || (initialNitrogen - 10f) * nobFormed < 0)
@@ -23,11 +25,12 @@ public sealed partial class HyperNobliumProductionReaction : IGasReactionEffect
 
         var oldHeatCapacity = atmosphereSystem.GetHeatCapacity(mixture, true);
 
-
+        var reductionFactor = Math.Clamp(initialTritium / (initialTritium + initialNitrousOxide), 0.001f, 1f);
         mixture.AdjustMoles(Gas.Tritium, -5f * nobFormed * reductionFactor);
         mixture.AdjustMoles(Gas.Nitrogen, -10f * nobFormed);
         mixture.AdjustMoles(Gas.HyperNoblium, nobFormed);
 
+        var energyReleased = nobFormed * (Atmospherics.NobliumFormationEnergy / Math.Max(initialNitrousOxide, 1));
 
         var newHeatCapacity = atmosphereSystem.GetHeatCapacity(mixture, true);
         if (newHeatCapacity > Atmospherics.MinimumHeatCapacity)
