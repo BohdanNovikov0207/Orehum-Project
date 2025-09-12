@@ -156,9 +156,9 @@ public sealed class SupermatterSpreaderSystem : EntitySystem
         }
     }
 
-    private void Spread(EntityUid uid, TransformComponent xform, ProtoId<EdgeSupermatterSpreaderPrototype> prototype, ref int updates)
+    private void Spread(EntityUid uid, TransformComponent xform, string prototypeId, ref int updates)
     {
-        GetNeighbors(uid, xform, prototype, out var freeTiles, out _, out var neighbors);
+        GetNeighbors(uid, xform, prototypeId, out var freeTiles, out _, out var neighbors);
 
         var ev = new SupermatterSpreadNeighborsEvent()
         {
@@ -174,13 +174,13 @@ public sealed class SupermatterSpreaderSystem : EntitySystem
     /// <summary>
     /// Gets the neighboring node data for the specified entity and the specified node group.
     /// </summary>
-    public void GetNeighbors(EntityUid uid, TransformComponent comp, ProtoId<EdgeSupermatterSpreaderPrototype> prototype, out ValueList<(MapGridComponent, TileRef)> freeTiles, out ValueList<Vector2i> occupiedTiles, out ValueList<EntityUid> neighbors)
+    public void GetNeighbors(EntityUid uid, TransformComponent comp, string prototypeId, out ValueList<(MapGridComponent, TileRef)> freeTiles, out ValueList<Vector2i> occupiedTiles, out ValueList<EntityUid> neighbors)
     {
         freeTiles = [];
         occupiedTiles = [];
         neighbors = [];
         // TODO remove occupiedTiles -- its currently unused and just slows this method down.
-        if (!_prototype.TryIndex(prototype, out var spreaderPrototype))
+        if (!_prototype.TryIndex<EdgeSupermatterSpreaderPrototype>(prototypeId, out var spreaderPrototype))
             return;
 
         if (!TryComp<MapGridComponent>(comp.GridUid, out var grid))
@@ -277,7 +277,7 @@ public sealed class SupermatterSpreaderSystem : EntitySystem
                 if (!spreaderQuery.TryGetComponent(ent, out var spreader))
                     continue;
 
-                if (spreader.Id != prototype)
+                if (spreader.Id != prototypeId)
                     continue;
 
                 neighbors.Add(ent.Value);
@@ -343,9 +343,17 @@ public sealed class SupermatterSpreaderSystem : EntitySystem
 
     public bool RequiresFloorToSpread(EntProtoId<EdgeSupermatterSpreaderComponent> spreader)
     {
-        if (!_prototype.Index(spreader).TryGetComponent<EdgeSupermatterSpreaderComponent>(out var spreaderComp, EntityManager.ComponentFactory))
+        if (!_prototype.TryIndex(spreader, out var entityProto))
             return false;
 
-        return _prototype.Index(spreaderComp.Id).PreventSpreadOnSpaced;
+        // Получаем компонент из прототипа сущности
+        if (!entityProto.TryGetComponent<EdgeSupermatterSpreaderComponent>(out var spreaderComp))
+            return false;
+
+        // Теперь получаем прототип spreader и проверяем его свойство
+        if (!_prototype.TryIndex<EdgeSupermatterSpreaderPrototype>(spreaderComp.Id, out var spreaderProto))
+            return false;
+
+        return spreaderProto.PreventSpreadOnSpaced;
     }
 }

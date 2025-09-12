@@ -4,7 +4,7 @@ using System.Text;
 using Content.Server.Chat.Systems;
 using Content.Server.Singularity.Components;
 using Content.Server.RoundEnd;
-using Content.Shared._EE.CCVar;
+using Content.Shared._EE.CCVars;
 using Content.Shared._EE.Supermatter.Components;
 using Content.Shared.Atmos;
 using Content.Shared.Audio;
@@ -31,6 +31,7 @@ using Robust.Shared.Player;
 using Robust.Shared.Random;
 using Robust.Shared.Spawners;
 using Vector4 = Robust.Shared.Maths.Vector4;
+using Content.Shared.Traits.Assorted.Components;
 
 namespace Content.Server._EE.Supermatter.Systems;
 
@@ -164,7 +165,7 @@ public sealed partial class SupermatterSystem
         _atmosphere.Merge(mix, gasReleased);
 
         var powerReduction = (float)Math.Pow(sm.Power / 500, 3);
-        sm.PowerLoss = Math.Min(powerReduction * sm.PowerlossInhibitor, sm.Power * 0.83f * sm.PowerlossInhibitor);
+        sm.PowerLoss = Math.Min(powerReduction * sm.PowerlossInhibitor, sm.Power * 0.60f * sm.PowerlossInhibitor);
         sm.Power = Math.Max(sm.Power - sm.PowerLoss, 0f);
 
         if (TryComp<GravityWellComponent>(uid, out var gravityWell))
@@ -212,8 +213,7 @@ public sealed partial class SupermatterSystem
         var totalDamage = 0f;
         var tempThreshold = Atmospherics.T0C + _config.GetCVar(CCVars.SupermatterHeatPenaltyThreshold);
 
-
-        var tempDamage = Math.Max(Math.Clamp(moles / 200f, .5f, 1f) * absorbedGas.Temperature - tempThreshold * sm.DynamicHeatResistance, 0f) *
+        var tempDamage = Math.Max(Math.Clamp(moles / 50f, .1f, .5f) * absorbedGas.Temperature - tempThreshold * sm.DynamicHeatResistance, 0f) *
             sm.MoleHeatPenaltyThreshold / 150f * sm.DamageIncreaseMultiplier;
         totalDamage += tempDamage;
 
@@ -304,7 +304,10 @@ public sealed partial class SupermatterSystem
             var moles = absorbedGas.TotalMoles;
 
             if (moles >= _config.GetCVar(CCVars.SupermatterMolePenaltyThreshold))
+            {
+                _alert.SetLevel(stationId, sm.AlertCodeDeltaId, true, true, true, false);
                 return DelamType.Singularity;
+            }
         }
 
         // Tesla Delam

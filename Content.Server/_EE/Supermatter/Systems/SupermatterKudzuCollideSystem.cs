@@ -16,7 +16,7 @@ using Content.Server.Radio.EntitySystems;
 using Content.Server.Singularity.Components;
 using Content.Server.Singularity.EntitySystems;
 using Content.Server.Traits.Assorted;
-using Content.Shared._EE.CCVar;
+using Content.Shared._EE.CCVars;
 using Content.Shared._EE.Supermatter.Components;
 using Content.Shared.Atmos;
 using Content.Shared.Audio;

@@ -247,6 +247,10 @@
     range: 5
     sound:
       path: /Audio/Ambience/Objects/buzzing.ogg
+  - type: RTGHeat
+    heatPerSecond: 0.1
+    heatInterval: 1
+    maxTemperature: 373.15
   - type: GuideHelp
     guides:
     - RTG
@@ -320,3 +324,8 @@
             max: 5
       - !type:DoActsBehavior
         acts: [ "Destruction" ]
+  - type: RadiationEvent
+    initialIntensity: 2
+    decayDelay: 3600
+    decayRate: 0.1
+    decayRateInterval: 60

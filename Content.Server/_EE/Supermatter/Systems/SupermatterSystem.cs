@@ -16,8 +16,7 @@ using Content.Server.Radio.EntitySystems;
 using Content.Server.Singularity.Components;
 using Content.Server.Singularity.EntitySystems;
 using Content.Server.Traits.Assorted;
-using Content.Server._EE.Hallucinations;
-using Content.Shared._EE.CCVar;
+using Content.Shared._EE.CCVars;
 using Content.Shared._EE.Supermatter.Components;
 using Content.Shared.Atmos;
 using Content.Shared.Audio;
@@ -35,6 +34,7 @@ using Content.Shared.Mobs.Components;
 using Content.Shared.Popups;
 using Content.Shared.Projectiles;
 using Content.Shared._EE.Supermatter;
+using Content.Shared.Radiation.Components;
 using Robust.Server.GameObjects;
 using Robust.Shared.Audio;
 using Robust.Shared.Audio.Systems;
@@ -46,6 +46,9 @@ using Robust.Shared.Physics.Events;
 using Robust.Shared.Player;
 using Robust.Shared.Random;
 using Robust.Shared.Timing;
+using Content.Shared.Tag;
+using Robust.Shared.Prototypes;
+using Content.Shared.Kitchen.Components;
 
 namespace Content.Server._EE.Supermatter.Systems;
 
@@ -78,7 +81,7 @@ public sealed partial class SupermatterSystem : EntitySystem
     [Dependency] private readonly StationSystem _station = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly RoundEndSystem _roundEnd = default!;
-    [Dependency] private readonly HallucinationsSystem _hallucinations = default!;
+    [Dependency] private readonly TagSystem _tag = default!;
 
     public override void Initialize()
     {
@@ -91,7 +94,8 @@ public sealed partial class SupermatterSystem : EntitySystem
         SubscribeLocalEvent<SupermatterComponent, InteractHandEvent>(OnHandInteract);
         SubscribeLocalEvent<SupermatterComponent, InteractUsingEvent>(OnItemInteract);
         SubscribeLocalEvent<SupermatterComponent, ExaminedEvent>(OnExamine);
-        SubscribeLocalEvent<SupermatterComponent, SupermatterDoAfterEvent>(OnGetSliver);
+        SubscribeLocalEvent<SupermatterComponent, SupermatterTamperDoAfterEvent>(OnGetSliver);
+        SubscribeLocalEvent<SupermatterComponent, SupermatterCoreDoAfterEvent>(OnInsertCore);
         SubscribeLocalEvent<SupermatterComponent, GravPulseEvent>(OnGravPulse);
     }
 
@@ -172,7 +176,7 @@ public sealed partial class SupermatterSystem : EntitySystem
         if (HasComp<SupermatterImmuneComponent>(target) || HasComp<GodmodeComponent>(target))
             return;
 
-        if (!sm.HasBeenPowered)
+        if (!sm.HasBeenPowered && !HasComp<SupermatterIgnoreComponent>(target))
             LogFirstPower(uid, sm, target);
 
         var power = 200f;
@@ -198,24 +202,37 @@ public sealed partial class SupermatterSystem : EntitySystem
     private void OnItemInteract(EntityUid uid, SupermatterComponent sm, ref InteractUsingEvent args)
     {
         // Ability to cut Sliver Supermatter if the object in your hand is sharp
-        if (!sm.HasBeenPowered)
-            sm.HasBeenPowered = true;
 
         if (sm.SliverRemoved)
             return;
 
         if (HasComp<SharpComponent>(args.Used))
         {
-            var doAfterArgs = new DoAfterArgs(EntityManager, args.User, 30f, new SupermatterDoAfterEvent(), args.Target)
+            var doAfterArgs = new DoAfterArgs(EntityManager, args.User, 30f, new SupermatterTamperDoAfterEvent(), args.Target)
             {
                 BreakOnDamage = true,
                 BreakOnHandChange = false,
                 BreakOnWeightlessMove = false,
                 NeedHand = true,
                 RequireCanInteract = true,
+                Used = args.Used,
             };
             _doAfter.TryStartDoAfter(doAfterArgs);
             _popup.PopupClient(Loc.GetString("supermatter-tamper-begin"), uid, args.User);
+        }
+        if (HasComp<SupermatterNobliumCoreComponent>(args.Used))
+        {
+            var doAfterArgs = new DoAfterArgs(EntityManager, args.User, 15f, new SupermatterCoreDoAfterEvent(), args.Target)
+            {
+                BreakOnDamage = true,
+                BreakOnHandChange = false,
+                BreakOnWeightlessMove = false,
+                NeedHand = true,
+                RequireCanInteract = true,
+                Used = args.Used,
+            };
+            _doAfter.TryStartDoAfter(doAfterArgs);
+            _popup.PopupClient(Loc.GetString("supermatter-inert-begin"), uid, args.User);
         }
 
         var target = args.User;
@@ -227,12 +244,15 @@ public sealed partial class SupermatterSystem : EntitySystem
         HasComp<SupermatterImmuneComponent>(item) ||
         HasComp<GodmodeComponent>(item))
             return;
+        if (!sm.HasBeenPowered)
+            sm.HasBeenPowered = true;
 
         if (HasComp<UnremoveableComponent>(item))
         {
+            if (HasComp<SupermatterIgnoreComponent>(target) || HasComp<SupermatterIgnoreComponent>(item))
+                return;
             if (!sm.HasBeenPowered)
                 LogFirstPower(uid, sm, target);
-
             var power = 200f;
 
             if (TryComp<PhysicsComponent>(target, out var targetPhysics))
@@ -258,9 +278,6 @@ public sealed partial class SupermatterSystem : EntitySystem
         }
         else
         {
-            if (!sm.HasBeenPowered)
-                LogFirstPower(uid, sm, item);
-
             if (TryComp<PhysicsComponent>(item, out var physics))
                 sm.MatterPower += physics.Mass;
 
@@ -273,29 +290,42 @@ public sealed partial class SupermatterSystem : EntitySystem
 
             _adminLog.Add(LogType.EntityDelete, LogImpact.High, $"{EntityManager.ToPrettyString(target):target} touched {EntityManager.ToPrettyString(uid):uid} with {EntityManager.ToPrettyString(item):item} and destroyed it at {Transform(uid).Coordinates:coordinates}");
             EntityManager.QueueDeleteEntity(item);
+            if (HasComp<SupermatterIgnoreComponent>(target) || HasComp<SupermatterIgnoreComponent>(item))
+                return;
+            if (!sm.HasBeenPowered)
+                LogFirstPower(uid, sm, item);
         }
 
         args.Handled = true;
     }
 
-    private void OnGetSliver(EntityUid uid, SupermatterComponent sm, ref SupermatterDoAfterEvent args)
+    private void OnGetSliver(EntityUid uid, SupermatterComponent sm, ref SupermatterTamperDoAfterEvent args)
     {
-        string message;
-        var global = false;
 
-        if (args.Cancelled)
+        if (args.Cancelled || !args.Used.HasValue)
             return;
-
+        QueueDel(args.Used.Value);
         // Your criminal actions will not go unnoticed
         sm.Damage += sm.DamageDelaminationPoint / 10;
 
-        message = Loc.GetString("supermatter-announcement-cc-tamper");
-        SendSupermatterAnnouncement(uid, sm, message, global);
+        var message = Loc.GetString("supermatter-announcement-cc-tamper");
+        SendSupermatterAnnouncement(uid, sm, message, global: false);
 
         Spawn(sm.SliverPrototype, _transform.GetMapCoordinates(args.User));
         _popup.PopupClient(Loc.GetString("supermatter-tamper-end"), uid, args.User);
 
-        sm.DelamTimer /= 2;
+    }
+    private void OnInsertCore(EntityUid uid, SupermatterComponent sm, ref SupermatterCoreDoAfterEvent args)
+    {
+        if (args.Cancelled || !args.Used.HasValue)
+            return;
+        QueueDel(args.Used.Value);
+        var message = Loc.GetString("supermatter-announcement-setinert");
+        SendSupermatterAnnouncement(uid, sm, message, global: false);
+        sm.HasBeenPowered = false;
+        if (TryComp<RadiationSourceComponent>(uid, out var rad))
+            rad.Intensity = 1;
+        _popup.PopupClient(Loc.GetString("supermatter-inert-end"), uid, args.User);
     }
 
     private void OnGravPulse(Entity<SupermatterComponent> ent, ref GravPulseEvent args)
@@ -328,9 +358,6 @@ public sealed partial class SupermatterSystem : EntitySystem
             _container.IsEntityInContainer(uid))
             return;
 
-        if (!sm.HasBeenPowered)
-            LogFirstPower(uid, sm, target);
-
         if (!HasComp<ProjectileComponent>(target))
         {
             if (HasComp<MobStateComponent>(target))
@@ -357,13 +384,14 @@ public sealed partial class SupermatterSystem : EntitySystem
         if (TryComp<SupermatterFoodComponent>(target, out var food))
             sm.Power += food.Energy;
         else if (TryComp<ProjectileComponent>(target, out var projectile))
-            sm.Power += (float)projectile.Damage.GetTotal();
+            sm.Power += (float) projectile.Damage.GetTotal();
         else
             sm.Power++;
 
         sm.MatterPower += HasComp<MobStateComponent>(target) ? 200 : 0;
+        if (!HasComp<SupermatterIgnoreComponent>(target) && !sm.HasBeenPowered)
+            LogFirstPower(uid, sm, target);
     }
-
     private void LogFirstPower(EntityUid uid, SupermatterComponent sm, EntityUid target)
     {
         _adminLog.Add(LogType.Unknown, LogImpact.Extreme, $"{EntityManager.ToPrettyString(uid):uid} was powered for the first time by {EntityManager.ToPrettyString(target):target} at {Transform(uid).Coordinates:coordinates}");

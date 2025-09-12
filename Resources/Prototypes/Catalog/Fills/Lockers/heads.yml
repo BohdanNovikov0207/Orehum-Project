@@ -173,6 +173,7 @@
     - id: RCDAmmo
     - id: RPD
     - id: RubberStampCE
+    - id: HyperNobCore
 
 # Hardsuit table, used for suit storage as well
 - type: entityTable

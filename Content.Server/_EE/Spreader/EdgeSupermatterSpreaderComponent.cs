@@ -7,5 +7,8 @@ namespace Content.Server._EE.Spreader;
 public sealed partial class EdgeSupermatterSpreaderComponent : Component
 {
     [DataField(required: true)]
-    public ProtoId<EdgeSupermatterSpreaderComponent> Id;
+    public EntProtoId<EdgeSupermatterSpreaderComponent> Id;
+
+    [DataField]
+    public bool PreventSpreadOnSpaced = true;
 }

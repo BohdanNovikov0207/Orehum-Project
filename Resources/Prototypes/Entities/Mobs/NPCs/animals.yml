@@ -452,6 +452,7 @@
     damage:
       types:
         Piercing: 0
+  - type: SupermatterIgnore
 
 - type: entity
   name: glockroach
@@ -629,6 +630,7 @@
         type: StrippableBoundUserInterface
       enum.SurgeryUIKey.Key:
         type: SurgeryBui
+  - type: SupermatterIgnore
   - type: InventorySlots
   - type: Inventory
     speciesId: hamster
@@ -2097,6 +2099,7 @@
       Taco: RatTaco
       Burger: RatBurger
       Skewer: RatSkewer
+  - type: SupermatterIgnore
   - type: NightVision
     isActive: true
     toggleAction: null
@@ -2349,6 +2352,7 @@
     interactSuccessSpawn: EffectHearts
   - type: Bloodstream
     bloodMaxVolume: 50
+  - type: SupermatterIgnore
 
 - type: entity
   name: frog
@@ -2757,6 +2761,7 @@
     speedModifier: 1.5
     useSound:
       path: /Audio/Items/crowbar.ogg
+  - type: SupermatterIgnore
   - type: PassiveDamage # Slight passive regen. Assuming one damage type, comes out to about 4 damage a minute from base.yml.
     allowedStates:
     - Alive

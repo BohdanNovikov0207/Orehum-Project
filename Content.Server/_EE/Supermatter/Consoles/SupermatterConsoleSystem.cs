@@ -1,4 +1,4 @@
-using Content.Shared._EE.CCVar;
+using Content.Shared._EE.CCVars;
 using Content.Shared._EE.Supermatter.Components;
 using Content.Shared._EE.Supermatter.Consoles;
 using Content.Shared.Atmos;

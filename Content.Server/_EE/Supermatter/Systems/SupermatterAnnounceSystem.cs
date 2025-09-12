@@ -4,7 +4,7 @@ using System.Text;
 using Robust.Shared.Player;
 using Content.Server.Chat.Systems;
 using Content.Server.Radio.EntitySystems;
-using Content.Shared._EE.CCVar;
+using Content.Shared._EE.CCVars;
 using Content.Shared._EE.Supermatter.Components;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
@@ -25,7 +25,7 @@ public sealed partial class SupermatterSystem
     /// </summary>
     public void AnnounceCoreDamage(EntityUid uid, SupermatterComponent sm)
     {
-        if (sm.Damage == 0)
+        if (sm.Damage == 0 || !sm.HasBeenPowered)
             return;
 
         string message;

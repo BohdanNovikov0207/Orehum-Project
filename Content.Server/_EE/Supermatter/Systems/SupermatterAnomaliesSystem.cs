@@ -1,7 +1,7 @@
 using System.Linq;
 using Content.Shared.Physics;
 using Robust.Shared.Physics.Components;
-using Content.Shared._EE.CCVar;
+using Content.Shared._EE.CCVars;
 using Content.Shared._EE.Supermatter.Components;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
@@ -34,6 +34,8 @@ public sealed partial class SupermatterSystem
     /// </summary>
     public void GenerateAnomalies(EntityUid uid, SupermatterComponent sm)
     {
+        if (!sm.HasBeenPowered)
+            return;
         sm.PreferredAnomalyMode = ChooseAnomalyType(uid, sm);
 
         var xform = Transform(uid);

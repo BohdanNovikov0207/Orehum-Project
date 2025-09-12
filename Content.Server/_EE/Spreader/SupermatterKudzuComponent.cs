@@ -9,7 +9,7 @@ public sealed partial class SupermatterKudzuComponent : Component
     [DataField]
     public float SpreadChance = 1f;
     [DataField]
-    public float CrowthTickChance = 1f;
+    public float GrowthTickChance = 1f;
 
     [DataField]
     public int SpriteVariants = 3;

@@ -46,3 +46,19 @@
       behaviors:
       - !type:DoActsBehavior
         acts: [ "Destruction" ]
+
+- type: entity
+  parent: BaseItem
+  id: HyperNobCore
+  name: hyper-Noblium Core
+  description: SPEEED SPEEED SPEEED HELL YEAAA :eagle:!!!!
+  components:
+    - type: Item
+      sprite: _EE/Objects/Misc/plutonium_core.rsi
+      size: Normal
+    - type: Sprite
+      layers:
+        - sprite: _EE/Objects/Misc/plutonium_core.rsi
+          state: hnob_core
+    - type: SupermatterNobliumCore
+    - type: SupermatterImmune

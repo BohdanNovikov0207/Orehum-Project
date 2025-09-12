@@ -1,4 +1,3 @@
-using Content.Server._EE.Hallucinations;
 using Content.Shared._EE.Supermatter.Components;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
@@ -15,6 +14,7 @@ using Robust.Server.GameObjects;
 using Robust.Shared.Audio.Components;
 using Content.Shared.Radiation.Components;
 using Content.Shared.Light.Components;
+using Content.Shared.Traits.Assorted.Components;
 
 namespace Content.Server._EE.Supermatter.Systems;
 public sealed partial class SupermatterSystem
@@ -77,8 +77,6 @@ public sealed partial class SupermatterSystem
             var hallucinationProto = "Supermatter";
             var hallucinationDuration = TimeSpan.FromSeconds(10);
             var refresh = true;
-
-            _hallucinations.StartHallucinations(mob, hallucinationKey, hallucinationDuration, refresh, hallucinationProto);
         }
 
         sm.PsyCoefficient = Math.Clamp(sm.PsyCoefficient + psyDiff, 0f, 1f);

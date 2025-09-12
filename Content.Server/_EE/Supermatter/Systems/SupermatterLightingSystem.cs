@@ -1,7 +1,7 @@
 using Robust.Shared.Audio;
 using Robust.Shared.Audio.Systems;
 using Content.Server.Lightning;
-using Content.Shared._EE.CCVar;
+using Content.Shared._EE.CCVars;
 using Content.Shared._EE.Supermatter.Components;
 using Robust.Shared.Configuration;
 using Robust.Shared.Random;
@@ -31,11 +31,17 @@ public sealed partial class SupermatterSystem
 
             var power = sm.Power;
             var integrity = GetIntegrity(sm);
-            var zapRange = Math.Clamp(power / 1000, 2, 7);
-            int zapCount = 1 + (int)(power / 2000);
+            var zapRange = Math.Clamp(power / 1000, 3, 7);
+            int zapCount = 1;
 
             if (_random.Prob(0.2f))
                 zapCount++;
+
+            if (power >= _config.GetCVar(CCVars.SupermatterPowerMinPenaltyThreshold))
+            {
+                var powerZapCount = Math.Clamp(power / 3000, 1, 2);
+                zapCount = (int)(zapCount + powerZapCount);
+            }
 
             if (integrity < 50)
             {
