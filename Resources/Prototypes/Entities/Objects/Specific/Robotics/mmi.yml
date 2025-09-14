@@ -146,3 +146,4 @@
   - type: LanguageKnowledge
     speaks: [RobotTalk]
     understands: [RobotTalk]
+  - type: PsionicInsulation # orehum positronics cant be psyker
