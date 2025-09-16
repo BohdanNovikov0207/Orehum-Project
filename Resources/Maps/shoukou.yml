@@ -1,11 +1,11 @@
 meta:
   format: 7
   category: Map
-  engineVersion: 261.2.0
+  engineVersion: 263.0.0
   forkId: ""
   forkVersion: ""
-  time: 09/04/2025 14:27:54
-  entityCount: 13639
+  time: 09/16/2025 10:09:15
+  entityCount: 13641
 maps:
 - 1
 grids:
@@ -3413,6 +3413,7 @@ entities:
     - type: GravityShake
       shakeTimes: 10
     - type: NavMap
+    - type: SupermatterSpreaderGrid
 - proto: ActionToggleLight
   entities:
   - uid: 4
@@ -71766,6 +71767,18 @@ entities:
     components:
     - type: Transform
       pos: -8.5,-26.5
+      parent: 2
+- proto: SpawnPointMartialArtist
+  entities:
+  - uid: 13640
+    components:
+    - type: Transform
+      pos: 3.5,7.5
+      parent: 2
+  - uid: 13641
+    components:
+    - type: Transform
+      pos: 2.5,4.5
       parent: 2
 - proto: SpawnPointMedicalDoctor
   entities:
