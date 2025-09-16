@@ -246,6 +246,13 @@ namespace Content.Server.IoC
             IoCManager.Register<CVarControlManager>();
             IoCManager.Register<LastRolledAntagManager>(); // Goobstation - antag pity
             IoCManager.Register<LinkAccountManager>(); // RMC - Patreon
+
+            // start-backmen: IoC
+            IoCManager.Register<Content.Corvax.Interfaces.Shared.ISharedSponsorsManager, Backmen.Sponsors.SponsorsManager>();
+            //IoCManager.Register<Content.Corvax.Interfaces.Server.IServerDiscordAuthManager, Backmen.DiscordAuth.DiscordAuthManager>();
+            //IoCManager.Register<Content.Corvax.Interfaces.Server.IServerJoinQueueManager, Backmen.JoinQueue.JoinQueueManager>();
+            IoCManager.Register<Content.Corvax.Interfaces.Shared.ISharedLoadoutsManager, Backmen.Sponsors.LoadoutsManager>();
+            // end-backmen: IoC
         }
     }
 }
