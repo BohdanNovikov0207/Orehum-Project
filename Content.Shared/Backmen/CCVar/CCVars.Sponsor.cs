@@ -2,7 +2,8 @@
 
 namespace Content.Shared.Backmen.CCVar;
 
-public sealed partial class CCVars
+[CVarDefs]
+public sealed class CCVars
 {
     /**
      * Sponsors
