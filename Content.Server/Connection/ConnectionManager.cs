@@ -2,6 +2,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
+using Content.Corvax.Interfaces.Shared;
 using Content.Server.Chat.Managers;
 using Content.Server.Database;
 using Content.Server.GameTicking;
@@ -59,6 +60,8 @@ namespace Content.Server.Connection
         [Dependency] private readonly ILogManager _logManager = default!;
         [Dependency] private readonly IChatManager _chatManager = default!;
 
+        private ISharedSponsorsManager? _sponsorsMgr; // Corvax-Sponsors
+
         private ISawmill _sawmill = default!;
         private readonly Dictionary<NetUserId, TimeSpan> _temporaryBypasses = [];
 
@@ -68,6 +71,8 @@ namespace Content.Server.Connection
         public void Initialize()
         {
             _sawmill = _logManager.GetSawmill("connections");
+
+            IoCManager.Instance!.TryResolveType(out _sponsorsMgr); // Corvax-Sponsors
 
             _netMgr.Connecting += NetMgrOnConnecting;
             _netMgr.Connected += OnConnected; // DeltaV - Soft whitelist improvements
@@ -458,7 +463,8 @@ namespace Content.Server.Connection
             var wasInGame = EntitySystem.TryGet<GameTicker>(out var ticker) &&
                 ticker.PlayerGameStatuses.TryGetValue(userId, out var status) &&
                 status == PlayerGameStatus.JoinedGame;
-            return isAdmin || wasInGame;
+            var havePriorityJoin = _sponsorsMgr != null && _sponsorsMgr.HaveServerPriorityJoin(userId); // Corvax-Sponsors
+            return isAdmin || wasInGame || havePriorityJoin; // Corvax-Sponsors
         }
     }
 }

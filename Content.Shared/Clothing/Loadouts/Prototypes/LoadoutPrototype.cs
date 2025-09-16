@@ -53,6 +53,11 @@ public sealed partial class LoadoutPrototype : IPrototype
     [DataField]
     public string GuideEntry { get; } = "";
 
+    // Corvax-Sponsors-Start
+    [DataField("sponsorOnly")]
+    public bool SponsorOnly = false;
+    // Corvax-Sponsors-End
+
     [DataField(serverOnly: true)]
     public LoadoutFunction[] Functions { get; private set; } = Array.Empty<LoadoutFunction>();
 }

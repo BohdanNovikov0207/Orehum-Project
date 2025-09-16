@@ -1,4 +1,5 @@
 using System.Linq;
+using Content.Corvax.Interfaces.Shared;
 using Content.Shared.CCVar;
 using Content.Shared.Mind;
 using Content.Shared.Players.PlayTimeTracking;
@@ -303,6 +304,11 @@ public sealed partial class CharacterPlaytimeRequirement : CharacterRequirement
         // Get the time for the tracker
         var time = playTimes.GetValueOrDefault(Tracker);
         reason = null;
+
+        //start-backmen: allRoles
+        if (IoCManager.Instance!.TryResolveType<ISharedSponsorsManager>(out var manager) && manager.IsClientAllRoles())
+            return true;
+        //end-backmen
 
         if (time > Max)
         {

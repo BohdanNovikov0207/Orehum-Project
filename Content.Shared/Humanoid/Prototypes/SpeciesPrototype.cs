@@ -187,6 +187,14 @@ public sealed partial class SpeciesPrototype : IPrototype
     /// </summary>
     [DataField]
     public int BonusTraitPoints;
+
+    // Corvax-Sponsors-Start
+    /// <summary>
+    /// Whether the species is available only for sponsors
+    /// </summary>
+    [DataField]
+    public bool SponsorOnly { get; private set; } = false;
+    // Corvax-Sponsors-End
 }
 
 public enum SpeciesNaming : byte

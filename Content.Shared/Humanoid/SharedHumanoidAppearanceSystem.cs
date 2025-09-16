@@ -1,6 +1,7 @@
 using System.IO;
 using System.Linq;
 using System.Numerics;
+using Content.Corvax.Interfaces.Shared;
 using Content.Shared._EE.Contractors.Prototypes;
 using Content.Shared.Examine;
 using Content.Shared.Humanoid.Markings;
@@ -43,6 +44,8 @@ public abstract class SharedHumanoidAppearanceSystem : EntitySystem
     [Dependency] private readonly HeightAdjustSystem _heightAdjust = default!;
     [Dependency] private readonly ISharedPlayerManager _sharedPlayerManager = default!;
 
+    private ISharedSponsorsManager? _sponsors;
+
     [ValidatePrototypeId<SpeciesPrototype>]
     public const string DefaultSpecies = "Human";
 
@@ -58,6 +61,7 @@ public abstract class SharedHumanoidAppearanceSystem : EntitySystem
     public override void Initialize()
     {
         base.Initialize();
+        IoCManager.Instance!.TryResolveType(out _sponsors); // Corvax-Sponsors
 
         SubscribeLocalEvent<HumanoidAppearanceComponent, ComponentInit>(OnInit);
         SubscribeLocalEvent<HumanoidAppearanceComponent, ExaminedEvent>(OnExamined);
@@ -88,7 +92,24 @@ public abstract class SharedHumanoidAppearanceSystem : EntitySystem
 
         var profile = export.Profile;
         var collection = IoCManager.Instance;
-        profile.EnsureValid(session, collection!);
+
+        string[] sponsorPrototypes = [];
+        if (_sponsors != null) // Corvax-Sponsors
+        {
+
+            if (_netManager.IsClient)
+            {
+                sponsorPrototypes = _sponsors.GetClientPrototypes().ToArray();
+            }
+            else
+            {
+                sponsorPrototypes = _sponsors.TryGetServerPrototypes(session.UserId, out var prototypes)
+                    ? prototypes.ToArray()
+                    : [];
+            }
+        }
+
+        profile.EnsureValid(session, collection!, sponsorPrototypes);
         return profile;
     }
 
