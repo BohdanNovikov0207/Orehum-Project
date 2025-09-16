@@ -17,22 +17,22 @@ public sealed class SponsorsManager : ISharedSponsorsManager
         //_netMgr.RegisterNetMessage<Shared.Backmen.MsgWhitelist>(RxWhitelist); //backmen: whitelist
     }
 
-    public List<string> GetClientPrototypes()
+    List<string> ISharedSponsorsManager.GetClientPrototypes()
     {
         return Prototypes.ToList();
     }
 
-    public List<string> GetClientLoadouts()
+    List<string> ISharedSponsorsManager.GetClientLoadouts()
     {
         return Loadouts.ToList();
     }
 
-    public bool IsClientAllRoles()
+    bool ISharedSponsorsManager.IsClientAllRoles()
     {
         return OpenAllRoles;
     }
 
-    public void Cleanup()
+    void ISharedSponsorsManager.Cleanup()
     {
         Reset();
     }

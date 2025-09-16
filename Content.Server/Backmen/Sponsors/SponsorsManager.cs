@@ -43,7 +43,7 @@ public sealed class SponsorsManager : ISharedSponsorsManager
         _netMgr.Connected += OnConnected;
     }
 
-    public bool TryGetServerPrototypes(NetUserId userId, [NotNullWhen(true)] out List<string>? prototypes)
+    bool ISharedSponsorsManager.TryGetServerPrototypes(NetUserId userId, [NotNullWhen(true)] out List<string>? prototypes)
     {
         if (_cachedSponsors.TryGetValue(userId, out var sponsor))
         {
@@ -55,7 +55,7 @@ public sealed class SponsorsManager : ISharedSponsorsManager
         return false;
     }
 
-    public bool TryGetServerOocColor(NetUserId userId, [NotNullWhen(true)] out Color? color)
+    bool ISharedSponsorsManager.TryGetServerOocColor(NetUserId userId, [NotNullWhen(true)] out Color? color)
     {
         if (_cachedSponsors.TryGetValue(userId, out var sponsor))
         {
@@ -67,12 +67,12 @@ public sealed class SponsorsManager : ISharedSponsorsManager
         return false;
     }
 
-    public int GetServerExtraCharSlots(NetUserId userId)
+    int ISharedSponsorsManager.GetServerExtraCharSlots(NetUserId userId)
     {
         return _cachedSponsors.TryGetValue(userId, out var sponsor) ? sponsor.ExtraSlots : 0;
     }
 
-    public bool HaveServerPriorityJoin(NetUserId userId)
+    bool ISharedSponsorsManager.HaveServerPriorityJoin(NetUserId userId)
     {
         return _cachedSponsors.TryGetValue(userId, out var sponsor) && sponsor.HavePriorityJoin;
     }
@@ -123,7 +123,7 @@ public sealed class SponsorsManager : ISharedSponsorsManager
         }
     }
 
-    public void Cleanup()
+    void ISharedSponsorsManager.Cleanup()
     {
         _lock.EnterWriteLock();
         try
@@ -163,7 +163,7 @@ public sealed class SponsorsManager : ISharedSponsorsManager
         return await response.Content.ReadFromJsonAsync<SponsorInfo>();
     }
 
-    public bool TryGetGhostTheme(NetUserId userId, [NotNullWhen(true)] out string? ghostTheme)
+    bool ISharedSponsorsManager.TryGetGhostTheme(NetUserId userId, [NotNullWhen(true)] out string? ghostTheme)
     {
         if (!_cachedSponsors.ContainsKey(userId) || string.IsNullOrEmpty(_cachedSponsors[userId].GhostTheme))
         {
@@ -189,7 +189,7 @@ public sealed class SponsorsManager : ISharedSponsorsManager
         return true;
     }
 
-    public bool TryGetLoadouts(NetUserId userId, [NotNullWhen(true)] out List<string>? prototypes)
+    bool ISharedSponsorsManager.TryGetLoadouts(NetUserId userId, [NotNullWhen(true)] out List<string>? prototypes)
     {
         if (!_cachedSponsors.ContainsKey(userId) || _cachedSponsors[userId].Loadouts.Length == 0)
         {
@@ -203,7 +203,7 @@ public sealed class SponsorsManager : ISharedSponsorsManager
         return true;
     }
 
-    public bool IsServerAllRoles(NetUserId userId)
+    bool ISharedSponsorsManager.IsServerAllRoles(NetUserId userId)
     {
         return _cachedSponsors.ContainsKey(userId) && _cachedSponsors[userId].OpenAllRoles;
     }

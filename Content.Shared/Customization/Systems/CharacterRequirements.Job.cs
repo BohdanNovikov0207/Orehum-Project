@@ -8,6 +8,7 @@ using Content.Shared.Roles;
 using Content.Shared.Roles.Jobs;
 using JetBrains.Annotations;
 using Robust.Shared.Configuration;
+using Robust.Shared.Network;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
 using Robust.Shared.Utility;
@@ -306,7 +307,10 @@ public sealed partial class CharacterPlaytimeRequirement : CharacterRequirement
         reason = null;
 
         //start-backmen: allRoles
-        if (IoCManager.Instance!.TryResolveType<ISharedSponsorsManager>(out var manager) && manager.IsClientAllRoles())
+        if (IoCManager.Instance!.TryResolveType<ISharedSponsorsManager>(out var manager)
+            && IoCManager.Instance.TryResolveType<INetManager>(out var net)
+            && mind != null
+            && (net.IsClient ? manager.IsClientAllRoles() : manager.IsServerAllRoles(mind.Session!.UserId)))
             return true;
         //end-backmen
 
