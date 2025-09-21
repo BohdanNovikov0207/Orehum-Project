@@ -1,0 +1,9 @@
+- type: entity
+  parent: BasePDA
+  id: NoCardPDA
+  components:
+  - type: Pda
+  - type: PdaBorderColor
+    borderColor: "#288e4d"
+  - type: Icon
+    state: pda-clear
