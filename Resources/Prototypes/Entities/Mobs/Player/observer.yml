@@ -75,11 +75,19 @@
     radius: 6
     castShadows: false
     enabled: false
+  - type: TypingIndicator
+    proto: ghost
+  - type: Speech
   - type: UserInterface
     interfaces:
       enum.RevivalContractUiKey.Key: # Goobstation - Devil
         type: RevivalContractBoundUserInterface
         requireInputValidation: false
+  #ADT start
+      enum.GhostInfoUiKey.Key:
+        type: GhostInfoBoundUserInterface
+  - type: GhostInfo
+  #ADT end
 
 
 # proto for player ghosts specifically
