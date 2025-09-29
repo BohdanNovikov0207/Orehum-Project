@@ -5,4 +5,6 @@ namespace Content.Server._EE.Objectives.Components;
 [RegisterComponent, Access(typeof(CascadeConditionSystem))]
 public sealed partial class CascadeConditionComponent : Component
 {
+    [DataField("needSupermatter")]
+    public bool Supermatter = false;
 }

@@ -68,4 +68,7 @@ public sealed partial class StealConditionComponent : Component
     public LocId DescriptionText;
     [DataField(required: true)]
     public LocId DescriptionMultiplyText;
+
+    [DataField("needSupermatter")]
+    public bool Supermatter = false;
 }
