@@ -1,16 +1,4 @@
 - type: jukebox
-  id: acrosstheuniverse
-  name: The Beatles - Across The Universe
-  path:
-    path: /Audio/_Orehum/Jukebox/acrosstheuni.ogg
-
-- type: jukebox
-  id: andiloveher
-  name: The Beatles - And I Love Her
-  path:
-    path: /Audio/_Orehum/Jukebox/andiloveher.ogg
-
-- type: jukebox
   id: avcehyegonet
   name: НАИВ - А в цеху его нет
   path:
@@ -47,22 +35,10 @@
     path: /Audio/_Orehum/Jukebox/Michael-Jackson-Billie-Jean.ogg
 
 - type: jukebox
-  id: blizard
-  name: Hotline Miami 2 - Blizard
-  path:
-    path: /Audio/_Orehum/Jukebox/Blizzard.ogg
-
-- type: jukebox
   id: bluemoon
   name: Frank Sinatra - Blue Moon
   path:
     path: /Audio/_Orehum/Jukebox/bluemoon.ogg
-
-- type: jukebox
-  id: bodypaint
-  name: Arctic Monkeys - Body Paint
-  path:
-    path: /Audio/_Orehum/Jukebox/bodypaint.ogg
 
 - type: jukebox
   id: boomboomboomboom
@@ -71,22 +47,10 @@
     path: /Audio/_Orehum/Jukebox/bombom.ogg
 
 - type: jukebox
-  id: breatheintheair
-  name: Pink Floyd - Breathe (In the Air)
-  path:
-    path: /Audio/_Orehum/Jukebox/breathe.ogg
-
-- type: jukebox
   id: californiasun
   name: The Rivieras - California Sun
   path:
     path: /Audio/_Orehum/Jukebox/califsun.ogg
-
-- type: jukebox
-  id: cancanmusic
-  name: Offenbach - Can Can Music
-  path:
-    path: /Audio/_Orehum/Jukebox/cancanmusic.ogg
 
 - type: jukebox
   id: caramelldansen
@@ -167,12 +131,6 @@
     path: /Audio/_Orehum/Jukebox/invisible.ogg
 
 - type: jukebox
-  id: inthewoods
-  name: Aron Wright - In the Woods
-  path:
-    path: /Audio/_Orehum/Jukebox/inthewoods.ogg
-
-- type: jukebox
   id: lifeonmars
   name: David Bowie - Life On Mars?
   path:
@@ -189,12 +147,6 @@
   name: SAMURAI - Never Fade Away
   path:
     path: /Audio/_Orehum/Jukebox/neverfadeaway.ogg
-
-- type: jukebox
-  id: newyorklove
-  name: Dean Wagg - New York Love
-  path:
-    path: /Audio/_Orehum/Jukebox/newyorklove.ogg
 
 - type: jukebox
   id: nightcall
@@ -245,22 +197,10 @@
     path: /Audio/_Orehum/Jukebox/Hotline-Miami-2-Run.ogg
 
 - type: jukebox
-  id: sesbianlexS
-  name: Schubert - Serenade D957 No.4
-  path:
-    path: /Audio/_Orehum/Jukebox/sesbianlex.ogg
-
-- type: jukebox
   id: september
   name: Earth, Wind & Fire - September
   path:
     path: /Audio/_Orehum/Jukebox/september.ogg
-
-- type: jukebox
-  id: shineonyoucrazydiamond
-  name: Pink Floyd - Shine On You Crazy Diamond
-  path:
-    path: /Audio/_Orehum/Jukebox/shineonyou.ogg
 
 - type: jukebox
   id: smellsliketeenspirit
@@ -293,12 +233,6 @@
     path: /Audio/_Orehum/Jukebox/Pixies-Where-Is-My-Mind.ogg
 
 - type: jukebox
-  id: wizardS
-  name: SS13 - Wizard
-  path:
-    path: /Audio/_Orehum/Jukebox/wizard.ogg
-
-- type: jukebox
   id: worldssmallestviolin
   name: AJR - World's Smallest Violin
   path:
@@ -309,12 +243,6 @@
   name: Arctic Monkeys - 505
   path:
     path: /Audio/_Orehum/Jukebox/505.ogg
-
-- type: jukebox
-  id: dirgeforplanet
-  name: Firelake - Dirge for Planet
-  path:
-    path: /Audio/_Orehum/Jukebox/dirgeforplanet.ogg
 
 - type: jukebox
   id: paidtoparty
@@ -357,3 +285,27 @@
   name: Frank Sinatra - My Way
   path:
     path: /Audio/_Orehum/Jukebox/MyWay.ogg
+
+- type: jukebox
+  id: sweetd
+  name: Klass - Sweer Dreams
+  path:
+    path: /Audio/_Orehum/Jukebox/sweetD.ogg
+
+- type: jukebox
+  id: numa
+  name: O-Zone - Dragostea Din Tei
+  path:
+    path: /Audio/_Orehum/Jukebox/numa.ogg
+
+- type: jukebox
+  id: deviltown
+  name: cavetown - Devil Town
+  path:
+    path: /Audio/_Orehum/Jukebox/deviltown.ogg
+
+- type: jukebox
+  id: syt
+  name: The Weeknd - Save Your Tears
+  path:
+    path: /Audio/_Orehum/Jukebox/SYT.ogg
