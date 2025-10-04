@@ -76,13 +76,13 @@ public sealed partial class BluespaceHarvesterComponent : Component
     /// but the value is not too large to cause a lot of harm.
     /// </summary>
     [DataField, ViewVariables(VVAccess.ReadWrite)]
-    public int DangerFromReset = 75;
+    public int DangerFromReset = 25;
 
     /// <summary>
     /// After this danger value, the generation of dangerous creatures and anomalies will begin.
     /// </summary>
     [DataField, ViewVariables(VVAccess.ReadWrite)]
-    public int DangerLimit = 175;
+    public int DangerLimit = 1500;
 
     /// <summary>
     /// A prototype rift created when the number of allowed points is exceeded.
@@ -101,7 +101,7 @@ public sealed partial class BluespaceHarvesterComponent : Component
     /// Tries once every 1 second, with this chance to create a rift if DangerLimit is exceeded.
     /// </summary>
     [DataField, ViewVariables(VVAccess.ReadWrite)]
-    public float RiftChance = 0.08f;
+    public float RiftChance = 0.02f;
 
     /// <summary>
     /// Replaces RiftChance when hacked by Emag.

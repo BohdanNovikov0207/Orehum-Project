@@ -5,7 +5,7 @@
     sprite: Objects/Misc/stock_parts.rsi
     state: ansible_crystal
   discipline: Experimental
-  tier: 2
-  cost: 40000
+  tier: 3
+  cost: 80000
   recipeUnlocks:
   - MachineBluespaceHarvesterCircuitboard

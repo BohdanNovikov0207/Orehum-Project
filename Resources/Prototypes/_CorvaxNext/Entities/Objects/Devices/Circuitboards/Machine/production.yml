@@ -10,13 +10,13 @@
   - type: MachineBoard
     prototype: BluespaceHarvester
     stackRequirements:
-      Glass: 15
-      Steel: 15
-      CableHV: 5
+      Glass: 65
+      Steel: 65
+      CableHV: 30
     machinePartRequirements:
-      Manipulator: 5
-      Capacitor: 5
-      MatterBin: 15
+      Manipulator: 10
+      Capacitor: 10
+      MatterBin: 30
     tagRequirements:
       GlassBeaker:
         amount: 5
