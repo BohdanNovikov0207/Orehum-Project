@@ -6,7 +6,7 @@ using JetBrains.Annotations;
 namespace Content.Server.Atmos.Reactions;
 
 [UsedImplicitly]
-public sealed partial class HyperNobliumProductionReaction : IGasReactionEffect
+public sealed partial class ProtoNitrateBZaseConversionReaction : IGasReactionEffect
 {
     public ReactionResult React(GasMixture mixture, IGasMixtureHolder? holder, AtmosphereSystem atmosphereSystem, float heatScale)
     {
@@ -14,23 +14,23 @@ public sealed partial class HyperNobliumProductionReaction : IGasReactionEffect
         if (initialHyperNoblium >= 5.0f && mixture.Temperature > 20f)
             return ReactionResult.NoReaction;
 
-        var initialNitrogen = mixture.GetMoles(Gas.Nitrogen);
-        var initialTritium = mixture.GetMoles(Gas.Tritium);
+        var initialProtoNitrate = mixture.GetMoles(Gas.ProtoNitrate);
         var initialBZ = mixture.GetMoles(Gas.BZ);
 
-        var nobFormed = Math.Min((initialNitrogen + initialTritium) * 0.01f, Math.Min(initialTritium * 5f, initialNitrogen * 10f));
-        if (nobFormed <= 0 || (initialTritium - 5f) * nobFormed < 0 || (initialNitrogen - 10f) * nobFormed < 0)
+        var temperature = mixture.Temperature;
+        var consumedAmount = Math.Min(temperature / 2240f * initialBZ * initialProtoNitrate / (initialBZ + initialProtoNitrate), Math.Min(initialBZ, initialProtoNitrate));
+
+        if (consumedAmount <= 0 || initialBZ - consumedAmount < 0)
             return ReactionResult.NoReaction;
 
         var oldHeatCapacity = atmosphereSystem.GetHeatCapacity(mixture, true);
 
-        var reductionFactor = Math.Clamp(initialTritium / (initialTritium + initialBZ), 0.001f, 1f);
+        mixture.AdjustMoles(Gas.BZ, -consumedAmount);
+        mixture.AdjustMoles(Gas.Nitrogen, consumedAmount * 0.4f);
+        mixture.AdjustMoles(Gas.Helium, consumedAmount * 1.6f);
+        mixture.AdjustMoles(Gas.Plasma, consumedAmount * 0.8f);
 
-        mixture.AdjustMoles(Gas.Tritium, -5f * nobFormed * reductionFactor);
-        mixture.AdjustMoles(Gas.Nitrogen, -10f * nobFormed);
-        mixture.AdjustMoles(Gas.HyperNoblium, 0.1f * nobFormed);
-
-        var energyReleased = nobFormed * (Atmospherics.NobliumFormationEnergy / Math.Max(initialBZ, 1));
+        var energyReleased = consumedAmount * Atmospherics.ProtoNitrateBZaseConversionEnergy;
 
         var newHeatCapacity = atmosphereSystem.GetHeatCapacity(mixture, true);
         if (newHeatCapacity > Atmospherics.MinimumHeatCapacity)
