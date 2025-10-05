@@ -531,17 +531,8 @@ public static class SupermatterGasData
         { Gas.Frezon,        new(-2f,   -10f,  -1f,  2f)  },
         { Gas.Ammonia,       new(1f,    0.5f,  1f,   1f)  },
         { Gas.NitrousOxide,  new(0.5f,  -2f,   0.5f, 3f)  },
-        { Gas.BZ,            new(2f,    -1f,   -2f,  8f)  },
-        { Gas.Pluoxium,      new(2f,     8f,    1f,  2f)  },
-        { Gas.Hydrogen,      new(3.5f,   1.4f,  3f,  0f)  },
-        { Gas.Nitrium,       new(2f,     8f,    2f,  1f)  },
-        { Gas.Healium,       new(-2f,   -1f,    2f,  8f)  },
-        { Gas.ProtoNitrate,  new(5f,     1f,    1f,  3f)  },
-        { Gas.Zauker,        new(30f,    15f,   2f,  1f)  },
-        { Gas.Halon,         new(0f,     0f,    0f,  0f)  },
-        { Gas.Helium,        new(0f,     0f,    0f,  0f)  },
         { Gas.HyperNoblium,  new(0f,    0f,    1f,   1f)  },
-        { Gas.AntiNoblium,   new(0f,    -10f,   0f, -1f)  }
+        { Gas.AntiNoblium,   new(0f,    -10f,    0f,   -1f) }
     };
 
     public static float CalculateGasMixModifier(GasMixture mix, Func<SupermatterGasFact, float> getModifier)

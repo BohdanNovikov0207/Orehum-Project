@@ -1,11 +1,2 @@
-gases-bz = БЗ
-gases-proto-nitrate = Прото-нитрат
-gases-pluoxium = Плюоксиум
-gases-hydrogen = Водород
-gases-nitrium = Нитриум
-gases-healium = Хилиум
-gases-zauker = Заукер
-gases-halon = Галон
-gases-helium = Гелий
 gases-hyper-noblium = Гипер-ноблий
 gases-anti-noblium = Анти-ноблий

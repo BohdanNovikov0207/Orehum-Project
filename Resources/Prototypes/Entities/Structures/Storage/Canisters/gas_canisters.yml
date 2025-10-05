@@ -617,7 +617,6 @@
       - 0 # Ammonia
       - 0 # N2O
       - 2769.36 # Frezon
-      - 0 # BZ, etc
       temperature: 293.15
   - type: Destructible
     thresholds:
