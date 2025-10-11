@@ -91,8 +91,8 @@
   - type: ContainerContainer
     containers:
       blueprint: !type:Container
-      machine_board: !type:Container
-      machine_parts: !type:Container
+  # this doesn't do anything currently as rev machines dont use machine construction
+  # keeping it here for reference incase it's changed in the future
   - type: EmptyOnMachineDeconstruct
     containers:
     - blueprint
@@ -115,11 +115,7 @@
   - type: MaterialStorage
     whitelist:
       tags:
-        - Sheet
-  - type: ContainerContainer
-    containers:
-      machine_board: !type:Container
-      machine_parts: !type:Container
+      - Sheet
   - type: Construction
     node: RevPrintingPress
 
@@ -136,10 +132,6 @@
     runningState: telecomms
     staticPacks:
     - RevTelecommsWorkbenchStatic
-  - type: ContainerContainer
-    containers:
-      machine_board: !type:Container
-      machine_parts: !type:Container
   - type: MaterialStorage
     whitelist:
       tags:

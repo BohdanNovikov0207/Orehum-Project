@@ -11,7 +11,8 @@
     size: Small
   - type: Damageable
     damageContainer: Inorganic
-  - type: OnUseTimerTrigger
+  - type: TriggerOnUse
+  - type: TimerTrigger
     delay: 0.9
   - type: Destructible
     thresholds:
