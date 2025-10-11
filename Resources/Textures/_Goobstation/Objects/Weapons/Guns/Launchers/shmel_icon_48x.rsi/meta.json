@@ -6,18 +6,18 @@
     "x": 48,
     "y": 48
   },
-    "states": [
-        {
-            "name": "icon"
-        },
-        {
-            "name": "base"
-        },
-        {
-            "name": "mag-0"
-        },
-        {
-            "name": "mag-1"
-        }
-    ]
+  "states": [
+    {
+      "name": "base"
+    },
+    {
+      "name": "mag-1"
+    },
+    {
+      "name": "mag-0"
+    },
+    {
+      "name": "icon"
+    }
+  ]
 }
