@@ -3,3 +3,4 @@ construction-graph-tag-seccomms = ключ шифрования службы б�
 construction-graph-tag-turretboard = плата турели революционеров
 construction-graph-tag-hand-teleporter = ручной телепорт
 construction-graph-tag-RCD = РСУ
+construction-graph-tag-rncryption-revolutionary = ключ шифрования революционеров
