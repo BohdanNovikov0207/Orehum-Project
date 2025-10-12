@@ -662,10 +662,19 @@
       - 0 # Plasma
       - 0 # Tritium
       - 0 # Water vapor
-      - 0 # Ammonia
+      - 0 # Miasma
       - 0 # N2O
       - 0 # Frezon
+      - 0 # BZ
+      - 0 # Pluoxium
+      - 0 # Hydrogen
+      - 0 # Nitrium
+      - 0 # Healium
       - 1871.71051 # Hyper-Noblium
+      - 0 # Proto-Nitrate
+      - 0 # Zauker
+      - 0 # Halon
+      - 0 # Helium
       - 0 # Anti-Noblium
       temperature: 293.15
   - type: Destructible
@@ -705,16 +714,25 @@
     gasMixture:
       volume: 1000
       moles:
-      - 0 # oxygen
+            - 0 # oxygen
       - 0 # nitrogen
       - 0 # CO2
       - 0 # Plasma
       - 0 # Tritium
       - 0 # Water vapor
-      - 0 # Ammonia
+      - 0 # Miasma
       - 0 # N2O
       - 0 # Frezon
+      - 0 # BZ
+      - 0 # Pluoxium
+      - 0 # Hydrogen
+      - 0 # Nitrium
+      - 0 # Healium
       - 0 # Hyper-Noblium
+      - 0 # Proto-Nitrate
+      - 0 # Zauker
+      - 0 # Halon
+      - 0 # Helium
       - 1871.71051 # Anti-Noblium
       temperature: 293.15
   - type: Destructible
