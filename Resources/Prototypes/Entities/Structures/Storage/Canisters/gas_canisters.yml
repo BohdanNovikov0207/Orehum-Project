@@ -714,7 +714,7 @@
     gasMixture:
       volume: 1000
       moles:
-            - 0 # oxygen
+      - 0 # oxygen
       - 0 # nitrogen
       - 0 # CO2
       - 0 # Plasma
