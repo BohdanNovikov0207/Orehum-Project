@@ -4,4 +4,3 @@ construction-graph-tag-turretboard = плата турели революцио�
 construction-graph-tag-hand-teleporter = ручной телепорт
 construction-graph-tag-RCD = РСУ
 construction-graph-tag-rncryption-revolutionary = ключ шифрования революционеров
-construction-graph-tag-paper = бумага

@@ -140,7 +140,7 @@
   - type: Construction
     deconstructionTarget: null
     graph: RevTurret
-    node: RevTurretPistol
+    node: pistol turret
 
 - type: entity
   parent: BaseWeaponTurretRevolutionaryMagazine
@@ -181,7 +181,7 @@
   - type: Construction
     deconstructionTarget: null
     graph: RevTurret
-    node: RevTurretSMG
+    node: SMG turret
 
 - type: entity
   parent: WeaponTurretRevolutionarySMG
