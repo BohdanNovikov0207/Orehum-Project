@@ -8,8 +8,6 @@
   rules:
   - MeteorSwarmScheduler
   - RampingStationEventScheduler
-  - SpaceTrafficControlEventScheduler
-  - SpaceTrafficControlFriendlyEventScheduler
   - BasicRoundstartVariation
   - LavalandStormScheduler # Lavaland Change
   - GlimmerEventScheduler # fix glimmer events
@@ -26,7 +24,6 @@
   rules:
   - KesslerSyndromeScheduler
   - RampingStationEventScheduler
-  - SpaceTrafficControlEventScheduler
   - BasicRoundstartVariation
   - LavalandStormScheduler # Lavaland Change
   - GlimmerEventScheduler # fix glimmer events
@@ -41,8 +38,6 @@
   rules:
   - MeteorSwarmScheduler
   - HellshiftStationEventScheduler
-  - SpaceTrafficControlEventScheduler
-  - SpaceTrafficControlFriendlyEventScheduler
   - BasicRoundstartVariation
   - LavalandStormScheduler # Lavaland Change
   - GlimmerEventScheduler # fix glimmer events
@@ -56,8 +51,6 @@
   rules:
   - MeteorSwarmScheduler
   - IrregularStationEventScheduler
-  - SpaceTrafficControlEventScheduler
-  - SpaceTrafficControlFriendlyEventScheduler
   - BasicRoundstartVariation
   - LavalandStormScheduler # Lavaland Change
   - GlimmerEventScheduler # fix glimmer events
@@ -71,8 +64,6 @@
   rules:
   - MeteorSwarmScheduler
   - IrregularExtendedStationEventScheduler
-  - SpaceTrafficControlEventScheduler
-  - SpaceTrafficControlFriendlyEventScheduler
   - BasicRoundstartVariation
   - LavalandStormScheduler # Lavaland Change
   - GlimmerEventScheduler # fix glimmer events
@@ -94,7 +85,6 @@
   - BloodCult
   - KesslerSyndromeScheduler
   - RampingStationEventScheduler
-  - SpaceTrafficControlEventScheduler
   - BasicRoundstartVariation
   - LavalandStormScheduler # Lavaland Change
   - GlimmerEventScheduler # fix glimmer events
@@ -122,8 +112,6 @@
   - MeteorSwarmMildScheduler
   - MeteorSwarmScheduler
   - RampingStationEventScheduler
-  - SpaceTrafficControlEventScheduler
-  - SpaceTrafficControlFriendlyEventScheduler
   - BasicRoundstartVariation
   - LavalandStormScheduler # Lavaland Change
   - GlimmerEventScheduler # fix glimmer events
@@ -139,7 +127,6 @@
   rules:
   - BasicStationEventScheduler
   - MeteorSwarmScheduler
-  - SpaceTrafficControlEventScheduler
   - LavalandStormScheduler # Lavaland Change
   - GlimmerEventScheduler # fix glimmer events
 
@@ -152,7 +139,6 @@
   showInVote: true
   description: greenshift-description
   rules:
-  - SpaceTrafficControlFriendlyEventScheduler
   - BasicRoundstartVariation
   - LavalandStormScheduler # Lavaland Change
   - GlimmerEventScheduler # fix glimmer events
@@ -177,7 +163,6 @@
   description: secret-description
   rules:
   - MeteorSwarmScheduler
-  - SpaceTrafficControlEventScheduler
   - BasicRoundstartVariation
   - LavalandStormScheduler # Lavaland Change
   - GlimmerEventScheduler # fix glimmer events
@@ -190,7 +175,6 @@
   showInVote: false #Admin Use
   description: secret-description
   rules:
-  - SpaceTrafficControlFriendlyEventScheduler
   - BasicRoundstartVariation
   - LavalandStormScheduler # Lavaland Change
   - GlimmerEventScheduler # fix glimmer events
@@ -221,7 +205,6 @@
   - SubGamemodesRule
   - BasicStationEventScheduler
   - MeteorSwarmScheduler
-  - SpaceTrafficControlEventScheduler
   - BasicRoundstartVariation
   - LavalandStormScheduler # Lavaland Change
   - GlimmerEventScheduler # fix glimmer events
@@ -251,7 +234,6 @@
   - SubGamemodesRule
   - BasicStationEventScheduler
   - MeteorSwarmScheduler
-  - SpaceTrafficControlEventScheduler
   - BasicRoundstartVariation
   - LavalandStormScheduler # Lavaland Change
   - GlimmerEventScheduler # fix glimmer events
@@ -270,7 +252,6 @@
   - SubGamemodesRule
   - BasicStationEventScheduler
   - MeteorSwarmScheduler
-  - SpaceTrafficControlEventScheduler
   - BasicRoundstartVariation
   - LavalandStormScheduler # Lavaland Change
   - GlimmerEventScheduler # fix glimmer events
@@ -287,7 +268,6 @@
   - SubGamemodesRuleNoWizard #No Dual Wizards at the start, midround is fine
   - BasicStationEventScheduler
   - MeteorSwarmScheduler
-  - SpaceTrafficControlEventScheduler
   - BasicRoundstartVariation
 
 - type: gamePreset
@@ -305,7 +285,6 @@
   - Zombie
   - BasicStationEventScheduler
   - MeteorSwarmScheduler
-  - SpaceTrafficControlEventScheduler
   - BasicRoundstartVariation
   - LavalandStormScheduler # Lavaland Change
   - GlimmerEventScheduler # fix glimmer events
@@ -323,7 +302,6 @@
   - Zombie
   - BasicStationEventScheduler
   - KesslerSyndromeScheduler
-  - SpaceTrafficControlEventScheduler
   - BasicRoundstartVariation
   - LavalandStormScheduler # Lavaland Change
   - GlimmerEventScheduler # fix glimmer events
@@ -343,7 +321,6 @@
   - SubGamemodesRule
   - BasicStationEventScheduler
   - MeteorSwarmScheduler
-  - SpaceTrafficControlEventScheduler
   - BasicRoundstartVariation
   - LavalandStormScheduler # Lavaland Change
   - GlimmerEventScheduler # fix glimmer events

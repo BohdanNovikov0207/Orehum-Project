@@ -383,7 +383,7 @@
 #       max: 7200 # 120 mins # you probably arent getting a second visitor shuttle in one round, but it is possible.
 #     scheduledGameRules: !type:NestedSelector
 #       tableId: SpaceTrafficControlTable
-# 
+#
 # - type: entity
 #   id: SpaceTrafficControlFriendlyEventScheduler
 #   parent: BaseGameRule
