@@ -24,7 +24,7 @@
 - type: entity
   parent: BaseUnfinishedRevWeapon
   id: RevSwordBlade
-  name: unfinished sword blade
+  name: лезвие меча
   description: An unfinished sword, use some wood to complete it.
   components:
   - type: Sprite
@@ -43,7 +43,7 @@
 - type: entity
   parent: BaseUnfinishedRevWeapon
   id: RevMaceHead
-  name: unfinished mace parts
+  name: кончик булавы
   description: An unfinished mace, use some wood to complete it.
   components:
   - type: Sprite
@@ -54,7 +54,7 @@
 - type: entity
   parent: BaseUnfinishedRevWeapon
   id: RevKnifeBlade
-  name: unfinished knife blade
+  name: лезвие кованого ножа
   description: An unfinished knife, use some wood to complete it.
   components:
   - type: Sprite
@@ -73,7 +73,7 @@
 - type: entity
   parent: BaseUnfinishedRevWeapon
   id: RevTorchHead
-  name: unfinished combat torch
+  name: незавершенный боевой факел
   description: An unfinished combat torch, use some wood to complete it.
   components:
   - type: Sprite
@@ -84,7 +84,7 @@
 - type: entity
   parent: BaseUnfinishedRevWeapon
   id: RevPitchforkHead
-  name: unfinished pitchfork
+  name: наконечник вилы
   description: An unfinished pitchfork, use a some wood to complete it.
   components:
   - type: Sprite
@@ -103,8 +103,8 @@
 - type: entity
   parent: [ BaseItem, BaseMinorContraband ]
   id: RevUnfinishedGun
-  name: misshapen steel chunk
-  description: A sheet of steel bent into the rough shape of a gun. It needs a lot more work before firing.
+  name: деформированный кусок стали
+  description: Лист стали, грубо изогнутый в форме пушки. Чтобы эта штука начала стрелять, над ней нужно ещё долго поработать.
   components:
   - type: Sprite
     sprite: _Trauma/Objects/Weapons/Guns/Pistols/unfinished.rsi
@@ -115,4 +115,14 @@
     graph: RevLiberator
     deconstructionTarget: null
     defaultTarget: RevLiberator
+    node: unfinished
+
+- type: entity
+  parent: RevUnfinishedGun
+  id: RevUnfinishedGun2
+  components:
+  - type: Construction
+    graph: RevResistance
+    deconstructionTarget: null
+    defaultTarget: RevResistance
     node: unfinished

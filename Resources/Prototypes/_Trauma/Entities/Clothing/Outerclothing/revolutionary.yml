@@ -1,8 +1,8 @@
 - type: entity
   parent: [ ClothingOuterBaseMedium, AllowSuitStorageClothing, BaseMajorContraband ]
   id: ClothingOuterArmorRev
-  name: chest plate
-  description: Hastily made armor for the people.
+  name: нагрудник
+  description: Наспех сделанная броня для народа.
   components:
   - type: Item
     size: Ginormous

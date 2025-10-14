@@ -108,7 +108,7 @@
 - type: entity
   parent: BaseWeaponTurretRevolutionary
   id: WeaponTurretRevolutionaryPistolFull
-  name: improvised pistol turret
+  name: самодельная пистолетная турель
   description: Fires at anything without the proper IFF signal, can only hold ten rounds which must be hand loaded. Careful with this thing.
   components:
   - type: Gun
@@ -145,7 +145,7 @@
 - type: entity
   parent: BaseWeaponTurretRevolutionaryMagazine
   id: WeaponTurretRevolutionarySMG
-  name: improvised smg turret
+  name: самодельная турель-ПП
   description: Fires at anything without the proper IFF signal. This one is magazine loaded, but extremely innaccurate.
   suffix: Empty
   components:

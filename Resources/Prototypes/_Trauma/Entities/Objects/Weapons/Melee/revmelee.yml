@@ -25,7 +25,7 @@
 - type: entity
   parent: BaseRevForgedWeapon
   id: RevMace
-  name: forged mace
+  name: кованая булава
   description: A robust mace, stuns enemies. Not great against modern armor, or for killing.
   components:
   - type: Sprite
@@ -52,7 +52,7 @@
 - type: entity
   parent: BaseRevForgedWeapon
   id: RevSword
-  name: forged sword
+  name: кованый меч
   description: A two handed sword, deals heavy damage.
   components:
   - type: Sprite
@@ -97,7 +97,7 @@
 - type: entity
   parent: BaseRevForgedWeapon
   id: RevPitchfork
-  name: forged pitchfork
+  name: кованые вилы
   description: A large pitchfork, can be thrown and has extended melee range.
   components:
   - type: Sprite
@@ -133,7 +133,7 @@
 - type: entity
   parent: BaseRevForgedWeapon
   id: RevKnife
-  name: forged knife
+  name: кованый нож
   description: A small forged knife. It is concealable, can be tipped with poison and is usable with a shield.
   components:
   - type: Sprite
@@ -210,7 +210,7 @@
 - type: entity
   parent: BaseRevMeleeWeapon
   id: RevTorch
-  name: combat torch
+  name: боевой факел
   description: A refined torch mounted with a steel head. Lights enemies on fire when hit.
   components:
   - type: Sprite

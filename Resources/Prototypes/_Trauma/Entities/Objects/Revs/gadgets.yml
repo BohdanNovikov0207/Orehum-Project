@@ -1,0 +1,62 @@
+
+- type: entity
+  name: глушилка революционеров
+  parent: [RadioJammer]
+  id: RevRadioJammer
+  description: Это устройство при активации прерывает любую исходящую радиосвязь поблизости, а также блокирует сигналы датчиков скафандра.
+  components:
+  - type: RadioJammer
+    settings:
+    - wattage: 1
+      range: 2.5
+      message: radio-jammer-component-set-message-low
+      name: radio-jammer-component-setting-low
+
+- type: entity
+  name: карта доступа революционеров
+  parent: [IDCardStandard]
+  id: RevIDCard
+  components:
+  - type: Access
+    tags:
+    - Maintenance
+    - SyndicateAgent #remake this later
+  - type: Sprite
+    state: idrevolutionary
+  - type: AgentIDCard
+  - type: ActivatableUI
+    key: enum.AgentIDCardUiKey.Key
+    inHandsOnly: true
+  - type: Tag
+    tags:
+    - DoorBumpOpener
+  - type: UserInterface
+    interfaces:
+      enum.AgentIDCardUiKey.Key:
+        type: AgentIDCardBoundUserInterface
+      enum.ChameleonUiKey.Key:
+        type: ChameleonBoundUserInterface
+  - type: NanoChatCard
+    listNumber: false
+
+- type: entity
+  parent: [BaseFlatpack]
+  id: RevDoorFlatpack
+  name: разборный шлюз революционеров
+  description: Плоская упаковка для строительства шлюза, который открывается только картами доступа революционеров.
+  components:
+  - type: Flatpack
+    entity: AirlockRevolutionary
+  - type: StaticPrice
+    price: 75
+
+- type: entity
+  parent: [AirlockSyndicate]
+  id: AirlockRevolutionary
+  suffix: Revolutionary, Locked
+  components:
+  - type: ContainerFill
+    containers:
+      board: [ DoorElectronicsSyndicateAgent ]
+  - type: Sprite
+    sprite: Structures/Doors/Airlocks/Standard/maint.rsi

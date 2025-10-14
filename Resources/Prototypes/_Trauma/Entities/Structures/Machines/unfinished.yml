@@ -1,8 +1,8 @@
 - type: entity
   parent: [ BaseMachine, BaseMinorContraband ]
   id: RevUnfinishedMachine
-  name: steel contraption
-  description: A large mass of steel worked into some kind of machine. Only a madman knows what this could be!
+  name: стальная диковина
+  description: Глыба стали, превращённая в некое подобие машины. Только безумец знает, чем это может оказаться!
   components:
   - type: Sprite
     sprite: _Trauma/Structures/Machines/unfinished.rsi
@@ -15,8 +15,8 @@
 - type: entity
   parent: RevUnfinishedMachine
   id: RevUnfinishedTurret
-  name: turret base
-  description: A lump of steel mounted to a tripod, not very imposing.
+  name: основание турели
+  description: Кусок стали, водружённый на штатив. Выглядит не очень впечатляюще.
   components:
   - type: Sprite
     sprite: _Trauma/Structures/Defences/turrets.rsi

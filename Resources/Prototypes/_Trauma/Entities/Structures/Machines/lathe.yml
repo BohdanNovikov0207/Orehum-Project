@@ -109,7 +109,7 @@
     sprite: _Trauma/Structures/Machines/revprintingpress.rsi
   - type: Lathe
     producingSound: /Audio/_Trauma/Revs/printingpress.ogg
-    runningState: printingpress
+    runningState: printingpress3m
     staticPacks:
     - RevPrintingPress
   - type: MaterialStorage
@@ -214,3 +214,25 @@
       - Ingot
   - type: Construction
     node: RevBulletPress
+
+- type: entity
+  parent: BaseRevIndustry
+  id: RevMicroelectronicsAssembler
+  name: сборщик микроэлектроники
+  description: Позволяет создавать нелегальные технологии, полезные для дела революции.
+  components:
+  - type: Sprite
+    sprite: _Trauma/Structures/Machines/microelectronicsassembler.rsi
+  - type: Lathe
+    producingSound: /Audio/_Trauma/Revs/microelectronicsassembler.ogg
+    runningState: microelectronicsassembler
+    staticPacks:
+    - RevMicroElectronicsStatic
+  - type: MaterialStorage
+    whitelist:
+      tags:
+      - Sheet
+      - RawMaterial
+      - Ingot
+  - type: Construction
+    node: RevMicroelectronicsAssembler
