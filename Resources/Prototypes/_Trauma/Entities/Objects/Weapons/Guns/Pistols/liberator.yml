@@ -1,8 +1,8 @@
 - type: entity
   parent: [ BaseItem, BaseMajorContraband ]
   id: WeaponPistolLiberator
-  name: liberator
-  description: A shitty little pistol that can only hold 6 rounds and has to be hand fed.
+  name: Освободитель
+  description: Дерьмовенький маленький пистолет, вмещающий всего 6 патронов, которые приходится заряжать вручную.
   suffix: Full
   components:
   - type: Item

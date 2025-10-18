@@ -1,0 +1,14 @@
+- type: entity
+  parent: [ClothingBackpack]
+  id: ClothingBackpackRev
+  name: рюкзак MOLLE
+  description: Рюкзак, разработанный для боевых условий. Он повидал немало войн в самых разных уголках галактики.
+  components:
+    - type: Sprite
+      sprite: Clothing/Back/Backpacks/merc.rsi
+    - type: ExplosionResistance
+      damageCoefficient: 0.1
+    - type: Storage
+      grid:
+      - 0,0,7,3
+      - 8,1,8,3

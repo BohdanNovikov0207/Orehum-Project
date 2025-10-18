@@ -115,3 +115,89 @@
     graph: RevGuns
     deconstructionTarget: null
     node: unfinished
+
+- type: entity
+  parent: [ BaseItem ]
+  id: RevHelmetLiner
+  name: подшлемник
+  description: Используется для создания шлемов. Добавьте пласталь, чтобы завершить изготовление.
+  components:
+  - type: Sprite
+    sprite: _Trauma/Objects/Revs/components.rsi
+    state: helmetliner
+  - type: Construction
+    graph: RevHelmet
+    deconstructionTarget: null
+    node: unfinished
+
+- type: entity
+  parent: [ BaseItem ]
+  id: RevGasFilter
+  name: газовый фильтр
+  description: Используется для создания противогазов. Добавьте пластик, чтобы завершить изготовление.
+  components:
+  - type: Sprite
+    sprite: _Trauma/Objects/Revs/components.rsi
+    state: gasfilter
+  - type: Construction
+    graph: RevMask
+    deconstructionTarget: null
+    node: unfinished
+
+- type: entity
+  parent: [ BaseItem ]
+  id: RevEmptyVest
+  name: пустой жилет из паутины
+  description: Пустой жилет, которому всё ещё нужны пластины. Добавьте бронепластины, чтобы завершить его изготовление.
+  components:
+  - type: Sprite
+    sprite: _Trauma/Objects/Revs/components.rsi
+    state: emptyweb
+  - type: Construction
+    graph: RevVest
+    deconstructionTarget: null
+    node: unfinished
+
+- type: entity
+  parent: [ BaseItem ]
+  id: RevArmorPlate
+  name: бронепластина
+  description: Пластина для жилета из паутины.
+  components:
+  - type: Sprite
+    sprite: _Trauma/Objects/Revs/components.rsi
+    state: armorplate
+  - type: Tag
+    tags:
+    - RevArmorPlate
+  - type: Construction
+    graph: RevVest
+    deconstructionTarget: null
+    node: unfinished
+
+- type: entity
+  parent: BaseItem
+  id: RevBallBearings
+  name: шарикоподшипники
+  description: Небольшая горсть металлических шариков.
+  components:
+  - type: Sprite
+    sprite: _Trauma/Objects/Revs/components.rsi
+    state: ballbearings
+  - type: Tag
+    tags:
+    - RevBallBearings
+
+- type: entity
+  parent: [BaseItem]
+  id: RevUnfinishedRocket
+  name: незавершённая ракета
+  description: Незавершённая ракета.
+  components:
+  - type: Sprite
+    sprite: _Trauma/Objects/Weapons/Guns/Ammunition/Rockets/unfinished.rsi
+    state: icon
+  - type: Construction
+    graph: RevRockets
+    deconstructionTarget: null
+    node: unfinished

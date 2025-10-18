@@ -1,0 +1,10 @@
+- type: entity
+  parent: ClothingMaskBandanaBase
+  id: ClothingMaskBandRev
+  name: темно-зеленая бандана
+  description: Позволяет скрыть вашу личность или просто прикрыть волосы.
+  components:
+  - type: Sprite
+    sprite: Clothing/Head/Bandanas/merc.rsi
+  - type: Clothing
+    sprite: Clothing/Head/Bandanas/merc.rsi

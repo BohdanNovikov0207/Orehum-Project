@@ -1,0 +1,14 @@
+- type: entity
+  parent: [ ClothingHeadHelmetArmoredBase ]
+  id: ClothingHeadHelmetRev
+  name: шлем
+  description: Боевой шлем, часто используемый революционерами. Прочный и лёгкий.
+  components:
+  - type: Sprite
+    sprite: Clothing/Head/Helmets/merc_helmet.rsi
+  - type: Clothing
+    sprite: Clothing/Head/Helmets/merc_helmet.rsi
+  - type: Construction
+    graph: RevHelmet
+    deconstructionTarget: null
+    node: finished

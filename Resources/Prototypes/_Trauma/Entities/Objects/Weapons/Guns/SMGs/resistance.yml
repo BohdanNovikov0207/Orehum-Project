@@ -1,8 +1,8 @@
 - type: entity
-  name: resistance
-  parent: BaseItem
+  parent: [ BaseItem ]
   id: WeaponSMGResistance
-  description: A small and innaccurate gun, cannot hit anything but at least it has a magazine.
+  name: Сопротивление
+  description: Маленькая и неточная пушка. Попасть из неё во что-либо практически невозможно, но зато у неё хотя бы есть магазин.
   suffix: Full
   components:
   - type: Sprite
@@ -91,10 +91,10 @@
   - type: Appearance
 
 - type: entity
-  name: resistance
+  name: Освободитель
   parent: WeaponSMGResistance
   id: WeaponSMGResistanceEmpty
-  description: A small and innaccurate gun, cannot hit anything but at least it has a magazine.
+  description: Маленькая и неточная пушка. Попасть из неё во что-либо практически невозможно, но зато у неё хотя бы есть магазин.
   components:
   - type: Construction
     deconstructionTarget: null
