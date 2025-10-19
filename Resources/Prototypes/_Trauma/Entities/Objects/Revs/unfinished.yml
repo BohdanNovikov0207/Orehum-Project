@@ -176,20 +176,7 @@
     node: unfinished
 
 - type: entity
-  parent: BaseItem
-  id: RevBallBearings
-  name: шарикоподшипники
-  description: Небольшая горсть металлических шариков.
-  components:
-  - type: Sprite
-    sprite: _Trauma/Objects/Revs/components.rsi
-    state: ballbearings
-  - type: Tag
-    tags:
-    - RevBallBearings
-
-- type: entity
-  parent: [BaseItem]
+  parent: [ BaseItem ]
   id: RevUnfinishedRocket
   name: незавершённая ракета
   description: Незавершённая ракета.

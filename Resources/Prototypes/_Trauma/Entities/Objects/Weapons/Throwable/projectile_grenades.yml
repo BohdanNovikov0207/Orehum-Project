@@ -37,4 +37,4 @@
   - type: Construction
     deconstructionTarget: null
     graph: RevIED
-    node: RevIED
+    node: IED
