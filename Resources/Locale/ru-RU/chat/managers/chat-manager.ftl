@@ -27,10 +27,7 @@ chat-manager-entity-whisper-unknown-wrap-message = [BubbleHeader][font size=10][
 chat-manager-entity-me-wrap-message = [italic]{ CAPITALIZE($entityName) } { $message }[/italic]
 chat-manager-entity-looc-wrap-message = LOOC: [bold]{ $entityName }:[/bold] { $message }
 chat-manager-send-ooc-wrap-message = OOC: {$playerName}: {$message}
-chat-manager-send-ooc-patron-wrap-message = OOC: [color={$patronColor}]{$playerName}{$authServer ->
-    [Unknown] {""}
-    *[other]
-}[/color]: {$message}
+chat-manager-send-ooc-patron-wrap-message = OOC: [color={$patronColor}]{$playerName}[/color]: {$message}
 chat-manager-send-dead-chat-wrap-message = { $deadChannelName }: [bold][BubbleHeader]{ $playerName }[/BubbleHeader]:[/bold] [BubbleContent]{ $message }[/BubbleContent]
 chat-manager-send-admin-dead-chat-wrap-message = { $adminChannelName }: [bold]([BubbleHeader]{ $userName }[/BubbleHeader]):[/bold] [BubbleContent]{ $message }[/BubbleContent]
 chat-manager-send-admin-chat-wrap-message = { $adminChannelName }: [bold]{ $playerName }:[/bold] { $message }

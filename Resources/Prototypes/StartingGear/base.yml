@@ -39,3 +39,11 @@
   - !type:CharacterSpeciesRequirement
     species:
     - Plasmaman
+
+- type: startingGear
+  id: WaterVaporBreather
+  abstract: true
+  requirements:
+  - !type:CharacterSpeciesRequirement
+    species:
+    - Feroxi

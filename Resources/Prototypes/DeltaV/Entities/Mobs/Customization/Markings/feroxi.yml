@@ -350,40 +350,41 @@
   - sprite: _DV/Mobs/Customization/Feroxi/body_markings.rsi
     state: feroxi-torso-stripes-tiger
 
-# Leg Markings
-- type: marking
-  id: FeroxiLegStripesBlitz
-  bodyPart: LLeg
-  markingCategory: Legs
-  speciesRestriction: [ Feroxi ]
-  sprites:
-  - sprite: _DV/Mobs/Customization/Feroxi/body_markings.rsi
-    state: feroxi-leg-stripes-blitz
-
-- type: marking
-  id: FeroxiLegStripesTiger
-  bodyPart: LLeg
-  markingCategory: Legs
-  speciesRestriction: [ Feroxi ]
-  sprites:
-  - sprite: _DV/Mobs/Customization/Feroxi/body_markings.rsi
-    state: feroxi-leg-stripes-tiger
-
-# Arm Markings
-- type: marking
-  id: FeroxiArmStripesBlitz
-  bodyPart: LArm
-  markingCategory: Arms
-  speciesRestriction: [ Feroxi ]
-  sprites:
-  - sprite: _DV/Mobs/Customization/Feroxi/body_markings.rsi
-    state: feroxi-arm-stripes-blitz
-
-- type: marking
-  id: FeroxiArmStripesTiger
-  bodyPart: LArm
-  markingCategory: Arms
-  speciesRestriction: [ Feroxi ]
-  sprites:
-  - sprite: _DV/Mobs/Customization/Feroxi/body_markings.rsi
-    state: feroxi-arm-stripes-tiger
+## Leg Markings
+#- type: marking
+#  id: FeroxiLegStripesBlitz
+#  bodyPart: LLeg
+#  markingCategory: Legs
+#  speciesRestriction: [ Feroxi ]
+#  sprites:
+#  - sprite: _DV/Mobs/Customization/Feroxi/body_markings.rsi
+#    state: feroxi-leg-stripes-blitz
+#
+#- type: marking
+#  id: FeroxiLegStripesTiger
+#  bodyPart: LLeg
+#  markingCategory: Legs
+#  speciesRestriction: [ Feroxi ]
+#  sprites:
+#  - sprite: _DV/Mobs/Customization/Feroxi/body_markings.rsi
+#    state: feroxi-leg-stripes-tiger
+#
+## Arm Markings
+#- type: marking
+#  id: FeroxiArmStripesBlitz
+#  bodyPart: LArm
+#  markingCategory: Arms
+#  speciesRestriction: [ Feroxi ]
+#  sprites:
+#  - sprite: _DV/Mobs/Customization/Feroxi/body_markings.rsi
+#    state: feroxi-arm-stripes-blitz
+#
+#- type: marking
+#  id: FeroxiArmStripesTiger
+#  bodyPart: LArm
+#  markingCategory: Arms
+#  speciesRestriction: [ Feroxi ]
+#  sprites:
+#  - sprite: _DV/Mobs/Customization/Feroxi/body_markings.rsi
+#    state: feroxi-arm-stripes-tiger
+#
