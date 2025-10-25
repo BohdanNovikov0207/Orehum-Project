@@ -170,10 +170,19 @@
   - type: Tag
     tags:
     - RevArmorPlate
-  - type: Construction
-    graph: RevVest
-    deconstructionTarget: null
-    node: unfinished
+
+- type: entity
+  parent: [ BaseItem, BaseRevMajorContraband ]
+  id: RevReflectivePlate
+  name: зеркальная пластина
+  description: Пластина для жилета с защитой от лазеров.
+  components:
+  - type: Sprite
+    sprite: _Trauma/Objects/Revs/components.rsi
+    state: reflectplate
+  - type: Tag
+    tags:
+    - RevReflectivePlate
 
 - type: entity
   parent: [ BaseItem ]
