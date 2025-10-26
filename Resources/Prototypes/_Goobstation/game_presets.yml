@@ -121,7 +121,6 @@
     - BasicStationEventScheduler
     - MeteorSwarmScheduler
     - BasicRoundstartVariation
-    - BasicRoundstartVariation
 
 - type: gamePreset
   id: Blob
@@ -150,6 +149,7 @@
     - SubGamemodesRule
     - RareIonStormScheduler
     - SpaceTrafficControlFriendlyEventScheduler
+    - BasicRoundstartVariation # Trauma
 
 - type: gamePreset
   id: TheGuide
@@ -165,6 +165,7 @@
     - SubGamemodesRule
     - IonStormScheduler
     - SpaceTrafficControlEventScheduler
+    - BasicRoundstartVariation # Trauma
 
 - type: gamePreset
   id: SecretPlusLow
@@ -177,6 +178,7 @@
   showInVote: false
   rules:
     - SecretPlusLow
+    - BasicRoundstartVariation # Trauma
 
 - type: gamePreset
   id: SecretPlusMid
@@ -189,6 +191,7 @@
   showInVote: true
   rules:
     - SecretPlusMid
+    - BasicRoundstartVariation # Trauma
 
 - type: gamePreset
   id: SecretPlusAdmeme
@@ -202,6 +205,7 @@
   showInVote: false # 1984
   rules:
     - SecretPlusAdmeme
+    - BasicRoundstartVariation # Trauma
 
 - type: gamePreset
   id: SurvivalPlusMid
@@ -214,6 +218,7 @@
   showInVote: true
   rules:
     - SecretPlusRampingMid
+    - BasicRoundstartVariation # Trauma
 
 - type: gamePreset
   id: Xenomorphs
@@ -227,6 +232,7 @@
   - XenomorphsInfestationRoundstart
   - SubGamemodesRule
   - SecretPlusRampingMid
+  - BasicRoundstartVariation # Trauma
 
 - type: gamePreset
   id: OopsAllThieves
