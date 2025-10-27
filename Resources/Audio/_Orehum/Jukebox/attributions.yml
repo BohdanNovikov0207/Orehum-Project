@@ -1,3 +1,50 @@
+- files: ["BurnItDown.ogg"]
+  license: "CC-BY-SA-3.0"
+  copyright: "Burn It Down by Linkin Park"
+  source: "https://www.youtube.com/watch?v=dxytyRy-O1k"
+  PS: "RIP Chester"
+
+- files: ["NewDivide.ogg"]
+  license: "CC-BY-SA-3.0"
+  copyright: "New Divide by Linkin Park"
+  source: "https://www.youtube.com/watch?v=ysSxxIqKNN0"
+  PS: "RIP Chester"
+
+- files: ["SweetFlower.ogg"]
+  license: "CC-BY-SA-3.0"
+  copyright: "За седьмым перевалом by Павел Пламенев"
+  source: "https://youtu.be/NJvpt7swmk8?si=BhxW9alVPV0SltDn"
+
+- files: ["BackInBlack.ogg"]
+  license: "CC-BY-SA-3.0"
+  copyright: "Back in Black by AC/DC"
+  source: "https://youtu.be/pAgnJDJN4VA?si=Hdj55v4r5YyLDQqV"
+
+- files: ["TheManWho.ogg"]
+  license: "CC-BY-SA-3.0"
+  copyright: "The Man Who Sold The World by Nirvana"
+  source: "https://youtu.be/fregObNcHC8?si=QcaiMFIXoMKpDSL4"
+
+- files: ["SoliderSad.ogg"]
+  license: "CC-BY-SA-3.0"
+  copyright: "Солдатская печаль by Kukryniksy"
+  source: "https://youtu.be/_t5Q4rPBwNw?si=kdayApHc65BC9Yp1"
+
+- files: ["WeNotAngels.ogg"]
+  license: "CC-BY-SA-3.0"
+  copyright: "Мы не ангелы by Алексей Пономарев"
+  source: "https://youtu.be/0R5GFbpgRtg?si=_lLZZxubSUi2yQYM"
+
+- files: ["KakNaWar.ogg"]
+  license: "CC-BY-SA-3.0"
+  copyright: "Как на войне by Агата Кристи"
+  source: "https://youtu.be/X77bf6zUJs0?si=lePST96xqrtqWGV5"
+
+- files: ["KISS.ogg"]
+  license: "CC-BY-SA-3.0"
+  copyright: "I Was Made For Lovin' You by Kiss"
+  source: "https://youtu.be/ZhIsAZO5gl0?si=079kfR83_E8RX3j1"
+
 - files: ["Fine.ogg"]
   license: "CC-BY-SA-3.0"
   copyright: "Fine by Lemon Demon."

@@ -1,4 +1,58 @@
 - type: jukebox
+  id: burnitdown
+  name: Linkin Park - Burn It Down
+  path:
+    path: /Audio/_Orehum/Jukebox/BurnItDown.ogg
+
+- type: jukebox
+  id: newdivide
+  name: Linkin Park - New Divide
+  path:
+    path: /Audio/_Orehum/Jukebox/NewDivide.ogg
+
+- type: jukebox
+  id: crazysweet
+  name: Павел Пламенев - За седьмым перевалом
+  path:
+    path: /Audio/_Orehum/Jukebox/SweetFlower.ogg
+
+- type: jukebox
+  id: backinblack
+  name: AC/DC - Back in Black
+  path:
+    path: /Audio/_Orehum/Jukebox/BackInBlack.ogg
+
+- type: jukebox
+  id: themanwho
+  name: Nirvana - The Man Who Sold The World
+  path:
+    path: /Audio/_Orehum/Jukebox/TheManWho.ogg
+
+- type: jukebox
+  id: solidersad
+  name: Kukryniksy - Солдатская печаль
+  path:
+    path: /Audio/_Orehum/Jukebox/SoliderSad.ogg
+
+- type: jukebox
+  id: wenotangels
+  name: Алекйсей Пономарев - Мы не ангелы, парень
+  path:
+    path: /Audio/_Orehum/Jukebox/WeNotAngels.ogg
+
+- type: jukebox
+  id: likeonwar
+  name: Агата Кристи - Как на Войне
+  path:
+    path: /Audio/_Orehum/Jukebox/KakNaWar.ogg
+
+- type: jukebox
+  id: iwasmadelove
+  name: Kiss - I Was Made For Lovin' you
+  path:
+    path: /Audio/_Orehum/Jukebox/KISS.ogg
+
+- type: jukebox
   id: avcehyegonet
   name: НАИВ - А в цеху его нет
   path:
@@ -138,7 +192,7 @@
 
 - type: jukebox
   id: lightthatnevercomes
-  name: LINKIN PARK x STEVE AOKI - LIGHT THAT NEVER COMES
+  name: Linkin Park x Steve Aoki - Light That Never Comes
   path:
     path: /Audio/_Orehum/Jukebox/lightthatnevercomes.ogg
 
