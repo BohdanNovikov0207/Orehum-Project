@@ -50,6 +50,8 @@
   sprites:
   - sprite: _EE/Mobs/Customization/Tajaran/ears.rsi
     state: ears
+  - sprite: _EE/Mobs/Customization/Tajaran/ears.rsi
+    state: ears_inner
 
 - type: marking
   id: TajaranEarsSeparate
@@ -82,6 +84,41 @@
   - sprite: _EE/Mobs/Customization/Tajaran/ears.rsi
     state: inears_near
 
+        ### Staplework of Rathar
+
+- type: marking
+  id: TajaranEarsServal
+  bodyPart: HeadTop
+  markingCategory: HeadTop
+  speciesRestriction: [Tajaran]
+  sprites:
+  - sprite: _EE/Mobs/Customization/Tajaran/ears.rsi
+    state: ears_big
+  - sprite: _EE/Mobs/Customization/Tajaran/ears.rsi
+    state: ears_big_inner
+
+- type: marking
+  id: TajaranEarsServalSpotted
+  bodyPart: HeadTop
+  markingCategory: HeadTop
+  speciesRestriction: [Tajaran]
+  sprites:
+  - sprite: _EE/Mobs/Customization/Tajaran/ears.rsi
+    state: ears_big2
+  - sprite: _EE/Mobs/Customization/Tajaran/ears.rsi
+    state: ears_big_inner2
+
+- type: marking
+  id: TajaranEarsBigCanine
+  bodyPart: HeadTop
+  markingCategory: HeadTop
+  speciesRestriction: [Tajaran]
+  sprites:
+  - sprite: _EE/Mobs/Customization/Tajaran/ears.rsi
+    state: ears_big3
+  - sprite: _EE/Mobs/Customization/Tajaran/ears.rsi
+    state: ears_big_inner3
+
 # Tajaran Head/Face
 
 - type: marking
@@ -101,15 +138,6 @@
   sprites:
   - sprite: _EE/Mobs/Customization/Tajaran/head.rsi
     state: muzzle
-
-- type: marking
-  id: TajaranHeadMuzzleLarge
-  bodyPart: Head
-  markingCategory: Head
-  speciesRestriction: [Tajaran]
-  sprites:
-  - sprite: _EE/Mobs/Customization/Tajaran/head.rsi
-    state: muzzle_large
 
 - type: marking
   id: TajaranHeadPoints
@@ -146,6 +174,47 @@
   sprites:
   - sprite: _EE/Mobs/Customization/Tajaran/head.rsi
     state: patch
+
+        ### Staplework of Rathar
+
+- type: marking
+  id: TajaranHeadMuzzleFox
+  bodyPart: Head
+  markingCategory: Head
+  speciesRestriction: [Tajaran]
+  sprites:
+  - sprite: _EE/Mobs/Customization/Tajaran/head.rsi
+    state: muzzle_large
+  - sprite: _EE/Mobs/Customization/Tajaran/head.rsi
+    state: muzzle_large_inner
+  - sprite: _EE/Mobs/Customization/Tajaran/head.rsi
+    state: muzzle_large_nose
+
+- type: marking
+  id: TajaranHeadMuzzleWolf
+  bodyPart: Head
+  markingCategory: Head
+  speciesRestriction: [Tajaran]
+  sprites:
+  - sprite: _EE/Mobs/Customization/Tajaran/head.rsi
+    state: muzzle_large2
+  - sprite: _EE/Mobs/Customization/Tajaran/head.rsi
+    state: muzzle_large_inner2
+  - sprite: _EE/Mobs/Customization/Tajaran/head.rsi
+    state: muzzle_large_nose
+
+- type: marking
+  id: TajaranHeadMuzzleServal
+  bodyPart: Head
+  markingCategory: Head
+  speciesRestriction: [Tajaran]
+  sprites:
+  - sprite: _EE/Mobs/Customization/Tajaran/head.rsi
+    state: muzzle_serval
+  - sprite: _EE/Mobs/Customization/Tajaran/head.rsi
+    state: muzzle_serval_inner
+  - sprite: _EE/Mobs/Customization/Tajaran/head.rsi
+    state: muzzle_serval_nose
 
 # Tajaran Torso
 
@@ -195,95 +264,3 @@
   sprites:
   - sprite: _EE/Mobs/Customization/Tajaran/overlays.rsi
     state: points
-
-# Felinid Ears, adapted for tajaran (all needed to be higher up and/or modified to fit better)
-
-- type: marking
-  id: TajaranEarsBasic
-  bodyPart: HeadTop
-  markingCategory: HeadTop
-  speciesRestriction: [Tajaran]
-  sprites:
-  - sprite: _EE/Mobs/Customization/Tajaran/felinid_ears.rsi
-    state: basic_outer
-  - sprite: _EE/Mobs/Customization/Tajaran/felinid_ears.rsi
-    state: basic_inner
-
-- type: marking
-  id: TajaranEarsCurled
-  bodyPart: HeadTop
-  markingCategory: HeadTop
-  speciesRestriction: [Tajaran]
-  sprites:
-  - sprite: _EE/Mobs/Customization/Tajaran/felinid_ears.rsi
-    state: curled_outer
-  - sprite: _EE/Mobs/Customization/Tajaran/felinid_ears.rsi
-    state: curled_inner
-
-- type: marking
-  id: TajaranEarsDroopy
-  bodyPart: HeadTop
-  markingCategory: HeadTop
-  speciesRestriction: [Tajaran]
-  sprites:
-  - sprite: _EE/Mobs/Customization/Tajaran/felinid_ears.rsi
-    state: droopy_outer
-  - sprite: _EE/Mobs/Customization/Tajaran/felinid_ears.rsi
-    state: droopy_inner
-
-- type: marking
-  id: TajaranEarsFuzzy
-  bodyPart: HeadTop
-  markingCategory: HeadTop
-  speciesRestriction: [Tajaran]
-  sprites:
-  - sprite: _EE/Mobs/Customization/Tajaran/felinid_ears.rsi
-    state: basic_outer
-  - sprite: _EE/Mobs/Customization/Tajaran/felinid_ears.rsi
-    state: fuzzy_inner
-
-- type: marking
-  id: TajaranEarsStubby
-  bodyPart: HeadTop
-  markingCategory: HeadTop
-  speciesRestriction: [Tajaran]
-  sprites:
-  - sprite: _EE/Mobs/Customization/Tajaran/felinid_ears.rsi
-    state: stubby_outer
-  - sprite: _EE/Mobs/Customization/Tajaran/felinid_ears.rsi
-    state: stubby_inner
-
-- type: marking
-  id: TajaranEarsTall
-  bodyPart: HeadTop
-  markingCategory: HeadTop
-  speciesRestriction: [Tajaran]
-  sprites:
-  - sprite: _EE/Mobs/Customization/Tajaran/felinid_ears.rsi
-    state: tall_outer
-  - sprite: _EE/Mobs/Customization/Tajaran/felinid_ears.rsi
-    state: tall_inner
-  - sprite: _EE/Mobs/Customization/Tajaran/felinid_ears.rsi
-    state: tall_fuzz
-
-- type: marking
-  id: TajaranEarsTorn
-  bodyPart: HeadTop
-  markingCategory: HeadTop
-  speciesRestriction: [Tajaran]
-  sprites:
-  - sprite: _EE/Mobs/Customization/Tajaran/felinid_ears.rsi
-    state: torn_outer
-  - sprite: _EE/Mobs/Customization/Tajaran/felinid_ears.rsi
-    state: torn_inner
-
-- type: marking
-  id: TajaranEarsWide
-  bodyPart: HeadTop
-  markingCategory: HeadTop
-  speciesRestriction: [Tajaran]
-  sprites:
-  - sprite: _EE/Mobs/Customization/Tajaran/felinid_ears.rsi
-    state: wide_outer
-  - sprite: _EE/Mobs/Customization/Tajaran/felinid_ears.rsi
-    state: wide_inner
