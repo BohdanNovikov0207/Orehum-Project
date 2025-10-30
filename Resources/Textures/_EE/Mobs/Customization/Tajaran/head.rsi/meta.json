@@ -34,6 +34,34 @@
         {
             "name": "tiger_head",
             "directions": 4
+        },
+        {
+            "name": "muzzle_large_inner",
+            "directions": 4
+        },
+        {
+            "name": "muzzle_large_nose",
+            "directions": 4
+        },
+        {
+            "name": "muzzle_large2",
+            "directions": 4
+        },
+        {
+            "name": "muzzle_large_inner2",
+            "directions": 4
+        },
+        {
+            "name": "muzzle_serval",
+            "directions": 4
+        },
+        {
+            "name": "muzzle_serval_inner",
+            "directions": 4
+        },
+        {
+            "name": "muzzle_serval_nose",
+            "directions": 4
         }
     ]
 }

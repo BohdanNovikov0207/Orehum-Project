@@ -38,6 +38,34 @@
         {
             "name": "patch_near",
             "directions": 4
+        },
+        {
+            "name": "ears_big",
+            "directions": 4
+        },
+        {
+            "name": "ears_big_inner",
+            "directions": 4
+        },
+        {
+            "name": "ears_big2",
+            "directions": 4
+        },
+        {
+            "name": "ears_big_inner2",
+            "directions": 4
+        },
+        {
+            "name": "ears_inner",
+            "directions": 4
+        },
+        {
+            "name": "ears_big3",
+            "directions": 4
+        },
+        {
+            "name": "ears_big_inner3",
+            "directions": 4
         }
     ]
 }
