@@ -77,3 +77,14 @@
   - type: Tag
     tags:
     - Document
+
+- type: entity
+  parent: RevPropaganda
+  id: RevPropagandaAdvanced
+  name: продвинутая пропагандистская листовка
+  description: Эта листовка пропитана мощнейшим классовым самосознанием, на которое вы только способны. Она обращает в веру мгновенно.
+  components:
+  - type: RevolutionaryConverter
+    conversionDuration: 0
+    consumesCharges: 1
+    applyFlashEffect: false

@@ -104,6 +104,17 @@
     stackType: RevGunParts
 
 - type: entity
+  parent: [ BaseRevPart ]
+  id: RevEngineParts
+  name: детали двигателя
+  description: Куча деталей двигателя. Сами по себе они бесполезны, но у вас на них свои планы.
+  components:
+  - type: Sprite
+    state: engineparts
+  - type: Stack
+    stackType: RevEngineParts
+
+- type: entity
   parent: BaseRevPart
   id: RevBallBearings
   name: подшипники
@@ -113,3 +124,4 @@
     state: ballbearings
   - type: Stack
     stackType: RevBallBearings
+

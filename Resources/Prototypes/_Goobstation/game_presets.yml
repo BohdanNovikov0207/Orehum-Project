@@ -150,6 +150,7 @@
     - RareIonStormScheduler
     - SpaceTrafficControlFriendlyEventScheduler
     - BasicRoundstartVariation # Trauma
+    - Insurgency # Trauma
 
 - type: gamePreset
   id: TheGuide
@@ -166,6 +167,7 @@
     - IonStormScheduler
     - SpaceTrafficControlEventScheduler
     - BasicRoundstartVariation # Trauma
+    - Insurgency # Trauma
 
 - type: gamePreset
   id: SecretPlusLow
@@ -179,6 +181,7 @@
   rules:
     - SecretPlusLow
     - BasicRoundstartVariation # Trauma
+    - Insurgency # Trauma
 
 - type: gamePreset
   id: SecretPlusMid
@@ -192,6 +195,7 @@
   rules:
     - SecretPlusMid
     - BasicRoundstartVariation # Trauma
+    - Insurgency # Trauma
 
 - type: gamePreset
   id: SecretPlusAdmeme
@@ -206,6 +210,7 @@
   rules:
     - SecretPlusAdmeme
     - BasicRoundstartVariation # Trauma
+    - Insurgency # Trauma
 
 - type: gamePreset
   id: SurvivalPlusMid
