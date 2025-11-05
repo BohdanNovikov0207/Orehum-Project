@@ -1078,6 +1078,8 @@
     Telecrystal: 10
   cost:
     Telecrystal: 20
+  categories:
+  - UplinkDisruption
 
 - type: listing
   id: UplinkRadioJammer
