@@ -81,6 +81,7 @@
         Heat: -8
         Shock: -8
         Cold: -2
+        Radiation: -6
   - type: Fixtures
     fixtures:
       fix1:
@@ -167,6 +168,7 @@
         Heat: -4
         Shock: -4
         Cold: -1
+        Radiation: -2
   - type: Fixtures
     fixtures:
       fix1:
@@ -252,6 +254,7 @@
         Heat: -2
         Shock: -2
         Cold: -0.5
+        Radiation: -0.5
   - type: Fixtures
     fixtures:
       fix1:
