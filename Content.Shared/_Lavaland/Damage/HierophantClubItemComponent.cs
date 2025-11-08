@@ -1,4 +1,4 @@
-﻿using Robust.Shared.Audio;
+using Robust.Shared.Audio;
 using Robust.Shared.Prototypes;
 
 namespace Content.Shared._Lavaland.Damage;
@@ -9,15 +9,18 @@ public sealed partial class HierophantClubItemComponent : Component
     [DataField]
     public EntProtoId CreateCrossActionId = "ActionHierophantSpawnCross";
 
+    /*
     [DataField]
     public EntProtoId PlaceMarkerActionId = "ActionHierophantPlaceMarker";
 
     [DataField]
     public EntProtoId TeleportToMarkerActionId = "ActionHierophantTeleport";
+    */
 
     [DataField]
     public EntityUid? CreateCrossActionEntity;
 
+    /*
     [DataField]
     public EntityUid? PlaceMarkerActionEntity;
 
@@ -26,6 +29,7 @@ public sealed partial class HierophantClubItemComponent : Component
 
     [DataField]
     public EntityUid? TeleportMarker;
+    */
 
     [DataField]
     public float CrossRange = 5f;

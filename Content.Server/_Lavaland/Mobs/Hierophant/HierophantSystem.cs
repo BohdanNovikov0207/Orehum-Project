@@ -17,6 +17,8 @@ using Content.Shared.Mobs.Systems;
 using Content.Shared.Mobs.Components;
 using Robust.Shared.Timing;
 
+using Content.Shared._Lavaland.Mobs.Components;
+
 // ReSharper disable AccessToModifiedClosure
 // ReSharper disable BadListLineBreaks
 
@@ -41,7 +43,10 @@ public sealed class HierophantSystem : EntitySystem
     // Im too lazy to deal with MobThreshholds.
     private const float HealthScalingFactor = 1.25f;
     private const float AngerScalingFactor = 1.15f;
-    private readonly FixedPoint2 _baseHierophantHp = 2500;
+    private readonly FixedPoint2 _baseHierophantHp = 3000;
+
+    public bool HasTriggeredTeleportAttack = false;
+    public bool commonIs = true;
 
     public override void Initialize()
     {
@@ -80,6 +85,17 @@ public sealed class HierophantSystem : EntitySystem
         _damage.SetAllDamage(ent, damageable, 0);
         _threshold.SetMobStateThreshold(ent, _baseHierophantHp, MobState.Dead, thresholds);
         Timer.Spawn(TimeSpan.FromSeconds(10), () => _xform.SetMapCoordinates(ent, position));
+
+        if (TryComp<AggressiveComponent>(ent, out var aggressive))
+        {
+            foreach (var target in aggressive.Aggressors)
+            {
+                if (HasComp<HierophantBeatComponent>(target))
+                {
+                    RemComp<HierophantBeatComponent>(target);
+                }
+            }
+        }
     }
 
     private void OnHierophantKilled(Entity<HierophantBossComponent> ent, ref MegafaunaKilledEvent args)
@@ -87,6 +103,17 @@ public sealed class HierophantSystem : EntitySystem
         if (ent.Comp.ConnectedFieldGenerator != null &&
             TryComp<HierophantFieldGeneratorComponent>(ent.Comp.ConnectedFieldGenerator.Value, out var fieldComp))
             _hierophantField.DeactivateField((ent.Comp.ConnectedFieldGenerator.Value, fieldComp));
+
+        if (TryComp<AggressiveComponent>(ent, out var aggressive))
+        {
+            foreach (var target in aggressive.Aggressors)
+            {
+                if (HasComp<HierophantBeatComponent>(target))
+                {
+                    RemComp<HierophantBeatComponent>(target);
+                }
+            }
+        }
     }
 
     private void OnAttacked(Entity<HierophantBossComponent> ent, ref AttackedEvent args)
@@ -124,6 +151,24 @@ public sealed class HierophantSystem : EntitySystem
                 else if (aggressors.Aggressors.Count == 0 && comp.Aggressive)
                     DeinitBoss(ent);
 
+                foreach (var target in aggressors.Aggressors)
+                {
+                    if (TryComp<MobStateComponent>(target, out var mobState) && mobState.CurrentState == MobState.Critical)
+                    {
+                        if (HasComp<HierophantBeatComponent>(target))
+                        {
+                            RemComp<HierophantBeatComponent>(target);
+                        }
+                        continue;
+                    }
+
+                    if (!HasComp<HierophantBeatComponent>(target))
+                    {
+                        var beat = EntityManager.AddComponent<HierophantBeatComponent>(target);
+                        beat.MovementSpeedBuff = 1.75f;
+                    }
+                }
+
                 angerMultiplier = aggressors.Aggressors.Count * AngerScalingFactor;
                 healthMultiplier = aggressors.Aggressors.Count * HealthScalingFactor;
             }
@@ -131,12 +176,34 @@ public sealed class HierophantSystem : EntitySystem
             if (!comp.Aggressive)
                 continue;
 
-            // tick attack timer
-            TickTimer(ref comp.AttackTimer, frameTime, () =>
+            if (damage.TotalDamage > 1500 && damage.TotalDamage < 2000 && comp.ConnectedFieldGenerator != null)
             {
-                DoRandomAttack(ent);
-                comp.AttackTimer = Math.Max(comp.AttackCooldown / comp.CurrentAnger, comp.MinAttackCooldown);
-            });
+                var field = comp.ConnectedFieldGenerator.Value;
+                if (!TerminatingOrDeleted(field))
+                {
+                    var position = _xform.GetMapCoordinates(field);
+
+                    Timer.Spawn(TimeSpan.FromSeconds(1), () =>
+                    {
+                        if (!TerminatingOrDeleted(uid))
+                            _xform.SetMapCoordinates(uid, position);
+                    });
+                    TickTimer(ref comp.AttackTimer, frameTime, () =>
+                    {
+                        DamageAreaWithOpenSides(ent, ent.Owner, 10, commonIs);
+                        commonIs = !commonIs;
+                        comp.AttackTimer = Math.Max(comp.AttackCooldown / comp.CurrentAnger, comp.MinAttackCooldown); // ← добавлено
+                    });
+                }
+            } else
+            {
+                // tick attack timer
+                TickTimer(ref comp.AttackTimer, frameTime, () =>
+                {
+                    DoRandomAttack(ent);
+                    comp.AttackTimer = Math.Max(comp.AttackCooldown / comp.CurrentAnger, comp.MinAttackCooldown);
+                });
+            }
 
             var newMinAnger = Math.Max((float) (damage.TotalDamage / (_baseHierophantHp * healthMultiplier)) * 2, 0f) + 1f;
             ent.Comp.MinAnger = newMinAnger * angerMultiplier;
@@ -158,7 +225,9 @@ public sealed class HierophantSystem : EntitySystem
 
     private void InitBoss(Entity<HierophantBossComponent> ent, AggressiveComponent aggressors)
     {
-        ent.Comp.Aggressive = true;  
+        ent.Comp.AttackTimer = ent.Comp.AttackCooldown;
+        ent.Comp.Aggressive = true;
+        ent.Comp.CancelToken = new System.Threading.CancellationTokenSource();
         RaiseLocalEvent(ent, new MegafaunaStartupEvent());
     }
 
@@ -166,7 +235,7 @@ public sealed class HierophantSystem : EntitySystem
     {
         ent.Comp.Aggressive = false;
         ent.Comp.CancelToken.Cancel(); // cancel all stuff
-
+        ent.Comp.CancelToken = new System.Threading.CancellationTokenSource();
         RaiseLocalEvent(ent, new MegafaunaDeinitEvent());
     }
 
@@ -189,8 +258,8 @@ public sealed class HierophantSystem : EntitySystem
             case HierophantAttackType.DamageArea:
                 if (_random.Next(0, 1) == 1)
                     DamageArea(ent, target, attackPower + 1);
-                else
-                    DamageArea(ent, target, attackPower * 2); // bad luck
+                else 
+                    DamageArea(ent, ent.Owner, attackPower * 2); // bad luck
                 break;
             case HierophantAttackType.Blink:
                 if (target != null && !TerminatingOrDeleted(target))
@@ -247,7 +316,7 @@ public sealed class HierophantSystem : EntitySystem
             if (TerminatingOrDeleted(ent))
                 return;
 
-            delay = (int) GetDelay(ent, ent.Comp.InterActionDelay / 3f) * i;
+            delay = (int) GetDelay(ent, ent.Comp.InterActionDelay / 3f) * i + 5;
             var rangeCopy = i; // funny timer things require us to copy the variable
             Timer.Spawn(delay,
                 () =>
@@ -329,6 +398,95 @@ public sealed class HierophantSystem : EntitySystem
 
         Blink(uid, vector);
     }
+
+    public void DamageAreaWithOpenSides(Entity<HierophantBossComponent> ent, EntityUid? target = null, int range = 1, bool common = true)
+    {
+        if (TerminatingOrDeleted(ent))
+            return;
+
+        target = (target ?? PickTarget(ent)) ?? ent;
+
+        var beacon = Spawn(null, _xform.GetMapCoordinates((EntityUid) target));
+        var token = ent.Comp.CancelToken.Token;
+
+        var delay = 0;
+        for (var i = 0; i <= range; i++)
+        {
+            if (TerminatingOrDeleted(ent))
+                return;
+
+            delay = (int) GetDelay(ent, ent.Comp.InterActionDelay / 3f) * i + 5;
+            var rangeCopy = i;
+            Timer.Spawn(delay,
+                () =>
+                {
+                    SpawnDamageBoxWithOpenSides(beacon, rangeCopy, common);
+                }, token);
+        }
+
+        Timer.Spawn(delay + 1000,
+            () =>
+            {
+                QueueDel(beacon);
+            }, token);
+    }
+
+    public void SpawnDamageBoxWithOpenSides(EntityUid relative, int range = 0, bool common = true)
+    {
+        if (range == 0)
+        {
+            Spawn(_damageBoxPrototype, Transform(relative).Coordinates);
+            return;
+        }
+
+        var xform = Transform(relative);
+
+        if (!TryComp<MapGridComponent>(xform.GridUid, out var grid))
+            return;
+
+        var gridEnt = ((EntityUid) xform.GridUid, grid);
+
+        if (!_xform.TryGetGridTilePosition(relative, out var tilePos))
+            return;
+
+        var pos = _map.TileCenterToVector(gridEnt, tilePos);
+        var outerBox = _map.GetLocalTilesIntersecting(relative, grid, new Box2(pos, pos).Enlarged(range)).ToList();
+        var innerBox = _map.GetLocalTilesIntersecting(relative, grid, new Box2(pos, pos).Enlarged(Math.Max(range - 1, 0))).ToList();
+
+        var ringTiles = outerBox.Where(b => !innerBox.Contains(b)).ToList();
+
+        var openings = new HashSet<Vector2i>();
+
+        if (common)
+        {
+            openings.Add(tilePos + new Vector2i(0, range));  
+            openings.Add(tilePos + new Vector2i(0, -range));
+            openings.Add(tilePos + new Vector2i(range, 0));  
+            openings.Add(tilePos + new Vector2i(-range, 0)); 
+        } else
+        {
+            openings.Add(tilePos + new Vector2i(-1, range));  
+            openings.Add(tilePos + new Vector2i(1, range));  
+
+            openings.Add(tilePos + new Vector2i(-1, -range)); 
+            openings.Add(tilePos + new Vector2i(1, -range)); 
+
+            openings.Add(tilePos + new Vector2i(range, -1));
+            openings.Add(tilePos + new Vector2i(range, 1)); 
+
+            openings.Add(tilePos + new Vector2i(-range, -1));
+            openings.Add(tilePos + new Vector2i(-range, 1)); 
+        }
+
+        foreach (var tile in ringTiles)
+        {
+            if (openings.Contains(tile.GridIndices))
+                continue;
+
+            Spawn(_damageBoxPrototype, _map.GridTileToWorld((EntityUid) xform.GridUid, grid, tile.GridIndices));
+        }
+    }
+
 
     #endregion
 

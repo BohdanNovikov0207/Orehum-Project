@@ -13,14 +13,15 @@ public sealed partial class HierophantBossComponent : MegafaunaComponent
     ///     Is responsive for how fast and strong hierophant attacks.
     /// </summary>
     [ViewVariables]
-    public float CurrentAnger = 1f;
+
+    public float CurrentAnger = 2f;
 
     /// <summary>
     /// Minimal amount of anger that Hierophant can have.
     /// Tends to 3 when health tends to 0.
     /// </summary>
     [DataField]
-    public float MinAnger = 1f;
+    public float MinAnger = 2f;
 
     /// <summary>
     /// Max cap for anger.
@@ -56,12 +57,13 @@ public sealed partial class HierophantBossComponent : MegafaunaComponent
     /// Controls
     /// </summary>
     [DataField]
+
     public Dictionary<HierophantAttackType, float> Attacks = new()
     {
-        { HierophantAttackType.Chasers, 0.1f },
-        { HierophantAttackType.Crosses, 0.1f },
-        { HierophantAttackType.DamageArea, 0.2f },
-        { HierophantAttackType.Blink, 0.2f },
+        { HierophantAttackType.Chasers, 0.20f },
+        { HierophantAttackType.Crosses, 2.5f },
+        { HierophantAttackType.DamageArea, 10f },
+        { HierophantAttackType.Blink, 0.15f },
     };
 
     /// <summary>

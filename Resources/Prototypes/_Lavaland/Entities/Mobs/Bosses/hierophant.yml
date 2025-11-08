@@ -52,13 +52,13 @@
   - type: MobThresholds
     thresholds:
       0: Alive
-      2500: Dead
+      3000: Dead
   - type: Tag
     tags:
     - CannotSuicide
   - type: NoSlip
   - type: HierophantBoss # boss specific component. defines pattern/scripted attacks and other stuff
-    loot: LavalandHierophantClub
+    loot: LavalandCrateNecropolisHierophant
   - type: DamageSquareImmunity
     isImmune: true
   - type: Aggressive # also required component for aggro checking
@@ -139,3 +139,17 @@
   coefficients:
     Piercing: 0.1 # No bullets
     Heat: 0.5 # No lasers
+
+
+
+- type: entity
+  name: сундук с наградой Иерофанта
+  id: LavalandCrateNecropolisHierophant
+  parent: LavalandCrateNecropolis
+  suffix: Hierophant
+  components:
+  - type: StorageFill
+    contents:
+      - id: LavalandHierophantClub
+      - id: ClothingNeckCloakHierophant
+
