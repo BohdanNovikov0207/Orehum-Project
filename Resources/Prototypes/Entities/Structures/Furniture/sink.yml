@@ -6,6 +6,7 @@
   placement:
     mode: SnapgridCenter
   components:
+  - type: Drink
   - type: Clickable
   - type: InteractionOutline
   - type: Sprite
