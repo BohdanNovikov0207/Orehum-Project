@@ -1,10 +1,10 @@
-ent-LavalandBossHierophant = иерофант
-    .desc = Массивный металлический клуб, который висит в воздухе, словно в ожидании. Он заставит вас танцевать под его ритм.
-ent-LavalandHierophantSquare = квадрат иерофанта
+ent-LavalandBossHierophant = Иерофант
+    .desc = Массивный металлический посох, который висит в воздухе, словно в ожидании. Он заставит вас танцевать под Его ритм.
+ent-LavalandHierophantSquare = квадрат Иерофанта
     .suffix = НЕ МАППИТЬ
     .desc = { "" }
 ent-LavalandHierophantDamageField = { "" }
     .desc = { "" }
-ent-LavalandHierophantChaser = охотник иерофанта
+ent-LavalandHierophantChaser = охотник Иерофанта
     .suffix = НЕ МАППИТЬ
     .desc = { "" }

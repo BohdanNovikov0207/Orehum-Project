@@ -3,5 +3,5 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-alerts-hierophantbeat-name = Ритм иерофанта
+alerts-hierophantbeat-name = Ритм Иерофанта
 alerts-hierophantbeat-desc = Таинственная потусторонняя мелодия влияет на вашу подвижность.
