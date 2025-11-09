@@ -9,6 +9,12 @@ public sealed partial class HierophantClubItemComponent : Component
     [DataField]
     public EntProtoId CreateCrossActionId = "ActionHierophantSpawnCross";
 
+    [DataField]
+    public EntProtoId CreateDamageAreaActionId = "ActionHierophantSpawnDamageArea";
+
+    [DataField]
+    public EntProtoId CreateChaserActionId = "ActionHierophantSpawnChaser";
+
     /*
     [DataField]
     public EntProtoId PlaceMarkerActionId = "ActionHierophantPlaceMarker";
@@ -19,6 +25,12 @@ public sealed partial class HierophantClubItemComponent : Component
 
     [DataField]
     public EntityUid? CreateCrossActionEntity;
+
+    [DataField]
+    public EntityUid? CreateDamageAreaActionEntity;
+
+    [DataField]
+    public EntityUid? CreateChaserActionEntity;
 
     /*
     [DataField]
@@ -33,6 +45,12 @@ public sealed partial class HierophantClubItemComponent : Component
 
     [DataField]
     public float CrossRange = 5f;
+
+    [DataField]
+    public float DamageAreaRange = 2f;
+
+    [DataField]
+    public float ChaserMaxSteps = 2f;
 
     [DataField]
     public SoundSpecifier DamageSound = new SoundPathSpecifier("/Audio/_Lavaland/Mobs/Bosses/hiero_blast.ogg");

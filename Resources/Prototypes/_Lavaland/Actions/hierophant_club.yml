@@ -14,3 +14,37 @@
     range: 8
     priority: -21
     useDelay: 1
+
+# Spawn damage area
+- type: entity
+  id: ActionHierophantSpawnDamageArea
+  name: Зона урона
+  description: Порождает зону урона, которая расходится волнами до конца радиуса. Пусть они узрят твой гнев!
+  components:
+  - type: WorldTargetAction
+    icon:
+      sprite: _Lavaland/Objects/Weapons/hierophant_club.rsi
+      state: icon
+    itemIconStyle: NoItem
+    event: !type:HierophantClubActivateDamageAreaEvent
+    checkCanAccess: true
+    range: 8
+    priority: -21
+    useDelay: 2
+
+# Spawn chaser
+- type: entity
+  id: ActionHierophantSpawnChaser
+  name: Преследователь
+  description: Порождает преследователя, который будет двигаться на указанный тайл.
+  components:
+  - type: WorldTargetAction
+    icon:
+      sprite: _Lavaland/Objects/Weapons/hierophant_club.rsi
+      state: icon
+    itemIconStyle: NoItem
+    event: !type:HierophantClubActivateChaserEvent
+    checkCanAccess: true
+    range: 16
+    priority: -21
+    useDelay: 2
