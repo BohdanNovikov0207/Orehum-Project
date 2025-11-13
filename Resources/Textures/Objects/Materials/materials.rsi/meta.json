@@ -247,6 +247,15 @@
         },
         {
             "name": "normality_3"
+        },
+        {
+            "name": "drake_bones"
+        },
+        {
+            "name": "drake_bones_2"
+        },
+        {
+            "name": "drake_bones_3"
         }
     ]
 }
