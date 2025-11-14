@@ -18,7 +18,7 @@ public sealed partial class AshDrakeTelepadComponent : Component
     public EntProtoId AshDrakePrototype = "LavalandBossAshDrake";
 
     [DataField]
-    public EntProtoId WallPrototype = "WallBasaltCobblebrick";
+    public EntProtoId WallPrototype = "LavalandAshDrakeWallBasaltCobblebrick";
 
     [DataField]
     public EntityUid? ConnectedAshDrake;

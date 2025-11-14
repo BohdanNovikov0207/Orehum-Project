@@ -47,7 +47,7 @@ public sealed class AshDrakeSystem : EntitySystem
     private readonly EntProtoId _firePrototype = "LavalandAshDrakeFire";
     private readonly EntProtoId _markPrototype = "LavalandSupportMarkAshDrake";
     private readonly EntProtoId _lavaPrototype = "LavalandSupportLavaMarkAshDrake";
-    private readonly EntProtoId _wallPrototype = "WallBasaltCobblebrick";
+    private readonly EntProtoId _wallPrototype = "LavalandAshDrakeWallBasaltCobblebrick";
     private readonly EntProtoId _safeMarkPrototype = "LavalandSupportSafeMarkAshDrake";
     private readonly EntProtoId _lavaArenaPrototype = "LavalandSupportLavaArenaMarkAshDrake";
 

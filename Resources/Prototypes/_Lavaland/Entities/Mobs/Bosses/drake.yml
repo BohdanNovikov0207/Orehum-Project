@@ -309,6 +309,25 @@
   maxCount: 30
 
 
+# эээ, базальтовая нерушимая стена... даааа
+- type: entity
+  parent: BaseWall
+  id: LavalandAshDrakeWallBasaltCobblebrick
+  name: basalt brick wall
+  components:
+  - type: Tag
+    tags:
+      - Wall
+  - type: Sprite
+    sprite: Structures/Walls/cobblebrick_basalt.rsi
+  - type: Icon
+    sprite: Structures/Walls/cobblebrick_basalt.rsi
+  - type: Destructible
+  - type: IconSmooth
+    key: cobblebricks
+    base: cobblebrick
+
+
 # попытка добавить в меню крафта что-то. Позже завершу.
 #- type: constructionGraph
 #  id: LavalandAshDrakeBoneArmor
