@@ -9,14 +9,15 @@ public sealed partial class GunSystem
     protected override void Cycle(EntityUid uid, BallisticAmmoProviderComponent component, MapCoordinates coordinates, GunComponent? gunComponent)
     {
         EntityUid? ent = null;
-        if (!Resolve(uid, ref gunComponent, false))
-            return;
+        //if (!Resolve(uid, ref gunComponent, false))
+        //    return;
 
         // TODO: Combine with TakeAmmo
         if (component.Entities.Count > 0)
         {
             var existing = component.Entities[^1];
             component.Entities.RemoveAt(component.Entities.Count - 1);
+            DirtyField(uid, component, nameof(BallisticAmmoProviderComponent.Entities));
 
             Containers.Remove(existing, component.Container);
             EnsureShootable(existing);
@@ -25,6 +26,7 @@ public sealed partial class GunSystem
         else if (component.UnspawnedCount > 0)
         {
             component.UnspawnedCount--;
+            DirtyField(uid, component, nameof(BallisticAmmoProviderComponent.UnspawnedCount));
             ent = Spawn(component.Proto, coordinates);
             EnsureShootable(ent.Value);
         }

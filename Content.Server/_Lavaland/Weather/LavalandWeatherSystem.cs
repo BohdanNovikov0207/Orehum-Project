@@ -5,6 +5,7 @@ using Content.Server.Temperature.Systems;
 using Content.Server.Weather;
 using Content.Shared._Lavaland.Weather;
 using Content.Shared.Damage;
+using Content.Shared.DeltaV.Weather.Components;
 using Content.Shared.Humanoid;
 using Content.Shared.Popups;
 using Robust.Shared.CPUJob.JobQueues;
@@ -86,7 +87,8 @@ public sealed class LavalandWeatherSystem : EntitySystem
 
         while (humans.MoveNext(out var human, out _, out var damageable))
         {
-            _lavalandWeatherJobQueue.EnqueueJob(new LavalandWeatherJob(this, (human, damageable), stormedMap, LavalandWeatherJobTime));
+            if (!HasComp<AshStormImmuneComponent>(human)) // orehum adapted deltav ash storm immune system
+                _lavalandWeatherJobQueue.EnqueueJob(new LavalandWeatherJob(this, (human, damageable), stormedMap, LavalandWeatherJobTime));
         }
 
         comp.DamageAccumulator = 0;

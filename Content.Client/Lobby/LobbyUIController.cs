@@ -5,6 +5,7 @@ using Content.Client.Inventory;
 using Content.Client.Lobby.UI;
 using Content.Client.Players.PlayTimeTracking;
 using Content.Client.Station;
+using Content.Corvax.Interfaces.Shared;
 using Content.Shared.CCVar;
 using Content.Shared.Clothing.Loadouts.Prototypes;
 using Content.Shared.Clothing.Loadouts.Systems;
@@ -48,6 +49,8 @@ public sealed class LobbyUIController : UIController, IOnStateEntered<LobbyState
     [UISystemDependency] private readonly GuidebookSystem _guide = default!;
     [UISystemDependency] private readonly SharedLoadoutSystem _loadouts = default!;
     [UISystemDependency] private readonly StationSpawningSystem _stationSpawning = default!;
+
+    [Dependency] private readonly ISharedSponsorsManager _clientSponsorsManager = default!; // sponsor
 
     private CharacterSetupGui? _characterSetup;
     private HumanoidProfileEditor? _profileEditor;
@@ -177,7 +180,7 @@ public sealed class LobbyUIController : UIController, IOnStateEntered<LobbyState
             return;
         }
 
-        var dummy = LoadProfileEntity(humanoid, true, true);
+        var dummy = LoadProfileEntity(humanoid, null, true, true);
         PreviewPanel.SetSprite(dummy);
         PreviewPanel.SetSummaryText(humanoid.Summary);
     }
@@ -261,11 +264,12 @@ public sealed class LobbyUIController : UIController, IOnStateEntered<LobbyState
             _resourceCache,
             _jobRequirements,
             _markings,
-            _random);
+            _random,
+            _clientSponsorsManager);
 
         _profileEditor.OnOpenGuidebook += _guide.OpenHelp;
 
-        _characterSetup = new CharacterSetupGui(EntityManager, _prototypeManager, _resourceCache, _preferencesManager, _profileEditor);
+        _characterSetup = new CharacterSetupGui(_profileEditor);
 
         _characterSetup.CloseButton.OnPressed += _ =>
         {
@@ -367,11 +371,25 @@ public sealed class LobbyUIController : UIController, IOnStateEntered<LobbyState
     /// <summary>
     /// Loads the profile onto a dummy entity.
     /// </summary>
-    public EntityUid LoadProfileEntity(HumanoidCharacterProfile? humanoid, bool jobClothes, bool loadouts)
+    public EntityUid LoadProfileEntity(HumanoidCharacterProfile? humanoid, JobPrototype? job, bool jobClothes, bool loadouts)
     {
         EntityUid dummyEnt;
 
-        if (humanoid is not null)
+        EntProtoId? previewEntity = null;
+        if (humanoid != null && jobClothes)
+        {
+            job ??= GetPreferredJob(humanoid);
+
+            previewEntity = job.JobPreviewEntity ?? (EntProtoId?)job?.JobEntity;
+        }
+
+        if (previewEntity != null)
+        {
+            // Special type like borg or AI, do not spawn a human just spawn the entity.
+            dummyEnt = EntityManager.SpawnEntity(previewEntity, MapCoordinates.Nullspace);
+            return dummyEnt;
+        }
+        else if (humanoid is not null)
         {
             var dummy = _prototypeManager.Index<SpeciesPrototype>(humanoid.Species).DollPrototype;
             dummyEnt = EntityManager.SpawnEntity(dummy, MapCoordinates.Nullspace);
@@ -382,11 +400,14 @@ public sealed class LobbyUIController : UIController, IOnStateEntered<LobbyState
             dummyEnt = EntityManager.SpawnEntity(dummy, MapCoordinates.Nullspace);
         }
 
-        _humanoid.LoadProfile(dummyEnt, humanoid, loadExtensions: false, generateLoadouts: false);
+        _humanoid.LoadProfile(dummyEnt, humanoid);
 
-        if (humanoid != null)
+        if (humanoid != null && jobClothes)
         {
-            var job = GetPreferredJob(humanoid);
+            DebugTools.Assert(job != null);
+
+            GiveDummyJobClothes(dummyEnt, job, humanoid);
+
             if (jobClothes)
                 GiveDummyJobClothes(dummyEnt, job, humanoid);
             if (loadouts)

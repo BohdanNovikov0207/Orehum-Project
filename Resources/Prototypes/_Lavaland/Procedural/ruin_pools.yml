@@ -5,6 +5,8 @@
 - type: lavalandRuinPool
   id: Lavaland
   hugeRuins:
+    AshWalkersBase: 1 # orehum
+    AshDrakeArena: 1
     SyndicateBase: 1
     HierophantArena: 1
     RougeAI: 1

@@ -40,6 +40,8 @@ using Robust.Shared.Audio.Systems;
 using Robust.Shared.Configuration;
 using Robust.Shared.Player;
 using Robust.Shared.Utility;
+using FoodComponent = Content.Shared.Nutrition.Components.FoodComponent;
+
 
 namespace Content.Server.Nutrition.EntitySystems;
 
@@ -340,13 +342,16 @@ public sealed class FoodSystem : EntitySystem
                     args.User, args.User, PopupType.MediumCaution);
 
             foreach (var mood in entity.Comp.MoodletsOnEat)
-                RaiseLocalEvent(args.User, new MoodEffectEvent(mood));
+            {
+                var ev = new MoodEffectEvent(mood);
+                RaiseLocalEvent(args.User, ref ev);
+            }
 
             // log successful voluntary eating
             _adminLogger.Add(LogType.Ingestion, LogImpact.Low, $"{ToPrettyString(args.User):target} ate {ToPrettyString(entity.Owner):food}");
         }
 
-        _audio.PlayPvs(entity.Comp.UseSound, args.Target.Value, AudioParams.Default.WithVolume(-1f));
+        _audio.PlayPvs(entity.Comp.UseSound, args.Target.Value, AudioParams.Default.WithVolume(-1f).WithVariation(0.20f));
 
         // Try to break all used utensils
         foreach (var utensil in utensils)

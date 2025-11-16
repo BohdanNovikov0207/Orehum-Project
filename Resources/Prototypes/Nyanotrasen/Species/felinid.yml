@@ -18,6 +18,9 @@
 - type: markingPoints
   id: MobFelinidMarkingLimits
   points:
+    Head: # Orehum fix
+      points: 2
+      required: false
     Hair:
       points: 1
       required: false

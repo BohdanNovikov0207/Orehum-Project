@@ -15,6 +15,7 @@
     tags:
     - HamsterWearable
     - WhitelistChameleon
+    - Mask # Need for heretic
   - type: HideLayerClothing
     slots:
     - Snout
@@ -219,6 +220,7 @@
     - ClownMask
     - WhitelistChameleon
     - IPCMaskWearable
+    - Mask # goob-edit
   - type: HideLayerClothing
     slots:
     - Snout
@@ -232,6 +234,7 @@
     - ClownMask
     - HamsterWearable
     - WhitelistChameleon
+    - Mask # Need for heretic
   - type: HideLayerClothing
     slots:
     - Snout
@@ -250,7 +253,7 @@
     node: mask
 
 - type: entity
-  parent: ClothingMaskClown
+  parent: [ClothingMaskClown, BaseRestrictedContraband]
   id: ClothingMaskClownSecurity
   name: security clown wig and mask
   description: A debatably oxymoronic but protective mask and wig.
@@ -406,7 +409,7 @@
         Heat: 0.95
 
 - type: entity
-  parent: [ ClothingMaskGas, BaseRestrictedContraband ]
+  parent: [ ClothingMaskGas, BaseSecurityCargoContraband ]
   id: ClothingMaskGasMerc
   name: mercenary gas mask
   description: Slightly outdated, but reliable military-style gas mask.
@@ -487,6 +490,7 @@
     - IPCMaskWearable
     - HamsterWearable
     - WhitelistChameleon
+    - Mask # Need for heretic
   - type: HideLayerClothing
     slots:
     - Snout
@@ -507,6 +511,7 @@
   - type: Tag
     tags:
     - IPCMaskWearable
+    - Mask # Need for heretic
   - type: HideLayerClothing
     slots:
     - Snout
@@ -526,6 +531,7 @@
   - type: Tag
     tags:
     - IPCMaskWearable
+    - Mask # Need for heretic
   - type: HideLayerClothing
     slots:
     - Snout
@@ -545,6 +551,7 @@
   - type: Tag
     tags:
     - IPCMaskWearable
+    - Mask # Need for heretic
   - type: HideLayerClothing
     slots:
     - Snout
@@ -564,6 +571,7 @@
   - type: Tag
     tags:
     - IPCMaskWearable
+    - Mask # Need for heretic
   - type: HideLayerClothing
     slots:
     - Snout
@@ -583,6 +591,7 @@
   - type: Tag
     tags:
     - IPCMaskWearable
+    - Mask # Need for heretic
   - type: HideLayerClothing
     slots:
     - Snout
@@ -602,6 +611,7 @@
   - type: Tag
     tags:
     - IPCMaskWearable
+    - Mask # Need for heretic
   - type: HideLayerClothing
     slots:
     - Snout
@@ -622,6 +632,7 @@
     tags:
     - WhitelistChameleon
     - IPCMaskWearable
+    - Mask # Need for heretic
 
 - type: entity
   parent: ClothingMaskNeckGaiter
@@ -721,4 +732,5 @@
   - type: Tag
     tags:
     - IPCMaskWearable
+    - Mask # Need for heretic
   - type: Unremoveable

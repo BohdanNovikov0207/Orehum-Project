@@ -1,4 +1,5 @@
 using System.Linq;
+using Content.Server.Bible.Components;
 using Content.Shared.Buckle.Components;
 using Content.Shared.DoAfter;
 using Content.Shared.Examine;
@@ -35,12 +36,42 @@ public abstract partial class SharedSacrificialAltarSystem : EntitySystem
 
     private void OnGetVerbs(Entity<SacrificialAltarComponent> ent, ref GetVerbsEvent<AlternativeVerb> args)
     {
+        var user = args.User;
+        // Orehum Start
+        if (HasComp<BibleUserComponent>(user))
+        {
+            if (ent.Comp.StartedServiceToGod)
+            {
+                args.Verbs.Add(new AlternativeVerb()
+                {
+                    Act = () => StopServiceToGod(ent, user),
+                    Text = "Начать служение",
+                    Priority = 2
+                });
+            }
+            else
+            {
+                args.Verbs.Add(new AlternativeVerb()
+                {
+                    Act = () => StartServiceToGod(ent, user, true),
+                    Text = "Начать служение ради зла",
+                    Priority = 3
+                });
+                args.Verbs.Add(new AlternativeVerb()
+                {
+                    Act = () => StartServiceToGod(ent, user, false),
+                    Text = "Начать служение ради света",
+                    Priority = 4
+                });
+            }
+        }
+        // Orehum End
+
         if (!args.CanAccess || !args.CanInteract || ent.Comp.DoAfter != null
             || !TryComp<StrapComponent>(ent, out var strap)
             || GetFirstBuckled(strap) is not { } target)
             return;
 
-        var user = args.User;
         args.Verbs.Add(new AlternativeVerb()
         {
             Act = () => AttemptSacrifice(ent, user, target),
@@ -58,4 +89,10 @@ public abstract partial class SharedSacrificialAltarSystem : EntitySystem
     }
 
     protected virtual void AttemptSacrifice(Entity<SacrificialAltarComponent> ent, EntityUid user, EntityUid target) { }
+
+    // Orehum Start
+    protected virtual void StartServiceToGod(Entity<SacrificialAltarComponent> ent, EntityUid user, bool isEvil) { }
+
+    protected virtual void StopServiceToGod(Entity<SacrificialAltarComponent> ent, EntityUid user) { }
+    // Orehum end
 }

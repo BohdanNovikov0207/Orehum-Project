@@ -696,6 +696,33 @@
     - type: Sprite
       state: poster63_contraband
 
+- type: entity
+  parent: PosterBase
+  id: PosterContrabandBanzai
+  name: "Rising Sun"
+  description: "A poster with rays of rising sun and japanese script '天皇陛下万歳' on it. Obviously that is too old."
+  components:
+    - type: Sprite
+      state: poster64_contraband
+
+- type: entity
+  parent: PosterBase
+  id: PosterContrabandHotVulpsIsland
+  name: "Hot Vulps Island"
+  description: "High sun, hot sands and boundless sea waits for you on a tropical island. Just sign up our vacation trip right now at that.beautifullife.nt! You will be not disappointed!"
+  components:
+    - type: Sprite
+      state: poster65_contraband
+
+- type: entity
+  parent: PosterBase
+  id: PosterContrabandPinkEvil
+  name: "I'm not evil!"
+  description: "A poster depicting crying pink vulpkanin, who are commonly accused of being a creature of Satana."
+  components:
+    - type: Sprite
+      state: poster66_contraband
+
 # Legit
 - type: entity
   parent: PosterBase
@@ -1293,6 +1320,15 @@
   components:
   - type: Sprite
     state: poster53_legit
+
+- type: entity
+  parent: PosterBase
+  id: PosterLegitKeepWater
+  name: "Keep Water"
+  description: "A poster appealing to save limited amount of water."
+  components:
+  - type: Sprite
+    state: poster54_legit
 
 #maps
 

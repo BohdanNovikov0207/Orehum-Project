@@ -1,0 +1,112 @@
+- type: startingGear
+  id: GasTankWaterVaporSuitStorage
+  parent: WaterVaporBreather
+  equipment:
+    suitstorage: WaterVaporTankFilled
+
+- type: startingGear
+  id: BoxSurvivalWaterVapor
+  parent: WaterVaporBreather
+  storage:
+    back:
+    - BoxSurvivalWaterVapor
+
+- type: startingGear
+  id: BoxSurvivalClownWaterVapor
+  parent: WaterVaporBreather
+  storage:
+    back:
+    - BoxHugWaterVapor
+
+
+## Mime
+#- type: loadout
+#  id: EmergencyWaterVaporMime
+#  effects:
+#  - !type:GroupLoadoutEffect
+#    proto: WaterBreather
+#  storage:
+#    back:
+#    - BoxMimeWaterVapor
+
+- type: startingGear
+  id: BoxSurvivalEngineeringWaterVapor
+  parent: WaterVaporBreather
+  storage:
+    back:
+    - BoxSurvivalEngineeringWaterVapor
+    
+- type: startingGear
+  id: BoxSurvivalMedicalWaterVapor
+  parent: WaterVaporBreather
+  storage:
+    back:
+    - BoxSurvivalMedicalWaterVapor
+
+- type: startingGear
+  id: BoxSurvivalSecurityWaterVapor
+  parent: WaterVaporBreather
+  storage:
+    back:
+    - BoxSurvivalSecurityWaterVapor
+
+- type: startingGear
+  id: BoxSurvivalSyndicateWaterVapor
+  parent: WaterVaporBreather
+  storage:
+    back:
+    - BoxSurvivalWaterVapor
+
+
+## Full EVA Tank, Any Species
+#- type: loadout
+#  id: LoadoutSpeciesEVAWaterVapor
+#  effects:
+#  - !type:GroupLoadoutEffect
+#    proto: WaterBreather
+#  equipment:
+#    suitstorage: WaterVaporTankFilled
+#
+## Species-appropriate Double Emergency Tank in Pocket 1
+#- type: loadout
+#  id: LoadoutSpeciesPocketDoubleWaterVapor
+#  effects:
+#  - !type:GroupLoadoutEffect
+#    proto: WaterBreather
+#  equipment:
+#    pocket1: DoubleEmergencyWaterVaporTankFilled
+#
+## Corpsman
+#- type: loadout
+#  id: EmergencyOxygenCorpsman
+#  effects:
+#  - !type:GroupLoadoutEffect
+#    proto: OxygenBreather
+#  storage:
+#    back:
+#    - BoxSurvivalBrigmedic
+#
+#- type: loadout
+#  id: EmergencyNitrogenCorpsman
+#  effects:
+#  - !type:GroupLoadoutEffect
+#    proto: NitrogenBreather
+#  storage:
+#    back:
+#    - BoxSurvivalBrigmedicNitrogen
+#
+#- type: loadout
+#  id: EmergencyWaterVaporCorpsman
+#  effects:
+#  - !type:GroupLoadoutEffect
+#    proto: WaterBreather
+#  equipment:
+#    mask: BoxSurvivalBrigmedicWaterVapor
+#
+#- type: loadout
+#  id: LoadoutSpeciesBreathToolCorpsman
+#  effects:
+#  - !type:GroupLoadoutEffect
+#    proto: EffectSpeciesVox
+#  equipment:
+#    mask: ClothingMaskBreathMedicalSecurity

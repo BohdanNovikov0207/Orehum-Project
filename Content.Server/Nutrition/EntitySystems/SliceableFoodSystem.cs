@@ -14,6 +14,8 @@ using Robust.Shared.Random;
 using Robust.Shared.Containers;
 using Robust.Shared.Physics.Components;
 using Robust.Shared.Physics.Systems;
+using FoodComponent = Content.Shared.Nutrition.Components.FoodComponent;
+
 
 namespace Content.Server.Nutrition.EntitySystems;
 

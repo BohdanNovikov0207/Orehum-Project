@@ -9,6 +9,9 @@
     "states": [
         {
             "name": "tendril"
+        },
+        {
+            "name": "ash_walker_nest"
         }
     ]
 }

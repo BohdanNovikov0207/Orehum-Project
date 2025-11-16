@@ -1,5 +1,10 @@
+using System.Numerics;
+using Robust.Shared.GameStates;
+
+
 namespace Content.Shared.Overlays;
 
+[NetworkedComponent]
 public abstract partial class BaseOverlayComponent : Component
 {
     [DataField, ViewVariables(VVAccess.ReadOnly)]

@@ -75,7 +75,7 @@ public sealed partial class AnomalySystem
         var pointRating = args.PartRatings[component.MachinePartPointMultiplier];
         var radRating = args.PartRatings[component.MachinePartPointMultiplier];
 
-        component.PointMultiplier = component.BasePointMultiplier * (component.UpgradePointMultiplier * pointRating);
+        component.PointMultiplier = component.BasePointMultiplier + (pointRating - 1) * component.UpgradePointMultiplier;
 
         if (TryComp<RadiationSourceComponent>(uid, out var radiation))
             radiation.Intensity = component.BaseRadiation * radRating;

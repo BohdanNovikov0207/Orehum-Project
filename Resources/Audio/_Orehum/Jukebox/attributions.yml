@@ -1,3 +1,50 @@
+- files: ["BurnItDown.ogg"]
+  license: "CC-BY-SA-3.0"
+  copyright: "Burn It Down by Linkin Park"
+  source: "https://www.youtube.com/watch?v=dxytyRy-O1k"
+  PS: "RIP Chester"
+
+- files: ["NewDivide.ogg"]
+  license: "CC-BY-SA-3.0"
+  copyright: "New Divide by Linkin Park"
+  source: "https://www.youtube.com/watch?v=ysSxxIqKNN0"
+  PS: "RIP Chester"
+
+- files: ["SweetFlower.ogg"]
+  license: "CC-BY-SA-3.0"
+  copyright: "За седьмым перевалом by Павел Пламенев"
+  source: "https://youtu.be/NJvpt7swmk8?si=BhxW9alVPV0SltDn"
+
+- files: ["BackInBlack.ogg"]
+  license: "CC-BY-SA-3.0"
+  copyright: "Back in Black by AC/DC"
+  source: "https://youtu.be/pAgnJDJN4VA?si=Hdj55v4r5YyLDQqV"
+
+- files: ["TheManWho.ogg"]
+  license: "CC-BY-SA-3.0"
+  copyright: "The Man Who Sold The World by Nirvana"
+  source: "https://youtu.be/fregObNcHC8?si=QcaiMFIXoMKpDSL4"
+
+- files: ["SoliderSad.ogg"]
+  license: "CC-BY-SA-3.0"
+  copyright: "Солдатская печаль by Kukryniksy"
+  source: "https://youtu.be/_t5Q4rPBwNw?si=kdayApHc65BC9Yp1"
+
+- files: ["WeNotAngels.ogg"]
+  license: "CC-BY-SA-3.0"
+  copyright: "Мы не ангелы by Алексей Пономарев"
+  source: "https://youtu.be/0R5GFbpgRtg?si=_lLZZxubSUi2yQYM"
+
+- files: ["KakNaWar.ogg"]
+  license: "CC-BY-SA-3.0"
+  copyright: "Как на войне by Агата Кристи"
+  source: "https://youtu.be/X77bf6zUJs0?si=lePST96xqrtqWGV5"
+
+- files: ["KISS.ogg"]
+  license: "CC-BY-SA-3.0"
+  copyright: "I Was Made For Lovin' You by Kiss"
+  source: "https://youtu.be/ZhIsAZO5gl0?si=079kfR83_E8RX3j1"
+
 - files: ["Fine.ogg"]
   license: "CC-BY-SA-3.0"
   copyright: "Fine by Lemon Demon."
@@ -23,14 +70,24 @@
   copyright: "From Katana ZERO."
   source: "https://www.youtube.com/watch?v=EO2lkMIxvUU"
 
+- files: ["LetItSnow.ogg"]
+  license: "CC-BY-SA-3.0"
+  copyright: "Let It Snow by Frank Sinatra"
+  source: "https://youtu.be/y5F_CUFuuto?si=mkXxUZJqw0up6zzN"
+
+- files: ["SixteenTons.ogg"]
+  license: "CC-BY-SA-3.0"
+  copyright: "Sixteen Tons by Tennessee Ford"
+  source: "https://youtu.be/BSvORvIjZiU?si=CawYv5gKDbcvNGBG"
+
+- files: ["SweetGreen.ogg"]
+  license: "CC-BY-SA-3.0"
+  copyright: "Sweet Ginder Green by Barrelhouse"
+  source: "https://www.youtube.com/watch?v=tvIo2ndPr68"
+
 - files: ["Caramelldansen.ogg"]
   license: "CC-BY-SA-3.0"
   copyright: "Caramelldansen by Caramella Girls."
-  source: "https://www.youtube.com/watch?v=6-8E4Nirh9s"
-
-- files: ["Blizzard.ogg"]
-  license: "CC-BY-SA-3.0"
-  copyright: "Blizard by El Huervo."
   source: "https://www.youtube.com/watch?v=6-8E4Nirh9s"
 
 - files: ["Paint-It-Black.ogg"]
@@ -98,11 +155,6 @@
   copyright: "Nirvana - Heart-Shaped Box."
   source: "https://www.youtube.com/watch?v=n6P0SitRwy8"
 
-- files: ["breathe.ogg"]
-  license: "CC-BY-SA-3.0"
-  copyright: "Breathe(In the air) - Pink Floyd."
-  source: "https://youtu.be/stOCUPEytzg?si=fz1VFxu7DM79UPsk"
-
 - files: ["mars.ogg"]
   license: "CC-BY-SA-3.0"
   copyright: "David Bowie - Life On Mars?."
@@ -113,30 +165,10 @@
   copyright: "Alexander Rybak - Fairytale."
   source: "https://youtu.be/H6vYJvRFYp0?feature=shared"
 
-- files: ["newyorklove.ogg"]
-  license: "CC-BY-SA-3.0"
-  copyright: "New York Love · Dean Wagg."
-  source: "https://youtu.be/vFCsLK52iZk?feature=shared"
-
-- files: ["bodypaint.ogg"]
-  license: "CC-BY-SA-3.0"
-  copyright: "Body Paint - Arctic Monkeys."
-  source: "https://youtu.be/ixX62CQPHh0?si=ElEp7F1ZdTZ5hC4Z"
-
 - files: ["pplrstrange.ogg"]
   license: "CC-BY-SA-3.0"
   copyright: "People Are Strange · The Doors."
   source: "https://youtu.be/N23X70m37L8?si=hrk7RviZJoKkvrYq"
-
-- files: ["andiloveher.ogg"]
-  license: "CC-BY-SA-3.0"
-  copyright: "The beatles - And I Love Her."
-  source: "https://youtu.be/5tc0gLSSU1M?si=jMjHb8-vGIhsimtf"
-
-- files: ["inthewoods.ogg"]
-  license: "CC-BY-SA-3.0"
-  copyright: "Aron Wright - In the Woods."
-  source: "https://youtu.be/FV5mib31IhA?feature=shared"
 
 - files: ["WSV.ogg"]
   license: "CC-BY-SA-3.0"
@@ -163,11 +195,6 @@
   copyright: "Arctic Monkeys - 505."
   source: "https://www.youtube.com/watch?v=MrmPDUvKyLs"
 
-- files: ["shineonyou.ogg"]
-  license: "CC-BY-SA-3.0"
-  copyright: "Pink Floyd - Shine On You Crazy Diamond."
-  source: "https://youtu.be/54W8kktFE_o?si=tgo-uJjLfAOVpw3g"
-
 - files: ["bombom.ogg"]
   license: "CC-BY-SA-3.0"
   copyright: "Vengaboys - Boom, Boom, Boom, Boom."
@@ -187,11 +214,6 @@
   license: "CC-BY-SA-3.0"
   copyright: "Kakaya Rznitsa - Rassvet."
   source: "https://www.youtube.com/watch?v=Gk5Nk-XHz6w"
-
-- files: ["cancanmusic.ogg"]
-  license: "CC-BY-SA-3.0"
-  copyright: "Offenbach - Can Can Music."
-  source: "https://youtu.be/4Diu2N8TGKA?feature=shared"
 
 - files: ["neverfadeaway.ogg"]
   license: "CC-BY-SA-3.0"
@@ -223,26 +245,6 @@
   copyright: "David Bowie - Space Oddity."
   source: "https://youtu.be/gGyxEinAal4?si=dfaBIhFFOTnoxX5i"
 
-- files: ["acrosstheuni.ogg"]
-  license: "CC-BY-SA-3.0"
-  copyright: "The Beatles - Across The Universe."
-  source: "https://youtu.be/90M60PzmxEE?si=b72vpCZ5VjBXsPhZ"
-
-- files: ["wizard.ogg"]
-  license: "CC-BY-SA-3.0"
-  copyright: "SS13."
-  source: "https://www.youtube.com/watch?v=jJDAV9vSmYc"
-
-- files: ["sesbianlex.ogg"]
-  license: "CC-BY-SA-3.0"
-  copyright: "Schubert Serenade D957 No.4."
-  source: "https://www.youtube.com/watch?v=pi7WOZaD3DU"
-
-- files: ["dirgeforplanet.ogg"]
-  license: "CC-BY-SA-3.0"
-  copyright: "Firelake - Dirge for Planet."
-  source: "https://youtu.be/WDCNlqMgnvo"
-
 - files: ["television.ogg"]
   license: "CC-BY-SA-3.0"
   copyright: "Rex Orange County - Television / So Far So Good."
@@ -251,4 +253,64 @@
 - files: ["tpbreathe.ogg"]
   license: "CC-BY-SA-3.0"
   copyright: "The Prodigy - Breathe."
-  source: "https://youtu.be/rmHDhAohJlQ?si=IDL3MvdmZbSfZs76"
+  sorce: "https://youtu.be/rmHDhAohJlQ?si=IDL3MvdmZbSfZs76"
+
+- files: ["Soviet-WW2.ogg"]
+  license: "CC-BY-SA-3.0"
+  copyright: "Soviet WW2 - Dark is the Night"
+  sorce: "https://www.youtube.com/watch?v=750QGi3RO0"
+
+- files: ["Paid-To-Party.ogg"]
+  license: "CC-BY-SA-3.0"
+  copyright: "Party Hard - Paid To Party by Felipe Adorno Vassao"
+  sorce: "https://www.youtube.com/watch?v=mybpH8K6K1o"
+
+- files: ["Party-Killer.ogg"]
+  license: "CC-BY-SA-3.0"
+  copyright: "Party Hard - Party Killer"
+  sorce: "https://www.youtube.com/watch?v=V9l4YLVUEtE"
+
+- files: ["PHLucky.ogg"]
+  license: "CC-BY-SA-3.0"
+  copyright: "Party Hard - Lucky"
+  sorce: "https://www.youtube.com/watch?v=Xef-kx_55kY"
+
+- files: ["HARD-DRIVE.ogg"]
+  license: "CC-BY-SA-3.0"
+  copyright: "Griffinilla - Hard Drive"
+  source: "https://www.youtube.com/watch?v=rdSXXwkuaT0"
+
+- files: ["BadBoys.ogg"]
+  license: "CC-BY-SA-3.0"
+  copyright: "BadBoysOfReggae - Bad Boys"
+  source: "https://www.youtube.com/watch?v=2Q3dGZPguSM"
+
+- files: ["TFPTOWS.ogg"]
+  license: "CC-BY-SA-3.0"
+  copyright: "The Stupendium - The fine print"
+  source: "https://www.youtube.com/watch?v=vvANy49Kqhw"
+
+- files: ["MyWay.ogg"]
+  license: "CC-BY-SA-3.0"
+  copyright: "Frank Sinatra - My Way"
+  source: "https://www.youtube.com/watch?v=qQzdAsjWGPg"
+
+- files: ["sweetD.ogg"]
+  license: "CC-BY-SA-3.0"
+  copyright: "Klass - Sweet Dreams"
+  source: "https://www.youtube.com/watch?v=qeMFqkcPYcg"
+
+- files: [numa.ogg]
+  license: "CC-BY-SA-3.0"
+  copyright: "O-Zone - Dragostea Din Tei"
+  source: "https://www.youtube.com/watch?v=YnopHCL1Jk8"
+
+- files: [deviltown.ogg]
+  license: "CC-BY-SA-3"
+  copyright: "cavetown - Devil Town"
+  source: "https://www.youtube.com/watch?v=KvaxYUfGHnk"
+
+- files: [SYT.ogg]
+  license: "CC-BY-SA-3"
+  copyright: "The Weeknd - Save Your Tears"
+  source: "https://www.youtube.com/watch?v=XXYlFuWEuKI"

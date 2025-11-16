@@ -1,4 +1,4 @@
-﻿using Content.Server.StationEvents.Events;
+using Content.Server.StationEvents.Events;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype;
 
@@ -15,4 +15,16 @@ public sealed partial class RandomSpawnRuleComponent : Component
     /// </summary>
     [DataField("prototype", required: true, customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
     public string Prototype = string.Empty;
+
+        /// <summary>
+    /// Minimum number of entities to spawn
+    /// </summary>
+    [DataField]
+    public int MinCount = 1;
+
+    /// <summary>
+    /// Maximum number of entities to spawn
+    /// </summary>
+    [DataField]
+    public int MaxCount = 5;
 }

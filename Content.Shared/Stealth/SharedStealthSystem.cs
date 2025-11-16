@@ -33,7 +33,7 @@ public abstract class SharedStealthSystem : EntitySystem
         SubscribeLocalEvent<BreakStealthOnAttackComponent, ShotAttemptedEvent>(OnShoot);
     }
 
-    private void OnExamineAttempt(EntityUid uid, StealthComponent component, ExamineAttemptEvent args)
+    private void OnExamineAttempt(EntityUid uid, StealthComponent component, ref ExamineAttemptEvent args)
     {
         if (!component.Enabled || GetVisibility(uid, component) > component.ExamineThreshold)
             return;

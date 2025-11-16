@@ -1,0 +1,32 @@
+## Static
+
+- type: latheRecipePack
+  id: BioGenIngredientsStatic
+  recipes:
+  - BioGenMilk
+  - BioGenMilkSoy
+  - BioGenEthanol
+  - BioGenCream
+  - BioGenBlackpepper
+  - BioGenEnzyme
+  - BioGenFlour
+  - BioGenSugar
+  - BioGenMonkeyCube
+  - BioGenKoboldCube
+  - BioGenCandle
+  - BioGenPlantBGone
+  - BioGenWeedKiller
+  - BioGenPestKiller
+  - BioGenLeft4Zed
+  - BioGenEZNutrient
+  - BioGenRobustHarvest
+  - BioGenMutagen # Orehum add mutagen to biogen
+  - BioGenDiseaseSwab # Orehum add палочки to biogen
+
+- type: latheRecipePack
+  id: BioGenMaterialsStatic
+  recipes:
+  - BioGenMaterialCloth1
+  - BioGenMaterialCardboard1
+  - BioGenPaper
+  - BioGenPaperRolling1

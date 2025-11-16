@@ -2,5 +2,5 @@
   id: SupermatterSliver
   name: steal-target-supermatter-sliver
   sprite:
-    sprite: _EE/Structures/Power/Generation/Supermatter/supermatter_sliver.rsi
-    state: icon
+    sprite: _EE/Objects/Misc/supermatter_silver.rsi
+    state: shard

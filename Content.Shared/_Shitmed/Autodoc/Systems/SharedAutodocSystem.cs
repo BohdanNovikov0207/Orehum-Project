@@ -20,6 +20,8 @@ using Content.Shared.Whitelist;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
 using System.Linq;
+using Content.Shared.Silicon.Components;
+
 
 namespace Content.Shared._Shitmed.Autodoc.Systems;
 
@@ -312,6 +314,7 @@ public abstract class SharedAutodocSystem : EntitySystem
 
     public bool IsAwake(EntityUid uid)
     {
+        if (HasComp<SiliconComponent>(uid)) return false; // Orehum fix silicons
         return _mobState.IsAlive(uid) && !HasComp<SleepingComponent>(uid);
     }
 

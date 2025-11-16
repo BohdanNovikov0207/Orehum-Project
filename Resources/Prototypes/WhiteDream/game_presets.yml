@@ -10,3 +10,5 @@
   - SubGamemodesRule
   - BasicStationEventScheduler
   - BasicRoundstartVariation
+  - LavalandStormScheduler
+  - GlimmerEventScheduler

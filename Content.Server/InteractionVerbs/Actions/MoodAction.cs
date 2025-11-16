@@ -33,9 +33,15 @@ public sealed partial class MoodAction : InteractionAction
     public override bool Perform(InteractionArgs args, InteractionVerbPrototype proto, VerbDependencies deps)
     {
         if (Remove)
-            deps.EntMan.EventBus.RaiseLocalEvent(args.Target, new MoodRemoveEffectEvent(Effect));
+        {
+            var ev = new MoodRemoveEffectEvent(Effect);
+            deps.EntMan.EventBus.RaiseLocalEvent(args.Target, ref ev);
+        }
         else
-            deps.EntMan.EventBus.RaiseLocalEvent(args.Target, new MoodEffectEvent(Effect, Modifier, Offset));
+        {
+            var ev = new MoodEffectEvent(Effect, Modifier, Offset);
+            deps.EntMan.EventBus.RaiseLocalEvent(args.Target, ref ev);
+        }
 
         return true; // Mood system is shitcode so we can't even know if the effect was added or anything
     }

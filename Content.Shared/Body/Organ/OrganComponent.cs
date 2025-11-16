@@ -69,6 +69,12 @@ public sealed partial class OrganComponent : Component, ISurgeryToolComponent //
     /// </summary>
     [DataField]
     public bool CanEnable = true;
+
+    /// <summary>
+    ///     DeltaV - Can this organ be removed? Used to be able to make organs unremovable by setting it to false.
+    /// </summary>
+    [DataField]
+    public bool Removable = true;
     // Shitmed Change End
 
     /// <summary>

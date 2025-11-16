@@ -1,5 +1,7 @@
 using Content.Server.Popups;
+using Content.Server.GameTicking;
 using Content.Shared.Administration;
+using Content.Shared.GameTicking;
 using Content.Shared.Mind;
 using Robust.Shared.Console;
 
@@ -20,6 +22,13 @@ namespace Content.Server.Ghost
             if (player == null)
             {
                 shell.WriteLine(Loc.GetString("ghost-command-no-session"));
+                return;
+            }
+
+            var gameTick = _entities.System<GameTicker>();
+            if (!gameTick.PlayerGameStatuses.TryGetValue(player.UserId, out var status) || status is not PlayerGameStatus.JoinedGame)
+            {
+                shell.WriteLine("Вы не можете стать призраком. Ты не в игре!");
                 return;
             }
 

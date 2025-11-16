@@ -98,7 +98,8 @@ namespace Content.Server.Medical
             _audio.PlayPvs("/Audio/Effects/Fluids/splat.ogg", uid, AudioParams.Default.WithVariation(0.2f).WithVolume(-4f));
             _popup.PopupEntity(Loc.GetString("disease-vomit", ("person", Identity.Entity(uid, EntityManager))), uid);
 
-            RaiseLocalEvent(uid, new MoodEffectEvent("MobVomit"));
+            var ev = new MoodEffectEvent("MobVomit");
+            RaiseLocalEvent(uid, ref ev);
         }
     }
 }

@@ -4,7 +4,6 @@ using Content.Server.Power.Components;
 using Content.Server.Power.Pow3r;
 using Content.Shared.Access.Systems;
 using Content.Shared.APC;
-using Content.Shared.Emag.Components;
 using Content.Shared.Emag.Systems;
 using Content.Shared.Emp;
 using Content.Shared.Popups;
@@ -18,16 +17,27 @@ namespace Content.Server.Power.EntitySystems;
 
 public sealed class ApcSystem : EntitySystem
 {
+    private static readonly Enum UiKey = ApcUiKey.Key;
+
     [Dependency] private readonly AccessReaderSystem _accessReader = default!;
     [Dependency] private readonly IGameTiming _gameTiming = default!;
+    [Dependency] private readonly EmagSystem _emag = default!;
     [Dependency] private readonly PopupSystem _popup = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly UserInterfaceSystem _ui = default!;
 
+    private EntityQuery<PowerNetworkBatteryComponent> _powerNetworkBatteryQuery;
+    private EntityQuery<UserInterfaceComponent> _uiQuery;
+    private EntityQuery<AppearanceComponent> _appearanceQuery;
+
     public override void Initialize()
     {
         base.Initialize();
+
+        _powerNetworkBatteryQuery = GetEntityQuery<PowerNetworkBatteryComponent>();
+        _uiQuery = GetEntityQuery<UserInterfaceComponent>();
+        _appearanceQuery = GetEntityQuery<AppearanceComponent>();
 
         UpdatesAfter.Add(typeof(PowerNetSystem));
 
@@ -46,16 +56,16 @@ public sealed class ApcSystem : EntitySystem
         var query = EntityQueryEnumerator<ApcComponent>();
         while (query.MoveNext(out var uid, out var apc))
         {
-            if (!TryComp(uid, out PowerNetworkBatteryComponent? battery)
-                || !TryComp(uid, out UserInterfaceComponent? ui))
+            if (!_powerNetworkBatteryQuery.TryComp(uid, out var battery)
+                || !_uiQuery.TryComp(uid, out var ui))
                 continue;
 
-            if (apc.LastUiUpdate + ApcComponent.VisualsChangeDelay < _gameTiming.CurTime && _ui.IsUiOpen((uid, ui), ApcUiKey.Key))
+            if (apc.LastUiUpdate + ApcComponent.VisualsChangeDelay < _gameTiming.CurTime && _ui.IsUiOpen((uid, ui), UiKey))
             {
                 apc.LastUiUpdate = _gameTiming.CurTime;
                 UpdateUIState(uid, apc, battery);
             }
-            
+
             if (apc.NeedStateUpdate)
             {
                 UpdateApcState(uid, apc, battery);
@@ -117,7 +127,12 @@ public sealed class ApcSystem : EntitySystem
 
     private void OnEmagged(EntityUid uid, ApcComponent comp, ref GotEmaggedEvent args)
     {
-        // no fancy conditions
+        if (!_emag.CompareFlag(args.Type, EmagType.Interaction))
+            return;
+
+        if (_emag.CheckFlag(uid, EmagType.Interaction))
+            return;
+
         args.Handled = true;
     }
 
@@ -136,7 +151,7 @@ public sealed class ApcSystem : EntitySystem
                 apc.LastChargeState = newState;
                 apc.LastChargeStateTime = _gameTiming.CurTime;
 
-                if (TryComp(uid, out AppearanceComponent? appearance))
+                if (_appearanceQuery.TryComp(uid, out var appearance))
                 {
                     _appearance.SetData(uid, ApcVisuals.ChargeState, newState, appearance);
                 }
@@ -176,7 +191,7 @@ public sealed class ApcSystem : EntitySystem
 
     private ApcChargeState CalcChargeState(EntityUid uid, PowerState.Battery battery)
     {
-        if (HasComp<EmaggedComponent>(uid) || HasComp<EmpDisabledComponent>(uid))
+        if (_emag.CheckFlag(uid, EmagType.Interaction))
             return ApcChargeState.Emag;
 
         if (battery.CurrentStorage / battery.Capacity > ApcComponent.HighPowerThreshold)

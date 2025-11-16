@@ -16,17 +16,16 @@ namespace Content.Shared.Movement.Pulling.Components;
 [Access(typeof(PullingSystem), typeof(TableSlamSystem), typeof(SharedMartialArtsSystem))] // Goobstation - Table Slam
 public sealed partial class PullerComponent : Component
 {
+    // My raiding guild
     /// <summary>
-    ///     Next time the puller change where they are pulling the target towards.
+    /// Next time the puller can throw what is being pulled.
+    /// Used to avoid spamming it for infinite spin + velocity.
     /// </summary>
     [DataField(customTypeSerializer: typeof(TimeOffsetSerializer)), AutoNetworkedField, Access(Other = AccessPermissions.ReadWriteExecute)]
-    public TimeSpan NextPushTargetChange;
-
-    [DataField, AutoNetworkedField, Access(Other = AccessPermissions.ReadWriteExecute)]
-    public TimeSpan NextPushStop;
+    public TimeSpan NextThrow;
 
     [DataField]
-    public TimeSpan PushChangeCooldown = TimeSpan.FromSeconds(0.1f), PushDuration = TimeSpan.FromSeconds(5f);
+    public TimeSpan ThrowCooldown = TimeSpan.FromSeconds(1);
 
     // Before changing how this is updated, please see SharedPullerSystem.RefreshMovementSpeed
     public float WalkSpeedModifier => Pulling == default ? 1.0f : 0.95f;
@@ -34,7 +33,7 @@ public sealed partial class PullerComponent : Component
     public float SprintSpeedModifier => Pulling == default ? 1.0f : 0.95f;
 
     /// <summary>
-    ///     Entity currently being pulled/pushed if applicable.
+    /// Entity currently being pulled if applicable.
     /// </summary>
     [AutoNetworkedField, DataField]
     public EntityUid? Pulling;

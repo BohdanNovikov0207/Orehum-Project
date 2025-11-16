@@ -247,7 +247,7 @@ namespace Content.Server.Atmos.EntitySystems
                 _fireEvents[ent] = tempDelta;
         }
 
-        private void OnRejuvenate(EntityUid uid, FlammableComponent component, RejuvenateEvent args)
+        private void OnRejuvenate(EntityUid uid, FlammableComponent component, ref RejuvenateEvent args)
         {
             Extinguish(uid, component);
         }
@@ -422,15 +422,9 @@ namespace Content.Server.Atmos.EntitySystems
             _timer -= UpdateTime;
 
             // TODO: This needs cleanup to take off the crust from TemperatureComponent and shit.
-            var query = EntityQueryEnumerator<OnFireComponent>();
-            while (query.MoveNext(out var uid, out _))
+            var query = EntityQueryEnumerator<FlammableComponent, TransformComponent>();
+            while (query.MoveNext(out var uid, out var flammable, out _))
             {
-                if (!TryComp(uid, out FlammableComponent? flammable))
-                {
-                    RemCompDeferred<OnFireComponent>(uid);
-                    continue;
-                }
-
                 // Slowly dry ourselves off if wet.
                 if (flammable.FireStacks < 0)
                 {
@@ -440,13 +434,10 @@ namespace Content.Server.Atmos.EntitySystems
                 if (!flammable.OnFire)
                 {
                     _alertsSystem.ClearAlert(uid, flammable.FireAlert);
-                    RaiseLocalEvent(uid, new MoodRemoveEffectEvent("OnFire"));
-                    RemCompDeferred<OnFireComponent>(uid);
                     continue;
                 }
 
                 _alertsSystem.ShowAlert(uid, flammable.FireAlert);
-                RaiseLocalEvent(uid, new MoodEffectEvent("OnFire"));
 
                 if (flammable.FireStacks > 0)
                 {
@@ -456,6 +447,9 @@ namespace Content.Server.Atmos.EntitySystems
                     if (air == null || air.GetMoles(Gas.Oxygen) < 1f)
                     {
                         Extinguish(uid, flammable);
+                        var moodEv = new MoodRemoveEffectEvent("OnFire");
+                        RaiseLocalEvent(uid, ref moodEv);
+                        RemCompDeferred<OnFireComponent>(uid);
                         continue;
                     }
 
@@ -465,20 +459,14 @@ namespace Content.Server.Atmos.EntitySystems
                     if (TryComp(uid, out TemperatureComponent? temp))
                         _temperatureSystem.ChangeHeat(uid, 12500 * flammable.FireStacks, false, temp);
 
-                    var multiplier = 1f;
-                    if (!flammable.IgnoreFireProtection)
-                    {
-                        var ev = new GetFireProtectionEvent();
-                        // let the thing on fire handle it
-                        RaiseLocalEvent(uid, ref ev);
-                        // and whatever it's wearing
-                        if (_inventoryQuery.TryComp(uid, out var inv))
-                            _inventory.RelayEvent((uid, inv), ref ev);
+                    var ev = new GetFireProtectionEvent();
+                    // let the thing on fire handle it
+                    RaiseLocalEvent(uid, ref ev);
+                    // and whatever it's wearing
+                    if (_inventoryQuery.TryComp(uid, out var inv))
+                        _inventory.RelayEvent((uid, inv), ref ev);
 
-                        multiplier = ev.Multiplier;
-                    }
-
-                    _damageableSystem.TryChangeDamage(uid, flammable.Damage * flammable.FireStacks * multiplier, interruptsDoAfters: false);
+                    _damageableSystem.TryChangeDamage(uid, flammable.Damage * flammable.FireStacks * ev.Multiplier, interruptsDoAfters: false);
 
                     AdjustFireStacks(uid, flammable.FirestackFade * (flammable.Resisting ? 10f : 1f), flammable, flammable.OnFire);
                 }

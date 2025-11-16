@@ -1,3 +1,4 @@
+# PIG
 - type: entity
   parent: BasePlushie
   id: RubberPig
@@ -47,3 +48,71 @@
   - type: PhysicalComposition
     materialComposition:
       Plastic: 25
+
+# PlushieJeff
+- type: entity
+  parent: BasePlushie
+  id: PlushieJeff
+  name: plushie jeff
+  description: Does it really bite?
+  components:
+    - type: Sprite
+      sprite: _Orehum/ME4TA/Objects/Fun/jeff.rsi
+      state: PlushieJeff
+    - type: EmitSoundOnUse
+      sound:
+        path: /Audio/_Orehum/ME4TA/Items/Toys/jeff.ogg
+    - type: EmitSoundOnLand
+      sound:
+        path: /Audio/_Orehum/ME4TA/Items/Toys/jeff.ogg
+    - type: EmitSoundOnActivate
+      sound:
+        path: /Audio/_Orehum/ME4TA/Items/Toys/jeff.ogg
+    - type: EmitSoundOnCollide
+      sound:
+        path: /Audio/_Orehum/ME4TA/Items/Toys/jeff.ogg
+    - type: EmitSoundOnTrigger
+      sound:
+        path: /Audio/_Orehum/ME4TA/Items/Toys/jeff.ogg
+    - type: Food
+      requiresSpecialDigestion: true
+      useSound:
+        path: /Audio/_Orehum/ME4TA/Items/Toys/jeff.ogg
+    - type: MeleeWeapon
+      wideAnimationRotation: 110
+      soundHit:
+        path: /Audio/_Orehum/ME4TA/Items/Toys/jeff.ogg
+
+# PlushieAkva
+- type: entity
+  parent: BasePlushie
+  id: PlushieAkva
+  name: plushie akvanova
+  description: this p**n star
+  components:
+    - type: Sprite
+      sprite: _Orehum/Objects/Fun/plushieunaAkvanova.rsi
+      state: plushie_una_Akvanova
+    - type: EmitSoundOnUse
+      sound:
+        path: /Audio/_Orehum/ME4TA/Items/Toys/pAkva.ogg
+    - type: EmitSoundOnLand
+      sound:
+        path: /Audio/_Orehum/ME4TA/Items/Toys/pAkva.ogg
+    - type: EmitSoundOnActivate
+      sound:
+        path: /Audio/_Orehum/ME4TA/Items/Toys/pAkva.ogg
+    - type: EmitSoundOnCollide
+      sound:
+        path: /Audio/_Orehum/ME4TA/Items/Toys/pAkva.ogg
+    - type: EmitSoundOnTrigger
+      sound:
+        path: /Audio/_Orehum/ME4TA/Items/Toys/pAkva.ogg
+    - type: Food
+      requiresSpecialDigestion: true
+      useSound:
+        path: /Audio/_Orehum/ME4TA/Items/Toys/pAkva.ogg
+    - type: MeleeWeapon
+      wideAnimationRotation: 110
+      soundHit:
+        path: /Audio/_Orehum/ME4TA/Items/Toys/pAkva.ogg

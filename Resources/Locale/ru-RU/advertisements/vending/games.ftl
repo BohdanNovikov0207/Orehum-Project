@@ -1,3 +1,4 @@
+advertisement-goodcleanfun-0 = Проявите инициативу!
 advertisement-goodcleanfun-1 = Сбегите в фантастический мир!
 advertisement-goodcleanfun-2 = Утолите свою зависимость от азартных игр!
 advertisement-goodcleanfun-3 = Разрушьте вашу дружбу!

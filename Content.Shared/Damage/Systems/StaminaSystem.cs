@@ -110,7 +110,7 @@ public sealed partial class StaminaSystem : EntitySystem
         return MathF.Max(0f, component.StaminaDamage - MathF.Max(0f, (float) (curTime - (component.NextUpdate + pauseTime)).TotalSeconds * component.Decay));
     }
 
-    private void OnRejuvenate(EntityUid uid, StaminaComponent component, RejuvenateEvent args)
+    private void OnRejuvenate(EntityUid uid, StaminaComponent component, ref RejuvenateEvent args)
     {
         if (component.StaminaDamage >= component.CritThreshold)
         {
@@ -468,7 +468,11 @@ public sealed partial class StaminaSystem : EntitySystem
         _adminLogger.Add(LogType.Stamina, LogImpact.Medium, $"{ToPrettyString(uid):user} entered stamina crit");
     }
 
-    private void ExitStamCrit(EntityUid uid, StaminaComponent? component = null)
+    // goob edit - made it public.
+    // in any case it requires a stamina component that can be freely modified.
+    // so it doesn't really matter if it's public or private. besides, very convenient.
+    // regards
+    public void ExitStamCrit(EntityUid uid, StaminaComponent? component = null)
     {
         if (!Resolve(uid, ref component) ||
             !component.Critical)

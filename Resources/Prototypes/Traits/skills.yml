@@ -197,8 +197,8 @@
   requirements:
     - !type:CharacterSpeciesRequirement
       species:
-        - Harpy
         - IPC
+        - Harpy
     - !type:CharacterTraitRequirement
       inverted: true
       traits:

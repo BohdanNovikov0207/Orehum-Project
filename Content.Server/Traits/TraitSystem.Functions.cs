@@ -281,7 +281,10 @@ public sealed partial class TraitAddMoodlets : TraitFunction
 
         foreach (var moodProto in MoodEffects)
             if (prototype.TryIndex(moodProto, out var moodlet))
-                entityManager.EventBus.RaiseLocalEvent(uid, new MoodEffectEvent(moodlet.ID));
+            {
+                var ev = new MoodEffectEvent(moodlet.ID);
+                entityManager.EventBus.RaiseLocalEvent(uid, ref ev);
+            }
     }
 }
 

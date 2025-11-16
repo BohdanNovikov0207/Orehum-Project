@@ -13,6 +13,8 @@ using Robust.Shared.Enums;
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
+using FoodComponent = Content.Shared.Nutrition.Components.FoodComponent;
+
 
 namespace Content.Server.Nutrition.EntitySystems;
 

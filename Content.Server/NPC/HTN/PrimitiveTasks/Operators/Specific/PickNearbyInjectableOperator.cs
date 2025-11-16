@@ -1,6 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
-using Content.Server.NPC.Components;
+using Content.Shared.NPC.Components;
 using Content.Server.NPC.Pathfinding;
 using Content.Shared.Chemistry.Components.SolutionManager;
 using Content.Shared.Damage;
@@ -9,12 +9,17 @@ using Content.Shared.Mobs.Components;
 using Content.Shared.Silicons.Bots;
 using Content.Shared.Emag.Components;
 using Content.Shared.Silicon.Components;
+using Microsoft.Extensions.ObjectPool;
+using Robust.Shared.Utility;
 
 
 namespace Content.Server.NPC.HTN.PrimitiveTasks.Operators.Specific;
 
 public sealed partial class PickNearbyInjectableOperator : HTNOperator
 {
+    private static readonly ObjectPool<HashSet<EntityUid>> EntPool =
+        new DefaultObjectPool<HashSet<EntityUid>>(new SetPolicy<EntityUid>(), 64);
+
     [Dependency] private readonly IEntityManager _entManager = default!;
     private EntityLookupSystem _lookup = default!;
     private MedibotSystem _medibot = default!;
@@ -59,7 +64,9 @@ public sealed partial class PickNearbyInjectableOperator : HTNOperator
         var mobState = _entManager.GetEntityQuery<MobStateComponent>();
         var emaggedQuery = _entManager.GetEntityQuery<EmaggedComponent>();
 
-        foreach (var entity in _lookup.GetEntitiesInRange(owner, range))
+        var entities = EntPool.Get();
+        _lookup.GetEntitiesInRange(owner, range, entities);
+        foreach (var entity in entities)
         {
             if (mobState.TryGetComponent(entity, out var state) &&
                 injectQuery.HasComponent(entity) &&
@@ -94,6 +101,7 @@ public sealed partial class PickNearbyInjectableOperator : HTNOperator
                 });
             }
         }
+        EntPool.Return(entities);
 
         return (false, null);
     }

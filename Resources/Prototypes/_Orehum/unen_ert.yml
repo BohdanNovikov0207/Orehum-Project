@@ -537,6 +537,7 @@
     - Chitinid
     - Plasmaman
     - Thaven
+    - Feroxi
   randomizeName: false
   components:
     - type: RandomHumanoidAppearance
@@ -609,6 +610,7 @@
     - Chitinid
     - Plasmaman
     - Thaven
+    - Feroxi
   randomizeName: false
   components:
     - type: RandomHumanoidAppearance
@@ -680,6 +682,7 @@
     - Chitinid
     - Plasmaman
     - Thaven
+    - Feroxi
   randomizeName: false
   components:
     - type: RandomHumanoidAppearance
@@ -752,6 +755,7 @@
     - Chitinid
     - Plasmaman
     - Thaven
+    - Feroxi
   components:
     - type: RandomHumanoidAppearance
       randomizeName: false
@@ -823,6 +827,7 @@
     - Chitinid
     - Plasmaman
     - Thaven
+    - Feroxi
   components:
     - type: RandomHumanoidAppearance
       randomizeName: false
@@ -894,6 +899,7 @@
     - Chitinid
     - Plasmaman
     - Thaven
+    - Feroxi
   components:
     - type: RandomHumanoidAppearance
       randomizeName: false
@@ -965,6 +971,7 @@
     - Chitinid
     - Plasmaman
     - Thaven
+    - Feroxi
   components:
     - type: RandomHumanoidAppearance
       randomizeName: false
@@ -1036,6 +1043,7 @@
     - Chitinid
     - Plasmaman
     - Thaven
+    - Feroxi
   components:
     - type: RandomHumanoidAppearance
       randomizeName: false
@@ -1107,6 +1115,7 @@
     - Chitinid
     - Plasmaman
     - Thaven
+    - Feroxi
   components:
     - type: RandomHumanoidAppearance
       randomizeName: false
@@ -1178,6 +1187,7 @@
     - Chitinid
     - Plasmaman
     - Thaven
+    - Feroxi
   components:
     - type: RandomHumanoidAppearance
       randomizeName: false
@@ -1250,6 +1260,7 @@
     - Chitinid
     - Plasmaman
     - Thaven
+    - Feroxi
   components:
     - type: RandomHumanoidAppearance
       randomizeName: false
@@ -1321,6 +1332,7 @@
     - Chitinid
     - Plasmaman
     - Thaven
+    - Feroxi
   components:
     - type: RandomHumanoidAppearance
       randomizeName: false
@@ -1392,6 +1404,7 @@
     - Chitinid
     - Plasmaman
     - Thaven
+    - Feroxi
   components:
     - type: RandomHumanoidAppearance
       randomizeName: false
@@ -1463,6 +1476,7 @@
     - Chitinid
     - Plasmaman
     - Thaven
+    - Feroxi
   components:
     - type: RandomHumanoidAppearance
       randomizeName: false
@@ -1534,6 +1548,7 @@
     - Chitinid
     - Plasmaman
     - Thaven
+    - Feroxi
   components:
     - type: RandomHumanoidAppearance
       randomizeName: false
@@ -1652,6 +1667,7 @@
     - Chitinid
     - Plasmaman
     - Thaven
+    - Feroxi
   components:
     - type: RandomHumanoidAppearance
       randomizeName: false
@@ -1762,6 +1778,7 @@
     - Chitinid
     - Plasmaman
     - Thaven
+    - Feroxi
   components:
     - type: RandomHumanoidAppearance
       randomizeName: false
@@ -1871,6 +1888,7 @@
     - Chitinid
     - Plasmaman
     - Thaven
+    - Feroxi
   components:
     - type: AutoImplant
       implants:
@@ -1972,6 +1990,7 @@
     - Chitinid
     - Plasmaman
     - Thaven
+    - Feroxi
   components:
     - type: AutoImplant
       implants:
@@ -2059,6 +2078,7 @@
     - Chitinid
     - Plasmaman
     - Thaven
+    - Feroxi
   components:
     - type: RandomHumanoidAppearance
       randomizeName: false
@@ -2099,7 +2119,7 @@
   components:
     - type: Sprite
       sprite: Markers/jobs.rsi
-      state: ertmedicaleva
+      state: cburn
     - type: RandomMetadata
       nameSegments:
       - NamesFirstMilitary

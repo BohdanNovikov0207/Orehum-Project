@@ -5,12 +5,18 @@ using Content.Server.NPC.Pathfinding;
 using Content.Shared.Emag.Components;
 using Content.Shared.Interaction;
 using Content.Shared.Silicons.Bots;
+using Microsoft.Extensions.ObjectPool;
 using Robust.Shared.Prototypes;
+using Robust.Shared.Utility;
+
 
 namespace Content.Server.NPC.HTN.PrimitiveTasks.Operators.Specific;
 
 public sealed partial class PickNearbyServicableHydroponicsTrayOperator : HTNOperator
 {
+    private static readonly ObjectPool<HashSet<EntityUid>> EntPool =
+        new DefaultObjectPool<HashSet<EntityUid>>(new SetPolicy<EntityUid>(), 64);
+
     [Dependency] private readonly IEntityManager _entManager = default!;
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
 
@@ -53,7 +59,9 @@ public sealed partial class PickNearbyServicableHydroponicsTrayOperator : HTNOpe
         var entityQuery = _entManager.GetEntityQuery<PlantHolderComponent>();
         var emagged = _entManager.HasComponent<EmaggedComponent>(owner);
 
-        foreach (var target in _lookup.GetEntitiesInRange(owner, range))
+        var entities = EntPool.Get();
+        _lookup.GetEntitiesInRange(owner, range, entities);
+        foreach (var target in entities)
         {
             if (!entityQuery.TryGetComponent(target, out var plantHolderComponent))
                 continue;
@@ -75,6 +83,7 @@ public sealed partial class PickNearbyServicableHydroponicsTrayOperator : HTNOpe
                 {NPCBlackboard.PathfindKey, path},
             });
         }
+        EntPool.Return(entities);
 
         return (false, null);
     }

@@ -29,13 +29,13 @@ public abstract class SharedPowerCellSystem : EntitySystem
         QueueUpdate((ent, ent.Comp));
     }
 
-    private void OnRejuvenate(EntityUid uid, PowerCellSlotComponent component, RejuvenateEvent args)
+    private void OnRejuvenate(EntityUid uid, PowerCellSlotComponent component, ref RejuvenateEvent args)
     {
         if (!_itemSlots.TryGetSlot(uid, component.CellSlotId, out var itemSlot) || !itemSlot.Item.HasValue)
             return;
 
         // charge entity batteries and remove booby traps.
-        RaiseLocalEvent(itemSlot.Item.Value, args);
+        RaiseLocalEvent(itemSlot.Item.Value, ref args);
     }
 
     private void OnCellInsertAttempt(EntityUid uid, PowerCellSlotComponent component, ContainerIsInsertingAttemptEvent args)

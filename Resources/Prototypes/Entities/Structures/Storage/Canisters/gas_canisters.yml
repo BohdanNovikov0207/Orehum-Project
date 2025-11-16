@@ -5,6 +5,7 @@
   name: gas canister
   description: A canister that can contain any type of gas. It can be attached to connector ports using a wrench.
   components:
+    - type: Animateable
     - type: InteractionOutline
     - type: Transform
       noRot: true
@@ -16,7 +17,7 @@
     - type: Appearance
     - type: GenericVisualizer
       visuals:
-        enum.GasPortableVisuals.ConnectedState:
+        enum.AnchorVisuals.Anchored:
           connectedToPort:
             False: { state: can-connector, visible: false }
             True: { state: can-connector, visible: true }
@@ -72,7 +73,7 @@
           shape:
             !type:PhysShapeAabb
             bounds: "-0.25,-0.25,0.25,0.25"
-          density: 380
+          density: 190
           mask:
           - SmallMobMask
           layer:
@@ -95,16 +96,20 @@
     - type: GasCanister
       gasTankSlot:
         name: comp-gas-canister-slot-name-gas-tank
+        ejectOnBreak: true
         whitelist:
           components:
             - GasTank
             - BorgJetpack
     - type: StaticPrice
-      price: 1000
+      price: 200
     - type: AccessReader
       access: [["Atmospherics"], ["Engineering"], ["Research"]]
     - type: Lock
       locked: false
+    - type: GuideHelp
+      guides:
+      - GasCanisters
 
 - type: entity
   parent: GasCanister
@@ -116,7 +121,7 @@
         - state: yellow
     - type: GasCanister
       gasMixture:
-        volume: 1000
+        volume: 1500
         moles: # List of gasses for easy reference
           - 0 # oxygen
           - 0 # nitrogen
@@ -165,10 +170,10 @@
       - state: grey
   - type: GasCanister
     gasMixture:
-      volume: 1000
+      volume: 1500
       moles:
-        - 393.0592071 # oxygen 21%
-        - 1478.6513029 # nitrogen 79%
+      - 581.56 # oxygen 21%
+      - 2187.79 # nitrogen 79%
       temperature: 293.15
   - type: Destructible
     thresholds:
@@ -205,9 +210,9 @@
       - state: blue
   - type: GasCanister
     gasMixture:
-      volume: 1000
+      volume: 1500
       moles:
-        - 1871.71051 # oxygen
+      - 2769.36 # oxygen
       temperature: 293.15
   - type: Destructible
     thresholds:
@@ -241,7 +246,7 @@
   components:
   - type: GasCanister
     gasMixture:
-      volume: 1000
+      volume: 1500
       moles:
         - 18710.71051 # oxygen
       temperature: 72
@@ -259,10 +264,10 @@
         - state: red
     - type: GasCanister
       gasMixture:
-        volume: 1000
+        volume: 1500
         moles:
           - 0 # oxygen
-          - 1871.71051 # nitrogen
+          - 2769.36 # nitrogen
         temperature: 293.15
     - type: Destructible
       thresholds:
@@ -296,7 +301,7 @@
   components:
   - type: GasCanister
     gasMixture:
-      volume: 1000
+      volume: 1500
       moles:
         - 0 # oxygen
         - 18710.71051 # nitrogen
@@ -315,11 +320,11 @@
         - state: black
     - type: GasCanister
       gasMixture:
-        volume: 1000
+        volume: 1500
         moles:
           - 0 # oxygen
           - 0 # nitrogen
-          - 1871.71051 # CO2
+          - 2769.36 # CO2
         temperature: 293.15
     - type: Destructible
       thresholds:
@@ -355,7 +360,7 @@
   components:
   - type: GasCanister
     gasMixture:
-      volume: 1000
+      volume: 1500
       moles:
         - 0 # oxygen
         - 0 # nitrogen
@@ -375,12 +380,12 @@
         - state: orange
     - type: GasCanister
       gasMixture:
-        volume: 1000
+        volume: 1500
         moles:
           - 0 # oxygen
           - 0 # nitrogen
           - 0 # carbon dioxide
-          - 1871.71051 # plasma
+          - 2769.36 # plasma
         temperature: 293.15
     - type: Destructible
       thresholds:
@@ -419,13 +424,13 @@
         - state: green
     - type: GasCanister
       gasMixture:
-        volume: 1000
+        volume: 1500
         moles:
           - 0 # oxygen
           - 0 # nitrogen
           - 0 # CO2
           - 0 # Plasma
-          - 1871.71051 # Tritium
+          - 2769.36 # Tritium
         temperature: 293.15
     - type: Destructible
       thresholds:
@@ -464,14 +469,14 @@
         - state: water_vapor
     - type: GasCanister
       gasMixture:
-        volume: 1000
+        volume: 1500
         moles:
           - 0 # oxygen
           - 0 # nitrogen
           - 0 # CO2
           - 0 # Plasma
           - 0 # Tritium
-          - 1871.71051 # Water vapor
+          - 2769.36 # Water vapor
         temperature: 293.15
     - type: Destructible
       thresholds:
@@ -508,7 +513,7 @@
         - state: greenys
     - type: GasCanister
       gasMixture:
-        volume: 1000
+        volume: 1500
         moles:
           - 0 # oxygen
           - 0 # nitrogen
@@ -516,7 +521,7 @@
           - 0 # Plasma
           - 0 # Tritium
           - 0 #  Water vapor
-          - 1871.71051 # Ammonia
+          - 2769.36 # Ammonia
         temperature: 293.15
     - type: Destructible
       thresholds:
@@ -555,7 +560,7 @@
         - state: redws
     - type: GasCanister
       gasMixture:
-        volume: 1000
+        volume: 1500
         moles:
           - 0 # oxygen
           - 0 # nitrogen
@@ -564,7 +569,7 @@
           - 0 # Tritium
           - 0 #  Water vapor
           - 0 # Ammonia
-          - 1871.71051 # N2O
+          - 2769.36 # N2O
         temperature: 293.15
     - type: Destructible
       thresholds:
@@ -601,7 +606,7 @@
     - state: frezon
   - type: GasCanister
     gasMixture:
-      volume: 1000
+      volume: 1500
       moles:
       - 0 # oxygen
       - 0 # nitrogen
@@ -611,7 +616,124 @@
       - 0 # Water vapor
       - 0 # Ammonia
       - 0 # N2O
-      - 1871.71051 # Frezon
+      - 2769.36 # Frezon
+      - 0 # BZ, etc
+      temperature: 293.15
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 600
+      behaviors:
+        - !type:DoActsBehavior
+          acts: [ "Destruction" ]
+    - trigger:
+        !type:DamageTrigger
+        damage: 300
+      behaviors:
+      - !type:PlaySoundBehavior
+        sound:
+          collection: MetalBreak
+      - !type:SpawnEntitiesBehavior
+        spawn:
+          FrezonCanisterBroken:
+            min: 1
+            max: 1
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
+      - !type:DumpCanisterBehavior
+  - type: Lock
+    locked: true
+
+- type: entity
+  parent: GasCanister
+  id: HyperNobliumCanister
+  components:
+  - type: Sprite
+    layers:
+    - state: nob
+  - type: GasCanister
+    gasMixture:
+      volume: 1000
+      moles:
+      - 0 # oxygen
+      - 0 # nitrogen
+      - 0 # CO2
+      - 0 # Plasma
+      - 0 # Tritium
+      - 0 # Water vapor
+      - 0 # Miasma
+      - 0 # N2O
+      - 0 # Frezon
+      - 0 # BZ
+      - 0 # Pluoxium
+      - 0 # Hydrogen
+      - 0 # Nitrium
+      - 0 # Healium
+      - 1871.71051 # Hyper-Noblium
+      - 0 # Proto-Nitrate
+      - 0 # Zauker
+      - 0 # Halon
+      - 0 # Helium
+      - 0 # Anti-Noblium
+      temperature: 293.15
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 600
+      behaviors:
+        - !type:DoActsBehavior
+          acts: [ "Destruction" ]
+    - trigger:
+        !type:DamageTrigger
+        damage: 300
+      behaviors:
+      - !type:PlaySoundBehavior
+        sound:
+          collection: MetalBreak
+      - !type:SpawnEntitiesBehavior
+        spawn:
+          FrezonCanisterBroken:
+            min: 1
+            max: 1
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
+      - !type:DumpCanisterBehavior
+  - type: Lock
+    locked: true
+
+- type: entity
+  parent: GasCanister
+  id: AntiNobliumCanister
+  components:
+  - type: Sprite
+    layers:
+    - state: antinob
+  - type: GasCanister
+    gasMixture:
+      volume: 1000
+      moles:
+      - 0 # oxygen
+      - 0 # nitrogen
+      - 0 # CO2
+      - 0 # Plasma
+      - 0 # Tritium
+      - 0 # Water vapor
+      - 0 # Miasma
+      - 0 # N2O
+      - 0 # Frezon
+      - 0 # BZ
+      - 0 # Pluoxium
+      - 0 # Hydrogen
+      - 0 # Nitrium
+      - 0 # Healium
+      - 0 # Hyper-Noblium
+      - 0 # Proto-Nitrate
+      - 0 # Zauker
+      - 0 # Halon
+      - 0 # Helium
+      - 1871.71051 # Anti-Noblium
       temperature: 293.15
   - type: Destructible
     thresholds:
@@ -784,3 +906,16 @@
   - type: Sprite
     state: frezon-1
 
+- type: entity
+  parent: GasCanisterBrokenBase
+  id: HyperNobliumCanisterBroken
+  components:
+  - type: Sprite
+    state: nob-1
+
+- type: entity
+  parent: GasCanisterBrokenBase
+  id: AntiNobliumCanisterBroken
+  components:
+  - type: Sprite
+    state: antinob-1

@@ -2221,7 +2221,7 @@ entities:
     - type: RadiationGridResistance
     - type: LoadedMap
     - type: SpreaderGrid
-    - type: GridTreeMovedGrids
+    #- type: GridTreeMovedGrids
     - type: GridPathfinding
 - proto: Airlock
   entities:

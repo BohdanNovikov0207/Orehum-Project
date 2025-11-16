@@ -32,15 +32,18 @@ namespace Content.Shared.Localizations
             _loc.LoadCulture(culture);
             _loc.LoadCulture(fallbackCulture);
             _loc.SetFallbackCluture(fallbackCulture);
-            _loc.AddFunction(culture, "MANY", FormatMany);
-            _loc.AddFunction(culture, "PRESSURE", FormatPressure);
-            _loc.AddFunction(culture, "POWERWATTS", FormatPowerWatts);
-            _loc.AddFunction(culture, "POWERJOULES", FormatPowerJoules);
-            _loc.AddFunction(culture, "UNITS", FormatUnits);
-            _loc.AddFunction(culture, "TOSTRING", args => FormatToString(culture, args));
-            _loc.AddFunction(culture, "LOC", FormatLoc);
-            _loc.AddFunction(culture, "NATURALFIXED", FormatNaturalFixed);
-            _loc.AddFunction(culture, "NATURALPERCENT", FormatNaturalPercent);
+            foreach (var cu in new[] {culture, fallbackCulture}) // orehum костыль локализашион эдишион
+            {
+                _loc.AddFunction(cu, "MANY", FormatMany);
+                _loc.AddFunction(cu, "PRESSURE", FormatPressure);
+                _loc.AddFunction(cu, "POWERWATTS", FormatPowerWatts);
+                _loc.AddFunction(cu, "POWERJOULES", FormatPowerJoules);
+                _loc.AddFunction(cu, "UNITS", FormatUnits);
+                _loc.AddFunction(cu, "TOSTRING", args => FormatToString(cu, args));
+                _loc.AddFunction(cu, "LOC", FormatLoc);
+                _loc.AddFunction(cu, "NATURALFIXED", FormatNaturalFixed);
+                _loc.AddFunction(cu, "NATURALPERCENT", FormatNaturalPercent);
+            }
 
 
             /*

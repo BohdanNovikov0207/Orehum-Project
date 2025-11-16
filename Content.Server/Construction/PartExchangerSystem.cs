@@ -76,7 +76,8 @@ public sealed class PartExchangerSystem : EntitySystem
             _container.RemoveEntity(uid, item);
         }
 
-        machineParts.Sort((x, y) => x.Comp.Rating.CompareTo(y.Comp.Rating));
+        machineParts.Sort(static (x, y) => x.Comp.Rating.CompareTo(y.Comp.Rating)); // orehum fix
+        machineParts.Reverse(); // orehum fix
 
         var updatedParts = new List<Entity<MachinePartComponent>>();
         foreach (var (machinePartId, amount) in macBoardComp.MachinePartRequirements)

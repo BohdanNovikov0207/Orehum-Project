@@ -13,8 +13,8 @@
 - files: ["centcomm.yml"]
   authors: Emisse
 
-- files: ["cluster.yml"]
-  authors: Scribbles0
+- files: ["_Orehum/ME4TA/cluster.yml"]
+  authors: ME4TA
 
 - files: ["fland.yml"]
   authors: Emisse

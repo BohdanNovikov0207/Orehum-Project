@@ -12,7 +12,7 @@ public sealed class ShuffleParticlesAnomalySystem : EntitySystem
     public override void Initialize()
     {
         SubscribeLocalEvent<ShuffleParticlesAnomalyComponent, AnomalyPulseEvent>(OnPulse);
-        SubscribeLocalEvent<ShuffleParticlesAnomalyComponent, StartCollideEvent>(OnStartCollide);
+        SubscribeLocalEvent<ShuffleParticlesAnomalyComponent, StartCollideEvent>(OnStartCollide, after: [typeof(AnomalySystem)]);
     }
 
     private void OnStartCollide(Entity<ShuffleParticlesAnomalyComponent> ent, ref StartCollideEvent args)

@@ -117,10 +117,16 @@ namespace Content.Shared.ActionBlocker
         /// </remarks>
         public bool CanUseHeldEntity(EntityUid user, EntityUid used)
         {
-            var ev = new UseAttemptEvent(user, used);
-            RaiseLocalEvent(user, ev);
+            var useEv = new UseAttemptEvent(user, used);
+            RaiseLocalEvent(user, useEv);
 
-            return !ev.Cancelled;
+            if (useEv.Cancelled)
+                return false;
+
+            var usedEv = new GettingUsedAttemptEvent(user);
+            RaiseLocalEvent(used, usedEv);
+
+            return !usedEv.Cancelled;
         }
 
 
@@ -143,14 +149,20 @@ namespace Content.Shared.ActionBlocker
             var ev = new ThrowAttemptEvent(user, itemUid);
             RaiseLocalEvent(user, ev);
 
-            return !ev.Cancelled;
+            if (ev.Cancelled)
+                return false;
+
+            var itemEv = new ThrowItemAttemptEvent(user);
+            RaiseLocalEvent(itemUid, ref itemEv);
+
+            return !itemEv.Cancelled;
         }
 
         public bool CanSpeak(EntityUid uid)
         {
             // This one is used as broadcast
             var ev = new SpeakAttemptEvent(uid);
-            RaiseLocalEvent(uid, ev, true);
+            RaiseLocalEvent(uid, ref ev, true);
 
             return !ev.Cancelled;
         }
@@ -201,7 +213,8 @@ namespace Content.Shared.ActionBlocker
             {
                 var containerEv = new CanAttackFromContainerEvent(uid, target);
                 RaiseLocalEvent(uid, containerEv);
-                return containerEv.CanAttack;
+                if (!containerEv.CanAttack)
+                    return false;
             }
 
             var ev = new AttackAttemptEvent(uid, target, weapon, disarm);
@@ -213,7 +226,7 @@ namespace Content.Shared.ActionBlocker
             if (target == null)
                 return true;
 
-            var tev = new GettingAttackedAttemptEvent();
+            var tev = new GettingAttackedAttemptEvent(uid, weapon, disarm);
             RaiseLocalEvent(target.Value, ref tev);
             return !tev.Cancelled;
         }

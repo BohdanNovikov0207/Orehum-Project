@@ -8,6 +8,10 @@
       jobs:
         - Borg
         - MedicalBorg
+    - !type:CharacterSpeciesRequirement
+      inverted: true
+      species:
+        - Diona
     - !type:CharacterTraitRequirement
       inverted: true
       traits:

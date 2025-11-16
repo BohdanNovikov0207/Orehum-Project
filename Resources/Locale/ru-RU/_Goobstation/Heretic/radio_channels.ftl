@@ -1,1 +1,1 @@
-chat-radio-mansus = Мансус
+chat-radio-mansus = Зов Мансуса

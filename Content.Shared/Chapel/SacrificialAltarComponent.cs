@@ -10,6 +10,7 @@ namespace Content.Shared.Chapel;
 ///     Altar that lets you sacrifice psionics to lower glimmer by a large amount.
 /// </summary>
 [RegisterComponent, NetworkedComponent, Access(typeof(SharedSacrificialAltarSystem))]
+[AutoGenerateComponentState(true, true)] // orehum
 public sealed partial class SacrificialAltarComponent : Component
 {
     /// <summary>
@@ -45,4 +46,20 @@ public sealed partial class SacrificialAltarComponent : Component
     /// </summary>
     [DataField]
     public float BaseItemChance = 0.1f;
+
+    // Orehum Start
+    [DataField, AutoNetworkedField]
+    public bool StartedServiceToGod = false;
+
+    [DataField]
+    public double GlimmerChange = 0.3f;
+
+    public bool EvilService = false;
+
+    public List<EntityUid> AlreadySpoken = new(16);
+
+    public EntityUid Speaker;
+
+    public string LastMessage;
+    // Orehum End
 }

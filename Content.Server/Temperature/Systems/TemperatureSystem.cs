@@ -39,8 +39,16 @@ public sealed class TemperatureSystem : EntitySystem
     [ValidatePrototypeId<AlertCategoryPrototype>]
     public const string TemperatureAlertCategory = "Temperature";
 
+    private EntityQuery<TemperatureComponent> _tempQuery;
+    private EntityQuery<ThermalRegulatorComponent> _tempRegQuery;
+    private EntityQuery<DamageableComponent> _damageableQuery;
+
     public override void Initialize()
     {
+        _tempQuery = GetEntityQuery<TemperatureComponent>();
+        _tempRegQuery = GetEntityQuery<ThermalRegulatorComponent>();
+        _damageableQuery = GetEntityQuery<DamageableComponent>();
+
         SubscribeLocalEvent<TemperatureComponent, OnTemperatureChangeEvent>(EnqueueDamage);
         SubscribeLocalEvent<TemperatureComponent, AtmosExposedUpdateEvent>(OnAtmosExposedUpdate);
         SubscribeLocalEvent<TemperatureComponent, RejuvenateEvent>(OnRejuvenate);
@@ -199,13 +207,13 @@ public sealed class TemperatureSystem : EntitySystem
 
     private void OnInit(EntityUid uid, InternalTemperatureComponent comp, MapInitEvent args)
     {
-        if (!TryComp<TemperatureComponent>(uid, out var temp))
+        if (!_tempQuery.TryComp(uid, out var temp))
             return;
 
         comp.Temperature = temp.CurrentTemperature;
     }
 
-    private void OnRejuvenate(EntityUid uid, TemperatureComponent comp, RejuvenateEvent args)
+    private void OnRejuvenate(EntityUid uid, TemperatureComponent comp, ref RejuvenateEvent args)
     {
         ForceChangeTemperature(uid, Atmospherics.T20C, comp);
     }
@@ -216,13 +224,13 @@ public sealed class TemperatureSystem : EntitySystem
         float threshold;
         float idealTemp;
 
-        if (!TryComp<TemperatureComponent>(uid, out var temperature))
+        if (!_tempQuery.TryComp(uid, out var temperature))
         {
             _alerts.ClearAlertCategory(uid, TemperatureAlertCategory);
             return;
         }
 
-        if (TryComp<ThermalRegulatorComponent>(uid, out var regulator) &&
+        if (_tempRegQuery.TryComp(uid, out var regulator) &&
             regulator.NormalBodyTemperature > temperature.ColdDamageThreshold &&
             regulator.NormalBodyTemperature < temperature.HeatDamageThreshold)
         {
@@ -281,7 +289,7 @@ public sealed class TemperatureSystem : EntitySystem
 
     private void ChangeDamage(EntityUid uid, TemperatureComponent temperature)
     {
-        if (!HasComp<DamageableComponent>(uid))
+        if (!_damageableQuery.HasComp(uid))
             return;
 
         // See this link for where the scaling func comes from:
@@ -342,7 +350,7 @@ public sealed class TemperatureSystem : EntitySystem
 
     private void ChangeTemperatureOnCollide(Entity<ChangeTemperatureOnCollideComponent> ent, ref ProjectileHitEvent args)
     {
-        _temperature.ChangeHeat(args.Target, ent.Comp.Heat, ent.Comp.IgnoreHeatResistance);// adjust the temperature 
+        _temperature.ChangeHeat(args.Target, ent.Comp.Heat, ent.Comp.IgnoreHeatResistance);// adjust the temperature
     }
 
     private void OnParentChange(EntityUid uid, TemperatureComponent component,

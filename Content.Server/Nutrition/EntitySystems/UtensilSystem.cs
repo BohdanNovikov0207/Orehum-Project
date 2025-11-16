@@ -8,6 +8,8 @@ using Content.Shared.Tools.EntitySystems;
 using Robust.Shared.Audio;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Random;
+using FoodComponent = Content.Shared.Nutrition.Components.FoodComponent;
+
 
 namespace Content.Server.Nutrition.EntitySystems
 {

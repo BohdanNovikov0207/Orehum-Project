@@ -23,7 +23,7 @@
   - MartialArtistPlasmamanGear
   equipment:
     jumpsuit: ClothingUniformMartialGi
-    belt: ClothingBeltMartialBlack
+    belt: ClothingBeltCorporateJudo
     back: ClothingBackpack
     id: MartialArtistPDA
     ears: ClothingHeadsetService

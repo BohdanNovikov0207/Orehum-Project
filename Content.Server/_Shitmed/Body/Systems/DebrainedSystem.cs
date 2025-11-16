@@ -49,7 +49,7 @@ public sealed class DebrainedSystem : EntitySystem
             RemComp<DelayedDeathComponent>(uid);
     }
 
-    private void OnSpeakAttempt(EntityUid uid, DebrainedComponent _, SpeakAttemptEvent args)
+    private void OnSpeakAttempt(EntityUid uid, DebrainedComponent _, ref SpeakAttemptEvent args)
     {
         _popupSystem.PopupEntity(Loc.GetString("speech-muted"), uid, uid);
         args.Cancel();

@@ -100,12 +100,12 @@ public sealed class InteractionPopupSystem : EntitySystem
                 if (component.InteractSuccessString == "hugging-success-generic")
                 {
                     var ev = new MoodEffectEvent("BeingHugged");
-                    RaiseLocalEvent(target, ev);
+                    RaiseLocalEvent(target, ref ev);
                 }
                 else if (component.InteractSuccessString.Contains("petting-success-"))
                 {
                     var ev = new MoodEffectEvent("PetAnimal");
-                    RaiseLocalEvent(user, ev);
+                    RaiseLocalEvent(user, ref ev);
                 }
             }
 

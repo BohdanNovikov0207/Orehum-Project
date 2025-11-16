@@ -23,7 +23,7 @@ namespace Content.Shared.Jittering
             SubscribeLocalEvent<JitteringComponent, RejuvenateEvent>(OnRejuvenate);
         }
 
-        private void OnRejuvenate(EntityUid uid, JitteringComponent component, RejuvenateEvent args)
+        private void OnRejuvenate(EntityUid uid, JitteringComponent component, ref RejuvenateEvent args)
         {
             EntityManager.RemoveComponentDeferred<JitteringComponent>(uid);
         }

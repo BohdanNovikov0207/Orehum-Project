@@ -14,6 +14,7 @@ public sealed class LavalandMapOptimizationSystem : EntitySystem
     {
         base.Initialize();
 
+        //SubscribeLocalEvent<LavalandMapComponent, BeforeLoadChunkEvent>(BeforeChunkLoad);
         SubscribeLocalEvent<LavalandMapComponent, UnLoadChunkEvent>(OnChunkUnLoaded);
         SubscribeLocalEvent<LavalandMapComponent, MapInitEvent>(OnChunkLoad);
     }
@@ -32,6 +33,15 @@ public sealed class LavalandMapOptimizationSystem : EntitySystem
     private void OnChunkUnLoaded(Entity<LavalandMapComponent> ent, ref UnLoadChunkEvent args)
     {
         if (ent.Comp.LoadedChunks.Contains(args.Chunk))
+        {
+            args.Cancel();
+        }
+    }
+
+    private void BeforeChunkLoad(Entity<LavalandMapComponent> ent, ref BeforeLoadChunkEvent args)
+    {
+        // We load only specified area.
+        if (!ent.Comp.LoadArea.Contains(args.Chunk))
         {
             args.Cancel();
         }

@@ -40,6 +40,9 @@ public sealed partial class ChemPurgeMoodlets : EntityEffect
         }
 
         foreach (var moodId in moodletList)
-            entityManager.EventBus.RaiseLocalEvent(args.TargetEntity, new MoodRemoveEffectEvent(moodId));
+        {
+            var ev = new MoodRemoveEffectEvent(moodId);
+            entityManager.EventBus.RaiseLocalEvent(args.TargetEntity, ref ev);
+        }
     }
 }

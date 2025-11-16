@@ -81,7 +81,6 @@ public sealed class RadialSelectorMenuBUI : BoundUserInterface
         var container = new RadialContainer
         {
             Name = !string.IsNullOrEmpty(parentCategory) ? parentCategory : "Main",
-            Radius = 48f + 24f * MathF.Log(entries.Count),
         };
 
         _menu.AddChild(container);
@@ -114,10 +113,10 @@ public sealed class RadialSelectorMenuBUI : BoundUserInterface
 
     private string GetName(string proto)
     {
-        if (_protoManager.TryIndex(proto, out var prototype))
+        if (_protoManager.TryIndex(proto, out var prototype, false))
             return prototype.Name;
 
-        if (_protoManager.TryIndex(proto, out ConstructionPrototype? constructionPrototype))
+        if (_protoManager.TryIndex(proto, out ConstructionPrototype? constructionPrototype, true))
             return constructionPrototype.Name;
 
         return proto;
@@ -132,13 +131,13 @@ public sealed class RadialSelectorMenuBUI : BoundUserInterface
             return result;
         }
 
-        if (_protoManager.TryIndex(entry.Prototype!, out var prototype))
+        if (_protoManager.TryIndex(entry.Prototype!, out var prototype, false))
         {
             result.AddRange(SpriteComponent.GetPrototypeTextures(prototype, _resources).Select(o => o.Default));
             return result;
         }
 
-        if (_protoManager.TryIndex(entry.Prototype!, out ConstructionPrototype? constructionProto))
+        if (_protoManager.TryIndex(entry.Prototype!, out ConstructionPrototype? constructionProto, true))
         {
             result.Add(_spriteSystem.Frame0(constructionProto.Icon));
             return result;

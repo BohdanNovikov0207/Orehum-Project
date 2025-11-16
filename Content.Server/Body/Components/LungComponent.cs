@@ -40,4 +40,11 @@ public sealed partial class LungComponent : Component
 
     [DataField]
     public bool CanReact = false; // No Dexalin lungs... right?
+
+    /// <summary>
+    /// DeltaV: Multiplier on saturation passively lost.
+    /// Higher values require more air, lower require less.
+    /// </summary>
+    [DataField]
+    public float SaturationLoss = 1f;
 }

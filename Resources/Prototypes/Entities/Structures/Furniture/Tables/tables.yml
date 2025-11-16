@@ -195,6 +195,9 @@
   - type: Construction
     graph: Table
     node: Table
+  - type: Tag # goob edit
+    tags:
+    - Table
 
 - type: entity
   id: TableReinforced
@@ -487,6 +490,7 @@
   - type: Tag
     tags:
     - Wooden
+    - Table
   - type: FootstepModifier
     footstepSoundCollection:
       collection: FootstepWood
@@ -528,6 +532,7 @@
   - type: Tag
     tags:
     - Wooden
+    - Table
   - type: FootstepModifier
     footstepSoundCollection:
       collection: FootstepCarpet
@@ -622,6 +627,7 @@
   - type: Tag
     tags:
     - Wooden
+    - Table
   - type: FootstepModifier
     footstepSoundCollection:
       collection: FootstepCarpet

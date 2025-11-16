@@ -153,7 +153,6 @@
   name: guide-entry-sop-service
   text: "/ServerInfo/Guidebook/SOP/Jobs/Service/ServiceSOP.xml"
   children:
-  #- Bartender SOP
   - Botanist SOP
   - Chef SOP
   - Clown SOP
@@ -161,6 +160,7 @@
   - Librarian SOP
   - Mime SOP
   - Reporter SOP
+  - Bartender SOP
 
 # Alert Levels SOP Entries
 - type: guideEntry
@@ -438,10 +438,10 @@
   text: "/ServerInfo/Guidebook/SOP/Jobs/Security/CorpsmanSOP.xml"
 
 # Service SOP Entries
-#- type: guideEntry # пупупу, #вернитеБарменуСРП
-#  id: Bartender SOP
-#  name: guide-entry-sop-bartender
-#  text: "/ServerInfo/Guidebook/SOP/Jobs/Service/BartenderSOP.xml"
+- type: guideEntry # пупупу, #вернитеБарменуСРП
+  id: Bartender SOP
+  name: guide-entry-sop-bartender
+  text: "/ServerInfo/Guidebook/SOP/Jobs/Service/BartenderSOP.xml"
 
 - type: guideEntry
   id: Botanist SOP

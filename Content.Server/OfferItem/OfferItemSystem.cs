@@ -8,6 +8,15 @@ public sealed class OfferItemSystem : SharedOfferItemSystem
 {
     [Dependency] private readonly AlertsSystem _alertsSystem = default!;
 
+    private EntityQuery<HandsComponent> _handsQuery;
+
+    public override void Initialize()
+    {
+        base.Initialize();
+
+        _handsQuery = GetEntityQuery<HandsComponent>();
+    }
+
     public override void Update(float frameTime)
     {
         base.Update(frameTime);
@@ -15,7 +24,7 @@ public sealed class OfferItemSystem : SharedOfferItemSystem
         var query = EntityQueryEnumerator<OfferItemComponent>();
         while (query.MoveNext(out var uid, out var offerItem))
         {
-            if (!TryComp<HandsComponent>(uid, out var hands) || hands.ActiveHand == null)
+            if (!_handsQuery.TryComp(uid, out var hands) || hands.ActiveHand == null)
                 continue;
 
             if (offerItem.Hand != null &&

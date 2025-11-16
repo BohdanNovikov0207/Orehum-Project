@@ -1,5 +1,4 @@
 using Content.Server.DeviceLinking.Components;
-using Content.Server.DeviceLinking.Events;
 using Content.Server.DeviceNetwork;
 using Content.Server.DeviceNetwork.Components;
 using Content.Server.DeviceNetwork.Systems;
@@ -21,19 +20,6 @@ public sealed class DeviceLinkSystem : SharedDeviceLinkSystem
         SubscribeLocalEvent<DeviceLinkSourceComponent, NewLinkEvent>(OnNewLink);
     }
 
-    public override void Update(float frameTime)
-    {
-        var query = EntityQueryEnumerator<ActiveDeviceLinkSinkComponent>();
-        while (query.MoveNext(out var uid, out var component))
-        {
-            component.InvokeCounter--;
-            if (component.InvokeCounter > 0)
-                continue;
-
-            RemCompDeferred<ActiveDeviceLinkSinkComponent>(uid);
-        }
-    }
-
     #region Sending & Receiving
     public override void InvokePort(EntityUid uid, string port, NetworkPayload? data = null, DeviceLinkSourceComponent? sourceComponent = null)
     {
@@ -51,7 +37,7 @@ public sealed class DeviceLinkSystem : SharedDeviceLinkSystem
             foreach (var (source, sink) in links)
             {
                 if (source == port)
-                    InvokeDirect((uid, sourceComponent), (sinkUid, sinkComponent), sink, data);
+                    InvokeDirect((uid, sourceComponent), (sinkUid, sinkComponent), source, sink, data);
             }
         }
     }
@@ -59,28 +45,22 @@ public sealed class DeviceLinkSystem : SharedDeviceLinkSystem
     /// <summary>
     /// Raises an event on or sends a network packet directly to a sink from a source.
     /// </summary>
-    private void InvokeDirect(Entity<DeviceLinkSourceComponent> source, Entity<DeviceLinkSinkComponent?> sink, string sinkPort, NetworkPayload? data)
+    private void InvokeDirect(Entity<DeviceLinkSourceComponent> source, Entity<DeviceLinkSinkComponent?> sink, string sourcePort, string sinkPort, NetworkPayload? data)
     {
         if (!Resolve(sink, ref sink.Comp))
             return;
 
-        if (sink.Comp.InvokeLimit > 0)
+        var invokeCounter = GetEffectiveInvokeCounter(sink.Comp);
+        if (invokeCounter > sink.Comp.InvokeLimit)
         {
-            EnsureComp<ActiveDeviceLinkSinkComponent>(sink, out var activeLink);
-
-            if (activeLink.InvokeCounter > sink.Comp.InvokeLimit)
-            {
-                activeLink.InvokeCounter = 0;
-                var args = new DeviceLinkOverloadedEvent();
-                RaiseLocalEvent(sink, ref args);
-                RemoveAllFromSink(sink, sink.Comp);
-                RemCompDeferred<ActiveDeviceLinkSinkComponent>(sink);
-                return;
-            }
-
-            activeLink.InvokeCounter++;
-            Dirty(sink.Owner, activeLink);
+            SetInvokeCounter(sink.Comp, 0);
+            var args = new DeviceLinkOverloadedEvent();
+            RaiseLocalEvent(sink, ref args);
+            RemoveAllFromSink(sink, sink.Comp);
+            return;
         }
+
+        SetInvokeCounter(sink.Comp, invokeCounter + 1);
 
         //Just skip using device networking if the source or the sink doesn't support it
         if (!HasComp<DeviceNetworkComponent>(source) || !TryComp<DeviceNetworkComponent>(sink, out var sinkNetwork))
@@ -169,7 +149,7 @@ public sealed class DeviceLinkSystem : SharedDeviceLinkSystem
         {
             [DeviceNetworkConstants.LogicState] = signal ? SignalState.High : SignalState.Low
         };
-        InvokeDirect(ent, args.Sink, args.SinkPort, payload);
+        InvokeDirect(ent, args.Sink, args.SourcePort, args.SinkPort, payload);
     }
     #endregion
 }

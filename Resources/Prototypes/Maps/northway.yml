@@ -3,7 +3,7 @@
   mapName: 'Northway'
   mapPath: /Maps/northway.yml
   minPlayers: 0
-  maxPlayers: 25
+  maxPlayers: 5
   stations:
     Northway:
       stationProto: StandardNanotrasenStationNoShuttles

@@ -13,6 +13,10 @@
         - Foreigner
         - ForeignerLight
         - Muted
+    - !type:CharacterSpeciesRequirement
+      inverted: true
+      species:
+        - Felinid
     - !type:CharacterEmployerRequirement
       inverted: true
       employers:

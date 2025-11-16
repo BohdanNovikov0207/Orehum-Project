@@ -46,7 +46,7 @@ public sealed partial class NPCSteeringSystem
         var layer = 0;
         var mask = 0;
 
-        if (TryComp<FixturesComponent>(uid, out var manager))
+        if (_fixturesQuery.TryComp(uid, out var manager))
         {
             (layer, mask) = _physics.GetHardCollision(uid, manager);
         }
@@ -129,7 +129,7 @@ public sealed partial class NPCSteeringSystem
             // Try climbing obstacles
             else if ((component.Flags & PathFlags.Climbing) != 0x0 && isClimbable)
             {
-                if (TryComp<ClimbingComponent>(uid, out var climbing))
+                if (_climbingQuery.TryComp(uid, out var climbing))
                 {
                     if (climbing.IsClimbing)
                     {
@@ -161,7 +161,7 @@ public sealed partial class NPCSteeringSystem
             // Try smashing obstacles.
             else if ((component.Flags & PathFlags.Smashing) != 0x0)
             {
-                if (_melee.TryGetWeapon(uid, out _, out var meleeWeapon) && meleeWeapon.NextAttack <= _timing.CurTime && TryComp<CombatModeComponent>(uid, out var combatMode))
+                if (_melee.TryGetWeapon(uid, out _, out var meleeWeapon) && meleeWeapon.NextAttack <= _timing.CurTime && _combatModeQuery.TryComp(uid, out var combatMode))
                 {
                     _combat.SetInCombatMode(uid, true, combatMode);
                     var destructibleQuery = GetEntityQuery<DestructibleComponent>();
@@ -202,7 +202,7 @@ public sealed partial class NPCSteeringSystem
     private void GetObstacleEntities(PathPoly poly, int mask, int layer, List<EntityUid> ents)
     {
         // TODO: Can probably re-use this from pathfinding or something
-        if (!TryComp<MapGridComponent>(poly.GraphUid, out var grid))
+        if (!_mapGridQuery.TryComp(poly.GraphUid, out var grid))
         {
             return;
         }

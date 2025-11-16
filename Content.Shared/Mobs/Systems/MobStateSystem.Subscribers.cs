@@ -189,7 +189,7 @@ public partial class MobStateSystem
             args.Multiplier /= 2;
     }
 
-    private void OnSpeakAttempt(EntityUid uid, MobStateComponent component, SpeakAttemptEvent args)
+    private void OnSpeakAttempt(EntityUid uid, MobStateComponent component, ref SpeakAttemptEvent args)
     {
         if (HasComp<AllowNextCritSpeechComponent>(uid))
         {

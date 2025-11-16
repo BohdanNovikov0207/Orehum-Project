@@ -1,5 +1,4 @@
 namespace Content.Shared.Rejuvenate;
 
-public sealed class RejuvenateEvent : EntityEventArgs
-{
-}
+[ByRefEvent]
+public record struct RejuvenateEvent;

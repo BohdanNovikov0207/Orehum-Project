@@ -1,3 +1,4 @@
+advertisement-coffee-0 = Кофе помогает работать!
 advertisement-coffee-1 = Выпейте!
 advertisement-coffee-2 = Выпьем!
 advertisement-coffee-3 = На здоровье!

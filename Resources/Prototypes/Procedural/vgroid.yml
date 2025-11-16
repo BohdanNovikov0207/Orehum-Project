@@ -14,8 +14,8 @@
     proto: VGRoidBlob
   - !type:PrototypeDunGen
     proto: VGRoidExterior
-  - !type:PrototypeDunGen
-    proto: VGRoidSmaller
+  #- !type:PrototypeDunGen # Orehum no small grids spam no fun
+  #  proto: VGRoidSmaller
   - !type:PrototypeDunGen
     proto: VGRoidSmallPaths
   - !type:EntityTableDunGen

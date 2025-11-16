@@ -11,6 +11,7 @@ using Content.Server.Power.Components;
 using Content.Server.Power.EntitySystems;
 using Content.Shared.Atmos;
 using Content.Shared.Atmos.Monitor;
+using Content.Shared.Atmos.Piping.Components;
 using Content.Shared.DeviceNetwork;
 using Content.Shared.Power;
 using Content.Shared.Tag;
@@ -32,16 +33,21 @@ public sealed class AtmosMonitorSystem : EntitySystem
 
     // Commands
     public const string AtmosMonitorSetThresholdCmd = "atmos_monitor_set_threshold";
+    public const string AtmosMonitorSetAllThresholdsCmd = "atmos_monitor_set_all_thresholds";
 
     // Packet data
     public const string AtmosMonitorThresholdData = "atmos_monitor_threshold_data";
-
+    public const string AtmosMonitorAllThresholdData = "atmos_monitor_all_threshold_data";
     public const string AtmosMonitorThresholdDataType = "atmos_monitor_threshold_type";
 
     public const string AtmosMonitorThresholdGasType = "atmos_monitor_threshold_gas";
 
+    private EntityQuery<AtmosDeviceComponent> _atmosDeviceQuery;
+
     public override void Initialize()
     {
+        _atmosDeviceQuery = GetEntityQuery<AtmosDeviceComponent>();
+
         SubscribeLocalEvent<AtmosMonitorComponent, ComponentStartup>(OnAtmosMonitorStartup);
         SubscribeLocalEvent<AtmosMonitorComponent, MapInitEvent>(OnMapInit);
         SubscribeLocalEvent<AtmosMonitorComponent, AtmosDeviceUpdateEvent>(OnAtmosUpdate);
@@ -137,7 +143,12 @@ public sealed class AtmosMonitorSystem : EntitySystem
                     args.Data.TryGetValue(AtmosMonitorThresholdGasType, out Gas? gas);
                     SetThreshold(uid, thresholdType.Value, thresholdData, gas);
                 }
-
+                break;
+            case AtmosMonitorSetAllThresholdsCmd:
+                if (args.Data.TryGetValue(AtmosMonitorAllThresholdData, out AtmosSensorData? allThresholdData))
+                {
+                    SetAllThresholds(uid, allThresholdData);
+                }
                 break;
             case AtmosDeviceNetworkSystem.SyncData:
                 var payload = new NetworkPayload();
@@ -163,13 +174,14 @@ public sealed class AtmosMonitorSystem : EntitySystem
                 }
 
                 _deviceNetSystem.QueuePacket(uid, args.SenderAddress, payload);
+                Alert(uid, component.LastAlarmState);
                 break;
         }
     }
 
     private void OnPowerChangedEvent(Entity<AtmosMonitorComponent> ent, ref PowerChangedEvent args)
     {
-        if (TryComp<AtmosDeviceComponent>(ent, out var atmosDeviceComponent))
+        if (_atmosDeviceQuery.TryComp(ent, out var atmosDeviceComponent))
         {
             if (!args.Powered)
             {
@@ -195,7 +207,7 @@ public sealed class AtmosMonitorSystem : EntitySystem
         if (component.MonitorFire
             && component.LastAlarmState != AtmosAlarmType.Danger)
         {
-            component.TrippedThresholds.Add(AtmosMonitorThresholdType.Temperature);
+            component.TrippedThresholds |= AtmosMonitorThresholdTypeFlags.Temperature;
             Alert(uid, AtmosAlarmType.Danger, null, component); // technically???
         }
 
@@ -206,7 +218,7 @@ public sealed class AtmosMonitorSystem : EntitySystem
             && component.TemperatureThreshold.CheckThreshold(args.Temperature, out var temperatureState)
             && temperatureState > component.LastAlarmState)
         {
-            component.TrippedThresholds.Add(AtmosMonitorThresholdType.Temperature);
+            component.TrippedThresholds |= AtmosMonitorThresholdTypeFlags.Temperature;
             Alert(uid, AtmosAlarmType.Danger, null, component);
         }
     }
@@ -247,7 +259,7 @@ public sealed class AtmosMonitorSystem : EntitySystem
         if (!Resolve(uid, ref monitor)) return;
 
         var state = AtmosAlarmType.Normal;
-        HashSet<AtmosMonitorThresholdType> alarmTypes = new(monitor.TrippedThresholds);
+        var alarmTypes = monitor.TrippedThresholds;
 
         if (monitor.TemperatureThreshold != null
             && monitor.TemperatureThreshold.CheckThreshold(air.Temperature, out var temperatureState))
@@ -255,11 +267,11 @@ public sealed class AtmosMonitorSystem : EntitySystem
             if (temperatureState > state)
             {
                 state = temperatureState;
-                alarmTypes.Add(AtmosMonitorThresholdType.Temperature);
+                alarmTypes |= AtmosMonitorThresholdTypeFlags.Temperature;
             }
             else if (temperatureState == AtmosAlarmType.Normal)
             {
-                alarmTypes.Remove(AtmosMonitorThresholdType.Temperature);
+                alarmTypes &= ~AtmosMonitorThresholdTypeFlags.Temperature;
             }
         }
 
@@ -270,11 +282,11 @@ public sealed class AtmosMonitorSystem : EntitySystem
             if (pressureState > state)
             {
                 state = pressureState;
-                alarmTypes.Add(AtmosMonitorThresholdType.Pressure);
+                alarmTypes |= AtmosMonitorThresholdTypeFlags.Pressure;
             }
             else if (pressureState == AtmosAlarmType.Normal)
             {
-                alarmTypes.Remove(AtmosMonitorThresholdType.Pressure);
+                alarmTypes &= ~AtmosMonitorThresholdTypeFlags.Pressure;
             }
         }
 
@@ -294,17 +306,17 @@ public sealed class AtmosMonitorSystem : EntitySystem
 
             if (tripped)
             {
-                alarmTypes.Add(AtmosMonitorThresholdType.Gas);
+                alarmTypes |= AtmosMonitorThresholdTypeFlags.Gas;
             }
             else
             {
-                alarmTypes.Remove(AtmosMonitorThresholdType.Gas);
+                alarmTypes &= ~AtmosMonitorThresholdTypeFlags.Gas;
             }
         }
 
         // if the state of the current air doesn't match the last alarm state,
         // we update the state
-        if (state != monitor.LastAlarmState || !alarmTypes.SetEquals(monitor.TrippedThresholds))
+        if (state != monitor.LastAlarmState || alarmTypes != monitor.TrippedThresholds)
         {
             Alert(uid, state, alarmTypes, monitor);
         }
@@ -315,7 +327,7 @@ public sealed class AtmosMonitorSystem : EntitySystem
     /// </summary>
     /// <param name="state">The alarm state to set this monitor to.</param>
     /// <param name="alarms">The alarms that caused this alarm state.</param>
-    public void Alert(EntityUid uid, AtmosAlarmType state, HashSet<AtmosMonitorThresholdType>? alarms = null, AtmosMonitorComponent? monitor = null)
+    public void Alert(EntityUid uid, AtmosAlarmType state, AtmosMonitorThresholdTypeFlags? alarms = null, AtmosMonitorComponent? monitor = null)
     {
         if (!Resolve(uid, ref monitor))
             return;
@@ -400,5 +412,21 @@ public sealed class AtmosMonitorSystem : EntitySystem
                 break;
         }
 
+    }
+
+    /// <summary>
+    ///     Sets all of a monitor's thresholds at once according to the incoming
+    ///     AtmosSensorData object's thresholds.
+    /// </summary>
+    /// <param name="uid">The entity's uid</param>
+    /// <param name="allThresholdData">An AtmosSensorData object from which the thresholds will be loaded.</param>
+    public void SetAllThresholds(EntityUid uid, AtmosSensorData allThresholdData)
+    {
+        SetThreshold(uid, AtmosMonitorThresholdType.Temperature, allThresholdData.TemperatureThreshold);
+        SetThreshold(uid, AtmosMonitorThresholdType.Pressure, allThresholdData.PressureThreshold);
+        foreach (var gas in Enum.GetValues<Gas>())
+        {
+            SetThreshold(uid, AtmosMonitorThresholdType.Gas, allThresholdData.GasThresholds[gas], gas);
+        }
     }
 }

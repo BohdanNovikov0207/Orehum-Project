@@ -2,6 +2,7 @@ using Content.Shared.ActionBlocker;
 using Content.Shared.Emoting;
 using Content.Shared.Interaction.Events;
 using Content.Shared.Item;
+using Content.Shared.Movement;
 using Content.Shared.Movement.Events;
 using Content.Shared.Movement.Pulling.Components;
 using Content.Shared.Movement.Pulling.Events;
@@ -40,7 +41,7 @@ public abstract class SharedAdminFrozenSystem : EntitySystem
         args.Cancelled = true;
     }
 
-    private void OnSpeakAttempt(EntityUid uid, AdminFrozenComponent component, SpeakAttemptEvent args)
+    private void OnSpeakAttempt(EntityUid uid, AdminFrozenComponent component, ref SpeakAttemptEvent args)
     {
         if (!component.Muted)
             return;

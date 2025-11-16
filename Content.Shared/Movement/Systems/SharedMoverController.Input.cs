@@ -205,7 +205,7 @@ namespace Content.Shared.Movement.Systems
             // 2. If we go from grid -> grid then (after lerp time) snap to nearest cardinal (probably imperceptible)
             // 3. If we go from map -> grid then (after lerp time) snap to nearest cardinal
 
-            if (mover.RelativeEntity.Equals(relative))
+            if (mover.RelativeEntity is { Id: var relativeId, } && relative is { Id: var otherId, } && relativeId == otherId)
                 return false;
 
             // Okay need to get our old relative rotation with respect to our new relative rotation

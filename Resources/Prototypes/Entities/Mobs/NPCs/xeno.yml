@@ -144,6 +144,7 @@
     color: "#808080"
     activateSound: null
     deactivateSound: null
+    pulseTime: -9999999.0 # Orehum fix thermalvision АААААААААААААААААААААААААААААААА
   - type: Fauna # Lavaland Change
 
 - type: entity

@@ -16,7 +16,7 @@ namespace Content.Server.Administration.Commands
 
         public void Execute(IConsoleShell shell, string argStr, string[] args)
         {
-            if (args.Length != 3)
+            if (args.Length != 4)
             {
                 shell.WriteError(Loc.GetString("shell-wrong-arguments-number"));
                 return;

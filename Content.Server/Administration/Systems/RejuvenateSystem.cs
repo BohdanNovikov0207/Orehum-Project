@@ -6,6 +6,7 @@ public sealed class RejuvenateSystem : EntitySystem
 {
     public void PerformRejuvenate(EntityUid target)
     {
-        RaiseLocalEvent(target, new RejuvenateEvent());
+        var ev = new RejuvenateEvent();
+        RaiseLocalEvent(target, ref ev);
     }
 }

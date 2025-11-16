@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "license": "CC-BY-SA-3.0",
-  "copyright": "Taken from https://github.com/tgstation/tgstation at 04e43d8c1d5097fdb697addd4395fb849dd341bd",
+  "license": "CC-BY-NC-SA 3.0",
+  "copyright": "sprite by TheGypsyBaron",
   "size": {
     "x": 32,
     "y": 32
@@ -23,12 +23,12 @@
       "name": "closing",
       "delays": [
         [
-          0.2,
-          0.2,
-          0.2,
-          0.2,
-          0.2,
-          0.2
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1
         ]
       ]
     },
@@ -46,14 +46,7 @@
       ]
     },
     {
-      "name": "deny",
-      "delays": [
-        [
-          0.1,
-          0.1,
-          0.1
-        ]
-      ]
+      "name": "deny"
     },
     {
       "name": "deny_unlit",
@@ -66,6 +59,18 @@
       ]
     },
     {
+      "name": "frame1"
+    },
+    {
+      "name": "frame2"
+    },
+    {
+      "name": "frame3"
+    },
+    {
+      "name": "frame4"
+    },
+    {
       "name": "locked"
     },
     {
@@ -75,12 +80,12 @@
       "name": "opening",
       "delays": [
         [
-          0.2,
-          0.2,
-          0.2,
-          0.2,
-          0.2,
-          0.2
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1
         ]
       ]
     },
@@ -141,6 +146,60 @@
           0.4,
           0.4
         ]
+      ]
+    },
+    {
+      "name": "pressure_unlit",
+      "delays": [
+        [
+          0.8,
+          0.4
+        ]
+      ]
+    },
+    {
+      "name": "base_pressure_unlit",
+      "delays": [
+        [
+          0.8,
+          0.4
+        ]
+      ]
+    },
+    {
+      "name": "pressure_unlit_flat",
+      "delays": [
+        [
+          0.8,
+          0.4
+        ]
+      ]
+    },
+    {
+      "name": "temperature_unlit",
+      "delays": [
+        [
+          0.8,
+          0.4
+        ]
+      ]
+    },
+    {
+      "name": "base_temperature_unlit",
+      "delays": [
+          [
+              0.8,
+              0.4
+          ]
+      ]
+    },
+    {
+      "name": "temperature_unlit_flat",
+      "delays": [
+          [
+              0.8,
+              0.4
+          ]
       ]
     }
   ]

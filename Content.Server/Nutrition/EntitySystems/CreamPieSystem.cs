@@ -15,6 +15,8 @@ using JetBrains.Annotations;
 using Robust.Shared.Audio;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Player;
+using FoodComponent = Content.Shared.Nutrition.Components.FoodComponent;
+
 
 namespace Content.Server.Nutrition.EntitySystems
 {
@@ -41,7 +43,9 @@ namespace Content.Server.Nutrition.EntitySystems
 
         protected override void SplattedCreamPie(EntityUid uid, CreamPieComponent creamPie)
         {
-            _audio.PlayPvs(_audio.GetSound(creamPie.Sound), uid, AudioParams.Default.WithVariation(0.125f));
+            // The entity is deleted, so play the sound at its position rather than parenting
+            var coordinates = Transform(uid).Coordinates;
+            _audio.PlayPvs(_audio.ResolveSound(creamPie.Sound), coordinates, AudioParams.Default.WithVariation(0.125f));
 
             if (EntityManager.TryGetComponent(uid, out FoodComponent? foodComp))
             {
@@ -49,12 +53,9 @@ namespace Content.Server.Nutrition.EntitySystems
                 {
                     _puddle.TrySpillAt(uid, solution, out _, false);
                 }
-                if (foodComp.Trash.Count == 0)
+                foreach (var trash in foodComp.Trash)
                 {
-                    foreach (var trash in foodComp.Trash)
-                    {
-                        EntityManager.SpawnEntity(trash, Transform(uid).Coordinates);
-                    }
+                    EntityManager.SpawnEntity(trash, Transform(uid).Coordinates);
                 }
             }
             ActivatePayload(uid);

@@ -1,3 +1,31 @@
+# heretic
+
+- type: entity
+  abstract: true
+  parent: BaseGameRule
+  id: BaseHereticRule
+  components:
+  - type: HereticRule
+  - type: AntagSelection
+
+- type: entity
+  parent: BaseHereticRule
+  id: Heretic
+  components:
+  - type: GameRule
+    minPlayers: 25
+  - type: AntagSelection
+    definitions:
+    - prefRoles: [ Heretic ]
+      max: 5
+      playerRatio: 15
+      lateJoinAdditional: true
+      #mindComponents:
+      #- type: HereticRole
+      startingGear: HereticGear # see Roles/Antags/heretic.yml
+
+# changeling
+
 - type: entity
   parent: BaseGameRule
   id: Changeling

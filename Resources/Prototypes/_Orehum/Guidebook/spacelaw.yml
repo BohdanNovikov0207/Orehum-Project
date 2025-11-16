@@ -52,6 +52,7 @@
   - IPC CourtRulings
   - Cultist CourtRulings
   - Sacrifice CourtRulings
+  - SpaceLaw Sentient Rights
 
 - type: guideEntry
   id: SpaceLaw CrimeChart
@@ -67,19 +68,7 @@
   name: guide-entry-spacelaw-categories
   text: "/ServerInfo/Guidebook/SpaceLaw/CrimeList/CrimeGroups/SpaceLaw_CrimeCategories.xml"
   children:
-  - Animal SpaceLaw
-  - Assault SpaceLaw
-  - Contraband SpaceLaw
-  - Disruption SpaceLaw
-  - Drugs SpaceLaw
-  - HostileAgent SpaceLaw
-  - Negligence SpaceLaw
-  - Psionics SpaceLaw
-  - Rioting SpaceLaw
-  - Sabotage SpaceLaw
-  - Thievery SpaceLaw
-  - Trespassing SpaceLaw
-  - Ungrouped SpaceLaw
+  - Crimes Government
 
 # Standalone Entries
 - type: guideEntry
@@ -161,68 +150,13 @@
   name: guide-entry-spacelaw-courtrulings-sacrifices
   text: "/ServerInfo/Guidebook/SpaceLaw/CourtRulings/SL_Sacrifices.xml"
 
+- type: guideEntry
+  id: SpaceLaw Sentient Rights
+  name: ОПРС
+  text: "/ServerInfo/Guidebook/SpaceLaw/CourtRulings/SL_SentientRights.xml"
+
 # Categories
 - type: guideEntry
-  id: Animal SpaceLaw
-  name: guide-entry-spacelaw-groups-animal
-  text: "/ServerInfo/Guidebook/SpaceLaw/CrimeList/CrimeGroups/SL_Animal.xml"
-
-- type: guideEntry
-  id: Assault SpaceLaw
-  name: guide-entry-spacelaw-groups-assault
-  text: "/ServerInfo/Guidebook/SpaceLaw/CrimeList/CrimeGroups/SL_Assault.xml"
-
-- type: guideEntry
-  id: Contraband SpaceLaw
-  name: guide-entry-spacelaw-groups-contraband
-  text: "/ServerInfo/Guidebook/SpaceLaw/CrimeList/CrimeGroups/SL_Contraband.xml"
-
-- type: guideEntry
-  id: Disruption SpaceLaw
-  name: guide-entry-spacelaw-groups-disruption
-  text: "/ServerInfo/Guidebook/SpaceLaw/CrimeList/CrimeGroups/SL_Disruption.xml"
-
-- type: guideEntry
-  id: Drugs SpaceLaw
-  name: guide-entry-spacelaw-groups-drugs
-  text: "/ServerInfo/Guidebook/SpaceLaw/CrimeList/CrimeGroups/SL_Drugs.xml"
-
-- type: guideEntry
-  id: HostileAgent SpaceLaw
-  name: guide-entry-spacelaw-groups-hostileagent
-  text: "/ServerInfo/Guidebook/SpaceLaw/CrimeList/CrimeGroups/SL_HostileAgent.xml"
-
-- type: guideEntry
-  id: Negligence SpaceLaw
-  name: guide-entry-spacelaw-groups-negligence
-  text: "/ServerInfo/Guidebook/SpaceLaw/CrimeList/CrimeGroups/SL_Negligence.xml"
-
-- type: guideEntry
-  id: Psionics SpaceLaw
-  name: guide-entry-spacelaw-groups-psionics
-  text: "/ServerInfo/Guidebook/SpaceLaw/CrimeList/CrimeGroups/SL_Psionics.xml"
-
-- type: guideEntry
-  id: Rioting SpaceLaw
-  name: guide-entry-spacelaw-groups-rioting
-  text: "/ServerInfo/Guidebook/SpaceLaw/CrimeList/CrimeGroups/SL_Rioting.xml"
-
-- type: guideEntry
-  id: Sabotage SpaceLaw
-  name: guide-entry-spacelaw-groups-sabotage
-  text: "/ServerInfo/Guidebook/SpaceLaw/CrimeList/CrimeGroups/SL_Sabotage.xml"
-
-- type: guideEntry
-  id: Thievery SpaceLaw
-  name: guide-entry-spacelaw-groups-thievery
-  text: "/ServerInfo/Guidebook/SpaceLaw/CrimeList/CrimeGroups/SL_Thievery.xml"
-
-- type: guideEntry
-  id: Trespassing SpaceLaw
-  name: guide-entry-spacelaw-groups-trespassing
-  text: "/ServerInfo/Guidebook/SpaceLaw/CrimeList/CrimeGroups/SL_Trespassing.xml"
-
-- type: guideEntry
-  id: Ungrouped SpaceLaw
-  name: guide-entry-spacelaw-groups-ungrouped
-  text: "/ServerInfo/Guidebook/SpaceLaw/CrimeList/CrimeGroups/SL_Ungrouped.xml"
+  id: Crimes Government
+  name: X-00
+  text: "/ServerInfo/Guidebook/SpaceLaw/CrimeList/CrimeGroups/SL_CrimesGovernment.xml"

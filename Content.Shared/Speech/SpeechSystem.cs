@@ -24,7 +24,7 @@ namespace Content.Shared.Speech
             Dirty(uid, component);
         }
 
-        private void OnSpeakAttempt(SpeakAttemptEvent args)
+        private void OnSpeakAttempt(ref SpeakAttemptEvent args)
         {
             if (!TryComp(args.Uid, out SpeechComponent? speech) || !speech.Enabled)
                 args.Cancel();

@@ -32,6 +32,6 @@ public sealed partial class ChemAddMoodlet : EntityEffect
 
         var entityManager = IoCManager.Resolve<EntityManager>();
         var ev = new MoodEffectEvent(MoodPrototype);
-        entityManager.EventBus.RaiseLocalEvent(args.TargetEntity, ev);
+        entityManager.EventBus.RaiseLocalEvent(args.TargetEntity, ref ev);
     }
 }

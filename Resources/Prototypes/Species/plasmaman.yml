@@ -38,6 +38,9 @@
   id: MobPlasmamanMarkingLimits
   onlyWhitelisted: true # Hides the hair and facial hair options
   points:
+    Head: # Orehum fix
+      points: 2
+      required: false
     Hair:
       points: 0
       required: false

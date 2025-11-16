@@ -87,6 +87,9 @@
     onBump: false
     requirePower: true
     highVoltageNode: output
+  - type: GuideHelp
+    guides:
+    - ShuttleCraft
 
 # Base Wallmount Generator
 
@@ -140,6 +143,9 @@
     supplyRampRate: 500
     supplyRampTolerance: 500
   - type: WallMount
+  - type: GuideHelp
+    guides:
+    - ShuttleCraft
 
 # Construction Frames
 
@@ -225,6 +231,9 @@
   - type: ContainerContainer
     containers:
       board: !type:Container
+  - type: GuideHelp
+    guides:
+    - ShuttleCraft
 
 # RTG - no fuel requirement
 
@@ -247,6 +256,10 @@
     range: 5
     sound:
       path: /Audio/Ambience/Objects/buzzing.ogg
+  - type: RTGHeat
+    heatPerSecond: 0.1
+    heatInterval: 1
+    maxTemperature: 373.15
   - type: GuideHelp
     guides:
     - RTG
@@ -320,3 +333,8 @@
             max: 5
       - !type:DoActsBehavior
         acts: [ "Destruction" ]
+  - type: RadiationEvent
+    initialIntensity: 2
+    decayDelay: 3600
+    decayRate: 0.1
+    decayRateInterval: 60

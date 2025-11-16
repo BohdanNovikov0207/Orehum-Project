@@ -9,7 +9,7 @@
 ## Узлы артефактов
 <Box>
 <GuideEntityEmbed Entity="ComplexXenoArtifact" Caption=""/>
-<GuideEntityEmbed Entity="SimpleXenoArtifactItem" Caption=""/>
+<GuideEntityEmbed Entity="ComplexXenoArtifactItem" Caption=""/>
 </Box>
 Артефакты представляют собой случайно сгенерированное древо узлов. У каждого узла есть «[color=#a4885c]глубина[/color]», отражающая его опасность, и число связей с другими узлами — «[color=#a4885c]рёбра[/color]».
 

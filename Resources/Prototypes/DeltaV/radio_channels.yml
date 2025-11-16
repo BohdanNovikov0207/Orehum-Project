@@ -8,7 +8,7 @@
 - type: radioChannel
   id: Prison
   name: chat-radio-prison
-  keycode: 'з'
+  keycode: 'ы'
   frequency: 1601
   color: "#FFA500"
 

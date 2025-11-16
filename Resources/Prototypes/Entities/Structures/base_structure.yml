@@ -4,6 +4,7 @@
   placement:
     mode: SnapgridCenter
   components:
+  - type: ProtectedFromMeteor # Orehum
   - type: Transform
     anchored: true
   - type: Clickable

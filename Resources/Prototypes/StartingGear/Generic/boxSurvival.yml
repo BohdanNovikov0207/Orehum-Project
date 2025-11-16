@@ -4,6 +4,7 @@
   subGear:
   - BoxSurvivalOxygen
   - BoxSurvivalNitrogen
+  - BoxSurvivalWaterVapor
 
 - type: startingGear
   id: BoxSurvivalOxygen
@@ -25,6 +26,7 @@
   subGear:
   - BoxSurvivalClownOxygen
   - BoxSurvivalClownNitrogen
+  - BoxSurvivalClownWaterVapor
 
 - type: startingGear
   id: BoxSurvivalClownOxygen
@@ -46,6 +48,7 @@
   subGear:
   - BoxSurvivalEngineeringOxygen
   - BoxSurvivalEngineeringNitrogen
+  - BoxSurvivalEngineeringWaterVapor
 
 - type: startingGear
   id: BoxSurvivalEngineeringOxygen
@@ -67,6 +70,7 @@
   subGear:
   - BoxSurvivalMedicalOxygen
   - BoxSurvivalMedicalNitrogen
+  - BoxSurvivalMedicalWaterVapor
 
 - type: startingGear
   id: BoxSurvivalMedicalOxygen
@@ -88,6 +92,7 @@
   subGear:
   - BoxSurvivalSecurityOxygen
   - BoxSurvivalSecurityNitrogen
+  - BoxSurvivalSecurityWaterVapor
 
 - type: startingGear
   id: BoxSurvivalSecurityOxygen
@@ -109,6 +114,7 @@
   subGear:
   - BoxSurvivalSyndicateOxygen
   - BoxSurvivalSyndicateNitrogen
+  - BoxSurvivalSyndicateWaterVapor
 
 - type: startingGear
   id: BoxSurvivalSyndicateOxygen

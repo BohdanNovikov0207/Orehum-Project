@@ -16,8 +16,16 @@ public sealed class StepTriggerSystem : EntitySystem
     [Dependency] private readonly SharedMapSystem _map = default!;
     [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
 
+    private EntityQuery<MapGridComponent> _mapGridQuery;
+    private EntityQuery<TraitSpeedModifierComponent> _traitSpeedModifierQuery;
+    private EntityQuery<PhysicsComponent> _physicsQuery;
+
     public override void Initialize()
     {
+        _mapGridQuery = GetEntityQuery<MapGridComponent>();
+        _traitSpeedModifierQuery = GetEntityQuery<TraitSpeedModifierComponent>();
+        _physicsQuery = GetEntityQuery<PhysicsComponent>();
+
         UpdatesOutsidePrediction = true;
         SubscribeLocalEvent<StepTriggerComponent, AfterAutoHandleStateEvent>(TriggerHandleState);
 
@@ -55,7 +63,7 @@ public sealed class StepTriggerSystem : EntitySystem
         if (!component.Active || component.Colliding.Count == 0)
             return true;
 
-        if (component.Blacklist != null && TryComp<MapGridComponent>(transform.GridUid, out var grid))
+        if (component.Blacklist != null && _mapGridQuery.TryComp(transform.GridUid, out var grid))
         {
             var positon = _map.LocalToTile(transform.GridUid.Value, grid, transform.Coordinates);
             var anch = _map.GetAnchoredEntitiesEnumerator(uid, grid, positon);
@@ -99,7 +107,7 @@ public sealed class StepTriggerSystem : EntitySystem
         var intersect = Box2.Area(otherAabb.Intersect(ourAabb));
         var ratio = Math.Max(intersect / Box2.Area(otherAabb), intersect / Box2.Area(ourAabb));
         var requiredTriggeredSpeed = component.RequiredTriggeredSpeed;
-        if (TryComp<TraitSpeedModifierComponent>(otherUid, out var speedModifier))
+        if (_traitSpeedModifierQuery.TryComp(otherUid, out var speedModifier))
             requiredTriggeredSpeed *= speedModifier.RequiredTriggeredSpeedModifier;
 
         if (otherPhysics.LinearVelocity.Length() < requiredTriggeredSpeed
@@ -131,7 +139,7 @@ public sealed class StepTriggerSystem : EntitySystem
         // Can't trigger if we don't ignore weightless entities
         // and the entity is flying or currently weightless
         // Makes sense simulation wise to have this be part of steptrigger directly IMO
-        if (!component.IgnoreWeightless && TryComp<PhysicsComponent>(otherUid, out var physics) &&
+        if (!component.IgnoreWeightless && _physicsQuery.TryComp(otherUid, out var physics) &&
             (physics.BodyStatus == BodyStatus.InAir || _gravity.IsWeightless(otherUid, physics)))
             return false;
 

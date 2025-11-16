@@ -30,3 +30,5 @@ ent-ClothingEyesGlassesChemical = очки химического анализа
     .desc = Очки, позволяющие сканировать химический состав раствора.
 ent-ClothingEyesVisorNinja = очки ниндзя
     .desc = Усовершенствованные очки, защищающие глаза ниндзя от вспышек света.
+ent-ClothingEyesGlasses3D = 3D-очки
+    .desc = твиин армагеддон2

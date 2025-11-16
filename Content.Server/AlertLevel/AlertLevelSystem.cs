@@ -150,9 +150,9 @@ public sealed class AlertLevelSystem : EntitySystem
         component.CurrentLevel = level;
         component.IsLevelLocked = locked;
 
-        var name = level.ToLower();
+        var name = level;
         if (Loc.TryGetString($"alert-level-{level}", out var locName))
-            name = locName.ToLower();
+            name = locName;
 
         // Announcement text. Is passed into announcementFull.
         var announcement = detail.Announcement;

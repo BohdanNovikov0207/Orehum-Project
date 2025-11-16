@@ -140,7 +140,8 @@ public sealed class BloodCultRuleSystem : GameRuleSystem<BloodCultRuleComponent>
 
     private void OnCultistComponentInit(Entity<BloodCultistComponent> cultist, ref ComponentInit args)
     {
-        RaiseLocalEvent(cultist, new MoodEffectEvent("CultFocused"));
+        var ev = new MoodEffectEvent("CultFocused");
+        RaiseLocalEvent(cultist, ref ev);
         _language.AddLanguage(cultist, cultist.Comp.CultLanguageId);
 
         var query = QueryActiveRules();
@@ -165,7 +166,8 @@ public sealed class BloodCultRuleSystem : GameRuleSystem<BloodCultRuleComponent>
         RemoveAllCultItems(cultist);
         RemoveCultistAppearance(cultist);
         RemoveObjectiveAndRole(cultist.Owner);
-        RaiseLocalEvent(cultist.Owner, new MoodRemoveEffectEvent("CultFocused"));
+        var moodEv = new MoodRemoveEffectEvent("CultFocused");
+        RaiseLocalEvent(cultist.Owner, ref moodEv);
         _language.RemoveLanguage(cultist.Owner, cultist.Comp.CultLanguageId);
 
         if (!TryComp(cultist, out BloodCultSpellsHolderComponent? powersHolder))

@@ -22,6 +22,11 @@
         - Blindness
         - Pacifist
         - BrittleBoneDisease
+        - WheelchairBound
+    - !type:CharacterSpeciesRequirement
+      inverted: true
+      species:
+        - Felinid
     - !type:CharacterEmployerRequirement
       employers:
       - NanoTrasen # BSO works directly for centcomm, they are not a contractor.

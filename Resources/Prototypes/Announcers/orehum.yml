@@ -41,6 +41,10 @@
       path: alerts/delta.ogg
     - id: alertEpsilon # The station has been terminated, good luck survivors!
       path: alerts/epsilon.ogg
+    - id: alertEnigma
+      path: alerts/enigma.ogg
+    - id: alertOmicron
+      path: alerts/omicron.ogg
 
     # Events
     ## Wizard's Den

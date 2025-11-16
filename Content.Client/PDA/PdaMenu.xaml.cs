@@ -1,6 +1,6 @@
 using Content.Client.GameTicking.Managers;
 using Content.Shared.PDA;
-using Robust.Shared.Utility;
+using Content.Shared._Orehum.Time;
 using Content.Shared.CartridgeLoader;
 using Content.Client.Message;
 using Robust.Client.UserInterface;
@@ -9,6 +9,7 @@ using Robust.Client.Graphics;
 using Robust.Client.UserInterface.XAML;
 using Robust.Client.UserInterface.Controls;
 using Robust.Shared.Timing;
+using Robust.Shared.Utility;
 
 namespace Content.Client.PDA
 {
@@ -32,7 +33,7 @@ namespace Content.Client.PDA
         private string _stationName = Loc.GetString("comp-pda-ui-unknown");
         private string _alertLevel = Loc.GetString("comp-pda-ui-unknown");
         private string _instructions = Loc.GetString("comp-pda-ui-unknown");
-        
+
 
         private int _currentView;
 
@@ -116,8 +117,13 @@ namespace Content.Client.PDA
 
             StationTimeButton.OnPressed += _ =>
             {
-                var stationTime = _gameTiming.CurTime.Subtract(_gameTicker.RoundStartTimeSpan);
-                _clipboard.SetText((stationTime.ToString("hh\\:mm\\:ss")));
+                var stationTime = _entitySystem.GetEntitySystem<TimeSystem>().GetStationTime();
+                _clipboard.SetText(stationTime.Time.ToString("hh\\:mm\\:ss"));
+            };
+            StationDateButton.OnPressed += _ =>
+            {
+              var stationDate = _entitySystem.GetEntitySystem<TimeSystem>().GetDate();
+              _clipboard.SetText((stationDate));
             };
 
             StationAlertLevelInstructionsButton.OnPressed += _ =>
@@ -125,7 +131,7 @@ namespace Content.Client.PDA
                 _clipboard.SetText(_instructions);
             };
 
-            
+
 
 
             HideAllViews();
@@ -165,12 +171,15 @@ namespace Content.Client.PDA
             _stationName = state.StationName ?? Loc.GetString("comp-pda-ui-unknown");
             StationNameLabel.SetMarkup(Loc.GetString("comp-pda-ui-station",
                 ("station", _stationName)));
-            
 
-            var stationTime = _gameTiming.CurTime.Subtract(_gameTicker.RoundStartTimeSpan);
+
+            var stationTime = _entitySystem.GetEntitySystem<TimeSystem>().GetStationTime();
+            var stationDate = _entitySystem.GetEntitySystem<TimeSystem>().GetDate();
 
             StationTimeLabel.SetMarkup(Loc.GetString("comp-pda-ui-station-time",
-                ("time", stationTime.ToString("hh\\:mm\\:ss"))));
+                ("time", stationTime.Time.ToString("hh\\:mm\\:ss"))));
+            StationDateLabel.SetMarkup(Loc.GetString("comp-pda-ui-station-date",
+                ("date", stationDate)));
 
             var alertLevel = state.PdaOwnerInfo.StationAlertLevel;
             var alertColor = state.PdaOwnerInfo.StationAlertColor;
@@ -341,10 +350,13 @@ namespace Content.Client.PDA
         {
             base.Draw(handle);
 
-            var stationTime = _gameTiming.CurTime.Subtract(_gameTicker.RoundStartTimeSpan);
+            var stationTime = _entitySystem.GetEntitySystem<TimeSystem>().GetStationTime();
+            var stationDate = _entitySystem.GetEntitySystem<TimeSystem>().GetDate();
 
             StationTimeLabel.SetMarkup(Loc.GetString("comp-pda-ui-station-time",
-                ("time", stationTime.ToString("hh\\:mm\\:ss"))));
+                ("time", stationTime.Time.ToString("hh\\:mm\\:ss"))));
+            StationDateLabel.SetMarkup(Loc.GetString("comp-pda-ui-station-date",
+                ("date", stationDate)));
         }
     }
 }

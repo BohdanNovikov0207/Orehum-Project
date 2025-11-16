@@ -51,7 +51,7 @@ namespace Content.Server.Speech.Muting
         }
 
 
-        private void OnSpeakAttempt(EntityUid uid, MutedComponent component, SpeakAttemptEvent args)
+        private void OnSpeakAttempt(EntityUid uid, MutedComponent component, ref SpeakAttemptEvent args)
         {
             var language = _languages.GetLanguage(uid);
             if (!language.SpeechOverride.RequireSpeech)

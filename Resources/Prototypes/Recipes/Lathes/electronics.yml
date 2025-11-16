@@ -431,11 +431,6 @@
 
 - type: latheRecipe
   parent: BaseCircuitboardRecipe
-  id: PowerComputerCircuitboard
-  result: PowerComputerCircuitboard
-
-- type: latheRecipe
-  parent: BaseCircuitboardRecipe
   id: AlertsComputerCircuitboard
   result: AlertsComputerCircuitboard
 
@@ -569,6 +564,9 @@
   id: ShuttleGunSvalinnMachineGunCircuitboard
   result: ShuttleGunSvalinnMachineGunCircuitboard
   completetime: 6
+  materials:
+     Steel: 100
+     Glass: 900
 
 - type: latheRecipe
   parent: BaseGoldCircuitboardRecipe
@@ -581,24 +579,25 @@
   id: ShuttleGunKineticCircuitboard
   result: ShuttleGunKineticCircuitboard
   completetime: 6
+  materials:
+     Steel: 100
+     Glass: 900
 
 - type: latheRecipe
   parent: BaseGoldCircuitboardRecipe
   id: ShuttleGunFriendshipCircuitboard
   result: ShuttleGunFriendshipCircuitboard
   completetime: 8
+  materials:
+     Steel: 100
+     Glass: 900
+     Gold: 50
 
 - type: latheRecipe
   parent: BaseGoldCircuitboardRecipe
   id: ShuttleGunDusterCircuitboard
   result: ShuttleGunDusterCircuitboard
   completetime: 12
-
-- type: latheRecipe
-  parent: BaseGoldCircuitboardRecipe
-  id: StationAnchorCircuitboard
-  result: StationAnchorCircuitboard
-  completetime: 8
 
 - type: latheRecipe
   parent: BaseGoldCircuitboardRecipe
@@ -614,6 +613,11 @@
   parent: BaseCircuitboardRecipe
   id: CutterMachineCircuitboard
   result: CutterMachineCircuitboard
+
+- type: latheRecipe
+  parent: BaseCircuitboardRecipe
+  id: HolopadMachineCircuitboard
+  result: HolopadMachineCircuitboard
 
 - type: latheRecipe
   parent: BaseGoldCircuitboardRecipe
@@ -663,3 +667,8 @@
   parent: BaseGoldCircuitboardRecipe
   id: MaterialSiloCircuitboard
   result: MaterialSiloCircuitboard
+
+- type: latheRecipe
+  parent: BaseCircuitboardRecipe
+  id: SupermatterComputerCircuitboardRecipe
+  result: SupermatterComputerCircuitboard

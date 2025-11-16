@@ -3,8 +3,8 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Mood;
 
-[Serializable, NetSerializable]
-public sealed class MoodEffectEvent : EntityEventArgs
+[Serializable, NetSerializable, ByRefEvent,]
+public record struct MoodEffectEvent
 {
     /// <summary>
     ///     ID of the moodlet prototype to use
@@ -33,8 +33,8 @@ public sealed class MoodEffectEvent : EntityEventArgs
     }
 }
 
-[Serializable, NetSerializable]
-public sealed class MoodRemoveEffectEvent : EntityEventArgs
+[Serializable, NetSerializable, ByRefEvent,]
+public record struct MoodRemoveEffectEvent
 {
     public string EffectId;
 

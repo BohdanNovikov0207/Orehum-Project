@@ -28,6 +28,7 @@ namespace Content.Server.Body.Systems
 
         private EntityQuery<OrganComponent> _organQuery;
         private EntityQuery<SolutionContainerManagerComponent> _solutionQuery;
+        private EntityQuery<MobStateComponent> _mobStateQuery;
 
         public override void Initialize()
         {
@@ -35,6 +36,7 @@ namespace Content.Server.Body.Systems
 
             _organQuery = GetEntityQuery<OrganComponent>();
             _solutionQuery = GetEntityQuery<SolutionContainerManagerComponent>();
+            _mobStateQuery = GetEntityQuery<MobStateComponent>();
 
             SubscribeLocalEvent<MetabolizerComponent, ComponentInit>(OnMetabolizerInit);
             SubscribeLocalEvent<MetabolizerComponent, MapInitEvent>(OnMapInit);
@@ -180,7 +182,7 @@ namespace Content.Server.Body.Systems
                     // if it's possible for them to be dead, and they are,
                     // then we shouldn't process any effects, but should probably
                     // still remove reagents
-                    if (TryComp<MobStateComponent>(solutionEntityUid.Value, out var state))
+                    if (_mobStateQuery.TryComp(solutionEntityUid.Value, out var state))
                     {
                         if (!proto.WorksOnTheDead && _mobStateSystem.IsDead(solutionEntityUid.Value, state))
                             continue;

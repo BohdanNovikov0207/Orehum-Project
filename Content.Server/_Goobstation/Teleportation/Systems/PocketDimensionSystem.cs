@@ -58,7 +58,8 @@ public sealed class PocketDimensionSystem : EntitySystem
     {
         if (Deleted(comp.PocketDimensionMap))
         {
-            if (!_mapLoader.TryLoadMap(comp.PocketDimensionPath, out var map, out var roots))
+            if (!_mapLoader.TryLoadMap(comp.PocketDimensionPath, out var map, out var roots,
+                options: new() { InitializeMaps = true, }))
             {
                 _sawmill.Error($"Failed to load pocket dimension map {comp.PocketDimensionPath}");
                 return;

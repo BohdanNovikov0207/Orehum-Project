@@ -45,7 +45,7 @@ public sealed partial class NPCCombatSystem
 
     private void OnRangedStartup(EntityUid uid, NPCRangedCombatComponent component, ComponentStartup args)
     {
-        if (TryComp<CombatModeComponent>(uid, out var combat))
+        if (_combatQuery.TryComp(uid, out var combat))
         {
             _combat.SetInCombatMode(uid, true, combat);
         }
@@ -57,7 +57,7 @@ public sealed partial class NPCCombatSystem
 
     private void OnRangedShutdown(EntityUid uid, NPCRangedCombatComponent component, ComponentShutdown args)
     {
-        if (TryComp<CombatModeComponent>(uid, out var combat))
+        if (_combatQuery.TryComp(uid, out var combat))
         {
             _combat.SetInCombatMode(uid, false, combat);
         }

@@ -45,6 +45,9 @@
   id: MobArachnidMarkingLimits
   onlyWhitelisted: true
   points:
+    Head: # Orehum fix
+      points: 2
+      required: false
     Hair:
       points: 0
       required: false

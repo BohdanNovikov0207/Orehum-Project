@@ -8,6 +8,7 @@ using Content.Shared.Mobs;
 using Content.Shared.Mobs.Systems;
 using Content.Shared.NPC;
 using Content.Shared.NPC.Systems;
+using Prometheus;
 using Robust.Server.GameObjects;
 using Robust.Shared.Configuration;
 using Robust.Shared.Player;
@@ -19,9 +20,17 @@ namespace Content.Server.NPC.Systems
     /// </summary>
     public sealed partial class NPCSystem : EntitySystem
     {
+        private static readonly Gauge ActiveGauge = Metrics.CreateGauge(
+            "npc_active_count",
+            "Amount of NPCs that are actively processing");
+
         [Dependency] private readonly IConfigurationManager _configurationManager = default!;
         [Dependency] private readonly HTNSystem _htn = default!;
         [Dependency] private readonly MobStateSystem _mobState = default!;
+
+        private EntityQuery<HTNComponent> _htnQuery;
+        private EntityQuery<ActorComponent> _actorQuery;
+        private EntityQuery<MindContainerComponent> _mindContainerQuery;
 
         /// <summary>
         /// Whether any NPCs are allowed to run at all.
@@ -36,6 +45,10 @@ namespace Content.Server.NPC.Systems
         public override void Initialize()
         {
             base.Initialize();
+
+            _htnQuery = GetEntityQuery<HTNComponent>();
+            _actorQuery = GetEntityQuery<ActorComponent>();
+            _mindContainerQuery = GetEntityQuery<MindContainerComponent>();
 
             Subs.CVar(_configurationManager, CCVars.NPCEnabled, value => Enabled = value, true);
             Subs.CVar(_configurationManager, CCVars.NPCMaxUpdates, obj => _maxUpdates = obj, true);
@@ -52,7 +65,7 @@ namespace Content.Server.NPC.Systems
                 return;
 
             // This NPC has an attached mind, so it should not wake up.
-            if (TryComp<MindContainerComponent>(uid, out var mindContainer) && mindContainer.HasMind)
+            if (_mindContainerQuery.TryComp(uid, out var mindContainer) && mindContainer.HasMind)
                 return;
 
             WakeNPC(uid, component);
@@ -81,7 +94,7 @@ namespace Content.Server.NPC.Systems
         {
             // If you add your own NPC components then add them here.
 
-            if (TryComp<HTNComponent>(uid, out var htn))
+            if (_htnQuery.TryComp(uid, out var htn))
             {
                 component = htn;
                 return true;
@@ -113,7 +126,7 @@ namespace Content.Server.NPC.Systems
             }
 
             // Don't bother with an event
-            if (TryComp<HTNComponent>(uid, out var htn))
+            if (_htnQuery.TryComp(uid, out var htn))
             {
                 if (htn.Plan != null)
                 {
@@ -139,11 +152,13 @@ namespace Content.Server.NPC.Systems
             _count = 0;
             // Add your system here.
             _htn.UpdateNPC(ref _count, _maxUpdates, frameTime);
+
+            ActiveGauge.Set(Count<ActiveNPCComponent>());
         }
 
         public void OnMobStateChange(EntityUid uid, HTNComponent component, MobStateChangedEvent args)
         {
-            if (HasComp<ActorComponent>(uid))
+            if (_actorQuery.HasComp(uid))
                 return;
 
             switch (args.NewMobState)

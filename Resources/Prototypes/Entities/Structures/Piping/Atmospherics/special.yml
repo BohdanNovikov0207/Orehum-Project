@@ -25,6 +25,9 @@
   - type: Tag
     tags:
       - SpreaderIgnore
+  - type: Construction
+    graph: AtmosFan
+    node: tinyFan
 
 - type: entity
   id: AtmosDeviceFanDirectional
@@ -54,3 +57,6 @@
   - type: Tag
     tags:
       - SpreaderIgnore
+  - type: Construction
+    graph: AtmosFan
+    node: directionalFan

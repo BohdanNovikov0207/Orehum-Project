@@ -34,6 +34,7 @@ namespace Content.Server.Power.EntitySystems
         private EntityQuery<ApcPowerReceiverBatteryComponent> _apcBatteryQuery;
         private EntityQuery<AppearanceComponent> _appearanceQuery;
         private EntityQuery<BatteryComponent> _batteryQuery;
+        private EntityQuery<PowerNetworkBatteryComponent> _powerNetworkBatteryQuery;
 
         private BatteryRampPegSolver _solver = new();
 
@@ -44,6 +45,7 @@ namespace Content.Server.Power.EntitySystems
             _apcBatteryQuery = GetEntityQuery<ApcPowerReceiverBatteryComponent>();
             _appearanceQuery = GetEntityQuery<AppearanceComponent>();
             _batteryQuery = GetEntityQuery<BatteryComponent>();
+            _powerNetworkBatteryQuery = GetEntityQuery<PowerNetworkBatteryComponent>();
 
             UpdatesAfter.Add(typeof(NodeGroupSystem));
             _solver = new(_cfg.GetCVar(CCVars.DebugPow3rDisableParallel));
@@ -479,7 +481,7 @@ namespace Content.Server.Power.EntitySystems
 
             DoReconnectBasePowerNet(net, netNode);
 
-            var batteryQuery = GetEntityQuery<PowerNetworkBatteryComponent>();
+            var batteryQuery = _powerNetworkBatteryQuery;
 
             foreach (var apc in net.Apcs)
             {
@@ -500,7 +502,7 @@ namespace Content.Server.Power.EntitySystems
 
             DoReconnectBasePowerNet(net, netNode);
 
-            var batteryQuery = GetEntityQuery<PowerNetworkBatteryComponent>();
+            var batteryQuery = _powerNetworkBatteryQuery;
 
             foreach (var charger in net.Chargers)
             {

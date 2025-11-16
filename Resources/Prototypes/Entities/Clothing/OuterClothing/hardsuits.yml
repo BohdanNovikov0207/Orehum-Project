@@ -523,6 +523,7 @@
     coolingCoefficient: 0.001
   - type: FireProtection
     reduction: 1
+  - type: SupermatterImmune
 
 #Chief Medical Officer's Hardsuit
 - type: entity
@@ -639,6 +640,7 @@
   id: ClothingOuterHardsuitLuxury
   name: luxury mining hardsuit
   description: A refurbished mining hardsuit, fashioned after the Logistics Officer's colors. Graphene lining provides less protection, but is much easier to move. # DeltaV - Logistics Department replacing Cargo
+  categories: [ DoNotMap ]
   components:
   - type: Sprite
     sprite: Clothing/OuterClothing/Hardsuits/luxury.rsi
@@ -918,7 +920,7 @@
 
 #Wizard Hardsuit
 - type: entity
-  parent: ClothingOuterHardsuitBase
+  parent: [ ClothingOuterHardsuitBase, BaseMagicalContraband ]
   id: ClothingOuterHardsuitWizard
   name: wizard hardsuit
   description: A bizarre gem-encrusted suit that radiates magical energies.
@@ -1100,6 +1102,10 @@
     coolingCoefficient: 0.001
   - type: FireProtection
     reduction: 1
+  - type: ClothingGrantComponent
+    component:
+    - type: SupermatterImmune
+  - type: SupermatterImmune
 
 #ERT Medic Hardsuit
 - type: entity
@@ -1191,6 +1197,10 @@
     clothingPrototype: ClothingHeadHelmetHardsuitDeathsquad
   - type: StaminaDamageResistance
     coefficient: 0.1 # 90%
+  - type: ClothingGrantComponent
+    component:
+    - type: SupermatterImmune
+  - type: SupermatterImmune
 
 #CBURN Hardsuit
 - type: entity

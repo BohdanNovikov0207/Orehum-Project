@@ -1,3 +1,4 @@
+advertisement-cola-0 = Хочется пить? Почему бы не выпить колы?
 advertisement-cola-1 = Освежает!
 advertisement-cola-2 = Надеюсь, ты хочешь пить!
 advertisement-cola-3 = Продано более миллиона напитков!

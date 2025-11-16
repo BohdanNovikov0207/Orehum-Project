@@ -1,4 +1,4 @@
-﻿using Robust.Shared.Audio;
+using Robust.Shared.Audio;
 using Robust.Shared.Prototypes;
 
 namespace Content.Shared._Lavaland.Damage;
@@ -10,14 +10,29 @@ public sealed partial class HierophantClubItemComponent : Component
     public EntProtoId CreateCrossActionId = "ActionHierophantSpawnCross";
 
     [DataField]
+    public EntProtoId CreateDamageAreaActionId = "ActionHierophantSpawnDamageArea";
+
+    [DataField]
+    public EntProtoId CreateChaserActionId = "ActionHierophantSpawnChaser";
+
+    /*
+    [DataField]
     public EntProtoId PlaceMarkerActionId = "ActionHierophantPlaceMarker";
 
     [DataField]
     public EntProtoId TeleportToMarkerActionId = "ActionHierophantTeleport";
+    */
 
     [DataField]
     public EntityUid? CreateCrossActionEntity;
 
+    [DataField]
+    public EntityUid? CreateDamageAreaActionEntity;
+
+    [DataField]
+    public EntityUid? CreateChaserActionEntity;
+
+    /*
     [DataField]
     public EntityUid? PlaceMarkerActionEntity;
 
@@ -26,9 +41,16 @@ public sealed partial class HierophantClubItemComponent : Component
 
     [DataField]
     public EntityUid? TeleportMarker;
+    */
 
     [DataField]
     public float CrossRange = 5f;
+
+    [DataField]
+    public float DamageAreaRange = 2f;
+
+    [DataField]
+    public float ChaserMaxSteps = 2f;
 
     [DataField]
     public SoundSpecifier DamageSound = new SoundPathSpecifier("/Audio/_Lavaland/Mobs/Bosses/hiero_blast.ogg");

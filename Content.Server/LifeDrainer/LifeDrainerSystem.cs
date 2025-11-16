@@ -86,7 +86,7 @@ public sealed class LifeDrainerSystem : EntitySystem
         _popup.PopupEntity(Loc.GetString("life-drain-third-end", ("drainer", uid), ("target", target)), target, Filter.PvsExcept(target), true, PopupType.LargeCaution);
 
         var rejuv = new RejuvenateEvent();
-        RaiseLocalEvent(uid, rejuv);
+        RaiseLocalEvent(uid, ref rejuv);
 
         _audio.PlayPvs(comp.FinishSound, uid);
 

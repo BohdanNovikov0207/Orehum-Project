@@ -147,3 +147,25 @@
   cost: 350
   category: cargoproduct-category-name-engineering
   group: market
+
+# Orehum start
+- type: cargoProduct
+  id: CrateEngineeringAMEShielding
+  icon:
+    sprite: Structures/Storage/Crates/engicrate_secure.rsi
+    state: icon
+  product: CrateEngineeringAMEShielding
+  cost: 5000
+  category: cargoproduct-category-name-engineering
+  group: market
+
+- type: cargoProduct
+  id: CrateEngineeringAMEControl
+  icon:
+    sprite: Structures/Storage/Crates/engicrate_secure.rsi
+    state: icon
+  product: CrateEngineeringAMEControl
+  cost: 2500
+  category: cargoproduct-category-name-engineering
+  group: market
+# Orehum end

@@ -26,6 +26,11 @@
         - Blindness
         - Pacifist
         - BrittleBoneDisease
+        - WheelchairBound
+    - !type:CharacterSpeciesRequirement
+      inverted: true
+      species:
+        - Felinid
     - !type:CharacterEmployerRequirement
       employers:
       - ZavodskoiInterstellar

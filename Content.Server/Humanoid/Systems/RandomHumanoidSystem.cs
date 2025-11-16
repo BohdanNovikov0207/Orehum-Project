@@ -5,6 +5,7 @@ using Content.Shared.Humanoid.Prototypes;
 using Content.Shared.Preferences;
 using Robust.Shared.Map;
 using Robust.Shared.Prototypes;
+using Robust.Shared.Random;
 using Robust.Shared.Serialization.Manager;
 
 namespace Content.Server.Humanoid.Systems;
@@ -17,6 +18,7 @@ public sealed class RandomHumanoidSystem : EntitySystem
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly ISerializationManager _serialization = default!;
     [Dependency] private readonly MetaDataSystem _metaData = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
 
     [Dependency] private readonly HumanoidAppearanceSystem _humanoid = default!;
 
@@ -48,12 +50,22 @@ public sealed class RandomHumanoidSystem : EntitySystem
         if (!_prototypeManager.TryIndex<RandomHumanoidSettingsPrototype>(prototypeId, out var prototype))
             throw new ArgumentException("Could not get random humanoid settings");
 
-        var blacklist = prototype.SpeciesBlacklist;
+        // Orehum start
+        HumanoidCharacterProfile profile;
+        if (prototype.SpeciesWhitelist.Any())
+        {
+            profile = HumanoidCharacterProfile.RandomWithSpecies(_random.Pick(prototype.SpeciesWhitelist));
+        }
+        else
+        {
+            var blacklist = prototype.SpeciesBlacklist;
 
-        if (!prototype.SpeciesBlacklist.Any())
-            blacklist = _notRoundStartSpecies;
+            if (!prototype.SpeciesBlacklist.Any())
+                blacklist = _notRoundStartSpecies;
 
-        var profile = HumanoidCharacterProfile.Random(blacklist);
+            profile = HumanoidCharacterProfile.Random(blacklist);
+        }
+        // Orehum end
         var speciesProto = _prototypeManager.Index<SpeciesPrototype>(profile.Species);
         var humanoid = EntityManager.CreateEntityUninitialized(speciesProto.Prototype, coordinates);
 

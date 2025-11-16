@@ -1,4 +1,5 @@
 using System.Linq;
+using Content.Corvax.Interfaces.Shared;
 using Content.Shared.CCVar;
 using Content.Shared.Mind;
 using Content.Shared.Players.PlayTimeTracking;
@@ -7,6 +8,7 @@ using Content.Shared.Roles;
 using Content.Shared.Roles.Jobs;
 using JetBrains.Annotations;
 using Robust.Shared.Configuration;
+using Robust.Shared.Network;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
 using Robust.Shared.Utility;
@@ -26,7 +28,7 @@ public sealed partial class CharacterJobRequirement : CharacterRequirement
 
     public override bool IsValid(JobPrototype job,
         HumanoidCharacterProfile profile,
-        Dictionary<string, TimeSpan> playTimes,
+        IReadOnlyDictionary<string, TimeSpan> playTimes,
         bool whitelisted,
         IPrototype prototype,
         IEntityManager entityManager,
@@ -78,7 +80,7 @@ public sealed partial class CharacterDepartmentRequirement : CharacterRequiremen
 
     public override bool IsValid(JobPrototype job,
         HumanoidCharacterProfile profile,
-        Dictionary<string, TimeSpan> playTimes,
+        IReadOnlyDictionary<string, TimeSpan> playTimes,
         bool whitelisted,
         IPrototype prototype,
         IEntityManager entityManager,
@@ -126,7 +128,7 @@ public sealed partial class CharacterDepartmentTimeRequirement : CharacterRequir
 
     public override bool IsValid(JobPrototype job,
         HumanoidCharacterProfile profile,
-        Dictionary<string, TimeSpan> playTimes,
+        IReadOnlyDictionary<string, TimeSpan> playTimes,
         bool whitelisted,
         IPrototype prototype,
         IEntityManager entityManager,
@@ -199,7 +201,7 @@ public sealed partial class CharacterOverallTimeRequirement : CharacterRequireme
 
     public override bool IsValid(JobPrototype job,
         HumanoidCharacterProfile profile,
-        Dictionary<string, TimeSpan> playTimes,
+        IReadOnlyDictionary<string, TimeSpan> playTimes,
         bool whitelisted,
         IPrototype prototype,
         IEntityManager entityManager,
@@ -262,7 +264,7 @@ public sealed partial class CharacterPlaytimeRequirement : CharacterRequirement
 
     public override bool IsValid(JobPrototype job,
         HumanoidCharacterProfile profile,
-        Dictionary<string, TimeSpan> playTimes,
+        IReadOnlyDictionary<string, TimeSpan> playTimes,
         bool whitelisted,
         IPrototype prototype,
         IEntityManager entityManager,
@@ -303,6 +305,14 @@ public sealed partial class CharacterPlaytimeRequirement : CharacterRequirement
         // Get the time for the tracker
         var time = playTimes.GetValueOrDefault(Tracker);
         reason = null;
+
+        //start-backmen: allRoles
+        if (IoCManager.Instance!.TryResolveType<ISharedSponsorsManager>(out var manager)
+            && IoCManager.Instance.TryResolveType<INetManager>(out var net)
+            && mind != null
+            && (net.IsClient ? manager.IsClientAllRoles() : manager.IsServerAllRoles(mind.Session!.UserId)))
+            return true;
+        //end-backmen
 
         if (time > Max)
         {

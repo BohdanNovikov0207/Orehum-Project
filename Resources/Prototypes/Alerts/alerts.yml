@@ -161,6 +161,7 @@
   description: alerts-walking-desc
   minSeverity: 0
   maxSeverity: 1
+  clientHandled: true
 
 - type: alert
   id: Stun

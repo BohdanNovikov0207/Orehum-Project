@@ -92,6 +92,8 @@ ghost-role-information-guardian-name = Страж
 ghost-role-information-guardian-description = Слушайте своего хозяина. Не танкуйте урон. Сильно стукайте врагов.
 ghost-role-information-tropico-name = Тропико
 ghost-role-information-tropico-description = Благородный спутник Атмосии и её самый стойкий защитник. Viva!
+ghost-role-information-laika-name = Лайка
+ghost-role-information-laika-description = Собака женского пола состоящая в рядах СБ. Подначивает членов службы охраны на ласку и впивается в жилы нападчиков.
 ghost-role-information-holoparasite-name = Голопаразит
 ghost-role-information-holoparasite-description = Слушайте своего хозяина. Не танкуйте урон. Сильно стукайте врагов.
 ghost-role-information-holoclown-name = Голоклоун
@@ -111,7 +113,7 @@ ghost-role-information-skeleton-pirate-description = Устройте хаос �
 ghost-role-information-skeleton-biker-name = Скелет-байкер
 ghost-role-information-skeleton-biker-description = Колесите на своём прекрасном байке.
 ghost-role-information-closet-skeleton-name = Скелет из шкафа
-ghost-role-information-closet-skeleton-description = Вы, похоже, один из старейших сотрудников станции! Верните себе прежнюю должность или устройте хаос! Мир в ваших руках.
+ghost-role-information-closet-skeleton-description = Вы, похоже, один из старейших сотрудников станции! Это ваш шанс вернуться в раунд и быть кем захотите. Вы имеете право устроиться в любой отдел на низшую должность с возможностью повышения. Поэтому у скелета есть все навыки. Не используйте роль с огромным потенциалом для РДМа. 
 ghost-role-information-remilia-name = Ремилия, фамильяр священника
 ghost-role-information-remilia-description = Слушайтесь и повинуйтесь священнику. Ешьте фрукты. Громко кричите людям в уши и списывайте это на эхолокацию.
 ghost-role-information-cerberus-name = Цербер, злой фамильяр
@@ -232,6 +234,8 @@ ghost-role-information-gingerbread-name = Пряничный человечек
 ghost-role-information-gingerbread-description =
     Существо чистого праздничного духа.
     Распространяйте паточную вкуснятину и хорошее настроение.
+ghost-role-information-shiva-name = Шива
+ghost-role-information-shiva-description = Главный защитник станции.
 ghost-role-information-tomatokiller-name = Томат-убийца
 ghost-role-information-tomatokiller-description = Этот маленький помидор будет служить ботанику до конца своей жизни... то есть пару минут.
 # Corvax-start

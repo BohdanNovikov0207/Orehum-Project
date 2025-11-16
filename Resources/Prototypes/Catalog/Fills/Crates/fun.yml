@@ -346,6 +346,7 @@
       - id: ClothingShoesSkates
       - id: RubberChicken
       - id: RubberPig
+      - id: PlushieJeff
 
 - type: entity
   id: CrateFunBikeHornImplants

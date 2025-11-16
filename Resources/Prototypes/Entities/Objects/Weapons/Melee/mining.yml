@@ -163,6 +163,10 @@
     angle: 120
     soundHit:
       collection: MetalThud
+  - type: IncreaseDamageOnWield # Orehum return structural damage for crusher
+    damage:
+      types:
+        Structural: 30
   - type: DamageOtherOnHit
     staminaCost: 8
   - type: Wieldable

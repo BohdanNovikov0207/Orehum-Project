@@ -1,23 +1,12 @@
 namespace Content.Server.Speech;
 
-public sealed class ListenEvent : EntityEventArgs
+[ByRefEvent]
+public record struct ListenEvent(string Message, EntityUid Source);
+
+[ByRefEvent]
+public record struct ListenAttemptEvent(EntityUid Source, bool Cancelled = false)
 {
-    public readonly string Message;
-    public readonly EntityUid Source;
+    public void Cancel() => Cancelled = true;
 
-    public ListenEvent(string message, EntityUid source)
-    {
-        Message = message;
-        Source = source;
-    }
-}
-
-public sealed class ListenAttemptEvent : CancellableEntityEventArgs
-{
-    public readonly EntityUid Source;
-
-    public ListenAttemptEvent(EntityUid source)
-    {
-        Source = source;
-    }
+    public void Uncancel() => Cancelled = false;
 }

@@ -527,3 +527,21 @@
       amount: 2
   products:
     LiftLoversSpecial: 7
+
+- type: reaction
+  id: Anti-nob
+  reactants:
+    Plutonium:
+      amount: 50
+    Hyper-Noblium:
+      amount: 1
+      catalyst: true
+  effects:
+  - !type:CreateGas
+    gas: AntiNoblium
+  - !type:PopupMessage
+    visualType: LargeCaution
+    messages: [ "anti-nob-created" ]
+    type: Pvs
+  products:
+    Anti-Noblium: 50

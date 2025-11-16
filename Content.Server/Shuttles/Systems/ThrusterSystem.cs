@@ -101,7 +101,7 @@ public sealed class ThrusterSystem : EntitySystem
         {
             // If the old tile was space but the new one isn't then disable all adjacent thrusters
             if (change.NewTile.IsSpace(_tileDefManager) || !change.OldTile.IsSpace(_tileDefManager))
-                return;
+                continue;
 
             var tilePos = change.GridIndices;
             var grid = Comp<MapGridComponent>(uid);
@@ -135,6 +135,7 @@ public sealed class ThrusterSystem : EntitySystem
                 }
             }
         }
+
     }
 
     private void OnActivateThruster(EntityUid uid, ThrusterComponent component, ActivateInWorldEvent args)

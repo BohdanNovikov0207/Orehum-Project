@@ -23,3 +23,4 @@ lavaland-ruin-big-shuttle = Огромный разрушенный шаттл
 lavaland-ruin-biodome = Биодом
 lavaland-ruin-syndicate = База синдиката
 lavaland-ruin-hierophant = Межпространственный сигнал
+lavaland-ruin-ashwalkers = Убежище пеплоходцев

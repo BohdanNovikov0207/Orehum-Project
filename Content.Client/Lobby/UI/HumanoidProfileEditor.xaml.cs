@@ -10,6 +10,7 @@ using Content.Client.Sprite;
 using Content.Client.Stylesheets;
 using Content.Client.UserInterface.Controls;
 using Content.Client.UserInterface.Systems.Guidebook;
+using Content.Corvax.Interfaces.Shared;
 using Content.Shared._EE.Contractors.Prototypes;
 using Content.Shared.CCVar;
 using Content.Shared.Clothing.Components;
@@ -61,6 +62,8 @@ namespace Content.Client.Lobby.UI
         private readonly LobbyUIController _controller;
         private readonly CharacterRequirementsSystem _characterRequirementsSystem;
         private readonly RoleSystem _roleSystem;
+
+        private readonly ISharedSponsorsManager _clientSponsorsManager;
 
         private FlavorText.FlavorText? _flavorText;
         private TextEdit? _flavorTextEdit;
@@ -143,7 +146,8 @@ namespace Content.Client.Lobby.UI
             IResourceManager resManager,
             JobRequirementsManager requirements,
             MarkingManager markings,
-            IRobustRandom random
+            IRobustRandom random,
+            ISharedSponsorsManager clientSponsorsManager
         )
         {
             RobustXamlLoader.Load(this);
@@ -158,6 +162,7 @@ namespace Content.Client.Lobby.UI
             _resManager = resManager;
             _requirements = requirements;
             _random = random;
+            _clientSponsorsManager = clientSponsorsManager;
 
             _roleSystem = _entManager.System<RoleSystem>();
             _characterRequirementsSystem = _entManager.System<CharacterRequirementsSystem>();
@@ -660,6 +665,11 @@ namespace Content.Client.Lobby.UI
             _species.AddRange(_prototypeManager.EnumeratePrototypes<SpeciesPrototype>().Where(o => o.RoundStart));
             var speciesIds = _species.Select(o => o.ID).ToList();
 
+            // Corvax-Sponsors-Start
+            if (_clientSponsorsManager != null)
+                _species = _species.Where(p => !p.SponsorOnly || _clientSponsorsManager.GetClientPrototypes().Contains(p.ID)).ToList();
+            // Corvax-Sponsors-End
+
             for (var i = 0; i < _species.Count; i++)
             {
                 SpeciesButton.AddItem(Loc.GetString(_species[i].Name), i);
@@ -886,11 +896,14 @@ namespace Content.Client.Lobby.UI
             if (Profile == null || !_prototypeManager.HasIndex(Profile.Species))
                 return;
 
-            PreviewDummy = _controller.LoadProfileEntity(Profile, ShowClothes.Pressed, ShowLoadouts.Pressed);
+            PreviewDummy = _controller.LoadProfileEntity(Profile, null, ShowClothes.Pressed, ShowLoadouts.Pressed);
             SpriteViewS.SetEntity(PreviewDummy);
             SpriteViewN.SetEntity(PreviewDummy);
             SpriteViewE.SetEntity(PreviewDummy);
             SpriteViewW.SetEntity(PreviewDummy);
+
+            // Check and set the dirty flag to enable the save/reset buttons as appropriate.
+            SetDirty();
         }
 
         /// <summary>
@@ -984,6 +997,9 @@ namespace Content.Client.Lobby.UI
 
             TraitsTabs.UpdateTabMerging();
             LoadoutsTabs.UpdateTabMerging();
+
+            // Check and set the dirty flag to enable the save/reset buttons as appropriate.
+            SetDirty();
         }
 
         private void LoadoutsChanged(bool enabled)
@@ -1045,7 +1061,7 @@ namespace Content.Client.Lobby.UI
             var firstCategory = true;
             foreach (var department in departments)
             {
-                var departmentName = Loc.GetString($"department-{department.ID}");
+                var departmentName = Loc.GetString(department.Name);
 
                 if (!_jobCategories.TryGetValue(department.ID, out var category))
                 {
@@ -1165,7 +1181,6 @@ namespace Content.Client.Lobby.UI
                 return;
 
             Profile = Profile.WithCharacterAppearance(Profile.Appearance.WithMarkings(markings.GetForwardEnumerator().ToList()));
-            SetDirty();
             ReloadProfilePreview();
         }
 
@@ -1254,7 +1269,6 @@ namespace Content.Client.Lobby.UI
                 }
             }
 
-            SetDirty();
             ReloadProfilePreview();
         }
 
@@ -1274,7 +1288,6 @@ namespace Content.Client.Lobby.UI
         {
             Profile = Profile?.WithAge(newAge);
             ReloadPreview();
-            SetDirty();
         }
 
         private void SetSex(Sex newSex)
@@ -1297,14 +1310,12 @@ namespace Content.Client.Lobby.UI
             UpdateGenderControls();
             Markings.SetSex(newSex);
             ReloadProfilePreview();
-            SetDirty();
         }
 
         private void SetGender(Gender newGender)
         {
             Profile = Profile?.WithGender(newGender);
             ReloadPreview();
-            SetDirty();
         }
 
         private void SetDisplayPronouns(string? displayPronouns)
@@ -1352,7 +1363,6 @@ namespace Content.Client.Lobby.UI
             UpdateHeightWidthSliders();
             UpdateWeight();
             UpdateSpeciesGuidebookIcon();
-            IsDirty = true;
             ReloadProfilePreview();
             ReloadClothes(); // Species may have job-specific gear, reload the clothes
         }
@@ -2012,7 +2022,11 @@ namespace Content.Client.Lobby.UI
             _traits.Clear();
             foreach (var trait in _prototypeManager.EnumeratePrototypes<TraitPrototype>())
             {
-                var usable = _characterRequirementsSystem.CheckRequirementsValid(
+                //backmen-start: sponsor traits
+                var usable = !(trait.SponsorOnly && !_clientSponsorsManager.GetClientPrototypes().Contains(trait.ID));
+                //backmen-end: sponsor traits
+
+                usable = usable && _characterRequirementsSystem.CheckRequirementsValid(
                     trait.Requirements,
                     highJob,
                     Profile ?? HumanoidCharacterProfile.DefaultWithSpecies(),
@@ -2032,6 +2046,9 @@ namespace Content.Client.Lobby.UI
                 var selector = _traitPreferences[i];
                 selector.Valid = usable;
                 selector.ShowUnusable = showUnusable.Value;
+
+                if (trait.SponsorOnly)
+                    selector.ToolTip += $" ({Loc.GetString("sponsor-only")})";
             }
 
             if (_traits.Count == 0)

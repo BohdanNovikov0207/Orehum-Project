@@ -1,4 +1,5 @@
 using Content.Server.Bible.Components;
+using Content.Server.Speech;
 using Content.Shared.Abilities.Psionics;
 using Content.Shared.Administration.Logs;
 using Content.Shared.Body.Components;
@@ -33,6 +34,7 @@ public sealed class SacrificialAltarSystem : SharedSacrificialAltarSystem
         base.Initialize();
 
         SubscribeLocalEvent<SacrificialAltarComponent, SacrificeDoAfterEvent>(OnDoAfter);
+        SubscribeLocalEvent<SacrificialAltarComponent, ListenEvent>(OnListenEvent); // orehum
     }
 
     private void OnDoAfter(Entity<SacrificialAltarComponent> ent, ref SacrificeDoAfterEvent args)
@@ -125,4 +127,52 @@ public sealed class SacrificialAltarSystem : SharedSacrificialAltarSystem
         };
         DoAfter.TryStartDoAfter(args, out ent.Comp.DoAfter);
     }
+
+    // Orehum Start
+    private void OnListenEvent(EntityUid uid, SacrificialAltarComponent component, ref ListenEvent args)
+    {
+        if (!component.StartedServiceToGod)
+            return;
+
+        var source = args.Source;
+        if (source == component.Speaker)
+        {
+            component.LastMessage = args.Message;
+
+            if (component.AlreadySpoken.Count > 0)
+            {
+                var delta = component.AlreadySpoken.Count * component.GlimmerChange;
+                if (!component.EvilService)
+                    delta = -delta;
+
+                _glimmer.DeltaGlimmerOutput(delta);
+                component.AlreadySpoken.Clear();
+            }
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(component.LastMessage)
+            || component.AlreadySpoken.Contains(source)
+            || component.LastMessage != args.Message)
+            return;
+
+        component.AlreadySpoken.Add(source);
+    }
+
+    protected override void StartServiceToGod(Entity<SacrificialAltarComponent> ent, EntityUid user, bool isEvil)
+    {
+        ent.Comp.EvilService = isEvil;
+        ent.Comp.StartedServiceToGod = true;
+        ent.Comp.Speaker = user;
+        _popup.PopupEntity("Вы начали свое служение!", user);
+        DirtyField(ent.AsNullable(), nameof(ent.Comp.StartedServiceToGod));
+    }
+
+    protected override void StopServiceToGod(Entity<SacrificialAltarComponent> ent, EntityUid user)
+    {
+        ent.Comp.StartedServiceToGod = false;
+        _popup.PopupEntity("Вы окончили свое служение.", user);
+        DirtyField(ent.AsNullable(), nameof(ent.Comp.StartedServiceToGod));
+    }
+    // Orehum End
 }

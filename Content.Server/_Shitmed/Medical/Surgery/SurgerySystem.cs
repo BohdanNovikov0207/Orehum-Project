@@ -23,6 +23,7 @@ using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
 using System.Linq;
+using Content.Shared.Silicon.Components;
 using Content.Shared.Verbs;
 
 namespace Content.Server._Shitmed.Medical.Surgery;
@@ -161,7 +162,7 @@ public sealed class SurgerySystem : SharedSurgerySystem
 
     private void OnStepScreamComplete(Entity<SurgeryStepEmoteEffectComponent> ent, ref SurgeryStepEvent args)
     {
-        if (HasComp<ForcedSleepingComponent>(args.Body) || HasComp<NoScreamComponent>(args.Body))
+        if (HasComp<ForcedSleepingComponent>(args.Body) || HasComp<NoScreamComponent>(args.Body) || HasComp<SiliconComponent>(args.Body)) // Orehum fix silicons
             return;
 
         _chat.TryEmoteWithChat(args.Body, ent.Comp.Emote);

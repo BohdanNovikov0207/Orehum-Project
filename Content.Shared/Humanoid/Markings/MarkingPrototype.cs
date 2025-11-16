@@ -47,6 +47,11 @@ namespace Content.Shared.Humanoid.Markings
         [DataField("sprites", required: true)]
         public List<SpriteSpecifier> Sprites { get; private set; } = default!;
 
+        // Corvax-Sponsors-Start
+        [DataField("sponsorOnly")]
+        public bool SponsorOnly = false;
+        // Corvax-Sponsors-End
+
         public Marking AsMarking()
         {
             return new Marking(ID, Sprites.Count);

@@ -22,10 +22,23 @@
     rules:
     - id: Thief
       prob: 0.5
-#    - id: Heretic # goob edit
-#      prob: 0.2
-#    - id: Devil # Goob
-#      prob: 0.3
+    - id: SubWizard
+      prob: 0.05
+    - id: Devil # Goob
+      prob: 0.3
+    - id: Heretic # goob edit
+      prob: 0.2
+
+- type: entity
+  parent: BaseGameRule
+  id: SubGamemodesRuleNoWizard
+  components:
+  - type: SubGamemodes
+    rules:
+    - id: Thief
+      prob: 0.5
+    - id: Devil # Goob
+      prob: 0.3
 
 - type: entity
   id: DeathMatch31
@@ -90,7 +103,7 @@
     #Species that do not work with nukies should be included in this list.
     #Once the issues are fixed the species should be removed from this list to be enabled.
     #Balance concerns are not a valid reason to disable a species, except for high-impact Nukie-specific exploits.
-    - Vox
+    #- Vox
 
 - type: entity
   parent: BaseNukeopsRule
@@ -189,7 +202,7 @@
 
 - type: entity
   id: TraitorReinforcement
-  parent: Traitor
+  parent: BaseTraitorRule
   components:
   - type: TraitorRule
     giveUplink: false
@@ -235,6 +248,54 @@
   parent: BaseGameRule
   components:
   - type: SecretRule
+
+- type: entity
+  abstract: true
+  parent: BaseGameRule
+  id: BaseWizardRule
+  components:
+  - type: AntagObjectives
+    objectives:
+    - WizardSurviveObjective
+    - WizardDemonstrateObjective
+  - type: LoadMapRule
+    gridPath: /Maps/Shuttles/wizard.yml
+  - type: RuleGrids
+  - type: AntagSelection
+  - type: AntagLoadProfileRule
+    speciesOverride: Human
+
+- type: entity
+  parent: BaseWizardRule
+  id: Wizard
+  components:
+  - type: GameRule
+    minPlayers: 10
+  - type: AntagSelection
+    agentName: wizard-round-end-name
+    selectionTime: PrePlayerSpawn
+    definitions:
+    - prefRoles: [ Wizard ]
+      max: 1
+      playerRatio: 1
+      spawnerPrototype: SpawnPointGhostWizard
+      briefing:
+        text: wizard-role-greeting
+        color: Turquoise
+        # TODO: Need Wizard Start sound
+        #sound: "/Audio/Ambience/Antag/wizard_start.ogg"
+      startingGear: WizardBlueGear
+      # TODO: WizardComp as needed
+      components:
+      - type: NpcFactionMember
+        factions:
+        - Wizard
+      - type: RandomMetadata
+        nameSegments:
+        - names_wizard_first
+        - names_wizard_last
+      mindRoles:
+      - MindRoleWizard
 
 - type: entity
   id: Zombie
@@ -283,7 +344,6 @@
         tableId: CalmPestEventsTable
       - !type:NestedSelector
         tableId: SpicyPestEventsTable
-        
 
 - type: entityTable
   id: SpaceTrafficControlTable
@@ -312,29 +372,29 @@
     scheduledGameRules: !type:NestedSelector
       tableId: BasicGameRulesTable
 
-- type: entity
-  id: SpaceTrafficControlEventScheduler # iff we make a selector for EntityTables that can respect StationEventComp restrictions, or somehow impliment them otherwise in said tables,
-  parent: BaseGameRule                  # we can remerge this with the other schedulers, but it will silently fail due to that limitation without a separate scheduler to balance atm.
-  components:
-  - type: BasicStationEventScheduler
-    minimumTimeUntilFirstEvent: 2700 # 45 mins #shows up like half way through shift.
-    minMaxEventTiming:
-      min: 1200 # 20 mins
-      max: 7200 # 120 mins # you probably arent getting a second visitor shuttle in one round, but it is possible.
-    scheduledGameRules: !type:NestedSelector
-      tableId: SpaceTrafficControlTable
-
-- type: entity
-  id: SpaceTrafficControlFriendlyEventScheduler
-  parent: BaseGameRule
-  components:
-  - type: BasicStationEventScheduler
-    minimumTimeUntilFirstEvent: 1200 # 20 mins
-    minMaxEventTiming:
-      min: 600 # 10 mins
-      max: 1800 # 30 mins
-    scheduledGameRules: !type:NestedSelector
-      tableId: UnknownShuttlesFriendlyTable
+# - type: entity
+#   id: SpaceTrafficControlEventScheduler # iff we make a selector for EntityTables that can respect StationEventComp restrictions, or somehow impliment them otherwise in said tables,
+#   parent: BaseGameRule                  # we can remerge this with the other schedulers, but it will silently fail due to that limitation without a separate scheduler to balance atm.
+#   components:
+#   - type: BasicStationEventScheduler
+#     minimumTimeUntilFirstEvent: 2700 # 45 mins #shows up like half way through shift.
+#     minMaxEventTiming:
+#       min: 1200 # 20 mins
+#       max: 7200 # 120 mins # you probably arent getting a second visitor shuttle in one round, but it is possible.
+#     scheduledGameRules: !type:NestedSelector
+#       tableId: SpaceTrafficControlTable
+#
+# - type: entity
+#   id: SpaceTrafficControlFriendlyEventScheduler
+#   parent: BaseGameRule
+#   components:
+#   - type: BasicStationEventScheduler
+#     minimumTimeUntilFirstEvent: 1200 # 20 mins
+#     minMaxEventTiming:
+#       min: 600 # 10 mins
+#       max: 1800 # 30 mins
+#     scheduledGameRules: !type:NestedSelector
+#       tableId: UnknownShuttlesFriendlyTable
 
 - type: entity
   id: HellshiftStationEventScheduler

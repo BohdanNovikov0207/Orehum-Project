@@ -58,7 +58,11 @@ public sealed class SingerSystem : SharedSingerSystem
     protected override void SetUpSwappableInstrument(EntityUid uid, SingerInstrumentPrototype singer)
     {
         if (singer.InstrumentList.Count <= 1)
+        {
+            if (TryComp<SwappableInstrumentComponent>(uid, out var swappable))
+                RemComp(uid, swappable);
             return;
+        }
 
         var swappableComp = EnsureComp<SwappableInstrumentComponent>(uid);
         swappableComp.InstrumentList = singer.InstrumentList;

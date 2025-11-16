@@ -12,3 +12,16 @@ public sealed class UnLoadChunkEvent : CancellableEntityEventArgs
         Chunk = chunk;
     }
 }
+
+/// <summary>
+/// Lavaland: Raised when biome chunk is about to load.
+/// </summary>
+public sealed class BeforeLoadChunkEvent : CancellableEntityEventArgs
+{
+    public Vector2i Chunk { get; set; }
+
+    public BeforeLoadChunkEvent(Vector2i chunk)
+    {
+        Chunk = chunk;
+    }
+}

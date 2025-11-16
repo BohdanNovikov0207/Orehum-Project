@@ -13,3 +13,21 @@
     - SpaceTrafficControlEventScheduler
     - BasicRoundstartVariation
     - LavalandStormScheduler
+    - GlimmerEventScheduler # fix glimmer events
+
+- type: gamePreset
+  id: Heretic
+  alias:
+  - heretic
+  name: heretic-title
+  minPlayers: 20
+  showInVote: true
+  description: heretic-title
+  rules:
+  - Heretic
+  - BasicRoundstartVariation
+  - SubGamemodesRule
+  - BasicStationEventScheduler
+  - MeteorSwarmScheduler
+  - LavalandStormScheduler
+  - GlimmerEventScheduler # fix glimmer events

@@ -47,7 +47,7 @@ public sealed class PreventChasmFallingSystem : EntitySystem
             _transform.SetCoordinates(args.Entity, newCoords);
             _transform.AttachToGridOrMap(args.Entity, Transform(args.Entity));
             _audio.PlayPvs("/Audio/Items/Mining/fultext_launch.ogg", args.Entity);
-            if (args.Entity != uid)
+            if (args.Entity != uid && comp.DeleteOnUse)
                 QueueDel(uid);
 
             coordsValid = true;

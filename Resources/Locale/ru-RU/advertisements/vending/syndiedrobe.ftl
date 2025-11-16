@@ -1,3 +1,4 @@
+advertisement-syndiedrobe-0 = Смерть NT!
 advertisement-syndiedrobe-1 = Совершенно новые наряды!
 advertisement-syndiedrobe-2 = Крышесносные наряды для любого случая!
 advertisement-syndiedrobe-3 = Быть негодяем может быть стильно.

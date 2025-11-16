@@ -1,5 +1,5 @@
 - type: typingIndicator
-  id: felinid
+  id: Felinid
   spritePath: /Textures/DeltaV/Effects/speech.rsi
   typingState: felinid0
   offset: 0, 0.2 # 0625
@@ -21,3 +21,8 @@
   spritePath: /Textures/_EE/Effects/speech.rsi
   typingState: thaven0
   offset: 0, 0.1 # 0625
+
+- type: typingIndicator
+  id: feroxi
+  spritePath: /Textures/_DV/Effects/speech.rsi
+  typingState: feroxi0

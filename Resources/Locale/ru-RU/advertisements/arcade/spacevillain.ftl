@@ -1,3 +1,4 @@
+advertisement-space-villain-0 = Муа-хах-хах-хах!
 advertisement-space-villain-1 = Достаточно ли вы круты, чтобы пройти эту игру?
 advertisement-space-villain-2 = Победите плохого парня и получите приз!
 advertisement-space-villain-3 = СРАЗИСЬ СО МНОЙ!

@@ -60,3 +60,9 @@
 - type: metabolizerType
   id: Plasmaman
   name: metabolizer-type-plasmaman
+
+# orehum
+
+- type: metabolizerType
+  id: AshWalker
+  name: metabolizer-type-ashwalker

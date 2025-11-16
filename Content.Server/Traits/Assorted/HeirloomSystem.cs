@@ -38,7 +38,7 @@ public sealed class HeirloomSystem : EntitySystem
                 continue;
 
             var ev = new MoodEffectEvent(moodlet);
-            RaiseLocalEvent(uid, ev);
+            RaiseLocalEvent(uid, ref ev);
         }
 
         query.Dispose();

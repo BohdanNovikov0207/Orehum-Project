@@ -200,6 +200,9 @@
         },
         {
             "name": "Thrall"
+        },
+        {
+            "name": "Mindcontrolled"
         }
     ]
 }

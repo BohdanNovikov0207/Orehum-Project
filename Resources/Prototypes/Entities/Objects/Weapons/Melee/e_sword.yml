@@ -243,7 +243,6 @@
       doAfterDuration: 4.0
     - type: Contraband
       severity: Syndicate
-      allowedDepartments: null
   - type: Sprite
     sprite: Objects/Weapons/Melee/e_dagger.rsi
     layers:
@@ -330,6 +329,9 @@
   description: A sleek energy weapon, its blade hums with volatile plasma, expertly contained to cut through nearly any material. The serial number on the hilt marks this gun as belonging to an NT Security Officer. # how do I make the text blue
   suffix: Security Loadouts
   components:
+  - type: Reflect
+    spread: 25
+    reflectProb: 0.15
   - type: MeleeWeapon
     attackRate: 1.25
   - type: ItemToggleMeleeWeapon
@@ -349,6 +351,7 @@
   components:
   - type: ItemToggle
     onUse: false # wielding events control it instead
+    onActivate: false # prevents the weapon from being able to be turned on when it is on the ground
     soundActivate:
       path: /Audio/Weapons/ebladeon.ogg
       params:

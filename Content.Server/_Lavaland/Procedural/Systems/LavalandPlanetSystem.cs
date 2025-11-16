@@ -194,9 +194,9 @@ public sealed class LavalandPlanetSystem : EntitySystem
         {
             var flag = IFFFlags.Hide;
 
-            #if DEBUG || TOOLS
+            //#if DEBUG || TOOLS
             flag = IFFFlags.HideLabel;
-            #endif
+            //#endif
 
             _shuttle.AddIFFFlag(grid, flag);
         }

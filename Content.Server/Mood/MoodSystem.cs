@@ -89,7 +89,7 @@ public sealed class MoodSystem : EntitySystem
         RemComp<SaturationScaleOverlayComponent>(uid);
     }
 
-    private void OnRemoveEffect(EntityUid uid, MoodComponent component, MoodRemoveEffectEvent args)
+    private void OnRemoveEffect(EntityUid uid, MoodComponent component, ref MoodRemoveEffectEvent args)
     {
         if (!_config.GetCVar(CCVars.MoodEnabled))
             return;
@@ -130,7 +130,7 @@ public sealed class MoodSystem : EntitySystem
         args.ModifySpeed(1, modifier);
     }
 
-    private void OnMoodEffect(EntityUid uid, MoodComponent component, MoodEffectEvent args)
+    private void OnMoodEffect(EntityUid uid, MoodComponent component, ref MoodEffectEvent args)
     {
         if (!_config.GetCVar(CCVars.MoodEnabled)
             || !_prototypeManager.TryIndex<MoodEffectPrototype>(args.EffectId, out var prototype) )
@@ -234,7 +234,7 @@ public sealed class MoodSystem : EntitySystem
             return;
 
         var ev = new MoodEffectEvent(proto.MoodletOnEnd);
-        EntityManager.EventBus.RaiseLocalEvent(uid, ev);
+        EntityManager.EventBus.RaiseLocalEvent(uid, ref ev);
     }
 
     private void OnMobStateChanged(EntityUid uid, MoodComponent component, MobStateChangedEvent args)
@@ -245,12 +245,12 @@ public sealed class MoodSystem : EntitySystem
         if (args.NewMobState == MobState.Dead && args.OldMobState != MobState.Dead)
         {
             var ev = new MoodEffectEvent("Dead");
-            RaiseLocalEvent(uid, ev);
+            RaiseLocalEvent(uid, ref ev);
         }
         else if (args.OldMobState == MobState.Dead && args.NewMobState != MobState.Dead)
         {
             var ev = new MoodRemoveEffectEvent("Dead");
-            RaiseLocalEvent(uid, ev);
+            RaiseLocalEvent(uid, ref ev);
         }
         RefreshMood(uid, component);
     }
@@ -431,6 +431,6 @@ public sealed class MoodSystem : EntitySystem
             }
 
         var ev = new MoodEffectEvent(protoId);
-        RaiseLocalEvent(uid, ev);
+        RaiseLocalEvent(uid, ref ev);
     }
 }

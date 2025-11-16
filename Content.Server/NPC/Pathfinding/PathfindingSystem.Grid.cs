@@ -57,7 +57,7 @@ public sealed partial class PathfindingSystem
         foreach (var change in ev.Changes)
         {
             if (change.OldTile.IsEmpty == change.NewTile.IsEmpty)
-                return;
+                continue;
 
             DirtyChunk(ev.Entity, _maps.GridTileToLocal(ev.Entity, ev.Entity.Comp, change.GridIndices));
         }
@@ -79,7 +79,7 @@ public sealed partial class PathfindingSystem
         component.Chunks.Clear();
     }
 
-    private void UpdateGrid(ParallelOptions options)
+    private void UpdateGrid()
     {
         if (PauseUpdating)
             return;
@@ -141,10 +141,9 @@ public sealed partial class PathfindingSystem
             // This is for map <> grid pathfinding
 
             // Without parallel this is roughly 3x slower on my desktop.
-            Parallel.For(0, dirt.Length, options, i =>
-            {
-                BuildBreadcrumbs(dirt[i], (uid, mapGridComp));
-            });
+            _buildBreadcrumbsJob.Dirt = dirt;
+            _buildBreadcrumbsJob.Grid = (uid, mapGridComp);
+            _parallel.ProcessNow(_buildBreadcrumbsJob, dirt.Length);
 
             const int Division = 4;
 
@@ -158,44 +157,18 @@ public sealed partial class PathfindingSystem
 
             for (var it = 0; it < Division; it++)
             {
-                var it1 = it;
-
-                Parallel.For(0, dirt.Length, options, j =>
-                {
-                    var chunk = dirt[j];
-                    // Check if the chunk is safe on this iteration.
-                    var x = Math.Abs(chunk.Origin.X % 2);
-                    var y = Math.Abs(chunk.Origin.Y % 2);
-                    var index = x * 2 + y;
-
-                    if (index != it1)
-                        return;
-
-                    ClearOldPolys(chunk);
-                });
+                _clearOldPolysJob.Dirt = dirt; // orehum
+                _clearOldPolysJob.It1 = it; // orehum
+                _parallel.ProcessNow(_clearOldPolysJob, dirt.Length); // orehum
             }
 
             // TODO: You can probably skimp on some neighbor chunk caches
             for (var it = 0; it < Division; it++)
             {
-                var it1 = it;
-
-                Parallel.For(0, dirt.Length, options, j =>
-                {
-                    var chunk = dirt[j];
-                    // Check if the chunk is safe on this iteration.
-                    var x = Math.Abs(chunk.Origin.X % 2);
-                    var y = Math.Abs(chunk.Origin.Y % 2);
-                    var index = x * 2 + y;
-
-                    if (index != it1)
-                        return;
-
-                    BuildNavmesh(chunk, pathfinding);
-#if DEBUG
-                    Interlocked.Increment(ref updateCount);
-#endif
-                });
+                _buildNavMeshJob.Dirt = dirt; // orehum
+                _buildNavMeshJob.It1 = it; // orehum
+                _buildNavMeshJob.Pathfinding = pathfinding; // orehum
+                _parallel.ProcessNow(_buildNavMeshJob, dirt.Length); // orehum
             }
 
             // Handle portals at the end after having cleared their neighbors above.
@@ -264,7 +237,7 @@ public sealed partial class PathfindingSystem
 
     private void OnBodyTypeChange(ref PhysicsBodyTypeChangedEvent ev)
     {
-        if (TryComp(ev.Entity, out TransformComponent? xform) &&
+        if (_xformQuery.TryComp(ev.Entity, out var xform) &&
             xform.GridUid != null)
         {
             var aabb = _lookup.GetAABBNoContainer(ev.Entity, xform.Coordinates.Position, xform.LocalRotation);
@@ -304,7 +277,7 @@ public sealed partial class PathfindingSystem
         EnsureComp<GridPathfindingComponent>(ev.EntityUid);
 
         // Pathfinder refactor
-        var mapGrid = Comp<MapGridComponent>(ev.EntityUid);
+        var mapGrid = _gridQuery.Comp(ev.EntityUid);
 
         for (var x = Math.Floor(mapGrid.LocalAABB.Left); x <= Math.Ceiling(mapGrid.LocalAABB.Right + ChunkSize); x += ChunkSize)
         {
@@ -325,7 +298,7 @@ public sealed partial class PathfindingSystem
     /// </summary>
     private void DirtyChunk(EntityUid gridUid, EntityCoordinates coordinates)
     {
-        if (!TryComp<GridPathfindingComponent>(gridUid, out var comp))
+        if (!_gridPathfindingQuery.TryComp(gridUid, out var comp))
             return;
 
         var currentTime = _timing.CurTime;
@@ -340,7 +313,7 @@ public sealed partial class PathfindingSystem
 
     private void DirtyChunkArea(EntityUid gridUid, Box2 aabb)
     {
-        if (!TryComp<GridPathfindingComponent>(gridUid, out var comp))
+        if (!_gridPathfindingQuery.TryComp(gridUid, out var comp))
             return;
 
         var currentTime = _timing.CurTime;

@@ -40,6 +40,11 @@ public sealed partial class TraitPrototype : IPrototype, IComparable
     [DataField]
     public int ItemGroupSlots = 1;
 
+    // Corvax-Sponsors-Start
+    [DataField("sponsorOnly")]
+    public bool SponsorOnly = false;
+    // Corvax-Sponsors-End
+
 
     [DataField]
     public List<CharacterRequirement> Requirements = new();

@@ -45,7 +45,7 @@ public sealed partial class PathfindingSystem
 
         // TODO
         if ((end.Data.Flags & PathfindingBreadcrumbFlag.Space) != 0x0 &&
-            (!TryComp<GravityComponent>(end.GraphUid, out var gravity) || !gravity.Enabled))
+            (!_gravityQuery.TryComp(end.GraphUid, out var gravity) || !gravity.Enabled))
         {
             return 0f;
         }

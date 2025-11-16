@@ -50,7 +50,7 @@ public sealed partial class NPCSteeringSystem
         // Handle the case where the node is a climb, we can climb, and we are climbing.
         else if ((node.Data.Flags & PathfindingBreadcrumbFlag.Climb) != 0x0 &&
             (steering.Flags & PathFlags.Climbing) != 0x0 &&
-            TryComp<ClimbingComponent>(uid, out var climbing) &&
+            _climbingQuery.TryComp(uid, out var climbing) &&
             climbing.IsClimbing)
         {
             return true;
@@ -427,7 +427,7 @@ public sealed partial class NPCSteeringSystem
         // TODO: Really need layer support
         CollisionGroup mask = 0;
 
-        if (TryComp<PhysicsComponent>(uid, out var physics))
+        if (_physicsQuery.TryComp(uid, out var physics))
         {
             mask = (CollisionGroup)physics.CollisionMask;
         }

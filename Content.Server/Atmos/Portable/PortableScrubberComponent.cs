@@ -1,5 +1,6 @@
 using Content.Shared.Atmos;
 using Content.Shared.Construction.Prototypes;
+using Content.Shared.Guidebook;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype;
 
 namespace Content.Server.Atmos.Portable
@@ -31,6 +32,17 @@ namespace Content.Server.Atmos.Portable
             Gas.Ammonia,
             Gas.NitrousOxide,
             Gas.Frezon,
+            Gas.BZ,
+            Gas.Pluoxium,
+            Gas.Hydrogen,
+            Gas.Nitrium,
+            Gas.Healium,
+            Gas.HyperNoblium,
+            Gas.ProtoNitrate,
+            Gas.Zauker,
+            Gas.Halon,
+            Gas.Helium,
+            Gas.AntiNoblium
         };
 
         [ViewVariables(VVAccess.ReadWrite)]
@@ -41,6 +53,19 @@ namespace Content.Server.Atmos.Portable
         /// </summary>
         [DataField]
         public float MaxPressure = 2500;
+
+        /// <summary>
+        /// The speed at which gas is scrubbed from the environment.
+        /// </summary>
+        [DataField, ViewVariables(VVAccess.ReadWrite)]
+        public float TransferRate = 800;
+
+        #region GuidebookData
+
+        [GuidebookData]
+        public float Volume => Air.Volume;
+
+        #endregion
 
         /// <summary>
         ///     The base amount of maximum internal pressure
@@ -60,12 +85,6 @@ namespace Content.Server.Atmos.Portable
         /// </summary>
         [DataField]
         public float PartRatingMaxPressureModifier = 1.5f;
-
-        /// <summary>
-        ///     The speed at which gas is scrubbed from the environment.
-        /// </summary>
-        [ViewVariables(VVAccess.ReadWrite)]
-        public float TransferRate = 800;
 
         /// <summary>
         ///     The base speed at which gas is scrubbed from the environment.
