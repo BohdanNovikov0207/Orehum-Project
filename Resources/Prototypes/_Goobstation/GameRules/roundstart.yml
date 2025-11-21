@@ -13,7 +13,7 @@
   id: Heretic
   components:
   - type: GameRule
-    minPlayers: 25
+    minPlayers: 15
   - type: AntagSelection
     definitions:
     - prefRoles: [ Heretic ]
@@ -32,7 +32,7 @@
   components:
   - type: ChangelingRule
   - type: GameRule
-    minPlayers: 15
+    minPlayers: 10
   - type: AntagObjectives
     objectives:
     - ChangelingStealDNAObjective
@@ -55,7 +55,7 @@
   components:
   - type: DevilRule
   - type: GameRule
-    minPlayers: 15
+    minPlayers: 7
   - type: AntagObjectives
     objectives:
     - DevilContractObjective

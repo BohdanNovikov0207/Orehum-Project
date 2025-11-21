@@ -10,6 +10,8 @@ using Content.Shared.Radio.Components;
 using Content.Shared.Radio.EntitySystems;
 using Robust.Shared.Network;
 using Robust.Shared.Player;
+using Robust.Server.Audio;
+using Robust.Shared.Audio;
 
 namespace Content.Server.Radio.EntitySystems;
 
@@ -17,6 +19,7 @@ public sealed class HeadsetSystem : SharedHeadsetSystem
 {
     [Dependency] private readonly INetManager _netMan = default!;
     [Dependency] private readonly RadioSystem _radio = default!;
+    [Dependency] private readonly AudioSystem _audio = default!;
     [Dependency] private readonly LanguageSystem _language = default!;
 
     public override void Initialize()
@@ -113,6 +116,8 @@ public sealed class HeadsetSystem : SharedHeadsetSystem
             };
             _netMan.ServerSendMessage(msg, actor.PlayerSession.Channel);
         }
+        
+        _audio.PlayPvs(component.RadioReceiveSoundPath, uid, AudioParams.Default.WithVolume(-10f));
     }
 
     private void OnEmpPulse(EntityUid uid, HeadsetComponent component, ref EmpPulseEvent args)

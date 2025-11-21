@@ -8,7 +8,7 @@ public sealed partial class CCVars
     ///     Allows enabling/disabling player-started votes for ultimate authority
     /// </summary>
     public static readonly CVarDef<bool> VoteEnabled =
-        CVarDef.Create("vote.enabled", false, CVar.SERVERONLY);
+        CVarDef.Create("vote.enabled", true, CVar.SERVERONLY);
 
     /// <summary>
     ///     See vote.enabled, but specific to restart votes
@@ -98,7 +98,7 @@ public sealed partial class CCVars
     ///     Whether a votekick initiator must be a ghost or not.
     /// </summary>
     public static readonly CVarDef<bool> VotekickInitiatorGhostRequirement =
-        CVarDef.Create("votekick.initiator_ghost_requirement", true, CVar.SERVERONLY);
+        CVarDef.Create("votekick.initiator_ghost_requirement", false, CVar.SERVERONLY);
 
     /// <summary>
     ///     Should the initiator be whitelisted to initiate a votekick?
@@ -116,7 +116,7 @@ public sealed partial class CCVars
     ///     Whether a votekick voter must be a ghost or not.
     /// </summary>
     public static readonly CVarDef<bool> VotekickVoterGhostRequirement =
-        CVarDef.Create("votekick.voter_ghost_requirement", true, CVar.SERVERONLY);
+        CVarDef.Create("votekick.voter_ghost_requirement", false, CVar.SERVERONLY);
 
     /// <summary>
     ///     Config for how many hours playtime a player must have to be able to vote on a votekick.

@@ -182,7 +182,7 @@
   id: DemomTail1
   bodyPart: Tail
   markingCategory: Tail
-  speciesRestriction: [Human, IPC]
+  speciesRestriction: [Human, IPC, Oni]
   sprites:
   - sprite: _ADT/Mobs/Customization/Demon/custom.rsi
     state: demon_tail
@@ -191,7 +191,7 @@
   id: DemomTailLong
   bodyPart: Tail
   markingCategory: Tail
-  speciesRestriction: [Human, IPC]
+  speciesRestriction: [Human, IPC, Oni]
   sprites:
   - sprite: _ADT/Mobs/Customization/Demon/custom.rsi
     state: long
@@ -200,7 +200,7 @@
   id: DemomTailUp
   bodyPart: Tail
   markingCategory: Tail
-  speciesRestriction: [Human, IPC]
+  speciesRestriction: [Human, IPC, Oni]
   sprites:
   - sprite: _ADT/Mobs/Customization/Demon/custom.rsi
     state: up

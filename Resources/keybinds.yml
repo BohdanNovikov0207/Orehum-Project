@@ -566,43 +566,43 @@ binds:
 - function: Loadout0
   type: State
   key: Num0
-  mod1: Shift
+  mod1: Control
 - function: Loadout1
   type: State
   key: Num1
-  mod1: Shift
+  mod1: Control
 - function: Loadout2
   type: State
   key: Num2
-  mod1: Shift
+  mod1: Control
 - function: Loadout3
   type: State
   key: Num3
-  mod1: Shift
+  mod1: Control
 - function: Loadout4
   type: State
   key: Num4
-  mod1: Shift
+  mod1: Control
 - function: Loadout5
   type: State
   key: Num5
-  mod1: Shift
+  mod1: Control
 - function: Loadout6
   type: State
   key: Num6
-  mod1: Shift
+  mod1: Control
 - function: Loadout7
   type: State
   key: Num7
-  mod1: Shift
+  mod1: Control
 - function: Loadout8
   type: State
   key: Num8
-  mod1: Shift
+  mod1: Control
 - function: Loadout9
   type: State
   key: Num9
-  mod1: Shift
+  mod1: Control
 # WD EDIT START
 - function: LookUp
   type: State

@@ -27,6 +27,7 @@
     - id: ClothingOuterHardsuitBlueshield
     - id: ClothingBlueshieldArmoredCoat
     - id: ClothingShoesBootsMagSec
+    - id: ClothingBeltBlueshieldWebbing
 
 - type: entity
   id: LockerMagistrateFilled
