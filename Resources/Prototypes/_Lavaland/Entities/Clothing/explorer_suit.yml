@@ -336,7 +336,7 @@
         Blunt: 0.35
         Slash: 0.35
         Piercing: 0.45
-        Heat: 0.10
+        Heat: 0.30
         Caustic: 0.30
   - type: ToggleableClothing
     clothingPrototypes:

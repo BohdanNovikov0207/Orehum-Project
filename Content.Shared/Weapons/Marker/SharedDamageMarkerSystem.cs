@@ -10,6 +10,23 @@ using Robust.Shared.Timing;
 using Content.Shared._Lavaland.Weapons.Marker;
 using Content.Shared._Lavaland.Mobs;
 
+using Content.Shared.Containers.ItemSlots;
+using Content.Shared.Weapons.Melee.Components;
+using Content.Shared._Lavaland.Weapons.Crusher.Upgrades.Components;
+using Content.Shared._Lavaland.Weapons.Crusher;
+
+//using Content.Shared.Actions;
+
+using Content.Shared._Lavaland.Damage;
+
+using Robust.Shared.Prototypes;
+
+using Robust.Shared.Map;
+
+using Content.Shared.Coordinates.Helpers;
+
+//using Content.Shared.Weapons.Marker.Chaser;
+
 namespace Content.Shared.Weapons.Marker;
 
 public abstract class SharedDamageMarkerSystem : EntitySystem
@@ -19,6 +36,12 @@ public abstract class SharedDamageMarkerSystem : EntitySystem
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly DamageableSystem _damageable = default!;
     [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
+
+    //[Dependency] private readonly ActionsSystem _actions = default!;
+
+    [Dependency] private readonly IMapManager _mapMan = default!;
+
+    private readonly EntProtoId _chaserPrototype = "LavalandHierophantChaser";
 
     public override void Initialize()
     {
@@ -45,6 +68,55 @@ public abstract class SharedDamageMarkerSystem : EntitySystem
         }
 
         RemCompDeferred<DamageMarkerComponent>(uid);
+
+        if (TryComp<ItemSlotsComponent>(component.Marker, out var slots))
+        {
+            foreach (var slot in slots.Slots.Values)
+            {
+                if (slot.Whitelist?.Tags?.Contains("CrusherCrest") != true)
+                    continue;
+
+                if (slot.Item is not EntityUid crestEntity)
+                    continue;
+
+                if (!TryComp<ItemSlotsComponent>(crestEntity, out var crestSlots))
+                    continue;
+
+                foreach (var innerSlot in crestSlots.Slots.Values)
+                {
+                    if (innerSlot.Item is not EntityUid upgradeEntity)
+                        continue;
+
+                    if (TryComp<CrusherUpgradeHierophantComponent>(upgradeEntity, out var hierophant))
+                    {
+                        // var damage = (int) Math.Round(damageable.TotalDamage.Float() / 10.0);
+                        var finalMaxSteps = 7; // club.ChaserMaxSteps; // + damage;
+
+                        AddImmunity(args.User, 70f);
+
+                        var xform = Transform(uid);
+                        var targetCoords = xform.Coordinates.SnapToGrid(EntityManager, _mapMan);
+
+                        var dummy = Spawn(null, targetCoords);
+
+
+                        var chaser = Spawn(_chaserPrototype, Transform(args.User).Coordinates);
+
+                        if (TryComp<HierophantChaserSharedComponent>(chaser, out var chasercomp))
+                        {
+                            chasercomp.Target = dummy;
+                            chasercomp.MaxSteps *= finalMaxSteps;
+                            chasercomp.Speed += 0.5f;
+                        }
+
+                        Timer.Spawn(TimeSpan.FromSeconds(finalMaxSteps + 100000), () =>
+                        {
+                            QueueDel(dummy);
+                        });
+                    }
+                }
+            }
+        }
     }
 
     public override void Update(float frameTime)
@@ -59,6 +131,9 @@ public abstract class SharedDamageMarkerSystem : EntitySystem
                 continue;
 
             RemCompDeferred<DamageMarkerComponent>(uid);
+
+            //if (comp.Marker != EntityUid.Invalid)
+                //RemComp<MeleeThrowOnHitComponent>(comp.Marker);
         }
     }
 
@@ -95,5 +170,73 @@ public abstract class SharedDamageMarkerSystem : EntitySystem
                 Dirty(uid, component);
             }
         }
+
+        if (projectile.Weapon is { } weapon)
+        {
+            if (TryComp<ItemSlotsComponent>(weapon, out var slots))
+            {
+                foreach (var slot in slots.Slots.Values)
+                {
+                    if (slot.Whitelist?.Tags?.Contains("CrusherCrest") != true)
+                        continue;
+
+                    if (slot.Item is not EntityUid crestEntity)
+                        continue;
+
+                    if (!TryComp<ItemSlotsComponent>(crestEntity, out var crestSlots))
+                        continue;
+
+                    foreach (var innerSlot in crestSlots.Slots.Values)
+                    {
+                        if (innerSlot.Item is not EntityUid upgradeEntity)
+                            continue;
+
+                        if (TryComp<CrusherUpgradeDrakeComponent>(upgradeEntity, out var drake))
+                        {
+                            EnsureComp<MeleeThrowOnHitComponent>(weapon);
+                            /*
+                            var throwComp = EnsureComp<MeleeThrowOnHitComponent>(weapon);
+
+                            throwComp.Speed = drake.Speed;
+                            throwComp.Lifetime = drake.Lifetime;
+
+                            Dirty(weapon, throwComp);
+                            */
+                            // мы делаем прикольчики
+
+                            Timer.Spawn(marker.EndTime - _timing.CurTime,
+                                () =>
+                                {
+                                    //Deferred
+                                    RemComp<MeleeThrowOnHitComponent>(weapon);
+                                });
+                        }
+
+                        if (TryComp<CrusherUpgradeHivelordComponent>(upgradeEntity, out var hivelord))
+                        {
+                            marker.EndTime += TimeSpan.FromSeconds(5);
+                        }
+
+                        if (TryComp<CrusherUpgradeWatcherComponent>(upgradeEntity, out var watcher))
+                        {
+                            var target = args.OtherEntity; 
+                            var lifetime = watcher.Lifetime + ((int) marker.EndTime.TotalSeconds - (int) _timing.CurTime.TotalSeconds);
+
+                            EnsureComp<IcyLookComponent>(target);
+
+                            Timer.Spawn(TimeSpan.FromSeconds(lifetime), () =>
+                            {
+                                RemComp<IcyLookComponent>(target);
+                            });
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void AddImmunity(EntityUid uid, float time = 3f)
+    {
+        EnsureComp<DamageSquareImmunityComponent>(uid).HasImmunityUntil = _timing.CurTime + TimeSpan.FromSeconds(time);
     }
 }

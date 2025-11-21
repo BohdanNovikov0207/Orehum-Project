@@ -28,6 +28,20 @@
   - type: DisarmMalus
   - type: MegafaunaWeaponLooter
 
+  - type: ItemSlots
+    slots:
+      crest:
+        name: Слот под крестовину
+        priority: 1
+        whitelist: !type:EntityWhitelist
+          tags:
+            - CrusherCrest
+  - type: ContainerContainer
+    containers:
+      crest: !type:ContainerSlot
+
+  - type: CrusherUpgradeable
+
 - type: entity
   parent: [LavalandWeaponKineticBase]
   id: LavalandWeaponKineticSpear

@@ -1,0 +1,48 @@
+- type: entity
+  name: крестовина кинетического оружия
+  id: LavalandKineticCrest
+  parent: BaseItem
+  description: Крестовина для кинетического оружия с возможностью вставки трофеев.
+  components:
+    - type: Sprite
+      sprite: _Lavaland/Objects/Specific/Salvage/crests.rsi
+      state: standart
+    - type: Tag
+      tags:
+      - CrusherCrest
+    - type: ItemSlots
+      slots:
+        range_upgrade:
+          name: Слот дестабилизатора
+          priority: 1
+          whitelist: !type:EntityWhitelist
+            tags:
+              - UpgradeMark
+
+        passive_upgrade:
+          name: Слот пассивной способности
+          priority: 2
+          whitelist: !type:EntityWhitelist
+            tags:
+              - UpgradePassive
+
+        fight_upgrade:
+          name: Слот боевой способности
+          priority: 3
+          whitelist:
+            tags:
+              - UpgradeFight
+
+        #boom_upgrade:
+        #  name: Слот взрыва метки
+        #  priority: 4
+        #  whitelist:
+        #    tags:
+        #      - UpgradeBoom
+
+    - type: ContainerContainer
+      containers:
+        range_upgrade: !type:ContainerSlot
+        passive_upgrade: !type:ContainerSlot
+        fight_upgrade: !type:ContainerSlot
+       # boom_upgrade: !type:ContainerSlot

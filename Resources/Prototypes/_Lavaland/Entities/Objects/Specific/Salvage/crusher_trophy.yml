@@ -1,0 +1,159 @@
+- type: entity
+  id: LavalandGoliathCrusherUpgrade
+  parent: BaseItem
+  name: щупальце голиафа
+  description: Всё ещё извивается. 
+  components:
+  - type: Sprite
+    sprite: _Lavaland/Objects/Specific/Salvage/crusher_trophy.rsi
+    state: goliath
+  - type: Item
+    size: Small
+  - type: CrusherUpgradeGoliath
+    damage:
+      types:
+        Blunt: 5
+
+  - type: StaticPrice
+    price: 750
+  - type: Tag
+    tags:
+    - UpgradePassive
+  
+
+- type: entity
+  id: LavalandDrakeCrusherUpgrade
+  parent: BaseItem
+  name: хвостовой шип
+  description: Острый шип, который находился на хвосте убитого дракона. Думаю, твоему оружию он нужнее.
+  components:
+  - type: Sprite
+    sprite: _Lavaland/Objects/Specific/Salvage/crusher_trophy.rsi
+    state: drake
+  - type: Item
+    size: Small
+  - type: CrusherUpgradeDrake
+    
+  - type: StaticPrice
+    price: 20000
+  - type: Tag
+    tags:
+    - UpgradeFight
+
+
+- type: entity
+  id: LavalandHivelordCrusherUpgrade
+  parent: BaseItem
+  name: череп
+  description: Череп пове- погодите, откуда он?
+  components:
+  - type: Sprite
+    sprite: _Lavaland/Objects/Specific/Salvage/crusher_trophy.rsi
+    state: hivelord
+  - type: Item
+    size: Small
+  - type: CrusherUpgradeHivelord
+    
+  - type: StaticPrice
+    price: 750
+  - type: Tag
+    tags:
+    - UpgradePassive
+
+
+- type: entity
+  id: LavalandIcyWatcherCrusherUpgrade
+  parent: BaseItem
+  name: крыло ледяного наблюдателя
+  description: Такое же холодное, как и твоё сердце.
+  components:
+  - type: Sprite
+    sprite: _Lavaland/Objects/Specific/Salvage/crusher_trophy.rsi
+    state: icy
+  - type: Item
+    size: Small
+  - type: CrusherUpgradeWatcher
+    lifetime: 4
+    
+  - type: StaticPrice
+    price: 750
+  - type: Tag
+    tags:
+    - UpgradeMark
+
+
+- type: entity
+  id: LavalandWatcherCrusherUpgrade
+  parent: BaseItem
+  name: крыло наблюдателя
+  description: И на этих штуках они летают?
+  components:
+  - type: Sprite
+    sprite: _Lavaland/Objects/Specific/Salvage/crusher_trophy.rsi
+    state: wing
+  - type: Item
+    size: Small
+  - type: CrusherUpgradeWatcher
+    lifetime: 2
+    
+  - type: StaticPrice
+    price: 750
+  - type: Tag
+    tags:
+    - UpgradeMark
+
+
+- type: entity
+  id: LavalandMagmaWatcherCrusherUpgrade
+  parent: BaseItem
+  name: крыло магмового наблюдателя
+  description: Выглядит горячо.
+  components:
+  - type: Sprite
+    sprite: _Lavaland/Objects/Specific/Salvage/crusher_trophy.rsi
+    state: magma
+  - type: Item
+    size: Small
+  - type: CrusherUpgradeMagmaWatcher  
+    proto: BulletChargeDamage
+    #originalProto: BulletCharge
+
+  - type: StaticPrice
+    price: 750
+  - type: Tag
+    tags:
+    - UpgradeMark
+
+# пулька
+- type: entity
+  id: BulletChargeDamage
+  name: charge bolt
+  parent: BulletCharge
+  categories: [ HideSpawnMenu ]
+  description: Marks a target for additional damage.
+  components:
+  - type: Projectile
+    impactEffect: BulletImpactEffectKinetic
+    damage:
+      types:
+        Heat: 5
+
+
+- type: entity
+  id: LavalandHierophantCrusherUpgrade
+  parent: BaseItem
+  name: вортекс-талисман
+  description: Залипательно. А нет, в нём погасла фиолетовая сила, что находилась в Иерофанте.
+  components:
+  - type: Sprite
+    sprite: _Lavaland/Objects/Specific/Salvage/crusher_trophy.rsi
+    state: hierophant
+  - type: Item
+    size: Small
+  - type: CrusherUpgradeHierophant
+
+  - type: StaticPrice
+    price: 10000
+  - type: Tag
+    tags:
+    - UpgradeFight

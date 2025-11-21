@@ -92,6 +92,7 @@
       amount: 3
     - id: MaterialGoliathHide1
       amount: 3
+    - id: LavalandGoliathCrusherUpgrade
   - type: Fauna # Lavaland Change
 
 - type: entity
@@ -242,6 +243,7 @@
   - type: Butcherable
     spawned:
     - id: FoodHivelordRemains
+    - id: LavalandHivelordCrusherUpgrade
 
 - type: entity
   id: MobHivelordBrood

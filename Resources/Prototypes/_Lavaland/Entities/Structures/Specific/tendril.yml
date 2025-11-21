@@ -68,6 +68,19 @@
     spawns: []
 
 - type: entity
+  id: LavalandTendrilHivelord
+  parent: LavalandTendrilBase
+  name: tendril
+  description: A huge structure.
+  suffix: Повелитель роя
+  components:
+  - type: Tendril
+    maxSpawns: 1
+    mobsToDefeat: 4
+    spawns:
+    - MobHivelord
+
+- type: entity
   id: LavalandTendrilLavaWatcher
   parent: LavalandTendrilBase
   name: tendril
@@ -143,6 +156,8 @@
       weight: 70
       children:
       - id: LavalandTendrilMagmawingWatcher
+      - id: LavalandTendrilIcewingWatcher
+      - id: LavalandTendrilMagmawingWatcher
       - id: LavalandTendrilSpaceCarp
       - id: LavalandTendrilMagmaHand
     - !type:GroupSelector
@@ -150,6 +165,7 @@
       children:
       - id: LavalandTendrilGoliath
       #- id: LavalandTendrilLegion
+      - id: LavalandTendrilHivelord
 
 - type: entity
   name: tendril spawner

@@ -11,3 +11,15 @@
     state: hierophant
   name: alerts-hierophantbeat-name
   description: alerts-hierophantbeat-desc
+
+
+
+# але але, че за копирайт сверху? Дальше моё, а не этого айдена с гуситлером
+- type: alert
+  id: IcyLook
+  category: TileMovement
+  icons:
+  - sprite: /Textures/Mobs/Aliens/Lavaland/watcher.rsi
+    state: dead-unshaded
+  name: Мёртвые останки
+  description: Мурашки пробегают по вашей коже.
