@@ -220,3 +220,59 @@
   - type: BlockCharge
     rechargeTime: 120
     markerReductionTime: 20
+
+
+
+- type: entity
+  parent: LavalandWeaponKineticBase
+  id: LavalandWeaponKineticScythe
+  name: коса линчевателя
+  description: Коса с настолько хлипкой конструкцией, что ты даже не уверен, выдержит ли она ещё один удар.
+  components:
+  - type: Sprite
+    sprite: _Lavaland/Objects/Weapons/Crushers/vigilante_scythe.rsi
+    state: icon
+  - type: UseDelay
+    delay: 1
+  - type: MeleeWeapon
+    attackRate: 1.25
+    wideAnimationRotation: -135
+    damage:
+      types:
+        Heat: 5
+        Slash: 15
+    soundHit:
+      collection: MetalThud
+    angle: 90 #0
+    animation: WeaponArcPunch
+    range: 1
+  - type: Item
+    size: Ginormous
+    sprite: _Lavaland/Objects/Weapons/Crushers/vigilante_scythe-inhands.rsi
+  - type: GunRequiresWield
+  - type: Wieldable
+  - type: MeleeRequiresWield
+    fumbleOnAttempt: true
+  - type: DamageBoostOnMarker
+    boost:
+      types: 
+        Heat: 10
+        Slash: 25
+  - type: BlockCharge
+    rechargeTime: 90
+    markerReductionTime: 20
+  - type: LeechOnMarker
+    leech:
+      groups:
+        Brute: -15
+        Burn: -15
+  - type: ItemSlots
+    slots:
+      crest:
+        name: Слот под крестовину
+        startingItem: LavalandKineticVigilanteCrest
+        priority: 1
+        whitelist: !type:EntityWhitelist
+          tags:
+            - CrusherCrest
+

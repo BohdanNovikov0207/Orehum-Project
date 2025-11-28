@@ -18,6 +18,9 @@ using Content.Shared.Projectiles;
 
 using Content.Shared.Weapons.Ranged.Components;
 
+using Content.Shared._Lavaland.Weapons.Crusher.Crests.Components;
+using Content.Shared.Weapons.Ranged.Events;
+
 namespace Content.Shared._Lavaland.Weapons.Crusher;
 
 public sealed class CrusherUpgradeableSystem : EntitySystem

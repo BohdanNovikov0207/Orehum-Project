@@ -17,12 +17,12 @@
 # але але, че за копирайт сверху? Дальше моё, а не этого айдена с гуситлером
 - type: alert
   id: IcyLook
-  category: TileMovement2
+  category: IcyLook
   icons:
   - sprite: /Textures/Mobs/Aliens/Lavaland/watcher.rsi
     state: dead-unshaded
   name: Мёртвые останки
-  description: Мурашки пробегают по вашей коже.
+  description: Мурашки пробегают по вашей коже. Скорость передвижения снижена.
 
 
 - type: alert
@@ -33,3 +33,13 @@
     state: carp
   name: Кровавый голод
   description: Вы чувствуете слабость.
+
+
+- type: alert
+  id: VigilanteEye
+  category: VigilanteEye
+  icons:
+  - sprite: /Textures/_Lavaland/Interface/Alerts/vigilante_eye.rsi
+    state: vigilante
+  name: Глаз Линчевателя
+  description: Вас переполняет решимость. 100% входящего урона будет заблокировано.

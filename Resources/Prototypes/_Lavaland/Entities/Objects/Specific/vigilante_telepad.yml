@@ -1,0 +1,10 @@
+- type: entity
+  id: LavalandVigilanteTelepad
+  name: линчеватель
+#  description:
+  placement:
+    mode: SnapgridCenter
+  components:
+  - type: Clickable
+  - type: InteractionOutline
+  - type: VigilanteTelepad

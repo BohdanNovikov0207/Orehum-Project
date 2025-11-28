@@ -25,6 +25,8 @@ using Robust.Shared.Map;
 
 using Content.Shared.Coordinates.Helpers;
 
+using Content.Shared._Lavaland.Weapons.Crusher.Crests.Components;
+
 //using Content.Shared.Weapons.Marker.Chaser;
 
 namespace Content.Shared.Weapons.Marker;
@@ -109,10 +111,24 @@ public abstract class SharedDamageMarkerSystem : EntitySystem
                             chasercomp.Speed += 0.5f;
                         }
 
-                        Timer.Spawn(TimeSpan.FromSeconds(finalMaxSteps + 100000), () =>
+                        Timer.Spawn(TimeSpan.FromSeconds(finalMaxSteps + 100), () =>
                         {
                             QueueDel(dummy);
                         });
+                    }
+
+                    if (TryComp<CrusherUpgradeVigilanteComponent>(upgradeEntity, out var vigilante))
+                    {
+                        if (!HasComp<VigilanteEyeComponent>(args.User))
+                        {
+                            EnsureComp<VigilanteEyeComponent>(args.User);
+                            float bonus = (float) (component.EndTime - _timing.CurTime).TotalSeconds / 10f;
+                            Timer.Spawn(TimeSpan.FromSeconds(vigilante.Lifetime + bonus), () =>
+                            {
+                                if (HasComp<VigilanteEyeComponent>(args.User))
+                                    RemComp<VigilanteEyeComponent>(args.User);
+                            });
+                        }
                     }
                 }
             }
@@ -185,6 +201,11 @@ public abstract class SharedDamageMarkerSystem : EntitySystem
 
                     if (!TryComp<ItemSlotsComponent>(crestEntity, out var crestSlots))
                         continue;
+
+                    if (TryComp<CrusherCrestHunterComponent>(crestEntity, out var crestHunter))
+                    {
+                        marker.EndTime += TimeSpan.FromSeconds(5);
+                    }
 
                     foreach (var innerSlot in crestSlots.Slots.Values)
                     {
