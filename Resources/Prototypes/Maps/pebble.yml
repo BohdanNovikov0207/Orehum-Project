@@ -25,6 +25,7 @@
             BlueshieldOfficer: [ 1, 1]
             NanotrasenRepresentative: [ 1, 1 ]
             HeadOfPersonnel: [ 1, 1 ]
+            AdministrativeAssistant: [ 1, 1 ]
             Bartender: [ 1, 2 ]
             Botanist: [ 2, 2 ]
             Chef: [ 2 , 2 ]
@@ -62,6 +63,7 @@
             SeniorOfficer: [ 1, 1 ]
             SecurityOfficer: [ 2, 2 ]
             SecurityCadet: [ 1, 1 ]
+            PrisonGuard: [ 1, 1 ]
           #supply
             Quartermaster: [ 1, 1 ]
             MailCarrier: [ 1, 2 ]

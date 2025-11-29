@@ -69,6 +69,13 @@
   text: "/ServerInfo/Guidebook/SpaceLaw/CrimeList/CrimeGroups/SpaceLaw_CrimeCategories.xml"
   children:
   - Crimes Government
+  - Crimes Personality
+  - Crimes Contraband
+  - Crimes Tools
+  - Crimes Society
+  - Crimes Theft
+  - Crimes Penetration
+  - Crimes Negligence
 
 # Standalone Entries
 - type: guideEntry
@@ -160,3 +167,38 @@
   id: Crimes Government
   name: X-00
   text: "/ServerInfo/Guidebook/SpaceLaw/CrimeList/CrimeGroups/SL_CrimesGovernment.xml"
+
+- type: guideEntry
+  id: Crimes Personality
+  name: X-01
+  text: "/ServerInfo/Guidebook/SpaceLaw/CrimeList/CrimeGroups/SL_CrimesPersonality.xml"
+
+- type: guideEntry
+  id: Crimes Contraband
+  name: X-02
+  text: "/ServerInfo/Guidebook/SpaceLaw/CrimeList/CrimeGroups/SL_CrimesContraband.xml"
+
+- type: guideEntry
+  id: Crimes Tools
+  name: X-03
+  text: "/ServerInfo/Guidebook/SpaceLaw/CrimeList/CrimeGroups/SL_CrimesTools.xml"
+
+- type: guideEntry
+  id: Crimes Society
+  name: X-04
+  text: "/ServerInfo/Guidebook/SpaceLaw/CrimeList/CrimeGroups/SL_CrimesSociety.xml"
+
+- type: guideEntry
+  id: Crimes Theft
+  name: X-05
+  text: "/ServerInfo/Guidebook/SpaceLaw/CrimeList/CrimeGroups/SL_CrimesTheft.xml"
+
+- type: guideEntry
+  id: Crimes Penetration
+  name: X-06
+  text: "/ServerInfo/Guidebook/SpaceLaw/CrimeList/CrimeGroups/SL_CrimesPenetration.xml"
+
+- type: guideEntry
+  id: Crimes Negligence
+  name: X-07
+  text: "/ServerInfo/Guidebook/SpaceLaw/CrimeList/CrimeGroups/SL_CrimesNegligence.xml"

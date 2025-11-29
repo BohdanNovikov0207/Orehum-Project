@@ -57,6 +57,7 @@ guide-entry-sop-cmo = Главный Врач
 guide-entry-sop-ce = Старший Инженер
 # Logistics Officer changed by Delta-V (original: Quartermaster)
 guide-entry-sop-lo = Квартирмейстер
+guide-entry-sop-AdministrativeAssistant = Секретарь
 # - Dignitary
 guide-entry-sop-bso = Офицер "Синий Щит"
 guide-entry-sop-ntr = Представитель NT

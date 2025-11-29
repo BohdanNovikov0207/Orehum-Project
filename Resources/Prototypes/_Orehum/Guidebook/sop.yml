@@ -99,6 +99,7 @@
   - ChiefMedicalOfficer SOP
   - ChiefEngineer SOP
   - LogisticsOfficer SOP # Changed for Delta-V Naming Scheme - Original: Quartermaster
+  - AdministrativeAssistant SOP
 
 - type: guideEntry
   id: Dignitary SOP
@@ -341,6 +342,11 @@
   id: LogisticsOfficer SOP
   name: guide-entry-sop-lo
   text: "/ServerInfo/Guidebook/SOP/Jobs/Command/LogisticsOfficerSOP.xml"
+
+- type: guideEntry
+  id: AdministrativeAssistant SOP
+  name: guide-entry-sop-AdministrativeAssistant
+  text: "/ServerInfo/Guidebook/SOP/Jobs/Command/AdministrativeAssistantSOP.xml"
 
 # Dignitary SOP Entries
 - type: guideEntry
