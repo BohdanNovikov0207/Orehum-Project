@@ -2,13 +2,11 @@
   license: "CC-BY-SA-3.0"
   copyright: "Burn It Down by Linkin Park"
   source: "https://www.youtube.com/watch?v=dxytyRy-O1k"
-  PS: "RIP Chester"
 
 - files: ["NewDivide.ogg"]
   license: "CC-BY-SA-3.0"
   copyright: "New Divide by Linkin Park"
   source: "https://www.youtube.com/watch?v=ysSxxIqKNN0"
-  PS: "RIP Chester"
 
 - files: ["SweetFlower.ogg"]
   license: "CC-BY-SA-3.0"
@@ -253,27 +251,27 @@
 - files: ["tpbreathe.ogg"]
   license: "CC-BY-SA-3.0"
   copyright: "The Prodigy - Breathe."
-  sorce: "https://youtu.be/rmHDhAohJlQ?si=IDL3MvdmZbSfZs76"
+  source: "https://youtu.be/rmHDhAohJlQ?si=IDL3MvdmZbSfZs76"
 
 - files: ["Soviet-WW2.ogg"]
   license: "CC-BY-SA-3.0"
   copyright: "Soviet WW2 - Dark is the Night"
-  sorce: "https://www.youtube.com/watch?v=750QGi3RO0"
+  source: "https://www.youtube.com/watch?v=750QGi3RO0"
 
 - files: ["Paid-To-Party.ogg"]
   license: "CC-BY-SA-3.0"
   copyright: "Party Hard - Paid To Party by Felipe Adorno Vassao"
-  sorce: "https://www.youtube.com/watch?v=mybpH8K6K1o"
+  source: "https://www.youtube.com/watch?v=mybpH8K6K1o"
 
 - files: ["Party-Killer.ogg"]
   license: "CC-BY-SA-3.0"
   copyright: "Party Hard - Party Killer"
-  sorce: "https://www.youtube.com/watch?v=V9l4YLVUEtE"
+  source: "https://www.youtube.com/watch?v=V9l4YLVUEtE"
 
 - files: ["PHLucky.ogg"]
   license: "CC-BY-SA-3.0"
   copyright: "Party Hard - Lucky"
-  sorce: "https://www.youtube.com/watch?v=Xef-kx_55kY"
+  source: "https://www.youtube.com/watch?v=Xef-kx_55kY"
 
 - files: ["HARD-DRIVE.ogg"]
   license: "CC-BY-SA-3.0"
@@ -306,11 +304,11 @@
   source: "https://www.youtube.com/watch?v=YnopHCL1Jk8"
 
 - files: [deviltown.ogg]
-  license: "CC-BY-SA-3"
+  license: "CC-BY-SA-3.0"
   copyright: "cavetown - Devil Town"
   source: "https://www.youtube.com/watch?v=KvaxYUfGHnk"
 
 - files: [SYT.ogg]
-  license: "CC-BY-SA-3"
+  license: "CC-BY-SA-3.0"
   copyright: "The Weeknd - Save Your Tears"
   source: "https://www.youtube.com/watch?v=XXYlFuWEuKI"
