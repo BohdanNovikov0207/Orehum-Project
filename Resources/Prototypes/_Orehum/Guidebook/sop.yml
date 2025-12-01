@@ -344,7 +344,7 @@
   text: "/ServerInfo/Guidebook/SOP/Jobs/Command/LogisticsOfficerSOP.xml"
 
 - type: guideEntry
-  id: AdministrativeAssistant SOP
+  id: AdministrativeAssistantSOP
   name: guide-entry-sop-AdministrativeAssistant
   text: "/ServerInfo/Guidebook/SOP/Jobs/Command/AdministrativeAssistantSOP.xml"
 
