@@ -10,7 +10,7 @@
     - SubGamemodesRule
     - BasicStationEventScheduler
     - MeteorSwarmScheduler
-    - SpaceTrafficControlEventScheduler
+ #   - SpaceTrafficControlEventScheduler
     - BasicRoundstartVariation
     - LavalandStormScheduler
     - GlimmerEventScheduler # fix glimmer events
