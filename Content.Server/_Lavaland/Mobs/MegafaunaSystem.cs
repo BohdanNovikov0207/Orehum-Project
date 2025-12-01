@@ -4,6 +4,9 @@ using Content.Shared.Mobs;
 using Content.Shared.Weapons.Melee.Events;
 using Robust.Shared.Player;
 
+using Content.Shared.Projectiles;
+using Robust.Shared.Physics.Events;
+
 namespace Content.Server._Lavaland.Mobs;
 
 public sealed class MegafaunaSystem : EntitySystem
@@ -14,12 +17,25 @@ public sealed class MegafaunaSystem : EntitySystem
 
         SubscribeLocalEvent<MegafaunaComponent, AttackedEvent>(OnAttacked);
         SubscribeLocalEvent<MegafaunaComponent, MobStateChangedEvent>(OnDeath);
+
+        SubscribeLocalEvent<MegafaunaComponent, StartCollideEvent>(OnCollide);
     }
 
     public void OnAttacked<T>(EntityUid uid, T comp, ref AttackedEvent args) where T : MegafaunaComponent
     {
+        // это полный пиздец
+        // просто
+        // как они до такого дожили
         if (!HasComp<MegafaunaWeaponLooterComponent>(args.Used))
             comp.CrusherOnly = false; // it's over...
+    }
+
+    private void OnCollide(EntityUid uid, MegafaunaComponent comp, ref StartCollideEvent args)
+    {
+        var other = args.OtherEntity;
+
+        if (!HasComp<MegafaunaWeaponLooterComponent>(other))
+            comp.CrusherOnly = false;
     }
 
     public void OnDeath<T>(EntityUid uid, T comp, ref MobStateChangedEvent args) where T : MegafaunaComponent

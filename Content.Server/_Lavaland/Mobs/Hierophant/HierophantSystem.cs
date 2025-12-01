@@ -165,7 +165,7 @@ public sealed class HierophantSystem : EntitySystem
                     if (!HasComp<HierophantBeatComponent>(target))
                     {
                         var beat = EntityManager.AddComponent<HierophantBeatComponent>(target);
-                        beat.MovementSpeedBuff = 1.75f;
+                        beat.MovementSpeedBuff = 1.05f;
                     }
                 }
 

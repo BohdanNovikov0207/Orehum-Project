@@ -62,6 +62,7 @@
         - id: MaterialToothSpaceCarp1
           amount: 1
           maxAmount: 4
+        - id: LavalandCarpCrusherUpgrade
     - type: MeleeWeapon
       altDisarm: false
       angle: 0

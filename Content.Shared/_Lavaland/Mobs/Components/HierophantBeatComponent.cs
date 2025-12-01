@@ -6,7 +6,7 @@ namespace Content.Shared._Lavaland.Mobs.Components;
 public sealed partial class HierophantBeatComponent : Component
 {
     [DataField]
-    public float MovementSpeedBuff = 1.5f;
+    public float MovementSpeedBuff = 1.05f;
 
     [DataField]
     public string HierophantBeatAlertKey = "HierophantBeat";

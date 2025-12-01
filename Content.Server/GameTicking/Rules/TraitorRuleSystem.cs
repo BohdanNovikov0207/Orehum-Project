@@ -165,9 +165,10 @@ public sealed class TraitorRuleSystem : GameRuleSystem<TraitorRuleComponent>
         _roleCodewordSystem.SetRoleCodewords(codewordComp, "traitor", component.Codewords.ToList(), color);
 
         // Don't change the faction, this was stupid.
-        //Log.Debug($"MakeTraitor {ToPrettyString(traitor)} - Change faction");
-        //_npcFaction.RemoveFaction(traitor, component.NanoTrasenFaction, false);
-        //_npcFaction.AddFaction(traitor, component.SyndicateFaction);
+        // why?
+        Log.Debug($"MakeTraitor {ToPrettyString(traitor)} - Change faction");
+        _npcFaction.RemoveFaction(traitor, component.NanoTrasenFaction, false);
+        _npcFaction.AddFaction(traitor, component.SyndicateFaction);
 
         var ev = new MoodEffectEvent("TraitorFocused");
         RaiseLocalEvent(traitor, ref ev);

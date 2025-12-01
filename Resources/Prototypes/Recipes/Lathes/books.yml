@@ -259,3 +259,13 @@
   parent: BaseBookRecipe
   id: BookJanitorTale
   result: BookJanitorTale
+
+- type: latheRecipe
+  parent: BaseBookRecipe
+  id: BookCorporateCQCGuidebook
+  result: BookCorporateCQCGuidebook
+
+- type: latheRecipe
+  parent: BaseBookRecipe
+  id: BookCorporateJudoGuidebook
+  result: BookCorporateJudoGuidebook

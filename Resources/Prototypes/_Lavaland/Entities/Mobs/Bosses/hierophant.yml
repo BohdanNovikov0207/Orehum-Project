@@ -59,6 +59,7 @@
   - type: NoSlip
   - type: HierophantBoss # boss specific component. defines pattern/scripted attacks and other stuff
     loot: LavalandCrateNecropolisHierophant
+    crusherLoot: LavalandCrusherCrateNecropolisHierophant
   - type: DamageSquareImmunity
     isImmune: true
   - type: Aggressive # also required component for aggro checking
@@ -152,4 +153,16 @@
     contents:
       - id: LavalandHierophantClub
       - id: ClothingNeckCloakHierophant
+
+- type: entity
+  name: сундук с наградой Иерофанта
+  id: LavalandCrusherCrateNecropolisHierophant
+  parent: LavalandCrateNecropolis
+  suffix: Hierophant
+  components:
+  - type: StorageFill
+    contents:
+      - id: LavalandHierophantClub
+      - id: ClothingNeckCloakHierophant
+      - id: LavalandHierophantCrusherUpgrade
 

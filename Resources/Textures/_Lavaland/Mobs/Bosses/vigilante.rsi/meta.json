@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "license": "СС BY-SA 3.0",
+  "copyright": "SoSal14",
+  "size": {
+    "x": 32,
+    "y": 32
+  },
+    "states": [
+        {
+            "name": "vigilante",
+            "directions": 4
+        },
+        {
+            "name": "vigilante_choke",
+            "directions": 4
+        },
+        {
+            "name": "vigilante_dead",
+            "directions": 4
+        },
+        {
+            "name": "vigilante_dead_without_eye",
+            "directions": 4
+        }
+    ]
+}

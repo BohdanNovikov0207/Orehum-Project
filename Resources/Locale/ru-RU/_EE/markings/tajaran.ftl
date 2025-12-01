@@ -67,9 +67,7 @@ marking-TajaranEarsTorn-torn_inner = Внутреннее ухо
 marking-TajaranEarsWide = Широкие уши
 marking-TajaranEarsWide-wide_outer = Наружное ухо
 marking-TajaranEarsWide-wide_inner = Внутреннее ухо
-
-		### Staplework of Rathar
-
+### Staplework of Rathar
 marking-TajaranEarsServal = Уши Сервала [RTH]
 marking-TajaranEarsServalSpotted = Уши Сервала с пятном [RTH]
 marking-TajaranEarsBigCanine = Лисоподобные уши [RTH]

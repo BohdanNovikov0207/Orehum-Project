@@ -566,3 +566,39 @@
     openOnActivation: true
     guides:
     - Psionics
+
+- type: entity
+  parent: BookBase
+  id: BookCorporateJudoGuidebook
+  name: "Корпоративное дзюдо для чайников"
+  description: Есть множество каракулей со сражающимися человечками на полях. Энергетические вспышки нарисованы на удивление впечатляюще.
+  components:
+  - type: Sprite
+    sprite: Objects/Misc/books.rsi
+    layers:
+    - state: paper
+    - state: cover_base
+      color: "#ab1515"
+    - state: decor_wingette
+      color: "#e05334"
+    - state: icon_judobookfist
+  - type: Paper
+    content: book-text-martialarts-judo
+
+- type: entity
+  parent: BookBase
+  id: BookCorporateCQCGuidebook
+  name: "Мануал по обновлению навыков CQC"
+  description: Эта книга основательно зачитана, но при этом тщательно ухожена.
+  components:
+  - type: Sprite
+    sprite: Objects/Misc/books.rsi
+    layers:
+    - state: paper
+    - state: cover_base
+      color: "#4d6df3"
+    - state: decor_wingette
+      color: "#2f3699"
+    - state: icon_cqcbookfist
+  - type: Paper
+    content: book-text-martialarts-cqc

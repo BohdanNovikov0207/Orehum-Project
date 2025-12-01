@@ -76,6 +76,7 @@
     state: dragon
   - type: AshDrakeBoss
     loot: LavalandAshDrakeDead
+    crusherLoot: LavalandCrusherAshDrakeDead
   - type: Damageable
   - type: MovementSpeedModifier
     baseWalkSpeed: 0
@@ -120,6 +121,27 @@
     - id: MaterialGoliathHide1
       amount: 12
 
+- type: entity
+  id: LavalandCrusherAshDrakeDead
+  parent: BaseMob
+  name: останки дракона
+  description: Даже столь могущественному существу однажды придёт конец.
+  components:
+  - type: Sprite
+    noRot: true
+    sprite: _Lavaland/Mobs/Bosses/ash_drake.rsi
+    state: dragon_dead
+  - type: MovementSpeedModifier
+    baseWalkSpeed: 0
+    baseSprintSpeed: 0
+  - type: Butcherable
+    spawned:
+    - id: MaterialAshDrakeBones1
+      amount: 30
+    - id: MaterialGoliathHide1
+      amount: 12
+    - id: LavalandDrakeCrusherUpgrade
+      amount: 1
 
 
 
@@ -245,19 +267,6 @@
     lifetime: 1
 
 
-# лут
-- type: entity
-  id: LavalandAshDrakeCrucifixes
-  parent: LavalandJaunter
-  name: драконий крест
-  description: Он спасёт вас от падения сколько угодно раз! Поверьте на слово!
-  components:
-  - type: Sprite
-    sprite: _Lavaland/Objects/Specific/Salvage/dragon_crucifixes.rsi
-    state: icon
-  - type: PreventChasmFalling
-    deleteOnUse: false
-
 - type: entity
   name: сундук с наградой Пепельного Дрейка
   description: Всему когда-нибудь приходит конец. Этот дракон не стал исключением.
@@ -268,46 +277,6 @@
   - type: StorageFill
     contents:
       - id: LavalandAshDrakeCrucifixes
-
-# прочая херь
-- type: entity
-  parent: MaterialBase
-  id: MaterialAshDrakeBones
-  name: кости дракона
-  suffix: Full
-  components:
-  - type: Stack
-    stackType: AshDrakeBones
-    baseLayer: base
-    layerStates:
-    - drake_bones
-    - drake_bones_2
-    - drake_bones_3
-  - type: Sprite
-    state: cotton_3
-    layers:
-    - state: cotton_3
-      map: ["base"]
-  - type: Appearance
-
-  - type: Item
-    heldPrefix: drake bones
-
-- type: entity
-  parent: MaterialAshDrakeBones
-  id: MaterialAshDrakeBones1
-  suffix: 1
-  components:
-  - type: Stack
-    count: 1
-
-- type: stack
-  id: AshDrakeBones
-  name: кости дракона
-  icon: { sprite: /Textures/Objects/Materials/materials.rsi, state: drake_bones }
-  spawn: MaterialAshDrakeBones1
-  maxCount: 30
-
 
 # эээ, базальтовая нерушимая стена... даааа
 - type: entity
@@ -326,19 +295,3 @@
   - type: IconSmooth
     key: cobblebricks
     base: cobblebrick
-
-
-# попытка добавить в меню крафта что-то. Позже завершу.
-#- type: constructionGraph
-#  id: LavalandAshDrakeBoneArmor
-#  start: start
-#  graph:
-#  - node: start
-#    edges:
-#    - to: armor
-#      steps:
-#      - material: AshDrakeBones
-#        amount: 6
-#        doAfter: 2
-#  - node: armor
-#    entity: ClothingOuterAshDrakeArmorBone
