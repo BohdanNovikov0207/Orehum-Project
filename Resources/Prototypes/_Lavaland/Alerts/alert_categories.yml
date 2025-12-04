@@ -1,15 +1,11 @@
 - type: alertCategory
   id: TileMovement
-  priority: 50
 
 - type: alertCategory
   id: IcyLook
-  priority: 60
 
 - type: alertCategory
   id: CarpBlood
-  priority: 40
 
 - type: alertCategory
   id: VigilanteEye
-  priority: 70
