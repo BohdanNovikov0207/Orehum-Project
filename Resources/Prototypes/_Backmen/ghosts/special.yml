@@ -104,8 +104,7 @@
 
 - type: ghostTheme
   id: AngelGhost
-  name: angel
-  description: blue angel
+  name: sponsor-win-manager-ghost-angel
   components:
     - type: Sprite
       noRot: true
@@ -118,8 +117,7 @@
 
 - type: ghostTheme
   id: EnvoilyGhost
-  name: envoily
-  description: envoily's ghost
+  name: sponsor-win-manager-ghost-envoily
   components:
     - type: Sprite
       noRot: true

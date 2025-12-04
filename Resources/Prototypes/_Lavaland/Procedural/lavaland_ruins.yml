@@ -6,7 +6,7 @@
 
 - type: lavalandRuin
   id: AshDrakeArena
-  name: Пепельные руины
+  name: lavaland-ruin-ashDrake
   path: /Maps/_Lavaland/Lavaland/ruin_ash_drake_arena.yml
   priority: -1 # highest priority
 
