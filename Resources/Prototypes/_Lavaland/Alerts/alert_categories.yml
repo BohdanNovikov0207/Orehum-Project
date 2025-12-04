@@ -1,0 +1,19 @@
+- type: alertCategory
+  id: TileMovement
+  name: Категория Движения по Клеткам
+  alertPriority: 50
+
+- type: alertCategory
+  id: IcyLook
+  name: Категория Ледяной Взгляд
+  alertPriority: 60
+
+- type: alertCategory
+  id: CarpBlood
+  name: Категория Кровь Карпа
+  alertPriority: 40
+
+- type: alertCategory
+  id: VigilanteEye
+  name: Категория Глаз Линчевателя
+  alertPriority: 70
