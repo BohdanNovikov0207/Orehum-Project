@@ -8,6 +8,7 @@ using Robust.Shared.Audio.Components;
 using Robust.Shared.Input;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
+using System.Linq;
 using FancyWindow = Content.Client.UserInterface.Controls.FancyWindow;
 
 namespace Content.Client.Audio.Jukebox;
@@ -15,9 +16,17 @@ namespace Content.Client.Audio.Jukebox;
 [GenerateTypedNameReferences]
 public sealed partial class JukeboxMenu : FancyWindow
 {
+    private enum SongFilter
+    {
+        All,
+        Holiday
+    }
+    private SongFilter _currentFilter = SongFilter.All;
+    private const string HolidayTag = "holiday";
+
     [Dependency] private readonly IEntityManager _entManager = default!;
     private AudioSystem _audioSystem;
-    private readonly List<(string Name, ProtoId<JukeboxPrototype> Id)> _allSongs = new();
+    private readonly List<(string Name, ProtoId<JukeboxPrototype> Id, IReadOnlyList<string> Tags)> _allSongs = new();
     /// <summary>
     /// Are we currently 'playing' or paused for the play / pause button.
     /// </summary>
@@ -56,6 +65,11 @@ public sealed partial class JukeboxMenu : FancyWindow
         PlaybackSlider.OnReleased += _ => SetTime?.Invoke(PlaybackSlider.Value);
         SearchBar.OnTextChanged += _ => FilterSongs();
 
+        AllSongsButton.OnPressed += _ => SetFilter(SongFilter.All);
+        HolidaySongsButton.OnPressed += _ => SetFilter(SongFilter.Holiday);
+        AllSongsButton.Disabled = true;
+        HolidaySongsButton.Disabled = false;
+
         SetPlayPauseButton(_audioSystem.IsPlaying(_audio), force: true);
     }
 
@@ -88,40 +102,57 @@ public sealed partial class JukeboxMenu : FancyWindow
         _allSongs.Clear();
         foreach (var proto in jukeboxProtos)
         {
-            _allSongs.Add((proto.Name, proto.ID));
+            _allSongs.Add((proto.Name, proto.ID, proto.Tags));
         }
+        FilterSongs();
+    }
+
+    private void SetFilter(SongFilter filter)
+    {
+        if (_currentFilter == filter)
+            return;
+        _currentFilter = filter;
+        AllSongsButton.Disabled = filter == SongFilter.All;
+        HolidaySongsButton.Disabled = filter == SongFilter.Holiday;
+
         FilterSongs();
     }
 
     private void FilterSongs()
     {
         MusicList.Clear();
-        var filter = SearchBar.Text.Trim().ToLowerInvariant();
+        var filterText = SearchBar.Text.Trim().ToLowerInvariant();
         foreach (var song in _allSongs)
         {
-            if (string.IsNullOrEmpty(filter) || song.Name.ToLowerInvariant().Contains(filter))
+            var matchesSearch = string.IsNullOrEmpty(filterText) || song.Name.ToLowerInvariant().Contains(filterText);
+            var matchesFilter = true;
+            if (_currentFilter == SongFilter.Holiday)
+            {
+                matchesFilter = song.Tags.Contains(HolidayTag);
+            }
+            if (matchesSearch && matchesFilter)
             {
                 MusicList.AddItem(song.Name, metadata: song.Id);
             }
         }
     }
 
-    private void OnSearchTextChanged(LineEdit.LineEditEventArgs args)
-    {
-        if (SearchBar == null || MusicList == null)
-            return;
+    //private void OnSearchTextChanged(LineEdit.LineEditEventArgs args)
+    //{
+    //    if (SearchBar == null || MusicList == null)
+    //        return;
 
-        var filter = SearchBar.Text.Trim().ToLowerInvariant();
-        MusicList.Clear();
+    //    var filter = SearchBar.Text.Trim().ToLowerInvariant();
+    //    MusicList.Clear();
 
-        foreach (var (name, id) in _allSongs)
-        {
-            if (string.IsNullOrEmpty(filter) || name.ToLowerInvariant().Contains(filter))
-            {
-                MusicList.AddItem(name, metadata: id);
-            }
-        }
-    }
+    //    foreach (var (name, id) in _allSongs)
+    //    {
+    //        if (string.IsNullOrEmpty(filter) || name.ToLowerInvariant().Contains(filter))
+    //        {
+    //            MusicList.AddItem(name, metadata: id);
+    //        }
+    //    }
+    //}
 
     public void SetPlayPauseButton(bool playing, bool force = false)
     {

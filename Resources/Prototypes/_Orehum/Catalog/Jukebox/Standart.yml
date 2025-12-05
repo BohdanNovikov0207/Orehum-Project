@@ -75,6 +75,8 @@
   name: Frank Sinatra - Let It Snow!
   path:
     path: /Audio/_Orehum/Jukebox/LetItSnow.ogg
+  tags:
+    - holiday
 
 - type: jukebox
   id: becauseigothigh
@@ -111,6 +113,8 @@
   name: Caramella Girls - Caramelldansen
   path:
     path: /Audio/_Orehum/Jukebox/Caramelldansen.ogg
+  tags:
+    - holiday
 
 - type: jukebox
   id: comeasyouare
@@ -342,7 +346,7 @@
 
 - type: jukebox
   id: sweetd
-  name: Klass - Sweer Dreams
+  name: Klass - Sweet Dreams
   path:
     path: /Audio/_Orehum/Jukebox/sweetD.ogg
 
