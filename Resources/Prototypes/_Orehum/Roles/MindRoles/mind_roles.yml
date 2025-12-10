@@ -5,5 +5,5 @@
   components:
     - type: MindRole
       antagPrototype: ArmsDealer
-      subtype: role-subtype-arms-dealer
+      roleType: SoloAntagonist
     - type: ArmsDealerRole

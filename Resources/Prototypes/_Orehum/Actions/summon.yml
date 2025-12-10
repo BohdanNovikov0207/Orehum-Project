@@ -5,7 +5,9 @@
   description: Use this on a closed container to summon a [color=crimson][bold]dangerous firearm![/bold][/color]
   components:
     - type: EntityTargetAction
-      icon: _Orehum/Interface/extract.rsi/arms-dealer.png
+      icon:
+        sprite: _Orehum/Interface/extract.rsi
+        state: arms-dealer
       useDelay: 300
       whitelist:
         components:
