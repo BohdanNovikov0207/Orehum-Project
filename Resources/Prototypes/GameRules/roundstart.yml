@@ -2,337 +2,342 @@
   id: BaseGameRule
   abstract: true
   components:
-  - type: GameRule
+    - type: GameRule
 
 - type: entity
   parent: BaseGameRule
   id: RespawnDeadRule
   components:
-  - type: RespawnDeadRule
-    alwaysRespawnDead: true
-  - type: RespawnTracker
-    respawnDelay: 10
-    deleteBody: false
+    - type: RespawnDeadRule
+      alwaysRespawnDead: true
+    - type: RespawnTracker
+      respawnDelay: 10
+      deleteBody: false
 
 - type: entity
   parent: BaseGameRule
   id: SubGamemodesRule
   components:
-  - type: SubGamemodes
-    rules:
-    - id: Thief
-      prob: 0.5
-    - id: SubWizard
-      prob: 0.05
-    - id: Devil # Goob
-      prob: 0.3
-    - id: Heretic # goob edit
-      prob: 0.2
+    - type: SubGamemodes
+      rules:
+        - id: Thief
+          prob: 0.5
+        - id: SubWizard
+          prob: 0.05
+        - id: Devil # Goob
+          prob: 0.3
+        - id: Heretic # goob edit
+          prob: 0.2
+        - id: ArmsDealer
+          prob: 0.5
 
 - type: entity
   parent: BaseGameRule
   id: SubGamemodesRuleNoWizard
   components:
-  - type: SubGamemodes
-    rules:
-    - id: Thief
-      prob: 0.5
-    - id: Devil # Goob
-      prob: 0.3
+    - type: SubGamemodes
+      rules:
+        - id: Thief
+          prob: 0.5
+        - id: Devil # Goob
+          prob: 0.3
+        - id: ArmsDealer
+          prob: 0.5
 
 - type: entity
   id: DeathMatch31
   parent: BaseGameRule
   components:
-  - type: DeathMatchRule
-    rewardSpawns:
-    - id: HealingToolbox
-    - id: ClothingOuterArmorBasicSlim
-      orGroup: loot
-    - id: ClothingHeadHelmetBasic
-      orGroup: loot
-    - id: SoapNT
-      orGroup: loot
-    - id: Bola
-      orGroup: loot
-    - id: Spear
-      orGroup: loot
-    - id: ClothingShoesGaloshes
-      orGroup: loot
-    - id: FoodPieBananaCream
-      orGroup: loot
-    - id: Stimpack
-      orGroup: loot
-  - type: KillCalloutRule
-  - type: PointManager
-  - type: RespawnDeadRule
-  - type: RespawnTracker
-    respawnDelay: 5
+    - type: DeathMatchRule
+      rewardSpawns:
+        - id: HealingToolbox
+        - id: ClothingOuterArmorBasicSlim
+          orGroup: loot
+        - id: ClothingHeadHelmetBasic
+          orGroup: loot
+        - id: SoapNT
+          orGroup: loot
+        - id: Bola
+          orGroup: loot
+        - id: Spear
+          orGroup: loot
+        - id: ClothingShoesGaloshes
+          orGroup: loot
+        - id: FoodPieBananaCream
+          orGroup: loot
+        - id: Stimpack
+          orGroup: loot
+    - type: KillCalloutRule
+    - type: PointManager
+    - type: RespawnDeadRule
+    - type: RespawnTracker
+      respawnDelay: 5
 
 - type: entity
   id: InactivityTimeRestart
   parent: BaseGameRule
   components:
-  - type: InactivityRule
-    inactivityMaxTime: 600
-    roundEndDelay: 10
+    - type: InactivityRule
+      inactivityMaxTime: 600
+      roundEndDelay: 10
 
 - type: entity
   id: MaxTimeRestart
   parent: BaseGameRule
   components:
-  - type: MaxTimeRestartRule
-    roundMaxTime: 300
-    roundEndDelay: 10
+    - type: MaxTimeRestartRule
+      roundMaxTime: 300
+      roundEndDelay: 10
 
 - type: entity
   abstract: true
   parent: BaseGameRule
   id: BaseNukeopsRule
   components:
-  - type: RandomMetadata #this generates the random operation name cuz it's cool.
-    nameSegments:
-    - operationPrefix
-    - operationSuffix
-  - type: NukeopsRule
-  - type: RuleGrids
-  - type: AntagSelection
-  - type: AntagLoadProfileRule
-    speciesOverride: Human
-    speciesOverrideBlacklist:
-    #Species that do not work with nukies should be included in this list.
-    #Once the issues are fixed the species should be removed from this list to be enabled.
-    #Balance concerns are not a valid reason to disable a species, except for high-impact Nukie-specific exploits.
-    #- Vox
+    - type: RandomMetadata #this generates the random operation name cuz it's cool.
+      nameSegments:
+        - operationPrefix
+        - operationSuffix
+    - type: NukeopsRule
+    - type: RuleGrids
+    - type: AntagSelection
+    - type: AntagLoadProfileRule
+      speciesOverride: Human
+      speciesOverrideBlacklist:
+      #Species that do not work with nukies should be included in this list.
+      #Once the issues are fixed the species should be removed from this list to be enabled.
+      #Balance concerns are not a valid reason to disable a species, except for high-impact Nukie-specific exploits.
+      #- Vox
 
 - type: entity
   parent: BaseNukeopsRule
   id: Nukeops
   components:
-  - type: GameRule
-    minPlayers: 20
-  - type: LoadMapRule
-    mapPath: /Maps/Nonstations/nukieplanet.yml
-  - type: AntagSelection
-    selectionTime: PrePlayerSpawn
-    definitions:
-    - prefRoles: [ NukeopsCommander ]
-      fallbackRoles: [ Nukeops, NukeopsMedic ]
-      spawnerPrototype: SpawnPointNukeopsCommander
-      startingGear: SyndicateCommanderGearFull
-      components:
-      - type: NukeOperative
-      - type: RandomMetadata
-        nameSegments:
-        - nukeops-role-commander
-        - SyndicateNamesElite
-      - type: NpcFactionMember
-        factions:
-        - Syndicate
-      mindRoles:
-      - MindRoleNukeopsCommander
-    - prefRoles: [ NukeopsMedic ]
-      fallbackRoles: [ Nukeops, NukeopsCommander ]
-      spawnerPrototype: SpawnPointNukeopsMedic
-      startingGear: SyndicateOperativeMedicFull
-      components:
-      - type: NukeOperative
-      - type: RandomMetadata
-        nameSegments:
-        - nukeops-role-agent
-        - SyndicateNamesNormal
-      - type: NpcFactionMember
-        factions:
-        - Syndicate
-      mindRoles:
-      - MindRoleNukeopsMedic
-    - prefRoles: [ Nukeops ]
-      fallbackRoles: [ NukeopsCommander, NukeopsMedic ]
-      spawnerPrototype: SpawnPointNukeopsOperative
-      max: 3
-      playerRatio: 10
-      startingGear: SyndicateOperativeGearFull
-      components:
-      - type: NukeOperative
-      - type: RandomMetadata
-        nameSegments:
-        - nukeops-role-operator
-        - SyndicateNamesNormal
-      - type: NpcFactionMember
-        factions:
-        - Syndicate
-      mindRoles:
-      - MindRoleNukeops
+    - type: GameRule
+      minPlayers: 20
+    - type: LoadMapRule
+      mapPath: /Maps/Nonstations/nukieplanet.yml
+    - type: AntagSelection
+      selectionTime: PrePlayerSpawn
+      definitions:
+        - prefRoles: [NukeopsCommander]
+          fallbackRoles: [Nukeops, NukeopsMedic]
+          spawnerPrototype: SpawnPointNukeopsCommander
+          startingGear: SyndicateCommanderGearFull
+          components:
+            - type: NukeOperative
+            - type: RandomMetadata
+              nameSegments:
+                - nukeops-role-commander
+                - SyndicateNamesElite
+            - type: NpcFactionMember
+              factions:
+                - Syndicate
+          mindRoles:
+            - MindRoleNukeopsCommander
+        - prefRoles: [NukeopsMedic]
+          fallbackRoles: [Nukeops, NukeopsCommander]
+          spawnerPrototype: SpawnPointNukeopsMedic
+          startingGear: SyndicateOperativeMedicFull
+          components:
+            - type: NukeOperative
+            - type: RandomMetadata
+              nameSegments:
+                - nukeops-role-agent
+                - SyndicateNamesNormal
+            - type: NpcFactionMember
+              factions:
+                - Syndicate
+          mindRoles:
+            - MindRoleNukeopsMedic
+        - prefRoles: [Nukeops]
+          fallbackRoles: [NukeopsCommander, NukeopsMedic]
+          spawnerPrototype: SpawnPointNukeopsOperative
+          max: 3
+          playerRatio: 10
+          startingGear: SyndicateOperativeGearFull
+          components:
+            - type: NukeOperative
+            - type: RandomMetadata
+              nameSegments:
+                - nukeops-role-operator
+                - SyndicateNamesNormal
+            - type: NpcFactionMember
+              factions:
+                - Syndicate
+          mindRoles:
+            - MindRoleNukeops
 
 - type: entity
   abstract: true
   parent: BaseGameRule
   id: BaseTraitorRule
   components:
-  - type: TraitorRule
-  # TODO: codewords in yml
-  # TODO: uplink in yml
-  - type: AntagRandomObjectives
-    sets:
-    - groups: TraitorObjectiveGroups
-    maxDifficulty: 5
-  - type: AntagSelection
-    agentName: traitor-round-end-agent-name
+    - type: TraitorRule
+    # TODO: codewords in yml
+    # TODO: uplink in yml
+    - type: AntagRandomObjectives
+      sets:
+        - groups: TraitorObjectiveGroups
+      maxDifficulty: 5
+    - type: AntagSelection
+      agentName: traitor-round-end-agent-name
 
 - type: entity
   parent: BaseTraitorRule
   id: Traitor
   components:
-  - type: GameRule
-    minPlayers: 5
-    delay:
-      min: 240
-      max: 420
-  - type: AntagSelection
-    definitions:
-    - prefRoles: [ Traitor ]
-      max: 8
-      playerRatio: 10
-      blacklist:
-        components:
-        - AntagImmune
-      lateJoinAdditional: true
-      mindRoles:
-      - MindRoleTraitor
+    - type: GameRule
+      minPlayers: 5
+      delay:
+        min: 240
+        max: 420
+    - type: AntagSelection
+      definitions:
+        - prefRoles: [Traitor]
+          max: 8
+          playerRatio: 10
+          blacklist:
+            components:
+              - AntagImmune
+          lateJoinAdditional: true
+          mindRoles:
+            - MindRoleTraitor
 
 - type: entity
   id: TraitorReinforcement
   parent: BaseTraitorRule
   components:
-  - type: TraitorRule
-    giveUplink: false
-    giveCodewords: false # It would actually give them a different set of codewords than the regular traitors, anyway
-    giveBriefing: false
-  - type: AntagSelection
-    definitions:
-    - prefRoles: [ Traitor ]
-      mindRoles:
-      - MindRoleTraitorReinforcement
+    - type: TraitorRule
+      giveUplink: false
+      giveCodewords: false # It would actually give them a different set of codewords than the regular traitors, anyway
+      giveBriefing: false
+    - type: AntagSelection
+      definitions:
+        - prefRoles: [Traitor]
+          mindRoles:
+            - MindRoleTraitorReinforcement
 
 - type: entity
   id: Revolutionary
   parent: BaseGameRule
   components:
-  - type: GameRule
-    minPlayers: 15
-  - type: RevolutionaryRule
-  - type: AntagSelection
-    definitions:
-    - prefRoles: [ HeadRev ]
-      max: 2
-      playerRatio: 20
-      briefing:
-        text: head-rev-role-greeting
-        color: CornflowerBlue
-        sound: "/Audio/Ambience/Antag/headrev_start.ogg"
-      startingGear: HeadRevGear
-      components:
-      - type: Revolutionary
-      - type: HeadRevolutionary
-      mindRoles:
-      - MindRoleHeadRevolutionary
+    - type: GameRule
+      minPlayers: 15
+    - type: RevolutionaryRule
+    - type: AntagSelection
+      definitions:
+        - prefRoles: [HeadRev]
+          max: 2
+          playerRatio: 20
+          briefing:
+            text: head-rev-role-greeting
+            color: CornflowerBlue
+            sound: "/Audio/Ambience/Antag/headrev_start.ogg"
+          startingGear: HeadRevGear
+          components:
+            - type: Revolutionary
+            - type: HeadRevolutionary
+          mindRoles:
+            - MindRoleHeadRevolutionary
 
 - type: entity
   id: Sandbox
   parent: BaseGameRule
   components:
-  - type: SandboxRule
+    - type: SandboxRule
 
 - type: entity
   id: Secret
   parent: BaseGameRule
   components:
-  - type: SecretRule
+    - type: SecretRule
 
 - type: entity
   abstract: true
   parent: BaseGameRule
   id: BaseWizardRule
   components:
-  - type: AntagObjectives
-    objectives:
-    - WizardSurviveObjective
-    - WizardDemonstrateObjective
-  - type: LoadMapRule
-    gridPath: /Maps/Shuttles/wizard.yml
-  - type: RuleGrids
-  - type: AntagSelection
-  - type: AntagLoadProfileRule
-    speciesOverride: Human
+    - type: AntagObjectives
+      objectives:
+        - WizardSurviveObjective
+        - WizardDemonstrateObjective
+    - type: LoadMapRule
+      gridPath: /Maps/Shuttles/wizard.yml
+    - type: RuleGrids
+    - type: AntagSelection
+    - type: AntagLoadProfileRule
+      speciesOverride: Human
 
 - type: entity
   parent: BaseWizardRule
   id: Wizard
   components:
-  - type: GameRule
-    minPlayers: 10
-  - type: AntagSelection
-    agentName: wizard-round-end-name
-    selectionTime: PrePlayerSpawn
-    definitions:
-    - prefRoles: [ Wizard ]
-      max: 1
-      playerRatio: 1
-      spawnerPrototype: SpawnPointGhostWizard
-      briefing:
-        text: wizard-role-greeting
-        color: Turquoise
-        # TODO: Need Wizard Start sound
-        #sound: "/Audio/Ambience/Antag/wizard_start.ogg"
-      startingGear: WizardBlueGear
-      # TODO: WizardComp as needed
-      components:
-      - type: NpcFactionMember
-        factions:
-        - Wizard
-      - type: RandomMetadata
-        nameSegments:
-        - names_wizard_first
-        - names_wizard_last
-      mindRoles:
-      - MindRoleWizard
+    - type: GameRule
+      minPlayers: 10
+    - type: AntagSelection
+      agentName: wizard-round-end-name
+      selectionTime: PrePlayerSpawn
+      definitions:
+        - prefRoles: [Wizard]
+          max: 1
+          playerRatio: 1
+          spawnerPrototype: SpawnPointGhostWizard
+          briefing:
+            text: wizard-role-greeting
+            color: Turquoise
+            # TODO: Need Wizard Start sound
+            #sound: "/Audio/Ambience/Antag/wizard_start.ogg"
+          startingGear: WizardBlueGear
+          # TODO: WizardComp as needed
+          components:
+            - type: NpcFactionMember
+              factions:
+                - Wizard
+            - type: RandomMetadata
+              nameSegments:
+                - names_wizard_first
+                - names_wizard_last
+          mindRoles:
+            - MindRoleWizard
 
 - type: entity
   id: Zombie
   parent: BaseGameRule
   components:
-  - type: GameRule
-    minPlayers: 20
-    delay:
-      min: 600
-      max: 900
-  - type: ZombieRule
-  - type: AntagSelection
-    definitions:
-    - prefRoles: [ InitialInfected ]
-      max: 6
-      playerRatio: 10
-      blacklist:
-        components:
-        - ZombieImmune
-        - AntagImmune
-      briefing:
-        text: zombie-patientzero-role-greeting
-        color: Plum
-        sound: "/Audio/Ambience/Antag/zombie_start.ogg"
-      components:
-      - type: PendingZombie
-      - type: ZombifyOnDeath
-      - type: IncurableZombie
-      - type: InitialInfected
-      mindRoles:
-      - MindRoleInitialInfected
+    - type: GameRule
+      minPlayers: 20
+      delay:
+        min: 600
+        max: 900
+    - type: ZombieRule
+    - type: AntagSelection
+      definitions:
+        - prefRoles: [InitialInfected]
+          max: 6
+          playerRatio: 10
+          blacklist:
+            components:
+              - ZombieImmune
+              - AntagImmune
+          briefing:
+            text: zombie-patientzero-role-greeting
+            color: Plum
+            sound: "/Audio/Ambience/Antag/zombie_start.ogg"
+          components:
+            - type: PendingZombie
+            - type: ZombifyOnDeath
+            - type: IncurableZombie
+            - type: InitialInfected
+          mindRoles:
+            - MindRoleInitialInfected
 
 # event schedulers
 
 - type: entityTable
   id: BasicGameRulesTable
-  table: !type:AllSelector # we need to pass a list of rules, since rules have further restrictions to consider via StationEventComp
+  table:
+    !type:AllSelector # we need to pass a list of rules, since rules have further restrictions to consider via StationEventComp
     children:
       - !type:NestedSelector
         tableId: BasicCalmEventsTable
@@ -347,7 +352,8 @@
 
 - type: entityTable
   id: SpaceTrafficControlTable
-  table: !type:AllSelector # we need to pass a list of rules, since rules have further restrictions to consider via StationEventComp
+  table:
+    !type:AllSelector # we need to pass a list of rules, since rules have further restrictions to consider via StationEventComp
     children:
       - !type:NestedSelector
         tableId: UnknownShuttlesFriendlyTable
@@ -360,17 +366,17 @@
   id: BasicStationEventScheduler
   parent: BaseGameRule
   components:
-  - type: BasicStationEventScheduler
-    scheduledGameRules: !type:NestedSelector
-      tableId: BasicGameRulesTable
+    - type: BasicStationEventScheduler
+      scheduledGameRules: !type:NestedSelector
+        tableId: BasicGameRulesTable
 
 - type: entity
   id: RampingStationEventScheduler
   parent: BaseGameRule
   components:
-  - type: RampingStationEventScheduler
-    scheduledGameRules: !type:NestedSelector
-      tableId: BasicGameRulesTable
+    - type: RampingStationEventScheduler
+      scheduledGameRules: !type:NestedSelector
+        tableId: BasicGameRulesTable
 
 # - type: entity
 #   id: SpaceTrafficControlEventScheduler # iff we make a selector for EntityTables that can respect StationEventComp restrictions, or somehow impliment them otherwise in said tables,
@@ -400,54 +406,54 @@
   id: HellshiftStationEventScheduler
   parent: BaseGameRule
   components:
-  - type: RampingStationEventScheduler
-    chaosModifier: 5 # By default, one event each 30-10 seconds after two hours. Changing CVars will cause this to deviate.
-    startingChaosRatio: 0.1
-    shiftLengthModifier: 2.5
-    scheduledGameRules: !type:NestedSelector
-      tableId: BasicGameRulesTable
+    - type: RampingStationEventScheduler
+      chaosModifier: 5 # By default, one event each 30-10 seconds after two hours. Changing CVars will cause this to deviate.
+      startingChaosRatio: 0.1
+      shiftLengthModifier: 2.5
+      scheduledGameRules: !type:NestedSelector
+        tableId: BasicGameRulesTable
 
 - type: entity
   id: IrregularStationEventScheduler
   parent: BaseGameRule
   components:
-  - type: OscillatingStationEventScheduler
-    minChaos: 0.8
-    maxChaos: 14
-    startingSlope: 0.2
-    downwardsLimit: -0.35
-    upwardsLimit: 0.4
+    - type: OscillatingStationEventScheduler
+      minChaos: 0.8
+      maxChaos: 14
+      startingSlope: 0.2
+      downwardsLimit: -0.35
+      upwardsLimit: 0.4
 
 # More likely to go down than up, so calmness prevails
 - type: entity
   id: IrregularExtendedStationEventScheduler
   parent: BaseGameRule
   components:
-  - type: OscillatingStationEventScheduler
-    minChaos: 0.8
-    maxChaos: 8
-    startingSlope: -1
-    downwardsLimit: -0.4
-    upwardsLimit: 0.3
-    downwardsBias: -1.1
-    upwardsBias: 0.9
+    - type: OscillatingStationEventScheduler
+      minChaos: 0.8
+      maxChaos: 8
+      startingSlope: -1
+      downwardsLimit: -0.4
+      upwardsLimit: 0.3
+      downwardsBias: -1.1
+      upwardsBias: 0.9
 
 # variation passes
 - type: entity
   id: BasicRoundstartVariation
   parent: BaseGameRule
   components:
-  - type: RoundstartStationVariationRule
-    rules:
-    #    - id: BasicPoweredLightVariationPass
-    - id: BasicTrashVariationPass
-    #    - id: SolidWallRustingVariationPass
-    #    - id: ReinforcedWallRustingVariationPass
-    - id: BasicPuddleMessVariationPass
-      prob: 0.99
-      orGroup: puddleMess
-    #    - id: BloodbathPuddleMessVariationPass
-    #      prob: 0.01
-    #      orGroup: puddleMess
-    - id: SmugglerStashVariationPass
-      prob: 0.90
+    - type: RoundstartStationVariationRule
+      rules:
+        #    - id: BasicPoweredLightVariationPass
+        - id: BasicTrashVariationPass
+        #    - id: SolidWallRustingVariationPass
+        #    - id: ReinforcedWallRustingVariationPass
+        - id: BasicPuddleMessVariationPass
+          prob: 0.99
+          orGroup: puddleMess
+        #    - id: BloodbathPuddleMessVariationPass
+        #      prob: 0.01
+        #      orGroup: puddleMess
+        - id: SmugglerStashVariationPass
+          prob: 0.90

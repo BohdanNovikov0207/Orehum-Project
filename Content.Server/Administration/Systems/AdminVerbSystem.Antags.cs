@@ -1,4 +1,6 @@
 using Content.Server._Goobstation.Devil.GameTicking.Rules;
+using Content.Server._Orehum.GameTicking.Components;
+using Content.Server._Orehum.GameTicking.Rules;
 using Content.Server.Administration.Commands;
 using Content.Server.Antag;
 using Content.Server.GameTicking.Rules.Components;
@@ -47,6 +49,8 @@ public sealed partial class AdminVerbSystem
 
     [ValidatePrototypeId<StartingGearPrototype>]
     private const string PirateGearId = "PirateGear";
+
+    private static readonly EntProtoId DefaultArmsDealerRule = "ArmsDealer";
 
     // All antag verbs have names so invokeverb works.
     private void AddAntagVerbs(GetVerbsEvent<Verb> args)
@@ -255,5 +259,20 @@ public sealed partial class AdminVerbSystem
             Message = Loc.GetString("admin-verb-make-heretic"),
         };
         args.Verbs.Add(heretic);
+
+        var armsDealerName = Loc.GetString("admin-verb-make-arms-dealer");
+        Verb armsDealer = new()
+        {
+            Text = armsDealerName,
+            Category = VerbCategory.Antag,
+            Icon = new SpriteSpecifier.Rsi(new ResPath("/Textures/Objects/Weapons/Guns/Pistols/mk58.rsi"), "icon"),
+            Act = () =>
+            {
+                _antag.ForceMakeAntag<ArmsDealerRuleComponent>(targetPlayer, DefaultArmsDealerRule);
+            },
+            Impact = LogImpact.High,
+            Message = string.Join(": ", armsDealerName, Loc.GetString("admin-verb-make-arms-dealer")),
+        };
+        args.Verbs.Add(armsDealer);
     }
 }

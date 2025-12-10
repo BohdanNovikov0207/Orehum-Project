@@ -1,0 +1,36 @@
+- type: entity
+  abstract: true
+  parent: BaseObjective
+  id: BaseArmsDealerObjective
+  components:
+    - type: Objective
+      issuer: objective-issuer-thief # since they're both criminals.
+      icon:
+        sprite: Objects/Weapons/Guns/Pistols/mk58.rsi
+        state: icon
+    - type: RoleRequirement
+      roles:
+        mindRoles:
+          - ArmsDealerRole
+
+- type: entity
+  parent: [BaseArmsDealerObjective, BaseFreeObjective]
+  id: ArmsDealerGunFreeObjective
+  components:
+    - type: Objective
+      difficulty: 0.2
+
+- type: entity
+  parent: [BaseArmsDealerObjective, BaseStealObjective]
+  id: ArmsDealerMoneyObjective
+  components:
+    - type: StealCondition
+      stealGroup: Cash
+      verifyMapExistence: false
+      minCollectionSize: 5000
+      maxCollectionSize: 5000
+      descriptionMultiplyText: objective-condition-arms-dealer-multiply-description
+      objectiveText: objective-condition-earn-title
+      objectiveNoOwnerText: objective-condition-earn-title
+    - type: Objective
+      difficulty: 0.1
