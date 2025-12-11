@@ -1,3 +1,4 @@
+using Content.Client._ES.Lighting;
 using Content.Client.Movement.Systems;
 using Content.Shared.Actions;
 using Content.Shared.Ghost;
@@ -15,6 +16,10 @@ namespace Content.Client.Ghost
         [Dependency] private readonly SharedActionsSystem _actions = default!;
         [Dependency] private readonly PointLightSystem _pointLightSystem = default!;
         [Dependency] private readonly ContentEyeSystem _contentEye = default!;
+        [Dependency] private readonly SpriteSystem _sprite = default!;
+        // ES START
+        [Dependency] private readonly ESInherentLightSystem _inherentLight = default!;
+        // ES END
 
         public int AvailableGhostRoleCount { get; private set; }
 
@@ -35,7 +40,7 @@ namespace Content.Client.Ghost
                 var query = AllEntityQuery<GhostComponent, SpriteComponent>();
                 while (query.MoveNext(out var uid, out _, out var sprite))
                 {
-                    sprite.Visible = value || uid == _playerManager.LocalEntity;
+                    _sprite.SetVisible((uid, sprite), value || uid == _playerManager.LocalEntity);
                 }
             }
         }
@@ -72,7 +77,7 @@ namespace Content.Client.Ghost
         private void OnStartup(EntityUid uid, GhostComponent component, ComponentStartup args)
         {
             if (TryComp(uid, out SpriteComponent? sprite))
-                sprite.Visible = GhostVisibility || uid == _playerManager.LocalEntity;
+                _sprite.SetVisible((uid, sprite), GhostVisibility || uid == _playerManager.LocalEntity);
         }
 
         private void OnToggleLighting(EntityUid uid, EyeComponent component, ToggleLightingActionEvent args)
@@ -80,7 +85,9 @@ namespace Content.Client.Ghost
             if (args.Handled)
                 return;
 
-            TryComp<PointLightComponent>(uid, out var light);
+            // ES START
+            // pointlight to inherentlight
+            TryComp<ESInherentLightComponent>(uid, out var light);
 
             if (!component.DrawLight)
             {
@@ -88,19 +95,20 @@ namespace Content.Client.Ghost
                 Popup.PopupEntity(Loc.GetString("ghost-gui-toggle-lighting-manager-popup-normal"), args.Performer);
                 _contentEye.RequestEye(component.DrawFov, true);
             }
-            else if (!light?.Enabled ?? false) // skip this option if we have no PointLightComponent
+            else if (!light?.Enabled ?? false) // skip this option if we have no ESInherentLightComponent
             {
                 // enable personal light
                 Popup.PopupEntity(Loc.GetString("ghost-gui-toggle-lighting-manager-popup-personal-light"), args.Performer);
-                _pointLightSystem.SetEnabled(uid, true, light);
+                _inherentLight.SetEnabled((uid, light), true);
             }
             else
             {
                 // fullbright mode
                 Popup.PopupEntity(Loc.GetString("ghost-gui-toggle-lighting-manager-popup-fullbright"), args.Performer);
                 _contentEye.RequestEye(component.DrawFov, false);
-                _pointLightSystem.SetEnabled(uid, false, light);
+                _inherentLight.SetEnabled((uid, light), false);
             }
+            // ES END
             args.Handled = true;
         }
 
@@ -119,8 +127,8 @@ namespace Content.Client.Ghost
             if (args.Handled)
                 return;
 
-            Popup.PopupEntity(Loc.GetString("ghost-gui-toggle-ghost-visibility-popup"), args.Performer);
-
+            var locId = GhostVisibility ? "ghost-gui-toggle-ghost-visibility-popup-off" : "ghost-gui-toggle-ghost-visibility-popup-on";
+            Popup.PopupEntity(Loc.GetString(locId), args.Performer);
             if (uid == _playerManager.LocalEntity)
                 ToggleGhostVisibility();
 
@@ -150,12 +158,11 @@ namespace Content.Client.Ghost
         private void OnGhostState(EntityUid uid, GhostComponent component, ref AfterAutoHandleStateEvent args)
         {
             if (TryComp<SpriteComponent>(uid, out var sprite))
-                sprite.LayerSetColor(0, component.color);
+                _sprite.LayerSetColor((uid, sprite), 0, component.Color);
 
             if (uid != _playerManager.LocalEntity)
                 return;
 
-            PlayerUpdated?.Invoke(component);
         }
 
         private void OnGhostPlayerDetach(EntityUid uid, GhostComponent component, LocalPlayerDetachedEvent args)
@@ -196,20 +203,9 @@ namespace Content.Client.Ghost
             _console.RemoteExecuteCommand(null, "ghostroles");
         }
 
-        public void GhostBarSpawn() // Goobstation - Ghost Bar
-        {
-            RaiseNetworkEvent(new GhostBarSpawnEvent());
-        }
-
         public void ToggleGhostVisibility(bool? visibility = null)
         {
             GhostVisibility = visibility ?? !GhostVisibility;
-        }
-
-        public void ReturnToRound()
-        {
-            var msg = new GhostReturnToRoundRequest();
-            RaiseNetworkEvent(msg);
         }
     }
 }
