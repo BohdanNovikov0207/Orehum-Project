@@ -2,6 +2,7 @@ using Content.Client._ES.Viewcone.Overlays;
 using Content.Client.Eye;
 using Content.Shared._ES.Viewcone;
 using Content.Shared.MouseRotator;
+using Content.Shared.Ghost;
 using Robust.Client.GameObjects;
 using Robust.Client.Graphics;
 using Robust.Client.Input;
@@ -21,6 +22,7 @@ public sealed class ESViewconeOverlayManagementSystem : EntitySystem
     [Dependency] private readonly IOverlayManager _overlayMan = default!;
     [Dependency] private readonly IInputManager _input = default!;
     [Dependency] private readonly IEyeManager _eye = default!;
+    [Dependency] private readonly IEntityManager _entMan = default!;
     [Dependency] private readonly SharedTransformSystem _xform = default!;
     private ESViewconeConeOverlay _coneOverlay = default!;
     private ESViewconeSetAlphaOverlay _setAlphaOverlay = default!;
@@ -115,6 +117,10 @@ public sealed class ESViewconeOverlayManagementSystem : EntitySystem
 
     private void OnPlayerAttached(Entity<ESViewconeComponent> entity, ref LocalPlayerAttachedEvent args)
     {
+        if (_entMan.HasComponent<GhostComponent>(entity.Owner))
+        {
+            return;
+        }
         AddOverlays();
     }
 
@@ -125,6 +131,10 @@ public sealed class ESViewconeOverlayManagementSystem : EntitySystem
 
     private void OnConeManInit(Entity<ESViewconeComponent> entity, ref ComponentInit args)
     {
+        if (_entMan.HasComponent<GhostComponent>(entity.Owner))
+        {
+            return;
+        }
         if (_playerManager.LocalSession?.AttachedEntity == entity.Owner)
             AddOverlays();
     }
