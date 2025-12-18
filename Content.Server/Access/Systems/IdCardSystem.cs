@@ -1,5 +1,6 @@
 using System.Linq;
 using Content.Server.Administration.Logs;
+using Content.Shared.Chat;
 using Content.Server.Chat.Systems;
 using Content.Server.Kitchen.Components;
 using Content.Server.Popups;
