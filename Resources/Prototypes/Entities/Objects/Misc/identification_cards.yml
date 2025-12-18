@@ -1022,7 +1022,7 @@
   components:
   - type: Sprite
     layers:
-    - state: orange
+    - state: prisoner
   - type: Item
     heldPrefix: orange
   - type: Access
