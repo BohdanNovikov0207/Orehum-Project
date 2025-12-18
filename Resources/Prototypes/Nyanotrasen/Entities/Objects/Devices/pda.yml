@@ -15,7 +15,7 @@
     state: pda-clear
 
 - type: entity
-  parent: PrisonerPDA
+  parent: PrisonerNyanoPDA
   id: GladiatorPDA
   name: gladiator PDA
   components:
