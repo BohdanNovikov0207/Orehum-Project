@@ -1,6 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<!-- Work around https://github.com/dotnet/project-system/issues/4314 -->
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 		<OutputPath>../bin/Content.Server/</OutputPath>
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
@@ -9,6 +8,7 @@
 		<WarningsAsErrors>nullable</WarningsAsErrors>
 		<ServerGarbageCollection>true</ServerGarbageCollection>
 	</PropertyGroup>
+	<Import Project="../MSBuild/Content.props" />
 
 	<ItemGroup>
     <ProjectReference Include="../Content.Trauma.Common/Content.Trauma.Common.csproj" />
@@ -16,7 +16,8 @@
 		<ProjectReference Include="../Content.Goobstation.Server/Content.Goobstation.Server.csproj" />
 		<ProjectReference Include="../Content.Server/Content.Server.csproj" />
 	</ItemGroup>
-  <Import Project="../RobustToolbox/Imports/Server.props" />
-  <Import Project="../RobustToolbox/Imports/Shared.props" />
+
+	<Import Project="../RobustToolbox/Imports/Server.props" />
+	<Import Project="../RobustToolbox/Imports/Shared.props" />
 	<Import Project="../RobustToolbox/MSBuild/Robust.Properties.targets" />
 </Project>

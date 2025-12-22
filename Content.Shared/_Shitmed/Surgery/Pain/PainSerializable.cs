@@ -1,4 +1,4 @@
-﻿using Content.Shared._Shitmed.Medical.Surgery.Pain.Components;
+using Content.Shared._Shitmed.Medical.Surgery.Pain.Components;
 using Content.Goobstation.Maths.FixedPoint;
 using Robust.Shared.Serialization;
 

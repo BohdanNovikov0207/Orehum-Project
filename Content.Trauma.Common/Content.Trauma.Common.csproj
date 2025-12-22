@@ -3,13 +3,14 @@
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 		<WarningsAsErrors>nullable</WarningsAsErrors>
 	</PropertyGroup>
-  <Import Project="../MSBuild/Content.props" />
+	<Import Project="../MSBuild/Content.props" />
 
 	<ItemGroup>
 		<ProjectReference Include="../Content.ModuleManager/Content.ModuleManager.csproj" />
-    <ProjectReference Include="../Content.Goobstation.Maths/Content.Goobstation.Maths.csproj" />
+		<ProjectReference Include="../Content.Goobstation.Maths/Content.Goobstation.Maths.csproj" />
 	</ItemGroup>
-  <Import Project="../RobustToolbox/Imports/Shared.props" />
+
+	<Import Project="../RobustToolbox/Imports/Shared.props" />
 	<Import Project="../RobustToolbox/MSBuild/Robust.Properties.targets" />
 	<Import Project="../RobustToolbox/MSBuild/Robust.CompNetworkGenerator.targets" />
 </Project>
