@@ -510,6 +510,7 @@
   - type: VisibleContraband # Goobstation
   - type: MomentumSteering # Goobstation - No steer
   - type: SpeedSliding
+  - type: Posing # Orion
 
 - type: entity
   save: false
