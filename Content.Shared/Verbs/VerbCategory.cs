@@ -104,6 +104,14 @@ namespace Content.Shared.Verbs
 
         public static readonly VerbCategory Rename = new("verb-categories-rename");
 
+        public static readonly VerbCategory SexChange = new("verb-categories-sex-change");
+
+        public static readonly VerbCategory GenderChange = new("verb-categories-gender-change");
+
+        public static readonly VerbCategory PowerLevel = new("verb-categories-power-level");
+
+        public static readonly VerbCategory Switch = new("verb-categories-switch");
+
         public static readonly VerbCategory Interaction = new("verb-categories-interaction");
 
         public static readonly VerbCategory BloodSpells = new("verb-categories-blood-cult",
