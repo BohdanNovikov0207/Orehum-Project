@@ -12,9 +12,6 @@ ent-LavalandAshDrakeFire = драконье пламя
 ent-LavalandSupportMarkAshDrake = метка
     .desc = Что-то летит, тебе лучше отойти подальше.
 
-ent-LavalandAshDrakeFire = драконье пламя
-    .desc = Не стоило играть с огнём...
-
 ent-LavalandSupportLavaMarkAshDrake = лавовая метка
     .desc = Зачем ты на это смотришь? У тебя щас боссфайт, не потеряй концентрацию!
 
