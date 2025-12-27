@@ -78,7 +78,7 @@
   result: ChemistryEmptyBottle01
   completetime: 2
   materials:
-    Glass: 50
+    Glass: 100
 
 # - type: latheRecipe
 #   id: Vape

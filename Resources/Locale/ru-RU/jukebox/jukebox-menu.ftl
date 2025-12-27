@@ -1,4 +1,6 @@
 jukebox-menu-title = Музыкальный автомат
+jukebox-menu-buttonall = Все
+jukebox-menu-buttonholiday = Новогодние
 jukebox-menu-selectedsong = Выбранная песня:
 jukebox-menu-buttonplay = Играть
 jukebox-menu-buttonpause = Пауза

@@ -6,10 +6,9 @@
 
 - type: lavalandRuin
   id: AshDrakeArena
-  name: lavaland-ruin-ash-drake
+  name: lavaland-ruin-ashDrake
   path: /Maps/_Lavaland/Lavaland/ruin_ash_drake_arena.yml
   priority: -1 # highest priority
-
 
 - type: lavalandRuin
   id: SyndicateBase

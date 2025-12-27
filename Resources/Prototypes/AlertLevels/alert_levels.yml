@@ -72,19 +72,18 @@
     enigma:
       announcement: alert-level-enigma-announcement
       selectable: false
-      sound: /Audio/Announcements/AlertLevels/code_enigma.ogg # DS14 alert sound
+      sound: /Audio/Announcements/Alerts/code_enigma.ogg # DS14 alert sound
       disableSelection: true
-      color: '#EF7200'
-      emergencyLightColor: '#EF7200'
+      color: "#EF7200"
+      emergencyLightColor: "#EF7200"
       forceEnableEmergencyLights: true
       shuttleTime: 240
     omicron:
       announcement: alert-level-omicron-announcement
       selectable: false
-      sound: Audio/Announcements/AlertLevels/code_omicron.ogg
+      sound: /Audio/Announcements/Alerts/code_omicron.ogg
       disableSelection: true
-      color: '#5A4B4B'
-      emergencyLightColor: '#5A4B4B'
+      color: "#5A4B4B"
+      emergencyLightColor: "#5A4B4B"
       forceEnableEmergencyLights: true
       shuttleTime: 1200
-

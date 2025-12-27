@@ -538,6 +538,7 @@
     - Plasmaman
     - Thaven
     - Feroxi
+    - Gingerbread
   randomizeName: false
   components:
     - type: RandomHumanoidAppearance
@@ -611,6 +612,7 @@
     - Plasmaman
     - Thaven
     - Feroxi
+    - Gingerbread
   randomizeName: false
   components:
     - type: RandomHumanoidAppearance
@@ -683,6 +685,7 @@
     - Plasmaman
     - Thaven
     - Feroxi
+    - Gingerbread
   randomizeName: false
   components:
     - type: RandomHumanoidAppearance
@@ -756,6 +759,7 @@
     - Plasmaman
     - Thaven
     - Feroxi
+    - Gingerbread
   components:
     - type: RandomHumanoidAppearance
       randomizeName: false
@@ -828,6 +832,7 @@
     - Plasmaman
     - Thaven
     - Feroxi
+    - Gingerbread
   components:
     - type: RandomHumanoidAppearance
       randomizeName: false
@@ -900,6 +905,7 @@
     - Plasmaman
     - Thaven
     - Feroxi
+    - Gingerbread
   components:
     - type: RandomHumanoidAppearance
       randomizeName: false
@@ -972,6 +978,7 @@
     - Plasmaman
     - Thaven
     - Feroxi
+    - Gingerbread
   components:
     - type: RandomHumanoidAppearance
       randomizeName: false
@@ -1044,6 +1051,7 @@
     - Plasmaman
     - Thaven
     - Feroxi
+    - Gingerbread
   components:
     - type: RandomHumanoidAppearance
       randomizeName: false
@@ -1116,6 +1124,7 @@
     - Plasmaman
     - Thaven
     - Feroxi
+    - Gingerbread
   components:
     - type: RandomHumanoidAppearance
       randomizeName: false
@@ -1188,6 +1197,7 @@
     - Plasmaman
     - Thaven
     - Feroxi
+    - Gingerbread
   components:
     - type: RandomHumanoidAppearance
       randomizeName: false
@@ -1261,6 +1271,7 @@
     - Plasmaman
     - Thaven
     - Feroxi
+    - Gingerbread
   components:
     - type: RandomHumanoidAppearance
       randomizeName: false
@@ -1333,6 +1344,7 @@
     - Plasmaman
     - Thaven
     - Feroxi
+    - Gingerbread
   components:
     - type: RandomHumanoidAppearance
       randomizeName: false
@@ -1405,6 +1417,7 @@
     - Plasmaman
     - Thaven
     - Feroxi
+    - Gingerbread
   components:
     - type: RandomHumanoidAppearance
       randomizeName: false
@@ -1477,6 +1490,7 @@
     - Plasmaman
     - Thaven
     - Feroxi
+    - Gingerbread
   components:
     - type: RandomHumanoidAppearance
       randomizeName: false
@@ -1549,6 +1563,7 @@
     - Plasmaman
     - Thaven
     - Feroxi
+    - Gingerbread
   components:
     - type: RandomHumanoidAppearance
       randomizeName: false
@@ -1668,6 +1683,7 @@
     - Plasmaman
     - Thaven
     - Feroxi
+    - Gingerbread
   components:
     - type: RandomHumanoidAppearance
       randomizeName: false
@@ -1779,6 +1795,7 @@
     - Plasmaman
     - Thaven
     - Feroxi
+    - Gingerbread
   components:
     - type: RandomHumanoidAppearance
       randomizeName: false
@@ -1889,6 +1906,7 @@
     - Plasmaman
     - Thaven
     - Feroxi
+    - Gingerbread
   components:
     - type: AutoImplant
       implants:
@@ -1991,6 +2009,7 @@
     - Plasmaman
     - Thaven
     - Feroxi
+    - Gingerbread
   components:
     - type: AutoImplant
       implants:
@@ -2079,6 +2098,7 @@
     - Plasmaman
     - Thaven
     - Feroxi
+    - Gingerbread
   components:
     - type: RandomHumanoidAppearance
       randomizeName: false

@@ -21,10 +21,12 @@
 - files: ["rubber_pig_5.ogg"]
   license: "CC-BY-4.0"
   copyright: "MattRuthSound from Freesound"
+  source: "https://zvukipro.com/"
 
 - files: ["jeff.ogg"]
   license: "CC-BY-4.0"
   copyright: "NN from Freesound"
+  source: "https://zvukipro.com"
 
 - files: ["pAkva.ogg"]
   license: "CC-BY-3.0"

@@ -16766,3 +16766,56 @@ Entries:
   id: 7316
   time: '2025-09-29T02:05:53.0000000+00:00'
   url: https://github.com/Simple-Station/Einstein-Engines/pull/2548
+- author: IsNotAcceptable
+  changes:
+    - type: Tweak
+      message: Теперь спавн оружия более менее сбалансированны
+  id: 7317
+  time: '2025-12-12T06:57:41.0000000+00:00'
+  url: https://github.com/BohdanNovikov0207/Orehum-Project/pull/185
+- author: ME4TA
+  changes:
+    - type: Add
+      message: Существа теперь моргают, а во время сна закрывают глазки
+  id: 7318
+  time: '2025-12-12T08:37:10.0000000+00:00'
+  url: https://github.com/BohdanNovikov0207/Orehum-Project/pull/186
+- author: Unenduring
+  changes:
+    - type: Add
+      message: Добавлена лоу-поп карта Snowball
+    - type: Add
+      message: Портирована общая тюрьма (генпоп), пока что имеется лишь на Snowball
+  id: 7319
+  time: '2025-12-18T22:39:33.0000000+00:00'
+  url: https://github.com/BohdanNovikov0207/Orehum-Project/pull/188
+- author: firfaronde
+  changes:
+    - type: Add
+      message: Omega Station
+  id: 7320
+  time: '2025-12-22T15:19:21.0000000+00:00'
+  url: https://github.com/BohdanNovikov0207/Orehum-Project/pull/189
+- author: firfaronde
+  changes:
+    - type: Fix
+      message: Пофиксил прототипы используемые омегой
+  id: 7321
+  time: '2025-12-23T23:10:12.0000000+00:00'
+  url: https://github.com/BohdanNovikov0207/Orehum-Project/pull/190
+- author: firfaronde
+  changes:
+    - type: Add
+      message: Упакованная СМ.
+  id: 7322
+  time: '2025-12-25T15:27:28.0000000+00:00'
+  url: https://github.com/BohdanNovikov0207/Orehum-Project/pull/191
+- author: ME4TA
+  changes:
+    - type: Add
+      message: Слои труб
+    - type: Tweak
+      message: Труба может принимать в одном направлении 3 позиции
+  id: 7323
+  time: '2025-12-27T13:18:04.0000000+00:00'
+  url: https://github.com/BohdanNovikov0207/Orehum-Project/pull/192

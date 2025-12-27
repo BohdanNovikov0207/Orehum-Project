@@ -1,0 +1,11 @@
+- type: alertCategory
+  id: TileMovement
+
+- type: alertCategory
+  id: IcyLook
+
+- type: alertCategory
+  id: CarpBlood
+
+- type: alertCategory
+  id: VigilanteEye

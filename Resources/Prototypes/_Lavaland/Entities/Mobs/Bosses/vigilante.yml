@@ -87,7 +87,7 @@
   coefficients:
     Piercing: 0.7
     Heat: 0.75
-    Brute: 0.6
+    Blunt: 0.6
     Slash: 0.6
 
 - type: entity
