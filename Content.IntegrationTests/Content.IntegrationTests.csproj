@@ -28,6 +28,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Content.Client\Content.Client.csproj" />
+    <ProjectReference Include="..\Content.Trauma.Common\Content.Trauma.Common.csproj" />
     <ProjectReference Include="..\Content.Goobstation.Client\Content.Goobstation.Client.csproj" />
     <ProjectReference Include="..\Content.Goobstation.Server\Content.Goobstation.Server.csproj" />
     <ProjectReference Include="..\Content.Goobstation.Shared\Content.Goobstation.Shared.csproj" />

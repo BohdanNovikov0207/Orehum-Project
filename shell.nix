@@ -45,6 +45,7 @@ let
     at-spi2-core
     cups
     python3
+    pipewire
   ];
 in pkgs.mkShell {
   name = "space-station-14-devshell";
