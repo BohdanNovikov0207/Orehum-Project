@@ -1,0 +1,156 @@
+- type: entity
+  abstract: true
+  parent: [BaseItem]
+  id: T45PartBase
+  description: Деталь для брони MARK-1.
+  components:
+  - type: Sprite
+    sprite: _Trauma/Objects/Specific/Mech/T45Armor.rsi
+  - type: Item
+    size: Ginormous
+
+- type: entity
+  parent: T45PartBase
+  id: T45Helmet
+  name: Шлем MARK-1
+  components:
+  - type: Sprite
+    state: t45_helmet
+  - type: Tag
+    tags:
+    - T45Helmet
+
+- type: entity
+  parent: T45PartBase
+  id: T45Chest
+  name: Грудь MARK-1
+  components:
+  - type: Sprite
+    state: t45_chest
+  - type: Tag
+    tags:
+    - T45Chest
+
+- type: entity
+  parent: T45PartBase
+  id: T45ArmL
+  name: Левая рука MARK-1
+  components:
+  - type: Sprite
+    state: t45_lefthand
+  - type: Tag
+    tags:
+    - T45ArmL
+
+- type: entity
+  parent: T45PartBase
+  id: T45ArmR
+  name: Правая рука MARK-1
+  components:
+  - type: Sprite
+    state: t45_righthand
+  - type: Tag
+    tags:
+    - T45ArmR
+
+- type: entity
+  parent: T45PartBase
+  id: T45LegR
+  name: Правая нога MARK-1
+  components:
+  - type: Sprite
+    state: t45_rightleg
+  - type: Tag
+    tags:
+    - T45LegR
+
+- type: entity
+  parent: T45PartBase
+  id: T45LegL
+  name: Левая нога MARK-1
+  components:
+  - type: Sprite
+    state: t45_leftleg
+  - type: Tag
+    tags:
+    - T45LegL
+
+- type: entity
+  parent: [PowerCellHyper]
+  id: FusionCore
+  name: термоядерное ядро
+  suffix: Full
+  description: Термоядерное ядро может использоваться в качестве батареи очень большой емкости, но чаще всего применяется для питания бронекостюмов MARK-1.
+  components:
+  - type: Sprite
+    sprite: _Trauma/Objects/Devices/fusionCore.rsi
+    layers:
+    - map: [ "enum.PowerCellVisualLayers.Base" ]
+      state: fusion_core
+    - map: [ "enum.PowerCellVisualLayers.Unshaded" ]
+      state: o2
+      shader: unshaded
+  - type: Item
+    size: Normal
+  - type: Tag
+    tags:
+    - FusionCore
+
+- type: entity
+  parent: [BaseMechWeaponMelee, CombatMechEquipment]
+  id: WeaponMechMeleePowerFist
+  name: силовой кулак
+  suffix: Mech Weapon, Melee
+  description: Бронированная перчатка с приводным тараном или аналогичным устройством, повышающим эффективность ударов, используемая в броне MARK-1.
+  components:
+  - type: Sprite
+    sprite: _Trauma/Objects/Weapons/Melee/powerfist.rsi
+    state: powerfist
+  - type: MeleeThrowOnHit
+    distance: 5
+    speed: 30
+  - type: MeleeWeapon
+    canWideSwing: false
+    angle: 0
+    wideAnimationRotation: -90
+    soundHit:
+      collection: PowerFistHit
+    attackRate: 0.5
+    damage:
+      groups:
+        Brute: 30
+      types:
+        Structural: 60
+
+- type: entity
+  parent: [ BaseMechWeaponRange, CombatMechEquipment ]
+  id: WeaponMechCombatFlameThrower
+  name: тяжелый огнемет fO-46 mk3
+  suffix: Mech Weapon, Gun, Combat, Flame
+  description: Из метательного устройства издает огнемет, может использоваться в броне MARK-1.
+  components:
+  - type: Sprite
+    sprite: _Trauma/Objects/Weapons/Guns/Flamethrower/flamethrower.rsi
+    state: icon
+  - type: BasicEntityAmmoProvider
+    proto: FlameThrowerBullet
+    capacity: 250
+    count: 250
+  - type: Buckleable
+  - type: Gun
+    minAngle: 0
+    maxAngle: 0
+    fireRate: 5
+    burstFireRate: 5
+    burstCooldown: .5
+    shotsPerBurst: 5
+    projectileSpeed: 20
+    selectedMode: FullAuto
+    availableModes:
+    - FullAuto
+    - Burst
+    soundGunshot:
+      path: /Audio/_Trauma/Revs/flamethrower.ogg
+  - type: AmmoCounter
+  - type: UseDelay
+    delay: 1

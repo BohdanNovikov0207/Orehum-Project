@@ -12,3 +12,17 @@ construction-graph-tag-RevID = карта доступа революционе�
 construction-graph-tag-RocketFrame = каркас ракеты
 construction-graph-tag-FlamethrowerTank = пустой топливный бак
 construction-graph-tag-QMBoard = цифровая плата отдела снабжения
+
+construction-graph-tag-fusion-core = термоядерное ядро
+
+# tools
+construction-graph-tag-welder-experimental = экспериментальный сварочный инструмент
+
+# structures
+construction-graph-tag-nail = гвоздь
+
+# robots
+
+construction-graph-tag-butt = задница
+construction-graph-tag-cyber-butt = паховая область IPC
+construction-graph-tag-egg = любое яйцо

@@ -321,3 +321,27 @@
       blueprint: !type:Container
   - type: Construction
     node: plasma foundry
+
+- type: entity
+  parent: BaseRevIndustry
+  id: RevPowerArmorStand
+  name: Подставка для брони
+  description: Подставка для брони, используемая для демонстрации брони MARK-1.
+  components:
+  - type: Sprite
+    sprite: _Trauma/Structures/Machines/powerarmorstand.rsi
+    layers:
+    - state: chains
+      map: [ "chains" ]
+    - state: station
+      map: ["station"]
+  - type: Construction
+    graph: PowerArmorStand
+    node: start
+  - type: Strap
+    buckleOnInteractHand: false
+    addBuckleverb: false
+    buckleOffset: "0, 0.2"
+    whitelist:
+      tags:
+      - T45Frame
