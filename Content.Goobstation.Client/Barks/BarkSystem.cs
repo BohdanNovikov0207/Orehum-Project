@@ -7,6 +7,7 @@ using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Timing;
 using Content.Goobstation.Common.CCVar;
+using Content.Shared.Chat; // Corvax-Wega-Deafness
 
 namespace Content.Goobstation.Client.Barks;
 
@@ -50,6 +51,10 @@ public sealed class BarkSystem : EntitySystem
         if (!TryComp<SpeechSynthesisComponent>(sourceEntity, out var comp)
             || comp.VoicePrototypeId is null
             || !_prototypeManager.TryIndex<BarkPrototype>(comp.VoicePrototypeId, out var proto))
+            return;
+
+        // Corvax-Wega-Deafness
+        if (HasComp<DeafnessComponent>(sourceEntity))
             return;
 
         PlayBark(sourceEntity, ev.Message, ev.Whisper, proto);

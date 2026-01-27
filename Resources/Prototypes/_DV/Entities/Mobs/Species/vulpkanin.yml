@@ -154,6 +154,13 @@
     - DoorBumpOpener
     - AnomalyHost
     - VulpEmotes
+  # - type: FootPrints # WD EDIT
+  - type: Wagging # Einstein-Engine
+  # Corvax-Wega-Genetics-start
+  - type: DnaModifier
+    upper: MobVulpkanin
+    lowest: MobWolfling
+  # Corvax-Wega-Genetics-end
 
 - type: entity
   save: false

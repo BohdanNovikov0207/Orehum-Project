@@ -23,6 +23,7 @@
   bodyPart: Eyes
   markingCategory: Overlay
   speciesRestriction: [Dwarf, Human, Arachnid, Felinid, Vulpkanin, Rodentia, Tajaran, Feroxi, Yowie] # Delta V - Felinid, Vulpkanin, Rodentia; Goob - Tajaran, Yowies
+  markingType: NonGenetics # Corvax-Wega-Genetics
   coloring:
     default:
       type:
@@ -37,6 +38,7 @@
   bodyPart: Eyes
   markingCategory: Overlay
   speciesRestriction: [Dwarf, Human, Reptilian, Arachnid, Felinid, Vulpkanin, Rodentia, Tajaran, Feroxi, Yowie] # Delta V - Felinid, Vulpkanin, Rodentia; Goob - Tajaran, Yowies
+  markingType: NonGenetics # Corvax-Wega-Genetics
   coloring:
     default:
       type:
@@ -51,6 +53,7 @@
   bodyPart: Eyes
   markingCategory: Overlay
   speciesRestriction: [Dwarf, Human, Arachnid, Felinid, Vulpkanin, Rodentia, Tajaran, Feroxi, Yowie] # Delta V - Felinid, Vulpkanin, Rodentia; Goob - Tajaran, Yowies
+  markingType: NonGenetics # Corvax-Wega-Genetics
   coloring:
     default:
       type:
@@ -65,6 +68,7 @@
   bodyPart: Eyes
   markingCategory: Overlay
   speciesRestriction: [Dwarf, Human, Reptilian, Arachnid, Felinid, Vulpkanin, Rodentia, Tajaran, Feroxi, Yowie] # Delta V - Felinid, Vulpkanin, Rodentia; Goob - Tajaran, Yowies
+  markingType: NonGenetics # Corvax-Wega-Genetics
   coloring:
     default:
       type:
@@ -79,6 +83,7 @@
   bodyPart: Eyes
   markingCategory: Overlay
   speciesRestriction: [Dwarf, Human, Arachnid, Felinid, Harpy, Vulpkanin, Rodentia, Tajaran, Feroxi, Yowie] # Delta V - Felinid, Vulpkanin, Rodentia; Goob - Tajaran, Yowies
+  markingType: NonGenetics # Corvax-Wega-Genetics
   coloring:
     default:
       type:
@@ -93,6 +98,7 @@
   bodyPart: Chest
   markingCategory: Overlay
   speciesRestriction: [Dwarf, Human, Reptilian, Arachnid, Felinid, Vulpkanin, Rodentia, Tajaran, Feroxi, Yowie] # Delta V - Felinid, Vulpkanin, Rodentia; Goob - Tajaran, Yowies
+  markingType: NonGenetics # Corvax-Wega-Genetics
   coloring:
     default:
       type:
@@ -107,6 +113,7 @@
   bodyPart: Chest
   markingCategory: Overlay
   speciesRestriction: [Dwarf, Human, Reptilian, Arachnid, Felinid, Vulpkanin, Rodentia, Tajaran, Feroxi, Yowie] # Delta V - Felinid, Vulpkanin, Rodentia; Goob - Tajaran, Yowies
+  markingType: NonGenetics # Corvax-Wega-Genetics
   coloring:
     default:
       type:
@@ -121,6 +128,7 @@
   bodyPart: RArm
   markingCategory: Overlay
   speciesRestriction: [Dwarf, Human, Reptilian, Arachnid, SlimePerson, Felinid, Vulpkanin, Rodentia, Tajaran, Feroxi, Yowie] # Delta V - Felinid, Vulpkanin, Rodentia; Goob - Tajaran, Yowies
+  markingType: NonGenetics # Corvax-Wega-Genetics
   coloring:
     default:
       type:
@@ -135,6 +143,7 @@
   bodyPart: RArm, RHand
   markingCategory: Overlay
   speciesRestriction: [Dwarf, Human, Reptilian, Arachnid, SlimePerson, Felinid, Vulpkanin, Rodentia, Tajaran, Feroxi, Yowie] # Delta V - Felinid, Vulpkanin, Rodentia; Goob - Tajaran, Yowies
+  markingType: NonGenetics # Corvax-Wega-Genetics
   coloring:
     default:
       type:
@@ -149,6 +158,7 @@
   bodyPart: LArm, LHand
   markingCategory: Overlay
   speciesRestriction: [Dwarf, Human, Reptilian, Arachnid, Felinid, Vulpkanin, Rodentia, Tajaran, Feroxi, Yowie] # Delta V - Felinid, Vulpkanin, Rodentia; Goob - Tajaran, Yowies
+  markingType: NonGenetics # Corvax-Wega-Genetics
   coloring:
     default:
       type:
@@ -163,6 +173,7 @@
   bodyPart: LFoot
   markingCategory: Overlay
   speciesRestriction: [Dwarf, Human, Arachnid, Felinid, Vulpkanin, Rodentia, Tajaran, Feroxi, Yowie] # Delta V - Felinid, Vulpkanin, Rodentia; Goob - Tajaran, Yowies
+  markingType: NonGenetics # Corvax-Wega-Genetics
   coloring:
     default:
       type:
@@ -177,6 +188,7 @@
   bodyPart: LLeg
   markingCategory: Overlay
   speciesRestriction: [Dwarf, Human, Reptilian, Arachnid, Felinid, Vulpkanin, Rodentia, Tajaran, Feroxi, Yowie] # Delta V - Felinid, Vulpkanin, Rodentia; Goob - Tajaran, Yowies
+  markingType: NonGenetics # Corvax-Wega-Genetics
   coloring:
     default:
       type:
@@ -191,6 +203,7 @@
   bodyPart: RLeg
   markingCategory: Overlay
   speciesRestriction: [Dwarf, Human, Reptilian, Arachnid, Felinid, Vulpkanin, Rodentia, Tajaran, Feroxi, Yowie] # Delta V - Felinid, Vulpkanin, Rodentia; Goob - Tajaran, Yowies
+  markingType: NonGenetics # Corvax-Wega-Genetics
   coloring:
     default:
       type:
@@ -205,6 +218,7 @@
   bodyPart: RFoot
   markingCategory: Overlay
   speciesRestriction: [Dwarf, Human, Arachnid, Felinid, Vulpkanin, Rodentia, Tajaran, Feroxi, Yowie] # Delta V - Felinid, Vulpkanin, Rodentia; Goob - Tajaran, Yowies
+  markingType: NonGenetics # Corvax-Wega-Genetics
   coloring:
     default:
       type:
@@ -219,6 +233,7 @@
   bodyPart: RHand
   markingCategory: Overlay
   speciesRestriction: [Dwarf, Human, Reptilian, Arachnid, SlimePerson, Felinid, Vulpkanin, Rodentia, Tajaran, Feroxi, Yowie] # Delta V - Felinid, Vulpkanin, Rodentia; Goob - Tajaran, Yowies
+  markingType: NonGenetics # Corvax-Wega-Genetics
   coloring:
     default:
       type:
@@ -233,6 +248,7 @@
   bodyPart: LHand
   markingCategory: Overlay
   speciesRestriction: [Dwarf, Human, Reptilian, Arachnid, SlimePerson, Felinid, Vulpkanin, Rodentia, Tajaran, Feroxi, Yowie] # Delta V - Felinid, Vulpkanin, Rodentia; Goob - Tajaran, Yowies
+  markingType: NonGenetics # Corvax-Wega-Genetics
   coloring:
     default:
       type:
@@ -247,6 +263,7 @@
   bodyPart: Head
   markingCategory: Overlay
   speciesRestriction: [Dwarf, Human, Reptilian, Arachnid, Moth, Chitinid, Feroxi, Yowie] # Delta V - Chitinid + Feroxi; Goob - Yowies
+  markingType: NonGenetics # Corvax-Wega-Genetics
   coloring:
     default:
       type:
@@ -262,6 +279,7 @@
   bodyPart: Eyes
   markingCategory: Overlay
   speciesRestriction: [Reptilian]
+  markingType: NonGenetics # Corvax-Wega-Genetics
   coloring:
     default:
       type:
@@ -276,6 +294,7 @@
   bodyPart: Eyes
   markingCategory: Overlay
   speciesRestriction: [Reptilian]
+  markingType: NonGenetics # Corvax-Wega-Genetics
   coloring:
     default:
       type:
@@ -290,6 +309,7 @@
   bodyPart: RFoot
   markingCategory: Overlay
   speciesRestriction: [Reptilian]
+  markingType: NonGenetics # Corvax-Wega-Genetics
   coloring:
     default:
       type:
@@ -304,6 +324,7 @@
   bodyPart: LFoot
   markingCategory: Overlay
   speciesRestriction: [Reptilian]
+  markingType: NonGenetics # Corvax-Wega-Genetics
   coloring:
     default:
       type:
@@ -318,6 +339,7 @@
   bodyPart: Eyes
   markingCategory: Overlay
   speciesRestriction: [Reptilian]
+  markingType: NonGenetics # Corvax-Wega-Genetics
   coloring:
     default:
       type:
@@ -333,6 +355,7 @@
   bodyPart: Eyes
   markingCategory: Overlay
   speciesRestriction: [Moth, Chitinid] # Delta V - Chitinid
+  markingType: NonGenetics # Corvax-Wega-Genetics
   coloring:
     default:
       type:
@@ -347,6 +370,7 @@
   bodyPart: Chest
   markingCategory: Overlay
   speciesRestriction: [Moth, Chitinid] # Delta V - Chitinid
+  markingType: NonGenetics # Corvax-Wega-Genetics
   coloring:
     default:
       type:
@@ -361,6 +385,7 @@
   bodyPart: Chest
   markingCategory: Overlay
   speciesRestriction: [Moth, Chitinid] # Delta V - Chitinid
+  markingType: NonGenetics # Corvax-Wega-Genetics
   coloring:
     default:
       type:
@@ -375,6 +400,7 @@
   bodyPart: Eyes
   markingCategory: Overlay
   speciesRestriction: [Moth, Chitinid] # Delta V - Chitinid
+  markingType: NonGenetics # Corvax-Wega-Genetics
   coloring:
     default:
       type:
@@ -389,6 +415,7 @@
   bodyPart: Eyes
   markingCategory: Overlay
   speciesRestriction: [Moth, Chitinid] # Delta V - Chitinid
+  markingType: NonGenetics # Corvax-Wega-Genetics
   coloring:
     default:
       type:
@@ -403,6 +430,7 @@
   bodyPart: Eyes
   markingCategory: Overlay
   speciesRestriction: [Moth, Chitinid] # Delta V - Chitinid
+  markingType: NonGenetics # Corvax-Wega-Genetics
   coloring:
     default:
       type:
@@ -417,6 +445,7 @@
   bodyPart: Eyes
   markingCategory: Overlay
   speciesRestriction: [Moth, Chitinid] # Delta V - Chitinid
+  markingType: NonGenetics # Corvax-Wega-Genetics
   coloring:
     default:
       type:
@@ -431,6 +460,7 @@
   bodyPart: RArm
   markingCategory: Overlay
   speciesRestriction: [Moth, Chitinid] # Delta V - Chitinid
+  markingType: NonGenetics # Corvax-Wega-Genetics
   coloring:
     default:
       type:
@@ -445,6 +475,7 @@
   bodyPart: LArm
   markingCategory: Overlay
   speciesRestriction: [Moth, Chitinid] # Delta V - Chitinid
+  markingType: NonGenetics # Corvax-Wega-Genetics
   coloring:
     default:
       type:
@@ -459,6 +490,7 @@
   bodyPart: RLeg
   markingCategory: Overlay
   speciesRestriction: [Moth, Chitinid] # Delta V - Chitinid
+  markingType: NonGenetics # Corvax-Wega-Genetics
   coloring:
     default:
       type:
@@ -473,6 +505,7 @@
   bodyPart: LLeg
   markingCategory: Overlay
   speciesRestriction: [Moth, Chitinid] # Delta V - Chitinid
+  markingType: NonGenetics # Corvax-Wega-Genetics
   coloring:
     default:
       type:
@@ -487,6 +520,7 @@
   bodyPart: RFoot
   markingCategory: Overlay
   speciesRestriction: [Moth, Chitinid] # Delta V - Chitinid
+  markingType: NonGenetics # Corvax-Wega-Genetics
   coloring:
     default:
       type:
@@ -501,6 +535,7 @@
   bodyPart: LFoot
   markingCategory: Overlay
   speciesRestriction: [Moth, Chitinid] # Delta V - Chitinid
+  markingType: NonGenetics # Corvax-Wega-Genetics
   coloring:
     default:
       type:

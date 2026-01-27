@@ -134,6 +134,11 @@
             sprite: _White/Mobs/Species/displacement.rsi
             state: shoes
     # Goob-Feroxi-Resprite-End
+  # Corvax-Wega-Genetics-start
+  - type: DnaModifier
+    upper: MobFeroxi
+    lowest: MobSkrellkey
+  # Corvax-Wega-Genetics-end
 
 - type: entity
   parent: MobHumanDummy

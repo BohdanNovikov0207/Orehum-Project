@@ -45,9 +45,8 @@ public sealed partial class InventoryComponent : Component
         set => IoCManager.Resolve<IEntityManager>().System<InventorySystem>().SetTemplateId((Owner, this), value);
     }
 
-    [DataField, AutoNetworkedField]
-    public string? SpeciesId;
-
+    [DataField("speciesId"), AutoNetworkedField]
+    public string? SpeciesId { get; set; } // Corvax-Wega-Edit
 
     [ViewVariables]
     public SlotDefinition[] Slots = Array.Empty<SlotDefinition>();
@@ -69,6 +68,16 @@ public sealed partial class InventoryComponent : Component
     /// </summary>
     [DataField, AutoNetworkedField]
     public Dictionary<string, DisplacementData> MaleDisplacements = new();
+
+    // Corvax-Wega-Genetics-start
+    public void Clone(InventoryComponent targetInventory)
+    {
+        this.SpeciesId = targetInventory.SpeciesId;
+        this.Displacements = targetInventory.Displacements;
+        this.FemaleDisplacements = targetInventory.FemaleDisplacements;
+        this.MaleDisplacements = targetInventory.MaleDisplacements;
+    }
+    // Corvax-Wega-Genetics-end
 }
 
 /// <summary>

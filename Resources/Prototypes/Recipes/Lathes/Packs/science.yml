@@ -109,6 +109,8 @@
   - APECircuitboard
   - ArtifactAnalyzerMachineCircuitboard
   - ArtifactCrusherMachineCircuitboard
+  - MedicalScannerMachineCircuitboard # Corvax-Wega-Genetics
+  - DnaModifierComputerCircuitboard # Corvax-Wega-Genetics
 
 - type: latheRecipePack
   id: CameraBoards
