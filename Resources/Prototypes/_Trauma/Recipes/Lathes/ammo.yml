@@ -1,0 +1,22 @@
+- type: latheRecipe
+  abstract: true
+  id: BasePracticeAmmoRecipe
+  categories:
+  - Ammo
+  completetime: 5
+
+- type: latheRecipe
+  abstract: true
+  parent: BasePracticeAmmoRecipe
+  id: BasePracticeAmmoBoxRecipe
+  categories:
+  - Ammo
+  - Boxes
+
+- type: latheRecipe
+  parent: BaseAmmoBoxRecipe
+  id: BoxShotgunBreaching
+  result: BoxShotgunBreaching
+  materials:
+    Steel: 190
+    Plasteel: 100

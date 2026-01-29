@@ -1,0 +1,24 @@
+- type: entity
+  parent: BaseMagazineShotgun
+  id: MagazineShotgunBreaching
+  name: барабанный магазин (12 калибра, пробиваемый)
+  description: Большой барабанный магазин, используемый в некоторых автоматических дробовиках армейского образца. Предназначен для хранения специализированных боеприпасов для взлома затворов.
+  components:
+  - type: BallisticAmmoProvider
+    proto: ShellShotgunBreaching
+  - type: Sprite
+    layers:
+    - state: pellets
+      map: ["enum.GunVisualLayers.Base"]
+    - state: mag-1
+      map: ["enum.GunVisualLayers.Mag"]
+  - type: Item
+    inhandVisuals:
+      left:
+      - state: inhand-left-mag
+      - state: inhand-left-stripe
+        color: "#ba7710"
+      right:
+      - state: inhand-right-mag
+      - state: inhand-right-stripe
+        color: "#ba7710"
