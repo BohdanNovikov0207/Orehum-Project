@@ -771,14 +771,15 @@
     tags: [] # ignore "WhitelistChameleon" tag
 
 - type: entity
-  name: passenger ID card
-  parent: IDCardStandard
+  parent: [IDCardStandard, BaseChameleon] # Trauma - don't parent passenger id
   id: AgentIDCard
+  name: ID-карта ассистента # Trauma - i hate this
   suffix: Agent
   components:
-  # Goob edit
-  #- type: PresetIdCard
-  #  job: Passenger
+  - type: Sprite # Trauma - i hate this
+    layers:
+    - state: default
+    - state: idpassenger
   - type: Access
     tags:
     - Maintenance
