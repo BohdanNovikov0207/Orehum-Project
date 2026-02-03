@@ -42,6 +42,7 @@ entities:
     - type: MetaData
     - type: Transform
     - type: Map
+
     - type: Broadphase
     - type: OccluderTree
     - type: MapGrid
@@ -2221,7 +2222,8 @@ entities:
     - type: RadiationGridResistance
     - type: LoadedMap
     - type: SpreaderGrid
-    #- type: GridTreeMovedGrids
+    - type: GridTree
+     
     - type: GridPathfinding
 - proto: Airlock
   entities:

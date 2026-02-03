@@ -1,4 +1,5 @@
 using Robust.Shared.Map; // Goobstation
+
 namespace Content.Server.SurveillanceCamera;
 
 [RegisterComponent]

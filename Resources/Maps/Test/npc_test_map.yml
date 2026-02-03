@@ -13,10 +13,12 @@ entities:
     - type: MetaData
     - type: Transform
     - type: Map
+
     - type: Broadphase
     - type: OccluderTree
     - type: LoadedMap
     - type: GridTree
+     
   - uid: 10
     components:
     - type: MetaData

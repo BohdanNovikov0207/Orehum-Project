@@ -4,11 +4,6 @@
   name: admin observer
   categories: [ HideSpawnMenu ]
   components:
-  - type: Sprite
-    sprite: _Orehum/Mobs/Ghosts/admin_ghost.rsi
-    layers:
-    - state: animated
-      shader: unshaded
   - type: Eye
     visMask:
     - TelegnosticProjection
@@ -66,10 +61,6 @@
       enum.GeneralStationRecordConsoleKey.Key:
         # who the fuck named this bruh
         type: GeneralStationRecordConsoleBoundUserInterface
-      #ADT start
-      enum.GhostInfoUiKey.Key:
-        type: GhostInfoBoundUserInterface
-      #ADT end
   - type: IntrinsicUI
     uis:
       enum.SolarControlConsoleUiKey.Key:
@@ -124,9 +115,7 @@
   components:
   - type: InstantAction
     icon: { sprite: Structures/Machines/parts.rsi, state: box_0 }
-    iconOn:
-      sprite: Structures/Machines/parts.rsi
-      state: box_2
+    iconOn: { sprite: Structures/Machines/parts.rsi, state: box_2 }
     keywords: [ "AI", "console", "interface" ]
     priority: -10
     event: !type:ToggleIntrinsicUIEvent { key: enum.SolarControlConsoleUiKey.Key }
@@ -138,9 +127,7 @@
   components:
   - type: InstantAction
     icon: { sprite: Interface/Actions/actions_ai.rsi, state: comms_console }
-    iconOn:
-      sprite: Interface/Actions/actions_ai.rsi
-      state: comms_console
+    iconOn: { sprite: Interface/Actions/actions_ai.rsi, state: comms_console }
     keywords: [ "AI", "console", "interface" ]
     priority: -4
     event: !type:ToggleIntrinsicUIEvent { key: enum.CommunicationsConsoleUiKey.Key }
@@ -152,9 +139,7 @@
   components:
   - type: InstantAction
     icon: { sprite: Interface/Actions/actions_ai.rsi, state: mass_scanner }
-    iconOn:
-      sprite: Interface/Actions/actions_ai.rsi
-      state: mass_scanner
+    iconOn: { sprite: Interface/Actions/actions_ai.rsi, state: mass_scanner }
     keywords: [ "AI", "console", "interface" ]
     priority: -6
     event: !type:ToggleIntrinsicUIEvent { key: enum.RadarConsoleUiKey.Key }
@@ -166,9 +151,7 @@
   components:
   - type: InstantAction
     icon: { sprite: Structures/Machines/parts.rsi, state: box_0 }
-    iconOn:
-      sprite: Structures/Machines/parts.rsi
-      state: box_2
+    iconOn: { sprite: Structures/Machines/parts.rsi, state: box_2 }
     keywords: [ "AI", "console", "interface" ]
     priority: -10
     event: !type:ToggleIntrinsicUIEvent { key: enum.CargoConsoleUiKey.Orders }
@@ -180,9 +163,7 @@
   components:
   - type: InstantAction
     icon: { sprite: Interface/Actions/actions_ai.rsi, state: crew_monitor }
-    iconOn:
-      sprite: Interface/Actions/actions_ai.rsi
-      state: crew_monitor
+    iconOn: { sprite: Interface/Actions/actions_ai.rsi, state: crew_monitor }
     keywords: [ "AI", "console", "interface" ]
     priority: -8
     event: !type:ToggleIntrinsicUIEvent { key: enum.CrewMonitoringUIKey.Key }
@@ -194,9 +175,7 @@
   components:
   - type: InstantAction
     icon: { sprite: Interface/Actions/actions_ai.rsi, state: station_records }
-    iconOn:
-      sprite: Interface/Actions/actions_ai.rsi
-      state: station_records
+    iconOn: { sprite: Interface/Actions/actions_ai.rsi, state: station_records }
     keywords: [ "AI", "console", "interface" ]
     priority: -7
     event: !type:ToggleIntrinsicUIEvent { key: enum.GeneralStationRecordConsoleKey.Key }

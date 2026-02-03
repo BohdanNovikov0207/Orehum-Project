@@ -6,7 +6,7 @@ namespace Content.Shared._CorvaxNext.CrewMedal;
 /// Component for a medal that can be awarded to a player and
 /// will be displayed in the final round summary screen.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState(true)]
+[RegisterComponent, NetworkedComponent,  AutoGenerateComponentState(true)]
 public sealed partial class CrewMedalComponent : Component
 {
     /// <summary>

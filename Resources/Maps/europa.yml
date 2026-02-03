@@ -4704,7 +4704,9 @@ entities:
     - type: Transform
     - type: Map
       mapPaused: True
+
     - type: GridTree
+     
     - type: Parallax
       parallax: Desert
     - type: Gravity

@@ -74,7 +74,9 @@ entities:
     - type: Transform
     - type: Map
       mapPaused: True
+
     - type: GridTree
+
     - type: Parallax
       parallax: Sky
     - type: MapAtmosphere

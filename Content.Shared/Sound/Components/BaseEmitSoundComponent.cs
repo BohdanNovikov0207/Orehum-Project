@@ -8,8 +8,6 @@ namespace Content.Shared.Sound.Components;
 /// </summary>
 public abstract partial class BaseEmitSoundComponent : Component
 {
-    public static readonly AudioParams DefaultParams = AudioParams.Default.WithVolume(-2f);
-
     /// <summary>
     /// The <see cref="SoundSpecifier"/> to play.
     /// </summary>

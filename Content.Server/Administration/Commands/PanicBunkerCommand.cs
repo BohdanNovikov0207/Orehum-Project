@@ -1,4 +1,12 @@
-﻿using Content.Shared.Administration;
+﻿// SPDX-FileCopyrightText: 2022 Moony <moonheart08@users.noreply.github.com>
+// SPDX-FileCopyrightText: 2023 DrSmugleaf <DrSmugleaf@users.noreply.github.com>
+// SPDX-FileCopyrightText: 2023 Morb <14136326+Morb0@users.noreply.github.com>
+// SPDX-FileCopyrightText: 2024 sleepyyapril <flyingkarii@gmail.com>
+// SPDX-FileCopyrightText: 2025 sleepyyapril <123355664+sleepyyapril@users.noreply.github.com>
+//
+// SPDX-License-Identifier: AGPL-3.0-or-later AND MIT
+
+using Content.Shared.Administration;
 using Content.Shared.CCVar;
 using Robust.Shared.Configuration;
 using Robust.Shared.Console;
@@ -139,7 +147,7 @@ public sealed class PanicBunkerMinAccountAgeCommand : LocalizedCommands
         if (args.Length == 0)
         {
             var current = _cfg.GetCVar(CCVars.PanicBunkerMinAccountAge);
-            shell.WriteLine(Loc.GetString("panicbunker-command-min-account-age-is", ("minutes", current)));
+            shell.WriteLine(Loc.GetString("panicbunker-command-min-account-age-is", ("hours", current / 60)));
         }
 
         if (args.Length > 1)
@@ -148,14 +156,14 @@ public sealed class PanicBunkerMinAccountAgeCommand : LocalizedCommands
             return;
         }
 
-        if (!int.TryParse(args[0], out var minutes))
+        if (!int.TryParse(args[0], out var hours))
         {
             shell.WriteError(Loc.GetString("shell-argument-must-be-number"));
             return;
         }
 
-        _cfg.SetCVar(CCVars.PanicBunkerMinAccountAge, minutes);
-        shell.WriteLine(Loc.GetString("panicbunker-command-min-account-age-set", ("minutes", minutes)));
+        _cfg.SetCVar(CCVars.PanicBunkerMinAccountAge, hours * 60);
+        shell.WriteLine(Loc.GetString("panicbunker-command-min-account-age-set", ("hours", hours)));
     }
 }
 
@@ -180,13 +188,13 @@ public sealed class PanicBunkerMinOverallMinutesCommand : LocalizedCommands
             return;
         }
 
-        if (!int.TryParse(args[0], out var minutes))
+        if (!int.TryParse(args[0], out var hours))
         {
             shell.WriteError(Loc.GetString("shell-argument-must-be-number"));
             return;
         }
 
-        _cfg.SetCVar(CCVars.PanicBunkerMinOverallMinutes, minutes);
-        shell.WriteLine(Loc.GetString("panicbunker-command-overall-minutes-age-set", ("minutes", minutes)));
+        _cfg.SetCVar(CCVars.PanicBunkerMinOverallMinutes, hours);
+        shell.WriteLine(Loc.GetString("panicbunker-command-overall-minutes-age-set", ("minutes", hours)));
     }
 }

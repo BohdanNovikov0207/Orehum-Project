@@ -1,4 +1,4 @@
-using System.Numerics;
+﻿using System.Numerics;
 using Content.Shared.Disposal;
 using Robust.Client.Graphics;
 using Robust.Client.UserInterface.Controls;
@@ -50,6 +50,6 @@ public sealed class PressureBar : ProgressBar
 
         var foregroundStyleBoxOverride = (StyleBoxFlat) ForegroundStyleBoxOverride;
         foregroundStyleBoxOverride.BackgroundColor =
-            Color.FromHsv(new Vector4(finalHue, saturation, value, alpha));
+            Color.FromHsv(new(finalHue, saturation, value, alpha));
     }
 }

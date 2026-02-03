@@ -58,7 +58,9 @@ entities:
     - type: Transform
     - type: Map
       mapPaused: True
+     
     - type: GridTree
+     
     - type: Broadphase
     - type: OccluderTree
     - type: LoadedMap
@@ -109561,7 +109563,7 @@ entities:
   - uid: 15930
     components:
     - type: Transform
-      #rot: -1.5707963267948966 rad
+      rot: -1.5707963267948966 rad
       pos: -17.5,-31.5
       parent: 2
     - type: DeviceLinkSink
@@ -110085,8 +110087,8 @@ entities:
     components:
     - type: Transform
       parent: 9131
-    #- type: Artifact
-    #  isSuppressed: True
+    - type: Artifact
+      isSuppressed: True
     - type: Physics
       angularDamping: 0
       linearDamping: 0

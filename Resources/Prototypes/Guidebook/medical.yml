@@ -11,7 +11,7 @@
   - MedicalPatches # Fix for Medicine Patches
 
 - type: guideEntry
-  id: MedicalDoctor #Руки бы оторвать тем, кто пишет в айдишниках через пробел
+  id: MedicalDoctor
   name: guide-entry-medicaldoctor
   text: "/ServerInfo/Guidebook/Medical/MedicalDoctor.xml"
 

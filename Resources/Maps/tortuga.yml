@@ -12842,7 +12842,9 @@ entities:
     - type: Transform
     - type: Map
       mapPaused: True
+     
     - type: GridTree
+     
     - type: Parallax
       parallax: TortugaStation
     - type: Broadphase
