@@ -12,6 +12,7 @@ using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Pointing;
 using Content.Shared.Popups;
+using Content.Shared.Rejuvenate;
 using Content.Shared.Slippery;
 using Content.Shared.Sound;
 using Content.Shared.Sound.Components;
