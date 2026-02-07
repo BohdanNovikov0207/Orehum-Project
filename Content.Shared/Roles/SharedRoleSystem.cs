@@ -3,6 +3,7 @@ using Content.Trauma.Common.Roles;
 // </Trauma>
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using Content.Shared._White.Roles;
 using Content.Shared.Administration.Logs;
 using Content.Shared.CCVar;
 using Content.Shared.Database;
@@ -173,11 +174,17 @@ public abstract class SharedRoleSystem : EntitySystem
 
         // RoleType refresh, Role time tracking, Update Admin playerlist
 
+        var addMessage = new RoleAddingEvent(mindId, mind, mindRoleId.Value, mindRoleComp); // WWDP EDIT
+        RaiseLocalEvent(mindId, addMessage); // WWDP EDIT
+
         var message = new RoleAddedEvent(mindId, mind, update, silent);
         RaiseLocalEvent(mindId, message, true);
-        // <Trauma> - above event is fucking useless for real logic, raise our own
-        var ev = new RoleGotAddedEvent(mindId, mind.OwnedEntity);
-        RaiseLocalEvent(mindRoleId.Value, ref ev);
+        // <Trauma> - raise our own event if player has an entity
+        if (mind.OwnedEntity is { } owned)
+        {
+            var ev = new RoleGotAddedEvent(mindId, owned);
+            RaiseLocalEvent(mindRoleId.Value, ref ev);
+        }
         // </Trauma>
 
         var name = Loc.GetString(protoEnt.Name);
@@ -406,11 +413,9 @@ public abstract class SharedRoleSystem : EntitySystem
 
         foreach (var role in delete)
         {
-            // <Trauma> - RoleRemovedEvent is completely useless, raise this on each role
-            var ev = new RoleGotRemovedEvent(mind, mind.Comp.OwnedEntity);
-            RaiseLocalEvent(role, ref ev);
-            // </Trauma>
-            PredictedDel(role);
+            var removingMessage = new RoleRemovingEvent(mind.Owner, mind.Comp, role, Comp<MindRoleComponent>(role)); // WWDP EDIT
+            RaiseLocalEvent(mind, removingMessage); // WWDP EDIT
+            Del(role);
         }
 
         var update = MindRolesUpdate(mind);
