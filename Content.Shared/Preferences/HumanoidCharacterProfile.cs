@@ -773,7 +773,7 @@ public sealed partial class HumanoidCharacterProfile : ICharacterProfile
     }
     // WD EDIT END
 
-    public ICharacterProfile Validated(ICommonSession session, IDependencyCollection collection)
+    public ICharacterProfile Validated(ICommonSession session, IDependencyCollection collection, string[] sponsorPrototypes)
     {
         var profile = new HumanoidCharacterProfile(this);
         profile.EnsureValid(session, collection, sponsorPrototypes);
