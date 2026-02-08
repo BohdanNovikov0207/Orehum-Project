@@ -268,7 +268,7 @@
                             <BoxContainer HorizontalExpand="True">
                                 <Label Name="WeightLabel" />
                             </BoxContainer>
-                        </ui:AlternatingBGContainer>
+                        </BoxContainer>
                         <!-- Skin -->
                         <BoxContainer Margin="0 4 0 4" HorizontalExpand="True" Orientation="Vertical">
                             <Label Text="{Loc 'humanoid-profile-editor-skin-color-label'}" />
@@ -285,9 +285,9 @@
                             <Label Text="{Loc 'humanoid-profile-editor-eyes-label'}" />
                             <humanoid:EyeColorPicker Name="EyeColorPicker" />
                         </BoxContainer>
-                    </BoxContainer>
-                </ScrollContainer>
-            </BoxContainer>
+                    </ScrollContainer>
+                </BoxContainer>
+            </ui:NeoTabContainer>
             <BoxContainer Name="Background" HorizontalExpand="True" Orientation="Vertical">
                 <!-- Background -->
                 <ui:AlternatingBGContainer Orientation="Vertical" VerticalExpand="False">
@@ -397,7 +397,7 @@
                     <humanoid:MarkingPicker Name="Markings" IgnoreCategories="Hair,FacialHair" />
                 </ScrollContainer>
             </BoxContainer>
-        </ui:NeoTabContainer>
+        </PanelContainer>
     </BoxContainer>
     <!-- Right side -->
     <!-- Sprite View -->

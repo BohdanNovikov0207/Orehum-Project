@@ -1,14 +1,17 @@
 using System.Linq;
 using Content.Server._White.GameTicking.Aspects.Components;
+using Content.Server.Antag;
 using Content.Server.Chat.Managers;
 using Content.Server.Chat.Systems;
 using Content.Server.GameTicking.Rules.Components;
 using Content.Server.Mind;
 using Content.Server.GameTicking.Rules;
 using Content.Shared.GameTicking.Components;
+using Content.Shared.Mind.Components;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Random;
 using Robust.Shared.Timing;
+using MindComponent = Content.Shared.Mind.MindComponent;
 
 namespace Content.Server._White.GameTicking.Aspects;
 
@@ -22,6 +25,7 @@ public sealed class TraitoredAspect : AspectSystem<TraitoredAspectComponent>
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly TraitorRuleSystem _traitorRuleSystem = default!;
     [Dependency] private readonly WhiteGameTicker _whiteGameTicker = default!;
+    [Dependency] private readonly AntagSelectionSystem _antag = default!;
 
     protected override void Started(EntityUid uid, TraitoredAspectComponent component, GameRuleComponent gameRule, GameRuleStartedEvent args)
     {
@@ -59,20 +63,25 @@ public sealed class TraitoredAspect : AspectSystem<TraitoredAspectComponent>
 
     private void AnnounceToTraitors(EntityUid uid, GameRuleComponent rule, string sound)
     {
-        var traitors = _traitorRuleSystem.GetAllLivingConnectedTraitors();
+        var traitors = new List<Entity<MindComponent>>();
+        var query = EntityQueryEnumerator<TraitorRuleComponent>();
+        while (query.MoveNext(out var traitorUid, out _))
+        {
+            traitors.AddRange(_antag.GetAntagMinds(traitorUid));
+        }
 
         if (traitors.Count == 0)
+        {
             ForceEndSelf(uid, rule);
+            return;
+        }
 
         foreach (var traitor in traitors)
         {
-            if (!_mindSystem.TryGetSession(traitor.Comp, out var session))
-                continue;
-
             var mindOwned = traitor.Comp.OwnedEntity;
 
-            if (mindOwned == null)
-                return;
+            if (mindOwned == null || !_mindSystem.TryGetSession(traitor.Owner, out var session))
+                continue;
 
             _chatManager.DispatchServerMessage(session, Loc.GetString("aspect-traitored-briefing"));
             _audio.PlayEntity(sound, mindOwned.Value, mindOwned.Value);
@@ -81,18 +90,36 @@ public sealed class TraitoredAspect : AspectSystem<TraitoredAspectComponent>
 
     private void AnnounceToAll(EntityUid uid, GameRuleComponent rule)
     {
-        var traitors = _traitorRuleSystem.GetAllLivingConnectedTraitors();
+        var traitors = new List<Entity<MindComponent>>();
+        var query = EntityQueryEnumerator<TraitorRuleComponent>();
+        while (query.MoveNext(out var traitorUid, out _))
+        {
+            traitors.AddRange(_antag.GetAntagMinds(traitorUid));
+        }
 
         var msg = Loc.GetString("aspect-traitored-announce");
+        bool foundAny = false;
 
         foreach (var traitor in traitors)
         {
-            var name = traitor.Comp.CharacterName;
+            var ownedEntity = traitor.Comp.OwnedEntity;
+
+            if (ownedEntity == null)
+                continue;
+
+            var name = EntityManager.GetComponent<MetaDataComponent>(ownedEntity.Value).EntityName;
+
             if (!string.IsNullOrEmpty(name))
-                msg += $"\n + {Loc.GetString("aspect-traitored-announce-name", ("name", name))}";
+            {
+                msg += $"\n + {Loc.GetString("aspect-traitored-announce-name", ("name", (object) name))}";
+                foundAny = true;
+            }
         }
 
-        _chatSystem.DispatchGlobalAnnouncement(msg, Loc.GetString("aspect-traitored-announce-sender"), colorOverride: Color.Aquamarine);
+        if (foundAny)
+        {
+            _chatSystem.DispatchGlobalAnnouncement(msg, Loc.GetString("aspect-traitored-announce-sender"), colorOverride: Color.Aquamarine);
+        }
 
         ForceEndSelf(uid, rule);
     }

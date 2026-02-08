@@ -56,7 +56,6 @@ public abstract class SharedBarkSystem : EntitySystem
                     job ?? default!,
                     profile,
                     new Dictionary<string, TimeSpan>(),
-                    [],
                     false,
                     prototype,
                     EntityManager,

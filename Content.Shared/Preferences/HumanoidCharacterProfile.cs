@@ -710,26 +710,26 @@ public sealed partial class HumanoidCharacterProfile : ICharacterProfile
         if(!CanHaveBark(prototypeManager, collection))
             BarkVoice = SharedHumanoidAppearanceSystem.DefaultBarkVoice;
 
-        for (var i = 0; i < loadouts.Count; i++)
-        {
-          var loadout = loadouts[i];
-          if (loadout.CustomContent is not { Length: > MaxCustomContentLength, })
-              continue;
-          var truncated = loadout.CustomContent.AsSpan(0, MaxCustomContentLength);
-          while (truncated.Length > 0 && char.IsLowSurrogate(truncated[^1]))
-              truncated = truncated[..^1];
+        // for (var i = 0; i < loadouts.Count; i++)
+        // {
+        //   var loadout = loadouts[i];
+        //   if (loadout.CustomContent is not { Length: > MaxCustomContentLength, })
+        //       continue;
+        //   var truncated = loadout.CustomContent.AsSpan(0, MaxCustomContentLength);
+        //   while (truncated.Length > 0 && char.IsLowSurrogate(truncated[^1]))
+        //       truncated = truncated[..^1];
 
-          var truncatedLoadout = new LoadoutPreference(
-                  loadout.LoadoutName,
-                  loadout.CustomName,
-                  loadout.CustomDescription,
-                  truncated.ToString(),
-                  loadout.CustomColorTint,
-                  loadout.CustomHeirloom)
-              { Selected = loadout.Selected, };
+        //   var truncatedLoadout = new LoadoutPreference(
+        //           loadout.LoadoutName,
+        //           loadout.CustomName,
+        //           loadout.CustomDescription,
+        //           truncated.ToString(),
+        //           loadout.CustomColorTint,
+        //           loadout.CustomHeirloom)
+        //       { Selected = loadout.Selected, };
 
-          loadouts[i] = truncatedLoadout;
-        }
+        //   loadouts[i] = truncatedLoadout;
+        // }
         // WD EDIT END
     }
 
@@ -761,7 +761,7 @@ public sealed partial class HumanoidCharacterProfile : ICharacterProfile
             var passes = requirement.IsValid(
                 default!,
                 this,
-                [],
+                new Dictionary<string, TimeSpan>(),
                 false,
                 voicePrototype,
                 collection.Resolve<IEntityManager>(),

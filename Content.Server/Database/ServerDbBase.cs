@@ -237,7 +237,7 @@ namespace Content.Server.Database
                     Volume = profile.BarkVolume,
                 },
                 // WD EDIT END
-                bodyType, // WD EDIT
+                profile.BodyType, // WD EDIT
                 gender,
                 profile.DisplayPronouns,
                 profile.StationAiName,

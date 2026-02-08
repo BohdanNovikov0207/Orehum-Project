@@ -1,7 +1,6 @@
 using Content.Client.Administration.Managers;
 using Content.Client.Audio;
 using Content.Shared._White.Bark;
-using Content.Shared._White.Bark.Systems;
 using Content.Shared._White.CCVar;
 using Content.Shared.CCVar;
 using Robust.Client.Audio;
@@ -10,7 +9,6 @@ using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.XAML;
 using Robust.Shared;
 using Robust.Shared.Configuration;
-using Range = Robust.Client.UserInterface.Controls.Range;
 
 namespace Content.Client.Options.UI.Tabs;
 
@@ -25,26 +23,6 @@ public sealed partial class AudioTab : Control
     {
         RobustXamlLoader.Load(this);
         IoCManager.InjectDependencies(this);
-
-        CharVoiceType.AddItem(Loc.GetString("char-voice-none"), (int) CharacterVoiceType.None);
-        CharVoiceType.AddItem(Loc.GetString("char-voice-bark"), (int) CharacterVoiceType.Bark);
-        // CharVoiceType.AddItem(Loc.GetString("char-voice-tts"), (int) CharacterVoiceType.TTS);
-
-        CharVoiceType.OnItemSelected += args =>
-        {
-            CharVoiceType.SelectId(args.Id);
-            _cfg.SetCVar(WhiteCVars.CharVoiceType, (CharacterVoiceType) args.Id);
-            _cfg.SaveSerializer();
-        };
-        CharVoiceType.SelectId((int) _cfg.GetCVar(WhiteCVars.CharVoiceType));
-
-        // TtsVolumeSlider.OnValueChanged += _ => UpdateWork();
-        BarkVolumeSlider.OnValueChanged += _ => UpdateWork();
-        BarkLimitSlider.OnValueChanged += _ => UpdateWork();
-
-        // TtsVolumeSlider.Value = _cfg.GetCVar(WhiteCVars.TTSVolume) * 100f;
-        BarkVolumeSlider.Value = _cfg.GetCVar(WhiteCVars.BarkVolume) * 100f;
-        BarkLimitSlider.Value = _cfg.GetCVar(WhiteCVars.BarkLimit);
 
         var masterVolume = Control.AddOptionPercentSlider(
             CVars.AudioMasterVolume,
@@ -82,12 +60,28 @@ public sealed partial class AudioTab : Control
             SliderVolumeAnnouncer,
             scale: ContentAudioSystem.AnnouncerMultiplier);
 
+        // WD EDIT START
+        // Control.AddOptionPercentSlider(
+        //     WhiteCVars.TTSVolume,
+        //     SliderVolumeTts,
+        //     scale: ContentAudioSystem.TTSMultiplier);
+
+        Control.AddOptionPercentSlider(
+            WhiteCVars.BarkVolume,
+            SliderVolumeBark);
+
+        Control.AddOptionSlider(
+            WhiteCVars.BarkLimit,
+            SliderLimitBark,
+            0,
+            128);
+        // WD EDIT END
+
         Control.AddOptionSlider(
             CCVars.MaxAmbientSources,
             SliderMaxAmbienceSounds,
             _cfg.GetCVar(CCVars.MinMaxAmbientSourcesConfigured),
             _cfg.GetCVar(CCVars.MaxMaxAmbientSourcesConfigured));
-
 
         Control.AddOptionCheckBox(CCVars.LobbyMusicEnabled, LobbyMusicCheckBox);
         Control.AddOptionCheckBox(CCVars.RestartSoundsEnabled, RestartSoundsCheckBox);
@@ -95,9 +89,19 @@ public sealed partial class AudioTab : Control
         Control.AddOptionCheckBox(CCVars.AnnouncerDisableMultipleEnabled, AnnouncerDisableMultipleSoundsCheckBox);
         Control.AddOptionCheckBox(CCVars.AdminSoundsEnabled, AdminSoundsCheckBox);
         Control.AddOptionCheckBox(CCVars.BwoinkSoundEnabled, BwoinkSoundCheckBox);
+        Control.AddOptionCheckBox(WhiteCVars.CombatModeSoundEnabled, CombatModeSoundCheckBox); // WD EDIT
 
+        // WD EDIT START
+        Control.AddOptionDropDown(
+            WhiteCVars.VoiceType,
+            DropDownVoiceType,
+            [
+                new (CharacterVoiceType.None, Loc.GetString("char-voice-none")),
+                new (CharacterVoiceType.Bark, Loc.GetString("char-voice-bark")),
+                // new (CharacterVoiceType.TTS, Loc.GetString("char-voice-tts")),
+            ]);
+        // WD EDIT END
         Control.Initialize();
-        UpdateWork();
     }
 
     protected override void EnteredTree()
@@ -113,29 +117,16 @@ public sealed partial class AudioTab : Control
         _admin.AdminStatusUpdated -= UpdateAdminButtonsVisibility;
     }
 
-    private void UpdateWork()
-    {
-        // _cfg.SetCVar(WhiteCVars.TTSVolume, TtsVolumeSlider.Value / 100f);
-        _cfg.SetCVar(WhiteCVars.BarkVolume, BarkVolumeSlider.Value / 100f);
-        _cfg.SetCVar(WhiteCVars.BarkLimit, (int) BarkLimitSlider.Value);
-        _cfg.SaveSerializer();
-
-        // TtsVolumeSlider.Text = Loc.GetString("ui-options-volume-percent", ("volume", (int)TtsVolumeSlider.Value));
-        BarkVolumeSlider.Text = Loc.GetString("ui-options-volume-percent", ("volume", (int)BarkVolumeSlider.Value));
-        BarkLimitSlider.Text = ((int) BarkLimitSlider.Value).ToString();
-    }
 
     private void UpdateAdminButtonsVisibility()
     {
         BwoinkSoundCheckBox.Visible = _admin.IsActive();
-        AdminSoundsCheckBox.Visible = _admin.IsActive();
     }
 
-    private void OnMasterVolumeSliderChanged(Range range)
+    private void OnMasterVolumeSliderChanged(float value)
     {
         // TODO: I was thinking of giving OptionsTabControlRow a flag to "set CVar immediately", but I'm deferring that
         // until there's a proper system for enforcing people don't close the window with pending changes.
-        // _audio.SetMasterGain(value);
-        _audio.MainVolume = range.Value / 100f * ContentAudioSystem.MasterVolumeMultiplier;
+        _audio.SetMasterGain(value);
     }
 }

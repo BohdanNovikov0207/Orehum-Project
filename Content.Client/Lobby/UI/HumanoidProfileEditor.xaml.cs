@@ -104,8 +104,6 @@ namespace Content.Client.Lobby.UI
         private List<LifepathPrototype> _lifepaths = new();
         // EE - Contractor System Changes End
         private List<BodyTypePrototype> _bodyTypes = new(); // WD EDIT
-        private List<(string, RequirementsSelector)> _jobPriorities = new();
-        private readonly Dictionary<string, BoxContainer> _jobCategories;
 
         private Dictionary<Button, ConfirmationData> _confirmationData = new();
         private List<TraitPreferenceSelector> _traitPreferences = new();
@@ -235,7 +233,7 @@ namespace Content.Client.Lobby.UI
             // WD EDIT START
             #region Voice
 
-            InitializeVoice();
+            // InitializeVoice();
             InitializeBark();
 
             #endregion
