@@ -1,3 +1,20 @@
+using Content.Server.Administration.Logs;
+using Content.Server.Administration.Managers;
+using Content.Shared._White.Bark;
+using Content.Shared._White.CustomGhostSystem;
+using Content.Shared.Administration.Logs;
+using Content.Shared.Clothing.Loadouts.Systems;
+using Content.Shared.Database;
+using Content.Shared.Humanoid;
+using Content.Shared.Humanoid.Markings;
+using Content.Shared.Preferences;
+using Content.Shared.Roles;
+using Content.Shared.Traits;
+using Microsoft.EntityFrameworkCore;
+using Robust.Shared.Enums;
+using Robust.Shared.Network;
+using Robust.Shared.Prototypes;
+using Robust.Shared.Utility;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -6,23 +23,6 @@ using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Content.Server.Administration.Logs;
-using Content.Server.Administration.Managers;
-using Content.Shared._White.Bark;
-using Content.Shared.Administration.Logs;
-using Content.Shared.Clothing.Loadouts.Systems;
-using Content.Shared.Database;
-using Content.Shared.Humanoid;
-using Content.Shared.Humanoid.Markings;
-using Content.Shared.Preferences;
-using Content.Shared.Preferences.Loadouts;
-using Content.Shared.Roles;
-using Content.Shared.Traits;
-using Microsoft.EntityFrameworkCore;
-using Robust.Shared.Enums;
-using Robust.Shared.Network;
-using Robust.Shared.Prototypes;
-using Robust.Shared.Utility;
 
 namespace Content.Server.Database
 {
@@ -64,7 +64,7 @@ namespace Content.Server.Database
                 profiles[profile.Slot] = ConvertProfiles(profile);
             }
 
-            return new PlayerPreferences(profiles, prefs.SelectedCharacterSlot, Color.FromHex(prefs.AdminOOCColor));
+            return new PlayerPreferences(profiles, prefs.SelectedCharacterSlot, Color.FromHex(prefs.AdminOOCColor), prefs.GhostId); // WWDP EDIT
         }
 
         public async Task SaveSelectedCharacterIndexAsync(NetUserId userId, int index)
@@ -140,7 +140,8 @@ namespace Content.Server.Database
             {
                 UserId = userId.UserId,
                 SelectedCharacterSlot = 0,
-                AdminOOCColor = Color.Red.ToHex()
+                AdminOOCColor = Color.Red.ToHex(),
+                GhostId = "default" // WWDP EDIT
             };
 
             prefs.Profiles.Add(profile);
@@ -149,7 +150,7 @@ namespace Content.Server.Database
 
             await db.DbContext.SaveChangesAsync();
 
-            return new PlayerPreferences(new[] { new KeyValuePair<int, ICharacterProfile>(0, defaultProfile) }, 0, Color.FromHex(prefs.AdminOOCColor));
+            return new PlayerPreferences(new[] { new KeyValuePair<int, ICharacterProfile>(0, defaultProfile) }, 0, Color.FromHex(prefs.AdminOOCColor), "default");
         }
 
         public async Task DeleteSlotAndSetSelectedIndex(NetUserId userId, int deleteSlot, int newSlot)
@@ -175,6 +176,20 @@ namespace Content.Server.Database
 
         }
 
+        // WWDP EDIT START
+        public async Task SaveGhostTypeAsync(NetUserId userId, ProtoId<CustomGhostPrototype> proto)
+        {
+            await using var db = await GetDb();
+            var prefs = await db.DbContext
+                .Preference
+                .Include(p => p.Profiles)
+                .SingleAsync(p => p.UserId == userId.UserId);
+            prefs.GhostId = proto.Id;
+
+            await db.DbContext.SaveChangesAsync();
+        }
+        // WWDP EDIT END
+
         private static async Task SetSelectedCharacterSlotAsync(NetUserId userId, int newSlot, ServerDbContext db)
         {
             var prefs = await db.Preference.SingleAsync(p => p.UserId == userId.UserId);
@@ -186,7 +201,17 @@ namespace Content.Server.Database
             var jobs = profile.Jobs.ToDictionary(j => new ProtoId<JobPrototype>(j.JobName), j => (JobPriority) j.Priority);
             var antags = profile.Antags.Select(a => new ProtoId<AntagPrototype>(a.AntagName));
             var traits = profile.Traits.Select(t => new ProtoId<TraitPrototype>(t.TraitName));
-            var loadouts = profile.Loadouts.Select(Shared.Clothing.Loadouts.Systems.Loadout (l) => l);
+            // WWDP EDIT START
+            var loadouts = profile.Loadouts.Select(l =>
+                new Loadout(
+                    l.LoadoutName,
+                    l.CustomName,
+                    l.CustomDescription,
+                    l.CustomContent,
+                    l.CustomColorTint,
+                    l.CustomHeirloom
+                    ));
+            // WWDP EDIT END
 
             var sex = Sex.Male;
             if (Enum.TryParse<Sex>(profile.Sex, true, out var sexVal))
@@ -197,6 +222,12 @@ namespace Content.Server.Database
             var gender = sex == Sex.Male ? Gender.Male : Gender.Female;
             if (Enum.TryParse<Gender>(profile.Gender, true, out var genderVal))
                 gender = genderVal;
+
+            // WD EDIT START
+            var bodyType = profile.BodyType;
+            if (bodyType == string.Empty)
+                bodyType = profile.Species + "Normal";
+            // WD EDIT END
 
             // ReSharper disable once ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
             var markingsRaw = profile.Markings?.Deserialize<List<string>>();
@@ -226,9 +257,8 @@ namespace Content.Server.Database
                 profile.Width,
                 profile.Age,
                 sex,
-                // voice, // WD EDIT
                 profile.BarkVoice, // WD EDIT
-                // WD EDIT START
+                                   // WD EDIT START
                 new BarkPercentageApplyData()
                 {
                     Pause = profile.BarkPause,
@@ -237,7 +267,7 @@ namespace Content.Server.Database
                     Volume = profile.BarkVolume,
                 },
                 // WD EDIT END
-                profile.BodyType, // WD EDIT
+                bodyType, // WD EDIT
                 gender,
                 profile.DisplayPronouns,
                 profile.StationAiName,
@@ -256,11 +286,7 @@ namespace Content.Server.Database
                 (PreferenceUnavailableMode) profile.PreferenceUnavailable,
                 antags.ToHashSet(),
                 traits.ToHashSet(),
-                loadouts.Select(l => new LoadoutPreference(l.LoadoutName)
-                {
-                    CustomName = l.CustomName, CustomDescription = l.CustomDescription,
-                    CustomColorTint = l.CustomColorTint, CustomHeirloom = l.CustomHeirloom, Selected = true,
-                }).ToHashSet()
+                loadouts.ToDictionary(p => p.LoadoutName) // WWDP EDIT
             );
         }
 
@@ -284,7 +310,6 @@ namespace Content.Server.Database
             profile.Lifepath = humanoid.Lifepath;
             profile.Age = humanoid.Age;
             profile.Sex = humanoid.Sex.ToString();
-            // profile.Voice = humanoid.Voice; // WD EDIT
             profile.BarkVoice = humanoid.BarkVoice; // WD EDIT
             profile.BodyType = humanoid.BodyType; // WD EDIT
             profile.Gender = humanoid.Gender.ToString();
@@ -324,8 +349,8 @@ namespace Content.Server.Database
             );
 
             profile.Loadouts.Clear();
-            profile.Loadouts.AddRange(humanoid.LoadoutPreferences
-                .Select(l => new Loadout(l.LoadoutName, l.CustomName, l.CustomDescription, l.CustomColorTint, l.CustomHeirloom)));
+            profile.Loadouts.AddRange(humanoid.LoadoutPreferencesList
+                .Select(l => new LoadoutItem(l.LoadoutName, l.CustomName, l.CustomDescription, l.CustomContent, l.CustomColorTint, l.CustomHeirloom))); // WD EDIT
 
             // WWDP EDIT START
             profile.BarkPause = humanoid.BarkSettings.Pause;
@@ -523,7 +548,7 @@ namespace Content.Server.Database
                 .ExecuteUpdateAsync(setters => setters
                     .SetProperty(b => b.Severity, severity)
                     .SetProperty(b => b.Reason, reason)
-                    .SetProperty(b => b.ExpirationTime, expiration.HasValue ? expiration.Value.UtcDateTime : (DateTime?)null)
+                    .SetProperty(b => b.ExpirationTime, expiration.HasValue ? expiration.Value.UtcDateTime : (DateTime?) null)
                     .SetProperty(b => b.LastEditedById, editedBy)
                     .SetProperty(b => b.LastEditedAt, editedAt.UtcDateTime)
                 );
@@ -1326,7 +1351,7 @@ INSERT INTO player_round (players_id, rounds_id) VALUES ({players[player]}, {id}
                 ban.LastEditedAt,
                 ban.ExpirationTime,
                 ban.Hidden,
-                new [] { ban.RoleId.Replace(BanManager.JobPrefix, null) },
+                new[] { ban.RoleId.Replace(BanManager.JobPrefix, null) },
                 MakePlayerRecord(unbanningAdmin),
                 ban.Unban?.UnbanTime);
         }
@@ -1490,10 +1515,10 @@ INSERT INTO player_round (players_id, rounds_id) VALUES ({players[player]}, {id}
         protected async Task<List<AdminWatchlistRecord>> GetActiveWatchlistsImpl(DbGuard db, Guid player)
         {
             var entities = await (from watchlist in db.DbContext.AdminWatchlists
-                          where watchlist.PlayerUserId == player &&
-                                !watchlist.Deleted &&
-                                (watchlist.ExpirationTime == null || DateTime.UtcNow < watchlist.ExpirationTime)
-                          select watchlist)
+                                  where watchlist.PlayerUserId == player &&
+                                        !watchlist.Deleted &&
+                                        (watchlist.ExpirationTime == null || DateTime.UtcNow < watchlist.ExpirationTime)
+                                  select watchlist)
                 .Include(note => note.Round)
                 .ThenInclude(r => r!.Server)
                 .Include(note => note.CreatedBy)
@@ -1518,9 +1543,9 @@ INSERT INTO player_round (players_id, rounds_id) VALUES ({players[player]}, {id}
         protected async Task<List<AdminMessageRecord>> GetMessagesImpl(DbGuard db, Guid player)
         {
             var entities = await (from message in db.DbContext.AdminMessages
-                        where message.PlayerUserId == player && !message.Deleted &&
-                              (message.ExpirationTime == null || DateTime.UtcNow < message.ExpirationTime)
-                        select message).Include(note => note.Round)
+                                  where message.PlayerUserId == player && !message.Deleted &&
+                                        (message.ExpirationTime == null || DateTime.UtcNow < message.ExpirationTime)
+                                  select message).Include(note => note.Round)
                     .ThenInclude(r => r!.Server)
                     .Include(note => note.CreatedBy)
                     .Include(note => note.LastEditedBy)
@@ -1635,37 +1660,6 @@ INSERT INTO player_round (players_id, rounds_id) VALUES ({players[player]}, {id}
         }
 
         #endregion
-
-        // Orehum start
-        #region Orehum
-        public async Task<List<string>> GetWhitelistedPresets()
-        {
-            await using var db = await GetDb();
-            var presets = db.DbContext.WhiteListedPresets;
-            if (!presets.Any())
-                return [];
-
-            return presets.Select(p => p.PresetId).ToList();
-        }
-
-        public async Task AddWhitelistedPreset(string preset)
-        {
-            await using var db = await GetDb();
-            db.DbContext.WhiteListedPresets.Add(new() { PresetId = preset, });
-            await db.DbContext.SaveChangesAsync();
-        }
-
-        public async Task RemoveWhitelistedPreset(string preset)
-        {
-            await using var db = await GetDb();
-            var p = new WhiteListedPreset() { PresetId = preset, };
-            if (db.DbContext.WhiteListedPresets.Contains(p))
-                db.DbContext.WhiteListedPresets.Remove(p);
-            await db.DbContext.SaveChangesAsync();
-        }
-        #endregion
-        // Orehum end
-
 
         #region Job Whitelists
 

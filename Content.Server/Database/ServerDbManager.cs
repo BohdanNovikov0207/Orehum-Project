@@ -1,14 +1,10 @@
-using System.Collections.Immutable;
-using System.IO;
-using System.Net;
-using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 using Content.Server.Administration.Logs;
+using Content.Shared._White.CustomGhostSystem;
 using Content.Shared.Administration.Logs;
 using Content.Shared.CCVar;
 using Content.Shared.Database;
 using Content.Shared.Preferences;
+using Content.Shared.Roles;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -17,10 +13,15 @@ using Prometheus;
 using Robust.Shared.Configuration;
 using Robust.Shared.ContentPack;
 using Robust.Shared.Network;
+using Robust.Shared.Prototypes;
+using System.Collections.Immutable;
+using System.IO;
+using System.Net;
+using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
 using LogLevel = Robust.Shared.Log.LogLevel;
 using MSLogLevel = Microsoft.Extensions.Logging.LogLevel;
-using Content.Shared.Roles;
-using Robust.Shared.Prototypes;
 
 namespace Content.Server.Database
 {
@@ -41,6 +42,8 @@ namespace Content.Server.Database
         Task SaveCharacterSlotAsync(NetUserId userId, ICharacterProfile? profile, int slot);
 
         Task SaveAdminOOCColorAsync(NetUserId userId, Color color);
+
+        Task SaveGhostTypeAsync(NetUserId userId, ProtoId<CustomGhostPrototype> ghostProto); // WWDP EDIT
 
         // Single method for two operations for transaction.
         Task DeleteSlotAndSetSelectedIndex(NetUserId userId, int deleteSlot, int newSlot);
@@ -93,7 +96,7 @@ namespace Content.Server.Database
             NetUserId? userId,
             ImmutableArray<byte>? hwId,
             ImmutableArray<ImmutableArray<byte>>? modernHWIds,
-            bool includeUnbanned=true);
+            bool includeUnbanned = true);
 
         Task AddServerBanAsync(ServerBanDef serverBan);
         Task AddServerUnbanAsync(ServerUnbanDef serverBan);
@@ -360,19 +363,6 @@ namespace Content.Server.Database
         Task SendNotification(DatabaseNotification notification);
 
         #endregion
-
-        // Orehum Start
-        #region Orehum
-
-        Task<List<string>> GetWhitelistedPresets();
-
-        Task AddWhitelistedPreset(string preset);
-
-        Task RemoveWhitelistedPreset(string preset);
-
-        #endregion
-
-        // Orehum End
     }
 
     /// <summary>
@@ -500,6 +490,14 @@ namespace Content.Server.Database
             return RunDbCommand(() => _db.SaveAdminOOCColorAsync(userId, color));
         }
 
+        // WWDP EDIT START
+        public Task SaveGhostTypeAsync(NetUserId userId, ProtoId<CustomGhostPrototype> ghostProto)
+        {
+            DbWriteOpsMetric.Inc();
+            return RunDbCommand(() => _db.SaveGhostTypeAsync(userId, ghostProto));
+        }
+        // WWDP EDIT END
+
         public Task<PlayerPreferences?> GetPlayerPreferencesAsync(NetUserId userId, CancellationToken cancel)
         {
             DbReadOpsMetric.Inc();
@@ -539,7 +537,7 @@ namespace Content.Server.Database
             NetUserId? userId,
             ImmutableArray<byte>? hwId,
             ImmutableArray<ImmutableArray<byte>>? modernHWIds,
-            bool includeUnbanned=true)
+            bool includeUnbanned = true)
         {
             DbReadOpsMetric.Inc();
             return RunDbCommand(() => _db.GetServerBansAsync(address, userId, hwId, modernHWIds, includeUnbanned));
@@ -1053,26 +1051,6 @@ namespace Content.Server.Database
             DbWriteOpsMetric.Inc();
             return RunDbCommand(() => _db.CleanIPIntelCache(range));
         }
-
-        // Orehum Start
-        public async Task<List<string>> GetWhitelistedPresets()
-        {
-            DbReadOpsMetric.Inc();
-            return await RunDbCommand(() => _db.GetWhitelistedPresets());
-        }
-
-        public Task AddWhitelistedPreset(string preset)
-        {
-            DbWriteOpsMetric.Inc();
-            return RunDbCommand(() => _db.AddWhitelistedPreset(preset));
-        }
-
-        public Task RemoveWhitelistedPreset(string preset)
-        {
-            DbWriteOpsMetric.Inc();
-            return RunDbCommand(() => _db.RemoveWhitelistedPreset(preset));
-        }
-        // Orehum End
 
         public void SubscribeToNotifications(Action<DatabaseNotification> handler)
         {

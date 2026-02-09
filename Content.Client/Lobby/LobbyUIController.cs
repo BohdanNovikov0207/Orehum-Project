@@ -118,9 +118,6 @@ public sealed class LobbyUIController : UIController, IOnStateEntered<LobbyState
 
         if (obj.WasModified<TraitPrototype>())
             _profileEditor.UpdateTraits(null, true);
-
-        if (obj.WasModified<LoadoutPrototype>())
-            _profileEditor.UpdateLoadouts(null, true);
     }
 
     private void PreferencesDataLoaded()
@@ -264,8 +261,7 @@ public sealed class LobbyUIController : UIController, IOnStateEntered<LobbyState
             _resourceCache,
             _jobRequirements,
             _markings,
-            _random,
-            _clientSponsorsManager);
+            _random);
 
         _profileEditor.OnOpenGuidebook += _guide.OpenHelp;
 
