@@ -1,5 +1,4 @@
 using Content.Server.Administration.Logs;
-using Content.Shared._White.CustomGhostSystem;
 using Content.Shared.Administration.Logs;
 using Content.Shared.CCVar;
 using Content.Shared.Database;
@@ -42,8 +41,6 @@ namespace Content.Server.Database
         Task SaveCharacterSlotAsync(NetUserId userId, ICharacterProfile? profile, int slot);
 
         Task SaveAdminOOCColorAsync(NetUserId userId, Color color);
-
-        Task SaveGhostTypeAsync(NetUserId userId, ProtoId<CustomGhostPrototype> ghostProto); // WWDP EDIT
 
         // Single method for two operations for transaction.
         Task DeleteSlotAndSetSelectedIndex(NetUserId userId, int deleteSlot, int newSlot);
@@ -363,6 +360,12 @@ namespace Content.Server.Database
         Task SendNotification(DatabaseNotification notification);
 
         #endregion
+
+        #region Orehum
+        Task<List<string>> GetWhitelistedPresets();
+        Task AddWhitelistedPreset(string preset);
+        Task RemoveWhitelistedPreset(string preset);
+        #endregion
     }
 
     /// <summary>
@@ -489,14 +492,6 @@ namespace Content.Server.Database
             DbWriteOpsMetric.Inc();
             return RunDbCommand(() => _db.SaveAdminOOCColorAsync(userId, color));
         }
-
-        // WWDP EDIT START
-        public Task SaveGhostTypeAsync(NetUserId userId, ProtoId<CustomGhostPrototype> ghostProto)
-        {
-            DbWriteOpsMetric.Inc();
-            return RunDbCommand(() => _db.SaveGhostTypeAsync(userId, ghostProto));
-        }
-        // WWDP EDIT END
 
         public Task<PlayerPreferences?> GetPlayerPreferencesAsync(NetUserId userId, CancellationToken cancel)
         {
@@ -1051,6 +1046,26 @@ namespace Content.Server.Database
             DbWriteOpsMetric.Inc();
             return RunDbCommand(() => _db.CleanIPIntelCache(range));
         }
+
+        // Orehum Start
+        public async Task<List<string>> GetWhitelistedPresets()
+        {
+            DbReadOpsMetric.Inc();
+            return await RunDbCommand(() => _db.GetWhitelistedPresets());
+        }
+
+        public Task AddWhitelistedPreset(string preset)
+        {
+            DbWriteOpsMetric.Inc();
+            return RunDbCommand(() => _db.AddWhitelistedPreset(preset));
+        }
+
+        public Task RemoveWhitelistedPreset(string preset)
+        {
+            DbWriteOpsMetric.Inc();
+            return RunDbCommand(() => _db.RemoveWhitelistedPreset(preset));
+        }
+        // Orehum End
 
         public void SubscribeToNotifications(Action<DatabaseNotification> handler)
         {

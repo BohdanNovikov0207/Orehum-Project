@@ -1,7 +1,6 @@
 using Content.Server.Administration.Logs;
 using Content.Server.Administration.Managers;
 using Content.Shared._White.Bark;
-using Content.Shared._White.CustomGhostSystem;
 using Content.Shared.Administration.Logs;
 using Content.Shared.Clothing.Loadouts.Systems;
 using Content.Shared.Database;
@@ -64,7 +63,7 @@ namespace Content.Server.Database
                 profiles[profile.Slot] = ConvertProfiles(profile);
             }
 
-            return new PlayerPreferences(profiles, prefs.SelectedCharacterSlot, Color.FromHex(prefs.AdminOOCColor), prefs.GhostId); // WWDP EDIT
+            return new PlayerPreferences(profiles, prefs.SelectedCharacterSlot, Color.FromHex(prefs.AdminOOCColor)); // WWDP EDIT
         }
 
         public async Task SaveSelectedCharacterIndexAsync(NetUserId userId, int index)
@@ -141,7 +140,6 @@ namespace Content.Server.Database
                 UserId = userId.UserId,
                 SelectedCharacterSlot = 0,
                 AdminOOCColor = Color.Red.ToHex(),
-                GhostId = "default" // WWDP EDIT
             };
 
             prefs.Profiles.Add(profile);
@@ -150,7 +148,7 @@ namespace Content.Server.Database
 
             await db.DbContext.SaveChangesAsync();
 
-            return new PlayerPreferences(new[] { new KeyValuePair<int, ICharacterProfile>(0, defaultProfile) }, 0, Color.FromHex(prefs.AdminOOCColor), "default");
+            return new PlayerPreferences(new[] { new KeyValuePair<int, ICharacterProfile>(0, defaultProfile) }, 0, Color.FromHex(prefs.AdminOOCColor));
         }
 
         public async Task DeleteSlotAndSetSelectedIndex(NetUserId userId, int deleteSlot, int newSlot)
@@ -176,19 +174,6 @@ namespace Content.Server.Database
 
         }
 
-        // WWDP EDIT START
-        public async Task SaveGhostTypeAsync(NetUserId userId, ProtoId<CustomGhostPrototype> proto)
-        {
-            await using var db = await GetDb();
-            var prefs = await db.DbContext
-                .Preference
-                .Include(p => p.Profiles)
-                .SingleAsync(p => p.UserId == userId.UserId);
-            prefs.GhostId = proto.Id;
-
-            await db.DbContext.SaveChangesAsync();
-        }
-        // WWDP EDIT END
 
         private static async Task SetSelectedCharacterSlotAsync(NetUserId userId, int newSlot, ServerDbContext db)
         {
@@ -1660,6 +1645,36 @@ INSERT INTO player_round (players_id, rounds_id) VALUES ({players[player]}, {id}
         }
 
         #endregion
+
+        // Orehum start
+        #region Orehum
+        public async Task<List<string>> GetWhitelistedPresets()
+        {
+            await using var db = await GetDb();
+            var presets = db.DbContext.WhiteListedPresets;
+            if (!presets.Any())
+                return [];
+
+            return presets.Select(p => p.PresetId).ToList();
+        }
+
+        public async Task AddWhitelistedPreset(string preset)
+        {
+            await using var db = await GetDb();
+            db.DbContext.WhiteListedPresets.Add(new() { PresetId = preset, });
+            await db.DbContext.SaveChangesAsync();
+        }
+
+        public async Task RemoveWhitelistedPreset(string preset)
+        {
+            await using var db = await GetDb();
+            var p = new WhiteListedPreset() { PresetId = preset, };
+            if (db.DbContext.WhiteListedPresets.Contains(p))
+                db.DbContext.WhiteListedPresets.Remove(p);
+            await db.DbContext.SaveChangesAsync();
+        }
+        #endregion
+        // Orehum end
 
         #region Job Whitelists
 
