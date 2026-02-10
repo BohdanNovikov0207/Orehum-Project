@@ -64,15 +64,18 @@ namespace Content.Client.Lobby.UI
 
             StatsButton.OnPressed += _ => new PlaytimeStatsWindow().OpenCentered();
 
+            profileEditor.CharacterSpriteView = CharacterSpriteView;
+            CharacterSpriteView.SetEntity(profileEditor.PreviewDummy);
+            PreviewRotateRightButton.OnPressed += args =>
+                CharacterSpriteView.OverrideDirection =
+                    (Direction)(((int)(CharacterSpriteView.OverrideDirection ?? Direction.South) + 2) % 8);
+
+            PreviewRotateLeftButton.OnPressed += args =>
+                CharacterSpriteView.OverrideDirection =
+                    (Direction)(((int)(CharacterSpriteView.OverrideDirection ?? Direction.South) + 6) % 8);
+
             _cfg.OnValueChanged(CCVars.SeeOwnNotes, p => AdminRemarksButton.Visible = p, true);
 
-            // Corvax-Sponsors-Start
-            if (IoCManager.Instance!.TryResolveType<ISponsorWindowCreator>(out var creator))
-            {
-                SponsorButton.Visible = true;
-                SponsorButton.OnPressed += _ => creator.OpenWindow();
-            }
-            // Corvax-Sponsors-End
         }
 
         /// <summary>
