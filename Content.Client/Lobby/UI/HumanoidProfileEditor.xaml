@@ -8,7 +8,7 @@
     xmlns:loadouts="clr-namespace:Content.Client._White.Loadouts"
     HorizontalExpand="True">
     <!-- Left side -->
-    <BoxContainer Orientation="Vertical" Margin="10 10 10 10" HorizontalExpand="True">
+    <BoxContainer Orientation="Vertical" Margin="10 10 10 10" HorizontalExpand="True" VerticalExpand="True">
         <!-- Top -->
         <PanelContainer StyleClasses="PanelBackground"> <!-- WD EDIT -->
             <BoxContainer Orientation="Horizontal" MinSize="60 0" HorizontalExpand="True" HorizontalAlignment="Right">

@@ -5,6 +5,7 @@ using System.Text.Json;
 using Content.Server.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using NpgsqlTypes;
@@ -14,9 +15,11 @@ using NpgsqlTypes;
 namespace Content.Server.Database.Migrations.Postgres
 {
     [DbContext(typeof(PostgresServerDbContext))]
-    partial class PostgresServerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250804101501_AddCustomContentToLoadouts")]
+    partial class AddCustomContentToLoadouts
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -35,14 +38,6 @@ namespace Content.Server.Database.Migrations.Postgres
                     b.Property<int?>("AdminRankId")
                         .HasColumnType("integer")
                         .HasColumnName("admin_rank_id");
-
-                    b.Property<bool>("Deadminned")
-                        .HasColumnType("boolean")
-                        .HasColumnName("deadminned");
-
-                    b.Property<bool>("Suspended")
-                        .HasColumnType("boolean")
-                        .HasColumnName("suspended");
 
                     b.Property<string>("Title")
                         .HasColumnType("text")
@@ -635,34 +630,6 @@ namespace Content.Server.Database.Migrations.Postgres
                         });
                 });
 
-            modelBuilder.Entity("Content.Server.Database.IPIntelCache", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("ipintel_cache_id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<IPAddress>("Address")
-                        .IsRequired()
-                        .HasColumnType("inet")
-                        .HasColumnName("address");
-
-                    b.Property<float>("Score")
-                        .HasColumnType("real")
-                        .HasColumnName("score");
-
-                    b.Property<DateTime>("Time")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("time");
-
-                    b.HasKey("Id")
-                        .HasName("PK_ipintel_cache");
-
-                    b.ToTable("ipintel_cache", (string)null);
-                });
-
             modelBuilder.Entity("Content.Server.Database.Job", b =>
                 {
                     b.Property<int>("Id")
@@ -874,26 +841,10 @@ namespace Content.Server.Database.Migrations.Postgres
                         .HasColumnType("integer")
                         .HasColumnName("age");
 
-                    b.Property<byte>("BarkPause")
-                        .HasColumnType("smallint")
-                        .HasColumnName("bark_pause");
-
-                    b.Property<byte>("BarkPitch")
-                        .HasColumnType("smallint")
-                        .HasColumnName("bark_pitch");
-
-                    b.Property<byte>("BarkPitchVariance")
-                        .HasColumnType("smallint")
-                        .HasColumnName("bark_pitch_variance");
-
-                    b.Property<string>("BarkVoice")
+                    b.Property<string>("Backpack")
                         .IsRequired()
                         .HasColumnType("text")
-                        .HasColumnName("bark_voice");
-
-                    b.Property<byte>("BarkVolume")
-                        .HasColumnType("smallint")
-                        .HasColumnName("bark_volume");
+                        .HasColumnName("backpack");
 
                     b.Property<string>("BodyType")
                         .IsRequired()
@@ -904,6 +855,15 @@ namespace Content.Server.Database.Migrations.Postgres
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("char_name");
+
+                    b.Property<string>("Clothing")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("clothing");
+
+                    b.Property<string>("ClownName")
+                        .HasColumnType("text")
+                        .HasColumnName("clown_name");
 
                     b.Property<string>("CustomSpecieName")
                         .IsRequired()
@@ -1010,6 +970,11 @@ namespace Content.Server.Database.Migrations.Postgres
                     b.Property<string>("StationAiName")
                         .HasColumnType("text")
                         .HasColumnName("station_ai_name");
+
+                    b.Property<string>("Voice")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("voice");
 
                     b.Property<float>("Width")
                         .HasColumnType("real")
@@ -1433,18 +1398,6 @@ namespace Content.Server.Database.Migrations.Postgres
                         .HasName("PK_uploaded_resource_log");
 
                     b.ToTable("uploaded_resource_log", (string)null);
-                });
-
-            modelBuilder.Entity("Content.Server.Database.WhiteListedPreset", b =>
-                {
-                    b.Property<string>("PresetId")
-                        .HasColumnType("text")
-                        .HasColumnName("preset_id");
-
-                    b.HasKey("PresetId")
-                        .HasName("PK_white_listed_presets");
-
-                    b.ToTable("white_listed_presets", (string)null);
                 });
 
             modelBuilder.Entity("Content.Server.Database.Whitelist", b =>

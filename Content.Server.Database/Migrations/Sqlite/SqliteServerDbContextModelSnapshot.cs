@@ -674,6 +674,10 @@ namespace Content.Server.Database.Migrations.Sqlite
                         .HasColumnType("TEXT")
                         .HasColumnName("custom_color_tint");
 
+                    b.Property<string>("CustomContent")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("custom_content");
+
                     b.Property<string>("CustomDescription")
                         .HasColumnType("TEXT")
                         .HasColumnName("custom_description");
@@ -934,18 +938,6 @@ namespace Content.Server.Database.Migrations.Sqlite
                         .IsRequired()
                         .HasColumnType("TEXT")
                         .HasColumnName("sex");
-
-                    // WD EDIT START
-                    // b.Property<string>("Voice")
-                    //     .IsRequired()
-                    //     .HasColumnType("TEXT")
-                    //     .HasColumnName("voice");
-
-                    b.Property<string>("BodyType")
-                        .IsRequired()
-                        .HasColumnType("TEXT")
-                        .HasColumnName("body_type");
-                    // WD EDIT END
 
                     b.Property<string>("SkinColor")
                         .IsRequired()
