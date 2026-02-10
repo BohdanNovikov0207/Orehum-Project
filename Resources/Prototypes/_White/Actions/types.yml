@@ -1,16 +1,16 @@
-- type: entity
-  id: ActivateHardlightSpearImplant
-  name: Create hardlight spear
-  description: Creates hardlight spear in your hands.
-  components:
-  - type: InstantAction
-    useDelay: 1.5
-    itemIconStyle: BigAction
-    priority: -20
-    icon:
-      sprite: _White/Objects/Weapons/Melee/Spear/hardlight_spear.rsi
-      state: spear
-    event: !type:ActivateSpawnImplantEvent
+# - type: entity
+#   id: ActivateHardlightSpearImplant
+#   name: Create hardlight spear
+#   description: Creates hardlight spear in your hands.
+#   components:
+#   - type: InstantAction
+#     useDelay: 1.5
+#     itemIconStyle: BigAction
+#     priority: -20
+#     icon:
+#       sprite: _White/Objects/Weapons/Melee/Spear/hardlight_spear.rsi
+#       state: spear
+#     event: !type:ActivateSpawnImplantEvent
 
 - type: entity
   id: ActivateSmokeImplant

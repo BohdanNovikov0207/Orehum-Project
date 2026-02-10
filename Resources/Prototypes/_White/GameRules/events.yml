@@ -1,21 +1,5 @@
 - type: entity
   parent: BaseGameRule
-  id: WormholesSpawn
-  components:
-  - type: StationEvent
-    startAnnouncement: true
-    weight: 8
-    duration: 10
-    minimumPlayers: 15
-    earliestStart: 35
-    reoccurrenceDelay: 50
-  - type: RandomSpawnRule
-    prototype: AnomalyWormhole
-    minCount: 20
-    maxCount: 35
-
-- type: entity
-  parent: BaseGameRule
   id: StraySupplyPod
   components:
     - type: StationEvent
