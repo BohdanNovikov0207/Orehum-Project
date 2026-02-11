@@ -525,12 +525,12 @@ namespace Content.Shared.Movement.Systems
         public void SetSprinting(Entity<InputMoverComponent> entity, ushort subTick, bool walking)
         {
             // Logger.Info($"[{_gameTiming.CurTick}/{subTick}] Sprint: {enabled}");
-
-            if (!Resolve(entity, ref entity.Comp))
+            var comp = entity.Comp;
+            if (!Resolve(entity, ref comp))
                 return;
 
-            SetMoveInput(entity!, subTick, walking, MoveButtons.Walk);
-            SprintingMovementUpdate(entity!);
+            SetMoveInput(entity, subTick, walking, MoveButtons.Walk);
+            SprintingMovementUpdate(entity);
         }
 
         /// <summary>
