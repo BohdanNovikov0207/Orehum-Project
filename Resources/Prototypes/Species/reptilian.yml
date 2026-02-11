@@ -43,10 +43,10 @@
     LHand: MobReptilianLHand
     RHand: MobReptilianRHand
     # WD EDIT START
-    LLeg: MobReptilianDigiLLeg
-    RLeg: MobReptilianDigiRLeg
-    LFoot: MobReptilianDigiLFoot
-    RFoot: MobReptilianDigiRFoot
+    LLeg: MobReptilianLLeg
+    RLeg: MobReptilianRLeg
+    LFoot: MobReptilianLFoot
+    RFoot: MobReptilianRFoot
     # WD EDIT END
 
 - type: markingPoints

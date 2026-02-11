@@ -354,8 +354,16 @@ namespace Content.Client.Lobby.UI
 
             UpdateHeightWidthSliders();
 
-            HeightSlider.OnValueChanged += _ => UpdateDimensions(SliderUpdate.Height);
-            WidthSlider.OnValueChanged += _ => UpdateDimensions(SliderUpdate.Width);
+            HeightSlider.OnValueChanged += _ =>
+            {
+                UpdateDimensions(SliderUpdate.Height);
+                IsDirty = true;
+            };
+            WidthSlider.OnValueChanged += _ =>
+            {
+                UpdateDimensions(SliderUpdate.Width);
+                IsDirty = true;
+            };
 
             HeightReset.OnPressed += _ =>
             {

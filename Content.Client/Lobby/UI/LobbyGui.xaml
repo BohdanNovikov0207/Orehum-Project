@@ -44,6 +44,7 @@
                         <BoxContainer Orientation="Vertical" SeparationOverride="4" Name="VoteContainer"
                                       Access="Public" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0 8" />
                     </BoxContainer>
+                    <Control Access="Public" Visible="False" Name="CharacterSetupState" VerticalExpand="True" />
 
                     <Control VerticalExpand="True" />
 
@@ -61,7 +62,6 @@
                     </BoxContainer>
                 </Control>
 
-                <Control Access="Public" Visible="False" Name="CharacterSetupState" VerticalExpand="True" />
             </BoxContainer>
 
             <PanelContainer Name="RightSide" Access="Public" StyleClasses="AngleRect" HorizontalAlignment="Right" VerticalExpand="True"
@@ -79,8 +79,6 @@
                     <BoxContainer Name="Center" Access="Public" Orientation="Horizontal" MinSize="0 40" HorizontalAlignment="Right">
                         <Button Name="AHelpButton" Access="Public" Text="{Loc 'ui-lobby-ahelp-button'}" StyleClasses="ButtonBig" />
                         <vote:VoteCallMenuButton Name="CallVoteButton" StyleClasses="ButtonBig" />
-
-                        <Button Name="CharacterSetupButton" Access="Public" Text="{Loc 'ui-lobby-character-setup-button'}" StyleClasses="ButtonBig" />
 
                         <Button Name="ChangelogButton" Access="Public" Text="Changelog" StyleClasses="ButtonBig" />
 
