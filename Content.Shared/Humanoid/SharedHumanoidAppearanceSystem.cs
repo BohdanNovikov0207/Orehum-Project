@@ -49,7 +49,7 @@ public abstract class SharedHumanoidAppearanceSystem : EntitySystem
     [Dependency] private readonly ISharedPlayerManager _sharedPlayerManager = default!;
     [Dependency] private readonly SharedBarkSystem _barkSystem = default!; // WWDP EDIT
 
-    // private ISharedSponsorsManager? _sponsors;
+    private ISharedSponsorsManager? _sponsors;
 
     [ValidatePrototypeId<SpeciesPrototype>]
     public const string DefaultSpecies = "Human";
@@ -114,23 +114,23 @@ public abstract class SharedHumanoidAppearanceSystem : EntitySystem
         var profile = export.Profile;
         var collection = IoCManager.Instance;
 
-        // string[] sponsorPrototypes = [];
-        // if (_sponsors != null) // Corvax-Sponsors
-        // {
+        string[] sponsorPrototypes = [];
+        if (_sponsors != null) // Corvax-Sponsors
+        {
 
-        //     if (_netManager.IsClient)
-        //     {
-        //         sponsorPrototypes = _sponsors.GetClientPrototypes().ToArray();
-        //     }
-        //     else
-        //     {
-        //         sponsorPrototypes = _sponsors.TryGetServerPrototypes(session.UserId, out var prototypes)
-        //             ? prototypes.ToArray()
-        //             : [];
-        //     }
-        // }
+            if (_netManager.IsClient)
+            {
+                sponsorPrototypes = _sponsors.GetClientPrototypes().ToArray();
+            }
+            else
+            {
+                sponsorPrototypes = _sponsors.TryGetServerPrototypes(session.UserId, out var prototypes)
+                    ? prototypes.ToArray()
+                    : [];
+            }
+        }
 
-        // profile.EnsureValid(session, collection!, sponsorPrototypes);
+        profile.EnsureValid(session, collection!, sponsorPrototypes);
         return profile;
     }
 

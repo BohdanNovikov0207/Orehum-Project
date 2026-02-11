@@ -1,4 +1,5 @@
 using System.Linq;
+using Content.Corvax.Interfaces.Shared;
 using Content.Client._White.UserInterface.Controls;
 using Content.Client.Guidebook;
 using Content.Client.Humanoid;
@@ -26,6 +27,8 @@ public sealed partial class SpeciesSelectWindow : DefaultWindow
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly DocumentParsingManager _documentParsingManager = default!;
     [Dependency] private readonly IPlayerManager _playerManager = default!;
+
+    [Dependency] private readonly ISharedSponsorsManager _clientSponsorsManager = default!; // sponsor
 
     public event Action<ProtoId<SpeciesPrototype>>? OnSpeciesSelected;
 
@@ -59,7 +62,7 @@ public sealed partial class SpeciesSelectWindow : DefaultWindow
             {
                 _dummyProfile = _dummyProfile.WithSpecies(_selectedSpecies.Value);
 
-                _dummyProfile.EnsureValid(_playerManager.LocalSession, _entityManager.EntitySysManager.DependencyCollection);
+                _dummyProfile.EnsureValid(_playerManager.LocalSession, _entityManager.EntitySysManager.DependencyCollection, _clientSponsorsManager.GetClientPrototypes().ToArray());
             }
 
             _dummyUid = _entityManager.SpawnEntity(prototype.DollPrototype, MapCoordinates.Nullspace);

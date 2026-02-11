@@ -64,6 +64,14 @@ namespace Content.Client.Lobby.UI
 
             StatsButton.OnPressed += _ => new PlaytimeStatsWindow().OpenCentered();
 
+            // Corvax-Sponsors-Start
+            if (IoCManager.Instance!.TryResolveType<ISponsorWindowCreator>(out var creator))
+            {
+                SponsorButton.Visible = true;
+                SponsorButton.OnPressed += _ => creator.OpenWindow();
+            }
+            // Corvax-Sponsors-End
+
             profileEditor.CharacterSpriteView = CharacterSpriteView;
             CharacterSpriteView.SetEntity(profileEditor.PreviewDummy);
             PreviewRotateRightButton.OnPressed += args =>
