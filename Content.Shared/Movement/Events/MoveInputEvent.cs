@@ -1,5 +1,6 @@
 using Content.Shared.Movement.Components;
 using Content.Shared.Movement.Systems;
+using Robust.Shared.Serialization;
 
 namespace Content.Shared.Movement.Events;
 
@@ -34,4 +35,7 @@ public readonly struct SprintingInputEvent(Entity<InputMoverComponent> entity)
 {
     public readonly Entity<InputMoverComponent> Entity = entity;
 }
+
+[Serializable, NetSerializable]
+public sealed class ToggleInputMoverRequestEvent : EntityEventArgs;
 // WD EDIT END
