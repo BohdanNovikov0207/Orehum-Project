@@ -55,6 +55,57 @@ public sealed partial class AbductorSystem : SharedAbductorSystem
         base.Initialize();
     }
 
+    public override void Update(float frameTime)
+    {
+        base.Update(frameTime);
+
+        _updateTimer += frameTime;
+
+        if (_updateTimer < UpdateInterval)
+            return;
+        _updateTimer = 0;
+
+        var query = _entityManager.EntityQueryEnumerator<AbductorHumanObservationConsoleComponent>();
+
+        while (query.MoveNext(out var id, out var comp))
+        {
+            if (!_uiSystem.IsUiOpen(id, AbductorCameraConsoleUIKey.Key)
+                || !_uiSystem.TryGetUiState<AbductorCameraConsoleBuiState>(id, AbductorCameraConsoleUIKey.Key, out var state))
+                continue;
+
+            var result = new Dictionary<NetEntity, StationBeacons>();
+            var isChanged = false;
+
+            foreach (var station in state.Stations)
+            {
+                var consoleTransform = Transform(id);
+                var stationUid = _entityManager.GetEntity(station.Value.StationId);
+
+                if (_stationSystem.GetLargestGrid(stationUid) is not { } gridUid)
+                    continue;
+
+                var gridTransform = Transform(gridUid);
+                var isEnabled = _xformSys.InRange((id, consoleTransform), (gridUid, gridTransform), comp.MinStationDistance);
+
+                if (isEnabled == station.Value.IsEnabled)
+                    continue;
+
+                result.Add(station.Value.StationId, new StationBeacons
+                {
+                    Name = station.Value.Name,
+                    StationId = station.Value.StationId,
+                    Beacons = [.. station.Value.Beacons],
+                    IsEnabled = isEnabled,
+                });
+
+                isChanged = true;
+            }
+
+            if (isChanged)
+                _uiSystem.SetUiState(id, AbductorCameraConsoleUIKey.Key, new AbductorCameraConsoleBuiState() { Stations = result });
+        }
+    }
+
     private void OnAbductorBeaconChosenBuiMsg(Entity<AbductorHumanObservationConsoleComponent> ent, ref AbductorBeaconChosenBuiMsg args)
     {
         OnCameraExit(args.Actor);

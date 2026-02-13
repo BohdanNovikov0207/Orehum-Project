@@ -7,7 +7,6 @@
 // SPDX-FileCopyrightText: 2025 coderabbitai[bot] <136622811+coderabbitai[bot]@users.noreply.github.com>
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
-using Content.Goobstation.Common.Religion;
 using Content.Goobstation.Shared.Bible;
 using Content.Server.Body.Components;
 using Content.Server.Flash;
@@ -46,6 +45,9 @@ using Robust.Shared.Containers;
 using Robust.Shared.Utility;
 using System.Collections.Frozen;
 using System.Diagnostics.CodeAnalysis;
+using Content.Shared.Flash.Components;
+using Content.Goobstation.Common.Religion;
+using Content.Shared.Storage.Components;
 
 namespace Content.Server.Vampire;
 
@@ -326,7 +328,7 @@ public sealed partial class VampireSystem
 
             if (HasComp<HumanoidAppearanceComponent>(entity))
             {
-                _stun.TryParalyze(entity, duration ?? TimeSpan.FromSeconds(3), false);
+                _stun.TryUpdateParalyzeDuration(entity, duration ?? TimeSpan.FromSeconds(3));
                 _chat.TryEmoteWithoutChat(entity, _prototypeManager.Index<EmotePrototype>(VampireComponent.ScreamEmoteProto), true);
             }
 
@@ -347,14 +349,14 @@ public sealed partial class VampireSystem
 
         if (HasComp<BibleUserComponent>(target))
         {
-            _stun.TryParalyze(vampire, duration ?? TimeSpan.FromSeconds(3), true);
+            _stun.TryUpdateParalyzeDuration(vampire, duration ?? TimeSpan.FromSeconds(3));
             _chat.TryEmoteWithoutChat(vampire.Owner, _prototypeManager.Index<EmotePrototype>(VampireComponent.ScreamEmoteProto), true);
             if (damage != null)
                 _damageableSystem.TryChangeDamage(vampire.Owner, damage);
             return;
         }
 
-        _stun.TryParalyze(target.Value, duration ?? TimeSpan.FromSeconds(3), true);
+        _stun.TryUpdateParalyzeDuration(target.Value, duration ?? TimeSpan.FromSeconds(3));
     }
     private void PolymorphSelf(Entity<VampireComponent> vampire, string? polymorphTarget)
     {
@@ -660,13 +662,13 @@ public sealed partial class VampireSystem
         if (!HasComp<VampireFangsExtendedComponent>(vampire))
             return false;
 
-        if (!HasComp<TransformComponent>(vampire))
-            return false;
+        // if (!HasComp<TransformComponent>(vampire))
+        //     return false;
 
-        if (!_interaction.InRangeUnobstructed(vampire.Owner, target, popup: true))
-            return false;
+        // if (!_interaction.InRangeUnobstructed(vampire.Owner, target, popup: true))
+        //     return false;
 
-        if (_food.IsMouthBlocked(target, vampire))
+        if (_ingestion.HasMouthAvailable(target, vampire))
             return false;
 
         if (_rotting.IsRotten(target))
@@ -700,7 +702,7 @@ public sealed partial class VampireSystem
         if (!HasComp<VampireFangsExtendedComponent>(entity))
             return;
 
-        if (_food.IsMouthBlocked(entity, entity))
+        if (_ingestion.HasMouthAvailable(entity, entity))
             return;
 
         if (_rotting.IsRotten(args.Target!.Value))
