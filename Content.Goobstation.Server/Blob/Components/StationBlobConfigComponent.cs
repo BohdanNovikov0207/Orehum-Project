@@ -1,8 +1,15 @@
-﻿using System.ComponentModel.DataAnnotations;
-//using Content.Server.SpecForces;
-using Robust.Shared.Prototypes;
+﻿// SPDX-FileCopyrightText: 2024 Aiden <aiden@djkraz.com>
+// SPDX-FileCopyrightText: 2024 Fishbait <Fishbait@git.ml>
+// SPDX-FileCopyrightText: 2024 Piras314 <p1r4s@proton.me>
+// SPDX-FileCopyrightText: 2024 fishbait <gnesse@gmail.com>
+// SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
+// SPDX-FileCopyrightText: 2025 Misandry <mary@thughunt.ing>
+// SPDX-FileCopyrightText: 2025 gus <august.eymann@gmail.com>
+//
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
-namespace Content.Server._Goobstation.Blob.Components;
+//using Content.Server.SpecForces;
+namespace Content.Goobstation.Server.Blob.Components;
 
 [RegisterComponent]
 public sealed partial class StationBlobConfigComponent : Component

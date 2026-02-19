@@ -1,6 +1,6 @@
 using Content.Shared.Actions;
 
-namespace Content.Server.Actions;
+namespace Content.Goobstation.Server.Actions;
 
 public sealed partial class ActionsProviderSystem : EntitySystem
 {
