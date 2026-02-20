@@ -1,7 +1,7 @@
 using System.Numerics;
 using System.Diagnostics.CodeAnalysis;
-using Content.Shared._Goobstation.MartialArts.Components;
-using Content.Shared._Goobstation.MartialArts.Events;
+using Content.Goobstation.Common.Grab;
+using Content.Goobstation.Common.MartialArts;
 using Content.Shared._White.Grab;
 using Content.Shared.ActionBlocker;
 using Content.Shared.Administration.Logs;

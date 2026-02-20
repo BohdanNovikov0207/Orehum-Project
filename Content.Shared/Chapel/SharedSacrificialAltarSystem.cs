@@ -1,5 +1,5 @@
 using System.Linq;
-using Content.Server.Bible.Components;
+using Content.Shared.Bible.Components;
 using Content.Shared.Buckle.Components;
 using Content.Shared.DoAfter;
 using Content.Shared.Examine;

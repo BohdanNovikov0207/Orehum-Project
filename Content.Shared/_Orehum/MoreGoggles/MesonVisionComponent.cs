@@ -1,5 +1,5 @@
 ﻿using Content.Shared.Actions;
-using Content.Shared.Overlays.Switchable;
+using Content.Shared.Overlays;
 using Robust.Shared.GameStates;
 
 namespace Content.Shared._Orehum.MoreGoggles;

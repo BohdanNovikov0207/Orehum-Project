@@ -1,7 +1,5 @@
 using Content.Shared.Chat;
-using Content.Shared._Goobstation.Flashbang;
 using Content.Shared._Orehum.MoreGoggles;
-using Content.Shared.Chat;
 using Content.Shared.Chemistry;
 using Content.Shared.Chemistry.Hypospray.Events;
 using Content.Shared.Climbing.Events;
@@ -11,7 +9,6 @@ using Content.Shared.Electrocution;
 using Content.Shared.Explosion;
 using Content.Shared.Eye.Blinding.Systems;
 using Content.Shared.Gravity;
-using Content.Shared.Heretic;
 using Content.Shared.IdentityManagement.Components;
 using Content.Shared.Inventory.Events;
 using Content.Shared.Movement.Events;
@@ -24,7 +21,6 @@ using Content.Shared.Strip.Components;
 using Content.Shared.Temperature;
 using Content.Shared.Verbs;
 using Content.Shared.Weapons.Ranged.Events;
-using Content.Shared.Overlays.Switchable;
 using Content.Shared.Stunnable;
 using Content.Shared.Movement.Events;
 

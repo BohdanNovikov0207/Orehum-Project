@@ -24,7 +24,7 @@ using Robust.Shared.Physics.Events;
 using Robust.Shared.Physics.Systems;
 using Content.Shared.Actions.Events;
 using Content.Shared.Climbing.Components;
-using Content.Shared._Goobstation.MartialArts.Components;
+using Content.Goobstation.Shared.MartialArts.Components;
 
 namespace Content.Shared.Stunnable;
 
