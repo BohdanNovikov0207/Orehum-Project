@@ -1,13 +1,4 @@
-using Robust.Shared.IoC;
-
-namespace Content.Goobstation.Common.IoC;
-
-internal static class CommonGoobContentIoC
-{
-    internal static void Register()
-    {
-        var instance = IoCManager.Instance!;
-    }// SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
+// SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
 // SPDX-FileCopyrightText: 2025 Misandry <mary@thughunt.ing>
 // SPDX-FileCopyrightText: 2025 gus <august.eymann@gmail.com>
 //
@@ -23,5 +14,4 @@ internal static class CommonGoobContentIoC
     {
         var instance = IoCManager.Instance!;
     }
-}
 }
