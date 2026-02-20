@@ -1,21 +1,35 @@
-﻿using Content.Server.Actions;
-using Content.Server.Language;
+﻿// SPDX-FileCopyrightText: 2024 Aiden <aiden@djkraz.com>
+// SPDX-FileCopyrightText: 2024 Fishbait <Fishbait@git.ml>
+// SPDX-FileCopyrightText: 2024 Piras314 <p1r4s@proton.me>
+// SPDX-FileCopyrightText: 2024 fishbait <gnesse@gmail.com>
+// SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
+// SPDX-FileCopyrightText: 2025 CerberusWolfie <wb.johnb.willis@gmail.com>
+// SPDX-FileCopyrightText: 2025 GoobBot <uristmchands@proton.me>
+// SPDX-FileCopyrightText: 2025 Misandry <mary@thughunt.ing>
+// SPDX-FileCopyrightText: 2025 SX-7 <sn1.test.preria.2002@gmail.com>
+// SPDX-FileCopyrightText: 2025 gus <august.eymann@gmail.com>
+//
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+using Content.Goobstation.Common.Blob;
+using Content.Goobstation.Shared.Blob;
+using Content.Goobstation.Shared.Blob.Components;
+using Content.Goobstation.Shared.Blob.Events;
+using Content.Server.Actions;
 using Content.Server.Body.Systems;
 using Content.Server.Ghost.Roles;
 using Content.Server.Ghost.Roles.Components;
 using Content.Server.Mind;
-using Content.Shared._Goobstation.Blob;
-using Content.Shared._Goobstation.Blob.Components;
-using Content.Shared.Language;
 using Content.Shared.Mind.Components;
 using Content.Shared.Mobs;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
-using Content.Shared.Language.Events;
-using Content.Server._Goobstation.Blob.Systems;
+using Content.Server._EinsteinEngines.Language;
+using Content.Shared._EinsteinEngines.Language;
+using Content.Shared._EinsteinEngines.Language.Events;
 
-namespace Content.Server._Goobstation.Blob;
+namespace Content.Goobstation.Server.Blob;
 
 public sealed class BlobCarrierSystem : SharedBlobCarrierSystem
 {
