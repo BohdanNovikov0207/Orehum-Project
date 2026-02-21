@@ -15,6 +15,7 @@ using Content.Shared.Slippery;
 using Content.Shared.Standing;
 using Content.Shared.StatusEffect;
 using Content.Shared.Weapons.Melee.Events;
+using BeforeStaminaDamageEvent = Content.Shared.Damage.Events.BeforeStaminaDamageEvent;
 
 namespace Content.Shared._Shitcode.Heretic.Systems.Abilities;
 
