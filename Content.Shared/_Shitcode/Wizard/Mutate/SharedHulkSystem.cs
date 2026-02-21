@@ -14,6 +14,7 @@ using Content.Shared.StatusEffect;
 using Content.Shared.StatusEffectNew;
 using Content.Shared.Weapons.Melee.Events;
 using Robust.Shared.Prototypes;
+using BeforeStaminaDamageEvent = Content.Shared.Damage.Events.BeforeStaminaDamageEvent;
 
 namespace Content.Shared._Goobstation.Wizard.Mutate;
 

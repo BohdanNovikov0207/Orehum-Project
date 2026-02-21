@@ -1,8 +1,8 @@
 ﻿using Content.Shared.Actions;
-using Content.Shared.Overlays;
+using Content.Goobstation.Shared.Overlays;
 using Robust.Shared.GameStates;
 
-namespace Content.Shared._Orehum.MoreGoggles;
+namespace Content.Goobstation.Shared._Orehum.MoreGoggles;
 
 [RegisterComponent, NetworkedComponent]
 public sealed partial class MinerVisionComponent : SwitchableOverlayComponent

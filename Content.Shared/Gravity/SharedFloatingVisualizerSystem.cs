@@ -1,6 +1,6 @@
 using System.Numerics;
 using Robust.Shared.Map;
-using Content.Shared.Flight.Events;
+using Content.Shared._EE.Flight.Events;
 
 namespace Content.Shared.Gravity;
 

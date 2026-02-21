@@ -25,6 +25,7 @@ using Content.Shared.UserInterface;
 using Content.Shared.Weapons.Melee;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Prototypes;
+using BeforeStaminaDamageEvent = Content.Shared.Damage.Events.BeforeStaminaDamageEvent;
 
 namespace Content.Shared._Goobstation.Wizard.Spellblade;
 

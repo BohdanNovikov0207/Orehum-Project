@@ -7,7 +7,7 @@ using Content.Shared.Buckle.Components;
 using Content.Shared.Contests;
 using Content.Shared.Cuffs.Components;
 using Content.Shared.Database;
-using Content.Shared.Flight;
+using Content.Shared._EE.Flight;
 using Content.Shared.DoAfter;
 using Content.Shared.Hands;
 using Content.Shared.Hands.Components;

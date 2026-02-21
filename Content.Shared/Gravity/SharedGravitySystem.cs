@@ -6,7 +6,7 @@ using Robust.Shared.Physics;
 using Robust.Shared.Physics.Components;
 using Robust.Shared.Serialization;
 using Robust.Shared.Timing;
-using Content.Shared.Flight;
+using Content.Shared._EE.Flight;
 
 namespace Content.Shared.Gravity
 {
