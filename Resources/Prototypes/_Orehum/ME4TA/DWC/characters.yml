@@ -92,7 +92,7 @@
     Shock: 0.0
     Poison: 0.0
     Radiation: 0.3
-    Bloodloss: 0.8
+    Bloodloss: 0.4
   flatReductions:
     Blunt: 15
     Heat: 15
@@ -142,3 +142,175 @@
     - Belt
     - Back
 
+#Dante
+- type: entity
+  parent: MobHuman
+  id: DWCDante
+  name: Даниэль
+  suffix: ME4TA
+  components:
+  - type: Loadout
+    prototypes: [DWCGearDante]
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      450: Critical
+      550: Dead
+  - type: MovementSpeedModifier
+    baseSprintSpeed: 8
+    baseWalkSpeed: 5
+  - type: Damageable
+    damageModifierSet: DanteResist
+  - type: ZombieImmune
+  - type: Actions
+  - type: StatusEffects
+    allowed:
+    - Stun
+    - KnockedDown
+    - SlowedDown
+  - type: NoSlip
+  - type: DanteAbilities
+    actions:
+    - ActionDanteRainStorm
+    - ActionDanteStinger
+
+- type: startingGear
+  id: DWCGearDante
+  equipment:
+    jumpsuit: ClothingUniformJumpsuitGreyShirt
+    outerClothing: ClothingOuterCoatVictorianRed
+    gloves: ClothingHandsGlovesCombatTCAF
+    shoes: ClothingShoesBootsJackFake
+    id: VisitorIDCard
+    belt: ClothingBeltSyndieHolster
+    back: DWCRebellion
+  storage:
+    belt:
+    - DWCEbony
+    - DWCIvory
+    - MagazinePistolHighCapacity
+    - MagazinePistolHighCapacity
+    - MagazinePistolHighCapacity
+    - MagazinePistolHighCapacity
+
+- type: entity
+  parent: WeaponPistolDualetta
+  id: DWCEbony
+  name: Ebony
+  description: "Модифицированный пистолет. На левом затворе выгравировано 'For Tony Redgrave'."
+  suffix: ME4TA
+  components:
+  - type: Tag
+    tags:
+    - EbonyIvory
+    - DanteWeapon
+    - WeaponPistolDualetta
+  - type: Multishot
+    spreadMultiplier: 1.25
+  - type: RequiresDualWield
+    whitelist:
+      tags:
+      - WeaponPistolDualetta
+
+- type: entity
+  parent: WeaponPistolDualetta
+  id: DWCIvory
+  name: Ivory
+  description: "Модифицированный пистолет. На правом затворе выгравировано 'By. 45 Art Warks'."
+  suffix: ME4TA
+  components:
+  - type: Tag
+    tags:
+    - EbonyIvory
+    - DanteWeapon
+    - WeaponPistolDualetta
+  - type: Multishot
+    spreadMultiplier: 1.25
+  - type: RequiresDualWield
+    whitelist:
+      tags:
+      - WeaponPistolDualetta
+
+- type: entity
+  parent: BaseSword
+  id: DWCRebellion
+  name: Мятежник
+  description: "Огромный клинок, пробуждающий истинную силу."
+  components:
+  - type: Sprite
+    sprite: _Orehum/ME4TA/DWC/rebellion.rsi
+    state: icon
+  - type: MeleeWeapon
+    damage:
+      types:
+        Slash: 21
+        Blunt: 10
+    animation: WeaponArcSlash
+  - type: Tag
+    tags:
+    - Rebellion
+    - DanteWeapon
+  - type: Item
+    size: Huge
+    sprite: _Orehum/ME4TA/DWC/rebellion.rsi
+  - type: Clothing
+    sprite: _Orehum/ME4TA/DWC/rebellion.rsi
+    slots:
+    - Back
+
+- type: damageModifierSet
+  id: DanteResist
+  coefficients:
+    Blunt: 0.6
+    Slash: 0.5
+    Piercing: 0.7
+    Heat: 0.5
+    Cold: 0.8
+    Shock: 0.8
+    Poison: 1.0
+    Radiation: 1.0
+    Bloodloss: 0.8
+
+- type: entity
+  id: ActionDanteStinger
+  name: "Stinger"
+  description: "Рывок с мечом в указанном направлении. При попадании во врага наносит урон, при ударе о стену оглушает."
+  components:
+  - type: WorldTargetAction
+    event: !type:DanteStingerEvent
+    icon: { sprite: _Orehum/ME4TA/DWC/rebellion.rsi, state: icon }
+    range: 7
+    useDelay: 3.0
+    checkCanAccess: false
+    checkCanInteract: true
+
+- type: entity
+  id: ActionDanteRainStorm
+  name: "Rain Storm"
+  description: "Град пуль с воздуха по всем врагам вокруг."
+  components:
+  - type: InstantAction
+    event: !type:DanteRainStormEvent
+    icon: { sprite: _Goobstation/Objects/Weapons/Guns/Pistols/Dualetta.rsi, state: icon }
+    useDelay: 4.0
+    checkCanInteract: true
+
+- type: entity
+  id: ActionDanteRainEffect
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Sprite
+    noRot: true
+    drawdepth: Effects
+    layers:
+    - shader: unshaded
+      sprite: _ES/Effects/viewcone_effects.rsi
+      state: gunfire
+      color: "#FFD700"
+  - type: PointLight
+    color: "#FFA500"
+    radius: 1.5
+    energy: 1.2
+  - type: TimedDespawn
+    lifetime: 0.3
+  - type: EffectVisuals
