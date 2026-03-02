@@ -1,4 +1,4 @@
-﻿using Content.Shared.DeltaV.Biscuit;
+﻿using Content.Shared._DV.Biscuit;
 
 namespace Content.Server.DeltaV.Biscuit;
 

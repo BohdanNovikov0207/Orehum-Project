@@ -1,5 +1,5 @@
 using Content.Server.Silicons.Laws;
-using Content.Shared.DeltaV.Silicons.Laws;
+using Content.Shared._DV.Silicons.Laws;
 using Content.Shared.Silicons.Laws;
 using Content.Shared.Silicons.Laws.Components;
 using Robust.Shared.Prototypes;

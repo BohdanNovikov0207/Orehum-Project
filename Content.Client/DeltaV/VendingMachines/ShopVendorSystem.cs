@@ -1,4 +1,4 @@
-using Content.Shared.DeltaV.VendingMachines;
+using Content.Shared._DV.VendingMachines;
 using Content.Shared.VendingMachines;
 using Robust.Client.Animations;
 using Robust.Client.GameObjects;

@@ -765,7 +765,9 @@ namespace Content.Server.Database.Migrations.Postgres
 
                     b.Property<string>("BodyType")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("text")
+                        .HasDefaultValue("")
                         .HasColumnName("body_type");
 
                     b.Property<string>("BorgName")

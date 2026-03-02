@@ -4,7 +4,7 @@ using Content.Shared.Audio;
 using Content.Shared.CartridgeLoader;
 using Content.Shared.CartridgeLoader.Cartridges;
 using Content.Shared.Database;
-using Content.Shared.DeltaV.NanoChat;
+using Content.Shared._DV.NanoChat;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Labels.EntitySystems;
 using Content.Shared.Paper;

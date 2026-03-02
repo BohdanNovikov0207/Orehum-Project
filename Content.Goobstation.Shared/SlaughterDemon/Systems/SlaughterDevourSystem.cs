@@ -1,6 +1,6 @@
 using Content.Goobstation.Shared.SlaughterDemon.Objectives;
 using Content.Goobstation.Shared.SlaughterDemon.Other;
-using Content.Shared._EinsteinEngines.Silicon.Components;
+using Content.Shared.Silicon.Components;
 using Content.Shared._Shitmed.Damage;
 using Content.Shared._Shitmed.Targeting;
 using Content.Shared.Damage;

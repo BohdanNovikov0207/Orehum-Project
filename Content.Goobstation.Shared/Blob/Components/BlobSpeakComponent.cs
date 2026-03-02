@@ -12,7 +12,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared._EinsteinEngines.Language;
+using Content.Shared.Language;
 using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
 

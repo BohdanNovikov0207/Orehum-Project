@@ -1,4 +1,4 @@
-using Content.Shared.DeltaV.Silicons.Laws;
+using Content.Shared._DV.Silicons.Laws;
 
 namespace Content.Client.DeltaV.Silicons.Laws;
 

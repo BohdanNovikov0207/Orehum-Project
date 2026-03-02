@@ -259,7 +259,7 @@ public sealed class ShadowlingAscensionEggSystem : EntitySystem
             message,
             sender,
             false,
-            new SoundPathSpecifier("/Audio/_EinsteinEngines/Shadowling/ascension.ogg"),
+            new SoundPathSpecifier("/Audio/_EE/Shadowling/ascension.ogg"),
             Color.Red);
 
         // Begin Global Sound

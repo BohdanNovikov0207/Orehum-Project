@@ -1,6 +1,6 @@
 using Content.Server.DeltaV.Silicons.Laws;
 using Content.Server.Silicons.Laws;
-using Content.Shared.DeltaV.Silicons.Laws;
+using Content.Shared._DV.Silicons.Laws;
 using Content.Shared.Emag.Components;
 using Content.Shared.Emag.Systems;
 using Content.Shared.Silicons.Laws;

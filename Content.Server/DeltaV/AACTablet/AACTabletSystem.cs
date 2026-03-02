@@ -2,7 +2,7 @@ using Content.Server.Abilities.Mime;
 using Content.Server.Chat.Systems;
 using Content.Server.Speech.Components;
 using Content.Shared.Chat;
-using Content.Shared.DeltaV.AACTablet;
+using Content.Shared._DV.AACTablet;
 using Content.Shared.IdentityManagement;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;

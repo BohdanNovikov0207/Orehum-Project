@@ -5,9 +5,9 @@
 
 using Content.Shared.CCVar;
 using Robust.Shared.Configuration;
-using Content.Shared._EinsteinEngines.HeightAdjust;
+using Content.Shared.HeightAdjust;
 using Content.Goobstation.Shared.Sprinting;
-using Content.Shared._EinsteinEngines.Flight;
+using Content.Shared.Flight;
 
 namespace Content.Server._Goobstation.HeightAdjust;
 

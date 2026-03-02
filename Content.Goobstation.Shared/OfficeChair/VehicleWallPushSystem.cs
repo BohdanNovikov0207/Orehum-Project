@@ -4,7 +4,7 @@
 
 using Content.Goobstation.Common.CCVar;
 using Content.Goobstation.Shared.Vehicles;
-using Content.Shared._EinsteinEngines.Contests;
+using Content.Shared.Contests;
 using Content.Shared.Actions;
 using Content.Shared.Buckle.Components;
 using Content.Shared.Item;

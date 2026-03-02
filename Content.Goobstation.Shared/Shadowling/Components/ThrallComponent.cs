@@ -18,5 +18,5 @@ public sealed partial class ThrallComponent : Component
     public ProtoId<FactionIconPrototype> StatusIcon { get; set; } = "ThrallFaction";
 
     [DataField]
-    public SoundSpecifier? ThrallConverted = new SoundPathSpecifier("/Audio/_EinsteinEngines/Shadowling/thrall.ogg");
+    public SoundSpecifier? ThrallConverted = new SoundPathSpecifier("/Audio/_EE/Shadowling/thrall.ogg");
 }

@@ -716,7 +716,9 @@ namespace Content.Server.Database.Migrations.Sqlite
 
                     b.Property<string>("BodyType")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT")
+                        .HasDefaultValue("")
                         .HasColumnName("body_type");
 
                     b.Property<string>("BorgName")

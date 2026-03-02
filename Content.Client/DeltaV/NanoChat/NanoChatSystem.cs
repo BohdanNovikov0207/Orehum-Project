@@ -1,4 +1,4 @@
-using Content.Shared.DeltaV.NanoChat;
+using Content.Shared._DV.NanoChat;
 
 namespace Content.Client.DeltaV.NanoChat;
 

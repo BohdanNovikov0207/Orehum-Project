@@ -26,9 +26,9 @@ public sealed partial class HatchingEggComponent : Component
     [ViewVariables] public bool HasThirdMessageAppeared;
 
     [DataField] public SoundSpecifier? CrackFirst =
-        new SoundPathSpecifier("/Audio/_EinsteinEngines/Shadowling/egg/crack01.ogg");
+        new SoundPathSpecifier("/Audio/_EE/Shadowling/egg/crack01.ogg");
     [DataField] public SoundSpecifier? CrackSecond =
-        new SoundPathSpecifier("/Audio/_EinsteinEngines/Shadowling/egg/crack02.ogg");
+        new SoundPathSpecifier("/Audio/_EE/Shadowling/egg/crack02.ogg");
     [DataField] public SoundSpecifier? CrackThird =
-        new SoundPathSpecifier("/Audio/_EinsteinEngines/Shadowling/egg/crack03.ogg");
+        new SoundPathSpecifier("/Audio/_EE/Shadowling/egg/crack03.ogg");
 }

@@ -1,5 +1,5 @@
-using Content.Shared.DeltaV.AACTablet;
-using Content.Shared.DeltaV.QuickPhrase;
+using Content.Shared._DV.AACTablet;
+using Content.Shared._DV.QuickPhrase;
 using Robust.Shared.Prototypes;
 
 namespace Content.Client.DeltaV.AACTablet.UI;

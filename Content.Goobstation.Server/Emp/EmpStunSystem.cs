@@ -8,7 +8,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Server.Emp;
-using Content.Shared._EinsteinEngines.Silicon.Components;
+using Content.Shared.Silicon.Components;
 using Content.Shared.Silicons.Borgs.Components;
 using Content.Shared.Stunnable;
 

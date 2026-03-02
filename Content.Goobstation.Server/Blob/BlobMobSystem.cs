@@ -23,10 +23,10 @@ using Content.Shared.Damage;
 using Content.Shared.Speech;
 using Robust.Shared.Network;
 using Robust.Shared.Player;
-using Content.Server._EinsteinEngines.Language;
-using Content.Shared._EinsteinEngines.Language;
-using Content.Shared._EinsteinEngines.Language.Components;
-using Content.Shared._EinsteinEngines.Language.Events;
+using Content.Server.Language;
+using Content.Shared.Language;
+using Content.Shared.Language.Components;
+using Content.Shared.Language.Events;
 using Content.Shared._Shitmed.Targeting;
 
 namespace Content.Goobstation.Server.Blob;

@@ -1,4 +1,4 @@
-﻿using Content.Shared.DeltaV.Biscuit;
+﻿using Content.Shared._DV.Biscuit;
 using Robust.Client.GameObjects;
 
 namespace Content.Client.DeltaV.Biscuit;
