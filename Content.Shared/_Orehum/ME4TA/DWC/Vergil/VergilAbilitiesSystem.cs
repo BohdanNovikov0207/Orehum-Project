@@ -23,7 +23,7 @@ public sealed class VergilAbilitiesSystem : EntitySystem
     [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly SharedHandsSystem _hands = default!;
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly StaminaSystem _stamina = default!;
+    [Dependency] private readonly SharedStaminaSystem _stamina = default!;
     [Dependency] private readonly DamageableSystem _damageable = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly IEntityManager _entManager = default!;

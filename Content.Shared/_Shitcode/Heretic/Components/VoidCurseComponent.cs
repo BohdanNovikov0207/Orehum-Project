@@ -1,3 +1,13 @@
+// SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
+// SPDX-FileCopyrightText: 2025 Aiden <aiden@djkraz.com>
+// SPDX-FileCopyrightText: 2025 Aviu00 <93730715+Aviu00@users.noreply.github.com>
+// SPDX-FileCopyrightText: 2025 Misandry <mary@thughunt.ing>
+// SPDX-FileCopyrightText: 2025 gus <august.eymann@gmail.com>
+// SPDX-FileCopyrightText: 2025 username <113782077+whateverusername0@users.noreply.github.com>
+// SPDX-FileCopyrightText: 2025 whateverusername0 <whateveremail>
+//
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 using Robust.Shared.GameStates;
 
 namespace Content.Shared._Goobstation.Heretic.Components;
@@ -5,12 +15,20 @@ namespace Content.Shared._Goobstation.Heretic.Components;
 [RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
 public sealed partial class VoidCurseComponent : Component
 {
-    [DataField, AutoNetworkedField] public float Lifetime = 20f;
-    [DataField] public float MaxLifetime = 60f;
-    [AutoNetworkedField, ViewVariables(VVAccess.ReadWrite)] public bool Drain = false;
+    [DataField, AutoNetworkedField]
+    public float Lifetime = 5f; // 8s on 1 stack, 20s on max stack
 
-    [ViewVariables(VVAccess.ReadWrite), AutoNetworkedField] public float Stacks = 1f;
-    [DataField, AutoNetworkedField] public float MaxStacks = 5f;
+    [DataField]
+    public float MaxLifetime = 5f;
+
+    [DataField]
+    public float LifetimeIncreasePerLevel = 3f;
+
+    [DataField, AutoNetworkedField]
+    public float Stacks = 0f;
+
+    [DataField, AutoNetworkedField]
+    public float MaxStacks = 5f;
 
     public float Timer = 1f;
 }

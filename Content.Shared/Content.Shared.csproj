@@ -12,6 +12,8 @@
     <PackageReference Include="JetBrains.Annotations" PrivateAssets="All" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Content.Goobstation.Common\Content.Goobstation.Common.csproj" />
+    <ProjectReference Include="..\Content.Goobstation.Maths\Content.Goobstation.Maths.csproj" />
     <ProjectReference Include="..\Content.Shared.Database\Content.Shared.Database.csproj" />
     <ProjectReference Include="..\RobustToolbox\Lidgren.Network\Lidgren.Network.csproj">
       <Private>false</Private>
@@ -25,6 +27,9 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="_EE\Shadowling\Components\Objectives\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Goobstation\Changeling\Changeling.Actions.cs" />
   </ItemGroup>
   <Import Project="..\RobustToolbox\MSBuild\Robust.Properties.targets" />
   <Import Project="..\RobustToolbox\MSBuild\Robust.CompNetworkGenerator.targets" />

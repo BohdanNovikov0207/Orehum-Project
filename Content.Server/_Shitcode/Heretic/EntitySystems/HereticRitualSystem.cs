@@ -1,3 +1,15 @@
+// SPDX-FileCopyrightText: 2024 BombasterDS <115770678+BombasterDS@users.noreply.github.com>
+// SPDX-FileCopyrightText: 2024 Piras314 <p1r4s@proton.me>
+// SPDX-FileCopyrightText: 2024 username <113782077+whateverusername0@users.noreply.github.com>
+// SPDX-FileCopyrightText: 2024 whateverusername0 <whateveremail>
+// SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
+// SPDX-FileCopyrightText: 2025 Aidenkrz <aiden@djkraz.com>
+// SPDX-FileCopyrightText: 2025 Aviu00 <93730715+Aviu00@users.noreply.github.com>
+// SPDX-FileCopyrightText: 2025 Misandry <mary@thughunt.ing>
+// SPDX-FileCopyrightText: 2025 gus <august.eymann@gmail.com>
+//
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 using Content.Server.Heretic.Components;
 using Content.Shared.Heretic.Prototypes;
 using Content.Shared.Heretic;
@@ -9,10 +21,11 @@ using Robust.Shared.Audio.Systems;
 using Robust.Shared.Prototypes;
 using System.Text;
 using System.Linq;
-using Robust.Shared.Serialization.Manager;
 using Content.Shared.Examine;
 using Content.Shared._Goobstation.Heretic.Components;
+using Content.Shared.Stacks;
 using Robust.Shared.Containers;
+using Robust.Shared.Utility;
 
 namespace Content.Server.Heretic.EntitySystems;
 
@@ -20,12 +33,13 @@ public sealed partial class HereticRitualSystem : EntitySystem
 {
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly IPrototypeManager _proto = default!;
-    [Dependency] private readonly ISerializationManager _series = default!;
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly HereticKnowledgeSystem _knowledge = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedUserInterfaceSystem _uiSystem = default!;
     [Dependency] private readonly SharedContainerSystem _container = default!;
+    [Dependency] private readonly SharedStackSystem _stack = default!;
+    [Dependency] private readonly GhoulSystem _ghoul = default!;
 
     public SoundSpecifier RitualSuccessSound = new SoundPathSpecifier("/Audio/_Goobstation/Heretic/castsummon.ogg");
 
@@ -49,11 +63,31 @@ public sealed partial class HereticRitualSystem : EntitySystem
         if (!TryComp<HereticComponent>(performer, out var hereticComp))
             return false;
 
-        var rit = _series.CreateCopy((HereticRitualPrototype) GetRitual(ritualId).Clone(), notNullableOverride: true);
-        var lookup = _lookup.GetEntitiesInRange(platform, .75f);
+        var rit = _proto.Index(ritualId);
+
+        List<EntityUid>? limited = null;
+        var exists = false;
+
+        if (rit.Limit > 0)
+            limited = hereticComp.LimitedTransmutations.GetOrNew(ritualId, out exists);
+
+        if (limited != null)
+        {
+            if (exists)
+                limited.RemoveAll(x => !Exists(x));
+
+            if (limited.Count >= rit.Limit)
+            {
+                _popup.PopupEntity(Loc.GetString("heretic-ritual-fail-limit"), platform, performer);
+                return false;
+            }
+        }
+
+        var lookup = _lookup.GetEntitiesInRange(platform, 1.5f);
 
         var missingList = new Dictionary<string, float>();
         var toDelete = new List<EntityUid>();
+        var toSplit = new List<(Entity<StackComponent> ent, int amount)>();
 
         // check for all conditions
         // this is god awful but it is that it is
@@ -62,7 +96,7 @@ public sealed partial class HereticRitualSystem : EntitySystem
 
         foreach (var behavior in behaviors)
         {
-            var ritData = new RitualData(performer, platform, ritualId, EntityManager);
+            var ritData = new RitualData(performer, platform, ritualId, EntityManager, limited, rit.Limit);
 
             if (!behavior.Execute(ritData, out var missingStr))
             {
@@ -85,11 +119,19 @@ public sealed partial class HereticRitualSystem : EntitySystem
 
                 if (ltags.Contains(tag.Key))
                 {
-                    requiredTags[tag.Key] -= 1;
+                    TryComp(look, out StackComponent? stack);
+                    var amount = stack == null ? 1 : Math.Min(stack.Count, requiredTags[tag.Key]);
+
+                    requiredTags[tag.Key] -= amount;
 
                     // prevent deletion of more items than needed
                     if (requiredTags[tag.Key] >= 0)
-                        toDelete.Add(look);
+                    {
+                        if (stack == null || stack.Count <= amount)
+                            toDelete.Add(look);
+                        else
+                            toSplit.Add(((look, stack), amount));
+                    }
                 }
             }
         }
@@ -127,7 +169,7 @@ public sealed partial class HereticRitualSystem : EntitySystem
         // finalize all of the custom ones
         foreach (var behavior in behaviors)
         {
-            var ritData = new RitualData(performer, platform, ritualId, EntityManager);
+            var ritData = new RitualData(performer, platform, ritualId, EntityManager, limited, rit.Limit);
             behavior.Finalize(ritData);
         }
 
@@ -135,11 +177,32 @@ public sealed partial class HereticRitualSystem : EntitySystem
         foreach (var ent in toDelete)
             QueueDel(ent);
 
+        foreach (var ((ent, stack), amount) in toSplit)
+        {
+            _stack.SetCount(ent, stack.Count - amount, stack);
+        }
+
+        var ghoulQuery = GetEntityQuery<GhoulComponent>();
+
         // add stuff
         var output = rit.Output ?? new();
         foreach (var ent in output.Keys)
-            for (int i = 0; i < output[ent]; i++)
-                Spawn(ent, Transform(platform).Coordinates);
+        {
+            for (var i = 0; i < output[ent]; i++)
+            {
+                var spawned = Spawn(ent, Transform(platform).Coordinates);
+
+                if (ghoulQuery.TryComp(spawned, out var ghoul))
+                    _ghoul.SetBoundHeretic((spawned, ghoul), performer);
+
+                if (limited == null)
+                    continue;
+
+                limited.Add(spawned);
+                if (limited.Count >= rit.Limit)
+                    break;
+            }
+        }
 
         if (rit.OutputEvent != null)
             RaiseLocalEvent(performer, rit.OutputEvent, true);
@@ -201,12 +264,13 @@ public sealed partial class HereticRitualSystem : EntitySystem
             return;
         }
 
-        if (!TryDoRitual(args.User, ent, (ProtoId<HereticRitualPrototype>) heretic.ChosenRitual))
+        var successAnimation = _proto.Index(heretic.ChosenRitual.Value).RuneSuccessAnimation;
+
+        if (!TryDoRitual(args.User, ent, heretic.ChosenRitual.Value))
             return;
 
-        _audio.PlayPvs(RitualSuccessSound, ent, AudioParams.Default.WithVolume(-3f));
-        _popup.PopupEntity(Loc.GetString("heretic-ritual-success"), ent, args.User);
-        Spawn("HereticRuneRitualAnimation", Transform(ent).Coordinates);
+        if (successAnimation)
+            RitualSuccess(ent, args.User);
     }
 
     private void OnExamine(Entity<HereticRitualRuneComponent> ent, ref ExaminedEvent args)
@@ -217,5 +281,12 @@ public sealed partial class HereticRitualSystem : EntitySystem
         var ritual = h.ChosenRitual != null ? GetRitual(h.ChosenRitual).LocName : null;
         var name = ritual != null ? Loc.GetString(ritual) : "None";
         args.PushMarkup(Loc.GetString("heretic-ritualrune-examine", ("rit", name)));
+    }
+
+    public void RitualSuccess(EntityUid ent, EntityUid user)
+    {
+        _audio.PlayPvs(RitualSuccessSound, ent, AudioParams.Default.WithVolume(-3f));
+        _popup.PopupEntity(Loc.GetString("heretic-ritual-success"), ent, user);
+        Spawn("HereticRuneRitualAnimation", Transform(ent).Coordinates);
     }
 }

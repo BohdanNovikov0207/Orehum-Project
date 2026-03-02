@@ -493,10 +493,11 @@ namespace Content.Shared.StatusEffect
     }
 
     /// <summary>
-    ///     Raised on an entity before a status effect is added to determine if adding it should be cancelled.
+    /// Raised on an entity before a status effect is added to determine if adding it should be cancelled.
+    /// Obsolete version of <see cref="BeforeStatusEffectAddedEvent" />
     /// </summary>
-    [ByRefEvent]
-    public record struct BeforeStatusEffectAddedEvent(string Key, bool Cancelled=false);
+    [ByRefEvent, Obsolete("Migration to StatusEffectNew.StatusEffectsSystem is required")]
+    public record struct BeforeOldStatusEffectAddedEvent(string EffectKey, bool Cancelled = false);
 
     public readonly struct StatusEffectAddedEvent
     {

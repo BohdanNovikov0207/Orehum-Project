@@ -1,3 +1,15 @@
+// SPDX-FileCopyrightText: 2024 BombasterDS <115770678+BombasterDS@users.noreply.github.com>
+// SPDX-FileCopyrightText: 2024 Piras314 <p1r4s@proton.me>
+// SPDX-FileCopyrightText: 2024 username <113782077+whateverusername0@users.noreply.github.com>
+// SPDX-FileCopyrightText: 2024 whateverusername0 <whateveremail>
+// SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
+// SPDX-FileCopyrightText: 2025 Misandry <mary@thughunt.ing>
+// SPDX-FileCopyrightText: 2025 SX_7 <sn1.test.preria.2002@gmail.com>
+// SPDX-FileCopyrightText: 2025 gus <august.eymann@gmail.com>
+//
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+using System.Numerics;
 using Content.Client.UserInterface.Controls;
 using Content.Shared.Heretic;
 using Content.Shared.Heretic.Prototypes;
@@ -6,7 +18,6 @@ using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.XAML;
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
-using System.Numerics;
 
 namespace Content.Client._Shitcode.Heretic.UI;
 
@@ -53,7 +64,6 @@ public sealed partial class HereticRitualRuneRadialMenu : RadialMenu
 
             var button = new HereticRitualMenuButton
             {
-                StyleClasses = { "RadialMenuButton" },
                 SetSize = new Vector2(64, 64),
                 ToolTip = Loc.GetString(ritualPrototype.LocName),
                 ProtoId = ritualPrototype.ID
@@ -94,7 +104,7 @@ public sealed partial class HereticRitualRuneRadialMenu : RadialMenu
         }
     }
 
-    public sealed class HereticRitualMenuButton : RadialMenuTextureButton
+    public sealed class HereticRitualMenuButton : RadialMenuTextureButtonWithSector
     {
         public ProtoId<HereticRitualPrototype> ProtoId { get; set; }
     }
