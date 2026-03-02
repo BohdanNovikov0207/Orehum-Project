@@ -8,7 +8,7 @@ using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
 using System.Numerics;
 
-namespace Content.Client._Goobstation.Heretic.UI;
+namespace Content.Client._Shitcode.Heretic.UI;
 
 public sealed partial class HereticRitualRuneRadialMenu : RadialMenu
 {

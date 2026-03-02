@@ -16,6 +16,7 @@ using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.GameObjects;
 using System.Text;
+using Content.Server._Goobstation.Objectives.Components;
 
 namespace Content.Server.GameTicking.Rules;
 
