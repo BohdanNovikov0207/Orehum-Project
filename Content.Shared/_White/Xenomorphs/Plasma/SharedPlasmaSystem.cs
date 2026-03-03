@@ -1,6 +1,6 @@
 using Content.Shared._White.Xenomorphs.Plasma.Components;
 using Content.Shared.Alert;
-using Content.Shared.FixedPoint;
+using Content.Goobstation.Maths.FixedPoint;
 
 namespace Content.Shared._White.Xenomorphs.Plasma;
 

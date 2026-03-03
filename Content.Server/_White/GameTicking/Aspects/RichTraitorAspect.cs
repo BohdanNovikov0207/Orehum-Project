@@ -6,7 +6,7 @@ using Content.Server.GameTicking.Rules.Components;
 using Content.Server.Mind;
 using Content.Server.Store.Systems;
 using Content.Server.Traitor.Uplink;
-using Content.Shared.FixedPoint;
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.GameTicking.Components;
 using Content.Shared.Mind;
 using MindComponent = Content.Shared.Mind.MindComponent;

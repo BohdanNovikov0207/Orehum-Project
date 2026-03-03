@@ -1,7 +1,7 @@
 using Content.Shared._White.Xenomorphs.Caste;
 using Content.Shared.Actions;
 using Content.Shared.DoAfter;
-using Content.Shared.FixedPoint;
+using Content.Goobstation.Maths.FixedPoint;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
 

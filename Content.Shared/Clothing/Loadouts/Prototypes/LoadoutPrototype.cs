@@ -41,8 +41,13 @@ public sealed partial class LoadoutPrototype : IPrototype
     [DataField]
     public bool CustomDescription = true;
 
+    // WD EDIT START
+    /// <summary>
+    ///     Determines whether players can set custom content for this loadout item.
+    /// </summary>
     [DataField]
-    public bool CustomContent = true;
+    public bool CustomContent = false;
+    // WD EDIT END
 
     [DataField]
     public bool CustomColorTint = false;
@@ -55,11 +60,6 @@ public sealed partial class LoadoutPrototype : IPrototype
 
     [DataField]
     public string GuideEntry { get; } = "";
-
-    // Corvax-Sponsors-Start
-    [DataField("sponsorOnly")]
-    public bool SponsorOnly = false;
-    // Corvax-Sponsors-End
 
     [DataField(serverOnly: true)]
     public LoadoutFunction[] Functions { get; private set; } = Array.Empty<LoadoutFunction>();
