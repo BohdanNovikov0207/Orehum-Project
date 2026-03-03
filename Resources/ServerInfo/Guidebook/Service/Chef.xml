@@ -1,8 +1,22 @@
-<Document>
-# Повар
-Людям нужно есть, и задача повара — чтобы народ питался не одной дрянью.
+<!--
+SPDX-FileCopyrightText: 2023 Sir Winters <7543955+Owai-Seek@users.noreply.github.com>
+SPDX-FileCopyrightText: 2023 Velcroboy <107660393+IamVelcroboy@users.noreply.github.com>
+SPDX-FileCopyrightText: 2023 end <72604018+laok233@users.noreply.github.com>
+SPDX-FileCopyrightText: 2024 Nemanja <98561806+EmoGarbage404@users.noreply.github.com>
+SPDX-FileCopyrightText: 2024 UBlueberry <161545003+UBlueberry@users.noreply.github.com>
+SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
 
-Прежде всего, познакомься с кухней и инструментами, которые у тебя есть.
+SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+
+<Document>
+# Chef
+A fella has gotta eat, and it's the chef's job to make sure folks have something other than junk to munch on.
+
+
+[textlink="Click here to see a list of food recipes." link="FoodRecipes"]
+
+First and foremost, you'll need to familiarize yourself with the kitchen, and the tools available to you.
 
 <Box>
 <GuideEntityEmbed Entity="KitchenKnife"/>
@@ -12,57 +26,57 @@
 <GuideEntityEmbed Entity="MobCow"/>
 </Box>
 <Box>
-<GuideEntityEmbed Entity="VendingMachineChefvend" Caption="Автомат повара"/>
+<GuideEntityEmbed Entity="VendingMachineChefvend" Caption="Chef Vendor"/>
 <GuideEntityEmbed Entity="KitchenMicrowave"/>
 <GuideEntityEmbed Entity="KitchenSpike"/>
-<GuideEntityEmbed Entity="VendingMachineDinnerware" Caption="Автомат посуды"/>
+<GuideEntityEmbed Entity="VendingMachineDinnerware" Caption="Dinnerware Vend"/>
 </Box>
 
-## Подготовка кухни:
+## Kitchen Prep:
 
-Сложно рассказать, как быть поваром, не скатившись в приказы, но вот основные моменты.
+It's hard to put into words how to play chef without feeling like you're being given orders, but here are some basics.
 
-- Проверь, какие есть ингредиенты. В большинстве кухонь найдутся мука, рис, яйца, кубики обезьян и ещё парочка вещей для старта.
-- Попробуй замесить тесто, смешав воду и муку в мензурке. (Пользуйся раковинами!)
-- Загляни в вики (или в справочник по рецептам), выбери блюдо и положи все перечисленные ингредиенты в микроволновку — получится готовая еда.
-- Поставь мышеловки. Да‑да, серьёзно. Без мер предосторожности мыши быстро сведут на нет все твои старания.
+- Check what you have on hand when it comes to ingredients, most kitchens have some Flour, Rice, Eggs, Monkey Cubes, and a few other things to get started with.
+- Try your hand at mixing up some dough by putting water and flour together in a beaker. (Use the sinks!)
+- Check the Wiki (or Food Recipes) guidebook for things you can make, and put all the listed ingredients into a microwave to cook it into a meal.
+- Set up mouse traps. Yes, really. It's easy to see all your hard work disappear if you don't take precautions for mice infestations.
 
-Когда набьёшь руку и разберёшься, что можно готовить, составь пару меню или «шпаргалку», чтобы выдавать ботаникам список нужных ингредиентов.
+Once you're a bit more experienced and familiar with what you can make, it might be best to put together a few menus, or a "cheat sheet" so you can give a list of ingredients to botany.
 
-## Замес теста:
-Смешай муку и воду в мензурке. (Воду бери из раковины!)
+## Mixing Dough:
+Add Flour and Water together in a beaker. (Use the sink for water!)
 <Box>
 <GuideEntityEmbed Entity="LargeBeaker"/>
 <GuideEntityEmbed Entity="ReagentContainerFlour"/>
-<GuideEntityEmbed Entity="DrinkWaterBottleFull" Caption="вода"/>
+<GuideEntityEmbed Entity="DrinkWaterBottleFull" Caption="water"/>
 <GuideEntityEmbed Entity="FoodDough"/>
 </Box>
-## Как сделать муку:
-Положи пшеницу в мельницу (внутри должна стоять мензурка) и перемели!
+## Making Flour:
+Place wheat in a grinder (with a beaker placed inside) and grind it up!
 <Box>
 <GuideEntityEmbed Entity="KitchenReagentGrinder"/>
 <GuideEntityEmbed Entity="LargeBeaker"/>
 <GuideEntityEmbed Entity="WheatBushel"/>
 <GuideEntityEmbed Entity="ReagentContainerFlour"/>
 </Box>
-## Добыча растений:
-Попроси у ботаников всё необходимое. Без ботаника, возможно, придётся выращивать больше самостоятельно.
+## Getting Plants:
+Ask Botany for what you need, without a botanist, you may need to grow more plants yourself.
 <Box>
 <GuideEntityEmbed Entity="SignHydro1" Caption=" "/>
 <GuideEntityEmbed Entity="hydroponicsTray"/>
 <GuideEntityEmbed Entity="WheatBushel"/>
 </Box>
-## Добыча молока:
-Alt‑клик по корове, держа в руке тару. (Мензурка, ведро, пакет молока и т. д.)
+## Gathering Milk:
+Alt-Click on a Cow with a container in your hand. (Beakers, Buckets, Milk Jugs, ect.)
 <Box>
 <GuideEntityEmbed Entity="Bucket"/>
 <GuideEntityEmbed Entity="MobCow"/>
 <GuideEntityEmbed Entity="DrinkMilkCarton"/>
 </Box>
-## Как разделывать мясо:
-В большинстве случаев достаточно применить нож на мёртвом существе. Лучше делать это в морозилке — последствия… весьма неаккуратные.
+## How to Butcher:
+In most cases, you should be able to use a knife directly on a creature that's dead. It's best to do this in the freezer, as the results are... messy.
 
-А вот обезьян (и других гуманоидов) придётся тащить на мясной шпиль для разделки.
+Monkeys, however, (and other humanoids), need to be dragged onto a meatspike to be butchered.
 <Box>
 <GuideEntityEmbed Entity="KitchenSpike"/>
 <GuideEntityEmbed Entity="KitchenKnife"/>

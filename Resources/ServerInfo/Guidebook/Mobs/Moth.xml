@@ -1,15 +1,25 @@
+<!--
+SPDX-FileCopyrightText: 2024 Errant <35878406+Errant-4@users.noreply.github.com>
+SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
+SPDX-FileCopyrightText: 2025 Ted Lukin <66275205+pheenty@users.noreply.github.com>
+
+SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+
 <Document>
-  # Ниан
+  # Moth People
 
   <Box>
     <GuideEntityEmbed Entity="MobMoth" Caption=""/>
   </Box>
 
-  Они могут есть хлопок, ткани и одежду, но практически ничего из того, что другие сочли бы "съедобным". Они предпочитают несколько более низкие температуры, чем люди.
-  В крови насекомых железо не усваивается, как в обычной крови.
+  They can eat cotton, fabrics and clothing, but virtually none of the food that others would consider "edible". They prefer a somewhat lower temperature range than humans. They are obsessed with the number "65".
 
-  Их крылья придают им большее ускорение, если на станции нет силы тяжести, но они все равно не могут передвигаться без снаряжения, когда парят в космосе.
+  Their wings give them better acceleration if there is no gravity on the station, but they still can't move without equipment when floating out in space.
+  They can also dash small distances once in 6.5 seconds using their wings, but that requires the gravity to be present. However they move 6.5% slower than other species due to their weak legs.
 
-Они наносят [color=#1e90ff] на 30% меньше урона от холода[/color], но [color=#ffa500] на 30% больше урона от тепла и легче загораются[/color].
+  They take [color=#1e90ff]30% less Cold damage[/color] but [color=#ffa500]30% more Heat and 6.5% more Brute damage, and catch on fire more easily[/color].
+
+  They are also 6.5% lighter than most species.
 
 </Document>

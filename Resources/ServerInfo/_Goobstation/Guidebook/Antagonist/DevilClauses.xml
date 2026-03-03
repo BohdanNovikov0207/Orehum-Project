@@ -1,346 +1,232 @@
 <Document>
-
-  ## Владение душой
+  ## Mortality
   <Box>
-    [color=#999999][italic]Вес 25[/italic][/color]
+    [color=#999999][italic]-135 Weight[/italic][/color]
   </Box>
 
-  - Передаёт право собственности на душу исполнителю контракта.
-  - По умолчанию в каждом контракте.
+  - Grants the target an unlimited amount of self revives.
 
-  ## Смерть
+  ## Weakness
   <Box>
-    [color=#999999][italic]Вес -25[/italic][/color]
+    [color=#999999][italic]-35 Weight[/italic][/color]
   </Box>
 
-  Позволяет получателю контракта возродиться ровно один раз после смерти.
-  - По умолчанию в каждом контракте.
+  - Cuts all damage the contractee takes in half.
+  - Increases holy damage taken.
 
-  ## Слабость
+<!-- Disabled, Used by shitters  ## Avarice
   <Box>
-    [color=#999999][italic]Вес -35[/italic][/color]
+    [color=#999999][italic]-30 Weight[/italic][/color]
   </Box>
 
-  - Половина урона, получаемого получателем, сокращается.
-  - Увеличивает получаемый священный урон.
+  - Allows the contractee to devour things whole, just like a dragon.
+  -->
 
-  ## Страх космоса
+  ## Fear of Death
   <Box>
-    [color=#999999][italic]Вес -30[/italic][/color]
+    [color=#999999][italic]-25 Weight[/italic][/color]
   </Box>
 
-  - Делает получателя невосприимчивым к давлению и низким температурам.
-  - Лишает получателя потребности дышать.
+  - Makes the contractee have no critical state. You stand, or you die.
 
-  ## Тени
+  ## Death
   <Box>
-    [color=#999999][italic]Вес -25[/italic][/color]
+    [color=#999999][italic]-25 Weight[/italic][/color]
   </Box>
 
-  - Делает получателя невидимым.
+  - Allows the contractee to revive themselves exactly once on death.
+  - Default on every contract.
 
-  ## Страх смерти
+  ## Shadows
   <Box>
-    [color=#999999][italic]Вес -25[/italic][/color]
+    [color=#999999][italic]-25 Weight[/italic][/color]
   </Box>
 
-  - Получатель больше не может быть в критическом состоянии. Он либо жив, либо мёртв.
+  - Makes the contractee invisible.
 
-  ## Страх огня
+  ## Brokeness
   <Box>
-    [color=#999999][italic]Вес -20[/italic][/color]
+    [color=#999999][italic]-20 Weight[/italic][/color]
   </Box>
 
-  - Делает получателю контракта невосприимчивым к огню и невосприимчивым к поджогу.
+  - Grants the contractee a pair of sick fucking jays, signed by Micheal Jordan himself.
 
-  ## Удача
+  ## Fear of Fire
   <Box>
-    [color=#999999][italic]Вес -20[/italic][/color]
+    [color=#999999][italic]-20 Weight[/italic][/color]
   </Box>
 
-  - Предоставляет получателю совершенно случайное условие. Хотите испытать удачу?
+  - Makes the contractee immune to fire, and immune to being lit on fire.
 
-  ## Сломленность
+  ## Chance
   <Box>
-    [color=#999999][italic]Вес -20[/italic][/color]
+    [color=#999999][italic]-15 Weight[/italic][/color]
   </Box>
 
-  - Предоставляет получателю пару долбаных соек, подписанных самим Майклом Джорданом.
+  - Grants the contractee a completely random clause. Want to try your luck?
 
-  ## Страх света
+  ## Fear of Light
   <Box>
-    [color=#999999][italic]Вес -15[/italic][/color]
+    [color=#999999][italic]-15 Weight[/italic][/color]
   </Box>
 
-  - Делает получателя контракта невосприимчивым к вспышкам.
+  - Makes the contractee immune to flashes.
 
-  ## Обжорство
+
+  ## Fear of Electricity
   <Box>
-    [color=#999999][italic]Вес -15[/italic][/color]
+    [color=#999999][italic]-15 Weight[/italic][/color]
   </Box>
 
-  - Благодаря этому получателю не нужны еда и вода.
+  - Makes the contractee immune to electrical shocks.
 
-  ## Страх электричества
+  ## Gluttony
   <Box>
-    [color=#999999][italic]Вес -15[/italic][/color]
+    [color=#999999][italic]-10 Weight[/italic][/color]
   </Box>
 
-  - Делает получателя контракта невосприимчивым к ударам током.
+  - Makes the contractee not need food or water.
 
-  ## Жадность
+  ## Fear of Drowning
   <Box>
-    [color=#999999][italic]Вес -10[/italic][/color]
+    [color=#999999][italic]-10 Weight[/italic][/color]
   </Box>
 
-  - Выдает цели кучу наличных.
+  - Disables the contractees need to breathe.
 
-  ## Боль
+  ## Fear of Clowns
   <Box>
-    [color=#999999][italic]Вес -5[/italic][/color]
+    [color=#999999][italic]-10 Weight[/italic][/color]
   </Box>
 
-  - Получатель не чувствует боли и не испытывает негативных эмоций из-за боли.
+  - Disables the contractees ability to slip.
 
-  ## Сила
+  ## Fear of Crushing
   <Box>
-    [color=#999999][italic]Вес 30[/italic][/color]
+    [color=#999999][italic]-10 Weight[/italic][/color]
   </Box>
 
-  - Наносит получателю большой урон.
+  - Makes the contractee immune to pressure damage.
 
-  ## Человечность
+  ## Fear of Freezing
   <Box>
-    [color=#999999][italic]Вес 25[/italic][/color]
+    [color=#999999][italic]-10 Weight[/italic][/color]
   </Box>
 
-  - Превращает заказчика в лягушку.
+  - Makes the contractee immune to low temperatures.
 
-  ## Связность
+  ## Greed
   <Box>
-    [color=#999999][italic]Вес 30[/italic][/color]
+    [color=#999999][italic]-10 Weight[/italic][/color]
   </Box>
 
-  - Из-за этого заказчик становится неуклюжим и запинается в речи.
+  - Grants the target a ton of cash-money.
 
-  ## Голос
+  ## Pain
   <Box>
-    [color=#999999][italic]Вес 25[/italic][/color]
+    [color=#999999][italic]-5 Weight[/italic][/color]
   </Box>
 
-  - Получатель больше не может говорить.
+  - Makes the contractee feel no pain, and suffer no negatives from pain.
 
-  ## Рука
+  ## Inner Peace
   <Box>
-    [color=#999999][italic]Вес 30[/italic][/color]
+    [color=#999999][italic]5 Weight[/italic][/color]
   </Box>
 
-  - У получателя больше нет одной руки.
+  - Grants the target peace. Everlasting.
 
-  ## Нога
+  ## Voice
   <Box>
-    [color=#999999][italic]Вес 30[/italic][/color]
+    [color=#999999][italic]20 Weight[/italic][/color]
   </Box>
 
-  - У получателя больше нет одной ноги.
+  - Permanently mutes the contractee.
 
-  ## Бодрость
+  ## A hand
   <Box>
-    [color=#999999][italic]Вес 40[/italic][/color]
+    [color=#999999][italic]20 Weight[/italic][/color]
   </Box>
 
-  - Превращает цель в нарколептика.
+  - Immediately severs one of the contractees hands.
 
-  ## Ноги
+  ## A leg
   <Box>
-    [color=#999999][italic]Вес 40[/italic][/color]
+    [color=#999999][italic]20 Weight[/italic][/color]
   </Box>
 
-  - Навсегда парализует обе ноги у получателя контракта.
+  - Immediately severs one of the contractees legs.
 
-  ## Орган
+  ## Soul Ownership
   <Box>
-    [color=#999999][italic]Вес 45[/italic][/color]
+    [color=#999999][italic]25 Weight[/italic][/color]
   </Box>
 
-  - Выбрасывает один из органов жертвы на землю.
-  - Скорее всего, это сердце.
+  - Transfers ownership of a soul to the contractor.
+  - Default on every contract.
 
-  ## Зрение
+  ## Strength
   <Box>
-    [color=#999999][italic]Вес 60[/italic][/color]
+    [color=#999999][italic]30 Weight[/italic][/color]
   </Box>
 
-  - Навсегда ослепляет получателя контракта.
+  - Makes the contractee take double damage.
 
-  ## Воля к борьбе
+  ## Coherence
   <Box>
-    [color=#999999][italic]Вес 80[/italic][/color]
+    [color=#999999][italic]30 Weight[/italic][/color]
   </Box>
 
-  - Делает получателя контракта пацифистом.
+  - Makes the contractee clumsy and messes up their speech.
 
-  ## Время
+  ## Awake
   <Box>
-    [color=#999999][italic]Вес 150[/italic][/color]
+    [color=#999999][italic]35 Weight[/italic][/color]
   </Box>
 
-  - Убивает получателя через пять минут.
+  - Turns the target narcoleptic.
 
-  ## Смертность
+  ## An organ
   <Box>
-    [color=#999999][italic]Вес -135[/italic][/color]
+    [color=#999999][italic]30 Weight[/italic][/color]
   </Box>
 
-  - Даёт цели неограниченное количество возможностей для возрождения. (Не даст возрадиться, если у игрока забрана душа)
+  - Dumps one of the contractees organs on the ground.
+  - This is most likely the heart.
 
-  # Нестандартные условия
-
-  ## Стеклянный
+  ## Legs
   <Box>
-    [color=#999999][italic]Вес 90[/italic][/color]
+    [color=#999999][italic]40 Weight[/italic][/color]
   </Box>
 
-  - Получатель умирает с первого удара.
+  - Permanently paralyzes both of the contractees legs.
 
-  ## Мастер хирургии
+  ## Sight
   <Box>
-    [color=#999999][italic]Вес -25[/italic][/color]
+    [color=#999999][italic]60 Weight[/italic][/color]
   </Box>
 
-  - Получатель получает бонус к проведению хирургических операций +250% как у ГВ
+  - Permanently blinds the contractee.
 
-  ## Повелитель хирургии
+  ## Will to fight
   <Box>
-    [color=#999999][italic]Вес -60[/italic][/color]
+    [color=#999999][italic]60 Weight[/italic][/color]
   </Box>
 
-  - Получатель получает бонус к проведению хирургических операций +400%
+  - Permanently pacifies the contractee.
 
-  ## Одаренный псионик
+  ## Humanity
   <Box>
-    [color=#999999][italic]Вес -50[/italic][/color]
+    [color=#999999][italic]80 Weight[/italic][/color]
   </Box>
 
-  - Получатель сможет с легкостью приобретать новые пси спобности
-  
-  ## Телепат
+  - Turns the contractee into a frog.
+  - This is permanent.
+
+  ## Time
   <Box>
-    [color=#999999][italic]Вес -10[/italic][/color]
+    [color=#999999][italic]150 Weight[/italic][/color]
   </Box>
 
-  - Получатель сможет пользоваться телепатией (если он уже имеет пси спобности)
-  - Нельзя совмещать с другими условиями, дающими пси способности.
-
-  ## Мерцающий
-  <Box>
-    [color=#999999][italic]Вес 20[/italic][/color]
-  </Box>
-
-  - Получатель становится источником мерцания.
-
-  ## Страх мерцания
-  <Box>
-    [color=#999999][italic]Вес -30[/italic][/color]
-  </Box>
-
-  - Получатель поглащает мерцание. (по сути работает как Поглотитель Мерцания)
-
-  ## Страх следопытов
-  <Box>
-    [color=#999999][italic]Вес -10[/italic][/color]
-  </Box>
-
-  - Получатель больше не оставляет следов.
-
-  ## Страх наручников
-  <Box>
-    [color=#999999][italic]Вес -20[/italic][/color]
-  </Box>
-
-  - На получателя больше нельзя надеть наручники
-
-  ## Полет
-  <Box>
-    [color=#999999][italic]Вес -20[/italic][/color]
-  </Box>
-
-  - Получатель может свободно передвигаться в условиях без гравитации как гарпии и моли.
-
-  ## Ультра зрения
-  <Box>
-    [color=#999999][italic]Вес -20[/italic][/color]
-  </Box>
-
-  - Получатель получает ультра зрения как у Гарпий.
-
-  ## Тепловое зрения
-  <Box>
-    [color=#999999][italic]Вес -20[/italic][/color]
-  </Box>
-
-  - Получатель получает тепловое зрения как при использовании термалок.
-
-  ## Тягатель
-  <Box>
-    [color=#999999][italic]Вес -5[/italic][/color]
-  </Box>
-
-  - Получатель может таскать вещи без рук.
-
-  ## Равновесие
-  <Box>
-    [color=#999999][italic]Вес -10[/italic][/color]
-  </Box>
-
-  - Получатель не подскальзывается
-
-  ## Боязнь огня
-  <Box>
-    [color=#999999][italic]Вес 20[/italic][/color]
-  </Box>
-
-  - Получатель получает очень много урона от огня
-
-  ## Паук
-  <Box>
-    [color=#999999][italic]Вес -20[/italic][/color]
-  </Box>
-
-  - Получатель может плести паутину как паук
-
-  ## Живучий
-  <Box>
-    [color=#999999][italic]Вес -60[/italic][/color]
-  </Box>
-
-  - Получатель может выдержать еще 100 ед. урона прежде чем умрет.
-
-  ## Поджигатель
-  <Box>
-    [color=#999999][italic]Вес -60[/italic][/color]
-  </Box>
-
-  - Получатель получает возможность поджигать существ вокруг
-
-  ## Рак
-  <Box>
-    [color=#999999][italic]Вес 60[/italic][/color]
-  </Box>
-
-  - Получатель умрет от рака через 11 минут, если не будет лечить клеточный урон.
-
-  ## Метеоризм
-  <Box>
-    [color=#999999][italic]Вес 45[/italic][/color]
-  </Box>
-
-  - Получатель начинает испускать плазму.
-
-   ## Светобоязнь
-  <Box>
-    [color=#999999][italic]Вес 40[/italic][/color]
-  </Box>
-
-  - Получатель получает урон, когда находится на свету.
+  - Kills the contractee after five minutes.
 </Document>

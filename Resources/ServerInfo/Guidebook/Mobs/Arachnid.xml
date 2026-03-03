@@ -1,16 +1,23 @@
+<!--
+SPDX-FileCopyrightText: 2024 Errant <35878406+Errant-4@users.noreply.github.com>
+SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
+
+SPDX-License-Identifier: MIT
+-->
+
 <Document>
-  # Арахнид
+  # Arachnids
 
   <Box>
     <GuideEntityEmbed Entity="MobArachnid" Caption=""/>
   </Box>
 
-  В их инвентаре есть два дополнительных кармана. Они могут есть сырое мясо без каких-либо побочных эффектов, но некоторые продукты, такие как шоколад и лук, отравляют их.
-  Они задыхаются на 50% быстрее, а их Голубая кровь не может усваиваться за счет железа, так как в ее основе лежит медь.
+  They have two additional Pocket slots in their inventory. They can eat raw meat without any ill effects, but some foods like chocolate and onion poisons them.
+  They suffocate 50% faster, and their Blue Blood can't be metabolised from Iron, being based on Copper instead.
 
-  Их атаки без оружия наносят колющий урон, а не тупой.
+  Their unarmed attacks deal Piercing damage instead of Blunt.
 
-  ## Шелководство
+  ## Sericulture
 
   <Box>
     <GuideEntityEmbed Entity="MaterialWebSilk" Caption=""/>
@@ -19,7 +26,7 @@
     <GuideEntityEmbed Entity="WallWeb" Caption=""/>
   </Box>
 
-  Паукообразные могут создавать паутинный шелк, чтобы еще больше проголодаться. Они (и только они) могут изготавливать из паутинного шелка различные предметы - от одежды и щитов до целых стен.
+  Arachnids can create Websilk at the cost of getting more hungry. They (and only they) can craft bundles of websilk into various items from clothing and shields to entire walls.
 
 
 </Document>
