@@ -1,0 +1,16 @@
+ent-ClothingOuterArmorHoSExperimental = экспериментальный бронированный плащ главы службы безопасности
+    .desc = Шинель, дополненная экспериментальным сплавом блюспейс-технологии, создающим дополнительную защиту и стиль для тех, кто обладает внушительной внешностью.
+ent-ClothingOuterCoatZeusJacket = куртка Зевса
+    .desc = У вас возникает желание швырнуть ближайшего пешехода в летящий вертолет.
+ent-ClothingOuterDavidsJacket = куртка СМП
+    .desc = Ярко-желтый сигнальный жилет, излюбленный парамедиками конца 21 века.
+ent-ClothingOuterDavidsJacketValid = куртка бегущего по лезвию
+    .desc = Вы на самом острие лезвия. Покажите им, что вы справитесь.
+ent-ClothingOuterCoatWardenBlue = синяя куртка смотрителя
+    .desc = Прочная, практичная куртка для тех, кто знаком с бригом.
+ent-ClothingOuterCoatRDPurple = экспериментальная куртка научного руководителя
+    .desc = Соткан по экспериментальной технологии... этот лабораторный халат защищает не больше, чем ваш обычный. По крайней мере, он выглядит красиво.
+ent-ClothingOuterCoatRDPurpleOpened = { ent-ClothingOuterCoatRDPurple }
+    .desc = { ent-ClothingOuterCoatRDPurple.desc }
+ent-ClothingOuterCoatHoPLong = длинное пальто главы персонала
+    .desc = Элегантное длинное пальто для главы персонала.

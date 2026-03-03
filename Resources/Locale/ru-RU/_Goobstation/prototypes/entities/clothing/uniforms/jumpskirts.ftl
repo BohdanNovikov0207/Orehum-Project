@@ -1,0 +1,14 @@
+ent-CentcomAgentSkirt = юбка-комбинезон агента Центком
+    .desc = Юбка, которую носят юристы Центком. Пахнет горелым кофе.
+ent-ClothingUniformJumpskirtNanotrasenRepresentative = юбка-комбинезон ПNT
+    .desc = Черная юбка, которую носят чиновники.
+ent-ClothingUniformJumpskirtBlueshieldOfficer = юбка-комбинезон офицера Синего Щита
+    .desc = Серо-синяя юбка с короткими рукавами из прочного материала.
+ent-ClothingUniformSkirtMailCarrier = юбка-комбинезон почтальона
+    .desc = Враг собак - везде.
+ent-ClothingUniformJumpskirtReporter = платье репортёра
+    .desc = Экстравагантное черное платье, призванное привлечь внимание как можно большего количества людей.
+ent-ClothingUniformJumpskirtTrainer = юбка-комбинезон профессионального тренера
+    .desc = Юбка, предназначенная для профессиональных тренеров Nanotrasen. Наполняет вас чувством гордости.
+ent-ClothingUniformJumpskirtCommandMaid = юбка-комбинезон горничной командования
+    .desc = Стильная униформа, специально разработанная для элитных горничных командования. Сочетает в себе профессионализм и элегантность.

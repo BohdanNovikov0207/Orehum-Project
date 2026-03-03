@@ -1,0 +1,21 @@
+ent-BaseCorporateObjective = { ent-BaseObjective }
+    .desc = { ent-BaseObjective.desc }
+ent-BaseCorporateSocialObjective = { ent-BaseSocialObjective }
+    .desc = { ent-BaseSocialObjective.desc }
+ent-BaseCorporateStealObjective = { ent-BaseStealObjective }
+    .desc = { ent-BaseStealObjective.desc }
+ent-CorporateEscapeShuttleObjective = Улететь на Центком живым и свободным.
+    .desc = Один из наших агентов под прикрытием допросит вас по прибытии. Не дайте себя арестовать.
+ent-CorporateHijackShuttleObjective = Угнать эвакуационный шаттл
+    .desc = Экипаж стал свидетелем чего-то, чего не должен был видеть. Оставайтесь на шаттле свободными от нанотразеновой команды. Используйте ЛЮБЫЕ доступные вам методы. Убедитесь, что никто не сбежал, чтобы рассказать о том, что здесь произошло. Игнорируйте помощь кого бы то ни было, кроме агента поддержки.
+ent-CorporateKillRandomPersonObjective = { ent-BaseKillObjective }
+    .desc = Цель подозревается в предательстве. Делайте, что хотите, только убедитесь, что цель не покинет станцию.
+ent-CorporateKillRandomHeadObjective = { ent-BaseKillObjective }
+    .desc = Данный глава слишком часто выступал против нас. Заставьте его исчезнуть. Удачи, агент.
+ent-RandomCorporateAliveObjective = { ent-BaseKeepAliveObjective }
+    .desc = Данный агент представляет для нас интерес. Убедитесь, что агент выживет.
+ent-RandomCorporateProgressObjective = { ent-BaseHelpProgressObjective }
+    .desc = Мы заключили выгодное соглашение с их работодателем. Помогите им с работой, и вы получите приятный бонус.
+# GOOB SPECIFIC
+ent-CorporatePermaKillRandomTraitorObjective = { ent-BaseKillObjective }
+    .desc = Делайте это, как вам нравится, до тех пор, пока цель больше не будет дышать.

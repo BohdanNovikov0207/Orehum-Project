@@ -1,0 +1,12 @@
+ent-LibrarianTranslatorImplanter = имплантер
+    .suffix = Библиотекарский переводчик
+    .desc = { ent-BaseTranslatorImplanter.desc }
+ent-ChevalTranslatorImplanter = имплантер
+    .suffix = Продвинутый переводчик Шечи
+    .desc = { ent-BaseTranslatorImplanter.desc }
+ent-BasicSpaceItalianTranslatorImplanter = имплантер
+    .suffix = Переводчик Космо-итальянский
+    .desc = { ent-BaseTranslatorImplanter.desc }
+ent-AdvancedSpaceItalianTranslatorImplanter = имплантер
+    .suffix = Продвинутый переводчик Космо-итальянский
+    .desc = { ent-BaseTranslatorImplanter.desc }

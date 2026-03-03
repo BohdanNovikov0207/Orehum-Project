@@ -1,0 +1,13 @@
+ent-ClothingEyesNightVisionGoggles = очки ночного видения
+    .desc = Теперь вы можете видеть в темноте!
+ent-ClothingEyesNightVisionGogglesSyndie = { ent-ClothingEyesNightVisionGoggles }
+    .suffix = Хамелеон
+    .desc = { ent-ClothingEyesNightVisionGoggles.desc }
+ent-ClothingEyesNightVisionGogglesNukie = { ent-ClothingEyesNightVisionGogglesSyndie }
+    .suffix = Хамелеон, Ядерные оперативники
+    .desc = { ent-ClothingEyesNightVisionGogglesSyndie.desc }
+ent-ClothingEyesThermalVisionGoggles = очки теплового видения
+    .desc = Теперь вы можете видеть всех!
+ent-ClothingEyesThermalVisionGogglesSyndie = { ent-ClothingEyesThermalVisionGoggles }
+    .suffix = Хамелеон
+    .desc = { ent-ClothingEyesThermalVisionGoggles.desc }

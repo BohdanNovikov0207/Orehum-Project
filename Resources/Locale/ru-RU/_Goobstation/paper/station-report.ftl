@@ -1,0 +1,18 @@
+station-report-text =
+    {"["}color=#1b67a5]░░██░░ [head=2]Oфициальный документ[/head]
+    ▀████▀ [head=3]Тема: Отчёт о работе станции[/head]
+    ▄█▀▀█▄ [head=3]Рецензент: Представитель Nanotrasen[/head]
+    {"["}/color]──────────────────────────────────────────
+    • [color=#9fed58][bold]Общий отчёт[/bold][/color]
+    >[mono][/mono]
+    • [color=#ff5c5c][bold]Отчёт о работе службы безопасности[/bold][/color]
+    >[mono][/mono]
+    • [color=#d28150][bold]Отчёт о работе сервисного отдела[/bold][/color]
+    >[mono][/mono]
+    • [color=#f2e052][bold]Отчёт о работе инженерного отдела[/bold][/color]
+    >[mono][/mono]
+    • [color=#5b97bc][bold]Отчёт о работе медицинского отдела[/bold][/color]
+    >[mono][/mono]
+    • [color=#c96dbf][bold]Отчёт о работе научного отдела[/bold][/color]
+    >[mono][/mono]
+    Подписано: [color=Green]имя представителя Nanotrasen[/color]

@@ -1,0 +1,16 @@
+ent-ClothingBackpackDuffelSyndicateMedicHardsuitBundle = набор скафандра медика Синдиката
+    .desc = Запасной боевой скафандр медика, предназначенный для вашей миссии.
+ent-ClothingBackpackDuffelSyndicateStealthHardsuitBundle = набор стелс-костюма Cybersun
+    .desc = Набор содержащий стелс-костюм.
+ent-ClothingBackpackDuffelSyndicateBurner = набор Горелка
+    .desc = Набор, содержащий винтовку, а так же взрывные и крупнокалиберные магазины.
+ent-ClothingBackpackDuffelSyndicateM90Bundle = набор M-90
+    .desc = Набор с автоматом Синдиката М-90 и двумя запасными магазинами.
+ent-ClothingBackpackDuffelSyndicateFilledWSPR = набор WSPR
+    .desc = Набор, содержащий WSPR и два запасных магазина к нему
+ent-ClothingBackpackDuffelSyndicateFilledWhimsy = набор "радости и капризы" Синдиката.
+    .desc = Пакет, содержащий все, что нужно синдикату для веселого времяпрепровождения.
+ent-ClothingBackpackDuffelSyndicateFilledCandy = набор конфет Синдиката
+    .desc = Набор, доверху набитый конфетами. Кто-то очень любит сладкое!
+ent-ClothingBackpackDuffelSyndicateFilledHE1SG8 = набор ВР1А-Р4Я
+    .desc = В этом комплекте находится винтовка ВР1А-Р4Я в паре с 19 патронами, что делает ее еще более забавной.

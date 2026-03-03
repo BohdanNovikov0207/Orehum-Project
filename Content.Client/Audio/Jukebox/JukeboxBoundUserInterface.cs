@@ -44,6 +44,11 @@ public sealed class JukeboxBoundUserInterface : BoundUserInterface
             }
         };
 
+        _menu.OnLoopPressed += () =>
+        {
+            SendMessage(new JukeboxToggleLoopMessage()); // Orehum
+        };
+
         _menu.OnStopPressed += () =>
         {
             SendMessage(new JukeboxStopMessage());
@@ -65,6 +70,7 @@ public sealed class JukeboxBoundUserInterface : BoundUserInterface
             return;
 
         _menu.SetAudioStream(jukebox.AudioStream);
+        _menu.SetLoopButton(jukebox.Loop); //Orehum
 
         if (_protoManager.TryIndex(jukebox.SelectedSongId, out var songProto))
         {

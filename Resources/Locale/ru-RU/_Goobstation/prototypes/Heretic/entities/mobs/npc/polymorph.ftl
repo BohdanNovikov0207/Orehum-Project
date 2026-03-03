@@ -1,0 +1,9 @@
+ent-PolymorphAshJauntAnimation = неизвестный
+    .desc = Вы не можете понять, что это такое.
+ent-PolymorphAshJauntEndAnimation = неизвестный
+    .desc = Вы не можете понять, что это такое.
+ent-PolymorphAshJaunt = неизвестный
+    .desc = Вы не можете понять, что это такое.
+ent-MobHereticFleshAscend = мясная куча
+    .desc = Непонятная путаница конечностей и глаз. Вы чувствуете, как оно смотрит вам в душу.
+    .suffix = НЕ МАППИТЬ

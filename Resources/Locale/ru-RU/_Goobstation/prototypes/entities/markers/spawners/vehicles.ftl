@@ -1,0 +1,10 @@
+ent-SpawnVehicleSecway = спавнер Сегвея
+    .desc = { ent-MarkerBase.desc }
+ent-SpawnVehicleATV = спавнер квадроциклов
+    .desc = { ent-MarkerBase.desc }
+ent-SpawnVehicleJanicart = спавнер тележки уборщика
+    .desc = { ent-MarkerBase.desc }
+ent-SpawnVehicleChairOfficeLight = спавнер светлого офисного кресла
+    .desc = { ent-MarkerBase.desc }
+ent-SpawnVehicleChairOfficeDark = спавнер темного офисного кресла
+    .desc = { ent-MarkerBase.desc }

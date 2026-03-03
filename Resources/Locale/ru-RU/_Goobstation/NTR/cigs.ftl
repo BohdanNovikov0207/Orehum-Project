@@ -1,0 +1,12 @@
+advertisement-cigs-deluxe-1 = КУРИТЕ ФИЛЬТРЫ KING!!
+advertisement-cigs-deluxe-2 = ЗАЖГИТЕ СВОИ LUCKY STRIKE!!
+advertisement-cigs-deluxe-3 = УДОВЛЕТВОРЕНИЕ NANOTRASEN!
+advertisement-cigs-deluxe-4 = УДОВОЛЬСТВИЕ ОТ ПЭЛЛ-МЭЛЛ!!
+advertisement-cigs-deluxe-5 = ПОЛУЧИТЕ СВОЙ NANOLBORO BLUES!!
+advertisement-cigs-deluxe-6 = ФИЛЬТРЫ SPACE CAMEL УЖЕ ЗДЕСЬ!!
+advertisement-cigs-deluxe-7 = НАСЛАДИТЕСЬ ВКУСОМ КРОМБАХА!!
+advertisement-cigs-deluxe-8 = ПОПРОБУЙТЕ УТОНЧЕННОСТЬ!!
+advertisement-cigs-deluxe-9 = КАЧЕСТВО С НАЧИНКОЙ ИЗ ЧЕСТЕРА!!
+advertisement-cigs-deluxe-10 = ГЛАДКОСТЬ СТАРОГО ЗОЛОТА!!
+advertisement-cigs-deluxe-11 = СВЕЖЕСТЬ N&T!!
+advertisement-cigs-deluxe-12 = ПОКАЖИТЕ ИМ ЧТО ВЫ БОГАТЫ!!

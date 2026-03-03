@@ -59,6 +59,7 @@ public sealed class JukeboxSystem : SharedJukeboxSystem
 {
     [Dependency] private readonly IPrototypeManager _protoManager = default!;
     [Dependency] private readonly AppearanceSystem _appearanceSystem = default!;
+    [Dependency] private readonly IEntityManager _entManager = default!; // Orehum
 
     public override void Initialize()
     {
@@ -72,6 +73,7 @@ public sealed class JukeboxSystem : SharedJukeboxSystem
         SubscribeLocalEvent<JukeboxComponent, ComponentShutdown>(OnComponentShutdown);
 
         SubscribeLocalEvent<JukeboxComponent, PowerChangedEvent>(OnPowerChanged);
+        SubscribeLocalEvent<JukeboxComponent, JukeboxToggleLoopMessage>(OnJukeboxToggleLoop); //Orehum
     }
 
     private void OnComponentInit(EntityUid uid, JukeboxComponent component, ComponentInit args)
@@ -84,7 +86,8 @@ public sealed class JukeboxSystem : SharedJukeboxSystem
 
     private void OnJukeboxPlay(EntityUid uid, JukeboxComponent component, ref JukeboxPlayingMessage args)
     {
-        if (Exists(component.AudioStream))
+        if (_entManager.TryGetComponent(component.AudioStream, out AudioComponent? audioComp) &&
+            audioComp.Playing) // Orehum
         {
             Audio.SetState(component.AudioStream, AudioState.Playing);
         }
@@ -97,11 +100,52 @@ public sealed class JukeboxSystem : SharedJukeboxSystem
             {
                 return;
             }
+            // Orehum start
+            var audioParams = new AudioParams
+            {
+                MaxDistance = 10f,
+                Loop = component.Loop,
+                Volume = 1f
+            };
 
-            component.AudioStream = Audio.PlayPvs(jukeboxProto.Path, uid, AudioParams.Default.WithMaxDistance(10f).WithVolume(-6f))?.Entity; // Goobstation - the jukebox doesn't break your ears anymore
+            component.AudioStream = Audio.PlayPvs(jukeboxProto.Path, uid, audioParams)?.Entity;
             Dirty(uid, component);
         }
     }
+
+    private void OnJukeboxToggleLoop(Entity<JukeboxComponent> ent, ref JukeboxToggleLoopMessage args)
+    {
+        ent.Comp.Loop = !ent.Comp.Loop;
+        Dirty(ent);
+
+        if (_entManager.TryGetComponent(ent.Comp.AudioStream, out AudioComponent? audioComp) &&
+            audioComp.Playing)
+        {
+            var position = audioComp.PlaybackPosition;
+            var songId = ent.Comp.SelectedSongId;
+
+            Audio.Stop(ent.Comp.AudioStream);
+
+            if (_protoManager.TryIndex(songId, out var jukeboxProto))
+            {
+                var audioParams = new AudioParams
+                {
+                    MaxDistance = 10f,
+                    Loop = ent.Comp.Loop,
+                    Volume = audioComp.Volume
+                };
+
+                ent.Comp.AudioStream = Audio.PlayPvs(jukeboxProto.Path, ent, audioParams)?.Entity;
+
+                if (ent.Comp.AudioStream != null)
+                {
+                    Audio.SetPlaybackPosition(ent.Comp.AudioStream, position);
+                }
+
+                Dirty(ent);
+            }
+        }
+    } // Orehum end
 
     private void OnJukeboxPause(Entity<JukeboxComponent> ent, ref JukeboxPauseMessage args)
     {

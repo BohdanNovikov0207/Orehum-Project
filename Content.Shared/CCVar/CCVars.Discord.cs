@@ -66,6 +66,14 @@ public sealed partial class CCVars
     public static readonly CVarDef<string> DiscordRoundEndRoleWebhook =
         CVarDef.Create("discord.round_end_role", string.Empty, CVar.SERVERONLY);
 
+    // Orehum start
+    /// <summary>
+    /// Webhook для отправки новостей со станции
+    /// </summary>
+    public static readonly CVarDef<string> DiscordNewNewsletterWebhook =
+        CVarDef.Create("discord.new_newsletter_webhook", string.Empty, CVar.SERVERONLY | CVar.CONFIDENTIAL);
+    // Orehum end
+
     /// <summary>
     ///     URL of the Discord webhook which will relay watchlist connection notifications. If left empty, disables the webhook.
     /// </summary>

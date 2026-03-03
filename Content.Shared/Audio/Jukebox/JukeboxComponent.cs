@@ -20,6 +20,9 @@ public sealed partial class JukeboxComponent : Component
     [DataField, AutoNetworkedField]
     public EntityUid? AudioStream;
 
+    [DataField, AutoNetworkedField]
+    public bool Loop { get; set; } = false; //Orehum
+
     /// <summary>
     /// RSI state for the jukebox being on.
     /// </summary>
@@ -79,6 +82,9 @@ public enum JukeboxVisualState : byte
     Off,
     Select,
 }
+
+[Serializable, NetSerializable]
+public sealed class JukeboxToggleLoopMessage : BoundUserInterfaceMessage; // Orehum
 
 public enum JukeboxVisualLayers : byte
 {

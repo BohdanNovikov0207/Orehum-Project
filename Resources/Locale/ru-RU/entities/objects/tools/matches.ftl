@@ -1,0 +1,13 @@
+ent-SmallboxItem = { ent-BaseItem }
+    .desc = { ent-BaseItem.desc }
+ent-Matchstick = спичка
+    .desc = Простая спичка, используемая для поджигания хороших курительных смесей.
+ent-MatchstickSpent = { ent-Matchstick }
+    .suffix = Использованный
+    .desc = { ent-Matchstick.desc }
+ent-Matchbox = спичечный коробок
+    .desc = Небольшой коробок Почти-Но-Не-Совсем-Плазменных-Премиум-Спичек.
+ent-GorlexMatchbox = спичечный коробок горлекс
+    .desc = Пневматический спичечный коробок в стиле экипировки мародёров Горлекса. Содержит 24 спички.
+ent-GorlexMatchstick = спичка
+    .desc = Военная спичка, используется для поджигания как табака, так и невооружённых целей.

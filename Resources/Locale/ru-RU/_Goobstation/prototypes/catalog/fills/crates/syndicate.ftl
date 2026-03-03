@@ -1,0 +1,15 @@
+ent-CrateCybersunDarkGygaxBundle = набор Гигакс Cybersun
+    .desc = Содержит набор лёгкого бронированого меха Cybersun - Гигакс.
+    .suffix = Заполненный
+ent-CrateCybersunMaulerBundle = набор Маулер Cybersun
+    .desc = Содержит набор тяжелого бронированного меха Cybersun - Маулер.
+    .suffix = Заполненный
+ent-CrateSyndicateBulkMosin = ящик винтовок Синдиката
+    .desc = Просто используйте больше винтовок, товарищ.
+    .suffix = Заполненный
+ent-CrateSyndicateDreadnought = ящик дредноута Cybersun
+    .desc = Усовершенствованный набор дредноута Cybersun.
+ent-CratePizzaParty = аварийная доставка пиццы
+    .desc = В конечном счете, если все остальное не помогло, утешайтесь мыслью о том, что большее количество пиццы решает все проблемы. В набор входит 16 видов пиццы.
+ent-CrateSyndicateUndetermined = ящик с неопределенным набором Синдиката
+    .desc = Содержит набор Cиндиката. Какой именно, еще предстоит определить.

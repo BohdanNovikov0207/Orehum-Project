@@ -1,0 +1,23 @@
+# Bark Voice Names
+bark-flowey = Flowey
+bark-txt1 = Текст 1
+bark-txt2 = Текст 2
+bark-txtal = Алфис
+bark-txtasg = Азгор
+bark-txtasr = Азриэль
+bark-txtber = Берджпантс
+bark-txtjok = Джокер
+bark-txtlan = Лансер
+bark-txtnoe = Ноэль
+bark-txtpap = Папирус
+bark-txtqueen = Королева
+bark-txtsans = Санс
+bark-txtspam = Спамтон
+bark-txtsus = Сьюзи
+bark-txttor = Ториэль
+bark-txtund = Андайн
+bark-gav = Гав
+bark-meow = Мяуканье
+bark-mtt = Меттатон
+bark-tem = Тэмми
+bark-tenna = Тенна

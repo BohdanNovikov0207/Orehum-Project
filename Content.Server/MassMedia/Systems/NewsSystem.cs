@@ -80,24 +80,6 @@ public sealed class NewsSystem : SharedNewsSystem
     {
         base.Initialize();
 
-        // Discord hook
-        _cfg.OnValueChanged(CCVars.DiscordNewsWebhook,
-            value =>
-            {
-                if (!string.IsNullOrWhiteSpace(value))
-                    _discord.GetWebhook(value, data => _webhookId = data.ToIdentifier());
-            }, true);
-
-        _cfg.OnValueChanged(CCVars.DiscordNewsWebhookEmbedColor, value =>
-            {
-                _webhookEmbedColor = Color.LawnGreen;
-                if (Color.TryParse(value, out var color))
-                    _webhookEmbedColor = color;
-            }, true);
-
-        _cfg.OnValueChanged(CCVars.DiscordNewsWebhookSendDuringRound, value => _webhookSendDuringRound = value, true);
-        SubscribeLocalEvent<RoundEndMessageEvent>(OnRoundEndMessageEvent);
-
         // News writer
         SubscribeLocalEvent<NewsWriterComponent, MapInitEvent>(OnMapInit);
 
@@ -116,6 +98,19 @@ public sealed class NewsSystem : SharedNewsSystem
         SubscribeLocalEvent<NewsReaderCartridgeComponent, NewsArticleDeletedEvent>(OnArticleDeleted);
         SubscribeLocalEvent<NewsReaderCartridgeComponent, CartridgeMessageEvent>(OnReaderUiMessage);
         SubscribeLocalEvent<NewsReaderCartridgeComponent, CartridgeUiReadyEvent>(OnReaderUiReady);
+
+        // Orehum start
+        Subs.CVar(_cfg,
+            CCVars.DiscordNewNewsletterWebhook,
+            value =>
+            {
+                if (!string.IsNullOrWhiteSpace(value))
+                {
+                    _discord.GetWebhook(value, data => _webhookId = data.ToIdentifier());
+                }
+            },
+            true);
+        // Orehum end
     }
 
     public override void Update(float frameTime)
@@ -212,7 +207,40 @@ public sealed class NewsSystem : SharedNewsSystem
                                                              ("author", article.Value.Author ?? Loc.GetString("news-read-ui-no-author"))
             ));
         }
+
+        PublishMessageToDiscord(article.Value.Title, article.Value.Content, article.Value.Author, article.Value.ShareTime); // Orehum
     }
+
+    // Orehum start
+    private async void PublishMessageToDiscord(string title, string content, string? author, TimeSpan shareTime)
+    {
+        try
+        {
+            if (_webhookId == null)
+                return;
+
+            var embed = new WebhookEmbed()
+            {
+                Title = title,
+                Color = 0x4169e1, // royal blue
+                Description = content,
+                Footer = new WebhookEmbedFooter
+                {
+                    Text = $"{(author ?? "Неизвестно")} | {shareTime.Hours:00}:{shareTime.Minutes:00}:{shareTime.Seconds:00}"
+                }
+            };
+
+            await _discord.CreateMessage(_webhookId.Value, new WebhookPayload
+                {
+                    Embeds = new List<WebhookEmbed> { embed }
+                });
+        }
+        catch(Exception e)
+        {
+            Log.Error($"Ошибка при отправке новости в дискорд:\n{e}");
+        }
+    }
+    // Orehum end
 
     /// <summary>
     /// Set the alert level based on the station's entity ID.
