@@ -35,5 +35,5 @@ public sealed partial class ShadowlingRapidRehatchComponent : Component
     /// The sound that plays during the ability.
     /// </summary>
     [DataField]
-    public SoundSpecifier? RapidRehatchSound = new SoundPathSpecifier("/Audio/_EE/Shadowling/rapid_rehatch.ogg");
+    public SoundSpecifier? RapidRehatchSound = new SoundPathSpecifier("/Audio/_EinsteinEngines/Shadowling/rapid_rehatch.ogg");
 }

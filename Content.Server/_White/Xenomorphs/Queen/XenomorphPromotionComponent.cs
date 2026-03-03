@@ -1,5 +1,5 @@
-using Content.Shared._White.Xenomorphs.Caste;
 using Content.Goobstation.Maths.FixedPoint;
+using Content.Shared._White.Xenomorphs.Caste;
 using Robust.Shared.Prototypes;
 
 namespace Content.Server._White.Xenomorphs.Queen;

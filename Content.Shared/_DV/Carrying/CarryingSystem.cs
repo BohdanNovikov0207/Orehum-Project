@@ -36,7 +36,7 @@ using Content.Shared.Verbs;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Network;
 using System.Numerics;
-using Content.Shared.Contests;
+using Content.Shared._EinsteinEngines.Contests;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Mind.Components;
 

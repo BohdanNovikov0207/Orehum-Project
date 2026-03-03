@@ -15,7 +15,7 @@ using Content.Goobstation.Server.Devil.GameTicking.Rules;
 using Content.Goobstation.Server.Shadowling.Rules;
 using Content.Server.Administration.Managers;
 using Content.Server.Antag;
-using Content.Shared.Silicon.Components;
+using Content.Shared._EinsteinEngines.Silicon.Components;
 using Content.Shared.Administration;
 using Content.Shared.Database;
 using Content.Shared.Mind.Components;
@@ -89,7 +89,7 @@ public sealed partial class GoobAdminVerbSystem
             Text = Loc.GetString("admin-verb-text-make-shadowling"),
             Category = VerbCategory.Antag,
             Icon = new SpriteSpecifier.Rsi(
-                new("/Textures/_EE/Shadowling/shadowling_abilities.rsi"),
+                new("/Textures/_EinsteinEngines/Shadowling/shadowling_abilities.rsi"),
                 "engage_hatch"),
             Act = () =>
             {

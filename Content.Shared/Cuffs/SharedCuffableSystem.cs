@@ -116,7 +116,7 @@ using Content.Shared.Buckle.Components;
 using Content.Shared.CombatMode;
 using Content.Shared.Cuffs.Components;
 using Content.Shared.Database;
-using Content.Shared.Flight;
+using Content.Shared._EinsteinEngines.Flight;
 using Content.Shared._Goobstation.Wizard.Mutate; // Goobstation
 using Content.Shared.DoAfter;
 using Content.Shared.Hands;
@@ -358,18 +358,13 @@ namespace Content.Shared.Cuffs
             args.Cancel();
         }
 
-        private void HandleStopPull(EntityUid uid, CuffableComponent component, ref AttemptStopPullingEvent args)
+        private void HandleStopPull(EntityUid uid, CuffableComponent component, AttemptStopPullingEvent args)
         {
             if (args.User == null || !Exists(args.User.Value))
                 return;
 
             if (args.User.Value == uid && !component.CanStillInteract)
-            {
-                //TODO: UX feedback. Simply blocking the normal interaction feels like an interface bug
-
                 args.Cancelled = true;
-            }
-
         }
 
         private void OnRemoveCuffsAlert(Entity<CuffableComponent> ent, ref RemoveCuffsAlertEvent args)
@@ -602,18 +597,16 @@ namespace Content.Shared.Cuffs
             EnsureComp<HandcuffComponent>(handcuff, out var handcuffsComp);
             handcuffsComp.Used = true;
             Dirty(handcuff, handcuffsComp);
-            // Shitmed Change End
-
-            // Success!
-            _hands.TryDrop(user, handcuff);
-
-            _container.Insert(handcuff, component.Container);
-
+            
             var ev = new TargetHandcuffedEvent();
             RaiseLocalEvent(target, ref ev);
 
-            UpdateHeldItems(target, handcuff, component);
+            // Success!
+            _hands.TryDrop(user, handcuff);
+            var result = _container.Insert(handcuff, component.Container);
+            // Shitmed Change End
 
+            UpdateHeldItems(target, handcuff, component);
             return true;
         }
 

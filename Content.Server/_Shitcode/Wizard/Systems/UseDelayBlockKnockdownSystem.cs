@@ -8,7 +8,7 @@
 using System.Linq;
 using Content.Goobstation.Common.Effects;
 using Content.Server._Goobstation.Wizard.Components;
-using Content.Shared.TelescopicBaton;
+using Content.Shared._EinsteinEngines.TelescopicBaton;
 using Content.Shared.Timing;
 using Robust.Server.Audio;
 

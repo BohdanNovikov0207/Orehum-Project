@@ -1,5 +1,5 @@
 using Content.Goobstation.Shared.Wraith.Events;
-using Content.Shared.Silicon.Components;
+using Content.Shared._EinsteinEngines.Silicon.Components;
 using Content.Shared.Actions;
 using Content.Shared.Actions.Components;
 using Content.Shared.Popups;

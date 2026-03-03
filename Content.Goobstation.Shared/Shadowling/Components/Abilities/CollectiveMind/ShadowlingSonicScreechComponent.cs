@@ -57,7 +57,7 @@ public sealed partial class ShadowlingSonicScreechComponent : Component
     /// The sound that plays once the ability is used.
     /// </summary>
     [DataField]
-    public SoundSpecifier? ScreechSound = new SoundPathSpecifier("/Audio/_EE/Shadowling/screech.ogg");
+    public SoundSpecifier? ScreechSound = new SoundPathSpecifier("/Audio/_EinsteinEngines/Shadowling/screech.ogg");
 
     /// <summary>
     /// The effect that is used once the ability activates.

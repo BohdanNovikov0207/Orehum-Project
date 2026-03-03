@@ -1,4 +1,43 @@
-using Content.Client._ES.Lighting;
+// SPDX-FileCopyrightText: 2021 20kdc <asdd2808@gmail.com>
+// SPDX-FileCopyrightText: 2021 Swept <sweptwastaken@protonmail.com>
+// SPDX-FileCopyrightText: 2021 Vera Aguilera Puerto <6766154+Zumorica@users.noreply.github.com>
+// SPDX-FileCopyrightText: 2021 Vera Aguilera Puerto <gradientvera@outlook.com>
+// SPDX-FileCopyrightText: 2021 Wrexbe <wrexbe@protonmail.com>
+// SPDX-FileCopyrightText: 2021 metalgearsloth <comedian_vs_clown@hotmail.com>
+// SPDX-FileCopyrightText: 2022 Francesco <frafonia@gmail.com>
+// SPDX-FileCopyrightText: 2022 Illiux <newoutlook@gmail.com>
+// SPDX-FileCopyrightText: 2022 Jacob Tong <10494922+ShadowCommander@users.noreply.github.com>
+// SPDX-FileCopyrightText: 2022 Jezithyr <Jezithyr.@gmail.com>
+// SPDX-FileCopyrightText: 2022 Jezithyr <Jezithyr@gmail.com>
+// SPDX-FileCopyrightText: 2022 Jezithyr <jmaster9999@gmail.com>
+// SPDX-FileCopyrightText: 2022 Nemanja <98561806+EmoGarbage404@users.noreply.github.com>
+// SPDX-FileCopyrightText: 2022 Visne <39844191+Visne@users.noreply.github.com>
+// SPDX-FileCopyrightText: 2022 mirrorcult <lunarautomaton6@gmail.com>
+// SPDX-FileCopyrightText: 2022 wrexbe <81056464+wrexbe@users.noreply.github.com>
+// SPDX-FileCopyrightText: 2022 wrexbe <wrexbe@protonmail.com>
+// SPDX-FileCopyrightText: 2023 Chief-Engineer <119664036+Chief-Engineer@users.noreply.github.com>
+// SPDX-FileCopyrightText: 2023 DrSmugleaf <DrSmugleaf@users.noreply.github.com>
+// SPDX-FileCopyrightText: 2023 Kara <lunarautomaton6@gmail.com>
+// SPDX-FileCopyrightText: 2023 Leon Friedrich <60421075+ElectroJr@users.noreply.github.com>
+// SPDX-FileCopyrightText: 2023 metalgearsloth <31366439+metalgearsloth@users.noreply.github.com>
+// SPDX-FileCopyrightText: 2024 0x6273 <0x40@keemail.me>
+// SPDX-FileCopyrightText: 2024 Aiden <aiden@djkraz.com>
+// SPDX-FileCopyrightText: 2024 Pieter-Jan Briers <pieterjan.briers+git@gmail.com>
+// SPDX-FileCopyrightText: 2024 Rank #1 Jonestown partygoer <mary@thughunt.ing>
+// SPDX-FileCopyrightText: 2024 ShadowCommander <shadowjjt@gmail.com>
+// SPDX-FileCopyrightText: 2024 tosatur <63034378+tosatur@users.noreply.github.com>
+// SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
+// SPDX-FileCopyrightText: 2025 Aidenkrz <aiden@djkraz.com>
+// SPDX-FileCopyrightText: 2025 Aviu00 <93730715+Aviu00@users.noreply.github.com>
+// SPDX-FileCopyrightText: 2025 Misandry <mary@thughunt.ing>
+// SPDX-FileCopyrightText: 2025 SX_7 <sn1.test.preria.2002@gmail.com>
+// SPDX-FileCopyrightText: 2025 Winkarst <74284083+Winkarst-cpu@users.noreply.github.com>
+// SPDX-FileCopyrightText: 2025 gus <august.eymann@gmail.com>
+// SPDX-FileCopyrightText: 2025 slarticodefast <161409025+slarticodefast@users.noreply.github.com>
+//
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+using Content.Client._Shitcode.Wizard.Systems;
 using Content.Client.Movement.Systems;
 using Content.Shared.Actions;
 using Content.Shared.Ghost;
@@ -17,9 +56,7 @@ namespace Content.Client.Ghost
         [Dependency] private readonly PointLightSystem _pointLightSystem = default!;
         [Dependency] private readonly ContentEyeSystem _contentEye = default!;
         [Dependency] private readonly SpriteSystem _sprite = default!;
-        // ES START
-        [Dependency] private readonly ESInherentLightSystem _inherentLight = default!;
-        // ES END
+        [Dependency] private readonly GhostVisibilitySystem _ghostVisSystem = default!; // Goobstation
 
         public int AvailableGhostRoleCount { get; private set; }
 
@@ -27,9 +64,12 @@ namespace Content.Client.Ghost
 
         private bool GhostVisibility
         {
-            get => _ghostVisibility;
+            get => _ghostVisSystem.GhostsVisible() || _ghostVisibility; // Goob edit
             set
             {
+                if (_ghostVisSystem.GhostsVisible()) // Goobstation
+                    value = true;
+
                 if (_ghostVisibility == value)
                 {
                     return;
@@ -71,7 +111,7 @@ namespace Content.Client.Ghost
 
             SubscribeLocalEvent<EyeComponent, ToggleLightingActionEvent>(OnToggleLighting);
             SubscribeLocalEvent<EyeComponent, ToggleFoVActionEvent>(OnToggleFoV);
-            SubscribeLocalEvent<GhostComponent, ToggleGhostsActionEvent>(OnToggleGhosts);
+            SubscribeLocalEvent<EyeComponent, ToggleGhostsActionEvent>(OnToggleGhosts); // Goob edit
         }
 
         private void OnStartup(EntityUid uid, GhostComponent component, ComponentStartup args)
@@ -85,36 +125,27 @@ namespace Content.Client.Ghost
             if (args.Handled)
                 return;
 
-            // ES START
-            // pointlight to inherentlight
-            var hasLight = TryComp<ESInherentLightComponent>(uid, out var light);
-            var isLightOn = hasLight && light!.Enabled;
+            TryComp<PointLightComponent>(uid, out var light);
 
             if (!component.DrawLight)
             {
                 // normal lighting
                 Popup.PopupEntity(Loc.GetString("ghost-gui-toggle-lighting-manager-popup-normal"), args.Performer);
                 _contentEye.RequestEye(component.DrawFov, true);
-
-                if (hasLight)
-                    _inherentLight.SetEnabled(uid, false);
             }
-            else if (hasLight && !isLightOn)
+            else if (!light?.Enabled ?? false) // skip this option if we have no PointLightComponent
             {
                 // enable personal light
                 Popup.PopupEntity(Loc.GetString("ghost-gui-toggle-lighting-manager-popup-personal-light"), args.Performer);
-                _inherentLight.SetEnabled(uid, true);
+                _pointLightSystem.SetEnabled(uid, true, light);
             }
             else
             {
                 // fullbright mode
                 Popup.PopupEntity(Loc.GetString("ghost-gui-toggle-lighting-manager-popup-fullbright"), args.Performer);
                 _contentEye.RequestEye(component.DrawFov, false);
-
-                if (hasLight)
-                    _inherentLight.SetEnabled(uid, false);
+                _pointLightSystem.SetEnabled(uid, false, light);
             }
-            // ES END
             args.Handled = true;
         }
 
@@ -128,9 +159,9 @@ namespace Content.Client.Ghost
             args.Handled = true;
         }
 
-        private void OnToggleGhosts(EntityUid uid, GhostComponent component, ToggleGhostsActionEvent args)
+        private void OnToggleGhosts(EntityUid uid, EyeComponent component, ToggleGhostsActionEvent args) // Goob edit
         {
-            if (args.Handled)
+            if (args.Handled || _ghostVisSystem.GhostsVisible()) // Goob edit
                 return;
 
             var locId = GhostVisibility ? "ghost-gui-toggle-ghost-visibility-popup-off" : "ghost-gui-toggle-ghost-visibility-popup-on";
@@ -169,6 +200,7 @@ namespace Content.Client.Ghost
             if (uid != _playerManager.LocalEntity)
                 return;
 
+            PlayerUpdated?.Invoke(component);
         }
 
         private void OnGhostPlayerDetach(EntityUid uid, GhostComponent component, LocalPlayerDetachedEvent args)
@@ -209,21 +241,9 @@ namespace Content.Client.Ghost
             _console.RemoteExecuteCommand(null, "ghostroles");
         }
 
-        public void GhostBarSpawn() // Goobstation - Ghost Bar
-        {
-            RaiseNetworkEvent(new GhostBarSpawnEvent());
-        }
-
         public void ToggleGhostVisibility(bool? visibility = null)
         {
             GhostVisibility = visibility ?? !GhostVisibility;
         }
-
-        public void ReturnToRound()
-        {
-            var msg = new GhostReturnToRoundRequest();
-            RaiseNetworkEvent(msg);
-        }
-
     }
 }

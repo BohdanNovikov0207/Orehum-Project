@@ -1,15 +1,46 @@
+// SPDX-FileCopyrightText: 2021 20kdc <asdd2808@gmail.com>
+// SPDX-FileCopyrightText: 2021 Acruid <shatter66@gmail.com>
+// SPDX-FileCopyrightText: 2021 Paul Ritter <ritter.paul1@googlemail.com>
+// SPDX-FileCopyrightText: 2021 Vera Aguilera Puerto <6766154+Zumorica@users.noreply.github.com>
+// SPDX-FileCopyrightText: 2021 Visne <39844191+Visne@users.noreply.github.com>
+// SPDX-FileCopyrightText: 2021 metalgearsloth <comedian_vs_clown@hotmail.com>
+// SPDX-FileCopyrightText: 2021 mirrorcult <notzombiedude@gmail.com>
+// SPDX-FileCopyrightText: 2022 Mervill <mervills.email@gmail.com>
+// SPDX-FileCopyrightText: 2022 Moony <moonheart08@users.noreply.github.com>
+// SPDX-FileCopyrightText: 2022 Pieter-Jan Briers <pieterjan.briers+git@gmail.com>
+// SPDX-FileCopyrightText: 2022 corentt <36075110+corentt@users.noreply.github.com>
+// SPDX-FileCopyrightText: 2022 wrexbe <81056464+wrexbe@users.noreply.github.com>
+// SPDX-FileCopyrightText: 2023 Chief-Engineer <119664036+Chief-Engineer@users.noreply.github.com>
+// SPDX-FileCopyrightText: 2023 DrSmugleaf <DrSmugleaf@users.noreply.github.com>
+// SPDX-FileCopyrightText: 2023 DrSmugleaf <drsmugleaf@gmail.com>
+// SPDX-FileCopyrightText: 2023 Kevin Zheng <kevinz5000@gmail.com>
+// SPDX-FileCopyrightText: 2023 LankLTE <135308300+LankLTE@users.noreply.github.com>
+// SPDX-FileCopyrightText: 2023 Leon Friedrich <60421075+ElectroJr@users.noreply.github.com>
+// SPDX-FileCopyrightText: 2023 metalgearsloth <31366439+metalgearsloth@users.noreply.github.com>
+// SPDX-FileCopyrightText: 2024 DrSmugleaf <10968691+DrSmugleaf@users.noreply.github.com>
+// SPDX-FileCopyrightText: 2024 LordCarve <27449516+LordCarve@users.noreply.github.com>
+// SPDX-FileCopyrightText: 2024 Nemanja <98561806+EmoGarbage404@users.noreply.github.com>
+// SPDX-FileCopyrightText: 2024 ShadowCommander <10494922+ShadowCommander@users.noreply.github.com>
+// SPDX-FileCopyrightText: 2024 SlamBamActionman <83650252+SlamBamActionman@users.noreply.github.com>
+// SPDX-FileCopyrightText: 2025 AftrLite <61218133+AftrLite@users.noreply.github.com>
+// SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
+// SPDX-FileCopyrightText: 2025 GoobBot <uristmchands@proton.me>
+// SPDX-FileCopyrightText: 2025 SX_7 <sn1.test.preria.2002@gmail.com>
+// SPDX-FileCopyrightText: 2025 gluesniffler <linebarrelerenthusiast@gmail.com>
+//
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 using System.Collections;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Threading.Tasks;
 using Content.Server.Administration;
 using Content.Server.Administration.Logs;
 using Content.Server.Administration.Managers;
 using Content.Server.Chat.Managers;
-using Content.Server.Database;
 using Content.Server.GameTicking;
 using Content.Server.Maps;
+using Content.Shared._DV.CosmicCult.Components; // DeltaV - Cosmic Cult
 using Content.Shared.Administration;
 using Content.Shared.CCVar;
 using Content.Shared.Database;
@@ -42,7 +73,6 @@ namespace Content.Server.Voting.Managers
         [Dependency] private readonly IEntityManager _entityManager = default!;
         [Dependency] private readonly IAdminLogManager _adminLogger = default!;
         [Dependency] private readonly ISharedPlaytimeManager _playtimeManager = default!;
-        [Dependency] private readonly IServerDbManager _dbManager = default!;
 
         private int _nextVoteId = 1;
 
@@ -53,11 +83,6 @@ namespace Content.Server.Voting.Managers
         private readonly Dictionary<NetUserId, TimeSpan> _voteTimeout = new();
         private readonly HashSet<ICommonSession> _playerCanCallVoteDirty = new();
         private readonly StandardVoteType[] _standardVoteTypeValues = Enum.GetValues<StandardVoteType>();
-
-        private bool _syncedWithDb = false;
-        private readonly List<string> _whitelistedPresets = ["Secret", "Traitor", "Survival", "Greenshift", "Extended"];
-
-        public List<string> GetWhitelistedPresets() => _whitelistedPresets;
 
         public void Initialize()
         {
@@ -81,25 +106,6 @@ namespace Content.Server.Voting.Managers
                 });
             }
         }
-
-        // Orehum start
-        private async void CheckWhitelistedPresets()
-        {
-            var result = await _dbManager.GetWhitelistedPresets();
-            if (result.Count == 0) // если нема пресетов
-            {
-                foreach (var preset in _whitelistedPresets)
-                {
-                    await _dbManager.AddWhitelistedPreset(preset); // регаем дефолтные пресетики
-                }
-            }
-            else // если есть уже разрешенные пресеты в дб
-            {
-                _whitelistedPresets.Clear();
-                _whitelistedPresets.AddRange(result);
-            }
-        }
-        // Orehum end
 
         private void ReceiveVoteMenu(MsgVoteMenu message)
         {
@@ -167,12 +173,6 @@ namespace Content.Server.Voting.Managers
 
         public void Update()
         {
-            if (_syncedWithDb == false) // orehum shit code check ИСПРАВИТЬ В БУДУЩЕМ НА НОРМАЛЬНЫЙ ЗАПРОС К ДБ ААААААААААААААААААААААААААААААААААААААА
-            {
-                _syncedWithDb = true;
-                CheckWhitelistedPresets();
-            }
-
             // Handle active votes.
             var remQueue = new RemQueue<int>();
             foreach (var v in _votes.Values)
@@ -261,30 +261,6 @@ namespace Content.Server.Voting.Managers
 
             return handle;
         }
-
-        // Orehum Start
-        public void AddWhitelistedPreset(string preset)
-        {
-            if (!_whitelistedPresets.Contains(preset))
-            {
-                _whitelistedPresets.Add(preset);
-                AddWhitelistedPresetToDb(preset);
-            }
-        }
-
-        private async void AddWhitelistedPresetToDb(string preset) => await _dbManager.AddWhitelistedPreset(preset);
-
-        public void RemoveWhitelistedPreset(string preset)
-        {
-            if (_whitelistedPresets.Contains(preset))
-            {
-                _whitelistedPresets.Remove(preset);
-                RemoveWhitelistedPresetToDb(preset);
-            }
-        }
-
-        private async void RemoveWhitelistedPresetToDb(string preset) => await _dbManager.RemoveWhitelistedPreset(preset);
-        // Orehum End
 
         private void SendUpdates(VoteReg v)
         {
@@ -510,6 +486,12 @@ namespace Content.Server.Voting.Managers
                     return false;
             }
 
+            // Begin DeltaV - Cosmic Cult
+            if (eligibility == VoterEligibility.CosmicCult)
+                if (!_entityManager.HasComponent<CosmicCultComponent>(player.AttachedEntity))
+                    return false;
+            // End DeltaV - Cosmic Cult
+
             return true;
         }
 
@@ -607,7 +589,8 @@ namespace Content.Server.Voting.Managers
             All,
             Ghost, // Player needs to be a ghost
             GhostMinimumPlaytime, // Player needs to be a ghost, with a minimum playtime and deathtime as defined by votekick CCvars.
-            MinimumPlaytime //Player needs to have a minimum playtime and deathtime as defined by votekick CCvars.
+            MinimumPlaytime, //Player needs to have a minimum playtime and deathtime as defined by votekick CCvars.
+            CosmicCult, // DeltaV - Player needs to be a cosmic cultist. Used by the cosmic cult gamemode.
         }
 
         #endregion

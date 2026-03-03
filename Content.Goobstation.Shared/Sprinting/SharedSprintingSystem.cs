@@ -7,7 +7,7 @@
 
 using Content.Goobstation.Common.Movement;
 using Content.Shared.Damage.Events;
-using Content.Shared.Flight.Events;
+using Content.Shared._EinsteinEngines.Flight.Events;
 using Content.Shared.Bed.Sleep;
 using Content.Shared.Buckle.Components;
 using Content.Shared.CombatMode;

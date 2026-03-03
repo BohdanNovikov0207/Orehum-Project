@@ -45,5 +45,5 @@ public sealed partial class ShadowlingBlindnessSmokeComponent : Component
     /// The sound used once the ability activates.
     /// </summary>
     [DataField]
-    public SoundSpecifier? BlindnessSound = new SoundPathSpecifier("/Audio/_EE/Effects/bamf.ogg");
+    public SoundSpecifier? BlindnessSound = new SoundPathSpecifier("/Audio/_EinsteinEngines/Effects/bamf.ogg");
 }

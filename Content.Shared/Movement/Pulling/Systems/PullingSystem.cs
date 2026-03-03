@@ -102,7 +102,7 @@
 using System.Numerics;
 using Content.Goobstation.Common.Grab;
 using Content.Goobstation.Common.MartialArts;
-using Content.Shared.Contests;
+using Content.Shared._EinsteinEngines.Contests;
 using Content.Shared._White.Grab; // Goobstation
 using Content.Shared.ActionBlocker;
 using Content.Shared.Administration.Logs;

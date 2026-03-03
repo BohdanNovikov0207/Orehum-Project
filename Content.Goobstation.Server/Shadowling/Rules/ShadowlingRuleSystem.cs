@@ -30,7 +30,7 @@ public sealed class ShadowlingRuleSystem : GameRuleSystem<ShadowlingRuleComponen
     [Dependency] private readonly MobStateSystem _mob = default!;
     [Dependency] private readonly NpcFactionSystem _npc = default!;
 
-    private readonly SoundSpecifier _briefingSound = new SoundPathSpecifier("/Audio/_EE/Shadowling/shadowling.ogg");
+    private readonly SoundSpecifier _briefingSound = new SoundPathSpecifier("/Audio/_EinsteinEngines/Shadowling/shadowling.ogg");
 
     private readonly EntProtoId _mindRole = "MindRoleShadowling";
 

@@ -72,5 +72,5 @@ public sealed partial class ShadowlingShadowWalkComponent : Component
     /// The sound that plays during the ability
     /// </summary>
     [DataField]
-    public SoundSpecifier? ShadowWalkSound = new SoundPathSpecifier("/Audio/_EE/Effects/bamf.ogg");
+    public SoundSpecifier? ShadowWalkSound = new SoundPathSpecifier("/Audio/_EinsteinEngines/Effects/bamf.ogg");
 }

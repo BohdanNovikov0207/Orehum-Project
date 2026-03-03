@@ -1,12 +1,21 @@
-﻿using System;
+// SPDX-FileCopyrightText: 2021 20kdc <asdd2808@gmail.com>
+// SPDX-FileCopyrightText: 2022 Pieter-Jan Briers <pieterjan.briers+git@gmail.com>
+// SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
+//
+// SPDX-License-Identifier: MIT
+
+using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using ImGuiNET;
+using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using ErrorCode = OpenTK.Windowing.GraphicsLibraryFramework.ErrorCode;
 using Vector2 = System.Numerics.Vector2;
+using Vector2i = OpenTK.Mathematics.Vector2i;
+using Matrix4 = OpenTK.Mathematics.Matrix4;
 
 // ReSharper disable PossibleNullReferenceException
 

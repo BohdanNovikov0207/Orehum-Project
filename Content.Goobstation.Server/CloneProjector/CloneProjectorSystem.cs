@@ -12,7 +12,7 @@ using Content.Goobstation.Shared.CloneProjector.Clone;
 using Content.Server.Emp;
 using Content.Server.Ghost.Roles.Components;
 using Content.Shared._DV.Carrying;
-using Content.Shared.Silicon.IPC;
+using Content.Shared._EinsteinEngines.Silicon.IPC;
 using Content.Shared.Actions;
 using Content.Shared.Actions.Components;
 using Content.Shared.Containers.ItemSlots;
