@@ -138,7 +138,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                     <BoxContainer MinHeight="10" />
                     <!-- Server Currency -->
                     <Label Name="Balance" Access="Public" StyleClasses="LabelHeadingBigger" VAlign="Center"
-                            HorizontalExpand="True" HorizontalAlignment="Center" />
+                            HorizontalExpand="True" HorizontalAlignment="Center" Visible="False" />
                     <!-- Gold line -->
                     <controls:HLine Color="{x:Static style:StyleNano.NanoGold}" Thickness="2" Access="Public" />
                     <controls:HSpacer Spacing="10" />
@@ -154,7 +154,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
             </PanelContainer>
         </SplitContainer>
         <PanelContainer Name="ExpandPanel"
-                        StyleClasses="AngleRect" 
+                        StyleClasses="AngleRect"
                         HorizontalAlignment="Right"
                         VerticalAlignment="Top"
                         Margin="0 2 2 0"

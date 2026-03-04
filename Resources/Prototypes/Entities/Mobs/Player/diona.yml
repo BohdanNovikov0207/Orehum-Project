@@ -40,8 +40,6 @@
       damageRecovery:
         types:
           Asphyxiation: -1.0
-    - type: Sprinter # Goob Change: bro you're a literal bundle of roots what did you expect
-      canSprint: false
 
 # Reformed Diona
 - type: entity
