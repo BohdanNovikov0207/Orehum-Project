@@ -249,12 +249,6 @@
   artist: LFMoth
 
 - type: lobbyBackground
-  id: stargoob
-  background: /Textures/LobbyScreens/StarGoob.webp
-  name: GoobWars
-  artist: Jvne
-
-- type: lobbyBackground
   id: enlist-lavaland
   background: /Textures/LobbyScreens/enlist.webp
   name: Nanotrasen wants YOU.

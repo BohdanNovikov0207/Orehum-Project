@@ -93,8 +93,8 @@ public sealed class ExaminableCharacterSystem : EntitySystem
                 && !HasComp<StripMenuInvisibleComponent>(slotEntity))
             {
                 var itemTex = Loc.GetString(slotLabel, ("item", metaData.EntityName), ("ent", uid), ("id", GetNetEntity(slotEntity.Value).Id), ("size", 14));
-                if (showExamine)
-                    args.PushMarkup($"[font size=10]{Loc.GetString(slotLabel, ("item", metaData.EntityName), ("ent", uid), ("id", "empty"))}[/font]", priority);
+                // if (showExamine)
+                //     args.PushMarkup($"[font size=10]{Loc.GetString(slotLabel, ("item", metaData.EntityName), ("ent", uid), ("id", "empty"))}[/font]", priority);
                 logLines.Add($"[color=DarkGray][font size=10]{itemTex}[/font][/color]");
                 priority--;
             }
@@ -102,8 +102,8 @@ public sealed class ExaminableCharacterSystem : EntitySystem
 
         if (priority < 13) // If nothing is worn dont show
         {
-            if (showExamine)
-                args.PushMarkup($"[font size=10]{cansee}[/font]", 14);
+            // if (showExamine)
+            //     args.PushMarkup($"[font size=10]{cansee}[/font]", 14);
         }
         else
         {

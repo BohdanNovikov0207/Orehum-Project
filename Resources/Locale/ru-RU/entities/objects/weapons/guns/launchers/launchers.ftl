@@ -26,5 +26,5 @@ ent-WeaponLauncherAdmemeMeteorLarge = пускатель метеоритов
 ent-WeaponLauncherAdmemeImmovableRodSlow = пускатель неподвижного жезла
     .desc = Стреляет неподвижными жезлами.
     .suffix = Адмемы
-ent-WeaponLauncherSingularityBuster = ракетная установка "Уничтожитель Синглуярности"
+ent-WeaponLauncherSingularityBuster = ракетная установка "Уничтожитель Сингулярности"
     .desc = Экспериментальная ракетная установка, предназначенная для стрельбы ракетами, способными дезинтегрировать сингулярность или теслу.
