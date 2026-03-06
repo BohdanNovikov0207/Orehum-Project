@@ -1,0 +1,35 @@
+- type: entity
+  id: portableReagentGrinder
+  name: Ступка и пестик
+  description: Инструмент для измельчения реагентов.
+  parent: BaseItem
+  components:
+  - type: Sprite
+    sprite: _Orehum/Objects/Tools/portableReagentGrinder.rsi
+    state: icon
+  - type: Item
+    size: Small
+  - type: ReagentGrinder
+  - type: ActivatableUI
+    key: enum.ReagentGrinderUiKey.Key
+  - type: UserInterface
+    interfaces:
+      enum.ReagentGrinderUiKey.Key:
+        type: ReagentGrinderBoundUserInterface
+  - type: ApcPowerReceiver
+    powerLoad: 0
+  - type: LightningTarget
+    priority: 0
+  - type: ItemSlots
+    slots:
+      beakerSlot:
+        whitelist:
+          components:
+          - FitsInDispenser
+  - type: ContainerContainer
+    containers:
+      beakerSlot: !type:ContainerSlot
+      inputContainer: !type:Container
+      machine_board: !type:Container
+      machine_parts: !type:Container
+

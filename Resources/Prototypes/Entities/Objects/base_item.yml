@@ -160,30 +160,30 @@
   parent: BaseItem
   abstract: true
   components:
-  - type: Storage
-  - type: UserInterface
-    interfaces:
-      enum.StorageUiKey.Key:
-        type: StorageBoundUserInterface
-  - type: ContainerContainer
-    containers:
-      storagebase: !type:Container
-        ents: []
+    - type: Storage
+    - type: UserInterface
+      interfaces:
+        enum.StorageUiKey.Key:
+          type: StorageBoundUserInterface
+    - type: ContainerContainer
+      containers:
+        storagebase: !type:Container
+          ents: []
 
 - type: entity
   id: BaseBagOpenClose
   abstract: true
   components:
-  - type: Appearance
-  - type: GenericVisualizer
-    visuals:
-      enum.SharedBagOpenVisuals.BagState: # You don't have to use both of these if its not necessary.
-        closeLayer:
-          Open: { visible: false }
-          Closed: { visible: true }
-        openLayer:
-          Open: { visible: true }
-          Closed: { visible: false }
+    - type: Appearance
+    - type: GenericVisualizer
+      visuals:
+        enum.SharedBagOpenVisuals.BagState: # You don't have to use both of these if its not necessary.
+          closeLayer:
+            Open: { visible: false }
+            Closed: { visible: true }
+          openLayer:
+            Open: { visible: true }
+            Closed: { visible: false }
 
 # PowerCellSlot parents
 - type: entity
@@ -192,7 +192,7 @@
   components:
     - type: ContainerContainer
       containers:
-        cell_slot: !type:ContainerSlot { }
+        cell_slot: !type:ContainerSlot {}
     - type: PowerCellSlot
       cellSlotId: cell_slot
     - type: ItemSlots
@@ -207,7 +207,7 @@
   components:
     - type: ContainerContainer
       containers:
-        cell_slot: !type:ContainerSlot { }
+        cell_slot: !type:ContainerSlot {}
     - type: PowerCellSlot
       cellSlotId: cell_slot
     - type: ItemSlots
@@ -222,7 +222,7 @@
   components:
     - type: ContainerContainer
       containers:
-        cell_slot: !type:ContainerSlot { }
+        cell_slot: !type:ContainerSlot {}
     - type: PowerCellSlot
       cellSlotId: cell_slot
     - type: ItemSlots

@@ -126,40 +126,39 @@
   abstract: true
   description: Mobs without physical bodies
   components:
-  - type: Sprite
-    noRot: true
-    overrideContainerOcclusion: true # Always show up regardless of where they're contained.
-    drawdepth: Ghosts
-  - type: FTLSmashImmune
-  - type: CargoSellBlacklist
-  - type: MovementSpeedModifier
-    baseSprintSpeed: 12
-    baseWalkSpeed: 8
-  - type: MovementIgnoreGravity
-  - type: Physics
-    bodyType: KinematicController
-    bodyStatus: InAir
-  - type: CanMoveInAir
-  - type: Fixtures
-    fixtures:
-      fix1:
-        shape:
-          !type:PhysShapeCircle
-          radius: 0.35
-        density: 15
-        layer:
-        - GhostImpassable
+    - type: Sprite
+      noRot: true
+      overrideContainerOcclusion: true # Always show up regardless of where they're contained.
+      drawdepth: Ghosts
+    - type: FTLSmashImmune
+    - type: CargoSellBlacklist
+    - type: MovementSpeedModifier
+      baseSprintSpeed: 12
+      baseWalkSpeed: 8
+    - type: MovementIgnoreGravity
+    - type: Physics
+      bodyType: KinematicController
+      bodyStatus: InAir
+    - type: CanMoveInAir
+    - type: Fixtures
+      fixtures:
+        fix1:
+          shape: !type:PhysShapeCircle
+            radius: 0.35
+          density: 15
+          layer:
+            - GhostImpassable
 
 # shared parent between aghosts, replay spectators and normal observers
 - type: entity
   parent:
-  - Incorporeal
-  - BaseMob
+    - Incorporeal
+    - BaseMob
   id: MobObserverBase
   abstract: true
   name: observer
   description: Boo!
-  categories: [ HideSpawnMenu ]
+  categories: [HideSpawnMenu]
   components:
   - type: Sprite
     sprite: Mobs/Ghosts/ghost_human.rsi

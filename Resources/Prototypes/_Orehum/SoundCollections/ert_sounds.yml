@@ -1,0 +1,7 @@
+- type: soundCollection
+  id: SoldierDeath
+  files:
+  - /Audio/_Orehum/Effects/ERT/death1.ogg
+  - /Audio/_Orehum/Effects/ERT/death2.ogg
+  - /Audio/_Orehum/Effects/ERT/death3.ogg
+  - /Audio/_Orehum/Effects/ERT/death4.ogg

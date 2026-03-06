@@ -76,6 +76,8 @@
         mask:
         - ItemMask
   - type: Appearance
+  - type: StealTarget
+    stealGroup: Cash
   # <Goobstation>
   - type: Flammable # it's about sending a message
     fireSpread: true

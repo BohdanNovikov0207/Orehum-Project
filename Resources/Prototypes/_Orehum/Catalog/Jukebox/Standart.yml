@@ -1,0 +1,365 @@
+- type: jukebox
+  id: burnitdown
+  name: Linkin Park - Burn It Down
+  path:
+    path: /Audio/_Orehum/Jukebox/BurnItDown.ogg
+
+- type: jukebox
+  id: newdivide
+  name: Linkin Park - New Divide
+  path:
+    path: /Audio/_Orehum/Jukebox/NewDivide.ogg
+
+- type: jukebox
+  id: crazysweet
+  name: Павел Пламенев - За седьмым перевалом
+  path:
+    path: /Audio/_Orehum/Jukebox/SweetFlower.ogg
+
+- type: jukebox
+  id: backinblack
+  name: AC/DC - Back in Black
+  path:
+    path: /Audio/_Orehum/Jukebox/BackInBlack.ogg
+
+- type: jukebox
+  id: themanwho
+  name: Nirvana - The Man Who Sold The World
+  path:
+    path: /Audio/_Orehum/Jukebox/TheManWho.ogg
+
+- type: jukebox
+  id: solidersad
+  name: Kukryniksy - Солдатская печаль
+  path:
+    path: /Audio/_Orehum/Jukebox/SoliderSad.ogg
+
+- type: jukebox
+  id: wenotangels
+  name: Алекйсей Пономарев - Мы не ангелы, парень
+  path:
+    path: /Audio/_Orehum/Jukebox/WeNotAngels.ogg
+
+- type: jukebox
+  id: likeonwar
+  name: Агата Кристи - Как на Войне
+  path:
+    path: /Audio/_Orehum/Jukebox/KakNaWar.ogg
+
+- type: jukebox
+  id: iwasmadelove
+  name: Kiss - I Was Made For Lovin' you
+  path:
+    path: /Audio/_Orehum/Jukebox/KISS.ogg
+
+- type: jukebox
+  id: avcehyegonet
+  name: НАИВ - А в цеху его нет
+  path:
+    path: /Audio/_Orehum/Jukebox/avcehyegonet.ogg
+
+- type: jukebox
+  id: sweetgreen
+  name: Barrelhouse - Sweet Ginder Green
+  path:
+    path: /Audio/_Orehum/Jukebox/SweetGreen.ogg
+
+- type: jukebox
+  id: sixteentons
+  name: Tennessee - Sixteen Tons
+  path:
+    path: /Audio/_Orehum/Jukebox/SixteenTons.ogg
+
+- type: jukebox
+  id: letitsnow
+  name: Frank Sinatra - Let It Snow!
+  path:
+    path: /Audio/_Orehum/Jukebox/LetItSnow.ogg
+
+- type: jukebox
+  id: becauseigothigh
+  name: Afroman - Because I Got High
+  path:
+    path: /Audio/_Orehum/Jukebox/Afroman-Because-I-Got-High.ogg
+
+- type: jukebox
+  id: billiejean
+  name: Michael Jackson - Billie Jean
+  path:
+    path: /Audio/_Orehum/Jukebox/Michael-Jackson-Billie-Jean.ogg
+
+- type: jukebox
+  id: bluemoon
+  name: Frank Sinatra - Blue Moon
+  path:
+    path: /Audio/_Orehum/Jukebox/bluemoon.ogg
+
+- type: jukebox
+  id: boomboomboomboom
+  name: Vengaboys - Boom, Boom, Boom, Boom
+  path:
+    path: /Audio/_Orehum/Jukebox/bombom.ogg
+
+- type: jukebox
+  id: californiasun
+  name: The Rivieras - California Sun
+  path:
+    path: /Audio/_Orehum/Jukebox/califsun.ogg
+
+- type: jukebox
+  id: caramelldansen
+  name: Caramella Girls - Caramelldansen
+  path:
+    path: /Audio/_Orehum/Jukebox/Caramelldansen.ogg
+
+- type: jukebox
+  id: comeasyouare
+  name: Nirvana - Come As You Are
+  path:
+    path: /Audio/_Orehum/Jukebox/Nirvana-Come-As-You-Are.ogg
+
+- type: jukebox
+  id: crystalsS
+  name: M.O.O.N. - Crystals
+  path:
+    path: /Audio/_Orehum/Jukebox/crystals.ogg
+
+- type: jukebox
+  id: darknight
+  name: Soviet - Тёмная ночь
+  path:
+    path: /Audio/_Orehum/Jukebox/Soviet-WW2.ogg
+
+- type: jukebox
+  id: disco
+  name: Surf Curse - Disco
+  path:
+    path: /Audio/_Orehum/Jukebox/Surf-Curse-Disco.ogg
+
+- type: jukebox
+  id: dontworrybehappy
+  name: Bobby McFerrin - Don't Worry Be Happy
+  path:
+    path: /Audio/_Orehum/Jukebox/dontworrybehappy.ogg
+
+- type: jukebox
+  id: fairytale
+  name: Alexander Rybak - Fairytale
+  path:
+    path: /Audio/_Orehum/Jukebox/fairytale.ogg
+
+- type: jukebox
+  id: feelgood
+  name: Gorillaz - Feel Good
+  path:
+    path: /Audio/_Orehum/Jukebox/Gorilla-Feel-Good-Inc.ogg
+
+- type: jukebox
+  id: fine
+  name: Lemon Demon - Fine
+  path:
+    path: /Audio/_Orehum/Jukebox/Fine.ogg
+
+- type: jukebox
+  id: franticaerovics
+  name: Hotline Miami 2 - Frantic Aerobics
+  path:
+    path: /Audio/_Orehum/Jukebox/Hotline-Miami-2-Frantic-Aerobics.ogg
+
+- type: jukebox
+  id: freaks
+  name: Surf Curse - Freaks
+  path:
+    path: /Audio/_Orehum/Jukebox/Surf-Curse-Freaks.ogg
+
+- type: jukebox
+  id: heartshapedbox
+  name: Nirvana - Heart-Shaped Box
+  path:
+    path: /Audio/_Orehum/Jukebox/heartbox.ogg
+
+- type: jukebox
+  id: invisibleS
+  name: Duran Duran - INVISIBLE
+  path:
+    path: /Audio/_Orehum/Jukebox/invisible.ogg
+
+- type: jukebox
+  id: lifeonmars
+  name: David Bowie - Life On Mars?
+  path:
+    path: /Audio/_Orehum/Jukebox/mars.ogg
+
+- type: jukebox
+  id: lightthatnevercomes
+  name: Linkin Park x Steve Aoki - Light That Never Comes
+  path:
+    path: /Audio/_Orehum/Jukebox/lightthatnevercomes.ogg
+
+- type: jukebox
+  id: neverfadeaway
+  name: SAMURAI - Never Fade Away
+  path:
+    path: /Audio/_Orehum/Jukebox/neverfadeaway.ogg
+
+- type: jukebox
+  id: nightcall
+  name: Kavinsky - Night Call
+  path:
+    path: /Audio/_Orehum/Jukebox/Kavinsky-Nightcall.ogg
+
+- type: jukebox
+  id: overdose
+  name: Katana ZERO - Overdose
+  path:
+    path: /Audio/_Orehum/Jukebox/Overdose.ogg
+
+- type: jukebox
+  id: paintitblack
+  name: The Roling Stones - Paint It Black
+  path:
+    path: /Audio/_Orehum/Jukebox/Paint-It-Black.ogg
+
+- type: jukebox
+  id: paranoid
+  name: BLACK SABBATH - Paranoid
+  path:
+    path: /Audio/_Orehum/Jukebox/BLACK-SABBATH.ogg
+
+- type: jukebox
+  id: peoplearestrange
+  name: The Doors - People Are Strange
+  path:
+    path: /Audio/_Orehum/Jukebox/pplrstrange.ogg
+
+- type: jukebox
+  id: plastinki
+  name: Дурной вкус - Пластинки
+  path:
+    path: /Audio/_Orehum/Jukebox/plastinki.ogg
+
+- type: jukebox
+  id: rassvet
+  name: Какая разница - Рассвет
+  path:
+    path: /Audio/_Orehum/Jukebox/rassvet.ogg
+
+- type: jukebox
+  id: run
+  name: Hotline Miami 2 - Run
+  path:
+    path: /Audio/_Orehum/Jukebox/Hotline-Miami-2-Run.ogg
+
+- type: jukebox
+  id: september
+  name: Earth, Wind & Fire - September
+  path:
+    path: /Audio/_Orehum/Jukebox/september.ogg
+
+- type: jukebox
+  id: smellsliketeenspirit
+  name: Nirvana - Smells Like Teen Spirit
+  path:
+    path: /Audio/_Orehum/Jukebox/Nirvana-Smells-Like-Teen-Spirit.ogg
+
+- type: jukebox
+  id: spaceoddity
+  name: David Bowie - Space Oddity
+  path:
+    path: /Audio/_Orehum/Jukebox/spaceoddity.ogg
+
+- type: jukebox
+  id: steponme
+  name: The Cardigans - Step On Me
+  path:
+    path: /Audio/_Orehum/Jukebox/steponme.ogg
+
+- type: jukebox
+  id: thebidding
+  name: Tally Hall - The Bidding
+  path:
+    path: /Audio/_Orehum/Jukebox/thebidding.ogg
+
+- type: jukebox
+  id: whereismymind
+  name: Pixies - Where Is My Mind
+  path:
+    path: /Audio/_Orehum/Jukebox/Pixies-Where-Is-My-Mind.ogg
+
+- type: jukebox
+  id: worldssmallestviolin
+  name: AJR - World's Smallest Violin
+  path:
+    path: /Audio/_Orehum/Jukebox/WSV.ogg
+
+- type: jukebox
+  id: 505AM
+  name: Arctic Monkeys - 505
+  path:
+    path: /Audio/_Orehum/Jukebox/505.ogg
+
+- type: jukebox
+  id: paidtoparty
+  name: Party Hard - Paid to Party
+  path:
+    path: /Audio/_Orehum/Jukebox/Paid-To-Party.ogg
+
+- type: jukebox
+  id: partykiller
+  name: Party Hard - Party Killer
+  path:
+    path: /Audio/_Orehum/Jukebox/Party-Killer.ogg
+
+- type: jukebox
+  id: phlucky
+  name: Party Hard - Lucky
+  path:
+    path: /Audio/_Orehum/Jukebox/PHLucky.ogg
+
+- type: jukebox
+  id: harddrive
+  name: Griffinilla - Hard Drive
+  path:
+    path: /Audio/_Orehum/Jukebox/HARD-DRIVE.ogg
+
+- type: jukebox
+  id: badboys
+  name: BadBoysOfReggae - Bad Boys
+  path:
+    path: /Audio/_Orehum/Jukebox/BadBoys.ogg
+
+- type: jukebox
+  id: tfptows
+  name: The Stupendium - The Fine Print
+  path:
+    path: /Audio/_Orehum/Jukebox/TFPTOWS.ogg
+
+- type: jukebox
+  id: myway
+  name: Frank Sinatra - My Way
+  path:
+    path: /Audio/_Orehum/Jukebox/MyWay.ogg
+
+- type: jukebox
+  id: sweetd
+  name: Klass - Sweer Dreams
+  path:
+    path: /Audio/_Orehum/Jukebox/sweetD.ogg
+
+- type: jukebox
+  id: numa
+  name: O-Zone - Dragostea Din Tei
+  path:
+    path: /Audio/_Orehum/Jukebox/numa.ogg
+
+- type: jukebox
+  id: deviltown
+  name: cavetown - Devil Town
+  path:
+    path: /Audio/_Orehum/Jukebox/deviltown.ogg
+
+- type: jukebox
+  id: syt
+  name: The Weeknd - Save Your Tears
+  path:
+    path: /Audio/_Orehum/Jukebox/SYT.ogg

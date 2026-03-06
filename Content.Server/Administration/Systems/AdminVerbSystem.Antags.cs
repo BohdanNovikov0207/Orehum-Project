@@ -83,6 +83,8 @@
 
 using Content.Server._Goobstation.Wizard.Components;
 using Content.Server._DV.CosmicCult.Components; // DeltaV
+using Content.Server._Orehum.GameTicking.Components;
+using Content.Server._Orehum.GameTicking.Rules;
 using Content.Server.Antag;
 using Content.Server.GameTicking;
 using Content.Server.GameTicking.Rules.Components;
@@ -112,6 +114,8 @@ public sealed partial class AdminVerbSystem
     private static readonly EntProtoId DefaultNukeOpRule = "LoneOpsSpawn";
     private static readonly EntProtoId DefaultRevsRule = "Revolutionary";
     private static readonly EntProtoId DefaultThiefRule = "Thief";
+    private static readonly EntProtoId DefaultArmsDealerRule = "ArmsDealer";
+
     private static readonly ProtoId<StartingGearPrototype> PirateGearId = "PirateGear";
 
     private static readonly EntProtoId ParadoxCloneRuleId = "ParadoxCloneSpawn";
@@ -310,5 +314,20 @@ public sealed partial class AdminVerbSystem
         };
         args.Verbs.Add(cosmiccult);
         // End DeltaV Additions
+
+        var armsDealerName = Loc.GetString("admin-verb-make-arms-dealer");
+        Verb armsDealer = new()
+        {
+            Text = armsDealerName,
+            Category = VerbCategory.Antag,
+            Icon = new SpriteSpecifier.Rsi(new ResPath("/Textures/Objects/Weapons/Guns/Pistols/mk58.rsi"), "icon"),
+            Act = () =>
+            {
+                _antag.ForceMakeAntag<ArmsDealerRuleComponent>(targetPlayer, DefaultArmsDealerRule);
+            },
+            Impact = LogImpact.High,
+            Message = string.Join(": ", armsDealerName, Loc.GetString("admin-verb-make-arms-dealer")),
+        };
+        args.Verbs.Add(armsDealer);
     }
 }
