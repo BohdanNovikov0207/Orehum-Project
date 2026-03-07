@@ -594,6 +594,11 @@ public enum LogType
     ShuttleImpact = 102,
 
     /// <summary>
+    /// Events related to players connecting/disconnecting.
+    /// </summary>
+    Connection = 104,
+
+    /// <summary>
     /// Events relating to midi playback.
     /// </summary>
     Instrument = 103,

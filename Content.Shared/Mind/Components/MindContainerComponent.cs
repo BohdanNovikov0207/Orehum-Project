@@ -81,6 +81,12 @@ public sealed partial class MindContainerComponent : Component
     [ViewVariables(VVAccess.ReadWrite)]
     [DataField("ghostOnShutdown")]
     public bool GhostOnShutdown { get; set; } = true;
+
+    /// <summary>
+    ///     Psionics: The first mind to control this mob. Will only be null if the mob never had a mind at all.
+    /// </summary>
+    [DataField, AutoNetworkedField]
+    public EntityUid? OriginalMind;
 }
 
 public abstract class MindEvent : EntityEventArgs
