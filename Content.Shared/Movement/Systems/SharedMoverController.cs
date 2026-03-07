@@ -109,6 +109,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
+using Content.Shared._ES.Viewcone;
 using Content.Shared.ActionBlocker;
 using Content.Shared.CCVar;
 using Content.Shared.Friction;
@@ -164,6 +165,9 @@ public abstract partial class SharedMoverController : VirtualController
     [Dependency] private   readonly SharedInteractionSystem _interaction = default!; // Tile Movement Change
     [Dependency] private   readonly StandingStateSystem _standing = default!; // Goobstation - kil mofs
     [Dependency] private   readonly CommonMomentumSteeringSystem _momentumSteering = default!; // Goobstation - momentum steering
+    // ES START
+    [Dependency] private   readonly ESViewconeEffectSystem _viewconeEffect = default!;
+    // ES END
 
     protected EntityQuery<CanMoveInAirComponent> CanMoveInAirQuery;
     protected EntityQuery<FootstepModifierComponent> FootstepModifierQuery;
@@ -185,6 +189,10 @@ public abstract partial class SharedMoverController : VirtualController
     protected EntityQuery<FixturesComponent> FixturesQuery; // Tile Movement Change
     protected EntityQuery<TileMovementComponent> TileMovementQuery; // Tile Movement Change
     protected EntityQuery<MomentumSteeringComponent> MomentumSteeringQuery; // Goobstation - momentum steering
+
+    // ES START
+    private static readonly EntProtoId ESFootstepViewconeEffect = "ESViewconeEffectFootstep";
+    // ES END
 
     private bool _relativeMovement;
     private float _minDamping;
@@ -350,6 +358,24 @@ public abstract partial class SharedMoverController : VirtualController
         float accel;
         Vector2 wishDir;
         var velocity = physicsComponent.LinearVelocity;
+        var worldRot = _transform.GetWorldRotation(xform);
+        bool forceWalk = false;
+
+        // ES START
+        // if facing backwards, start walking
+        // only applies in the non-weightless path
+        {
+            var backwardsAngle = moveSpeedComponent?.BackwardsAngle ??
+                MovementSpeedModifierComponent.ESDefaultBackwardsAngle;
+            var rotNorm = worldRot.ToWorldVec().Normalized();
+            var velNorm = velocity.Normalized();
+            var cosAngle = Vector2.Dot(velNorm, rotNorm);
+            var threshold = new Angle(MathF.PI) - (backwardsAngle / 2);
+
+            forceWalk = cosAngle < Math.Cos(threshold.Theta);
+            //wishDir = AssertValidWish(mover, walkSpeed, sprintSpeed, forceWalk);
+        }
+        // ES END
 
         // Get current tile def for things like speed/friction mods
         ContentTileDefinition? tileDef = null;
@@ -501,12 +527,12 @@ public abstract partial class SharedMoverController : VirtualController
             {
                 // TODO apparently this results in a duplicate move event because "This should have its event run during
                 // island solver"??. So maybe SetRotation needs an argument to avoid raising an event?
-                var worldRot = _transform.GetWorldRotation(xform);
 
                 _transform.SetLocalRotation(uid, xform.LocalRotation + wishDir.ToWorldAngle() - worldRot, xform);
             }
 
             if (!weightless && MobMoverQuery.TryGetComponent(uid, out var mobMover) &&
+                mover.Sprinting && !forceWalk &&
                 TryGetSound(weightless, uid, mover, mobMover, xform, out var sound, tileDef: tileDef))
             {
                 var soundModifier = mover.Sprinting ? 3.5f : 1.5f;
@@ -524,6 +550,9 @@ public abstract partial class SharedMoverController : VirtualController
                 {
                     _audio.PlayPredicted(sound, uid, uid, audioParams);
                 }
+                // ES START
+                _viewconeEffect.SpawnEffect(uid, ESFootstepViewconeEffect, wishDir.ToWorldAngle());
+                // ES END
             }
         }
     }
@@ -790,9 +819,11 @@ public abstract partial class SharedMoverController : VirtualController
         return sound != null;
     }
 
-    private Vector2 AssertValidWish(InputMoverComponent mover, float walkSpeed, float sprintSpeed)
+
+
+    private Vector2 AssertValidWish(InputMoverComponent mover, float walkSpeed, float sprintSpeed, bool forceWalk=false)
     {
-        var (walkDir, sprintDir) = GetVelocityInput(mover);
+        var (walkDir, sprintDir) = GetVelocityInput(mover, forceWalk);
 
         var total = walkDir * walkSpeed + sprintDir * sprintSpeed;
 

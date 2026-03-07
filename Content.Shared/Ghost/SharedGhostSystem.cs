@@ -247,7 +247,9 @@ namespace Content.Shared.Ghost
     /// A client to server request for their ghost to be warped to the most followed entity.
     /// </summary>
     [Serializable, NetSerializable]
-    public sealed class GhostnadoRequestEvent : EntityEventArgs;
+    public sealed class GhostnadoRequestEvent : EntityEventArgs
+    {
+    }
 
     /// <summary>
     /// A client to server request for their ghost to return to body

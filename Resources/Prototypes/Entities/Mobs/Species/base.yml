@@ -257,6 +257,7 @@
   - MobPolymorphable
   - MobCombat
   - StripableInventoryBase
+  - ESBaseMob
   id: BaseMobSpecies
   abstract: true
   components:

@@ -4,7 +4,6 @@ guide-entry-rules-nrp = НРП правила
 # Goob SOP
 # - Основные справочники
 guide-entry-sop = СРП
-guide-entry-sm = Двигатель Суперматерии
 guide-entry-automation = Автоматизация
 guide-entry-sop-alert-levels = Коды станции
 guide-entry-sop-emergencies = Чрезвычайные ситуации

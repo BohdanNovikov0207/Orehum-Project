@@ -32,6 +32,7 @@
   parent:
   - BaseMob
   - MobDamageable
+  - ESBaseMob
   - MobAtmosExposed
   - MobCombat
   abstract: true
