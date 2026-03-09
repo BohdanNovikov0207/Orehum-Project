@@ -189,12 +189,6 @@
   artist: Cheeki
 
 - type: lobbyBackground
-  id: grandtheftgoob
-  background: /Textures/LobbyScreens/grandtheftgoob.webp
-  name: Grand Theft Goob
-  artist: Piras314
-
-- type: lobbyBackground
   id: greytideworldwide
   background: /Textures/LobbyScreens/greytideworldwide.webp
   name: Greytide Worldwide

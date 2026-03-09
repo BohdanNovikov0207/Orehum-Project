@@ -33,6 +33,7 @@ public sealed partial class GhostGui : UIWidget
     public event Action? RequestWarpsPressed;
     public event Action? ReturnToBodyPressed;
     public event Action? GhostRolesPressed;
+    public event Action? ReturnToRoundPressed; // WD EDIT
     private int _prevNumberRoles;
 
     public GhostGui()
@@ -47,6 +48,7 @@ public sealed partial class GhostGui : UIWidget
         ReturnToBodyButton.OnPressed += _ => ReturnToBodyPressed?.Invoke();
         GhostRolesButton.OnPressed += _ => GhostRolesPressed?.Invoke();
         GhostRolesButton.OnPressed += _ => GhostRolesButton.StyleClasses.Remove(StyleBase.ButtonCaution);
+        ReturnToRound.OnPressed += _ => ReturnToRoundPressed?.Invoke(); // WD EDIT
     }
 
     public void Hide()

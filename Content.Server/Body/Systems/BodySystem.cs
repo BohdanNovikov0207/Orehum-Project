@@ -130,7 +130,7 @@ public sealed partial class BodySystem : SharedBodySystem // Shitmed change: mad
 
         if (_mobState.IsDead(ent) && _mindSystem.TryGetMind(ent, out var mindId, out var mind))
         {
-            mind.TimeOfDeath ??= _gameTiming.RealTime;
+            mind.TimeOfDeath ??= _gameTiming.CurTime;
             _ghostSystem.OnGhostAttempt(mindId, canReturnGlobal: true, mind: mind);
         }
     }

@@ -147,6 +147,7 @@ public sealed class GhostUIController : UIController, IOnSystemChanged<GhostSyst
         Gui.ReturnToBodyPressed += ReturnToBody;
         Gui.GhostRolesPressed += GhostRolesPressed;
         Gui.TargetWindow.WarpClicked += OnWarpClicked;
+        Gui.ReturnToRoundPressed += ReturnToRound; // WD EDIT
         Gui.TargetWindow.OnGhostnadoClicked += OnGhostnadoClicked;
 
         UpdateGui();
@@ -161,6 +162,7 @@ public sealed class GhostUIController : UIController, IOnSystemChanged<GhostSyst
         Gui.ReturnToBodyPressed -= ReturnToBody;
         Gui.GhostRolesPressed -= GhostRolesPressed;
         Gui.TargetWindow.WarpClicked -= OnWarpClicked;
+        Gui.ReturnToRoundPressed -= ReturnToRound; // WD EDIT
 
         Gui.Hide();
     }
@@ -168,6 +170,11 @@ public sealed class GhostUIController : UIController, IOnSystemChanged<GhostSyst
     private void ReturnToBody()
     {
         _system?.ReturnToBody();
+    }
+
+    private void ReturnToRound() // WD EDIT
+    {
+        _system?.ReturnToRound();
     }
 
     private void RequestWarps()
