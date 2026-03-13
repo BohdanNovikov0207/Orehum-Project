@@ -231,10 +231,10 @@ namespace Content.Shared.GameTicking
 
             public string Role;
 
-            [DataField, NonSerialized]
+            [DataField] // Trauma - make it not NonSerialized
             public string[] JobPrototypes;
 
-            [DataField, NonSerialized]
+            [DataField] // Trauma - make it not NonSerialized (wtf?)
             public string[] AntagPrototypes;
 
             public NetEntity? PlayerNetEntity;
