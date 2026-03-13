@@ -7,6 +7,7 @@
     stampedName: stamp-component-stamped-name-nanorep
     stampedColor: "#2ec69b"
     stampState: "paper_stamp-nanorep"
+    stampLargeIcon: "large_stamp-centcom"
   - type: Sprite
     sprite: _Goobstation/Objects/Misc/stamps.rsi
     state: stamp-nanorep

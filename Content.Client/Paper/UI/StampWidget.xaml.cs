@@ -12,7 +12,7 @@ namespace Content.Client.Paper.UI;
 [GenerateTypedNameReferences]
 public sealed partial class StampWidget : PanelContainer
 {
-    private StyleBoxTexture _borderTexture;
+    private StyleBoxTexture? _borderTexture;
     private ShaderInstance? _stampShader;
 
     public float Orientation
@@ -23,9 +23,35 @@ public sealed partial class StampWidget : PanelContainer
 
     public StampDisplayInfo StampInfo {
         set {
-            StampedByLabel.Text = Loc.GetString(value.StampedName);
-            StampedByLabel.FontColorOverride = value.StampedColor;
-            ModulateSelfOverride = value.StampedColor;
+            // Goobstation - start
+
+           // StampedByLabel.Text = Loc.GetString(value.StampedName);
+           // StampedByLabel.FontColorOverride = value.StampedColor;
+           // ModulateSelfOverride = value.StampedColor;
+
+           var icon = value.StampLargeIcon;
+           if (icon != null)
+           {
+               var resCache = IoCManager.Resolve<IResourceCache>();
+               var borderImage = resCache.GetResource<TextureResource>(
+                   "/Textures/_Goobstation/Interface/Paper/Stamps/" + icon + ".png");
+
+               _borderTexture = new StyleBoxTexture { Texture = borderImage };
+               PanelOverride = _borderTexture;
+
+               // make stamps 50% larger to better match the original stamp sizes
+               var width = (int)(borderImage.Texture.Width * 1.5);
+               var height = (int)(borderImage.Texture.Height * 1.5);
+               SetSize = new Vector2(width, height);
+           }
+
+           else
+           {
+               StampedByLabel.Text = Loc.GetString(value.StampedName);
+               StampedByLabel.FontColorOverride = value.StampedColor;
+               ModulateSelfOverride = value.StampedColor;
+           }
+           //Goobstation  - end
         }
     }
 
