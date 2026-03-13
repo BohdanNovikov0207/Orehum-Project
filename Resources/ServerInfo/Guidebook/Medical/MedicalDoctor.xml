@@ -1,41 +1,50 @@
+<!--
+SPDX-FileCopyrightText: 2023 Sir Winters <7543955+Owai-Seek@users.noreply.github.com>
+SPDX-FileCopyrightText: 2023 end <72604018+laok233@users.noreply.github.com>
+SPDX-FileCopyrightText: 2024 UBlueberry <161545003+UBlueberry@users.noreply.github.com>
+SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
+
+SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+
 <Document>
-# Врач
-Время лечить. Или хотя бы попытаться. Врачи — главные по всем «ай-ай» и «ой-ой» на станции, от мелкой царапины до сваренного кипятком эпидермиса.
+# Medical Doctor
+It's time to heal. Or at least, try to heal, anyway. Medical Doctors are the primary caretakers of every boo boo and ouchie crewmembers get on the station, be it a small scratch, or boiled skin.
 
-Это руководство даёт базовый обзор доступных вариантов лечения, принципов сортировки и других методов помощи.
+This guide will give you a basic outline of the treatment options you have available, triage, and other avenues of care.
 
-## Основы
-Есть два способа понять, что именно беспокоит пациента: сделать скан (анализатором здоровья или медицинским КПК) или осмотреть его — Shift-клик и нажатие на значок сердца.
+## The Basics
+There are two ways to tell what's ailing someone: Taking a scan (with a health analyzer or a medical PDA), or examining them, with a shift-click, and clicking the heart symbol.
 
-Лучше делать и то и другое, когда возможно: часть проблем (например, отравление или радиация) не видна при осмотре, а другие (например, уровень крови) не показывает анализатор.
+Using a health analyzer is often more powerful than examination, as some things (such as poison, or radiation) don't show up on examination. However, using an analyzer has its drawbacks, as it makes noise and uses up a battery.
 <Box>
-<GuideEntityEmbed Entity="SignExamroom" Caption="осмотр пациента"/>
+<GuideEntityEmbed Entity="SignExamroom" Caption="examine patient"/>
 <GuideEntityEmbed Entity="MedicalPDA"/>
-<GuideEntityEmbed Entity="MedicalInternPDA" Caption="КПК интерна"/>
+<GuideEntityEmbed Entity="MedicalInternPDA" Caption="intern PDA"/>
 <GuideEntityEmbed Entity="HandheldHealthAnalyzer"/>
 </Box>
 
-## Лекарства и варианты лечения
-Прежде чем идти дальше, коротко о типах урона и о том, что их лечит. На вики — подробнее, здесь перечислено самое ходовое.
+## Medication and Treatment Options
+Before we go any further, it's probably a good idea to go over damage types, and what will heal them. The wiki has more extensive info available, but these are commonly used.
 
-Важный момент: у большинства препаратов есть порог передозировки, превышение которого навредит пациенту. Таблетки действуют с задержкой из‑за метаболизма; если нужно быстро — используйте шприц.
+An important note: Most medication has an overdose level, which will cause harm to your patient. Chemicals also take time to metabolise in pill form, if you want things to act quickly, use a syringe.
 
-- Урон по телу (brute): Bicaridine или наборы Bruise Pack
-- Ожоги (burn): Dermaline или Ointment
-- Токсины (яд): Dylovene
-- Токсины (радиация): Hyronalin или Arithrazine
-- Недостаток воздуха (airloss): Dexaline или Inaprovaline
-- Потеря крови: Dexaline (Осмотрите пациента: если бледный — всё ещё требуется кровь или железо.)
-- Кровотечение: Tranexamic acid и Gauze (Кровотечение также можно прижечь, нанеся ожог.)
+- Brute Damage: Bicaridine or Bruise Packs
+- Burn Damage: Dermaline or Ointment
+- Toxin (Poison): Dylovene
+- Toxin (Radiation) Hyronalin or Arithrazine
+- Airloss: Dexaline or Inaprovaline
+- Bloodloss: Dexaline (Examine the patient, if pale, they still need blood or iron.)
+- Bleeding: Tranexamic acid and Gauze (Bleeding can also be cauterized with burn damage.)
 
-Во многих отсеках на складе есть готовые наборы, а у всех медиков в стартовом поясе — базовое снаряжение.
+Many stations are stocked with kits in storage, and all medics have some equipment in their starting belt.
 
 <Box>
 <GuideEntityEmbed Entity="MedkitFilled"/>
-<GuideEntityEmbed Entity="MedkitBruteFilled" Caption="набор от травм"/>
-<GuideEntityEmbed Entity="MedkitRadiationFilled" Caption="набор от радиации"/>
-<GuideEntityEmbed Entity="MedkitBurnFilled" Caption="набор от ожогов"/>
-<GuideEntityEmbed Entity="MedkitToxinFilled" Caption="набор от токсинов"/>
+<GuideEntityEmbed Entity="MedkitBruteFilled" Caption="brute kit"/>
+<GuideEntityEmbed Entity="MedkitRadiationFilled" Caption="radiation kit"/>
+<GuideEntityEmbed Entity="MedkitBurnFilled" Caption="burn kit"/>
+<GuideEntityEmbed Entity="MedkitToxinFilled" Caption="toxin kit"/>
 </Box>
 
 <Box>
@@ -46,24 +55,27 @@
 <GuideEntityEmbed Entity="Gauze"/>
 </Box>
 
-## Базовое лечение и сортировка
-Осмотрите пациента и зафиксируйте важные детали: жив ли, кровоточит ли, какой тип урона.
+## Basic Treatment and Triage
+Examine your patient, and note down the important details: Are they alive? Bleeding? What type of damage?
 
-Если жив — лечите максимально эффективно. Критическое состояние — при 100 единицах урона, смерть — при 200. Учитывайте это при выборе тактики. Экстренные автоинъекторы и эпинефрин часто используются для стабилизации.
+If alive, treat them as best as you can. Patients are in critical condition at 100 damage, and dead at 200. Keep this in mind when choosing how to treat them. Emergency Pens and Epinephrine are often used to keep patients stable.
 
-Если нужно время на лечение, пристегните пациента к медицинской койке, а при необходимости — к стазис-койке. Помните: на стазисе метаболизм (и, соответственно, действие лекарств) почти замирает, поэтому для эффекта их придётся снимать со стазиса. (Зато пакеты крови, мазь и наборы от травм работают как обычно.)
+If possible, buckle them to a medical bed, if you need time to treat them, strap them to a stasis bed instead. Just keep in mind that metabolism (and by extension, healing chemicals) are slowed to a crawl when on stasis, they'll need to be taken off of it for the medicine to be effective. (But Blood Packs, Ointment, and Brute packs all work as normal.)
 <Box>
 <GuideEntityEmbed Entity="MedicalBed"/>
 <GuideEntityEmbed Entity="StasisBed"/>
 </Box>
-## Смерть и реанимация
-Спасти всех нельзя — иногда смерть неизбежна. В зависимости от состояния тела, наличия «души» и степени разложения возможны разные варианты.
+## Assessing Corpses
+You can't save them all, sometimes, death happens. Depending on the [color=#a4885c]status[/color] of the body, there are a few things that can be done.
 
-1. Есть ли «душа»? При осмотре это видно по фразе: «Их душа покинула тело». Если её нет, можно поместить тело в холодильник морга или переработать на биомассу.
+1. Do they have a soul attached? You can tell if, when examining, the following phrase is displayed: "Their soul has departed." If this isn't displayed, there is still a player who can be revived.
 
-2. Тело гниёт? Если да, увы — поможет только клонирование. Разложившееся тело дефибриллятором не вернуть к жизни. (См. «Клонирование».)
+2. Is the body rotting? If it is, sadly, they'll have to be cloned. A rotting body can't be brought back with a defibrillator. (See Cloning)
 
-3. Если душа есть и тело не гнилое — реанимация возможна. Без учёта «airloss» дефибриллятором можно оживить при общем уроне меньше 200. Химикаты в мёртвом теле не метаболизируются, но наборы от травм и мазь помогут снизить урон до порога для реанимации.
+3. If they have a soul, and aren't rotten, it's possible to revive them. Consider storing the body in a morgue tray if you don't have enough time to revive someone, as the body will rot if you wait too long.
+
+## Revival
+Not counting airloss, Defibrillator's can be used to revive patients under 200 total damage. Chemicals don't metabolise in the dead, but brute packs and ointment can still patch them up. Use them to bring their numbers down enough for revival.
 
 <Box>
 <GuideEntityEmbed Entity="Brutepack"/>

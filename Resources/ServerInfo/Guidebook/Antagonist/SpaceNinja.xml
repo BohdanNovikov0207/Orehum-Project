@@ -1,80 +1,103 @@
+<!--
+SPDX-FileCopyrightText: 2023 deltanedas <39013340+deltanedas@users.noreply.github.com>
+SPDX-FileCopyrightText: 2023 deltanedas <@deltanedas:kde.org>
+SPDX-FileCopyrightText: 2024 Aidenkrz <aiden@djkraz.com>
+SPDX-FileCopyrightText: 2024 Ghagliiarghii <68826635+Ghagliiarghii@users.noreply.github.com>
+SPDX-FileCopyrightText: 2024 UBlueberry <161545003+UBlueberry@users.noreply.github.com>
+SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
+
+SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+
 <Document>
-  # Космический ниндзя
+  # Space Ninja
 
-  [color=#66FF00]Космический ниндзя[/color] — призрачная роль, которая случайно становится доступна в середине или конце раунда. Выбирая её, вы получаете снаряжение, цели и приветствие.
+  <Box>
+    [color=#999999][italic]"Spider of the night, silent is my bite."[/italic][/color]
+  </Box>
 
-  Вы — ниндзя. В космосе. [color=#66FF00]Клан Паука[/color] отправил вас на станцию сеять хаос, и у вас есть всё, чтобы делать это тихо — но смертоносно.
+  You are an elite mercenary that [color=#66FF00]The Spider Clan[/color] has sent to wreak all kinds of havoc on the station. You are equipped to keep it silent-but-deadly.
 
-  Будь то методичная охота на экипаж по одному или бесконечные устранения клоуна — ваша дисциплина велит: [color=#66FF00]к целям нужно как минимум стремиться[/color]. Во имя чести!
+  Whether you get bloody or stay out of trouble, your discipline has taught you that [italic]your objectives must be at least attempted[/italic]. For honor!
 
-  # Снаряжение
+  ## Standard Equipment
+  You begin implanted with a [color=cyan]death acidifier[/color], so if you are captured or KIA all your precious equipment is kept out of enemy hands.
 
-  В вас изначально установлен [color=#a4885c]«кислотный самоуничтожитель»[/color], так что если вы погибнете или решите совершить сэппуку, оставите уборщику прощальный «подарок», а всё ваше ценное снаряжение не достанется врагу.
+  Your bag is full of [bold]tools[/bold] and a [bold]survival box[/bold]. You also carry a [color=cyan]jetpack[/color] and a [color=cyan]pinpointer[/color] that will lead you to the station.
 
-  В рюкзаке — инструменты для тонких диверсий и коробка выживания на случай перекуса.
+  <Box>
+    <GuideEntityEmbed Entity="JetpackBlack"/>
+    <GuideEntityEmbed Entity="PinpointerStation"/>
+  </Box>
 
-  У вас есть [color=#a4885c]ранец‑реактив[/color] и [color=#a4885c]пинпоинтер[/color], позволяющие найти станцию.
+  ## Your Suit
 
-  <GuideEntityEmbed Entity="PinpointerStation" Caption="пинпоинтер станции"/>
+  <Box>
+    <GuideEntityEmbed Entity="ClothingEyesVisorNinja" Caption="your visor"/>
+    <GuideEntityEmbed Entity="ClothingOuterSuitSpaceNinja" Caption="your suit"/>
+    <GuideEntityEmbed Entity="ClothingShoesSpaceNinja" Caption="your boots"/>
+  </Box>
 
-  ## Костюм ниндзя
+  Your single most important item is [color=cyan]your suit[/color], without it none of your abilities would work.
+  Your suit requires power to function, which is supplied by its [bold]internal battery[/bold]. It can be replaced, and [italic]high capacity batteries[/italic] mean a [italic]highly effective ninja[/italic].
 
-  <GuideEntityEmbed Entity="ClothingOuterSuitSpaceNinja" Captain="костюм ниндзя"/>
+  [bold]You can recharge your internal battery directly[/bold] by using [color=cyan]your gloves[/color]. You can see the current charge by examining the suit or checking the nifty battery alert on your screen.
 
-  Ваш главный предмет — это [color=#66FF00]костюм[/color]; без него не работает ни одна способность.
-  Костюм требует энергию. Его [color=#a4885c]внутреннюю батарею[/color] можно заменить кликом другой батареи, а [color=#a4885c]более ёмкая батарея[/color] делает [color=#a4885c]ниндзю куда эффективнее[/color].
-  Заряд виден при осмотре костюма и в удобном индикаторе батареи в правом верхнем углу.
+  Your outfit also includes [color=cyan]special boots[/color] that keep you agile, upright and grounded without using energy. You've also got flash protection thanks to your [color=cyan]visor[/color].
 
-  Если энергия кончилась — зарядите батарею перчатками, слив её с АРС, подстанции или СМЭС.
+  ## Ninja Gloves
 
-  ## Перчатки ниндзя
+  <Box>
+    <GuideEntityEmbed Entity="ClothingHandsGlovesSpaceNinja" Caption="your gloves"/>
+  </Box>
 
-  <GuideEntityEmbed Entity="ClothingHandsGlovesSpaceNinja" Caption="перчатки ниндзя"/>
+  [color=#66FF00]These bad boys are your bread and butter.[/color] They are made from [bold]insulated nanomachines[/bold] to allow you to gracefully break into restricted areas without leaving behind fingerprints.
 
-  [color=#66FF00]Это — ваш хлеб с маслом.[/color]
+  You have an action to toggle gloves. When the gloves are turned on, they allow you to use [bold]special abilities[/bold], which are triggered by interacting with things with an empty hand and with combat mode disabled.
 
-  Они сделаны из [color=#a4885c]изолированных наномашин[/color] и помогают изящно проникать куда нужно, не оставляя отпечатков.
+  Your glove abilities include:
+  - Emagging doors and airlocks.
+  - Draining power from [bold]transformers[/bold] such as APCs, substations, or SMESes (higher voltage transformers drain more efficiently).
+  - Tampering with [bold]station equipment[/bold] to complete [color=#66FF00]objectives[/color].
 
-  Перчатки переключаются отдельным действием. Во включённом режиме они дают доступ к [color=#a4885c]особым способностям[/color], которые срабатывают при взаимодействии пустой рукой и с отключённым боевым режимом.
+  ## Energy Katana
 
-  Возможности перчаток:
-  - Взлом неограниченного количества дверей (эмаг).
-  - Слив энергии с АРС, подстанций или СМЭС: чем выше напряжение, тем эффективнее.
-  - Электрошок любой цели: оглушение и небольшой урон.
-  - Загрузка технологий с сервера НИО для выполнения одной из целей.
-  - Взлом консоли связи для вызова угрозы.
+  <Box>
+    <GuideEntityEmbed Entity="EnergyKatana"/>
+  </Box>
 
-  ## Энерго-катана
+  [bold]You have sworn yourself to the sword and refuse to use firearms.[/bold] Luckily, you've got a pretty cool sword.
 
-  <GuideEntityEmbed Entity="EnergyKatana" Captain="энерго‑катана"/>
+  Your [color=cyan]energy katana[/color] hurts plenty and can be [bold]recalled at will[/bold] at the cost of suit power. The farther away it is from you, the more energy required to recall it.
 
-  Вы присягнули [color=#66FF00]мечу[/color] и отказываетесь от огнестрельного оружия.
-  Наносит высокий урон и может быть отозвана по желанию, расходуя энергию костюма пропорционально расстоянию телепортации.
+  While in hand you may also [color=cyan]teleport[/color] to anywhere that you can see, [bold]including through windows[/bold]. The charges required to do this regenerate slowly, so keep a charge or two spare in case you need a quick getaway.
 
-  Держа её в руке, вы можете [color=#a4885c]телепортироваться[/color] в любую видимую точку — через двери и окна, но не сквозь глухие стены.
-  Зарядов немного, они восстанавливаются медленно, поэтому держите пару зарядов про запас для поспешного отхода.
+  ## Spider Clan Charge
 
-  ## Заряд клана Паука
+  <Box>
+    <GuideEntityEmbed Entity="SpiderCharge"/>
+  </Box>
 
-  <GuideEntityEmbed Entity="SpiderCharge" Caption="заряд клана Паука"/>
+  This is a [color=cyan]modified C-4 explosive[/color] which can be found in your pocket. Creates a large explosion but [bold]must be armed in your target area[/bold] as it is one of your objectives.
 
-  [color=#66FF00]Модифицированная взрывчатка C-4[/color], с которой вы начинаете. Создаёт мощный взрыв, но её нужно активировать в целевой области.
-  На карте случайно выбирается область для подрыва — это одна из ваших [color=#a4885c]целей[/color].
+  It can't be activated manually, so simply plant it on a wall or some furniture that does not spark joy. Choose wisely, it can't be unstuck once planted.
 
-  Вручную активировать нельзя: просто установите заряд на стену или особенно уродливую мебель.
-  После установки снять его уже нельзя.
+  ## Ninjutsu
 
-  ## Обувь ниндзя
+  <Box>
+    <GuideEntityEmbed Entity="NinjutsuScroll"/>
+  </Box>
 
-  Особые [color=#a4885c]нескользящие ботинки[/color], сохраняющие вашу ловкость, скорость и устойчивость.
-  Энергия не требуется.
+  As a true warrior of the Spider Clan, you are a master of [textlink="Ninjutsu" link="Ninjutsu"], a martial art honed over centuries by your teachers.
+  The art is not simply about strength or speed; it is about becoming one with the shadows and striking with deadly precision.
 
-  # Цели
+  ## Objectives
 
-  - Скачать X исследовательских узлов: используйте перчатки на сервере НИО с рядом разблокированных технологий.
-  - Вскрыть X дверей на станции: используйте перчатки для эмага.
-  - Подорвать заряд клана Паука: установите его в случайной указанной зоне и наблюдайте за взрывом.
-  - Вызвать угрозу: используйте перчатки на консоли связи.
-  - Выжить: не умирайте.
+  - Download \[9-13\] research nodes: Use your gloves on an R&D server with a number of unlocked technologies. You may have to unlock technologies yourself if there aren't enough to steal already.
+  - Doorjack \[15-40\] doors on the station: Use your gloves to emag a number of doors.
+  - Detonate the spider clan charge: Plant your spider clan charge at the specified location and watch it go boom!
+  - Call in a [textlink="threat" link="MinorAntagonists"]: Use your gloves on a communications console.
+  - Set everyone to wanted: Use your gloves on a criminal records console.
+  - Survive: Don't die.
 
 </Document>

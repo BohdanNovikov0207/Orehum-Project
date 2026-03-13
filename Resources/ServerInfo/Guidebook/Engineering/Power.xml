@@ -1,53 +1,48 @@
+<!--
+SPDX-FileCopyrightText: 2023 Leon Friedrich <60421075+ElectroJr@users.noreply.github.com>
+SPDX-FileCopyrightText: 2023 Myakot <30875116+Myakot@users.noreply.github.com>
+SPDX-FileCopyrightText: 2023 end <72604018+laok233@users.noreply.github.com>
+SPDX-FileCopyrightText: 2024 Kira Bridgeton <161087999+Verbalase@users.noreply.github.com>
+SPDX-FileCopyrightText: 2024 Tayrtahn <tayrtahn@gmail.com>
+SPDX-FileCopyrightText: 2024 Terraspark4941 <terraspark4941@gmail.com>
+SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
+SPDX-FileCopyrightText: 2025 ArtisticRoomba <145879011+ArtisticRoomba@users.noreply.github.com>
+
+SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+
 <Document>
-  # Электроснабжение
+  # Power
+  Power is the lifeblood of the station.
+  Without it, the station will quickly fall into chaos.
+  Engineers are responsible for maintaining the station's power grid, ensuring that power is supplied, distributed, and all departments are satisfied.
 
-  В SS14 система питания достаточно детально смоделирована: все устройства станции получают электричество через три основные сети — высоковольтную, средневольтную и низковольтную.
   <Box>
-  <GuideEntityEmbed Entity="CableHVStack"/>
-  <GuideEntityEmbed Entity="CableMVStack"/>
-  <GuideEntityEmbed Entity="CableApcStack"/>
+    <GuideEntityEmbed Entity="SingularityGenerator" Caption=""/>
+    <GuideEntityEmbed Entity="TeslaGenerator" Caption=""/>
+    <GuideEntityEmbed Entity="AmeController" Caption=""/>
+    <GuideEntityEmbed Entity="SMESBasic" Caption=""/>
+    <GuideEntityEmbed Entity="SubstationBasic" Caption=""/>
+    <GuideEntityEmbed Entity="APCBasic" Caption=""/>
   </Box>
 
-  ## Кабели
-  Три основных типа кабелей (HV, MV и LV) позволяют создавать независимые энергосети. Осматривайте их в игре, чтобы увидеть подробности применения.
-  <Box>
-  <GuideEntityEmbed Entity="CableHV"/>
-  <GuideEntityEmbed Entity="CableMV"/>
-  <GuideEntityEmbed Entity="CableApcExtension"/>
-  </Box>
+  There are many different aspects to Space Station 14's power system simulation, as well as Engineering's intended gameplay.
 
-  ## Накопители энергии
-  Каждый из устройств накопления энергии одновременно играет роль «трансформатора» для своего уровня напряжения (HV, MV и LV) и предоставляет ёмкий резервный аккумулятор для сглаживания провалов и всплесков потребления.
-  <Box>
-  <GuideEntityEmbed Entity="SMESBasic"/>
-  <GuideEntityEmbed Entity="SubstationBasic"/>
-  <GuideEntityEmbed Entity="APCBasic"/>
-  </Box>
+  Some important information to keep in mind includes:
+  - Station [textlink="generators" link="Generators"] are tiered and follow a hierarchy. The lower the tier, the less they are sustainable, but the easier they are to setup. The higher the tier, the more sustainable they are, but the more complex they are to setup.
+  - Space Station 14 features [textlink="voltage networks" link="VoltageNetworks"], which distribute power across the station and are stepped down in voltage by machines, so they can be used by other machines.
+  - Power [textlink="generators" link="Generators"] have [textlink="ramping" link="Ramping"], which means they take time to match the grid's demand to their supply.
 
-  ## Рамп‑ап
-  Вопреки ожиданиям от «игровой электрички», мощность не подаётся мгновенно по требованию. Генераторам и батареям требуется время, чтобы нарастить отдачу под возросшую нагрузку, из‑за чего при резких скачках потребления возможны просадки напряжения, например, когда батареи опустошаются.
+  ## Starting Out
+  At the start of the shift, the station is running off of purely [textlink="battery" link="PowerStorage"] power.
+  This will at most last 5-10 minutes, depending on the station's power draw.
 
-  ## Установка накопителей
-  Подстанции — самые понятные: установите машину поверх кабелей MV и HV; она будет брать мощность из HV и подавать в MV.
+  To extend this, you can start up the station's [textlink="Antimatter Engine" link="AME"], or [textlink="AME." link="AME"]
+  This will extend the runtime of the station's batteries by a significant amount, giving you more time to setup the station's higher-tier [textlink="generators." link="Generators"]
+  You can extend this even further by setting up [textlink="solar panels" link="SolarPanels"], which generate power for free.
 
-  APC ставятся похоже, но это строго настенные устройства — на пол их не поставить. Убедитесь, что подключены и MV, и LV.
+  After setting up the [textlink="AME" link="AME"] and [textlink="Solars" link="SolarPanels"], you should be generating a decent amount of power.
 
-  Для SMES требуется построить клемму ввода. SMES берёт питание с клеммы и выдаёт вниз. Клемма гарантирует, что вход HV и выход HV не соединяются напрямую. Не подключайте SMES к самому себе: это короткое замыкание, чреватое мерцанием питания или отключениями.
-
-  ## Отсечка APC
-  Сейчас только APC ограничивает мощность, которую отдаёт в сеть: если суммарное потребление подключённых устройств превысит [color=#a4885c]24 кВт[/color], автомат выбьет и всё отключится. Если вы не инженер — вызовите инженера (или киборга), чтобы включить обратно, снизив нагрузку [color=#a4885c]ниже[/color] 24 кВт.
-  <Box>
-  <GuideEntityEmbed Entity="APCBasic"/>
-  </Box>
-
-  ## Проверка энергосети
-  1. Используйте [color=#a4885c]t‑ray сканер[/color], чтобы находить кабели под плиткой. (пропустите, если кабели не скрыты)
-  2. Подденьте плитку [color=#a4885c]ломом[/color], чтобы открыть доступ к кабелю. (пропустите, если кабели не скрыты)
-  3. Возьмите [color=#a4885c]мультитул[/color] и кликните по любому кабелю, чтобы увидеть параметры сети.
-  <Box>
-  <GuideEntityEmbed Entity="Multitool"/>
-  <GuideEntityEmbed Entity="Crowbar"/>
-  <GuideEntityEmbed Entity="trayScanner"/>
-  </Box>
+  Now that you've bought yourself time, you can focus on setting up higher-tier [textlink="generators" link="Generators"] like the [textlink="Singularity Engine" link="SingularityEngine"], which can provide power for the rest of the shift.
 
 </Document>

@@ -1,23 +1,28 @@
+<!--
+SPDX-FileCopyrightText: 2023 Nemanja <98561806+EmoGarbage404@users.noreply.github.com>
+SPDX-FileCopyrightText: 2024 end <72604018+laok233@users.noreply.github.com>
+SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
+
+SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+
 <Document>
-# Технологии
+# Technologies
 
-Все технологии имеют стоимость и требуемый уровень (tier) для исследования. Их открытие добавляет набор рецептов, которые можно печатать на различных станках.
+All technologies have a cost and a tier requirement in order to be researched. Unlocking them adds a variety of recipes that can be printed at various lathes.
 
-Ниже перечислены технологии и соответствующие им направления.
+The different technologies and their respective discipline are listed below.
 
-## Промышленность
+## Industrial
 <GuideTechDisciplineEmbed Discipline="Industrial"/>
 
-## Биохимия
-<GuideTechDisciplineEmbed Discipline="Biochemical"/>
-
-## Арсенал
+## Arsenal
 <GuideTechDisciplineEmbed Discipline="Arsenal"/>
 
-## Экспериментальные
+## Experimental
 <GuideTechDisciplineEmbed Discipline="Experimental"/>
 
-## Гражданские службы
+## Civilian Services
 <GuideTechDisciplineEmbed Discipline="CivilianServices"/>
 
 </Document>

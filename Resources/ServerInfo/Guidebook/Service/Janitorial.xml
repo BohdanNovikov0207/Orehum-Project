@@ -1,9 +1,19 @@
+<!--
+SPDX-FileCopyrightText: 2023 Myakot <30875116+Myakot@users.noreply.github.com>
+SPDX-FileCopyrightText: 2023 Sir Winters <7543955+Owai-Seek@users.noreply.github.com>
+SPDX-FileCopyrightText: 2023 end <72604018+laok233@users.noreply.github.com>
+SPDX-FileCopyrightText: 2024 metalgearsloth <31366439+metalgearsloth@users.noreply.github.com>
+SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
+
+SPDX-License-Identifier: MIT
+-->
+
 <Document>
-# Уборщик
+# Janitorial
 
-Ты поддерживаешь чистоту — работа порой неблагодарная, но кто‑то же должен её делать. Здесь рассказано о рабочих инструментах и том, как ими пользоваться.
+You keep things clean, it's a rough job sometimes, but someone's gotta do it. This will walk you through the tools of the trade, and how they're used.
 
-## Базовое снаряжение
+## Basic Equipment
 <Box>
 <GuideEntityEmbed Entity="MopItem"/>
 <GuideEntityEmbed Entity="JanitorialTrolley"/>
@@ -18,39 +28,54 @@
 <GuideEntityEmbed Entity="Mousetrap"/>
 </Box>
 
-## Дополнительное снаряжение
+## Additional Equipment
 <Box>
 <GuideEntityEmbed Entity="WetFloorSign"/>
-<GuideEntityEmbed Entity="Holoprojector" Caption="голографический проектор знаков"/>
+<GuideEntityEmbed Entity="Holoprojector" Caption="holosign projector"/>
 <GuideEntityEmbed Entity="LightReplacer"/>
+<GuideEntityEmbed Entity="WireBrush"/>
 </Box>
 <Box>
-<GuideEntityEmbed Entity="AdvMopItem" Caption="Продвинутая швабра, спроси в НИОКР"/>
+<GuideEntityEmbed Entity="AdvMopItem" Caption="Advanced mop, ask in R&D"/>
 </Box>
 
-## Набор и слив жидкостей
+## Fluid Acquisition and Disposal
 <Box>
 <GuideEntityEmbed Entity="WaterTankFull"/>
 <GuideEntityEmbed Entity="Sink"/>
 <GuideEntityEmbed Entity="FloorDrain"/>
 </Box>
 
-## Наводим порядок.
-А теперь — к делу. Мы ведь тут, чтобы убирать, верно? Коротко и по сути: твои основные инструменты — верная швабра, мусорный мешок, спейс‑клинер и один из трёх видов вёдер.
+## Tidying up.
+Now, onto the (figurative) meat and potatoes. We're here to clean, right? Lets keep it simple. The main tools you'll be putting to use are the trusty mop, a trash bag, space cleaner, and one of the three different buckets.
 
-Мытьё полов: Наполни тележку водой, затем — на поиски луж! Смочи швабру и вымой их — оставшаяся вода вскоре высохнет. Не забудь поставить знаки «Мокрый пол»!
-- Чтобы слить воду из тележки, перетащи её (курсором) на напольный трап. Это выльет все жидкости внутри. Трап обычно есть где‑нибудь в медотсеке, в кухонной морозилке и, конечно, в кабинете уборщика.
+Mopping: Fill your cart up with water, then, find some puddles! Wet your mop, and wipe them up, the resulting water puddle will dry after a short time. Don't forget the wet floor signs!
+- To drain your cart, drag it (with your cursor) onto a floor drain. This will dump all the fluids inside! Floor drains can usually be found somewhere in medical, the kitchen freezer, and of course, the janitor closet.
 
-Мусор: Суй его прямо в мешок или держи мешок в руке. Кликни рядом с мусором, чтобы собрать весь хлам поблизости, или собирай по одному. Используй мешок на мусоропроводе, чтобы его опорожнить.
-- Логистика может попросить часть мусора — заглядывай к ним время от времени!
+Trash: Place it in the bag directly, or hold it in your hand. Click -near- trash to scoop -all- nearby junk up, or click on each piece individually. Using the bag on a disposal will empty it.
+- Cargo might want some of your trash, it might be worthwhile to check in from time to time!
 
-Спейс‑клинер: этот чудо‑спрей умеет два дела — смывать граффити и, при случае, убирать лужи!
-- Больше можно попросить у химиков.
+Space Cleaner: This miracle spray can do two things, clean graffiti, and in a pinch, clean up puddles!
+- You might be able to get more of this from chemistry.
 
-## Дополнительные обязанности
-Хороший уборщик всегда ищет, чем ещё помочь, а инструментов у тебя хватает. Следи за перегоревшими лампами, помогай повару с мышами на кухне, а если почувствуешь прилив щедрости — пополняй автоматы и аварийные шкафчики по станции!
+Light Replacer: Just point at broken bulbs and click!
+- Replace enough broken ones, get a bulb for free!
 
-##Дополнительная информация:
+Janitorial Keyring: Your trusty keys, hundreds of them on a single ring. If only you could remember which goes where...
+- At the start of the round, the keyring will spawn with a few randomized access levels. It could open cargo, it could open medical, who knows?
+
+## Dealing with footprints and trails.
+It gets a little tedious cleaning [italic]every[/italic] little footprint left behind by those pesky doctors.
+The solution? A little bit of elbow grease!
+
+There's two ways of going about this:
+- Using a mop on the floor near footprints will scrub the area of footprints and trails. [bold]Although slow, this has the benefit of not gunking up your mop.[/bold]
+- You can use a bar of soap or a damp rag for the same effect, albeit worse.
+
+## Extra Duties
+A good janitor is always on the lookout for a bit more to do, and there are plenty of tools at your disposal. Keep an eye out for broken lights, help the chef take care of mice in the kitchen, and if you're feeling -really- generous, try to restock the vending machines and emergency closets around the station!
+
+##Additional Information:
 <GuideReagentEmbed Reagent="SpaceCleaner"/>
 <GuideReagentEmbed Reagent="Ammonia"/>
 
