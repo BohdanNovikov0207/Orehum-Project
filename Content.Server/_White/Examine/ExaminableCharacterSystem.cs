@@ -53,7 +53,6 @@ public sealed class ExaminableCharacterSystem : EntitySystem
         }
         AddLine(message);
         message.Pop();
-
     }
 
     private void HandleExamine(EntityUid uid, MetaDataComponent metaData, ExamineCompletedEvent args)

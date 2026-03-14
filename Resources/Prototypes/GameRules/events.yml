@@ -29,6 +29,12 @@
     #- id: SpiderSpawnHorde
     # </Trauma>
     - id: VentClog
+    - id: TidemindDevelop # Goobstation - Tidemind
+    - id: MothroachSpawn # DeltaV
+    - id: DerelictCyborgSyndicateSpawn # Goobstation - usually calm
+    - id: MalignRiftSpawn # DeltaV
+    - id: FloorGoblinMidRound # Goobstation
+    - id: ClownGoblinMigration # Goobstation - New Midrounds
 
 - type: entityTable
   id: BasicAntagEventsTable
@@ -57,6 +63,17 @@
       tableId: ModerateAntagEventsTrauma
     - id: DragonSpawn
     - id: NinjaSpawn
+    - id: BlobSpawn # Goobstation - Blob
+    - id: LoneAbductorSpawn # Shitmed - Starlight Abductors
+    - id: DuoAbductorSpawn # Shitmed - Starlight Abductors
+    - id: BingleSpawn #Goobstation - Bingle
+    - id: SlaughterDemonMidround # Goobstation - Slaughter Demon
+    - id: XenomorphsInfestation # WD EDIT
+    - id: SingulothKnightsMidround # Goobstation - New Midrounds
+    #- id: DarkLordMidround # Goobstation - New Midrounds
+    - id: MimeAssassinMidround # Goobstation - New Midrounds
+    - id: DarkPriestMidround # Goobstation - New Midrounds
+    #- id: WraithMidround # Goobstation - Wraith
     #- id: ParadoxCloneSpawn # Trauma - moved to minor events
     #- id: RevenantSpawn  # GoobStation - removed till rework
     - id: SleeperAgents

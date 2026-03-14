@@ -111,13 +111,6 @@
   - ExclusiveItems # Trauma
 
 - type: roleLoadout
-  id: RoleSurvivalNukieHonkops
-  groups:
-  - SurvivalSyndicate
-  - GroupHonkopsMask
-  - GroupPocketTankDouble
-
-- type: roleLoadout
   id: JobRoboticist
   groups:
   - GroupTankHarness

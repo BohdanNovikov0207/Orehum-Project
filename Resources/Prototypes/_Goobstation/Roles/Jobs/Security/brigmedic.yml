@@ -17,7 +17,7 @@
   guides:
   - MedicalDoctor
   - Medicine
-  access: # intentionally no medical access, not even hos has it, ask chemists instead of silently stealing meds
+  access: # EE parity, make corpsman able function.
   - Security
   - Brig
   - Maintenance

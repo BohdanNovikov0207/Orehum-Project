@@ -131,21 +131,83 @@
   - BlobGameMode
 
 - type: gamePreset
-  id: Honkops
+  id: TheGhost
   alias:
-  - honkops
-  name: honkops-title
-  description: honkops-description
-  showInVote: false
+    - calm
+    - calmdynamic
+  name: sleeper-title
+  description: sleeper-description
+  showInVote: true
+  minPlayers: 5
   rules:
-  - BasicRoundstartVariation
-  - BasicStationEventScheduler
-  - BasicAntagEventScheduler
-  - ModerateAntagEventScheduler
-  - MeteorSwarmScheduler
-  - SpaceTrafficControlEventScheduler
-  - SubGamemodesRule
-  - Honkops
+    - CalmDynamic
+    - SubGamemodesRule
+    - RareIonStormScheduler
+    - SpaceTrafficControlFriendlyEventScheduler
+
+- type: gamePreset
+  id: TheGuide
+  alias:
+    - combat
+    - combatdynamic
+  name: guide-title
+  description: guide-description
+  showInVote: false
+  minPlayers: 25
+  rules:
+    - CombatDynamic
+    - SubGamemodesRule
+    - IonStormScheduler
+    - SpaceTrafficControlEventScheduler
+
+- type: gamePreset
+  id: SecretPlusLow
+  alias:
+    - secretpluslow
+    - secretpluscalm
+    - turbulence
+  name: secretplus-low-title
+  description: secretplus-low-description
+  showInVote: true
+  rules:
+    - SecretPlusLow
+
+- type: gamePreset
+  id: SecretPlusMid
+  alias:
+    - secretplusmid
+    - secretplus
+    - entropy
+  name: secretplus-mid-title
+  description: secretplus-mid-description
+  showInVote: true
+  rules:
+    - SecretPlusMid
+
+- type: gamePreset
+  id: SecretPlusAdmeme
+  alias:
+    - secretplusadmeme
+    - secretplusevil
+    - secretplushigh
+    - chaos
+  name: secretplus-admeme-title
+  description: secretplus-admeme-description
+  showInVote: false # 1984
+  rules:
+    - SecretPlusAdmeme
+
+- type: gamePreset
+  id: SurvivalPlusMid
+  alias:
+    - survivalplus
+    - newsurvival
+    - survivalnew
+  name: survivalplus-title
+  description: survivalplus-description
+  showInVote: true
+  rules:
+    - SecretPlusRampingMid
 
 - type: gamePreset
   id: Xenomorphs

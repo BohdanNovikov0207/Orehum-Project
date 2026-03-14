@@ -299,27 +299,6 @@
     clothingPrototypes:
       head: ClothingHeadSinguloth
 
-# Vox raider hardsuit
-
-- type: entity
-  parent: ClothingOuterHardsuitCybersunStealth
-  id: ClothingOuterHardsuitVoxRaiderStealth
-  name: vox raider stealth suit
-  description: A sleek black suit. It seems to have a tail, and is very heavy.
-  components:
-  - type: Sprite
-    sprite: _Goobstation/Clothing/OuterClothing/Hardsuits/vox-raiders-stealth.rsi
-  - type: Clothing
-    sprite: _Goobstation/Clothing/OuterClothing/Hardsuits/vox-raiders-stealth.rsi
-  - type: ToggleableClothing
-    clothingPrototypes:
-      head: ClothingHeadHelmetHardsuitVoxRaiderStealth
-  - type: ClothingConditions
-    reason: entity-condition-popup-not-vox-raider
-    conditions:
-    - !type:SpeciesCondition
-      species: Vox
-
 # Detective's Hardsuit
 
 - type: entity

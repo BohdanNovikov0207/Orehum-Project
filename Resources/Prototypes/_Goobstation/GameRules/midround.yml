@@ -224,64 +224,6 @@
 
 - type: entity
   parent: BaseGameRule
-  id: GreyTideAntagMidround
-  components:
-  - type: StationEvent
-    weight: 1
-    duration: null
-    earliestStart: 20
-    minimumPlayers: 40
-  - type: AntagSpawner
-    prototype: MobHumanGreyTide
-  - type: AntagSelection
-    agentName: ghost-role-information-grey-tide-name
-    definitions:
-    - spawnerPrototype: SpawnPointGhostGreyTide
-      min: 1
-      max: 1
-      pickPlayer: false
-      mindRoles:
-      - MindRoleGhostRoleSoloAntagonist
-      briefing:
-        text: grey-tide-role-greeting
-        color: Red
-        sound: /Audio/_Goobstation/Music/the_gray_tide_song.ogg
-  - type: MaintsSpawnRule
-  - type: AntagObjectives
-    objectives:
-    - GrayTideKillEveryoneObjective
-
-- type: entity
-  parent: BaseGameRule
-  id: TunnelClownMidround
-  components:
-  - type: StationEvent
-    weight: 1
-    duration: null
-    earliestStart: 15
-    minimumPlayers: 20
-  - type: AntagSpawner
-    prototype: MobHumanTunnelClown
-  - type: AntagSelection
-    agentName: ghost-role-information-tunnel-clown-name
-    definitions:
-    - spawnerPrototype: SpawnPointGhostTunnelClown
-      min: 1
-      max: 1
-      pickPlayer: false
-      mindRoles:
-      - MindRoleGhostRoleSoloAntagonist
-      briefing:
-        text: tunnel-clown-role-greeting
-        color: Pink
-        sound: /Audio/_Goobstation/Misc/clownalwayswinsshort.ogg
-  - type: MaintsSpawnRule
-  - type: AntagObjectives
-    objectives:
-    - TunnelClownProtectMaintenanceObjective
-
-- type: entity
-  parent: BaseGameRule
   id: SingulothKnightsMidround
   components:
   - type: StationEvent
@@ -431,46 +373,6 @@
     - EscapeShuttleObjective
 
 - type: entity
-  parent: BaseGameRule
-  id: VoxRaidersMidround
-  components:
-  - type: StationEvent
-    earliestStart: 35
-    weight: 0.3
-    minimumPlayers: 50
-    duration: 1
-  - type: AntagSpawner
-    prototype: MobVoxRaider
-  - type: RuleGrids
-  - type: LoadMapRule
-    gridPath: /Maps/_Goobstation/Shuttles/VoxRaiderShuttle.yml
-  - type: AntagSelection
-    agentName: ghost-role-information-vox-raider-name
-    definitions:
-    - spawnerPrototype: SpawnPointGhostVoxRaider
-      min: 2
-      max: 3
-      pickPlayer: false
-      mindRoles:
-      - MindRoleGhostRoleTeamAntagonist
-      - MindRoleThief
-      briefing:
-        text: vox-raider-role-greeting
-        color: Purple
-        sound: /Audio/Misc/thief_greeting.ogg
-  - type: AntagObjectives
-    objectives:
-    - EscapeThiefShuttleObjective
-  - type: AntagRandomObjectives
-    sets:
-    - groups: ThiefBigObjectiveGroups
-      prob: 0.7
-      maxPicks: 2
-    - groups: ThiefObjectiveGroups
-      maxPicks: 15
-    maxDifficulty: 4
-
-- type: entity
   id: ClownGoblinMigration
   parent: BaseGameRule
   components:
@@ -550,3 +452,67 @@
         - NamesSlasherTitle
         - NamesSlasher
         nameFormat: name-format-slasher
+  - type: Tag
+    tags:
+    - MidroundAntag
+
+#Contractor
+- type: entity
+  parent: ContractorSpawn
+  id: ContractorSpawnMidround
+  components:
+  - type: GameRule
+    chaosScore: 400
+  - type: RuleGrids
+  - type: LoadMapRule
+    gridPath: /Maps/_Goobstation/Shuttles/ShuttleEvent/Legionnaire.yml
+  - type: StationEvent
+    startAnnouncement: null
+    weight: 1
+    duration: null
+    earliestStart: 30
+    minimumPlayers: 30
+    chaos:
+      Hostile: 40
+      Combat: 40
+      Death: 40
+    eventType: HostilesSpawn
+  - type: AntagLoadProfileRule
+    speciesOverrideBlacklist:
+    - Yowie
+    - IPC
+    - Diona
+    - Harpy
+    - Plasmaman
+  - type: AntagObjectives
+    objectives:
+    - ContractorRansomObjective
+  - type: AntagSelection
+    selectionTime: PostPlayerSpawn
+    agentName: ghost-role-information-contractor-name
+    definitions:
+    - spawnerPrototype: ContractorSpawner
+      min: 1
+      max: 1
+      pickPlayer: false
+      startingGear: ContractorGear
+      roleLoadout:
+      - RoleSurvivalNukie
+      mindRoles:
+      - MindRoleContractor
+      briefing:
+        text: contractor-role-greeting
+        color: Red
+        sound: /Audio/Ambience/Antag/traitor_wawa.ogg
+      components:
+      - type: RandomMetadata
+        nameSegments:
+        - NamesContractorPrefix
+        - NamesSyndicateElite
+        nameFormat: name-format-standard
+      - type: NpcFactionMember
+        factions:
+        - Syndicate
+  - type: Tag
+    tags:
+    - MidroundAntag
