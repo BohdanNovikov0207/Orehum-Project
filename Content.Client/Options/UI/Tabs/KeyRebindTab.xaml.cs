@@ -229,7 +229,7 @@ namespace Content.Client.Options.UI.Tabs
             AddButton(EngineKeyFunctions.Walk);
             AddCheckBox("ui-options-hotkey-toggle-walk", _cfg.GetCVar(CCVars.ToggleWalk), HandleToggleWalk);
             AddCheckBox("ui-options-hotkey-default-walk", _cfg.GetCVar(CCVars.DefaultWalk), HandleDefaultWalk);
-            AddButton(ContentKeyFunctions.Sprint);
+            // AddButton(ContentKeyFunctions.Sprint);
             InitToggleWalk();
             AddButton(ContentKeyFunctions.ToggleKnockdown);
 

@@ -1,0 +1,18 @@
+- type: entity
+  id: TardisDoor
+  name: Дверь TARDIS
+  description: Куда она ведет?
+  parent: ClosetBluespace
+  components:
+    - type: Sprite
+      sprite: _Orehum/ME4TA/tardis.rsi
+      noRot: true
+      layers:
+      - state: locker
+        map: ["enum.StorageVisualLayers.Base"]
+      - state: locker_door
+        map: ["enum.StorageVisualLayers.Door"]
+    - type: EntityStorageVisuals
+      stateBaseClosed: locker
+      stateDoorOpen: locker_open
+      stateDoorClosed: locker_door

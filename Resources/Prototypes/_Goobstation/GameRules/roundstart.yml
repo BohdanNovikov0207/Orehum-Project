@@ -115,7 +115,7 @@
   id: CalmTraitor # For Dual Antag Gamemodes
   components:
   - type: GameRule
-    minPlayers: 30
+    minPlayers: 5
   - type: AntagSelection
     selectionTime: IntraPlayerSpawn
     definitions:

@@ -73,7 +73,7 @@ namespace Content.Server.Voting.Managers
             {StandardVoteType.Votekick, CCVars.VotekickEnabled}
         };
 
-        public void CreateStandardVote(ICommonSession? initiator, StandardVoteType voteType, string[]? args = null)
+        public IVoteHandle CreateStandardVote(ICommonSession? initiator, StandardVoteType voteType, string[]? args = null)
         {
             if (initiator != null && args == null)
                 _adminLogger.Add(LogType.Vote, LogImpact.Medium, $"{initiator} initiated a {voteType.ToString()} vote");
@@ -107,6 +107,9 @@ namespace Content.Server.Voting.Managers
             _gameTicker.UpdateInfoText();
             if (timeoutVote)
                 TimeoutStandardVote(voteType);
+            if (_voteHandles.TryGetValue(_nextVoteId - 1, out var handle))
+                return handle;
+            return CreateStandardVote(initiator, StandardVoteType.Preset, args);
         }
 
         private void CreateRestartVote(ICommonSession? initiator)
@@ -296,6 +299,9 @@ namespace Content.Server.Voting.Managers
         private void CreateMapVote(ICommonSession? initiator)
         {
             var maps = _gameMapManager.CurrentlyEligibleMaps().ToDictionary(map => map, map => map.MapName);
+
+            if (maps.Count == 0)
+                return;
 
             var alone = _playerManager.PlayerCount == 1 && initiator != null;
             var options = new VoteOptions

@@ -66,7 +66,7 @@
   alias:
     - survival
   name: survival-title
-  showInVote: false # secret
+  showInVote: true
   description: survival-description
   rules:
     - MeteorSwarmScheduler
@@ -150,7 +150,7 @@
   - extended
   - shittersafari
   name: extended-title
-  showInVote: false #2boring2vote
+  showInVote: true
   description: extended-description
   rules:
   - BasicStationEventScheduler
@@ -164,7 +164,7 @@
   - greenshift
   - shittersafarideluxeedition
   name: greenshift-title
-  showInVote: false #4boring4vote
+  showInVote: false
   description: greenshift-description
   rules:
   - SpaceTrafficControlFriendlyEventScheduler
@@ -176,7 +176,7 @@
     - secret
     - sekrit
   name: secret-title
-  showInVote: false # Goob - Game Director
+  showInVote: true
   description: secret-description
   rules:
     - Secret
@@ -224,10 +224,11 @@
     - tator
   name: traitor-title
   description: traitor-description
-  showInVote: false
+  showInVote: true
   rules:
   - DummyNonAntagChance
   - Traitor
+  - CalmTraitor
   - SubGamemodesRule
   - BasicStationEventScheduler
   - MeteorSwarmScheduler
@@ -242,7 +243,7 @@
   name: death-match-title
   description: death-match-description
   maxPlayers: 15
-  showInVote: true
+  showInVote: false
   supportedMaps: DeathMatchMapPool
   rules:
     - DeathMatch31

@@ -143,7 +143,7 @@ public sealed partial class GoobCVars
     ///     Is sprint enabled.
     /// </summary>
     public static readonly CVarDef<bool> ToggleSprint =
-        CVarDef.Create("control.toggle_sprint", true, CVar.CLIENTONLY | CVar.ARCHIVE);
+        CVarDef.Create("control.toggle_sprint", false, CVar.CLIENTONLY | CVar.ARCHIVE);
 
     /// <summary>
     ///     Enable Dorm Notifier

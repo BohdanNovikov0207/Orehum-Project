@@ -33,7 +33,7 @@
   id: Omega
   mapName: 'Omega'
   mapPath: /Maps/_Goobstation/omega.yml # Goobstation
-  minPlayers: 7
+  minPlayers: 1
   maxPlayers: 35
   stations:
     Omega:
