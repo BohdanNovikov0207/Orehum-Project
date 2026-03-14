@@ -138,21 +138,6 @@
   - SubGamemodesRule
 
 - type: gamePreset
-  id: Honkops
-  alias:
-    - honkops
-  name: honkops-title
-  description: honkops-description
-  showInVote: false
-  rules:
-    - Honkops
-    - SubGamemodesRule
-    - BasicStationEventScheduler
-    - MeteorSwarmScheduler
-    - SpaceTrafficControlEventScheduler
-    - BasicRoundstartVariation
-
-- type: gamePreset
   id: TheGhost
   alias:
     - calm
