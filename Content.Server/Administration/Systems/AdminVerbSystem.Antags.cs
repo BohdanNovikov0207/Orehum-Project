@@ -2,6 +2,8 @@
 using Content.Server._Goobstation.Wizard.Components;
 // </Trauma>
 using Content.Server.Antag;
+using Content.Server._Orehum.GameTicking.Components;
+using Content.Server._Orehum.GameTicking.Rules;
 using Content.Server.GameTicking;
 using Content.Server.GameTicking.Rules.Components;
 using Content.Server.Zombies;
@@ -32,6 +34,10 @@ public sealed partial class AdminVerbSystem
     private static readonly EntProtoId DefaultRevsRule = "Revolutionary";
     private static readonly EntProtoId DefaultThiefRule = "Thief";
     //private static readonly EntProtoId DefaultChangelingRule = "Changeling"; // Trauma - goob ling used instead
+
+    private static readonly EntProtoId DefaultArmsDealerRule = "ArmsDealer";
+    private static readonly ProtoId<StartingGearPrototype> PirateGearId = "PirateGear";
+
     private static readonly EntProtoId ParadoxCloneRuleId = "ParadoxCloneSpawn";
     private static readonly EntProtoId DefaultWizardRule = "Wizard";
     private static readonly EntProtoId DefaultNinjaRule = "NinjaSpawn";
@@ -158,6 +164,21 @@ public sealed partial class AdminVerbSystem
             Message = string.Join(": ", thiefName, Loc.GetString("admin-verb-make-thief")),
         };
         args.Verbs.Add(thief);
+
+        var armsDealerName = Loc.GetString("admin-verb-make-arms-dealer");
+        Verb armsDealer = new()
+        {
+            Text = armsDealerName,
+            Category = VerbCategory.Antag,
+            Icon = new SpriteSpecifier.Rsi(new ResPath("/Textures/Objects/Weapons/Guns/Pistols/mk58.rsi"), "icon"),
+            Act = () =>
+            {
+                _antag.ForceMakeAntag<ArmsDealerRuleComponent>(targetPlayer, DefaultArmsDealerRule);
+            },
+            Impact = LogImpact.High,
+            Message = string.Join(": ", armsDealerName, Loc.GetString("admin-verb-make-arms-dealer")),
+        };
+        args.Verbs.Add(armsDealer);
 
         var paradoxCloneName = Loc.GetString("admin-verb-text-make-paradox-clone");
         Verb paradox = new()

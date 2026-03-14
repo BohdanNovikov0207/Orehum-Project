@@ -3,7 +3,7 @@
   alias:
     - survival
   name: survival-title
-  showInVote: false # secret
+  showInVote: true
   description: survival-description
   rules:
     - MeteorSwarmScheduler
@@ -96,7 +96,7 @@
   - extended
   - shittersafari
   name: extended-title
-  showInVote: false #2boring2vote
+  showInVote: true
   description: extended-description
   rules:
   - BasicStationEventScheduler
@@ -110,7 +110,7 @@
   - greenshift
   - shittersafarideluxeedition
   name: greenshift-title
-  showInVote: false #4boring4vote
+  showInVote: false
   description: greenshift-description
   rules:
   - BasicRoundstartVariation
@@ -162,7 +162,7 @@
     - tator
   name: traitor-title
   description: traitor-description
-  showInVote: false
+  showInVote: true
   rules:
   # <Trauma>
   - BasicAntagEventScheduler
@@ -170,6 +170,7 @@
   # </Trauma>
   - DummyNonAntagChance
   - Traitor
+  - CalmTraitor
   - SubGamemodesRule
   - BasicStationEventScheduler
   - MeteorSwarmScheduler
@@ -184,7 +185,7 @@
   name: death-match-title
   description: death-match-description
   maxPlayers: 15
-  showInVote: true
+  showInVote: false
   supportedMaps: DeathMatchMapPool
   rules:
     - DeathMatch31

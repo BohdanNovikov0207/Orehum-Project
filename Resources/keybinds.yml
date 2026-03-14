@@ -44,10 +44,10 @@ binds:
 - function: Walk
   type: State
   key: Shift
-- function: Sprint # Goob
-  type: State
-  key: C
-- function: ResistGrab # Goob
+# - function: Sprint
+#   type: State
+#   key:
+- function: ResistGrab
   type: State
   key: B
 - function: Tackle # Trauma
