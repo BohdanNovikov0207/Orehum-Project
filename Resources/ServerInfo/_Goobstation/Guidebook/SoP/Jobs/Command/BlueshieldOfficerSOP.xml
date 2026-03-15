@@ -1,39 +1,30 @@
-<!--
-SPDX-FileCopyrightText: 2024 John Willis <143434770+CerberusWolfie@users.noreply.github.com>
-SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
-SPDX-FileCopyrightText: 2025 Rouge2t7 <81053047+Sarahon@users.noreply.github.com>
-SPDX-FileCopyrightText: 2025 Solstice <solsticeofthewinter@gmail.com>
-
-SPDX-License-Identifier: AGPL-3.0-or-later
--->
-
 <Document>
-# Blueshield Officer (BSO) SOP
-This is the list of procedures, responsibilities, and duties of the [color=#1b67a5][bold]Blueshield Officer[/bold][/color] of this station.
+# СРП офицера "Синий Щит" (ОСЩ)
+Это список стандартных процедур и обязанностей [color=#1b67a5][bold]Офицера "Синий Щит"[/bold][/color] на этой станции.
 
 <ColorBox>
   <Box HorizontalAlignment="Center" Margin="10">
-    The [color=#1b67a5][bold]Blueshield Officer[/bold][/color] should never be Captain nor Head of Staff.
+    [color=#1b67a5][bold]Офицер "Синий Щит"[/bold][/color] никогда не должен исполнять обязанности капитана или руководителя отдела.
   </Box>
 </ColorBox>
 
-The [bold][color=#fcd12a]most important[/color][/bold] rule of the Blueshield Officer is to protect and maintain the lives of Command personnel on the station.
-<Box>Command personnel are personnel hired by Nanotrasen (confirmed personnel in command) and any Central Command officials (including NTR).</Box>
+[bold][color=#fcd12a]Самая важная задача/color][/bold]- защищать и обеспечивать безопасность командного состава станции на станции.
+<Box>Командный состав — это сотрудники, нанятые компанией Nanotrasen (подтверждённый командный состав), а также все должностные лица Центрального командования (включая ПНТ)</Box>
 
-1. The Blueshield Officer is hired and entrusted with the sole responsibility of protecting command. They should only take action in matters related to command or upon request from command members, unless directed otherwise by Central Command.
-  <Box>The Blueshield Officer should remain neutral on all conflicts between command staff.</Box>
+1. Офицер «Синий Щит» несёт ответственность за безопасность командования. Он должен принимать меры только в вопросах, связанных с командованием, или по запросу членов командования, если только центральное командование не распорядится иначе.
+  <Box>Офицер «Синий Щит» должен сохранять нейтралитет во всех конфликтах между командным составом.</Box>
 
-2. The Blueshield Officer is to put the lives of Command over the lives of all others, including the Blueshield Officer. Their well-being is top priority.
-<Box>This includes first aid, revival, and ensuring they are safe and secure during emergencies.</Box>
+2. Офицер «Синий Щит» должен ставить интересы командования выше интересов всех остальных, включая самого офицера «Синий Щит». Их благополучие — главный приоритет.
+<Box>Это включает в себя оказание первой помощи, реанимацию и обеспечение безопасности во время чрезвычайных ситуаций.</Box>
 
-3. The Blueshield Officer is to protect the lives of Command, not follow their orders to a fault.
+3. Офицер «Синий Щит» должен защищать жизнь членов командования, а не слепо выполнять их приказы.
 
-4. The Blueshield Officer is not permitted to interfere with legal demotions or arrests. To do so would be a violation of their Central Command orders and Space Law.
-<Box>This primarily pertains to Command and Security work.</Box>
+4. Офицеру «Синий Щит» не разрешается вмешиваться в законные процедуры понижения в должности или ареста. Это является нарушением приказов Центрального командования и космического закона
+<Box>Это в первую очередь касается работы командования и службы безопасности.</Box>
 
-5. The Blueshield Officer may use lethal force when actively protecting a member of Command from a clear and present danger. When the situation permits, they should warn transgressors that lethal force will be used if they continue their actions.
+5. Офицер «Синий Щит» может применить оружие на поражение, если активно защищает члена командования от явной и непосредственной угрозы. Если позволяет ситуация, он должен предупредить нарушителей, что в случае продолжения противоправных действий будет применено оружие на поражение.
 
-6. If multiple command members are threatened at once, the Blueshield Officer should follow the Chain-Of-Command to know who to prioritize.
-<Box>Central Command officials are to be prioritized over Command staff.  </Box>
+6. Если угроза нависла сразу над несколькими членами командного состава, то офицер «Синий Щит» должен действовать согласно цепочке командования и важности персон, чтобы определить, кому отдать приоритет. Представитель Nanotrasen и Магистрат имеют наивысший приоритет.
+<Box>Представители Центрального командования имеют приоритет перед сотрудниками командования.  </Box>
 
 </Document>

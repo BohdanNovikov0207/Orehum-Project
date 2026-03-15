@@ -1,157 +1,123 @@
 <Document>
-  # Shadowlings
+  # Тенеморфы
   <Box>
     <GuideEntityEmbed Entity="GuidebookShadowling" Caption=""/>
   </Box>
-  They aren't gods. But they want to become one...
-  These enigmatic aliens have baffled even the most advanced research divisions.
+  Они не боги, но хотят ими стать...
+  Эти загадочные существа поставили в тупик даже самые продвинутые исследовательские команды.
 
-  Shadowlings are light-sensitive xenoform alien creatures that come from space.
-  Primarily [bold]defensive in nature[/bold], they possess the ability to [bold]enthrall[/bold] crew members, taking full control of their minds and loyalty.
+  Тенеморфы — светочувствительные ксеноформные пришельцы из космоса.
+  В основне их [bold]обороны[/bold], способность [bold]порабощать[/bold] членов экипажа, полностью подчиняя их разум.
 
-  Shadowlings starts off disguised as a normal crew member.
-  After they awake, they must 'hatch' to unlock their powers.
+  Тенеморф начинает замаскировавшись под обычного члена экипажа.
+  После пробуждения он должен "вылупиться", чтобы получить свои способности.
 
-  When hatched, shadowlings will resemble humans with black skin, small horns, red eyes, and claws.
+  После вылупления тенеморф выглядит как человек с чёрной кожей, небольшими рогами, красными глазами и когтями.
 
-  Shadowlings take damage in the light, heal in the dark, are clumsy with guns. They cannot wear clothes of any kind, but can still equip headsets and wear backpacks.
+  Тенеморфы неуклюжо обращаются с огнестрельным оружием и не могут носить одежду. Несмотря на это, они всё ещё могут использовать гарнитуру и носить рюкзаки.
 
-  ## Starting out as a Shadowling
+  К слову, тенеморфы не обязаны работать вместе. Хотя сотрудничество может помочь, одиночная игра — вполне допустимый стиль.
 
-  You gain power as you enthrall others, so staying undetected is important at your weakest point.
+  ## Что делать, если я тенеморф?
 
-  Start by finding an isolated location, and break nearby lights to create a safe territory. Doing this while still a human is good, as once you transform, there is no going back and lights start to hurt you!
+  Ваша основная цель как тенеморфа — [color=#d22b2b]вознестись[/color].
 
-  Choose a hidden place to hatch that will keep your egg safe during your 15 second hatching period, and make sure you have the tools to get out when you are ready!
-  Upon hatching, pick up your ID for access, your backpack for belongings, and your headset, and to remain unknown, you must rehide your egg.
+  Чтобы вознестись, вам нужно:
+  - 1. Собрать 20 траллов (порабощённых).
+  - 2. Создать свой кокон при помощи способности "Вознесение".
+  - 3. Войти в кокон и начать ритуал вознесения.
 
-  You are now a Shadowling so you need to worry about lights! Toggling off [bold]night vision[/bold] can help you see lights, and your [bold]Veil[/bold] ability disables and breaks lights in a large range.
-  Your fists also work for hitting lights as you don't get shocked.
+  Вы уязвимы к свету и будете получать урон при от его воздействия. Однако [bold]в тени вы исцеляетесь[/bold], так что используйте тьму себе во благо.
 
-  You now look like a demon, so if you are spotted by security, you are always [bold]vulnerable to being flashed[/bold], so your best option early on is to run while you gain abilities and allies.
-  You are very capable of fleeing if you use [bold]Shadow Walk[/bold] to rapidly move while invisible, and [bold]Icy Veins[/bold] to freeze everyone nearby.
+  Выбирайте своих траллов с умом.
 
-  ## Enthralling Others
+  ## Я Тралл. В чём моя цель?
 
-  Your general goal from here is to convert 20 people, so how do you do that? First of all you can't enthrall IPCs or mindshielded people until you are empowered.
+  Вы похожи на революционера, но со временем и послушанием можете стать чем-то гораздо более могущественным.
 
-  Your conversion ability [bold]Enthrall[/bold] takes 5 seconds of standing near someone, so you need that person to stay still for you.
-  This is best achieved with [bold]Glare[/bold], which is a 6 second instant stun and mute, which works best at close range.
+  Ваша главная цель — слушаться тенеморфа, который вас поработил.
+  Если тенеморф приказывает вам совершить самоубийство — вы должны это сделать. Неважно, маг вы или ядерный оперативник.
 
-  You may need to [bold]Veil[/bold] to disable all nearby lights, to make sure you are uninterrupted by light damage during this time.
-  Conversions can be secured slightly easier with makeshift handcuffs, but make sure to quickly take off their headset after they are restrained.
+  У вас также есть несколько способностей, например Тень и Зрение тралла.
 
-  If you succeed, this thrall is now essentially mind controlled to you, but they also gain the ability to see in the dark, and temporarily turn invisible.
-  They are a normal crewmember, but can be identified as a thrall if they are not covering their eyes, so tell them to wear face or eyewear, and to start breaking lights to expand your territory.
+  - Взор: даёт временную невидимость, если используется в темноте.
+  - Зрение тралла: даёт ночное зрение, позволяющее видеть в полной темноте.
 
-  ## Shadowling Progressive Abilities
+  Чем вы полезнее и преданнее, тем большую ценность представляете для своего тенеморфа.
 
-  Once you start gaining thralls, you gain access to more abilities. Use the ability [bold]Collective Mind[/bold] to see your progress, and reap the rewards.
+  ## Что делать экипажу против тенеморфов?
 
-  Your abilities are unlocked at set thresholds, being:
-  - At 3 thralls: Temporarily disorient nearby victims with [bold]Sonic Screech[/bold]
-  - At 5 thralls: Damage and disable APCs with [bold]Null Charge[/bold]
-  - At 7 thralls: Revive thralls and create up to 5 Lesser Shadowlings with [bold]Black Recuperation[/bold], at the permanent cost of your own light resistance!
-  - At 10 thralls: Create a smoke cloud that heals thralls and shadows, and blinds those who aren't
-  - At 12 thralls: Enthrall is replaced with [bold]Empowered Enthrall[/bold] that allows for converting those who are mindshielded and IPCs, at a much quicker rate
-  - At 15 thralls: Gain full immunity to light damage with [bold]Nox Imperii[/bold]
-  - At 20 thralls: Form your ascension egg to begin your 5 minute ascension period
+  Тенеморф — это угроза, которую нужно устранить как можно скорее.
 
-  ## How do I Ascend?
+  - Никогда не патрулируйте техи в одиночку. Держитесь группами.
+  - Служба Безопасности должна быть вооружена и всегда находиться начеку.
 
-  Once you have 20 thralls, use your "Ascendance" ability to place your ascension egg.
-  Right-click the egg and select "Start Ascension".
+  NanoTrasen также оснастила станцию специальным устройством, разработка которого заняла несколько десятилетий изучения этой
+  странной инопланетной расы и её воздействия на живые организмы.
 
-  You will be immobile and vulnerable for 5 minutes during the process.
+  [bold]УПМК — Устройство Против Ментального Контроля[/bold] может удалить любое ментальное воздействие и повысить сопротивляемость освобожденного порабощённого.
 
-  If the egg is destroyed, you become an Abomination. That means:
-    - No powers
-    - Extremely slow movement
-    - Practically useless
+  Он доступен во 2-м уровне исследований через протолат и требует те же материалы, что и вспышка, но еще нужен свинец.
 
-  Protect your egg at all costs. Failure means humiliation.
+  Не забывайте, что у устройства всего [bold]5 зарядов[/bold].
 
-  ## I'm a Thrall, What is my Purpose?
+  Кроме того, младшие тенеморфы не подвержены его воздействию. Их разум потерян, и, к сожалению, восстановлению не подлежит.
 
-  You're similar to a revolutionary, but with time and obedience, you can become something far more powerful.
+  Дополнительные меры:
+  - Импланты защиты разума дают временную защиту, но тенеморфы со временем получают способности обходить их.
 
-  As a thrall, your main purpose is to listen to your shadowling, the one that converted you.
-  You can be identified as a thrall through examination if you don't cover your eyes with a mask or glasses.
-  If your Shadowling demands that you suicide, you must suicide. It doesn't matter if you're a Wizard or a Nukie.
+  Если тенеморф начинает вознесение, весь доступный экипаж должен вооружиться и попытаться уничтожить кокон до завершения процесса вознесения.
+  Успейте — и выживете. Провалитесь — и узрите божество!
 
-  You also have a few abilities at your disposal, like Guise and Thrall Darksight.
+  ## Как вознестись?
 
-  - Guise: Grants temporary invisibility when used in the dark.
+  Когда у вас будет 20 траллов, используйте способность "Вознесение", чтобы создать кокон.
+  Кликните правой кнопкой по кокону и выберите "Начать вознесение".
 
-  - Thrall Darksight: Grants night vision, allowing you to see in complete darkness.
+  Во время процесса вы будете неподвижны и уязвимы в течение 5-ти минут.
 
-  The more obedient and useful you are, the more valuable you become to your Shadowling.
+  Если яйцо будет уничтожено, вы станете Мерзостью. Это значит:
+    - Без способностей
+    - Крайне медленное передвижение
+    - Практически бесполезно
 
-  ## What Can I Do as Crew to Fight Against a Shadowling?
+  Защищайте своё яйцо любой ценой. Провал — это унижение.
 
-  A Shadowling is a threat that should be taken care of early in the shift.
+  ## Что происходит, если тенеморф возносится...
 
-  - Never patrol maintenance alone. Stick to groups.
-  - Security should stay armed and alert.
+  Если тенеморф возносится, экипаж всё ещё может победить, убив его. Однако у него будет много здоровья и очень мощные способности.
 
-  Nanotrasen has also issued the Station with a special device that essentially took several decades of researching this
-  strange alien species and its effects on living beings.
+  После завершения вознесения все тенеморфы возносятся мгновенно, а траллы превращаются в кошмаров.
 
-  The [bold]anti-mind control device[/bold] can remove any mind control from any person, and apply further resistance to the Thrall
-  that is to be deconverted.
+  Кошмары имеют клинки вместо рук, могут уничтожать источники света и проходить сквозь стены без усилий!
 
-  It exists in Tier 2 research through the prolathe and it has the same materials as a Flash, but with Gold required.
+  Кошмары также отражают пули, находясь в темноте.
 
-  Don't forget that it has only [bold]5 charges[/bold] per device.
+  ## Кто такие младшие тенеморфы?
 
-  Other than that, note that Lesser Shadowlings are not affected from it. Their mind is lost, and sadly unrecovable.
+  Младший тенеморф — это тралл, превращённый способностью "Восстановление".
+  Младших тенеморфов нельзя освободить при помощи УПМК.
 
-  Additional Countemeasures:
-  - Mindshield implants offer temporary protection, though Shadowlings will gain abilities to bypass them.
+  Однако они тоже получают урон от света, как и обычные тенеморфы, пусть и значительно медленнее.
 
-  In case of a Shadowling starting an ascension, all available crew should arm themselves and rush to destroy the ascension egg before the process completes.
-  Succeed, and you live. Fail... and witness a god!
+  Вы можете иметь до 5-ти таких порабощённых, поэтому выбирайте их с умом. Качество важнее количества.
 
-  ## What Happens If a Shadowling Ascends...
+  ## Советы и дополнительная информация
 
-  If a Shadowling ascends, there's still a chance to win by killing the Shadowling. However, it has a good amount
-  of health and very strong abilities, including an instant ranged enthrallment, instant ranged gibbing, and a charged lightning frenzy.
+  - Как тенеморф, вы можете определить своих траллов, осматривая их.
 
-  Once an ascension completes all Thralls will be turned into Nightmares.
+  - Хотя другие тенеморфы возносятся, когда один достигает вознесения, конкуренция может сделать игру интереснее. Станьте единственным вознесённым, или умрите хотя бы попытавшись.
 
-  Nightmares have arm-blades that can ash lights, and they can phase through walls without a care in the world!
+  - Способность "Коллективный разум" парализует ваших траллов при получении новой силы, но также сообщает, сколько ещё осталось для вознесения.
 
-  Nightmares also reflect all bullets when in the dark.
+  - Осматривайте себя, чтобы узнать, насколько вы устойчивы к свету.
 
-  ## What is a Lesser Shadowling?
+  - "Восстановление" снижает вашу устойчивость к свету при каждом использовании, так что применяйте её с осторожностью.
 
-  A lesser Shadowling is a thrall who got converted by the Black Recuperation ability.
-  Lesser Shadowlings can not be deconverted by the anti-mind control device.
+  - Экипажу не нужно уничтожать тело тенеморфа. После смерти он теряет всех траллов.
 
-  However, they do take damage from lights, similarly to a Shadowling. Much slower, though.
-  They also gain a weaker version of [bold]Veil[/bold], that stuns and mutes for less time, but long enough to cuff for conversions.
+  - [bold]Это скрытый антагонист[/bold]. Не вступайте в открытый бой. Играйте осторожно и порабощайте членов экипажа.
 
-  You can have up to 5 of them, so choose them carefully. Quality over quantity.
-
-  ## Tips and more info
-
-  - As a Shadowling, you can identify your thralls by examining them.
-
-  - Your Collective Mind ability paralyzes your Thralls once you gain a new power. However, it also
-  informs you on how many thralls you need to ascend.
-
-  - Examine yourself to see how much light resistance you have.
-
-  - Black Recuperation decreases your light resistance per use, so be careful when you use it.
-
-  - As crew, you do not have to ash or gib a Shadowling. They lose all thralls at death.
-
-  - [bold]This is a stealth antagonist[/bold], do not try to fight people as a Shadowling. Instead, play defensive and enthrall people.
-
-  - The emergency shuttle can be delayed with your [bold]Destroy Engines[/bold] ability.
-
-  - All of your damage, internal and external, can be healed with [bold]Rapid Rehatch[/bold], but only when not critical.
-
-  [bold][color=#000000]Become the darkness.[/color] [color=#702963]Embrace the void.[/color] [color=#D2042D]Ascend.[/color][/bold]
+  [bold][color=#000000]Станьте тьмой.[/color] [color=#702963]Обнимите пустоту.[/color] [color=#D2042D]Вознеситесь.[/color][/bold]
 
 </Document>

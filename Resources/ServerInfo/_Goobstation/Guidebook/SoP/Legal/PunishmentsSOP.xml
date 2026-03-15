@@ -1,37 +1,30 @@
-<!--
-SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
-SPDX-FileCopyrightText: 2025 John Willis <143434770+CerberusWolfie@users.noreply.github.com>
-
-SPDX-License-Identifier: AGPL-3.0-or-later
--->
-
 <Document>
-# Punishment Procedures
-This is a list of procedures for punishing those accused of crimes. These are standard punishments and should be followed unless an emergency prevents such cases.
+# Процедуры наказаний
+Это перечень процедур для наказания обвиняемых в преступлениях. Это стандартные меры, и им следует следовать, если только чрезвычайная ситуация не мешает их выполнению.
 
-## Brigging Rules
-No prisoner is to be held for longer than ten (10) minutes in Processing if no evidence against them is readily available.
+## Правила помещения в бриг
+Ни один заключённый не должен содержаться в Процессинге дольше десяти (10) минут, если против него нет готовых доказательств.
 
-Should the ten (10) minutes expire without any evidence of any crimes coming to light, the prisoner is to be released. Otherwise, proceed with the following guidelines.
+Если по истечении десяти (10) минут доказательства преступления не обнаружены, заключённого следует отпустить. В противном случае действуйте по следующим пунктам.
 
-## Brigging Guidelines
-1. The prisoner is to be cuffed, and brought to their cell.
+## Порядок помещения в бриг
+1. Заключённого следует заковать в наручники и доставить в его камеру.
 
-2. The prisoner is to be stripped of all belongings, save for their uniform, headset, PDA and shoes. Vox are to retain their internals.
+2. Заключённого следует лишить всех вещей, кроме формы, гарнитуры, ПДА и обуви. Воксам следует оставить интерналы.
 
-3. The timer for the cell is to be set, and the charges declared.
+3. Установите таймер камеры и объявите предъявленные обвинения.
 
-4. The prisoner is then to be uncuffed. If they are a violent risk, they may be buckle cuffed, flashed and then have their cuffs removed.
+4. Затем заключённого следует разнести. Если он представляет опасность, его можно пристегнуть к койке в наручниках, ослепить вспышкой, а затем снять наручники.
 
-5. Prisoners attempting to break the lights in the cell are to be flashed.
+5. Заключённых, пытающихся разбить освещение в камере, следует ослеплять вспышкой.
 
-6. Prisoners attempting to break the windows of the cell are to be flashed and their timers reset.
+6. Заключённых, пытающихся разбить окна камеры, следует ослеплять вспышкой и сбрасывать им таймер.
 
-7. Removal of the prisoner's headset may ONLY occur if the prisoner is using the headset to constantly flood any communication channel with irrelevant/inane information and/or calls of "Shitcurity", or if the prisoner is seriously attempting to incite violent action against Security and/or Command via continuous calls for violence.
+7. Снимать гарнитуру с заключённого можно ТОЛЬКО в случае, если он использует её для постоянного засорения любого канала связи бессмысленной/никчёмной информацией и/или криками «Shitcurity», либо если он серьёзно пытается подстрекать к насилию против СБ и/или Командования посредством непрерывных призывов к насилию.
 
-8. After searching has been done on PDA, clothing, and headset, they are to be returned unless they are contraband or have been tampered with. In such cases, they should be replaced.
+8. После досмотра ПДА, одежды и гарнитуры их следует вернуть, если они не являются контрабандой и не были модифицированы. В таком случае их следует заменить.
 
-9. Prisoners should never be deprived of equipment that is necessary for their vital operations.
-<Box>This includes batteries for IPCs, N2 Gas Tanks and Masks for Voxes, and regular equipment as stated above (PDA, Headset, Clothes).</Box>
+9. Заключённых нельзя лишать оборудования, необходимого для их жизнедеятельности.
+<Box>К таким предметам относятся батареи для IPC, баллоны с азотом и маски для воксов, а также обычное снаряжение, указанное выше (ПДА, гарнитура, одежда).</Box>
 
 </Document>

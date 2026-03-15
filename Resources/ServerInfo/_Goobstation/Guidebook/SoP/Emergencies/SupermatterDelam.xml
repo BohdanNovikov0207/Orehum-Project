@@ -1,23 +1,16 @@
-<!--
-SPDX-FileCopyrightText: 2024 John Willis <143434770+CerberusWolfie@users.noreply.github.com>
-SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
-
-SPDX-License-Identifier: AGPL-3.0-or-later
--->
-
 <Document>
-# Supermatter Delamination Procedures
-In the event of the supermatter crystal completely delaminating, the station alert should be set to [color=#a40484]Delta Alert[/color] and the evacuation shuttle should be called.
+# Процедуры отслаивания сверхматерии
+В случае полного отслаивания кристалла сверхматерии, сигнал тревоги на станции должен быть установлен на [color=#a40484]Дельта код[/color] и должен быть вызван эвакуационный шаттл.
 
-1. If the Supermatter Crystal integrity is rapidly declining, Engineering personnel should vent the atmosphere in an attempt to stabilize it.
+1. Если целостность кристаллов сверхматерии быстро снижается, инженерный персонал должен проветрить атмосферу в попытке стабилизировать ее.
 
-2. If the Supermatter Crystal integrity is nearing zero, Engineering personnel should attempt to fix and/or prepare containment fields to contain the delamination.
+2. Если целостность кристаллов сверхматерии приближается к нулю, инженерный персонал должен попытаться зафиксировать и/или подготовить защитные поля для предотвращения расслоения.
 
-3. If the Supermatter Crystal is beyond saving, containment fields impossible to setup, Engineering personnel should attempt to remove the Supermatter Crystal from the station by any means necessary.
+3. Если кристалл Сверхматерии невозможно сохранить, а защитные поля невозможно установить, инженерный персонал должен попытаться удалить Кристалл сверхматерии со станции любыми необходимыми средствами.
 
-4. If the delamination is contained, the station alert should be set to a safe alert level, and crew should be notified of the recovery.
-<Box>Engineering personnel should alert the crew of a successful containment.</Box>
+4. Если отслоение локализовано, следует установить аварийный сигнал станции на безопасный уровень и уведомить экипаж о восстановлении.
+<Box>Инженерный персонал должен предупредить экипаж об успешной локализации.</Box>
 
-5. If it is found that the delamination process was due to gross negligence, incompetence, and/or sabotage, the personnel responsible should be dismissed/demoted.
+5.  Если будет установлено, что процесс расслаивания произошел из-за грубой халатности, некомпетентности и/или саботажа, ответственный персонал должен быть уволен/понижен в должности.
 
 </Document>

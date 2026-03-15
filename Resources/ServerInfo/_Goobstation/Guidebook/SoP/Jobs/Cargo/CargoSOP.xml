@@ -1,17 +1,13 @@
-<!--
-SPDX-FileCopyrightText: 2024 John Willis <143434770+CerberusWolfie@users.noreply.github.com>
-SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
-
-SPDX-License-Identifier: AGPL-3.0-or-later
--->
-
 <Document>
-# Cargo Department SOP
-These are the list of SOPs that Cargo Personnel should follow. These are, as stated before, [bold]not checklists[/bold] and should be treated as guidelines.
+# Регламент отдела снабжения
+Здесь перечислены стандартные процедуры, которым должен следовать персонал снабжения. Это, как уже отмечалось, [bold]не чек-листы[/bold], и их следует рассматривать как рекомендации.
 
-The following jobs have entries in this Department, the [color=#1b67a5][bold]Quartermaster[/bold][/color] being the Head of Staff:
-- [textlink="Quartermaster" link="QuartermasterSOP"]
-- [textlink="Cargo Technician" link="CargoTechSOP"]
-- [textlink="Salvage Specialist" link="SalvageSpecialistSOP"]
+Для простоты [color=#846326]Техник снабжения[/color] и [color=#846326]Курьер[/color] объединены.
+
+В этом отделе представлены следующие должности; [color=#1b67a5][bold]Офицер по логистике[/bold][/color] — глава отдела:
+- [textlink="Офицер по логистике" link="LogisticsOfficer SOP"]
+- [textlink="Техник снабжения" link="CargoTech SOP"]
+- [textlink="Курьер" link="CargoTech SOP"]
+- [textlink="Специалист по подъёму обломков" link="SalvageSpecialist SOP"]
 
 </Document>

@@ -1,27 +1,20 @@
-<!--
-SPDX-FileCopyrightText: 2024 John Willis <143434770+CerberusWolfie@users.noreply.github.com>
-SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
-
-SPDX-License-Identifier: AGPL-3.0-or-later
--->
-
 <Document>
-# Chef SOP
-This is the list of procedures, responsibilities, and duties of the [color=#388c34][bold]Chef[/bold][/color] of this station.
+# Регламент повара
+Это перечень процедур, полномочий и обязанностей [color=#388c34][bold]Повара[/bold][/color] на этой станции.
 
-1. The Chef is not permitted to use the corpses of deceased personnel for meat unless given specific permission from the Chief Medical Officer.
-<Box>Exceptions are made for changelings and any other executed personnel not slated for Borgifications.</Box>
-<Box>Exceptions can also be made for express permission given and signed off by a Command Personnel with consent from the deceased personnel.</Box>
+1. Повару запрещено использовать тела умерших сотрудников в качестве мяса, если только на это не получено прямое разрешение Главного врача.
+<Box>Исключение — генокрады, а также иные казнённые, не намеченные к боргизации.</Box>
+<Box>Исключение также может быть сделано при наличии прямого разрешения, выданного и утверждённого членом командования, при условии, что погибший дал на это согласие.</Box>
 
-2. The Chef is permitted to use Ambrosia and other such light narcotics in the production of food.
+2. Повару разрешается использовать амброзию и другие аналогичные лёгкие наркотики при приготовлении пищи.
 
-3. The Chef must produce at least three (3) dishes of any food within twenty (20) minutes.
-<Box>Failure to do so is to be considered a breach of Standard Operating Procedure.</Box>
+3. Повар обязан приготовить не менее трёх (3) блюд в течение двадцати (20) минут.
+<Box>Невыполнение этого требования будет считаться нарушением стандартных процедур.</Box>
 
-4. The Chef is not permitted to leave the kitchen unattended for longer than fifteen (15) minutes if there is no food available for consumption.
-<Box>Exception is made if there are no ingredients, or if the Kitchen is unusable or is an active hazard zone.</Box>
-<Box>Exceptions also apply if there is an active emergency, such as Nuclear Operatives, Blob, and/or Delta Alert.</Box>
+4. Повару запрещено оставлять кухню без присмотра более чем на пятнадцать (15) минут, если нет готовой к употреблению пищи.
+<Box>Исключение — отсутствие ингредиентов, непригодность кухни к использованию или если кухня является активной опасной зоной.</Box>
+<Box>Исключения также действуют при активной чрезвычайной ситуации, такой как ядерные оперативники, блоб и/или уровень тревоги «Дельта».</Box>
 
-5. The chef is permitted to use their [textlink="Close Quarters Cooking (CQC)" link="CQC"] to defend their workplace and coworkers. Lethal force should only be used when necessary.
+5. Повару разрешено использовать свои импровизированные средства защиты, для защиты рабочего места и коллег. Смертельную силу следует применять только при необходимости.
 
 </Document>

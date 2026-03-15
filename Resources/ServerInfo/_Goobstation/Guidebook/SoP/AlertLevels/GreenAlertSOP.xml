@@ -1,47 +1,40 @@
-<!--
-SPDX-FileCopyrightText: 2024 John Willis <143434770+CerberusWolfie@users.noreply.github.com>
-SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
-
-SPDX-License-Identifier: AGPL-3.0-or-later
--->
-
-<Document>
+﻿<Document>
     # Station Alert - Green
 
     <Box>
-        [italic]Called by: Anyone with Command-Level Access at a working Communications Console.[/italic]
+        [italic]Вызывается: Любым пользователем, имеющим доступ командного уровня к рабочей консоли связи.[/italic]
     </Box>
 
-    [bold]Conditions:[/bold]
+    [bold]Условия:[/bold]
 
-    Default Alert Code at the start of the shift. Do not change unless a threat is suspected/confirmed;
+    Стандартный код в начале смены. Не меняйте его, пока не появится подозрение/подтверждение угрозы;
 
-    [bold]OR[/bold]
+    [bold]ИЛИ[/bold]
 
-    All confirmed/suspected threats to the station and/or crew have been handled, or simply vanished on their own. It is recommended that, after 15+ minutes on Code Blue without any hostile activity, Code Green be called;
+    Все подтвержденные/предполагаемые угрозы станции и/или экипажу были устранены или просто исчезли сами по себе. Рекомендуется, чтобы после более чем 15 минут действия синего кода без каких-либо враждебных действий был объявлен Зеленый код;
 
-    [bold]Security:[/bold]
+    [bold]Служба безопаности:[/bold]
 
-    All weapons must be holstered or kept in pockets/suit storage slots unless absolutely required;
+    Все оружие должно быть убрано в кобуру или храниться в карманах/отделениях для хранения костюма, за исключением случаев крайней необходимости;
 
-    Random searches are not permitted without express permission by either the Head of Security or Captain. However, searches are still permitted if there is reasonable suspicion of a crime.
+    Произвольные обыски запрещены без специального разрешения начальника службы безопасности или капитана. Однако обыски по-прежнему разрешены, если есть обоснованные подозрения в совершении преступления.
 
-    [bold]Secure Areas:[/bold]
+    [bold]Безопасные зоны:[/bold]
 
-    EVA Storage, Tech Storage, Gravity Generator, Engineering Secure Storage, AI Upload, Vault, Gateway, anywhere else requiring command level access that does not get regularly used.
+    Хранилище EVA, техническое хранилище, Гравитационный генератор, Инженерное защищенное хранилище, загрузка ИИ, хранилище, шлюз, любое другое хранилище, требующее доступа на командном уровне, которое используется нерегулярно.
 
-    Secure areas such as EVA are to be left unbolted and ready to be used for their intended purposes.
+    Защищенные зоны, такие как EVA, следует оставлять незапертыми и готовыми к использованию по назначению.
 
-    Exceptions are below;
+    Ниже приведены исключения;
 
-    The Vault is not to be opened unless repairs are required, gold is required for Research and Development (in case Mining fails to deliver) or a critical item needs to be hidden in the safe.
+    Хранилище нельзя открывать, если только не требуется ремонт, золото требуется для исследований и разработок (на случай, если добыча не принесет результатов) или если необходимо спрятать в сейф важный предмет.
 
-    Searches of a person or department need to have a signed and stamped warrant by the Captain or HoP.
+    Для проведения обыска у человека или в отделе должен быть ордер, подписанный и заверенный печатью главы службы безопасности.
 
-    [bold]General Crew:[/bold]
+    [bold]Общий состав экипажа:[/bold]
 
-    While not required, it is recommended that the crew activate and maximize their Suit Sensors, due to the potential for workplace accidents;
+    Несмотря на то, что это не требуется, экипажу рекомендуется активировать и максимально использовать датчики своих костюмов из-за возможности несчастных случаев на производстве;
 
-    Free transit through the station is permitted for the crew, excluding Secure Areas.
+    Экипажу разрешен свободный проход по станции, за исключением охраняемых зон.
 
 </Document>

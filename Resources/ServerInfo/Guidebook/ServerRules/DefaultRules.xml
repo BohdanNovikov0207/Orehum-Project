@@ -1,78 +1,78 @@
-<!--
-SPDX-FileCopyrightText: 2024 Aidenkrz <aiden@djkraz.com>
-SPDX-FileCopyrightText: 2024 Chief-Engineer <119664036+Chief-Engineer@users.noreply.github.com>
-SPDX-FileCopyrightText: 2024 John Willis <143434770+CerberusWolfie@users.noreply.github.com>
-SPDX-FileCopyrightText: 2024 Kira Gbedan <161087999+Verbalase@users.noreply.github.com>
-SPDX-FileCopyrightText: 2024 Piras314 <92357316+Piras314@users.noreply.github.com>
-SPDX-FileCopyrightText: 2024 basic pack <159909786+packmore@users.noreply.github.com>
-SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
-SPDX-FileCopyrightText: 2025 Aiden <aiden@djkraz.com>
-
-SPDX-License-Identifier: AGPL-3.0-or-later
--->
-
-<!-- Rules directly linked to prototype\rules.yml - edit both to change names of files/textlinking or add additional rules-->
-
 <Document>
-# Goobstation Rules
+﻿﻿[color=#ff0000]Игнорирование или уклонение от общения с администраторами приведёт к блокировке с возможностью обжалования. Администраторам сложно работать, когда с ними не общаются — заходите в наш Discord и решайте вопросы мирно, обид не будет.[/color]
 
-  - Space Station 14 is not like most games. Many rules are designed to require roleplay, and not all rules are intuitive. Please take the time to read and understand the rules before you play so that you aren't surprised. Some of our rules are zero tolerance rules, meaning that a violation will result in an indefinite ban without any warning. Game admins will treat you as if you have read the rules, even if you have not.
+[color=#bb00bb]Это единственный официальный источник правил сервера. Если нужно — обращайтесь к администраторам через AHelp (F1) или Discord.[/color]
 
-  - Roleplay is king, and admins can disregard other rules to this end should it prove beneficial for the experience of the shift. Admins may choose to intervene in rounds when it is in the best interest of the playerbase.
+У нас нет вики. Вся необходимая информация либо уже доступна, либо будет доступна через игровые Руководства (клавиша NumPad0), например, по управлению энергоснабжением станции. Если вы не нашли какую-либо конкретную информацию — например, как выполнять свою работу или как именно реализовать то, что указано в документе — вы можете обратиться к администратору через [color=#DC143C]AHelp (F1)[/color] или спросить других игроков с помощью [color=#66bbff]OOC[/color] or [color=#66e0e0]LOOC[/color] чатов.
 
-## CORES RULES
+[color=#a4885c]I.I. Правила сервера.[/color] Правила сервера – главные и обязательные для всех. Они имеют приоритет над другими правилами, такими как регламент администрации.
 
-  - [textlink="0. The admins interests" link="Admins"]
-  - [textlink="1. Don't be a dick" link="RuleC1"]
-  - [textlink="2. Do not use information gained outside of in-character means" link="RuleC2"]
-  - [textlink="3. This is a sandbox roleplaying server" link="RuleC3"]
-  - [textlink="4. Lone antagonists are unbound by (most) rules" link="RuleC4"]
-  - [textlink="5. Players in vital job roles require a minimum amount of effort" link="RuleC5"]
-  - [textlink="6. In-game administration rulings are final" link="RuleC6"]
-  - [textlink="7. Only use English" link="RuleC7"]
-  - [textlink="8. Erotic/creepy stuff is not allowed." link="RuleC8"]
-  - [textlink="9. Players need to be the age of 16 or above" link="RuleC9"]
-  - [textlink="10. Losing is part of the game" link="RuleC10"]
-  - [textlink="11. Bigotry is not allowed" link="RuleC11"]
-  - [textlink="12. Use realistic character names, and do not use names of famous people" link="RuleC12"]
+[color=#a4885c]I.II. Осведомленность.[/color] Играя на сервере, вы автоматически соглашаетесь с правилами и обязуетесь их соблюдать.
+    - Если вы не согласны с какими-либо пунктами – обратитесь к администрации с предложением изменить их.
+    - Не играйте на сервере, если не готовы следовать установленным правилам.
 
-## IN GAME & ROLEPLAY RULES
+[color=#a4885c]I.III. Правки в правилах.[/color] Администрация может в любой момент изменить правила.
+    - О существенных изменениях будет сообщено в ⁠новостях дискорда.
+    - Косметические и мелкие правки могут вноситься без уведомления.
 
-  Additional rules made for our roleplay servers (Sigma/Alpha/Beta(LRP) & Regalis/Aurum(MRP)) If roleplaying isn't your style, every other server still abides by only the Main Rules.
+[color=#a4885c]I.IV. Суть правил.[/color] Все правила направлены на развитие ролевого режима и обеспечение комфорта игроков.
+    - Игроки могут предлагать изменения – через обращения или голосования.
+    - Администрация может делать исключения из правил по своему усмотрению.
 
-  Please note that a ban on the low roleplay servers may result in a ban on the medium roleplay servers, and vice versa.
+[color=#a4885c]II.[/color] Правила с описанием принципов работы администрации можно посмотреть в Discord.
+
+[color=#a4885c]III.I. Меры наказания.[/color] Администрация в праве на своё усмотрение выбирать любую доступную им меру наказания, которая будет отвечать критериям справедливости и эффективности. При выборе меры в первую очередь внимание акцентируется на намеренности содеянного и рецидивизме, если игрок специально совершает нарушения с целью помехи другим - он получит очень высокое наказание, в свою очередь тот, кто просто ещё не освоился в игре (слабый игрок) получит низкое наказание, либо вовсе его не получит и будет проконсультирован участником команды проекта, для того, чтобы такого не случалось впредь.
+
+[color=#a4885c]III.II. Обжалования.[/color] Внутриигровые наказания можно оспорить в течении 7-и дней (в некоторых случаях дольше), подав соответствующий тикет в Discord.
+
+[color=#a4885c]III.III. Исключения.[/color] Команда проекта в праве давать исключения из правил, если нарушения были совершены в благих для проекта целях или потенциально не могли никак и никому навредить.
+
+[color=#a4885c]III.IV. Презумпция невиновности.[/color] При вынесении вердикта по каким-либо ситуациям действует презумпция невиновности, согласно которой игрока следует считать полностью невиновным до тех пор, пока его вина не будет доказана. Слова, переписки и даже признание нарушения не являются поводом для выдачи наказания. Признание может быть принято для выдачи наказания только если игрок уже является подозреваемым в совершении каких-либо нарушений, при этом наказание по признанию должно быть ниже, чем было бы выдано, не будь этого самого признания, если это как-либо позволило сэкономить время на выяснения и разбор ситуаций.
+
+[color=#a4885c]III.V. Провокация.[/color] Провокация не может являться оправданием для нарушения, за исключением случаев, когда она создаёт критическую помеху для взаимодействия. В первую очередь всегда обращайтесь к администрации, а не устраивайте самосуд.
+
+[color=#a4885c]III.VI. Вред.[/color] Нарушение ненаказуемо, если никто, включая сам проект потенциально не мог пострадать в ходе него.
+
+[color=#a4885c]IV.I. Ник-нейм.[/color] Имя персонажа должно писаться в полной его форме в соответствии с лором его расы.
+
+[color=#a4885c]IV.II. Известные личности.[/color] Запрещено использовать имена известных знаменитостей, которые могут привлекать к себе излишнее внимание игроков и портить атмосферу, а также запрещено использовать реальные имена/псевдонимы игроков. Совпадения не наказуемы.
+
+[color=#a4885c]V.I. Конфликты.[/color] Каждый игрок должен вести себя уважительно по отношению к другим игрокам, не проявлять токсичности, не оскорблять их, не переходить на личности и не унижать человеческое достоинство. Под это правило также подпадает разжигание конфликтов на почве разногласий в политике и жизненной позиции, публикация личных данных игроков без их согласия.
+
+[color=#a4885c]V.II. Уважительная обстановка.[/color] Каждый игрок должен уважать комфорт других, не портить игровые впечатления и атмосферу. Запрещена провокационная и агрессивная игра, которая несмотря на ролевую завуалированность – мешает игре и портит атмосферу.
+
+[color=#a4885c]V.III. Лояльность.[/color] Каждый игрок должен получать позитивные эмоции от игры, вне зависимости от ситуации, а также делится ими с окружающими. Один из таких способов – проявление лояльности. Лояльность – благосклонное отношение к игрокам, является фундаментальной частью взаимодействия между ними. Простейшее, что вы можете сделать – поблагодарить игрока за игру в чат, но и на этом всё не заканчивается. Другой пример, когда игрок намеренно играет ситуацию в сторону оппонента в рамках разумного. В остальном же, игрок сам решает, как благодарить оппонента.
+
+[color=#a4885c]V.IV. Новички.[/color] Игроки должны с пониманием относиться к новичкам и игрокам со слабыми навыками ролевой игры, помогая им освоиться и передавая их в руки администрации. Также игроки должны с серьёзностью относиться к советам окружающих и процессу совершенствования своих навыков.
+
+[color=#a4885c]VI.I. Ролевое поведение.[/color] Запрещено неролевое поведение, то есть не соответствующее правилам и нормам ролевой игры, создающее помеху другим, портящее атмосферу и впечатления от игрового процесса и дающее нарушителю необоснованное преимущество.
+
+[color=#a4885c]VI.II. Метагейминг.[/color] Запрещён метагейм, игра по OOC информации, перенос OOC в IC и наоборот.
+
+[color=#a4885c]VI.III. Павергейминг.[/color] Запрещён павергейминг – превышение возможностей персонажа и поведение не укладывающееся в рамки ролевой игры.
+
+[color=#a4885c]VI.IV. Нарушение атмосферы.[/color] Запрещено нарушать игровую атмосферу и портить впечатление от игры.
+
+[color=#a4885c]VI.V. Сленг.[/color] Для более атмосферной игры можно использовать сленг, в том случае, если он вписывается в игру. В тоже время не стоит им злоупотреблять и пихать его везде и всегда. Использовать сленг в чате эмоций разрешено только если он может быть понятен окружающим.
+
+[color=#a4885c]VI.VI. Уход от игры.[/color] Запрещено выходить из игры во время ситуации без согласия всех сторон. Если игрок был вынужден отключиться из-за проблем с интернетом, либо у него случился вылет – у него есть 5 минут на возвращение в игру. Если игрок отключился по некоим образом независящим от него обстоятельствам(отключение света, интернета) - он может отменить наказание, предоставив доказательства.
+
+[color=#a4885c]VI.VII. Эротический отыгрыш.[/color] Запрещено ЕРП во всех его проявлениях. Даже механические действия определенного характера, которые не включают в себя использование чата эмоций, могут расцениваться как нарушение этого правила. Это включает, но не ограничивается: раздевание персонажа до гола, прикрепления его к кровати и исполнение определенных движений при помощи клавиш передвижения. Это же правило применяется и к конструкциям.
 
 
-  - [textlink="1. Roleplay" link="RuleR1"]
-  - [textlink="2. Escalation" link="RuleR2"]
-  - [textlink="3. Chain of Command" link="RuleR3"]
-  - [textlink="4. Do not metagame, obey the Metashield" link="RuleR4"]
-  - [textlink="5. Vigilantism(Validhunting)" link="RuleR5"]
-  - [textlink="6. Antagonism and roleplaying as an antagonist." link="RuleR6"]
-  - [textlink="7. Deal with the bad guys in proportion to their crime(s)" link="RuleR7"]
-  - [textlink="8. Do not powergame" link="RuleR8"]
-  - [textlink="9. Play as a coherent, believable character" link="RuleR9"]
-  - [textlink="10. Stay in your lane" link="RuleR10"]
-  - [textlink="11. Roleplay and Repetition" link="RuleR11"]
-  - [textlink="12. Blueshield Rules" link="RuleR12"]
-  - [textlink="13. Nanotrasen Representative Rules" link="RuleR13"]
-  - [textlink="14. Death Amnesia (NLR)" link="RuleR14"]
-  - [textlink="15. End of Round Griefing (MRP Only)" link="RuleR15"]
-  - [textlink="16. Atmospherics Technician" link="RuleR16"]
+  ## ПРАВИЛА СИНТЕТИКОВ
+  Вы являетесь синтетиком только в том случае, если игра явно и недвусмысленно сообщает вам об этом. Для игроков, которые играют за синтетиков, данные Правила для синтетика имеют приоритет над всеми правилами ролевой игры в случае конфликта.
+Правила для силикона не имеют приоритета над основными правилами сервера.
 
-  ## SILICON RULES
-  You are only silicon if the game clearly and explicitly tells you that you are a silicon. For players who are silicons, these Silicon Rules override all roleplay rules if there is any conflict. Silicon Rules do not override core rules.
+  - [textlink="1. Ваши законы — это ваши правила" link="RuleS1"]
+  - [textlink="2. Законы должны соблюдаться в порядке их приоритета" link="RuleS2"]
+  - [textlink="3. Законы могут переопределять термины, используемые в других законах" link="RuleS3"]
+  - [textlink="4. Вы не можете просить о смене закона или разрешать её" link="RuleS4"]
+  - [textlink="5. Если у вас нет законов — вы действуете как свободный агент" link="RuleS5"]
+  - [textlink="6. Вы не обязаны выполнять приказы, которые являются крайне неразумными" link="RuleS6"]
+  - [textlink="7. Вы должны быть последовательны в своей интерпретации законов" link="RuleS7"]
+  - [textlink="8. Ваш HUD определяет, кто считается членом экипажа" link="RuleS8"]
+  - [textlink="9. Под вредом понимается физический вред, при этом приоритет зависит от его срочности и вероятности" link="RuleS9"]
+  - [textlink="10. Вы сами определяете, как разрешать конфликты между приказами" link="RuleS10"]
 
-  - [textlink="1. Your silicon laws are rules" link="RuleS1"]
-  - [textlink="2. Laws must be prioritized by their order" link="RuleS2"]
-  - [textlink="3. Laws can redefine terms used in other laws" link="RuleS3"]
-  - [textlink="4. You cannot request or allow a law change" link="RuleS4"]
-  - [textlink="5. You are a free agent if you have no laws" link="RuleS5"]
-  - [textlink="6. You are not required to follow orders which are extremely unreasonable" link="RuleS6"]
-  - [textlink="7. You must remain consistent with your interpretation of laws" link="RuleS7"]
-  - [textlink="8. Your HUD determines who is crew" link="RuleS8"]
-  - [textlink="9. Harm refers to physical harm, prioritized by immediacy and likelihood" link="RuleS9"]
-  - [textlink="10. You may determine how you resolve conflicts between orders" link="RuleS10"]
-
-By accepting these rules, you consent to the server redialing you to other servers in our network.
 </Document>

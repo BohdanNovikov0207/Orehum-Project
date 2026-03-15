@@ -1,24 +1,17 @@
-<!--
-SPDX-FileCopyrightText: 2024 John Willis <143434770+CerberusWolfie@users.noreply.github.com>
-SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
-
-SPDX-License-Identifier: AGPL-3.0-or-later
--->
-
 <Document>
-# Meteor Storm Procedures
-In the event of a meteor storm affecting the station, the station alert should be set to [color=#c8a404]Yellow Alert[/color] until the meteor storm damage/event is over.
+# Процедуры, связанные с метеоритным штормом
+В случае воздействия метеоритного шторма на станцию, оповещение станции должно быть установлено на [color=#c8a404]Желтый код[/color] до тех пор, пока не закончится ущерб от метеоритного шторма.
 
-1. Station personnel are to report damages and assist injured crew when possible.
+1. Персонал станции должен сообщать о повреждениях и по возможности оказывать помощь пострадавшему экипажу.
 
-2. Repair activities should be prioritized for immediate/severe damage areas, and should not be done to low-impacted areas until after the event is over.
+2. Ремонтные работы должны проводиться в первую очередь в зонах непосредственного/серьезного повреждения и не должны проводиться в зонах с незначительным воздействием до окончания мероприятия.
 
-3. All personnel performing EVA/shuttle activity (primarily Cargo Department) should return until the meteor storm event is over.
+3. Весь персонал, выполняющий работу в EVA/шаттле (в первую очередь грузовой отдел), должен вернуться на место до окончания метеоритного шторма.
 
-4. Engineering Personnel should repair all damages with location assistance from crew, when the meteor storm is over.
+4. Инженерный персонал должен устранить все повреждения при содействии экипажа на месте, когда метеоритный шторм закончится.
 
-5. In the event that the station damage is too severe, the evacuation shuttle should be called.
+5. В случае, если повреждения станции слишком серьезны, следует вызвать эвакуационный шаттл.
 
-6. In the event of the meteor storm remaining prolonged in time, immediate evacuation may be requested from Central Command.
+6. В случае, если метеоритный шторм затянется, Центральное командование может запросить немедленную эвакуацию.
 
 </Document>

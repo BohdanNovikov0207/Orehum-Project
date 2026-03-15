@@ -1,26 +1,33 @@
-<!--
-SPDX-FileCopyrightText: 2024 John Willis <143434770+CerberusWolfie@users.noreply.github.com>
-SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
-
-SPDX-License-Identifier: AGPL-3.0-or-later
--->
-
 <Document>
-# Hiring/Transfer Policies
-These are the policies/procedures that should be followed when hiring or transferring personnel to new job positions.
+  # Политика найма и перевода сотрудников
+  Это процедуры и правила, которых следует придерживаться
+  при найме или переводе сотрудников на новые должности.
 
-1. All personnel hired should be done so with authorization from the new Department's Head of Staff.
-<Box>[bullet/]If there is no Head of Staff available, one should be hired by the Captain or Acting Captain (following naming procedures listed below).</Box>
+  1. Все наймы должны выполняться с одобрения Главы отдела,
+     в который принимается сотрудник.
+     <Box>[bullet/]Если Глава отдела отсутствует, найм должен быть произведён
+     Капитаном или Исполняющим обязанности Капитана
+     (с соблюдением процедур наименования, указанных ниже).</Box>
 
-2. Promotions to Acting Head of Staff of a Department requires approval from Captain or Acting Captain. Central Comman may be contacted if so desired.
+  2. Повышение до Исполняющего обязанности Главы отдела
+     требует одобрения Капитана или Исполняющего обязанности Капитана.
+     При желании можно связаться с Центральным Командованием.
 
-3. Positions above Command (Nanotrasen Representative and Blueshield Officer) cannot be promoted to without consent/authorization from Central Command.
+  3. На должности выше командования
+     (Представитель NanoTrasen, Магистрат, Офицер «Синий Щит»)
+     нельзя повысить без согласия и одобрения Центрального Командования.
 
-4. All new hires to Security and/or Command positions should be mindshielded, checked for implanted materials and/or contraband, and checked for suspicious communication devices.
+  4. Все новые сотрудники в Отдел Безопасности и/или на командные должности
+     должны пройти проверку майндшилдом, проверку на наличие имплантов,
+     контрабанды и подозрительных средств связи.
 
-5. All new Command promotions (anyone promoted to a Head of Staff, Central Command position, or Captain) must have an "Acting" prefix to their position title.
-<Box>[bullet/]I.e, "Acting Captain", "Acting Research Director", et cetera.</Box>
+  5. Все новые назначения на командные должности
+     (Глав отдела, должности ЦК или Капитана)
+     должны иметь приставку «И.о.» («Исполняющий обязанности») в названии должности.
+     <Box>[bullet/]Например: «И.о. Капитана», «И.о. Научного Руководителя» и т.д.</Box>
 
-6. The [color=#1b67a5][bold]Nanotrasen Representative[/bold][/color] should assist any Head of Staff or Captain promotions to the best of their ability.
-
+  6. [color=#1b67a5][bold]Представитель NanoTrasen[/bold][/color]
+     должен оказывать максимальное содействие
+     при назначении Глав отделов или Капитана.
 </Document>
+

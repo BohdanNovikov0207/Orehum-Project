@@ -1,49 +1,41 @@
-<!--
-SPDX-FileCopyrightText: 2024 John Willis <143434770+CerberusWolfie@users.noreply.github.com>
-SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
-
-SPDX-License-Identifier: AGPL-3.0-or-later
--->
-
-<Document>
+﻿<Document>
   # Station Alert - Blue
 
   <Box>
-    [italic]Called by: Anyone with Command-Level Access at a working Communications Console.[/italic]
+    [italic]Вызывается: Любым пользователем, имеющим доступ командного уровня к рабочей консоли связи.[/italic]
   </Box>
 
-  [bold]Conditions:[/bold]
+  [bold]Условия:[/bold]
 
-  There is a suspected threat on-board the station, or at a nearby location in space. This includes any signs of hostile activity that have not caused any damage to station or crew, but nonetheless seem present.
+  Существует подозрение на наличие угрозы на борту станции или в близлежащем месте в космосе. Сюда относятся любые признаки враждебной активности, которые не причинили никакого ущерба станции или экипажу, но, тем не менее, кажутся присутствующими.
 
-  [italics]Minor threats such as thieves, bar fights, and non-violent protests are not credible enough threats to elevate alert level to blue.
+  [italics]Незначительные угрозы, такие как воры, драки в барах и ненасильственные протесты, не являются достаточно вероятными угрозами, чтобы повышать код до синего.
 
-  [bold]OR[/bold]
+  [bold]ИЛИ[/bold]
 
-  Confirmed Code Red threats have been properly handled or subsided on their own. It is recommended that, after 10+ minutes on Code Red without any hostile activity, Code Blue be called.
+  Подтверждено, что угрозы с красным кодом были должным образом обработаны или устранены сами по себе. Рекомендуется, чтобы после более чем 10 минут действия красного кода без каких-либо враждебных действий был вызван Синий код.
+  [bold]Служба безопасности:[/bold]
 
-  [bold]Security:[/bold]
+  Оружие не обязательно должно находиться в кобуре. Однако сотрудникам службы безопасности рекомендуется соблюдать правила безопасности, чтобы предотвратить несчастные случаи и быть полностью осведомленными о порядке применения оружия;
 
-  Weapons do not need to be holstered. However, it is recommended that Security personnel follow Security SOP in order to prevent accidents and to be fully aware of armament procedure;
+  Произвольный досмотр полностью разрешен. Сотрудники службы безопасности могут задержать любого сотрудника, отказывающегося от проведения произвольного досмотра с целью проведения указанного досмотра;
 
-  Random searches are fully permitted. Security personnel may detain any personnel refusing a random search in order to conduct said search;
+  [bold]Безопасные зоны:[/bold]
 
-  [bold]Secure Areas:[/bold]
+  EВиртуальное хранилище, Технологическое хранилище, Гравитационный генератор, Инженерное защищенное хранилище, загрузка ИИ, Хранилище, шлюз, любое другое место, требующее доступа на командном уровне, которое используется нерегулярно.
 
-  EVA Storage, Tech Storage, Gravity Generator, Engineering Secure Storage, AI Upload, Vault, Gateway, anywhere else requiring command level access that does not get regularly used.
+  Рекомендуется, чтобы все защищенные участки были закреплены болтами, за исключением случаев, когда в их использовании есть необходимость;
 
-  It is recommended that all Secure Areas be bolted down unless their use is necessary;
+  Экспедиции через шлюзы не рекомендуются, за исключением случаев, когда это спасательные группы.
 
-  Excursions into the Gateway are not recommended, unless they are rescue parties.
+  [bold]Общий состав экипажа:[/bold]
 
-  [bold]General Crew:[/bold]
+  Всему персоналу настоятельно рекомендуется максимально использовать датчики в своих костюмах;
 
-  All personnel are highly recommended to maximize their Suit Sensors;
+  Персонал должен сообщать о любых подозрительных действиях ближайшему сотруднику службы безопасности или, при необходимости, пользоваться своими КПК или гарнитурами;
 
-  Personnel are to report any suspicious activity to the nearest member of Security, or use their PDA or headsets if required;
+  Персоналу настоятельно рекомендуется проявлять осторожность, даже если угроза только предполагается. Соблюдение простых правил техники безопасности (например, отказ от проведения технического обслуживания в одиночку) может предотвратить ненужные несчастные случаи;
 
-  Personnel are highly encouraged to exercise caution, even if the threat is only suspected. Following simple safety procedures (such as not going through Maintenance alone) can prevent needless accidents;
-
-  Visitors to the station (anyone with Civilian-level access) are recommended to stay in public areas, for their safety.
+  Посетителям станции (всем, у кого есть доступ на гражданском уровне) рекомендуется оставаться в общественных местах в целях их безопасности.
 
 </Document>
