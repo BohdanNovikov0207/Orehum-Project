@@ -1,5 +1,6 @@
 # The literal bare minimum needed to be a controllable mob. Cannot move but can interact.
 - type: entity
+  parent: [ESBaseMob]
   abstract: true
   save: false
   id: BaseControllable

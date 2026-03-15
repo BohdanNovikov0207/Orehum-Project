@@ -27,6 +27,7 @@ namespace Content.Server.Entry
             "HideClothingLayerClothing", // Goobstation
             "MultiShaderSprite", // Goobstation
             "ItemSlotRenderer", // WWDP EDIT
+            "ESInherentLight", //ES EDIT
         };
     }
 }

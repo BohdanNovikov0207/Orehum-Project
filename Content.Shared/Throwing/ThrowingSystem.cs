@@ -11,6 +11,8 @@ using Content.Shared.Construction.Components;
 using Content.Shared.Construction.EntitySystems;
 using Content.Shared.Database;
 using Content.Shared.Friction;
+using Content.Shared.Interaction;
+using Content.Shared.Gravity;
 using Content.Shared.Projectiles;
 using Robust.Shared.Configuration;
 using Robust.Shared.Map;
@@ -47,6 +49,7 @@ public sealed partial class ThrowingSystem : EntitySystem
     [Dependency] private readonly SharedCameraRecoilSystem _recoil = default!;
     [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
     [Dependency] private readonly IConfigurationManager _configManager = default!;
+    [Dependency] private readonly RotateToFaceSystem _rotate = default!;
 
     private EntityQuery<AnchorableComponent> _anchorableQuery;
 
@@ -283,8 +286,8 @@ public sealed partial class ThrowingSystem : EntitySystem
         recoil &= _gameTiming.IsFirstTimePredicted;
         recoil &= _net.IsClient || !predicted; // don't make server send a second recoil if client predicted it first
         // </Trauma>
-        if (recoil)
-            _recoil.KickCamera(user.Value, -direction * 0.04f);
+
+        _recoil.KickCamera(user.Value, -direction * 0.3f);
 
         // Give thrower an impulse in the other direction
         if (pushbackRatio == 0.0f ||
@@ -303,6 +306,8 @@ public sealed partial class ThrowingSystem : EntitySystem
 
         if (pushEv.Push)
             _physics.ApplyLinearImpulse(user.Value, -impulseVector / physics.Mass * pushbackRatio * MathF.Min(massLimit, physics.Mass), body: userPhysics);
+
+        _rotate.TryFaceAngle(user.Value, direction.ToWorldAngle());
     }
 
 
