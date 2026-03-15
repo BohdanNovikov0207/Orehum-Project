@@ -9,19 +9,21 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-- type: entity
-  id: TidemindDevelop
-  parent: BaseGameRule
-  components:
-  - type: StationEvent
-    weight: 3 # rare
-    duration: 1
-    # no occurences limit so newly arriving tiders can also get it
-  - type: JobAddCollectiveMindRule
-    message: station-event-tidemind-message
-    affected:
-      - Passenger
-    channel: Tidemind
+# - type: entity
+#   id: TidemindDevelop
+#   parent: BaseGameRule
+#   components:
+#   - type: GameRule
+#     chaosScore: 150
+#   - type: StationEvent
+#     weight: 3 # rare
+#     duration: 1
+#     # no occurences limit so newly arriving tiders can also get it
+#   - type: JobAddCollectiveMindRule
+#     message: station-event-tidemind-message
+#     affected:
+#       - Passenger
+#     channel: Tidemind
 
 - type: entity
   parent: BaseGameRule

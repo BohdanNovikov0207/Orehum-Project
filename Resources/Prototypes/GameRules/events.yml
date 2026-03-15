@@ -29,7 +29,7 @@
     #- id: SpiderSpawnHorde
     # </Trauma>
     - id: VentClog
-    - id: TidemindDevelop # Goobstation - Tidemind
+    #- id: TidemindDevelop # Goobstation - Tidemind
     - id: MothroachSpawn # DeltaV
     - id: DerelictCyborgSyndicateSpawn # Goobstation - usually calm
     - id: MalignRiftSpawn # DeltaV
