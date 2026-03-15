@@ -83,6 +83,7 @@ public sealed class ThrownItemVisualizerSystem : EntitySystem
         if (length <= TimeSpan.Zero)
             return null;
 
+        length += TimeSpan.FromSeconds(ThrowingSystem.FlyTimePercentage);
         var scale = ent.Comp2.Scale;
         var lenFloat = (float)length.TotalSeconds;
 

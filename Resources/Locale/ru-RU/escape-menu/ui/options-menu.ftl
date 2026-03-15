@@ -284,6 +284,7 @@ ui-options-function-text-cursor-select-begin = Расширить выделен
 ui-options-function-text-cursor-select-end = Расширить выделение до конца
 ui-options-header-targeting = Прицеливание
 ui-options-function-target-head = Целиться в голову
+ui-options-function-es-hold-to-face = Направление лица / Стрейф
 # Goobstation - Highlight chat sounds!
 ui-options-highlight-sound = Проигрывать звук упоминаний
 ui-options-function-target-chest = Целиться в грудь
