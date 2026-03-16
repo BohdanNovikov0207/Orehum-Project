@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "license": "CC-BY-SA-3.0",
-  "copyright": "Taken from TauCetiClassic at commit https://github.com/TauCetiStation/TauCetiClassic/commit/fd5cfd76acdf5bda9e46413c11006a6e825d51a9, recolored by SonicHDC",
+  "license": "CC-BY-NC-SA 3.0",
+  "copyright": "sprites by TheGypsyBaron(semkagamez)",
   "size": {
     "x": 32,
     "y": 32
@@ -55,9 +55,6 @@
       "name": "deny_unlit",
       "delays": [
         [
-          0.1,
-          0.1,
-          0.1,
           0.1,
           0.1
         ]
@@ -191,7 +188,13 @@
       ]
     },
     {
-      "name": "emergency_open_unlit"
+      "name": "emergency_open_unlit",
+      "delays": [
+        [
+          1.2,
+          1.2
+        ]
+      ]
     }
   ]
 }

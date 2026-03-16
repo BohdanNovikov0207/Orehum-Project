@@ -25,28 +25,28 @@
 #       - Passenger
 #     channel: Tidemind
 
-- type: entity
-  parent: BaseGameRule
-  id: DerelictCyborgSyndicateSpawn
-  components:
-  - type: GameRule
-    chaosScore: 150
-  - type: StationEvent
-    weight: 4.5 # Uncommon
-    earliestStart: 30
-    reoccurrenceDelay: 30
-    minimumPlayers: 4
-    duration: null
-  - type: SpaceSpawnRule
-    spawnDistance: 0
-  - type: AntagSpawner
-    prototype: PlayerBorgDerelictSyndicateAssaultBattery
-  - type: AntagSelection
-    definitions:
-    - spawnerPrototype: SpawnPointGhostDerelictCyborgSyndicate
-      min: 1
-      max: 1
-      pickPlayer: false
+# - type: entity
+#   parent: BaseGameRule
+#   id: DerelictCyborgSyndicateSpawn
+#   components:
+#   - type: GameRule
+#     chaosScore: 150
+#   - type: StationEvent
+#     weight: 4.5 # Uncommon
+#     earliestStart: 30
+#     reoccurrenceDelay: 30
+#     minimumPlayers: 4
+#     duration: null
+#   - type: SpaceSpawnRule
+#     spawnDistance: 0
+#   - type: AntagSpawner
+#     prototype: PlayerBorgDerelictSyndicateAssaultBattery
+#   - type: AntagSelection
+#     definitions:
+#     - spawnerPrototype: SpawnPointGhostDerelictCyborgSyndicate
+#       min: 1
+#       max: 1
+#       pickPlayer: false
 
 - type: entity # Goobstation
   id: JobDistributionError

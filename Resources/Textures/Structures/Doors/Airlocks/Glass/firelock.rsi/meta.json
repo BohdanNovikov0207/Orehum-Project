@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "license": "CC-BY-SA-3.0",
-  "copyright": "Taken from skyrat-tg at commit https://github.com/Skyrat-SS13/Skyrat-tg/commit/f9e3b58ecd64fa061f83420689bd90bfa3a4c185",
+  "license": "CC-BY-NC-SA 3.0",
+  "copyright": "sprite by TheGypsyBaron",
   "size": {
     "x": 32,
     "y": 32
@@ -28,12 +28,6 @@
           0.1,
           0.1,
           0.1,
-          0.1,
-          0.1,
-          0.1,
-          0.1,
-          0.1,
-          0.1,
           0.1
         ]
       ]
@@ -52,6 +46,9 @@
       ]
     },
     {
+      "name": "deny"
+    },
+    {
       "name": "deny_unlit",
       "delays": [
         [
@@ -62,21 +59,27 @@
       ]
     },
     {
-      "name": "open"
+      "name": "frame1"
     },
     {
-      "name": "open_unlit"
+      "name": "frame2"
+    },
+    {
+      "name": "frame3"
+    },
+    {
+      "name": "frame4"
+    },
+    {
+      "name": "locked"
+    },
+    {
+      "name": "open"
     },
     {
       "name": "opening",
       "delays": [
         [
-          0.1,
-          0.1,
-          0.1,
-          0.1,
-          0.1,
-          0.1,
           0.1,
           0.1,
           0.1,

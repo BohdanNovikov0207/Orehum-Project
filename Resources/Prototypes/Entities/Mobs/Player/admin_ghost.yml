@@ -145,6 +145,11 @@
   name: admin observer
   categories: [ HideSpawnMenu ]
   components:
+  - type: Sprite
+    sprite: _Orehum/Mobs/Ghosts/admin_ghost.rsi
+    layers:
+    - state: animated
+      shader: unshaded
   - type: ContentEye
     maxZoom: 8.916104, 8.916104
   - type: Tag
