@@ -42,8 +42,6 @@
           ShardGlass:
             min: 0
             max: 1
-      - !type:AddGameRuleBehavior
-        rule: LaughterDemonSummon
       - !type:DoActsBehavior
         acts: [ "Destruction" ]
 
@@ -80,8 +78,6 @@
           ShardGlass:
             min: 0
             max: 1
-      - !type:AddGameRuleBehavior
-        rule: SlaughterDemonSummon
       - !type:DoActsBehavior
         acts: [ "Destruction" ]
   - type: VialSummon
