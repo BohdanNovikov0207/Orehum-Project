@@ -470,8 +470,6 @@
     - Sign
     - Schechi
     - NewKinPidgin
-  - type: SpeechSynthesis # Corvax-Frontier-Barks
-    voice: Borg
 
 # Hologram projection that the AI's eye tracks.
 - type: entity

@@ -6,10 +6,9 @@
   - /Audio/Voice/Talk/speak_2_ask.ogg
   - /Audio/Voice/Talk/speak_2_exclaim.ogg
 
-- type: bark
+- type: barkVoice
   id: Alto
-  name: Alto
-  soundCollection:
+  barkSound:
     collection: AltoBark
 
 # baritone
@@ -20,11 +19,9 @@
     - /Audio/Voice/Talk/speak_1_ask.ogg
     - /Audio/Voice/Talk/speak_1_exclaim.ogg
 
-- type: bark
+- type: barkVoice
   id: Baritone
-  name: Baritone
-  volume: 1
-  soundCollection:
+  barkSound:
     collection: BaritoneBark
 
 # bass
@@ -35,12 +32,12 @@
     - /Audio/Voice/Talk/speak_4_ask.ogg
     - /Audio/Voice/Talk/speak_4_exclaim.ogg
 
-- type: bark
+- type: barkVoice
   id: Bass
-  name: Bass
-  volume: 2
-  soundCollection:
+  barkSound:
     collection: BassBark
+  clampData:
+    volumeMax: 2
 
 # tenor
 - type: soundCollection
@@ -50,130 +47,12 @@
     - /Audio/Voice/Talk/speak_3_ask.ogg
     - /Audio/Voice/Talk/speak_3_exclaim.ogg
 
-- type: bark
+- type: barkVoice
   id: Tenor
-  name: Tenor
-  volume: 1
-  soundCollection:
+  barkSound:
     collection: TenorBark
-
-# arachnid
-- type: soundCollection
-  id: ArachnidBark
-  files:
-    - /Audio/Voice/Talk/arachnid.ogg
-    - /Audio/Voice/Talk/arachnid_ask.ogg
-    - /Audio/Voice/Talk/arachnid_exclaim.ogg
-
-- type: bark
-  id: Arachnid
-  name: Arachnid
-  volume: 1
-  soundCollection:
-    collection: ArachnidBark
-  speciesWhitelist:
-    - Arachnid
-
-# lizard
-- type: soundCollection
-  id: LizardBark
-  files:
-    - /Audio/Voice/Talk/lizard.ogg
-    - /Audio/Voice/Talk/lizard_ask.ogg
-    - /Audio/Voice/Talk/lizard_exclaim.ogg
-
-- type: bark
-  id: Lizard
-  name: Lizard
-  volume: 0.4
-  soundCollection:
-    collection: LizardBark
-  speciesWhitelist:
-    - Reptilian
-    - Kobold
-
-# slime
-- type: soundCollection
-  id: SlimeBark
-  files:
-    - /Audio/Voice/Talk/slime.ogg
-    - /Audio/Voice/Talk/slime_ask.ogg
-    - /Audio/Voice/Talk/slime_exclaim.ogg
-
-- type: bark
-  id: Slime
-  name: Slime
-  volume: 0.5
-  soundCollection:
-    collection: SlimeBark
-  speciesWhitelist:
-    - SlimePerson
-
-# vox
-- type: soundCollection
-  id: VoxBark
-  files:
-    - /Audio/Voice/Talk/vox.ogg
-    - /Audio/Voice/Talk/vox_ask.ogg
-    - /Audio/Voice/Talk/vox_exclaim.ogg
-
-- type: bark
-  id: Vox
-  name: Vox
-  volume: 0.5
-  soundCollection:
-    collection: VoxBark
-  speciesWhitelist:
-    - Vox
-
-# harpy
-- type: soundCollection
-  id: HarpyBark
-  files:
-  - /Audio/_DV/Voice/Harpy/chirp1.ogg
-
-- type: bark
-  id: Harpy
-  name: Harpy
-  volume: 1
-  soundCollection:
-    collection: HarpyBark
-  speciesWhitelist:
-    - Harpy
-
-# Vulpkanin
-- type: soundCollection
-  id: VulpkaninBark
-  files:
-    - /Audio/_DV/Voice/Talk/vulp.ogg
-    - /Audio/_DV/Voice/Talk/vulp_ask.ogg
-    - /Audio/_DV/Voice/Talk/vulp_exclaim.ogg
-
-- type: bark
-  id: Vulpkanin
-  name: Vulpkanin
-  volume: 1
-  soundCollection:
-    collection: VulpkaninBark
-  speciesWhitelist:
-    - Vulpkanin
-
-# Squeak
-- type: soundCollection
-  id: SqueakBark
-  files:
-  - /Audio/Animals/mouse_squeak.ogg
-
-- type: bark
-  id: Squeak
-  name: Squeak
-  frequency: 0.3
-  minPitch: 0.8
-  maxPitch: 1.1
-  soundCollection:
-    collection: SqueakBark
-  speciesWhitelist:
-    - Rodentia
+  clampData:
+    volumeMax: 1
 
 # MaleAvali
 - type: soundCollection
@@ -183,15 +62,12 @@
     - /Audio/_Floofstation/Voice/Avali/avali_1_ask.ogg
     - /Audio/_Floofstation/Voice/Avali/avali_1_exclaim.ogg
 
-- type: bark
+- type: barkVoice
   id: MaleAvali
-  name: MaleAvali
-  frequency: 0.5
-  volume: 0.7
-  soundCollection:
+  barkSound:
     collection: MaleAvaliBark
-  speciesWhitelist:
-    - Resomi
+  clampData:
+    volumeMax: 0.7
 
 # FemaleAvali
 - type: soundCollection
@@ -201,15 +77,12 @@
     - /Audio/_Floofstation/Voice/Avali/avali_2_ask.ogg
     - /Audio/_Floofstation/Voice/Avali/avali_2_exclaim.ogg
 
-- type: bark
+- type: barkVoice
   id: FemaleAvali
-  name: FemaleAvali
-  volume: 0.7
-  frequency: 0.5
-  soundCollection:
+  barkSound:
     collection: FemaleAvaliBark
-  speciesWhitelist:
-    - Resomi
+  clampData:
+    volumeMax: 0.7
 
 # Pai
 - type: soundCollection
@@ -219,15 +92,12 @@
     - /Audio/Voice/Talk/pai_ask.ogg
     - /Audio/Voice/Talk/pai_exclaim.ogg
 
-- type: bark
+- type: barkVoice
   id: Pai
-  name: Pai
-  volume: 1
-  frequency: 0.4
-  soundCollection:
+  barkSound:
     collection: PaiBark
-  speciesWhitelist:
-    - IPC
+  clampData:
+    volumeMax: 1
 
 # Borg
 - type: soundCollection
@@ -237,15 +107,12 @@
     - /Audio/Voice/Talk/Silicon/borg_ask.ogg
     - /Audio/Voice/Talk/Silicon/borg_exclaim.ogg
 
-- type: bark
+- type: barkVoice
   id: Borg
-  name: Borg
-  volume: 0.7
-  frequency: 0.35
-  soundCollection:
+  barkSound:
     collection: BorgBark
-  speciesWhitelist:
-    - IPC
+  clampData:
+    volumeMax: 0.7
 
 # BorgSyndie
 - type: soundCollection
@@ -255,14 +122,12 @@
     - /Audio/Voice/Talk/Silicon/syndieborg_ask.ogg
     - /Audio/Voice/Talk/Silicon/syndieborg_exclaim.ogg
 
-- type: bark
+- type: barkVoice
   id: BorgSyndie
-  name: BorgSyndie
-  roundStart: false
-  volume: 0.5
-  frequency: 0.35
-  soundCollection:
+  barkSound:
     collection: BorgSyndieBark
+  clampData:
+    volumeMax: 0.5
 
 # Durk
 - type: soundCollection
@@ -275,15 +140,12 @@
     - /Audio/_Goobstation/Voice/Barks/Durk/u.wav
     - /Audio/_Goobstation/Voice/Barks/Durk/y.wav
 
-- type: bark
+- type: barkVoice
   id: Durk
-  name: Durk
-  volume: 1
-  frequency: 0.9
-  minPitch: 0.9
-  maxPitch: 1.1
-  soundCollection:
+  barkSound:
     collection: DurkBark
+  clampData:
+    volumeMax: 1
 
 # Aviu
 - type: soundCollection
@@ -296,11 +158,9 @@
     - /Audio/_Goobstation/Voice/Barks/aviu1/5.ogg
     - /Audio/_Goobstation/Voice/Barks/aviu1/6.ogg
 
-- type: bark
+- type: barkVoice
   id: Aviu1
-  name: Impudent
-  frequency: 0.7
-  soundCollection:
+  barkSound:
     collection: Aviu1Bark
 
 - type: soundCollection
@@ -313,11 +173,9 @@
     - /Audio/_Goobstation/Voice/Barks/aviu2/5.ogg
     - /Audio/_Goobstation/Voice/Barks/aviu2/6.ogg
 
-- type: bark
+- type: barkVoice
   id: Aviu2
-  name: Strong
-  frequency: 0.7
-  soundCollection:
+  barkSound:
     collection: Aviu2Bark
 
 - type: soundCollection
@@ -330,11 +188,9 @@
     - /Audio/_Goobstation/Voice/Barks/aviu3/5.ogg
     - /Audio/_Goobstation/Voice/Barks/aviu3/6.ogg
 
-- type: bark
+- type: barkVoice
   id: Aviu3
-  name: Alien
-  frequency: 0.7
-  soundCollection:
+  barkSound:
     collection: Aviu3Bark
 
 - type: soundCollection
@@ -347,9 +203,7 @@
     - /Audio/_Goobstation/Voice/Barks/aviu4/5.ogg
     - /Audio/_Goobstation/Voice/Barks/aviu4/6.ogg
 
-- type: bark
+- type: barkVoice
   id: Aviu4
-  name: Ethereal
-  frequency: 0.7
-  soundCollection:
+  barkSound:
     collection: Aviu4Bark

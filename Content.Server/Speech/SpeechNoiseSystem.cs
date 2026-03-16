@@ -25,7 +25,6 @@ using Robust.Shared.Timing;
 using Robust.Shared.Random;
 
 // Goob Station
- using Content.Goobstation.Common.Barks;
 using Content.Goobstation.Common.CCVar;
 using Robust.Shared.Configuration;
 
@@ -94,14 +93,6 @@ namespace Content.Server.Speech
 
         private void OnEntitySpoke(EntityUid uid, SpeechComponent component, EntitySpokeEvent args)
         {
-            // Goob station - Barks
-            if (component.SpeechSounds == null
-                || !args.Language.SpeechOverride.RequireSpeech
-                || _cfg.GetCVar(GoobCVars.BarksEnabled) // Goob Station - Barks
-                && HasComp<SpeechSynthesisComponent>(uid))
-                return;
-            // END
-
             var currentTime = _gameTiming.CurTime;
             var cooldown = TimeSpan.FromSeconds(component.SoundCooldownTime);
 
