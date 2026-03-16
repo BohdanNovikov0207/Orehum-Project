@@ -29,10 +29,10 @@
   announcement: terror-blob
   rule: BlobSpawn
 
-- type: ninjaHackingThreat
-  id: LaughterDemon
-  announcement: terror-slaughter-demon
-  rule: LaughterDemonSummon
+# - type: ninjaHackingThreat
+#   id: LaughterDemon
+#   announcement: terror-slaughter-demon
+#   rule: LaughterDemonSummon
 
 - type: ninjaHackingThreat
   id: ShuttleInstigator
