@@ -34,10 +34,11 @@ namespace Content.Shared.Communications
         public readonly bool CountdownStarted;
         public List<string>? AlertLevels;
         public string CurrentAlert;
+        public Color CurrentAlertColor;
         public float CurrentAlertDelay;
 
         // Trauma - added station
-        public CommunicationsConsoleInterfaceState(NetEntity? station, bool canAnnounce, bool canCall, List<string>? alertLevels, string currentAlert, float currentAlertDelay, TimeSpan? expectedCountdownEnd = null)
+        public CommunicationsConsoleInterfaceState(NetEntity? station, bool canAnnounce, bool canCall, List<string>? alertLevels, string currentAlert, Color currentAlertColor, float currentAlertDelay, TimeSpan? expectedCountdownEnd = null)
         {
             Station = station; // Trauma
             CanAnnounce = canAnnounce;
@@ -46,6 +47,7 @@ namespace Content.Shared.Communications
             CountdownStarted = expectedCountdownEnd != null;
             AlertLevels = alertLevels;
             CurrentAlert = currentAlert;
+            CurrentAlertColor = currentAlertColor;
             CurrentAlertDelay = currentAlertDelay;
         }
     }
