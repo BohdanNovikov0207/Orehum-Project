@@ -415,10 +415,13 @@
   groups:
   - GroupTankHarness
   - CargoTechnicianHead
+  - CargoTechnicianNeck
   - CargoTechnicianJumpsuit
   - CargoTechnicianBackpack
+  - CargoTechnicianBelt
   - CargoTechnicianOuterClothing
   - CargoTechnicianShoes
+  - CargoTechnicianItem
   - Glasses
   - Survival
   - Trinkets
