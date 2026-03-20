@@ -400,6 +400,7 @@
   - CargoTechnicianBackpack
   - QuartermasterOuterClothing
   - QuartermasterShoes
+  - CargoQuarterItem
   - Glasses
   - Survival
   - Trinkets
@@ -438,9 +439,11 @@
   - GroupTankHarness
   - SalvageSpecialistNeck # Goobstation
   - SalvageSpecialistBackpack
+  - SalvageBelt
   - SalvageSpecialistJumpsuit # Goobstation
   - SalvageSpecialistOuterClothing
   - SalvageSpecialistShoes
+  - SalvageItem
   - Glasses
   - Survival
   - Trinkets

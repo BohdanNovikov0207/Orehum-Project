@@ -1,4 +1,6 @@
 # Cargo
+
+#Techni
 - type: loadoutGroup
   id: CargoTechnicianItem
   name: loadout-group-cargo-technician-item
@@ -25,3 +27,29 @@
   loadouts:
   - ClothingNeckScarfStripedBrown
   - ClothingNeckCloakVoid
+
+# Quarter
+- type: loadoutGroup
+  id: CargoQuarterItem
+  name: loadout-group-quartermaster-item
+  minLimit: 0
+  maxLimit: 1
+  loadouts:
+  - HahahaCash
+
+# Salvage
+- type: loadoutGroup
+  id: SalvageItem
+  name: loadout-group-salvage-specialist-item
+  minLimit: 0
+  maxLimit: 2
+  loadouts:
+  - MineralScannerEmpty
+
+- type: loadoutGroup
+  id: SalvageBelt
+  name: loadout-group-salvage-specialist-belt
+  minLimit: 0
+  maxLimit: 1
+  loadouts:
+  - ClothingBeltSalvageWebbing

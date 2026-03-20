@@ -53,3 +53,26 @@
   effects:
   - !type:GroupLoadoutEffect
     proto: MasterCargoTech
+
+# Quarter
+
+#Item
+- type: loadout
+  id: HahahaCash
+  storage:
+    back:
+    - SpaceCash1000
+
+# Salvage
+
+# Belt
+- type: loadout
+  id: ClothingBeltSalvageWebbing
+  equipment:
+    belt: ClothingBeltSalvageWebbing
+#Item
+- type: loadout
+  id: MineralScannerEmpty
+  storage:
+    back:
+    - MineralScannerEmpty

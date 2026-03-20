@@ -78,6 +78,7 @@ loadout-group-quartermaster-jumpsuit = Квартирмейстер, комби�
 loadout-group-quartermaster-neck = Квартирмейстер, шея
 loadout-group-quartermaster-outerclothing = Квартирмейстер, верхняя одежда
 loadout-group-quartermaster-shoes = Квартирмейстер, обувь
+loadout-group-quartermaster-item = Квартирмейстер, предметы
 loadout-group-cargo-technician-head = Грузчик, голова
 loadout-group-cargo-technician-jumpsuit = Грузчик, комбинезон
 loadout-group-cargo-technician-backpack = Грузчик, рюкзак
@@ -86,7 +87,9 @@ loadout-group-cargo-technician-shoes = Грузчик, обувь
 loadout-group-cargo-technician-item = Грузчик, предметы
 loadout-group-cargo-technician-belt = Грузчик, пояс
 loadout-group-cargo-technician-neck = Грузчик, шея
+loadout-group-salvage-specialist-belt = Утилизатор, пояс
 loadout-group-salvage-specialist-backpack = Утилизатор, рюкзак
+loadout-group-salvage-specialist-item = Утилизатор, предметы
 loadout-group-salvage-specialist-outerclothing = Утилизатор, верхняя одежда
 loadout-group-salvage-specialist-shoes = Утилизатор, обувь
 # Engineering
