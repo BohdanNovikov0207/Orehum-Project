@@ -128,11 +128,13 @@
                         <BoxContainer Name="AntagList" Orientation="Vertical" />
                     </ScrollContainer>
                 </BoxContainer>
-                <BoxContainer Orientation="Vertical" Margin="10">
+                <BoxContainer Name="TraitsTab" Orientation="Vertical" Margin="10">
                     <!-- Traits -->
-                    <ScrollContainer VerticalExpand="True">
-                        <BoxContainer Name="TraitsList" Orientation="Vertical" />
-                    </ScrollContainer>
+                    <BoxContainer Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 0 0 10">
+                        <Label Text="Доступные очки: " />
+                        <Label Name="TotalTraitPointsLabel" Text="0" FontColorOverride="Cyan" />
+                    </BoxContainer>
+                    <TabContainer Name="TraitsTabContainer" VerticalExpand="True" />
                 </BoxContainer>
                 <BoxContainer Name="MarkingsTab" Orientation="Vertical" Margin="10" Access="Public"> <!-- Trauma - made public -->
                     <!-- Markings -->

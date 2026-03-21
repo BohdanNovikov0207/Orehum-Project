@@ -432,8 +432,27 @@ namespace Content.Client.Lobby.UI
 
         private void UpdateSaveButton()
         {
-            SaveButton.Disabled = Profile is null || !IsDirty;
+            int points = 7;
+            if (Profile != null)
+            {
+                foreach (var traitId in Profile.TraitPreferences)
+                {
+                    if (_prototypeManager.TryIndex<TraitPrototype>(traitId, out var trait))
+                        points -= trait.Cost;
+                }
+            }
+
+            SaveButton.Disabled = Profile is null || !IsDirty || points < 0;
             ResetButton.Disabled = Profile is null || !IsDirty;
+
+            if (points < 0)
+            {
+                SaveButton.ToolTip = Loc.GetString("humanoid-profile-editor-traits-no-points");
+            }
+            else
+            {
+                SaveButton.ToolTip = "";
+            }
         }
 
         private void SetPreviewRotation(Direction direction)

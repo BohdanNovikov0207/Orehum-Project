@@ -278,6 +278,11 @@ public sealed class LobbyUIController : UIController, IOnStateEntered<LobbyState
             // Open the save panel if we have unsaved changes.
             if (_profileEditor.Profile != null && _profileEditor.IsDirty)
             {
+                if (!_profileEditor.IsTraitsBalanceValid())
+                {
+                    CloseProfileEditor();
+                    return;
+                }
                 OpenSavePanel();
 
                 return;
