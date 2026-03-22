@@ -3,7 +3,7 @@
   name: trait-pacifist-name
   description: trait-pacifist-desc
   category: Mental
-  cost: -15
+  cost: -11
   components:
   - type: Pacified
 
@@ -12,7 +12,7 @@
   name: trait-narcolepsy-name
   description: trait-narcolepsy-desc
   category: Mental
-  cost: -9
+  cost: -6
   components:
   - type: Narcolepsy
     timeBetweenIncidents: 300, 600
@@ -23,6 +23,6 @@
   name: trait-tile-movement-name
   description: trait-tile-movement-desc
   category: Mental
-  cost: -5
+  cost: -4
   components:
   - type: TileMovement

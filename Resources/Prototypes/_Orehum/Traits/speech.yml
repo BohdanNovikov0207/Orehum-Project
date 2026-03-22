@@ -5,7 +5,6 @@
   category: Speach
   cost: -14
   blacklist:
-    components:
     - BorgChassis
   components:
   - type: Muted

@@ -404,6 +404,7 @@ namespace Content.Client.Lobby.UI
                 UpdateHairPickers();
                 OnSkinColorOnValueChanged();
                 UpdateHeightWidthSliders(); // Goobstation: port EE height/width sliders
+                RefreshTraits();
             };
 
             // begin Goobstation: port EE height/width sliders
@@ -746,6 +747,11 @@ namespace Content.Client.Lobby.UI
 
                 foreach (var trait in traits)
                 {
+                    if (!Profile.TraitPreferences.Contains(trait.ID) && !IsTraitCompatible(trait))
+                    {
+                        continue;
+                    }
+
                     var selector = new TraitPreferenceSelector(trait);
                     selector.Preference = Profile.TraitPreferences.Contains(trait.ID);
 
@@ -2075,6 +2081,29 @@ namespace Content.Client.Lobby.UI
             _exporting = false;
             ImportButton.Disabled = false;
             ExportButton.Disabled = false;
+        }
+
+        private bool IsTraitCompatible(TraitPrototype trait)
+        {
+            if (Profile == null) return true;
+
+            if (trait.Blacklist.Contains(Profile.Species))
+            {
+                return false;
+            }
+
+            foreach (var selectedId in Profile.TraitPreferences)
+            {
+                if (selectedId == trait.ID) continue;
+
+                if (!_prototypeManager.TryIndex<TraitPrototype>(selectedId, out var selected))
+                    continue;
+
+                if (trait.Blacklist.Contains(selectedId) || selected.Blacklist.Contains(trait.ID))
+                    return false;
+            }
+
+            return true;
         }
     }
 }
