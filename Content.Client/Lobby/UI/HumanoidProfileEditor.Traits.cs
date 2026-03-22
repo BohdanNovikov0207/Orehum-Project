@@ -69,6 +69,11 @@ public sealed partial class HumanoidProfileEditor
 
             foreach (var trait in traits)
             {
+                if (!Profile.TraitPreferences.Contains(trait.ID) && !IsTraitCompatible(trait))
+                {
+                    continue;
+                }
+
                 var selector = new TraitPreferenceSelector(trait);
                 selector.Preference = Profile.TraitPreferences.Contains(trait.ID);
 

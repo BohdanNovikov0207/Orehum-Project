@@ -199,6 +199,7 @@ namespace Content.Client.Lobby.UI
                 SpeciesButton.SelectId(args.Id);
                 SetSpecies(_species[args.Id].ID);
                 OnSkinColorOnValueChanged();
+                RefreshTraits();
             };
 
             #region Skin
@@ -458,6 +459,29 @@ namespace Content.Client.Lobby.UI
         private void SetPreviewRotation(Direction direction)
         {
             SpriteView.OverrideDirection = (Direction)((int)direction % 4 * 2);
+        }
+
+        private bool IsTraitCompatible(TraitPrototype trait)
+        {
+            if (Profile == null) return true;
+
+            if (trait.Blacklist.Contains(Profile.Species))
+            {
+                return false;
+            }
+
+            foreach (var selectedId in Profile.TraitPreferences)
+            {
+                if (selectedId == trait.ID) continue;
+
+                if (!_prototypeManager.TryIndex<TraitPrototype>(selectedId, out var selected))
+                    continue;
+
+                if (trait.Blacklist.Contains(selectedId) || selected.Blacklist.Contains(trait.ID))
+                    return false;
+            }
+
+            return true;
         }
     }
 }
