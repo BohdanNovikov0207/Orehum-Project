@@ -1,4 +1,4 @@
 [submodule "RobustToolbox"]
-	path = RobustToolbox
-	url = git@github.com:IsNotAcceptable/RobustToolbox.git
-	branch = master
+    path = RobustToolbox
+    url = https://github.com/IsNotAcceptable/RobustToolbox
+    branch = 269.0.0
