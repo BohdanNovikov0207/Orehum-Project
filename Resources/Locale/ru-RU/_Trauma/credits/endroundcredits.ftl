@@ -11,7 +11,7 @@ round-end-credits-trauma-show-credits = Показать итоговую сво
 round-end-credits-trauma-created = Ответственный за объект и протокол
 round-end-credits-trauma-kojima = Хидэо Кодзима
 
-round-end-credits-trauma-jargon = Зафиксировано на объекте Orehum Project
+round-end-credits-trauma-jargon = Зафиксировано на объекте {$station}
 
     Сгенерировано с использованием технологий Robust ©
     Данные о внешнем космосе предоставлены архивами NASA
