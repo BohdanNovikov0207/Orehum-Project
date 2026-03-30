@@ -22,6 +22,10 @@
             "directions": 4
         },
         {
+            "name": "equipped-head-resomi",
+            "directions": 4
+        },
+        {
             "name": "equipped-head-reptilian",
             "directions": 4
         }

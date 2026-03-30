@@ -10,10 +10,6 @@
     {
       "name": "bodyscar_r",
       "directions": 4
-    },
-    {
-      "name": "buff",
-      "directions": 4
     }
   ]
 }

@@ -49,7 +49,6 @@
         { "name": "weak_curse" },
         { "name": "whisper" },
         { "name": "trickster_haunt" },
-        { "name": "wraith_poison" },
-        { "name": "dark_whisper" }
+        { "name": "wraith_poison" }
     ]
 }

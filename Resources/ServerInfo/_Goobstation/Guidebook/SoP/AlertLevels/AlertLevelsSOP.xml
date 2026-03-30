@@ -1,10 +1,3 @@
-<!--
-SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
-SPDX-FileCopyrightText: 2025 John Willis <143434770+CerberusWolfie@users.noreply.github.com>
-
-SPDX-License-Identifier: AGPL-3.0-or-later
--->
-
 <Document>
 # Alert Levels
 The following alert levels are the publicly defined levels on this station and what they entail.
@@ -12,7 +5,7 @@ Below are the listed pop-ups for each alert and the color associated with them.
 
 <ColorBox>
   <Box>
-    For the purposes of Alert Escalation: Treat higher alerts as if they are still on the previous alert level. (Yellow Alert is Blue Alert if it was Blue Alert prior.) Furthermore, treat Delta, Gamma, Epsilon, and Violet Alert as Red Alert.
+    В целях повышения уровня оповещения: Относитесь к более высоким оповещениям так, как будто они все еще находятся на предыдущем уровне. (Желтый код - это синий код, если ранее он было синим.) Кроме того, относитесь к Дельта-, Гамма-, Эпсилон- и фиолетовому кодам как к красному коду.
   </Box>
 </ColorBox>
 
@@ -21,12 +14,12 @@ There are individual entries for each alert level and what they entail for stati
 <Table Columns="1">
   <ColorBox Color="#388c34">
     <Box HorizontalAlignment="Center" VerticalAlignment="Stretch" Margin="10">
-      [bold][color=#ffffff][head=1]Green Alert[/head][/color][/bold]
+      [bold][color=#ffffff][head=1]Зеленый код[/head][/color][/bold]
     </Box>
   </ColorBox>
   <ColorBox>
     <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="10">
-      Attention! Station alert level is now green! It is now safe to return to your workplace!
+      Внимание! Код на станции теперь зеленый! Теперь вы можете безопасно возвращаться на свое рабочее место!
     </Box>
   </ColorBox>
 </Table>
@@ -36,12 +29,12 @@ The [color=#388c34]Green Alert[/color] will always appear at the start of shift 
 <Table Columns="1">
   <ColorBox Color="#1b67a5">
     <Box HorizontalAlignment="Center" VerticalAlignment="Stretch" Margin="10">
-      [bold][color=#ffffff][head=1]Blue Alert[/head][/color][/bold]
+      [bold][color=#ffffff][head=1]Синий код[/head][/color][/bold]
     </Box>
   </ColorBox>
   <ColorBox>
     <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="10">
-      Attention! Station alert level is now blue! There is a confirmed threat to the station. Security should perform random checks. Crewmembers are advised to be vigilant and report suspicious activity to security.
+     Внимание! Код на станции теперь синий! Подтверждена угроза для станции. Службе безопасности следует проводить выборочные проверки. Членам экипажа рекомендуется проявлять бдительность и сообщать службе безопасности о подозрительных действиях.
     </Box>
   </ColorBox>
 </Table>
@@ -51,12 +44,12 @@ The [color=#1b67a5]Blue Alert[/color] will appear when a threat or significant a
 <Table Columns="1">
   <ColorBox Color="#c8a404">
     <Box HorizontalAlignment="Center" VerticalAlignment="Stretch" Margin="10">
-      [bold][color=#ffffff][head=1]Yellow Alert[/head][/color][/bold]
+      [bold][color=#ffffff][head=1]Желтый код[/head][/color][/bold]
     </Box>
   </ColorBox>
   <ColorBox>
     <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="10">
-      Attention! Station alert level is now yellow! There is a structural or atmospheric threat within the station. Engineering staff are advised to immediately respond and perform safety measures. Crewmembers are advised to stay away from the threat, and stay in their workplaces if necessary.
+      Внимание! Код на станции теперь желтый! На станции существует структурная или атмосферная угроза. Инженерному персоналу рекомендуется немедленно отреагировать и принять меры безопасности. Членам экипажа рекомендуется держаться подальше от места возникновения угрозы и при необходимости оставаться на своих рабочих местах.
     </Box>
   </ColorBox>
 </Table>
@@ -66,30 +59,27 @@ The [color=#c8a404]Yellow Alert[/color] will appear for massive damage to the st
 <Table Columns="1">
   <ColorBox Color="#ba292c">
     <Box HorizontalAlignment="Center" VerticalAlignment="Stretch" Margin="10">
-      [bold][color=#ffffff][head=1]Red Alert[/head][/color][/bold]
+      [bold][color=#ffffff][head=1]Красный код[/head][/color][/bold]
     </Box>
   </ColorBox>
   <ColorBox>
     <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="10">
-      Attention! Station alert level is now red! There is an immediate threat to the station. Security should prepare to use lethal force if necessary. Crewmembers should find a safe place to shelter in, and are advised to follow any present authorities.
+      Внимание! Код на станции повышен до красного! Существует непосредственная угроза для станции. Служба безопасности должна быть готова к применению летальной силы в случае необходимости. Членам экипажа следует найти безопасное укрытие, и им рекомендуется следовать всем действующим инструкциям.
     </Box>
   </ColorBox>
 </Table>
 
 The [color=#ba292c]Red Alert[/color] will appear for major hostile activities and/or threats to the station.
 
-<!-- Trauma - red alert is locked now -->
-[color=#ba292c]Red Alert[/color] can only be activated when [color=#1b67a5]Blue Alert[/color] has been in effect for at least [color=#1b67a5]5 minutes[/color].
-
 <Table Columns="1">
   <ColorBox Color="#8b0000">
     <Box HorizontalAlignment="Center" VerticalAlignment="Stretch" Margin="10">
-      [bold][color=#ffffff][head=1]Delta Alert[/head][/color][/bold]
+      [bold][color=#ffffff][head=1]Дельта код[/head][/color][/bold]
     </Box>
   </ColorBox>
   <ColorBox>
     <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="10">
-      Attention! Station alert level is now delta! The station is currently under threat of imminent destruction. Crewmembers are advised to listen to heads of staff for more information.
+      Внимание! Код на станции повышен до дельта! В настоящее время станция находится под угрозой неминуемого разрушения. Членам экипажа рекомендуется прислушиваться к руководителям персонала для получения дополнительной информации.
     </Box>
   </ColorBox>
 </Table>
@@ -99,12 +89,12 @@ The [color=#8b0000]Delta Alert[/color] will appear in situations where the stati
 <Table Columns="1">
   <ColorBox Color="#9400d3">
     <Box HorizontalAlignment="Center" VerticalAlignment="Stretch" Margin="10">
-      [bold][color=#ffffff][head=1]Epsilon Alert[/head][/color][/bold]
+      [bold][color=#ffffff][head=1]Эпсилон код[/head][/color][/bold]
     </Box>
   </ColorBox>
   <ColorBox>
     <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="10">
-      Attention! Station alert level is now epsilon! Central Command has ordered the Epsilon security level on the station. Consider all contracts terminated.
+      Внимание! Код на станции теперь "эпсилон"! Центральное командование объявило о повышении уровня безопасности на станции до кода "Эпсилон". Считайте, что все контракты расторгнуты.
     </Box>
   </ColorBox>
 </Table>
@@ -114,12 +104,12 @@ The [color=#9400d3]Epsilon Alert[/color] is only set when Central Command interv
 <Table Columns="1">
   <ColorBox Color="#db7093">
     <Box HorizontalAlignment="Center" VerticalAlignment="Stretch" Margin="10">
-      [bold][color=#ffffff][head=1]Gamma Alert[/head][/color][/bold]
+      [bold][color=#ffffff][head=1]Гамма код[/head][/color][/bold]
     </Box>
   </ColorBox>
   <ColorBox>
     <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="10">
-      Attention! Station alert level is now gamma! Central Command has ordered the Gamma security level on the station. Security is to have weapons at all times, and all civilians are to immediately seek their nearest head for transportation to a secure location.
+      Внимание! Код на станции повышен до гамма! Центральное командование объявило о повышении уровня безопасности на станции. Сотрудники службы безопасности должны всегда иметь при себе оружие, а все гражданские лица должны немедленно обратиться к ближайшему руководителю для транспортировки в безопасное место.
     </Box>
   </ColorBox>
 </Table>
@@ -129,17 +119,32 @@ The [color=#db7093]Gamma Alert[/color] is rare and often only used in extreme ca
 <Table Columns="1">
   <ColorBox Color="#cc74fc">
     <Box HorizontalAlignment="Center" VerticalAlignment="Stretch" Margin="10">
-      [bold][color=#ffffff][head=1]Violet Alert[/head][/color][/bold]
+      [bold][color=#ffffff][head=1]Фиолетовый код[/head][/color][/bold]
     </Box>
   </ColorBox>
   <ColorBox>
     <Box HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="10">
-      Attention! Station alert level is now violet! There is a viral threat on the station. Medical staff are advised to isolate crewmembers with any symptoms. Crewmembers are advised to distance themselves from others and perform safety measures to prevent further spread.
+      Внимание! Код на станции повышен до фиолетового! На станции существует вирусная угроза. Медицинскому персоналу рекомендуется изолировать членов экипажа при любых симптомах. Членам экипажа рекомендуется держаться подальше от других и соблюдать меры безопасности для предотвращения дальнейшего распространения.
     </Box>
   </ColorBox>
 </Table>
 
 The [color=#cc74fc]Violet Alert[/color] is set for viral outbreaks when a zombie infection or other disease occurs.
+
+<Table Columns="1">
+  <ColorBox Color="#ffffff">
+    <Box HorizontalAlignment="Center" VerticalAlignment="Stretch" Margin="10">
+      [bold][color=#000000][head=1]Белый код[/head][/color][/bold]
+    </Box>
+  </ColorBox>
+  <ColorBox>
+    <Box>
+      Внимание! Код станции установлен на белый! На станции опасно высокий уровень мерцания, есть несколько активных псионических угроз или другая серьезная научная проблема. Отключите все датчики мерцания. Найдите псионическую изоляцию. Экстрасенсы должны сообщать о случаях умопомрачения.
+    </Box>
+  </ColorBox>
+</Table>
+
+The [bold][color=#ffffff]White Alert[/color][/bold] is set for high levels of glimmer or Epistemics emergencies.
 
 These alerts can be found in entries listed below:
 - [textlink="Green Alert" link="GreenAlert SOP"]
@@ -150,5 +155,6 @@ These alerts can be found in entries listed below:
 - [textlink="Epsilon Alert" link="EpsilonAlert SOP"]
 - [textlink="Gamma Alert" link="GammaAlert SOP"]
 - [textlink="Violet Alert" link="VioletAlert SOP"]
+- [textlink="White Alert" link="WhiteAlert SOP"]
 
 </Document>

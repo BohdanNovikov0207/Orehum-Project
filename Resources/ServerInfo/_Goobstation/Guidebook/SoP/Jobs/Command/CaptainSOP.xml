@@ -1,43 +1,35 @@
-<!--
-SPDX-FileCopyrightText: 2024 John Willis <143434770+CerberusWolfie@users.noreply.github.com>
-SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
-SPDX-FileCopyrightText: 2025 Rouge2t7 <81053047+Sarahon@users.noreply.github.com>
-
-SPDX-License-Identifier: AGPL-3.0-or-later
--->
-
 <Document>
-# Captain SOP
-This is the list of procedures, responsibilities, and duties of the [color=#1b67a5][bold]Captain[/bold][/color] of this station.
+# СРП капитана
+Это список процедур и обязанностей [color=#1b67a5][bold]капитана[/bold][/color] на этой станции.
 
-1. The Captain should [bold]NOT[/bold] act as a Security Officer. Their Job is to manage and help the station. Any deviation without reasonable reason may be grounds for demotion.
+1. Капитан [bold]НЕ[/bold] должен выполнять обязанности сотрудника службы безопасности. Его задача — управлять станцией и помогать её экипажу. Любое отклонение от должностных обязанностей без уважительной причины может повлечь за собой понижение в должности.
 
-2. If a Department lacks a Head of Staff, the Captain should make an effort to appoint an Acting Head of Staff, if there are available personnel to fill the position.
-<Box>Said Acting Head of Staff must be a member of the Department they are to lead.</Box>
-<Box>The Acting Head of Staff must have the prefix 'Acting' in front of their title, and be relieved of duty when a new one is hired by Nanotrasen. Refer to [bold]Hiring/Transfer Policies[/bold]</Box>
+2. Если в отделе нет руководителя отдела, капитан должен приложить усилия для назначения исполняющего обязанности руководителя отдела, если есть персонал для занимания этого поста.
+<Box>Указанный исполняющий обязанности руководителя отдела должен быть членом отдела, который он должен возглавлять.</Box>
+<Box>Должность исполняющего обязанности руководителя должна иметь приставку «ВРИО» перед своей должностью и освобождаться от обязанностей при наличии нового руководител отдела отдела Nanotrasen, а также они должны быть наняты согласно [bold]политике найма/перевода[/bold]</Box>
 
-3. The Captain is to ensure that Space Law is being correctly applied. This should be done in cooperation with the Head of Security and Warden.
+3. Капитан должен обеспечить правильное применение космического закона. Это должно осуществляться совместно с главой службы безопасности и смотрителем.
 
-4. Captain is [bold]heavily encourage[/bold] to give the provided pinpointer(s) to the Head of Security.
-<Box>If the Head of Security is not available, then the Warden.</Box>
-<Box>If neither are available on the current station, refer to the [bold]Chain of Command[/bold].</Box>
+4. Капитану [bold]рекомендуется[/bold] передать пинпоинтер главе службы безопасости.
+<Box>Если глава службы безопасности отсутствует, то это смотритель.</Box>
+<Box>Если они отсутствуют на текущей станции, обратитесь к [bold]цепочке командования[/bold].</Box>
 
-5. Captain may keep Captain spare IDs in their room or give it to the appropriate members in the [bold]Chain of Command[/bold].
-<Box>The [color=#1b67a5][bold]Nanotrasen Representative[/bold][/color] is not permitted to carry these IDs.</Box>
+5. Капитан может хранить ID карты капитана в своей комнате или передавать их соответствующим членам [bold]цепочке командования[/bold].
+<Box>Также[color=#1b67a5][bold]Представителю NanoTrasen[/bold][/color], [color=#1b67a5][bold]Магистрату[/bold][/color], и [color=#1b67a5][bold]Офицеру "Синий Щит"[/bold][/color] не разрешено носить эти ID.</Box>
 
-6. The Captain is not to leave the Station unless given specific permission by Central Command.
+6. Капитану запрещается покидать станцию без разрешения от Центрального командования.
 
-7. The Captain must keep the Nuclear Authentication Disk on their person at all times.
+7. Капитан должен постоянно иметь при себе диск ядерной аутентификации.
 
-8. The Captain is to attempt to resolve every issue that arises in Command locally before contacting Central Command.
+8. Капитан должен попытаться решить все возникающие в Командовании проблемы на местном уровне, прежде чем обращаться в Центральное Командование.
 
-9. The Captain, despite being in charge of the Station, is not independent from NanoTrasen. Any attempts to disregard general company policy are to be considered an instant condition for contract termination.
+9. Несмотря на то, что капитан возглавляет станцию, он не является независимым от NanoTrasen. Любые попытки игнорировать общую политику компании должны рассматриваться как немедленное основание для расторжения контракта.
 
-10. Firing a Head of Staff [bold]must[/bold] be done with reasonable justification. Refer to [bold]Dismissal/Demotion Policies[/bold].
-<Box>Firing Central Command VIPs (e.g. [color=#1b67a5][bold]Nanotrasen Representative[/bold][/color]) [bold]must[/bold] be done with authorization from Central Command.</Box>
+10. Увольнение руководителя отдела [bold]должно[/bold] быть сделано при наличии разумного обоснования и соответствовать[bold]Политике увольнения/понижения в должности[/bold].
+<Box>Увольнение VIP-персон Центрального командования ([color=#1b67a5][bold]Представителя NanoTrasen[/bold][/color], [color=#1b67a5][bold]Магистрата[/bold][/color], и [color=#1b67a5][bold]Офицера "Синий Щит"[/bold][/color]) [bold]должны[/bold] осуществляться с разрешения Центрального командования.</Box>
 
-11. The Captain may not promote anyone to Central Command VIP Positions (e.g. [color=#1b67a5][bold]Nanotrasen Representative[/bold][/color]) without authorization from Central Command.
+11. Капитан не может назначать кого-либо на VIP-должности Центрального командования ([color=#1b67a5][bold]Представителя Nanotrasen[/bold][/color], [color=#1b67a5][bold]Магистрата[/bold][/color], и [color=#1b67a5][bold]Офицера "Синий Щит"[/bold][/color]) без разрешения Центрального командования.
 
-12. The Captain may carry their weaponry on them at all times.
+12. Капитан может постоянно иметь при себе оружие.
 
 </Document>

@@ -24,6 +24,14 @@
       "directions": 4
     },
     {
+      "name": "equipped-HEAD-sealed-vulpkanin",
+      "directions": 4
+    },
+    {
+      "name": "equipped-HEAD-vulpkanin",
+      "directions": 4
+    },
+    {
       "name": "equipped-HEAD-sealed-unshaded",
       "directions": 4
     },
@@ -42,11 +50,11 @@
     {
       "name": "equipped-HAND-sealed-unshaded",
       "directions": 4
-    },
+    },    
 	{
       "name": "equipped-FEET-sealed-unshaded",
       "directions": 4
-    },
+    },    
 	{
       "name": "equipped-BACKPACK-sealed-unshaded",
       "directions": 4
@@ -128,11 +136,11 @@
     {
       "name": "equipped-HAND-sealed-unshaded-vox",
       "directions": 4
-    },
+    },  
 	{
       "name": "equipped-HAND-vox",
       "directions": 4
-    },
+    },    
 	{
       "name": "equipped-FEET-sealed-unshaded-vox",
       "directions": 4

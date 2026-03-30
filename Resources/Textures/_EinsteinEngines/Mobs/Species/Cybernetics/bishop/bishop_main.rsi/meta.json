@@ -24,7 +24,7 @@
       "directions": 4
     },
     {
-      "name": "l_leg",
+      "name": "l_leg-combined",
       "directions": 4
     },
     {
@@ -36,7 +36,7 @@
       "directions": 4
     },
     {
-      "name": "r_leg",
+      "name": "r_leg-combined",
       "directions": 4
     },
     {
@@ -60,7 +60,7 @@
       "directions": 4
     },
     {
-      "name": "l_arm",
+      "name": "l_arm-combined",
       "directions": 4
     },
     {
@@ -76,7 +76,7 @@
       "directions": 4
     },
     {
-      "name": "r_arm",
+      "name": "r_arm-combined",
       "directions": 4
     },
     {

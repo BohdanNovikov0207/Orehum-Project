@@ -1,20 +1,11 @@
-<!--
-SPDX-FileCopyrightText: 2024 John Willis <143434770+CerberusWolfie@users.noreply.github.com>
-SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
+<Document> # Регламент инженерного отдела Здесь перечислены стандартные процедуры, которым должен следовать персонал инженерного отдела. Это, как уже отмечалось, [bold]не чек-листы[/bold], и их следует рассматривать как рекомендации.
+Для ясности: [color=#c8a404][bold]Старший инженер[/bold][/color], [color=#c8a404][bold]Инженер станции[/bold][/color] и [color=#c8a404][bold]Технический ассистент[/bold][/color] объединены в одну запись; к ним применяется единый регламент.
 
-SPDX-License-Identifier: AGPL-3.0-or-later
--->
+В этом отделе представлены следующие должности, при этом [color=#1b67a5][bold]Главный инженер[/bold][/color] — глава отдела:
 
-<Document>
-# Engineering Department SOP
-These are the list of SOPs that Engineering Personnel should follow. These are, as stated before, [bold]not checklists[/bold] and should be treated as guidelines.
-
-For clarification, [color=#c8a404][bold]Station Engineer[/bold][/color] and [color=#c8a404][bold]Technical Assistant[/bold][/color] are combined into the same entry, and should be followed as such.
-
-The following jobs have entries in this Department, with [color=#1b67a5][bold]Chief Engineer[/bold][/color] being the Head of Staff:
-- [textlink="Chief Engineer" link="ChiefEngineer SOP"]
-- [textlink="Atmospheric Technician" link="AtmosTech SOP"]
-- [textlink="Station Engineer" link="StationEngineer SOP"]
-- [textlink="Technical Assistant" link="StationEngineer SOP"]
-
+[textlink="Главный инженер" link="ChiefEngineer SOP"]
+[textlink="Атмосферный техник" link="AtmosTech SOP"]
+[textlink="Старший инженер" link="StationEngineer SOP"]
+[textlink="Инженер станции" link="StationEngineer SOP"]
+[textlink="Технический ассистент" link="StationEngineer SOP"]
 </Document>

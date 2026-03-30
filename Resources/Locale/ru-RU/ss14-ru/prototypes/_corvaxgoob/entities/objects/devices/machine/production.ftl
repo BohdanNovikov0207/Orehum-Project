@@ -1,0 +1,14 @@
+ent-PrinterDocMachineCircuitboard = принтер документов (машинная плата)
+    .desc = Машинная плата принтера документов.
+ent-StasisOperatingTableCircuitboard = стазисный операционный стол (машинная плата)
+    .desc = { ent-BaseMachineCircuitboard.desc }
+    .suffix = { ent-BaseMachineCircuitboard.suffix }
+ent-MachineMedipenRefillerCircuitboard = заполнитель медипенов (машинная плата)
+    .desc = Печатная плата заполнителя медипенов.
+    .suffix = { ent-BaseMachineCircuitboard.suffix }
+ent-QuantumTelepadMachineCircuitboard = квантовый телепад (машинная плата)
+    .desc = { ent-BaseMachineCircuitboard.desc }
+    .suffix = { ent-BaseMachineCircuitboard.suffix }
+ent-CivilianFlatpackerMachineCircuitboard = Упаковщик 467-Г (машинная плата)
+    .desc = { ent-BaseMachineCircuitboard.desc }
+    .suffix = { ent-BaseMachineCircuitboard.suffix }

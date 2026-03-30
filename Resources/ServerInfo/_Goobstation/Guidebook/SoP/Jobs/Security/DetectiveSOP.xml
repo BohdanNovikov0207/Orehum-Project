@@ -1,50 +1,45 @@
-<!--
-SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
-SPDX-FileCopyrightText: 2025 John Willis <143434770+CerberusWolfie@users.noreply.github.com>
-
-SPDX-License-Identifier: AGPL-3.0-or-later
--->
-
 <Document>
-# Detective SOP
-This is the list of procedures, responsibilities, and duties of the [color=#ba292c][bold]Detective[/bold][/color] of this station.
+# СРП детектива
+Это список стандартных процедур и обязанностей [color=#ba292c][bold]Детектива[/bold][/color] на этой станции.
 
 <ColorBox>
   <Box>
-    For the purposes of Alert Escalation: Treat higher alerts as if they are still on the previous alert level. (Yellow Alert is Blue Alert if it was Blue Alert prior.) Furthermore, treat Delta, Gamma, Epsilon, and Violet Alert as Red Alert.
+    Для повышения уровня оповещения: рассматривайте оповещения более высокого уровня так, как если бы они оставались на предыдущем уровне. (Жёлтое оповещение — это синее оповещение, если ранее оно было синим.) Кроме того, рассматривайте оповещения «Дельта», «Гамма», «Эпсилон» и «Фиолетовый» как красные оповещения.
   </Box>
 </ColorBox>
 
-The [color=#ba292c][bold]Detective[/bold][/color] is permitted to carry their shift-start equipment, but should follow escalation laws and leave them holstered on Green Alert.
+[color=#ba292c][bold]Детективу[/bold][/color] разрешается носить с собой снаряжение, которое он получает перед началом смены, но необходимо соблюдать правила эскалации и оставлять его в кобуре во время зелёного кода.
 
-## Green Alert
-1. The Detective is permitted to assist Security Officers with all Patrol Duties. This includes stops, searches, and arrests as per the current Alert Code.
-<Box>They should, however, prioritize investigations and the collection of forensic evidence.</Box>
+## Зелёный код
+1. Детективу разрешается помогать сотрудникам службы безопасности при выполнении всех патрульных обязанностей. Это включает в себя задержание, обыск и арест в соответствии с действующим кодом угрозы.
+<Box>Однако ему следует уделять первостепенное внимание расследованиям и сбору криминалистических доказательств.</Box>
 
-2. The Detective is to follow all Standard Operating Procedures as outlined by the Security Officer SOP in regard to stops, searches and arrests as per the current Alert Code.
+2. Детектив должен следовать всем стандартным рабочим процедурам, описанным в инструкциях для сотрудников службы безопасности, в отношении задержаний, обысков и арестов в соответствии с текущим кодом угрозы.
 
-3. The Detective may carry their Inspector revolver, spare ammunition for it and their Betty umbrella, as well as standard security equipment, excluding stunbaton and Judo belts.
+3. Детектив может носить с собой револьвер и запасные патроны.
 
-4. The Detective is not permitted to obtain more ammunition without permission from the Captain, Head of Security, and/or Warden.
+4. Детективу не разрешается получать дополнительные боеприпасы без разрешения капитана, начальника службы безопасности и/или смотрителя.
 
-5. The Detective is permitted to wear non-Security clothing with permission from the Captain and/or Head of Security for the purpose of undercover investigations.
+5. Детективу разрешается носить одежду, не относящуюся к форме службы безопасности, с разрешения капитана и/или начальника службы безопасности для проведения тайных расследований.
 
-6. When not undercover, the Detective must follow the same guidelines as Security Officers for attire, with the exception that their own assigned attire is also acceptable for any of the attire mentioned for Security Officers.
+6. Если детектив не работает под прикрытием, он должен соблюдать те же правила в отношении одежды, что и сотрудники службы безопасности, за исключением того, что он может носить свою обычную форму в дополнение к одежде, указанной для сотрудников службы безопасности.
 
-## Blue Alert
-1. All Guidelines carry over from [color=#388c34]Green Alert[/color].
+## Синий код
+1. Все пункты переносятся с [color=#388c34]Зелёного кода[/color].
 
-2. The Detective may pull aside any suspect for an interrogation during the course of their time in Processing. No detainee is to be held for longer than five (5) minutes in Processing if no evidence against them is readily available.
-<Box>Exceptions may be made for changelings, heretics, and/or revolutionaries.</Box>
+2. Детектив может отвести любого подозреваемого в сторону для допроса во время обработки данных. Ни один задержанный не может находиться в процессе обработки данных более пяти (5) минут, если против него нет неопровержимых улик.
+<Box>Исключения могут быть сделаны для генокрадов, культистов и/или революционеров.</Box>
 
-3. The Detective may use their revolver during arrests.
+3. Детектив может использовать свой револьвер при задержании.
 
-## Red Alert
-1. Guidelines 1, 2, 3, 4, 5 and 7 carry over from [color=#388c34]Green Alert[/color].
+## Красный код
+1. Пункты 1, 2, 3, 4, 5 и 7 переносятся с [color=#388c34]Зелёного кода[/color].
 
-2. Guidelines 2 and 3 carry over from [color=#1b67a5]Blue Alert[/color].
+2. Пункты 2 и 3 переносятся с [color=#1b67a5]Синего кода[/color].
 
-3. The Detective is permitted to carry around any weapons or equipment available in the Armory, at the Captain, Head of Security, and/or Warden's discretion, but never more than one at a time.
-<Box>Exception is made for extreme emergencies, such as Nuclear Operatives, Blob, and/or Delta Alert.</Box>
+3. Детективу разрешается использовать свой энергетический револьвер и свободно использовать его при возникновении смертельных угроз в соответствии с постановлением Космического закона о применении смертоносной силы.
+
+4. Детективу разрешается носить с собой любое оружие или снаряжение, имеющееся в арсенале, по усмотрению капитана, начальника службы безопасности и/или смотрителя, но не более одного предмета за раз.
+<Box>Исключения делаются только в случае крайней необходимости, например при ядерных оперативниках или Дельта коде.</Box>
 
 </Document>

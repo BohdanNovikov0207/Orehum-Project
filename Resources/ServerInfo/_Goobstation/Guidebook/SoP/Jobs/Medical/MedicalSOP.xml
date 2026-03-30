@@ -1,21 +1,12 @@
-<!--
-SPDX-FileCopyrightText: 2024 John Willis <143434770+CerberusWolfie@users.noreply.github.com>
-SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
+<Document> # Регламент медицинского отдела Здесь перечислены стандартные процедуры, которым должен следовать медицинский персонал. Это, как уже отмечалось, [bold]не чек-листы[/bold], и их следует рассматривать как рекомендации.
+Для упрощения [color=#42636d][bold]Старший врач[/bold][/color], [color=#42636d][bold]Врач[/bold][/color], [color=#42636d][bold]Медицинский интерн[/bold][/color] и [color=#42636d][bold]Парамедик[/bold][/color] объединены в одну запись.
 
-SPDX-License-Identifier: AGPL-3.0-or-later
--->
+В этом отделе представлены следующие должности, при этом [color=#1b67a5][bold]Главный врач[/bold][/color] — глава отдела:
 
-<Document>
-# Medical Department SOP
-These are the list of SOPs that Medical Personnel should follow. These are, as stated before, [bold]not checklists[/bold] and should be treated as guidelines.
-
-For purposes of condensing entries, [color=#42636d][bold]Medical Doctor[/bold][/color], [color=#42636d][bold]Medical Intern[/bold][/color], [color=#42636d][bold]Paramedic[/bold][/color] are combined.
-
-The following jobs have entries in this Department, the [color=#1b67a5][bold]Chief Medical Officer[/bold][/color] being the Head of Staff:
-- [textlink="Chief Medical Officer" link="ChiefMedicalOfficer SOP"]
-- [textlink="Chemist" link="Chemist SOP"]
-- [textlink="Paramedic" link="DoctorIntern SOP"]
-- [textlink="Medical Doctor" link="DoctorIntern SOP"]
-- [textlink="Medical Intern" link="DoctorIntern SOP"]
-
+[textlink="Главный врач" link="ChiefMedicalOfficer SOP"]
+[textlink="Химик" link="Chemist SOP"]
+[textlink="Старший врач" link="DoctorIntern SOP"]
+[textlink="Парамедик" link="DoctorIntern SOP"]
+[textlink="Врач" link="DoctorIntern SOP"]
+[textlink="Медицинский интерн" link="DoctorIntern SOP"]
 </Document>

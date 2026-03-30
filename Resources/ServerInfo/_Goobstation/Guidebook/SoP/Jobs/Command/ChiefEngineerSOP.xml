@@ -1,31 +1,24 @@
-<!--
-SPDX-FileCopyrightText: 2024 John Willis <143434770+CerberusWolfie@users.noreply.github.com>
-SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
-
-SPDX-License-Identifier: AGPL-3.0-or-later
--->
-
 <Document>
-# Chief Engineer (CE) SOP
-This is the list of procedures, responsibilities, and duties of the [color=#1b67a5][bold]Chief Engineer[/bold][/color] of this station.
+# СРП старшего инженера (СИ)
+Это список процедур и обязанностей [color=#1b67a5][bold]старшего инженера[/bold][/color] на этой станции.
 
-1. The Chief Engineer must make sure that the AME, Supermatter Engine, Tesla and/or Singularity are fully set up and supplying power to the station before any further action is taken by themselves or their team.
-<Box>Atmospherics should be set up by Atmospheric Technicians unless there is understaffing. The Chief Engineer is expected to handle this [italic]after[/italic] power is setup.</Box>
+1. Старший инженер должен убедиться, что AME, двигатель на сверхматерии, тесла и/или сингулярнось полностью настроены и обеспечивают станцию энергией, прежде чем предпринимать какие-либо дальнейшие действия самостоятельно или с помощью своих подчинённых.
+<Box>Атмосферные условия должны регулироваться атмосферными техниками, за исключением случаев нехватки персонала. Предполагается, что старший инженер займётся настройкой [italic]after[/italic] этой системы.</Box>
 
-2. The Chief Engineer is responsible for maintaining the integrity of Telecommunications.
-<Box>The Chief Engineer must not hinder the proper functionality of Telecommunications, and must diagnose and repair any issues that arise.</Box>
+2. Старший инженер отвечает за поддержание работоспособности телекоммуникационной системы.
+<Box>Старший инженер не должен препятствовать нормальной работе телекоммуникационной системы. Он должен диагностировать и устранять любые возникающие неполадки.</Box>
 
-3. The Chief Engineer is not permitted to take the axe out of its case unless there is an immediate and urgent threat to their life or urgent access to crisis locations is necessary.
-<Box>The axe must be returned to the case afterwards, and the case locked.</Box>
+3. Старшему инженеру не разрешается вынимать топор из шкафа, за исключением случаев, когда его жизни угрожает непосредственная опасность или необходим срочный доступ к месту чрезвычайной ситуации.
+<Box>После этого топор нужно вернуть в шкаф, а шкаф — запереть.</Box>
 
-4. The Chief Engineer is permitted to carry a telescopic baton, flash, and any Engineering equipment necessary for their job.
+4. Старшему инженеру разрешается иметь при себе телескопическую дубинку, вспышку и любое инженерное оборудование, необходимое для работы.
 
-5. The Chief Engineer is Responsible for maintaining the Integrity of the station's engines, power supply systems, [bold]and[/bold] atmospherics systems.
-<Box>Failure to maintain this is grounds for termination.</Box>
+5. Старший инженер отвечает за поддержание работоспособности двигателей и систем энергоснабжения станции, [bold]and[/bold] атмосферных систем.
+<Box>Несоблюдение этого требования является основанием для увольнения.</Box>
 
-6. The Chief Engineer may declare an area "Condemned" if it is damaged to the point where repairs cannot reasonably be completed within an acceptable frame of time.
-<Box>This area should be blocked off by Engineering personnel (including the Chief Engineer) to prevent harm to station personnel. This area should be announced over Central Communications Console.</Box>
+6. Старший инженер может объявить какую-то зону на станции «непригодным для эксплуатации», если он поврежден настолько, что ремонт не может быть завершен в разумные сроки.
+<Box>Эта зона должна быть перекрыта инженерным персоналом (включая главного инженера) во избежание причинения вреда персоналу станции. Об этой зоне следует сообщить через консоль связи.</Box>
 
-7. The Chief Engineer is permitted to grant Building Permits to crewmembers.
+7. Старшему инженеру разрешается выдавать членам экипажа разрешения на строительство.
 
 </Document>
