@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 using Robust.Shared.GameStates;
 
 namespace Content.Goobstation.Shared.Changeling.Components;
@@ -19,6 +21,12 @@ public sealed partial class ChangelingActionComponent : Component
 
     [DataField]
     public LocId NotChangelingPopup = "changeling-action-fail-not-changeling";
+
+    [DataField, AutoNetworkedField]
+    public float ChemicalCost = 0;
+
+    [DataField, AutoNetworkedField]
+    public float AltChemicalCost = 0; // specifically for actions with an on/off state
 
     [DataField, AutoNetworkedField]
     public bool UseOnFire = false;

@@ -1,8 +1,7 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 using Content.Shared.Actions;
-using Content.Shared.Magic.Events;
 
 namespace Content.Goobstation.Shared.Mimery;
 
 public sealed partial class InvisibleBlockadeActionEvent : InstantActionEvent;
-
-public sealed partial class FingerGunsActionEvent : ProjectileSpellEvent;

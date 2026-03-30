@@ -115,9 +115,6 @@
       - PosterContrabandExoAcid
       - PosterContrabandExoRun
       - PosterContrabandExoChomp
-      - PosterContrabandGoobChuckler # Goobstation
-      - PosterContrabandGoobYakub # Goobstation
-      - PosterContrabandGoobRedFOSS # Goobstation
     chance: 1
 
 - type: entity
@@ -193,13 +190,13 @@
       - PosterLegitGoobWallMeat # Goobstation
       - PosterLegitGoobCoolS # Goobstation
       - PosterLegitGoobBigBrotherAI # Goobstation
-      - PosterLegitGoobDurkPlush # Goobstation
       - PosterLegitGoobWelderBomb # Goobstation
       - PosterLegitGoobLokoAdvertisement # Goobstation
-      - PosterLegitGoobLouieVote # Goobstation
       - PosterLegitGoobSlowDownClown # Goobstation
       - PosterLegitGoobNTRAdvert # Goobstation
+      - PosterContrabandGoobChuckler # Goobstation
       - PosterLegitOppenhopper
       - PosterLegitTyrone
-      - PosterLegitHelio
+#      - PosterLegitHelio # Trauma - Cull scurret references ingame.
+      - PosterLegitBotanyFear
     chance: 1

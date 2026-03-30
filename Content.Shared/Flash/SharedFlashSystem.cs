@@ -18,10 +18,6 @@ using Content.Shared.Charges.Components;
 using Content.Shared.Charges.Systems;
 using Content.Shared.Examine;
 using Content.Shared.Eye.Blinding.Components;
-using Content.Shared.Charges.Components;
-using Content.Shared.Charges.Systems;
-using Content.Shared.Examine;
-using Content.Shared.Eye.Blinding.Components;
 using Content.Shared.Flash.Components;
 using Content.Shared.IdentityManagement;
 using Content.Shared.Interaction.Events;
@@ -40,12 +36,11 @@ using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Timing;
 using System.Linq;
-using Content.Goobstation.Common.Flash;
+using Content.Goobstation.Common.Flash; // Goob
 using Content.Shared.Mobs.Components; // Goobstation
 using Content.Shared.Movement.Systems;
-using Robust.Shared.Random;
-using Robust.Shared.Timing;
-using System.Linq;
+using Content.Shared.Random.Helpers;
+using Content.Shared.Clothing.Components;
 
 namespace Content.Shared.Flash;
 
@@ -192,6 +187,15 @@ public abstract class SharedFlashSystem : EntitySystem
             if (attempt.Cancelled)
                 return;
         }
+
+        if (used != null)
+        {
+            var dirCheck = new CheckDirectionFlashEvent(target, user);
+            RaiseLocalEvent(used.Value, ref dirCheck);
+
+            if (dirCheck.Cancelled)
+                return;
+        }
         // Goob edit end
 
         // Goobstation start
@@ -204,10 +208,12 @@ public abstract class SharedFlashSystem : EntitySystem
         if (!_statusEffectsSystem.TryAddStatusEffect<FlashedComponent>(target, FlashedKey, flashDuration, true))
             return;
 
+        // <Goob> - multiply durations by multiplier
         if (stunDuration != null)
             _stun.TryUpdateParalyzeDuration(target, stunDuration.Value * multiplier);
         else
             _movementMod.TryUpdateMovementSpeedModDuration(target, MovementModStatusSystem.FlashSlowdown, flashDuration * multiplier, slowTo);
+        // </Goob>
 
         if (displayPopup && user != null && target != user && Exists(user.Value))
         {
@@ -243,9 +249,7 @@ public abstract class SharedFlashSystem : EntitySystem
         _entityLookup.GetEntitiesInRange(transform.Coordinates, range, _entSet);
         foreach (var entity in _entSet)
         {
-            // TODO: Use RandomPredicted https://github.com/space-wizards/RobustToolbox/pull/5849
-            var rand = new System.Random((int)_timing.CurTick.Value + GetNetEntity(entity).Id);
-            if (!rand.Prob(probability))
+            if (!SharedRandomExtensions.PredictedProb(_timing, probability, GetNetEntity(entity)))
                 continue;
 
             // Is the entity affected by the flash either through status effects or by taking damage?
@@ -299,15 +303,19 @@ public abstract class SharedFlashSystem : EntitySystem
 
     private void OnFlashImmunityFlashAttempt(Entity<FlashImmunityComponent> ent, ref FlashAttemptEvent args)
     {
+        if (TryComp<MaskComponent>(ent, out var mask) && mask.IsToggled)
+            return;
+
         if (ent.Comp.Enabled)
             args.Cancelled = true;
     }
 
     private void OnExamine(Entity<FlashImmunityComponent> ent, ref ExaminedEvent args)
     {
-        if (HasComp<MobStateComponent>(args.Examined)) // Goobstation - dont add exmained value to mobs whit flash protection
+        if (HasComp<MobStateComponent>(args.Examined)) // Goobstation - dont add exmained value to mobs with flash protection
             return;
 
-        args.PushMarkup(Loc.GetString("flash-protection"));
+        if (ent.Comp.ShowInExamine)
+            args.PushMarkup(Loc.GetString("flash-protection"));
     }
 }

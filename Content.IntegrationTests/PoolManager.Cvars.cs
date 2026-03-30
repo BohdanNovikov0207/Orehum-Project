@@ -1,23 +1,23 @@
 #nullable enable
 // <Trauma>
+using Content.Lavaland.Shared.CCVar;
 using Content.Trauma.Common.CCVar;
 // </Trauma>
 using Content.Shared.CCVar;
-using Robust.Shared;
-using Robust.Shared.Configuration;
-using Robust.UnitTesting;
 
 namespace Content.IntegrationTests;
 
-// Partial class containing cvar logic
+// Partial class containing test cvars
+// This could probably be merged into the main file, but I'm keeping it separate to reduce
+// conflicts for forks.
 public static partial class PoolManager
 {
     public static readonly (string cvar, string value)[] TestCvars =
     {
         // @formatter:off
         // <Trauma>
-        (CCVars.LavalandEnabled.Name, "false"),
-        (TraumaCVars.GhostBarEnabled.Name, "false"),
+        (LavalandCVars.LavalandEnabled.Name, "false"),
+        (TraumaCVars.DisablePathfinding.Name, "true"), // 5GB memory usage spike in some tests and potential deadlocking
         // </Trauma>
         (CCVars.DatabaseSynchronous.Name,     "true"),
         (CCVars.DatabaseSqliteDelay.Name,     "0"),
@@ -26,6 +26,7 @@ public static partial class PoolManager
         (CCVars.AdminLogsQueueSendDelay.Name, "0"),
         (CCVars.NPCMaxUpdates.Name,           "999999"),
         (CCVars.GameRoleTimers.Name,          "false"),
+        (CCVars.GameRoleLoadoutTimers.Name,   "false"),
         (CCVars.GameRoleWhitelist.Name,       "false"),
         (CCVars.GridFill.Name,                "false"),
         (CCVars.PreloadGrids.Name,            "false"),

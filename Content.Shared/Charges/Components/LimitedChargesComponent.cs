@@ -14,7 +14,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Shared.Charges.Systems;
-using Content.Goobstation.Maths.FixedPoint;
+using Content.Shared.FixedPoint;
 using Robust.Shared.GameStates;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
 
@@ -32,7 +32,7 @@ public sealed partial class LimitedChargesComponent : Component
     /// <summary>
     ///     The max charges this action has.
     /// </summary>
-    [DataField, AutoNetworkedField] // Goob Change: Stupid fuckin set accessors.
+    [DataField, AutoNetworkedField]
     public int MaxCharges = 3;
 
     /// <summary>

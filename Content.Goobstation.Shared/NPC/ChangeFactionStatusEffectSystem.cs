@@ -1,10 +1,13 @@
-using Content.Shared.StatusEffectNew;
-using Robust.Shared.Prototypes;
-using Content.Shared.NPC.Systems;
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 using Content.Shared.NPC.Components;
 using Content.Shared.NPC.Prototypes;
+using Content.Shared.NPC.Systems;
+using Content.Shared.StatusEffectNew;
+using Robust.Shared.Prototypes;
 
 namespace Content.Goobstation.Shared.NPC;
+
 public sealed partial class ChangeFactionStatusEffectSystem : EntitySystem
 {
     [Dependency] private readonly StatusEffectsSystem _status = default!;
@@ -20,35 +23,31 @@ public sealed partial class ChangeFactionStatusEffectSystem : EntitySystem
         SubscribeLocalEvent<ChangeFactionStatusEffectComponent, StatusEffectRemovedEvent>(OnStatusRemoved);
     }
 
-    public void TryChangeFaction(EntityUid uid, ProtoId<NpcFactionPrototype> newFaction, out EntityUid? statusEffect, float durationInSeconds)
+    public void TryChangeFaction(Entity<NpcFactionMemberComponent> ent, ProtoId<NpcFactionPrototype> newFaction, TimeSpan? duration)
     {
-        statusEffect = default;
-        if (!TryComp<NpcFactionMemberComponent>(uid, out var npc))
-            return;
-
-        if (durationInSeconds <= 0)
+        if (duration == null)
         {
-            SwapFactions((uid, npc), newFaction);
+            SwapFactions(ent.AsNullable(), newFaction);
             return;
         }
 
-        _status.TryAddStatusEffect(uid, ChangeFactionStatusEffect, out statusEffect, TimeSpan.FromSeconds(durationInSeconds));
+        _status.TryAddStatusEffect(ent.Owner, ChangeFactionStatusEffect, out var statusEffect, duration);
         if (statusEffect.HasValue && TryComp<ChangeFactionStatusEffectComponent>(statusEffect, out var f))
         {
             f.NewFaction = newFaction;
-            var args = new StatusEffectAppliedEvent(uid);
+            var args = new StatusEffectAppliedEvent(ent);
             OnStatusApplied((statusEffect.Value, f), ref args); // mango code
         }
     }
 
     private void OnStatusApplied(Entity<ChangeFactionStatusEffectComponent> ent, ref StatusEffectAppliedEvent args)
     {
-        if (!ent.Comp.NewFaction.HasValue)
+        if (ent.Comp.NewFaction is not {} faction)
             return;
 
         var npc = EnsureComp<NpcFactionMemberComponent>(args.Target);
         ent.Comp.OldFactions = npc.Factions;
-        SwapFactions((args.Target, npc), ent.Comp.NewFaction);
+        SwapFactions((args.Target, npc), faction);
     }
 
     private void OnStatusRemoved(Entity<ChangeFactionStatusEffectComponent> ent, ref StatusEffectRemovedEvent args)
@@ -57,15 +56,15 @@ public sealed partial class ChangeFactionStatusEffectSystem : EntitySystem
         SwapFactions((args.Target, npc), ent.Comp.OldFactions);
     }
 
-    private void SwapFactions(Entity<NpcFactionMemberComponent> ent, string faction)
+    private void SwapFactions(Entity<NpcFactionMemberComponent?> ent, string faction)
     {
-        _npc.ClearFactions((ent, ent.Comp));
-        _npc.AddFaction((ent, ent.Comp), faction);
+        _npc.ClearFactions(ent);
+        _npc.AddFaction(ent, faction);
     }
 
-    private void SwapFactions(Entity<NpcFactionMemberComponent> ent, HashSet<ProtoId<NpcFactionPrototype>> factions)
+    private void SwapFactions(Entity<NpcFactionMemberComponent?> ent, HashSet<ProtoId<NpcFactionPrototype>> factions)
     {
-        _npc.ClearFactions((ent, ent.Comp));
-        _npc.AddFactions((ent, ent.Comp), factions);
+        _npc.ClearFactions(ent);
+        _npc.AddFactions(ent, factions);
     }
 }

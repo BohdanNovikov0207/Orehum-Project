@@ -8,14 +8,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Server.Clothing.Systems;
-using Content.Server.Destructible;
-using Content.Server.Destructible.Thresholds;
-using Content.Server.Destructible.Thresholds.Behaviors;
-using Content.Server.Destructible.Thresholds.Triggers;
-using Content.Server.IdentityManagement;
+using Content.Shared.Destructible.Thresholds;
+using Content.Shared.Destructible.Thresholds.Behaviors;
+using Content.Shared.Destructible.Thresholds.Triggers;
 using Content.Server.Respawn;
 using Content.Shared._Goobstation.Wizard;
 using Content.Shared._Goobstation.Wizard.BindSoul;
+using Content.Shared.Destructible;
 using Content.Shared.Humanoid;
 using Content.Shared.IdentityManagement;
 using Content.Shared.Mind;
@@ -51,7 +50,7 @@ public sealed class BindSoulSystem : SharedBindSoulSystem
         if (soulBound.Name != string.Empty)
             Meta.SetEntityName(ent, soulBound.Name);
 
-        if (TryComp(ent, out HumanoidAppearanceComponent? humanoid))
+        if (TryComp(ent, out HumanoidProfileComponent? humanoid))
         {
             if (soulBound.Age != null)
                 humanoid.Age = soulBound.Age.Value;

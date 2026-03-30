@@ -1,10 +1,5 @@
-using System.Linq;
-using Content.Goobstation.Common.Stunnable;
-using Content.Shared.Damage.Components;
-using Content.Shared.Jittering;
 using Content.Shared.Movement.Components;
 using Content.Shared.Movement.Events;
-using Content.Shared.Speech.EntitySystems;
 using Content.Shared.StatusEffectNew;
 using Robust.Shared.Prototypes;
 
@@ -24,6 +19,7 @@ namespace Content.Shared.Movement.Systems;
 /// </remarks>
 public sealed class MovementModStatusSystem : EntitySystem
 {
+    public static readonly EntProtoId ReagentSpeed = "ReagentSpeedStatusEffect";
     public static readonly EntProtoId VomitingSlowdown = "VomitingSlowdownStatusEffect";
     public static readonly EntProtoId TaserSlowdown = "TaserSlowdownStatusEffect";
     public static readonly EntProtoId FlashSlowdown = "FlashSlowdownStatusEffect";
@@ -31,8 +27,6 @@ public sealed class MovementModStatusSystem : EntitySystem
 
     [Dependency] private readonly MovementSpeedModifierSystem _movementSpeedModifier = default!;
     [Dependency] private readonly StatusEffectsSystem _status = default!;
-    [Dependency] private readonly SharedStutteringSystem _stutter = default!; // goob edit
-    [Dependency] private readonly SharedJitteringSystem _jitter = default!; // goob edit
 
     public override void Initialize()
     {
@@ -164,13 +158,11 @@ public sealed class MovementModStatusSystem : EntitySystem
     /// <param name="status">Status effect entity whose modifiers we are updating</param>
     /// <param name="walkSpeedModifier">New walkSpeedModifer we're applying</param>
     /// <param name="sprintSpeedModifier">New sprintSpeedModifier we're applying</param>
-    /// <param name="visual">Should the ent jitter, requires staminacomp, all else runs if it doesn't have one</param>
     public bool TryUpdateMovementStatus(
         EntityUid uid,
         Entity<MovementModStatusEffectComponent?> status,
         float walkSpeedModifier,
-        float sprintSpeedModifier,
-        bool visual = false // Goobstation edit.
+        float sprintSpeedModifier
     )
     {
         if (!Resolve(status, ref status.Comp))
@@ -180,32 +172,6 @@ public sealed class MovementModStatusSystem : EntitySystem
         status.Comp.WalkSpeedModifier = walkSpeedModifier;
 
         _movementSpeedModifier.RefreshMovementSpeedModifiers(uid);
-
-        // Goob edit start
-
-        var ignoreEv = new BeforeTrySlowdownEvent();
-        RaiseLocalEvent(uid, ref ignoreEv);
-
-        if (ignoreEv.Cancelled)
-            return false;
-
-
-        // specifically mostly john station moved here from sharedstunsystem
-        if (!TryComp<StaminaComponent>(uid, out var staminaComp))
-            return true; // look all the other code ran if they have no stamina im gonna say they dont need to jitter and its fine.
-
-        // goob edit - stunmeta
-        // no slowdown because funny
-        // Choose bigger of speed modifiers (usually sprint) and use it to scale Crowd Control effect time
-        var cCFactor = Math.Clamp(1 - Math.Min(walkSpeedModifier, sprintSpeedModifier), 0, 1);
-        var cCTime = TimeSpan.FromSeconds(10f);
-        if (visual && !TerminatingOrDeleted(uid)
-            && 0 <= staminaComp.ActiveDrains.Aggregate((float) 0, (current, modifier) => current + modifier.Value.DrainRate)) // Goob edit // Goob edit 2 - So stamina regenerating effects doesn't cause jittering
-        {
-            _jitter.DoJitter(uid, cCFactor * cCTime, true);
-            _stutter.DoStutter(uid, cCFactor * cCTime, true);
-        }
-        // Goobstation edit end.
 
         return true;
     }

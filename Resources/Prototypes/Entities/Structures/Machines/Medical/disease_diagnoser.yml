@@ -96,7 +96,8 @@
     headerMargin: 0.0, 0.0, 0.0, 6.0
     backgroundImageTile: true
     backgroundPatchMargin: 0.0, 6.0, 0.0, 6.0
-  - type: ContainerContainer #goob edit start - swabs in disease reports
+  # <Goob> - swabs in disease reports
+  - type: ContainerContainer
     containers:
       item: !type:ContainerSlot
   - type: ItemSlots
@@ -104,4 +105,5 @@
       item:
         whitelist:
           components:
-          - DiseaseSwab # goob edit end
+          - DiseaseSwab
+  # </Goob>

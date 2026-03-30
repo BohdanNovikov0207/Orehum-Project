@@ -173,3 +173,21 @@
               collection: MetalGlassBreak
               params:
                 volume: -4
+
+- type: entity
+  abstract: true # Trauma - xeno station content isn't cherry picked
+  id: FireAlarmXeno
+  parent: FireAlarm
+  description: An alien fire alarm. Works just the same!
+  components:
+  - type: Sprite
+    sprite: Structures/Wallmounts/air_monitors_xeno.rsi
+
+- type: entity
+  abstract: true # Trauma - xeno station content isn't cherry picked
+  id: FireAlarmAssemblyXeno
+  parent: FireAlarmAssembly
+  description: An alien fire alarm assembly. Good luck with the wires.
+  components:
+  - type: Sprite
+    sprite: Structures/Wallmounts/air_monitors_xeno.rsi

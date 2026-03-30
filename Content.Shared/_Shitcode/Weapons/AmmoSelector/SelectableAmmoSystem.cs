@@ -18,6 +18,7 @@ using Content.Shared.Weapons.Ranged.Events;
 using Content.Shared.Weapons.Ranged.Systems;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Prototypes;
+using Robust.Shared.Serialization;
 
 namespace Content.Shared._Goobstation.Weapons.AmmoSelector;
 
@@ -70,7 +71,7 @@ public sealed class SelectableAmmoSystem : EntitySystem
 
     public bool TrySetProto(Entity<AmmoSelectorComponent> ent, ProtoId<SelectableAmmoPrototype> proto)
     {
-        if (!_protoManager.TryIndex(proto, out var index))
+        if (!_protoManager.Resolve(proto, out var index))
             return false;
 
         if (!SetProviderProto(ent, index))
@@ -92,6 +93,7 @@ public sealed class SelectableAmmoSystem : EntitySystem
 
         if (index.Color != null && TryComp(ent, out AppearanceComponent? appearance))
             _appearance.SetData(ent, ToggleableVisuals.Color, index.Color, appearance);
+        _appearance.SetData(ent, AmmoSelectorVisuals.Selected, proto.Id);
 
         Dirty(ent);
         return true;
@@ -99,17 +101,15 @@ public sealed class SelectableAmmoSystem : EntitySystem
 
     private string? GetProviderProtoName(EntityUid uid)
     {
+        // TODO: fuck you, event
         if (TryComp(uid, out BasicEntityAmmoProviderComponent? basic) && basic.Proto != null)
-            return _protoManager.TryIndex(basic.Proto, out var index) ? index.Name : null;
+            return _protoManager.Resolve(basic.Proto, out var index) ? index.Name : null;
 
-        if (TryComp(uid, out HitscanBatteryAmmoProviderComponent? hitscanBattery))
-            return _protoManager.TryIndex(hitscanBattery.Prototype, out var index) ? index.Name : null;
-
-        if (TryComp(uid, out ProjectileBatteryAmmoProviderComponent? projectileBattery))
-            return _protoManager.TryIndex(projectileBattery.Prototype, out var index) ? index.Name : null;
+        if (TryComp(uid, out BatteryAmmoProviderComponent? battery))
+            return _protoManager.Resolve(battery.Prototype, out var index) ? index.Name : null;
 
         if (TryComp(uid, out ChangelingChemicalsAmmoProviderComponent? chemicals))
-            return _protoManager.TryIndex(chemicals.Proto, out var index) ? index.Name : null;
+            return _protoManager.Resolve(chemicals.Proto, out var index) ? index.Name : null;
 
         // Add more providers if needed
 
@@ -125,36 +125,20 @@ public sealed class SelectableAmmoSystem : EntitySystem
         }
 
         // this entire system makes me want to sob but im not touching this shit more than i have to
-        if (TryComp(uid, out HitscanBatteryAmmoProviderComponent? hitscanBattery))
+        // kys whoever wrote this, fucker
+        if (TryComp(uid, out BatteryAmmoProviderComponent? battery))
         {
-            hitscanBattery.Prototype = proto.ProtoId;
+            battery.Prototype = proto.ProtoId;
             if (!ShouldSetFireCost(proto))
                 return true;
 
-            var oldFireCost = hitscanBattery.FireCost;
-            hitscanBattery.FireCost = proto.FireCost;
-            var fireCostDiff = proto.FireCost / oldFireCost;
-            hitscanBattery.Shots = (int) Math.Round(hitscanBattery.Shots / fireCostDiff);
-            hitscanBattery.Capacity = (int) Math.Round(hitscanBattery.Capacity / fireCostDiff);
-            Dirty(uid, hitscanBattery);
-            var updateClientAmmoEvent = new UpdateClientAmmoEvent();
-            RaiseLocalEvent(uid, ref updateClientAmmoEvent);
-            return true;
-        }
-
-        if (TryComp(uid, out ProjectileBatteryAmmoProviderComponent? projectileBattery))
-        {
-            projectileBattery.Prototype = proto.ProtoId;
-            if (!ShouldSetFireCost(proto))
-                return true;
-            var oldFireCost = projectileBattery.FireCost;
-            projectileBattery.FireCost = proto.FireCost;
-            var fireCostDiff =  proto.FireCost / oldFireCost;
-            projectileBattery.Shots = (int) Math.Round(projectileBattery.Shots / fireCostDiff);
-            projectileBattery.Capacity = (int) Math.Round(projectileBattery.Capacity / fireCostDiff);
-            Dirty(uid, projectileBattery);
-            var updateClientAmmoEvent = new UpdateClientAmmoEvent();
-            RaiseLocalEvent(uid, ref updateClientAmmoEvent);
+            var oldFireCost = battery.FireCost;
+            battery.FireCost = proto.FireCost;
+            var fireCostRatio = oldFireCost / proto.FireCost;
+            // this will never have a rounding error TRUST
+            battery.Shots = (int) Math.Round(battery.Shots * fireCostRatio);
+            battery.Capacity = (int) Math.Round(battery.Capacity * fireCostRatio);
+            Dirty(uid, battery);
             return true;
         }
 
@@ -168,6 +152,7 @@ public sealed class SelectableAmmoSystem : EntitySystem
         }
 
         // Add more providers if needed
+        // kys
 
         return false;
     }
@@ -186,4 +171,10 @@ public sealed class SelectableAmmoSystem : EntitySystem
     {
         return (proto.Flags & (int) SelectableAmmoFlags.ChangeWeaponFireRate) != 0;
     }
+}
+
+[Serializable, NetSerializable]
+public enum AmmoSelectorVisuals : byte
+{
+    Selected
 }

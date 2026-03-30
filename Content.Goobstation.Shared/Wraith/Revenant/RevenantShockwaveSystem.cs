@@ -1,5 +1,7 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 using Content.Goobstation.Shared.Wraith.Events;
-using Content.Shared.Damage;
+using Content.Shared.Damage.Systems;
 using Content.Shared.Maps;
 using Content.Shared.StatusEffect;
 using Content.Shared.Stunnable;
@@ -55,10 +57,7 @@ public sealed class RevenantShockwaveSystem : EntitySystem
                 continue;
             }
 
-            if (!_statusEffectsQuery.TryComp(entity, out var statusEffect))
-                continue;
-
-            _stun.KnockdownOrStun(entity, ent.Comp.KnockdownDuration, true);
+            _stun.KnockdownOrStun(entity, ent.Comp.KnockdownDuration);
         }
 
         _audio.PlayPredicted(ent.Comp.ShockSound, ent.Owner, null);

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 using Content.Goobstation.Server.Devil.Contract;
 using Content.Goobstation.Shared.Slasher.Components;
 using Content.Goobstation.Shared.Slasher.Events;
@@ -7,11 +9,12 @@ using Content.Server.AlertLevel;
 using Content.Server.Atmos.EntitySystems;
 using Content.Server.Chat.Systems;
 using Content.Server.Ghost;
-using Content.Server.Light.EntitySystems;
+using Content.Shared.Light.EntitySystems;
 using Content.Server.Station.Systems;
 using Content.Shared.Actions;
 using Content.Shared.Atmos;
 using Content.Shared.Damage;
+using Content.Shared.Damage.Systems;
 using Content.Shared.DoAfter;
 using Content.Shared.Hands;
 using Content.Shared.Hands.Components;
@@ -28,9 +31,9 @@ using Robust.Shared.Audio.Systems;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Timing;
-using FixedPoint2 = Content.Goobstation.Maths.FixedPoint.FixedPoint2;
+using FixedPoint2 = Content.Shared.FixedPoint.FixedPoint2;
 using System.Linq;
-using Content.Server.Light.Components;
+using Content.Shared.Light.Components;
 using Robust.Server.GameObjects;
 
 namespace Content.Goobstation.Server.Slasher.Systems;
@@ -56,11 +59,12 @@ public sealed class SlasherSoulStealSystem : EntitySystem
     [Dependency] private readonly ChatSystem _chatSystem = default!;
     [Dependency] private readonly AlertLevelSystem _alertLevel = default!;
     [Dependency] private readonly SharedWeatherSystem _weather = default!;
-    [Dependency] private readonly IPrototypeManager _protoMan = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly PoweredLightSystem _light = default!;
+    [Dependency] private readonly SharedPoweredLightSystem _light = default!;
     [Dependency] private readonly SlasherRegenerateSystem _regenerate = default!;
+
+    public static readonly EntProtoId Storm = "WeatherStorm";
 
     public override void Initialize()
     {
@@ -234,8 +238,8 @@ public sealed class SlasherSoulStealSystem : EntitySystem
                 _alertLevel.SetLevel(station.Value, "red", true, true, true, false);
 
                 // Make it rain in space
-                var xform = Transform(user);
-                _weather.SetWeather(xform.MapID, _protoMan.Index<WeatherPrototype>("Storm"), null);
+                if (Transform(user).MapUid is {} map)
+                    _weather.TryAddWeather(map, Storm, out _);
 
                 // Make station announcement from Central Command
                 _chatSystem.DispatchStationAnnouncement(

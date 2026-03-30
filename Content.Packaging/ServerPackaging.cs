@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using System.IO.Compression;
-using Content.ModuleManager;
 using Robust.Packaging;
 using Robust.Packaging.AssetProcessing;
 using Robust.Packaging.AssetProcessing.Passes;
@@ -20,10 +19,13 @@ public static class ServerPackaging
         new PlatformReg("osx-x64", "MacOS", true),
         new PlatformReg("osx-arm64", "MacOS", true),
         // Non-default platforms (i.e. for Watchdog Git)
-        new PlatformReg("win-x86", "Windows", false),
-        new PlatformReg("linux-x86", "Linux", false),
-        new PlatformReg("linux-arm", "Linux", false),
         new PlatformReg("freebsd-x64", "FreeBSD", false),
+    };
+
+    private static IReadOnlySet<string> ServerContentIgnoresResources { get; } = new HashSet<string>
+    {
+        "ServerInfo",
+        "Changelog",
     };
 
     private static List<string> PlatformRids => Platforms
@@ -34,18 +36,6 @@ public static class ServerPackaging
         .Where(o => o.BuildByDefault)
         .Select(o => o.Rid)
         .ToList();
-
-    /// <summary>
-    /// Trauma - used by shitcode
-    /// </summary>
-    private static readonly List<string> CoreServerContentAssemblies = new()
-    {
-        "Content.Server.Database",
-        "Content.Server",
-        "Content.Shared",
-        "Content.Shared.Database",
-        "Content.ModuleManager", // I cant be fucked to figure out how to this dynamically
-    };
 
     private static readonly List<string> ServerNotExtraAssemblies = new()
     {
@@ -70,7 +60,7 @@ public static class ServerPackaging
         "zh-Hant"
     };
 
-    public static async Task PackageServer(bool skipBuild, bool hybridAcz, IPackageLogger logger, string configuration, List<string>? platforms = null)
+    public static async Task PackageServer(bool skipBuild, bool hybridAcz, bool logBuild, IPackageLogger logger, string configuration, List<string>? platforms = null)
     {
         if (platforms == null)
         {
@@ -83,7 +73,7 @@ public static class ServerPackaging
             // Rather than hosting the client ZIP on the watchdog or on a separate server,
             //  Hybrid ACZ uses the ACZ hosting functionality to host it as part of the status host,
             //  which means that features such as automatic UPnP forwarding still work properly.
-            await ClientPackaging.PackageClient(skipBuild, configuration, logger);
+            await ClientPackaging.PackageClient(skipBuild, logBuild, configuration, logger);
         }
 
         // Good variable naming right here.
@@ -92,37 +82,45 @@ public static class ServerPackaging
             if (!platforms.Contains(platform.Rid))
                 continue;
 
-            await BuildPlatform(platform, skipBuild, hybridAcz, configuration, logger);
+            await BuildPlatform(platform, skipBuild, hybridAcz, logBuild, configuration, logger);
         }
     }
 
-    private static async Task BuildPlatform(PlatformReg platform, bool skipBuild, bool hybridAcz, string configuration, IPackageLogger logger)
+    private static async Task BuildPlatform(PlatformReg platform,
+        bool skipBuild,
+        bool hybridAcz,
+        bool logBuild,
+        string configuration,
+        IPackageLogger logger)
     {
         logger.Info($"Building project for {platform.TargetOs}...");
 
         if (!skipBuild)
         {
-            var serverModules = FindServerModules();
-
-            foreach (var module in serverModules)
+            var startInfo = new ProcessStartInfo
             {
-                await ProcessHelpers.RunCheck(new ProcessStartInfo
+                FileName = "dotnet",
+                ArgumentList =
                 {
-                    FileName = "dotnet",
-                    ArgumentList =
-                    {
-                        "build",
-                        Path.Combine(module, $"{module}.csproj"),
-                        "-c", configuration,
-                        "--nologo",
-                        "/v:m",
-                        $"/p:TargetOs={platform.TargetOs}",
-                        "/t:Rebuild",
-                        "/p:FullRelease=true",
-                        "/m"
-                    }
-                });
+                    "build",
+                    Path.Combine("Content.Trauma.Server", "Content.Trauma.Server.csproj"), // Trauma - Trauma.Server depends on everything
+                    "-c", configuration,
+                    "--nologo",
+                    "/v:m",
+                    $"/p:TargetOs={platform.TargetOs}",
+                    "/t:Rebuild",
+                    "/p:FullRelease=true",
+                    "/m"
+                }
+            };
+
+            if (logBuild)
+            {
+                startInfo.ArgumentList.Add($"/bl:{Path.Combine("release", $"server-{platform.Rid}.binlog")}");
+                startInfo.ArgumentList.Add("/p:ReportAnalyzer=true");
             }
+
+            await ProcessHelpers.RunCheck(startInfo);
 
             await PublishClientServer(platform.Rid, platform.TargetOs, configuration);
         }
@@ -141,54 +139,6 @@ public static class ServerPackaging
         }
 
         logger.Info($"Finished packaging server in {sw.Elapsed}");
-    }
-
-    private static List<string> FindServerModules(string path = ".")
-    {
-        var serverModules = new List<string> { "Content.Server" };
-
-        var directories = Directory.GetDirectories(path, "Content.*");
-        foreach (var dir in directories)
-        {
-            var dirName = Path.GetFileName(dir);
-
-            // Look for Content.{name}.Server projects
-            if (dirName != "Content.Server" && dirName.EndsWith(".Server"))
-            {
-                var projectPath = Path.Combine(dir, $"{dirName}.csproj");
-                if (File.Exists(projectPath))
-                {
-                    serverModules.Add(dirName);
-                }
-            }
-        }
-
-        return serverModules;
-    }
-
-    private static List<string> FindAllServerModules(string path = ".")
-    {
-        var modules = new List<string>(CoreServerContentAssemblies);
-        modules.AddRange(ModuleDiscovery.DiscoverModules(path)
-            .Where(m => m.Type is not ModuleType.Client)
-            .Select(m => m.Name)
-            .Distinct()
-        );
-
-        var directories = Directory.GetDirectories(path, "Content.*");
-        foreach (var dir in directories)
-        {
-            var dirName = Path.GetFileName(dir);
-
-            // Throw out anything that does not end with ".Server" or ".Shared"
-            if ((!dirName.EndsWith(".Server") && !dirName.EndsWith(".Shared")) || modules.Contains(dirName))
-                continue;
-            var projectPath = Path.Combine(dir, $"{dirName}.csproj");
-            if (File.Exists(projectPath))
-                modules.Add(dirName);
-        }
-
-        return modules;
     }
 
     private static async Task PublishClientServer(string runtime, string targetOs, string configuration)
@@ -229,7 +179,12 @@ public static class ServerPackaging
         var inputPassCore = graph.InputCore;
         var inputPassResources = graph.InputResources;
 
-        var contentAssemblies = FindAllServerModules();
+        // Additional assemblies that need to be copied such as EFCore.
+        var sourcePath = Path.Combine(contentDir, "bin", "Content.Server");
+
+        var deps = DepsHandler.Load(Path.Combine(sourcePath, "Content.Trauma.Server.deps.json")); // Trauma
+
+        var contentAssemblies = GetContentAssemblyNamesToCopy(deps);
 
         await RobustSharedPackaging.DoResourceCopy(
             Path.Combine("RobustToolbox", "bin", "Server",
@@ -246,7 +201,11 @@ public static class ServerPackaging
             contentAssemblies,
             cancel: cancel);
 
-        await RobustServerPackaging.WriteServerResources(contentDir, inputPassResources, cancel);
+        await RobustServerPackaging.WriteServerResources(
+            contentDir,
+            inputPassResources,
+            ServerContentIgnoresResources.Concat(SharedPackaging.AdditionalIgnoredResources).ToHashSet(),
+            cancel);
 
         if (hybridAcz)
         {
@@ -260,8 +219,16 @@ public static class ServerPackaging
     // This returns both content assemblies (e.g. Content.Server.dll) and dependencies (e.g. Npgsql)
     private static IEnumerable<string> GetContentAssemblyNamesToCopy(DepsHandler deps)
     {
-        var depsContent = deps.RecursiveGetLibrariesFrom("Content.Server").SelectMany(GetLibraryNames);
-        var depsRobust = deps.RecursiveGetLibrariesFrom("Robust.Server").SelectMany(GetLibraryNames);
+        return GetContentAssemblyNamesToCopy(deps, "Server"); // Trauma - use helper
+    }
+
+    /// <summary>
+    /// Trauma - made generic over side and public.
+    /// </summary>
+    public static IEnumerable<string> GetContentAssemblyNamesToCopy(DepsHandler deps, string side)
+    {
+        var depsContent = deps.RecursiveGetLibrariesFrom($"Content.Trauma.{side}").SelectMany(GetLibraryNames); // Trauma
+        var depsRobust = deps.RecursiveGetLibrariesFrom($"Robust.{side}").SelectMany(GetLibraryNames); // Trauma
 
         var depsContentExclusive = depsContent.Except(depsRobust).ToHashSet();
 

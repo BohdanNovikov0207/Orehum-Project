@@ -33,9 +33,6 @@ ghost-role-information-lootbug-description = Try not to be butchered by tiders.
 ghost-role-information-homunculus-name = homunculus
 ghost-role-information-homunculus-description = Obey the one who has created you, if there are nowhere to be found, do as you will.
 
-ghost-role-information-fillbot-name = fillbot
-ghost-role-information-fillbot-description = Serve the one who has created you, if there are nowhere to be found, do as you will.
-
 ghost-role-information-huborg-name = Urist McBorg
 ghost-role-information-huborg-description = You are a disgusting abomination of a cyborg.
 
@@ -48,10 +45,6 @@ ghost-role-information-derelict-cyborg-syndicate-description = You were lost dur
 ghost-role-information-navy-captain-name = Navy Captain
 ghost-role-information-navy-captain-description = Classified.
 ghost-role-information-navy-captain-rules = You are beholden to no rules.
-
-ghost-role-information-special-operations-officer-name = Special Operations Officer
-ghost-role-information-special-operations-officer-description = Send, brief, and direct emergency response teams or other Nanotrasen forces. Release the nuclear codes, or don't.
-ghost-role-information-special-operations-officer-rules = Bring the Nanotrasen Representative in alive, the rest are just collateral. [color=#yellow][bold]Navy Captain[/bold][/color] orders may change this.
 
 ghost-role-information-navy-officer-name = Navy Officer
 ghost-role-information-navy-officer-description = Answer faxes and radio communications directed at Central Command. Perform investigations on the station and it's crew.
@@ -79,12 +72,6 @@ ghost-role-information-trevor-description = Securities trusted battle steed.
 ghost-role-information-Gman-name = The G-Man
 ghost-role-information-Gman-description = The right man in the wrong place can make all the difference in the world.
 ghost-role-information-Gman-rules = You are beholden to no rules or boundaries. Death cannot hold you, and neither can Nanotrasen.
-
-# Blueshild Deputy
-
-ghost-role-information-bsd-name = Blueshield Deputy
-ghost-role-information-bsd-description = You were called onto the station by the NTR, obey him, protect Command, follow the law.
-ghost-role-information-bsd-rules = Follow the orders given you by the [color=yellow][bold]NanoTrasen Representative[/bold][/color], protect command.
 
 # interns
 ghost-role-intern-name = CentComm intern
@@ -192,15 +179,7 @@ vox-raider-role-greeting = You are a [color=#7851A9]Vox Raider[/color], a Vox th
 ghost-role-information-clown-goblin-name = Clown goblin
 ghost-role-information-clown-goblin-description = A terrible creature, born out of hell.
 
-ghost-role-information-santa-name = Santa Claus
-ghost-role-information-santa-description = Spread christmas cheer around the station!
-
 ghost-role-information-slasher-token = The Slasher (Token)
- 
-ghost-role-information-sentientanimal-rules = You are a [color={role-type-sentient-animal-color}][bold]{role-type-sentient-animal-name}[/bold][/color]. You are a neutral animal who may act in self defense but otherwise not seek to harm crew.
-                                              You don't remember any of your previous life, and you don't remember anything you learned as a ghost.
-                                              You are allowed to remember knowledge about the game in general, such as how to cook, how to use objects, etc, however you are not knowledgeable in advanced roles.
-                                              You are absolutely [color=red]NOT[/color] allowed to remember, say, the name, appearance, etc. of your previous character.
 
 ghost-role-information-contractor-name = Syndicate Contractor
 ghost-role-information-contractor-token = Syndicate Contractor (Token)

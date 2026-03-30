@@ -8,7 +8,6 @@
 
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
-using System.Linq;
 
 namespace Content.Shared.Silicons.Laws;
 
@@ -32,13 +31,16 @@ public sealed partial class SiliconLawset
 
     /// <summary>
     /// A single line used in logging laws.
-    /// Now using linq why? because I felt like it and it's free perf.
     /// </summary>
     public string LoggingString()
     {
-        return string.Join(" / ", 
-            from law in Laws 
-            select $"{law.Order}: {Loc.GetString(law.LawString)}");
+        var laws = new List<string>(Laws.Count);
+        foreach (var law in Laws)
+        {
+            laws.Add($"{law.Order}: {Loc.GetString(law.LawString)}");
+        }
+
+        return string.Join(" / ", laws);
     }
 
     /// <summary>
@@ -71,6 +73,12 @@ public sealed partial class SiliconLawsetPrototype : IPrototype
     /// <inheritdoc/>
     [IdDataField]
     public string ID { get; private set; } = default!;
+
+    /// <summary>
+    /// The locstring of the lawset for the guidebook entry, if no name is provided, defaults to the ID
+    /// </summary>
+    [DataField]
+    public LocId? Name = null;
 
     /// <summary>
     /// List of law prototype ids in this lawset.

@@ -1,69 +1,8 @@
-// SPDX-FileCopyrightText: 2021 Paul Ritter <ritter.paul1@gmail.com>
-// SPDX-FileCopyrightText: 2021 Paul Ritter <ritter.paul1@googlemail.com>
-// SPDX-FileCopyrightText: 2021 Vera Aguilera Puerto <6766154+Zumorica@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2021 Vera Aguilera Puerto <gradientvera@outlook.com>
-// SPDX-FileCopyrightText: 2021 metalgearsloth <comedian_vs_clown@hotmail.com>
-// SPDX-FileCopyrightText: 2021 mirrorcult <lunarautomaton6@gmail.com>
-// SPDX-FileCopyrightText: 2021 pointer-to-null <91910481+pointer-to-null@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2022 Acruid <shatter66@gmail.com>
-// SPDX-FileCopyrightText: 2022 Rane <60792108+Elijahrane@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2022 keronshb <54602815+keronshb@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2022 metalgearsloth <metalgearsloth@gmail.com>
-// SPDX-FileCopyrightText: 2022 wrexbe <81056464+wrexbe@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2023 DrSmugleaf <drsmugleaf@gmail.com>
-// SPDX-FileCopyrightText: 2023 Jezithyr <jezithyr@gmail.com>
-// SPDX-FileCopyrightText: 2023 Kara <lunarautomaton6@gmail.com>
-// SPDX-FileCopyrightText: 2023 Pieter-Jan Briers <pieterjan.briers@gmail.com>
-// SPDX-FileCopyrightText: 2024 Aiden <aiden@djkraz.com>
-// SPDX-FileCopyrightText: 2024 Alice "Arimah" Heurlin <30327355+arimah@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2024 Chief-Engineer <119664036+Chief-Engineer@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2024 DrSmugleaf <10968691+DrSmugleaf@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2024 Ed <96445749+TheShuEd@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2024 Errant <35878406+Errant-4@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2024 Flareguy <78941145+Flareguy@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2024 HS <81934438+HolySSSS@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2024 IProduceWidgets <107586145+IProduceWidgets@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2024 Leon Friedrich <60421075+ElectroJr@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2024 Mnemotechnican <69920617+Mnemotechnician@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2024 Mr. 27 <45323883+Dutch-VanDerLinde@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2024 PJBot <pieterjan.briers+bot@gmail.com>
-// SPDX-FileCopyrightText: 2024 Pieter-Jan Briers <pieterjan.briers+git@gmail.com>
-// SPDX-FileCopyrightText: 2024 Plykiya <58439124+Plykiya@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2024 Remuchi <72476615+Remuchi@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2024 Rouge2t7 <81053047+Sarahon@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2024 Tayrtahn <tayrtahn@gmail.com>
-// SPDX-FileCopyrightText: 2024 Truoizys <153248924+Truoizys@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2024 TsjipTsjip <19798667+TsjipTsjip@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2024 Ubaser <134914314+UbaserB@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2024 VMSolidus <evilexecutive@gmail.com>
-// SPDX-FileCopyrightText: 2024 Vasilis <vasilis@pikachu.systems>
-// SPDX-FileCopyrightText: 2024 beck-thompson <107373427+beck-thompson@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2024 deltanedas <39013340+deltanedas@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2024 deltanedas <@deltanedas:kde.org>
-// SPDX-FileCopyrightText: 2024 lzk <124214523+lzk228@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2024 osjarw <62134478+osjarw@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2024 plykiya <plykiya@protonmail.com>
-// SPDX-FileCopyrightText: 2024 username <113782077+whateverusername0@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2024 whateverusername0 <whateveremail>
-// SPDX-FileCopyrightText: 2024 Арт <123451459+JustArt1m@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2025 Aviu00 <93730715+Aviu00@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2025 GoobBot <uristmchands@proton.me>
-// SPDX-FileCopyrightText: 2025 Milon <milonpl.git@proton.me>
-// SPDX-FileCopyrightText: 2025 Misandry <mary@thughunt.ing>
-// SPDX-FileCopyrightText: 2025 Nemanja <98561806+EmoGarbage404@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2025 Princess Cheeseballs <66055347+Pronana@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2025 RadsammyT <radsammyt@gmail.com>
-// SPDX-FileCopyrightText: 2025 SX-7 <sn1.test.preria.2002@gmail.com>
-// SPDX-FileCopyrightText: 2025 gluesniffler <159397573+gluesniffler@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2025 gluesniffler <linebarrelerenthusiast@gmail.com>
-// SPDX-FileCopyrightText: 2025 gus <august.eymann@gmail.com>
-// SPDX-FileCopyrightText: 2025 metalgearsloth <31366439+metalgearsloth@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2025 nikitosych <boriszyn@gmail.com>
-//
-// SPDX-License-Identifier: AGPL-3.0-or-later
-
-using System.Linq;
+// <Trauma>
+using Content.Goobstation.Common.Stunnable;
+using Content.Shared.Jittering;
+using Content.Shared.Speech.EntitySystems;
+// </Trauma>
 using Content.Shared.ActionBlocker;
 using Content.Shared.Administration.Logs;
 using Content.Shared.Alert;
@@ -84,14 +23,6 @@ using Content.Shared.Throwing;
 using Content.Shared.Whitelist;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Physics.Events;
-using Robust.Shared.Physics.Systems;
-using Robust.Shared.Containers;
-using Content.Shared.Jittering;
-using Content.Shared.Speech.EntitySystems;
-using Content.Goobstation.Common.Stunnable;
-using Content.Shared.Bed.Sleep;
-using Content.Shared.Interaction;
-using Content.Shared.StatusEffect;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
 
@@ -101,20 +32,19 @@ public abstract partial class SharedStunSystem : EntitySystem
 {
     public static readonly EntProtoId StunId = "StatusEffectStunned";
 
-    [Dependency] private readonly IComponentFactory _componentFactory = default!;
-    [Dependency] protected readonly ActionBlockerSystem Blocker = default!;
-    [Dependency] protected readonly AlertsSystem Alerts = default!;
     [Dependency] protected readonly IGameTiming GameTiming = default!;
     [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
+    [Dependency] protected readonly ActionBlockerSystem Blocker = default!;
+    [Dependency] protected readonly AlertsSystem Alerts = default!;
     [Dependency] private readonly EntityWhitelistSystem _entityWhitelist = default!;
     [Dependency] private readonly MovementSpeedModifierSystem _movementSpeedModifier = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] protected readonly SharedAppearanceSystem Appearance = default!;
     [Dependency] protected readonly SharedDoAfterSystem DoAfter = default!;
     [Dependency] protected readonly SharedStaminaSystem Stamina = default!;
-    [Dependency] private readonly StatusEffectNew.StatusEffectsSystem _status = default!;
-    [Dependency] private readonly SharedStutteringSystem _stutter = default!; // goob edit
-    [Dependency] private readonly SharedJitteringSystem _jitter = default!; // goob edit
+    [Dependency] private readonly StatusEffectsSystem _status = default!;
+    [Dependency] private readonly SharedStutteringSystem _stutter = default!; // Goob
+    [Dependency] private readonly SharedJitteringSystem _jitter = default!; // Goob
 
     public override void Initialize()
     {
@@ -196,15 +126,25 @@ public abstract partial class SharedStunSystem : EntitySystem
         if (args.OurFixtureId != ent.Comp.FixtureId)
             return;
 
-        if (_entityWhitelist.IsBlacklistPass(ent.Comp.Blacklist, args.OtherEntity))
+        if (_entityWhitelist.IsWhitelistPass(ent.Comp.Blacklist, args.OtherEntity))
             return;
-        TryUpdateStunDuration(args.OtherEntity, ent.Comp.Duration);
+
+        //TryUpdateStunDuration(args.OtherEntity, ent.Comp.Duration); // Trauma - only knockdown chud
         TryKnockdown(args.OtherEntity, ent.Comp.Duration, force: true);
     }
 
     // TODO STUN: Make events for different things. (Getting modifiers, attempt events, informative events...)
     public bool TryAddStunDuration(EntityUid uid, TimeSpan duration)
     {
+        // <Goob>
+        var modifierEv = new GetClothingStunModifierEvent(uid);
+        RaiseLocalEvent(uid, modifierEv, true);
+        duration *= modifierEv.Modifier;
+
+        if (duration <= TimeSpan.Zero)
+            return false;
+        // </Goob>
+
         if (!_status.TryAddStatusEffectDuration(uid, StunId, duration))
             return false;
 
@@ -214,15 +154,14 @@ public abstract partial class SharedStunSystem : EntitySystem
 
     public bool TryUpdateStunDuration(EntityUid uid, TimeSpan? duration)
     {
+        // <Goob>
+        var modifierEv = new GetClothingStunModifierEvent(uid);
+        RaiseLocalEvent(uid, modifierEv, true);
+        duration *= modifierEv.Modifier;
+        // </Goob>
+
         if (!_status.TryUpdateStatusEffectDuration(uid, StunId, duration))
             return false;
-        // goob start
-        var ignoreEv = new BeforeStunEvent();
-        RaiseLocalEvent(uid, ref ignoreEv);
-
-        if (ignoreEv.Cancelled)
-            return false;
-        // goob end
 
         OnStunnedSuccessfully(uid, duration);
         return true;
@@ -230,8 +169,19 @@ public abstract partial class SharedStunSystem : EntitySystem
 
     private void OnStunnedSuccessfully(EntityUid uid, TimeSpan? duration)
     {
-        var ev = new StunnedEvent();
-        RaiseLocalEvent(uid, ref ev);// todo: rename event or change how it is raised - this event is raised each time duration of stun was externally changed
+        // <Goob>
+        if (duration is {} time)
+        {
+            _jitter.DoJitter(uid, time, refresh: true);
+            _stutter.DoStutter(uid, time, refresh: true);
+        }
+        // </Goob>
+
+        var ev = new StunnedEvent(); // todo: rename event or change how it is raised - this event is raised each time duration of stun was externally changed
+        RaiseLocalEvent(uid, ref ev);
+
+        var evDropHands = new DropHandItemsEvent();
+        RaiseLocalEvent(uid, ref evDropHands);
 
         var timeForLogs = duration.HasValue
             ? duration.Value.Seconds.ToString()
@@ -261,7 +211,7 @@ public abstract partial class SharedStunSystem : EntitySystem
         if (!Resolve(entity, ref entity.Comp, false))
             return false;
 
-        return TryKnockdown(entity, time, refresh, autoStand, drop, force); // goob edit
+        return TryKnockdown(entity, time, refresh, autoStand, drop, force);
     }
 
     /// <inheritdoc cref="TryCrawling(Entity{CrawlerComponent?},TimeSpan?,bool,bool,bool,bool)"/>
@@ -275,17 +225,7 @@ public abstract partial class SharedStunSystem : EntitySystem
         if (!Resolve(entity, ref entity.Comp, false))
             return false;
 
-        return TryKnockdown(entity, entity.Comp.DefaultKnockedDuration, refresh, autoStand, drop, force); // goob edit
-    }
-
-    /// <summary>
-    ///     Goobstation.
-    ///     Try knockdown, if it fails - stun.
-    ///     Refresh true by default on either, statuseffectcomp is handled by each system separately
-    /// </summary>
-    public bool KnockdownOrStun(EntityUid uid, TimeSpan time, bool refresh = true) // todo goobstation kill this shit
-    {
-        return TryKnockdown(uid, time, refresh) || TryUpdateStunDuration(uid, time);
+        return TryKnockdown(entity, entity.Comp.DefaultKnockedDuration, refresh, autoStand, drop, force);
     }
 
     /// <summary>
@@ -298,15 +238,17 @@ public abstract partial class SharedStunSystem : EntitySystem
     /// <param name="force">Should we force the status effect?</param>
     public bool CanKnockdown(Entity<StandingStateComponent?> entity, ref TimeSpan? time, ref bool autoStand, ref bool drop, bool force = false)
     {
-        var modifierEv = new GetClothingStunModifierEvent(entity);
-        RaiseLocalEvent( entity, modifierEv, true);
-        time *= modifierEv.Modifier;
+        // <Goob>
+        if (time != null)
+        {
+            var modifierEv = new GetClothingStunModifierEvent(entity);
+            RaiseLocalEvent(modifierEv);
+            time *= modifierEv.Modifier;
 
-        if (!HasComp<CrawlerComponent>(entity)) // Goobstation - only knockdown mobs that can lie down
-            return false;
-
-        if (time <= TimeSpan.Zero)
-            return false;
+            if (time <= TimeSpan.Zero)
+                return false;
+        }
+        // </Goob>
 
         // Can't fall down if you can't actually be downed.
         if (!Resolve(entity, ref entity.Comp, false))
@@ -315,22 +257,11 @@ public abstract partial class SharedStunSystem : EntitySystem
         var evAttempt = new KnockDownAttemptEvent(autoStand, drop, time);
         RaiseLocalEvent(entity, ref evAttempt);
 
-            if (evAttempt.Cancelled)
-                return false;
+        autoStand = evAttempt.AutoStand;
+        drop = evAttempt.Drop;
 
-            // goob start
-            var ignoreEv = new BeforeStunEvent();
-            RaiseLocalEvent(entity, ref ignoreEv);
-
-            if (ignoreEv.Cancelled)
-                return false;
-            // goob end
-
-            autoStand = evAttempt.AutoStand;
-            drop = evAttempt.Drop;
-
-            return force || !evAttempt.Cancelled;
-        }
+        return force || !evAttempt.Cancelled;
+    }
 
     /// <summary>
     ///     Knocks down the entity, making it fall to the ground.
@@ -341,16 +272,8 @@ public abstract partial class SharedStunSystem : EntitySystem
     /// <param name="autoStand">Whether we want to automatically stand when knockdown ends.</param>
     /// <param name="drop">Whether we should drop items.</param>
     /// <param name="force">Should we force the status effect?</param>
-    public bool TryKnockdown(Entity<CrawlerComponent?> entity, TimeSpan? time, bool refresh = true, bool autoStand = true,
-        bool drop = true, // goob edit
-        bool force = false)
-     {
-        //goob start stunmodifiers todo goob these are fucking broke anyway apparently
-        var modifierEv = new GetClothingStunModifierEvent(entity);
-        RaiseLocalEvent(modifierEv);
-        time *= modifierEv.Modifier;
-        //goob end
-
+    public bool TryKnockdown(Entity<CrawlerComponent?> entity, TimeSpan? time, bool refresh = true, bool autoStand = true, bool drop = true, bool force = false)
+    {
         if (!CanKnockdown(entity.Owner, ref time, ref autoStand, ref drop, force))
             return false;
 
@@ -358,8 +281,6 @@ public abstract partial class SharedStunSystem : EntitySystem
         // Also time shouldn't be null if we're and trying to add time but, we check just in case anyways.
         if (!Resolve(entity, ref entity.Comp, false))
             return refresh || time == null ? TryUpdateParalyzeDuration(entity, time) : TryAddParalyzeDuration(entity, time.Value);
-
-
 
         Knockdown(entity, time, refresh, autoStand, drop);
         return true;
@@ -381,28 +302,24 @@ public abstract partial class SharedStunSystem : EntitySystem
             RefreshKnockedMovement((uid, component));
             CancelKnockdownDoAfter((uid, component));
         }
-        //else // Goob edit, we handle dropitembehaviour differently and its gonna bite me in the ass cause i know it gets decoupled later
-        //{ Goob
-            // Only drop items the first time we want to fall...
-        if (drop)
+        else
         {
-            var ev = new DropHandItemsEvent();
-            RaiseLocalEvent(uid, ref ev);
-        }
+            // Only drop items the first time we want to fall...
+            if (drop)
+            {
+                var ev = new DropHandItemsEvent();
+                RaiseLocalEvent(uid, ref ev);
+            }
 
             // Only update Autostand value if it's our first time being knocked down...
-        SetAutoStand((uid, component), autoStand);
-        //} Goob
+            SetAutoStand((uid, component), autoStand);
+        }
 
         var knockedEv = new KnockedDownEvent();
         RaiseLocalEvent(uid, ref knockedEv);
 
         if (time != null)
         {
-            // goob edit
-            _jitter.DoJitter(uid, time.Value, true);
-            _stutter.DoStutter(uid, time.Value, true);
-            // goob edit end
             UpdateKnockdownTime((uid, component), time.Value, refresh);
             _adminLogger.Add(LogType.Stamina, LogImpact.Medium, $"{ToPrettyString(uid):user} was knocked down for {time.Value.Seconds} seconds");
         }
@@ -413,9 +330,20 @@ public abstract partial class SharedStunSystem : EntitySystem
         }
     }
 
-    public bool TryAddParalyzeDuration(EntityUid uid, TimeSpan duration)
+    /// <summary>
+    /// Goob - Try to knockdown an entity, stunning if that fails.
+    /// </summary>
+    public bool KnockdownOrStun(EntityUid uid, TimeSpan? duration)
+        => TryKnockdown(uid, duration) || TryUpdateParalyzeDuration(uid, duration);
+
+    public bool TryAddParalyzeDuration(EntityUid uid, TimeSpan? duration) // Goob - made duration optional
     {
-        if (!_status.TryAddStatusEffectDuration(uid, StunId, duration))
+        // <Goob> - made duration optional
+        if (duration == null)
+            return TryUpdateParalyzeDuration(uid, duration);
+
+        if (!_status.TryAddStatusEffectDuration(uid, StunId, duration.Value))
+        // </Goob>
             return false;
 
         // We can't exit knockdown when we're stunned, so this prevents knockdown lasting longer than the stun.
@@ -436,6 +364,7 @@ public abstract partial class SharedStunSystem : EntitySystem
 
         return true;
     }
+
     public bool TryUnstun(Entity<StunnedComponent?> entity)
     {
         if (!Resolve(entity, ref entity.Comp, logMissing: false))
@@ -469,6 +398,7 @@ public abstract partial class SharedStunSystem : EntitySystem
         ev.Cancelled = true;
         args.Args = ev;
     }
+
     private void OnKnockdownStatusApplied(Entity<KnockdownStatusEffectComponent> entity, ref StatusEffectAppliedEvent args)
     {
         if (GameTiming.ApplyingState)

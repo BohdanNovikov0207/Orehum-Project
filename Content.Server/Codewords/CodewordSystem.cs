@@ -68,25 +68,23 @@ public sealed class CodewordSystem : EntitySystem
     /// <summary>
     /// Generates codewords as specified by the <see cref="CodewordGeneratorPrototype"/> codeword generator.
     /// </summary>
-    // goob edit
-    // instead of gathering all words into a giant list
-    // it randomly picks a dataset and then a random word from it
-    // this creates more variety in cases that one set has 1000 words and the other has 50.
     public string[] GenerateCodewords(ProtoId<CodewordGeneratorPrototype> generatorId)
     {
         var generator = _prototypeManager.Index(generatorId);
 
-        var codewordPool = new Dictionary<string, List<string>>();
-        foreach (var dataset in generator.Words.Select(datasetPrototype => _prototypeManager.Index(datasetPrototype)))
-            codewordPool.Add(dataset.ID, dataset.Values.ToList());
-
-        var codewords = new List<string>();
-        for (var i = 0; i < generator.Amount; i++)
+        var codewordPool = new List<string>();
+        foreach (var dataset in generator.Words
+                     .Select(datasetPrototype => _prototypeManager.Index(datasetPrototype)))
         {
-            var set = _random.Pick(codewordPool.Keys);
-            codewords.Add(Loc.GetString(_random.PickAndTake(codewordPool[set])));
+            codewordPool.AddRange(dataset.Values);
         }
-        return codewords.ToArray();
+
+        var finalCodewordCount = Math.Min(generator.Amount, codewordPool.Count);
+        var codewords = new string[finalCodewordCount];
+        for (var i = 0; i < finalCodewordCount; i++)
+        {
+            codewords[i] = Loc.GetString(_random.PickAndTake(codewordPool));
+        }
+        return codewords;
     }
-    // goob edit end
 }

@@ -134,7 +134,13 @@ hugging-success-generic = You hug {THE($target)}.
 hugging-success-generic-others = { CAPITALIZE(THE($user)) } hugs {THE($target)}.
 hugging-success-generic-target = { CAPITALIZE(THE($user)) } hugs you.
 
+petting-success-soft-floofy-vulp = You pet { THE($target) } on {POSS-ADJ($target)} soft floofy head.
+petting-success-soft-floofy-vulp-others = { CAPITALIZE(THE($user)) } pets {THE($target)} on {POSS-ADJ($target)} soft floofy head.
+
 ## Other
 
 petting-success-tesla = You pet {THE($target)}, violating the laws of nature and physics.
 petting-failure-tesla = You reach out towards {THE($target)}, but {SUBJECT($target)} {CONJUGATE-BASIC($target, "zap", "zaps")} your hand away.
+
+petting-success-mail-teleporter = You pet {THE($target)} on {POSS-ADJ($target)} dutiful, cold exterior.
+petting-failure-mail-teleporter = You reach out to pet {THE($target)}, but {SUBJECT($target)} {CONJUGATE-BE($target)} busy sorting mail!

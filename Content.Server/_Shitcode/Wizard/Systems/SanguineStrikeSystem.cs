@@ -14,7 +14,7 @@ using Content.Shared._Goobstation.Wizard.SanguineStrike;
 using Content.Shared.Chemistry.Components;
 using Content.Shared.Chemistry.Components.SolutionManager;
 using Content.Shared.Chemistry.EntitySystems;
-using Content.Goobstation.Maths.FixedPoint;
+using Content.Shared.FixedPoint;
 using Content.Shared.Body.Components;
 using Robust.Server.Audio;
 using Robust.Server.GameObjects;
@@ -133,7 +133,7 @@ public sealed class SanguineStrikeSystem : SharedSanguineStrikeSystem
             return;
 
         Solution tempSol = new();
-        var missingBlood = userBlood.BloodMaxVolume - userBlood.BloodSolution.Value.Comp.Solution.Volume;
+        var missingBlood = userBlood.BloodReferenceSolution.Volume - userBlood.BloodSolution.Value.Comp.Solution.Volume;
         missingBlood = FixedPoint2.Max(FixedPoint2.Zero, missingBlood);
         var bloodSuckAmount = bloodStealAmount / bloodEntities.Count;
         foreach (var (entity, blood, solution) in bloodEntities)

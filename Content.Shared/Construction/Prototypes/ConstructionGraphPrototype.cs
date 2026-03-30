@@ -33,7 +33,7 @@ namespace Content.Shared.Construction.Prototypes
         public string ID { get; private set; } = default!;
 
         [DataField("start")]
-        public string? Start { get; private set; } = "start"; // Goobstation - fuck you chuds
+        public string? Start = "start"; // Trauma - default to start because that's what everything uses...
 
         [DataField("graph", priority: 0)]
         private List<ConstructionGraphNode> _graph = new();
@@ -108,6 +108,7 @@ namespace Content.Shared.Construction.Prototypes
 
             var start = _nodes[startNode];
             var finish = _nodes[finishNode];
+
 
             var current = finish;
             var path = new List<ConstructionGraphNode>();

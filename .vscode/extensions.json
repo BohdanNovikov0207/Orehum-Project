@@ -2,11 +2,10 @@
     "recommendations": [
         "ms-dotnettools.csharp",
         "editorconfig.editorconfig",
-        "aaron-bond.better-comments",
-        "tamasfe.even-better-toml",
-        "slava0135.robust-yaml",
-        "slevesque.shader",
-        "macabeus.vscode-fluent",
-        "redhat.vscode-yaml"
+        // Goob stuff below
+        "ertanic.robust-lsp",
+        "GitHub.vscode-pull-request-github",
+        "eamodio.gitlens",
+        "macabeus.vscode-fluent"
     ]
 }

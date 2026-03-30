@@ -6,28 +6,26 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Robust.Shared.Random;
-using Content.Shared._EinsteinEngines.Silicon.Components;
-using Content.Server.Power.Components;
-using Content.Shared.Mobs.Systems;
-using Content.Server.Temperature.Components;
-using Content.Server.Atmos.Components;
-using Content.Server.Atmos.EntitySystems;
-using Content.Server.Popups;
-using Content.Shared.Popups;
-using Content.Shared._EinsteinEngines.Silicon.Systems;
-using Content.Shared.Movement.Systems;
-using Content.Server.Body.Components;
-using Content.Shared.Mind.Components;
-using System.Diagnostics.CodeAnalysis;
 using Content.Goobstation.Common.CCVar;
-using Content.Server.Power.EntitySystems; // Goobstation - Energycrit
-using Content.Server.PowerCell;
+using Content.Server.Body.Components;
+using Content.Shared.Power.EntitySystems; // Goobstation - Energycrit
+using Content.Shared.PowerCell;
+using Content.Shared._EinsteinEngines.Silicon.Components;
+using Content.Shared._EinsteinEngines.Silicon.Systems;
+using Content.Shared.Alert;
+using Content.Shared.Atmos.Components;
+using Content.Shared.Mind.Components;
+using Content.Shared.Mobs.Systems;
+using Content.Shared.Movement.Systems;
+using Content.Shared.Popups;
+using Content.Shared.Power.Components;
+using Content.Shared.PowerCell.Components;
+using Content.Shared.Temperature.Components;
 using Robust.Shared.Timing;
 using Robust.Shared.Configuration;
+using Robust.Shared.Random;
 using Robust.Shared.Utility;
-using Content.Shared.PowerCell.Components;
-using Content.Shared.Alert;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Content.Server._EinsteinEngines.Silicon.Charge;
 
@@ -35,51 +33,19 @@ public sealed class SiliconChargeSystem : EntitySystem
 {
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly MobStateSystem _mobState = default!;
-    [Dependency] private readonly FlammableSystem _flammable = default!;
-    [Dependency] private readonly PopupSystem _popup = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly MovementSpeedModifierSystem _moveMod = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly IConfigurationManager _config = default!;
     [Dependency] private readonly PowerCellSystem _powerCell = default!;
     [Dependency] private readonly AlertsSystem _alerts = default!;
-    [Dependency] private readonly BatterySystem _battery = default!; // Goobstation - Energycrit
+    [Dependency] private readonly SharedBatterySystem _battery = default!; // Goobstation - Energycrit
 
     public override void Initialize()
     {
         base.Initialize();
 
         SubscribeLocalEvent<SiliconComponent, ComponentStartup>(OnSiliconStartup);
-    }
-
-    // Goobstation - Energycrit: Added batteryEnt argument
-    public bool TryGetSiliconBattery(EntityUid silicon, [NotNullWhen(true)] out BatteryComponent? batteryComp, [NotNullWhen(true)] out EntityUid? batteryEnt)
-    {
-        batteryComp = null;
-        batteryEnt = null; // Goobstation - Energycrit
-        if (!HasComp<SiliconComponent>(silicon))
-            return false;
-
-        // Try to get battery on silicon
-        if (TryComp(silicon, out batteryComp))
-        {
-            batteryEnt = silicon;
-            return true;
-        }
-
-        // Try to get inserted battery
-        if (_powerCell.TryGetBatteryFromSlot(silicon, out batteryEnt, out batteryComp))
-            return true;
-
-        // Goobstation - Energycrit: Deshitcodified this
-        /*
-        // try get a battery directly on the inserted entity
-        if (TryComp(silicon, out batteryComp)
-            || _powerCell.TryGetBatteryFromSlot(silicon, out batteryComp))
-            return true;
-        */
-
-        //DebugTools.Assert("SiliconComponent does not contain Battery");
-        return false;
     }
 
     private void OnSiliconStartup(EntityUid uid, SiliconComponent component, ComponentStartup args)
@@ -115,7 +81,7 @@ public sealed class SiliconChargeSystem : EntitySystem
 
             // Goobstation - Added batteryEnt parameter
             // If you can't find a battery, set the indicator and skip it.
-            if (!TryGetSiliconBattery(silicon, out var batteryComp, out var batteryEnt))
+            if (!_powerCell.TryGetBatteryFromEntityOrSlot(silicon, out var battery))
             {
                 UpdateChargeState(silicon, 0, siliconComp);
                 if (_alerts.IsShowingAlert(silicon, siliconComp.BatteryAlert))
@@ -131,13 +97,14 @@ public sealed class SiliconChargeSystem : EntitySystem
                 && !mindContComp.HasMind)
                 continue;
 
+            // TODO: fucking kid named PowerCellDraw holy shit, this spams states
             var drainRate = siliconComp.DrainPerSecond;
 
             // All multipliers will be subtracted by 1, and then added together, and then multiplied by the drain rate. This is then added to the base drain rate.
             // This is to stop exponential increases, while still allowing for less-than-one multipliers.
             var drainRateFinalAddi = 0f;
 
-            // TODO: Devise a method of adding multis where other systems can alter the drain rate.
+            // TODO: Devise a method of adding multis where other systems can alter the drain rate. (its called a fucking event moron)
             // Maybe use something similar to refreshmovespeedmodifiers, where it's stored in the component.
             // Maybe it doesn't matter, and stuff should just use static drain?
             if (!siliconComp.EntityType.Equals(SiliconType.Npc)) // Don't bother checking heat if it's an NPC. It's a waste of time, and it'd be delayed due to the update time.
@@ -145,13 +112,15 @@ public sealed class SiliconChargeSystem : EntitySystem
 
             // Ensures that the drain rate is at least 10% of normal,
             // and would allow at least 4 minutes of life with a max charge, to prevent cheese.
+            var batt = battery.Value.AsNullable();
+            var batteryComp = battery.Value.Comp;
             drainRate += Math.Clamp(drainRateFinalAddi, drainRate * -0.9f, batteryComp.MaxCharge / 240);
 
             // Drain the battery.
-            _battery.TryUseCharge(batteryEnt.Value, frameTime * drainRate); // Goobstation - Use BatterySystem instead of PowerCellSystem
+            _battery.TryUseCharge(batt, frameTime * drainRate); // Goobstation - Use BatterySystem instead of PowerCellSystem
 
             // Figure out the current state of the Silicon.
-            var chargePercent = (short) MathF.Round(batteryComp.CurrentCharge / batteryComp.MaxCharge * 10f);
+            var chargePercent = (short) _battery.GetRemainingUses(batt, batteryComp.MaxCharge * 0.1f);
 
             UpdateChargeState(silicon, chargePercent, siliconComp);
         }
@@ -178,8 +147,9 @@ public sealed class SiliconChargeSystem : EntitySystem
 
     private float SiliconHeatEffects(EntityUid silicon, SiliconComponent siliconComp, float frameTime)
     {
-        if (!TryComp<TemperatureComponent>(silicon, out var temperComp)
-            || !TryComp<ThermalRegulatorComponent>(silicon, out var thermalComp))
+        if (!TryComp<TemperatureComponent>(silicon, out var temp) ||
+            !TryComp<TemperatureDamageComponent>(silicon, out var tempDamage) ||
+            !TryComp<ThermalRegulatorComponent>(silicon, out var thermalComp))
             return 0;
 
         // If the Silicon is hot, drain the battery faster, if it's cold, drain it slower, capped.
@@ -187,10 +157,10 @@ public sealed class SiliconChargeSystem : EntitySystem
         var upperThreshHalf = thermalComp.NormalBodyTemperature + thermalComp.ThermalRegulationTemperatureThreshold * 0.5f;
 
         // Check if the silicon is in a hot environment.
-        if (temperComp.CurrentTemperature > upperThreshHalf)
+        if (temp.CurrentTemperature > upperThreshHalf)
         {
             // Divide the current temp by the max comfortable temp capped to 4, then add that to the multiplier.
-            var hotTempMulti = Math.Min(temperComp.CurrentTemperature / upperThreshHalf, 4);
+            var hotTempMulti = Math.Min(temp.CurrentTemperature / upperThreshHalf, 4);
 
             // If the silicon is hot enough, it has a chance to catch fire.
 
@@ -200,24 +170,21 @@ public sealed class SiliconChargeSystem : EntitySystem
 
             siliconComp.OverheatAccumulator -= 5;
 
-            if (!EntityManager.TryGetComponent<FlammableComponent>(silicon, out var flamComp)
+            if (!TryComp<FlammableComponent>(silicon, out var flamComp)
                 || flamComp is { OnFire: true }
-                || !(temperComp.CurrentTemperature > temperComp.HeatDamageThreshold))
+                || !(temp.CurrentTemperature > tempDamage.HeatDamageThreshold))
                 return hotTempMulti;
 
             _popup.PopupEntity(Loc.GetString("silicon-overheating"), silicon, silicon, PopupType.MediumCaution);
-            if (!_random.Prob(Math.Clamp(temperComp.CurrentTemperature / (upperThresh * 5), 0.001f, 0.9f)))
+            if (!_random.Prob(Math.Clamp(temp.CurrentTemperature / (upperThresh * 5), 0.001f, 0.9f)))
                 return hotTempMulti;
 
-            // Goobstation: Replaced by KillOnOverheatSystem
-            //_flammable.AdjustFireStacks(silicon, Math.Clamp(siliconComp.FireStackMultiplier, -10, 10), flamComp);
-            //_flammable.Ignite(silicon, silicon, flamComp);
             return hotTempMulti;
         }
 
         // Check if the silicon is in a cold environment.
-        if (temperComp.CurrentTemperature < thermalComp.NormalBodyTemperature)
-            return 0.5f + temperComp.CurrentTemperature / thermalComp.NormalBodyTemperature * 0.5f;
+        if (temp.CurrentTemperature < thermalComp.NormalBodyTemperature)
+            return 0.5f + temp.CurrentTemperature / thermalComp.NormalBodyTemperature * 0.5f;
 
         return 0;
     }

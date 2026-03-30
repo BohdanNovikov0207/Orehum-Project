@@ -116,18 +116,18 @@
   description: This implant plays a sad tune when the user dies.
   categories: [ HideSpawnMenu ]
   components:
-    - type: SubdermalImplant
-      whitelist:
-        components:
-        - MobState # admeme implanting a chair with trombone implant needs to give the chair mobstate so it can die first
-    - type: TriggerOnMobstateChange
-      mobState:
-      - Dead
-    - type: EmitSoundOnTrigger
-      sound:
-        collection: SadTrombone
-        params:
-          variation: 0.125
+  - type: SubdermalImplant
+    whitelist:
+      components:
+      - MobState # admeme implanting a chair with trombone implant needs to give the chair mobstate so it can die first
+  - type: TriggerOnMobstateChange
+    mobState:
+    - Dead
+  - type: EmitSoundOnTrigger
+    sound:
+      collection: SadTrombone
+      params:
+        variation: 0.125
 
 - type: entity
   parent: BaseSubdermalImplant
@@ -136,20 +136,20 @@
   description: This implant emits light from the user's skin on activation.
   categories: [ HideSpawnMenu ]
   components:
-    - type: SubdermalImplant
-      implantAction: ActionToggleLight
-    - type: PointLight
-      enabled: false
-      radius: 2.5
-      softness: 5
-      mask: /Textures/Effects/LightMasks/cone.png
-      autoRot: true
-    - type: Tag
-      tags:
-        - SubdermalImplant
-        - HideContextMenu
-        - Flashlight
-    - type: UnpoweredFlashlight
+  - type: SubdermalImplant
+    implantAction: ActionToggleLight
+  - type: PointLight
+    enabled: false
+    radius: 2.5
+    softness: 5
+    mask: /Textures/Effects/LightMasks/cone.png
+    autoRot: true
+  - type: Tag
+    tags:
+    - SubdermalImplant
+    - HideContextMenu
+    - Flashlight
+  - type: UnpoweredFlashlight
 
 - type: entity
   parent: BaseSubdermalImplant
@@ -206,6 +206,7 @@
   description: This implant grants hidden storage within a person's body using bluespace technology.
   categories: [ HideSpawnMenu ]
   components:
+    - type: StorageImplant
     - type: SubdermalImplant
       implantAction: ActionOpenStorageImplant
       whitelist:
@@ -235,14 +236,16 @@
     whitelist:
       components:
       - Cuffable # useless if you cant be cuffed
-      - Ensnareable # Goob
   - type: TriggerOnActivateImplant
   - type: UncuffOnTrigger
     targetUser: true
-  - type: RemoveSnareOnTrigger # Goob
+  - type: EntityEffectOnTrigger # Trauma - entity effect version of goob shitcode
     targetUser: true
-  - type: ParalyzePullerOnTrigger # Goob
-    targetUser: true
+    effects:
+    - !type:RelayPuller # stun whoever is pulling you
+      effect: !type:ModifyParalysis
+        time: 5
+    - !type:RemoveSnares # remove any snares
 
 - type: entity
   parent: BaseSubdermalImplant
@@ -288,7 +291,7 @@
   - type: TriggerOnActivateImplant
   - type: EmpOnTrigger
     range: 2.75
-    energyConsumption: 360 # Goob edit
+    energyConsumption: 1000 # Trauma edit - was 50000
     disableDuration: 10
 
 - type: entity
@@ -315,7 +318,7 @@
     implantAction: ActionActivateDnaScramblerImplant
     whitelist:
       components:
-      - HumanoidAppearance # syndies cant turn hamlet into a human
+      - HumanoidProfile # syndies cant turn hamlet into a human
   - type: TriggerOnActivateImplant
   - type: DnaScrambleOnTrigger
     targetUser: true
@@ -337,6 +340,26 @@
     interfaces:
       enum.ChameleonControllerKey.Key:
         type: ChameleonControllerBoundUserInterface
+
+- type: entity
+  parent: BaseSubdermalImplant
+  id: VoiceMaskImplant
+  name: identity mask implant
+  description: This implant allows you to change your identity at will.
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: SubdermalImplant
+    implantAction: ActionChangeVoiceMaskImplant
+  - type: VoiceMask
+    overrideIdentity: true
+    changeIDName: true
+  - type: UserInterface
+    interfaces:
+      enum.VoiceMaskUIKey.Key:
+        type: VoiceMaskBoundUserInterface
+  - type: Tag
+    tags:
+    - SubdermalImplant
 
 #Nuclear Operative/Special Exclusive implants
 
@@ -371,7 +394,6 @@
     - HideContextMenu
     - MicroBomb
 
-
 - type: entity
   parent: BaseSubdermalImplant
   id: MacroBombImplant
@@ -382,6 +404,10 @@
     - type: SubdermalImplant
       implantationTimeMultiplier: 4 # Goobstation - Traitor suicide implants
       permanent: true
+    - type: ReplacementImplant
+      whitelist:
+        tags:
+        - MicroBomb # replace microbomb implant with macrobomb
     - type: TriggerOnMobstateChange #activates the timer
       mobState:
       - Dead
@@ -408,9 +434,8 @@
       canCreateVacuum: true
     - type: Tag
       tags:
-        - SubdermalImplant
-        - HideContextMenu
-        - MacroBomb
+      - SubdermalImplant
+      - HideContextMenu
 
 - type: entity
   parent: BaseSubdermalImplant
@@ -437,7 +462,6 @@
     tags:
     - SubdermalImplant
     - HideContextMenu
-    - DeathAcidifier
 
 - type: entity
   parent: BaseSubdermalImplant
@@ -466,9 +490,11 @@
   description: This implant allows the implanter to produce a fake signal that NT security huds use to identify individuals implanted with a mindshield.
   categories: [ HideSpawnMenu ]
   components:
-      - type: SubdermalImplant
-        implantAction: FakeMindShieldToggleAction
-      - type: FakeMindShieldImplant
+  - type: SubdermalImplant
+    implantAction: FakeMindShieldToggleAction
+    implantComponents:
+    - type: FakeMindShield # TODO: put the component on the implant and use implant relay events for the status icon
+  - type: FakeMindShieldImplant
 
 # Sec and Command implants
 

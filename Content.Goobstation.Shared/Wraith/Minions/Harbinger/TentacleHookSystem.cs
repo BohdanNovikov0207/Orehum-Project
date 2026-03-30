@@ -1,17 +1,16 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 using Content.Goobstation.Shared.Wraith.Events;
-using Content.Shared.Body.Components;
+using Content.Shared.Body;
 using Content.Shared.Physics;
 using Content.Shared.Projectiles;
+using Content.Shared.StatusEffectNew;
 using Content.Shared.Weapons.Ranged.Systems;
 using Robust.Shared.Audio.Systems;
-using Robust.Shared.Network;
 using Robust.Shared.Physics;
 using Robust.Shared.Physics.Systems;
 using Robust.Shared.Timing;
 using System.Numerics;
-using Content.Shared.Movement.Systems;
-using Content.Shared.Stunnable;
-using Robust.Shared.Prototypes;
 using Robust.Shared.Spawners;
 
 namespace Content.Goobstation.Shared.Wraith.Minions.Harbinger;
@@ -20,16 +19,12 @@ public sealed class TentacleHookSystem : EntitySystem
 {
     [Dependency] private readonly SharedGunSystem _gun = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly INetManager _netManager = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SharedJointSystem _joints = default!;
-    [Dependency] private readonly SharedStunSystem _stun = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly MovementModStatusSystem _movementMod = default!;
+    [Dependency] private readonly StatusEffectsSystem _status = default!;
 
     private const string TentacleJoint = "grappling";
-
-    public static readonly EntProtoId EffectId = "TentacleSlowdownStatusEffect";
 
     public override void Initialize()
     {
@@ -45,10 +40,7 @@ public sealed class TentacleHookSystem : EntitySystem
 
     private void OnTentacleHook(Entity<TentacleHookComponent> ent, ref TentacleHookEvent args)
     {
-        if (_netManager.IsClient)
-            return;
-
-        var proj = SpawnAtPosition(ent.Comp.TentacleProto, Transform(ent.Owner).Coordinates);
+        var proj = PredictedSpawnAtPosition(ent.Comp.TentacleProto, Transform(ent.Owner).Coordinates);
         var projPos = _transform.GetWorldPosition(proj);
         var targetPos = _transform.GetWorldPosition(args.Target);
 
@@ -59,7 +51,7 @@ public sealed class TentacleHookSystem : EntitySystem
         var visuals = EnsureComp<JointVisualsComponent>(proj);
         visuals.Sprite = ent.Comp.RopeSprite;
         visuals.OffsetA = new Vector2(0f, 0.5f);
-        visuals.Target = GetNetEntity(ent.Owner);
+        visuals.Target = ent.Owner;
         Dirty(proj, visuals);
 
         _audio.PlayPredicted(ent.Comp.HookSound, ent.Owner, ent.Owner);
@@ -99,7 +91,8 @@ public sealed class TentacleHookSystem : EntitySystem
 
         ent.Comp.Target = args.Target;
         Dirty(ent);
-        _movementMod.TryUpdateMovementSpeedModDuration(args.Target, EffectId, ent.Comp.DurationSlow, ent.Comp.SlowMultiplier, ent.Comp.SlowMultiplier);
+
+        _status.TryUpdateStatusEffectDuration(args.Target, ent.Comp.SlowdownEffect, ent.Comp.DurationSlow);
 
         var tentacle = EnsureComp<TentacleHookedComponent>(args.Target);
         tentacle.ThrowTowards = args.Shooter;
@@ -109,8 +102,7 @@ public sealed class TentacleHookSystem : EntitySystem
 
     private void OnJointRemoved(Entity<TentacleHookProjectileComponent> ent, ref JointRemovedEvent args)
     {
-        if (_netManager.IsServer)
-            QueueDel(ent.Owner);
+        PredictedQueueDel(ent.Owner);
     }
 
     private void OnDespawn(Entity<TentacleHookProjectileComponent> ent, ref TimedDespawnEvent args)

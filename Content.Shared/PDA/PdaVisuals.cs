@@ -22,7 +22,6 @@ namespace Content.Shared.PDA
     public enum PdaVisuals
     {
         IdCardInserted,
-        PenInserted,//goob addition for pen visual
         PdaType
     }
 

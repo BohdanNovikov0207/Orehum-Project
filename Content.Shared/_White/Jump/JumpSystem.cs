@@ -39,7 +39,7 @@ public sealed class JumpSystem : EntitySystem
         if (args.Handled || _container.IsEntityInContainer(uid))
             return;
 
-        _throwing.TryThrow(uid, args.Target, component.JumpSpeed, uid, 10F);
+        _throwing.TryThrow(uid, args.Target, component.JumpSpeed, uid, pushbackRatio: 0f);
 
         _audio.PlayPvs(component.JumpSound, uid, component.JumpSound?.Params);
 
@@ -53,9 +53,6 @@ public sealed class JumpSystem : EntitySystem
 
     private void OnThrowDoHit(EntityUid uid, JumpComponent component, ThrowDoHitEvent args)
     {
-        if (args.Handled)
-            return;
-
         _throwingItem.StopThrow(uid, args.Component);
 
         if (Transform(args.Target).Anchored)
@@ -64,9 +61,8 @@ public sealed class JumpSystem : EntitySystem
             return;
         }
 
-        _stun.TryKnockdown(args.Target, component.StunTime, true);
-
-        args.Handled = true;
+        _stun.TryUpdateParalyzeDuration(args.Target, component.StunTime);
+        _stun.TryKnockdown(args.Target, component.StunTime);
     }
 }
 

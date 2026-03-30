@@ -6,17 +6,17 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Damage.Systems;
 using Content.Shared.Damage;
+using Content.Shared.Damage.Components;
+using Content.Shared.Damage.Systems;
 using Content.Shared.Effects;
 using Content.Shared.Throwing;
 using Robust.Shared.Network;
 using Robust.Shared.Physics.Events;
 using Robust.Shared.Player;
 using System.Numerics;
-using Content.Shared._White.Standing;
-using Content.Shared.Standing;
 using Content.Shared.Stunnable;
+using Content.Shared.Standing;
 using Robust.Shared.Physics.Components;
 
 namespace Content.Shared._White.Grab;
@@ -80,8 +80,7 @@ public sealed class GrabThrownSystem : EntitySystem
         if (comp.DamageOnCollide != null)
             _damageable.TryChangeDamage(uid, comp.DamageOnCollide);
 
-        if (HasComp<GrabThrownComponent>(uid))
-            RemComp<GrabThrownComponent>(uid);
+        RemCompDeferred(uid, comp);
     }
 
     /// <summary>
@@ -99,13 +98,13 @@ public sealed class GrabThrownSystem : EntitySystem
         Vector2 vector,
         float grabThrownSpeed,
         DamageSpecifier? damageToUid = null,
-        bool behavior = false) // Goob edit
+        bool drop = true)
     {
         var comp = EnsureComp<GrabThrownComponent>(uid);
         comp.IgnoreEntity.Add(thrower);
         comp.DamageOnCollide = damageToUid;
 
-        _stun.TryCrawling(uid);
+        _stun.TryCrawling(uid, drop: drop);
         _throwing.TryThrow(uid, vector, grabThrownSpeed, animated: false);
     }
 }

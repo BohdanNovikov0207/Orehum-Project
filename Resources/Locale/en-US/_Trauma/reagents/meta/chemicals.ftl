@@ -33,3 +33,21 @@ reagent-desc-ammonium-nitrate-fuel-oil = An off white, crystalline solid mixed w
 
 reagent-name-octogen = octogen
 reagent-desc-octogen = A white, opaque powder that has detonation velocity similar to re-entry speeds. Also known as HMX. Explodes at 553K.
+
+reagent-name-nanomachines = nanomachines
+reagent-desc-nanomachines = A black, dark fluid that seems to move on it's own. Converts people into cyborgs.
+
+reagent-name-nanoprocessor = nanoprocessor
+reagent-desc-nanoprocessor = A white fluid that is responsible for computing at the nanoscopic level.
+
+reagent-name-calcium-carbonate = calcium carbonate
+reagent-desc-calcium-carbonate = Also known as lime, typically found in limestone and egg shells.
+
+reagent-name-calcium-oxide = calcium oxide
+reagent-desc-calcium-oxide = Also known as quicklime, used in cement, reacts with water to produce heat and calcium hydroxide
+
+reagent-name-calcium-hydroxide = calcium hydroxide
+reagent-desc-calcium-hydroxide = The result of calcium oxide reacting with water.
+
+reagent-name-burnite = burnite
+reagent-desc-burnite = Basically just chemical flame, it can create fires even in space! Well, as long as it's on a tile that is.

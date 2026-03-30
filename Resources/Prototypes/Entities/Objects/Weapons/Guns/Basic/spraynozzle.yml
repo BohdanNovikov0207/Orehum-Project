@@ -31,9 +31,7 @@
       path: /Audio/Weapons/Guns/Gunshots/water_spray.ogg
   - type: Appearance
   - type: ClothingSlotAmmoProvider
-    targetSlot:
-    - BACK
-    - suitStorage #goob edit
+    targetSlot: BACK
     providerWhitelist:
       tags:
       - NozzleBackTank

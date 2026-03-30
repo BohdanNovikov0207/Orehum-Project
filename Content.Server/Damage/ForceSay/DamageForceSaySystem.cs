@@ -12,7 +12,8 @@ using Content.Shared.Bed.Sleep;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Events;
 using Content.Shared.Damage.ForceSay;
-using Content.Goobstation.Maths.FixedPoint;
+using Content.Shared.Damage.Systems;
+using Content.Shared.FixedPoint;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Systems;
 using Content.Shared.Stunnable;
@@ -71,7 +72,7 @@ public sealed class DamageForceSaySystem : EntitySystem
         var ev = new BeforeForceSayEvent(component.ForceSayStringDataset);
         RaiseLocalEvent(uid, ev);
 
-        if (!_prototype.TryIndex(ev.Prefix, out var prefixList))
+        if (!_prototype.Resolve(ev.Prefix, out var prefixList))
             return;
 
         var suffix = Loc.GetString(_random.Pick(prefixList.Values));

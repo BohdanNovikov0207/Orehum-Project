@@ -3,14 +3,16 @@
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 		<OutputPath>../bin/Content.Client/</OutputPath>
 		<OutputType Condition="'$(FullRelease)' != 'True'">Exe</OutputType>
-		<WarningsAsErrors>nullable</WarningsAsErrors>
+		<NoWarn>CS0618</NoWarn>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 		<Configurations>Debug;Release;Tools;DebugOpt</Configurations>
 		<Platforms>AnyCPU</Platforms>
 	</PropertyGroup>
 	<Import Project="../MSBuild/Content.props" />
 	<ItemGroup>
-    <ProjectReference Include="../Content.Trauma.Common/Content.Trauma.Common.csproj" />
 		<ProjectReference Include="../Content.Goobstation.Client/Content.Goobstation.Client.csproj" />
+		<ProjectReference Include="../Content.Lavaland.Client/Content.Lavaland.Client.csproj" />
+		<ProjectReference Include="../Content.Medical.Client/Content.Medical.Client.csproj" />
 		<ProjectReference Include="../Content.Trauma.Shared/Content.Trauma.Shared.csproj" />
 	</ItemGroup>
 

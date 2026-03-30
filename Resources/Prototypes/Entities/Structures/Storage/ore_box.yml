@@ -77,13 +77,13 @@
           False: { visible: true }
   - type: Storage
     grid:
-    #- 0,0,9,5
-    - 0,0,11,7 # Lavaland Change
+    - 0,0,19,9 # Lavaland Change
     maxItemSize: Normal
     storageOpenSound: /Audio/Effects/closetopen.ogg
     storageCloseSound: /Audio/Effects/closetclose.ogg
     whitelist:
       tags:
+      - ArtifactFragment # Lavaland Change
       - Ore
   - type: UserInterface
     interfaces:
@@ -100,15 +100,13 @@
           !type:PhysShapeCircle
           radius: 0.3
         # very not dense to make it easy to pull
-        density: 50 # Lavaland Change - make it heavier: 20 -> 50
+        density: 20
         mask:
         - MachineMask
         layer:
         - MachineLayer
   # Lavaland Change Start
-  - type: Construction
-    graph: OreBox
-    node: crate
-    containers:
-    - entity_storage
+  - type: OreBag
+  - type: MagnetPickup
+  - type: ItemToggle
   # Lavaland Change End

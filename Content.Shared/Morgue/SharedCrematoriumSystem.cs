@@ -1,4 +1,4 @@
-using Content.Goobstation.Common.CrematorImmune;
+using Content.Goobstation.Common.Morgue; // Goob
 using Content.Shared.Database;
 using Content.Shared.Examine;
 using Content.Shared.Mind;
@@ -142,7 +142,7 @@ public abstract class SharedCrematoriumSystem : EntitySystem
             for (var i = ent.Comp2.Contents.ContainedEntities.Count - 1; i >= 0; i--)
             {
                 var item = ent.Comp2.Contents.ContainedEntities[i];
-                if (HasComp<CrematoriumImmuneComponent>(item)) // GOOBCODE ALERT //
+                if (HasComp<CrematoriumImmuneComponent>(item)) // Goob
                     continue;
 
                 _container.Remove(item, ent.Comp2.Contents);

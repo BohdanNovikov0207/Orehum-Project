@@ -32,8 +32,6 @@ reagent-effect-guidebook-change-species = Turns the target into a {$species}.
 
 reagent-effect-guidebook-change-species-random = Turns the target into a completely random species.
 
-reagent-effect-guidebook-sex-change = Swaps the person's gender
-
 reagent-effect-guidebook-immunity-modifier =
     { $chance ->
         [1] Modifies

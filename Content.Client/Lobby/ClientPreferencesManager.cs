@@ -19,7 +19,6 @@
 
 using System.Linq;
 using Content.Shared.Construction.Prototypes;
-using Content.Corvax.Interfaces.Shared;
 using Content.Shared.Preferences;
 using Robust.Client;
 using Robust.Client.Player;
@@ -40,8 +39,6 @@ namespace Content.Client.Lobby
         [Dependency] private readonly IBaseClient _baseClient = default!;
         [Dependency] private readonly IPlayerManager _playerManager = default!;
 
-        private ISharedSponsorsManager? _sponsorsManager; // Corvax-Sponsors
-
         public event Action? OnServerDataLoaded;
 
         public GameSettings Settings { get; private set; } = default!;
@@ -49,7 +46,6 @@ namespace Content.Client.Lobby
 
         public void Initialize()
         {
-            IoCManager.Instance!.TryResolveType(out _sponsorsManager); // Corvax-Sponsors
             _netManager.RegisterNetMessage<MsgPreferencesAndSettings>(HandlePreferencesAndSettings);
             _netManager.RegisterNetMessage<MsgUpdateCharacter>();
             _netManager.RegisterNetMessage<MsgSelectCharacter>();
@@ -67,7 +63,7 @@ namespace Content.Client.Lobby
             }
         }
 
-        public void SelectCharacter(ICharacterProfile profile)
+        public void SelectCharacter(HumanoidCharacterProfile profile)
         {
             SelectCharacter(Preferences.IndexOfCharacter(profile));
         }
@@ -82,14 +78,11 @@ namespace Content.Client.Lobby
             _netManager.ClientSendMessage(msg);
         }
 
-        public void UpdateCharacter(ICharacterProfile profile, int slot)
+        public void UpdateCharacter(HumanoidCharacterProfile profile, int slot)
         {
             var collection = IoCManager.Instance!;
-            // Corvax-Sponsors-Start
-            var sponsorPrototypes = _sponsorsManager?.GetClientPrototypes().ToArray() ?? [];
-            profile.EnsureValid(_playerManager.LocalSession!, collection, sponsorPrototypes);
-            // Corvax-Sponsors-End
-            var characters = new Dictionary<int, ICharacterProfile>(Preferences.Characters) {[slot] = profile};
+            profile.EnsureValid(_playerManager.LocalSession!, collection);
+            var characters = new Dictionary<int, HumanoidCharacterProfile>(Preferences.Characters) {[slot] = profile};
             Preferences = new PlayerPreferences(characters, Preferences.SelectedCharacterIndex, Preferences.AdminOOCColor, Preferences.ConstructionFavorites);
             var msg = new MsgUpdateCharacter
             {
@@ -99,9 +92,9 @@ namespace Content.Client.Lobby
             _netManager.ClientSendMessage(msg);
         }
 
-        public void CreateCharacter(ICharacterProfile profile)
+        public void CreateCharacter(HumanoidCharacterProfile profile)
         {
-            var characters = new Dictionary<int, ICharacterProfile>(Preferences.Characters);
+            var characters = new Dictionary<int, HumanoidCharacterProfile>(Preferences.Characters);
             var lowest = Enumerable.Range(0, Settings.MaxCharacterSlots)
                 .Except(characters.Keys)
                 .FirstOrNull();
@@ -118,7 +111,7 @@ namespace Content.Client.Lobby
             UpdateCharacter(profile, l);
         }
 
-        public void DeleteCharacter(ICharacterProfile profile)
+        public void DeleteCharacter(HumanoidCharacterProfile profile)
         {
             DeleteCharacter(Preferences.IndexOfCharacter(profile));
         }

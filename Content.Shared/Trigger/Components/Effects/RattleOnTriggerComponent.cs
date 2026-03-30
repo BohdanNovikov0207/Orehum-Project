@@ -29,8 +29,7 @@ public sealed partial class RattleOnTriggerComponent : BaseXOnTriggerComponent
     };
 
     /// <summary>
-    /// Lavaland Change
-    /// If true, reports the coordinates instead of the nearest beacon message.
+    /// Goob - If true, reports the coordinates instead of the nearest beacon message.
     /// </summary>
     [DataField]
     public bool ReportCoordinates;

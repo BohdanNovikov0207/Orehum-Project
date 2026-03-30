@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 using Robust.Shared.GameStates;
 using System;
 
@@ -19,4 +21,3 @@ namespace Content.Goobstation.Shared.Disease.Chemistry
         public TimeSpan ModifierTimer { get; set; } = TimeSpan.Zero;
     }
 }
-

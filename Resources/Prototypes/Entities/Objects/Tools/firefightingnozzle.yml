@@ -25,7 +25,6 @@
   - type: Tag
     tags:
     - Nozzle
-
   - type: Spray
     transferAmount: 15
     pushbackAmount: 60
@@ -77,8 +76,7 @@
     duration: 8
     spreadAmount: 200
     smokePrototype: Resin
+  - type: AutoStartTimer
   - type: TimerTrigger
     delay: 0.3
   - type: DeleteOnTrigger
-
-

@@ -1,14 +1,16 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 using Content.Goobstation.Shared.Slasher.Components;
 using Content.Goobstation.Shared.Slasher.Events;
 using Content.Shared.Actions;
+using Content.Shared.Body;
 using Content.Shared.Interaction;
-using Content.Shared.Movement.Systems;
 using Content.Shared.Popups;
-using Content.Shared.StatusEffect;
 using Content.Shared.Stunnable;
 using Robust.Shared.Audio.Systems;
-using Robust.Shared.Network;
+using Content.Shared.StatusEffectNew;
 using Robust.Shared.Prototypes;
+using Robust.Shared.Network;
 
 namespace Content.Goobstation.Shared.Slasher.Systems;
 
@@ -17,17 +19,15 @@ namespace Content.Goobstation.Shared.Slasher.Systems;
 /// </summary>
 public sealed class SlasherStaggerAreaSystem : EntitySystem
 {
-
-    public static readonly EntProtoId EffectId = "SlasherSlowdownStatusEffect";
-
     [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly SharedStunSystem _stun = default!;
+    [Dependency] private readonly StatusEffectsSystem _status = default!;
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedInteractionSystem _interact = default!;
     [Dependency] private readonly SharedActionsSystem _actions = default!;
     [Dependency] private readonly INetManager _net = default!;
-    [Dependency] private readonly MovementModStatusSystem _movemod = default!;
+
+    private static readonly EntProtoId StaggerEffect = "SlasherStaggerStatusEffect";
 
     public override void Initialize()
     {
@@ -55,7 +55,7 @@ public sealed class SlasherStaggerAreaSystem : EntitySystem
 
         var (uid, comp) = ent;
 
-        foreach (var (targetUid, _) in _lookup.GetEntitiesInRange<StatusEffectsComponent>(Transform(uid).Coordinates, comp.Range, LookupFlags.Dynamic))
+        foreach (var (targetUid, _) in _lookup.GetEntitiesInRange<BodyComponent>(Transform(uid).Coordinates, comp.Range, LookupFlags.Dynamic))
         {
             if (targetUid == uid)
                 continue;
@@ -63,7 +63,7 @@ public sealed class SlasherStaggerAreaSystem : EntitySystem
             if (!_interact.InRangeUnobstructed(uid, targetUid, comp.Range))
                 continue;
 
-            _movemod.TryUpdateMovementSpeedModDuration(targetUid, EffectId, TimeSpan.FromSeconds(comp.SlowDuration), comp.SlowMultiplier, comp.SlowMultiplier);
+            _status.TryUpdateStatusEffectDuration(targetUid, StaggerEffect, comp.SlowDuration);
 
             // Show popup to the victim
             if (_net.IsServer)

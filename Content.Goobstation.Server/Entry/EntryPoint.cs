@@ -1,8 +1,3 @@
-// SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2025 Misandry <mary@thughunt.ing>
-// SPDX-FileCopyrightText: 2025 Sara Aldrete's Top Guy <mary@thughunt.ing>
-// SPDX-FileCopyrightText: 2025 gus <august.eymann@gmail.com>
-//
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Goobstation.Server.IoC;
@@ -16,22 +11,24 @@ namespace Content.Goobstation.Server.Entry;
 
 public sealed class EntryPoint : GameServer
 {
-    private IVoiceChatServerManager _voiceManager = default!;
-    private ICommonCurrencyManager _curr = default!;
+    [Dependency] private readonly ICommonCurrencyManager _curr = default!;
+    [Dependency] private readonly IVoiceChatServerManager _voiceManager = default!;
+    [Dependency] private readonly IJoinQueueManager _joinQueue = default!;
+
+    public override void PreInit()
+    {
+        ServerGoobContentIoC.Register(Dependencies);
+    }
 
     public override void Init()
     {
         base.Init();
 
-        ServerGoobContentIoC.Register();
+        Dependencies.BuildGraph();
+        Dependencies.InjectDependencies(this);
 
-        IoCManager.BuildGraph();
+        _joinQueue.Initialize();
 
-        _voiceManager = IoCManager.Resolve<IVoiceChatServerManager>();
-
-        IoCManager.Resolve<IJoinQueueManager>().Initialize();
-
-        _curr = IoCManager.Resolve<ICommonCurrencyManager>();
         _curr.Initialize();
     }
 
@@ -52,7 +49,7 @@ public sealed class EntryPoint : GameServer
     {
         base.Dispose(disposing);
 
-        _curr.Shutdown(); // Goobstation
-        _voiceManager.Shutdown(); // Goobstation
+        _curr.Shutdown();
+        _voiceManager.Shutdown();
     }
 }

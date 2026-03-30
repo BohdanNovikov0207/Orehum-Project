@@ -3,7 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Damage;
+using Content.Shared.Damage.Systems;
 using Content.Shared.Hands;
 using Robust.Shared.Containers;
 
@@ -30,7 +30,11 @@ namespace Content.Server.Mail
         /// </summary>
         private void OnRemovedFromContainer(EntityUid uid, DelayedItemComponent component, ContainerModifiedMessage args)
         {
+            if (TerminatingOrDeleted(uid))
+                return;
+
             Spawn(component.Item, Transform(uid).Coordinates);
+            QueueDel(uid);
         }
 
         /// <summary>
@@ -38,7 +42,7 @@ namespace Content.Server.Mail
         /// </summary>
         private void OnHandEquipped(EntityUid uid, DelayedItemComponent component, EquippedHandEvent args)
         {
-            EntityManager.DeleteEntity(uid);
+            Del(uid);
         }
 
         /// <summary>
@@ -46,7 +50,7 @@ namespace Content.Server.Mail
         /// </summary>
         private void OnDropAttempt(EntityUid uid, DelayedItemComponent component, DropAttemptEvent args)
         {
-            EntityManager.DeleteEntity(uid);
+            Del(uid);
         }
 
         /// <summary>
@@ -55,7 +59,7 @@ namespace Content.Server.Mail
         private void OnDamageChanged(EntityUid uid, DelayedItemComponent component, DamageChangedEvent args)
         {
             Spawn(component.Item, Transform(uid).Coordinates);
-            EntityManager.DeleteEntity(uid);
+            Del(uid);
         }
     }
 }

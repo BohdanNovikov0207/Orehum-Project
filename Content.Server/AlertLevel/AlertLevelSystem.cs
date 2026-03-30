@@ -25,6 +25,7 @@ using System.Linq;
 using Content.Server.Chat.Systems;
 using Content.Server.Station.Systems;
 using Content.Shared.CCVar;
+using Content.Trauma.Common.AlertLevel; // Trauma
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Configuration;
 using Robust.Shared.Prototypes;
@@ -175,12 +176,18 @@ public sealed class AlertLevelSystem : EntitySystem
         if (!force)
         {
             if (!detail.Selectable
-                && !detail.EmagSelectable // Goobstation
                 || component.CurrentDelay > 0
                 || component.IsLevelLocked)
             {
                 return;
             }
+
+            // <Trauma>
+            var attemptEv = new ChangeAlertLevelAttemptEvent(level, component.CurrentLevel);
+            RaiseLocalEvent(station, ref attemptEv);
+            if (attemptEv.Cancelled)
+                return;
+            // </Trauma>
 
             component.CurrentDelay = _cfg.GetCVar(CCVars.GameAlertLevelChangeDelay);
             component.ActiveDelay = true;
@@ -229,7 +236,10 @@ public sealed class AlertLevelSystem : EntitySystem
                 colorOverride: detail.Color, sender: stationName);
         }
 
-        RaiseLocalEvent(new AlertLevelChangedEvent(station, level));
+        // <Trauma> - changed it to raise it on the station as well as broadcast
+        var ev = new AlertLevelChangedEvent(station, level);
+        RaiseLocalEvent(station, ev, true);
+        // </Trauma>
     }
 }
 

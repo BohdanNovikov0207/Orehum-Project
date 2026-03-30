@@ -26,6 +26,7 @@ namespace Content.Shared.Communications
     [Serializable, NetSerializable]
     public sealed class CommunicationsConsoleInterfaceState : BoundUserInterfaceState
     {
+        public NetEntity? Station; // Trauma
         public readonly bool CanAnnounce;
         public readonly bool CanBroadcast = true;
         public readonly bool CanCall;
@@ -33,18 +34,18 @@ namespace Content.Shared.Communications
         public readonly bool CountdownStarted;
         public List<string>? AlertLevels;
         public string CurrentAlert;
-        public Color CurrentAlertColor;
         public float CurrentAlertDelay;
 
-        public CommunicationsConsoleInterfaceState(bool canAnnounce, bool canCall, List<string>? alertLevels, string currentAlert, Color currentAlertColor, float currentAlertDelay, TimeSpan? expectedCountdownEnd = null)
+        // Trauma - added station
+        public CommunicationsConsoleInterfaceState(NetEntity? station, bool canAnnounce, bool canCall, List<string>? alertLevels, string currentAlert, float currentAlertDelay, TimeSpan? expectedCountdownEnd = null)
         {
+            Station = station; // Trauma
             CanAnnounce = canAnnounce;
             CanCall = canCall;
             ExpectedCountdownEnd = expectedCountdownEnd;
             CountdownStarted = expectedCountdownEnd != null;
             AlertLevels = alertLevels;
             CurrentAlert = currentAlert;
-            CurrentAlertColor = currentAlertColor;
             CurrentAlertDelay = currentAlertDelay;
         }
     }

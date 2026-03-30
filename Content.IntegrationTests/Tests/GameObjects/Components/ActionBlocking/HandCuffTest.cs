@@ -26,6 +26,7 @@
 using Content.Server.Cuffs;
 using Content.Shared.Cuffs.Components;
 using Content.Shared.Hands.Components;
+using Content.Shared.Hands.EntitySystems; // Trauma
 using Robust.Server.Console;
 using Robust.Shared.GameObjects;
 
@@ -75,7 +76,7 @@ namespace Content.IntegrationTests.Tests.GameObjects.Components.ActionBlocking
             HandsComponent hands = default!;
 
             var entityManager = server.ResolveDependency<IEntityManager>();
-            var host = server.ResolveDependency<IServerConsoleHost>();
+            var handsSys = entityManager.System<SharedHandsSystem>(); // Trauma - replaces host
 
             var map = await pair.CreateTestMap();
 
@@ -108,10 +109,12 @@ namespace Content.IntegrationTests.Tests.GameObjects.Components.ActionBlocking
                 cuffableSys.TryAddNewCuffs(human, human, cuffs, cuffed);
                 Assert.That(cuffed.CuffedHandCount, Is.GreaterThan(0), "Handcuffing a player did not result in their hands being cuffed");
 
-                // Test to ensure a player with 4 hands will still only have 2 hands cuffed
-                AddHand(entityManager.GetNetEntity(human), host);
-                AddHand(entityManager.GetNetEntity(human), host);
+                // <Trauma> - dont use fucking addhand command
+                handsSys.AddHand(human, "hand_lefter", HandLocation.Left);
+                handsSys.AddHand(human, "hand_righter", HandLocation.Right);
+                // </Trauma>
 
+                // Test to ensure a player with 4 hands will still only have 2 hands cuffed
                 Assert.Multiple(() =>
                 {
                     Assert.That(cuffed.CuffedHandCount, Is.EqualTo(2));
@@ -124,11 +127,6 @@ namespace Content.IntegrationTests.Tests.GameObjects.Components.ActionBlocking
             });
 
             await pair.CleanReturnAsync();
-        }
-
-        private static void AddHand(NetEntity to, IServerConsoleHost host)
-        {
-            host.ExecuteCommand(null, $"addhand {to}");
         }
     }
 }

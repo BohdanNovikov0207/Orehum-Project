@@ -13,7 +13,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Shared.Alert;
-using Content.Goobstation.Maths.FixedPoint;
+using Content.Shared.FixedPoint;
 using Content.Shared.Mobs.Systems;
 using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
@@ -42,6 +42,7 @@ public sealed partial class MobThresholdsComponent : Component
     public Dictionary<MobState, ProtoId<AlertPrototype>> StateAlertDict = new()
     {
         {MobState.Alive, "HumanHealth"},
+        {MobState.SoftCrit, "HumanCrit"}, // Trauma - reusing real crit because idc
         {MobState.Critical, "HumanCrit"},
         {MobState.Dead, "HumanDead"},
     };

@@ -24,10 +24,11 @@
 
 using Content.Goobstation.Common.Silo;
 using Content.Shared._DV.Salvage.Components;
-using Content.Shared._Lavaland.UnclaimedOre;
+using Content.Lavaland.Common.Mining;
 using Content.Shared.Access.Systems;
 using Content.Shared.Lathe;
 using Content.Shared.Materials;
+using Content.Trauma.Common.Salvage; // Trauma
 using Robust.Shared.Audio;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Timing;
@@ -74,14 +75,26 @@ public sealed class MiningPointsSystem : EntitySystem
     private void OnClaimMiningPoints(Entity<MiningPointsLatheComponent> ent, ref LatheClaimMiningPointsMessage args)
     {
         var user = args.Actor;
-        if (GetPointComp(user) is {} dest) // Goobstation - borg Miningpoints
-            TransferAll(ent.Owner, dest);
+        // <Trauma> - raises event too
+        var comp = _query.Comp(ent);
+        var points = comp.Points;
+        if (points == 0)
+            return;
+
+        if (GetPointComp(user) is not {} dest)
+            return;
+
+        TransferAll((ent.Owner, comp), dest);
+
+        var ev = new MiningPointsClaimedEvent(user, (int) points);
+        RaiseLocalEvent(ent, ref ev, true);
+        // </Trauma>
     }
 
     #endregion
     #region Public API
     /// <summary>
-    /// if user can claim mining points 
+    /// if user can claim mining points
     /// <summary>
     public bool CanClaimPoints(EntityUid user) // Goobstation - borg Miningpoints
     {

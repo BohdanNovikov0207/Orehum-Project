@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 using Content.Goobstation.Common.Traitor.PenSpin;
 using Content.Goobstation.Shared.Traitor.PenSpin;
 using JetBrains.Annotations;
@@ -38,15 +40,5 @@ public sealed class PenSpinBoundUserInterface : BoundUserInterface
     private void OnSubmitPressed(int degree)
     {
         SendPredictedMessage(new PenSpinSubmitDegreeMessage(degree));
-    }
-
-    protected override void Dispose(bool disposing)
-    {
-        base.Dispose(disposing);
-
-        if (disposing)
-        {
-            _menu?.Dispose();
-        }
     }
 }

@@ -50,10 +50,6 @@ public sealed partial class MagicComponent : Component
     // Goobstation
     [DataField]
     public MagicSchool School = MagicSchool.Unset;
-
-    // Goobstation
-    [DataField]
-    public bool BlockedBySpectral = true;
 }
 
 public enum MagicSchool : byte // Goobstation

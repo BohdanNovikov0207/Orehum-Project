@@ -1,12 +1,7 @@
-// SPDX-FileCopyrightText: 2025 GoobBot <uristmchands@proton.me>
-// SPDX-FileCopyrightText: 2025 Roudenn <romabond091@gmail.com>
-// SPDX-FileCopyrightText: 2025 Timfa <timfalken@hotmail.com>
-//
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Goobstation.Shared.Silicon.Components;
 using Content.Shared.Emag.Systems;
-using Content.Shared.Movement.Systems;
 using Content.Shared.NPC.Components;
 using Content.Shared.NPC.Prototypes;
 using Content.Shared.NPC.Systems;
@@ -24,7 +19,6 @@ public sealed class EmagReplaceFactionsSystem : EntitySystem
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly NpcFactionSystem _npcFactionSystem = default!;
     [Dependency] private readonly SharedStunSystem _stunSystem = default!;
-    [Dependency] private readonly MovementModStatusSystem _movementMod = default!;
 
     public override void Initialize()
     {
@@ -50,8 +44,7 @@ public sealed class EmagReplaceFactionsSystem : EntitySystem
         _npcFactionSystem.ClearFactions(uid, false);
         _npcFactionSystem.AddFactions(uid, newFactions);
 
-        if(comp.StunSeconds > 0)
-            _stunSystem.TryUpdateStunDuration(uid, TimeSpan.FromSeconds(comp.StunSeconds));
+        _stunSystem.TryUpdateParalyzeDuration(uid, comp.StunTime);
 
         args.Handled = true;
     }

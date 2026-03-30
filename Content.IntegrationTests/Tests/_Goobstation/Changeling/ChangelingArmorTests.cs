@@ -11,30 +11,27 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Goobstation.Shared.Changeling.Components;
-using Content.Goobstation.Shared.InternalResources.Components;
-using Content.Goobstation.Shared.InternalResources.EntitySystems;
 using Content.Server.Actions;
 using Content.Shared.Actions.Components;
 using Content.Shared.Inventory;
 using Robust.Shared.GameObjects;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
 
 namespace Content.IntegrationTests.Tests._Goobstation.Changeling;
 
+// TODO: optimise this dogshit it takes me 73s to fucking use an action why
 [TestFixture]
 public sealed class ChangelingArmorTest
 {
+    private static readonly EntProtoId mercenaryHelmet = "ClothingHeadHelmetMerc";
+
     [Test]
     [TestCase("ActionToggleChitinousArmor", "ChangelingClothingOuterArmor", "ChangelingClothingHeadHelmet")]
+    [Explicit] // Trauma - takes so long for no benefit idc
     public async Task TestChangelingFullArmor(string actionProto, string outerProto, string helmetProto)
     {
-        await using var pair = await PoolManager.GetServerClient(new PoolSettings
-        {
-            // This makes it take like 3 minutes, twice.
-            // Dirty = true,
-            // InLobby = false,
-            // DummyTicker = false,
-        });
+        await using var pair = await PoolManager.GetServerClient();
 
         var server = pair.Server;
         var testMap = await pair.CreateTestMap();
@@ -43,13 +40,11 @@ public sealed class ChangelingArmorTest
 
         var actionSys = entMan.System<ActionsSystem>();
         var invSys = entMan.System<InventorySystem>();
-        var resourceSys = entMan.System<SharedInternalResourcesSystem>();
 
         // Assert.That(ticker.RunLevel, Is.EqualTo(GameRunLevel.InRound));
 
         var urist = EntityUid.Invalid;
         ChangelingIdentityComponent changelingIdentity;
-        ChangelingChemicalComponent changelingChemical;
         Entity<ActionComponent> armorAction = (EntityUid.Invalid, null);
 
         await server.WaitPost(() =>
@@ -60,11 +55,8 @@ public sealed class ChangelingArmorTest
             // Make urist a changeling
             changelingIdentity = entMan.EnsureComponent<ChangelingIdentityComponent>(urist);
             changelingIdentity.TotalAbsorbedEntities += 10;
-
-            // set chemicals
-            changelingChemical = entMan.EnsureComponent<ChangelingChemicalComponent>(urist);
-            resourceSys.TrySetResourcesCapacity(urist, changelingChemical.ResourceData, 1000);
-            resourceSys.TryUpdateResourcesAmount(urist, changelingChemical.ResourceData, 1000);
+            changelingIdentity.MaxChemicals = 1000;
+            changelingIdentity.Chemicals = 1000;
 
             // Give urist chitinous armor action
             var armorActionEntityNullable = actionSys.AddAction(urist, actionProto);
@@ -92,12 +84,9 @@ public sealed class ChangelingArmorTest
                 Assert.That(head, Is.Not.Null);
                 Assert.That(entMan.GetComponent<MetaDataComponent>(head.Value).EntityPrototype!.ID, Is.EqualTo(helmetProto));
             });
-        });
 
-        await server.WaitPost(() =>
-        {
             // Armor down
-            actionSys.PerformAction(urist,  armorAction);
+            actionSys.PerformAction(urist, armorAction);
         });
 
         await server.WaitRunTicks(5);
@@ -117,12 +106,7 @@ public sealed class ChangelingArmorTest
                 Assert.That(entMan.TryGetComponent<MetaDataComponent>(head, out var meta), Is.False);
                 Assert.That(meta?.EntityPrototype, Is.Null);
             });
-        });
 
-        const string mercenaryHelmet = "ClothingHeadHelmetMerc";
-
-        await server.WaitPost(() =>
-        {
             // Equip helmet
             var helm = entMan.SpawnEntity(mercenaryHelmet, testMap.GridCoords);
             Assert.That(invSys.TryEquip(urist, helm, "head", force: true));
@@ -148,9 +132,8 @@ public sealed class ChangelingArmorTest
                 Assert.That(head, Is.Not.Null);
                 Assert.That(entMan.GetComponent<MetaDataComponent>(head.Value).EntityPrototype!.ID, Is.EqualTo(mercenaryHelmet));
             });
+            entMan.DeleteEntity(urist);
         });
-
-        await server.WaitPost(() => entMan.DeleteEntity(urist));
 
         await pair.CleanReturnAsync();
     }

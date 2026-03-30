@@ -116,11 +116,6 @@ public sealed partial class LoadoutPrototype : IPrototype, IEquipmentLoadout
     [DataField]
     public List<LoadoutEffect> Effects = new();
 
-    // Corvax-Sponsors-Start
-    [DataField("sponsorOnly")]
-    public bool SponsorOnly = false;
-    // Corvax-Sponsors-End
-
     /// <inheritdoc />
     [DataField]
     public Dictionary<string, EntProtoId> Equipment { get; set; } = new();

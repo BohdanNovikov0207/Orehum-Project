@@ -1,4 +1,7 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 using Robust.Shared.GameStates;
+using Robust.Shared.Prototypes;
 
 namespace Content.Goobstation.Shared.Wraith.Minions.Harbinger;
 
@@ -8,9 +11,9 @@ public sealed partial class TentacleHookProjectileComponent : Component
     [DataField]
     public TimeSpan DurationSlow = TimeSpan.FromSeconds(10);
 
-    [ViewVariables]
-    public EntityUid? Target;
+    [DataField]
+    public EntProtoId SlowdownEffect = "TentacleHookStatusEffect";
 
     [DataField]
-    public float SlowMultiplier = 0.3f;
+    public EntityUid? Target;
 }

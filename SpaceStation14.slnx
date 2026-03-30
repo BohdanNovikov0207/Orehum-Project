@@ -37,6 +37,7 @@
   <Project Path="Content.Server/Content.Server.csproj" />
   <Project Path="Content.Shared.Database/Content.Shared.Database.csproj" />
   <Project Path="Content.Shared/Content.Shared.csproj" />
+  <!-- <Trauma> -->
   <Project Path="Content.Trauma.Server/Content.Trauma.Server.csproj" />
   <Project Path="Content.Trauma.Shared/Content.Trauma.Shared.csproj" />
   <Project Path="Content.Trauma.Client/Content.Trauma.Client.csproj" />
@@ -47,6 +48,16 @@
   <Project Path="Content.Goobstation.Common/Content.Goobstation.Common.csproj" />
   <Project Path="Content.Goobstation.Maths/Content.Goobstation.Maths.csproj" />
   <Project Path="Content.Goobstation.UIKit/Content.Goobstation.UIKit.csproj" />
+  <Project Path="Content.Lavaland.Server/Content.Lavaland.Server.csproj" />
+  <Project Path="Content.Lavaland.Shared/Content.Lavaland.Shared.csproj" />
+  <Project Path="Content.Lavaland.Client/Content.Lavaland.Client.csproj" />
+  <Project Path="Content.Lavaland.Common/Content.Lavaland.Common.csproj" />
+  <Project Path="Content.Medical.Server/Content.Medical.Server.csproj" />
+  <Project Path="Content.Medical.Shared/Content.Medical.Shared.csproj" />
+  <Project Path="Content.Medical.Client/Content.Medical.Client.csproj" />
+  <Project Path="Content.Medical.Common/Content.Medical.Common.csproj" />
+  <Project Path="Content.ModuleManager/Content.ModuleManager.csproj" />
+  <!-- </Trauma> -->
   <Project Path="Content.Tests/Content.Tests.csproj" />
   <Project Path="Content.Tools/Content.Tools.csproj" />
   <Project Path="Content.YAMLLinter/Content.YAMLLinter.csproj" />

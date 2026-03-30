@@ -1,8 +1,4 @@
-# [submodule "RobustToolbox"]
-#     path = RobustToolbox
-#     url = https://github.com/IsNotAcceptable/RobustToolbox
-#     branch = 269.0.0
 [submodule "RobustToolbox"]
-    path = RobustToolbox
-    url = https://github.com/space-wizards/RobustToolbox
-    branch = master
+	path = RobustToolbox
+	url = https://github.com/space-wizards/RobustToolbox.git
+	branch = master

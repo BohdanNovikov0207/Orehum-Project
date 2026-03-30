@@ -1,3 +1,4 @@
+using Content.Trauma.Common.Abilities.Mime; // Trauma
 using Content.Shared.Popups;
 using Content.Shared.Actions;
 using Content.Shared.Actions.Events;
@@ -67,7 +68,7 @@ public sealed class MimePowersSystem : EntitySystem
             Dirty(ent, illiterateComponent);
         }
 
-        _alertsSystem.ShowAlert(ent, ent.Comp.VowAlert);
+        _alertsSystem.ShowAlert(ent.Owner, ent.Comp.VowAlert);
         _actionsSystem.AddAction(ent, ref ent.Comp.InvisibleWallActionEntity, ent.Comp.InvisibleWallAction);
     }
 
@@ -138,10 +139,10 @@ public sealed class MimePowersSystem : EntitySystem
         if (!Resolve(uid, ref mimePowers))
             return;
 
-        if (!mimePowers.CanBreakVow) // Goobstation
+        if (mimePowers.VowBroken)
             return;
 
-        if (mimePowers.VowBroken)
+        if (!mimePowers.CanBreakVow) // Goobstation
             return;
 
         mimePowers.Enabled = false;
@@ -155,6 +156,10 @@ public sealed class MimePowersSystem : EntitySystem
         _alertsSystem.ClearAlert(uid, mimePowers.VowAlert);
         _alertsSystem.ShowAlert(uid, mimePowers.VowBrokenAlert);
         _actionsSystem.RemoveAction(uid, mimePowers.InvisibleWallActionEntity);
+        // <Trauma> - Mime Enforcement rewrite
+        var ev = new MimeBrokeVowEvent();
+        RaiseLocalEvent(uid, ref ev);
+        // </Trauma>
     }
 
     /// <summary>

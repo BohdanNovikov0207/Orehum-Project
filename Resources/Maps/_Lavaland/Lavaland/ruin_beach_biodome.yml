@@ -578,7 +578,6 @@ entities:
     - type: GasTileOverlay
     - type: RadiationGridResistance
     - type: ImplicitRoof
-    - type: FTLDrive
 - proto: AirlockCargo
   entities:
   - uid: 2

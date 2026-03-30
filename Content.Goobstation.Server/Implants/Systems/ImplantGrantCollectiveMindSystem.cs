@@ -1,6 +1,3 @@
-// SPDX-FileCopyrightText: 2025 GoobBot <uristmchands@proton.me>
-// SPDX-FileCopyrightText: 2025 pheenty <fedorlukin2006@gmail.com>
-//
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Goobstation.Server.Implants.Components;
@@ -21,9 +18,7 @@ public sealed class ImplantGrantCollectiveMindSystem : EntitySystem
 
     public void OnImplanted(Entity<ImplantGrantCollectiveMindComponent> ent, ref ImplantImplantedEvent args)
     {
-        if (args.Implanted is not {} mob)
-            return;
-
+        var mob = args.Implanted;
         var mind = EnsureComp<CollectiveMindComponent>(mob);
         mind.Channels.Add(ent.Comp.CollectiveMind);
     }

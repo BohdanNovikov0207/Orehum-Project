@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 using Content.Shared.Actions;
 using Robust.Shared.Audio;
 using Robust.Shared.GameStates;
@@ -27,13 +29,7 @@ public sealed partial class SlasherStaggerAreaComponent : Component
     /// Duration of the slowdown.
     /// </summary>
     [DataField]
-    public float SlowDuration = 8f;
-
-    /// <summary>
-    /// Speed debuff.
-    /// </summary>
-    [DataField]
-    public float SlowMultiplier = 0.5f;
+    public TimeSpan SlowDuration = TimeSpan.FromSeconds(8);
 
     /// <summary>
     /// Sound to play when the stagger area is activated.

@@ -1,4 +1,4 @@
-﻿using Content.Shared.Trigger.Components.Triggers;
+using Content.Shared.Trigger.Components.Triggers;
 using Content.Shared.StepTrigger.Systems;
 using Robust.Shared.Physics.Events;
 
@@ -77,12 +77,6 @@ public sealed partial class TriggerSystem
                 if (curTime > collidingTime)
                 {
                     triggerOnTimedCollide.Colliding[collidingEntity] += triggerOnTimedCollide.Threshold;
-                    // Goob start
-                    var attemptTriggerEvent = new AttemptTriggerEvent(uid, collidingEntity.ToString());
-                    RaiseLocalEvent(uid, ref attemptTriggerEvent);
-                    if (attemptTriggerEvent.Cancelled)
-                        return;
-                    // Goob end
                     Dirty(uid, triggerOnTimedCollide);
                     Trigger(uid, collidingEntity, triggerOnTimedCollide.KeyOut);
                 }

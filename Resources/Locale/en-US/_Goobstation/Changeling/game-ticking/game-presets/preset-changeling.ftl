@@ -4,7 +4,7 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-changeling-roundend-name = a changeling
+changeling-roundend-name = changeling
 
 objective-issuer-hivemind = [color=orange]The Hive[/color]
 objective-issuer-tiger = [color=crimson]Tiger Cooperative[/color]

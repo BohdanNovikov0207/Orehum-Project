@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 using Content.Shared.Alert;
 using Robust.Shared.Prototypes;
 
@@ -19,38 +21,26 @@ public sealed partial class InternalResourcesPrototype : IPrototype
     public LocId? Description;
 
     /// <summary>
-    /// The alert prototype to be shown.
+    /// Alert prototype for inner resources visualising
     /// </summary>
     [DataField("alert")]
     public ProtoId<AlertPrototype> AlertPrototype = "ChangelingChemicals";
 
     /// <summary>
-    /// The thresholds proto used for raising InternalResourcesThresholdMetEvent.
-    /// </summary>
-    [DataField("thresholds")]
-    public ProtoId<InternalResourcesThresholdsPrototype>? ThresholdsProto;
-
-    /// <summary>
-    /// Base resource regeneration amount per update tick
+    /// Base resources regeneration rate per update time
     /// </summary>
     [DataField("regenerationRate")]
     public float BaseRegenerationRate = 1f;
 
     /// <summary>
-    /// Base resource maximum amount
+    /// Base resources maximum amount
     /// </summary>
     [DataField("maxAmount")]
     public float BaseMaxAmount = 100f;
 
     /// <summary>
-    /// Starting resource amount when added to an entity.
+    /// Base amount of resources when these internal resources is added to entity
     /// </summary>
     [DataField("startingAmount")]
     public float BaseStartingAmount = 100f;
-
-    /// <summary>
-    /// Used for action popups when the resource amount is not high enough.
-    /// </summary>
-    [DataField]
-    public LocId DeficitPopup = "internal-resources-action-generic-deficit";
 }

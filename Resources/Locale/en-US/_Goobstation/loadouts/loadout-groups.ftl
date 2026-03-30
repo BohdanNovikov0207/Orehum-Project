@@ -171,12 +171,6 @@ loadout-group-ntr-envirosuit = Nanotrasen Representative envirosuit
 loadout-group-ntr-envirogloves = Nanotrasen Representative envirogloves
 loadout-group-ntr-gloves = Nanotrasen Representative gloves
 
-# Blueshield Officer
-loadout-group-bso-envirohelm = Blueshield Officer envirohelm
-loadout-group-bso-envirosuit = Blueshield Officer envirosuit
-loadout-group-bso-envirogloves = Blueshield Officer envirogloves
-loadout-group-bso-gloves = Blueshield Officer gloves
-
 # Reporter
 loadout-group-reporter-envirohelm = Reporter envirohelm
 loadout-group-reporter-envirosuit = Reporter envirosuit
@@ -223,7 +217,3 @@ loadout-group-boxer-envirosuit = Boxer envirosuit
 
 # Misc
 loadout-group-plasma-tank = Plasma tank
-
-# Salvage/Shaft Miner
-loadout-group-salvage-specialist-jumpsuit = Salvage Specialist Jumpsuit
-loadout-group-shaft-miner-jumpsuit = Shaft Miner Jumpsuit

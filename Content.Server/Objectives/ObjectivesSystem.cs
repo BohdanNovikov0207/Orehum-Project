@@ -1,35 +1,7 @@
-// SPDX-FileCopyrightText: 2023 Colin-Tel <113523727+Colin-Tel@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2023 DrSmugleaf <DrSmugleaf@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2023 Flareguy <78941145+Flareguy@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2023 ShadowCommander <10494922+ShadowCommander@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2023 themias <89101928+themias@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2024 Aiden <aiden@djkraz.com>
-// SPDX-FileCopyrightText: 2024 Aidenkrz <aiden@djkraz.com>
-// SPDX-FileCopyrightText: 2024 Crotalus <Crotalus@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2024 Ed <96445749+TheShuEd@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2024 Hreno <hrenor@gmail.com>
-// SPDX-FileCopyrightText: 2024 Nemanja <98561806+EmoGarbage404@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2024 Piras314 <p1r4s@proton.me>
-// SPDX-FileCopyrightText: 2024 Tayrtahn <tayrtahn@gmail.com>
-// SPDX-FileCopyrightText: 2024 deltanedas <39013340+deltanedas@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2024 deltanedas <@deltanedas:kde.org>
-// SPDX-FileCopyrightText: 2024 lzk <124214523+lzk228@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2024 nikthechampiongr <32041239+nikthechampiongr@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2024 username <113782077+whateverusername0@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2024 whateverusername0 <whateveremail>
-// SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2025 Conchelle <mary@thughunt.ing>
-// SPDX-FileCopyrightText: 2025 GoobBot <uristmchands@proton.me>
-// SPDX-FileCopyrightText: 2025 Killerqu00 <47712032+Killerqu00@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2025 Misandry <mary@thughunt.ing>
-// SPDX-FileCopyrightText: 2025 SX-7 <92227810+SX-7@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2025 SX-7 <sn1.test.preria.2002@gmail.com>
-// SPDX-FileCopyrightText: 2025 ScarKy0 <106310278+ScarKy0@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2025 gluesniffler <159397573+gluesniffler@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2025 gus <august.eymann@gmail.com>
-//
-// SPDX-License-Identifier: AGPL-3.0-or-later
-
+// <Trauma>
+using Content.Goobstation.Shared.ManifestListings;
+using Robust.Shared.Network;
+// </Trauma>
 using Content.Server.GameTicking;
 using Content.Server.Shuttles.Systems;
 using Content.Shared.Cuffs.Components;
@@ -43,11 +15,6 @@ using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using System.Linq;
 using System.Text;
-using Content.Shared._DV.CustomObjectiveSummary; // DeltaV
-using Content.Shared._DV.CCVars;
-using Content.Goobstation.Common.CCVar;
-using Content.Goobstation.Common.ServerCurrency;
-using Content.Goobstation.Shared.ManifestListings;
 using Content.Server.Objectives.Commands;
 using Content.Shared.CCVar;
 using Content.Shared.Prototypes;
@@ -55,15 +22,12 @@ using Content.Shared.Roles.Jobs;
 using Robust.Server.Player;
 using Robust.Shared.Configuration;
 using Robust.Shared.Utility;
-using Content.Shared.Administration.Logs;
-using Robust.Shared.Network;
-using Content.Shared.Roles;
-using Content.Server.Roles; //Goobstation
 
 namespace Content.Server.Objectives;
 
 // heavily edited by goobstation contributor gang
 // if you wanna upstream something think twice
+// TODO: kill this faction slop
 public sealed class ObjectivesSystem : SharedObjectivesSystem
 {
     [Dependency] private readonly GameTicker _gameTicker = default!;
@@ -72,18 +36,12 @@ public sealed class ObjectivesSystem : SharedObjectivesSystem
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly EmergencyShuttleSystem _emergencyShuttle = default!;
     [Dependency] private readonly SharedJobSystem _job = default!;
-    [Dependency] private readonly ICommonCurrencyManager _currencyMan = default!;
     [Dependency] private readonly IConfigurationManager _cfg = default!;
-    [Dependency] private readonly ISharedAdminLogManager _adminLog = default!;
-    [Dependency] private readonly SharedRoleSystem _roles = default!;
 
     private IEnumerable<string>? _objectives;
 
     private bool _showGreentext;
 
-    private int _maxLengthSummaryLength; // DeltaV
-
-    private int _goobcoinsServerMultiplier = 1;
     public override void Initialize()
     {
         base.Initialize();
@@ -91,10 +49,8 @@ public sealed class ObjectivesSystem : SharedObjectivesSystem
         SubscribeLocalEvent<RoundEndTextAppendEvent>(OnRoundEndText);
 
         Subs.CVar(_cfg, CCVars.GameShowGreentext, value => _showGreentext = value, true);
-        Subs.CVar(_cfg, DCCVars.MaxObjectiveSummaryLength, len => _maxLengthSummaryLength = len, true); // DeltaV
 
         _prototypeManager.PrototypesReloaded += CreateCompletions;
-        Subs.CVar(_cfg, GoobCVars.GoobcoinServerMultiplier, value => _goobcoinsServerMultiplier = value, true);
     }
 
     public override void Shutdown()
@@ -122,7 +78,7 @@ public sealed class ObjectivesSystem : SharedObjectivesSystem
             if (info.Minds.Count == 0)
                 continue;
 
-            // first group the gamerules by their factions, for example 2 different dragons
+            // first group the gamerules by their agents, for example 2 different dragons
             var agent = info.Faction ?? info.AgentName;
             if (!summaries.ContainsKey(agent))
                 summaries[agent] = new Dictionary<string, Dictionary<string, List<(EntityUid, string)>>>();
@@ -163,10 +119,10 @@ public sealed class ObjectivesSystem : SharedObjectivesSystem
                 }
 
                 var result = new StringBuilder();
-                result.AppendLine(Loc.GetString("objectives-round-end-result", ("count", total), ("agent", faction)));
+                result.AppendLine(Loc.GetString("objectives-round-end-result", ("count", total), ("agent", agent)));
                 if (agent == Loc.GetString("traitor-round-end-agent-name"))
                 {
-                    result.AppendLine(Loc.GetString("objectives-round-end-result-in-custody", ("count", total), ("custody", totalInCustody), ("agent", faction)));
+                    result.AppendLine(Loc.GetString("objectives-round-end-result-in-custody", ("count", total), ("custody", totalInCustody), ("agent", agent)));
                 }
                 // next add all the players with its own prepended text
                 foreach (var (prepend, minds) in summary)
@@ -188,29 +144,14 @@ public sealed class ObjectivesSystem : SharedObjectivesSystem
     private void AddSummary(StringBuilder result, string agent, List<(EntityUid, string)> minds)
     {
         var agentSummaries = new List<(string summary, float successRate, int completedObjectives)>();
-        var currencyStorage = new Dictionary<NetUserId, float>(); //goobstation - store all currency and add at end off round
 
         foreach (var (mindId, name) in minds)
         {
             if (!TryComp<MindComponent>(mindId, out var mind))
                 continue;
 
-            var userid = mind.OriginalOwnerUserId;
             var title = GetTitle((mindId, mind), name);
             var custody = IsInCustody(mindId, mind) ? Loc.GetString("objectives-in-custody") : string.Empty;
-
-            // goobstation - traitor flavor
-            // TODO: the entirety of roundend methods are shitcode
-            // if we were to add changeling/heretic/bloodbrother/antag flavor
-            // (something like "Timmy Turner was the Ashbringer" or "Grey Maria was from Gami Hive")
-            // we'd need to make a type check on every mind role or raise a separate event for each game rule/role
-            // and i can't be assed to do it!
-            // regards
-            if (_roles.MindHasRole<TraitorRoleComponent>(mindId, out var traitorRole))
-            {
-                var issuer = traitorRole.Value.Comp2.ObjectiveIssuer.Replace(" ", "").ToLower();
-                agent = Loc.GetString($"traitor-{issuer}-roundend");
-            }
 
             var objectives = mind.Objectives;
             if (objectives.Count == 0)
@@ -224,12 +165,12 @@ public sealed class ObjectivesSystem : SharedObjectivesSystem
             var agentSummary = new StringBuilder();
             agentSummary.AppendLine(Loc.GetString("objectives-with-objectives", ("custody", custody), ("title", title), ("agent", agent)));
 
-            // Goobstation start
+            // <Trauma>
             var ev = new PrependObjectivesSummaryTextEvent();
             RaiseLocalEvent(mindId, ref ev);
             if (ev.Text != string.Empty)
                 agentSummary.AppendLine(ev.Text);
-            // Goobstation end
+            // </Trauma>
 
             foreach (var objectiveGroup in objectives.GroupBy(o => Comp<ObjectiveComponent>(o).LocIssuer))
             {
@@ -246,31 +187,21 @@ public sealed class ObjectivesSystem : SharedObjectivesSystem
 
                     var objectiveTitle = info.Value.Title;
                     var progress = info.Value.Progress;
-                    var reward = info.Value.ServerCurrency;
-                    var rewardPartial = info.Value.PartialCurrency;
                     totalObjectives++;
 
-                    // Goob (even tho the entire file got massacred by John already)
-                    // Logging objective status for admins
-                    IFormattable? username = ToPrettyString(mind.CurrentEntity);
-                    if (username is null &&
-                        userid.HasValue &&
-                        _player.TryGetPlayerData(userid.Value, out var data))
-                        username = System.Runtime.CompilerServices.FormattableStringFactory.Create(data.UserName);
-
-                    _adminLog.Add(Shared.Database.LogType.AntagObjective,
-                                    Shared.Database.LogImpact.Low,
-                                    $"{username:subject} achieved {progress}% of objective {objectiveTitle}");
-
                     agentSummary.Append("- ");
-                    agentSummary.AppendLine(objectiveTitle);
-                    if (_showGreentext && progress > 0.99f && userid.HasValue)
+                    if (!_showGreentext)
                     {
+                        agentSummary.AppendLine(objectiveTitle);
+                    }
+                    else if (progress > 0.99f)
+                    {
+                        agentSummary.AppendLine(Loc.GetString(
+                            "objectives-objective-success",
+                            ("objective", objectiveTitle),
+                            ("progress", progress)
+                        ));
                         completedObjectives++;
-                        if (currencyStorage.ContainsKey(userid.Value))
-                            currencyStorage[userid.Value] += reward;
-                        else
-                            currencyStorage.Add(userid.Value, reward);
                     }
                     else if (progress <= 0.99f && progress >= 0.5f)
                     {
@@ -279,12 +210,6 @@ public sealed class ObjectivesSystem : SharedObjectivesSystem
                             ("objective", objectiveTitle),
                             ("progress", progress)
                         ));
-                        //Goobstation
-                        if (userid.HasValue && rewardPartial)
-                            if (currencyStorage.ContainsKey(userid.Value))
-                                currencyStorage[userid.Value] += reward * progress;
-                            else
-                                currencyStorage.Add(userid.Value, reward * progress);
                     }
                     else if (progress < 0.5f && progress > 0f)
                     {
@@ -305,30 +230,7 @@ public sealed class ObjectivesSystem : SharedObjectivesSystem
                 }
             }
 
-            var successRate = totalObjectives > 0 ? (float)completedObjectives / totalObjectives : 0f;
-            // Begin DeltaV Additions - custom objective response.
-            if (TryComp<CustomObjectiveSummaryComponent>(mindId, out var customComp) &&
-                customComp.ObjectiveSummary.Length <= _maxLengthSummaryLength)
-            {
-                // We have to spit it like this to make it readable. Yeah, it sucks but for some reason the entire thing
-                // is just one long string...
-                var words = customComp.ObjectiveSummary.Split(" ");
-                var currentLine = "";
-                foreach (var word in words)
-                {
-                    currentLine += word + " ";
-
-                    // magic number
-                    if (currentLine.Length <= 50)
-                        continue;
-
-                    agentSummary.AppendLine(Loc.GetString("custom-objective-format", ("line", currentLine)));
-                    currentLine = "";
-                }
-
-                agentSummary.AppendLine(Loc.GetString("custom-objective-format", ("line", currentLine)));
-            }
-            // End DeltaV Additions
+            var successRate = totalObjectives > 0 ? (float) completedObjectives / totalObjectives : 0f;
             agentSummaries.Add((agentSummary.ToString(), successRate, completedObjectives));
         }
 
@@ -339,9 +241,6 @@ public sealed class ObjectivesSystem : SharedObjectivesSystem
         {
             result.AppendLine(summary);
         }
-
-        foreach (var (key, currency) in currencyStorage)
-            _currencyMan.AddCurrency(key, (int)Math.Round( currency * _goobcoinsServerMultiplier));
     }
 
     public EntityUid? GetRandomObjective(EntityUid mindId, MindComponent mind, ProtoId<WeightedRandomPrototype> objectiveGroupProto, float maxDifficulty)
@@ -402,7 +301,7 @@ public sealed class ObjectivesSystem : SharedObjectivesSystem
     /// Get the title for a player's mind used in round end.
     /// Pass in the original entity name which is shown alongside username.
     /// </summary>
-    public string GetTitle(Entity<MindComponent?> mind, string name = "")
+    public string GetTitle(Entity<MindComponent?> mind, string name)
     {
         if (Resolve(mind, ref mind.Comp) &&
             mind.Comp.OriginalOwnerUserId != null &&

@@ -8,16 +8,12 @@ using Content.Shared.Alert;
 using Content.Shared.Bed.Sleep;
 using Robust.Shared.Serialization;
 using Content.Shared.Movement.Systems;
-using Content.Shared.Containers.ItemSlots;
-using Content.Goobstation.Common.Mind;
 
 namespace Content.Shared._EinsteinEngines.Silicon.Systems;
-
 
 public sealed class SharedSiliconChargeSystem : EntitySystem
 {
     [Dependency] private readonly AlertsSystem _alertsSystem = default!;
-    [Dependency] private readonly ItemSlotsSystem _itemSlots = default!;
 
     public override void Initialize()
     {
@@ -32,7 +28,6 @@ public sealed class SharedSiliconChargeSystem : EntitySystem
         SubscribeLocalEvent<SiliconComponent, ItemSlotEjectAttemptEvent>(OnItemSlotEjectAttempt);
         */
         SubscribeLocalEvent<SiliconComponent, TryingToSleepEvent>(OnTryingToSleep);
-        SubscribeLocalEvent<SiliconComponent, GetAntagSelectionBlockerEvent>(OnGetAntagBlocker); // GOOB EDIT
     }
 
     // Monolith - IPC Rework
@@ -95,12 +90,6 @@ public sealed class SharedSiliconChargeSystem : EntitySystem
     private void OnTryingToSleep(EntityUid uid, SiliconComponent component, ref TryingToSleepEvent args)
     {
         args.Cancelled = !component.DoSiliconsDreamOfElectricSheep;
-    }
-
-    // goob edit - antag target blockers
-    private void OnGetAntagBlocker(Entity<SiliconComponent> ent, ref GetAntagSelectionBlockerEvent args)
-    {
-        args.Blocked = true;
     }
 }
 

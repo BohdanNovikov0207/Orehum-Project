@@ -158,7 +158,6 @@ entities:
     - type: GasTileOverlay
     - type: RadiationGridResistance
     - type: ImplicitRoof
-    - type: FTLDrive
 - proto: AirlockMiningGlass
   entities:
   - uid: 2

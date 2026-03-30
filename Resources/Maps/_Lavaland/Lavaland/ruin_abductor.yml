@@ -79,7 +79,6 @@ entities:
     - type: GasTileOverlay
     - type: RadiationGridResistance
     - type: ImplicitRoof
-    - type: FTLDrive
 - proto: AbductorExperimentator
   entities:
   - uid: 2

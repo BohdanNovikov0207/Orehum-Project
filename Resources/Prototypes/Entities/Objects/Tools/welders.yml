@@ -206,7 +206,6 @@
     - Welding
     - Axing # Goobstation
     - Ignition
-  - type: WeldingSparks # Goobstation
   - type: ToolTileCompatible # Goobstation
     delay: 2
   - type: Welder
@@ -310,8 +309,11 @@
       Plasma: 50
   - type: StaticPrice #Goobstation - Recycle update
     price: 50
-  - type: WeldingSparks # Goobstation
-    effect: EffectWeldingSparksExp
+  - type: Tag # Trauma - new tag for weldbot
+    tags:
+    - DroneUsable
+    - WeldingTool
+    - WelderExperimental
 
 - type: entity
   name: emergency welding tool
@@ -343,8 +345,8 @@
 - type: entity
   parent: [ Welder, BaseXenoborgContraband ]
   id: RefuelingWelder
-  name: refuling welding tool
-  description: "An slow welder that can refuel itself over time."
+  name: refueling welding tool
+  description: "A slow welder that can refuel itself over time."
   components:
   - type: Tool
     speedModifier: 0.5

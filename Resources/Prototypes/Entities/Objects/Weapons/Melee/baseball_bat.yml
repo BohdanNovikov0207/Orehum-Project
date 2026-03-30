@@ -70,16 +70,13 @@
       types:
         Blunt: 5
         Structural: 10
-  - type: StaminaDamageOnHit # goob - bat makes you hurt and tired (but not as much as the real stun stick)
-    damage: 12 # goob - 8 hits to stamcrit someone with armor vest + helmet
   - type: MeleeThrowOnHit # Goobstation
     distance: 1
     speed: 5
   - type: Item
-    size: Large # Goob edit
-    storedRotation: 90 # Goob
+    size: Large # Goob - was Normal
     shape:
-    - 0,0,0,3
+    - 0,0,1,3 # Goob - 2x4 instead of 1x4
     storedSprite:
       state: storage
       sprite: Objects/Weapons/Melee/baseball_bat.rsi
@@ -103,6 +100,44 @@
     tags:
     - BaseballBat
   - type: UndetectableContraband #Goobstation-Contraband detector
+  # <Trauma>
+  - type: Durability
+    durabilityThresholds:
+      # Reinforced, if not specified here, will default to anything under 0.
+      0: Pristine
+      10: Worn
+      22: Damaged
+      28: Broken
+      35: Destroyed
+    damagePopups:
+      Worn:
+      - durability-weapon-bat-0
+      - durability-weapon-bat-1
+      Damaged:
+      - durability-weapon-bat-1
+      - durability-weapon-bat-2
+      - durability-weapon-bat-3
+      Broken:
+      - durability-weapon-bat-3
+      - durability-weapon-bat-4
+      - durability-weapon-bat-5
+      - durability-weapon-bat-6
+      Destroyed:
+      - durability-weapon-bat-7
+      - durability-weapon-bat-8
+      - durability-weapon-bat-9
+    onBreakBehavior: !type:SpawnEntitiesBehavior
+      spawn:
+        MaterialWoodPlank1:
+          min: 2
+          max: 3
+    minDamageRoll: 2
+    maxDamageRoll: 5
+    repairDoAfter: 3
+    repairMaterials:
+      Wood: 4, 6
+    maxRepairBonus: 8
+  # </Trauma>
 
 - type: entity
   name: incomplete baseball bat

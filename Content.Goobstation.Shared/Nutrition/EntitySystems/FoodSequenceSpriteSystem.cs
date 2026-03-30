@@ -1,25 +1,15 @@
-// SPDX-FileCopyrightText: 2024 Aiden <aiden@djkraz.com>
-// SPDX-FileCopyrightText: 2024 Piras314 <p1r4s@proton.me>
-// SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2025 Misandry <mary@thughunt.ing>
-// SPDX-FileCopyrightText: 2025 gus <august.eymann@gmail.com>
-//
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Shared.NameModifier.Components;
 using Content.Shared.Nutrition.Components;
 using Content.Shared.Nutrition.EntitySystems;
-using Content.Shared.Nutrition.Prototypes;
-using Content.Shared.Tag;
-using Robust.Shared.Prototypes;
-using Robust.Shared.Utility;
 
 namespace Content.Goobstation.Shared.Nutrition.EntitySystems;
 
-public class FoodSequenceSpriteSystem : SharedFoodSequenceSystem
+public sealed class FoodSequenceSpriteSystem : SharedFoodSequenceSystem
 {
-    // Yeah nah i agree fuck this.
-    /*
+    /* Trauma
+    Can't work anymore because Sprite is clientside...
     private EntityQuery<NameModifierComponent> _modifierQuery;
 
     public override void Initialize()
@@ -33,11 +23,10 @@ public class FoodSequenceSpriteSystem : SharedFoodSequenceSystem
 
     private void OnComponentStartup(Entity<FoodSequenceElementComponent> ent, ref ComponentStartup args)
     {
-        var _protoMan = IoCManager.Resolve<IPrototypeManager>();
         if (ent.Comp.Entries.Count != 0)
             return;
 
-        var defaultEntry = new FoodSequenceElementEntry();
+        var layer = new FoodSequenceVisualLayer();
 
         var meta = MetaData(ent);
         var name = _modifierQuery.CompOrNull(ent)?.BaseName ?? meta.EntityName;

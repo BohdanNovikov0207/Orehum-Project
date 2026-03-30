@@ -36,9 +36,10 @@ public sealed partial class ReactiveComponent : Component
     public List<ReactiveReagentEffectEntry>? Reactions;
 
     /// <summary>
-    ///     Goobstation - should 15 units of whatchamacallit get clamped into one?
+    /// Trauma - Scale override to use instead of reagent quantity for entity effects.
     /// </summary>
-    [DataField] public bool OneUnitReaction = false;
+    [DataField]
+    public float? ScaleOverride;
 }
 
 [DataDefinition]
@@ -51,7 +52,7 @@ public sealed partial class ReactiveReagentEffectEntry
     public HashSet<string>? Reagents = null;
 
     [DataField("effects", required: true)]
-    public List<EntityEffect> Effects = default!;
+    public EntityEffect[] Effects = default!;
 
     [DataField("groups", readOnly: true, serverOnly: true,
         customTypeSerializer:typeof(PrototypeIdDictionarySerializer<HashSet<ReactionMethod>, ReactiveGroupPrototype>))]

@@ -1,10 +1,3 @@
-// SPDX-FileCopyrightText: 2025 Aidenkrz <aiden@djkraz.com>
-// SPDX-FileCopyrightText: 2025 Aviu00 <93730715+Aviu00@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2025 Aviu00 <aviu00@protonmail.com>
-// SPDX-FileCopyrightText: 2025 GoobBot <uristmchands@proton.me>
-// SPDX-FileCopyrightText: 2025 Rouden <149893554+Roudenn@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2025 Roudenn <romabond091@gmail.com>
-//
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Linq;
@@ -29,7 +22,6 @@ public sealed class FishingSystem : SharedFishingSystem
 {
     // Here we calculate the start of fishing, because apparently StartCollideEvent
     // works janky on clientside so we can't predict when fishing starts.
-    [Dependency] private readonly IComponentFactory _compFactory = default!;
     [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly PhysicsSystem _physics = default!;
@@ -69,7 +61,7 @@ public sealed class FishingSystem : SharedFishingSystem
         var fish = spotComp.FishList.GetSpawns(_random.GetRandom(), EntityManager, _proto, new EntityTableContext()).First();
 
         // Get fish difficulty
-        _proto.Index(fish).TryGetComponent(out FishComponent? fishComp, _compFactory);
+        _proto.Index(fish).TryGetComponent(out FishComponent? fishComp, Factory);
 
         // Assign things that depend on the fish
         var activeFishSpot = EnsureComp<ActiveFishingSpotComponent>(attachedEnt);
@@ -127,7 +119,7 @@ public sealed class FishingSystem : SharedFishingSystem
             direction = Vector2.UnitX; // If the user somehow manages to click directly in the center of themself, just toss it to the right i guess.
 
         // Yeet
-        Throwing.TryThrow(fishFloat, direction, 15f, player, 2f, null, true);
+        Throwing.TryThrow(fishFloat, direction, 15f, player, 2f, null, true, predicted: false);
 
         // Set up lure component
         var fishLureComp = EnsureComp<FishingLureComponent>(fishFloat);
@@ -139,7 +131,8 @@ public sealed class FishingSystem : SharedFishingSystem
         visuals.Sprite = component.RopeSprite;
         visuals.OffsetA = component.RopeLureOffset;
         visuals.OffsetB = component.RopeUserOffset;
-        visuals.Target = GetNetEntity(uid);
+        visuals.Target = uid;
+        Dirty(fishFloat, visuals);
     }
 
     protected override void ThrowFishReward(EntProtoId fishId, EntityUid fishSpot, EntityUid target)
@@ -152,7 +145,7 @@ public sealed class FishingSystem : SharedFishingSystem
         var distance = Math.Clamp(length, 0.5f, 15f);
         direction *= distance / length;
 
-        Throwing.TryThrow(fish, direction, 7f);
+        Throwing.TryThrow(fish, direction, 7f, predicted: false);
     }
 
     protected override void CalculateFightingTimings(Entity<ActiveFisherComponent> fisher, ActiveFishingSpotComponent activeSpotComp)

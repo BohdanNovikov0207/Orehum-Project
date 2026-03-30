@@ -84,7 +84,7 @@ namespace Content.Client.Info
                 Text = Loc.GetString("rmc-ui-link-discord-account"),
             };
             linkAccountButton.OnPressed += _ => linkAccount.ToggleWindow();
-            // buttons.AddChild(linkAccountButton);
+            buttons.AddChild(linkAccountButton);
 
             var guidebookController = UserInterfaceManager.GetUIController<GuidebookUIController>();
             var guidebookButton = new Button() { Text = Loc.GetString("server-info-guidebook-button") };

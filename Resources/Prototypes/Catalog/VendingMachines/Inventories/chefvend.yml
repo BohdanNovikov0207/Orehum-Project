@@ -86,7 +86,7 @@
 - type: vendingMachineInventory
   id: ChefvendInventory
   startingInventory:
-    ReagentContainerFlour: 6 #Goobstation
+    ReagentContainerFlour: 2
     ReagentContainerCornmeal: 2
     ReagentContainerSugar: 2
     ReagentContainerRice: 2
@@ -97,17 +97,15 @@
     FoodCondimentBottleBBQ: 1
     FoodCondimentBottleVinegar: 2
     ReagentContainerOliveoil: 2
+    DrinkFullFatCarton: 3 # Trauma
     ReagentContainerMayo: 1
     VariantCubeBox: 1
-    FoodContainerEgg: 2 #Goobstation
+    FoodContainerEgg: 1
     DrinkMilkCarton: 2
     DrinkSoyMilkCarton: 1
     FoodButter: 3
-    FoodCheese: 2 #Goobstation
+    FoodCheese: 1
     FoodMeat: 6
-    FoodGarlic: 2 #Goobstation
-    FoodOnion: 2 #Goobstation
-    FoodTomato: 3 #Goobstation
   contrabandInventory:
     EggBoxBroken: 1
     FoodBoxDonkpocket: 1

@@ -10,7 +10,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared._DV.Polymorph;
 using Content.Shared.ActionBlocker;
 using Content.Shared.Buckle.Components;
 using Content.Shared.Climbing.Events;
@@ -79,7 +78,7 @@ public sealed class CarryingSystem : EntitySystem
         SubscribeLocalEvent<BeingCarriedComponent, UnbuckledEvent>(OnDrop);
         SubscribeLocalEvent<BeingCarriedComponent, StrappedEvent>(OnDrop);
         SubscribeLocalEvent<BeingCarriedComponent, UnstrappedEvent>(OnDrop);
-        SubscribeLocalEvent<BeingCarriedComponent, EscapeInventoryEvent>(OnEscapeDrop); // Goob
+        SubscribeLocalEvent<BeingCarriedComponent, EscapeInventoryEvent>(OnDrop);
         SubscribeLocalEvent<CarriableComponent, CarryDoAfterEvent>(OnDoAfter);
         SubscribeLocalEvent<BeingCarriedComponent, EntityTerminatingEvent>(OnDelete);
     }
@@ -149,9 +148,6 @@ public sealed class CarryingSystem : EntitySystem
     /// </summary>
     private void OnThrow(Entity<CarryingComponent> ent, ref BeforeThrowEvent args)
     {
-        if (ent.Owner != args.PlayerUid) // Goobstation
-            return;
-
         if (!TryComp<VirtualItemComponent>(args.ItemUid, out var virtItem) || !HasComp<CarriableComponent>(virtItem.BlockingEntity))
             return;
 
@@ -159,7 +155,6 @@ public sealed class CarryingSystem : EntitySystem
         args.ItemUid = carried;
 
         args.ThrowSpeed = 5f * _contests.MassContest(ent, carried);
-        args.GrabThrow = true;
     }
 
     private void OnParentChanged(Entity<CarryingComponent> ent, ref EntParentChangedMessage args)
@@ -225,14 +220,6 @@ public sealed class CarryingSystem : EntitySystem
     private void OnDrop<TEvent>(Entity<BeingCarriedComponent> ent, ref TEvent args) // Augh
     {
         DropCarried(ent.Comp.Carrier, ent);
-    }
-
-    // Separate event so that cancels dont just drop the ent
-    private void OnEscapeDrop(Entity<BeingCarriedComponent> ent, ref EscapeInventoryEvent args)
-    {
-        if (args.Cancelled)
-            return;
-        DropCarried(ent.Comp.Carrier, ent.Owner);
     }
 
     private void OnDoAfter(Entity<CarriableComponent> ent, ref CarryDoAfterEvent args)
@@ -337,7 +324,7 @@ public sealed class CarryingSystem : EntitySystem
         RemComp<BeingCarriedComponent>(carried);
         RemComp<KnockedDownComponent>(carried); // TODO SHITMED: make sure this doesnt let you make someone with no legs walk
         _actionBlocker.UpdateCanMove(carried);
-        Transform(carried).AttachToGridOrMap();
+        _transform.AttachToGridOrMap(carried);
         _standingState.Stand(carried);
     }
 
@@ -356,7 +343,10 @@ public sealed class CarryingSystem : EntitySystem
 
     public bool CanCarry(EntityUid carrier, Entity<CarriableComponent> carried)
     {
+        var ev = new CarryAttemptEvent(carrier);
+        RaiseLocalEvent(carried, ref ev);
         return
+            !ev.Cancelled &&
             carrier != carried.Owner &&
             // can't carry multiple people, even if you have 4 hands it will break invariants when removing carryingcomponent for first carried person
             !HasComp<CarryingComponent>(carrier) &&
@@ -409,3 +399,9 @@ public sealed class CarryingSystem : EntitySystem
         }
     }
 }
+
+/// <summary>
+/// Raised on a mob to check if it can be carried.
+/// </summary>
+[ByRefEvent]
+public record struct CarryAttemptEvent(EntityUid Carrier, bool Cancelled = false);

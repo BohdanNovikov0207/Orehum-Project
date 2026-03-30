@@ -13,7 +13,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-using Content.Goobstation.Maths.FixedPoint;
+using Content.Shared.FixedPoint;
 using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
@@ -23,14 +23,15 @@ namespace Content.Shared.Fluids.Components;
 /// <summary>
 /// Added to puddles that contain water so it may evaporate over time.
 /// </summary>
-[NetworkedComponent, AutoGenerateComponentPause]
+[NetworkedComponent, AutoGenerateComponentPause, AutoGenerateComponentState]
 [RegisterComponent, Access(typeof(SharedPuddleSystem))]
 public sealed partial class EvaporationComponent : Component
 {
     /// <summary>
     /// The next time we remove the EvaporationSystem reagent amount from this entity.
     /// </summary>
-    [AutoPausedField, DataField(customTypeSerializer: typeof(TimeOffsetSerializer))]
+    [AutoNetworkedField, AutoPausedField]
+    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))]
     public TimeSpan NextTick;
 
     /// <summary>

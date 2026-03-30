@@ -1,7 +1,3 @@
-// SPDX-FileCopyrightText: 2025 GoobBot <uristmchands@proton.me>
-// SPDX-FileCopyrightText: 2025 Lumminal <81829924+Lumminal@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2025 Roudenn <romabond091@gmail.com>
-//
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Goobstation.Shared.Shadowling.Components;
@@ -107,10 +103,7 @@ public sealed class ShadowlingCollectiveMindSystem : EntitySystem
         // If no abilities were added, nothing happens as seen from the return statement above.
         foreach (var thrall in sling.Thralls)
         {
-            if (!HasComp<StatusEffectsComponent>(thrall))
-                return;
-
-            _stun.TryUpdateParalyzeDuration(thrall, TimeSpan.FromSeconds(comp.BaseStunTime * abiltiesAddedCount + 1));
+            _stun.TryAddParalyzeDuration(thrall, TimeSpan.FromSeconds(comp.BaseStunTime * abiltiesAddedCount + 1));
         }
 
         args.Handled = true;

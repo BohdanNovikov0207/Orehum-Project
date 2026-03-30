@@ -1,25 +1,16 @@
-// SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2025 Aidenkrz <aiden@djkraz.com>
-// SPDX-FileCopyrightText: 2025 Aviu00 <93730715+Aviu00@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2025 Misandry <mary@thughunt.ing>
-// SPDX-FileCopyrightText: 2025 gus <august.eymann@gmail.com>
-//
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared._Goobstation.Heretic.Components;
 using Content.Shared._Goobstation.Wizard.Mutate;
-using Content.Shared._White.Standing;
-using Content.Shared.Projectiles;
 using Content.Shared.Stunnable;
+using Content.Shared.Projectiles;
 using Content.Shared.Throwing;
 
 namespace Content.Goobstation.Shared.Knockdown;
 
 public sealed class KnockdownOnCollideSystem : EntitySystem
 {
+    [Dependency] private readonly SharedStunSystem _stun = default!;
     [Dependency] private readonly SharedHulkSystem _hulk = default!;
-    [Dependency] private readonly SharedStunSystem _stunSystem = default!;
-
 
     public override void Initialize()
     {
@@ -47,9 +38,6 @@ public sealed class KnockdownOnCollideSystem : EntitySystem
             return;
         }
 
-        if (HasComp<RustbringerComponent>(target))
-            return;
-
-        _stunSystem.TryCrawling(target);
+        _stun.TryKnockdown(target, time: null, drop: component.DropItems);
     }
 }

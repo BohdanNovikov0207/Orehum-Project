@@ -1,19 +1,18 @@
 using System.Linq;
-using Content.Goobstation.Maths.FixedPoint;
 using Content.Server._EinsteinEngines.Language;
 using Content.Server.Administration.Managers;
-using Content.Server.Body.Components;
-using Content.Server.Body.Systems;
 using Content.Server.Chat.Managers;
 using Content.Server.Chat.Systems;
 using Content.Shared._EinsteinEngines.Language;
-using Content.Shared._Shitmed.Medical.Surgery.Traumas.Components;
-using Content.Shared._Shitmed.Medical.Surgery.Wounds.Systems;
+using Content.Medical.Shared.Traumas;
 using Content.Shared._White.Xenomorphs.Xenomorph;
+using Content.Shared.Body;
 using Content.Shared.Body.Components;
+using Content.Shared.Body.Systems;
 using Content.Shared.Chat;
-using Content.Shared.Chemistry.EntitySystems;
 using Content.Shared.Damage;
+using Content.Shared.Damage.Systems;
+using Content.Shared.FixedPoint;
 using Robust.Shared.Network;
 using Robust.Shared.Player;
 using Robust.Shared.Timing;
@@ -26,12 +25,9 @@ public sealed class XenomorphSystem : SharedXenomorphSystem
     [Dependency] private readonly IAdminManager _adminManager = default!;
     [Dependency] private readonly IChatManager _chatManager = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
-
     [Dependency] private readonly DamageableSystem _damageable = default!;
     [Dependency] private readonly LanguageSystem _language = default!;
-    [Dependency] private readonly WoundSystem _wounds = default!; // Goobstation
-    [Dependency] private readonly SharedSolutionContainerSystem _solutionContainer = default!; // Goobstation
-    [Dependency] private readonly BodySystem _body = default!; // Goobstation
+    [Dependency] private readonly SharedBloodstreamSystem _bloodstream = default!;
 
     public override void Initialize()
     {
@@ -40,86 +36,45 @@ public sealed class XenomorphSystem : SharedXenomorphSystem
         SubscribeLocalEvent<XenomorphComponent, EntitySpokeEvent>(OnEntitySpoke);
     }
 
-public override void Update(float frameTime)
-{
-    // Goobstation start
-    base.Update(frameTime);
-
-    var time = _timing.CurTime;
-    var query = EntityQueryEnumerator<XenomorphComponent, BloodstreamComponent, BodyComponent>();  // Added BodyComponent to query
-
-    while (query.MoveNext(out var uid, out var xenomorph, out var bloodstream, out var body))
+    public override void Update(float frameTime)
     {
-        if (xenomorph.WeedHeal == null || time < xenomorph.NextPointsAt)
-            continue;
+        // Goobstation start
+        base.Update(frameTime);
 
-        // Update next heal time
-        xenomorph.NextPointsAt = time + xenomorph.WeedHealRate;
+        var time = _timing.CurTime;
+        var query = EntityQueryEnumerator<XenomorphComponent, BloodstreamComponent, BodyComponent>();  // Added BodyComponent to query
 
-        if (!xenomorph.OnWeed)
-            continue;
-
-        // Apply regular weed healing if on weeds
-        _damageable.TryChangeDamage(uid, xenomorph.WeedHeal);
-
-        // Process bleeding and blood loss in parallel with cached values
-        ProcessBleeding(uid, body);
-        ProcessBloodLoss(uid, bloodstream);
-    }
-}
-
-// Heal/Seal any bleeding parts over time.
-private void ProcessBleeding(EntityUid uid, BodyComponent body)
-{
-    const float bleedReduction = 0.5f;
-    var reduction = FixedPoint2.New(bleedReduction);
-
-    // Get Bodyparts
-    var bodyParts = _body.GetBodyChildren(uid, body).ToList();
-
-    foreach (var part in bodyParts)
-    {
-        // Process all wounds in this part
-        foreach (var wound in _wounds.GetWoundableWounds(part.Id))
+        while (query.MoveNext(out var uid, out var xenomorph, out var bloodstream, out var body))
         {
-            if (!TryComp<BleedInflicterComponent>(wound, out var bleedComp) ||
-                !bleedComp.IsBleeding ||
-                bleedComp.BleedingAmountRaw <= FixedPoint2.Zero)
-            {
-                continue;
-            }
-
-            // Calculate new bleed amount
-            var newBleed = FixedPoint2.Max(FixedPoint2.Zero, bleedComp.BleedingAmountRaw - reduction);
-            var amountHealed = bleedComp.BleedingAmountRaw - newBleed;
-
-            if (amountHealed <= FixedPoint2.Zero)
+            if (xenomorph.WeedHeal == null || time < xenomorph.NextPointsAt)
                 continue;
 
-            // Apply changes
-            bleedComp.BleedingAmountRaw = newBleed;
-            Dirty(wound, bleedComp);
+            // Update next heal time
+            xenomorph.NextPointsAt = time + xenomorph.WeedHealRate;
+
+            if (!xenomorph.OnWeed)
+                continue;
+
+            // Apply regular weed healing if on weeds
+            _damageable.TryChangeDamage(uid, xenomorph.WeedHeal);
+
+            // Process bleeding and blood loss in parallel with cached values
+            ProcessBloodLoss(uid, bloodstream);
         }
     }
-}
 
-// Slowly heal bloodloss
-private void ProcessBloodLoss(EntityUid uid, BloodstreamComponent bloodstream)
-{
-    if (!_solutionContainer.ResolveSolution(uid,
-            bloodstream.BloodSolutionName,
-            ref bloodstream.BloodSolution,
-            out var bloodSolution)
-            || bloodSolution.Volume >= bloodstream.BloodMaxVolume)
+    // Slowly heal bloodloss
+    private void ProcessBloodLoss(EntityUid uid, BloodstreamComponent bloodstream)
     {
-        return;
-    }
+        if (_bloodstream.GetBloodLevel((uid, bloodstream)) > 0.99f)
+            return;
 
-    var bloodloss = new DamageSpecifier();
-    bloodloss.DamageDict["Bloodloss"] = -0.2f;  // Heal blood per tick
-    _damageable.TryChangeDamage(uid, bloodloss);
-}
-// Goobstation end
+        _bloodstream.TryModifyBloodLevel((uid, bloodstream), 0.5);
+        var bloodloss = new DamageSpecifier();
+        bloodloss.DamageDict["Bloodloss"] = -0.2f;  // Heal blood per tick
+        _damageable.TryChangeDamage(uid, bloodloss);
+    }
+    // Goobstation end
 
     private void OnEntitySpoke(EntityUid uid, XenomorphComponent component, EntitySpokeEvent args)
     {
@@ -146,7 +101,7 @@ private void ProcessBloodLoss(EntityUid uid, BloodstreamComponent bloodstream)
             ("message", FormattedMessage.EscapeText(message)));
 
         _chatManager.ChatMessageToMany(
-            ChatChannel.Telepathic,
+            ChatChannel.CollectiveMind,
             message,
             wrappedMessage,
             source,

@@ -1,9 +1,7 @@
 using System.Numerics;
 using Content.Server._Mono.FireControl;
 using Content.Server._Mono.SpaceArtillery.Components;
-using Content.Server.DeviceLinking.Systems;
 using Content.Server.Power.Components;
-using Content.Server.Power.EntitySystems;
 using Content.Server.Weapons.Ranged.Systems;
 using Content.Shared._Mono.ShipGuns;
 using Content.Shared._Mono.SpaceArtillery;
@@ -12,6 +10,8 @@ using Content.Shared.DeviceLinking;
 using Content.Shared.DeviceLinking.Events;
 using Content.Shared.Examine;
 using Content.Shared.Power;
+using Content.Shared.Power.Components;
+using Content.Shared.Power.EntitySystems;
 using Content.Shared.Projectiles;
 using Content.Shared.Weapons.Ranged.Events;
 using Robust.Shared.Map;
@@ -22,8 +22,7 @@ namespace Content.Server._Mono.SpaceArtillery;
 public sealed partial class SpaceArtillerySystem : EntitySystem
 {
     [Dependency] private readonly GunSystem _gun = default!;
-    [Dependency] private readonly DeviceLinkSystem _deviceLink = default!;
-    [Dependency] private readonly BatterySystem _battery = default!;
+    [Dependency] private readonly SharedBatterySystem _battery = default!;
     [Dependency] private readonly SharedTransformSystem _xform = default!;
     [Dependency] private readonly SharedCameraRecoilSystem _recoilSystem = default!;
     [Dependency] private readonly FireControlSystem _fireControl = default!;
@@ -60,7 +59,7 @@ public sealed partial class SpaceArtillerySystem : EntitySystem
         if (!TryComp<ApcPowerReceiverComponent>(uid, out var apc) && !hasBattery)
             return;
 
-        if (apc is { Powered: true } || battery?.CurrentCharge >= component.PowerUseActive)
+        if (apc is { Powered: true } || _battery.GetCharge((uid, battery)) >= component.PowerUseActive)
             TryFireArtillery(uid, Transform(uid), component);
         else
             OnMalfunction(uid, component);
@@ -69,19 +68,12 @@ public sealed partial class SpaceArtillerySystem : EntitySystem
 
     private void OnApcChanged(EntityUid uid, SpaceArtilleryComponent component, ref PowerChangedEvent args)
     {
-        if (TryComp<BatterySelfRechargerComponent>(uid, out var batteryCharger))
-        {
-            if (args.Powered)
-            {
-                batteryCharger.AutoRecharge = true;
-                batteryCharger.AutoRechargeRate = component.PowerChargeRate;
-            }
-            else
-            {
-                batteryCharger.AutoRecharge = true;
-                batteryCharger.AutoRechargeRate = component.PowerUsePassive * -1;
-            }
-        }
+        if (!TryComp<BatterySelfRechargerComponent>(uid, out var batteryCharger))
+            return;
+        batteryCharger.AutoRechargeRate = args.Powered
+            ? component.PowerChargeRate
+            : -component.PowerUsePassive;
+        Dirty(uid, batteryCharger);
     }
 
 
@@ -89,7 +81,9 @@ public sealed partial class SpaceArtillerySystem : EntitySystem
     {
         if (TryComp<ApcPowerReceiverComponent>(uid, out var apcPowerReceiver) && TryComp<BatteryComponent>(uid, out var battery))
         {
-            apcPowerReceiver.Load = battery.CurrentCharge >= battery.MaxCharge * 0.99 ? component.PowerUsePassive : component.PowerUsePassive + component.PowerChargeRate;
+            apcPowerReceiver.Load = _battery.GetCharge((uid, battery)) >= battery.MaxCharge * 0.99
+                ? component.PowerUsePassive
+                : component.PowerUsePassive + component.PowerChargeRate;
         }
     }
 
@@ -132,10 +126,7 @@ public sealed partial class SpaceArtillerySystem : EntitySystem
             return;
         }
 
-        if (TryComp<BatteryComponent>(uid, out var battery))
-        {
-            _battery.UseCharge(uid, component.PowerUseActive, battery);
-        }
+        _battery.UseCharge(uid, component.PowerUseActive);
     }
 
     private void OnEmptyShotEvent(EntityUid uid, SpaceArtilleryComponent component, OnEmptyGunShotEvent args)

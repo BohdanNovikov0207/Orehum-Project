@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 using Content.Goobstation.Shared.MobCall;
 using Content.Server.Chat.Systems;
 using Content.Server.NPC.Systems;
@@ -31,6 +33,5 @@ public sealed partial class MobCallSystem : EntitySystem
             if (_whitelist.IsWhitelistPass(ent.Comp.Whitelist, uid))
                 _npc.SetBlackboard(uid, ent.Comp.Key, entCoord);
         }
-        args.Handled = true;
     }
 }

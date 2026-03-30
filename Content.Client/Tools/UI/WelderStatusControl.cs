@@ -14,7 +14,7 @@
 using Content.Client.Items.UI;
 using Content.Client.Message;
 using Content.Client.Stylesheets;
-using Content.Goobstation.Maths.FixedPoint;
+using Content.Shared.FixedPoint;
 using Content.Shared.Tools.Components;
 using Content.Shared.Tools.Systems;
 using Robust.Client.UserInterface.Controls;
@@ -33,7 +33,7 @@ public sealed class WelderStatusControl : PollingItemStatusControl<WelderStatusC
         _parent = parent;
         _entityManager = entityManager;
         _toolSystem = toolSystem;
-        _label = new RichTextLabel { StyleClasses = { StyleNano.StyleClassItemStatus } };
+        _label = new RichTextLabel { StyleClasses = { StyleClass.ItemStatus } };
         AddChild(_label);
 
         UpdateDraw();

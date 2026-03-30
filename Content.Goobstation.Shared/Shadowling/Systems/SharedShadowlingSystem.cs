@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 using Content.Goobstation.Common.Conversion;
 using Content.Goobstation.Shared.Changeling.Components;
 using Content.Goobstation.Shared.LightDetection.Components;
@@ -6,19 +8,19 @@ using Content.Goobstation.Shared.Mindcontrol;
 using Content.Goobstation.Shared.Shadowling.Components;
 using Content.Shared._Starlight.CollectiveMind;
 using Content.Shared.Actions;
-using Content.Shared.Damage;
+using Content.Shared.Body;
+using Content.Shared.Damage.Systems;
 using Content.Shared.DoAfter;
 using Content.Shared.Examine;
-using Content.Shared.Heretic;
 using Content.Shared.Humanoid;
+using Content.Shared.Humanoid.Markings;
 using Content.Shared.Mind.Components;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Mobs.Systems;
-using Content.Shared.Movement.Systems;
 using Content.Shared.Popups;
 using Content.Shared.Projectiles;
-using Content.Shared.Stunnable;
+using Content.Shared.StatusEffectNew;
 using Robust.Shared.Audio;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Prototypes;
@@ -27,15 +29,20 @@ namespace Content.Goobstation.Shared.Shadowling.Systems;
 
 public abstract class SharedShadowlingSystem : EntitySystem
 {
+    [Dependency] private readonly BodySystem _body = default!;
     [Dependency] private readonly MobStateSystem _mobStateSystem = default!;
     [Dependency] private readonly SharedLightDetectionDamageSystem _lightDamage = default!;
-    [Dependency] private readonly SharedHumanoidAppearanceSystem _appearance = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly IPrototypeManager _protoMan = default!;
     [Dependency] private readonly SharedActionsSystem _actions = default!;
     [Dependency] private readonly DamageableSystem _damageable = default!;
-    [Dependency] private readonly MovementModStatusSystem _movementMod = default!;
+    [Dependency] private readonly StatusEffectsSystem _status = default!;
+
+    public static readonly ProtoId<OrganCategoryPrototype> HeadCategory = "Head";
+    public static readonly ProtoId<OrganCategoryPrototype> TorsoCategory = "Torso";
+    public static readonly ProtoId<MarkingPrototype> AbominationHorns = "AbominationHorns";
+    public static readonly ProtoId<MarkingPrototype> AbominationTorso = "AbominationTorso";
 
     public override void Initialize()
     {
@@ -147,10 +154,10 @@ public abstract class SharedShadowlingSystem : EntitySystem
                 EntityManager.RemoveComponents(uid, _protoMan.Index(component.ObtainableComponents));
 
                 // this is such a big L that even the code is losing and all variables are hardcoded.
-                // upstreaming note - on god slowdowncomponent no longer exists so im straight up slowing the shadowlings for a DAY fuck it.
-                _movementMod.TryUpdateMovementSpeedModDuration(uid, SharedStunSystem.StunId, TimeSpan.FromDays(1), 0.5f, 0.5f);
-                _appearance.AddMarking(uid, "AbominationTorso");
-                _appearance.AddMarking(uid, "AbominationHorns");
+                _status.TryAddStatusEffect(uid, "ShadowlingAbominationStatusEffect", out _);
+                // mfw i have to write my own marking api :face_holding_back_tears:
+                _body.AddOrganMarking(uid, TorsoCategory, AbominationTorso);
+                _body.AddOrganMarking(uid, HeadCategory, AbominationHorns);
 
                 // take another hardcoded variable
                 _damageable.SetDamageModifierSetId(uid, "ShadowlingAbomination");
@@ -196,7 +203,7 @@ public abstract class SharedShadowlingSystem : EntitySystem
             return false;
         }
 
-        if (!HasComp<HumanoidAppearanceComponent>(target))
+        if (!HasComp<HumanoidProfileComponent>(target))
         {
             _popup.PopupPredicted(Loc.GetString("shadowling-enthrall-non-humanoid"), uid, uid, PopupType.SmallCaution);
             return false;
@@ -221,8 +228,7 @@ public abstract class SharedShadowlingSystem : EntitySystem
 
         return HasComp<MobStateComponent>(target)
                && !HasComp<ShadowlingComponent>(target)
-               && !HasComp<ThrallComponent>(target)
-               && !HasComp<HereticComponent>(target);
+               && !HasComp<ThrallComponent>(target);
     }
 
     public void DoEnthrall(EntityUid uid, EntProtoId components, SimpleDoAfterEvent args)

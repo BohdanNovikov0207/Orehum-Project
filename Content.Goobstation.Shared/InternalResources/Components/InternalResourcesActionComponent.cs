@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 using Content.Goobstation.Shared.InternalResources.Data;
 using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
@@ -13,15 +15,6 @@ public sealed partial class InternalResourcesActionComponent : Component
     [DataField(required: true)]
     public ProtoId<InternalResourcesPrototype> ResourceProto;
 
-    /// <summary>
-    /// Used instead of the DeficitPopup in ResourceProto when not null.
-    /// </summary>
     [DataField]
-    public LocId? DeficitPopup;
-
-    [DataField]
-    public float UseAmount;
-
-    [DataField]
-    public float AltUseAmount;
+    public float UseAmount = 0;
 }

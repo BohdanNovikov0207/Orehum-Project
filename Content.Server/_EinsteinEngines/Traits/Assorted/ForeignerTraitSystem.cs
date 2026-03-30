@@ -31,13 +31,14 @@ public sealed partial class ForeignerTraitSystem : EntitySystem
         if (entity.Comp.CantUnderstand && !entity.Comp.CantSpeak)
             Log.Warning($"Allowing entity {entity.Owner} to speak a language but not understand it leads to undefined behavior.");
 
-        if (!TryComp<LanguageKnowledgeComponent>(entity, out var knowledge))
+        if (!TryComp<LanguageSpeakerComponent>(entity, out var speaker))
         {
-            Log.Warning($"Entity {entity.Owner} does not have a LanguageKnowledge but has a ForeignerTrait!");
+            Log.Warning($"Entity {entity.Owner} does not have a LanguageSpeaker but has a ForeignerTrait!");
             return;
         }
 
-        var alternateLanguage = knowledge.SpokenLanguages.Find(it => it != entity.Comp.BaseLanguage);
+        var spoken = speaker.Speaks;
+        var alternateLanguage = spoken.Find(it => it != entity.Comp.BaseLanguage);
         if (alternateLanguage == default)
         {
             Log.Warning($"Entity {entity.Owner} does not have an alternative language to choose from (must have at least one non-GC for ForeignerTrait)!");

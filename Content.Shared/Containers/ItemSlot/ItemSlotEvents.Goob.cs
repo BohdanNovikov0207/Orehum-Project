@@ -1,4 +1,4 @@
-using Content.Shared.DoAfter; // Goobstation
+using Content.Shared.DoAfter;
 using Robust.Shared.Serialization;
 
 namespace Content.Shared.Containers.ItemSlots;
@@ -34,6 +34,6 @@ public sealed partial class ItemSlotInteractionDoAfterEvent : DoAfterEvent
 
     public override DoAfterEvent Clone()
     {
-        return this;
+        return new ItemSlotInteractionDoAfterEvent(SlotId, TryEject, TryInsert);
     }
 }

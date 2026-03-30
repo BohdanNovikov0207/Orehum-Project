@@ -179,7 +179,6 @@ entities:
     - type: GasTileOverlay
     - type: RadiationGridResistance
     - type: ImplicitRoof
-    - type: FTLDrive
 - proto: AirlockShuttle
   entities:
   - uid: 2
@@ -367,8 +366,6 @@ entities:
     - type: Transform
       pos: -0.5,-2.5
       parent: 1
-    - type: PowerSupplier
-      supplyRate: 5000
 - proto: GravityGeneratorMini
   entities:
   - uid: 63

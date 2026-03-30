@@ -1,6 +1,5 @@
 using Content.Shared.Access;
 using Content.Shared.Access.Systems;
-using Content.Shared.Item.ItemToggle;
 using JetBrains.Annotations;
 using Robust.Shared.Prototypes;
 
@@ -14,8 +13,7 @@ namespace Content.Shared.Turrets;
 public sealed partial class TurretTargetSettingsSystem : EntitySystem
 {
     [Dependency] private readonly AccessReaderSystem _accessReader = default!;
-    [Dependency] private readonly ItemToggleSystem _toggle = default!; // goob edit dont target disabled borgs
-    
+
     private ProtoId<AccessLevelPrototype> _accessLevelBorg = "Borg";
     private ProtoId<AccessLevelPrototype> _accessLevelBasicSilicon = "BasicSilicon";
 
@@ -129,9 +127,6 @@ public sealed partial class TurretTargetSettingsSystem : EntitySystem
         if (accessLevels.Contains(_accessLevelBasicSilicon))
             return !HasAccessLevelExemption(ent, _accessLevelBasicSilicon);
 
-        if (!_toggle.IsActivated(target)) // goob edit dont target disabled borgs
-            return !HasAccessLevelExemption(ent, _accessLevelBorg); // goob edit dont target disabled borgs
-  
         return !HasAnyAccessLevelExemption(ent, accessLevels);
     }
 }

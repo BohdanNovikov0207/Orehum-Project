@@ -50,7 +50,6 @@ public sealed class EggLayerSystem : EntitySystem
 
         SubscribeLocalEvent<EggLayerComponent, MapInitEvent>(OnMapInit);
         SubscribeLocalEvent<EggLayerComponent, EggLayInstantActionEvent>(OnEggLayAction);
-        SubscribeLocalEvent<EggLayerComponent, ComponentShutdown>(OnShutdown); //_Trauma
     }
 
     public override void Update(float frameTime)
@@ -139,12 +138,5 @@ public sealed class EggLayerSystem : EntitySystem
         _popup.PopupEntity(Loc.GetString("action-popup-lay-egg-others", ("entity", uid)), uid, Filter.PvsExcept(uid), true);
 
         return true;
-    }
-
-//_Trauma
-// Removes egg laying action when EggLayerComponent is removed from an entity.
-     void OnShutdown(Entity<EggLayerComponent> ent, ref ComponentShutdown args)
-    {
-        _actions.RemoveAction(ent.Comp.Action);
     }
 }

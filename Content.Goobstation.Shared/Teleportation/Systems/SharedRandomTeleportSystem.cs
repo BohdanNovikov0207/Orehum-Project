@@ -1,18 +1,9 @@
-// SPDX-FileCopyrightText: 2024 Ilya246 <57039557+Ilya246@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2024 Piras314 <p1r4s@proton.me>
-// SPDX-FileCopyrightText: 2024 whateverusername0 <whateveremail>
-// SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2025 Misandry <mary@thughunt.ing>
-// SPDX-FileCopyrightText: 2025 gus <august.eymann@gmail.com>
-//
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Numerics;
 using Content.Goobstation.Common.BlockTeleport;
 using Content.Goobstation.Common.Effects;
-using Content.Goobstation.Common.Grab;
-using Content.Goobstation.Shared.GrabIntent;
-using Content.Goobstation.Common.MartialArts;
+using Content.Trauma.Common.MartialArts;
 using Content.Shared.Destructible.Thresholds;
 using Content.Shared.Movement.Pulling.Components;
 using Content.Shared.Movement.Pulling.Systems;
@@ -61,7 +52,7 @@ public partial class SharedRandomTeleportSystem : EntitySystem
         if (sound) _audio.PlayPvs(rtp.DepartureSound, Transform(target).Coordinates, AudioParams.Default);
         _sparks.DoSparks(Transform(target).Coordinates); // also sparks!!
 
-        finalWorldPos = RandomTeleport(target, rtp.Radius, rtp.TeleportAttempts, rtp.ForceSafeTeleport, rtp.TeleportPulledEntities);
+        finalWorldPos = RandomTeleport(target, rtp.Radius, rtp.TeleportAttempts, rtp.ForceSafeTeleport);
 
         if (sound) _audio.PlayPvs(rtp.ArrivalSound, Transform(target).Coordinates, AudioParams.Default);
         _sparks.DoSparks(Transform(target).Coordinates);
@@ -78,7 +69,7 @@ public partial class SharedRandomTeleportSystem : EntitySystem
         return _random.NextAngle().ToVec() * distance;
     }
 
-    public Vector2? RandomTeleport(EntityUid uid, MinMax radius, int triesBase = 10, bool forceSafe = true, bool teleportPulledEntities = false)
+    public Vector2? RandomTeleport(EntityUid uid, MinMax radius, int triesBase = 10, bool forceSafe = true)
     {
         var xform = Transform(uid);
         var entityCoords = _xform.ToMapCoordinates(xform.Coordinates);
@@ -139,8 +130,7 @@ public partial class SharedRandomTeleportSystem : EntitySystem
         var stage = GrabStage.No;
         if (TryComp<PullerComponent>(uid, out var puller))
         {
-            if (TryComp<GrabIntentComponent>(uid, out var grabIntent))
-                stage = grabIntent.GrabStage;
+            stage = puller.GrabStage;
             pullableEntity = puller.Pulling;
         }
 
@@ -151,7 +141,7 @@ public partial class SharedRandomTeleportSystem : EntitySystem
 
         // pulled entity goes with us
         // btw STOP REVERSING CHECKS
-        if (pullableEntity != null && teleportPulledEntities)
+        if (pullableEntity != null)
         {
             _xform.SetWorldPosition(pullableEntity.Value, newPos);
             _pullingSystem.TryStartPull(uid, pullableEntity.Value, grabStageOverride: stage, force: true);

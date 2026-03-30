@@ -1,22 +1,3 @@
-// SPDX-FileCopyrightText: 2022 Leon Friedrich <60421075+ElectroJr@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2023 DrSmugleaf <drsmugleaf@gmail.com>
-// SPDX-FileCopyrightText: 2023 Jezithyr <jezithyr@gmail.com>
-// SPDX-FileCopyrightText: 2023 metalgearsloth <31366439+metalgearsloth@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2024 0x6273 <0x40@keemail.me>
-// SPDX-FileCopyrightText: 2024 Pieter-Jan Briers <pieterjan.briers+git@gmail.com>
-// SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2025 Coolsurf6 <coolsurf24@yahoo.com.au>
-// SPDX-FileCopyrightText: 2025 GoobBot <uristmchands@proton.me>
-// SPDX-FileCopyrightText: 2025 Kayzel <43700376+KayzelW@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2025 Roudenn <romabond091@gmail.com>
-// SPDX-FileCopyrightText: 2025 Spatison <137375981+Spatison@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2025 Trest <144359854+trest100@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2025 gluesniffler <linebarrelerenthusiast@gmail.com>
-// SPDX-FileCopyrightText: 2025 kurokoTurbo <92106367+kurokoTurbo@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2025 RichardBlonski <48651647+RichardBlonski@users.noreply.github.com>
-//
-// SPDX-License-Identifier: MIT
-
 using System.Numerics;
 using Content.Shared.Mobs;
 using Robust.Client.Graphics;
@@ -45,7 +26,7 @@ public sealed class DamageOverlay : Overlay
     public MobState State = MobState.Alive;
 
     /// <summary>
-    /// Shitmed Change: Handles the red pulsing overlay
+    /// Handles the red pulsing overlay
     /// </summary>
     public float PainLevel = 0f;
 
@@ -181,15 +162,19 @@ public sealed class DamageOverlay : Overlay
             _bruteShader.SetParameter("outerCircleMaxRadius", outerRadius + 0.2f * distance);
             _bruteShader.SetParameter("innerCircleRadius", innerRadius);
             _bruteShader.SetParameter("innerCircleMaxRadius", innerRadius + 0.02f * distance);
+
             handle.UseShader(_bruteShader);
             handle.DrawRect(viewport, Color.White);
         }
-        else
-        {
-            _oldPainLevel = PainLevel;
-        }
 
-        level = State != MobState.Critical ? _oldOxygenLevel : 1f;
+        // Always update _oldPainLevel to match PainLevel when PainLevel is 0
+        if (PainLevel <= 0f)
+        {
+            _oldPainLevel = 0f;
+        }
+        // Goobstation end
+
+        level = (State == MobState.Alive || State == MobState.Dead) ? _oldOxygenLevel : 1f; // Trauma - max level for softcrit too
 
         if (level > 0f)
         {

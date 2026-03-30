@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 using System.Linq;
 using Content.Goobstation.Shared.Wraith.Components;
 using Content.Goobstation.Shared.Wraith.Events;
@@ -24,6 +26,8 @@ public sealed class WraithCommandSystem : EntitySystem
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly INetManager _netManager = default!;
 
+    private HashSet<Entity<PullableComponent>> _found = new();
+
     /// <inheritdoc/>
     public override void Initialize()
     {
@@ -36,24 +40,24 @@ public sealed class WraithCommandSystem : EntitySystem
     //Just cosmetic, so leaving for part 2.
     private void OnCommand(Entity<WraithCommandComponent> ent, ref WraithCommandEvent args)
     {
-        _stun.TryUpdateStunDuration(args.Target, ent.Comp.StunDuration);
+        _stun.TryAddParalyzeDuration(args.Target, ent.Comp.StunDuration);
+
+        args.Handled = true;
 
         if (_netManager.IsClient)
             return;
 
-        var found = new HashSet<Entity<PullableComponent>>();
-        _lookupSystem.GetEntitiesInRange(Transform(ent.Owner).Coordinates, ent.Comp.SearchRange, found);
-        var foundList = found.ToList();
+        _found.Clear();
+        _lookupSystem.GetEntitiesInRange(Transform(ent.Owner).Coordinates, ent.Comp.SearchRange, _found);
+        var foundList = _found.ToList();
         _random.Shuffle(foundList);
 
         foreach (var entity in foundList)
         {
-            if (_whitelist.IsBlacklistPass(ent.Comp.Blacklist, entity))
+            if (_whitelist.IsWhitelistPass(ent.Comp.Blacklist, entity))
                 continue;
 
             _throwingSystem.TryThrow(entity, Transform(args.Target).Coordinates, ent.Comp.ThrowSpeed, ent.Owner);
         }
-
-        args.Handled = true;
     }
 }

@@ -1,14 +1,11 @@
-// SPDX-FileCopyrightText: 2025 GoobBot <uristmchands@proton.me>
-// SPDX-FileCopyrightText: 2025 Lumminal <81829924+Lumminal@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2025 Roudenn <romabond091@gmail.com>
-//
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Goobstation.Shared.Shadowling.Components;
 using Content.Goobstation.Shared.Shadowling.Components.Abilities.CollectiveMind;
 using Content.Shared._EinsteinEngines.Silicon.Components;
 using Content.Shared.Actions;
-using Content.Shared.Damage;
+using Content.Shared.Damage.Components;
+using Content.Shared.Damage.Systems;
 using Content.Shared.Humanoid;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Popups;
@@ -67,7 +64,7 @@ public sealed class ShadowlingSonicScreechSystem : EntitySystem
                 && TryComp<DamageableComponent>(entity, out var damageableComponent)
                 && _net.IsServer)
             {
-                _damageable.TryChangeDamage(entity, component.WindowDamage, true, damageable: damageableComponent);
+                _damageable.ChangeDamage((entity, damageableComponent), component.WindowDamage, true);
                 continue;
             }
 
@@ -80,11 +77,11 @@ public sealed class ShadowlingSonicScreechSystem : EntitySystem
 
             if (HasComp<SiliconComponent>(entity))
             {
-                _stun.TryUpdateParalyzeDuration(entity, component.SiliconStunTime);
+                _stun.TryAddParalyzeDuration(entity, component.SiliconStunTime);
                 continue;
             }
 
-            if (HasComp<HumanoidAppearanceComponent>(entity))
+            if (HasComp<HumanoidProfileComponent>(entity))
                 PredictedSpawnAtPosition(component.ProtoFlash, Transform(entity).Coordinates);
         }
 

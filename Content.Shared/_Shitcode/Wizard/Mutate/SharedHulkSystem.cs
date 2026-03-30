@@ -10,8 +10,8 @@ using Content.Shared.Damage.Events;
 using Content.Shared.Damage.Prototypes;
 using Content.Shared.Damage.Systems;
 using Content.Shared.Slippery;
-using Content.Shared.StatusEffect;
 using Content.Shared.StatusEffectNew;
+using Content.Shared.Stunnable;
 using Content.Shared.Weapons.Melee.Events;
 using Robust.Shared.Prototypes;
 
@@ -21,12 +21,16 @@ public abstract class SharedHulkSystem : EntitySystem
 {
     [Dependency] private readonly IPrototypeManager _prototype = default!;
 
+    public static readonly EntProtoId StatusEffectStunned = "StatusEffectStunned";
+    public static readonly ProtoId<DamageTypePrototype> Structural = "Structural";
+
     public override void Initialize()
     {
         base.Initialize();
 
         SubscribeLocalEvent<HulkComponent, BeforeStaminaDamageEvent>(OnBeforeStaminaDamage);
-        SubscribeLocalEvent<HulkComponent, BeforeOldStatusEffectAddedEvent>(OnBeforeStatusEffect);
+        SubscribeLocalEvent<HulkComponent, BeforeStatusEffectAddedEvent>(OnBeforeStatusEffect);
+        SubscribeLocalEvent<HulkComponent, KnockDownAttemptEvent>(OnKnockDownAttempt);
         SubscribeLocalEvent<HulkComponent, SlipAttemptEvent>(OnSlipAttempt);
         SubscribeLocalEvent<HulkComponent, MeleeHitEvent>(OnMeleeHit);
         SubscribeLocalEvent<HulkComponent, ComponentStartup>(OnStartup);
@@ -35,7 +39,7 @@ public abstract class SharedHulkSystem : EntitySystem
     private void OnStartup(Entity<HulkComponent> ent, ref ComponentStartup args)
     {
         UpdateColorStartup(ent);
-        ent.Comp.StructuralDamage ??= new DamageSpecifier(_prototype.Index<DamageTypePrototype>("Structural"), 80f);
+        ent.Comp.StructuralDamage ??= new DamageSpecifier(_prototype.Index(Structural), 80f);
     }
 
     private void OnMeleeHit(Entity<HulkComponent> ent, ref MeleeHitEvent args)
@@ -57,11 +61,17 @@ public abstract class SharedHulkSystem : EntitySystem
         args.NoSlip = true;
     }
 
-    private void OnBeforeStatusEffect(Entity<HulkComponent> ent, ref BeforeOldStatusEffectAddedEvent args)
+    private void OnBeforeStatusEffect(Entity<HulkComponent> ent, ref BeforeStatusEffectAddedEvent args)
     {
-        if (args.EffectKey is not ("KnockedDown" or "Stun"))
+        if (args.Effect != StatusEffectStunned)
             return;
 
+        Roar(ent);
+        args.Cancelled = true;
+    }
+
+    private void OnKnockDownAttempt(Entity<HulkComponent> ent, ref KnockDownAttemptEvent args)
+    {
         Roar(ent);
         args.Cancelled = true;
     }

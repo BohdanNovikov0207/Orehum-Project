@@ -8,9 +8,7 @@
 using System.Numerics;
 using Content.Server._Goobstation.Wizard.Components;
 using Content.Server.Chat.Systems;
-using Content.Server.Humanoid;
 using Content.Server.Popups;
-using Content.Server.Toolshed.Commands.Misc;
 using Content.Server.Weapons.Ranged.Systems;
 using Content.Shared._Goobstation.Wizard.Mutate;
 using Content.Shared.Chat;
@@ -31,11 +29,11 @@ public sealed class HulkSystem : SharedHulkSystem
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly PhysicsSystem _physics = default!;
-    [Dependency] private readonly AppearanceSystem _appearance = default!;
-    [Dependency] private readonly HumanoidAppearanceSystem _humanoidAppearance = default!;
+    [Dependency] private readonly HumanoidProfileSystem _humanoid = default!;
     [Dependency] private readonly GunSystem _gun = default!;
     [Dependency] private readonly PopupSystem _popup = default!;
     [Dependency] private readonly ChatSystem _chat = default!;
+    [Dependency] private readonly SharedScaleVisualsSystem _scale = default!;
 
     public override void Initialize()
     {
@@ -54,16 +52,12 @@ public sealed class HulkSystem : SharedHulkSystem
 
         Scale(ent, 0.8f);
 
-        if (TryComp(uid, out HumanoidAppearanceComponent? humanoid))
+        if (HasComp<HumanoidProfileComponent>(uid))
         {
-            foreach (var (layer, info) in comp.OldCustomBaseLayers)
-            {
-                _humanoidAppearance.SetBaseLayerColor(uid, layer, info.Color, false, humanoid);
-                _humanoidAppearance.SetBaseLayerId(uid, layer, info.Id, false, humanoid);
-            }
-
-            humanoid.EyeColor = comp.OldEyeColor;
-            _humanoidAppearance.SetSkinColor(uid, comp.OldSkinColor, true, false, humanoid);
+            if (comp.OldEyeColor is {} eyeColor)
+                _humanoid.SetEyeColor(uid, eyeColor);
+            if (comp.OldSkinColor is {} skinColor)
+                _humanoid.SetSkinColor(uid, skinColor);
         }
 
         _popup.PopupEntity(Loc.GetString("hulk-unhulked"), uid, uid);
@@ -72,7 +66,7 @@ public sealed class HulkSystem : SharedHulkSystem
             return;
 
         RemComp<GunComponent>(ent);
-        RemComp<HitscanBatteryAmmoProviderComponent>(ent);
+        RemComp<BatteryAmmoProviderComponent>(ent);
     }
 
     private void OnInit(Entity<HulkComponent> ent, ref ComponentInit args)
@@ -81,37 +75,18 @@ public sealed class HulkSystem : SharedHulkSystem
 
         Scale(uid, 1.25f);
 
-        if (TryComp(uid, out HumanoidAppearanceComponent? humanoid))
+        if (HasComp<HumanoidProfileComponent>(uid))
         {
-            comp.OldSkinColor = humanoid.SkinColor;
-            comp.OldEyeColor = humanoid.EyeColor;
-            comp.OldCustomBaseLayers = new(humanoid.CustomBaseLayers);
-
-            _humanoidAppearance.SetSkinColor(uid, comp.SkinColor, true, false, humanoid);
-
-            if (comp.LaserEyes)
-                humanoid.EyeColor = comp.EyeColor;
-
-            _humanoidAppearance.SetBaseLayerId(uid, HumanoidVisualLayers.Tail, comp.BaseLayerExternal, false, humanoid);
-            _humanoidAppearance.SetBaseLayerId(uid,
-                HumanoidVisualLayers.HeadSide,
-                comp.BaseLayerExternal,
-                false,
-                humanoid);
-            _humanoidAppearance.SetBaseLayerId(uid,
-                HumanoidVisualLayers.HeadTop,
-                comp.BaseLayerExternal,
-                false,
-                humanoid);
-            _humanoidAppearance.SetBaseLayerId(uid,
-                HumanoidVisualLayers.Snout,
-                comp.BaseLayerExternal,
-                false,
-                humanoid);
+            var organs = _humanoid.GetOrgansData(uid);
+            comp.OldEyeColor = _humanoid.GetEyeColor(organs);
+            comp.OldSkinColor = _humanoid.GetSkinColor(organs);
+            _humanoid.SetSkinColor(uid, comp.SkinColor);
         }
 
         if (!comp.LaserEyes)
             return;
+
+        _humanoid.SetEyeColor(uid, comp.EyeColor);
 
         RemComp<GunComponent>(uid);
         var gun = AddComp<GunComponent>(uid);
@@ -120,9 +95,10 @@ public sealed class HulkSystem : SharedHulkSystem
         _gun.SetClumsyProof(gun, true);
         _gun.SetSoundGunshot(gun, comp.SoundGunshot);
         _gun.RefreshModifiers((uid, gun));
-        var hitscan = EntityManager.ComponentFactory.GetComponent<BasicHitscanAmmoProviderComponent>();
+        // TODO: kill this shitcode if BasicEntityAmmoProvider gets made to support hitscans like BatteryAmmoProvider does
+        var hitscan = EnsureComp<BasicHitscanAmmoProviderComponent>(uid);
         hitscan.Proto = comp.ShotProto;
-        AddComp(uid, hitscan, true);
+        Dirty(uid, hitscan);
     }
 
     public override void Roar(Entity<HulkComponent> hulk, float prob = 1f)
@@ -146,19 +122,12 @@ public sealed class HulkSystem : SharedHulkSystem
 
     private void Scale(EntityUid uid, float scale)
     {
-        EnsureComp<ScaleVisualsComponent>(uid);
-        var ev = new ScaleEntityEvent();
-        RaiseLocalEvent(uid, ref ev);
-
-        var appearanceComponent = EnsureComp<AppearanceComponent>(uid);
-        if (!_appearance.TryGetData<Vector2>(uid, ScaleVisuals.Scale, out var oldScale, appearanceComponent))
-            oldScale = TryComp(uid, out ScaleDataComponent? scaleData) ? scaleData.Scale : Vector2.One;
-
-        _appearance.SetData(uid, ScaleVisuals.Scale, oldScale * scale, appearanceComponent);
+        _scale.SetSpriteScale(uid, _scale.GetSpriteScale(uid) * scale);
 
         if (!TryComp(uid, out FixturesComponent? manager))
             return;
 
+        // fat
         foreach (var (id, fixture) in manager.Fixtures)
         {
             switch (fixture.Shape)

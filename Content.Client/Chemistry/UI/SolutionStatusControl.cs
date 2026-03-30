@@ -13,7 +13,7 @@ using Content.Client.Message;
 using Content.Client.Stylesheets;
 using Content.Shared.Chemistry.Components;
 using Content.Shared.Chemistry.EntitySystems;
-using Content.Goobstation.Maths.FixedPoint;
+using Content.Shared.FixedPoint;
 using Robust.Client.UserInterface.Controls;
 
 namespace Content.Client.Chemistry.UI;
@@ -37,7 +37,7 @@ public sealed class SolutionStatusControl : PollingItemStatusControl<SolutionSta
         _parent = parent;
         _entityManager = entityManager;
         _solutionContainers = solutionContainers;
-        _label = new RichTextLabel { StyleClasses = { StyleNano.StyleClassItemStatus } };
+        _label = new RichTextLabel { StyleClasses = { StyleClass.ItemStatus } };
         AddChild(_label);
     }
 

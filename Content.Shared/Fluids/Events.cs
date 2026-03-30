@@ -8,7 +8,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Shared.DoAfter;
-using Content.Goobstation.Maths.FixedPoint;
+using Content.Shared.FixedPoint;
 using Robust.Shared.Audio;
 using Robust.Shared.Serialization;
 
@@ -48,7 +48,7 @@ public sealed partial class AbsorbantDoAfterEvent : DoAfterEvent
 /// Raised when trying to spray something, for example a fire extinguisher.
 /// </summary>
 [ByRefEvent]
-public record struct SprayAttemptEvent(EntityUid User, bool Cancelled = false)
+public record struct SprayAttemptEvent(EntityUid? User, bool Cancelled = false, string? CancelPopupMessage = null)
 {
     public void Cancel()
     {

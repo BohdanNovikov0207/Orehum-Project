@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
 
@@ -20,7 +22,7 @@ public sealed partial class ShadowlingGlareComponent : Component
     // otherwise it gets reduced based on distance.
     // </summary>
     [DataField]
-    public float GlareStunTime;
+    public TimeSpan GlareStunTime;
 
     // <summary>
     // Variable activation time. On distance 1 or lower, it is immediate,
@@ -29,7 +31,7 @@ public sealed partial class ShadowlingGlareComponent : Component
     // Note: needs to be rewritten to not use frametime
     // </summary>
     [DataField]
-    public float GlareTimeBeforeEffect;
+    public TimeSpan GlareTimeBeforeEffect;
 
     [DataField]
     public float MaxGlareDistance = 10f;
@@ -38,25 +40,28 @@ public sealed partial class ShadowlingGlareComponent : Component
     public float MinGlareDistance = 1f;
 
     [DataField]
-    public float MaxGlareStunTime = 6f;
+    public TimeSpan MaxGlareStunTime = TimeSpan.FromSeconds(6);
 
     [DataField]
-    public float SlowTime = 7f;
+    public EntProtoId SlowdownStatusEffect = "ShadowlingGlareStatusEffect";
 
     [DataField]
-    public float MuteTime = 6f;
+    public TimeSpan SlowTime = TimeSpan.FromSeconds(7);
 
-    // <summary>
-    // Regarding time delay before activation
-    // </summary>
     [DataField]
-    public float MaxGlareDelay = 2f;
+    public TimeSpan MuteTime = TimeSpan.FromSeconds(6);
 
     // <summary>
     // Regarding time delay before activation
     // </summary>
     [DataField]
-    public float MinGlareDelay = 0.1f;
+    public TimeSpan MaxGlareDelay = TimeSpan.FromSeconds(2);
+
+    // <summary>
+    // Regarding time delay before activation
+    // </summary>
+    [DataField]
+    public TimeSpan MinGlareDelay = TimeSpan.FromSeconds(0.1f);
 
     [DataField]
     public EntityUid GlareTarget;

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 using Content.Shared.Actions;
 using Content.Shared.DoAfter;
 using Robust.Shared.Serialization;
@@ -68,4 +70,3 @@ public sealed class SlasherIncorporealCameraCheckEvent : EntityEventArgs
     /// </summary>
     public bool Cancelled { get; set; }
 }
-

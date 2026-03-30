@@ -301,6 +301,9 @@
         color: "#5ABF2F"
   - type: Fiber
     fiberColor: fibers-green
+  - type: Tag # Goobstation edit
+    tags:
+      - GreenGloves
 
 # Light Brown Gloves
 - type: entity
@@ -403,10 +406,8 @@
     inhandVisuals:
       left:
       - state: inhand-left
-        color: "#535353"
       right:
       - state: inhand-right
-        color: "#535353"
   - type: Clothing
     sprite: Clothing/Hands/Gloves/Color/black.rsi
   - type: Butcherable

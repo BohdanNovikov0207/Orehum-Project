@@ -1,17 +1,11 @@
-// SPDX-FileCopyrightText: 2025 GoobBot <uristmchands@proton.me>
-// SPDX-FileCopyrightText: 2025 Lumminal <81829924+Lumminal@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2025 Roudenn <romabond091@gmail.com>
-//
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Goobstation.Shared.Shadowling.Components.Abilities.PreAscension;
 using Content.Shared.Actions;
-using Content.Shared.Movement.Systems;
 using Content.Shared.Popups;
 using Content.Shared.StatusEffect;
 using Content.Shared.Stunnable;
 using Content.Shared.Speech.Muting;
-using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
 
 namespace Content.Goobstation.Shared.Shadowling.Systems.Abilities.PreAscension;
@@ -27,10 +21,8 @@ public sealed class ShadowlingGlareSystem : EntitySystem
     [Dependency] private readonly SharedShadowlingSystem _shadowling = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly StatusEffectsSystem _effects = default!;
+    [Dependency] private readonly Content.Shared.StatusEffectNew.StatusEffectsSystem _effectsNew = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly MovementModStatusSystem _movementMod = default!;
-
-    public static readonly EntProtoId SlingGlareSlowEffect = "ShadowlingGlareSlowdownEffect";
 
     public override void Initialize()
     {
@@ -55,14 +47,15 @@ public sealed class ShadowlingGlareSystem : EntitySystem
             return;
 
         var query = EntityQueryEnumerator<ShadowlingGlareComponent>();
+        var decay = TimeSpan.FromSeconds(frameTime);
         while (query.MoveNext(out _, out var glare))
         {
             if (glare.ActivateGlareTimer)
             {
                 // Time before the ability activates
-                glare.GlareTimeBeforeEffect -= frameTime;
+                glare.GlareTimeBeforeEffect -= decay;
 
-                if (glare.GlareTimeBeforeEffect <= 0)
+                if (glare.GlareTimeBeforeEffect <= TimeSpan.Zero)
                     ActivateStun(glare.GlareTarget, glare);
             }
         }
@@ -70,7 +63,7 @@ public sealed class ShadowlingGlareSystem : EntitySystem
 
     private void ActivateStun(EntityUid target, ShadowlingGlareComponent comp)
     {
-        _stun.TryUpdateStunDuration(target, TimeSpan.FromSeconds(comp.GlareStunTime));
+        _stun.TryAddParalyzeDuration(target, comp.GlareStunTime);
         comp.ActivateGlareTimer = false;
     }
 
@@ -92,23 +85,20 @@ public sealed class ShadowlingGlareSystem : EntitySystem
         if (distance <= comp.MinGlareDistance)
         {
             comp.GlareStunTime = comp.MaxGlareStunTime;
-            _stun.TryUpdateStunDuration(target, TimeSpan.FromSeconds(comp.GlareStunTime));
+            _stun.TryUpdateParalyzeDuration(target, comp.GlareStunTime);
         }
         else
         {
             // Do I know what is going on here? No. But it works so... Thanks for listening!
-            comp.GlareStunTime = comp.MaxGlareStunTime * (1 - Math.Clamp(distance / comp.MaxGlareDistance, 0, 1));
+            comp.GlareStunTime *= (1 - Math.Clamp(distance / comp.MaxGlareDistance, 0, 1));
             comp.GlareTimeBeforeEffect = comp.MinGlareDelay + (comp.MaxGlareDelay - comp.MinGlareDelay) * Math.Clamp(distance / comp.MaxGlareDistance, 0, 1);
 
             comp.ActivateGlareTimer = true;
         }
 
         // Glare mutes and slows down the target no matter what.
-        if (TryComp<StatusEffectsComponent>(target, out var statComp))
-        {
-            _effects.TryAddStatusEffect<MutedComponent>(target, "Muted", TimeSpan.FromSeconds(comp.MuteTime), true);
-            _movementMod.TryUpdateMovementSpeedModDuration(target, SlingGlareSlowEffect, TimeSpan.FromSeconds(comp.SlowTime), 0.5f, 0.5f);
-        }
+        _effects.TryAddStatusEffect<MutedComponent>(target, "Muted", comp.MuteTime, true);
+        _effectsNew.TryUpdateStatusEffectDuration(target, comp.SlowdownStatusEffect, comp.SlowTime);
 
         var effectEnt = PredictedSpawnAtPosition(comp.EffectGlare, Transform(uid).Coordinates);
         _transform.SetParent(effectEnt, uid);

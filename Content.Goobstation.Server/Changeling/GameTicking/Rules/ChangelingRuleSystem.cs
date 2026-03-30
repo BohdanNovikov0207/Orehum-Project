@@ -1,28 +1,18 @@
-// SPDX-FileCopyrightText: 2024 Aviu00 <93730715+Aviu00@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2024 Errant <35878406+Errant-4@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2024 Piras314 <p1r4s@proton.me>
-// SPDX-FileCopyrightText: 2024 username <113782077+whateverusername0@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2024 whateverusername0 <whateveremail>
-// SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2025 GoobBot <uristmchands@proton.me>
-// SPDX-FileCopyrightText: 2025 Marcus F <199992874+thebiggestbruh@users.noreply.github.com>
-// SPDX-FileCopyrightText: 2025 Misandry <mary@thughunt.ing>
-// SPDX-FileCopyrightText: 2025 gus <august.eymann@gmail.com>
-//
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Text;
-using Content.Goobstation.Server.Changeling.Roles;
+using Content.Goobstation.Common.Changeling;
 using Content.Goobstation.Shared.Changeling.Components;
+using Content.Goobstation.Shared.Roles;
 using Content.Server.Antag;
 using Content.Server.GameTicking.Rules;
 using Content.Server.Mind;
 using Content.Server.Objectives;
-using Content.Server.Roles;
 using Content.Shared._EinsteinEngines.Silicon.Components;
 using Content.Shared.NPC.Prototypes;
 using Content.Shared.NPC.Systems;
 using Content.Shared.Roles;
+using Content.Shared.Roles.Components;
 using Content.Shared.Store;
 using Content.Shared.Store.Components;
 using Robust.Shared.Audio;
@@ -35,6 +25,7 @@ public sealed class ChangelingRuleSystem : GameRuleSystem<ChangelingRuleComponen
     [Dependency] private readonly MindSystem _mind = default!;
     [Dependency] private readonly AntagSelectionSystem _antag = default!;
     [Dependency] private readonly SharedRoleSystem _role = default!;
+    [Dependency] private readonly SharedUserInterfaceSystem _ui = default!;
     [Dependency] private readonly NpcFactionSystem _npcFaction = default!;
     [Dependency] private readonly ObjectivesSystem _objective = default!;
 
@@ -50,7 +41,7 @@ public sealed class ChangelingRuleSystem : GameRuleSystem<ChangelingRuleComponen
 
     public readonly int StartingCurrency = 16;
 
-    [ValidatePrototypeId<EntityPrototype>] EntProtoId mindRole = "MindRoleChangeling";
+    public static readonly EntProtoId<ChangelingRoleComponent> MindRole = "MindRoleChangeling";
 
     public override void Initialize()
     {
@@ -72,20 +63,24 @@ public sealed class ChangelingRuleSystem : GameRuleSystem<ChangelingRuleComponen
         if (!_mind.TryGetMind(target, out var mindId, out var mind))
             return false;
 
-        _role.MindAddRole(mindId, mindRole.Id, mind, true);
+        _role.MindAddRole(mindId, MindRole, mind, true);
 
         // briefing
-        // Everypony has a metadata component, why are you trycomp'ing it?
-        if (TryComp<MetaDataComponent>(target, out var metaData))
+        var name = Name(target) ?? Loc.GetString("generic-unknown-title");
+        var briefing = Loc.GetString("changeling-role-greeting", ("name", name));
+        var briefingShort = Loc.GetString("changeling-role-greeting-short", ("name", name));
+
+        _antag.SendBriefing(target, briefing, Color.Yellow, BriefingSound);
+
+        if (!_role.MindHasRole<ChangelingRoleComponent>(mindId, out var mr))
         {
-            var briefing = Loc.GetString("changeling-role-greeting", ("name", metaData?.EntityName ?? "Unknown"));
-            var briefingShort = Loc.GetString("changeling-role-greeting-short", ("name", metaData?.EntityName ?? "Unknown"));
-
-            _antag.SendBriefing(target, briefing, Color.Yellow, BriefingSound);
-
-            if (_role.MindHasRole<ChangelingRoleComponent>(mindId, out var mr))
-                AddComp(mr.Value, new RoleBriefingComponent { Briefing = briefingShort }, overwrite: true);
+            Log.Error($"Mind role {MindRole} did not have ChangelingRoleComponent!");
+            return false;
         }
+
+        var role = mr.Value.Owner;
+        AddComp(role, new RoleBriefingComponent { Briefing = briefingShort }, overwrite: true);
+
         // hivemind stuff
         _npcFaction.RemoveFaction(target, NanotrasenFactionId, false);
         _npcFaction.AddFaction(target, ChangelingFactionId);
@@ -94,41 +89,47 @@ public sealed class ChangelingRuleSystem : GameRuleSystem<ChangelingRuleComponen
         EnsureComp<ChangelingComponent>(target);
 
         // add store
-        var store = EnsureComp<StoreComponent>(target);
+        var store = EnsureComp<StoreComponent>(role);
         foreach (var category in rule.StoreCategories)
             store.Categories.Add(category);
         store.CurrencyWhitelist.Add(Currency);
         store.Balance.Add(Currency, StartingCurrency);
+        // TODO: uncomment if store gets predicted
+        //Dirty(role, store)
+
+        // no range or validation because it's on the mind and would immediately get closed
+        var uiData = new InterfaceData("StoreBoundUserInterface", 0f, false);
+        _ui.SetUi(role, StoreUiKey.Key, uiData);
 
         rule.ChangelingMinds.Add(mindId);
 
         return true;
     }
 
-    private void OnTextPrepend(EntityUid uid, ChangelingRuleComponent comp, ref ObjectivesTextPrependEvent args)
+    private void OnTextPrepend(Entity<ChangelingRuleComponent> ent, ref ObjectivesTextPrependEvent args)
     {
         var mostAbsorbedName = string.Empty;
         var mostStolenName = string.Empty;
         var mostAbsorbed = 0f;
         var mostStolen = 0f;
 
-        foreach (var ling in EntityQuery<ChangelingIdentityComponent>()) // TODO make a ChangelingAbsorbComponent to store data about absorbed DNA and entities
+        // TODO make a ChangelingAbsorbComponent to store data about absorbed DNA and entities
+        var query = EntityQueryEnumerator<ChangelingIdentityComponent>();
+        while (query.MoveNext(out var uid, out var ling))
         {
-            if (!_mind.TryGetMind(ling.Owner, out var mindId, out var mind))
+            if (!_mind.TryGetMind(uid, out var mindId, out var mind))
                 continue;
 
-            if (!TryComp<MetaDataComponent>(ling.Owner, out var metaData))
-                continue;
-
+            var name = Name(uid);
             if (ling.TotalAbsorbedEntities > mostAbsorbed)
             {
                 mostAbsorbed = ling.TotalAbsorbedEntities;
-                mostAbsorbedName = _objective.GetTitle((mindId, mind), metaData.EntityName);
+                mostAbsorbedName = _objective.GetTitle((mindId, mind), name);
             }
             if (ling.TotalStolenDNA > mostStolen)
             {
                 mostStolen = ling.TotalStolenDNA;
-                mostStolenName = _objective.GetTitle((mindId, mind), metaData.EntityName);
+                mostStolenName = _objective.GetTitle((mindId, mind), name);
             }
         }
 

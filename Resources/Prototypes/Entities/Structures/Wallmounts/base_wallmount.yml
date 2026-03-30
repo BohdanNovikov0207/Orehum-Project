@@ -6,8 +6,13 @@
     snap:
     - Wallmount
   components:
+  - type: Anchorable
+    flags:
+    - Anchorable
+  - type: Rotatable
   - type: Physics
     canCollide: false
+  - type: Fixtures # Trauma - stop fucking shitting up my map yml
   - type: Clickable
   - type: WallMount
   - type: InteractionOutline

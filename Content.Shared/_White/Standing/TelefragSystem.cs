@@ -24,20 +24,16 @@ public sealed class TelefragSystem : EntitySystem
         EntityCoordinates coords,
         TimeSpan knockdownTime,
         float range = 0.3f,
-        bool behavior = false,
-        bool autoStandUp = false)
+        bool drop = true,
+        bool autoStand = false)
     {
-        if (range <= 0f)
+        if (range <= 0f || knockdownTime <= TimeSpan.Zero)
             return;
 
         var entities = _lookup.GetEntitiesInRange(coords, range, LookupFlags.Dynamic);
         foreach (var ent in entities.Where(ent => ent != uid && !_standing.IsDown(ent)))
         {
-            if (knockdownTime > TimeSpan.Zero && _stun.TryKnockdown(ent, knockdownTime))
-                continue;
-
-            if (_stun.TryCrawling(ent) && autoStandUp)
-                _stun.TryStand(ent!);
+            _stun.TryKnockdown(ent, knockdownTime, true, autoStand: autoStand, drop: drop);
         }
     }
 }

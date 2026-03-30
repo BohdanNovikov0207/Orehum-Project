@@ -70,7 +70,13 @@
 - type: entity
   id: BowImprovised
   parent: BaseBow
+  name: improvised shortbow
   components:
+  # <Trauma>
+  - type: Tag
+    tags:
+    - BowImprovised
+  # </Trauma>
   - type: Sprite
     layers:
     - state: unwielded

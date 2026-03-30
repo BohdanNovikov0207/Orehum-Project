@@ -8,7 +8,6 @@ using Content.Server.Nuke;
 using Content.Server.Popups;
 using Content.Server.RoundEnd;
 using Content.Server.Shuttles.Systems;
-using Content.Server.Station.Components;
 using Content.Server.Station.Systems;
 using Content.Shared._White.Xenomorphs;
 using Content.Shared._White.Xenomorphs.Caste;
@@ -17,6 +16,7 @@ using Content.Shared.GameTicking.Components;
 using Content.Shared.Humanoid;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Mobs.Systems;
+using Content.Shared.Station.Components;
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
@@ -24,7 +24,6 @@ using Robust.Shared.Timing;
 using Robust.Shared.Utility;
 using Robust.Server.Audio; // Goobstation - Play music on announcement
 using Content.Server.Ghost.Roles.Components;
-using Content.Shared.Station.Components;
 
 namespace Content.Server._White.GameTicking.Rules;
 
@@ -321,7 +320,7 @@ public sealed class XenomorphsRuleSystem : GameRuleSystem<XenomorphsRuleComponen
         var humans = new List<EntityUid>();
         stationGrids ??= GetStationGrids();
 
-        var players = AllEntityQuery<HumanoidAppearanceComponent, ActorComponent, MobStateComponent, TransformComponent>();
+        var players = AllEntityQuery<HumanoidProfileComponent, ActorComponent, MobStateComponent, TransformComponent>();
         while (players.MoveNext(out var uid, out _, out _, out var mobStateComponent, out var xform))
         {
             if (_mobState.IsDead(uid, mobStateComponent)
@@ -360,7 +359,7 @@ public sealed class XenomorphsRuleSystem : GameRuleSystem<XenomorphsRuleComponen
         var stationGrids = new HashSet<EntityUid>();
         foreach (var station in _gameTicker.GetSpawnableStations())
         {
-            if (TryComp<StationDataComponent>(station, out var _) && _station.GetLargestGrid(station) is { } grid)
+            if (_station.GetLargestGrid(station) is { } grid)
                 stationGrids.Add(grid);
         }
 

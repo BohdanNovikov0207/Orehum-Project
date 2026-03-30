@@ -5,9 +5,9 @@
   description: This little mothroach has mopshoes on its feet! How adorable!
   components:
   - type: GhostRole
+    prob: 0 # Trauma
     name: ghost-role-information-moproach-name
     description: ghost-role-information-moproach-description
-    rules: ghost-role-information-sentientanimal-rules # Goobstation Sentient Animal PR
   - type: Sprite
     sprite: Mobs/Animals/mothroach/moproach.rsi
   - type: Clothing

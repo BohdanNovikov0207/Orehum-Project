@@ -61,11 +61,12 @@
 using System.Diagnostics.CodeAnalysis;
 using Content.Shared.Actions;
 using Content.Shared.Alert;
-using Content.Goobstation.Maths.FixedPoint;
+using Content.Shared.FixedPoint;
 using Content.Shared.IdentityManagement;
 using Content.Shared.Interaction.Events;
 using Content.Shared.Popups;
 using Content.Shared.Throwing;
+using Content.Shared.Weapons.Ranged.Components;
 using Content.Shared.Weapons.Ranged.Events;
 using Robust.Shared.Timing;
 
@@ -124,6 +125,10 @@ public sealed class PacificationSystem : EntitySystem
     {
         if (HasComp<PacifismAllowedGunComponent>(args.Used))
             return;
+
+        if (TryComp<BatteryWeaponFireModesComponent>(args.Used, out var component))
+            if (component.FireModes[component.CurrentFireMode].PacifismAllowedMode)
+                return;
 
         // Disallow firing guns in all cases.
         ShowPopup(ent, args.Used, "pacified-cannot-fire-gun");
@@ -193,9 +198,6 @@ public sealed class PacificationSystem : EntitySystem
 
     private void OnBeforeThrow(Entity<PacifiedComponent> ent, ref BeforeThrowEvent args)
     {
-        if (ent.Owner != args.PlayerUid) // Goobstation
-            return;
-
         var thrownItem = args.ItemUid;
         var itemName = Identity.Entity(thrownItem, EntityManager);
 
@@ -210,7 +212,7 @@ public sealed class PacificationSystem : EntitySystem
 
         // Tell the player why they can’t throw stuff:
         var cannotThrowMessage = ev.CancelReasonMessageId ?? "pacified-cannot-throw";
-        _popup.PopupEntity(Loc.GetString(cannotThrowMessage, ("projectile", itemName)), ent, ent);
+        _popup.PopupClient(Loc.GetString(cannotThrowMessage, ("projectile", itemName)), ent, ent); // Trauma - PopupClient not PopupEntity
     }
 
     private void OnPacifiedDangerousAttack(Entity<PacifismDangerousAttackComponent> ent, ref AttemptPacifiedAttackEvent args)

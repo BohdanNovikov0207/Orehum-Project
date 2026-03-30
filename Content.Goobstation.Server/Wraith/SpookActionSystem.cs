@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 using Content.Goobstation.Shared.Wraith.Components;
 using Content.Goobstation.Shared.Wraith.Events;
 using Content.Goobstation.Shared.Wraith.Spook;
@@ -6,13 +8,12 @@ using Content.Server.Actions;
 using Content.Server.Doors.Systems;
 using Content.Server.Fluids.EntitySystems;
 using Content.Server.Ghost;
-using Content.Server.Light.Components;
-using Content.Server.Light.EntitySystems;
-using Content.Server.Popups;
+using Content.Shared.Light.Components;
+using Content.Shared.Light.EntitySystems;
 using Content.Server.Power.Components;
-using Content.Server.Power.EntitySystems;
-using Content.Server.Storage.Components;
-using Content.Server.Storage.EntitySystems;
+using Content.Shared.Power.EntitySystems;
+using Content.Shared.Storage.Components;
+using Content.Shared.Storage.EntitySystems;
 using Content.Shared.Actions.Components;
 using Content.Shared.Doors.Components;
 using Content.Shared.Popups;
@@ -21,10 +22,9 @@ using Robust.Shared.Map;
 using Robust.Shared.Random;
 using Robust.Shared.Timing;
 using System.Linq;
-using Content.Server.Atmos.Components;
+using Content.Shared.Atmos.Components;
 using Content.Server.Atmos.EntitySystems;
 using Content.Shared.Humanoid;
-using Content.Shared.Storage.Components;
 
 namespace Content.Goobstation.Server.Wraith;
 
@@ -34,15 +34,15 @@ public sealed class SpookActionSystem : EntitySystem
 
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly PoweredLightSystem _poweredLight = default!;
+    [Dependency] private readonly SharedPoweredLightSystem _poweredLight = default!;
     [Dependency] private readonly FlammableSystem _flammableSystem = default!;
     [Dependency] private readonly DoorSystem _door = default!;
-    [Dependency] private readonly EntityStorageSystem _entityStorage = default!;
+    [Dependency] private readonly SharedEntityStorageSystem _entityStorage = default!;
     [Dependency] private readonly SmokeSystem _smoke = default!;
-    [Dependency] private readonly TransformSystem _transform = default!;
-    [Dependency] private readonly BatterySystem _battery = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
+    [Dependency] private readonly SharedBatterySystem _battery = default!;
     [Dependency] private readonly ActionsSystem _actions = default!;
-    [Dependency] private readonly PopupSystem _popup = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
 
     private EntityQuery<PoweredLightComponent> _poweredLightQuery;
     private EntityQuery<DoorComponent> _doorQuery;
@@ -50,7 +50,7 @@ public sealed class SpookActionSystem : EntitySystem
     private EntityQuery<ApcComponent> _apcQuery;
     private EntityQuery<ActionComponent> _actionQuery;
     private EntityQuery<FlammableComponent> _flammable;
-    private EntityQuery<HumanoidAppearanceComponent> _humanoidAppearanceQuery;
+    private EntityQuery<HumanoidProfileComponent> _humanoidAppearanceQuery;
 
     public override void Initialize()
     {
@@ -62,7 +62,7 @@ public sealed class SpookActionSystem : EntitySystem
         _apcQuery = GetEntityQuery<ApcComponent>();
         _actionQuery = GetEntityQuery<ActionComponent>();
         _flammable = GetEntityQuery<FlammableComponent>();
-        _humanoidAppearanceQuery = GetEntityQuery<HumanoidAppearanceComponent>();
+        _humanoidAppearanceQuery = GetEntityQuery<HumanoidProfileComponent>();
 
         SubscribeLocalEvent<SpookMarkComponent, SpookEvent>(OnSpookEvent);
 
