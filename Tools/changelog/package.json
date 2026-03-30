@@ -1,0 +1,7 @@
+{
+    "_credit": "Originally from https://github.com/DeltaV-Station/Delta-v/pull/11/files by DebugOk. Rewritten by deltanedas",
+    "name": "changelogs",
+    "dependencies": {
+        "js-yaml": "^4.1.0"
+    }
+}
