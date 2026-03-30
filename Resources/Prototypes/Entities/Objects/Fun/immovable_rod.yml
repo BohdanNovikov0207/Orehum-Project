@@ -56,7 +56,6 @@
     follow: true
     location: immovable rod
 
-# goob edit
 - type: entity
   id: ImmovableRodDespawn
   suffix: Despawn
