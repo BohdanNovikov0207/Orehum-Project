@@ -102,15 +102,16 @@
   objective: roles-antag-nuclear-operative-objective
   requirements:
   - !type:OverallPlaytimeRequirement
-    time: 36000 # 10 hours - Goobstation
-  - !type:DepartmentTimeRequirement
+    time: 10h # Goob - was 5h
+  - !type:DepartmentTimeRequirement # Goob
     department: Security
-    time: 36000 # 10h Goobstation
-  - !type:SpeciesRequirement
+    time: 10h
+  - !type:SpeciesRequirement # Goob
     inverted: true
     species:
     - Plasmaman
   guides: [ NuclearOperatives ]
+  creditImage: /Textures/_Trauma/EndCredits/Antags/nukeops.png # Trauma
 
 - type: antag
   id: NukeopsMedic
@@ -120,18 +121,19 @@
   objective: roles-antag-nuclear-operative-agent-objective
   requirements:
   - !type:OverallPlaytimeRequirement
-    time: 90000 # 25 hours - Goobstation
-  - !type:DepartmentTimeRequirement
+    time: 25h # Goob - was 5h
+  - !type:DepartmentTimeRequirement # Goob
     department: Security
-    time: 36000 # 10h Goobstation
+    time: 10h
   - !type:RoleTimeRequirement
     role: JobChemist
-    time: 18000 # 5h Goobstation
-  - !type:SpeciesRequirement
+    time: 5h # Goob - was 3h
+  - !type:SpeciesRequirement # Goob
     inverted: true
     species:
     - Plasmaman
   guides: [ NuclearOperatives ]
+  dontShowInCredits: true # Trauma
 
 - type: antag
   id: NukeopsCommander
@@ -141,19 +143,20 @@
   objective: roles-antag-nuclear-operative-commander-objective
   requirements:
   - !type:OverallPlaytimeRequirement
-    time: 90000 # 25 hours - Goobstation
+    time: 25h # Goob - was 5h
   - !type:DepartmentTimeRequirement
     department: Security
-    time: 36000 # 10h Goobstation
-  - !type:DepartmentTimeRequirement
+    time: 10h # Goob - was 5h
+  - !type:DepartmentTimeRequirement # Goob
     department: Command
-    time: 18000 # 5h Goobstation
+    time: 5h
 # should be changed to nukie playtime when thats tracked (wyci)
-  - !type:SpeciesRequirement
+  - !type:SpeciesRequirement # Goob
     inverted: true
     species:
     - Plasmaman
   guides: [ NuclearOperatives ]
+  dontShowInCredits: true # Trauma
 
 - type: startingGear
   id: SyndicateOperativeGearFullNoUplink
@@ -166,7 +169,7 @@
     gloves: ClothingHandsGlovesCombat
     #outerClothing: ClothingOuterHardsuitSyndie # goobstation - duke nukies
     shoes: ClothingShoesBootsCombatFilled
-    id: SyndiPDANukie # Goobstation
+    id: SyndiOperativePDA
     pocket2: PlushieCarp
     belt: ClothingBeltMilitaryWebbing
   storage:
@@ -186,7 +189,7 @@
   id: NukeopsOutfit
   name: roles-antag-nuclear-operative-name
   startingGear: SyndicateOperativeGearFullNoUplink
-  icon: "JobIconSyndicate"
+  icon: "JobIconSyndicateOperative"
   equipment:
     head: ClothingHeadHelmetHardsuitSyndie
     neck: ClothingNeckScarfStripedSyndieRed
@@ -196,18 +199,19 @@
   id: SyndicateCommanderGearFull
   parent: SyndicateOperativeGearFullNoUplink
   equipment:
+    id: SyndiCommanderPDA
     neck: SyndicateWhistle
     pocket2: BaseUplinkRadio350TC # goobstation - im rich :fire::fire:
     #outerClothing: ClothingOuterHardsuitSyndieCommander # goobstation - duke nukies
     ears: ClothingHeadsetAltSyndicateCommander # goob - loudspeaker
   inhand:
-  - NukeOpsDeclarationOfWar
+  - ToolboxSyndicateFilledWar # Trauma
 
 - type: chameleonOutfit
   id: NukeopsCommanderOutfit
   name: roles-antag-nuclear-operative-commander-name
   startingGear: SyndicateCommanderGearFull
-  icon: "JobIconSyndicate"
+  icon: "JobIconSyndicateCommander"
   equipment:
     head: ClothingHeadHelmetHardsuitSyndieCommander
     neck: ClothingNeckScarfStripedSyndieGreen
@@ -218,12 +222,11 @@
   parent: SyndicateOperativeGearFullNoUplink
   equipment:
     back: ClothingBackpackDuffelSyndicateMedical # Goobstation
-    eyes: ClothingEyesHudSyndicateAgent # Goob edit
+    eyes: ClothingEyesHudSyndicate
     #outerClothing: ClothingOuterHardsuitSyndieMedic # goobstation - duke nukies
     shoes: ClothingShoesBootsMagSyndie
-    id: SyndiAgentPDA
-    belt: ClothingBeltChemBagSyndiFilled # Goobstation
-    pocket2: BaseUplinkRadio225TCMedic
+    belt: ClothingBeltChemBagSyndiFilled # Goobstation - replace webbing
+    pocket2: BaseUplinkRadio225TCMedic # Goob
   storage:
     back:
     - SyndiHypo
@@ -241,7 +244,7 @@
   id: NukeopsMedicOutfit
   name: roles-antag-nuclear-operative-agent-name
   startingGear: SyndicateOperativeMedicFull
-  icon: "JobIconSyndicate"
+  icon: "JobIconSyndicateCorpsman"
   equipment:
     head: ClothingHeadHelmetHardsuitSyndieMedic
     neck: ClothingNeckScarfStripedLightBlue

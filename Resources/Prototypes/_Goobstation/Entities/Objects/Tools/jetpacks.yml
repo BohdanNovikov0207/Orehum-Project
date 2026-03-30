@@ -24,8 +24,8 @@
       volume: 1000
       temperature: 1
       moles:
-        - 10000 # oxygen
-        - 10000 # nitrogen
+        Oxygen: 10000
+        Nitrogen: 10000
   - type: Jetpack
     moleUsage: 0.00002
   - type: MovementSpeedModifier
@@ -66,9 +66,9 @@
   suffix: Filled
   components:
   - type: GasTank
-    outputPressure: 18
+    outputPressure: 18.2
     air:
       volume: 5
       temperature: 293.15
       moles:
-        - 2.05137905 # oxygen
+        Oxygen: 2.05137905

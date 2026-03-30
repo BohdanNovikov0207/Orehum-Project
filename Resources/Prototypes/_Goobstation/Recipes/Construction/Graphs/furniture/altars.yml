@@ -138,21 +138,13 @@
       - tag: PowerCellSmall
         name: construction-graph-tag-power-cell-small
         doAfter: 3
-    - to: DragonAltarNode
+    - to: ConvertOrangeNode
       completed:
       - !type:SnapToGrid
         southRotation: true
       steps:
-      - tag: PlushieCarp
-        name: construction-graph-tag-plushie-carp
-        doAfter: 3
-    - to: EmpireAltarNode
-      completed:
-      - !type:SnapToGrid
-        southRotation: true
-      steps:
-      - tag: Book
-        name: construction-graph-tag-book
+      - tag: BowImprovised
+        name: construction-graph-tag-improvised-bow
         doAfter: 3
 
   #Nullrod Altars
@@ -300,25 +292,13 @@
       - tool: Prying
         doAfter: 1
 
-  - node: DragonAltarNode
-    entity: AltarDragon
+  - node: ConvertOrangeNode
+    entity: AltarConvertOrange
     edges:
     - to: AltarConvertNode
       completed:
       - !type:SpawnPrototype
-        prototype: PlushieCarp
-        amount: 1
-      steps:
-      - tool: Prying
-        doAfter: 1
-
-  - node: EmpireAltarNode
-    entity: AltarEmpire
-    edges:
-    - to: AltarConvertNode
-      completed:
-      - !type:SpawnPrototype
-        prototype: BookRandom
+        prototype: BowImprovised
         amount: 1
       steps:
       - tool: Prying

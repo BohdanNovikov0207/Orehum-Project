@@ -12,12 +12,6 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 ## Static
-- type: latheRecipePack
-  id: SecurityAmmoStaticGoob
-  recipes:
-  - MagazineBoxShotgunHighCaliber
-  - MagazineBoxShotgunSlugHighCaliber
-  - MagazineBoxShotgunPracticeHighCaliber
 
 - type: latheRecipePack
   id: SecurityEquipmentStaticGoob
@@ -35,39 +29,15 @@
   - CartridgeSaline
   - SecHypo
 
-- type: latheRecipePack
-  id: SecurityWeaponsStaticGoob
-  recipes:
-  - PolymerBaton
-  - SpearTelescopic
-
-- type: latheRecipePack
-  id: SecurityWeaponsNonEmaggableStaticGoob # At some point Terminus should be mapped and not printable, at least without research.
-  recipes:
-  - Terminus
-
-- type: latheRecipePack
-  id: ERTAmmoStaticGoob
-  recipes:
-  - MagazineBoxLightRifle
-  - MagazineLightRifleEmpty
-  - MagazineLightRifle
-  - MagazineMagnumEmpty
-  - MagazineMagnum
-  - MagazineBoxShotgunHighCaliber
-
 ## Dynamic
 - type: latheRecipePack
   id: SecurityWeaponsGoob
   recipes:
-  - WeaponSubMachineSmart
   - WeaponEnergyRifle
-  - WeaponEnergyIonRifle
   - WeaponLaserCellRevolver
   - WeaponLaserCellSMG
   - WeaponLaserCellSniper
   - ClothingBackpackLMGBattery
-  - ClothingEyesGlassesSecurityContraDetect
 
 - type: latheRecipePack
   id: SecurityAmmoGoob
@@ -76,10 +46,9 @@
   - EnergyMagRifleIon
   - EnergyMagRifleDisabler
   - EnergyMagRifleLethal
-  - MagazineSmart
-  - MagazineBoxShotgunIncendiaryHighCaliber
-  - MagazineBoxShotgunBeanbagHighCaliber
-  - MagazineBoxShotgunUraniumHighCaliber
+  # - MagazineBoxShotgunIncendiaryHighCaliber # Trauma - remove 8 gauge
+  # - MagazineBoxShotgunBeanbagHighCaliber
+  # - MagazineBoxShotgunUraniumHighCaliber
   - PowerCellIRRevolver
   - PowerCellIonRevolver
   - PowerCellXrayRevolver
@@ -93,10 +62,6 @@
   - PowerCellXraySniper
   - PowerCellOverchargedSniper
   - MilitaryPowerCellLMG
-  - PowerCellBluespaceRevolver
-  - PowerCellBluespaceSMG
-  - PowerCellBluespaceSniper
-  - MilitaryPowerCellBluespaceLMG
 
 - type: latheRecipePack
   id: SecurityEquipmentDynamicGoob

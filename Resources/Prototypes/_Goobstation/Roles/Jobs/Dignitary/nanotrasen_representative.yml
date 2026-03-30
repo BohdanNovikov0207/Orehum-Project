@@ -95,20 +95,15 @@
 
 - type: job
   id: NanotrasenRepresentative
-  enabled: false
-  name: Nanotrasen Representative
-  description: "Represent NT, Send reports back to them on the station's situation, Inform the heads of anything CentCom orders them to do."
+  name: job-name-ntr
+  description: job-description-ntr
   playTimeTracker: JobNanotrasenRepresentative
   requirements:
     - !type:DepartmentTimeRequirement
       department: Command
-      time: 9999999999 #muhehehe
+      time: 50h
     - !type:AgeRequirement
       requiredAge: 21
-    - !type:SpeciesRequirement # Goob - None Felinid
-      inverted: true
-      species:
-      - Felinid
   weight: 20
   startingGear: NanotrasenRepresentativeGear
   icon: "JobIconNanotrasenRepresentative"
@@ -117,8 +112,6 @@
   supervisors: job-supervisors-centcom
   canBeAntag: false
   guides:
-  - NanotrasenRepSOP
-  - SOP
   - SpaceLaw
   - Writing
   access:

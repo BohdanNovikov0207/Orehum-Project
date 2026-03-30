@@ -34,6 +34,7 @@
     - BaseSimpleMob
     - MobBloodstream
     - MobFlammable
+    - BaseMobAnimal
   id: MobGondola
   description: Having no hands he embodies the Taoist principle of wu-wei (non-action) while his smiling facial expression shows his utter and complete acceptance of the world as it is.
   components:
@@ -56,14 +57,12 @@
   - type: StatusEffects
     allowed:
       - Stun
-      - KnockedDown
       - SlowedDown
       - Stutter
       - Electrocution
       - ForcedSleep
       - TemporaryBlindness
       - Pacified
-      - StaminaModifier
   - type: FloatingVisuals
   - type: NpcFactionMember
     factions:
@@ -115,7 +114,10 @@
     - id: FoodMeatGondola
       amount: 3
   - type: Bloodstream
-    bloodMaxVolume: 150
+    bloodReferenceSolution:
+      reagents:
+      - ReagentId: Blood
+        Quantity: 150
   - type: Damageable
     damageContainer: Biological
     damageModifierSet: Scale
@@ -128,7 +130,6 @@
   - type: ReplacementAccent
     accent: gondola
   - type: LanguageSpeaker # Einstein Engines - Language
-  - type: LanguageKnowledge # Einstein Engines - Language
     speaks:
     - TauCetiBasic # Replacement Accent will have to do for now until custom language.
     understands:
@@ -136,9 +137,6 @@
   - type: HTN
     rootTask:
       task: IdleCompound
-  - type: Body
-    prototype: Animal
-    bodyType: Simple
   - type: Climbing
   - type: NameIdentifier
     group: GenericNumber
@@ -183,7 +181,7 @@
   - type: NpcFactionMember
     factions:
     - Syndicate
-  - type: LanguageKnowledge # Einstein Engines - Language
+  - type: LanguageSpeaker # Einstein Engines - Language
     speaks:
     - Moffic
     understands:
@@ -260,7 +258,6 @@
     speechSounds: Squeak
     allowedEmotes: ['Squeak']
   - type: LanguageSpeaker # Einstein Engines - Language
-  - type: LanguageKnowledge # Einstein Engines - Language
     speaks:
     - TauCetiBasic
     understands:
@@ -277,15 +274,17 @@
       0: Alive
       100: Dead
   - type: Bloodstream
-    bloodReagent: InsectBlood
-    bloodMaxVolume: 40
+    bloodReferenceSolution:
+      reagents:
+      - ReagentId: InsectBlood
+        Quantity: 40
   - type: Tag
     tags:
     - Trash
     - VimPilot
   - type: Butcherable
-    spawned: []
-    #- id: SpawnLootLootbug
+    spawned:
+      - id: SpawnLootLootbug
   - type: NpcFactionMember # they're pests, makes them the target of shiva and aves
     factions:
       - Mouse
@@ -317,7 +316,7 @@
 - type: entity
   name: space carp
   id: MobCarpSentient
-  parent: [ SimpleSpaceMobBase, FlyingMobBase, MobCombat ]
+  parent: [ AppearanceCarp, SimpleSpaceMobBase, FlyingMobBase, MobCombat ]
   description: It's a space carp. Used to be a person.
   components:
   - type: InputMover
@@ -359,7 +358,7 @@
     baseWalkSpeed: 2.5
     baseSprintSpeed: 3.5
   - type: Stamina
-    critThreshold: 100
+    baseCritThreshold: 100
   - type: DamageStateVisuals
     states:
       Alive:
@@ -396,19 +395,11 @@
     interactFailureString: petting-failure-carp
     interactFailureSound:
       path: /Audio/Effects/bite.ogg
-  - type: Body # Shitmed: Special carp organs
-    prototype: Carp
-    bodyType: Simple
-  - type: SurgeryTarget # Shitmed
-  - type: UserInterface # Shitmed
-    interfaces:
-      enum.SurgeryUIKey.Key:
-        type: SurgeryBui
-  - type: NightVision # Goobstation - Nigthvision
+  - type: NightVision
     color: "#808080"
     activateSound: null
     deactivateSound: null
-  - type: LanguageKnowledge # Einstein Engines - Language (prevent universal)
+  - type: LanguageSpeaker
     speaks:
     - TauCetiBasic # Is sentient, should have TauCeti since it's the norm.
     understands:
@@ -488,8 +479,10 @@
       0: Alive
       50: Dead
   - type: Bloodstream
-    bloodReagent: Blood
-    bloodMaxVolume: 40
+    bloodReferenceSolution:
+      reagents:
+      - ReagentId: Blood
+        Quantity: 40
   - type: Tag
     tags:
     - Trash
@@ -509,7 +502,7 @@
         Slash: 10
   - type: Item
     size: Tiny
-  - type: LanguageKnowledge # Einstein Engines - Language
+  - type: LanguageSpeaker # Einstein Engines - Language
     speaks:
     - TauCetiBasic # Is sentient, should have TauCeti since it is norm.
     understands:
@@ -560,8 +553,10 @@
     - type: Speech
       speechVerb: Cluwne
     - type: Bloodstream
-      bloodMaxVolume: 150
-      bloodReagent: Laughter
+      bloodReferenceSolution:
+        reagents:
+        - ReagentId: Laughter
+          Quantity: 150
     - type: Clumsy
     - type: NoSlip
     - type: Tag
@@ -580,15 +575,14 @@
   - type: HTN
     rootTask:
       task: SimpleHostileCompound
-  - type: SpamEmitSound
-    minInterval: 5
-    maxInterval: 15
-    sound:
-      path: /Audio/_Goobstation/Wraith/Mobs/brullbar/brullbar_roar.ogg
-      params:
-          volume: 1
-          maxDistance: 20
-          variation: 0.01
+  - type: AutoEmote
+    emotes:
+    - BrullbarHowl
+  - type: Vocal
+    sounds:
+      Male: Brullbar
+      Female: Brullbar
+      Unsexed: Brullbar
   - type: NpcFactionMember
     factions:
     - SimpleHostile
@@ -735,7 +729,7 @@
       spawned:
       - id: FoodMeat
         amount: 1
-    - type: LanguageKnowledge # Einstein Engines - Language
+    - type: LanguageSpeaker # Einstein Engines - Language
       speaks:
       - Dog
       understands:
@@ -762,7 +756,6 @@
     speechVerb: HorseVerb
     speechSounds: HorseSpeech
   - type: LanguageSpeaker # Einstein Engines - Language
-  - type: LanguageKnowledge # Einstein Engines - Language
     speaks:
     - Cheval
     understands:
@@ -815,8 +808,6 @@
     attributes:
       proper: true
       gender: male
-  - type: Sprinter
-    staminaDrainRate: 2
   - type: TemperatureSpeed
     thresholds:
       293: 0.8
@@ -909,8 +900,10 @@
       types:
         Blunt: 0.1
   - type: Bloodstream
-    bloodMaxVolume: 50
-    bloodReagent: Honk
+    bloodReferenceSolution:
+      reagents:
+      - ReagentId: Honk
+        Quantity: 50
   - type: FootstepModifier
     footstepSoundCollection:
       collection: FootstepClown

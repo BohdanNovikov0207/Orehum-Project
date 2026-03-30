@@ -6,6 +6,7 @@
   categories:
   - Mech
   - Parts
+  - MechEquipment # Goobstation
   completetime: 10
   materials:
     Steel: 500
@@ -17,15 +18,11 @@
   parent: BaseMechEquipmentRecipe
   id: MechEquipmentGrabber
   result: MechEquipmentGrabber
-  categories: # Goobstation
-  - MechEquipment
 
 - type: latheRecipe
   parent: BaseMechEquipmentRecipe
   id: MechEquipmentGrabberSmall
   result: MechEquipmentGrabberSmall
-  categories:
-  - MechEquipment # Goobstation
   materials:
     Steel: 400
     Plastic: 100
@@ -34,8 +31,6 @@
   parent: BaseMechEquipmentRecipe
   id: MechEquipmentHorn
   result: MechEquipmentHorn
-  categories:
-  - MechEquipment # Goobstation
   materials:
     Steel: 500
     Bananium: 200

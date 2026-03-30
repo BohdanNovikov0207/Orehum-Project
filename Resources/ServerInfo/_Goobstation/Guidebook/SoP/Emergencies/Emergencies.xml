@@ -1,10 +1,18 @@
+<!--
+SPDX-FileCopyrightText: 2024 John Willis <143434770+CerberusWolfie@users.noreply.github.com>
+SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
+SPDX-FileCopyrightText: 2025 Solstice <solsticeofthewinter@gmail.com>
+
+SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+
 <Document>
-# Аварийные процедуры
-Это список процедур, которые следует (в идеале) соблюдать при определенных обстоятельствах. Речь идет о различных чрезвычайных ситуациях и уровнях враждебности/угрозы для станции.
+# Emergency Procedures
+This is the list of procedures that should (ideally) be followed in certain circumstances. This is a variety of emergencies and levels of hostiliy/threat to the station.
 
-Командованию и службе безопасности следует использовать этот раздел, чтобы определить уровень опасности для данной станции и выбрать соответствующие меры реагирования.
+Command and Security should utilize this section to differentiate the danger level for this station and choose appropriate reactions.
 
-В этой папке находятся следующие аварийные ситуации:
+The following emergencies are underneath this folder:
 - [textlink="Confirmed Revolutions" link="ConfirmedRevs SOP"]
 - [textlink="Containment Failures (Tesla/Singularity)" link="ContainmentFail SOP"]
 - [textlink="Fire/Gas Spills" link="FireGasSpill SOP"]
@@ -12,5 +20,6 @@
 - [textlink="Supermatter Delamination" link="SMDelam SOP"]
 - [textlink="War Declaration" link="WarDeclaration SOP"]
 - [textlink="Zombie Outbreak" link="Zombie SOP"]
+- [textlink="Emergency Response Team" link="EmergencyResponseTeam SOP"]
 
 </Document>

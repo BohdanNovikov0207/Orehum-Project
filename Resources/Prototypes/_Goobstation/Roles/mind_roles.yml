@@ -18,18 +18,6 @@
 
 - type: entity
   parent: BaseMindRoleAntag
-  id: MindRoleChangeling
-  name: Changeling Role
-  components:
-  - type: MindRole
-    antagPrototype: Changeling
-    exclusiveAntag: true
-    roleType: SoloAntagonist
-    subtype: role-subtype-changeling
-  - type: ChangelingRole
-
-- type: entity
-  parent: BaseMindRoleAntag
   id: MindRoleHeretic
   name: Heretic Role
   components:
@@ -64,6 +52,27 @@
     subtype: role-subtype-brainwashed
   - type: MindcontrolledRole
 
+- type: entity
+  parent: MindRoleChangeling
+  id: MindRoleChangelingmidround
+  name: Sleeper Changeling Role
+  components:
+  - type: MindRole
+    exclusiveAntag: false           #  bastard experiment
+
+- type: entity
+  parent: MindRoleHeretic
+  id: MindRoleHereticmidround
+  name: Sleeper Heretic Role
+  components:
+  - type: MindRole
+    exclusiveAntag: false   # bastard experiment
+
+- type: entity
+  parent: DevilMindRole
+  id: DevilMindRolemidround
+  name: Sleeper Devil Role
+
 # Slasher
 - type: entity
   parent: BaseMindRoleAntag
@@ -76,16 +85,6 @@
     roleType: SoloAntagonist
     subtype: role-subtype-slasher
 
-# Goobstation Sentient Animal PR # This role is intended for all animals who aren't explicitly an antag
-- type: entity
-  parent: [ BaseMindRoleAntag, MindRoleGhostRoleNeutral ]
-  id: MindRoleGhostRoleSentientAnimal
-  name: Ghost Role (SentientAnimal)
-  components:
-  - type: MindRole
-    roleType: SentientAnimal
-    sortWeight: 30
-    
 #contractor
 - type: entity
   parent: BaseMindRoleAntag

@@ -51,7 +51,7 @@
   - type: FireProtection
     reduction: 0.1
   - type: FaceHuggerBlocker
-    
+
 - type: entity
   parent: ClothingHeadHatHoodHeretic
   id: ClothingHeadHatHoodHereticVoid
@@ -101,6 +101,16 @@
     state: icon
   - type: Clothing
     sprite: _Goobstation/Heretic/Clothing/Head/cosmos_hood.rsi
+
+- type: entity
+  parent: ClothingHeadHatHoodHeretic
+  id: ClothingHeadHatHoodHereticLock
+  components:
+  - type: Sprite
+    sprite: _Goobstation/Heretic/Clothing/Head/lock_hood.rsi
+    state: icon
+  - type: Clothing
+    sprite: _Goobstation/Heretic/Clothing/Head/lock_hood.rsi
 
 - type: entity
   parent: ClothingHeadBase

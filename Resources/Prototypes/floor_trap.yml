@@ -104,6 +104,7 @@
     - type: DeleteOnTrigger
 
 - type: entity
+  abstract: true # Trauma - no chud xenos
   parent: CollideFloorTrapSpawn
   id: SpawnFloorTrapXenoDrone
   suffix: Xeno. Drone
@@ -112,10 +113,11 @@
       fixtureID: floortrap
       maxTriggers: 1
     - type: SpawnOnTrigger
-      proto: CMMobXenoDrone # goob CM xenos
+      proto: MobXenoDrone
     - type: DeleteOnTrigger
 
 - type: entity
+  abstract: true # Trauma - no chud xenos
   parent: CollideFloorTrapSpawn
   id: SpawnFloorTrapXenoBurrower
   suffix: Xeno. Burrower
@@ -124,5 +126,5 @@
       fixtureID: floortrap
       maxTriggers: 1
     - type: SpawnOnTrigger
-      proto: CMMobXenoDrone # goob CM xenos
+      proto: MobXeno
     - type: DeleteOnTrigger

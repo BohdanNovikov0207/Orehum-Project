@@ -14,24 +14,13 @@
   - type: Clothing
     slots:
     - SUITSTORAGE
-    - Back
+    - BACK
     sprite: _Goobstation/Xenobiology/Specific/Xenobiology/slime_pack.rsi
   - type: ContainerContainer
     containers:
       tankbase: !type:Container
-        showEnts: False
-        occludes: True
-        ents: [ ]
       item: !type:ContainerSlot
-        showEnts: False
-        occludes: True
-        ent: null
       StorageTank: !type:Container
-        showEnts: False
-        occludes: True
-        ents: [ ]
-  - type: ResistLocker
-    resistTime: 10
   - type: Damageable
     damageContainer: StructuralInorganic
     damageModifierSet: Metallic

@@ -18,22 +18,15 @@
   - Monkey
   - Kobold
   - Abductor
-  - Yowie
   - IPC
   - Diona
-  - Harpy
   - Vox # Pasha
-  - Tajaran # Specism.
-  - Resomi # Sprites look shit on them.
-  - Oni # Same as above, plus it fucks over ERTs.
   - Gingerbread # Soecusn
   - Plasmaman
   - Reptilian
   - Moth
-  - Shadowkin # One flash is all it takes...
   - Arachnid
   - Vulpkanin
-  - Rodentia
   - SlimePerson
   - Dwarf
   - Feroxi
@@ -47,13 +40,6 @@
   - type: Speech
     speechVerb: HolierThanThou
   - type: GhostRole
-    requirements:
-    - !type:DepartmentTimeRequirement
-      department: Security
-      time: 36000 # Ten Hours
-    - !type:DepartmentTimeRequirement
-      department: Command
-      time: 108000 # Thirty hours. Fuck you.
 
 # Navy Officer
 
@@ -63,7 +49,7 @@
   suffix: CentComm
   components:
   - type: Sprite
-    sprite: _Goobstation/Clothing/Uniforms/Jumpsuit/Centcom/navy_gold.rsi
+    sprite: _Goobstation/Clothing/Uniforms/Jumpsuit/navy_gold.rsi
     state: icon
   - type: RandomMetadata
     nameSegments:
@@ -103,7 +89,7 @@
   suffix: ADMIN ONLY, DO FUCKING NOT
   components:
   - type: Sprite
-    sprite: _Goobstation/Clothing/Uniforms/Jumpsuit/Centcom/navy_gold.rsi
+    sprite: _Goobstation/Clothing/Uniforms/Jumpsuit/navy_gold.rsi
     state: icon
   - type: RandomMetadata
     nameSegments:
@@ -143,7 +129,7 @@
   suffix: CentComm
   components:
   - type: Sprite
-    sprite: _Goobstation/Clothing/Uniforms/Jumpsuit/Centcom/navy_gold.rsi
+    sprite: _Goobstation/Clothing/Uniforms/Jumpsuit/navy_gold.rsi
     state: icon
   - type: RandomMetadata
     nameSegments:
@@ -175,46 +161,6 @@
     - NamesMilitaryLast
     nameFormat: name-format-standard
 
-# Special Operations Officer
-
-- type: entity
-  id: RandomHumanoidSpawnerSpecialOperationsOfficers
-  name: Special Operations Officer
-  suffix: CentComm
-  components:
-  - type: Sprite
-    sprite: _Goobstation/Clothing/Uniforms/Jumpsuit/Centcom/navy_gold.rsi
-    state: icon
-  - type: RandomMetadata
-    nameSegments:
-    - NamesMilitaryFirstHighRank
-    - NamesMilitaryLast
-    nameFormat: name-format-standard
-  - type: RandomHumanoidSpawner
-    settings: SpecialOperationsOfficer
-
-- type: randomHumanoidSettings
-  id: SpecialOperationsOfficer
-  parent: CentcommHumanoid
-  randomizeName: false
-  components:
-  - type: AutoImplant
-    implants: [ FreedomImplant, BluespaceLifelineImplant, RadioImplantCentcomm, NutrimentPumpImplant, StypticStimulatorImplant]
-  - type: GhostRole
-    name: ghost-role-information-special-operations-officer-name
-    description: ghost-role-information-special-operations-officer-description
-    rules: ghost-role-information-special-operations-officer-rules
-    raffle:
-      settings: short
-  - type: Loadout
-    prototypes: [ SpecialOperationsOfficerGear ]
-    roleLoadout: [ RoleSurvivalEVA ]
-  - type: RandomMetadata
-    nameSegments:
-    - NamesMilitaryFirstHighRank
-    - NamesMilitaryLast
-    nameFormat: name-format-standard
-
 # Diplomat
 
 - type: entity
@@ -223,7 +169,7 @@
   suffix: CentComm
   components:
   - type: Sprite
-    sprite: _Goobstation/Clothing/Uniforms/Jumpsuit/Centcom/navy_gold.rsi
+    sprite: _Goobstation/Clothing/Uniforms/Jumpsuit/diplomat.rsi
     state: icon
   - type: RandomMetadata
     nameSegments:
@@ -263,7 +209,7 @@
   suffix: CentComm
   components:
   - type: Sprite
-    sprite: _Goobstation/Clothing/Uniforms/Jumpsuit/Centcom/navy_gold.rsi
+    sprite: _Goobstation/Clothing/Uniforms/Jumpsuit/navy_gold.rsi
     state: icon
   - type: RandomMetadata
     nameSegments:
@@ -434,7 +380,6 @@
     implants: [ FreedomImplant, NutrimentPumpImplant, SpaceProofImplant ]
   - type: RandomHumanoidAppearance
     randomizeName: false
-    hair: HairBald
   - type: GhostRole
     name: ghost-role-information-conquest-name
     description: ghost-role-information-conquest-description
@@ -448,7 +393,6 @@
   - type: Puller
     needsHands: false
     throwCooldown: 0.1
-  - type: GrabIntent
     stageChangeCooldown: 0.1
     grabThrowDamageModifier: 100
     grabThrownSpeed: 50
@@ -489,9 +433,10 @@
       - !type:GibBehavior { }
   - type: NoSlip
   - type: Temperature
-    heatDamageThreshold: 5000
     currentTemperature: 310.15
     specificHeat: 42
+  - type: TemperatureDamage
+    heatDamageThreshold: 5000
     heatDamage:
       types:
         Heat: -1
@@ -502,18 +447,18 @@
       1000: 1.5
       1500: 2
   - type: Stamina
-    critThreshold: 100000
+    baseCritThreshold: 100000
   - type: PassiveDamage
     allowedStates:
     - Alive
     - Critical
     - Dead
-    damageCap: 0
     damage:
       types:
         Heat: -3
-      groups:
-        Brute: -3
+        Blunt: -1
+        Slash: -1
+        Piercing: -1
   - type: StatusEffects
     allowed:
     - PressureImmunity

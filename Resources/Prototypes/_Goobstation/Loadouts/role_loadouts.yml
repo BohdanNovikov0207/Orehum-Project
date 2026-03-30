@@ -101,7 +101,6 @@
   - NanotrasenRepresentativeBelt
   - Glasses
   - Trinkets
-  - Animals
   - GroupSpeciesBreathTool
   - Survival
   - NanotrasenRepresentativeGloves
@@ -109,62 +108,27 @@
   - NanotrasenRepresentativeEnvirohelm
   - NanotrasenRepresentativeEnvirosuit
   - NanotrasenRepresentativeEnvirogloves
-  - ExclusiveItems
+  - ExclusiveItems # Trauma
 
 - type: roleLoadout
-  id: JobBlueshieldOfficer
+  id: RoleSurvivalNukieHonkops
   groups:
-  - BlueshieldOfficerHead
-  - BlueshieldOfficerJumpsuit
-  - BlueshieldOfficerBackpack
-  - BlueshieldOfficerOuter
-  - BlueshieldOfficerNeck
-  - BlueshieldOfficerMask
-  - BlueshieldOfficerShoes
-  - Trinkets
-  - Animals
-  - GroupSpeciesBreathTool
-  - SurvivalSecurity
-  # Goobstation - EE Plasmeme Change.
-  - BlueshieldOfficerEnvirohelm
-  - BlueshieldOfficerEnvirosuit
-  - BlueshieldOfficerEnvirogloves
-  - BlueshieldOfficerGloves
-  - ExclusiveItems
-
-- type: roleLoadout
-  id: JobNanotrasenCareerTrainer
-  groups:
-  - GroupTankHarness
-  - NanotrasenTrainerHead
-  - NanotrasenTrainerJumpsuit
-  - NanotrasenTrainerOuterClothing
-  - NanotrasenTrainerBackpack
-  - NanotrasenTrainerShoes
-  - NanotrasenTrainerGloves
-  - NanotrasenTrainerBelt
-  - Trinkets
-  - Animals
-  - GroupSpeciesBreathTool
-  - Survival
-  # Goobstation - EE Plasmeme Change.
-  - CentComOfficerEnvirohelm
-  - CentComOfficerEnvirosuit
-  - CentComOfficerEnvirogloves
-  - ExclusiveItems
+  - SurvivalSyndicate
+  - GroupHonkopsMask
+  - GroupPocketTankDouble
 
 - type: roleLoadout
   id: JobRoboticist
   groups:
   - GroupTankHarness
-  - RoboticistHead
+  - ScientistHead
   - ScientistNeck
-  - RoboticistJumpsuit
-  - RoboticistBackpack
-  - RoboticistOuterClothing
-  - RoboticistGloves
-  - RoboticistShoes
-  - RoboticistPDA
+  - ScientistJumpsuit
+  - ScientistBackpack
+  - ScientistOuterClothing
+  - ScientistGloves
+  - ScientistShoes
+  - ScientistPDA
   - Glasses
   - Survival
   - Trinkets
@@ -173,7 +137,6 @@
   - ScientistEnvirohelm
   - ScientistEnvirosuit
   - ScientistEnvirogloves
-  - ExclusiveItems
 
 - type: roleLoadout
   id: JobBrigmedic
@@ -182,21 +145,16 @@
   - MedicalMask
   - BrigmedicJumpsuit
   - BrigmedicOuterClothing
-  - MedicalGloves
   - BrigmedicBackpack
-  - SecurityMelee # EE parity, make corpsman able to carry weapons like the rest of security
   - SecurityShoes
   - SecurityNeck
   - SurvivalSecurity
   - Trinkets
-  - Animals
-  - SecurityStar
   - GroupSpeciesBreathToolSecurity
-  # Goobstation - EE Plasmeme Change.
   - BrigmedicEnvirohelm
   - BrigmedicEnvirosuit
   - BrigmedicEnvirogloves
-  - ExclusiveItems
+  - ExclusiveItems # Trauma
 
 - type: roleLoadout
   id: JobRadioHost
@@ -205,14 +163,13 @@
   - CommonBackpack
   - Survival
   - Trinkets
-  - Animals
   - GroupSpeciesBreathTool
   - Glasses
   - GroupTankHarness
   - ServiceWorkerEnvirohelm
   - ServiceWorkerEnvirosuit
   - ServiceWorkerEnvirogloves
-  - ExclusiveItems
+  - ExclusiveItems # Trauma
 
 # gives plasmaman a plasma breathing tank
 # other species get nothing
@@ -248,19 +205,18 @@
 - type: roleLoadout
   id: JobVirologist
   groups:
-   - GroupTankHarness
-   - MedicalDoctorHead
-   - MedicalMask
-   - VirologistJumpsuit
-   - MedicalGloves
-   - VirologistBackpack
-   - VirologistOuterClothing
-   - MedicalShoes
-   - VirologistPDA
-   - SurvivalMedical
-   - Trinkets
-   - GroupSpeciesBreathToolMedical
-   - VirologyEnvirohelm
-   - VirologyEnvirosuit
-   - VirologyEnvirogloves
-   - ExclusiveItems
+  - GroupTankHarness
+  - MedicalDoctorHead
+  - MedicalMask
+  - VirologistJumpsuit
+  - VirologistBackpack
+  - VirologistOuterClothing
+  - MedicalShoes
+  - VirologistPDA
+  - SurvivalMedical
+  - Trinkets
+  - GroupSpeciesBreathToolMedical
+  - VirologyEnvirohelm
+  - VirologyEnvirosuit
+  - VirologyEnvirogloves
+  - ExclusiveItems # Trauma

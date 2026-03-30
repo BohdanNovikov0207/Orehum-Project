@@ -10,7 +10,6 @@
 # Shitmed Recipes
 
 - type: latheRecipe
-  parent: BaseSurgicalRecipe
   id: BoneGel
   result: BoneGel
   completetime: 2
@@ -19,7 +18,6 @@
     Plasma: 200
 
 - type: latheRecipe
-  parent: BaseSurgicalRecipe
   id: MedicalStitches
   result: MedicalStitches
   completetime: 2
@@ -28,7 +26,6 @@
     Plastic: 10
 
 - type: latheRecipe
-  parent: BaseSurgicalRecipe
   id: Bonesetter
   result: Bonesetter
   completetime: 2
@@ -38,7 +35,7 @@
 
 - type: latheRecipe
   id: MedicalCyberneticEyes
-  result: MedicalCyberneticEyes
+  result: OrganCyberneticEyesMedical
   categories:
   - Robotics
   completetime: 10
@@ -50,7 +47,6 @@
     Silver: 600
 
 - type: latheRecipe
-  parent: BaseSurgicalRecipe
   id: EnergyScalpel
   result: EnergyScalpel
   completetime: 2
@@ -60,7 +56,6 @@
     Gold: 150
 
 - type: latheRecipe
-  parent: BaseSurgicalRecipe
   id: AdvancedRetractor
   result: AdvancedRetractor
   completetime: 2
@@ -70,7 +65,6 @@
     Silver: 150
 
 - type: latheRecipe
-  parent: BaseSurgicalRecipe
   id: EnergyCautery
   result: EnergyCautery
   completetime: 2
@@ -80,7 +74,6 @@
     Plasma: 150
 
 - type: latheRecipe
-  parent: BaseSurgicalRecipe
   id: AdvancedBoneGel
   result: AdvancedBoneGel
   completetime: 2
@@ -90,7 +83,6 @@
     Plasma: 150
 
 - type: latheRecipe
-  parent: BaseSurgicalRecipe
   id: OmnimedTool
   result: OmnimedTool
   completetime: 4
@@ -102,7 +94,6 @@
     Silver: 300
 
 - type: latheRecipe
-  parent: BaseSurgicalRecipe
   id: ClothingHandsGlovesSurgical
   result: ClothingHandsGlovesSurgical
   completetime: 2
@@ -113,47 +104,8 @@
     BSCrystal: 100
 
 - type: latheRecipe
-  id: BasicCyberneticHeart
-  result: BasicCyberneticHeart
-  categories:
-  - Robotics
-  completetime: 10
-  materials:
-    Steel: 2000
-    Glass: 1000
-    Plastic: 1000
-    Gold: 1000
-    Silver: 600
-
-- type: latheRecipe
-  id: UpgradedCyberneticHeart
-  result: UpgradedCyberneticHeart
-  categories:
-  - Robotics
-  completetime: 10
-  materials:
-    Steel: 3000
-    Glass: 1500
-    Plastic: 1000
-    Gold: 1500
-    Silver: 900
-
-- type: latheRecipe
-  id: BasicCyberneticLiver
-  result: BasicCyberneticLiver
-  categories:
-  - Robotics
-  completetime: 5
-  materials:
-    Steel: 1000
-    Glass: 5000
-    Plastic: 500
-    Gold: 500
-    Silver: 300
-
-- type: latheRecipe
   id: BasicCyberneticLungs
-  result: BasicCyberneticLungs
+  result: OrganCyberneticLungs
   categories:
   - Robotics
   completetime: 10
@@ -166,7 +118,7 @@
 
 - type: latheRecipe
   id: UpgradedCyberneticLungs
-  result: UpgradedCyberneticLungs
+  result: OrganCyberneticLungsUpgraded
   categories:
   - Robotics
   completetime: 10

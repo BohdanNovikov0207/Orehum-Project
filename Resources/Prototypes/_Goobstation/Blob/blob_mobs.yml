@@ -43,8 +43,7 @@
         - HEAD
     - type: Tag
       tags:
-        - HidesHair
-        - BlobMob
+      - HidesHair
     - type: CollectiveMind
       defaultChannel: Blobmind
       channels:
@@ -71,7 +70,6 @@
     # - type: BlobSpeak
     # Einstein Engines - Language begin
     - type: LanguageSpeaker
-    - type: LanguageKnowledge
       speaks:
       - Blob
       understands:
@@ -127,6 +125,7 @@
     - type: GuideHelp
       guides:
       - Blob
+    - type: MovementIgnoreGravity # Trauma
 
 # Blobbernaut
 - type: entity
@@ -142,8 +141,7 @@
       damageModifierSet: BlobBlobbernaut
     - type: Tag
       tags:
-        - Blobbernaut
-        - BlobMob
+      - Blobbernaut
     - type: CollectiveMind
       defaultChannel: Blobmind
       channels:
@@ -165,7 +163,6 @@
     # - type: BlobSpeak
     # Einstein Engines - Language begin
     - type: LanguageSpeaker
-    - type: LanguageKnowledge
       speaks:
       - Blob
       understands:
@@ -228,6 +225,11 @@
         - map: [ "enum.DamageStateVisualLayers.BaseUnshaded" ]
           state: nautdamage
           shader: unshaded
+    - type: AnimatedEmotes
+      flexState: blobbernaut_flex
+      flexDefaultState: blobbernaut
+      flexDamageState: blobbernaut_flex_damage
+      flexDefaultDamageState: nautdamage
     - type: NightVision
       color: "#808080"
       activateSound: null
@@ -236,9 +238,12 @@
       guides:
       - Blob
     - type: Bloodstream
-      bloodMaxVolume: 300
-      bloodReagent: Blood
+      bloodReferenceSolution:
+        reagents:
+        - ReagentId: Blood
+          Quantity: 300
       bleedReductionAmount: 5
+    - type: MovementIgnoreGravity # Trauma
 
 # Observer
 - type: entity
@@ -256,7 +261,6 @@
     # Einstein Engines - Language begin
     - type: LanguageSpeaker
       currentLanguage: Blob
-    - type: LanguageKnowledge
       speaks:
       - Blob
       understands:
@@ -268,7 +272,7 @@
       showInHands: true
     - type: BlobObserver
     - type: Visibility
-      layer: 2 # Ghost visflag
+      layer: 2
     - type: ContentEye
     - type: MindContainer
     - type: Clickable
@@ -282,9 +286,6 @@
       rules: You are an antagonist, destroy the station!
       mindRoles:
       - MindRoleGhostRoleSoloAntagonist
-      requirements:
-      - !type:OverallPlaytimeRequirement
-        time: 18000 #5 hours
     - type: GhostTakeoverAvailable
     - type: Fixtures
       fixtures:

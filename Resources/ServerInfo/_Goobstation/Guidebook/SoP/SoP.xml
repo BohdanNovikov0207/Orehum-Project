@@ -1,55 +1,47 @@
+<!--
+SPDX-FileCopyrightText: 2024 John Willis <143434770+CerberusWolfie@users.noreply.github.com>
+SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
+
+SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+
 <Document>
-  # Стандартные Рабочие Процедуры (СРП)
-  Стандартные Рабочие Процедуры (СРП) — это набор инструкций,
-  которых должен придерживаться персонал станции в условиях
-  как наличия, так и отсутствия чрезвычайных ситуаций.
-  Эти указания помогут вам, как ценному члену экипажа, понять,
-  как действовать в особых ситуациях.
+# Standard Operating Procedure
+The Standard Operating Procedure, SOP, is the set of procedures for crew personnel to follow when there is (or isn't) an emergency on the station.
+These directives are here to assist you, as a valuable crew member on this station, with knowledge of what to do in these special scenarios.
 
-  Данные процедуры являются руководством, чтобы гарантировать,
-  что все действия соответствуют интересам NanoTrasen.
-  Несоблюдение этих правил может привести к увольнению
-  и/или понижению в должности.
+These procedures are a guideline to assure all actions follow Nanotrasen's best interest. Failure to follow these can result in dismissal and/or demotion from your job position.
 
-  <Box>Настоятельно [bold]рекомендуется[/bold] ознакомиться с разделами [bold]Стандартных процедур[/bold], [bold]Правовыми положениями[/bold] и [bold]СРП вашего отдела[/bold]!</Box>
+<Box>It is [bold]highly advised[/bold] to read over the [bold]Standard Procedures[/bold], [bold]Legal[/bold], and your [bold]Job Department[/bold] SOP!</Box>
 
-  ## Что определяют эти процедуры?
-  СРП охватывают различные протоколы для уровней тревоги,
-  порядок командования (преемственность командования),
-  обращение с заключёнными, идентификацию угроз и многое другое.
-  Ожидается, что вы будете следовать этим указаниям,
-  однако они могут быть адаптированы к конкретным ситуациям.
-  Если вы решите отступить от этих правил,
-  вы должны будете обосновать свои действия по запросу.
+## What Does This Define?
+The SOP outlines several procedures for alert levels, Chain of Command (command succession), treatment of prisoners, identification of threats, and much more.
+Adherence to these guidelines is expected but the guidelines are malleable to multiple scenarios. Should you choose to deviate from these guidelines, you must justify your actions when asked.
 
   <Box>
-    [bold]ПРИМЕЧАНИЕ:[/bold] Слепое следование СРП без учёта контекста —
-    [italic]крайне плохая идея[/italic] и не рекомендуется.
-    [bold]Контекст — превыше всего![/bold]
+    [bold]NOTE:[/bold] Blindly following SOP while ignoring context is a [italic]ridiciously bad idea[/italic] and is not suggested. [bold]Context is King![/bold]
   </Box>
   <Box>
-    Также следует помнить, что любые упоминания "Этой станции" или "Станции"
-    подразумевают ту станцию, на которой вы работаете в текущую смену.
-    Вы можете уточнить это в своём КПК.
+    Further note that any references to "This Station" or "Station" are assumed to be the station you are working on during this shift. You may find this on your PDA.
   </Box>
 
-  ## Общие процедуры станции
-  Следующие ссылки содержат общую информацию о станции:
-  - [textlink="Найм, повышение, перевод" link="Hiring SOP"]
-  - [textlink="Увольнение, понижение, увольнение" link="Demoting SOP"]
-  - [textlink="Порядок командования" link="Succession"]
-  - [textlink="Правовые положения" link="Legal SOP"]
-  - [textlink="Чрезвычайные ситуации" link="Emergencies SOP"]
-  - [textlink="Уровни тревоги" link="Alert Levels"]
+## General Station SOP
+The following links are for general knowledge of the station.
+- [textlink="Hiring, Promoting, Transferring" link="Hiring SOP"]
+- [textlink="Firing, Demoting, Terminating" link="Demoting SOP"]
+- [textlink="Chain of Command" link="Succession"]
+- [textlink="Legal" link="Legal SOP"]
+- [textlink="Emergencies" link="Emergencies SOP"]
+- [textlink="Alert Levels" link="Alert Levels"]
 
-  ## Общие СРП отделов
-  Следующие ссылки ведут к общим СРП отделов:
-  - [textlink="Отдел снабжения" link="Cargo SOP"]
-  - [textlink="Командный отдел" link="Command SOP"]
-  - [textlink="Отдел дипломатии" link="Dignitary SOP"]
-  - [textlink="Инженерный отдел" link="Engineering SOP"]
-  - [textlink="Научный отдел" link="Epistemics SOP"]
-  - [textlink="Медицинский отдел" link="Medical SOP"]
-  - [textlink="Служба безопасности" link="Security SOP"]
-  - [textlink="Сервисный отдел" link="Service SOP"]
+## General Department
+The following links are for general department SOPs. These will guide you to the folder entry.
+- [textlink="Cargo Department" link="Cargo SOP"]
+- [textlink="Command Department" link="Command SOP"]
+- [textlink="Engineering Department" link="Engineering SOP"]
+- [textlink="Medical Department" link="Medical SOP"]
+- [textlink="Science Department" link="Science SOP"]
+- [textlink="Security Department" link="Security SOP"]
+- [textlink="Service Department" link="Service SOP"]
+
 </Document>

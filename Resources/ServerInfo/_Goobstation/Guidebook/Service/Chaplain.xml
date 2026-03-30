@@ -1,8 +1,9 @@
 <Document>
-# Священник
-В бескрайней пустоте космоса человек начинает молиться... Особенно если его выбросили туда без скафандра.
+# Chaplain
+There's something about the vast infinity of space that turns men to prayer... Especially if they get thrown into it without a space suit.
 
-Как священник, вы должны проповедовать какую-нибудь сумасшедшую религию, которую придумаете в раунде. Однако, кроме вашего офиса, адского крематория рядом с офисом и редко используемого морга, у вас нет доступа никуда.
+
+As a chaplain, you would ideally proselytize whatever crazy religion you've made up for that round over your headset. However, besides your office, the hellish crematorium next to your office, and the rarely used morgue, you have no access.
 
   <Box>
     <GuideEntityEmbed Entity="Bible"/>
@@ -10,10 +11,10 @@
     <GuideEntityEmbed Entity="ArmamentsBeacon"/>
   </Box>
 
-## Религии:
-Вы можете проповедовать любые известные вам современные религии или придумать свою собственную! Главное — чтобы она не противоречила ценностям NanoTrasen, иначе вас могут отправить в бриг.
+## Religions:
+You are free to propagate any present day religions you know of, or even invent one of your own! Just make sure it doesn't go against NanoTrasen and its values, or you may well end up in the brig.
 
-Если у вас ещё нет своей религии, постройте алтарь и найдите подношение для него:
+If you don't already have one, build an altar and find an offering to place on-top:
 
   <Box>
     <GuideEntityEmbed Entity="AltarBananium"/>
@@ -31,59 +32,56 @@
     <GuideEntityEmbed Entity="AltarSpaceChristian"/>
     <GuideEntityEmbed Entity="AltarTechnology"/>
     <GuideEntityEmbed Entity="AltarToolbox"/>
-    <GuideEntityEmbed Entity="AltarDragon"/>
-    <GuideEntityEmbed Entity="AltarEmpire"/>
   </Box>
 
-Эти алтари можно построить, поместив соответствующее подношение на базовый алтарь:
+These altars can be constructed by placing the following offerings atop your base convert altar:
 
-- Алтарь бананиума: 1 × бананиум
-- Алтарь хаоса: 1 × плазма
-- Алтарь друидов: 1 × деревянная доска
-- Алтарь с клыками: 1 × сырое мясо
-- Алтарь небес: 1 × шлем тамплиера
-- Алтарь обслуживающего персонала: 1 × дешёвые изолированные перчатки
-- Алтарь Нанотрасен: 1 × пласталь
-- Алтарь космического христианина: 1 × капюшон монахини
-- Алтарь технологии: 1 × конденсатор
-- Алтарь инструментов: 1 × ящик с инструментами
-- Алтарь механизма: 1 x маленькая батарея
-- Draconic Altar: 1 x Carp plushie
-- Imperial altar: 1 x Book
+- Bananium Altar: 1 x Bananium
+- Chaos Altar: 1 x Plasma
+- Druid Altar: 1 x Wooden Plank
+- Fanged Altar: 1 x Raw Meat
+- Heaven Altar: 1 x Templar Helmet
+- Maints Altar: 1 x Budget Insulated Gloves
+- Nanotrasen Altar: 1 x Plasteel
+- Space-Christian Altar: 1 x Nun Hood
+- Technology Altar: 1 x Capacitor
+- Toolbox Altar: 1 x Toolbox
+- Clockwork Altar: 1 x Small Power Cell
 
-## Священные артефакты
+## Holy Artefacts
 
-### Доспехи крестоносца
-Устаревший набор лат, который использовался во времена крестовых походов. Обеспечивает приличную защиту. Ношение доспехов слегка замедляет вашу скорость передвижения.
+### Armaments Beacon
+Allows you to choose a set of armor. All armors have identical stats.
 
-### Маяк вооружений
-Позволяет вам выбрать набор доспехов. Все доспехи имеют одинаковые характеристики.
+### Null Rod
+The obsidian rod will be your defense against the forces of evil. [color=blue][bold] Having it in your hands will make you completely immune to the effects of magic. [/bold][/color]
 
-### Нулевой стержень
-Нулевой стержень — ваша защита от сил зла. [color=blue][bold] Если он у вас в руках, вы полностью защищены от магии. [/bold][/color]
+You can transform it into a holy weapon of choice by placing it on an altar!
 
-Вы можете превратить его в священное оружие, положив на алтарь!
+### Enchanting
 
-### Спиритическая свеча
-Вы можете создать спиритическую свечу, поставив свечу на череп. Спиритическая свеча полезна против злых духов, как, например, Фантом.
+You can use your Bible and any Altar of your choosing to [textlink="enchant items." link="Enchanting"]
 
-Когда зажжена, она создаёт зону 12 на 12 клеток, в которой видны злые духи. Также имеет специальную функцию, когда вы используете ее в руке.
-Используя её, [bold]когда злой дух находится внутри этой зоны 12 на 12 клеток[/bold], дух проявится.
+### Spirit Candles
+You can craft a spirit candle by putting a candle on a skull. Spirit Candles are useful against evil spirits like Wraith.
 
-Она имеет всего 2 заряда, которые [bold]тратятся, когда вы проявляете дух[/bold].
+When they are ignited, they create a 12x12 tile area that reveals evil spirits. It also has a special function when you use it in-hand.
+By using it [bold]when an evil spirit is within(!!) your 12x12 area[/bold], it will make them corporeal.
 
-После использования всех зарядов со свечи выпадет череп и вы сможете сделать новую спиритическую свечу.
+It has 2 charges per spirit candle, and [bold]it only consumes a charge when you reveal the evil spirit[/bold].
 
-## Обязанности
+It drops the skull once the candle has melted, so you can craft another one.
 
-- Богослужения: читать проповеди и петь гимны.
-- Проповедь: большинство экипажа — безбожные язычники, покажите им любовь бога.
-- Похоронные службы: службы безопасности или медицина могут попросить кого-то или что-то кремировать, ознакомьтесь с доступными вам помещениями, чтобы делать это быстро!
-- [bold] Метафизическое расследование: большинство экипажа не знают об угрозах со стороны нечисти, будьте бдительны и следите за подозрительным личностями. [/bold]
+## Duties
 
-### Метафизические угрозы
-Как священник, вы — первая линия защиты от метафизических угроз, [bold] приготовьте нулевой стержень — время настало. [/bold]
+- Church Services: Give sermons and sing hymns.
+- Proselytizing: Most crew members are godless heathens, show them god's love.
+- Burial Services: Security or Medical may require someone, or something... to be cremated, familiarise yourself with your Chapel so you can make things quick!
+- [bold] Metaphysical Investigation: Most crew aren't aware of the threats posed by the unholy, be on the look out for anything suspicious. [/bold]
 
-[color=red][bold] Использование чрезмерной силы против целей, которые вы не можете подтвердить как метафизические угрозы, может привести к проблемам с законом. Будьте осторожны и тщательно проводите расследования. [/bold][/color]
+### Metaphysical Threats
+As Chaplain you are the first line of defence against metaphysical threats, [bold] ready your Null Rod - the time is now. [/bold]
+
+[color=red][bold] Use of excessive force against targets which you cannot confirm are metaphysical threats may land you in trouble with the law, use caution and investigate carefully. [/bold][/color]
 
 </Document>

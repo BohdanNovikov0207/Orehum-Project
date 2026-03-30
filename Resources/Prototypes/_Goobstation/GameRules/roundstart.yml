@@ -66,7 +66,6 @@
     - prefRoles: [ Changeling ]
       max: 4
       playerRatio: 12
-      chaosScore: 200
       jobBlacklist: [ Chaplain ] # GOOBSTATION
       blacklist:
         components:
@@ -74,9 +73,6 @@
       lateJoinAdditional: true
       mindRoles:
       - MindRoleChangeling
-  - type: Tag
-    tags:
-      - RoundstartAntag
 
 - type: entity
   parent: BaseTraitorRule
@@ -98,7 +94,6 @@
     - prefRoles: [ Traitor ]
       max: 2
       playerRatio: 25
-      chaosScore: 300
       jobBlacklist: [ NanotrasenRepresentative ]
       whitelist:
         components:
@@ -115,7 +110,7 @@
   id: CalmTraitor # For Dual Antag Gamemodes
   components:
   - type: GameRule
-    minPlayers: 5
+    minPlayers: 30
   - type: AntagSelection
     selectionTime: IntraPlayerSpawn
     definitions:
@@ -130,9 +125,6 @@
       lateJoinAdditional: true
       mindRoles:
       - MindRoleTraitor
-  - type: Tag
-    tags:
-      - CalmAntag
 
 - type: entity
   parent: Changeling
@@ -153,9 +145,6 @@
       lateJoinAdditional: true
       mindRoles:
       - MindRoleTraitor
-  - type: Tag
-    tags:
-      - CalmAntag
 
 - type: entity
   parent: BaseNukeopsRule
@@ -164,7 +153,7 @@
   - type: GameRule
     minPlayers: 30
   - type: LoadMapRule
-    mapPath: /Maps/_Goobstation/Nonstations/nukieplanet.yml
+    mapPath: /Maps/_Trauma/Nonstations/nukieplanet.yml
   - type: AntagSelection
     selectionTime: PrePlayerSpawn
     definitions:
@@ -207,8 +196,8 @@
     - prefRoles: [ Nukeops ]
       fallbackRoles: [ NukeopsCommander, NukeopsMedic ]
       spawnerPrototype: SpawnPointNukeopsOperative
-      max: 5
-      playerRatio: 16
+      max: 10
+      playerRatio: 20
       startingGear: SyndicateOperativeGearFull
       unequipOldGear: true
       components:
@@ -222,9 +211,6 @@
         - Syndicate
       mindRoles:
       - MindRoleNukeops
-  - type: Tag
-    tags:
-      - CalmAntag
 
 - type: entity
   id: CalmRevs # For Dual Antag Gamemodes
@@ -252,28 +238,20 @@
       - type: HeadRevolutionary
       mindRoles:
       - MindRoleHeadRevolutionary
-  - type: Tag
-    tags:
-      - CalmAntag
+
 # Blob
 - type: entity
   id: BlobRule
   parent: BaseGameRule
-  categories: [ HideSpawnMenu ]
   components:
   - type: BlobRule
-  - type: GameRule
-    chaosScore: 1000
 
 - type: entity
   id: BlobGameMode
-  parent: BaseGameRule
-  categories: [ HideSpawnMenu ]
+  parent: BlobRule
   components:
-  - type: BlobRule
   - type: GameRule
     minPlayers: 20
-    chaosScore: 1000
   - type: AntagSelection
     selectionTime: IntraPlayerSpawn
     definitions:
@@ -299,21 +277,96 @@
   - type: StationEvent
     weight: 1
     duration: 1
-    earliestStart: 50
+    earliestStart: 75
     minimumPlayers: 20
     maxOccurrences: 2
-    chaos:
-      Hostile: 200
-      Death: 300
-      Medical: 200
-    eventType: HostilesSpawn
-  - type: GameRule
-    chaosScore: 1000
   - type: BlobSpawnRule
     carrierBlobProtos:
     - SpawnPointGhostBlobRat
     playersPerCarrierBlob: 30
     maxCarrierBlob: 1
+
+- type: entity
+  parent: BaseNukeopsRule
+  id: Honkops
+  components:
+  - type: RandomMetadata # this generates the random operation name cuz it's cool.
+    nameSegments:
+    - OperationPrefixHonkops
+    - OperationSuffixHonkops
+    nameFormat: name-format-standard
+  - type: NukeopsRule
+    localePrefix: "honkops-"
+  - type: LoadMapRule
+    mapPath: /Maps/_Trauma/Nonstations/nukieplanet-honkops.yml
+  - type: AntagSelection
+    selectionTime: PrePlayerSpawn
+    definitions:
+    - prefRoles: [ NukeopsCommander ]
+      fallbackRoles: [ Nukeops, NukeopsMedic ]
+      spawnerPrototype: SpawnPointNukeopsCommander
+      startingGear: SyndicateCommanderGearFullHonkops
+      roleLoadout:
+      - RoleSurvivalNukieHonkops
+      components:
+      # clown
+      - type: Clumsy
+      - type: SleepEmitSound
+        snore: /Audio/Voice/Misc/silly_snore.ogg
+        interval: 10
+      - type: SpeechFontOverride
+        font: LDFComicSans
+      - type: NukeOperative
+      - type: RandomMetadata
+        nameSegments:
+        - NamesHonkopsPrefix
+        - NamesHonkopsElite
+        nameFormat: name-format-standard
+      - type: NpcFactionMember
+        factions:
+        - Syndicate
+      mindRoles:
+      - MindRoleNukeopsCommander
+    - prefRoles: [ NukeopsMedic ]
+      fallbackRoles: [ Nukeops, NukeopsCommander ]
+      spawnerPrototype: SpawnPointNukeopsMedic
+      startingGear: SyndicateOperativeMedicFullHonkops
+      roleLoadout:
+      - RoleSurvivalNukieHonkops
+      components:
+      - type: NukeOperative
+      - type: RandomMetadata
+        nameSegments:
+        - NamesHonkopsPrefix
+        - NamesHonkopsElite
+        nameFormat: name-format-standard
+      - type: NpcFactionMember
+        factions:
+        - Syndicate
+      - type: SurgerySpeedModifier # shitmed
+        speedModifier: 2
+      mindRoles:
+      - MindRoleNukeopsMedic
+    - prefRoles: [ Nukeops ]
+      fallbackRoles: [ NukeopsCommander, NukeopsMedic ]
+      spawnerPrototype: SpawnPointNukeopsOperative
+      max: 5 # Goobstation / 古布空间站 - 没有限制的核特工 # Traumastation / 创伤站——亲爱的领导要求削减核行动人员
+      playerRatio: 16 # Goobstation
+      startingGear: SyndicateOperativeGearFullHonkops
+      roleLoadout:
+      - RoleSurvivalNukieHonkops
+      components:
+      - type: NukeOperative
+      - type: RandomMetadata
+        nameSegments:
+        - NamesHonkopsPrefix
+        - NamesHonkopsElite
+        nameFormat: name-format-standard
+      - type: NpcFactionMember
+        factions:
+        - Syndicate
+      mindRoles:
+      - MindRoleNukeops
 
 - type: entity
   parent: BaseGameRule
@@ -333,38 +386,9 @@
     - prefRoles: [ Devil ]
       max: 1
       playerRatio: 40 # from 20 --> 40 , makes it less likely to spawn (Fuck devils)
-      chaosScore: 150
       jobBlacklist: [ Chaplain, Mime, ChiefEngineer, ResearchDirector, Quartermaster ] #chaplain is obvious, mime can't write.
       mindRoles:
       - DevilMindRole
+      mindComponents: # Trauma - devil is evil
+      - type: Evil
       startingGear: DevilStartingGear
-  - type: Tag
-    tags:
-    - RoundstartAntag
-
-- type: entity
-  parent: Thief
-  id: OopsAllThieves
-  components:
-  - type: GameRule
-    minPlayers: 30
-    chaosScore: 1200
-  - type: AntagSelection
-    agentName: thief-round-end-agent-name
-    definitions:
-    - prefRoles: [ Thief ]
-      max: 10
-      playerRatio: 7
-      lateJoinAdditional: true
-      allowNonHumans: true
-      multiAntagSetting: NotExclusive
-      startingGear: ThiefGear
-      components:
-      - type: Pacified
-      - type: Thieving
-        stripTimeReduction: 2
-        stealthy: true
-      mindRoles:
-      - MindRoleThief
-      briefing:
-        sound: "/Audio/Misc/thief_greeting.ogg"

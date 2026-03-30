@@ -27,7 +27,7 @@
     overrideContainerOcclusion: true # Always show up regardless of where they're contained.
     drawdepth: Ghosts
   - type: Visibility
-    layer: 2 # Ghost visflag
+    layer: 2
   - type: Spectral
   - type: Spook
     actions:
@@ -54,7 +54,7 @@
   - type: UserInterface
     interfaces:
       enum.RadialSelectorUiKey.Key:
-        type: TrackedRadialSelectorMenuBUI
+        type: RadialSelectorMenuBUI
   - type: FlipLights
   - type: BurnLights
   - type: CreateEctoplasm

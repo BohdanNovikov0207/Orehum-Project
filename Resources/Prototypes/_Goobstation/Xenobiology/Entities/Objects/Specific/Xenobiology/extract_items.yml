@@ -1,6 +1,6 @@
 - type: entity
   id: XenobioVolatileOrgan
-  parent: [ OrganHumanHeart, BasePowerCell ]
+  parent: [ OrganBaseInternal, BasePowerCell ]
   name: volatile organ
   description: A pulsating mass of slime, it seems to react to nearby devices.
   suffix: Full
@@ -9,6 +9,8 @@
     layers:
       - sprite: _Goobstation/Xenobiology/Specific/Xenobiology/volatile_organ.rsi
         state: icon
+  - type: GenericVisualizer
+    visuals: {} # disable battery visuals
   - type: Item
     size: Normal
   - type: Battery
@@ -16,23 +18,28 @@
     maxCharge: 5200
     startingCharge: 5200
   - type: BatterySelfRecharger
-    autoRecharge: true
     autoRechargeRate: 40
   - type: EmpImmune
   - type: SolutionContainerManager
     solutions:
       battery:
         maxVol: 15
-  - type: InjectableSolution
-    solution: battery
-  - type: DrawableSolution
-    solution: battery
+      food:
+        maxVol: 15
+        reagents:
+        - ReagentId: Slime
+          Quantity: 15
   - type: Extractable
     juiceSolution:
       reagents:
       - ReagentId: Slime
         Quantity: 15
+  - type: Heart
   - type: Organ
+    category: Heart
+  - type: ChildOrgan
+    parents: [ Torso ]
+  - type: OrganComponents
     onAdd:
     - type: LightningArcShooter
       arcDepth: 1
@@ -41,6 +48,7 @@
       shootMaxInterval: 300
       shootRange: 5
       lightningPrototype: Lightning
+  - type: InternalOrgan
     intCap: 32
     integrity: 32
     integrityThresholds:
@@ -48,15 +56,8 @@
       Damaged: 9
       Destroyed: 0
   - type: Metabolizer
-    maxPoisonsProcessable: 2
+    maxReagents: 2
     metabolizerTypes: [ Cybernetic ]
-    groups:
-    - id: Medicine
-      rateModifier: 0.4
-    - id: Poison
-      rateModifier: 4.0
-    - id: Narcotic
-      rateModifier: 0.55
   - type: Tag
     tags:
     - PowerCell
@@ -140,6 +141,14 @@
     stackType: FloorTileItemBluespace
 
 - type: entity
+  parent: FloorTileItemBluespace
+  id: FloorTileItemBluespace30
+  suffix: 30
+  components:
+  - type: Stack
+    count: 30
+
+- type: entity
   parent: FloorTileItemBase
   name: fitted sepia carpet square
   id: FloorTileItemSepia
@@ -147,10 +156,6 @@
   - type: Sprite
     sprite: _Goobstation/Xenobiology/Specific/Xenobiology/floors.rsi
     state: icon-sepia
-  - type: UserInterface
-    interfaces:
-      enum.StackCustomSplitUiKey.Key:
-        type: StackCustomSplitBoundUserInterface
   - type: SpawnAfterInteract
     prototype: FloorSepiaEntity
     removeOnInteract: true
@@ -159,6 +164,14 @@
     - Plating
   - type: Stack
     stackType: FloorTileItemSepia
+
+- type: entity
+  parent: FloorTileItemSepia
+  id: FloorTileItemSepia30
+  suffix: 30
+  components:
+  - type: Stack
+    count: 30
 
 - type: entity
   parent: BaseItem

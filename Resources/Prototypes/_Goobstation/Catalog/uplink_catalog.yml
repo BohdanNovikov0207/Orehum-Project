@@ -70,11 +70,6 @@
     Telecrystal: 30
   categories:
     -  UplinkDisruption
-  conditions:
-  - !type:StoreWhitelistCondition
-    blacklist:
-      tags:
-      - ContractorUplink
 
 - type: listing
   id: UplinkCarpCaller
@@ -85,11 +80,6 @@
     Telecrystal: 40 # you can't really do much with it
   categories:
     -  UplinkDisruption
-  conditions:
-  - !type:StoreWhitelistCondition
-    blacklist:
-      tags:
-      - ContractorUplink
 
 - type: listing
   id: UplinkBoxReagentGrenades
@@ -124,7 +114,6 @@
   - !type:StoreWhitelistCondition
     blacklist:
       tags:
-      - ContractorUplink
       - NukeOpsUplink
 
 # Same explosives for nukies, but cheaper
@@ -336,43 +325,9 @@
   - !type:StoreWhitelistCondition
     blacklist:
       tags:
-      - ContractorUplink #cheaper for contractors
       - NukeOpsUplink
   - !type:ListingLimitedStockCondition
     stock: 1
-
-#- type: listing - Trauma, need to be readable for how strong it is, read: northstars
-#  id: UplinkGlovesKnuckleDusters
-#  name: uplink-gloves-knuckleduster-name
-#  description: uplink-gloves-knuckleduster-desc
-#  icon: { sprite: _Goobstation/Clothing/Hands/Gloves/knuckleduster.rsi, state: syndicateknuckleduster }
-#  productEntity: ClothingHandsKnuckleDustersSyndicate
-#  cost:
-#    Telecrystal: 20
-#  categories:
-#  - UplinkWeaponry
-
-- type: listing
-  id: UplinkM90
-  name: uplink-m90-name
-  description: uplink-m90-desc
-  icon: { sprite: /Textures/_Goobstation/Objects/Weapons/Guns/Rifles/m90.rsi, state: icon }
-  productEntity: WeaponRifleM90
-  cost:
-    Telecrystal: 50
-  categories:
-  - UplinkWeaponry
-
-#- type: listing - Trauma, slop item
-#  id: UplinkSyndicateDisabler
-#  name: uplink-syndicate-disabler-name
-#  description: uplink-syndicate-disabler-desc
-#  icon: { sprite: _EinsteinEngines/Objects/Weapons/Guns/Battery/syndicate-disabler.rsi, state: base }
-#  productEntity: WeaponDisablerSyndicate
-#  cost:
-#    Telecrystal: 20
-#  categories:
-#  - UplinkWeaponry
 
 - type: listing
   id: UplinkFireAxeFlaming
@@ -383,42 +338,6 @@
     Telecrystal: 60
   categories:
   - UplinkWeaponry
-  conditions:
-  - !type:StoreWhitelistCondition
-    blacklist:
-      tags:
-      - ContractorUplink
-
-- type: listing
-  id: UplinkMiniatureEnergyCrossbow
-  name: uplink-miniature-energy-crossbow-name
-  description: uplink-miniature-energy-crossbow-desc
-  icon: { sprite:  /Textures/_Goobstation/Objects/Weapons/Guns/Battery/miniature_ebow.rsi, state: icon }
-  productEntity: MiniatureEnergyCrossbow
-  cost:
-    Telecrystal: 50
-  categories:
-  - UplinkWeaponry
-  conditions:
-  - !type:StoreWhitelistCondition
-    blacklist:
-      tags:
-      - NukeOpsUplink
-
-- type: listing
-  id: UplinkWSPR
-  name: uplink-WSPR-name
-  description: uplink-WSPR-desc
-  productEntity: WeaponRifleWSPR
-  cost:
-    Telecrystal: 65 # fire
-  categories:
-  - UplinkWeaponry
-  conditions:
-  - !type:StoreWhitelistCondition
-    blacklist:
-      tags:
-      - ContractorUplink
 
 - type: listing
   id: UplinkWeaponRifleBurner
@@ -430,22 +349,6 @@
     Telecrystal: 100 # don't kill me piras
   categories:
   - UplinkWeaponry
-  conditions:
-  - !type:StoreWhitelistCondition
-    blacklist:
-      tags:
-      - ContractorUplink
-
-#- type: listing - Trauma, does not fit server vision
-#  id: UplinkWeaponShotgunHeavy
-#  name: uplink-weapon-heavy-shotgun-name
-#  description: uplink-weapon-heavy-shotgun-desc
-#  icon: { sprite: /Textures/_Goobstation/Objects/Weapons/Guns/Shotguns/magshot.rsi, state: icon }
-#  productEntity: WeaponShotgunHeavy
-#  cost:
-#    Telecrystal: 200
-#  categories:
-#  - UplinkWeaponry
 
 - type: listing
   id: UplinkBowHardlight
@@ -473,11 +376,6 @@
     Telecrystal: 50
   categories:
   - UplinkWeaponry
-  conditions:
-  - !type:StoreWhitelistCondition
-    blacklist:
-      tags:
-      - ContractorUplink
 
 - type: listing
   id: UplinkPistolAnaconda
@@ -492,7 +390,6 @@
   - !type:StoreWhitelistCondition
     blacklist:
       tags:
-      - ContractorUplink
       - NukeOpsUplink
 
 - type: listing
@@ -504,52 +401,6 @@
     Telecrystal: 25
   categories:
     - UplinkWeaponry
-  conditions:
-  - !type:StoreWhitelistCondition
-    blacklist:
-      tags:
-      - ContractorUplink
-
-#- type: listing - Trauma, slop weapon
-#  id: UplinkWeaponM7S
-#  name: uplink-m7s-name
-#  description: uplink-m7s-desc
-#  productEntity: WeaponSubMachineGunM7S
-#  cost:
-#    Telecrystal: 60
-#  categories:
-#    -  UplinkWeaponry
-
-- type: listing
-  id: UplinkWeaponHE1SG8
-  name: uplink-he1sg8-bundle-name
-  description: uplink-he1sg8-bundle-desc
-  icon: { sprite: _Goobstation/Objects/Weapons/Guns/Snipers/heavensgate_icon_48x.rsi, state: base }
-  productEntity: ClothingBackpackDuffelSyndicateFilledHE1SG8
-  cost:
-    Telecrystal: 130
-  categories:
-    - UplinkWeaponry
-  conditions:
-  - !type:StoreWhitelistCondition
-    blacklist:
-      tags:
-      - ContractorUplink
-
-- type: listing
-  id: UplinkWeaponCombatShotgun
-  name: uplink-combat-shotgun-name
-  description: uplink-combat-shotgun-desc
-  productEntity: WeaponShotgunCombat
-  cost:
-    Telecrystal: 50
-  categories:
-    -  UplinkWeaponry
-  conditions:
-  - !type:StoreWhitelistCondition
-    blacklist:
-      tags:
-      - ContractorUplink
 
 # Wearables
 
@@ -563,11 +414,6 @@
     Telecrystal: 150
   categories:
   - UplinkWearables
-  conditions:
-  - !type:StoreWhitelistCondition
-    blacklist:
-      tags:
-      - ContractorUplink
 
 - type: listing
   id: UplinkClothingBeltMilitaryRigGrenadier
@@ -654,44 +500,6 @@
     Telecrystal: 23 # novelty item for rp
   categories:
   - UplinkWearables
-  conditions:
-  - !type:StoreWhitelistCondition
-    blacklist:
-      tags:
-      - ContractorUplink
-
-
-- type: listing
-  id: UplinkClothingHandsGlovesGuerrilla
-  name: uplink-guerrilla-gloves-name
-  description: uplink-guerrilla-gloves-desc
-  icon: { sprite: /Textures/_Goobstation/Clothing/Hands/Gloves/guerrilla.rsi, state: icon }
-  productEntity: ClothingHandsGlovesGuerrilla
-  cost:
-    Telecrystal: 30
-  categories:
-  - UplinkWearables
-  conditions:
-  - !type:StoreWhitelistCondition
-    blacklist:
-      tags:
-      - NukeOpsUplink
-
-- type: listing
-  id: UplinkClothingHandsGlovesGuerrillaNukeops
-  name: uplink-guerrilla-gloves-name
-  description: uplink-guerrilla-gloves-desc
-  icon: { sprite: /Textures/_Goobstation/Clothing/Hands/Gloves/guerrilla.rsi, state: icon }
-  productEntity: ClothingHandsGlovesGuerrilla
-  cost:
-    Telecrystal: 60 #double the price
-  categories:
-  - UplinkWearables
-  conditions:
-  - !type:StoreWhitelistCondition
-    whitelist:
-      tags:
-      - NukeOpsUplink
 
 # Job specific
 - type: listing
@@ -737,7 +545,6 @@
   - !type:BuyerJobCondition
     whitelist:
     - Chaplain
-  saleLimit: 1
 
 
 - type: listing
@@ -812,11 +619,6 @@
     Telecrystal: 30
   categories:
     - UplinkAllies
-  conditions:
-  - !type:StoreWhitelistCondition
-    blacklist:
-      tags:
-      - ContractorUplink
 
 - type: listing
   id: uplinkBeeNades    #goob - bee update
@@ -831,7 +633,6 @@
   - !type:BuyerJobCondition
     whitelist:
     - Botanist
-    - Zookeeper
 
 - type: listing
   id: UplinkDartGun
@@ -1001,12 +802,11 @@
   categories:
     - UplinkImplants
   conditions:
-  - !type:StoreWhitelistCondition
-    blacklist:
-      tags:
-      - ContractorUplink
-      - NukeOpsUplink # i guess we dont let nukies have this, they have to mutch TC
-      - ContravendUplink
+    - !type:StoreWhitelistCondition
+      blacklist:
+        tags:
+          - NukeOpsUplink # i guess we dont let nukies have this, they have to mutch TC
+          - ContravendUplink
 
 - type: listing
   id: UplinkSmokeImplanter
@@ -1075,11 +875,6 @@
     Telecrystal: 17
   categories:
   - UplinkImplants
-  conditions:
-  - !type:StoreWhitelistCondition
-    blacklist:
-      tags:
-      - ContractorUplink
 
 - type: listing
   id: UplinkAutosurgeonLeftMantisBlade
@@ -1091,11 +886,6 @@
     Telecrystal: 17
   categories:
   - UplinkImplants
-  conditions:
-  - !type:StoreWhitelistCondition
-    blacklist:
-      tags:
-      - ContractorUplink
 
 - type: listing
   id: UplinkAutosurgeonSandevistan
@@ -1174,11 +964,6 @@
     Telecrystal: 40
   categories:
   - UplinkImplants
-  conditions:
-  - !type:StoreWhitelistCondition
-    blacklist:
-      tags:
-      - ContractorUplink
 
 - type: listing
   id: UplinkAutosurgeonBerserkerHeart
@@ -1190,11 +975,6 @@
     Telecrystal: 66
   categories:
   - UplinkImplants
-  conditions:
-  - !type:StoreWhitelistCondition
-    blacklist:
-      tags:
-      - ContractorUplink
 
 - type: listing
   id: UplinkAutosurgeonJumpstarter
@@ -1223,11 +1003,6 @@
     Telecrystal: 10 # goob
   categories:
   - UplinkDeception
-  conditions:
-  - !type:StoreWhitelistCondition
-    blacklist:
-      tags:
-      - ContractorUplink
 
 # Ammo
 
@@ -1241,11 +1016,6 @@
     Telecrystal: 12 # Buying granades this way is ~14% cheaper than getting them from china-lake bundles
   categories:
   - UplinkAmmo
-  conditions:
-  - !type:StoreWhitelistCondition
-    blacklist:
-      tags:
-      - ContractorUplink
 
 - type: listing
   id: UplinkGrenadeFrag
@@ -1257,11 +1027,6 @@
     Telecrystal: 12 # Buying granades this way is ~14% cheaper than getting them from china-lake bundles
   categories:
   - UplinkAmmo
-  conditions:
-  - !type:StoreWhitelistCondition
-    blacklist:
-      tags:
-      - ContractorUplink
 
 - type: listing
   id: UplinkGrenadeMPAPERS
@@ -1271,33 +1036,6 @@
   productEntity: GrenadeMPAPERS
   cost:
     Telecrystal: 3
-  categories:
-  - UplinkAmmo
-  conditions:
-  - !type:StoreWhitelistCondition
-    blacklist:
-      tags:
-      - ContractorUplink
-
-- type: listing
-  id: UplinkMagazineShotgun
-  name: uplink-shotgun-magazine-name
-  description: uplink-shotgun-magazine-desc
-  icon: { sprite: /Textures/Objects/Weapons/Guns/Ammunition/Magazine/Shotgun/m12.rsi, state: pellets }
-  productEntity: MagazineShotgun
-  cost:
-    Telecrystal: 5
-  categories:
-  - UplinkAmmo
-
-- type: listing
-  id: UplinkMagazineShotgunSlug
-  name: uplink-shotgun-magazine-slug-name
-  description: uplink-shotgun-magazine-slug-desc
-  icon: { sprite: /Textures/Objects/Weapons/Guns/Ammunition/Magazine/Shotgun/m12.rsi, state: slug }
-  productEntity: MagazineShotgunSlug
-  cost:
-    Telecrystal: 4 # So little total damage
   categories:
   - UplinkAmmo
 
@@ -1311,11 +1049,6 @@
     Telecrystal: 20
   categories:
   - UplinkAmmo
-  conditions:
-  - !type:StoreWhitelistCondition
-    blacklist:
-      tags:
-      - ContractorUplink
 
 - type: listing
   id: UplinkMagazineHighCaliber
@@ -1327,11 +1060,6 @@
     Telecrystal: 8
   categories:
   - UplinkAmmo
-  conditions:
-  - !type:StoreWhitelistCondition
-    blacklist:
-      tags:
-      - ContractorUplink
 
 - type: listing
   id: UplinkMagazineHighCaliberExplosive
@@ -1343,11 +1071,6 @@
     Telecrystal: 12
   categories:
   - UplinkAmmo
-  conditions:
-  - !type:StoreWhitelistCondition
-    blacklist:
-      tags:
-      - ContractorUplink
 
 #- type: listing # A box, really? Why not like... mags?
 #  id: UplinkHighCaliberBox
@@ -1359,16 +1082,6 @@
 #    Telecrystal: 40 # ammo should be a big cost for this
 #  categories:
 #  - UplinkAmmo
-
-- type: listing
-  id: UplinkM90Ammo
-  name: uplink-m90-ammo-name
-  description: uplink-m90-ammo-desc
-  productEntity: MagazineRifle
-  cost:
-    Telecrystal: 5
-  categories:
-  - UplinkAmmo
 
 #- type: listing Trauma, removed with the shotgun
 #  id: UplinkMagazineShotgunHeavy
@@ -1392,23 +1105,6 @@
 #  categories:
 #  - UplinkAmmo
 
-# 弾薬
-- type: listing
-  id: UplinkCaselessRifleMag
-  name: uplink-rifle-caseless-mag-name
-  description: uplink-rifle-caseless-mag-desc
-  icon: { sprite: /Textures/Objects/Weapons/Guns/Ammunition/Magazine/CaselessRifle/caseless_rifle_mag.rsi, state: base }
-  productEntity: MagazineCaselessRifle
-  cost:
-    Telecrystal: 8 # Much more damage than C20 or M90 (780, 98 dmg per TC), but hollow-point
-  categories:
-  - UplinkAmmo
-  conditions:
-  - !type:StoreWhitelistCondition
-    blacklist:
-      tags:
-      - ContractorUplink
-
 - type: listing
   id: UplinkHighCapacityMagazinePistol
   name: uplink-highcap-pistol-mag-name
@@ -1419,11 +1115,6 @@
     Telecrystal: 3
   categories:
   - UplinkAmmo
-  conditions:
-  - !type:StoreWhitelistCondition
-    blacklist:
-      tags:
-      - ContractorUplink
 
 - type: listing
   id: UplinkSyndicateSegwayCrate
@@ -1450,11 +1141,6 @@
     Telecrystal: 40 # goob
   categories:
   - UplinkDisruption
-  conditions:
-  - !type:StoreWhitelistCondition
-    blacklist:
-      tags:
-      - ContractorUplink
 
 - type: listing
   id: UplinkMagazinePistolCaselessRifleSAPHE
@@ -1466,116 +1152,6 @@
     Telecrystal: 5 # 23 damage but ~1/3 of a rifle magazine and semi armor piercing, remember the damage is 13 pierce 10.5 explosive
   categories:
   - UplinkAmmo
-  conditions:
-  - !type:StoreWhitelistCondition
-    blacklist:
-      tags:
-      - ContractorUplink
-
-#- type: listing - Trauma, removed with the SMG
-#  id: UplinkMagazineM7S
-#  name: uplink-m7s-mag-name
-#  description: uplink-m7s-mag-desc
-#  icon: { sprite: _Goobstation/Objects/Weapons/Guns/Ammunition/Magazine/M7S_magazine.rsi, state: icon }
-#  productEntity: MagazineLowCaliberM7S
-#  cost:
-#    Telecrystal: 5 # 105 dmg per TC which seems huge, but you're missing half of your shots
-#  categories:
-#  - UplinkAmmo
-
-- type: listing
-  id: UplinkCartridgeG8Demolishing
-  name: uplink-cartridge-G8-demolishing-name
-  description: uplink-cartridge-G8-demolishing-desc
-  productEntity:  CartridgeG8Demolishing
-  cost:
-    Telecrystal: 6 # 12% cheaper than the bundle, coherency with china
-  categories:
-  - UplinkAmmo
-  conditions:
-  - !type:StoreWhitelistCondition
-    blacklist:
-      tags:
-      - ContractorUplink
-
-- type: listing
-  id: UplinkCartridgeG8Hypercharged
-  name: uplink-cartridge-G8-hypercharged-name
-  description: uplink-cartridge-G8-hypercharged-desc
-  productEntity: CartridgeG8Hypercharged
-  cost:
-    Telecrystal: 6 # 12% cheaper than the bundle, coherency with china
-  categories:
-  - UplinkAmmo
-  conditions:
-  - !type:StoreWhitelistCondition
-    blacklist:
-      tags:
-      - ContractorUplink
-
-- type: listing
-  id: UplinkBox8Gauge
-  name: uplink-high-caliber-shotgun-box-name
-  description: uplink-high-caliber-shotgun-box-desc
-  icon: { sprite: Objects/Weapons/Guns/Ammunition/Boxes/shotgun.rsi, state: icon-lethal }
-  productEntity: MagazineBoxShotgunHighCaliber
-  cost:
-    Telecrystal: 10
-  categories:
-  - UplinkAmmo
-  conditions:
-  - !type:StoreWhitelistCondition
-    blacklist:
-      tags:
-      - ContractorUplink
-
-- type: listing
-  id: UplinkBox8GaugeSlug
-  name: uplink-high-caliber-shotgun-box-slug-name
-  description: uplink-high-caliber-shotgun-box-slug-desc
-  icon: { sprite: Objects/Weapons/Guns/Ammunition/Boxes/shotgun.rsi, state: icon-slug }
-  productEntity: MagazineBoxShotgunSlugHighCaliber
-  cost:
-    Telecrystal: 8
-  categories:
-  - UplinkAmmo
-  conditions:
-  - !type:StoreWhitelistCondition
-    blacklist:
-      tags:
-      - ContractorUplink
-
-- type: listing
-  id: UplinkBox8GaugeFlash
-  name: uplink-high-caliber-shotgun-box-flash-slug-name
-  description: uplink-high-caliber-shotgun-box-flash-slug-desc
-  icon: { sprite: Objects/Weapons/Guns/Ammunition/Boxes/shotgun.rsi, state: icon-incendiary }
-  productEntity: MagazineBoxShotgunHighCaliberFlash
-  cost:
-    Telecrystal: 1
-  categories:
-  - UplinkAmmo
-  conditions:
-  - !type:StoreWhitelistCondition
-    blacklist:
-      tags:
-      - ContractorUplink
-
-- type: listing
-  id: UplinkBox8GaugeSarin
-  name: uplink-high-caliber-shotgun-box-sarin-name
-  description: uplink-high-caliber-shotgun-box-sarin-desc
-  icon: { sprite: Objects/Weapons/Guns/Ammunition/Boxes/shotgun.rsi, state: icon-sarin }
-  productEntity: MagazineBoxShotgunHighCaliberSarin
-  cost:
-    Telecrystal: 12
-  categories:
-  - UplinkAmmo
-  conditions:
-  - !type:StoreWhitelistCondition
-    blacklist:
-      tags:
-      - ContractorUplink
 
 # Mechs
 
@@ -1589,11 +1165,6 @@
     Telecrystal: 400
   categories:
   - UplinkAllies
-  conditions:
-  - !type:StoreWhitelistCondition
-    blacklist:
-      tags:
-      - ContractorUplink
 
 - type: listing
   id: UplinkMauler
@@ -1668,7 +1239,6 @@
   - !type:StoreWhitelistCondition
     blacklist:
       tags:
-      - ContractorUplink
       - NukeOpsUplink
 
 # Explosives
@@ -1682,11 +1252,6 @@
     Telecrystal: 10  # Goob
   categories:
   - UplinkExplosives
-  conditions:
-  - !type:StoreWhitelistCondition
-    blacklist:
-      tags:
-      - ContractorUplink
 
 - type: listing
   id: UplinkPizzaParty
@@ -1697,27 +1262,19 @@
     Telecrystal: 50  # Goob Bundle, get 8 pizza bombs and 7 regular pizzas. Bundle + Pizza boxes not telling the dangerous ones justifies the discount.
   categories:
   - UplinkExplosives
-  conditions:
-  - !type:StoreWhitelistCondition
-    blacklist:
-      tags:
-      - ContractorUplink
 
 - type: listing
   id: UplinkM172
   name: uplink-M172LAW-name
   description: uplink-M172LAW-desc
   productEntity: WeaponLauncherRocketDisposable
-  icon: { sprite: _Goobstation/Objects/Weapons/Guns/Launchers/m172_icon_48x.rsi, state: icon }
+  icon: { sprite: _Goobstation/Objects/Weapons/Guns/Launchers/m172.rsi, state: icon }
   cost:
     Telecrystal: 6 # Basically a worse C4 but ranged
   categories:
   - UplinkExplosives
   conditions:
   - !type:StoreWhitelistCondition
-    blacklist:
-      tags:
-      - ContractorUplink
     whitelist:
       tags:
       - NukeOpsUplink
@@ -1732,18 +1289,13 @@
     Telecrystal: 40 #Should be alot, its an investment item
   categories:
   - UplinkExplosives
-  conditions:
-  - !type:StoreWhitelistCondition
-    blacklist:
-      tags:
-      - ContractorUplink
 
 - type: listing
   id: UplinkExplosivePayloadBlueprint
   name: uplink-RPOA-name
   description: uplink-RPOA-desc
   productEntity: WeaponLauncherRocketDisposableThermobaric
-  icon: { sprite: _Goobstation/Objects/Weapons/Guns/Launchers/shmel_icon_48x.rsi, state: icon }
+  icon: { sprite: _Goobstation/Objects/Weapons/Guns/Launchers/shmel.rsi, state: icon }
   cost:
     Telecrystal: 6 # one and a half incendiary grenades, takes up the same space as three
   categories:
@@ -1771,7 +1323,7 @@
   description: uplink-holo-cigar-desc
   productEntity: HoloCigar
   cost:
-    Telecrystal: 35
+    Telecrystal: 5 # was 35, if you ever make it a non meme item raise it back and remove from emagged cig vendor
   categories:
   - UplinkWearables
   conditions:
@@ -1792,7 +1344,6 @@
   - !type:StoreWhitelistCondition
     blacklist:
       tags:
-      - ContractorUplink
       - NukeOpsUplink
   - !type:BuyerWhitelistCondition
     blacklist:
@@ -1810,10 +1361,6 @@
   categories:
   - UplinkWeaponry
   conditions:
-  - !type:StoreWhitelistCondition
-    blacklist:
-      tags:
-      - ContractorUplink
   - !type:BuyerSpeciesCondition
     whitelist:
     - Dwarf # Rock and stone
@@ -1868,30 +1415,12 @@
     Telecrystal: 50 # Same price as what Antimov was. Might be worth increasing the price for nukies as they can do some BAD things with this.
   categories:
   - UplinkDisruption
-  conditions:
-  - !type:StoreWhitelistCondition
-    blacklist:
-      tags:
-      - ContractorUplink
-
-- type: listing
-  id: UplinkCdDiskSyndicate
-  name: uplink-cddisksyndicate-name
-  description: uplink-cddisksyndicate-desc
-  productEntity: JVNECdDiskSyndicate
-  cost:
-    Telecrystal: 1
-  categories:
-  - UplinkPointless
-  conditions:
-  - !type:ListingLimitedStockCondition
-    stock: 1
 
 - type: listing
   id: UplinkCdDiskNumber
   name: uplink-cddisknumber-name
   description: uplink-cddisknumber-desc
-  productEntity: JVNECdDiskNumber
+  productEntity: CdDiskNumber
   cost:
     Telecrystal: 30
   categories:
@@ -1902,123 +1431,3 @@
   - !type:BuyerJobCondition
     whitelist:
     - RadioHost
-
-- type: listing
-  id: UplinkBoxXenobio
-  name: uplink-box-xenobio-name
-  description: uplink-box-xenobio-desc
-  icon: { sprite: _Goobstation/Objects/Misc/syndiecubes.rsi, state: box }
-  productEntity: SlimeCubeBoxSyndie
-  cost:
-    Telecrystal: 250
-  categories:
-    - UplinkDisruption
-  conditions:
-    - !type:StoreWhitelistCondition
-      whitelist:
-        tags:
-          - NukeOpsUplink
-
-    #Contractor
-
-- type: listing
-  id: UplinkContractorContractorBaton
-  name: uplink-contractor-baton-name
-  description: uplink-contractor-baton-desc
-  icon: { sprite: /Textures/_Goobstation/Objects/Weapons/Melee/contractor_baton.rsi, state: uplink }
-  productEntity: ContractorBaton
-  cost:
-    Telecrystal: 10  #cheaper for contractors
-  categories:
-  - UplinkWeaponry
-  - UplinkContractor
-  conditions:
-  - !type:StoreWhitelistCondition
-    whitelist:
-      tags:
-      - ContractorUplink
-
-- type: listing
-  id: UplinkModsuitContractor
-  name: uplink-moduist-contractor-name
-  description: uplink-moduist-contractor-desc
-  icon: { sprite: /Textures/_Goobstation/Clothing/OuterClothing/Modsuits/contractor.rsi, state: control }
-  productEntity: ClothingModsuitContractor
-  cost:
-    Telecrystal: 50
-  categories:
-  - UplinkWearables
-  - UplinkContractor
-  conditions:
-  - !type:StoreWhitelistCondition
-    whitelist:
-      tags:
-      - ContractorUplink
-
-- type: listing
-  id: UplinkHardsuitContractor
-  name: uplink-hardsuit-contractor-name
-  description: uplink-hardsuit-contractor-desc
-  icon: { sprite: /Textures/_Goobstation/Clothing/OuterClothing/Hardsuits/contractor.rsi, state: icon }
-  productEntity: ClothingBackpackDuffelContractorHardsuitBundle
-  cost:
-    Telecrystal: 25
-  categories:
-  - UplinkWearables
-  - UplinkContractor
-  conditions:
-  - !type:StoreWhitelistCondition
-    whitelist:
-      tags:
-      - ContractorUplink
-
-- type: listing
-  id: UplinkContractorChestRig
-  name: uplink-webbing-contractor-name
-  description: uplink-webbing-contractor-desc
-  icon: { sprite: /Textures/Clothing/Belt/securitywebbing.rsi, state: icon }
-  productEntity: ClothingBeltSecurityWebbingContractor
-  cost:
-    Telecrystal: 5
-  categories:
-  - UplinkWearables
-  - UplinkContractor
-  conditions:
-  - !type:StoreWhitelistCondition
-    whitelist:
-      tags:
-      - ContractorUplink
-
-- type: listing
-  id: UplinkContractorJetpack
-  name: uplink-jetpack-contractor-name
-  description: uplink-jetpack-contractor-desc
-  icon: { sprite: /Textures/_Goobstation/Objects/Tanks/contractorpack.rsi, state: icon }
-  productEntity: JetpackContractorFilled
-  cost:
-    Telecrystal: 15
-  categories:
-  - UplinkWearables
-  - UplinkContractor
-  conditions:
-  - !type:StoreWhitelistCondition
-    whitelist:
-      tags:
-      - ContractorUplink
-
-- type: listing
-  id: UplinkContractorCuffs
-  name: uplink-cuffs-contractor-name
-  description: uplink-cuffs-contractor-desc
-  icon: { sprite: /Textures/Objects/Misc/handcuffs.rsi, state: handcuff }
-  productEntity: Handcuffs
-  cost:
-    Telecrystal: 2
-  categories:
-  - UplinkDisruption
-  - UplinkContractor
-  conditions:
-  - !type:StoreWhitelistCondition
-    whitelist:
-      tags:
-      - ContractorUplink

@@ -1,32 +1,39 @@
+<!--
+SPDX-FileCopyrightText: 2024 John Willis <143434770+CerberusWolfie@users.noreply.github.com>
+SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
+
+SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+
 <Document>
   # Station Alert - Epsilon
 
   <Box>
-    [italic]Вызывается только центральным командованием.[/italic]
+    [italic]Called by: Central Command Only.[/italic]
   </Box>
 
-  [bold]Условия:[/bold]
+  [bold]Conditions:[/bold]
 
-  Центральное командование сочло необходимым расторгнуть все контракты.
+  Central Command has deemed it necessary to terminate all contracts.
 
-  [bold]Служба безопаности:[/bold]
+  [bold]Security:[/bold]
 
-  Служба безопасности и остальная часть станции должны сами позаботиться о себе. Все контракты расторгнуты, и никаких действий предпринимать не требуется.
+  Security and the rest of the station are to fend for themselves. All contracts are terminated and nothing is required to act upon.
 
-  [bold]Безопасные зоны:[/bold]
+  [bold]Secure Areas:[/bold]
 
-  Вся станция считается охраняемой территорией.
+  The entire station is considered a secure area.
 
-  Все охраняемые зоны должны быть закрыты на засовы. Охраняемые зоны могут быть оставлены незапертыми по усмотрению любого персонала, имеющего к этому доступ.
+  All Secure Areas are to be bolted down. Secure Areas may be left unbolted at the discretion of any personnel with access to do so.
 
-  [bold]Общий состав экипажа:[/bold]
+  [bold]General Crew:[/bold]
 
-  Больше не требуется, чтобы весь персонал максимально использовал датчики костюма. Делайте это по своему усмотрению.
+  All personnel are no longer required to maximize suit sensors. Do so at your discretion.
 
-  Весь персонал больше не обязан оставаться в каком-либо отделе.
+  All personnel are no longer required to remain in any Department.
 
-  Посетители станции, все, у кого нет доступа к Центральному командованию, должны сами заботиться о себе вместе с экипажем станции.
+  Visitors of the station, anyone without Central Command access, are to fend for themselves along with the station crew.
 
-  Персонал больше не обязан следовать инструкциям какого-либо другого лица.
+  Personnel are no longer required to follow instructions from any other person.
 
 </Document>

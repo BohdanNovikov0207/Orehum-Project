@@ -17,10 +17,6 @@
         reagents:
         - ReagentId: SulfuricAcid
           Quantity: 20
-  - type: FoodSequenceElement # it's usable as xeno meat in a burger... but what a waste
-    entries:
-      Burger: MeatXeno
-      Taco: MeatXeno
   - type: FlavorProfile
     flavors:
     - meaty

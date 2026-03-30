@@ -18,11 +18,9 @@
     - type: StatusEffects
       allowed:
       - Stun
-      - KnockedDown
       - SlowedDown
       - Electrocution
       - PressureImmunity
-      - StaminaModifier
       - SeeAll
       - Flashed
     - type: Reactive

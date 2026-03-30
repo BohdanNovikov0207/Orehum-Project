@@ -347,6 +347,13 @@
 # Atmospheric Technician
 
 - type: loadoutGroup
+  id: AtmosphericTechnicianHead
+  name: loadout-group-atmospheric-technician-head
+  minLimit: 0
+  loadouts:
+  - SeniorEngineerBeret
+
+- type: loadoutGroup
   id: AtmosEnvirohelm
   name: loadout-group-atmos-envirohelm
   minLimit: 1
@@ -907,7 +914,6 @@
   minLimit: 0
   loadouts:
   - ClothingNeckScarfStripedCentcom
-  - NanotrasenRepresentativeEnsemble
 
 - type: loadoutGroup
   id: NanotrasenRepresentativeBackpack
@@ -972,157 +978,7 @@
   loadouts:
   - BlackEnvirogloves
 
-# BSO
-- type: loadoutGroup
-  id: BlueshieldOfficerHead
-  name: loadout-group-bso-head
-  minLimit: 0
-  loadouts:
-  - BlueshieldOfficerHeadSwatHelmet
-  - BlueshieldOfficerBeret
-  - BlueshieldOfficerHeadCowboy
-  - BlueshieldOfficerGoidaHelmet
-
-- type: loadoutGroup
-  id: BlueshieldOfficerBackpack
-  name: loadout-group-bso-backpack
-  loadouts:
-  - BlueshieldOfficerBackpack
-  - BlueshieldOfficerSatchel
-  - BlueshieldOfficerDuffel
-  - BlueshieldOfficerMessenger
-
-- type: loadoutGroup
-  id: BlueshieldOfficerJumpsuit
-  name: loadout-group-bso-jumpsuit
-  loadouts:
-  - BlueshieldOfficerInnerBlueshieldSuit
-  - BlueshieldOfficerInnerBlueshieldSkirt
-  - BlueshieldOfficerInnerBlueshieldShirt
-
-- type: loadoutGroup
-  id: BlueshieldOfficerOuter
-  name: loadout-group-bso-outer
-  loadouts:
-  - BlueshieldOfficerOuterBlueshieldArmorVest
-  - BlueshieldOfficerOuterBlueshieldArmoredJacket
-  - BlueshieldOfficerOuterBlueshieldCowboyVest
-  - BlueshieldOfficerOuterWinterBlueshield
-
-- type: loadoutGroup
-  id: BlueshieldOfficerNeck
-  name: loadout-group-bso-neck
-  minLimit: 0
-  loadouts:
-  - BlueshieldOfficerOuterBlueshieldMantle
-  - BlueshieldOfficerEnsemble
-
-- type: loadoutGroup
-  id: BlueshieldOfficerMask
-  name: loadout-group-bso-mask
-  minLimit: 0
-  loadouts:
-  - BlueshieldOfficerMaskLollypop
-
-- type: loadoutGroup
-  id: BlueshieldOfficerShoes
-  name: loadout-group-bso-shoes
-  loadouts:
-  - JackBoots
-  - BlackCowboyBoots
-  - SnowjacksBso
-
-- type: loadoutGroup
-  id: BlueshieldOfficerEnvirohelm
-  name: loadout-group-bso-envirohelm
-  minLimit: 1
-  maxLimit: 1
-  loadouts:
-  - BlueshieldOfficerEnvirohelm
-
-- type: loadoutGroup
-  id: BlueshieldOfficerEnvirosuit
-  name: loadout-group-bso-envirosuit
-  minLimit: 1
-  maxLimit: 1
-  loadouts:
-  - BlueshieldOfficerEnvirosuit
-
-- type: loadoutGroup
-  id: BlueshieldOfficerEnvirogloves
-  name: loadout-group-bso-envirogloves
-  minLimit: 1
-  maxLimit: 1
-  loadouts:
-  - CombatEnvirogloves
-
-- type: loadoutGroup
-  id: BlueshieldOfficerGloves
-  name: loadout-group-bso-gloves
-  minLimit: 1
-  maxLimit: 1
-  loadouts:
-  - CombatGloves
-
-# Career Trainer
-
-- type: loadoutGroup
-  id: NanotrasenTrainerHead
-  name: loadout-group-nct-head
-  minLimit: 0
-  loadouts:
-  - NanotrasenTrainerHat
-  - NanotrasenTrainerBeret
-
-- type: loadoutGroup
-  id: NanotrasenTrainerBackpack
-  name: loadout-group-nct-backpack
-  loadouts:
-  - NanotrasenTrainerSatchel
-  - NanotrasenTrainerBackpack
-  - NanotrasenTrainerDuffel
-
-- type: loadoutGroup
-  id: NanotrasenTrainerJumpsuit
-  name: loadout-group-nct-jumpsuit
-  loadouts:
-  - NanotrasenTrainerJumpsuit
-  - NanotrasenTrainerJumpskirt
-
-- type: loadoutGroup
-  id: NanotrasenTrainerOuterClothing
-  name: loadout-group-nct-outerclothing
-  minLimit: 0
-  loadouts:
-  - NanotrasenTrainerCoat
-
-- type: loadoutGroup
-  id: NanotrasenTrainerGloves
-  name: loadout-group-nct-gloves
-  loadouts:
-  - NanotrasenTrainerGloves
-
-- type: loadoutGroup
-  id: NanotrasenTrainerBelt
-  name: loadout-group-nct-belt
-  minLimit: 0
-  loadouts:
-  - NanotrasenTrainerClipboard
-
-- type: loadoutGroup
-  id: NanotrasenTrainerShoes
-  name: loadout-group-nct-shoes
-  loadouts:
-  - NanotrasenTrainerBoots
-  - NanotrasenTrainerShoes
-
 # Reporter
-
-- type: loadoutGroup
-  id: ReporterOuterClothing
-  name: loadout-group-reporter-outerclothing
-  loadouts:
-  - NoPro
 
 - type: loadoutGroup
   id: ReporterEnvirohelm
@@ -1157,6 +1013,17 @@
   loadouts:
   - Bodycam # Goobstation - Body cameras
   - ClothingNeckCWPSec
+
+#honkops
+
+- type: loadoutGroup
+  id: GroupHonkopsMask
+  name: loadout-group-honkops-mask
+  minLimit: 1
+  maxLimit: 1
+  hidden: true
+  loadouts:
+  - LoadoutHonkopsMask
 
 # Captain
 
@@ -1289,7 +1156,6 @@
   minLimit: 0
   loadouts:
   - MinerCloak
-  - SalvageEspecialistEnsemble
 
 # Chemist
 
@@ -1367,7 +1233,7 @@
   minLimit: 1
   maxLimit: 1
   loadouts:
-  - CombatGloves
+  - GorillaGloves
 # Brigmedic
 
 - type: loadoutGroup
@@ -1437,68 +1303,6 @@
   name: loadout-group-security-melee
   loadouts:
   - SecurityMeleeKnife
-  - SecurityMeleePolyBaton
-  - SecurityMeleeSpear
-
-# Zookeeper
-
-- type: loadoutGroup
-  id: ZookeeperHead
-  name: loadout-group-zookeeper-head
-  minLimit: 1
-  maxLimit: 1
-  loadouts:
-  - ZookeeperHead
-
-- type: loadoutGroup
-  id: ZookeeperJumpsuit
-  name: loadout-group-zookeeper-jumpsuit
-  minLimit: 1
-  maxLimit: 1
-  loadouts:
-  - ZookeeperJumpsuit
-
-- type: loadoutGroup
-  id: ZookeeperEnvirohelm
-  name: loadout-group-zookeeper-envirohelm
-  minLimit: 1
-  maxLimit: 1
-  loadouts:
-  - ZookeeperEnvirohelm
-
-- type: loadoutGroup
-  id: ZookeeperEnvirosuit
-  name: loadout-group-zookeeper-envirosuit
-  minLimit: 1
-  maxLimit: 1
-  loadouts:
-  - ZookeeperEnvirosuit
-
-- type: loadoutGroup
-  id: ZookeeperEnvirogloves
-  name: loadout-group-zookeeper-envirogloves
-  minLimit: 1
-  maxLimit: 1
-  loadouts:
-  - PurpleEnvirogloves
-
-# Boxer
-
-- type: loadoutGroup
-  id: BoxerEnvirohelm
-  name: loadout-group-boxer-envirohelm
-  minLimit: 1
-  maxLimit: 1
-  loadouts:
-  - BoxerEnvirohelm
-
-- type: loadoutGroup
-  id: BoxerEnvirosuit
-  name: loadout-group-boxer-envirosuit
-  minLimit: 1
-  maxLimit: 1
-  loadouts:
-  - BoxerEnvirosuit
 
 # Plasmamen
 
@@ -1576,21 +1380,3 @@
   - JumpsuitHawaiBlue
   - JumpsuitHawaiRed
   - JumpsuitHawaiYellow
-
-# Salvage/Shaft Miner
-
-- type: loadoutGroup
-  id: SalvageSpecialistJumpsuit
-  name: loadout-group-salvage-specialist-jumpsuit
-  loadouts:
-  - SalvageSpecialistJumpsuit
-  - SalvageSpecialistJumpskirt
-  - SalvageSpecialistOveralls
-
-- type: loadoutGroup
-  id: ShaftMinerJumpsuit
-  name: loadout-group-shaft-miner-jumpsuit
-  loadouts:
-  - ShaftMinerJumpsuit
-  - ShaftMinerJumpskirt
-  - ShaftMinerOveralls

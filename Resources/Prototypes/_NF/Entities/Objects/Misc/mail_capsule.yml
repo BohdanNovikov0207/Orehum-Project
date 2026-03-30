@@ -33,11 +33,9 @@
           tags:
           - Book
           - Document
-          - Mail
           components:
-          - Mail
+          - Delivery
           - Paper
-          #- HyperlinkBook # Goobstation
         insertOnInteract: true
         priority: 3
       food_slot:
@@ -47,7 +45,7 @@
         startingItem: null
         whitelist:
           components:
-          - Food
+          - Edible
         insertOnInteract: true
         priority: 1 # Goob Edit - Spesos are both food and money, so check for money first
       cash_slot:
@@ -57,7 +55,7 @@
         startingItem: null
         whitelist:
           components:
-          - Cash # Goob Edit - Turns out, spesos don't have a CurrencyComp
+          - Cash # Goob Edit - Turns out, Currency is server-only
         insertOnInteract: true
         priority: 2 # Goob Edit - Spesos are both food and money, so check for money first
   - type: ContainerContainer
@@ -84,7 +82,7 @@
       icon-food:
         whitelist:
           components:
-          - Food
+          - Edible
       icon-cash:
         whitelist:
           components:
@@ -94,11 +92,9 @@
           tags:
           - Book
           - Document
-          - Mail
           components:
-          - Mail
+          - Delivery
           - Paper
-          #- HyperlinkBook # Goobstation
     sprite: _NF/Objects/Misc/mail_capsule.rsi
   - type: Dumpable
   - type: Damageable
@@ -135,9 +131,10 @@
   - type: Storage
     grid:
     - 0,0,4,3
-  - type: StorageFill
-    contents:
-      - id: MailCapsulePrimed
+  - type: EntityTableContainerFill
+    containers:
+      storagebase:
+        id: MailCapsulePrimed
         amount: 10
   - type: Sprite
     layers:

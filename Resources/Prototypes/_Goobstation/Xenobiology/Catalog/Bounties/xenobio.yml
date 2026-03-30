@@ -11,7 +11,7 @@
 - type: xenobiologyBounty
   id: BountyExtractAnyThreeTier1
   pointsAwarded: 10000
-  entries:  
+  entries:
   - name: bounty-item-extract-any-three-tier1
     amount: 3
     whitelist:
@@ -22,8 +22,8 @@
      - XenobiologyMetalExtract
 
 - type: xenobiologyBounty
-  id: BountyExtractAnyThreeTier2                                         
-  pointsAwarded: 22500                                           
+  id: BountyExtractAnyThreeTier2
+  pointsAwarded: 22500
   entries:
   - name: bounty-item-extract-any-three-tier2
     amount: 3
@@ -33,9 +33,9 @@
       - XenobiologyDarkPurpleExtract
       - XenobiologyDarkBlueExtract
       - XenobiologySilverExtract
-      - XenobiologyBluespaceExtract 
+      - XenobiologyBluespaceExtract
       - XenobiologySepiaExtract
-      - XenobiologyCeruleanExtract                                                                                                                                                       
+      - XenobiologyCeruleanExtract
 
 - type: xenobiologyBounty
   id: BountyExtractAnyThreeTier3
@@ -282,4 +282,3 @@
     whitelist:
       tags:
       - XenobiologyAdamantineExtract
-

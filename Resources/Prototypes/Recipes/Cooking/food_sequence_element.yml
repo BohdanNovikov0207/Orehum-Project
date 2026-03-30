@@ -576,7 +576,7 @@
   - sprite: Objects/Specific/Hydroponics/lemon.rsi
     state: produce
   tags:
-  - Fruit
+    - Fruit
 
 # Lemoon
 
@@ -587,7 +587,7 @@
   - sprite: Objects/Specific/Hydroponics/lemoon.rsi
     state: produce
   tags:
-  - Fruit
+    - Fruit
 
 # Lime
 
@@ -598,7 +598,7 @@
   - sprite: Objects/Specific/Hydroponics/lime.rsi
     state: produce
   tags:
-  - Fruit
+    - Fruit
 
 # Orange
 
@@ -609,7 +609,7 @@
   - sprite: Objects/Specific/Hydroponics/orange.rsi
     state: produce
   tags:
-  - Fruit
+    - Fruit
 
 # Extradimensional Orange
 
@@ -621,7 +621,7 @@
     state: produce
   scale: 0.5,0.5
   tags:
-  - Fruit
+    - Fruit
 
 - type: foodSequenceElement
   id: ExtradimensionalOrangeBurger
@@ -631,7 +631,7 @@
     state: produce
   scale: 0.5,0.5
   tags:
-  - Fruit
+    - Fruit
 
 # Potato
 
@@ -642,7 +642,7 @@
   - sprite: Objects/Specific/Hydroponics/potato.rsi
     state: produce
   tags:
-  - Vegetable
+    - Vegetable
 
 # Tomato
 
@@ -1545,6 +1545,16 @@
   name: food-sequence-cotton-burger-content-plushie-moth
   sprites:
   - sprite: Objects/Fun/Plushies/moth.rsi
+    state: icon
+
+#Vulp Plushie
+
+- type: foodSequenceElement
+  id: PlushieVulp
+  scale: 0.8, 0.8
+  name: food-sequence-cotton-burger-content-plushie-vulp
+  sprites:
+  - sprite: Objects/Fun/Plushies/vulp.rsi
     state: icon
 
 #Ian Toy

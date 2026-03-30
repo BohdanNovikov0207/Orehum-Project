@@ -1,18 +1,25 @@
+<!--
+SPDX-FileCopyrightText: 2024 John Willis <143434770+CerberusWolfie@users.noreply.github.com>
+SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
+
+SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+
 <Document>
-# Регламент сервисного отдела
-Здесь перечислены стандартные процедуры, которым должен следовать персонал сервисного отдела. Это, как уже отмечалось, [bold]не чек-листы[/bold], и их следует рассматривать как рекомендации.
+# Service Department SOP
+These are the list of SOPs that Service Personnel should follow. These are, as stated before, [bold]not checklists[/bold] and should be treated as guidelines.
 
-Кроме того, эти положения не обязательно совпадают друг с другом и, если не указано иное, разделены по должностям.
+Furthermore, these listings do not necessarily coincide with one another, and are separated by Job unless otherwise stated.
 
-В этом отделе представлены следующие должности, при этом [color=#1b67a5][bold]Глава персонала[/bold][/color] — глава отдела:
-- [textlink="Глава персонала" link="HeadOfPersonnel SOP"]
-- [textlink="Бармен" link="Bartender SOP"]
-- [textlink="Ботаник" link="Botanist SOP"]
-- [textlink="Повар" link="Chef SOP"]
-- [textlink="Клоун" link="Clown SOP"]
-- [textlink="Уборщик" link="Janitor SOP"]
-- [textlink="Библиотекарь" link="Librarian SOP"]
-- [textlink="Мим" link="Mime SOP"]
-- [textlink="Репортёр" link="Reporter SOP"]
+The following jobs have entries in this Department, the [color=#1b67a5][bold]Head of Personnel[/bold][/color] being the Head of Staff:
+- [textlink="Head of Personnel" link="HeadOfPersonnel SOP"]
+- [textlink="Bartender" link="Bartender SOP"]
+- [textlink="Botanist" link="Botanist SOP"]
+- [textlink="Chef" link="Chef SOP"]
+- [textlink="Clown" link="Clown SOP"]
+- [textlink="Janitor" link="Janitor SOP"]
+- [textlink="Librarian" link="Librarian SOP"]
+- [textlink="Mime" link="Mime SOP"]
+- [textlink="Reporter" link="Reporter SOP"]
 
 </Document>

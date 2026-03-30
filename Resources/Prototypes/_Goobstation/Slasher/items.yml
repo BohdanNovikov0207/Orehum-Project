@@ -4,9 +4,6 @@
   id: SlasherMachete
   description: A large, vicious looking blade.
   components:
-  - type: Tag
-    tags:
-    - Machete
   - type: Sprite
     sprite: _Goobstation/Objects/Specific/Slasher/machete.rsi
   - type: MeleeWeapon
@@ -15,9 +12,7 @@
       types:
         Slash: 15
     soundHit:
-      path: /Audio/_Goobstation/Weapons/Melee/slashermachetehit.ogg
-      params:
-        volume: -12
+      path: /Audio/Weapons/bladeslice.ogg
   - type: DamageOtherOnHit
     damage:
       types:
@@ -97,8 +92,7 @@
     - WhitelistChameleon
   - type: Armor
     coverage:
-    - Chest
-    - Groin
+    - Torso
     - Arm
     - Leg
     modifiers:
@@ -109,7 +103,7 @@
         Heat: 0.90
         Caustic: 0.90
   - type: StaminaResistance
-    damageCoefficient: 0.1
+    damageCoefficient: 0.5
   - type: ModifyDelayedKnockdown
     cancel: true
 

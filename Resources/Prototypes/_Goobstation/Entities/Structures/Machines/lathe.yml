@@ -70,9 +70,9 @@
     - SharedBoards
     - CameraBoards
     - ShuttleBoards
-    - ShuttleBoardsGoob
     - BluespaceTheory
     - ScienceClothing
+    - TraumaScienceClothing
     - UpgradeKits
   - type: EmagLatheRecipes
     emagStaticPacks:
@@ -135,9 +135,9 @@
     - CargoBoards
     - SharedBoards
     - ShuttleBoards
-    - ShuttleBoardsGoob
     - BluespaceTheory
     - ScienceClothing
+    - TraumaScienceClothing
     - ConstructionBagOfHolding
   - type: EmagLatheRecipes
     emagStaticPacks:
@@ -192,13 +192,15 @@
     - ElectronicsStatic
     - SurgeryStatic
     - ScienceBoardsStatic
-    - ScienceExplosives # Goobstation - Roundstart Grenade Tech
-    - GrenadeTriggersStatic # Goobstation - Roundstart Grenade Tech
+    - ScienceExplosives
+    - GrenadeTriggersStatic
     - MiscSignallersStatic
+    - GeneticsStatic # Trauma
     dynamicPacks:
     - AdvancedTools
     - ScienceEquipment
     - ScienceClothing
+    - TraumaScienceClothing
     - ScienceWeapons
     - AtmosTools
     - EngineeringWeapons
@@ -213,7 +215,6 @@
     - SharedBoards
     - ScienceBoards
     - ShuttleBoards
-    - ShuttleBoardsGoob
     - MedicalBoardsGoob
     - BluespaceTheory
     - ExperimentalScienceGoob
@@ -296,40 +297,3 @@
         - Sheet
         - RawMaterial
         - Ingot
-
-- type: entity
-  id: ERTTechFab
-  parent: [BaseLatheLube, BaseSiloUtilizer]
-  name: ERT techfab
-  description: Standard-issue ammunition and gear for Emergency Response Team deployments. Fast, basic, reliable.
-  components:
-    - type: Sprite
-      sprite: Structures/Machines/techfab.rsi
-      layers:
-        - state: icon
-          map: ["enum.LatheVisualLayers.IsRunning"]
-        - state: ert
-        - state: unlit
-          shader: unshaded
-          map: ["enum.PowerDeviceVisualLayers.Powered"]
-        - state: inserting
-          map: ["enum.MaterialStorageVisualLayers.Inserting"]
-        - state: panel
-          map: ["enum.WiresVisualLayers.MaintenancePanel"]
-    - type: Machine
-      board: ERTTechFabCircuitboard
-    - type: Lathe
-      idleState: icon
-      runningState: icon
-      staticPacks:
-      - SecurityAmmoStatic
-      - SecurityAmmoStaticGoob
-      - ERTAmmoStaticGoob
-      - SecurityHypoStatic
-      - SecurityEquipmentStaticGoob
-    - type: MaterialStorage
-      whitelist:
-        tags:
-          - Sheet
-          - RawMaterial
-          - Ingot

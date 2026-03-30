@@ -32,8 +32,39 @@
   - type: AntagRandomSpawn
   - type: AntagObjectives
     objectives:
-      # - SlaughterKillTheWizardObjective
+      - SlaughterKillTheWizardObjective
       - SlaughterKillEveryoneObjective
+
+# laughter
+- type: entity
+  parent: BaseGameRule
+  id: LaughterDemonSummon
+  components:
+  - type: AntagSpawner
+    prototype: MobLaughterDemon
+  - type: AntagSelection
+    agentName: laughter-round-end-agent-name
+    definitions:
+    - spawnerPrototype: SpawnPointGhostLaughterDemon
+      min: 1
+      max: 1
+      pickPlayer: false
+      mindRoles:
+      - MindRoleSlaughterDemon
+      briefing:
+        text: laughter-role-greeting
+        color: Pink
+        sound: /Audio/_Goobstation/Vehicle/Clowncar/clowncar_fart.ogg
+      components:
+      - type: RandomMetadata
+        nameSegments:
+        - NamesLaughterTitle
+        - NamesSlaughter
+        nameFormat: name-format-slaughter
+  - type: AntagRandomSpawn
+  - type: AntagObjectives
+    objectives:
+    - SlaughterHugAndTickleObjective
 
 # midround
 - type: entity
@@ -68,24 +99,13 @@
     minimumPlayers: 50
     duration: null
     maxOccurrences: 1
-    chaos:
-      Hostile: 200
-      Friend: 40
-      Medical: 200
-      Death: 200
-    eventType: HostilesSpawn
-  - type: GameRule
-    chaosScore: 900
-  - type: Tag
-    tags:
-    - MidroundAntag
   - type: AntagObjectives
     objectives:
-      - SlaughterDevourObjective
-      - AnnihilateAllJanitorsObjectiveFluff
-      - SpareCrewObjectiveFluff
-      - HuntTheBraveObjectiveFluff
-      - HuntTheCowardsObjectiveFluff
-      - ShowCrewPowerObjectiveFluff
-      - DriveInsaneObjectiveFluff
-      - SpreadBloodObjectiveFluff
+    - SlaughterDevourObjective
+    - AnnihilateAllJanitorsObjectiveFluff
+    - SpareCrewObjectiveFluff
+    - HuntTheBraveObjectiveFluff
+    - HuntTheCowardsObjectiveFluff
+    - ShowCrewPowerObjectiveFluff
+    - DriveInsaneObjectiveFluff
+    - SpreadBloodObjectiveFluff

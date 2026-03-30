@@ -52,15 +52,6 @@
     description: abductor-lone-ghost-role-desc
     mindRoles:
     - MindRoleGhostRoleSoloAntagonist
-    requirements:
-    - !type:OverallPlaytimeRequirement
-      time: 18000 #5 hours
-    - !type:DepartmentTimeRequirement
-      department: Medical
-      time: 7200 #2 hours
-    - !type:DepartmentTimeRequirement
-      department: Security
-      time: 7200 #2 hours
   - type: AbductorScientist
   - type: SurgeryIgnoreClothing
   - type: Sanitized
@@ -80,12 +71,6 @@
     description: abductor-scientist-ghost-role-desc
     mindRoles:
     - MindRoleGhostRoleTeamAntagonist
-    requirements:
-    - !type:OverallPlaytimeRequirement
-      time: 18000 #5 hours
-    - !type:DepartmentTimeRequirement
-      department: Medical
-      time: 10800 #3 hours
   - type: AbductorScientist
   - type: SurgeryIgnoreClothing
   - type: Sanitized
@@ -105,12 +90,6 @@
     description: abductor-agent-ghost-role-desc
     mindRoles:
     - MindRoleGhostRoleTeamAntagonist
-    requirements:
-    - !type:OverallPlaytimeRequirement
-      time: 18000 #5 hours
-    - !type:DepartmentTimeRequirement
-      department: Security
-      time: 10800 #3 hours
   - type: RandomMetadata
     nameSegments:
       - AbductorAgentPrefix
@@ -139,9 +118,12 @@
     outerClothing: ClothingOuterCoatAbductor
     back: ClothingBackpackAbductor
     pocket1: AbductorGizmo
-    pocket2: WeaponAlien
+    pocket2: AbductorTaskTablet
     suitstorage: Wonderprod
     id: AgentIDCard
+  storage:
+    back:
+    - WeaponAlien
 
 - type: startingGear
   id: AbductorScientistGear
@@ -153,9 +135,13 @@
     head: ClothingHeadMirror
     outerClothing: ClothingOuterCoatAbductor
     back: ClothingBackpackDuffelAbductor
-    pocket1: AbductorGizmo
+    pocket1: Silencer # Trauma - swapped silencer and gizmo
+    pocket2: AbductorTaskTablet
     suitstorage: WeaponDecloner
     id: AgentIDCard
+  storage:
+    back:
+    - RadioJammer
 
 - type: startingGear
   id: AbductorAgentGear
@@ -167,25 +153,27 @@
     head: ClothingHeadHelmetAbductor
     outerClothing: ClothingOuterArmorAbductor
     back: ClothingBackpackAbductor
-    pocket1: Silencer
+    pocket1: AbductorGizmo # Trauma - swapped silencer and gizmo
     pocket2: WeaponAlien
     suitstorage: Wonderprod
     id: AgentIDCard
+  inhand:
+    - ClothingBackpackChameleonFillAgent
 
 # Spawners
 
 - type: entity
-  name: lone abductor spawner
-  id: SpawnPointLoneAbductor
   parent: MarkerBase
+  id: SpawnPointAbductor
+  name: abductor spawn point
   components:
   - type: SpawnPoint
   - type: Sprite
     sprite: Markers/jobs.rsi
     layers:
-      - state: green
-      - sprite: Structures/Wallmounts/signs.rsi
-        state: radiation
+    - state: green
+    - sprite: _Shitmed/Objects/Weapons/Melee/wonderprod.rsi
+      state: icon
 
 - type: entity
   categories: [ HideSpawnMenu, Spawner ]
@@ -200,28 +188,6 @@
     - MindRoleGhostRoleSoloAntagonist
     raffle:
       settings: default
-    requirements:
-    - !type:OverallPlaytimeRequirement
-      time: 18000 #5 hours
-    - !type:DepartmentTimeRequirement
-      department: Medical
-      time: 7200 #2 hours
-    - !type:DepartmentTimeRequirement
-      department: Security
-      time: 7200 #2 hours
-  - type: Sprite
-    sprite: Markers/jobs.rsi
-    layers:
-      - state: green
-      - sprite: Structures/Wallmounts/signs.rsi
-        state: radiation
-
-- type: entity
-  name: abductor agent spawner
-  id: SpawnPointAbductorAgent
-  parent: MarkerBase
-  components:
-  - type: SpawnPoint
   - type: Sprite
     sprite: Markers/jobs.rsi
     layers:
@@ -242,25 +208,6 @@
     - MindRoleGhostRoleTeamAntagonist
     raffle:
       settings: default
-    requirements:
-    - !type:OverallPlaytimeRequirement
-      time: 18000 #5 hours
-    - !type:DepartmentTimeRequirement
-      department: Security
-      time: 10800 #3 hours
-  - type: Sprite
-    sprite: Markers/jobs.rsi
-    layers:
-      - state: green
-      - sprite: Structures/Wallmounts/signs.rsi
-        state: radiation
-
-- type: entity
-  name: abductor scientist spawner
-  id: SpawnPointAbductorScientist
-  parent: MarkerBase
-  components:
-  - type: SpawnPoint
   - type: Sprite
     sprite: Markers/jobs.rsi
     layers:
@@ -281,12 +228,6 @@
     - MindRoleGhostRoleTeamAntagonist
     raffle:
       settings: default
-    requirements:
-    - !type:OverallPlaytimeRequirement
-      time: 18000 #5 hours
-    - !type:DepartmentTimeRequirement
-      department: Medical
-      time: 10800 #3 hours
   - type: Sprite
     sprite: Markers/jobs.rsi
     layers:

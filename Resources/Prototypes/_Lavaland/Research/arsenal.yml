@@ -35,6 +35,6 @@
   - PKAUpgradeRange
   - PKAUpgradeFireRate
   - PKAUpgradeSpace
-  position: 0,-7
+  position: 0,-3
   technologyPrerequisites:
   - MassExcavation

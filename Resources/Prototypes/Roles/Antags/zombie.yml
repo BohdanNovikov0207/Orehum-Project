@@ -16,12 +16,15 @@
   setPreference: true
   objective: roles-antag-initial-infected-objective
   requirements:
-  - !type:SpeciesRequirement
+  - !type:OverallPlaytimeRequirement
+    time: 1h
+  - !type:SpeciesRequirement # Goob
     inverted: true
     species:
     - IPC
     - Plasmaman
   guides: [ Zombies ]
+  dontShowInCredits: true # Trauma
 
 - type: antag
   id: Zombie
@@ -30,9 +33,10 @@
   setPreference: false
   objective: roles-antag-zombie-objective
   requirements:
-  - !type:SpeciesRequirement
+  - !type:SpeciesRequirement # Goob
     inverted: true
     species:
     - IPC
     - Plasmaman
   guides: [ Zombies ]
+  creditImage: /Textures/_Trauma/EndCredits/Antags/zombies.png # Trauma

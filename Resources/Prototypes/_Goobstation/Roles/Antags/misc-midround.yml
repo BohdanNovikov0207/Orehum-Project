@@ -1,4 +1,38 @@
 - type: startingGear
+  id: GreyTideAntagGear
+  equipment:
+    mask: ClothingMaskGasUnremoveable
+    jumpsuit: ClothingUniformJumpsuitAncientUnremoveable
+    shoes: ClothingShoesColorBlackUnremoveable
+    id: PassengerPDA
+    ears: ClothingHeadsetGrey
+    belt: ClothingBeltUtilityFilledUnremoveable
+    gloves: ClothingHandsGlovesColorYellowUnremovable
+    back: ClothingBackpackUnremoveable
+  inhand:
+  - Toolboxrobust
+
+- type: startingGear
+  id: TunnelClownAntagGear
+  equipment:
+    mask: ClothingMaskClownUnremoveable
+    jumpsuit: ClothingUniformJumpsuitClown
+    outerClothing: ClothingOuterCoatJacketBiker
+    shoes: ClothingShoesClownUnremoveable
+    id: ClownPDA
+    ears: ClothingHeadsetService
+    gloves: ClothingHandsGlovesCombat
+    back: ClothingBackpackClown
+  inhand:
+  - FireAxe
+  - Stunprod
+  storage:
+    back:
+    - ClownRecorder
+    - FoodMeatClown
+    - TunnelClownBusinessCard
+
+- type: startingGear
   id: SingulothKnightsAntagGear
   equipment:
     jumpsuit: ClothingUniformJumpsuitColorBlack
@@ -7,7 +41,6 @@
     gloves: ClothingHandsGlovesColorYellow
     back: ClothingBackpackSatchelLeather
     belt: ClothingBeltUtilityFilled
-    suitstorage: OxygenTankFilled
   inhand:
   - SingulothsHammer
   storage:
@@ -39,7 +72,6 @@
     belt: ClothingBeltAssaultFilled
     id: CentcomPDA
   inhand:
-  - PinpointerDarkLord
   - EnergySwordBlue
 
 - type: startingGear
@@ -65,6 +97,8 @@
     - MagazinePistolCaselessRifle
     - ChemistryBottleNocturine
     - Syringe
+    - DeathAcidifierImplanter
+    - FreedomImplanter
 
 - type: startingGear
   id: DarkPriestAntagGear
@@ -86,20 +120,24 @@
     - ClothingOuterHoodieChaplain
     - BoxSurvivalSlots
 
-# christmas
-
 - type: startingGear
-  id: SantaGear
+  id: VoxRaiderAntagGear
   equipment:
-    ears: ClothingHeadsetCentCom
-    head: ClothingHeadHatSantahat
-    jumpsuit: ClothingUniformJumpsuitColorWhite
+    ears: ClothingHeadsetAltSyndicate
+    jumpsuit: ClothingUniformJumpsuitTacticool
     shoes: ClothingShoesColorBlack
-    id: CentcomPDA
-    pocket1: FoodBakedCookie
-    pocket2: DrinkGlassWhite
-    gloves: ClothingHandsGlovesColorWhite
-    outerClothing: ClothingOuterSanta
-    back: ClothingBackpackSantasSack
-  inhand:
-  - SantaCannonRegenerating
+    id: SyndicateIDCard
+    mask: ClothingMaskGasSyndicate
+    gloves: ClothingHandsChameleonThief
+    outerClothing: ClothingOuterHardsuitVoxRaiderStealth
+    suitstorage: ExtendedEmergencyNitrogenTankFilled
+    back: ClothingBackpack
+  storage:
+    back:
+    - BoxSurvivalSlotsNitrogen
+    - ExtendedEmergencyNitrogenTankFilled
+    - ChameleonProjector
+    - DartGun
+    - ChemistryBottleNocturine
+    - ChemistryBottleNocturine
+    - AgentIDCard

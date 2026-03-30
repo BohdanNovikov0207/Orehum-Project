@@ -180,15 +180,6 @@
     Glass: 850
 
 - type: latheRecipe
-  parent: BaseWeaponRecipeLong
-  id: WeaponEnergyIonRifle
-  result: WeaponEnergyIonRifle
-  materials:
-    Steel: 1200
-    Plastic: 600
-    Gold: 300
-
-- type: latheRecipe
   parent: BaseWeaponRecipe
   id: PolymerBaton
   result: PolymerBaton
@@ -204,36 +195,9 @@
     Glass: 250
     Steel: 100
 
-- type: latheRecipe
-  parent: BaseWeaponRecipeLong
-  id: Terminus
-  result: Terminus # Einstein Engines
-  materials:
-    Steel: 1250
-    Plastic: 750
-    Gold: 500
-
-# Smartgun
-
-- type: latheRecipe
-  parent: BaseWeaponRecipeLong
-  id: WeaponSubMachineSmart
-  result: WeaponSubMachineSmart
-  materials:
-    Steel: 1800
-    Plastic: 750
-    Silver: 500
-    Gold: 500
-
-- type: latheRecipe
-  parent: BaseAmmoRecipe
-  id: MagazineSmart
-  result: MagazineSmart
-  materials:
-    Steel: 550
-
 # Mech Weapons
 - type: latheRecipe
+  parent: BaseRedAlert # Trauma
   id: WeaponMechCombatImmolationGun
   result: WeaponMechCombatImmolationGun
   categories:
@@ -246,6 +210,7 @@
     Glass: 500
 
 - type: latheRecipe
+  parent: BaseRedAlert # Trauma
   id: WeaponMechCombatSolarisLaser
   result: WeaponMechCombatSolarisLaser
   categories:
@@ -258,6 +223,7 @@
     Glass: 200
 
 - type: latheRecipe
+  parent: BaseRedAlert # Trauma
   id: WeaponMechCombatFiredartLaser
   result: WeaponMechCombatFiredartLaser
   categories:
@@ -270,6 +236,7 @@
     Glass: 50
 
 - type: latheRecipe
+  parent: BaseRedAlert # Trauma
   id: WeaponMechCombatUltraRifle
   result: WeaponMechCombatUltraRifle
   categories:
@@ -280,6 +247,7 @@
     Plastic: 200
 
 - type: latheRecipe
+  parent: BaseRedAlert # Trauma
   id: WeaponMechCombatShotgun
   result: WeaponMechCombatShotgun
   categories:
@@ -290,6 +258,7 @@
     Plastic: 550
 
 - type: latheRecipe
+  parent: BaseRedAlert # Trauma
   id: WeaponMechCombatShotgunIncendiary
   result: WeaponMechCombatShotgunIncendiary
   categories:
@@ -301,6 +270,7 @@
     Plasma: 300
 
 - type: latheRecipe
+  parent: BaseRedAlert # Trauma
   id: WeaponMechCombatDisabler
   result: WeaponMechCombatDisabler
   categories:
@@ -312,6 +282,7 @@
     Plastic: 300
 
 - type: latheRecipe
+  parent: BaseRedAlert # Trauma
   id: WeaponMechCombatFlashbangLauncher
   result: WeaponMechCombatFlashbangLauncher
   categories:
@@ -323,6 +294,7 @@
     Plastic: 450
 
 - type: latheRecipe
+  parent: BaseRedAlert # Trauma
   id: WeaponMechCombatMissileRack8
   result: WeaponMechCombatMissileRack8
   categories:
@@ -521,13 +493,6 @@
 
 - type: latheRecipe
   parent: BaseAmmoRecipe
-  id: MagazinePistolCaselessRifle
-  result: MagazinePistolCaselessRifle
-  materials:
-    Steel: 145
-
-- type: latheRecipe
-  parent: BaseAmmoRecipe
   id: MagazineLowCaliberM7S
   result: MagazineLowCaliberM7S
   materials:
@@ -658,27 +623,6 @@
 
 - type: latheRecipe
   parent: BaseEmptyAmmoRecipe
-  id: MagazineCaselessRifleEmpty
-  result: MagazineCaselessRifleEmpty
-  materials:
-    Steel: 25
-
-- type: latheRecipe
-  parent: BaseAmmoRecipe
-  id: MagazineCaselessRifle
-  result: MagazineCaselessRifle
-  materials:
-    Steel: 400
-
-- type: latheRecipe
-  parent: BaseAmmoRecipe
-  id: MagazineBoxAntiMateriel
-  result: MagazineBoxAntiMateriel
-  materials:
-    Steel: 1500
-
-- type: latheRecipe
-  parent: BaseEmptyAmmoRecipe
   id: MagazinePistolHighCapacityEmpty
   result: MagazinePistolHighCapacityEmpty
   materials:
@@ -690,61 +634,6 @@
   result: MagazinePistolHighCapacity
   materials:
     Steel: 285
-
-- type: latheRecipe
-  parent: BaseAmmoRecipe
-  id: PowerCellBluespaceRevolver
-  result: PowerCellBluespaceRevolver
-  materials:
-    Steel: 300
-    Gold: 200
-    Glass: 300
-    Plasma: 500
-    Uranium: 400
-    BSCrystal: 100
-    
-- type: latheRecipe
-  parent: BaseAmmoRecipe
-  id: MilitaryPowerCellBluespaceLMG
-  result: MilitaryPowerCellBluespaceLMG
-  materials:
-    Steel: 1500
-    Gold: 200
-    Glass: 800
-    Plasma: 1000
-    BSCrystal: 200
-
-- type: latheRecipe
-  parent: BaseAmmoRecipe
-  id: PowerCellBluespaceSniper
-  result: PowerCellBluespaceSniper
-  materials:
-    Steel: 600
-    Gold: 300
-    Glass: 600
-    Plasma: 1500
-    BSCrystal: 100
-
-- type: latheRecipe
-  parent: BaseAmmoRecipe
-  id: PowerCellBluespaceSMG
-  result: PowerCellBluespaceSMG
-  materials:
-    Steel: 400
-    Gold: 200
-    Glass: 400
-    Plasma: 1000
-    BSCrystal: 100
-
-- type: latheRecipe
-  id: ClothingEyesGlassesSecurityContraDetect
-  result: ClothingEyesGlassesSecurityContraDetect
-  completetime: 2
-  materials:
-    Steel: 200
-    Glass: 100
-    Silver: 100
-    Gold: 100
 
 # Circuitboards
 
@@ -772,5 +661,3 @@
     Steel: 500
     Plastic: 250
     Cloth: 200
-
-  

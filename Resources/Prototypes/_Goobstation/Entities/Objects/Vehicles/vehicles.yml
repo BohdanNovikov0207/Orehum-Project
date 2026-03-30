@@ -39,7 +39,7 @@
   - type: InteractionOutline
   - type: Access
   - type: Physics
-    bodyType: Dynamic
+    bodyType: KinematicController
   - type: Fixtures
     fixtures:
       fix1:
@@ -80,7 +80,7 @@
   - type: MovementSpeedModifier
     baseAcceleration: 8
     baseFriction: 0.2 # wheels dont stop instantly
-    baseSprintSpeed: 6 # Trauma edit
+    baseSprintSpeed: 6 # Trauma - was 8.5
     baseWalkSpeed: 4.5 # default walking speed
   - type: ItemSlots
     slots:
@@ -103,7 +103,7 @@
 
 - type: entity
   id: VehicleSecway
-  parent: [ BaseVehicle, BaseSecurityContraband ]
+  parent: [ BaseGroundVehicle, BaseSecurityContraband ]
   name: secway
   description: The future of transportation. Popularized by St. James, the patron saint of security officers and internet forum moderators.
   components:
@@ -160,7 +160,7 @@
 
 - type: entity
   id: VehicleATV
-  parent: BaseVehicle
+  parent: BaseGroundVehicle
   name: ATV
   description: All-Tile Vehicle.
   components:
@@ -190,7 +190,7 @@
 
 - type: entity
   id: VehicleJanicart
-  parent: BaseVehicle
+  parent: BaseGroundVehicle
   name: janicart
   description: The janitor's trusty steed.
   components:
@@ -224,7 +224,7 @@
 
 - type: entity
   id: VehicleWheelchair
-  parent: [ BaseVehicle, BaseFoldable, BaseItem ]
+  parent: [ BaseGroundVehicle, BaseFoldable, BaseItem ]
   name: wheelchair
   description: A chair with big wheels. It looks like you can move in these on your own.
   components:
@@ -256,18 +256,6 @@
     materialComposition:
       Steel: 125
       Plastic: 125
-  - type: Fixtures
-    fixtures:
-      fix1:
-        shape:
-          !type:PhysShapeCircle
-          radius: 0.45
-        density: 100
-        mask:
-          - MobMask
-        layer:
-          - None # can't be hit by projectiles or lasers
-        hard: true
 
 - type: entity
   parent: VehicleWheelchair
@@ -279,7 +267,7 @@
 
 - type: entity
   id: VehicleHoverchair
-  parent: BaseVehicle
+  parent: BaseVehicle # not ground vehicle because hovering :)
   name: hoverchair
   description: A luxury hoverchair, kick back and relax.
   components:
@@ -361,7 +349,7 @@
 
 - type: entity
   id: VehicleForklift
-  parent: BaseVehicle
+  parent: BaseGroundVehicle
   name: forklift
   description: NanoTrasen approved Forklift Certification required.
   components:

@@ -19,35 +19,39 @@
   flavor: mindful
   color: "#915E48"
   metabolisms:
-    Poison:
+    Bloodstream:
       metabolismRate: 0.05 # Trauma
       effects:
       - !type:AdjustReagent # Trauma - Gradually builds up if not "neutralized" with spicy food
         reagent: Tranquility
         amount: 0.1 # 20s/1u after metabolism
         conditions:
-        - !type:ReagentThreshold
+        - !type:ReagentCondition
+          reagent: Tranquility
           min: 2.5 # Not sure where to put this yet, but shouldn't work diluted
       - !type:PopupMessage
-          type: Local
-          messages: [ "reagent-popup-tranquility" ]
-          probability: 0.05 # Trauma - Reduced so that it doesn't spam you over the course of your "infection"
+        type: Local
+        messages: [ "reagent-popup-tranquility" ]
+        probability: 0.05 # Trauma - Reduced so that it doesn't spam you over the course of your "infection"
       - !type:GenericStatusEffect
         key: Pacified
         component: Pacified
         conditions:
-        - !type:ReagentThreshold
+        - !type:ReagentCondition
+          reagent: Tranquility
           min: 10
       - !type:GenericStatusEffect
         key: Muted
         component: Muted
         conditions:
-        - !type:ReagentThreshold
+        - !type:ReagentCondition
+          reagent: Tranquility
           min: 20 # Trauma - Threshold increased so you can ask medical for help
       - !type:Polymorph
         prototype: Gondola
         conditions:
-        - !type:ReagentThreshold
+        - !type:ReagentCondition
+          reagent: Tranquility
           min: 25
 
 - type: reagent
@@ -59,7 +63,7 @@
   flavor: bitter
   color: "#1a6ac1"
   metabolisms:
-    Poison:
+    Bloodstream:
       metabolismRate: 0.05
       effects:
       - !type:PopupMessage
@@ -69,7 +73,8 @@
       - !type:Polymorph
         prototype: Bingle
         conditions:
-        - !type:ReagentThreshold
+        - !type:ReagentCondition
+          reagent: BingleJuice
           min: 25
 
 - type: reagent
@@ -81,19 +86,21 @@
   flavor: bitter
   color: "#bb26f9"
   metabolisms:
-    Poison:
+    Bloodstream:
       metabolismRate: 0.05
       effects:
       - !type:Polymorph
         prototype: ForcedCarpSentient
         conditions:
-        - !type:ReagentThreshold
+        - !type:ReagentCondition
+          reagent: Carpolin
           min: 9
       - !type:AdjustReagent
         reagent: Carpolin
         amount: -10
         conditions:
-        - !type:ReagentThreshold
+        - !type:ReagentCondition
+          reagent: Carpolin
           min: 9 # keep it the same as above
       - !type:PopupMessage
         type: Local
@@ -101,10 +108,11 @@
         probability: 0.3
       - !type:HealthChange
         conditions:
-        - !type:ReagentThreshold
+        - !type:ReagentCondition
+          reagent: Carpolin
           min: 1
-        - !type:OrganType
-          type: Animal
+        - !type:MetabolizerTypeCondition
+          type: [ Animal ]
         damage:
           types:
             Poison: 0.06
@@ -122,8 +130,8 @@
   flavor: offensive
   color: "#BF5E5E"
   metabolisms:
-    Poison:
-      metabolismRate: 0.10
+    Bloodstream:
+      metabolismRate: 0.1
       effects:
       - !type:GenericStatusEffect
         key: Vulgarity
@@ -139,7 +147,7 @@
   flavor: tears
   color: "#fcb8f5"
   metabolisms:
-    Poison:
+    Bloodstream:
       effects:
       - !type:PopupMessage
         type: Local
@@ -156,7 +164,7 @@
   flavor: fizzy
   color: "#ffff40"
   metabolisms:
-    Poison:
+    Bloodstream:
       metabolismRate: 0.1
       effects:
       - !type:Emote
@@ -167,16 +175,18 @@
       - !type:Polymorph
         prototype: Cat
         conditions:
-        - !type:OrganType
-          type: Animal
-          shouldHave: false
-        - !type:ReagentThreshold
+        - !type:MetabolizerTypeCondition
+          type: [ Animal ]
+          inverted: true
+        - !type:ReagentCondition
+          reagent: CatDrugs
           min: 50
       - !type:AdjustReagent
         reagent: CatDrugs
         amount: -20
         conditions:
-        - !type:ReagentThreshold
+        - !type:ReagentCondition
+          reagent: CatDrugs
           min: 50
 
 - type: reagent
@@ -197,7 +207,7 @@
   flavor: robust
   color: "#ffd648"
   metabolisms:
-    Drink:
+    Bloodstream:
       metabolismRate: 0.1
       effects:
       - !type:GenericStatusEffect
@@ -214,7 +224,7 @@
   flavor: horrible
   color: "#654321"
   metabolisms:
-    Poison:
+    Bloodstream:
       metabolismRate: 2.5
       effects:
       - !type:Emote

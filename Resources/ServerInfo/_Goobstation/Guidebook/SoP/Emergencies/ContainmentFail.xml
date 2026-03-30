@@ -1,14 +1,21 @@
+<!--
+SPDX-FileCopyrightText: 2024 John Willis <143434770+CerberusWolfie@users.noreply.github.com>
+SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
+
+SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+
 <Document>
-# Тесла/Процедуры ослабления защиты от сингулярности
-В случае сбоя защитной системы Теслы или Сингулярности (удачно названной "tesloose" и "singuloose") должна быть вызвана эвакуация станции, а оповещение станции должно быть установлено на [color=#c8a404]Желтый код[/color].
+# Tesla/Singularity Containment Loose Procedures
+In the event of a tesla or singularity containment failure (aptly named "tesloose" and "singuloose"), the station evac is to be called and the station alert set to [color=#c8a404]Yellow Alert[/color].
 
-1. Попытки остановить высвобождение материала следует предпринимать, по возможности, с помощью средств сдерживания, таких как [bold][italic]Портативный Замедлитель Частиц[/italic][/bold].
+1. Attempts to stop the loosed material should be made, if possible, via containment weapons, such as the [bold][italic]Portable Particle Decelerator[/italic][/bold].
 
-2. Командование и инженерный состав должны сделать все возможное для отслеживания и уведомления экипажа по каналам связи о местонахождении вышедшей из строя Теслы/Сингулярности.
-<Box>Это не обязательно, но настоятельно рекомендуется.</Box>
+2. Command and Engineering are to do their best at tracking and notifying crew via Communications Channels of the location of the loosed tesla/singularity.
+<Box>It is not required, but vastly recommended of doing so.</Box>
 
-3. Командование [bold]должно[/bold] открыть хранилище EVA и настроить его на аварийный доступ.
+3. Command [bold]must[/bold] open and set EVA Storage to Emergency Access.
 
-4.  В случае полной локализации высвобожденного материала, если станция относительно не повреждена, следует возобновить нормальную работу смены и перевести сигнал тревоги в режим безопасного оповещения.
+4. In the event of a complete containment of the loosed material, if the station is relatively undamaged, normal shift activity should resume and the alert should be set to a safe alert.
 
 </Document>

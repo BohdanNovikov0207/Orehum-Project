@@ -1,20 +1,20 @@
-﻿<Document>
+<Document>
 
-  # Производство Пластиковых листов
+  # Plastic Sheet Production
 
   <GuideEntityEmbed Entity="SheetPlastic"/>
 
-  Пластиковый лист — это универсальный синтетический материал, используемый в самых различных рецептах. Хоть их производство и не является сложным, для правильного синтеза требуется высокая температура и несколько реагентов.
+  Plastic sheets are versatile synthetic materials used in a wide variety of recipes. While not inherently complex to produce, they require high temperatures and multiple reagents to synthesize correctly.
 
-  ## Рецепт
+  ## Recipe
 
-  Для производства [bold]10 Пластиковых листов[/bold], combine the following in a chemical mixer and heat to at least [bold]374 Kelvin[/bold]:
+  To produce [bold]10 Plastic Sheets[/bold], combine the following in a chemical mixer and heat to at least [bold]374 Kelvin[/bold]:
 
-  — 10u [bold]Машинного масла[/bold]
+  — 10 units of [bold]Oil[/bold]
 
-  — 6u [bold]Пепла[/bold]
+  — 6 units of [bold]Ash[/bold]
 
-  — 4u [bold]Серной кислоты[/bold]
+  — 4 units of [bold]Sulfuric Acid[/bold]
 
   ## Components
 
@@ -24,6 +24,6 @@
 
   ## Output
 
-  После завершения синтеза пластик появится поверх мензурки или ХимМастера.
+  Once complete, Plastic will appear on top of the beaker or ChemMaster. Transfer it to storage or fabrication systems as needed.
 
 </Document>

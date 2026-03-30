@@ -27,9 +27,12 @@
   - Chemist
   - Cloning
   - Cryogenics
-  - Surgery # Shitmed Change
-  - MedicalPatches # Fix for Medicine Patches
-  - Virology # Goobstation
+  # <Trauma>
+  - Surgery
+  - MedicalPatches
+  - Virology
+  - Hypoports
+  # </Trauma>
 
 - type: guideEntry
   id: MedicalDoctor

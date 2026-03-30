@@ -1,14 +1,10 @@
-# SPDX-FileCopyrightText: 2025 Aviu00 <aviu00@protonmail.com>
-# SPDX-FileCopyrightText: 2025 GoobBot <uristmchands@proton.me>
-#
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-# ER-5 Torrent SMG
 - type: entity
-  name: ER-5 Torrent
+  name: energy SMG
   parent: [ BaseWeaponCustomCell, BaseSecurityContraband ]
   id: WeaponLaserCellSMG
-  description: A specialized laser SMG, designed to put down suppressive fire through cover and be reloaded on the fly. Takes SMG power cells.
+  description: A laser SMG, compatible with specialized SMG power cells.
   components:
   - type: Item
     size: Large
@@ -60,29 +56,29 @@
       path: /Audio/_Goobstation/Weapons/Guns/Gunshots/laser_smg.ogg
   - type: AmmoCounter
 
-# ES-7 Multilens Sniper Rifle
+
 - type: entity
-  name:  ES-7 Multilens
+  name:  energy sniper
   parent: [ BaseWeaponCustomCell, BaseGunWieldable, BaseSecurityContraband ]
   id: WeaponLaserCellSniper
-  description: A burst-fire laser sniper rifle that retains its power across extreme distances. Fitted with a standard magnifying scope. Takes sniper power cells.
+  description: A laser sniper rifle, very heavy and slow to fire but excellent for holding a position.
   components:
   - type: Item
-    sprite: _Goobstation/Objects/Weapons/Guns/Battery/cell_sniper.rsi
     size: Huge
     shape:
     - 0,0,6,1
+  - type: ClothingSpeedModifier
+    walkModifier: 0.75
+    sprintModifier: 0.75
+  - type: HeldSpeedModifier
   - type: Gun
-    burstFireRate: 15
-    shotsPerBurst: 3
-    burstCooldown: 1.5
-    fireRate: 1.5
-    lockOnTargetBurst: true
-    selectedMode: Burst
+    projectileSpeed: 60
+    fireRate: 0.25
+    selectedMode: FullAuto
     availableModes:
-    - Burst
+    - FullAuto
     soundGunshot:
-      path: /Audio/_Goobstation/Weapons/Guns/Gunshots/laser_lmg.ogg
+      path: /Audio/Weapons/Guns/Gunshots/laser_cannon2.ogg
   - type: ItemSlots
     slots:
       gun_magazine:
@@ -91,7 +87,7 @@
           tags:
           - MilitaryPowerCellSniper
   - type: Sprite
-    sprite: _Goobstation/Objects/Weapons/Guns/Battery/cell_sniper_icon_48x.rsi
+    sprite: _Goobstation/Objects/Weapons/Guns/Battery/cell_sniper.rsi
     layers:
     - state: icon
       visible: false
@@ -128,12 +124,12 @@
       path: /Audio/_Goobstation/Weapons/Guns/Gunshots/laser_lmg.ogg
   - type: AmmoCounter
 
-# EG-1 Taro Revolver
+
 - type: entity
-  name: EG-1 Taro
+  name: energy revolver
   parent: [ BaseWeaponCustomCellSmall, BaseSecurityContraband ]
   id: WeaponLaserCellRevolver
-  description: Originally designed as a sidearm for NanoTrasen security teams, the Taro is an obscure break action laser revolver platform. It was quickly scrapped due to an annoying firerate cap included to prevent overheating. Takes revolver power cells.
+  description: A laser revolver, compatible with specialized revolver power cells.
   components:
   - type: Item
     size: Small
@@ -145,7 +141,7 @@
     - Sidearm
   - type: Gun
     selectedMode: SemiAuto
-    fireRate: 1.5 # Goobstation
+    fireRate: 2 # Trauma, was 1.5
     availableModes:
     - SemiAuto
     soundGunshot:
@@ -202,15 +198,15 @@
       path: /Audio/Weapons/Guns/Gunshots/laser_cannon.ogg
   - type: AmmoCounter
 
-# EL-20 HAMRR
+
 - type: entity
-  name: EL-20 HAMRR
+  name: energy LMG
   parent: [BaseItem, BaseSecurityContraband]
   id: WeaponLaserLMG
-  description: An unwieldy laser LMG that draws power from its dedicated backpack storage rig. The compromises taken to allow for its overwhelming firerate and onboard cooling system make it both heavy and inaccurate.
+  description: A high-tech laser LMG, that draws power from specialized backpack.
   components:
   - type: Sprite
-    sprite: _Goobstation/Objects/Weapons/Guns/Battery/energy_lmg_icon_48x.rsi
+    sprite: _Goobstation/Objects/Weapons/Guns/Battery/energy_lmg.rsi
     layers:
     - state: base
       map: ["enum.GunVisualLayers.Base"]
@@ -218,19 +214,18 @@
       shader: unshaded
       map: ["enum.GunVisualLayers.BaseUnshaded"]
   - type: Item
-    sprite: _Goobstation/Objects/Weapons/Guns/Battery/energy_lmg.rsi
     size: Huge
     shape:
     - 0,0,4,3
   - type: Wieldable
   - type: GunWieldBonus
-    minAngle: -15
-    maxAngle: -15
+    minAngle: -20
+    maxAngle: -20
   - type: Gun
-    minAngle: 50
-    maxAngle: 20
-    angleIncrease: -5
-    angleDecay: -80
+    minAngle: 24
+    maxAngle: 45
+    angleIncrease: 4
+    angleDecay: 16
     fireRate: 10
     selectedMode: FullAuto
     availableModes:

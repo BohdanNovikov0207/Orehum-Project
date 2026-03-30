@@ -83,17 +83,7 @@
     requirement:
       !type:RoleTimeRequirement
       role: JobHeadOfPersonnel
-      time: 72000 #20 hrs
-
-# Goobstation - For Ensembles
-- type: loadoutEffectGroup
-  id: GrandMasterHoP
-  effects:
-  - !type:JobRequirementLoadoutEffect
-    requirement:
-      !type:RoleTimeRequirement
-      role: JobHeadOfPersonnel
-      time: 360000 # 100 hrs
+      time: 20h
 
 # Professional HoP Time
 - type: loadoutEffectGroup
@@ -103,7 +93,7 @@
     requirement:
       !type:RoleTimeRequirement
       role: JobHeadOfPersonnel
-      time: 54000 #15 hrs, special reward for HoP mains
+      time: 15h # special reward for HoP mains
 
 # Jumpsuit
 - type: loadout
@@ -148,14 +138,6 @@
   id: HoPMantle
   equipment:
     neck: ClothingNeckMantleHOP
-
-- type: loadout # Goobstation - Ensembles
-  id: HeadOfPersonnelEnsemble
-  equipment:
-    neck: ClothingNeckEnsembleHeadOfPersonnel
-  effects:
-  - !type:GroupLoadoutEffect
-    proto: GrandMasterHoP
 
 # Back
 - type: loadout

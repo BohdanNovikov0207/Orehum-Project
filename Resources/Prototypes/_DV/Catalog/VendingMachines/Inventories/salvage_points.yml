@@ -73,6 +73,10 @@
     cost: 750
   - id: LavalandJaunter
     cost: 750
+  - id: WeaponCrusher
+    cost: 750
+  - id: WeaponProtoKineticAccelerator
+    cost: 750
   - id: SpaceCash5000
     cost: 750
   - id: SurvivalMedipen
@@ -85,22 +89,27 @@
     cost: 1000
   - id: LavalandEquipmentExplorerSuit
     cost: 1000
-  - id: LavalandWeaponKineticMachete
-    cost: 1050
-  - id: LavalandWeaponKineticClaws
-    cost: 1050
   - id: WeaponCrusherDagger
     cost: 1050
-  - id: MiningDrill
-    cost: 1100
   - id: AdvancedMineralScanner
-    cost: 1150
-  - id: OreBagMagnetic
-    cost: 1200
+    cost: 1100
   - id: PKAUpgradeDamage
     cost: 1200
+  # TODO: lazarus injector for 1k
+  - id: WeaponCrusherHammer
+    cost: 1250
+  - id: LavalandWeaponKineticMachete
+    cost: 1250
+  - id: LavalandWeaponKineticClaws
+    cost: 1250
+  - id: WeaponProtoKineticRepeater
+    cost: 1250
+  - id: WeaponProtoKineticPistol
+    cost: 1250
   - id: ClothingBackpackDuffelSalvageConscription
     cost: 1250
+  - id: WeaponProtoKineticShotgun
+    cost: 1500
   - id: LuxuryMedipen
     cost: 1500
   - id: WeaponPlasmaCutter
@@ -117,7 +126,7 @@
     cost: 2000
   - id: ClothingOuterHardsuitSalvage
     cost: 2000
-    #TODO: super resonator for 2500
+    #TODO:  super resonator for 2500
   - id: ClothingShoesBootsJump
     cost: 2500
   - id: ClothingOuterHardsuitLuxury

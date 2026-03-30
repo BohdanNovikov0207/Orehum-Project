@@ -34,5 +34,21 @@
   - type: FoodSequenceElement
     # TODO: Sequence sprites are to be scaled by 0.8x.
     entries:
-      Taco: FSE_Mango
-      Burger: FSE_MangoBurger
+      Taco: MangoTaco
+      Burger: MangoBurger
+
+- type: foodSequenceElement
+  id: MangoTaco
+  name: food-sequence-content-mango
+  scale: 0.8,0.8
+  sprites:
+  - sprite: _RMC14/Objects/Kitchen/Plants/mango.rsi
+    state: produce
+
+- type: foodSequenceElement
+  id: MangoBurger
+  name: food-sequence-burger-content-mango
+  scale: 0.8,0.8
+  sprites:
+  - sprite: _RMC14/Objects/Kitchen/Plants/mango.rsi
+    state: produce

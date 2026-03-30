@@ -37,11 +37,10 @@
         Base: dragon
       Dead:
         Base: dragon_dead
-  - type: ProjectileBatteryAmmoProvider
+  - type: BatteryAmmoProvider
     proto: ProjectileFireball
     fireCost: 50
   - type: BatterySelfRecharger
-    autoRecharge: true
     autoRechargeRate: 50
   - type: Battery
     maxCharge: 1000
@@ -84,5 +83,3 @@
     soundId: AshDrake
   - type: Aggressive # also required component for aggro checking
     forgiveRange: 20.0
-  - type: CombatPower # Goobstation
-    factor: 25 # times more dangerous than a crew-member

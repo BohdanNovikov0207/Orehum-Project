@@ -33,9 +33,6 @@
     equippedPrefix: transform
   - type: ChangePrefixAfterDelay
     delay: 1
-  - type: ChangelingEquipment
-    chemModifier: 0.25
-    requiredSlot: OUTERCLOTHING
   - type: TemperatureProtection
     heatingCoefficient: 0.35 # solid protection, resists WEAKER fires
   - type: Armor
@@ -46,8 +43,7 @@
       VeinsDamage: 0
       NerveDamage: 0
     coverage:
-    - Chest
-    - Groin
+    - Torso
     - Arm
     - Hand
     - Leg
@@ -70,6 +66,7 @@
   - type: ExplosionResistance
     damageCoefficient: 0.9
   - type: GroupExamine
+  - type: Unremoveable
   - type: ModifyDelayedKnockdown
     cancel: true
   - type: StaminaResistance

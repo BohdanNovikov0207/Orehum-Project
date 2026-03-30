@@ -6,10 +6,10 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 - type: entity
-  name: M7S Ventilator
+  name: M7S "Ventilator" submachine gun
   parent: [BaseWeaponSubMachineGun, BaseGunWieldable, BaseSyndicateContraband]
   id: WeaponSubMachineGunM7S
-  description: For when you need to air out an entire hallway, forcibly. Feeds from side-loading 5x23mm magazines.
+  description: You may or may not be green, but you are still very very mean. Takes proprietary side-loading 5x23mm rifle magazines.
   components:
   - type: Sprite
     sprite: _Goobstation/Objects/Weapons/Guns/SMGs/M7S.rsi
@@ -25,7 +25,7 @@
     - 0,0,2,1
   - type: Gun
     fireRate: 12.5 # Reduced fireRate and increased projectileSpeed
-    projectileSpeed: 30
+    projectileSpeed: 27 # Trauma fire rate breaks past 27 idk why
     minAngle: 15 # More controlled than before
     maxAngle: 55
     angleDecay: -8 # Intentionally negative, loses accuracy while not shooting
@@ -60,10 +60,3 @@
     steps: 1
     zeroVisible: true
   - type: Appearance
-  - type: RestrictGunshotsByUserTag
-    doesntContain:
-    - Oni
-    messages:
-    - oni-cannot-shoot-guns-1
-    - oni-cannot-shoot-guns-2
-    - oni-cannot-shoot-guns-3

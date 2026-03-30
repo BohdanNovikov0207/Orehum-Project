@@ -31,13 +31,3 @@
       amount: 3
   products:
     Amasec: 5
-
-- type: reaction
-  id: MilkChoco
-  reactants:
-    Milk:
-      amount: 1
-    CocoaPowder:
-      amount: 1
-  products:
-    MilkChoco: 2

@@ -11,23 +11,14 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-# - type: entity
-#   id: BingleSpawn
-#   parent: BaseStationEventShortDelay
-#   components:
-#   - type: StationEvent
-#     earliestStart: 50
-#     weight: 3
-#     duration: 50
-#     minimumPlayers: 50
-#     chaos: # Goobstation
-#       Hostile: 200
-#       Friend: 20
-#       Combat: 200
-#       Death: 200
-#       Medical: 200
-#     eventType: HostilesSpawn
-#   - type: GameRule
-#     chaosScore: 600
-#   - type: RandomSpawnRule
-#     prototype: SpawnPointGhostBinglePrime
+- type: entity
+  id: BingleSpawn
+  parent: BaseStationEventShortDelay
+  components:
+  - type: StationEvent
+    earliestStart: 50
+    weight: 1
+    duration: 50
+    minimumPlayers: 50
+  - type: RandomSpawnRule
+    prototype: SpawnPointGhostBinglePrime

@@ -37,96 +37,89 @@
 
 # ERT
 
-# - type: entity
-#   parent: BaseUnknownShuttleRule
-#   id: SpawnERTSecurity
-#   components:
-#   - type: StationEvent
-#     startAnnouncement: station-event-emergencyresponseteam-security-enroute
-#     startAudio:
-#       path: /Audio/Announcements/attention.ogg
-#     duration: 1
-#     maxOccurrences: 1
-#   - type: LoadMapRule
-#     preloadedGrid: RetortShuttleAssault
+- type: entity
+  parent: BaseUnknownShuttleRule
+  id: SpawnERTSecurity
+  components:
+  - type: StationEvent
+    startAnnouncement: station-event-emergencyresponseteam-security-enroute
+    startAudio:
+      path: /Audio/Announcements/attention.ogg
+    duration: 1
+    maxOccurrences: 1
+  - type: LoadMapRule
+    preloadedGrid: RetortShuttleAssault
 
-# - type: entity
-#   parent: BaseUnknownShuttleRule
-#   id: SpawnERTMedical
-#   components:
-#   - type: StationEvent
-#     startAnnouncement: station-event-emergencyresponseteam-medical-enroute
-#     startAudio:
-#       path: /Audio/Announcements/attention.ogg
-#     duration: 1
-#     maxOccurrences: 1
-#   - type: LoadMapRule
-#     preloadedGrid: RetortShuttleMedical
+- type: entity
+  parent: BaseUnknownShuttleRule
+  id: SpawnERTMedical
+  components:
+  - type: StationEvent
+    startAnnouncement: station-event-emergencyresponseteam-medical-enroute
+    startAudio:
+      path: /Audio/Announcements/attention.ogg
+    duration: 1
+    maxOccurrences: 1
+  - type: LoadMapRule
+    preloadedGrid: RetortShuttleMedical
 
-# - type: entity
-#   parent: BaseUnknownShuttleRule
-#   id: SpawnERTEngineering
-#   components:
-#   - type: StationEvent
-#     startAnnouncement: station-event-emergencyresponseteam-engineering-enroute
-#     startAudio:
-#       path: /Audio/Announcements/attention.ogg
-#     duration: 1
-#     maxOccurrences: 1
-#   - type: LoadMapRule
-#     preloadedGrid: RetortShuttleEngineering
+- type: entity
+  parent: BaseUnknownShuttleRule
+  id: SpawnERTEngineering
+  components:
+  - type: StationEvent
+    startAnnouncement: station-event-emergencyresponseteam-engineering-enroute
+    startAudio:
+      path: /Audio/Announcements/attention.ogg
+    duration: 1
+    maxOccurrences: 1
+  - type: LoadMapRule
+    preloadedGrid: RetortShuttleEngineering
 
-# - type: entity
-#   parent: BaseUnknownShuttleRule
-#   id: SpawnERTJanitorial
-#   components:
-#   - type: StationEvent
-#     startAnnouncement: station-event-emergencyresponseteam-generic-enroute
-#     startAudio:
-#       path: /Audio/Announcements/attention.ogg
-#     duration: 1
-#     maxOccurrences: 1
-#   - type: LoadMapRule
-#     preloadedGrid: RetortShuttleJanitorial
+- type: entity
+  parent: BaseUnknownShuttleRule
+  id: SpawnERTJanitorial
+  components:
+  - type: StationEvent
+    startAnnouncement: station-event-emergencyresponseteam-generic-enroute
+    startAudio:
+      path: /Audio/Announcements/attention.ogg
+    duration: 1
+    maxOccurrences: 1
+  - type: LoadMapRule
+    preloadedGrid: RetortShuttleJanitorial
 
-# - type: entity
-#   parent: BaseUnknownShuttleRule
-#   id: SpawnERTChaplain
-#   components:
-#   - type: StationEvent
-#     startAnnouncement: station-event-emergencyresponseteam-chaplain-enroute
-#     startAudio:
-#       path: /Audio/Announcements/attention.ogg
-#     duration: 1
-#     maxOccurrences: 1
-#   - type: LoadMapRule
-#     preloadedGrid: RetortShuttleChaplain
+- type: entity
+  parent: BaseUnknownShuttleRule
+  id: SpawnERTChaplain
+  components:
+  - type: StationEvent
+    startAnnouncement: station-event-emergencyresponseteam-chaplain-enroute
+    startAudio:
+      path: /Audio/Announcements/attention.ogg
+    duration: 1
+    maxOccurrences: 1
+  - type: LoadMapRule
+    preloadedGrid: RetortShuttleChaplain
 
 #Contractor
 - type: entity
-  parent: BaseGameRule
+  parent: BaseUnknownShuttleRule
   id: ContractorSpawn
   components:
   - type: StationEvent
-    earliestStart: 15
-    reoccurrenceDelay: 45
-    weight: 3
-    minimumPlayers: 10
+    startAnnouncement: null
+    weight: 1
     duration: null
-    chaos:
-      Hostile: 75
-    eventType: HostilesSpawn
-  - type: GameRule
-    chaosScore: 100
+    earliestStart: 30
+    minimumPlayers: 30
   - type: RuleGrids
   - type: LoadMapRule
-    gridPath: /Maps/_Goobstation/Shuttles/ShuttleEvent/Legionnaire.yml
+    gridPath: /Maps/_Trauma/Shuttles/ShuttleEvent/legionnaire.yml
   - type: AntagLoadProfileRule
     speciesOverrideBlacklist:
-    - Yowie
     - IPC
     - Diona
-    - Harpy
     - Plasmaman
   - type: AntagObjectives
     objectives:

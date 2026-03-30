@@ -31,7 +31,7 @@
     layers:
     - state: erifle_lethal
       map: [ "enum.GunVisualLayers.Base" ]
-  - type: ProjectileBatteryAmmoProvider
+  - type: BatteryAmmoProvider
     proto: RifleBulletEnergyGunLethal
     fireCost: 50
 
@@ -45,7 +45,7 @@
     layers:
     - state: erifle_disabler
       map: [ "enum.GunVisualLayers.Base" ]
-  - type: ProjectileBatteryAmmoProvider
+  - type: BatteryAmmoProvider
     proto: RifleBulletEnergyGunDisabler
     fireCost: 50
 
@@ -53,15 +53,15 @@
   id: EnergyMagRifleIon
   parent: [ EnergyRifleMagBase, BaseSecurityContraband ]
   name: energy rifle magazine (Ion)
-  description: Powercell with an attached power converter that create Ionize bolt at the end of energy rifle.
+  description: Powercell with an attached power converter that create Ionize bolt at the end of energy rifle, extremely energy intensive.
   components:
   - type: Sprite
     layers:
     - state: erifle_ion
       map: [ "enum.GunVisualLayers.Base" ]
-  - type: ProjectileBatteryAmmoProvider
+  - type: BatteryAmmoProvider
     proto: RifleBulletEnergyGunIon
-    fireCost: 50
+    fireCost: 200
 
 - type: entity
   id: EnergyMagRifleOverchargeLethal
@@ -73,6 +73,6 @@
     layers:
     - state: erifle_overcharge
       map: [ "enum.GunVisualLayers.Base" ]
-  - type: ProjectileBatteryAmmoProvider
+  - type: BatteryAmmoProvider
     proto: RifleBulletEnergyGunOverchargeLethal
     fireCost: 66 #15 shot hopefully

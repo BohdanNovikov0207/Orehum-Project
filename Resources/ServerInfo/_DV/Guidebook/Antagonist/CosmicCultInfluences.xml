@@ -1,30 +1,32 @@
 <Document>
-  # Влияния
+  # Influences
 
-  Культисты начинают с двух мощных [color=Yellow]влияний[/color] и будут постепенно получать новые по мере продвижения Памятника через три его стадии.
+  Culists begin with two powerful inflences, and will gradually unlock more as they progress the Monument through its three stages.
 
-  Когда Памятник достигает второй стадии, каждый раз при использовании влияния у культиста появляется шанс породить характерное [color=#4cabb3]Зловещее Эхо[/color]. Оно исчезнет через короткое время, но может преждевременно выдать ваше присутствие посторонним!
+  Once a cultist reaches the third stage, any time a cultist uses an influence, they have a chance to generate a telltale [color=#4cabb3]Malign Echo[/color]. These will fade after a short time, but may alert outsiders to the presence of your cult prematurely!
 
-  Использование эффекта «Поглощение Энтропии» никогда не вызывает Зловещее Эхо.
+  Using Siphon Entropy will never generate a Malign Echo.
 
   <Box>
     <GuideEntityEmbed Entity="CosmicEchoVfx" Caption=""/>
   </Box>
 
-  ## Начальные влияния
-  - [color=#4cabb3][bold]Поглощение Энтропии:[/bold][/color] Беззвучно поглощает энтропию у цели, нанося при этом небольшой урон.
-  - [color=#4cabb3][bold]Взор Пустоты:[/bold][/color] Испускает ужасающий импульс космического света, замедляя и дезориентируя всех поблизости.
+  ## Starting Influences
+  - [color=#4cabb3][bold]Siphon Entropy:[/bold][/color] Silently siphon entropy from your target. If the target is in critical condition, it will finish them off, but also give much more entropy.
+  - [color=#4cabb3][bold]Attune Influence:[/bold][/color] Check the cult's progress, and spend gathered entropy to unlock better, more powerful Influences.
 
-  ## Разблокируемые активные влияния
-  - [color=#4cabb3][bold]Искажение Плоти:[/bold][/color] Нарушает телесную форму цели, временно делая её неподвижной, нематериальной и непроходимой.
-  - [color=#4cabb3][bold]Изгнание Сознания:[/bold][/color] Изгоняет разум цели из тела в космическую пустоту, временно оставляя тело безвольным.
-  - [color=#4cabb3][bold]Прорыв Внутрь:[/bold][/color] Сконцентрированный выброс энергии, способный насильно открыть защищённую дверь.
-  - [color=#4cabb3][bold]Астральная Нова:[/bold][/color] Выпускает мощный и разрушительный заряд астральной энергии.
-  - [color=#4cabb3][bold]Пустотное Воздействие:[/bold][/color] Полностью нейтрализует входящий урон на короткое время.
+  ## Special Influences
+  - [color=#4cabb3][bold]Null Fragmentation:[/bold][/color] Transfer malign empowerment into a digital system, such as an AI Upload Console or Cyborg, corrupting it in the process. Doing so will expend empowerment.
 
-  ## Разблокируемые пассивные влияния
-  - [color=#4cabb3][bold]Отказ от Метаболизма:[/bold][/color] Тебе больше не требуется есть или пить — твои физические потребности разрушены.
-  - [color=#4cabb3][bold]Шаг Вне Гравитации:[/bold][/color] Ты движешься относительно звёздной пустоты — на тебя больше не влияет гравитация.
-  - [color=#4cabb3][bold]Астральный Шаг:[/bold][/color] Астральная энергия усиливает каждое твое движение, немного увеличивая скорость.
-  - [color=#4cabb3][bold]Пустотное Возрождение:[/bold][/color] Беззвёздная пустота Памятника охватывает твоё тело и разум. Пока ты рядом с ним, твоё физическое тело постепенно восстанавливается.
+  ## Unlockable Influences
+  - [color=#4cabb3][bold]Null Glare:[/bold][/color] Emit a horrific pulse of cosmic light, slowing and disorienting everyone around you.
+  - [color=#4cabb3][bold]Abberant Lapse:[/bold][/color] Lapse your target's corporeal form, temporarily rendering it immutable, impassible, and frozen in place.
+  - [color=#4cabb3][bold]Force Ingress:[/bold][/color] Use a concentrated blast of power to force any lock open.
+  - [color=#4cabb3][bold]Unbound Step:[/bold][/color] You move relative only to the starless black - your movement is no longer affected by gravity.
+  - [color=#4cabb3][bold]Corrupt Matter:[/bold][/color] Pour malign power into an item, transforming it into something else. You can see what items can be transmuted by examining them.
+  - [color=#4cabb3][bold]Shunt Subjectivity:[/bold][/color] Shunt your target's mind out of their body and unto the cosmic dark, temporarily rendering their body mindless.
+  - [color=#4cabb3][bold]Astral Stride:[/bold][/color] Astral energy invigorates your movement, allowing you to run at incredible speed for a short amount of time.
+  - [color=#4cabb3][bold]Shatter Cognition:[/bold][/color] Share the Knowledge with an unsuspecting crewmember, leaving them with no choice but to join your cause.
+  - [color=#4cabb3][bold]Astral Nova:[/bold][/color] Hurl a large and disruptive blast of astral energy, wreaking havoc upon a large area.
+  - [color=#4cabb3][bold]Vacuous Imposition:[/bold][/color] Negate any incoming damage for a short time, at the cost of slowing down your movement.
 </Document>

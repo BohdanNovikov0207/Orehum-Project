@@ -10,12 +10,12 @@
     - !type:PlantAdjustNutrition
       amount: 6 # similar to potash but has sulfur, hard to make anyways
   metabolisms:
-    Food:
+    Digestion:
       effects:
       - !type:SatiateHunger
-#        conditions: i majorly cannot be assed to fix this specifically
-#        - !type:MetabolizerTypeCondition
-#          type: [ Plant ]
+        conditions:
+        - !type:MetabolizerTypeCondition
+          type: [ Plant ]
 
 - type: reagent
   id: AmmoniumNitrate
@@ -33,7 +33,7 @@
     - !type:PlantAdjustHealth
       amount: 0.5
   metabolisms:
-    Poison:
+    Bloodstream:
       effects:
       - !type:HealthChange
         damage:

@@ -112,27 +112,14 @@
     node: bingle steak
 
 - type: entity
-  name: 'fried "chicken"'
-  parent: FoodMeatBase
+  parent: FoodMeatChickenFried
   id: FoodMeatVoxFried
+  name: 'fried "chicken"'
   description: A juicy hunk of chicken meat... I think...
   components:
-  - type: Tag
-    tags:
-    - Cooked
-    - Meat
   - type: FlavorProfile
     flavors:
     - chuddy
-  - type: Sprite
-    layers:
-    - state: chicken-fried
-      map: [ "enum.DamageStateVisualLayers.Base" ]
-  - type: RandomSprite
-    available:
-      - enum.DamageStateVisualLayers.Base:
-          chicken-fried: ""
-          chicken2-fried: ""
   - type: SolutionContainerManager
     solutions:
       food:
@@ -143,8 +130,3 @@
           Quantity: 5
         - ReagentId: Ammonia
           Quantity: 5
-  - type: FoodSequenceElement
-    entries:
-      Burger: FSE_FoodMeatVoxFried
-      Taco: FSE_FoodMeatVoxFried
-      Skewer: FSE_FoodMeatVoxFriedSkewer

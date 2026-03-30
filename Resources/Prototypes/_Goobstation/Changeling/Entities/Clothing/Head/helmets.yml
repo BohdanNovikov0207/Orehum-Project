@@ -24,9 +24,6 @@
     equippedPrefix: transform
   - type: ChangePrefixAfterDelay
     delay: 1
-  - type: ChangelingEquipment
-    requiredSlot: OUTERCLOTHING
-    ## no modifier as the armor/torso is the actual "main" part
   - type: FireProtection
     reduction: 0.15
   - type: Armor
@@ -45,6 +42,7 @@
         Piercing: 0.45
         Heat: 0.65
         Caustic: 0.55
+  - type: Unremoveable
   - type: IdentityBlocker
   - type: IngestionBlocker
   - type: HideClothingLayerClothing

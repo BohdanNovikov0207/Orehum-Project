@@ -42,9 +42,7 @@
   - BotanyHoe
   - BotanyShovel
   - Bottle
-  - Brain
   - Bread
-  - Briefcase
   - BrimFlatcapBrown
   - BrimFlatcapGrey
   - Brutepack
@@ -71,7 +69,6 @@
   - Crowbar
   - DoorElectronics
   - Egg
-  - Eyes
   - Figurine
   - FireAlarm
   - FireAlarmElectronics
@@ -83,7 +80,6 @@
   - Galaxythistle
   - GasMask
   - GasScrubber
-  - GasTank
   - GasVent
   - Gauze
   - GeigerCounter
@@ -96,11 +92,8 @@
   - HudSecurity
   - Hamster
   - Hardsuit
-  - Heart
   - HelmetEVA
   - Igniter
-  - Liver
-  - Lungs
   - Mask
   - Mayo
   - Meat
@@ -122,7 +115,6 @@
   - PowerCell
   - Shiv
   - Soap
-  - Stomach
   - Steak
   - Sunglasses
   - SurgeryTool

@@ -31,11 +31,10 @@
     layers:
     - map: ["enum.DamageStateVisualLayers.Base"]
       state: eva
-  - type: ProjectileBatteryAmmoProvider
+  - type: BatteryAmmoProvider
     proto: BulletKineticShuttle
     fireCost: 50
   - type: BatterySelfRecharger
-    autoRecharge: true
     autoRechargeRate: 50
   - type: Battery
     maxCharge: 1000
@@ -82,7 +81,5 @@
   - type: TileMovement
   - type: BossMusic
     soundId: Colossus
-  - type: CombatPower # Goobstation
-    factor: 25 # times more dangerous than a crew-member
   - type: Aggressive # also required component for aggro checking
     forgiveRange: 20.0

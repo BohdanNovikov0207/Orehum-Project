@@ -43,18 +43,6 @@
   id: Dementia
 
 - type: statusEffect
-  id: MansusGraspAffected
-  alwaysAllowed: true
-
-- type: statusEffect
-  id: Realignment
-  alwaysAllowed: true
-
-- type: statusEffect
-  id: BlockProtectiveBladeShoot
-  alwaysAllowed: true
-
-- type: statusEffect
   id: DragonPower
   alert: DragonPower
   alwaysAllowed: true
@@ -65,8 +53,8 @@
   alwaysAllowed: true
 
 - type: statusEffect
-  id: ShadowCloakAlertSE
-  alert: ShadowCloakAlert
+  id: Fleshmend
+  alert: Fleshmend
   alwaysAllowed: true
 
 - type: entity
@@ -78,7 +66,12 @@
 
 - type: entity
   parent: MobStatusEffectBase
-  id: StatusEffectMeleeVulnerability
-  name: melee vulnerability
+  id: EmoteVomitCounterStatusEffect
+  name: emote vomit
   components:
-  - type: MeleeVulnerabilityStatusEffect
+  - type: CounterStatusEffect
+
+- type: entity
+  parent: MobStatusEffectBase
+  id: BlockVomitEmotesStatusEffect
+  name: block vomit emotes

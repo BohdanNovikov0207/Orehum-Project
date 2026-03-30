@@ -1,26 +1,33 @@
+<!--
+SPDX-FileCopyrightText: 2024 John Willis <143434770+CerberusWolfie@users.noreply.github.com>
+SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
+
+SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+
 <Document>
-# Процедуры обысков
-Это перечень процедур, которым следует следовать при проведении досмотров персонала станции и/или в отделах.
+# Search Procedures
+This is the list of procedures that should be followed when performing searches on station personnel and/or in Departments.
 
-1. При [color=#388c34]Зеленом Коде[/color] для проведения досмотра требуются достаточные основания и/или разрешение Капитана и/или Начальника службы безопасности.
-<Box>Под достаточными основаниями понимаются любые обстоятельства, вызывающие разумное подозрение, что было совершено преступление (например, прямое обвинение от члена экипажа, непосредственное наблюдение преступления, отпечатки на месте преступления, нахождение в закрытой зоне с особо ценными предметами и т. п.).</Box>
-<Box>Санкция — это просто разрешение от соответствующего лица; достаточно устно или по радио.</Box>
+1. On [color=#388c34]Green Alert[/color], a search requires probable cause and/or approval from the Captain and/or Head of Security.
+<Box>Probable Cause is defined as any circumstance that creates reasonable suspicion that a crime was committed (eg, direct accusation from a crewmember, witnessing the crime directly, prints on a crime scene, presence in a restricted area with high value items, etc).</Box>
+<Box>Approval simply requires permission from the relevant person - verbal or over radio is enough.</Box>
 
-2. При [color=#388c34]Зелёном Коде[/color] досмотр следует проводить без наручников; досматриваемый должен добровольно передать запрошенные предметы.
+2. On [color=#388c34]Green Alert[/color], searches should be conducted without cuffs, and the searched personnel must hand over requested items.
 
-3. Отказывающихся можно заковать в наручники для проведения досмотра.
+3. Searchees who refuse may be cuffed for the search.
 
-4. Можно потребовать передать любые иные предметы, находящиеся у досматриваемого, включая, но не ограничиваясь: рюкзаки, пояса, куртки, гарнитуры и ПДА.
+4. Any other item in the searchee's possession may be asked for, including but not limited to bags, belts, jackets, headsets, and PDAs.
 
-5. При [color=#1b67a5]Синем Коде[/color] и выше досмотр может проводиться без достаточных оснований.
-<Box>Это может включать заковывание досматриваемого в наручники, принудительное изъятие сумок и опустошение карманов.</Box>
+5. On [color=#1b67a5]Blue Alert[/color] and above, a search can be done without probable cause.
+<Box>This can be done by cuffing the searched, and forcibly removing their bags and emptying their pockets.</Box>
 
-6. Отказ от законного досмотра (при синем коде или выше) считается сопротивлением аресту.
+6. Refusing a legal search is considered resisting arrest (on [color=#1b67a5]Blue Alert[/color] or higher).
 
-7. Сотрудники СБ могут проводить хирургическое вмешательство для поиска нелегальных имплантов только если досматриваемый — подтверждённый EoC (враг корпорации) или подтверждено, что он украл предмет, который больше не удаётся обнаружить.
-<Box>Кроме того, при наличии обоснованного подозрения на наличие нелегальных имплантов Капитан и/или Начальник службы безопасности могут выдать ордер на их поиск, если сочтут это необходимым.</Box>
+7. Security may only perform surgery to search for illegal implants if the searched personnel is a confirmed EoC or has been confirmed to have stolen an item that can no longer be located.
+<Box>In addition, if there is reasonable suspicion of illegal implant possession, the Captain and/or Head of Security can issue a warrant for an implant search if they deem it necessary.</Box>
 
-8. Рекомендуется, но необязательно: после досмотра установить статус безопасности как "ОСВОБОЖДЁН" и добавить пометку, что досмотр проведён и ничего не найдено.
-<Box>Это помогает не тратить время на повторные досмотры одного и того же человека и упрощает понимание, кого ещё не досматривали.</Box>
+8. Recommended but optional: After searching someone, their security status should be set to RELEASED, and add a note that they were searched but nothing was found.
+<Box>This helps prevent security wasting time by repeatedly re-searching the same person, and makes it easier to tell who has not yet been searched.</Box>
 
 </Document>

@@ -11,8 +11,10 @@
   description: Exceedingly slow, but is immune to all forms of damage, except holy.
   components:
   - type: Bloodstream
-    bloodMaxVolume: 5
-    bloodReagent: MindbreakerToxin
+    bloodReferenceSolution:
+      reagents:
+      - ReagentId: MindbreakerToxin
+        Quantity: 5
   - type: Sprite
     drawdepth: Mobs
     sprite: _Goobstation/Mobs/Demons/curse.rsi
@@ -58,8 +60,7 @@
   - type: Damageable
     damageContainer: BiologicalMetaphysical
     damageModifierSet: AdvancedSpirit
-  - type: WeakToHoly
-    alwaysTakeHoly: true
+  - type: AlwaysTakeHoly
   - type: NoSlip
   - type: MovementSpeedModifier
     baseWalkSpeed : 1
@@ -179,8 +180,9 @@
       damage:
         types:
           Heat: -1
-        groups:
-          Brute: -1
+          Blunt: -0.33
+          Slash: -0.33
+          Piercing: -0.33
     - type: Butcherable
       spawned:
         - id: MaterialBananium1
@@ -198,11 +200,11 @@
     - type: StaticPrice
       price: 3000
     - type: Bloodstream
-      bloodMaxVolume: 300
-      bloodReagent: Laughter
-    - type: Fauna # Lavaland Change
-    - type: CombatPower # Goobstation
-      factor: 3 # times more dangerous than a crew-member
+      bloodReferenceSolution:
+        reagents:
+        - ReagentId: Laughter
+          Quantity: 300
+    - type: Fauna
 
 
 - type: entity
@@ -266,8 +268,9 @@
       damage:
         types:
           Heat: -1
-        groups:
-          Brute: -1
+          Blunt: -0.33
+          Slash: -0.33
+          Piercing: -0.33
     - type: StaticPrice
       price: 3000
     - type: TileMovement
@@ -283,8 +286,8 @@
       - id: DiamondOre1 # not unprocessed
         amount: 1
     - type: Bloodstream
-      bloodMaxVolume: 300
-      bloodReagent: Haloperidol
-    - type: Fauna # Lavaland Change
-    - type: CombatPower # Goobstation
-      factor: 3 # times more dangerous than a crew-member
+      bloodReferenceSolution:
+        reagents:
+        - ReagentId: Haloperidol
+          Quantity: 300
+    - type: Fauna

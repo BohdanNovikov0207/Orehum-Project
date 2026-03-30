@@ -28,6 +28,7 @@
     radius: 1.5
     energy: 1.6
     color: "#FC0097"
+  - type: DoAfter
 
 - type: entity
   parent: ComputerComms
@@ -81,12 +82,10 @@
   - type: Eye
     pvsScale: 1.5
   - type: Visibility
-    layer: 8 # Abductor visflag
+    layer: 8
   - type: Sprite
     sprite: _Shitmed/Structures/Machines/abductor_camera_console.rsi
     layers:
     - state: eye
       shader: unshaded
-  - type: Tag
-    tags:
-    - CantInteract
+  - type: AiEye # Trauma

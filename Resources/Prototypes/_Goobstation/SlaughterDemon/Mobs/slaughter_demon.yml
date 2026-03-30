@@ -5,8 +5,9 @@
 
 - type: entity
   parent:
-    - SimpleSpaceMobBase
-    - MobPolymorphable
+  - AppearanceSlaughterDemon
+  - SimpleSpaceMobBase
+  - MobPolymorphable
   id: BaseMobSlaughterDemon
   name: slaughter demon
   suffix: ""
@@ -16,7 +17,7 @@
     sprite: _Goobstation/SlaughterDemon/demon.rsi
     state: daemon
   - type: Stamina
-    critThreshold: 150
+    baseCritThreshold: 150
   - type: NightVision
     color: "#AA4A44"
     activateSound: null
@@ -54,9 +55,6 @@
     - MindRoleGhostRoleSoloAntagonist
     raffle:
       settings: default
-    requirements:
-    - !type:OverallPlaytimeRequirement
-      time: 18000
   - type: GhostTakeoverAvailable
   - type: Physics
     bodyType: KinematicController
@@ -75,6 +73,7 @@
       types:
         Slash: 25
         Structural: 50
+  - type: Evil # Trauma - duh
   - type: SlaughterDemon # main component
     speedModWalk: 2.5
     speedModRun: 2.5
@@ -83,52 +82,39 @@
       params:
         volume: 2
   - type: SlaughterDevour # allows the demon to devour
-    toHeal: # Healing done when eating someone
-      groups:
-        Brute: -100
-        Burn: -100
-        Airloss: -100
-        Toxin: -100
-        Genetic: -100
-        Metaphysical: -100
-    toHealNonCrew: # Healing done when eating a robot
-      groups:
-        Brute: -50
-        Burn: -50
-        Airloss: -50
-        Toxin: -50
-        Genetic: -50
-        Metaphysical: -50
-    toHealAnythingElse:  # Healing when previous conditions weren't met
-      groups:
-        Brute: -25
-        Burn: -25
-        Airloss: -25
-        Toxin: -25
-        Genetic: -25
-        Metaphysical: -25
+    healDamage:
+      types:
+        Blunt: -1
+        Slash: -1
+        Piercing: -1
+        Heat: -1
+        Cold: -1
+        Shock: -1
+        Caustic: -1
+        Poison: -1
+        Radiation: -1
+        Asphyxiation: -1
+        Bloodloss: -1
+        Cellular: -1
+        Holy: -1
     doAfterDelay: 2
   - type: DemonicWhisper # allows the demon to demonic whisper
   - type: DemonicAccent # the accent
   - type: Puller
-    needsHands: false
-  - type: GrabIntent
     stageChangeCooldown: 0.5
     grabThrowDamageModifier: 6.0
     throwingDistance: 30
+    needsHands: false
   - type: Targeting
   - type: Speech
     speechVerb: SlaughterDemon
     speechSounds: SlaughterDemon
   - type: TypingIndicator
     proto: guardian
-  - type: Gibbable
   - type: Crawler
   - type: RotationVisuals
     defaultRotation: 90
     horizontalRotation: 90
-  - type: Body
-    prototype: SlaughterDemon
   - type: StandingState
   - type: Fixtures
     fixtures:
@@ -152,9 +138,12 @@
       - DemonicWhisperAction
   - type: ReplacementAccent
     accent: slaughterDemon
-  - type: GrantHellRip
-  - type: WeakToHoly
-    alwaysTakeHoly: true
+  - type: KnowledgeGrant
+    skills:
+      MartialArtHellRip: 88 # almost maxed out, demon cant read books
+      StrengthKnowledge: 70
+      AthleticsKnowledge: 40
+  - type: AlwaysTakeHoly
   - type: Hands
   - type: PressureImmunity
   - type: TriggerOnMobstateChange
@@ -173,10 +162,12 @@
     speedModifierThresholds:
       200: 1
   - type: Bloodstream
-    bloodMaxVolume: 300
-    bloodReagent: Sulfur
+    bloodReferenceSolution:
+      reagents:
+      - ReagentId: Sulfur
+        Quantity: 300
     bleedReductionAmount: 5
-  - type: Temperature
+  - type: TemperatureDamage
     coldDamage:
       types:
         Cold: 0
@@ -185,6 +176,56 @@
         Heat: 0
     heatDamageThreshold: 666
     coldDamageThreshold: 66
+  - type: LanguageSpeaker
+    speaks:
+    - TauCetiBasic
+    - Eldritch
+    understands:
+    - TauCetiBasic
+    - Eldritch
+
+# laughter demon
+- type: entity
+  parent: BaseMobSlaughterDemon
+  id: MobLaughterDemon
+  name: laughter demon
+  description: A large, adorable creature covered in armor with pink bows.
+  components:
+  - type: Sprite
+    sprite: _Goobstation/SlaughterDemon/demon.rsi
+    state: bowmon
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      190: Dead
+  - type: SlaughterDevour
+    feastSound: /Audio/_Goobstation/Misc/scary_horn2.ogg
+  - type: SlaughterDemon
+    isLaughter: true
+  - type: Speech
+    speechVerb: Cluwne
+  - type: MeleeWeapon
+    soundHit:
+      path: /Audio/Items/bikehorn.ogg
+    animation: WeaponArcPunch
+    damage:
+      types:
+        Slash: 20
+        Structural: 50
+  - type: GhostRole
+    allowMovement: true
+    allowSpeech: true
+    makeSentient: true
+    name: ghost-role-information-laughter-demon-name
+    description: ghost-role-information-laughter-demon-description
+    rules: ghost-role-information-slaughter-demon-rules
+    mindRoles:
+    - MindRoleGhostRoleSoloAntagonist
+    raffle:
+      settings: default
+  - type: EmitSoundOnTrigger
+    sound:
+      path: /Audio/Effects/sadtrombone.ogg
 
 # midround roll
 - type: entity

@@ -41,10 +41,11 @@
     powerRequired: true
     speakNormally: true
     enabled: true
+    hideChat: true
     channels:
     - RadioShow
   - type: Speech
-    speechVerb: StationRadio
+    speechVerb: Robotic
   - type: ActiveRadio
     channels:
     - RadioShow

@@ -154,70 +154,94 @@
     - state: bullet
       shader: unshaded
 
-- type: hitscan
+- type: entity
+  parent: BasicHitscan
   id: HeavyPulse
-  damage:
-    types:
-      Heat: 35 # Damage nerfed slightly to give you a BIT of a chance. You're still fucked though.
-      Blunt: 10
-      Structural: 80
-  muzzleFlash:
-    sprite: Objects/Weapons/Guns/Projectiles/projectiles.rsi
-    state: muzzle_blue
-  travelFlash:
-    sprite: _Goobstation/Objects/Weapons/Guns/Projectiles/heavy_pulse.rsi
-    state: beam_blue_heavy
-  impactFlash:
-    sprite: Objects/Weapons/Guns/Projectiles/projectiles.rsi
-    state: impact_blue
+  name: heavy pulse beam
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: HitscanBasicDamage
+    damage:
+      types:
+        Heat: 35 # Damage nerfed slightly to give you a BIT of a chance. You're still fucked though.
+        Blunt: 10
+        Structural: 80
+  - type: HitscanBasicVisuals
+    muzzleFlash:
+      sprite: Objects/Weapons/Guns/Projectiles/projectiles.rsi
+      state: muzzle_blue
+    travelFlash:
+      sprite: _Goobstation/Objects/Weapons/Guns/Projectiles/heavy_pulse.rsi
+      state: beam_blue_heavy
+    impactFlash:
+      sprite: Objects/Weapons/Guns/Projectiles/projectiles.rsi
+      state: impact_blue
 
-- type: hitscan
+- type: entity
+  parent: BasicHitscan
   id: LightPulse
-  damage:
-    types:
-      Heat: 20 # Slightly nerfing damage, otherwise people will bitch about how I'm giving the pulse pistol out like candy
-      Blunt: 5 # Split damage is cool.
-  muzzleFlash:
-    sprite: Objects/Weapons/Guns/Projectiles/projectiles.rsi
-    state: muzzle_blue
-  travelFlash:
-    sprite: Objects/Weapons/Guns/Projectiles/projectiles.rsi
-    state: beam_blue
-  impactFlash:
-    sprite: Objects/Weapons/Guns/Projectiles/projectiles.rsi
-    state: impact_blue
+  name: light pulse beam
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: HitscanBasicDamage
+    damage:
+      types:
+        Heat: 20 # Slightly nerfing damage, otherwise people will bitch about how I'm giving the pulse pistol out like candy
+        Blunt: 5 # Split damage is cool.
+  - type: HitscanBasicVisuals
+    muzzleFlash:
+      sprite: Objects/Weapons/Guns/Projectiles/projectiles.rsi
+      state: muzzle_blue
+    travelFlash:
+      sprite: Objects/Weapons/Guns/Projectiles/projectiles.rsi
+      state: beam_blue
+    impactFlash:
+      sprite: Objects/Weapons/Guns/Projectiles/projectiles.rsi
+      state: impact_blue
 
-- type: hitscan
+- type: entity
+  parent: BasicHitscan
   id: LaserSniper
-  damage:
-    types:
-      Heat: 30
-      Shock: 10
-  muzzleFlash:
-    sprite: Objects/Weapons/Guns/Projectiles/projectiles.rsi
-    state: muzzle_blue
-  travelFlash:
-    sprite: _Goobstation/Objects/Weapons/Guns/Projectiles/heavy_pulse.rsi
-    state: beam_blue_heavy
-  impactFlash:
-    sprite: Objects/Weapons/Guns/Projectiles/projectiles.rsi
-    state: impact_blue
+  name: laser sniper
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: HitscanBasicDamage
+    damage:
+      types:
+        Heat: 30
+        Shock: 10
+  - type: HitscanBasicVisuals
+    muzzleFlash:
+      sprite: Objects/Weapons/Guns/Projectiles/projectiles.rsi
+      state: muzzle_blue
+    travelFlash:
+      sprite: _Goobstation/Objects/Weapons/Guns/Projectiles/heavy_pulse.rsi
+      state: beam_blue_heavy
+    impactFlash:
+      sprite: Objects/Weapons/Guns/Projectiles/projectiles.rsi
+      state: impact_blue
 
-- type: hitscan
+- type: entity
+  parent: BasicHitscan
   id: RedMediumSplitLaser
-  damage:
-    types:
-      Heat: 17
-      Shock: 2 # Lecter is slightly armor-piercing and so is this
-  muzzleFlash:
-    sprite: Objects/Weapons/Guns/Projectiles/projectiles.rsi
-    state: muzzle_laser
-  travelFlash:
-    sprite: Objects/Weapons/Guns/Projectiles/projectiles.rsi
-    state: beam
-  impactFlash:
-    sprite: Objects/Weapons/Guns/Projectiles/projectiles.rsi
-    state: impact_laser
+  name: red medium split laser
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: HitscanBasicDamage
+    damage:
+      types:
+        Heat: 17
+        Shock: 2 # Lecter is slightly armor-piercing and so is this
+  - type: HitscanBasicVisuals
+    muzzleFlash:
+      sprite: Objects/Weapons/Guns/Projectiles/projectiles.rsi
+      state: muzzle_laser
+    travelFlash:
+      sprite: Objects/Weapons/Guns/Projectiles/projectiles.rsi
+      state: beam
+    impactFlash:
+      sprite: Objects/Weapons/Guns/Projectiles/projectiles.rsi
+      state: impact_laser
 
 - type: entity
   name: heavy laser bolt
@@ -255,18 +279,24 @@
     count: 6
     spread: 30
 
-- type: hitscan
+- type: entity
+  parent: BasicHitscan
   id: StunPulse
-  staminaDamage: 80
-  muzzleFlash:
-    sprite: Objects/Weapons/Guns/Projectiles/projectiles.rsi
-    state: muzzle_blue
-  travelFlash:
-    sprite: Objects/Weapons/Guns/Projectiles/projectiles.rsi
-    state: beam_blue
-  impactFlash:
-    sprite: Objects/Weapons/Guns/Projectiles/projectiles.rsi
-    state: impact_blue
+  name: stun pulse
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: HitscanStaminaDamage
+    staminaDamage: 80
+  - type: HitscanBasicVisuals
+    muzzleFlash:
+      sprite: Objects/Weapons/Guns/Projectiles/projectiles.rsi
+      state: muzzle_blue
+    travelFlash:
+      sprite: Objects/Weapons/Guns/Projectiles/projectiles.rsi
+      state: beam_blue
+    impactFlash:
+      sprite: Objects/Weapons/Guns/Projectiles/projectiles.rsi
+      state: impact_blue
 
 - type: entity
   id: BulletTemperatureCold
@@ -279,12 +309,15 @@
     damage:
       types:
         Cold: 3
+  - type: Reflective # Trauma
+    reflective:
+    - None
   - type: PointLight
     radius: 2
     color: blue
     energy: 1
   - type: ChangeTemperatureOnCollide
-    heat: -35000
+    heat: -50000 # -35000 > -50000 Trauma
   - type: Sprite
     sprite: Objects/Weapons/Guns/Projectiles/projectiles_tg.rsi
     layers:
@@ -302,13 +335,15 @@
     damage:
       types:
         Heat: 3
+  - type: Reflective # Trauma
+    reflective:
+    - None
   - type: PointLight
     radius: 2
     color: red
     energy: 1
   - type: ChangeTemperatureOnCollide # This will probably be tweaked.
-    heat: 35000
-
+    heat: 50000 # 35000 > 50000 Trauma
 
 - type: entity
   name: disabler bolt
@@ -395,7 +430,9 @@
       - ReagentId: TearGas
         Quantity: 20
     spreadAmount: 5
+  - type: AutoStartTimer
   - type: TimerTrigger
+    examinable: false
     delay: 5
   - type: DeleteOnTrigger
   - type: Projectile
@@ -426,7 +463,7 @@
       - MobState
     damage:
       types:
-        Burn: 3
+        Heat: 3
         Holy: 20
     effect: { sprite: /Textures/_ShitChap/Effects/holy_beam.rsi, state: beam }
     sound: /Audio/Effects/holy.ogg
@@ -448,8 +485,8 @@
   - type: Projectile
     damage:
       types:
-        Piercing: 5
-        Holy: 4
+        Piercing: 3
+        Holy: 6
 
 - type: entity
   name : stun bolt
@@ -513,7 +550,7 @@
 
 - type: entity
   categories: [ HideSpawnMenu ]
-  parent: BaseBullet
+  parent: BaseBulletTrigger
   id: BulletMime
   name: bullet (silent)
   components:
@@ -521,11 +558,11 @@
     damage:
       types:
         Piercing: 40
-  - type: EntityEffectOnProjectileHit
+  - type: EntityEffectOnTrigger
+    targetUser: true # user is actually hit entity in this case
     effects:
     - !type:GenericStatusEffect
       key: Muted
       component: Muted
-      type: Add
+      type: Update
       time: 20
-      refresh: true
