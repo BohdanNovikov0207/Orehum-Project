@@ -50,7 +50,7 @@ namespace Content.Shared.Localizations
             var culture = new CultureInfo(Culture);
             var fallbackCulture = new CultureInfo(FallbackCulture);
 
-            _loc.LoadCulture(ruCulture);
+            _loc.LoadCulture(culture);
             _loc.LoadCulture(fallbackCulture);
             _loc.SetFallbackCluture(fallbackCulture);
             _loc.AddFunction(culture, "MANY", FormatMany);

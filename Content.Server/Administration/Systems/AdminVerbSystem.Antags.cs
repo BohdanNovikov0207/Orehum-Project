@@ -36,7 +36,6 @@ public sealed partial class AdminVerbSystem
     //private static readonly EntProtoId DefaultChangelingRule = "Changeling"; // Trauma - goob ling used instead
 
     private static readonly EntProtoId DefaultArmsDealerRule = "ArmsDealer";
-    private static readonly ProtoId<StartingGearPrototype> PirateGearId = "PirateGear";
 
     private static readonly EntProtoId ParadoxCloneRuleId = "ParadoxCloneSpawn";
     private static readonly EntProtoId DefaultWizardRule = "Wizard";

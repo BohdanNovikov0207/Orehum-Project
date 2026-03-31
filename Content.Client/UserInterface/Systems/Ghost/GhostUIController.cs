@@ -39,7 +39,6 @@ public sealed class GhostUIController : UIController, IOnSystemChanged<GhostSyst
     public void OnSystemLoaded(GhostSystem system)
     {
         system.PlayerRemoved += OnPlayerRemoved;
-        system.PlayerUpdated += OnPlayerUpdated;
         system.PlayerAttached += OnPlayerAttached;
         system.PlayerDetached += OnPlayerDetached;
         system.GhostWarpsResponse += OnWarpsResponse;
@@ -49,7 +48,6 @@ public sealed class GhostUIController : UIController, IOnSystemChanged<GhostSyst
     public void OnSystemUnloaded(GhostSystem system)
     {
         system.PlayerRemoved -= OnPlayerRemoved;
-        system.PlayerUpdated -= OnPlayerUpdated;
         system.PlayerAttached -= OnPlayerAttached;
         system.PlayerDetached -= OnPlayerDetached;
         system.GhostWarpsResponse -= OnWarpsResponse;

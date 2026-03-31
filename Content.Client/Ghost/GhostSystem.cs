@@ -17,7 +17,6 @@ namespace Content.Client.Ghost
         [Dependency] private readonly IClientConsoleHost _console = default!;
         [Dependency] private readonly IPlayerManager _playerManager = default!;
         [Dependency] private readonly SharedActionsSystem _actions = default!;
-        [Dependency] private readonly PointLightSystem _pointLightSystem = default!;
         [Dependency] private readonly ContentEyeSystem _contentEye = default!;
         [Dependency] private readonly SpriteSystem _sprite = default!;
         [Dependency] private readonly GhostVisibilitySystem _ghostVisSystem = default!; // Goobstation
@@ -56,7 +55,6 @@ namespace Content.Client.Ghost
         public bool IsGhost => Player != null;
 
         public event Action<GhostComponent>? PlayerRemoved;
-        public event Action<GhostComponent>? PlayerUpdated;
         public event Action<GhostComponent>? PlayerAttached;
         public event Action? PlayerDetached;
         public event Action<GhostWarpsResponseEvent>? GhostWarpsResponse;

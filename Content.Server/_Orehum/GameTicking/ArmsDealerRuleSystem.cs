@@ -5,6 +5,8 @@ using Content.Server.GameTicking.Rules.Components;
 using Content.Server.GameTicking.Rules;
 using Content.Server.Roles;
 using Content.Shared.Humanoid;
+using Content.Server.Humanoid.Components;
+using Content.Server.Humanoid.Systems;
 
 namespace Content.Server._Orehum.GameTicking.Rules;
 
@@ -38,7 +40,7 @@ public sealed class ArmsDealerRuleSystem : GameRuleSystem<ArmsDealerRuleComponen
 
     private string MakeBriefing(EntityUid ent)
     {
-        var isHuman = HasComp<HumanoidAppearanceComponent>(ent);
+        var isHuman = HasComp<RandomHumanoidAppearanceComponent>(ent);
         var briefing = isHuman
             ? Loc.GetString("arms-dealer-role-greeting-human")
             : Loc.GetString("arms-dealer-role-greeting-animal");
