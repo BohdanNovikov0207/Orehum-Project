@@ -1,4 +1,3 @@
-# <Trauma>
 [lavaland]
 enabled = false
 
@@ -6,8 +5,7 @@ enabled = false
 ascension_requires_objectives = false
 
 [infolinks]
-github = "https://github.com/Trauma-Station/Trauma-Station"
-# </Trauma>
+github = "https://github.com/BohdanNovikov0207/Orehum-Project"
 
 [game]
 # Straight in-game baby

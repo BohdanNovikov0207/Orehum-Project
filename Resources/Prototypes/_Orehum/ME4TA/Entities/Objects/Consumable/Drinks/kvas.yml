@@ -10,6 +10,5 @@
         reagents:
         - ReagentId: Kvass
           Quantity: 200
-  - type: Drink
   - type: Sprite
     sprite: _Orehum/ME4TA/Objects/Consumable/Drinks/kvasbottle.rsi

@@ -116,4 +116,27 @@ public sealed partial class HumanoidProfileEditor
         }
         return points >= 0;
     }
+
+    private bool IsTraitCompatible(TraitPrototype trait)
+    {
+        if (Profile == null) return true;
+
+        if (trait.Blacklist.Contains(Profile.Species))
+        {
+            return false;
+        }
+
+        foreach (var selectedId in Profile.TraitPreferences)
+        {
+            if (selectedId == trait.ID) continue;
+
+            if (!_prototypeManager.TryIndex<TraitPrototype>(selectedId, out var selected))
+                continue;
+
+            if (trait.Blacklist.Contains(selectedId) || selected.Blacklist.Contains(trait.ID))
+                return false;
+        }
+
+        return true;
+    }
 }

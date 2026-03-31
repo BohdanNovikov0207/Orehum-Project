@@ -31,8 +31,4 @@ reagent-effect-condition-guidebook-unique-bloodstream-chem-threshold =
                *[other] в организме от { $min } до { $max } реагентов
             }
     }
-reagent-effect-condition-guidebook-typed-damage-threshold =
-    { $inverse ->
-        [true] у цели максимум
-       *[false] у цели как минимум
-    } { $changes } урона
+reagent-effect-condition-guidebook-typed-damage-threshold = у цели не более { $changes } урона

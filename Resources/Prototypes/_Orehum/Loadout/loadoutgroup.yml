@@ -1,11 +1,3 @@
-#Exclusive items
-- type: loadoutGroup
-  id: ExclusiveItems
-  name: loadout-group-exclusive
-  minLimit: 0
-  loadouts:
-  - RubberPig
-
 # Cargo
 
 #Techni
