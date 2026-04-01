@@ -1,25 +1,97 @@
 {
-    "version": 1,
-    "license": "CC-BY-SA-3.0",
-    "copyright": "made by mubururu_ (github)",
-    "size": {
-        "x": 32,
-        "y": 32
+  "version": 1,
+  "license": "CC-BY-SA-3.0",
+  "copyright": "made by mubururu_ (github)",
+  "size": {
+    "x": 32,
+    "y": 32
+  },
+  "states": [
+    {
+      "name": "lungs-inhand-left",
+      "directions": 4
     },
-    "states": [
-        {
-            "name": "lungs-inhand-left",
-            "directions": 4
-        },
-        {
-            "name": "lungs-inhand-right",
-            "directions": 4
-        },
-        {
-            "name": "lung-l"
-        },
-        {
-            "name": "lung-r"
-        }
-    ]
+    {
+      "name": "lungs-inhand-right",
+      "directions": 4
+    },
+    {
+      "name": "lung-l"
+    },
+    {
+      "name": "lung-r"
+    },
+    {
+      "name": "heart-inhand-right",
+      "directions": 1
+    },
+    {
+      "name": "kidney-r",
+      "directions": 1
+    },
+    {
+      "name": "heart-inhand-left",
+      "directions": 1
+    },
+    {
+      "name": "stomach-inhand-right",
+      "directions": 1
+    },
+    {
+      "name": "liver-inhand-left",
+      "directions": 1
+    },
+    {
+      "name": "kidneys-inhand-right",
+      "directions": 1
+    },
+    {
+      "name": "heart-on",
+      "directions": 1
+    },
+    {
+      "name": "liver-inhand-right",
+      "directions": 1
+    },
+    {
+      "name": "eyeball-l",
+      "directions": 1
+    },
+    {
+      "name": "kidney-l",
+      "directions": 1
+    },
+    {
+      "name": "liver",
+      "directions": 1
+    },
+    {
+      "name": "eyeball-r",
+      "directions": 1
+    },
+    {
+      "name": "eyeballs-inhand-left",
+      "directions": 1
+    },
+    {
+      "name": "eyeballs-inhand-right",
+      "directions": 1
+    },
+    {
+      "name": "kidneys-inhand-left",
+      "directions": 1
+    },
+    {
+      "name": "stomach",
+      "directions": 1
+    },
+    {
+      "name": "stomach-inhand-left",
+      "directions": 1
+    },
+    {
+      "name": "tongue",
+      "directions": 1
+    }
+  ]
 }

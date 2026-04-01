@@ -65,6 +65,18 @@
     {
       "name": "groin_m",
       "directions": 4
+    },
+    {
+      "name": "torso_m",
+      "directions": 1
+    },
+    {
+      "name": "head",
+      "directions": 1
+    },
+    {
+      "name": "torso_f",
+      "directions": 1
     }
   ]
 }

@@ -74,6 +74,10 @@
           0.1
         ]
       ]
+    },
+    {
+      "name": "mmi_icon",
+      "directions": 1
     }
   ]
 }

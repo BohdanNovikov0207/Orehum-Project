@@ -7,7 +7,7 @@
     "y": 32
   },
   "states": [
-	{
+    {
       "name": "fulltile_overlay"
     },
     {
@@ -201,6 +201,86 @@
     },
     {
       "name": "pavement_vertical_checker_b"
+    },
+    {
+      "name": "horizontalslats_continuous_full",
+      "directions": 1
+    },
+    {
+      "name": "verticalslats_bordered_inner_e",
+      "directions": 1
+    },
+    {
+      "name": "verticalslats_bordered_outer_e",
+      "directions": 1
+    },
+    {
+      "name": "verticalslats_continuous_outer_w",
+      "directions": 1
+    },
+    {
+      "name": "horizontalslats_continuous_outer_n",
+      "directions": 1
+    },
+    {
+      "name": "verticalslats_continuous_full",
+      "directions": 1
+    },
+    {
+      "name": "horizontalslats_bordered_inner_s",
+      "directions": 1
+    },
+    {
+      "name": "verticalslats_continuous_outer_e",
+      "directions": 1
+    },
+    {
+      "name": "horizontalslats_continuous_inner_n",
+      "directions": 1
+    },
+    {
+      "name": "verticalslats_bordered_inner_w",
+      "directions": 1
+    },
+    {
+      "name": "horizontalslats_bordered_outer_n",
+      "directions": 1
+    },
+    {
+      "name": "horizontalslats_bordered_outer_s",
+      "directions": 1
+    },
+    {
+      "name": "verticalslats_continuous_inner_e",
+      "directions": 1
+    },
+    {
+      "name": "horizontalslats_continuous_outer_s",
+      "directions": 1
+    },
+    {
+      "name": "horizontalslats_bordered_inner_n",
+      "directions": 1
+    },
+    {
+      "name": "verticalslats_bordered_full",
+      "directions": 1
+    },
+    {
+      "name": "horizontalslats_bordered_full",
+      "directions": 1
+    },
+    {
+      "name": "verticalslats_bordered_outer_w",
+      "directions": 1
+    },
+    {
+      "name": "verticalslats_continuous_inner_w",
+      "directions": 1
+    },
+    {
+      "name": "horizontalslats_continuous_inner_s",
+      "directions": 1
     }
   ]
 }

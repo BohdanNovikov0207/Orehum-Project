@@ -17,6 +17,42 @@
     {
       "name": "inhand-right",
       "directions": 4
+    },
+    {
+      "name": "decaying",
+      "directions": 1
+    },
+    {
+      "name": "timer_2",
+      "directions": 1
+    },
+    {
+      "name": "severity_mask",
+      "directions": 1
+    },
+    {
+      "name": "timer_1",
+      "directions": 1
+    },
+    {
+      "name": "growing",
+      "directions": 1
+    },
+    {
+      "name": "timer_4",
+      "directions": 1
+    },
+    {
+      "name": "timer_5",
+      "directions": 1
+    },
+    {
+      "name": "supercritical",
+      "directions": 1
+    },
+    {
+      "name": "timer_3",
+      "directions": 1
     }
   ]
 }

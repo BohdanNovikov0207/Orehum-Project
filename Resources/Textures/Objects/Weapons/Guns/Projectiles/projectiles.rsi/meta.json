@@ -333,6 +333,18 @@
           0.5
         ]
       ]
+    },
+    {
+      "name": "debug",
+      "directions": 1
+    },
+    {
+      "name": "impact_debug",
+      "directions": 1
+    },
+    {
+      "name": "muzzle_debug",
+      "directions": 1
     }
   ]
 }

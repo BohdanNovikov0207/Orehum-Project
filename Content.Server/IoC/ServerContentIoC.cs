@@ -90,5 +90,6 @@ internal static class ServerContentIoC
         deps.Register<LinkAccountManager>(); // RMC - Patreon
         deps.Register<ServerFeedbackManager>();
         deps.Register<ISharedFeedbackManager, ServerFeedbackManager>();
+        deps.Register<Content.Corvax.Interfaces.Shared.ISharedSponsorsManager, Content.Server.Backmen.Sponsors.SponsorsManager>(); // Corvax-Sponsors
     }
 }

@@ -95,13 +95,17 @@
       "name": "steel-bench",
       "directions": 4
     },
-	{
-		"name": "brass_chair",
-		"directions": 4
-	},
     {
-        "name": "card-stool",
-        "directions": 4
+      "name": "brass_chair",
+      "directions": 4
+    },
+    {
+      "name": "card-stool",
+      "directions": 4
+    },
+    {
+      "name": "xeno-chair",
+      "directions": 1
     }
   ]
 }

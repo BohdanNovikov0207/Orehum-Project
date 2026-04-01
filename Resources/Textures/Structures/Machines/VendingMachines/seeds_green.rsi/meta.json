@@ -47,6 +47,22 @@
     },
     {
       "name": "panel"
+    },
+    {
+      "name": "seeds_generic-shelf2",
+      "directions": 1
+    },
+    {
+      "name": "seeds_generic-shelf0",
+      "directions": 1
+    },
+    {
+      "name": "seeds_generic-shelf3",
+      "directions": 1
+    },
+    {
+      "name": "seeds_generic-shelf1",
+      "directions": 1
     }
   ]
 }

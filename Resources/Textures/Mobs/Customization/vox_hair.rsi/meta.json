@@ -118,6 +118,10 @@
     {
       "name": "slick_s",
       "directions": 4
+    },
+    {
+      "name": "catfish_s",
+      "directions": 1
     }
   ]
 }

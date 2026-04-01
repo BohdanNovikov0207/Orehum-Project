@@ -18,6 +18,22 @@
     },
     {
       "name": "adv-o"
+    },
+    {
+      "name": "inhand-left-reg",
+      "directions": 1
+    },
+    {
+      "name": "inhand-left-adv",
+      "directions": 1
+    },
+    {
+      "name": "inhand-right-reg",
+      "directions": 1
+    },
+    {
+      "name": "inhand-right-adv",
+      "directions": 1
     }
   ]
 }

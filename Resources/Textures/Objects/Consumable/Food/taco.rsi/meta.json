@@ -24,6 +24,10 @@
     },
     {
       "name": "rattaco"
+    },
+    {
+      "name": "dragontaco",
+      "directions": 1
     }
   ]
 }

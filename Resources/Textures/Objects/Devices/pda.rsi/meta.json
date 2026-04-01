@@ -232,7 +232,7 @@
     {
       "name": "pda-seniorofficer"
     },
-	{
+    {
       "name": "pda-wizard",
       "delays": [
         [
@@ -246,6 +246,26 @@
     {
       "name": "equipped-IDCARD",
       "directions": 4
+    },
+    {
+      "name": "pda-syndi-corpsman",
+      "directions": 1
+    },
+    {
+      "name": "pda-syndi-commander",
+      "directions": 1
+    },
+    {
+      "name": "pda-syndi-operative",
+      "directions": 1
+    },
+    {
+      "name": "pda-seniorcourier",
+      "directions": 1
+    },
+    {
+      "name": "pda-ninja",
+      "directions": 1
     }
   ]
 }

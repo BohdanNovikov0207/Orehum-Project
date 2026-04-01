@@ -37,6 +37,10 @@
     },
     {
       "name": "off"
+    },
+    {
+      "name": "eject-unshaded",
+      "directions": 1
     }
   ]
 }

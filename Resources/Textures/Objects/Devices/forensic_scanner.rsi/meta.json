@@ -1,21 +1,37 @@
 {
-   "copyright" : "Taken from https://github.com/tgstation/tgstation",
-   "license" : "CC-BY-SA-3.0",
-   "size" : {
-      "x" : 32,
-      "y" : 32
-   },
-   "states" : [
-      {
-         "delays" : [
-            [
-               0.8,
-               0.2
-            ]
-         ],
-         "directions" : 1,
-         "name" : "forensicnew"
-      }
-   ],
-   "version" : 1
+  "copyright": "Taken from https://github.com/tgstation/tgstation",
+  "license": "CC-BY-SA-3.0",
+  "size": {
+    "x": 32,
+    "y": 32
+  },
+  "states": [
+    {
+      "delays": [
+        [
+          0.8,
+          0.2
+        ]
+      ],
+      "directions": 1,
+      "name": "forensicnew"
+    },
+    {
+      "name": "equipped-BELT",
+      "directions": 1
+    },
+    {
+      "name": "inhand-right",
+      "directions": 1
+    },
+    {
+      "name": "inhand-left",
+      "directions": 1
+    },
+    {
+      "name": "icon",
+      "directions": 1
+    }
+  ],
+  "version": 1
 }

@@ -21,6 +21,10 @@
           0.4
         ]
       ]
+    },
+    {
+      "name": "pale",
+      "directions": 1
     }
   ]
 }

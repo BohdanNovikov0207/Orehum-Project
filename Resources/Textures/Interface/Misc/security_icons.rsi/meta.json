@@ -30,6 +30,14 @@
     },
     {
       "name": "hud_perma"
+    },
+    {
+      "name": "hud_eliminated",
+      "directions": 1
+    },
+    {
+      "name": "hud_hostile",
+      "directions": 1
     }
   ]
 }

@@ -46,6 +46,62 @@
     {
       "name": "tail_ring",
       "directions": 4
+    },
+    {
+      "name": "cheekblush",
+      "directions": 1
+    },
+    {
+      "name": "underbelly",
+      "directions": 1
+    },
+    {
+      "name": "beakcover_stripe",
+      "directions": 1
+    },
+    {
+      "name": "beakcover_tip",
+      "directions": 1
+    },
+    {
+      "name": "tattoo_arrow_head",
+      "directions": 1
+    },
+    {
+      "name": "nightbelt",
+      "directions": 1
+    },
+    {
+      "name": "chest_v_2",
+      "directions": 1
+    },
+    {
+      "name": "tail_talisman",
+      "directions": 1
+    },
+    {
+      "name": "visage_r",
+      "directions": 1
+    },
+    {
+      "name": "tattoo_nightling_head",
+      "directions": 1
+    },
+    {
+      "name": "chest_v_1",
+      "directions": 1
+    },
+    {
+      "name": "visage",
+      "directions": 1
+    },
+    {
+      "name": "eyeliner",
+      "directions": 1
+    },
+    {
+      "name": "visage_l",
+      "directions": 1
     }
   ]
 }

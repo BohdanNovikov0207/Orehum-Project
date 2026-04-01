@@ -173,7 +173,7 @@
       "name": "scientist"
     },
     {
-      "name": "security_cadet" 
+      "name": "security_cadet"
     },
     {
       "name": "security_officer"
@@ -204,6 +204,14 @@
     },
     {
       "name": "zookeeper"
+    },
+    {
+      "name": "ertchaplain",
+      "directions": 1
+    },
+    {
+      "name": "ertchaplaineva",
+      "directions": 1
     }
   ]
 }

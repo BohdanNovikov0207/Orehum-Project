@@ -10,7 +10,7 @@
     {
       "name": "6pack1"
     },
-	  {
+    {
       "name": "6pack2"
     },
     {
@@ -27,6 +27,14 @@
     },
     {
       "name": "plastic-thingy"
+    },
+    {
+      "name": "inhand-right",
+      "directions": 1
+    },
+    {
+      "name": "inhand-left",
+      "directions": 1
     }
   ]
 }

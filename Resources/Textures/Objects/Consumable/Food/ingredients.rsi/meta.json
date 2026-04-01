@@ -143,6 +143,30 @@
     },
     {
       "name": "cloth-box"
+    },
+    {
+      "name": "rice-big_open",
+      "directions": 1
+    },
+    {
+      "name": "cornmeal-big_open",
+      "directions": 1
+    },
+    {
+      "name": "sugar-big_open",
+      "directions": 1
+    },
+    {
+      "name": "mayo_open",
+      "directions": 1
+    },
+    {
+      "name": "oliveoil_open",
+      "directions": 1
+    },
+    {
+      "name": "flour-big_open",
+      "directions": 1
     }
   ]
 }

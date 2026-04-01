@@ -53,6 +53,10 @@
           0.4
         ]
       ]
+    },
+    {
+      "name": "dead",
+      "directions": 1
     }
   ]
 }

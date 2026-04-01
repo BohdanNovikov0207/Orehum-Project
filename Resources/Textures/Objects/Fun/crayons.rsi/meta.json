@@ -151,6 +151,10 @@
     },
     {
       "name": "white_box"
+    },
+    {
+      "name": "electric",
+      "directions": 1
     }
   ]
 }

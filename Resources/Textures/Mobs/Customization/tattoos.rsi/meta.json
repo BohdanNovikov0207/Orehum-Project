@@ -66,6 +66,14 @@
     {
       "name": "eyeshadow_lower",
       "directions": 4
+    },
+    {
+      "name": "tattoo_eye_vulpkanin_r",
+      "directions": 1
+    },
+    {
+      "name": "tattoo_eye_vulpkanin_l",
+      "directions": 1
     }
   ]
 }

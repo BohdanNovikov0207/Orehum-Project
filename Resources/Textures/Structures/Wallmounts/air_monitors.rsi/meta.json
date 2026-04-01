@@ -9,7 +9,7 @@
   "states": [
     {
       "name": "alarm0",
-	  "directions": 1,
+      "directions": 1,
       "delays": [
         [
           2.8,
@@ -19,7 +19,7 @@
     },
     {
       "name": "alarm1",
-	  "directions": 1,
+      "directions": 1,
       "delays": [
         [
           0.6,
@@ -184,6 +184,14 @@
     },
     {
       "name": "firex",
+      "directions": 1
+    },
+    {
+      "name": "fire_overlay",
+      "directions": 1
+    },
+    {
+      "name": "fire_detected",
       "directions": 1
     }
   ]

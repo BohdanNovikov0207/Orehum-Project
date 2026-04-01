@@ -30,6 +30,22 @@
     },
     {
       "name": "extraction_pack"
+    },
+    {
+      "name": "inhand-left-fulton",
+      "directions": 1
+    },
+    {
+      "name": "inhand-right-beacon",
+      "directions": 1
+    },
+    {
+      "name": "inhand-right-fulton",
+      "directions": 1
+    },
+    {
+      "name": "inhand-left-beacon",
+      "directions": 1
     }
   ]
 }

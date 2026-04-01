@@ -53,6 +53,10 @@
     {
       "name": "groin",
       "directions": 4
+    },
+    {
+      "name": "torso",
+      "directions": 1
     }
   ]
 }

@@ -49,6 +49,10 @@
     },
     {
       "name": "panel"
+    },
+    {
+      "name": "deny-unshaded",
+      "directions": 1
     }
   ]
 }

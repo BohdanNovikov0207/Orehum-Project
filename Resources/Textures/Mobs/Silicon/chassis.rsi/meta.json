@@ -409,7 +409,7 @@
       "name": "xenoborg_heavy_l",
       "directions": 4
     },
-	  {
+    {
       "name": "xenoborg_scout",
       "directions": 4
     },
@@ -515,7 +515,7 @@
       "name": "xenoborg_engi",
       "directions": 4
     },
-	  {
+    {
       "name": "xenoborg_engi_e",
       "directions": 4
     },
@@ -670,6 +670,50 @@
           0.1
         ]
       ]
+    },
+    {
+      "name": "janitor_moving_derelict",
+      "directions": 1
+    },
+    {
+      "name": "medical_moving_derelict",
+      "directions": 1
+    },
+    {
+      "name": "miner_moving_derelict",
+      "directions": 1
+    },
+    {
+      "name": "janitor_derelict",
+      "directions": 1
+    },
+    {
+      "name": "synd_sec_derelict",
+      "directions": 1
+    },
+    {
+      "name": "engineer_derelict",
+      "directions": 1
+    },
+    {
+      "name": "synd_sec_derelict_e",
+      "directions": 1
+    },
+    {
+      "name": "synd_sec_derelict_l",
+      "directions": 1
+    },
+    {
+      "name": "medical_derelict",
+      "directions": 1
+    },
+    {
+      "name": "miner_derelict",
+      "directions": 1
+    },
+    {
+      "name": "engineer_derelict_crystal",
+      "directions": 1
     }
   ]
 }

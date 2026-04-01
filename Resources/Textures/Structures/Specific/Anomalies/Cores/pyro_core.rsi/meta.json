@@ -20,6 +20,14 @@
           0.15625
         ]
       ]
+    },
+    {
+      "name": "inhand-right",
+      "directions": 1
+    },
+    {
+      "name": "inhand-left",
+      "directions": 1
     }
   ]
 }

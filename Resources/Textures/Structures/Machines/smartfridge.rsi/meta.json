@@ -21,6 +21,10 @@
     },
     {
       "name": "smartfridge_door"
+    },
+    {
+      "name": "panel",
+      "directions": 1
     }
   ]
 }

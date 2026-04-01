@@ -26,6 +26,14 @@
           0.1
         ]
       ]
+    },
+    {
+      "name": "deny-unshaded",
+      "directions": 1
+    },
+    {
+      "name": "eject-unshaded",
+      "directions": 1
     }
   ]
 }

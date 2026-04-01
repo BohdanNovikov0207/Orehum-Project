@@ -93,6 +93,10 @@
     },
     {
       "name": "tracks"
+    },
+    {
+      "name": "syndicate_circuit",
+      "directions": 1
     }
   ]
 }

@@ -18,6 +18,10 @@
     },
     {
       "name": "rectangle-mirror-broke"
+    },
+    {
+      "name": "mirror-broke",
+      "directions": 1
     }
   ]
 }

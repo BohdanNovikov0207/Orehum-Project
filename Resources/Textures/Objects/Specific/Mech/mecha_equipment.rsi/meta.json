@@ -183,6 +183,30 @@
           0.1
         ]
       ]
+    },
+    {
+      "name": "inhand-left-big",
+      "directions": 1
+    },
+    {
+      "name": "inhand-right-small",
+      "directions": 1
+    },
+    {
+      "name": "inhand-right-honk",
+      "directions": 1
+    },
+    {
+      "name": "inhand-left-honk",
+      "directions": 1
+    },
+    {
+      "name": "inhand-right-big",
+      "directions": 1
+    },
+    {
+      "name": "inhand-left-small",
+      "directions": 1
     }
   ]
 }

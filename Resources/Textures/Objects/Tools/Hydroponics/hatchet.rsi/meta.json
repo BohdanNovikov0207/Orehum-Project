@@ -17,6 +17,10 @@
     },
     {
       "name": "icon"
+    },
+    {
+      "name": "storage",
+      "directions": 1
     }
   ]
 }

@@ -27,6 +27,14 @@
     {
       "name": "inhand-right",
       "directions": 4
+    },
+    {
+      "name": "decharging",
+      "directions": 1
+    },
+    {
+      "name": "powered",
+      "directions": 1
     }
   ]
 }

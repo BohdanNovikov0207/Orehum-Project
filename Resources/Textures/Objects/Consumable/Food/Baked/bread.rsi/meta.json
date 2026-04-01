@@ -153,6 +153,30 @@
     },
     {
       "name": "xenomeat-slice"
+    },
+    {
+      "name": "batard-cotton-inhand-left",
+      "directions": 1
+    },
+    {
+      "name": "batard",
+      "directions": 1
+    },
+    {
+      "name": "batard-cotton-inhand-right",
+      "directions": 1
+    },
+    {
+      "name": "batard-inhand-right",
+      "directions": 1
+    },
+    {
+      "name": "batard-inhand-left",
+      "directions": 1
+    },
+    {
+      "name": "batard-cotton",
+      "directions": 1
     }
   ]
 }

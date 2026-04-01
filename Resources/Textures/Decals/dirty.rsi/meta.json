@@ -30,6 +30,22 @@
     },
     {
       "name": "rust"
+    },
+    {
+      "name": "dirtlight-vertical-slats",
+      "directions": 1
+    },
+    {
+      "name": "dirtheavy-vertical-slats",
+      "directions": 1
+    },
+    {
+      "name": "dirtheavy-horizontal-slats",
+      "directions": 1
+    },
+    {
+      "name": "dirtlight-horizontal-slats",
+      "directions": 1
     }
   ]
 }

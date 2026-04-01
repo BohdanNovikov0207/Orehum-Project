@@ -1,14 +1,22 @@
 {
-    "version": 1,
-    "license": "CC-BY-SA-3.0",
-    "copyright": "Made by Dezzzix; Discord: dezzzix",
-    "size": {
-      "x": 32,
-      "y": 32
+  "version": 1,
+  "license": "CC-BY-SA-3.0",
+  "copyright": "Made by Dezzzix; Discord: dezzzix",
+  "size": {
+    "x": 32,
+    "y": 32
+  },
+  "states": [
+    {
+      "name": "icon"
     },
-    "states": [
-      {
-        "name": "icon"
-      }
-    ]
-  }
+    {
+      "name": "inhand-right",
+      "directions": 1
+    },
+    {
+      "name": "inhand-left",
+      "directions": 1
+    }
+  ]
+}

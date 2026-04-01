@@ -85,6 +85,14 @@
     {
       "name": "outline",
       "directions": 4
+    },
+    {
+      "name": "torso",
+      "directions": 1
+    },
+    {
+      "name": "head",
+      "directions": 1
     }
   ]
 }

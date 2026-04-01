@@ -186,6 +186,158 @@
     {
       "name": "inhand-left",
       "directions": 4
+    },
+    {
+      "name": "alpha-bun-inhand-right",
+      "directions": 1
+    },
+    {
+      "name": "alpha-bun-inhand-left",
+      "directions": 1
+    },
+    {
+      "name": "plain-inhand-right",
+      "directions": 1
+    },
+    {
+      "name": "dog-inhand-right",
+      "directions": 1
+    },
+    {
+      "name": "plain-inhand-left",
+      "directions": 1
+    },
+    {
+      "name": "alpha-patty-inhand-left",
+      "directions": 1
+    },
+    {
+      "name": "mime-inhand-right",
+      "directions": 1
+    },
+    {
+      "name": "clown-inhand-left",
+      "directions": 1
+    },
+    {
+      "name": "spell-inhand-right",
+      "directions": 1
+    },
+    {
+      "name": "rat-inhand-left",
+      "directions": 1
+    },
+    {
+      "name": "spell-inhand-left",
+      "directions": 1
+    },
+    {
+      "name": "bear-inhand-left",
+      "directions": 1
+    },
+    {
+      "name": "cat-inhand-left",
+      "directions": 1
+    },
+    {
+      "name": "brain-inhand-left",
+      "directions": 1
+    },
+    {
+      "name": "mime-inhand-left",
+      "directions": 1
+    },
+    {
+      "name": "mothroach-inhand-left",
+      "directions": 1
+    },
+    {
+      "name": "alpha-filling-inhand-left",
+      "directions": 1
+    },
+    {
+      "name": "rat-inhand-right",
+      "directions": 1
+    },
+    {
+      "name": "cat-inhand-right",
+      "directions": 1
+    },
+    {
+      "name": "burger-super-inhand-right",
+      "directions": 1
+    },
+    {
+      "name": "burger-big-inhand-left",
+      "directions": 1
+    },
+    {
+      "name": "bear-inhand-right",
+      "directions": 1
+    },
+    {
+      "name": "burger-inhand-right",
+      "directions": 1
+    },
+    {
+      "name": "bun-inhand-left",
+      "directions": 1
+    },
+    {
+      "name": "plasma-inhand-right",
+      "directions": 1
+    },
+    {
+      "name": "burger-super-inhand-left",
+      "directions": 1
+    },
+    {
+      "name": "alpha-patty-inhand-right",
+      "directions": 1
+    },
+    {
+      "name": "brain-inhand-right",
+      "directions": 1
+    },
+    {
+      "name": "burger-big-inhand-right",
+      "directions": 1
+    },
+    {
+      "name": "alpha-filling-inhand-right",
+      "directions": 1
+    },
+    {
+      "name": "mothroach-inhand-right",
+      "directions": 1
+    },
+    {
+      "name": "bun-inhand-right",
+      "directions": 1
+    },
+    {
+      "name": "crazy-inhand-left",
+      "directions": 1
+    },
+    {
+      "name": "clown-inhand-right",
+      "directions": 1
+    },
+    {
+      "name": "dog-inhand-left",
+      "directions": 1
+    },
+    {
+      "name": "plasma-inhand-left",
+      "directions": 1
+    },
+    {
+      "name": "crazy-inhand-right",
+      "directions": 1
+    },
+    {
+      "name": "burger-inhand-left",
+      "directions": 1
     }
   ]
 }

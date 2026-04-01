@@ -508,6 +508,46 @@
           0.1
         ]
       ]
+    },
+    {
+      "name": "pale",
+      "directions": 1
+    },
+    {
+      "name": "bhole3",
+      "directions": 1
+    },
+    {
+      "name": "realitycrack",
+      "directions": 1
+    },
+    {
+      "name": "eye_open",
+      "directions": 1
+    },
+    {
+      "name": "eye_pulse",
+      "directions": 1
+    },
+    {
+      "name": "heretic_aura",
+      "directions": 1
+    },
+    {
+      "name": "eye_close",
+      "directions": 1
+    },
+    {
+      "name": "heretic_eye_dripping",
+      "directions": 1
+    },
+    {
+      "name": "heretic_eye",
+      "directions": 1
+    },
+    {
+      "name": "eye_flash",
+      "directions": 1
     }
   ]
 }

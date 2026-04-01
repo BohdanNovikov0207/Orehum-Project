@@ -60,6 +60,10 @@
           0.8
         ]
       ]
+    },
+    {
+      "name": "coffee-hellfire",
+      "directions": 1
     }
   ]
 }

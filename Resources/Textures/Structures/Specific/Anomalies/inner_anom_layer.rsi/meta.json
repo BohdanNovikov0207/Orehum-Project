@@ -651,6 +651,86 @@
           0.4
         ]
       ]
+    },
+    {
+      "name": "rock_ARACHNID",
+      "directions": 1
+    },
+    {
+      "name": "frost_ARACHNID",
+      "directions": 1
+    },
+    {
+      "name": "flora_MOTH",
+      "directions": 1
+    },
+    {
+      "name": "flesh_ARACHNID",
+      "directions": 1
+    },
+    {
+      "name": "frost_MOTH",
+      "directions": 1
+    },
+    {
+      "name": "tech_ARACHNID",
+      "directions": 1
+    },
+    {
+      "name": "fire_ARACHNID",
+      "directions": 1
+    },
+    {
+      "name": "tech_MOTH",
+      "directions": 1
+    },
+    {
+      "name": "fire_MOTH",
+      "directions": 1
+    },
+    {
+      "name": "bluespace_MOTH",
+      "directions": 1
+    },
+    {
+      "name": "shock_MOTH",
+      "directions": 1
+    },
+    {
+      "name": "shadow_ARACHNID",
+      "directions": 1
+    },
+    {
+      "name": "rock_MOTH",
+      "directions": 1
+    },
+    {
+      "name": "grav_ARACHNID",
+      "directions": 1
+    },
+    {
+      "name": "flora_ARACHNID",
+      "directions": 1
+    },
+    {
+      "name": "bluespace_ARACHNID",
+      "directions": 1
+    },
+    {
+      "name": "flesh_MOTH",
+      "directions": 1
+    },
+    {
+      "name": "shadow_MOTH",
+      "directions": 1
+    },
+    {
+      "name": "shock_ARACHNID",
+      "directions": 1
+    },
+    {
+      "name": "grav_MOTH",
+      "directions": 1
     }
   ]
 }

@@ -298,6 +298,18 @@
           0.2
         ]
       ]
+    },
+    {
+      "name": "beak_squarecere",
+      "directions": 1
+    },
+    {
+      "name": "beak_shaved",
+      "directions": 1
+    },
+    {
+      "name": "beak_hooked",
+      "directions": 1
     }
   ]
 }

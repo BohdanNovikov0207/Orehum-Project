@@ -926,6 +926,38 @@
           0.4
         ]
       ]
+    },
+    {
+      "name": "Tail_Minor_alt",
+      "directions": 1
+    },
+    {
+      "name": "Tail_Severe_alt",
+      "directions": 1
+    },
+    {
+      "name": "Wings_Minor",
+      "directions": 1
+    },
+    {
+      "name": "Wings_Minor_alt",
+      "directions": 1
+    },
+    {
+      "name": "Wings_Severe",
+      "directions": 1
+    },
+    {
+      "name": "Tail_Minor",
+      "directions": 1
+    },
+    {
+      "name": "Wings_Severe_alt",
+      "directions": 1
+    },
+    {
+      "name": "Tail_Severe",
+      "directions": 1
     }
   ]
 }

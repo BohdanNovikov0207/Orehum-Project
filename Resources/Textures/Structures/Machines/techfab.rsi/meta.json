@@ -54,6 +54,10 @@
           0.1
         ]
       ]
+    },
+    {
+      "name": "unlit-building",
+      "directions": 1
     }
   ]
 }

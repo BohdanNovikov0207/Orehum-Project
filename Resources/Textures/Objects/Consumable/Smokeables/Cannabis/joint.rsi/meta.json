@@ -177,6 +177,14 @@
           0.1
         ]
       ]
+    },
+    {
+      "name": "lit-equipped-MASK-vulpkanin",
+      "directions": 1
+    },
+    {
+      "name": "unlit-equipped-MASK-vulpkanin",
+      "directions": 1
     }
   ]
 }

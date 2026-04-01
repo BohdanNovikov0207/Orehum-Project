@@ -73,6 +73,14 @@
     {
       "name": "vox_m",
       "directions": 4
+    },
+    {
+      "name": "groin",
+      "directions": 1
+    },
+    {
+      "name": "torso",
+      "directions": 1
     }
   ]
 }
