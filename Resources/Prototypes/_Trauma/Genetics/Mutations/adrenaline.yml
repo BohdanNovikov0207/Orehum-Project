@@ -1,8 +1,8 @@
 - type: entity
   parent: BaseMutation
   id: MutationAdrenalineRush
-  name: Adrenaline Rush
-  description: Allows the host to trigger their body's adrenaline response at will.
+  name: Адреналиновый раш
+  description: Позволяет носителю по желанию активировать адреналиновый отклик своего организма.
   components:
   - type: Mutation
     instability: 25
@@ -12,8 +12,8 @@
 - type: entity
   parent: BaseMutationAction
   id: ActionMutationAdrenaline
-  name: Adrenaline!
-  description: Energize yourself, pushing your body to its limits!
+  name: Адреналин!
+  description: Наполните себя энергией, выведя свое тело на предел возможностей!
   components:
   - type: Action
     checkCanInteract: false # its your heart or something

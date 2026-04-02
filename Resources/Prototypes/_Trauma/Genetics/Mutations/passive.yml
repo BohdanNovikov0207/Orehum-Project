@@ -3,8 +3,8 @@
 - type: entity
   parent: BaseMutation
   id: MutationClever
-  name: Clever
-  description: Causes the subject to feel just a little bit smarter. Most effective in specimens with low levels of intelligence.
+  name: Смышлёность
+  description: Заставляет подопытного чувствовать себя чуточку умнее. Наиболее эффективно проявляется у особей с низким уровнем интеллекта.
   components:
   - type: Mutation
     instability: 25

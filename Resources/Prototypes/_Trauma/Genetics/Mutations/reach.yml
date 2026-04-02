@@ -1,8 +1,8 @@
 - type: entity
   parent: BaseMutation
   id: MutationTelekinesis
-  name: Telekinesis
-  description: A strange mutation that allows the holder to interact with objects through thought.
+  name: Телекинез
+  description: Странная мутация, позволяющая носителю взаимодействовать с объектами силой мысли.
   components:
   - type: Mutation
     instability: 35
@@ -19,8 +19,8 @@
 - type: entity
   parent: BaseAction
   id: ActionMutationTelekinesis
-  name: Use Telekinesis
-  description: Move an object using the power of your mind!
+  name: Использовать телекинез
+  description: Перемещайте объекты, используя всю мощь своего разума!
   components:
   - type: Action
     raiseOnUser: true
@@ -48,8 +48,8 @@
 - type: entity
   parent: BaseMutation
   id: MutationElasticArms
-  name: Elastic Arms
-  description: Subject's arms have become elastic, allowing them to stretch up to a meter away. However, this elasticity makes it difficult to wear gloves, handle complex tasks, or grab large objects.
+  name: Эластичные руки
+  description: Руки подопытного стали невероятно эластичными, что позволяет им растягиваться почти на метр. Однако из-за этого становится трудно носить перчатки, выполнять сложные задачи или удерживать крупные объекты.
   components:
   - type: Mutation
     instability: 35

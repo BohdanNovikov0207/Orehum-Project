@@ -1,8 +1,8 @@
 - type: entity
   parent: BaseMutation
   id: MutationVoidMagnet
-  name: Void Magnet
-  description: A rare genome that attracts odd forces not usually observed.
+  name: Магнит Бездны
+  description: Редкий геном, притягивающий странные силы, которые обычно остаются незримыми.
   components:
   - type: Mutation
     instability: 25
@@ -15,8 +15,8 @@
 - type: entity
   parent: BaseMutationAction
   id: ActionMutationVoidMagnet
-  name: Convoke Void
-  description: A rare genome that attracts odd forces not usually observed. May sometimes pull you in randomly.
+  name: Призыв Бездны
+  description: "Позволяет воззвать к странным силам извне. Осторожно: иногда Бездна может затянуть вас в себя совершенно случайно."
   components:
   - type: Action
     icon:

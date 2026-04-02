@@ -1,8 +1,8 @@
 - type: entity
   parent: BaseMutation
   id: MutationFarsight
-  name: Farsight
-  description: The subject's eyes are able to see further than normal.
+  name: Дальнозоркость
+  description: Глаза подопытного способны видеть значительно дальше, чем у обычного человека.
   components:
   - type: Mutation
     instability: 10

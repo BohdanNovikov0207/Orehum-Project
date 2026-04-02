@@ -15,8 +15,8 @@
 - type: entity
   parent: BaseMutationWeakness
   id: MutationColdWeakness
-  name: Cold Weakness
-  description: A strange mutation that cripples the host's ability to raise its body temperature. Cold is far more dangerous.
+  name: Уязвимость к холоду
+  description: Странная мутация, которая подавляет способность организма повышать температуру тела. Холод становится в разы опаснее.
   components:
   - type: ThermalRegulatorMutation
     shivering: 0.05
@@ -31,8 +31,8 @@
 - type: entity
   parent: BaseMutationWeakness
   id: MutationHeatWeakness
-  name: Heat Weakness
-  description: A strange mutation that cripples the host's ability to lower its body temperature. Heat is far more dangerous.
+  name: Уязвимость к жаре
+  description: Странная мутация, которая подавляет способность организма понижать температуру тела. Жара становится в разы опаснее.
   components:
   - type: ThermalRegulatorMutation
     sweating: 0.05
@@ -47,8 +47,8 @@
 - type: entity
   parent: BaseMutationWeakness
   id: MutationThermalWeakness
-  name: Homeostatic Shutdown
-  description: A life-threatening mutation that almost shuts down the host's ability to control its body temperature.
+  name: Гомеостатический сбой
+  description: Опасная для жизни мутация, практически полностью отключающая способность организма контролировать температуру тела.
   components:
   - type: Mutation
     instability: -40 # bonus 10 stability when combined for being a smart lad...

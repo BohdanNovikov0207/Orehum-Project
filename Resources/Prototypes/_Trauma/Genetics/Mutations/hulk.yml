@@ -1,8 +1,8 @@
 - type: entity
   parent: BaseMutation
   id: MutationHulk # the big one
-  name: Hulk
-  description: A poorly understood genome that causes the holder's muscles to expand, inhibit speech and gives the person a bad skin condition.
+  name: Халк
+  description: Малоизученный геном, вызывающий гипертрофию мышц, нарушение речи и крайне скверное состояние кожи.
   components:
   - type: Mutation
     instability: 35
@@ -20,8 +20,8 @@
 - type: entity
   parent: MutationHulk
   id: MutationOrk
-  name: Ork
-  description: A mutation caused by a mixup of hulk genes which severely impacts speech centers in owners' brains.
+  name: Орк
+  description: Мутация, возникшая из-за ошибки в генах халка, которая серьезно подавляет речевые центры в мозге носителя.
   components:
   - type: Mutation
     conflicts: [] # uninherit ork conflict

@@ -1,8 +1,8 @@
 - type: entity
   parent: BaseMutation
   id: MutationChameleon
-  name: Chameleon
-  description: A genome that causes the holder's skin to become transparent over time.
+  name: Хамелеон
+  description: Геном, который заставляет кожу носителя со временем становиться прозрачной, сливаясь с окружением.
   components:
   - type: Mutation
     instability: 35

@@ -1,8 +1,8 @@
 - type: entity
   parent: BaseMutation
   id: MutationGeladikinesis
-  name: Geladikinesis
-  description: Allows the user to concentrate moisture and sub-zero forces into snow.
+  name: Геладикинез
+  description: Позволяет носителю концентрировать влагу и силы абсолютного нуля для создания снега.
   components:
   - type: Mutation
     instability: 10
@@ -13,8 +13,8 @@
 - type: entity
   parent: BaseMutation
   id: MutationCryokinesis
-  name: Cryokinesis
-  description: Draws negative energy from the sub-zero void to freeze surrounding temperatures at subject's will.
+  name: Криокинез
+  description: Извлекает отрицательную энергию из ледяной пустоты, чтобы замораживать всё вокруг по воле подопытного.
   components:
   - type: Mutation
     instability: 25
@@ -26,8 +26,8 @@
 - type: entity
   parent: BaseConjureAction
   id: ActionMutationGeladikinesis
-  name: Create Snow
-  description: Concentrates cryokinetic forces to create snow, useful for snow-like construction.
+  name: Создать снег
+  description: Концентрирует криокинетические силы для создания снега, пригодного для "снежного" строительства.
   components:
   - type: Action
     itemIconStyle: BigAction
@@ -40,8 +40,8 @@
 - type: entity
   parent: ActionMutationPyrokinesis
   id: ActionMutationCryokinesis
-  name: Cryobeam
-  description: This power fires a frozen bolt at a target.
+  name: Криолуч
+  description: Эта способность выпускает в цель леденящий энергетический заряд.
   components:
   - type: Action
     useDelay: 16

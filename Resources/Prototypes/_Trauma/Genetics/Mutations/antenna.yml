@@ -1,8 +1,8 @@
 - type: entity
   parent: BaseMutation
   id: MutationAntenna
-  name: Antenna
-  description: The affected person sprouts an antenna. This is known to allow them to access common radio channel passively.
+  name: Антенна
+  description: У носителя вырастает антенна, позволяющая пассивно прослушивать общий радиоканал станции.
   components:
   - type: Mutation
     instability: 10
@@ -14,8 +14,8 @@
 - type: entity
   parent: BaseMutation
   id: MutationMindReader
-  name: Mind Reader
-  description: The affected person can look into the recent memories of others.
+  name: Чтец мыслей
+  description: Носитель может заглядывать в недавние воспоминания окружающих.
   components:
   - type: Mutation
     instability: 10
@@ -33,8 +33,8 @@
 - type: entity
   parent: BaseMutationAction
   id: ActionMutationMindRead
-  name: Mindread
-  description: Read the target's mind.
+  name: Чтение мыслей
+  description: Проникните в разум цели, чтобы узнать её секреты.
   components:
   - type: Action
     icon:

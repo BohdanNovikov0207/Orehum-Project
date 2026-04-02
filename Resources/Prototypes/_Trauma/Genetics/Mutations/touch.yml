@@ -1,8 +1,8 @@
 - type: entity
   parent: BaseMutation
   id: MutationShockTouch
-  name: Shock Touch
-  description: The affected can channel excess electricity through their hands without shocking themselves, allowing them to shock others. Mostly harmless! Mostly...
+  name: Шоковое касание
+  description: Носитель может пропускать избыток электричества через свои руки, не травмируя себя, что позволяет бить током других. Почти безвредно! Почти...
   components:
   - type: Mutation
     instability: 25
@@ -14,8 +14,8 @@
 - type: entity
   parent: BaseMutationAction
   id: ActionMutationShockTouch
-  name: Shock Touch
-  description: Channel electricity to your hand to shock people with. Mostly harmless! Mostly...
+  name: Шоковое касание
+  description: Направьте электричество в ладонь, чтобы ударить кого-нибудь током. Почти безвредно! Почти...
   components:
   - type: Action
     useDelay: 7
@@ -36,32 +36,32 @@
 - type: entity
   parent: BaseMutation
   id: MutationMendingTouch
-  name: Mending Touch
-  description: The affected can lay their hands on other people to transfer a small amount of their injuries to themselves.
+  name: Исцеляющее касание
+  description: Носитель может возлагать руки на других людей, перенося часть их ранений на себя.
   components:
   - type: Mutation
     instability: 35
     difficulty: 16
     rarity: Mythical
-  #- type: ActionMutation
-  #  action: ActionMutationMendingTouch
+  - type: ActionMutation
+    action: ActionMutationMendingTouch
   # TODO: jesus christ this has a lot of logic
 
-#- type: entity
-#  parent: BaseAction
-#  id: ActionMutationMendingTouch
-#  name: Mending Touch
-#  description: Lay your hands on other people to transfer a small amount of their physical injuries to yourself.
-#  components:
-#  - type: Action
-#    useDelay: 12
-#    icon:
-#      sprite: _Trauma/Actions/mutations.rsi
-#      state: mending_touch
-#  - type: TargetAction
-#  - type: EntityTargetAction
-#    whitelist:
-#      requireAll: true
-#      components:
-#      - Damageable
-#      - Body
+- type: entity
+  parent: BaseAction
+  id: ActionMutationMendingTouch
+  name: Исцеляющее касание
+  description: Носитель может возлагать руки на других людей, перенося часть их ранений на себя.
+  components:
+  - type: Action
+    useDelay: 12
+    icon:
+      sprite: _Trauma/Actions/mutations.rsi
+      state: mending_touch
+  - type: TargetAction
+  - type: EntityTargetAction
+    whitelist:
+      requireAll: true
+      components:
+      - Damageable
+      - Body

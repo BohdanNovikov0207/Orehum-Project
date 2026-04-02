@@ -17,8 +17,6 @@
     # TOOD: remove these if they fucking suck lmao
     - id: SingulothKnightsMidround
     - id: MimeAssassinMidround
-    - id: VoxRaidersMidround
-    - id: TunnelClownMidround
     - id: WraithMidround # Unchuddified version | no evolution | no absorbing corpses
     - id: ParadoxCloneSpawn
 

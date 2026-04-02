@@ -1,8 +1,8 @@
 - type: entity
   parent: BaseMutation
   id: MutationTelepathy
-  name: Telepathy
-  description: A rare mutation that allows the user to telepathically communicate to others.
+  name: Телепатия
+  description: Редкая мутация, позволяющая носителю мысленно общаться с окружающими.
   components:
   - type: Mutation
     instability: 10
@@ -14,8 +14,8 @@
 - type: entity
   parent: [ BaseMutationAction, BaseMentalAction ]
   id: ActionMutationTelepathy
-  name: Telepathy
-  description: Telepathically transmits a message to the target.
+  name: Телепатия
+  description: Позволяет передать телепатическое сообщение цели.
   components:
   - type: Action
     useDelay: 5

@@ -1,8 +1,8 @@
 - type: entity
   parent: BaseMutation
   id: MutationTongueSpike
-  name: Tongue Spike
-  description: Allows a creature to voluntarily shoot their tongue out as a deadly weapon.
+  name: Язык-гарпун
+  description: Позволяет существу добровольно выстреливать своим языком как смертоносным оружием.
   components:
   - type: Mutation
     instability: 5
@@ -14,8 +14,8 @@
 - type: entity
   parent: BaseMutationAction
   id: ActionMutationTongueSpike
-  name: Launch spike
-  description: Shoot your tongue out in the direction you click, embedding it and dealing damage until they remove it.
+  name: Выстрелить языком
+  description: Выстрелите языком в направлении клика. Он вонзится в цель и будет наносить урон, пока его не извлекут.
   components:
   - type: Action
     icon:
@@ -33,8 +33,8 @@
 - type: entity
   parent: MutationTongueSpike
   id: MutationChemSpike
-  name: Chem Spike
-  description: Allows a creature to voluntarily shoot their tongue out as biomass, allowing a long range transfer of chemicals.
+  name: Химический гарпун
+  description: Позволяет существу выстреливать языком как биомассой, обеспечивая дистанционную передачу химикатов.
   components:
   - type: Mutation
     instability: 10
@@ -50,8 +50,8 @@
 - type: entity
   parent: ActionMutationTongueSpike
   id: ActionMutationChemSpike
-  name: Launch chem spike
-  description: Shoot your tongue out in the direction you click, embedding it and dealing damage until they remove it. While the other person has the spike embedded, you can transfer your chemicals to them.
+  name: Выстрелить хим-гарпуном
+  description: Выстрелите языком в направлении клика. Пока шип находится в теле цели, вы можете передавать ей свои реагенты.
   components:
   - type: Action
     icon:
@@ -64,8 +64,8 @@
 - type: entity
   parent: BaseMutationAction
   id: ActionMutationChemSpikeSend
-  name: Transfer Chemicals
-  description: Send all of your reagents into whomever the chem spike is embedded in. One use.
+  name: Передать химикаты
+  description: Перекачайте все свои реагенты в того, в ком застрял химический шип. Одноразовое использование.
   components:
   - type: Action
     icon:

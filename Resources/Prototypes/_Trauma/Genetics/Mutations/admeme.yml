@@ -10,7 +10,7 @@
 - type: entity
   parent: BaseMutationAdmeme
   id: MutationUnstableDna
-  name: Unstable DNA
+  name: Нестабильное ДНК
   description: ???
   components:
   - type: Mutation
@@ -20,8 +20,8 @@
 - type: entity
   parent: BaseMutationAdmeme
   id: MutationMouse
-  name: Mouse
-  description: Piep!
+  name: Мышь
+  description: Пиии!
   components:
   - type: PolymorphMutation
     prototypes:

@@ -1,8 +1,8 @@
 - type: entity
   parent: BaseLightMutation
   id: MutationRadioactivity
-  name: Radioactivity
-  description: A volatile mutation that causes the host to sent out deadly beta radiation. This affects both the host and their surroundings.
+  name: Радиоактивность
+  description: Нестабильная мутация, заставляющая носителя испускать смертоносное бета-излучение. Это пагубно влияет как на самого носителя, так и на всё живое вокруг.
   components:
   - type: Mutation
     instability: -40

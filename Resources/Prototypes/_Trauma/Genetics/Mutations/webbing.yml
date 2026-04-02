@@ -1,8 +1,8 @@
 - type: entity
   parent: BaseMutation
   id: MutationWebbingProduction
-  name: Webbing Production
-  description: Allows the user to lay webbing, and travel through it.
+  name: Плетение паутины
+  description: Позволяет пользователю расставлять ловушки из паутины и быстро перемещаться по ним.
   components:
   - type: Mutation
     instability: 25

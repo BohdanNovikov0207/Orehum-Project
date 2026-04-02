@@ -14,8 +14,8 @@
 - type: entity
   parent: BaseMutationAdaptation
   id: MutationColdAdaptation
-  name: Cold Adaptation
-  description: A strange mutation that renders the host immune to damage from low temperature environments.
+  name: Адаптация к холоду
+  description: Странная мутация, дарующая носителю иммунитет к урону от низких температур.
   #It also prevents the host from slipping on ice.
   components:
   - type: ComponentMutation
@@ -27,8 +27,8 @@
 - type: entity
   parent: BaseMutationAdaptation
   id: MutationHeatAdaptation
-  name: Heat Adaptation
-  description: A strange mutation that renders the host immune to damage from high temperature, including being set alight, though the flame itself still burns clothing. It also seems to make the host resist ash storms.
+  name: Адаптация к жаре
+  description: Странная мутация, дарующая иммунитет к высоким температурам и воспламенению. Также защищает от пепельных бурь.
   components:
   - type: ComponentMutation
     added:
@@ -39,8 +39,8 @@
 - type: entity
   parent: BaseMutation
   id: MutationThermalAdaptation
-  name: Thermal Adaptation
-  description: A strange mutation that renders the host immune to damage from both low and high temperature environments. Does not protect from high or low pressure environments.
+  name: Термальная адаптация
+  description: Сложная мутация, дарующая иммунитет к урону как от низких, так и от высоких температур. Не защищает от перепадов давления.
   components:
   - type: Mutation
     instability: 35
@@ -60,8 +60,8 @@
 - type: entity
   parent: BaseMutationAdaptation
   id: MutationPressureAdaptation
-  name: Pressure Adaptation
-  description: A strange mutation that renders the host immune to damage from both low and high pressure environments. Does not protect from temperature, including the cold of space.
+  name: Адаптация к давлению
+  description: Странная мутация, дарующая иммунитет к урону от экстремально низкого и высокого давления. Не защищает от температур, включая холод открытого космоса.
   components:
   - type: Mutation
     conflicts: # cant combine temp and pressure at all
