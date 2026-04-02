@@ -4,7 +4,6 @@
   description: trait-no-hypoport-desc
   category: Quirks
   blacklist:
-    components:
     - BorgChassis
   components:
   - type: NoHypoport

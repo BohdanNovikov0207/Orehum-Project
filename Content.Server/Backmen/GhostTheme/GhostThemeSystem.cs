@@ -5,6 +5,7 @@ using Robust.Server.Configuration;
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization.Manager;
+using Robust.Shared.GameObjects;
 
 #pragma warning disable CS0618 // Type or member is obsolete
 
@@ -62,8 +63,7 @@ public sealed class GhostThemeSystem : EntitySystem
         foreach (var entry in ghostThemePrototype.Components.Values)
         {
             var comp = (Component) _serialization.CreateCopy(entry.Component, notNullableOverride: true);
-            comp.Owner = uid;
-            EntityManager.AddComponent(uid, comp);
+            ((IEntityManager)EntityManager).AddComponent(uid, comp);
         }
 
         EnsureComp<GhostThemeComponent>(uid).GhostTheme = ghostThemePrototype.ID;

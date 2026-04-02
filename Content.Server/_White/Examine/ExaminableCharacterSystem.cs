@@ -16,9 +16,6 @@ using Content.Trauma.Common.Heretic;
 namespace Content.Server._White.Examine;
 public sealed class ExaminableCharacterSystem : EntitySystem
 {
-    [Dependency] private readonly InventorySystem _inventorySystem = default!;
-    [Dependency] private readonly IdentitySystem _identitySystem = default!;
-    [Dependency] private readonly IChatManager _chatManager = default!;
     [Dependency] private readonly INetConfigurationManager _netConfigManager = default!;
 
     private List<string> _logLines = new();
@@ -38,8 +35,6 @@ public sealed class ExaminableCharacterSystem : EntitySystem
         var showExamine = _netConfigManager.GetClientCVar(actorComponent.PlayerSession.Channel, GoobCVars.DetailedExamine);
 
         var selfaware = args.Examiner == args.Examined;
-
-        var priority = 13;
 
         FormattedMessage message = new();
         message.PushTag(new MarkupNode("examineborder", null, null)); // border

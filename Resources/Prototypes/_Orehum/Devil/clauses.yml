@@ -96,13 +96,6 @@
   - type: Cuffable
 
 - type: clause
-  id: ultravision
-  name: Ультра зрения
-  clauseWeight: -20
-  addedComponents:
-  - type: UltraVision
-
-- type: clause
   id: thermalvision
   name: Тепловое зрения
   clauseWeight: -20

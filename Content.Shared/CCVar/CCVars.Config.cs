@@ -21,7 +21,7 @@ public sealed partial class CCVars
     ///     Only the file name (without extension) must be given for this variable.
     /// </remarks>
     public static readonly CVarDef<string> ConfigPresets =
-        CVarDef.Create("config.presets", "Build/development", CVar.SERVERONLY); // Trauma - temporary until it can be set on live server
+        CVarDef.Create("config.presets", "Build/debug", CVar.SERVERONLY); // Trauma - temporary until it can be set on live server
 
     /// <summary>
     ///     Whether to load the preset development CVars.

@@ -5,7 +5,6 @@
   category: SpeechTraits
   cost: 1
   blacklist:
-    components:
     - BorgChassis
   effects:
   - !type:AddMutation

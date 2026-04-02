@@ -8,8 +8,7 @@
   category: LanguageTraits
   cost: -1
   blacklist:
-    components:
-      - BorgChassis
+    - BorgChassis
   components:
   - type: ForeignerTrait
     cantUnderstand: false
@@ -22,8 +21,7 @@
   category: LanguageTraits
   cost: -2
   blacklist:
-    components:
-      - BorgChassis
+    - BorgChassis
   components:
   - type: ForeignerTrait
     baseTranslator: TranslatorForeigner
@@ -36,8 +34,7 @@
   category: LanguageTraits
   cost: 1
   blacklist:
-    components:
-      - BorgChassis
+    - BorgChassis
   components:
   - type: LanguageSpeaker
   languagesSpoken:
@@ -52,8 +49,7 @@
   category: LanguageTraits
   cost: 1
   blacklist:
-    components:
-      - BorgChassis
+    - BorgChassis
   components:
   - type: LanguageSpeaker
   languagesSpoken:
@@ -68,8 +64,7 @@
   category: LanguageTraits
   cost: 1
   blacklist:
-    components:
-      - BorgChassis
+    - BorgChassis
   components:
   - type: LanguageSpeaker
   languagesSpoken:
@@ -84,8 +79,7 @@
   category: LanguageTraits
   cost: 1
   blacklist:
-    components:
-      - BorgChassis
+    - BorgChassis
   components:
   - type: LanguageSpeaker
   languagesSpoken:
@@ -100,8 +94,7 @@
   category: LanguageTraits
   cost: 1
   blacklist:
-    components:
-      - BorgChassis
+    - BorgChassis
   components:
   - type: LanguageSpeaker
   languagesSpoken:

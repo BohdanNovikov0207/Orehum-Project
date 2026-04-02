@@ -35,15 +35,6 @@
   - type: DogVision
 
 - type: trait
-  id: UltraVision
-  name: trait-ultravision-name
-  description: trait-ultravision-desc
-  category: Visual
-  cost: 0
-  components:
-  - type: UltraVision
-
-- type: trait
   id: Monochromacy
   name: trait-monochromacy-name
   description: trait-monochromacy-desc

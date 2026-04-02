@@ -7,8 +7,7 @@
   category: LanguageTraits
   cost: 2
   blacklist:
-    components:
-      - BorgChassis
+    - BorgChassis
   components:
   - type: LanguageSpeaker
   languagesSpoken:
@@ -23,8 +22,7 @@
   category: LanguageTraits
   cost: 2
   blacklist:
-    components:
-      - BorgChassis
+    - BorgChassis
   components:
   - type: LanguageSpeaker
   languagesSpoken:
@@ -39,8 +37,7 @@
   category: LanguageTraits
   cost: 2
   blacklist:
-    components:
-      - BorgChassis
+    - BorgChassis
   components:
   - type: LanguageSpeaker
   languagesSpoken:
@@ -55,8 +52,7 @@
   category: LanguageTraits
   cost: 2
   blacklist:
-    components:
-      - BorgChassis
+    - BorgChassis
   components:
   - type: LanguageSpeaker
   languagesSpoken:
@@ -71,8 +67,7 @@
   category: LanguageTraits
   cost: 2
   blacklist:
-    components:
-      - BorgChassis
+    - BorgChassis
   components:
   - type: LanguageSpeaker
   languagesSpoken:
@@ -87,8 +82,7 @@
   category: LanguageTraits
   cost: 2
   blacklist:
-    components:
-      - BorgChassis
+    - BorgChassis
   components:
   - type: LanguageSpeaker
   languagesSpoken:
