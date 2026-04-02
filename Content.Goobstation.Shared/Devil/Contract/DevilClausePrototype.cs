@@ -14,6 +14,10 @@ public sealed partial class DevilClausePrototype : IPrototype
     [DataField(required: true)]
     public int ClauseWeight;
 
+    // CorvaxGoob Devil fix; Without localized name clauses don't work
+    [DataField(required: true)]
+    public string? Name;
+
     [DataField]
     public ComponentRegistry? AddedComponents;
 
