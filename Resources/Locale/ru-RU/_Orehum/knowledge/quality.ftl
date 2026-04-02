@@ -1,0 +1,11 @@
+quality-name--5 = катастрофический выбор: {$baseName}
+quality-name--4 = ужасающий {$baseName}
+quality-name--3 = отвратный {$baseName}
+quality-name--2 = криво сделанный {$baseName}
+quality-name--1 = посредственный {$baseName}
+quality-name-0 = {$baseName}
+quality-name-1 = отточенный {$baseName}
+quality-name-2 = превосходный {$baseName}
+quality-name-3 = великолепный {$baseName}
+quality-name-4 = шедевральный {$baseName}
+quality-name-5 = РОБАСТНЫЙ {$baseName}

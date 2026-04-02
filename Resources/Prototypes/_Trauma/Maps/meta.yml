@@ -2,7 +2,7 @@
   id: Meta
   mapName: 'Meta Station'
   mapPath: /Maps/_Trauma/meta.yml
-  minPlayers: 30
+  minPlayers: 15
   maxPlayers: 85
   stations:
     Meta:

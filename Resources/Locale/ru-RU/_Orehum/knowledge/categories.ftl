@@ -1,0 +1,9 @@
+knowledge-category-Martial = Боевые искусства
+knowledge-category-Languages = Языкознание
+knowledge-category-Recipes = Рецептура
+knowledge-category-Crafting = Ремесло
+knowledge-category-Combat = Тактика и бой
+knowledge-category-Medical = Медицина
+knowledge-category-Physical = Атлетика
+knowledge-category-Intellectual = Образованность
+knowledge-category-Scientific = Естественные науки

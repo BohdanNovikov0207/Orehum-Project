@@ -2,7 +2,7 @@
   id: Packed
   mapName: 'Packed'
   mapPath: /Maps/_Trauma/packed.yml
-  minPlayers: 7
+  minPlayers: 1
   maxPlayers: 35
   stations:
     Packed:

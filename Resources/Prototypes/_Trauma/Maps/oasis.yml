@@ -2,7 +2,7 @@
   id: Oasis
   mapName: 'Oasis'
   mapPath: /Maps/_Trauma/oasis.yml
-  minPlayers: 30
+  minPlayers: 13
   stations:
     Oasis:
       stationProto: StandardNanotrasenStation
