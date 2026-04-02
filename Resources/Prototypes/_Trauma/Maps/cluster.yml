@@ -2,8 +2,9 @@
   id: Cluster
   mapName: 'Cluster'
   mapPath: /Maps/_Trauma/cluster.yml
-  minPlayers: 1
+  minPlayers: 0
   maxPlayers: 35
+  fallback: true
   stations:
     Cluster:
       stationProto: StandardNanotrasenStation

@@ -10,17 +10,17 @@
     FoodButterSlice: 1
     FoodEgg: 2
 
-- type: microwaveMealRecipe
-  id: RecipeBingleSoup
-  name: bingle soup recipe
-  result: FoodSoupBingle
-  time: 10
-  group: Soup
-  reagents:
-    Water: 10
-  solids:
-    FoodMeatBingleCooked: 1
-    FoodCarrot: 2
+# - type: microwaveMealRecipe
+#   id: RecipeBingleSoup
+#   name: bingle soup recipe
+#   result: FoodSoupBingle
+#   time: 10
+#   group: Soup
+#   reagents:
+#     Water: 10
+#   solids:
+#     FoodMeatBingleCooked: 1
+#     FoodCarrot: 2
 
 - type: microwaveMealRecipe
   id: RecipeBloodSoup

@@ -2,8 +2,9 @@
   id: Atlas
   mapName: Atlas
   mapPath: /Maps/_Trauma/atlas.yml
-  minPlayers: 1
+  minPlayers: 0
   maxPlayers: 20
+  fallback: true
   stations:
     Atlas:
       stationProto: StandardNanotrasenStation

@@ -18,8 +18,8 @@ namespace Content.Trauma.Client.RoundEndCredits;
 public sealed partial class EndRoundCreditsControl : ScrollContainer
 {
     private static readonly ResPath Logo = new("/Textures/Logo/logo.png");
-    private static readonly ResPath Pixellari = new("/Fonts/_Trauma/Pixellari.ttf");
-    private static readonly ResPath GrandPixel = new("/Fonts/_Trauma/Grand9K_Pixel.ttf");
+    private static readonly ResPath Pixellari = new("/Fonts/NotoSans/NotoSans-Regular.ttf");
+    private static readonly ResPath GrandPixel = new("/Fonts/NotoSans/NotoSans-Bold.ttf");
 
     private const int SmallFontSize = 10;
     private const int NormalFontSize = 16;

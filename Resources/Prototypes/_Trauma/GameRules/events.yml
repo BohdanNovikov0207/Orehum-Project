@@ -2,7 +2,7 @@
   id: BasicCalmEventsTrauma
   table: !type:AllSelector
     children:
-    - id: TidemindDevelop
+    #- id: TidemindDevelop
     - id: MothmaggotSpawn
     - id: DerelictCyborgSyndicateSpawn
     - id: MalignRiftSpawn
@@ -28,7 +28,7 @@
     children:
     - id: BlobSpawn
     - id: DuoAbductorSpawn
-    - id: BingleSpawn
+    #- id: BingleSpawn
     - id: XenomorphsInfestation
     #- id: SlasherSpawn # TODO: when slasher is ready
     - id: ColossusSpawn

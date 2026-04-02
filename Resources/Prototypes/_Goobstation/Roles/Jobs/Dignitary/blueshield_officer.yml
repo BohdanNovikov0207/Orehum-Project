@@ -44,10 +44,10 @@
       time: 90000 # 25 hours
     - !type:AgeRequirement
       requiredAge: 21
-    - !type:SpeciesRequirement # Goob - None Felinid
-      inverted: true
-      species:
-      - Felinid
+    # - !type:SpeciesRequirement # Goob - None Felinid
+    #   inverted: true
+    #   species:
+    #    
   guides:
   - BlueshieldOfficerSOP
   - Command

@@ -4,6 +4,7 @@
   mapPath: /Maps/_Trauma/bagel.yml
   minPlayers: 5
   maxPlayers: 80
+  fallback: true
   stations:
     Bagel:
       stationProto: StandardNanotrasenStation

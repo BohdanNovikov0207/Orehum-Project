@@ -2,8 +2,9 @@
   id: Omega
   mapName: 'Omega'
   mapPath: /Maps/_Trauma/omega.yml
-  minPlayers: 1
+  minPlayers: 0
   maxPlayers: 35
+  fallback: true
   stations:
     Omega:
       stationProto: StandardNanotrasenStation

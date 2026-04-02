@@ -2,8 +2,9 @@
   id: Packed
   mapName: 'Packed'
   mapPath: /Maps/_Trauma/packed.yml
-  minPlayers: 1
+  minPlayers: 0
   maxPlayers: 35
+  fallback: true
   stations:
     Packed:
       stationProto: StandardNanotrasenStation

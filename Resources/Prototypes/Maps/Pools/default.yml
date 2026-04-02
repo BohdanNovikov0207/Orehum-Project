@@ -5,26 +5,26 @@
   - AreaKitchen # for chef CQC
   - AreaMaints # for ambience and maints spawn rules
   maps:
-  #- Atlas
-  #- Amber
+  - Atlas
+  - Amber
   - Bagel
   - Box
-  #- Cluster
+  - Cluster
   - Fland
   - Loop
   - Marathon
   - Meta
   - Oasis
-  #- Omega
+  - Omega
   - Origin
   - Saltern
-  #- Packed
-  #- Barratry
+  - Packed
+  - Barratry
   - Kettle
   #- Submarine
   - Leonid
   - Delta
-  #- Chloris
+  - Chloris
   - Cog
   - Reach
   - Serpentcrest

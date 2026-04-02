@@ -154,7 +154,6 @@
   - type: Buckle
   - type: CombatMode
     canDisarm: true
-  - type: SSDIndicator
   - type: StandingState
   - type: MindContainer
   - type: NpcFactionMember
