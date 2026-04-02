@@ -1,7 +1,7 @@
 - type: entity
   parent: BaseIntellectualKnowledge
   id: MagicalLiteracyKnowledge
-  name: Magical Literacy
+  name: Оккультная грамотность
   components:
   - type: Knowledge
     experienceCost: 30
@@ -10,7 +10,7 @@
 - type: entity
   parent: BaseIntellectualKnowledge
   id: LiteracyKnowledge
-  name: Literacy
+  name: Грамотность
   components:
   - type: Knowledge
     experienceCost: 20

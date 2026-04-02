@@ -1,7 +1,7 @@
 - type: entity
   parent: BaseMedicalKnowledge
   id: SurgeryKnowledge
-  name: Surgery
+  name: Хирургия
   components:
   - type: Knowledge
     experienceCost: 24
@@ -9,7 +9,7 @@
 - type: entity
   parent: BaseMedicalKnowledge
   id: FirstAidKnowledge
-  name: First Aid
+  name: Первая помощь
   components:
   - type: Knowledge
     experienceCost: 19
@@ -26,7 +26,7 @@
 - type: entity
   parent: BaseMedicalKnowledge
   id: ChemistryKnowledge
-  name: Chemistry
+  name: Химия
   components:
   - type: Knowledge
     experienceCost: 15

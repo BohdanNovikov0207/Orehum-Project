@@ -2,7 +2,7 @@
 - type: entity
   parent: BaseRecipesKnowledge
   id: CookingKnowledge
-  name: Cooking
+  name: Готовка
   components:
   - type: Knowledge
     experienceCost: 15
@@ -12,67 +12,67 @@
 - type: entity
   parent: BaseRecipesKnowledge
   id: MaterialsKnowledge
-  name: Materials
+  name: Материалы
 
 - type: entity
   parent: BaseRecipesKnowledge
   id: DoorsKnowledge
-  name: Doors
+  name: Двери
 
 - type: entity
   parent: BaseRecipesKnowledge
   id: AirlocksKnowledge
-  name: Airlocks
+  name: Воздушные шлюзы
 
 - type: entity
   parent: BaseRecipesKnowledge
   id: ToysKnowledge
-  name: Toys
+  name: Игрушки
 
 - type: entity
   parent: BaseRecipesKnowledge
   id: BananiumKnowledge
-  name: Bananium
+  name: Бананиум
 
 - type: entity
   parent: BaseRecipesKnowledge
   id: BotsKnowledge
-  name: Bots
+  name: Боты
 
 - type: entity
   parent: BaseRecipesKnowledge
   id: FurnitureKnowledge
-  name: Furniture
+  name: Мебель
 
 - type: entity
   parent: BaseRecipesKnowledge
   id: InfrastructureKnowledge
-  name: Infrastructure
+  name: Инфраструктура
 
 - type: entity
   parent: BaseRecipesKnowledge
   id: ElectronicsKnowledge
-  name: Electronics
+  name: Электроника
 
 - type: entity
   parent: BaseRecipesKnowledge
   id: WallsKnowledge
-  name: Walls
+  name: Стены
 
 - type: entity
   parent: BaseRecipesKnowledge
   id: ScienceKnowledge
-  name: Science
+  name: Наука
 
 - type: entity
   parent: BaseRecipesKnowledge
   id: WindowsKnowledge
-  name: Windows
+  name: Окна
 
 - type: entity
   parent: BaseRecipesKnowledge
   id: SpiderCraftKnowledge
-  name: Spider Webs
+  name: Паучье ремесло
   components:
   - type: Knowledge
     costs: null # Spider only
@@ -80,12 +80,12 @@
 - type: entity
   parent: BaseRecipesKnowledge
   id: SmokeablesKnowledge
-  name: Smokeables
+  name: Курительные изделия
 
 - type: entity
   parent: BaseRecipesKnowledge
   id: RevolutionaryKnowledge
-  name: Revolutionary
+  name: Революционер
   components:
   - type: Knowledge
     costs: null # lol

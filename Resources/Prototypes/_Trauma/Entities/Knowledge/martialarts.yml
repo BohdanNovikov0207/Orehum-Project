@@ -44,7 +44,7 @@
 - type: entity
   parent: BaseMartialArtsKnowledge
   id: MartialArtCorporateJudo
-  name: Corporate Judo
+  name: Корпоративное Дзюдо
   components:
   - type: CanPerformCombo
     roundstartCombos:
@@ -57,7 +57,7 @@
 - type: entity
   parent: BaseMartialArtsKnowledge
   id: MartialArtKravMaga
-  name: Krav Maga
+  name: Крав-мага
   components:
   - type: CanPerformCombo
   - type: ComboActions
@@ -69,7 +69,7 @@
 - type: entity
   parent: BaseMartialArtsKnowledge
   id: MartialArtCapoeira
-  name: Capoeira
+  name: Капоэйра
   components:
   - type: CanPerformCombo
     roundstartCombos:
@@ -96,7 +96,7 @@
 - type: entity
   parent: BaseMartialArtsKnowledge
   id: MartialArtHellRip
-  name: Hell Rip
+  name: Разрыв преисподней
   components:
   - type: CanPerformCombo
     roundstartCombos:
@@ -108,7 +108,7 @@
 - type: entity
   parent: BaseMartialArtsKnowledge
   id: MartialArtNinjutsu
-  name: Ninjutsu
+  name: Ниндзюцу
   components:
   - type: CanPerformCombo
     roundstartCombos:
@@ -121,7 +121,7 @@
 - type: entity
   parent: BaseMartialArtsKnowledge
   id: MartialArtDragon
-  name: Dragon Kung Fu
+  name: Кунг-фу Дракона
   components:
   - type: CanPerformCombo
     roundstartCombos:
@@ -132,7 +132,7 @@
 - type: entity
   parent: BaseMartialArtsKnowledge
   id: MartialArtSleepingCarp
-  name: Sleeping Carp
+  name: Спящий Карп
   components:
   - type: Sprite
     sprite: _Goobstation/Wizard/Objects/scroll.rsi
@@ -148,7 +148,7 @@
 - type: entity
   parent: BaseMartialArtsKnowledge
   id: MartialArtPlasmaFist
-  name: Plasma Fist
+  name: Плазменный кулак
   components:
   - type: CanPerformCombo
     roundstartCombos:
@@ -159,7 +159,7 @@
 - type: entity
   parent: BaseMartialArtsKnowledge
   id: MartialArtSpaceBear
-  name: Space Bear
+  name: Стиль Космического Медведя
   components:
   - type: CanPerformCombo
     roundstartCombos:
@@ -170,7 +170,7 @@
 - type: entity
   parent: BaseMartialArtsKnowledge
   id: MartialArtBoxing
-  name: Boxing
+  name: Бокс
   components:
   - type: CanPerformCombo
     roundstartCombos:
@@ -179,7 +179,7 @@
 - type: entity
   parent: BaseMartialArtsKnowledge
   id: MartialArtDrunkfu
-  name: Drunk-Fu
+  name: Пьяный мастер
   components:
   - type: CanPerformCombo
     roundstartCombos:
@@ -188,7 +188,7 @@
 - type: entity
   parent: BaseMartialArtsKnowledge
   id: MartialArtMimejutsu
-  name: Mimejutsu
+  name: Мим-дзюцу
   components:
   - type: CanPerformCombo
     roundstartCombos:
@@ -199,7 +199,7 @@
 - type: entity
   parent: BaseMartialArtsKnowledge
   id: MartialArtAdminfu
-  name: Admin-Fu
+  name: Админ-фу
   components:
   - type: CanPerformCombo
     roundstartCombos:

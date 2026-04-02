@@ -11,7 +11,7 @@
 - type: entity
   parent: CrateGenericSteel
   id: CrateRandomSkillbooks
-  name: skillbooks crate
+  name: ящик с учебниками
   description: Contains skillbooks.
   components:
   - type: EntityTableContainerFill
@@ -69,7 +69,7 @@
 - type: entity
   parent: BookSkillbook
   id: BookSchematic
-  name: blueprint
+  name: чертеж
   abstract: true
   components:
   - type: Sprite
@@ -78,7 +78,7 @@
 - type: entity
   parent: BookSkillbook
   id: BookStrength
-  name: HOW TO GET JACKED MONTHY OH HELL YEAH
+  name: КАК СТАТЬ КАЧКОМ ЗА МЕСЯЦ О ДА-А-А!
   suffix: strength
   description: You feel yourself throwing your back out just looking at this.
   components:
@@ -101,7 +101,7 @@
 - type: entity
   parent: [BookSkillbook, BaseMinorContraband]
   id: BookMelee
-  name: George Gimmes Guide to Killing
+  name: Руководство Джорджа Гиммса по убийствам
   suffix: melee
   description: It contains crude drawings of an elderly man hurting people with his bare fists and carving various shitty weapons.
   components:
@@ -120,7 +120,7 @@
 - type: entity
   parent: [BookSkillbook, BaseMinorContraband]
   id: BookMeleePrinted
-  name: Close Combat in the Modern Age
+  name: Ближний бой в современную эпоху
   suffix: melee
   description: A detailed book about how to properly throw punches, kicks, and make some proper improvised weaponry.
   components:
@@ -160,7 +160,7 @@
 - type: entity
   parent: [BookSkillbook, BaseMinorContraband]
   id: BookShooting
-  name: Cadet Training Guide
+  name: Справочник по подготовке кадетов
   suffix: shooting
   description: Its useless.
   components:
@@ -179,7 +179,7 @@
 - type: entity
   parent: [BookSkillbook, BaseMinorContraband]
   id: BookShootingPrinted
-  name: Ancienct Chinese Shooting Techniques and you
+  name: Древнекитайские техники стрельбы и вы
   suffix: melee
   description: You need to become ancient and Chinese.
   components:
@@ -219,7 +219,7 @@
 - type: entity
   parent: BookSkillbook
   id: BookSurgery
-  name: Encyclopedia Medica - 1st edition
+  name: Медицинская энциклопедия — 1-е издание
   suffix: surgery
   description: It's from the early 2000s, it is full of barbaric practices, and does not even mention cloning.
   components:
@@ -238,7 +238,7 @@
 - type: entity
   parent: BookSkillbook
   id: BookSurgeryPrinted
-  name: Encyclopedia Medica - 37th Edition
+  name: Медицинская энциклопедия — 1-е издание
   suffix: surgery
   description: A textbook detailing the fundamentals of modern medicine.
   components:
@@ -259,7 +259,7 @@
 - type: entity
   parent: [BookSkillbook, BaseMagicalContraband]
   id: BookMagicalLiteracy
-  name: Grim Tales from Old Earth
+  name: Мрачные сказки Старой Земли
   suffix: magical literacy
   description: Recently banned, it contains a collection of old earth stories origionating from various places.
   components:
@@ -276,7 +276,7 @@
 - type: entity
   parent: [BookSkillbook, BaseMagicalContraband]
   id: BookMagicalLiteracyPrinted
-  name: logs from space station 13
+  name: Логи с Космической Станции 13
   suffix: magical literacy
   description: The transcript of a blackbox recovered by a station supposedly completely destroyed by creatures unheard of.
   components:
@@ -293,7 +293,7 @@
 - type: entity
   parent: BookSkillbook
   id: BookLiteracy
-  name: Two Spacemen, One pair of Insuls
+  name: Два космонавта, одна пара изолятов
   suffix: literacy
   description: Its a picture book that ends with a gruesome and violent death! Who made this?!
   components:
@@ -310,7 +310,7 @@
 - type: entity
   parent: BookSkillbook
   id: BookJanitor
-  name: WHY I LOVE SOAP AND WHY YOU SHOULD TOO
+  name: ПОЧЕМУ Я ЛЮБЛЮ МЫЛО
   suffix: janitor
   description: Voxes supposedly love this one, its mostly useless rambling.
   components:
@@ -329,7 +329,7 @@
 - type: entity
   parent: BookSkillbook
   id: BookLanguageTauCeti
-  name: Tau Ceti Phrases for Beginners
+  name: Фразы Тау Сети для начинающих
   suffix: Tau Ceti
   description: Its a book on the basics of the Tau Ceti language.
   components:
@@ -348,7 +348,7 @@
 - type: entity
   parent: BookSkillbook
   id: BookFabrication
-  name: Home Crafters Monthly
+  name: Ежемесячник «Домашний мастер»
   suffix: fabrication
   description: Mostly advertisements, but there are some nice tips in here.
   components:
@@ -365,7 +365,7 @@
 - type: entity
   parent: BookSkillbook
   id: BookFabricationPrinted
-  name: Principles of Engineering in Space - 17th Edition
+  name: Принципы космической инженерии — 17-е издание
   suffix: fabrication
   description: Used to guarantee you a bright future. Now it guarantees you wage slavery.
   components:
@@ -384,7 +384,7 @@
 - type: entity
   parent: BookSkillbook
   id: BookSurvival
-  name: BSA handbook
+  name: Справочник BSA по выживанию
   suffix: survival
   description: Has a plethora of knowledge on plants you will never see and animals that died out long ago. At least it teaches you how to carve.
   components:
@@ -401,7 +401,7 @@
 - type: entity
   parent: BookSkillbook
   id: BookSurvivalPrinted
-  name: Wood and Bone Carving Techniques
+  name: Техники резьбы по дереву и кости
   suffix: survival
   description: Niche books for niche hobbies.
   components:

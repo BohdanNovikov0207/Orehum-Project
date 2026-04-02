@@ -1,7 +1,7 @@
 - type: entity
   parent: BasePhysicalKnowledge
   id: ToughnessKnowledge
-  name: Toughness
+  name: Стойкость
   components:
   - type: Knowledge
     experienceCost: 20
@@ -18,7 +18,7 @@
 - type: entity
   parent: BasePhysicalKnowledge
   id: StrengthKnowledge
-  name: Strength
+  name: Сила
   components:
   - type: Knowledge
     experienceCost: 12
@@ -32,7 +32,7 @@
 - type: entity
   parent: BasePhysicalKnowledge
   id: AthleticsKnowledge
-  name: Athletics
+  name: Атлетика
   components:
   - type: Knowledge
     experienceCost: 12
@@ -48,7 +48,7 @@
 - type: entity
   parent: BasePhysicalKnowledge
   id: ThrowingKnowledge
-  name: Throwing
+  name: Метание
   components:
   - type: Knowledge
     experienceCost: 5

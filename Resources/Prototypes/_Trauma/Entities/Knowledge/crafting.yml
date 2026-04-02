@@ -8,7 +8,7 @@
 - type: entity
   parent: BaseCraftingKnowledge
   id: FabricationKnowledge
-  name: Fabrication
+  name: Производство
   components:
   - type: Knowledge
     experienceCost: 15
@@ -16,39 +16,39 @@
 - type: entity
   parent: BaseCraftingKnowledge
   id: WeaponsKnowledge
-  name: Weaponsmith
+  name: Оружейное дело
 
 - type: entity
   parent: BaseCraftingKnowledge
   id: ArmorKnowledge
-  name: Armorsmith
+  name: Изготовление брони
 
 - type: entity
   parent: BaseCraftingKnowledge
   id: MetalworkingKnowledge
-  name: Metalworking
+  name: Металлообработка
 
 - type: entity
   parent: BaseCraftingKnowledge
   id: CarvingKnowledge
-  name: Carving
+  name: Резьба
 
 - type: entity
   parent: BaseCraftingKnowledge
   id: GunsmithingKnowledge
-  name: Gunsmithing
+  name: Сборка огнестрела
 
 - type: entity
   parent: BaseCraftingKnowledge
   id: MechanicsKnowledge
-  name: Mechanics
+  name: Механика
 
 - type: entity
   parent: BaseCraftingKnowledge
   id: TailoringKnowledge
-  name: Tailoring
+  name: Портняжное дело
 
 # - type: entity - Also effects quality, but has a few recipes.
 #   parent: BaseCraftingKnowledge
 #   id: ElectronicsKnowledge
-#   name: Electronics
+#   name: Электроника
