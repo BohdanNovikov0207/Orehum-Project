@@ -31,13 +31,13 @@ public sealed partial class CCVars
     ///     Should users be able to see their own notes? Admins will be able to see and set notes regardless
     /// </summary>
     public static readonly CVarDef<bool> SeeOwnNotes =
-        CVarDef.Create("admin.see_own_notes", false, CVar.ARCHIVE | CVar.REPLICATED | CVar.SERVER);
+        CVarDef.Create("admin.see_own_notes", true, CVar.ARCHIVE | CVar.REPLICATED | CVar.SERVER);
 
     /// <summary>
     ///     Should the server play a quick sound to the active admins whenever a new player joins?
     /// </summary>
     public static readonly CVarDef<bool> AdminNewPlayerJoinSound =
-        CVarDef.Create("admin.new_player_join_sound", false, CVar.SERVERONLY);
+        CVarDef.Create("admin.new_player_join_sound", true, CVar.SERVERONLY);
 
     /// <summary>
     ///     The amount of days before the note starts fading. It will slowly lose opacity until it reaches stale. Set to 0 to disable.
@@ -211,5 +211,5 @@ public sealed partial class CCVars
     /// Whether admins should gain role playtime even when playing while not de-adminned.
     /// </summary>
     public static readonly CVarDef<bool> GameAdminJobTracking =
-        CVarDef.Create("game.admin_job_tracking", false, CVar.SERVERONLY);
+        CVarDef.Create("game.admin_job_tracking", true, CVar.SERVERONLY);
 }

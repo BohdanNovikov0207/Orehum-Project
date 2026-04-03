@@ -1,0 +1,5 @@
+- type: guideEntry
+  id: DefaultRuleset
+  name: guide-entry-rules
+  priority: 60
+  text: "/ServerInfo/_Orehum/Guidebook/ServerRules/Rules.xml"

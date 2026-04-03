@@ -1,9 +1,9 @@
 <Document>
-# Tackle
+# Захват
 
-Tackle is a combat move that allows the user to dive some distance forward, knocking down the first victim on their path.
+Захват — это боевой приём, позволяющий игроку прыгнуть вперёд на некоторое расстояние и сбить с ног первую цель на своём пути.
 
-To perform a tackle you must have a special kind of gloves with tackle ability.
+Чтобы выполнить захват, вам нужны специальные перчатки с возможностью захвата.
 
 <Box>
   <GuideEntityEmbed Entity="ClothingHandsGlovesSecurity"/>
@@ -17,16 +17,16 @@ To perform a tackle you must have a special kind of gloves with tackle ability.
   <GuideEntityEmbed Entity="ClothingHandsGlovesGripper"/>
 </Box>
 
-Tackle can be performed once every 3 seconds with [color=yellow]Alt-Q[/color] key by default.
+Захват можно выполнять раз в 3 секунды, по умолчанию клавишей [color=yellow]Alt-Q[/color].
 
-Be aware that you will knock yourself down and drop all held items when performing a tackle. Also avoid any obstacles such as walls, as they may cause an unhappy landing.
+Учтите, что при выполнении захвата вы сами падаете и роняете все предметы из рук. Также избегайте препятствий, таких как стены, так как они могут привести к неудачному приземлению.
 
-Tackle outcome is determined by multiple factors (modifiers), such as: user/victim health, stamina damage, weight, user speed, victim stamina protection and the gloves modifier itself.
+Результат захвата определяется множеством факторов (модификаторов), таких как: здоровье пользователя/жертвы, урон выносливости, вес, скорость пользователя, защита выносливости цели и модификатор самих перчаток.
 
-Tackle will guaranteed knock down your target and deal some stamina damage to them, and good tackle with high modifier will disarm them as well and make the user stand up. Some gloves, such as [color=red]guerrilla gloves[/color] can automatically hard grab the target as the result of your target as well!
+Захват гарантированно сбивает цель с ног и наносит ей урон по выносливости, а при удачном захвате с высоким модификатором также может выбить предметы из её рук и оставить пользователя на ногах. Некоторые перчатки, такие как [color=red]перчатки партизана[/color], могут также автоматически выполнить жёсткий захват цели!
 
-Different kind of gloves have different tackle modifier to them, as well as different speed, range and knockdown time. Some gloves, such as [color=orange]rocket gloves[/color], [color=blue]dolphin gloves[/color] and [color=brown]improvised gripper gloves[/color] have "unsafe" minimum tackle distance - if you fly range is any lower than that and you hit something, your head will hurt, especially if you hit a wall.
+Разные типы перчаток имеют разные модификаторы захвата, а также отличаются по скорости, дальности и времени оглушения. Некоторые перчатки, такие как [color=orange]ракетные перчатки[/color], [color=blue]дельфиньи перчатки[/color] и [color=brown]самодельные хватательные перчатки[/color], имеют «небезопасную» минимальную дистанцию захвата — если вы пролетите меньше этого расстояния и врежетесь во что-то, ваша голова пострадает, особенно если это стена.
 
-Tackle costs some amount of stamina to perform, this value varies depending on the gloves.
+Захват требует определённого количества выносливости, и это значение зависит от типа перчаток.
 
 </Document>
