@@ -1,12 +1,13 @@
-roles-antag-insurgent-name = Insurgent
-roles-antag-insurgent-objective = Work your way onto the station, cause trouble and try to take over!
+roles-antag-insurgent-name = Мятежник
+roles-antag-insurgent-objective = Проберитесь на станцию, сейте хаос и попытайтесь захватить власть!
 
-insurgent-round-end-agent-name = insurgent
+insurgent-round-end-agent-name = Мятежник
 
-objective-issuer-insurgents = Insurgents
+objective-issuer-insurgents = Мятежники
 
-insurgency-title = Insurgency
-insurgency-description = Insurgents are among us...
+insurgency-title = Мятежник
+insurgency-description = Среди нас затаились мятежники...
 
-roles-antag-shadow-demon-name = Shadow Demon
-roles-antag-shadow-demon-objective = The darkness needs a King, and you got summoned to wear that crown.
+roles-antag-shadow-demon-name = Теневой демон
+roles-antag-shadow-demon-objective = Тьме нужен Король, и вы были призваны, чтобы надеть эту корону.
+

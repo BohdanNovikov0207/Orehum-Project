@@ -46,8 +46,9 @@ roles-antag-thief-objective = Add some NT property to your personal collection w
 roles-antag-dragon-name = Space Dragon
 roles-antag-dragon-objective = Create a carp army to take over this quadrant.
 
-roles-antag-mothership-core-name = Xenoborg Core
-roles-antag-mothership-core-objective = Use your xenoborgs to create even more xenoborgs.
+roles-antag-mothership-core-name = Ядро Ксеноборгов
+roles-antag-mothership-core-objective = Используйте своих ксеноборгов, чтобы создать ещё больше собратьев.
 
-roles-antag-xenoborg-name = Xenoborg
-roles-antag-xenoborg-objective = Help the mothership create more xenoborgs.
+roles-antag-xenoborg-name = Ксеноборг
+roles-antag-xenoborg-objective = Помогайте материнскому кораблю расширять армию ксеноборгов.
+

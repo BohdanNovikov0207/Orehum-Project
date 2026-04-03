@@ -1,2 +1,2 @@
-roles-antag-wraith-name = Wraith
-roles-antag-wraith-objective = Make the station your playground.
+roles-antag-wraith-name = Фантом
+roles-antag-wraith-objective = Сделайте эту станцию своей игровой площадкой.
