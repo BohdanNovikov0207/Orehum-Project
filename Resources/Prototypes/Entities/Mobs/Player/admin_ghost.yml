@@ -4,6 +4,11 @@
   name: admin observer
   categories: [ HideSpawnMenu ]
   components:
+  - type: Sprite
+    sprite: _Orehum/Mobs/Ghosts/admin_ghost.rsi
+    layers:
+    - state: animated
+      shader: unshaded
   # <Trauma>
   - type: SupermatterImmune
   - type: Speech
