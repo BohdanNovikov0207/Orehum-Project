@@ -31,8 +31,8 @@
           0.2,
           0.2,
           0.2
+        ]
       ]
-    ]
     },
     {
       "name": "closing_unlit",
@@ -46,8 +46,8 @@
           0.2,
           0.2,
           0.2
+        ]
       ]
-    ]
     },
     {
       "name": "deny_unlit",
@@ -61,8 +61,8 @@
           0.2,
           0.2,
           0.2
+        ]
       ]
-    ]
     },
     {
       "name": "open"
@@ -79,8 +79,8 @@
           0.2,
           0.2,
           0.2
+        ]
       ]
-    ]
     },
     {
       "name": "opening_unlit",
@@ -94,8 +94,8 @@
           0.2,
           0.2,
           0.2
+        ]
       ]
-    ]
     },
     {
       "name": "panel_closing",
@@ -109,8 +109,8 @@
           0.2,
           0.2,
           0.2
+        ]
       ]
-    ]
     },
     {
       "name": "panel_open"
@@ -127,8 +127,8 @@
           0.2,
           0.2,
           0.2
+        ]
       ]
-    ]
     },
     {
       "name": "welded"
@@ -141,6 +141,22 @@
           0.4
         ]
       ]
+    },
+    {
+      "name": "emergency_open_unlit",
+      "directions": 1
+    },
+    {
+      "name": "open_unlit",
+      "directions": 1
+    },
+    {
+      "name": "bolted_open_unlit",
+      "directions": 1
+    },
+    {
+      "name": "panel_closed",
+      "directions": 1
     }
   ]
 }

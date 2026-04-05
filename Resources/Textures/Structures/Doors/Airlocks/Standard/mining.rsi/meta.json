@@ -196,6 +196,22 @@
           0.4
         ]
       ]
+    },
+    {
+      "name": "emergency_open_unlit",
+      "directions": 1
+    },
+    {
+      "name": "open_unlit",
+      "directions": 1
+    },
+    {
+      "name": "bolted_open_unlit",
+      "directions": 1
+    },
+    {
+      "name": "panel_closed",
+      "directions": 1
     }
   ]
 }
