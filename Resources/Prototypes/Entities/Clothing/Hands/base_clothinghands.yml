@@ -157,7 +157,7 @@
   components:
   - type: Fiber
     fiberMaterial: fibers-synthetic
-#  - type: FingerprintMask
+  - type: FingerprintMask
 
 - type: entity
   abstract: true
