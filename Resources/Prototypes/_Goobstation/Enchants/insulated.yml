@@ -8,7 +8,7 @@
     whitelist:
       components:
       - MobState # insulated mice/hamlet
-      - FingerprintMask # magically insulated fingerless insuls
+    #  - FingerprintMask # magically insulated fingerless insuls
     incompatible:
     - EnchantBudgetInsulated
   - type: ComponentsEnchant

@@ -99,7 +99,7 @@
         color: "#234f60"
   - type: Fiber
     fiberMaterial: fibers-nitrile
-  - type: FingerprintMask
+#  - type: FingerprintMask
 
 - type: entity
   parent: ClothingHandsGlovesEnviroglovesBase
@@ -147,7 +147,7 @@
     sprite: Clothing/Hands/Gloves/forensic.rsi
   - type: Clothing
     sprite: Clothing/Hands/Gloves/forensic.rsi
-  - type: FingerprintMask
+#  - type: FingerprintMask
   - type: GuideHelp
     guides:
     - Forensics
@@ -453,7 +453,7 @@
   name: captain's envirogloves
   description: Covers up those scandalous, bony hands in a fancy way.
   components:
-  - type: FingerprintMask
+#  - type: FingerprintMask
   - type: Insulated
   - type: Fiber
     fiberMaterial: fibers-durathread

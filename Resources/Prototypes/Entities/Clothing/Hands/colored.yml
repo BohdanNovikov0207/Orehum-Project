@@ -421,7 +421,7 @@
   id: ClothingHandsGlovesColorYellowBase
   abstract: true
   components:
-  - type: FingerprintMask
+#  - type: FingerprintMask
   - type: Sprite
     sprite: Clothing/Hands/Gloves/Color/yellow.rsi
   - type: Clothing

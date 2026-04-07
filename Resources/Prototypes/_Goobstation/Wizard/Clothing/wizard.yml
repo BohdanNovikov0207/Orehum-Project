@@ -464,7 +464,7 @@
   - type: Clothing
     sprite: _Goobstation/Wizard/Clothing/Hands/wizgloves.rsi
   - type: Insulated
-  - type: FingerprintMask
+#  - type: FingerprintMask
   - type: StaticPrice
     price: 1000
 

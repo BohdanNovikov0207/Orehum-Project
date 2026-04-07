@@ -16,7 +16,7 @@
   - type: Fiber
     fiberColor: fibers-blue
     fiberMaterial: fibers-latex
-  - type: FingerprintMask
+#  - type: FingerprintMask
   - type: ClothingGrantComponent
     component:
     - type: SurgeryIgnoreClothing

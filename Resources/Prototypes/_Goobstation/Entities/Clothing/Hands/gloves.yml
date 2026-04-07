@@ -115,7 +115,7 @@
   - type: Clothing
     sprite: _Goobstation/Clothing/Hands/Gloves/chronolegioneer.rsi
   - type: Insulated
-  - type: FingerprintMask
+#  - type: FingerprintMask
 
 - type: entity
   parent: ClothingHandsGlovesChronoLegioneer
