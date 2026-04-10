@@ -1,2 +1,3 @@
 department-Orehum = Департамент Orehum
 department-Orehum-description = ...
+changelog-tab-title-Orehum = Orehum Project
