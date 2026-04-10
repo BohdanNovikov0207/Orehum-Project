@@ -120,7 +120,7 @@
 
 - type: ghostTheme
   id: EnvoilyGhost
-  name: sponsor-win-manager-ghost-Envoily
+  name: Envoily
   components:
   - type: Sprite
     noRot: true
