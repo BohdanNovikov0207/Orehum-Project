@@ -66,7 +66,7 @@
   alias:
     - survival
   name: survival-title
-  showInVote: true
+  showInVote: false
   description: survival-description
   rules:
     - MeteorSwarmScheduler
@@ -164,7 +164,7 @@
   - greenshift
   - shittersafarideluxeedition
   name: greenshift-title
-  showInVote: false
+  showInVote: false #4boring4vote
   description: greenshift-description
   rules:
   - SpaceTrafficControlFriendlyEventScheduler
@@ -176,7 +176,7 @@
     - secret
     - sekrit
   name: secret-title
-  showInVote: true
+  showInVote: false # Goob - Game Director
   description: secret-description
   rules:
     - Secret
@@ -228,7 +228,6 @@
   rules:
   - DummyNonAntagChance
   - Traitor
-  - CalmTraitor
   - SubGamemodesRule
   - BasicStationEventScheduler
   - MeteorSwarmScheduler
@@ -254,7 +253,7 @@
     - nukeops
   name: nukeops-title
   description: nukeops-description
-  showInVote: false
+  showInVote: true
   rules:
   - Nukeops
   - DummyNonAntagChance

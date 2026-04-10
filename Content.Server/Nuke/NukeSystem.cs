@@ -643,9 +643,9 @@ public sealed class NukeSystem : EntitySystem
         {
             if (TryComp<NukeopsRuleComponent>(rule, out var nukeopsComp))
             {
-                if (nukeopsComp.LocalePrefix == "honkops-") // This is a silly way of doing it, but why make another bool when you can just hardcode this?
+                if (nukeopsComp.LocalePrefix == "loneop-")
                 {
-                    _selectedNukeSong = _audio.GetSound(component.HonkopsArmMusic);
+                    _selectedNukeSong = _audio.GetSound(component.LoneopArmMusic);
                     break;
                 }
             }

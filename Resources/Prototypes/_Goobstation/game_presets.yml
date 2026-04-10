@@ -145,9 +145,8 @@
   name: sleeper-title
   description: sleeper-description
   showInVote: true
-  minPlayers: 0
   rules:
-    - CalmDynamic
+    # - CalmDynamic
     - SubGamemodesRule
     - RareIonStormScheduler
     - SpaceTrafficControlFriendlyEventScheduler
@@ -185,9 +184,9 @@
     - secretplusmid
     - secretplus
     - entropy
-  name: secretplus-mid-title
-  description: secretplus-mid-description
-  showInVote: false
+  name: secret-title #secretplus-mid-title
+  description: secret-description #secretplus-mid-description
+  showInVote: true
   rules:
     - SecretPlusMid
 
@@ -210,9 +209,9 @@
     - survivalplus
     - newsurvival
     - survivalnew
-  name: survivalplus-title
-  description: survivalplus-description
-  showInVote: false
+  name: survival-title #survivalplus-title
+  description: survival-description #survivalplus-description
+  showInVote: true
   rules:
     - SecretPlusRampingMid
 
