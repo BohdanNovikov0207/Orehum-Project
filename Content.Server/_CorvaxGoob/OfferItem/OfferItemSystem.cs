@@ -1,4 +1,8 @@
-﻿using Content.Shared._CorvaxGoob.OfferItem;
+// SPDX-FileCopyrightText: 2026 Space Station 14 Contributors
+//
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+using Content.Shared._CorvaxGoob.OfferItem;
 using Content.Shared.Alert;
 using Content.Shared.Hands.Components;
 using Content.Shared.Hands.EntitySystems;
