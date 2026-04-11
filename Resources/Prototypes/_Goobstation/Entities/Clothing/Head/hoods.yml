@@ -56,10 +56,10 @@
   description: A torn, dust-caked hood. Smudgy eyes line the inside.
   components:
   - type: Sprite
-    sprite: _Goobstation/Heretic/Clothing/Head/toy_hood.rsi
+    sprite: _CorvaxGoob/Clothing/Head/HereticHoods/rust_hood.rsi # CorvaxGoob
     state: icon
   - type: Clothing
-    sprite: _Goobstation/Heretic/Clothing/Head/toy_hood.rsi
+    sprite: _CorvaxGoob/Clothing/Head/HereticHoods/rust_hood.rsi # CorvaxGoob
 
 - type: entity
   parent: ClothingHeadBase
@@ -69,30 +69,47 @@
   description: Comfortable hood of monastic vestment.
   components:
   - type: Sprite
-    sprite: _Goobstation/Clothing/Head/Hoods/schema_monk.rsi
+    sprite: _CorvaxGoob/Clothing/Head/HereticHoods/void_hood.rsi # CorvaxGoob
+    state: icon
   - type: Clothing
-    sprite: _Goobstation/Clothing/Head/Hoods/schema_monk.rsi
-  - type: Tag
-    tags:
-    - WhitelistChameleon
-  - type: HideLayerClothing
-    slots:
-    - Hair
-  - type: Armor
-    coverage:
-    - Head
-    modifiers:
-      coefficients:
-        Blunt: 0.5
-        Slash: 0.5
-        Piercing: 0.5
-        Heat: 0.5
-        Caustic: 0.5
-    traumaDeductions:
-      Dismemberment: 0.5
-      OrganDamage: 0.5
-      BoneDamage: 0.5
-      VeinsDamage: 0.0
-      NerveDamage: 0.0
-  - type: FireProtection
-    reduction: 0.1
+    sprite: _CorvaxGoob/Clothing/Head/HereticHoods/void_hood.rsi # CorvaxGoob
+
+- type: entity
+  parent: ClothingHeadHatHoodHereticCostume
+  id: ClothingHeadHatHoodHereticVoidCostume
+  components:
+  - type: Sprite
+    sprite: _CorvaxGoob/Clothing/Head/HereticHoods/void_hood.rsi # CorvaxGoob
+    state: icon
+  - type: Clothing
+    sprite: _CorvaxGoob/Clothing/Head/HereticHoods/void_hood.rsi # CorvaxGoob
+
+- type: entity
+  parent: ClothingHeadHatHoodHereticCostume
+  id: ClothingHeadHatHoodHereticAshCostume
+  components:
+  - type: Sprite
+    sprite: _CorvaxGoob/Clothing/Head/HereticHoods/ashen_hood.rsi # CorvaxGoob
+    state: icon
+  - type: Clothing
+    sprite: _CorvaxGoob/Clothing/Head/HereticHoods/ashen_hood.rsi # CorvaxGoob
+
+- type: entity
+  parent: ClothingHeadHatHoodHereticCostume
+  id: ClothingHeadHatHoodHereticFleshCostume
+  components:
+  - type: Sprite
+    sprite: _CorvaxGoob/Clothing/Head/HereticHoods/flesh_hood.rsi # CorvaxGoob
+    state: icon
+  - type: Clothing
+    sprite: _CorvaxGoob/Clothing/Head/HereticHoods/flesh_hood.rsi # CorvaxGoob
+
+- type: entity
+  parent: ClothingHeadHatHoodHereticCostume
+  id: ClothingHeadHatHoodHereticBladeCostume
+  components:
+  - type: Sprite
+    sprite: _CorvaxGoob/Clothing/Head/HereticHoods/blade_hood.rsi # CorvaxGoob
+    state: icon
+  - type: Clothing
+    sprite: _CorvaxGoob/Clothing/Head/HereticHoods/blade_hood.rsi # CorvaxGoob

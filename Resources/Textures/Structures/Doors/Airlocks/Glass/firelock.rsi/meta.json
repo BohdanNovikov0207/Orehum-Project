@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "license": "CC-BY-NC-SA 3.0",
+  "license": "CC-BY-NC-SA-3.0",
   "copyright": "sprite by TheGypsyBaron",
   "size": {
     "x": 32,
@@ -75,6 +75,9 @@
     },
     {
       "name": "open"
+    },
+    {
+      "name": "open_unlit"
     },
     {
       "name": "opening",

@@ -487,6 +487,15 @@
     - FootstepSound
     - DoorBumpOpener
     - AnomalyHost
+  - type: EmoteOnDamage # CorvaxGoob-AutoEmote
+    emotes:
+      50: ["Scream"] # >50 of alive HP. Scream only
+      80: ["Scream", "Crying"] # Precrit. Crying and scream
+    emoteChance: 0.6
+    withChat: true
+    hiddenFromChatWindow: true
+    emoteCooldown: 8
+
   - type: Targeting # Shitmed Change
   - type: CanEscapeInventory # GoobStation - Escape being picked up by players
   - type: Consciousness
@@ -514,6 +523,7 @@
   abstract: true
   components:
   - type: Absorbable # Goobstation - changelings
+  - type: OfferItem # CorvaxGoob-Offer
   - type: WraithAbsorbable # Goobstation - wraith
   - type: Barotrauma
     damage:
