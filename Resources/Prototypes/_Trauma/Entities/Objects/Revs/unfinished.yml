@@ -172,7 +172,7 @@
     - RevArmorPlate
 
 - type: entity
-  parent: [ BaseItem, BaseRevMajorContraband ]
+  parent: [ BaseItem ]
   id: RevReflectivePlate
   name: зеркальная пластина
   description: Пластина для жилета с защитой от лазеров.

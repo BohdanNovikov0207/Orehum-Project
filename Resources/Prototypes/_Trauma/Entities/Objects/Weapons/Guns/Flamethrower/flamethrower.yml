@@ -1,7 +1,7 @@
 
 - type: entity
   name: огнемёт
-  parent: [BaseItem, BaseRevMajorContraband]
+  parent: [BaseItem]
   id: WeaponFlamethrower
   description: Огнемёт, использующий топливо из ранцевого баллона.
   components:
@@ -42,7 +42,7 @@
 
 - type: entity
   id: FuelTankFlamethrower
-  parent: [BaseItem, BaseRevMajorContraband]
+  parent: [BaseItem]
   name: топливный бак для огнемёта
   description: Сменный бак с горючим для заправки огнемёта.
   components:
