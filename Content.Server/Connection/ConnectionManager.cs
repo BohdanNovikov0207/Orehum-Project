@@ -109,6 +109,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using Content.Server.Administration.Managers;
+using Content.Corvax.Interfaces.Shared;
 using Content.Server.Chat.Managers;
 using Content.Server.Connection.IPIntel;
 using Content.Server.Database;
@@ -170,6 +171,8 @@ namespace Content.Server.Connection
         [Dependency] private readonly IHttpClientHolder _http = default!;
         [Dependency] private readonly IAdminManager _adminManager = default!;
 
+        private ISharedSponsorsManager? _sponsorsMgr; // Corvax-Sponsors
+
         private ISawmill _sawmill = default!;
         private readonly Dictionary<NetUserId, TimeSpan> _temporaryBypasses = [];
         private IPIntel.IPIntel _ipintel = default!;
@@ -184,6 +187,8 @@ namespace Content.Server.Connection
             _sawmill = _logManager.GetSawmill("connections");
 
             _ipintel = new IPIntel.IPIntel(new IPIntelApi(_http, _cfg), _db, _cfg, _logManager, _chatManager, _gameTiming);
+
+            IoCManager.Instance!.TryResolveType(out _sponsorsMgr); // Corvax-Sponsors
 
             _netMgr.Connecting += NetMgrOnConnecting;
             _netMgr.AssignUserIdCallback = AssignUserIdCallback;
@@ -480,7 +485,8 @@ namespace Content.Server.Connection
             var ticker = IoCManager.Resolve<IEntityManager>().System<GameTicker>();
             var wasInGame = ticker.PlayerGameStatuses.TryGetValue(userId, out var status) &&
                             status == PlayerGameStatus.JoinedGame;
-            return isAdmin || wasInGame;
+            var havePriorityJoin = _sponsorsMgr != null && _sponsorsMgr.HaveServerPriorityJoin(userId); // Corvax-Sponsors
+            return isAdmin || wasInGame || havePriorityJoin; // Corvax-Sponsors
         }
     }
 }
