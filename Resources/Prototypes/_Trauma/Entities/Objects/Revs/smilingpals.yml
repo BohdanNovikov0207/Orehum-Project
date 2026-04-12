@@ -10,7 +10,7 @@
 - type: entity
   parent: BaseGrinningPal
   id: SmilingBanana
-  name: grinning banana guy
+  name: улыбающийся банановый парень
   components:
   - type: Sprite
     state: smilingbanana
@@ -18,7 +18,7 @@
 - type: entity
   parent: BaseGrinningPal
   id: SmilingBean
-  name: grinning small guy
+  name: улыбающийся маленький парень
   components:
   - type: Sprite
     state: smilingbean
@@ -26,7 +26,7 @@
 - type: entity
   parent: BaseGrinningPal
   id: SmilingBoss
-  name: grinning old guy
+  name: улыбающийся старый парень
   components:
   - type: Sprite
     state: smilingboss
@@ -34,7 +34,7 @@
 - type: entity
   parent: BaseGrinningPal
   id: SmilingFrog
-  name: grinning green guy
+  name: улыбающийся зеленый парень
   description: His eye burn with a blazing hatred.
   components:
   - type: Sprite
@@ -43,7 +43,7 @@
 - type: entity
   parent: BaseGrinningPal
   id: SmilingRedGuy
-  name: grinning red guy
+  name: улыбающийся красный парень
   components:
   - type: Sprite
     state: smilingredguy
@@ -51,7 +51,7 @@
 - type: entity
   parent: BaseGrinningPal
   id: SmilingTylenol
-  name: grinning tylenol
+  name: улыбающийся тайленол
   components:
   - type: Sprite
     state: smilingtylenol

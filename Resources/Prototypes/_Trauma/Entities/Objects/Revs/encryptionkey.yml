@@ -1,7 +1,7 @@
 - type: entity
   parent: [ EncryptionKey, BaseMajorContraband ]
   id: EncryptionKeyRev
-  name: revolutionary encryption key
+  name: ключ шифрования революционеров
   description: An encryption key used by underground revolutionary groups.
   components:
   - type: EncryptionKey

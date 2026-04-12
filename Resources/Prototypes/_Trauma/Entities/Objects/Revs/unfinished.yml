@@ -1,7 +1,7 @@
 - type: entity
   parent: BaseItem
   id: RevUnfinishedComponent
-  name: steel chunk
+  name: кусок стали
   description: A misshapen lump of steel, clearly being worked into something.
   components:
   - type: Sprite

@@ -61,8 +61,8 @@
 - type: entity
   parent: BaseRevIndustry
   id: RevForge
-  name: industrial forge
-  description: This jury rigged machine can produce all sorts of useful (and dangerous) components.
+  name: промышленная кузня
+  description: Эта кустарная машина способна производить самые разные полезные (и опасные) компоненты.
   components:
   - type: Sprite
     sprite: _Trauma/Structures/Machines/revforge.rsi
@@ -102,8 +102,8 @@
 - type: entity
   parent: BaseRevIndustry
   id: RevPrintingPress
-  name: printing press
-  description: A printing press for mass producing media, or in your case anti-NT propaganda.
+  name: печатный станок
+  description: Печатный станок для массового выпуска медиаматериалов или, в вашем случае, анти-NT пропаганды.
   components:
   - type: Sprite
     sprite: _Trauma/Structures/Machines/revprintingpress.rsi
@@ -122,8 +122,8 @@
 - type: entity
   parent: BaseRevIndustry
   id: RevRadioBench
-  name: telecommunications workshop
-  description: A device for hacking into nearby signals, allows the production of radiochips, turrets, as well as some upgrades for other machines.
+  name: цех телекоммуникаций
+  description: Устройство для взлома ближайших сигналов. Позволяет производить радиочипы, турели, а также некоторые улучшения для других машин.
   components:
   - type: Sprite
     sprite: _Trauma/Structures/Machines/telecommsbench.rsi
@@ -144,8 +144,8 @@
 - type: entity
   parent: BaseRevIndustry
   id: RevTelesphere
-  name: telesphere
-  description: An experimental device, it can be used to remotely steal materials from passing trade ships using plasma. Additionally; it can be used as a material silo for the revolution.
+  name: телесфера
+  description: Экспериментальное устройство, позволяющее при помощи плазмы дистанционно красть материалы с проходящих мимо торговых судов. Кроме того, может использоваться как хранилище материалов для революции.
   components:
   - type: Sprite
     sprite: _Trauma/Structures/Machines/telesphere.rsi
@@ -174,8 +174,8 @@
 - type: entity
   parent: BaseRevIndustry
   id: RevPrinter
-  name: 3D printer
-  description: Makes either cute little guys or gun parts, zero inbetween. This one can print both metal and plastic.
+  name: 3D принтер
+  description: Печатает либо милых маленьких ребят, либо детали для пушек — третьего не дано. Эта модель умеет печатать как металлом, так и пластиком.
   components:
   - type: Sprite
     sprite: _Trauma/Structures/Machines/printer.rsi

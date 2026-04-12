@@ -1,7 +1,7 @@
 - type: entity
   parent: [ BaseImplantOnlyImplanter ]
   id: TrackingImplanterRev
-  name: meditrack implanter
+  name: имплантер медитрекера
   suffix: Tracking
   description: An implant that reports in the revolutionary radio the location of its host if injured or killed.
   components:
@@ -11,7 +11,7 @@
 - type: entity
   parent: DeathRattleImplant
   id: DeathRattleImplantRev
-  name: meditrack implant
+  name: имплант медитрекера
   description: This implant will inform the Revolutionary radio channel should the user fall into critical condition or die.
   categories: [ HideSpawnMenu ]
   components:

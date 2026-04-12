@@ -21,7 +21,7 @@
 - type: entity
   parent: BaseRevComponent
   id: RevGear
-  name: gear
+  name: шестерня
   description: A gear, used in quite a few devices.
   components:
   - type: Sprite
@@ -34,7 +34,7 @@
 - type: entity
   parent: BaseRevComponent
   id: RevBolt
-  name: pile of bolts
+  name: болт
   description: Some bolts, used in quite a few devices.
   components:
   - type: Sprite
@@ -47,7 +47,7 @@
 - type: entity
   parent: BaseRevComponent
   id: RevNut
-  name: pile of nuts
+  name: гайка
   description: Some nuts, used in quite a few devices.
   components:
   - type: Sprite
@@ -60,7 +60,7 @@
 - type: entity
   parent: [ BaseItem, BaseMajorContraband ]
   id: RevTurretElectronics
-  name: revolutionary turret circuit board
+  name: плата турели революционеров
   description: Used in the creation of turrets, they are programmed to shoot anything without an IFF badge so be careful.
   components:
   - type: Sprite
@@ -73,7 +73,7 @@
 - type: entity
   parent: [ BaseRevPart, BaseMinorContraband ]
   id: RevGunParts
-  name: gun parts
+  name: оружейные детали
   description: A small pile of gun parts. Useless on their own, but you have plans for them.
   components:
   - type: Sprite
