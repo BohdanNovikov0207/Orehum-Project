@@ -14,6 +14,16 @@
       "name": "broken"
     },
     {
+      "name": "coffee-hellfire",
+      "delays": [
+        [
+          0.1,
+          0.1,
+          0.1
+        ]
+      ]
+    },
+    {
       "name": "deny-unshaded",
       "delays": [
         [

@@ -1,0 +1,51 @@
+# RED
+- type: entity
+  parent: AirlockGlassShuttle
+  id: AirlockGlassShuttleRedKamikaze
+  suffix: Red, Kamikaze
+  components:
+  - type: PriorityDock
+    tag: RedAssault
+  - type: ContainerFill
+    containers:
+      board: [ DoorElectronicsExternal ]
+
+- type: entity
+  parent: AirlockGlassShuttleRedKamikaze
+  id: AirlockGlassShuttleRedKamikazeFill
+  suffix: Red, Filled, Kamikaze
+  components:
+  - type: PriorityDock
+    tag: RedKamikaze
+  - type: GridFill
+    path: /Maps/_Orehum/ME4TA/war/kamikad/RED-little.yml
+    addComponents:
+    - type: IFF
+      flags:
+      - HideLabel
+
+# BLUE
+- type: entity
+  parent: AirlockGlassShuttle
+  id: AirlockGlassShuttleBlueKamikaze
+  suffix: Blue, Kamikaze
+  components:
+  - type: PriorityDock
+    tag: BlueKamikaze
+  - type: ContainerFill
+    containers:
+      board: [ DoorElectronicsExternal ]
+
+- type: entity
+  parent: AirlockGlassShuttleBlueKamikaze
+  id: AirlockGlassShuttleBlueKamikazeFill
+  suffix: Blue, Filled, Kamikaze
+  components:
+  - type: PriorityDock
+    tag: BlueKamikaze
+  - type: GridFill
+    path: /Maps/_Orehum/ME4TA/war/kamikad/BLUE-little.yml
+    addComponents:
+    - type: IFF
+      flags:
+      - HideLabel

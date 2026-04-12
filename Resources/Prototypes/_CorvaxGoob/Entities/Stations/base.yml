@@ -1,0 +1,27 @@
+# SPDX-FileCopyrightText: 2026 Space Station 14 Contributors
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+- type: entity
+  id: BaseStationGoal
+  abstract: true
+  components:
+    - type: StationGoal
+      goals:
+      - Singularity
+      - SolarPanels
+      - Artifacts
+      - Bank
+      - Zoo
+      - MiningOutpost
+      - Tesla
+      - SecurityTraining
+      - ShuttleMed
+      - ShuttleSec
+      - ShuttleRnd
+      - ShuttleSrv
+      - ShuttleEmergency
+      - Theatre
+      - CellAI
+      - Botany
+      - Bunker

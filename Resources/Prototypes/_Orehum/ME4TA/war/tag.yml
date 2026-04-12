@@ -1,0 +1,17 @@
+- type: Tag
+  id: RedAssault
+
+- type: Tag
+  id: BlueAssault
+
+- type: Tag
+  id: RedKamikaze
+
+- type: Tag
+  id: BlueKamikaze
+
+- type: Tag
+  id: RedLinkorn
+
+- type: Tag
+  id: BlueLinkorn

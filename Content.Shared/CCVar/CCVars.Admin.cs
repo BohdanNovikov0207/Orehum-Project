@@ -37,7 +37,7 @@ public sealed partial class CCVars
     ///     Should the server play a quick sound to the active admins whenever a new player joins?
     /// </summary>
     public static readonly CVarDef<bool> AdminNewPlayerJoinSound =
-        CVarDef.Create("admin.new_player_join_sound", false, CVar.SERVERONLY);
+        CVarDef.Create("admin.new_player_join_sound", true, CVar.SERVERONLY);
 
     /// <summary>
     ///     The amount of days before the note starts fading. It will slowly lose opacity until it reaches stale. Set to 0 to disable.
