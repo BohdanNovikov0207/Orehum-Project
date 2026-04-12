@@ -125,7 +125,7 @@
       announcement: alert-level-gamma-announcement
       selectable: false
       sound:
-        path: /Audio/Misc/gamma.ogg
+        path: /Audio/Announcements/Alerts/code_gamma.ogg
         params:
           volume: -2
       disableSelection: true
@@ -160,7 +160,7 @@
       announcement: alert-level-omicron-announcement
       selectable: false
       sound:
-        path: /Audio/_Goobstation/Misc/omicron.ogg
+        path: /Audio/Announcements/Alerts/code_omicron.ogg
       disableSelection: true
       color: Ivory
       emergencyLightColor: Ivory
