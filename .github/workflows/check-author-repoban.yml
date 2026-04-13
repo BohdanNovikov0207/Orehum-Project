@@ -1,11 +1,15 @@
-﻿name: soft-repoban check
+# SPDX-FileCopyrightText: 2026 Space Station 14 Contributors
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+name: soft-repoban check
 
 on:
   pull_request:
     types: [opened, reopened]
 
 env:
-  BLOCKED_AUTHORS: "201311861"
+  BLOCKED_AUTHORS: "null"
 
 jobs:
   check-author:

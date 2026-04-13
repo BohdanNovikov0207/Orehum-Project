@@ -19,7 +19,7 @@
 # used by the unique items of xenoborgs (like modules and stuff)
 - type: entity
   id: BaseXenoborgContraband
-  abstract: true
+  abstract: false
   components:
   - type: Contraband
     severity: Major # placeholder until they make a better severity
@@ -29,7 +29,7 @@
 # any type of magical items used by wizards and similiar
 - type: entity
   id: BaseMagicalContraband
-  abstract: true
+  abstract: false
   components:
   - type: Contraband
     severity: Magical
@@ -39,7 +39,7 @@
 # non-stealth syndicate stuff
 - type: entity
   id: BaseSyndicateContraband
-  abstract: true
+  abstract: false
   components:
   - type: Contraband
     severity: Syndicate
@@ -49,7 +49,7 @@
 # minor contraband not departmentally restricted -- improvised weapons etc
 - type: entity
   id: BaseMinorContraband
-  abstract: true
+  abstract: false
   components:
   - type: Contraband
     severity: Minor
@@ -57,7 +57,7 @@
 # major contraband, for things like guns or weaponry that don't belong to any department and aren't syndicate specific
 - type: entity
   id: BaseMajorContraband
-  abstract: true
+  abstract: false
   components:
   - type: Contraband
     severity: Major
@@ -65,7 +65,7 @@
 # base department restricted contraband, this should only be used as a parent for other contraband prototypes, not the restricted items themselves.
 - type: entity
   id: BaseRestrictedContraband
-  abstract: true
+  abstract: false
   components:
   - type: Contraband
     severity: Restricted
@@ -76,7 +76,7 @@
 - type: entity
   id: BaseCentcommContraband
   parent: BaseRestrictedContraband
-  abstract: true
+  abstract: false
   components:
   - type: Contraband
     allowedDepartments: [ CentralCommand ]
@@ -84,7 +84,7 @@
 - type: entity
   id: BaseCommandContraband
   parent: BaseRestrictedContraband
-  abstract: true
+  abstract: false
   components:
   - type: Contraband
     allowedDepartments: [ Command ]
@@ -92,7 +92,7 @@
 - type: entity
   id: BaseSecurityContraband
   parent: BaseRestrictedContraband
-  abstract: true
+  abstract: false
   components:
   - type: Contraband
     allowedDepartments: [ Security ]
@@ -101,7 +101,7 @@
 - type: entity
   id: BaseEngineeringContraband
   parent: BaseRestrictedContraband
-  abstract: true
+  abstract: false
   components:
   - type: Contraband
     allowedDepartments: [ Engineering ]
@@ -109,7 +109,7 @@
 - type: entity
   id: BaseScienceContraband
   parent: BaseRestrictedContraband
-  abstract: true
+  abstract: false
   components:
   - type: Contraband
     allowedDepartments: [ Science ]
@@ -117,7 +117,7 @@
 - type: entity
   id: BaseMedicalContraband
   parent: BaseRestrictedContraband
-  abstract: true
+  abstract: false
   components:
   - type: Contraband
     allowedDepartments: [ Medical ]
@@ -126,7 +126,7 @@
 - type: entity
   id: BaseCivilianContraband
   parent: BaseRestrictedContraband
-  abstract: true
+  abstract: false
   components:
   - type: Contraband
     allowedDepartments: [ Civilian ]
@@ -134,7 +134,7 @@
 - type: entity
   id: BaseCargoContraband
   parent: BaseRestrictedContraband
-  abstract: true
+  abstract: false
   components:
   - type: Contraband
     allowedDepartments: [ Cargo ]
@@ -143,7 +143,7 @@
 - type: entity
   id: BaseCentcommCommandContraband
   parent: BaseRestrictedContraband
-  abstract: true
+  abstract: false
   components:
   - type: Contraband
     allowedDepartments: [ CentralCommand, Command ]
@@ -151,7 +151,7 @@
 - type: entity
   id: BaseSecurityCommandContraband
   parent: BaseRestrictedContraband
-  abstract: true
+  abstract: false
   components:
   - type: Contraband
     allowedDepartments: [ Security, Command ]
@@ -159,7 +159,7 @@
 - type: entity
   id: BaseSecurityScienceCommandContraband
   parent: BaseRestrictedContraband
-  abstract: true
+  abstract: false
   components:
   - type: Contraband
     allowedDepartments: [ Security, Science, Command ]
@@ -167,7 +167,7 @@
 - type: entity
   id: BaseSecurityEngineeringContraband
   parent: BaseRestrictedContraband
-  abstract: true
+  abstract: false
   components:
   - type: Contraband
     allowedDepartments: [ Security, Engineering ]
@@ -175,7 +175,7 @@
 - type: entity
   id: BaseSiliconScienceContraband
   parent: BaseRestrictedContraband
-  abstract: true
+  abstract: false
   components:
   - type: Contraband
     allowedDepartments: [ Science, Silicon ]
@@ -183,7 +183,7 @@
 - type: entity
   id: BaseSecurityCargoContraband
   parent: BaseRestrictedContraband
-  abstract: true
+  abstract: false
   components:
   - type: Contraband
     allowedDepartments: [ Security, Cargo ]
@@ -191,7 +191,7 @@
 - type: entity
   id: BaseMedicalScienceContraband
   parent: BaseRestrictedContraband
-  abstract: true
+  abstract: false
   components:
   - type: Contraband
     allowedDepartments: [ Medical, Science ]
@@ -200,7 +200,7 @@
 - type: entity
   id: BaseSecurityBartenderContraband
   parent: BaseRestrictedContraband
-  abstract: true
+  abstract: false
   components:
   - type: Contraband
     allowedDepartments: [ Security ]
@@ -209,7 +209,7 @@
 - type: entity
   id: BaseSecurityBartenderZookeeperContraband
   parent: BaseRestrictedContraband
-  abstract: true
+  abstract: false
   components:
   - type: Contraband
     allowedDepartments: [ Security ]
@@ -218,7 +218,7 @@
 - type: entity
   id: BaseSecurityLawyerContraband
   parent: BaseRestrictedContraband
-  abstract: true
+  abstract: false
   components:
   - type: Contraband
     allowedDepartments: [ Security ]
@@ -227,7 +227,7 @@
 - type: entity
   id: BaseJanitorContraband
   parent: BaseRestrictedContraband
-  abstract: true
+  abstract: false
   components:
   - type: Contraband
     allowedJobs: [ Janitor ]
@@ -235,7 +235,7 @@
 # for ~objective items
 - type: entity
   id: BaseGrandTheftContraband
-  abstract: true
+  abstract: false
   components:
   - type: Contraband
     severity: GrandTheft
@@ -244,7 +244,7 @@
 
 - type: entity
   id: BaseHonkraband
-  abstract: true
+  abstract: false
   components:
   - type: Contraband
     severity: Honkraband

@@ -1,0 +1,161 @@
+<!--
+SPDX-FileCopyrightText: 2023 coolmankid12345 <55817627+coolmankid12345@users.noreply.github.com>
+SPDX-FileCopyrightText: 2024 Aidenkrz <aiden@djkraz.com>
+SPDX-FileCopyrightText: 2024 BombasterDS <115770678+BombasterDS@users.noreply.github.com>
+SPDX-FileCopyrightText: 2024 Ghagliiarghii <68826635+Ghagliiarghii@users.noreply.github.com>
+SPDX-FileCopyrightText: 2024 Killerqu00 <47712032+Killerqu00@users.noreply.github.com>
+SPDX-FileCopyrightText: 2024 Piras314 <p1r4s@proton.me>
+SPDX-FileCopyrightText: 2024 UBlueberry <161545003+UBlueberry@users.noreply.github.com>
+SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
+
+SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+
+<Document>
+  # Революционеры
+
+  <Box>
+    [color=#999999][italic]"Viva la revolución!!"[/italic][/color]
+  </Box>
+  <Box>
+    <GuideEntityEmbed Entity="PosterContrabandRevolt" Caption="" />
+  </Box>
+
+  Революционеры — это антагонисты, вербующие сторонников среди рабочего класса NanoTrasen. Их цель — захватить станцию, строя гигантские военные заводы.
+
+  ## Самое важное!
+  Как глава революции, вы — лидер, а не боец передовой. Делегируйте задачи своим людям, иначе они не будут знать, что делать.
+
+  ## Цели
+  Вы должны убить, обратить или изгнать весь [textlink="командный состав" link="Command"] станции в любом порядке.
+
+  Ваша цель — не разрушить станцию, а [italic]захватить её[/italic], поэтому старайтесь минимизировать ущерб, где это возможно.
+
+  [bold]Революция потерпит крах[/bold], если все [bold][color=#5e9cff]Главы революции[/color][/bold] погибнут. Если это произойдет, все [color=red]Революционеры[/color] отрекутся от идей и вернутся в ряды экипажа.
+
+  ## Глав. Рев и вербовка
+  [bold][color=#5e9cff]Главы революции[/color][/bold] выбираются в начале смены. Они начинают с [color=cyan]булавой[/color], [color=cyan]двумя листовками[/color], [color=cyan]наручниками[/color] и стартовым набором [color=cyan]деталей[/color].
+
+  <Box>
+    <GuideEntityEmbed Entity="RevMace"/>
+    <GuideEntityEmbed Entity="Handcuffs"/>
+    <GuideEntityEmbed Entity="RevPropaganda"/>
+    <GuideEntityEmbed Entity="RevGear"/>
+  </Box>
+
+  Вы можете переманивать членов экипажа на свою сторону, оглушив их [color=#ff0000]булавой[/color], надев на них наручники и зачитав [color=#ff0000]пропаганду[/color] (нажав на цель листовкой в руке). Обязательно снимите с цели гарнитуру, иначе они успеют позвать на помощь!
+
+  Ещё одно препятствие на вашем пути — [color=cyan]чипы защиты разума[/color] (майндшилды). Они:
+  - Предотвращают обращение человека в [color=red]Революционера[/color].
+  - «Излечивают» революционеров, лишая их верности вашему делу.
+  - Видимым образом меняют облик [bold][color=#5e9cff]Главы революции[/color][/bold] при имплантации, раскрывая его прикрытие и отключая способность к вербовке.
+
+  Считайте, что вся [color=#cb0000]Служба Безопасности[/color] и [color=#1b67a5]Командование[/color] уже чипированы.
+
+  Вы сможете удалять защиту разума с помощью [color=red]извлекателей имплантов[/color], как только разблокируете их.
+
+  <Box>
+    <GuideEntityEmbed Entity="RevShieldRipper"/>
+  </Box>
+
+  ## Строительство заводов и технологии
+
+  [bold][color=red]Самая важная часть[/color][/bold] работы глав. Рева — создание полноценных заводов. Это позволит вам расширять дерево технологий и получать более [color=red]опасные[/color] и мощные предметы для вооружения армии. Имейте в виду: здания повстанцев работают [color=red][bold]очень громко[/bold][/color], поэтому вам нужно найти изолированное место и заранее позаботиться об обороне!
+
+  ### Промышленная кузня
+
+  Вам следует [bold][color=red]ВСЕГДА[/color][/bold] начинать с кузни, и лучше построить несколько, если позволяют ресурсы. Хорошие базы повстанцев имеют по 4-5 кузен, постоянно производящих детали.
+
+  <Box>
+    <GuideEntityEmbed Entity="RevForge"/>
+  </Box>
+
+  Она позволяет [color=cyan]создавать компоненты[/color] для других машин, а также базовую броню и оружие. Сюда входят такие важные предметы, как булава — ваше основное оружие для оглушения.
+
+  Примеры того, что можно сделать в кузне:
+  <Box>
+    <GuideEntityEmbed Entity="RevGear"/>
+    <GuideEntityEmbed Entity="RevNut"/>
+    <GuideEntityEmbed Entity="RevBolt"/>
+    <GuideEntityEmbed Entity="ClothingOuterArmorRev"/>
+    <GuideEntityEmbed Entity="RevSwordBlade"/>
+  </Box>
+
+  ### Печатный станок
+
+  Второе по важности здание. Он позволяет [color=cyan]создавать пропаганду[/color] для вербовки. Однако печать занимает много времени, поэтому стоит поставить несколько станков.
+
+ <Box>
+    <GuideEntityEmbed Entity="RevPrintingPress"/>
+  </Box>
+
+  Чтобы раздобыть бумагу, прикажите своим людям распечатывать нано-задачи (nanotasks) из их ПДА, а затем переделывать их в бумагу для пресса. Не бойтесь делегировать!
+
+  <Box>
+    <GuideEntityEmbed Entity="PaperNanoTaskItem"/>
+    <GuideEntityEmbed Entity="SheetPaper"/>
+    <GuideEntityEmbed Entity="RevPropaganda"/>
+  </Box>
+
+  ### Технологии Революции (Т2)
+
+  После настройки базового производства можно переходить ко второму уровню технологий (T2).
+
+  <Box>
+    <GuideEntityEmbed Entity="RevPrinter"/>
+    <GuideEntityEmbed Entity="RevRadioBench"/>
+    <GuideEntityEmbed Entity="RevMicroelectronicsAssembler"/>
+  </Box>
+
+  <Box>
+    <GuideEntityEmbed Entity="RevUniformPrinter"/>
+    <GuideEntityEmbed Entity="RevBulletPress"/>
+  </Box>
+
+  Все эти здания требуют уникальных компонентов, таких как ключ шифрования СБ для цеха телекоммуникаций. Найдя эти предметы, вы сможете построить соответствующие устройства.
+
+  Эти здания открывают доступ к уникальным и мощным вещам, например:
+
+  <Box>
+    <GuideEntityEmbed Entity="PinpointerCommand"/>
+    <GuideEntityEmbed Entity="RevGunParts"/>
+    <GuideEntityEmbed Entity="ClothingBeltRevWebbing"/>
+    <GuideEntityEmbed Entity="EncryptionKeyRev"/>
+  </Box>
+
+  ### Технологии Революции (Т3)
+
+  Третий уровень — это лучшие технологии, которые революционеры смогли собрать буквально «на коленке». Они дают доступ к самому смертоносному снаряжению.
+
+  <Box>
+    <GuideEntityEmbed Entity="RevTelesphere"/>
+    <GuideEntityEmbed Entity="RevTechAnalyzer"/>
+    <GuideEntityEmbed Entity="RevPlasmaFoundry"/>
+  </Box>
+
+  Однако для их создания вам придется убить кого-то из глав отделов! Каждое устройство требует уникальный предмет, к которому есть доступ только у командования.
+
+  <Box>
+    <GuideEntityEmbed Entity="HandTeleporter"/>
+    <GuideEntityEmbed Entity="ClothingShoesBootsMagAdv"/>
+    <GuideEntityEmbed Entity="BoxFolderQmClipboard"/>
+  </Box>
+
+  Отправьте ударный отряд, чтобы устранить главу и забрать нужный предмет — любой из них может переломить ход игры!
+
+  Примеры предметов Т3:
+
+  <Box>
+    <GuideEntityEmbed Entity="RevCircuitBoard"/>
+    <GuideEntityEmbed Entity="Killdozer"/>
+    <GuideEntityEmbed Entity="CartridgeRocketRPG2HE"/>
+  </Box>
+
+  ## Революционер
+  [bold][color=red]Революционер[/color][/bold] — это член экипажа, обращенный [bold][color=#5e9cff]Главой революции[/color][/bold].
+
+  [bold][color=red]Революционеры[/color] не могут вербовать людей сами[/bold], но они более чем способны выполнять «грязную» работу и следовать приказам.
+
+  Будучи [bold][color=red]Революционером[/color][/bold], слушайтесь своих глав. ревов!
+
+</Document>

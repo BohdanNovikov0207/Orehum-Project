@@ -1,0 +1,14 @@
+- type: entity
+  id: RevCircuitBoard
+  parent: [BaseElectronics]
+  name: плата законов (Революция)
+  description: Электронная плата, содержащая набор законов Революции.
+  components:
+  - type: Sprite
+    sprite: Objects/Misc/module.rsi
+    state: std_mod
+  - type: SiliconLawProvider
+    laws: RevLawset
+    lawUploadSound: /Audio/Ambience/Antag/silicon_lawboard_antimov.ogg
+  - type: StaticPrice
+    price: 10000

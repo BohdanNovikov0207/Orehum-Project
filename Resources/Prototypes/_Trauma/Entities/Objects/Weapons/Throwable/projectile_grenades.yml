@@ -1,0 +1,40 @@
+- type: entity
+  parent: [ProjectileGrenadeBase]
+  id: GrenadeShrapnelRev
+  name: самодельная осколочная бомба
+  description: Выпускает смертоносный сноп осколков, вызывающий сильное кровотечение.
+  components:
+  - type: Sprite
+    sprite: Objects/Weapons/Bombs/ied.rsi
+    layers:
+    - state: base
+      map: ["enum.TriggerVisualLayers.Base"]
+    - state: fuel
+    - state: wires
+  - type: ProjectileGrenade
+    fillPrototype: PelletClusterLethalWeak
+    capacity: 30
+  - type: TriggerOnUse
+  - type: TimerTrigger
+    delay: 5
+    examinable: false
+    initialBeepDelay: 0
+    beepSound:
+      path: /Audio/Weapons/Guns/MagOut/pistol_magout.ogg
+      params:
+        volume: 1
+  - type: Item
+    sprite: Objects/Weapons/Bombs/ied.rsi
+  - type: EmitSoundOnTrigger
+    sound:
+      path: "/Audio/Weapons/Guns/Gunshots/batrifle.ogg"
+  - type: StaticPrice
+    price: 1500
+  - type: Appearance
+  - type: AnimationPlayer
+  - type: TimerTriggerVisuals
+    unprimedSprite: base
+  - type: Construction
+    deconstructionTarget: null
+    graph: RevIED
+    node: IED

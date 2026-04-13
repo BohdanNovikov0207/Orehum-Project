@@ -1,0 +1,22 @@
+# Customizations
+station-ai-icon-not-malf = Исправен
+station-ai-icon-firewall = Файрвол
+station-ai-icon-monochrome = Монохром
+station-ai-icon-murica = Мур'ика
+station-ai-icon-nanotrasen = Nanotrasen
+station-ai-icon-president = Господин президент
+station-ai-icon-red-dot = Красная точка
+station-ai-icon-red = Красный
+station-ai-icon-too-deep = Слишком глубоко
+station-ai-icon-triumvirate = Триумвират
+station-ai-icon-matrix = Матрица
+station-ai-icon-house = 2984
+station-ai-icon-database = База данных
+station-ai-icon-glitchman = Глючный
+station-ai-icon-helios = Гелиос
+station-ai-icon-hades = Аид
+station-ai-icon-rainbow = Радуга
+station-ai-icon-alien = Чужой
+station-ai-icon-goon = Древний
+station-ai-icon-weird = Странный
+station-ai-icon-inverted = Перевёрнутый

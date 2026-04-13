@@ -1,0 +1,323 @@
+# Like BaseLathe but without wire panel or constructible/powered machine
+- type: entity
+  parent: [ BaseMachine, BaseMajorContraband ]
+  id: BaseRevIndustry
+  abstract: true
+  components:
+  - type: Transform
+    noRot: false
+  - type: Sprite
+    snapCardinals: true
+    layers:
+    - state: icon
+      map: ["enum.LatheVisualLayers.IsRunning"]
+  - type: Appearance
+  - type: Lathe
+    idleState: icon
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeAabb
+          bounds: "-0.4,-0.4,0.4,0.4"
+        density: 190
+        mask:
+        - MachineMask
+        layer:
+        - MachineLayer
+  - type: Destructible
+    thresholds:
+    - trigger: !type:DamageTrigger
+        damage: 100
+      behaviors:
+      - !type:PlaySoundBehavior
+        sound:
+          collection: MetalBreak
+      - !type:DoActsBehavior
+        acts: ["Destruction"]
+  - type: ActivatableUI
+    key: enum.LatheUiKey.Key
+  - type: UserInterface
+    interfaces:
+      enum.LatheUiKey.Key:
+        type: LatheBoundUserInterface
+      enum.ResearchClientUiKey.Key:
+        type: ResearchClientBoundUserInterface
+  - type: StaticPrice
+    price: 800
+  - type: TechnologyDatabase
+  - type: AutomationSlots
+    slots:
+    - !type:AutomatedMaterialStorage
+      input: AutomationSlotMaterials
+      output: null
+  - type: Animateable
+  - type: LightningTarget
+    priority: 1
+  - type: Construction
+    deconstructionTarget: null
+    graph: RevMachine
+
+- type: entity
+  parent: BaseRevIndustry
+  id: RevForge
+  name: промышленная кузня
+  description: Эта кустарная машина способна производить самые разные полезные (и опасные) компоненты.
+  components:
+  - type: Sprite
+    sprite: _Trauma/Structures/Machines/revforge.rsi
+  - type: Lathe
+    runningState: revforge
+    staticPacks:
+    - RevForgeStatic
+  - type: MaterialStorage
+    whitelist:
+      tags:
+      - Sheet
+      - Metal
+      - Wooden
+      - RawMaterial
+      - Plastic
+  - type: PointLight
+    enabled: true
+    color: "#E25822"
+    radius: 1.5
+    energy: 5.0
+  - type: BlueprintReceiver
+    whitelist:
+      tags:
+      - ForgeMold
+  - type: ContainerContainer
+    containers:
+      blueprint: !type:Container
+  # this doesn't do anything currently as rev machines dont use machine construction
+  # keeping it here for reference incase it's changed in the future
+  - type: EmptyOnMachineDeconstruct
+    containers:
+    - blueprint
+  - type: Construction
+    node: industrial forge
+
+- type: entity
+  parent: BaseRevIndustry
+  id: RevPrintingPress
+  name: печатный станок
+  description: Печатный станок для массового выпуска медиаматериалов или, в вашем случае, анти-NT пропаганды.
+  components:
+  - type: Sprite
+    sprite: _Trauma/Structures/Machines/revprintingpress.rsi
+  - type: Lathe
+    producingSound: /Audio/_Trauma/Revs/printingpresslong.ogg
+    runningState: printingpress
+    staticPacks:
+    - RevPrintingPress
+  - type: MaterialStorage
+    whitelist:
+      tags:
+      - Sheet
+  - type: Construction
+    node: printing press
+
+- type: entity
+  parent: BaseRevIndustry
+  id: RevRadioBench
+  name: цех телекоммуникаций
+  description: Устройство для взлома ближайших сигналов. Позволяет производить радиочипы, турели, а также некоторые улучшения для других машин.
+  components:
+  - type: Sprite
+    sprite: _Trauma/Structures/Machines/telecommsbench.rsi
+  - type: Lathe
+    producingSound: /Audio/_Trauma/Revs/commsworkbench.ogg
+    runningState: telecomms
+    staticPacks:
+    - RevTelecommsWorkbenchStatic
+  - type: MaterialStorage
+    whitelist:
+      tags:
+      - Sheet
+      - RawMaterial
+      - Ingot
+  - type: Construction
+    node: telecomms workshop
+
+- type: entity
+  parent: BaseRevIndustry
+  id: RevTelesphere
+  name: телесфера
+  description: Экспериментальное устройство, позволяющее при помощи плазмы дистанционно красть материалы с проходящих мимо торговых судов. Кроме того, может использоваться как хранилище материалов для революции.
+  components:
+  - type: Sprite
+    sprite: _Trauma/Structures/Machines/telesphere.rsi
+  - type: Lathe
+    producingSound: /Audio/_Trauma/Revs/telesphere.ogg
+    runningState: telesphere
+    staticPacks:
+    - RevTelesphereStatic
+  - type: Construction
+    node: telesphere
+  - type: PointLight
+    enabled: true
+    color: "#ffffff"
+    radius: 1.5
+    energy: 5.0
+  - type: WirelessNetworkConnection
+    range: 1000
+  - type: DeviceLinkSource
+    range: 1000
+    ports:
+    - MaterialSilo
+  - type: MaterialStorage
+    ignoreColor: true
+  - type: Silo
+
+- type: entity
+  parent: BaseRevIndustry
+  id: RevPrinter
+  name: 3D принтер
+  description: Печатает либо милых маленьких ребят, либо детали для пушек — третьего не дано. Эта модель умеет печатать как металлом, так и пластиком.
+  components:
+  - type: Sprite
+    sprite: _Trauma/Structures/Machines/printer.rsi
+  - type: Lathe
+    producingSound: /Audio/_Trauma/Revs/printer.ogg
+    runningState: printer
+    staticPacks:
+    - RevPrinterStatic
+  - type: MaterialStorage
+    whitelist:
+      tags:
+      - Sheet
+      - RawMaterial
+      - Ingot
+  - type: Construction
+    node: 3D printer
+
+- type: entity
+  parent: BaseRevIndustry
+  id: RevBulletPress
+  name: пресс для пуль
+  description: Created ammo by pressing the bullet into the casing, this one is automated.
+  components:
+  - type: Sprite
+    sprite: _Trauma/Structures/Machines/bulletpress.rsi
+  - type: Lathe
+    producingSound: /Audio/_Trauma/Revs/bulletpress.ogg
+    runningState: bulletpress
+    staticPacks:
+    - RevBulletPressStatic
+  - type: MaterialStorage
+    whitelist:
+      tags:
+      - Sheet
+      - RawMaterial
+      - Ingot
+  - type: Construction
+    node: bullet press
+
+- type: entity
+  parent: BaseRevIndustry
+  id: RevMicroelectronicsAssembler
+  name: сборщик микроэлектроники
+  description: Позволяет создавать нелегальные технологии, полезные для дела революции.
+  components:
+  - type: Sprite
+    sprite: _Trauma/Structures/Machines/microelectronicsassembler.rsi
+  - type: Lathe
+    producingSound: /Audio/_Trauma/Revs/microelectronicsassembler.ogg
+    runningState: microelectronicsassembler
+    staticPacks:
+    - RevMicroElectronicsStatic
+  - type: MaterialStorage
+    whitelist:
+      tags:
+      - Sheet
+      - RawMaterial
+      - Ingot
+  - type: Construction
+    node: microelectronics assembler
+  - type: BlueprintReceiver
+    whitelist:
+      tags:
+      - DataChip
+  - type: ContainerContainer
+    containers:
+      blueprint: !type:Container
+  - type: EmptyOnMachineDeconstruct
+    containers:
+    - blueprint
+
+- type: entity
+  parent: BaseRevIndustry
+  id: RevUniformPrinter
+  name: принтер военной формы
+  description: Создаёт бронированную одежду для войск.
+  components:
+  - type: Sprite
+    sprite: _Trauma/Structures/Machines/uniformprinter.rsi
+  - type: Lathe
+    producingSound: /Audio/Machines/uniformprinter.ogg
+    runningState: uniformsewer
+    staticPacks:
+    - RevClothingStatic
+  - type: Construction
+    node: uniform printer
+  - type: MaterialStorage
+    whitelist:
+      tags:
+        - Sheet
+        - RawMaterial
+        - Ingot
+
+- type: entity
+  parent: BaseRevIndustry
+  id: RevTechAnalyzer
+  name: анализатор технологий
+  description: Сканирует технологии NT и создает диски с данными, которые сборщик микроэлектроники может использовать для производства.
+  components:
+  - type: Sprite
+    sprite: _Trauma/Structures/Machines/techanalyzer.rsi
+  - type: Lathe
+    producingSound: /Audio/Machines/uniformprinter.ogg
+    runningState: techAnalyzer
+    staticPacks:
+    - RevTechStatic
+  - type: Construction
+    node: tech analyzer
+  - type: MaterialStorage
+    whitelist:
+      tags:
+      - Sheet
+      - RawMaterial
+      - Ingot
+
+- type: entity
+  parent: BaseRevIndustry
+  id: RevPlasmaFoundry
+  name: плазменная плавильня
+  description: Продвинутая плавильня, работающая на плазме. Она невероятно быстро плавит металлы и позволяет создавать сложные высокотехнологичные компоненты.
+  components:
+  - type: Sprite
+    sprite: _Trauma/Structures/Machines/plasmaforge.rsi
+  - type: Lathe
+    producingSound: /Audio/_Trauma/Revs/foundryaudio.ogg
+    runningState: plasmaforge
+    staticPacks:
+    - RevFoundryStatic
+  - type: MaterialStorage
+    whitelist:
+      tags:
+      - Sheet
+      - Metal
+      - Wooden
+      - RawMaterial
+      - Plastic
+  - type: PointLight
+    enabled: true
+    color: "#E25822"
+    radius: 3.5
+    energy: 5.0
+  - type: ContainerContainer
+    containers:
+      blueprint: !type:Container
+  - type: Construction
+    node: plasma foundry

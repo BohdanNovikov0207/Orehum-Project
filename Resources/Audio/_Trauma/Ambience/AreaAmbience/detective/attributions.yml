@@ -1,0 +1,8 @@
+# SPDX-FileCopyrightText: 2026 Space Station 14 Contributors
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+- files: ["detectivesroom.ogg"]
+  license: "CC-BY-4.0"
+  copyright: "By Kevin MacLeod"
+  source: "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100137&Search=Search"

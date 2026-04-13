@@ -1,0 +1,23 @@
+- type: entity
+  abstract: true
+  parent: BaseObjective
+  id: BaseInsurgentObjective
+  components:
+  - type: Objective
+    issuer: objective-issuer-insurgents
+  - type: RoleRequirement
+    roles:
+    - InsurgentRole
+
+- type: entity
+  parent: [ BaseInsurgentObjective, BaseLivingObjective]
+  id: InsurgentEscapeObjective
+  name: Сбежать на Центком живым и свободным.
+  description: Чтобы ваше дело увенчалось успехом, вы должны сохранить свое прикрытие и добраться до Центрального Командования в целости и сохранности.
+  components:
+  - type: Objective
+    difficulty: 1
+    icon:
+      sprite: Structures/Furniture/chairs.rsi
+      state: shuttle
+  - type: EscapeShuttleCondition

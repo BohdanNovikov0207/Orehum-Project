@@ -1,0 +1,264 @@
+- type: entity
+  parent: BaseItem
+  id: RevUnfinishedComponent
+  name: кусок стали
+  description: A misshapen lump of steel, clearly being worked into something.
+  components:
+  - type: Sprite
+    sprite: _Trauma/Objects/Revs/components.rsi
+    state: unfinished
+  - type: Construction
+    graph: RevParts
+    deconstructionTarget: null
+    node: unfinished
+
+- type: entity
+  abstract: true
+  parent: [ RevUnfinishedComponent, BaseMinorContraband ]
+  id: BaseUnfinishedRevWeapon
+  components:
+  - type: Construction
+    defaultTarget: finished
+    node: start
+
+- type: entity
+  parent: BaseUnfinishedRevWeapon
+  id: RevSwordBlade
+  name: лезвие меча
+  description: An unfinished sword, use some wood to complete it.
+  components:
+  - type: Sprite
+    state: sword
+  - type: EmbeddableProjectile
+    sound: /Audio/Weapons/bladeslice.ogg
+  - type: DamageOtherOnHit
+    damage:
+      types:
+        Slash: 5
+  - type: ThrowingAngle
+    angle: 225
+  - type: Construction
+    graph: RevSword
+
+- type: entity
+  parent: BaseUnfinishedRevWeapon
+  id: RevMaceHead
+  name: кончик булавы
+  description: An unfinished mace, use some wood to complete it.
+  components:
+  - type: Sprite
+    state: mace
+  - type: Construction
+    graph: RevMace
+
+- type: entity
+  parent: BaseUnfinishedRevWeapon
+  id: RevKnifeBlade
+  name: лезвие кованого ножа
+  description: An unfinished knife, use some wood to complete it.
+  components:
+  - type: Sprite
+    state: knife
+  - type: EmbeddableProjectile
+    sound: /Audio/Weapons/bladeslice.ogg
+  - type: DamageOtherOnHit
+    damage:
+      types:
+        Slash: 5
+  - type: ThrowingAngle
+    angle: 225
+  - type: Construction
+    graph: RevKnife
+
+- type: entity
+  parent: BaseUnfinishedRevWeapon
+  id: RevTorchHead
+  name: незавершенный боевой факел
+  description: An unfinished combat torch, use some wood to complete it.
+  components:
+  - type: Sprite
+    state: torch
+  - type: Construction
+    graph: RevTorch
+
+- type: entity
+  parent: BaseUnfinishedRevWeapon
+  id: RevPitchforkHead
+  name: наконечник вилы
+  description: An unfinished pitchfork, use a some wood to complete it.
+  components:
+  - type: Sprite
+    state: spear
+  - type: EmbeddableProjectile
+    sound: /Audio/Weapons/bladeslice.ogg
+  - type: DamageOtherOnHit
+    damage:
+      types:
+        Slash: 5
+  - type: ThrowingAngle
+    angle: 225
+  - type: Construction
+    graph: RevPitchfork
+
+- type: entity
+  parent: [ BaseItem, BaseMinorContraband ]
+  id: RevUnfinishedGun
+  name: деформированный кусок стали
+  description: Лист стали, грубо изогнутый в форме пушки. Чтобы эта штука начала стрелять, над ней нужно ещё долго поработать.
+  components:
+  - type: Sprite
+    sprite: _Trauma/Objects/Weapons/Guns/Pistols/unfinished.rsi
+    state: icon
+  - type: Item
+    size: Normal
+  - type: Construction
+    graph: RevGuns
+    deconstructionTarget: null
+    node: unfinished
+
+- type: entity
+  parent: [ BaseItem ]
+  id: RevHelmetLiner
+  name: подшлемник
+  description: Используется для создания шлемов. Добавьте пласталь, чтобы завершить изготовление.
+  components:
+  - type: Sprite
+    sprite: _Trauma/Objects/Revs/components.rsi
+    state: helmetliner
+  - type: Construction
+    graph: RevHelmet
+    deconstructionTarget: null
+    node: unfinished
+
+- type: entity
+  parent: [ BaseItem ]
+  id: RevGasFilter
+  name: газовый фильтр
+  description: Используется для создания противогазов. Добавьте пластик, чтобы завершить изготовление.
+  components:
+  - type: Sprite
+    sprite: _Trauma/Objects/Revs/components.rsi
+    state: gasfilter
+  - type: Construction
+    graph: RevMask
+    defaultTarget: finished
+    deconstructionTarget: null
+    node: unfinished
+
+- type: entity
+  parent: [ BaseItem ]
+  id: RevEmptyVest
+  name: пустой жилет из паутины
+  description: Пустой жилет, которому всё ещё нужны пластины. Добавьте бронепластины, чтобы завершить его изготовление.
+  components:
+  - type: Sprite
+    sprite: _Trauma/Objects/Revs/components.rsi
+    state: emptyweb
+  - type: Construction
+    graph: RevVest
+    deconstructionTarget: null
+    node: unfinished
+
+- type: entity
+  parent: [ BaseItem ]
+  id: RevArmorPlate
+  name: бронепластина
+  description: Пластина для жилета из паутины.
+  components:
+  - type: Sprite
+    sprite: _Trauma/Objects/Revs/components.rsi
+    state: armorplate
+  - type: Tag
+    tags:
+    - RevArmorPlate
+
+- type: entity
+  parent: [ BaseItem ]
+  id: RevReflectivePlate
+  name: зеркальная пластина
+  description: Пластина для жилета с защитой от лазеров.
+  components:
+  - type: Sprite
+    sprite: _Trauma/Objects/Revs/components.rsi
+    state: reflectplate
+  - type: Tag
+    tags:
+    - RevReflectivePlate
+
+- type: entity
+  parent: [ BaseItem ]
+  id: RevUnfinishedRocket
+  name: незавершённая ракета
+  description: Незавершённая ракета.
+  components:
+  - type: Sprite
+    sprite: _Trauma/Objects/Weapons/Guns/Ammunition/Rockets/unfinished.rsi
+    state: icon
+  - type: Construction
+    graph: RevRockets
+    deconstructionTarget: null
+    node: unfinished
+
+- type: entity
+  parent: [ BaseItem ]
+  id: RevRocketFrame
+  name: каркас ракеты
+  description: Это каркас ракеты
+  components:
+  - type: Sprite
+    sprite: _Trauma/Objects/Weapons/Guns/Ammunition/Rockets/unfinished.rsi
+    state: icon
+  - type: Tag
+    tags:
+    - RevRocket
+
+- type: entity
+  parent: [ BaseItem ]
+  id: RevUnfinishedFuelTank
+  name: unfinished fuel tank
+  description: An unfinished flamethrower fuel tank
+  components:
+  - type: Sprite
+    sprite: _Trauma/Objects/Weapons/Guns/Ammunition/Flamethrower/unfinished.rsi
+    state: icon
+  - type: Tag
+    tags:
+    - RevFuelTank
+  - type: SolutionContainerManager
+    solutions:
+      beaker:
+        maxVol: 100
+  - type: MixableSolution
+    solution: beaker
+  - type: RefillableSolution
+    solution: beaker
+  - type: DrainableSolution
+    solution: beaker
+  - type: ExaminableSolution
+    solution: beaker
+  - type: DrawableSolution
+    solution: beaker
+  - type: SolutionTransfer
+    maxTransferAmount: 20
+    canChangeTransferAmount: true
+  - type: SolutionItemStatus
+    solution: beaker
+  - type: Spillable
+    solution: beaker
+  - type: Construction
+    graph: RevFlamethrowerAmmo
+    deconstructionTarget: null
+    node: empty
+
+- type: entity
+  parent: [ BaseItem ]
+  id: RevFuelFrame
+  name: empty fuel tank
+  description: A frame for a flamethrower fuel tank
+  components:
+  - type: Sprite
+    sprite: _Trauma/Objects/Weapons/Guns/Ammunition/Flamethrower/unfinished.rsi
+    state: icon
+  - type: Tag
+    tags:
+    - RevFuelTank

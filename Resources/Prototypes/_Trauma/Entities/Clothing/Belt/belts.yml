@@ -1,0 +1,10 @@
+- type: entity
+  parent: [ ClothingBeltStorageBase ]
+  id: ClothingBeltRevWebbing
+  name: нагрудная разгрузка
+  description: "Идеально подходит для хранения всего: от боеприпасов до оружия и предметов первой необходимости."
+  components:
+  - type: Sprite
+    sprite: Clothing/Belt/mercwebbing.rsi
+  - type: Clothing
+    sprite: Clothing/Belt/mercwebbing.rsi
