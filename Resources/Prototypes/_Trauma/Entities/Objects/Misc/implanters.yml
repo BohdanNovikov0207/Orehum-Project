@@ -54,7 +54,7 @@
     - MindShieldImplant
 
 - type: entity
-  parent: [BaseImplantOnlyImplanter, BaseRevMajorContraband]
+  parent: [BaseImplantOnlyImplanter]
   id: FakeMindShieldImplanterRev
   suffix: Fake Mindshield
   name: fake mindshield implanter
