@@ -168,7 +168,7 @@
 
 - type: listing
   id: ReinforcementBeaconDClass
-  name: Оформить D-Класс
+  name: Оформить расходника
   description: Нанять расходника с какой-то захолустной планетки. Минимальное время прибытия — три минуты.
   productEntity: ReinforcementBeaconDClass
   icon:
