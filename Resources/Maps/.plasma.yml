@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2026 Space Station 14 Contributors
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 meta:
   format: 7
   category: Map
@@ -77118,7 +77122,7 @@ entities:
       pos: -51.5,-7.5
       parent: 2
     - type: FaxMachine
-      name: Head of Personell
+      name: Head of Personnel
   - uid: 13583
     components:
     - type: MetaData
