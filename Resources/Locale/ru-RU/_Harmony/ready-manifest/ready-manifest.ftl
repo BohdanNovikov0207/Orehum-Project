@@ -1,10 +1,10 @@
-ready-manifest-title = Manifesto de Prontos
+ready-manifest-title = Манифест
 ready-manifest-job-title = {$jobTitle}:
 
 ready-manifest-no-ready-count = 0
-ready-manifest-low-ready-count = {$count} Baixa
-ready-manifest-medium-ready-count = {$count} Média
-ready-manifest-high-ready-count = {$count} Alta
+ready-manifest-low-ready-count = {$count} низкий
+ready-manifest-medium-ready-count = {$count} среднее
+ready-manifest-high-ready-count = {$count} высокий
 
 ready-manifest-no-ready-indicator = -
 ready-manifest-low-ready-indicator = -
