@@ -771,7 +771,7 @@
     tags: [] # ignore "WhitelistChameleon" tag
 
 - type: entity
-  parent: [IDCardStandard, BaseChameleon] # Trauma - don't parent passenger id
+  parent: [IDCardStandard] # Trauma - don't parent passenger id
   id: AgentIDCard
   name: ID-карта ассистента # Trauma - i hate this
   suffix: Agent
