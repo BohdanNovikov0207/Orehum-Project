@@ -1,8 +1,8 @@
 - type: entity
   parent: BaseItem
   id: IngredientsBeacon
-  name: ingredients beacon
-  description: Summon ingredients to help you get started cooking
+  name: маяк ингредиентов
+  description: Призовите ингредиенты, которые помогут вам начать готовить.
   components:
   - type: Sprite
     sprite: _Trauma/Objects/Revs/droppodbeacon.rsi

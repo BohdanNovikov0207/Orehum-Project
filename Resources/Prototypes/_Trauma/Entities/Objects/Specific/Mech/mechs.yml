@@ -134,8 +134,8 @@
 
 - type: entity
   id: PowerArmorFrame
-  name: P.O.W.A.R armor frame
-  description: Precise Orbital WAR, armor
+  name: каркс брони MARK-1
+  description: Что это...
   components:
   - type: Sprite
     drawdepth: Mobs
@@ -207,8 +207,8 @@
 - type: entity
   parent: [ BaseMech, CombatMech ]
   id: T45PowerArmor
-  name: T-45 P.O.W.A.R armor
-  description: Precise Orbital Worn Armor (for) Revolutionaries
+  name: броня MARK-1
+  description: M A R K - 1, та самая броня для революции
   components:
   - type: Sprite
     drawdepth: Mobs
