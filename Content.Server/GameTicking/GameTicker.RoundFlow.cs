@@ -114,7 +114,6 @@ using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
 using Content.Goobstation.Maths.FixedPoint;
 using Content.Goobstation.Shared.Mind.Components;
-using Content.Server.Announcements.Systems;
 using System.Text.RegularExpressions;
 
 namespace Content.Server.GameTicking
