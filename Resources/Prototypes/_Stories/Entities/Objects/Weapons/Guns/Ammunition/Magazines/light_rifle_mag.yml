@@ -5,9 +5,9 @@
   description: Curved 30-round double stack magazine for combat rifles. Intended to hold anti-demon silver ammunition.
   components:
   - type: BallisticAmmoProvider
-    proto: CartridgeLightRifleSilver
+    proto: STCartridgeLightRifleSilver
   - type: Sprite
-    sprite: _Stories\Objects\Weapons\Guns\Ammunition\Magazines\light_rifle_mag.rsi
+    sprite: _Stories/Objects/Weapons/Guns/Ammunition/Magazines/light_rifle_mag.rsi
     layers:
     - state: base
       map: ["enum.GunVisualLayers.Base"]

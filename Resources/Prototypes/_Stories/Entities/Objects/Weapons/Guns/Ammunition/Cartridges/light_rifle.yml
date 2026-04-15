@@ -5,9 +5,9 @@
   description: A classic intermediate cartridge used by many combat rifles and LMGs. Incendiary ammunition contains a self-igniting compound that sets the target ablaze.
   components:
   - type: CartridgeAmmo
-    proto: BulletLightRifleSilver
+    proto: STBulletLightRifleSilver
   - type: Sprite
-    sprite: _Stories\Objects\Weapons\Guns\Ammunition\Casings\ammo-silver.rsi
+    sprite: _Stories/Objects/Weapons/Guns/Ammunition/Casings/ammo-silver.rsi
     layers:
       - state: base
         map: [ "enum.AmmoVisualLayers.Base" ]

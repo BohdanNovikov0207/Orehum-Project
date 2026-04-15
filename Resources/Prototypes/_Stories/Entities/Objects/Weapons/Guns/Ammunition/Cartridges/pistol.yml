@@ -5,9 +5,9 @@
   parent: BaseCartridgePistol
   components:
   - type: CartridgeAmmo
-    proto: BulletPistolSilver
+    proto: STBulletPistolSilver
   - type: Sprite
-    sprite: _Stories\Objects\Weapons\Guns\Ammunition\Casings\ammo-silver.rsi
+    sprite: _Stories/Objects/Weapons/Guns/Ammunition/Casings/ammo-silver.rsi
     layers:
       - state: base
         map: [ "enum.AmmoVisualLayers.Base" ]
