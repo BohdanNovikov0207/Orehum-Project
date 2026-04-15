@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2026 Space Station 14 Contributors
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 - type: latheRecipe
   abstract: true
   parent: BaseRevWeapon
@@ -28,6 +32,29 @@
   parent: BaseRevBullet
   id: RevRifleBullet
   result: CartridgeLightRifle
+
+- type: latheRecipe
+  parent: BaseRevBullet
+  id: RevBuckShell
+  materials:
+    Steel: 20
+  result: ShellShotgun
+
+- type: latheRecipe
+  parent: BaseRevBullet
+  id: RevSlugShell
+  materials:
+    Steel: 15
+    Plastic: 5
+  result: ShellShotgunSlug
+
+- type: latheRecipe
+  parent: BaseRevBullet
+  id: RevBreachShell
+  materials:
+    Steel: 15
+    Plasteel: 5
+  result: ShellShotgunBreaching
 
 - type: latheRecipe
   parent: BaseRevMagazine

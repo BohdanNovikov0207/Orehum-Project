@@ -1,0 +1,19 @@
+# SPDX-FileCopyrightText: 2026 Space Station 14 Contributors
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+- type: entity
+  parent: AmmoProviderShotgunShell
+  id: BoxShotgunBreaching
+  name: коробка боеприпасов (12 калибр, пробиваемый)
+  description: Картонная коробка с патронами для дробовика 12 калибра. Предназначена для хранения боеприпасов для взлома... производитель забыл сделать коробку необычной.
+  components:
+  - type: BallisticAmmoProvider
+    proto: ShellShotgunBreaching
+  - type: Sprite
+    layers:
+    - state: base
+      map: ["enum.GunVisualLayers.Base"]
+    - state: mag-1
+      map: ["enum.GunVisualLayers.Mag"]
+    - state: lethal # TODO: resprite the box (i dont feel like it right now)

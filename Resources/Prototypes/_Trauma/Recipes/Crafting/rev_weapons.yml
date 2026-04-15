@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2026 Space Station 14 Contributors
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 - type: construction
   id: RevLiberator
   graph: RevGuns
@@ -39,6 +43,18 @@
   graph: RevGuns
   startNode: start
   targetNode: Flamethrower
+  category: construction-category-antagonist
+  objectType: Item
+  entityWhitelist:
+    components:
+    - HeadRevolutionary
+    - Revolutionary
+
+- type: construction
+  id: Devastator
+  graph: RevGuns
+  startNode: start
+  targetNode: Devastator
   category: construction-category-antagonist
   objectType: Item
   entityWhitelist:

@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2026 Space Station 14 Contributors
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 - type: construction
   id: SheetPaper
   graph: SheetPaper
@@ -5,3 +9,15 @@
   targetNode: paper sheet
   category: construction-category-materials
   objectType: Item
+
+- type: construction
+  id: PowerArmorStand
+  graph: PowerArmorStand
+  startNode: start
+  targetNode: PowerArmorStand
+  category: construction-category-antagonist
+  objectType: Item
+  entityWhitelist:
+    components:
+    - HeadRevolutionary
+    - Revolutionary

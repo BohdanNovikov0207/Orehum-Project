@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2026 Space Station 14 Contributors
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 - type: latheRecipePack
   id: RevForgeStatic
   recipes:
@@ -66,6 +70,9 @@
   - RevTurretBullet
   - RevPistolBullet
   - RevRifleBullet
+  - RevBuckShell
+  - RevSlugShell
+  - RevBreachShell
 
 - type: latheRecipePack
   id: RevMicroElectronicsStatic
@@ -76,6 +83,7 @@
   - RevHeadset
   - RevVisor
   - PinpointerCommand
+  - FusionCore
 
 - type: latheRecipePack
   id: RevClothingStatic
@@ -106,3 +114,9 @@
   - RevEngineParts
   # - Needs more eventually
   - RevEmptyFuelTank
+  - T45Helmet
+  - T45Chest
+  - T45ArmL
+  - T45ArmR
+  - T45LegL
+  - T45LegR
