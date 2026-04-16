@@ -41,6 +41,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Corvax.Interfaces.Shared;
 using Content.Client.Gameplay;
 using Content.Client.UserInterface.Controls;
 using Content.Client.UserInterface.Systems.Guidebook;
@@ -91,6 +92,8 @@ public sealed class EscapeUIController : UIController, IOnStateEntered<GameplayS
     [Dependency] private readonly JobRequirementsManager _requirements = default!;
     [Dependency] private readonly MarkingManager _markings = default!;
     [UISystemDependency] private readonly GuidebookSystem? _guide = default!;
+
+    [Dependency] private readonly ISharedSponsorsManager _clientSponsorsManager = default!; // sponsor
 
     private Options.UI.EscapeMenu? _escapeWindow;
     // Goobstation - Character customization in escape menu
@@ -267,7 +270,8 @@ public sealed class EscapeUIController : UIController, IOnStateEntered<GameplayS
             _prototypeManager,
             _resourceCache,
             _requirements,
-            _markings);
+            _markings,
+            _clientSponsorsManager);
 
         if (_guide != null)
             _profileEditor.OnOpenGuidebook += _guide.OpenHelp;
