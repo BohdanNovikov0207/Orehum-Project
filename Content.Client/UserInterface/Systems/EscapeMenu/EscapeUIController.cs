@@ -68,7 +68,6 @@ using Content.Shared.Preferences;
 using Content.Client.Guidebook;
 using Content.Client.Lobby.UI;
 using Content.Client.Players.PlayTimeTracking;
-﻿using Content.Corvax.Interfaces.Server;
 using Content.Corvax.Interfaces.Shared;
 
 namespace Content.Client.UserInterface.Systems.EscapeMenu;
