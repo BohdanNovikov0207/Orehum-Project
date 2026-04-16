@@ -1911,6 +1911,8 @@
   description: Cousins to the sentient race of lizard people, kobolds blend in with their natural habitat and are as nasty as monkeys; ready to pull out your hair and stab you to death.
   abstract: true
   components:
+  - type: SpeedSliding
+    minSlideSpeed: 5
   - type: NameIdentifier
     group: Kobold
   - type: LizardAccent

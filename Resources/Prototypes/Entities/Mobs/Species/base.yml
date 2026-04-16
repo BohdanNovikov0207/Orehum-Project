@@ -509,6 +509,7 @@
   - type: MindControllable # Goobstation
   - type: VisibleContraband # Goobstation
   - type: MomentumSteering # Goobstation - No steer
+  - type: SpeedSliding
 
 - type: entity
   save: false

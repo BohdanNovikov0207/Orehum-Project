@@ -193,6 +193,9 @@
     spawned:
     - id: FoodMeatSlime
       amount: 5
+  - type: SpeedSliding
+    slideDistance: 6.5
+    slideSpeed: 2.5
   - type: Respirator
     damage:
       types:
