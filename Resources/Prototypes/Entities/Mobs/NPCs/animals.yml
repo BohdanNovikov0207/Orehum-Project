@@ -2182,7 +2182,6 @@
     - Mouse
     understands:
     - Mouse
-    - TauCetiBasic
   - type: Tag
     tags:
     - Trash
