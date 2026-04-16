@@ -268,7 +268,7 @@ public sealed class EscapeUIController : UIController, IOnStateEntered<GameplayS
             _prototypeManager,
             _resourceCache,
             _requirements,
-            _markings;
+            _markings,
             _clientSponsorsManager);
 
         if (_guide != null)
