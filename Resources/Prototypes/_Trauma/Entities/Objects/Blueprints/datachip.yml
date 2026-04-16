@@ -1,0 +1,49 @@
+- type: entity
+  parent: [ BaseItem ]
+  id: BaseBlueprintDatachip
+  abstract: true
+  name: чип данных
+  description: Чип данных. Его можно вставить в сборщик микроэлектроники для создания новых полезных технологий.
+  components:
+  - type: Sprite
+    sprite: _Trauma/Objects/Revs/datachip.rsi
+    state: icon
+  - type: Tag
+    tags:
+    - DataChip
+
+- type: entity
+  parent: BaseBlueprintDatachip
+  id: DataChipAIBoard
+  name: чип данных (плата перегрузки ИИ)
+  components:
+  - type: Blueprint
+    providedRecipes:
+    - RevCircuitBoard
+
+- type: entity
+  parent: BaseBlueprintDatachip
+  id: DataChipReflectivePlate
+  name: чип данных (зеркальное покрытие)
+  components:
+  - type: Blueprint
+    providedRecipes:
+    - RevReflectivePlate
+
+- type: entity
+  parent: BaseBlueprintDatachip
+  id: DataChipFakeMindshield
+  name: чип данных (фальшивый чип защиты разума)
+  components:
+  - type: Blueprint
+    providedRecipes:
+    - FakeMindShieldImplanterRev
+
+- type: entity
+  parent: BaseBlueprintDatachip
+  id: DataChipShieldRipper
+  name: чип данных (извлекатель чипов защиты разума)
+  components:
+  - type: Blueprint
+    providedRecipes:
+    - RevShieldRipper

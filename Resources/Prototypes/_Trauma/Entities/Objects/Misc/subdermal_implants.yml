@@ -1,0 +1,10 @@
+- type: entity
+  parent: BaseSubdermalImplant
+  id: HellRipImplant
+  name: имплант «Адский разрыв»
+  description: Этот имплант позволяет пользователю выполнять различные приемы в стиле «Адский разрыв».
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: ComponentsImplant
+    added:
+    # - type: GrantHellRip

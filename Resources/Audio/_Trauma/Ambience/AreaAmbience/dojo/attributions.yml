@@ -1,0 +1,8 @@
+# SPDX-FileCopyrightText: 2026 Space Station 14 Contributors
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+- files: ["dojoambi.ogg"]
+  license: "CC-BY-NC-SA-3.0"
+  copyright: "Taken from goonstation"
+  source: "https://github.com/goonstation/goonstation/tree/a031671daf2bd88020a83f85130ce9915d0cd0d6/sound/ambience/dojo"

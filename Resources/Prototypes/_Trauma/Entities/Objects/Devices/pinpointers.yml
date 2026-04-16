@@ -1,0 +1,21 @@
+- type: entity
+  name: командный пинпоинтер
+  description: Ручное устройство слежения, которое указывает направление на ближайшего члена командного состава.
+  id: PinpointerCommand
+  parent: [PinpointerBase]
+  components:
+  - type: Sprite
+    layers:
+    - state: pinpointer_thief
+      map: ["enum.PinpointerLayers.Base"]
+    - state: pinonnull
+      map: ["enum.PinpointerLayers.Screen"]
+      shader: unshaded
+      visible: false
+  - type: Icon
+    state: pinpointer_thief
+  - type: Pinpointer
+    targetName: command staff
+    whitelist:
+      components:
+      - CommandStaff

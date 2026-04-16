@@ -1,0 +1,12 @@
+- type: entity
+  parent: [ClothingHeadsetAlt]
+  id: ClothingHeadsetRevolutionary
+  name: гарнитура революционеров
+  description: Модульная гарнитура с интеркомом. Имеет слоты для ключей шифрования и защищает от светошумовых гранат.
+  components:
+  - type: Sprite
+    sprite: _Trauma/Clothing/Ears/Headsets/revearpiece.rsi
+    state: icon
+  - type: Clothing
+    sprite: _Trauma/Clothing/Ears/Headsets/revearpiece.rsi
+  - type: FlashSoundSuppression

@@ -1,0 +1,19 @@
+# SPDX-FileCopyrightText: 2026 Space Station 14 Contributors
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+- type: entity
+  parent: [ BaseShellShotgun ]
+  id: ShellShotgunBreaching
+  name: патрон (12 калибр, пробиваемый)
+  description: Стандартный патрон, используемый в большинстве современных дробовиков. Патроны для пробивания предназначены для нанесения максимального урона таким конструкциям, как стены.
+  components:
+  - type: Sprite
+    sprite: _Trauma/Objects/Weapons/Guns/Ammunition/Casings/shotgun_shell.rsi
+    layers:
+    - state: breach
+      map: [ "enum.AmmoVisualLayers.Base" ]
+  - type: CartridgeAmmo
+    proto: PelletShotgunBreachingSpread
+  - type: SpentAmmoVisuals
+    state: "breach"

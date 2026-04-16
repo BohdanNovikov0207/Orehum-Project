@@ -114,6 +114,7 @@ using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
 using Content.Goobstation.Maths.FixedPoint;
 using Content.Goobstation.Shared.Mind.Components;
+using System.Text.RegularExpressions;
 
 namespace Content.Server.GameTicking
 {
@@ -734,11 +735,32 @@ namespace Content.Server.GameTicking
                     return;
 
                 var duration = RoundDuration();
+                var gamemodeTitle = CurrentPreset != null ? Loc.GetString(CurrentPreset.ModeTitle) : string.Empty;
+
+                var textEv = new RoundEndTextAppendEvent();
+                RaiseLocalEvent(textEv);
+
+                var manifest = Regex.Replace(textEv.Text, @"\[/\.*?\]", "");
+                manifest = Regex.Replace(manifest, @"\[.*?\]", "");
+
                 var content = Loc.GetString("discord-round-notifications-end",
                     ("id", RoundId),
                     ("hours", Math.Truncate(duration.TotalHours)),
                     ("minutes", duration.Minutes),
-                    ("seconds", duration.Seconds));
+                    ("seconds", duration.Seconds),
+                    ("gamemode", gamemodeTitle),
+                    ("manifest", manifest));
+
+                if (textEv.Text == String.Empty)
+                {
+                    content = Loc.GetString("discord-round-notifications-end-no-manifest",
+                        ("id", RoundId),
+                        ("hours", Math.Truncate(duration.TotalHours)),
+                        ("minutes", duration.Minutes),
+                        ("seconds", duration.Seconds),
+                        ("gamemode", gamemodeTitle));
+                }
+
                 var payload = new WebhookPayload { Content = content };
 
                 await _discord.CreateMessage(_webhookIdentifier.Value, payload);

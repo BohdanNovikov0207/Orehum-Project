@@ -84,7 +84,7 @@ public sealed class SharedTailLashSystem : EntitySystem
         intersect = intersect.Concat(_physics.IntersectRayWithPredicate(transform.MapID, rightRay, range, Ignored, false));
         var results = intersect.Select(r => r.HitEntity).ToHashSet();
 
-        _interaction.DoContactInteraction(uid, uid);
+        _interaction.DoContactInteraction(uid, uid, null, true);
 
         var hitEntities = results.Where(result => _interaction.InRangeUnobstructed(uid, result, range: range)).ToList();
         var hitEvent = new MeleeHitEvent(hitEntities, uid, uid, component.TailDamage, null, args.Target);
@@ -92,7 +92,7 @@ public sealed class SharedTailLashSystem : EntitySystem
 
         foreach (var hit in hitEntities)
         {
-            _interaction.DoContactInteraction(uid, hit);
+            _interaction.DoContactInteraction(uid, hit, null, true);
 
             var attackedEv = new AttackedEvent(uid, hit, args.Target);
             RaiseLocalEvent(hit, attackedEv);

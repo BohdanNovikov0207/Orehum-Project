@@ -1,0 +1,5 @@
+- type: entity
+  parent: [ ClothingHeadBandBase, ClothingMaskBandRev ]
+  id: ClothingHeadBandRev
+  name: темно-зеленая бандана
+  suffix: Headband

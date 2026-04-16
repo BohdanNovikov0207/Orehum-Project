@@ -57,6 +57,7 @@
 
 using Content.Goobstation.Common.Solutions;
 using Content.Shared.Chemistry.Components;
+using Content.Shared._Adventure.Bartender.Systems; // Adventure
 using Content.Shared.Chemistry.EntitySystems;
 using Content.Shared.Chemistry.Reaction;
 using Content.Shared.Chemistry;
@@ -70,11 +71,14 @@ using Content.Shared.Spillable;
 using Content.Shared.Throwing;
 using Content.Shared.Weapons.Melee.Events;
 using Robust.Shared.Player;
+using Robust.Shared.Physics.Systems; // Adventure
 
 namespace Content.Server.Fluids.EntitySystems;
 
 public sealed partial class PuddleSystem
 {
+    [Dependency] private readonly SharedPhysicsSystem _physics = default!; // Adventure
+    [Dependency] private readonly SpillProofThrowerSystem _nonspillthrower = default!; // Adventure
     protected override void InitializeSpillable()
     {
         base.InitializeSpillable();
@@ -175,7 +179,17 @@ public sealed partial class PuddleSystem
 
         if (args.User != null)
         {
+
+            // Adventure start
+            if (_nonspillthrower.GetSpillProofThrow(args.User.Value))
+            {
+                _physics.SetAngularVelocity(entity, 0);
+                Transform(entity).LocalRotation = Angle.Zero;
+                return;
+            }
+            // Adventure end
             _adminLogger.Add(LogType.Landed,
+
                 $"{ToPrettyString(entity.Owner):entity} spilled a solution {SharedSolutionContainerSystem.ToPrettyString(solution):solution} on landing");
         }
 

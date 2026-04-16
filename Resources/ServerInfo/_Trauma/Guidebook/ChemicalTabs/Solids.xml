@@ -1,0 +1,130 @@
+<!--
+SPDX-FileCopyrightText: 2024 f0x-n3rd <150924715+f0x-n3rd@users.noreply.github.com>
+SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
+
+SPDX-License-Identifier: MIT
+-->
+
+<Document>
+
+# Твердые вещества
+
+Здесь представлены рецепты твердых предметов, создаваемых с помощью химии.
+
+## Алоэ-крем
+  <Box>
+    <GuideEntityEmbed Entity="FoodAloe" Caption="Сырое алоэ"/>
+    <GuideEntityEmbed Entity="AloeCream" Caption="Алоэ-крем"/>
+  </Box>
+
+Алоэ-крем можно приготовить, разогрев сырое алоэ в микроволновке в течение 10 секунд.
+
+## Кристаллы
+  <Box>
+    <GuideEntityEmbed Entity="ShardCrystalBlue" Caption="Кристалл"/>
+  </Box>
+
+Кристалл можно создать, смешав следующие ингредиенты:
+- 15 Сахар (Sugar)
+- 15 Вода (Water)
+- 5 Этанол (Ethanol)
+
+## ЭМИ
+  <Box>
+    <GuideEntityEmbed Entity="EmpGrenade" Caption="ЭМИ"/>
+  </Box>
+
+Электромагнитный импульс можно создать, смешав следующие ингредиенты:
+- 1 Уран (Uranium)
+- 1 Железо (Iron)
+- 1 Алюминий (Aluminum)
+
+## Пена
+  <Box>
+    <GuideEntityEmbed Entity="CleanerGrenade" Caption="Пена"/>
+  </Box>
+
+Облако пены можно создать, смешав следующие ингредиенты:
+- 1 Вода (Water)
+- 1 Фторсурфактант (Fluorosurfactant)
+
+Пена работает так же, как и дым, удерживая химикаты в пределах объема, с которым она была создана.
+
+## Порох
+  <Box>
+    <GuideEntityEmbed Entity="MaterialGunpowder" Caption="Порох"/>
+  </Box>
+
+Порох можно создать, смешав следующие ингредиенты:
+- 6 Калий (Potassium)
+- 2 Сера (Sulfur)
+- 2 Древесный уголь (Charcoal)
+
+## Пластик
+  <Box>
+    <GuideEntityEmbed Entity="SheetPlastic" Caption="Листы пластика"/>
+  </Box>
+
+10 листов пластика можно создать, смешав следующие ингредиенты:
+- 10 Нефть (Oil)
+- 6 Зола (Ash)
+- 4 Серная кислота (Sulfuric Acid)
+- Нагрев раствор до 374 градусов
+
+## Регенеративная сетка
+  <Box>
+    <GuideEntityEmbed Entity="RegenerativeMesh" Caption="Сетка"/>
+  </Box>
+
+Сетки можно создать, разогрев в микроволновке следующие ингредиенты в течение 10 секунд:
+
+  <Box>
+    <GuideEntityEmbed Entity="FoodAloe" Caption="Сырое алоэ"/>
+    <GuideEntityEmbed Entity="Ointment" Caption="Мазь"/>
+    <GuideEntityEmbed Entity="MaterialCloth" Caption="Ткань"/>
+  </Box>
+
+- 1 Сырое алоэ
+- 1 Мазь
+- 1 Ткань
+- 20 единиц Сигината (Sigynate)
+- 20 единиц Дермалина (Dermaline)
+
+
+## Дым
+  <Box>
+    <GuideEntityEmbed Entity="SmokeGrenade" Caption="Дым"/>
+  </Box>
+
+Облако дыма можно создать, смешав следующие ингредиенты:
+- 1 Сахар (Sugar)
+- 1 Калий (Potassium)
+- 1 Фосфор (Phosphorus)
+
+Дым переносит любые дополнительные химикаты, находившиеся в реакционной среде, в объеме, пропорциональном количеству созданного дыма. Например:
+
+Смесь 5-5-5 может переносить 5 единиц мутагена и передавать его любому, кто войдет в облако дыма.
+
+## Шовный материал
+  <Box>
+    <GuideEntityEmbed Entity="MedicatedSuture" Caption="Шов"/>
+  </Box>
+
+Шовные материалы можно создать, разогрев в микроволновке следующие ингредиенты в течение 10 секунд:
+
+  <Box>
+    <GuideEntityEmbed Entity="FoodPoppy" Caption="Мак"/>
+    <GuideEntityEmbed Entity="MaterialCloth" Caption="Ткань"/>
+    <GuideEntityEmbed Entity="Brutepack" Caption="Набор для лечения ушибов"/>
+  </Box>
+
+- 1 Мак
+- 1 Набор для лечения ушибов (Brute Pack)
+- 1 Ткань
+- 20 единиц Транексамовой кислоты (Tranexamic Acid)
+- 20 единиц Криптобиолина (Cryptobiolin)
+
+
+<GuideReagentGroupEmbed Group="Solids"/>
+
+</Document>

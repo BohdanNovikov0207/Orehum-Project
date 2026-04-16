@@ -57,6 +57,7 @@ public sealed class ExaminableCharacterSystem : EntitySystem
         var cansee = Loc.GetString(canseeloc, ("ent", uid));
         logLines.Add($"[color=DarkGray][font size=10]{cansee}[/font][/color]");
 
+        /*
         var slotLabels = new Dictionary<string, string>
         {
             { "head", "head-" },
@@ -115,6 +116,7 @@ public sealed class ExaminableCharacterSystem : EntitySystem
             var canseenothing = Loc.GetString(canseenothingloc, ("ent", uid));
             logLines.Add($"[color=DarkGray][font size=10]{canseenothing}[/font][/color]");
         }
+        */
 
         FormattedMessage message = new();
         message.PushTag(new MarkupNode("examineborder", null, null)); // border
