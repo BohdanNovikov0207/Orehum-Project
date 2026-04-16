@@ -90,6 +90,7 @@ public sealed class EscapeUIController : UIController, IOnStateEntered<GameplayS
     [Dependency] private readonly IUriOpener _uri = default!;
     [Dependency] private readonly JobRequirementsManager _requirements = default!;
     [Dependency] private readonly MarkingManager _markings = default!;
+    [Dependency] private readonly ISharedSponsorsManager _clientSponsorsManager = default!; // sponsor
     [UISystemDependency] private readonly GuidebookSystem? _guide = default!;
 
     private Options.UI.EscapeMenu? _escapeWindow;
@@ -267,7 +268,8 @@ public sealed class EscapeUIController : UIController, IOnStateEntered<GameplayS
             _prototypeManager,
             _resourceCache,
             _requirements,
-            _markings);
+            _markings;
+            _clientSponsorsManager);
 
         if (_guide != null)
             _profileEditor.OnOpenGuidebook += _guide.OpenHelp;
