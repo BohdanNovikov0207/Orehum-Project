@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Goob Station Contributors
+//
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
@@ -13,5 +17,14 @@ public sealed partial class ProjectileImmunityComponent : Component
     [DataField, AutoNetworkedField]
     public EntProtoId? DodgeEffect;
 
+    [DataField, AutoNetworkedField]
+    public float StaminaCostPerDodge;
+
+    [DataField, AutoNetworkedField]
+    public float BatteryCostPerDodge;
+
     public HashSet<EntityUid> DodgedEntities = new();
 }
+
+[ByRefEvent]
+public record struct ProjectileDodgeAttemptEvent(bool Cancelled = false);
