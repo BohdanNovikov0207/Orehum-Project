@@ -72,6 +72,7 @@ using Content.Client.Materials;
 using Content.Shared._DV.Salvage.Components; // DeltaV
 using Content.Shared._DV.Salvage.Systems; // DeltaV
 using Content.Client._Shitcode.Silo; // Goobstation
+using Content.Client.UserInterface.Controls;
 using Content.Shared.Lathe;
 using Content.Shared.Lathe.Prototypes;
 using Content.Shared.Research.Prototypes;
@@ -89,7 +90,7 @@ using Robust.Shared.Utility;
 namespace Content.Client.Lathe.UI;
 
 [GenerateTypedNameReferences]
-public sealed partial class LatheMenu : DefaultWindow
+public sealed partial class LatheMenu : FancyWindow
 {
     [Dependency] private readonly IEntityManager _entityManager = default!;
     [Dependency] private readonly IPlayerManager _player = default!; // DeltaV
@@ -145,6 +146,7 @@ public sealed partial class LatheMenu : DefaultWindow
     public void SetEntity(EntityUid uid)
     {
         Entity = uid;
+        this.SetInfoFromEntity(_entityManager, Entity);
 
         if (_entityManager.TryGetComponent<LatheComponent>(Entity, out var latheComponent))
         {
