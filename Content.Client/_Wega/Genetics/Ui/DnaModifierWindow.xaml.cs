@@ -312,7 +312,7 @@ public sealed partial class DnaModifierWindow : FancyWindow
 
         var foregroundStyleBoxOverride = (StyleBoxFlat)HealthBar.ForegroundStyleBoxOverride;
         foregroundStyleBoxOverride.BackgroundColor =
-            Color.FromHsv(new Robust.Shared.Maths.Vector4(finalHue, saturation, value, alpha));
+            Color.FromHsv(new Vector4(finalHue, saturation, value, alpha));
     }
 
     private void OnTabChanged(int tabIndex)

@@ -11,7 +11,7 @@ using Content.Server.Beam;
 using Content.Server.Body.Systems;
 using Content.Server.Chat.Systems;
 using Content.Server.Interaction;
-using Content.Server.Nutrition.EntitySystems;
+using Content.Shared.Nutrition.EntitySystems;
 using Content.Server.Polymorph.Systems;
 using Content.Server.Storage.EntitySystems;
 using Content.Server.Mind;

@@ -11,7 +11,7 @@
 using Content.Goobstation.Shared.Bible;
 using Content.Server.Body.Components;
 using Content.Server.Flash;
-using Content.Server.Flash.Components;
+using Content.Shared.Flash.Components;
 using Content.Server.Speech.Components;
 using Content.Server.Storage.Components;
 using Content.Server.Store.Components;

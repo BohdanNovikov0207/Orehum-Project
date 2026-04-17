@@ -92,7 +92,6 @@ namespace Content.Server.Bible
 
             SubscribeLocalEvent<BibleComponent, AfterInteractEvent>(OnAfterInteract);
             SubscribeLocalEvent<BibleComponent, EntGotInsertedIntoContainerMessage>(OnInsertedContainer);
-            SubscribeLocalEvent<BibleUserComponent, ComponentInit>(ViewFracture);
             SubscribeLocalEvent<SummonableComponent, GetVerbsEvent<AlternativeVerb>>(AddSummonVerb);
             SubscribeLocalEvent<SummonableComponent, GetItemActionsEvent>(GetSummonAction);
             SubscribeLocalEvent<SummonableComponent, SummonActionEvent>(OnSummon);
