@@ -37,7 +37,6 @@ using Content.Shared.Mobs;
 using Content.Shared.Mobs.Systems;
 using Content.Shared.Popups;
 using Content.Shared.Prayer;
-using Content.Shared.StatusEffect;
 using Content.Shared.Stealth.Components;
 using Content.Shared.Stunnable;
 using Content.Shared.Vampire;
@@ -61,6 +60,7 @@ public sealed partial class VampireSystem : EntitySystem
 {
     [Dependency] private readonly MindSystem _mind = default!;
     [Dependency] private readonly IAdminLogManager _admin = default!;
+    [Dependency] private readonly IngestionSystem _ingestion = default!;
     [Dependency] private readonly FoodSystem _food = default!;
     [Dependency] private readonly EntityStorageSystem _entityStorage = default!;
     [Dependency] private readonly BloodstreamSystem _blood = default!;
@@ -82,7 +82,7 @@ public sealed partial class VampireSystem : EntitySystem
     [Dependency] private readonly SharedBodySystem _body = default!;
     [Dependency] private readonly SharedSolutionContainerSystem _solution = default!;
     [Dependency] private readonly SharedStunSystem _stun = default!;
-    [Dependency] private readonly SharedStatusEffectsSystem _statusEffects = default!;
+    [Dependency] private readonly StatusEffectsSystem _statusEffects = default!;
     [Dependency] private readonly DamageableSystem _damageableSystem = default!;
     [Dependency] private readonly MobThresholdSystem _mobThreshold = default!;
     [Dependency] private readonly MobStateSystem _mobState = default!;
@@ -179,7 +179,7 @@ public sealed partial class VampireSystem : EntitySystem
 
     private void OnExamined(EntityUid uid, VampireComponent component, ExaminedEvent args)
     {
-        if (HasComp<VampireFangsExtendedComponent>(uid) && args.IsInDetailsRange && !_food.IsMouthBlocked(uid))
+        if (HasComp<VampireFangsExtendedComponent>(uid) && args.IsInDetailsRange && !_ingestion.HasMouthAvailable(uid, uid))
             args.AddMarkup($"{Loc.GetString("vampire-fangs-extended-examine")}{Environment.NewLine}");
     }
 
@@ -259,7 +259,7 @@ public sealed partial class VampireSystem : EntitySystem
             if (!TryComp(uid, out ActionsComponent? comp))
                 return;
 
-            _action.RemoveAction(uid, entity, comp);
+            _action.RemoveAction((uid, comp), entity);
             _actionContainer.RemoveAction(entity);
             _actionEntities.Remove(VampireComponent.MutationsActionPrototype);
         }
@@ -283,7 +283,7 @@ public sealed partial class VampireSystem : EntitySystem
             if (!TryComp(uid, out ActionsComponent? comp))
                 return;
 
-            _action.RemoveAction(uid, entity, comp);
+            _action.RemoveAction((uid, comp), entity);
             _actionContainer.RemoveAction(entity);
             _actionEntities.Remove("ActionVampireBloodSteal");
         }
@@ -305,7 +305,7 @@ public sealed partial class VampireSystem : EntitySystem
             if (!TryComp(uid, out ActionsComponent? comp))
                 return;
 
-            _action.RemoveAction(uid, entity, comp);
+            _action.RemoveAction((uid, comp), entity);
             _actionContainer.RemoveAction(entity);
             _actionEntities.Remove("ActionVampireScreech");
         }
@@ -332,7 +332,7 @@ public sealed partial class VampireSystem : EntitySystem
             if (!TryComp(uid, out ActionsComponent? comp))
                 return;
 
-            _action.RemoveAction(uid, entity, comp);
+            _action.RemoveAction((uid, comp), entity);
             _actionContainer.RemoveAction(entity);
             _actionEntities.Remove("ActionVampireGlare");
         }
@@ -354,7 +354,7 @@ public sealed partial class VampireSystem : EntitySystem
             if (!TryComp(uid, out ActionsComponent? comp))
                 return;
 
-            _action.RemoveAction(uid, entity, comp);
+            _action.RemoveAction((uid, comp), entity);
             _actionContainer.RemoveAction(entity);
             _actionEntities.Remove("ActionVampireCloakOfDarkness");
         }
@@ -398,7 +398,7 @@ public sealed partial class VampireSystem : EntitySystem
             if (!TryComp(uid, out ActionsComponent? comp))
                 return;
 
-            _action.RemoveAction(uid, entity, comp);
+            _action.RemoveAction((uid, comp), entity);
             _actionContainer.RemoveAction(entity);
             _actionEntities.Remove("ActionVampireBatform");
         }
@@ -420,7 +420,7 @@ public sealed partial class VampireSystem : EntitySystem
             if (!TryComp(uid, out ActionsComponent? comp))
                 return;
 
-            _action.RemoveAction(uid, entity, comp);
+            _action.RemoveAction((uid, comp), entity);
             _actionContainer.RemoveAction(entity);
             _actionEntities.Remove("ActionVampireMouseform");
         }

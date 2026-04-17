@@ -7,6 +7,7 @@
 using Content.Server.Atmos.Components;
 using Content.Server.Body.Components;
 using Content.Server.Temperature.Components;
+using Content.Shared.Actions.Components;
 using Content.Shared.Actions;
 using Content.Shared.Atmos;
 using Content.Shared.Atmos.Rotting;
