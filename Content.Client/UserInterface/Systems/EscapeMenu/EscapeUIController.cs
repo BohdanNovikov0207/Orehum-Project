@@ -41,6 +41,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Corvax.Interfaces.Shared;
 using Content.Client.Gameplay;
 using Content.Client.UserInterface.Controls;
 using Content.Client.UserInterface.Systems.Guidebook;
@@ -68,7 +69,6 @@ using Content.Shared.Preferences;
 using Content.Client.Guidebook;
 using Content.Client.Lobby.UI;
 using Content.Client.Players.PlayTimeTracking;
-using Content.Corvax.Interfaces.Shared;
 
 namespace Content.Client.UserInterface.Systems.EscapeMenu;
 
@@ -91,8 +91,9 @@ public sealed class EscapeUIController : UIController, IOnStateEntered<GameplayS
     [Dependency] private readonly IUriOpener _uri = default!;
     [Dependency] private readonly JobRequirementsManager _requirements = default!;
     [Dependency] private readonly MarkingManager _markings = default!;
-    [Dependency] private readonly ISharedSponsorsManager _clientSponsorsManager = default!; // sponsor
     [UISystemDependency] private readonly GuidebookSystem? _guide = default!;
+
+    [Dependency] private readonly ISharedSponsorsManager _clientSponsorsManager = default!; // sponsor
 
     private Options.UI.EscapeMenu? _escapeWindow;
     // Goobstation - Character customization in escape menu

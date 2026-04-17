@@ -54,6 +54,7 @@ using Content.Shared.Popups;
 using Content.Shared.Timing;
 using Content.Shared.Verbs;
 using Robust.Shared.Audio.Systems;
+using Robust.Shared.Map;
 using Robust.Shared.Player;
 using Robust.Shared.Random;
 
@@ -190,6 +191,11 @@ namespace Content.Server.Bible
 
                 var selfMessage = Loc.GetString(component.LocPrefix + "-heal-success-none-self", ("target", Identity.Entity(args.Target.Value, EntityManager)), ("bible", uid));
                 _popupSystem.PopupEntity(selfMessage, args.User, args.User, PopupType.Large);
+                _audio.PlayPvs(component.HealSoundPath, args.User);
+                _delay.TryResetDelay((uid, useDelay));
+
+                if (component.HealingLightEffect.HasValue)
+                    Spawn(component.HealingLightEffect.Value, new EntityCoordinates(args.Target.Value, default));
             }
             else
             {

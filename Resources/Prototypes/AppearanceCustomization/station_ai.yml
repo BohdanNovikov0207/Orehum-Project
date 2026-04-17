@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2026 Space Station 14 Contributors
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 # Groups
 - type: stationAiCustomizationGroup
   id: StationAiCoreIconography
@@ -15,10 +19,8 @@
   - StationAiIconFirewall
   - StationAiIconDatabase
   - StationAiIconGlitchman
-  - StationAiIconHades
   - StationAiIconMatrix
   - StationAiIconMonochrome
-  - StationAiIconMurica
   - StationAiIconNanotrasen
   - StationAiIconPresident
   - StationAiIconRedDot
@@ -29,7 +31,6 @@
   - StationAiIconHelios
   - StationAiIconHouse
   - StationAiIconRainbow
-  - StationAiIconAlien
   - StationAiIconGoon
   - StationAiIconWeird
   - StationAiIconInverted
@@ -47,6 +48,24 @@
   - StationAiHologramDog
   - StationAiHologramKobold
   - StationAiHologramMonkey
+  - StationAiHologramHorror
+  - StationAiHologramXenomorphQueen
+  - StationAiHologramAngel
+  - StationAiHologramBorb
+  - StationAiHologramCloudkat
+  - StationAiHologramPhoenix
+  - StationAiHologramAlgalone
+  - StationAiHologramFractalsnowflake
+  - StationAiHologramHensonsnode
+  - StationAiHologramLongrun
+  - StationAiHologramNtpaint
+  - StationAiHologramPuredata
+  - StationAiHologramRorschach
+  - StationAiHologramSeraphim
+  - StationAiHologramTripleaffirmative
+  # Orion-End
+#  - StationAiHologramKobold # Orion-Edit: Already have it
+#  - StationAiHologramMonkey # Orion-Edit: Already have it
   - StationAiHologramScurret # goob
 
 # Iconography

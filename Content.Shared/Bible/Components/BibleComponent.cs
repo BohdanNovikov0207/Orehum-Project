@@ -76,5 +76,9 @@ namespace Content.Goobstation.Shared.Bible // Death to serverside components. Gl
         [DataField]
         public TimeSpan SmiteStunDuration = TimeSpan.FromSeconds(8);
 
+        /// A short light effect to display when successfully healing someone
+        /// </summary>
+        [DataField]
+        public EntProtoId? HealingLightEffect = "HolyLightEffect";
     }
 }
