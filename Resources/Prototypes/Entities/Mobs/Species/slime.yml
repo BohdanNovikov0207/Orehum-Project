@@ -132,6 +132,7 @@
   - type: Damageable
     damageContainer: Biological
     damageModifierSet: Slime
+  - type: Geras # ADT-tweak
 #  - type: PassiveDamage # Around 8 damage a minute healed
 #    allowedStates:
 #    - Alive
