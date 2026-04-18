@@ -1,51 +1,50 @@
 <Document>
-  # Vampiro
-  
+  # Вампиры
+
   <Box>
-    [color=#999999][italic]"Vampiro das sombras, sugando todo o seu sangue."[/italic][/color]
+    [color=#999999][italic]"Вампир из теней, выпивающий всю твою кровь до капли."[/italic][/color]
   </Box>
 
-  Você é apenas um vampiro comum. Você e seus colegas se infiltraram na estação disfarçados de funcionários para ganhar força e poder para sobreviver. Você está dominado por [color=#eb4034]sede de sangue[/color].
+  Вы — обычный вампир. Вы и ваши сородичи проникли на станцию под видом сотрудников, чтобы обрести силу и власть, необходимые для выживания. Вами движет [color=#eb4034]жажда крови[/color].
 
-  Sua tarefa é absorver o máximo de sangue possível sem ferir gravemente a tripulação. Pois é assim que você se revela. Você possui mutações em seu arsenal que podem ativar uma variedade de habilidades diferentes.
+  Ваша задача — поглотить как можно больше крови, стараясь при этом не калечить экипаж слишком сильно, чтобы не выдать себя раньше времени. В вашем арсенале есть мутации, открывающие доступ к различным способностям.
 
-  ## Mutações
-  
-  Mutações permitem que um vampiro adquira habilidades. A seleção de mutação é aberta ao drenar 100 de sangue. Atualmente existem apenas 4 mutações representadas:
-  
-  [bold]Hemomante[/bold]
-   - Foca em magia de sangue e manipulação do sangue ao redor.
-   - Habilidades:
-   - Grito (200 sangue)
-   - Roubo de Sangue (300 sangue)
-   
-  [bold]Sombra[/bold]
-  - Foca em escuridão, furtividade, mobilidade.
-  - Habilidades:
-  - Ofuscamento (200 sangue)
-  - Manto das Sombras (300 sangue)
-  
-  [bold]Gargantua[/bold]
-  - Foca em dano corpo a corpo e resistência.
-  - Habilidades:
-  - Força Profana (200 sangue)
-  - Força Sobrenatural (300 sangue)
-  
-  [bold]Bestia[/bold]
-  - Foca em transformação e coleta de troféus.
-  - Habilidades:
-  - Forma de Morcego (200 sangue)
-  - Forma de Rato (300 sangue)
+  ## Мутации
 
-  ## Clã Vampiro
+  Мутации позволяют вампиру приобретать новые умения. Выбор мутации открывается после того, как вы выпьете 100 единиц крови. На данный момент представлено 4 ветки развития:
 
-  Todos os vampiros da estação fazem parte do mesmo clã, os membros do [color=#FF0000]Clã Vampiro[/color] são capazes de se comunicar entre si telepaticamente atravéz de sua linhagem sanguinea de um ancestral comum, o que permite que eles compartilhem informações e estratégias em qualquer lugar da estação.
-  O prefixo para se comunicar é: +v
+  [bold]Гемомант[/bold]
+   - Специализируется на магии крови и манипулировании кровью вокруг себя.
+   - Способности:
+   - Визг (требуется 200 крови)
+   - Похищение крови (требуется 300 крови)
 
-  ## Sistema de Sangue
+  [bold]Тень[/bold]
+  - Специализируется на тьме, скрытности и мобильности.
+  - Способности:
+  - Ослепляющий взгляд (требуется 200 крови)
+  - Покров тьмы (требуется 300 крови)
 
-  Você provavelmente já se deparou com um momento ao escolher uma mutação.
-  Suas habilidades não aparecem, mas não é um bug!
-  As habilidades só aparecem em determinado nível de sangue, assim como desaparecem: se seu sangue estiver abaixo de 200 você perde todas as habilidades, se estiver abaixo de 300 você perde a última.
+  [bold]Гаргантюа[/bold]
+  - Специализируется на ближнем бое и стойкости.
+  - Способности:
+  - Нечестивая сила (требуется 200 крови)
+  - Сверхъестественная мощь (требуется 300 крови)
+
+  [bold]Бестия[/bold]
+  - Фокусируется на превращениях и сборе трофеев.
+  - Способности:
+  - Форма летучей мыши (требуется 200 крови)
+  - Форма мыши (требуется 300 крови)
+
+  ## Клан Вампиров
+
+  Все вампиры на станции принадлежат к одному клану. Члены [color=#FF0000]Клана Вампиров[/color] могут общаться друг с другом телепатически благодаря общей крови древнего предка. Это позволяет обмениваться информацией и координировать действия в любой точке станции.
+  Префикс для общения в канале клана: +v
+
+  ## Система крови
+
+  При выборе мутации вы можете столкнуться с тем, что способности не отображаются сразу. Это не баг!
+  Умения появляются и исчезают в зависимости от текущего уровня крови: если уровень крови падает ниже 200, вы теряете все способности; если ниже 300 — теряете вторую (самую сильную) способность.
 
 </Document>
