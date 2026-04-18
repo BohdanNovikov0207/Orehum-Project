@@ -1,0 +1,43 @@
+- type: entity
+  parent: [DrinkBottleVisualsAll, DrinkBottleGlassSmallBaseFull]
+  id: StrawberryBeer
+  name: бутылка пива
+  description: "Обычная бутылка пива. На этикетке аккуратным почерком выведено: «Вручено Strawberry»."
+  suffix: Эксклюзив
+  components:
+  - type: SolutionContainerManager
+    solutions:
+      drink:
+        reagents:
+        - ReagentId: Beer
+          Quantity: 15
+        - ReagentId: Stimulants
+          Quantity: 35
+  - type: Sprite
+    sprite: Objects/Consumable/Drinks/beer.rsi
+  - type: Openable
+    closeable: false
+  - type: Tag
+    tags:
+    - Beer
+
+- type: entity
+  parent: [DrinkBottleVisualsAll, DrinkBottleGlassSmallBaseFull]
+  id: Mor5hey97Beer
+  name: бутылка пива
+  description: "Обычная бутылка пива. На этикетке аккуратным почерком выведено: «Вручено Mor5hey97»."
+  suffix: Эксклюзив
+  components:
+  - type: SolutionContainerManager
+    solutions:
+      drink:
+        reagents:
+        - ReagentId: Omnizine
+          Quantity: 50
+  - type: Sprite
+    sprite: Objects/Consumable/Drinks/beer.rsi
+  - type: Openable
+    closeable: false
+  - type: Tag
+    tags:
+    - Beer
