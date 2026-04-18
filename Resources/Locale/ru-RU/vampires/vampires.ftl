@@ -1,4 +1,5 @@
 vampires-title = Вампиры
+metabolizer-type-vampire = Vampire
 
 vampire-fangs-extended-examine = Вы замечаете блеск [color=white]острых клыков[/color]
 vampire-fangs-extended = Вы обнажаете клыки

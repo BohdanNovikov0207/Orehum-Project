@@ -21,15 +21,6 @@
     lowest: MobMonkeyOni
 
 - type: entity
-  id: MobMonkeyDaengati
-  parent: MobMonkey
-  suffix: AI, Daengati
-  components: 
-  - type: DnaModifier
-    upper: MobDaengati
-    lowest: MobMonkeyDaengati
-
-- type: entity
   name: gray slime
   id: MobAdultSlimesGrey
   parent: MobAdultSlimes
@@ -54,7 +45,7 @@
   id: MobMouseRodentia
   parent: MobMouse
   suffix: AI, Rodentia
-  components: 
+  components:
   - type: MobThresholds
     thresholds:
       0: Alive
@@ -72,7 +63,7 @@
   id: MobMothroachMoth
   parent: MobMothroach
   suffix: AI, Moth
-  components: 
+  components:
   - type: MobThresholds
     thresholds:
       0: Alive
@@ -90,7 +81,7 @@
   id: MobCockroachChitinid
   parent: MobCockroach
   suffix: AI, Chitinid
-  components: 
+  components:
   - type: MobThresholds
     thresholds:
       0: Alive
@@ -108,7 +99,7 @@
   id: MobSquackroachHarpy
   parent: MobSquackroach
   suffix: AI, Harpy
-  components: 
+  components:
   - type: MobThresholds
     thresholds:
       0: Alive

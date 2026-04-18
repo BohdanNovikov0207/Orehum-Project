@@ -7,7 +7,7 @@ using Content.Shared.EntityEffects;
 using Robust.Shared.Prototypes;
 using JetBrains.Annotations;
 
-namespace Content.Server.Chemistry.ReagentEffects
+namespace Content.Shared._Wega.EntityEffects.ReagentEffects
 {
     [UsedImplicitly]
     public sealed partial class ChemMutateDna : EntityEffect

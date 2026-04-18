@@ -1,5 +1,9 @@
 # Errors
 loadout-group-species-restriction = Этот предмет недоступен для вашей текущей расы.
+
+loadout-group-genetics-envirohelm = экошлем генетика
+loadout-group-genetics-envirosuit = экокостюм генетика
+loadout-group-genetics-envirogloves = экоперчатчки генетика
 # Miscellaneous
 loadout-group-trinkets = Безделушки
 loadout-group-glasses = Очки
