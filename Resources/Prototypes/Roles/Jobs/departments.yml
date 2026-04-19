@@ -172,6 +172,8 @@
   color: "#334E6D"
   weight: -2 # WD EDIT
   roles:
+  - CommandMaid
+  - HecuOperative
   - Captain
   - ChiefEngineer
   - ChiefMedicalOfficer
@@ -191,8 +193,6 @@
   - ERTSecurity
   - ERTEngineer
   - DeathSquad
-  - HecuOperative
-  - CommandMaid # event-restricted, Goobstation
   primary: false
 
 - type: department
