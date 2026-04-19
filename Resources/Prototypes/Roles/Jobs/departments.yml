@@ -254,6 +254,7 @@
   name: department-Silicon
   description: department-Silicon-description
   color: "#D381C9"
+  weight: -15 # Trauma
   roles:
   - Borg
   - StationAi
@@ -263,7 +264,7 @@
   name: department-Specific
   description: department-Specific-description
   color: "#9FED58"
-  weight: 10
+  weight: 0 # Trauma - was 10
   roles:
   - RadioHost # Goobstation
   - Boxer

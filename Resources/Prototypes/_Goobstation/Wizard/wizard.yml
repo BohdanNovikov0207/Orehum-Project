@@ -41,6 +41,7 @@
     species:
     - Plasmaman
   guides: [ Wizard ]
+  creditImage: /Textures/_Trauma/EndCredits/Antags/wizard.png # Trauma
 
 - type: antag
   id: Apprentice
