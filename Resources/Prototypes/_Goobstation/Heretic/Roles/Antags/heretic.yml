@@ -29,9 +29,3 @@
   objective: roles-antag-ghoul-description
   guides: [ Heretics ]
   dontShowInCredits: True # Trauma
-
-- type: startingGear
-  id: Heretictmidround
-  storage:
-    back:
-    - Inkofimaginination
