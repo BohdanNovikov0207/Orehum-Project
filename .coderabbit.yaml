@@ -75,7 +75,7 @@ reviews:
     - path: ".agent/**"
       instructions: |
         Treat `.agent/` as the canonical source tree for repository rules and skills.
-        If rules or skills change here, matching bridges in `.agents/`, `.claude/`, `.cursor/`, and `.github/` must stay synchronized per the authoring policies.
+        If rules or skills change here, matching bridges in `.agents/` must stay synchronized per the authoring policies.
         Flag missing bridge updates and suggest running `pwsh ./.agents/rules/check-rule-bridges.ps1` and `pwsh ./.agents/skills/check-skill-bridges.ps1` when these files change.
     - path: ".agents/**"
       instructions: |
@@ -87,17 +87,11 @@ reviews:
       - mode: error
         name: "SS14 bridge sync"
         instructions: |
-          Fail if this PR changes any canonical rule or skill under `.agent/rules/` or `.agent/skills/` without updating every required bridge in `.agents/`, `.claude/`, `.cursor/`, and `.github/` in the same PR.
+          Fail if this PR changes any canonical rule or skill under `.agent/rules/` or `.agent/skills/` without updating every required bridge in `.agents/` in the same PR.
           Required rule bridges:
           - `.agents/rules/<same-file>.md`
-          - `.claude/rules/<same-file>.md`
-          - `.cursor/rules/<same-file>.md`
-          - `.github/rules/<same-file>.md`
           Required skill bridges:
           - `.agents/skills/<skill-name>/SKILL.md`
-          - `.claude/skills/<skill-name>/SKILL.md`
-          - `.cursor/skills/<skill-name>/SKILL.md`
-          - `.github/skills/<skill-name>/SKILL.md`
           Also fail if a changed bridge points to the wrong `.agent` source path or if synchronized trigger/name/description metadata diverges from the canonical source.
           Pass only if all changed canonical files and bridge files remain synchronized.
       - mode: error
