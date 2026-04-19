@@ -44,4 +44,4 @@
       - Mindcontrolled
   icon:
     sprite: /Textures/_Orehum/Interface/Misc/geass.rsi
-    state: Geass
+    state: geass
