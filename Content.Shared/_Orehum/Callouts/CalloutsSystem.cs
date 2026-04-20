@@ -64,8 +64,15 @@ public abstract class CalloutsSystem : EntitySystem
 
     private void TrySendOrders(EntityUid entity, List<LocId> listOrdersSays, EntProtoId effectOnAction)
     {
-        var random = new System.Random();
-        var selectedMessage = listOrdersSays[random.Next(0, listOrdersSays.Count - 1)];
+[Dependency] private readonly IRobustRandom _random = default!;
+[Dependency] private readonly IGameTiming _timing = default!;
+
+private void TrySendOrders(EntityUid entity, List<LocId> listOrdersSays, EntProtoId effectOnAction)
+{
+    if (!_timing.IsFirstTimePredicted)
+        return;
+
+    var selectedMessage = _random.Pick(listOrdersSays);
 
 private void TrySendOrders(EntityUid entity, List<LocId> listOrdersSays, EntProtoId effectOnAction)
 {
