@@ -67,7 +67,16 @@ public abstract class CalloutsSystem : EntitySystem
         var random = new System.Random();
         var selectedMessage = listOrdersSays[random.Next(0, listOrdersSays.Count - 1)];
 
+private void TrySendOrders(EntityUid entity, List<LocId> listOrdersSays, EntProtoId effectOnAction)
+{
+    if (!_timing.IsFirstTimePredicted)
+        return;
+
+    var selectedMessage = _random.Pick(listOrdersSays);
+
+    if (_net.IsServer)
         Spawn(effectOnAction, Transform(entity).Coordinates);
+}
 
         if (!TryGetHeadset(entity, out var headsetChannel))
         {
