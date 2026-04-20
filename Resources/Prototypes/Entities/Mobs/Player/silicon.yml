@@ -496,6 +496,7 @@
     layer: 2
   - type: Sprite
     sprite: Mobs/Silicon/station_ai.rsi
+    drawdepth: CyberspaceObjects # Orehum
     layers:
     - state: ai_camera
       shader: unshaded
