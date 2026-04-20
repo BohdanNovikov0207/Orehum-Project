@@ -275,7 +275,7 @@ namespace Content.Server.Voting.Managers
 
         private void SendSingleUpdate(VoteReg v, ICommonSession player)
         {
-            if (!player.Channel.IsConnected)
+            if (player.Channel.CurrentMtu == 0)
                 return;
 
             var msg = new MsgVoteData();
@@ -339,7 +339,7 @@ namespace Content.Server.Voting.Managers
 
         private void SendUpdateCanCallVote(ICommonSession player)
         {
-            if (!player.Channel.IsConnected)
+            if (player.Channel.CurrentMtu == 0)
                 return;
 
             var msg = new MsgVoteCanCall();
