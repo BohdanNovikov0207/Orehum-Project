@@ -34,7 +34,7 @@
           - MachineLayer
   - type: Sprite
     sprite: Mobs/Silicon/mothership_core.rsi
-    drawdepth: CyberspaceObjects
+    drawdepth: CyberspaceObjects # Orehum
     layers:
     - state: core-idle
       map: ["enum.LatheVisualLayers.IsRunning"]
