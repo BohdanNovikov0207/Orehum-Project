@@ -17455,3 +17455,11 @@ Entries:
       message: Укусы генокрадов имеют время перезарядки 1,5 секунды.
   id: 7349
   time: '2026-04-19T09:15:56.0000000+00:00'
+- author: IsNotAcceptable
+  changes:
+    - type: Add
+      message: '[Github] шаблон для coderabbitai'
+    - type: Tweak
+      message: '[Github] Читабельные лабели у ПРов'
+  id: 7350
+  time: '2026-04-20T15:42:51.0000000+00:00'
