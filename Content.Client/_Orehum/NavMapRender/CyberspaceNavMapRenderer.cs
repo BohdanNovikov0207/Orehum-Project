@@ -67,6 +67,7 @@ internal sealed class CyberspaceNavMapRenderer(IPrototypeManager proto)
         handle.SetTransform(transform);
         DrawNavMap(handle);
         handle.UseShader(null);
+        handle.SetTransform(Matrix3x2.Identity);
     }
 
     private void DrawNavMap(DrawingHandleWorld handle)
