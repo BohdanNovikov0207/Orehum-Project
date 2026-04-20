@@ -2,7 +2,6 @@ using Content.Server.Actions;
 using Content.Server.Chat.Systems;
 using Content.Shared.Inventory;
 using Content.Shared.Whitelist;
-using Content.Shared._RMC14.Marines.Announce;
 using Content.Shared._Orehum.Callouts;
 using Robust.Shared.Random;
 
@@ -12,10 +11,6 @@ public sealed class MCMarineOrdersSystem : CalloutsSystem
 {
     [Dependency] private readonly ActionsSystem _actions = default!;
     [Dependency] private readonly ChatSystem _chat = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly SharedMarineAnnounceSystem _marineAnnounce = default!;
-    [Dependency] private readonly InventorySystem _inventory = default!;
-    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
 
     public override void Initialize()
     {
