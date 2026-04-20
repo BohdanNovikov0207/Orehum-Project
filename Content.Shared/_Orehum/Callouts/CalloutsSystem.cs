@@ -91,21 +91,7 @@ public abstract class CalloutsSystem : EntitySystem
     {
         channel = default;
 
-        var hasHeadset = false;
-        var slots = _inventory.GetSlotEnumerator(entity);
-        while (slots.MoveNext(out var slot))
-        {
-            if (slot.ContainedEntity is not { } contained)
-                continue;
-
-            if (slot.ID != "ears")
-                continue;
-
-            hasHeadset = true;
-            break;
-        }
-
-        if (!hasHeadset)
+        if (!_inventory.TryGetSlotEntity(entity, "ears", out var headsetEntity))
             return false;
 
         var squadChannel = TryGetSquadRadioChannel(entity);
