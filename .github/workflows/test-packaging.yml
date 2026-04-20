@@ -45,7 +45,7 @@ jobs:
         git submodule update --init --recursive
 
     - name: Pull engine updates
-      uses: ivanbakel/submodule-dependency@v0.1.5
+      uses: space-wizards/submodule-dependency@v0.1.5
 
     - name: Update Engine Submodules
       run: |
