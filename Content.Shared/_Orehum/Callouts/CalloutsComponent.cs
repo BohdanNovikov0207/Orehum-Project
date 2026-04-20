@@ -63,16 +63,16 @@ public sealed partial class CalloutsComponent : Component
     [DataField, AutoNetworkedField]
     public EntProtoId RallyAction = "OrehumActionCalloutRally";
 
-    [DataField, AutoNetworkedField]
+    [AutoNetworkedField]
     public EntityUid? AttackActionEntity;
 
-    [DataField, AutoNetworkedField]
+    [AutoNetworkedField]
     public EntityUid? DefendActionEntity;
 
-    [DataField, AutoNetworkedField]
+    [AutoNetworkedField]
     public EntityUid? RetreatActionEntity;
 
-    [DataField, AutoNetworkedField]
+    [AutoNetworkedField]
     public EntityUid? RallyActionEntity;
 
     [DataField, AutoNetworkedField]
