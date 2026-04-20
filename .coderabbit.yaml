@@ -168,30 +168,6 @@ reviews:
         - ".coderabbit/ast-grep/rules"
   auto_apply_labels: true
   allow_label_editing: true
-  labeling_instructions:
-    - label: "🗺️ Карты 🗺️"
-      instructions: "Применить, когда PR содержит изменения в файлах карт (.yml файлы в папках Resources/Maps/ или Resources/Prototypes/Maps/)"
-
-    - label: "🔊 Аудио 🔊"
-      instructions: "Применить, когда PR содержит изменения в аудио файлах (.ogg, .mp3, .wav и других звуковых форматах)"
-
-    - label: "🧊 Нет C# 🧊"
-      instructions: "Применить, когда PR не содержит изменений в .cs файлах"
-
-    - label: "🛠️ Есть C# 🛠️"
-      instructions: "Применить, когда PR содержит изменения в .cs файлах"
-
-    - label: "📚 Изменения: Локализация 📚"
-      instructions: "Применить, когда PR содержит изменения в .ftl файлах локализации"
-
-    - label: "🖌️ Спрайты 🖌️"
-      instructions: "Применить, когда PR содержит изменения в .png, .jpg, .jpeg, .gif или других графических файлах"
-
-    - label: "📦 YAML | Прототип 📦"
-      instructions: "Применить, когда PR содержит изменения в .yml или .yaml файлах прототипов"
-
-    - label: "🪟 Интерфейс 🪟"
-      instructions: "Применить, когда PR содержит изменения в визуальных элементах интерфейса, которые видны пользователю: кнопки, окна, панели, меню и другие компоненты UI"
 
 chat:
   auto_reply: true
