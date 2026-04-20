@@ -1,5 +1,5 @@
 - type: entity
-  parent: ActionXenoBase
+  parent: BaseAction
   id: OrehumActionCalloutAttack
   name: Отдать приказ атаковать
   components:
@@ -20,7 +20,7 @@
     cooldown: 30
 
 - type: entity
-  parent: ActionXenoBase
+  parent: BaseAction
   id: OrehumActionCalloutDefend
   name: Отдать приказ защищаться
   components:
@@ -41,7 +41,7 @@
     cooldown: 30
 
 - type: entity
-  parent: ActionXenoBase
+  parent: BaseAction
   id: OrehumActionCalloutRetreat
   name: Отдать приказ отступить
   components:
@@ -62,7 +62,7 @@
     cooldown: 30
 
 - type: entity
-  parent: ActionXenoBase
+  parent: BaseAction
   id: OrehumActionCalloutRally
   name: Отдать приказ собраться
   components:

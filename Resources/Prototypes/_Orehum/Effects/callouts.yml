@@ -13,12 +13,6 @@
   - type: Tag
     tags:
     - HideContextMenu
-  - type: MarineMapTracked
-  - type: TacticalMapTracked
-  - type: TacticalMapIcon
-    icon:
-      sprite: _MC/Interface/MapIcons/orders.rsi
-      state: attack
 
 - type: entity
   id: OrehumEffectDefendOrder
@@ -35,12 +29,6 @@
   - type: Tag
     tags:
     - HideContextMenu
-  - type: MarineMapTracked
-  - type: TacticalMapTracked
-  - type: TacticalMapIcon
-    icon:
-      sprite: _MC/Interface/MapIcons/orders.rsi
-      state: defend
 
 - type: entity
   id: OrehumEffectRetreatOrder
@@ -57,12 +45,6 @@
   - type: Tag
     tags:
     - HideContextMenu
-  - type: MarineMapTracked
-  - type: TacticalMapTracked
-  - type: TacticalMapIcon
-    icon:
-      sprite: _MC/Interface/MapIcons/orders.rsi
-      state: retreat
 
 - type: entity
   id: OrehumEffectRallyOrder
@@ -79,9 +61,3 @@
   - type: Tag
     tags:
     - HideContextMenu
-  - type: MarineMapTracked
-  - type: TacticalMapTracked
-  - type: TacticalMapIcon
-    icon:
-      sprite: _MC/Interface/MapIcons/orders.rsi
-      state: rally
