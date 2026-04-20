@@ -8,7 +8,7 @@ using Robust.Shared.Random;
 
 namespace Content.Server._Orehum.Callouts;
 
-public sealed class MCMarineOrdersSystem : MCSharedSendOrdersSystem
+public sealed class MCMarineOrdersSystem : CalloutsSystem
 {
     [Dependency] private readonly ActionsSystem _actions = default!;
     [Dependency] private readonly ChatSystem _chat = default!;
