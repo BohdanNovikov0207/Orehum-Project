@@ -275,6 +275,9 @@ namespace Content.Server.Voting.Managers
 
         private void SendSingleUpdate(VoteReg v, ICommonSession player)
         {
+            if (player.Channel.CurrentMtu == 0)
+                return;
+
             var msg = new MsgVoteData();
 
             msg.VoteId = v.Id;
@@ -336,6 +339,9 @@ namespace Content.Server.Voting.Managers
 
         private void SendUpdateCanCallVote(ICommonSession player)
         {
+            if (player.Channel.CurrentMtu == 0)
+                return;
+
             var msg = new MsgVoteCanCall();
             msg.CanCall = CanCallVote(player, null, out var isAdmin, out var timeSpan);
             msg.WhenCanCallVote = timeSpan;
