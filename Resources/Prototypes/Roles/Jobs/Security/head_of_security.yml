@@ -191,6 +191,7 @@
     components:
       - type: CommandStaff
       - type: SecurityStaff # goobstation
+      - type: Callouts # Orehum - Callouts
 
 - type: startingGear
   id: HoSGear

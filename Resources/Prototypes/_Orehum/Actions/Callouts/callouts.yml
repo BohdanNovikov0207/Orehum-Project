@@ -1,0 +1,83 @@
+- type: entity
+  parent: ActionXenoBase
+  id: OrehumActionCalloutAttack
+  name: Отдать приказ атаковать
+  components:
+  - type: Action
+    itemIconStyle: NoItem
+    icon:
+      sprite: _MC/Actions/actions.rsi
+      state: attack
+    useDelay: 30
+  - type: InstantAction
+    event: !type:AttackCalloutActionEvent
+  - type: ActionSharedCooldown
+    id: OrehumActionCalloutAttack
+    ids:
+    - OrehumActionCalloutDefend
+    - OrehumActionCalloutRetreat
+    - OrehumActionCalloutRally
+    cooldown: 30
+
+- type: entity
+  parent: ActionXenoBase
+  id: OrehumActionCalloutDefend
+  name: Отдать приказ защищаться
+  components:
+  - type: Action
+    itemIconStyle: NoItem
+    icon:
+      sprite: _MC/Actions/actions.rsi
+      state: defend
+    useDelay: 30
+  - type: InstantAction
+    event: !type:DefendCalloutActionEvent
+  - type: ActionSharedCooldown
+    id: OrehumActionCalloutDefend
+    ids:
+    - OrehumActionCalloutAttack
+    - OrehumActionCalloutRetreat
+    - OrehumActionCalloutRally
+    cooldown: 30
+
+- type: entity
+  parent: ActionXenoBase
+  id: OrehumActionCalloutRetreat
+  name: Отдать приказ отступить
+  components:
+  - type: Action
+    itemIconStyle: NoItem
+    icon:
+      sprite: _MC/Actions/actions.rsi
+      state: retreat
+    useDelay: 30
+  - type: InstantAction
+    event: !type:RetreatCalloutActionEvent
+  - type: ActionSharedCooldown
+    id: OrehumActionCalloutRetreat
+    ids:
+    - OrehumActionCalloutDefend
+    - OrehumActionCalloutAttack
+    - OrehumActionCalloutRally
+    cooldown: 30
+
+- type: entity
+  parent: ActionXenoBase
+  id: OrehumActionCalloutRally
+  name: Отдать приказ собраться
+  components:
+  - type: Action
+    itemIconStyle: NoItem
+    icon:
+      sprite: _MC/Actions/actions.rsi
+      state: rally
+    useDelay: 30
+  - type: InstantAction
+    event: !type:RallyCalloutActionEvent
+  - type: ActionSharedCooldown
+    id: OrehumActionCalloutRally
+    ids:
+    - OrehumActionCalloutDefend
+    - OrehumActionCalloutRetreat
+    - OrehumActionCalloutAttack
+    cooldown: 30
