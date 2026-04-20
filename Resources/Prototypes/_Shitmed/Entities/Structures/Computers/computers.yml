@@ -84,7 +84,7 @@
     layer: 8 # Abductor visflag
   - type: Sprite
     sprite: _Shitmed/Structures/Machines/abductor_camera_console.rsi
-    drawdepth: CyberspaceObjects
+    drawdepth: CyberspaceObjects # Orehum-Edit
     layers:
     - state: eye
       shader: unshaded
