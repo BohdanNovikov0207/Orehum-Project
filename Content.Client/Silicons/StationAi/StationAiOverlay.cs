@@ -67,8 +67,6 @@ public sealed class StationAiOverlay : Overlay
     private EntityUid _lastGridUid = EntityUid.Invalid;
     // Orehum end
 
-    private EntityUid _lastGridUid = EntityUid.Invalid; // goobstation - off grid vision fix
-
     public StationAiOverlay()
     {
         IoCManager.InjectDependencies(this);
@@ -87,8 +85,8 @@ public sealed class StationAiOverlay : Overlay
                 new RenderTargetFormatParameters(RenderTargetColorFormat.Rgba8Srgb),
                 name: "station-ai-static");
 
-            res.StencilTexture = _clyde.CreateRenderTarget(args.Viewport.Size, _renderParams, name: "station-ai-stencil");
-            res.StaticTexture = _clyde.CreateRenderTarget(args.Viewport.Size, _renderParams, name: "station-ai-static");
+            _stencilTexture = _clyde.CreateRenderTarget(args.Viewport.Size, _renderParams, name: "station-ai-stencil");
+            _staticTexture = _clyde.CreateRenderTarget(args.Viewport.Size, _renderParams, name: "station-ai-static");
         }
 
         var worldHandle = args.WorldHandle;
@@ -146,7 +144,7 @@ public sealed class StationAiOverlay : Overlay
 
             if (_accumulator <= 0f)
             {
-                _accumulator = MathF.Max(0f, _accumulator + _updateRate);
+                _accumulator = MathF.Max(0f, _accumulator + UpdateRate);
                 _visibleTiles.Clear();
                 _entManager.System<StationAiVisionSystem>().GetView((gridUid, broadphase, grid), worldBounds, _visibleTiles);
             }
@@ -169,13 +167,6 @@ public sealed class StationAiOverlay : Overlay
 
             // Once this is gucci optimise rendering.
             worldHandle.RenderInRenderTarget(_staticTexture!,
-            () =>
-            {
-                worldHandle.SetTransform(invMatrix);
-                var shader = _proto.Index(CameraStaticShader).Instance();
-                worldHandle.UseShader(shader);
-                worldHandle.DrawRect(worldBounds, Color.White);
-            },
                 () => _cyberspaceRenderer.Draw(worldHandle, matty), // Orehum
             Color.Black);
         }
