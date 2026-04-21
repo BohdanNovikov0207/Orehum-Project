@@ -41,7 +41,7 @@ public sealed class OrdersOverlay : Overlay
 
     protected override void Draw(in OverlayDrawArgs args)
     {
-        if (!_entity.HasComponent<OComponent>(_players.LocalEntity))
+        if (!_entity.HasComponent<OrderListenComponent>(_players.LocalEntity))
             return;
 
         var handle = args.WorldHandle;

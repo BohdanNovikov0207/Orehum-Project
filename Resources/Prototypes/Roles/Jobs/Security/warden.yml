@@ -174,7 +174,8 @@
   - !type:AddComponentSpecial # goobstation
     components:
       - type: SecurityStaff
-      - type: Callouts # Orehum - Callouts
+      - type: Orders # Orehum - Orders
+      - type: OrderListen
 
 - type: startingGear
   id: WardenGear

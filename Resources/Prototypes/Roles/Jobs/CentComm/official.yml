@@ -60,7 +60,8 @@
     implants: [ MindShieldImplant, FreedomImplant, BluespaceLifelineImplant, RadioImplantCentcomm, NutrimentPumpImplant, StypticStimulatorImplant, DeathRattleImplantCentcomm ]
   - !type:AddComponentSpecial
     components:
-    - type: Callouts # Orehum - Callouts
+    - type: Orders # Orehum - Orders
+    - type: OrderListen
 
 - type: startingGear # Goobstation - Start - SolsticeOfTheWinter
   id: CentcomGear

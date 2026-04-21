@@ -13,7 +13,7 @@ public abstract class SharedOrdersSystem : EntitySystem
     [Dependency] private readonly MovementSpeedModifierSystem _movementSpeed = default!;
     [Dependency] private readonly SharedActionsSystem _actions = default!;
 
-    private readonly HashSet<Entity<OComponent>> _receivers = new();
+    private readonly HashSet<Entity<OrderListenComponent>> _receivers = new();
 
     public override void Initialize()
     {
@@ -175,7 +175,7 @@ public abstract class SharedOrdersSystem : EntitySystem
         if (args.Player is null)
             return;
 
-        args.Cancelled = !HasComp<OComponent>(args.Player.AttachedEntity);
+        args.Cancelled = !HasComp<OrderListenComponent>(args.Player.AttachedEntity);
     }
 
     public override void Update(float frameTime)

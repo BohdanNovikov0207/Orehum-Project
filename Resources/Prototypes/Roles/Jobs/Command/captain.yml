@@ -183,7 +183,8 @@
       - type: CommandStaff
       - type: Condemned # Goobstation - Nanotrasen owns your soul pal.
         soulOwnedNotDevil: true
-      - type: Callouts # Orehum - Callouts
+      - type: Orders # Orehum - Orders
+      - type: OrderListen
 
 - type: startingGear
   id: CaptainGear

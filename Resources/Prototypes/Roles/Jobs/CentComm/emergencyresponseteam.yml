@@ -136,7 +136,8 @@
     implants: [ MindShieldImplant, FreedomImplant, BluespaceLifelineImplant, RadioImplantCentcomm, NutrimentPumpImplant, StypticStimulatorImplant, DeathRattleImplantCentcomm ]
   - !type:AddComponentSpecial
     components:
-    - type: Callouts # Orehum - Callouts
+    - type: Orders # Orehum - Orders
+    - type: OrderListen
 
 - type: startingGear
   id: ERTLeaderGear
@@ -220,6 +221,7 @@
     - type: BibleUser #Lets them heal with bibles
     - type: CurseImmune # Goobstation - Wraith
     - type: CanEnchant #GoobStation
+    - type: OrderListen
   - !type:AddImplantSpecial
      implants: [ MindShieldImplant, FreedomImplant, BluespaceLifelineImplant, RadioImplantCentcomm, NutrimentPumpImplant, StypticStimulatorImplant, DeathRattleImplantCentcomm ]
 
@@ -319,6 +321,9 @@
   special: # Goobstation
   - !type:AddImplantSpecial
     implants: [ MindShieldImplant, FreedomImplant, BluespaceLifelineImplant, RadioImplantCentcomm, NutrimentPumpImplant, StypticStimulatorImplant, DeathRattleImplantCentcomm ]
+  - !type:AddComponentSpecial
+    components:
+    - type: OrderListen
 
 - type: startingGear
   id: ERTEngineerGear
@@ -407,6 +412,9 @@
   special: # Goobstation
   - !type:AddImplantSpecial
     implants: [ MindShieldImplant, FreedomImplant, BluespaceLifelineImplant, RadioImplantCentcomm, NutrimentPumpImplant, StypticStimulatorImplant, DeathRattleImplantCentcomm]
+  - !type:AddComponentSpecial
+    components:
+    - type: OrderListen
 
 - type: startingGear
   id: ERTSecurityGear
@@ -514,6 +522,9 @@
   special: # Goobstation
   - !type:AddImplantSpecial
     implants: [ MindShieldImplant, FreedomImplant, BluespaceLifelineImplant, RadioImplantCentcomm, NutrimentPumpImplant, StypticStimulatorImplant, DeathRattleImplantCentcomm ]
+  - !type:AddComponentSpecial
+    components:
+    - type: OrderListen
 
 - type: startingGear
   id: ERTMedicalGear
@@ -600,6 +611,9 @@
   special: # Goobstation
   - !type:AddImplantSpecial
     implants: [ MindShieldImplant, FreedomImplant, BluespaceLifelineImplant, RadioImplantCentcomm, NutrimentPumpImplant, StypticStimulatorImplant, DeathRattleImplantCentcomm]
+  - !type:AddComponentSpecial
+    components:
+    - type: OrderListen
 
 - type: startingGear
   id: ERTJanitorGear
