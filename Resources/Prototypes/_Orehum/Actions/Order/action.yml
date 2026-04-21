@@ -1,5 +1,5 @@
 - type: entity
   id: ActionOrderBase
-  parent: CMEntityBase
+  parent: BaseAction
   categories:
-  - hideSpawnMenu
+  - HideSpawnMenu

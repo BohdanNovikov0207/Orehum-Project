@@ -62,7 +62,6 @@ public sealed class OrdersSystem : SharedOrdersSystem
             return;
         OnAction(uid, comp.FocusCallouts);
     }
-    }
 
     private void OnAction(EntityUid uid, List<string> callouts)
     {
