@@ -1,7 +1,7 @@
 - type: entity
   id: ActionOrderFocus
   parent: ActionOrderBase
-  name: Focus!
+  name: Целься!
   components:
   - type: Action
     itemIconStyle: NoItem
@@ -14,7 +14,7 @@
 - type: entity
   id: ActionOrderHold
   parent: ActionOrderBase
-  name: Hold!
+  name: Удерживать!
   components:
   - type: Action
     itemIconStyle: NoItem
@@ -27,7 +27,7 @@
 - type: entity
   id: ActionOrderMove
   parent: ActionOrderBase
-  name: Move!
+  name: Вперед!
   components:
   - type: Action
     itemIconStyle: NoItem
