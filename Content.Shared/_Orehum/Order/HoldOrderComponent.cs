@@ -21,7 +21,7 @@ public sealed partial class HoldOrderComponent : Component, IOrderComponent
     /// Resistance to damage.
     /// </summary>
     [DataField, AutoNetworkedField]
-    public FixedPoint2 DamageModifier = 0.1;
+    public FixedPoint2 DamageModifier = 0.95;
 
     [DataField]
     public List<ProtoId<DamageTypePrototype>> DamageTypes = new() {"Slash", "Blunt"};
@@ -34,7 +34,7 @@ public sealed partial class HoldOrderComponent : Component, IOrderComponent
     /// </remarks>
     /// CM14 TODO Make this do something meaningful when pain is actually a thing.
     [DataField, AutoNetworkedField]
-    public FixedPoint2 PainModifier = 0.1;
+    public FixedPoint2 PainModifier;
 
     [DataField(customTypeSerializer: typeof(TimeOffsetSerializer)), AutoNetworkedField]
     public TimeSpan Duration { get; set; }

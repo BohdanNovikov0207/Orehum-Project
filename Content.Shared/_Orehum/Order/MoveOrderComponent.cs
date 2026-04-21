@@ -13,10 +13,10 @@ public sealed partial class MoveOrderComponent : Component, IOrderComponent
     public SpriteSpecifier Icon = new Rsi(new ResPath("/Textures/_Orehum/Interface/marine_orders.rsi"), "move");
 
     [DataField, AutoNetworkedField]
-    public FixedPoint2 MoveSpeedModifier = 0.1;
+    public FixedPoint2 MoveSpeedModifier = 1.1;
 
     [DataField, AutoNetworkedField]
-    public FixedPoint2 DodgeModifier = 0.1;
+    public FixedPoint2 DodgeModifier = 1.1;
 
     [DataField(customTypeSerializer: typeof(TimeOffsetSerializer)), AutoNetworkedField]
     public TimeSpan Duration { get; set; }

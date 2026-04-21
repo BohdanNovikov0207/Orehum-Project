@@ -3,11 +3,12 @@
   parent: ActionOrderBase
   name: Focus!
   components:
-  - type: InstantAction
+  - type: Action
     itemIconStyle: NoItem
     icon:
       sprite: _Orehum/Actions/marine_actions.rsi
       state: focus
+  - type: InstantAction
     event: !type:FocusActionEvent
 
 - type: entity
@@ -15,11 +16,12 @@
   parent: ActionOrderBase
   name: Hold!
   components:
-  - type: InstantAction
+  - type: Action
     itemIconStyle: NoItem
     icon:
       sprite: _Orehum/Actions/marine_actions.rsi
       state: hold
+  - type: InstantAction
     event: !type:HoldActionEvent
 
 - type: entity
@@ -27,9 +29,10 @@
   parent: ActionOrderBase
   name: Move!
   components:
-  - type: InstantAction
+  - type: Action
     itemIconStyle: NoItem
     icon:
       sprite: _Orehum/Actions/marine_actions.rsi
       state: move
+  - type: InstantAction
     event: !type:MoveActionEvent
