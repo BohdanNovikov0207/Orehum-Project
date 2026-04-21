@@ -1,6 +1,9 @@
 using Content.Shared.Actions;
 using Content.Shared.Damage;
 using Content.Shared.Movement.Systems;
+using Robust.Shared.Audio;
+using Robust.Shared.Audio.Components;
+using Robust.Shared.Audio.Systems;
 using Robust.Shared.GameStates;
 using Robust.Shared.Utility;
 using Robust.Shared.Timing;
@@ -12,6 +15,7 @@ public abstract class SharedOrdersSystem : EntitySystem
     [Dependency] private readonly EntityLookupSystem _entityLookup = default!;
     [Dependency] private readonly MovementSpeedModifierSystem _movementSpeed = default!;
     [Dependency] private readonly SharedActionsSystem _actions = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
 
     private readonly HashSet<Entity<OrderListenComponent>> _receivers = new();
 
@@ -72,19 +76,23 @@ public abstract class SharedOrdersSystem : EntitySystem
 
     protected virtual void OnAction(EntityUid uid, OrdersComponent orders, FocusActionEvent args)
     {
+        _audio.PlayPvs(new SoundCollectionSpecifier("OrderFocus"), uid);
         OnAction(uid, Orders.Focus, orders, args);
-
+        args.Handled = true;
     }
 
     protected virtual void OnAction(EntityUid uid, OrdersComponent orders, HoldActionEvent args)
     {
+        _audio.PlayPvs(new SoundCollectionSpecifier("OrderHold"), uid);
         OnAction(uid, Orders.Hold, orders, args);
-
+        args.Handled = true;
     }
 
     protected virtual void OnAction(EntityUid uid, OrdersComponent orders, MoveActionEvent args)
     {
+        _audio.PlayPvs(new SoundCollectionSpecifier("OrderMove"), uid);
         OnAction(uid, Orders.Move, orders, args);
+        args.Handled = true;
     }
 
     private void OnAction(EntityUid uid, Orders order, OrdersComponent orders, InstantActionEvent args)
