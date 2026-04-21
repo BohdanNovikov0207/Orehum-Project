@@ -115,10 +115,12 @@ public abstract class SharedRMCActionsSystem : EntitySystem
             return;
 
         comp.UseDelayReduction = args.Amount;
+        Dirty(uid, comp);
 
         if (TryComp(uid, out ActionSharedCooldownComponent? shared))
         {
             comp.UseDelayBase ??= shared.Cooldown;
+            Dirty(uid, comp);
 
             RefreshSharedUseDelay((uid, comp), shared);
             return;
@@ -126,6 +128,7 @@ public abstract class SharedRMCActionsSystem : EntitySystem
 
         // Should be fine to only set this once as the base use delay should remain constant
         comp.UseDelayBase ??= component.UseDelay;
+        Dirty(uid, comp);
         RefreshUseDelay((uid, comp));
     }
 
