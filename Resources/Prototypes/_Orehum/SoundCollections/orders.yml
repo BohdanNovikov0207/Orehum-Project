@@ -3,7 +3,7 @@
   files:
     - /Audio/_Orehum/Orders/focus/backtohell.ogg
     - /Audio/_Orehum/Orders/focus/fire.ogg
-    - /Audio/_Orehum/Orders/focus/takedowb.ogg
+    - /Audio/_Orehum/Orders/focus/takedown.ogg
 
 - type: soundCollection
   id: OrderHold
