@@ -42,19 +42,26 @@ public sealed class OrdersSystem : SharedOrdersSystem
     protected override void OnAction(EntityUid uid, OrdersComponent comp, MoveActionEvent ev)
     {
         base.OnAction(uid, comp, ev);
+        if (!ev.Handled)
+            return;
         OnAction(uid, comp.MoveCallouts);
     }
 
     protected override void OnAction(EntityUid uid, OrdersComponent comp, HoldActionEvent ev)
     {
         base.OnAction(uid, comp, ev);
+        if (!ev.Handled)
+            return;
         OnAction(uid, comp.HoldCallouts);
     }
 
     protected override void OnAction(EntityUid uid, OrdersComponent comp, FocusActionEvent ev)
     {
         base.OnAction(uid, comp, ev);
+        if (!ev.Handled)
+            return;
         OnAction(uid, comp.FocusCallouts);
+    }
     }
 
     private void OnAction(EntityUid uid, List<string> callouts)
