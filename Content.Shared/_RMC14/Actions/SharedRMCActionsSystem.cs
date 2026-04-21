@@ -149,6 +149,7 @@ public abstract class SharedRMCActionsSystem : EntitySystem
         var delayNew = delayBase.Multiply(1 - reduction);
 
         shared.Cooldown = delayNew;
+        Dirty(ent.Owner, shared);
     }
 
     private void OnCooldownUse(Entity<ActionCooldownComponent> ent, ref RMCActionUseEvent args)

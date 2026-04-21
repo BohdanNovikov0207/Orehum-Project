@@ -17,8 +17,8 @@ public sealed class OrdersSystem : SharedOrdersSystem
 
     public override void Shutdown()
     {
-        base.Shutdown();
-
         _overlays.RemoveOverlay<OrdersOverlay>();
+
+        base.Shutdown();
     }
 }

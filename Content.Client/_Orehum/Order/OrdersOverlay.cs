@@ -35,6 +35,8 @@ public sealed class OrdersOverlay : Overlay
         _transform = _entity.System<TransformSystem>();
 
         _shader = _prototype.Index<ShaderPrototype>("unshaded").Instance();
+
+        _xformQuery = _entity.GetEntityQuery<TransformComponent>();
     }
 
     protected override void Draw(in OverlayDrawArgs args)
@@ -46,7 +48,6 @@ public sealed class OrdersOverlay : Overlay
 
         var eyeRot = args.Viewport.Eye?.Rotation ?? default;
 
-        _xformQuery = _entity.GetEntityQuery<TransformComponent>();
         var scaleMatrix = Matrix3.CreateScale(new Vector2(1, 1));
         var rotationMatrix = Matrix3.CreateRotation(-eyeRot);
 

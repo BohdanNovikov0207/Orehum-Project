@@ -15,7 +15,7 @@ namespace Content.Shared._Orehum.Orders;
 public sealed partial class HoldOrderComponent : Component, IOrderComponent
 {
     [DataField, AutoNetworkedField]
-    public SpriteSpecifier Icon = new Rsi(new ResPath("/Textures/_RMC14/Interface/marine_orders.rsi"), "hold");
+    public SpriteSpecifier Icon = new Rsi(new ResPath("/Textures/_Orehum/Interface/marine_orders.rsi"), "hold");
 
     /// <summary>
     /// Resistance to damage.

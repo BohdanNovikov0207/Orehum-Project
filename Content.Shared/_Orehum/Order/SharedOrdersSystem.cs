@@ -62,6 +62,7 @@ public abstract class SharedOrdersSystem : EntitySystem
     private void OnUnpause<T>(EntityUid uid, T comp, EntityUnpausedEvent args) where T : IComponent, IOrderComponent
     {
         comp.Duration += args.PausedTime;
+        Dirty(uid, comp);
     }
 
     private void OnMoveShutdown(Entity<MoveOrderComponent> uid, ref ComponentShutdown ev)
@@ -91,9 +92,29 @@ public abstract class SharedOrdersSystem : EntitySystem
         if (args.Handled)
             return;
 
-        HandleAction(uid, order, orders);
+        if (!TryHandleAction(uid, order, orders))
+            return;
 
         args.Handled = true;
+    }
+
+    private bool TryHandleAction(EntityUid uid, Orders order, OrdersComponent orders)
+    {
+        if (!CanHandleAction(uid, orders))
+            return false;
+
+        DoHandleAction(uid, order, orders);
+        return true;
+    }
+
+    private bool CanHandleAction(EntityUid uid, OrdersComponent orders)
+    {
+        return HasComp<TransformComponent>(uid);
+    }
+
+    private void DoHandleAction(EntityUid uid, Orders order, OrdersComponent orders)
+    {
+        HandleAction(uid, order, orders);
     }
 
     private void HandleAction(EntityUid uid, Orders order, OrdersComponent orderComp)

@@ -5,7 +5,7 @@
   - type: TimedDespawn
     lifetime: 30
   - type: Sprite
-    sprite: _MC/Effects/orders.rsi
+    sprite: _Orehum/Effects/orders.rsi
     noRot: true
     state: attack
     drawdepth: Effects
@@ -21,7 +21,7 @@
   - type: TimedDespawn
     lifetime: 30
   - type: Sprite
-    sprite: _MC/Effects/orders.rsi
+    sprite: _Orehum/Effects/orders.rsi
     noRot: true
     state: defend
     drawdepth: Effects
@@ -37,7 +37,7 @@
   - type: TimedDespawn
     lifetime: 30
   - type: Sprite
-    sprite: _MC/Effects/orders.rsi
+    sprite: _Orehum/Effects/orders.rsi
     noRot: true
     state: retreat
     drawdepth: Effects
@@ -53,7 +53,7 @@
   - type: TimedDespawn
     lifetime: 30
   - type: Sprite
-    sprite: _MC/Effects/orders.rsi
+    sprite: _Orehum/Effects/orders.rsi
     noRot: true
     state: rally
     drawdepth: Effects

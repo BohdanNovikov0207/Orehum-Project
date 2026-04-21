@@ -10,7 +10,7 @@ namespace Content.Shared._Orehum.Orders;
 public sealed partial class MoveOrderComponent : Component, IOrderComponent
 {
     [DataField, AutoNetworkedField]
-    public SpriteSpecifier Icon = new Rsi(new ResPath("/Textures/_RMC14/Interface/marine_orders.rsi"), "move");
+    public SpriteSpecifier Icon = new Rsi(new ResPath("/Textures/_Orehum/Interface/marine_orders.rsi"), "move");
 
     [DataField, AutoNetworkedField]
     public FixedPoint2 MoveSpeedModifier = 0.1;

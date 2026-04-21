@@ -46,19 +46,19 @@ public sealed partial class OrdersComponent : Component
     [DataField(customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
     public string FocusAction = "ActionOrderFocus";
 
-    [DataField]
+    [AutoNetworkedField]
     public EntityUid? FocusActionEntity;
 
     [DataField(customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
     public string HoldAction = "ActionOrderHold";
 
-    [DataField]
+    [AutoNetworkedField]
     public EntityUid? HoldActionEntity;
 
     [DataField(customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
     public string MoveAction = "ActionOrderMove";
 
-    [DataField]
+    [AutoNetworkedField]
     public EntityUid? MoveActionEntity;
 
     [DataField, AutoNetworkedField]

@@ -2,6 +2,7 @@ using Content.Server.Actions;
 using Content.Server.Chat.Systems;
 using Content.Shared.Chat;
 using Content.Shared._Orehum.Orders;
+using Robust.Shared.Random;
 
 namespace Content.Server._Orehum.Orders;
 
@@ -9,6 +10,7 @@ public sealed class OrdersSystem : SharedOrdersSystem
 {
     [Dependency] private readonly ActionsSystem _actions = default!;
     [Dependency] private readonly ChatSystem _chat = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
 
     public override void Initialize()
     {
@@ -57,9 +59,11 @@ public sealed class OrdersSystem : SharedOrdersSystem
 
     private void OnAction(EntityUid uid, List<string> callouts)
     {
-        var random = new Random();
-        var callout = random.Next(0, callouts.Count);
-        _chat.TrySendInGameICMessage(uid, Loc.GetString(callouts[callout]), InGameICChatType.Speak, false);
+        if (callouts.Count == 0)
+            return;
+
+        var callout = _random.Pick(callouts);
+        _chat.TrySendInGameICMessage(uid, Loc.GetString(callout), InGameICChatType.Speak, false);
     }
 
 }

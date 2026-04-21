@@ -6,7 +6,7 @@
   - type: InstantAction
     itemIconStyle: NoItem
     icon:
-      sprite: _RMC14/Actions/marine_actions.rsi
+      sprite: _Orehum/Actions/marine_actions.rsi
       state: focus
     event: !type:FocusActionEvent
 
@@ -18,7 +18,7 @@
   - type: InstantAction
     itemIconStyle: NoItem
     icon:
-      sprite: _RMC14/Actions/marine_actions.rsi
+      sprite: _Orehum/Actions/marine_actions.rsi
       state: hold
     event: !type:HoldActionEvent
 
@@ -30,6 +30,6 @@
   - type: InstantAction
     itemIconStyle: NoItem
     icon:
-      sprite: _RMC14/Actions/marine_actions.rsi
+      sprite: _Orehum/Actions/marine_actions.rsi
       state: move
     event: !type:MoveActionEvent

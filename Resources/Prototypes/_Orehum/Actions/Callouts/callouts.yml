@@ -6,7 +6,7 @@
   - type: Action
     itemIconStyle: NoItem
     icon:
-      sprite: _MC/Actions/actions.rsi
+      sprite: _Orehum/Actions/actions.rsi
       state: attack
     useDelay: 30
   - type: InstantAction
@@ -27,7 +27,7 @@
   - type: Action
     itemIconStyle: NoItem
     icon:
-      sprite: _MC/Actions/actions.rsi
+      sprite: _Orehum/Actions/actions.rsi
       state: defend
     useDelay: 30
   - type: InstantAction
@@ -48,7 +48,7 @@
   - type: Action
     itemIconStyle: NoItem
     icon:
-      sprite: _MC/Actions/actions.rsi
+      sprite: _Orehum/Actions/actions.rsi
       state: retreat
     useDelay: 30
   - type: InstantAction
@@ -69,7 +69,7 @@
   - type: Action
     itemIconStyle: NoItem
     icon:
-      sprite: _MC/Actions/actions.rsi
+      sprite: _Orehum/Actions/actions.rsi
       state: rally
     useDelay: 30
   - type: InstantAction

@@ -10,7 +10,7 @@ namespace Content.Shared._Orehum.Orders;
 public sealed partial class FocusOrderComponent : Component, IOrderComponent
 {
     [DataField, AutoNetworkedField]
-    public SpriteSpecifier Icon = new Rsi(new ResPath("/Textures/_RMC14/Interface/marine_orders.rsi"), "focus");
+    public SpriteSpecifier Icon = new Rsi(new ResPath("/Textures/_Orehum/Interface/marine_orders.rsi"), "focus");
 
     // CM14 TODO Make this do something when/if you will ever be able to modify the deviation of bullets with an event
     // or something. Trying to do it now would be possible but would then deviate from upstream stuff.
