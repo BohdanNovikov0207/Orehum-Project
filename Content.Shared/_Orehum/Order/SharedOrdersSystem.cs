@@ -76,23 +76,23 @@ public abstract class SharedOrdersSystem : EntitySystem
 
     protected virtual void OnAction(EntityUid uid, OrdersComponent orders, FocusActionEvent args)
     {
-        _audio.PlayPvs(new SoundCollectionSpecifier("OrderFocus"), uid);
         OnAction(uid, Orders.Focus, orders, args);
-        args.Handled = true;
+        if (args.Handled && _timing.IsFirstTimePredicted)
+            _audio.PlayPvs(new SoundCollectionSpecifier("OrderFocus"), uid);
     }
 
     protected virtual void OnAction(EntityUid uid, OrdersComponent orders, HoldActionEvent args)
     {
-        _audio.PlayPvs(new SoundCollectionSpecifier("OrderHold"), uid);
         OnAction(uid, Orders.Hold, orders, args);
-        args.Handled = true;
+        if (args.Handled && _timing.IsFirstTimePredicted)
+            _audio.PlayPvs(new SoundCollectionSpecifier("OrderHold"), uid);
     }
 
     protected virtual void OnAction(EntityUid uid, OrdersComponent orders, MoveActionEvent args)
     {
-        _audio.PlayPvs(new SoundCollectionSpecifier("OrderMove"), uid);
         OnAction(uid, Orders.Move, orders, args);
-        args.Handled = true;
+        if (args.Handled && _timing.IsFirstTimePredicted)
+            _audio.PlayPvs(new SoundCollectionSpecifier("OrderMove"), uid);
     }
 
     private void OnAction(EntityUid uid, Orders order, OrdersComponent orders, InstantActionEvent args)
