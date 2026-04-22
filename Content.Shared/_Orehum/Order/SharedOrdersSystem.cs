@@ -46,7 +46,7 @@ public abstract class SharedOrdersSystem : EntitySystem
     private void OnDamageModify(EntityUid uid, HoldOrderComponent comp, DamageModifyEvent args)
     {
         var damage = args.Damage.DamageDict;
-        var multiplier = 2 - comp.DamageModifier;
+        var multiplier = 1 - comp.DamageModifier;
 
         var damageTypes = comp.DamageTypes.GetEnumerator();
 
