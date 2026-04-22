@@ -2,13 +2,13 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Client.ADT.Geras.Component;
-using Content.Shared.ADT.Geras;
+using Content.Client._ADT.Geras.Component;
+using Content.Shared._ADT.Geras;
 using Robust.Client.GameObjects;
 using Content.Shared.Item;
 using static Robust.Client.GameObjects.SpriteComponent;
 
-namespace Content.Client.ADT.Geras;
+namespace Content.Client._ADT.Geras;
 
 public sealed class GerasSystem : VisualizerSystem<GerasComponent>
 {

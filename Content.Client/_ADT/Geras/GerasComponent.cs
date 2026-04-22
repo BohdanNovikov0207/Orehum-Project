@@ -2,9 +2,9 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.ADT.Geras;
+using Content.Shared._ADT.Geras;
 
-namespace Content.Client.ADT.Geras.Component;
+namespace Content.Client._ADT.Geras.Component;
 
 [RegisterComponent]
 public sealed partial class GerasComponent : SharedGerasComponent;

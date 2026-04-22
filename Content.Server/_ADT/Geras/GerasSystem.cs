@@ -6,14 +6,14 @@ using Content.Server.Polymorph.Systems;
 using Content.Shared.Zombies;
 using Content.Server.Actions;
 using Content.Server.Popups;
-using Content.Shared.ADT.Geras;
+using Content.Shared._ADT.Geras;
 using Robust.Shared.Player;
 using Content.Shared.Humanoid;
 using Content.Shared.Mobs.Systems;
 using Content.Shared.ActionBlocker;
 using Content.Shared.DoAfter;
 
-namespace Content.Server.ADT.Geras;
+namespace Content.Server._ADT.Geras;
 
 public sealed class GerasSystem : SharedGerasSystem
 {

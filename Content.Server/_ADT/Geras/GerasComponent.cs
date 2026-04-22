@@ -5,7 +5,7 @@
 using Content.Shared.Polymorph;
 using Robust.Shared.Prototypes;
 
-namespace Content.Server.ADT.Geras;
+namespace Content.Server._ADT.Geras;
 
 /// <summary>
 /// This component assigns the entity with a polymorph action.
