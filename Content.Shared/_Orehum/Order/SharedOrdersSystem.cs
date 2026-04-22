@@ -46,7 +46,7 @@ public abstract class SharedOrdersSystem : EntitySystem
     private void OnDamageModify(EntityUid uid, HoldOrderComponent comp, DamageModifyEvent args)
     {
         var damage = args.Damage.DamageDict;
-        var multiplier = 1 + comp.DamageModifier;
+        var multiplier = 1 - comp.DamageModifier;
 
         var damageTypes = comp.DamageTypes.GetEnumerator();
 
@@ -76,23 +76,26 @@ public abstract class SharedOrdersSystem : EntitySystem
 
     protected virtual void OnAction(EntityUid uid, OrdersComponent orders, FocusActionEvent args)
     {
-        _audio.PlayPvs(new SoundCollectionSpecifier("OrderFocus"), uid);
+        var wasHandled = args.Handled;
         OnAction(uid, Orders.Focus, orders, args);
-        args.Handled = true;
+        if (!wasHandled && args.Handled && _timing.IsFirstTimePredicted)
+            _audio.PlayPvs(new SoundCollectionSpecifier("OrderFocus"), uid);
     }
 
     protected virtual void OnAction(EntityUid uid, OrdersComponent orders, HoldActionEvent args)
     {
-        _audio.PlayPvs(new SoundCollectionSpecifier("OrderHold"), uid);
+        var wasHandled = args.Handled;
         OnAction(uid, Orders.Hold, orders, args);
-        args.Handled = true;
+        if (!wasHandled && args.Handled && _timing.IsFirstTimePredicted)
+            _audio.PlayPvs(new SoundCollectionSpecifier("OrderHold"), uid);
     }
 
     protected virtual void OnAction(EntityUid uid, OrdersComponent orders, MoveActionEvent args)
     {
-        _audio.PlayPvs(new SoundCollectionSpecifier("OrderMove"), uid);
+        var wasHandled = args.Handled;
         OnAction(uid, Orders.Move, orders, args);
-        args.Handled = true;
+        if (!wasHandled && args.Handled && _timing.IsFirstTimePredicted)
+            _audio.PlayPvs(new SoundCollectionSpecifier("OrderMove"), uid);
     }
 
     private void OnAction(EntityUid uid, Orders order, OrdersComponent orders, InstantActionEvent args)
