@@ -1,8 +1,8 @@
 ﻿- type: entity
   parent: [BaseItem, BaseStash, ClothingMaskBase]
   id: TennisBall
-  name: tennis ball
-  description: Made for testing security's patience.
+  name: теннисный мячик
+  description: Создано для того, чтобы испытывать терпение сотрудников службы безопасности.
   components:
   - type: Sprite
     sprite: _Goobstation/Objects/Fun/tennis.rsi
@@ -52,10 +52,10 @@
 
 
 - type: entity
-  name: tennis racket
+  name: теннисная ракетка
   parent: BaseItem
   id: BaseTennisRacket
-  description: A robust tennis racket.
+  description: Прочная теннисная ракетка.
   components:
   - type: Sprite
     sprite: _Goobstation/Objects/Fun/tennis_racket.rsi
@@ -80,10 +80,10 @@
 
 
 - type: entity
-  name: nanotrasen tennis racket
+  name: теннисная ракетка Нанотрайзен
   parent: BaseTennisRacket
   id: NTTennisRacket
-  description: Team Nanotrasen robust tennis racket!
+  description: Надежная теннисная ракетка Нанотрайзена
   components:
   - type: Sprite
     sprite: _Goobstation/Objects/Fun/nt_tennis_racket.rsi
@@ -93,10 +93,10 @@
 
 
 - type: entity
-  name: syndicate tennis racket
+  name: теннисная ракетка синдиката
   parent: BaseTennisRacket
   id: SyndicateTennisRacket
-  description: Team Syndicate robust tennis racket!
+  description: Надежная теннисная ракетка синдиката
   components:
   - type: Sprite
     sprite: _Goobstation/Objects/Fun/syndicate_tennis_racket.rsi
