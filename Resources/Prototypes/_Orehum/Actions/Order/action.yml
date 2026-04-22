@@ -1,0 +1,5 @@
+- type: entity
+  id: ActionOrderBase
+  parent: BaseAction
+  categories:
+  - HideSpawnMenu

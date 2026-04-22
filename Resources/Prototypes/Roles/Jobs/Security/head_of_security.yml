@@ -191,6 +191,8 @@
     components:
       - type: CommandStaff
       - type: SecurityStaff # goobstation
+      - type: Orders # Orehum - Orders
+      - type: OrderListen
 
 - type: startingGear
   id: HoSGear

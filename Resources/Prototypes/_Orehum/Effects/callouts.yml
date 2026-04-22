@@ -1,0 +1,63 @@
+- type: entity
+  id: OrehumEffectAttackOrder
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: TimedDespawn
+    lifetime: 30
+  - type: Sprite
+    sprite: _Orehum/Effects/orders.rsi
+    noRot: true
+    state: attack
+    drawdepth: Effects
+  - type: EffectVisuals
+  - type: Tag
+    tags:
+    - HideContextMenu
+
+- type: entity
+  id: OrehumEffectDefendOrder
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: TimedDespawn
+    lifetime: 30
+  - type: Sprite
+    sprite: _Orehum/Effects/orders.rsi
+    noRot: true
+    state: defend
+    drawdepth: Effects
+  - type: EffectVisuals
+  - type: Tag
+    tags:
+    - HideContextMenu
+
+- type: entity
+  id: OrehumEffectRetreatOrder
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: TimedDespawn
+    lifetime: 30
+  - type: Sprite
+    sprite: _Orehum/Effects/orders.rsi
+    noRot: true
+    state: retreat
+    drawdepth: Effects
+  - type: EffectVisuals
+  - type: Tag
+    tags:
+    - HideContextMenu
+
+- type: entity
+  id: OrehumEffectRallyOrder
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: TimedDespawn
+    lifetime: 30
+  - type: Sprite
+    sprite: _Orehum/Effects/orders.rsi
+    noRot: true
+    state: rally
+    drawdepth: Effects
+  - type: EffectVisuals
+  - type: Tag
+    tags:
+    - HideContextMenu
