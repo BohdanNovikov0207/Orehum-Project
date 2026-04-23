@@ -3,6 +3,7 @@ using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype;
+using Robust.Shared.Audio;
 
 namespace Content.Shared._Orehum.Orders;
 
@@ -69,6 +70,15 @@ public sealed partial class OrdersComponent : Component
 
     [DataField, AutoNetworkedField]
     public List<string> HoldCallouts = new() {"hold-order-callout-1","hold-order-callout-2","hold-order-callout-3"};
+
+    [DataField, AutoNetworkedField]
+    public SoundSpecifier MoveSound = new SoundCollectionSpecifier("OrderMove");
+
+    [DataField, AutoNetworkedField]
+    public SoundSpecifier FocusSound = new SoundCollectionSpecifier("OrderFocus");
+
+    [DataField, AutoNetworkedField]
+    public SoundSpecifier HoldSound = new SoundCollectionSpecifier("OrderHold");
 
     public override bool SessionSpecific => true;
 }

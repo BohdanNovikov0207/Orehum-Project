@@ -1,9 +1,6 @@
 using Content.Shared.Actions;
 using Content.Shared.Damage;
 using Content.Shared.Movement.Systems;
-using Robust.Shared.Audio;
-using Robust.Shared.Audio.Components;
-using Robust.Shared.Audio.Systems;
 using Robust.Shared.GameStates;
 using Robust.Shared.Utility;
 using Robust.Shared.Timing;
@@ -15,7 +12,6 @@ public abstract class SharedOrdersSystem : EntitySystem
     [Dependency] private readonly EntityLookupSystem _entityLookup = default!;
     [Dependency] private readonly MovementSpeedModifierSystem _movementSpeed = default!;
     [Dependency] private readonly SharedActionsSystem _actions = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
 
     private readonly HashSet<Entity<OrderListenComponent>> _receivers = new();
 
@@ -78,24 +74,18 @@ public abstract class SharedOrdersSystem : EntitySystem
     {
         var wasHandled = args.Handled;
         OnAction(uid, Orders.Focus, orders, args);
-        if (!wasHandled && args.Handled && _timing.IsFirstTimePredicted)
-            _audio.PlayPvs(new SoundCollectionSpecifier("OrderFocus"), uid);
     }
 
     protected virtual void OnAction(EntityUid uid, OrdersComponent orders, HoldActionEvent args)
     {
         var wasHandled = args.Handled;
         OnAction(uid, Orders.Hold, orders, args);
-        if (!wasHandled && args.Handled && _timing.IsFirstTimePredicted)
-            _audio.PlayPvs(new SoundCollectionSpecifier("OrderHold"), uid);
     }
 
     protected virtual void OnAction(EntityUid uid, OrdersComponent orders, MoveActionEvent args)
     {
         var wasHandled = args.Handled;
         OnAction(uid, Orders.Move, orders, args);
-        if (!wasHandled && args.Handled && _timing.IsFirstTimePredicted)
-            _audio.PlayPvs(new SoundCollectionSpecifier("OrderMove"), uid);
     }
 
     private void OnAction(EntityUid uid, Orders order, OrdersComponent orders, InstantActionEvent args)
