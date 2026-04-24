@@ -4,7 +4,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-using Content.Shared.Hands.Components;
 using Content.Server.Hands.Systems;
 using Robust.Shared.Prototypes;
 
@@ -17,19 +16,17 @@ public sealed partial class ActiveHandComponentPrecondition : HTNPrecondition
 {
     [Dependency] private readonly IEntityManager _entManager = default!;
 
-    [DataField("invert")]
-    public bool Invert;
-
     [DataField("components", required: true)]
     public ComponentRegistry Components = new();
+
+    [DataField("invert")]
+    public bool Invert;
 
     public override bool IsMet(NPCBlackboard blackboard)
     {
         if (!blackboard.TryGetValue<EntityUid>(NPCBlackboard.Owner, out var owner, _entManager) ||
             !blackboard.TryGetValue<string>(NPCBlackboard.ActiveHand, out var hand, _entManager))
-        {
             return Invert;
-        }
 
         if (!_entManager.System<HandsSystem>().TryGetHeldItem(owner, hand, out var entity))
             return Invert;
@@ -40,9 +37,7 @@ public sealed partial class ActiveHandComponentPrecondition : HTNPrecondition
 
             if (!hasComp ||
                 Invert && hasComp)
-            {
                 return false;
-            }
         }
 
         return true;

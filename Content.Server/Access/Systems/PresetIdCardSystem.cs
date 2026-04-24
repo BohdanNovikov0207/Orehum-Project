@@ -22,16 +22,15 @@ using Content.Server.GameTicking;
 using Content.Server.Station.Components;
 using Content.Server.Station.Systems;
 using Content.Shared.Access.Systems;
-using Content.Shared.Roles;
 using Robust.Shared.Prototypes;
 
 namespace Content.Server.Access.Systems;
 
 public sealed class PresetIdCardSystem : EntitySystem
 {
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-    [Dependency] private readonly IdCardSystem _cardSystem = default!;
     [Dependency] private readonly SharedAccessSystem _accessSystem = default!;
+    [Dependency] private readonly IdCardSystem _cardSystem = default!;
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly StationSystem _stationSystem = default!;
 
     public override void Initialize()
@@ -51,7 +50,8 @@ public sealed class PresetIdCardSystem : EntitySystem
             var station = _stationSystem.GetOwningStation(uid);
 
             // If we're not on an extended access station, the ID is already configured correctly from MapInit.
-            if (station == null || !TryComp<StationJobsComponent>(station.Value, out var jobsComp) || !jobsComp.ExtendedAccess)
+            if (station == null || !TryComp<StationJobsComponent>(station.Value, out var jobsComp) ||
+                !jobsComp.ExtendedAccess)
                 continue;
 
             SetupIdAccess(uid, card, true);
@@ -89,7 +89,7 @@ public sealed class PresetIdCardSystem : EntitySystem
         if (id.JobName == null)
             return;
 
-        if (!_prototypeManager.TryIndex(id.JobName, out JobPrototype? job))
+        if (!_prototypeManager.TryIndex(id.JobName, out var job))
         {
             Log.Error($"Invalid job id ({id.JobName}) for preset card");
             return;

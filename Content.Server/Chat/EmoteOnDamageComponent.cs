@@ -5,36 +5,40 @@
 //
 // SPDX-License-Identifier: MIT
 
-namespace Content.Server.Chat;
-
 using Content.Server.Chat.Systems;
 using Content.Shared.Chat.Prototypes;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
 
+namespace Content.Server.Chat;
+
 /// <summary>
 /// Causes an entity to automatically emote when taking damage.
 /// </summary>
-[RegisterComponent, Access(typeof(EmoteOnDamageSystem)), AutoGenerateComponentPause]
+[RegisterComponent] [Access(typeof(EmoteOnDamageSystem))] [AutoGenerateComponentPause]
 public sealed partial class EmoteOnDamageComponent : Component
 {
+    // CorvaxGoob-AutoEmote-Start : Changes
+    [DataField]
+    public HashSet<string> AllowedDamageType = ["Blunt", "Caustic", "Heat", "Cold", "Piercing", "Shock", "Slash"];
+
     /// <summary>
     /// Chance of preforming an emote when taking damage and not on cooldown.
     /// </summary>
-    [DataField("emoteChance"), ViewVariables(VVAccess.ReadWrite)]
+    [DataField("emoteChance")] [ViewVariables(VVAccess.ReadWrite)]
     public float EmoteChance = 0.5f;
 
     /// <summary>
-    /// A dictionary of emotes threshold that will be randomly picked from.
-    /// <see cref="EmotePrototype"/>
+    /// The cooldown between emotes.
     /// </summary>
-    [DataField("emotes"), ViewVariables(VVAccess.ReadWrite)]
-    public Dictionary<float, HashSet<string>> EmotesThreshold = new(); // CorvaxGoob-AutoEmote : Changes
+    [DataField("emoteCooldown")] [ViewVariables(VVAccess.ReadWrite)]
+    public TimeSpan EmoteCooldown = TimeSpan.FromSeconds(2);
 
     /// <summary>
-    /// Also send the emote in chat.
-    /// <summary>
-    [DataField("withChat"), ViewVariables(VVAccess.ReadWrite)]
-    public bool WithChat = false;
+    /// A dictionary of emotes threshold that will be randomly picked from.
+    /// <see cref="EmotePrototype" />
+    /// </summary>
+    [DataField("emotes")] [ViewVariables(VVAccess.ReadWrite)]
+    public Dictionary<float, HashSet<string>> EmotesThreshold = new(); // CorvaxGoob-AutoEmote : Changes
 
     /// <summary>
     /// Hide the chat message from the chat window, only showing the popup.
@@ -46,21 +50,17 @@ public sealed partial class EmoteOnDamageComponent : Component
     /// <summary>
     /// The simulation time of the last emote preformed due to taking damage.
     /// </summary>
-    [DataField("lastEmoteTime", customTypeSerializer: typeof(TimeOffsetSerializer)), ViewVariables(VVAccess.ReadWrite)]
+    [DataField("lastEmoteTime", customTypeSerializer: typeof(TimeOffsetSerializer))] [ViewVariables(VVAccess.ReadWrite)]
     [AutoPausedField]
     public TimeSpan LastEmoteTime = TimeSpan.Zero;
 
-    /// <summary>
-    /// The cooldown between emotes.
-    /// </summary>
-    [DataField("emoteCooldown"), ViewVariables(VVAccess.ReadWrite)]
-    public TimeSpan EmoteCooldown = TimeSpan.FromSeconds(2);
-
-    // CorvaxGoob-AutoEmote-Start : Changes
-    [DataField]
-    public HashSet<string> AllowedDamageType = ["Blunt", "Caustic", "Heat", "Cold", "Piercing", "Shock", "Slash"];
-
     [DataField]
     public float PainThreshold = 6.0f;
+
+    /// <summary>
+    /// Also send the emote in chat.
+    /// <summary>
+    [DataField("withChat")] [ViewVariables(VVAccess.ReadWrite)]
+    public bool WithChat = false;
     // CorvaxGoob-AutoEmote-End : Changes
 }

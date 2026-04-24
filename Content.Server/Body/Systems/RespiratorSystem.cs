@@ -81,60 +81,62 @@
 using Content.Goobstation.Common.Body.Components;
 using Content.Goobstation.Common.Grab;
 using Content.Goobstation.Common.MartialArts;
-using Content.Goobstation.Shared.Body; // goob
+using Content.Goobstation.Shared.Body;
 using Content.Goobstation.Shared.GrabIntent;
 using Content.Server.Administration.Logs;
 using Content.Server.Atmos.EntitySystems;
 using Content.Server.Body.Components;
 using Content.Server.Chat.Systems;
-using Content.Shared.EntityEffects.EffectConditions;
-using Content.Shared.EntityEffects.Effects;
-using Content.Shared.Chemistry.EntitySystems;
+using Content.Server.EntityEffects;
+using Content.Shared._DV.CosmicCult.Components;
+using Content.Shared._Shitmed.Body.Components;
+using Content.Shared._Shitmed.Body.Organ;
+using Content.Shared._Shitmed.Medical.Surgery.Consciousness;
+using Content.Shared._Shitmed.Medical.Surgery.Consciousness.Systems;
+using Content.Shared._Shitmed.Targeting;
 using Content.Shared.Alert;
 using Content.Shared.Atmos;
 using Content.Shared.Body.Components;
 using Content.Shared.Body.Events;
 using Content.Shared.Body.Prototypes;
-using Content.Shared.Chat; // Einstein Engines - Language
+using Content.Shared.Chat;
 using Content.Shared.Chemistry.Components;
-using Content.Shared.EntityEffects;
+using Content.Shared.Chemistry.EntitySystems;
 using Content.Shared.Chemistry.Reagent;
 using Content.Shared.Damage;
 using Content.Shared.Database;
-using Content.Server.EntityEffects;
+using Content.Shared.EntityEffects;
+using Content.Shared.EntityEffects.EffectConditions;
+using Content.Shared.EntityEffects.Effects;
 using Content.Shared.Mobs.Systems;
 using JetBrains.Annotations;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
-using Content.Shared._DV.CosmicCult.Components; // DeltaV
+// goob
+// Einstein Engines - Language
+// DeltaV
 
 // Shitmed Change
-using Content.Shared._Shitmed.Targeting;
-using Content.Shared._Shitmed.Body.Components;
-using Content.Shared._Shitmed.Body.Organ;
-using Content.Shared._Shitmed.Medical.Surgery.Consciousness;
-using Content.Shared._Shitmed.Medical.Surgery.Consciousness.Systems;
 
 namespace Content.Server.Body.Systems;
 
 [UsedImplicitly]
 public sealed class RespiratorSystem : EntitySystem
 {
+    private static readonly ProtoId<MetabolismGroupPrototype> GasId = new("Gas");
     [Dependency] private readonly IAdminLogManager _adminLogger = default!;
-    [Dependency] private readonly IGameTiming _gameTiming = default!;
     [Dependency] private readonly AlertsSystem _alertsSystem = default!;
     [Dependency] private readonly AtmosphereSystem _atmosSys = default!;
     [Dependency] private readonly BodySystem _bodySystem = default!;
+    [Dependency] private readonly ChatSystem _chat = default!;
+    [Dependency] private readonly ConsciousnessSystem _consciousness = default!; // Shitmed Change
     [Dependency] private readonly DamageableSystem _damageableSys = default!;
+    [Dependency] private readonly EntityEffectSystem _entityEffect = default!;
+    [Dependency] private readonly IGameTiming _gameTiming = default!;
     [Dependency] private readonly LungSystem _lungSystem = default!;
     [Dependency] private readonly MobStateSystem _mobState = default!;
     [Dependency] private readonly IPrototypeManager _protoMan = default!;
     [Dependency] private readonly SharedSolutionContainerSystem _solutionContainerSystem = default!;
-    [Dependency] private readonly ChatSystem _chat = default!;
-    [Dependency] private readonly EntityEffectSystem _entityEffect = default!;
-    [Dependency] private readonly ConsciousnessSystem _consciousness = default!; // Shitmed Change
-
-    private static readonly ProtoId<MetabolismGroupPrototype> GasId = new("Gas");
 
     public override void Initialize()
     {
@@ -171,11 +173,10 @@ public sealed class RespiratorSystem : EntitySystem
 
         return !HasComp<KravMagaBlockedBreathingComponent>(uid);
     }
+
     // Goobstation end
-    private void OnMapInit(Entity<RespiratorComponent> ent, ref MapInitEvent args)
-    {
+    private void OnMapInit(Entity<RespiratorComponent> ent, ref MapInitEvent args) =>
         ent.Comp.NextUpdate = _gameTiming.CurTime + ent.Comp.AdjustedUpdateInterval;
-    }
 
     public override void Update(float frameTime)
     {
@@ -189,7 +190,8 @@ public sealed class RespiratorSystem : EntitySystem
 
             respirator.NextUpdate += respirator.AdjustedUpdateInterval;
 
-            if (_mobState.IsDead(uid) || HasComp<BreathingImmunityComponent>(uid) || HasComp<SpecialBreathingImmunityComponent>(uid)) // Shitmed: BreathingImmunity
+            if (_mobState.IsDead(uid) || HasComp<BreathingImmunityComponent>(uid) ||
+                HasComp<SpecialBreathingImmunityComponent>(uid)) // Shitmed: BreathingImmunity
                 continue;
 
             // Begin DeltaV Code: Addition:
@@ -199,10 +201,14 @@ public sealed class RespiratorSystem : EntitySystem
             {
                 multiplier *= lung.SaturationLoss * respirator.SaturationLoss; // Goob Edit - In a DeltaV Edit :o
             }
-            // End DeltaV Code
-            UpdateSaturation(uid,  multiplier * (float) respirator.UpdateInterval.TotalSeconds, respirator); // DeltaV: use multiplier instead of negating
 
-            if (!_mobState.IsIncapacitated(uid) && !HasComp<DebrainedComponent>(uid)) // Shitmed Change - Cannot breathe in crit or when no brain.
+            // End DeltaV Code
+            UpdateSaturation(uid,
+                multiplier * (float) respirator.UpdateInterval.TotalSeconds,
+                respirator); // DeltaV: use multiplier instead of negating
+
+            if (!_mobState.IsIncapacitated(uid) &&
+                !HasComp<DebrainedComponent>(uid)) // Shitmed Change - Cannot breathe in crit or when no brain.
             {
                 switch (respirator.Status)
                 {
@@ -247,7 +253,7 @@ public sealed class RespiratorSystem : EntitySystem
 
     public void Inhale(Entity<RespiratorComponent?> entity)
     {
-        if (!Resolve(entity, ref entity.Comp, logMissing: false))
+        if (!Resolve(entity, ref entity.Comp, false))
             return;
 
         // Inhale gas
@@ -279,7 +285,7 @@ public sealed class RespiratorSystem : EntitySystem
         // exhale gas
 
         var ev = new ExhaleLocationEvent();
-        RaiseLocalEvent(entity, ref ev, broadcast: false);
+        RaiseLocalEvent(entity, ref ev, false);
 
         if (ev.Gas is null)
         {
@@ -295,7 +301,7 @@ public sealed class RespiratorSystem : EntitySystem
 
     public void Exhale(Entity<RespiratorComponent?> entity, GasMixture gas)
     {
-        if (!Resolve(entity, ref entity.Comp, logMissing: false))
+        if (!Resolve(entity, ref entity.Comp, false))
             return;
 
         var ev = new ExhaledGasEvent(gas);
@@ -313,7 +319,7 @@ public sealed class RespiratorSystem : EntitySystem
         if (!Resolve(ent, ref ent.Comp))
             return false;
 
-        return (ent.Comp.Saturation > ent.Comp.SuffocationThreshold);
+        return ent.Comp.Saturation > ent.Comp.SuffocationThreshold;
     }
 
     /// <summary>
@@ -502,8 +508,8 @@ public sealed class RespiratorSystem : EntitySystem
                     ent,
                     nerveSys.Value,
                     -ent.Comp.Damage.GetTotal(),
-                    identifier: "Suffocation",
-                    type: ConsciousnessModType.Pain);
+                    "Suffocation",
+                    ConsciousnessModType.Pain);
             }
             else
             {
@@ -511,13 +517,16 @@ public sealed class RespiratorSystem : EntitySystem
                     ent,
                     nerveSys.Value,
                     modifier.Value.Change - ent.Comp.Damage.GetTotal(),
-                    identifier: "Suffocation",
-                    type: ConsciousnessModType.Pain);
+                    "Suffocation",
+                    ConsciousnessModType.Pain);
             }
         }
 
         // Shitmed Change End
-        _damageableSys.TryChangeDamage(ent, HasComp<DebrainedComponent>(ent) ? ent.Comp.Damage * 4.5f : ent.Comp.Damage, targetPart: TargetBodyPart.All, interruptsDoAfters: false); // Shitmed Change
+        _damageableSys.TryChangeDamage(ent,
+            HasComp<DebrainedComponent>(ent) ? ent.Comp.Damage * 4.5f : ent.Comp.Damage,
+            targetPart: TargetBodyPart.All,
+            interruptsDoAfters: false); // Shitmed Change
 
         if (ent.Comp.SuffocationCycles < ent.Comp.SuffocationCycleThreshold)
             return;
@@ -564,21 +573,22 @@ public sealed class RespiratorSystem : EntitySystem
             && _consciousness.TryGetConsciousnessModifier(ent, nerveSys.Value, out var modifier, "Suffocation"))
         {
             if (modifier.Value.Change < respirator.DamageRecovery.GetTotal())
-            {
                 _consciousness.RemoveConsciousnessModifier(ent, nerveSys.Value, "Suffocation");
-            }
             else
             {
                 _consciousness.SetConsciousnessModifier(
                     ent,
                     nerveSys.Value,
                     modifier.Value.Change + respirator.DamageRecovery.GetTotal(),
-                    identifier: "Suffocation",
-                    type: ConsciousnessModType.Pain);
+                    "Suffocation",
+                    ConsciousnessModType.Pain);
             }
         }
 
-        _damageableSys.TryChangeDamage(ent, respirator.DamageRecovery, targetPart: TargetBodyPart.All, ignoreBlockers: true);
+        _damageableSys.TryChangeDamage(ent,
+            respirator.DamageRecovery,
+            targetPart: TargetBodyPart.All,
+            ignoreBlockers: true);
         // Shitmed Change End
     }
 
@@ -600,10 +610,8 @@ public sealed class RespiratorSystem : EntitySystem
             Math.Clamp(respirator.Saturation, respirator.MinSaturation, respirator.MaxSaturation);
     }
 
-    private void OnApplyMetabolicMultiplier(Entity<RespiratorComponent> ent, ref ApplyMetabolicMultiplierEvent args)
-    {
+    private void OnApplyMetabolicMultiplier(Entity<RespiratorComponent> ent, ref ApplyMetabolicMultiplierEvent args) =>
         ent.Comp.UpdateIntervalMultiplier = args.Multiplier;
-    }
 
     private void OnGasInhaled(Entity<BodyComponent> entity, ref InhaledGasEvent args)
     {
@@ -678,4 +686,8 @@ public record struct StopSuffocatingEvent;
 /// <param name="Toxic">Whether the gas returns as toxic to any respirator.</param>
 /// <param name="Saturation">The amount of saturation we got from the gas.</param>
 [ByRefEvent]
-public record struct CanMetabolizeGasEvent(GasMixture Gas, bool Toxic = false, float Saturation = 0f, bool Handled = false);
+public record struct CanMetabolizeGasEvent(
+    GasMixture Gas,
+    bool Toxic = false,
+    float Saturation = 0f,
+    bool Handled = false);

@@ -13,24 +13,23 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototy
 namespace Content.Server.Radio.Components;
 
 /// <summary>
-///     Listens for radio messages and relays them to local chat.
+/// Listens for radio messages and relays them to local chat.
 /// </summary>
 [RegisterComponent]
 [Access(typeof(RadioDeviceSystem))]
 public sealed partial class RadioSpeakerComponent : Component
 {
-    /// <summary>
-    /// Whether or not interacting with this entity
-    /// toggles it on or off.
-    /// </summary>
-    [DataField("toggleOnInteract")]
-    public bool ToggleOnInteract = true;
-
     [DataField("channels", customTypeSerializer: typeof(PrototypeIdHashSetSerializer<RadioChannelPrototype>))]
-    public HashSet<string> Channels = new () { SharedChatSystem.CommonChannel };
+    public HashSet<string> Channels = new() { SharedChatSystem.CommonChannel };
 
     [DataField("enabled")]
     public bool Enabled;
+
+    /// <summary>
+    /// Does the radio need to be on a power grid to work?
+    /// </summary>
+    [DataField]
+    public bool PowerRequired;
 
     // Goob start
     /// <summary>
@@ -40,9 +39,10 @@ public sealed partial class RadioSpeakerComponent : Component
     public bool SpeakNormally;
 
     /// <summary>
-    /// Does the radio need to be on a power grid to work?
+    /// Whether or not interacting with this entity
+    /// toggles it on or off.
     /// </summary>
-    [DataField]
-    public bool PowerRequired;
+    [DataField("toggleOnInteract")]
+    public bool ToggleOnInteract = true;
     // Goob end
 }

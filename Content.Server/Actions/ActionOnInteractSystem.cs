@@ -99,19 +99,18 @@ using Content.Shared.Charges.Components;
 using Content.Shared.Charges.Systems;
 using Content.Shared.Interaction;
 using Robust.Shared.Random;
-using Robust.Shared.Timing;
 
 namespace Content.Server.Actions;
 
 /// <summary>
-///     This System handled interactions for the <see cref="ActionOnInteractComponent"/>.
+/// This System handled interactions for the <see cref="ActionOnInteractComponent" />.
 /// </summary>
 public sealed class ActionOnInteractSystem : EntitySystem
 {
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly SharedActionsSystem _actions = default!;
     [Dependency] private readonly ActionContainerSystem _actionContainer = default!;
+    [Dependency] private readonly SharedActionsSystem _actions = default!;
     [Dependency] private readonly SharedChargesSystem _charges = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
 
     public override void Initialize()
     {
@@ -139,9 +138,9 @@ public sealed class ActionOnInteractSystem : EntitySystem
         if (args.Handled || !args.Complex)
             return;
 
-        if (component.ActionEntities is not {} actionEnts)
+        if (component.ActionEntities is not { } actionEnts)
         {
-            if (!TryComp<ActionsContainerComponent>(uid,  out var actionsContainerComponent))
+            if (!TryComp<ActionsContainerComponent>(uid, out var actionsContainerComponent))
                 return;
 
             actionEnts = actionsContainerComponent.Container.ContainedEntities.ToList();
@@ -166,16 +165,16 @@ public sealed class ActionOnInteractSystem : EntitySystem
         if (args.Handled)
             return;
 
-        if (component.ActionEntities is not {} actionEnts)
+        if (component.ActionEntities is not { } actionEnts)
         {
-            if (!TryComp<ActionsContainerComponent>(uid,  out var actionsContainerComponent))
+            if (!TryComp<ActionsContainerComponent>(uid, out var actionsContainerComponent))
                 return;
 
             actionEnts = actionsContainerComponent.Container.ContainedEntities.ToList();
         }
 
         // First, try entity target actions
-        if (args.Target is {} target)
+        if (args.Target is { } target)
         {
             var entOptions = GetValidActions<EntityTargetActionComponent>(actionEnts, args.CanReach);
             for (var i = entOptions.Count - 1; i >= 0; i--)
@@ -197,6 +196,7 @@ public sealed class ActionOnInteractSystem : EntitySystem
                 return;
             }
         }
+
         // else: try world target actions
         var options = GetValidActions<WorldTargetActionComponent>(component.ActionEntities, args.CanReach);
         for (var i = options.Count - 1; i >= 0; i--)
@@ -213,17 +213,18 @@ public sealed class ActionOnInteractSystem : EntitySystem
             return;
 
         var (actId, comp, world) = _random.Pick(options);
-        if (world.Event is {} worldEv)
+        if (world.Event is { } worldEv)
         {
             worldEv.Target = args.ClickLocation;
             worldEv.Entity = HasComp<EntityTargetActionComponent>(actId) ? args.Target : null;
         }
 
-        _actions.PerformAction(args.User, (actId, comp), world.Event, predicted: false);
+        _actions.PerformAction(args.User, (actId, comp), world.Event, false);
         args.Handled = true;
     }
 
-    private List<Entity<ActionComponent, T>> GetValidActions<T>(List<EntityUid>? actions, bool canReach = true) where T: Component
+    private List<Entity<ActionComponent, T>> GetValidActions<T>(List<EntityUid>? actions, bool canReach = true)
+        where T : Component
     {
         var valid = new List<Entity<ActionComponent, T>>();
 
@@ -232,12 +233,10 @@ public sealed class ActionOnInteractSystem : EntitySystem
 
         foreach (var id in actions)
         {
-            if (_actions.GetAction(id) is not {} action ||
+            if (_actions.GetAction(id) is not { } action ||
                 !TryComp<T>(id, out var comp) ||
                 !_actions.ValidAction(action, canReach))
-            {
                 continue;
-            }
 
             valid.Add((id, action, comp));
         }

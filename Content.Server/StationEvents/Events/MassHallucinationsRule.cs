@@ -19,14 +19,16 @@ using Content.Shared.Humanoid;
 using Content.Shared.Mind.Components;
 using Content.Shared.Traits.Assorted;
 
-
 namespace Content.Server.StationEvents.Events;
 
 public sealed class MassHallucinationsRule : StationEventSystem<MassHallucinationsRuleComponent>
 {
     [Dependency] private readonly ParacusiaSystem _paracusia = default!;
 
-    protected override void Started(EntityUid uid, MassHallucinationsRuleComponent component, GameRuleComponent gameRule, GameRuleStartedEvent args)
+    protected override void Started(EntityUid uid,
+        MassHallucinationsRuleComponent component,
+        GameRuleComponent gameRule,
+        GameRuleStartedEvent args)
     {
         base.Started(uid, component, gameRule, args);
 
@@ -36,7 +38,10 @@ public sealed class MassHallucinationsRule : StationEventSystem<MassHallucinatio
             if (!EnsureComp<ParacusiaComponent>(ent, out var paracusia))
             {
                 _paracusia.SetSounds(ent, component.Sounds, paracusia);
-                _paracusia.SetTime(ent, component.MinTimeBetweenIncidents, component.MaxTimeBetweenIncidents, paracusia);
+                _paracusia.SetTime(ent,
+                    component.MinTimeBetweenIncidents,
+                    component.MaxTimeBetweenIncidents,
+                    paracusia);
                 _paracusia.SetDistance(ent, component.MaxSoundDistance);
 
                 component.AffectedEntities.Add(ent);
@@ -44,7 +49,10 @@ public sealed class MassHallucinationsRule : StationEventSystem<MassHallucinatio
         }
     }
 
-    protected override void Ended(EntityUid uid, MassHallucinationsRuleComponent component, GameRuleComponent gameRule, GameRuleEndedEvent args)
+    protected override void Ended(EntityUid uid,
+        MassHallucinationsRuleComponent component,
+        GameRuleComponent gameRule,
+        GameRuleEndedEvent args)
     {
         base.Ended(uid, component, gameRule, args);
 

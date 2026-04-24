@@ -19,7 +19,10 @@ public sealed class RandomEntityStorageSpawnRule : StationEventSystem<RandomEnti
 {
     [Dependency] private readonly EntityStorageSystem _entityStorage = default!;
 
-    protected override void Started(EntityUid uid, RandomEntityStorageSpawnRuleComponent comp, GameRuleComponent gameRule, GameRuleStartedEvent args)
+    protected override void Started(EntityUid uid,
+        RandomEntityStorageSpawnRuleComponent comp,
+        GameRuleComponent gameRule,
+        GameRuleStartedEvent args)
     {
         base.Started(uid, comp, gameRule, args);
 
@@ -49,8 +52,6 @@ public sealed class RandomEntityStorageSpawnRule : StationEventSystem<RandomEnti
 
         var (locker, storageComp) = RobustRandom.Pick(validLockers);
         if (!_entityStorage.Insert(spawn, locker, storageComp))
-        {
             Del(spawn);
-        }
     }
 }

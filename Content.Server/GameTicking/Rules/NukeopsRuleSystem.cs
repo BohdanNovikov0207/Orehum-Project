@@ -77,7 +77,10 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Linq;
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Server.Antag;
+using Content.Server.Chat.Systems;
 using Content.Server.Communications;
 using Content.Server.GameTicking.Rules.Components;
 using Content.Server.Nuke;
@@ -88,6 +91,7 @@ using Content.Server.RoundEnd;
 using Content.Server.Shuttles.Events;
 using Content.Server.Shuttles.Systems;
 using Content.Server.Station.Components;
+using Content.Server.Station.Systems;
 using Content.Server.Store.Systems;
 using Content.Shared.GameTicking.Components;
 using Content.Shared.Mobs;
@@ -96,42 +100,40 @@ using Content.Shared.NPC.Components;
 using Content.Shared.NPC.Systems;
 using Content.Shared.Nuke;
 using Content.Shared.NukeOps;
+using Content.Shared.Station.Components;
 using Content.Shared.Store;
+using Content.Shared.Store.Components;
 using Content.Shared.Tag;
 using Content.Shared.Zombies;
+using Robust.Server.Player;
 using Robust.Shared.Map;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Utility;
-using System.Linq;
-using Content.Shared.Station.Components;
-using Content.Shared.Store.Components;
-using Content.Server.Station.Systems;
-using Content.Server.Chat.Systems;
-using Robust.Server.Player;
-using Robust.Shared.Prototypes;
 
 namespace Content.Server.GameTicking.Rules;
 
 public sealed class NukeopsRuleSystem : GameRuleSystem<NukeopsRuleComponent>
 {
-    [Dependency] private readonly AntagSelectionSystem _antag = default!;
-    [Dependency] private readonly EmergencyShuttleSystem _emergency = default!;
-    [Dependency] private readonly NpcFactionSystem _npcFaction = default!;
-    [Dependency] private readonly PopupSystem _popupSystem = default!;
-    [Dependency] private readonly RoundEndSystem _roundEndSystem = default!;
-    [Dependency] private readonly StoreSystem _store = default!;
-    [Dependency] private readonly TagSystem _tag = default!;
-    // goob edit
-    [Dependency] private readonly StationSystem _stationSystem = default!;
-    [Dependency] private readonly ChatSystem _chat = default!;
-    [Dependency] private readonly IPlayerManager _playerManager = default!;
+    [ValidatePrototypeId<TagPrototype>]
+    private const string NukeOpsReinforcementUplinkTagPrototype = "NukeOpsReinforcementUplink"; // Goobstation
     // goob edit end
 
     private static readonly ProtoId<CurrencyPrototype> TelecrystalCurrencyPrototype = "Telecrystal";
     private static readonly ProtoId<TagPrototype> NukeOpsUplinkTagPrototype = "NukeOpsUplink";
+    [Dependency] private readonly AntagSelectionSystem _antag = default!;
+    [Dependency] private readonly ChatSystem _chat = default!;
+    [Dependency] private readonly EmergencyShuttleSystem _emergency = default!;
+    [Dependency] private readonly NpcFactionSystem _npcFaction = default!;
+    [Dependency] private readonly IPlayerManager _playerManager = default!;
+    [Dependency] private readonly PopupSystem _popupSystem = default!;
 
-    [ValidatePrototypeId<TagPrototype>]
-    private const string NukeOpsReinforcementUplinkTagPrototype = "NukeOpsReinforcementUplink"; // Goobstation
+    [Dependency] private readonly RoundEndSystem _roundEndSystem = default!;
+
+    // goob edit
+    [Dependency] private readonly StationSystem _stationSystem = default!;
+    [Dependency] private readonly StoreSystem _store = default!;
+    [Dependency] private readonly TagSystem _tag = default!;
 
     public override void Initialize()
     {
@@ -176,7 +178,204 @@ public sealed class NukeopsRuleSystem : GameRuleSystem<NukeopsRuleComponent>
         component.TargetStation = RobustRandom.Pick(eligible);
     }
 
+    /// <summary>
+    /// Returns conditions for war declaration
+    /// </summary>
+    public WarConditionStatus GetWarCondition(NukeopsRuleComponent nukieRule, WarConditionStatus? oldStatus)
+    {
+        if (!nukieRule.CanEnableWarOps)
+            return WarConditionStatus.NoWarUnknown;
+
+        if (EntityQuery<NukeopsRoleComponent>().Count() < nukieRule.WarDeclarationMinOps)
+            return WarConditionStatus.NoWarSmallCrew;
+
+        if (nukieRule.LeftOutpost)
+            return WarConditionStatus.NoWarShuttleDeparted;
+
+        if (oldStatus == WarConditionStatus.YesWar)
+            return WarConditionStatus.WarReady;
+
+        return WarConditionStatus.YesWar;
+    }
+
+    private void DistributeExtraTc(Entity<NukeopsRuleComponent> nukieRule)
+    {
+        var enumerator = EntityQueryEnumerator<StoreComponent>();
+        while (enumerator.MoveNext(out var uid, out var component))
+        {
+            if (!_tag.HasTag(uid, NukeOpsUplinkTagPrototype) ||
+                _tag.HasTag(uid, NukeOpsReinforcementUplinkTagPrototype)) // Goob edit - no tc for reinforcements
+                continue;
+
+            if (GetOutpost(nukieRule.Owner) is not { } outpost)
+                continue;
+
+            if (Transform(uid).MapID != Transform(outpost).MapID) // Will receive bonus TC only on their start outpost
+                continue;
+
+            _store.TryAddCurrency(new Dictionary<string, FixedPoint2>
+                    { { TelecrystalCurrencyPrototype, CalculateBonusTcPerNukie(nukieRule.Comp) } },
+                uid,
+                component); // Goob edit
+
+            var msg = Loc.GetString("store-currency-war-boost-given", ("target", uid));
+            _popupSystem.PopupEntity(msg, uid);
+        }
+    }
+
+    private int CalculateBonusTcPerNukie(NukeopsRuleComponent rule) // Goobstation
+    {
+        var nukiesCount = EntityQuery<NukeopsRoleComponent>().Count();
+        if (nukiesCount == 0)
+            return rule.WarTcAmountPerNukie;
+        var totalPlayersCount = _antag.GetTotalPlayerCount(_playerManager.Sessions);
+        var playersCount = Math.Max(0, totalPlayersCount - nukiesCount);
+        var maxNukies = totalPlayersCount / rule.WarNukiePlayerRatio;
+        var nukiesMissing = Math.Max(0, maxNukies - nukiesCount);
+        var totalBonus = playersCount * rule.WarTcPerPlayer;
+        totalBonus += nukiesMissing * rule.WarTcPerNukieMissing;
+        return Math.Max(rule.WarTcAmountPerNukie, totalBonus / nukiesCount);
+    }
+
+    private void SetWinType(Entity<NukeopsRuleComponent> ent, WinType type, bool endRound = true)
+    {
+        ent.Comp.WinType = type;
+
+        if (endRound && (type == WinType.CrewMajor || type == WinType.OpsMajor))
+            _roundEndSystem.EndRound();
+    }
+
+    private void CheckRoundShouldEnd(bool announce = true) // Goobstation
+    {
+        var query = QueryActiveRules();
+        while (query.MoveNext(out var uid, out _, out var nukeops, out _))
+        {
+            CheckRoundShouldEnd((uid, nukeops),
+                announce); // Goobstation
+        }
+    }
+
+    private void CheckRoundShouldEnd(Entity<NukeopsRuleComponent> ent,
+        bool announce = true) // Goobstation
+    {
+        var nukeops = ent.Comp;
+
+        if (nukeops.RoundEndBehavior == RoundEndBehavior.Nothing || nukeops.WinType == WinType.CrewMajor ||
+            nukeops.WinType == WinType.OpsMajor)
+            return;
+
+
+        // If there are any nuclear bombs that are active, immediately return. We're not over yet.
+        foreach (var nuke in EntityQuery<NukeComponent>())
+        {
+            if (nuke.Status == NukeStatus.ARMED)
+                return;
+        }
+
+        var shuttle = GetShuttle((ent, ent));
+
+        MapId? shuttleMapId = Exists(shuttle)
+            ? Transform(shuttle.Value).MapID
+            : null;
+
+        MapId? targetStationMap = null;
+        if (nukeops.TargetStation != null && TryComp(nukeops.TargetStation, out StationDataComponent? data))
+        {
+            var grid = data.Grids.FirstOrNull();
+            targetStationMap = grid != null
+                ? Transform(grid.Value).MapID
+                : null;
+        }
+
+        // Check if there are nuke operatives still alive on the same map as the shuttle,
+        // or on the same map as the station.
+        // If there are, the round can continue.
+        var operatives = EntityQuery<NukeOperativeComponent, MobStateComponent, TransformComponent>(true);
+        var operativesAlive = operatives
+            .Where(op =>
+                op.Item3.MapID == shuttleMapId
+                || op.Item3.MapID == targetStationMap)
+            .Any(op => op.Item2.CurrentState == MobState.Alive && op.Item1.Running);
+
+        if (operativesAlive)
+            return; // There are living operatives than can access the shuttle, or are still on the station's map.
+
+        // Check that there are spawns available and that they can access the shuttle.
+        var spawnsAvailable = EntityQuery<NukeOperativeSpawnerComponent>(true).Any();
+        if (spawnsAvailable && CompOrNull<RuleGridsComponent>(ent)?.Map == shuttleMapId)
+            return; // Ghost spawns can still access the shuttle. Continue the round.
+
+        // The shuttle is inaccessible to both living nuke operatives and yet to spawn nuke operatives,
+        // and there are no nuclear operatives on the target station's map.
+        nukeops.WinConditions.Add(spawnsAvailable
+            ? WinCondition.NukiesAbandoned
+            : WinCondition.AllNukiesDead);
+
+        SetWinType(ent, WinType.CrewMajor, false);
+
+        // goob edit - no more roundend behavior, just announcement
+        if (announce)
+        {
+            _chat.DispatchGlobalAnnouncement(
+                Loc.GetString(nukeops.RoundEndTextAnnouncement),
+                Loc.GetString(nukeops.RoundEndTextSender));
+        }
+
+        // prevent it called multiple times
+        nukeops.RoundEndBehavior = RoundEndBehavior.Nothing;
+    }
+
+    private void OnAfterAntagEntSelected(Entity<NukeopsRuleComponent> ent, ref AfterAntagEntitySelectedEvent args)
+    {
+        var target = ent.Comp.TargetStation is not null ? Name(ent.Comp.TargetStation.Value) : "the target";
+
+        _antag.SendBriefing(args.Session,
+            Loc.GetString($"{ent.Comp.LocalePrefix}welcome",
+                ("station", target),
+                ("name", Name(ent))),
+            Color.Red,
+            ent.Comp.GreetSoundNotification);
+    }
+
+    private void OnGetBriefing(Entity<NukeopsRoleComponent> role, ref GetBriefingEvent args) =>
+        // TODO Different character screen briefing for the 3 nukie types
+        args.Append(
+            Loc.GetString(
+                "nukeops-briefing")); // TODO: Goobstation: somehow pass the nukeopsrulecomponent here so we can change this based on LocalePrefix for Honkops.
+
+    /// <remarks>
+    /// Is this method the shitty glue holding together the last of my sanity? yes.
+    /// Do i have a better solution? not presently.
+    /// </remarks>
+    private EntityUid? GetOutpost(Entity<RuleGridsComponent?> ent)
+    {
+        if (!Resolve(ent, ref ent.Comp, false))
+            return null;
+
+        return ent.Comp.MapGrids.Where(e => !HasComp<NukeOpsShuttleComponent>(e)).FirstOrNull();
+    }
+
+    /// <remarks>
+    /// Is this method the shitty glue holding together the last of my sanity? yes.
+    /// Do i have a better solution? not presently.
+    /// </remarks>
+    private EntityUid? GetShuttle(Entity<NukeopsRuleComponent?> ent)
+    {
+        if (!Resolve(ent, ref ent.Comp, false))
+            return null;
+
+        var query = EntityQueryEnumerator<NukeOpsShuttleComponent>();
+        while (query.MoveNext(out var uid, out var comp))
+        {
+            if (comp.AssociatedRule == ent.Owner)
+                return uid;
+        }
+
+        return null;
+    }
+
     #region Event Handlers
+
     protected override void AppendRoundEndText(EntityUid uid,
         NukeopsRuleComponent component,
         GameRuleComponent gameRule,
@@ -222,9 +421,7 @@ public sealed class NukeopsRuleSystem : GameRuleSystem<NukeopsRuleComponent>
                     foreach (var grid in data.Grids)
                     {
                         if (grid != ev.OwningStation)
-                        {
                             continue;
-                        }
 
                         nukeops.WinConditions.Add(WinCondition.NukeExplodedOnCorrectStation);
                         SetWinType((uid, nukeops), WinType.OpsMajor);
@@ -238,9 +435,7 @@ public sealed class NukeopsRuleSystem : GameRuleSystem<NukeopsRuleComponent>
                 nukeops.WinConditions.Add(WinCondition.NukeExplodedOnIncorrectLocation);
             }
             else
-            {
                 nukeops.WinConditions.Add(WinCondition.NukeExplodedOnIncorrectLocation);
-            }
 
             _roundEndSystem.EndRound();
         }
@@ -324,22 +519,17 @@ public sealed class NukeopsRuleSystem : GameRuleSystem<NukeopsRuleComponent>
         // This also implies that some nuclear operatives have died.
         SetWinType(ent,
             diskAtCentCom
-            ? WinType.CrewMinor
-            : WinType.OpsMinor);
+                ? WinType.CrewMinor
+                : WinType.OpsMinor);
         ent.Comp.WinConditions.Add(diskAtCentCom
             ? WinCondition.NukeDiskOnCentCom
             : WinCondition.NukeDiskNotOnCentCom);
     }
 
-    private void OnNukeDisarm(NukeDisarmSuccessEvent ev)
-    {
-        CheckRoundShouldEnd();
-    }
+    private void OnNukeDisarm(NukeDisarmSuccessEvent ev) => CheckRoundShouldEnd();
 
-    private void OnComponentRemove(EntityUid uid, NukeOperativeComponent component, ComponentRemove args)
-    {
+    private void OnComponentRemove(EntityUid uid, NukeOperativeComponent component, ComponentRemove args) =>
         CheckRoundShouldEnd(false); // Goobstation
-    }
 
     private void OnMobStateChanged(EntityUid uid, NukeOperativeComponent component, MobStateChangedEvent ev)
     {
@@ -347,10 +537,8 @@ public sealed class NukeopsRuleSystem : GameRuleSystem<NukeopsRuleComponent>
             CheckRoundShouldEnd();
     }
 
-    private void OnOperativeZombified(EntityUid uid, NukeOperativeComponent component, ref EntityZombifiedEvent args)
-    {
+    private void OnOperativeZombified(EntityUid uid, NukeOperativeComponent component, ref EntityZombifiedEvent args) =>
         RemCompDeferred(uid, component);
-    }
 
     private void OnRuleLoadedGrids(Entity<NukeopsRuleComponent> ent, ref RuleLoadedGridsEvent args)
     {
@@ -411,7 +599,6 @@ public sealed class NukeopsRuleSystem : GameRuleSystem<NukeopsRuleComponent>
                     return;
                 }
             }
-
         }
     }
 
@@ -441,193 +628,4 @@ public sealed class NukeopsRuleSystem : GameRuleSystem<NukeopsRuleComponent>
     }
 
     #endregion Event Handlers
-
-    /// <summary>
-    ///     Returns conditions for war declaration
-    /// </summary>
-    public WarConditionStatus GetWarCondition(NukeopsRuleComponent nukieRule, WarConditionStatus? oldStatus)
-    {
-        if (!nukieRule.CanEnableWarOps)
-            return WarConditionStatus.NoWarUnknown;
-
-        if (EntityQuery<NukeopsRoleComponent>().Count() < nukieRule.WarDeclarationMinOps)
-            return WarConditionStatus.NoWarSmallCrew;
-
-        if (nukieRule.LeftOutpost)
-            return WarConditionStatus.NoWarShuttleDeparted;
-
-        if (oldStatus == WarConditionStatus.YesWar)
-            return WarConditionStatus.WarReady;
-
-        return WarConditionStatus.YesWar;
-    }
-
-    private void DistributeExtraTc(Entity<NukeopsRuleComponent> nukieRule)
-    {
-        var enumerator = EntityQueryEnumerator<StoreComponent>();
-        while (enumerator.MoveNext(out var uid, out var component))
-        {
-            if (!_tag.HasTag(uid, NukeOpsUplinkTagPrototype) || _tag.HasTag(uid, NukeOpsReinforcementUplinkTagPrototype)) // Goob edit - no tc for reinforcements
-                continue;
-
-            if (GetOutpost(nukieRule.Owner) is not { } outpost)
-                continue;
-
-            if (Transform(uid).MapID != Transform(outpost).MapID) // Will receive bonus TC only on their start outpost
-                continue;
-
-            _store.TryAddCurrency(new() { { TelecrystalCurrencyPrototype, CalculateBonusTcPerNukie(nukieRule.Comp) } }, uid, component); // Goob edit
-
-            var msg = Loc.GetString("store-currency-war-boost-given", ("target", uid));
-            _popupSystem.PopupEntity(msg, uid);
-        }
-    }
-
-    private int CalculateBonusTcPerNukie(NukeopsRuleComponent rule) // Goobstation
-    {
-        var nukiesCount = EntityQuery<NukeopsRoleComponent>().Count();
-        if (nukiesCount == 0)
-            return rule.WarTcAmountPerNukie;
-        var totalPlayersCount = _antag.GetTotalPlayerCount(_playerManager.Sessions);
-        var playersCount = Math.Max(0, totalPlayersCount - nukiesCount);
-        var maxNukies = totalPlayersCount / rule.WarNukiePlayerRatio;
-        var nukiesMissing = Math.Max(0, maxNukies - nukiesCount);
-        var totalBonus = playersCount * rule.WarTcPerPlayer;
-        totalBonus += nukiesMissing * rule.WarTcPerNukieMissing;
-        return Math.Max(rule.WarTcAmountPerNukie, totalBonus / nukiesCount);
-    }
-
-    private void SetWinType(Entity<NukeopsRuleComponent> ent, WinType type, bool endRound = true)
-    {
-        ent.Comp.WinType = type;
-
-        if (endRound && (type == WinType.CrewMajor || type == WinType.OpsMajor))
-            _roundEndSystem.EndRound();
-    }
-
-    private void CheckRoundShouldEnd(bool announce = true) // Goobstation
-    {
-        var query = QueryActiveRules();
-        while (query.MoveNext(out var uid, out _, out var nukeops, out _))
-        {
-            CheckRoundShouldEnd((uid, nukeops),
-                                announce); // Goobstation
-        }
-    }
-
-    private void CheckRoundShouldEnd(Entity<NukeopsRuleComponent> ent,
-                                     bool announce = true) // Goobstation
-    {
-        var nukeops = ent.Comp;
-
-        if (nukeops.RoundEndBehavior == RoundEndBehavior.Nothing || nukeops.WinType == WinType.CrewMajor || nukeops.WinType == WinType.OpsMajor)
-            return;
-
-
-        // If there are any nuclear bombs that are active, immediately return. We're not over yet.
-        foreach (var nuke in EntityQuery<NukeComponent>())
-        {
-            if (nuke.Status == NukeStatus.ARMED)
-                return;
-        }
-
-        var shuttle = GetShuttle((ent, ent));
-
-        MapId? shuttleMapId = Exists(shuttle)
-            ? Transform(shuttle.Value).MapID
-            : null;
-
-        MapId? targetStationMap = null;
-        if (nukeops.TargetStation != null && TryComp(nukeops.TargetStation, out StationDataComponent? data))
-        {
-            var grid = data.Grids.FirstOrNull();
-            targetStationMap = grid != null
-                ? Transform(grid.Value).MapID
-                : null;
-        }
-
-        // Check if there are nuke operatives still alive on the same map as the shuttle,
-        // or on the same map as the station.
-        // If there are, the round can continue.
-        var operatives = EntityQuery<NukeOperativeComponent, MobStateComponent, TransformComponent>(true);
-        var operativesAlive = operatives
-            .Where(op =>
-                op.Item3.MapID == shuttleMapId
-                || op.Item3.MapID == targetStationMap)
-            .Any(op => op.Item2.CurrentState == MobState.Alive && op.Item1.Running);
-
-        if (operativesAlive)
-            return; // There are living operatives than can access the shuttle, or are still on the station's map.
-
-        // Check that there are spawns available and that they can access the shuttle.
-        var spawnsAvailable = EntityQuery<NukeOperativeSpawnerComponent>(true).Any();
-        if (spawnsAvailable && CompOrNull<RuleGridsComponent>(ent)?.Map == shuttleMapId)
-            return; // Ghost spawns can still access the shuttle. Continue the round.
-
-        // The shuttle is inaccessible to both living nuke operatives and yet to spawn nuke operatives,
-        // and there are no nuclear operatives on the target station's map.
-        nukeops.WinConditions.Add(spawnsAvailable
-            ? WinCondition.NukiesAbandoned
-            : WinCondition.AllNukiesDead);
-
-        SetWinType(ent, WinType.CrewMajor, false);
-
-        // goob edit - no more roundend behavior, just announcement
-        if (announce)
-            _chat.DispatchGlobalAnnouncement(
-                Loc.GetString(nukeops.RoundEndTextAnnouncement),
-                Loc.GetString(nukeops.RoundEndTextSender));
-
-        // prevent it called multiple times
-        nukeops.RoundEndBehavior = RoundEndBehavior.Nothing;
-    }
-
-    private void OnAfterAntagEntSelected(Entity<NukeopsRuleComponent> ent, ref AfterAntagEntitySelectedEvent args)
-    {
-        var target = (ent.Comp.TargetStation is not null) ? Name(ent.Comp.TargetStation.Value) : "the target";
-
-        _antag.SendBriefing(args.Session,
-            Loc.GetString($"{ent.Comp.LocalePrefix}welcome",
-                ("station", target),
-                ("name", Name(ent))),
-            Color.Red,
-            ent.Comp.GreetSoundNotification);
-    }
-
-    private void OnGetBriefing(Entity<NukeopsRoleComponent> role, ref GetBriefingEvent args)
-    {
-        // TODO Different character screen briefing for the 3 nukie types
-        args.Append(Loc.GetString("nukeops-briefing")); // TODO: Goobstation: somehow pass the nukeopsrulecomponent here so we can change this based on LocalePrefix for Honkops.
-    }
-
-    /// <remarks>
-    /// Is this method the shitty glue holding together the last of my sanity? yes.
-    /// Do i have a better solution? not presently.
-    /// </remarks>
-    private EntityUid? GetOutpost(Entity<RuleGridsComponent?> ent)
-    {
-        if (!Resolve(ent, ref ent.Comp, false))
-            return null;
-
-        return ent.Comp.MapGrids.Where(e => !HasComp<NukeOpsShuttleComponent>(e)).FirstOrNull();
-    }
-
-    /// <remarks>
-    /// Is this method the shitty glue holding together the last of my sanity? yes.
-    /// Do i have a better solution? not presently.
-    /// </remarks>
-    private EntityUid? GetShuttle(Entity<NukeopsRuleComponent?> ent)
-    {
-        if (!Resolve(ent, ref ent.Comp, false))
-            return null;
-
-        var query = EntityQueryEnumerator<NukeOpsShuttleComponent>();
-        while (query.MoveNext(out var uid, out var comp))
-        {
-            if (comp.AssociatedRule == ent.Owner)
-                return uid;
-        }
-
-        return null;
-    }
 }

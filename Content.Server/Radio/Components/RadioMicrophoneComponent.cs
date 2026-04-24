@@ -14,7 +14,7 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototy
 namespace Content.Server.Radio.Components;
 
 /// <summary>
-///     Listens for local chat messages and relays them to some radio frequency
+/// Listens for local chat messages and relays them to some radio frequency
 /// </summary>
 [RegisterComponent]
 [Access(typeof(RadioDeviceSystem))]
@@ -24,12 +24,12 @@ public sealed partial class RadioMicrophoneComponent : Component
     [DataField("broadcastChannel", customTypeSerializer: typeof(PrototypeIdSerializer<RadioChannelPrototype>))]
     public string BroadcastChannel = SharedChatSystem.CommonChannel;
 
-    [ViewVariables(VVAccess.ReadWrite)]
-    [DataField("listenRange")]
-    public int ListenRange  = 4;
-
     [DataField("enabled")]
     public bool Enabled = false;
+
+    [ViewVariables(VVAccess.ReadWrite)]
+    [DataField("listenRange")]
+    public int ListenRange = 4;
 
     [DataField("powerRequired")]
     public bool PowerRequired = false;

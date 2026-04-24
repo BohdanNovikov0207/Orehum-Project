@@ -13,24 +13,12 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Server.Atmos.Components;
-using Content.Server.Heretic.Components.PathSpecific;
-using Content.Server.Magic;
-using Content.Shared.Heretic;
-using Content.Shared.Movement.Components;
-using Content.Shared.Slippery;
-using Robust.Shared.Physics.Components;
-using Content.Goobstation.Common.Atmos;
-using Content.Goobstation.Common.Temperature.Components;
 using Content.Goobstation.Common.Religion;
 using Content.Server.Polymorph.Components;
 using Content.Shared._Shitcode.Heretic.Components;
 using Content.Shared.Coordinates;
-using Content.Shared.Movement.Events;
-using Content.Shared.Physics.Controllers;
+using Content.Shared.Heretic;
 using Content.Shared.Polymorph;
-using Content.Shared.Stunnable;
-using Robust.Shared.Physics;
 using Robust.Shared.Prototypes;
 
 namespace Content.Server.Heretic.Abilities;

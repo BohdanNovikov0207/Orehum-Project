@@ -19,15 +19,15 @@ namespace Content.Server._DV.CosmicCult;
 
 public sealed class DeconversionSystem : EntitySystem
 {
-    [Dependency] private readonly DamageableSystem _damageable = default!;
-    [Dependency] private readonly IEntityManager _entityManager = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly MobStateSystem _mobState = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
-    [Dependency] private readonly SharedJitteringSystem _jittering = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly DamageableSystem _damageable = default!;
     [Dependency] private readonly UseDelaySystem _delay = default!;
+    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
+    [Dependency] private readonly IEntityManager _entityManager = default!;
+    [Dependency] private readonly SharedJitteringSystem _jittering = default!;
+    [Dependency] private readonly MobStateSystem _mobState = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -70,7 +70,7 @@ public sealed class DeconversionSystem : EntitySystem
         if (!HasComp<BibleUserComponent>(args.User))
         {
             _popup.PopupEntity(Loc.GetString("cleanse-item-sizzle",
-                ("target", Identity.Entity(args.Used, EntityManager))),
+                    ("target", Identity.Entity(args.Used, EntityManager))),
                 args.User,
                 args.User);
             _audio.PlayPvs(uid.Comp.SizzleSound, args.User);
@@ -80,16 +80,22 @@ public sealed class DeconversionSystem : EntitySystem
         }
 
         _popup.PopupEntity(Loc.GetString("cleanse-deconvert-attempt-begin",
-            ("target", Identity.Entity(args.User, EntityManager))),
+                ("target", Identity.Entity(args.User, EntityManager))),
             args.User,
             args.Target.Value);
 
         _popup.PopupEntity(Loc.GetString("cleanse-deconvert-attempt-begin-user",
-            ("target", Identity.Entity(args.Target.Value, EntityManager))),
+                ("target", Identity.Entity(args.Target.Value, EntityManager))),
             args.User,
             args.User);
 
-        _doAfter.TryStartDoAfter(new DoAfterArgs(EntityManager, args.User, uid.Comp.UseTime, new CleanseOnDoAfterEvent(), uid, args.Target, uid)
+        _doAfter.TryStartDoAfter(new DoAfterArgs(EntityManager,
+            args.User,
+            uid.Comp.UseTime,
+            new CleanseOnDoAfterEvent(),
+            uid,
+            args.Target,
+            uid)
         {
             BreakOnMove = true,
             BreakOnDamage = true,
@@ -126,7 +132,7 @@ public sealed class DeconversionSystem : EntitySystem
                 _audio.PlayPvs(uid.Comp.MalignSound, targetPosition, AudioParams.Default.WithVolume(2f));
                 _damageable.TryChangeDamage(args.User, uid.Comp.SelfDamage, true);
                 _popup.PopupEntity(Loc.GetString("cleanse-deconvert-attempt-success-empowered",
-                    ("target", Identity.Entity(target.Value, EntityManager))),
+                        ("target", Identity.Entity(target.Value, EntityManager))),
                     args.User,
                     args.User);
             }
@@ -137,7 +143,7 @@ public sealed class DeconversionSystem : EntitySystem
                 cleanse.CleanseDuration = TimeSpan.FromSeconds(1);
                 _audio.PlayPvs(uid.Comp.CleanseSound, targetPosition, AudioParams.Default.WithVolume(4f));
                 _popup.PopupEntity(Loc.GetString("cleanse-deconvert-attempt-success",
-                    ("target", Identity.Entity(target.Value, EntityManager))),
+                        ("target", Identity.Entity(target.Value, EntityManager))),
                     args.User,
                     args.User);
             }
@@ -147,12 +153,16 @@ public sealed class DeconversionSystem : EntitySystem
             Spawn(uid.Comp.CleanseVFX, targetPosition);
             RemComp<RogueAscendedInfectionComponent>(target.Value);
             _audio.PlayPvs(uid.Comp.CleanseSound, targetPosition, AudioParams.Default.WithVolume(4f));
-            _popup.PopupEntity(Loc.GetString("cleanse-deconvert-attempt-success", ("target", Identity.Entity(target.Value, EntityManager))), args.User, args.User);
+            _popup.PopupEntity(Loc.GetString("cleanse-deconvert-attempt-success",
+                    ("target", Identity.Entity(target.Value, EntityManager))),
+                args.User,
+                args.User);
         }
         else
-        {
-            _popup.PopupEntity(Loc.GetString("cleanse-deconvert-attempt-notcorrupted", ("target", Identity.Entity(target.Value, EntityManager))), args.User, args.User);
-        }
+            _popup.PopupEntity(Loc.GetString("cleanse-deconvert-attempt-notcorrupted",
+                    ("target", Identity.Entity(target.Value, EntityManager))),
+                args.User,
+                args.User);
 
         _delay.TryResetDelay((uid, useDelay));
         args.Handled = true;

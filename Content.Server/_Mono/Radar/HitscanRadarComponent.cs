@@ -10,16 +10,10 @@ namespace Content.Server._Mono.Radar;
 public sealed partial class HitscanRadarComponent : Component
 {
     /// <summary>
-    /// Color that gets shown on the radar screen for the hitscan line.
+    /// Controls whether this hitscan line is visible on radar.
     /// </summary>
-    [ViewVariables(VVAccess.ReadWrite), DataField("radarColor")]
-    public Color RadarColor = Color.Magenta;
-
-    /// <summary>
-    /// Start position of the hitscan beam in world coordinates.
-    /// </summary>
-    [DataField]
-    public Vector2 StartPosition;
+    [ViewVariables(VVAccess.ReadWrite)] [DataField("enabled")]
+    public bool Enabled = true;
 
     /// <summary>
     /// End position of the hitscan beam in world coordinates.
@@ -28,9 +22,15 @@ public sealed partial class HitscanRadarComponent : Component
     public Vector2 EndPosition;
 
     /// <summary>
+    /// Time this hitscan radar blip should remain visible before being automatically removed.
+    /// </summary>
+    [DataField]
+    public float LifeTime = 0.5f;
+
+    /// <summary>
     /// Thickness of the line drawn on the radar.
     /// </summary>
-    [ViewVariables(VVAccess.ReadWrite), DataField("lineThickness")]
+    [ViewVariables(VVAccess.ReadWrite)] [DataField("lineThickness")]
     public float LineThickness = 1.0f;
 
     /// <summary>
@@ -41,14 +41,14 @@ public sealed partial class HitscanRadarComponent : Component
     public EntityUid? OriginGrid;
 
     /// <summary>
-    /// Controls whether this hitscan line is visible on radar.
+    /// Color that gets shown on the radar screen for the hitscan line.
     /// </summary>
-    [ViewVariables(VVAccess.ReadWrite), DataField("enabled")]
-    public bool Enabled = true;
+    [ViewVariables(VVAccess.ReadWrite)] [DataField("radarColor")]
+    public Color RadarColor = Color.Magenta;
 
     /// <summary>
-    /// Time this hitscan radar blip should remain visible before being automatically removed.
+    /// Start position of the hitscan beam in world coordinates.
     /// </summary>
     [DataField]
-    public float LifeTime = 0.5f;
+    public Vector2 StartPosition;
 }

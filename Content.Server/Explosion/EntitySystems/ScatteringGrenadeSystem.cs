@@ -4,16 +4,15 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Shared.Explosion.Components;
+using Content.Shared.Explosion.EntitySystems;
 using Content.Shared.Throwing;
 using Content.Shared.Trigger;
-using Content.Shared.Trigger.Systems;
 using Content.Shared.Trigger.Components;
+using Content.Shared.Trigger.Systems;
 using Robust.Server.GameObjects;
 using Robust.Shared.Containers;
 using Robust.Shared.Map;
 using Robust.Shared.Random;
-using System.Numerics;
-using Content.Shared.Explosion.EntitySystems;
 
 namespace Content.Server.Explosion.EntitySystems;
 
@@ -80,9 +79,10 @@ public sealed class ScatteringGrenadeSystem : SharedScatteringGrenadeSystem
                         thrownCount++;
                     }
 
-                    Vector2 direction = angle.ToVec().Normalized();
+                    var direction = angle.ToVec().Normalized();
                     if (component.RandomDistance)
-                        direction *= _random.NextFloat(component.RandomThrowDistanceMin, component.RandomThrowDistanceMax);
+                        direction *= _random.NextFloat(component.RandomThrowDistanceMin,
+                            component.RandomThrowDistanceMax);
                     else
                         direction *= component.Distance;
 
@@ -90,9 +90,11 @@ public sealed class ScatteringGrenadeSystem : SharedScatteringGrenadeSystem
 
                     if (component.TriggerContents && TryComp<TimerTriggerComponent>(contentUid, out var contentTimer))
                     {
-                        additionalIntervalDelay += _random.NextFloat(component.IntervalBetweenTriggersMin, component.IntervalBetweenTriggersMax);
+                        additionalIntervalDelay += _random.NextFloat(component.IntervalBetweenTriggersMin,
+                            component.IntervalBetweenTriggersMax);
 
-                        _trigger.SetDelay((contentUid, contentTimer), TimeSpan.FromSeconds(component.DelayBeforeTriggerContents + additionalIntervalDelay));
+                        _trigger.SetDelay((contentUid, contentTimer),
+                            TimeSpan.FromSeconds(component.DelayBeforeTriggerContents + additionalIntervalDelay));
                         _trigger.ActivateTimerTrigger((contentUid, contentTimer));
                     }
                 }
@@ -107,7 +109,9 @@ public sealed class ScatteringGrenadeSystem : SharedScatteringGrenadeSystem
     /// <summary>
     /// Spawns one instance of the fill prototype or contained entity at the coordinate indicated
     /// </summary>
-    private bool TrySpawnContents(MapCoordinates spawnCoordinates, ScatteringGrenadeComponent component, out EntityUid contentUid)
+    private bool TrySpawnContents(MapCoordinates spawnCoordinates,
+        ScatteringGrenadeComponent component,
+        out EntityUid contentUid)
     {
         contentUid = default;
 

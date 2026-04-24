@@ -28,9 +28,9 @@ using Robust.Shared.Configuration;
 namespace Content.Server.Chat.Managers;
 
 /// <summary>
-///     Sanitizes messages!
-///     It currently ony removes the shorthands for emotes (like "lol" or "^-^") from a chat message and returns the last
-///     emote in their message
+/// Sanitizes messages!
+/// It currently ony removes the shorthands for emotes (like "lol" or "^-^") from a chat message and returns the last
+/// emote in their message
 /// </summary>
 public sealed class ChatSanitizationManager : IChatSanitizationManager
 {
@@ -85,7 +85,7 @@ public sealed class ChatSanitizationManager : IChatSanitizationManager
         Entry("o-o", "chatsan-wide-eyed"),
         Entry("o.o", "chatsan-wide-eyed"),
         Entry("._.", "chatsan-surprised"),
-        Entry( "!", "chatsan-surprised"), // Goobstation
+        Entry("!", "chatsan-surprised"), // Goobstation
         Entry(".-.", "chatsan-confused"),
         Entry("-_-", "chatsan-unimpressed"),
         Entry("smh", "chatsan-unimpressed"),
@@ -121,13 +121,11 @@ public sealed class ChatSanitizationManager : IChatSanitizationManager
 
     private bool _doSanitize;
 
-    public void Initialize()
-    {
+    public void Initialize() =>
         _configurationManager.OnValueChanged(CCVars.ChatSanitizerEnabled, x => _doSanitize = x, true);
-    }
 
     /// <summary>
-    ///     Remove the shorthands from the message, returning the last one found as the emote
+    /// Remove the shorthands from the message, returning the last one found as the emote
     /// </summary>
     /// <param name="message">The pre-sanitized message</param>
     /// <param name="speaker">The speaker</param>

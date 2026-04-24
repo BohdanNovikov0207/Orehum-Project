@@ -14,6 +14,10 @@ namespace Content.Server.SurveillanceCamera;
 [RegisterComponent]
 public sealed partial class SurveillanceCameraRouterComponent : Component
 {
+    [ViewVariables]
+    // The frequency that talks to this router's subnet.
+    public uint SubnetFrequency;
+
     [ViewVariables] public bool Active { get; set; }
 
     // The name of the subnet connected to this router.
@@ -27,11 +31,8 @@ public sealed partial class SurveillanceCameraRouterComponent : Component
     // is added or removed from active routing.
     public HashSet<string> MonitorRoutes { get; } = new();
 
-    [ViewVariables]
-    // The frequency that talks to this router's subnet.
-    public uint SubnetFrequency;
-    [DataField("subnetFrequency", customTypeSerializer:typeof(PrototypeIdSerializer<DeviceFrequencyPrototype>))]
-    public string? SubnetFrequencyId { get; set;  }
+    [DataField("subnetFrequency", customTypeSerializer: typeof(PrototypeIdSerializer<DeviceFrequencyPrototype>))]
+    public string? SubnetFrequencyId { get; set; }
 
     [DataField("setupAvailableNetworks")]
     public List<ProtoId<DeviceFrequencyPrototype>> AvailableNetworks { get; private set; } = new();

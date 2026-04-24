@@ -25,12 +25,12 @@ namespace Content.Server._Goobstation.Wizard.Systems;
 
 public sealed class GhostVisibilitySystem : SharedGhostVisibilitySystem
 {
-    [Dependency] private readonly VisibilitySystem _visibilitySystem = default!;
     [Dependency] private readonly AudioSystem _audio = default!;
-    [Dependency] private readonly GameTicker _gameTicker = default!;
-    [Dependency] private readonly PvsOverrideSystem _pvsOverride = default!;
-    [Dependency] private readonly IAdminLogManager _log = default!;
     [Dependency] private readonly IChatManager _chatManager = default!;
+    [Dependency] private readonly GameTicker _gameTicker = default!;
+    [Dependency] private readonly IAdminLogManager _log = default!;
+    [Dependency] private readonly PvsOverrideSystem _pvsOverride = default!;
+    [Dependency] private readonly VisibilitySystem _visibilitySystem = default!;
 
     public override void Initialize()
     {
@@ -53,7 +53,7 @@ public sealed class GhostVisibilitySystem : SharedGhostVisibilitySystem
             _visibilitySystem.AddLayer((uid, vis), (int) VisibilityFlags.Normal, false);
             _visibilitySystem.RemoveLayer((uid, vis), (int) VisibilityFlags.Ghost, false);
 
-            _visibilitySystem.RefreshVisibility(uid, visibilityComponent: vis);
+            _visibilitySystem.RefreshVisibility(uid, vis);
         }
     }
 

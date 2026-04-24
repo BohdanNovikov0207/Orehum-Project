@@ -22,7 +22,10 @@ public sealed class AnomalySpawnRule : StationEventSystem<AnomalySpawnRuleCompon
 {
     [Dependency] private readonly AnomalySystem _anomaly = default!;
 
-    protected override void Added(EntityUid uid, AnomalySpawnRuleComponent component, GameRuleComponent gameRule, GameRuleAddedEvent args)
+    protected override void Added(EntityUid uid,
+        AnomalySpawnRuleComponent component,
+        GameRuleComponent gameRule,
+        GameRuleAddedEvent args)
     {
         if (!TryComp<StationEventComponent>(uid, out var stationEvent))
             return;
@@ -34,7 +37,10 @@ public sealed class AnomalySpawnRule : StationEventSystem<AnomalySpawnRuleCompon
         base.Added(uid, component, gameRule, args);
     }
 
-    protected override void Started(EntityUid uid, AnomalySpawnRuleComponent component, GameRuleComponent gameRule, GameRuleStartedEvent args)
+    protected override void Started(EntityUid uid,
+        AnomalySpawnRuleComponent component,
+        GameRuleComponent gameRule,
+        GameRuleStartedEvent args)
     {
         base.Started(uid, component, gameRule, args);
 

@@ -11,9 +11,10 @@ using Robust.Shared.Audio;
 namespace Content.Server._Shitmed.Medical.Surgery;
 
 /// <summary>
-/// Makes all sharp things usable for incisions and sawing through bones, though worse than any other kind of ghetto analogue.
+/// Makes all sharp things usable for incisions and sawing through bones, though worse than any other kind of ghetto
+/// analogue.
 /// </summary>
-public sealed partial class GhettoSurgerySystem : EntitySystem
+public sealed class GhettoSurgerySystem : EntitySystem
 {
     public override void Initialize()
     {
@@ -26,9 +27,7 @@ public sealed partial class GhettoSurgerySystem : EntitySystem
     private void OnSharpInit(Entity<SharpComponent> ent, ref MapInitEvent args)
     {
         if (EnsureComp<SurgeryToolComponent>(ent, out var tool))
-        {
             ent.Comp.HadSurgeryTool = true;
-        }
         else
         {
             tool.StartSound = new SoundPathSpecifier("/Audio/_Shitmed/Medical/Surgery/scalpel1.ogg");
@@ -37,9 +36,7 @@ public sealed partial class GhettoSurgerySystem : EntitySystem
         }
 
         if (EnsureComp<ScalpelComponent>(ent, out var scalpel))
-        {
             ent.Comp.HadScalpel = true;
-        }
         else
         {
             scalpel.Speed = 0.3f;
@@ -47,9 +44,7 @@ public sealed partial class GhettoSurgerySystem : EntitySystem
         }
 
         if (EnsureComp<BoneSawComponent>(ent, out var saw))
-        {
             ent.Comp.HadBoneSaw = true;
-        }
         else
         {
             saw.Speed = 0.2f;

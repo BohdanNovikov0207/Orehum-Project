@@ -7,11 +7,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Server.Emp;
-using Content.Shared._Shitmed.Body.Organ;
 using Content.Shared._Shitmed.Body.Events;
+using Content.Shared._Shitmed.Body.Organ;
 using Content.Shared._Shitmed.Cybernetics;
-using Content.Shared.Body.Part;
 using Content.Shared.Body.Organ;
+using Content.Shared.Body.Part;
 using Content.Shared.Body.Systems;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Prototypes;
@@ -21,14 +21,16 @@ namespace Content.Server._Shitmed.Cybernetics;
 
 internal sealed class CyberneticsSystem : EntitySystem
 {
-    [Dependency] private readonly IPrototypeManager _prototypes = default!;
-    [Dependency] private readonly DamageableSystem _damageable = default!;
     [Dependency] private readonly SharedBodySystem _body = default!;
+    [Dependency] private readonly DamageableSystem _damageable = default!;
+    [Dependency] private readonly IPrototypeManager _prototypes = default!;
+
     public override void Initialize()
     {
         SubscribeLocalEvent<CyberneticsComponent, EmpPulseEvent>(OnEmpPulse);
         SubscribeLocalEvent<CyberneticsComponent, EmpDisabledRemoved>(OnEmpDisabledRemoved);
     }
+
     private void OnEmpPulse(Entity<CyberneticsComponent> cyberEnt, ref EmpPulseEvent ev)
     {
         if (!cyberEnt.Comp.Disabled)
@@ -52,7 +54,11 @@ internal sealed class CyberneticsSystem : EntitySystem
                 {
                     var shock = new DamageSpecifier(_prototypes.Index<DamageTypePrototype>("Shock"), 30);
                     var targetPart = _body.GetTargetBodyPart(part);
-                    _damageable.TryChangeDamage(part.Body.Value, shock, ignoreResistances: true, targetPart: targetPart, damageable: damageable);
+                    _damageable.TryChangeDamage(part.Body.Value,
+                        shock,
+                        true,
+                        targetPart: targetPart,
+                        damageable: damageable);
                     Dirty(cyberEnt, damageable);
                 }
             }

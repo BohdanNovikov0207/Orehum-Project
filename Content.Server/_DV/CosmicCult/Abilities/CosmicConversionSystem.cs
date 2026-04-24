@@ -9,30 +9,30 @@
 
 using Content.Goobstation.Common.Religion;
 using Content.Server._DV.CosmicCult.Components;
+using Content.Server.Administration.Systems;
+using Content.Server.Atmos.Rotting;
 using Content.Server.Popups;
-using Content.Shared._DV.CosmicCult.Components;
 using Content.Shared._DV.CosmicCult;
+using Content.Shared._DV.CosmicCult.Components;
 using Content.Shared.Damage;
 using Content.Shared.Mindshield.Components;
 using Content.Shared.Mobs.Systems;
 using Content.Shared.Popups;
 using Content.Shared.Stunnable;
-using Content.Server.Atmos.Rotting;
-using Content.Server.Administration.Systems;
 
 namespace Content.Server._DV.CosmicCult.Abilities;
 
 public sealed class CosmicConversionSystem : EntitySystem
 {
-    [Dependency] private readonly CosmicCultRuleSystem _cultRule = default!;
+    [Dependency] private readonly SharedCosmicCultSystem _cosmicCult = default!;
     [Dependency] private readonly CosmicGlyphSystem _cosmicGlyph = default!;
+    [Dependency] private readonly CosmicCultRuleSystem _cultRule = default!;
     [Dependency] private readonly DamageableSystem _damageable = default!;
     [Dependency] private readonly MobStateSystem _mobState = default!;
     [Dependency] private readonly PopupSystem _popup = default!;
-    [Dependency] private readonly SharedCosmicCultSystem _cosmicCult = default!;
-    [Dependency] private readonly SharedStunSystem _stun = default!;
-    [Dependency] private readonly RottingSystem _rotting = default!;
     [Dependency] private readonly RejuvenateSystem _rejuvenateSystem = default!;
+    [Dependency] private readonly RottingSystem _rotting = default!;
+    [Dependency] private readonly SharedStunSystem _stun = default!;
 
     public override void Initialize()
     {
@@ -68,12 +68,13 @@ public sealed class CosmicConversionSystem : EntitySystem
                 _popup.PopupEntity(Loc.GetString("cult-glyph-target-rotting"), uid, args.User);
                 args.Cancel();
             }
+
             if (HasComp<BibleUserComponent>(target))
             {
                 _popup.PopupEntity(Loc.GetString("cult-glyph-target-chaplain"), uid, args.User);
                 args.Cancel();
             }
-            else if (uid.Comp.NegateProtection == false && HasComp<MindShieldComponent>(target))
+            else if (!uid.Comp.NegateProtection && HasComp<MindShieldComponent>(target))
             {
                 _popup.PopupEntity(Loc.GetString("cult-glyph-target-mindshield"), uid, args.User);
                 args.Cancel();
@@ -81,14 +82,19 @@ public sealed class CosmicConversionSystem : EntitySystem
             else
             {
                 _stun.TryUpdateStunDuration(target, TimeSpan.FromSeconds(4f));
-                _rejuvenateSystem.PerformRejuvenate(target); //Goobstation: No one likes being brought into the antag gang dead, now do we?
+                _rejuvenateSystem
+                    .PerformRejuvenate(
+                        target); //Goobstation: No one likes being brought into the antag gang dead, now do we?
                 _cultRule.CosmicConversion(uid, target);
-                var finaleQuery = EntityQueryEnumerator<CosmicFinaleComponent>(); // Enumerator for The Monument's Finale
+                var finaleQuery =
+                    EntityQueryEnumerator<CosmicFinaleComponent>(); // Enumerator for The Monument's Finale
                 while (finaleQuery.MoveNext(out var monument, out var comp)
-                    && comp.CurrentState == FinaleState.ActiveBuffer)
+                       && comp.CurrentState == FinaleState.ActiveBuffer)
                 {
                     comp.BufferTimer -= TimeSpan.FromSeconds(45);
-                    _popup.PopupCoordinates(Loc.GetString("cosmiccult-finale-speedup"), Transform(monument).Coordinates, PopupType.Large);
+                    _popup.PopupCoordinates(Loc.GetString("cosmiccult-finale-speedup"),
+                        Transform(monument).Coordinates,
+                        PopupType.Large);
                 }
             }
         }

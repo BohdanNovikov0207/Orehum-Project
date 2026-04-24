@@ -9,7 +9,6 @@ using Content.Shared.Procedural;
 using Content.Shared.Tag;
 using Robust.Shared.Collections;
 using Robust.Shared.Map.Components;
-using Robust.Shared.Physics.Components;
 using Robust.Shared.Prototypes;
 
 namespace Content.Server.Procedural.DungeonJob;
@@ -50,9 +49,7 @@ public sealed partial class DungeonJob
                         dungeon.RoomExteriorTiles.Contains(neighbor) ||
                         dungeon.RoomTiles.Contains(neighbor) ||
                         dungeon.Entrances.Contains(neighbor))
-                    {
                         continue;
-                    }
 
                     exterior.Add(neighbor);
                 }
@@ -124,15 +121,15 @@ public sealed partial class DungeonJob
 
                 // Shrink by 0.01 to avoid polygon overlap from neighboring tiles.
                 // TODO: Uhh entityset re-usage.
-                foreach (var ent in _lookup.GetEntitiesIntersecting(_gridUid, new Box2(neighbor * grid.TileSize, (neighbor + 1) * grid.TileSize).Enlarged(-0.1f), flags))
+                foreach (var ent in _lookup.GetEntitiesIntersecting(_gridUid,
+                             new Box2(neighbor * grid.TileSize, (neighbor + 1) * grid.TileSize).Enlarged(-0.1f),
+                             flags))
                 {
                     if (!_physicsQuery.TryGetComponent(ent, out var physics) ||
                         !physics.Hard ||
                         (DungeonSystem.CollisionMask & physics.CollisionLayer) == 0x0 &&
                         (DungeonSystem.CollisionLayer & physics.CollisionMask) == 0x0)
-                    {
                         continue;
-                    }
 
                     _entManager.DeleteEntity(ent);
                 }

@@ -25,7 +25,6 @@ using Content.Server.Atmos.EntitySystems;
 using Content.Server.Body.Systems;
 using Content.Server.Construction;
 using Content.Server.Construction.Components;
-using Content.Server.Storage.Components;
 using Content.Shared.Destructible;
 using Content.Shared.Explosion;
 using Content.Shared.Foldable;
@@ -46,8 +45,8 @@ namespace Content.Server.Storage.EntitySystems;
 
 public sealed class EntityStorageSystem : SharedEntityStorageSystem
 {
-    [Dependency] private readonly ConstructionSystem _construction = default!;
     [Dependency] private readonly AtmosphereSystem _atmos = default!;
+    [Dependency] private readonly ConstructionSystem _construction = default!;
     [Dependency] private readonly IMapManager _map = default!;
     [Dependency] private readonly MapSystem _mapSystem = default!;
 
@@ -59,7 +58,8 @@ public sealed class EntityStorageSystem : SharedEntityStorageSystem
         SubscribeLocalEvent<EntityStorageComponent, EntityUnpausedEvent>(OnEntityUnpausedEvent);
         SubscribeLocalEvent<EntityStorageComponent, ComponentInit>(OnComponentInit);
         SubscribeLocalEvent<EntityStorageComponent, ComponentStartup>(OnComponentStartup);
-        SubscribeLocalEvent<EntityStorageComponent, ActivateInWorldEvent>(OnInteract, after: new[] { typeof(LockSystem) });
+        SubscribeLocalEvent<EntityStorageComponent, ActivateInWorldEvent>(OnInteract,
+            after: new[] { typeof(LockSystem) });
         SubscribeLocalEvent<EntityStorageComponent, LockToggleAttemptEvent>(OnLockToggleAttempt);
         SubscribeLocalEvent<EntityStorageComponent, DestructionEventArgs>(OnDestruction);
         SubscribeLocalEvent<EntityStorageComponent, GetVerbsEvent<InteractionVerb>>(AddToggleOpenVerb);
@@ -126,10 +126,8 @@ public sealed class EntityStorageSystem : SharedEntityStorageSystem
         }
     }
 
-    private void OnExploded(Entity<EntityStorageComponent> ent, ref BeforeExplodeEvent args)
-    {
+    private void OnExploded(Entity<EntityStorageComponent> ent, ref BeforeExplodeEvent args) =>
         args.Contents.AddRange(ent.Comp.Contents.ContainedEntities);
-    }
 
     protected override void TakeGas(EntityUid uid, EntityStorageComponent component)
     {
@@ -139,10 +137,9 @@ public sealed class EntityStorageSystem : SharedEntityStorageSystem
         var serverComp = (EntityStorageComponent) component;
         var tile = GetOffsetTileRef(uid, serverComp);
 
-        if (tile != null && _atmos.GetTileMixture(tile.Value.GridUid, null, tile.Value.GridIndices, true) is {} environment)
-        {
+        if (tile != null && _atmos.GetTileMixture(tile.Value.GridUid, null, tile.Value.GridIndices, true) is
+                { } environment)
             _atmos.Merge(serverComp.Air, environment.RemoveVolume(serverComp.Air.Volume));
-        }
     }
 
     public override void ReleaseGas(EntityUid uid, EntityStorageComponent component)
@@ -154,7 +151,8 @@ public sealed class EntityStorageSystem : SharedEntityStorageSystem
 
         var tile = GetOffsetTileRef(uid, serverComp);
 
-        if (tile != null && _atmos.GetTileMixture(tile.Value.GridUid, null, tile.Value.GridIndices, true) is {} environment)
+        if (tile != null && _atmos.GetTileMixture(tile.Value.GridUid, null, tile.Value.GridIndices, true) is
+                { } environment)
         {
             _atmos.Merge(environment, serverComp.Air);
             serverComp.Air.Clear();
@@ -166,14 +164,14 @@ public sealed class EntityStorageSystem : SharedEntityStorageSystem
         var targetCoordinates = TransformSystem.ToMapCoordinates(new EntityCoordinates(uid, component.EnteringOffset));
 
         if (_map.TryFindGridAt(targetCoordinates, out var gridId, out var grid))
-        {
             return _mapSystem.GetTileRef(gridId, grid, targetCoordinates);
-        }
 
         return null;
     }
 
-    private void OnRemoved(EntityUid uid, InsideEntityStorageComponent component, EntGotRemovedFromContainerMessage args)
+    private void OnRemoved(EntityUid uid,
+        InsideEntityStorageComponent component,
+        EntGotRemovedFromContainerMessage args)
     {
         if (args.Container.Owner != component.Storage)
             return;
@@ -185,20 +183,18 @@ public sealed class EntityStorageSystem : SharedEntityStorageSystem
     private void OnInsideInhale(EntityUid uid, InsideEntityStorageComponent component, InhaleLocationEvent args)
     {
         if (TryComp<EntityStorageComponent>(component.Storage, out var storage) && storage.Airtight)
-        {
             args.Gas = storage.Air;
-        }
     }
 
     private void OnInsideExhale(EntityUid uid, InsideEntityStorageComponent component, ExhaleLocationEvent args)
     {
         if (TryComp<EntityStorageComponent>(component.Storage, out var storage) && storage.Airtight)
-        {
             args.Gas = storage.Air;
-        }
     }
 
-    private void OnInsideExposed(EntityUid uid, InsideEntityStorageComponent component, ref AtmosExposedGetAirEvent args)
+    private void OnInsideExposed(EntityUid uid,
+        InsideEntityStorageComponent component,
+        ref AtmosExposedGetAirEvent args)
     {
         if (args.Handled)
             return;

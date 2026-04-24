@@ -108,32 +108,33 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Server.Power.Components;
+using System.Diagnostics.CodeAnalysis;
 using Content.Server.Emp;
+using Content.Server.Power.Components;
 using Content.Server.PowerCell;
+using Content.Shared.Emp;
 using Content.Shared.Examine;
+using Content.Shared.Inventory;
 using Content.Shared.Power;
 using Content.Shared.PowerCell.Components;
-using Content.Shared.Emp;
-using JetBrains.Annotations;
-using Robust.Shared.Containers;
-using System.Diagnostics.CodeAnalysis;
 using Content.Shared.Storage.Components;
-using Robust.Server.Containers;
-using Content.Shared.Inventory; // Goobstation
 using Content.Shared.Whitelist;
+using JetBrains.Annotations;
+using Robust.Server.Containers;
+using Robust.Shared.Containers;
+// Goobstation
 
 namespace Content.Server.Power.EntitySystems;
 
 [UsedImplicitly]
 internal sealed class ChargerSystem : EntitySystem
 {
-    [Dependency] private readonly ContainerSystem _container = default!;
-    [Dependency] private readonly PowerCellSystem _powerCell = default!;
-    [Dependency] private readonly BatterySystem _battery = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
-    [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
+    [Dependency] private readonly BatterySystem _battery = default!;
+    [Dependency] private readonly ContainerSystem _container = default!;
     [Dependency] private readonly InventorySystem _inventory = default!; // Goobstation
+    [Dependency] private readonly PowerCellSystem _powerCell = default!;
+    [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
 
     public override void Initialize()
     {
@@ -148,17 +149,17 @@ internal sealed class ChargerSystem : EntitySystem
         SubscribeLocalEvent<ChargerComponent, EmpPulseEvent>(OnEmpPulse);
     }
 
-    private void OnStartup(EntityUid uid, ChargerComponent component, ComponentStartup args)
-    {
+    private void OnStartup(EntityUid uid, ChargerComponent component, ComponentStartup args) =>
         UpdateStatus(uid, component);
-    }
 
     private void OnChargerExamine(EntityUid uid, ChargerComponent component, ExaminedEvent args)
     {
         using (args.PushGroup(nameof(ChargerComponent)))
         {
             // rate at which the charger charges
-            args.PushMarkup(Loc.GetString("charger-examine", ("color", "yellow"), ("chargeRate", (int) component.ChargeRate)));
+            args.PushMarkup(Loc.GetString("charger-examine",
+                ("color", "yellow"),
+                ("chargeRate", (int) component.ChargeRate)));
 
             // try to get contents of the charger
             if (!_container.TryGetContainer(uid, component.SlotId, out var container))
@@ -170,9 +171,7 @@ internal sealed class ChargerSystem : EntitySystem
             // if charger is empty and not a power cell type charger, add empty message
             // power cells have their own empty message by default, for things like flash lights
             if (container.ContainedEntities.Count == 0)
-            {
                 args.PushMarkup(Loc.GetString("charger-empty"));
-            }
             else
             {
                 // add how much each item is charged it
@@ -181,7 +180,7 @@ internal sealed class ChargerSystem : EntitySystem
                     if (!TryComp<BatteryComponent>(contained, out var battery))
                         continue;
 
-                    var chargePercentage = (battery.CurrentCharge / battery.MaxCharge) * 100;
+                    var chargePercentage = battery.CurrentCharge / battery.MaxCharge * 100;
                     args.PushMarkup(Loc.GetString("charger-content", ("chargePercentage", (int) chargePercentage)));
                 }
             }
@@ -201,7 +200,8 @@ internal sealed class ChargerSystem : EntitySystem
                 continue;
             UpdateStatus(uid, charger);
             // Goobstation end
-            if (charger.Status == CellChargerStatus.Empty || charger.Status == CellChargerStatus.Charged) // Goobstation edit
+            if (charger.Status == CellChargerStatus.Empty ||
+                charger.Status == CellChargerStatus.Charged) // Goobstation edit
                 continue;
 
             foreach (var contained in container.ContainedEntities)
@@ -211,10 +211,8 @@ internal sealed class ChargerSystem : EntitySystem
         }
     }
 
-    private void OnPowerChanged(EntityUid uid, ChargerComponent component, ref PowerChangedEvent args)
-    {
+    private void OnPowerChanged(EntityUid uid, ChargerComponent component, ref PowerChangedEvent args) =>
         UpdateStatus(uid, component);
-    }
 
     private void OnInserted(EntityUid uid, ChargerComponent component, EntInsertedIntoContainerMessage args)
     {
@@ -236,7 +234,7 @@ internal sealed class ChargerSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Verify that the entity being inserted is actually rechargeable.
+    /// Verify that the entity being inserted is actually rechargeable.
     /// </summary>
     private void OnInsertAttempt(EntityUid uid, ChargerComponent component, ContainerIsInsertingAttemptEvent args)
     {
@@ -253,7 +251,9 @@ internal sealed class ChargerSystem : EntitySystem
             args.Cancel();
     }
 
-    private void OnEntityStorageInsertAttempt(EntityUid uid, ChargerComponent component, ref InsertIntoEntityStorageAttemptEvent args)
+    private void OnEntityStorageInsertAttempt(EntityUid uid,
+        ChargerComponent component,
+        ref InsertIntoEntityStorageAttemptEvent args)
     {
         if (!component.Initialized || args.Cancelled)
             return;
@@ -280,13 +280,9 @@ internal sealed class ChargerSystem : EntitySystem
         component.Status = status;
 
         if (component.Status == CellChargerStatus.Charging)
-        {
             AddComp<ActiveChargerComponent>(uid);
-        }
         else
-        {
             RemComp<ActiveChargerComponent>(uid);
-        }
 
         switch (component.Status)
         {
@@ -368,7 +364,9 @@ internal sealed class ChargerSystem : EntitySystem
     }
 
     // Goobstation - made public
-    public bool SearchForBattery(EntityUid uid, [NotNullWhen(true)] out EntityUid? batteryUid, [NotNullWhen(true)] out BatteryComponent? component)
+    public bool SearchForBattery(EntityUid uid,
+        [NotNullWhen(true)] out EntityUid? batteryUid,
+        [NotNullWhen(true)] out BatteryComponent? component)
     {
         batteryUid = null;
         component = null;
@@ -391,12 +389,13 @@ internal sealed class ChargerSystem : EntitySystem
         if (findEv.FoundBattery == null && TryComp<InventoryComponent>(uid, out var inventory))
             _inventory.RelayEvent((uid, inventory), ref findEv);
 
-        if (findEv.FoundBattery is {} battery)
+        if (findEv.FoundBattery is { } battery)
         {
             batteryUid = battery.Owner;
             component = battery.Comp;
             return true;
         }
+
         // </Goobstation>
         return false;
     }
@@ -412,7 +411,6 @@ internal sealed class ChargerSystem : EntitySystem
 [ByRefEvent]
 public record struct FindBatteryEvent() : IInventoryRelayEvent
 {
-    public SlotFlags TargetSlots { get; } = SlotFlags.WITHOUT_POCKET;
-
     public Entity<BatteryComponent>? FoundBattery;
+    public SlotFlags TargetSlots { get; } = SlotFlags.WITHOUT_POCKET;
 }

@@ -18,11 +18,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Server.DeviceLinking.Components;
-using Content.Shared.UserInterface;
 using Content.Shared.Access.Systems;
 using Content.Shared.DeviceLinking.Events;
 using Content.Shared.MachineLinking;
 using Content.Shared.TextScreen;
+using Content.Shared.UserInterface;
 using Robust.Server.GameObjects;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Timing;
@@ -31,17 +31,18 @@ namespace Content.Server.DeviceLinking.Systems;
 
 public sealed class SignalTimerSystem : EntitySystem
 {
+    [Dependency] private readonly AccessReaderSystem _accessReader = default!;
+    [Dependency] private readonly SharedAppearanceSystem _appearanceSystem = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly IGameTiming _gameTiming = default!;
     [Dependency] private readonly DeviceLinkSystem _signalSystem = default!;
-    [Dependency] private readonly SharedAppearanceSystem _appearanceSystem = default!;
-    [Dependency] private readonly UserInterfaceSystem _ui = default!;
-    [Dependency] private readonly AccessReaderSystem _accessReader = default!;
 
     /// <summary>
     /// Per-tick timer cache.
     /// </summary>
-    private List<Entity<SignalTimerComponent>> _timers = new();
+    private readonly List<Entity<SignalTimerComponent>> _timers = new();
+
+    [Dependency] private readonly UserInterfaceSystem _ui = default!;
 
     public override void Initialize()
     {
@@ -63,23 +64,27 @@ public sealed class SignalTimerSystem : EntitySystem
         _signalSystem.EnsureSinkPorts(uid, component.Trigger);
     }
 
-    private void OnAfterActivatableUIOpen(EntityUid uid, SignalTimerComponent component, AfterActivatableUIOpenEvent args)
+    private void OnAfterActivatableUIOpen(EntityUid uid,
+        SignalTimerComponent component,
+        AfterActivatableUIOpenEvent args)
     {
         var time = TryComp<ActiveSignalTimerComponent>(uid, out var active) ? active.TriggerTime : TimeSpan.Zero;
 
         if (_ui.HasUi(uid, SignalTimerUiKey.Key))
         {
-            _ui.SetUiState(uid, SignalTimerUiKey.Key, new SignalTimerBoundUserInterfaceState(component.Label,
-                TimeSpan.FromSeconds(component.Delay), // Mono
-                component.CanEditLabel,
-                time,
-                active != null,
-                _accessReader.IsAllowed(args.User, uid)));
+            _ui.SetUiState(uid,
+                SignalTimerUiKey.Key,
+                new SignalTimerBoundUserInterfaceState(component.Label,
+                    TimeSpan.FromSeconds(component.Delay), // Mono
+                    component.CanEditLabel,
+                    time,
+                    active != null,
+                    _accessReader.IsAllowed(args.User, uid)));
         }
     }
 
     /// <summary>
-    ///     Finishes a timer, triggering its main port, and removing its <see cref="ActiveSignalTimerComponent"/>.
+    /// Finishes a timer, triggering its main port, and removing its <see cref="ActiveSignalTimerComponent" />.
     /// </summary>
     public void Trigger(EntityUid uid, SignalTimerComponent signalTimer)
     {
@@ -90,12 +95,14 @@ public sealed class SignalTimerSystem : EntitySystem
 
         if (_ui.HasUi(uid, SignalTimerUiKey.Key))
         {
-            _ui.SetUiState(uid, SignalTimerUiKey.Key, new SignalTimerBoundUserInterfaceState(signalTimer.Label,
-                TimeSpan.FromSeconds(signalTimer.Delay), // Mono
-                signalTimer.CanEditLabel,
-                TimeSpan.Zero,
-                false,
-                true));
+            _ui.SetUiState(uid,
+                SignalTimerUiKey.Key,
+                new SignalTimerBoundUserInterfaceState(signalTimer.Label,
+                    TimeSpan.FromSeconds(signalTimer.Delay), // Mono
+                    signalTimer.CanEditLabel,
+                    TimeSpan.Zero,
+                    false,
+                    true));
         }
     }
 
@@ -129,7 +136,7 @@ public sealed class SignalTimerSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Checks if a UI <paramref name="message"/> is allowed to be sent by the user.
+    /// Checks if a UI <paramref name="message" /> is allowed to be sent by the user.
     /// </summary>
     /// <param name="uid">The entity that is interacted with.</param>
     private bool IsMessageValid(EntityUid uid, BoundUserInterfaceMessage message)
@@ -141,8 +148,8 @@ public sealed class SignalTimerSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Called by <see cref="SignalTimerTextChangedMessage"/> to both
-    ///     change the default component label, and propagate that change to the TextScreen.
+    /// Called by <see cref="SignalTimerTextChangedMessage" /> to both
+    /// change the default component label, and propagate that change to the TextScreen.
     /// </summary>
     private void OnTextChangedMessage(EntityUid uid, SignalTimerComponent component, SignalTimerTextChangedMessage args)
     {
@@ -161,10 +168,12 @@ public sealed class SignalTimerSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Called by <see cref="SignalTimerDelayChangedMessage"/> to change the <see cref="SignalTimerComponent"/>
-    ///     delay, and propagate that change to a textscreen.
+    /// Called by <see cref="SignalTimerDelayChangedMessage" /> to change the <see cref="SignalTimerComponent" />
+    /// delay, and propagate that change to a textscreen.
     /// </summary>
-    private void OnDelayChangedMessage(EntityUid uid, SignalTimerComponent component, SignalTimerDelayChangedMessage args)
+    private void OnDelayChangedMessage(EntityUid uid,
+        SignalTimerComponent component,
+        SignalTimerDelayChangedMessage args)
     {
         if (!IsMessageValid(uid, args))
             return;
@@ -174,8 +183,8 @@ public sealed class SignalTimerSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Called by <see cref="SignalTimerStartMessage"/> to instantiate an <see cref="ActiveSignalTimerComponent"/>,
-    ///     clear <see cref="TextScreenVisuals.ScreenText"/>, propagate those changes, and invoke the start port.
+    /// Called by <see cref="SignalTimerStartMessage" /> to instantiate an <see cref="ActiveSignalTimerComponent" />,
+    /// clear <see cref="TextScreenVisuals.ScreenText" />, propagate those changes, and invoke the start port.
     /// </summary>
     private void OnTimerStartMessage(EntityUid uid, SignalTimerComponent component, SignalTimerStartMessage args)
     {
@@ -195,9 +204,7 @@ public sealed class SignalTimerSystem : EntitySystem
     private void OnSignalReceived(EntityUid uid, SignalTimerComponent component, ref SignalReceivedEvent args)
     {
         if (args.Port == component.Trigger)
-        {
             OnStartTimer(uid, component);
-        }
     }
 
     public void OnStartTimer(EntityUid uid, SignalTimerComponent component)

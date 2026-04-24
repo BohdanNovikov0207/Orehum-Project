@@ -42,30 +42,27 @@ using Robust.Shared.Random;
 namespace Content.Server.StationRecords.Systems;
 
 /// <summary>
-///     Station records.
-///
-///     A station record is tied to an ID card, or anything that holds
-///     a station record's key. This key will determine access to a
-///     station record set's record entries, and it is imperative not
-///     to lose the item that holds the key under any circumstance.
-///
-///     Records are mostly a roleplaying tool, but can have some
-///     functionality as well (i.e., security records indicating that
-///     a specific person holding an ID card with a linked key is
-///     currently under warrant, showing a crew manifest with user
-///     settable, custom titles).
-///
-///     General records are tied into this system, as most crewmembers
-///     should have a general record - and most systems should probably
-///     depend on this general record being created. This is subject
-///     to change.
+/// Station records.
+/// A station record is tied to an ID card, or anything that holds
+/// a station record's key. This key will determine access to a
+/// station record set's record entries, and it is imperative not
+/// to lose the item that holds the key under any circumstance.
+/// Records are mostly a roleplaying tool, but can have some
+/// functionality as well (i.e., security records indicating that
+/// a specific person holding an ID card with a linked key is
+/// currently under warrant, showing a crew manifest with user
+/// settable, custom titles).
+/// General records are tied into this system, as most crewmembers
+/// should have a general record - and most systems should probably
+/// depend on this general record being created. This is subject
+/// to change.
 /// </summary>
 public sealed partial class StationRecordsSystem : SharedStationRecordsSystem
 {
+    [Dependency] private readonly IdCardSystem _idCard = default!;
     [Dependency] private readonly InventorySystem _inventory = default!;
     [Dependency] private readonly StationRecordKeyStorageSystem _keyStorage = default!;
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-    [Dependency] private readonly IdCardSystem _idCard = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
 
     public override void Initialize()
@@ -96,20 +93,21 @@ public sealed partial class StationRecordsSystem : SharedStationRecordsSystem
         if (_idCard.TryFindIdCard(ev.Uid, out var idCard))
         {
             if (TryComp(idCard, out StationRecordKeyStorageComponent? keyStorage)
-                && keyStorage.Key is {} key)
+                && keyStorage.Key is { } key)
             {
                 if (TryGetRecord<GeneralStationRecord>(key, out var generalRecord))
-                {
                     generalRecord.Name = ev.NewName;
-                }
 
                 Synchronize(key);
             }
         }
     }
 
-    private void CreateGeneralRecord(EntityUid station, EntityUid player, HumanoidCharacterProfile profile,
-        string? jobId, StationRecordsComponent records)
+    private void CreateGeneralRecord(EntityUid station,
+        EntityUid player,
+        HumanoidCharacterProfile profile,
+        string? jobId,
+        StationRecordsComponent records)
     {
         // TODO make PlayerSpawnCompleteEvent.JobId a ProtoId
         if (string.IsNullOrEmpty(jobId)
@@ -122,17 +120,27 @@ public sealed partial class StationRecordsSystem : SharedStationRecordsSystem
         TryComp<FingerprintComponent>(player, out var fingerprintComponent);
         TryComp<DnaComponent>(player, out var dnaComponent);
 
-        CreateGeneralRecord(station, idUid.Value, profile.Name, profile.Age, profile.Species, profile.Gender, jobId, fingerprintComponent?.Fingerprint, dnaComponent?.DNA, profile, records);
+        CreateGeneralRecord(station,
+            idUid.Value,
+            profile.Name,
+            profile.Age,
+            profile.Species,
+            profile.Gender,
+            jobId,
+            fingerprintComponent?.Fingerprint,
+            dnaComponent?.DNA,
+            profile,
+            records);
     }
 
 
     /// <summary>
-    ///     Create a general record to store in a station's record set.
+    /// Create a general record to store in a station's record set.
     /// </summary>
     /// <remarks>
-    ///     This is tied into the record system, as any crew member's
-    ///     records should generally be dependent on some generic
-    ///     record with the bare minimum of information involved.
+    /// This is tied into the record system, as any crew member's
+    /// records should generally be dependent on some generic
+    /// record with the bare minimum of information involved.
     /// </remarks>
     /// <param name="station">The entity uid of the station.</param>
     /// <param name="idUid">The entity uid of an entity's ID card. Can be null.</param>
@@ -140,17 +148,16 @@ public sealed partial class StationRecordsSystem : SharedStationRecordsSystem
     /// <param name="species">Species of the character.</param>
     /// <param name="gender">Gender of the character.</param>
     /// <param name="jobId">
-    ///     The job to initially tie this record to. This must be a valid job loaded in, otherwise
-    ///     this call will cause an exception. Ensure that a general record starts out with a job
-    ///     that is currently a valid job prototype.
+    /// The job to initially tie this record to. This must be a valid job loaded in, otherwise
+    /// this call will cause an exception. Ensure that a general record starts out with a job
+    /// that is currently a valid job prototype.
     /// </param>
     /// <param name="mobFingerprint">Fingerprint of the character.</param>
     /// <param name="dna">DNA of the character.</param>
-    ///
     /// <param name="profile">
-    ///     Profile for the related player. This is so that other systems can get further information
-    ///     about the player character.
-    ///     Optional - other systems should anticipate this.
+    /// Profile for the related player. This is so that other systems can get further information
+    /// about the player character.
+    /// Optional - other systems should anticipate this.
     /// </param>
     /// <param name="records">Station records component.</param>
     public void CreateGeneralRecord(
@@ -171,13 +178,13 @@ public sealed partial class StationRecordsSystem : SharedStationRecordsSystem
 
         // when adding a record that already exists use the old one
         // this happens when respawning as the same character
-        if (GetRecordByName(station, name, records) is {} id)
+        if (GetRecordByName(station, name, records) is { } id)
         {
             SetIdKey(idUid, new StationRecordKey(id, station));
             return;
         }
 
-        var record = new GeneralStationRecord()
+        var record = new GeneralStationRecord
         {
             Name = name,
             Age = age,
@@ -188,7 +195,7 @@ public sealed partial class StationRecordsSystem : SharedStationRecordsSystem
             Gender = gender,
             DisplayPriority = jobPrototype.RealDisplayWeight,
             Fingerprint = mobFingerprint,
-            DNA = dna
+            DNA = dna,
         };
 
         var key = AddRecordEntry(station, record);
@@ -208,20 +215,18 @@ public sealed partial class StationRecordsSystem : SharedStationRecordsSystem
     /// </summary>
     public void SetIdKey(EntityUid? uid, StationRecordKey key)
     {
-        if (uid is not {} idUid)
+        if (uid is not { } idUid)
             return;
 
         var keyStorageEntity = idUid;
-        if (TryComp<PdaComponent>(idUid, out var pda) && pda.ContainedId is {} id)
-        {
+        if (TryComp<PdaComponent>(idUid, out var pda) && pda.ContainedId is { } id)
             keyStorageEntity = id;
-        }
 
         _keyStorage.AssignKey(keyStorageEntity, key);
     }
 
     /// <summary>
-    ///     Removes a record from this station.
+    /// Removes a record from this station.
     /// </summary>
     /// <param name="key">The station and key to remove.</param>
     /// <param name="records">Station records component.</param>
@@ -241,16 +246,18 @@ public sealed partial class StationRecordsSystem : SharedStationRecordsSystem
     }
 
     /// <summary>
-    ///     Try to get a record from this station's record entries,
-    ///     from the provided station record key. Will always return
-    ///     null if the key does not match the station.
+    /// Try to get a record from this station's record entries,
+    /// from the provided station record key. Will always return
+    /// null if the key does not match the station.
     /// </summary>
     /// <param name="key">Station and key to try and index from the record set.</param>
     /// <param name="entry">The resulting entry.</param>
     /// <param name="records">Station record component.</param>
     /// <typeparam name="T">Type to get from the record set.</typeparam>
     /// <returns>True if the record was obtained, false otherwise.</returns>
-    public bool TryGetRecord<T>(StationRecordKey key, [NotNullWhen(true)] out T? entry, StationRecordsComponent? records = null)
+    public bool TryGetRecord<T>(StationRecordKey key,
+        [NotNullWhen(true)] out T? entry,
+        StationRecordsComponent? records = null)
     {
         entry = default;
 
@@ -308,13 +315,13 @@ public sealed partial class StationRecordsSystem : SharedStationRecordsSystem
     public string RecordName(StationRecordKey key)
     {
         if (!TryGetRecord<GeneralStationRecord>(key, out var record))
-           return string.Empty;
+            return string.Empty;
 
         return record.Name;
     }
 
     /// <summary>
-    ///     Gets all records of a specific type from a station.
+    /// Gets all records of a specific type from a station.
     /// </summary>
     /// <param name="station">The station to get the records from.</param>
     /// <param name="records">Station records component.</param>
@@ -329,7 +336,7 @@ public sealed partial class StationRecordsSystem : SharedStationRecordsSystem
     }
 
     /// <summary>
-    ///     Adds a new record entry to a station's record set.
+    /// Adds a new record entry to a station's record set.
     /// </summary>
     /// <param name="station">The station to add the record to.</param>
     /// <param name="record">The record to add.</param>
@@ -354,7 +361,8 @@ public sealed partial class StationRecordsSystem : SharedStationRecordsSystem
     /// <param name="record">The record to add.</param>
     /// <param name="records">Station records component.</param>
     /// <typeparam name="T">The type of record to add.</typeparam>
-    public void AddRecordEntry<T>(StationRecordKey key, T record,
+    public void AddRecordEntry<T>(StationRecordKey key,
+        T record,
         StationRecordsComponent? records = null)
     {
         if (!Resolve(key.OriginStation, ref records))
@@ -364,7 +372,7 @@ public sealed partial class StationRecordsSystem : SharedStationRecordsSystem
     }
 
     /// <summary>
-    ///     Synchronizes a station's records with any systems that need it.
+    /// Synchronizes a station's records with any systems that need it.
     /// </summary>
     /// <param name="station">The station to synchronize any recently accessed records with..</param>
     /// <param name="records">Station records component.</param>
@@ -428,9 +436,10 @@ public sealed partial class StationRecordsSystem : SharedStationRecordsSystem
             StationRecordFilterType.Species =>
                 !someRecord.Species.ToLower().Contains(filterLowerCaseValue),
             StationRecordFilterType.Prints => someRecord.Fingerprint != null
-                && IsFilterWithSomeCodeValue(someRecord.Fingerprint, filterLowerCaseValue),
+                                              && IsFilterWithSomeCodeValue(someRecord.Fingerprint,
+                                                  filterLowerCaseValue),
             StationRecordFilterType.DNA => someRecord.DNA != null
-                && IsFilterWithSomeCodeValue(someRecord.DNA, filterLowerCaseValue),
+                                           && IsFilterWithSomeCodeValue(someRecord.DNA, filterLowerCaseValue),
             _ => throw new IndexOutOfRangeException(nameof(filter.Type)),
         };
     }
@@ -471,31 +480,34 @@ public sealed partial class StationRecordsSystem : SharedStationRecordsSystem
 public abstract class StationRecordEvent : EntityEventArgs
 {
     public readonly StationRecordKey Key;
-    public EntityUid Station => Key.OriginStation;
 
     protected StationRecordEvent(StationRecordKey key)
     {
         Key = key;
     }
+
+    public EntityUid Station => Key.OriginStation;
 }
 
 /// <summary>
-///     Event raised after the player's general profile is created.
-///     Systems that modify records on a station would have more use
-///     listening to this event, as it contains the character's record key.
-///     Also stores the general record reference, to save some time.
+/// Event raised after the player's general profile is created.
+/// Systems that modify records on a station would have more use
+/// listening to this event, as it contains the character's record key.
+/// Also stores the general record reference, to save some time.
 /// </summary>
 public sealed class AfterGeneralRecordCreatedEvent : StationRecordEvent
 {
-    public readonly GeneralStationRecord Record;
     /// <summary>
     /// Profile for the related player. This is so that other systems can get further information
-    ///     about the player character.
-    ///     Optional - other systems should anticipate this.
+    /// about the player character.
+    /// Optional - other systems should anticipate this.
     /// </summary>
     public readonly HumanoidCharacterProfile Profile;
 
-    public AfterGeneralRecordCreatedEvent(StationRecordKey key, GeneralStationRecord record,
+    public readonly GeneralStationRecord Record;
+
+    public AfterGeneralRecordCreatedEvent(StationRecordKey key,
+        GeneralStationRecord record,
         HumanoidCharacterProfile profile) : base(key)
     {
         Record = record;
@@ -504,10 +516,10 @@ public sealed class AfterGeneralRecordCreatedEvent : StationRecordEvent
 }
 
 /// <summary>
-///     Event raised after a record is removed. Only the key is given
-///     when the record is removed, so that any relevant systems/components
-///     that store record keys can then remove the key from their internal
-///     fields.
+/// Event raised after a record is removed. Only the key is given
+/// when the record is removed, so that any relevant systems/components
+/// that store record keys can then remove the key from their internal
+/// fields.
 /// </summary>
 public sealed class RecordRemovedEvent : StationRecordEvent
 {
@@ -517,9 +529,9 @@ public sealed class RecordRemovedEvent : StationRecordEvent
 }
 
 /// <summary>
-///     Event raised after a record is modified. This is to
-///     inform other systems that records stored in this key
-///     may have changed.
+/// Event raised after a record is modified. This is to
+/// inform other systems that records stored in this key
+/// may have changed.
 /// </summary>
 public sealed class RecordModifiedEvent : StationRecordEvent
 {

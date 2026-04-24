@@ -7,10 +7,9 @@
 namespace Content.Server.Speech.Components;
 
 /// <summary>
-///     Hiss!
+/// Hiss!
 /// </summary>
 [RegisterComponent]
 public sealed partial class LizardAccentComponent : Component
 {
-
 }

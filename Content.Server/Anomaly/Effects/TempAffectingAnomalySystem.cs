@@ -5,15 +5,15 @@
 //
 // SPDX-License-Identifier: MIT
 
-using Content.Server.Atmos.EntitySystems;
 using Content.Server.Anomaly.Components;
+using Content.Server.Atmos.EntitySystems;
 using Content.Shared.Anomaly.Components;
 using Robust.Server.GameObjects;
 
 namespace Content.Server.Anomaly.Effects;
 
 /// <summary>
-/// This handles <see cref="TempAffectingAnomalyComponent"/>
+/// This handles <see cref="TempAffectingAnomalyComponent" />
 /// </summary>
 public sealed class TempAffectingAnomalySystem : EntitySystem
 {
@@ -32,15 +32,16 @@ public sealed class TempAffectingAnomalySystem : EntitySystem
             var indices = _xform.GetGridTilePositionOrDefault((ent, xform));
             var mixture = _atmosphere.GetTileMixture(grid, map, indices, true);
 
-            if (mixture is { })
-            {
+            if (mixture is not null)
                 mixture.Temperature += comp.TempChangePerSecond * anom.Severity * frameTime;
-            }
 
             if (grid != null && anom.Severity > comp.AnomalyHotSpotThreshold)
-            {
-                _atmosphere.HotspotExpose(grid.Value, indices, comp.HotspotExposeTemperature, comp.HotspotExposeVolume, ent, true);
-            }
+                _atmosphere.HotspotExpose(grid.Value,
+                    indices,
+                    comp.HotspotExposeTemperature,
+                    comp.HotspotExposeVolume,
+                    ent,
+                    true);
         }
     }
 }

@@ -21,6 +21,8 @@ public sealed partial class BanManager
     /// </summary>
     public const string BanNotificationChannel = "ban_notification";
 
+    private const int BanNotificationRateLimitCount = 10;
+
     // Rate limit to avoid undue load from mass-ban imports.
     // Only process 10 bans per 30 second interval.
     //
@@ -28,11 +30,10 @@ public sealed partial class BanManager
     // to avoid any possibility of dropping a normal ban by coincidence.
     // Didn't bother implementing this though.
     private static readonly TimeSpan BanNotificationRateLimitTime = TimeSpan.FromSeconds(30);
-    private const int BanNotificationRateLimitCount = 10;
 
     private readonly object _banNotificationRateLimitStateLock = new();
-    private TimeSpan _banNotificationRateLimitStart;
     private int _banNotificationRateLimitCount;
+    private TimeSpan _banNotificationRateLimitStart;
 
     private bool OnDatabaseNotificationEarlyFilter()
     {
@@ -90,7 +91,7 @@ public sealed partial class BanManager
         /// <summary>
         /// The ID of the new ban object in the database to check.
         /// </summary>
-        [JsonRequired, JsonPropertyName("ban_id")]
+        [JsonRequired] [JsonPropertyName("ban_id")]
         public int BanId { get; init; }
 
         /// <summary>

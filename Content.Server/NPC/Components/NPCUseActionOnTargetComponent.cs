@@ -12,14 +12,11 @@ namespace Content.Server.NPC.Components;
 /// <summary>
 /// This is used for an NPC that constantly tries to use an action on a given target.
 /// </summary>
-[RegisterComponent, Access(typeof(NPCUseActionOnTargetSystem))]
+[RegisterComponent] [Access(typeof(NPCUseActionOnTargetSystem))]
 public sealed partial class NPCUseActionOnTargetComponent : Component
 {
-    /// <summary>
-    /// HTN blackboard key for the target entity
-    /// </summary>
     [DataField]
-    public string TargetKey = "Target";
+    public EntityUid? ActionEnt;
 
     /// <summary>
     /// Action that's going to attempt to be used.
@@ -27,6 +24,9 @@ public sealed partial class NPCUseActionOnTargetComponent : Component
     [DataField(required: true)]
     public EntProtoId<TargetActionComponent> ActionId;
 
+    /// <summary>
+    /// HTN blackboard key for the target entity
+    /// </summary>
     [DataField]
-    public EntityUid? ActionEnt;
+    public string TargetKey = "Target";
 }

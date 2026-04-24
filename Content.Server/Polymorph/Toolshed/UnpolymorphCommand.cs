@@ -15,9 +15,9 @@ using Robust.Shared.Toolshed;
 namespace Content.Server.Polymorph.Toolshed;
 
 /// <summary>
-///     Undoes a polymorph, reverting the target to it's original form.
+/// Undoes a polymorph, reverting the target to it's original form.
 /// </summary>
-[ToolshedCommand, AdminCommand(AdminFlags.Fun)]
+[ToolshedCommand] [AdminCommand(AdminFlags.Fun)]
 public sealed class UnpolymorphCommand : ToolshedCommand
 {
     private PolymorphSystem? _system;
@@ -32,5 +32,5 @@ public sealed class UnpolymorphCommand : ToolshedCommand
 
     [CommandImplementation]
     public IEnumerable<EntityUid> Unpolymorph([PipedArgument] IEnumerable<EntityUid> input)
-        => input.Select(Unpolymorph).Where(x => x is not null).Select(x => (EntityUid)x!);
+        => input.Select(Unpolymorph).Where(x => x is not null).Select(x => (EntityUid) x!);
 }

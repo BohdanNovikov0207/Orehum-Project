@@ -15,11 +15,11 @@ namespace Content.Server.Chat.V2;
 /// </summary>
 public sealed class CommsAnnouncementCreatedEvent(EntityUid sender, EntityUid console, string message) : IChatEvent
 {
+    public EntityUid Console = console;
     public uint Id { get; set; }
     public EntityUid Sender { get; set; } = sender;
     public string Message { get; set; } = message;
     public MessageType Type => MessageType.Announcement;
-    public EntityUid Console = console;
 }
 
 /// <summary>
@@ -27,11 +27,11 @@ public sealed class CommsAnnouncementCreatedEvent(EntityUid sender, EntityUid co
 /// </summary>
 public sealed class DeadChatCreatedEvent(EntityUid speaker, string message, bool isAdmin) : IChatEvent
 {
+    public bool IsAdmin = isAdmin;
     public uint Id { get; set; }
     public EntityUid Sender { get; set; } = speaker;
     public string Message { get; set; } = message;
     public MessageType Type => MessageType.DeadChat;
-    public bool IsAdmin = isAdmin;
 }
 
 /// <summary>
@@ -39,11 +39,11 @@ public sealed class DeadChatCreatedEvent(EntityUid speaker, string message, bool
 /// </summary>
 public sealed class EmoteCreatedEvent(EntityUid sender, string message, float range) : IChatEvent
 {
+    public float Range = range;
     public uint Id { get; set; }
     public EntityUid Sender { get; set; } = sender;
     public string Message { get; set; } = message;
     public MessageType Type => MessageType.Emote;
-    public float Range = range;
 }
 
 /// <summary>
@@ -51,11 +51,11 @@ public sealed class EmoteCreatedEvent(EntityUid sender, string message, float ra
 /// </summary>
 public sealed class LocalChatCreatedEvent(EntityUid speaker, string message, float range) : IChatEvent
 {
+    public float Range = range;
     public uint Id { get; set; }
     public EntityUid Sender { get; set; } = speaker;
     public string Message { get; set; } = message;
     public MessageType Type => MessageType.Local;
-    public float Range = range;
 }
 
 /// <summary>
@@ -78,10 +78,10 @@ public sealed class RadioCreatedEvent(
     RadioChannelPrototype channel)
     : IChatEvent
 {
+    public RadioChannelPrototype Channel = channel;
     public uint Id { get; set; }
     public EntityUid Sender { get; set; } = speaker;
     public string Message { get; set; } = message;
-    public RadioChannelPrototype Channel = channel;
     public MessageType Type => MessageType.Radio;
 }
 
@@ -90,10 +90,10 @@ public sealed class RadioCreatedEvent(
 /// </summary>
 public sealed class WhisperCreatedEvent(EntityUid speaker, string message, float minRange, float maxRange) : IChatEvent
 {
+    public float MaxRange = maxRange;
+    public float MinRange = minRange;
     public uint Id { get; set; }
     public EntityUid Sender { get; set; } = speaker;
     public string Message { get; set; } = message;
     public MessageType Type => MessageType.Whisper;
-    public float MinRange = minRange;
-    public float MaxRange = maxRange;
 }

@@ -10,15 +10,15 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Chemistry.Components;
 using Content.Shared.Chemistry.Components.SolutionManager;
 using Content.Shared.Chemistry.EntitySystems;
-using Content.Goobstation.Maths.FixedPoint;
 
 namespace Content.Server.Chemistry.Containers.EntitySystems;
 
 [Obsolete("This is being depreciated. Use SharedSolutionContainerSystem instead!")]
-public sealed partial class SolutionContainerSystem : SharedSolutionContainerSystem
+public sealed class SolutionContainerSystem : SharedSolutionContainerSystem
 {
     [Obsolete("This is being depreciated. Use the ensure methods in SharedSolutionContainerSystem instead!")]
     public Solution EnsureSolution(Entity<MetaDataComponent?> entity, string name)
@@ -33,10 +33,14 @@ public sealed partial class SolutionContainerSystem : SharedSolutionContainerSys
         => EnsureSolution(entity, name, maxVol, null, out existed);
 
     [Obsolete("This is being depreciated. Use the ensure methods in SharedSolutionContainerSystem instead!")]
-    public Solution EnsureSolution(Entity<MetaDataComponent?> entity, string name, FixedPoint2 maxVol, Solution? prototype, out bool existed)
+    public Solution EnsureSolution(Entity<MetaDataComponent?> entity,
+        string name,
+        FixedPoint2 maxVol,
+        Solution? prototype,
+        out bool existed)
     {
         EnsureSolution(entity, name, maxVol, prototype, out existed, out var solution);
-        return solution!;//solution is only ever null on the client, so we can suppress this
+        return solution!; //solution is only ever null on the client, so we can suppress this
     }
 
     [Obsolete("This is being depreciated. Use the ensure methods in SharedSolutionContainerSystem instead!")]
@@ -48,6 +52,6 @@ public sealed partial class SolutionContainerSystem : SharedSolutionContainerSys
         out bool existed)
     {
         EnsureSolutionEntity(entity, name, out existed, out var solEnt, maxVol, prototype);
-        return solEnt!.Value;//solEnt is only ever null on the client, so we can suppress this
+        return solEnt!.Value; //solEnt is only ever null on the client, so we can suppress this
     }
 }

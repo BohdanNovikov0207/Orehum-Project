@@ -41,7 +41,7 @@ public sealed partial class SurveillanceCameraComponent : Component
     // the most terrible thing possible.
     [ViewVariables(VVAccess.ReadWrite)]
     [DataField("id")]
-    public string CameraId { get; set;  } = "camera";
+    public string CameraId { get; set; } = "camera";
 
     [ViewVariables(VVAccess.ReadWrite)]
     [DataField("nameSet")]
@@ -56,5 +56,6 @@ public sealed partial class SurveillanceCameraComponent : Component
     public List<ProtoId<DeviceFrequencyPrototype>> AvailableNetworks { get; private set; } = new();
 
     [DataField]
-    public bool Mobile { get; set; } = false; // Goobstation - a value to differentiate stationary cameras from mobile like bodycams
+    public bool Mobile { get; set; } =
+        false; // Goobstation - a value to differentiate stationary cameras from mobile like bodycams
 }

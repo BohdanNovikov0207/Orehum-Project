@@ -5,9 +5,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Linq;
+using Content.Server._EinsteinEngines.Atmos.Components;
 using Content.Server.Atmos.Components;
 using Content.Server.Atmos.EntitySystems;
-using Content.Server._EinsteinEngines.Atmos.Components;
 using Content.Server.Cloning.Components;
 using Content.Shared._Shitmed.Targeting;
 using Content.Shared.Bed.Components;
@@ -22,13 +22,12 @@ namespace Content.Server._EinsteinEngines.Atmos.EntitySystems;
 
 public sealed class IgniteFromGasSystem : EntitySystem
 {
-    [Dependency] private readonly SharedBodySystem _body = default!;
-    [Dependency] private readonly InventorySystem _inventory = default!;
-    [Dependency] private readonly AtmosphereSystem _atmos = default!;
-    [Dependency] private readonly FlammableSystem _flammable = default!;
-
     // All ignitions tick at the same time because FlammableSystem is also the same
     private const float UpdateTimer = 1f;
+    [Dependency] private readonly AtmosphereSystem _atmos = default!;
+    [Dependency] private readonly SharedBodySystem _body = default!;
+    [Dependency] private readonly FlammableSystem _flammable = default!;
+    [Dependency] private readonly InventorySystem _inventory = default!;
     private float _timer;
 
     public override void Initialize()
@@ -81,9 +80,12 @@ public sealed class IgniteFromGasSystem : EntitySystem
         UpdateIgniteImmunity((ent, ent.Comp));
     }
 
-    private void OnIgniteFromGasImmunityEquipped(Entity<IgniteFromGasImmunityComponent> ent, ref GotEquippedEvent args) =>
+    private void OnIgniteFromGasImmunityEquipped(Entity<IgniteFromGasImmunityComponent> ent,
+        ref GotEquippedEvent args) =>
         UpdateIgniteImmunity(args.Equipee);
-    private void OnIgniteFromGasImmunityUnequipped(Entity<IgniteFromGasImmunityComponent> ent, ref GotUnequippedEvent args) =>
+
+    private void OnIgniteFromGasImmunityUnequipped(Entity<IgniteFromGasImmunityComponent> ent,
+        ref GotUnequippedEvent args) =>
         UpdateIgniteImmunity(args.Equipee);
 
     public void UpdateIgniteImmunity(Entity<IgniteFromGasComponent?, InventoryComponent?> ent)
@@ -100,7 +102,9 @@ public sealed class IgniteFromGasSystem : EntitySystem
                 continue;
 
             foreach (var immunePart in immunity.Parts)
+            {
                 exposedBodyParts.Remove(immunePart);
+            }
         }
 
         if (exposedBodyParts.Count == 0)
@@ -128,7 +132,7 @@ public sealed class IgniteFromGasSystem : EntitySystem
                 HasComp<StasisBedBuckledComponent>(uid) ||
                 _atmos.GetContainingMixture(uid, excite: true) is not { } gas ||
                 gas[(int) ignite.Gas] < ignite.MolesToIgnite
-                )
+               )
                 continue;
 
             _flammable.AdjustFireStacks(uid, ignite.FireStacksPerUpdate, flammable, true, 10f);

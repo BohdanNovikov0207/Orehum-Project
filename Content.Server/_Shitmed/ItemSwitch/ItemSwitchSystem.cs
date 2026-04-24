@@ -22,8 +22,9 @@ namespace Content.Server._Shitmed.ItemSwitch;
 
 public sealed class ItemSwitchSystem : SharedItemSwitchSystem
 {
-    [Dependency] private readonly SharedItemSwitchSystem _itemSwitch = default!;
     [Dependency] private readonly BatterySystem _battery = default!;
+    [Dependency] private readonly SharedItemSwitchSystem _itemSwitch = default!;
+
     public override void Initialize()
     {
         base.Initialize();
@@ -38,9 +39,9 @@ public sealed class ItemSwitchSystem : SharedItemSwitchSystem
     private void OnExamined(Entity<ItemSwitchComponent> ent, ref ExaminedEvent args)
     {
         if (!ent.Comp.NeedsPower
-        || !TryComp<BatteryComponent>(ent, out var battery)
-        || !ent.Comp.States.TryGetValue(ent.Comp.State, out var state))
-        return;
+            || !TryComp<BatteryComponent>(ent, out var battery)
+            || !ent.Comp.States.TryGetValue(ent.Comp.State, out var state))
+            return;
 
         // If the current state is the default state, which is also the off state, show off. Else, show on.
         var onMsg = ent.Comp.State != ent.Comp.DefaultState
@@ -80,10 +81,8 @@ public sealed class ItemSwitchSystem : SharedItemSwitchSystem
         _battery.TryUseCharge(ent, state.EnergyPerUse, battery);
     }
 
-    private void OnAttemptMelee(EntityUid uid, ItemSwitchComponent component, ref AttemptMeleeEvent args)
-    {
+    private void OnAttemptMelee(EntityUid uid, ItemSwitchComponent component, ref AttemptMeleeEvent args) =>
         CheckPowerAndSwitchState(uid, component);
-    }
 
     public override void Update(float frameTime)
     {
@@ -95,5 +94,4 @@ public sealed class ItemSwitchSystem : SharedItemSwitchSystem
             CheckPowerAndSwitchState(uid, comp);
         }
     }
-
 }

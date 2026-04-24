@@ -35,7 +35,6 @@ using Content.Shared.Administration;
 using Content.Shared.Ghost;
 using Content.Shared.Mind;
 using Robust.Server.GameObjects;
-using Robust.Server.Player;
 using Robust.Shared.Console;
 using Robust.Shared.Player;
 
@@ -55,7 +54,8 @@ public sealed class AGhostCommand : LocalizedCommands
         if (args.Length == 1)
         {
             var names = _playerManager.Sessions.OrderBy(c => c.Name).Select(c => c.Name).ToArray();
-            return CompletionResult.FromHintOptions(names, LocalizationManager.GetString("shell-argument-username-optional-hint"));
+            return CompletionResult.FromHintOptions(names,
+                LocalizationManager.GetString("shell-argument-username-optional-hint"));
         }
 
         return CompletionResult.Empty;
@@ -113,7 +113,8 @@ public sealed class AGhostCommand : LocalizedCommands
             return;
         }
 
-        if (mind.VisitingEntity != default && _entities.TryGetComponent<GhostComponent>(mind.VisitingEntity, out var oldGhostComponent))
+        if (mind.VisitingEntity != default &&
+            _entities.TryGetComponent<GhostComponent>(mind.VisitingEntity, out var oldGhostComponent))
         {
             mindSystem.UnVisit(mindId, mind);
             // If already an admin ghost, then return to body.

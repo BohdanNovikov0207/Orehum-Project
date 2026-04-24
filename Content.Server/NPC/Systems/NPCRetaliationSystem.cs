@@ -9,7 +9,7 @@
 // SPDX-License-Identifier: MIT
 
 using Content.Server.NPC.Components;
-using Content.Server.NPC.Events; // Goobstation
+using Content.Server.NPC.Events;
 using Content.Shared.CombatMode;
 using Content.Shared.Damage;
 using Content.Shared.Mobs.Components;
@@ -17,11 +17,12 @@ using Content.Shared.NPC.Components;
 using Content.Shared.NPC.Systems;
 using Robust.Shared.Collections;
 using Robust.Shared.Timing;
+// Goobstation
 
 namespace Content.Server.NPC.Systems;
 
 /// <summary>
-///     Handles NPC which become aggressive after being attacked.
+/// Handles NPC which become aggressive after being attacked.
 /// </summary>
 public sealed class NPCRetaliationSystem : EntitySystem
 {
@@ -40,19 +41,18 @@ public sealed class NPCRetaliationSystem : EntitySystem
         if (!args.DamageIncreased)
             return;
 
-        if (args.Origin is not {} origin)
+        if (args.Origin is not { } origin)
             return;
 
         TryRetaliate(ent, origin);
     }
 
-    private void OnDisarmed(Entity<NPCRetaliationComponent> ent, ref DisarmedEvent args)
-    {
+    private void OnDisarmed(Entity<NPCRetaliationComponent> ent, ref DisarmedEvent args) =>
         TryRetaliate(ent, args.Source);
-    }
 
-    public bool TryRetaliate(Entity<NPCRetaliationComponent> ent, EntityUid target,
-                             bool secondary = false) // Goobstation - whether this should trigger group retaliation
+    public bool TryRetaliate(Entity<NPCRetaliationComponent> ent,
+        EntityUid target,
+        bool secondary = false) // Goobstation - whether this should trigger group retaliation
     {
         // don't retaliate against inanimate objects.
         if (!HasComp<MobStateComponent>(target))
@@ -63,7 +63,7 @@ public sealed class NPCRetaliationSystem : EntitySystem
             return false;
 
         _npcFaction.AggroEntity(ent.Owner, target);
-        if (ent.Comp.AttackMemoryLength is {} memoryLength)
+        if (ent.Comp.AttackMemoryLength is { } memoryLength)
             ent.Comp.AttackMemories[target] = _timing.CurTime + memoryLength;
 
         // Goobstation

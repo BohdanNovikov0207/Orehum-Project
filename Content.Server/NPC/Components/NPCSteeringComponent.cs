@@ -23,9 +23,102 @@ namespace Content.Server.NPC.Components;
 /// <summary>
 /// Added to NPCs that are moving.
 /// </summary>
-[RegisterComponent, AutoGenerateComponentPause]
+[RegisterComponent] [AutoGenerateComponentPause]
 public sealed partial class NPCSteeringComponent : Component
 {
+    public const float StuckDistance = 1f;
+
+    public const int FailedPathLimit = 3;
+
+    /// <summary>
+    /// Are we considered arrived if we have line of sight of the target.
+    /// </summary>
+    [DataField("arriveOnLineOfSight")]
+    public bool ArriveOnLineOfSight = false;
+
+    /// <summary>
+    /// End target that we're trying to move to.
+    /// </summary>
+    [ViewVariables(VVAccess.ReadWrite)] public EntityCoordinates Coordinates;
+
+    /// <summary>
+    /// Current path we're following to our coordinates.
+    /// </summary>
+    [ViewVariables] public Queue<PathPoly> CurrentPath = new();
+
+    // Goobstation
+    /// <summary>
+    /// Whether to ignore pathing and just move directly to target.
+    /// </summary>
+    [ViewVariables(VVAccess.ReadWrite)] public bool DirectMove = false;
+
+    /// <summary>
+    /// If the NPC is using a do_after to clear an obstacle.
+    /// </summary>
+    [DataField("doAfterId")]
+    public DoAfterId? DoAfterId = null;
+
+    /// <summary>
+    /// How many times we've failed to pathfind. Once this hits the limit we'll stop steering.
+    /// </summary>
+    [ViewVariables] public int FailedPathCount;
+
+    [ViewVariables(VVAccess.ReadWrite)] public PathFlags Flags = PathFlags.None;
+
+    /// <summary>
+    /// Set to true from other systems if you wish to force the NPC to move closer.
+    /// </summary>
+    [DataField("forceMove")]
+    public bool ForceMove = false;
+
+    // Goobstation
+    /// <summary>
+    /// Up to how fast can we be going before being considered in range, if not null.
+    /// </summary>
+    [ViewVariables(VVAccess.ReadWrite)] public float? InRangeMaxSpeed = null;
+
+    [DataField("lastSteerDirection")]
+    public Vector2 LastSteerDirection = Vector2.Zero;
+
+    /// <summary>
+    /// Last position we considered for being stuck.
+    /// </summary>
+    [DataField("lastStuckCoordinates")]
+    public EntityCoordinates LastStuckCoordinates;
+
+    [DataField("lastStuckTime", customTypeSerializer: typeof(TimeOffsetSerializer))]
+    [AutoPausedField]
+    public TimeSpan LastStuckTime;
+
+    /// <summary>
+    /// How long the target has been in line of sight if applicable.
+    /// </summary>
+    [DataField("lineOfSightTimer")]
+    public float LineOfSightTimer = 0f;
+
+    [DataField("lineOfSightTimeRequired")]
+    public float LineOfSightTimeRequired = 0.5f;
+
+    [ViewVariables] public CancellationTokenSource? PathfindToken = null;
+
+    /// <summary>
+    /// How close are we trying to get to the coordinates before being considered in range.
+    /// </summary>
+    [ViewVariables(VVAccess.ReadWrite)] public float Range = 0.2f;
+
+    /// <summary>
+    /// How far does the last node in the path need to be before considering re-pathfinding.
+    /// </summary>
+    [ViewVariables(VVAccess.ReadWrite)] public float RepathRange = 1.5f;
+
+    [ViewVariables] public SteeringStatus Status = SteeringStatus.Moving;
+
+    /// <summary>
+    /// Have we currently requested a path.
+    /// </summary>
+    [ViewVariables]
+    public bool Pathfind => PathfindToken != null;
+
     #region Context Steering
 
     /// <summary>
@@ -40,109 +133,16 @@ public sealed partial class NPCSteeringComponent : Component
     [ViewVariables(VVAccess.ReadWrite)]
     public float Radius = 0.35f;
 
-    [ViewVariables, DataField]
+    [ViewVariables] [DataField]
     public float[] Interest = new float[SharedNPCSteeringSystem.InterestDirections];
 
-    [ViewVariables, DataField]
+    [ViewVariables] [DataField]
     public float[] Danger = new float[SharedNPCSteeringSystem.InterestDirections];
 
     // TODO: Update radius, also danger points debug only
     public readonly List<Vector2> DangerPoints = new();
 
     #endregion
-
-    /// <summary>
-    /// Set to true from other systems if you wish to force the NPC to move closer.
-    /// </summary>
-    [DataField("forceMove")]
-    public bool ForceMove = false;
-
-    [DataField("lastSteerDirection")]
-    public Vector2 LastSteerDirection = Vector2.Zero;
-
-    /// <summary>
-    /// Last position we considered for being stuck.
-    /// </summary>
-    [DataField("lastStuckCoordinates")]
-    public EntityCoordinates LastStuckCoordinates;
-
-    [DataField("lastStuckTime", customTypeSerializer:typeof(TimeOffsetSerializer))]
-    [AutoPausedField]
-    public TimeSpan LastStuckTime;
-
-    public const float StuckDistance = 1f;
-
-    /// <summary>
-    /// Have we currently requested a path.
-    /// </summary>
-    [ViewVariables]
-    public bool Pathfind => PathfindToken != null;
-
-    /// <summary>
-    /// Are we considered arrived if we have line of sight of the target.
-    /// </summary>
-    [DataField("arriveOnLineOfSight")]
-    public bool ArriveOnLineOfSight = false;
-
-    /// <summary>
-    /// How long the target has been in line of sight if applicable.
-    /// </summary>
-    [DataField("lineOfSightTimer")]
-    public float LineOfSightTimer = 0f;
-
-    [DataField("lineOfSightTimeRequired")]
-    public float LineOfSightTimeRequired = 0.5f;
-
-    [ViewVariables] public CancellationTokenSource? PathfindToken = null;
-
-    /// <summary>
-    /// Current path we're following to our coordinates.
-    /// </summary>
-    [ViewVariables] public Queue<PathPoly> CurrentPath = new();
-
-    /// <summary>
-    /// End target that we're trying to move to.
-    /// </summary>
-    [ViewVariables(VVAccess.ReadWrite)] public EntityCoordinates Coordinates;
-
-    /// <summary>
-    /// How close are we trying to get to the coordinates before being considered in range.
-    /// </summary>
-    [ViewVariables(VVAccess.ReadWrite)] public float Range = 0.2f;
-
-    // Goobstation
-    /// <summary>
-    /// Whether to ignore pathing and just move directly to target.
-    /// </summary>
-    [ViewVariables(VVAccess.ReadWrite)] public bool DirectMove = false;
-
-    // Goobstation
-    /// <summary>
-    /// Up to how fast can we be going before being considered in range, if not null.
-    /// </summary>
-    [ViewVariables(VVAccess.ReadWrite)] public float? InRangeMaxSpeed = null;
-
-    /// <summary>
-    /// How far does the last node in the path need to be before considering re-pathfinding.
-    /// </summary>
-    [ViewVariables(VVAccess.ReadWrite)] public float RepathRange = 1.5f;
-
-    public const int FailedPathLimit = 3;
-
-    /// <summary>
-    /// How many times we've failed to pathfind. Once this hits the limit we'll stop steering.
-    /// </summary>
-    [ViewVariables] public int FailedPathCount;
-
-    [ViewVariables] public SteeringStatus Status = SteeringStatus.Moving;
-
-    [ViewVariables(VVAccess.ReadWrite)] public PathFlags Flags = PathFlags.None;
-
-    /// <summary>
-    /// If the NPC is using a do_after to clear an obstacle.
-    /// </summary>
-    [DataField("doAfterId")]
-    public DoAfterId? DoAfterId = null;
 }
 
 public enum SteeringStatus : byte

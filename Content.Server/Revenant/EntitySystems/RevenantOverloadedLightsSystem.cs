@@ -32,6 +32,9 @@ public sealed class RevenantOverloadedLightsSystem : SharedRevenantOverloadedLig
         if (distance > component.ZapRange)
             return;
 
-        _beam.TryCreateBeam(lights, component.Target.Value, component.ZapBeamEntityId, accumulateIndex: false); // Goob edit
+        _beam.TryCreateBeam(lights,
+            component.Target.Value,
+            component.ZapBeamEntityId,
+            accumulateIndex: false); // Goob edit
     }
 }

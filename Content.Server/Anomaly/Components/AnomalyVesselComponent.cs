@@ -17,7 +17,7 @@ namespace Content.Server.Anomaly.Components;
 /// they generate points for the selected server based on
 /// the anomaly's stability and severity.
 /// </summary>
-[RegisterComponent, Access(typeof(SharedAnomalySystem)), AutoGenerateComponentPause]
+[RegisterComponent] [Access(typeof(SharedAnomalySystem))] [AutoGenerateComponentPause]
 public sealed partial class AnomalyVesselComponent : Component
 {
     /// <summary>
@@ -28,10 +28,10 @@ public sealed partial class AnomalyVesselComponent : Component
     public EntityUid? Anomaly;
 
     /// <summary>
-    /// A multiplier applied to the amount of points generated.
+    /// The sound that is played repeatedly when the anomaly is destabilizing/decaying
     /// </summary>
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
-    public float PointMultiplier = 1;
+    [DataField("beepSound")]
+    public SoundSpecifier BeepSound = new SoundPathSpecifier("/Audio/Machines/vessel_warning.ogg");
 
     /// <summary>
     /// The maximum time between each beep
@@ -48,13 +48,13 @@ public sealed partial class AnomalyVesselComponent : Component
     /// <summary>
     /// When the next beep sound will play
     /// </summary>
-    [DataField("nextBeep", customTypeSerializer:typeof(TimeOffsetSerializer))]
+    [DataField("nextBeep", customTypeSerializer: typeof(TimeOffsetSerializer))]
     [AutoPausedField]
     public TimeSpan NextBeep = TimeSpan.Zero;
 
     /// <summary>
-    /// The sound that is played repeatedly when the anomaly is destabilizing/decaying
+    /// A multiplier applied to the amount of points generated.
     /// </summary>
-    [DataField("beepSound")]
-    public SoundSpecifier BeepSound = new SoundPathSpecifier("/Audio/Machines/vessel_warning.ogg");
+    [DataField] [ViewVariables(VVAccess.ReadWrite)]
+    public float PointMultiplier = 1;
 }

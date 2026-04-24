@@ -17,17 +17,29 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototy
 namespace Content.Server.Wires;
 
 /// <summary>
-///     WireLayout prototype.
-///
-///     This is meant for ease of organizing wire sets on entities that use
-///     wires. Once one of these is initialized, it should be stored in the
-///     WiresSystem as a functional wire set.
+/// WireLayout prototype.
+/// This is meant for ease of organizing wire sets on entities that use
+/// wires. Once one of these is initialized, it should be stored in the
+/// WiresSystem as a functional wire set.
 /// </summary>
 [Prototype]
-public sealed partial class WireLayoutPrototype : IPrototype, IInheritingPrototype
+public sealed class WireLayoutPrototype : IPrototype, IInheritingPrototype
 {
-    [IdDataField]
-    public string ID { get; private set; } = default!;
+    /// <summary>
+    /// How many wires in this layout will do
+    /// nothing (these are added upon layout
+    /// initialization)
+    /// </summary>
+    [DataField("dummyWires")]
+    [NeverPushInheritance]
+    public int DummyWires { get; private set; } = default!;
+
+    /// <summary>
+    /// All the valid IWireActions currently in this layout.
+    /// </summary>
+    [DataField("wires")]
+    [NeverPushInheritance]
+    public List<IWireAction>? Wires { get; private set; }
 
     [ParentDataField(typeof(AbstractPrototypeIdArraySerializer<WireLayoutPrototype>))]
     public string[]? Parents { get; private set; }
@@ -35,19 +47,6 @@ public sealed partial class WireLayoutPrototype : IPrototype, IInheritingPrototy
     [AbstractDataField]
     public bool Abstract { get; private set; }
 
-    /// <summary>
-    ///     How many wires in this layout will do
-    ///     nothing (these are added upon layout
-    ///     initialization)
-    /// </summary>
-    [DataField("dummyWires")]
-    [NeverPushInheritance]
-    public int DummyWires { get; private set; } = default!;
-
-    /// <summary>
-    ///     All the valid IWireActions currently in this layout.
-    /// </summary>
-    [DataField("wires")]
-    [NeverPushInheritance]
-    public List<IWireAction>? Wires { get; private set; }
+    [IdDataField]
+    public string ID { get; } = default!;
 }

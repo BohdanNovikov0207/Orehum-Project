@@ -11,12 +11,13 @@ using Robust.Shared.Random;
 
 namespace Content.Server.GameTicking.Rules.VariationPass;
 
-/// <inheritdoc cref="PoweredLightVariationPassComponent"/>
+/// <inheritdoc cref="PoweredLightVariationPassComponent" />
 public sealed class PoweredLightVariationPassSystem : VariationPassSystem<PoweredLightVariationPassComponent>
 {
     [Dependency] private readonly PoweredLightSystem _poweredLight = default!;
 
-    protected override void ApplyVariation(Entity<PoweredLightVariationPassComponent> ent, ref StationVariationPassEvent args)
+    protected override void ApplyVariation(Entity<PoweredLightVariationPassComponent> ent,
+        ref StationVariationPassEvent args)
     {
         var query = AllEntityQuery<PoweredLightComponent, TransformComponent>();
         while (query.MoveNext(out var uid, out var comp, out var xform))
@@ -48,9 +49,7 @@ public sealed class PoweredLightVariationPassSystem : VariationPassSystem<Powere
                 _poweredLight.ReplaceSpawnedPrototype((uid, comp), ent.Comp.AgedLightTubePrototype);
             }
             else
-            {
                 _poweredLight.ReplaceSpawnedPrototype((uid, comp), ent.Comp.AgedLightBulbPrototype);
-            }
         }
     }
 }

@@ -16,7 +16,7 @@ using Robust.Shared.Map;
 namespace Content.Server.Salvage;
 
 [AdminCommand(AdminFlags.Admin)]
-sealed class SalvageRulerCommand : IConsoleCommand
+internal sealed class SalvageRulerCommand : IConsoleCommand
 {
     [Dependency] private readonly IEntityManager _entities = default!;
     [Dependency] private readonly IMapManager _maps = default!;
@@ -25,7 +25,7 @@ sealed class SalvageRulerCommand : IConsoleCommand
 
     public string Description => Loc.GetString("salvage-ruler-command-description");
 
-    public string Help => Loc.GetString("salvage-ruler-command-help-text", ("command",Command));
+    public string Help => Loc.GetString("salvage-ruler-command-help-text", ("command", Command));
 
     public void Execute(IConsoleShell shell, string argStr, string[] args)
     {
@@ -54,11 +54,11 @@ sealed class SalvageRulerCommand : IConsoleCommand
         var first = true;
         foreach (var mapGrid in _maps.GetAllGrids(entityTransform.MapID))
         {
-            var aabb = _entities.System<SharedTransformSystem>().GetWorldMatrix(mapGrid).TransformBox(mapGrid.Comp.LocalAABB);
+            var aabb = _entities.System<SharedTransformSystem>()
+                .GetWorldMatrix(mapGrid)
+                .TransformBox(mapGrid.Comp.LocalAABB);
             if (first)
-            {
                 total = aabb;
-            }
             else
             {
                 total = total.ExtendToContain(aabb.TopLeft);
@@ -66,8 +66,10 @@ sealed class SalvageRulerCommand : IConsoleCommand
                 total = total.ExtendToContain(aabb.BottomLeft);
                 total = total.ExtendToContain(aabb.BottomRight);
             }
+
             first = false;
         }
+
         shell.WriteLine(total.ToString());
     }
 }

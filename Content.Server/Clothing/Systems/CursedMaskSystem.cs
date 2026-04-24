@@ -109,9 +109,11 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Server.Clothing.Systems;
 
-/// <inheritdoc/>
+/// <inheritdoc />
 public sealed class CursedMaskSystem : SharedCursedMaskSystem
 {
+    // We can't store this info on the component easily
+    private static readonly ProtoId<HTNCompoundPrototype> TakeoverRootTask = "SimpleHostileCompound";
     [Dependency] private readonly IAdminLogManager _adminLog = default!;
     [Dependency] private readonly GhostSystem _ghostSystem = default!;
     [Dependency] private readonly HTNSystem _htn = default!;
@@ -119,9 +121,6 @@ public sealed class CursedMaskSystem : SharedCursedMaskSystem
     [Dependency] private readonly NPCSystem _npc = default!;
     [Dependency] private readonly NpcFactionSystem _npcFaction = default!;
     [Dependency] private readonly PopupSystem _popup = default!;
-
-    // We can't store this info on the component easily
-    private static readonly ProtoId<HTNCompoundPrototype> TakeoverRootTask = "SimpleHostileCompound";
 
     protected override void TryTakeover(Entity<CursedMaskComponent> ent, EntityUid wearer)
     {

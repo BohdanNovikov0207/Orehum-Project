@@ -19,17 +19,10 @@ namespace Content.Server.NukeOps;
 /// <summary>
 /// Used with NukeOps game rule to send war declaration announcement
 /// </summary>
-[RegisterComponent, AutoGenerateComponentPause]
+[RegisterComponent] [AutoGenerateComponentPause]
 [Access(typeof(WarDeclaratorSystem), typeof(NukeopsRuleSystem))]
 public sealed partial class WarDeclaratorComponent : Component
 {
-    /// <summary>
-    /// Custom war declaration message. If empty, use default.
-    /// </summary>
-    [ViewVariables(VVAccess.ReadWrite)]
-    [DataField]
-    public string Message;
-
     /// <summary>
     /// Permission to customize message text
     /// </summary>
@@ -44,11 +37,18 @@ public sealed partial class WarDeclaratorComponent : Component
     [DataField]
     public Color Color = Color.Red;
 
-    /// <summary>
-    /// War declaration sound file path
-    /// </summary>
     [DataField]
-    public SoundSpecifier Sound = new SoundPathSpecifier("/Audio/Announcements/war.ogg");
+    public WarConditionStatus? CurrentStatus;
+
+    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))] [AutoPausedField]
+    public TimeSpan DisableAt;
+
+    /// <summary>
+    /// Custom war declaration message. If empty, use default.
+    /// </summary>
+    [ViewVariables(VVAccess.ReadWrite)]
+    [DataField]
+    public string Message;
 
     /// <summary>
     /// Fluent ID for the declaration sender title
@@ -58,22 +58,22 @@ public sealed partial class WarDeclaratorComponent : Component
     public LocId SenderTitle = "comms-console-announcement-title-nukie";
 
     /// <summary>
+    /// How long the shuttle will be disabled for
+    /// </summary>
+    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))] [AutoPausedField]
+    public TimeSpan ShuttleDisabledTime;
+
+    /// <summary>
+    /// War declaration sound file path
+    /// </summary>
+    [DataField]
+    public SoundSpecifier Sound = new SoundPathSpecifier("/Audio/Announcements/war.ogg");
+
+    /// <summary>
     /// Time allowed for declaration of war
     /// </summary>
     [DataField]
     public float WarDeclarationDelay = 6.0f;
-
-    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer)), AutoPausedField]
-    public TimeSpan DisableAt;
-
-    /// <summary>
-    /// How long the shuttle will be disabled for
-    /// </summary>
-    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer)), AutoPausedField]
-    public TimeSpan ShuttleDisabledTime;
-
-    [DataField]
-    public WarConditionStatus? CurrentStatus;
 }
 
 [ByRefEvent]

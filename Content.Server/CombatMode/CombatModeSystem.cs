@@ -27,8 +27,5 @@ namespace Content.Server.CombatMode;
 
 public sealed class CombatModeSystem : SharedCombatModeSystem
 {
-    protected override bool IsNpc(EntityUid uid)
-    {
-        return HasComp<HTNComponent>(uid);
-    }
+    protected override bool IsNpc(EntityUid uid) => HasComp<HTNComponent>(uid);
 }

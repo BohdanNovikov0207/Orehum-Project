@@ -4,10 +4,10 @@
 //
 // SPDX-License-Identifier: MIT
 
+using Content.Server.Lightning;
 using Content.Server.Power.Components;
 using Content.Server.Power.EntitySystems;
 using Content.Server.Tesla.Components;
-using Content.Server.Lightning;
 
 namespace Content.Server.Tesla.EntitySystems;
 
@@ -29,8 +29,6 @@ public sealed class TeslaCoilSystem : EntitySystem
     private void OnHitByLightning(Entity<TeslaCoilComponent> coil, ref HitByLightningEvent args)
     {
         if (TryComp<BatteryComponent>(coil, out var batteryComponent))
-        {
             _battery.SetCharge(coil, batteryComponent.CurrentCharge + coil.Comp.ChargeFromLightning);
-        }
     }
 }

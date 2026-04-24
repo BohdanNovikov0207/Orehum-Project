@@ -3,15 +3,17 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Server._EinsteinEngines.Language; // Goob Station - Revolutionary Language
+using Content.Server._EinsteinEngines.Language;
 using Content.Server.Polymorph.Systems;
 using Content.Shared.Polymorph;
 using Content.Shared.Revolutionary;
 using Content.Shared.Revolutionary.Components;
+// Goob Station - Revolutionary Language
 
 namespace Content.Server.Revolutionary;
 
-public sealed class RevolutionarySystem : SharedRevolutionarySystem  // Goob Station - Revolutionary Language (entire class body)
+public sealed class
+    RevolutionarySystem : SharedRevolutionarySystem // Goob Station - Revolutionary Language (entire class body)
 {
     [Dependency] private readonly LanguageSystem _languageSystem = default!;
     [Dependency] private readonly PolymorphSystem _polymorph = default!;

@@ -14,9 +14,9 @@ namespace Content.Server.Objectives.Components;
 /// <summary>
 /// Requires that the player's species matches a whitelist.
 /// </summary>
-[RegisterComponent, Access(typeof(SpeciesRequirementSystem))]
+[RegisterComponent] [Access(typeof(SpeciesRequirementSystem))]
 public sealed partial class SpeciesRequirementComponent : Component
 {
-    [DataField(required: true), ViewVariables(VVAccess.ReadWrite)]
+    [DataField(required: true)] [ViewVariables(VVAccess.ReadWrite)]
     public List<ProtoId<SpeciesPrototype>> AllowedSpecies = new();
 }

@@ -81,4 +81,5 @@ namespace Content.Server.Forensics;
 /// </summary>
 [RegisterComponent]
 public sealed partial class DnaSubstanceTraceComponent : Component
-{ }
+{
+}

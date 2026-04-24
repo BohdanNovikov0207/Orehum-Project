@@ -13,9 +13,15 @@ namespace Content.Server.GameTicking.Rules.Components;
 /// This is used for globally tracking players that need to be respawned.
 /// Used on gamerule entities.
 /// </summary>
-[RegisterComponent, Access(typeof(RespawnRuleSystem))]
+[RegisterComponent] [Access(typeof(RespawnRuleSystem))]
 public sealed partial class RespawnTrackerComponent : Component
 {
+    /// <summary>
+    /// Whether or not to delete the original body when respawning
+    /// </summary>
+    [DataField]
+    public bool DeleteBody = true;
+
     /// <summary>
     /// A list of the people that should be respawned.
     /// Used to make sure that we don't respawn aghosts or observers.
@@ -34,10 +40,4 @@ public sealed partial class RespawnTrackerComponent : Component
     /// </summary>
     [DataField]
     public Dictionary<NetUserId, TimeSpan> RespawnQueue = new();
-
-    /// <summary>
-    /// Whether or not to delete the original body when respawning
-    /// </summary>
-    [DataField]
-    public bool DeleteBody = true;
 }

@@ -1,14 +1,14 @@
 using Content.Server.Administration.Managers;
 using Content.Server.EUI;
 using Content.Shared.Administration;
+using Content.Shared.Coordinates;
 using Content.Shared.Eui;
 using Content.Shared.Follower;
-using Content.Shared.Coordinates;
+using JetBrains.Annotations;
 using Robust.Server.GameStates;
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
-using JetBrains.Annotations;
 
 namespace Content.Server.Administration.UI;
 
@@ -17,19 +17,18 @@ namespace Content.Server.Administration.UI;
 /// Use the "Open Camera" admin verb or the "camera" command to open.
 /// </summary>
 [UsedImplicitly]
-public sealed partial class AdminCameraEui : BaseEui
+public sealed class AdminCameraEui : BaseEui
 {
+    private static readonly EntProtoId CameraProtoId = "AdminCamera";
     [Dependency] private readonly IAdminManager _admin = default!;
     [Dependency] private readonly IEntityManager _entityManager = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
 
     private readonly FollowerSystem _follower = default!;
     private readonly PvsOverrideSystem _pvs = default!;
-    private readonly SharedViewSubscriberSystem _viewSubscriber = default!;
-
-    private static readonly EntProtoId CameraProtoId = "AdminCamera";
 
     private readonly EntityUid _target;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    private readonly SharedViewSubscriberSystem _viewSubscriber = default!;
     private EntityUid? _camera;
 
 
@@ -68,8 +67,6 @@ public sealed partial class AdminCameraEui : BaseEui
                 if (!_admin.HasAdminFlag(Player, AdminFlags.Admin) || Player.AttachedEntity == null)
                     return;
                 _follower.StartFollowingEntity(Player.AttachedEntity.Value, _target);
-                break;
-            default:
                 break;
         }
     }

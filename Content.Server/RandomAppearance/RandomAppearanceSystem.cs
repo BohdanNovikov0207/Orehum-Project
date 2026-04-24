@@ -13,8 +13,8 @@ namespace Content.Server.RandomAppearance;
 
 public sealed class RandomAppearanceSystem : EntitySystem
 {
-    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
 
     public override void Initialize()
     {
@@ -26,8 +26,6 @@ public sealed class RandomAppearanceSystem : EntitySystem
     private void OnComponentInit(EntityUid uid, RandomAppearanceComponent component, ComponentInit args)
     {
         if (TryComp(uid, out AppearanceComponent? appearance) && component.EnumKey != null)
-        {
             _appearance.SetData(uid, component.EnumKey, _random.Pick(component.SpriteStates), appearance);
-        }
     }
 }

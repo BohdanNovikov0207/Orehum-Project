@@ -16,9 +16,12 @@ namespace Content.Server.Procedural.DungeonJob;
 public sealed partial class DungeonJob
 {
     /// <summary>
-    /// <see cref="CorridorDecalSkirtingDunGen"/>
+    ///     <see cref="CorridorDecalSkirtingDunGen" />
     /// </summary>
-    private async Task PostGen(CorridorDecalSkirtingDunGen decks, Dungeon dungeon, HashSet<Vector2i> reservedTiles, Random random)
+    private async Task PostGen(CorridorDecalSkirtingDunGen decks,
+        Dungeon dungeon,
+        HashSet<Vector2i> reservedTiles,
+        Random random)
     {
         var directions = new ValueList<DirectionFlag>(4);
         var pocketDirections = new ValueList<Direction>(4);
@@ -46,9 +49,7 @@ public sealed partial class DungeonJob
                         !physics.CanCollide ||
                         !physics.Hard ||
                         doorQuery.HasComponent(ent.Value))
-                    {
                         continue;
-                    }
 
                     directions.Add(dir);
                     break;
@@ -73,9 +74,7 @@ public sealed partial class DungeonJob
                             !physics.CanCollide ||
                             !physics.Hard ||
                             doorQuery.HasComponent(ent.Value))
-                        {
                             continue;
-                        }
 
                         pocketDirections.Add(dir);
                         break;
@@ -88,7 +87,7 @@ public sealed partial class DungeonJob
                     {
                         // Decals not being centered biting my ass again
                         var gridPos = _maps.GridTileToLocal(_gridUid, _grid, tile).Offset(offset);
-                        _decals.TryAddDecal(cDir, gridPos, out _, color: decks.Color);
+                        _decals.TryAddDecal(cDir, gridPos, out _, decks.Color);
                     }
                 }
 
@@ -101,7 +100,7 @@ public sealed partial class DungeonJob
                 {
                     // Decals not being centered biting my ass again
                     var gridPos = _maps.GridTileToLocal(_gridUid, _grid, tile).Offset(offset);
-                    _decals.TryAddDecal(cDir, gridPos, out _, color: decks.Color);
+                    _decals.TryAddDecal(cDir, gridPos, out _, decks.Color);
                 }
 
                 continue;
@@ -116,7 +115,7 @@ public sealed partial class DungeonJob
                 if (decks.CornerDecals.TryGetValue(dirFlag, out var cDir))
                 {
                     var gridPos = _maps.GridTileToLocal(_gridUid, _grid, tile).Offset(offset);
-                    _decals.TryAddDecal(cDir, gridPos, out _, color: decks.Color);
+                    _decals.TryAddDecal(cDir, gridPos, out _, decks.Color);
                 }
             }
         }

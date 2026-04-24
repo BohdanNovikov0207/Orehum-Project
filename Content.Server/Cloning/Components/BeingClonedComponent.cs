@@ -9,21 +9,20 @@
 
 using Content.Shared.Mind;
 
-namespace Content.Server.Cloning.Components
+namespace Content.Server.Cloning.Components;
+
+[RegisterComponent]
+public sealed partial class BeingClonedComponent : Component
 {
-    [RegisterComponent]
-    public sealed partial class BeingClonedComponent : Component
-    {
-        [ViewVariables]
-        public MindComponent? Mind = default;
+    [ViewVariables]
+    public MindComponent? Mind = default;
 
-        [ViewVariables]
-        public EntityUid Parent;
+    /// <summary>
+    /// Goobstation - The previous body that this is a clone of.
+    /// </summary>
+    [DataField]
+    public EntityUid? Original;
 
-        /// <summary>
-        /// Goobstation - The previous body that this is a clone of.
-        /// </summary>
-        [DataField]
-        public EntityUid? Original;
-    }
+    [ViewVariables]
+    public EntityUid Parent;
 }

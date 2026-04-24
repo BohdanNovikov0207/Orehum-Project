@@ -5,18 +5,17 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Shared._Shitmed.BodyEffects.Subsystems;
-using Content.Shared.Body.Organ;
 using Content.Shared.StatusEffect;
-using Robust.Shared.Timing;
 using Robust.Shared.Random;
+using Robust.Shared.Timing;
 
 namespace Content.Server._Shitmed.BodyEffects.Subsystems;
 
 public sealed class RandomStatusActivationSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly StatusEffectsSystem _effects = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -24,7 +23,9 @@ public sealed class RandomStatusActivationSystem : EntitySystem
         SubscribeLocalEvent<RandomStatusActivationComponent, ComponentInit>(OnInit);
     }
 
-    private void OnInit(EntityUid uid, RandomStatusActivationComponent component, ComponentInit args) => GetRandomTime(component);
+    private void OnInit(EntityUid uid, RandomStatusActivationComponent component, ComponentInit args) =>
+        GetRandomTime(component);
+
     private void GetRandomTime(RandomStatusActivationComponent component)
     {
         var minTime = component.MinActivationTime;
@@ -49,7 +50,14 @@ public sealed class RandomStatusActivationSystem : EntitySystem
                 continue;
 
             foreach (var (key, component) in comp.StatusEffects)
-                _effects.TryAddStatusEffect(uid, key, comp.Duration ?? TimeSpan.FromSeconds(1), refresh: true, component, effects);
+            {
+                _effects.TryAddStatusEffect(uid,
+                    key,
+                    comp.Duration ?? TimeSpan.FromSeconds(1),
+                    true,
+                    component,
+                    effects);
+            }
 
             GetRandomTime(comp);
         }

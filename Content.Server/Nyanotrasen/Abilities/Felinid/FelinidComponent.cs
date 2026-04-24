@@ -4,19 +4,26 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype;
 using Robust.Shared.Prototypes;
+using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype;
 
 namespace Content.Server.Abilities.Felinid;
 
 [RegisterComponent]
 public sealed partial class FelinidComponent : Component
 {
-    /// <summary>
-    /// The hairball prototype to use.
-    /// </summary>
-    [DataField("hairballPrototype", customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
-    public string HairballPrototype = "Hairball";
+    [DataField("eatAction")]
+    public EntityUid? EatAction;
+
+    [DataField("eatActionId",
+        customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
+    public string? EatActionId = "ActionEatMouse";
+
+    [DataField("eatActionTarget")]
+    public EntityUid? EatActionTarget = null;
+
+    [DataField("hairballAction")]
+    public EntityUid? HairballAction;
 
     //[DataField("hairballAction", customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
     //public string HairballAction = "ActionHairball";
@@ -25,16 +32,9 @@ public sealed partial class FelinidComponent : Component
         customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
     public string? HairballActionId = "ActionHairball";
 
-    [DataField("hairballAction")]
-    public EntityUid? HairballAction;
-
-    [DataField("eatActionId",
-        customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
-    public string? EatActionId = "ActionEatMouse";
-
-    [DataField("eatAction")]
-    public EntityUid? EatAction;
-
-    [DataField("eatActionTarget")]
-    public EntityUid? EatActionTarget = null;
+    /// <summary>
+    /// The hairball prototype to use.
+    /// </summary>
+    [DataField("hairballPrototype", customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
+    public string HairballPrototype = "Hairball";
 }

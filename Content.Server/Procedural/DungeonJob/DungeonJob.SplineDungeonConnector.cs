@@ -16,7 +16,7 @@ namespace Content.Server.Procedural.DungeonJob;
 public sealed partial class DungeonJob
 {
     /// <summary>
-    /// <see cref="SplineDungeonConnectorDunGen"/>
+    ///     <see cref="SplineDungeonConnectorDunGen" />
     /// </summary>
     private async Task<Dungeon> PostGen(
         SplineDungeonConnectorDunGen gen,
@@ -56,30 +56,31 @@ public sealed partial class DungeonJob
 
         foreach (var pair in tree)
         {
-            var path = pathfinding.GetSplinePath(new PathfindingSystem.SplinePathArgs()
-            {
-                Distance = gen.DivisionDistance,
-                MaxRatio = gen.VarianceMax,
-                Args = new PathfindingSystem.SimplePathArgs()
+            var path = pathfinding.GetSplinePath(new PathfindingSystem.SplinePathArgs
                 {
-                    Start = pair.Start,
-                    End = pair.End,
-                    TileCost = node =>
+                    Distance = gen.DivisionDistance,
+                    MaxRatio = gen.VarianceMax,
+                    Args = new PathfindingSystem.SimplePathArgs
                     {
-                        // We want these to get prioritised internally and into space if it's a space dungeon.
-                        if (_maps.TryGetTile(_grid, node, out var tile) && !tile.IsEmpty)
-                            return 1f;
+                        Start = pair.Start,
+                        End = pair.End,
+                        TileCost = node =>
+                        {
+                            // We want these to get prioritised internally and into space if it's a space dungeon.
+                            if (_maps.TryGetTile(_grid, node, out var tile) && !tile.IsEmpty)
+                                return 1f;
 
-                        return 5f;
-                    }
+                            return 5f;
+                        },
+                    },
                 },
-            },
-            random);
+                random);
 
             // Welp
             if (path.Path.Count == 0)
             {
-                _sawmill.Error($"Unable to connect spline dungeon path for {_entManager.ToPrettyString(_gridUid)} between {pair.Start} and {pair.End}");
+                _sawmill.Error(
+                    $"Unable to connect spline dungeon path for {_entManager.ToPrettyString(_gridUid)} between {pair.Start} and {pair.End}");
                 continue;
             }
 
@@ -88,11 +89,11 @@ public sealed partial class DungeonJob
             if (!ValidateResume())
                 return Dungeon.Empty;
 
-            var wide = pathfinding.GetWiden(new PathfindingSystem.WidenArgs()
-            {
-                Path = path.Path,
-            },
-            random);
+            var wide = pathfinding.GetWiden(new PathfindingSystem.WidenArgs
+                {
+                    Path = path.Path,
+                },
+                random);
 
             tiles.Clear();
             allTiles.EnsureCapacity(allTiles.Count + wide.Count);
@@ -106,13 +107,9 @@ public sealed partial class DungeonJob
                 Tile tile;
 
                 if (random.Prob(0.9f))
-                {
                     tile = new Tile(widen.TileId);
-                }
                 else
-                {
                     tile = _tileDefManager.GetVariantTile(widen, random);
-                }
 
                 tiles.Add((node, tile));
             }

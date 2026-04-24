@@ -82,6 +82,7 @@
 
 using Content.Server.Popups;
 using Content.Server.Storage.EntitySystems;
+using Content.Shared.ActionBlocker;
 using Content.Shared.DoAfter;
 using Content.Shared.Lock;
 using Content.Shared.Movement.Events;
@@ -90,20 +91,19 @@ using Content.Shared.Resist;
 using Content.Shared.Storage.Components;
 using Content.Shared.Tools.Components;
 using Content.Shared.Tools.Systems;
-using Content.Shared.ActionBlocker;
 using Robust.Server.Containers;
 
 namespace Content.Server.Resist;
 
 public sealed class ResistLockerSystem : EntitySystem
 {
+    [Dependency] private readonly ActionBlockerSystem _actionBlocker = default!;
+    [Dependency] private readonly ContainerSystem _container = default!; // good edit
+    [Dependency] private readonly SharedDoAfterSystem _doAfterSystem = default!;
     [Dependency] private readonly EntityStorageSystem _entityStorage = default!;
     [Dependency] private readonly LockSystem _lockSystem = default!;
     [Dependency] private readonly PopupSystem _popupSystem = default!;
-    [Dependency] private readonly SharedDoAfterSystem _doAfterSystem = default!;
     [Dependency] private readonly WeldableSystem _weldable = default!;
-    [Dependency] private readonly ActionBlockerSystem _actionBlocker = default!;
-    [Dependency] private readonly ContainerSystem _container = default!; // good edit
 
     public override void Initialize()
     {
@@ -113,12 +113,14 @@ public sealed class ResistLockerSystem : EntitySystem
     }
 
     // goob edit - made it support more than just entity storage
-    private void OnRelayMovement(EntityUid uid, ResistLockerComponent component, ref ContainerRelayMovementEntityEvent args)
+    private void OnRelayMovement(EntityUid uid,
+        ResistLockerComponent component,
+        ref ContainerRelayMovementEntityEvent args)
     {
         if (component.IsResisting // already resisting
-        || !_actionBlocker.CanMove(args.Entity) // can move
-        || TryComp<LockComponent>(uid, out var @lock) && !@lock.Locked // has a lock and is unlocked
-        || !_weldable.IsWelded(uid)) // not welded
+            || !_actionBlocker.CanMove(args.Entity) // can move
+            || TryComp<LockComponent>(uid, out var @lock) && !@lock.Locked // has a lock and is unlocked
+            || !_weldable.IsWelded(uid)) // not welded
             return;
 
         AttemptResist(args.Entity, uid, component);
@@ -129,7 +131,12 @@ public sealed class ResistLockerSystem : EntitySystem
         if (!Resolve(target, ref resistLockerComponent))
             return;
 
-        var doAfterEventArgs = new DoAfterArgs(EntityManager, user, resistLockerComponent.ResistTime, new ResistLockerDoAfterEvent(), target, target: target)
+        var doAfterEventArgs = new DoAfterArgs(EntityManager,
+            user,
+            resistLockerComponent.ResistTime,
+            new ResistLockerDoAfterEvent(),
+            target,
+            target)
         {
             BreakOnMove = true,
             BreakOnDamage = true,
@@ -146,7 +153,10 @@ public sealed class ResistLockerSystem : EntitySystem
         if (args.Cancelled)
         {
             component.IsResisting = false;
-            _popupSystem.PopupEntity(Loc.GetString("resist-locker-component-resist-interrupted"), args.Args.User, args.Args.User, PopupType.Medium);
+            _popupSystem.PopupEntity(Loc.GetString("resist-locker-component-resist-interrupted"),
+                args.Args.User,
+                args.Args.User,
+                PopupType.Medium);
             return;
         }
 

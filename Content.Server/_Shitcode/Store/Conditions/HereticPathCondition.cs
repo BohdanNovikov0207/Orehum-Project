@@ -8,8 +8,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Server.Heretic.EntitySystems;
-using Content.Shared.Heretic;
-using Content.Shared.Mind;
 using Content.Shared.Store;
 
 namespace Content.Server.Store.Conditions;
@@ -17,16 +15,16 @@ namespace Content.Server.Store.Conditions;
 public sealed partial class HereticPathCondition : ListingCondition
 {
     [DataField]
-    public HashSet<string>? Whitelist;
+    public HashSet<string>? Blacklist;
 
     [DataField]
-    public HashSet<string>? Blacklist;
+    public bool RequiresCanAscend;
 
     [DataField]
     public int Stage;
 
     [DataField]
-    public bool RequiresCanAscend;
+    public HashSet<string>? Whitelist;
 
     public override bool Condition(ListingConditionArgs args)
     {
@@ -46,16 +44,22 @@ public sealed partial class HereticPathCondition : ListingCondition
         if (Whitelist != null)
         {
             foreach (var white in Whitelist)
+            {
                 if (hereticComp.CurrentPath == white)
                     return true;
+            }
+
             return false;
         }
 
         if (Blacklist != null)
         {
             foreach (var black in Blacklist)
+            {
                 if (hereticComp.CurrentPath == black)
                     return false;
+            }
+
             return true;
         }
 

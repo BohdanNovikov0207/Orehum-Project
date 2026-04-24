@@ -23,10 +23,10 @@ namespace Content.Server.Administration.Commands;
 [AdminCommand(AdminFlags.Ban)]
 public sealed class DepartmentBanCommand : IConsoleCommand
 {
-    [Dependency] private readonly IPrototypeManager _protoManager = default!;
-    [Dependency] private readonly IPlayerLocator _locator = default!;
     [Dependency] private readonly IBanManager _banManager = default!;
     [Dependency] private readonly IConfigurationManager _cfg = default!;
+    [Dependency] private readonly IPlayerLocator _locator = default!;
+    [Dependency] private readonly IPrototypeManager _protoManager = default!;
 
     public string Command => "departmentban";
     public string Description => Loc.GetString("cmd-departmentban-desc");
@@ -40,7 +40,8 @@ public sealed class DepartmentBanCommand : IConsoleCommand
         uint minutes;
         if (!Enum.TryParse(_cfg.GetCVar(CCVars.DepartmentBanDefaultSeverity), out NoteSeverity severity))
         {
-            Logger.WarningS("admin.department_ban", "Department ban severity could not be parsed from config! Defaulting to medium.");
+            Logger.WarningS("admin.department_ban",
+                "Department ban severity could not be parsed from config! Defaulting to medium.");
             severity = NoteSeverity.Medium;
         }
 
@@ -75,7 +76,7 @@ public sealed class DepartmentBanCommand : IConsoleCommand
                     return;
                 }
 
-                if (!Enum.TryParse(args[4], ignoreCase: true, out severity))
+                if (!Enum.TryParse(args[4], true, out severity))
                 {
                     shell.WriteLine(Loc.GetString("cmd-roleban-severity-parse", ("severity", args[4]), ("help", Help)));
                     return;
@@ -89,9 +90,7 @@ public sealed class DepartmentBanCommand : IConsoleCommand
         }
 
         if (!_protoManager.TryIndex<DepartmentPrototype>(department, out var departmentProto))
-        {
             return;
-        }
 
         var located = await _locator.LookupIdByNameOrIdAsync(target);
         if (located == null)
@@ -108,7 +107,16 @@ public sealed class DepartmentBanCommand : IConsoleCommand
         var now = DateTimeOffset.UtcNow;
         foreach (var job in departmentProto.Roles)
         {
-            _banManager.CreateRoleBan(targetUid, located.Username, shell.Player?.UserId, null, targetHWid, job, minutes, severity, reason, now);
+            _banManager.CreateRoleBan(targetUid,
+                located.Username,
+                shell.Player?.UserId,
+                null,
+                targetHWid,
+                job,
+                minutes,
+                severity,
+                reason,
+                now);
         }
     }
 
@@ -141,8 +149,7 @@ public sealed class DepartmentBanCommand : IConsoleCommand
             3 => CompletionResult.FromHint(Loc.GetString("cmd-roleban-hint-3")),
             4 => CompletionResult.FromHintOptions(durOpts, Loc.GetString("cmd-roleban-hint-4")),
             5 => CompletionResult.FromHintOptions(severities, Loc.GetString("cmd-roleban-hint-5")),
-            _ => CompletionResult.Empty
+            _ => CompletionResult.Empty,
         };
     }
-
 }

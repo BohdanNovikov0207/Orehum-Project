@@ -26,14 +26,14 @@ public sealed partial class CanEscapeInventoryComponent : Component
     [DataField("baseResistTime")]
     public float BaseResistTime = 5f;
 
-    public bool IsEscaping => DoAfter != null;
-
     [DataField("doAfter")]
     public DoAfterId? DoAfter;
 
     /// <summary>
-    ///     DeltaV - action to cancel inventory escape. Added dynamically.
+    /// DeltaV - action to cancel inventory escape. Added dynamically.
     /// </summary>
     [DataField]
     public EntityUid? EscapeCancelAction;
+
+    public bool IsEscaping => DoAfter != null;
 }

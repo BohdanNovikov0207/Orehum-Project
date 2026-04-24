@@ -52,7 +52,7 @@ public sealed partial class ConditionNotesPlaytimeRange : WhitelistCondition
     public bool IncludeExpired = false;
 
     [DataField]
-    public NoteSeverity MinimumSeverity  = NoteSeverity.Minor;
+    public bool IncludeSecret = false;
 
     /// <summary>
     /// The minimum number of notes required.
@@ -60,12 +60,12 @@ public sealed partial class ConditionNotesPlaytimeRange : WhitelistCondition
     [DataField]
     public int MinimumNotes = 1;
 
+    [DataField]
+    public NoteSeverity MinimumSeverity = NoteSeverity.Minor;
+
     /// <summary>
     /// The range in minutes to check for notes.
     /// </summary>
     [DataField]
     public int Range = int.MaxValue;
-
-    [DataField]
-    public bool IncludeSecret = false;
 }

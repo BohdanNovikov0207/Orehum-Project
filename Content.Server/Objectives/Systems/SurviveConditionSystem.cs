@@ -5,8 +5,8 @@
 // SPDX-License-Identifier: MIT
 
 using Content.Server.Objectives.Components;
-using Content.Shared.Objectives.Components;
 using Content.Shared.Mind;
+using Content.Shared.Objectives.Components;
 
 namespace Content.Server.Objectives.Systems;
 
@@ -24,8 +24,6 @@ public sealed class SurviveConditionSystem : EntitySystem
         SubscribeLocalEvent<SurviveConditionComponent, ObjectiveGetProgressEvent>(OnGetProgress);
     }
 
-    private void OnGetProgress(EntityUid uid, SurviveConditionComponent comp, ref ObjectiveGetProgressEvent args)
-    {
+    private void OnGetProgress(EntityUid uid, SurviveConditionComponent comp, ref ObjectiveGetProgressEvent args) =>
         args.Progress = _mind.IsCharacterDeadIc(args.Mind) ? 0f : 1f;
-    }
 }

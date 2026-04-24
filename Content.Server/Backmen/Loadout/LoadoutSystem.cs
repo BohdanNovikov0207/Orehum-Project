@@ -1,12 +1,9 @@
-﻿using Content.Corvax.Interfaces.Server;
-using Content.Corvax.Interfaces.Shared;
-using Content.Server.GameTicking;
+﻿using Content.Corvax.Interfaces.Shared;
 using Content.Server.Hands.Systems;
 using Content.Server.Storage.EntitySystems;
-using Content.Shared.Clothing.Components;
-using Content.Shared.Preferences.Loadouts;
 using Content.Shared.GameTicking;
 using Content.Shared.Inventory;
+using Content.Shared.Preferences.Loadouts;
 using Robust.Shared.Prototypes;
 
 namespace Content.Server.Backmen.Loadout;
@@ -14,17 +11,14 @@ namespace Content.Server.Backmen.Loadout;
 public sealed class LoadoutSystem : EntitySystem
 {
     private const string BackpackSlotId = "back";
+    [Dependency] private readonly HandsSystem _handsSystem = default!;
+    [Dependency] private readonly InventorySystem _inventorySystem = default!;
 
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-    [Dependency] private readonly InventorySystem _inventorySystem = default!;
-    [Dependency] private readonly HandsSystem _handsSystem = default!;
-    [Dependency] private readonly StorageSystem _storageSystem = default!;
     [Dependency] private readonly ISharedSponsorsManager _sponsorsManager = default!;
+    [Dependency] private readonly StorageSystem _storageSystem = default!;
 
-    public override void Initialize()
-    {
-        SubscribeLocalEvent<PlayerSpawnCompleteEvent>(OnPlayerSpawned);
-    }
+    public override void Initialize() => SubscribeLocalEvent<PlayerSpawnCompleteEvent>(OnPlayerSpawned);
 
     private void OnPlayerSpawned(PlayerSpawnCompleteEvent ev)
     {
@@ -47,17 +41,13 @@ public sealed class LoadoutSystem : EntitySystem
             {
                 var entity = Spawn(protoId, coordinates);
 
-                if (!_inventorySystem.TryEquip(ev.Mob, entity, slot, true, force: true))
+                if (!_inventorySystem.TryEquip(ev.Mob, entity, slot, true, true))
                 {
                     if (_inventorySystem.TryGetSlotEntity(ev.Mob, BackpackSlotId, out var backEntity) &&
                         _storageSystem.CanInsert(backEntity.Value, entity, out _))
-                    {
                         _storageSystem.Insert(backEntity.Value, entity, out _, playSound: false);
-                    }
                     else
-                    {
                         QueueDel(entity);
-                    }
                 }
             }
 
@@ -69,13 +59,9 @@ public sealed class LoadoutSystem : EntitySystem
                 {
                     if (_inventorySystem.TryGetSlotEntity(ev.Mob, BackpackSlotId, out var backEntity) &&
                         _storageSystem.CanInsert(backEntity.Value, entity, out _))
-                    {
                         _storageSystem.Insert(backEntity.Value, entity, out _, playSound: false);
-                    }
                     else
-                    {
                         QueueDel(entity);
-                    }
                 }
             }
         }

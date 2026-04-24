@@ -19,10 +19,10 @@ namespace Content.Server.Anomaly.Effects;
 
 public sealed class TechAnomalySystem : EntitySystem
 {
-    [Dependency] private readonly DeviceLinkSystem _signal = default!;
+    [Dependency] private readonly BeamSystem _beam = default!;
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly BeamSystem _beam = default!;
+    [Dependency] private readonly DeviceLinkSystem _signal = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
@@ -35,10 +35,8 @@ public sealed class TechAnomalySystem : EntitySystem
         SubscribeLocalEvent<TechAnomalyComponent, AnomalyStabilityChangedEvent>(OnStabilityChanged);
     }
 
-    private void OnTechMapInit(Entity<TechAnomalyComponent> ent, ref MapInitEvent args)
-    {
+    private void OnTechMapInit(Entity<TechAnomalyComponent> ent, ref MapInitEvent args) =>
         ent.Comp.NextTimer = _timing.CurTime;
-    }
 
     public override void Update(float frameTime)
     {
@@ -59,7 +57,7 @@ public sealed class TechAnomalySystem : EntitySystem
     private void OnStabilityChanged(Entity<TechAnomalyComponent> tech, ref AnomalyStabilityChangedEvent args)
     {
         var links = MathHelper.Lerp(tech.Comp.LinkCountPerPulse.Min, tech.Comp.LinkCountPerPulse.Max, args.Severity);
-        CreateNewRandomLink(tech, (int)links);
+        CreateNewRandomLink(tech, (int) links);
     }
 
     private void CreateNewRandomLink(Entity<TechAnomalyComponent> tech, int count)
@@ -82,15 +80,20 @@ public sealed class TechAnomalySystem : EntitySystem
         }
     }
 
-    private void CreateNewLink(Entity<TechAnomalyComponent> tech, Entity<DeviceLinkSourceComponent> source, Entity<DeviceLinkSinkComponent> target)
+    private void CreateNewLink(Entity<TechAnomalyComponent> tech,
+        Entity<DeviceLinkSourceComponent> source,
+        Entity<DeviceLinkSinkComponent> target)
     {
         var sourcePort = _random.Pick(source.Comp.Ports);
         var sinkPort = _random.Pick(target.Comp.Ports);
 
-        _signal.SaveLinks(null, source, target,new()
-        {
-            (sourcePort, sinkPort),
-        });
+        _signal.SaveLinks(null,
+            source,
+            target,
+            new List<(string source, string sink)>
+            {
+                (sourcePort, sinkPort),
+            });
         _beam.TryCreateBeam(source, target, tech.Comp.LinkBeamProto);
     }
 
@@ -134,8 +137,6 @@ public sealed class TechAnomalySystem : EntitySystem
         }
     }
 
-    private void OnPulse(Entity<TechAnomalyComponent> tech, ref AnomalyPulseEvent args)
-    {
+    private void OnPulse(Entity<TechAnomalyComponent> tech, ref AnomalyPulseEvent args) =>
         _signal.InvokePort(tech, tech.Comp.PulsePort);
-    }
 }

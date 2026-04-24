@@ -1,7 +1,7 @@
 using Content.Server.AlertLevel;
+using Content.Server.Station.Systems;
 using Content.Shared.Trigger;
 using Content.Shared.Trigger.Components.Effects;
-using Content.Server.Station.Systems;
 
 namespace Content.Server.Trigger.Systems;
 
@@ -26,7 +26,11 @@ public sealed class AlertLevelChangeOnTriggerSystem : EntitySystem
         if (stationUid == null)
             return;
 
-        _alertLevelSystem.SetLevel(stationUid.Value, ent.Comp.Level, ent.Comp.PlaySound, ent.Comp.Announce, ent.Comp.Force);
+        _alertLevelSystem.SetLevel(stationUid.Value,
+            ent.Comp.Level,
+            ent.Comp.PlaySound,
+            ent.Comp.Announce,
+            ent.Comp.Force);
         args.Handled = true;
     }
 }

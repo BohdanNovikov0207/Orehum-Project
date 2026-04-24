@@ -31,24 +31,24 @@ using System.Linq;
 using Content.Server.Light.Components;
 using Content.Shared.Examine;
 using Content.Shared.Interaction;
-using Content.Shared.Light.EntitySystems;
 using Content.Shared.Light.Components;
+using Content.Shared.Light.EntitySystems;
+using Content.Shared.Materials;
 using Content.Shared.Popups;
 using Content.Shared.Storage;
 using JetBrains.Annotations;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Containers;
-using Content.Shared.Materials;
 
 namespace Content.Server.Light.EntitySystems;
 
 [UsedImplicitly]
 public sealed class LightReplacerSystem : SharedLightReplacerSystem
 {
-    [Dependency] private readonly PoweredLightSystem _poweredLight = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedContainerSystem _container = default!;
     [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
+    [Dependency] private readonly PoweredLightSystem _poweredLight = default!;
 
     public override void Initialize()
     {
@@ -101,10 +101,8 @@ public sealed class LightReplacerSystem : SharedLightReplacerSystem
         }
     }
 
-    private void OnInit(EntityUid uid, LightReplacerComponent replacer, ComponentInit args)
-    {
-        replacer.InsertedBulbs = _container.EnsureContainer<Container>(uid, "light_replacer_storage");
-    }
+    private void OnInit(EntityUid uid, LightReplacerComponent replacer, ComponentInit args) => replacer.InsertedBulbs =
+        _container.EnsureContainer<Container>(uid, "light_replacer_storage");
 
     private void HandleAfterInteract(EntityUid uid, LightReplacerComponent component, AfterInteractEvent eventArgs)
     {
@@ -145,12 +143,15 @@ public sealed class LightReplacerSystem : SharedLightReplacerSystem
     }
 
     /// <summary>
-    ///     Try to replace a light bulb in <paramref name="fixtureUid"/>
-    ///     using light replacer. Light fixture should have <see cref="PoweredLightComponent"/>.
+    /// Try to replace a light bulb in <paramref name="fixtureUid" />
+    /// using light replacer. Light fixture should have <see cref="PoweredLightComponent" />.
     /// </summary>
     /// <returns>True if successfully replaced light, false otherwise</returns>
-    public bool TryReplaceBulb(EntityUid replacerUid, EntityUid fixtureUid, EntityUid? userUid = null,
-        LightReplacerComponent? replacer = null, PoweredLightComponent? fixture = null)
+    public bool TryReplaceBulb(EntityUid replacerUid,
+        EntityUid fixtureUid,
+        EntityUid? userUid = null,
+        LightReplacerComponent? replacer = null,
+        PoweredLightComponent? fixture = null)
     {
         if (!Resolve(replacerUid, ref replacer))
             return false;
@@ -168,8 +169,8 @@ public sealed class LightReplacerSystem : SharedLightReplacerSystem
         }
 
         // try get first inserted bulb of the same type as targeted light fixtutre
-        var bulb = replacer.InsertedBulbs.ContainedEntities.FirstOrDefault(
-            e => CompOrNull<LightBulbComponent>(e)?.Type == fixture.BulbType);
+        var bulb = replacer.InsertedBulbs.ContainedEntities.FirstOrDefault(e =>
+            CompOrNull<LightBulbComponent>(e)?.Type == fixture.BulbType);
 
         // found bulb in inserted storage
         if (bulb.Valid) // FirstOrDefault can return default/invalid uid.
@@ -187,11 +188,13 @@ public sealed class LightReplacerSystem : SharedLightReplacerSystem
                     ("light-replacer", replacerUid));
                 _popupSystem.PopupEntity(msg, replacerUid, userUid.Value);
             }
+
             return false;
         }
 
         // insert it into fixture
-        var wasReplaced = _poweredLight.ReplaceBulb(fixtureUid, bulb, out var oldBulb, fixture); // Goobstation - Recycle bulbs!
+        var wasReplaced =
+            _poweredLight.ReplaceBulb(fixtureUid, bulb, out var oldBulb, fixture); // Goobstation - Recycle bulbs!
         if (wasReplaced)
         {
             _audio.PlayPvs(replacer.Sound, replacerUid);
@@ -204,18 +207,21 @@ public sealed class LightReplacerSystem : SharedLightReplacerSystem
                 replacer.GlassRecycled -= replacer.GlassRequired;
                 TrySpawnInContainer(replacer.LightBulbProto, replacerUid, "light_replacer_storage", out _);
             } // Goobstation - End
-
         }
 
         return wasReplaced;
     }
 
     /// <summary>
-    ///     Try to insert a new bulb inside light replacer
+    /// Try to insert a new bulb inside light replacer
     /// </summary>
     /// <returns>True if successfully inserted light, false otherwise</returns>
-    public bool TryInsertBulb(EntityUid replacerUid, EntityUid bulbUid, EntityUid? userUid = null, bool showTooltip = false,
-        LightReplacerComponent? replacer = null, LightBulbComponent? bulb = null)
+    public bool TryInsertBulb(EntityUid replacerUid,
+        EntityUid bulbUid,
+        EntityUid? userUid = null,
+        bool showTooltip = false,
+        LightReplacerComponent? replacer = null,
+        LightBulbComponent? bulb = null)
     {
         if (!Resolve(replacerUid, ref replacer))
             return false;
@@ -239,7 +245,8 @@ public sealed class LightReplacerSystem : SharedLightReplacerSystem
         if (hasInsert && showTooltip && userUid != null)
         {
             var msg = Loc.GetString("comp-light-replacer-insert-light",
-                ("light-replacer", replacerUid), ("bulb", bulbUid));
+                ("light-replacer", replacerUid),
+                ("bulb", bulbUid));
             _popupSystem.PopupEntity(msg, replacerUid, userUid.Value, PopupType.Medium);
         }
 
@@ -247,14 +254,17 @@ public sealed class LightReplacerSystem : SharedLightReplacerSystem
     }
 
     /// <summary>
-    ///     Try to insert all light bulbs from storage (for example light tubes box)
+    /// Try to insert all light bulbs from storage (for example light tubes box)
     /// </summary>
     /// <returns>
-    ///     Returns true if storage contained at least one light bulb
-    ///     which was successfully inserted inside light replacer
+    /// Returns true if storage contained at least one light bulb
+    /// which was successfully inserted inside light replacer
     /// </returns>
-    public bool TryInsertBulbsFromStorage(EntityUid replacerUid, EntityUid storageUid, EntityUid? userUid = null,
-        LightReplacerComponent? replacer = null, StorageComponent? storage = null)
+    public bool TryInsertBulbsFromStorage(EntityUid replacerUid,
+        EntityUid storageUid,
+        EntityUid? userUid = null,
+        LightReplacerComponent? replacer = null,
+        StorageComponent? storage = null)
     {
         if (!Resolve(replacerUid, ref replacer))
             return false;
@@ -268,9 +278,7 @@ public sealed class LightReplacerSystem : SharedLightReplacerSystem
         {
             if (TryComp<LightBulbComponent>(ent, out var bulb) &&
                 TryInsertBulb(replacerUid, ent, userUid, false, replacer, bulb))
-            {
                 insertedBulbs++;
-            }
         }
 
         // show some message if success
@@ -284,8 +292,6 @@ public sealed class LightReplacerSystem : SharedLightReplacerSystem
     }
 
     // Goobstation - Reclaimer Update
-    public void OnReclaim(Entity<LightReplacerComponent> replacer, ref GotReclaimedEvent args)
-    {
+    public void OnReclaim(Entity<LightReplacerComponent> replacer, ref GotReclaimedEvent args) =>
         _container.EmptyContainer(replacer.Comp.InsertedBulbs, destination: args.ReclaimerCoordinates);
-    }
 }

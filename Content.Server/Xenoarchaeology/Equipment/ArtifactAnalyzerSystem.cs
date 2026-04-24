@@ -15,15 +15,17 @@ public sealed class ArtifactAnalyzerSystem : SharedArtifactAnalyzerSystem
     [Dependency] private readonly ResearchSystem _research = default!;
     [Dependency] private readonly XenoArtifactSystem _xenoArtifact = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
 
-        SubscribeLocalEvent<AnalysisConsoleComponent, AnalysisConsoleExtractButtonPressedMessage>(OnExtractButtonPressed);
+        SubscribeLocalEvent<AnalysisConsoleComponent, AnalysisConsoleExtractButtonPressedMessage>(
+            OnExtractButtonPressed);
     }
 
-    private void OnExtractButtonPressed(Entity<AnalysisConsoleComponent> ent, ref AnalysisConsoleExtractButtonPressedMessage args)
+    private void OnExtractButtonPressed(Entity<AnalysisConsoleComponent> ent,
+        ref AnalysisConsoleExtractButtonPressedMessage args)
     {
         if (!TryGetArtifactFromConsole(ent, out var artifact))
             return;
@@ -48,4 +50,3 @@ public sealed class ArtifactAnalyzerSystem : SharedArtifactAnalyzerSystem
         _popup.PopupEntity(Loc.GetString("analyzer-artifact-extract-popup"), artifact.Value, PopupType.Large);
     }
 }
-

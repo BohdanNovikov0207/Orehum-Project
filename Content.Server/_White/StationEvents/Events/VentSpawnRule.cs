@@ -18,7 +18,7 @@ public sealed class VentSpawnRule : StationEventSystem<VentSpawnRuleComponent>
 
         SubscribeLocalEvent<VentSpawnRuleComponent, AntagSelectLocationEvent>(OnSelectLocation);
     }
-    
+
     private void OnSelectLocation(Entity<VentSpawnRuleComponent> ent, ref AntagSelectLocationEvent args)
     {
         var comp = Comp<GameRuleComponent>(args.GameRule);
@@ -46,8 +46,6 @@ public sealed class VentSpawnRule : StationEventSystem<VentSpawnRuleComponent>
         }
 
         if (validLocations is { } coords)
-        {
             args.Coordinates.AddRange(coords);
-        }
     }
 }

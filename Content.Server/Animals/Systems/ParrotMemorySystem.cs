@@ -25,16 +25,16 @@ namespace Content.Server.Animals.Systems;
 /// (radiovocalizer) and stores them in a list. When an entity with a VocalizerComponent attempts to vocalize, this will
 /// try to set the message from memory.
 /// </summary>
-public sealed partial class ParrotMemorySystem : SharedParrotMemorySystem
+public sealed class ParrotMemorySystem : SharedParrotMemorySystem
 {
-    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
-    [Dependency] private readonly IAdminLogManager _adminLogger = default!;
     [Dependency] private readonly IAdminManager _admin = default!;
+    [Dependency] private readonly IAdminLogManager _adminLogger = default!;
     [Dependency] private readonly IGameTiming _gameTiming = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly MindSystem _mind = default!;
     [Dependency] private readonly MobStateSystem _mobState = default!;
     [Dependency] private readonly PopupSystem _popup = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
 
     public override void Initialize()
     {
@@ -50,23 +50,18 @@ public sealed partial class ParrotMemorySystem : SharedParrotMemorySystem
         SubscribeLocalEvent<ParrotMemoryComponent, TryVocalizeEvent>(OnTryVocalize);
     }
 
-    private void OnErase(ref EraseEvent args)
-    {
-        DeletePlayerMessages(args.PlayerNetUserId);
-    }
+    private void OnErase(ref EraseEvent args) => DeletePlayerMessages(args.PlayerNetUserId);
 
     private void ListenerOnMapInit(Entity<ParrotListenerComponent> entity, ref MapInitEvent args)
     {
         // If an entity has a ParrotListenerComponent it really ought to have an ActiveListenerComponent
         if (!HasComp<ActiveListenerComponent>(entity))
-            Log.Warning($"Entity {ToPrettyString(entity)} has a ParrotListenerComponent but was not given an ActiveListenerComponent");
+            Log.Warning(
+                $"Entity {ToPrettyString(entity)} has a ParrotListenerComponent but was not given an ActiveListenerComponent");
     }
 
-    private void OnListen(Entity<ParrotListenerComponent> entity, ref ListenEvent args)
-    {
-
+    private void OnListen(Entity<ParrotListenerComponent> entity, ref ListenEvent args) =>
         TryLearn(entity.Owner, args.Message, args.Source);
-    }
 
     private void OnHeadsetReceive(Entity<ParrotListenerComponent> entity, ref HeadsetRadioReceiveRelayEvent args)
     {
@@ -104,7 +99,9 @@ public sealed partial class ParrotMemorySystem : SharedParrotMemorySystem
     /// <param name="entity">Entity learning a new word</param>
     /// <param name="incomingMessage">Message to learn</param>
     /// <param name="source">Source EntityUid of the message</param>
-    public void TryLearn(Entity<ParrotMemoryComponent?, ParrotListenerComponent?> entity, string incomingMessage, EntityUid source)
+    public void TryLearn(Entity<ParrotMemoryComponent?, ParrotListenerComponent?> entity,
+        string incomingMessage,
+        EntityUid source)
     {
         if (!Resolve(entity, ref entity.Comp1, ref entity.Comp2))
             return;
@@ -157,13 +154,13 @@ public sealed partial class ParrotMemorySystem : SharedParrotMemorySystem
     {
         // log a low-priority chat type log to the admin logger
         // specifies what message was learnt by what entity, and who taught the message to that entity
-        _adminLogger.Add(LogType.Chat, LogImpact.Low, $"Parroting entity {ToPrettyString(entity):entity} learned the phrase \"{message}\" from {ToPrettyString(source):speaker}");
+        _adminLogger.Add(LogType.Chat,
+            LogImpact.Low,
+            $"Parroting entity {ToPrettyString(entity):entity} learned the phrase \"{message}\" from {ToPrettyString(source):speaker}");
 
         NetUserId? sourceNetUserId = null;
         if (_mind.TryGetMind(source, out _, out var mind))
-        {
             sourceNetUserId = mind.UserId;
-        }
 
         var newMemory = new SpeechMemory(sourceNetUserId, message);
 

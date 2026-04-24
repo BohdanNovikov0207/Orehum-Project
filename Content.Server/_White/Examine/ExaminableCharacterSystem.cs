@@ -4,27 +4,27 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Goobstation.Common.CCVar;
+using Content.Goobstation.Common.Examine;
 using Content.Server.Chat.Managers;
 using Content.Server.IdentityManagement;
-using Content.Goobstation.Common.Examine; // Goobstation Change
-using Content.Goobstation.Common.CCVar; // Goobstation Change
-using Content.Shared._Goobstation.Heretic.Components; // Goobstation Change
-using Content.Shared.Chat;
 using Content.Shared.Examine;
-using Content.Shared._White.Examine;
 using Content.Shared.Inventory;
 using Robust.Shared.Configuration;
 using Robust.Shared.Player;
 using Robust.Shared.Utility;
-using System.Globalization;
+// Goobstation Change
+// Goobstation Change
+// Goobstation Change
 
 namespace Content.Server._White.Examine;
+
 public sealed class ExaminableCharacterSystem : EntitySystem
 {
-    [Dependency] private readonly InventorySystem _inventorySystem = default!;
-    [Dependency] private readonly IdentitySystem _identitySystem = default!;
-    [Dependency] private readonly EntityManager _entityManager = default!;
     [Dependency] private readonly IChatManager _chatManager = default!;
+    [Dependency] private readonly EntityManager _entityManager = default!;
+    [Dependency] private readonly IdentitySystem _identitySystem = default!;
+    [Dependency] private readonly InventorySystem _inventorySystem = default!;
     [Dependency] private readonly INetConfigurationManager _netConfigManager = default!;
 
     public override void Initialize()
@@ -39,19 +39,21 @@ public sealed class ExaminableCharacterSystem : EntitySystem
             || !args.IsInDetailsRange)
             return;
 
-        var showExamine = _netConfigManager.GetClientCVar(actorComponent.PlayerSession.Channel, GoobCVars.DetailedExamine);
+        var showExamine =
+            _netConfigManager.GetClientCVar(actorComponent.PlayerSession.Channel, GoobCVars.DetailedExamine);
 
         var selfaware = args.Examiner == args.Examined;
         var logLines = new List<string>();
 
-        string canseeloc = "examine-can-see";
-        string nameloc = "examine-name";
+        var canseeloc = "examine-can-see";
+        var nameloc = "examine-name";
 
         if (selfaware)
         {
             canseeloc += "-selfaware";
             nameloc += "-selfaware";
         }
+
         var identity = _identitySystem.GetEntityIdentity(uid);
         var name = Loc.GetString(nameloc, ("name", identity));
         var cansee = Loc.GetString(canseeloc, ("ent", uid));
@@ -129,6 +131,7 @@ public sealed class ExaminableCharacterSystem : EntitySystem
             message.AddText(line);
             message.PushNewline();
         }
+
         AddLine(message);
         message.Pop();
         if (showExamine && _netConfigManager.GetClientCVar(actorComponent.PlayerSession.Channel, GoobCVars.LogInChat))

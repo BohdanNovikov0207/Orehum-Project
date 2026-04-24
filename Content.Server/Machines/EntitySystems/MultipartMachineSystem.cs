@@ -15,14 +15,13 @@ namespace Content.Server.Machines.EntitySystems;
 /// </summary>
 public sealed class MultipartMachineSystem : SharedMultipartMachineSystem
 {
-    [Dependency] private readonly IComponentFactory _factory = default!;
-    [Dependency] private readonly MapSystem _mapSystem = default!;
-    [Dependency] private readonly EntityLookupSystem _lookupSystem = default!;
-
     // The largest size ANY machine can theoretically have.
     // Used to aid search for machines in range of parts that have been anchored/constructed.
     private const float MaximumRange = 30;
     private readonly HashSet<Entity<MultipartMachineComponent>> _entitiesInRange = [];
+    [Dependency] private readonly IComponentFactory _factory = default!;
+    [Dependency] private readonly EntityLookupSystem _lookupSystem = default!;
+    [Dependency] private readonly MapSystem _mapSystem = default!;
 
     public override void Initialize()
     {
@@ -32,7 +31,8 @@ public sealed class MultipartMachineSystem : SharedMultipartMachineSystem
 
         SubscribeLocalEvent<MultipartMachineComponent, AnchorStateChangedEvent>(OnMachineAnchorChanged);
 
-        SubscribeLocalEvent<MultipartMachinePartComponent, AfterConstructionChangeEntityEvent>(OnPartConstructionNodeChanged);
+        SubscribeLocalEvent<MultipartMachinePartComponent, AfterConstructionChangeEntityEvent>(
+            OnPartConstructionNodeChanged);
         SubscribeLocalEvent<MultipartMachinePartComponent, AnchorStateChangedEvent>(OnPartAnchorChanged);
     }
 

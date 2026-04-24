@@ -54,12 +54,11 @@ using JukeboxComponent = Content.Shared.Audio.Jukebox.JukeboxComponent;
 
 namespace Content.Server.Audio.Jukebox;
 
-
 public sealed class JukeboxSystem : SharedJukeboxSystem
 {
-    [Dependency] private readonly IPrototypeManager _protoManager = default!;
     [Dependency] private readonly AppearanceSystem _appearanceSystem = default!;
     [Dependency] private readonly IEntityManager _entManager = default!;
+    [Dependency] private readonly IPrototypeManager _protoManager = default!;
 
     public override void Initialize()
     {
@@ -80,35 +79,37 @@ public sealed class JukeboxSystem : SharedJukeboxSystem
     private void OnComponentInit(EntityUid uid, JukeboxComponent component, ComponentInit args)
     {
         if (HasComp<ApcPowerReceiverComponent>(uid))
-        {
             TryUpdateVisualState(uid, component);
-        }
     }
 
     private void OnJukeboxPlay(EntityUid uid, JukeboxComponent component, ref JukeboxPlayingMessage args)
     {
         if (_entManager.TryGetComponent(component.AudioStream, out AudioComponent? audioComp) &&
             audioComp.Playing)
-        {
             Audio.SetState(component.AudioStream, AudioState.Playing);
-        }
         else
         {
             component.AudioStream = Audio.Stop(component.AudioStream);
 
             if (string.IsNullOrEmpty(component.SelectedSongId) ||
                 !_protoManager.TryIndex(component.SelectedSongId, out var jukeboxProto))
-            {
                 return;
-            }
             var audioParams = new AudioParams
             {
                 MaxDistance = 10f,
                 Loop = component.Loop,
-                Volume = 1f
+                Volume = 1f,
             };
 
-            component.AudioStream = Audio.PlayPvs(jukeboxProto.Path, uid, AudioParams.Default.WithMaxDistance(10f).WithVolume(MapToRange(component.Volume, component.MinSlider, component.MaxSlider, component.MinVolume, component.MaxVolume)))?.Entity;
+            component.AudioStream = Audio.PlayPvs(jukeboxProto.Path,
+                    uid,
+                    AudioParams.Default.WithMaxDistance(10f)
+                        .WithVolume(MapToRange(component.Volume,
+                            component.MinSlider,
+                            component.MaxSlider,
+                            component.MinVolume,
+                            component.MaxVolume)))
+                ?.Entity;
             Dirty(uid, component);
         }
     }
@@ -132,25 +133,21 @@ public sealed class JukeboxSystem : SharedJukeboxSystem
                 {
                     MaxDistance = 10f,
                     Loop = ent.Comp.Loop,
-                    Volume = audioComp.Volume
+                    Volume = audioComp.Volume,
                 };
 
                 ent.Comp.AudioStream = Audio.PlayPvs(jukeboxProto.Path, ent, audioParams)?.Entity;
 
                 if (ent.Comp.AudioStream != null)
-                {
                     Audio.SetPlaybackPosition(ent.Comp.AudioStream, position);
-                }
 
                 Dirty(ent);
             }
         }
     }
 
-    private void OnJukeboxPause(Entity<JukeboxComponent> ent, ref JukeboxPauseMessage args)
-    {
+    private void OnJukeboxPause(Entity<JukeboxComponent> ent, ref JukeboxPauseMessage args) =>
         Audio.SetState(ent.Comp.AudioStream, AudioState.Paused);
-    }
 
     private void OnJukeboxSetTime(EntityUid uid, JukeboxComponent component, JukeboxSetTimeMessage args)
     {
@@ -167,7 +164,12 @@ public sealed class JukeboxSystem : SharedJukeboxSystem
 
         if (!TryComp<AudioComponent>(component.AudioStream, out var audioComponent))
             return;
-        Audio.SetVolume(component.AudioStream, MapToRange(args.Volume, component.MinSlider, component.MaxSlider, component.MinVolume, component.MaxVolume));
+        Audio.SetVolume(component.AudioStream,
+            MapToRange(args.Volume,
+                component.MinSlider,
+                component.MaxSlider,
+                component.MinVolume,
+                component.MaxVolume));
     }
 
     private void OnPowerChanged(Entity<JukeboxComponent> entity, ref PowerChangedEvent args)
@@ -175,15 +177,10 @@ public sealed class JukeboxSystem : SharedJukeboxSystem
         TryUpdateVisualState(entity);
 
         if (!this.IsPowered(entity.Owner, EntityManager))
-        {
             Stop(entity);
-        }
     }
 
-    private void OnJukeboxStop(Entity<JukeboxComponent> entity, ref JukeboxStopMessage args)
-    {
-        Stop(entity);
-    }
+    private void OnJukeboxStop(Entity<JukeboxComponent> entity, ref JukeboxStopMessage args) => Stop(entity);
 
     private void Stop(Entity<JukeboxComponent> entity)
     {
@@ -231,15 +228,11 @@ public sealed class JukeboxSystem : SharedJukeboxSystem
         Dirty(uid, component);
     }
 
-    private void OnComponentShutdown(EntityUid uid, JukeboxComponent component, ComponentShutdown args)
-    {
+    private void OnComponentShutdown(EntityUid uid, JukeboxComponent component, ComponentShutdown args) =>
         component.AudioStream = Audio.Stop(component.AudioStream);
-    }
 
-    private void DirectSetVisualState(EntityUid uid, JukeboxVisualState state)
-    {
+    private void DirectSetVisualState(EntityUid uid, JukeboxVisualState state) =>
         _appearanceSystem.SetData(uid, JukeboxVisuals.VisualState, state);
-    }
 
     private void TryUpdateVisualState(EntityUid uid, JukeboxComponent? jukeboxComponent = null)
     {
@@ -249,9 +242,7 @@ public sealed class JukeboxSystem : SharedJukeboxSystem
         var finalState = JukeboxVisualState.On;
 
         if (!this.IsPowered(uid, EntityManager))
-        {
             finalState = JukeboxVisualState.Off;
-        }
 
         _appearanceSystem.SetData(uid, JukeboxVisuals.VisualState, finalState);
     }

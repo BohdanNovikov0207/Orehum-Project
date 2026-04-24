@@ -8,7 +8,6 @@ using Content.Shared._Shitcode.Heretic.Components;
 using Content.Shared._Shitcode.Heretic.Systems;
 using Content.Shared._Shitmed.Damage;
 using Content.Shared._Shitmed.Targeting;
-using Content.Shared.Body.Systems;
 using Content.Shared.Damage;
 using Content.Shared.Heretic;
 using Content.Shared.Mobs.Components;
@@ -23,12 +22,12 @@ namespace Content.Server._Shitcode.Heretic.EntitySystems.PathSpecific;
 
 public sealed class FireBlastSystem : SharedFireBlastSystem
 {
-    [Dependency] private readonly PhysicsSystem _physics = default!;
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly FlammableSystem _flammable = default!;
-    [Dependency] private readonly StunSystem _stun = default!;
     [Dependency] private readonly AudioSystem _audio = default!;
+    [Dependency] private readonly FlammableSystem _flammable = default!;
     [Dependency] private readonly SharedHereticSystem _heretic = default!;
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
+    [Dependency] private readonly PhysicsSystem _physics = default!;
+    [Dependency] private readonly StunSystem _stun = default!;
 
     public override void Initialize()
     {
@@ -64,7 +63,7 @@ public sealed class FireBlastSystem : SharedFireBlastSystem
         var statusQuery = GetEntityQuery<StatusEffectsComponent>();
 
         // Prioritize alive targets on fire, closest to origin
-        var result = _lookup.GetEntitiesInRange(origin, origin.Comp.BonusRange, flags: LookupFlags.Dynamic)
+        var result = _lookup.GetEntitiesInRange(origin, origin.Comp.BonusRange, LookupFlags.Dynamic)
             .Select(x => (x, flammableQuery.CompOrNull(x)))
             .Where(x => x.Item2 != null && x.Item1 != origin.Owner &&
                         (!_heretic.TryGetHereticComponent(x.Item1, out var heretic, out _) ||
@@ -74,10 +73,14 @@ public sealed class FireBlastSystem : SharedFireBlastSystem
 
         foreach (var (uid, flam) in result)
         {
-            _flammable.AdjustFireStacks(uid, origin.Comp.BonusFireStacks, flam, true, origin.Comp.FireProtectionPenetration);
+            _flammable.AdjustFireStacks(uid,
+                origin.Comp.BonusFireStacks,
+                flam,
+                true,
+                origin.Comp.FireProtectionPenetration);
 
             if (statusQuery.TryComp(uid, out var status))
-                _stun.KnockdownOrStun(uid, origin.Comp.BonusKnockdownTime, true);
+                _stun.KnockdownOrStun(uid, origin.Comp.BonusKnockdownTime);
 
             if (!dmgQuery.TryComp(uid, out var dmg))
                 continue;
@@ -117,11 +120,12 @@ public sealed class FireBlastSystem : SharedFireBlastSystem
         var pos = Xform.GetWorldPosition(xform);
 
         // Prioritize alive targets on fire, closest to origin
-        var result = _lookup.GetEntitiesInRange(origin, origin.Comp.FireBlastRange, flags: LookupFlags.Dynamic)
+        var result = _lookup.GetEntitiesInRange(origin, origin.Comp.FireBlastRange, LookupFlags.Dynamic)
             .Select(x => (x, flammableQuery.CompOrNull(x), mobStateQuery.CompOrNull(x),
                 (Xform.GetWorldPosition(x) - pos).LengthSquared()))
             .Where(x => x is { Item2: not null, Item3: not null } && x.Item1 != origin.Owner &&
-                        (!_heretic.TryGetHereticComponent(x.Item1, out var heretic, out _) || heretic.CurrentPath != "Ash") &&
+                        (!_heretic.TryGetHereticComponent(x.Item1, out var heretic, out _) ||
+                         heretic.CurrentPath != "Ash") &&
                         !ghoulQuery.HasComp(x.Item1) &&
                         !Status.HasEffectComp<FireBlastedStatusEffectComponent>(x.Item1) &&
                         !origin.Comp.HitEntities.Contains(x.Item1))
@@ -149,7 +153,7 @@ public sealed class FireBlastSystem : SharedFireBlastSystem
             return false;
 
         var fireBlasted = EnsureComp<FireBlastedComponent>(target);
-        fireBlasted.HitEntities = new(origin.Comp.HitEntities);
+        fireBlasted.HitEntities = new HashSet<EntityUid>(origin.Comp.HitEntities);
         fireBlasted.HitEntities.Add(origin);
         fireBlasted.Damage = antimagic ? 0f : 2f;
         fireBlasted.MaxBounces = origin.Comp.MaxBounces;
@@ -211,7 +215,11 @@ public sealed class FireBlastSystem : SharedFireBlastSystem
                 continue;
 
             if (flammableQuery.TryComp(ent.HitEntity, out var flam))
-                _flammable.AdjustFireStacks(ent.HitEntity, origin.Comp.CollisionFireStacks, flam, true, origin.Comp.FireProtectionPenetration);
+                _flammable.AdjustFireStacks(ent.HitEntity,
+                    origin.Comp.CollisionFireStacks,
+                    flam,
+                    true,
+                    origin.Comp.FireProtectionPenetration);
 
             if (!dmgQuery.TryComp(ent.HitEntity, out var dmg))
                 continue;

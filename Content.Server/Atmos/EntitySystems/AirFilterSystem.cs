@@ -11,15 +11,15 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Diagnostics.CodeAnalysis;
 using Content.Server.Atmos.Components;
 using Content.Server.Atmos.Piping.Components;
 using Content.Shared.Atmos;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Content.Server.Atmos.EntitySystems;
 
 /// <summary>
-/// Handles gas filtering and intake for <see cref="AirIntakeComponent"/> and <see cref="AirFilterComponent"/>.
+/// Handles gas filtering and intake for <see cref="AirIntakeComponent" /> and <see cref="AirFilterComponent" />.
 /// </summary>
 public sealed class AirFilterSystem : EntitySystem
 {
@@ -76,16 +76,14 @@ public sealed class AirFilterSystem : EntitySystem
         var gases = oxygen >= filter.TargetOxygen ? filter.Gases : filter.OverflowGases;
 
         GasMixture? destination = null;
-        if (args.Grid is {} grid)
+        if (args.Grid is { } grid)
         {
             var position = _transform.GetGridTilePositionOrDefault(uid);
             destination = _atmosphere.GetTileMixture(grid, args.Map, position, true);
         }
 
         if (destination != null)
-        {
             _atmosphere.ScrubInto(removed, destination, gases);
-        }
         else
         {
             // filtering into space/planet so just discard them
@@ -99,7 +97,7 @@ public sealed class AirFilterSystem : EntitySystem
     }
 
     /// <summary>
-    /// Uses <see cref="GetFilterAirEvent"/> to get an internal volume of air on an entity.
+    /// Uses <see cref="GetFilterAirEvent" /> to get an internal volume of air on an entity.
     /// Used for both filter and intake.
     /// </summary>
     public bool GetAir(EntityUid uid, [NotNullWhen(true)] out GasMixture? air)

@@ -84,10 +84,7 @@ namespace Content.Server.Speech.EntitySystems;
 public sealed class RussianAccentSystem : EntitySystem
 {
     [Dependency] private readonly ReplacementAccentSystem _replacement = default!;
-    public override void Initialize()
-    {
-        SubscribeLocalEvent<RussianAccentComponent, AccentGetEvent>(OnAccent);
-    }
+    public override void Initialize() => SubscribeLocalEvent<RussianAccentComponent, AccentGetEvent>(OnAccent);
 
     public string Accentuate(string message)
     {
@@ -113,15 +110,13 @@ public sealed class RussianAccentSystem : EntitySystem
                 'Y' => 'У',
                 'W' => 'Ш',
                 'w' => 'ш',
-                _ => accentedMessage[i]
+                _ => accentedMessage[i],
             };
         }
 
         return accentedMessage.ToString();
     }
 
-    private void OnAccent(EntityUid uid, RussianAccentComponent component, AccentGetEvent args)
-    {
+    private void OnAccent(EntityUid uid, RussianAccentComponent component, AccentGetEvent args) =>
         args.Message = Accentuate(args.Message);
-    }
 }

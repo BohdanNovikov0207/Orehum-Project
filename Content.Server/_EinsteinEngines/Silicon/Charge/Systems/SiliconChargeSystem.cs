@@ -6,43 +6,44 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Robust.Shared.Random;
-using Content.Shared._EinsteinEngines.Silicon.Components;
-using Content.Server.Power.Components;
-using Content.Shared.Mobs.Systems;
-using Content.Server.Temperature.Components;
-using Content.Server.Atmos.Components;
-using Content.Server.Atmos.EntitySystems;
-using Content.Server.Popups;
-using Content.Shared.Popups;
-using Content.Shared._EinsteinEngines.Silicon.Systems;
-using Content.Shared.Movement.Systems;
-using Content.Server.Body.Components;
-using Content.Shared.Mind.Components;
 using System.Diagnostics.CodeAnalysis;
 using Content.Goobstation.Common.CCVar;
-using Content.Server.Power.EntitySystems; // Goobstation - Energycrit
+using Content.Server.Atmos.Components;
+using Content.Server.Atmos.EntitySystems;
+using Content.Server.Body.Components;
+using Content.Server.Popups;
+using Content.Server.Power.Components;
+using Content.Server.Power.EntitySystems;
 using Content.Server.PowerCell;
-using Robust.Shared.Timing;
-using Robust.Shared.Configuration;
-using Robust.Shared.Utility;
-using Content.Shared.PowerCell.Components;
+using Content.Server.Temperature.Components;
+using Content.Shared._EinsteinEngines.Silicon.Components;
+using Content.Shared._EinsteinEngines.Silicon.Systems;
 using Content.Shared.Alert;
+using Content.Shared.Mind.Components;
+using Content.Shared.Mobs.Systems;
+using Content.Shared.Movement.Systems;
+using Content.Shared.Popups;
+using Content.Shared.PowerCell.Components;
+using Robust.Shared.Configuration;
+using Robust.Shared.Random;
+using Robust.Shared.Timing;
+using Robust.Shared.Utility;
+// Goobstation - Energycrit
 
 namespace Content.Server._EinsteinEngines.Silicon.Charge;
 
 public sealed class SiliconChargeSystem : EntitySystem
 {
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly MobStateSystem _mobState = default!;
-    [Dependency] private readonly FlammableSystem _flammable = default!;
-    [Dependency] private readonly PopupSystem _popup = default!;
-    [Dependency] private readonly MovementSpeedModifierSystem _moveMod = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly IConfigurationManager _config = default!;
-    [Dependency] private readonly PowerCellSystem _powerCell = default!;
     [Dependency] private readonly AlertsSystem _alerts = default!;
     [Dependency] private readonly BatterySystem _battery = default!; // Goobstation - Energycrit
+    [Dependency] private readonly IConfigurationManager _config = default!;
+    [Dependency] private readonly FlammableSystem _flammable = default!;
+    [Dependency] private readonly MobStateSystem _mobState = default!;
+    [Dependency] private readonly MovementSpeedModifierSystem _moveMod = default!;
+    [Dependency] private readonly PopupSystem _popup = default!;
+    [Dependency] private readonly PowerCellSystem _powerCell = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -52,7 +53,9 @@ public sealed class SiliconChargeSystem : EntitySystem
     }
 
     // Goobstation - Energycrit: Added batteryEnt argument
-    public bool TryGetSiliconBattery(EntityUid silicon, [NotNullWhen(true)] out BatteryComponent? batteryComp, [NotNullWhen(true)] out EntityUid? batteryEnt)
+    public bool TryGetSiliconBattery(EntityUid silicon,
+        [NotNullWhen(true)] out BatteryComponent? batteryComp,
+        [NotNullWhen(true)] out EntityUid? batteryEnt)
     {
         batteryComp = null;
         batteryEnt = null; // Goobstation - Energycrit
@@ -123,6 +126,7 @@ public sealed class SiliconChargeSystem : EntitySystem
                     _alerts.ClearAlert(silicon, siliconComp.BatteryAlert);
                     _alerts.ShowAlert(silicon, siliconComp.NoBatteryAlert);
                 }
+
                 continue;
             }
 
@@ -140,15 +144,19 @@ public sealed class SiliconChargeSystem : EntitySystem
             // TODO: Devise a method of adding multis where other systems can alter the drain rate.
             // Maybe use something similar to refreshmovespeedmodifiers, where it's stored in the component.
             // Maybe it doesn't matter, and stuff should just use static drain?
-            if (!siliconComp.EntityType.Equals(SiliconType.Npc)) // Don't bother checking heat if it's an NPC. It's a waste of time, and it'd be delayed due to the update time.
-                drainRateFinalAddi += SiliconHeatEffects(silicon, siliconComp, frameTime) - 1; // This will need to be changed at some point if we allow external batteries, since the heat of the Silicon might not be applicable.
+            if (!siliconComp.EntityType.Equals(SiliconType
+                    .Npc)) // Don't bother checking heat if it's an NPC. It's a waste of time, and it'd be delayed due to the update time.
+                drainRateFinalAddi +=
+                    SiliconHeatEffects(silicon, siliconComp, frameTime) -
+                    1; // This will need to be changed at some point if we allow external batteries, since the heat of the Silicon might not be applicable.
 
             // Ensures that the drain rate is at least 10% of normal,
             // and would allow at least 4 minutes of life with a max charge, to prevent cheese.
             drainRate += Math.Clamp(drainRateFinalAddi, drainRate * -0.9f, batteryComp.MaxCharge / 240);
 
             // Drain the battery.
-            _battery.TryUseCharge(batteryEnt.Value, frameTime * drainRate); // Goobstation - Use BatterySystem instead of PowerCellSystem
+            _battery.TryUseCharge(batteryEnt.Value,
+                frameTime * drainRate); // Goobstation - Use BatterySystem instead of PowerCellSystem
 
             // Figure out the current state of the Silicon.
             var chargePercent = (short) MathF.Round(batteryComp.CurrentCharge / batteryComp.MaxCharge * 10f);
@@ -158,7 +166,7 @@ public sealed class SiliconChargeSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Checks if anything needs to be updated, and updates it.
+    /// Checks if anything needs to be updated, and updates it.
     /// </summary>
     public void UpdateChargeState(EntityUid uid, short chargePercent, SiliconComponent component)
     {
@@ -184,7 +192,8 @@ public sealed class SiliconChargeSystem : EntitySystem
 
         // If the Silicon is hot, drain the battery faster, if it's cold, drain it slower, capped.
         var upperThresh = thermalComp.NormalBodyTemperature + thermalComp.ThermalRegulationTemperatureThreshold;
-        var upperThreshHalf = thermalComp.NormalBodyTemperature + thermalComp.ThermalRegulationTemperatureThreshold * 0.5f;
+        var upperThreshHalf =
+            thermalComp.NormalBodyTemperature + thermalComp.ThermalRegulationTemperatureThreshold * 0.5f;
 
         // Check if the silicon is in a hot environment.
         if (temperComp.CurrentTemperature > upperThreshHalf)

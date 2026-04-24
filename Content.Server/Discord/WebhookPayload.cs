@@ -22,8 +22,9 @@ public struct WebhookPayload
     // Why not make WebhookPayloadExtensions like a proper human being instead of shitting up what's not yours
     [JsonPropertyName("UserID")] // Frontier, this is used to identify the players in the webhook
     public Guid? UserID { get; set; }
+
     /// <summary>
-    ///     The message to send in the webhook. Maximum of 2000 characters.
+    /// The message to send in the webhook. Maximum of 2000 characters.
     /// </summary>
     [JsonPropertyName("content")]
     public string? Content { get; set; }

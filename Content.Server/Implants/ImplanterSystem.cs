@@ -19,7 +19,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using System.Linq;
 using Content.Server.Popups;
 using Content.Shared.DoAfter;
 using Content.Shared.IdentityManagement;
@@ -33,9 +32,9 @@ namespace Content.Server.Implants;
 
 public sealed partial class ImplanterSystem : SharedImplanterSystem
 {
-    [Dependency] private readonly PopupSystem _popup = default!;
-    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
     [Dependency] private readonly SharedContainerSystem _container = default!;
+    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
+    [Dependency] private readonly PopupSystem _popup = default!;
 
     public override void Initialize()
     {
@@ -59,13 +58,11 @@ public sealed partial class ImplanterSystem : SharedImplanterSystem
 
         //TODO: Rework when surgery is in for implant cases
         if (component.CurrentMode == ImplanterToggleMode.Draw && !component.ImplantOnly)
-        {
             TryDraw(component, args.User, target, uid);
-        }
         else
         {
             // Goobstation - allow traitors to buy suicide implants
-            bool canImplant = CanImplant(args.User, target, uid, component, out var implant, out var implantComp);
+            var canImplant = CanImplant(args.User, target, uid, component, out var implant, out var implantComp);
             if (!canImplant)
             {
                 // no popup if implant doesn't exist
@@ -82,12 +79,16 @@ public sealed partial class ImplanterSystem : SharedImplanterSystem
             }
 
 
-
             //Implant self instantly, otherwise try to inject the target.
             if (args.User == target)
                 Implant(target, target, uid, component);
             else if (implantComp != null)
-                TryImplant(component, args.User, target, uid, implantComp.ImplantationTimeMultiplier); // Goobstation - allow traitors to buy suicide implants (add time multiplier)
+                TryImplant(component,
+                    args.User,
+                    target,
+                    uid,
+                    implantComp
+                        .ImplantationTimeMultiplier); // Goobstation - allow traitors to buy suicide implants (add time multiplier)
         }
 
         args.Handled = true;
@@ -101,9 +102,19 @@ public sealed partial class ImplanterSystem : SharedImplanterSystem
     /// <param name="target">The entity being implanted</param>
     /// <param name="implanter">The implanter being used</param>
     // Goobstation - allow traitors to buy suicide implants (add time multiplier)
-    public void TryImplant(ImplanterComponent component, EntityUid user, EntityUid target, EntityUid implanter, float timeMultiplier = 1)
+    public void TryImplant(ImplanterComponent component,
+        EntityUid user,
+        EntityUid target,
+        EntityUid implanter,
+        float timeMultiplier = 1)
     {
-        var args = new DoAfterArgs(EntityManager, user, component.ImplantTime * timeMultiplier, new ImplantEvent(), implanter, target: target, used: implanter)
+        var args = new DoAfterArgs(EntityManager,
+            user,
+            component.ImplantTime * timeMultiplier,
+            new ImplantEvent(),
+            implanter,
+            target,
+            implanter)
         {
             BreakOnDamage = true,
             BreakOnMove = true,
@@ -116,7 +127,10 @@ public sealed partial class ImplanterSystem : SharedImplanterSystem
         _popup.PopupEntity(Loc.GetString("injector-component-injecting-user"), target, user);
 
         var userName = Identity.Entity(user, EntityManager);
-        _popup.PopupEntity(Loc.GetString("implanter-component-implanting-target", ("user", userName)), user, target, PopupType.LargeCaution);
+        _popup.PopupEntity(Loc.GetString("implanter-component-implanting-target", ("user", userName)),
+            user,
+            target,
+            PopupType.LargeCaution);
     }
 
     /// <summary>
@@ -129,7 +143,13 @@ public sealed partial class ImplanterSystem : SharedImplanterSystem
     //TODO: Remove when surgery is in
     public void TryDraw(ImplanterComponent component, EntityUid user, EntityUid target, EntityUid implanter)
     {
-        var args = new DoAfterArgs(EntityManager, user, component.DrawTime, new DrawEvent(), implanter, target: target, used: implanter)
+        var args = new DoAfterArgs(EntityManager,
+            user,
+            component.DrawTime,
+            new DrawEvent(),
+            implanter,
+            target,
+            implanter)
         {
             BreakOnDamage = true,
             BreakOnMove = true,
@@ -138,7 +158,6 @@ public sealed partial class ImplanterSystem : SharedImplanterSystem
 
         if (_doAfter.TryStartDoAfter(args))
             _popup.PopupEntity(Loc.GetString("injector-component-injecting-user"), target, user);
-
     }
 
     private void OnImplant(EntityUid uid, ImplanterComponent component, ImplantEvent args)

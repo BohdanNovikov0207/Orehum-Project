@@ -18,10 +18,9 @@ namespace Content.Server.Administration.Commands;
 [AnyCommand]
 public sealed class OpenUserVisibleNotesCommand : IConsoleCommand
 {
+    public const string CommandName = "adminremarks";
     [Dependency] private readonly IConfigurationManager _configuration = default!;
     [Dependency] private readonly IAdminNotesManager _notes = default!;
-
-    public const string CommandName = "adminremarks";
 
     public string Command => CommandName;
     public string Description => Loc.GetString("admin-remarks-command-description");

@@ -14,7 +14,7 @@ using Content.Shared.StationRecords;
 
 namespace Content.Server.StationRecords.Components;
 
-[RegisterComponent, Access(typeof(GeneralStationRecordConsoleSystem))]
+[RegisterComponent] [Access(typeof(GeneralStationRecordConsoleSystem))]
 public sealed partial class GeneralStationRecordConsoleComponent : Component
 {
     /// <summary>
@@ -25,14 +25,14 @@ public sealed partial class GeneralStationRecordConsoleComponent : Component
     public uint? ActiveKey;
 
     /// <summary>
-    /// Qualities to filter a search by.
-    /// </summary>
-    [DataField]
-    public StationRecordsFilter? Filter;
-
-    /// <summary>
     /// Whether this Records Console is able to delete entries.
     /// </summary>
     [DataField]
     public bool CanDeleteEntries;
+
+    /// <summary>
+    /// Qualities to filter a search by.
+    /// </summary>
+    [DataField]
+    public StationRecordsFilter? Filter;
 }

@@ -76,23 +76,20 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Diagnostics.CodeAnalysis;
-using Content.Server.GameTicking;
-using Content.Server.GameTicking.Rules;
-using Content.Server.GameTicking.Rules.Components;
-using Content.Server.Traitor.Components;
-using Robust.Shared.Random;
-using Robust.Shared.Utility;
 using System.Linq;
 using Content.Server.Codewords;
+using Content.Server.Traitor.Components;
 using Content.Shared.Paper;
+using Robust.Shared.Random;
+using Robust.Shared.Utility;
 
 namespace Content.Server.Traitor.Systems;
 
 public sealed class TraitorCodePaperSystem : EntitySystem
 {
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly PaperSystem _paper = default!;
     [Dependency] private readonly CodewordSystem _codewordSystem = default!;
+    [Dependency] private readonly PaperSystem _paper = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
 
     public override void Initialize()
     {
@@ -100,10 +97,8 @@ public sealed class TraitorCodePaperSystem : EntitySystem
         SubscribeLocalEvent<TraitorCodePaperComponent, MapInitEvent>(OnMapInit);
     }
 
-    private void OnMapInit(EntityUid uid, TraitorCodePaperComponent component, MapInitEvent args)
-    {
+    private void OnMapInit(EntityUid uid, TraitorCodePaperComponent component, MapInitEvent args) =>
         SetupPaper(uid, component);
-    }
 
     private void SetupPaper(EntityUid uid, TraitorCodePaperComponent? component = null)
     {
@@ -113,9 +108,7 @@ public sealed class TraitorCodePaperSystem : EntitySystem
         if (TryComp(uid, out PaperComponent? paperComp))
         {
             if (TryGetTraitorCode(out var paperContent, component))
-            {
                 _paper.SetContent((uid, paperComp), paperContent);
-            }
         }
     }
 
@@ -136,7 +129,7 @@ public sealed class TraitorCodePaperSystem : EntitySystem
 
         _random.Shuffle(codeList);
 
-        int i = 0;
+        var i = 0;
         foreach (var code in codeList)
         {
             i++;
@@ -154,6 +147,7 @@ public sealed class TraitorCodePaperSystem : EntitySystem
             else
                 traitorCode = Loc.GetString("traitor-codes-message-plural") + codesMessage;
         }
+
         return !codesMessage.IsEmpty;
     }
 }

@@ -16,17 +16,17 @@ namespace Content.Server.Construction.Completions;
 public sealed partial class AppearanceChange : IGraphAction
 {
     /// <summary>
-    /// The appearance key to use.
-    /// </summary>
-    [DataField("key")]
-    public Enum Key = ConstructionVisuals.Key;
-
-    /// <summary>
     /// The enum data to set. If not specified, will set the data to the name of the current edges' target node
     /// (or the current node). This is because appearance changes are usually associated with reaching a new node.
     /// </summary>
     [DataField("data")]
     public Enum? Data;
+
+    /// <summary>
+    /// The appearance key to use.
+    /// </summary>
+    [DataField("key")]
+    public Enum Key = ConstructionVisuals.Key;
 
     public void PerformAction(EntityUid uid, EntityUid? userUid, IEntityManager entityManager)
     {

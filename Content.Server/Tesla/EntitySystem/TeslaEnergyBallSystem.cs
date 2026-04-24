@@ -7,14 +7,15 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Server.Singularity.Components;
+using Content.Server.Singularity.Events;
 using Content.Server.Tesla.Components;
 using Robust.Server.Audio;
-using Content.Server.Singularity.Events;
 
 namespace Content.Server.Tesla.EntitySystems;
 
 /// <summary>
-/// A component that tracks an entity's saturation level from absorbing other creatures by touch, and spawns new entities when the saturation limit is reached.
+/// A component that tracks an entity's saturation level from absorbing other creatures by touch, and spawns new entities
+/// when the saturation limit is reached.
 /// </summary>
 public sealed class TeslaEnergyBallSystem : EntitySystem
 {
@@ -31,12 +32,9 @@ public sealed class TeslaEnergyBallSystem : EntitySystem
     {
         Spawn(tesla.Comp.ConsumeEffectProto, Transform(args.Entity).Coordinates);
         if (TryComp<SinguloFoodComponent>(args.Entity, out var singuloFood))
-        {
             AdjustEnergy(tesla, tesla.Comp, singuloFood.Energy);
-        } else
-        {
+        else
             AdjustEnergy(tesla, tesla.Comp, tesla.Comp.ConsumeStuffEnergy);
-        }
     }
 
     public void AdjustEnergy(EntityUid uid, TeslaEnergyBallComponent component, float delta)
@@ -48,6 +46,7 @@ public sealed class TeslaEnergyBallSystem : EntitySystem
             component.Energy -= component.NeedEnergyToSpawn;
             Spawn(component.SpawnProto, Transform(uid).Coordinates);
         }
+
         if (component.Energy < component.EnergyToDespawn)
         {
             _audio.PlayPvs(component.SoundCollapse, uid);

@@ -13,18 +13,11 @@ namespace Content.Server.Power.Generation.Teg;
 /// A "circulator" for the thermo-electric generator (TEG).
 /// Circulators are used by the TEG to take in a side of either hot or cold gas.
 /// </summary>
-/// <seealso cref="TegSystem"/>
+/// <seealso cref="TegSystem" />
 [RegisterComponent]
 [Access(typeof(TegSystem))]
 public sealed partial class TegCirculatorComponent : Component
 {
-    /// <summary>
-    /// The difference between the inlet and outlet pressure at the start of the previous tick.
-    /// </summary>
-    [ViewVariables(VVAccess.ReadWrite)]
-    [DataField("lastPressureDelta")]
-    public float LastPressureDelta;
-
     /// <summary>
     /// The amount of moles transferred by the circulator last tick.
     /// </summary>
@@ -33,11 +26,18 @@ public sealed partial class TegCirculatorComponent : Component
     public float LastMolesTransferred;
 
     /// <summary>
-    /// Minimum pressure delta between inlet and outlet for which the circulator animation speed is "fast".
+    /// The difference between the inlet and outlet pressure at the start of the previous tick.
     /// </summary>
     [ViewVariables(VVAccess.ReadWrite)]
-    [DataField("visualSpeedDelta")]
-    public float VisualSpeedDelta = 5 * Atmospherics.OneAtmosphere;
+    [DataField("lastPressureDelta")]
+    public float LastPressureDelta;
+
+    /// <summary>
+    /// Light color of this circulator when it's running at "fast" speed.
+    /// </summary>
+    [ViewVariables(VVAccess.ReadWrite)]
+    [DataField("lightColorFast")]
+    public Color LightColorFast = Color.FromHex("#AA00FF");
 
     /// <summary>
     /// Light color of this circulator when it's running at "slow" speed.
@@ -47,9 +47,9 @@ public sealed partial class TegCirculatorComponent : Component
     public Color LightColorSlow = Color.FromHex("#FF3300");
 
     /// <summary>
-    /// Light color of this circulator when it's running at "fast" speed.
+    /// Minimum pressure delta between inlet and outlet for which the circulator animation speed is "fast".
     /// </summary>
     [ViewVariables(VVAccess.ReadWrite)]
-    [DataField("lightColorFast")]
-    public Color LightColorFast = Color.FromHex("#AA00FF");
+    [DataField("visualSpeedDelta")]
+    public float VisualSpeedDelta = 5 * Atmospherics.OneAtmosphere;
 }

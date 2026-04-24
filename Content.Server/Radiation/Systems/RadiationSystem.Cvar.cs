@@ -19,9 +19,15 @@ public partial class RadiationSystem
 
     private void SubscribeCvars()
     {
-        Subs.CVar(_cfg, CCVars.RadiationMinIntensity, radiationMinIntensity => MinIntensity = radiationMinIntensity, true);
+        Subs.CVar(_cfg,
+            CCVars.RadiationMinIntensity,
+            radiationMinIntensity => MinIntensity = radiationMinIntensity,
+            true);
         Subs.CVar(_cfg, CCVars.RadiationGridcastUpdateRate, updateRate => GridcastUpdateRate = updateRate, true);
-        Subs.CVar(_cfg, CCVars.RadiationGridcastSimplifiedSameGrid, simplifiedSameGrid => GridcastSimplifiedSameGrid = simplifiedSameGrid, true);
+        Subs.CVar(_cfg,
+            CCVars.RadiationGridcastSimplifiedSameGrid,
+            simplifiedSameGrid => GridcastSimplifiedSameGrid = simplifiedSameGrid,
+            true);
         Subs.CVar(_cfg, CCVars.RadiationGridcastMaxDistance, maxDistance => GridcastMaxDistance = maxDistance, true);
     }
 }

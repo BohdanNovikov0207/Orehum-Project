@@ -14,12 +14,12 @@ namespace Content.Server.Objectives.Components;
 /// <remarks>
 /// Only works for traitors so don't use for anything else.
 /// </remarks>
-[RegisterComponent, Access(typeof(ObjectiveLimitSystem))]
+[RegisterComponent] [Access(typeof(ObjectiveLimitSystem))]
 public sealed partial class ObjectiveLimitComponent : Component
 {
     /// <summary>
     /// Max number of players
     /// </summary>
-    [DataField(required: true), ViewVariables(VVAccess.ReadWrite)]
+    [DataField(required: true)] [ViewVariables(VVAccess.ReadWrite)]
     public uint Limit;
 }

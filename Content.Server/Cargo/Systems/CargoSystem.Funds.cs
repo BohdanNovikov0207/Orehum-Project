@@ -20,8 +20,12 @@ public sealed partial class CargoSystem
         SubscribeLocalEvent<FundingAllocationConsoleComponent, SetFundingAllocationBuiMessage>(OnSetFundingAllocation);
         SubscribeLocalEvent<FundingAllocationConsoleComponent, BeforeActivatableUIOpenEvent>(OnFundAllocationBuiOpen);
 
-        _cfg.OnValueChanged(CCVars.AllowPrimaryAccountAllocation, enabled => { _allowPrimaryAccountAllocation = enabled; }, true);
-        _cfg.OnValueChanged(CCVars.AllowPrimaryCutAdjustment, enabled => { _allowPrimaryCutAdjustment = enabled; }, true);
+        _cfg.OnValueChanged(CCVars.AllowPrimaryAccountAllocation,
+            enabled => { _allowPrimaryAccountAllocation = enabled; },
+            true);
+        _cfg.OnValueChanged(CCVars.AllowPrimaryCutAdjustment,
+            enabled => { _allowPrimaryCutAdjustment = enabled; },
+            true);
     }
 
     private void OnWithdrawFunds(Entity<CargoOrderConsoleComponent> ent, ref CargoConsoleWithdrawFundsMessage args)
@@ -46,7 +50,7 @@ public sealed partial class CargoSystem
         }
 
         ent.Comp.NextAccountActionTime = Timing.CurTime + ent.Comp.AccountActionDelay;
-        UpdateBankAccount((station, bank), -args.Amount,  ent.Comp.Account, dirty: false);
+        UpdateBankAccount((station, bank), -args.Amount, ent.Comp.Account, false);
         _audio.PlayPvs(ApproveSound, ent);
 
         var tryGetIdentityShortInfoEvent = new TryGetIdentityShortInfoEvent(ent, args.Actor);
@@ -61,7 +65,9 @@ public sealed partial class CargoSystem
             if (!_emag.CheckFlag(ent, EmagType.Interaction))
             {
                 var msg = Loc.GetString("cargo-console-fund-withdraw-broadcast",
-                    ("name", tryGetIdentityShortInfoEvent.Title ?? Loc.GetString("cargo-console-fund-transfer-user-unknown")),
+                    ("name",
+                        tryGetIdentityShortInfoEvent.Title ??
+                        Loc.GetString("cargo-console-fund-transfer-user-unknown")),
                     ("amount", args.Amount),
                     ("name1", Loc.GetString(ourAccount.Name)),
                     ("code1", Loc.GetString(ourAccount.Code)));
@@ -76,7 +82,9 @@ public sealed partial class CargoSystem
             if (!_emag.CheckFlag(ent, EmagType.Interaction))
             {
                 var msg = Loc.GetString("cargo-console-fund-transfer-broadcast",
-                    ("name", tryGetIdentityShortInfoEvent.Title ?? Loc.GetString("cargo-console-fund-transfer-user-unknown")),
+                    ("name",
+                        tryGetIdentityShortInfoEvent.Title ??
+                        Loc.GetString("cargo-console-fund-transfer-user-unknown")),
                     ("amount", args.Amount),
                     ("name1", Loc.GetString(ourAccount.Name)),
                     ("code1", Loc.GetString(ourAccount.Code)),
@@ -103,13 +111,16 @@ public sealed partial class CargoSystem
     }
 
 
-    private void OnSetFundingAllocation(Entity<FundingAllocationConsoleComponent> ent, ref SetFundingAllocationBuiMessage args)
+    private void OnSetFundingAllocation(Entity<FundingAllocationConsoleComponent> ent,
+        ref SetFundingAllocationBuiMessage args)
     {
         if (_station.GetOwningStation(ent) is not { } station ||
             !TryComp<StationBankAccountComponent>(station, out var bank))
             return;
 
-        var expectedCount = _allowPrimaryAccountAllocation ? bank.RevenueDistribution.Count : bank.RevenueDistribution.Count - 1;
+        var expectedCount = _allowPrimaryAccountAllocation
+            ? bank.RevenueDistribution.Count
+            : bank.RevenueDistribution.Count - 1;
         if (args.Percents.Count != expectedCount)
             return;
 
@@ -122,6 +133,7 @@ public sealed partial class CargoSystem
                 break;
             }
         }
+
         differs = differs || args.PrimaryCut != bank.PrimaryCut || args.LockboxCut != bank.LockboxCut;
 
         if (!differs)
@@ -132,23 +144,18 @@ public sealed partial class CargoSystem
 
         var primaryCut = bank.RevenueDistribution[bank.PrimaryAccount];
         bank.RevenueDistribution.Clear();
-        foreach (var (account, percent )in args.Percents)
+        foreach (var (account, percent)in args.Percents)
         {
             bank.RevenueDistribution.Add(account, percent / 100.0);
         }
+
         if (!_allowPrimaryAccountAllocation)
-        {
             bank.RevenueDistribution.Add(bank.PrimaryAccount, 0);
-        }
 
         if (_allowPrimaryCutAdjustment && args.PrimaryCut is >= 0.0 and <= 1.0)
-        {
             bank.PrimaryCut = args.PrimaryCut;
-        }
         if (_lockboxCutEnabled && args.LockboxCut is >= 0.0 and <= 1.0)
-        {
             bank.LockboxCut = args.LockboxCut;
-        }
 
         Dirty(station, bank);
 
@@ -159,9 +166,12 @@ public sealed partial class CargoSystem
             $"{ToPrettyString(args.Actor):player} set station {ToPrettyString(station)} fund distribution: {string.Join(',', bank.RevenueDistribution.Select(p => $"{p.Key}: {p.Value}").ToList())}, primary cut: {bank.PrimaryCut}, lockbox cut: {bank.LockboxCut}");
     }
 
-    private void OnFundAllocationBuiOpen(Entity<FundingAllocationConsoleComponent> ent, ref BeforeActivatableUIOpenEvent args)
+    private void OnFundAllocationBuiOpen(Entity<FundingAllocationConsoleComponent> ent,
+        ref BeforeActivatableUIOpenEvent args)
     {
         if (_station.GetOwningStation(ent) is { } station)
-            _uiSystem.SetUiState(ent.Owner, FundingAllocationConsoleUiKey.Key, new FundingAllocationConsoleBuiState(GetNetEntity(station)));
+            _uiSystem.SetUiState(ent.Owner,
+                FundingAllocationConsoleUiKey.Key,
+                new FundingAllocationConsoleBuiState(GetNetEntity(station)));
     }
 }

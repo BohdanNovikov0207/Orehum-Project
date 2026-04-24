@@ -3,10 +3,10 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Administration; // Touching for REUSE HEADERS
-using Content.Shared._EinsteinEngines.Language;
+using Content.Shared.Administration;
 using Robust.Shared.Console;
 using Robust.Shared.Enums;
+// Touching for REUSE HEADERS
 
 namespace Content.Server._EinsteinEngines.Language.Commands;
 
@@ -28,7 +28,7 @@ public sealed class ListLanguagesCommand : IConsoleCommand
         if (player.Status != SessionStatus.InGame)
             return;
 
-        if (player.AttachedEntity is not {} playerEntity)
+        if (player.AttachedEntity is not { } playerEntity)
         {
             shell.WriteError(Loc.GetString("shell-must-be-attached-to-entity"));
             return;
@@ -39,25 +39,31 @@ public sealed class ListLanguagesCommand : IConsoleCommand
 
         shell.WriteLine(Loc.GetString("command-language-spoken"));
         var spoken = languages.GetSpokenLanguages(playerEntity);
-        for (int i = 0; i < spoken.Count; i++)
+        for (var i = 0; i < spoken.Count; i++)
         {
             var lang = spoken[i];
             shell.WriteLine(lang == currentLang
-                ? Loc.GetString("command-language-current-entry", ("id", i + 1), ("language", lang), ("name", LanguageName(lang)))
-                : Loc.GetString("command-language-entry", ("id", i + 1), ("language", lang), ("name", LanguageName(lang))));
+                ? Loc.GetString("command-language-current-entry",
+                    ("id", i + 1),
+                    ("language", lang),
+                    ("name", LanguageName(lang)))
+                : Loc.GetString("command-language-entry",
+                    ("id", i + 1),
+                    ("language", lang),
+                    ("name", LanguageName(lang))));
         }
 
         shell.WriteLine(Loc.GetString("command-language-understood"));
         var understood = languages.GetUnderstoodLanguages(playerEntity);
-        for (int i = 0; i < understood.Count; i++)
+        for (var i = 0; i < understood.Count; i++)
         {
             var lang = understood[i];
-            shell.WriteLine(Loc.GetString("command-language-entry", ("id", i + 1), ("language", lang), ("name", LanguageName(lang))));
+            shell.WriteLine(Loc.GetString("command-language-entry",
+                ("id", i + 1),
+                ("language", lang),
+                ("name", LanguageName(lang))));
         }
     }
 
-    private string LanguageName(string id)
-    {
-        return Loc.GetString($"language-{id}-name");
-    }
+    private string LanguageName(string id) => Loc.GetString($"language-{id}-name");
 }

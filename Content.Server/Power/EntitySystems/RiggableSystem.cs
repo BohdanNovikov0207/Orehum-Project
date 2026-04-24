@@ -19,12 +19,12 @@ using Content.Shared.Rejuvenate;
 namespace Content.Server.Power.EntitySystems;
 
 /// <summary>
-///  Handles sabotaged/rigged objects
+/// Handles sabotaged/rigged objects
 /// </summary>
 public sealed class RiggableSystem : EntitySystem
 {
-    [Dependency] private readonly ExplosionSystem _explosionSystem = default!;
     [Dependency] private readonly IAdminLogManager _adminLogger = default!;
+    [Dependency] private readonly ExplosionSystem _explosionSystem = default!;
 
     public override void Initialize()
     {
@@ -34,10 +34,8 @@ public sealed class RiggableSystem : EntitySystem
         SubscribeLocalEvent<RiggableComponent, SolutionContainerChangedEvent>(OnSolutionChanged);
     }
 
-    private void OnRejuvenate(Entity<RiggableComponent> entity, ref RejuvenateEvent args)
-    {
+    private void OnRejuvenate(Entity<RiggableComponent> entity, ref RejuvenateEvent args) =>
         entity.Comp.IsRigged = false;
-    }
 
     private void OnMicrowaved(Entity<RiggableComponent> entity, ref BeingMicrowavedEvent args)
     {
@@ -63,9 +61,9 @@ public sealed class RiggableSystem : EntitySystem
         entity.Comp.IsRigged = quantity >= entity.Comp.RequiredQuantity.Quantity;
 
         if (entity.Comp.IsRigged && !wasRigged)
-        {
-            _adminLogger.Add(LogType.Explosion, LogImpact.Medium, $"{ToPrettyString(entity.Owner)} has been rigged up to explode when used.");
-        }
+            _adminLogger.Add(LogType.Explosion,
+                LogImpact.Medium,
+                $"{ToPrettyString(entity.Owner)} has been rigged up to explode when used.");
     }
 
     public void Explode(EntityUid uid, BatteryComponent? battery = null, EntityUid? cause = null)
@@ -75,7 +73,7 @@ public sealed class RiggableSystem : EntitySystem
 
         var radius = MathF.Min(5, MathF.Sqrt(battery.CurrentCharge) / 9);
 
-        _explosionSystem.TriggerExplosive(uid, radius: radius, user:cause);
+        _explosionSystem.TriggerExplosive(uid, radius: radius, user: cause);
         QueueDel(uid);
     }
 }

@@ -6,7 +6,7 @@
 namespace Content.Server.Gateway.Components;
 
 /// <summary>
-/// Destination created by <see cref="GatewayGeneratorComponent"/>
+/// Destination created by <see cref="GatewayGeneratorComponent" />
 /// </summary>
 [RegisterComponent]
 public sealed partial class GatewayGeneratorDestinationComponent : Component
@@ -17,6 +17,9 @@ public sealed partial class GatewayGeneratorDestinationComponent : Component
     [DataField]
     public EntityUid Generator;
 
+    [DataField]
+    public bool Loaded;
+
     /// <summary>
     /// Is the map locked from being used still or unlocked.
     /// Used in conjunction with the attached generator's NextUnlock.
@@ -24,18 +27,15 @@ public sealed partial class GatewayGeneratorDestinationComponent : Component
     [DataField]
     public bool Locked = true;
 
+    /// <summary>
+    /// Origin of the gateway.
+    /// </summary>
     [DataField]
-    public bool Loaded;
+    public Vector2i Origin;
 
     /// <summary>
     /// Seed used for this destination.
     /// </summary>
     [DataField]
     public int Seed;
-
-    /// <summary>
-    /// Origin of the gateway.
-    /// </summary>
-    [DataField]
-    public Vector2i Origin;
 }

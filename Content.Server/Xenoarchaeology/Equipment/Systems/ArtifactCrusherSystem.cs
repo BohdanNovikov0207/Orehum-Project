@@ -60,18 +60,18 @@ using Robust.Shared.Timing;
 
 namespace Content.Server.Xenoarchaeology.Equipment.Systems;
 
-/// <inheritdoc/>
+/// <inheritdoc />
 public sealed class ArtifactCrusherSystem : SharedArtifactCrusherSystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly BodySystem _body = default!;
     [Dependency] private readonly DamageableSystem _damageable = default!;
-    [Dependency] private readonly StackSystem _stack = default!;
     [Dependency] private readonly PopupSystem _popup = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly StackSystem _stack = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
@@ -96,7 +96,7 @@ public sealed class ArtifactCrusherSystem : SharedArtifactCrusherSystem
         {
             Text = Loc.GetString("artifact-crusher-verb-start-crushing"),
             Priority = 2,
-            Act = () => StartCrushing((ent, ent.Comp, entityStorageComp))
+            Act = () => StartCrushing((ent, ent.Comp, entityStorageComp)),
         };
         args.Verbs.Add(verb);
     }
@@ -175,14 +175,13 @@ public sealed class ArtifactCrusherSystem : SharedArtifactCrusherSystem
                 {
                     _damageable.TryChangeDamage(contained, crusher.CrushingDamage);
                 }
+
                 crusher.NextSecond += TimeSpan.FromSeconds(1);
                 Dirty(uid, crusher);
             }
 
             if (crusher.CrushEndTime < _timing.CurTime)
-            {
                 FinishCrushing((uid, crusher, storage));
-            }
         }
     }
 }

@@ -4,9 +4,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using System.Linq;
 using Content.Server.Antag;
-using Content.Server.Antag.Components;
 using Content.Server.Cloning;
 using Content.Server.GameTicking.Rules.Components;
 using Content.Server.Medical.SuitSensors;
@@ -16,17 +14,18 @@ using Content.Shared.Gibbing.Components;
 using Content.Shared.Medical.SuitSensor;
 using Content.Shared.Mind;
 using Content.Shared.Whitelist;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 
 namespace Content.Server.GameTicking.Rules;
 
 public sealed class ParadoxCloneRuleSystem : GameRuleSystem<ParadoxCloneRuleComponent>
 {
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
+    [Dependency] private readonly CloningSystem _cloning = default!;
     [Dependency] private readonly SharedMindSystem _mind = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly CloningSystem _cloning = default!;
     [Dependency] private readonly SuitSensorSystem _sensor = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly EntityWhitelistSystem _whitelist = default!; // Goobstation
 
     public override void Initialize()
@@ -37,7 +36,10 @@ public sealed class ParadoxCloneRuleSystem : GameRuleSystem<ParadoxCloneRuleComp
         SubscribeLocalEvent<ParadoxCloneRuleComponent, AfterAntagEntitySelectedEvent>(AfterAntagEntitySelected);
     }
 
-    protected override void Started(EntityUid uid, ParadoxCloneRuleComponent component, GameRuleComponent gameRule, GameRuleStartedEvent args)
+    protected override void Started(EntityUid uid,
+        ParadoxCloneRuleComponent component,
+        GameRuleComponent gameRule,
+        GameRuleStartedEvent args)
     {
         base.Started(uid, component, gameRule, args);
 
@@ -60,18 +62,21 @@ public sealed class ParadoxCloneRuleSystem : GameRuleSystem<ParadoxCloneRuleComp
 
         if (ent.Comp.OriginalBody != null) // target was overridden, for example by admin antag control
         {
-            if (Deleted(ent.Comp.OriginalBody.Value) || !_mind.TryGetMind(ent.Comp.OriginalBody.Value, out var originalMindId, out var _))
+            if (Deleted(ent.Comp.OriginalBody.Value) ||
+                !_mind.TryGetMind(ent.Comp.OriginalBody.Value, out var originalMindId, out _))
             {
                 Log.Warning("Could not find mind of target player to paradox clone!");
                 return;
             }
+
             ent.Comp.OriginalMind = originalMindId;
         }
         else
         {
             // get possible targets
             var allAliveHumanoids = _mind.GetAliveHumans();
-            allAliveHumanoids.RemoveWhere(human => _whitelist.IsBlacklistPass(ent.Comp.TargetBlacklist, human)); // Goobstation
+            allAliveHumanoids.RemoveWhere(human =>
+                _whitelist.IsBlacklistPass(ent.Comp.TargetBlacklist, human)); // Goobstation
 
             // we already checked when starting the gamerule, but someone might have died since then.
             if (allAliveHumanoids.Count == 0)
@@ -84,10 +89,12 @@ public sealed class ParadoxCloneRuleSystem : GameRuleSystem<ParadoxCloneRuleComp
             var randomHumanoidMind = _random.Pick(allAliveHumanoids);
             ent.Comp.OriginalMind = randomHumanoidMind;
             ent.Comp.OriginalBody = randomHumanoidMind.Comp.OwnedEntity;
-
         }
 
-        if (ent.Comp.OriginalBody == null || !_cloning.TryCloning(ent.Comp.OriginalBody.Value, _transform.GetMapCoordinates(spawner), ent.Comp.Settings, out var clone))
+        if (ent.Comp.OriginalBody == null || !_cloning.TryCloning(ent.Comp.OriginalBody.Value,
+                _transform.GetMapCoordinates(spawner),
+                ent.Comp.Settings,
+                out var clone))
         {
             Log.Error($"Unable to make a paradox clone of entity {ToPrettyString(ent.Comp.OriginalBody)}");
             return;
@@ -98,7 +105,8 @@ public sealed class ParadoxCloneRuleSystem : GameRuleSystem<ParadoxCloneRuleComp
 
         var gibComp = EnsureComp<GibOnRoundEndComponent>(clone.Value);
         gibComp.SpawnProto = ent.Comp.GibProto;
-        gibComp.PreventGibbingObjectives = new() { "ParadoxCloneKillObjective" }; // don't gib them if they killed the original.
+        gibComp.PreventGibbingObjectives =
+            new HashSet<EntProtoId> { "ParadoxCloneKillObjective" }; // don't gib them if they killed the original.
 
         // turn their suit sensors off so they don't immediately get noticed
         _sensor.SetAllSensors(clone.Value, SuitSensorMode.SensorOff);
@@ -114,6 +122,9 @@ public sealed class ParadoxCloneRuleSystem : GameRuleSystem<ParadoxCloneRuleComp
         if (!_mind.TryGetMind(args.EntityUid, out var cloneMindId, out var cloneMindComp))
             return;
 
-        _mind.CopyObjectives(ent.Comp.OriginalMind.Value, (cloneMindId, cloneMindComp), ent.Comp.ObjectiveWhitelist, ent.Comp.ObjectiveBlacklist);
+        _mind.CopyObjectives(ent.Comp.OriginalMind.Value,
+            (cloneMindId, cloneMindComp),
+            ent.Comp.ObjectiveWhitelist,
+            ent.Comp.ObjectiveBlacklist);
     }
 }

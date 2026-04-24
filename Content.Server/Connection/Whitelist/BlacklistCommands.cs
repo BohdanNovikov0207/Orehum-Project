@@ -49,8 +49,8 @@ namespace Content.Server.Connection.Whitelist;
 [AdminCommand(AdminFlags.Ban)]
 public sealed class AddBlacklistCommand : LocalizedCommands
 {
-    [Dependency] private readonly IPlayerLocator _playerLocator = default!;
     [Dependency] private readonly IServerDbManager _db = default!;
+    [Dependency] private readonly IPlayerLocator _playerLocator = default!;
 
     public override string Command => "blacklistadd";
 
@@ -78,6 +78,7 @@ public sealed class AddBlacklistCommand : LocalizedCommands
             shell.WriteError(Loc.GetString("cmd-blacklistadd-not-found", ("username", args[0])));
             return;
         }
+
         var guid = data.UserId;
         var isBlacklisted = await _db.GetBlacklistStatusAsync(guid);
         if (isBlacklisted)
@@ -93,9 +94,7 @@ public sealed class AddBlacklistCommand : LocalizedCommands
     public override CompletionResult GetCompletion(IConsoleShell shell, string[] args)
     {
         if (args.Length == 1)
-        {
             return CompletionResult.FromHint(Loc.GetString("cmd-blacklistadd-arg-player"));
-        }
 
         return CompletionResult.Empty;
     }
@@ -104,8 +103,8 @@ public sealed class AddBlacklistCommand : LocalizedCommands
 [AdminCommand(AdminFlags.Ban)]
 public sealed class RemoveBlacklistCommand : LocalizedCommands
 {
-    [Dependency] private readonly IPlayerLocator _playerLocator = default!;
     [Dependency] private readonly IServerDbManager _db = default!;
+    [Dependency] private readonly IPlayerLocator _playerLocator = default!;
 
     public override string Command => "blacklistremove";
 
@@ -149,9 +148,7 @@ public sealed class RemoveBlacklistCommand : LocalizedCommands
     public override CompletionResult GetCompletion(IConsoleShell shell, string[] args)
     {
         if (args.Length == 1)
-        {
             return CompletionResult.FromHint(Loc.GetString("cmd-blacklistremove-arg-player"));
-        }
 
         return CompletionResult.Empty;
     }

@@ -72,14 +72,11 @@ public sealed class ToggleNukeCommand : LocalizedCommands
     public override CompletionResult GetCompletion(IConsoleShell shell, string[] args)
     {
         if (args.Length == 1)
-        {
             return CompletionResult.FromHint(Loc.GetString(Loc.GetString("cmd-nukearm-1-help")));
-        }
 
         if (args.Length == 2)
-        {
-            return CompletionResult.FromHintOptions(CompletionHelper.Components<NukeComponent>(args[1]), Loc.GetString("cmd-nukearm-2-help"));
-        }
+            return CompletionResult.FromHintOptions(CompletionHelper.Components<NukeComponent>(args[1]),
+                Loc.GetString("cmd-nukearm-2-help"));
 
         return CompletionResult.Empty;
     }

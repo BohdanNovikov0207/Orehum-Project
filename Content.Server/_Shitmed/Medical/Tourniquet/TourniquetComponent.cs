@@ -9,6 +9,9 @@ namespace Content.Server._Shitmed.Medical.Tourniquet;
 [RegisterComponent]
 public sealed partial class TourniquetComponent : Component
 {
+    [DataField] [ViewVariables(VVAccess.ReadOnly)]
+    public List<BodyPartType> BlockedBodyParts = new();
+
     [ViewVariables(VVAccess.ReadOnly)]
     public EntityUid? BodyPartTorniqueted;
 
@@ -26,18 +29,15 @@ public sealed partial class TourniquetComponent : Component
     [DataField]
     public float RemoveDelay = 7f;
 
-    [DataField, ViewVariables(VVAccess.ReadOnly)]
-    public List<BodyPartType> BlockedBodyParts = new();
-
     /// <summary>
-    ///     Sound played on healing begin
-    /// </summary>
-    [DataField("putOnSound")]
-    public SoundSpecifier? TourniquetPutOnSound = null;
-
-    /// <summary>
-    ///     Sound played on healing end
+    /// Sound played on healing end
     /// </summary>
     [DataField("putOffSound")]
     public SoundSpecifier? TourniquetPutOffSound = null;
+
+    /// <summary>
+    /// Sound played on healing begin
+    /// </summary>
+    [DataField("putOnSound")]
+    public SoundSpecifier? TourniquetPutOnSound = null;
 }

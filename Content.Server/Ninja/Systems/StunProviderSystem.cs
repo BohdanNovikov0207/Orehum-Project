@@ -28,14 +28,14 @@ namespace Content.Server.Ninja.Systems;
 /// </summary>
 public sealed class StunProviderSystem : SharedStunProviderSystem
 {
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly BatterySystem _battery = default!;
     [Dependency] private readonly DamageableSystem _damageable = default!;
-    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedNinjaGlovesSystem _gloves = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly SharedStunSystem _stun = default!;
     [Dependency] private readonly UseDelaySystem _useDelay = default!;
+    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
 
     public override void Initialize()
     {
@@ -59,7 +59,7 @@ public sealed class StunProviderSystem : SharedStunProviderSystem
             return;
 
         var useDelay = EnsureComp<UseDelayComponent>(uid);
-        if (_useDelay.IsDelayed((uid, useDelay), id: comp.DelayId))
+        if (_useDelay.IsDelayed((uid, useDelay), comp.DelayId))
             return;
 
         // take charge from battery
@@ -71,18 +71,16 @@ public sealed class StunProviderSystem : SharedStunProviderSystem
 
         _audio.PlayPvs(comp.Sound, target);
 
-        _damageable.TryChangeDamage(target, comp.StunDamage, false, true, null, origin: uid);
+        _damageable.TryChangeDamage(target, comp.StunDamage, false, true, null, uid);
         _stun.TryAddParalyzeDuration(target, comp.StunTime);
 
         // short cooldown to prevent instant stunlocking
-        _useDelay.SetLength((uid, useDelay), comp.Cooldown, id: comp.DelayId);
+        _useDelay.SetLength((uid, useDelay), comp.Cooldown, comp.DelayId);
         _useDelay.TryResetDelay((uid, useDelay), id: comp.DelayId);
 
         args.Handled = true;
     }
 
-    private void OnBatteryChanged(Entity<StunProviderComponent> ent, ref NinjaBatteryChangedEvent args)
-    {
+    private void OnBatteryChanged(Entity<StunProviderComponent> ent, ref NinjaBatteryChangedEvent args) =>
         SetBattery((ent, ent.Comp), args.Battery);
-    }
 }

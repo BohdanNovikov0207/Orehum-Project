@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using Content.Shared.Maps;
 using Content.Shared.Procedural;
 using Content.Shared.Procedural.PostGeneration;
-using Content.Shared.Storage;
 using Robust.Shared.Utility;
 
 namespace Content.Server.Procedural.DungeonJob;
@@ -16,9 +15,12 @@ namespace Content.Server.Procedural.DungeonJob;
 public sealed partial class DungeonJob
 {
     /// <summary>
-    /// <see cref="MiddleConnectionDunGen"/>
+    ///     <see cref="MiddleConnectionDunGen" />
     /// </summary>
-    private async Task PostGen(MiddleConnectionDunGen gen, Dungeon dungeon, HashSet<Vector2i> reservedTiles, Random random)
+    private async Task PostGen(MiddleConnectionDunGen gen,
+        Dungeon dungeon,
+        HashSet<Vector2i> reservedTiles,
+        Random random)
     {
         // Grab all of the room bounds
         // Then, work out connections between them
@@ -37,16 +39,17 @@ public sealed partial class DungeonJob
                         // Cardinals only
                         if (x != 0 && y != 0 ||
                             x == 0 && y == 0)
-                        {
                             continue;
-                        }
 
                         var neighbor = new Vector2i(index.X + x, index.Y + y);
 
                         if (dungeon.RoomTiles.Contains(neighbor))
                             continue;
 
-                        if (!_anchorable.TileFree(_grid, neighbor, DungeonSystem.CollisionLayer, DungeonSystem.CollisionMask))
+                        if (!_anchorable.TileFree(_grid,
+                                neighbor,
+                                DungeonSystem.CollisionLayer,
+                                DungeonSystem.CollisionMask))
                             continue;
 
                         roomEdges.Add(neighbor);
@@ -73,9 +76,7 @@ public sealed partial class DungeonJob
             {
                 if (room.Equals(otherRoom) ||
                     conns.Contains(otherRoom))
-                {
                     continue;
-                }
 
                 var flipp = new HashSet<Vector2i>(border);
                 flipp.IntersectWith(otherBorders);
@@ -115,9 +116,7 @@ public sealed partial class DungeonJob
                     _maps.SetTile(_gridUid, _grid, node, _tile.GetVariantTile((ContentTileDefinition) tileDef, random));
 
                     if (flankContents != null && nodeDistances.Count - i <= 2)
-                    {
                         _entManager.SpawnEntitiesAttachedTo(gridPos, _entTable.GetSpawns(flankContents, random));
-                    }
                     else
                     {
                         // Iterate neighbors and check for blockers, if so bulldoze

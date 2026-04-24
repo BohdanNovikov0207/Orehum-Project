@@ -9,25 +9,20 @@ using Robust.Shared.Prototypes;
 namespace Content.Server.GameTicking.Rules.VariationPass.Components;
 
 /// <summary>
-/// This handle randomly destroying lights, causing them to flicker endlessly, or replacing their tube/bulb with different variants.
+/// This handle randomly destroying lights, causing them to flicker endlessly, or replacing their tube/bulb with different
+/// variants.
 /// </summary>
 [RegisterComponent]
 public sealed partial class PoweredLightVariationPassComponent : Component
 {
-    /// <summary>
-    ///     Chance that a light will be replaced with a broken variant.
-    /// </summary>
     [DataField]
-    public float LightBreakChance = 0.15f;
-
-    /// <summary>
-    ///     Chance that a light will be replaced with an aged variant.
-    /// </summary>
-    [DataField]
-    public float LightAgingChance = 0.05f;
+    public EntProtoId AgedLightBulbPrototype = "LightBulbOld";
 
     [DataField]
     public float AgedLightTubeFlickerChance = 0.03f;
+
+    [DataField]
+    public EntProtoId AgedLightTubePrototype = "LightTubeOld";
 
     [DataField]
     public EntProtoId BrokenLightBulbPrototype = "LightBulbBroken";
@@ -35,9 +30,15 @@ public sealed partial class PoweredLightVariationPassComponent : Component
     [DataField]
     public EntProtoId BrokenLightTubePrototype = "LightTubeBroken";
 
+    /// <summary>
+    /// Chance that a light will be replaced with an aged variant.
+    /// </summary>
     [DataField]
-    public EntProtoId AgedLightBulbPrototype = "LightBulbOld";
+    public float LightAgingChance = 0.05f;
 
+    /// <summary>
+    /// Chance that a light will be replaced with a broken variant.
+    /// </summary>
     [DataField]
-    public EntProtoId AgedLightTubePrototype = "LightTubeOld";
+    public float LightBreakChance = 0.15f;
 }

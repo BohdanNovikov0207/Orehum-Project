@@ -13,14 +13,14 @@ using Robust.Shared.Network;
 namespace Content.Server.Database;
 
 /// <summary>
-/// Implements logic to match a <see cref="ServerBanDef"/> against a player query.
+/// Implements logic to match a <see cref="ServerBanDef" /> against a player query.
 /// </summary>
 /// <remarks>
-/// <para>
-/// This implementation is used by in-game ban matching code, and partially by the SQLite database layer.
-/// Some logic is duplicated into both the SQLite and PostgreSQL database layers to provide more optimal SQL queries.
-/// Both should be kept in sync, please!
-/// </para>
+///     <para>
+///     This implementation is used by in-game ban matching code, and partially by the SQLite database layer.
+///     Some logic is duplicated into both the SQLite and PostgreSQL database layers to provide more optimal SQL queries.
+///     Both should be kept in sync, please!
+///     </para>
 /// </remarks>
 public static class BanMatcher
 {
@@ -28,9 +28,9 @@ public static class BanMatcher
     /// Check whether a ban matches the specified player info.
     /// </summary>
     /// <remarks>
-    /// <para>
-    /// This function does not check whether the ban itself is expired or manually unbanned.
-    /// </para>
+    ///     <para>
+    ///     This function does not check whether the ban itself is expired or manually unbanned.
+    ///     </para>
     /// </remarks>
     /// <param name="ban">The ban information.</param>
     /// <param name="player">Information about the player to match against.</param>
@@ -50,23 +50,17 @@ public static class BanMatcher
             && ban.Address is not null
             && player.Address.IsInSubnet(ban.Address.Value)
             && (!ban.ExemptFlags.HasFlag(ServerBanExemptFlags.BlacklistedRange) || player.IsNewPlayer))
-        {
             return true;
-        }
 
         if (player.UserId is { } id && ban.UserId == id.UserId)
-        {
             return true;
-        }
 
         switch (ban.HWId?.Type)
         {
             case HwidType.Legacy:
                 if (player.HWId is { Length: > 0 } hwIdVar
                     && hwIdVar.AsSpan().SequenceEqual(ban.HWId.Hwid.AsSpan()))
-                {
                     return true;
-                }
                 break;
             case HwidType.Modern:
                 if (player.ModernHWIds is { Length: > 0 } modernHwIdVar)
@@ -77,6 +71,7 @@ public static class BanMatcher
                             return true;
                     }
                 }
+
                 break;
         }
 
@@ -99,12 +94,12 @@ public static class BanMatcher
         public IPAddress? Address;
 
         /// <summary>
-        /// The LEGACY hardware ID of the player. Corresponds with <see cref="NetUserData.HWId"/>.
+        /// The LEGACY hardware ID of the player. Corresponds with <see cref="NetUserData.HWId" />.
         /// </summary>
         public ImmutableArray<byte>? HWId;
 
         /// <summary>
-        /// The modern hardware IDs of the player. Corresponds with <see cref="NetUserData.ModernHWIds"/>.
+        /// The modern hardware IDs of the player. Corresponds with <see cref="NetUserData.ModernHWIds" />.
         /// </summary>
         public ImmutableArray<ImmutableArray<byte>>? ModernHWIds;
 

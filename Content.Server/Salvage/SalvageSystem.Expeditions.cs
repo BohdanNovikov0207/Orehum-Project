@@ -25,7 +25,6 @@ using System.Linq;
 using System.Threading;
 using Content.Server.Salvage.Expeditions;
 using Content.Shared.CCVar;
-using Content.Shared.Examine;
 using Content.Shared.Salvage.Expeditions;
 using Content.Shared.Shuttles.Components;
 using Robust.Shared.CPUJob.JobQueues;
@@ -41,10 +40,10 @@ public sealed partial class SalvageSystem
      */
 
     private const int MissionLimit = 3;
+    private const double SalvageJobTime = 0.002;
+    private readonly List<(SpawnSalvageMissionJob Job, CancellationTokenSource CancelToken)> _salvageJobs = new();
 
     private readonly JobQueue _salvageQueue = new();
-    private readonly List<(SpawnSalvageMissionJob Job, CancellationTokenSource CancelToken)> _salvageJobs = new();
-    private const double SalvageJobTime = 0.002;
 
     private float _cooldown;
 
@@ -62,13 +61,13 @@ public sealed partial class SalvageSystem
         Subs.CVar(_configurationManager, CCVars.SalvageExpeditionCooldown, SetCooldownChange);
     }
 
-    private void OnExpeditionGetState(EntityUid uid, SalvageExpeditionComponent component, ref ComponentGetState args)
-    {
-        args.State = new SalvageExpeditionComponentState()
+    private void OnExpeditionGetState(EntityUid uid,
+        SalvageExpeditionComponent component,
+        ref ComponentGetState args) =>
+        args.State = new SalvageExpeditionComponentState
         {
-            Stage = component.Stage
+            Stage = component.Stage,
         };
-    }
 
     private void SetCooldownChange(float obj)
     {
@@ -85,10 +84,8 @@ public sealed partial class SalvageSystem
         _cooldown = obj;
     }
 
-    private void OnExpeditionMapInit(EntityUid uid, SalvageExpeditionComponent component, MapInitEvent args)
-    {
+    private void OnExpeditionMapInit(EntityUid uid, SalvageExpeditionComponent component, MapInitEvent args) =>
         component.SelectedSong = _audio.ResolveSound(component.Sound);
-    }
 
     private void OnExpeditionShutdown(EntityUid uid, SalvageExpeditionComponent component, ComponentShutdown args)
     {
@@ -117,9 +114,7 @@ public sealed partial class SalvageSystem
 
         // Finish mission
         if (TryComp<SalvageExpeditionDataComponent>(component.Station, out var data))
-        {
             FinishExpedition((component.Station, data), uid);
-        }
     }
 
     private void UpdateExpeditions()
@@ -181,7 +176,11 @@ public sealed partial class SalvageSystem
     private SalvageExpeditionConsoleState GetState(SalvageExpeditionDataComponent component)
     {
         var missions = component.Missions.Values.ToList();
-        return new SalvageExpeditionConsoleState(component.NextOffer, component.Claimed, component.Cooldown, component.ActiveMission, missions);
+        return new SalvageExpeditionConsoleState(component.NextOffer,
+            component.Claimed,
+            component.Cooldown,
+            component.ActiveMission,
+            missions);
     }
 
     private void SpawnMission(SalvageMissionParams missionParams, EntityUid station, EntityUid? coordinatesDisk)

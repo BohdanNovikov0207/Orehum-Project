@@ -40,18 +40,18 @@ public sealed partial class ContainerSpawnPointComponent : Component, ISpawnPoin
     /// <summary>
     /// The ID of the container that this entity will spawn players into
     /// </summary>
-    [DataField(required: true), ViewVariables(VVAccess.ReadWrite)]
+    [DataField(required: true)] [ViewVariables(VVAccess.ReadWrite)]
     public string ContainerId = string.Empty;
 
     /// <summary>
     /// An optional job specifier
     /// </summary>
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    [DataField] [ViewVariables(VVAccess.ReadWrite)]
     public ProtoId<JobPrototype>? Job;
 
     /// <summary>
     /// The type of spawn point
     /// </summary>
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    [DataField] [ViewVariables(VVAccess.ReadWrite)]
     public SpawnPointType SpawnType { get; set; } = SpawnPointType.Unset;
 }

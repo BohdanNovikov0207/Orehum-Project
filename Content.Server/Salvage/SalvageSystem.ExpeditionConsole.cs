@@ -9,9 +9,9 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Shared.Dataset;
 using Content.Shared.Procedural;
 using Content.Shared.Salvage.Expeditions;
-using Content.Shared.Dataset;
 using Robust.Shared.Prototypes;
 
 namespace Content.Server.Salvage;
@@ -21,7 +21,9 @@ public sealed partial class SalvageSystem
     public static readonly EntProtoId CoordinatesDisk = "CoordinatesDisk";
     public static readonly ProtoId<LocalizedDatasetPrototype> PlanetNames = "NamesBorer";
 
-    private void OnSalvageClaimMessage(EntityUid uid, SalvageExpeditionConsoleComponent component, ClaimSalvageMessage args)
+    private void OnSalvageClaimMessage(EntityUid uid,
+        SalvageExpeditionConsoleComponent component,
+        ClaimSalvageMessage args)
     {
         var station = _station.GetOwningStation(uid);
 
@@ -35,7 +37,8 @@ public sealed partial class SalvageSystem
         SpawnMission(missionparams, station.Value, cdUid);
 
         data.ActiveMission = args.Index;
-        var mission = GetMission(_prototypeManager.Index<SalvageDifficultyPrototype>(missionparams.Difficulty), missionparams.Seed);
+        var mission = GetMission(_prototypeManager.Index<SalvageDifficultyPrototype>(missionparams.Difficulty),
+            missionparams.Seed);
         data.NextOffer = _timing.CurTime + mission.Duration + TimeSpan.FromSeconds(1);
 
         _labelSystem.Label(cdUid, GetFTLName(_prototypeManager.Index(PlanetNames), missionparams.Seed));
@@ -44,15 +47,11 @@ public sealed partial class SalvageSystem
         UpdateConsoles((station.Value, data));
     }
 
-    private void OnSalvageConsoleInit(Entity<SalvageExpeditionConsoleComponent> console, ref ComponentInit args)
-    {
+    private void OnSalvageConsoleInit(Entity<SalvageExpeditionConsoleComponent> console, ref ComponentInit args) =>
         UpdateConsole(console);
-    }
 
-    private void OnSalvageConsoleParent(Entity<SalvageExpeditionConsoleComponent> console, ref EntParentChangedMessage args)
-    {
-        UpdateConsole(console);
-    }
+    private void OnSalvageConsoleParent(Entity<SalvageExpeditionConsoleComponent> console,
+        ref EntParentChangedMessage args) => UpdateConsole(console);
 
     private void UpdateConsoles(Entity<SalvageExpeditionDataComponent> component)
     {
@@ -76,13 +75,9 @@ public sealed partial class SalvageSystem
         SalvageExpeditionConsoleState state;
 
         if (TryComp<SalvageExpeditionDataComponent>(station, out var dataComponent))
-        {
             state = GetState(dataComponent);
-        }
         else
-        {
             state = new SalvageExpeditionConsoleState(TimeSpan.Zero, false, true, 0, new List<SalvageMissionParams>());
-        }
 
         _ui.SetUiState(component.Owner, SalvageConsoleUiKey.Expedition, state);
     }

@@ -10,38 +10,65 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Server.Gateway.Systems;
-using Content.Shared.Tag; // Goobstation
+using Content.Shared.Tag;
 using Robust.Shared.Audio;
-using Robust.Shared.Prototypes; // Goobstation
+using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
 using Robust.Shared.Utility;
+// Goobstation
+// Goobstation
 
 namespace Content.Server.Gateway.Components;
 
 /// <summary>
 /// Controlling gateway that links to other gateway destinations on the server.
 /// </summary>
-[RegisterComponent, Access(typeof(GatewaySystem)), AutoGenerateComponentPause]
+[RegisterComponent] [Access(typeof(GatewaySystem))] [AutoGenerateComponentPause]
 public sealed partial class GatewayComponent : Component
 {
+    /// <summary>
+    /// Sound to play when trying to open or close the portal and missing access.
+    /// </summary>
+    [DataField]
+    public SoundSpecifier AccessDeniedSound = new SoundPathSpecifier("/Audio/Machines/custom_deny.ogg");
+
+    /// <summary>
+    /// Sound to play when closing the portal.
+    /// </summary>
+    [DataField]
+    public SoundSpecifier CloseSound = new SoundPathSpecifier("/Audio/Effects/Lightning/lightningbolt.ogg");
+
+    /// <summary>
+    /// Cooldown between opening portal / closing.
+    /// </summary>
+    [DataField]
+    public TimeSpan Cooldown = TimeSpan.FromSeconds(30);
+
     /// <summary>
     /// Whether this destination is shown in the gateway ui.
     /// If you are making a gateway for an admeme set this once you are ready for players to select it.
     /// </summary>
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    [DataField] [ViewVariables(VVAccess.ReadWrite)]
     public bool Enabled;
 
     /// <summary>
     /// Can the gateway be interacted with? If false then only settable via admins / mappers.
     /// </summary>
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    [DataField] [ViewVariables(VVAccess.ReadWrite)]
     public bool Interactable = true;
 
     /// <summary>
     /// Name as it shows up on the ui of station gateways.
     /// </summary>
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    [DataField] [ViewVariables(VVAccess.ReadWrite)]
     public FormattedMessage Name = new();
+
+    /// <summary>
+    /// The time at which the portal can next be opened.
+    /// </summary>
+    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))]
+    [AutoPausedField]
+    public TimeSpan NextReady;
 
     /// <summary>
     /// Sound to play when opening the portal.
@@ -51,31 +78,6 @@ public sealed partial class GatewayComponent : Component
     /// </remarks>
     [DataField("portalSound")]
     public SoundSpecifier OpenSound = new SoundPathSpecifier("/Audio/Effects/Lightning/lightningbolt.ogg");
-
-    /// <summary>
-    /// Sound to play when closing the portal.
-    /// </summary>
-    [DataField]
-    public SoundSpecifier CloseSound = new SoundPathSpecifier("/Audio/Effects/Lightning/lightningbolt.ogg");
-
-    /// <summary>
-    /// Sound to play when trying to open or close the portal and missing access.
-    /// </summary>
-    [DataField]
-    public SoundSpecifier AccessDeniedSound = new SoundPathSpecifier("/Audio/Machines/custom_deny.ogg");
-
-    /// <summary>
-    /// Cooldown between opening portal / closing.
-    /// </summary>
-    [DataField]
-    public TimeSpan Cooldown = TimeSpan.FromSeconds(30);
-
-    /// <summary>
-    /// The time at which the portal can next be opened.
-    /// </summary>
-    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))]
-    [AutoPausedField]
-    public TimeSpan NextReady;
 
     // Goobstation
     /// <summary>

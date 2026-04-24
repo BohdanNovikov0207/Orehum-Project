@@ -10,44 +10,45 @@
 using Content.Server.Atmos.Rotting;
 using Content.Server.Body.Components;
 using Content.Server.DoAfter;
-using Content.Server.Nutrition.EntitySystems;
 using Content.Server.Popups;
+using Content.Shared._Shitmed.Targeting;
 using Content.Shared.Atmos.Rotting;
 using Content.Shared.Damage;
 using Content.Shared.DoAfter;
 using Content.Shared.Inventory;
-
 using Content.Shared.Medical.CPR;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Mobs.Systems;
+using Content.Shared.Nutrition.EntitySystems;
+using Content.Shared.Traits.Assorted;
 using Content.Shared.Verbs;
 using Robust.Server.Audio;
 using Robust.Shared.Audio;
 using Robust.Shared.Random;
 using Robust.Shared.Utility;
-using Content.Shared.Traits.Assorted;
-using Content.Shared._Shitmed.Targeting;
-using Content.Shared.Nutrition.EntitySystems; // Shitmed Change
+
+// Shitmed Change
 
 namespace Content.Server.Medical.CPR;
 
 public sealed class CPRSystem : EntitySystem
 {
-    [Dependency] private readonly PopupSystem _popupSystem = default!;
-    [Dependency] private readonly DoAfterSystem _doAfterSystem = default!;
-    [Dependency] private readonly MobStateSystem _mobStateSystem = default!;
-    [Dependency] private readonly IngestionSystem _ingestionSystem = default!;
+    [Dependency] private readonly AudioSystem _audio = default!;
     [Dependency] private readonly DamageableSystem _damageable = default!;
+    [Dependency] private readonly DoAfterSystem _doAfterSystem = default!;
+    [Dependency] private readonly IngestionSystem _ingestionSystem = default!;
+    [Dependency] private readonly InventorySystem _inventory = default!;
+    [Dependency] private readonly MobStateSystem _mobStateSystem = default!;
     [Dependency] private readonly MobThresholdSystem _mobThreshold = default!;
+    [Dependency] private readonly PopupSystem _popupSystem = default!;
     [Dependency] private readonly IRobustRandom _robustRandom = default!;
     [Dependency] private readonly RottingSystem _rottingSystem = default!;
-    [Dependency] private readonly InventorySystem _inventory = default!;
-    [Dependency] private readonly AudioSystem _audio = default!;
 
     public override void Initialize()
     {
-        base.Initialize(); SubscribeLocalEvent<CPRTrainingComponent, GetVerbsEvent<InnateVerb>>(AddCPRVerb);
+        base.Initialize();
+        SubscribeLocalEvent<CPRTrainingComponent, GetVerbsEvent<InnateVerb>>(AddCPRVerb);
         SubscribeLocalEvent<CPRTrainingComponent, CPRDoAfterEvent>(OnCPRDoAfter);
     }
 
@@ -62,8 +63,8 @@ public sealed class CPRSystem : EntitySystem
         {
             Act = () => { StartCPR(performer, target); },
             Text = Loc.GetString("cpr-verb"),
-            Icon = new SpriteSpecifier.Rsi(new("Interface/Alerts/human_alive.rsi"), "health4"),
-            Priority = 2
+            Icon = new SpriteSpecifier.Rsi(new ResPath("Interface/Alerts/human_alive.rsi"), "health4"),
+            Priority = 2,
         };
 
         args.Verbs.Add(verb);
@@ -89,19 +90,25 @@ public sealed class CPRSystem : EntitySystem
             return;
         }
 
-        if (!_ingestionSystem.HasMouthAvailable(performer, performer) || !_ingestionSystem.HasMouthAvailable(target, performer))
+        if (!_ingestionSystem.HasMouthAvailable(performer, performer) ||
+            !_ingestionSystem.HasMouthAvailable(target, performer))
             return;
 
         _popupSystem.PopupEntity(Loc.GetString("cpr-start-second-person", ("target", target)), target, performer);
         _popupSystem.PopupEntity(Loc.GetString("cpr-start-second-person-patient", ("user", performer)), target, target);
 
         var doAfterArgs = new DoAfterArgs(
-            EntityManager, performer, performer.Comp.DoAfterDuration, new CPRDoAfterEvent(), performer, target,
+            EntityManager,
+            performer,
+            performer.Comp.DoAfterDuration,
+            new CPRDoAfterEvent(),
+            performer,
+            target,
             performer)
         {
             BreakOnMove = true,
             NeedHand = true,
-            BlockDuplicate = true
+            BlockDuplicate = true,
         };
 
         _doAfterSystem.TryStartDoAfter(doAfterArgs);
@@ -122,14 +129,21 @@ public sealed class CPRSystem : EntitySystem
         }
 
         if (!performer.Comp.CPRHealing.Empty)
-            _damageable.TryChangeDamage(args.Target, performer.Comp.CPRHealing, true, origin: performer, targetPart: TargetBodyPart.All); // Shitmed Change
+            _damageable.TryChangeDamage(args.Target,
+                performer.Comp.CPRHealing,
+                true,
+                origin: performer,
+                targetPart: TargetBodyPart.All); // Shitmed Change
 
         if (performer.Comp.RotReductionMultiplier > 0)
+        {
             _rottingSystem.ReduceAccumulator(
-                (EntityUid)args.Target, performer.Comp.DoAfterDuration * performer.Comp.RotReductionMultiplier);
+                (EntityUid) args.Target,
+                performer.Comp.DoAfterDuration * performer.Comp.RotReductionMultiplier);
+        }
 
         if (_robustRandom.Prob(performer.Comp.ResuscitationChance)
-            && _mobThreshold.TryGetThresholdForState((EntityUid)args.Target, MobState.Dead, out var threshold)
+            && _mobThreshold.TryGetThresholdForState((EntityUid) args.Target, MobState.Dead, out var threshold)
             && TryComp<DamageableComponent>(args.Target, out var damageableComponent)
             && TryComp<MobStateComponent>(args.Target, out var state)
             && !HasComp<UnrevivableComponent>(args.Target)

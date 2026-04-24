@@ -14,9 +14,7 @@ public sealed partial class PathfindingSystem
     private PathResult UpdateBFSPath(IRobustRandom random, BFSPathRequest request)
     {
         if (request.Task.IsCanceled)
-        {
             return PathResult.NoPath;
-        }
 
         // TODO: Need partial planning that uses best node.
         PathPoly? currentNode = null;
@@ -32,22 +30,16 @@ public sealed partial class PathfindingSystem
         {
             // Theoretically this shouldn't be happening, but practically...
             if (request.Frontier.Count == 0)
-            {
                 return PathResult.NoPath;
-            }
 
             (_, currentNode) = request.Frontier.Peek();
 
             if (!currentNode.IsValid())
-            {
                 return PathResult.NoPath;
-            }
 
             // Re-validate parents too.
             if (request.CameFrom.TryGetValue(currentNode, out var parentNode) && !parentNode.IsValid())
-            {
                 return PathResult.NoPath;
-            }
         }
 
         DebugTools.Assert(!request.Task.IsCompleted);
@@ -56,9 +48,7 @@ public sealed partial class PathfindingSystem
         var startNode = GetPoly(request.Start);
 
         if (startNode == null)
-        {
             return PathResult.NoPath;
-        }
 
         request.Frontier.Add((0.0f, startNode));
         request.CostSoFar[startNode] = 0.0f;
@@ -84,18 +74,14 @@ public sealed partial class PathfindingSystem
                 var tileCost = GetTileCost(request, currentNode, neighbor);
 
                 if (tileCost.Equals(0f))
-                {
                     continue;
-                }
 
                 // f = g + h
                 // gScore is distance to the start node
                 // hScore is distance to the end node
                 var gScore = request.CostSoFar[currentNode] + tileCost;
                 if (request.CostSoFar.TryGetValue(neighbor, out var nextValue) && gScore >= nextValue)
-                {
                     continue;
-                }
 
                 request.CameFrom[neighbor] = currentNode;
                 request.CostSoFar[neighbor] = gScore;
@@ -104,9 +90,7 @@ public sealed partial class PathfindingSystem
         }
 
         if (request.CostSoFar.Count == 0)
-        {
             return PathResult.NoPath;
-        }
 
         // Pick a random node to use?
         (currentNode, _) = random.Pick(request.CostSoFar);
@@ -118,9 +102,7 @@ public sealed partial class PathfindingSystem
         {
             // Due to partial planning some nodes may have been invalidated.
             if (!node.IsValid())
-            {
                 return PathResult.NoPath;
-            }
 
             path.Enqueue(node.Coordinates);
         }

@@ -87,7 +87,6 @@ using Content.Shared.Power.Generator;
 using Content.Shared.Verbs;
 using Robust.Server.Audio;
 using Robust.Server.GameObjects;
-using Robust.Shared.Player;
 using Robust.Shared.Random;
 using Robust.Shared.Utility;
 
@@ -96,17 +95,17 @@ namespace Content.Server.Power.Generator;
 /// <summary>
 /// Implements logic for portable generators (the PACMAN). Primarily UI & power switching behavior.
 /// </summary>
-/// <seealso cref="PortableGeneratorComponent"/>
+/// <seealso cref="PortableGeneratorComponent" />
 public sealed class PortableGeneratorSystem : SharedPortableGeneratorSystem
 {
-    [Dependency] private readonly UserInterfaceSystem _uiSystem = default!;
-    [Dependency] private readonly PopupSystem _popup = default!;
-    [Dependency] private readonly DoAfterSystem _doAfter = default!;
     [Dependency] private readonly AudioSystem _audio = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly DoAfterSystem _doAfter = default!;
     [Dependency] private readonly GeneratorSystem _generator = default!;
-    [Dependency] private readonly PowerSwitchableSystem _switchable = default!;
+    [Dependency] private readonly PopupSystem _popup = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly ActiveGeneratorRevvingSystem _revving = default!;
+    [Dependency] private readonly PowerSwitchableSystem _switchable = default!;
+    [Dependency] private readonly UserInterfaceSystem _uiSystem = default!;
 
     public override void Initialize()
     {
@@ -121,12 +120,15 @@ public sealed class PortableGeneratorSystem : SharedPortableGeneratorSystem
         SubscribeLocalEvent<PortableGeneratorComponent, AutoGeneratorStartedEvent>(OnAutoGeneratorStarted);
         SubscribeLocalEvent<PortableGeneratorComponent, PortableGeneratorStartMessage>(GeneratorStartMessage);
         SubscribeLocalEvent<PortableGeneratorComponent, PortableGeneratorStopMessage>(GeneratorStopMessage);
-        SubscribeLocalEvent<PortableGeneratorComponent, PortableGeneratorSwitchOutputMessage>(GeneratorSwitchOutputMessage);
+        SubscribeLocalEvent<PortableGeneratorComponent, PortableGeneratorSwitchOutputMessage>(
+            GeneratorSwitchOutputMessage);
 
         SubscribeLocalEvent<FuelGeneratorComponent, SwitchPowerCheckEvent>(OnSwitchPowerCheck);
     }
 
-    private void GeneratorSwitchOutputMessage(EntityUid uid, PortableGeneratorComponent component, PortableGeneratorSwitchOutputMessage args)
+    private void GeneratorSwitchOutputMessage(EntityUid uid,
+        PortableGeneratorComponent component,
+        PortableGeneratorSwitchOutputMessage args)
     {
         var fuelGenerator = Comp<FuelGeneratorComponent>(uid);
         if (fuelGenerator.On)
@@ -135,15 +137,13 @@ public sealed class PortableGeneratorSystem : SharedPortableGeneratorSystem
         _switchable.Cycle(uid, args.Actor);
     }
 
-    private void GeneratorStopMessage(EntityUid uid, PortableGeneratorComponent component, PortableGeneratorStopMessage args)
-    {
-        StopGenerator(uid, component, args.Actor);
-    }
+    private void GeneratorStopMessage(EntityUid uid,
+        PortableGeneratorComponent component,
+        PortableGeneratorStopMessage args) => StopGenerator(uid, component, args.Actor);
 
-    private void GeneratorStartMessage(EntityUid uid, PortableGeneratorComponent component, PortableGeneratorStartMessage args)
-    {
-        StartGenerator(uid, component, args.Actor);
-    }
+    private void GeneratorStartMessage(EntityUid uid,
+        PortableGeneratorComponent component,
+        PortableGeneratorStartMessage args) => StartGenerator(uid, component, args.Actor);
 
     private void StartGenerator(EntityUid uid, PortableGeneratorComponent component, EntityUid user)
     {
@@ -151,19 +151,18 @@ public sealed class PortableGeneratorSystem : SharedPortableGeneratorSystem
         if (fuelGenerator.On || !Transform(uid).Anchored)
             return;
 
-        _doAfter.TryStartDoAfter(new DoAfterArgs(EntityManager, user, component.StartTime, new GeneratorStartedEvent(), uid, uid)
-        {
-            BreakOnDamage = true,
-            BreakOnMove = true,
-            NeedHand = true,
-            BreakOnDropItem = false,
-        });
+        _doAfter.TryStartDoAfter(
+            new DoAfterArgs(EntityManager, user, component.StartTime, new GeneratorStartedEvent(), uid, uid)
+            {
+                BreakOnDamage = true,
+                BreakOnMove = true,
+                NeedHand = true,
+                BreakOnDropItem = false,
+            });
     }
 
-    private void StopGenerator(EntityUid uid, PortableGeneratorComponent component, EntityUid user)
-    {
+    private void StopGenerator(EntityUid uid, PortableGeneratorComponent component, EntityUid user) =>
         _generator.SetFuelGeneratorOn(uid, false);
-    }
 
     private void OnGeneratorStarted(EntityUid uid, PortableGeneratorComponent component, GeneratorStartedEvent args)
     {
@@ -173,7 +172,9 @@ public sealed class PortableGeneratorSystem : SharedPortableGeneratorSystem
         GeneratorTugged(uid, component, args.User, out args.Repeat);
     }
 
-    private void OnAutoGeneratorStarted(EntityUid uid, PortableGeneratorComponent component, ref AutoGeneratorStartedEvent args)
+    private void OnAutoGeneratorStarted(EntityUid uid,
+        PortableGeneratorComponent component,
+        ref AutoGeneratorStartedEvent args)
     {
         GeneratorTugged(uid, component, null, out var repeat);
 
@@ -207,7 +208,6 @@ public sealed class PortableGeneratorSystem : SharedPortableGeneratorSystem
                 return;
 
             _popup.PopupEntity(Loc.GetString("portable-generator-start-success"), uid, user.Value);
-
         }
         else
         {
@@ -221,7 +221,8 @@ public sealed class PortableGeneratorSystem : SharedPortableGeneratorSystem
         }
     }
 
-    private void GetAlternativeVerb(EntityUid uid, PortableGeneratorComponent component,
+    private void GetAlternativeVerb(EntityUid uid,
+        PortableGeneratorComponent component,
         GetVerbsEvent<AlternativeVerb> args)
     {
         if (!args.CanAccess || !args.CanInteract)
@@ -237,7 +238,7 @@ public sealed class PortableGeneratorSystem : SharedPortableGeneratorSystem
                     StopGenerator(uid, component, args.User);
                 },
                 Disabled = false,
-                Icon = new SpriteSpecifier.Texture(new("/Textures/Interface/VerbIcons/zap.svg.192dpi.png")),
+                Icon = new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/VerbIcons/zap.svg.192dpi.png")),
                 Text = Loc.GetString("portable-generator-verb-stop"),
             };
 
@@ -255,7 +256,7 @@ public sealed class PortableGeneratorSystem : SharedPortableGeneratorSystem
                     StartGenerator(uid, component, args.User);
                 },
 
-                Icon = new SpriteSpecifier.Texture(new("/Textures/Interface/VerbIcons/zap.svg.192dpi.png")),
+                Icon = new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/VerbIcons/zap.svg.192dpi.png")),
                 Text = Loc.GetString("portable-generator-verb-start"),
             };
 

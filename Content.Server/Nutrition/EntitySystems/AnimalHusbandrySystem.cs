@@ -33,26 +33,26 @@ using Robust.Shared.Timing;
 namespace Content.Server.Nutrition.EntitySystems;
 
 /// <summary>
-/// This handles logic and interactions related to <see cref="ReproductiveComponent"/>
+/// This handles logic and interactions related to <see cref="ReproductiveComponent" />
 /// </summary>
 public sealed class AnimalHusbandrySystem : EntitySystem
 {
-    [Dependency] private readonly EntityLookupSystem _entityLookup = default!;
-    [Dependency] private readonly HungerSystem _hunger = default!;
     [Dependency] private readonly IAdminLogManager _adminLog = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly MobStateSystem _mobState = default!;
-    [Dependency] private readonly PopupSystem _popup = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
-    [Dependency] private readonly NameModifierSystem _nameMod = default!;
+    private readonly HashSet<EntityUid> _birthQueue = new();
+    [Dependency] private readonly EntityLookupSystem _entityLookup = default!;
 
     private readonly HashSet<EntityUid> _failedAttempts = new();
-    private readonly HashSet<EntityUid> _birthQueue = new();
+    [Dependency] private readonly HungerSystem _hunger = default!;
+    [Dependency] private readonly MobStateSystem _mobState = default!;
+    [Dependency] private readonly NameModifierSystem _nameMod = default!;
+    [Dependency] private readonly PopupSystem _popup = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
+    [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         SubscribeLocalEvent<ReproductiveComponent, MindAddedMessage>(OnMindAdded);
@@ -100,6 +100,7 @@ public sealed class AnimalHusbandrySystem : EntitySystem
             if (_failedAttempts.Contains(uid))
                 return false;
         }
+
         return false;
     }
 
@@ -140,7 +141,8 @@ public sealed class AnimalHusbandrySystem : EntitySystem
 
         component.GestationEndTime = _timing.CurTime + component.GestationDuration;
         component.Gestating = true;
-        _adminLog.Add(LogType.Action, $"{ToPrettyString(uid)} (carrier) and {ToPrettyString(partner)} (partner) successfully bred.");
+        _adminLog.Add(LogType.Action,
+            $"{ToPrettyString(uid)} (carrier) and {ToPrettyString(partner)} (partner) successfully bred.");
         return true;
     }
 
@@ -212,6 +214,7 @@ public sealed class AnimalHusbandrySystem : EntitySystem
                 // Make sure the name prefix is applied
                 _nameMod.RefreshNameModifiers(offspring);
             }
+
             _adminLog.Add(LogType.Action, $"{ToPrettyString(uid)} gave birth to {ToPrettyString(offspring)}.");
         }
 
@@ -232,13 +235,12 @@ public sealed class AnimalHusbandrySystem : EntitySystem
         while (query.MoveNext(out var uid, out var reproductive))
         {
             if (reproductive.GestationEndTime != null && _timing.CurTime >= reproductive.GestationEndTime)
-            {
                 _birthQueue.Add(uid);
-            }
 
             if (_timing.CurTime < reproductive.NextBreedAttempt)
                 continue;
-            reproductive.NextBreedAttempt += _random.Next(reproductive.MinBreedAttemptInterval, reproductive.MaxBreedAttemptInterval);
+            reproductive.NextBreedAttempt +=
+                _random.Next(reproductive.MinBreedAttemptInterval, reproductive.MaxBreedAttemptInterval);
 
             // no.
             if (HasComp<ActorComponent>(uid) || TryComp<MindContainerComponent>(uid, out var mind) && mind.HasMind)

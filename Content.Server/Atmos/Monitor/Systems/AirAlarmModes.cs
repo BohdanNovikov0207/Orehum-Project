@@ -22,8 +22,8 @@ using Content.Shared.Atmos.Piping.Unary.Components;
 namespace Content.Server.Atmos.Monitor;
 
 /// <summary>
-///     This is an interface that air alarm modes use
-///     in order to execute the defined modes.
+/// This is an interface that air alarm modes use
+/// in order to execute the defined modes.
 /// </summary>
 public interface IAirAlarmMode
 {
@@ -32,11 +32,11 @@ public interface IAirAlarmMode
     // modes such as Filter/Panic are immediately
     // set.
     /// <summary>
-    ///     Executed the mode is set on an air alarm.
-    ///     This is to ensure that modes like Filter/Panic
-    ///     are immediately set.
+    /// Executed the mode is set on an air alarm.
+    /// This is to ensure that modes like Filter/Panic
+    /// are immediately set.
     /// </summary>
-    public void Execute(EntityUid uid);
+    void Execute(EntityUid uid);
 }
 
 // IAirAlarmModeUpdate
@@ -45,60 +45,57 @@ public interface IAirAlarmMode
 // in order to 'update' air alarm modes so that
 // modes like Replace can be implemented.
 /// <summary>
-///     An interface that AirAlarmSystem uses
-///     in order to update air alarm modes that
-///     need updating (e.g., Replace)
+/// An interface that AirAlarmSystem uses
+/// in order to update air alarm modes that
+/// need updating (e.g., Replace)
 /// </summary>
 public interface IAirAlarmModeUpdate
 {
     /// <summary>
-    ///     This is checked by AirAlarmSystem when
-    ///     a mode is updated. This should be set
-    ///     to a DeviceNetwork address, or some
-    ///     unique identifier that ID's the
-    ///     owner of the mode's executor.
+    /// This is checked by AirAlarmSystem when
+    /// a mode is updated. This should be set
+    /// to a DeviceNetwork address, or some
+    /// unique identifier that ID's the
+    /// owner of the mode's executor.
     /// </summary>
-    public string NetOwner { get; set; }
+    string NetOwner { get; set; }
+
     /// <summary>
-    ///     This is executed every time the air alarm
-    ///     update loop is fully executed. This should
-    ///     be where all the logic goes.
+    /// This is executed every time the air alarm
+    /// update loop is fully executed. This should
+    /// be where all the logic goes.
     /// </summary>
-    public void Update(EntityUid uid);
+    void Update(EntityUid uid);
 }
 
 public sealed class AirAlarmModeFactory
 {
-    private static IAirAlarmMode _filterMode = new AirAlarmFilterMode();
-    private static IAirAlarmMode _wideFilterMode = new AirAlarmWideFilterMode();
-    private static IAirAlarmMode _fillMode = new AirAlarmFillMode();
-    private static IAirAlarmMode _panicMode = new AirAlarmPanicMode();
-    private static IAirAlarmMode _noneMode = new AirAlarmNoneMode();
+    private static readonly IAirAlarmMode _filterMode = new AirAlarmFilterMode();
+    private static readonly IAirAlarmMode _wideFilterMode = new AirAlarmWideFilterMode();
+    private static readonly IAirAlarmMode _fillMode = new AirAlarmFillMode();
+    private static readonly IAirAlarmMode _panicMode = new AirAlarmPanicMode();
+    private static readonly IAirAlarmMode _noneMode = new AirAlarmNoneMode();
 
     // still not a fan since ReplaceMode must have an allocation
     // but it's whatever
-    public static IAirAlarmMode? ModeToExecutor(AirAlarmMode mode)
-    {
-        return mode switch
+    public static IAirAlarmMode? ModeToExecutor(AirAlarmMode mode) =>
+        mode switch
         {
             AirAlarmMode.Filtering => _filterMode,
             AirAlarmMode.WideFiltering => _wideFilterMode,
             AirAlarmMode.Fill => _fillMode,
             AirAlarmMode.Panic => _panicMode,
             AirAlarmMode.None => _noneMode,
-            _ => null
+            _ => null,
         };
-    }
 }
 
 // like a tiny little EntitySystem
 public abstract class AirAlarmModeExecutor : IAirAlarmMode
 {
-    [Dependency] public readonly IEntityManager EntityManager = default!;
-    public readonly DeviceNetworkSystem DeviceNetworkSystem;
     public readonly AirAlarmSystem AirAlarmSystem;
-
-    public abstract void Execute(EntityUid uid);
+    public readonly DeviceNetworkSystem DeviceNetworkSystem;
+    [Dependency] public readonly IEntityManager EntityManager = default!;
 
     public AirAlarmModeExecutor()
     {
@@ -107,6 +104,8 @@ public abstract class AirAlarmModeExecutor : IAirAlarmMode
         DeviceNetworkSystem = EntityManager.System<DeviceNetworkSystem>();
         AirAlarmSystem = EntityManager.System<AirAlarmSystem>();
     }
+
+    public abstract void Execute(EntityUid uid);
 }
 
 public sealed class AirAlarmNoneMode : AirAlarmModeExecutor

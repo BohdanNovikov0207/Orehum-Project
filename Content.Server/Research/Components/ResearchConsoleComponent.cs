@@ -40,6 +40,6 @@ public sealed partial class ResearchConsoleComponent : Component
     /// <summary>
     /// The radio channel that the unlock announcements are broadcast to.
     /// </summary>
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    [DataField] [ViewVariables(VVAccess.ReadWrite)]
     public ProtoId<RadioChannelPrototype> AnnouncementChannel = "Science";
 }

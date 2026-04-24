@@ -22,17 +22,13 @@ public sealed class AstroNavCartridgeSystem : EntitySystem
         SubscribeLocalEvent<AstroNavCartridgeComponent, CartridgeRemovedEvent>(OnCartridgeRemoved);
     }
 
-    private void OnCartridgeAdded(Entity<AstroNavCartridgeComponent> ent, ref CartridgeAddedEvent args)
-    {
+    private void OnCartridgeAdded(Entity<AstroNavCartridgeComponent> ent, ref CartridgeAddedEvent args) =>
         EnsureComp<HandheldGPSComponent>(args.Loader);
-    }
 
     private void OnCartridgeRemoved(Entity<AstroNavCartridgeComponent> ent, ref CartridgeRemovedEvent args)
     {
         // only remove when the program itself is removed
         if (!_cartridgeLoaderSystem.HasProgram<AstroNavCartridgeComponent>(args.Loader))
-        {
             RemComp<HandheldGPSComponent>(args.Loader);
-        }
     }
 }

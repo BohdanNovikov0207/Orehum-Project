@@ -10,18 +10,36 @@
 using Robust.Shared.Reflection;
 using Robust.Shared.Serialization;
 using Robust.Shared.Serialization.Manager;
-using Robust.Shared.Serialization.Markdown;
 using Robust.Shared.Serialization.Markdown.Mapping;
 using Robust.Shared.Serialization.Markdown.Validation;
 using Robust.Shared.Serialization.TypeSerializers.Interfaces;
-using Robust.Shared.Utility;
 
 namespace Content.Server.NPC;
 
 public sealed class NPCBlackboardSerializer : ITypeReader<NPCBlackboard, MappingDataNode>, ITypeCopier<NPCBlackboard>
 {
-    public ValidationNode Validate(ISerializationManager serializationManager, MappingDataNode node,
-        IDependencyCollection dependencies, ISerializationContext? context = null)
+    public void CopyTo(
+        ISerializationManager serializationManager,
+        NPCBlackboard source,
+        ref NPCBlackboard target,
+        IDependencyCollection dependencies,
+        SerializationHookContext hookCtx,
+        ISerializationContext? context = null)
+    {
+        target.Clear();
+        using var enumerator = source.GetEnumerator();
+
+        while (enumerator.MoveNext())
+        {
+            var current = enumerator.Current;
+            target.SetValue(current.Key, current.Value);
+        }
+    }
+
+    public ValidationNode Validate(ISerializationManager serializationManager,
+        MappingDataNode node,
+        IDependencyCollection dependencies,
+        ISerializationContext? context = null)
     {
         var validated = new List<ValidationNode>();
 
@@ -55,9 +73,11 @@ public sealed class NPCBlackboardSerializer : ITypeReader<NPCBlackboard, Mapping
         return new ValidatedSequenceNode(validated);
     }
 
-    public NPCBlackboard Read(ISerializationManager serializationManager, MappingDataNode node,
+    public NPCBlackboard Read(ISerializationManager serializationManager,
+        MappingDataNode node,
         IDependencyCollection dependencies,
-        SerializationHookContext hookCtx, ISerializationContext? context = null,
+        SerializationHookContext hookCtx,
+        ISerializationContext? context = null,
         ISerializationManager.InstantiationDelegate<NPCBlackboard>? instanceProvider = null)
     {
         var value = instanceProvider != null ? instanceProvider() : new NPCBlackboard();
@@ -88,23 +108,5 @@ public sealed class NPCBlackboardSerializer : ITypeReader<NPCBlackboard, Mapping
         }
 
         return value;
-    }
-
-    public void CopyTo(
-        ISerializationManager serializationManager,
-        NPCBlackboard source,
-        ref NPCBlackboard target,
-        IDependencyCollection dependencies,
-        SerializationHookContext hookCtx,
-        ISerializationContext? context = null)
-    {
-        target.Clear();
-        using var enumerator = source.GetEnumerator();
-
-        while (enumerator.MoveNext())
-        {
-            var current = enumerator.Current;
-            target.SetValue(current.Key, current.Value);
-        }
     }
 }

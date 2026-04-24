@@ -22,9 +22,7 @@ public sealed partial class WaitOperator : HTNOperator
     public override HTNOperatorStatus Update(NPCBlackboard blackboard, float frameTime)
     {
         if (!blackboard.TryGetValue<float>(Key, out var timer, _entManager))
-        {
             return HTNOperatorStatus.Finished;
-        }
 
         timer -= frameTime;
         blackboard.SetValue(Key, timer);
@@ -38,8 +36,6 @@ public sealed partial class WaitOperator : HTNOperator
 
         // The replacement plan may want this value so only dump it if we're successful.
         if (status != HTNOperatorStatus.BetterPlan)
-        {
             blackboard.Remove<float>(Key);
-        }
     }
 }

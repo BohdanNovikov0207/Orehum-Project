@@ -7,7 +7,6 @@
 using Content.Server.Atmos.Monitor.Components;
 using Content.Server.Atmos.Monitor.Systems;
 using Content.Server.Atmos.Piping.Components;
-using Content.Server.Atmos.Piping.Unary.Components;
 using Content.Server.DeviceNetwork.Systems;
 using Content.Server.Power.Generation.Teg;
 using Content.Shared.Atmos.Monitor;
@@ -26,6 +25,11 @@ namespace Content.Server.SensorMonitoring;
 
 public sealed partial class SensorMonitoringConsoleSystem : EntitySystem
 {
+    [Dependency] private readonly DeviceNetworkSystem _deviceNetwork = default!;
+
+    [Dependency] private readonly IGameTiming _gameTiming = default!;
+
+    [Dependency] private readonly UserInterfaceSystem _userInterface = default!;
     // TODO: THIS THING IS HEAVILY WIP AND NOT READY FOR GENERAL USE BY PLAYERS.
     // Some of the issues, off the top of my head:
     // Way too huge network load when opened
@@ -34,10 +38,6 @@ public sealed partial class SensorMonitoringConsoleSystem : EntitySystem
     // UI sucks. need a way to make basic dashboards like Grafana, and save them.
 
     private EntityQuery<DeviceNetworkComponent> _deviceNetworkQuery;
-
-    [Dependency] private readonly IGameTiming _gameTiming = default!;
-    [Dependency] private readonly DeviceNetworkSystem _deviceNetwork = default!;
-    [Dependency] private readonly UserInterfaceSystem _userInterface = default!;
 
     public override void Initialize()
     {
@@ -94,10 +94,8 @@ public sealed partial class SensorMonitoringConsoleSystem : EntitySystem
     private void DeviceListUpdated(
         EntityUid uid,
         SensorMonitoringConsoleComponent component,
-        DeviceListUpdateEvent args)
-    {
+        DeviceListUpdateEvent args) =>
         UpdateDevices(uid, component, args.Devices, args.OldDevices);
-    }
 
     private void UpdateDevices(
         EntityUid uid,
@@ -153,7 +151,8 @@ public sealed partial class SensorMonitoringConsoleSystem : EntitySystem
         return SensorDeviceType.Unknown;
     }
 
-    private void DevicePacketReceived(EntityUid uid, SensorMonitoringConsoleComponent component,
+    private void DevicePacketReceived(EntityUid uid,
+        SensorMonitoringConsoleComponent component,
         DeviceNetworkPacketEvent args)
     {
         if (!component.Sensors.TryGetValue(args.Sender, out var sensorData))
@@ -230,7 +229,8 @@ public sealed partial class SensorMonitoringConsoleSystem : EntitySystem
                 if (command != BatterySensorSystem.DeviceNetworkCommandSyncData)
                     return;
 
-                if (!args.Data.TryGetValue(BatterySensorSystem.DeviceNetworkCommandSyncData, out BatterySensorData? batteryData))
+                if (!args.Data.TryGetValue(BatterySensorSystem.DeviceNetworkCommandSyncData,
+                        out BatterySensorData? batteryData))
                     return;
 
                 // @formatter:off
@@ -264,10 +264,7 @@ public sealed partial class SensorMonitoringConsoleSystem : EntitySystem
         stream.Samples.Enqueue(new SensorSample(time, value));
     }
 
-    private static int MakeNetId(SensorMonitoringConsoleComponent component)
-    {
-        return ++component.IdCounter;
-    }
+    private static int MakeNetId(SensorMonitoringConsoleComponent component) => ++component.IdCounter;
 
     private void AtmosUpdate(
         EntityUid uid,
@@ -283,7 +280,7 @@ public sealed partial class SensorMonitoringConsoleSystem : EntitySystem
                 case SensorDeviceType.Teg:
                     payload = new NetworkPayload
                     {
-                        [DeviceNetworkConstants.Command] = TegSystem.DeviceNetworkCommandSyncData
+                        [DeviceNetworkConstants.Command] = TegSystem.DeviceNetworkCommandSyncData,
                     };
                     break;
 
@@ -292,7 +289,7 @@ public sealed partial class SensorMonitoringConsoleSystem : EntitySystem
                 case SensorDeviceType.VolumePump:
                     payload = new NetworkPayload
                     {
-                        [DeviceNetworkConstants.Command] = AtmosDeviceNetworkSystem.SyncData
+                        [DeviceNetworkConstants.Command] = AtmosDeviceNetworkSystem.SyncData,
                     };
                     break;
 
@@ -317,7 +314,7 @@ public sealed partial class SensorMonitoringConsoleSystem : EntitySystem
                 case SensorDeviceType.Battery:
                     payload = new NetworkPayload
                     {
-                        [DeviceNetworkConstants.Command] = BatterySensorSystem.DeviceNetworkCommandSyncData
+                        [DeviceNetworkConstants.Command] = BatterySensorSystem.DeviceNetworkCommandSyncData,
                     };
                     break;
 

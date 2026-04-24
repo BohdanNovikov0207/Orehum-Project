@@ -1,4 +1,5 @@
 ﻿using Content.Corvax.Interfaces.Shared;
+using Content.Shared.Backmen.CCVar;
 using Content.Shared.Backmen.GhostTheme;
 using Content.Shared.Ghost;
 using Robust.Server.Configuration;
@@ -12,10 +13,10 @@ namespace Content.Server.Backmen.GhostTheme;
 
 public sealed class GhostThemeSystem : EntitySystem
 {
-    [Dependency] private readonly ISharedSponsorsManager _sponsorsMgr = default!; // Corvax-Sponsors
+    [Dependency] private readonly IServerNetConfigurationManager _netConfigManager = default!;
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly ISerializationManager _serialization = default!;
-    [Dependency] private readonly IServerNetConfigurationManager _netConfigManager = default!;
+    [Dependency] private readonly ISharedSponsorsManager _sponsorsMgr = default!; // Corvax-Sponsors
 
     public override void Initialize()
     {
@@ -25,7 +26,7 @@ public sealed class GhostThemeSystem : EntitySystem
 
     private void OnPlayerAttached(EntityUid uid, GhostComponent component, PlayerAttachedEvent args)
     {
-        var prefGhost = _netConfigManager.GetClientCVar(args.Player.Channel, Shared.Backmen.CCVar.CCVars.SponsorsSelectedGhost);
+        var prefGhost = _netConfigManager.GetClientCVar(args.Player.Channel, CCVars.SponsorsSelectedGhost);
         {
 #if DEBUG
             if (!_sponsorsMgr.TryGetServerPrototypes(args.Player.UserId, out var items))
@@ -42,21 +43,17 @@ public sealed class GhostThemeSystem : EntitySystem
             }
 #else
             if (!_sponsorsMgr.TryGetServerPrototypes(args.Player.UserId, out var items) || !items.Contains(prefGhost))
-            {
                 prefGhost = "";
-            }
 #endif
         }
 
         GhostThemePrototype? ghostThemePrototype = null;
-        if (string.IsNullOrEmpty(prefGhost) || !_prototypeManager.TryIndex<GhostThemePrototype>(prefGhost, out ghostThemePrototype))
+        if (string.IsNullOrEmpty(prefGhost) || !_prototypeManager.TryIndex(prefGhost, out ghostThemePrototype))
         {
             if (!_sponsorsMgr.TryGetGhostTheme(args.Player.UserId, out var ghostTheme) ||
                 !_prototypeManager.TryIndex(ghostTheme, out ghostThemePrototype)
                )
-            {
                 return;
-            }
         }
 
         foreach (var entry in ghostThemePrototype.Components.Values)

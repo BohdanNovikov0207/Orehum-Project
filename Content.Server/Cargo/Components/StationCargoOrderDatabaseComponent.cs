@@ -30,24 +30,6 @@ public sealed partial class StationCargoOrderDatabaseComponent : Component
     [DataField]
     public int Capacity = 20;
 
-    [ViewVariables]
-    public IEnumerable<CargoOrderData> AllOrders => Orders.SelectMany(p => p.Value);
-
-    [DataField]
-    public Dictionary<ProtoId<CargoAccountPrototype>, List<CargoOrderData>> Orders = new();
-
-    /// <summary>
-    /// Used to determine unique order IDs
-    /// </summary>
-    [ViewVariables]
-    public int NumOrdersCreated;
-
-    /// <summary>
-    ///     GoobStation - Tracks next time that a product on cooldown can be ordered.
-    /// </summary>
-    [ViewVariables(VVAccess.ReadOnly), DataField]
-    public Dictionary<string, TimeSpan> ProductCooldownTime = new Dictionary<string, TimeSpan>();
-
     /// <summary>
     /// An all encompassing determiner of what markets can be ordered from.
     /// Not every console can order from every market, but a console can't order from a market not on this list.
@@ -58,6 +40,27 @@ public sealed partial class StationCargoOrderDatabaseComponent : Component
         "market",
     };
 
+    /// <summary>
+    /// Used to determine unique order IDs
+    /// </summary>
+    [ViewVariables]
+    public int NumOrdersCreated;
+
+    [DataField]
+    public Dictionary<ProtoId<CargoAccountPrototype>, List<CargoOrderData>> Orders = new();
+
+    /// <summary>
+    /// The paper-type prototype to spawn with the order information.
+    /// </summary>
+    [DataField]
+    public EntProtoId PrinterOutput = "PaperCargoInvoice";
+
+    /// <summary>
+    /// GoobStation - Tracks next time that a product on cooldown can be ordered.
+    /// </summary>
+    [ViewVariables(VVAccess.ReadOnly)] [DataField]
+    public Dictionary<string, TimeSpan> ProductCooldownTime = new();
+
     // TODO: Can probably dump this
     /// <summary>
     /// The cargo shuttle assigned to this station.
@@ -65,23 +68,22 @@ public sealed partial class StationCargoOrderDatabaseComponent : Component
     [DataField("shuttle")]
     public EntityUid? Shuttle;
 
-    /// <summary>
-    ///     The paper-type prototype to spawn with the order information.
-    /// </summary>
-    [DataField]
-    public EntProtoId PrinterOutput = "PaperCargoInvoice";
+    [ViewVariables]
+    public IEnumerable<CargoOrderData> AllOrders => Orders.SelectMany(p => p.Value);
 }
 
 /// <summary>
 /// Event broadcast before a cargo order is fulfilled, allowing alternate systems to fulfill the order.
 /// </summary>
 [ByRefEvent]
-public record struct FulfillCargoOrderEvent(Entity<StationDataComponent> Station, CargoOrderData Order, Entity<CargoOrderConsoleComponent> OrderConsole)
+public record struct FulfillCargoOrderEvent(
+    Entity<StationDataComponent> Station,
+    CargoOrderData Order,
+    Entity<CargoOrderConsoleComponent> OrderConsole)
 {
-    public Entity<CargoOrderConsoleComponent> OrderConsole = OrderConsole;
-    public Entity<StationDataComponent> Station = Station;
-    public CargoOrderData Order = Order;
-
     public EntityUid? FulfillmentEntity;
     public bool Handled = false;
+    public CargoOrderData Order = Order;
+    public Entity<CargoOrderConsoleComponent> OrderConsole = OrderConsole;
+    public Entity<StationDataComponent> Station = Station;
 }

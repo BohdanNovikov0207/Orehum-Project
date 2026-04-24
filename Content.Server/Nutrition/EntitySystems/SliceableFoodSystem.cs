@@ -90,36 +90,37 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Server.DoAfter;
 using Content.Server.Nutrition.Components;
+using Content.Shared.Chemistry.Components;
 using Content.Shared.Chemistry.EntitySystems;
+using Content.Shared.Destructible;
+using Content.Shared.DoAfter;
+using Content.Shared.Interaction;
 using Content.Shared.Nutrition;
 using Content.Shared.Nutrition.Components;
-using Content.Shared.Chemistry.Components;
-using Content.Shared.DoAfter;
-using Content.Goobstation.Maths.FixedPoint;
-using Content.Shared.Interaction;
 using Robust.Server.GameObjects;
 using Robust.Shared.Audio;
 using Robust.Shared.Audio.Systems;
-using Robust.Shared.Random;
 using Robust.Shared.Containers;
 using Robust.Shared.Physics.Components;
 using Robust.Shared.Physics.Systems;
-using Content.Shared.Destructible;
+using Robust.Shared.Random;
 
 namespace Content.Server.Nutrition.EntitySystems;
 
 public sealed class SliceableFoodSystem : EntitySystem
 {
-    [Dependency] private readonly SharedSolutionContainerSystem _solutionContainer = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedDestructibleSystem _destroy = default!;
-    [Dependency] private readonly TransformSystem _transform = default!;
-    [Dependency] private readonly DoAfterSystem _doAfter = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly SharedContainerSystem _container = default!;
+    [Dependency] private readonly SharedDestructibleSystem _destroy = default!;
+    [Dependency] private readonly DoAfterSystem _doAfter = default!;
     [Dependency] private readonly SharedPhysicsSystem _physics = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly SharedSolutionContainerSystem _solutionContainer = default!;
+    [Dependency] private readonly TransformSystem _transform = default!;
+
     public override void Initialize()
     {
         base.Initialize();
@@ -165,7 +166,8 @@ public sealed class SliceableFoodSystem : EntitySystem
         EntityUid user,
         EntityUid? usedItem)
     {
-        if (!Resolve(entity, ref entity.Comp1, ref entity.Comp2, ref entity.Comp3) || string.IsNullOrEmpty(entity.Comp2.Slice))
+        if (!Resolve(entity, ref entity.Comp1, ref entity.Comp2, ref entity.Comp3) ||
+            string.IsNullOrEmpty(entity.Comp2.Slice))
             return false;
 
         if (!_solutionContainer.TryGetSolution(entity.Owner, entity.Comp3.Solution, out var soln, out var solution))
@@ -175,7 +177,7 @@ public sealed class SliceableFoodSystem : EntitySystem
             return false;
 
         var sliceVolume = solution.Volume / FixedPoint2.New(entity.Comp2.TotalCount);
-        for (int i = 0; i < entity.Comp2.TotalCount; i++)
+        for (var i = 0; i < entity.Comp2.TotalCount; i++)
         {
             var sliceUid = Slice(entity, user);
 
@@ -224,7 +226,7 @@ public sealed class SliceableFoodSystem : EntitySystem
     {
         var ev = new BeforeFullySlicedEvent
         {
-            User = user
+            User = user,
         };
         RaiseLocalEvent(uid, ev);
         if (ev.Cancelled)

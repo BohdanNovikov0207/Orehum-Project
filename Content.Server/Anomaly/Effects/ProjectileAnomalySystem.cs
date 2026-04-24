@@ -9,7 +9,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using System.Linq;
 using System.Numerics;
 using Content.Server.Anomaly.Components;
 using Content.Server.Weapons.Ranged.Systems;
@@ -23,21 +22,22 @@ using Robust.Shared.Random;
 namespace Content.Server.Anomaly.Effects;
 
 /// <summary>
-/// This handles <see cref="ProjectileAnomalyComponent"/> and the events from <seealso cref="AnomalySystem"/>
+/// This handles <see cref="ProjectileAnomalyComponent" /> and the events from <seealso cref="AnomalySystem" />
 /// </summary>
 public sealed class ProjectileAnomalySystem : EntitySystem
 {
-    [Dependency] private readonly TransformSystem _xform = default!;
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly IMapManager _mapManager = default!;
     [Dependency] private readonly GunSystem _gunSystem = default!;
-
-    private EntityQuery<TransformComponent> _xFormQuery;
-    private EntityQuery<MobStateComponent> _mobQuery;
 
     /// <summary> Pre-allocated collection for calculating entities in range. </summary>
     private readonly HashSet<EntityUid> _inRange = new();
+
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
+    [Dependency] private readonly IMapManager _mapManager = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly TransformSystem _xform = default!;
+    private EntityQuery<MobStateComponent> _mobQuery;
+
+    private EntityQuery<TransformComponent> _xFormQuery;
 
     public override void Initialize()
     {
@@ -48,19 +48,17 @@ public sealed class ProjectileAnomalySystem : EntitySystem
         _mobQuery = GetEntityQuery<MobStateComponent>();
     }
 
-    private void OnPulse(EntityUid uid, ProjectileAnomalyComponent component, ref AnomalyPulseEvent args)
-    {
+    private void OnPulse(EntityUid uid, ProjectileAnomalyComponent component, ref AnomalyPulseEvent args) =>
         ShootProjectilesAtEntities(uid, component, args.Severity * args.PowerModifier);
-    }
 
-    private void OnSupercritical(EntityUid uid, ProjectileAnomalyComponent component, ref AnomalySupercriticalEvent args)
-    {
-        ShootProjectilesAtEntities(uid, component, args.PowerModifier);
-    }
+    private void OnSupercritical(EntityUid uid,
+        ProjectileAnomalyComponent component,
+        ref AnomalySupercriticalEvent args) => ShootProjectilesAtEntities(uid, component, args.PowerModifier);
 
     private void ShootProjectilesAtEntities(EntityUid uid, ProjectileAnomalyComponent component, float severity)
     {
-        var projectileCount = (int)MathF.Round(MathHelper.Lerp(component.MinProjectiles, component.MaxProjectiles, severity));
+        var projectileCount =
+            (int) MathF.Round(MathHelper.Lerp(component.MinProjectiles, component.MaxProjectiles, severity));
 
         var xform = _xFormQuery.GetComponent(uid);
 
@@ -85,7 +83,7 @@ public sealed class ProjectileAnomalySystem : EntitySystem
                 ? _random.PickAndTake(priority)
                 : _random.Pick(_inRange);
 
-            var targetXForm= _xFormQuery.GetComponent(target);
+            var targetXForm = _xFormQuery.GetComponent(target);
             var targetCoords = targetXForm.Coordinates.Offset(_random.NextVector2(0.5f));
 
             ShootProjectile(
@@ -110,8 +108,8 @@ public sealed class ProjectileAnomalySystem : EntitySystem
         var mapPos = _xform.ToMapCoordinates(coords);
 
         var spawnCoords = _mapManager.TryFindGridAt(mapPos, out var gridUid, out _)
-                ? _xform.WithEntityId(coords, gridUid)
-                : new(_mapManager.GetMapEntityId(mapPos.MapId), mapPos.Position);
+            ? _xform.WithEntityId(coords, gridUid)
+            : new EntityCoordinates(_mapManager.GetMapEntityId(mapPos.MapId), mapPos.Position);
 
         var ent = Spawn(component.ProjectilePrototype, spawnCoords);
         var direction = _xform.ToMapCoordinates(targetCoords).Position - mapPos.Position;

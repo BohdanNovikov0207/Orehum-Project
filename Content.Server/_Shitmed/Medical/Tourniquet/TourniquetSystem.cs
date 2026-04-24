@@ -12,6 +12,7 @@ using Content.Shared._Shitmed.Medical.Surgery.Traumas.Components;
 using Content.Shared._Shitmed.Medical.Surgery.Wounds.Components;
 using Content.Shared._Shitmed.Medical.Surgery.Wounds.Systems;
 using Content.Shared._Shitmed.Targeting;
+using Content.Shared._Shitmed.Tourniquet;
 using Content.Shared.Body.Components;
 using Content.Shared.Body.Part;
 using Content.Shared.Body.Systems;
@@ -20,7 +21,6 @@ using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Interaction;
 using Content.Shared.Interaction.Events;
 using Content.Shared.Popups;
-using Content.Shared._Shitmed.Tourniquet;
 using Content.Shared.Verbs;
 using Robust.Shared.Audio;
 using Robust.Shared.Audio.Systems;
@@ -34,17 +34,16 @@ namespace Content.Server._Shitmed.Medical.Tourniquet;
 /// </summary>
 public sealed class TourniquetSystem : EntitySystem
 {
+    private const string TourniquetContainerId = "Tourniquet";
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly BloodstreamSystem _bloodstream = default!;
     [Dependency] private readonly SharedBodySystem _body = default!;
-    [Dependency] private readonly WoundSystem _wound = default!;
     [Dependency] private readonly SharedContainerSystem _container = default!;
     [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedHandsSystem _hands = default!;
     [Dependency] private readonly PainSystem _pain = default!;
-    [Dependency] private readonly BloodstreamSystem _bloodstream = default!;
-
-    private const string TourniquetContainerId = "Tourniquet";
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly WoundSystem _wound = default!;
 
     public override void Initialize()
     {
@@ -59,7 +58,10 @@ public sealed class TourniquetSystem : EntitySystem
         SubscribeLocalEvent<BodyComponent, GetVerbsEvent<InnateVerb>>(OnBodyGetVerbs);
     }
 
-    private bool TryTourniquet(EntityUid target, EntityUid user, EntityUid tourniquetEnt, TourniquetComponent tourniquet)
+    private bool TryTourniquet(EntityUid target,
+        EntityUid user,
+        EntityUid tourniquetEnt,
+        TourniquetComponent tourniquet)
     {
         if (!TryComp<TargetingComponent>(user, out var targeting)
             || !HasComp<BodyComponent>(user)
@@ -74,8 +76,12 @@ public sealed class TourniquetSystem : EntitySystem
             return false;
         }
 
-        _popup.PopupEntity(Loc.GetString("puts-on-a-tourniquet", ("user", user), ("part", partType)), target, PopupType.Medium);
-        _audio.PlayPvs(tourniquet.TourniquetPutOnSound, target, AudioParams.Default.WithVariation(0.125f).WithVolume(1f));
+        _popup.PopupEntity(Loc.GetString("puts-on-a-tourniquet", ("user", user), ("part", partType)),
+            target,
+            PopupType.Medium);
+        _audio.PlayPvs(tourniquet.TourniquetPutOnSound,
+            target,
+            AudioParams.Default.WithVariation(0.125f).WithVolume(1f));
 
         var doAfterEventArgs =
             new DoAfterArgs(EntityManager,
@@ -83,8 +89,8 @@ public sealed class TourniquetSystem : EntitySystem
                 tourniquet.Delay,
                 new TourniquetDoAfterEvent(),
                 target,
-                target: target,
-                used: tourniquetEnt)
+                target,
+                tourniquetEnt)
             {
                 BreakOnDamage = true,
                 NeedHand = true,
@@ -96,17 +102,28 @@ public sealed class TourniquetSystem : EntitySystem
         return true;
     }
 
-    private void TakeOffTourniquet(EntityUid target, EntityUid user, EntityUid tourniquetEnt, TourniquetComponent tourniquet)
+    private void TakeOffTourniquet(EntityUid target,
+        EntityUid user,
+        EntityUid tourniquetEnt,
+        TourniquetComponent tourniquet)
     {
         _popup.PopupEntity(Loc.GetString("takes-off-a-tourniquet",
-            ("user", user),
-            ("part", tourniquet.BodyPartTorniqueted!)),
+                ("user", user),
+                ("part", tourniquet.BodyPartTorniqueted!)),
             target,
             PopupType.Medium);
-        _audio.PlayPvs(tourniquet.TourniquetPutOffSound, target, AudioParams.Default.WithVariation(0.125f).WithVolume(1f));
+        _audio.PlayPvs(tourniquet.TourniquetPutOffSound,
+            target,
+            AudioParams.Default.WithVariation(0.125f).WithVolume(1f));
 
         var doAfterEventArgs =
-            new DoAfterArgs(EntityManager, user, tourniquet.RemoveDelay, new RemoveTourniquetDoAfterEvent(), target, target: target, used: tourniquetEnt)
+            new DoAfterArgs(EntityManager,
+                user,
+                tourniquet.RemoveDelay,
+                new RemoveTourniquetDoAfterEvent(),
+                target,
+                target,
+                tourniquetEnt)
             {
                 BreakOnDamage = true,
                 NeedHand = true,
@@ -191,7 +208,7 @@ public sealed class TourniquetSystem : EntitySystem
             }
 
             if (tourniquetableWounds.Count <= 0
-               || !_container.Insert(args.Used.Value, container))
+                || !_container.Insert(args.Used.Value, container))
             {
                 _popup.PopupEntity(Loc.GetString("no-wounds-tourniquet"), ent, PopupType.Medium);
                 return;
@@ -215,6 +232,7 @@ public sealed class TourniquetSystem : EntitySystem
                 _popup.PopupEntity(Loc.GetString("cant-tourniquet"), ent, PopupType.Medium);
                 return;
             }
+
             _pain.TryAddPainFeelsModifier(args.Used.Value, "Tourniquet", targetPart.Value.Id, -10f);
             _bloodstream.TryAddBleedModifier(targetPart.Value.Id, "TourniquetPresent", 100, false, true);
 
@@ -226,6 +244,7 @@ public sealed class TourniquetSystem : EntitySystem
 
             tourniquet.BodyPartTorniqueted = targetPart.Value.Id;
         }
+
         args.Handled = true;
     }
 
@@ -298,7 +317,7 @@ public sealed class TourniquetSystem : EntitySystem
                 Act = () => TakeOffTourniquet(args.Target, args.User, entity, tourniquet),
                 Text = Loc.GetString("take-off-tourniquet", ("part", tourniquet.BodyPartTorniqueted!)),
                 // Icon = new SpriteSpecifier.Texture(new ("/Textures/")),
-                Priority = 2
+                Priority = 2,
             };
             args.Verbs.Add(verb);
         }

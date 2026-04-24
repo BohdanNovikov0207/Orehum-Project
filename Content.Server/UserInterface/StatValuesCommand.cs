@@ -31,13 +31,15 @@ namespace Content.Server.UserInterface;
 [AdminCommand(AdminFlags.Debug)]
 public sealed class StatValuesCommand : IConsoleCommand
 {
-    [Dependency] private readonly EuiManager _eui = default!;
+    private static readonly ProtoId<DamageTypePrototype> StructuralDamageType = "Structural";
     [Dependency] private readonly IEntityManager _entManager = default!;
+    [Dependency] private readonly EuiManager _eui = default!;
     [Dependency] private readonly IPrototypeManager _proto = default!;
 
     public string Command => "showvalues";
     public string Description => Loc.GetString("stat-values-desc");
     public string Help => $"{Command} <cargosell / lathesell / melee / itemsize>";
+
     public void Execute(IConsoleShell shell, string argStr, string[] args)
     {
         if (shell.Player is not { } pSession)
@@ -84,9 +86,7 @@ public sealed class StatValuesCommand : IConsoleCommand
     public CompletionResult GetCompletion(IConsoleShell shell, string[] args)
     {
         if (args.Length == 1)
-        {
             return CompletionResult.FromOptions(new[] { "cargosell", "lathesell", "melee", "itemsize", "drawrate" });
-        }
 
         return CompletionResult.Empty;
     }
@@ -125,10 +125,10 @@ public sealed class StatValuesCommand : IConsoleCommand
             });
         }
 
-        var state = new StatValuesEuiMessage()
+        var state = new StatValuesEuiMessage
         {
             Title = Loc.GetString("stat-cargo-values"),
-            Headers = new List<string>()
+            Headers = new List<string>
             {
                 Loc.GetString("stat-cargo-id"),
                 Loc.GetString("stat-cargo-price"),
@@ -183,8 +183,6 @@ public sealed class StatValuesCommand : IConsoleCommand
         return state;
     }
 
-    private static readonly ProtoId<DamageTypePrototype> StructuralDamageType = "Structural";
-
     private StatValuesEuiMessage GetMelee()
     {
         var values = new List<string[]>();
@@ -196,9 +194,7 @@ public sealed class StatValuesCommand : IConsoleCommand
             if (proto.Abstract ||
                 !proto.Components.TryGetValue(meleeName,
                     out var meleeComp))
-            {
                 continue;
-            }
 
             var comp = (MeleeWeaponComponent) meleeComp.Component;
 
@@ -213,8 +209,11 @@ public sealed class StatValuesCommand : IConsoleCommand
             {
                 var comp2 = (IncreaseDamageOnWieldComponent) increaseDamageComp.Component;
 
-                wieldedStructuralDamage = (structuralDamage + comp2.BonusDamage.DamageDict.GetValueOrDefault(StructuralDamageType)).ToString();
-                wieldedDamage = (baseDamage + comp2.BonusDamage.GetTotal() - comp2.BonusDamage.DamageDict.GetValueOrDefault(StructuralDamageType)).ToString();
+                wieldedStructuralDamage =
+                    (structuralDamage + comp2.BonusDamage.DamageDict.GetValueOrDefault(StructuralDamageType))
+                    .ToString();
+                wieldedDamage = (baseDamage + comp2.BonusDamage.GetTotal() -
+                                 comp2.BonusDamage.DamageDict.GetValueOrDefault(StructuralDamageType)).ToString();
             }
 
             values.Add(new[]
@@ -273,10 +272,10 @@ public sealed class StatValuesCommand : IConsoleCommand
             });
         }
 
-        var state = new StatValuesEuiMessage()
+        var state = new StatValuesEuiMessage
         {
             Title = Loc.GetString("stat-lathe-values"),
-            Headers = new List<string>()
+            Headers = new List<string>
             {
                 Loc.GetString("stat-lathe-id"),
                 Loc.GetString("stat-lathe-cost"),
@@ -298,9 +297,7 @@ public sealed class StatValuesCommand : IConsoleCommand
             if (proto.Abstract ||
                 !proto.Components.TryGetValue(powerName,
                     out var powerConsumer))
-            {
                 continue;
-            }
 
             var comp = (ApcPowerReceiverComponent) powerConsumer.Component;
 

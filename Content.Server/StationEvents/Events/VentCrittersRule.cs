@@ -12,13 +12,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Server.Antag;
-using Content.Server.GameTicking.Rules.Components;
 using Content.Server.Pinpointer;
 using Content.Server.StationEvents.Components;
 using Content.Shared.EntityTable;
 using Content.Shared.GameTicking.Components;
 using Content.Shared.Station.Components;
-using Content.Shared.Storage;
 using Robust.Shared.Map;
 using Robust.Shared.Player;
 using Robust.Shared.Random;
@@ -41,16 +39,19 @@ public sealed class VentCrittersRule : StationEventSystem<VentCrittersRuleCompon
 
     [Dependency] private readonly AntagSelectionSystem _antag = default!;
     [Dependency] private readonly EntityTableSystem _entityTable = default!;
-    [Dependency] private readonly ISharedPlayerManager _player = default!;
+
+    private readonly List<EntityCoordinates> _locations = new();
     [Dependency] private readonly NavMapSystem _navMap = default!;
+    [Dependency] private readonly ISharedPlayerManager _player = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
 
-    private List<EntityCoordinates> _locations = new();
-
-    protected override void Added(EntityUid uid, VentCrittersRuleComponent comp, GameRuleComponent gameRule, GameRuleAddedEvent args)
+    protected override void Added(EntityUid uid,
+        VentCrittersRuleComponent comp,
+        GameRuleComponent gameRule,
+        GameRuleAddedEvent args)
     {
         PickLocation(comp);
-        if (comp.Location is not {} coords)
+        if (comp.Location is not { } coords)
         {
             ForceEndSelf(uid, gameRule);
             return;
@@ -61,16 +62,20 @@ public sealed class VentCrittersRule : StationEventSystem<VentCrittersRuleCompon
             return;
 
         var nearest = beacon?.Comp?.Text!;
-        Comp<StationEventComponent>(uid).StartAnnouncement = Loc.GetString("station-event-vent-creatures-start-announcement-deltav", ("location", nearest));
+        Comp<StationEventComponent>(uid).StartAnnouncement =
+            Loc.GetString("station-event-vent-creatures-start-announcement-deltav", ("location", nearest));
 
         base.Added(uid, comp, gameRule, args);
     }
 
-    protected override void Ended(EntityUid uid, VentCrittersRuleComponent comp, GameRuleComponent gameRule, GameRuleEndedEvent args)
+    protected override void Ended(EntityUid uid,
+        VentCrittersRuleComponent comp,
+        GameRuleComponent gameRule,
+        GameRuleEndedEvent args)
     {
         base.Ended(uid, comp, gameRule, args);
 
-        if (comp.Location is not {} coords)
+        if (comp.Location is not { } coords)
             return;
 
         var players = _antag.GetTotalPlayerCount(_player.Sessions);
@@ -78,7 +83,7 @@ public sealed class VentCrittersRule : StationEventSystem<VentCrittersRuleCompon
         var max = comp.Max * players / comp.PlayerRatio;
         var count = Math.Max(RobustRandom.Next(min, max), 1);
         Log.Info($"Spawning {count} critters for {ToPrettyString(uid):rule}");
-        for (int i = 0; i < count; i++)
+        for (var i = 0; i < count; i++)
         {
             foreach (var spawn in _entityTable.GetSpawns(comp.Table))
             {
@@ -104,9 +109,7 @@ public sealed class VentCrittersRule : StationEventSystem<VentCrittersRuleCompon
         while (locations.MoveNext(out var uid, out _, out var transform))
         {
             if (CompOrNull<StationMemberComponent>(transform.GridUid)?.Station == station)
-            {
                 _locations.Add(transform.Coordinates);
-            }
         }
 
         if (_locations.Count > 0)

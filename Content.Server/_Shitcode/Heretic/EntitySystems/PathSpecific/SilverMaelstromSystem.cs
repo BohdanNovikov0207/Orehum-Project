@@ -49,9 +49,7 @@ public sealed class SilverMaelstromSystem : EntitySystem
         }
     }
 
-    private void OnBladeUsed(Entity<SilverMaelstromComponent> ent, ref ProtectiveBladeUsedEvent args)
-    {
+    private void OnBladeUsed(Entity<SilverMaelstromComponent> ent, ref ProtectiveBladeUsedEvent args) =>
         // using max since ascended heretic can spawn more blades with furious steel action
         ent.Comp.ActiveBlades = Math.Max(ent.Comp.ActiveBlades - 1, 0);
-    }
 }

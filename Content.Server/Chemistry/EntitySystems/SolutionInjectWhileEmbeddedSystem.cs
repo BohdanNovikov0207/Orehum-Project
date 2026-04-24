@@ -24,8 +24,8 @@ namespace Content.Server.Chemistry.EntitySystems;
 /// </summary>
 public sealed class SolutionInjectWhileEmbeddedSystem : EntitySystem
 {
-	[Dependency] private readonly IGameTiming _gameTiming = default!;
     [Dependency] private readonly BloodstreamSystem _bloodstream = default!;
+    [Dependency] private readonly IGameTiming _gameTiming = default!;
     [Dependency] private readonly InventorySystem _inventory = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly SharedSolutionContainerSystem _solutionContainer = default!;
@@ -37,10 +37,8 @@ public sealed class SolutionInjectWhileEmbeddedSystem : EntitySystem
         SubscribeLocalEvent<SolutionInjectWhileEmbeddedComponent, MapInitEvent>(OnMapInit);
     }
 
-    private void OnMapInit(Entity<SolutionInjectWhileEmbeddedComponent> ent, ref MapInitEvent args)
-    {
+    private void OnMapInit(Entity<SolutionInjectWhileEmbeddedComponent> ent, ref MapInitEvent args) =>
         ent.Comp.NextUpdate = _gameTiming.CurTime + ent.Comp.UpdateInterval;
-    }
 
     public override void Update(float frameTime)
     {
@@ -55,9 +53,10 @@ public sealed class SolutionInjectWhileEmbeddedSystem : EntitySystem
             injectComponent.NextUpdate += injectComponent.UpdateInterval;
 
             // <Goobstation> Goobstation - Shot syringes injecting over time
-            if(projectileComponent.EmbeddedIntoUid == null) // check if we should reset state,
+            if (projectileComponent.EmbeddedIntoUid == null) // check if we should reset state,
             {
-                if (TryComp<PhysicsComponent>(uid, out var physics) && physics.BodyStatus != BodyStatus.InAir) // don't reset in-flight things
+                if (TryComp<PhysicsComponent>(uid, out var physics) &&
+                    physics.BodyStatus != BodyStatus.InAir) // don't reset in-flight things
                     injectComponent.Injections = 0;
                 continue;
             }
@@ -76,7 +75,6 @@ public sealed class SolutionInjectWhileEmbeddedSystem : EntitySystem
 
             var ev = new InjectOverTimeEvent(projectileComponent.EmbeddedIntoUid.Value);
             RaiseLocalEvent(uid, ref ev);
-
         }
     }
 }

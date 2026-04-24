@@ -34,15 +34,15 @@ public sealed class InnerBodyAnomalySystem : SharedInnerBodyAnomalySystem
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly BodySystem _body = default!;
     [Dependency] private readonly IChatManager _chat = default!;
-    [Dependency] private readonly ISharedPlayerManager _player = default!;
-    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
     [Dependency] private readonly JitteringSystem _jitter = default!;
+
+    private readonly Color _messageColor = Color.FromSrgb(new Color(201, 22, 94));
     [Dependency] private readonly MindSystem _mind = default!;
+    [Dependency] private readonly ISharedPlayerManager _player = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly StunSystem _stun = default!;
-
-    private readonly Color _messageColor = Color.FromSrgb(new Color(201, 22, 94));
+    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
 
     public override void Initialize()
     {
@@ -86,10 +86,7 @@ public sealed class InnerBodyAnomalySystem : SharedInnerBodyAnomalySystem
         QueueDel(ent);
     }
 
-    private void OnMapInit(Entity<InnerBodyAnomalyComponent> ent, ref MapInitEvent args)
-    {
-        AddAnomalyToBody(ent);
-    }
+    private void OnMapInit(Entity<InnerBodyAnomalyComponent> ent, ref MapInitEvent args) => AddAnomalyToBody(ent);
 
     private void AddAnomalyToBody(Entity<InnerBodyAnomalyComponent> ent)
     {
@@ -125,8 +122,9 @@ public sealed class InnerBodyAnomalySystem : SharedInnerBodyAnomalySystem
 
             _popup.PopupEntity(message, ent, ent, PopupType.MediumCaution);
 
-            _adminLog.Add(LogType.Anomaly,LogImpact.Medium,$"{ToPrettyString(ent)} became anomaly host.");
+            _adminLog.Add(LogType.Anomaly, LogImpact.Medium, $"{ToPrettyString(ent)} became anomaly host.");
         }
+
         Dirty(ent);
     }
 
@@ -157,16 +155,19 @@ public sealed class InnerBodyAnomalySystem : SharedInnerBodyAnomalySystem
             ent.Comp.LastSeverityInformed = 0.5f;
             message = Loc.GetString("inner-anomaly-severity-info-50");
         }
+
         if (args.Severity >= 0.75 && ent.Comp.LastSeverityInformed < 0.75)
         {
             ent.Comp.LastSeverityInformed = 0.75f;
             message = Loc.GetString("inner-anomaly-severity-info-75");
         }
+
         if (args.Severity >= 0.9 && ent.Comp.LastSeverityInformed < 0.9)
         {
             ent.Comp.LastSeverityInformed = 0.9f;
             message = Loc.GetString("inner-anomaly-severity-info-90");
         }
+
         if (args.Severity >= 1 && ent.Comp.LastSeverityInformed < 1)
         {
             ent.Comp.LastSeverityInformed = 1f;
@@ -207,10 +208,8 @@ public sealed class InnerBodyAnomalySystem : SharedInnerBodyAnomalySystem
         RemCompDeferred<InnerBodyAnomalyComponent>(ent);
     }
 
-    private void OnCompShutdown(Entity<InnerBodyAnomalyComponent> ent, ref ComponentShutdown args)
-    {
+    private void OnCompShutdown(Entity<InnerBodyAnomalyComponent> ent, ref ComponentShutdown args) =>
         RemoveAnomalyFromBody(ent);
-    }
 
     private void RemoveAnomalyFromBody(Entity<InnerBodyAnomalyComponent> ent)
     {
@@ -239,7 +238,9 @@ public sealed class InnerBodyAnomalySystem : SharedInnerBodyAnomalySystem
 
             _popup.PopupEntity(message, ent, ent, PopupType.MediumCaution);
 
-            _adminLog.Add(LogType.Anomaly, LogImpact.Medium,$"{ToPrettyString(ent)} is no longer a host for the anomaly.");
+            _adminLog.Add(LogType.Anomaly,
+                LogImpact.Medium,
+                $"{ToPrettyString(ent)} is no longer a host for the anomaly.");
         }
 
         ent.Comp.Injected = false;

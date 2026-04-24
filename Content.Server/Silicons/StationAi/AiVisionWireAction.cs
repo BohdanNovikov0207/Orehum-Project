@@ -38,22 +38,16 @@ public sealed partial class AiVisionWireAction : ComponentWireAction<StationAiVi
     public override Color Color { get; set; } = Color.White;
     public override object StatusKey => AirlockWireStatus.AiVisionIndicator;
 
-    public override StatusLightState? GetLightState(Wire wire, StationAiVisionComponent component)
-    {
-        return component.Enabled ? StatusLightState.On : StatusLightState.Off;
-    }
+    public override StatusLightState? GetLightState(Wire wire, StationAiVisionComponent component) =>
+        component.Enabled ? StatusLightState.On : StatusLightState.Off;
 
-    public override bool Cut(EntityUid user, Wire wire, StationAiVisionComponent component)
-    {
-        return EntityManager.System<SharedStationAiSystem>()
-            .SetVisionEnabled((component.Owner, component), false, announce: true);
-    }
+    public override bool Cut(EntityUid user, Wire wire, StationAiVisionComponent component) =>
+        EntityManager.System<SharedStationAiSystem>()
+            .SetVisionEnabled((component.Owner, component), false, true);
 
-    public override bool Mend(EntityUid user, Wire wire, StationAiVisionComponent component)
-    {
-        return EntityManager.System<SharedStationAiSystem>()
+    public override bool Mend(EntityUid user, Wire wire, StationAiVisionComponent component) =>
+        EntityManager.System<SharedStationAiSystem>()
             .SetVisionEnabled((component.Owner, component), true);
-    }
 
     public override void Pulse(EntityUid user, Wire wire, StationAiVisionComponent component)
     {

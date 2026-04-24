@@ -10,9 +10,9 @@ namespace Content.Server.Objectives.Components;
 
 /// <summary>
 /// An objective that is set to complete by code in another system.
-/// Use <see cref="CodeConditionSystem"/> to check and set this.
+/// Use <see cref="CodeConditionSystem" /> to check and set this.
 /// </summary>
-[RegisterComponent, Access(typeof(CodeConditionSystem))]
+[RegisterComponent] [Access(typeof(CodeConditionSystem))]
 public sealed partial class CodeConditionComponent : Component
 {
     /// <summary>

@@ -7,14 +7,17 @@ namespace Content.Server.Codewords;
 /// This is a prototype for specifying codeword generation
 /// </summary>
 [Prototype]
-public sealed partial class CodewordGeneratorPrototype : IPrototype
+public sealed class CodewordGeneratorPrototype : IPrototype
 {
-    /// <inheritdoc/>
-    [IdDataField]
-    public string ID { get; } = default!;
+    /// <summary>
+    /// How many codewords should be generated?
+    /// </summary>
+    [DataField]
+    public int Amount = 3;
 
     /// <summary>
-    /// List of datasets to use for word generation. All values will be concatenated into one list and then randomly chosen from
+    /// List of datasets to use for word generation. All values will be concatenated into one list and then randomly chosen
+    /// from
     /// </summary>
     [DataField]
     public List<ProtoId<LocalizedDatasetPrototype>> Words { get; } =
@@ -23,10 +26,7 @@ public sealed partial class CodewordGeneratorPrototype : IPrototype
         "Verbs",
     ];
 
-
-    /// <summary>
-    /// How many codewords should be generated?
-    /// </summary>
-    [DataField]
-    public int Amount = 3;
+    /// <inheritdoc />
+    [IdDataField]
+    public string ID { get; } = default!;
 }

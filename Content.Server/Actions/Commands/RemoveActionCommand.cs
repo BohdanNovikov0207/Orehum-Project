@@ -21,13 +21,15 @@ public sealed class RemoveActionCommand : LocalizedEntityCommands
             return;
         }
 
-        if (!NetEntity.TryParse(args[0], out var targetUidNet) || !EntityManager.TryGetEntity(targetUidNet, out var targetEntity))
+        if (!NetEntity.TryParse(args[0], out var targetUidNet) ||
+            !EntityManager.TryGetEntity(targetUidNet, out var targetEntity))
         {
             shell.WriteLine(Loc.GetString("shell-could-not-find-entity-with-uid", ("uid", args[0])));
             return;
         }
 
-        if (!NetEntity.TryParse(args[1], out var targetActionUidNet) || !EntityManager.TryGetEntity(targetActionUidNet, out var targetActionEntity))
+        if (!NetEntity.TryParse(args[1], out var targetActionUidNet) ||
+            !EntityManager.TryGetEntity(targetActionUidNet, out var targetActionEntity))
         {
             shell.WriteLine(Loc.GetString("shell-could-not-find-entity-with-uid", ("uid", args[1])));
             return;
@@ -61,7 +63,8 @@ public sealed class RemoveActionCommand : LocalizedEntityCommands
 
         if (args.Length == 2)
         {
-            if (!NetEntity.TryParse(args[0], out var targetUidNet) || !EntityManager.TryGetEntity(targetUidNet, out var targetEntity))
+            if (!NetEntity.TryParse(args[0], out var targetUidNet) ||
+                !EntityManager.TryGetEntity(targetUidNet, out var targetEntity))
                 return CompletionResult.Empty;
 
             if (!EntityManager.HasComponent<ActionsComponent>(targetEntity))

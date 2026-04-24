@@ -21,10 +21,8 @@ public sealed class CarpRiftsConditionSystem : EntitySystem
         SubscribeLocalEvent<CarpRiftsConditionComponent, ObjectiveGetProgressEvent>(OnGetProgress);
     }
 
-    private void OnGetProgress(EntityUid uid, CarpRiftsConditionComponent comp, ref ObjectiveGetProgressEvent args)
-    {
+    private void OnGetProgress(EntityUid uid, CarpRiftsConditionComponent comp, ref ObjectiveGetProgressEvent args) =>
         args.Progress = GetProgress(comp, _number.GetTarget(uid));
-    }
 
     private float GetProgress(CarpRiftsConditionComponent comp, int target)
     {
@@ -35,7 +33,7 @@ public sealed class CarpRiftsConditionSystem : EntitySystem
         if (comp.RiftsCharged >= target)
             return 1f;
 
-        return (float) comp.RiftsCharged / (float) target;
+        return comp.RiftsCharged / (float) target;
     }
 
     /// <summary>

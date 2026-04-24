@@ -12,5 +12,4 @@ namespace Content.Server.NPC.Queries.Queries;
 [ImplicitDataDefinitionForInheritors]
 public abstract partial class UtilityQuery
 {
-
 }

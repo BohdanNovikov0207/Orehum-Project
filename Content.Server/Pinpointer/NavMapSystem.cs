@@ -11,39 +11,37 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Diagnostics.CodeAnalysis;
 using Content.Server.Administration.Logs;
 using Content.Server.Atmos.Components;
 using Content.Server.Atmos.EntitySystems;
 using Content.Server.Station.Systems;
 using Content.Shared.Database;
-using Content.Shared.Examine;
 using Content.Shared.Localizations;
 using Content.Shared.Maps;
 using Content.Shared.Pinpointer;
+using Content.Shared.Warps;
 using JetBrains.Annotations;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Timing;
-using System.Diagnostics.CodeAnalysis;
-using Content.Shared.Warps;
 
 namespace Content.Server.Pinpointer;
 
 /// <summary>
 /// Handles data to be used for in-grid map displays.
 /// </summary>
-public sealed partial class NavMapSystem : SharedNavMapSystem
+public sealed class NavMapSystem : SharedNavMapSystem
 {
-    [Dependency] private readonly IAdminLogManager _adminLog = default!;
-    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
-    [Dependency] private readonly SharedMapSystem _mapSystem = default!;
-    [Dependency] private readonly SharedTransformSystem _transformSystem = default!;
-    [Dependency] private readonly IMapManager _mapManager = default!;
-    [Dependency] private readonly IGameTiming _gameTiming = default!;
-    [Dependency] private readonly TurfSystem _turfSystem = default!;
-
     public const float CloseDistance = 15f;
     public const float FarDistance = 30f;
+    [Dependency] private readonly IAdminLogManager _adminLog = default!;
+    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly IGameTiming _gameTiming = default!;
+    [Dependency] private readonly IMapManager _mapManager = default!;
+    [Dependency] private readonly SharedMapSystem _mapSystem = default!;
+    [Dependency] private readonly SharedTransformSystem _transformSystem = default!;
+    [Dependency] private readonly TurfSystem _turfSystem = default!;
 
     private EntityQuery<AirtightComponent> _airtightQuery;
     private EntityQuery<MapGridComponent> _gridQuery;
@@ -103,7 +101,7 @@ public sealed partial class NavMapSystem : SharedNavMapSystem
     {
         if (!component.Chunks.TryGetValue(origin, out var chunk))
         {
-            chunk = new(origin);
+            chunk = new NavMapChunk(origin);
             component.Chunks[origin] = chunk;
         }
 
@@ -136,9 +134,7 @@ public sealed partial class NavMapSystem : SharedNavMapSystem
                     continue;
             }
             else
-            {
                 tileData = FloorMask;
-            }
 
             DirtyChunk((ev.Entity, navMap), chunk);
         }
@@ -162,12 +158,11 @@ public sealed partial class NavMapSystem : SharedNavMapSystem
 
         if (!_navQuery.TryComp(gridUid, out var navMap) ||
             !_gridQuery.TryComp(gridUid, out var mapGrid))
-        {
             return;
-        }
 
         var chunkOrigin = SharedMapSystem.GetChunkIndices(args.Position.Tile, ChunkSize);
-        var (newValue, chunk) = RefreshTileEntityContents(gridUid, navMap, mapGrid, chunkOrigin, args.Position.Tile, setFloor: false);
+        var (newValue, chunk) =
+            RefreshTileEntityContents(gridUid, navMap, mapGrid, chunkOrigin, args.Position.Tile, false);
 
         if (newValue == 0 && PruneEmpty((gridUid, navMap), chunk))
             return;
@@ -196,7 +191,8 @@ public sealed partial class NavMapSystem : SharedNavMapSystem
         UpdateNavMapBeaconData(uid, component);
     }
 
-    private void OnConfigureMessage(Entity<ConfigurableNavMapBeaconComponent> ent, ref NavMapBeaconConfigureBuiMessage args)
+    private void OnConfigureMessage(Entity<ConfigurableNavMapBeaconComponent> ent,
+        ref NavMapBeaconConfigureBuiMessage args)
     {
         if (!TryComp<NavMapBeaconComponent>(ent, out var beacon))
             return;
@@ -206,13 +202,12 @@ public sealed partial class NavMapSystem : SharedNavMapSystem
             beacon.Enabled == args.Enabled)
             return;
 
-        _adminLog.Add(LogType.Action, LogImpact.Medium,
+        _adminLog.Add(LogType.Action,
+            LogImpact.Medium,
             $"{ToPrettyString(args.Actor):player} configured NavMapBeacon \'{ToPrettyString(ent):entity}\' with text \'{args.Text}\', color {args.Color.ToHexNoAlpha()}, and {(args.Enabled ? "enabled" : "disabled")} it.");
 
         if (TryComp<WarpPointComponent>(ent, out var warpPoint))
-        {
             warpPoint.Location = args.Text;
-        }
 
         beacon.Text = args.Text;
         beacon.Color = args.Color;
@@ -265,7 +260,7 @@ public sealed partial class NavMapSystem : SharedNavMapSystem
 
             var chunk = EnsureChunk(component, chunkOrigin);
             chunk.LastUpdate = _gameTiming.CurTick;
-            RefreshTileEntityContents(uid, component, mapGrid, chunkOrigin, tile, setFloor: true);
+            RefreshTileEntityContents(uid, component, mapGrid, chunkOrigin, tile, true);
         }
 
         Dirty(uid, component);
@@ -298,7 +293,7 @@ public sealed partial class NavMapSystem : SharedNavMapSystem
             if (category == NavMapChunkType.Invalid)
                 continue;
 
-            var directions = (int)airtight.AirBlockedDirection;
+            var directions = (int) airtight.AirBlockedDirection;
             tileData |= directions << (int) category;
         }
 
@@ -307,7 +302,8 @@ public sealed partial class NavMapSystem : SharedNavMapSystem
         // Is this for blast-doors or something?
 
         // Shift airlock bits over to the wall bits
-        var shiftedAirlockBits = (tileData & AirlockMask) >> ((int) NavMapChunkType.Airlock - (int) NavMapChunkType.Wall);
+        var shiftedAirlockBits =
+            (tileData & AirlockMask) >> ((int) NavMapChunkType.Airlock - (int) NavMapChunkType.Wall);
 
         // And then mask door bits
         tileData &= ~shiftedAirlockBits;
@@ -333,7 +329,9 @@ public sealed partial class NavMapSystem : SharedNavMapSystem
 
     #region: Beacon functions
 
-    private void UpdateNavMapBeaconData(EntityUid uid, NavMapBeaconComponent component, TransformComponent? xform = null)
+    private void UpdateNavMapBeaconData(EntityUid uid,
+        NavMapBeaconComponent component,
+        TransformComponent? xform = null)
     {
         if (!Resolve(uid, ref xform))
             return;
@@ -357,10 +355,9 @@ public sealed partial class NavMapSystem : SharedNavMapSystem
             Dirty(xform.GridUid.Value, navMap);
     }
 
-    private void UpdateBeaconEnabledVisuals(Entity<NavMapBeaconComponent> ent)
-    {
-        _appearance.SetData(ent, NavMapBeaconVisuals.Enabled, ent.Comp.Enabled && Transform(ent).Anchored);
-    }
+    private void UpdateBeaconEnabledVisuals(Entity<NavMapBeaconComponent> ent) => _appearance.SetData(ent,
+        NavMapBeaconVisuals.Enabled,
+        ent.Comp.Enabled && Transform(ent).Anchored);
 
     /// <summary>
     /// Sets the beacon's Enabled field and refreshes the grid.
@@ -414,7 +411,8 @@ public sealed partial class NavMapSystem : SharedNavMapSystem
         beaconCoords = null;
         var minDistance = float.PositiveInfinity;
 
-        var query = EntityQueryEnumerator<ConfigurableNavMapBeaconComponent, NavMapBeaconComponent, TransformComponent>();
+        var query =
+            EntityQueryEnumerator<ConfigurableNavMapBeaconComponent, NavMapBeaconComponent, TransformComponent>();
         while (query.MoveNext(out var uid, out _, out var navBeacon, out var xform))
         {
             if (!navBeacon.Enabled)
@@ -441,7 +439,7 @@ public sealed partial class NavMapSystem : SharedNavMapSystem
 
     /// <summary>
     /// Returns a string describing the rough distance and direction
-    /// to the position of <paramref name="ent"/> from the nearest beacon.
+    /// to the position of <paramref name="ent" /> from the nearest beacon.
     /// </summary>
     [PublicAPI]
     public string GetNearestBeaconString(Entity<TransformComponent?> ent)
@@ -454,9 +452,8 @@ public sealed partial class NavMapSystem : SharedNavMapSystem
 
     /// <summary>
     /// Returns a string describing the rough distance and direction
-    /// to <paramref name="coordinates"/> from the nearest beacon.
+    /// to <paramref name="coordinates" /> from the nearest beacon.
     /// </summary>
-
     public string GetNearestBeaconString(MapCoordinates coordinates)
     {
         if (!TryGetNearestBeacon(coordinates, out var beacon, out var pos))

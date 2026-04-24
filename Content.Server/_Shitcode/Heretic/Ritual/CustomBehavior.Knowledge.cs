@@ -13,25 +13,24 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Server.Heretic.EntitySystems;
-using Content.Shared.Heretic;
 using Content.Shared.Heretic.Prototypes;
 using Content.Shared.Mind;
 using Content.Shared.Store.Components;
 using Content.Shared.Tag;
-using Robust.Shared.Prototypes;
 using Robust.Server.Containers;
+using Robust.Shared.Prototypes;
 
 namespace Content.Server.Heretic.Ritual;
 
 public sealed partial class RitualKnowledgeBehavior : RitualCustomBehavior
 {
-    private HashSet<ProtoId<TagPrototype>> _missingTags = new();
-    private List<EntityUid> _toDelete = new();
+    private readonly HashSet<ProtoId<TagPrototype>> _missingTags = new();
+    private readonly List<EntityUid> _toDelete = new();
+    private ContainerSystem _container = default!;
+    private HereticSystem _heretic = default!;
 
     private EntityLookupSystem _lookup = default!;
-    private HereticSystem _heretic = default!;
     private TagSystem _tag = default!;
-    private ContainerSystem _container = default!;
 
     // this is basically a ripoff from hereticritualsystem
     public override bool Execute(RitualData args, out string? outstr)

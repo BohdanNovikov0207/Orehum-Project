@@ -24,10 +24,10 @@ namespace Content.Server.Salvage.Expeditions;
 /// <summary>
 /// Designates this entity as holding a salvage expedition.
 /// </summary>
-[RegisterComponent, AutoGenerateComponentPause]
+[RegisterComponent] [AutoGenerateComponentPause]
 public sealed partial class SalvageExpeditionComponent : SharedSalvageExpeditionComponent
 {
-    public SalvageMissionParams MissionParams = default!;
+    [ViewVariables] public bool Completed = false;
 
     /// <summary>
     /// Where the dungeon is located for initial announcement.
@@ -38,9 +38,26 @@ public sealed partial class SalvageExpeditionComponent : SharedSalvageExpedition
     /// <summary>
     /// When the expeditions ends.
     /// </summary>
-    [ViewVariables(VVAccess.ReadWrite), DataField("endTime", customTypeSerializer: typeof(TimeOffsetSerializer))]
+    [ViewVariables(VVAccess.ReadWrite)] [DataField("endTime", customTypeSerializer: typeof(TimeOffsetSerializer))]
     [AutoPausedField]
     public TimeSpan EndTime;
+
+    public SalvageMissionParams MissionParams = default!;
+
+    /// <summary>
+    /// Song selected on MapInit so we can predict the audio countdown properly.
+    /// </summary>
+    [DataField]
+    public ResolvedSoundSpecifier SelectedSong;
+
+    /// <summary>
+    /// Sound that plays when the mission end is imminent.
+    /// </summary>
+    [ViewVariables(VVAccess.ReadWrite)] [DataField]
+    public SoundSpecifier Sound = new SoundCollectionSpecifier("ExpeditionEnd")
+    {
+        Params = AudioParams.Default.WithVolume(-5),
+    };
 
     /// <summary>
     /// Station whose mission this is.
@@ -48,26 +65,9 @@ public sealed partial class SalvageExpeditionComponent : SharedSalvageExpedition
     [DataField("station")]
     public EntityUid Station;
 
-    [ViewVariables] public bool Completed = false;
-
     /// <summary>
     /// Countdown audio stream.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public EntityUid? Stream = null;
-
-    /// <summary>
-    /// Sound that plays when the mission end is imminent.
-    /// </summary>
-    [ViewVariables(VVAccess.ReadWrite), DataField]
-    public SoundSpecifier Sound = new SoundCollectionSpecifier("ExpeditionEnd")
-    {
-        Params = AudioParams.Default.WithVolume(-5),
-    };
-
-    /// <summary>
-    /// Song selected on MapInit so we can predict the audio countdown properly.
-    /// </summary>
-    [DataField]
-    public ResolvedSoundSpecifier SelectedSong;
 }

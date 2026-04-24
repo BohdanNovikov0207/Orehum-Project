@@ -5,28 +5,28 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Server.Chat.Systems;
-using Content.Shared.Radio;
 using Content.Server.Radio.Components;
 using Content.Server.Radio.EntitySystems;
 using Content.Server.Speech.Components;
 using Content.Server.Wires;
-using Content.Shared.Wires;
+using Content.Shared.Radio;
 using Content.Shared.Speech;
+using Content.Shared.Wires;
 using Robust.Shared.Prototypes;
 
 namespace Content.Server.Speech;
 
 public sealed partial class ListenWireAction : BaseToggleWireAction
 {
-    private WiresSystem _wires = default!;
-    private ChatSystem _chat = default!;
-    private RadioSystem _radio = default!;
-    private IPrototypeManager _protoMan = default!;
-
     /// <summary>
     /// Length of the gibberish string sent when pulsing the wire
     /// </summary>
     private const int NoiseLength = 16;
+
+    private ChatSystem _chat = default!;
+    private IPrototypeManager _protoMan = default!;
+    private RadioSystem _radio = default!;
+    private WiresSystem _wires = default!;
     public override Color Color { get; set; } = Color.Green;
     public override string Name { get; set; } = "wire-name-listen";
 
@@ -45,17 +45,16 @@ public sealed partial class ListenWireAction : BaseToggleWireAction
         _radio = EntityManager.System<RadioSystem>();
         _protoMan = IoCManager.Resolve<IPrototypeManager>();
     }
+
     public override StatusLightState? GetLightState(Wire wire)
     {
         if (GetValue(wire.Owner))
             return StatusLightState.On;
-        else
-        {
-            if (TimeoutKey != null && _wires.HasData(wire.Owner, TimeoutKey))
-                return StatusLightState.BlinkingSlow;
-            return StatusLightState.Off;
-        }
+        if (TimeoutKey != null && _wires.HasData(wire.Owner, TimeoutKey))
+            return StatusLightState.BlinkingSlow;
+        return StatusLightState.Off;
     }
+
     public override void ToggleValue(EntityUid owner, bool setting)
     {
         if (setting)
@@ -64,15 +63,10 @@ public sealed partial class ListenWireAction : BaseToggleWireAction
             EntityManager.RemoveComponent<BlockListeningComponent>(owner);
         }
         else
-        {
             EntityManager.EnsureComponent<BlockListeningComponent>(owner);
-        }
     }
 
-    public override bool GetValue(EntityUid owner)
-    {
-        return !EntityManager.HasComponent<BlockListeningComponent>(owner);
-    }
+    public override bool GetValue(EntityUid owner) => !EntityManager.HasComponent<BlockListeningComponent>(owner);
 
     public override void Pulse(EntityUid user, Wire wire)
     {
@@ -91,7 +85,10 @@ public sealed partial class ListenWireAction : BaseToggleWireAction
         // The reason for the override is to make the voice sound like its coming from electrity rather than the intercom.
         voiceOverrideComp.NameOverride = Loc.GetString("wire-listen-pulse-identifier");
         voiceOverrideComp.Enabled = true;
-        _radio.SendRadioMessage(wire.Owner, noiseMsg, _protoMan.Index<RadioChannelPrototype>(radioMicroPhoneComp.BroadcastChannel), wire.Owner);
+        _radio.SendRadioMessage(wire.Owner,
+            noiseMsg,
+            _protoMan.Index<RadioChannelPrototype>(radioMicroPhoneComp.BroadcastChannel),
+            wire.Owner);
         voiceOverrideComp.Enabled = false;
 
         base.Pulse(user, wire);

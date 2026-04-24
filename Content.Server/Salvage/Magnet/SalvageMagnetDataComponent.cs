@@ -23,14 +23,8 @@ public sealed partial class SalvageMagnetDataComponent : Component
     [DataField]
     public List<EntityUid>? ActiveEntities;
 
-    /// <summary>
-    /// If the magnet is currently active when does it end.
-    /// </summary>
-    [DataField(customTypeSerializer:typeof(TimeOffsetSerializer))]
-    public TimeSpan? EndTime;
-
-    [DataField(customTypeSerializer:typeof(TimeOffsetSerializer))]
-    public TimeSpan NextOffer;
+    [DataField]
+    public int ActiveSeed;
 
     /// <summary>
     /// How long salvage will be active for before despawning.
@@ -39,26 +33,32 @@ public sealed partial class SalvageMagnetDataComponent : Component
     public TimeSpan ActiveTime = TimeSpan.FromMinutes(6);
 
     /// <summary>
+    /// Final countdown announcement.
+    /// </summary>
+    [DataField]
+    public bool Announced;
+
+    /// <summary>
+    /// If the magnet is currently active when does it end.
+    /// </summary>
+    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))]
+    public TimeSpan? EndTime;
+
+    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))]
+    public TimeSpan NextOffer;
+
+    /// <summary>
     /// Cooldown between offerings after one ends.
     /// </summary>
     [DataField]
     public TimeSpan OfferCooldown = TimeSpan.FromMinutes(3);
+
+    [DataField]
+    public int OfferCount = 5;
 
     /// <summary>
     /// Seeds currently offered
     /// </summary>
     [DataField]
     public List<int> Offered = new();
-
-    [DataField]
-    public int OfferCount = 5;
-
-    [DataField]
-    public int ActiveSeed;
-
-    /// <summary>
-    /// Final countdown announcement.
-    /// </summary>
-    [DataField]
-    public bool Announced;
 }

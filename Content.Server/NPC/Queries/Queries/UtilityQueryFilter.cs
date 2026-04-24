@@ -11,5 +11,4 @@ namespace Content.Server.NPC.Queries.Queries;
 /// </summary>
 public abstract partial class UtilityQueryFilter : UtilityQuery
 {
-
 }

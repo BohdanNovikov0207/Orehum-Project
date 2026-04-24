@@ -21,10 +21,8 @@
 
 using Content.Server.Body.Systems;
 using Content.Server.Destructible;
-using Content.Server.Examine;
 using Content.Server.Polymorph.Components;
 using Content.Server.Popups;
-using Content.Server.Storage.Components;
 using Content.Server.Storage.EntitySystems;
 using Content.Server.Stunnable;
 using Content.Shared.Body.Components;
@@ -45,21 +43,20 @@ namespace Content.Server.ImmovableRod;
 
 public sealed class ImmovableRodSystem : EntitySystem
 {
-    [Dependency] private readonly IRobustRandom _random = default!;
+    private static readonly ProtoId<TagPrototype> IgnoreTag = "IgnoreImmovableRod"; // Goobstation
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
 
     [Dependency] private readonly BodySystem _bodySystem = default!;
-    [Dependency] private readonly PopupSystem _popup = default!;
-    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly DamageableSystem _damageable = default!;
     [Dependency] private readonly DestructibleSystem _destructible = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly SharedMapSystem _map = default!;
     [Dependency] private readonly EntityStorageSystem _entityStorage = default!; // Goobstation
-    [Dependency] private readonly TagSystem _tag = default!; // Goobstation
+    [Dependency] private readonly SharedMapSystem _map = default!;
+    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
+    [Dependency] private readonly PopupSystem _popup = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly StunSystem _stun = default!; // Goobstation
-
-    private static readonly ProtoId<TagPrototype> IgnoreTag = "IgnoreImmovableRod"; // Goobstation
+    [Dependency] private readonly TagSystem _tag = default!; // Goobstation
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     public override void Update(float frameTime)
     {
@@ -104,7 +101,8 @@ public sealed class ImmovableRodSystem : EntitySystem
                 vel = component.DirectionOverride.Degrees switch
                 {
                     0f => _random.NextVector2(component.MinSpeed, component.MaxSpeed),
-                    _ => worldRot.RotateVec(component.DirectionOverride.ToVec()) * _random.NextFloat(component.MinSpeed, component.MaxSpeed)
+                    _ => worldRot.RotateVec(component.DirectionOverride.ToVec()) *
+                         _random.NextFloat(component.MinSpeed, component.MaxSpeed),
                 };
             }
 
@@ -126,15 +124,15 @@ public sealed class ImmovableRodSystem : EntitySystem
         // Goobstation end
 
         if (_random.Prob(component.HitSoundProbability))
-        {
             _audio.PlayPvs(component.Sound, uid);
-        }
 
         if (HasComp<ImmovableRodComponent>(ent))
         {
             // oh god.
             var coords = Transform(uid).Coordinates;
-            _popup.PopupCoordinates(Loc.GetString("immovable-rod-collided-rod-not-good"), coords, PopupType.LargeCaution);
+            _popup.PopupCoordinates(Loc.GetString("immovable-rod-collided-rod-not-good"),
+                coords,
+                PopupType.LargeCaution);
 
             Del(uid);
             Del(ent);
@@ -154,7 +152,9 @@ public sealed class ImmovableRodSystem : EntitySystem
         if (TryComp<BodyComponent>(ent, out var body))
         {
             component.MobCount++;
-            _popup.PopupEntity(Loc.GetString("immovable-rod-penetrated-mob", ("rod", uid), ("mob", ent)), uid, PopupType.LargeCaution);
+            _popup.PopupEntity(Loc.GetString("immovable-rod-penetrated-mob", ("rod", uid), ("mob", ent)),
+                uid,
+                PopupType.LargeCaution);
 
             if (!component.ShouldGib)
             {
@@ -162,9 +162,13 @@ public sealed class ImmovableRodSystem : EntitySystem
                     return;
 
                 component.DamagedEntities.Add(ent); // Goobstation
-                _damageable.TryChangeDamage(ent, component.Damage, component.IgnoreResistances, origin: uid, partMultiplier: component.PartDamageMultiplier); // Goob edit
+                _damageable.TryChangeDamage(ent,
+                    component.Damage,
+                    component.IgnoreResistances,
+                    origin: uid,
+                    partMultiplier: component.PartDamageMultiplier); // Goob edit
                 if (component.KnockdownTime > TimeSpan.Zero) // Goobstation
-                    _stun.KnockdownOrStun(ent, component.KnockdownTime, true);
+                    _stun.KnockdownOrStun(ent, component.KnockdownTime);
                 return;
             }
 
@@ -180,12 +184,8 @@ public sealed class ImmovableRodSystem : EntitySystem
     private void OnExamined(EntityUid uid, ImmovableRodComponent component, ExaminedEvent args)
     {
         if (component.MobCount == 0)
-        {
             args.PushText(Loc.GetString("immovable-rod-consumed-none", ("rod", uid)));
-        }
         else
-        {
             args.PushText(Loc.GetString("immovable-rod-consumed-souls", ("rod", uid), ("amount", component.MobCount)));
-        }
     }
 }

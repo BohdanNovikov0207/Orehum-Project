@@ -2,9 +2,8 @@ namespace Content.Server._Starlight.Objectives;
 
 /// <summary>
 /// Requires that a target at least dies once.
-/// Depends on <see cref="TargetObjectiveComponent"/> to function.
+/// Depends on <see cref="TargetObjectiveComponent" /> to function.
 /// </summary>
-
 [RegisterComponent]
 public sealed partial class TeachALessonConditionComponent : Component
 {
@@ -13,5 +12,4 @@ public sealed partial class TeachALessonConditionComponent : Component
     /// </summary>
     [ViewVariables(VVAccess.ReadWrite)]
     public bool HasDied = false;
-
 }

@@ -25,13 +25,11 @@ namespace Content.Server.Power.EntitySystems;
 public sealed partial class CableSystem
 {
     [Dependency] private readonly IAdminLogManager _adminLogger = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly SharedMapSystem _map = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
 
-    private void InitializeCablePlacer()
-    {
+    private void InitializeCablePlacer() =>
         SubscribeLocalEvent<CablePlacerComponent, AfterInteractEvent>(OnCablePlacerAfterInteract);
-    }
 
     private void OnCablePlacerAfterInteract(Entity<CablePlacerComponent> placer, ref AfterInteractEvent args)
     {
@@ -47,7 +45,7 @@ public sealed partial class CableSystem
 
         var gridUid = _transform.GetGrid(args.ClickLocation)!.Value;
         var snapPos = _map.TileIndicesFor((gridUid, grid), args.ClickLocation);
-        var tileDef = (ContentTileDefinition)_tileManager[_map.GetTileRef(gridUid, grid, snapPos).Tile.TypeId];
+        var tileDef = (ContentTileDefinition) _tileManager[_map.GetTileRef(gridUid, grid, snapPos).Tile.TypeId];
 
         if (!tileDef.IsSubFloor || !tileDef.Sturdy)
             return;
@@ -63,7 +61,8 @@ public sealed partial class CableSystem
             return;
 
         var newCable = Spawn(component.CablePrototypeId, _map.GridTileToLocal(gridUid, grid, snapPos));
-        _adminLogger.Add(LogType.Construction, LogImpact.Low,
+        _adminLogger.Add(LogType.Construction,
+            LogImpact.Low,
             $"{ToPrettyString(args.User):player} placed {ToPrettyString(newCable):cable} at {Transform(newCable).Coordinates}");
         args.Handled = true;
     }

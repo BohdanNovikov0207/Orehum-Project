@@ -19,38 +19,39 @@ using Content.Server.Power.Components;
 using Content.Server.Radio;
 using Content.Server.Radio.Components;
 using Content.Server.Station.Systems;
-using Content.Shared.Access.Components;
-using Content.Shared.CartridgeLoader;
-using Content.Shared.Database;
 using Content.Shared._DV.CartridgeLoader.Cartridges;
 using Content.Shared._DV.NanoChat;
+using Content.Shared.Access.Components;
+using Content.Shared.CartridgeLoader;
+using Content.Shared.CCVar;
+using Content.Shared.Database;
 using Content.Shared.PDA;
 using Content.Shared.Radio.Components;
+using Robust.Shared.Configuration;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
-using Content.Shared.CCVar;
-using Robust.Shared.Configuration;
-using Robust.Shared.Utility; // Goob
+using Robust.Shared.Utility;
+
+// Goob
 
 namespace Content.Server._DV.CartridgeLoader.Cartridges;
 
 public sealed class NanoChatCartridgeSystem : EntitySystem
 {
-    [Dependency] private readonly CartridgeLoaderSystem _cartridge = default!;
-    [Dependency] private readonly IAdminLogManager _adminLogger = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly IPrototypeManager _prototype = default!;
-    [Dependency] private readonly SharedNanoChatSystem _nanoChat = default!;
-    [Dependency] private readonly StationSystem _station = default!;
-    [Dependency] private readonly SharedUserInterfaceSystem _ui = default!;
-    [Dependency] private readonly IConfigurationManager _cfgManager = default!;
-
     // Messages in notifications get cut off after this point
     // no point in storing it on the comp
     private const int NotificationMaxLength = 64;
+    [Dependency] private readonly IAdminLogManager _adminLogger = default!;
+    [Dependency] private readonly CartridgeLoaderSystem _cartridge = default!;
+    [Dependency] private readonly IConfigurationManager _cfgManager = default!;
+    [Dependency] private readonly SharedNanoChatSystem _nanoChat = default!;
+    [Dependency] private readonly IPrototypeManager _prototype = default!;
+    [Dependency] private readonly StationSystem _station = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly SharedUserInterfaceSystem _ui = default!;
+    private int _maxIdJobLength;
 
     private int _maxNameLength;
-    private int _maxIdJobLength;
 
     public override void Initialize()
     {
@@ -69,9 +70,7 @@ public sealed class NanoChatCartridgeSystem : EntitySystem
             cartridge.LoaderUid is not { } pda ||
             !TryComp<CartridgeLoaderComponent>(pda, out var loader) ||
             !GetCardEntity(pda, out var card))
-        {
             return;
-        }
 
         // if you switch to another program or close the pda UI, allow notifications for the selected chat
         _nanoChat.SetClosed((card, card.Comp), loader.ActiveProgram != ent.Owner || !_ui.IsUiOpen(pda, PdaUiKey.Key));
@@ -108,7 +107,7 @@ public sealed class NanoChatCartridgeSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Handles incoming UI messages from the NanoChat cartridge.
+    /// Handles incoming UI messages from the NanoChat cartridge.
     /// </summary>
     private void OnMessage(Entity<NanoChatCartridgeComponent> ent, ref CartridgeMessageEvent args)
     {
@@ -147,7 +146,7 @@ public sealed class NanoChatCartridgeSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Gets the ID card entity associated with a PDA.
+    /// Gets the ID card entity associated with a PDA.
     /// </summary>
     /// <param name="loaderUid">The PDA entity ID</param>
     /// <param name="card">Output parameter containing the found card entity and component</param>
@@ -169,7 +168,7 @@ public sealed class NanoChatCartridgeSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Handles creation of a new chat conversation.
+    /// Handles creation of a new chat conversation.
     /// </summary>
     private void HandleNewChat(Entity<NanoChatCardComponent> card, NanoChatUiMessageEvent msg)
     {
@@ -210,7 +209,7 @@ public sealed class NanoChatCartridgeSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Handles selecting a chat conversation.
+    /// Handles selecting a chat conversation.
     /// </summary>
     private void HandleSelectChat(Entity<NanoChatCardComponent> card, NanoChatUiMessageEvent msg)
     {
@@ -229,15 +228,13 @@ public sealed class NanoChatCartridgeSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Handles closing the current chat conversation.
+    /// Handles closing the current chat conversation.
     /// </summary>
-    private void HandleCloseChat(Entity<NanoChatCardComponent> card)
-    {
+    private void HandleCloseChat(Entity<NanoChatCardComponent> card) =>
         _nanoChat.SetCurrentChat((card, card.Comp), null);
-    }
 
     /// <summary>
-    ///     Handles deletion of a chat conversation.
+    /// Handles deletion of a chat conversation.
     /// </summary>
     private void HandleDeleteChat(Entity<NanoChatCardComponent> card, NanoChatUiMessageEvent msg)
     {
@@ -258,7 +255,7 @@ public sealed class NanoChatCartridgeSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Handles toggling notification mute state.
+    /// Handles toggling notification mute state.
     /// </summary>
     private void HandleToggleMute(Entity<NanoChatCardComponent> card)
     {
@@ -273,7 +270,7 @@ public sealed class NanoChatCartridgeSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Handles sending a new message in a chat conversation.
+    /// Handles sending a new message in a chat conversation.
     /// </summary>
     private void HandleSendMessage(Entity<NanoChatCartridgeComponent> cartridge,
         Entity<NanoChatCardComponent> card,
@@ -297,7 +294,7 @@ public sealed class NanoChatCartridgeSystem : EntitySystem
         var message = new NanoChatMessage(
             _timing.CurTime,
             content,
-            (uint)card.Comp.Number
+            (uint) card.Comp.Number
         );
 
         // Attempt delivery
@@ -331,18 +328,16 @@ public sealed class NanoChatCartridgeSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Ensures a recipient exists in the sender's contacts.
+    /// Ensures a recipient exists in the sender's contacts.
     /// </summary>
     /// <param name="card">The card to check contacts for</param>
     /// <param name="recipientNumber">The recipient's number to check</param>
     /// <returns>True if the recipient exists or was created successfully</returns>
-    private bool EnsureRecipientExists(Entity<NanoChatCardComponent> card, uint recipientNumber)
-    {
-        return _nanoChat.EnsureRecipientExists((card, card.Comp), recipientNumber, GetCardInfo(recipientNumber));
-    }
+    private bool EnsureRecipientExists(Entity<NanoChatCardComponent> card, uint recipientNumber) =>
+        _nanoChat.EnsureRecipientExists((card, card.Comp), recipientNumber, GetCardInfo(recipientNumber));
 
     /// <summary>
-    ///     Attempts to deliver a message to recipients.
+    /// Attempts to deliver a message to recipients.
     /// </summary>
     /// <param name="sender">The sending cartridge entity</param>
     /// <param name="recipientNumber">The recipient's number</param>
@@ -416,7 +411,7 @@ public sealed class NanoChatCartridgeSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Checks if there are any active telecomms servers on the given station
+    /// Checks if there are any active telecomms servers on the given station
     /// </summary>
     private bool HasActiveServer(EntityUid station)
     {
@@ -434,7 +429,7 @@ public sealed class NanoChatCartridgeSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Delivers a message to the recipient and handles associated notifications.
+    /// Delivers a message to the recipient and handles associated notifications.
     /// </summary>
     /// <param name="sender">The sender's card entity</param>
     /// <param name="recipient">The recipient's card entity</param>
@@ -462,7 +457,7 @@ public sealed class NanoChatCartridgeSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Handles unread message notifications and updates unread status.
+    /// Handles unread message notifications and updates unread status.
     /// </summary>
     private void HandleUnreadNotification(Entity<NanoChatCardComponent> recipient,
         NanoChatMessage message,
@@ -477,17 +472,19 @@ public sealed class NanoChatCartridgeSystem : EntitySystem
 
         // Update unread status
         if (!hasSelectedCurrentChat)
+        {
             _nanoChat.SetRecipient((recipient, recipient.Comp),
                 message.SenderId,
                 senderRecipient with { HasUnread = true });
+        }
 
         if (recipient.Comp.NotificationsMuted ||
-            recipient.Comp.PdaUid is not {} pdaUid ||
+            recipient.Comp.PdaUid is not { } pdaUid ||
             !TryComp<CartridgeLoaderComponent>(pdaUid, out var loader) ||
             // Don't notify if the recipient has the NanoChat program open with this chat selected.
-            (hasSelectedCurrentChat &&
-                _ui.IsUiOpen(pdaUid, PdaUiKey.Key) &&
-                HasComp<NanoChatCartridgeComponent>(loader.ActiveProgram)))
+            hasSelectedCurrentChat &&
+            _ui.IsUiOpen(pdaUid, PdaUiKey.Key) &&
+            HasComp<NanoChatCartridgeComponent>(loader.ActiveProgram))
             return;
 
         _cartridge.SendNotification(pdaUid,
@@ -497,7 +494,7 @@ public sealed class NanoChatCartridgeSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Updates the UI for any PDAs containing the specified card.
+    /// Updates the UI for any PDAs containing the specified card.
     /// </summary>
     private void UpdateUIForCard(EntityUid cardUid)
     {
@@ -513,7 +510,7 @@ public sealed class NanoChatCartridgeSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Updates the UI for all PDAs containing a NanoChat cartridge.
+    /// Updates the UI for all PDAs containing a NanoChat cartridge.
     /// </summary>
     private void UpdateUIForAllCards()
     {
@@ -527,7 +524,7 @@ public sealed class NanoChatCartridgeSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Gets the <see cref="NanoChatRecipient" /> for a given NanoChat number.
+    /// Gets the <see cref="NanoChatRecipient" /> for a given NanoChat number.
     /// </summary>
     private NanoChatRecipient? GetCardInfo(uint number)
     {
@@ -554,14 +551,12 @@ public sealed class NanoChatCartridgeSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Truncates a message to the notification maximum length.
+    /// Truncates a message to the notification maximum length.
     /// </summary>
-    private static string TruncateMessage(string message)
-    {
-        return message.Length <= NotificationMaxLength
+    private static string TruncateMessage(string message) =>
+        message.Length <= NotificationMaxLength
             ? message
             : message[..(NotificationMaxLength - 4)] + " [...]";
-    }
 
     private void OnUiReady(Entity<NanoChatCartridgeComponent> ent, ref CartridgeUiReadyEvent args)
     {
@@ -581,17 +576,15 @@ public sealed class NanoChatCartridgeSystem : EntitySystem
             var query = AllEntityQuery<NanoChatCardComponent, IdCardComponent>();
             while (query.MoveNext(out var entityId, out var nanoChatCard, out var idCardComponent))
             {
-                if (nanoChatCard.ListNumber && nanoChatCard.Number is uint nanoChatNumber && idCardComponent.FullName is string fullName && _station.GetOwningStation(entityId) == station)
-                {
+                if (nanoChatCard.ListNumber && nanoChatCard.Number is uint nanoChatNumber &&
+                    idCardComponent.FullName is string fullName && _station.GetOwningStation(entityId) == station)
                     contacts.Add(new NanoChatRecipient(nanoChatNumber, fullName));
-                }
             }
+
             contacts.Sort((contactA, contactB) => string.CompareOrdinal(contactA.Name, contactB.Name));
         }
         else
-        {
             contacts = null;
-        }
 
         var recipients = new Dictionary<uint, NanoChatRecipient>();
         var messages = new Dictionary<uint, List<NanoChatMessage>>();

@@ -19,7 +19,7 @@ using JetBrains.Annotations;
 namespace Content.Server.Administration.UI;
 
 /// <summary>
-///     Admin Eui for spawning and preview-ing explosions
+/// Admin Eui for spawning and preview-ing explosions
 /// </summary>
 [UsedImplicitly]
 public sealed class SpawnExplosionEui : BaseEui

@@ -23,9 +23,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using System.Threading.Tasks;
 using Content.Server.Administration.Logs;
-using Content.Server.CartridgeLoader.Cartridges;
 using Content.Server.CartridgeLoader;
+using Content.Server.CartridgeLoader.Cartridges;
 using Content.Server.Chat.Managers;
 using Content.Server.Discord;
 using Content.Server.GameTicking;
@@ -34,46 +36,42 @@ using Content.Server.Popups;
 using Content.Server.Station.Systems;
 using Content.Shared.Access.Components;
 using Content.Shared.Access.Systems;
-using Content.Shared.CCVar;
-using Content.Shared.CartridgeLoader.Cartridges;
 using Content.Shared.CartridgeLoader;
+using Content.Shared.CartridgeLoader.Cartridges;
+using Content.Shared.CCVar;
 using Content.Shared.Database;
 using Content.Shared.GameTicking;
 using Content.Shared.IdentityManagement;
 using Content.Shared.MassMedia.Components;
 using Content.Shared.MassMedia.Systems;
 using Content.Shared.Popups;
-using Robust.Server.GameObjects;
 using Robust.Server;
+using Robust.Server.GameObjects;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Configuration;
-using Robust.Shared.Maths;
 using Robust.Shared.Timing;
 using Robust.Shared.Utility;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Content.Server.MassMedia.Systems;
 
 public sealed class NewsSystem : SharedNewsSystem
 {
     [Dependency] private readonly AccessReaderSystem _accessReaderSystem = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly IAdminLogManager _adminLogger = default!;
-    [Dependency] private readonly UserInterfaceSystem _ui = default!;
-    [Dependency] private readonly CartridgeLoaderSystem _cartridgeLoaderSystem = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly IBaseServer _baseServer = default!;
+    [Dependency] private readonly CartridgeLoaderSystem _cartridgeLoaderSystem = default!;
+    [Dependency] private readonly IConfigurationManager _cfg = default!;
+    [Dependency] private readonly IChatManager _chatManager = default!;
+    [Dependency] private readonly DiscordWebhook _discord = default!;
     [Dependency] private readonly PopupSystem _popup = default!;
     [Dependency] private readonly StationSystem _station = default!;
     [Dependency] private readonly GameTicker _ticker = default!;
-    [Dependency] private readonly IChatManager _chatManager = default!;
-    [Dependency] private readonly DiscordWebhook _discord = default!;
-    [Dependency] private readonly IConfigurationManager _cfg = default!;
-    [Dependency] private readonly IBaseServer _baseServer = default!;
-
-    private WebhookIdentifier? _webhookId = null;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly UserInterfaceSystem _ui = default!;
     private Color _webhookEmbedColor;
+
+    private WebhookIdentifier? _webhookId;
     private bool _webhookSendDuringRound;
 
     public override void Initialize()
@@ -86,14 +84,17 @@ public sealed class NewsSystem : SharedNewsSystem
             {
                 if (!string.IsNullOrWhiteSpace(value))
                     _discord.GetWebhook(value, data => _webhookId = data.ToIdentifier());
-            }, true);
+            },
+            true);
 
-        _cfg.OnValueChanged(CCVars.DiscordNewsWebhookEmbedColor, value =>
+        _cfg.OnValueChanged(CCVars.DiscordNewsWebhookEmbedColor,
+            value =>
             {
                 _webhookEmbedColor = Color.LawnGreen;
                 if (Color.TryParse(value, out var color))
                     _webhookEmbedColor = color;
-            }, true);
+            },
+            true);
 
         _cfg.OnValueChanged(CCVars.DiscordNewsWebhookSendDuringRound, value => _webhookSendDuringRound = value, true);
         SubscribeLocalEvent<RoundEndMessageEvent>(OnRoundEndMessageEvent);
@@ -102,14 +103,15 @@ public sealed class NewsSystem : SharedNewsSystem
         SubscribeLocalEvent<NewsWriterComponent, MapInitEvent>(OnMapInit);
 
         // New writer bui messages
-        Subs.BuiEvents<NewsWriterComponent>(NewsWriterUiKey.Key, subs =>
-        {
-            subs.Event<NewsWriterDeleteMessage>(OnWriteUiDeleteMessage);
-            subs.Event<NewsWriterArticlesRequestMessage>(OnRequestArticlesUiMessage);
-            subs.Event<NewsWriterPublishMessage>(OnWriteUiPublishMessage);
-            subs.Event<NewsWriterSaveDraftMessage>(OnNewsWriterDraftUpdatedMessage);
-            subs.Event<NewsWriterRequestDraftMessage>(OnRequestArticleDraftMessage);
-        });
+        Subs.BuiEvents<NewsWriterComponent>(NewsWriterUiKey.Key,
+            subs =>
+            {
+                subs.Event<NewsWriterDeleteMessage>(OnWriteUiDeleteMessage);
+                subs.Event<NewsWriterArticlesRequestMessage>(OnRequestArticlesUiMessage);
+                subs.Event<NewsWriterPublishMessage>(OnWriteUiPublishMessage);
+                subs.Event<NewsWriterSaveDraftMessage>(OnNewsWriterDraftUpdatedMessage);
+                subs.Event<NewsWriterRequestDraftMessage>(OnRequestArticleDraftMessage);
+            });
 
         // News reader
         SubscribeLocalEvent<NewsReaderCartridgeComponent, NewsArticlePublishedEvent>(OnArticlePublished);
@@ -132,6 +134,97 @@ public sealed class NewsSystem : SharedNewsSystem
             UpdateWriterUi((uid, comp));
         }
     }
+
+    private bool TryGetArticles(EntityUid uid, [NotNullWhen(true)] out List<NewsArticle>? articles)
+    {
+        if (_station.GetOwningStation(uid) is not { } station ||
+            !TryComp<StationNewsComponent>(station, out var stationNews))
+        {
+            articles = null;
+            return false;
+        }
+
+        articles = stationNews.Articles;
+        return true;
+    }
+
+    private void UpdateWriterUi(Entity<NewsWriterComponent> ent)
+    {
+        if (!_ui.HasUi(ent, NewsWriterUiKey.Key))
+            return;
+
+        if (!TryGetArticles(ent, out var articles))
+            return;
+
+        var state = new NewsWriterBoundUserInterfaceState(articles.ToArray(),
+            ent.Comp.PublishEnabled,
+            ent.Comp.NextPublish,
+            ent.Comp.DraftTitle,
+            ent.Comp.DraftContent);
+        _ui.SetUiState(ent.Owner, NewsWriterUiKey.Key, state);
+    }
+
+    private void UpdateReaderUi(Entity<NewsReaderCartridgeComponent> ent, EntityUid loaderUid)
+    {
+        if (!TryGetArticles(ent, out var articles))
+            return;
+
+        NewsReaderLeafArticle(ent, 0);
+
+        if (articles.Count == 0)
+        {
+            _cartridgeLoaderSystem.UpdateCartridgeUiState(loaderUid,
+                new NewsReaderEmptyBoundUserInterfaceState(ent.Comp.NotificationOn));
+            return;
+        }
+
+        var state = new NewsReaderBoundUserInterfaceState(
+            articles[ent.Comp.ArticleNumber],
+            ent.Comp.ArticleNumber + 1,
+            articles.Count,
+            ent.Comp.NotificationOn);
+
+        _cartridgeLoaderSystem.UpdateCartridgeUiState(loaderUid, state);
+    }
+
+    private void NewsReaderLeafArticle(Entity<NewsReaderCartridgeComponent> ent, int leafDir)
+    {
+        if (!TryGetArticles(ent, out var articles))
+            return;
+
+        ent.Comp.ArticleNumber += leafDir;
+
+        if (ent.Comp.ArticleNumber >= articles.Count)
+            ent.Comp.ArticleNumber = 0;
+
+        if (ent.Comp.ArticleNumber < 0)
+            ent.Comp.ArticleNumber = articles.Count - 1;
+    }
+
+    private void UpdateWriterDevices()
+    {
+        var query = EntityQueryEnumerator<NewsWriterComponent>();
+        while (query.MoveNext(out var owner, out var comp))
+        {
+            UpdateWriterUi((owner, comp));
+        }
+    }
+
+    private bool CanUse(EntityUid user, EntityUid console)
+    {
+        if (TryComp<AccessReaderComponent>(console, out var accessReaderComponent))
+            return _accessReaderSystem.IsAllowed(user, console, accessReaderComponent);
+        return true;
+    }
+
+    private void OnNewsWriterDraftUpdatedMessage(Entity<NewsWriterComponent> ent, ref NewsWriterSaveDraftMessage args)
+    {
+        ent.Comp.DraftTitle = FormattedMessage.EscapeText(args.DraftTitle); // Goob Sanitize Text
+        ent.Comp.DraftContent = FormattedMessage.EscapeText(args.DraftContent); // Goob Sanitize Text
+    }
+
+    private void OnRequestArticleDraftMessage(Entity<NewsWriterComponent> ent, ref NewsWriterRequestDraftMessage msg) =>
+        UpdateWriterUi(ent);
 
     #region Writer Event Handlers
 
@@ -156,7 +249,8 @@ public sealed class NewsSystem : SharedNewsSystem
         if (CanUse(msg.Actor, ent.Owner))
         {
             _adminLogger.Add(
-                LogType.Chat, LogImpact.Medium,
+                LogType.Chat,
+                LogImpact.Medium,
                 $"{ToPrettyString(msg.Actor):actor} deleted news article {article.Title} by {article.Author}: {article.Content}"
             );
 
@@ -179,10 +273,9 @@ public sealed class NewsSystem : SharedNewsSystem
         UpdateWriterDevices();
     }
 
-    private void OnRequestArticlesUiMessage(Entity<NewsWriterComponent> ent, ref NewsWriterArticlesRequestMessage msg)
-    {
+    private void
+        OnRequestArticlesUiMessage(Entity<NewsWriterComponent> ent, ref NewsWriterArticlesRequestMessage msg) =>
         UpdateWriterUi(ent);
-    }
 
     private void OnWriteUiPublishMessage(Entity<NewsWriterComponent> ent, ref NewsWriterPublishMessage msg)
     {
@@ -197,7 +290,7 @@ public sealed class NewsSystem : SharedNewsSystem
 
         var tryGetIdentityShortInfoEvent = new TryGetIdentityShortInfoEvent(ent, msg.Actor);
         RaiseLocalEvent(tryGetIdentityShortInfoEvent);
-        string? authorName = tryGetIdentityShortInfoEvent.Title;
+        var authorName = tryGetIdentityShortInfoEvent.Title;
 
         var title = FormattedMessage.EscapeText(msg.Title.Trim()); // Goob Sanitize Text
         var content = FormattedMessage.EscapeText(msg.Content.Trim()); // Goob Sanitize Text
@@ -207,9 +300,9 @@ public sealed class NewsSystem : SharedNewsSystem
             _audio.PlayPvs(ent.Comp.ConfirmSound, ent);
 
             _chatManager.SendAdminAnnouncement(Loc.GetString("news-publish-admin-announcement",
-                                                             ("actor", msg.Actor),
-                                                             ("title", article.Value.Title),
-                                                             ("author", article.Value.Author ?? Loc.GetString("news-read-ui-no-author"))
+                ("actor", msg.Actor),
+                ("title", article.Value.Title),
+                ("author", article.Value.Author ?? Loc.GetString("news-read-ui-no-author"))
             ));
         }
     }
@@ -222,7 +315,12 @@ public sealed class NewsSystem : SharedNewsSystem
     /// <param name="content">Content of the news article.</param>
     /// <param name="author">Author of the news article.</param>
     /// <param name="actor">Entity which caused the news article to publish. Used for admin logs.</param>
-    public bool TryAddNews(EntityUid uid, string title, string content, [NotNullWhen(true)] out NewsArticle? article, string? author = null, EntityUid? actor = null)
+    public bool TryAddNews(EntityUid uid,
+        string title,
+        string content,
+        [NotNullWhen(true)] out NewsArticle? article,
+        string? author = null,
+        EntityUid? actor = null)
     {
         if (!TryGetArticles(uid, out var articles))
         {
@@ -235,7 +333,7 @@ public sealed class NewsSystem : SharedNewsSystem
             Title = title.Length <= MaxTitleLength ? title : $"{title[..MaxTitleLength]}...",
             Content = content.Length <= MaxContentLength ? content : $"{content[..MaxContentLength]}...",
             Author = author,
-            ShareTime = _ticker.RoundDuration()
+            ShareTime = _ticker.RoundDuration(),
         };
 
         articles.Add(article.Value);
@@ -271,10 +369,8 @@ public sealed class NewsSystem : SharedNewsSystem
         return true;
     }
 
-    private async void AddNewsSendWebhook(NewsArticle article)
-    {
+    private async void AddNewsSendWebhook(NewsArticle article) =>
         await Task.Run(async () => await SendArticleToDiscordWebhook(article));
-    }
 
     #endregion
 
@@ -325,102 +421,10 @@ public sealed class NewsSystem : SharedNewsSystem
         UpdateReaderUi(ent, GetEntity(args.LoaderUid));
     }
 
-    private void OnReaderUiReady(Entity<NewsReaderCartridgeComponent> ent, ref CartridgeUiReadyEvent args)
-    {
+    private void OnReaderUiReady(Entity<NewsReaderCartridgeComponent> ent, ref CartridgeUiReadyEvent args) =>
         UpdateReaderUi(ent, args.Loader);
-    }
+
     #endregion
-
-    private bool TryGetArticles(EntityUid uid, [NotNullWhen(true)] out List<NewsArticle>? articles)
-    {
-        if (_station.GetOwningStation(uid) is not { } station ||
-            !TryComp<StationNewsComponent>(station, out var stationNews))
-        {
-            articles = null;
-            return false;
-        }
-
-        articles = stationNews.Articles;
-        return true;
-    }
-
-    private void UpdateWriterUi(Entity<NewsWriterComponent> ent)
-    {
-        if (!_ui.HasUi(ent, NewsWriterUiKey.Key))
-            return;
-
-        if (!TryGetArticles(ent, out var articles))
-            return;
-
-        var state = new NewsWriterBoundUserInterfaceState(articles.ToArray(), ent.Comp.PublishEnabled, ent.Comp.NextPublish, ent.Comp.DraftTitle, ent.Comp.DraftContent);
-        _ui.SetUiState(ent.Owner, NewsWriterUiKey.Key, state);
-    }
-
-    private void UpdateReaderUi(Entity<NewsReaderCartridgeComponent> ent, EntityUid loaderUid)
-    {
-        if (!TryGetArticles(ent, out var articles))
-            return;
-
-        NewsReaderLeafArticle(ent, 0);
-
-        if (articles.Count == 0)
-        {
-            _cartridgeLoaderSystem.UpdateCartridgeUiState(loaderUid, new NewsReaderEmptyBoundUserInterfaceState(ent.Comp.NotificationOn));
-            return;
-        }
-
-        var state = new NewsReaderBoundUserInterfaceState(
-            articles[ent.Comp.ArticleNumber],
-            ent.Comp.ArticleNumber + 1,
-            articles.Count,
-            ent.Comp.NotificationOn);
-
-        _cartridgeLoaderSystem.UpdateCartridgeUiState(loaderUid, state);
-    }
-
-    private void NewsReaderLeafArticle(Entity<NewsReaderCartridgeComponent> ent, int leafDir)
-    {
-        if (!TryGetArticles(ent, out var articles))
-            return;
-
-        ent.Comp.ArticleNumber += leafDir;
-
-        if (ent.Comp.ArticleNumber >= articles.Count)
-            ent.Comp.ArticleNumber = 0;
-
-        if (ent.Comp.ArticleNumber < 0)
-            ent.Comp.ArticleNumber = articles.Count - 1;
-    }
-
-    private void UpdateWriterDevices()
-    {
-        var query = EntityQueryEnumerator<NewsWriterComponent>();
-        while (query.MoveNext(out var owner, out var comp))
-        {
-            UpdateWriterUi((owner, comp));
-        }
-    }
-
-    private bool CanUse(EntityUid user, EntityUid console)
-    {
-
-        if (TryComp<AccessReaderComponent>(console, out var accessReaderComponent))
-        {
-            return _accessReaderSystem.IsAllowed(user, console, accessReaderComponent);
-        }
-        return true;
-    }
-
-    private void OnNewsWriterDraftUpdatedMessage(Entity<NewsWriterComponent> ent, ref NewsWriterSaveDraftMessage args)
-    {
-        ent.Comp.DraftTitle = FormattedMessage.EscapeText(args.DraftTitle); // Goob Sanitize Text
-        ent.Comp.DraftContent = FormattedMessage.EscapeText(args.DraftContent); // Goob Sanitize Text
-    }
-
-    private void OnRequestArticleDraftMessage(Entity<NewsWriterComponent> ent, ref NewsWriterRequestDraftMessage msg)
-    {
-        UpdateWriterUi(ent);
-    }
 
     #region Discord Hook
 
@@ -465,8 +469,8 @@ public sealed class NewsSystem : SharedNewsSystem
                         ("server", _baseServer.ServerName),
                         ("round", _ticker.RoundId),
                         ("author", article.Author ?? Loc.GetString("news-discord-unknown-author")),
-                        ("time", article.ShareTime.ToString(@"hh\:mm\:ss")))
-                }
+                        ("time", article.ShareTime.ToString(@"hh\:mm\:ss"))),
+                },
             };
             var payload = new WebhookPayload { Embeds = [embed] };
             await _discord.CreateMessage(_webhookId.Value, payload);

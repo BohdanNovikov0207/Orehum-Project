@@ -12,79 +12,78 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Linq;
+using System.Numerics;
 using Content.Server._Goobstation.Heretic.EntitySystems.PathSpecific;
-using Content.Server.Atmos.EntitySystems;
 using Content.Server.Atmos.Components;
+using Content.Server.Atmos.EntitySystems;
 using Content.Server.Audio;
+using Content.Server.Heretic.Components.PathSpecific;
 using Content.Server.Light.Components;
 using Content.Server.Light.EntitySystems;
-using Content.Server.Heretic.Components.PathSpecific;
+using Content.Shared._Goobstation.Wizard.Projectiles;
+using Content.Shared._Shitcode.Heretic.Components;
 using Content.Shared.Atmos;
 using Content.Shared.Audio;
 using Content.Shared.Coordinates.Helpers;
 using Content.Shared.Damage;
-using Content.Shared.Maps;
-using Content.Shared.Mobs;
-using Content.Shared.Mobs.Components;
-using Content.Shared.Popups;
-using Content.Shared.Tag;
-using Content.Shared.Weather;
-using Robust.Shared.Audio;
-using Robust.Shared.Map;
-using Robust.Shared.Map.Components;
-using Robust.Shared.Prototypes;
-using Robust.Shared.Player;
-using Robust.Shared.Random;
-using System.Linq;
-using System.Numerics;
-using Content.Shared._Goobstation.Wizard.Projectiles;
-using Content.Shared._Shitcode.Heretic.Components;
 using Content.Shared.Doors.Components;
 using Content.Shared.Effects;
 using Content.Shared.Heretic;
+using Content.Shared.Maps;
+using Content.Shared.Mobs;
+using Content.Shared.Mobs.Components;
 using Content.Shared.Movement.Components;
+using Content.Shared.Popups;
 using Content.Shared.Projectiles;
 using Content.Shared.Standing;
 using Content.Shared.StatusEffect;
+using Content.Shared.Tag;
 using Content.Shared.Weapons.Ranged.Events;
+using Content.Shared.Weather;
+using Robust.Shared.Audio;
 using Robust.Shared.Audio.Systems;
+using Robust.Shared.Map;
+using Robust.Shared.Map.Components;
 using Robust.Shared.Physics.Components;
 using Robust.Shared.Physics.Events;
 using Robust.Shared.Physics.Systems;
+using Robust.Shared.Player;
+using Robust.Shared.Prototypes;
+using Robust.Shared.Random;
 
 namespace Content.Server.Heretic.EntitySystems.PathSpecific;
 
 // void path heretic exclusive
 public sealed class AristocratSystem : EntitySystem
 {
-    [Dependency] private readonly TileSystem _tile = default!;
-    [Dependency] private readonly IRobustRandom _rand = default!;
-    [Dependency] private readonly IPrototypeManager _prot = default!;
-    [Dependency] private readonly IMapManager _mapMan = default!;
-    [Dependency] private readonly AtmosphereSystem _atmos = default!;
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly VoidCurseSystem _voidcurse = default!;
-    [Dependency] private readonly ServerGlobalSoundSystem _globalSound = default!;
-    [Dependency] private readonly DamageableSystem _damage = default!;
-    [Dependency] private readonly PoweredLightSystem _light = default!;
-    [Dependency] private readonly FlammableSystem _flammable = default!;
-    [Dependency] private readonly SharedWeatherSystem _weather = default!;
-    [Dependency] private readonly TagSystem _tag = default!;
-    [Dependency] private readonly TurfSystem _turf = default!;
-    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
-    [Dependency] private readonly SharedTransformSystem _xform = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedColorFlashEffectSystem _color = default!;
-    [Dependency] private readonly StatusEffectsSystem _status = default!;
-    [Dependency] private readonly StandingStateSystem _standing = default!;
-    [Dependency] private readonly HereticSystem _heretic = default!;
+    private const float ConduitDelay = 2f;
 
     private static readonly EntProtoId IceTilePrototype = "IceCrust";
     private static readonly ProtoId<ContentTileDefinition> SnowTilePrototype = "FloorAstroSnow";
     private static readonly EntProtoId IceWallPrototype = "WallIce";
-
-    private const float ConduitDelay = 2f;
+    [Dependency] private readonly AtmosphereSystem _atmos = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly SharedColorFlashEffectSystem _color = default!;
+    [Dependency] private readonly DamageableSystem _damage = default!;
+    [Dependency] private readonly FlammableSystem _flammable = default!;
+    [Dependency] private readonly ServerGlobalSoundSystem _globalSound = default!;
+    [Dependency] private readonly HereticSystem _heretic = default!;
+    [Dependency] private readonly PoweredLightSystem _light = default!;
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
+    [Dependency] private readonly IMapManager _mapMan = default!;
+    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly IPrototypeManager _prot = default!;
+    [Dependency] private readonly IRobustRandom _rand = default!;
+    [Dependency] private readonly StandingStateSystem _standing = default!;
+    [Dependency] private readonly StatusEffectsSystem _status = default!;
+    [Dependency] private readonly TagSystem _tag = default!;
+    [Dependency] private readonly TileSystem _tile = default!;
+    [Dependency] private readonly TurfSystem _turf = default!;
+    [Dependency] private readonly VoidCurseSystem _voidcurse = default!;
+    [Dependency] private readonly SharedWeatherSystem _weather = default!;
+    [Dependency] private readonly SharedTransformSystem _xform = default!;
 
     private float _accumulator;
 
@@ -133,10 +132,8 @@ public sealed class AristocratSystem : EntitySystem
         RemComp(args.OtherEntity, affected);
     }
 
-    private void OnStartCollide(Entity<VoidAscensionAuraComponent> ent, ref StartCollideEvent args)
-    {
+    private void OnStartCollide(Entity<VoidAscensionAuraComponent> ent, ref StartCollideEvent args) =>
         ProcessAura(ent, args.OtherEntity, physics: args.OtherBody);
-    }
 
     private void ProcessAura(Entity<VoidAscensionAuraComponent> ent,
         EntityUid bullet,
@@ -164,10 +161,8 @@ public sealed class AristocratSystem : EntitySystem
         FreezeBullet((parent, aristocrat, null, null), (bullet, projectile, affected, physics));
     }
 
-    private void OnReflectHitScan(Entity<AristocratComponent> ent, ref HitScanReflectAttemptEvent args)
-    {
+    private void OnReflectHitScan(Entity<AristocratComponent> ent, ref HitScanReflectAttemptEvent args) =>
         args.Reflected = true;
-    }
 
     private void OnStartup(Entity<AristocratComponent> ent, ref ComponentStartup args)
     {
@@ -348,6 +343,7 @@ public sealed class AristocratSystem : EntitySystem
                             true,
                             status);
                     }
+
                     continue;
                 }
 
@@ -404,9 +400,7 @@ public sealed class AristocratSystem : EntitySystem
         var step = ent.Comp1.UpdateStep;
 
         if (step % 100 == 0)
-        {
             step = 10;
-        }
 
         if (step % 10 == 0)
             FreezeNoobs(ent);
@@ -471,7 +465,7 @@ public sealed class AristocratSystem : EntitySystem
 
         // If heretic is lying down, walking or moving slowly, bullets are slowed down even more
         var waltzMultiplier = TryComp(ent, out InputMoverComponent? mover) && !mover.Sprinting ||
-            _standing.IsDown(ent) || ent.Comp3.LinearVelocity.Length() <= 2.5f
+                              _standing.IsDown(ent) || ent.Comp3.LinearVelocity.Length() <= 2.5f
             ? 1f
             : 2f;
 

@@ -24,6 +24,17 @@ namespace Content.Server.GuideGenerator;
 
 public sealed class ReagentEntry
 {
+    public ReagentEntry(ReagentPrototype proto)
+    {
+        Id = proto.ID;
+        Name = proto.LocalizedName;
+        Group = proto.Group;
+        Description = proto.LocalizedDescription;
+        PhysicalDescription = proto.LocalizedPhysicalDescription;
+        SubstanceColor = proto.SubstanceColor.ToHex();
+        Metabolisms = proto.Metabolisms?.ToDictionary(x => x.Key.Id, x => x.Value);
+    }
+
     [JsonPropertyName("id")]
     public string Id { get; }
 
@@ -47,36 +58,10 @@ public sealed class ReagentEntry
 
     [JsonPropertyName("metabolisms")]
     public Dictionary<string, ReagentEffectsEntry>? Metabolisms { get; }
-
-    public ReagentEntry(ReagentPrototype proto)
-    {
-        Id = proto.ID;
-        Name = proto.LocalizedName;
-        Group = proto.Group;
-        Description = proto.LocalizedDescription;
-        PhysicalDescription = proto.LocalizedPhysicalDescription;
-        SubstanceColor = proto.SubstanceColor.ToHex();
-        Metabolisms = proto.Metabolisms?.ToDictionary(x => x.Key.Id, x => x.Value);
-    }
 }
 
 public sealed class ReactionEntry
 {
-    [JsonPropertyName("id")]
-    public string Id { get; }
-
-    [JsonPropertyName("name")]
-    public string Name { get; }
-
-    [JsonPropertyName("reactants")]
-    public Dictionary<string, ReactantEntry> Reactants { get; }
-
-    [JsonPropertyName("products")]
-    public Dictionary<string, float> Products { get; }
-
-    [JsonPropertyName("effects")]
-    public List<EntityEffect> Effects { get; }
-
     public ReactionEntry(ReactionPrototype proto)
     {
         Id = proto.ID;
@@ -91,19 +76,34 @@ public sealed class ReactionEntry
                 .ToDictionary(x => x.Key, x => x.Value);
         Effects = proto.Effects;
     }
+
+    [JsonPropertyName("id")]
+    public string Id { get; }
+
+    [JsonPropertyName("name")]
+    public string Name { get; }
+
+    [JsonPropertyName("reactants")]
+    public Dictionary<string, ReactantEntry> Reactants { get; }
+
+    [JsonPropertyName("products")]
+    public Dictionary<string, float> Products { get; }
+
+    [JsonPropertyName("effects")]
+    public List<EntityEffect> Effects { get; }
 }
 
 public sealed class ReactantEntry
 {
-    [JsonPropertyName("amount")]
-    public float Amount { get; }
-
-    [JsonPropertyName("catalyst")]
-    public bool Catalyst { get; }
-
     public ReactantEntry(float amnt, bool cata)
     {
         Amount = amnt;
         Catalyst = cata;
     }
+
+    [JsonPropertyName("amount")]
+    public float Amount { get; }
+
+    [JsonPropertyName("catalyst")]
+    public bool Catalyst { get; }
 }

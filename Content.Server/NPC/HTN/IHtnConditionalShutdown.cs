@@ -16,7 +16,7 @@ public interface IHtnConditionalShutdown
     HTNPlanState ShutdownState { get; }
 
     /// <summary>
-    /// Run whenever the <see cref="ShutdownState"/> specifies.
+    /// Run whenever the <see cref="ShutdownState" /> specifies.
     /// </summary>
     void ConditionalShutdown(NPCBlackboard blackboard);
 }

@@ -11,20 +11,20 @@ namespace Content.Server.Anomaly.Components;
 /// <summary>
 /// Hides some information about the anomaly when scanning it
 /// </summary>
-[RegisterComponent, Access(typeof(SecretDataAnomalySystem), typeof(AnomalySystem))]
+[RegisterComponent] [Access(typeof(SecretDataAnomalySystem), typeof(AnomalySystem))]
 public sealed partial class SecretDataAnomalyComponent : Component
 {
-    /// <summary>
-    /// Minimum hidden data elements on MapInit
-    /// </summary>
-    [DataField]
-    public int RandomStartSecretMin = 0;
-
     /// <summary>
     /// Maximum hidden data elements on MapInit
     /// </summary>
     [DataField]
     public int RandomStartSecretMax = 0;
+
+    /// <summary>
+    /// Minimum hidden data elements on MapInit
+    /// </summary>
+    [DataField]
+    public int RandomStartSecretMin = 0;
 
     /// <summary>
     /// Current secret data
@@ -47,5 +47,5 @@ public enum AnomalySecretData : byte
     ParticleContainment,
     ParticleTransformation,
     Behavior,
-    Default
+    Default,
 }

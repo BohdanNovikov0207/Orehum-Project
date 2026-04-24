@@ -61,7 +61,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Server.Administration.Logs;
 using Content.Server.Atmos.EntitySystems;
 using Content.Server.Atmos.Piping.Components;
 using Content.Server.Atmos.Piping.Unary.EntitySystems;
@@ -70,30 +69,29 @@ using Content.Server.NodeContainer.EntitySystems;
 using Content.Server.NodeContainer.NodeGroups;
 using Content.Server.NodeContainer.Nodes;
 using Content.Server.Temperature.Components;
+using Content.Shared.Actions;
 using Content.Shared.Atmos;
-using Content.Shared.Actions; // Shitmed Change
-using Content.Shared.UserInterface;
+using Content.Shared.Bed.Sleep;
 using Content.Shared.Body.Components;
 using Content.Shared.Chemistry.EntitySystems;
 using Content.Shared.Medical.Cryogenics;
 using Content.Shared.MedicalScanner;
 using Content.Shared.UserInterface;
-using Content.Shared.Verbs;
-using Content.Shared.Bed.Sleep; // Shitmed Change
-using Robust.Server.GameObjects;
 using Robust.Shared.Containers;
+// Shitmed Change
+// Shitmed Change
 
 namespace Content.Server.Medical;
 
 public sealed partial class CryoPodSystem : SharedCryoPodSystem
 {
-    [Dependency] private readonly AtmosphereSystem _atmosphereSystem = default!;
     [Dependency] private readonly SharedActionsSystem _actionsSystem = default!;
+    [Dependency] private readonly AtmosphereSystem _atmosphereSystem = default!;
     [Dependency] private readonly GasCanisterSystem _gasCanisterSystem = default!;
     [Dependency] private readonly NodeContainerSystem _nodeContainer = default!;
-    [Dependency] private readonly SharedUserInterfaceSystem _uiSystem = default!;
-    [Dependency] private readonly SharedSolutionContainerSystem _solutionContainerSystem = default!;
     [Dependency] private readonly SleepingSystem _sleepingSystem = default!; // Shitmed change
+    [Dependency] private readonly SharedSolutionContainerSystem _solutionContainerSystem = default!;
+    [Dependency] private readonly SharedUserInterfaceSystem _uiSystem = default!;
 
     public override void Initialize()
     {
@@ -114,25 +112,26 @@ public sealed partial class CryoPodSystem : SharedCryoPodSystem
         TryComp<BloodstreamComponent>(entity.Comp.BodyContainer.ContainedEntity, out var bloodstream);
 
         if (TryComp<HealthAnalyzerComponent>(entity, out var healthAnalyzer))
-        {
             healthAnalyzer.ScannedEntity = entity.Comp.BodyContainer.ContainedEntity;
-        }
 
         // TODO: This should be a state my dude
         _uiSystem.ServerSendUiMessage(
             entity.Owner,
             HealthAnalyzerUiKey.Key,
             new HealthAnalyzerScannedUserMessage(GetNetEntity(entity.Comp.BodyContainer.ContainedEntity),
-            temp?.CurrentTemperature ?? 0,
-            (bloodstream != null && _solutionContainerSystem.ResolveSolution(entity.Comp.BodyContainer.ContainedEntity.Value,
-                bloodstream.BloodSolutionName, ref bloodstream.BloodSolution, out var bloodSolution))
-                ? bloodSolution.FillFraction
-                : 0,
-            null,
-            null,
-            null,
-            null // Shitmed Change
-        ));
+                temp?.CurrentTemperature ?? 0,
+                bloodstream != null && _solutionContainerSystem.ResolveSolution(
+                    entity.Comp.BodyContainer.ContainedEntity.Value,
+                    bloodstream.BloodSolutionName,
+                    ref bloodstream.BloodSolution,
+                    out var bloodSolution)
+                    ? bloodSolution.FillFraction
+                    : 0,
+                null,
+                null,
+                null,
+                null // Shitmed Change
+            ));
     }
 
     private void OnCryoPodUpdateAtmosphere(Entity<CryoPodComponent> entity, ref AtmosDeviceUpdateEvent args)
@@ -146,9 +145,7 @@ public sealed partial class CryoPodSystem : SharedCryoPodSystem
         _atmosphereSystem.React(cryoPodAir.Air, portNode);
 
         if (portNode.NodeGroup is PipeNet { NodeCount: > 1 } net)
-        {
             _gasCanisterSystem.MixContainerWithPipeNet(cryoPodAir.Air, net.Air);
-        }
     }
 
     private void OnGasAnalyzed(Entity<CryoPodComponent> entity, ref GasAnalyzerScanEvent args)
@@ -172,9 +169,7 @@ public sealed partial class CryoPodSystem : SharedCryoPodSystem
     private void OnEjected(Entity<CryoPodComponent> cryoPod, ref EntRemovedFromContainerMessage args)
     {
         if (TryComp<HealthAnalyzerComponent>(cryoPod.Owner, out var healthAnalyzer))
-        {
             healthAnalyzer.ScannedEntity = null;
-        }
 
         // if body is ejected - no need to display health-analyzer
         _uiSystem.CloseUi(cryoPod.Owner, HealthAnalyzerUiKey.Key);

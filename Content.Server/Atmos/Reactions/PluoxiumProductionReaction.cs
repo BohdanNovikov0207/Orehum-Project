@@ -5,7 +5,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Server.Atmos.EntitySystems;
-using Content.Shared.EntityEffects.Effects;
 using Content.Shared.Atmos;
 using Content.Shared.Atmos.Reactions;
 using JetBrains.Annotations;
@@ -13,19 +12,22 @@ using JetBrains.Annotations;
 namespace Content.Server.Atmos.Reactions;
 
 /// <summary>
-///     Assmos - /tg/ gases
-///     Consumes a tiny amount of tritium to convert CO2 and oxygen to pluoxium.
+/// Assmos - /tg/ gases
+/// Consumes a tiny amount of tritium to convert CO2 and oxygen to pluoxium.
 /// </summary>
 [UsedImplicitly]
 public sealed partial class PluoxiumProductionReaction : IGasReactionEffect
 {
-    public ReactionResult React(GasMixture mixture, IGasMixtureHolder? holder, AtmosphereSystem atmosphereSystem, float heatScale)
+    public ReactionResult React(GasMixture mixture,
+        IGasMixtureHolder? holder,
+        AtmosphereSystem atmosphereSystem,
+        float heatScale)
     {
         var initO2 = mixture.GetMoles(Gas.Oxygen);
         var initCO2 = mixture.GetMoles(Gas.CarbonDioxide);
         var initTrit = mixture.GetMoles(Gas.Tritium);
 
-        float[] efficiencies = {5f, initCO2, initO2 * 2f, initTrit * 100f};
+        float[] efficiencies = { 5f, initCO2, initO2 * 2f, initTrit * 100f };
         Array.Sort(efficiencies);
         var producedAmount = efficiencies[0];
 
@@ -51,7 +53,8 @@ public sealed partial class PluoxiumProductionReaction : IGasReactionEffect
         var energyReleased = producedAmount * Atmospherics.PluoxiumProductionEnergy;
         var heatCap = atmosphereSystem.GetHeatCapacity(mixture, true);
         if (heatCap > Atmospherics.MinimumHeatCapacity)
-            mixture.Temperature = Math.Max((mixture.Temperature * heatCap + energyReleased) / heatCap, Atmospherics.TCMB);
+            mixture.Temperature =
+                Math.Max((mixture.Temperature * heatCap + energyReleased) / heatCap, Atmospherics.TCMB);
 
         return ReactionResult.Reacting;
     }

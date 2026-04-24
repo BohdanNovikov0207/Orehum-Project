@@ -5,7 +5,6 @@
 
 using System.Linq;
 using System.Threading.Tasks;
-using Content.Server.NodeContainer;
 using Content.Shared.NodeContainer;
 using Content.Shared.Procedural;
 using Content.Shared.Procedural.PostGeneration;
@@ -16,7 +15,7 @@ namespace Content.Server.Procedural.DungeonJob;
 public sealed partial class DungeonJob
 {
     /// <summary>
-    /// <see cref="AutoCablingDunGen"/>
+    ///     <see cref="AutoCablingDunGen" />
     /// </summary>
     private async Task PostGen(AutoCablingDunGen gen, Dungeon dungeon, HashSet<Vector2i> reservedTiles, Random random)
     {
@@ -37,10 +36,8 @@ public sealed partial class DungeonJob
             while (anchored.MoveNext(out var anc))
             {
                 if (!nodeQuery.TryGetComponent(anc, out var nodeContainer) ||
-                   !nodeContainer.Nodes.ContainsKey("power"))
-                {
+                    !nodeContainer.Nodes.ContainsKey("power"))
                     continue;
-                }
 
                 cableTiles.Add(tile);
                 break;
@@ -91,9 +88,7 @@ public sealed partial class DungeonJob
             }
 
             if (!_maps.TryGetTileRef(_gridUid, _grid, node, out var tileRef) || tileRef.Tile.IsEmpty)
-            {
                 continue;
-            }
 
             for (var i = 0; i < 4; i++)
             {
@@ -104,27 +99,19 @@ public sealed partial class DungeonJob
 
                 // Prefer straight lines.
                 if (lastDirection[node] != dir)
-                {
                     tileCost *= 1.1f;
-                }
 
                 if (cableTiles.Contains(neighbor))
-                {
                     tileCost *= 0.1f;
-                }
 
                 // Prefer tiles without walls on them
                 if (HasWall(neighbor))
-                {
                     tileCost *= 20f;
-                }
 
                 var gScore = costSoFar[node] + tileCost;
 
                 if (costSoFar.TryGetValue(neighbor, out var nextValue) && gScore >= nextValue)
-                {
                     continue;
-                }
 
                 cameFrom[neighbor] = node;
                 costSoFar[neighbor] = gScore;
@@ -145,9 +132,7 @@ public sealed partial class DungeonJob
             {
                 if (!nodeQuery.TryGetComponent(anc, out var nodeContainer) ||
                     !nodeContainer.Nodes.ContainsKey("power"))
-                {
                     continue;
-                }
 
                 found = true;
                 break;

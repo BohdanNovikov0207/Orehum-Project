@@ -24,6 +24,7 @@ public sealed class DirtyCommand : LocalizedEntityCommands
                 {
                     DirtyAll(entity);
                 }
+
                 break;
             case 1:
                 if (!NetEntity.TryParse(args[0], out var parsedTarget))
@@ -31,6 +32,7 @@ public sealed class DirtyCommand : LocalizedEntityCommands
                     shell.WriteError(Loc.GetString("shell-entity-uid-must-be-number"));
                     return;
                 }
+
                 DirtyAll(EntityManager.GetEntity(parsedTarget));
                 break;
             default:

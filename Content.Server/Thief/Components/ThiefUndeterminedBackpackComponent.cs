@@ -45,9 +45,18 @@ namespace Content.Server.Thief.Components;
 /// This component stores the possible contents of the backpack,
 /// which can be selected via the interface.
 /// </summary>
-[RegisterComponent, Access(typeof(ThiefUndeterminedBackpackSystem))]
+[RegisterComponent] [Access(typeof(ThiefUndeterminedBackpackSystem))]
 public sealed partial class ThiefUndeterminedBackpackComponent : Component
 {
+    [DataField]
+    public SoundCollectionSpecifier ApproveSound = new("storageRustle");
+
+    /// <summary>
+    /// Max number of sets you can select.
+    /// </summary>
+    [DataField]
+    public int MaxSelectedSets = 2;
+
     /// <summary>
     /// List of sets available for selection
     /// </summary>
@@ -56,15 +65,6 @@ public sealed partial class ThiefUndeterminedBackpackComponent : Component
 
     [DataField]
     public List<int> SelectedSets = new();
-
-    [DataField]
-    public SoundCollectionSpecifier ApproveSound = new SoundCollectionSpecifier("storageRustle");
-
-    /// <summary>
-    /// Max number of sets you can select.
-    /// </summary>
-    [DataField]
-    public int MaxSelectedSets = 2;
 
     /// <summary>
     /// What entity all the spawned items will appear inside of

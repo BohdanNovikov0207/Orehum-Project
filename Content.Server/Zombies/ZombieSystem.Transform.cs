@@ -75,45 +75,47 @@ using Content.Shared.Body.Components;
 using Content.Shared.CombatMode;
 using Content.Shared.CombatMode.Pacification;
 using Content.Shared.Damage;
+using Content.Shared.Ghost.Roles.Components;
 using Content.Shared.Hands.Components;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Humanoid;
 using Content.Shared.Interaction.Components;
+using Content.Shared.Mech.Components;
+using Content.Shared.Mech.EntitySystems;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Movement.Pulling.Components;
 using Content.Shared.Movement.Systems;
 using Content.Shared.NameModifier.EntitySystems;
+using Content.Shared.NPC.Prototypes;
 using Content.Shared.NPC.Systems;
 using Content.Shared.Nutrition.AnimalHusbandry;
 using Content.Shared.Nutrition.Components;
 using Content.Shared.Popups;
+using Content.Shared.Prying.Components;
+using Content.Shared.Rejuvenate;
+using Content.Shared.Tag;
 using Content.Shared.Weapons.Melee;
 using Content.Shared.Zombies;
-using Content.Shared.Prying.Components;
-using Content.Shared.Traits.Assorted;
 using Robust.Shared.Audio.Systems;
-using Content.Shared.Ghost.Roles.Components;
-using Content.Shared.Tag;
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
-using Content.Shared.Roles;
-using Content.Server.Animals.Components;
-using Content.Shared.Mech.Components;
-using Content.Shared.Rejuvenate; // Shitmed Change
-using Content.Shared.NPC.Prototypes;
-using Content.Shared.Mech.EntitySystems; // Goobstation
+// Shitmed Change
+
+// Goobstation
 
 namespace Content.Server.Zombies;
 
 /// <summary>
-///     Handles zombie propagation and inherent zombie traits
+/// Handles zombie propagation and inherent zombie traits
 /// </summary>
 /// <remarks>
-///     Don't Shitcode Open Inside
+/// Don't Shitcode Open Inside
 /// </remarks>
 public sealed partial class ZombieSystem
 {
+    private static readonly ProtoId<TagPrototype> CannotSuicideTag = "CannotSuicide";
+    private static readonly ProtoId<NpcFactionPrototype> ZombieFaction = "Zombie";
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly IChatManager _chatMan = default!;
     [Dependency] private readonly SharedCombatModeSystem _combat = default!;
@@ -122,16 +124,13 @@ public sealed partial class ZombieSystem
     [Dependency] private readonly HumanoidAppearanceSystem _humanoidAppearance = default!;
     [Dependency] private readonly IdentitySystem _identity = default!;
     [Dependency] private readonly ServerInventorySystem _inventory = default!;
+    [Dependency] private readonly SharedMechSystem _mech = default!; // Goobstation
     [Dependency] private readonly MindSystem _mind = default!;
     [Dependency] private readonly MovementSpeedModifierSystem _movementSpeedModifier = default!;
-    [Dependency] private readonly NPCSystem _npc = default!;
     [Dependency] private readonly NameModifierSystem _nameMod = default!;
-    [Dependency] private readonly TagSystem _tag = default!;
+    [Dependency] private readonly NPCSystem _npc = default!;
     [Dependency] private readonly ISharedPlayerManager _player = default!;
-    [Dependency] private readonly SharedMechSystem _mech = default!; // Goobstation
-
-    private static readonly ProtoId<TagPrototype> CannotSuicideTag = "CannotSuicide";
-    private static readonly ProtoId<NpcFactionPrototype> ZombieFaction = "Zombie";
+    [Dependency] private readonly TagSystem _tag = default!;
 
     /// <summary>
     /// Handles an entity turning into a zombie when they die or go into crit
@@ -139,23 +138,21 @@ public sealed partial class ZombieSystem
     private void OnDamageChanged(EntityUid uid, ZombifyOnDeathComponent component, MobStateChangedEvent args)
     {
         if (args.NewMobState == MobState.Dead)
-        {
             ZombifyEntity(uid, args.Component);
-        }
     }
 
     /// <summary>
-    ///     This is the general purpose function to call if you want to zombify an entity.
-    ///     It handles both humanoid and nonhumanoid transformation and everything should be called through it.
+    /// This is the general purpose function to call if you want to zombify an entity.
+    /// It handles both humanoid and nonhumanoid transformation and everything should be called through it.
     /// </summary>
     /// <param name="target">the entity being zombified</param>
     /// <param name="mobState"></param>
     /// <remarks>
-    ///     ALRIGHT BIG BOYS, GIRLS AND ANYONE ELSE. YOU'VE COME TO THE LAYER OF THE BEAST. THIS IS YOUR WARNING.
-    ///     This function is the god function for zombie stuff, and it is cursed. I have
-    ///     attempted to label everything thouroughly for your sanity. I have attempted to
-    ///     rewrite this, but this is how it shall lie eternal. Turn back now.
-    ///     -emo
+    /// ALRIGHT BIG BOYS, GIRLS AND ANYONE ELSE. YOU'VE COME TO THE LAYER OF THE BEAST. THIS IS YOUR WARNING.
+    /// This function is the god function for zombie stuff, and it is cursed. I have
+    /// attempted to label everything thouroughly for your sanity. I have attempted to
+    /// rewrite this, but this is how it shall lie eternal. Turn back now.
+    /// -emo
     /// </remarks>
     public void ZombifyEntity(EntityUid target, MobStateComponent? mobState = null)
     {
@@ -163,7 +160,7 @@ public sealed partial class ZombieSystem
         if (HasComp<ZombieComponent>(target) || HasComp<ZombieImmuneComponent>(target))
             return;
 
-        if (!Resolve(target, ref mobState, logMissing: false))
+        if (!Resolve(target, ref mobState, false))
             return;
 
         //you're a real zombie now, son.
@@ -205,15 +202,17 @@ public sealed partial class ZombieSystem
         melee.Angle = 0.0f;
         melee.HitSound = zombiecomp.BiteSound;
 
-        DirtyFields(target, melee, null, fields:
-        [
-            nameof(MeleeWeaponComponent.Animation),
-            nameof(MeleeWeaponComponent.WideAnimation),
-            nameof(MeleeWeaponComponent.AltDisarm),
-            nameof(MeleeWeaponComponent.Range),
-            nameof(MeleeWeaponComponent.Angle),
-            nameof(MeleeWeaponComponent.HitSound),
-        ]);
+        DirtyFields(target,
+            melee,
+            null,
+            [
+                nameof(MeleeWeaponComponent.Animation),
+                nameof(MeleeWeaponComponent.WideAnimation),
+                nameof(MeleeWeaponComponent.AltDisarm),
+                nameof(MeleeWeaponComponent.Range),
+                nameof(MeleeWeaponComponent.Angle),
+                nameof(MeleeWeaponComponent.HitSound),
+            ]);
 
         if (mobState.CurrentState == MobState.Alive)
         {
@@ -232,7 +231,8 @@ public sealed partial class ZombieSystem
             //store some values before changing them in case the humanoid get cloned later
             zombiecomp.BeforeZombifiedSkinColor = huApComp.SkinColor;
             zombiecomp.BeforeZombifiedEyeColor = huApComp.EyeColor;
-            zombiecomp.BeforeZombifiedCustomBaseLayers = new(huApComp.CustomBaseLayers);
+            zombiecomp.BeforeZombifiedCustomBaseLayers =
+                new Dictionary<HumanoidVisualLayers, CustomBaseLayerInfo>(huApComp.CustomBaseLayers);
             if (TryComp<BloodstreamComponent>(target, out var stream))
                 zombiecomp.BeforeZombifiedBloodReagent = stream.BloodReagent;
 
@@ -242,10 +242,22 @@ public sealed partial class ZombieSystem
             huApComp.EyeColor = zombiecomp.EyeColor;
 
             // this might not resync on clone?
-            _humanoidAppearance.SetBaseLayerId(target, HumanoidVisualLayers.Tail, zombiecomp.BaseLayerExternal, humanoid: huApComp);
-            _humanoidAppearance.SetBaseLayerId(target, HumanoidVisualLayers.HeadSide, zombiecomp.BaseLayerExternal, humanoid: huApComp);
-            _humanoidAppearance.SetBaseLayerId(target, HumanoidVisualLayers.HeadTop, zombiecomp.BaseLayerExternal, humanoid: huApComp);
-            _humanoidAppearance.SetBaseLayerId(target, HumanoidVisualLayers.Snout, zombiecomp.BaseLayerExternal, humanoid: huApComp);
+            _humanoidAppearance.SetBaseLayerId(target,
+                HumanoidVisualLayers.Tail,
+                zombiecomp.BaseLayerExternal,
+                humanoid: huApComp);
+            _humanoidAppearance.SetBaseLayerId(target,
+                HumanoidVisualLayers.HeadSide,
+                zombiecomp.BaseLayerExternal,
+                humanoid: huApComp);
+            _humanoidAppearance.SetBaseLayerId(target,
+                HumanoidVisualLayers.HeadTop,
+                zombiecomp.BaseLayerExternal,
+                humanoid: huApComp);
+            _humanoidAppearance.SetBaseLayerId(target,
+                HumanoidVisualLayers.Snout,
+                zombiecomp.BaseLayerExternal,
+                humanoid: huApComp);
 
             //This is done here because non-humanoids shouldn't get baller damage
             melee.Damage = zombiecomp.DamageOnBite;
@@ -290,7 +302,7 @@ public sealed partial class ZombieSystem
             _damageable.SetAllDamage(target, damageablecomp, 0);
         _mobState.ChangeMobState(target, MobState.Alive);
 
-        _faction.ClearFactions(target, dirty: false);
+        _faction.ClearFactions(target, false);
         _faction.AddFaction(target, ZombieFaction);
 
         //gives it the funny "Zombie ___" name.
@@ -299,7 +311,7 @@ public sealed partial class ZombieSystem
         _identity.QueueIdentityUpdate(target);
 
         var htn = EnsureComp<HTNComponent>(target);
-        htn.RootTask = new HTNCompoundTask() { Task = "SimpleHostileCompound" };
+        htn.RootTask = new HTNCompoundTask { Task = "SimpleHostileCompound" };
         htn.Blackboard.SetValue(NPCBlackboard.Owner, target);
         _npc.SleepNPC(target, htn);
 
@@ -308,7 +320,7 @@ public sealed partial class ZombieSystem
         if (hasMind && mind != null && _player.TryGetSessionById(mind.UserId, out var session))
         {
             //Zombie role for player manifest
-            _role.MindAddRole(mindId, "MindRoleZombie", mind: null, silent: true);
+            _role.MindAddRole(mindId, "MindRoleZombie", null, true);
 
             //Greeting message for new bebe zombers
             _chatMan.DispatchServerMessage(session, Loc.GetString("zombie-infection-greeting"));
@@ -317,11 +329,10 @@ public sealed partial class ZombieSystem
             _audio.PlayGlobal(zombiecomp.GreetSoundNotification, session);
         }
         else
-        {
             _npc.WakeNPC(target, htn);
-        }
 
-        if (!HasComp<GhostRoleMobSpawnerComponent>(target) && !hasMind) //this specific component gives build test trouble so pop off, ig
+        if (!HasComp<GhostRoleMobSpawnerComponent>(target) &&
+            !hasMind) //this specific component gives build test trouble so pop off, ig
         {
             //yet more hardcoding. Visit zombie.ftl for more information.
             var ghostRole = EnsureComp<GhostRoleComponent>(target);
@@ -350,7 +361,8 @@ public sealed partial class ZombieSystem
         RaiseLocalEvent(target, ref ev, true);
         //zombies get slowdown once they convert
         _movementSpeedModifier.RefreshMovementSpeedModifiers(target);
-        if (TryComp<MechPilotComponent>(target, out var mechPilotComponent)) // Goobstation - kick out zombies from mechs on conversion
+        if (TryComp<MechPilotComponent>(target,
+                out var mechPilotComponent)) // Goobstation - kick out zombies from mechs on conversion
             _mech.TryEject(mechPilotComponent.Mech, null, target);
     }
 }

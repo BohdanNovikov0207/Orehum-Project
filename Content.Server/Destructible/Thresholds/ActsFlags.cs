@@ -3,7 +3,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-namespace Content.Server.Destructible.Thresholds
+namespace Content.Server.Destructible.Thresholds;
+
+public sealed class ActsFlags
 {
-    public sealed class ActsFlags { }
 }

@@ -36,22 +36,16 @@ public sealed partial class AiInteractWireAction : ComponentWireAction<StationAi
     public override Color Color { get; set; } = Color.DeepSkyBlue;
     public override object StatusKey => AirlockWireStatus.AiControlIndicator;
 
-    public override StatusLightState? GetLightState(Wire wire, StationAiWhitelistComponent component)
-    {
-        return component.Enabled ? StatusLightState.On : StatusLightState.Off;
-    }
+    public override StatusLightState? GetLightState(Wire wire, StationAiWhitelistComponent component) =>
+        component.Enabled ? StatusLightState.On : StatusLightState.Off;
 
-    public override bool Cut(EntityUid user, Wire wire, StationAiWhitelistComponent component)
-    {
-        return EntityManager.System<SharedStationAiSystem>()
-            .SetWhitelistEnabled((component.Owner, component), false, announce: true);
-    }
+    public override bool Cut(EntityUid user, Wire wire, StationAiWhitelistComponent component) =>
+        EntityManager.System<SharedStationAiSystem>()
+            .SetWhitelistEnabled((component.Owner, component), false, true);
 
-    public override bool Mend(EntityUid user, Wire wire, StationAiWhitelistComponent component)
-    {
-        return EntityManager.System<SharedStationAiSystem>()
+    public override bool Mend(EntityUid user, Wire wire, StationAiWhitelistComponent component) =>
+        EntityManager.System<SharedStationAiSystem>()
             .SetWhitelistEnabled((component.Owner, component), true);
-    }
 
     public override void Pulse(EntityUid user, Wire wire, StationAiWhitelistComponent component)
     {

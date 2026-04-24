@@ -31,11 +31,9 @@ public sealed partial class ImplanterSystem
         ent.Comp.ImplantContainer.OccludesLight = false;
     }
 
-    private void OnShutdown(Entity<ImplantedComponent> ent, ref ComponentShutdown args)
-    {
+    private void OnShutdown(Entity<ImplantedComponent> ent, ref ComponentShutdown args) =>
         //If the entity is deleted, get rid of the implants
         _container.CleanContainer(ent.Comp.ImplantContainer);
-    }
 
     private void OnGibbed(Entity<ImplantedComponent> ent, ref BeingGibbedEvent args)
     {
@@ -45,6 +43,5 @@ public sealed partial class ImplanterSystem
             if (TryComp<StorageComponent>(implant, out var storage))
                 _container.EmptyContainer(storage.Container, destination: Transform(ent).Coordinates);
         }
-
     }
 }

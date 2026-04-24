@@ -9,11 +9,12 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Text;
+using Content.Shared._DV.NanoChat;
 using Content.Shared.Access.Components;
 using Content.Shared.Administration.Logs;
 using Content.Shared.CartridgeLoader;
 using Content.Shared.CartridgeLoader.Cartridges;
-using Content.Shared._DV.NanoChat; // DeltaV
 using Content.Shared.Database;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Labels.EntitySystems;
@@ -21,21 +22,21 @@ using Content.Shared.Paper;
 using Content.Shared.Popups;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Timing;
-using System.Text;
+// DeltaV
 
 namespace Content.Server.CartridgeLoader.Cartridges;
 
 public sealed partial class LogProbeCartridgeSystem : EntitySystem // DeltaV - Made partial
 {
-    [Dependency] private readonly CartridgeLoaderSystem _cartridge = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly CartridgeLoaderSystem _cartridge = default!;
     [Dependency] private readonly SharedHandsSystem _hands = default!;
     [Dependency] private readonly LabelSystem _label = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly PaperSystem _paper = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     public override void Initialize()
     {
@@ -48,8 +49,8 @@ public sealed partial class LogProbeCartridgeSystem : EntitySystem // DeltaV - M
 
     /// <summary>
     /// The <see cref="CartridgeAfterInteractEvent" /> gets relayed to this system if the cartridge loader is running
-    /// the LogProbe program and someone clicks on something with it. <br/>
-    /// <br/>
+    /// the LogProbe program and someone clicks on something with it. <br />
+    /// <br />
     /// Updates the program's list of logs with those from the device.
     /// </summary>
     private void AfterInteract(Entity<LogProbeCartridgeComponent> ent, ref CartridgeAfterInteractEvent args)
@@ -96,10 +97,8 @@ public sealed partial class LogProbeCartridgeSystem : EntitySystem // DeltaV - M
     /// <summary>
     /// This gets called when the ui fragment needs to be updated for the first time after activating
     /// </summary>
-    private void OnUiReady(Entity<LogProbeCartridgeComponent> ent, ref CartridgeUiReadyEvent args)
-    {
+    private void OnUiReady(Entity<LogProbeCartridgeComponent> ent, ref CartridgeUiReadyEvent args) =>
         UpdateUiState(ent, args.Loader);
-    }
 
     private void OnMessage(Entity<LogProbeCartridgeComponent> ent, ref CartridgeMessageEvent args)
     {
@@ -121,7 +120,7 @@ public sealed partial class LogProbeCartridgeSystem : EntitySystem // DeltaV - M
         _label.Label(paper, ent.Comp.EntityName); // label it for easy identification
 
         _audio.PlayEntity(ent.Comp.PrintSound, user, paper);
-        _hands.PickupOrDrop(user, paper, checkActionBlocker: false);
+        _hands.PickupOrDrop(user, paper, false);
 
         // generate the actual printout text
         var builder = new StringBuilder();
@@ -131,19 +130,26 @@ public sealed partial class LogProbeCartridgeSystem : EntitySystem // DeltaV - M
         foreach (var log in ent.Comp.PulledAccessLogs)
         {
             var time = TimeSpan.FromSeconds(Math.Truncate(log.Time.TotalSeconds)).ToString();
-            builder.AppendLine(Loc.GetString("log-probe-printout-entry", ("number", number), ("time", time), ("accessor", log.Accessor)));
+            builder.AppendLine(Loc.GetString("log-probe-printout-entry",
+                ("number", number),
+                ("time", time),
+                ("accessor", log.Accessor)));
             number++;
         }
 
         var paperComp = Comp<PaperComponent>(paper);
         _paper.SetContent((paper, paperComp), builder.ToString());
 
-        _adminLogger.Add(LogType.EntitySpawn, LogImpact.Low, $"{ToPrettyString(user):user} printed out LogProbe logs ({paper}) of {ent.Comp.EntityName}");
+        _adminLogger.Add(LogType.EntitySpawn,
+            LogImpact.Low,
+            $"{ToPrettyString(user):user} printed out LogProbe logs ({paper}) of {ent.Comp.EntityName}");
     }
 
     private void UpdateUiState(Entity<LogProbeCartridgeComponent> ent, EntityUid loaderUid)
     {
-        var state = new LogProbeUiState(ent.Comp.EntityName, ent.Comp.PulledAccessLogs, ent.Comp.ScannedNanoChatData); // DeltaV - NanoChat support
+        var state = new LogProbeUiState(ent.Comp.EntityName,
+            ent.Comp.PulledAccessLogs,
+            ent.Comp.ScannedNanoChatData); // DeltaV - NanoChat support
         _cartridge?.UpdateCartridgeUiState(loaderUid, state);
     }
 }

@@ -15,29 +15,33 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Examine;
-using Content.Shared.Coordinates.Helpers;
 using Content.Server.Power.Components;
 using Content.Server.PowerCell;
+using Content.Shared.Coordinates.Helpers;
+using Content.Shared.Examine;
 using Content.Shared.Interaction;
-using Content.Shared.Physics; // Goobstation
+using Content.Shared.Physics;
 using Content.Shared.Storage;
-using Content.Shared.Tag; // Goobstation
-using Robust.Shared.Map; // Goobstation
-using Robust.Shared.Physics.Components; // Goobstation
+using Content.Shared.Tag;
+using Robust.Shared.Map;
+using Robust.Shared.Physics.Components;
+// Goobstation
+// Goobstation
+// Goobstation
+
+// Goobstation
 
 namespace Content.Server.Holosign;
 
 public sealed class HolosignSystem : EntitySystem
 {
-    [Dependency] private readonly PowerCellSystem _powerCell = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
-
     // Goobstation start
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly SharedMapSystem _map = default!;
-    [Dependency] private readonly TagSystem _tag = default!;
     [Dependency] private readonly IMapManager _mapManager = default!;
+    [Dependency] private readonly PowerCellSystem _powerCell = default!;
+    [Dependency] private readonly TagSystem _tag = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     private EntityQuery<PhysicsComponent> _physicsQuery;
     // Goobstation end
@@ -64,9 +68,7 @@ public sealed class HolosignSystem : EntitySystem
             args.PushMarkup(Loc.GetString("limited-charges-charges-remaining", ("charges", charges)));
 
             if (charges > 0 && charges == maxCharges)
-            {
                 args.PushMarkup(Loc.GetString("limited-charges-max-charges"));
-            }
         }
     }
 
@@ -75,7 +77,8 @@ public sealed class HolosignSystem : EntitySystem
         // Goob edit start
         if (args.Handled
             || !args.CanReach // prevent placing out of range
-            || HasComp<StorageComponent>(args.Target)) // if it's a storage component like a bag, we ignore usage so it can be stored
+            || HasComp<StorageComponent>(args
+                .Target)) // if it's a storage component like a bag, we ignore usage so it can be stored
             return;
 
         // places the holographic sign at the click location, snapped to grid.
@@ -99,13 +102,17 @@ public sealed class HolosignSystem : EntitySystem
                         CollisionGroup.HighImpassable)) != 0)
                 return;
         }
-        if (!_powerCell.TryUseCharge(uid, component.ChargeUse, user: args.User)) // if no battery or no charge, doesn't work
+
+        if (!_powerCell.TryUseCharge(uid,
+                component.ChargeUse,
+                user: args.User)) // if no battery or no charge, doesn't work
             return;
         var holoUid = Spawn(component.SignProto, coords);
         // Goob edit end
         var xform = Transform(holoUid);
         if (!xform.Anchored)
-            _transform.AnchorEntity(holoUid, xform); // anchor to prevent any tempering with (don't know what could even interact with it)
+            _transform.AnchorEntity(holoUid,
+                xform); // anchor to prevent any tempering with (don't know what could even interact with it)
 
         args.Handled = true;
     }
@@ -113,7 +120,8 @@ public sealed class HolosignSystem : EntitySystem
     private int UsesRemaining(HolosignProjectorComponent component, BatteryComponent? battery = null)
     {
         if (battery == null ||
-            component.ChargeUse == 0f) return 0;
+            component.ChargeUse == 0f)
+            return 0;
 
         return (int) (battery.CurrentCharge / component.ChargeUse);
     }
@@ -121,7 +129,8 @@ public sealed class HolosignSystem : EntitySystem
     private int MaxUses(HolosignProjectorComponent component, BatteryComponent? battery = null)
     {
         if (battery == null ||
-            component.ChargeUse == 0f) return 0;
+            component.ChargeUse == 0f)
+            return 0;
 
         return (int) (battery.MaxCharge / component.ChargeUse);
     }

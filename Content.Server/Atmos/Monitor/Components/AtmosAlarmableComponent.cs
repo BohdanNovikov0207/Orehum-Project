@@ -32,11 +32,11 @@ namespace Content.Server.Atmos.Monitor.Components;
 // -> Everything linked to that monitor (targetted)
 
 /// <summary>
-///     A component to add to device network devices if you want them to be alarmed
-///     by an atmospheric alarmer. This will store every single alert received, and
-///     calculate the highest alert based on the alerts received. Equally, if you
-///     link other alarmables to this, it will store the alerts from them to
-///     calculate the highest network alert.
+/// A component to add to device network devices if you want them to be alarmed
+/// by an atmospheric alarmer. This will store every single alert received, and
+/// calculate the highest alert based on the alerts received. Equally, if you
+/// link other alarmables to this, it will store the alerts from them to
+/// calculate the highest network alert.
 /// </summary>
 [RegisterComponent]
 public sealed partial class AtmosAlarmableComponent : Component
@@ -55,7 +55,7 @@ public sealed partial class AtmosAlarmableComponent : Component
     public float AlarmVolume { get; set; } = -10;
 
     /// <summary>
-    ///     List of tags to check for when synchronizing alarms.
+    /// List of tags to check for when synchronizing alarms.
     /// </summary>
     [DataField("syncWith", customTypeSerializer: typeof(PrototypeIdHashSetSerializer<TagPrototype>))]
     public HashSet<string> SyncWithTags { get; private set; } = new();
@@ -64,9 +64,9 @@ public sealed partial class AtmosAlarmableComponent : Component
     public AtmosMonitorThresholdTypeFlags MonitorAlertTypes { get; private set; }
 
     /// <summary>
-    ///     If this device should receive only. If it can only
-    ///     receive, that means that attempting to sync outwards
-    ///     will result in nothing happening.
+    /// If this device should receive only. If it can only
+    /// receive, that means that attempting to sync outwards
+    /// will result in nothing happening.
     /// </summary>
     [DataField("receiveOnly")]
     public bool ReceiveOnly { get; private set; }

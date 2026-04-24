@@ -20,7 +20,7 @@ public sealed partial class DroneConsoleComponent : Component
     public ComponentRegistry Components = default!;
 
     /// <summary>
-    /// <see cref="ShuttleConsoleComponent"/> that we're proxied into.
+    /// <see cref="ShuttleConsoleComponent" /> that we're proxied into.
     /// </summary>
     [DataField("entity")]
     public EntityUid? Entity;

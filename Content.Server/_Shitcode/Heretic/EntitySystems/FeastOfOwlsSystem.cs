@@ -14,14 +14,14 @@ namespace Content.Server.Heretic.EntitySystems;
 
 public sealed class FeastOfOwlsSystem : EntitySystem
 {
-    [Dependency] private readonly StatusEffectsSystem _status = default!;
-    [Dependency] private readonly JitteringSystem _jitter = default!;
-    [Dependency] private readonly StutteringSystem _stutter = default!;
-    [Dependency] private readonly StunSystem _stun = default!;
-    [Dependency] private readonly ChatSystem _chat = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly ChatSystem _chat = default!;
     [Dependency] private readonly HereticSystem _heretic = default!;
+    [Dependency] private readonly JitteringSystem _jitter = default!;
     [Dependency] private readonly PopupSystem _popup = default!;
+    [Dependency] private readonly StatusEffectsSystem _status = default!;
+    [Dependency] private readonly StunSystem _stun = default!;
+    [Dependency] private readonly StutteringSystem _stutter = default!;
 
     public override void Update(float frameTime)
     {
@@ -51,7 +51,7 @@ public sealed class FeastOfOwlsSystem : EntitySystem
                 continue;
             }
 
-            _jitter.DoJitter(uid, comp.JitterStutterTime, true, 10f, 10f,  true, status);
+            _jitter.DoJitter(uid, comp.JitterStutterTime, true, 10f, 10f, true, status);
             _stutter.DoStutter(uid, comp.JitterStutterTime, true, status);
 
             if (vocalQuery.TryGetComponent(uid, out var vocal))
@@ -61,7 +61,7 @@ public sealed class FeastOfOwlsSystem : EntitySystem
 
             _popup.PopupEntity(Loc.GetString("feast-of-owls-knowledge-gaim-message"), uid, uid, PopupType.LargeCaution);
 
-            _heretic.UpdateKnowledge(uid,  1,  false, false, mindContainer);
+            _heretic.UpdateKnowledge(uid, 1, false, false, mindContainer);
 
             comp.CurrentStep++;
 

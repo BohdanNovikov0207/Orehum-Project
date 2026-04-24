@@ -22,29 +22,10 @@ namespace Content.Server.Cargo.Components;
 public sealed partial class StationCargoBountyDatabaseComponent : Component
 {
     /// <summary>
-    /// Maximum amount of bounties a station can have.
-    /// </summary>
-    [DataField]
-    public int MaxBounties = 6;
-
-    /// <summary>
     /// A list of all the bounties currently active for a station.
     /// </summary>
     [DataField]
     public List<CargoBountyData> Bounties = new();
-
-    /// <summary>
-    /// A list of all the bounties that have been completed or
-    /// skipped for a station.
-    /// </summary>
-    [DataField]
-    public List<CargoBountyHistoryData> History = new();
-
-    /// <summary>
-    /// Used to determine unique order IDs
-    /// </summary>
-    [DataField]
-    public int TotalBounties;
 
     /// <summary>
     /// A list of bounty IDs that have been checked this tick.
@@ -60,6 +41,19 @@ public sealed partial class StationCargoBountyDatabaseComponent : Component
     public ProtoId<CargoBountyGroupPrototype> Group = "StationBounty";
 
     /// <summary>
+    /// A list of all the bounties that have been completed or
+    /// skipped for a station.
+    /// </summary>
+    [DataField]
+    public List<CargoBountyHistoryData> History = new();
+
+    /// <summary>
+    /// Maximum amount of bounties a station can have.
+    /// </summary>
+    [DataField]
+    public int MaxBounties = 6;
+
+    /// <summary>
     /// The time at which players will be able to skip the next bounty.
     /// </summary>
     [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))]
@@ -70,4 +64,10 @@ public sealed partial class StationCargoBountyDatabaseComponent : Component
     /// </summary>
     [DataField]
     public TimeSpan SkipDelay = TimeSpan.FromMinutes(15);
+
+    /// <summary>
+    /// Used to determine unique order IDs
+    /// </summary>
+    [DataField]
+    public int TotalBounties;
 }

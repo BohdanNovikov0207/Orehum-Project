@@ -27,52 +27,11 @@ namespace Content.Server.NPC.HTN.PrimitiveTasks.Operators;
 /// </summary>
 public sealed partial class MoveToOperator : HTNOperator, IHtnConditionalShutdown
 {
+    private const string MovementCancelToken = "MovementCancelToken";
     [Dependency] private readonly IEntityManager _entManager = default!;
-    private NPCSteeringSystem _steering = default!;
     private PathfindingSystem _pathfind = default!;
+    private NPCSteeringSystem _steering = default!;
     private SharedTransformSystem _transform = default!;
-
-    /// <summary>
-    /// When to shut the task down.
-    /// </summary>
-    [DataField("shutdownState")]
-    public HTNPlanState ShutdownState { get; private set; } = HTNPlanState.TaskFinished;
-
-    /// <summary>
-    /// Should we assume the MovementTarget is reachable during planning or should we pathfind to it?
-    /// </summary>
-    [DataField("pathfindInPlanning")]
-    public bool PathfindInPlanning = true;
-
-    /// <summary>
-    /// When we're finished moving to the target should we remove its key?
-    /// </summary>
-    [DataField("removeKeyOnFinish")]
-    public bool RemoveKeyOnFinish = true;
-
-    /// <summary>
-    /// Target Coordinates to move to. This gets removed after execution.
-    /// </summary>
-    [DataField("targetKey")]
-    public string TargetKey = "TargetCoordinates";
-
-    /// <summary>
-    /// Where the pathfinding result will be stored (if applicable). This gets removed after execution.
-    /// </summary>
-    [DataField("pathfindKey")]
-    public string PathfindKey = NPCBlackboard.PathfindKey;
-
-    /// <summary>
-    /// How close we need to get before considering movement finished.
-    /// </summary>
-    [DataField("rangeKey")]
-    public string RangeKey = "MovementRange";
-
-    /// <summary>
-    /// Do we only need to move into line of sight.
-    /// </summary>
-    [DataField("stopOnLineOfSight")]
-    public bool StopOnLineOfSight;
 
     // Goobstation - if you see this in a merge conflict: should be safe to just revert our version, however it has changes to some goob HTNs to make them not brake (via setting this datafield to null), you might want to reinstate those
     /// <summary>
@@ -89,7 +48,67 @@ public sealed partial class MoveToOperator : HTNOperator, IHtnConditionalShutdow
     [DataField]
     public string DirectMoveTargetKey = "DirectMoveTarget";
 
-    private const string MovementCancelToken = "MovementCancelToken";
+    /// <summary>
+    /// Should we assume the MovementTarget is reachable during planning or should we pathfind to it?
+    /// </summary>
+    [DataField("pathfindInPlanning")]
+    public bool PathfindInPlanning = true;
+
+    /// <summary>
+    /// Where the pathfinding result will be stored (if applicable). This gets removed after execution.
+    /// </summary>
+    [DataField("pathfindKey")]
+    public string PathfindKey = NPCBlackboard.PathfindKey;
+
+    /// <summary>
+    /// How close we need to get before considering movement finished.
+    /// </summary>
+    [DataField("rangeKey")]
+    public string RangeKey = "MovementRange";
+
+    /// <summary>
+    /// When we're finished moving to the target should we remove its key?
+    /// </summary>
+    [DataField("removeKeyOnFinish")]
+    public bool RemoveKeyOnFinish = true;
+
+    /// <summary>
+    /// Do we only need to move into line of sight.
+    /// </summary>
+    [DataField("stopOnLineOfSight")]
+    public bool StopOnLineOfSight;
+
+    /// <summary>
+    /// Target Coordinates to move to. This gets removed after execution.
+    /// </summary>
+    [DataField("targetKey")]
+    public string TargetKey = "TargetCoordinates";
+
+    /// <summary>
+    /// When to shut the task down.
+    /// </summary>
+    [DataField("shutdownState")]
+    public HTNPlanState ShutdownState { get; private set; } = HTNPlanState.TaskFinished;
+
+    public void ConditionalShutdown(NPCBlackboard blackboard)
+    {
+        // Cleanup the blackboard and remove steering.
+        if (blackboard.TryGetValue<CancellationTokenSource>(MovementCancelToken, out var cancelToken, _entManager))
+        {
+            cancelToken.Cancel();
+            blackboard.Remove<CancellationTokenSource>(MovementCancelToken);
+        }
+
+        // OwnerCoordinates is only used in planning so dump it.
+        blackboard.Remove<PathResultEvent>(PathfindKey);
+        // Goobstation - also clear direct move
+        blackboard.Remove<bool>(DirectMoveTargetKey);
+
+        if (RemoveKeyOnFinish)
+            blackboard.Remove<EntityCoordinates>(TargetKey);
+
+        _steering.Unregister(blackboard.GetValue<EntityUid>(NPCBlackboard.Owner));
+    }
 
     public override void Initialize(IEntitySystemManager sysManager)
     {
@@ -103,9 +122,7 @@ public sealed partial class MoveToOperator : HTNOperator, IHtnConditionalShutdow
         CancellationToken cancelToken)
     {
         if (!blackboard.TryGetValue<EntityCoordinates>(TargetKey, out var targetCoordinates, _entManager))
-        {
             return (false, null);
-        }
 
         var owner = blackboard.GetValue<EntityUid>(NPCBlackboard.Owner);
 
@@ -115,25 +132,29 @@ public sealed partial class MoveToOperator : HTNOperator, IHtnConditionalShutdow
 
         // Goobstation - check if we or target are offgrid or on different grids
         var doDirectMove = !_entManager.TryGetComponent<MapGridComponent>(xform.GridUid, out var ownerGrid) ||
-                      !_entManager.TryGetComponent<MapGridComponent>(_transform.GetGrid(targetCoordinates), out var targetGrid) ||
-                      ownerGrid != targetGrid;
+                           !_entManager.TryGetComponent<MapGridComponent>(_transform.GetGrid(targetCoordinates),
+                               out var targetGrid) ||
+                           ownerGrid != targetGrid;
 
         var range = blackboard.GetValueOrDefault<float>(RangeKey, _entManager);
 
         if (xform.Coordinates.TryDistance(_entManager, targetCoordinates, out var distance) && distance <= range)
         {
             // In range
-            return (true, new Dictionary<string, object>()
+            return (true, new Dictionary<string, object>
             {
-                {NPCBlackboard.OwnerCoordinates, blackboard.GetValueOrDefault<EntityCoordinates>(NPCBlackboard.OwnerCoordinates, _entManager)}
+                {
+                    NPCBlackboard.OwnerCoordinates,
+                    blackboard.GetValueOrDefault<EntityCoordinates>(NPCBlackboard.OwnerCoordinates, _entManager)
+                },
             });
         }
 
         if (!PathfindInPlanning)
         {
-            return (true, new Dictionary<string, object>()
+            return (true, new Dictionary<string, object>
             {
-                {NPCBlackboard.OwnerCoordinates, targetCoordinates}
+                { NPCBlackboard.OwnerCoordinates, targetCoordinates },
             });
         }
 
@@ -142,31 +163,27 @@ public sealed partial class MoveToOperator : HTNOperator, IHtnConditionalShutdow
             var path = await _pathfind.GetPath(
                 blackboard.GetValue<EntityUid>(NPCBlackboard.Owner),
                 xform.Coordinates,
-                    targetCoordinates,
+                targetCoordinates,
                 range,
                 cancelToken,
                 _pathfind.GetFlags(blackboard));
 
             if (path.Result != PathResult.Path)
-            {
                 return (false, null);
-            }
 
-            return (true, new Dictionary<string, object>()
+            return (true, new Dictionary<string, object>
             {
-                {NPCBlackboard.OwnerCoordinates, targetCoordinates},
-                {PathfindKey, path}
+                { NPCBlackboard.OwnerCoordinates, targetCoordinates },
+                { PathfindKey, path },
             });
         }
         // Goobstation - else try move directly to target
-        else
+
+        return (true, new Dictionary<string, object>
         {
-            return (true, new Dictionary<string, object>()
-            {
-                {NPCBlackboard.OwnerCoordinates, targetCoordinates},
-                {DirectMoveTargetKey, true}
-            });
-        }
+            { NPCBlackboard.OwnerCoordinates, targetCoordinates },
+            { DirectMoveTargetKey, true },
+        });
     }
 
     // Given steering is complicated we'll hand it off to a dedicated system rather than this singleton operator.
@@ -185,9 +202,7 @@ public sealed partial class MoveToOperator : HTNOperator, IHtnConditionalShutdow
         comp.ArriveOnLineOfSight = StopOnLineOfSight;
 
         if (blackboard.TryGetValue<float>(RangeKey, out var range, _entManager))
-        {
             comp.Range = range;
-        }
 
         // Goobstation - see if we want to just move directly first
         if (blackboard.TryGetValue<bool>(DirectMoveTargetKey, out var doDirectMove, _entManager) && doDirectMove)
@@ -200,14 +215,20 @@ public sealed partial class MoveToOperator : HTNOperator, IHtnConditionalShutdow
             // Goobstation
             comp.DirectMove = false;
 
-            if (blackboard.TryGetValue<EntityCoordinates>(NPCBlackboard.OwnerCoordinates, out var coordinates, _entManager))
+            if (blackboard.TryGetValue<EntityCoordinates>(NPCBlackboard.OwnerCoordinates,
+                    out var coordinates,
+                    _entManager))
             {
                 var mapCoords = _transform.ToMapCoordinates(coordinates);
-                _steering.PrunePath(uid, mapCoords, _transform.ToMapCoordinates(targetCoordinates).Position - mapCoords.Position, result.Path);
+                _steering.PrunePath(uid,
+                    mapCoords,
+                    _transform.ToMapCoordinates(targetCoordinates).Position - mapCoords.Position,
+                    result.Path);
             }
 
             comp.CurrentPath = new Queue<PathPoly>(result.Path);
         }
+
         comp.InRangeMaxSpeed = BrakeMaxVelocity; // Goobstation
     }
 
@@ -220,38 +241,14 @@ public sealed partial class MoveToOperator : HTNOperator, IHtnConditionalShutdow
 
         // Just keep moving in the background and let the other tasks handle it.
         if (ShutdownState == HTNPlanState.PlanFinished && steering.Status == SteeringStatus.Moving)
-        {
             return HTNOperatorStatus.Finished;
-        }
 
         return steering.Status switch
         {
             SteeringStatus.InRange => HTNOperatorStatus.Finished,
             SteeringStatus.NoPath => HTNOperatorStatus.Failed,
             SteeringStatus.Moving => HTNOperatorStatus.Continuing,
-            _ => throw new ArgumentOutOfRangeException()
+            _ => throw new ArgumentOutOfRangeException(),
         };
-    }
-
-    public void ConditionalShutdown(NPCBlackboard blackboard)
-    {
-        // Cleanup the blackboard and remove steering.
-        if (blackboard.TryGetValue<CancellationTokenSource>(MovementCancelToken, out var cancelToken, _entManager))
-        {
-            cancelToken.Cancel();
-            blackboard.Remove<CancellationTokenSource>(MovementCancelToken);
-        }
-
-        // OwnerCoordinates is only used in planning so dump it.
-        blackboard.Remove<PathResultEvent>(PathfindKey);
-        // Goobstation - also clear direct move
-        blackboard.Remove<bool>(DirectMoveTargetKey);
-
-        if (RemoveKeyOnFinish)
-        {
-            blackboard.Remove<EntityCoordinates>(TargetKey);
-        }
-
-        _steering.Unregister(blackboard.GetValue<EntityUid>(NPCBlackboard.Owner));
     }
 }

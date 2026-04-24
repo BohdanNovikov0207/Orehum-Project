@@ -13,9 +13,7 @@ public sealed partial class PathfindingSystem
     public List<Vector2i> GetPath(Vector2i start, Vector2i end, bool diagonal = false)
     {
         if (start == end)
-        {
             return new List<Vector2i>();
-        }
 
         var frontier = new PriorityQueue<Vector2i, float>();
         frontier.Enqueue(start, 0f);
@@ -25,9 +23,7 @@ public sealed partial class PathfindingSystem
         while (frontier.TryDequeue(out node, out _))
         {
             if (node == end)
-            {
                 break;
-            }
 
             if (diagonal)
             {
@@ -59,9 +55,7 @@ public sealed partial class PathfindingSystem
         }
 
         if (node != end)
-        {
             return new List<Vector2i>();
-        }
 
         var path = new List<Vector2i>();
 

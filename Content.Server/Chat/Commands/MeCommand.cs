@@ -23,44 +23,50 @@
 
 using Content.Server.Chat.Systems;
 using Content.Shared.Administration;
-using Content.Shared.Chat; // Einstein Engines - Languages
+using Content.Shared.Chat;
 using Robust.Shared.Console;
 using Robust.Shared.Enums;
+// Einstein Engines - Languages
 
-namespace Content.Server.Chat.Commands
+namespace Content.Server.Chat.Commands;
+
+[AnyCommand]
+internal sealed class MeCommand : LocalizedEntityCommands
 {
-    [AnyCommand]
-    internal sealed class MeCommand : LocalizedEntityCommands
+    [Dependency] private readonly ChatSystem _chatSystem = default!;
+
+    public override string Command => "me";
+
+    public override void Execute(IConsoleShell shell, string argStr, string[] args)
     {
-        [Dependency] private readonly ChatSystem _chatSystem = default!;
-
-        public override string Command => "me";
-
-        public override void Execute(IConsoleShell shell, string argStr, string[] args)
+        if (shell.Player is not { } player)
         {
-            if (shell.Player is not { } player)
-            {
-                shell.WriteError(Loc.GetString($"shell-cannot-run-command-from-server"));
-                return;
-            }
-
-            if (player.Status != SessionStatus.InGame)
-                return;
-
-            if (player.AttachedEntity is not {} playerEntity)
-            {
-                shell.WriteError(Loc.GetString($"shell-must-be-attached-to-entity"));
-                return;
-            }
-
-            if (args.Length < 1)
-                return;
-
-            var message = string.Join(" ", args).Trim();
-            if (string.IsNullOrEmpty(message))
-                return;
-
-            _chatSystem.TrySendInGameICMessage(playerEntity, message, InGameICChatType.Emote, ChatTransmitRange.Normal, false, shell, player);
+            shell.WriteError(Loc.GetString("shell-cannot-run-command-from-server"));
+            return;
         }
+
+        if (player.Status != SessionStatus.InGame)
+            return;
+
+        if (player.AttachedEntity is not { } playerEntity)
+        {
+            shell.WriteError(Loc.GetString("shell-must-be-attached-to-entity"));
+            return;
+        }
+
+        if (args.Length < 1)
+            return;
+
+        var message = string.Join(" ", args).Trim();
+        if (string.IsNullOrEmpty(message))
+            return;
+
+        _chatSystem.TrySendInGameICMessage(playerEntity,
+            message,
+            InGameICChatType.Emote,
+            ChatTransmitRange.Normal,
+            false,
+            shell,
+            player);
     }
 }

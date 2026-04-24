@@ -8,7 +8,6 @@
 // SPDX-License-Identifier: MIT
 
 using Content.Shared.Decals;
-using Content.Shared.Random.Helpers;
 using Content.Shared.Sprite;
 using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
@@ -16,7 +15,7 @@ using Robust.Shared.Random;
 
 namespace Content.Server.Sprite;
 
-public sealed class RandomSpriteSystem: SharedRandomSpriteSystem
+public sealed class RandomSpriteSystem : SharedRandomSpriteSystem
 {
     [Dependency] private readonly IPrototypeManager _prototype = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
@@ -38,13 +37,9 @@ public sealed class RandomSpriteSystem: SharedRandomSpriteSystem
 
         var groups = new List<Dictionary<string, Dictionary<string, string?>>>();
         if (component.GetAllGroups)
-        {
             groups = component.Available;
-        }
         else
-        {
             groups.Add(_random.Pick(component.Available));
-        }
 
         component.Selected.EnsureCapacity(groups.Count);
 
@@ -59,11 +54,12 @@ public sealed class RandomSpriteSystem: SharedRandomSpriteSystem
                 var selectedState = _random.Pick(layer.Value);
                 if (!string.IsNullOrEmpty(selectedState.Value))
                 {
-                    if (selectedState.Value == $"Inherit")
+                    if (selectedState.Value == "Inherit")
                         color = previousColor;
                     else
                     {
-                        color = _random.Pick(_prototype.Index<ColorPalettePrototype>(selectedState.Value).Colors.Values);
+                        color = _random.Pick(_prototype.Index<ColorPalettePrototype>(selectedState.Value)
+                            .Colors.Values);
                         previousColor = color;
                     }
                 }
@@ -75,11 +71,9 @@ public sealed class RandomSpriteSystem: SharedRandomSpriteSystem
         Dirty(uid, component);
     }
 
-    private void OnGetState(EntityUid uid, RandomSpriteComponent component, ref ComponentGetState args)
-    {
-        args.State = new RandomSpriteColorComponentState()
+    private void OnGetState(EntityUid uid, RandomSpriteComponent component, ref ComponentGetState args) =>
+        args.State = new RandomSpriteColorComponentState
         {
             Selected = component.Selected,
         };
-    }
 }

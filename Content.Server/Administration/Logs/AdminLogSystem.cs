@@ -14,8 +14,8 @@ using Content.Server.GameTicking.Events;
 namespace Content.Server.Administration.Logs;
 
 /// <summary>
-///     For system events that the manager needs to know about.
-///     <see cref="IAdminLogManager"/> for admin log usage.
+/// For system events that the manager needs to know about.
+/// <see cref="IAdminLogManager" /> for admin log usage.
 /// </summary>
 public sealed class AdminLogSystem : EntitySystem
 {
@@ -29,10 +29,7 @@ public sealed class AdminLogSystem : EntitySystem
         SubscribeLocalEvent<GameRunLevelChangedEvent>(ev => _adminLogs.RunLevelChanged(ev.New));
     }
 
-    public override void Update(float frameTime)
-    {
-        _adminLogs.Update();
-    }
+    public override void Update(float frameTime) => _adminLogs.Update();
 
     public override void Shutdown()
     {

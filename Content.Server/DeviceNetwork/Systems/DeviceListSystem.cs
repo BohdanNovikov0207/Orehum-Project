@@ -43,7 +43,7 @@ public sealed class DeviceListSystem : SharedDeviceListSystem
     [Conditional("DEBUG")]
     public void VerifyDeviceList(EntityUid? uid, DeviceListComponent? listComp = null)
     {
-        if (uid is not {} listUid)
+        if (uid is not { } listUid)
         {
             Log.Error("VerifyDeviceList was passed a null uid");
             return;
@@ -52,7 +52,8 @@ public sealed class DeviceListSystem : SharedDeviceListSystem
 
         if (listComp == null)
         {
-            if (Deleted(uid)) return;
+            if (Deleted(uid))
+                return;
             if (!Resolve(listUid, ref listComp))
             {
                 Log.Error("Failed to resolve DeviceListComponent for verification");
@@ -63,24 +64,28 @@ public sealed class DeviceListSystem : SharedDeviceListSystem
         var config_query = GetEntityQuery<NetworkConfiguratorComponent>();
         foreach (var conf_enty in listComp.Configurators)
         {
-            if (Deleted(conf_enty)) continue;
+            if (Deleted(conf_enty))
+                continue;
             if (!config_query.TryGetComponent(conf_enty, out var conf_comp))
             {
                 Log.Error("Failed to find NetworkConfiguratorComponent in DeviceListComponent Configurators");
                 continue;
             }
+
             DebugTools.Assert(conf_comp.ActiveDeviceList == listUid);
         }
 
         var device_query = GetEntityQuery<DeviceNetworkComponent>();
         foreach (var dev_enty in listComp.Devices)
         {
-            if (Deleted(dev_enty)) continue;
+            if (Deleted(dev_enty))
+                continue;
             if (!device_query.TryGetComponent(dev_enty, out var dev_comp))
             {
                 Log.Error("Failed to find DeviceNetworkComponent in DeviceListComponent Devices");
                 continue;
             }
+
             DebugTools.Assert(dev_comp.DeviceLists.Contains(listUid));
         }
     }
@@ -98,6 +103,7 @@ public sealed class DeviceListSystem : SharedDeviceListSystem
             if (query.TryGetComponent(device, out var comp))
                 comp.DeviceLists.Remove(uid);
         }
+
         component.Devices.Clear();
 
         VerifyDeviceList(uid, component); // Goobstation - Fix desync of configurator lists
@@ -126,7 +132,6 @@ public sealed class DeviceListSystem : SharedDeviceListSystem
                 : $"UID: {deviceUid.ToString()}";
 
             devices.Add(address, deviceUid);
-
         }
 
         return devices;
@@ -146,7 +151,8 @@ public sealed class DeviceListSystem : SharedDeviceListSystem
     }
 
     /// <summary>
-    /// Filters the broadcasts recipient list against the device list as either an allow or deny list depending on the components IsAllowList field
+    /// Filters the broadcasts recipient list against the device list as either an allow or deny list depending on the
+    /// components IsAllowList field
     /// </summary>
     private void OnBeforeBroadcast(EntityUid uid, DeviceListComponent component, BeforeBroadcastAttemptEvent args)
     {
@@ -170,7 +176,7 @@ public sealed class DeviceListSystem : SharedDeviceListSystem
     }
 
     /// <summary>
-    /// Filters incoming packets if that is enabled <see cref="OnBeforeBroadcast"/>
+    /// Filters incoming packets if that is enabled <see cref="OnBeforeBroadcast" />
     /// </summary>
     private void OnBeforePacketSent(EntityUid uid, DeviceListComponent component, BeforePacketSentEvent args)
     {
@@ -236,13 +242,16 @@ public sealed class DeviceListSystem : SharedDeviceListSystem
     }
 
     /// <summary>
-    ///     Updates the device list stored on this entity.
+    /// Updates the device list stored on this entity.
     /// </summary>
     /// <param name="uid">The entity to update.</param>
     /// <param name="devices">The devices to store.</param>
     /// <param name="merge">Whether to merge or replace the devices stored.</param>
     /// <param name="deviceList">Device list component</param>
-    public DeviceListUpdateResult UpdateDeviceList(EntityUid uid, IEnumerable<EntityUid> devices, bool merge = false, DeviceListComponent? deviceList = null)
+    public DeviceListUpdateResult UpdateDeviceList(EntityUid uid,
+        IEnumerable<EntityUid> devices,
+        bool merge = false,
+        DeviceListComponent? deviceList = null)
     {
         if (!Resolve(uid, ref deviceList))
             return DeviceListUpdateResult.NoComponent;
@@ -254,9 +263,7 @@ public sealed class DeviceListSystem : SharedDeviceListSystem
             newDevices.UnionWith(deviceList.Devices);
 
         if (newDevices.Count > deviceList.DeviceLimit)
-        {
             return DeviceListUpdateResult.TooManyDevices;
-        }
 
         var query = GetEntityQuery<DeviceNetworkComponent>();
         var oldDevices = deviceList.Devices.ToList();

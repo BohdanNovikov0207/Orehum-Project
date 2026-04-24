@@ -26,81 +26,77 @@ using Robust.Shared.Configuration;
 using Robust.Shared.Console;
 using Robust.Shared.Prototypes;
 
-namespace Content.Server.GameTicking.Commands
+namespace Content.Server.GameTicking.Commands;
+
+[AnyCommand]
+internal sealed class JoinGameCommand : IConsoleCommand
 {
-    [AnyCommand]
-    sealed class JoinGameCommand : IConsoleCommand
+    [Dependency] private readonly IAdminManager _adminManager = default!;
+    [Dependency] private readonly IConfigurationManager _cfg = default!;
+    [Dependency] private readonly IEntityManager _entManager = default!;
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+
+    public JoinGameCommand()
     {
-        [Dependency] private readonly IEntityManager _entManager = default!;
-        [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-        [Dependency] private readonly IAdminManager _adminManager = default!;
-        [Dependency] private readonly IConfigurationManager _cfg = default!;
+        IoCManager.InjectDependencies(this);
+    }
 
-        public string Command => "joingame";
-        public string Description => "";
-        public string Help => "";
+    public string Command => "joingame";
+    public string Description => "";
+    public string Help => "";
 
-        public JoinGameCommand()
+    public void Execute(IConsoleShell shell, string argStr, string[] args)
+    {
+        if (args.Length != 2)
         {
-            IoCManager.InjectDependencies(this);
+            shell.WriteError(Loc.GetString("shell-wrong-arguments-number"));
+            return;
         }
-        public void Execute(IConsoleShell shell, string argStr, string[] args)
+
+        var player = shell.Player;
+
+        if (player == null)
+            return;
+
+        var ticker = _entManager.System<GameTicker>();
+        var stationJobs = _entManager.System<StationJobsSystem>();
+
+        if (ticker.PlayerGameStatuses.TryGetValue(player.UserId, out var status) &&
+            status == PlayerGameStatus.JoinedGame)
         {
-            if (args.Length != 2)
-            {
-                shell.WriteError(Loc.GetString("shell-wrong-arguments-number"));
-                return;
-            }
-
-            var player = shell.Player;
-
-            if (player == null)
-            {
-                return;
-            }
-
-            var ticker = _entManager.System<GameTicker>();
-            var stationJobs = _entManager.System<StationJobsSystem>();
-
-            if (ticker.PlayerGameStatuses.TryGetValue(player.UserId, out var status) && status == PlayerGameStatus.JoinedGame)
-            {
-                Logger.InfoS("security", $"{player.Name} ({player.UserId}) attempted to latejoin while in-game.");
-                shell.WriteError($"{player.Name} is not in the lobby.   This incident will be reported.");
-                return;
-            }
-
-            if (ticker.RunLevel == GameRunLevel.PreRoundLobby)
-            {
-                shell.WriteLine("Round has not started.");
-                return;
-            }
-            else if (ticker.RunLevel == GameRunLevel.InRound)
-            {
-                string id = args[0];
-
-                if (!int.TryParse(args[1], out var sid))
-                {
-                    shell.WriteError(Loc.GetString("shell-argument-must-be-number"));
-                }
-
-                var station = _entManager.GetEntity(new NetEntity(sid));
-                var jobPrototype = _prototypeManager.Index<JobPrototype>(id);
-                if(stationJobs.TryGetJobSlot(station, jobPrototype, out var slots) == false || slots == 0)
-                {
-                    shell.WriteLine($"{jobPrototype.LocalizedName} has no available slots.");
-                    return;
-                }
-
-                if (_adminManager.IsAdmin(player) && _cfg.GetCVar(CCVars.AdminDeadminOnJoin))
-                {
-                    _adminManager.DeAdmin(player);
-                }
-
-                ticker.MakeJoinGame(player, station, id);
-                return;
-            }
-
-            ticker.MakeJoinGame(player, EntityUid.Invalid);
+            Logger.InfoS("security", $"{player.Name} ({player.UserId}) attempted to latejoin while in-game.");
+            shell.WriteError($"{player.Name} is not in the lobby.   This incident will be reported.");
+            return;
         }
+
+        if (ticker.RunLevel == GameRunLevel.PreRoundLobby)
+        {
+            shell.WriteLine("Round has not started.");
+            return;
+        }
+
+        if (ticker.RunLevel == GameRunLevel.InRound)
+        {
+            var id = args[0];
+
+            if (!int.TryParse(args[1], out var sid))
+                shell.WriteError(Loc.GetString("shell-argument-must-be-number"));
+
+            var station = _entManager.GetEntity(new NetEntity(sid));
+            var jobPrototype = _prototypeManager.Index<JobPrototype>(id);
+            if (!stationJobs.TryGetJobSlot(station, jobPrototype, out var slots) || slots == 0)
+            {
+                shell.WriteLine($"{jobPrototype.LocalizedName} has no available slots.");
+                return;
+            }
+
+            if (_adminManager.IsAdmin(player) && _cfg.GetCVar(CCVars.AdminDeadminOnJoin))
+                _adminManager.DeAdmin(player);
+
+            ticker.MakeJoinGame(player, station, id);
+            return;
+        }
+
+        ticker.MakeJoinGame(player, EntityUid.Invalid);
     }
 }

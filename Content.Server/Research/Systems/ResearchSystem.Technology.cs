@@ -51,7 +51,10 @@ public sealed partial class ResearchSystem
     /// <summary>
     /// Syncs the primary entity's database to that of the secondary entity's database.
     /// </summary>
-    public void Sync(EntityUid primaryUid, EntityUid otherUid, TechnologyDatabaseComponent? primaryDb = null, TechnologyDatabaseComponent? otherDb = null)
+    public void Sync(EntityUid primaryUid,
+        EntityUid otherUid,
+        TechnologyDatabaseComponent? primaryDb = null,
+        TechnologyDatabaseComponent? otherDb = null)
     {
         if (!Resolve(primaryUid, ref primaryDb) || !Resolve(otherUid, ref otherDb))
             return;
@@ -69,12 +72,14 @@ public sealed partial class ResearchSystem
     }
 
     /// <summary>
-    ///     If there's a research client component attached to the owner entity,
-    ///     and the research client is connected to a research server, this method
-    ///     syncs against the research server, and the server against the local database.
+    /// If there's a research client component attached to the owner entity,
+    /// and the research client is connected to a research server, this method
+    /// syncs against the research server, and the server against the local database.
     /// </summary>
     /// <returns>Whether it could sync or not</returns>
-    public void SyncClientWithServer(EntityUid uid, TechnologyDatabaseComponent? databaseComponent = null, ResearchClientComponent? clientComponent = null)
+    public void SyncClientWithServer(EntityUid uid,
+        TechnologyDatabaseComponent? databaseComponent = null,
+        ResearchClientComponent? clientComponent = null)
     {
         if (!Resolve(uid, ref databaseComponent, ref clientComponent, false))
             return;
@@ -125,13 +130,14 @@ public sealed partial class ResearchSystem
         ModifyServerPoints(serverEnt.Value, -prototype.Cost);
         UpdateTechnologyCards(serverEnt.Value);
 
-        _adminLog.Add(LogType.Action, LogImpact.Medium,
+        _adminLog.Add(LogType.Action,
+            LogImpact.Medium,
             $"{ToPrettyString(user):player} unlocked {prototype.ID} (discipline: {prototype.Discipline}, tier: {prototype.Tier}) at {ToPrettyString(client)}, for server {ToPrettyString(serverEnt.Value)}.");
         return true;
     }
 
     /// <summary>
-    ///     Adds a technology to the database without checking if it could be unlocked.
+    /// Adds a technology to the database without checking if it could be unlocked.
     /// </summary>
     [PublicAPI]
     public void AddTechnology(EntityUid uid, string technology, TechnologyDatabaseComponent? component = null)
@@ -145,9 +151,11 @@ public sealed partial class ResearchSystem
     }
 
     /// <summary>
-    ///     Adds a technology to the database without checking if it could be unlocked.
+    /// Adds a technology to the database without checking if it could be unlocked.
     /// </summary>
-    public void AddTechnology(EntityUid uid, TechnologyPrototype technology, TechnologyDatabaseComponent? component = null)
+    public void AddTechnology(EntityUid uid,
+        TechnologyPrototype technology,
+        TechnologyDatabaseComponent? component = null)
     {
         if (!Resolve(uid, ref component))
             return;
@@ -166,15 +174,17 @@ public sealed partial class ResearchSystem
                 continue;
             component.UnlockedRecipes.Add(unlock);
         }
+
         Dirty(uid, component);
 
-        var ev = new TechnologyDatabaseModifiedEvent(technology.RecipeUnlocks); // Goobstation - Lathe message on recipes update
+        var ev = new TechnologyDatabaseModifiedEvent(technology
+            .RecipeUnlocks); // Goobstation - Lathe message on recipes update
         RaiseLocalEvent(uid, ref ev);
     }
 
     /// <summary>
-    ///     Returns whether a technology can be unlocked on this database,
-    ///     taking parent technologies into account.
+    /// Returns whether a technology can be unlocked on this database,
+    /// taking parent technologies into account.
     /// </summary>
     /// <returns>Whether it could be unlocked or not</returns>
     public bool CanServerUnlockTechnology(EntityUid uid,
@@ -182,7 +192,6 @@ public sealed partial class ResearchSystem
         TechnologyDatabaseComponent? database = null,
         ResearchClientComponent? client = null)
     {
-
         if (!Resolve(uid, ref client, ref database, false))
             return false;
 
@@ -198,7 +207,9 @@ public sealed partial class ResearchSystem
         return true;
     }
 
-    private void OnDatabaseRegistrationChanged(EntityUid uid, TechnologyDatabaseComponent component, ref ResearchRegistrationChangedEvent args)
+    private void OnDatabaseRegistrationChanged(EntityUid uid,
+        TechnologyDatabaseComponent component,
+        ref ResearchRegistrationChangedEvent args)
     {
         if (args.Server != null)
             return;

@@ -15,26 +15,30 @@ using Robust.Shared.Map;
 namespace Content.Server.Explosion.EntitySystems;
 
 /// <summary>
-///     See <see cref="ExplosionTileFlood"/>.
+/// See <see cref="ExplosionTileFlood" />.
 /// </summary>
 public sealed class ExplosionSpaceTileFlood : ExplosionTileFlood
 {
     /// <summary>
-    ///     The keys of this dictionary correspond to space tiles that intersect a grid. The values have information
-    ///     about what grid (which could be more than one), and in what directions the space-based explosion is allowed
-    ///     to propagate from this tile.
+    /// The keys of this dictionary correspond to space tiles that intersect a grid. The values have information
+    /// about what grid (which could be more than one), and in what directions the space-based explosion is allowed
+    /// to propagate from this tile.
     /// </summary>
-    private Dictionary<Vector2i, BlockedSpaceTile> _gridBlockMap;
+    private readonly Dictionary<Vector2i, BlockedSpaceTile> _gridBlockMap;
 
     /// <summary>
-    ///     After every iteration, this data set will store all the grid-tiles that were reached as a result of the
-    ///     explosion expanding in space.
+    /// After every iteration, this data set will store all the grid-tiles that were reached as a result of the
+    /// explosion expanding in space.
     /// </summary>
     public Dictionary<EntityUid, HashSet<Vector2i>> GridJump = new();
 
     public ushort TileSize = ExplosionSystem.DefaultTileSize;
 
-    public ExplosionSpaceTileFlood(ExplosionSystem system, MapCoordinates epicentre, EntityUid? referenceGrid, List<EntityUid> localGrids, float maxDistance)
+    public ExplosionSpaceTileFlood(ExplosionSystem system,
+        MapCoordinates epicentre,
+        EntityUid? referenceGrid,
+        List<EntityUid> localGrids,
+        float maxDistance)
     {
         (_gridBlockMap, TileSize) = system.TransformGridEdges(epicentre, referenceGrid, localGrids, maxDistance);
         system.GetUnblockedDirections(_gridBlockMap, TileSize);
@@ -42,10 +46,10 @@ public sealed class ExplosionSpaceTileFlood : ExplosionTileFlood
 
     public int AddNewTiles(int iteration, HashSet<Vector2i> inputSpaceTiles)
     {
-        NewTiles = new();
-        NewBlockedTiles = new();
-        NewFreedTiles = new();
-        GridJump = new();
+        NewTiles = new List<Vector2i>();
+        NewBlockedTiles = new List<Vector2i>();
+        NewFreedTiles = new HashSet<Vector2i>();
+        GridJump = new Dictionary<EntityUid, HashSet<Vector2i>>();
 
         // Adjacent tiles
         if (TileLists.TryGetValue(iteration - 2, out var adjacent))
@@ -80,11 +84,12 @@ public sealed class ExplosionSpaceTileFlood : ExplosionTileFlood
     {
         foreach (var edge in blocker.BlockingGridEdges)
         {
-            if (edge.Grid == null) continue;
+            if (edge.Grid == null)
+                continue;
 
             if (!GridJump.TryGetValue(edge.Grid.Value, out var set))
             {
-                set = new();
+                set = new HashSet<Vector2i>();
                 GridJump[edge.Grid.Value] = set;
             }
 
@@ -116,7 +121,7 @@ public sealed class ExplosionSpaceTileFlood : ExplosionTileFlood
     public override void InitTile(Vector2i initialTile)
     {
         ProcessedTiles.Add(initialTile);
-        TileLists[0] = new() { initialTile };
+        TileLists[0] = new List<Vector2i> { initialTile };
 
         // It might be the case that the initial space-explosion tile actually overlaps on a grid. In that case we
         // need to manually add it to the `spaceToGridTiles` dictionary. This would normally be done automatically
@@ -167,8 +172,6 @@ public sealed class ExplosionSpaceTileFlood : ExplosionTileFlood
         JumpToGrid(blocker);
     }
 
-    protected override AtmosDirection GetUnblockedDirectionOrAll(Vector2i tile)
-    {
-        return _gridBlockMap.TryGetValue(tile, out var blocker) ? blocker.UnblockedDirections : AtmosDirection.All;
-    }
+    protected override AtmosDirection GetUnblockedDirectionOrAll(Vector2i tile) =>
+        _gridBlockMap.TryGetValue(tile, out var blocker) ? blocker.UnblockedDirections : AtmosDirection.All;
 }

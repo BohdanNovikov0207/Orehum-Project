@@ -15,12 +15,12 @@ namespace Content.Server.Announcements;
 /// Used for any announcements on the start of a round.
 /// </summary>
 [Prototype]
-public sealed partial class RoundAnnouncementPrototype : IPrototype
+public sealed class RoundAnnouncementPrototype : IPrototype
 {
-    [IdDataField]
-    public string ID { get; private set; } = default!;
+    [DataField("message")] public string? Message;
 
     [DataField("sound")] public SoundSpecifier? Sound;
 
-    [DataField("message")] public string? Message;
+    [IdDataField]
+    public string ID { get; } = default!;
 }

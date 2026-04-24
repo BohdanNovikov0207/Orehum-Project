@@ -7,22 +7,22 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Diagnostics.CodeAnalysis;
-using Content.Shared.CCVar;
-using Content.Shared.GridPreloader.Prototypes;
-using Content.Shared.GridPreloader.Systems;
-using Robust.Server.GameObjects;
-using Robust.Shared.Configuration;
-using Robust.Shared.Map;
-using Robust.Shared.Map.Components;
-using Robust.Shared.Physics.Components;
-using Robust.Shared.Prototypes;
 using System.Numerics;
 using Content.Server.GameTicking;
+using Content.Shared.CCVar;
 using Content.Shared.GameTicking;
+using Content.Shared.GridPreloader.Prototypes;
+using Content.Shared.GridPreloader.Systems;
 using JetBrains.Annotations;
+using Robust.Server.GameObjects;
+using Robust.Shared.Configuration;
 using Robust.Shared.EntitySerialization.Systems;
+using Robust.Shared.Map;
+using Robust.Shared.Physics.Components;
+using Robust.Shared.Prototypes;
 
 namespace Content.Server.GridPreloader;
+
 public sealed class GridPreloaderSystem : SharedGridPreloaderSystem
 {
     [Dependency] private readonly IConfigurationManager _cfg = default!;
@@ -56,10 +56,7 @@ public sealed class GridPreloaderSystem : SharedGridPreloaderSystem
         Del(ent.Value.Owner);
     }
 
-    private void OnPostGameMapLoad(PostGameMapLoad ev)
-    {
-        EnsurePreloadedGridMap();
-    }
+    private void OnPostGameMapLoad(PostGameMapLoad ev) => EnsurePreloadedGridMap();
 
     private void EnsurePreloadedGridMap()
     {
@@ -97,19 +94,19 @@ public sealed class GridPreloaderSystem : SharedGridPreloaderSystem
                 var coords = new Vector2(-physics.LocalCenter.X + globalXOffset, -physics.LocalCenter.Y);
                 _transform.SetCoordinates(gridUid, new EntityCoordinates(mapUid, coords));
 
-                globalXOffset += (mapGrid.LocalAABB.Width / 2) + 1;
+                globalXOffset += mapGrid.LocalAABB.Width / 2 + 1;
 
                 // Add to list
                 if (!preloader.PreloadedGrids.ContainsKey(proto.ID))
-                    preloader.PreloadedGrids[proto.ID] = new();
+                    preloader.PreloadedGrids[proto.ID] = new List<EntityUid>();
                 preloader.PreloadedGrids[proto.ID].Add(gridUid);
             }
         }
     }
 
     /// <summary>
-    ///     Should be a singleton no matter station count, so we can assume 1
-    ///     (better support for singleton component in engine at some point i guess)
+    /// Should be a singleton no matter station count, so we can assume 1
+    /// (better support for singleton component in engine at some point i guess)
     /// </summary>
     /// <returns></returns>
     public Entity<GridPreloaderComponent>? GetPreloaderEntity()
@@ -127,7 +124,9 @@ public sealed class GridPreloaderSystem : SharedGridPreloaderSystem
     /// An attempt to get a certain preloaded shuttle. If there are no more such shuttles left, returns null
     /// </summary>
     [PublicAPI]
-    public bool TryGetPreloadedGrid(ProtoId<PreloadedGridPrototype> proto, [NotNullWhen(true)] out EntityUid? preloadedGrid, GridPreloaderComponent? preloader = null)
+    public bool TryGetPreloadedGrid(ProtoId<PreloadedGridPrototype> proto,
+        [NotNullWhen(true)] out EntityUid? preloadedGrid,
+        GridPreloaderComponent? preloader = null)
     {
         preloadedGrid = null;
 

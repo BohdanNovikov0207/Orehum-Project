@@ -17,10 +17,7 @@ public sealed class AnomalyCoreSystem : EntitySystem
 {
     [Dependency] private readonly IGameTiming _gameTiming = default!;
 
-    public override void Initialize()
-    {
-        SubscribeLocalEvent<AnomalyCoreComponent, PriceCalculationEvent>(OnGetPrice);
-    }
+    public override void Initialize() => SubscribeLocalEvent<AnomalyCoreComponent, PriceCalculationEvent>(OnGetPrice);
 
     private void OnGetPrice(Entity<AnomalyCoreComponent> core, ref PriceCalculationEvent args)
     {

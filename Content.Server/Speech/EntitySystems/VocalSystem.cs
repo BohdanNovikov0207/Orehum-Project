@@ -27,11 +27,11 @@ namespace Content.Server.Speech.EntitySystems;
 
 public sealed class VocalSystem : EntitySystem
 {
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly IPrototypeManager _proto = default!;
+    [Dependency] private readonly ActionsSystem _actions = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly ChatSystem _chat = default!;
-    [Dependency] private readonly ActionsSystem _actions = default!;
+    [Dependency] private readonly IPrototypeManager _proto = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
 
     public override void Initialize()
     {
@@ -55,15 +55,11 @@ public sealed class VocalSystem : EntitySystem
     {
         // remove scream action when component removed
         if (component.ScreamActionEntity != null)
-        {
             _actions.RemoveAction(uid, component.ScreamActionEntity);
-        }
     }
 
-    private void OnSexChanged(EntityUid uid, VocalComponent component, SexChangedEvent args)
-    {
+    private void OnSexChanged(EntityUid uid, VocalComponent component, SexChangedEvent args) =>
         LoadSounds(uid, component, args.NewSex);
-    }
 
     private void OnEmote(EntityUid uid, VocalComponent component, ref EmoteEvent args)
     {

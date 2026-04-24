@@ -1,6 +1,6 @@
 using Content.Server.Administration;
-using Content.Shared.Administration;
 using Content.Shared._RMC14.CCVar;
+using Content.Shared.Administration;
 using Robust.Shared.Configuration;
 using Robust.Shared.Console;
 
@@ -12,6 +12,7 @@ public sealed class SetDchatCommand : IConsoleCommand
     public string Command => "setdchat";
     public string Description => Loc.GetString("set-dchat-command-description");
     public string Help => Loc.GetString("set-dchat-command-help");
+
     public void Execute(IConsoleShell shell, string argStr, string[] args)
     {
         var cfg = IoCManager.Resolve<IConfigurationManager>();
@@ -25,9 +26,7 @@ public sealed class SetDchatCommand : IConsoleCommand
         var dchat = cfg.GetCVar(RMCCVars.RMCDeadChatEnabled);
 
         if (args.Length == 0)
-        {
             dchat = !dchat;
-        }
 
         if (args.Length == 1 && !bool.TryParse(args[0], out dchat))
         {

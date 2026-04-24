@@ -5,9 +5,9 @@ using Content.Server.Atmos.Components;
 using Content.Server.Atmos.EntitySystems;
 using Content.Server.Body.Components;
 using Content.Server.Body.Systems;
+using Content.Server.Botany;
 using Content.Server.Botany.Components;
 using Content.Server.Botany.Systems;
-using Content.Server.Botany;
 using Content.Server.Chat.Systems;
 using Content.Server.Emp;
 using Content.Server.Explosion.EntitySystems;
@@ -26,14 +26,13 @@ using Content.Shared._EinsteinEngines.Language.Components;
 using Content.Shared._EinsteinEngines.Language.Systems;
 using Content.Shared._Shitmed.Medical.Surgery.Wounds.Systems;
 using Content.Shared.Atmos;
-using Content.Shared.Audio;
 using Content.Shared.Body.Components;
 using Content.Shared.Chat;
 using Content.Shared.Coordinates.Helpers;
-using Content.Shared.EntityEffects.EffectConditions;
-using Content.Shared.EntityEffects.Effects.PlantMetabolism;
-using Content.Shared.EntityEffects.Effects;
 using Content.Shared.EntityEffects;
+using Content.Shared.EntityEffects.EffectConditions;
+using Content.Shared.EntityEffects.Effects;
+using Content.Shared.EntityEffects.Effects.PlantMetabolism;
 using Content.Shared.Flash;
 using Content.Shared.Maps;
 using Content.Shared.Mind.Components;
@@ -46,7 +45,6 @@ using Robust.Shared.Audio.Systems;
 using Robust.Shared.Map;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
-
 using TemperatureCondition = Content.Shared.EntityEffects.EffectConditions.Temperature; // disambiguate the namespace
 using PolymorphEffect = Content.Shared.EntityEffects.Effects.Polymorph;
 
@@ -55,30 +53,34 @@ namespace Content.Server.EntityEffects;
 public sealed class EntityEffectSystem : EntitySystem
 {
     [Dependency] private readonly AtmosphereSystem _atmosphere = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly BloodstreamSystem _bloodstream = default!;
     [Dependency] private readonly ChatSystem _chat = default!;
     [Dependency] private readonly EmpSystem _emp = default!;
     [Dependency] private readonly ExplosionSystem _explosion = default!;
     [Dependency] private readonly FlammableSystem _flammable = default!;
     [Dependency] private readonly SharedFlashSystem _flash = default!;
-    [Dependency] private readonly IMapManager _mapManager = default!;
-    [Dependency] private readonly IPrototypeManager _protoManager = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly SharedMapSystem _map = default!;
+    [Dependency] private readonly IMapManager _mapManager = default!;
     [Dependency] private readonly MutationSystem _mutation = default!;
     [Dependency] private readonly NarcolepsySystem _narcolepsy = default!;
     [Dependency] private readonly PlantHolderSystem _plantHolder = default!;
-    [Dependency] private readonly PolymorphSystem _polymorph = default!;
-    [Dependency] private readonly RespiratorSystem _respirator = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedPointLightSystem _pointLight = default!;
+    [Dependency] private readonly PolymorphSystem _polymorph = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly IPrototypeManager _protoManager = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly RespiratorSystem _respirator = default!;
     [Dependency] private readonly SmokeSystem _smoke = default!;
     [Dependency] private readonly SpreaderSystem _spreader = default!;
     [Dependency] private readonly TemperatureSystem _temperature = default!;
-    [Dependency] private readonly SharedTransformSystem _xform = default!;
+
+    [Dependency]
+    private readonly TurfSystem
+        _turf = default!; //todo Goobstation? The only thing im using this for is meant to be in RT? Fix if you havent
+
     [Dependency] private readonly VomitSystem _vomit = default!;
-    [Dependency] private readonly TurfSystem _turf = default!; //todo Goobstation? The only thing im using this for is meant to be in RT? Fix if you havent
+    [Dependency] private readonly SharedTransformSystem _xform = default!;
 
     public override void Initialize()
     {
@@ -183,15 +185,17 @@ public sealed class EntityEffectSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Checks if the plant holder can metabolize the reagent or not. Checks if it has an alive plant by default.
+    /// Checks if the plant holder can metabolize the reagent or not. Checks if it has an alive plant by default.
     /// </summary>
     /// <param name="plantHolder">The entity holding the plant</param>
     /// <param name="plantHolderComponent">The plant holder component</param>
     /// <param name="entityManager">The entity manager</param>
     /// <param name="mustHaveAlivePlant">Whether to check if it has an alive plant or not</param>
     /// <returns></returns>
-    private bool CanMetabolizePlant(EntityUid plantHolder, [NotNullWhen(true)] out PlantHolderComponent? plantHolderComponent,
-        bool mustHaveAlivePlant = true, bool mustHaveMutableSeed = false)
+    private bool CanMetabolizePlant(EntityUid plantHolder,
+        [NotNullWhen(true)] out PlantHolderComponent? plantHolderComponent,
+        bool mustHaveAlivePlant = true,
+        bool mustHaveMutableSeed = false)
     {
         plantHolderComponent = null;
 
@@ -234,7 +238,7 @@ public sealed class EntityEffectSystem : EntitySystem
 
     private void OnExecutePlantAdjustNutrition(ref ExecuteEntityEffectEvent<PlantAdjustNutrition> args)
     {
-        if (!CanMetabolizePlant(args.Args.TargetEntity, out var plantHolderComp, mustHaveAlivePlant: false))
+        if (!CanMetabolizePlant(args.Args.TargetEntity, out var plantHolderComp, false))
             return;
 
         _plantHolder.AdjustNutrient(args.Args.TargetEntity, args.Effect.Amount, plantHolderComp);
@@ -270,7 +274,7 @@ public sealed class EntityEffectSystem : EntitySystem
 
     private void OnExecutePlantAdjustWater(ref ExecuteEntityEffectEvent<PlantAdjustWater> args)
     {
-        if (!CanMetabolizePlant(args.Args.TargetEntity, out var plantHolderComp, mustHaveAlivePlant: false))
+        if (!CanMetabolizePlant(args.Args.TargetEntity, out var plantHolderComp, false))
             return;
 
         _plantHolder.AdjustWater(args.Args.TargetEntity, args.Effect.Amount, plantHolderComp);
@@ -305,26 +309,22 @@ public sealed class EntityEffectSystem : EntitySystem
 
         // Starting number of bits that are high, between 0 and bits.
         // In other words, it's val mapped linearly from range [min, max] to range [0, bits], and then rounded.
-        int valInt = (int)MathF.Round((val - min) / (max - min) * bits);
+        var valInt = (int) MathF.Round((val - min) / (max - min) * bits);
         // val may be outside the range of min/max due to starting prototype values, so clamp.
         valInt = Math.Clamp(valInt, 0, bits);
 
         // Probability that the bit flip increases n.
         // The higher the current value is, the lower the probability of increasing value is, and the higher the probability of decreasive it it.
         // In other words, it tends to go to the middle.
-        float probIncrease = 1 - (float)valInt / bits;
+        var probIncrease = 1 - (float) valInt / bits;
         int valIntMutated;
         if (_random.Prob(probIncrease))
-        {
             valIntMutated = valInt + 1;
-        }
         else
-        {
             valIntMutated = valInt - 1;
-        }
 
         // Set value based on mutated thermometer code.
-        float valMutated = Math.Clamp((float)valIntMutated / bits * (max - min) + min, min, max);
+        var valMutated = Math.Clamp((float) valIntMutated / bits * (max - min) + min, min, max);
         val = valMutated;
     }
 
@@ -338,23 +338,19 @@ public sealed class EntityEffectSystem : EntitySystem
 
         // Starting number of bits that are high, between 0 and bits.
         // In other words, it's val mapped linearly from range [min, max] to range [0, bits], and then rounded.
-        int valInt = (int)MathF.Round((val - min) / (max - min) * bits);
+        var valInt = (int) MathF.Round((val - min) / (max - min) * bits);
         // val may be outside the range of min/max due to starting prototype values, so clamp.
         valInt = Math.Clamp(valInt, 0, bits);
 
         // Probability that the bit flip increases n.
         // The higher the current value is, the lower the probability of increasing value is, and the higher the probability of decreasing it.
         // In other words, it tends to go to the middle.
-        float probIncrease = 1 - (float)valInt / bits;
+        var probIncrease = 1 - (float) valInt / bits;
         int valMutated;
         if (_random.Prob(probIncrease))
-        {
             valMutated = val + 1;
-        }
         else
-        {
             valMutated = val - 1;
-        }
 
         valMutated = Math.Clamp(valMutated, min, max);
         val = valMutated;
@@ -372,7 +368,8 @@ public sealed class EntityEffectSystem : EntitySystem
 
         if (member == null)
         {
-            _mutation.Log.Error(args.Effect.GetType().Name + " Error: Member " + args.Effect.TargetValue + " not found on " + plantHolderComp.Seed.GetType().Name + ". Did you misspell it?");
+            _mutation.Log.Error(args.Effect.GetType().Name + " Error: Member " + args.Effect.TargetValue +
+                                " not found on " + plantHolderComp.Seed.GetType().Name + ". Did you misspell it?");
             return;
         }
 
@@ -382,19 +379,19 @@ public sealed class EntityEffectSystem : EntitySystem
 
         if (member.FieldType == typeof(float))
         {
-            var floatVal = (float)currentValObj;
+            var floatVal = (float) currentValObj;
             MutateFloat(ref floatVal, args.Effect.MinValue, args.Effect.MaxValue, args.Effect.Steps);
             member.SetValue(plantHolderComp.Seed, floatVal);
         }
         else if (member.FieldType == typeof(int))
         {
-            var intVal = (int)currentValObj;
-            MutateInt(ref intVal, (int)args.Effect.MinValue, (int)args.Effect.MaxValue, args.Effect.Steps);
+            var intVal = (int) currentValObj;
+            MutateInt(ref intVal, (int) args.Effect.MinValue, (int) args.Effect.MaxValue, args.Effect.Steps);
             member.SetValue(plantHolderComp.Seed, intVal);
         }
         else if (member.FieldType == typeof(bool))
         {
-            var boolVal = (bool)currentValObj;
+            var boolVal = (bool) currentValObj;
             boolVal = !boolVal;
             member.SetValue(plantHolderComp.Seed, boolVal);
         }
@@ -424,7 +421,7 @@ public sealed class EntityEffectSystem : EntitySystem
         if (!CanMetabolizePlant(args.Args.TargetEntity, out var plantHolderComp, mustHaveMutableSeed: true))
             return;
 
-        if (plantHolderComp.Seed!.Seedless == false)
+        if (!plantHolderComp.Seed!.Seedless)
         {
             _plantHolder.EnsureUniqueSeed(args.Args.TargetEntity, plantHolderComp);
             _popup.PopupEntity(
@@ -486,12 +483,11 @@ public sealed class EntityEffectSystem : EntitySystem
         if (plantHolderComp.Seed.Potency < args.Effect.PotencyLimit)
         {
             _plantHolder.EnsureUniqueSeed(args.Args.TargetEntity, plantHolderComp);
-            plantHolderComp.Seed.Potency = Math.Min(plantHolderComp.Seed.Potency + args.Effect.PotencyIncrease, args.Effect.PotencyLimit);
+            plantHolderComp.Seed.Potency = Math.Min(plantHolderComp.Seed.Potency + args.Effect.PotencyIncrease,
+                args.Effect.PotencyLimit);
 
             if (plantHolderComp.Seed.Potency > args.Effect.PotencySeedlessThreshold)
-            {
                 plantHolderComp.Seed.Seedless = true;
-            }
         }
         else if (plantHolderComp.Seed.Yield > 1 && _random.Prob(0.1f))
         {
@@ -508,9 +504,7 @@ public sealed class EntityEffectSystem : EntitySystem
             var amount = args.Effect.Amount;
 
             if (args.Args is EntityEffectReagentArgs reagentArgs)
-            {
                 amount *= reagentArgs.Scale.Float();
-            }
 
             _temperature.ChangeHeat(args.Args.TargetEntity, amount, true, temp);
         }
@@ -523,18 +517,18 @@ public sealed class EntityEffectSystem : EntitySystem
             if (reagentArgs.Source == null)
                 return;
 
-            var spreadAmount = (int) Math.Max(0, Math.Ceiling((reagentArgs.Quantity / args.Effect.OverflowThreshold).Float()));
+            var spreadAmount = (int) Math.Max(0,
+                Math.Ceiling((reagentArgs.Quantity / args.Effect.OverflowThreshold).Float()));
             var splitSolution = reagentArgs.Source.SplitSolution(reagentArgs.Source.Volume);
             var transform = EntityManager.GetComponent<TransformComponent>(reagentArgs.TargetEntity);
-            var mapCoords = _xform.GetMapCoordinates(reagentArgs.TargetEntity, xform: transform);
+            var mapCoords = _xform.GetMapCoordinates(reagentArgs.TargetEntity, transform);
 
             if (!_mapManager.TryFindGridAt(mapCoords, out var gridUid, out var grid) ||
                 !_map.TryGetTileRef(gridUid, grid, transform.Coordinates, out var tileRef))
-            {
                 return;
-            }
 
-            if (_spreader.RequiresFloorToSpread(args.Effect.PrototypeId) &&  _turf.IsSpace(tileRef)) //todo Goobstation? _turf should be tileRef but we dont have the RT for it?
+            if (_spreader.RequiresFloorToSpread(args.Effect.PrototypeId) &&
+                _turf.IsSpace(tileRef)) //todo Goobstation? _turf should be tileRef but we dont have the RT for it?
                 return;
 
             var coords = _map.MapToGrid(gridUid, mapCoords);
@@ -568,16 +562,16 @@ public sealed class EntityEffectSystem : EntitySystem
             _bloodstream.FlushChemicals(args.Args.TargetEntity, reagentArgs.Reagent.ID, cleanseRate);
         }
         else
-        {
             _bloodstream.FlushChemicals(args.Args.TargetEntity, "", cleanseRate);
-        }
     }
 
     private void OnExecuteChemVomit(ref ExecuteEntityEffectEvent<ChemVomit> args)
     {
         if (args.Args is EntityEffectReagentArgs reagentArgs)
+        {
             if (reagentArgs.Scale != 1f)
                 return;
+        }
 
         _vomit.Vomit(args.Args.TargetEntity, args.Effect.ThirstAmount, args.Effect.HungerAmount);
     }
@@ -585,13 +579,13 @@ public sealed class EntityEffectSystem : EntitySystem
     private void OnExecuteCreateEntityReactionEffect(ref ExecuteEntityEffectEvent<CreateEntityReactionEffect> args)
     {
         var transform = Comp<TransformComponent>(args.Args.TargetEntity);
-        var quantity = (int)args.Effect.Number;
+        var quantity = (int) args.Effect.Number;
         if (args.Args is EntityEffectReagentArgs reagentArgs)
             quantity *= reagentArgs.Quantity.Int();
 
         for (var i = 0; i < quantity; i++)
         {
-            var uid = Spawn(args.Effect.Entity, _xform.GetMapCoordinates(args.Args.TargetEntity, xform: transform));
+            var uid = Spawn(args.Effect.Entity, _xform.GetMapCoordinates(args.Args.TargetEntity, transform));
             _xform.AttachToGridOrMap(uid);
 
             // TODO figure out how to properly spawn inside of containers
@@ -611,13 +605,9 @@ public sealed class EntityEffectSystem : EntitySystem
         if (tileMix != null)
         {
             if (args.Args is EntityEffectReagentArgs reagentArgs)
-            {
                 tileMix.AdjustMoles(args.Effect.Gas, reagentArgs.Quantity.Float() * args.Effect.Multiplier);
-            }
             else
-            {
                 tileMix.AdjustMoles(args.Effect.Gas, args.Effect.Multiplier);
-            }
         }
     }
 
@@ -630,9 +620,7 @@ public sealed class EntityEffectSystem : EntitySystem
         RemComp<PendingZombieComponent>(args.Args.TargetEntity);
 
         if (args.Effect.Innoculate)
-        {
             EnsureComp<ZombieImmuneComponent>(args.Args.TargetEntity);
-        }
     }
 
     private void OnExecuteEmote(ref ExecuteEntityEffectEvent<Emote> args)
@@ -641,7 +629,10 @@ public sealed class EntityEffectSystem : EntitySystem
             return;
 
         if (args.Effect.ShowInChat)
-            _chat.TryEmoteWithChat(args.Args.TargetEntity, args.Effect.EmoteId, ChatTransmitRange.GhostRangeLimit, forceEmote: args.Effect.Force);
+            _chat.TryEmoteWithChat(args.Args.TargetEntity,
+                args.Effect.EmoteId,
+                ChatTransmitRange.GhostRangeLimit,
+                forceEmote: args.Effect.Force);
         else
             _chat.TryEmoteWithoutChat(args.Args.TargetEntity, args.Effect.EmoteId);
     }
@@ -653,11 +644,9 @@ public sealed class EntityEffectSystem : EntitySystem
         var range = args.Effect.EmpRangePerUnit;
 
         if (args.Args is EntityEffectReagentArgs reagentArgs)
-        {
             range = MathF.Min((float) (reagentArgs.Quantity * args.Effect.EmpRangePerUnit), args.Effect.EmpMaxRange);
-        }
 
-        _emp.EmpPulse(_xform.GetMapCoordinates(args.Args.TargetEntity, xform: transform),
+        _emp.EmpPulse(_xform.GetMapCoordinates(args.Args.TargetEntity, transform),
             range,
             args.Effect.EnergyConsumption,
             args.Effect.DisableDuration);
@@ -668,9 +657,8 @@ public sealed class EntityEffectSystem : EntitySystem
         var intensity = args.Effect.IntensityPerUnit;
 
         if (args.Args is EntityEffectReagentArgs reagentArgs)
-        {
-            intensity = MathF.Min((float) reagentArgs.Quantity * args.Effect.IntensityPerUnit, args.Effect.MaxTotalIntensity);
-        }
+            intensity = MathF.Min((float) reagentArgs.Quantity * args.Effect.IntensityPerUnit,
+                args.Effect.MaxTotalIntensity);
 
         _explosion.QueueExplosion(
             args.Args.TargetEntity,
@@ -687,7 +675,9 @@ public sealed class EntityEffectSystem : EntitySystem
             return;
 
         // Sets the multiplier for FireStacks to MultiplierOnExisting is 0 or greater and target already has FireStacks
-        var multiplier = flammable.FireStacks != 0f && args.Effect.MultiplierOnExisting >= 0 ? args.Effect.MultiplierOnExisting : args.Effect.Multiplier;
+        var multiplier = flammable.FireStacks != 0f && args.Effect.MultiplierOnExisting >= 0
+            ? args.Effect.MultiplierOnExisting
+            : args.Effect.Multiplier;
         var quantity = 1f;
         if (args.Args is EntityEffectReagentArgs reagentArgs)
         {
@@ -697,9 +687,7 @@ public sealed class EntityEffectSystem : EntitySystem
                 reagentArgs.Source?.RemoveReagent(reagentArgs.Reagent.ID, reagentArgs.Quantity);
         }
         else
-        {
             _flammable.AdjustFireStacks(args.Args.TargetEntity, multiplier, flammable);
-        }
     }
 
     private void OnExecuteFlashReactionEffect(ref ExecuteEntityEffectEvent<FlashReactionEffect> args)
@@ -709,14 +697,14 @@ public sealed class EntityEffectSystem : EntitySystem
         var range = 1f;
 
         if (args.Args is EntityEffectReagentArgs reagentArgs)
-            range = MathF.Min((float)(reagentArgs.Quantity * args.Effect.RangePerUnit), args.Effect.MaxRange);
+            range = MathF.Min((float) (reagentArgs.Quantity * args.Effect.RangePerUnit), args.Effect.MaxRange);
 
         _flash.FlashArea(
             args.Args.TargetEntity,
             null,
             range,
             args.Effect.Duration,
-            slowTo: args.Effect.SlowTo,
+            args.Effect.SlowTo,
             sound: args.Effect.Sound);
 
         if (args.Effect.FlashEffectPrototype == null)
@@ -737,13 +725,9 @@ public sealed class EntityEffectSystem : EntitySystem
             return;
 
         if (args.Args is EntityEffectReagentArgs reagentArgs)
-        {
-            _flammable.Ignite(reagentArgs.TargetEntity, reagentArgs.OrganEntity ?? reagentArgs.TargetEntity, flammable: flammable);
-        }
+            _flammable.Ignite(reagentArgs.TargetEntity, reagentArgs.OrganEntity ?? reagentArgs.TargetEntity, flammable);
         else
-        {
-            _flammable.Ignite(args.Args.TargetEntity, args.Args.TargetEntity, flammable: flammable);
-        }
+            _flammable.Ignite(args.Args.TargetEntity, args.Args.TargetEntity, flammable);
     }
 
     private void OnExecuteMakeSentient(ref ExecuteEntityEffectEvent<MakeSentient> args)
@@ -773,15 +757,11 @@ public sealed class EntityEffectSystem : EntitySystem
 
         // Stops from adding a ghost role to things like people who already have a mind
         if (TryComp<MindContainerComponent>(uid, out var mindContainer) && mindContainer.HasMind)
-        {
             return;
-        }
 
         // Don't add a ghost role to things that already have ghost roles
         if (TryComp(uid, out GhostRoleComponent? ghostRole))
-        {
             return;
-        }
 
         ghostRole = AddComp<GhostRoleComponent>(uid);
         EnsureComp<GhostTakeoverAvailableComponent>(uid);
@@ -796,7 +776,8 @@ public sealed class EntityEffectSystem : EntitySystem
         if (TryComp<BloodstreamComponent>(args.Args.TargetEntity, out var blood))
         {
             var amt = args.Effect.Amount;
-            if (args.Args is EntityEffectReagentArgs reagentArgs) {
+            if (args.Args is EntityEffectReagentArgs reagentArgs)
+            {
                 if (args.Effect.Scaled)
                     amt *= reagentArgs.Quantity.Float();
                 amt *= reagentArgs.Scale.Float();
@@ -829,7 +810,7 @@ public sealed class EntityEffectSystem : EntitySystem
     private void OnExecuteModifyLungGas(ref ExecuteEntityEffectEvent<ModifyLungGas> args)
     {
         LungComponent? lung;
-        float amount = 1f;
+        var amount = 1f;
 
         if (args.Args is EntityEffectReagentArgs reagentArgs)
         {
@@ -840,7 +821,8 @@ public sealed class EntityEffectSystem : EntitySystem
         }
         else
         {
-            if (!TryComp<LungComponent>(args.Args.TargetEntity, out var organLung)) //Likely needs to be modified to ensure it works correctly
+            if (!TryComp<LungComponent>(args.Args.TargetEntity,
+                    out var organLung)) //Likely needs to be modified to ensure it works correctly
                 return;
             lung = organLung;
         }
@@ -861,14 +843,10 @@ public sealed class EntityEffectSystem : EntitySystem
     {
         var multiplier = 1f;
         if (args.Args is EntityEffectReagentArgs reagentArgs)
-        {
             multiplier = reagentArgs.Quantity.Float();
-        }
 
         if (TryComp<RespiratorComponent>(args.Args.TargetEntity, out var resp))
-        {
             _respirator.UpdateSaturation(args.Args.TargetEntity, multiplier * args.Effect.Factor, resp);
-        }
     }
 
     private void OnExecutePlantMutateChemicals(ref ExecuteEntityEffectEvent<PlantMutateChemicals> args)
@@ -884,9 +862,9 @@ public sealed class EntityEffectSystem : EntitySystem
         // Add a random amount of a random chemical to this set of chemicals
         if (randomChems != null)
         {
-            var pick = _random.Pick<RandomFillSolution>(randomChems);
+            var pick = _random.Pick(randomChems);
             var chemicalId = _random.Pick(pick.Reagents);
-            var amount = _random.Next(1, (int)pick.Quantity);
+            var amount = _random.Next(1, (int) pick.Quantity);
             var seedChemQuantity = new SeedChemQuantity();
             if (chemicals.ContainsKey(chemicalId))
             {
@@ -899,7 +877,8 @@ public sealed class EntityEffectSystem : EntitySystem
                 seedChemQuantity.Max = 1 + amount;
                 seedChemQuantity.Inherent = false;
             }
-            var potencyDivisor = (int)Math.Ceiling(100.0f / seedChemQuantity.Max);
+
+            var potencyDivisor = (int) Math.Ceiling(100.0f / seedChemQuantity.Max);
             seedChemQuantity.PotencyDivisor = potencyDivisor;
             chemicals[chemicalId] = seedChemQuantity;
         }
@@ -915,16 +894,12 @@ public sealed class EntityEffectSystem : EntitySystem
         var gasses = plantholder.Seed.ExudeGasses;
 
         // Add a random amount of a random gas to this gas dictionary
-        float amount = _random.NextFloat(args.Effect.MinValue, args.Effect.MaxValue);
-        Gas gas = _random.Pick(Enum.GetValues(typeof(Gas)).Cast<Gas>().ToList());
+        var amount = _random.NextFloat(args.Effect.MinValue, args.Effect.MaxValue);
+        var gas = _random.Pick(Enum.GetValues(typeof(Gas)).Cast<Gas>().ToList());
         if (gasses.ContainsKey(gas))
-        {
             gasses[gas] += amount;
-        }
         else
-        {
             gasses.Add(gas, amount);
-        }
     }
 
     private void OnExecutePlantMutateExudeGasses(ref ExecuteEntityEffectEvent<PlantMutateExudeGasses> args)
@@ -937,16 +912,12 @@ public sealed class EntityEffectSystem : EntitySystem
         var gasses = plantholder.Seed.ConsumeGasses;
 
         // Add a random amount of a random gas to this gas dictionary
-        float amount = _random.NextFloat(args.Effect.MinValue, args.Effect.MaxValue);
-        Gas gas = _random.Pick(Enum.GetValues(typeof(Gas)).Cast<Gas>().ToList());
+        var amount = _random.NextFloat(args.Effect.MinValue, args.Effect.MaxValue);
+        var gas = _random.Pick(Enum.GetValues(typeof(Gas)).Cast<Gas>().ToList());
         if (gasses.ContainsKey(gas))
-        {
             gasses[gas] += amount;
-        }
         else
-        {
             gasses.Add(gas, amount);
-        }
     }
 
     private void OnExecutePlantMutateHarvest(ref ExecuteEntityEffectEvent<PlantMutateHarvest> args)
@@ -972,7 +943,7 @@ public sealed class EntityEffectSystem : EntitySystem
             return;
 
         var targetProto = _random.Pick(plantholder.Seed.MutationPrototypes);
-        _protoManager.TryIndex(targetProto, out SeedPrototype? protoSeed);
+        _protoManager.TryIndex(targetProto, out var protoSeed);
 
         if (protoSeed == null)
         {
@@ -993,8 +964,10 @@ public sealed class EntityEffectSystem : EntitySystem
     private void OnExecuteResetNarcolepsy(ref ExecuteEntityEffectEvent<ResetNarcolepsy> args)
     {
         if (args.Args is EntityEffectReagentArgs reagentArgs)
+        {
             if (reagentArgs.Scale != 1f)
                 return;
+        }
 
         _narcolepsy.AdjustNarcolepsyTimer(args.Args.TargetEntity, args.Effect.TimerReset);
     }

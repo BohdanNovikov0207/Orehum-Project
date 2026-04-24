@@ -19,16 +19,15 @@ using Robust.Shared.Utility;
 namespace Content.Server.Maps;
 
 /// <summary>
-///     Performs basic map migration operations by listening for engine <see cref="MapLoaderSystem"/> events.
+/// Performs basic map migration operations by listening for engine <see cref="MapLoaderSystem" /> events.
 /// </summary>
 public sealed class MapMigrationSystem : EntitySystem
 {
+    private const string MigrationFile = "/migration.yml";
 #pragma warning disable CS0414
     [Dependency] private readonly IPrototypeManager _protoMan = default!;
 #pragma warning restore CS0414
     [Dependency] private readonly IResourceManager _resMan = default!;
-
-    private const string MigrationFile = "/migration.yml";
 
     public override void Initialize()
     {

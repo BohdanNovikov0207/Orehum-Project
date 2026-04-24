@@ -22,42 +22,41 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using Content.Goobstation.Common.NTR.Scan;
 using Content.Server.Botany.Components;
 using Content.Server.Kitchen.Components;
 using Content.Server.Popups;
-using Content.Shared.Chemistry.EntitySystems;
+using Content.Shared.Administration.Logs;
 using Content.Shared.Botany;
+using Content.Shared.Chemistry.EntitySystems;
+using Content.Shared.Database;
+using Content.Shared.EntityEffects;
 using Content.Shared.Examine;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Popups;
 using Content.Shared.Random;
-using Content.Shared.Random.Helpers;
 using Robust.Server.GameObjects;
 using Robust.Shared.Map;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using Content.Goobstation.Common.NTR.Scan;
-using Content.Server.EntityEffects; // Goobstation
-using Content.Shared.Administration.Logs;
-using Content.Shared.Database;
-using Content.Shared.EntityEffects;
+// Goobstation
 
 namespace Content.Server.Botany.Systems;
 
 public sealed partial class BotanySystem : EntitySystem
 {
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-    [Dependency] private readonly IRobustRandom _robustRandom = default!;
-    [Dependency] private readonly AppearanceSystem _appearance = default!;
-    [Dependency] private readonly PopupSystem _popupSystem = default!;
-    [Dependency] private readonly SharedHandsSystem _hands = default!;
-    [Dependency] private readonly SharedSolutionContainerSystem _solutionContainerSystem = default!;
-    [Dependency] private readonly MetaDataSystem _metaData = default!;
-    [Dependency] private readonly RandomHelperSystem _randomHelper = default!;
     [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
+    [Dependency] private readonly AppearanceSystem _appearance = default!;
     [Dependency] private readonly SharedEntityEffectSystem _effect = default!; // goob edit
+    [Dependency] private readonly SharedHandsSystem _hands = default!;
+    [Dependency] private readonly MetaDataSystem _metaData = default!;
+    [Dependency] private readonly PopupSystem _popupSystem = default!;
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    [Dependency] private readonly RandomHelperSystem _randomHelper = default!;
+    [Dependency] private readonly IRobustRandom _robustRandom = default!;
+    [Dependency] private readonly SharedSolutionContainerSystem _solutionContainerSystem = default!;
 
     public override void Initialize()
     {
@@ -116,9 +115,9 @@ public sealed partial class BotanySystem : EntitySystem
         using (args.PushGroup(nameof(SeedComponent), 1))
         {
             var name = Loc.GetString(seed.DisplayName);
-            args.PushMarkup(Loc.GetString($"seed-component-description", ("seedName", name)));
-            args.PushMarkup(Loc.GetString($"seed-component-plant-yield-text", ("seedYield", seed.Yield)));
-            args.PushMarkup(Loc.GetString($"seed-component-plant-potency-text", ("seedPotency", seed.Potency)));
+            args.PushMarkup(Loc.GetString("seed-component-description", ("seedName", name)));
+            args.PushMarkup(Loc.GetString("seed-component-plant-yield-text", ("seedYield", seed.Yield)));
+            args.PushMarkup(Loc.GetString("seed-component-plant-potency-text", ("seedPotency", seed.Potency)));
         }
     }
 
@@ -127,7 +126,10 @@ public sealed partial class BotanySystem : EntitySystem
     /// <summary>
     /// Spawns a new seed packet on the floor at a position, then tries to put it in the user's hands if possible.
     /// </summary>
-    public EntityUid SpawnSeedPacket(SeedData proto, EntityCoordinates coords, EntityUid user, float? healthOverride = null)
+    public EntityUid SpawnSeedPacket(SeedData proto,
+        EntityCoordinates coords,
+        EntityUid user,
+        float? healthOverride = null)
     {
         var seed = Spawn(proto.PacketPrototype, coords);
         var seedComp = EnsureComp<SeedComponent>(seed);
@@ -150,7 +152,9 @@ public sealed partial class BotanySystem : EntitySystem
             proto.ProductPrototypes.Count > 0)
         {
             if (proto.HarvestLogImpact != null)
-                _adminLogger.Add(LogType.Botany, proto.HarvestLogImpact.Value, $"Auto-harvested {Loc.GetString(proto.Name):seed} at Pos:{position}.");
+                _adminLogger.Add(LogType.Botany,
+                    proto.HarvestLogImpact.Value,
+                    $"Auto-harvested {Loc.GetString(proto.Name):seed} at Pos:{position}.");
 
             return GenerateProduct(proto, position, yieldMod);
         }
@@ -167,10 +171,14 @@ public sealed partial class BotanySystem : EntitySystem
         }
 
         var name = Loc.GetString(proto.DisplayName);
-        _popupSystem.PopupCursor(Loc.GetString("botany-harvest-success-message", ("name", name)), user, PopupType.Medium);
+        _popupSystem.PopupCursor(Loc.GetString("botany-harvest-success-message", ("name", name)),
+            user,
+            PopupType.Medium);
 
         if (proto.HarvestLogImpact != null)
-            _adminLogger.Add(LogType.Botany, proto.HarvestLogImpact.Value, $"{ToPrettyString(user):player} harvested {Loc.GetString(proto.Name):seed} at Pos:{Transform(user).Coordinates}.");
+            _adminLogger.Add(LogType.Botany,
+                proto.HarvestLogImpact.Value,
+                $"{ToPrettyString(user):player} harvested {Loc.GetString(proto.Name):seed} at Pos:{Transform(user).Coordinates}.");
 
         return GenerateProduct(proto, Transform(user).Coordinates, yieldMod);
     }
@@ -214,17 +222,16 @@ public sealed partial class BotanySystem : EntitySystem
                 var metaData = MetaData(entity);
                 _metaData.SetEntityName(entity, metaData.EntityName + "?", metaData);
                 _metaData.SetEntityDescription(entity,
-                    metaData.EntityDescription + " " + Loc.GetString("botany-mysterious-description-addon"), metaData);
+                    metaData.EntityDescription + " " + Loc.GetString("botany-mysterious-description-addon"),
+                    metaData);
             }
         }
 
         return products;
     }
 
-    public bool CanHarvest(SeedData proto, EntityUid? held = null)
-    {
-        return !proto.Ligneous || proto.Ligneous && held != null && HasComp<SharpComponent>(held);
-    }
+    public bool CanHarvest(SeedData proto, EntityUid? held = null) =>
+        !proto.Ligneous || proto.Ligneous && held != null && HasComp<SharpComponent>(held);
 
     #endregion
 }

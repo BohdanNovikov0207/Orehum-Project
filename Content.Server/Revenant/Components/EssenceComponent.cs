@@ -10,6 +10,13 @@ namespace Content.Server.Revenant.Components;
 public sealed partial class EssenceComponent : Component
 {
     /// <summary>
+    /// The total amount of Essence that the entity has.
+    /// Changes based on mob state.
+    /// </summary>
+    [ViewVariables(VVAccess.ReadWrite)]
+    public float EssenceAmount = 0f;
+
+    /// <summary>
     /// Whether or not the entity has been harvested yet.
     /// </summary>
     [ViewVariables(VVAccess.ReadWrite)]
@@ -21,11 +28,4 @@ public sealed partial class EssenceComponent : Component
     /// </summary>
     [ViewVariables(VVAccess.ReadWrite)]
     public bool SearchComplete = false;
-
-    /// <summary>
-    /// The total amount of Essence that the entity has.
-    /// Changes based on mob state.
-    /// </summary>
-    [ViewVariables(VVAccess.ReadWrite)]
-    public float EssenceAmount = 0f;
 }

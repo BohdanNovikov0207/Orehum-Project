@@ -42,6 +42,9 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Numerics;
+using Content.Goobstation.Maths.FixedPoint;
+using Content.Goobstation.Shared.OfficeChair;
 using Content.Server.Chemistry.Components;
 using Content.Server.Chemistry.EntitySystems;
 using Content.Server.Fluids.Components;
@@ -49,42 +52,48 @@ using Content.Server.Gravity;
 using Content.Server.Popups;
 using Content.Shared.CCVar;
 using Content.Shared.Chemistry.EntitySystems;
-using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Fluids;
+using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Interaction;
+using Content.Shared.Inventory;
 using Content.Shared.Timing;
 using Content.Shared.Vapor;
+using Content.Shared.Whitelist;
 using Robust.Server.GameObjects;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Configuration;
+using Robust.Shared.Map;
 using Robust.Shared.Physics.Components;
 using Robust.Shared.Prototypes;
-using System.Numerics;
-using Robust.Shared.Map;
-using Content.Shared.Inventory; // Assmos - Extinguisher Nozzle
-using Content.Shared.Whitelist; // Assmos - Extinguisher Nozzle
-using Content.Shared.Hands.EntitySystems; // Assmos - Extinguisher Nozzle
-using Content.Goobstation.Shared.OfficeChair; // Goobstation - Vehicle Spray Pushback (Office chairs)
+// Assmos - Extinguisher Nozzle
+// Assmos - Extinguisher Nozzle
+// Assmos - Extinguisher Nozzle
+
+// Goobstation - Vehicle Spray Pushback (Office chairs)
 
 namespace Content.Server.Fluids.EntitySystems;
 
 public sealed class SpraySystem : EntitySystem
 {
-    [Dependency] private readonly IPrototypeManager _proto = default!;
-    [Dependency] private readonly GravitySystem _gravity = default!;
-    [Dependency] private readonly PhysicsSystem _physics = default!;
-    [Dependency] private readonly UseDelaySystem _useDelay = default!;
-    [Dependency] private readonly PopupSystem _popupSystem = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedSolutionContainerSystem _solutionContainer = default!;
-    [Dependency] private readonly VaporSystem _vapor = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly IConfigurationManager _cfg = default!;
-    [Dependency] private readonly InventorySystem _inventory = default!; // Assmos - Extinguisher Nozzle
-    [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!; // Assmos - Extinguisher Nozzle
+    [Dependency] private readonly GravitySystem _gravity = default!;
     [Dependency] private readonly SharedHandsSystem _handsSystem = default!; // Assmos - Extinguisher Nozzle
-    [Dependency] private readonly SprayPushableVehicleSystem _sprayPushSys = default!; // Goobstation - Vehicle Spray Pushback (Office chairs)
+    [Dependency] private readonly InventorySystem _inventory = default!; // Assmos - Extinguisher Nozzle
+    [Dependency] private readonly PhysicsSystem _physics = default!;
+    [Dependency] private readonly PopupSystem _popupSystem = default!;
+    [Dependency] private readonly IPrototypeManager _proto = default!;
+    [Dependency] private readonly SharedSolutionContainerSystem _solutionContainer = default!;
+
+    [Dependency]
+    private readonly SprayPushableVehicleSystem
+        _sprayPushSys = default!; // Goobstation - Vehicle Spray Pushback (Office chairs)
+
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
+    [Dependency] private readonly UseDelaySystem _useDelay = default!;
+    [Dependency] private readonly VaporSystem _vapor = default!;
+    [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!; // Assmos - Extinguisher Nozzle
 
     private float _gridImpulseMultiplier;
 
@@ -109,10 +118,7 @@ public sealed class SpraySystem : EntitySystem
         Spray(entity, args.User, targetMapPos);
     }
 
-    private void UpdateGridMassMultiplier(float value)
-    {
-        _gridImpulseMultiplier = value;
-    }
+    private void UpdateGridMassMultiplier(float value) => _gridImpulseMultiplier = value;
 
     private void OnAfterInteract(Entity<SprayComponent> entity, ref AfterInteractEvent args)
     {
@@ -132,17 +138,15 @@ public sealed class SpraySystem : EntitySystem
         var sprayOwner = entity.Owner;
         var solutionName = SprayComponent.SolutionName;
 
-        if (entity.Comp.ExternalContainer == true)
+        if (entity.Comp.ExternalContainer)
         {
-            bool foundContainer = false;
+            var foundContainer = false;
 
             // Check held items (exclude nozzle)
             foreach (var item in _handsSystem.EnumerateHeld(user))
             {
                 if (item == entity.Owner)
-                {
                     continue;
-                }
 
                 if (!_whitelistSystem.IsWhitelistFailOrNull(entity.Comp.ProviderWhitelist, item) &&
                     _solutionContainer.TryGetSolution(item, SprayComponent.TankSolutionName, out _, out _))
@@ -155,7 +159,8 @@ public sealed class SpraySystem : EntitySystem
             }
 
             // Fall back to target slot
-            if (!foundContainer && _inventory.TryGetContainerSlotEnumerator(user, out var enumerator, entity.Comp.TargetSlot))
+            if (!foundContainer &&
+                _inventory.TryGetContainerSlotEnumerator(user, out var enumerator, entity.Comp.TargetSlot))
             {
                 while (enumerator.NextItem(out var item))
                 {
@@ -171,7 +176,8 @@ public sealed class SpraySystem : EntitySystem
             }
         }
 
-        if (!_solutionContainer.TryGetSolution(sprayOwner, solutionName, out var soln, out var solution)) return;
+        if (!_solutionContainer.TryGetSolution(sprayOwner, solutionName, out var soln, out var solution))
+            return;
         // End of assmos changes
         //if (!_solutionContainer.TryGetSolution(entity.Owner, SprayComponent.SolutionName, out var soln, out var solution)) return;
 
@@ -228,18 +234,23 @@ public sealed class SpraySystem : EntitySystem
                 // Create a slight movement effect
                 var rotation = Angle.FromDegrees(45);
                 var impulseDirection = -offset.Normalized();
-                var time = 0.5f;  // Shorter duration for self-spray
-                var target = userMapPos.Offset(impulseDirection * 0.5f);  // Small movement distance
+                var time = 0.5f; // Shorter duration for self-spray
+                var target = userMapPos.Offset(impulseDirection * 0.5f); // Small movement distance
 
                 _vapor.Start(ent, vaporXform, impulseDirection * 0.5f, entity.Comp.SprayVelocity, target, time, user);
 
                 if (TryComp<PhysicsComponent>(user, out var body))
                 {
                     if (_gravity.IsWeightless(user, body))
-                        _physics.ApplyLinearImpulse(user, -impulseDirection.Normalized() * entity.Comp.PushbackAmount, body: body);
+                        _physics.ApplyLinearImpulse(user,
+                            -impulseDirection.Normalized() * entity.Comp.PushbackAmount,
+                            body: body);
                 }
 
-                RaiseLocalEvent(user, new SprayUserImpulseEvent(-impulseDirection.Normalized() * entity.Comp.PushbackAmount)); // Goobstation - Vehicle Spray Pushback (Office chairs)
+                RaiseLocalEvent(user,
+                    new SprayUserImpulseEvent(-impulseDirection.Normalized() *
+                                              entity.Comp
+                                                  .PushbackAmount)); // Goobstation - Vehicle Spray Pushback (Office chairs)
 
                 _audio.PlayPvs(entity.Comp.SpraySound, entity, entity.Comp.SpraySound.Params.WithVariation(0.125f));
 
@@ -249,14 +260,13 @@ public sealed class SpraySystem : EntitySystem
                 return;
             }
         }
+
         // Lavaland Shitcode End
         var diffNorm = diffPos.Normalized();
         var diffLength = diffPos.Length();
 
         if (diffLength > entity.Comp.SprayDistance)
-        {
             diffLength = entity.Comp.SprayDistance;
-        }
 
         var diffAngle = diffNorm.ToAngle();
 
@@ -264,7 +274,8 @@ public sealed class SpraySystem : EntitySystem
         var threeQuarters = diffNorm * 0.75f;
         var quarter = diffNorm * 0.25f;
 
-        var amount = Math.Max(Math.Min((solution.Volume / entity.Comp.TransferAmount).Int(), entity.Comp.VaporAmount), 1);
+        var amount = Math.Max(Math.Min((solution.Volume / entity.Comp.TransferAmount).Int(), entity.Comp.VaporAmount),
+            1);
         var spread = entity.Comp.VaporSpread / amount;
 
         var accumulatedVehiclePush = Vector2.Zero; // Goobstation - Vehicle Spray Pushback (Office chairs)
@@ -327,15 +338,19 @@ public sealed class SpraySystem : EntitySystem
                     {
                         // apply both linear and angular momentum depending on the player position
                         // multiply by a cvar because grid mass is currently extremely small compared to all other masses
-                        _physics.ApplyLinearImpulse(userTransform.GridUid.Value, -impulseDirection * _gridImpulseMultiplier * entity.Comp.PushbackAmount, userTransform.LocalPosition);
+                        _physics.ApplyLinearImpulse(userTransform.GridUid.Value,
+                            -impulseDirection * _gridImpulseMultiplier * entity.Comp.PushbackAmount,
+                            userTransform.LocalPosition);
                     }
                 }
             }
 
-            accumulatedVehiclePush += -impulseDirection * entity.Comp.PushbackAmount; // Goobstation - Vehicle Spray Pushback (Office chairs)
+            accumulatedVehiclePush +=
+                -impulseDirection * entity.Comp.PushbackAmount; // Goobstation - Vehicle Spray Pushback (Office chairs)
         }
 
-        RaiseLocalEvent(user, new SprayUserImpulseEvent(accumulatedVehiclePush));  // Goobstation - Vehicle Spray Pushback (Office chairs)
+        RaiseLocalEvent(user,
+            new SprayUserImpulseEvent(accumulatedVehiclePush)); // Goobstation - Vehicle Spray Pushback (Office chairs)
 
         _audio.PlayPvs(entity.Comp.SpraySound, entity, entity.Comp.SpraySound.Params.WithVariation(0.125f));
 

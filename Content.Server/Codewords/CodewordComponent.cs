@@ -3,7 +3,7 @@
 /// <summary>
 /// Container for generated codewords.
 /// </summary>
-[RegisterComponent, Access(typeof(CodewordSystem))]
+[RegisterComponent] [Access(typeof(CodewordSystem))]
 public sealed partial class CodewordComponent : Component
 {
     /// <summary>

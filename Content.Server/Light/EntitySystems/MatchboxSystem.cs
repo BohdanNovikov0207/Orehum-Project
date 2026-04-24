@@ -19,29 +19,30 @@ using Content.Server.Light.Components;
 using Content.Server.Storage.EntitySystems;
 using Content.Shared.Interaction;
 using Content.Shared.Smoking;
-using Content.Shared.Smoking.Components; // Shitmed Change
+using Content.Shared.Smoking.Components;
 
-namespace Content.Server.Light.EntitySystems
+// Shitmed Change
+
+namespace Content.Server.Light.EntitySystems;
+
+public sealed class MatchboxSystem : EntitySystem
 {
-    public sealed class MatchboxSystem : EntitySystem
+    [Dependency] private readonly MatchstickSystem _stickSystem = default!;
+
+    public override void Initialize()
     {
-        [Dependency] private readonly MatchstickSystem _stickSystem = default!;
+        base.Initialize();
+        SubscribeLocalEvent<MatchboxComponent, InteractUsingEvent>(OnInteractUsing, new[] { typeof(StorageSystem) });
+    }
 
-        public override void Initialize()
+    private void OnInteractUsing(EntityUid uid, MatchboxComponent component, InteractUsingEvent args)
+    {
+        if (!args.Handled
+            && EntityManager.TryGetComponent(args.Used, out MatchstickComponent? matchstick)
+            && matchstick.CurrentState == SmokableState.Unlit)
         {
-            base.Initialize();
-            SubscribeLocalEvent<MatchboxComponent, InteractUsingEvent>(OnInteractUsing, before: new[] { typeof(StorageSystem) });
-        }
-
-        private void OnInteractUsing(EntityUid uid, MatchboxComponent component, InteractUsingEvent args)
-        {
-            if (!args.Handled
-                && EntityManager.TryGetComponent(args.Used, out MatchstickComponent? matchstick)
-                && matchstick.CurrentState == SmokableState.Unlit)
-            {
-                _stickSystem.Ignite((args.Used, matchstick), args.User);
-                args.Handled = true;
-            }
+            _stickSystem.Ignite((args.Used, matchstick), args.User);
+            args.Handled = true;
         }
     }
 }

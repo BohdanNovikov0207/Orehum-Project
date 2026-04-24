@@ -21,14 +21,14 @@ public sealed partial class CutWireVariationPassComponent : Component
     public EntityWhitelist Blacklist = new();
 
     /// <summary>
-    /// Chance for an individual wire to be cut.
-    /// </summary>
-    [DataField]
-    public float WireCutChance = 0.05f;
-
-    /// <summary>
     /// Maximum number of wires that can be cut stationwide.
     /// </summary>
     [DataField]
     public int MaxWiresCut = 10;
+
+    /// <summary>
+    /// Chance for an individual wire to be cut.
+    /// </summary>
+    [DataField]
+    public float WireCutChance = 0.05f;
 }

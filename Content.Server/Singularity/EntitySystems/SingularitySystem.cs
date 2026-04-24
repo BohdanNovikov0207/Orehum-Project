@@ -47,19 +47,14 @@ using Robust.Shared.Timing;
 namespace Content.Server.Singularity.EntitySystems;
 
 /// <summary>
-/// The server-side version of <see cref="SharedSingularitySystem"/>.
-/// Primarily responsible for managing <see cref="SingularityComponent"/>s.
-/// Handles their accumulation of energy upon consuming entities (see <see cref="EventHorizonComponent"/>) and gradual dissipation.
+/// The server-side version of <see cref="SharedSingularitySystem" />.
+/// Primarily responsible for managing <see cref="SingularityComponent" />s.
+/// Handles their accumulation of energy upon consuming entities (see <see cref="EventHorizonComponent" />) and gradual
+/// dissipation.
 /// Also handles synchronizing server-side components with the singuarities level.
 /// </summary>
 public sealed class SingularitySystem : SharedSingularitySystem
 {
-#region Dependencies
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly PvsOverrideSystem _pvs = default!;
-#endregion Dependencies
-
     /// <summary>
     /// The amount of energy singulos accumulate when they eat a tile.
     /// </summary>
@@ -103,7 +98,7 @@ public sealed class SingularitySystem : SharedSingularitySystem
     /// <param name="frameTime">The amount of time since the last set of updates.</param>
     public override void Update(float frameTime)
     {
-        if(!_timing.IsFirstTimePredicted)
+        if (!_timing.IsFirstTimePredicted)
             return;
 
         var query = EntityQueryEnumerator<SingularityComponent>();
@@ -113,10 +108,18 @@ public sealed class SingularitySystem : SharedSingularitySystem
         }
     }
 
-#region Getters/Setters
+    #region Dependencies
+
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly PvsOverrideSystem _pvs = default!;
+
+    #endregion Dependencies
+
+    #region Getters/Setters
 
     /// <summary>
-    /// Setter for <see cref="SingularityComponent.Energy"/>.
+    /// Setter for <see cref="SingularityComponent.Energy" />.
     /// Also updates the level of the singularity accordingly.
     /// </summary>
     /// <param name="uid">The uid of the singularity to set the energy of.</param>
@@ -124,7 +127,7 @@ public sealed class SingularitySystem : SharedSingularitySystem
     /// <param name="singularity">The state of the singularity to set the energy of.</param>
     public void SetEnergy(EntityUid uid, float value, SingularityComponent? singularity = null)
     {
-        if(!Resolve(uid, ref singularity))
+        if (!Resolve(uid, ref singularity))
             return;
 
         var oldValue = singularity.Energy;
@@ -132,18 +135,20 @@ public sealed class SingularitySystem : SharedSingularitySystem
             return;
 
         singularity.Energy = value;
-        SetLevel(uid, value switch
-        {
-			// Normally, a level 6 singularity requires the supermatter + 3000 energy.
-			// The required amount of energy has been bumped up to compensate for the lack of the supermatter.
-            >= 5000 => 6,
-            >= 2000 => 5,
-            >= 1000 => 4,
-            >= 500 => 3,
-            >= 200 => 2,
-            > 0 => 1,
-            _ => 0
-        }, singularity);
+        SetLevel(uid,
+            value switch
+            {
+                // Normally, a level 6 singularity requires the supermatter + 3000 energy.
+                // The required amount of energy has been bumped up to compensate for the lack of the supermatter.
+                >= 5000 => 6,
+                >= 2000 => 5,
+                >= 1000 => 4,
+                >= 500 => 3,
+                >= 200 => 2,
+                > 0 => 1,
+                _ => 0,
+            },
+            singularity);
     }
 
     /// <summary>
@@ -153,25 +158,36 @@ public sealed class SingularitySystem : SharedSingularitySystem
     /// <param name="delta">The amount to adjust the energy of the singuarity.</param>
     /// <param name="min">The minimum amount of energy for the singularity to be adjusted to.</param>
     /// <param name="max">The maximum amount of energy for the singularity to be adjusted to.</param>
-    /// <param name="snapMin">Whether the amount of energy in the singularity should be forced to within the specified range if it already is below it.</param>
-    /// <param name="snapMax">Whether the amount of energy in the singularity should be forced to within the specified range if it already is above it.</param>
+    /// <param name="snapMin">
+    /// Whether the amount of energy in the singularity should be forced to within the specified range if
+    /// it already is below it.
+    /// </param>
+    /// <param name="snapMax">
+    /// Whether the amount of energy in the singularity should be forced to within the specified range if
+    /// it already is above it.
+    /// </param>
     /// <param name="singularity">The state of the singularity to adjust the energy of.</param>
-    public void AdjustEnergy(EntityUid uid, float delta, float min = float.MinValue, float max = float.MaxValue, bool snapMin = true, bool snapMax = true, SingularityComponent? singularity = null)
+    public void AdjustEnergy(EntityUid uid,
+        float delta,
+        float min = float.MinValue,
+        float max = float.MaxValue,
+        bool snapMin = true,
+        bool snapMax = true,
+        SingularityComponent? singularity = null)
     {
-        if(!Resolve(uid, ref singularity))
+        if (!Resolve(uid, ref singularity))
             return;
 
         var newValue = singularity.Energy + delta;
-        if((!snapMin && newValue < min)
-        || (!snapMax && newValue > max))
+        if (!snapMin && newValue < min
+            || !snapMax && newValue > max)
             return;
         SetEnergy(uid, MathHelper.Clamp(newValue, min, max), singularity);
     }
 
+    #endregion Getters/Setters
 
-#endregion Getters/Setters
-
-#region Event Handlers
+    #region Event Handlers
 
     /// <summary>
     /// Handles playing the startup sounds when a singulo forms.
@@ -198,10 +214,8 @@ public sealed class SingularitySystem : SharedSingularitySystem
     /// <param name="uid">The entity UID of the entity that is gaining the shader.</param>
     /// <param name="comp">The component of the shader that the entity is gaining.</param>
     /// <param name="args">The event arguments.</param>
-    public void OnDistortionStartup(EntityUid uid, SingularityDistortionComponent comp, ComponentStartup args)
-    {
+    public void OnDistortionStartup(EntityUid uid, SingularityDistortionComponent comp, ComponentStartup args) =>
         _pvs.AddGlobalOverride(uid);
-    }
 
     /// <summary>
     /// Handles playing the shutdown sounds when a singulo dissipates.
@@ -233,10 +247,8 @@ public sealed class SingularitySystem : SharedSingularitySystem
     /// <param name="uid">The uid of the singularity that is being synced.</param>
     /// <param name="comp">The state of the singularity that is being synced.</param>
     /// <param name="args">The event arguments.</param>
-    private void HandleSingularityState(EntityUid uid, SingularityComponent comp, ref ComponentGetState args)
-    {
+    private void HandleSingularityState(EntityUid uid, SingularityComponent comp, ref ComponentGetState args) =>
         args.State = new SingularityComponentState(comp);
-    }
 
     /// <summary>
     /// Adds the energy of any entities that are consumed to the singularity that consumed them.
@@ -259,10 +271,8 @@ public sealed class SingularitySystem : SharedSingularitySystem
     /// <param name="uid">The entity UID of the singularity that is consuming the tiles.</param>
     /// <param name="comp">The component of the singularity that is consuming the tiles.</param>
     /// <param name="args">The event arguments.</param>
-    public void OnConsumedTiles(EntityUid uid, SingularityComponent comp, ref TilesConsumedByEventHorizonEvent args)
-    {
+    public void OnConsumedTiles(EntityUid uid, SingularityComponent comp, ref TilesConsumedByEventHorizonEvent args) =>
         AdjustEnergy(uid, args.Tiles.Count * BaseTileEnergy, singularity: comp);
-    }
 
     /// <summary>
     /// Adds the energy of this singularity to singularities that consume it.
@@ -303,8 +313,7 @@ public sealed class SingularitySystem : SharedSingularitySystem
     /// <param name="uid">The entity UID of the singularity that changed in level.</param>
     /// <param name="comp">The component of the singularity that changed in level.</param>
     /// <param name="args">The event arguments.</param>
-    public void UpdateEnergyDrain(EntityUid uid, SingularityComponent comp, SingularityLevelChangedEvent args)
-    {
+    public void UpdateEnergyDrain(EntityUid uid, SingularityComponent comp, SingularityLevelChangedEvent args) =>
         comp.EnergyDrain = args.NewValue switch
         {
             6 => 0,
@@ -313,9 +322,8 @@ public sealed class SingularitySystem : SharedSingularitySystem
             3 => 10,
             2 => 5,
             1 => 1,
-            _ => 0
+            _ => 0,
         };
-    }
 
     /// <summary>
     /// Updates the possible speeds of the singulos random walk when the singularities level changes.
@@ -343,5 +351,5 @@ public sealed class SingularitySystem : SharedSingularitySystem
         (comp.BaseRadialAcceleration, comp.BaseTangentialAcceleration) = GravPulseAcceleration(singulos);
     }
 
-#endregion Event Handlers
+    #endregion Event Handlers
 }

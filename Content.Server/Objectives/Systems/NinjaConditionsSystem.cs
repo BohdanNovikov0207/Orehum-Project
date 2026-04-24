@@ -14,8 +14,8 @@
 
 using Content.Server.Objectives.Components;
 using Content.Server.Roles;
-using Content.Shared.Objectives.Components;
 using Content.Shared.Ninja.Components;
+using Content.Shared.Objectives.Components;
 using Content.Shared.Roles;
 using Content.Shared.Warps;
 using Robust.Shared.Random;
@@ -24,7 +24,7 @@ namespace Content.Server.Objectives.Systems;
 
 /// <summary>
 /// Handles the objective conditions that hard depend on ninja.
-/// Survive is handled by <see cref="SurviveConditionSystem"/> since it works without being a ninja.
+/// Survive is handled by <see cref="SurviveConditionSystem" /> since it works without being a ninja.
 /// </summary>
 public sealed class NinjaConditionsSystem : EntitySystem
 {
@@ -45,10 +45,9 @@ public sealed class NinjaConditionsSystem : EntitySystem
 
     // doorjack
 
-    private void OnDoorjackGetProgress(EntityUid uid, DoorjackConditionComponent comp, ref ObjectiveGetProgressEvent args)
-    {
-        args.Progress = DoorjackProgress(comp, _number.GetTarget(uid));
-    }
+    private void OnDoorjackGetProgress(EntityUid uid,
+        DoorjackConditionComponent comp,
+        ref ObjectiveGetProgressEvent args) => args.Progress = DoorjackProgress(comp, _number.GetTarget(uid));
 
     private float DoorjackProgress(DoorjackConditionComponent comp, int target)
     {
@@ -60,7 +59,9 @@ public sealed class NinjaConditionsSystem : EntitySystem
     }
 
     // spider charge
-    private void OnSpiderChargeRequirementCheck(EntityUid uid, SpiderChargeConditionComponent comp, ref RequirementCheckEvent args)
+    private void OnSpiderChargeRequirementCheck(EntityUid uid,
+        SpiderChargeConditionComponent comp,
+        ref RequirementCheckEvent args)
     {
         if (args.Cancelled || !_roles.MindHasRole<NinjaRoleComponent>(args.MindId))
             return;
@@ -71,9 +72,7 @@ public sealed class NinjaConditionsSystem : EntitySystem
         while (query.MoveNext(out var warpUid, out _, out var warp))
         {
             if (warp.Location != null)
-            {
                 warps.Add(warpUid);
-            }
         }
 
         if (warps.Count <= 0)
@@ -81,10 +80,13 @@ public sealed class NinjaConditionsSystem : EntitySystem
             args.Cancelled = true;
             return;
         }
+
         comp.Target = _random.Pick(warps);
     }
 
-    private void OnSpiderChargeAfterAssign(EntityUid uid, SpiderChargeConditionComponent comp, ref ObjectiveAfterAssignEvent args)
+    private void OnSpiderChargeAfterAssign(EntityUid uid,
+        SpiderChargeConditionComponent comp,
+        ref ObjectiveAfterAssignEvent args)
     {
         string title;
         if (comp.Target == null || !TryComp<WarpPointComponent>(comp.Target, out var warp) || warp.Location == null)
@@ -93,18 +95,16 @@ public sealed class NinjaConditionsSystem : EntitySystem
             title = Loc.GetString("objective-condition-spider-charge-title-no-target");
         }
         else
-        {
             title = Loc.GetString("objective-condition-spider-charge-title", ("location", warp.Location));
-        }
+
         _metaData.SetEntityName(uid, title, args.Meta);
     }
 
     // steal research
 
-    private void OnStealResearchGetProgress(EntityUid uid, StealResearchConditionComponent comp, ref ObjectiveGetProgressEvent args)
-    {
-        args.Progress = StealResearchProgress(comp, _number.GetTarget(uid));
-    }
+    private void OnStealResearchGetProgress(EntityUid uid,
+        StealResearchConditionComponent comp,
+        ref ObjectiveGetProgressEvent args) => args.Progress = StealResearchProgress(comp, _number.GetTarget(uid));
 
     private float StealResearchProgress(StealResearchConditionComponent comp, int target)
     {

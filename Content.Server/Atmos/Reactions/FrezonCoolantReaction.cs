@@ -15,12 +15,15 @@ using JetBrains.Annotations;
 namespace Content.Server.Atmos.Reactions;
 
 /// <summary>
-///     Takes in nitrogen and frezon and cools down the surrounding area.
+/// Takes in nitrogen and frezon and cools down the surrounding area.
 /// </summary>
 [UsedImplicitly]
 public sealed partial class FrezonCoolantReaction : IGasReactionEffect
 {
-    public ReactionResult React(GasMixture mixture, IGasMixtureHolder? holder, AtmosphereSystem atmosphereSystem, float heatScale)
+    public ReactionResult React(GasMixture mixture,
+        IGasMixtureHolder? holder,
+        AtmosphereSystem atmosphereSystem,
+        float heatScale)
     {
         var oldHeatCapacity = atmosphereSystem.GetHeatCapacity(mixture, true);
         var temperature = mixture.Temperature;

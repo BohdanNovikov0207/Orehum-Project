@@ -80,16 +80,16 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Numerics;
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Chemistry.Reaction;
 using Content.Shared.Chemistry.Reagent;
-using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Maps;
 using Content.Shared.Whitelist;
 using Robust.Shared.Map;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype;
-using System.Numerics;
 
 namespace Content.Server.Chemistry.TileReactions;
 
@@ -99,23 +99,23 @@ public sealed partial class CreateEntityTileReaction : ITileReaction
     [DataField(required: true, customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
     public string Entity = default!;
 
-    [DataField]
-    public FixedPoint2 Usage = FixedPoint2.New(1);
-
     /// <summary>
-    ///     How many of the whitelisted entity can fit on one tile?
+    /// How many of the whitelisted entity can fit on one tile?
     /// </summary>
     [DataField]
     public int MaxOnTile = 1;
 
+    [DataField]
+    public float RandomOffsetMax = 0.0f;
+
+    [DataField]
+    public FixedPoint2 Usage = FixedPoint2.New(1);
+
     /// <summary>
-    ///     The whitelist to use when determining what counts as "max entities on a tile".0
+    /// The whitelist to use when determining what counts as "max entities on a tile".0
     /// </summary>
     [DataField("maxOnTileWhitelist")]
     public EntityWhitelist? Whitelist;
-
-    [DataField]
-    public float RandomOffsetMax = 0.0f;
 
     public FixedPoint2 TileReact(TileRef tile,
         ReagentPrototype reagent,
@@ -130,8 +130,8 @@ public sealed partial class CreateEntityTileReaction : ITileReaction
         {
             var lookup = entityManager.System<EntityLookupSystem>();
 
-            int acc = 0;
-            foreach (var ent in lookup.GetEntitiesInTile(tile, LookupFlags.Static))
+            var acc = 0;
+            foreach (var ent in lookup.GetEntitiesInTile(tile))
             {
                 var whitelistSystem = entityManager.System<EntityWhitelistSystem>();
                 if (whitelistSystem.IsWhitelistPass(Whitelist, ent))

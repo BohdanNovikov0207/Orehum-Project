@@ -9,7 +9,7 @@ using JetBrains.Annotations;
 
 namespace Content.Server.NPC.Queries.Considerations;
 
-[ImplicitDataDefinitionForInheritors, MeansImplicitUse]
+[ImplicitDataDefinitionForInheritors] [MeansImplicitUse]
 public abstract partial class UtilityConsideration
 {
     [DataField("curve", required: true)]

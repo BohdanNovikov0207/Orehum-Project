@@ -22,25 +22,17 @@ public sealed partial class BoltWireAction : ComponentWireAction<DefusableCompon
     public override string Name { get; set; } = "wire-name-bomb-bolt";
     public override bool LightRequiresPower { get; set; } = false;
 
-    public override StatusLightState? GetLightState(Wire wire, DefusableComponent comp)
-    {
-        return comp.Bolted ? StatusLightState.On : StatusLightState.Off;
-    }
-
     public override object StatusKey { get; } = DefusableWireStatus.BoltIndicator;
 
-    public override bool Cut(EntityUid user, Wire wire, DefusableComponent comp)
-    {
-        return EntityManager.System<DefusableSystem>().BoltWireCut(user, wire, comp);
-    }
+    public override StatusLightState? GetLightState(Wire wire, DefusableComponent comp) =>
+        comp.Bolted ? StatusLightState.On : StatusLightState.Off;
 
-    public override bool Mend(EntityUid user, Wire wire, DefusableComponent comp)
-    {
-        return EntityManager.System<DefusableSystem>().BoltWireMend(user, wire, comp);
-    }
+    public override bool Cut(EntityUid user, Wire wire, DefusableComponent comp) =>
+        EntityManager.System<DefusableSystem>().BoltWireCut(user, wire, comp);
 
-    public override void Pulse(EntityUid user, Wire wire, DefusableComponent comp)
-    {
+    public override bool Mend(EntityUid user, Wire wire, DefusableComponent comp) =>
+        EntityManager.System<DefusableSystem>().BoltWireMend(user, wire, comp);
+
+    public override void Pulse(EntityUid user, Wire wire, DefusableComponent comp) =>
         EntityManager.System<DefusableSystem>().BoltWirePulse(user, wire, comp);
-    }
 }

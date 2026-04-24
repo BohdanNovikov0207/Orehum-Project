@@ -17,7 +17,7 @@ namespace Content.Server.Procedural.DungeonJob;
 public sealed partial class DungeonJob
 {
     /// <summary>
-    /// <see cref="OreDunGen"/>
+    ///     <see cref="OreDunGen" />
     /// </summary>
     private async Task PostGen(
         OreDunGen gen,
@@ -131,13 +131,12 @@ public sealed partial class DungeonJob
 
                         if (replaceEntities.TryGetValue(node, out var existingEnt))
                         {
-                            var existingProto = _entManager.GetComponent<MetaDataComponent>(existingEnt).EntityPrototype;
+                            var existingProto = _entManager.GetComponent<MetaDataComponent>(existingEnt)
+                                .EntityPrototype;
                             _entManager.DeleteEntity(existingEnt);
 
                             if (existingProto != null && remapping.TryGetValue(existingProto.ID, out var remapped))
-                            {
                                 prototype = remapped;
-                            }
                         }
 
                         // Tile valid salad so add it.
@@ -148,9 +147,7 @@ public sealed partial class DungeonJob
                 }
 
                 if (groupSize > 0)
-                {
                     _sawmill.Warning($"Found remaining group size for ore veins of {gen.Replacement ?? "null"}!");
-                }
             }
         }
     }

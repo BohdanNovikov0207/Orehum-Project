@@ -43,19 +43,19 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.UserInterface;
 using Content.Server.Advertise.EntitySystems;
 using Content.Shared.Advertise.Components;
 using Content.Shared.Arcade;
 using Content.Shared.Power;
+using Content.Shared.UserInterface;
 using Robust.Server.GameObjects;
 
 namespace Content.Server.Arcade.BlockGame;
 
 public sealed class BlockGameArcadeSystem : EntitySystem
 {
-    [Dependency] private readonly UserInterfaceSystem _uiSystem = default!;
     [Dependency] private readonly SpeakOnUIClosedSystem _speakOnUIClosed = default!;
+    [Dependency] private readonly UserInterfaceSystem _uiSystem = default!;
 
     public override void Initialize()
     {
@@ -65,17 +65,18 @@ public sealed class BlockGameArcadeSystem : EntitySystem
         SubscribeLocalEvent<BlockGameArcadeComponent, AfterActivatableUIOpenEvent>(OnAfterUIOpen);
         SubscribeLocalEvent<BlockGameArcadeComponent, PowerChangedEvent>(OnBlockPowerChanged);
 
-        Subs.BuiEvents<BlockGameArcadeComponent>(BlockGameUiKey.Key, subs =>
-        {
-            subs.Event<BoundUIClosedEvent>(OnAfterUiClose);
-            subs.Event<BlockGameMessages.BlockGamePlayerActionMessage>(OnPlayerAction);
-        });
+        Subs.BuiEvents<BlockGameArcadeComponent>(BlockGameUiKey.Key,
+            subs =>
+            {
+                subs.Event<BoundUIClosedEvent>(OnAfterUiClose);
+                subs.Event<BlockGameMessages.BlockGamePlayerActionMessage>(OnPlayerAction);
+            });
     }
 
     public override void Update(float frameTime)
     {
         var query = EntityQueryEnumerator<BlockGameArcadeComponent>();
-        while (query.MoveNext(out var _, out var blockGame))
+        while (query.MoveNext(out _, out var blockGame))
         {
             blockGame.Game?.GameTick(frameTime);
         }
@@ -86,13 +87,14 @@ public sealed class BlockGameArcadeSystem : EntitySystem
         if (!Resolve(uid, ref blockGame))
             return;
 
-        _uiSystem.ServerSendUiMessage(uid, BlockGameUiKey.Key, new BlockGameMessages.BlockGameUserStatusMessage(blockGame.Player == actor), actor);
+        _uiSystem.ServerSendUiMessage(uid,
+            BlockGameUiKey.Key,
+            new BlockGameMessages.BlockGameUserStatusMessage(blockGame.Player == actor),
+            actor);
     }
 
-    private void OnComponentInit(EntityUid uid, BlockGameArcadeComponent component, ComponentInit args)
-    {
-        component.Game = new(uid);
-    }
+    private void OnComponentInit(EntityUid uid, BlockGameArcadeComponent component, ComponentInit args) =>
+        component.Game = new BlockGame(uid);
 
     private void OnAfterUIOpen(EntityUid uid, BlockGameArcadeComponent component, AfterActivatableUIOpenEvent args)
     {
@@ -110,7 +112,7 @@ public sealed class BlockGameArcadeSystem : EntitySystem
         if (component.Player != args.Actor)
         {
             component.Spectators.Remove(args.Actor);
-            UpdatePlayerStatus(uid, args.Actor, blockGame: component);
+            UpdatePlayerStatus(uid, args.Actor, component);
             return;
         }
 
@@ -119,10 +121,10 @@ public sealed class BlockGameArcadeSystem : EntitySystem
         {
             component.Player = component.Spectators[0];
             component.Spectators.Remove(component.Player.Value);
-            UpdatePlayerStatus(uid, component.Player.Value, blockGame: component);
+            UpdatePlayerStatus(uid, component.Player.Value, component);
         }
 
-        UpdatePlayerStatus(uid, temp.Value, blockGame: component);
+        UpdatePlayerStatus(uid, temp.Value, component);
     }
 
     private void OnBlockPowerChanged(EntityUid uid, BlockGameArcadeComponent component, ref PowerChangedEvent args)
@@ -135,7 +137,9 @@ public sealed class BlockGameArcadeSystem : EntitySystem
         component.Spectators.Clear();
     }
 
-    private void OnPlayerAction(EntityUid uid, BlockGameArcadeComponent component, BlockGameMessages.BlockGamePlayerActionMessage msg)
+    private void OnPlayerAction(EntityUid uid,
+        BlockGameArcadeComponent component,
+        BlockGameMessages.BlockGamePlayerActionMessage msg)
     {
         if (component.Game == null)
             return;
@@ -146,8 +150,8 @@ public sealed class BlockGameArcadeSystem : EntitySystem
 
         if (msg.PlayerAction == BlockGamePlayerAction.NewGame)
         {
-            if (component.Game.Started == true)
-                component.Game = new(uid);
+            if (component.Game.Started)
+                component.Game = new BlockGame(uid);
             component.Game.StartGame();
             return;
         }

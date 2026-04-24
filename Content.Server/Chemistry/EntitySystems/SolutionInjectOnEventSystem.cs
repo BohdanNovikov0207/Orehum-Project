@@ -12,13 +12,12 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Armor; // Goobstation - Armor resisting syringe gun
-using Content.Server.Body.Components;
 using Content.Server.Body.Systems;
 using Content.Server.Chemistry.Components;
-using Content.Shared.Chemistry.Components; // GoobStation
-using Content.Shared.Chemistry.EntitySystems;
+using Content.Shared.Armor;
 using Content.Shared.Body.Components;
+using Content.Shared.Chemistry.Components;
+using Content.Shared.Chemistry.EntitySystems;
 using Content.Shared.Chemistry.Events;
 using Content.Shared.Inventory;
 using Content.Shared.Popups;
@@ -26,18 +25,23 @@ using Content.Shared.Projectiles;
 using Content.Shared.Tag;
 using Content.Shared.Throwing;
 using Content.Shared.Weapons.Melee.Events;
-using Robust.Shared.Collections;
 using Robust.Shared.Prototypes;
-using Robust.Shared.Timing; // Goob
+using Robust.Shared.Timing;
+// Goobstation - Armor resisting syringe gun
+// GoobStation
+
+// Goob
 
 namespace Content.Server.Chemistry.EntitySystems;
 
 /// <summary>
-/// System for handling the different inheritors of <see cref="BaseSolutionInjectOnEventComponent"/>.
+/// System for handling the different inheritors of <see cref="BaseSolutionInjectOnEventComponent" />.
 /// Subscribes to relevent events and performs solution injections when they are raised.
 /// </summary>
 public sealed class SolutionInjectOnCollideSystem : EntitySystem
 {
+    private static readonly ProtoId<TagPrototype> SyringeArmorTag = "SyringeArmor"; // Goobstation
+    private static readonly ProtoId<TagPrototype> HardsuitTag = "Hardsuit";
     [Dependency] private readonly BloodstreamSystem _bloodstream = default!;
     [Dependency] private readonly InventorySystem _inventory = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
@@ -45,9 +49,6 @@ public sealed class SolutionInjectOnCollideSystem : EntitySystem
     [Dependency] private readonly TagSystem _tag = default!;
 
     [Dependency] private readonly IGameTiming _timing = default!; // Goobstation
-
-    private static readonly ProtoId<TagPrototype> SyringeArmorTag = "SyringeArmor"; // Goobstation
-    private static readonly ProtoId<TagPrototype> HardsuitTag = "Hardsuit";
 
     public override void Initialize()
     {
@@ -64,15 +65,12 @@ public sealed class SolutionInjectOnCollideSystem : EntitySystem
         SubscribeLocalEvent<SolutionInjectWhileEmbeddedComponent, ProjectileEmbedEvent>(OnOverTimeEmbed);
     }
 
-    private void HandleProjectileHit(Entity<SolutionInjectOnProjectileHitComponent> entity, ref ProjectileHitEvent args)
-    {
+    private void
+        HandleProjectileHit(Entity<SolutionInjectOnProjectileHitComponent> entity, ref ProjectileHitEvent args) =>
         DoInjection((entity.Owner, entity.Comp), args.Target, args.Shooter);
-    }
 
-    private void HandleEmbed(Entity<SolutionInjectOnEmbedComponent> entity, ref EmbedEvent args)
-    {
+    private void HandleEmbed(Entity<SolutionInjectOnEmbedComponent> entity, ref EmbedEvent args) =>
         DoInjection((entity.Owner, entity.Comp), args.Embedded, args.Shooter);
-    }
 
     private void HandleMeleeHit(Entity<MeleeChemicalInjectorComponent> entity, ref MeleeHitEvent args)
     {
@@ -88,15 +86,12 @@ public sealed class SolutionInjectOnCollideSystem : EntitySystem
         }
     }
 
-    private void OnInjectOverTime(Entity<SolutionInjectWhileEmbeddedComponent> entity, ref InjectOverTimeEvent args)
-    {
+    private void OnInjectOverTime(Entity<SolutionInjectWhileEmbeddedComponent> entity, ref InjectOverTimeEvent args) =>
         DoInjection((entity.Owner, entity.Comp), args.EmbeddedIntoUid);
-    }
 
-    private void DoInjection(Entity<BaseSolutionInjectOnEventComponent> injectorEntity, EntityUid target, EntityUid? source = null)
-    {
-        TryInjectTargets(injectorEntity, [target], source);
-    }
+    private void DoInjection(Entity<BaseSolutionInjectOnEventComponent> injectorEntity,
+        EntityUid target,
+        EntityUid? source = null) => TryInjectTargets(injectorEntity, [target], source);
 
     private void ResetState(BaseSolutionInjectOnEventComponent comp) // Goobstation
     {
@@ -105,18 +100,19 @@ public sealed class SolutionInjectOnCollideSystem : EntitySystem
     }
 
     private void OnEmbedLand(Entity<SolutionInjectOnEmbedComponent> entity, ref LandEvent args) // Goobstation
-    {
-        ResetState(entity.Comp);
-    }
+        =>
+            ResetState(entity.Comp);
 
-    private void OnWhileEmbeddedLand(Entity<SolutionInjectWhileEmbeddedComponent> entity, ref LandEvent args) // Goobstation
+    private void
+        OnWhileEmbeddedLand(Entity<SolutionInjectWhileEmbeddedComponent> entity, ref LandEvent args) // Goobstation
     {
         entity.Comp.UpdateInterval *= entity.Comp.SpeedMultiplier;
         entity.Comp.EmbedTime = TimeSpan.Zero;
         ResetState(entity.Comp);
     }
 
-    private void OnOverTimeAttempt(Entity<SolutionInjectWhileEmbeddedComponent> ent, ref InjectOverTimeAttemptEvent args) // Goobstation
+    private void OnOverTimeAttempt(Entity<SolutionInjectWhileEmbeddedComponent> ent,
+        ref InjectOverTimeAttemptEvent args) // Goobstation
     {
         if (ent.Comp.PierceArmor)
             return;
@@ -139,9 +135,7 @@ public sealed class SolutionInjectOnCollideSystem : EntitySystem
         foreach (var coefficient in modifierDict)
         {
             if (armorCoefficients.TryGetValue(coefficient.Key, out var armorCoefficient))
-            {
                 mult *= 1f - (1f - armorCoefficient) * coefficient.Value;
-            }
         }
 
         switch (mult)
@@ -159,25 +153,31 @@ public sealed class SolutionInjectOnCollideSystem : EntitySystem
             args.Cancelled = true;
     }
 
-    private void OnOverTimeEmbed(Entity<SolutionInjectWhileEmbeddedComponent> ent, ref ProjectileEmbedEvent args) // Goobstation
-    {
-        ent.Comp.EmbedTime = _timing.CurTime;
-    }
+    private void
+        OnOverTimeEmbed(Entity<SolutionInjectWhileEmbeddedComponent> ent, ref ProjectileEmbedEvent args) // Goobstation
+        =>
+            ent.Comp.EmbedTime = _timing.CurTime;
 
     /// <summary>
-    /// Filters <paramref name="targets"/> for valid targets and tries to inject a portion of <see cref="BaseSolutionInjectOnEventComponent.Solution"/> into
+    /// Filters <paramref name="targets" /> for valid targets and tries to inject a portion of
+    /// <see cref="BaseSolutionInjectOnEventComponent.Solution" /> into
     /// each valid target's bloodstream.
     /// </summary>
     /// <remarks>
     /// Targets are invalid if any of the following are true:
     /// <list type="bullet">
     ///     <item>The target does not have a bloodstream.</item>
-    ///     <item><see cref="BaseSolutionInjectOnEventComponent.PierceArmor"/> is false and the target is wearing a hardsuit.</item>
-    ///     <item><see cref="BaseSolutionInjectOnEventComponent.BlockSlots"/> is not NONE and the target has an item equipped in any of the specified slots.</item>
+    ///     <item><see cref="BaseSolutionInjectOnEventComponent.PierceArmor" /> is false and the target is wearing a hardsuit.</item>
+    ///     <item>
+    ///     <see cref="BaseSolutionInjectOnEventComponent.BlockSlots" /> is not NONE and the target has an item equipped
+    ///     in any of the specified slots.
+    ///     </item>
     /// </list>
     /// </remarks>
     /// <returns>true if at least one target was successfully injected, otherwise false</returns>
-    private bool TryInjectTargets(Entity<BaseSolutionInjectOnEventComponent> injector, IReadOnlyList<EntityUid> targets, EntityUid? source = null)
+    private bool TryInjectTargets(Entity<BaseSolutionInjectOnEventComponent> injector,
+        IReadOnlyList<EntityUid> targets,
+        EntityUid? source = null)
     {
         // Make sure we have at least one target
         if (targets.Count == 0)
@@ -187,7 +187,7 @@ public sealed class SolutionInjectOnCollideSystem : EntitySystem
         if (!_solutionContainer.TryGetSolution(injector.Owner, injector.Comp.Solution, out var injectorSolution))
             return false;
 
-        bool anySuccess = false;
+        var anySuccess = false;
 
         foreach (var target in targets)
         {
@@ -197,32 +197,41 @@ public sealed class SolutionInjectOnCollideSystem : EntitySystem
             // Goobstation - Armor resisting syringe gun
             var mult = 1f; // multiplier of how much to actually inject
             var pierce = injector.Comp.PierceArmorOverride ?? injector.Comp.PierceArmor;
-            if (_inventory.TryGetSlotEntity(target, "outerClothing", out var suit)) // attempt to apply armor injection speed multiplier or block the syringe
+            if (_inventory.TryGetSlotEntity(target,
+                    "outerClothing",
+                    out var suit)) // attempt to apply armor injection speed multiplier or block the syringe
             {
                 var blocked = _tag.HasTag(suit.Value, SyringeArmorTag);
                 // bool syringeArmor = _tag.HasTag(suit.Value, "SyringeArmor");
                 // bool blocked = syringeArmor && !pierce; // if we have syringe armor and it's not piercing just block it outright
                 // pierce = pierce && !syringeArmor; // if we have syringe armor and it IS piercing, downgrade it
 
-                if (!blocked && !pierce && TryComp<ArmorComponent>(suit, out var armor)) // don't bother checking if we already blocked
+                if (!blocked && !pierce &&
+                    TryComp<ArmorComponent>(suit, out var armor)) // don't bother checking if we already blocked
                 {
                     var modifierDict = injector.Comp.DamageModifierResistances;
                     var armorCoefficients = armor.Modifiers.Coefficients;
                     foreach (var coefficient in modifierDict)
                     {
                         if (armorCoefficients.ContainsKey(coefficient.Key))
-                        {
                             mult *= 1f - (1f - armorCoefficients[coefficient.Key]) * coefficient.Value;
-                        }
                     }
+
                     if (mult <= 0f)
                         blocked = true;
                 }
+
                 if (blocked)
                 {
                     // Only show popup to attacker
                     if (source != null)
-                        _popup.PopupEntity(Loc.GetString(injector.Comp.BlockedByArmorPopupMessage, ("weapon", injector.Owner), ("target", target)), target, source.Value, PopupType.SmallCaution);
+                        _popup.PopupEntity(
+                            Loc.GetString(injector.Comp.BlockedByArmorPopupMessage,
+                                ("weapon", injector.Owner),
+                                ("target", target)),
+                            target,
+                            source.Value,
+                            PopupType.SmallCaution);
 
                     continue;
                 }
@@ -241,6 +250,7 @@ public sealed class SolutionInjectOnCollideSystem : EntitySystem
                         break;
                     }
                 }
+
                 if (blocked)
                     continue;
             }
@@ -249,9 +259,11 @@ public sealed class SolutionInjectOnCollideSystem : EntitySystem
             if (!TryComp<BloodstreamComponent>(target, out var bloodstream))
                 continue;
 
-            Solution removedSolution = _solutionContainer.SplitSolution(injectorSolution.Value, injector.Comp.TransferAmount * mult);
+            var removedSolution =
+                _solutionContainer.SplitSolution(injectorSolution.Value, injector.Comp.TransferAmount * mult);
             // Adjust solution amount based on transfer efficiency
-            var solutionToInject = removedSolution.SplitSolution(removedSolution.Volume * injector.Comp.TransferEfficiency);
+            var solutionToInject =
+                removedSolution.SplitSolution(removedSolution.Volume * injector.Comp.TransferEfficiency);
             // Inject our portion into the target's bloodstream
             if (_bloodstream.TryAddToChemicals((target, bloodstream), solutionToInject))
                 anySuccess = true;

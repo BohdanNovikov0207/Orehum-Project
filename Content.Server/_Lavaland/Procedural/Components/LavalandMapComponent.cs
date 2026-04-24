@@ -27,15 +27,6 @@ namespace Content.Server._Lavaland.Procedural.Components;
 [RegisterComponent]
 public sealed partial class LavalandMapComponent : Component
 {
-    [ViewVariables]
-    public List<EntityUid> SpawnedGrids;
-
-    [ViewVariables]
-    public int Seed;
-
-    [ViewVariables]
-    public ProtoId<LavalandMapPrototype>? PrototypeId;
-
     /// <summary>
     /// Chunks in this area are always loaded
     /// </summary>
@@ -47,4 +38,13 @@ public sealed partial class LavalandMapComponent : Component
     /// </summary>
     [DataField("loadedChunks")]
     public HashSet<Vector2i> LoadedChunks = new();
+
+    [ViewVariables]
+    public ProtoId<LavalandMapPrototype>? PrototypeId;
+
+    [ViewVariables]
+    public int Seed;
+
+    [ViewVariables]
+    public List<EntityUid> SpawnedGrids;
 }

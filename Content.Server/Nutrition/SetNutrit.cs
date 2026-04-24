@@ -146,9 +146,9 @@ public sealed class SetNutrit : LocalizedEntityCommands
                 if (!Enum.TryParse(args[1], out ThirstThreshold thirstThreshold))
                 {
                     shell.WriteError(Loc.GetString("cmd-setnutrit-error-invalid-threshold",
-                         ("thresholdType", nameof(ThirstThreshold)),
-                         ("thresholdString", args[1])
-                     ));
+                        ("thresholdType", nameof(ThirstThreshold)),
+                        ("thresholdString", args[1])
+                    ));
                     return;
                 }
 
@@ -177,8 +177,10 @@ public sealed class SetNutrit : LocalizedEntityCommands
             {
                 return args[0] switch
                 {
-                    "hunger" => CompletionResult.FromHintOptions(Enum.GetNames<HungerThreshold>(), nameof(HungerThreshold)),
-                    "thirst" => CompletionResult.FromHintOptions(Enum.GetNames<ThirstThreshold>(), nameof(ThirstThreshold)),
+                    "hunger" => CompletionResult.FromHintOptions(Enum.GetNames<HungerThreshold>(),
+                        nameof(HungerThreshold)),
+                    "thirst" => CompletionResult.FromHintOptions(Enum.GetNames<ThirstThreshold>(),
+                        nameof(ThirstThreshold)),
                     _ => CompletionResult.Empty,
                 };
             }

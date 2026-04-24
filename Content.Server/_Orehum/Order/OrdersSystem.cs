@@ -1,7 +1,7 @@
 using Content.Server.Actions;
 using Content.Server.Chat.Systems;
-using Content.Shared.Chat;
 using Content.Shared._Orehum.Orders;
+using Content.Shared.Chat;
 using Robust.Shared.Random;
 
 namespace Content.Server._Orehum.Orders;
@@ -71,5 +71,4 @@ public sealed class OrdersSystem : SharedOrdersSystem
         var callout = _random.Pick(callouts);
         _chat.TrySendInGameICMessage(uid, Loc.GetString(callout), InGameICChatType.Speak, false);
     }
-
 }

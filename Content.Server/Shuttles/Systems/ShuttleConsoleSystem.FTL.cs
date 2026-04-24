@@ -62,43 +62,31 @@ public sealed partial class ShuttleConsoleSystem
         SubscribeLocalEvent<FTLExclusionComponent, ComponentStartup>(OnExclusionStartup);
     }
 
-    private void OnExclusionStartup(Entity<FTLExclusionComponent> ent, ref ComponentStartup args)
-    {
+    private void OnExclusionStartup(Entity<FTLExclusionComponent> ent, ref ComponentStartup args) =>
         RefreshShuttleConsoles();
-    }
 
-    private void OnBeaconStartup(Entity<FTLBeaconComponent> ent, ref ComponentStartup args)
-    {
-        RefreshShuttleConsoles();
-    }
+    private void OnBeaconStartup(Entity<FTLBeaconComponent> ent, ref ComponentStartup args) => RefreshShuttleConsoles();
 
-    private void OnBeaconAnchorChanged(Entity<FTLBeaconComponent> ent, ref AnchorStateChangedEvent args)
-    {
+    private void OnBeaconAnchorChanged(Entity<FTLBeaconComponent> ent, ref AnchorStateChangedEvent args) =>
         RefreshShuttleConsoles();
-    }
 
     private void OnBeaconFTLMessage(Entity<ShuttleConsoleComponent> ent, ref ShuttleConsoleFTLBeaconMessage args)
     {
         var beaconEnt = GetEntity(args.Beacon);
         if (!_xformQuery.TryGetComponent(beaconEnt, out var targetXform))
-        {
             return;
-        }
 
         var nCoordinates = new NetCoordinates(GetNetEntity(targetXform.ParentUid), targetXform.LocalPosition);
         if (targetXform.ParentUid == EntityUid.Invalid)
-        {
             nCoordinates = new NetCoordinates(GetNetEntity(beaconEnt), targetXform.LocalPosition);
-        }
 
         // Check target exists
         if (!_shuttle.CanFTLBeacon(nCoordinates))
-        {
             return;
-        }
 
         var angle = args.Angle.Reduced();
-        var targetCoordinates = new EntityCoordinates(targetXform.MapUid!.Value, _transform.GetWorldPosition(targetXform));
+        var targetCoordinates =
+            new EntityCoordinates(targetXform.MapUid!.Value, _transform.GetWorldPosition(targetXform));
 
         ConsoleFTL(ent, targetCoordinates, angle, targetXform.MapID);
     }
@@ -109,9 +97,7 @@ public sealed partial class ShuttleConsoleSystem
 
         // If it's beacons only block all position messages.
         if (!Exists(mapUid) || _shuttle.IsBeaconMap(mapUid))
-        {
             return;
-        }
 
         var targetCoordinates = new EntityCoordinates(mapUid, args.Coordinates.Position);
         var angle = args.Angle.Reduced();
@@ -147,14 +133,19 @@ public sealed partial class ShuttleConsoleSystem
                 continue;
 
             exclusions ??= new List<ShuttleExclusionObject>();
-            exclusions.Add(new ShuttleExclusionObject(GetNetCoordinates(xform.Coordinates), comp.Range, Loc.GetString("shuttle-console-exclusion")));
+            exclusions.Add(new ShuttleExclusionObject(GetNetCoordinates(xform.Coordinates),
+                comp.Range,
+                Loc.GetString("shuttle-console-exclusion")));
         }
     }
 
     /// <summary>
     /// Handles shuttle console FTLs.
     /// </summary>
-    private void ConsoleFTL(Entity<ShuttleConsoleComponent> ent, EntityCoordinates targetCoordinates, Angle targetAngle, MapId targetMap)
+    private void ConsoleFTL(Entity<ShuttleConsoleComponent> ent,
+        EntityCoordinates targetCoordinates,
+        Angle targetAngle,
+        MapId targetMap)
     {
         var consoleUid = GetDroneConsole(ent.Owner);
 
@@ -166,7 +157,7 @@ public sealed partial class ShuttleConsoleSystem
         if (!TryComp(shuttleUid, out ShuttleComponent? shuttleComp))
             return;
 
-        if (shuttleComp.Enabled == false)
+        if (!shuttleComp.Enabled)
             return;
 
         // Check shuttle can even FTL
@@ -178,22 +169,16 @@ public sealed partial class ShuttleConsoleSystem
 
         // Check shuttle can FTL to this target.
         if (!_shuttle.CanFTLTo(shuttleUid.Value, targetMap, ent))
-        {
             return;
-        }
 
         List<ShuttleExclusionObject>? exclusions = null;
         GetExclusions(ref exclusions);
 
         if (!_shuttle.FTLFree(shuttleUid.Value, targetCoordinates, targetAngle, exclusions))
-        {
             return;
-        }
 
         if (!TryComp(shuttleUid.Value, out PhysicsComponent? shuttlePhysics))
-        {
             return;
-        }
 
         // Client sends the "adjusted" coordinates and we adjust it back to get the actual transform coordinates.
         var adjustedCoordinates = targetCoordinates.Offset(targetAngle.RotateVec(-shuttlePhysics.LocalCenter));

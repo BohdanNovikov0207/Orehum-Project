@@ -15,20 +15,22 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototy
 namespace Content.Server.Chemistry.Components;
 
 /// <summary>
-///     Fills a solution container randomly using a weighted random prototype
+/// Fills a solution container randomly using a weighted random prototype
 /// </summary>
-[RegisterComponent, Access(typeof(SolutionRandomFillSystem))]
+[RegisterComponent] [Access(typeof(SolutionRandomFillSystem))]
 public sealed partial class RandomFillSolutionComponent : Component
 {
     /// <summary>
-    ///     Solution name which to add reagents to.
+    /// Weighted random fill prototype Id. Used to pick reagent and quantity.
+    /// </summary>
+    [DataField("weightedRandomId",
+        required: true,
+        customTypeSerializer: typeof(PrototypeIdSerializer<WeightedRandomFillSolutionPrototype>))]
+    public string? WeightedRandomId;
+
+    /// <summary>
+    /// Solution name which to add reagents to.
     /// </summary>
     [DataField("solution")]
     public string Solution { get; set; } = "default";
-
-    /// <summary>
-    ///     Weighted random fill prototype Id. Used to pick reagent and quantity.
-    /// </summary>
-    [DataField("weightedRandomId", required: true, customTypeSerializer: typeof(PrototypeIdSerializer<WeightedRandomFillSolutionPrototype>))]
-    public string? WeightedRandomId;
 }

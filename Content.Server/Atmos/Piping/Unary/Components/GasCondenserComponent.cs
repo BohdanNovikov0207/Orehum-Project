@@ -27,10 +27,14 @@ public sealed partial class GasCondenserComponent : Component
     public string Inlet = "pipe";
 
     /// <summary>
-    /// The ID for the solution.
+    /// For a condenser, how many U of reagents are given per each mole of gas.
     /// </summary>
-    [DataField]
-    public string SolutionId = "tank";
+    /// <remarks>
+    /// Derived from a standard of 500u per canister:
+    /// 400u / 1871.71051 moles per canister
+    /// </remarks>
+    [DataField] [ViewVariables(VVAccess.ReadWrite)]
+    public float MolesToReagentMultiplier = 0.2137f;
 
     /// <summary>
     /// The solution that gases are condensed into.
@@ -39,12 +43,8 @@ public sealed partial class GasCondenserComponent : Component
     public Entity<SolutionComponent>? Solution = null;
 
     /// <summary>
-    /// For a condenser, how many U of reagents are given per each mole of gas.
+    /// The ID for the solution.
     /// </summary>
-    /// <remarks>
-    /// Derived from a standard of 500u per canister:
-    /// 400u / 1871.71051 moles per canister
-    /// </remarks>
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
-    public float MolesToReagentMultiplier = 0.2137f;
+    [DataField]
+    public string SolutionId = "tank";
 }

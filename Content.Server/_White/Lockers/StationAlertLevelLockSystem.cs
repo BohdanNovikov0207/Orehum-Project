@@ -20,7 +20,7 @@ public sealed class StationAlertLevelLockSystem : SharedStationAlertLevelLockSys
     public void OnInit(Entity<StationAlertLevelLockComponent> ent, ref MapInitEvent args)
     {
         // for non-station mapped safes don't lock them because that's chuddy
-        if (_station.GetOwningStation(ent.Owner) is not {} station)
+        if (_station.GetOwningStation(ent.Owner) is not { } station)
         {
             ent.Comp.Enabled = false;
             Dirty(ent);

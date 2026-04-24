@@ -13,24 +13,22 @@ using Robust.Shared.Timing;
 
 namespace Content.Server.GameTicking.Rules.VariationPass;
 
-/// <inheritdoc cref="EntityReplaceVariationPassComponent"/>
+/// <inheritdoc cref="EntityReplaceVariationPassComponent" />
 /// <summary>
-///     A base system for fast replacement of entities utilizing a query, rather than having to iterate every entity
-///     To use, you must have a marker component to use for <see cref="TEntComp"/>--each replaceable entity must have it
-///     Then you need an inheriting system as well as a unique game rule component for <see cref="TGameRuleComp"/>
-///
-///     This means a bit more boilerplate for each one, but significantly faster to actually execute.
-///     See <see cref="WallReplaceVariationPassSystem"/>
+/// A base system for fast replacement of entities utilizing a query, rather than having to iterate every entity
+/// To use, you must have a marker component to use for <see cref="TEntComp" />--each replaceable entity must have it
+/// Then you need an inheriting system as well as a unique game rule component for <see cref="TGameRuleComp" />
+/// This means a bit more boilerplate for each one, but significantly faster to actually execute.
+/// See <see cref="WallReplaceVariationPassSystem" />
 /// </summary>
 public abstract class BaseEntityReplaceVariationPassSystem<TEntComp, TGameRuleComp> : VariationPassSystem<TGameRuleComp>
-    where TEntComp: IComponent
-    where TGameRuleComp: IComponent
+    where TEntComp : IComponent
+    where TGameRuleComp : IComponent
 {
     /// <summary>
-    ///     Used so we don't modify while enumerating
-    ///     if the replaced entity also has <see cref="TEntComp"/>.
-    ///
-    ///     Filled and cleared within the same tick so no persistence issues.
+    /// Used so we don't modify while enumerating
+    /// if the replaced entity also has <see cref="TEntComp" />.
+    /// Filled and cleared within the same tick so no persistence issues.
     /// </summary>
     private readonly Queue<(string, EntityCoordinates, Angle)> _queuedSpawns = new();
 
@@ -65,7 +63,8 @@ public abstract class BaseEntityReplaceVariationPassSystem<TEntComp, TGameRuleCo
             Transform(newEnt).LocalRotation = rot;
         }
 
-        Log.Debug($"Entity replacement took {stopwatch.Elapsed} with {Stations.GetTileCount(args.Station.AsNullable())} tiles");
+        Log.Debug(
+            $"Entity replacement took {stopwatch.Elapsed} with {Stations.GetTileCount(args.Station.AsNullable())} tiles");
     }
 
     private void QueueReplace(Entity<TransformComponent> ent, List<EntitySpawnEntry> replacements)

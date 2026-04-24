@@ -85,6 +85,7 @@
 using System.Linq;
 using Content.Server.Explosion.EntitySystems;
 using Content.Server.Resist;
+using Content.Server.Shuttles.Components;
 using Content.Server.Storage.Components;
 using Content.Shared.Access;
 using Content.Shared.Access.Components;
@@ -97,25 +98,23 @@ using Content.Shared.Storage.Components;
 using Content.Shared.Storage.EntitySystems;
 using Content.Shared.Tools.Systems;
 using Robust.Shared.Containers;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Timing;
-using Robust.Shared.Prototypes;
-using Content.Server.Shuttles.Components;
-using Robust.Shared.Physics;
 
 namespace Content.Server.Storage.EntitySystems;
 
 public sealed class BluespaceLockerSystem : EntitySystem
 {
+    [Dependency] private readonly SharedContainerSystem _containerSystem = default!;
+    [Dependency] private readonly SharedDoAfterSystem _doAfterSystem = default!;
+    [Dependency] private readonly EntityStorageSystem _entityStorage = default!;
+    [Dependency] private readonly ExplosionSystem _explosionSystem = default!;
+    [Dependency] private readonly LockSystem _lockSystem = default!;
     [Dependency] private readonly IRobustRandom _robustRandom = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly SharedContainerSystem _containerSystem = default!;
-    [Dependency] private readonly EntityStorageSystem _entityStorage = default!;
-    [Dependency] private readonly WeldableSystem _weldableSystem = default!;
-    [Dependency] private readonly LockSystem _lockSystem = default!;
-    [Dependency] private readonly SharedDoAfterSystem _doAfterSystem = default!;
     [Dependency] private readonly SharedTransformSystem _transformSystem = default!;
-    [Dependency] private readonly ExplosionSystem _explosionSystem = default!;
+    [Dependency] private readonly WeldableSystem _weldableSystem = default!;
 
     public override void Initialize()
     {
@@ -137,17 +136,24 @@ public sealed class BluespaceLockerSystem : EntitySystem
         EnsureComp<ArrivalsBlacklistComponent>(uid); // To stop people getting to arrivals terminal
     }
 
-    public void BluespaceEffect(EntityUid effectTargetUid, BluespaceLockerComponent effectSourceComponent, BluespaceLockerComponent? effectTargetComponent, bool bypassLimit = false)
+    public void BluespaceEffect(EntityUid effectTargetUid,
+        BluespaceLockerComponent effectSourceComponent,
+        BluespaceLockerComponent? effectTargetComponent,
+        bool bypassLimit = false)
     {
         if (!bypassLimit && Resolve(effectTargetUid, ref effectTargetComponent, false))
+        {
             if (effectTargetComponent.BehaviorProperties.BluespaceEffectMinInterval > 0)
             {
                 var curTimeTicks = _timing.CurTick.Value;
                 if (curTimeTicks < effectTargetComponent.BluespaceEffectNextTime)
                     return;
 
-                effectTargetComponent.BluespaceEffectNextTime = curTimeTicks + (uint) (_timing.TickRate * effectTargetComponent.BehaviorProperties.BluespaceEffectMinInterval);
+                effectTargetComponent.BluespaceEffectNextTime = curTimeTicks +
+                                                                (uint) (_timing.TickRate * effectTargetComponent
+                                                                    .BehaviorProperties.BluespaceEffectMinInterval);
             }
+        }
 
         Spawn(effectSourceComponent.BehaviorProperties.BluespaceEffectPrototype, effectTargetUid.ToCoordinates());
     }
@@ -155,7 +161,7 @@ public sealed class BluespaceLockerSystem : EntitySystem
     private void PreOpen(EntityUid uid, BluespaceLockerComponent component, ref StorageBeforeOpenEvent args)
     {
         EntityStorageComponent? entityStorageComponent = null;
-        int transportedEntities = 0;
+        var transportedEntities = 0;
 
         if (!Resolve(uid, ref entityStorageComponent))
             return;
@@ -177,6 +183,7 @@ public sealed class BluespaceLockerSystem : EntitySystem
         {
             // Move contained items
             if (component.BehaviorProperties.TransportEntities || component.BehaviorProperties.TransportSentient)
+            {
                 foreach (var entity in target.Value.storageComponent.Contents.ContainedEntities.ToArray())
                 {
                     if (HasComp<MindContainerComponent>(entity))
@@ -193,6 +200,7 @@ public sealed class BluespaceLockerSystem : EntitySystem
                         transportedEntities++;
                     }
                 }
+            }
 
             // Move contained air
             if (component.BehaviorProperties.TransportGas)
@@ -211,7 +219,10 @@ public sealed class BluespaceLockerSystem : EntitySystem
         DestroyAfterLimit(uid, component, transportedEntities);
     }
 
-    private bool ValidLink(EntityUid locker, EntityUid link, BluespaceLockerComponent lockerComponent, bool intendToLink = false)
+    private bool ValidLink(EntityUid locker,
+        EntityUid link,
+        BluespaceLockerComponent lockerComponent,
+        bool intendToLink = false)
     {
         if (!link.Valid ||
             !TryComp<EntityStorageComponent>(link, out var linkStorage) ||
@@ -221,14 +232,16 @@ public sealed class BluespaceLockerSystem : EntitySystem
 
         if (lockerComponent.BehaviorProperties.InvalidateOneWayLinks &&
             !(intendToLink && lockerComponent.AutoLinksBidirectional) &&
-            !(HasComp<BluespaceLockerComponent>(link) && Comp<BluespaceLockerComponent>(link).BluespaceLinks.Contains(locker)))
+            !(HasComp<BluespaceLockerComponent>(link) &&
+              Comp<BluespaceLockerComponent>(link).BluespaceLinks.Contains(locker)))
             return false;
 
         return true;
     }
 
-    /// <returns>True if any HashSet in <paramref name="a"/> would grant access to <paramref name="b"/></returns>
-    private bool AccessMatch(IReadOnlyCollection<HashSet<ProtoId<AccessLevelPrototype>>>? a, IReadOnlyCollection<HashSet<ProtoId<AccessLevelPrototype>>>? b)
+    /// <returns>True if any HashSet in <paramref name="a" /> would grant access to <paramref name="b" /></returns>
+    private bool AccessMatch(IReadOnlyCollection<HashSet<ProtoId<AccessLevelPrototype>>>? a,
+        IReadOnlyCollection<HashSet<ProtoId<AccessLevelPrototype>>>? b)
     {
         if ((a == null || a.Count == 0) && (b == null || b.Count == 0))
             return true;
@@ -281,7 +294,8 @@ public sealed class BluespaceLockerSystem : EntitySystem
         return true;
     }
 
-    public (EntityUid uid, EntityStorageComponent storageComponent, BluespaceLockerComponent? bluespaceLockerComponent)? GetTarget(EntityUid lockerUid, BluespaceLockerComponent component, bool init = false)
+    public (EntityUid uid, EntityStorageComponent storageComponent, BluespaceLockerComponent? bluespaceLockerComponent)?
+        GetTarget(EntityUid lockerUid, BluespaceLockerComponent component, bool init = false)
     {
         while (true)
         {
@@ -319,16 +333,15 @@ public sealed class BluespaceLockerSystem : EntitySystem
                                 targetBluespaceComponent.BluespaceLinks.Add(lockerUid);
 
                             if (component.AutoLinksUseProperties)
-                                targetBluespaceComponent.BehaviorProperties = component.AutoLinkProperties with {};
+                                targetBluespaceComponent.BehaviorProperties = component.AutoLinkProperties with { };
 
                             GetTarget(potentialLink, targetBluespaceComponent, true);
                             BluespaceEffect(potentialLink, targetBluespaceComponent, targetBluespaceComponent, true);
                         }
                         else if (component.AutoLinksBidirectional)
-                        {
                             targetBluespaceComponent.BluespaceLinks.Add(lockerUid);
-                        }
                     }
+
                     if (component.BluespaceLinks.Count >= component.MinBluespaceLinks)
                         break;
                 }
@@ -352,10 +365,8 @@ public sealed class BluespaceLockerSystem : EntitySystem
         }
     }
 
-    private void PostClose(EntityUid uid, BluespaceLockerComponent component, ref StorageAfterCloseEvent args)
-    {
+    private void PostClose(EntityUid uid, BluespaceLockerComponent component, ref StorageAfterCloseEvent args) =>
         PostClose(uid, component);
-    }
 
     private void OnDoAfter(EntityUid uid, BluespaceLockerComponent component, DoAfterEvent args)
     {
@@ -370,7 +381,7 @@ public sealed class BluespaceLockerSystem : EntitySystem
     private void PostClose(EntityUid uid, BluespaceLockerComponent component, bool doDelay = true)
     {
         EntityStorageComponent? entityStorageComponent = null;
-        int transportedEntities = 0;
+        var transportedEntities = 0;
 
         if (!Resolve(uid, ref entityStorageComponent))
             return;
@@ -383,7 +394,11 @@ public sealed class BluespaceLockerSystem : EntitySystem
         {
             EnsureComp<DoAfterComponent>(uid);
 
-            _doAfterSystem.TryStartDoAfter(new DoAfterArgs(EntityManager, uid, component.BehaviorProperties.Delay, new BluespaceLockerDoAfterEvent(), uid));
+            _doAfterSystem.TryStartDoAfter(new DoAfterArgs(EntityManager,
+                uid,
+                component.BehaviorProperties.Delay,
+                new BluespaceLockerDoAfterEvent(),
+                uid));
             return;
         }
 
@@ -394,6 +409,7 @@ public sealed class BluespaceLockerSystem : EntitySystem
 
         // Move contained items
         if (component.BehaviorProperties.TransportEntities || component.BehaviorProperties.TransportSentient)
+        {
             foreach (var entity in entityStorageComponent.Contents.ContainedEntities.ToArray())
             {
                 if (HasComp<MindContainerComponent>(entity))
@@ -410,6 +426,7 @@ public sealed class BluespaceLockerSystem : EntitySystem
                     transportedEntities++;
                 }
             }
+        }
 
         // Move contained air
         if (component.BehaviorProperties.TransportGas)
@@ -459,8 +476,12 @@ public sealed class BluespaceLockerSystem : EntitySystem
             if (component.BehaviorProperties.ClearLinksEvery <= component.UsesSinceLinkClear)
             {
                 if (component.BehaviorProperties.ClearLinksDebluespaces)
+                {
                     foreach (var link in component.BluespaceLinks)
+                    {
                         RemComp<BluespaceLockerComponent>(link);
+                    }
+                }
 
                 component.BluespaceLinks.Clear();
                 component.UsesSinceLinkClear = 0;
@@ -478,7 +499,12 @@ public sealed class BluespaceLockerSystem : EntitySystem
         {
             case BluespaceLockerDestroyType.Explode:
                 _explosionSystem.QueueExplosion(_transformSystem.ToMapCoordinates(uid.ToCoordinates()),
-                    ExplosionSystem.DefaultExplosionPrototypeId, 4, 1, 2, uid, maxTileBreak: 0);
+                    ExplosionSystem.DefaultExplosionPrototypeId,
+                    4,
+                    1,
+                    2,
+                    uid,
+                    maxTileBreak: 0);
                 goto case BluespaceLockerDestroyType.Delete;
             case BluespaceLockerDestroyType.Delete:
                 QueueDel(uid);

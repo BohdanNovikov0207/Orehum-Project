@@ -27,5 +27,4 @@ public sealed partial class HandcuffedPrecondition : HTNPrecondition
 
         return cuffable.IsCuffed(target, ReactOnlyWhenFullyCuffed);
     }
-
 }

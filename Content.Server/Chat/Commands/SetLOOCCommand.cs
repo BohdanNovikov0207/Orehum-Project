@@ -31,9 +31,7 @@ public sealed class SetLoocCommand : LocalizedCommands
         var looc = _configManager.GetCVar(CCVars.LoocEnabled);
 
         if (args.Length == 0)
-        {
             looc = !looc;
-        }
 
         if (args.Length == 1 && !bool.TryParse(args[0], out looc))
         {

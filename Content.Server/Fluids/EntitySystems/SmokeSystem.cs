@@ -83,9 +83,10 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Linq;
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Server.Administration.Logs;
 using Content.Server.Body.Systems;
-using Content.Shared.EntityEffects.Effects;
 using Content.Server.Spreader;
 using Content.Shared.Body.Components;
 using Content.Shared.Chemistry;
@@ -94,7 +95,9 @@ using Content.Shared.Chemistry.EntitySystems;
 using Content.Shared.Chemistry.Reaction;
 using Content.Shared.Chemistry.Reagent;
 using Content.Shared.Database;
-using Content.Goobstation.Maths.FixedPoint;
+using Content.Shared.EntityEffects.Effects;
+using Content.Shared.Inventory;
+using Content.Shared.Nutrition.Components;
 using Content.Shared.Smoking;
 using Robust.Server.GameObjects;
 using Robust.Shared.Map.Components;
@@ -105,10 +108,6 @@ using Robust.Shared.Physics.Systems;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Timing;
-using System.Linq;
-using Content.Server.Nutrition.Components;
-using Content.Shared.Inventory;
-using Content.Shared.Nutrition.Components;
 using TimedDespawnComponent = Robust.Shared.Spawners.TimedDespawnComponent;
 
 namespace Content.Server.Fluids.EntitySystems;
@@ -118,25 +117,27 @@ namespace Content.Server.Fluids.EntitySystems;
 /// </summary>
 public sealed class SmokeSystem : EntitySystem
 {
-    // If I could do it all again this could probably use a lot more of puddles.
-    [Dependency] private readonly IAdminLogManager _logger = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly SharedMapSystem _map = default!;
-    [Dependency] private readonly IPrototypeManager _prototype = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly AppearanceSystem _appearance = default!;
     [Dependency] private readonly BloodstreamSystem _blood = default!;
-    [Dependency] private readonly InternalsSystem _internals = default!;
-    [Dependency] private readonly ReactiveSystem _reactive = default!;
     [Dependency] private readonly SharedBroadphaseSystem _broadphase = default!;
-    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
-    [Dependency] private readonly SharedSolutionContainerSystem _solutionContainerSystem = default!;
+    [Dependency] private readonly InternalsSystem _internals = default!;
+
     [Dependency] private readonly InventorySystem _inventory = default!; // Goobstation
 
-    private EntityQuery<SmokeComponent> _smokeQuery;
+    // If I could do it all again this could probably use a lot more of puddles.
+    [Dependency] private readonly IAdminLogManager _logger = default!;
+    [Dependency] private readonly SharedMapSystem _map = default!;
+    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
+    [Dependency] private readonly IPrototypeManager _prototype = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly ReactiveSystem _reactive = default!;
+    [Dependency] private readonly SharedSolutionContainerSystem _solutionContainerSystem = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
     private EntityQuery<SmokeAffectedComponent> _smokeAffectedQuery;
 
-    /// <inheritdoc/>
+    private EntityQuery<SmokeComponent> _smokeQuery;
+
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
@@ -151,7 +152,7 @@ public sealed class SmokeSystem : EntitySystem
         SubscribeLocalEvent<SmokeComponent, SpreadNeighborsEvent>(OnSmokeSpread);
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Update(float frameTime)
     {
         base.Update(frameTime);
@@ -211,7 +212,10 @@ public sealed class SmokeSystem : EntitySystem
 
     private void OnSmokeSpread(Entity<SmokeComponent> entity, ref SpreadNeighborsEvent args)
     {
-        if (entity.Comp.SpreadAmount == 0 || !_solutionContainerSystem.ResolveSolution(entity.Owner, SmokeComponent.SolutionName, ref entity.Comp.Solution, out var solution))
+        if (entity.Comp.SpreadAmount == 0 || !_solutionContainerSystem.ResolveSolution(entity.Owner,
+                SmokeComponent.SolutionName,
+                ref entity.Comp.Solution,
+                out var solution))
         {
             RemCompDeferred<ActiveEdgeSpreaderComponent>(entity);
             return;
@@ -271,7 +275,6 @@ public sealed class SmokeSystem : EntitySystem
                 break;
             }
         }
-
     }
 
     private void OnReactionAttempt(Entity<SmokeComponent> entity, ref ReactionAttemptEvent args)
@@ -299,7 +302,11 @@ public sealed class SmokeSystem : EntitySystem
     /// <summary>
     /// Sets up a smoke component for spreading.
     /// </summary>
-    public void StartSmoke(EntityUid uid, Solution solution, float duration, int spreadAmount, SmokeComponent? component = null)
+    public void StartSmoke(EntityUid uid,
+        Solution solution,
+        float duration,
+        int spreadAmount,
+        SmokeComponent? component = null)
     {
         if (!Resolve(uid, ref component))
             return;
@@ -334,25 +341,33 @@ public sealed class SmokeSystem : EntitySystem
         if (!Resolve(smokeUid, ref component))
             return;
 
-        if (!_solutionContainerSystem.ResolveSolution(smokeUid, SmokeComponent.SolutionName, ref component.Solution, out var solution) ||
+        if (!_solutionContainerSystem.ResolveSolution(smokeUid,
+                SmokeComponent.SolutionName,
+                ref component.Solution,
+                out var solution) ||
             solution.Contents.Count == 0)
-        {
             return;
-        }
 
         ReactWithEntity(entity, smokeUid, solution, component);
         UpdateVisuals((smokeUid, component));
     }
 
-    private void ReactWithEntity(EntityUid entity, EntityUid smokeUid, Solution solution, SmokeComponent? component = null)
+    private void ReactWithEntity(EntityUid entity,
+        EntityUid smokeUid,
+        Solution solution,
+        SmokeComponent? component = null)
     {
         if (!Resolve(smokeUid, ref component))
             return;
 
-        if (!TryComp<BloodstreamComponent>(entity, out var bloodstream) || bloodstream.SmokeImmune) // Goobstation - ignore SmokeImmune entities
+        if (!TryComp<BloodstreamComponent>(entity, out var bloodstream) ||
+            bloodstream.SmokeImmune) // Goobstation - ignore SmokeImmune entities
             return;
 
-        if (!_solutionContainerSystem.ResolveSolution(entity, bloodstream.ChemicalSolutionName, ref bloodstream.ChemicalSolution, out var chemSolution) || chemSolution.AvailableVolume <= 0)
+        if (!_solutionContainerSystem.ResolveSolution(entity,
+                bloodstream.ChemicalSolutionName,
+                ref bloodstream.ChemicalSolution,
+                out var chemSolution) || chemSolution.AvailableVolume <= 0)
             return;
 
         var blockIngestion = _internals.AreInternalsWorking(entity);
@@ -360,9 +375,7 @@ public sealed class SmokeSystem : EntitySystem
         if (_inventory.TryGetSlotEntity(entity, "mask", out var maskUid) &&
             EntityManager.TryGetComponent<IngestionBlockerComponent>(maskUid, out var blocker) &&
             blocker is { Enabled: true, BlockSmokeIngestion: true }) // Goobstation
-        {
             blockIngestion = true;
-        }
 
         var cloneSolution = solution.Clone();
         var availableTransfer = FixedPoint2.Min(cloneSolution.Volume, component.TransferRate);
@@ -377,7 +390,11 @@ public sealed class SmokeSystem : EntitySystem
 
             _reactive.ReactionEntity(entity, ReactionMethod.Touch, reagentProto, reagentQuantity, transferSolution);
             if (!blockIngestion)
-                _reactive.ReactionEntity(entity, ReactionMethod.Ingestion, reagentProto, reagentQuantity, transferSolution);
+                _reactive.ReactionEntity(entity,
+                    ReactionMethod.Ingestion,
+                    reagentProto,
+                    reagentQuantity,
+                    transferSolution);
         }
 
         if (blockIngestion)
@@ -386,7 +403,9 @@ public sealed class SmokeSystem : EntitySystem
         if (_blood.TryAddToChemicals((entity, bloodstream), transferSolution))
         {
             // Log solution addition by smoke
-            _logger.Add(LogType.ForceFeed, LogImpact.Medium, $"{ToPrettyString(entity):target} ingested smoke {SharedSolutionContainerSystem.ToPrettyString(transferSolution)}");
+            _logger.Add(LogType.ForceFeed,
+                LogImpact.Medium,
+                $"{ToPrettyString(entity):target} ingested smoke {SharedSolutionContainerSystem.ToPrettyString(transferSolution)}");
         }
     }
 
@@ -395,7 +414,10 @@ public sealed class SmokeSystem : EntitySystem
         if (!Resolve(uid, ref component, ref xform))
             return;
 
-        if (!_solutionContainerSystem.ResolveSolution(uid, SmokeComponent.SolutionName, ref component.Solution, out var solution) || !solution.Any())
+        if (!_solutionContainerSystem.ResolveSolution(uid,
+                SmokeComponent.SolutionName,
+                ref component.Solution,
+                out var solution) || !solution.Any())
             return;
 
         if (!TryComp<MapGridComponent>(xform.GridUid, out var mapGrid))
@@ -424,7 +446,10 @@ public sealed class SmokeSystem : EntitySystem
         if (!Resolve(smoke, ref smoke.Comp))
             return;
 
-        if (!_solutionContainerSystem.ResolveSolution(smoke.Owner, SmokeComponent.SolutionName, ref smoke.Comp.Solution, out var solutionArea))
+        if (!_solutionContainerSystem.ResolveSolution(smoke.Owner,
+                SmokeComponent.SolutionName,
+                ref smoke.Comp.Solution,
+                out var solutionArea))
             return;
 
         var addSolution = solution.SplitSolution(FixedPoint2.Min(solution.Volume, solutionArea.AvailableVolume));
@@ -436,7 +461,10 @@ public sealed class SmokeSystem : EntitySystem
     private void UpdateVisuals(Entity<SmokeComponent?, AppearanceComponent?> smoke)
     {
         if (!Resolve(smoke, ref smoke.Comp1, ref smoke.Comp2) ||
-            !_solutionContainerSystem.ResolveSolution(smoke.Owner, SmokeComponent.SolutionName, ref smoke.Comp1.Solution, out var solution))
+            !_solutionContainerSystem.ResolveSolution(smoke.Owner,
+                SmokeComponent.SolutionName,
+                ref smoke.Comp1.Solution,
+                out var solution))
             return;
 
         var color = solution.GetColor(_prototype);

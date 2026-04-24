@@ -12,7 +12,7 @@ using Robust.Shared.Toolshed;
 
 namespace Content.Server.Access;
 
-[ToolshedCommand, AdminCommand(AdminFlags.Mapping)]
+[ToolshedCommand] [AdminCommand(AdminFlags.Mapping)]
 public sealed class AddAccessLogCommand : ToolshedCommand
 {
     [CommandImplementation]
@@ -22,7 +22,8 @@ public sealed class AddAccessLogCommand : ToolshedCommand
 
         var accessLogCount = accessReader.AccessLog.Count;
         if (accessLogCount >= accessReader.AccessLogLimit)
-            ctx.WriteLine($"WARNING: Surpassing the limit of the log by {accessLogCount - accessReader.AccessLogLimit+1} entries!");
+            ctx.WriteLine(
+                $"WARNING: Surpassing the limit of the log by {accessLogCount - accessReader.AccessLogLimit + 1} entries!");
 
         var accessTime = TimeSpan.FromSeconds(seconds);
         EntityManager.System<AccessReaderSystem>().LogAccess((input, accessReader), accessor, accessTime, true);
@@ -32,8 +33,8 @@ public sealed class AddAccessLogCommand : ToolshedCommand
     }
 
     [CommandImplementation]
-    public void AddAccessLogPiped(IInvocationContext ctx, [PipedArgument] EntityUid input, float seconds, string accessor)
-    {
-        AddAccessLog(ctx, input, seconds, accessor);
-    }
+    public void AddAccessLogPiped(IInvocationContext ctx,
+        [PipedArgument] EntityUid input,
+        float seconds,
+        string accessor) => AddAccessLog(ctx, input, seconds, accessor);
 }

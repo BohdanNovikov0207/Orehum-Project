@@ -20,12 +20,12 @@ namespace Content.Server._Harmony.ReadyManifest;
 public sealed class ReadyManifestSystem : SharedReadyManifestSystem
 {
     [Dependency] private readonly IConfigurationManager _cfg = default!;
-    [Dependency] private readonly IServerPreferencesManager _prefsManager = default!;
     [Dependency] private readonly EuiManager _euiManager = default!;
     [Dependency] private readonly GameTicker _gameTicker = default!;
+    private readonly Dictionary<ProtoId<JobPrototype>, ReadyManifestJobData> _jobCounts = new();
 
     private readonly Dictionary<ICommonSession, ReadyManifestEui> _openEuis = new();
-    private Dictionary<ProtoId<JobPrototype>, ReadyManifestJobData> _jobCounts = new();
+    [Dependency] private readonly IServerPreferencesManager _prefsManager = default!;
 
     public override void Initialize()
     {
@@ -46,10 +46,7 @@ public sealed class ReadyManifestSystem : SharedReadyManifestSystem
         _openEuis.Clear();
     }
 
-    private void OnRoundRestart(RoundRestartCleanupEvent args)
-    {
-        _jobCounts.Clear();
-    }
+    private void OnRoundRestart(RoundRestartCleanupEvent args) => _jobCounts.Clear();
 
     private void OnPlayerToggledReady(ref PlayerToggledReadyEvent args)
     {
@@ -101,10 +98,7 @@ public sealed class ReadyManifestSystem : SharedReadyManifestSystem
         eui.Close();
     }
 
-    public Dictionary<ProtoId<JobPrototype>, ReadyManifestJobData> GetReadyManifest()
-    {
-        return _jobCounts;
-    }
+    public Dictionary<ProtoId<JobPrototype>, ReadyManifestJobData> GetReadyManifest() => _jobCounts;
 
     private void RebuildReadyManifest()
     {
@@ -118,7 +112,7 @@ public sealed class ReadyManifestSystem : SharedReadyManifestSystem
             if (!_prefsManager.TryGetCachedPreferences(userId, out var preferences))
                 continue;
 
-            var profile = (HumanoidCharacterProfile)preferences.SelectedCharacter;
+            var profile = (HumanoidCharacterProfile) preferences.SelectedCharacter;
             foreach (var (jobId, priority) in profile.JobPriorities)
             {
                 var jobPriorityAmounts = _jobCounts.GetValueOrDefault(jobId);

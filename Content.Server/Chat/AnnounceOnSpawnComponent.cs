@@ -13,9 +13,15 @@ namespace Content.Server.Chat;
 /// <summary>
 /// Dispatches an announcement to everyone when the entity is mapinit'd.
 /// </summary>
-[RegisterComponent, Access(typeof(AnnounceOnSpawnSystem))]
+[RegisterComponent] [Access(typeof(AnnounceOnSpawnSystem))]
 public sealed partial class AnnounceOnSpawnComponent : Component
 {
+    /// <summary>
+    /// Color override for the announcement.
+    /// </summary>
+    [DataField]
+    public Color? Color;
+
     /// <summary>
     /// Locale id of the announcement message.
     /// </summary>
@@ -33,10 +39,4 @@ public sealed partial class AnnounceOnSpawnComponent : Component
     /// </summary>
     [DataField]
     public SoundSpecifier? Sound;
-
-    /// <summary>
-    /// Color override for the announcement.
-    /// </summary>
-    [DataField]
-    public Color? Color;
 }

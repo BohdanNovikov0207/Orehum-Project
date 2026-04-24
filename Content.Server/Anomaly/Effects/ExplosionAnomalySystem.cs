@@ -4,14 +4,14 @@
 //
 // SPDX-License-Identifier: MIT
 
-using Content.Server.Explosion.EntitySystems;
 using Content.Server.Anomaly.Components;
+using Content.Server.Explosion.EntitySystems;
 using Content.Shared.Anomaly.Components;
 
 namespace Content.Server.Anomaly.Effects;
 
 /// <summary>
-/// This handles <see cref="ExplosionAnomalyComponent"/>
+/// This handles <see cref="ExplosionAnomalyComponent" />
 /// </summary>
 public sealed class ExplosionAnomalySystem : EntitySystem
 {
@@ -23,8 +23,9 @@ public sealed class ExplosionAnomalySystem : EntitySystem
         SubscribeLocalEvent<ExplosionAnomalyComponent, AnomalySupercriticalEvent>(OnSupercritical);
     }
 
-    private void OnSupercritical(EntityUid uid, ExplosionAnomalyComponent component, ref AnomalySupercriticalEvent args)
-    {
+    private void OnSupercritical(EntityUid uid,
+        ExplosionAnomalyComponent component,
+        ref AnomalySupercriticalEvent args) =>
         _boom.QueueExplosion(
             uid,
             component.ExplosionPrototype,
@@ -32,5 +33,4 @@ public sealed class ExplosionAnomalySystem : EntitySystem
             component.Dropoff,
             component.MaxTileIntensity
         );
-    }
 }

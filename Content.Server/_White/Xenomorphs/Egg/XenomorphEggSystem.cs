@@ -17,14 +17,13 @@ namespace Content.Server._White.Xenomorphs.Egg;
 
 public sealed class XenomorphEggSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
-
     [Dependency] private readonly AppearanceSystem _appearance = default!;
     [Dependency] private readonly AudioSystem _audio = default!;
     [Dependency] private readonly EntityLookupSystem _entityLookup = default!;
     [Dependency] private readonly FaceHuggerSystem _faceHugger = default!;
     [Dependency] private readonly PopupSystem _popup = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -84,7 +83,9 @@ public sealed class XenomorphEggSystem : EntitySystem
                 case XenomorphEggStatus.Grown when time >= xenomorphEgg.CheckInRangeAt:
                     xenomorphEgg.CheckInRangeAt = time + xenomorphEgg.CheckInRangeDelay;
 
-                    foreach (var entity in _entityLookup.GetEntitiesInRange<InventoryComponent>(Transform(uid).Coordinates, xenomorphEgg.BurstRange))
+                    foreach (var entity in _entityLookup.GetEntitiesInRange<InventoryComponent>(
+                                 Transform(uid).Coordinates,
+                                 xenomorphEgg.BurstRange))
                     {
                         if (HasComp<GhostComponent>(entity) || HasComp<XenomorphComponent>(entity))
                             continue;
@@ -120,7 +121,6 @@ public sealed class XenomorphEggSystem : EntitySystem
             return;
 
 
-
         foreach (var entity in _entityLookup.GetEntitiesInRange<InventoryComponent>(coordinates, component.BurstRange))
         {
             if (_faceHugger.TryEquipFaceHugger(spawned, entity, equipOn))
@@ -131,9 +131,7 @@ public sealed class XenomorphEggSystem : EntitySystem
     private void OnStepTriggered(EntityUid uid, XenomorphEggComponent component, ref StepTriggeredOffEvent args)
     {
         if (component.Status == XenomorphEggStatus.Grown)
-        {
             SetBursting(uid, component);
-        }
         else if (component.Status == XenomorphEggStatus.Growning)
         {
             component.Status = XenomorphEggStatus.Grown;

@@ -8,11 +8,10 @@
 //
 // SPDX-License-Identifier: MIT
 
-namespace Content.Server.DeviceNetwork.Components
+namespace Content.Server.DeviceNetwork.Components;
+
+[RegisterComponent]
+[ComponentProtoName("WiredNetworkConnection")]
+public sealed partial class WiredNetworkComponent : Component
 {
-    [RegisterComponent]
-    [ComponentProtoName("WiredNetworkConnection")]
-    public sealed partial class WiredNetworkComponent : Component
-    {
-    }
 }

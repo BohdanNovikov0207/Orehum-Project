@@ -15,17 +15,16 @@ using Content.Shared.Anomaly.Effects;
 using Content.Shared.Anomaly.Effects.Components;
 using Content.Shared.Maps;
 using Robust.Shared.Map;
-using Robust.Shared.Map.Components;
 
 namespace Content.Server.Anomaly.Effects;
 
 public sealed class TileAnomalySystem : SharedTileAnomalySystem
 {
     [Dependency] private readonly SharedAnomalySystem _anomaly = default!;
-    [Dependency] private readonly ITileDefinitionManager _tiledef = default!;
     [Dependency] private readonly TileSystem _tile = default!;
+    [Dependency] private readonly ITileDefinitionManager _tiledef = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         SubscribeLocalEvent<TileSpawnAnomalyComponent, AnomalyPulseEvent>(OnPulse);
@@ -90,7 +89,11 @@ public sealed class TileAnomalySystem : SharedTileAnomalySystem
         }
     }
 
-    private void SpawnTiles(Entity<TileSpawnAnomalyComponent> anomaly, TileSpawnSettingsEntry entry, float stability, float severity, float powerMod)
+    private void SpawnTiles(Entity<TileSpawnAnomalyComponent> anomaly,
+        TileSpawnSettingsEntry entry,
+        float stability,
+        float severity,
+        float powerMod)
     {
         var tiles = _anomaly.GetSpawningPoints(anomaly, stability, severity, entry.Settings, powerMod);
         if (tiles == null)

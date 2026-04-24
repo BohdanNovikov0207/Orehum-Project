@@ -90,9 +90,12 @@ public sealed partial class ExplosionSystem
     public bool SleepNodeSys { get; private set; }
     public bool IncrementalTileBreaking { get; private set; }
     public int SingleTickAreaLimit { get; private set; }
+
     public bool CanCreateVacuum { get; private set; }
+
     // Goob edit start
     public float PartVariation { get; private set; }
+
     public float WoundMultiplier { get; private set; }
     // Goob edit end
 

@@ -16,8 +16,6 @@ namespace Content.Server.Speech.EntitySystems;
 
 public sealed class RatvarianLanguageSystem : SharedRatvarianLanguageSystem
 {
-    [Dependency] private readonly StatusEffectsSystem _statusEffects = default!;
-
     private static readonly ProtoId<StatusEffectPrototype> RatvarianKey = "RatvarianLanguage";
 
     // This is the word of Ratvar and those who speak it shall abide by His rules:
@@ -31,24 +29,27 @@ public sealed class RatvarianLanguageSystem : SharedRatvarianLanguageSystem
      * Where the word "to" appears, it's linked to the following word by a hyphen: "to-use"
      * Where the word "my" appears, it's linked to the following word by a hyphen: "my-light"
      * Any Ratvarian proper noun is not translated: Ratvar, Nezbere, Sevtug, Nzcrentr and Inath-neq
-        * This only applies if they're being used as a proper noun: armorer/Nezbere
+     * This only applies if they're being used as a proper noun: armorer/Nezbere
      */
 
-    private static Regex THPattern = new Regex(@"th\w\B", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-    private static Regex ETPattern = new Regex(@"\Bet", RegexOptions.Compiled);
-    private static Regex TEPattern = new Regex(@"te\B",RegexOptions.Compiled);
-    private static Regex OFPattern = new Regex(@"(\s)(of)");
-    private static Regex TIPattern = new Regex(@"ti\B", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-    private static Regex GUAPattern = new Regex(@"(gu)(a)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-    private static Regex ANDPattern = new Regex(@"\b(\s)(and)(\s)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-    private static Regex TOMYPattern = new Regex(@"(to|my)\s", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-    private static Regex ProperNouns = new Regex(@"(ratvar)|(nezbere)|(sevtuq)|(nzcrentr)|(inath-neq)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+    private static readonly Regex THPattern = new(@"th\w\B", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+    private static readonly Regex ETPattern = new(@"\Bet", RegexOptions.Compiled);
+    private static readonly Regex TEPattern = new(@"te\B", RegexOptions.Compiled);
+    private static readonly Regex OFPattern = new(@"(\s)(of)");
+    private static readonly Regex TIPattern = new(@"ti\B", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+    private static readonly Regex GUAPattern = new(@"(gu)(a)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+    private static readonly Regex ANDPattern = new(@"\b(\s)(and)(\s)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+    private static readonly Regex TOMYPattern = new(@"(to|my)\s", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-    public override void Initialize()
-    {
+    private static readonly Regex ProperNouns = new(@"(ratvar)|(nezbere)|(sevtuq)|(nzcrentr)|(inath-neq)",
+        RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+    [Dependency] private readonly StatusEffectsSystem _statusEffects = default!;
+
+    public override void Initialize() =>
         // Activate before other modifications so translation works properly
-        SubscribeLocalEvent<RatvarianLanguageComponent, AccentGetEvent>(OnAccent, before: new[] {typeof(SharedSlurredSystem), typeof(SharedStutteringSystem)});
-    }
+        SubscribeLocalEvent<RatvarianLanguageComponent, AccentGetEvent>(OnAccent,
+            new[] { typeof(SharedSlurredSystem), typeof(SharedStutteringSystem) });
 
     public override void DoRatvarian(EntityUid uid, TimeSpan time, bool refresh, StatusEffectsComponent? status = null)
     {
@@ -58,10 +59,8 @@ public sealed class RatvarianLanguageSystem : SharedRatvarianLanguageSystem
         _statusEffects.TryAddStatusEffect<RatvarianLanguageComponent>(uid, RatvarianKey, time, refresh, status);
     }
 
-    private void OnAccent(EntityUid uid, RatvarianLanguageComponent component, AccentGetEvent args)
-    {
+    private void OnAccent(EntityUid uid, RatvarianLanguageComponent component, AccentGetEvent args) =>
         args.Message = Translate(args.Message);
-    }
 
     private string Translate(string message)
     {
@@ -89,7 +88,7 @@ public sealed class RatvarianLanguageSystem : SharedRatvarianLanguageSystem
 
             else
             {
-                for (int i = 0; i < word.Length; i++)
+                for (var i = 0; i < word.Length; i++)
                 {
                     var letter = word[i];
 
@@ -112,13 +111,13 @@ public sealed class RatvarianLanguageSystem : SharedRatvarianLanguageSystem
                         newWord.Append((char) letterRot);
                     }
                     else
-                    {
                         newWord.Append(word[i]);
-                    }
                 }
             }
+
             finalMessage.Append(newWord + " ");
         }
+
         return finalMessage.ToString().Trim();
     }
 }

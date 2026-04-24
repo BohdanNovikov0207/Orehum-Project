@@ -45,13 +45,9 @@ public sealed partial class VendingMachineContrabandWireAction : BaseToggleWireA
     public override void ToggleValue(EntityUid owner, bool setting)
     {
         if (EntityManager.TryGetComponent(owner, out VendingMachineComponent? vending))
-        {
             _vendingMachineSystem.SetContraband(owner, !vending.Contraband, vending);
-        }
     }
 
-    public override bool GetValue(EntityUid owner)
-    {
-        return EntityManager.TryGetComponent(owner, out VendingMachineComponent? vending) && !vending.Contraband;
-    }
+    public override bool GetValue(EntityUid owner) =>
+        EntityManager.TryGetComponent(owner, out VendingMachineComponent? vending) && !vending.Contraband;
 }

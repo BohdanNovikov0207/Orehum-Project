@@ -80,8 +80,8 @@
 using Content.Server.DeviceLinking.Systems;
 using Content.Server.Materials;
 using Content.Shared.Conveyor;
-using Content.Shared.DeviceLinking.Events;
 using Content.Shared.Destructible;
+using Content.Shared.DeviceLinking.Events;
 using Content.Shared.Maps;
 using Content.Shared.Physics;
 using Content.Shared.Physics.Controllers;
@@ -94,10 +94,10 @@ namespace Content.Server.Physics.Controllers;
 
 public sealed class ConveyorController : SharedConveyorController
 {
-    [Dependency] private readonly FixtureSystem _fixtures = default!;
-    [Dependency] private readonly DeviceLinkSystem _signalSystem = default!;
-    [Dependency] private readonly MaterialReclaimerSystem _materialReclaimer = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly FixtureSystem _fixtures = default!;
+    [Dependency] private readonly MaterialReclaimerSystem _materialReclaimer = default!;
+    [Dependency] private readonly DeviceLinkSystem _signalSystem = default!;
     [Dependency] private readonly TurfSystem _turf = default!;
 
     public override void Initialize()
@@ -122,10 +122,13 @@ public sealed class ConveyorController : SharedConveyorController
             var shape = new PolygonShape();
             shape.SetAsBox(0.55f, 0.55f);
 
-            _fixtures.TryCreateFixture(uid, shape, ConveyorFixture,
+            _fixtures.TryCreateFixture(uid,
+                shape,
+                ConveyorFixture,
                 collisionLayer: (int) (CollisionGroup.LowImpassable | CollisionGroup.MidImpassable |
-                                       CollisionGroup.Impassable), hard: false, body: physics);
-
+                                       CollisionGroup.Impassable),
+                hard: false,
+                body: physics);
         }
     }
 
@@ -140,10 +143,8 @@ public sealed class ConveyorController : SharedConveyorController
         _fixtures.DestroyFixture(uid, ConveyorFixture, body: physics);
     }
 
-    private void OnBreakage(Entity<ConveyorComponent> ent, ref BreakageEventArgs args)
-    {
+    private void OnBreakage(Entity<ConveyorComponent> ent, ref BreakageEventArgs args) =>
         SetState(ent, ConveyorState.Off, ent);
-    }
 
     private void OnPowerChanged(EntityUid uid, ConveyorComponent component, ref PowerChangedEvent args)
     {
@@ -152,10 +153,9 @@ public sealed class ConveyorController : SharedConveyorController
         Dirty(uid, component);
     }
 
-    private void UpdateAppearance(EntityUid uid, ConveyorComponent component)
-    {
-        _appearance.SetData(uid, ConveyorVisuals.State, component.Powered ? component.State : ConveyorState.Off);
-    }
+    private void UpdateAppearance(EntityUid uid, ConveyorComponent component) => _appearance.SetData(uid,
+        ConveyorVisuals.State,
+        component.Powered ? component.State : ConveyorState.Off);
 
     private void OnSignalReceived(EntityUid uid, ConveyorComponent component, ref SignalReceivedEvent args)
     {
@@ -163,14 +163,10 @@ public sealed class ConveyorController : SharedConveyorController
             SetState(uid, ConveyorState.Off, component);
 
         else if (args.Port == component.ForwardPort)
-        {
             SetState(uid, ConveyorState.Forward, component);
-        }
 
         else if (args.Port == component.ReversePort)
-        {
             SetState(uid, ConveyorState.Reverse, component);
-        }
     }
 
     private void SetState(EntityUid uid, ConveyorState state, ConveyorComponent? component = null)
@@ -184,9 +180,7 @@ public sealed class ConveyorController : SharedConveyorController
         component.State = state;
 
         if (state != ConveyorState.Off)
-        {
             WakeConveyed(uid);
-        }
 
         UpdateAppearance(uid, component);
         Dirty(uid, component);
@@ -208,7 +202,11 @@ public sealed class ConveyorController : SharedConveyorController
         if (beltTileRef != null)
         {
             Intersecting.Clear();
-            Lookup.GetLocalEntitiesIntersecting(beltTileRef.Value.GridUid, beltTileRef.Value.GridIndices, Intersecting, 0f, flags: LookupFlags.Dynamic | LookupFlags.Sundries | LookupFlags.Approximate);
+            Lookup.GetLocalEntitiesIntersecting(beltTileRef.Value.GridUid,
+                beltTileRef.Value.GridIndices,
+                Intersecting,
+                0f,
+                LookupFlags.Dynamic | LookupFlags.Sundries | LookupFlags.Approximate);
 
             foreach (var entity in Intersecting)
             {

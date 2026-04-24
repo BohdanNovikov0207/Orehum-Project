@@ -89,8 +89,8 @@ namespace Content.Server.Botany.Systems;
 public sealed class BotanySwabSystem : EntitySystem
 {
     [Dependency] private readonly SharedDoAfterSystem _doAfterSystem = default!;
-    [Dependency] private readonly PopupSystem _popupSystem = default!;
     [Dependency] private readonly MutationSystem _mutationSystem = default!;
+    [Dependency] private readonly PopupSystem _popupSystem = default!;
 
     public override void Initialize()
     {
@@ -124,7 +124,13 @@ public sealed class BotanySwabSystem : EntitySystem
         if (args.Target == null || !args.CanReach || !HasComp<PlantHolderComponent>(args.Target))
             return;
 
-        _doAfterSystem.TryStartDoAfter(new DoAfterArgs(EntityManager, args.User, swab.SwabDelay, new BotanySwabDoAfterEvent(), uid, target: args.Target, used: uid)
+        _doAfterSystem.TryStartDoAfter(new DoAfterArgs(EntityManager,
+            args.User,
+            swab.SwabDelay,
+            new BotanySwabDoAfterEvent(),
+            uid,
+            args.Target,
+            uid)
         {
             Broadcast = true,
             BreakOnMove = true,

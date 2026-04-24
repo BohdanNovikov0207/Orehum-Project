@@ -15,12 +15,12 @@ public sealed partial class FireControlServerComponent : Component
     public EntityUid? ConnectedGrid = null;
 
     [ViewVariables]
-    public HashSet<EntityUid> Controlled = new();
-
-    [ViewVariables]
     public HashSet<EntityUid> Consoles = new();
 
-    [ViewVariables, DataField]
+    [ViewVariables]
+    public HashSet<EntityUid> Controlled = new();
+
+    [ViewVariables] [DataField]
     public int ProcessingPower;
 
     [ViewVariables]

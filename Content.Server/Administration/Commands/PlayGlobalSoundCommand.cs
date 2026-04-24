@@ -5,18 +5,17 @@
 // SPDX-License-Identifier: MIT
 
 using System.Linq;
+using Content.Server.Administration.Logs;
 using Content.Server.Audio;
 using Content.Shared.Administration;
+using Content.Shared.Database;
 using Robust.Server.Player;
 using Robust.Shared.Audio;
 using Robust.Shared.Console;
 using Robust.Shared.ContentPack;
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
-
 // Goobstation - Admin Log
-using Content.Shared.Database;
-using Content.Server.Administration.Logs;
 
 
 namespace Content.Server.Administration.Commands;
@@ -24,13 +23,12 @@ namespace Content.Server.Administration.Commands;
 [AdminCommand(AdminFlags.Fun)]
 public sealed class PlayGlobalSoundCommand : IConsoleCommand
 {
+    // Goobstation - Admin Log
+    [Dependency] private readonly IAdminLogManager _adminLog = default!;
     [Dependency] private readonly IEntityManager _entManager = default!;
     [Dependency] private readonly IPlayerManager _playerManager = default!;
     [Dependency] private readonly IPrototypeManager _protoManager = default!;
     [Dependency] private readonly IResourceManager _res = default!;
-
-    // Goobstation - Admin Log
-    [Dependency] private readonly IAdminLogManager _adminLog = default!;
 
     public string Command => "playglobalsound";
     public string Description => Loc.GetString("play-global-sound-command-description");
@@ -41,10 +39,10 @@ public sealed class PlayGlobalSoundCommand : IConsoleCommand
         Filter filter;
         var audio = AudioParams.Default;
 
-        bool replay = true;
+        var replay = true;
 
         // Goobstation - Admin Log
-        var playerName = shell.Player as ICommonSession;
+        var playerName = shell.Player;
 
         switch (args.Length)
         {
@@ -99,7 +97,8 @@ public sealed class PlayGlobalSoundCommand : IConsoleCommand
 
                         if (!_playerManager.TryGetSessionByUsername(username, out var session))
                         {
-                            shell.WriteError(Loc.GetString("play-global-sound-command-player-not-found", ("username", username)));
+                            shell.WriteError(Loc.GetString("play-global-sound-command-player-not-found",
+                                ("username", username)));
                             continue;
                         }
 

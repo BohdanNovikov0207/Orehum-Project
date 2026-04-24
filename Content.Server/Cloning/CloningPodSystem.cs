@@ -4,7 +4,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Goobstation.Common.Cloning; // Goobstation
+using Content.Goobstation.Common.CCVar;
+using Content.Goobstation.Common.Cloning;
 using Content.Server.Atmos.EntitySystems;
 using Content.Server.Chat.Systems;
 using Content.Server.Cloning.Components;
@@ -14,9 +15,7 @@ using Content.Server.Fluids.EntitySystems;
 using Content.Server.Materials;
 using Content.Server.Popups;
 using Content.Server.Power.EntitySystems;
-using Content.Shared._EinsteinEngines.Silicon.Components;
 using Content.Shared.Atmos;
-using Content.Shared.CCVar;
 using Content.Shared.Chat;
 using Content.Shared.Chemistry.Components;
 using Content.Shared.Cloning;
@@ -37,38 +36,40 @@ using Robust.Shared.Containers;
 using Robust.Shared.Physics.Components;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
-using Content.Goobstation.Common.CCVar; // Goobstation
+// Goobstation
+
+// Goobstation
 
 namespace Content.Server.Cloning;
 
 public sealed class CloningPodSystem : EntitySystem
 {
-    [Dependency] private readonly DeviceLinkSystem _signalSystem = default!;
-    [Dependency] private readonly IPlayerManager _playerManager = null!;
-    [Dependency] private readonly EuiManager _euiManager = null!;
-    [Dependency] private readonly CloningConsoleSystem _cloningConsoleSystem = default!;
-    [Dependency] private readonly ContainerSystem _containerSystem = default!;
-    [Dependency] private readonly MobStateSystem _mobStateSystem = default!;
-    [Dependency] private readonly PowerReceiverSystem _powerReceiverSystem = default!;
-    [Dependency] private readonly IRobustRandom _robustRandom = default!;
-    [Dependency] private readonly AtmosphereSystem _atmosphereSystem = default!;
-    [Dependency] private readonly SharedTransformSystem _transformSystem = default!;
+    public const float EasyModeCloningCost = 0.7f;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
-    [Dependency] private readonly PuddleSystem _puddleSystem = default!;
-    [Dependency] private readonly ChatSystem _chatSystem = default!;
+    [Dependency] private readonly AtmosphereSystem _atmosphereSystem = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly IConfigurationManager _configManager = default!;
-    [Dependency] private readonly MaterialStorageSystem _material = default!;
-    [Dependency] private readonly PopupSystem _popupSystem = default!;
-    [Dependency] private readonly SharedMindSystem _mindSystem = default!;
+    [Dependency] private readonly ChatSystem _chatSystem = default!;
     [Dependency] private readonly CloningSystem _cloning = default!;
-    [Dependency] private readonly EmagSystem _emag = default!;
+    [Dependency] private readonly CloningConsoleSystem _cloningConsoleSystem = default!;
+    [Dependency] private readonly IConfigurationManager _configManager = default!;
+    [Dependency] private readonly ContainerSystem _containerSystem = default!;
     [Dependency] private readonly DamageableSystem _damage = default!; // Goobstation 
+    [Dependency] private readonly EmagSystem _emag = default!;
+    [Dependency] private readonly EuiManager _euiManager = null!;
+    [Dependency] private readonly MaterialStorageSystem _material = default!;
+    [Dependency] private readonly SharedMindSystem _mindSystem = default!;
+    [Dependency] private readonly MobStateSystem _mobStateSystem = default!;
+    [Dependency] private readonly IPlayerManager _playerManager = null!;
+    [Dependency] private readonly PopupSystem _popupSystem = default!;
+    [Dependency] private readonly PowerReceiverSystem _powerReceiverSystem = default!;
+    [Dependency] private readonly PuddleSystem _puddleSystem = default!;
+    [Dependency] private readonly IRobustRandom _robustRandom = default!;
+    [Dependency] private readonly DeviceLinkSystem _signalSystem = default!;
+    [Dependency] private readonly SharedTransformSystem _transformSystem = default!;
 
     // Goobstation - killed
     //public readonly Dictionary<MindComponent, EntityUid> ClonesWaitingForMind = new();
     public readonly ProtoId<CloningSettingsPrototype> SettingsId = "CloningPod";
-    public const float EasyModeCloningCost = 0.7f;
 
     public override void Initialize()
     {
@@ -109,7 +110,7 @@ public sealed class CloningPodSystem : EntitySystem
         if (!found)
             return;
 
-        _mindSystem.TransferTo(mindId, mob, ghostCheckOverride: true, mind: mind);
+        _mindSystem.TransferTo(mindId, mob, true, mind: mind);
         _mindSystem.UnVisit(mindId, mind);
     }
     // <Goobstation>
@@ -117,12 +118,13 @@ public sealed class CloningPodSystem : EntitySystem
     private void HandleMindAdded(EntityUid uid, BeingClonedComponent clonedComponent, MindAddedMessage message)
     {
         // <Goobstation>
-        if (clonedComponent.Original is {} original && Exists(original))
+        if (clonedComponent.Original is { } original && Exists(original))
         {
             var ev = new TransferredToCloneEvent(uid);
             RaiseLocalEvent(original, ref ev);
             clonedComponent.Original = null; // prevent multiple events from brain swaps
         }
+
         // </Goobstation>
         if (clonedComponent.Parent == EntityUid.Invalid ||
             !Exists(clonedComponent.Parent) ||
@@ -132,23 +134,28 @@ public sealed class CloningPodSystem : EntitySystem
             RemComp<BeingClonedComponent>(uid);
             return;
         }
+
         UpdateStatus(clonedComponent.Parent, CloningPodStatus.Cloning, cloningPodComponent);
     }
-    private void OnPortDisconnected(Entity<CloningPodComponent> ent, ref PortDisconnectedEvent args)
-    {
+
+    private void OnPortDisconnected(Entity<CloningPodComponent> ent, ref PortDisconnectedEvent args) =>
         ent.Comp.ConnectedConsole = null;
-    }
 
     private void OnAnchor(Entity<CloningPodComponent> ent, ref AnchorStateChangedEvent args)
     {
-        if (ent.Comp.ConnectedConsole == null || !TryComp<CloningConsoleComponent>(ent.Comp.ConnectedConsole, out var console))
+        if (ent.Comp.ConnectedConsole == null ||
+            !TryComp<CloningConsoleComponent>(ent.Comp.ConnectedConsole, out var console))
             return;
 
         if (args.Anchored)
         {
-            _cloningConsoleSystem.RecheckConnections(ent.Comp.ConnectedConsole.Value, ent.Owner, console.GeneticScanner, console);
+            _cloningConsoleSystem.RecheckConnections(ent.Comp.ConnectedConsole.Value,
+                ent.Owner,
+                console.GeneticScanner,
+                console);
             return;
         }
+
         _cloningConsoleSystem.UpdateUserInterface(ent.Comp.ConnectedConsole.Value, console);
     }
 
@@ -157,10 +164,15 @@ public sealed class CloningPodSystem : EntitySystem
         if (!args.IsInDetailsRange || !_powerReceiverSystem.IsPowered(ent.Owner))
             return;
 
-        args.PushMarkup(Loc.GetString("cloning-pod-biomass", ("number", _material.GetMaterialAmount(ent.Owner, ent.Comp.RequiredMaterial))));
+        args.PushMarkup(Loc.GetString("cloning-pod-biomass",
+            ("number", _material.GetMaterialAmount(ent.Owner, ent.Comp.RequiredMaterial))));
     }
 
-    public bool TryCloning(EntityUid uid, EntityUid bodyToClone, Entity<MindComponent> mindEnt, CloningPodComponent? clonePod, float failChanceModifier = 1)
+    public bool TryCloning(EntityUid uid,
+        EntityUid bodyToClone,
+        Entity<MindComponent> mindEnt,
+        CloningPodComponent? clonePod,
+        float failChanceModifier = 1)
     {
         if (!Resolve(uid, ref clonePod))
             return false;
@@ -196,7 +208,7 @@ public sealed class CloningPodSystem : EntitySystem
         if (!TryComp<PhysicsComponent>(bodyToClone, out var physics))
             return false;
 
-        var cloningCost = (int)Math.Round(physics.FixturesMass);
+        var cloningCost = (int) Math.Round(physics.FixturesMass);
 
         if (_configManager.GetCVar(GoobCVars.CloneBiomassEasyMode)) // Goobstation - Changed the cvar
             cloningCost = (int) Math.Round(cloningCost * EasyModeCloningCost);
@@ -207,7 +219,10 @@ public sealed class CloningPodSystem : EntitySystem
         if (biomassAmount < cloningCost)
         {
             if (clonePod.ConnectedConsole != null)
-                _chatSystem.TrySendInGameICMessage(clonePod.ConnectedConsole.Value, Loc.GetString("cloning-console-chat-error", ("units", cloningCost)), InGameICChatType.Speak, false);
+                _chatSystem.TrySendInGameICMessage(clonePod.ConnectedConsole.Value,
+                    Loc.GetString("cloning-console-chat-error", ("units", cloningCost)),
+                    InGameICChatType.Speak,
+                    false);
             return false;
         }
 
@@ -217,11 +232,14 @@ public sealed class CloningPodSystem : EntitySystem
         if (TryComp<DamageableComponent>(bodyToClone, out var damageable) &&
             damageable.Damage.DamageDict.TryGetValue("Cellular", out var cellularDmg))
         {
-            var chance = Math.Clamp((float)(cellularDmg / 100), 0, 1);
+            var chance = Math.Clamp((float) (cellularDmg / 100), 0, 1);
             chance *= failChanceModifier;
 
             if (cellularDmg > 0 && clonePod.ConnectedConsole != null)
-                _chatSystem.TrySendInGameICMessage(clonePod.ConnectedConsole.Value, Loc.GetString("cloning-console-cellular-warning", ("percent", Math.Round(100 - chance * 100))), InGameICChatType.Speak, false);
+                _chatSystem.TrySendInGameICMessage(clonePod.ConnectedConsole.Value,
+                    Loc.GetString("cloning-console-cellular-warning", ("percent", Math.Round(100 - chance * 100))),
+                    InGameICChatType.Speak,
+                    false);
 
             if (_robustRandom.Prob(chance))
             {
@@ -235,10 +253,16 @@ public sealed class CloningPodSystem : EntitySystem
         }
         // end of genetic damage checks
 
-        if (!_cloning.TryCloning(bodyToClone, _transformSystem.GetMapCoordinates(bodyToClone), SettingsId, out var mob)) // spawn a new body
+        if (!_cloning.TryCloning(bodyToClone,
+                _transformSystem.GetMapCoordinates(bodyToClone),
+                SettingsId,
+                out var mob)) // spawn a new body
         {
             if (clonePod.ConnectedConsole != null)
-                _chatSystem.TrySendInGameICMessage(clonePod.ConnectedConsole.Value, Loc.GetString("cloning-console-uncloneable-trait-error"), InGameICChatType.Speak, false);
+                _chatSystem.TrySendInGameICMessage(clonePod.ConnectedConsole.Value,
+                    Loc.GetString("cloning-console-uncloneable-trait-error"),
+                    InGameICChatType.Speak,
+                    false);
             return false;
         }
 
@@ -266,7 +290,7 @@ public sealed class CloningPodSystem : EntitySystem
     public override void Update(float frameTime)
     {
         var query = EntityQueryEnumerator<ActiveCloningPodComponent, CloningPodComponent>();
-        while (query.MoveNext(out var uid, out var _, out var cloning))
+        while (query.MoveNext(out var uid, out _, out var cloning))
         {
             if (!_powerReceiverSystem.IsPowered(uid))
                 continue;
@@ -308,7 +332,8 @@ public sealed class CloningPodSystem : EntitySystem
         if (!Resolve(uid, ref clonePod))
             return;
 
-        if (clonePod.BodyContainer.ContainedEntity is not { Valid: true } entity || clonePod.CloningProgress < clonePod.CloningTime)
+        if (clonePod.BodyContainer.ContainedEntity is not { Valid: true } entity ||
+            clonePod.CloningProgress < clonePod.CloningTime)
             return;
 
         _damage.TryChangeDamage(entity, clonePod.CloneDamage, true); // Goobstation - Damage the clone if successful
@@ -346,12 +371,13 @@ public sealed class CloningPodSystem : EntitySystem
             if (_robustRandom.Prob(0.2f))
                 i++;
         }
+
         _puddleSystem.TrySpillAt(uid, bloodSolution, out _);
 
         if (!HasComp<EmaggedComponent>(uid))
-        {
-            _material.SpawnMultipleFromMaterial(_robustRandom.Next(1, (int)(clonePod.UsedBiomass / 2.5)), clonePod.RequiredMaterial, Transform(uid).Coordinates);
-        }
+            _material.SpawnMultipleFromMaterial(_robustRandom.Next(1, (int) (clonePod.UsedBiomass / 2.5)),
+                clonePod.RequiredMaterial,
+                Transform(uid).Coordinates);
 
         clonePod.UsedBiomass = 0;
         RemCompDeferred<ActiveCloningPodComponent>(uid);

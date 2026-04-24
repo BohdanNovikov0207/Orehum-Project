@@ -3,14 +3,10 @@
 //
 // SPDX-License-Identifier: MIT
 
-using Content.Shared.TextScreen;
 using Content.Server.Screens.Components;
-using Content.Server.DeviceNetwork.Components;
-using Content.Server.DeviceNetwork.Systems;
-using Content.Shared.DeviceNetwork.Components;
 using Content.Shared.DeviceNetwork.Events;
+using Content.Shared.TextScreen;
 using Robust.Shared.Timing;
-
 
 namespace Content.Server.Screens.Systems;
 
@@ -19,8 +15,8 @@ namespace Content.Server.Screens.Systems;
 /// </summary>
 public sealed class ScreenSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _gameTiming = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearanceSystem = default!;
+    [Dependency] private readonly IGameTiming _gameTiming = default!;
 
     public override void Initialize()
     {
@@ -30,8 +26,8 @@ public sealed class ScreenSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Calls either a normal screen text update or shuttle timer update based on the presence of
-    ///     <see cref="ShuttleTimerMasks.ShuttleMap"/> in <see cref="args.Data"/>
+    /// Calls either a normal screen text update or shuttle timer update based on the presence of
+    /// <see cref="ShuttleTimerMasks.ShuttleMap" /> in <see cref="args.Data" />
     /// </summary>
     private void OnPacketReceived(EntityUid uid, ScreenComponent component, DeviceNetworkPacketEvent args)
     {
@@ -42,7 +38,7 @@ public sealed class ScreenSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Send a text update to every screen on the same MapUid as the originating comms console.
+    /// Send a text update to every screen on the same MapUid as the originating comms console.
     /// </summary>
     private void ScreenText(EntityUid uid, ScreenComponent component, DeviceNetworkPacketEvent args)
     {
@@ -60,7 +56,7 @@ public sealed class ScreenSystem : EntitySystem
             && screenMap == argsMap
             && args.Data.TryGetValue(ScreenMasks.Text, out string? text)
             && text != null
-            )
+           )
         {
             _appearanceSystem.SetData(uid, TextScreenVisuals.DefaultText, text);
             _appearanceSystem.SetData(uid, TextScreenVisuals.ScreenText, text);
@@ -70,7 +66,8 @@ public sealed class ScreenSystem : EntitySystem
     /// <summary>
     /// Determines if/how a timer packet affects this screen.
     /// Currently there are 2 broadcast domains: Arrivals, and every other screen.
-    /// Domain is determined by the <see cref="Shared.DeviceNetwork.Components.DeviceNetworkComponent.TransmitFrequencyId"/> on each timer.
+    /// Domain is determined by the <see cref="Shared.DeviceNetwork.Components.DeviceNetworkComponent.TransmitFrequencyId" />
+    /// on each timer.
     /// Each broadcast domain is divided into subnets. Screen MapUid determines subnet.
     /// Subnets are the shuttle, source, and dest. Source/dest change each jump.
     /// This is required to send different timers to the shuttle/terminal/station.
@@ -88,7 +85,7 @@ public sealed class ScreenSystem : EntitySystem
         args.Data.TryGetValue(ShuttleTimerMasks.SourceMap, out EntityUid? source);
         args.Data.TryGetValue(ShuttleTimerMasks.DestMap, out EntityUid? dest);
         args.Data.TryGetValue(ShuttleTimerMasks.Docked, out bool docked);
-        string text = docked ? ShuttleTimerMasks.ETD : ShuttleTimerMasks.ETA;
+        var text = docked ? ShuttleTimerMasks.ETD : ShuttleTimerMasks.ETA;
 
         switch (timerXform.MapUid)
         {

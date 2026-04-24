@@ -7,10 +7,10 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Linq;
 using Content.Shared.Body.Part;
 using Content.Shared.Body.Systems;
 using Content.Shared.Heretic.Prototypes;
-using System.Linq;
 
 namespace Content.Server.Heretic.Ritual;
 
@@ -43,8 +43,5 @@ public sealed partial class RitualBladeAscendBehavior : RitualSacrificeBehavior
         return true;
     }
 
-    public override void Finalize(RitualData args)
-    {
-        base.Finalize(args);
-    }
+    public override void Finalize(RitualData args) => base.Finalize(args);
 }

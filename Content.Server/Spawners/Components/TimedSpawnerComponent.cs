@@ -27,17 +27,9 @@ namespace Content.Server.Spawners.Components;
 /// Can configure the set of entities, spawn timing, spawn chance,
 /// and min/max number of entities to spawn.
 /// </summary>
-[RegisterComponent, EntityCategory("Spawner")]
+[RegisterComponent] [EntityCategory("Spawner")]
 public sealed partial class TimedSpawnerComponent : Component, ISerializationHooks
 {
-    /// <summary>
-    /// List of entities that can be spawned by this component. One will be randomly
-    /// chosen for each entity spawned. When multiple entities are spawned at once,
-    /// each will be randomly chosen separately.
-    /// </summary>
-    [DataField]
-    public List<EntProtoId> Prototypes = [];
-
     /// <summary>
     /// Chance of an entity being spawned at the end of each interval.
     /// </summary>
@@ -51,16 +43,24 @@ public sealed partial class TimedSpawnerComponent : Component, ISerializationHoo
     public int IntervalSeconds = 60;
 
     /// <summary>
+    /// The maximum number of entities that can be spawned when an interval elapses.
+    /// </summary>
+    [DataField]
+    public int MaximumEntitiesSpawned = 1;
+
+    /// <summary>
     /// The minimum number of entities that can be spawned when an interval elapses.
     /// </summary>
     [DataField]
     public int MinimumEntitiesSpawned = 1;
 
     /// <summary>
-    /// The maximum number of entities that can be spawned when an interval elapses.
+    /// List of entities that can be spawned by this component. One will be randomly
+    /// chosen for each entity spawned. When multiple entities are spawned at once,
+    /// each will be randomly chosen separately.
     /// </summary>
     [DataField]
-    public int MaximumEntitiesSpawned = 1;
+    public List<EntProtoId> Prototypes = [];
 
     public CancellationTokenSource? TokenSource;
 

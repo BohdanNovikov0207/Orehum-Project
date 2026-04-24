@@ -15,32 +15,31 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Linq;
 using Content.Server.Administration.Logs;
 using Content.Shared.Chemistry.Components;
+using Content.Shared.Chemistry.EntitySystems;
 using Content.Shared.Database;
 using Content.Shared.Examine;
 using Content.Shared.Payload.Components;
 using Content.Shared.Tag;
 using Content.Shared.Trigger;
-using Content.Shared.Chemistry.EntitySystems;
+using Robust.Server.GameObjects;
 using Robust.Shared.Containers;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization.Manager;
 using Robust.Shared.Utility;
-using System.Linq;
-using Robust.Server.GameObjects;
-using Robust.Shared.Prototypes;
 
 namespace Content.Server.Payload.EntitySystems;
 
 public sealed class PayloadSystem : EntitySystem
 {
-    [Dependency] private readonly TagSystem _tagSystem = default!;
-    [Dependency] private readonly SharedSolutionContainerSystem _solutionContainerSystem = default!;
-    [Dependency] private readonly TransformSystem _transform = default!;
+    private static readonly ProtoId<TagPrototype> PayloadTag = "Payload";
     [Dependency] private readonly IAdminLogManager _adminLogger = default!;
     [Dependency] private readonly ISerializationManager _serializationManager = default!;
-
-    private static readonly ProtoId<TagPrototype> PayloadTag = "Payload";
+    [Dependency] private readonly SharedSolutionContainerSystem _solutionContainerSystem = default!;
+    [Dependency] private readonly TagSystem _tagSystem = default!;
+    [Dependency] private readonly TransformSystem _transform = default!;
 
     public override void Initialize()
     {
@@ -79,7 +78,7 @@ public sealed class PayloadSystem : EntitySystem
         // Pass trigger event onto all contained payloads. Payload capacity configurable by construction graphs.
         foreach (var ent in GetAllPayloads(uid, contMan))
         {
-            RaiseLocalEvent(ent, ref args, false);
+            RaiseLocalEvent(ent, ref args);
         }
     }
 
@@ -155,13 +154,9 @@ public sealed class PayloadSystem : EntitySystem
             }
 
             if (GetAllPayloads(uid).Any())
-            {
                 args.PushMarkup(Loc.GetString("payload-case-has-payload", ("ent", uid)));
-            }
             else
-            {
                 args.PushMarkup(Loc.GetString("payload-case-does-not-have-payload", ("ent", uid)));
-            }
         }
     }
 
@@ -178,9 +173,7 @@ public sealed class PayloadSystem : EntitySystem
             || !_solutionContainerSystem.TryGetSolution(beakerB, compB.Solution, out var solnB, out var solutionB)
             || solutionA.Volume == 0
             || solutionB.Volume == 0)
-        {
             return;
-        }
 
         var solStringA = SharedSolutionContainerSystem.ToPrettyString(solutionA);
         var solStringB = SharedSolutionContainerSystem.ToPrettyString(solutionB);
@@ -193,7 +186,8 @@ public sealed class PayloadSystem : EntitySystem
         _solutionContainerSystem.RemoveAllSolution(solnB.Value);
 
         // The grenade might be a dud. Redistribute solution:
-        var tmpSol = _solutionContainerSystem.SplitSolution(solnA.Value, solutionA.Volume * solutionB.MaxVolume / solutionA.MaxVolume);
+        var tmpSol = _solutionContainerSystem.SplitSolution(solnA.Value,
+            solutionA.Volume * solutionB.MaxVolume / solutionA.MaxVolume);
         _solutionContainerSystem.TryAddSolution(solnB.Value, tmpSol);
         solutionA.MaxVolume -= solutionB.MaxVolume;
         _solutionContainerSystem.UpdateChemicals(solnA.Value);

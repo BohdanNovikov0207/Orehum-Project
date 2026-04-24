@@ -10,21 +10,16 @@ using Content.Server.Stunnable;
 using Content.Shared._EinsteinEngines.TelescopicBaton;
 using Content.Shared.Mobs.Systems;
 using Content.Shared.Silicons.Borgs.Components;
-using Content.Shared.StatusEffect;
-using Content.Shared.Stunnable;
 using Content.Shared.Weapons.Melee.Events;
 
 namespace Content.Server._EinsteinEngines.TelescopicBaton;
 
 public sealed class KnockdownOnHitSystem : EntitySystem
 {
-    [Dependency] private readonly StunSystem _stun = default!;
     [Dependency] private readonly MobStateSystem _mobState = default!; // Goobstation
+    [Dependency] private readonly StunSystem _stun = default!;
 
-    public override void Initialize()
-    {
-        SubscribeLocalEvent<KnockdownOnHitComponent, MeleeHitEvent>(OnMeleeHit);
-    }
+    public override void Initialize() => SubscribeLocalEvent<KnockdownOnHitComponent, MeleeHitEvent>(OnMeleeHit);
 
     private void OnMeleeHit(Entity<KnockdownOnHitComponent> entity, ref MeleeHitEvent args)
     {
@@ -46,11 +41,11 @@ public sealed class KnockdownOnHitSystem : EntitySystem
                  args.HitEntities.Where(e => !HasComp<BorgChassisComponent>(e) && _mobState.IsAlive(e))) // Goob edit
         {
             if (_stun.TryKnockdown(target,
-                entity.Comp.Duration,
-                entity.Comp.RefreshDuration,
-                true,
-                dropItems,
-                entity.Comp.Autostand)) // goob edit
+                    entity.Comp.Duration,
+                    entity.Comp.RefreshDuration,
+                    true,
+                    dropItems,
+                    entity.Comp.Autostand)) // goob edit
                 knockedDown.Add(target);
         }
 

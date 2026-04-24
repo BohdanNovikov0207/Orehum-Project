@@ -15,40 +15,44 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Shared._CorvaxNext.Silicons.Borgs.Components;
+using Content.Shared._Imp.Drone;
 using Content.Shared.DeviceNetwork;
+using Content.Shared.DeviceNetwork.Components;
+using Content.Shared.DeviceNetwork.Events;
+using Content.Shared.Emag.Systems;
 using Content.Shared.Movement.Components;
 using Content.Shared.Popups;
 using Content.Shared.Robotics;
 using Content.Shared.Silicons.Borgs.Components;
-using Content.Shared.DeviceNetwork.Components;
-using Content.Shared.DeviceNetwork.Events;
-using Content.Shared.Emag.Systems;
+using Robust.Shared.Player;
 using Robust.Shared.Utility;
-using Content.Shared._Imp.Drone; //Goobstation drone
-using Robust.Shared.Player; //Goobstation drone
-using Content.Shared._CorvaxNext.Silicons.Borgs.Components; // Corvax-Next-AiRemoteControl
+//Goobstation drone
+//Goobstation drone
+
+// Corvax-Next-AiRemoteControl
 
 namespace Content.Server.Silicons.Borgs;
 
-/// <inheritdoc/>
+/// <inheritdoc />
 public sealed partial class BorgSystem
 {
     [Dependency] private readonly EmagSystem _emag = default!;
 
-    private void InitializeTransponder()
-    {
+    private void InitializeTransponder() =>
         SubscribeLocalEvent<BorgTransponderComponent, DeviceNetworkPacketEvent>(OnPacketReceived);
-    }
 
     public override void Update(float frameTime)
     {
         base.Update(frameTime);
 
         var now = _timing.CurTime;
-        var query = EntityQueryEnumerator<BorgTransponderComponent, BorgChassisComponent, DeviceNetworkComponent, MetaDataComponent>();
+        var query =
+            EntityQueryEnumerator<BorgTransponderComponent, BorgChassisComponent, DeviceNetworkComponent,
+                MetaDataComponent>();
         while (query.MoveNext(out var uid, out var comp, out var chassis, out var device, out var meta))
         {
-            if (comp.NextDisable is {} nextDisable && now >= nextDisable)
+            if (comp.NextDisable is { } nextDisable && now >= nextDisable)
                 DoDisable((uid, comp, chassis, meta));
 
             if (now < comp.NextBroadcast)
@@ -70,18 +74,21 @@ public sealed partial class BorgSystem
                 canDisable,
                 HasComp<AiRemoteControllerComponent>(uid)); // Corvax-Next-AiRemoteControl
 
-            var payload = new NetworkPayload()
+            var payload = new NetworkPayload
             {
                 [DeviceNetworkConstants.Command] = DeviceNetworkConstants.CmdUpdatedState,
-                [RoboticsConsoleConstants.NET_CYBORG_DATA] = data
+                [RoboticsConsoleConstants.NET_CYBORG_DATA] = data,
             };
             _deviceNetwork.QueuePacket(uid, null, payload, device: device);
 
             comp.NextBroadcast = now + comp.BroadcastDelay;
         }
+
         //Goobstation Drone transponder start
-        var query2 = EntityQueryEnumerator<BorgTransponderComponent, DroneComponent, DeviceNetworkComponent, MetaDataComponent>();
-        while (query2.MoveNext(out var uid, out  var comp, out var drone, out var device, out var  meta))
+        var query2 =
+            EntityQueryEnumerator<BorgTransponderComponent, DroneComponent, DeviceNetworkComponent,
+                MetaDataComponent>();
+        while (query2.MoveNext(out var uid, out var comp, out var drone, out var device, out var meta))
         {
             if (now < comp.NextBroadcast)
                 continue;
@@ -96,10 +103,10 @@ public sealed partial class BorgSystem
                 false, // Corvax-Next-AiRemoteControl
                 false);
 
-            var payload = new NetworkPayload()
+            var payload = new NetworkPayload
             {
                 [DeviceNetworkConstants.Command] = DeviceNetworkConstants.CmdUpdatedState,
-                [RoboticsConsoleConstants.NET_CYBORG_DATA] = data
+                [RoboticsConsoleConstants.NET_CYBORG_DATA] = data,
             };
             _deviceNetwork.QueuePacket(uid, null, payload, device: device);
 
@@ -118,7 +125,7 @@ public sealed partial class BorgSystem
             return;
         }
 
-        if (ent.Comp2.BrainEntity is not {} brain)
+        if (ent.Comp2.BrainEntity is not { } brain)
             return;
 
         var message = Loc.GetString(ent.Comp1.DisabledPopup, ("name", Name(ent, ent.Comp3)));
@@ -177,7 +184,10 @@ public sealed partial class BorgSystem
     {
         if (_emag.CheckFlag(uid, EmagType.Interaction))
         {
-            Popup.PopupEntity(Loc.GetString($"borg-transponder-emagged-{name}-popup"), uid, uid, PopupType.LargeCaution);
+            Popup.PopupEntity(Loc.GetString($"borg-transponder-emagged-{name}-popup"),
+                uid,
+                uid,
+                PopupType.LargeCaution);
             return true;
         }
 
@@ -185,18 +195,13 @@ public sealed partial class BorgSystem
     }
 
     /// <summary>
-    /// Sets <see cref="BorgTransponderComponent.Sprite"/>.
+    /// Sets <see cref="BorgTransponderComponent.Sprite" />.
     /// </summary>
-    public void SetTransponderSprite(Entity<BorgTransponderComponent> ent, SpriteSpecifier sprite)
-    {
+    public void SetTransponderSprite(Entity<BorgTransponderComponent> ent, SpriteSpecifier sprite) =>
         ent.Comp.Sprite = sprite;
-    }
 
     /// <summary>
-    /// Sets <see cref="BorgTransponderComponent.Name"/>.
+    /// Sets <see cref="BorgTransponderComponent.Name" />.
     /// </summary>
-    public void SetTransponderName(Entity<BorgTransponderComponent> ent, string name)
-    {
-        ent.Comp.Name = name;
-    }
+    public void SetTransponderName(Entity<BorgTransponderComponent> ent, string name) => ent.Comp.Name = name;
 }

@@ -23,15 +23,11 @@
 using System.Linq;
 using Content.Server.Administration.Managers;
 using Content.Server.Antag;
-using Content.Server.Antag.Components;
-using Content.Server.Players.PlayTimeTracking;
 using Content.Server.Station.Components;
 using Content.Server.Station.Events;
 using Content.Shared.Preferences;
 using Content.Shared.Roles;
-using Robust.Server.Player;
 using Robust.Shared.Network;
-using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Utility;
@@ -41,15 +37,16 @@ namespace Content.Server.Station.Systems;
 // Contains code for round-start spawning.
 public sealed partial class StationJobsSystem
 {
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-    [Dependency] private readonly IBanManager _banManager = default!;
     [Dependency] private readonly AntagSelectionSystem _antag = default!;
+    [Dependency] private readonly IBanManager _banManager = default!;
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
 
     private Dictionary<int, HashSet<string>> _jobsByWeight = default!;
     private List<int> _orderedWeights = default!;
 
     /// <summary>
-    /// Sets up some tables used by AssignJobs, including jobs sorted by their weights, and a list of weights in order from highest to lowest.
+    /// Sets up some tables used by AssignJobs, including jobs sorted by their weights, and a list of weights in order from
+    /// highest to lowest.
     /// </summary>
     private void InitializeRoundStart()
     {
@@ -71,21 +68,28 @@ public sealed partial class StationJobsSystem
     /// </summary>
     /// <param name="profiles">The profiles to use for selection.</param>
     /// <param name="stations">List of stations to assign for.</param>
-    /// <param name="useRoundStartJobs">Whether or not to use the round-start jobs for the stations instead of their current jobs.</param>
+    /// <param name="useRoundStartJobs">
+    /// Whether or not to use the round-start jobs for the stations instead of their current
+    /// jobs.
+    /// </param>
     /// <returns>List of players and their assigned jobs.</returns>
     /// <remarks>
     /// You probably shouldn't use useRoundStartJobs mid-round if the station has been available to join,
     /// as there may end up being more round-start slots than available slots, which can cause weird behavior.
-    /// A warning to all who enter ye cursed lands: This function is long and mildly incomprehensible. Best used without touching.
+    /// A warning to all who enter ye cursed lands: This function is long and mildly incomprehensible. Best used without
+    /// touching.
     /// </remarks>
-    public Dictionary<NetUserId, (ProtoId<JobPrototype>?, EntityUid)> AssignJobs(Dictionary<NetUserId, HumanoidCharacterProfile> profiles, IReadOnlyList<EntityUid> stations, bool useRoundStartJobs = true)
+    public Dictionary<NetUserId, (ProtoId<JobPrototype>?, EntityUid)> AssignJobs(
+        Dictionary<NetUserId, HumanoidCharacterProfile> profiles,
+        IReadOnlyList<EntityUid> stations,
+        bool useRoundStartJobs = true)
     {
         DebugTools.Assert(stations.Count > 0);
 
         InitializeRoundStart();
 
         if (profiles.Count == 0)
-            return new();
+            return new Dictionary<NetUserId, (ProtoId<JobPrototype>?, EntityUid)>();
 
         // We need to modify this collection later, so make a copy of it.
         profiles = profiles.ShallowClone();
@@ -98,13 +102,9 @@ public sealed partial class StationJobsSystem
         foreach (var station in stations)
         {
             if (useRoundStartJobs)
-            {
                 stationJobs.Add(station, GetRoundStartJobs(station).ToDictionary(x => x.Key, x => x.Value));
-            }
             else
-            {
                 stationJobs.Add(station, GetJobs(station).ToDictionary(x => x.Key, x => x.Value));
-            }
         }
 
 
@@ -201,8 +201,8 @@ public sealed partial class StationJobsSystem
                 {
                     stationTotalSlots.Add(
                         station,
-                        (int)jobs.Values.Sum(x => x ?? 1)
-                        );
+                        jobs.Values.Sum(x => x ?? 1)
+                    );
                 }
 
                 var totalSlots = 0;
@@ -227,7 +227,8 @@ public sealed partial class StationJobsSystem
                 foreach (var station in stations)
                 {
                     // Calculates the percent share then multiplies.
-                    stationShares[station] = (int)Math.Floor(((float)stationTotalSlots[station] / totalSlots) * candidates.Count);
+                    stationShares[station] =
+                        (int) Math.Floor((float) stationTotalSlots[station] / totalSlots * candidates.Count);
                     distributed += stationShares[station];
                 }
 
@@ -284,6 +285,7 @@ public sealed partial class StationJobsSystem
                         }
                     } while (priorCount != stationShares[station]);
                 }
+
                 done: ;
             }
         }
@@ -312,9 +314,7 @@ public sealed partial class StationJobsSystem
         foreach (var player in allPlayersToAssign)
         {
             if (assignedJobs.ContainsKey(player))
-            {
                 continue;
-            }
 
             var profile = profiles[player];
             if (profile.PreferenceUnavailable != PreferenceUnavailableMode.SpawnAsOverflow)
@@ -354,7 +354,8 @@ public sealed partial class StationJobsSystem
             jobs.ExtendedAccess = count <= thresh;
 
             Log.Debug("Station {Station} on extended access: {ExtendedAccess}",
-                Name(station), jobs.ExtendedAccess);
+                Name(station),
+                jobs.ExtendedAccess);
         }
     }
 
@@ -365,14 +366,15 @@ public sealed partial class StationJobsSystem
     /// <param name="selectedPriority">Priority to find, if any.</param>
     /// <param name="profiles">Profiles to look in.</param>
     /// <returns>Players and a list of their matching jobs.</returns>
-    private Dictionary<NetUserId, List<string>> GetPlayersJobCandidates(int? weight, JobPriority? selectedPriority, Dictionary<NetUserId, HumanoidCharacterProfile> profiles)
+    private Dictionary<NetUserId, List<string>> GetPlayersJobCandidates(int? weight,
+        JobPriority? selectedPriority,
+        Dictionary<NetUserId, HumanoidCharacterProfile> profiles)
     {
         var outputDict = new Dictionary<NetUserId, List<string>>(profiles.Count);
         var antagBlacklists = _antag.GetPreSelectedAntagSessionsWithBlacklist(); //GOOBSTATION
 
         foreach (var (player, profile) in profiles)
         {
-
             var roleBans = _banManager.GetJobBans(player);
             var antagBlocked = _antag.GetPreSelectedAntagSessions();
             var profileJobs = profile.JobPriorities.Keys.Select(k => new ProtoId<JobPrototype>(k)).ToList();
@@ -392,13 +394,15 @@ public sealed partial class StationJobsSystem
                     continue;
 
                 // Check if this job is blacklisted for the player's session || GOOBSTATION
-                if (_player.TryGetSessionById(player, out var session) && antagBlacklists.TryGetValue(session, out var blacklistedJobs))
+                if (_player.TryGetSessionById(player, out var session) &&
+                    antagBlacklists.TryGetValue(session, out var blacklistedJobs))
                 {
                     if (blacklistedJobs.Contains(jobId))
                         continue;
                 }
 
-                if (!job.CanBeAntag && (!_player.TryGetSessionById(player, out session) || antagBlocked.Contains(session)))
+                if (!job.CanBeAntag &&
+                    (!_player.TryGetSessionById(player, out session) || antagBlocked.Contains(session)))
                     continue;
 
                 if (weight is not null && job.Weight != weight.Value)

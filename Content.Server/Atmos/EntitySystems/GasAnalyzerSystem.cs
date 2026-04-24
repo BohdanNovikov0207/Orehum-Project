@@ -26,13 +26,11 @@
 
 using System.Linq;
 using Content.Server.Atmos.Components;
-using Content.Server.NodeContainer;
 using Content.Server.NodeContainer.Nodes;
 using Content.Server.Popups;
 using Content.Shared.Atmos;
 using Content.Shared.Atmos.Components;
 using Content.Shared.Interaction;
-using Content.Shared.Interaction.Events;
 using Content.Shared.NodeContainer;
 using JetBrains.Annotations;
 using Robust.Server.GameObjects;
@@ -43,16 +41,16 @@ namespace Content.Server.Atmos.EntitySystems;
 [UsedImplicitly]
 public sealed class GasAnalyzerSystem : EntitySystem
 {
-    [Dependency] private readonly PopupSystem _popup = default!;
-    [Dependency] private readonly AtmosphereSystem _atmo = default!;
-    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
-    [Dependency] private readonly UserInterfaceSystem _userInterface = default!;
-    [Dependency] private readonly SharedInteractionSystem _interactionSystem = default!;
-
     /// <summary>
     /// Minimum moles of a gas to be sent to the client.
     /// </summary>
     private const float UIMinMoles = 0.01f;
+
+    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly AtmosphereSystem _atmo = default!;
+    [Dependency] private readonly SharedInteractionSystem _interactionSystem = default!;
+    [Dependency] private readonly PopupSystem _popup = default!;
+    [Dependency] private readonly UserInterfaceSystem _userInterface = default!;
 
     public override void Initialize()
     {
@@ -60,11 +58,12 @@ public sealed class GasAnalyzerSystem : EntitySystem
 
         SubscribeLocalEvent<GasAnalyzerComponent, AfterInteractEvent>(OnAfterInteract);
 
-        Subs.BuiEvents<GasAnalyzerComponent>(GasAnalyzerUiKey.Key, subs =>
-        {
-            subs.Event<BoundUIOpenedEvent>(OnBoundUIOpened);
-            subs.Event<BoundUIClosedEvent>(OnBoundUIClosed);
-        });
+        Subs.BuiEvents<GasAnalyzerComponent>(GasAnalyzerUiKey.Key,
+            subs =>
+            {
+                subs.Event<BoundUIOpenedEvent>(OnBoundUIOpened);
+                subs.Event<BoundUIClosedEvent>(OnBoundUIClosed);
+            });
     }
 
     public override void Update(float frameTime)
@@ -86,15 +85,14 @@ public sealed class GasAnalyzerSystem : EntitySystem
     }
 
     /// <summary>
-    /// Activates the analyzer when used in the world, scanning the target entity (if it exists) and the tile the analyzer is in
+    /// Activates the analyzer when used in the world, scanning the target entity (if it exists) and the tile the analyzer is
+    /// in
     /// </summary>
     private void OnAfterInteract(Entity<GasAnalyzerComponent> entity, ref AfterInteractEvent args)
     {
         var target = args.Target;
         if (target != null && !_interactionSystem.InRangeUnobstructed((args.User, null), (target.Value, null)))
-        {
             target = null; // if the target is out of reach, invalidate it
-        }
         // always run the analyzer, regardless of weather or not there is a target
         // since we can always show the local environment.
         ActivateAnalyzer(entity, args.User, target);
@@ -141,9 +139,7 @@ public sealed class GasAnalyzerSystem : EntitySystem
     {
         if (HasComp<ActiveGasAnalyzerComponent>(entity.Owner)
             && !_userInterface.IsUiOpen(entity.Owner, args.UiKey))
-        {
             DisableAnalyzer(entity, args.Actor);
-        }
     }
 
     /// <summary>
@@ -153,13 +149,12 @@ public sealed class GasAnalyzerSystem : EntitySystem
     {
         if (!HasComp<ActiveGasAnalyzerComponent>(entity.Owner)
             && _userInterface.IsUiOpen(entity.Owner, args.UiKey))
-        {
             ActivateAnalyzer(entity, args.Actor);
-        }
     }
 
     /// <summary>
-    /// Fetches fresh data for the analyzer. Should only be called by Update or when the user requests an update via refresh button
+    /// Fetches fresh data for the analyzer. Should only be called by Update or when the user requests an update via refresh
+    /// button
     /// </summary>
     private bool UpdateAnalyzer(EntityUid uid, GasAnalyzerComponent? component = null)
     {
@@ -187,7 +182,10 @@ public sealed class GasAnalyzerSystem : EntitySystem
         var tileMixture = _atmo.GetContainingMixture(uid, true);
         if (tileMixture != null)
         {
-            gasMixList.Add(new GasMixEntry(Loc.GetString("gas-analyzer-window-environment-tab-label"), tileMixture.Volume, tileMixture.Pressure, tileMixture.Temperature,
+            gasMixList.Add(new GasMixEntry(Loc.GetString("gas-analyzer-window-environment-tab-label"),
+                tileMixture.Volume,
+                tileMixture.Pressure,
+                tileMixture.Temperature,
                 GenerateGasEntryArray(tileMixture)));
         }
         else
@@ -218,7 +216,11 @@ public sealed class GasAnalyzerSystem : EntitySystem
                 {
                     if (mixes.Item2 != null)
                     {
-                        gasMixList.Add(new GasMixEntry(mixes.Item1, mixes.Item2.Volume, mixes.Item2.Pressure, mixes.Item2.Temperature, GenerateGasEntryArray(mixes.Item2)));
+                        gasMixList.Add(new GasMixEntry(mixes.Item1,
+                            mixes.Item2.Volume,
+                            mixes.Item2.Pressure,
+                            mixes.Item2.Temperature,
+                            GenerateGasEntryArray(mixes.Item2)));
                         validTarget = true;
                     }
                 }
@@ -241,7 +243,11 @@ public sealed class GasAnalyzerSystem : EntitySystem
                             var pipeAir = pipeNode.Air.Clone();
                             pipeAir.Multiply(pipeNode.Volume / pipeNode.Air.Volume);
                             pipeAir.Volume = pipeNode.Volume;
-                            gasMixList.Add(new GasMixEntry(pair.Key, pipeAir.Volume, pipeAir.Pressure, pipeAir.Temperature, GenerateGasEntryArray(pipeAir)));
+                            gasMixList.Add(new GasMixEntry(pair.Key,
+                                pipeAir.Volume,
+                                pipeAir.Pressure,
+                                pipeAir.Temperature,
+                                GenerateGasEntryArray(pipeAir)));
                             validTarget = true;
                         }
                     }
@@ -251,16 +257,15 @@ public sealed class GasAnalyzerSystem : EntitySystem
             // If the target doesn't actually have any gas mixes to add,
             // invalidate it as the target
             if (!validTarget)
-            {
                 component.Target = null;
-            }
         }
 
         // Don't bother sending a UI message with no content, and stop updating I guess?
         if (gasMixList.Count == 0)
             return false;
 
-        _userInterface.ServerSendUiMessage(uid, GasAnalyzerUiKey.Key,
+        _userInterface.ServerSendUiMessage(uid,
+            GasAnalyzerUiKey.Key,
             new GasAnalyzerUserMessage(gasMixList.ToArray(),
                 component.Target != null ? Name(component.Target.Value) : string.Empty,
                 GetNetEntity(component.Target) ?? NetEntity.Invalid,
@@ -304,12 +309,13 @@ public sealed class GasAnalyzerSystem : EntitySystem
 public sealed class GasAnalyzerScanEvent : EntityEventArgs
 {
     /// <summary>
-    /// The string is for the name (ex "pipe", "inlet", "filter"), GasMixture for the corresponding gas mix. Add all mixes that should be reported when scanned.
-    /// </summary>
-    public List<(string, GasMixture?)>? GasMixtures;
-
-    /// <summary>
     /// If the device is flipped. Flipped is defined as when the inline input is 90 degrees CW to the side input
     /// </summary>
     public bool DeviceFlipped;
+
+    /// <summary>
+    /// The string is for the name (ex "pipe", "inlet", "filter"), GasMixture for the corresponding gas mix. Add all mixes that
+    /// should be reported when scanned.
+    /// </summary>
+    public List<(string, GasMixture?)>? GasMixtures;
 }

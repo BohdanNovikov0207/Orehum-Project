@@ -19,7 +19,11 @@ namespace Content.Server._Lavaland.Procedural.Systems;
 
 public sealed partial class LavalandSystem
 {
-    private void SetupRuins(LavalandRuinPoolPrototype? pool, Entity<LavalandMapComponent> lavaland, Entity<LavalandPreloaderComponent> preloader)
+    private readonly List<(Vector2i, Tile)> _tiles = new();
+
+    private void SetupRuins(LavalandRuinPoolPrototype? pool,
+        Entity<LavalandMapComponent> lavaland,
+        Entity<LavalandPreloaderComponent> preloader)
     {
         if (pool == null)
             return; // nothing to spawn
@@ -74,7 +78,8 @@ public sealed partial class LavalandSystem
                 if (attempts <= ruin.SpawnAttempts)
                     continue;
 
-                Log.Warning($"Failed to spawn GridRuin {ruin.ID} on {ToPrettyString(lavaland)} surface! All {ruin.SpawnAttempts} attempts have failed.");
+                Log.Warning(
+                    $"Failed to spawn GridRuin {ruin.ID} on {ToPrettyString(lavaland)} surface! All {ruin.SpawnAttempts} attempts have failed.");
                 break;
             }
         }
@@ -165,7 +170,8 @@ public sealed partial class LavalandSystem
         // If any used boundary intersects with current boundary, return
         if (usedSpace.Any(used => used.Intersects(ruinBox)))
         {
-            Log.Debug($"Ruin {ruin.ID} can't be placed on picked coordinates {coord.ToString()} on {ToPrettyString(lavaland)} planet, skipping spawn.");
+            Log.Debug(
+                $"Ruin {ruin.ID} can't be placed on picked coordinates {coord.ToString()} on {ToPrettyString(lavaland)} planet, skipping spawn.");
             return false;
         }
 
@@ -189,7 +195,8 @@ public sealed partial class LavalandSystem
             }
         }
 
-        Log.Debug($"Successfully spawned ruin {ruin.ID} on {ToPrettyString(lavaland)} planet surface at coordinates {coord.ToString()}");
+        Log.Debug(
+            $"Successfully spawned ruin {ruin.ID} on {ToPrettyString(lavaland)} planet surface at coordinates {coord.ToString()}");
         return true;
     }
 
@@ -254,7 +261,8 @@ public sealed partial class LavalandSystem
         return coords;
     }
 
-    private List<LavalandGridRuinPrototype> GetGridRuinProtos(Dictionary<ProtoId<LavalandGridRuinPrototype>, ushort> protos)
+    private List<LavalandGridRuinPrototype> GetGridRuinProtos(
+        Dictionary<ProtoId<LavalandGridRuinPrototype>, ushort> protos)
     {
         var list = new List<LavalandGridRuinPrototype>();
 
@@ -270,7 +278,8 @@ public sealed partial class LavalandSystem
         return list;
     }
 
-    private List<LavalandDungeonRuinPrototype> GetDungeonRuinProtos(Dictionary<ProtoId<LavalandDungeonRuinPrototype>, ushort> protos)
+    private List<LavalandDungeonRuinPrototype> GetDungeonRuinProtos(
+        Dictionary<ProtoId<LavalandDungeonRuinPrototype>, ushort> protos)
     {
         var list = new List<LavalandDungeonRuinPrototype>();
         foreach (var (protoId, count) in protos)
@@ -284,8 +293,6 @@ public sealed partial class LavalandSystem
 
         return list;
     }
-
-    private readonly List<(Vector2i, Tile)> _tiles = new();
 
     /// <summary>
     /// Tricky and sneaky method that patches some grid to a lavaland planet
@@ -350,17 +357,11 @@ public sealed partial class LavalandSystem
                 // Yeah idk about the uhh vectors here but it looked visually okay but they may still be off by 1.
                 // Also EyeManager.PixelsPerMeter should really be in shared.
                 if (angle.Equals(Math.PI))
-                {
                     position += new Vector2(-1f / 32f, 1f / 32f);
-                }
                 else if (angle.Equals(-Math.PI / 2f))
-                {
                     position += new Vector2(-1f / 32f, 0f);
-                }
                 else if (angle.Equals(Math.PI / 2f))
-                {
                     position += new Vector2(0f, 1f / 32f);
-                }
                 else if (angle.Equals(Math.PI * 1.5f))
                 {
                     // I hate this but decals are bottom-left rather than center position and doing the
@@ -368,9 +369,7 @@ public sealed partial class LavalandSystem
                     // field for 1 specific op on decals
                     if (decal.Id != "DiagonalCheckerAOverlay" &&
                         decal.Id != "DiagonalCheckerBOverlay")
-                    {
                         position += new Vector2(-1f / 32f, 0f);
-                    }
                 }
 
                 var tilePos = position.Floored();

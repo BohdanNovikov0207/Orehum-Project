@@ -17,27 +17,26 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Server.Atmos.Monitor.Components;
-using Content.Server.DeviceNetwork.Components;
 using Content.Server.Power.EntitySystems;
 using Content.Shared.Access.Systems;
 using Content.Shared.Atmos.Monitor;
 using Content.Shared.CCVar;
 using Content.Shared.DeviceNetwork.Components;
 using Content.Shared.DeviceNetwork.Systems;
-using Content.Shared.Interaction;
 using Content.Shared.Emag.Systems;
+using Content.Shared.Interaction;
 using Robust.Shared.Configuration;
 
 namespace Content.Server.Atmos.Monitor.Systems;
 
 public sealed class FireAlarmSystem : EntitySystem
 {
-    [Dependency] private readonly AtmosDeviceNetworkSystem _atmosDevNet = default!;
+    [Dependency] private readonly AccessReaderSystem _access = default!;
     [Dependency] private readonly AtmosAlarmableSystem _atmosAlarmable = default!;
+    [Dependency] private readonly AtmosDeviceNetworkSystem _atmosDevNet = default!;
+    [Dependency] private readonly IConfigurationManager _configManager = default!;
     [Dependency] private readonly EmagSystem _emag = default!;
     [Dependency] private readonly SharedInteractionSystem _interactionSystem = default!;
-    [Dependency] private readonly AccessReaderSystem _access = default!;
-    [Dependency] private readonly IConfigurationManager _configManager = default!;
 
     public override void Initialize()
     {
@@ -52,9 +51,7 @@ public sealed class FireAlarmSystem : EntitySystem
         foreach (var device in args.OldDevices)
         {
             if (!query.TryGetComponent(device, out var deviceNet))
-            {
                 continue;
-            }
 
             _atmosDevNet.Deregister(uid, deviceNet.Address);
         }
@@ -74,18 +71,12 @@ public sealed class FireAlarmSystem : EntitySystem
         if (this.IsPowered(uid, EntityManager))
         {
             if (!_atmosAlarmable.TryGetHighestAlert(uid, out var alarm))
-            {
                 alarm = AtmosAlarmType.Normal;
-            }
 
             if (alarm == AtmosAlarmType.Normal)
-            {
                 _atmosAlarmable.ForceAlert(uid, AtmosAlarmType.Danger);
-            }
             else
-            {
                 _atmosAlarmable.ResetAllOnNetwork(uid);
-            }
         }
     }
 

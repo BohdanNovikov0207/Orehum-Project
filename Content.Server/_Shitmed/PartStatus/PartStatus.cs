@@ -5,10 +5,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Shared._Shitmed.Medical.Surgery.Traumas;
-using Content.Shared._Shitmed.Medical.Surgery.Traumas.Components;
 using Content.Shared._Shitmed.Medical.Surgery.Wounds;
-using Content.Shared._Shitmed.Medical.Surgery.Wounds.Components;
-using Content.Shared.Body.Organ;
 using Content.Shared.Body.Part;
 
 namespace Content.Server._Shitmed.PartStatus;
@@ -24,17 +21,16 @@ public sealed class PartStatus(
     BoneSeverity boneSeverity,
     bool bleeding)
 {
-    public BodyPartType PartType = partType;
+    public bool Bleeding = bleeding;
 
-    public BodyPartSymmetry PartSymmetry = partSymmetry;
+    public BoneSeverity BoneSeverity = boneSeverity;
+
+    public Dictionary<string, WoundSeverity> DamageSeverities = damageSeverities;
 
     public string PartName = partName;
 
     public WoundableSeverity PartSeverity = partSeverity;
 
-    public Dictionary<string, WoundSeverity> DamageSeverities = damageSeverities;
-
-    public BoneSeverity BoneSeverity = boneSeverity;
-
-    public bool Bleeding = bleeding;
+    public BodyPartSymmetry PartSymmetry = partSymmetry;
+    public BodyPartType PartType = partType;
 }

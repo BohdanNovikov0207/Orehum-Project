@@ -12,73 +12,68 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Server.NodeContainer;
 using Content.Server.NodeContainer.Nodes;
 using Content.Shared.NodeContainer;
-using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
 
-namespace Content.Server.Power.Nodes
+namespace Content.Server.Power.Nodes;
+
+[DataDefinition]
+public sealed partial class CableNode : Node
 {
-    [DataDefinition]
-    public sealed partial class CableNode : Node
+    public override IEnumerable<Node> GetReachableNodes(TransformComponent xform,
+        EntityQuery<NodeContainerComponent> nodeQuery,
+        EntityQuery<TransformComponent> xformQuery,
+        MapGridComponent? grid,
+        IEntityManager entMan)
     {
-        public override IEnumerable<Node> GetReachableNodes(TransformComponent xform,
-            EntityQuery<NodeContainerComponent> nodeQuery,
-            EntityQuery<TransformComponent> xformQuery,
-            MapGridComponent? grid,
-            IEntityManager entMan)
+        if (!xform.Anchored || grid == null)
+            yield break;
+
+        var gridIndex = grid.TileIndicesFor(xform.Coordinates);
+
+        // While we go over adjacent nodes, we build a list of blocked directions due to
+        // incoming or outgoing wire terminals.
+        var terminalDirs = 0;
+        List<(Direction, Node)> nodeDirs = new();
+
+        foreach (var (dir, node) in NodeHelpers.GetCardinalNeighborNodes(nodeQuery, grid, gridIndex))
         {
-            if (!xform.Anchored || grid == null)
-                yield break;
+            if (node is CableNode && node != this)
+                nodeDirs.Add((dir, node));
 
-            var gridIndex = grid.TileIndicesFor(xform.Coordinates);
-
-            // While we go over adjacent nodes, we build a list of blocked directions due to
-            // incoming or outgoing wire terminals.
-            var terminalDirs = 0;
-            List<(Direction, Node)> nodeDirs = new();
-
-            foreach (var (dir, node) in NodeHelpers.GetCardinalNeighborNodes(nodeQuery, grid, gridIndex))
+            if (node is CableDeviceNode && dir == Direction.Invalid)
             {
-                if (node is CableNode && node != this)
-                {
-                    nodeDirs.Add((dir, node));
-                }
+                // device on same tile
+                nodeDirs.Add((Direction.Invalid, node));
+            }
 
-                if (node is CableDeviceNode && dir == Direction.Invalid)
+            if (node is CableTerminalNode)
+            {
+                if (dir == Direction.Invalid)
                 {
-                    // device on same tile
-                    nodeDirs.Add((Direction.Invalid, node));
+                    // On own tile, block direction it faces
+                    terminalDirs |= 1 << (int) xformQuery.GetComponent(node.Owner).LocalRotation.GetCardinalDir();
                 }
-
-                if (node is CableTerminalNode)
+                else
                 {
-                    if (dir == Direction.Invalid)
+                    var terminalDir = xformQuery.GetComponent(node.Owner).LocalRotation.GetCardinalDir();
+                    if (terminalDir.GetOpposite() == dir)
                     {
-                        // On own tile, block direction it faces
-                        terminalDirs |= 1 << (int) xformQuery.GetComponent(node.Owner).LocalRotation.GetCardinalDir();
-                    }
-                    else
-                    {
-                        var terminalDir = xformQuery.GetComponent(node.Owner).LocalRotation.GetCardinalDir();
-                        if (terminalDir.GetOpposite() == dir)
-                        {
-                            // Target tile has a terminal towards us, block the direction.
-                            terminalDirs |= 1 << (int) dir;
-                        }
+                        // Target tile has a terminal towards us, block the direction.
+                        terminalDirs |= 1 << (int) dir;
                     }
                 }
             }
+        }
 
-            foreach (var (dir, node) in nodeDirs)
-            {
-                // If there is a wire terminal connecting across this direction, skip the node.
-                if (dir != Direction.Invalid && (terminalDirs & (1 << (int) dir)) != 0)
-                    continue;
+        foreach (var (dir, node) in nodeDirs)
+        {
+            // If there is a wire terminal connecting across this direction, skip the node.
+            if (dir != Direction.Invalid && (terminalDirs & (1 << (int) dir)) != 0)
+                continue;
 
-                yield return node;
-            }
+            yield return node;
         }
     }
 }

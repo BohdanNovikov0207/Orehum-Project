@@ -19,83 +19,84 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Server.Store.Systems;
-using Content.Goobstation.Maths.FixedPoint;
-using Content.Shared.Eye;
-using Content.Shared.Heretic;
-using Content.Shared.Mind;
-using Content.Shared.Store.Components;
-using Content.Shared.Heretic.Prototypes;
-using Content.Server.Chat.Systems;
-using Robust.Shared.Audio;
-using Content.Server.Heretic.Components;
-using Content.Server.Antag;
-using Robust.Shared.Random;
 using System.Linq;
 using Content.Goobstation.Common.CCVar;
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Server._Goobstation.Objectives.Components;
 using Content.Server.Actions;
+using Content.Server.Antag;
 using Content.Server.Chat.Managers;
+using Content.Server.Chat.Systems;
+using Content.Server.Hands.Systems;
+using Content.Server.Heretic.Components;
 using Content.Server.Objectives;
-using Content.Shared.Humanoid;
-using Robust.Server.Player;
-using Content.Server.Revolutionary.Components;
-using Content.Shared._Shitcode.Heretic.Components;
-using Content.Shared.Chat;
-using Content.Shared.GameTicking;
-using Content.Shared.Humanoid.Markings;
 using Content.Server.Polymorph.Components;
-using Content.Shared.Preferences;
-using Content.Shared.Random.Helpers;
-using Content.Shared.Roles.Jobs;
-using Content.Shared.Tag;
-using Robust.Shared.Audio.Systems;
-using Robust.Shared.Configuration;
-using Robust.Shared.Player;
-using Robust.Shared.Prototypes;
-using Robust.Shared.Utility;
+using Content.Server.Revolutionary.Components;
+using Content.Server.Store.Systems;
+using Content.Shared._Shitcode.Heretic.Components;
 using Content.Shared._Shitcode.Heretic.Systems;
 using Content.Shared.Actions;
 using Content.Shared.Actions.Components;
+using Content.Shared.Chat;
+using Content.Shared.Eye;
+using Content.Shared.GameTicking;
+using Content.Shared.Heretic;
+using Content.Shared.Heretic.Prototypes;
+using Content.Shared.Humanoid;
+using Content.Shared.Humanoid.Markings;
+using Content.Shared.Mind;
 using Content.Shared.Mind.Components;
 using Content.Shared.Mobs.Components;
 using Content.Shared.NPC.Prototypes;
 using Content.Shared.NPC.Systems;
-using Content.Server.Hands.Systems;
+using Content.Shared.Preferences;
+using Content.Shared.Random.Helpers;
+using Content.Shared.Roles.Jobs;
+using Content.Shared.Store.Components;
+using Content.Shared.Tag;
+using Robust.Server.Player;
+using Robust.Shared.Audio;
+using Robust.Shared.Audio.Systems;
+using Robust.Shared.Configuration;
+using Robust.Shared.Player;
+using Robust.Shared.Prototypes;
+using Robust.Shared.Random;
+using Robust.Shared.Utility;
 
 namespace Content.Server.Heretic.EntitySystems;
 
 public sealed partial class HereticSystem : SharedHereticSystem
 {
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedMindSystem _mind = default!;
-    [Dependency] private readonly StoreSystem _store = default!;
-    [Dependency] private readonly ChatSystem _chat = default!;
-    [Dependency] private readonly SharedEyeSystem _eye = default!;
-    [Dependency] private readonly AntagSelectionSystem _antag = default!;
-    [Dependency] private readonly SharedJobSystem _job = default!;
-    [Dependency] private readonly ActionsSystem _actions = default!;
-    [Dependency] private readonly ObjectivesSystem _objectives = default!;
-    [Dependency] private readonly HereticRitualSystem _ritual = default!;
-    [Dependency] private readonly ActionContainerSystem _actionContainer = default!;
-    [Dependency] private readonly NpcFactionSystem _npcFaction = default!;
-    [Dependency] private readonly HandsSystem _hands = default!;
-
-    [Dependency] private readonly IRobustRandom _rand = default!;
-    [Dependency] private readonly IPlayerManager _playerMan = default!;
-    [Dependency] private readonly IPrototypeManager _proto = default!;
-    [Dependency] private readonly IChatManager _chatMan = default!;
-    [Dependency] private readonly IConfigurationManager _cfg = default!;
-
-    private float _timer;
     private const float PassivePointCooldown = 20f * 60f;
-    private bool _ascensionRequiresObjectives;
 
-    private const int HereticVisFlags = (int) (VisibilityFlags.EldritchInfluence | VisibilityFlags.EldritchInfluenceSpent);
+    private const int HereticVisFlags =
+        (int) (VisibilityFlags.EldritchInfluence | VisibilityFlags.EldritchInfluenceSpent);
 
     public static readonly ProtoId<NpcFactionPrototype> HereticFactionId = "Heretic";
 
     public static readonly ProtoId<NpcFactionPrototype> NanotrasenFactionId = "NanoTrasen";
+    [Dependency] private readonly ActionContainerSystem _actionContainer = default!;
+    [Dependency] private readonly ActionsSystem _actions = default!;
+    [Dependency] private readonly AntagSelectionSystem _antag = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly IConfigurationManager _cfg = default!;
+    [Dependency] private readonly ChatSystem _chat = default!;
+    [Dependency] private readonly IChatManager _chatMan = default!;
+    [Dependency] private readonly SharedEyeSystem _eye = default!;
+    [Dependency] private readonly HandsSystem _hands = default!;
+    [Dependency] private readonly SharedJobSystem _job = default!;
+    [Dependency] private readonly SharedMindSystem _mind = default!;
+    [Dependency] private readonly NpcFactionSystem _npcFaction = default!;
+    [Dependency] private readonly ObjectivesSystem _objectives = default!;
+    [Dependency] private readonly IPlayerManager _playerMan = default!;
+    [Dependency] private readonly IPrototypeManager _proto = default!;
+
+    [Dependency] private readonly IRobustRandom _rand = default!;
+    [Dependency] private readonly HereticRitualSystem _ritual = default!;
+    [Dependency] private readonly StoreSystem _store = default!;
+    private bool _ascensionRequiresObjectives;
+
+    private float _timer;
 
     public override void Initialize()
     {
@@ -199,10 +200,7 @@ public sealed partial class HereticSystem : SharedHereticSystem
         _eye.SetVisibilityMask(ev.Heretic, mask, eye);
     }
 
-    private void OnRestart(RoundRestartCleanupEvent ev)
-    {
-        _timer = 0f;
-    }
+    private void OnRestart(RoundRestartCleanupEvent ev) => _timer = 0f;
 
     public override void Update(float frameTime)
     {

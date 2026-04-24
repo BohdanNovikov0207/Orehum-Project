@@ -10,10 +10,7 @@ namespace Content.Server.Station.Systems;
 
 public sealed class StationDampeningSystem : EntitySystem
 {
-    public override void Initialize()
-    {
-        SubscribeLocalEvent<StationPostInitEvent>(OnInitStation);
-    }
+    public override void Initialize() => SubscribeLocalEvent<StationPostInitEvent>(OnInitStation);
 
     private void OnInitStation(ref StationPostInitEvent ev)
     {

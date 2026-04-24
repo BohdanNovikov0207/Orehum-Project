@@ -5,7 +5,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-using Content.Server.DeviceNetwork;
 using Content.Server.DeviceNetwork.Systems;
 using Content.Server.Power.Components;
 using Content.Shared.DeviceNetwork;
@@ -19,10 +18,8 @@ public sealed class BatterySensorSystem : EntitySystem
 
     [Dependency] private readonly DeviceNetworkSystem _deviceNetwork = default!;
 
-    public override void Initialize()
-    {
+    public override void Initialize() =>
         SubscribeLocalEvent<BatterySensorComponent, DeviceNetworkPacketEvent>(PacketReceived);
-    }
 
     private void PacketReceived(EntityUid uid, BatterySensorComponent component, DeviceNetworkPacketEvent args)
     {
@@ -44,7 +41,7 @@ public sealed class BatterySensorSystem : EntitySystem
                         netBattery.CurrentReceiving,
                         netBattery.MaxChargeRate,
                         netBattery.CurrentSupply,
-                        netBattery.MaxSupply)
+                        netBattery.MaxSupply),
                 };
 
                 _deviceNetwork.QueuePacket(uid, args.SenderAddress, payload);

@@ -7,7 +7,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Server.Roles;
 using Content.Shared.Containers.ItemSlots;
 using Content.Shared.Mind.Components;
 using Content.Shared.Roles;
@@ -16,10 +15,9 @@ using Robust.Shared.Containers;
 
 namespace Content.Server.Silicons.Borgs;
 
-/// <inheritdoc/>
+/// <inheritdoc />
 public sealed partial class BorgSystem
 {
-
     [Dependency] private readonly SharedRoleSystem _roles = default!;
 
     public void InitializeMMI()
@@ -65,15 +63,11 @@ public sealed partial class BorgSystem
         _appearance.SetData(uid, MMIVisuals.BrainPresent, true);
     }
 
-    private void OnMMIMindAdded(EntityUid uid, MMIComponent component, MindAddedMessage args)
-    {
+    private void OnMMIMindAdded(EntityUid uid, MMIComponent component, MindAddedMessage args) =>
         _appearance.SetData(uid, MMIVisuals.HasMind, true);
-    }
 
-    private void OnMMIMindRemoved(EntityUid uid, MMIComponent component, MindRemovedMessage args)
-    {
+    private void OnMMIMindRemoved(EntityUid uid, MMIComponent component, MindRemovedMessage args) =>
         _appearance.SetData(uid, MMIVisuals.HasMind, false);
-    }
 
     private void OnMMILinkedMindAdded(EntityUid uid, MMILinkedComponent component, MindAddedMessage args)
     {

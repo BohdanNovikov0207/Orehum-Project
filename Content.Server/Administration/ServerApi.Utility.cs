@@ -12,8 +12,7 @@ namespace Content.Server.Administration;
 
 public sealed partial class ServerApi
 {
-    private void RegisterHandler(HttpMethod method, string exactPath, Func<IStatusHandlerContext, Task> handler)
-    {
+    private void RegisterHandler(HttpMethod method, string exactPath, Func<IStatusHandlerContext, Task> handler) =>
         _statusHost.AddHandler(async context =>
         {
             if (context.RequestMethod != method || context.Url.AbsolutePath != exactPath)
@@ -25,18 +24,19 @@ public sealed partial class ServerApi
             await handler(context);
             return true;
         });
-    }
 
-    private void RegisterActorHandler(HttpMethod method, string exactPath, Func<IStatusHandlerContext, Actor, Task> handler)
-    {
-        RegisterHandler(method, exactPath, async context =>
-        {
-            if (await CheckActor(context) is not { } actor)
-                return;
+    private void RegisterActorHandler(HttpMethod method,
+        string exactPath,
+        Func<IStatusHandlerContext, Actor, Task> handler) =>
+        RegisterHandler(method,
+            exactPath,
+            async context =>
+            {
+                if (await CheckActor(context) is not { } actor)
+                    return;
 
-            await handler(context, actor);
-        });
-    }
+                await handler(context, actor);
+            });
 
     /// <summary>
     /// Async helper function which runs a task on the main thread and returns the result.
@@ -61,7 +61,8 @@ public sealed partial class ServerApi
     }
 
     /// <summary>
-    /// Runs an action on the main thread. This does not return any value and is meant to be used for void functions. Use <see cref="RunOnMainThread{T}"/> for functions that return a value.
+    /// Runs an action on the main thread. This does not return any value and is meant to be used for void functions. Use
+    /// <see cref="RunOnMainThread{T}" /> for functions that return a value.
     /// </summary>
     private async Task RunOnMainThread(Action action)
     {
@@ -127,26 +128,20 @@ public sealed partial class ServerApi
         ErrorCode errorCode,
         HttpStatusCode statusCode,
         string message,
-        ExceptionData? exception = null)
-    {
+        ExceptionData? exception = null) =>
         await context.RespondJsonAsync(new BaseResponse(message, errorCode, exception), statusCode)
             .ConfigureAwait(false);
-    }
 
     private static async Task RespondBadRequest(
         IStatusHandlerContext context,
         string message,
-        ExceptionData? exception = null)
-    {
+        ExceptionData? exception = null) =>
         await RespondError(context, ErrorCode.BadRequest, HttpStatusCode.BadRequest, message, exception)
             .ConfigureAwait(false);
-    }
 
-    private static async Task RespondOk(IStatusHandlerContext context)
-    {
+    private static async Task RespondOk(IStatusHandlerContext context) =>
         await context.RespondJsonAsync(new BaseResponse("OK"))
             .ConfigureAwait(false);
-    }
 
     private static string FormatLogActor(Actor actor) => $"{actor.Name} ({actor.Guid})";
 }

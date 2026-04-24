@@ -24,24 +24,54 @@ namespace Content.Server.Station.Components;
 /// <summary>
 /// Stores information about a station's job selection.
 /// </summary>
-[RegisterComponent, Access(typeof(StationJobsSystem)), PublicAPI]
+[RegisterComponent] [Access(typeof(StationJobsSystem))] [PublicAPI]
 public sealed partial class StationJobsComponent : Component
 {
     /// <summary>
+    /// Station is running on extended access.
+    /// </summary>
+    [DataField] public bool ExtendedAccess;
+
+    /// <summary>
+    /// The current list of jobs of available jobs. Null implies that is no limit.
+    /// </summary>
+    /// <remarks>
+    /// This should not be mutated or used directly unless you really know what you're doing, go through StationJobsSystem.
+    /// </remarks>
+    [DataField]
+    public Dictionary<ProtoId<JobPrototype>, int?> JobList = new();
+
+    /// <summary>
     /// Total *mid-round* jobs at station start.
-    /// This is inferred automatically from <see cref="SetupAvailableJobs"/>.
+    /// This is inferred automatically from <see cref="SetupAvailableJobs" />.
     /// </summary>
     [ViewVariables] public int MidRoundTotalJobs;
+
+    /// <summary>
+    /// Overflow jobs that round-start can spawn infinitely many of.
+    /// This is inferred automatically from <see cref="SetupAvailableJobs" />.
+    /// </summary>
+    [ViewVariables]
+    public IReadOnlySet<ProtoId<JobPrototype>> OverflowJobs = default!;
+
+    /// <summary>
+    /// A dictionary relating a NetUserId to the jobs they have on station.
+    /// An OOC way to track where job slots have gone.
+    /// </summary>
+    [DataField]
+    public Dictionary<NetUserId, List<ProtoId<JobPrototype>>> PlayerJobs = new();
+
+    /// <summary>
+    /// Mapping of jobs to an int[2] array that specifies jobs available at round start, and midround.
+    /// Negative values implies that there is no limit.
+    /// </summary>
+    [DataField("availableJobs", required: true)]
+    public Dictionary<ProtoId<JobPrototype>, int[]> SetupAvailableJobs = default!;
 
     /// <summary>
     /// Current total jobs.
     /// </summary>
     [DataField] public int TotalJobs;
-
-    /// <summary>
-    /// Station is running on extended access.
-    /// </summary>
-    [DataField] public bool ExtendedAccess;
 
     /// <summary>
     /// If there are less than or equal this amount of players in the game at round start,
@@ -61,34 +91,4 @@ public sealed partial class StationJobsComponent : Component
     /// </remarks>
     [ViewVariables]
     public float? PercentJobsRemaining => MidRoundTotalJobs > 0 ? TotalJobs / (float) MidRoundTotalJobs : null;
-
-    /// <summary>
-    /// The current list of jobs of available jobs. Null implies that is no limit.
-    /// </summary>
-    /// <remarks>
-    /// This should not be mutated or used directly unless you really know what you're doing, go through StationJobsSystem.
-    /// </remarks>
-    [DataField]
-    public Dictionary<ProtoId<JobPrototype>, int?> JobList = new();
-
-    /// <summary>
-    /// Overflow jobs that round-start can spawn infinitely many of.
-    /// This is inferred automatically from <see cref="SetupAvailableJobs"/>.
-    /// </summary>
-    [ViewVariables]
-    public IReadOnlySet<ProtoId<JobPrototype>> OverflowJobs = default!;
-
-    /// <summary>
-    /// A dictionary relating a NetUserId to the jobs they have on station.
-    /// An OOC way to track where job slots have gone.
-    /// </summary>
-    [DataField]
-    public Dictionary<NetUserId, List<ProtoId<JobPrototype>>> PlayerJobs = new();
-
-    /// <summary>
-    /// Mapping of jobs to an int[2] array that specifies jobs available at round start, and midround.
-    /// Negative values implies that there is no limit.
-    /// </summary>
-    [DataField("availableJobs", required: true)]
-    public Dictionary<ProtoId<JobPrototype>, int[]> SetupAvailableJobs = default!;
 }

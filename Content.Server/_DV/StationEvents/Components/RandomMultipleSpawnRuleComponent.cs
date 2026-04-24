@@ -6,14 +6,14 @@ namespace Content.Server._DV.StationEvents.Components;
 /// <summary>
 /// Spawns a random amount of entities at a random tile on a station using TryGetRandomTile.
 /// </summary>
-[RegisterComponent, Access(typeof(RandomSpawnRule))]
+[RegisterComponent] [Access(typeof(RandomSpawnRule))]
 public sealed partial class RandomMultipleSpawnRuleComponent : Component
 {
     /// <summary>
-    /// The entity to be spawned.
+    /// The maximum amount of entities to be spawned.
     /// </summary>
-    [DataField(required: true)]
-    public EntProtoId Prototype = string.Empty;
+    [DataField]
+    public int MaxAmount = 1;
 
     /// <summary>
     /// The minimum amount of entities to be spawned.
@@ -22,8 +22,8 @@ public sealed partial class RandomMultipleSpawnRuleComponent : Component
     public int MinAmount = 1;
 
     /// <summary>
-    /// The maximum amount of entities to be spawned.
+    /// The entity to be spawned.
     /// </summary>
-    [DataField]
-    public int MaxAmount = 1;
+    [DataField(required: true)]
+    public EntProtoId Prototype = string.Empty;
 }

@@ -4,40 +4,42 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Server.Power.Components;
-using Content.Shared._EinsteinEngines.Silicon.Systems;
-using Content.Shared.Bed.Sleep;
+using Content.Goobstation.Shared.Sprinting;
 using Content.Server._EinsteinEngines.Silicon.Charge;
 using Content.Server.Humanoid;
-using Content.Shared.Humanoid;
-using Content.Shared.StatusEffectNew;
-// Goobstation Start - Energycrit
-using Content.Goobstation.Shared.Sprinting;
-using Content.Server.Popups;
+using Content.Server.Power.Components;
 using Content.Server.Radio;
 using Content.Shared._EinsteinEngines.Silicon.Death;
+using Content.Shared._EinsteinEngines.Silicon.Systems;
 using Content.Shared.Actions;
+using Content.Shared.Bed.Sleep;
 using Content.Shared.CombatMode;
+using Content.Shared.Humanoid;
 using Content.Shared.Interaction.Components;
 using Content.Shared.Popups;
 using Content.Shared.Standing;
+using Content.Shared.StatusEffectNew;
 using Content.Shared.Stunnable;
+// Goobstation Start - Energycrit
+
 // Goobstation End - Energycrit
 
 namespace Content.Server._EinsteinEngines.Silicon.Death;
 
 public sealed class SiliconDeathSystem : SharedSiliconDeathSystem
 {
-    [Dependency] private readonly SleepingSystem _sleep = default!;
-    [Dependency] private readonly StatusEffectsSystem _status = default!;
-    [Dependency] private readonly SiliconChargeSystem _silicon = default!;
-    [Dependency] private readonly HumanoidAppearanceSystem _humanoidAppearanceSystem = default!;
+    [Dependency] private readonly SharedActionsSystem _actions = default!;
+
     // Goobstation Start - Energycrit
     [Dependency] private readonly SharedCombatModeSystem _combat = default!;
-    [Dependency] private readonly SharedActionsSystem _actions = default!;
-    [Dependency] private readonly StandingStateSystem _standing = default!;
-    [Dependency] private readonly SharedStunSystem _stun = default!;
+    [Dependency] private readonly HumanoidAppearanceSystem _humanoidAppearanceSystem = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly SiliconChargeSystem _silicon = default!;
+    [Dependency] private readonly SleepingSystem _sleep = default!;
+    [Dependency] private readonly StandingStateSystem _standing = default!;
+    [Dependency] private readonly StatusEffectsSystem _status = default!;
+
+    [Dependency] private readonly SharedStunSystem _stun = default!;
     // Goobstation End - Energycrit
 
     public override void Initialize()
@@ -52,7 +54,9 @@ public sealed class SiliconDeathSystem : SharedSiliconDeathSystem
         // Goobstation End - Energycrit
     }
 
-    private void OnSiliconChargeStateUpdate(EntityUid uid, SiliconDownOnDeadComponent siliconDeadComp, SiliconChargeStateUpdateEvent args)
+    private void OnSiliconChargeStateUpdate(EntityUid uid,
+        SiliconDownOnDeadComponent siliconDeadComp,
+        SiliconChargeStateUpdateEvent args)
     {
         // Goobstation - Added batteryEnt argument
         if (!_silicon.TryGetSiliconBattery(uid, out var batteryComp, out var batteryEnt))
@@ -84,8 +88,8 @@ public sealed class SiliconDeathSystem : SharedSiliconDeathSystem
 
     // Goobstation - Energycrit
     /// <summary>
-    ///     Some actions, like picking up an IPC and carrying it remove the KnockedDownComponent, if they try to stand when they
-    ///     shouldn't, just knock them down again
+    /// Some actions, like picking up an IPC and carrying it remove the KnockedDownComponent, if they try to stand when they
+    /// shouldn't, just knock them down again
     /// </summary>
     private void OnStandAttempt(Entity<SiliconDownOnDeadComponent> ent, ref StandUpAttemptEvent args)
     {
@@ -94,12 +98,17 @@ public sealed class SiliconDeathSystem : SharedSiliconDeathSystem
             return;
 
         // todo goobstation ftl this and refactor this fucking mess.
-        _popup.PopupEntity("Without charge, you don't have the strength to stand up",ent.Owner, PopupType.SmallCaution);
+        _popup.PopupEntity("Without charge, you don't have the strength to stand up",
+            ent.Owner,
+            PopupType.SmallCaution);
         args.Autostand = false;
         args.Cancelled = true;
     }
 
-    private void SiliconDead(EntityUid uid, SiliconDownOnDeadComponent siliconDeadComp, BatteryComponent? batteryComp, EntityUid batteryUid)
+    private void SiliconDead(EntityUid uid,
+        SiliconDownOnDeadComponent siliconDeadComp,
+        BatteryComponent? batteryComp,
+        EntityUid batteryUid)
     {
         var deadEvent = new SiliconChargeDyingEvent(uid, batteryComp, batteryUid);
         RaiseLocalEvent(uid, deadEvent);
@@ -134,7 +143,7 @@ public sealed class SiliconDeathSystem : SharedSiliconDeathSystem
         }
 
         _standing.Down(uid);
-        _stun.TryCrawling((uid, crawler), autoStand:false);
+        _stun.TryCrawling((uid, crawler), autoStand: false);
 
         if (TryComp(uid, out HumanoidAppearanceComponent? humanoidAppearanceComponent))
         {
@@ -155,7 +164,10 @@ public sealed class SiliconDeathSystem : SharedSiliconDeathSystem
         RaiseLocalEvent(uid, new SiliconChargeDeathEvent(uid, batteryComp, batteryUid));
     }
 
-    private void SiliconUnDead(EntityUid uid, SiliconDownOnDeadComponent siliconDeadComp, BatteryComponent? batteryComp, EntityUid batteryUid)
+    private void SiliconUnDead(EntityUid uid,
+        SiliconDownOnDeadComponent siliconDeadComp,
+        BatteryComponent? batteryComp,
+        EntityUid batteryUid)
     {
         // Goobstation Start - Energycrit
 
@@ -193,56 +205,56 @@ public sealed class SiliconDeathSystem : SharedSiliconDeathSystem
 }
 
 /// <summary>
-///     A cancellable event raised when a Silicon is about to go down due to charge.
+/// A cancellable event raised when a Silicon is about to go down due to charge.
 /// </summary>
 /// <remarks>
-///     This probably shouldn't be modified unless you intend to fill the Silicon's battery,
-///     as otherwise it'll just be triggered again next frame.
+/// This probably shouldn't be modified unless you intend to fill the Silicon's battery,
+/// as otherwise it'll just be triggered again next frame.
 /// </remarks>
 public sealed class SiliconChargeDyingEvent : CancellableEntityEventArgs
 {
-    public EntityUid SiliconUid { get; }
-    public BatteryComponent? BatteryComp { get; }
-    public EntityUid BatteryUid { get; }
-
     public SiliconChargeDyingEvent(EntityUid siliconUid, BatteryComponent? batteryComp, EntityUid batteryUid)
     {
         SiliconUid = siliconUid;
         BatteryComp = batteryComp;
         BatteryUid = batteryUid;
     }
-}
 
-/// <summary>
-///     An event raised after a Silicon has gone down due to charge.
-/// </summary>
-public sealed class SiliconChargeDeathEvent : EntityEventArgs
-{
     public EntityUid SiliconUid { get; }
     public BatteryComponent? BatteryComp { get; }
     public EntityUid BatteryUid { get; }
+}
 
+/// <summary>
+/// An event raised after a Silicon has gone down due to charge.
+/// </summary>
+public sealed class SiliconChargeDeathEvent : EntityEventArgs
+{
     public SiliconChargeDeathEvent(EntityUid siliconUid, BatteryComponent? batteryComp, EntityUid batteryUid)
     {
         SiliconUid = siliconUid;
         BatteryComp = batteryComp;
         BatteryUid = batteryUid;
     }
-}
 
-/// <summary>
-///     An event raised after a Silicon has reawoken due to an increase in charge.
-/// </summary>
-public sealed class SiliconChargeAliveEvent : EntityEventArgs
-{
     public EntityUid SiliconUid { get; }
     public BatteryComponent? BatteryComp { get; }
     public EntityUid BatteryUid { get; }
+}
 
+/// <summary>
+/// An event raised after a Silicon has reawoken due to an increase in charge.
+/// </summary>
+public sealed class SiliconChargeAliveEvent : EntityEventArgs
+{
     public SiliconChargeAliveEvent(EntityUid siliconUid, BatteryComponent? batteryComp, EntityUid batteryUid)
     {
         SiliconUid = siliconUid;
         BatteryComp = batteryComp;
         BatteryUid = batteryUid;
     }
+
+    public EntityUid SiliconUid { get; }
+    public BatteryComponent? BatteryComp { get; }
+    public EntityUid BatteryUid { get; }
 }

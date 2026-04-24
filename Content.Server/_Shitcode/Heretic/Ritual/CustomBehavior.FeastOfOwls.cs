@@ -1,6 +1,5 @@
 using Content.Server._Shitcode.Heretic.Ui;
 using Content.Server.EUI;
-using Content.Shared.Heretic;
 using Content.Shared.Heretic.Prototypes;
 using Robust.Shared.Player;
 
@@ -24,6 +23,7 @@ public sealed partial class RitualFeastOfOwlsBehavior : RitualCustomBehavior
             return;
 
         var eui = IoCManager.Resolve<EuiManager>();
-        eui.OpenEui(new FeastOfOwlsEui(args.Performer, args.Mind, args.Platform, args.EntityManager), actor.PlayerSession);
+        eui.OpenEui(new FeastOfOwlsEui(args.Performer, args.Mind, args.Platform, args.EntityManager),
+            actor.PlayerSession);
     }
 }

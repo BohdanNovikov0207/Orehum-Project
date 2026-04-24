@@ -28,14 +28,14 @@ namespace Content.Server._Goobstation.Wizard.Systems;
 
 public sealed class WizardMirrorSystem : SharedWizardMirrorSystem
 {
-    [Dependency] private readonly IPrototypeManager _proto = default!;
+    [Dependency] private readonly GrammarSystem _grammar = default!;
     [Dependency] private readonly HumanoidAppearanceSystem _humanoid = default!;
     [Dependency] private readonly MarkingManager _markingManager = default!;
-    [Dependency] private readonly GrammarSystem _grammar = default!;
-    [Dependency] private readonly PolymorphSystem _polymorph = default!;
     [Dependency] private readonly MetaDataSystem _meta = default!;
-    [Dependency] private readonly PopupSystem _popup = default!;
     [Dependency] private readonly MindSystem _mind = default!;
+    [Dependency] private readonly PolymorphSystem _polymorph = default!;
+    [Dependency] private readonly PopupSystem _popup = default!;
+    [Dependency] private readonly IPrototypeManager _proto = default!;
 
     public override void Initialize()
     {
@@ -93,7 +93,7 @@ public sealed class WizardMirrorSystem : SharedWizardMirrorSystem
                 Inventory = PolymorphInventoryChange.Transfer,
                 RevertOnCrit = false,
                 RevertOnDeath = false,
-                ComponentsToTransfer = new()
+                ComponentsToTransfer = new HashSet<ComponentTransferData>
                 {
                     new("LanguageKnowledge"),
                     new("LanguageSpeaker"),
@@ -135,13 +135,9 @@ public sealed class WizardMirrorSystem : SharedWizardMirrorSystem
                 continue;
 
             if (!prototype.ForcedColoring)
-            {
                 _humanoid.AddMarking(target, marking.MarkingId, marking.MarkingColors, false);
-            }
             else
-            {
                 markingFColored.Add(marking, prototype);
-            }
         }
 
         // Don't limit hair color but still apply the restrictions to them
@@ -150,15 +146,11 @@ public sealed class WizardMirrorSystem : SharedWizardMirrorSystem
 
         if (_markingManager.Markings.TryGetValue(profile.Appearance.HairStyleId, out var hairPrototype) &&
             _markingManager.CanBeApplied(profile.Species, profile.Sex, hairPrototype, _proto))
-        {
             _humanoid.AddMarking(target, profile.Appearance.HairStyleId, hairColor, false);
-        }
 
         if (_markingManager.Markings.TryGetValue(profile.Appearance.FacialHairStyleId, out var facialHairPrototype) &&
             _markingManager.CanBeApplied(profile.Species, profile.Sex, facialHairPrototype, _proto))
-        {
             _humanoid.AddMarking(target, profile.Appearance.FacialHairStyleId, facialHairColor, false);
-        }
 
         // Finally adding marking with forced colors
         foreach (var (marking, prototype) in markingFColored)

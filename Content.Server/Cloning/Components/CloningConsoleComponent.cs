@@ -5,27 +5,26 @@
 //
 // SPDX-License-Identifier: MIT
 
-namespace Content.Server.Cloning.Components
+namespace Content.Server.Cloning.Components;
+
+[RegisterComponent]
+public sealed partial class CloningConsoleComponent : Component
 {
-    [RegisterComponent]
-    public sealed partial class CloningConsoleComponent : Component
-    {
-        public const string ScannerPort = "MedicalScannerSender";
+    public const string ScannerPort = "MedicalScannerSender";
 
-        public const string PodPort = "CloningPodSender";
+    public const string PodPort = "CloningPodSender";
 
-        [ViewVariables]
-        public EntityUid? GeneticScanner = null;
+    [ViewVariables]
+    public EntityUid? CloningPod = null;
 
-        [ViewVariables]
-        public EntityUid? CloningPod = null;
+    public bool CloningPodInRange = true;
 
-        /// Maximum distance between console and one if its machines
-        [DataField("maxDistance")]
-        public float MaxDistance = 4f;
+    [ViewVariables]
+    public EntityUid? GeneticScanner = null;
 
-        public bool GeneticScannerInRange = true;
+    public bool GeneticScannerInRange = true;
 
-        public bool CloningPodInRange = true;
-    }
+    /// Maximum distance between console and one if its machines
+    [DataField("maxDistance")]
+    public float MaxDistance = 4f;
 }

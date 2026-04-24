@@ -83,6 +83,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Linq;
+using Content.Corvax.Interfaces.Shared;
 using Content.Server.Administration;
 using Content.Server.Administration.Managers;
 using Content.Server.Afk;
@@ -109,7 +110,7 @@ using Robust.Shared.Utility;
 namespace Content.Server.Players.PlayTimeTracking;
 
 /// <summary>
-/// Connects <see cref="PlayTimeTrackingManager"/> to the simulation state. Reports trackers and such.
+/// Connects <see cref="PlayTimeTrackingManager" /> to the simulation state. Reports trackers and such.
 /// </summary>
 public sealed class PlayTimeTrackingSystem : EntitySystem
 {
@@ -120,9 +121,9 @@ public sealed class PlayTimeTrackingSystem : EntitySystem
     [Dependency] private readonly IServerPreferencesManager _preferencesManager = default!;
     [Dependency] private readonly IPrototypeManager _prototypes = default!;
     [Dependency] private readonly SharedRoleSystem _roles = default!;
-    [Dependency] private readonly PlayTimeTrackingManager _tracking = default!;
 
-    [Dependency] private readonly Content.Corvax.Interfaces.Shared.ISharedSponsorsManager _sponsorsManager = default!; // backmen: allRoles
+    [Dependency] private readonly ISharedSponsorsManager _sponsorsManager = default!; // backmen: allRoles
+    [Dependency] private readonly PlayTimeTrackingManager _tracking = default!;
 
     public override void Initialize()
     {
@@ -211,36 +212,19 @@ public sealed class PlayTimeTrackingSystem : EntitySystem
             _tracking.QueueRefreshTrackers(session);
     }
 
-    private void OnRoundEnd(RoundRestartCleanupEvent ev)
-    {
-        _tracking.Save();
-    }
+    private void OnRoundEnd(RoundRestartCleanupEvent ev) => _tracking.Save();
 
-    private void OnUnAFK(ref UnAFKEvent ev)
-    {
-        _tracking.QueueRefreshTrackers(ev.Session);
-    }
+    private void OnUnAFK(ref UnAFKEvent ev) => _tracking.QueueRefreshTrackers(ev.Session);
 
-    private void OnAFK(ref AFKEvent ev)
-    {
-        _tracking.QueueRefreshTrackers(ev.Session);
-    }
+    private void OnAFK(ref AFKEvent ev) => _tracking.QueueRefreshTrackers(ev.Session);
 
-    private void AdminPermsChanged(AdminPermsChangedEventArgs admin)
-    {
-        _tracking.QueueRefreshTrackers(admin.Player);
-    }
+    private void AdminPermsChanged(AdminPermsChangedEventArgs admin) => _tracking.QueueRefreshTrackers(admin.Player);
 
-    private void OnPlayerAttached(PlayerAttachedEvent ev)
-    {
-        _tracking.QueueRefreshTrackers(ev.Player);
-    }
+    private void OnPlayerAttached(PlayerAttachedEvent ev) => _tracking.QueueRefreshTrackers(ev.Player);
 
-    private void OnPlayerDetached(PlayerDetachedEvent ev)
-    {
+    private void OnPlayerDetached(PlayerDetachedEvent ev) =>
         // This doesn't fire if the player doesn't leave their body. I guess it's fine?
         _tracking.QueueRefreshTrackers(ev.Player);
-    }
 
     private void OnMobStateChanged(MobStateChangedEvent ev)
     {
@@ -257,10 +241,8 @@ public sealed class PlayTimeTrackingSystem : EntitySystem
         _tracking.QueueSendTimers(ev.PlayerSession);
     }
 
-    private void OnStationJobsGetCandidates(ref StationJobsGetCandidatesEvent ev)
-    {
+    private void OnStationJobsGetCandidates(ref StationJobsGetCandidatesEvent ev) =>
         RemoveDisallowedJobs(ev.Player, ev.Jobs);
-    }
 
     private void OnIsJobAllowed(ref IsJobAllowedEvent ev)
     {
@@ -268,10 +250,7 @@ public sealed class PlayTimeTrackingSystem : EntitySystem
             ev.Cancelled = true;
     }
 
-    private void OnGetDisallowedJobs(ref GetDisallowedJobsEvent ev)
-    {
-        ev.Jobs.UnionWith(GetDisallowedJobs(ev.Player));
-    }
+    private void OnGetDisallowedJobs(ref GetDisallowedJobsEvent ev) => ev.Jobs.UnionWith(GetDisallowedJobs(ev.Player));
 
     public bool IsAllowed(ICommonSession player, string role)
     {
@@ -290,7 +269,12 @@ public sealed class PlayTimeTrackingSystem : EntitySystem
             playTimes = new Dictionary<string, TimeSpan>();
         }
 
-        return JobRequirements.TryRequirementsMet(job, playTimes, out _, EntityManager, _prototypes, (HumanoidCharacterProfile?) _preferencesManager.GetPreferences(player.UserId).SelectedCharacter);
+        return JobRequirements.TryRequirementsMet(job,
+            playTimes,
+            out _,
+            EntityManager,
+            _prototypes,
+            (HumanoidCharacterProfile?) _preferencesManager.GetPreferences(player.UserId).SelectedCharacter);
     }
 
     public HashSet<ProtoId<JobPrototype>> GetDisallowedJobs(ICommonSession player)
@@ -312,7 +296,12 @@ public sealed class PlayTimeTrackingSystem : EntitySystem
 
         foreach (var job in _prototypes.EnumeratePrototypes<JobPrototype>())
         {
-            if (JobRequirements.TryRequirementsMet(job, playTimes, out _, EntityManager, _prototypes, (HumanoidCharacterProfile?) _preferencesManager.GetPreferences(player.UserId).SelectedCharacter))
+            if (JobRequirements.TryRequirementsMet(job,
+                    playTimes,
+                    out _,
+                    EntityManager,
+                    _prototypes,
+                    (HumanoidCharacterProfile?) _preferencesManager.GetPreferences(player.UserId).SelectedCharacter))
                 roles.Add(job.ID);
         }
 
@@ -340,18 +329,18 @@ public sealed class PlayTimeTrackingSystem : EntitySystem
         for (var i = 0; i < jobs.Count; i++)
         {
             if (_prototypes.TryIndex(jobs[i], out var job)
-                && JobRequirements.TryRequirementsMet(job, playTimes, out _, EntityManager, _prototypes, (HumanoidCharacterProfile?) _preferencesManager.GetPreferences(userId).SelectedCharacter))
-            {
+                && JobRequirements.TryRequirementsMet(job,
+                    playTimes,
+                    out _,
+                    EntityManager,
+                    _prototypes,
+                    (HumanoidCharacterProfile?) _preferencesManager.GetPreferences(userId).SelectedCharacter))
                 continue;
-            }
 
             jobs.RemoveSwap(i);
             i--;
         }
     }
 
-    public void PlayerRolesChanged(ICommonSession player)
-    {
-        _tracking.QueueRefreshTrackers(player);
-    }
+    public void PlayerRolesChanged(ICommonSession player) => _tracking.QueueRefreshTrackers(player);
 }

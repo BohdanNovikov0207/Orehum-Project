@@ -132,7 +132,8 @@ public sealed partial class AtmosphereSystem
         args.Handled = true;
     }
 
-    private void GridGetAllMixtures(EntityUid uid, GridAtmosphereComponent component,
+    private void GridGetAllMixtures(EntityUid uid,
+        GridAtmosphereComponent component,
         ref GetAllMixturesMethodEvent args)
     {
         if (args.Handled)
@@ -190,14 +191,12 @@ public sealed partial class AtmosphereSystem
         tile.AdjacentBits = AtmosDirection.Invalid;
         for (var i = 0; i < Atmospherics.Directions; i++)
         {
-            var direction = (AtmosDirection)(1 << i);
+            var direction = (AtmosDirection) (1 << i);
             var adjacentIndices = tile.GridIndices.Offset(direction);
 
             TileAtmosphere? adjacent;
             if (!tile.NoGridTile)
-            {
                 adjacent = GetOrNewTile(uid, atmos, adjacentIndices);
-            }
             else if (!atmos.Tiles.TryGetValue(adjacentIndices, out adjacent))
             {
                 tile.AdjacentBits &= ~direction;
@@ -210,7 +209,7 @@ public sealed partial class AtmosphereSystem
                 AddActiveTile(atmos, adjacent);
 
             var oppositeIndex = i.ToOppositeIndex();
-            var oppositeDirection = (AtmosDirection)(1 << oppositeIndex);
+            var oppositeDirection = (AtmosDirection) (1 << oppositeIndex);
 
             if (adjBlockDirs.IsFlagSet(oppositeDirection) || blockedDirs.IsFlagSet(direction))
             {
@@ -250,7 +249,8 @@ public sealed partial class AtmosphereSystem
         return (air, map.Space);
     }
 
-    private void GridHotspotExtinguish(EntityUid uid, GridAtmosphereComponent component,
+    private void GridHotspotExtinguish(EntityUid uid,
+        GridAtmosphereComponent component,
         ref HotspotExtinguishMethodEvent args)
     {
         if (args.Handled)
@@ -267,7 +267,8 @@ public sealed partial class AtmosphereSystem
         AddActiveTile(component, tile);
     }
 
-    private void GridIsHotspotActive(EntityUid uid, GridAtmosphereComponent component,
+    private void GridIsHotspotActive(EntityUid uid,
+        GridAtmosphereComponent component,
         ref IsHotspotActiveMethodEvent args)
     {
         if (args.Handled)
@@ -327,7 +328,7 @@ public sealed partial class AtmosphereSystem
     }
 
     /// <summary>
-    ///     Repopulates all tiles on a grid atmosphere.
+    /// Repopulates all tiles on a grid atmosphere.
     /// </summary>
     public void InvalidateAllTiles(Entity<MapGridComponent?, GridAtmosphereComponent?> entity)
     {

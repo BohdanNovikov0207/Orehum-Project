@@ -22,6 +22,25 @@ namespace Content.Server.GameTicking.Rules.Components;
 public sealed partial class AntagLoadProfileRuleComponent : Component
 {
     /// <summary>
+    /// Goobstation
+    /// If true, then SpeciesOverride will always be used
+    /// </summary>
+    [DataField]
+    public bool AlwaysUseSpeciesOverride;
+
+    /// <summary>
+    /// Goobstation - If true, forces the spawned entity to use maximum height and width for their species
+    /// </summary>
+    [DataField]
+    public bool ForceMaxSize = false;
+
+    /// <summary>
+    /// Shitmed - Starlight Abductors: Species valid for the rule.
+    /// </summary>
+    [DataField]
+    public ProtoId<SpeciesPrototype>? SpeciesHardOverride;
+
+    /// <summary>
     /// If specified, the profile loaded will be made into this species if the chosen species matches the blacklist.
     /// </summary>
     [DataField]
@@ -32,23 +51,4 @@ public sealed partial class AntagLoadProfileRuleComponent : Component
     /// </summary>
     [DataField]
     public HashSet<ProtoId<SpeciesPrototype>>? SpeciesOverrideBlacklist;
-
-    /// <summary>
-    /// Goobstation
-    /// If true, then SpeciesOverride will always be used
-    /// </summary>
-    [DataField]
-    public bool AlwaysUseSpeciesOverride;
-
-    /// <summary>
-    ///     Shitmed - Starlight Abductors: Species valid for the rule.
-    /// </summary>
-    [DataField]
-    public ProtoId<SpeciesPrototype>? SpeciesHardOverride;
-
-    /// <summary>
-    /// Goobstation - If true, forces the spawned entity to use maximum height and width for their species
-    /// </summary>
-    [DataField]
-    public bool ForceMaxSize = false;
 }

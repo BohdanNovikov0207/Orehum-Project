@@ -22,21 +22,20 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Server.Store.Components;
-using Content.Shared.UserInterface;
+using System.Linq;
 using Content.Goobstation.Maths.FixedPoint;
+using Content.Server._White.StoreDiscount;
+using Content.Server.Polymorph.Systems;
+using Content.Server.Store.Components;
 using Content.Shared.Implants.Components;
 using Content.Shared.Interaction;
+using Content.Shared.Polymorph;
 using Content.Shared.Popups;
 using Content.Shared.Stacks;
 using Content.Shared.Store.Components;
+using Content.Shared.UserInterface;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
-using System.Linq;
-using Content.Server._White.StoreDiscount;
-using Content.Shared.Mind;
-using Content.Shared.Polymorph;
-using Content.Server.Polymorph.Systems;
 
 namespace Content.Server.Store.Systems;
 
@@ -48,10 +47,10 @@ namespace Content.Server.Store.Systems;
 // do not touch unless you want to shoot yourself in the leg
 public sealed partial class StoreSystem : EntitySystem
 {
-    [Dependency] private readonly IPrototypeManager _proto = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly StoreDiscountSystem _storeDiscount = default!; // WD EDIT
     [Dependency] private readonly PolymorphSystem _polymorph = default!; // goob edit
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly IPrototypeManager _proto = default!;
+    [Dependency] private readonly StoreDiscountSystem _storeDiscount = default!; // WD EDIT
 
     public override void Initialize()
     {
@@ -92,9 +91,7 @@ public sealed partial class StoreSystem : EntitySystem
     {
         // for traitors, because the StoreComponent for the PDA can be added at any time.
         if (MetaData(uid).EntityLifeStage == EntityLifeStage.MapInitialized)
-        {
             RefreshAllListings(component);
-        }
 
         var ev = new StoreAddedEvent();
         RaiseLocalEvent(uid, ref ev, true);
@@ -145,18 +142,22 @@ public sealed partial class StoreSystem : EntitySystem
         _popup.PopupEntity(msg, args.Target.Value, args.User);
     }
 
-    private void OnImplantActivate(EntityUid uid, StoreComponent component, OpenUplinkImplantEvent args)
-    {
+    private void OnImplantActivate(EntityUid uid, StoreComponent component, OpenUplinkImplantEvent args) =>
         ToggleUi(args.Performer, uid, component);
-    }
 
     /// <summary>
     /// Gets the value from an entity's currency component.
     /// Scales with stacks.
     /// </summary>
     /// <remarks>
-    /// If this result is intended to be used with <see cref="TryAddCurrency(Robust.Shared.GameObjects.Entity{Content.Server.Store.Components.CurrencyComponent?},Robust.Shared.GameObjects.Entity{Content.Shared.Store.Components.StoreComponent?})"/>,
-    /// consider using <see cref="TryAddCurrency(Robust.Shared.GameObjects.Entity{Content.Server.Store.Components.CurrencyComponent?},Robust.Shared.GameObjects.Entity{Content.Shared.Store.Components.StoreComponent?})"/> instead to ensure that the currency is consumed in the process.
+    /// If this result is intended to be used with
+    /// <see
+    ///     cref="TryAddCurrency(Robust.Shared.GameObjects.Entity{Content.Server.Store.Components.CurrencyComponent?},Robust.Shared.GameObjects.Entity{Content.Shared.Store.Components.StoreComponent?})" />
+    /// ,
+    /// consider using
+    /// <see
+    ///     cref="TryAddCurrency(Robust.Shared.GameObjects.Entity{Content.Server.Store.Components.CurrencyComponent?},Robust.Shared.GameObjects.Entity{Content.Shared.Store.Components.StoreComponent?})" />
+    /// instead to ensure that the currency is consumed in the process.
     /// </remarks>
     /// <param name="uid"></param>
     /// <param name="component"></param>
@@ -230,10 +231,10 @@ public sealed partial class StoreSystem : EntitySystem
 
 public sealed class CurrencyInsertAttemptEvent : CancellableEntityEventArgs
 {
-    public readonly EntityUid User;
+    public readonly StoreComponent Store;
     public readonly EntityUid Target;
     public readonly EntityUid Used;
-    public readonly StoreComponent Store;
+    public readonly EntityUid User;
 
     public CurrencyInsertAttemptEvent(EntityUid user, EntityUid target, EntityUid used, StoreComponent store)
     {

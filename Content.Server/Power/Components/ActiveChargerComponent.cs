@@ -5,10 +5,9 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-namespace Content.Server.Power.Components
+namespace Content.Server.Power.Components;
+
+[RegisterComponent]
+public sealed partial class ActiveChargerComponent : Component
 {
-    [RegisterComponent]
-    public sealed partial class ActiveChargerComponent : Component
-    {
-    }
 }

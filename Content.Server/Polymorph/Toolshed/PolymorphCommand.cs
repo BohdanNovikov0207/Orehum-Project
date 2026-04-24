@@ -20,19 +20,19 @@ using Robust.Shared.Toolshed;
 namespace Content.Server.Polymorph.Toolshed;
 
 /// <summary>
-///     Polymorphs the given entity(s) into the target morph.
+/// Polymorphs the given entity(s) into the target morph.
 /// </summary>
-[ToolshedCommand, AdminCommand(AdminFlags.Fun)]
+[ToolshedCommand] [AdminCommand(AdminFlags.Fun)]
 public sealed class PolymorphCommand : ToolshedCommand
 {
+    [Dependency] private readonly IPrototypeManager _proto = default!;
     private PolymorphSystem? _system;
-    [Dependency] private IPrototypeManager _proto = default!;
 
     [CommandImplementation]
     public EntityUid? Polymorph(
-            [PipedArgument] EntityUid input,
-            ProtoId<PolymorphPrototype> protoId
-        )
+        [PipedArgument] EntityUid input,
+        ProtoId<PolymorphPrototype> protoId
+    )
     {
         _system ??= GetSys<PolymorphSystem>();
 
@@ -44,8 +44,8 @@ public sealed class PolymorphCommand : ToolshedCommand
 
     [CommandImplementation]
     public IEnumerable<EntityUid> Polymorph(
-            [PipedArgument] IEnumerable<EntityUid> input,
-            ProtoId<PolymorphPrototype> protoId
-        )
-        => input.Select(x => Polymorph(x, protoId)).Where(x => x is not null).Select(x => (EntityUid)x!);
+        [PipedArgument] IEnumerable<EntityUid> input,
+        ProtoId<PolymorphPrototype> protoId
+    )
+        => input.Select(x => Polymorph(x, protoId)).Where(x => x is not null).Select(x => (EntityUid) x!);
 }

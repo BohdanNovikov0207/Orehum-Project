@@ -102,12 +102,12 @@ public sealed class SpecialRespawnSystem : SharedSpecialRespawnSystem
 {
     [Dependency] private readonly IAdminLogManager _adminLog = default!;
     [Dependency] private readonly AtmosphereSystem _atmosphere = default!;
+    [Dependency] private readonly IChatManager _chat = default!;
+    [Dependency] private readonly SharedMapSystem _map = default!;
+    [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly SharedMapSystem _map = default!;
     [Dependency] private readonly TurfSystem _turf = default!;
-    [Dependency] private readonly IChatManager _chat = default!;
-    [Dependency] private readonly IPrototypeManager _proto = default!;
 
     public override void Initialize()
     {
@@ -169,7 +169,8 @@ public sealed class SpecialRespawnSystem : SharedSpecialRespawnSystem
         if (!component.Respawn || !HasComp<StationMemberComponent>(entityGridUid) || entityMapUid == null)
             return;
 
-        if (!TryComp<MapGridComponent>(entityGridUid, out var grid) || MetaData(entityGridUid.Value).EntityLifeStage >= EntityLifeStage.Terminating)
+        if (!TryComp<MapGridComponent>(entityGridUid, out var grid) ||
+            MetaData(entityGridUid.Value).EntityLifeStage >= EntityLifeStage.Terminating)
             return;
 
         //Invalid prototype
@@ -184,7 +185,7 @@ public sealed class SpecialRespawnSystem : SharedSpecialRespawnSystem
         {
             var xform = Transform(entityGridUid.Value);
             var pos = xform.Coordinates;
-            var mapPos = _transform.GetMapCoordinates(entityGridUid.Value, xform: xform);
+            var mapPos = _transform.GetMapCoordinates(entityGridUid.Value, xform);
             var circle = new Circle(mapPos.Position, 2);
 
             var found = false;
@@ -193,11 +194,10 @@ public sealed class SpecialRespawnSystem : SharedSpecialRespawnSystem
             {
                 if (_turf.IsSpace(tile)
                     || _turf.IsTileBlocked(tile, CollisionGroup.MobMask)
-                    || !_atmosphere.IsTileMixtureProbablySafe(entityGridUid, entityMapUid.Value,
+                    || !_atmosphere.IsTileMixtureProbablySafe(entityGridUid,
+                        entityMapUid.Value,
                         _map.TileIndicesFor((entityGridUid.Value, grid), mapPos)))
-                {
                     continue;
-                }
 
                 pos = _turf.GetTileCenter(tile);
                 found = true;
@@ -219,8 +219,11 @@ public sealed class SpecialRespawnSystem : SharedSpecialRespawnSystem
     private void Respawn(EntityUid oldEntity, string prototype, EntityCoordinates coords)
     {
         var entity = Spawn(prototype, coords);
-        _adminLog.Add(LogType.Respawn, LogImpact.Extreme, $"{ToPrettyString(oldEntity)} was deleted and was respawned at {_transform.ToMapCoordinates(coords)} as {ToPrettyString(entity)}");
-        _chat.SendAdminAlert($"{MetaData(oldEntity).EntityName} was deleted and was respawned as {ToPrettyString(entity)}");
+        _adminLog.Add(LogType.Respawn,
+            LogImpact.Extreme,
+            $"{ToPrettyString(oldEntity)} was deleted and was respawned at {_transform.ToMapCoordinates(coords)} as {ToPrettyString(entity)}");
+        _chat.SendAdminAlert(
+            $"{MetaData(oldEntity).EntityName} was deleted and was respawned as {ToPrettyString(entity)}");
     }
 
     /// <summary>
@@ -232,7 +235,11 @@ public sealed class SpecialRespawnSystem : SharedSpecialRespawnSystem
     /// <param name="targetCoords">If successful, the coordinates of the safe tile</param>
     /// <param name="checkTileMixture">Goobstation: Whether to skip tiles with unsafe air mixture</param>
     /// <returns></returns>
-    public bool TryFindRandomTile(EntityUid targetGrid, EntityUid targetMap, int maxAttempts, out EntityCoordinates targetCoords, bool checkTileMixture = true) // Goob edit - add checkTileMixture
+    public bool TryFindRandomTile(EntityUid targetGrid,
+        EntityUid targetMap,
+        int maxAttempts,
+        out EntityCoordinates targetCoords,
+        bool checkTileMixture = true) // Goob edit - add checkTileMixture
     {
         targetCoords = EntityCoordinates.Invalid;
 
@@ -253,17 +260,19 @@ public sealed class SpecialRespawnSystem : SharedSpecialRespawnSystem
         //Obviously don't put anything ridiculous in here
         for (var i = 0; i < maxAttempts; i++)
         {
-            var randomX = _random.Next((int)gridBounds.Left, (int)gridBounds.Right);
-            var randomY = _random.Next((int)gridBounds.Bottom, (int)gridBounds.Top);
+            var randomX = _random.Next((int) gridBounds.Left, (int) gridBounds.Right);
+            var randomY = _random.Next((int) gridBounds.Bottom, (int) gridBounds.Top);
 
-            tile = new Vector2i(randomX - (int)gridPos.X, randomY - (int)gridPos.Y);
+            tile = new Vector2i(randomX - (int) gridPos.X, randomY - (int) gridPos.Y);
             var mapPos = _map.GridTileToWorldPos(targetGrid, grid, tile);
             var mapTarget = _map.WorldToTile(targetGrid, grid, mapPos);
             var circle = new Circle(mapPos, 2);
 
             foreach (var newTileRef in _map.GetTilesIntersecting(targetGrid, grid, circle))
             {
-                if (_turf.IsSpace(newTileRef) || _turf.IsTileBlocked(newTileRef, CollisionGroup.MobMask) || !_atmosphere.IsTileMixtureProbablySafe(targetGrid, targetMap, mapTarget) && checkTileMixture)  // Goob edit - add checkTileMixture
+                if (_turf.IsSpace(newTileRef) || _turf.IsTileBlocked(newTileRef, CollisionGroup.MobMask) ||
+                    !_atmosphere.IsTileMixtureProbablySafe(targetGrid, targetMap, mapTarget) &&
+                    checkTileMixture) // Goob edit - add checkTileMixture
                     continue;
 
                 found = true;

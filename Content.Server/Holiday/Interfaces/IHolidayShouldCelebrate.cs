@@ -7,11 +7,10 @@
 //
 // SPDX-License-Identifier: MIT
 
-namespace Content.Server.Holiday.Interfaces
+namespace Content.Server.Holiday.Interfaces;
+
+[ImplicitDataDefinitionForInheritors]
+public partial interface IHolidayShouldCelebrate
 {
-    [ImplicitDataDefinitionForInheritors]
-    public partial interface IHolidayShouldCelebrate
-    {
-        bool ShouldCelebrate(DateTime date, HolidayPrototype holiday);
-    }
+    bool ShouldCelebrate(DateTime date, HolidayPrototype holiday);
 }

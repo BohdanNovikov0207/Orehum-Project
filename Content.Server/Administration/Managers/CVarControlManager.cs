@@ -14,27 +14,21 @@ using Robust.Shared.Reflection;
 namespace Content.Server.Administration.Managers;
 
 /// <summary>
-/// Manages the control of CVars via the <see cref="Content.Shared.CCVar.CVarAccess.CVarControl"/> attribute.
+/// Manages the control of CVars via the <see cref="Content.Shared.CCVar.CVarAccess.CVarControl" /> attribute.
 /// </summary>
 public sealed class CVarControlManager : IPostInjectInit
 {
-    [Dependency] private readonly IReflectionManager _reflectionManager = default!;
     [Dependency] private readonly IAdminManager _adminManager = default!;
-    [Dependency] private readonly ILocalizationManager _localizationManager = default!;
-    [Dependency] private readonly ILogManager _logger = default!;
 
     private readonly List<ChangableCVar> _changableCvars = new();
+    [Dependency] private readonly ILocalizationManager _localizationManager = default!;
+    [Dependency] private readonly ILogManager _logger = default!;
+    [Dependency] private readonly IReflectionManager _reflectionManager = default!;
     private ISawmill _sawmill = default!;
 
-    void IPostInjectInit.PostInject()
-    {
-        _sawmill = _logger.GetSawmill("cvarcontrol");
-    }
+    void IPostInjectInit.PostInject() => _sawmill = _logger.GetSawmill("cvarcontrol");
 
-    public void Initialize()
-    {
-        RegisterCVars();
-    }
+    public void Initialize() => RegisterCVars();
 
     private void RegisterCVars()
     {
@@ -48,15 +42,14 @@ public sealed class CVarControlManager : IPostInjectInit
 
         foreach (var type in validCvarsDefs)
         {
-            foreach (var field in type.GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy))
+            foreach (var field in type.GetFields(BindingFlags.Public | BindingFlags.Static |
+                                                 BindingFlags.FlattenHierarchy))
             {
                 var allowed = field.GetCustomAttribute<CVarControl>();
                 if (allowed == null)
-                {
                     continue;
-                }
 
-                var cvarDef = (CVarDef)field.GetValue(null)!;
+                var cvarDef = (CVarDef) field.GetValue(null)!;
                 _changableCvars.Add(new ChangableCVar(cvarDef.Name, allowed, _localizationManager));
             }
         }
@@ -88,23 +81,15 @@ public sealed class CVarControlManager : IPostInjectInit
             .ToList();
     }
 
-    public ChangableCVar? GetCVar(string name)
-    {
-        return _changableCvars.FirstOrDefault(cvar => cvar.Name == name);
-    }
+    public ChangableCVar? GetCVar(string name) => _changableCvars.FirstOrDefault(cvar => cvar.Name == name);
 }
 
 public sealed class ChangableCVar
 {
     private const string LocPrefix = "changecvar";
-
-    public string Name { get; }
-
-    // Holding a reference to the attribute might be skrunkly? Not sure how much mem it eats up.
-    public CVarControl Control { get; }
+    public string? LongHelp;
 
     public string? ShortHelp;
-    public string? LongHelp;
 
     public ChangableCVar(string name, CVarControl control, ILocalizationManager loc)
     {
@@ -112,19 +97,18 @@ public sealed class ChangableCVar
         Control = control;
 
         if (loc.TryGetString($"{LocPrefix}-simple-{name.Replace('.', '_')}", out var simple))
-        {
             ShortHelp = simple;
-        }
 
         if (loc.TryGetString($"{LocPrefix}-full-{name.Replace('.', '_')}", out var longHelp))
-        {
             LongHelp = longHelp;
-        }
 
         // If one is set and the other is not, we throw
         if (ShortHelp == null && LongHelp != null || ShortHelp != null && LongHelp == null)
-        {
             throw new InvalidOperationException("Short and long help must both be set or both be null.");
-        }
     }
+
+    public string Name { get; }
+
+    // Holding a reference to the attribute might be skrunkly? Not sure how much mem it eats up.
+    public CVarControl Control { get; }
 }

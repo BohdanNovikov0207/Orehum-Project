@@ -43,13 +43,9 @@ public partial class RadiationSystem
     private void OnAnchorChanged(EntityUid uid, RadiationBlockerComponent component, ref AnchorStateChangedEvent args)
     {
         if (args.Anchored)
-        {
             AddTile(uid, component);
-        }
         else
-        {
             RemoveTile(uid, component);
-        }
     }
 
     private void OnReAnchor(EntityUid uid, RadiationBlockerComponent component, ref ReAnchorEvent args)
@@ -74,12 +70,12 @@ public partial class RadiationSystem
         }
     }
 
-    private void OnGridRemoved(EntityUid uid, RadiationGridResistanceComponent component, ref EntityTerminatingEvent args)
-    {
+    private void OnGridRemoved(EntityUid uid,
+        RadiationGridResistanceComponent component,
+        ref EntityTerminatingEvent args) =>
         // grid is about to be removed - lets delete grid component first
         // this should save a bit performance when blockers will be deleted
         RemComp(uid, component);
-    }
 
     public void SetEnabled(EntityUid uid, bool isEnabled, RadiationBlockerComponent? component = null)
     {
@@ -99,9 +95,7 @@ public partial class RadiationSystem
     {
         // check that last position was removed
         if (component.CurrentPosition != null)
-        {
             RemoveTile(uid, component);
-        }
 
         // check if entity even provide some rad protection
         if (!component.Enabled || component.RadResistance <= 0)
@@ -142,9 +136,7 @@ public partial class RadiationSystem
         // add to existing cell more rad resistance
         var newResistance = radResistance;
         if (grid.TryGetValue(tilePos, out var existingResistance))
-        {
             newResistance += existingResistance;
-        }
         grid[tilePos] = newResistance;
     }
 

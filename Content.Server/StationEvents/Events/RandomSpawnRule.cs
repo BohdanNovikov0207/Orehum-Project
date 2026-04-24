@@ -13,7 +13,10 @@ namespace Content.Server.StationEvents.Events;
 
 public sealed class RandomSpawnRule : StationEventSystem<RandomSpawnRuleComponent>
 {
-    protected override void Started(EntityUid uid, RandomSpawnRuleComponent comp, GameRuleComponent gameRule, GameRuleStartedEvent args)
+    protected override void Started(EntityUid uid,
+        RandomSpawnRuleComponent comp,
+        GameRuleComponent gameRule,
+        GameRuleStartedEvent args)
     {
         base.Started(uid, comp, gameRule, args);
 

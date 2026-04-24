@@ -45,10 +45,9 @@ public sealed partial class ShuttleConsoleSystem
         }
     }
 
-    private void OnDronePilotConsoleOpen(EntityUid uid, DroneConsoleComponent component, AfterActivatableUIOpenEvent args)
-    {
-        component.Entity = GetShuttleConsole(uid);
-    }
+    private void OnDronePilotConsoleOpen(EntityUid uid,
+        DroneConsoleComponent component,
+        AfterActivatableUIOpenEvent args) => component.Entity = GetShuttleConsole(uid);
 
     private void OnDronePilotConsoleClose(EntityUid uid, DroneConsoleComponent component, BoundUIClosedEvent args)
     {
@@ -57,10 +56,8 @@ public sealed partial class ShuttleConsoleSystem
             component.Entity = null;
     }
 
-    private void OnCargoGetConsole(EntityUid uid, DroneConsoleComponent component, ref ConsoleShuttleEvent args)
-    {
+    private void OnCargoGetConsole(EntityUid uid, DroneConsoleComponent component, ref ConsoleShuttleEvent args) =>
         args.Console = GetShuttleConsole(uid, component);
-    }
 
     /// <summary>
     /// Gets the relevant shuttle console to proxy from the drone console.
@@ -76,14 +73,16 @@ public sealed partial class ShuttleConsoleSystem
                 return null;
 
             foreach (var linkedPort in deviceLinkSink.LinkedPorts)
-                foreach (var port in linkedPort.Value)
-                    if (port.Source == ShuttleDroneLinkSystem.RemoteDroneSourcePort)
-                    {
-                        if (!HasComp<ShuttleConsoleComponent>(linkedPort.Key))
-                            continue;
+            foreach (var port in linkedPort.Value)
+            {
+                if (port.Source == ShuttleDroneLinkSystem.RemoteDroneSourcePort)
+                {
+                    if (!HasComp<ShuttleConsoleComponent>(linkedPort.Key))
+                        continue;
 
-                        return linkedPort.Key;
-                    }
+                    return linkedPort.Key;
+                }
+            }
 
             return null;
         }
@@ -101,9 +100,7 @@ public sealed partial class ShuttleConsoleSystem
             if (xform.GridUid == null ||
                 !TryComp<StationMemberComponent>(xform.GridUid, out var member) ||
                 member.Station != stationUid)
-            {
                 continue;
-            }
 
             foreach (var compType in component.Components.Values)
             {

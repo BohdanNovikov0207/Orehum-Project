@@ -39,20 +39,24 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using System.Linq;  // goob - intermap transmitters
-using Content.Goobstation.Shared.Communications; // goob - intermap transmitters
-using Content.Goobstation.Shared.Loudspeaker.Events; // goob - loudspeakers
+using System.Linq;
+using Content.Goobstation.Shared.Communications;
+using Content.Goobstation.Shared.Loudspeaker.Events;
+using Content.Goobstation.Shared.Radio;
+using Content.Server._EinsteinEngines.Language;
 using Content.Server.Administration.Logs;
 using Content.Server.Chat.Systems;
-using Content.Server._EinsteinEngines.Language;
 using Content.Server.Power.Components;
 using Content.Server.Radio.Components;
-using Content.Shared.Chat;
-using Content.Shared.Database;
 using Content.Shared._EinsteinEngines.Language;
+using Content.Shared.Chat;
+using Content.Shared.Chat.RadioIconsEvents;
+using Content.Shared.Database;
 using Content.Shared.Radio;
 using Content.Shared.Radio.Components;
 using Content.Shared.Speech;
+using Content.Shared.StatusIcon;
+using Content.Shared.Whitelist;
 using Robust.Shared.Map;
 using Robust.Shared.Network;
 using Robust.Shared.Player;
@@ -60,31 +64,37 @@ using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Replays;
 using Robust.Shared.Utility;
-using Content.Shared.Access.Systems; // Goobstation
-using Content.Shared.Chat.RadioIconsEvents; // Goobstation
-using Content.Shared.Whitelist; // Goobstation
-using Content.Shared.StatusIcon; // Goobstation
-using Content.Goobstation.Shared.Radio; // Goobstation
+// goob - intermap transmitters
+// goob - intermap transmitters
+// goob - loudspeakers
+// Goobstation
+// Goobstation
+// Goobstation
+// Goobstation
+
+// Goobstation
 
 namespace Content.Server.Radio.EntitySystems;
 
 /// <summary>
-///     This system handles intrinsic radios and the general process of converting radio messages into chat messages.
+/// This system handles intrinsic radios and the general process of converting radio messages into chat messages.
 /// </summary>
-public sealed partial class RadioSystem : EntitySystem
+public sealed class RadioSystem : EntitySystem
 {
-    [Dependency] private readonly INetManager _netMan = default!;
-    [Dependency] private readonly IReplayRecordingManager _replay = default!;
     [Dependency] private readonly IAdminLogManager _adminLogger = default!;
-    [Dependency] private readonly IPrototypeManager _prototype = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly ChatSystem _chat = default!;
-    [Dependency] private readonly RadioJobIconSystem _radioIconSystem = default!; // Goobstation - radio icons
     [Dependency] private readonly LanguageSystem _language = default!; // Einstein Engines - Language
-    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!; // Goobstation - Whitelisted radio channels
 
     // set used to prevent radio feedback loops.
     private readonly HashSet<string> _messages = new();
+    [Dependency] private readonly INetManager _netMan = default!;
+    [Dependency] private readonly IPrototypeManager _prototype = default!;
+    [Dependency] private readonly RadioJobIconSystem _radioIconSystem = default!; // Goobstation - radio icons
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly IReplayRecordingManager _replay = default!;
+
+    [Dependency]
+    private readonly EntityWhitelistSystem _whitelist = default!; // Goobstation - Whitelisted radio channels
 
     private EntityQuery<TelecomExemptComponent> _exemptQuery;
 
@@ -93,7 +103,8 @@ public sealed partial class RadioSystem : EntitySystem
         base.Initialize();
         SubscribeLocalEvent<IntrinsicRadioReceiverComponent, RadioReceiveEvent>(OnIntrinsicReceive);
         SubscribeLocalEvent<IntrinsicRadioTransmitterComponent, EntitySpokeEvent>(OnIntrinsicSpeak);
-        SubscribeLocalEvent<IntrinsicRadioReceiverComponent, RadioReceiveAttemptEvent>(OnIntrinsicReceiveAttempt); // Goobstation
+        SubscribeLocalEvent<IntrinsicRadioReceiverComponent, RadioReceiveAttemptEvent>(
+            OnIntrinsicReceiveAttempt); // Goobstation
 
         _exemptQuery = GetEntityQuery<TelecomExemptComponent>();
     }
@@ -102,14 +113,17 @@ public sealed partial class RadioSystem : EntitySystem
     {
         if (args.Channel != null
             && component.Channels.Contains(args.Channel.ID)
-            && _whitelist.IsWhitelistPassOrNull(args.Channel.SendWhitelist, uid)) // Goobstation - Whitelisted radio channels
+            && _whitelist.IsWhitelistPassOrNull(args.Channel.SendWhitelist,
+                uid)) // Goobstation - Whitelisted radio channels
         {
             SendRadioMessage(uid, args.Message, args.Channel, uid, args.Language); // Einstein Engines - Language
             args.Channel = null; // prevent duplicate messages from other listeners.
         }
     }
 
-    private void OnIntrinsicReceive(EntityUid uid, IntrinsicRadioReceiverComponent component, ref RadioReceiveEvent args)
+    private void OnIntrinsicReceive(EntityUid uid,
+        IntrinsicRadioReceiverComponent component,
+        ref RadioReceiveEvent args)
     {
         if (TryComp(uid, out ActorComponent? actor))
         {
@@ -126,10 +140,10 @@ public sealed partial class RadioSystem : EntitySystem
     }
 
     // Goobstation - Whitelisted radio channels
-    private void OnIntrinsicReceiveAttempt(EntityUid uid, IntrinsicRadioReceiverComponent component, ref RadioReceiveAttemptEvent args)
-    {
+    private void OnIntrinsicReceiveAttempt(EntityUid uid,
+        IntrinsicRadioReceiverComponent component,
+        ref RadioReceiveAttemptEvent args) =>
         args.Cancelled = _whitelist.IsWhitelistFail(args.Channel.ReceiveWhitelist, uid);
-    }
 
     /// <summary>
     /// Send radio message to all active radio listeners
@@ -140,10 +154,13 @@ public sealed partial class RadioSystem : EntitySystem
         ProtoId<RadioChannelPrototype> channel,
         EntityUid radioSource,
         LanguagePrototype? language = null,
-        bool escapeMarkup = true)
-    {
-        SendRadioMessage(messageSource, message, _prototype.Index(channel), radioSource, escapeMarkup: escapeMarkup, language: language); // Einstein Engines - Language
-    }
+        bool escapeMarkup = true) =>
+        SendRadioMessage(messageSource,
+            message,
+            _prototype.Index(channel),
+            radioSource,
+            escapeMarkup: escapeMarkup,
+            language: language); // Einstein Engines - Language
 
     /// <summary>
     /// Send radio message to all active radio listeners
@@ -212,7 +229,14 @@ public sealed partial class RadioSystem : EntitySystem
         //     ("channel", $"\\[{channel.LocalizedName}\\]"),
         //     ("name", name),
         //     ("message", content));
-        var wrappedMessage = WrapRadioMessage(messageSource, channel, name, content, language, jobIcon, jobName); // Einstein Engines - Language
+        var wrappedMessage =
+            WrapRadioMessage(messageSource,
+                channel,
+                name,
+                content,
+                language,
+                jobIcon,
+                jobName); // Einstein Engines - Language
 
         // most radios are relayed to chat, so lets parse the chat message beforehand
         // var chat = new ChatMessage(
@@ -232,7 +256,11 @@ public sealed partial class RadioSystem : EntitySystem
         // Goobstation - Chat Pings
         // Added GetNetEntity(messageSource), to source
         var obfuscatedWrapped = WrapRadioMessage(messageSource, channel, name, obfuscated, language, jobIcon, jobName);
-        var notUdsMsg = new ChatMessage(ChatChannel.Radio, obfuscated, obfuscatedWrapped, GetNetEntity(messageSource), null);
+        var notUdsMsg = new ChatMessage(ChatChannel.Radio,
+            obfuscated,
+            obfuscatedWrapped,
+            GetNetEntity(messageSource),
+            null);
         var ev = new RadioReceiveEvent(messageSource, channel, msg, notUdsMsg, language, radioSource);
         // Einstein Engines - Language end
 
@@ -250,13 +278,14 @@ public sealed partial class RadioSystem : EntitySystem
         {
             if (!radio.ReceiveAllChannels)
             {
-                if (!radio.Channels.Contains(channel.ID) || (TryComp<IntercomComponent>(receiver, out var intercom) &&
-                                                             !intercom.SupportedChannels.Contains(channel.ID)))
+                if (!radio.Channels.Contains(channel.ID) || TryComp<IntercomComponent>(receiver, out var intercom) &&
+                    !intercom.SupportedChannels.Contains(channel.ID))
                     continue;
             }
 
             if (!channel.LongRange && transform.MapID != sourceMapId && !radio.GlobalReceive
-                && !(HasActiveTransmitter(transform.MapID) && HasActiveTransmitter(sourceMapId))) // goob - intermap transmitters
+                && !(HasActiveTransmitter(transform.MapID) &&
+                     HasActiveTransmitter(sourceMapId))) // goob - intermap transmitters
                 continue;
 
             // don't need telecom server for long range channels or handheld radios and intercoms
@@ -276,9 +305,13 @@ public sealed partial class RadioSystem : EntitySystem
         }
 
         if (name != Name(messageSource))
-            _adminLogger.Add(LogType.Chat, LogImpact.Low, $"Radio message from {ToPrettyString(messageSource):user} as {name} on {channel.LocalizedName}: {message}");
+            _adminLogger.Add(LogType.Chat,
+                LogImpact.Low,
+                $"Radio message from {ToPrettyString(messageSource):user} as {name} on {channel.LocalizedName}: {message}");
         else
-            _adminLogger.Add(LogType.Chat, LogImpact.Low, $"Radio message from {ToPrettyString(messageSource):user} on {channel.LocalizedName}: {message}");
+            _adminLogger.Add(LogType.Chat,
+                LogImpact.Low,
+                $"Radio message from {ToPrettyString(messageSource):user} on {channel.LocalizedName}: {message}");
 
         _replay.RecordServerMessage(msg); // Einstein Engines - Language
         _messages.Remove(message);
@@ -358,7 +391,10 @@ public sealed partial class RadioSystem : EntitySystem
         // Goobstation end
 
         if (language.SpeechOverride.Color is { } colorOverride)
-            languageColor = Color.InterpolateBetween(Color.White, colorOverride, colorOverride.A); // Changed first param to Color.White so it shows color correctly.
+            languageColor =
+                Color.InterpolateBetween(Color.White,
+                    colorOverride,
+                    colorOverride.A); // Changed first param to Color.White so it shows color correctly.
 
         var languageDisplay = language.IsVisibleLanguage
             ? Loc.GetString("chat-manager-language-prefix", ("language", language.ChatName))
@@ -372,6 +408,7 @@ public sealed partial class RadioSystem : EntitySystem
         RaiseLocalEvent(source, ref getLoudspeakerEv);
 
         if (getLoudspeakerEv.Loudspeakers != null)
+        {
             foreach (var loudspeaker in getLoudspeakerEv.Loudspeakers)
             {
                 var loudSpeakerEv = new GetLoudspeakerDataEvent();
@@ -383,18 +420,25 @@ public sealed partial class RadioSystem : EntitySystem
                     break;
                 }
             }
+        }
 
         var nameString = jobIcon is null // (unrelated to loudspeakers but still goob)
             ? name
-            : Loc.GetString("chat-radio-message-name-with-icon", ("jobIcon", jobIcon), ("jobName", jobName ?? ""), ("name", name));
+            : Loc.GetString("chat-radio-message-name-with-icon",
+                ("jobIcon", jobIcon),
+                ("jobName", jobName ?? ""),
+                ("name", name));
         // goob end
 
         return Loc.GetString(wrapId,
             ("color", channel.Color),
             ("languageColor", languageColor),
             ("fontType", language.SpeechOverride.FontId ?? speech.FontId),
-            ("fontSize", loudSpeakFont ?? language.SpeechOverride.FontSize ?? speech.FontSize), // goob edit - "loudSpeakFont"
-            ("boldFontType", language.SpeechOverride.BoldFontId ?? language.SpeechOverride.FontId ?? speech.FontId), // Goob Edit - Custom Bold Fonts
+            ("fontSize",
+                loudSpeakFont ?? language.SpeechOverride.FontSize ?? speech.FontSize), // goob edit - "loudSpeakFont"
+            ("boldFontType",
+                language.SpeechOverride.BoldFontId ??
+                language.SpeechOverride.FontId ?? speech.FontId), // Goob Edit - Custom Bold Fonts
             ("verb", Loc.GetString(_random.Pick(speech.SpeechVerbStrings))),
             ("channel", $"\\[{channel.LocalizedName}\\]"),
             ("name", nameString), // goob
@@ -403,27 +447,26 @@ public sealed partial class RadioSystem : EntitySystem
     }
     // Einstein Engines - Language end
 
-    /// <inheritdoc cref="TelecomServerComponent"/>
+    /// <inheritdoc cref="TelecomServerComponent" />
     private bool HasActiveServer(MapId mapId, string channelId)
     {
-        var servers = EntityQuery<TelecomServerComponent, EncryptionKeyHolderComponent, ApcPowerReceiverComponent, TransformComponent>();
+        var servers =
+            EntityQuery<TelecomServerComponent, EncryptionKeyHolderComponent, ApcPowerReceiverComponent,
+                TransformComponent>();
         foreach (var (_, keys, power, transform) in servers)
         {
             if (transform.MapID == mapId &&
                 power.Powered &&
                 keys.Channels.Contains(channelId))
-            {
                 return true;
-            }
         }
+
         return false;
     }
 
-    /// <inheritdoc cref="TelecomServerComponent"/>
-    private bool HasActiveTransmitter(MapId mapId)
-    {
-        return EntityQuery<TelecomTransmitterComponent, ApcPowerReceiverComponent, TransformComponent>()
+    /// <inheritdoc cref="TelecomServerComponent" />
+    private bool HasActiveTransmitter(MapId mapId) =>
+        EntityQuery<TelecomTransmitterComponent, ApcPowerReceiverComponent, TransformComponent>()
             .Any(server => server.Item3.MapID == mapId && server.Item2.Powered);
-    }
     // goob end
 }

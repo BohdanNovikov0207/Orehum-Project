@@ -11,4 +11,6 @@ namespace Content.Server.Chemistry.Components;
 /// contained solution into a target when they hit it.
 /// </summary>
 [RegisterComponent]
-public sealed partial class SolutionInjectOnProjectileHitComponent : BaseSolutionInjectOnEventComponent { }
+public sealed partial class SolutionInjectOnProjectileHitComponent : BaseSolutionInjectOnEventComponent
+{
+}

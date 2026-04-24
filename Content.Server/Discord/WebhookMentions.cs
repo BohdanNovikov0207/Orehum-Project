@@ -18,8 +18,5 @@ public struct WebhookMentions
     {
     }
 
-    public void AllowRoleMentions()
-    {
-        Parse.Add("roles");
-    }
+    public void AllowRoleMentions() => Parse.Add("roles");
 }

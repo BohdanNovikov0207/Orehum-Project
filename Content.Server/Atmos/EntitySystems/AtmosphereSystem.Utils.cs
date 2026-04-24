@@ -12,8 +12,6 @@ using System.Runtime.CompilerServices;
 using Content.Server.Atmos.Components;
 using Content.Shared.Atmos;
 using Content.Shared.Atmos.Components;
-using Content.Shared.Maps;
-using Robust.Shared.Map;
 using Content.Shared.Atmos.Piping.Components;
 using Robust.Shared.Map.Components;
 
@@ -39,42 +37,34 @@ public partial class AtmosphereSystem
         // Pay more for gas canisters that are more pure
         float purity = 1;
         if (totalMoles > 0)
-        {
             purity = maxComponent / totalMoles;
-        }
 
         return basePrice * purity;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void InvalidateVisuals(Entity<GasTileOverlayComponent?> grid, Vector2i tile)
-    {
+    public void InvalidateVisuals(Entity<GasTileOverlayComponent?> grid, Vector2i tile) =>
         _gasTileOverlaySystem.Invalidate(grid, tile);
-    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void InvalidateVisuals(
         Entity<GridAtmosphereComponent, GasTileOverlayComponent, MapGridComponent, TransformComponent> ent,
-        TileAtmosphere tile)
-    {
+        TileAtmosphere tile) =>
         _gasTileOverlaySystem.Invalidate((ent.Owner, ent.Comp2), tile.GridIndices);
-    }
 
     /// <summary>
-    ///     Gets the volume in liters for a number of tiles, on a specific grid.
+    /// Gets the volume in liters for a number of tiles, on a specific grid.
     /// </summary>
     /// <param name="mapGrid">The grid in question.</param>
     /// <param name="tiles">The amount of tiles.</param>
     /// <returns>The volume in liters that the tiles occupy.</returns>
-    private float GetVolumeForTiles(MapGridComponent mapGrid, int tiles = 1)
-    {
-        return Atmospherics.CellVolume * mapGrid.TileSize * tiles;
-    }
+    private float GetVolumeForTiles(MapGridComponent mapGrid, int tiles = 1) =>
+        Atmospherics.CellVolume * mapGrid.TileSize * tiles;
 
-    public readonly record struct AirtightData(AtmosDirection BlockedDirections, bool NoAirWhenBlocked,
-        bool FixVacuum);
-
-    private void UpdateAirtightData(EntityUid uid, GridAtmosphereComponent atmos, MapGridComponent grid, TileAtmosphere tile)
+    private void UpdateAirtightData(EntityUid uid,
+        GridAtmosphereComponent atmos,
+        MapGridComponent grid,
+        TileAtmosphere tile)
     {
         var oldBlocked = tile.AirtightData.BlockedDirections;
 
@@ -113,7 +103,7 @@ public partial class AtmosphereSystem
     }
 
     /// <summary>
-    ///     Pries a tile in a grid.
+    /// Pries a tile in a grid.
     /// </summary>
     /// <param name="mapGrid">The grid in question.</param>
     /// <param name="tile">The indices of the tile.</param>
@@ -128,7 +118,7 @@ public partial class AtmosphereSystem
     /// <summary>
     /// Notifies all subscribing entities on a particular tile that the tile has changed.
     /// Atmos devices may store references to tiles, so this is used to properly resync devices
-    /// after a significant atmos change on that tile, for example a tile getting a new <see cref="GasMixture"/>.
+    /// after a significant atmos change on that tile, for example a tile getting a new <see cref="GasMixture" />.
     /// </summary>
     /// <param name="ent">The grid atmosphere entity.</param>
     /// <param name="tile">The tile to check for devices on.</param>
@@ -141,4 +131,9 @@ public partial class AtmosphereSystem
             RaiseLocalEvent(uid, ref ev);
         }
     }
+
+    public readonly record struct AirtightData(
+        AtmosDirection BlockedDirections,
+        bool NoAirWhenBlocked,
+        bool FixVacuum);
 }

@@ -9,8 +9,8 @@ namespace Content.Server._Lavaland.Trigger;
 public sealed partial class TriggerBlockerComponent : Component
 {
     [DataField]
-    public EntityWhitelist? MapWhitelist;
+    public EntityWhitelist? MapBlacklist;
 
     [DataField]
-    public EntityWhitelist? MapBlacklist;
+    public EntityWhitelist? MapWhitelist;
 }

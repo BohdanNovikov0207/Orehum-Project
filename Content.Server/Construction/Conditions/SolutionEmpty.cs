@@ -56,9 +56,9 @@ public sealed partial class SolutionEmpty : IGraphCondition
 
     public IEnumerable<ConstructionGuideEntry> GenerateGuideEntry()
     {
-        yield return new ConstructionGuideEntry()
+        yield return new ConstructionGuideEntry
         {
-            Localization = "construction-guide-condition-solution-empty"
+            Localization = "construction-guide-condition-solution-empty",
         };
     }
 }

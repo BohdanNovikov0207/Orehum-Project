@@ -82,43 +82,50 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Linq;
-using Content.Goobstation.Common.CCVar; // Goobstation
+using Content.Goobstation.Common.CCVar;
 using Content.Server.GameTicking;
 using Content.Server.RoundEnd;
 using Content.Server.StationEvents.Components;
 using Content.Shared.CCVar;
+using Content.Shared.EntityTable;
+using Content.Shared.EntityTable.EntitySelectors;
 using Robust.Server.Player;
 using Robust.Shared.Configuration;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
-using Content.Shared.EntityTable.EntitySelectors;
-using Content.Shared.EntityTable;
+// Goobstation
 
 namespace Content.Server.StationEvents;
 
 public sealed class EventManagerSystem : EntitySystem
 {
     [Dependency] private readonly IConfigurationManager _configurationManager = default!;
-    [Dependency] private readonly IPlayerManager _playerManager = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly IPrototypeManager _prototype = default!;
     [Dependency] private readonly EntityTableSystem _entityTable = default!;
-    [Dependency] public readonly GameTicker GameTicker = default!;
+    [Dependency] private readonly IPlayerManager _playerManager = default!;
+    [Dependency] private readonly IPrototypeManager _prototype = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly RoundEndSystem _roundEnd = default!;
+    [Dependency] public readonly GameTicker GameTicker = default!;
+
+    public float EventSpeedup = 1f; // Goobstation
+    public int PlayerCountBias; // Goobstation
 
     public bool EventsEnabled { get; private set; }
     private void SetEnabled(bool value) => EventsEnabled = value;
-
-    public float EventSpeedup = 1f; // Goobstation
-    public int PlayerCountBias = 0; // Goobstation
 
     public override void Initialize()
     {
         base.Initialize();
 
         Subs.CVar(_configurationManager, CCVars.EventsEnabled, SetEnabled, true);
-        Subs.CVar(_configurationManager, GoobCVars.StationEventSpeedup, (value) => EventSpeedup = value, true); // Goobstation
-        Subs.CVar(_configurationManager, GoobCVars.StationEventPlayerBias, (value) => PlayerCountBias = value, true); // Goobstation
+        Subs.CVar(_configurationManager,
+            GoobCVars.StationEventSpeedup,
+            value => EventSpeedup = value,
+            true); // Goobstation
+        Subs.CVar(_configurationManager,
+            GoobCVars.StationEventPlayerBias,
+            value => PlayerCountBias = value,
+            true); // Goobstation
     }
 
     /// <summary>
@@ -156,7 +163,7 @@ public sealed class EventManagerSystem : EntitySystem
     public void RunRandomEvent(EntityTableSelector limitedEventsTable)
     {
         var availableEvents = AvailableEvents(); // handles the player counts and individual event restrictions.
-                                                 // Putting this here only makes any sense in the context of the toolshed commands in BasicStationEventScheduler. Kill me.
+        // Putting this here only makes any sense in the context of the toolshed commands in BasicStationEventScheduler. Kill me.
 
         if (!TryBuildLimitedEvents(limitedEventsTable, availableEvents, out var limitedEvents))
         {
@@ -164,7 +171,8 @@ public sealed class EventManagerSystem : EntitySystem
             return;
         }
 
-        var randomLimitedEvent = FindEvent(limitedEvents); // this picks the event, It might be better to use the GetSpawns to do it, but that will be a major rebalancing fuck.
+        var randomLimitedEvent =
+            FindEvent(limitedEvents); // this picks the event, It might be better to use the GetSpawns to do it, but that will be a major rebalancing fuck.
         if (randomLimitedEvent == null)
         {
             Log.Warning("The selected random event is null!");
@@ -187,7 +195,7 @@ public sealed class EventManagerSystem : EntitySystem
         EntityTableSelector limitedEventsTable,
         Dictionary<EntityPrototype, StationEventComponent> availableEvents,
         out Dictionary<EntityPrototype, StationEventComponent> limitedEvents
-        )
+    )
     {
         limitedEvents = new Dictionary<EntityPrototype, StationEventComponent>();
 
@@ -199,7 +207,7 @@ public sealed class EventManagerSystem : EntitySystem
 
         var selectedEvents = _entityTable.GetSpawns(limitedEventsTable);
 
-        if (selectedEvents.Any() != true) // This is here so if you fuck up the table it wont die.
+        if (!selectedEvents.Any()) // This is here so if you fuck up the table it wont die.
             return false;
 
         foreach (var eventid in selectedEvents)
@@ -210,13 +218,15 @@ public sealed class EventManagerSystem : EntitySystem
                 continue;
             }
 
-            if (limitedEvents.ContainsKey(eventproto)) // This stops it from dying if you add duplicate entries in a fucked table
+            if (limitedEvents
+                .ContainsKey(eventproto)) // This stops it from dying if you add duplicate entries in a fucked table
                 continue;
 
             if (eventproto.Abstract)
                 continue;
 
-            if (!eventproto.TryGetComponent<StationEventComponent>(out var stationEvent, EntityManager.ComponentFactory))
+            if (!eventproto.TryGetComponent<StationEventComponent>(out var stationEvent,
+                    EntityManager.ComponentFactory))
                 continue;
 
             if (!availableEvents.ContainsKey(eventproto))
@@ -267,9 +277,7 @@ public sealed class EventManagerSystem : EntitySystem
             sumOfWeights -= stationEvent.Weight;
 
             if (sumOfWeights <= 0.0f)
-            {
                 return proto.ID;
-            }
         }
 
         Log.Error("Event was not found after weighted pick process!");
@@ -279,8 +287,14 @@ public sealed class EventManagerSystem : EntitySystem
     /// <summary>
     /// Gets the events that have met their player count, time-until start, etc.
     /// </summary>
-    /// <param name="playerCountOverride">Override for player count, if using this to simulate events rather than in an actual round.</param>
-    /// <param name="currentTimeOverride">Override for round time, if using this to simulate events rather than in an actual round.</param>
+    /// <param name="playerCountOverride">
+    /// Override for player count, if using this to simulate events rather than in an actual
+    /// round.
+    /// </param>
+    /// <param name="currentTimeOverride">
+    /// Override for round time, if using this to simulate events rather than in an actual
+    /// round.
+    /// </param>
     /// <returns></returns>
     public Dictionary<EntityPrototype, StationEventComponent> AvailableEvents(
         bool ignoreEarliestStart = false,
@@ -288,7 +302,7 @@ public sealed class EventManagerSystem : EntitySystem
         TimeSpan? currentTimeOverride = null,
         float reoccurrenceMult = 1f) // Goobstation
     {
-        var playerCount = playerCountOverride ?? (_playerManager.PlayerCount + PlayerCountBias); // Goobstation
+        var playerCount = playerCountOverride ?? _playerManager.PlayerCount + PlayerCountBias; // Goobstation
 
         // playerCount does a lock so we'll just keep the variable here
         var currentTime = currentTimeOverride ?? (!ignoreEarliestStart
@@ -300,9 +314,7 @@ public sealed class EventManagerSystem : EntitySystem
         foreach (var (proto, stationEvent) in AllEvents())
         {
             if (CanRun(proto, stationEvent, playerCount, currentTime, reoccurrenceMult)) // Goobstation
-            {
                 result.Add(proto, stationEvent);
-            }
         }
 
         return result;
@@ -325,15 +337,10 @@ public sealed class EventManagerSystem : EntitySystem
         return allEvents;
     }
 
-    private int GetOccurrences(EntityPrototype stationEvent)
-    {
-        return GetOccurrences(stationEvent.ID);
-    }
+    private int GetOccurrences(EntityPrototype stationEvent) => GetOccurrences(stationEvent.ID);
 
-    private int GetOccurrences(string stationEvent)
-    {
-        return GameTicker.AllPreviousGameRules.Count(p => p.Item2 == stationEvent);
-    }
+    private int GetOccurrences(string stationEvent) =>
+        GameTicker.AllPreviousGameRules.Count(p => p.Item2 == stationEvent);
 
     public TimeSpan TimeSinceLastEvent(EntityPrototype stationEvent)
     {
@@ -346,38 +353,31 @@ public sealed class EventManagerSystem : EntitySystem
         return TimeSpan.Zero;
     }
 
-    public bool CanRun(EntityPrototype prototype, StationEventComponent stationEvent, int playerCount, TimeSpan currentTime,
-                       float reoccurrenceMult = 1f) // Goobstation
+    public bool CanRun(EntityPrototype prototype,
+        StationEventComponent stationEvent,
+        int playerCount,
+        TimeSpan currentTime,
+        float reoccurrenceMult = 1f) // Goobstation
     {
         if (GameTicker.IsGameRuleActive(prototype.ID))
             return false;
 
         if (stationEvent.MaxOccurrences.HasValue && GetOccurrences(prototype) >= stationEvent.MaxOccurrences.Value)
-        {
             return false;
-        }
 
         if (playerCount < stationEvent.MinimumPlayers)
-        {
             return false;
-        }
 
         if (currentTime != TimeSpan.Zero && currentTime.TotalMinutes < stationEvent.EarliestStart / EventSpeedup)
-        {
             return false;
-        }
 
         var lastRun = TimeSinceLastEvent(prototype);
         if (lastRun != TimeSpan.Zero && currentTime.TotalMinutes <
             stationEvent.ReoccurrenceDelay * reoccurrenceMult / EventSpeedup + lastRun.TotalMinutes) // Goobstation
-        {
             return false;
-        }
 
         if (_roundEnd.IsRoundEndRequested() && !stationEvent.OccursDuringRoundEnd)
-        {
             return false;
-        }
 
         return true;
     }

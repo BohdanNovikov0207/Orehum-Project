@@ -4,30 +4,33 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Linq;
+using Content.Server.Administration;
+using Content.Server.Mail.Components;
+using Content.Shared.Administration;
 using Robust.Shared.Console;
 using Robust.Shared.Containers;
 using Robust.Shared.Prototypes;
-using Content.Shared.Administration;
-using Content.Server.Administration;
-using Content.Server.Mail.Components;
 
 namespace Content.Server.Mail;
 
 [AdminCommand(AdminFlags.Fun)]
 public sealed class MailToCommand : IConsoleCommand
 {
-    public string Command => "mailto";
-    public string Description => Loc.GetString("command-mailto-description", ("requiredComponent", nameof(MailReceiverComponent)));
-    public string Help => Loc.GetString("command-mailto-help", ("command", Command));
-
-    [Dependency] private readonly IEntityManager _entityManager = default!;
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-    [Dependency] private readonly IEntitySystemManager _entitySystemManager = default!;
+    private readonly string _blankLargeMailPrototype = "MailLargeAdminFun"; // Frontier: large mail
 
     private readonly string _blankMailPrototype = "MailAdminFun";
-    private readonly string _blankLargeMailPrototype = "MailLargeAdminFun"; // Frontier: large mail
     private readonly string _container = "storagebase";
+
+    [Dependency] private readonly IEntityManager _entityManager = default!;
+    [Dependency] private readonly IEntitySystemManager _entitySystemManager = default!;
     private readonly string _mailContainer = "contents";
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    public string Command => "mailto";
+
+    public string Description =>
+        Loc.GetString("command-mailto-description", ("requiredComponent", nameof(MailReceiverComponent)));
+
+    public string Help => Loc.GetString("command-mailto-help", ("command", Command));
 
 
     public async void Execute(IConsoleShell shell, string argStr, string[] args)
@@ -50,25 +53,26 @@ public sealed class MailToCommand : IConsoleCommand
             return;
         }
 
-        if (!Boolean.TryParse(args[2], out var isFragile))
+        if (!bool.TryParse(args[2], out var isFragile))
         {
             shell.WriteError(Loc.GetString("shell-invalid-bool"));
             return;
         }
 
-        if (!Boolean.TryParse(args[3], out var isPriority))
+        if (!bool.TryParse(args[3], out var isPriority))
         {
             shell.WriteError(Loc.GetString("shell-invalid-bool"));
             return;
         }
 
         // Frontier: Large Mail
-        bool isLarge = false;
-        if (args.Length > 4 && !Boolean.TryParse(args[4], out isLarge))
+        var isLarge = false;
+        if (args.Length > 4 && !bool.TryParse(args[4], out isLarge))
         {
             shell.WriteError(Loc.GetString("shell-invalid-bool"));
             return;
         }
+
         var mailPrototype = isLarge ? _blankLargeMailPrototype : _blankMailPrototype;
         // End Frontier
 
@@ -78,13 +82,15 @@ public sealed class MailToCommand : IConsoleCommand
 
         if (!_entityManager.TryGetComponent(recipientUid, out MailReceiverComponent? mailReceiver))
         {
-            shell.WriteLine(Loc.GetString("command-mailto-no-mailreceiver", ("requiredComponent", nameof(MailReceiverComponent))));
+            shell.WriteLine(Loc.GetString("command-mailto-no-mailreceiver",
+                ("requiredComponent", nameof(MailReceiverComponent))));
             return;
         }
 
         if (!_prototypeManager.HasIndex<EntityPrototype>(mailPrototype)) // Frontier: _blankMailPrototype<mailPrototype
         {
-        shell.WriteLine(Loc.GetString("command-mailto-no-blankmail", ("blankMail", mailPrototype))); // Frontier: _blankMailPrototype<mailPrototype
+            shell.WriteLine(Loc.GetString("command-mailto-no-blankmail",
+                ("blankMail", mailPrototype))); // Frontier: _blankMailPrototype<mailPrototype
             return;
         }
 
@@ -94,29 +100,35 @@ public sealed class MailToCommand : IConsoleCommand
             return;
         }
 
-        if (!_mailSystem.TryGetMailRecipientForReceiver(mailReceiver, out MailRecipient? recipient))
+        if (!_mailSystem.TryGetMailRecipientForReceiver(mailReceiver, out var recipient))
         {
             shell.WriteLine(Loc.GetString("command-mailto-unable-to-receive"));
             return;
         }
 
-        if (!_mailSystem.TryGetMailTeleporterForReceiver(mailReceiver, out MailTeleporterComponent? teleporterComponent))
+        if (!_mailSystem.TryGetMailTeleporterForReceiver(mailReceiver, out var teleporterComponent))
         {
             shell.WriteLine(Loc.GetString("command-mailto-no-teleporter-found"));
             return;
         }
 
-        var mailUid = _entityManager.SpawnEntity(mailPrototype, _entityManager.GetComponent<TransformComponent>(containerUid).Coordinates); // Frontier: _blankMailPrototype<mailPrototype
+        var mailUid = _entityManager.SpawnEntity(mailPrototype,
+            _entityManager.GetComponent<TransformComponent>(containerUid)
+                .Coordinates); // Frontier: _blankMailPrototype<mailPrototype
         var mailContents = _containerSystem.EnsureContainer<Container>(mailUid, _mailContainer);
 
         if (!_entityManager.TryGetComponent(mailUid, out MailComponent? mailComponent))
         {
-            shell.WriteLine(Loc.GetString("command-mailto-bogus-mail", ("blankMail", mailPrototype), ("requiredMailComponent", nameof(MailComponent)))); // Frontier: _blankMailPrototype<mailPrototype
+            shell.WriteLine(Loc.GetString("command-mailto-bogus-mail",
+                ("blankMail", mailPrototype),
+                ("requiredMailComponent", nameof(MailComponent)))); // Frontier: _blankMailPrototype<mailPrototype
             return;
         }
 
         foreach (var entity in targetContainer.ContainedEntities.ToArray())
+        {
             _containerSystem.Insert(entity, mailContents);
+        }
 
         mailComponent.IsFragile = isFragile;
         mailComponent.IsPriority = isPriority;
@@ -126,19 +138,19 @@ public sealed class MailToCommand : IConsoleCommand
 
         var teleporterQueue = _containerSystem.EnsureContainer<Container>(teleporterComponent.Owner, "queued");
         _containerSystem.Insert(mailUid, teleporterQueue);
-        shell.WriteLine(Loc.GetString("command-mailto-success", ("timeToTeleport", teleporterComponent.TeleportInterval.TotalSeconds - teleporterComponent.Accumulator)));
+        shell.WriteLine(Loc.GetString("command-mailto-success",
+            ("timeToTeleport", teleporterComponent.TeleportInterval.TotalSeconds - teleporterComponent.Accumulator)));
     }
 }
 
 [AdminCommand(AdminFlags.Fun)]
 public sealed class MailNowCommand : IConsoleCommand
 {
+    [Dependency] private readonly IEntityManager _entityManager = default!;
+    [Dependency] private readonly IEntitySystemManager _entitySystemManager = default!;
     public string Command => "mailnow";
     public string Description => Loc.GetString("command-mailnow");
     public string Help => Loc.GetString("command-mailnow-help", ("command", Command));
-
-    [Dependency] private readonly IEntityManager _entityManager = default!;
-    [Dependency] private readonly IEntitySystemManager _entitySystemManager = default!;
 
     public async void Execute(IConsoleShell shell, string argStr, string[] args)
     {
@@ -146,7 +158,8 @@ public sealed class MailNowCommand : IConsoleCommand
 
         foreach (var mailTeleporter in _entityManager.EntityQuery<MailTeleporterComponent>())
         {
-            mailTeleporter.Accumulator += (float) mailTeleporter.TeleportInterval.TotalSeconds - mailTeleporter.Accumulator;
+            mailTeleporter.Accumulator +=
+                (float) mailTeleporter.TeleportInterval.TotalSeconds - mailTeleporter.Accumulator;
         }
 
         shell.WriteLine(Loc.GetString("command-mailnow-success"));

@@ -24,19 +24,17 @@ namespace Content.Server.Procedural;
 
 public sealed partial class DungeonSystem
 {
-    [Dependency] private readonly IMapManager _mapManager = default!;
+    private readonly List<DungeonRoomPrototype> _availableRooms = new();
 
     // Temporary caches.
     private readonly HashSet<EntityUid> _entitySet = new();
-    private readonly List<DungeonRoomPrototype> _availableRooms = new();
+    [Dependency] private readonly IMapManager _mapManager = default!;
 
     /// <summary>
     /// Gets a random dungeon room matching the specified area, whitelist and size.
     /// </summary>
-    public DungeonRoomPrototype? GetRoomPrototype(Vector2i size, Random random, EntityWhitelist? whitelist = null)
-    {
-        return GetRoomPrototype(random, whitelist, minSize: size, maxSize: size);
-    }
+    public DungeonRoomPrototype? GetRoomPrototype(Vector2i size, Random random, EntityWhitelist? whitelist = null) =>
+        GetRoomPrototype(random, whitelist, size, size);
 
     /// <summary>
     /// Gets a random dungeon room matching the specified area and whitelist and size range
@@ -48,9 +46,7 @@ public sealed partial class DungeonSystem
     {
         // Can never be true.
         if (whitelist is { Tags: null })
-        {
             return null;
-        }
 
         _availableRooms.Clear();
 
@@ -100,9 +96,7 @@ public sealed partial class DungeonSystem
         var roomRotation = Angle.Zero;
 
         if (rotation)
-        {
             roomRotation = GetRoomRotation(room, random);
-        }
 
         var roomTransform = Matrix3Helpers.CreateTransform((Vector2) room.Size / 2f, roomRotation);
         var finalTransform = Matrix3x2.Multiply(roomTransform, originTransform);
@@ -120,9 +114,7 @@ public sealed partial class DungeonSystem
             roomRotation = random.Next(4) * Math.PI / 2;
         }
         else if (random.Next(2) == 1)
-        {
             roomRotation += Math.PI;
-        }
 
         return roomRotation;
     }
@@ -222,7 +214,8 @@ public sealed partial class DungeonSystem
                 // Offset by 0.5 because decals are offset from bot-left corner
                 // So we convert it to center of tile then convert it back again after transform.
                 // Do these shenanigans because 32x32 decals assume as they are centered on bottom-left of tiles.
-                var position = Vector2.Transform(decal.Coordinates + grid.TileSizeHalfVector - roomCenter, roomTransform);
+                var position = Vector2.Transform(decal.Coordinates + grid.TileSizeHalfVector - roomCenter,
+                    roomTransform);
                 position -= grid.TileSizeHalfVector;
 
                 if (!clearExisting && reservedTiles?.Contains(position.Floored()) == true)
@@ -235,17 +228,11 @@ public sealed partial class DungeonSystem
                 // Yeah idk about the uhh vectors here but it looked visually okay but they may still be off by 1.
                 // Also EyeManager.PixelsPerMeter should really be in shared.
                 if (angle.Equals(Math.PI))
-                {
                     position += new Vector2(-1f / 32f, 1f / 32f);
-                }
                 else if (angle.Equals(-Math.PI / 2f))
-                {
                     position += new Vector2(-1f / 32f, 0f);
-                }
                 else if (angle.Equals(Math.PI / 2f))
-                {
                     position += new Vector2(0f, 1f / 32f);
-                }
                 else if (angle.Equals(Math.PI * 1.5f))
                 {
                     // I hate this but decals are bottom-left rather than center position and doing the
@@ -253,9 +240,7 @@ public sealed partial class DungeonSystem
                     // field for 1 specific op on decals
                     if (decal.Id != "DiagonalCheckerAOverlay" &&
                         decal.Id != "DiagonalCheckerBOverlay")
-                    {
                         position += new Vector2(-1f / 32f, 0f);
-                    }
                 }
 
                 var tilePos = position.Floored();
@@ -263,9 +248,11 @@ public sealed partial class DungeonSystem
                 // Fallback because uhhhhhhhh yeah, a corner tile might look valid on the original
                 // but place 1 nanometre off grid and fail the add.
                 if (!_maps.TryGetTileRef(gridUid, grid, tilePos, out var tileRef) || tileRef.Tile.IsEmpty)
-                {
-                    _maps.SetTile(gridUid, grid, tilePos, _tile.GetVariantTile((ContentTileDefinition) _tileDefManager[FallbackTileId], _random.GetRandom()));
-                }
+                    _maps.SetTile(gridUid,
+                        grid,
+                        tilePos,
+                        _tile.GetVariantTile((ContentTileDefinition) _tileDefManager[FallbackTileId],
+                            _random.GetRandom()));
 
                 var result = _decals.TryAddDecal(
                     decal.Id,

@@ -77,9 +77,9 @@ namespace Content.Server.Light.EntitySystems;
 public sealed class EmergencyLightSystem : SharedEmergencyLightSystem
 {
     [Dependency] private readonly AmbientSoundSystem _ambient = default!;
+    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
     [Dependency] private readonly BatterySystem _battery = default!;
     [Dependency] private readonly PointLightSystem _pointLight = default!;
-    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
     [Dependency] private readonly StationSystem _station = default!;
 
     public override void Initialize()
@@ -99,9 +99,7 @@ public sealed class EmergencyLightSystem : SharedEmergencyLightSystem
         // TODO: PowerChangedEvent shouldn't be issued for paused ents but this is the world we live in.
         if (meta.EntityLifeStage >= EntityLifeStage.Terminating ||
             meta.EntityPaused)
-        {
             return;
-        }
 
         UpdateState(entity);
     }
@@ -131,7 +129,7 @@ public sealed class EmergencyLightSystem : SharedEmergencyLightSystem
             args.PushMarkup(
                 Loc.GetString("emergency-light-component-on-examine-alert",
                     ("color", color.ToHex()),
-                    ("level", Loc.GetString($"alert-level-{name.ToString().ToLower()}"))));
+                    ("level", Loc.GetString($"alert-level-{name.ToLower()}"))));
         }
     }
 
@@ -160,7 +158,9 @@ public sealed class EmergencyLightSystem : SharedEmergencyLightSystem
         if (alert.AlertLevels == null || !alert.AlertLevels.Levels.TryGetValue(ev.AlertLevel, out var details))
             return;
 
-        var query = EntityQueryEnumerator<EmergencyLightComponent, PointLightComponent, AppearanceComponent, TransformComponent>();
+        var query =
+            EntityQueryEnumerator<EmergencyLightComponent, PointLightComponent, AppearanceComponent,
+                TransformComponent>();
         while (query.MoveNext(out var uid, out var light, out var pointLight, out var appearance, out var xform))
         {
             if (CompOrNull<StationMemberComponent>(xform.GridUid)?.Station != ev.Station)
@@ -185,7 +185,8 @@ public sealed class EmergencyLightSystem : SharedEmergencyLightSystem
 
     public void SetState(EntityUid uid, EmergencyLightComponent component, EmergencyLightState state)
     {
-        if (component.State == state) return;
+        if (component.State == state)
+            return;
 
         component.State = state;
         RaiseLocalEvent(uid, new EmergencyLightEvent(state));
@@ -212,13 +213,13 @@ public sealed class EmergencyLightSystem : SharedEmergencyLightSystem
         }
         else
         {
-            _battery.SetCharge(entity.Owner, battery.CurrentCharge + entity.Comp.ChargingWattage * frameTime * entity.Comp.ChargingEfficiency, battery);
+            _battery.SetCharge(entity.Owner,
+                battery.CurrentCharge + entity.Comp.ChargingWattage * frameTime * entity.Comp.ChargingEfficiency,
+                battery);
             if (_battery.IsFull(entity, battery))
             {
                 if (TryComp<ApcPowerReceiverComponent>(entity.Owner, out var receiver))
-                {
                     receiver.Load = 1;
-                }
 
                 SetState(entity.Owner, entity.Comp, EmergencyLightState.Full);
             }
@@ -226,7 +227,7 @@ public sealed class EmergencyLightSystem : SharedEmergencyLightSystem
     }
 
     /// <summary>
-    ///     Updates the light's power drain, battery drain, sprite and actual light state.
+    /// Updates the light's power drain, battery drain, sprite and actual light state.
     /// </summary>
     public void UpdateState(Entity<EmergencyLightComponent> entity)
     {
@@ -268,7 +269,7 @@ public sealed class EmergencyLightSystem : SharedEmergencyLightSystem
     }
 
     /// <summary>
-    ///     Turn off emergency light and set color.
+    /// Turn off emergency light and set color.
     /// </summary>
     private void TurnOff(Entity<EmergencyLightComponent> entity, Color color)
     {
@@ -287,7 +288,7 @@ public sealed class EmergencyLightSystem : SharedEmergencyLightSystem
     }
 
     /// <summary>
-    ///     Turn on emergency light and set color.
+    /// Turn on emergency light and set color.
     /// </summary>
     private void TurnOn(Entity<EmergencyLightComponent> entity, Color color)
     {

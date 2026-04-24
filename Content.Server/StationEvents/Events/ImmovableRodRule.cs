@@ -12,6 +12,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Linq;
 using System.Numerics;
 using Content.Server.ImmovableRod;
 using Content.Server.StationEvents.Components;
@@ -20,17 +21,19 @@ using Content.Shared.GameTicking.Components;
 using Content.Shared.Storage;
 using Robust.Shared.Prototypes;
 using TimedDespawnComponent = Robust.Shared.Spawners.TimedDespawnComponent;
-using System.Linq;
 
 namespace Content.Server.StationEvents.Events;
 
 public sealed class ImmovableRodRule : StationEventSystem<ImmovableRodRuleComponent>
 {
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly GunSystem _gun = default!;
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
 
-    protected override void Started(EntityUid uid, ImmovableRodRuleComponent component, GameRuleComponent gameRule, GameRuleStartedEvent args)
+    protected override void Started(EntityUid uid,
+        ImmovableRodRuleComponent component,
+        GameRuleComponent gameRule,
+        GameRuleStartedEvent args)
     {
         base.Started(uid, component, gameRule, args);
 
@@ -47,13 +50,12 @@ public sealed class ImmovableRodRule : StationEventSystem<ImmovableRodRuleCompon
             var speed = RobustRandom.NextFloat(rod.MinSpeed, rod.MaxSpeed);
             var angle = RobustRandom.NextAngle();
             var direction = angle.ToVec();
-            var spawnCoords = targetCoords.ToMap(EntityManager, _transform).Offset(-direction * speed * despawn.Lifetime / 2);
+            var spawnCoords = targetCoords.ToMap(EntityManager, _transform)
+                .Offset(-direction * speed * despawn.Lifetime / 2);
             var ent = Spawn(protoName, spawnCoords);
             _gun.ShootProjectile(ent, direction, Vector2.Zero, uid, speed: speed);
         }
         else
-        {
             Sawmill.Error($"Invalid immovable rod prototype: {protoName}");
-        }
     }
 }

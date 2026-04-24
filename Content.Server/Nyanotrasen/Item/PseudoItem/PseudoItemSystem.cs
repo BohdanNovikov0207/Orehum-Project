@@ -11,8 +11,8 @@ using Content.Server.DoAfter;
 using Content.Server.Item;
 using Content.Server.Popups;
 using Content.Server.Storage.EntitySystems;
-using Content.Shared.Bed.Sleep;
 using Content.Shared._DV.Carrying;
+using Content.Shared.Bed.Sleep;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.IdentityManagement;
 using Content.Shared.Item;
@@ -24,12 +24,12 @@ namespace Content.Server.Nyanotrasen.Item.PseudoItem;
 
 public sealed class PseudoItemSystem : SharedPseudoItemSystem
 {
-    [Dependency] private readonly StorageSystem _storage = default!;
-    [Dependency] private readonly ItemSystem _item = default!;
+    [Dependency] private readonly CarryingSystem _carrying = default!;
     [Dependency] private readonly DoAfterSystem _doAfter = default!;
     [Dependency] private readonly SharedHandsSystem _hands = default!;
-    [Dependency] private readonly CarryingSystem _carrying = default!;
+    [Dependency] private readonly ItemSystem _item = default!;
     [Dependency] private readonly PopupSystem _popup = default!;
+    [Dependency] private readonly StorageSystem _storage = default!;
 
     public override void Initialize()
     {
@@ -62,12 +62,14 @@ public sealed class PseudoItemSystem : SharedPseudoItemSystem
                 StartInsertDoAfter(args.User, uid, held.Value, component);
             },
             Text = Loc.GetString("action-name-insert-other", ("target", Identity.Entity(args.Target, EntityManager))),
-            Priority = 2
+            Priority = 2,
         };
         args.Verbs.Add(verb);
     }
 
-    protected override void OnGettingPickedUpAttempt(EntityUid uid, PseudoItemComponent component, GettingPickedUpAttemptEvent args)
+    protected override void OnGettingPickedUpAttempt(EntityUid uid,
+        PseudoItemComponent component,
+        GettingPickedUpAttemptEvent args)
     {
         // Try to pick the entity up instead first
         if (args.User != args.Item && _carrying.TryCarry(args.User, uid))
@@ -84,7 +86,8 @@ public sealed class PseudoItemSystem : SharedPseudoItemSystem
     private void OnTrySleeping(EntityUid uid, PseudoItemComponent component, TryingToSleepEvent args)
     {
         var parent = Transform(uid).ParentUid;
-        if (!HasComp<SleepingComponent>(uid) && parent is { Valid: true } && HasComp<AllowsSleepInsideComponent>(parent))
+        if (!HasComp<SleepingComponent>(uid) && parent is { Valid: true } &&
+            HasComp<AllowsSleepInsideComponent>(parent))
             _popup.PopupEntity(Loc.GetString("popup-sleep-in-bag", ("entity", uid)), uid);
     }
 }

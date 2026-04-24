@@ -15,30 +15,29 @@
 
 using Content.Shared.Atmos;
 
-namespace Content.Server.Atmos.Piping.Trinary.Components
+namespace Content.Server.Atmos.Piping.Trinary.Components;
+
+[RegisterComponent]
+public sealed partial class GasFilterComponent : Component
 {
-    [RegisterComponent]
-    public sealed partial class GasFilterComponent : Component
-    {
-        [DataField]
-        public bool Enabled = true;
+    [DataField]
+    public bool Enabled = true;
 
-        [DataField("inlet")]
-        public string InletName = "inlet";
+    [DataField]
+    public Gas? FilteredGas;
 
-        [DataField("filter")]
-        public string FilterName = "filter";
+    [DataField("filter")]
+    public string FilterName = "filter";
 
-        [DataField("outlet")]
-        public string OutletName = "outlet";
+    [DataField("inlet")]
+    public string InletName = "inlet";
 
-        [DataField]
-        public float TransferRate = Atmospherics.MaxTransferRate;
+    [DataField]
+    public float MaxTransferRate = Atmospherics.MaxTransferRate;
 
-        [DataField]
-        public float MaxTransferRate = Atmospherics.MaxTransferRate;
+    [DataField("outlet")]
+    public string OutletName = "outlet";
 
-        [DataField]
-        public Gas? FilteredGas;
-    }
+    [DataField]
+    public float TransferRate = Atmospherics.MaxTransferRate;
 }

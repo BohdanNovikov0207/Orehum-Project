@@ -22,16 +22,15 @@ namespace Content.Server.Shuttles.Commands;
 /// Creates FTL disks, to maps, grids, or entities.
 /// </summary>
 [AdminCommand(AdminFlags.Fun)]
-
 public sealed class FTLDiskCommand : LocalizedCommands
 {
+    public static readonly EntProtoId CoordinatesDisk = "CoordinatesDisk";
+    public static readonly EntProtoId DiskCase = "DiskCase";
     [Dependency] private readonly IEntityManager _entManager = default!;
     [Dependency] private readonly IEntitySystemManager _entSystemManager = default!;
 
     public override string Command => "ftldisk";
 
-    public static readonly EntProtoId CoordinatesDisk = "CoordinatesDisk";
-    public static readonly EntProtoId DiskCase = "DiskCase";
     public override void Execute(IConsoleShell shell, string argStr, string[] args)
     {
         if (args.Length == 0)
@@ -54,7 +53,7 @@ public sealed class FTLDiskCommand : LocalizedCommands
             return;
         }
 
-        EntityUid entity = player.AttachedEntity.Value;
+        var entity = player.AttachedEntity.Value;
         var coords = _entManager.GetComponent<TransformComponent>(entity).Coordinates;
 
         var handsSystem = _entSystemManager.GetEntitySystem<SharedHandsSystem>();
@@ -95,56 +94,72 @@ public sealed class FTLDiskCommand : LocalizedCommands
                 }
 
                 // find and verify the map is not somehow unusable.
-                if (!_entManager.TryGetComponent<MapComponent>(dest, out var mapComp)) // We have to check for a MapComponent here and above since we could have changed our dest entity.
+                if (!_entManager.TryGetComponent<MapComponent>(dest,
+                        out var mapComp)) // We have to check for a MapComponent here and above since we could have changed our dest entity.
                 {
-                    shell.WriteLine(Loc.GetString("cmd-ftldisk-no-map-comp", ("destination", destinations), ("map", dest)));
+                    shell.WriteLine(Loc.GetString("cmd-ftldisk-no-map-comp",
+                        ("destination", destinations),
+                        ("map", dest)));
                     continue;
                 }
-                if (mapComp.MapInitialized == false)
+
+                if (!mapComp.MapInitialized)
                 {
-                    shell.WriteLine(Loc.GetString("cmd-ftldisk-map-not-init", ("destination", destinations), ("map", dest)));
+                    shell.WriteLine(Loc.GetString("cmd-ftldisk-map-not-init",
+                        ("destination", destinations),
+                        ("map", dest)));
                     continue;
                 }
-                if (mapComp.MapPaused == true)
+
+                if (mapComp.MapPaused)
                 {
-                    shell.WriteLine(Loc.GetString("cmd-ftldisk-map-paused", ("destination", destinations), ("map", dest)));
+                    shell.WriteLine(Loc.GetString("cmd-ftldisk-map-paused",
+                        ("destination", destinations),
+                        ("map", dest)));
                     continue;
                 }
 
                 // check if our destination works already, if not, make it.
                 if (!_entManager.TryGetComponent<FTLDestinationComponent>(dest, out var ftlDestComp))
                 {
-                    FTLDestinationComponent ftlDest = _entManager.AddComponent<FTLDestinationComponent>(dest);
+                    var ftlDest = _entManager.AddComponent<FTLDestinationComponent>(dest);
                     ftlDest.RequireCoordinateDisk = true;
 
                     if (_entManager.HasComponent<MapGridComponent>(dest))
                     {
                         ftlDest.BeaconsOnly = true;
 
-                        shell.WriteLine(Loc.GetString("cmd-ftldisk-planet", ("destination", destinations), ("map", dest)));
+                        shell.WriteLine(Loc.GetString("cmd-ftldisk-planet",
+                            ("destination", destinations),
+                            ("map", dest)));
                     }
                 }
                 else
                 {
                     // we don't do these automatically, since it isn't clear what the correct resolution is. Instead we provide feedback to the user and carry on like they know what theyre doing.
-                    if (ftlDestComp.Enabled == false)
-                        shell.WriteLine(Loc.GetString("cmd-ftldisk-already-dest-not-enabled", ("destination", destinations), ("map", dest)));
+                    if (!ftlDestComp.Enabled)
+                        shell.WriteLine(Loc.GetString("cmd-ftldisk-already-dest-not-enabled",
+                            ("destination", destinations),
+                            ("map", dest)));
 
-                    if (ftlDestComp.BeaconsOnly == true)
-                        shell.WriteLine(Loc.GetString("cmd-ftldisk-requires-ftl-point", ("destination", destinations), ("map", dest)));
+                    if (ftlDestComp.BeaconsOnly)
+                        shell.WriteLine(Loc.GetString("cmd-ftldisk-requires-ftl-point",
+                            ("destination", destinations),
+                            ("map", dest)));
                 }
 
                 // create the FTL disk
-                EntityUid cdUid = _entManager.SpawnEntity(CoordinatesDisk, coords);
+                var cdUid = _entManager.SpawnEntity(CoordinatesDisk, coords);
                 var cd = _entManager.EnsureComponent<ShuttleDestinationCoordinatesComponent>(cdUid);
                 cd.Destination = dest;
                 _entManager.Dirty(cdUid, cd);
 
                 // create disk case
-                EntityUid cdCaseUid = _entManager.SpawnEntity(DiskCase, coords);
+                var cdCaseUid = _entManager.SpawnEntity(DiskCase, coords);
 
                 // apply labels
-                if (_entManager.TryGetComponent<MetaDataComponent>(dest, out var meta) && meta != null && meta.EntityName != null)
+                if (_entManager.TryGetComponent<MetaDataComponent>(dest, out var meta) && meta != null &&
+                    meta.EntityName != null)
                 {
                     labelSystem.Label(cdUid, meta.EntityName);
                     labelSystem.Label(cdCaseUid, meta.EntityName);
@@ -152,34 +167,32 @@ public sealed class FTLDiskCommand : LocalizedCommands
 
                 // if the case has a storage, try to place the disk in there and then the case inhand
 
-                if (_entManager.TryGetComponent<StorageComponent>(cdCaseUid, out var storage) && storageSystem.Insert(cdCaseUid, cdUid, out _, storageComp: storage, playSound: false))
+                if (_entManager.TryGetComponent<StorageComponent>(cdCaseUid, out var storage) &&
+                    storageSystem.Insert(cdCaseUid, cdUid, out _, storageComp: storage, playSound: false))
                 {
-                    if (_entManager.TryGetComponent<HandsComponent>(entity, out var handsComponent) && handsSystem.TryGetEmptyHand((entity, handsComponent), out var emptyHand))
-                    {
-                        handsSystem.TryPickup(entity, cdCaseUid, emptyHand, checkActionBlocker: false, handsComp: handsComponent);
-                    }
+                    if (_entManager.TryGetComponent<HandsComponent>(entity, out var handsComponent) &&
+                        handsSystem.TryGetEmptyHand((entity, handsComponent), out var emptyHand))
+                        handsSystem.TryPickup(entity, cdCaseUid, emptyHand, false, handsComp: handsComponent);
                 }
                 else // the case was messed up, put disk inhand
                 {
                     _entManager.DeleteEntity(cdCaseUid); // something went wrong so just yeet the chaf
 
-                    if (_entManager.TryGetComponent<HandsComponent>(entity, out var handsComponent) && handsSystem.TryGetEmptyHand((entity, handsComponent), out var emptyHand))
-                    {
-                        handsSystem.TryPickup(entity, cdUid, emptyHand, checkActionBlocker: false, handsComp: handsComponent);
-                    }
+                    if (_entManager.TryGetComponent<HandsComponent>(entity, out var handsComponent) &&
+                        handsSystem.TryGetEmptyHand((entity, handsComponent), out var emptyHand))
+                        handsSystem.TryPickup(entity, cdUid, emptyHand, false, handsComp: handsComponent);
                 }
             }
             else
-            {
                 shell.WriteLine(Loc.GetString("shell-invalid-entity-uid", ("uid", destinations)));
-            }
         }
     }
 
     public override CompletionResult GetCompletion(IConsoleShell shell, string[] args)
     {
         if (args.Length >= 1)
-            return CompletionResult.FromHintOptions(CompletionHelper.MapUids(_entManager), Loc.GetString("cmd-ftldisk-hint"));
+            return CompletionResult.FromHintOptions(CompletionHelper.MapUids(_entManager),
+                Loc.GetString("cmd-ftldisk-hint"));
         return CompletionResult.Empty;
     }
 }

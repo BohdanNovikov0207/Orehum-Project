@@ -50,20 +50,14 @@ public sealed partial class GunSystem
         SubscribeLocalEvent<ProjectileBatteryAmmoProviderComponent, PowerCellChangedEvent>(OnPowerCellChanged);
     }
 
-    private void OnBatteryStartup<T>(Entity<T> entity, ref ComponentStartup args) where T : BatteryAmmoProviderComponent
-    {
-        UpdateShots(entity, entity.Comp);
-    }
+    private void OnBatteryStartup<T>(Entity<T> entity, ref ComponentStartup args)
+        where T : BatteryAmmoProviderComponent => UpdateShots(entity, entity.Comp);
 
-    private void OnBatteryChargeChange<T>(Entity<T> entity, ref ChargeChangedEvent args) where T : BatteryAmmoProviderComponent
-    {
-        UpdateShots(entity, entity.Comp, args.Charge, args.MaxCharge);
-    }
+    private void OnBatteryChargeChange<T>(Entity<T> entity, ref ChargeChangedEvent args)
+        where T : BatteryAmmoProviderComponent => UpdateShots(entity, entity.Comp, args.Charge, args.MaxCharge);
 
-    private void OnPowerCellChanged<T>(Entity<T> entity, ref PowerCellChangedEvent args) where T : BatteryAmmoProviderComponent
-    {
-        UpdateShots(entity, entity.Comp);
-    }
+    private void OnPowerCellChanged<T>(Entity<T> entity, ref PowerCellChangedEvent args)
+        where T : BatteryAmmoProviderComponent => UpdateShots(entity, entity.Comp);
 
     private void UpdateShots(EntityUid uid, BatteryAmmoProviderComponent component)
     {
@@ -79,9 +73,7 @@ public sealed partial class GunSystem
         var maxShots = (int) (maxCharge / component.FireCost);
 
         if (component.Shots != shots || component.Capacity != maxShots)
-        {
             Dirty(uid, component);
-        }
 
         component.Shots = shots;
 
@@ -94,7 +86,8 @@ public sealed partial class GunSystem
         RaiseLocalEvent(uid, ref updateAmmoEv);
     }
 
-    private void OnBatteryDamageExamine<T>(Entity<T> entity, ref DamageExamineEvent args) where T : BatteryAmmoProviderComponent
+    private void OnBatteryDamageExamine<T>(Entity<T> entity, ref DamageExamineEvent args)
+        where T : BatteryAmmoProviderComponent
     {
         var damageSpec = GetDamage(entity.Comp);
 
@@ -119,22 +112,21 @@ public sealed partial class GunSystem
             return;
 
         var abs = Math.Abs(ap);
-        args.Message.AddMarkupPermissive("\n" + Loc.GetString("armor-penetration", ("arg", ap/abs), ("abs", abs)));
+        args.Message.AddMarkupPermissive("\n" + Loc.GetString("armor-penetration", ("arg", ap / abs), ("abs", abs)));
     }
 
     private DamageSpecifier? GetDamage(BatteryAmmoProviderComponent component)
     {
         if (component is ProjectileBatteryAmmoProviderComponent battery)
         {
-            if (ProtoManager.Index<EntityPrototype>(battery.Prototype).Components
+            if (ProtoManager.Index<EntityPrototype>(battery.Prototype)
+                .Components
                 .TryGetValue(Factory.GetComponentName<ProjectileComponent>(), out var projectile))
             {
                 var p = (ProjectileComponent) projectile.Component;
 
                 if (!p.Damage.Empty)
-                {
                     return p.Damage * Damageable.UniversalProjectileDamageModifier;
-                }
             }
 
             return null;

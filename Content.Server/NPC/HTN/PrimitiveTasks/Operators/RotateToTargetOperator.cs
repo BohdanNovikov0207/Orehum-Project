@@ -14,11 +14,11 @@ public sealed partial class RotateToTargetOperator : HTNOperator
     [Dependency] private readonly IEntityManager _entityManager = default!;
     private RotateToFaceSystem _rotate = default!;
 
-    [DataField("targetKey")]
-    public string TargetKey = "RotateTarget";
-
     [DataField("rotateSpeedKey")]
     public string RotationSpeedKey = NPCBlackboard.RotateSpeed;
+
+    [DataField("targetKey")]
+    public string TargetKey = "RotateTarget";
 
     // Didn't use a key because it's likely the same between all NPCs
     [DataField("tolerance")]
@@ -39,21 +39,15 @@ public sealed partial class RotateToTargetOperator : HTNOperator
     public override HTNOperatorStatus Update(NPCBlackboard blackboard, float frameTime)
     {
         if (!blackboard.TryGetValue<Angle>(TargetKey, out var rotateTarget, _entityManager))
-        {
             return HTNOperatorStatus.Failed;
-        }
 
         if (!blackboard.TryGetValue<float>(RotationSpeedKey, out var rotateSpeed, _entityManager))
-        {
             return HTNOperatorStatus.Failed;
-        }
 
         var owner = blackboard.GetValue<EntityUid>(NPCBlackboard.Owner);
 
         if (_rotate.TryRotateTo(owner, rotateTarget, frameTime, Tolerance, rotateSpeed))
-        {
             return HTNOperatorStatus.Finished;
-        }
 
         return HTNOperatorStatus.Continuing;
     }

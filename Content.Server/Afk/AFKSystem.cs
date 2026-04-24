@@ -31,15 +31,15 @@ namespace Content.Server.Afk;
 public sealed class AFKSystem : EntitySystem
 {
     [Dependency] private readonly IAfkManager _afkManager = default!;
+
+    private readonly HashSet<ICommonSession> _afkPlayers = new();
     [Dependency] private readonly IConfigurationManager _configManager = default!;
     [Dependency] private readonly IPlayerManager _playerManager = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly GameTicker _ticker = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     private float _checkDelay;
     private TimeSpan _checkTime;
-
-    private readonly HashSet<ICommonSession> _afkPlayers = new();
 
     public override void Initialize()
     {
@@ -50,15 +50,10 @@ public sealed class AFKSystem : EntitySystem
         SubscribeNetworkEvent<FullInputCmdMessage>(HandleInputCmd);
     }
 
-    private void HandleInputCmd(FullInputCmdMessage msg, EntitySessionEventArgs args)
-    {
+    private void HandleInputCmd(FullInputCmdMessage msg, EntitySessionEventArgs args) =>
         _afkManager.PlayerDidAction(args.SenderSession);
-    }
 
-    private void SetAfkDelay(float obj)
-    {
-        _checkDelay = obj;
-    }
+    private void SetAfkDelay(float obj) => _checkDelay = obj;
 
     private void OnPlayerChange(object? sender, SessionStatusEventArgs e)
     {
@@ -96,7 +91,8 @@ public sealed class AFKSystem : EntitySystem
 
         foreach (var pSession in Filter.GetAllPlayers())
         {
-            if (pSession.Status != SessionStatus.InGame) continue;
+            if (pSession.Status != SessionStatus.InGame)
+                continue;
             var isAfk = _afkManager.IsAfk(pSession);
 
             if (isAfk && _afkPlayers.Add(pSession))

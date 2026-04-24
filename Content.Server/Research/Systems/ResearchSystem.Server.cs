@@ -39,7 +39,9 @@ public sealed partial class ResearchSystem
         }
     }
 
-    private void OnServerDatabaseModified(EntityUid uid, ResearchServerComponent component, ref TechnologyDatabaseModifiedEvent args)
+    private void OnServerDatabaseModified(EntityUid uid,
+        ResearchServerComponent component,
+        ref TechnologyDatabaseModifiedEvent args)
     {
         foreach (var client in component.Clients)
         {
@@ -47,10 +49,7 @@ public sealed partial class ResearchSystem
         }
     }
 
-    private bool CanRun(EntityUid uid)
-    {
-        return this.IsPowered(uid, EntityManager);
-    }
+    private bool CanRun(EntityUid uid) => this.IsPowered(uid, EntityManager);
 
     private void UpdateServer(EntityUid uid, int time, ResearchServerComponent? component = null)
     {
@@ -70,8 +69,11 @@ public sealed partial class ResearchSystem
     /// <param name="clientComponent"></param>
     /// <param name="serverComponent"></param>
     /// <param name="dirtyServer">Whether or not to dirty the server component after registration</param>
-    public void RegisterClient(EntityUid client, EntityUid server, ResearchClientComponent? clientComponent = null,
-        ResearchServerComponent? serverComponent = null,  bool dirtyServer = true)
+    public void RegisterClient(EntityUid client,
+        EntityUid server,
+        ResearchClientComponent? clientComponent = null,
+        ResearchServerComponent? serverComponent = null,
+        bool dirtyServer = true)
     {
         if (!Resolve(client, ref clientComponent, false) || !Resolve(server, ref serverComponent, false))
             return;
@@ -96,7 +98,9 @@ public sealed partial class ResearchSystem
     /// <param name="client"></param>
     /// <param name="clientComponent"></param>
     /// <param name="dirtyServer"></param>
-    public void UnregisterClient(EntityUid client, ResearchClientComponent? clientComponent = null, bool dirtyServer = true)
+    public void UnregisterClient(EntityUid client,
+        ResearchClientComponent? clientComponent = null,
+        bool dirtyServer = true)
     {
         if (!Resolve(client, ref clientComponent))
             return;
@@ -115,8 +119,11 @@ public sealed partial class ResearchSystem
     /// <param name="clientComponent"></param>
     /// <param name="serverComponent"></param>
     /// <param name="dirtyServer"></param>
-    public void UnregisterClient(EntityUid client, EntityUid server, ResearchClientComponent? clientComponent = null,
-        ResearchServerComponent? serverComponent = null, bool dirtyServer = true)
+    public void UnregisterClient(EntityUid client,
+        EntityUid server,
+        ResearchClientComponent? clientComponent = null,
+        ResearchServerComponent? serverComponent = null,
+        bool dirtyServer = true)
     {
         if (!Resolve(client, ref clientComponent, false) || !Resolve(server, ref serverComponent, false))
             return;
@@ -126,9 +133,7 @@ public sealed partial class ResearchSystem
         SyncClientWithServer(client, clientComponent: clientComponent);
 
         if (dirtyServer && !TerminatingOrDeleted(server))
-        {
             Dirty(server, serverComponent);
-        }
 
         var ev = new ResearchRegistrationChangedEvent(null);
         RaiseLocalEvent(client, ref ev);
@@ -155,7 +160,9 @@ public sealed partial class ResearchSystem
         {
             RaiseLocalEvent(client, ref ev);
         }
-        RaiseLocalEvent(uid, ref ev); // Goobstation: We raise on the server as well in case its working as a point source.
+
+        RaiseLocalEvent(uid,
+            ref ev); // Goobstation: We raise on the server as well in case its working as a point source.
         return ev.Points;
     }
 
@@ -178,6 +185,7 @@ public sealed partial class ResearchSystem
         {
             RaiseLocalEvent(client, ref ev);
         }
+
         Dirty(uid, component);
     }
 }

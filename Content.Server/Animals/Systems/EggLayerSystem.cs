@@ -31,18 +31,18 @@ using Robust.Shared.Timing;
 namespace Content.Server.Animals.Systems;
 
 /// <summary>
-///     Gives the ability to lay eggs/other things;
-///     produces endlessly if the owner does not have a HungerComponent.
+/// Gives the ability to lay eggs/other things;
+/// produces endlessly if the owner does not have a HungerComponent.
 /// </summary>
 public sealed class EggLayerSystem : EntitySystem
 {
-    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly ActionsSystem _actions = default!;
     [Dependency] private readonly AudioSystem _audio = default!;
     [Dependency] private readonly HungerSystem _hunger = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly PopupSystem _popup = default!;
     [Dependency] private readonly MobStateSystem _mobState = default!;
+    [Dependency] private readonly PopupSystem _popup = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -72,7 +72,8 @@ public sealed class EggLayerSystem : EntitySystem
                 continue;
 
             // Randomize next growth time for more organic egglaying.
-            eggLayer.NextGrowth += TimeSpan.FromSeconds(_random.NextFloat(eggLayer.EggLayCooldownMin, eggLayer.EggLayCooldownMax));
+            eggLayer.NextGrowth +=
+                TimeSpan.FromSeconds(_random.NextFloat(eggLayer.EggLayCooldownMin, eggLayer.EggLayCooldownMax));
 
             if (_mobState.IsDead(uid))
                 continue;
@@ -81,6 +82,7 @@ public sealed class EggLayerSystem : EntitySystem
             // so it's used for player controlled chickens as well.
             eligibleEggLayers.Add((uid, eggLayer)); // Goob - self-spawning
         }
+
         // Goob - self-spawning start
         foreach (var ent in eligibleEggLayers)
         {
@@ -92,14 +94,14 @@ public sealed class EggLayerSystem : EntitySystem
     private void OnMapInit(EntityUid uid, EggLayerComponent component, MapInitEvent args)
     {
         _actions.AddAction(uid, ref component.Action, component.EggLayAction);
-        component.NextGrowth = _timing.CurTime + TimeSpan.FromSeconds(_random.NextFloat(component.EggLayCooldownMin, component.EggLayCooldownMax));
+        component.NextGrowth = _timing.CurTime +
+                               TimeSpan.FromSeconds(_random.NextFloat(component.EggLayCooldownMin,
+                                   component.EggLayCooldownMax));
     }
 
-    private void OnEggLayAction(EntityUid uid, EggLayerComponent egglayer, EggLayInstantActionEvent args)
-    {
+    private void OnEggLayAction(EntityUid uid, EggLayerComponent egglayer, EggLayInstantActionEvent args) =>
         // Cooldown is handeled by ActionAnimalLayEgg in types.yml.
         args.Handled = TryLayEgg(uid, egglayer);
-    }
 
     public bool TryLayEgg(EntityUid uid, EggLayerComponent? egglayer)
     {
@@ -136,15 +138,16 @@ public sealed class EggLayerSystem : EntitySystem
         // Sound + popups
         _audio.PlayPvs(egglayer.EggLaySound, uid);
         _popup.PopupEntity(Loc.GetString("action-popup-lay-egg-user"), uid, uid);
-        _popup.PopupEntity(Loc.GetString("action-popup-lay-egg-others", ("entity", uid)), uid, Filter.PvsExcept(uid), true);
+        _popup.PopupEntity(Loc.GetString("action-popup-lay-egg-others", ("entity", uid)),
+            uid,
+            Filter.PvsExcept(uid),
+            true);
 
         return true;
     }
 
 //_Trauma
 // Removes egg laying action when EggLayerComponent is removed from an entity.
-     void OnShutdown(Entity<EggLayerComponent> ent, ref ComponentShutdown args)
-    {
+    private void OnShutdown(Entity<EggLayerComponent> ent, ref ComponentShutdown args) =>
         _actions.RemoveAction(ent.Comp.Action);
-    }
 }

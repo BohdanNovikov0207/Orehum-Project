@@ -29,8 +29,8 @@ using Content.Server.Parallax;
 using Content.Server.Shuttles.Systems;
 using Content.Shared.CCVar;
 using Content.Shared.GameTicking;
-using Content.Shared.Mobs.Components;
 using Content.Shared.Maps;
+using Content.Shared.Mobs.Components;
 using Robust.Shared.Configuration;
 using Robust.Shared.EntitySerialization.Systems;
 using Robust.Shared.Map;
@@ -45,28 +45,28 @@ namespace Content.Server._Lavaland.Procedural.Systems;
 
 public sealed partial class LavalandSystem : EntitySystem
 {
-    public bool LavalandEnabled = true;
-
-    [Dependency] private readonly SharedMapSystem _map = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly TileSystem _tile = default!;
-    [Dependency] private readonly ITileDefinitionManager _tiledef = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly INetConfigurationManager _config = default!;
-    [Dependency] private readonly IMapManager _mapManager = default!;
-    [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly AtmosphereSystem _atmos = default!;
     [Dependency] private readonly BiomeSystem _biome = default!;
+    [Dependency] private readonly INetConfigurationManager _config = default!;
     [Dependency] private readonly DecalSystem _decals = default!;
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly MetaDataSystem _metaData = default!;
+
+    [Dependency] private readonly SharedMapSystem _map = default!;
     [Dependency] private readonly MapLoaderSystem _mapLoader = default!;
+    [Dependency] private readonly IMapManager _mapManager = default!;
+    [Dependency] private readonly MetaDataSystem _metaData = default!;
     [Dependency] private readonly SharedPhysicsSystem _physics = default!;
+    [Dependency] private readonly IPrototypeManager _proto = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly ShuttleSystem _shuttle = default!;
+    [Dependency] private readonly TileSystem _tile = default!;
+    [Dependency] private readonly ITileDefinitionManager _tiledef = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
+    private EntityQuery<FixturesComponent> _fixtureQuery;
 
     private EntityQuery<MapGridComponent> _gridQuery;
     private EntityQuery<TransformComponent> _xformQuery;
-    private EntityQuery<FixturesComponent> _fixtureQuery;
+    public bool LavalandEnabled = true;
 
     public override void Initialize()
     {

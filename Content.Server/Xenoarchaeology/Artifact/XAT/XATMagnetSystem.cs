@@ -13,13 +13,14 @@ namespace Content.Server.Xenoarchaeology.Artifact.XAT;
 /// </summary>
 public sealed class XATMagnetSystem : BaseQueryUpdateXATSystem<XATMagnetComponent>
 {
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
 
     /// <summary> Pre-allocated and re-used collection.</summary>
-    private HashSet<Entity<MagbootsComponent>> _magbootEntities = new();
+    private readonly HashSet<Entity<MagbootsComponent>> _magbootEntities = new();
 
-    /// <inheritdoc/>
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
+
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
@@ -28,7 +29,9 @@ public sealed class XATMagnetSystem : BaseQueryUpdateXATSystem<XATMagnetComponen
     }
 
     /// <inheritdoc />
-    protected override void UpdateXAT(Entity<XenoArtifactComponent> artifact, Entity<XATMagnetComponent, XenoArtifactNodeComponent> node, float frameTime)
+    protected override void UpdateXAT(Entity<XenoArtifactComponent> artifact,
+        Entity<XATMagnetComponent, XenoArtifactNodeComponent> node,
+        float frameTime)
     {
         var coords = Transform(artifact.Owner).Coordinates;
 
@@ -36,7 +39,7 @@ public sealed class XATMagnetSystem : BaseQueryUpdateXATSystem<XATMagnetComponen
         _lookup.GetEntitiesInRange(coords, node.Comp1.MagbootsRange, _magbootEntities);
         foreach (var ent in _magbootEntities)
         {
-            if(!TryComp<ItemToggleComponent>(ent, out var itemToggle) || !itemToggle.Activated)
+            if (!TryComp<ItemToggleComponent>(ent, out var itemToggle) || !itemToggle.Activated)
                 continue;
 
             Trigger(artifact, node);

@@ -19,18 +19,16 @@ using Content.Shared.Radiation.Components;
 using Content.Shared.Radiation.Systems;
 using Robust.Server.Audio;
 using Robust.Server.Player;
-using Robust.Shared.Player;
 
 namespace Content.Server.Radiation.Systems;
 
 public sealed class GeigerSystem : SharedGeigerSystem
 {
+    private static readonly float ApproxEqual = 0.01f;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
-    [Dependency] private readonly RadiationSystem _radiation = default!;
     [Dependency] private readonly AudioSystem _audio = default!;
     [Dependency] private readonly IPlayerManager _player = default!;
-
-    private static readonly float ApproxEqual = 0.01f;
+    [Dependency] private readonly RadiationSystem _radiation = default!;
 
     public override void Initialize()
     {
@@ -147,7 +145,8 @@ public sealed class GeigerSystem : SharedGeigerSystem
         Dirty(geiger, component);
     }
 
-    private void UpdateAppearance(EntityUid uid, GeigerComponent? component = null,
+    private void UpdateAppearance(EntityUid uid,
+        GeigerComponent? component = null,
         AppearanceComponent? appearance = null)
     {
         if (!Resolve(uid, ref component, ref appearance, false))
@@ -173,22 +172,22 @@ public sealed class GeigerSystem : SharedGeigerSystem
         if (component.BroadcastAudio)
         {
             // For some reason PlayPvs sounds quieter even at distance 0, so we need to boost the volume a bit for consistency
-            param = sounds.Params.WithLoop(true).WithVolume(component.Volume + 1.5f).WithMaxDistance(component.BroadcastRange);
+            param = sounds.Params.WithLoop(true)
+                .WithVolume(component.Volume + 1.5f)
+                .WithMaxDistance(component.BroadcastRange);
             component.Stream = _audio.PlayPvs(sound, uid, param)?.Entity;
         }
-        else if(component.User is not null && _player.TryGetSessionByEntity(component.User.Value, out var session))
-                    component.Stream = _audio.PlayGlobal(sound, session, param)?.Entity;
+        else if (component.User is not null && _player.TryGetSessionByEntity(component.User.Value, out var session))
+            component.Stream = _audio.PlayGlobal(sound, session, param)?.Entity;
     }
 
-    public static GeigerDangerLevel RadsToLevel(float rads)
-    {
-        return rads switch
+    public static GeigerDangerLevel RadsToLevel(float rads) =>
+        rads switch
         {
             < 0.2f => GeigerDangerLevel.None,
             < 1f => GeigerDangerLevel.Low,
             < 3f => GeigerDangerLevel.Med,
             < 6f => GeigerDangerLevel.High,
-            _ => GeigerDangerLevel.Extreme
+            _ => GeigerDangerLevel.Extreme,
         };
-    }
 }

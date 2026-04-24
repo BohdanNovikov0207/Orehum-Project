@@ -33,9 +33,7 @@ public sealed class SetOOCCommand : LocalizedCommands
         var ooc = _configManager.GetCVar(CCVars.OocEnabled);
 
         if (args.Length == 0)
-        {
             ooc = !ooc;
-        }
 
         if (args.Length == 1 && !bool.TryParse(args[0], out ooc))
         {

@@ -64,8 +64,6 @@ public sealed class AntiRotOnBuckleSystem : EntitySystem
                        antiRot.Enabled;
     }
 
-    private void OnPowerChanged(EntityUid uid, AntiRotOnBuckleComponent component, ref PowerChangedEvent args)
-    {
+    private void OnPowerChanged(EntityUid uid, AntiRotOnBuckleComponent component, ref PowerChangedEvent args) =>
         component.Enabled = !component.RequiresPower || args.Powered;
-    }
 }

@@ -14,25 +14,22 @@ using Content.Server.IdentityManagement;
 using Content.Shared._Shitmed.StatusEffects;
 using Content.Shared.DetailExaminable;
 using Content.Shared.Forensics;
-using Content.Shared.Humanoid;
-using Content.Shared.Preferences;
-using Content.Shared.Popups;
 using Content.Shared.Forensics.Components;
+using Content.Shared.Humanoid;
+using Content.Shared.Popups;
+using Content.Shared.Preferences;
 
 namespace Content.Server._Shitmed.StatusEffects;
 
 public sealed class ScrambleDnaEffectSystem : EntitySystem
 {
+    [Dependency] private readonly ForensicsSystem _forensicsSystem = default!;
 
     [Dependency] private readonly HumanoidAppearanceSystem _humanoidAppearance = default!;
-    [Dependency] private readonly ForensicsSystem _forensicsSystem = default!;
+    [Dependency] private readonly IdentitySystem _identity = default!;
     [Dependency] private readonly MetaDataSystem _metaData = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly IdentitySystem _identity = default!;
-    public override void Initialize()
-    {
-        SubscribeLocalEvent<ScrambleDnaEffectComponent, ComponentInit>(OnInit);
-    }
+    public override void Initialize() => SubscribeLocalEvent<ScrambleDnaEffectComponent, ComponentInit>(OnInit);
 
     private void OnInit(EntityUid uid, ScrambleDnaEffectComponent component, ComponentInit args) =>
         Scramble(uid);

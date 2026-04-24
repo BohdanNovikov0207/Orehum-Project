@@ -30,8 +30,8 @@ public sealed class CharacterInfoSystem : EntitySystem
 {
     [Dependency] private readonly JobSystem _jobs = default!;
     [Dependency] private readonly MindSystem _minds = default!;
-    [Dependency] private readonly RoleSystem _roles = default!;
     [Dependency] private readonly SharedObjectivesSystem _objectives = default!;
+    [Dependency] private readonly RoleSystem _roles = default!;
 
     public override void Initialize()
     {
@@ -74,6 +74,7 @@ public sealed class CharacterInfoSystem : EntitySystem
             briefing = _roles.MindGetBriefing(mindId);
         }
 
-        RaiseNetworkEvent(new CharacterInfoEvent(GetNetEntity(entity), jobTitle, objectives, briefing), args.SenderSession);
+        RaiseNetworkEvent(new CharacterInfoEvent(GetNetEntity(entity), jobTitle, objectives, briefing),
+            args.SenderSession);
     }
 }

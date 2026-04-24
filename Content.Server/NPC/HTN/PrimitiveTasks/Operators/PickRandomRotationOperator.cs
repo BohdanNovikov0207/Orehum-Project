@@ -22,9 +22,9 @@ public sealed partial class PickRandomRotationOperator : HTNOperator
         CancellationToken cancelToken)
     {
         var rotation = _random.NextAngle();
-        return (true, new Dictionary<string, object>()
+        return (true, new Dictionary<string, object>
         {
-            {TargetKey, rotation}
+            { TargetKey, rotation },
         });
     }
 }

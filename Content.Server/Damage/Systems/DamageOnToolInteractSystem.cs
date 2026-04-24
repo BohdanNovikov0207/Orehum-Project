@@ -26,53 +26,56 @@ using Content.Shared.Tools.Components;
 using Content.Shared.Tools.Systems;
 using ItemToggleComponent = Content.Shared.Item.ItemToggle.Components.ItemToggleComponent;
 
-namespace Content.Server.Damage.Systems
+namespace Content.Server.Damage.Systems;
+
+public sealed class DamageOnToolInteractSystem : EntitySystem
 {
-    public sealed class DamageOnToolInteractSystem : EntitySystem
+    [Dependency] private readonly IAdminLogManager _adminLogger = default!;
+    [Dependency] private readonly DamageableSystem _damageableSystem = default!;
+    [Dependency] private readonly SharedToolSystem _toolSystem = default!;
+
+    public override void Initialize()
     {
-        [Dependency] private readonly DamageableSystem _damageableSystem = default!;
-        [Dependency] private readonly IAdminLogManager _adminLogger = default!;
-        [Dependency] private readonly SharedToolSystem _toolSystem = default!;
+        base.Initialize();
 
-        public override void Initialize()
-        {
-            base.Initialize();
+        SubscribeLocalEvent<DamageOnToolInteractComponent, InteractUsingEvent>(OnInteracted);
+    }
 
-            SubscribeLocalEvent<DamageOnToolInteractComponent, InteractUsingEvent>(OnInteracted);
-        }
+    private void OnInteracted(EntityUid uid, DamageOnToolInteractComponent component, InteractUsingEvent args)
+    {
+        if (args.Handled)
+            return;
 
-        private void OnInteracted(EntityUid uid, DamageOnToolInteractComponent component, InteractUsingEvent args)
-        {
-            if (args.Handled)
-                return;
+        if (!TryComp<ItemToggleComponent>(args.Used, out var itemToggle))
+            return;
 
-            if (!TryComp<ItemToggleComponent>(args.Used, out var itemToggle))
-                return;
-
-            if (component.WeldingDamage is {} weldingDamage
+        if (component.WeldingDamage is { } weldingDamage
             && TryComp(args.Used, out WelderComponent? welder)
             && itemToggle.Activated
             && !welder.TankSafe)
+        {
+            var dmg = _damageableSystem.TryChangeDamage(args.Target, weldingDamage, origin: args.User);
+
+            if (dmg != null)
             {
-                var dmg = _damageableSystem.TryChangeDamage(args.Target, weldingDamage, origin: args.User);
-
-                if (dmg != null)
-                    _adminLogger.Add(LogType.Damaged,
-                        $"{ToPrettyString(args.User):user} used {ToPrettyString(args.Used):used} as a welder to deal {dmg.GetTotal():damage} damage to {ToPrettyString(args.Target):target}");
-
-                args.Handled = true;
+                _adminLogger.Add(LogType.Damaged,
+                    $"{ToPrettyString(args.User):user} used {ToPrettyString(args.Used):used} as a welder to deal {dmg.GetTotal():damage} damage to {ToPrettyString(args.Target):target}");
             }
-            else if (component.DefaultDamage is {} damage
-                && _toolSystem.HasQuality(args.Used, component.Tools))
+
+            args.Handled = true;
+        }
+        else if (component.DefaultDamage is { } damage
+                 && _toolSystem.HasQuality(args.Used, component.Tools))
+        {
+            var dmg = _damageableSystem.TryChangeDamage(args.Target, damage, origin: args.User);
+
+            if (dmg != null)
             {
-                var dmg = _damageableSystem.TryChangeDamage(args.Target, damage, origin: args.User);
-
-                if (dmg != null)
-                    _adminLogger.Add(LogType.Damaged,
-                        $"{ToPrettyString(args.User):user} used {ToPrettyString(args.Used):used} as a tool to deal {dmg.GetTotal():damage} damage to {ToPrettyString(args.Target):target}");
-
-                args.Handled = true;
+                _adminLogger.Add(LogType.Damaged,
+                    $"{ToPrettyString(args.User):user} used {ToPrettyString(args.Used):used} as a tool to deal {dmg.GetTotal():damage} damage to {ToPrettyString(args.Target):target}");
             }
+
+            args.Handled = true;
         }
     }
 }

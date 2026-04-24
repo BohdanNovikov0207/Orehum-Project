@@ -11,6 +11,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Numerics;
 using Content.Server.Chat.Systems;
 using Content.Server.NPC;
 using Content.Server.NPC.Systems;
@@ -19,14 +20,14 @@ using Content.Shared.Damage;
 using Content.Shared.Dragon;
 using Content.Shared.Examine;
 using Content.Shared.Sprite;
-using Robust.Shared.Map;
-using Robust.Shared.Player;
-using Robust.Shared.Serialization.Manager;
-using System.Numerics;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.GameStates;
-using Robust.Shared.Random; // Goobstation - Buff carp rift
+using Robust.Shared.Map;
+using Robust.Shared.Player;
+using Robust.Shared.Random;
+using Robust.Shared.Serialization.Manager;
 using Robust.Shared.Utility;
+// Goobstation - Buff carp rift
 
 namespace Content.Server.Dragon;
 
@@ -35,13 +36,13 @@ namespace Content.Server.Dragon;
 /// </summary>
 public sealed class DragonRiftSystem : EntitySystem
 {
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly ChatSystem _chat = default!;
     [Dependency] private readonly DragonSystem _dragon = default!;
-    [Dependency] private readonly IRobustRandom _random = default!; // Goobstation - Buff carp rift
-    [Dependency] private readonly ISerializationManager _serManager = default!;
     [Dependency] private readonly NavMapSystem _navMap = default!;
     [Dependency] private readonly NPCSystem _npc = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly IRobustRandom _random = default!; // Goobstation - Buff carp rift
+    [Dependency] private readonly ISerializationManager _serManager = default!;
 
     public override void Initialize()
     {
@@ -53,13 +54,11 @@ public sealed class DragonRiftSystem : EntitySystem
         SubscribeLocalEvent<DragonRiftComponent, ComponentShutdown>(OnShutdown);
     }
 
-    private void OnGetState(Entity<DragonRiftComponent> ent, ref ComponentGetState args)
-    {
+    private void OnGetState(Entity<DragonRiftComponent> ent, ref ComponentGetState args) =>
         args.State = new DragonRiftComponentState
         {
             State = ent.Comp.State,
         };
-    }
 
     public override void Update(float frameTime)
     {
@@ -82,9 +81,7 @@ public sealed class DragonRiftSystem : EntitySystem
                 Dirty(uid, comp);
             }
             else if (comp.State != DragonRiftState.Finished)
-            {
                 comp.Accumulator += frameTime;
-            }
 
             comp.SpawnAccumulator += frameTime;
 
@@ -103,7 +100,8 @@ public sealed class DragonRiftSystem : EntitySystem
             if (comp.SpawnAccumulator > comp.SpawnCooldown)
             {
                 comp.SpawnAccumulator -= comp.SpawnCooldown;
-                var ent = Spawn(_random.Prob(comp.StrongSpawnChance) ? comp.SpawnPrototypeStrong : comp.SpawnPrototype, xform.Coordinates); // Goobstation - Buff carp rift
+                var ent = Spawn(_random.Prob(comp.StrongSpawnChance) ? comp.SpawnPrototypeStrong : comp.SpawnPrototype,
+                    xform.Coordinates); // Goobstation - Buff carp rift
 
                 // Update their look to match the leader.
                 if (TryComp<RandomSpriteComponent>(comp.Dragon, out var randomSprite))
@@ -114,22 +112,21 @@ public sealed class DragonRiftSystem : EntitySystem
                 }
 
                 if (comp.Dragon != null)
-                    _npc.SetBlackboard(ent, NPCBlackboard.FollowTarget, new EntityCoordinates(comp.Dragon.Value, Vector2.Zero));
+                    _npc.SetBlackboard(ent,
+                        NPCBlackboard.FollowTarget,
+                        new EntityCoordinates(comp.Dragon.Value, Vector2.Zero));
             }
         }
     }
 
-    private void OnExamined(EntityUid uid, DragonRiftComponent component, ExaminedEvent args)
-    {
-        args.PushMarkup(Loc.GetString("carp-rift-examine", ("percentage", MathF.Round(component.Accumulator / component.MaxAccumulator * 100))));
-    }
+    private void OnExamined(EntityUid uid, DragonRiftComponent component, ExaminedEvent args) => args.PushMarkup(
+        Loc.GetString("carp-rift-examine",
+            ("percentage", MathF.Round(component.Accumulator / component.MaxAccumulator * 100))));
 
     private void OnAnchorChange(EntityUid uid, DragonRiftComponent component, ref AnchorStateChangedEvent args)
     {
         if (!args.Anchored && component.State == DragonRiftState.Charging)
-        {
             QueueDel(uid);
-        }
     }
 
     private void OnShutdown(EntityUid uid, DragonRiftComponent comp, ComponentShutdown args)

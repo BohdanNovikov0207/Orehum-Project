@@ -21,11 +21,11 @@ using Robust.Shared.Utility;
 
 namespace Content.Server.Station.Commands;
 
-[ToolshedCommand, AdminCommand(AdminFlags.Admin)]
+[ToolshedCommand] [AdminCommand(AdminFlags.Admin)]
 public sealed class StationsCommand : ToolshedCommand
 {
-    private StationSystem? _station;
     private CargoSystem? _cargo;
+    private StationSystem? _station;
 
     [CommandImplementation("list")]
     public IEnumerable<EntityUid> List()
@@ -118,10 +118,8 @@ public sealed class StationsCommand : ToolshedCommand
 
 public record struct OnlyOneStationsError : IConError
 {
-    public FormattedMessage DescribeInner()
-    {
-        return FormattedMessage.FromMarkupOrThrow("This command doesn't function if there is more than one or no stations, explicitly specify a station with the ent command or similar.");
-    }
+    public FormattedMessage DescribeInner() => FormattedMessage.FromMarkupOrThrow(
+        "This command doesn't function if there is more than one or no stations, explicitly specify a station with the ent command or similar.");
 
     public string? Expression { get; set; }
     public Vector2i? IssueSpan { get; set; }

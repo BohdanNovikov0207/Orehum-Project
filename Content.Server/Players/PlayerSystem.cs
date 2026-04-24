@@ -12,8 +12,5 @@ namespace Content.Server.Players;
 
 public sealed class PlayerSystem : SharedPlayerSystem
 {
-    public override ContentPlayerData? ContentData(ICommonSession? session)
-    {
-        return session?.ContentData();
-    }
+    public override ContentPlayerData? ContentData(ICommonSession? session) => session?.ContentData();
 }

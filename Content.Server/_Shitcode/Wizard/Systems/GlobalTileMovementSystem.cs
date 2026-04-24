@@ -8,20 +8,19 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Server._Goobstation.Wizard.Systems;
-using Content.Shared._Goobstation.Wizard;
-using Content.Shared._Goobstation.Wizard.EventSpells;
 using Content.Server.Administration.Logs;
 using Content.Server.Chat.Managers;
 using Content.Server.GameTicking;
 using Content.Server.Ghost.Roles.Events;
+using Content.Shared._Goobstation.Wizard;
+using Content.Shared._Goobstation.Wizard.EventSpells;
 using Content.Shared._Lavaland.Movement;
 using Content.Shared.Chat;
+using Content.Shared.Database;
 using Content.Shared.GameTicking;
+using Content.Shared.GameTicking.Components;
 using Content.Shared.Mind.Components;
 using Content.Shared.Mobs.Components;
-using Content.Shared.Database;
-using Content.Shared.GameTicking.Components;
 using Robust.Server.Audio;
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
@@ -30,13 +29,13 @@ namespace Content.Server._Goobstation.Wizard.Systems;
 
 public sealed class GlobalTileMovementSystem : EntitySystem
 {
+    private static readonly EntProtoId GameRule = "GlobalTileMovement";
     [Dependency] private readonly AudioSystem _audio = default!;
+    [Dependency] private readonly IChatManager _chatManager = default!;
     [Dependency] private readonly GameTicker _gameTicker = default!;
     [Dependency] private readonly IAdminLogManager _log = default!;
-    [Dependency] private readonly IChatManager _chatManager = default!;
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly WizardRuleSystem _wizardRuleSystem = default!;
-    private static readonly EntProtoId GameRule = "GlobalTileMovement";
 
     public override void Initialize()
     {
@@ -46,9 +45,11 @@ public sealed class GlobalTileMovementSystem : EntitySystem
         SubscribeLocalEvent<GhostRoleSpawnerUsedEvent>(OnGhostRoleSpawnerUsed);
         SubscribeLocalEvent<PlayerSpawnCompleteEvent>(OnPlayerSpawn);
     }
+
     public bool GlobalTileMovementIsActive()
     {
-        var query = EntityQueryEnumerator<GlobalTileMovementRuleComponent, ActiveGameRuleComponent, GameRuleComponent>();
+        var query =
+            EntityQueryEnumerator<GlobalTileMovementRuleComponent, ActiveGameRuleComponent, GameRuleComponent>();
         while (query.MoveNext(out _, out _, out _, out _))
         {
             return true;

@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Numerics;
 using Content.Goobstation.Common.Physics;
+using Content.Goobstation.Maths.Vectors;
 using Content.Server.Chat.Systems;
 using Content.Server.Ghost;
 using Content.Server.Ghost.Roles;
@@ -33,21 +34,21 @@ namespace Content.Server._Shitcode.Heretic.EntitySystems.PathSpecific;
 
 public sealed class StarGazerSystem : SharedStarGazerSystem
 {
-    [Dependency] private readonly PvsOverrideSystem _pvs = default!;
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly DamageableSystem _dmg = default!;
-    [Dependency] private readonly SharedStarMarkSystem _mark = default!;
+    [Dependency] private readonly ISharedAdminLogManager _admin = default!;
+    [Dependency] private readonly AudioSystem _audio = default!;
+    [Dependency] private readonly SharedBodySystem _body = default!;
     [Dependency] private readonly ChatSystem _chat = default!;
-    [Dependency] private readonly ThrowingSystem _throw = default!;
+    [Dependency] private readonly DamageableSystem _dmg = default!;
+    [Dependency] private readonly GhostRoleSystem _ghostRole = default!;
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
+    [Dependency] private readonly SharedStarMarkSystem _mark = default!;
     [Dependency] private readonly MobStateSystem _mobState = default!;
     [Dependency] private readonly PopupSystem _popup = default!;
-    [Dependency] private readonly AudioSystem _audio = default!;
-    [Dependency] private readonly GhostRoleSystem _ghostRole = default!;
     [Dependency] private readonly PullingSystem _pulling = default!;
-    [Dependency] private readonly SharedBodySystem _body = default!;
+    [Dependency] private readonly PvsOverrideSystem _pvs = default!;
 
     [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly ISharedAdminLogManager _admin = default!;
+    [Dependency] private readonly ThrowingSystem _throw = default!;
 
     public override void Initialize()
     {
@@ -117,10 +118,8 @@ public sealed class StarGazerSystem : SharedStarGazerSystem
     }
 
 
-    private void OnMindDetached(Entity<StarGazerComponent> ent, ref HereticMindDetachedEvent args)
-    {
+    private void OnMindDetached(Entity<StarGazerComponent> ent, ref HereticMindDetachedEvent args) =>
         KillStarGazer(ent);
-    }
 
     private void KillStarGazer(EntityUid starGazer)
     {
@@ -197,7 +196,7 @@ public sealed class StarGazerSystem : SharedStarGazerSystem
             var hasMind = mindContainer.HasMind;
             var resettingMind = starGazer.ResettingMindSession != null;
             var changedSession = resettingMind && (!actorQuery.TryComp(uid, out var actor) ||
-                actor.PlayerSession != starGazer.ResettingMindSession);
+                                                   actor.PlayerSession != starGazer.ResettingMindSession);
 
             var minion = minionQuery.CompOrNull(uid);
 
@@ -205,7 +204,7 @@ public sealed class StarGazerSystem : SharedStarGazerSystem
             {
                 if (changedSession)
                     RemoveGhostRole((uid, starGazer), hasMind, resettingMind);
-                else if (hasMind && resettingMind &&  ghostRoleQuery.TryComp(uid, out var ghostRole))
+                else if (hasMind && resettingMind && ghostRoleQuery.TryComp(uid, out var ghostRole))
                 {
                     starGazer.GhostRoleAccumulator += frameTime;
 
@@ -426,10 +425,10 @@ public sealed class StarGazerSystem : SharedStarGazerSystem
                 if (aLen <= 0.01f || bLen <= 0.01f)
                     continue;
 
-                var angleac = Goobstation.Maths.Vectors.GoobVector3.CalculateAngle(new Goobstation.Maths.Vectors.GoobVector3(-a),
-                    new Goobstation.Maths.Vectors.GoobVector3(-c));
-                var anglebc = Goobstation.Maths.Vectors.GoobVector3.CalculateAngle(new Goobstation.Maths.Vectors.GoobVector3(-b),
-                    new Goobstation.Maths.Vectors.GoobVector3(c));
+                var angleac = GoobVector3.CalculateAngle(new GoobVector3(-a),
+                    new GoobVector3(-c));
+                var anglebc = GoobVector3.CalculateAngle(new GoobVector3(-b),
+                    new GoobVector3(c));
 
                 var sinac = MathF.Sin(angleac);
                 var sinbc = MathF.Sin(anglebc);
@@ -465,10 +464,8 @@ public sealed class StarGazerSystem : SharedStarGazerSystem
         }
     }
 
-    private static Dictionary<NetEntity, ComplexJointVisualsData> GetJointData(ComplexJointVisualsComponent joint)
-    {
-        return joint.Data.Where(x => x.Value.Id == JointId).ToDictionary();
-    }
+    private static Dictionary<NetEntity, ComplexJointVisualsData> GetJointData(ComplexJointVisualsComponent joint) =>
+        joint.Data.Where(x => x.Value.Id == JointId).ToDictionary();
 
     private void ClearJoints(EntityUid uid,
         ComplexJointVisualsComponent joint,
@@ -495,11 +492,9 @@ public sealed class StarGazerSystem : SharedStarGazerSystem
         return val > 0 ? 1 : 2;
     }
 
-    public static bool OnSegment(Vector2 a, Vector2 b, Vector2 c)
-    {
-        return b.X <= Math.Max(a.X, c.X) && b.X >= Math.Min(a.X, c.X) &&
-               b.Y <= Math.Max(a.Y, c.Y) && b.Y >= Math.Min(a.Y, c.Y);
-    }
+    public static bool OnSegment(Vector2 a, Vector2 b, Vector2 c) =>
+        b.X <= Math.Max(a.X, c.X) && b.X >= Math.Min(a.X, c.X) &&
+        b.Y <= Math.Max(a.Y, c.Y) && b.Y >= Math.Min(a.Y, c.Y);
 
     public static bool DoIntersect(Vector2 p1, Vector2 q1, Vector2 p2, Vector2 q2)
     {
@@ -533,10 +528,7 @@ public sealed class StarGazerSystem : SharedStarGazerSystem
         return false; // Doesn't fall in any of the above cases
     }
 
-    private static int GetBeamStage(float time)
-    {
-        return time < 0.8f ? 1 : time > 9.7f ? 3 : 2;
-    }
+    private static int GetBeamStage(float time) => time < 0.8f ? 1 : time > 9.7f ? 3 : 2;
 
     private void OnShutdown(Entity<LaserBeamEndpointComponent> ent, ref ComponentShutdown args)
     {

@@ -13,7 +13,7 @@ namespace Content.Server.KillTracking;
 /// <summary>
 /// This is used for entities that track player damage sources and killers.
 /// </summary>
-[RegisterComponent, Access(typeof(KillTrackingSystem))]
+[RegisterComponent] [Access(typeof(KillTrackingSystem))]
 public sealed partial class KillTrackerComponent : Component
 {
     /// <summary>
@@ -34,7 +34,7 @@ public abstract record KillSource;
 /// <summary>
 /// A kill source for players
 /// </summary>
-[DataDefinition, Serializable]
+[DataDefinition] [Serializable]
 public sealed partial record KillPlayerSource : KillSource
 {
     [DataField("playerId")]
@@ -49,7 +49,7 @@ public sealed partial record KillPlayerSource : KillSource
 /// <summary>
 /// A kill source for non-player controlled entities
 /// </summary>
-[DataDefinition, Serializable]
+[DataDefinition] [Serializable]
 public sealed partial record KillNpcSource : KillSource
 {
     [DataField("npcEnt")]
@@ -64,5 +64,5 @@ public sealed partial record KillNpcSource : KillSource
 /// <summary>
 /// A kill source for kills with no damage origin
 /// </summary>
-[DataDefinition, Serializable]
+[DataDefinition] [Serializable]
 public sealed partial record KillEnvironmentSource : KillSource;

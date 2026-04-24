@@ -9,8 +9,8 @@ namespace Content.Server.Administration.Commands;
 [AdminCommand(AdminFlags.Admin)]
 public sealed class CameraCommand : LocalizedCommands
 {
-    [Dependency] private readonly EuiManager _eui = default!;
     [Dependency] private readonly IEntityManager _entManager = default!;
+    [Dependency] private readonly EuiManager _eui = default!;
     [Dependency] private readonly IPlayerManager _playerManager = default!;
 
     public override string Command => "camera";
@@ -29,7 +29,8 @@ public sealed class CameraCommand : LocalizedCommands
             return;
         }
 
-        if (!NetEntity.TryParse(args[0], out var targetNetId) || !_entManager.TryGetEntity(targetNetId, out var targetUid))
+        if (!NetEntity.TryParse(args[0], out var targetNetId) ||
+            !_entManager.TryGetEntity(targetNetId, out var targetUid))
         {
             if (!_playerManager.TryGetSessionByUsername(args[0], out var player)
                 || player.AttachedEntity == null)
@@ -37,6 +38,7 @@ public sealed class CameraCommand : LocalizedCommands
                 shell.WriteError(Loc.GetString("cmd-camera-wrong-argument"));
                 return;
             }
+
             targetUid = player.AttachedEntity.Value;
         }
 

@@ -49,7 +49,6 @@
 
 using System.Threading;
 using System.Threading.Tasks;
-using Robust.Shared.CPUJob.JobQueues.Queues;
 using Content.Server.Decals;
 using Content.Server.GameTicking.Events;
 using Content.Shared.CCVar;
@@ -58,9 +57,9 @@ using Content.Shared.GameTicking;
 using Content.Shared.Maps;
 using Content.Shared.Physics;
 using Content.Shared.Procedural;
-using Robust.Server.GameObjects;
 using Robust.Shared.Configuration;
 using Robust.Shared.Console;
+using Robust.Shared.CPUJob.JobQueues.Queues;
 using Robust.Shared.EntitySerialization;
 using Robust.Shared.EntitySerialization.Systems;
 using Robust.Shared.Map;
@@ -73,34 +72,33 @@ namespace Content.Server.Procedural;
 
 public sealed partial class DungeonSystem : SharedDungeonSystem
 {
-    [Dependency] private readonly IConfigurationManager _configManager = default!;
-    [Dependency] private readonly IConsoleHost _console = default!;
-    [Dependency] private readonly IPrototypeManager _prototype = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly ITileDefinitionManager _tileDefManager = default!;
-    [Dependency] private readonly AnchorableSystem _anchorable = default!;
-    [Dependency] private readonly DecalSystem _decals = default!;
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly TileSystem _tile = default!;
-    [Dependency] private readonly TurfSystem _turf = default!;
-    [Dependency] private readonly MapLoaderSystem _loader = default!;
-    [Dependency] private readonly SharedMapSystem _maps = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
-
-    private readonly List<(Vector2i, Tile)> _tiles = new();
-
-    private EntityQuery<MetaDataComponent> _metaQuery;
-    private EntityQuery<TransformComponent> _xformQuery;
-
     private const double DungeonJobTime = 0.005;
 
     public const int CollisionMask = (int) CollisionGroup.Impassable;
     public const int CollisionLayer = (int) CollisionGroup.Impassable;
 
+    public static readonly ProtoId<ContentTileDefinition> FallbackTileId = "FloorSteel";
+    [Dependency] private readonly AnchorableSystem _anchorable = default!;
+    [Dependency] private readonly IConfigurationManager _configManager = default!;
+    [Dependency] private readonly IConsoleHost _console = default!;
+    [Dependency] private readonly DecalSystem _decals = default!;
+
     private readonly JobQueue _dungeonJobQueue = new(DungeonJobTime);
     private readonly Dictionary<DungeonJob.DungeonJob, CancellationTokenSource> _dungeonJobs = new();
+    [Dependency] private readonly MapLoaderSystem _loader = default!;
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
+    [Dependency] private readonly SharedMapSystem _maps = default!;
+    [Dependency] private readonly IPrototypeManager _prototype = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly TileSystem _tile = default!;
+    [Dependency] private readonly ITileDefinitionManager _tileDefManager = default!;
 
-    public static readonly ProtoId<ContentTileDefinition> FallbackTileId = "FloorSteel";
+    private readonly List<(Vector2i, Tile)> _tiles = new();
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
+    [Dependency] private readonly TurfSystem _turf = default!;
+
+    private EntityQuery<MetaDataComponent> _metaQuery;
+    private EntityQuery<TransformComponent> _xformQuery;
 
     public override void Initialize()
     {
@@ -108,9 +106,21 @@ public sealed partial class DungeonSystem : SharedDungeonSystem
 
         _metaQuery = GetEntityQuery<MetaDataComponent>();
         _xformQuery = GetEntityQuery<TransformComponent>();
-        _console.RegisterCommand("dungen", Loc.GetString("cmd-dungen-desc"), Loc.GetString("cmd-dungen-help"), GenerateDungeon, CompletionCallback);
-        _console.RegisterCommand("dungen_preset_vis", Loc.GetString("cmd-dungen_preset_vis-desc"), Loc.GetString("cmd-dungen_preset_vis-help"), DungeonPresetVis, PresetCallback);
-        _console.RegisterCommand("dungen_pack_vis", Loc.GetString("cmd-dungen_pack_vis-desc"), Loc.GetString("cmd-dungen_pack_vis-help"), DungeonPackVis, PackCallback);
+        _console.RegisterCommand("dungen",
+            Loc.GetString("cmd-dungen-desc"),
+            Loc.GetString("cmd-dungen-help"),
+            GenerateDungeon,
+            CompletionCallback);
+        _console.RegisterCommand("dungen_preset_vis",
+            Loc.GetString("cmd-dungen_preset_vis-desc"),
+            Loc.GetString("cmd-dungen_preset_vis-help"),
+            DungeonPresetVis,
+            PresetCallback);
+        _console.RegisterCommand("dungen_pack_vis",
+            Loc.GetString("cmd-dungen_pack_vis-desc"),
+            Loc.GetString("cmd-dungen_pack_vis-help"),
+            DungeonPackVis,
+            PackCallback);
         SubscribeLocalEvent<PrototypesReloadedEventArgs>(PrototypeReload);
         SubscribeLocalEvent<RoundRestartCleanupEvent>(OnRoundCleanup);
         SubscribeLocalEvent<RoundStartingEvent>(OnRoundStart);
@@ -165,9 +175,7 @@ public sealed partial class DungeonSystem : SharedDungeonSystem
     private void PrototypeReload(PrototypesReloadedEventArgs obj)
     {
         if (!obj.ByType.TryGetValue(typeof(DungeonRoomPrototype), out var rooms))
-        {
             return;
-        }
 
         foreach (var proto in rooms.Modified.Values)
         {
@@ -203,9 +211,7 @@ public sealed partial class DungeonSystem : SharedDungeonSystem
             }
 
             if (!found)
-            {
                 GetOrCreateTemplate(roomProto);
-            }
         }
     }
 
@@ -223,12 +229,12 @@ public sealed partial class DungeonSystem : SharedDungeonSystem
 
         var opts = new MapLoadOptions
         {
-            DeserializationOptions = DeserializationOptions.Default with {PauseMaps = true},
-            ExpectedCategory = FileCategory.Map
+            DeserializationOptions = DeserializationOptions.Default with { PauseMaps = true },
+            ExpectedCategory = FileCategory.Map,
         };
 
         if (!_loader.TryLoadGeneric(proto.AtlasPath, out var res, opts) || !res.Maps.TryFirstOrNull(out var map))
-            throw new Exception($"Failed to load dungeon template.");
+            throw new Exception("Failed to load dungeon template.");
 
         comp = AddComp<DungeonAtlasTemplateComponent>(map.Value.Owner);
         comp.Path = proto.AtlasPath;
@@ -306,9 +312,7 @@ public sealed partial class DungeonSystem : SharedDungeonSystem
         await job.AsTask;
 
         if (job.Exception != null)
-        {
             throw job.Exception;
-        }
 
         return job.Result!;
     }

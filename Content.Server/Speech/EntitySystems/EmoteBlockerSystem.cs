@@ -14,10 +14,8 @@ public sealed class EmoteBlockerSystem : EntitySystem
         SubscribeLocalEvent<EmoteBlockerComponent, InventoryRelayedEvent<BeforeEmoteEvent>>(OnRelayedEmoteEvent);
     }
 
-    private static void OnRelayedEmoteEvent(Entity<EmoteBlockerComponent> entity, ref InventoryRelayedEvent<BeforeEmoteEvent> args)
-    {
-        OnEmoteEvent(entity, ref args.Args);
-    }
+    private static void OnRelayedEmoteEvent(Entity<EmoteBlockerComponent> entity,
+        ref InventoryRelayedEvent<BeforeEmoteEvent> args) => OnEmoteEvent(entity, ref args.Args);
 
     private static void OnEmoteEvent(Entity<EmoteBlockerComponent> entity, ref BeforeEmoteEvent args)
     {

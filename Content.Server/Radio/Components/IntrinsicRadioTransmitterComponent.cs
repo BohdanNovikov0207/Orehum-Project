@@ -12,8 +12,8 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototy
 namespace Content.Server.Radio.Components;
 
 /// <summary>
-///     This component allows an entity to directly translate spoken text into radio messages (effectively an intrinsic
-///     radio headset).
+/// This component allows an entity to directly translate spoken text into radio messages (effectively an intrinsic
+/// radio headset).
 /// </summary>
 [RegisterComponent]
 public sealed partial class IntrinsicRadioTransmitterComponent : Component

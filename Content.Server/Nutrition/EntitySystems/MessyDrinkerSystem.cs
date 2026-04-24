@@ -9,10 +9,10 @@ namespace Content.Server.Nutrition.EntitySystems;
 
 public sealed class MessyDrinkerSystem : EntitySystem
 {
-    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly IngestionSystem _ingestion = default!;
-    [Dependency] private readonly PuddleSystem _puddle = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly PuddleSystem _puddle = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
 
     public override void Initialize()
     {

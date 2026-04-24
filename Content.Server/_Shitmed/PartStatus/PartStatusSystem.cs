@@ -8,6 +8,7 @@
 
 using System.Linq;
 using System.Text;
+using Content.Goobstation.Common.Examine;
 using Content.Server.Body.Systems;
 using Content.Server.Chat.Managers;
 using Content.Shared._Shitmed.Medical.Surgery.Traumas;
@@ -19,31 +20,23 @@ using Content.Shared._Shitmed.Medical.Surgery.Wounds.Systems;
 using Content.Shared._Shitmed.PartStatus.Events;
 using Content.Shared.Body.Part;
 using Content.Shared.Chat;
-using Content.Shared.Mobs.Systems;
-using Robust.Shared.Player;
-using Robust.Shared.Utility;
-
-using Content.Goobstation.Common.Examine; // Goobstation Change
 using Content.Shared.Damage;
 using Content.Shared.Examine;
-using Content.Goobstation.Maths.FixedPoint;
-using Content.Shared.IdentityManagement;
-using Content.Shared.Verbs;
-using Robust.Shared.Utility;
 using Content.Shared.HealthExaminable;
+using Content.Shared.IdentityManagement;
+using Content.Shared.Mobs.Systems;
+using Content.Shared.Verbs;
+using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
+using Robust.Shared.Utility;
+// Goobstation Change
 
 namespace Content.Server._Shitmed.PartStatus;
 
 public sealed class PartStatusSystem : EntitySystem
 {
-    [Dependency] private readonly WoundSystem _woundSystem = default!;
-    [Dependency] private readonly BodySystem _bodySystem = default!;
-    [Dependency] private readonly MobStateSystem _mobStateSystem = default!;
-    [Dependency] private readonly TraumaSystem _trauma = default!;
-    [Dependency] private readonly IChatManager _chat = default!;
-    [Dependency] private readonly IPrototypeManager _proto = default!;
-    [Dependency] private readonly ExamineSystemShared _examineSystem = default!;
+    private const string BleedLocaleStr = "inspect-wound-Bleeding-moderate";
+    private const string BoneLocaleStr = "inspect-trauma-BoneDamage";
 
     private static readonly IReadOnlyList<BodyPartType> BodyPartOrder = new List<BodyPartType>
     {
@@ -56,15 +49,20 @@ public sealed class PartStatusSystem : EntitySystem
         BodyPartType.Foot,
     }.AsReadOnly();
 
-    private static List<BodyPartSymmetry> _symmetryPriority =
+    private static readonly List<BodyPartSymmetry> _symmetryPriority =
     [
         BodyPartSymmetry.Left,
         BodyPartSymmetry.Right,
         BodyPartSymmetry.None,
     ];
 
-    private const string BleedLocaleStr = "inspect-wound-Bleeding-moderate";
-    private const string BoneLocaleStr = "inspect-trauma-BoneDamage";
+    [Dependency] private readonly BodySystem _bodySystem = default!;
+    [Dependency] private readonly IChatManager _chat = default!;
+    [Dependency] private readonly ExamineSystemShared _examineSystem = default!;
+    [Dependency] private readonly MobStateSystem _mobStateSystem = default!;
+    [Dependency] private readonly IPrototypeManager _proto = default!;
+    [Dependency] private readonly TraumaSystem _trauma = default!;
+    [Dependency] private readonly WoundSystem _woundSystem = default!;
 
     public override void Initialize()
     {
@@ -103,7 +101,7 @@ public sealed class PartStatusSystem : EntitySystem
 
         var detailsRange = _examineSystem.IsInDetailsRange(args.User, uid);
 
-        var verb = new ExamineVerb()
+        var verb = new ExamineVerb
         {
             Act = () =>
             {
@@ -116,13 +114,16 @@ public sealed class PartStatusSystem : EntitySystem
             Category = VerbCategory.Examine,
             Disabled = !detailsRange,
             Message = detailsRange ? null : Loc.GetString("health-examinable-verb-disabled"),
-            Icon = new SpriteSpecifier.Texture(new ("/Textures/Interface/VerbIcons/rejuvenate.svg.192dpi.png"))
+            Icon = new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/VerbIcons/rejuvenate.svg.192dpi.png")),
         };
 
         args.Verbs.Add(verb);
     }
 
-    public FormattedMessage CreateMarkup(EntityUid uid, EntityUid examiner, HealthExaminableComponent component, DamageableComponent damage)
+    public FormattedMessage CreateMarkup(EntityUid uid,
+        EntityUid examiner,
+        HealthExaminableComponent component,
+        DamageableComponent damage)
     {
         if (!_bodySystem.TryGetRootPart(uid, out var rootPart))
             return new FormattedMessage();
@@ -201,9 +202,7 @@ public sealed class PartStatusSystem : EntitySystem
             message.PushNewline();
         }
         else
-        {
             titlestring += "-styleless";
-        }
 
         message.AddText(Loc.GetString(titlestring, ("entity", Identity.Name(entity, EntityManager))));
         message.PushNewline();
@@ -240,9 +239,7 @@ public sealed class PartStatusSystem : EntitySystem
             var locString = "inspect-part-status-line";
 
             if (styleless)
-            {
                 locString += "-styleless";
-            }
 
             message.AddText("    " + Loc.GetString(locString,
                 ("possessive", possessive),
@@ -304,16 +301,19 @@ public sealed class PartStatusSystem : EntitySystem
         var maxSeverity = WoundSeverity.Healed;
         foreach (var (type, severity) in damageSeverities)
         {
-            if (type is not ("Brute" or "Burn") // At some point we gonna de-hardcode this, but i doubt that day is soon.
+            if (type is not ("Brute"
+                    or "Burn") // At some point we gonna de-hardcode this, but i doubt that day is soon.
                 || severity <= maxSeverity)
                 continue;
 
             maxSeverity = severity;
         }
+
         return maxSeverity;
     }
 
-    private List<string> GetDamageGroupDescriptions(Dictionary<string, WoundSeverity> damageSeverities, bool inspectingSelf)
+    private List<string> GetDamageGroupDescriptions(Dictionary<string, WoundSeverity> damageSeverities,
+        bool inspectingSelf)
     {
         var descriptions = new List<string>();
         foreach (var (type, severity) in damageSeverities)

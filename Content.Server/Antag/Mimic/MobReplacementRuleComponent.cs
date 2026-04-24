@@ -15,14 +15,13 @@ namespace Content.Server.Antag.Mimic;
 [RegisterComponent]
 public sealed partial class MobReplacementRuleComponent : Component
 {
-    // If you want more components use generics, using a whitelist would probably kill the server iterating every single entity.
-
-    [DataField]
-    public EntProtoId Proto = "MobMimic";
-
     /// <summary>
     /// Chance per-entity.
     /// </summary>
     [DataField]
     public float Chance = 0.004f;
+    // If you want more components use generics, using a whitelist would probably kill the server iterating every single entity.
+
+    [DataField]
+    public EntProtoId Proto = "MobMimic";
 }

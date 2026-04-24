@@ -21,16 +21,15 @@ using Robust.Shared.Timing;
 namespace Content.Server.Worldgen.Systems;
 
 /// <summary>
-///     This handles putting together chunk entities and notifying them about important changes.
+/// This handles putting together chunk entities and notifying them about important changes.
 /// </summary>
 public sealed class WorldControllerSystem : EntitySystem
 {
-    [Dependency] private readonly TransformSystem _xformSys = default!;
+    private const int PlayerLoadRadius = 2;
     [Dependency] private readonly IGameTiming _gameTiming = default!;
     [Dependency] private readonly ILogManager _logManager = default!;
     [Dependency] private readonly MetaDataSystem _metaData = default!;
-
-    private const int PlayerLoadRadius = 2;
+    [Dependency] private readonly TransformSystem _xformSys = default!;
 
     private ISawmill _sawmill = default!;
 
@@ -44,7 +43,7 @@ public sealed class WorldControllerSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Handles deleting chunks properly.
+    /// Handles deleting chunks properly.
     /// </summary>
     private void OnChunkShutdown(EntityUid uid, WorldChunkComponent component, ComponentShutdown args)
     {
@@ -55,14 +54,14 @@ public sealed class WorldControllerSystem : EntitySystem
         {
             var ev = new WorldChunkUnloadedEvent(uid, component.Coordinates);
             RaiseLocalEvent(component.Map, ref ev);
-            RaiseLocalEvent(uid, ref ev, broadcast: true);
+            RaiseLocalEvent(uid, ref ev, true);
         }
 
         controller.Chunks.Remove(component.Coordinates);
     }
 
     /// <summary>
-    ///     Handles the inner logic of loading a chunk, i.e. events.
+    /// Handles the inner logic of loading a chunk, i.e. events.
     /// </summary>
     private void OnChunkLoadedCore(EntityUid uid, LoadedChunkComponent component, ComponentStartup args)
     {
@@ -71,12 +70,12 @@ public sealed class WorldControllerSystem : EntitySystem
 
         var ev = new WorldChunkLoadedEvent(uid, chunk.Coordinates);
         RaiseLocalEvent(chunk.Map, ref ev);
-        RaiseLocalEvent(uid, ref ev, broadcast: true);
+        RaiseLocalEvent(uid, ref ev, true);
         //_sawmill.Debug($"Loaded chunk {ToPrettyString(uid)} at {chunk.Coordinates}");
     }
 
     /// <summary>
-    ///     Handles the inner logic of unloading a chunk, i.e. events.
+    /// Handles the inner logic of unloading a chunk, i.e. events.
     /// </summary>
     private void OnChunkUnloadedCore(EntityUid uid, LoadedChunkComponent component, ComponentShutdown args)
     {
@@ -168,7 +167,7 @@ public sealed class WorldControllerSystem : EntitySystem
         var chunksUnloaded = 0;
 
         // Make sure these chunks get unloaded at the end of the tick.
-        while (loadedEnum.MoveNext(out var uid, out var _, out var chunk))
+        while (loadedEnum.MoveNext(out var uid, out _, out var chunk))
         {
             var coords = chunk.Coordinates;
 
@@ -215,7 +214,7 @@ public sealed class WorldControllerSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Attempts to get a chunk, creating it if it doesn't exist.
+    /// Attempts to get a chunk, creating it if it doesn't exist.
     /// </summary>
     /// <param name="chunk">Chunk coordinates to get the chunk entity for.</param>
     /// <param name="map">Map the chunk is in.</param>
@@ -233,7 +232,7 @@ public sealed class WorldControllerSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Constructs a new chunk entity, attaching it to the map.
+    /// Constructs a new chunk entity, attaching it to the map.
     /// </summary>
     /// <param name="chunkCoords">The coordinates the new chunk should be initialized for.</param>
     /// <param name="map"></param>
@@ -247,7 +246,9 @@ public sealed class WorldControllerSystem : EntitySystem
         return chunk;
     }
 
-    private void StartupChunkEntity(EntityUid chunk, Vector2i coords, EntityUid map,
+    private void StartupChunkEntity(EntityUid chunk,
+        Vector2i coords,
+        EntityUid map,
         WorldControllerComponent controller)
     {
         if (!TryComp<WorldChunkComponent>(chunk, out var chunkComponent))
@@ -262,26 +263,26 @@ public sealed class WorldControllerSystem : EntitySystem
         chunkComponent.Coordinates = coords;
         chunkComponent.Map = map;
         var ev = new WorldChunkAddedEvent(chunk, coords);
-        RaiseLocalEvent(map, ref ev, broadcast: true);
+        RaiseLocalEvent(map, ref ev, true);
     }
 }
 
 /// <summary>
-///     A directed event fired when a chunk is initially set up in the world. The chunk is not loaded at this point.
+/// A directed event fired when a chunk is initially set up in the world. The chunk is not loaded at this point.
 /// </summary>
 [ByRefEvent]
 [PublicAPI]
 public readonly record struct WorldChunkAddedEvent(EntityUid Chunk, Vector2i Coords);
 
 /// <summary>
-///     A directed event fired when a chunk is loaded into the world, i.e. a player or other world loader has entered vicinity.
+/// A directed event fired when a chunk is loaded into the world, i.e. a player or other world loader has entered vicinity.
 /// </summary>
 [ByRefEvent]
 [PublicAPI]
 public readonly record struct WorldChunkLoadedEvent(EntityUid Chunk, Vector2i Coords);
 
 /// <summary>
-///     A directed event fired when a chunk is unloaded from the world, i.e. no world loaders remain nearby.
+/// A directed event fired when a chunk is unloaded from the world, i.e. no world loaders remain nearby.
 /// </summary>
 [ByRefEvent]
 [PublicAPI]

@@ -39,7 +39,10 @@ public sealed class VentClogRule : StationEventSystem<VentClogRuleComponent>
 {
     [Dependency] private readonly SmokeSystem _smoke = default!;
 
-    protected override void Started(EntityUid uid, VentClogRuleComponent component, GameRuleComponent gameRule, GameRuleStartedEvent args)
+    protected override void Started(EntityUid uid,
+        VentClogRuleComponent component,
+        GameRuleComponent gameRule,
+        GameRuleStartedEvent args)
     {
         base.Started(uid, component, gameRule, args);
 
@@ -49,14 +52,13 @@ public sealed class VentClogRule : StationEventSystem<VentClogRuleComponent>
         // TODO: "safe random" for chems. Right now this includes admin chemicals.
         var allReagents = PrototypeManager.EnumeratePrototypes<ReagentPrototype>()
             .Where(x => !x.Abstract)
-            .Select(x => new ProtoId<ReagentPrototype>(x.ID)).ToList();
+            .Select(x => new ProtoId<ReagentPrototype>(x.ID))
+            .ToList();
 
         foreach (var (_, transform) in EntityQuery<GasVentPumpComponent, TransformComponent>())
         {
             if (CompOrNull<StationMemberComponent>(transform.GridUid)?.Station != chosenStation)
-            {
                 continue;
-            }
 
             var solution = new Solution();
 

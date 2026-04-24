@@ -8,10 +8,9 @@
 namespace Content.Server.Speech.Components;
 
 /// <summary>
-///     Buzzz!
+/// Buzzz!
 /// </summary>
 [RegisterComponent]
 public sealed partial class MothAccentComponent : Component
 {
-
 }

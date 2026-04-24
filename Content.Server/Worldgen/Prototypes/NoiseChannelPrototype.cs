@@ -17,81 +17,81 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototy
 namespace Content.Server.Worldgen.Prototypes;
 
 /// <summary>
-///     This is a config for noise channels, used by worldgen.
+/// This is a config for noise channels, used by worldgen.
 /// </summary>
 [Virtual]
 public class NoiseChannelConfig
 {
     /// <summary>
-    ///     The noise type used by the noise generator.
+    /// The noise type used by the noise generator.
     /// </summary>
     [DataField("noiseType")]
-    public FastNoiseLite.NoiseType NoiseType { get; private set; } = FastNoiseLite.NoiseType.Cellular;
+    public FastNoiseLite.NoiseType NoiseType { get; } = FastNoiseLite.NoiseType.Cellular;
 
     /// <summary>
-    ///     The fractal type used by the noise generator.
+    /// The fractal type used by the noise generator.
     /// </summary>
     [DataField("fractalType")]
-    public FastNoiseLite.FractalType FractalType { get; private set; } = FastNoiseLite.FractalType.FBm;
+    public FastNoiseLite.FractalType FractalType { get; } = FastNoiseLite.FractalType.FBm;
 
     /// <summary>
-    ///     Multiplied by pi in code when used.
+    /// Multiplied by pi in code when used.
     /// </summary>
     [DataField("fractalLacunarityByPi")]
-    public float FractalLacunarityByPi { get; private set; } = 2.0f / 3.0f;
+    public float FractalLacunarityByPi { get; } = 2.0f / 3.0f;
 
     /// <summary>
-    ///     Ranges of values that get clamped down to the "clipped" value.
+    /// Ranges of values that get clamped down to the "clipped" value.
     /// </summary>
     [DataField("clippingRanges")]
-    public List<Vector2> ClippingRanges { get; private set; } = new();
+    public List<Vector2> ClippingRanges { get; } = new();
 
     /// <summary>
-    ///     The value clipped chunks are set to.
+    /// The value clipped chunks are set to.
     /// </summary>
     [DataField("clippedValue")]
     public float ClippedValue { get; private set; }
 
     /// <summary>
-    ///     A value the output is multiplied by.
+    /// A value the output is multiplied by.
     /// </summary>
     [DataField("outputMultiplier")]
-    public float OutputMultiplier { get; private set; } = 1.0f;
+    public float OutputMultiplier { get; } = 1.0f;
 
     /// <summary>
-    ///     A value the input is multiplied by.
+    /// A value the input is multiplied by.
     /// </summary>
     [DataField("inputMultiplier")]
-    public float InputMultiplier { get; private set; } = 1.0f;
+    public float InputMultiplier { get; } = 1.0f;
 
     /// <summary>
-    ///     Remaps the output of the noise function from the range (-1, 1) to (0, 1). This is done before all other output
-    ///     transformations.
+    /// Remaps the output of the noise function from the range (-1, 1) to (0, 1). This is done before all other output
+    /// transformations.
     /// </summary>
     [DataField("remapTo0Through1")]
     public bool RemapTo0Through1 { get; private set; }
 
     /// <summary>
-    ///     For when the transformation you need is too complex to describe in YAML.
+    /// For when the transformation you need is too complex to describe in YAML.
     /// </summary>
     [DataField("noisePostProcess")]
     public NoisePostProcess? NoisePostProcess { get; private set; }
 
     /// <summary>
-    ///     For when you need a complex transformation of the input coordinates.
+    /// For when you need a complex transformation of the input coordinates.
     /// </summary>
     [DataField("noiseCoordinateProcess")]
     public NoiseCoordinateProcess? NoiseCoordinateProcess { get; private set; }
 
     /// <summary>
-    ///     The "center" of the range of values. Or the minimum if mapped 0 through 1.
+    /// The "center" of the range of values. Or the minimum if mapped 0 through 1.
     /// </summary>
     [DataField("minimum")]
     public float Minimum { get; private set; }
 }
 
 [Prototype]
-public sealed partial class NoiseChannelPrototype : NoiseChannelConfig, IPrototype, IInheritingPrototype
+public sealed class NoiseChannelPrototype : NoiseChannelConfig, IPrototype, IInheritingPrototype
 {
     /// <inheritdoc />
     [ParentDataField(typeof(AbstractPrototypeIdArraySerializer<EntityPrototype>))]
@@ -104,11 +104,11 @@ public sealed partial class NoiseChannelPrototype : NoiseChannelConfig, IPrototy
 
     /// <inheritdoc />
     [IdDataField]
-    public string ID { get; private set; } = default!;
+    public string ID { get; } = default!;
 }
 
 /// <summary>
-///     A wrapper around FastNoise's noise generation, using noise channel configs.
+/// A wrapper around FastNoise's noise generation, using noise channel configs.
 /// </summary>
 public struct NoiseGenerator
 {
@@ -116,7 +116,7 @@ public struct NoiseGenerator
     private readonly FastNoiseLite _noise;
 
     /// <summary>
-    ///     Produces a new noise generator from the given channel config and rng seed.
+    /// Produces a new noise generator from the given channel config and rng seed.
     /// </summary>
     public NoiseGenerator(NoiseChannelConfig config, int seed)
     {
@@ -129,7 +129,7 @@ public struct NoiseGenerator
     }
 
     /// <summary>
-    ///     Evaluates the noise generator at the provided coordinates.
+    /// Evaluates the noise generator at the provided coordinates.
     /// </summary>
     /// <param name="coords">Coordinates to use as input</param>
     /// <returns>Computed noise value</returns>
@@ -162,7 +162,7 @@ public struct NoiseGenerator
 }
 
 /// <summary>
-///     A processing class that adjusts the input coordinate space to a noise channel.
+/// A processing class that adjusts the input coordinate space to a noise channel.
 /// </summary>
 [ImplicitDataDefinitionForInheritors]
 public abstract partial class NoiseCoordinateProcess
@@ -171,7 +171,7 @@ public abstract partial class NoiseCoordinateProcess
 }
 
 /// <summary>
-///     A processing class that adjusts the final result of the noise channel.
+/// A processing class that adjusts the final result of the noise channel.
 /// </summary>
 [ImplicitDataDefinitionForInheritors]
 public abstract partial class NoisePostProcess

@@ -9,32 +9,31 @@
 using System.Linq;
 using Content.Server.CartridgeLoader;
 using Content.Server.CartridgeLoader.Cartridges;
+using Content.Server.GameTicking;
+using Content.Server.Station.Systems;
 using Content.Server.StationRecords.Systems;
+using Content.Shared.CartridgeLoader;
+using Content.Shared.CartridgeLoader.Cartridges;
 using Content.Shared.CriminalRecords;
 using Content.Shared.CriminalRecords.Systems;
 using Content.Shared.Security;
 using Content.Shared.StationRecords;
-using Content.Server.GameTicking;
-using Content.Server.Station.Systems;
-using Content.Shared.CartridgeLoader;
-using Content.Shared.CartridgeLoader.Cartridges;
 
 namespace Content.Server.CriminalRecords.Systems;
 
 /// <summary>
-///     Criminal records
-///
-///     Criminal Records inherit Station Records' core and add role-playing tools for Security:
-///         - Ability to track a person's status (Detained/Wanted/None)
-///         - See security officers' actions in Criminal Records in the radio
-///         - See reasons for any action with no need to ask the officer personally
+/// Criminal records
+/// Criminal Records inherit Station Records' core and add role-playing tools for Security:
+/// - Ability to track a person's status (Detained/Wanted/None)
+/// - See security officers' actions in Criminal Records in the radio
+/// - See reasons for any action with no need to ask the officer personally
 /// </summary>
 public sealed class CriminalRecordsSystem : SharedCriminalRecordsSystem
 {
-    [Dependency] private readonly GameTicker _ticker = default!;
+    [Dependency] private readonly CartridgeLoaderSystem _cartridge = default!;
     [Dependency] private readonly StationRecordsSystem _records = default!;
     [Dependency] private readonly StationSystem _station = default!;
-    [Dependency] private readonly CartridgeLoaderSystem _cartridge = default!;
+    [Dependency] private readonly GameTicker _ticker = default!;
 
     public override void Initialize()
     {
@@ -58,7 +57,10 @@ public sealed class CriminalRecordsSystem : SharedCriminalRecordsSystem
     /// Reason should only be passed if status is Wanted, nullability isn't checked.
     /// </summary>
     /// <returns>True if the status is changed, false if not</returns>
-    public bool TryChangeStatus(StationRecordKey key, SecurityStatus status, string? reason, string? initiatorName = null)
+    public bool TryChangeStatus(StationRecordKey key,
+        SecurityStatus status,
+        string? reason,
+        string? initiatorName = null)
     {
         // don't do anything if its the same status
         if (!_records.TryGetRecord<CriminalRecord>(key, out var record)
@@ -73,7 +75,11 @@ public sealed class CriminalRecordsSystem : SharedCriminalRecordsSystem
     /// <summary>
     /// Sets the status without checking previous status or reason nullability.
     /// </summary>
-    public void OverwriteStatus(StationRecordKey key, CriminalRecord record, SecurityStatus status, string? reason, string? initiatorName = null)
+    public void OverwriteStatus(StationRecordKey key,
+        CriminalRecord record,
+        SecurityStatus status,
+        string? reason,
+        string? initiatorName = null)
     {
         record.Status = status;
         record.Reason = reason;
@@ -135,7 +141,7 @@ public sealed class CriminalRecordsSystem : SharedCriminalRecordsSystem
         if (index >= record.History.Count)
             return false;
 
-        var history = record.History[(int)index];
+        var history = record.History[(int) index];
         record.History.RemoveAt((int) index);
 
         var args = new CriminalHistoryRemovedEvent(history);
@@ -165,10 +171,8 @@ public sealed class CriminalRecordsSystem : SharedCriminalRecordsSystem
         UpdateReaderUi(ent, loaderUid);
     }
 
-    private void OnCartridgeUiReady(Entity<WantedListCartridgeComponent> ent, ref CartridgeUiReadyEvent args)
-    {
+    private void OnCartridgeUiReady(Entity<WantedListCartridgeComponent> ent, ref CartridgeUiReadyEvent args) =>
         UpdateReaderUi(ent, args.Loader);
-    }
 
     private void UpdateReaderUi(Entity<WantedListCartridgeComponent> ent, EntityUid loaderUid)
     {

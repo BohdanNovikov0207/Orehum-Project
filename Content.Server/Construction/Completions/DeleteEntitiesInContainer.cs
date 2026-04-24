@@ -15,27 +15,26 @@ using System.Linq;
 using Content.Shared.Construction;
 using Robust.Server.Containers;
 
-namespace Content.Server.Construction.Completions
+namespace Content.Server.Construction.Completions;
+
+[DataDefinition]
+public sealed partial class DeleteEntitiesInContainer : IGraphAction
 {
-    [DataDefinition]
-    public sealed partial class DeleteEntitiesInContainer : IGraphAction
+    [DataField("container")] public string Container { get; private set; } = string.Empty;
+
+    public void PerformAction(EntityUid uid, EntityUid? userUid, IEntityManager entityManager)
     {
-        [DataField("container")] public string Container { get; private set; } = string.Empty;
+        if (string.IsNullOrEmpty(Container))
+            return;
+        var containerSys = entityManager.EntitySysManager.GetEntitySystem<ContainerSystem>();
 
-        public void PerformAction(EntityUid uid, EntityUid? userUid, IEntityManager entityManager)
+        if (!containerSys.TryGetContainer(uid, Container, out var container))
+            return;
+
+        foreach (var contained in container.ContainedEntities.ToArray())
         {
-            if (string.IsNullOrEmpty(Container))
-                return;
-            var containerSys = entityManager.EntitySysManager.GetEntitySystem<ContainerSystem>();
-
-            if (!containerSys.TryGetContainer(uid, Container, out var container))
-                return;
-
-            foreach (var contained in container.ContainedEntities.ToArray())
-            {
-                if(containerSys.Remove(contained, container))
-                    entityManager.QueueDeleteEntity(contained);
-            }
+            if (containerSys.Remove(contained, container))
+                entityManager.QueueDeleteEntity(contained);
         }
     }
 }

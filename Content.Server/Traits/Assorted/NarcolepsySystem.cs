@@ -19,20 +19,15 @@ namespace Content.Server.Traits.Assorted;
 /// </summary>
 public sealed class NarcolepsySystem : EntitySystem
 {
-    [Dependency] private readonly StatusEffectsSystem _statusEffects = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly StatusEffectsSystem _statusEffects = default!;
 
-    /// <inheritdoc/>
-    public override void Initialize()
-    {
-        SubscribeLocalEvent<NarcolepsyComponent, ComponentStartup>(SetupNarcolepsy);
-    }
+    /// <inheritdoc />
+    public override void Initialize() => SubscribeLocalEvent<NarcolepsyComponent, ComponentStartup>(SetupNarcolepsy);
 
-    private void SetupNarcolepsy(EntityUid uid, NarcolepsyComponent component, ComponentStartup args)
-    {
+    private void SetupNarcolepsy(EntityUid uid, NarcolepsyComponent component, ComponentStartup args) =>
         component.NextIncidentTime =
             _random.NextFloat(component.TimeBetweenIncidents.X, component.TimeBetweenIncidents.Y);
-    }
 
     public void AdjustNarcolepsyTimer(EntityUid uid, int TimerReset, NarcolepsyComponent? narcolepsy = null)
     {
@@ -63,7 +58,9 @@ public sealed class NarcolepsySystem : EntitySystem
             // Make sure the sleep time doesn't cut into the time to next incident.
             narcolepsy.NextIncidentTime += duration;
 
-            _statusEffects.TryAddStatusEffectDuration(uid, SleepingSystem.StatusEffectForcedSleeping, TimeSpan.FromSeconds(duration));
+            _statusEffects.TryAddStatusEffectDuration(uid,
+                SleepingSystem.StatusEffectForcedSleeping,
+                TimeSpan.FromSeconds(duration));
         }
     }
 }

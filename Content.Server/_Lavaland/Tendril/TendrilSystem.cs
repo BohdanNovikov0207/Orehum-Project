@@ -20,10 +20,10 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Server._Lavaland.Tendril.Components;
 using Content.Shared.Damage;
 using Content.Shared.Destructible;
-using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Mobs;
 using Content.Shared.Popups;
 using Robust.Shared.Map;
@@ -35,8 +35,8 @@ namespace Content.Server._Lavaland.Tendril;
 public sealed class TendrilSystem : EntitySystem
 {
     [Dependency] private readonly DamageableSystem _damage = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly IGameTiming _time = default!;
 
     public override void Initialize()
@@ -77,10 +77,8 @@ public sealed class TendrilSystem : EntitySystem
         }
     }
 
-    private void OnTendrilStartup(EntityUid uid, TendrilComponent comp, ComponentStartup args)
-    {
+    private void OnTendrilStartup(EntityUid uid, TendrilComponent comp, ComponentStartup args) =>
         comp.LastSpawn = _time.CurTime + TimeSpan.FromSeconds(5);
-    }
 
     private void OnTendrilMobDeath(EntityUid uid, TendrilComponent comp, ref TendrilMobDeadEvent args)
     {
@@ -91,7 +89,8 @@ public sealed class TendrilSystem : EntitySystem
         if (comp.DefeatedMobs >= comp.MobsToDefeat)
         {
             comp.DestroyedWithMobs = true;
-            _damage.TryChangeDamage(uid, new DamageSpecifier { DamageDict = new Dictionary<string, FixedPoint2> {{ "Blunt", 1000 }} });
+            _damage.TryChangeDamage(uid,
+                new DamageSpecifier { DamageDict = new Dictionary<string, FixedPoint2> { { "Blunt", 1000 } } });
         }
     }
 
@@ -107,9 +106,9 @@ public sealed class TendrilSystem : EntitySystem
 
         Timer.Spawn(TimeSpan.FromSeconds(delay),
             () =>
-        {
-            SpawnChasm(coords, comp.ChasmRadius);
-        });
+            {
+                SpawnChasm(coords, comp.ChasmRadius);
+            });
     }
 
     private void SpawnChasm(EntityCoordinates coords, int radius)
@@ -128,6 +127,7 @@ public sealed class TendrilSystem : EntitySystem
             Spawn("FloorChasmEntity", new EntityCoordinates(coords.EntityId, coords.X - i, coords.Y - i));
         }
     }
+
     private void OnMobState(EntityUid uid, TendrilMobComponent comp, MobStateChangedEvent args)
     {
         if (args.NewMobState != MobState.Dead)

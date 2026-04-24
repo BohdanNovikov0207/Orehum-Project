@@ -14,9 +14,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Server.Anomaly.Components;
-using Content.Shared.Chemistry.EntitySystems;
 using Content.Shared.Anomaly.Components;
 using Content.Shared.Chemistry.Components;
+using Content.Shared.Chemistry.EntitySystems;
 using Content.Shared.Sprite;
 using Robust.Server.GameObjects;
 using Robust.Shared.Audio.Systems;
@@ -25,10 +25,15 @@ using Robust.Shared.Random;
 
 namespace Content.Server.Anomaly.Effects;
 
-/// <see cref="ReagentProducerAnomalyComponent"/>
-
+/// <see cref="ReagentProducerAnomalyComponent" />
 public sealed class ReagentProducerAnomalySystem : EntitySystem
 {
+    public const string FallbackReagent = "Water";
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly PointLightSystem _light = default!;
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+
+    [Dependency] private readonly IRobustRandom _random = default!;
     //The idea is to divide substances into several categories.
     //The anomaly will choose one of the categories with a given chance based on severity.
     //Then a random substance will be selected from the selected category.
@@ -44,12 +49,6 @@ public sealed class ReagentProducerAnomalySystem : EntitySystem
     //Those reagents that the players are hunting for. Very low percentage of loss.
 
     [Dependency] private readonly SharedSolutionContainerSystem _solutionContainer = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly PointLightSystem _light = default!;
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-
-    public const string FallbackReagent = "Water";
 
     public override void Initialize()
     {
@@ -83,15 +82,21 @@ public sealed class ReagentProducerAnomalySystem : EntitySystem
             if (component.AccumulatedFrametime < component.UpdateInterval)
                 continue;
 
-            if (!_solutionContainer.ResolveSolution(uid, component.SolutionName, ref component.Solution, out var producerSolution))
+            if (!_solutionContainer.ResolveSolution(uid,
+                    component.SolutionName,
+                    ref component.Solution,
+                    out var producerSolution))
                 continue;
 
             Solution newSol = new();
-            var reagentProducingAmount = anomaly.Stability * component.MaxReagentProducing * component.AccumulatedFrametime;
-            if (anomaly.Severity >= 0.97) reagentProducingAmount *= component.SupercriticalReagentProducingModifier;
+            var reagentProducingAmount =
+                anomaly.Stability * component.MaxReagentProducing * component.AccumulatedFrametime;
+            if (anomaly.Severity >= 0.97)
+                reagentProducingAmount *= component.SupercriticalReagentProducingModifier;
 
             newSol.AddReagent(component.ProducingReagent, reagentProducingAmount);
-            _solutionContainer.TryAddSolution(component.Solution.Value, newSol); // TODO - the container is not fully filled.
+            _solutionContainer.TryAddSolution(component.Solution.Value,
+                newSol); // TODO - the container is not fully filled.
 
             component.AccumulatedFrametime = 0;
 
@@ -112,16 +117,15 @@ public sealed class ReagentProducerAnomalySystem : EntitySystem
                         state.Color = color;
                         randomSprite.Selected[ent.Key] = state;
                     }
+
                     Dirty(uid, randomSprite);
                 }
             }
         }
     }
 
-    private void OnMapInit(Entity<ReagentProducerAnomalyComponent> entity, ref MapInitEvent args)
-    {
+    private void OnMapInit(Entity<ReagentProducerAnomalyComponent> entity, ref MapInitEvent args) =>
         ChangeReagent(entity, 0.1f); //MapInit Reagent 100% change
-    }
 
     // returns a random reagent based on a system of random weights.
     // First, the category is selected: The category has a minimum and maximum weight,
@@ -135,9 +139,12 @@ public sealed class ReagentProducerAnomalySystem : EntitySystem
     private string GetRandomReagentType(Entity<ReagentProducerAnomalyComponent> entity, float severity)
     {
         //Category Weight Randomization
-        var currentWeightDangerous = MathHelper.Lerp(entity.Comp.WeightSpreadDangerous.X, entity.Comp.WeightSpreadDangerous.Y, severity);
+        var currentWeightDangerous = MathHelper.Lerp(entity.Comp.WeightSpreadDangerous.X,
+            entity.Comp.WeightSpreadDangerous.Y,
+            severity);
         var currentWeightFun = MathHelper.Lerp(entity.Comp.WeightSpreadFun.X, entity.Comp.WeightSpreadFun.Y, severity);
-        var currentWeightUseful = MathHelper.Lerp(entity.Comp.WeightSpreadUseful.X, entity.Comp.WeightSpreadUseful.Y, severity);
+        var currentWeightUseful =
+            MathHelper.Lerp(entity.Comp.WeightSpreadUseful.X, entity.Comp.WeightSpreadUseful.Y, severity);
 
         var sumWeight = currentWeightDangerous + currentWeightFun + currentWeightUseful;
         var rnd = _random.NextFloat(0f, sumWeight);
@@ -147,20 +154,23 @@ public sealed class ReagentProducerAnomalySystem : EntitySystem
             var reagent = _random.Pick(entity.Comp.DangerousChemicals);
             return reagent;
         }
-        else rnd -= currentWeightDangerous;
+
+        rnd -= currentWeightDangerous;
         //Fun
         if (rnd <= currentWeightFun && entity.Comp.FunChemicals.Count > 0)
         {
             var reagent = _random.Pick(entity.Comp.FunChemicals);
             return reagent;
         }
-        else rnd -= currentWeightFun;
+
+        rnd -= currentWeightFun;
         //Useful
         if (rnd <= currentWeightUseful && entity.Comp.UsefulChemicals.Count > 0)
         {
             var reagent = _random.Pick(entity.Comp.UsefulChemicals);
             return reagent;
         }
+
         //We should never end up here.
         //Maybe Log Error?
         return FallbackReagent;

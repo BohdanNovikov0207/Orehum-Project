@@ -80,7 +80,7 @@ public sealed class ContainerSpawnPointSystem : EntitySystem
     public override void Initialize()
     {
         base.Initialize();
-        SubscribeLocalEvent<PlayerSpawningEvent>(HandlePlayerSpawning, before: new []{ typeof(SpawnPointSystem) });
+        SubscribeLocalEvent<PlayerSpawningEvent>(HandlePlayerSpawning, new[] { typeof(SpawnPointSystem) });
     }
 
     public void HandlePlayerSpawning(PlayerSpawningEvent args)
@@ -91,12 +91,12 @@ public sealed class ContainerSpawnPointSystem : EntitySystem
         // If it's just a spawn pref check if it's for cryo (silly).
         if (args.HumanoidCharacterProfile?.SpawnPriority != SpawnPriorityPreference.Cryosleep &&
             (!_proto.TryIndex(args.Job, out var jobProto) || jobProto.JobEntity == null))
-        {
             return;
-        }
 
-        var query = EntityQueryEnumerator<ContainerSpawnPointComponent, ContainerManagerComponent, TransformComponent>();
-        var possibleContainers = new List<Entity<ContainerSpawnPointComponent, ContainerManagerComponent, TransformComponent>>();
+        var query =
+            EntityQueryEnumerator<ContainerSpawnPointComponent, ContainerManagerComponent, TransformComponent>();
+        var possibleContainers =
+            new List<Entity<ContainerSpawnPointComponent, ContainerManagerComponent, TransformComponent>>();
 
         while (query.MoveNext(out var uid, out var spawnPoint, out var container, out var xform))
         {
@@ -113,16 +113,12 @@ public sealed class ContainerSpawnPointSystem : EntitySystem
             }
 
             if (_gameTicker.RunLevel == GameRunLevel.InRound && spawnPoint.SpawnType == SpawnPointType.LateJoin)
-            {
                 possibleContainers.Add((uid, spawnPoint, container, xform));
-            }
 
             if (_gameTicker.RunLevel != GameRunLevel.InRound &&
                 spawnPoint.SpawnType == SpawnPointType.Job &&
                 (args.Job == null || spawnPoint.Job == args.Job))
-            {
                 possibleContainers.Add((uid, spawnPoint, container, xform));
-            }
         }
 
         if (possibleContainers.Count == 0)
@@ -142,7 +138,7 @@ public sealed class ContainerSpawnPointSystem : EntitySystem
             if (!_container.TryGetContainer(uid, spawnPoint.ContainerId, out var container, manager))
                 continue;
 
-            if (!_container.Insert(args.SpawnResult.Value, container, containerXform: xform))
+            if (!_container.Insert(args.SpawnResult.Value, container, xform))
                 continue;
 
             return;

@@ -15,10 +15,10 @@ namespace Content.Server.Xenoarchaeology.Artifact.XAE;
 /// </summary>
 public sealed class XAEFoamSystem : BaseXAESystem<XAEFoamComponent>
 {
+    [Dependency] private readonly MetaDataSystem _metaData = default!;
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly SmokeSystem _smoke = default!;
-    [Dependency] private readonly IPrototypeManager _prototypeManager= default!;
-    [Dependency] private readonly MetaDataSystem _metaData = default!;
 
     /// <inheritdoc />
     public override void Initialize()
@@ -54,7 +54,9 @@ public sealed class XAEFoamSystem : BaseXAESystem<XAEFoamComponent>
             return;
 
         var sol = new Solution();
-        var range = (int)MathF.Round(MathHelper.Lerp(component.MinFoamAmount, component.MaxFoamAmount, _random.NextFloat(0, 1f)));
+        var range = (int) MathF.Round(MathHelper.Lerp(component.MinFoamAmount,
+            component.MaxFoamAmount,
+            _random.NextFloat(0, 1f)));
         sol.AddReagent(component.SelectedReagent, component.ReagentAmount);
         var foamEnt = Spawn(ChemicalReactionSystem.FoamReaction, args.Coordinates);
         var spreadAmount = range * 4;

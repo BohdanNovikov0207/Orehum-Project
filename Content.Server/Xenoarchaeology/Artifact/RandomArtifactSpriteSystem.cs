@@ -18,10 +18,10 @@ namespace Content.Server.Xenoarchaeology.Artifact;
 
 public sealed class RandomArtifactSpriteSystem : EntitySystem
 {
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly IGameTiming _time = default!;
     [Dependency] private readonly AppearanceSystem _appearance = default!;
     [Dependency] private readonly SharedItemSystem _item = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly IGameTiming _time = default!;
 
     public override void Initialize()
     {
@@ -59,15 +59,11 @@ public sealed class RandomArtifactSpriteSystem : EntitySystem
         _item.SetHeldPrefix(uid, "ano" + randomSprite.ToString("D2")); //set item artifact inhands
     }
 
-    private void UnlockingStageStarted(Entity<RandomArtifactSpriteComponent> ent, ref ArtifactUnlockingStartedEvent args)
-    {
-        _appearance.SetData(ent, SharedArtifactsVisuals.IsUnlocking, true);
-    }
+    private void UnlockingStageStarted(Entity<RandomArtifactSpriteComponent> ent,
+        ref ArtifactUnlockingStartedEvent args) => _appearance.SetData(ent, SharedArtifactsVisuals.IsUnlocking, true);
 
-    private void UnlockingStageFinished(Entity<RandomArtifactSpriteComponent> ent, ref ArtifactUnlockingFinishedEvent args)
-    {
-        _appearance.SetData(ent, SharedArtifactsVisuals.IsUnlocking, false);
-    }
+    private void UnlockingStageFinished(Entity<RandomArtifactSpriteComponent> ent,
+        ref ArtifactUnlockingFinishedEvent args) => _appearance.SetData(ent, SharedArtifactsVisuals.IsUnlocking, false);
 
     private void ArtifactActivated(Entity<RandomArtifactSpriteComponent> ent, ref XenoArtifactActivatedEvent args)
     {

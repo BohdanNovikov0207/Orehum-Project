@@ -11,15 +11,9 @@ namespace Content.Server.Administration.Components;
 /// <summary>
 /// Component to track the timer for the SuperBonk smite.
 /// </summary>
-[RegisterComponent, AutoGenerateComponentPause, Access(typeof(SuperBonkSystem))]
+[RegisterComponent] [AutoGenerateComponentPause] [Access(typeof(SuperBonkSystem))]
 public sealed partial class SuperBonkComponent : Component
 {
-    /// <summary>
-    /// All of the tables the target will be bonked on.
-    /// </summary>
-    [DataField]
-    public List<EntityUid>.Enumerator Tables;
-
     /// <summary>
     /// How often should we bonk.
     /// </summary>
@@ -29,7 +23,7 @@ public sealed partial class SuperBonkComponent : Component
     /// <summary>
     /// Next time when we will bonk.
     /// </summary>
-    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer)), AutoPausedField]
+    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))] [AutoPausedField]
     public TimeSpan NextBonk = TimeSpan.Zero;
 
     /// <summary>
@@ -44,4 +38,10 @@ public sealed partial class SuperBonkComponent : Component
     /// </summary>
     [DataField]
     public bool StopWhenDead = true;
+
+    /// <summary>
+    /// All of the tables the target will be bonked on.
+    /// </summary>
+    [DataField]
+    public List<EntityUid>.Enumerator Tables;
 }

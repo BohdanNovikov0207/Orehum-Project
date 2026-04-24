@@ -42,28 +42,29 @@ namespace Content.Server.Administration.Managers;
 
 public sealed partial class BanManager : IBanManager, IPostInjectInit
 {
+    public const string SawmillId = "admin.bans";
+
+    public const string JobPrefix = "Job:";
+
+    // Cached ban exemption flags are used to handle
+    private readonly Dictionary<ICommonSession, ServerBanExemptFlags> _cachedBanExemptions = new();
+
+    private readonly Dictionary<ICommonSession, List<ServerRoleBanDef>> _cachedRoleBans = new();
+    [Dependency] private readonly IConfigurationManager _cfg = default!;
+    [Dependency] private readonly IChatManager _chat = default!;
     [Dependency] private readonly IServerDbManager _db = default!;
+    [Dependency] private readonly ServerDbEntryManager _entryManager = default!;
+    [Dependency] private readonly IGameTiming _gameTiming = default!;
+    [Dependency] private readonly ILocalizationManager _localizationManager = default!;
+    [Dependency] private readonly ILogManager _logManager = default!;
+    [Dependency] private readonly INetManager _netManager = default!;
     [Dependency] private readonly IPlayerManager _playerManager = default!;
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly IEntitySystemManager _systems = default!;
-    [Dependency] private readonly IConfigurationManager _cfg = default!;
-    [Dependency] private readonly ILocalizationManager _localizationManager = default!;
-    [Dependency] private readonly ServerDbEntryManager _entryManager = default!;
-    [Dependency] private readonly IChatManager _chat = default!;
-    [Dependency] private readonly INetManager _netManager = default!;
-    [Dependency] private readonly ILogManager _logManager = default!;
-    [Dependency] private readonly IGameTiming _gameTiming = default!;
     [Dependency] private readonly ITaskManager _taskManager = default!;
     [Dependency] private readonly UserDbDataManager _userDbData = default!;
 
     private ISawmill _sawmill = default!;
-
-    public const string SawmillId = "admin.bans";
-    public const string JobPrefix = "Job:";
-
-    private readonly Dictionary<ICommonSession, List<ServerRoleBanDef>> _cachedRoleBans = new();
-    // Cached ban exemption flags are used to handle
-    private readonly Dictionary<ICommonSession, ServerBanExemptFlags> _cachedBanExemptions = new();
 
     public void Initialize()
     {
@@ -78,47 +79,6 @@ public sealed partial class BanManager : IBanManager, IPostInjectInit
 
         _userDbData.AddOnLoadPlayer(CachePlayerData);
         _userDbData.AddOnPlayerDisconnect(ClearPlayerData);
-    }
-
-    private async Task CachePlayerData(ICommonSession player, CancellationToken cancel)
-    {
-        var flags = await _db.GetBanExemption(player.UserId, cancel);
-
-        var netChannel = player.Channel;
-        ImmutableArray<byte>? hwId = netChannel.UserData.HWId.Length == 0 ? null : netChannel.UserData.HWId;
-        var modernHwids = netChannel.UserData.ModernHWIds;
-        var roleBans = await _db.GetServerRoleBansAsync(netChannel.RemoteEndPoint.Address, player.UserId, hwId, modernHwids, false);
-
-        var userRoleBans = new List<ServerRoleBanDef>();
-        foreach (var ban in roleBans)
-        {
-            userRoleBans.Add(ban);
-        }
-
-        cancel.ThrowIfCancellationRequested();
-        _cachedBanExemptions[player] = flags;
-        _cachedRoleBans[player] = userRoleBans;
-
-        SendRoleBans(player);
-    }
-
-    private void ClearPlayerData(ICommonSession player)
-    {
-        _cachedBanExemptions.Remove(player);
-    }
-
-    private async Task<bool> AddRoleBan(ServerRoleBanDef banDef)
-    {
-        banDef = await _db.AddServerRoleBanAsync(banDef);
-
-        if (banDef.UserId != null
-            && _playerManager.TryGetSessionById(banDef.UserId, out var player)
-            && _cachedRoleBans.TryGetValue(player, out var cachedBans))
-        {
-            cachedBans.Add(banDef);
-        }
-
-        return true;
     }
 
     public HashSet<string>? GetRoleBans(NetUserId playerUserId)
@@ -153,18 +113,81 @@ public sealed partial class BanManager : IBanManager, IPostInjectInit
         }
     }
 
+    public void SendRoleBans(ICommonSession pSession)
+    {
+        var roleBans = _cachedRoleBans.GetValueOrDefault(pSession) ?? new List<ServerRoleBanDef>();
+        var bans = new MsgRoleBans
+        {
+            Bans = roleBans.Select(o => o.Role).ToList(),
+        };
+
+        _sawmill.Debug($"Sent rolebans to {pSession.Name}");
+        _netManager.ServerSendMessage(bans, pSession.Channel);
+    }
+
+    public void PostInject() => _sawmill = _logManager.GetSawmill(SawmillId);
+
+    private async Task CachePlayerData(ICommonSession player, CancellationToken cancel)
+    {
+        var flags = await _db.GetBanExemption(player.UserId, cancel);
+
+        var netChannel = player.Channel;
+        ImmutableArray<byte>? hwId = netChannel.UserData.HWId.Length == 0 ? null : netChannel.UserData.HWId;
+        var modernHwids = netChannel.UserData.ModernHWIds;
+        var roleBans = await _db.GetServerRoleBansAsync(netChannel.RemoteEndPoint.Address,
+            player.UserId,
+            hwId,
+            modernHwids,
+            false);
+
+        var userRoleBans = new List<ServerRoleBanDef>();
+        foreach (var ban in roleBans)
+        {
+            userRoleBans.Add(ban);
+        }
+
+        cancel.ThrowIfCancellationRequested();
+        _cachedBanExemptions[player] = flags;
+        _cachedRoleBans[player] = userRoleBans;
+
+        SendRoleBans(player);
+    }
+
+    private void ClearPlayerData(ICommonSession player) => _cachedBanExemptions.Remove(player);
+
+    private async Task<bool> AddRoleBan(ServerRoleBanDef banDef)
+    {
+        banDef = await _db.AddServerRoleBanAsync(banDef);
+
+        if (banDef.UserId != null
+            && _playerManager.TryGetSessionById(banDef.UserId, out var player)
+            && _cachedRoleBans.TryGetValue(player, out var cachedBans))
+            cachedBans.Add(banDef);
+
+        return true;
+    }
+
     #region Server Bans
-    public async void CreateServerBan(NetUserId? target, string? targetUsername, NetUserId? banningAdmin, (IPAddress, int)? addressRange, ImmutableTypedHwid? hwid, uint? minutes, NoteSeverity severity, string reason)
+
+    public async void CreateServerBan(NetUserId? target,
+        string? targetUsername,
+        NetUserId? banningAdmin,
+        (IPAddress, int)? addressRange,
+        ImmutableTypedHwid? hwid,
+        uint? minutes,
+        NoteSeverity severity,
+        string reason)
     {
         DateTimeOffset? expires = null;
         if (minutes > 0)
-        {
             expires = DateTimeOffset.Now + TimeSpan.FromMinutes(minutes.Value);
-        }
 
         _systems.TryGetEntitySystem<GameTicker>(out var ticker);
         int? roundId = ticker == null || ticker.RoundId == 0 ? null : ticker.RoundId;
-        var playtime = target == null ? TimeSpan.Zero : (await _db.GetPlayTimes(target.Value)).Find(p => p.Tracker == PlayTimeTrackingShared.TrackerOverall)?.TimeSpent ?? TimeSpan.Zero;
+        var playtime = target == null
+            ? TimeSpan.Zero
+            : (await _db.GetPlayTimes(target.Value)).Find(p => p.Tracker == PlayTimeTrackingShared.TrackerOverall)
+            ?.TimeSpent ?? TimeSpan.Zero;
 
         var banDef = new ServerBanDef(
             null,
@@ -182,7 +205,8 @@ public sealed partial class BanManager : IBanManager, IPostInjectInit
 
         await _db.AddServerBanAsync(banDef);
         if (_cfg.GetCVar(CCVars.ServerBanResetLastReadRules) && target != null)
-            await _db.SetLastReadRules(target.Value, null); // Reset their last read rules. They probably need a refresher!
+            await _db.SetLastReadRules(target.Value,
+                null); // Reset their last read rules. They probably need a refresher!
         var adminName = banningAdmin == null
             ? Loc.GetString("system-user")
             : (await _db.GetPlayerRecordByUserId(banningAdmin.Value))?.LastSeenUserName ?? Loc.GetString("system-user");
@@ -249,25 +273,34 @@ public sealed partial class BanManager : IBanManager, IPostInjectInit
     #endregion
 
     #region Job Bans
+
     // If you are trying to remove timeOfBan, please don't. It's there because the note system groups role bans by time, reason and banning admin.
     // Removing it will clutter the note list. Please also make sure that department bans are applied to roles with the same DateTimeOffset.
-    public async void CreateRoleBan(NetUserId? target, string? targetUsername, NetUserId? banningAdmin, (IPAddress, int)? addressRange, ImmutableTypedHwid? hwid, string role, uint? minutes, NoteSeverity severity, string reason, DateTimeOffset timeOfBan)
+    public async void CreateRoleBan(NetUserId? target,
+        string? targetUsername,
+        NetUserId? banningAdmin,
+        (IPAddress, int)? addressRange,
+        ImmutableTypedHwid? hwid,
+        string role,
+        uint? minutes,
+        NoteSeverity severity,
+        string reason,
+        DateTimeOffset timeOfBan)
     {
         if (!_prototypeManager.TryIndex(role, out JobPrototype? _))
-        {
             throw new ArgumentException($"Invalid role '{role}'", nameof(role));
-        }
 
         role = string.Concat(JobPrefix, role);
         DateTimeOffset? expires = null;
         if (minutes > 0)
-        {
             expires = DateTimeOffset.Now + TimeSpan.FromMinutes(minutes.Value);
-        }
 
         _systems.TryGetEntitySystem(out GameTicker? ticker);
         int? roundId = ticker == null || ticker.RoundId == 0 ? null : ticker.RoundId;
-        var playtime = target == null ? TimeSpan.Zero : (await _db.GetPlayTimes(target.Value)).Find(p => p.Tracker == PlayTimeTrackingShared.TrackerOverall)?.TimeSpent ?? TimeSpan.Zero;
+        var playtime = target == null
+            ? TimeSpan.Zero
+            : (await _db.GetPlayTimes(target.Value)).Find(p => p.Tracker == PlayTimeTrackingShared.TrackerOverall)
+            ?.TimeSpent ?? TimeSpan.Zero;
 
         var banDef = new ServerRoleBanDef(
             null,
@@ -286,17 +319,23 @@ public sealed partial class BanManager : IBanManager, IPostInjectInit
 
         if (!await AddRoleBan(banDef))
         {
-            _chat.SendAdminAlert(Loc.GetString("cmd-roleban-existing", ("target", targetUsername ?? "null"), ("role", role)));
+            _chat.SendAdminAlert(Loc.GetString("cmd-roleban-existing",
+                ("target", targetUsername ?? "null"),
+                ("role", role)));
             return;
         }
 
-        var length = expires == null ? Loc.GetString("cmd-roleban-inf") : Loc.GetString("cmd-roleban-until", ("expires", expires));
-        _chat.SendAdminAlert(Loc.GetString("cmd-roleban-success", ("target", targetUsername ?? "null"), ("role", role), ("reason", reason), ("length", length)));
+        var length = expires == null
+            ? Loc.GetString("cmd-roleban-inf")
+            : Loc.GetString("cmd-roleban-until", ("expires", expires));
+        _chat.SendAdminAlert(Loc.GetString("cmd-roleban-success",
+            ("target", targetUsername ?? "null"),
+            ("role", role),
+            ("reason", reason),
+            ("length", length)));
 
         if (target != null && _playerManager.TryGetSessionById(target.Value, out var session))
-        {
             SendRoleBans(session);
-        }
     }
 
     public async Task<string> PardonRoleBan(int banId, NetUserId? unbanningAdmin, DateTimeOffset unbanTime)
@@ -304,18 +343,14 @@ public sealed partial class BanManager : IBanManager, IPostInjectInit
         var ban = await _db.GetServerRoleBanAsync(banId);
 
         if (ban == null)
-        {
             return $"No ban found with id {banId}";
-        }
 
         if (ban.Unban != null)
         {
             var response = new StringBuilder("This ban has already been pardoned");
 
             if (ban.Unban.UnbanningAdmin != null)
-            {
                 response.Append($" by {ban.Unban.UnbanningAdmin.Value}");
-            }
 
             response.Append($" in {ban.Unban.UnbanTime}.");
             return response.ToString();
@@ -347,22 +382,6 @@ public sealed partial class BanManager : IBanManager, IPostInjectInit
             .Select(ban => new ProtoId<JobPrototype>(ban.Role[JobPrefix.Length..]))
             .ToHashSet();
     }
+
     #endregion
-
-    public void SendRoleBans(ICommonSession pSession)
-    {
-        var roleBans = _cachedRoleBans.GetValueOrDefault(pSession) ?? new List<ServerRoleBanDef>();
-        var bans = new MsgRoleBans()
-        {
-            Bans = roleBans.Select(o => o.Role).ToList()
-        };
-
-        _sawmill.Debug($"Sent rolebans to {pSession.Name}");
-        _netManager.ServerSendMessage(bans, pSession.Channel);
-    }
-
-    public void PostInject()
-    {
-        _sawmill = _logManager.GetSawmill(SawmillId);
-    }
 }

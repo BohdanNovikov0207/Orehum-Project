@@ -11,4 +11,6 @@ namespace Content.Server.Chemistry.Components;
 /// contained solution into a target when they become embedded in it.
 /// </summary>
 [RegisterComponent]
-public sealed partial class SolutionInjectOnEmbedComponent : BaseSolutionInjectOnEventComponent { }
+public sealed partial class SolutionInjectOnEmbedComponent : BaseSolutionInjectOnEventComponent
+{
+}

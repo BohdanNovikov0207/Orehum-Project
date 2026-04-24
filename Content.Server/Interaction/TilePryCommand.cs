@@ -23,17 +23,16 @@ using Content.Shared.Maps;
 using Robust.Shared.Console;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
-using Robust.Shared.Prototypes;
 
 namespace Content.Server.Interaction;
 
 [AdminCommand(AdminFlags.Debug)]
 public sealed class TilePryCommand : LocalizedEntityCommands
 {
-    [Dependency] private readonly ITileDefinitionManager _tileDefinitionManager = default!;
     [Dependency] private readonly SharedMapSystem _mapSystem = default!;
 
     private readonly string _platingId = "Plating";
+    [Dependency] private readonly ITileDefinitionManager _tileDefinitionManager = default!;
 
     public override string Command => "tilepry";
 
@@ -41,9 +40,7 @@ public sealed class TilePryCommand : LocalizedEntityCommands
     {
         var player = shell.Player;
         if (player?.AttachedEntity is not { } attached)
-        {
             return;
-        }
 
         if (args.Length != 1)
         {
@@ -53,13 +50,13 @@ public sealed class TilePryCommand : LocalizedEntityCommands
 
         if (!int.TryParse(args[0], out var radius))
         {
-            shell.WriteError(Loc.GetString($"cmd-tilepry-arg-must-be-number", ("arg", args[0])));
+            shell.WriteError(Loc.GetString("cmd-tilepry-arg-must-be-number", ("arg", args[0])));
             return;
         }
 
         if (radius < 0)
         {
-            shell.WriteError(Loc.GetString($"cmd-tilepry-radius-must-be-positive"));
+            shell.WriteError(Loc.GetString("cmd-tilepry-radius-must-be-positive"));
             return;
         }
 
@@ -78,7 +75,7 @@ public sealed class TilePryCommand : LocalizedEntityCommands
             {
                 var tile = _mapSystem.GetTileRef(playerGrid.Value, mapGrid, playerPosition.Offset(new Vector2(i, j)));
                 var coordinates = _mapSystem.GridTileToLocal(playerGrid.Value, mapGrid, tile.GridIndices);
-                var tileDef = (ContentTileDefinition)_tileDefinitionManager[tile.Tile.TypeId];
+                var tileDef = (ContentTileDefinition) _tileDefinitionManager[tile.Tile.TypeId];
 
                 if (!tileDef.CanCrowbar)
                     continue;

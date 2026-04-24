@@ -52,14 +52,14 @@ using Robust.Shared.Timing;
 
 namespace Content.Server.Construction;
 
-/// <inheritdoc/>
+/// <inheritdoc />
 public sealed class FlatpackSystem : SharedFlatpackSystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly AmbientSoundSystem _ambientSound = default!;
     [Dependency] private readonly ItemSlotsSystem _itemSlots = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();

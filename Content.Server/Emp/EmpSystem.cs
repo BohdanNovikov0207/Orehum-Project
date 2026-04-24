@@ -8,9 +8,8 @@ namespace Content.Server.Emp;
 
 public sealed class EmpSystem : SharedEmpSystem
 {
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
-
     public const string EmpPulseEffectPrototype = "EffectEmpPulse";
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
 
     public override void Initialize()
     {
@@ -28,11 +27,13 @@ public sealed class EmpSystem : SharedEmpSystem
         {
             TryEmpEffects(uid, energyConsumption, duration);
         }
+
         Spawn(EmpPulseEffectPrototype, coordinates);
     }
 
     /// <summary>
-    ///   Triggers an EMP pulse at the given location, by first raising an <see cref="EmpAttemptEvent"/>, then a raising <see cref="EmpPulseEvent"/> on all entities in range.
+    /// Triggers an EMP pulse at the given location, by first raising an <see cref="EmpAttemptEvent" />, then a raising
+    /// <see cref="EmpPulseEvent" /> on all entities in range.
     /// </summary>
     /// <param name="coordinates">The location to trigger the EMP pulse at.</param>
     /// <param name="range">The range of the EMP pulse.</param>
@@ -44,11 +45,13 @@ public sealed class EmpSystem : SharedEmpSystem
         {
             TryEmpEffects(uid, energyConsumption, duration);
         }
+
         Spawn(EmpPulseEffectPrototype, coordinates);
     }
 
     /// <summary>
-    ///    Attempts to apply the effects of an EMP pulse onto an entity by first raising an <see cref="EmpAttemptEvent"/>, followed by raising a <see cref="EmpPulseEvent"/> on it.
+    /// Attempts to apply the effects of an EMP pulse onto an entity by first raising an <see cref="EmpAttemptEvent" />,
+    /// followed by raising a <see cref="EmpPulseEvent" /> on it.
     /// </summary>
     /// <param name="uid">The entity to apply the EMP effects on.</param>
     /// <param name="energyConsumption">The amount of energy consumed by the EMP.</param>
@@ -64,7 +67,7 @@ public sealed class EmpSystem : SharedEmpSystem
     }
 
     /// <summary>
-    ///    Applies the effects of an EMP pulse onto an entity by raising a <see cref="EmpPulseEvent"/> on it.
+    /// Applies the effects of an EMP pulse onto an entity by raising a <see cref="EmpPulseEvent" /> on it.
     /// </summary>
     /// <param name="uid">The entity to apply the EMP effects on.</param>
     /// <param name="energyConsumption">The amount of energy consumed by the EMP.</param>
@@ -100,34 +103,29 @@ public sealed class EmpSystem : SharedEmpSystem
         }
     }
 
-    private void OnRadioSendAttempt(EntityUid uid, EmpDisabledComponent component, ref RadioSendAttemptEvent args)
-    {
+    private void OnRadioSendAttempt(EntityUid uid, EmpDisabledComponent component, ref RadioSendAttemptEvent args) =>
         args.Cancelled = true;
-    }
 
-    private void OnRadioReceiveAttempt(EntityUid uid, EmpDisabledComponent component, ref RadioReceiveAttemptEvent args)
-    {
+    private void
+        OnRadioReceiveAttempt(EntityUid uid, EmpDisabledComponent component, ref RadioReceiveAttemptEvent args) =>
         args.Cancelled = true;
-    }
 
-    private void OnApcToggleMainBreaker(EntityUid uid, EmpDisabledComponent component, ref ApcToggleMainBreakerAttemptEvent args)
-    {
-        args.Cancelled = true;
-    }
+    private void OnApcToggleMainBreaker(EntityUid uid,
+        EmpDisabledComponent component,
+        ref ApcToggleMainBreakerAttemptEvent args) => args.Cancelled = true;
 
-    private void OnCameraSetActive(EntityUid uid, EmpDisabledComponent component, ref SurveillanceCameraSetActiveAttemptEvent args)
-    {
-        args.Cancelled = true;
-    }
+    private void OnCameraSetActive(EntityUid uid,
+        EmpDisabledComponent component,
+        ref SurveillanceCameraSetActiveAttemptEvent args) => args.Cancelled = true;
 }
 
 /// <summary>
-/// Raised on an entity before <see cref="EmpPulseEvent"/>. Cancel this to prevent the emp event being raised.
+/// Raised on an entity before <see cref="EmpPulseEvent" />. Cancel this to prevent the emp event being raised.
 /// </summary>
-public sealed partial class EmpAttemptEvent : CancellableEntityEventArgs;
+public sealed class EmpAttemptEvent : CancellableEntityEventArgs;
 
 [ByRefEvent]
 public record struct EmpPulseEvent(float EnergyConsumption, bool Affected, bool Disabled, TimeSpan Duration);
 
 [ByRefEvent]
-public record struct EmpDisabledRemoved();
+public record struct EmpDisabledRemoved;

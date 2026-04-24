@@ -16,15 +16,9 @@ namespace Content.Server.NPC.Queries;
 /// These results are then run through the considerations.
 /// </summary>
 [Prototype]
-public sealed partial class UtilityQueryPrototype : IPrototype
+public sealed class UtilityQueryPrototype : IPrototype
 {
-    [IdDataField]
-    public string ID { get; private set; } = default!;
-
-    [ViewVariables(VVAccess.ReadWrite), DataField("query")]
-    public List<UtilityQuery> Query = new();
-
-    [ViewVariables(VVAccess.ReadWrite), DataField("considerations")]
+    [ViewVariables(VVAccess.ReadWrite)] [DataField("considerations")]
     public List<UtilityConsideration> Considerations = new();
 
     /// <summary>
@@ -32,4 +26,10 @@ public sealed partial class UtilityQueryPrototype : IPrototype
     /// </summary>
     [DataField("limit")]
     public int Limit = 128;
+
+    [ViewVariables(VVAccess.ReadWrite)] [DataField("query")]
+    public List<UtilityQuery> Query = new();
+
+    [IdDataField]
+    public string ID { get; } = default!;
 }

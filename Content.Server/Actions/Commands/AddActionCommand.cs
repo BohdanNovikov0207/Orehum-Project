@@ -25,7 +25,8 @@ public sealed class AddActionCommand : LocalizedEntityCommands
             return;
         }
 
-        if (!NetEntity.TryParse(args[0], out var targetUidNet) || !EntityManager.TryGetEntity(targetUidNet, out var targetEntity))
+        if (!NetEntity.TryParse(args[0], out var targetUidNet) ||
+            !EntityManager.TryGetEntity(targetUidNet, out var targetEntity))
         {
             shell.WriteLine(Loc.GetString("shell-entity-uid-must-be-number"));
             return;
@@ -45,9 +46,7 @@ public sealed class AddActionCommand : LocalizedEntityCommands
         }
 
         if (_actions.AddAction(targetEntity.Value, args[1]) == null)
-        {
             shell.WriteError(Loc.GetString("cmd-addaction-adding-failed"));
-        }
     }
 
     public override CompletionResult GetCompletion(IConsoleShell shell, string[] args)

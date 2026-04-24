@@ -4,49 +4,40 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Linq;
 using Content.Shared.Arcade;
 using Robust.Server.GameObjects;
 using Robust.Shared.Random;
-using System.Linq;
 
 namespace Content.Server.Arcade.BlockGame;
 
 public sealed partial class BlockGame
 {
-    [Dependency] private readonly IEntityManager _entityManager = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
     private readonly ArcadeSystem _arcadeSystem;
-    private readonly UserInterfaceSystem _uiSystem;
+    [Dependency] private readonly IEntityManager _entityManager = default!;
 
     /// <summary>
     /// What entity is currently hosting this game of NT-BG.
     /// </summary>
-    private readonly EntityUid _owner = default!;
+    private readonly EntityUid _owner;
+
+    [Dependency] private readonly IRobustRandom _random = default!;
+    private readonly UserInterfaceSystem _uiSystem;
 
     /// <summary>
-    /// Whether the game has been started.
+    /// The amount of time that has passed since the active piece last moved vertically,
     /// </summary>
-    public bool Started { get; private set; } = false;
-
-    /// <summary>
-    /// Whether the game is currently running (not paused).
-    /// </summary>
-    private bool _running = false;
-
-    /// <summary>
-    /// Whether the game should not currently be running.
-    /// </summary>
-    private bool Paused => !(Started && _running);
+    private float _accumulatedFieldFrameTime;
 
     /// <summary>
     /// Whether the game has finished.
     /// </summary>
-    private bool _gameOver = false;
+    private bool _gameOver;
 
     /// <summary>
-    /// Whether the game should have finished given the current game state.
+    /// Whether the game is currently running (not paused).
     /// </summary>
-    private bool IsGameOver => _field.Any(block => block.Position.Y == 0);
+    private bool _running;
 
 
     public BlockGame(EntityUid owner)
@@ -60,6 +51,21 @@ public sealed partial class BlockGame
         _internalNextPiece = GetRandomBlockGamePiece(_random);
         InitializeNewBlock();
     }
+
+    /// <summary>
+    /// Whether the game has been started.
+    /// </summary>
+    public bool Started { get; private set; }
+
+    /// <summary>
+    /// Whether the game should not currently be running.
+    /// </summary>
+    private bool Paused => !(Started && _running);
+
+    /// <summary>
+    /// Whether the game should have finished given the current game state.
+    /// </summary>
+    private bool IsGameOver => _field.Any(block => block.Position.Y == 0);
 
     /// <summary>
     /// Starts the game. Including relaying this info to everyone watching.
@@ -84,12 +90,15 @@ public sealed partial class BlockGame
         _gameOver = true;
 
         if (_entityManager.TryGetComponent<BlockGameArcadeComponent>(_owner, out var cabinet)
-        && _entityManager.TryGetComponent<MetaDataComponent>(cabinet.Player, out var meta))
+            && _entityManager.TryGetComponent<MetaDataComponent>(cabinet.Player, out var meta))
         {
             _highScorePlacement = _arcadeSystem.RegisterHighScore(meta.EntityName, Points);
             SendHighscoreUpdate();
         }
-        SendMessage(new BlockGameMessages.BlockGameGameOverScreenMessage(Points, _highScorePlacement?.LocalPlacement, _highScorePlacement?.GlobalPlacement));
+
+        SendMessage(new BlockGameMessages.BlockGameGameOverScreenMessage(Points,
+            _highScorePlacement?.LocalPlacement,
+            _highScorePlacement?.GlobalPlacement));
     }
 
     /// <summary>
@@ -105,11 +114,6 @@ public sealed partial class BlockGame
 
         FieldTick(frameTime);
     }
-
-    /// <summary>
-    /// The amount of time that has passed since the active piece last moved vertically,
-    /// </summary>
-    private float _accumulatedFieldFrameTime;
 
     /// <summary>
     /// Handles timing the movements of the active game piece.
@@ -141,9 +145,7 @@ public sealed partial class BlockGame
     {
         if (CurrentPiece.Positions(_currentPiecePosition.AddToY(1), _currentRotation)
             .All(DropCheck))
-        {
             _currentPiecePosition = _currentPiecePosition.AddToY(1);
-        }
         else
         {
             var blocks = CurrentPiece.Blocks(_currentPiecePosition, _currentRotation);
@@ -189,7 +191,7 @@ public sealed partial class BlockGame
                     2 => 100,
                     3 => 300,
                     4 => 1200,
-                    _ => 0
+                    _ => 0,
                 };
                 pointsToAdd += mod * (Level + 1);
             }
@@ -249,7 +251,8 @@ public sealed partial class BlockGame
         NextPiece = GetRandomBlockGamePiece(_random);
         _holdBlock = false;
 
-        SendMessage(new BlockGameMessages.BlockGameVisualUpdateMessage(NextPiece.BlocksForPreview(), BlockGameMessages.BlockGameVisualType.NextBlock));
+        SendMessage(new BlockGameMessages.BlockGameVisualUpdateMessage(NextPiece.BlocksForPreview(),
+            BlockGameMessages.BlockGameVisualType.NextBlock));
     }
 
     /// <summary>
@@ -297,11 +300,12 @@ public sealed partial class BlockGame
     {
         var spacesDropped = 0;
         while (CurrentPiece.Positions(_currentPiecePosition.AddToY(1), _currentRotation)
-            .All(DropCheck))
+               .All(DropCheck))
         {
             _currentPiecePosition = _currentPiecePosition.AddToY(1);
             spacesDropped++;
         }
+
         AddPoints(spacesDropped * 2);
 
         InternalFieldTick();

@@ -59,10 +59,8 @@ public sealed class ShowRulesCommand : LocalizedCommands
         _net.ServerSendMessage(message, player.Channel);
     }
 
-    public override CompletionResult GetCompletion(IConsoleShell shell, string[] args)
-    {
-        return args.Length == 1
+    public override CompletionResult GetCompletion(IConsoleShell shell, string[] args) =>
+        args.Length == 1
             ? CompletionResult.FromOptions(CompletionHelper.SessionNames(players: _player))
             : CompletionResult.Empty;
-    }
 }

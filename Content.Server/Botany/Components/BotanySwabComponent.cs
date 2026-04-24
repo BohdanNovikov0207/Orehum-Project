@@ -7,20 +7,19 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-namespace Content.Server.Botany
+namespace Content.Server.Botany;
+
+/// <summary>
+/// Anything that can be used to cross-pollinate plants.
+/// </summary>
+[RegisterComponent]
+public sealed partial class BotanySwabComponent : Component
 {
     /// <summary>
-    /// Anything that can be used to cross-pollinate plants.
+    /// SeedData from the first plant that got swabbed.
     /// </summary>
-    [RegisterComponent]
-    public sealed partial class BotanySwabComponent : Component
-    {
-        [DataField("swabDelay")]
-        public float SwabDelay = 2f;
+    public SeedData? SeedData;
 
-        /// <summary>
-        /// SeedData from the first plant that got swabbed.
-        /// </summary>
-        public SeedData? SeedData;
-    }
+    [DataField("swabDelay")]
+    public float SwabDelay = 2f;
 }

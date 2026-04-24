@@ -91,25 +91,25 @@ namespace Content.Server.Administration;
 
 public sealed class PlayerPanelEui : BaseEui
 {
+    [Dependency] private readonly IAdminLogManager _adminLog = default!;
     [Dependency] private readonly IAdminManager _admins = default!;
     [Dependency] private readonly IServerDbManager _db = default!;
-    [Dependency] private readonly IAdminNotesManager _notesMan = default!;
     [Dependency] private readonly IEntityManager _entity = default!;
-    [Dependency] private readonly IPlayerManager _player = default!;
     [Dependency] private readonly EuiManager _eui = default!;
-    [Dependency] private readonly IAdminLogManager _adminLog = default!;
+    private readonly FollowerSystem _follower;
+    [Dependency] private readonly IAdminNotesManager _notesMan = default!;
+    [Dependency] private readonly IPlayerManager _player = default!;
 
     private readonly LocatedPlayerData _targetPlayer;
-    private int? _notes;
     private int? _bans;
+    private bool _canAhelp;
+    private bool _canFreeze;
+    private bool _frozen;
+    private int? _notes;
+    private TimeSpan _playtime;
     private int? _roleBans;
     private int _sharedConnections;
     private bool? _whitelisted;
-    private TimeSpan _playtime;
-    private bool _frozen;
-    private bool _canFreeze;
-    private bool _canAhelp;
-    private FollowerSystem _follower;
 
     public PlayerPanelEui(LocatedPlayerData player)
     {
@@ -130,9 +130,8 @@ public sealed class PlayerPanelEui : BaseEui
         _admins.OnPermsChanged -= OnPermsChanged;
     }
 
-    public override EuiStateBase GetNewState()
-    {
-        return new PlayerPanelEuiState(_targetPlayer.UserId,
+    public override EuiStateBase GetNewState() =>
+        new PlayerPanelEuiState(_targetPlayer.UserId,
             _targetPlayer.Username,
             _playtime,
             _notes,
@@ -143,7 +142,6 @@ public sealed class PlayerPanelEui : BaseEui
             _canFreeze,
             _frozen,
             _canAhelp);
-    }
 
     private void OnPermsChanged(AdminPermsChangedEventArgs args)
     {
@@ -170,7 +168,8 @@ public sealed class PlayerPanelEui : BaseEui
 
                 if (_entity.HasComponent<AdminFrozenComponent>(session.AttachedEntity))
                 {
-                    _adminLog.Add(LogType.Action,$"{Player:actor} unfroze {_entity.ToPrettyString(session.AttachedEntity):subject}");
+                    _adminLog.Add(LogType.Action,
+                        $"{Player:actor} unfroze {_entity.ToPrettyString(session.AttachedEntity):subject}");
                     _entity.RemoveComponent<AdminFrozenComponent>(session.AttachedEntity.Value);
                     SetPlayerState();
                     return;
@@ -178,14 +177,17 @@ public sealed class PlayerPanelEui : BaseEui
 
                 if (freezeMsg.Mute)
                 {
-                    _adminLog.Add(LogType.Action,$"{Player:actor} froze and muted {_entity.ToPrettyString(session.AttachedEntity):subject}");
+                    _adminLog.Add(LogType.Action,
+                        $"{Player:actor} froze and muted {_entity.ToPrettyString(session.AttachedEntity):subject}");
                     frozenSystem.FreezeAndMute(session.AttachedEntity.Value);
                 }
                 else
                 {
-                    _adminLog.Add(LogType.Action,$"{Player:actor} froze {_entity.ToPrettyString(session.AttachedEntity):subject}");
+                    _adminLog.Add(LogType.Action,
+                        $"{Player:actor} froze {_entity.ToPrettyString(session.AttachedEntity):subject}");
                     _entity.EnsureComponent<AdminFrozenComponent>(session.AttachedEntity.Value);
                 }
+
                 SetPlayerState();
                 break;
 
@@ -196,7 +198,7 @@ public sealed class PlayerPanelEui : BaseEui
                 _adminLog.Add(LogType.Action, $"{Player:actor} opened logs on {_targetPlayer.Username:subject}");
                 var ui = new AdminLogsEui();
                 _eui.OpenEui(ui, Player);
-                ui.SetLogFilter(search: _targetPlayer.Username);
+                ui.SetLogFilter(_targetPlayer.Username);
                 break;
             case PlayerPanelDeleteMessage:
             case PlayerPanelRejuvenationMessage:
@@ -207,7 +209,8 @@ public sealed class PlayerPanelEui : BaseEui
 
                 if (msg is PlayerPanelRejuvenationMessage)
                 {
-                    _adminLog.Add(LogType.Action,$"{Player:actor} rejuvenated {_entity.ToPrettyString(session.AttachedEntity):subject}");
+                    _adminLog.Add(LogType.Action,
+                        $"{Player:actor} rejuvenated {_entity.ToPrettyString(session.AttachedEntity):subject}");
                     if (!_entity.TrySystem<RejuvenateSystem>(out var rejuvenate))
                         return;
 
@@ -215,9 +218,11 @@ public sealed class PlayerPanelEui : BaseEui
                 }
                 else
                 {
-                    _adminLog.Add(LogType.Action,$"{Player:actor} deleted {_entity.ToPrettyString(session.AttachedEntity):subject}");
+                    _adminLog.Add(LogType.Action,
+                        $"{Player:actor} deleted {_entity.ToPrettyString(session.AttachedEntity):subject}");
                     _entity.DeleteEntity(session.AttachedEntity);
                 }
+
                 break;
             case PlayerPanelFollowMessage:
                 if (!_admins.HasAdminFlag(Player, AdminFlags.Admin) ||
@@ -246,18 +251,15 @@ public sealed class PlayerPanelEui : BaseEui
             .FirstOrDefault();
 
         if (_notesMan.CanView(Player))
-        {
             _notes = (await _notesMan.GetAllAdminRemarks(_targetPlayer.UserId)).Count;
-        }
         else
-        {
             _notes = null;
-        }
 
-        _sharedConnections = _player.Sessions.Count(s => s.Channel.RemoteEndPoint.Address.Equals(_targetPlayer.LastAddress) && s.UserId != _targetPlayer.UserId);
+        _sharedConnections = _player.Sessions.Count(s =>
+            s.Channel.RemoteEndPoint.Address.Equals(_targetPlayer.LastAddress) && s.UserId != _targetPlayer.UserId);
 
-    // Apparently the Bans flag is also used for whitelists
-    if (_admins.HasAdminFlag(Player, AdminFlags.Ban))
+        // Apparently the Bans flag is also used for whitelists
+        if (_admins.HasAdminFlag(Player, AdminFlags.Ban))
         {
             _whitelisted = await _db.GetWhitelistStatusAsync(_targetPlayer.UserId);
             // This won't get associated ip or hwid bans but they were not placed on this account anyways
@@ -265,7 +267,9 @@ public sealed class PlayerPanelEui : BaseEui
             // Unfortunately role bans for departments and stuff are issued individually. This means that a single role ban can have many individual role bans internally
             // The only way to distinguish whether a role ban is the same is to compare the ban time.
             // This is horrible and I would love to just erase the database and start from scratch instead but that's what I can do for now.
-            _roleBans = (await _db.GetServerRoleBansAsync(null, _targetPlayer.UserId, null, null)).DistinctBy(rb => rb.BanTime).Count();
+            _roleBans = (await _db.GetServerRoleBansAsync(null, _targetPlayer.UserId, null, null))
+                .DistinctBy(rb => rb.BanTime)
+                .Count();
         }
         else
         {
@@ -280,18 +284,12 @@ public sealed class PlayerPanelEui : BaseEui
             _frozen = _entity.HasComponent<AdminFrozenComponent>(session.AttachedEntity);
         }
         else
-        {
             _canFreeze = false;
-        }
 
         if (_admins.HasAdminFlag(Player, AdminFlags.Adminhelp))
-        {
             _canAhelp = true;
-        }
         else
-        {
             _canAhelp = false;
-        }
 
         StateDirty();
     }

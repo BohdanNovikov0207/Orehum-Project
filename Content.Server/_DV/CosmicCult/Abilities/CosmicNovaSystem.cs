@@ -8,15 +8,15 @@
 
 using System.Numerics;
 using Content.Goobstation.Common.Religion;
-using Content.Shared._DV.CosmicCult.Components;
 using Content.Shared._DV.CosmicCult;
+using Content.Shared._DV.CosmicCult.Components;
 using Content.Shared.Damage;
 using Content.Shared.Effects;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Stunnable;
 using Content.Shared.Weapons.Ranged.Systems;
-using Robust.Shared.Audio.Systems;
 using Robust.Shared.Audio;
+using Robust.Shared.Audio.Systems;
 using Robust.Shared.Physics.Events;
 using Robust.Shared.Physics.Systems;
 using Robust.Shared.Player;
@@ -26,17 +26,16 @@ namespace Content.Server._DV.CosmicCult.Abilities;
 
 public sealed class CosmicNovaSystem : EntitySystem
 {
-    [Dependency] private readonly CosmicCultSystem _cult = default!;
-    [Dependency] private readonly DamageableSystem _damageable = default!;
+    private static readonly EntProtoId Projectile = "ProjectileCosmicNova";
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedColorFlashEffectSystem _color = default!;
     [Dependency] private readonly SharedCosmicCultSystem _cosmicCult = default!;
+    [Dependency] private readonly CosmicCultSystem _cult = default!;
+    [Dependency] private readonly DamageableSystem _damageable = default!;
     [Dependency] private readonly SharedGunSystem _gun = default!;
     [Dependency] private readonly SharedPhysicsSystem _physics = default!;
     [Dependency] private readonly SharedStunSystem _stun = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
-
-    private static readonly EntProtoId Projectile = "ProjectileCosmicNova";
 
     public override void Initialize()
     {
@@ -47,7 +46,8 @@ public sealed class CosmicNovaSystem : EntitySystem
     }
 
     /// <summary>
-    /// This is the basic spell projectile code but updated to use non-obsolete functions, all so i can change the default projectile speed. Fuck.
+    /// This is the basic spell projectile code but updated to use non-obsolete functions, all so i can change the default
+    /// projectile speed. Fuck.
     /// </summary>
     private void OnCosmicNova(Entity<CosmicCultComponent> uid, ref EventCosmicNova args)
     {
@@ -57,7 +57,7 @@ public sealed class CosmicNovaSystem : EntitySystem
 
         var delta = targetPos.Position - startPos.Position;
         if (delta.EqualsApprox(Vector2.Zero))
-            delta = new(.01f, 0);
+            delta = new Vector2(.01f, 0);
 
         args.Handled = true;
         var ent = Spawn(Projectile, startPos);
@@ -68,13 +68,17 @@ public sealed class CosmicNovaSystem : EntitySystem
 
     private void OnNovaCollide(Entity<CosmicAstralNovaComponent> uid, ref StartCollideEvent args)
     {
-        if (_cosmicCult.EntityIsCultist(args.OtherEntity) || HasComp<BibleUserComponent>(args.OtherEntity) || !HasComp<MobStateComponent>(args.OtherEntity))
+        if (_cosmicCult.EntityIsCultist(args.OtherEntity) || HasComp<BibleUserComponent>(args.OtherEntity) ||
+            !HasComp<MobStateComponent>(args.OtherEntity))
             return;
 
         if (uid.Comp.DoStun)
             _stun.TryUpdateParalyzeDuration(args.OtherEntity, TimeSpan.FromSeconds(0.8f));
 
-        _damageable.TryChangeDamage(args.OtherEntity, uid.Comp.CosmicNovaDamage); // This'll probably trigger two or three times because of how collision works. I'm not being lazy here, it's a feature (kinda /s)
-        _color.RaiseEffect(Color.Red, new List<EntityUid>() { args.OtherEntity }, Filter.Pvs(args.OtherEntity, entityManager: EntityManager));
+        _damageable.TryChangeDamage(args.OtherEntity,
+            uid.Comp.CosmicNovaDamage); // This'll probably trigger two or three times because of how collision works. I'm not being lazy here, it's a feature (kinda /s)
+        _color.RaiseEffect(Color.Red,
+            new List<EntityUid> { args.OtherEntity },
+            Filter.Pvs(args.OtherEntity, entityManager: EntityManager));
     }
 }

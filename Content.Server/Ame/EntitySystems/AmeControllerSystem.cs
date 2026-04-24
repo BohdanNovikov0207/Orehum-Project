@@ -51,7 +51,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Content.Server.Administration.Logs;
 using Content.Server.Ame.Components;
-using Content.Server.NodeContainer;
 using Content.Server.Power.Components;
 using Content.Shared.Ame.Components;
 using Content.Shared.Containers.ItemSlots;
@@ -70,11 +69,11 @@ namespace Content.Server.Ame.EntitySystems;
 public sealed class AmeControllerSystem : EntitySystem
 {
     [Dependency] private readonly IAdminLogManager _adminLogger = default!;
-    [Dependency] private readonly IGameTiming _gameTiming = default!;
     [Dependency] private readonly AppearanceSystem _appearanceSystem = default!;
     [Dependency] private readonly SharedAudioSystem _audioSystem = default!;
-    [Dependency] private readonly UserInterfaceSystem _userInterfaceSystem = default!;
+    [Dependency] private readonly IGameTiming _gameTiming = default!;
     [Dependency] private readonly ItemSlotsSystem _itemSlots = default!;
+    [Dependency] private readonly UserInterfaceSystem _userInterfaceSystem = default!;
 
     public override void Initialize()
     {
@@ -108,10 +107,8 @@ public sealed class AmeControllerSystem : EntitySystem
         }
     }
 
-    private void OnRemove(EntityUid uid, AmeControllerComponent component, ComponentRemove args)
-    {
+    private void OnRemove(EntityUid uid, AmeControllerComponent component, ComponentRemove args) =>
         _itemSlots.RemoveItemSlot(uid, component.FuelSlot);
-    }
 
     private void OnItemSlotChanged(EntityUid uid, AmeControllerComponent component, ContainerModifiedMessage args)
     {
@@ -124,7 +121,10 @@ public sealed class AmeControllerSystem : EntitySystem
         UpdateUi(uid, component);
     }
 
-    private void UpdateController(EntityUid uid, TimeSpan curTime, AmeControllerComponent? controller = null, NodeContainerComponent? nodes = null)
+    private void UpdateController(EntityUid uid,
+        TimeSpan curTime,
+        AmeControllerComponent? controller = null,
+        NodeContainerComponent? nodes = null)
     {
         if (!Resolve(uid, ref controller))
             return;
@@ -144,9 +144,7 @@ public sealed class AmeControllerSystem : EntitySystem
         {
             // if the jar is empty shut down the AME
             if (fuelContainer.FuelAmount <= 0)
-            {
                 SetInjecting(uid, false, null, controller);
-            }
             else
             {
                 var availableInject = Math.Min(controller.InjectionAmount, fuelContainer.FuelAmount);
@@ -161,7 +159,9 @@ public sealed class AmeControllerSystem : EntitySystem
 
                 // only play audio if we actually had an injection
                 if (availableInject > 0)
-                    _audioSystem.PlayPvs(controller.InjectSound, uid, AudioParams.Default.WithVolume(overloading ? 10f : 0f));
+                    _audioSystem.PlayPvs(controller.InjectSound,
+                        uid,
+                        AudioParams.Default.WithVolume(overloading ? 10f : 0f));
                 UpdateUi(uid, controller);
             }
         }
@@ -205,40 +205,40 @@ public sealed class AmeControllerSystem : EntitySystem
         // set current power statistics in kW
         float currentPowerSupply = 0;
         if (TryComp<PowerSupplierComponent>(uid, out var powerOutlet) && coreCount > 0)
-        {
             currentPowerSupply = powerOutlet.CurrentSupply / 1000;
-        }
 
         var fuelContainerInSlot = controller.FuelSlot.Item;
         var hasFuelContainerInSlot = Exists(fuelContainerInSlot);
         if (!hasFuelContainerInSlot || !TryComp<AmeFuelContainerComponent>(fuelContainerInSlot, out var fuelContainer))
+        {
             return new AmeControllerBoundUserInterfaceState(powered,
-                                                            IsMasterController(uid),
-                                                            false,
-                                                            hasFuelContainerInSlot,
-                                                            0,
-                                                            controller.InjectionAmount,
-                                                            coreCount,
-                                                            currentPowerSupply,
-                                                            targetedPowerSupply);
+                IsMasterController(uid),
+                false,
+                hasFuelContainerInSlot,
+                0,
+                controller.InjectionAmount,
+                coreCount,
+                currentPowerSupply,
+                targetedPowerSupply);
+        }
 
         return new AmeControllerBoundUserInterfaceState(powered,
-                                                        IsMasterController(uid),
-                                                        controller.Injecting,
-                                                        hasFuelContainerInSlot,
-                                                        fuelContainer.FuelAmount,
-                                                        controller.InjectionAmount,
-                                                        coreCount,
-                                                        currentPowerSupply,
-                                                        targetedPowerSupply);
+            IsMasterController(uid),
+            controller.Injecting,
+            hasFuelContainerInSlot,
+            fuelContainer.FuelAmount,
+            controller.InjectionAmount,
+            coreCount,
+            currentPowerSupply,
+            targetedPowerSupply);
     }
 
-    private bool IsMasterController(EntityUid uid)
-    {
-        return TryGetAMENodeGroup(uid, out var group) && group.MasterController == uid;
-    }
+    private bool IsMasterController(EntityUid uid) =>
+        TryGetAMENodeGroup(uid, out var group) && group.MasterController == uid;
 
-    private bool TryGetAMENodeGroup(EntityUid uid, [MaybeNullWhen(false)] out AmeNodeGroup group, NodeContainerComponent? nodes = null)
+    private bool TryGetAMENodeGroup(EntityUid uid,
+        [MaybeNullWhen(false)] out AmeNodeGroup group,
+        NodeContainerComponent? nodes = null)
     {
         if (!Resolve(uid, ref nodes))
         {
@@ -270,7 +270,10 @@ public sealed class AmeControllerSystem : EntitySystem
         UpdateUi(uid, controller);
     }
 
-    public void SetInjecting(EntityUid uid, bool value, EntityUid? user = null, AmeControllerComponent? controller = null)
+    public void SetInjecting(EntityUid uid,
+        bool value,
+        EntityUid? user = null,
+        AmeControllerComponent? controller = null)
     {
         if (!Resolve(uid, ref controller))
             return;
@@ -292,7 +295,9 @@ public sealed class AmeControllerSystem : EntitySystem
             return;
 
         var humanReadableState = value ? "Inject" : "Not inject";
-        _adminLogger.Add(LogType.Action, LogImpact.Medium, $"{ToPrettyString(user.Value):player} has set the AME to {humanReadableState}");
+        _adminLogger.Add(LogType.Action,
+            LogImpact.Medium,
+            $"{ToPrettyString(user.Value):player} has set the AME to {humanReadableState}");
     }
 
     public void ToggleInjecting(EntityUid uid, EntityUid? user = null, AmeControllerComponent? controller = null)
@@ -302,7 +307,10 @@ public sealed class AmeControllerSystem : EntitySystem
         SetInjecting(uid, !controller.Injecting, user, controller);
     }
 
-    public void SetInjectionAmount(EntityUid uid, int value, EntityUid? user = null, AmeControllerComponent? controller = null)
+    public void SetInjectionAmount(EntityUid uid,
+        int value,
+        EntityUid? user = null,
+        AmeControllerComponent? controller = null)
     {
         if (!Resolve(uid, ref controller))
             return;
@@ -325,12 +333,17 @@ public sealed class AmeControllerSystem : EntitySystem
         if (TryGetAMENodeGroup(uid, out var group))
             safeLimit = group.CoreCount * 4;
 
-        var logImpact = (oldValue <= safeLimit && value > safeLimit) ? LogImpact.Extreme : LogImpact.Medium;
+        var logImpact = oldValue <= safeLimit && value > safeLimit ? LogImpact.Extreme : LogImpact.Medium;
 
-        _adminLogger.Add(LogType.Action, logImpact, $"{ToPrettyString(user.Value):player} has set the AME to inject {controller.InjectionAmount} while set to {humanReadableState}");
+        _adminLogger.Add(LogType.Action,
+            logImpact,
+            $"{ToPrettyString(user.Value):player} has set the AME to inject {controller.InjectionAmount} while set to {humanReadableState}");
     }
 
-    public void AdjustInjectionAmount(EntityUid uid, int delta, EntityUid? user = null, AmeControllerComponent? controller = null)
+    public void AdjustInjectionAmount(EntityUid uid,
+        int delta,
+        EntityUid? user = null,
+        AmeControllerComponent? controller = null)
     {
         if (!Resolve(uid, ref controller))
             return;
@@ -343,10 +356,13 @@ public sealed class AmeControllerSystem : EntitySystem
     {
         if (!TryGetAMENodeGroup(ent, out var group))
             return 0;
-        return  group.CoreCount * 8;
+        return group.CoreCount * 8;
     }
 
-    private void UpdateDisplay(EntityUid uid, int stability, AmeControllerComponent? controller = null, AppearanceComponent? appearance = null)
+    private void UpdateDisplay(EntityUid uid,
+        int stability,
+        AmeControllerComponent? controller = null,
+        AppearanceComponent? appearance = null)
     {
         if (!Resolve(uid, ref controller, ref appearance))
             return;
@@ -370,10 +386,8 @@ public sealed class AmeControllerSystem : EntitySystem
         );
     }
 
-    private void OnPowerChanged(EntityUid uid, AmeControllerComponent comp, ref PowerChangedEvent args)
-    {
+    private void OnPowerChanged(EntityUid uid, AmeControllerComponent comp, ref PowerChangedEvent args) =>
         UpdateUi(uid, comp);
-    }
 
     private void OnUiButtonPressed(EntityUid uid, AmeControllerComponent comp, UiButtonPressedMessage msg)
     {
@@ -394,16 +408,16 @@ public sealed class AmeControllerSystem : EntitySystem
         switch (msg.Button)
         {
             case UiButton.Eject:
-                TryEject(uid, user: user, controller: comp);
+                TryEject(uid, user, comp);
                 break;
             case UiButton.ToggleInjection:
-                ToggleInjecting(uid, user: user, controller: comp);
+                ToggleInjecting(uid, user, comp);
                 break;
             case UiButton.IncreaseFuel:
-                AdjustInjectionAmount(uid, +2, user: user, controller: comp);
+                AdjustInjectionAmount(uid, +2, user, comp);
                 break;
             case UiButton.DecreaseFuel:
-                AdjustInjectionAmount(uid, -2, user: user, controller: comp);
+                AdjustInjectionAmount(uid, -2, user, comp);
                 break;
         }
 
@@ -418,7 +432,10 @@ public sealed class AmeControllerSystem : EntitySystem
     /// </summary>
     /// <param name="playerEntity">The player entity.</param>
     /// <returns>Returns true if the entity can use the controller, and false if it cannot.</returns>
-    private bool PlayerCanUseController(EntityUid uid, EntityUid playerEntity, bool needsPower = true, AmeControllerComponent? controller = null)
+    private bool PlayerCanUseController(EntityUid uid,
+        EntityUid playerEntity,
+        bool needsPower = true,
+        AmeControllerComponent? controller = null)
     {
         if (!Resolve(uid, ref controller))
             return false;

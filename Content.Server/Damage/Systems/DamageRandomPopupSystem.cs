@@ -25,8 +25,6 @@ public sealed class DamageRandomPopupSystem : EntitySystem
         SubscribeLocalEvent<DamageRandomPopupComponent, DamageChangedEvent>(OnDamageChange);
     }
 
-    private void OnDamageChange(EntityUid uid, DamageRandomPopupComponent component, DamageChangedEvent args)
-    {
+    private void OnDamageChange(EntityUid uid, DamageRandomPopupComponent component, DamageChangedEvent args) =>
         _popupSystem.PopupEntity(Loc.GetString(_random.Pick(component.Popups)), uid);
-    }
 }

@@ -10,16 +10,16 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
 
 namespace Content.Server.NPC.Components;
 
-[RegisterComponent, AutoGenerateComponentPause]
+[RegisterComponent] [AutoGenerateComponentPause]
 public sealed partial class NPCJukeComponent : Component
 {
-    [DataField("jukeType")]
-    public JukeType JukeType = JukeType.Away;
-
     [DataField("jukeDuration")]
     public float JukeDuration = 0.5f;
 
-    [DataField("nextJuke", customTypeSerializer:typeof(TimeOffsetSerializer))]
+    [DataField("jukeType")]
+    public JukeType JukeType = JukeType.Away;
+
+    [DataField("nextJuke", customTypeSerializer: typeof(TimeOffsetSerializer))]
     [AutoPausedField]
     public TimeSpan NextJuke;
 
@@ -37,5 +37,5 @@ public enum JukeType : byte
     /// <summary>
     /// Move to the adjacent tile for the specified duration.
     /// </summary>
-    AdjacentTile
+    AdjacentTile,
 }

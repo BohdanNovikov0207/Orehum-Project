@@ -4,28 +4,27 @@
 //
 // SPDX-License-Identifier: MIT
 
-namespace Content.Server.Ghost.Roles.Events
+namespace Content.Server.Ghost.Roles.Events;
+
+/// <summary>
+/// Raised on a spawned entity after they use a ghost role mob spawner.
+/// </summary>
+public sealed class GhostRoleSpawnerUsedEvent : EntityEventArgs
 {
     /// <summary>
-    /// Raised on a spawned entity after they use a ghost role mob spawner.
+    /// The entity spawned.
     /// </summary>
-    public sealed class GhostRoleSpawnerUsedEvent : EntityEventArgs
+    public EntityUid Spawned;
+
+    /// <summary>
+    /// The entity that spawned this.
+    /// </summary>
+    public EntityUid Spawner;
+
+    public GhostRoleSpawnerUsedEvent(EntityUid spawner, EntityUid spawned)
     {
-        /// <summary>
-        /// The entity that spawned this.
-        /// </summary>
-        public EntityUid Spawner;
+        Spawner = spawner;
 
-        /// <summary>
-        /// The entity spawned.
-        /// </summary>
-        public EntityUid Spawned;
-
-        public GhostRoleSpawnerUsedEvent(EntityUid spawner, EntityUid spawned)
-        {
-            Spawner = spawner;
-
-            Spawned = spawned;
-        }
+        Spawned = spawned;
     }
 }

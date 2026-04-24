@@ -1,5 +1,4 @@
-﻿using Content.Corvax.Interfaces.Server;
-using Content.Corvax.Interfaces.Shared;
+﻿using Content.Corvax.Interfaces.Shared;
 using Content.Shared.GameTicking;
 using Robust.Server.Player;
 using Robust.Shared.Player;
@@ -12,6 +11,7 @@ public sealed class PlayerJoinMoveToGameEvent : EntityEventArgs
     {
         Player = player;
     }
+
     public ICommonSession Player { get; }
 }
 
@@ -19,6 +19,7 @@ public sealed class PlayerManagerSystem : EntitySystem
 {
     [Dependency] private readonly IPlayerManager _playerManager = default!;
     [Dependency] private readonly ISharedSponsorsManager _sponsorsManager = default!;
+
     public override void Initialize()
     {
         base.Initialize();

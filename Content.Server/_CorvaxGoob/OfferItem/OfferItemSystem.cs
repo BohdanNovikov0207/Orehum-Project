@@ -11,11 +11,11 @@ namespace Content.Server._CorvaxGoob.OfferItem;
 
 public sealed class OfferItemSystem : SharedOfferItemSystem
 {
-    [Dependency] private readonly SharedHandsSystem _hands = default!;
-    [Dependency] private readonly AlertsSystem _alertsSystem = default!;
-
-    private float _offerAcc = 0;
     private const float OfferAccMax = 3f;
+    [Dependency] private readonly AlertsSystem _alertsSystem = default!;
+    [Dependency] private readonly SharedHandsSystem _hands = default!;
+
+    private float _offerAcc;
 
     public override void Update(float frameTime)
     {

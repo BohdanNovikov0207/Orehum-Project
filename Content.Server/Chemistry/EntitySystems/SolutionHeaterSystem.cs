@@ -46,9 +46,9 @@
 
 using Content.Server.Chemistry.Components;
 using Content.Server.Power.EntitySystems;
-using Content.Shared.Chemistry.EntitySystems;
 using Content.Shared.Chemistry;
 using Content.Shared.Chemistry.Components.SolutionManager;
+using Content.Shared.Chemistry.EntitySystems;
 using Content.Shared.Placeable;
 using Content.Shared.Power;
 
@@ -56,11 +56,11 @@ namespace Content.Server.Chemistry.EntitySystems;
 
 public sealed class SolutionHeaterSystem : EntitySystem
 {
-    [Dependency] private readonly PowerReceiverSystem _powerReceiver = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly PowerReceiverSystem _powerReceiver = default!;
     [Dependency] private readonly SharedSolutionContainerSystem _solutionContainer = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
@@ -98,19 +98,12 @@ public sealed class SolutionHeaterSystem : EntitySystem
     {
         var placer = Comp<ItemPlacerComponent>(entity);
         if (args.Powered && placer.PlacedEntities.Count > 0)
-        {
             TurnOn(entity);
-        }
         else
-        {
             TurnOff(entity);
-        }
     }
 
-    private void OnItemPlaced(Entity<SolutionHeaterComponent> entity, ref ItemPlacedEvent args)
-    {
-        TryTurnOn(entity);
-    }
+    private void OnItemPlaced(Entity<SolutionHeaterComponent> entity, ref ItemPlacedEvent args) => TryTurnOn(entity);
 
     private void OnItemRemoved(Entity<SolutionHeaterComponent> entity, ref ItemRemovedEvent args)
     {
@@ -123,7 +116,8 @@ public sealed class SolutionHeaterSystem : EntitySystem
     {
         base.Update(frameTime);
 
-        var query = EntityQueryEnumerator<ActiveSolutionHeaterComponent, SolutionHeaterComponent, ItemPlacerComponent>();
+        var query =
+            EntityQueryEnumerator<ActiveSolutionHeaterComponent, SolutionHeaterComponent, ItemPlacerComponent>();
         while (query.MoveNext(out _, out _, out var heater, out var placer))
         {
             foreach (var heatingEntity in placer.PlacedEntities)

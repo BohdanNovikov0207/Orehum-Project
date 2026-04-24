@@ -43,7 +43,9 @@ public sealed class AddAccentClothingSystem : EntitySystem
         component.IsActive = true;
     }
 
-    private void OnGotUnequipped(EntityUid uid, AddAccentClothingComponent component, ref ClothingGotUnequippedEvent args)
+    private void OnGotUnequipped(EntityUid uid,
+        AddAccentClothingComponent component,
+        ref ClothingGotUnequippedEvent args)
     {
         if (!component.IsActive)
             return;

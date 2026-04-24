@@ -7,7 +7,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-using Content.Server.NodeContainer;
 using Content.Server.NodeContainer.EntitySystems;
 using Content.Server.Popups;
 using Content.Server.Power.Components;
@@ -25,14 +24,14 @@ namespace Content.Server.Power.Generator;
 /// <summary>
 /// Implements server logic for power-switchable devices.
 /// </summary>
-/// <seealso cref="PowerSwitchableComponent"/>
-/// <seealso cref="PortableGeneratorSystem"/>
-/// <seealso cref="GeneratorSystem"/>
+/// <seealso cref="PowerSwitchableComponent" />
+/// <seealso cref="PortableGeneratorSystem" />
+/// <seealso cref="GeneratorSystem" />
 public sealed class PowerSwitchableSystem : SharedPowerSwitchableSystem
 {
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly NodeGroupSystem _nodeGroup = default!;
     [Dependency] private readonly PopupSystem _popup = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly UseDelaySystem _useDelay = default!;
 
     public override void Initialize()
@@ -57,8 +56,8 @@ public sealed class PowerSwitchableSystem : SharedPowerSwitchableSystem
                 // don't need to check it again since if its disabled server wont let the verb act
                 Cycle(uid, args.User, comp);
             },
-            Icon = new SpriteSpecifier.Texture(new("/Textures/Interface/VerbIcons/zap.svg.192dpi.png")),
-            Text = msg
+            Icon = new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/VerbIcons/zap.svg.192dpi.png")),
+            Text = msg,
         };
 
         var ev = new SwitchPowerCheckEvent();
@@ -126,8 +125,8 @@ public sealed class PowerSwitchableSystem : SharedPowerSwitchableSystem
 }
 
 /// <summary>
-/// Raised on a <see cref="PowerSwitchableComponent"/> to see if its verb should work.
-/// If <see cref="DisableMessage"/> is non-null, the verb is disabled with that as the message.
+/// Raised on a <see cref="PowerSwitchableComponent" /> to see if its verb should work.
+/// If <see cref="DisableMessage" /> is non-null, the verb is disabled with that as the message.
 /// </summary>
 [ByRefEvent]
 public record struct SwitchPowerCheckEvent(string? DisableMessage = null);

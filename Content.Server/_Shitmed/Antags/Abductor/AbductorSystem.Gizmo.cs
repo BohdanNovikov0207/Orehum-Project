@@ -20,10 +20,11 @@ namespace Content.Server._Shitmed.Antags.Abductor;
 
 public sealed partial class AbductorSystem : SharedAbductorSystem
 {
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly ActionBlockerSystem _actionBlockerSystem = default!;
-    [Dependency] private readonly IGameTiming _time = default!;
     private static readonly ProtoId<TagPrototype> Abductor = "Abductor";
+    [Dependency] private readonly ActionBlockerSystem _actionBlockerSystem = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly IGameTiming _time = default!;
+
     public void InitializeGizmo()
     {
         SubscribeLocalEvent<AbductorGizmoComponent, AfterInteractEvent>(OnGizmoInteract);
@@ -34,22 +35,28 @@ public sealed partial class AbductorSystem : SharedAbductorSystem
 
     private void OnGizmoHitInteract(Entity<AbductorGizmoComponent> ent, ref MeleeHitEvent args)
     {
-        if (args.HitEntities.Count != 1) return;
+        if (args.HitEntities.Count != 1)
+            return;
         var target = args.HitEntities[0];
-        if (!HasComp<SurgeryTargetComponent>(target)) return;
+        if (!HasComp<SurgeryTargetComponent>(target))
+            return;
         GizmoUse(ent, target, args.User);
     }
 
     private void OnGizmoInteract(Entity<AbductorGizmoComponent> ent, ref AfterInteractEvent args)
     {
-        if (!_actionBlockerSystem.CanInstrumentInteract(args.User, args.Used, args.Target)) return;
-        if (!args.Target.HasValue) return;
+        if (!_actionBlockerSystem.CanInstrumentInteract(args.User, args.Used, args.Target))
+            return;
+        if (!args.Target.HasValue)
+            return;
 
         if (TryComp<AbductorConsoleComponent>(args.Target, out var console))
         {
             console.Target = ent.Comp.Target;
             _popup.PopupEntity(Loc.GetString("abductors-ui-gizmo-transferred"), args.User);
-            _color.RaiseEffect(Color.FromHex("#00BA00"), new List<EntityUid>(2) { ent.Owner, args.Target.Value }, Filter.Pvs(args.User, entityManager: EntityManager));
+            _color.RaiseEffect(Color.FromHex("#00BA00"),
+                new List<EntityUid>(2) { ent.Owner, args.Target.Value },
+                Filter.Pvs(args.User, entityManager: EntityManager));
             UpdateGui(console.Target, (args.Target.Value, console));
             return;
         }
@@ -67,11 +74,17 @@ public sealed partial class AbductorSystem : SharedAbductorSystem
         if (_tags.HasTag(target, Abductor))
             time = TimeSpan.FromSeconds(0.5);
 
-        var doAfter = new DoAfterArgs(EntityManager, user, time, new AbductorGizmoMarkDoAfterEvent(), ent, target, ent.Owner)
+        var doAfter = new DoAfterArgs(EntityManager,
+            user,
+            time,
+            new AbductorGizmoMarkDoAfterEvent(),
+            ent,
+            target,
+            ent.Owner)
         {
             BreakOnMove = true,
             BreakOnDamage = true,
-            DistanceThreshold = 1f
+            DistanceThreshold = 1f,
         };
         _doAfter.TryStartDoAfter(doAfter);
     }

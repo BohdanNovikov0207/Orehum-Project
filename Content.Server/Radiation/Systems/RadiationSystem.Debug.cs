@@ -26,15 +26,13 @@ public partial class RadiationSystem
     private readonly HashSet<ICommonSession> _debugSessions = new();
 
     /// <summary>
-    ///     Toggle radiation debug overlay for selected player.
+    /// Toggle radiation debug overlay for selected player.
     /// </summary>
     public void ToggleDebugView(ICommonSession session)
     {
         bool isEnabled;
         if (_debugSessions.Add(session))
-        {
             isEnabled = true;
-        }
         else
         {
             _debugSessions.Remove(session);
@@ -46,7 +44,7 @@ public partial class RadiationSystem
     }
 
     /// <summary>
-    ///     Send new information for radiation overlay.
+    /// Send new information for radiation overlay.
     /// </summary>
     private void UpdateDebugOverlay(EntityEventArgs ev)
     {
@@ -87,13 +85,16 @@ public partial class RadiationSystem
         if (_debugSessions.Count == 0)
             return;
 
-        var ev = new OnRadiationOverlayUpdateEvent(elapsedTime, totalSources, totalReceivers, rays ?? new());
+        var ev = new OnRadiationOverlayUpdateEvent(elapsedTime,
+            totalSources,
+            totalReceivers,
+            rays ?? new List<DebugRadiationRay>());
         UpdateDebugOverlay(ev);
     }
 }
 
 /// <summary>
-///     Toggle visibility of radiation rays coming from rad sources.
+/// Toggle visibility of radiation rays coming from rad sources.
 /// </summary>
 [AdminCommand(AdminFlags.Admin)]
 public sealed class RadiationViewCommand : LocalizedEntityCommands

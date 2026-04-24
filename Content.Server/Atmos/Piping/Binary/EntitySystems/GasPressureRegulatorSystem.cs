@@ -35,10 +35,8 @@ public sealed class GasPressureRegulatorSystem : SharedGasPressureRegulatorSyste
         SubscribeLocalEvent<GasPressureRegulatorComponent, MapInitEvent>(OnMapInit);
     }
 
-    private void OnMapInit(Entity<GasPressureRegulatorComponent> ent, ref MapInitEvent args)
-    {
+    private void OnMapInit(Entity<GasPressureRegulatorComponent> ent, ref MapInitEvent args) =>
         ent.Comp.NextUiUpdate = _timing.CurTime + ent.Comp.UpdateInterval;
-    }
 
     /// <summary>
     /// Dirties the regulator every second or so, so that the UI can update.
@@ -67,10 +65,7 @@ public sealed class GasPressureRegulatorSystem : SharedGasPressureRegulatorSyste
         }
     }
 
-    private void OnInit(Entity<GasPressureRegulatorComponent> ent, ref ComponentInit args)
-    {
-        UpdateAppearance(ent);
-    }
+    private void OnInit(Entity<GasPressureRegulatorComponent> ent, ref ComponentInit args) => UpdateAppearance(ent);
 
     /// <summary>
     /// Handles the updating logic for the pressure regulator.
@@ -133,7 +128,7 @@ public sealed class GasPressureRegulatorSystem : SharedGasPressureRegulatorSyste
         var deltaMolesToTransfer = Math.Min(deltaMolesToPressureThreshold, deltaMolesToEqualizePressure);
 
         // Fourth, convert to the desired volume to transfer.
-        var desiredVolumeToTransfer = deltaMolesToTransfer * ((Atmospherics.R * t1) / p1);
+        var desiredVolumeToTransfer = deltaMolesToTransfer * (Atmospherics.R * t1 / p1);
 
         // And finally, limit the transfer volume to the max flow rate of the valve.
         var actualVolumeToTransfer = Math.Min(desiredVolumeToTransfer,
@@ -152,14 +147,14 @@ public sealed class GasPressureRegulatorSystem : SharedGasPressureRegulatorSyste
     /// <summary>
     /// Updates the visual appearance of the pressure regulator based on its current state.
     /// </summary>
-    /// <param name="ent">The <see cref="Entity{GasPressureRegulatorComponent, AppearanceComponent}"/>
-    /// representing the pressure regulator with respective components.</param>
-    private void UpdateAppearance(Entity<GasPressureRegulatorComponent> ent)
-    {
+    /// <param name="ent">
+    /// The <see cref="Entity{GasPressureRegulatorComponent, AppearanceComponent}" />
+    /// representing the pressure regulator with respective components.
+    /// </param>
+    private void UpdateAppearance(Entity<GasPressureRegulatorComponent> ent) =>
         _appearance.SetData(ent,
             PressureRegulatorVisuals.State,
             ent.Comp.Enabled);
-    }
 
     /// <summary>
     /// Updates the pressure regulator's appearance and sound based on its current state, while

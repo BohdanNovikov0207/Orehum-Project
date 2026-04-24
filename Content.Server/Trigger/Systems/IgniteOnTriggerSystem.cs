@@ -7,7 +7,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-using Content.Server.Explosion.EntitySystems;
 using Content.Shared.IgnitionSource;
 using Content.Shared.Trigger;
 using Content.Shared.Trigger.Components.Effects;
@@ -20,8 +19,8 @@ namespace Content.Server.Trigger.Systems;
 /// </summary>
 public sealed class IgniteOnTriggerSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SharedIgnitionSourceSystem _source = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {

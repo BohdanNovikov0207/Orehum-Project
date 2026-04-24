@@ -8,11 +8,10 @@
 //
 // SPDX-License-Identifier: MIT
 
-namespace Content.Server.Zombies
+namespace Content.Server.Zombies;
+
+[RegisterComponent]
+public sealed partial class ZombifyOnDeathComponent : Component
 {
-    [RegisterComponent]
-    public sealed partial class ZombifyOnDeathComponent : Component
-    {
-        //this is not the component you are looking for
-    }
+    //this is not the component you are looking for
 }

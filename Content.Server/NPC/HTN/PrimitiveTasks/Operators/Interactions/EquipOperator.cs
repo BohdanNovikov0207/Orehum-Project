@@ -18,18 +18,14 @@ public sealed partial class EquipOperator : HTNOperator
     public override HTNOperatorStatus Update(NPCBlackboard blackboard, float frameTime)
     {
         if (!blackboard.TryGetValue<EntityUid>(Target, out var target, _entManager))
-        {
             return HTNOperatorStatus.Failed;
-        }
 
         var owner = blackboard.GetValue<EntityUid>(NPCBlackboard.Owner);
         var handsSystem = _entManager.System<HandsSystem>();
 
         // TODO: As elsewhere need some generic interaction cooldown system
         if (handsSystem.TryPickup(owner, target))
-        {
             return HTNOperatorStatus.Finished;
-        }
 
         return HTNOperatorStatus.Failed;
     }

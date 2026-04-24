@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Server.Body.Systems;
 using Content.Shared.Administration.Logs;
 using Content.Shared.Body.Components;
@@ -10,7 +11,6 @@ using Content.Shared.Chemistry;
 using Content.Shared.Chemistry.Components;
 using Content.Shared.Chemistry.EntitySystems;
 using Content.Shared.Database;
-using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Fluids.Components;
 using Content.Shared.Rootable;
 using Robust.Shared.Timing;
@@ -23,11 +23,11 @@ namespace Content.Server.Rootable;
 /// </summary>
 public sealed class RootableSystem : SharedRootableSystem
 {
-    [Dependency] private readonly ISharedAdminLogManager _logger = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly SharedSolutionContainerSystem _solutionContainer = default!;
-    [Dependency] private readonly ReactiveSystem _reactive = default!;
     [Dependency] private readonly BloodstreamSystem _blood = default!;
+    [Dependency] private readonly ISharedAdminLogManager _logger = default!;
+    [Dependency] private readonly ReactiveSystem _reactive = default!;
+    [Dependency] private readonly SharedSolutionContainerSystem _solutionContainer = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Update(float frameTime)
     {
@@ -37,7 +37,8 @@ public sealed class RootableSystem : SharedRootableSystem
         var curTime = _timing.CurTime;
         while (query.MoveNext(out var uid, out var rooted, out var bloodstream))
         {
-            if (!rooted.Rooted || rooted.PuddleEntity == null || curTime < rooted.NextUpdate || !PuddleQuery.TryComp(rooted.PuddleEntity, out var puddleComp))
+            if (!rooted.Rooted || rooted.PuddleEntity == null || curTime < rooted.NextUpdate ||
+                !PuddleQuery.TryComp(rooted.PuddleEntity, out var puddleComp))
                 continue;
 
             rooted.NextUpdate += rooted.TransferFrequency;
@@ -49,13 +50,15 @@ public sealed class RootableSystem : SharedRootableSystem
     /// <summary>
     /// Determines if the puddle is set up properly and if so, moves on to reacting.
     /// </summary>
-    private void PuddleReact(Entity<RootableComponent, BloodstreamComponent> entity, Entity<PuddleComponent> puddleEntity)
+    private void PuddleReact(Entity<RootableComponent, BloodstreamComponent> entity,
+        Entity<PuddleComponent> puddleEntity)
     {
-        if (!_solutionContainer.ResolveSolution(puddleEntity.Owner, puddleEntity.Comp.SolutionName, ref puddleEntity.Comp.Solution, out var solution) ||
+        if (!_solutionContainer.ResolveSolution(puddleEntity.Owner,
+                puddleEntity.Comp.SolutionName,
+                ref puddleEntity.Comp.Solution,
+                out var solution) ||
             solution.Contents.Count == 0)
-        {
             return;
-        }
 
         ReactWithEntity(entity, puddleEntity, solution);
     }
@@ -63,9 +66,14 @@ public sealed class RootableSystem : SharedRootableSystem
     /// <summary>
     /// Attempt to transfer an amount of the solution to the entity's bloodstream.
     /// </summary>
-    private void ReactWithEntity(Entity<RootableComponent, BloodstreamComponent> entity, Entity<PuddleComponent> puddleEntity, Solution solution)
+    private void ReactWithEntity(Entity<RootableComponent, BloodstreamComponent> entity,
+        Entity<PuddleComponent> puddleEntity,
+        Solution solution)
     {
-        if (!_solutionContainer.ResolveSolution(entity.Owner, entity.Comp2.ChemicalSolutionName, ref entity.Comp2.ChemicalSolution, out var chemSolution) || chemSolution.AvailableVolume <= 0)
+        if (!_solutionContainer.ResolveSolution(entity.Owner,
+                entity.Comp2.ChemicalSolutionName,
+                ref entity.Comp2.ChemicalSolution,
+                out var chemSolution) || chemSolution.AvailableVolume <= 0)
             return;
 
         var availableTransfer = FixedPoint2.Min(solution.Volume, entity.Comp1.TransferRate);
@@ -77,7 +85,9 @@ public sealed class RootableSystem : SharedRootableSystem
         if (_blood.TryAddToChemicals((entity, entity.Comp2), transferSolution))
         {
             // Log solution addition by puddle
-            _logger.Add(LogType.ForceFeed, LogImpact.Medium, $"{ToPrettyString(entity):target} absorbed puddle {SharedSolutionContainerSystem.ToPrettyString(transferSolution)}");
+            _logger.Add(LogType.ForceFeed,
+                LogImpact.Medium,
+                $"{ToPrettyString(entity):target} absorbed puddle {SharedSolutionContainerSystem.ToPrettyString(transferSolution)}");
         }
     }
 }

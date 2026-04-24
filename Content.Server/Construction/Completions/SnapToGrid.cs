@@ -22,29 +22,27 @@
 //
 // SPDX-License-Identifier: MIT
 
-using Content.Shared.Coordinates.Helpers;
 using Content.Shared.Construction;
+using Content.Shared.Coordinates.Helpers;
 using JetBrains.Annotations;
 
-namespace Content.Server.Construction.Completions
+namespace Content.Server.Construction.Completions;
+
+[UsedImplicitly]
+[DataDefinition]
+public sealed partial class SnapToGrid : IGraphAction
 {
-    [UsedImplicitly]
-    [DataDefinition]
-    public sealed partial class SnapToGrid : IGraphAction
+    [DataField("southRotation")] public bool SouthRotation { get; private set; }
+
+    public void PerformAction(EntityUid uid, EntityUid? userUid, IEntityManager entityManager)
     {
-        [DataField("southRotation")] public bool SouthRotation { get; private set; }
+        var transform = entityManager.GetComponent<TransformComponent>(uid);
 
-        public void PerformAction(EntityUid uid, EntityUid? userUid, IEntityManager entityManager)
-        {
-            var transform = entityManager.GetComponent<TransformComponent>(uid);
+        if (!transform.Anchored)
+            entityManager.System<SharedTransformSystem>()
+                .SetCoordinates(uid, transform.Coordinates.SnapToGrid(entityManager));
 
-            if (!transform.Anchored)
-                entityManager.System<SharedTransformSystem>().SetCoordinates(uid, transform.Coordinates.SnapToGrid(entityManager));
-
-            if (SouthRotation)
-            {
-                transform.LocalRotation = Angle.Zero;
-            }
-        }
+        if (SouthRotation)
+            transform.LocalRotation = Angle.Zero;
     }
 }

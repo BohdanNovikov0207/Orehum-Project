@@ -15,14 +15,14 @@ namespace Content.Server.StationEvents.Components;
 /// This is used for an event that spawns an artifact
 /// somewhere random on the station.
 /// </summary>
-[RegisterComponent, Access(typeof(BluespaceArtifactRule))]
+[RegisterComponent] [Access(typeof(BluespaceArtifactRule))]
 public sealed partial class BluespaceArtifactRuleComponent : Component
 {
-    [DataField("artifactSpawnerPrototype", customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
-    public string ArtifactSpawnerPrototype = "RandomArtifactSpawner";
-
     [DataField("artifactFlashPrototype", customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
     public string ArtifactFlashPrototype = "EffectFlashBluespace";
+
+    [DataField("artifactSpawnerPrototype", customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
+    public string ArtifactSpawnerPrototype = "RandomArtifactSpawner";
 
     [DataField("possibleSightings")]
     public List<string> PossibleSighting = new()
@@ -33,6 +33,6 @@ public sealed partial class BluespaceArtifactRuleComponent : Component
         "bluespace-artifact-sighting-4",
         "bluespace-artifact-sighting-5",
         "bluespace-artifact-sighting-6",
-        "bluespace-artifact-sighting-7"
+        "bluespace-artifact-sighting-7",
     };
 }

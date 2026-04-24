@@ -21,13 +21,9 @@ public sealed class DockingSignalControlSystem : EntitySystem
         SubscribeLocalEvent<DockingSignalControlComponent, UndockEvent>(OnUndocked);
     }
 
-    private void OnDocked(Entity<DockingSignalControlComponent> ent, ref DockEvent args)
-    {
-        _deviceLinkSystem.SendSignal(ent, ent.Comp.DockStatusSignalPort, signal: true);
-    }
+    private void OnDocked(Entity<DockingSignalControlComponent> ent, ref DockEvent args) =>
+        _deviceLinkSystem.SendSignal(ent, ent.Comp.DockStatusSignalPort, true);
 
-    private void OnUndocked(Entity<DockingSignalControlComponent> ent, ref UndockEvent args)
-    {
-        _deviceLinkSystem.SendSignal(ent, ent.Comp.DockStatusSignalPort, signal: false);
-    }
+    private void OnUndocked(Entity<DockingSignalControlComponent> ent, ref UndockEvent args) =>
+        _deviceLinkSystem.SendSignal(ent, ent.Comp.DockStatusSignalPort, false);
 }

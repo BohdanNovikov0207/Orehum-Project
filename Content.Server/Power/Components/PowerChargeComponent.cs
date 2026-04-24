@@ -28,7 +28,7 @@ public sealed partial class PowerChargeComponent : SharedPowerChargeComponent
     public float IdlePowerUse { get; set; }
 
     /// <summary>
-    /// Power consumed when <see cref="SwitchedOn"/> is true.
+    /// Power consumed when <see cref="SwitchedOn" /> is true.
     /// </summary>
     [DataField("activePower")]
     public float ActivePowerUse { get; set; }
@@ -55,10 +55,10 @@ public sealed partial class PowerChargeComponent : SharedPowerChargeComponent
     public float MaxCharge { get; set; } = 1;
 
     /// <summary>
-    /// The UI key of the UI that's used with this machine.<br/>
+    /// The UI key of the UI that's used with this machine.<br />
     /// This is used to allow machine power charging to be integrated into any ui
     /// </summary>
-    [DataField, ViewVariables(VVAccess.ReadOnly)]
+    [DataField] [ViewVariables(VVAccess.ReadOnly)]
     public Enum UiKey { get; set; } = PowerChargeUiKey.Key;
 
     /// <summary>

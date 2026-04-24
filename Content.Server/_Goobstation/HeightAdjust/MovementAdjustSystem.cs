@@ -3,11 +3,11 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.CCVar;
-using Robust.Shared.Configuration;
-using Content.Shared._EinsteinEngines.HeightAdjust;
 using Content.Goobstation.Shared.Sprinting;
 using Content.Shared._EinsteinEngines.Flight;
+using Content.Shared._EinsteinEngines.HeightAdjust;
+using Content.Shared.CCVar;
+using Robust.Shared.Configuration;
 
 namespace Content.Server._Goobstation.HeightAdjust;
 
@@ -17,12 +17,14 @@ public sealed class MovementAdjustSystem : EntitySystem
 
     public override void Initialize()
     {
-        SubscribeLocalEvent<SprintingAffectedByScaleComponent, HeightAdjustedEvent>((uid, comp, args) => TryAdjustSprintSpeed((uid, comp), ref args));
-        SubscribeLocalEvent<FlightAffectedByScaleComponent, HeightAdjustedEvent>((uid, comp, args) => TryAdjustFlight((uid, comp), ref args));
+        SubscribeLocalEvent<SprintingAffectedByScaleComponent, HeightAdjustedEvent>((uid, comp, args) =>
+            TryAdjustSprintSpeed((uid, comp), ref args));
+        SubscribeLocalEvent<FlightAffectedByScaleComponent, HeightAdjustedEvent>((uid, comp, args) =>
+            TryAdjustFlight((uid, comp), ref args));
     }
 
     /// <summary>
-    ///     Adjusts the sprinting speed of the specified entity based on the settings provided by the component.
+    /// Adjusts the sprinting speed of the specified entity based on the settings provided by the component.
     /// </summary>
     public bool TryAdjustSprintSpeed(Entity<SprintingAffectedByScaleComponent> ent, ref HeightAdjustedEvent args)
     {
@@ -33,10 +35,10 @@ public sealed class MovementAdjustSystem : EntitySystem
             // We only care about the scale that the player selects. Otherwise, the sprint speed adjustment is applied twice, which would alter sprint speed more than intended. So, we check that the entity has been initialized.
             || !TryComp(ent, out MetaDataComponent? metaData)
             || !metaData.EntityInitialized
-            )
+           )
             return false;
 
-        args.NewScale.Deconstruct(out float xscale, out float yscale);
+        args.NewScale.Deconstruct(out var xscale, out var yscale);
 
         var factor = (xscale + yscale) / 2;
         factor = Math.Clamp(factor, ent.Comp.Min, ent.Comp.Max);
@@ -49,7 +51,7 @@ public sealed class MovementAdjustSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Adjusts the flight speed and stamina drain of the specified entity based on the settings provided by the component.
+    /// Adjusts the flight speed and stamina drain of the specified entity based on the settings provided by the component.
     /// </summary>
     public bool TryAdjustFlight(Entity<FlightAffectedByScaleComponent> ent, ref HeightAdjustedEvent args)
     {
@@ -60,10 +62,10 @@ public sealed class MovementAdjustSystem : EntitySystem
             // We only care about the scale that the player selects. Otherwise, the sprint speed adjustment is applied twice, which would alter sprint speed more than intended. So, we check that the entity has been initialized.
             || !TryComp(ent, out MetaDataComponent? metaData)
             || !metaData.EntityInitialized
-            )
+           )
             return false;
 
-        args.NewScale.Deconstruct(out float xscale, out float yscale);
+        args.NewScale.Deconstruct(out var xscale, out var yscale);
 
         var factor = (xscale + yscale) / 2;
 

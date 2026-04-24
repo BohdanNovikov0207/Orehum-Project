@@ -70,7 +70,7 @@ public sealed partial class NPCSteeringSystem
         if (weight == 0f || direction == Vector2.Zero)
             return;
 
-        var directionAngle = (float)direction.ToAngle().Theta;
+        var directionAngle = (float) direction.ToAngle().Theta;
 
         for (var i = 0; i < InterestDirections; i++)
         {
@@ -78,6 +78,192 @@ public sealed partial class NPCSteeringSystem
             var dot = MathF.Cos(directionAngle - angle);
             dot = (dot + 1f) * 0.5f;
             interest[i] = Math.Clamp(interest[i] + dot * weight, 0f, 1f);
+        }
+    }
+
+    #region Static Avoidance
+
+    /// <summary>
+    /// Tries to avoid static blockers such as walls.
+    /// </summary>
+    private void CollisionAvoidance(
+        EntityUid uid,
+        Angle offsetRot,
+        Vector2 worldPos,
+        float agentRadius,
+        int layer,
+        int mask,
+        TransformComponent xform,
+        Span<float> danger)
+    {
+        var objectRadius = 0.25f;
+        var detectionRadius = MathF.Max(0.35f, agentRadius + objectRadius);
+        var ents = _entSetPool.Get();
+        _lookup.GetEntitiesInRange(uid,
+            detectionRadius,
+            ents,
+            LookupFlags.Dynamic | LookupFlags.Static | LookupFlags.Approximate);
+
+        foreach (var ent in ents)
+        {
+            // TODO: If we can access the door or smth.
+            if (!_physicsQuery.TryGetComponent(ent, out var otherBody) ||
+                !otherBody.Hard ||
+                !otherBody.CanCollide ||
+                otherBody.BodyType == BodyType.KinematicController ||
+                (mask & otherBody.CollisionLayer) == 0x0 &&
+                (layer & otherBody.CollisionMask) == 0x0)
+                continue;
+
+            var xformB = _xformQuery.GetComponent(ent);
+
+            if (!PhysicsSystem.TryGetNearest(uid,
+                    ent,
+                    out var pointA,
+                    out var pointB,
+                    out var distance,
+                    xform,
+                    xformB))
+                continue;
+
+            if (distance > detectionRadius)
+                continue;
+
+            var weight = 1f;
+            var obstacleDirection = pointB - pointA;
+
+            // Inside each other so just use worldPos
+            if (distance == 0f)
+                obstacleDirection = _transform.GetWorldPosition(xformB) - worldPos;
+            else
+                weight = (detectionRadius - distance) / detectionRadius;
+
+            if (obstacleDirection == Vector2.Zero)
+                continue;
+
+            obstacleDirection = offsetRot.RotateVec(obstacleDirection);
+            var norm = obstacleDirection.Normalized();
+
+            for (var i = 0; i < InterestDirections; i++)
+            {
+                var dot = Vector2.Dot(norm, Directions[i]);
+                danger[i] = MathF.Max(dot * weight, danger[i]);
+            }
+        }
+
+        _entSetPool.Return(ents);
+    }
+
+    #endregion
+
+    #region Dynamic Avoidance
+
+    /// <summary>
+    /// Tries to avoid mobs of the same faction.
+    /// </summary>
+    private void Separation(
+        EntityUid uid,
+        Angle offsetRot,
+        Vector2 worldPos,
+        float agentRadius,
+        int layer,
+        int mask,
+        PhysicsComponent body,
+        TransformComponent xform,
+        Span<float> danger)
+    {
+        var objectRadius = 0.25f;
+        var detectionRadius = MathF.Max(0.35f, agentRadius + objectRadius);
+        var ourVelocity = body.LinearVelocity;
+        _factionQuery.TryGetComponent(uid, out var ourFaction);
+        var ents = _entSetPool.Get();
+        _lookup.GetEntitiesInRange(uid, detectionRadius, ents, LookupFlags.Dynamic | LookupFlags.Approximate);
+
+        foreach (var ent in ents)
+        {
+            // TODO: If we can access the door or smth.
+            if (!_physicsQuery.TryGetComponent(ent, out var otherBody) ||
+                !otherBody.Hard ||
+                !otherBody.CanCollide ||
+                (mask & otherBody.CollisionLayer) == 0x0 &&
+                (layer & otherBody.CollisionMask) == 0x0 ||
+                !_factionQuery.TryGetComponent(ent, out var otherFaction) ||
+                !_npcFaction.IsEntityFriendly((uid, ourFaction), (ent, otherFaction)) ||
+                // Use <= 0 so we ignore stationary friends in case.
+                Vector2.Dot(otherBody.LinearVelocity, ourVelocity) <= 0f)
+                continue;
+
+            var xformB = _xformQuery.GetComponent(ent);
+
+            if (!PhysicsSystem.TryGetNearest(uid, ent, out var pointA, out var pointB, out var distance, xform, xformB))
+                continue;
+
+            if (distance > detectionRadius)
+                continue;
+
+            var weight = 1f;
+            var obstacleDirection = pointB - pointA;
+
+            // Inside each other so just use worldPos
+            if (distance == 0f)
+            {
+                obstacleDirection = _transform.GetWorldPosition(xformB) - worldPos;
+
+                // Welp
+                if (obstacleDirection == Vector2.Zero)
+                    obstacleDirection = _random.NextAngle().ToVec();
+            }
+            else
+                weight = distance / detectionRadius;
+
+            obstacleDirection = offsetRot.RotateVec(obstacleDirection);
+            var norm = obstacleDirection.Normalized();
+            weight *= 0.25f;
+
+            for (var i = 0; i < InterestDirections; i++)
+            {
+                var dot = Vector2.Dot(norm, Directions[i]);
+                danger[i] = MathF.Max(dot * weight, danger[i]);
+            }
+        }
+
+        _entSetPool.Return(ents);
+    }
+
+    #endregion
+
+    // TODO: Alignment
+
+    // TODO: Cohesion
+    private void Blend(NPCSteeringComponent steering, float frameTime, Span<float> interest, Span<float> danger)
+    {
+        /*
+         * Future sloth notes:
+         * Pathfinder cleanup:
+            - Cleanup whatever the fuck is happening in pathfinder
+            - Use Flee for melee behavior / actions and get the seek direction from that rather than bulldozing
+            - Must always have a path
+            - Path should return the full version + the snipped version
+            - Pathfinder needs to do diagonals
+            - Next node is either <current node + 1> or <nearest node + 1> (on the full path)
+            - If greater than <1.5m distance> repath
+         */
+
+        // IDK why I didn't do this sooner but blending is a lot better than lastdir for fixing stuttering.
+        const float BlendWeight = 10f;
+        var blendValue = Math.Min(1f, frameTime * BlendWeight);
+
+        for (var i = 0; i < InterestDirections; i++)
+        {
+            var currentInterest = interest[i];
+            var lastInterest = steering.Interest[i];
+            var interestDiff = (currentInterest - lastInterest) * blendValue;
+            steering.Interest[i] = lastInterest + interestDiff;
+
+            var currentDanger = danger[i];
+            var lastDanger = steering.Danger[i];
+            var dangerDiff = (currentDanger - lastDanger) * blendValue;
+            steering.Danger[i] = lastDanger + dangerDiff;
         }
     }
 
@@ -92,21 +278,17 @@ public sealed partial class NPCSteeringSystem
         PathPoly node)
     {
         if (node.Data.IsFreeSpace)
-        {
             return true;
-        }
         // Handle the case where the node is a climb, we can climb, and we are climbing.
-        else if ((node.Data.Flags & PathfindingBreadcrumbFlag.Climb) != 0x0 &&
+        if ((node.Data.Flags & PathfindingBreadcrumbFlag.Climb) != 0x0 &&
             (steering.Flags & PathFlags.Climbing) != 0x0 &&
             TryComp<ClimbingComponent>(uid, out var climbing) &&
             climbing.IsClimbing)
-        {
             return true;
-        }
 
         // TODO: Ideally for "FreeSpace" we check all entities on the tile and build flags dynamically (pathfinder refactor in future).
         var ents = _entSetPool.Get();
-        _lookup.GetLocalEntitiesIntersecting(node.GraphUid, node.Box.Enlarged(-0.04f), ents, flags: LookupFlags.Static);
+        _lookup.GetLocalEntitiesIntersecting(node.GraphUid, node.Box.Enlarged(-0.04f), ents, LookupFlags.Static);
         var result = true;
 
         if (ents.Count > 0)
@@ -117,9 +299,7 @@ public sealed partial class NPCSteeringSystem
             foreach (var intersecting in ents)
             {
                 if (!PhysicsSystem.IsCurrentlyHardCollidable((uid, fixtures, physics), intersecting))
-                {
                     continue;
-                }
 
                 result = false;
                 break;
@@ -174,9 +354,7 @@ public sealed partial class NPCSteeringSystem
                 }
             }
             else
-            {
                 steering.LineOfSightTimer = 0f;
-            }
         }
         else
         {
@@ -188,7 +366,8 @@ public sealed partial class NPCSteeringSystem
         var velLen = body.LinearVelocity.Length();
 
         var careAboutSpeed = steering.InRangeMaxSpeed != null;
-        var finalInRange = ourCoordinates.TryDistance(EntityManager, destinationCoordinates, out var targetDistance) && inLos && targetDistance <= steering.Range;
+        var finalInRange = ourCoordinates.TryDistance(EntityManager, destinationCoordinates, out var targetDistance) &&
+                           inLos && targetDistance <= steering.Range;
         var velocityHigh = careAboutSpeed && velLen > steering.InRangeMaxSpeed!.Value;
         // if we're in range and we care about velocity, stop trying to move if we early return
         if (finalInRange && careAboutSpeed)
@@ -254,15 +433,11 @@ public sealed partial class NPCSteeringSystem
         // If next node is a free tile then get within its bounds.
         // This is to avoid popping it too early
         else if (steering.CurrentPath.TryPeek(out var node) && IsFreeSpace(uid, steering, node))
-        {
             arrived = node.Box.Contains(ourCoordinates.Position);
-        }
         // Try getting into blocked range I guess?
         // TODO: Consider melee range or the likes.
         else
-        {
             arrived = direction.Length() <= SharedInteractionSystem.InteractionRange - 0.05f;
-        }
 
         // Are we in range
         if (arrived)
@@ -280,9 +455,7 @@ public sealed partial class NPCSteeringSystem
                 {
                     // We're still coming to a stop so wait for the do_after.
                     if (body.LinearVelocity.LengthSquared() > 0.01f)
-                    {
                         return true;
-                    }
 
                     status = TryHandleFlags(uid, steering, node);
                 }
@@ -340,9 +513,7 @@ public sealed partial class NPCSteeringSystem
                 ResetStuck(steering, ourCoordinates);
             }
             else
-            {
                 needsPath = true;
-            }
         }
         // Stuck detection
         // Check if we have moved further than the movespeed * stuck time.
@@ -372,18 +543,14 @@ public sealed partial class NPCSteeringSystem
             }
         }
         else
-        {
             ResetStuck(steering, ourCoordinates);
-        }
 
         // If not in LOS and no path then get a new one fam.
         // Goobstation - add DirectMove
         if (!directMove &&
-            ((!inLos && steering.ArriveOnLineOfSight && steering.CurrentPath.Count == 0) ||
-             (!steering.ArriveOnLineOfSight && steering.CurrentPath.Count == 0)))
-        {
+            (!inLos && steering.ArriveOnLineOfSight && steering.CurrentPath.Count == 0 ||
+             !steering.ArriveOnLineOfSight && steering.CurrentPath.Count == 0))
             needsPath = true;
-        }
 
         // TODO: Probably need partial planning support i.e. patch from the last node to where the target moved to.
         // Goobstation - add DirectMove
@@ -397,7 +564,7 @@ public sealed partial class NPCSteeringSystem
         // available but we assume there was.
         // Goobstation - add DirectMove
         if (!directMove && steering is { Pathfind: true, CurrentPath.Count: 0 } && !haveToBrake)
-                                                                 // Goobstation
+            // Goobstation
             return true;
 
         if (moveSpeed == 0f || direction == Vector2.Zero)
@@ -452,17 +619,19 @@ public sealed partial class NPCSteeringSystem
                     // otherwise we can overbrake in this frame and reverse movement direction
                     // TODO: a way to tell calling code that we don't want to reverse movement direction to not have to do this
                     moveMultiplier = MapValue(cvel.Length(), 0f, frameAccel);
-                                        // brake                                 // normalise
+                    // brake                                 // normalise
                     ApplySeek(interest, -offsetRot.RotateVec(body.LinearVelocity / velLen), 1f);
                 }
+
                 break;
             case MovementType.BrakingTangential:
                 if (velLen > 0f)
                 {
                     moveMultiplier = MapValue(tgVel.Length(), 0f, frameAccel);
-                                        // brake
+                    // brake
                     ApplySeek(interest, -offsetRot.RotateVec(tgVel.Normalized()), tgVel.Length() / velLen);
                 }
+
                 break;
             case MovementType.Coasting:
                 moveMultiplier = 0f;
@@ -479,7 +648,7 @@ public sealed partial class NPCSteeringSystem
         MovingToTarget,
         Braking,
         BrakingTangential,
-        Coasting
+        Coasting,
     }
 
     private void ResetStuck(NPCSteeringComponent component, EntityCoordinates ourCoordinates)
@@ -488,7 +657,11 @@ public sealed partial class NPCSteeringSystem
         component.LastStuckTime = Timing.CurTime;
     }
 
-    private void CheckPath(EntityUid uid, NPCSteeringComponent steering, TransformComponent xform, bool needsPath, float targetDistance)
+    private void CheckPath(EntityUid uid,
+        NPCSteeringComponent steering,
+        TransformComponent xform,
+        bool needsPath,
+        float targetDistance)
     {
         if (!_pathfinding)
         {
@@ -500,23 +673,20 @@ public sealed partial class NPCSteeringSystem
 
         if (!needsPath && steering.CurrentPath.Count > 0)
         {
-            needsPath = steering.CurrentPath.Count > 0 && (steering.CurrentPath.Peek().Data.Flags & PathfindingBreadcrumbFlag.Invalid) != 0x0;
+            needsPath = steering.CurrentPath.Count > 0 &&
+                        (steering.CurrentPath.Peek().Data.Flags & PathfindingBreadcrumbFlag.Invalid) != 0x0;
 
             // If the target has sufficiently moved.
             var lastNode = GetCoordinates(steering.CurrentPath.Last());
 
             if (lastNode.TryDistance(EntityManager, steering.Coordinates, out var lastDistance) &&
                 lastDistance > steering.RepathRange)
-            {
                 needsPath = true;
-            }
         }
 
         // Request the new path.
         if (needsPath)
-        {
             RequestPath(uid, steering, xform, targetDistance);
-        }
     }
 
     /// <summary>
@@ -558,9 +728,7 @@ public sealed partial class NPCSteeringSystem
         CollisionGroup mask = 0;
 
         if (TryComp<PhysicsComponent>(uid, out var physics))
-        {
-            mask = (CollisionGroup)physics.CollisionMask;
-        }
+            mask = (CollisionGroup) physics.CollisionMask;
 
         for (var i = 0; i < nodes.Count; i++)
         {
@@ -595,9 +763,7 @@ public sealed partial class NPCSteeringSystem
 
         // Even if we're at the last node may not be able to head to target in case we get stuck on a corner or the likes.
         if (_pathfinding && steering.CurrentPath.Count >= 1 && steering.CurrentPath.TryPeek(out var nextTarget))
-        {
             return GetCoordinates(nextTarget);
-        }
 
         return steering.Coordinates;
     }
@@ -618,199 +784,4 @@ public sealed partial class NPCSteeringSystem
     }
 
     #endregion
-
-    #region Static Avoidance
-
-    /// <summary>
-    /// Tries to avoid static blockers such as walls.
-    /// </summary>
-    private void CollisionAvoidance(
-        EntityUid uid,
-        Angle offsetRot,
-        Vector2 worldPos,
-        float agentRadius,
-        int layer,
-        int mask,
-        TransformComponent xform,
-        Span<float> danger)
-    {
-        var objectRadius = 0.25f;
-        var detectionRadius = MathF.Max(0.35f, agentRadius + objectRadius);
-        var ents = _entSetPool.Get();
-        _lookup.GetEntitiesInRange(uid, detectionRadius, ents, LookupFlags.Dynamic | LookupFlags.Static | LookupFlags.Approximate);
-
-        foreach (var ent in ents)
-        {
-            // TODO: If we can access the door or smth.
-            if (!_physicsQuery.TryGetComponent(ent, out var otherBody) ||
-                !otherBody.Hard ||
-                !otherBody.CanCollide ||
-                otherBody.BodyType == BodyType.KinematicController ||
-                (mask & otherBody.CollisionLayer) == 0x0 &&
-                (layer & otherBody.CollisionMask) == 0x0)
-            {
-                continue;
-            }
-
-            var xformB = _xformQuery.GetComponent(ent);
-
-            if (!PhysicsSystem.TryGetNearest(uid, ent,
-                    out var pointA, out var pointB, out var distance,
-                    xform, xformB))
-            {
-                continue;
-            }
-
-            if (distance > detectionRadius)
-                continue;
-
-            var weight = 1f;
-            var obstacleDirection = pointB - pointA;
-
-            // Inside each other so just use worldPos
-            if (distance == 0f)
-            {
-                obstacleDirection = _transform.GetWorldPosition(xformB) - worldPos;
-            }
-            else
-            {
-                weight = (detectionRadius - distance) / detectionRadius;
-            }
-
-            if (obstacleDirection == Vector2.Zero)
-                continue;
-
-            obstacleDirection = offsetRot.RotateVec(obstacleDirection);
-            var norm = obstacleDirection.Normalized();
-
-            for (var i = 0; i < InterestDirections; i++)
-            {
-                var dot = Vector2.Dot(norm, Directions[i]);
-                danger[i] = MathF.Max(dot * weight, danger[i]);
-            }
-        }
-
-        _entSetPool.Return(ents);
-    }
-
-    #endregion
-
-    #region Dynamic Avoidance
-
-    /// <summary>
-    /// Tries to avoid mobs of the same faction.
-    /// </summary>
-    private void Separation(
-        EntityUid uid,
-        Angle offsetRot,
-        Vector2 worldPos,
-        float agentRadius,
-        int layer,
-        int mask,
-        PhysicsComponent body,
-        TransformComponent xform,
-        Span<float> danger)
-    {
-        var objectRadius = 0.25f;
-        var detectionRadius = MathF.Max(0.35f, agentRadius + objectRadius);
-        var ourVelocity = body.LinearVelocity;
-        _factionQuery.TryGetComponent(uid, out var ourFaction);
-        var ents = _entSetPool.Get();
-        _lookup.GetEntitiesInRange(uid, detectionRadius, ents, LookupFlags.Dynamic | LookupFlags.Approximate);
-
-        foreach (var ent in ents)
-        {
-            // TODO: If we can access the door or smth.
-            if (!_physicsQuery.TryGetComponent(ent, out var otherBody) ||
-                !otherBody.Hard ||
-                !otherBody.CanCollide ||
-                (mask & otherBody.CollisionLayer) == 0x0 &&
-                (layer & otherBody.CollisionMask) == 0x0 ||
-                !_factionQuery.TryGetComponent(ent, out var otherFaction) ||
-                !_npcFaction.IsEntityFriendly((uid, ourFaction), (ent, otherFaction)) ||
-                // Use <= 0 so we ignore stationary friends in case.
-                Vector2.Dot(otherBody.LinearVelocity, ourVelocity) <= 0f)
-            {
-                continue;
-            }
-
-            var xformB = _xformQuery.GetComponent(ent);
-
-            if (!PhysicsSystem.TryGetNearest(uid, ent, out var pointA, out var pointB, out var distance, xform, xformB))
-            {
-                continue;
-            }
-
-            if (distance > detectionRadius)
-                continue;
-
-            var weight = 1f;
-            var obstacleDirection = pointB - pointA;
-
-            // Inside each other so just use worldPos
-            if (distance == 0f)
-            {
-                obstacleDirection = _transform.GetWorldPosition(xformB) - worldPos;
-
-                // Welp
-                if (obstacleDirection == Vector2.Zero)
-                {
-                    obstacleDirection = _random.NextAngle().ToVec();
-                }
-            }
-            else
-            {
-                weight = distance / detectionRadius;
-            }
-
-            obstacleDirection = offsetRot.RotateVec(obstacleDirection);
-            var norm = obstacleDirection.Normalized();
-            weight *= 0.25f;
-
-            for (var i = 0; i < InterestDirections; i++)
-            {
-                var dot = Vector2.Dot(norm, Directions[i]);
-                danger[i] = MathF.Max(dot * weight, danger[i]);
-            }
-        }
-
-        _entSetPool.Return(ents);
-    }
-
-    #endregion
-
-    // TODO: Alignment
-
-    // TODO: Cohesion
-    private void Blend(NPCSteeringComponent steering, float frameTime, Span<float> interest, Span<float> danger)
-    {
-        /*
-         * Future sloth notes:
-         * Pathfinder cleanup:
-            - Cleanup whatever the fuck is happening in pathfinder
-            - Use Flee for melee behavior / actions and get the seek direction from that rather than bulldozing
-            - Must always have a path
-            - Path should return the full version + the snipped version
-            - Pathfinder needs to do diagonals
-            - Next node is either <current node + 1> or <nearest node + 1> (on the full path)
-            - If greater than <1.5m distance> repath
-         */
-
-        // IDK why I didn't do this sooner but blending is a lot better than lastdir for fixing stuttering.
-        const float BlendWeight = 10f;
-        var blendValue = Math.Min(1f, frameTime * BlendWeight);
-
-        for (var i = 0; i < InterestDirections; i++)
-        {
-            var currentInterest = interest[i];
-            var lastInterest = steering.Interest[i];
-            var interestDiff = (currentInterest - lastInterest) * blendValue;
-            steering.Interest[i] = lastInterest + interestDiff;
-
-            var currentDanger = danger[i];
-            var lastDanger = steering.Danger[i];
-            var dangerDiff = (currentDanger - lastDanger) * blendValue;
-            steering.Danger[i] = lastDanger + dangerDiff;
-        }
-    }
 }

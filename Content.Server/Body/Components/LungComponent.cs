@@ -23,7 +23,7 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Server.Body.Components;
 
-[RegisterComponent, Access(typeof(LungSystem))]
+[RegisterComponent] [Access(typeof(LungSystem))]
 public sealed partial class LungComponent : Component
 {
     [DataField]
@@ -31,20 +31,8 @@ public sealed partial class LungComponent : Component
     public GasMixture Air = new()
     {
         Volume = 6,
-        Temperature = Atmospherics.NormalBodyTemperature
+        Temperature = Atmospherics.NormalBodyTemperature,
     };
-
-    /// <summary>
-    /// The name/key of the solution on this entity which these lungs act on.
-    /// </summary>
-    [DataField]
-    public string SolutionName = LungSystem.LungSolutionName;
-
-    /// <summary>
-    /// The solution on this entity that these lungs act on.
-    /// </summary>
-    [ViewVariables]
-    public Entity<SolutionComponent>? Solution = null;
 
     /// <summary>
     /// The type of gas this lung needs. Used only for the breathing alerts, not actual metabolism.
@@ -58,4 +46,16 @@ public sealed partial class LungComponent : Component
     /// </summary>
     [DataField]
     public float SaturationLoss = 1f;
+
+    /// <summary>
+    /// The solution on this entity that these lungs act on.
+    /// </summary>
+    [ViewVariables]
+    public Entity<SolutionComponent>? Solution = null;
+
+    /// <summary>
+    /// The name/key of the solution on this entity which these lungs act on.
+    /// </summary>
+    [DataField]
+    public string SolutionName = LungSystem.LungSolutionName;
 }

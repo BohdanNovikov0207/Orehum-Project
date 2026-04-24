@@ -88,15 +88,16 @@
 using Content.Goobstation.Common.StationEvents.SecretPlus;
 using Content.Goobstation.Server.StationEvents.Metric;
 using Robust.Shared.Audio;
-using Robust.Shared.Prototypes; // Goobstation
+using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
+// Goobstation
 
 namespace Content.Server.StationEvents.Components;
 
 /// <summary>
-///     Defines basic data for a station event
+/// Defines basic data for a station event
 /// </summary>
-[RegisterComponent, AutoGenerateComponentPause]
+[RegisterComponent] [AutoGenerateComponentPause]
 public sealed partial class StationEventComponent : Component
 {
     public const float WeightVeryLow = 0.0f;
@@ -105,73 +106,34 @@ public sealed partial class StationEventComponent : Component
     public const float WeightHigh = 15.0f;
     public const float WeightVeryHigh = 20.0f;
 
-    // Goob Edit Start
+    // Goobstation start
     /// <summary>
-    /// Can this event be selected randomly by the game director?
+    /// Expected Chaos changes when this event occurs.
+    /// Used by the GameDirector, which picks an event expected to make the desired chaos changes.
     /// </summary>
-    [DataField]
-    public bool IsSelectable = true;
-    // Goob Edit End
-
-    [DataField]
-    public float Weight = WeightNormal;
-
-    [DataField]
-    public string? StartAnnouncement;
-
-    [DataField]
-    public string? EndAnnouncement;
-
-    [DataField]
-    public Color StartAnnouncementColor = Color.Gold;
-
-    [DataField]
-    public Color EndAnnouncementColor = Color.Gold;
-
-    [DataField]
-    public SoundSpecifier? StartAudio;
-
-    [DataField]
-    public SoundSpecifier? EndAudio;
+    [DataField("chaos")]
+    public ChaosMetrics Chaos = new();
 
     /// <summary>
-    ///     In minutes, when is the first round time this event can start
-    /// </summary>
-    [DataField]
-    public int EarliestStart = 5;
-
-    /// <summary>
-    ///     In minutes, the amount of time before the same event can occur again
-    /// </summary>
-    [DataField]
-    public int ReoccurrenceDelay = 30;
-
-    /// <summary>
-    ///     How long the event lasts.
+    /// How long the event lasts.
     /// </summary>
     [DataField]
     public TimeSpan? Duration = TimeSpan.FromSeconds(1);
 
     /// <summary>
-    ///     The max amount of time the event lasts.
+    /// In minutes, when is the first round time this event can start
     /// </summary>
     [DataField]
-    public TimeSpan? MaxDuration;
+    public int EarliestStart = 5;
 
-    /// <summary>
-    ///     How many players need to be present on station for the event to run
-    /// </summary>
-    /// <remarks>
-    ///     To avoid running deadly events with low-pop
-    /// </remarks>
     [DataField]
-    public int MinimumPlayers;
+    public string? EndAnnouncement;
 
-    /// <summary>
-    ///     How many times this even can occur in a single round
-    /// </summary>
     [DataField]
-    public int? MaxOccurrences;
+    public Color EndAnnouncementColor = Color.Gold;
+
+    [DataField]
+    public SoundSpecifier? EndAudio;
 
     /// <summary>
     /// When the station event ends.
@@ -181,24 +143,63 @@ public sealed partial class StationEventComponent : Component
     public TimeSpan? EndTime;
 
     /// <summary>
+    /// What type of event is this.
+    /// Used by SecretPlus to determine whether it's allowed to fire this event.
+    /// </summary>
+    [DataField]
+    public ProtoId<EventTypePrototype> EventType = "Neutral";
+
+    // Goob Edit Start
+    /// <summary>
+    /// Can this event be selected randomly by the game director?
+    /// </summary>
+    [DataField]
+    public bool IsSelectable = true;
+
+    /// <summary>
+    /// The max amount of time the event lasts.
+    /// </summary>
+    [DataField]
+    public TimeSpan? MaxDuration;
+
+    /// <summary>
+    /// How many times this even can occur in a single round
+    /// </summary>
+    [DataField]
+    public int? MaxOccurrences;
+
+    /// <summary>
+    /// How many players need to be present on station for the event to run
+    /// </summary>
+    /// <remarks>
+    /// To avoid running deadly events with low-pop
+    /// </remarks>
+    [DataField]
+    public int MinimumPlayers;
+
+    /// <summary>
     /// If false, the event won't trigger during ongoing evacuation.
     /// </summary>
     [DataField]
     public bool OccursDuringRoundEnd = true;
 
-    // Goobstation start
     /// <summary>
-    ///  Expected Chaos changes when this event occurs.
-    ///  Used by the GameDirector, which picks an event expected to make the desired chaos changes.
-    /// </summary>
-    [DataField("chaos")]
-    public ChaosMetrics Chaos = new ChaosMetrics();
-
-    /// <summary>
-    ///  What type of event is this.
-    ///  Used by SecretPlus to determine whether it's allowed to fire this event.
+    /// In minutes, the amount of time before the same event can occur again
     /// </summary>
     [DataField]
-    public ProtoId<EventTypePrototype> EventType = "Neutral";
+    public int ReoccurrenceDelay = 30;
+
+    [DataField]
+    public string? StartAnnouncement;
+
+    [DataField]
+    public Color StartAnnouncementColor = Color.Gold;
+
+    [DataField]
+    public SoundSpecifier? StartAudio;
+    // Goob Edit End
+
+    [DataField]
+    public float Weight = WeightNormal;
     // Goobstation end
 }

@@ -12,16 +12,16 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototy
 /// <summary>
 /// Requires that the player not have a certain job to have this objective.
 /// </summary>
-[RegisterComponent, Access(typeof(NotJobRequirementSystem))]
+[RegisterComponent] [Access(typeof(NotJobRequirementSystem))]
 public sealed partial class NotJobRequirementComponent : Component
 {
+    // MisandryBox/JobObjectives - Double negative to not break compatibility
+    [DataField]
+    public bool Inverted = false;
+
     /// <summary>
     /// ID of the job to ban from having this objective.
     /// </summary>
     [DataField(required: true, customTypeSerializer: typeof(PrototypeIdSerializer<JobPrototype>))]
     public string Job = string.Empty;
-
-    // MisandryBox/JobObjectives - Double negative to not break compatibility
-    [DataField]
-    public bool Inverted = false;
 }

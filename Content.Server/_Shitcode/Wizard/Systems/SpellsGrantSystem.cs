@@ -29,14 +29,14 @@ namespace Content.Server._Goobstation.Wizard.Systems;
 
 public sealed class SpellsGrantSystem : EntitySystem
 {
-    [Dependency] private readonly IPrototypeManager _proto = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly ActionContainerSystem _actionContainer = default!;
     [Dependency] private readonly AntagSelectionSystem _antag = default!;
     [Dependency] private readonly MindSystem _mind = default!;
     [Dependency] private readonly ObjectivesSystem _objectives = default!;
-    [Dependency] private readonly TargetObjectiveSystem _target = default!;
     [Dependency] private readonly IPlayerManager _player = default!;
+    [Dependency] private readonly IPrototypeManager _proto = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly TargetObjectiveSystem _target = default!;
 
     public override void Initialize()
     {

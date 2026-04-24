@@ -12,7 +12,7 @@ using Robust.Shared.Random;
 namespace Content.Server.Worldgen.Tools;
 
 /// <summary>
-///     A faster version of EntitySpawnCollection that requires caching to work.
+/// A faster version of EntitySpawnCollection that requires caching to work.
 /// </summary>
 public sealed class EntitySpawnCollectionCache
 {
@@ -35,11 +35,11 @@ public sealed class EntitySpawnCollectionCache
     }
 
     /// <summary>
-    ///     Using a collection of entity spawn entries, picks a random list of entity prototypes to spawn from that collection.
+    /// Using a collection of entity spawn entries, picks a random list of entity prototypes to spawn from that collection.
     /// </summary>
     /// <remarks>
-    ///     This does not spawn the entities. The caller is responsible for doing so, since it may want to do something
-    ///     special to those entities (offset them, insert them into storage, etc)
+    /// This does not spawn the entities. The caller is responsible for doing so, since it may want to do something
+    /// special to those entities (offset them, insert them into storage, etc)
     /// </remarks>
     /// <param name="random">Resolve param.</param>
     /// <param name="spawned">List that spawned entities are inserted into.</param>

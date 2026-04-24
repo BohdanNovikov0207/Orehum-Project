@@ -14,13 +14,13 @@ using Robust.Shared.Timing;
 
 namespace Content.Server._DV.Abilities.Chitinid;
 
-public sealed partial class ChitinidSystem : EntitySystem
+public sealed class ChitinidSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly ItemCougherSystem _cougher = default!;
     [Dependency] private readonly DamageableSystem _damageable = default!;
     [Dependency] private readonly MobStateSystem _mobState = default!;
+    [Dependency] private readonly IPrototypeManager _proto = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -43,7 +43,7 @@ public sealed partial class ChitinidSystem : EntitySystem
                 || _mobState.IsDead(uid))
                 continue;
 
-            if (_damageable.TryChangeDamage(uid, comp.Healing, damageable: damageable) is not {} delta)
+            if (_damageable.TryChangeDamage(uid, comp.Healing, damageable: damageable) is not { } delta)
                 continue;
 
             // damage healed is subtracted, so the delta is negative.

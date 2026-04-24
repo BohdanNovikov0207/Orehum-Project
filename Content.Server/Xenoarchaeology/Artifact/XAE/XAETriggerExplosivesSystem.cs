@@ -14,9 +14,10 @@ public sealed class XAETriggerExplosivesSystem : BaseXAESystem<XAETriggerExplosi
     [Dependency] private readonly ExplosionSystem _explosion = default!;
 
     /// <inheritdoc />
-    protected override void OnActivated(Entity<XAETriggerExplosivesComponent> ent, ref XenoArtifactNodeActivatedEvent args)
+    protected override void OnActivated(Entity<XAETriggerExplosivesComponent> ent,
+        ref XenoArtifactNodeActivatedEvent args)
     {
-        if(!TryComp<ExplosiveComponent>(ent, out var explosiveComp))
+        if (!TryComp<ExplosiveComponent>(ent, out var explosiveComp))
             return;
 
         _explosion.TriggerExplosive(ent, explosiveComp);

@@ -79,7 +79,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Server.Explosion.EntitySystems;
 using Content.Server.Mind;
 using Content.Server.Objectives.Components;
 using Content.Server.Popups;
@@ -98,10 +97,10 @@ namespace Content.Server.Ninja.Systems;
 public sealed class SpiderChargeSystem : SharedSpiderChargeSystem
 {
     [Dependency] private readonly MindSystem _mind = default!;
+    [Dependency] private readonly SpaceNinjaSystem _ninja = default!;
     [Dependency] private readonly PopupSystem _popup = default!;
     [Dependency] private readonly SharedRoleSystem _role = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly SpaceNinjaSystem _ninja = default!;
 
     public override void Initialize()
     {
@@ -140,21 +139,19 @@ public sealed class SpiderChargeSystem : SharedSpiderChargeSystem
         var targetXform = Transform(obj.Target.Value);
         var locXform = Transform(args.Target);
         if (locXform.MapID != targetXform.MapID ||
-            (_transform.GetWorldPosition(locXform) - _transform.GetWorldPosition(targetXform)).LengthSquared() > comp.Range * comp.Range)
+            (_transform.GetWorldPosition(locXform) - _transform.GetWorldPosition(targetXform)).LengthSquared() >
+            comp.Range * comp.Range)
         {
             _popup.PopupEntity(Loc.GetString("spider-charge-too-far"), user, user);
             args.Cancelled = true;
-            return;
         }
     }
 
     /// <summary>
     /// Allows greentext to occur after exploding.
     /// </summary>
-    private void OnStuck(EntityUid uid, SpiderChargeComponent comp, ref EntityStuckEvent args)
-    {
+    private void OnStuck(EntityUid uid, SpiderChargeComponent comp, ref EntityStuckEvent args) =>
         comp.Planter = args.User;
-    }
 
     /// <summary>
     /// Handles greentext after exploding.

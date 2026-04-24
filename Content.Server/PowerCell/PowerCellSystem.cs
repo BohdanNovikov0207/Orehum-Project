@@ -92,18 +92,18 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Diagnostics.CodeAnalysis;
 using Content.Server.Emp;
+using Content.Server.Kitchen.Components;
 using Content.Server.Power.Components;
+using Content.Server.Power.EntitySystems;
+using Content.Shared.Containers.ItemSlots;
 using Content.Shared.Examine;
+using Content.Shared.Popups;
 using Content.Shared.PowerCell;
 using Content.Shared.PowerCell.Components;
 using Content.Shared.Rounding;
 using Robust.Shared.Containers;
-using System.Diagnostics.CodeAnalysis;
-using Content.Server.Kitchen.Components;
-using Content.Server.Power.EntitySystems;
-using Content.Shared.Containers.ItemSlots;
-using Content.Shared.Popups;
 using ActivatableUISystem = Content.Shared.UserInterface.ActivatableUISystem;
 
 namespace Content.Server.PowerCell;
@@ -117,9 +117,9 @@ public sealed partial class PowerCellSystem : SharedPowerCellSystem
     [Dependency] private readonly BatterySystem _battery = default!;
     [Dependency] private readonly SharedContainerSystem _containerSystem = default!;
     [Dependency] private readonly ItemSlotsSystem _itemSlotsSystem = default!;
-    [Dependency] private readonly SharedAppearanceSystem _sharedAppearanceSystem = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly RiggableSystem _riggableSystem = default!;
+    [Dependency] private readonly SharedAppearanceSystem _sharedAppearanceSystem = default!;
 
     public override void Initialize()
     {
@@ -160,7 +160,7 @@ public sealed partial class PowerCellSystem : SharedPowerCellSystem
         }
 
         var frac = args.Charge / args.MaxCharge;
-        var level = (byte)ContentHelpers.RoundToNearestLevels(frac, 1, component.PowerCellVisualsLevels); // Goob edit
+        var level = (byte) ContentHelpers.RoundToNearestLevels(frac, 1, component.PowerCellVisualsLevels); // Goob edit
         _sharedAppearanceSystem.SetData(uid, PowerCellVisuals.ChargeLevel, level);
 
         // If this power cell is inside a cell-slot, inform that entity that the power has changed (for updating visuals n such).
@@ -173,7 +173,9 @@ public sealed partial class PowerCellSystem : SharedPowerCellSystem
         }
     }
 
-    protected override void OnCellRemoved(EntityUid uid, PowerCellSlotComponent component, EntRemovedFromContainerMessage args)
+    protected override void OnCellRemoved(EntityUid uid,
+        PowerCellSlotComponent component,
+        EntRemovedFromContainerMessage args)
     {
         base.OnCellRemoved(uid, component, args);
 
@@ -183,52 +185,6 @@ public sealed partial class PowerCellSystem : SharedPowerCellSystem
         var ev = new PowerCellSlotEmptyEvent();
         RaiseLocalEvent(uid, ref ev);
     }
-
-    #region Activatable
-    /// <inheritdoc/>
-    public override bool HasActivatableCharge(EntityUid uid, PowerCellDrawComponent? battery = null, PowerCellSlotComponent? cell = null, EntityUid? user = null)
-    {
-        // Default to true if we don't have the components.
-        if (!Resolve(uid, ref battery, ref cell, false))
-            return true;
-
-        return HasCharge(uid, battery.UseRate, cell, user);
-    }
-
-    /// <summary>
-    /// Tries to use the <see cref="PowerCellDrawComponent.UseRate"/> for this entity.
-    /// </summary>
-    /// <param name="user">Popup to this user with the relevant detail if specified.</param>
-    public bool TryUseActivatableCharge(EntityUid uid, PowerCellDrawComponent? battery = null, PowerCellSlotComponent? cell = null, EntityUid? user = null)
-    {
-        // Default to true if we don't have the components.
-        if (!Resolve(uid, ref battery, ref cell, false))
-            return true;
-
-        if (TryUseCharge(uid, battery.UseRate, cell, user))
-        {
-            _sharedAppearanceSystem.SetData(uid, PowerCellSlotVisuals.Enabled, HasActivatableCharge(uid, battery, cell, user));
-            _activatable.CheckUsage(uid);
-            return true;
-        }
-
-        return false;
-    }
-
-    /// <inheritdoc/>
-    public override bool HasDrawCharge(
-        EntityUid uid,
-        PowerCellDrawComponent? battery = null,
-        PowerCellSlotComponent? cell = null,
-        EntityUid? user = null)
-    {
-        if (!Resolve(uid, ref battery, ref cell, false))
-            return true;
-
-        return HasCharge(uid, battery.DrawRate, cell, user);
-    }
-
-    #endregion
 
     /// <summary>
     /// Returns whether the entity has a slotted battery and charge for the requested action.
@@ -258,7 +214,10 @@ public sealed partial class PowerCellSystem : SharedPowerCellSystem
     /// <summary>
     /// Tries to use charge from a slotted battery.
     /// </summary>
-    public bool TryUseCharge(EntityUid uid, float charge, PowerCellSlotComponent? component = null, EntityUid? user = null)
+    public bool TryUseCharge(EntityUid uid,
+        float charge,
+        PowerCellSlotComponent? component = null,
+        EntityUid? user = null)
     {
         if (!TryGetBatteryFromSlot(uid, out var batteryEnt, out var battery, component))
         {
@@ -280,10 +239,9 @@ public sealed partial class PowerCellSystem : SharedPowerCellSystem
         return true;
     }
 
-    public bool TryGetBatteryFromSlot(EntityUid uid, [NotNullWhen(true)] out BatteryComponent? battery, PowerCellSlotComponent? component = null)
-    {
-        return TryGetBatteryFromSlot(uid, out _, out battery, component);
-    }
+    public bool TryGetBatteryFromSlot(EntityUid uid,
+        [NotNullWhen(true)] out BatteryComponent? battery,
+        PowerCellSlotComponent? component = null) => TryGetBatteryFromSlot(uid, out _, out battery, component);
 
     public bool TryGetBatteryFromSlot(EntityUid uid,
         [NotNullWhen(true)] out EntityUid? batteryEnt,
@@ -297,7 +255,7 @@ public sealed partial class PowerCellSystem : SharedPowerCellSystem
             return false;
         }
 
-        if (_itemSlotsSystem.TryGetSlot(uid, component.CellSlotId, out ItemSlot? slot))
+        if (_itemSlotsSystem.TryGetSlot(uid, component.CellSlotId, out var slot))
         {
             batteryEnt = slot.Item;
             return TryComp(slot.Item, out battery);
@@ -336,9 +294,7 @@ public sealed partial class PowerCellSystem : SharedPowerCellSystem
             args.PushMarkup(Loc.GetString("power-cell-component-examine-details", ("currentCharge", $"{charge:F0}")));
         }
         else
-        {
             args.PushMarkup(Loc.GetString("power-cell-component-examine-details-no-battery"));
-        }
     }
 
     private void OnGetCharge(Entity<PowerCellSlotComponent> entity, ref GetChargeEvent args)
@@ -356,4 +312,59 @@ public sealed partial class PowerCellSystem : SharedPowerCellSystem
 
         RaiseLocalEvent(batteryUid.Value, ref args);
     }
+
+    #region Activatable
+
+    /// <inheritdoc />
+    public override bool HasActivatableCharge(EntityUid uid,
+        PowerCellDrawComponent? battery = null,
+        PowerCellSlotComponent? cell = null,
+        EntityUid? user = null)
+    {
+        // Default to true if we don't have the components.
+        if (!Resolve(uid, ref battery, ref cell, false))
+            return true;
+
+        return HasCharge(uid, battery.UseRate, cell, user);
+    }
+
+    /// <summary>
+    /// Tries to use the <see cref="PowerCellDrawComponent.UseRate" /> for this entity.
+    /// </summary>
+    /// <param name="user">Popup to this user with the relevant detail if specified.</param>
+    public bool TryUseActivatableCharge(EntityUid uid,
+        PowerCellDrawComponent? battery = null,
+        PowerCellSlotComponent? cell = null,
+        EntityUid? user = null)
+    {
+        // Default to true if we don't have the components.
+        if (!Resolve(uid, ref battery, ref cell, false))
+            return true;
+
+        if (TryUseCharge(uid, battery.UseRate, cell, user))
+        {
+            _sharedAppearanceSystem.SetData(uid,
+                PowerCellSlotVisuals.Enabled,
+                HasActivatableCharge(uid, battery, cell, user));
+            _activatable.CheckUsage(uid);
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    public override bool HasDrawCharge(
+        EntityUid uid,
+        PowerCellDrawComponent? battery = null,
+        PowerCellSlotComponent? cell = null,
+        EntityUid? user = null)
+    {
+        if (!Resolve(uid, ref battery, ref cell, false))
+            return true;
+
+        return HasCharge(uid, battery.DrawRate, cell, user);
+    }
+
+    #endregion
 }

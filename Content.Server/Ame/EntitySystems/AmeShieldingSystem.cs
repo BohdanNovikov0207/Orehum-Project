@@ -28,7 +28,10 @@ public sealed class AmeShieldingSystem : EntitySystem
             UpdateCoreVisuals(uid, 0, false, shield);
     }
 
-    public void UpdateCoreVisuals(EntityUid uid, int injectionStrength, bool injecting, AmeShieldComponent? shield = null)
+    public void UpdateCoreVisuals(EntityUid uid,
+        int injectionStrength,
+        bool injecting,
+        AmeShieldComponent? shield = null)
     {
         if (!Resolve(uid, ref shield))
             return;
@@ -42,6 +45,8 @@ public sealed class AmeShieldingSystem : EntitySystem
 
         _pointLightSystem.SetRadius(uid, Math.Clamp(injectionStrength, 1, 12));
         _pointLightSystem.SetEnabled(uid, true);
-        _appearanceSystem.SetData(uid, AmeShieldVisuals.CoreState, injectionStrength > 2 ? AmeCoreState.Strong : AmeCoreState.Weak);
+        _appearanceSystem.SetData(uid,
+            AmeShieldVisuals.CoreState,
+            injectionStrength > 2 ? AmeCoreState.Strong : AmeCoreState.Weak);
     }
 }

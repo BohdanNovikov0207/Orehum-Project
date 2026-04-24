@@ -40,13 +40,14 @@ public sealed class CosmicCorruptingSystem : EntitySystem
     [Dependency] private readonly TurfSystem _turfs = default!;
 
     /// <remarks>
-    ///     this system is a mostly generic way of replacing tiles around an entity. the only hardcoded behaviour is secret
-    ///     walls -> malign doors, but that shouldn't be too hard to fix if this is needed for smth else later.
+    /// this system is a mostly generic way of replacing tiles around an entity. the only hardcoded behaviour is secret
+    /// walls -> malign doors, but that shouldn't be too hard to fix if this is needed for smth else later.
     /// </remarks>
     public override void Initialize() => SubscribeLocalEvent<CosmicCorruptingComponent, MapInitEvent>(OnMapInit);
 
     //when the entity spawns, add all neighbouring tiles to the corruptable list
-    private void OnMapInit(Entity<CosmicCorruptingComponent> ent, ref MapInitEvent args) => RecalculateStartingTiles(ent);
+    private void OnMapInit(Entity<CosmicCorruptingComponent> ent, ref MapInitEvent args) =>
+        RecalculateStartingTiles(ent);
 
     public override void Update(float frameTime)
     {
@@ -67,7 +68,8 @@ public sealed class CosmicCorruptingSystem : EntitySystem
             }
 
             if (comp.CorruptionTicks >= comp.CorruptionMaxTicks && comp.AutoDisable)
-                comp.Enabled = false; //maybe just remComp this? atm nothing re-enables a corruptor so that should be safe to do?
+                comp.Enabled =
+                    false; //maybe just remComp this? atm nothing re-enables a corruptor so that should be safe to do?
         }
     }
 
@@ -86,7 +88,7 @@ public sealed class CosmicCorruptingSystem : EntitySystem
 
         //go over every corruptible tile
         foreach (var pos in
-            new HashSet<Vector2i>(ent.Comp.CorruptableTiles)) //we love avoiding ConcurrentModificationExceptions
+                 new HashSet<Vector2i>(ent.Comp.CorruptableTiles)) //we love avoiding ConcurrentModificationExceptions
         {
             var tileRef = _map.GetTileRef((gridUid, mapGrid), pos);
             if (tileRef.Tile.TypeId == convertTile.TileId ||
@@ -165,7 +167,7 @@ public sealed class CosmicCorruptingSystem : EntitySystem
 
         if (ent.Comp.FloodFillStarting) //todo make this async? it doesn't actually run that much though
         {
-            var convertTile = (ContentTileDefinition)_tileDefinition[ent.Comp.ConversionTile];
+            var convertTile = (ContentTileDefinition) _tileDefinition[ent.Comp.ConversionTile];
             var visitedTiles = new HashSet<Vector2i>();
             var tilesToVisit = new HashSet<Vector2i> { tile.GridIndices };
 

@@ -9,10 +9,11 @@ using Robust.Shared.Random;
 
 namespace Content.Server.GameTicking.Rules.VariationPass;
 
-/// <inheritdoc cref="EntitySpawnVariationPassComponent"/>
+/// <inheritdoc cref="EntitySpawnVariationPassComponent" />
 public sealed class EntitySpawnVariationPassSystem : VariationPassSystem<EntitySpawnVariationPassComponent>
 {
-    protected override void ApplyVariation(Entity<EntitySpawnVariationPassComponent> ent, ref StationVariationPassEvent args)
+    protected override void ApplyVariation(Entity<EntitySpawnVariationPassComponent> ent,
+        ref StationVariationPassEvent args)
     {
         var totalTiles = Stations.GetTileCount(args.Station.AsNullable());
 

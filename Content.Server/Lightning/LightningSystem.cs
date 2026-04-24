@@ -41,14 +41,13 @@ namespace Content.Server.Lightning;
 //and the number of these branches is explicitly controlled in the new function.
 public sealed class LightningSystem : SharedLightningSystem
 {
-    [Dependency] private readonly BeamSystem _beam = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly TransformSystem _transform = default!;
-    [Dependency] private readonly PhysicsSystem _physics = default!; // Goobstation
-    [Dependency] private readonly TagSystem _tag = default!; // Goobstation
-
     private static readonly ProtoId<TagPrototype> BlockLightningTag = "BlockLightning";
+    [Dependency] private readonly BeamSystem _beam = default!;
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
+    [Dependency] private readonly PhysicsSystem _physics = default!; // Goobstation
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly TagSystem _tag = default!; // Goobstation
+    [Dependency] private readonly TransformSystem _transform = default!;
 
     public override void Initialize()
     {
@@ -59,10 +58,9 @@ public sealed class LightningSystem : SharedLightningSystem
 
     private void OnRemove(EntityUid uid, LightningComponent component, ComponentRemove args)
     {
-        if (!TryComp<BeamComponent>(uid, out var lightningBeam) || !TryComp<BeamComponent>(lightningBeam.VirtualBeamController, out var beamController))
-        {
+        if (!TryComp<BeamComponent>(uid, out var lightningBeam) ||
+            !TryComp<BeamComponent>(lightningBeam.VirtualBeamController, out var beamController))
             return;
-        }
 
         beamController.CreatedBeams.Remove(uid);
     }
@@ -76,7 +74,12 @@ public sealed class LightningSystem : SharedLightningSystem
     /// <param name="triggerLightningEvents">if the lightnings being fired should trigger lightning events.</param>
     /// <param name="beamAction">Goobstation. Action that is called on each beam entity.</param>
     /// <param name="accumulateIndex">Goobstation. Whether to accumulate BeamSystem.NextIndex.</param>
-    public bool ShootLightning(EntityUid user, EntityUid target, string lightningPrototype = "Lightning", bool triggerLightningEvents = true, Action<EntityUid>? beamAction = null, bool accumulateIndex = true)
+    public bool ShootLightning(EntityUid user,
+        EntityUid target,
+        string lightningPrototype = "Lightning",
+        bool triggerLightningEvents = true,
+        Action<EntityUid>? beamAction = null,
+        bool accumulateIndex = true)
     {
         // Goobstation start. This is required for force walls to block lightning so that you can't stand inside them
         // and spam lightning spells.
@@ -105,7 +108,12 @@ public sealed class LightningSystem : SharedLightningSystem
         // Goobstation end
 
         var spriteState = LightningRandomizer();
-        if (!_beam.TryCreateBeam(user, target, lightningPrototype, spriteState, beamAction: beamAction, accumulateIndex: accumulateIndex)) // Goob edit
+        if (!_beam.TryCreateBeam(user,
+                target,
+                lightningPrototype,
+                spriteState,
+                beamAction: beamAction,
+                accumulateIndex: accumulateIndex)) // Goob edit
             return false;
 
         if (triggerLightningEvents) // we don't want certain prototypes to trigger lightning level events
@@ -119,7 +127,8 @@ public sealed class LightningSystem : SharedLightningSystem
 
 
     /// <summary>
-    /// Looks for objects with a LightningTarget component in the radius, prioritizes them, and hits the highest priority targets with lightning.
+    /// Looks for objects with a LightningTarget component in the radius, prioritizes them, and hits the highest priority
+    /// targets with lightning.
     /// </summary>
     /// <param name="user">Where the lightning fires from</param>
     /// <param name="range">Targets selection radius</param>
@@ -129,39 +138,59 @@ public sealed class LightningSystem : SharedLightningSystem
     /// <param name="triggerLightningEvents">if the lightnings being fired should trigger lightning events.</param>
     /// <param name="ignoredEntity">Goobstation. Don't arc to this entity.</param>
     /// <param name="beamAction">Goobstation. Action that is called on each beam entity.</param>
-    public void ShootRandomLightnings(EntityUid user, float range, int boltCount, string lightningPrototype = "Lightning", int arcDepth = 0, bool triggerLightningEvents = true, EntityUid? ignoredEntity = null, Action<EntityUid>? beamAction = null) // Goob edit
+    public void ShootRandomLightnings(EntityUid user,
+        float range,
+        int boltCount,
+        string lightningPrototype = "Lightning",
+        int arcDepth = 0,
+        bool triggerLightningEvents = true,
+        EntityUid? ignoredEntity = null,
+        Action<EntityUid>? beamAction = null) // Goob edit
     {
         //TODO: add support to different priority target tablem for different lightning types
         //TODO: Remove Hardcode LightningTargetComponent (this should be a parameter of the SharedLightningComponent)
         //TODO: This is still pretty bad for perf but better than before and at least it doesn't re-allocate
         // several hashsets every time
 
-        var targets = _lookup.GetEntitiesInRange<LightningTargetComponent>(_transform.GetMapCoordinates(user), range).ToList();
+        var targets = _lookup.GetEntitiesInRange<LightningTargetComponent>(_transform.GetMapCoordinates(user), range)
+            .ToList();
         targets = targets.Where(x => x.Owner != ignoredEntity).ToList(); // Goobstation
         _random.Shuffle(targets);
         targets.Sort((x, y) => y.Comp.Priority.CompareTo(x.Comp.Priority));
 
-        int shootedCount = 0;
-        int count = -1;
-        while(shootedCount < boltCount)
+        var shootedCount = 0;
+        var count = -1;
+        while (shootedCount < boltCount)
         {
             count++;
 
-            if (count >= targets.Count) { break; }
+            if (count >= targets.Count)
+                break;
 
             var curTarget = targets[count];
             if (!_random.Prob(curTarget.Comp.HitProbability)) //Chance to ignore target
                 continue;
 
-            if (!ShootLightning(user, targets[count].Owner, lightningPrototype, triggerLightningEvents, beamAction, false)) // Goob edit
+            if (!ShootLightning(user,
+                    targets[count].Owner,
+                    lightningPrototype,
+                    triggerLightningEvents,
+                    beamAction,
+                    false)) // Goob edit
             {
                 shootedCount++;
                 continue;
             }
+
             if (arcDepth - targets[count].Comp.LightningResistance > 0)
-            {
-                ShootRandomLightnings(targets[count].Owner, range, 1, lightningPrototype, arcDepth - targets[count].Comp.LightningResistance, triggerLightningEvents, ignoredEntity, beamAction); // Goob edit
-            }
+                ShootRandomLightnings(targets[count].Owner,
+                    range,
+                    1,
+                    lightningPrototype,
+                    arcDepth - targets[count].Comp.LightningResistance,
+                    triggerLightningEvents,
+                    ignoredEntity,
+                    beamAction); // Goob edit
             shootedCount++;
         }
 

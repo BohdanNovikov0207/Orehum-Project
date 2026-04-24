@@ -45,8 +45,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Content.Server.Nutrition.Components;
 using Content.Server.Power.EntitySystems;
-using Content.Server.Storage.Components;
-using Content.Shared.Emag.Components;
 using Content.Shared.Emag.Systems;
 using Content.Shared.Nutrition.Components;
 using Content.Shared.Nutrition.EntitySystems;
@@ -58,17 +56,17 @@ using Robust.Shared.Timing;
 namespace Content.Server.Nutrition.EntitySystems;
 
 /// <summary>
-/// This handles logic and interactions relating to <see cref="FatExtractorComponent"/>
+/// This handles logic and interactions relating to <see cref="FatExtractorComponent" />
 /// </summary>
 public sealed class FatExtractorSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly EmagSystem _emag = default!;
-    [Dependency] private readonly HungerSystem _hunger = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly EmagSystem _emag = default!;
+    [Dependency] private readonly HungerSystem _hunger = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         SubscribeLocalEvent<FatExtractorComponent, GotEmaggedEvent>(OnGotEmagged);
@@ -88,15 +86,11 @@ public sealed class FatExtractorSystem : EntitySystem
         args.Handled = true;
     }
 
-    private void OnClosed(EntityUid uid, FatExtractorComponent component, ref StorageAfterCloseEvent args)
-    {
+    private void OnClosed(EntityUid uid, FatExtractorComponent component, ref StorageAfterCloseEvent args) =>
         StartProcessing(uid, component);
-    }
 
-    private void OnOpen(EntityUid uid, FatExtractorComponent component, ref StorageAfterOpenEvent args)
-    {
+    private void OnOpen(EntityUid uid, FatExtractorComponent component, ref StorageAfterOpenEvent args) =>
         StopProcessing(uid, component);
-    }
 
     private void OnPowerChanged(EntityUid uid, FatExtractorComponent component, ref PowerChangedEvent args)
     {
@@ -104,7 +98,9 @@ public sealed class FatExtractorSystem : EntitySystem
             StopProcessing(uid, component);
     }
 
-    public void StartProcessing(EntityUid uid, FatExtractorComponent? component = null, EntityStorageComponent? storage = null)
+    public void StartProcessing(EntityUid uid,
+        FatExtractorComponent? component = null,
+        EntityStorageComponent? storage = null)
     {
         if (!Resolve(uid, ref component, ref storage))
             return;
@@ -137,7 +133,10 @@ public sealed class FatExtractorSystem : EntitySystem
         component.Stream = _audio.Stop(component.Stream);
     }
 
-    public bool TryGetValidOccupant(EntityUid uid, [NotNullWhen(true)] out EntityUid? occupant, FatExtractorComponent? component = null, EntityStorageComponent? storage = null)
+    public bool TryGetValidOccupant(EntityUid uid,
+        [NotNullWhen(true)] out EntityUid? occupant,
+        FatExtractorComponent? component = null,
+        EntityStorageComponent? storage = null)
     {
         occupant = null;
         if (!Resolve(uid, ref component, ref storage))

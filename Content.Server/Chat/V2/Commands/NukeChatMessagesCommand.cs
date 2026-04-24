@@ -15,7 +15,7 @@ using Robust.Shared.Utility;
 
 namespace Content.Server.Chat.V2.Commands;
 
-[ToolshedCommand, AdminCommand(AdminFlags.Admin)]
+[ToolshedCommand] [AdminCommand(AdminFlags.Admin)]
 public sealed class NukeChatMessagesCommand : ToolshedCommand
 {
     [Dependency] private readonly IEntitySystemManager _manager = default!;
@@ -28,19 +28,14 @@ public sealed class NukeChatMessagesCommand : ToolshedCommand
         foreach (var username in usernames)
         {
             if (!_manager.GetEntitySystem<ChatRepositorySystem>().NukeForUsername(username, out var reason))
-            {
                 ctx.ReportError(new NukeMessagesForUsernameError(reason));
-            }
         }
     }
 }
 
 public record struct NukeMessagesForUsernameError(string Reason) : IConError
 {
-    public FormattedMessage DescribeInner()
-    {
-        return FormattedMessage.FromUnformatted(Reason);
-    }
+    public FormattedMessage DescribeInner() => FormattedMessage.FromUnformatted(Reason);
 
     public string? Expression { get; set; }
     public Vector2i? IssueSpan { get; set; }

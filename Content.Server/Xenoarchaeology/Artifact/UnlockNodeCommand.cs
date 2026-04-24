@@ -43,7 +43,8 @@ public sealed class UnlockNodeCommand : LocalizedEntityCommands
                     completionOptions.Add(new CompletionOption(uid.ToString()));
                 }
 
-                return CompletionResult.FromHintOptions(completionOptions, Loc.GetString("cmd-unlocknode-artifact-hint"));
+                return CompletionResult.FromHintOptions(completionOptions,
+                    Loc.GetString("cmd-unlocknode-artifact-hint"));
             }
             case 2 when
                 NetEntity.TryParse(args[0], out var netEnt) &&

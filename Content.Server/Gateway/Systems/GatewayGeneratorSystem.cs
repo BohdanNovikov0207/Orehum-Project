@@ -34,23 +34,22 @@ namespace Content.Server.Gateway.Systems;
 /// </summary>
 public sealed class GatewayGeneratorSystem : EntitySystem
 {
-    [Dependency] private readonly IConfigurationManager _cfgManager = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly IPrototypeManager _protoManager = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly IMapManager _mapManager = default!;
-    [Dependency] private readonly ITileDefinitionManager _tileDefManager = default!;
-    [Dependency] private readonly BiomeSystem _biome = default!;
-    [Dependency] private readonly DungeonSystem _dungeon = default!;
-    [Dependency] private readonly GatewaySystem _gateway = default!;
-    [Dependency] private readonly MetaDataSystem _metadata = default!;
-    [Dependency] private readonly SharedMapSystem _maps = default!;
-    [Dependency] private readonly SharedSalvageSystem _salvage = default!;
-    [Dependency] private readonly TileSystem _tile = default!;
-
     private static readonly ProtoId<LocalizedDatasetPrototype> PlanetNames = "NamesBorer";
     private static readonly ProtoId<BiomeTemplatePrototype> BiomeTemplate = "Continental";
     private static readonly ProtoId<DungeonConfigPrototype> DungeonConfig = "Experiment";
+    [Dependency] private readonly BiomeSystem _biome = default!;
+    [Dependency] private readonly IConfigurationManager _cfgManager = default!;
+    [Dependency] private readonly DungeonSystem _dungeon = default!;
+    [Dependency] private readonly GatewaySystem _gateway = default!;
+    [Dependency] private readonly IMapManager _mapManager = default!;
+    [Dependency] private readonly SharedMapSystem _maps = default!;
+    [Dependency] private readonly MetaDataSystem _metadata = default!;
+    [Dependency] private readonly IPrototypeManager _protoManager = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly SharedSalvageSystem _salvage = default!;
+    [Dependency] private readonly TileSystem _tile = default!;
+    [Dependency] private readonly ITileDefinitionManager _tileDefManager = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     // TODO:
     // Fix shader some more
@@ -121,7 +120,7 @@ public sealed class GatewayGeneratorSystem : EntitySystem
         var origin = new Vector2i(random.Next(-MaxOffset, MaxOffset), random.Next(-MaxOffset, MaxOffset));
         var restricted = new RestrictedRangeComponent
         {
-            Origin = origin
+            Origin = origin,
         };
         AddComp(mapUid, restricted);
 
@@ -133,7 +132,8 @@ public sealed class GatewayGeneratorSystem : EntitySystem
         {
             for (var y = -2; y <= 2; y++)
             {
-                tiles.Add((new Vector2i(x, y) + origin, new Tile(tileDef.TileId, variant: _tile.PickVariant((ContentTileDefinition) tileDef, random))));
+                tiles.Add((new Vector2i(x, y) + origin,
+                    new Tile(tileDef.TileId, variant: _tile.PickVariant((ContentTileDefinition) tileDef, random))));
             }
         }
 
@@ -151,12 +151,15 @@ public sealed class GatewayGeneratorSystem : EntitySystem
         // Create the gateway.
         var gatewayUid = SpawnAtPosition(generator.Proto, originCoords);
         var gatewayComp = Comp<GatewayComponent>(gatewayUid);
-        _gateway.SetDestinationName(gatewayUid, FormattedMessage.FromMarkupOrThrow($"[color=#D381C996]{gatewayName}[/color]"), gatewayComp);
+        _gateway.SetDestinationName(gatewayUid,
+            FormattedMessage.FromMarkupOrThrow($"[color=#D381C996]{gatewayName}[/color]"),
+            gatewayComp);
         _gateway.SetEnabled(gatewayUid, true, gatewayComp);
         generator.Generated.Add(mapUid);
     }
 
-    private void OnGeneratorAttemptOpen(Entity<GatewayGeneratorDestinationComponent> ent, ref AttemptGatewayOpenEvent args)
+    private void OnGeneratorAttemptOpen(Entity<GatewayGeneratorDestinationComponent> ent,
+        ref AttemptGatewayOpenEvent args)
     {
         if (ent.Comp.Loaded || args.Cancelled)
             return;

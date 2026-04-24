@@ -131,6 +131,7 @@ using Content.Server.Administration.Logs;
 using Content.Server.Atmos.Components;
 using Content.Server.NodeContainer.EntitySystems;
 using Content.Server.NPC.Pathfinding;
+using Content.Shared.Body.Systems;
 using Content.Shared.Camera;
 using Content.Shared.CCVar;
 using Content.Shared.Damage;
@@ -153,56 +154,53 @@ using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Utility;
-
 // Shitmed Change
-using Content.Shared.Armor;
-using Content.Shared.Body.Systems;
 
 namespace Content.Server.Explosion.EntitySystems;
 
 public sealed partial class ExplosionSystem : SharedExplosionSystem
 {
-    [Dependency] private readonly IMapManager _mapManager = default!;
-    [Dependency] private readonly IRobustRandom _robustRandom = default!;
-    [Dependency] private readonly ITileDefinitionManager _tileDefinitionManager = default!;
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-    [Dependency] private readonly IConfigurationManager _cfg = default!;
-    [Dependency] private readonly IPlayerManager _playerManager = default!;
-
-    [Dependency] private readonly MapSystem _mapSystem = default!;
-    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
-    [Dependency] private readonly DamageableSystem _damageableSystem = default!;
-    [Dependency] private readonly NodeGroupSystem _nodeGroupSystem = default!;
-    [Dependency] private readonly PathfindingSystem _pathfindingSystem = default!;
-    [Dependency] private readonly SharedCameraRecoilSystem _recoilSystem = default!;
-    [Dependency] private readonly IAdminLogManager _adminLogger = default!;
-    [Dependency] private readonly ThrowingSystem _throwingSystem = default!;
-    [Dependency] private readonly PvsOverrideSystem _pvsSys = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedTransformSystem _transformSystem = default!;
-    [Dependency] private readonly SharedMapSystem _map = default!;
-    [Dependency] private readonly SharedBodySystem _body = default!; // Shitmed Change
-
-    private EntityQuery<FlammableComponent> _flammableQuery;
-    private EntityQuery<PhysicsComponent> _physicsQuery;
-    private EntityQuery<ProjectileComponent> _projectileQuery;
-
     /// <summary>
-    ///     "Tile-size" for space when there are no nearby grids to use as a reference.
+    /// "Tile-size" for space when there are no nearby grids to use as a reference.
     /// </summary>
     public const ushort DefaultTileSize = 1;
 
     public const int MaxExplosionAudioRange = 30;
 
     /// <summary>
-    ///     The "default" explosion prototype.
+    /// The "default" explosion prototype.
     /// </summary>
     /// <remarks>
-    ///     Generally components should specify an explosion prototype via a yaml datafield, so that the yaml-linter can
-    ///     find errors. However some components, like rogue arrows, or some commands like the admin-smite need to have
-    ///     a "default" option specified outside of yaml data-fields. Hence this const string.
+    /// Generally components should specify an explosion prototype via a yaml datafield, so that the yaml-linter can
+    /// find errors. However some components, like rogue arrows, or some commands like the admin-smite need to have
+    /// a "default" option specified outside of yaml data-fields. Hence this const string.
     /// </remarks>
     public static readonly ProtoId<ExplosionPrototype> DefaultExplosionPrototypeId = "Default";
+
+    [Dependency] private readonly IAdminLogManager _adminLogger = default!;
+    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly SharedBodySystem _body = default!; // Shitmed Change
+    [Dependency] private readonly IConfigurationManager _cfg = default!;
+    [Dependency] private readonly DamageableSystem _damageableSystem = default!;
+    [Dependency] private readonly SharedMapSystem _map = default!;
+    [Dependency] private readonly IMapManager _mapManager = default!;
+
+    [Dependency] private readonly MapSystem _mapSystem = default!;
+    [Dependency] private readonly NodeGroupSystem _nodeGroupSystem = default!;
+    [Dependency] private readonly PathfindingSystem _pathfindingSystem = default!;
+    [Dependency] private readonly IPlayerManager _playerManager = default!;
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    [Dependency] private readonly PvsOverrideSystem _pvsSys = default!;
+    [Dependency] private readonly SharedCameraRecoilSystem _recoilSystem = default!;
+    [Dependency] private readonly IRobustRandom _robustRandom = default!;
+    [Dependency] private readonly ThrowingSystem _throwingSystem = default!;
+    [Dependency] private readonly ITileDefinitionManager _tileDefinitionManager = default!;
+    [Dependency] private readonly SharedTransformSystem _transformSystem = default!;
+
+    private EntityQuery<FlammableComponent> _flammableQuery;
+    private EntityQuery<PhysicsComponent> _physicsQuery;
+    private EntityQuery<ProjectileComponent> _projectileQuery;
 
     public override void Initialize()
     {
@@ -216,7 +214,8 @@ public sealed partial class ExplosionSystem : SharedExplosionSystem
         SubscribeLocalEvent<ExplosionResistanceComponent, GetExplosionResistanceEvent>(OnGetResistance);
 
         // as long as explosion-resistance mice are never added, this should be fine (otherwise a mouse-hat will transfer it's power to the wearer).
-        SubscribeLocalEvent<ExplosionResistanceComponent, InventoryRelayedEvent<GetExplosionResistanceEvent>>(RelayedResistance);
+        SubscribeLocalEvent<ExplosionResistanceComponent, InventoryRelayedEvent<GetExplosionResistanceEvent>>(
+            RelayedResistance);
 
         SubscribeLocalEvent<TileChangedEvent>(OnTileChanged);
 
@@ -254,7 +253,9 @@ public sealed partial class ExplosionSystem : SharedExplosionSystem
         _pathfindingSystem.PauseUpdating = false;
     }
 
-    public void SetExplosionResistance(EntityUid entityUid, float newCoefficient, ExplosionResistanceComponent? component = null) // Goobstation - Blob
+    public void SetExplosionResistance(EntityUid entityUid,
+        float newCoefficient,
+        ExplosionResistanceComponent? component = null) // Goobstation - Blob
     {
         if (!Resolve(entityUid, ref component))
             return;
@@ -263,26 +264,34 @@ public sealed partial class ExplosionSystem : SharedExplosionSystem
         Dirty(entityUid, component);
     }
 
-    private void RelayedResistance(EntityUid uid, ExplosionResistanceComponent component,
+    private void RelayedResistance(EntityUid uid,
+        ExplosionResistanceComponent component,
         InventoryRelayedEvent<GetExplosionResistanceEvent> args)
     {
         if (component.Worn)
             OnGetResistance(uid, component, ref args.Args);
     }
 
-    private void OnGetResistance(EntityUid uid, ExplosionResistanceComponent component, ref GetExplosionResistanceEvent args)
+    private void OnGetResistance(EntityUid uid,
+        ExplosionResistanceComponent component,
+        ref GetExplosionResistanceEvent args)
     {
         args.DamageCoefficient *= component.DamageCoefficient;
         if (component.Modifiers.TryGetValue(args.ExplosionPrototype, out var modifier))
             args.DamageCoefficient *= modifier;
     }
 
-    /// <inheritdoc/>
-    public override void TriggerExplosive(EntityUid uid, ExplosiveComponent? explosive = null, bool delete = true, float? totalIntensity = null, float? radius = null, EntityUid? user = null)
+    /// <inheritdoc />
+    public override void TriggerExplosive(EntityUid uid,
+        ExplosiveComponent? explosive = null,
+        bool delete = true,
+        float? totalIntensity = null,
+        float? radius = null,
+        EntityUid? user = null)
     {
         // log missing: false, because some entities (e.g. liquid tanks) attempt to trigger explosions when damaged,
         // but may not actually be explosive.
-        if (!Resolve(uid, ref explosive, logMissing: false))
+        if (!Resolve(uid, ref explosive, false))
             return;
 
         // No reusable explosions here.
@@ -293,12 +302,12 @@ public sealed partial class ExplosionSystem : SharedExplosionSystem
 
         // Override the explosion intensity if optional arguments were provided.
         if (radius != null)
-            totalIntensity ??= RadiusToIntensity((float)radius, explosive.IntensitySlope, explosive.MaxIntensity);
+            totalIntensity ??= RadiusToIntensity((float) radius, explosive.IntensitySlope, explosive.MaxIntensity);
         totalIntensity ??= explosive.TotalIntensity;
 
         QueueExplosion(uid,
             explosive.ExplosionType,
-            (float)totalIntensity,
+            (float) totalIntensity,
             explosive.IntensitySlope,
             explosive.MaxIntensity,
             explosive.TileBreakScale,
@@ -311,13 +320,14 @@ public sealed partial class ExplosionSystem : SharedExplosionSystem
     }
 
     /// <summary>
-    ///     Find the strength needed to generate an explosion of a given radius. More useful for radii larger then 4, when the explosion becomes less "blocky".
+    /// Find the strength needed to generate an explosion of a given radius. More useful for radii larger then 4, when the
+    /// explosion becomes less "blocky".
     /// </summary>
     /// <remarks>
-    ///     This assumes the explosion is in a vacuum / unobstructed. Given that explosions are not perfectly
-    ///     circular, here radius actually means the sqrt(Area/pi), where the area is the total number of tiles
-    ///     covered by the explosion. Until you get to radius 30+, this is functionally equivalent to the
-    ///     actual radius.
+    /// This assumes the explosion is in a vacuum / unobstructed. Given that explosions are not perfectly
+    /// circular, here radius actually means the sqrt(Area/pi), where the area is the total number of tiles
+    /// covered by the explosion. Until you get to radius 30+, this is functionally equivalent to the
+    /// actual radius.
     /// </remarks>
     public float RadiusToIntensity(float radius, float slope, float maxIntensity = 0)
     {
@@ -343,7 +353,7 @@ public sealed partial class ExplosionSystem : SharedExplosionSystem
     }
 
     /// <summary>
-    ///     Inverse formula for <see cref="RadiusToIntensity"/>
+    /// Inverse formula for <see cref="RadiusToIntensity" />
     /// </summary>
     public float IntensityToRadius(float totalIntensity, float slope, float maxIntensity)
     {
@@ -363,7 +373,7 @@ public sealed partial class ExplosionSystem : SharedExplosionSystem
     }
 
     /// <summary>
-    ///     Queue an explosions, centered on some entity.
+    /// Queue an explosions, centered on some entity.
     /// </summary>
     public void QueueExplosion(EntityUid uid,
         string typeId,
@@ -382,29 +392,40 @@ public sealed partial class ExplosionSystem : SharedExplosionSystem
 
         var posFound = _transformSystem.TryGetMapOrGridCoordinates(uid, out var gridPos, pos);
 
-        QueueExplosion(mapPos, typeId, totalIntensity, slope, maxTileIntensity, uid, tileBreakScale, maxTileBreak, canCreateVacuum, addLog: false);
+        QueueExplosion(mapPos,
+            typeId,
+            totalIntensity,
+            slope,
+            maxTileIntensity,
+            uid,
+            tileBreakScale,
+            maxTileBreak,
+            canCreateVacuum,
+            false);
 
         if (!addLog)
             return;
 
         if (user == null)
         {
-            _adminLogger.Add(LogType.Explosion, LogImpact.High,
+            _adminLogger.Add(LogType.Explosion,
+                LogImpact.High,
                 $"{ToPrettyString(uid):entity} exploded ({typeId}) at Pos:{(posFound ? $"{gridPos:coordinates}" : "[Grid or Map not found]")} with intensity {totalIntensity} slope {slope}");
         }
         else
         {
             var alertMinExplosionIntensity = _cfg.GetCVar(CCVars.AdminAlertExplosionMinIntensity);
-            var logImpact = (alertMinExplosionIntensity > -1 && totalIntensity >= alertMinExplosionIntensity)
+            var logImpact = alertMinExplosionIntensity > -1 && totalIntensity >= alertMinExplosionIntensity
                 ? LogImpact.Extreme
                 : LogImpact.High;
-            _adminLogger.Add(LogType.Explosion, logImpact,
+            _adminLogger.Add(LogType.Explosion,
+                logImpact,
                 $"{ToPrettyString(user.Value):user} caused {ToPrettyString(uid):entity} to explode ({typeId}) at Pos:{(posFound ? $"{gridPos:coordinates}" : "[Grid or Map not found]")} with intensity {totalIntensity} slope {slope}");
         }
     }
 
     /// <summary>
-    ///     Queue an explosion, with a specified epicenter and set of starting tiles.
+    /// Queue an explosion, with a specified epicenter and set of starting tiles.
     /// </summary>
     public void QueueExplosion(MapCoordinates epicenter,
         string typeId,
@@ -427,7 +448,9 @@ public sealed partial class ExplosionSystem : SharedExplosionSystem
         }
 
         if (addLog) // dont log if already created a separate, more detailed, log.
-            _adminLogger.Add(LogType.Explosion, LogImpact.High, $"Explosion ({typeId}) spawned at {epicenter:coordinates} with intensity {totalIntensity} slope {slope}");
+            _adminLogger.Add(LogType.Explosion,
+                LogImpact.High,
+                $"Explosion ({typeId}) spawned at {epicenter:coordinates} with intensity {totalIntensity} slope {slope}");
 
         // try to combine explosions on the same tile if they are the same type
         foreach (var queued in _queuedExplosions)
@@ -455,16 +478,16 @@ public sealed partial class ExplosionSystem : SharedExplosionSystem
             TileBreakScale = tileBreakScale,
             MaxTileBreak = maxTileBreak,
             CanCreateVacuum = canCreateVacuum,
-            Cause = cause
+            Cause = cause,
         };
         _explosionQueue.Enqueue(boom);
         _queuedExplosions.Add(boom);
     }
 
     /// <summary>
-    ///     This function actually spawns the explosion. It returns an <see cref="Explosion"/> instance with
-    ///     information about the affected tiles for the explosion system to process. It will also trigger the
-    ///     camera shake and sound effect.
+    /// This function actually spawns the explosion. It returns an <see cref="Explosion" /> instance with
+    /// information about the affected tiles for the explosion system to process. It will also trigger the
+    /// camera shake and sound effect.
     /// </summary>
     private Explosion? SpawnExplosion(QueuedExplosion queued)
     {
@@ -472,14 +495,23 @@ public sealed partial class ExplosionSystem : SharedExplosionSystem
         if (!_mapSystem.MapExists(pos.MapId))
             return null;
 
-        var results = GetExplosionTiles(pos, queued.Proto.ID, queued.TotalIntensity, queued.Slope, queued.MaxTileIntensity);
+        var results = GetExplosionTiles(pos,
+            queued.Proto.ID,
+            queued.TotalIntensity,
+            queued.Slope,
+            queued.MaxTileIntensity);
 
         if (results == null)
             return null;
 
         var (area, iterationIntensity, spaceData, gridData, spaceMatrix) = results.Value;
 
-        var visualEnt = CreateExplosionVisualEntity(pos, queued.Proto.ID, spaceMatrix, spaceData, gridData.Values, iterationIntensity);
+        var visualEnt = CreateExplosionVisualEntity(pos,
+            queued.Proto.ID,
+            spaceMatrix,
+            spaceData,
+            gridData.Values,
+            iterationIntensity);
 
         // camera shake
         CameraShake(iterationIntensity.Count * 4f, pos, queued.TotalIntensity);
@@ -548,7 +580,7 @@ public sealed partial class ExplosionSystem : SharedExplosionSystem
             var delta = epicenter.Position - playerPos;
 
             if (delta.EqualsApprox(Vector2.Zero))
-                delta = new(0.01f, 0);
+                delta = new Vector2(0.01f, 0);
 
             var distance = delta.Length();
             var effect = 5 * MathF.Pow(totalIntensity, 0.5f) * (1 - distance / range);

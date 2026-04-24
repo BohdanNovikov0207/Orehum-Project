@@ -15,7 +15,7 @@ using Content.Shared.Speech.Components;
 namespace Content.Server.Speech.EntitySystems;
 
 /// <summary>
-///     This system redirects local chat messages to listening entities (e.g., radio microphones).
+/// This system redirects local chat messages to listening entities (e.g., radio microphones).
 /// </summary>
 public sealed class ListeningSystem : EntitySystem
 {
@@ -28,10 +28,8 @@ public sealed class ListeningSystem : EntitySystem
         SubscribeLocalEvent<EntitySpokeEvent>(OnSpeak);
     }
 
-    private void OnSpeak(EntitySpokeEvent ev)
-    {
+    private void OnSpeak(EntitySpokeEvent ev) =>
         PingListeners(ev.Source, ev.Message, ev.IsWhisper); // Einstein Engines - Languages
-    }
 
     public void PingListeners(EntityUid source, string message, bool isWhisper) // Einstein Engines - Language
     {
@@ -44,10 +42,13 @@ public sealed class ListeningSystem : EntitySystem
 
         var attemptEv = new ListenAttemptEvent(source);
         var ev = new ListenEvent(message, source);
-        var obfuscatedEv = !isWhisper ? null : new ListenEvent(_chat.ObfuscateMessageReadability(message), source); // Einstein Engines - Language
+        var obfuscatedEv =
+            !isWhisper
+                ? null
+                : new ListenEvent(_chat.ObfuscateMessageReadability(message), source); // Einstein Engines - Language
         var query = EntityQueryEnumerator<ActiveListenerComponent, TransformComponent>();
 
-        while(query.MoveNext(out var listenerUid, out var listener, out var xform))
+        while (query.MoveNext(out var listenerUid, out var listener, out var xform))
         {
             if (xform.MapID != sourceXform.MapID)
                 continue;

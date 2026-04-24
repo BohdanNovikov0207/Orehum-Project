@@ -13,8 +13,10 @@ namespace Content.Server.Singularity.Events;
 /// Can be cancelled to prevent the target entity from being consumed.
 /// </summary>
 [ByRefEvent]
-public record struct EventHorizonAttemptConsumeEntityEvent
-(EntityUid entity, EntityUid eventHorizonUid, EventHorizonComponent eventHorizon)
+public record struct EventHorizonAttemptConsumeEntityEvent(
+    EntityUid entity,
+    EntityUid eventHorizonUid,
+    EventHorizonComponent eventHorizon)
 {
     /// <summary>
     /// The entity that the event horizon is attempting to consume.
@@ -22,14 +24,14 @@ public record struct EventHorizonAttemptConsumeEntityEvent
     public readonly EntityUid Entity = entity;
 
     /// <summary>
-    /// The uid of the event horizon consuming the entity.
-    /// </summary>
-    public readonly EntityUid EventHorizonUid = eventHorizonUid;
-
-    /// <summary>
     /// The event horizon consuming the target entity.
     /// </summary>
     public readonly EventHorizonComponent EventHorizon = eventHorizon;
+
+    /// <summary>
+    /// The uid of the event horizon consuming the entity.
+    /// </summary>
+    public readonly EntityUid EventHorizonUid = eventHorizonUid;
 
     /// <summary>
     /// Whether the event horizon has been prevented from consuming the target entity.

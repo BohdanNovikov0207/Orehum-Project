@@ -20,14 +20,13 @@ namespace Content.Server._Goobstation.Wizard.Systems;
 
 public sealed class ScryingOrbSystem : SharedScryingOrbSystem
 {
-    [Dependency] private readonly SharedTransformSystem _transformSystem = default!;
-    [Dependency] private readonly SharedMindSystem _mind = default!;
-    [Dependency] private readonly MetaDataSystem _meta = default!;
+    private static readonly EntProtoId ObserverProto = "MobObserverWizard";
     [Dependency] private readonly SharedEyeSystem _eye = default!;
     [Dependency] private readonly SharedGhostSystem _ghost = default!;
+    [Dependency] private readonly MetaDataSystem _meta = default!;
+    [Dependency] private readonly SharedMindSystem _mind = default!;
     [Dependency] private readonly IPlayerManager _player = default!;
-
-    private static readonly EntProtoId ObserverProto = "MobObserverWizard";
+    [Dependency] private readonly SharedTransformSystem _transformSystem = default!;
 
     public override void Initialize()
     {
@@ -41,15 +40,11 @@ public sealed class ScryingOrbSystem : SharedScryingOrbSystem
         SubscribeLocalEvent<ScryingOrbComponent, GotUnequippedEvent>(OnUnequip);
     }
 
-    private void OnUnequip(Entity<ScryingOrbComponent> ent, ref GotUnequippedEvent args)
-    {
+    private void OnUnequip(Entity<ScryingOrbComponent> ent, ref GotUnequippedEvent args) =>
         AttemptDisableXRay(args.Equipee);
-    }
 
-    private void OnUnequipHand(Entity<ScryingOrbComponent> ent, ref GotUnequippedHandEvent args)
-    {
+    private void OnUnequipHand(Entity<ScryingOrbComponent> ent, ref GotUnequippedHandEvent args) =>
         AttemptDisableXRay(args.User);
-    }
 
     private void OnEquip(Entity<ScryingOrbComponent> ent, ref GotEquippedEvent args)
     {
@@ -94,7 +89,7 @@ public sealed class ScryingOrbSystem : SharedScryingOrbSystem
             return;
 
         var user = args.User;
-        args.Verbs.Add(new()
+        args.Verbs.Add(new InteractionVerb
         {
             Act = () =>
             {

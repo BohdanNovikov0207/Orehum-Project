@@ -29,23 +29,20 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Linq;
+using Content.Goobstation.Maths.FixedPoint;
+using Content.Goobstation.Shared.ManifestListings;
 using Content.Goobstation.Shared.NTR;
 using Content.Goobstation.Shared.NTR.Events;
 using Content.Server._Goobstation.Wizard.Store;
 using Content.Server.Actions;
 using Content.Server.Administration.Logs;
 using Content.Server.Heretic.EntitySystems;
-using Content.Server.PDA.Ringer;
 using Content.Server.Stack;
 using Content.Server.Store.Components;
-using Content.Shared._Goobstation.Wizard.Refund; // Goob
+using Content.Shared._Goobstation.Wizard.Refund;
 using Content.Shared.Actions;
 using Content.Shared.Database;
-using Content.Goobstation.Maths.FixedPoint;
-using Content.Goobstation.Shared.ManifestListings;
 using Content.Shared.Hands.EntitySystems;
-using Content.Shared.Heretic; // Goob
-using Content.Shared.Heretic.Prototypes; // Goob
 using Content.Shared.Mind;
 using Content.Shared.PDA.Ringer;
 using Content.Shared.Store;
@@ -55,7 +52,12 @@ using Robust.Server.GameObjects;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
-using Robust.Shared.Timing; // Goob
+using Robust.Shared.Timing;
+// Goob
+// Goob
+// Goob
+
+// Goob
 
 namespace Content.Server.Store.Systems;
 
@@ -63,17 +65,17 @@ namespace Content.Server.Store.Systems;
 // do not touch unless you want to shoot yourself in the leg
 public sealed partial class StoreSystem
 {
-    [Dependency] private readonly IAdminLogManager _admin = default!;
-    [Dependency] private readonly SharedHandsSystem _hands = default!;
-    [Dependency] private readonly ActionsSystem _actions = default!;
     [Dependency] private readonly ActionContainerSystem _actionContainer = default!;
+    [Dependency] private readonly ActionsSystem _actions = default!;
     [Dependency] private readonly ActionUpgradeSystem _actionUpgrade = default!;
-    [Dependency] private readonly SharedMindSystem _mind = default!;
+    [Dependency] private readonly IAdminLogManager _admin = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly StackSystem _stack = default!;
-    [Dependency] private readonly UserInterfaceSystem _ui = default!;
+    [Dependency] private readonly SharedHandsSystem _hands = default!;
     [Dependency] private readonly HereticSystem _heretic = default!; // goobstation - heretics
+    [Dependency] private readonly SharedMindSystem _mind = default!;
+    [Dependency] private readonly StackSystem _stack = default!;
     [Dependency] private readonly IGameTiming _timing = default!; // goobstation - ntr update
+    [Dependency] private readonly UserInterfaceSystem _ui = default!;
 
     private void InitializeUi()
     {
@@ -89,10 +91,8 @@ public sealed partial class StoreSystem
         // Goobstation end
     }
 
-    private void OnRefundEntityDeleted(Entity<StoreComponent> ent, ref RefundEntityDeletedEvent args)
-    {
+    private void OnRefundEntityDeleted(Entity<StoreComponent> ent, ref RefundEntityDeletedEvent args) =>
         ent.Comp.BoughtEntities.Remove(args.Uid);
-    }
 
     /// <summary>
     /// Toggles the store Ui open and closed
@@ -138,9 +138,8 @@ public sealed partial class StoreSystem
 
         //this is the person who will be passed into logic for all listing filtering.
         if (user != null) //if we have no "buyer" for this update, then don't update the listings
-        {
-            component.LastAvailableListings = GetAvailableListings(component.AccountOwner ?? user.Value, store, component).ToHashSet();
-        }
+            component.LastAvailableListings =
+                GetAvailableListings(component.AccountOwner ?? user.Value, store, component).ToHashSet();
 
         //dictionary for all currencies, including 0 values for currencies on the whitelist
         Dictionary<ProtoId<CurrencyPrototype>, FixedPoint2> allCurrency = new();
@@ -158,19 +157,18 @@ public sealed partial class StoreSystem
         // only tell operatives to lock their uplink if it can be locked
         var showFooter = HasComp<RingerUplinkComponent>(store);
 
-        var state = new StoreUpdateState(component.LastAvailableListings, allCurrency, showFooter, component.RefundAllowed);
+        var state = new StoreUpdateState(component.LastAvailableListings,
+            allCurrency,
+            showFooter,
+            component.RefundAllowed);
         _ui.SetUiState(store, StoreUiKey.Key, state);
     }
 
-    private void OnRequestUpdate(EntityUid uid, StoreComponent component, StoreRequestUpdateInterfaceMessage args)
-    {
+    private void OnRequestUpdate(EntityUid uid, StoreComponent component, StoreRequestUpdateInterfaceMessage args) =>
         UpdateUserInterface(args.Actor, GetEntity(args.Entity), component);
-    }
 
-    private void BeforeActivatableUiOpen(EntityUid uid, StoreComponent component, BeforeActivatableUIOpenEvent args)
-    {
+    private void BeforeActivatableUiOpen(EntityUid uid, StoreComponent component, BeforeActivatableUIOpenEvent args) =>
         UpdateUserInterface(args.User, uid, component);
-    }
 
     /// <summary>
     /// Handles whenever a purchase was made.
@@ -206,10 +204,9 @@ public sealed partial class StoreSystem
         foreach (var currency in listing.Cost)
         {
             if (!component.Balance.TryGetValue(currency.Key, out var balance) || balance < currency.Value)
-            {
                 return;
-            }
         }
+
         if (HasComp<NtrClientAccountComponent>(uid))
             RaiseLocalEvent(uid, new NtrListingPurchaseEvent(listing.Cost.First().Value));
         OnPurchase(listing); // Goob edit - ntr shittery
@@ -314,15 +311,22 @@ public sealed partial class StoreSystem
                         cost.TryAdd(key, FixedPoint2.Zero);
                         cost[key] += value;
                     }
+
                     originalListing = storeRefund.Data;
                 }
+
                 component.BoughtEntities.Remove(listing.ProductActionEntity.Value);
             }
 
             if (!_actionUpgrade.TryUpgradeAction(listing.ProductActionEntity, out var upgradeActionId))
             {
                 if (listing.ProductActionEntity != null)
-                    HandleRefundComp(uid, component, listing.ProductActionEntity.Value, cost, originalListing, true); // Goob edit
+                    HandleRefundComp(uid,
+                        component,
+                        listing.ProductActionEntity.Value,
+                        cost,
+                        originalListing,
+                        true); // Goob edit
 
                 return;
             }
@@ -376,10 +380,10 @@ public sealed partial class StoreSystem
         if (listing.ResetRestockOnPurchase) // goobstation edit start
         {
             // making sure that you cant buy some stuff endlessly if they are not meant to
-            var restockDuration = listing.RestockAfterPurchase ?? listing.RestockDuration; // Просто используем значение напрямую
+            var restockDuration =
+                listing.RestockAfterPurchase ?? listing.RestockDuration; // Просто используем значение напрямую
             listing.RestockTime = _timing.CurTime + restockDuration;
         } // goob edit end
-
     }
 
     /// <summary>
@@ -417,7 +421,7 @@ public sealed partial class StoreSystem
             var cashId = proto.Cash[value];
             var amountToSpawn = (int) MathF.Floor((float) (amountRemaining / value));
             var ents = _stack.SpawnMultiple(cashId, amountToSpawn, coordinates);
-            if (ents.FirstOrDefault() is {} ent)
+            if (ents.FirstOrDefault() is { } ent)
                 _hands.PickupOrDrop(buyer, ent);
             amountRemaining -= value * amountToSpawn;
         }
@@ -493,7 +497,7 @@ public sealed partial class StoreSystem
     private void UpdateRefundUserInterface(EntityUid uid, StoreComponent component)
     {
         if (!IsOnStartingMap(uid, component))
-            _ui.SetUiState(uid, RefundUiKey.Key, new StoreRefundState(new(), true));
+            _ui.SetUiState(uid, RefundUiKey.Key, new StoreRefundState(new List<RefundListingData>(), true));
         else
         {
             List<RefundListingData> listings = new();
@@ -511,7 +515,11 @@ public sealed partial class StoreSystem
         }
     }
 
-    private bool RefundListing(EntityUid uid, StoreComponent component, EntityUid boughtEntity, EntityUid buyer, bool log)
+    private bool RefundListing(EntityUid uid,
+        StoreComponent component,
+        EntityUid boughtEntity,
+        EntityUid buyer,
+        bool log)
     {
         if (!IsOnStartingMap(uid, component) || !Exists(boughtEntity) ||
             !TryComp(boughtEntity, out StoreRefundComponent? refundComp) || refundComp.Data == null ||
@@ -519,7 +527,9 @@ public sealed partial class StoreSystem
             return false;
 
         if (log)
-            _admin.Add(LogType.StoreRefund, LogImpact.Low, $"{ToPrettyString(buyer):player} has refunded {ToPrettyString(boughtEntity):purchase} from {ToPrettyString(uid):store}");
+            _admin.Add(LogType.StoreRefund,
+                LogImpact.Low,
+                $"{ToPrettyString(buyer):player} has refunded {ToPrettyString(boughtEntity):purchase} from {ToPrettyString(uid):store}");
 
         foreach (var (currency, value) in refundComp.BalanceSpent)
         {
@@ -580,7 +590,9 @@ public sealed partial class StoreSystem
             return;
         }
 
-        _admin.Add(LogType.StoreRefund, LogImpact.Low, $"{ToPrettyString(buyer):player} has refunded their purchases from {ToPrettyString(uid):store}");
+        _admin.Add(LogType.StoreRefund,
+            LogImpact.Low,
+            $"{ToPrettyString(buyer):player} has refunded their purchases from {ToPrettyString(uid):store}");
 
         for (var i = component.BoughtEntities.Count - 1; i >= 0; i--)
         {
@@ -600,7 +612,12 @@ public sealed partial class StoreSystem
     }
     // Goobstation end
 
-    private void HandleRefundComp(EntityUid uid, StoreComponent component, EntityUid purchase, Dictionary<ProtoId<CurrencyPrototype>, FixedPoint2> cost, ListingData? data, bool overrideCost = false) // Goob edit
+    private void HandleRefundComp(EntityUid uid,
+        StoreComponent component,
+        EntityUid purchase,
+        Dictionary<ProtoId<CurrencyPrototype>, FixedPoint2> cost,
+        ListingData? data,
+        bool overrideCost = false) // Goob edit
     {
         component.BoughtEntities.Add(purchase);
         var refundComp = EnsureComp<StoreRefundComponent>(purchase);
@@ -629,7 +646,7 @@ public sealed partial class StoreSystem
     }
 
     /// <summary>
-    ///     Disables refunds for this store
+    /// Disables refunds for this store
     /// </summary>
     public void DisableRefund(EntityUid store, StoreComponent? component = null)
     {

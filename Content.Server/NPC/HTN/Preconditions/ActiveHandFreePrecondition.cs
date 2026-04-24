@@ -14,8 +14,6 @@ public sealed partial class ActiveHandFreePrecondition : HTNPrecondition
 {
     [Dependency] private readonly IEntityManager _entManager = default!;
 
-    public override bool IsMet(NPCBlackboard blackboard)
-    {
-        return blackboard.TryGetValue<bool>(NPCBlackboard.ActiveHandFree, out var handFree, _entManager) && handFree;
-    }
+    public override bool IsMet(NPCBlackboard blackboard) =>
+        blackboard.TryGetValue<bool>(NPCBlackboard.ActiveHandFree, out var handFree, _entManager) && handFree;
 }

@@ -5,9 +5,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Server._Shitmed.DelayedDeath;
+using Content.Server.Popups;
 using Content.Shared._Shitmed.Body.Organ;
 using Content.Shared.Body.Systems;
-using Content.Server.Popups;
 using Content.Shared.Speech;
 using Content.Shared.Standing;
 using Content.Shared.Stunnable;
@@ -15,14 +15,15 @@ using Content.Shared.Stunnable;
 namespace Content.Server._Shitmed.Body.Systems;
 
 /// <summary>
-///     This system handles behavior on entities when they lose their head or their brains are removed.
-///     MindComponent fuckery should still be mainly handled on BrainSystem as usual.
+/// This system handles behavior on entities when they lose their head or their brains are removed.
+/// MindComponent fuckery should still be mainly handled on BrainSystem as usual.
 /// </summary>
 public sealed class DebrainedSystem : EntitySystem
 {
     [Dependency] private readonly SharedBodySystem _bodySystem = default!;
     [Dependency] private readonly PopupSystem _popupSystem = default!;
     [Dependency] private readonly StandingStateSystem _standingSystem = default!;
+
     public override void Initialize()
     {
         base.Initialize();
@@ -60,8 +61,5 @@ public sealed class DebrainedSystem : EntitySystem
         args.Cancel();
     }
 
-    private void OnStandAttempt(EntityUid uid, DebrainedComponent _, StandAttemptEvent args)
-    {
-        args.Cancel();
-    }
+    private void OnStandAttempt(EntityUid uid, DebrainedComponent _, StandAttemptEvent args) => args.Cancel();
 }

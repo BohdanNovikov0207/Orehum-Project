@@ -22,6 +22,7 @@ public sealed partial class CryoPodEjectLockWireAction : ComponentWireAction<Cry
     public override bool LightRequiresPower { get; set; } = false;
 
     public override object? StatusKey { get; } = CryoPodWireActionKey.Key;
+
     public override bool Cut(EntityUid user, Wire wire, CryoPodComponent cryoPodComponent)
     {
         if (!cryoPodComponent.PermaLocked)

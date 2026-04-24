@@ -13,7 +13,7 @@ using Robust.Server.GameObjects;
 namespace Content.Server.Worldgen.Systems;
 
 /// <summary>
-///     This handles loading in objects based on distance from player, using some metadata on chunks.
+/// This handles loading in objects based on distance from player, using some metadata on chunks.
 /// </summary>
 public sealed class LocalityLoaderSystem : BaseWorldSystem
 {
@@ -51,7 +51,8 @@ public sealed class LocalityLoaderSystem : BaseWorldSystem
                         if (!xformQuery.TryGetComponent(loader, out var loaderXform))
                             continue;
 
-                        if ((_xformSys.GetWorldPosition(loaderXform) - _xformSys.GetWorldPosition(xform)).Length() > loadable.LoadingDistance)
+                        if ((_xformSys.GetWorldPosition(loaderXform) - _xformSys.GetWorldPosition(xform)).Length() >
+                            loadable.LoadingDistance)
                             continue;
 
                         RaiseLocalEvent(uid, new LocalStructureLoadedEvent());
@@ -66,6 +67,6 @@ public sealed class LocalityLoaderSystem : BaseWorldSystem
 }
 
 /// <summary>
-///     A directed fired on a loadable entity when a local loader enters it's vicinity.
+/// A directed fired on a loadable entity when a local loader enters it's vicinity.
 /// </summary>
 public record struct LocalStructureLoadedEvent;

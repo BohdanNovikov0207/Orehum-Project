@@ -8,10 +8,10 @@ using Robust.Shared.Random;
 
 namespace Content.Server.IconSmoothing;
 
-public sealed partial class RandomIconSmoothSystem : SharedRandomIconSmoothSystem
+public sealed class RandomIconSmoothSystem : SharedRandomIconSmoothSystem
 {
-    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
 
     public override void Initialize()
     {

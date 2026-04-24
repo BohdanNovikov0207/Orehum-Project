@@ -20,10 +20,10 @@ namespace Content.Server.CartridgeLoader.Cartridges;
 
 public sealed class NetProbeCartridgeSystem : EntitySystem
 {
-    [Dependency] private readonly CartridgeLoaderSystem? _cartridgeLoaderSystem = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
     [Dependency] private readonly SharedAudioSystem _audioSystem = default!;
+    [Dependency] private readonly CartridgeLoaderSystem? _cartridgeLoaderSystem = default!;
+    [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
 
     public override void Initialize()
     {
@@ -34,9 +34,10 @@ public sealed class NetProbeCartridgeSystem : EntitySystem
 
     /// <summary>
     /// The <see cref="CartridgeAfterInteractEvent" /> gets relayed to this system if the cartridge loader is running
-    /// the NetProbe program and someone clicks on something with it. <br/>
-    /// <br/>
-    /// Saves name, address... etc. of the device that was clicked into a list on the component when the device isn't already present in that list
+    /// the NetProbe program and someone clicks on something with it. <br />
+    /// <br />
+    /// Saves name, address... etc. of the device that was clicked into a list on the component when the device isn't already
+    /// present in that list
     /// </summary>
     private void AfterInteract(EntityUid uid, NetProbeCartridgeComponent component, CartridgeAfterInteractEvent args)
     {
@@ -58,7 +59,7 @@ public sealed class NetProbeCartridgeSystem : EntitySystem
 
         //Play scanning sound with slightly randomized pitch
         //Why is there no NextFloat(float min, float max)???
-        var audioParams = AudioParams.Default.WithVolume(-2f).WithPitchScale((float)_random.Next(12, 21) / 10);
+        var audioParams = AudioParams.Default.WithVolume(-2f).WithPitchScale((float) _random.Next(12, 21) / 10);
         _audioSystem.PlayEntity(component.SoundScan, args.InteractEvent.User, target, audioParams);
         _popupSystem.PopupCursor(Loc.GetString("net-probe-scan", ("device", target)), args.InteractEvent.User);
 
@@ -82,10 +83,8 @@ public sealed class NetProbeCartridgeSystem : EntitySystem
     /// <summary>
     /// This gets called when the ui fragment needs to be updated for the first time after activating
     /// </summary>
-    private void OnUiReady(EntityUid uid, NetProbeCartridgeComponent component, CartridgeUiReadyEvent args)
-    {
+    private void OnUiReady(EntityUid uid, NetProbeCartridgeComponent component, CartridgeUiReadyEvent args) =>
         UpdateUiState(uid, args.Loader, component);
-    }
 
     private void UpdateUiState(EntityUid uid, EntityUid loaderUid, NetProbeCartridgeComponent? component)
     {

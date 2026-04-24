@@ -10,9 +10,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Linq;
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Server.Storage.EntitySystems;
 using Content.Server.Store.Systems;
-using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Store;
 using Content.Shared.Store.Components;
 using Robust.Shared.Random;
@@ -21,8 +21,8 @@ namespace Content.Server.Traitor.Uplink.SurplusBundle;
 
 public sealed class SurplusBundleSystem : EntitySystem
 {
-    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly EntityStorageSystem _entityStorage = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly StoreSystem _store = default!;
 
     public override void Initialize()

@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Content.Shared.Maps;
 using Content.Shared.Procedural;
 using Content.Shared.Procedural.PostGeneration;
-using Content.Shared.Storage;
 using Robust.Shared.Collections;
 using Robust.Shared.Map;
 
@@ -16,7 +15,7 @@ namespace Content.Server.Procedural.DungeonJob;
 public sealed partial class DungeonJob
 {
     /// <summary>
-    /// <see cref="EntranceFlankDunGen"/>
+    ///     <see cref="EntranceFlankDunGen" />
     /// </summary>
     private async Task PostGen(EntranceFlankDunGen gen, Dungeon dungeon, HashSet<Vector2i> reservedTiles, Random random)
     {
@@ -50,7 +49,8 @@ public sealed partial class DungeonJob
 
         foreach (var entrance in spawnPositions)
         {
-            _entManager.SpawnEntitiesAttachedTo(_maps.GridTileToLocal(_gridUid, _grid, entrance), _entTable.GetSpawns(contents, random));
+            _entManager.SpawnEntitiesAttachedTo(_maps.GridTileToLocal(_gridUid, _grid, entrance),
+                _entTable.GetSpawns(contents, random));
         }
     }
 }

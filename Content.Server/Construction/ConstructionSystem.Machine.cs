@@ -30,10 +30,8 @@ public sealed partial class ConstructionSystem
         component.PartContainer = _container.EnsureContainer<Container>(uid, MachineFrameComponent.PartContainerName);
     }
 
-    private void OnMachineMapInit(EntityUid uid, MachineComponent component, MapInitEvent args)
-    {
+    private void OnMachineMapInit(EntityUid uid, MachineComponent component, MapInitEvent args) =>
         CreateBoardAndStockParts(uid, component);
-    }
 
     private void CreateBoardAndStockParts(EntityUid uid, MachineComponent component)
     {
@@ -50,28 +48,28 @@ public sealed partial class ConstructionSystem
 
         var xform = Transform(uid);
         if (!TrySpawnInContainer(component.Board, uid, MachineFrameComponent.BoardContainerName, out var board))
-        {
-            throw new Exception($"Couldn't insert board with prototype {component.Board} to machine with prototype {Prototype(uid)?.ID ?? "N/A"}!");
-        }
+            throw new Exception(
+                $"Couldn't insert board with prototype {component.Board} to machine with prototype {Prototype(uid)?.ID ?? "N/A"}!");
 
         if (!TryComp<MachineBoardComponent>(board, out var machineBoard))
-        {
-            throw new Exception($"Entity with prototype {component.Board} doesn't have a {nameof(MachineBoardComponent)}!");
-        }
+            throw new Exception(
+                $"Entity with prototype {component.Board} doesn't have a {nameof(MachineBoardComponent)}!");
 
         foreach (var (stackType, amount) in machineBoard.StackRequirements)
         {
             var stack = _stackSystem.Spawn(amount, stackType, xform.Coordinates);
             if (!_container.Insert(stack, partContainer))
-                throw new Exception($"Couldn't insert machine material of type {stackType} to machine with prototype {Prototype(uid)?.ID ?? "N/A"}");
+                throw new Exception(
+                    $"Couldn't insert machine material of type {stackType} to machine with prototype {Prototype(uid)?.ID ?? "N/A"}");
         }
 
         foreach (var (compName, info) in machineBoard.ComponentRequirements)
         {
             for (var i = 0; i < info.Amount; i++)
             {
-                if(!TrySpawnInContainer(info.DefaultPrototype, uid, MachineFrameComponent.PartContainerName, out _))
-                    throw new Exception($"Couldn't insert machine component part with default prototype '{compName}' to machine with prototype {Prototype(uid)?.ID ?? "N/A"}");
+                if (!TrySpawnInContainer(info.DefaultPrototype, uid, MachineFrameComponent.PartContainerName, out _))
+                    throw new Exception(
+                        $"Couldn't insert machine component part with default prototype '{compName}' to machine with prototype {Prototype(uid)?.ID ?? "N/A"}");
             }
         }
 
@@ -79,8 +77,9 @@ public sealed partial class ConstructionSystem
         {
             for (var i = 0; i < info.Amount; i++)
             {
-                if(!TrySpawnInContainer(info.DefaultPrototype, uid, MachineFrameComponent.PartContainerName, out _))
-                    throw new Exception($"Couldn't insert machine component part with default prototype '{tagName}' to machine with prototype {Prototype(uid)?.ID ?? "N/A"}");
+                if (!TrySpawnInContainer(info.DefaultPrototype, uid, MachineFrameComponent.PartContainerName, out _))
+                    throw new Exception(
+                        $"Couldn't insert machine component part with default prototype '{tagName}' to machine with prototype {Prototype(uid)?.ID ?? "N/A"}");
             }
         }
     }

@@ -14,7 +14,7 @@ namespace Content.Server.GridPreloader;
 /// Component storing data about preloaded grids and their location
 /// Goes on the map entity
 /// </summary>
-[RegisterComponent, Access(typeof(GridPreloaderSystem))]
+[RegisterComponent] [Access(typeof(GridPreloaderSystem))]
 public sealed partial class GridPreloaderComponent : Component
 {
     [DataField]

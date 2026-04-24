@@ -12,18 +12,19 @@ namespace Content.Server._White.Spawners.Systems;
 
 public sealed class AreaSpawnerSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly TurfSystem _turf = default!;
     [Dependency] private readonly MapSystem _map = default!;
-    [Dependency] private readonly TransformSystem _transform = default!;
 
-    private readonly List<Vector2> _offsets = new List<Vector2>
+    private readonly List<Vector2> _offsets = new()
     {
-                           new Vector2(0, 1),
-        new Vector2(-1, 0),                  new Vector2(1, 0),
-                           new Vector2(0, -1)
+        new Vector2(0, 1),
+        new Vector2(-1, 0), new Vector2(1, 0),
+        new Vector2(0, -1),
     };
+
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly TransformSystem _transform = default!;
+    [Dependency] private readonly TurfSystem _turf = default!;
 
     public override void Initialize()
     {

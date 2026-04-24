@@ -8,12 +8,19 @@ using Robust.Shared.Containers;
 using Robust.Shared.Prototypes;
 
 namespace Content.Server.Explosion.Components;
+
 /// <summary>
 /// Grenades that, when triggered, explode into projectiles
 /// </summary>
-[RegisterComponent, Access(typeof(ProjectileGrenadeSystem))]
+[RegisterComponent] [Access(typeof(ProjectileGrenadeSystem))]
 public sealed partial class ProjectileGrenadeComponent : Component
 {
+    /// <summary>
+    /// Total amount of projectiles
+    /// </summary>
+    [DataField]
+    public int Capacity = 3;
+
     public Container Container = default!;
 
     /// <summary>
@@ -23,21 +30,10 @@ public sealed partial class ProjectileGrenadeComponent : Component
     public EntProtoId? FillPrototype;
 
     /// <summary>
-    ///     If we have a pre-fill how many more can we spawn.
-    /// </summary>
-    public int UnspawnedCount;
-
-    /// <summary>
-    ///     Total amount of projectiles
+    /// The maximum speed the projectiles may come out at
     /// </summary>
     [DataField]
-    public int Capacity = 3;
-
-    /// <summary>
-    ///     Should the angle of the projectiles be uneven?
-    /// </summary>
-    [DataField]
-    public bool RandomAngle = false;
+    public float MaxVelocity = 6f;
 
     /// <summary>
     /// The minimum speed the projectiles may come out at
@@ -46,14 +42,19 @@ public sealed partial class ProjectileGrenadeComponent : Component
     public float MinVelocity = 2f;
 
     /// <summary>
-    /// The maximum speed the projectiles may come out at
+    /// Should the angle of the projectiles be uneven?
     /// </summary>
     [DataField]
-    public float MaxVelocity = 6f;
+    public bool RandomAngle = false;
 
     /// <summary>
     /// The trigger key that will activate the grenade.
     /// </summary>
     [DataField]
     public string TriggerKey = "trigger"; // Goobstation shrapnel payload
+
+    /// <summary>
+    /// If we have a pre-fill how many more can we spawn.
+    /// </summary>
+    public int UnspawnedCount;
 }

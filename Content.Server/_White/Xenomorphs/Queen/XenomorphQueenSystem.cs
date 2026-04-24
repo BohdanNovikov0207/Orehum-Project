@@ -3,23 +3,20 @@ using Content.Server._White.Xenomorphs.Plasma;
 using Content.Server.Actions;
 using Content.Server.Mind;
 using Content.Server.Popups;
-using Content.Shared._White.Actions;
 using Content.Shared._White.Xenomorphs;
 using Content.Shared._White.Xenomorphs.Queen;
 using Content.Shared._White.Xenomorphs.Xenomorph;
-using Content.Shared.Mind.Components;
-using Content.Shared.Popups;
 
 namespace Content.Server._White.Xenomorphs.Queen;
 
 public sealed class XenomorphQueenSystem : EntitySystem
 {
     [Dependency] private readonly ActionsSystem _actions = default!;
+    [Dependency] private readonly IEntityManager _entityManager = default!;
+    [Dependency] private readonly MindSystem _mind = default!;
     [Dependency] private readonly PlasmaSystem _plasma = default!;
     [Dependency] private readonly PopupSystem _popup = default!;
-    [Dependency] private readonly MindSystem _mind = default!;
     [Dependency] private readonly XenomorphEvolutionSystem _xenomorphEvolution = default!;
-    [Dependency] private readonly IEntityManager _entityManager = default!;
 
     public override void Initialize()
     {
@@ -74,9 +71,7 @@ public sealed class XenomorphQueenSystem : EntitySystem
         // Copy over any important components
         if (TryComp<XenomorphComponent>(newXeno, out var newXenoComp) &&
             TryComp<XenomorphComponent>(target, out var oldXenoComp))
-        {
             newXenoComp.Caste = oldXenoComp.Caste;
-        }
 
         // Update the caste to Praetorian for the new entity
         if (TryComp<XenomorphComponent>(newXeno, out var xenomorphComp))

@@ -14,11 +14,11 @@ using Content.Shared.Radiation.Components;
 namespace Content.Server.Anomaly.Effects;
 
 /// <summary>
-/// This handles logic and events relating to <see cref="GravityAnomalyComponent"/> and <seealso cref="AnomalySystem"/>
+/// This handles logic and events relating to <see cref="GravityAnomalyComponent" /> and <seealso cref="AnomalySystem" />
 /// </summary>
 public sealed class GravityAnomalySystem : SharedGravityAnomalySystem
 {
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();

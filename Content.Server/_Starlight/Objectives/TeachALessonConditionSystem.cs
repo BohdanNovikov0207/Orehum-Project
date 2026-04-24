@@ -2,9 +2,10 @@ using Content.Server.Ghost;
 using Content.Server.Objectives.Components;
 using Content.Shared.Bed.Cryostorage;
 using Content.Shared.Mind;
-using Content.Shared.Mind.Components; // goob - fix teach a lesson
+using Content.Shared.Mind.Components;
 using Content.Shared.Mobs;
 using Content.Shared.Objectives.Components;
+// goob - fix teach a lesson
 
 namespace Content.Server._Starlight.Objectives;
 
@@ -19,16 +20,15 @@ public sealed class TeachALessonConditionSystem : EntitySystem
 
         SubscribeLocalEvent<TeachALessonTargetComponent, MobStateChangedEvent>(OnMobStateChanged);
         SubscribeLocalEvent<TeachALessonTargetComponent, MindAddedMessage>(OnMindAdded);
-        SubscribeLocalEvent<TeachALessonTargetComponent, MindRemovedMessage>(OnMindRemoved); // goob - fix teach a lesson
+        SubscribeLocalEvent<TeachALessonTargetComponent, MindRemovedMessage>(
+            OnMindRemoved); // goob - fix teach a lesson
         SubscribeLocalEvent<GhostAttemptHandleEvent>(OnGhostAttempt); // goob - fix teach a lesson
         SubscribeLocalEvent<TeachALessonConditionComponent, ObjectiveAfterAssignEvent>(OnAfterAssign);
         SubscribeLocalEvent<TeachALessonConditionComponent, ObjectiveGetProgressEvent>(OnGetProgress);
     }
 
-    private void OnGetProgress(Entity<TeachALessonConditionComponent> ent, ref ObjectiveGetProgressEvent args)
-    {
+    private void OnGetProgress(Entity<TeachALessonConditionComponent> ent, ref ObjectiveGetProgressEvent args) =>
         args.Progress = ent.Comp.HasDied ? 1.0f : 0.0f;
-    }
 
     private void OnAfterAssign(Entity<TeachALessonConditionComponent> ent, ref ObjectiveAfterAssignEvent args)
     {
@@ -46,7 +46,10 @@ public sealed class TeachALessonConditionSystem : EntitySystem
         targetComponent.Teachers.Add(ent.Owner);
     }
 
-    private void OnMindAdded(EntityUid uid, TeachALessonTargetComponent component, MindAddedMessage args) // goob - fix teach a lesson
+    private void
+        OnMindAdded(EntityUid uid,
+            TeachALessonTargetComponent component,
+            MindAddedMessage args) // goob - fix teach a lesson
     {
         var targetComponent = EnsureComp<TeachALessonTargetComponent>(args.Container.Owner);
         foreach (var teacher in component.Teachers)
@@ -55,13 +58,14 @@ public sealed class TeachALessonConditionSystem : EntitySystem
         }
     }
 
-    private void OnMindRemoved(EntityUid uid, TeachALessonTargetComponent component, MindRemovedMessage args) // goob - fix teach a lesson
+    private void
+        OnMindRemoved(EntityUid uid,
+            TeachALessonTargetComponent component,
+            MindRemovedMessage args) // goob - fix teach a lesson
     {
         // cryo storage fix godo
         if (TryComp<CryostorageContainedComponent>(uid, out var contained) && contained.GracePeriodEndTime == null)
-        {
             TriggerObjective(component);
-        }
 
         RemCompDeferred<TeachALessonTargetComponent>(uid);
     }

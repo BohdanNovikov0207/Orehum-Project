@@ -20,9 +20,9 @@ using Content.Server.Administration;
 using Content.Shared.Administration;
 using Content.Shared.Maps;
 using Content.Shared.Tag;
+using Robust.Server.GameObjects;
 using Robust.Shared.Console;
 using Robust.Shared.Map;
-using Robust.Server.GameObjects;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Prototypes;
 
@@ -31,6 +31,9 @@ namespace Content.Server.Construction.Commands;
 [AdminCommand(AdminFlags.Mapping)]
 public sealed class TileWallsCommand : IConsoleCommand
 {
+    public static readonly ProtoId<ContentTileDefinition> TilePrototypeId = "Plating";
+    public static readonly ProtoId<TagPrototype> WallTag = "Wall";
+    public static readonly ProtoId<TagPrototype> DiagonalTag = "Diagonal";
     [Dependency] private readonly IEntityManager _entManager = default!;
     [Dependency] private readonly ITileDefinitionManager _tileDefManager = default!;
 
@@ -38,10 +41,6 @@ public sealed class TileWallsCommand : IConsoleCommand
     public string Command => "tilewalls";
     public string Description => "Puts an underplating tile below every wall on a grid.";
     public string Help => $"Usage: {Command} <gridId> | {Command}";
-
-    public static readonly ProtoId<ContentTileDefinition> TilePrototypeId = "Plating";
-    public static readonly ProtoId<TagPrototype> WallTag = "Wall";
-    public static readonly ProtoId<TagPrototype> DiagonalTag = "Diagonal";
 
     public void Execute(IConsoleShell shell, string argStr, string[] args)
     {
@@ -93,35 +92,25 @@ public sealed class TileWallsCommand : IConsoleCommand
         while (enumerator.MoveNext(out var child))
         {
             if (!_entManager.EntityExists(child))
-            {
                 continue;
-            }
 
             if (!tagSystem.HasTag(child, WallTag))
-            {
                 continue;
-            }
 
             if (tagSystem.HasTag(child, DiagonalTag))
-            {
                 continue;
-            }
 
             var childTransform = _entManager.GetComponent<TransformComponent>(child);
 
             if (!childTransform.Anchored)
-            {
                 continue;
-            }
 
             var mapSystem = _entManager.System<MapSystem>();
             var tile = mapSystem.GetTileRef(gridId.Value, grid, childTransform.Coordinates);
-            var tileDef = (ContentTileDefinition)_tileDefManager[tile.Tile.TypeId];
+            var tileDef = (ContentTileDefinition) _tileDefManager[tile.Tile.TypeId];
 
             if (tileDef.ID == TilePrototypeId)
-            {
                 continue;
-            }
 
             mapSystem.SetTile(gridId.Value, grid, childTransform.Coordinates, underplatingTile);
             changed++;

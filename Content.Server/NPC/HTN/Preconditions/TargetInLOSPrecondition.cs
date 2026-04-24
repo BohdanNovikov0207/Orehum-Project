@@ -18,11 +18,11 @@ public sealed partial class TargetInLOSPrecondition : HTNPrecondition
     private InteractionSystem _interaction = default!;
     private StealthSystem _stealth = default!; // goob edit
 
-    [DataField("targetKey")]
-    public string TargetKey = "Target";
-
     [DataField("rangeKey")]
     public string RangeKey = "RangeKey";
+
+    [DataField("targetKey")]
+    public string TargetKey = "Target";
 
     [DataField("opaqueKey")]
     public bool UseOpaqueForLOSChecksKey = true;
@@ -42,11 +42,14 @@ public sealed partial class TargetInLOSPrecondition : HTNPrecondition
             return false;
 
         // goob edit - stealthed entities can't be seen by npcs
-        if (_entManager.TryGetComponent<StealthComponent>(target, out var stealth) && _stealth.GetVisibility(target, stealth) <= stealth.ExamineThreshold)
+        if (_entManager.TryGetComponent<StealthComponent>(target, out var stealth) &&
+            _stealth.GetVisibility(target, stealth) <= stealth.ExamineThreshold)
             return false;
 
         var range = blackboard.GetValueOrDefault<float>(RangeKey, _entManager);
-        var collisionGroup = UseOpaqueForLOSChecksKey ? CollisionGroup.Opaque : (CollisionGroup.Impassable | CollisionGroup.InteractImpassable);
+        var collisionGroup = UseOpaqueForLOSChecksKey
+            ? CollisionGroup.Opaque
+            : CollisionGroup.Impassable | CollisionGroup.InteractImpassable;
 
         return _interaction.InRangeUnobstructed(owner, target, range, collisionGroup);
     }

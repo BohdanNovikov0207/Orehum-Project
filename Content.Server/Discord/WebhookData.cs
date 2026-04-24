@@ -40,8 +40,5 @@ public struct WebhookData
     [JsonPropertyName("url")]
     public string? Url { get; set; }
 
-    public WebhookIdentifier ToIdentifier()
-    {
-        return new WebhookIdentifier(Id, Token);
-    }
+    public WebhookIdentifier ToIdentifier() => new(Id, Token);
 }

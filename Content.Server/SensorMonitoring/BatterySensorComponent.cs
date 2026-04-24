@@ -12,7 +12,7 @@ namespace Content.Server.SensorMonitoring;
 /// Enables a battery entity (such as an SMES) to be monitored via the sensor monitoring console.
 /// </summary>
 /// <remarks>
-/// The entity should also have a <see cref="BatteryComponent"/> and <see cref="PowerNetworkBatteryComponent"/>.
+/// The entity should also have a <see cref="BatteryComponent" /> and <see cref="PowerNetworkBatteryComponent" />.
 /// </remarks>
 [RegisterComponent]
 public sealed partial class BatterySensorComponent : Component
@@ -20,7 +20,7 @@ public sealed partial class BatterySensorComponent : Component
 }
 
 /// <summary>
-/// Device network data sent by a <see cref="BatterySensorComponent"/>.
+/// Device network data sent by a <see cref="BatterySensorComponent" />.
 /// </summary>
 /// <param name="Charge">The current energy charge of the battery, in joules (J).</param>
 /// <param name="MaxCharge">The maximum energy capacity of the battery, in joules (J).</param>

@@ -33,7 +33,7 @@ public sealed class IceCubeSystem : SharedIceCubeSystem
 
         SubscribeLocalEvent<IceCubeComponent, OnTemperatureChangeEvent>(OnTemperatureChange);
         SubscribeLocalEvent<IceCubeComponent, DamageChangedEvent>(OnDamageChanged);
-        SubscribeLocalEvent<IceCubeComponent, BeforeStaminaDamageEvent>(OnStaminaDamage, before: [typeof(SharedStaminaSystem)]);
+        SubscribeLocalEvent<IceCubeComponent, BeforeStaminaDamageEvent>(OnStaminaDamage, [typeof(SharedStaminaSystem)]);
         SubscribeLocalEvent<IceCubeOnProjectileHitComponent, ProjectileHitEvent>(OnHit);
     }
 
@@ -99,10 +99,8 @@ public sealed class IceCubeSystem : SharedIceCubeSystem
         return _random.Prob(probability);
     }
 
-    private float InverseLerp(float min, float max, float value)
-    {
-        return max <= min ? 1f : Math.Clamp((value - min) / (max - min), 0f , 1f);
-    }
+    private float InverseLerp(float min, float max, float value) =>
+        max <= min ? 1f : Math.Clamp((value - min) / (max - min), 0f, 1f);
 
     private void OnTemperatureChange(Entity<IceCubeComponent> ent, ref OnTemperatureChangeEvent args)
     {

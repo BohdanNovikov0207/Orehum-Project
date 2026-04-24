@@ -13,14 +13,12 @@ namespace Content.Server._ADT.Geras;
 [RegisterComponent]
 public sealed partial class GerasComponent : Component
 {
-    [DataField] public ProtoId<PolymorphPrototype> GerasPolymorphId = "SlimeMorphGeras";
-
     [DataField] public EntProtoId GerasAction = "ADTActionMorphGeras";
 
     [DataField] public EntityUid? GerasActionEntity;
-
-    [DataField] public bool NoAction = false;
+    [DataField] public ProtoId<PolymorphPrototype> GerasPolymorphId = "SlimeMorphGeras";
 
     [DataField] public TimeSpan MorphDoAfter = TimeSpan.FromSeconds(5);
-}
 
+    [DataField] public bool NoAction = false;
+}

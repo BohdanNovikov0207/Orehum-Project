@@ -8,7 +8,7 @@ using Content.Shared.MouseRotator;
 
 namespace Content.Server.MouseRotator;
 
-/// <inheritdoc/>
+/// <inheritdoc />
 public sealed class MouseRotatorSystem : SharedMouseRotatorSystem
 {
 }

@@ -19,16 +19,16 @@ public sealed partial class ShuttleConsoleSystem
     {
         SubscribeLocalEvent<ShuttleConsoleComponent, ComponentStartup>(OnConsoleStartup);
 
-        Subs.BuiEvents<ShuttleConsoleComponent>(ShuttleConsoleUiKey.Key, subs =>
-        {
-            subs.Event<ShuttlePortButtonPressedMessage>(OnShuttlePortButtonPressed);
-        });
+        Subs.BuiEvents<ShuttleConsoleComponent>(ShuttleConsoleUiKey.Key,
+            subs =>
+            {
+                subs.Event<ShuttlePortButtonPressedMessage>(OnShuttlePortButtonPressed);
+            });
     }
 
-    private void OnShuttlePortButtonPressed(EntityUid uid, ShuttleConsoleComponent component, ShuttlePortButtonPressedMessage args)
-    {
-        _deviceLink.SendSignal(uid, args.SourcePort, true);
-    }
+    private void OnShuttlePortButtonPressed(EntityUid uid,
+        ShuttleConsoleComponent component,
+        ShuttlePortButtonPressedMessage args) => _deviceLink.SendSignal(uid, args.SourcePort, true);
 
     private void OnConsoleStartup(EntityUid uid, ShuttleConsoleComponent component, ComponentStartup args)
     {
@@ -50,6 +50,8 @@ public sealed partial class ShuttleConsoleSystem
 
         // Clear all signal states to prevent unwanted signals when establishing new connections
         foreach (var sourcePort in component.SourcePorts)
+        {
             _deviceLink.ClearSignal((uid, sourceComp), sourcePort);
+        }
     }
 }

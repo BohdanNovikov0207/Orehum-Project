@@ -47,8 +47,8 @@ namespace Content.Server.Power.Components;
 [RegisterComponent]
 public sealed partial class ApcComponent : BaseApcNetComponent
 {
-    [DataField("onReceiveMessageSound")]
-    public SoundSpecifier OnReceiveMessageSound = new SoundPathSpecifier("/Audio/Machines/machine_switch.ogg");
+    public const float HighPowerThreshold = 0.9f;
+    public static TimeSpan VisualsChangeDelay = TimeSpan.FromSeconds(1);
 
     public ApcChargeState LastChargeState;
     public TimeSpan? LastChargeStateTime;
@@ -57,7 +57,7 @@ public sealed partial class ApcComponent : BaseApcNetComponent
 
     /// <summary>
     /// Time the ui was last updated automatically.
-    /// Done after every <see cref="VisualsChangeDelay"/> to show the latest load.
+    /// Done after every <see cref="VisualsChangeDelay" /> to show the latest load.
     /// If charge state changes it will be instantly updated.
     /// </summary>
     public TimeSpan LastUiUpdate;
@@ -70,18 +70,12 @@ public sealed partial class ApcComponent : BaseApcNetComponent
     /// </summary>
     public bool NeedStateUpdate;
 
-    public const float HighPowerThreshold = 0.9f;
-    public static TimeSpan VisualsChangeDelay = TimeSpan.FromSeconds(1);
+    [DataField("onReceiveMessageSound")]
+    public SoundSpecifier OnReceiveMessageSound = new SoundPathSpecifier("/Audio/Machines/machine_switch.ogg");
 
     // TODO ECS power a little better!
     // End the suffering
-    protected override void AddSelfToNet(IApcNet apcNet)
-    {
-        apcNet.AddApc(Owner, this);
-    }
+    protected override void AddSelfToNet(IApcNet apcNet) => apcNet.AddApc(Owner, this);
 
-    protected override void RemoveSelfFromNet(IApcNet apcNet)
-    {
-        apcNet.RemoveApc(Owner, this);
-    }
+    protected override void RemoveSelfFromNet(IApcNet apcNet) => apcNet.RemoveApc(Owner, this);
 }

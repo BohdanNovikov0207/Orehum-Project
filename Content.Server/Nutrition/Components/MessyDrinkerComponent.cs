@@ -10,20 +10,20 @@ namespace Content.Server.Nutrition.Components;
 [RegisterComponent]
 public sealed partial class MessyDrinkerComponent : Component
 {
-    [DataField]
-    public float SpillChance = 0.2f;
-
-    /// <summary>
-    /// The amount of solution that is spilled when <see cref="SpillChance"/> procs.
-    /// </summary>
-    [DataField]
-    public FixedPoint2 SpillAmount = 1.0;
-
     /// <summary>
     /// The types of food prototypes we can spill
     /// </summary>
     [DataField]
-    public List<ProtoId<EdiblePrototype>> SpillableTypes = new List<ProtoId<EdiblePrototype>> { "Drink" };
+    public List<ProtoId<EdiblePrototype>> SpillableTypes = new() { "Drink" };
+
+    /// <summary>
+    /// The amount of solution that is spilled when <see cref="SpillChance" /> procs.
+    /// </summary>
+    [DataField]
+    public FixedPoint2 SpillAmount = 1.0;
+
+    [DataField]
+    public float SpillChance = 0.2f;
 
     [DataField]
     public LocId? SpillMessagePopup;

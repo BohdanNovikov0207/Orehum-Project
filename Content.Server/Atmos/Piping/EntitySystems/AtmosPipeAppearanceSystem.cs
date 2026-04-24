@@ -18,7 +18,7 @@ using Robust.Shared.Map.Components;
 
 namespace Content.Server.Atmos.Piping.EntitySystems;
 
-public sealed partial class AtmosPipeAppearanceSystem : SharedAtmosPipeAppearanceSystem
+public sealed class AtmosPipeAppearanceSystem : SharedAtmosPipeAppearanceSystem
 {
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
     [Dependency] private readonly SharedMapSystem _map = default!;
@@ -30,12 +30,12 @@ public sealed partial class AtmosPipeAppearanceSystem : SharedAtmosPipeAppearanc
         SubscribeLocalEvent<PipeAppearanceComponent, NodeGroupsRebuilt>(OnNodeUpdate);
     }
 
-    private void OnNodeUpdate(EntityUid uid, PipeAppearanceComponent component, ref NodeGroupsRebuilt args)
-    {
+    private void OnNodeUpdate(EntityUid uid, PipeAppearanceComponent component, ref NodeGroupsRebuilt args) =>
         UpdateAppearance(args.NodeOwner);
-    }
 
-    private void UpdateAppearance(EntityUid uid, AppearanceComponent? appearance = null, NodeContainerComponent? container = null,
+    private void UpdateAppearance(EntityUid uid,
+        AppearanceComponent? appearance = null,
+        NodeContainerComponent? container = null,
         TransformComponent? xform = null)
     {
         if (!Resolve(uid, ref appearance, ref container, ref xform, false))
@@ -75,7 +75,7 @@ public sealed partial class AtmosPipeAppearanceSystem : SharedAtmosPipeAppearanc
 
         foreach (var (neighbour, pipeLayer) in connected)
         {
-            var pipeIndex = (int)pipeLayer;
+            var pipeIndex = (int) pipeLayer;
 
             if (pipeIndex >= numberOfPipeLayers)
                 continue;
@@ -89,7 +89,7 @@ public sealed partial class AtmosPipeAppearanceSystem : SharedAtmosPipeAppearanc
                 (0, -1) => PipeDirection.South,
                 (1, 0) => PipeDirection.East,
                 (-1, 0) => PipeDirection.West,
-                _ => PipeDirection.None
+                _ => PipeDirection.None,
             };
 
             connectedDirections[pipeIndex] = pipeLayerDirections;
@@ -99,7 +99,9 @@ public sealed partial class AtmosPipeAppearanceSystem : SharedAtmosPipeAppearanc
         var netConnectedDirections = 0;
 
         for (var i = numberOfPipeLayers - 1; i >= 0; i--)
-            netConnectedDirections += (int)connectedDirections[i] << (PipeDirectionHelpers.PipeDirections * i);
+        {
+            netConnectedDirections += (int) connectedDirections[i] << (PipeDirectionHelpers.PipeDirections * i);
+        }
 
         _appearance.SetData(uid, PipeVisuals.VisualState, netConnectedDirections, appearance);
     }

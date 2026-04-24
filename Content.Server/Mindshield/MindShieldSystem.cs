@@ -12,17 +12,20 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Goobstation.Shared.Mindcontrol;
 using Content.Server.Administration.Logs;
 using Content.Server.Mind;
 using Content.Server.Popups;
-using Content.Server.Revolutionary.Components; // GoobStation
+using Content.Server.Revolutionary.Components;
 using Content.Server.Roles;
 using Content.Shared.Database;
 using Content.Shared.Implants;
 using Content.Shared.Mindshield.Components;
-using Content.Shared.Revolutionary; // GoobStation
+using Content.Shared.Revolutionary;
 using Content.Shared.Revolutionary.Components;
 using Robust.Shared.Containers;
+// GoobStation
+// GoobStation
 
 namespace Content.Server.Mindshield;
 
@@ -33,10 +36,10 @@ namespace Content.Server.Mindshield;
 public sealed class MindShieldSystem : EntitySystem
 {
     [Dependency] private readonly IAdminLogManager _adminLogManager = default!;
-    [Dependency] private readonly RoleSystem _roleSystem = default!;
     [Dependency] private readonly MindSystem _mindSystem = default!;
     [Dependency] private readonly PopupSystem _popupSystem = default!;
     [Dependency] private readonly SharedRevolutionarySystem _revolutionarySystem = default!; // Goobstation
+    [Dependency] private readonly RoleSystem _roleSystem = default!;
 
     public override void Initialize()
     {
@@ -69,28 +72,30 @@ public sealed class MindShieldSystem : EntitySystem
         if (TryComp<HeadRevolutionaryComponent>(implanted, out var headRevComp)) // GoobStation - headRevComp
         {
             _popupSystem.PopupEntity(Loc.GetString("head-rev-break-mindshield"), implanted);
-            _revolutionarySystem.ToggleConvertAbility((implanted, headRevComp), false); // GoobStation - turn off headrev ability to convert
+            _revolutionarySystem.ToggleConvertAbility((implanted, headRevComp),
+                false); // GoobStation - turn off headrev ability to convert
             //QueueDel(implant); - Goobstation - Headrevs should remove implant before turning on ability
             return;
         }
 
         if (_mindSystem.TryGetMind(implanted, out var mindId, out _) &&
             _roleSystem.MindRemoveRole<RevolutionaryRoleComponent>(mindId))
-        {
-            _adminLogManager.Add(LogType.Mind, LogImpact.Medium, $"{ToPrettyString(implanted)} was deconverted due to being implanted with a Mindshield.");
-        }
-        if (HasComp<Goobstation.Shared.Mindcontrol.MindcontrolledComponent>(implanted))   //Goobstation - Mindcontrol Implant
-            RemComp<Goobstation.Shared.Mindcontrol.MindcontrolledComponent>(implanted);
+            _adminLogManager.Add(LogType.Mind,
+                LogImpact.Medium,
+                $"{ToPrettyString(implanted)} was deconverted due to being implanted with a Mindshield.");
+        if (HasComp<MindcontrolledComponent>(implanted)) //Goobstation - Mindcontrol Implant
+            RemComp<MindcontrolledComponent>(implanted);
     }
 
     private void OnImplantDraw(Entity<MindShieldImplantComponent> ent, ref EntGotRemovedFromContainerMessage args)
     {
-        _popupSystem.PopupEntity(Loc.GetString("mindshield-implant-effect-removed"), args.Container.Owner, args.Container.Owner);
+        _popupSystem.PopupEntity(Loc.GetString("mindshield-implant-effect-removed"),
+            args.Container.Owner,
+            args.Container.Owner);
 
         if (TryComp<HeadRevolutionaryComponent>(args.Container.Owner, out var headRevComp))
-            _revolutionarySystem.ToggleConvertAbility((args.Container.Owner, headRevComp), true);
+            _revolutionarySystem.ToggleConvertAbility((args.Container.Owner, headRevComp));
 
         RemComp<MindShieldComponent>(args.Container.Owner);
     }
 }
-

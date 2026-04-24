@@ -11,35 +11,6 @@ namespace Content.Server.NPC.Pathfinding;
 
 public sealed partial class PathfindingSystem
 {
-    public record struct SimplifyPathArgs
-    {
-        public Vector2i Start;
-        public Vector2i End;
-        public List<Vector2i> Path;
-    }
-
-    public record struct SplinePathResult()
-    {
-        public static SplinePathResult NoPath = new();
-
-        public List<Vector2i> Points = new();
-
-        public List<Vector2i> Path = new();
-        public Dictionary<Vector2i, Vector2i>? CameFrom;
-    }
-
-    public record struct SplinePathArgs(SimplePathArgs Args)
-    {
-        public SimplePathArgs Args = Args;
-
-        public float MaxRatio = 0.25f;
-
-        /// <summary>
-        /// Minimum distance between subdivisions.
-        /// </summary>
-        public int Distance = 20;
-    }
-
     /// <summary>
     /// Gets a spline path from start to end.
     /// </summary>
@@ -92,19 +63,21 @@ public sealed partial class PathfindingSystem
                 var perpLine = pointBPerp - pointAPerp;
                 var perpHalfway = perpLine.Length() / 2f;
 
-                var splinePoint = (pointAPerp + perpLine.Normalized() * random.NextFloat(-args.MaxRatio, args.MaxRatio) * perpHalfway).Floored();
+                var splinePoint =
+                    (pointAPerp + perpLine.Normalized() * random.NextFloat(-args.MaxRatio, args.MaxRatio) * perpHalfway)
+                    .Floored();
 
                 // We essentially take (A, B) and turn it into (A, C) & (C, B)
                 pairs[i] = (pointA, splinePoint);
                 pairs.Insert(i + 1, (splinePoint, pointB));
 
-                i+= 2;
+                i += 2;
             }
         }
 
         var spline = new ValueList<Vector2i>(pairs.Count - 1)
         {
-            start
+            start,
         };
 
         foreach (var pair in pairs)
@@ -133,7 +106,7 @@ public sealed partial class PathfindingSystem
             if (aStarResult == SimplePathResult.NoPath)
                 return SplinePathResult.NoPath;
 
-            path.AddRange(aStarResult.Path[0..]);
+            path.AddRange(aStarResult.Path[..]);
 
             foreach (var a in aStarResult.CameFrom)
             {
@@ -143,14 +116,14 @@ public sealed partial class PathfindingSystem
 
         points.Add(spline[^1]);
 
-        var simple = SimplifyPath(new SimplifyPathArgs()
+        var simple = SimplifyPath(new SimplifyPathArgs
         {
             Start = args.Args.Start,
             End = args.Args.End,
             Path = path,
         });
 
-        return new SplinePathResult()
+        return new SplinePathResult
         {
             Path = simple,
             CameFrom = cameFrom,
@@ -165,10 +138,10 @@ public sealed partial class PathfindingSystem
     {
         var nodes = new HashSet<Vector2i>(args.Path);
 
-        var result = GetBreadthPath(new BreadthPathArgs()
+        var result = GetBreadthPath(new BreadthPathArgs
         {
             Start = args.Start,
-            Ends = new List<Vector2i>()
+            Ends = new List<Vector2i>
             {
                 args.End,
             },
@@ -178,9 +151,38 @@ public sealed partial class PathfindingSystem
                     return 0f;
 
                 return 1f;
-            }
+            },
         });
 
         return result.Path;
+    }
+
+    public record struct SimplifyPathArgs
+    {
+        public Vector2i End;
+        public List<Vector2i> Path;
+        public Vector2i Start;
+    }
+
+    public record struct SplinePathResult()
+    {
+        public static SplinePathResult NoPath = new();
+        public Dictionary<Vector2i, Vector2i>? CameFrom;
+
+        public List<Vector2i> Path = new();
+
+        public List<Vector2i> Points = new();
+    }
+
+    public record struct SplinePathArgs(SimplePathArgs Args)
+    {
+        public SimplePathArgs Args = Args;
+
+        /// <summary>
+        /// Minimum distance between subdivisions.
+        /// </summary>
+        public int Distance = 20;
+
+        public float MaxRatio = 0.25f;
     }
 }

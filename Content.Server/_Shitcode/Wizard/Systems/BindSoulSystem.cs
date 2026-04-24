@@ -26,10 +26,10 @@ namespace Content.Server._Goobstation.Wizard.Systems;
 
 public sealed class BindSoulSystem : SharedBindSoulSystem
 {
-    [Dependency] private readonly SpecialRespawnSystem _respawn = default!;
-    [Dependency] private readonly WizardRuleSystem _wizard = default!;
     [Dependency] private readonly IdentitySystem _identity = default!;
     [Dependency] private readonly OutfitSystem _outfit = default!;
+    [Dependency] private readonly SpecialRespawnSystem _respawn = default!;
+    [Dependency] private readonly WizardRuleSystem _wizard = default!;
 
     public override void Resurrect(EntityUid mind,
         EntityUid phylactery,
@@ -64,6 +64,7 @@ public sealed class BindSoulSystem : SharedBindSoulSystem
                 if (TryComp(identity, out GrammarComponent? identityGrammar))
                     Grammar.SetGender((identity, identityGrammar), soulBound.Gender);
             }
+
             if (soulBound.Sex != null)
                 humanoid.Sex = soulBound.Sex.Value;
             Dirty(ent, humanoid);
@@ -72,8 +73,7 @@ public sealed class BindSoulSystem : SharedBindSoulSystem
         _identity.QueueIdentityUpdate(ent);
 
         Stun.TryKnockdown(ent,
-            TimeSpan.FromSeconds(20) + TimeSpan.FromSeconds(10) * soulBound.ResurrectionsCount,
-            true);
+            TimeSpan.FromSeconds(20) + TimeSpan.FromSeconds(10) * soulBound.ResurrectionsCount);
         soulBound.ResurrectionsCount++;
         Dirty(mind, soulBound);
     }
@@ -120,7 +120,7 @@ public sealed class BindSoulSystem : SharedBindSoulSystem
         var threshold = new DamageThreshold
         {
             Trigger = trigger,
-            Behaviors = new() { behavior },
+            Behaviors = new List<IThresholdBehavior> { behavior },
         };
         destructible.Thresholds.Add(threshold);
     }

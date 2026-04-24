@@ -22,15 +22,21 @@ namespace Content.Server.AlertLevel;
 [RegisterComponent]
 public sealed partial class AlertLevelComponent : Component
 {
+    [ViewVariables] public bool ActiveDelay;
+
+    // Once stations are a prototype, this should be used.
+    [DataField("alertLevelPrototype",
+        required: true,
+        customTypeSerializer: typeof(PrototypeIdSerializer<AlertLevelPrototype>))]
+    public string AlertLevelPrototype = default!;
+
     /// <summary>
     /// The current set of alert levels on the station.
     /// </summary>
     [ViewVariables]
     public AlertLevelPrototype? AlertLevels;
 
-    // Once stations are a prototype, this should be used.
-    [DataField("alertLevelPrototype", required: true, customTypeSerializer: typeof(PrototypeIdSerializer<AlertLevelPrototype>))]
-    public string AlertLevelPrototype = default!;
+    [ViewVariables] public float CurrentDelay = 0;
 
     /// <summary>
     /// The current level on the station.
@@ -42,9 +48,6 @@ public sealed partial class AlertLevelComponent : Component
     /// </summary>
     [ViewVariables(VVAccess.ReadWrite)] public bool IsLevelLocked = false;
 
-    [ViewVariables] public float CurrentDelay = 0;
-    [ViewVariables] public bool ActiveDelay;
-
     /// <summary>
     /// If the level can be selected on the station.
     /// </summary>
@@ -55,11 +58,10 @@ public sealed partial class AlertLevelComponent : Component
         {
             if (AlertLevels == null
                 || !AlertLevels.Levels.TryGetValue(CurrentLevel, out var level))
-            {
                 return false;
-            }
 
-            return (level.Selectable || level.EmagSelectable) && !level.DisableSelection && !IsLevelLocked; // Goobstation - added EmagSelectable
+            return (level.Selectable || level.EmagSelectable) && !level.DisableSelection &&
+                   !IsLevelLocked; // Goobstation - added EmagSelectable
         }
     }
 }

@@ -21,16 +21,16 @@ using Robust.Shared.Random;
 namespace Content.Server.NameIdentifier;
 
 /// <summary>
-///     Handles unique name identifiers for entities e.g. `monkey (MK-912)`
+/// Handles unique name identifiers for entities e.g. `monkey (MK-912)`
 /// </summary>
 public sealed class NameIdentifierSystem : EntitySystem
 {
+    [Dependency] private readonly NameModifierSystem _nameModifier = default!;
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly IRobustRandom _robustRandom = default!;
-    [Dependency] private readonly NameModifierSystem _nameModifier = default!;
 
     /// <summary>
-    /// Free IDs available per <see cref="NameIdentifierGroupPrototype"/>.
+    /// Free IDs available per <see cref="NameIdentifierGroupPrototype" />.
     /// </summary>
     [ViewVariables]
     public readonly Dictionary<string, List<int>> CurrentIds = [];
@@ -67,17 +67,15 @@ public sealed class NameIdentifierSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Generates a new unique name/suffix for a given entity and adds it to <see cref="CurrentIds"/>
-    ///     but does not set the entity's name.
+    /// Generates a new unique name/suffix for a given entity and adds it to <see cref="CurrentIds" />
+    /// but does not set the entity's name.
     /// </summary>
-    public string GenerateUniqueName(EntityUid uid, ProtoId<NameIdentifierGroupPrototype> proto, out int randomVal)
-    {
-        return GenerateUniqueName(uid, _prototypeManager.Index(proto), out randomVal);
-    }
+    public string GenerateUniqueName(EntityUid uid, ProtoId<NameIdentifierGroupPrototype> proto, out int randomVal) =>
+        GenerateUniqueName(uid, _prototypeManager.Index(proto), out randomVal);
 
     /// <summary>
-    ///     Generates a new unique name/suffix for a given entity and adds it to <see cref="CurrentIds"/>
-    ///     but does not set the entity's name.
+    /// Generates a new unique name/suffix for a given entity and adds it to <see cref="CurrentIds" />
+    /// but does not set the entity's name.
     /// </summary>
     public string GenerateUniqueName(EntityUid uid, NameIdentifierGroupPrototype proto, out int randomVal)
     {
@@ -153,10 +151,7 @@ public sealed class NameIdentifierSystem : EntitySystem
         args.AddModifier(format, -10, ("identifier", ent.Comp.FullIdentifier));
     }
 
-    private void InitialSetupPrototypes()
-    {
-        EnsureIds();
-    }
+    private void InitialSetupPrototypes() => EnsureIds();
 
     private void FillGroup(NameIdentifierGroupPrototype proto, List<int> values)
     {
@@ -200,9 +195,7 @@ public sealed class NameIdentifierSystem : EntitySystem
         foreach (var proto in CurrentIds.Keys)
         {
             if (!_prototypeManager.HasIndex<NameIdentifierGroupPrototype>(proto))
-            {
                 toRemove.Add(proto);
-            }
         }
 
         foreach (var proto in toRemove)
@@ -212,7 +205,7 @@ public sealed class NameIdentifierSystem : EntitySystem
 
         foreach (var proto in set.Modified.Values)
         {
-            var name_proto = (NameIdentifierGroupPrototype)proto;
+            var name_proto = (NameIdentifierGroupPrototype) proto;
 
             // Only bother adding new ones.
             if (CurrentIds.ContainsKey(proto.ID))
@@ -224,8 +217,5 @@ public sealed class NameIdentifierSystem : EntitySystem
     }
 
 
-    private void CleanupIds(RoundRestartCleanupEvent ev)
-    {
-        EnsureIds();
-    }
+    private void CleanupIds(RoundRestartCleanupEvent ev) => EnsureIds();
 }

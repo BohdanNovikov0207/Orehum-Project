@@ -15,7 +15,7 @@ using Robust.Shared.Random;
 namespace Content.Server.Worldgen.Systems;
 
 /// <summary>
-///     This handles the noise index.
+/// This handles the noise index.
 /// </summary>
 public sealed class NoiseIndexSystem : EntitySystem
 {
@@ -23,7 +23,7 @@ public sealed class NoiseIndexSystem : EntitySystem
     [Dependency] private readonly IRobustRandom _random = default!;
 
     /// <summary>
-    ///     Gets a particular noise channel from the index on the given entity.
+    /// Gets a particular noise channel from the index on the given entity.
     /// </summary>
     /// <param name="holder">The holder of the index</param>
     /// <param name="protoId">The channel prototype ID</param>
@@ -40,7 +40,7 @@ public sealed class NoiseIndexSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Attempts to evaluate the given noise channel using the generator on the given entity.
+    /// Attempts to evaluate the given noise channel using the generator on the given entity.
     /// </summary>
     /// <param name="holder">The holder of the index</param>
     /// <param name="protoId">The channel prototype ID</param>

@@ -95,10 +95,8 @@ public sealed class StressTestMovementSystem : EntitySystem
         SubscribeLocalEvent<StressTestMovementComponent, ComponentStartup>(OnStressStartup);
     }
 
-    private void OnStressStartup(EntityUid uid, StressTestMovementComponent component, ComponentStartup args)
-    {
+    private void OnStressStartup(EntityUid uid, StressTestMovementComponent component, ComponentStartup args) =>
         component.Origin = _transform.GetWorldPosition(uid);
-    }
 
     public override void Update(float frameTime)
     {
@@ -114,9 +112,7 @@ public sealed class StressTestMovementSystem : EntitySystem
             stressTest.Progress += frameTime;
 
             if (stressTest.Progress > 1)
-            {
                 stressTest.Progress -= 1;
-            }
 
             var x = MathF.Sin(stressTest.Progress * MathHelper.TwoPi);
             var y = MathF.Cos(stressTest.Progress * MathHelper.TwoPi);

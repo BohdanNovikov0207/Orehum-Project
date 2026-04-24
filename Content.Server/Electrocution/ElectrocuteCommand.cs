@@ -20,26 +20,26 @@ namespace Content.Server.Electrocution;
 [AdminCommand(AdminFlags.Fun)]
 public sealed class ElectrocuteCommand : LocalizedEntityCommands
 {
+    private static readonly ProtoId<StatusEffectPrototype> ElectrocutionStatusEffect = "Electrocution";
     [Dependency] private readonly ElectrocutionSystem _electrocution = default!;
     [Dependency] private readonly StatusEffectsSystem _statusEffects = default!;
 
     public override string Command => "electrocute";
 
-    private static readonly ProtoId<StatusEffectPrototype> ElectrocutionStatusEffect = "Electrocution";
-
     public override void Execute(IConsoleShell shell, string argStr, string[] args)
     {
         if (args.Length is < 1 or > 3)
         {
-            shell.WriteError(Loc.GetString($"shell-need-between-arguments",
+            shell.WriteError(Loc.GetString("shell-need-between-arguments",
                 ("lower", 1),
                 ("upper", 3)));
             return;
         }
 
-        if (!NetEntity.TryParse(args[0], out var uidNet) || !EntityManager.TryGetEntity(uidNet, out var uid) || !EntityManager.EntityExists(uid))
+        if (!NetEntity.TryParse(args[0], out var uidNet) || !EntityManager.TryGetEntity(uidNet, out var uid) ||
+            !EntityManager.EntityExists(uid))
         {
-            shell.WriteError(Loc.GetString($"shell-could-not-find-entity-with-uid", ("uid", args[0])));
+            shell.WriteError(Loc.GetString("shell-could-not-find-entity-with-uid", ("uid", args[0])));
             return;
         }
 
@@ -55,6 +55,11 @@ public sealed class ElectrocuteCommand : LocalizedEntityCommands
         if (args.Length < 3 || !int.TryParse(args[2], out var damage))
             damage = 10;
 
-        _electrocution.TryDoElectrocution(uid.Value, null, damage, TimeSpan.FromSeconds(seconds), refresh: true, ignoreInsulation: true);
+        _electrocution.TryDoElectrocution(uid.Value,
+            null,
+            damage,
+            TimeSpan.FromSeconds(seconds),
+            true,
+            ignoreInsulation: true);
     }
 }

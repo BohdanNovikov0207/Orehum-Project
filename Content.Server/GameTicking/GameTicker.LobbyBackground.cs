@@ -9,23 +9,23 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.GameTicking.Prototypes;
-using Robust.Shared.Random;
 using System.Linq;
+using Content.Shared.GameTicking.Prototypes;
 using Robust.Shared.Prototypes;
+using Robust.Shared.Random;
 
 namespace Content.Server.GameTicking;
 
 // Goobstation - this file is heavily modified to add credits for lobby backgrounds
 public sealed partial class GameTicker
 {
+    private static readonly string[] WhitelistedBackgroundExtensions = new[] { "png", "jpg", "jpeg", "webp" };
+
+    [ViewVariables]
+    private readonly List<ProtoId<LobbyBackgroundPrototype>> _lobbyBackgrounds = [];
+
     [ViewVariables]
     public ProtoId<LobbyBackgroundPrototype>? LobbyBackground { get; private set; }
-
-    [ViewVariables]
-    private List<ProtoId<LobbyBackgroundPrototype>> _lobbyBackgrounds = [];
-
-    private static readonly string[] WhitelistedBackgroundExtensions = new string[] {"png", "jpg", "jpeg", "webp"};
 
     private void InitializeLobbyBackground()
     {
@@ -33,7 +33,8 @@ public sealed partial class GameTicker
         {
             if (!WhitelistedBackgroundExtensions.Contains(prototype.Background.Extension))
             {
-                _sawmill.Warning($"Lobby background '{prototype.ID}' has an invalid extension '{prototype.Background.Extension}' and will be ignored.");
+                _sawmill.Warning(
+                    $"Lobby background '{prototype.ID}' has an invalid extension '{prototype.Background.Extension}' and will be ignored.");
                 continue;
             }
 
@@ -43,7 +44,7 @@ public sealed partial class GameTicker
         RandomizeLobbyBackground();
     }
 
-    private void RandomizeLobbyBackground() {
-        LobbyBackground = _lobbyBackgrounds.Any() ? _robustRandom.Pick(_lobbyBackgrounds) : (ProtoId<LobbyBackgroundPrototype>?) null;
-    }
+    private void RandomizeLobbyBackground() => LobbyBackground = _lobbyBackgrounds.Any()
+        ? _robustRandom.Pick(_lobbyBackgrounds)
+        : (ProtoId<LobbyBackgroundPrototype>?) null;
 }

@@ -37,31 +37,29 @@ public sealed class WaggingSystem : EntitySystem
         SubscribeLocalEvent<WaggingComponent, MobStateChangedEvent>(OnMobStateChanged);
     }
 
-    private void OnWaggingMapInit(EntityUid uid, WaggingComponent component, MapInitEvent args)
-    {
+    private void OnWaggingMapInit(EntityUid uid, WaggingComponent component, MapInitEvent args) =>
         _actions.AddAction(uid, ref component.ActionEntity, component.Action, uid);
-    }
 
-    private void OnWaggingShutdown(EntityUid uid, WaggingComponent component, ComponentShutdown args)
-    {
+    private void OnWaggingShutdown(EntityUid uid, WaggingComponent component, ComponentShutdown args) =>
         _actions.RemoveAction(uid, component.ActionEntity);
-    }
 
     private void OnWaggingToggle(EntityUid uid, WaggingComponent component, ref ToggleActionEvent args)
     {
         if (args.Handled)
             return;
 
-        TryToggleWagging(uid, wagging: component);
+        TryToggleWagging(uid, component);
     }
 
     private void OnMobStateChanged(EntityUid uid, WaggingComponent component, MobStateChangedEvent args)
     {
         if (component.Wagging)
-            TryToggleWagging(uid, wagging: component);
+            TryToggleWagging(uid, component);
     }
 
-    public bool TryToggleWagging(EntityUid uid, WaggingComponent? wagging = null, HumanoidAppearanceComponent? humanoid = null)
+    public bool TryToggleWagging(EntityUid uid,
+        WaggingComponent? wagging = null,
+        HumanoidAppearanceComponent? humanoid = null)
     {
         if (!Resolve(uid, ref wagging, ref humanoid))
             return false;
@@ -80,15 +78,11 @@ public sealed class WaggingSystem : EntitySystem
             string newMarkingId;
 
             if (wagging.Wagging)
-            {
                 newMarkingId = $"{currentMarkingId}{wagging.Suffix}";
-            }
             else
             {
                 if (currentMarkingId.EndsWith(wagging.Suffix))
-                {
                     newMarkingId = currentMarkingId[..^wagging.Suffix.Length];
-                }
                 else
                 {
                     newMarkingId = currentMarkingId;
@@ -102,8 +96,11 @@ public sealed class WaggingSystem : EntitySystem
                 continue;
             }
 
-            _humanoidAppearance.SetMarkingId(uid, MarkingCategories.Tail, idx, newMarkingId,
-                humanoid: humanoid);
+            _humanoidAppearance.SetMarkingId(uid,
+                MarkingCategories.Tail,
+                idx,
+                newMarkingId,
+                humanoid);
         }
 
         return true;

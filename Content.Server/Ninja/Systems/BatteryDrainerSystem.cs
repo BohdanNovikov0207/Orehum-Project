@@ -28,8 +28,8 @@ namespace Content.Server.Ninja.Systems;
 /// </summary>
 public sealed class BatteryDrainerSystem : SharedBatteryDrainerSystem
 {
-    [Dependency] private readonly BatterySystem _battery = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly BatterySystem _battery = default!;
     [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly SparksSystem _sparks = default!; // goob edit - sparks everywhere
@@ -50,7 +50,7 @@ public sealed class BatteryDrainerSystem : SharedBatteryDrainerSystem
     {
         var (uid, comp) = ent;
         var target = args.Target;
-        if (args.Handled || comp.BatteryUid is not {} battery || !HasComp<PowerNetworkBatteryComponent>(target))
+        if (args.Handled || comp.BatteryUid is not { } battery || !HasComp<PowerNetworkBatteryComponent>(target))
             return;
 
         // handles even if battery is full so you can actually see the poup
@@ -62,7 +62,12 @@ public sealed class BatteryDrainerSystem : SharedBatteryDrainerSystem
             return;
         }
 
-        var doAfterArgs = new DoAfterArgs(EntityManager, uid, comp.DrainTime, new DrainDoAfterEvent(), target: target, eventTarget: uid)
+        var doAfterArgs = new DoAfterArgs(EntityManager,
+            uid,
+            comp.DrainTime,
+            new DrainDoAfterEvent(),
+            target: target,
+            eventTarget: uid)
         {
             MovementThreshold = 0.5f,
             BreakOnMove = true,
@@ -74,28 +79,28 @@ public sealed class BatteryDrainerSystem : SharedBatteryDrainerSystem
         _doAfter.TryStartDoAfter(doAfterArgs);
     }
 
-    private void OnBatteryChanged(Entity<BatteryDrainerComponent> ent, ref NinjaBatteryChangedEvent args)
-    {
+    private void OnBatteryChanged(Entity<BatteryDrainerComponent> ent, ref NinjaBatteryChangedEvent args) =>
         SetBattery((ent, ent.Comp), args.Battery);
-    }
 
-    /// <inheritdoc/>
-    protected override void OnDoAfterAttempt(Entity<BatteryDrainerComponent> ent, ref DoAfterAttemptEvent<DrainDoAfterEvent> args)
+    /// <inheritdoc />
+    protected override void OnDoAfterAttempt(Entity<BatteryDrainerComponent> ent,
+        ref DoAfterAttemptEvent<DrainDoAfterEvent> args)
     {
         base.OnDoAfterAttempt(ent, ref args);
 
-        if (ent.Comp.BatteryUid is not {} battery || _battery.IsFull(battery))
+        if (ent.Comp.BatteryUid is not { } battery || _battery.IsFull(battery))
             args.Cancel();
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     protected override bool TryDrainPower(Entity<BatteryDrainerComponent> ent, EntityUid target)
     {
         var (uid, comp) = ent;
         if (comp.BatteryUid == null || !TryComp<BatteryComponent>(comp.BatteryUid.Value, out var battery))
             return false;
 
-        if (!TryComp<BatteryComponent>(target, out var targetBattery) || !TryComp<PowerNetworkBatteryComponent>(target, out var pnb))
+        if (!TryComp<BatteryComponent>(target, out var targetBattery) ||
+            !TryComp<PowerNetworkBatteryComponent>(target, out var pnb))
             return false;
 
         if (MathHelper.CloseToPercent(targetBattery.CurrentCharge, 0))

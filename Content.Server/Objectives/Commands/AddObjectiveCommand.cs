@@ -27,10 +27,10 @@ namespace Content.Server.Objectives.Commands;
 [AdminCommand(AdminFlags.Admin)]
 public sealed class AddObjectiveCommand : LocalizedEntityCommands
 {
-    [Dependency] private readonly IPlayerManager _players = default!;
-    [Dependency] private readonly IPrototypeManager _prototypes = default!;
     [Dependency] private readonly SharedMindSystem _mind = default!;
     [Dependency] private readonly ObjectivesSystem _objectives = default!;
+    [Dependency] private readonly IPlayerManager _players = default!;
+    [Dependency] private readonly IPrototypeManager _prototypes = default!;
 
     public override string Command => "addobjective";
 

@@ -15,10 +15,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Server.Stunnable.Components;
-using Content.Shared.StatusEffect;
 using Content.Shared.Movement.Systems;
-using JetBrains.Annotations;
 using Content.Shared.Throwing;
+using JetBrains.Annotations;
 using Robust.Shared.Physics.Events;
 
 namespace Content.Server.Stunnable.Systems;
@@ -26,8 +25,8 @@ namespace Content.Server.Stunnable.Systems;
 [UsedImplicitly]
 internal sealed class StunOnCollideSystem : EntitySystem
 {
-    [Dependency] private readonly StunSystem _stunSystem = default!;
     [Dependency] private readonly MovementModStatusSystem _movementMod = default!;
+    [Dependency] private readonly StunSystem _stunSystem = default!;
 
     public override void Initialize()
     {
@@ -39,7 +38,7 @@ internal sealed class StunOnCollideSystem : EntitySystem
 
     private void TryDoCollideStun(Entity<StunOnCollideComponent> ent, EntityUid target)
     {
-        _stunSystem.TryKnockdown(target, ent.Comp.KnockdownAmount, ent.Comp.Refresh, ent.Comp.AutoStand, true); // goob edit
+        _stunSystem.TryKnockdown(target, ent.Comp.KnockdownAmount, ent.Comp.Refresh, ent.Comp.AutoStand); // goob edit
 
         if (ent.Comp.Refresh)
         {
@@ -73,8 +72,6 @@ internal sealed class StunOnCollideSystem : EntitySystem
         TryDoCollideStun(ent, args.OtherEntity);
     }
 
-    private void HandleThrow(Entity<StunOnCollideComponent> ent, ref ThrowDoHitEvent args)
-    {
+    private void HandleThrow(Entity<StunOnCollideComponent> ent, ref ThrowDoHitEvent args) =>
         TryDoCollideStun(ent, args.Target);
-    }
 }

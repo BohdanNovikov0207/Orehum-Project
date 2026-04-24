@@ -22,26 +22,23 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Server.Chat.Systems;
-using Content.Shared.Chat; // Einstein Engines - Languages
-using Content.Shared.NPC.Components;
+using Content.Shared.Chat;
 using Content.Shared.Chemistry.EntitySystems;
-using Content.Shared.Damage;
-using Content.Shared.Emag.Components;
 using Content.Shared.Interaction;
-using Content.Shared.Mobs.Components;
 using Content.Shared.Popups;
 using Content.Shared.Silicons.Bots;
 using Robust.Shared.Audio.Systems;
+// Einstein Engines - Languages
 
 namespace Content.Server.NPC.HTN.PrimitiveTasks.Operators.Specific;
 
 public sealed partial class MedibotInjectOperator : HTNOperator
 {
     [Dependency] private readonly IEntityManager _entMan = default!;
-    private ChatSystem _chat = default!;
-    private MedibotSystem _medibot = default!;
     private SharedAudioSystem _audio = default!;
+    private ChatSystem _chat = default!;
     private SharedInteractionSystem _interaction = default!;
+    private MedibotSystem _medibot = default!;
     private SharedPopupSystem _popup = default!;
     private SharedSolutionContainerSystem _solutionContainer = default!;
 
@@ -82,7 +79,7 @@ public sealed partial class MedibotInjectOperator : HTNOperator
         if (!_medibot.CheckInjectable((owner, botComp), target) || !_medibot.TryInject((owner, botComp), target))
             return HTNOperatorStatus.Failed;
 
-        _chat.TrySendInGameICMessage(owner, Loc.GetString("medibot-finish-inject"), InGameICChatType.Speak, hideChat: true, hideLog: true);
+        _chat.TrySendInGameICMessage(owner, Loc.GetString("medibot-finish-inject"), InGameICChatType.Speak, true, true);
 
         return HTNOperatorStatus.Finished;
     }

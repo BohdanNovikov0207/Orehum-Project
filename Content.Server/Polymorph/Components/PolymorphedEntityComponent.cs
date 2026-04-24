@@ -17,6 +17,9 @@ namespace Content.Server.Polymorph.Components;
 [Access(typeof(PolymorphSystem))]
 public sealed partial class PolymorphedEntityComponent : Component
 {
+    [DataField]
+    public EntityUid? Action;
+
     /// <summary>
     /// The polymorph prototype, used to track various information
     /// about the polymorph
@@ -36,7 +39,4 @@ public sealed partial class PolymorphedEntityComponent : Component
     /// </summary>
     [DataField]
     public float Time;
-
-    [DataField]
-    public EntityUid? Action;
 }

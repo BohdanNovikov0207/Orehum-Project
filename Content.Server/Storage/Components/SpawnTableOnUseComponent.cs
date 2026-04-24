@@ -12,7 +12,7 @@ namespace Content.Server.Storage.Components;
 /// <summary>
 /// Spawns items from an entity table when used in hand.
 /// </summary>
-[RegisterComponent, Access(typeof(SpawnTableOnUseSystem))]
+[RegisterComponent] [Access(typeof(SpawnTableOnUseSystem))]
 public sealed partial class SpawnTableOnUseComponent : Component
 {
     /// <summary>

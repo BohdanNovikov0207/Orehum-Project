@@ -53,9 +53,7 @@
 using Content.Server.Atmos.EntitySystems;
 using Content.Server.Atmos.Piping.Components;
 using Content.Server.Audio;
-using Content.Server.DeviceNetwork;
 using Content.Server.DeviceNetwork.Systems;
-using Content.Server.NodeContainer;
 using Content.Server.NodeContainer.Nodes;
 using Content.Server.Power.Components;
 using Content.Shared.Atmos;
@@ -68,7 +66,6 @@ using Content.Shared.Power.EntitySystems;
 using Content.Shared.Power.Generation.Teg;
 using Content.Shared.Rounding;
 using Robust.Server.GameObjects;
-using Robust.Shared.Utility;
 
 namespace Content.Server.Power.Generation.Teg;
 
@@ -76,33 +73,33 @@ namespace Content.Server.Power.Generation.Teg;
 /// Handles processing logic for the thermo-electric generator (TEG).
 /// </summary>
 /// <remarks>
-/// <para>
-/// The TEG generates power by exchanging heat between gases flowing through its two sides.
-/// The gas flows through a "circulator" entity on each side, which have both an inlet and an outlet port.
-/// </para>
-/// <remarks>
-/// Connecting the TEG core to its circulators is implemented via a node group. See <see cref="TegNodeGroup"/>.
+///     <para>
+///     The TEG generates power by exchanging heat between gases flowing through its two sides.
+///     The gas flows through a "circulator" entity on each side, which have both an inlet and an outlet port.
+///     </para>
+///     <remarks>
+///     Connecting the TEG core to its circulators is implemented via a node group. See <see cref="TegNodeGroup" />.
+///     </remarks>
+///     <para>
+///     The TEG center does HV power output, and must also be connected to an LV wire for the TEG to function.
+///     </para>
+///     <para>
+///     Unlike in SS13, the TEG actually adjusts gas heat exchange to match the energy demand of the power network.
+///     To achieve this, the TEG implements its own ramping logic instead of using the built-in Pow3r ramping.
+///     The TEG actually has a maximum output of +n% more than was really generated,
+///     which allows Pow3r to draw more power to "signal" that there is more network load.
+///     The ramping is also exponential instead of linear like in normal Pow3r.
+///     This system does mean a fully-loaded TEG creates +n% power out of thin air, but this is considered acceptable.
+///     </para>
 /// </remarks>
-/// <para>
-/// The TEG center does HV power output, and must also be connected to an LV wire for the TEG to function.
-/// </para>
-/// <para>
-/// Unlike in SS13, the TEG actually adjusts gas heat exchange to match the energy demand of the power network.
-/// To achieve this, the TEG implements its own ramping logic instead of using the built-in Pow3r ramping.
-/// The TEG actually has a maximum output of +n% more than was really generated,
-/// which allows Pow3r to draw more power to "signal" that there is more network load.
-/// The ramping is also exponential instead of linear like in normal Pow3r.
-/// This system does mean a fully-loaded TEG creates +n% power out of thin air, but this is considered acceptable.
-/// </para>
-/// </remarks>
-/// <seealso cref="TegGeneratorComponent"/>
-/// <seealso cref="TegCirculatorComponent"/>
-/// <seealso cref="TegNodeGroup"/>
-/// <seealso cref="TegSensorData"/>
+/// <seealso cref="TegGeneratorComponent" />
+/// <seealso cref="TegCirculatorComponent" />
+/// <seealso cref="TegNodeGroup" />
+/// <seealso cref="TegSensorData" />
 public sealed class TegSystem : EntitySystem
 {
     /// <summary>
-    /// Node name for the TEG part connection nodes (<see cref="TegNodeGroup"/>).
+    /// Node name for the TEG part connection nodes (<see cref="TegNodeGroup" />).
     /// </summary>
     private const string NodeNameTeg = "teg";
 
@@ -117,7 +114,7 @@ public sealed class TegSystem : EntitySystem
     private const string NodeNameOutlet = "outlet";
 
     /// <summary>
-    /// Device network command to have the TEG output a <see cref="TegSensorData"/> object for its last statistics.
+    /// Device network command to have the TEG output a <see cref="TegSensorData" /> object for its last statistics.
     /// </summary>
     public const string DeviceNetworkCommandSyncData = "teg_sync_data";
 
@@ -146,9 +143,7 @@ public sealed class TegSystem : EntitySystem
     private void GeneratorExamined(EntityUid uid, TegGeneratorComponent component, ExaminedEvent args)
     {
         if (GetNodeGroup(uid) is not { IsFullyBuilt: true })
-        {
             args.PushMarkup(Loc.GetString("teg-generator-examine-connection"));
-        }
         else
         {
             var supplier = Comp<PowerSupplierComponent>(uid);
@@ -217,7 +212,7 @@ public sealed class TegSystem : EntitySystem
             // Reduce efficiency at low temperature differences to encourage burn chambers (instead
             // of just feeding the TEG room temperature gas from an infinite gas miner).
             var dT = Thot - Tcold;
-            N *= MathF.Tanh(dT/700); // https://www.wolframalpha.com/input?i=tanh(x/700)+from+0+to+1000
+            N *= MathF.Tanh(dT / 700); // https://www.wolframalpha.com/input?i=tanh(x/700)+from+0+to+1000
 
             var transfer = Wmax * N;
             electricalEnergy = transfer * component.PowerFactor;
@@ -274,9 +269,7 @@ public sealed class TegSystem : EntitySystem
                 12);
         }
         else
-        {
             powerLevel = 0;
-        }
 
         _ambientSound.SetAmbience(uid, powerLevel >= 1);
         // TODO: Ok so this introduces popping which is a major shame big rip.
@@ -318,9 +311,7 @@ public sealed class TegSystem : EntitySystem
         // If the group IS fully built, the generator will update its circulators.
         // Otherwise, make sure circulator is set to nothing.
         if (!group.IsFullyBuilt)
-        {
             UpdateCirculatorAppearance((uid, component), false);
-        }
     }
 
     private void UpdateCirculatorAppearance(Entity<TegCirculatorComponent?> ent, bool powered)
@@ -339,9 +330,7 @@ public sealed class TegSystem : EntitySystem
                 speed = TegCirculatorSpeed.SpeedSlow;
         }
         else
-        {
             speed = TegCirculatorSpeed.SpeedStill;
-        }
 
         _appearance.SetData(ent, TegVisuals.CirculatorSpeed, speed);
         _appearance.SetData(ent, TegVisuals.CirculatorPower, powered);
@@ -349,7 +338,9 @@ public sealed class TegSystem : EntitySystem
         if (_pointLight.TryGetLight(ent, out var pointLight))
         {
             _pointLight.SetEnabled(ent, powered, pointLight);
-            _pointLight.SetColor(ent, speed == TegCirculatorSpeed.SpeedFast ? circ.LightColorFast : circ.LightColorSlow, pointLight);
+            _pointLight.SetColor(ent,
+                speed == TegCirculatorSpeed.SpeedFast ? circ.LightColorFast : circ.LightColorSlow,
+                pointLight);
         }
     }
 
@@ -441,8 +432,8 @@ public sealed class TegSystem : EntitySystem
                         CirculatorB = GetCirculatorSensorData(group.CirculatorB!.Owner),
                         LastGeneration = component.LastGeneration,
                         PowerOutput = supplier.CurrentSupply,
-                        RampPosition = component.RampPosition
-                    }
+                        RampPosition = component.RampPosition,
+                    },
                 };
 
                 _deviceNetwork.QueuePacket(uid, args.SenderAddress, payload);

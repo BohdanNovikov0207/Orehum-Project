@@ -53,13 +53,10 @@ public sealed partial class SpawnPointComponent : Component, ISpawnPoint
     /// <summary>
     /// The type of spawn point
     /// </summary>
-    [DataField("spawn_type"), ViewVariables(VVAccess.ReadWrite)]
+    [DataField("spawn_type")] [ViewVariables(VVAccess.ReadWrite)]
     public SpawnPointType SpawnType { get; set; } = SpawnPointType.Unset;
 
-    public override string ToString()
-    {
-        return $"{Job} {SpawnType}";
-    }
+    public override string ToString() => $"{Job} {SpawnType}";
 }
 
 public enum SpawnPointType

@@ -19,7 +19,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Content.Server.Antag.Components;
 using Content.Server.GameTicking.Rules.Components;
-using Content.Server.Objectives;
 using Content.Shared.Antag;
 using Content.Shared.Chat;
 using Content.Shared.GameTicking.Components;
@@ -110,6 +109,7 @@ public sealed partial class AntagSelectionSystem
                 continue;
             l.Add(session);
         }
+
         return l;
     }
     // goob edit end
@@ -130,8 +130,11 @@ public sealed partial class AntagSelectionSystem
         var countOffset = 0;
         foreach (var otherDef in ent.Comp.Definitions)
         {
-            countOffset += Math.Clamp((poolSize - countOffset) / otherDef.PlayerRatio, otherDef.Min, otherDef.Max) * otherDef.PlayerRatio; // Note: Is the PlayerRatio necessary here? Seems like it can cause issues for defs with varied PlayerRatio.
+            countOffset += Math.Clamp((poolSize - countOffset) / otherDef.PlayerRatio, otherDef.Min, otherDef.Max) *
+                           otherDef
+                               .PlayerRatio; // Note: Is the PlayerRatio necessary here? Seems like it can cause issues for defs with varied PlayerRatio.
         }
+
         // make sure we don't double-count the current selection
         countOffset -= Math.Clamp(poolSize / def.PlayerRatio, def.Min, def.Max) * def.PlayerRatio;
 
@@ -160,6 +163,7 @@ public sealed partial class AntagSelectionSystem
 
             output.Add((mind, data, name));
         }
+
         return output;
     }
 
@@ -169,7 +173,7 @@ public sealed partial class AntagSelectionSystem
     public List<Entity<MindComponent>> GetAntagMinds(Entity<AntagSelectionComponent?> ent)
     {
         if (!Resolve(ent, ref ent.Comp, false))
-            return new();
+            return new List<Entity<MindComponent>>();
 
         var output = new List<Entity<MindComponent>>();
         foreach (var (mind, _) in ent.Comp.AssignedMinds)
@@ -179,6 +183,7 @@ public sealed partial class AntagSelectionSystem
 
             output.Add((mind, mindComp));
         }
+
         return output;
     }
 
@@ -188,7 +193,7 @@ public sealed partial class AntagSelectionSystem
     public List<EntityUid> GetAntagMindEntityUids(Entity<AntagSelectionComponent?> ent)
     {
         if (!Resolve(ent, ref ent.Comp, false))
-            return new();
+            return new List<EntityUid>();
 
         return ent.Comp.AssignedMinds.Select(p => p.Item1).ToList();
     }
@@ -311,7 +316,10 @@ public sealed partial class AntagSelectionSystem
     /// <param name="briefingColor">The color the briefing should be, null for default</param>
     /// <param name="briefingSound">The sound to briefing/greeting sound to play</param>
     [PublicAPI]
-    public void SendBriefing(List<ICommonSession> sessions, string briefing, Color? briefingColor, SoundSpecifier? briefingSound)
+    public void SendBriefing(List<ICommonSession> sessions,
+        string briefing,
+        Color? briefingColor,
+        SoundSpecifier? briefingSound)
     {
         foreach (var session in sessions)
         {
@@ -355,7 +363,12 @@ public sealed partial class AntagSelectionSystem
         if (!string.IsNullOrEmpty(briefing))
         {
             var wrappedMessage = Loc.GetString("chat-manager-server-wrap-message", ("message", briefing));
-            _chat.ChatMessageToOne(ChatChannel.Server, briefing, wrappedMessage, default, false, session.Channel,
+            _chat.ChatMessageToOne(ChatChannel.Server,
+                briefing,
+                wrappedMessage,
+                default,
+                false,
+                session.Channel,
                 briefingColor);
         }
     }
@@ -384,6 +397,7 @@ public sealed partial class AntagSelectionSystem
         {
             return (uid, comp);
         }
+
         var ruleEnt = GameTicker.AddGameRule(id);
         RemComp<LoadMapRuleComponent>(ruleEnt);
         var antag = Comp<AntagSelectionComponent>(ruleEnt);
@@ -439,7 +453,8 @@ public sealed partial class AntagSelectionSystem
                 if (def.Equals(except))
                     continue;
 
-                if (def.MultiAntagSetting == AntagAcceptability.None && comp.PreSelectedSessions.TryGetValue(def, out var set))
+                if (def.MultiAntagSetting == AntagAcceptability.None &&
+                    comp.PreSelectedSessions.TryGetValue(def, out var set))
                 {
                     result.UnionWith(set);
                     break;
@@ -453,7 +468,8 @@ public sealed partial class AntagSelectionSystem
     /// <summary>
     /// Get all definition blacklists from sessions that have been preselected for antag. | GOOBSTATION
     /// </summary>
-    public Dictionary<ICommonSession, List<ProtoId<JobPrototype>>> GetPreSelectedAntagSessionsWithBlacklist(AntagSelectionDefinition? except = null)
+    public Dictionary<ICommonSession, List<ProtoId<JobPrototype>>> GetPreSelectedAntagSessionsWithBlacklist(
+        AntagSelectionDefinition? except = null)
     {
         var result = new Dictionary<ICommonSession, List<ProtoId<JobPrototype>>>();
         var query = QueryAllRules();
@@ -477,17 +493,14 @@ public sealed partial class AntagSelectionSystem
 
                         // If session already exists, merge the blacklists
                         if (result.TryGetValue(session, out var existingBlacklist))
-                        {
                             existingBlacklist.AddRange(blacklist);
-                        }
                         else
-                        {
                             result[session] = new List<ProtoId<JobPrototype>>(blacklist);
-                        }
                     }
                 }
             }
         }
+
         return result;
     }
 }

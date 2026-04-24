@@ -101,33 +101,30 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Linq;
+using Content.Goobstation.Common.Barks;
 using Content.Server.Actions;
 using Content.Server.Humanoid;
-//ADT-Geras-Tweak-Start
-using Content.Server.Speech.Components;
-using Content.Shared.Speech.Components;
-using Content.Shared.Traits.Assorted;
-using Content.Shared.CombatMode.Pacification;
-using Content.Shared.Bed.Sleep;
-using Content.Shared.Eye.Blinding.Components;
-using Content.Server.Traits.Assorted;
-using Content.Shared.Speech.Muting;
-using Content.Shared.Storage.Components;
-using Content.Shared._EinsteinEngines.Language.Components;
-using Content.Goobstation.Common.Barks;
-//ADT-Geras-Tweak-End
 using Content.Server.Inventory;
-using Content.Server.Mind.Commands;
 using Content.Server.Polymorph.Components;
+using Content.Server.Speech.Components;
+using Content.Server.Traits.Assorted;
 using Content.Shared._DV.Polymorph;
+using Content.Shared._EinsteinEngines.Language.Components;
 using Content.Shared._Goobstation.Wizard.BindSoul;
-using Content.Shared.Actions;
+using Content.Shared._Shitmed.Body;
+using Content.Shared._Shitmed.Medical.Surgery.Wounds.Systems;
 using Content.Shared.Actions.Components;
+using Content.Shared.Bed.Sleep;
+using Content.Shared.Body.Components;
+using Content.Shared.Body.Systems;
 using Content.Shared.Buckle;
 using Content.Shared.Buckle.Components;
+using Content.Shared.CombatMode.Pacification;
 using Content.Shared.Coordinates;
 using Content.Shared.Damage;
 using Content.Shared.Destructible;
+using Content.Shared.Eye.Blinding.Components;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.IdentityManagement;
 using Content.Shared.Inventory;
@@ -139,57 +136,54 @@ using Content.Shared.Nutrition;
 using Content.Shared.Polymorph;
 using Content.Shared.Popups;
 using Content.Shared.Random.Helpers;
+using Content.Shared.Speech.Components;
+using Content.Shared.Speech.Muting;
+using Content.Shared.Storage.Components;
 using Content.Shared.Tag;
+using Content.Shared.Traits.Assorted;
 using Robust.Server.Audio;
 using Robust.Server.Containers;
 using Robust.Server.GameObjects;
-using Robust.Shared.Map;
-using Robust.Shared.Physics;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Serialization.Manager;
 using Robust.Shared.Timing;
 using Robust.Shared.Utility;
+//ADT-Geras-Tweak-Start
+//ADT-Geras-Tweak-End
 
 // Shitmed Change
-using Content.Shared._Shitmed.Targeting;
-using Content.Shared._Shitmed.Body;
-using Content.Shared._Shitmed.Medical.Surgery.Wounds.Systems;
-using Content.Shared.Body.Components;
-using Content.Shared.Body.Systems;
-using System.Linq;
 
 namespace Content.Server.Polymorph.Systems;
 
 public sealed partial class PolymorphSystem : EntitySystem
 {
-    [Dependency] private readonly IRobustRandom _random = default!; // Goobstation
-    [Dependency] private readonly ISerializationManager _serialization = default!; // Goobstation
-    [Dependency] private readonly IComponentFactory _compFact = default!;
-    [Dependency] private readonly SharedMapSystem _map = default!;
-    [Dependency] private readonly IPrototypeManager _proto = default!;
-    [Dependency] private readonly IGameTiming _gameTiming = default!;
+    private const string RevertPolymorphId = "ActionRevertPolymorph";
     [Dependency] private readonly ActionsSystem _actions = default!;
     [Dependency] private readonly AudioSystem _audio = default!;
-    [Dependency] private readonly SharedBuckleSystem _buckle = default!;
-    [Dependency] private readonly ContainerSystem _container = default!;
-    [Dependency] private readonly DamageableSystem _damageable = default!;
-    [Dependency] private readonly HumanoidAppearanceSystem _humanoid = default!;
-    [Dependency] private readonly MobStateSystem _mobState = default!;
-    [Dependency] private readonly MobThresholdSystem _mobThreshold = default!;
-    [Dependency] private readonly ServerInventorySystem _inventory = default!;
-    [Dependency] private readonly SharedHandsSystem _hands = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly TransformSystem _transform = default!;
-    [Dependency] private readonly SharedMindSystem _mindSystem = default!;
-    [Dependency] private readonly MetaDataSystem _metaData = default!;
-    [Dependency] private readonly TagSystem _tag = default!; // goob edit
 
     // Shitmed Deps
     [Dependency] private readonly SharedBodySystem _body = default!;
+    [Dependency] private readonly SharedBuckleSystem _buckle = default!;
+    [Dependency] private readonly IComponentFactory _compFact = default!;
+    [Dependency] private readonly ContainerSystem _container = default!;
+    [Dependency] private readonly DamageableSystem _damageable = default!;
+    [Dependency] private readonly IGameTiming _gameTiming = default!;
+    [Dependency] private readonly SharedHandsSystem _hands = default!;
+    [Dependency] private readonly HumanoidAppearanceSystem _humanoid = default!;
+    [Dependency] private readonly ServerInventorySystem _inventory = default!;
+    [Dependency] private readonly SharedMapSystem _map = default!;
+    [Dependency] private readonly MetaDataSystem _metaData = default!;
+    [Dependency] private readonly SharedMindSystem _mindSystem = default!;
+    [Dependency] private readonly MobStateSystem _mobState = default!;
+    [Dependency] private readonly MobThresholdSystem _mobThreshold = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly IPrototypeManager _proto = default!;
+    [Dependency] private readonly IRobustRandom _random = default!; // Goobstation
+    [Dependency] private readonly ISerializationManager _serialization = default!; // Goobstation
+    [Dependency] private readonly TagSystem _tag = default!; // goob edit
+    [Dependency] private readonly TransformSystem _transform = default!;
     [Dependency] private readonly WoundSystem _wound = default!;
-
-    private const string RevertPolymorphId = "ActionRevertPolymorph";
 
     public override void Initialize()
     {
@@ -225,9 +219,7 @@ public sealed partial class PolymorphSystem : EntitySystem
 
             if (comp.Configuration.RevertOnDeath && _mobState.IsDead(uid, mob) ||
                 comp.Configuration.RevertOnCrit && _mobState.IsIncapacitated(uid, mob))
-            {
                 Revert((uid, comp));
-            }
         }
     }
 
@@ -268,10 +260,8 @@ public sealed partial class PolymorphSystem : EntitySystem
     }
 
     private void OnRevertPolymorphActionEvent(Entity<PolymorphedEntityComponent> ent,
-        ref RevertPolymorphActionEvent args)
-    {
+        ref RevertPolymorphActionEvent args) =>
         Revert((ent, ent));
-    }
 
     private void OnBeforeFullySliced(Entity<PolymorphedEntityComponent> ent, ref BeforeFullySlicedEvent args)
     {
@@ -290,9 +280,7 @@ public sealed partial class PolymorphSystem : EntitySystem
     private void OnDestruction(Entity<PolymorphedEntityComponent> ent, ref DestructionEventArgs args)
     {
         if (ent.Comp.Configuration.RevertOnDeath)
-        {
             Revert((ent, ent));
-        }
     }
 
     /// <summary>
@@ -360,7 +348,10 @@ public sealed partial class PolymorphSystem : EntitySystem
 
             proto = entities.Pick(_random);
         }
-        var child = Spawn(proto, _transform.GetMapCoordinates(uid, targetTransformComp), rotation: _transform.GetWorldRotation(uid));
+
+        var child = Spawn(proto,
+            _transform.GetMapCoordinates(uid, targetTransformComp),
+            rotation: _transform.GetWorldRotation(uid));
 
         _mindSystem.MakeSentient(child, configuration.AllowMovement);
         // Goob edit end
@@ -387,7 +378,7 @@ public sealed partial class PolymorphSystem : EntitySystem
             damage != null)
         {
             if (TryComp<BodyComponent>(child, out var childBody)
-                && childBody.BodyType == Shared._Shitmed.Body.BodyType.Complex // Too lazy to come up with a new name lmfao
+                && childBody.BodyType == BodyType.Complex // Too lazy to come up with a new name lmfao
                 && _body.TryGetRootPart(child, out var rootPart, childBody))
             {
                 var woundables = _wound.GetAllWoundableChildrenWithComp<DamageableComponent>(rootPart.Value);
@@ -402,12 +393,10 @@ public sealed partial class PolymorphSystem : EntitySystem
                             _damageable.SetDamage(woundable, woundable.Comp2, wounds);
                     }
                     else
-                    {
                         _damageable.SetDamage(woundable, woundable.Comp2, damage / count);
-                    }
                 }
-
             }
+
             _damageable.SetDamage(child, damageChild, damage);
         }
 
@@ -514,7 +503,7 @@ public sealed partial class PolymorphSystem : EntitySystem
                 typeof(SpanishAccentComponent),
                 typeof(StutteringAccentComponent),
                 typeof(FrontalLispComponent),
-                typeof(SlowAccentComponent)
+                typeof(SlowAccentComponent),
             };
 
             foreach (var accentType in accentComponents)
@@ -523,7 +512,8 @@ public sealed partial class PolymorphSystem : EntitySystem
                     continue;
 
                 var originalAccentComp = EntityManager.GetComponent(uid, accentType);
-                var childAccentComp = (Component) _serialization.CreateCopy(originalAccentComp, notNullableOverride: true);
+                var childAccentComp =
+                    (Component) _serialization.CreateCopy(originalAccentComp, notNullableOverride: true);
                 AddComp(child, childAccentComp);
             }
         }
@@ -543,7 +533,7 @@ public sealed partial class PolymorphSystem : EntitySystem
                 typeof(UnrevivableComponent),
                 typeof(MutedComponent),
                 typeof(ParacusiaComponent),
-                typeof(PainNumbnessComponent)
+                typeof(PainNumbnessComponent),
             };
 
             foreach (var quirkType in quirkComponents)
@@ -552,16 +542,15 @@ public sealed partial class PolymorphSystem : EntitySystem
                     continue;
 
                 var originalQuirkComp = EntityManager.GetComponent(uid, quirkType);
-                var childQuirkComp = (Component) _serialization.CreateCopy(originalQuirkComp, notNullableOverride: true);
+                var childQuirkComp =
+                    (Component) _serialization.CreateCopy(originalQuirkComp, notNullableOverride: true);
                 AddComp(child, childQuirkComp);
             }
         }
         // ADT-Geras-Tweak-End
 
         if (configuration.TransferHumanoidAppearance)
-        {
             _humanoid.CloneAppearance(uid, child);
-        }
 
         if (configuration.ComponentsToTransfer.Count > 0) // Goobstation
         {
@@ -659,7 +648,7 @@ public sealed partial class PolymorphSystem : EntitySystem
             damage != null)
         {
             if (TryComp<BodyComponent>(parent, out var parentBody)
-                && parentBody.BodyType == Shared._Shitmed.Body.BodyType.Complex // Too lazy to come up with a new name lmfao
+                && parentBody.BodyType == BodyType.Complex // Too lazy to come up with a new name lmfao
                 && _body.TryGetRootPart(parent, out var rootPart, parentBody))
             {
                 var woundables = _wound.GetAllWoundableChildrenWithComp<DamageableComponent>(rootPart.Value);
@@ -674,12 +663,10 @@ public sealed partial class PolymorphSystem : EntitySystem
                             _damageable.SetDamage(woundable, woundable.Comp2, wounds);
                     }
                     else
-                    {
                         _damageable.SetDamage(woundable, woundable.Comp2, damage / count);
-                    }
                 }
-
             }
+
             _damageable.SetDamage(parent, damageParent, damage);
         }
 
@@ -689,7 +676,7 @@ public sealed partial class PolymorphSystem : EntitySystem
             foreach (var held in _hands.EnumerateHeld(uid))
             {
                 _hands.TryDrop(uid, held);
-                _hands.TryPickupAnyHand(parent, held, checkActionBlocker: false);
+                _hands.TryPickupAnyHand(parent, held, false);
             }
         }
         else if (component.Configuration.Inventory == PolymorphInventoryChange.Drop)
@@ -731,13 +718,15 @@ public sealed partial class PolymorphSystem : EntitySystem
             SpawnAttachedTo(component.Configuration.EffectProto, parent.ToCoordinates());
 
         var popup = Loc.GetString("polymorph-revert-popup-generic",
-                    ("parent", Identity.Entity(uid, EntityManager)),
-                    ("child", Identity.Entity(parent, EntityManager)));
+            ("parent", Identity.Entity(uid, EntityManager)),
+            ("child", Identity.Entity(parent, EntityManager)));
 
         if (component.Configuration.ExitPolymorphPopup != null)
+        {
             popup = Loc.GetString(component.Configuration.ExitPolymorphPopup,
                 ("parent", Identity.Entity(uid, EntityManager)),
                 ("child", Identity.Entity(parent, EntityManager)));
+        }
 
         if (component.Configuration.ShowPopup)
             _popup.PopupEntity(popup, parent);
@@ -753,7 +742,7 @@ public sealed partial class PolymorphSystem : EntitySystem
     /// <param name="target">The entity that will be gaining the action</param>
     public void CreatePolymorphAction(ProtoId<PolymorphPrototype> id, Entity<PolymorphableComponent> target)
     {
-        target.Comp.PolymorphActions ??= new();
+        target.Comp.PolymorphActions ??= new Dictionary<ProtoId<PolymorphPrototype>, EntityUid>();
         if (target.Comp.PolymorphActions.ContainsKey(id))
             return;
 
@@ -774,10 +763,14 @@ public sealed partial class PolymorphSystem : EntitySystem
         target.Comp.PolymorphActions.Add(id, actionId.Value);
 
         var metaDataCache = MetaData(actionId.Value);
-        _metaData.SetEntityName(actionId.Value, Loc.GetString("polymorph-self-action-name", ("target", entProto.Name)), metaDataCache);
-        _metaData.SetEntityDescription(actionId.Value, Loc.GetString("polymorph-self-action-description", ("target", entProto.Name)), metaDataCache);
+        _metaData.SetEntityName(actionId.Value,
+            Loc.GetString("polymorph-self-action-name", ("target", entProto.Name)),
+            metaDataCache);
+        _metaData.SetEntityDescription(actionId.Value,
+            Loc.GetString("polymorph-self-action-description", ("target", entProto.Name)),
+            metaDataCache);
 
-        if (_actions.GetAction(actionId) is not {} action)
+        if (_actions.GetAction(actionId) is not { } action)
             return;
 
         _actions.SetIcon((action, action.Comp), new SpriteSpecifier.EntityPrototype(polyProto.Configuration.Entity));
@@ -786,7 +779,7 @@ public sealed partial class PolymorphSystem : EntitySystem
 
     public void RemovePolymorphAction(ProtoId<PolymorphPrototype> id, Entity<PolymorphableComponent> target)
     {
-        if (target.Comp.PolymorphActions is not {} actions)
+        if (target.Comp.PolymorphActions is not { } actions)
             return;
 
         if (actions.TryGetValue(id, out var action))
@@ -801,7 +794,10 @@ public sealed partial class PolymorphSystem : EntitySystem
 
     // don't use transfer if you have component references like EE languages
     // ideally you shouldn't use comp references at all
-    public IComponent? CopyPolymorphComponent(EntityUid old, EntityUid @new, string componentRegistration, bool transfer = true)
+    public IComponent? CopyPolymorphComponent(EntityUid old,
+        EntityUid @new,
+        string componentRegistration,
+        bool transfer = true)
     {
         if (!_compFact.TryGetRegistration(componentRegistration, out var reg))
             return null;

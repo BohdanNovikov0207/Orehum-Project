@@ -32,7 +32,8 @@ public sealed partial class PickPathfindPointOperator : HTNOperator
 
         var points = new List<TransformComponent>();
 
-        foreach (var (point, pointXform) in _entManager.EntityQuery<NPCPathfindPointComponent, TransformComponent>(true))
+        foreach (var (point, pointXform) in
+                 _entManager.EntityQuery<NPCPathfindPointComponent, TransformComponent>(true))
         {
             if (gridUid != pointXform.GridUid)
                 continue;
@@ -45,9 +46,9 @@ public sealed partial class PickPathfindPointOperator : HTNOperator
 
         var selected = _random.Pick(points);
 
-        return (true, new Dictionary<string, object>()
+        return (true, new Dictionary<string, object>
         {
-            { NPCBlackboard.MovementTarget, selected.Coordinates }
+            { NPCBlackboard.MovementTarget, selected.Coordinates },
         });
     }
 }

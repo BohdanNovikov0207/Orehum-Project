@@ -10,19 +10,15 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Linq;
-using Content.Shared.UserInterface;
 using Content.Shared.CCVar;
 using Content.Shared.Database;
-using Content.Shared.NameIdentifier;
-using Content.Shared.PowerCell.Components;
-using Content.Shared.Preferences;
 using Content.Shared.Silicons.Borgs;
 using Content.Shared.Silicons.Borgs.Components;
-using Robust.Shared.Configuration;
+using Content.Shared.UserInterface;
 
 namespace Content.Server.Silicons.Borgs;
 
-/// <inheritdoc/>
+/// <inheritdoc />
 public sealed partial class BorgSystem
 {
     // CCvar.
@@ -39,24 +35,25 @@ public sealed partial class BorgSystem
         Subs.CVar(_cfgManager, CCVars.MaxNameLength, value => _maxNameLength = value, true);
     }
 
-    private void OnBeforeBorgUiOpen(EntityUid uid, BorgChassisComponent component, BeforeActivatableUIOpenEvent args)
-    {
+    private void OnBeforeBorgUiOpen(EntityUid uid, BorgChassisComponent component, BeforeActivatableUIOpenEvent args) =>
         UpdateUI(uid, component);
-    }
 
     private void OnEjectBrainBuiMessage(EntityUid uid, BorgChassisComponent component, BorgEjectBrainBuiMessage args)
     {
         if (component.BrainEntity is not { } brain)
             return;
 
-        _adminLog.Add(LogType.Action, LogImpact.Medium,
+        _adminLog.Add(LogType.Action,
+            LogImpact.Medium,
             $"{ToPrettyString(args.Actor):player} removed brain {ToPrettyString(brain)} from borg {ToPrettyString(uid)}");
         _container.Remove(brain, component.BrainContainer);
         _hands.TryPickupAnyHand(args.Actor, brain);
         UpdateUI(uid, component);
     }
 
-    private void OnEjectBatteryBuiMessage(EntityUid uid, BorgChassisComponent component, BorgEjectBatteryBuiMessage args)
+    private void OnEjectBatteryBuiMessage(EntityUid uid,
+        BorgChassisComponent component,
+        BorgEjectBatteryBuiMessage args)
     {
         if (TryEjectPowerCell(uid, component, out var ents))
             _hands.TryPickupAnyHand(args.Actor, ents.First());
@@ -68,9 +65,7 @@ public sealed partial class BorgSystem
             args.Name.Length == 0 ||
             string.IsNullOrWhiteSpace(args.Name) ||
             string.IsNullOrEmpty(args.Name))
-        {
             return;
-        }
 
         var name = args.Name.Trim();
 
@@ -80,11 +75,15 @@ public sealed partial class BorgSystem
         if (metaData.EntityName.Equals(name, StringComparison.InvariantCulture))
             return;
 
-        _adminLog.Add(LogType.Action, LogImpact.High, $"{ToPrettyString(args.Actor):player} set borg \"{ToPrettyString(uid)}\"'s name to: {name}");
+        _adminLog.Add(LogType.Action,
+            LogImpact.High,
+            $"{ToPrettyString(args.Actor):player} set borg \"{ToPrettyString(uid)}\"'s name to: {name}");
         _metaData.SetEntityName(uid, name, metaData);
     }
 
-    private void OnRemoveModuleBuiMessage(EntityUid uid, BorgChassisComponent component, BorgRemoveModuleBuiMessage args)
+    private void OnRemoveModuleBuiMessage(EntityUid uid,
+        BorgChassisComponent component,
+        BorgRemoveModuleBuiMessage args)
     {
         var module = GetEntity(args.Module);
 
@@ -94,7 +93,8 @@ public sealed partial class BorgSystem
         if (!CanRemoveModule((uid, component), (module, Comp<BorgModuleComponent>(module)), args.Actor))
             return;
 
-        _adminLog.Add(LogType.Action, LogImpact.Medium,
+        _adminLog.Add(LogType.Action,
+            LogImpact.Medium,
             $"{ToPrettyString(args.Actor):player} removed module {ToPrettyString(module)} from borg {ToPrettyString(uid)}");
         _container.Remove(module, component.ModuleContainer);
         _hands.TryPickupAnyHand(args.Actor, module);

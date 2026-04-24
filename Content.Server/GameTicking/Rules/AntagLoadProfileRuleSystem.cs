@@ -10,6 +10,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Numerics;
 using Content.Server.Antag;
 using Content.Server.GameTicking.Rules.Components;
 using Content.Server.Humanoid;
@@ -18,15 +19,16 @@ using Content.Shared.Humanoid;
 using Content.Shared.Humanoid.Prototypes;
 using Content.Shared.Preferences;
 using Robust.Shared.Prototypes;
-using System.Numerics; // Goobstation
+
+// Goobstation
 
 namespace Content.Server.GameTicking.Rules;
 
 public sealed class AntagLoadProfileRuleSystem : GameRuleSystem<AntagLoadProfileRuleComponent>
 {
     [Dependency] private readonly HumanoidAppearanceSystem _humanoid = default!;
-    [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly IServerPreferencesManager _prefs = default!;
+    [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly SharedHumanoidAppearanceSystem _sharedHumanoid = default!; // Goobstation
 
     public override void Initialize()
@@ -47,15 +49,13 @@ public sealed class AntagLoadProfileRuleSystem : GameRuleSystem<AntagLoadProfile
 
 
         if (profile?.Species is not { } speciesId || !_proto.TryIndex(speciesId, out var species))
-        {
-            species = _proto.Index<SpeciesPrototype>(SharedHumanoidAppearanceSystem.DefaultSpecies);
-        }
+            species = _proto.Index(SharedHumanoidAppearanceSystem.DefaultSpecies);
 
         if (ent.Comp.SpeciesOverride != null
-            && (ent.Comp.AlwaysUseSpeciesOverride || ( ent.Comp.SpeciesOverrideBlacklist?.Contains(new ProtoId<SpeciesPrototype>(species.ID)) ?? false))) // Goob edit
-        {
+            && (ent.Comp.AlwaysUseSpeciesOverride ||
+                (ent.Comp.SpeciesOverrideBlacklist?.Contains(new ProtoId<SpeciesPrototype>(species.ID)) ??
+                 false))) // Goob edit
             species = _proto.Index(ent.Comp.SpeciesOverride.Value);
-        }
 
         if (ent.Comp.SpeciesHardOverride is not null) // Shitmed - Starlight Abductors
             species = _proto.Index(ent.Comp.SpeciesHardOverride.Value); // Shitmed - Starlight Abductors

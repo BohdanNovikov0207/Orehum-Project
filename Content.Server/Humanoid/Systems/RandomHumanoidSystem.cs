@@ -90,22 +90,19 @@ using Robust.Shared.Serialization.Manager;
 namespace Content.Server.Humanoid.Systems;
 
 /// <summary>
-///     This deals with spawning and setting up random humanoids.
+/// This deals with spawning and setting up random humanoids.
 /// </summary>
 public sealed class RandomHumanoidSystem : EntitySystem
 {
+    [Dependency] private readonly HumanoidAppearanceSystem _humanoid = default!;
+    [Dependency] private readonly MetaDataSystem _metaData = default!;
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly ISerializationManager _serialization = default!;
-    [Dependency] private readonly MetaDataSystem _metaData = default!;
 
-    [Dependency] private readonly HumanoidAppearanceSystem _humanoid = default!;
-
-    /// <inheritdoc/>
-    public override void Initialize()
-    {
+    /// <inheritdoc />
+    public override void Initialize() =>
         SubscribeLocalEvent<RandomHumanoidSpawnerComponent, MapInitEvent>(OnMapInit,
-            after: new []{ typeof(RandomMetadataSystem) });
-    }
+            after: new[] { typeof(RandomMetadataSystem) });
 
     private void OnMapInit(EntityUid uid, RandomHumanoidSpawnerComponent component, MapInitEvent args)
     {
@@ -122,7 +119,7 @@ public sealed class RandomHumanoidSystem : EntitySystem
         var profile = prototype.SpeciesWhitelist != null
             ? HumanoidCharacterProfile.RandomWithSpecies(prototype.SpeciesWhitelist)
             : HumanoidCharacterProfile.Random(prototype.SpeciesBlacklist); // Goob edit
-        var speciesProto = _prototypeManager.Index<SpeciesPrototype>(profile.Species);
+        var speciesProto = _prototypeManager.Index(profile.Species);
         var humanoid = EntityManager.CreateEntityUninitialized(speciesProto.Prototype, coordinates);
 
         _metaData.SetEntityName(humanoid, prototype.RandomizeName ? profile.Name : name);
@@ -133,7 +130,7 @@ public sealed class RandomHumanoidSystem : EntitySystem
         {
             foreach (var entry in prototype.Components.Values)
             {
-                var comp = (Component)_serialization.CreateCopy(entry.Component, notNullableOverride: true);
+                var comp = (Component) _serialization.CreateCopy(entry.Component, notNullableOverride: true);
                 RemComp(humanoid, comp.GetType());
                 AddComp(humanoid, comp);
             }

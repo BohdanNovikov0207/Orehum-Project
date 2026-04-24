@@ -82,10 +82,10 @@ namespace Content.Server.NPC.HTN.PrimitiveTasks.Operators.Combat;
 public sealed partial class UnPullOperator : HTNOperator
 {
     [Dependency] private readonly IEntityManager _entManager = default!;
-    private PullingSystem _pulling = default!;
     private ActionBlockerSystem _actionBlocker = default!;
 
     private EntityQuery<PullableComponent> _pullableQuery;
+    private PullingSystem _pulling = default!;
 
     [DataField("shutdownState")]
     public HTNPlanState ShutdownState { get; private set; } = HTNPlanState.TaskFinished;
@@ -107,8 +107,5 @@ public sealed partial class UnPullOperator : HTNOperator
             _pulling.TryStopPull(owner, _pullableQuery.GetComponent(owner), owner);
     }
 
-    public override HTNOperatorStatus Update(NPCBlackboard blackboard, float frameTime)
-    {
-        return HTNOperatorStatus.Finished;
-    }
+    public override HTNOperatorStatus Update(NPCBlackboard blackboard, float frameTime) => HTNOperatorStatus.Finished;
 }

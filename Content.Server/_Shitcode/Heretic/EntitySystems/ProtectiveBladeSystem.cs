@@ -10,28 +10,26 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Server.Heretic.Components;
-using Content.Server.Weapons.Ranged.Systems;
-using Content.Shared.Damage;
-using Content.Shared.Follower;
-using Content.Shared.Follower.Components;
-using Content.Shared.Heretic;
-using Content.Shared.Interaction;
-using Content.Shared.StatusEffect;
-using Robust.Shared.Prototypes;
 using System.Linq;
 using System.Numerics;
 using Content.Server.Buckle.Systems;
 using Content.Server.Hands.Systems;
 using Content.Server.Heretic.Abilities;
+using Content.Server.Heretic.Components;
+using Content.Server.Weapons.Ranged.Systems;
 using Content.Shared._Goobstation.Heretic.Systems;
 using Content.Shared._Shitcode.Heretic.Components;
+using Content.Shared.Damage;
 using Content.Shared.Damage.Components;
+using Content.Shared.Follower;
+using Content.Shared.Follower.Components;
 using Content.Shared.Input;
+using Content.Shared.Interaction;
 using Content.Shared.Mobs.Systems;
 using Content.Shared.Physics;
 using Content.Shared.Popups;
 using Content.Shared.Projectiles;
+using Content.Shared.StatusEffect;
 using Content.Shared.Weapons.Melee.Events;
 using Content.Shared.Weapons.Ranged.Events;
 using Content.Shared.Weapons.Reflect;
@@ -40,6 +38,7 @@ using Robust.Shared.Audio.Systems;
 using Robust.Shared.Input.Binding;
 using Robust.Shared.Map;
 using Robust.Shared.Player;
+using Robust.Shared.Prototypes;
 
 namespace Content.Server.Heretic.EntitySystems;
 
@@ -50,23 +49,24 @@ public sealed class ProtectiveBladeUsedEvent : EntityEventArgs
 
 public sealed class ProtectiveBladeSystem : EntitySystem
 {
-    [Dependency] private readonly FollowerSystem _follow = default!;
-    [Dependency] private readonly GunSystem _gun = default!;
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly SharedTransformSystem _xform = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly ReflectSystem _reflect = default!;
-    [Dependency] private readonly StatusEffectsSystem _status = default!;
-    [Dependency] private readonly SharedInteractionSystem _interaction = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly MobStateSystem _mobState = default!;
-    [Dependency] private readonly HereticSystem _heretic = default!;
-
     public static readonly EntProtoId BladePrototype = "HereticProtectiveBlade";
     public static readonly EntProtoId BladeProjecilePrototype = "HereticProtectiveBladeProjectile";
     public static readonly SoundSpecifier BladeAppearSound = new SoundPathSpecifier("/Audio/Items/unsheath.ogg");
+
     public static readonly SoundSpecifier BladeBlockSound =
         new SoundPathSpecifier("/Audio/_Goobstation/Heretic/parry.ogg");
+
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly FollowerSystem _follow = default!;
+    [Dependency] private readonly GunSystem _gun = default!;
+    [Dependency] private readonly HereticSystem _heretic = default!;
+    [Dependency] private readonly SharedInteractionSystem _interaction = default!;
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
+    [Dependency] private readonly MobStateSystem _mobState = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly ReflectSystem _reflect = default!;
+    [Dependency] private readonly StatusEffectsSystem _status = default!;
+    [Dependency] private readonly SharedTransformSystem _xform = default!;
 
     public override void Initialize()
     {
@@ -74,7 +74,8 @@ public sealed class ProtectiveBladeSystem : EntitySystem
 
         SubscribeLocalEvent<ProtectiveBladeComponent, ComponentStartup>(OnStartup);
 
-        SubscribeLocalEvent<ProtectiveBladesComponent, InteractHandEvent>(OnHereticInteract, after: [typeof(BuckleSystem)]);
+        SubscribeLocalEvent<ProtectiveBladesComponent, InteractHandEvent>(OnHereticInteract,
+            after: [typeof(BuckleSystem)]);
         SubscribeLocalEvent<ProtectiveBladesComponent, BeforeDamageChangedEvent>(OnTakeDamage);
         SubscribeLocalEvent<ProtectiveBladesComponent, BeforeHarmfulActionEvent>(OnBeforeHarmfulAction,
             after: [typeof(HereticAbilitySystem), typeof(RiposteeSystem)]);
@@ -120,7 +121,8 @@ public sealed class ProtectiveBladeSystem : EntitySystem
             args.Handled = true;
     }
 
-    private void OnProjectileReflectAttempt(Entity<ProtectiveBladesComponent> ent, ref ProjectileReflectAttemptEvent args)
+    private void OnProjectileReflectAttempt(Entity<ProtectiveBladesComponent> ent,
+        ref ProjectileReflectAttemptEvent args)
     {
         if (args.Cancelled)
             return;
@@ -194,16 +196,12 @@ public sealed class ProtectiveBladeSystem : EntitySystem
             pbc.Timer -= frameTime;
 
             if (pbc.Timer <= 0)
-            {
                 RemoveProtectiveBlade((uid, pbc));
-            }
         }
     }
 
-    private void OnStartup(Entity<ProtectiveBladeComponent> ent, ref ComponentStartup args)
-    {
+    private void OnStartup(Entity<ProtectiveBladeComponent> ent, ref ComponentStartup args) =>
         ent.Comp.Timer = ent.Comp.Lifetime;
-    }
 
     private void OnTakeDamage(Entity<ProtectiveBladesComponent> ent, ref BeforeDamageChangedEvent args)
     {
@@ -237,11 +235,12 @@ public sealed class ProtectiveBladeSystem : EntitySystem
 
         return blades;
     }
+
     private EntityUid? GetNearestTarget(EntityUid origin, float range = 10f)
     {
         var pos = _xform.GetWorldPosition(origin);
 
-        var lookup = _lookup.GetEntitiesInRange(origin, range, flags: LookupFlags.Dynamic)
+        var lookup = _lookup.GetEntitiesInRange(origin, range, LookupFlags.Dynamic)
             .Where(e => e != origin && _mobState.IsAlive(e) && _interaction.InRangeUnobstructed(
                 origin,
                 e,
@@ -283,18 +282,21 @@ public sealed class ProtectiveBladeSystem : EntitySystem
         }
         */
     }
+
     public void RemoveProtectiveBlade(Entity<ProtectiveBladeComponent> blade)
     {
         if (!TryComp<FollowerComponent>(blade, out var follower))
             return;
 
-        var ev = new ProtectiveBladeUsedEvent() { Used = blade };
+        var ev = new ProtectiveBladeUsedEvent { Used = blade };
         RaiseLocalEvent(follower.Following, ev);
 
         QueueDel(blade);
     }
 
-    public bool TryThrowProtectiveBlade(EntityUid origin, Entity<ProtectiveBladeComponent>? pblade, EntityUid? target = null)
+    public bool TryThrowProtectiveBlade(EntityUid origin,
+        Entity<ProtectiveBladeComponent>? pblade,
+        EntityUid? target = null)
     {
         if (HasComp<BlockProtectiveBladeShootComponent>(origin))
             return false;
@@ -343,7 +345,7 @@ public sealed class ProtectiveBladeSystem : EntitySystem
         if (targetEntity != EntityUid.Invalid)
             _gun.SetTarget(proj, targetEntity, out _);
 
-        var ev = new ProtectiveBladeUsedEvent() { Used = pblade.Value };
+        var ev = new ProtectiveBladeUsedEvent { Used = pblade.Value };
         RaiseLocalEvent(origin, ev);
 
         QueueDel(pblade.Value);

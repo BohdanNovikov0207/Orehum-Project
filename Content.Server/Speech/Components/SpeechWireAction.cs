@@ -12,8 +12,8 @@ namespace Content.Server.Speech;
 
 public sealed partial class SpeechWireAction : ComponentWireAction<SpeechComponent>
 {
-    private SpeechSystem _speech = default!;
     private PopupSystem _popup = default!;
+    private SpeechSystem _speech = default!;
 
     public override Color Color { get; set; } = Color.Green;
     public override string Name { get; set; } = "wire-name-speech";
@@ -43,8 +43,6 @@ public sealed partial class SpeechWireAction : ComponentWireAction<SpeechCompone
         return true;
     }
 
-    public override void Pulse(EntityUid user, Wire wire, SpeechComponent component)
-    {
+    public override void Pulse(EntityUid user, Wire wire, SpeechComponent component) =>
         _popup.PopupEntity(Loc.GetString("wire-speech-pulse", ("name", wire.Owner)), wire.Owner);
-    }
 }

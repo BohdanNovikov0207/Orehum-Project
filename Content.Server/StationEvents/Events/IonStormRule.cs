@@ -24,7 +24,10 @@ public sealed class IonStormRule : StationEventSystem<IonStormRuleComponent>
 {
     [Dependency] private readonly IonStormSystem _ionStorm = default!;
 
-    protected override void Started(EntityUid uid, IonStormRuleComponent comp, GameRuleComponent gameRule, GameRuleStartedEvent args)
+    protected override void Started(EntityUid uid,
+        IonStormRuleComponent comp,
+        GameRuleComponent gameRule,
+        GameRuleStartedEvent args)
     {
         base.Started(uid, comp, gameRule, args);
 

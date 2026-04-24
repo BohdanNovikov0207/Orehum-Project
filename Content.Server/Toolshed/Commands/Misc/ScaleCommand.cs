@@ -10,11 +10,11 @@ namespace Content.Server.Toolshed.Commands.Misc;
 /// <summary>
 /// Used to change an entity's sprite scale.
 /// </summary>
-[ToolshedCommand, AdminCommand(AdminFlags.VarEdit)]
+[ToolshedCommand] [AdminCommand(AdminFlags.VarEdit)]
 public sealed class ScaleCommand : ToolshedCommand
 {
-    private SharedScaleVisualsSystem? _scaleVisuals;
     private SharedPhysicsSystem? _physics;
+    private SharedScaleVisualsSystem? _scaleVisuals;
 
     [CommandImplementation("set")]
     public IEnumerable<EntityUid> Set([PipedArgument] IEnumerable<EntityUid> input, Vector2 scale)

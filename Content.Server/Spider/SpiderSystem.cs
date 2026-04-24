@@ -5,10 +5,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Server.Popups;
-using Content.Shared.Spider;
 using Content.Shared.Maps;
 using Content.Shared.Mobs.Systems;
-using Robust.Server.GameObjects;
+using Content.Shared.Spider;
 using Robust.Shared.Map;
 using Robust.Shared.Player;
 using Robust.Shared.Timing;
@@ -17,13 +16,13 @@ namespace Content.Server.Spider;
 
 public sealed class SpiderSystem : SharedSpiderSystem
 {
-    [Dependency] private readonly PopupSystem _popup = default!;
-    [Dependency] private readonly TurfSystem _turf = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly MobStateSystem _mobState = default!;
+    [Dependency] private readonly PopupSystem _popup = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly TurfSystem _turf = default!;
 
     /// <summary>
-    ///     A recycled hashset used to check turfs for spiderwebs.
+    /// A recycled hashset used to check turfs for spiderwebs.
     /// </summary>
     private readonly HashSet<EntityUid> _webs = [];
 
@@ -95,7 +94,7 @@ public sealed class SpiderSystem : SharedSpiderSystem
         // Spawn web in other directions
         for (var i = 0; i < 4; i++)
         {
-            var direction = (DirectionFlag)(1 << i);
+            var direction = (DirectionFlag) (1 << i);
             var outerSpawnCoordinates = coords.Offset(direction.AsDir().ToVec());
 
             if (IsTileBlockedByWeb(outerSpawnCoordinates))
@@ -117,6 +116,7 @@ public sealed class SpiderSystem : SharedSpiderSystem
             if (HasComp<SpiderWebObjectComponent>(entity))
                 return true;
         }
+
         return false;
     }
 }

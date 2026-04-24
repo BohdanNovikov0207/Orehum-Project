@@ -9,15 +9,15 @@
 
 using Content.Server.Atmos.EntitySystems;
 using Content.Server.Body.Systems;
-using Content.Shared.NodeContainer;
 using Content.Server.NodeContainer.EntitySystems;
 using Content.Server.NodeContainer.Nodes;
 using Content.Shared._Starlight.VentCrawling.Components;
 using Content.Shared.Actions.Events;
-using Content.Shared.Interaction.Events;
 using Content.Shared.Hands;
+using Content.Shared.Interaction.Events;
 using Content.Shared.Inventory.Events;
 using Content.Shared.Item;
+using Content.Shared.NodeContainer;
 using Content.Shared.Throwing;
 
 namespace Content.Server._Starlight.VentCrawling;
@@ -42,7 +42,6 @@ public sealed class BeingVentCrawSystem : EntitySystem
         SubscribeLocalEvent<BeingVentCrawlerComponent, DropAttemptEvent>(OnDropAttempt);
         SubscribeLocalEvent<BeingVentCrawlerComponent, IsUnequippingAttemptEvent>(OnUnequiptAttempt);
         SubscribeLocalEvent<BeingVentCrawlerComponent, IsEquippingAttemptEvent>(OnEquiptAttempt);
-
     }
 
     private void OnGetAir(EntityUid uid, BeingVentCrawlerComponent component, ref AtmosExposedGetAirEvent args)
@@ -121,7 +120,9 @@ public sealed class BeingVentCrawSystem : EntitySystem
     private void OnDropAttempt(EntityUid uid, BeingVentCrawlerComponent component, ref DropAttemptEvent args)
         => args.Cancel();
 
-    private void OnUnequiptAttempt(EntityUid uid, BeingVentCrawlerComponent component, ref IsUnequippingAttemptEvent args)
+    private void OnUnequiptAttempt(EntityUid uid,
+        BeingVentCrawlerComponent component,
+        ref IsUnequippingAttemptEvent args)
         => args.Cancel();
 
     private void OnEquiptAttempt(EntityUid uid, BeingVentCrawlerComponent component, ref IsEquippingAttemptEvent args)

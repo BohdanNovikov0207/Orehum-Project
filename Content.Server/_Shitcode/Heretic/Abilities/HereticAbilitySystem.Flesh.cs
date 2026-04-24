@@ -15,12 +15,12 @@ using Content.Goobstation.Maths.FixedPoint;
 using Content.Goobstation.Shared.Clothing.Components;
 using Content.Goobstation.Shared.MartialArts.Components;
 using Content.Server.Body.Components;
-using Content.Server.Body.Systems;
 using Content.Server.Ghost.Roles.Components;
 using Content.Shared._Shitcode.Heretic.Components;
 using Content.Shared.Body.Components;
 using Content.Shared.Body.Organ;
 using Content.Shared.Body.Part;
+using Content.Shared.Body.Prototypes;
 using Content.Shared.Body.Systems;
 using Content.Shared.Chemistry.Components.SolutionManager;
 using Content.Shared.Cloning;
@@ -85,7 +85,11 @@ public sealed partial class HereticAbilitySystem
         if (!Heretic.TryGetHereticComponent(ent, out var heretic, out _) || heretic.PathStage <= 0)
             return;
 
-        var multiplier = GetMultiplier((ent.Owner, ent.Comp), heretic, ref args, out var stage, out var multipliersApplied);
+        var multiplier = GetMultiplier((ent.Owner, ent.Comp),
+            heretic,
+            ref args,
+            out var stage,
+            out var multipliersApplied);
         if (!multipliersApplied)
             return;
 
@@ -152,10 +156,8 @@ public sealed partial class HereticAbilitySystem
         args.Organ = stomach;
     }
 
-    private void OnMapInit(Entity<FleshPassiveComponent> ent, ref MapInitEvent args)
-    {
+    private void OnMapInit(Entity<FleshPassiveComponent> ent, ref MapInitEvent args) =>
         ent.Comp.FleshStomach = ResolveStomach(ent);
-    }
 
     private Entity<StomachComponent, OrganComponent> ResolveStomach(Entity<FleshPassiveComponent> ent)
     {
@@ -181,8 +183,8 @@ public sealed partial class HereticAbilitySystem
         var metabolizer = EnsureComp<MetabolizerComponent>(fleshStomach);
         metabolizer.UpdateInterval = TimeSpan.FromMilliseconds(100);
         metabolizer.MaxPoisonsProcessable = 10;
-        metabolizer.MetabolismGroups = new() { new() { Id = "Food" }, new() { Id = "Drink" } };
-        metabolizer.MetabolizerTypes = new() { "Vox" };
+        metabolizer.MetabolismGroups = new List<MetabolismGroupEntry> { new() { Id = "Food" }, new() { Id = "Drink" } };
+        metabolizer.MetabolizerTypes = new HashSet<ProtoId<MetabolizerTypePrototype>> { "Vox" };
         metabolizer.SolutionOnBody = false;
         metabolizer.RemoveEmpty = true;
         metabolizer.SolutionName = solName;
@@ -319,7 +321,7 @@ public sealed partial class HereticAbilitySystem
                 { "Blunt", 0.3 },
                 { "Slash", 0.3 },
                 { "Piercing", 0.3 },
-            }
+            },
         };
         damage.MultiplierIncrease = 0.02f;
         damage.IgnoreResistances = true;
@@ -337,6 +339,7 @@ public sealed partial class HereticAbilitySystem
             _npcFaction.AggroEntity((clone.Value, exception), uid);
             EnsureComp<FleshMimickedComponent>(uid).FleshMimics.Add(clone.Value);
         }
+
         if (hostile != null && hostile.Value != user)
         {
             _npcFaction.AggroEntity((clone.Value, exception), hostile.Value);

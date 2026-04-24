@@ -7,25 +7,24 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Server.GameTicking.Rules;
 using Content.Server.Objectives.Components;
 using Content.Shared.Mind;
 using Content.Shared.Objectives.Components;
-using Content.Server.GameTicking.Rules;
-using Content.Server.Revolutionary.Components;
 using Robust.Shared.Random;
-using System.Linq;
 
 namespace Content.Server.Objectives.Systems;
 
 /// <summary>
-/// Handles assinging a target to an objective entity with <see cref="TargetObjectiveComponent"/> using different components.
+/// Handles assinging a target to an objective entity with <see cref="TargetObjectiveComponent" /> using different
+/// components.
 /// These can be combined with condition components for objective completions in order to create a variety of objectives.
 /// </summary>
 public sealed class PickObjectiveTargetSystem : EntitySystem
 {
-    [Dependency] private readonly TargetObjectiveSystem _target = default!;
     [Dependency] private readonly SharedMindSystem _mind = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly TargetObjectiveSystem _target = default!;
     [Dependency] private readonly TraitorRuleSystem _traitorRule = default!;
 
     public override void Initialize()
@@ -79,7 +78,7 @@ public sealed class PickObjectiveTargetSystem : EntitySystem
             return;
 
         // couldn't find a target :(
-        if (_mind.PickFromPool(ent.Comp.Pool, ent.Comp.Filters, args.MindId) is not {} picked)
+        if (_mind.PickFromPool(ent.Comp.Pool, ent.Comp.Filters, args.MindId) is not { } picked)
         {
             args.Cancelled = true;
             return;

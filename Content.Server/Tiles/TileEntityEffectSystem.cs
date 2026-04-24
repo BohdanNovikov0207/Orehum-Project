@@ -5,8 +5,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.StepTrigger.Systems;
 using Content.Shared.EntityEffects;
+using Content.Shared.StepTrigger.Systems;
 
 namespace Content.Server.Tiles;
 
@@ -21,10 +21,8 @@ public sealed class TileEntityEffectSystem : EntitySystem
         SubscribeLocalEvent<TileEntityEffectComponent, StepTriggerAttemptEvent>(OnTileStepTriggerAttempt);
     }
 
-    private void OnTileStepTriggerAttempt(Entity<TileEntityEffectComponent> ent, ref StepTriggerAttemptEvent args)
-    {
+    private void OnTileStepTriggerAttempt(Entity<TileEntityEffectComponent> ent, ref StepTriggerAttemptEvent args) =>
         args.Continue = true;
-    }
 
     private void OnTileStepTriggered(Entity<TileEntityEffectComponent> ent, ref StepTriggeredOffEvent args)
     {

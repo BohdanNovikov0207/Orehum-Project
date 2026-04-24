@@ -18,12 +18,12 @@ public sealed partial class StoreSystem
 {
     [Dependency] private readonly IConsoleHost _consoleHost = default!;
 
-    public void InitializeCommand()
-    {
-        _consoleHost.RegisterCommand("addcurrency", "Adds currency to the specified store", "addcurrency <uid> <currency prototype> <amount>",
+    public void InitializeCommand() =>
+        _consoleHost.RegisterCommand("addcurrency",
+            "Adds currency to the specified store",
+            "addcurrency <uid> <currency prototype> <amount>",
             AddCurrencyCommand,
             AddCurrencyCommandCompletions);
-    }
 
     [AdminCommand(AdminFlags.Fun)]
     private void AddCurrencyCommand(IConsoleShell shell, string argstr, string[] args)
@@ -34,17 +34,16 @@ public sealed partial class StoreSystem
             return;
         }
 
-        if (!NetEntity.TryParse(args[0], out var uidNet) || !TryGetEntity(uidNet, out var uid) || !float.TryParse(args[2], out var id))
-        {
+        if (!NetEntity.TryParse(args[0], out var uidNet) || !TryGetEntity(uidNet, out var uid) ||
+            !float.TryParse(args[2], out var id))
             return;
-        }
 
         if (!TryComp<StoreComponent>(uid, out var store))
             return;
 
         var currency = new Dictionary<string, FixedPoint2>
         {
-            { args[1], id }
+            { args[1], id },
         };
 
         TryAddCurrency(currency, uid.Value, store);
@@ -60,13 +59,15 @@ public sealed partial class StoreSystem
             {
                 allStores.Add(storeuid.ToString());
             }
+
             return CompletionResult.FromHintOptions(allStores, "<uid>");
         }
 
         if (args.Length == 2 && NetEntity.TryParse(args[0], out var uidNet) && TryGetEntity(uidNet, out var uid))
         {
             if (TryComp<StoreComponent>(uid, out var store))
-                return CompletionResult.FromHintOptions(store.CurrencyWhitelist.Select(p => p.ToString()), "<currency prototype>");
+                return CompletionResult.FromHintOptions(store.CurrencyWhitelist.Select(p => p.ToString()),
+                    "<currency prototype>");
         }
 
         return CompletionResult.Empty;

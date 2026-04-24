@@ -21,33 +21,32 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Goobstation.Shared.IntrinsicVoiceModulator.VoiceMask; // Goobstation
 using Content.Shared.Actions;
 using Content.Shared.Administration.Logs;
 using Content.Shared.CCVar;
 using Content.Shared.Chat;
-using Content.Shared.Chat.RadioIconsEvents; // Goobstation
 using Content.Shared.Clothing;
 using Content.Shared.Database;
 using Content.Shared.Inventory;
 using Content.Shared.Popups;
-using Content.Shared.Preferences;
-using Content.Shared.Roles.Jobs; // Goobstation
 using Content.Shared.Speech;
 using Content.Shared.VoiceMask;
 using Robust.Shared.Configuration;
 using Robust.Shared.Prototypes;
+// Goobstation
+// Goobstation
+// Goobstation
 
 namespace Content.Server.VoiceMask;
 
-public sealed partial class VoiceMaskSystem : EntitySystem
+public sealed class VoiceMaskSystem : EntitySystem
 {
-    [Dependency] private readonly SharedUserInterfaceSystem _uiSystem = default!;
-    [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
-    [Dependency] private readonly IConfigurationManager _cfgManager = default!;
-    [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
-    [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly SharedActionsSystem _actions = default!;
+    [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
+    [Dependency] private readonly IConfigurationManager _cfgManager = default!;
+    [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
+    [Dependency] private readonly IPrototypeManager _proto = default!;
+    [Dependency] private readonly SharedUserInterfaceSystem _uiSystem = default!;
 
     // CCVar.
     private int _maxNameLength;
@@ -55,7 +54,8 @@ public sealed partial class VoiceMaskSystem : EntitySystem
     public override void Initialize()
     {
         base.Initialize();
-        SubscribeLocalEvent<VoiceMaskComponent, InventoryRelayedEvent<TransformSpeakerNameEvent>>(OnTransformSpeakerName);
+        SubscribeLocalEvent<VoiceMaskComponent, InventoryRelayedEvent<TransformSpeakerNameEvent>>(
+            OnTransformSpeakerName);
         SubscribeLocalEvent<VoiceMaskComponent, VoiceMaskChangeNameMessage>(OnChangeName);
         SubscribeLocalEvent<VoiceMaskComponent, VoiceMaskChangeVerbMessage>(OnChangeVerb);
         SubscribeLocalEvent<VoiceMaskComponent, ClothingGotEquippedEvent>(OnEquip);
@@ -64,13 +64,22 @@ public sealed partial class VoiceMaskSystem : EntitySystem
         Subs.CVar(_cfgManager, CCVars.MaxNameLength, value => _maxNameLength = value, true);
     }
 
-    private void OnTransformSpeakerName(Entity<VoiceMaskComponent> entity, ref InventoryRelayedEvent<TransformSpeakerNameEvent> args)
+    private void OnTransformSpeakerName(Entity<VoiceMaskComponent> entity,
+        ref InventoryRelayedEvent<TransformSpeakerNameEvent> args)
     {
         args.Args.VoiceName = GetCurrentVoiceName(entity);
         args.Args.SpeechVerb = entity.Comp.VoiceMaskSpeechVerb ?? args.Args.SpeechVerb;
     }
 
+    #region Helper functions
+
+    private string GetCurrentVoiceName(Entity<VoiceMaskComponent> entity) =>
+        entity.Comp.VoiceMaskName ?? Loc.GetString("voice-mask-default-name-override");
+
+    #endregion
+
     #region User inputs from UI
+
     private void OnChangeVerb(Entity<VoiceMaskComponent> entity, ref VoiceMaskChangeVerbMessage msg)
     {
         if (msg.Verb is { } id && !_proto.HasIndex<SpeechVerbPrototype>(id))
@@ -88,12 +97,17 @@ public sealed partial class VoiceMaskSystem : EntitySystem
     {
         if (message.Name.Length > _maxNameLength || message.Name.Length <= 0)
         {
-            _popupSystem.PopupEntity(Loc.GetString("voice-mask-popup-failure"), entity, message.Actor, PopupType.SmallCaution);
+            _popupSystem.PopupEntity(Loc.GetString("voice-mask-popup-failure"),
+                entity,
+                message.Actor,
+                PopupType.SmallCaution);
             return;
         }
 
         entity.Comp.VoiceMaskName = message.Name;
-        _adminLogger.Add(LogType.Action, LogImpact.Medium, $"{ToPrettyString(message.Actor):player} set voice of {ToPrettyString(entity):mask}: {entity.Comp.VoiceMaskName}");
+        _adminLogger.Add(LogType.Action,
+            LogImpact.Medium,
+            $"{ToPrettyString(message.Actor):player} set voice of {ToPrettyString(entity):mask}: {entity.Comp.VoiceMaskName}");
 
         _popupSystem.PopupEntity(Loc.GetString("voice-mask-popup-success"), entity, message.Actor);
 
@@ -103,6 +117,7 @@ public sealed partial class VoiceMaskSystem : EntitySystem
     #endregion
 
     #region UI
+
     private void OnEquip(EntityUid uid, VoiceMaskComponent component, ClothingGotEquippedEvent args)
     {
         if (component.EnableAction) //Goobstation
@@ -126,14 +141,12 @@ public sealed partial class VoiceMaskSystem : EntitySystem
     public void UpdateUI(Entity<VoiceMaskComponent> entity) // Make public by goobstation
     {
         if (_uiSystem.HasUi(entity, VoiceMaskUIKey.Key))
-            _uiSystem.SetUiState(entity.Owner, VoiceMaskUIKey.Key, new VoiceMaskBuiState(GetCurrentVoiceName(entity), entity.Comp.VoiceMaskSpeechVerb, entity.Comp.JobIconProtoId)); // GabyStation -> Radio icons
+            _uiSystem.SetUiState(entity.Owner,
+                VoiceMaskUIKey.Key,
+                new VoiceMaskBuiState(GetCurrentVoiceName(entity),
+                    entity.Comp.VoiceMaskSpeechVerb,
+                    entity.Comp.JobIconProtoId)); // GabyStation -> Radio icons
     }
-    #endregion
 
-    #region Helper functions
-    private string GetCurrentVoiceName(Entity<VoiceMaskComponent> entity)
-    {
-        return entity.Comp.VoiceMaskName ?? Loc.GetString("voice-mask-default-name-override");
-    }
     #endregion
 }

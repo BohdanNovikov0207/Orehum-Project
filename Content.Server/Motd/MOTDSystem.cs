@@ -13,14 +13,15 @@ using Content.Server.Chat.Managers;
 using Content.Server.GameTicking;
 using Content.Shared.CCVar;
 using Content.Shared.Chat;
-using Robust.Shared.Console;
 using Robust.Shared.Configuration;
+using Robust.Shared.Console;
 using Robust.Shared.Player;
 
 namespace Content.Server.Motd;
 
 /// <summary>
-/// The system that handles broadcasting the Message Of The Day to players when they join the lobby/the MOTD changes/they ask for it to be printed.
+/// The system that handles broadcasting the Message Of The Day to players when they join the lobby/the MOTD changes/they
+/// ask for it to be printed.
 /// </summary>
 public sealed class MOTDSystem : EntitySystem
 {
@@ -35,7 +36,7 @@ public sealed class MOTDSystem : EntitySystem
     public override void Initialize()
     {
         base.Initialize();
-        Subs.CVar(_configurationManager, CCVars.MOTD, OnMOTDChanged, invokeImmediately: true);
+        Subs.CVar(_configurationManager, CCVars.MOTD, OnMOTDChanged, true);
         SubscribeLocalEvent<PlayerJoinedLobbyEvent>(OnPlayerJoinedLobby);
     }
 
@@ -48,7 +49,12 @@ public sealed class MOTDSystem : EntitySystem
             return;
 
         var wrappedMessage = Loc.GetString("motd-wrap-message", ("motd", _messageOfTheDay));
-        _chatManager.ChatMessageToAll(ChatChannel.Server, _messageOfTheDay, wrappedMessage, source: EntityUid.Invalid, hideChat: false, recordReplay: true);
+        _chatManager.ChatMessageToAll(ChatChannel.Server,
+            _messageOfTheDay,
+            wrappedMessage,
+            EntityUid.Invalid,
+            false,
+            true);
     }
 
     /// <summary>
@@ -60,14 +66,20 @@ public sealed class MOTDSystem : EntitySystem
             return;
 
         var wrappedMessage = Loc.GetString("motd-wrap-message", ("motd", _messageOfTheDay));
-        _chatManager.ChatMessageToOne(ChatChannel.Server, _messageOfTheDay, wrappedMessage, source: EntityUid.Invalid, hideChat: false, client: player.Channel);
+        _chatManager.ChatMessageToOne(ChatChannel.Server,
+            _messageOfTheDay,
+            wrappedMessage,
+            EntityUid.Invalid,
+            false,
+            player.Channel);
     }
 
     /// <summary>
     /// Sends the Message Of The Day, if any, to a specific player's console and chat.
     /// </summary>
     /// <remarks>
-    /// This is used by the MOTD console command because we can't tell whether the player is using `console or /console so we send the message to both.
+    /// This is used by the MOTD console command because we can't tell whether the player is using `console or /console so we
+    /// send the message to both.
     /// </remarks>
     public void TrySendMOTD(IConsoleShell shell)
     {
@@ -77,7 +89,12 @@ public sealed class MOTDSystem : EntitySystem
         var wrappedMessage = Loc.GetString("motd-wrap-message", ("motd", _messageOfTheDay));
         shell.WriteLine(wrappedMessage);
         if (shell.Player is { } player)
-            _chatManager.ChatMessageToOne(ChatChannel.Server, _messageOfTheDay, wrappedMessage, source: EntityUid.Invalid, hideChat: false, client: player.Channel);
+            _chatManager.ChatMessageToOne(ChatChannel.Server,
+                _messageOfTheDay,
+                wrappedMessage,
+                EntityUid.Invalid,
+                false,
+                player.Channel);
     }
 
     #region Event Handlers
@@ -85,10 +102,7 @@ public sealed class MOTDSystem : EntitySystem
     /// <summary>
     /// Posts the Message Of The Day to any players who join the lobby.
     /// </summary>
-    private void OnPlayerJoinedLobby(PlayerJoinedLobbyEvent ev)
-    {
-        TrySendMOTD(ev.PlayerSession);
-    }
+    private void OnPlayerJoinedLobby(PlayerJoinedLobbyEvent ev) => TrySendMOTD(ev.PlayerSession);
 
     /// <summary>
     /// Broadcasts changes to the Message Of The Day to all players.

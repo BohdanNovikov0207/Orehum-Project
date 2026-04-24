@@ -27,8 +27,8 @@ namespace Content.Server._Lavaland.Weapons.Block;
 
 public sealed class BlockChargeSystem : SharedBlockChargeSystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Update(float frameTime)
     {

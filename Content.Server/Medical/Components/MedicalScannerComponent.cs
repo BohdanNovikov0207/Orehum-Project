@@ -61,16 +61,16 @@
 using Content.Shared.MedicalScanner;
 using Robust.Shared.Containers;
 
-namespace Content.Server.Medical.Components
-{
-    [RegisterComponent]
-    public sealed partial class MedicalScannerComponent : SharedMedicalScannerComponent
-    {
-        public const string ScannerPort = "MedicalScannerReceiver";
-        public ContainerSlot BodyContainer = default!;
-        public EntityUid? ConnectedConsole;
+namespace Content.Server.Medical.Components;
 
-        [DataField, ViewVariables(VVAccess.ReadWrite)]
-        public float CloningFailChanceMultiplier = 1f;
-    }
+[RegisterComponent]
+public sealed partial class MedicalScannerComponent : SharedMedicalScannerComponent
+{
+    public const string ScannerPort = "MedicalScannerReceiver";
+    public ContainerSlot BodyContainer = default!;
+
+    [DataField] [ViewVariables(VVAccess.ReadWrite)]
+    public float CloningFailChanceMultiplier = 1f;
+
+    public EntityUid? ConnectedConsole;
 }

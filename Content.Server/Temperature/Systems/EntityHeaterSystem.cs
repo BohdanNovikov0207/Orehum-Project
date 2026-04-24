@@ -48,7 +48,7 @@ using Content.Shared.Temperature.Systems;
 namespace Content.Server.Temperature.Systems;
 
 /// <summary>
-/// Handles the server-only parts of <see cref="SharedEntityHeaterSystem"/>
+/// Handles the server-only parts of <see cref="SharedEntityHeaterSystem" />
 /// </summary>
 public sealed class EntityHeaterSystem : SharedEntityHeaterSystem
 {
@@ -88,10 +88,12 @@ public sealed class EntityHeaterSystem : SharedEntityHeaterSystem
     }
 
     /// <remarks>
-    /// <see cref="ApcPowerReceiverComponent"/> doesn't exist on the client, so we need
+    /// <see cref="ApcPowerReceiverComponent" /> doesn't exist on the client, so we need
     /// this server-only override to handle setting the network load.
     /// </remarks>
-    protected override void ChangeSetting(Entity<EntityHeaterComponent> ent, EntityHeaterSetting setting, EntityUid? user = null)
+    protected override void ChangeSetting(Entity<EntityHeaterComponent> ent,
+        EntityHeaterSetting setting,
+        EntityUid? user = null)
     {
         base.ChangeSetting(ent, setting, user);
 

@@ -92,10 +92,10 @@ namespace Content.Server.Atmos.Rotting;
 
 public sealed class RottingSystem : SharedRottingSystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly AtmosphereSystem _atmosphere = default!;
     [Dependency] private readonly ContainerSystem _container = default!;
     [Dependency] private readonly DamageableSystem _damageable = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -114,8 +114,9 @@ public sealed class RottingSystem : SharedRottingSystem
         if (!TryComp<PerishableComponent>(uid, out var perishable))
             return;
 
-        var molsToDump = perishable.MolsPerSecondPerUnitMass * physics.FixturesMass * (float)component.TotalRotTime.TotalSeconds;
-        var tileMix = _atmosphere.GetTileMixture(uid, excite: true);
+        var molsToDump = perishable.MolsPerSecondPerUnitMass * physics.FixturesMass *
+                         (float) component.TotalRotTime.TotalSeconds;
+        var tileMix = _atmosphere.GetTileMixture(uid, true);
         tileMix?.AdjustMoles(Gas.Ammonia, molsToDump);
     }
 
@@ -136,9 +137,7 @@ public sealed class RottingSystem : SharedRottingSystem
     {
         if (_container.TryGetContainingContainer((uid, null, null), out var container) &&
             TryComp<ProRottingContainerComponent>(container.Owner, out var rotContainer))
-        {
             return rotContainer.DecayModifier;
-        }
 
         return 1f;
     }
@@ -175,7 +174,8 @@ public sealed class RottingSystem : SharedRottingSystem
         var rotQuery = EntityQueryEnumerator<RottingComponent, PerishableComponent, TransformComponent>();
         while (rotQuery.MoveNext(out var uid, out var rotting, out var perishable, out var xform))
         {
-            if (_timing.CurTime < rotting.NextRotUpdate) // This is where it starts to get noticable on larger animals, no need to run every second
+            if (_timing.CurTime <
+                rotting.NextRotUpdate) // This is where it starts to get noticable on larger animals, no need to run every second
                 continue;
             rotting.NextRotUpdate += rotting.RotUpdateRate;
 
@@ -204,8 +204,8 @@ public sealed class RottingSystem : SharedRottingSystem
                 continue;
             // We need a way to get the mass of the mob alone without armor etc in the future
             // or just remove the mass mechanics altogether because they aren't good.
-            var molRate = perishable.MolsPerSecondPerUnitMass * (float)rotting.RotUpdateRate.TotalSeconds;
-            var tileMix = _atmosphere.GetTileMixture(uid, excite: true);
+            var molRate = perishable.MolsPerSecondPerUnitMass * (float) rotting.RotUpdateRate.TotalSeconds;
+            var tileMix = _atmosphere.GetTileMixture(uid, true);
             tileMix?.AdjustMoles(Gas.Ammonia, molRate * physics.FixturesMass);
         }
     }

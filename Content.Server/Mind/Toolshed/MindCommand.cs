@@ -12,12 +12,11 @@ using Content.Shared.Mind;
 using Robust.Shared.Player;
 using Robust.Shared.Toolshed;
 using Robust.Shared.Toolshed.Errors;
-using Robust.Shared.Toolshed.Syntax;
 
 namespace Content.Server.Mind.Toolshed;
 
 /// <summary>
-///     Contains various mind-manipulation commands like getting minds, controlling mobs, etc.
+/// Contains various mind-manipulation commands like getting minds, controlling mobs, etc.
 /// </summary>
 [ToolshedCommand]
 public sealed class MindCommand : ToolshedCommand

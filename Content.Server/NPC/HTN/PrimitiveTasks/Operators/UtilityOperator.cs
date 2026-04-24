@@ -15,7 +15,7 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototy
 namespace Content.Server.NPC.HTN.PrimitiveTasks.Operators;
 
 /// <summary>
-/// Utilises a <see cref="UtilityQueryPrototype"/> to determine the best target and sets it to the Key.
+/// Utilises a <see cref="UtilityQueryPrototype" /> to determine the best target and sets it to the Key.
 /// </summary>
 public sealed partial class UtilityOperator : HTNOperator
 {
@@ -29,7 +29,7 @@ public sealed partial class UtilityOperator : HTNOperator
     [DataField("keyCoordinates")]
     public string KeyCoordinates = "TargetCoordinates";
 
-    [DataField("proto", required: true, customTypeSerializer:typeof(PrototypeIdSerializer<UtilityQueryPrototype>))]
+    [DataField("proto", required: true, customTypeSerializer: typeof(PrototypeIdSerializer<UtilityQueryPrototype>))]
     public string Prototype = string.Empty;
 
     public override async Task<(bool Valid, Dictionary<string, object>? Effects)> Plan(NPCBlackboard blackboard,
@@ -39,14 +39,12 @@ public sealed partial class UtilityOperator : HTNOperator
         var target = result.GetHighest();
 
         if (!target.IsValid())
-        {
             return (false, new Dictionary<string, object>());
-        }
 
-        var effects = new Dictionary<string, object>()
+        var effects = new Dictionary<string, object>
         {
-            {Key, target},
-            {KeyCoordinates, new EntityCoordinates(target, Vector2.Zero)}
+            { Key, target },
+            { KeyCoordinates, new EntityCoordinates(target, Vector2.Zero) },
         };
 
         return (true, effects);

@@ -12,7 +12,7 @@ namespace Content.Server.Antag.Components;
 /// <summary>
 /// Spawns a prototype for antags created with a spawner.
 /// </summary>
-[RegisterComponent, Access(typeof(AntagSpawnerSystem))]
+[RegisterComponent] [Access(typeof(AntagSpawnerSystem))]
 public sealed partial class AntagSpawnerComponent : Component
 {
     /// <summary>

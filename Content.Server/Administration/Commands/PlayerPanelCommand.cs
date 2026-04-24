@@ -84,8 +84,8 @@ namespace Content.Server.Administration.Commands;
 [AdminCommand(AdminFlags.Admin)]
 public sealed class PlayerPanelCommand : LocalizedCommands
 {
-    [Dependency] private readonly IPlayerLocator _locator = default!;
     [Dependency] private readonly EuiManager _euis = default!;
+    [Dependency] private readonly IPlayerLocator _locator = default!;
     [Dependency] private readonly IPlayerManager _players = default!;
 
     public override string Command => "playerpanel";
@@ -123,7 +123,8 @@ public sealed class PlayerPanelCommand : LocalizedCommands
         {
             var options = _players.Sessions.OrderBy(c => c.Name).Select(c => c.Name).ToArray();
 
-            return CompletionResult.FromHintOptions(options, LocalizationManager.GetString("cmd-playerpanel-completion"));
+            return CompletionResult.FromHintOptions(options,
+                LocalizationManager.GetString("cmd-playerpanel-completion"));
         }
 
         return CompletionResult.Empty;

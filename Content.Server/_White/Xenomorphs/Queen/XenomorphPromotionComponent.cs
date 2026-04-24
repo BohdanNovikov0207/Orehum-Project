@@ -8,14 +8,14 @@ namespace Content.Server._White.Xenomorphs.Queen;
 public sealed partial class XenomorphPromotionComponent : Component
 {
     [ViewVariables]
-    public EntProtoId PromoteTo = "MobXenomorphPraetorian";
+    public List<ProtoId<XenomorphCastePrototype>> CasteWhitelist = new();
+
+    [ViewVariables]
+    public TimeSpan EvolutionDelay = TimeSpan.FromSeconds(3);
 
     [ViewVariables]
     public FixedPoint2 PlasmaCost = 0;
 
     [ViewVariables]
-    public List<ProtoId<XenomorphCastePrototype>> CasteWhitelist = new();
-
-    [ViewVariables]
-    public TimeSpan EvolutionDelay = TimeSpan.FromSeconds(3);
+    public EntProtoId PromoteTo = "MobXenomorphPraetorian";
 }

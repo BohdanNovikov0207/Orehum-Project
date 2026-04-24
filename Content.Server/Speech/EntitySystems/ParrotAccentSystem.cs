@@ -12,9 +12,9 @@ using Robust.Shared.Random;
 
 namespace Content.Server.Speech.EntitySystems;
 
-public sealed partial class ParrotAccentSystem : EntitySystem
+public sealed class ParrotAccentSystem : EntitySystem
 {
-    private static readonly Regex WordCleanupRegex = new Regex("[^A-Za-z0-9 -]");
+    private static readonly Regex WordCleanupRegex = new("[^A-Za-z0-9 -]");
 
     [Dependency] private readonly IRobustRandom _random = default!;
 
@@ -25,10 +25,8 @@ public sealed partial class ParrotAccentSystem : EntitySystem
         SubscribeLocalEvent<ParrotAccentComponent, AccentGetEvent>(OnAccentGet);
     }
 
-    private void OnAccentGet(Entity<ParrotAccentComponent> entity, ref AccentGetEvent args)
-    {
+    private void OnAccentGet(Entity<ParrotAccentComponent> entity, ref AccentGetEvent args) =>
         args.Message = Accentuate(entity, args.Message);
-    }
 
     public string Accentuate(Entity<ParrotAccentComponent> entity, string message)
     {
@@ -81,8 +79,6 @@ public sealed partial class ParrotAccentSystem : EntitySystem
     /// <summary>
     /// Returns a random, localized squawk sound.
     /// </summary>
-    private string GetRandomSquawk(Entity<ParrotAccentComponent> entity)
-    {
-        return Loc.GetString(_random.Pick(entity.Comp.Squawks));
-    }
+    private string GetRandomSquawk(Entity<ParrotAccentComponent> entity) =>
+        Loc.GetString(_random.Pick(entity.Comp.Squawks));
 }

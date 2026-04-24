@@ -51,30 +51,29 @@ namespace Content.Server.Heretic.EntitySystems;
 
 public sealed class MansusGraspSystem : SharedMansusGraspSystem
 {
-    [Dependency] private readonly ITileDefinitionManager _tileDefinitionManager = default!;
-    [Dependency] private readonly IMapManager _mapManager = default!;
-    [Dependency] private readonly SharedStaminaSystem _stamina = default!;
-    [Dependency] private readonly SharedStunSystem _stun = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly ChatSystem _chat = default!;
-    [Dependency] private readonly RatvarianLanguageSystem _language = default!;
-    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
-    [Dependency] private readonly StatusEffectsSystem _statusEffect = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly TagSystem _tag = default!;
-    [Dependency] private readonly UseDelaySystem _delay = default!;
-    [Dependency] private readonly SharedMapSystem _mapSystem = default!;
-    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
-    [Dependency] private readonly HereticAbilitySystem _ability = default!;
-    [Dependency] private readonly SharedActionsSystem _actions = default!;
-    [Dependency] private readonly PopupSystem _popup = default!;
-    [Dependency] private readonly HereticSystem _heretic = default!;
-
     public static readonly SoundSpecifier DefaultSound = new SoundPathSpecifier("/Audio/Items/welder.ogg");
 
     public static readonly LocId DefaultInvocation = "heretic-speech-mansusgrasp";
 
     public static readonly TimeSpan DefaultCooldown = TimeSpan.FromSeconds(10);
+    [Dependency] private readonly HereticAbilitySystem _ability = default!;
+    [Dependency] private readonly SharedActionsSystem _actions = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly ChatSystem _chat = default!;
+    [Dependency] private readonly UseDelaySystem _delay = default!;
+    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
+    [Dependency] private readonly HereticSystem _heretic = default!;
+    [Dependency] private readonly RatvarianLanguageSystem _language = default!;
+    [Dependency] private readonly IMapManager _mapManager = default!;
+    [Dependency] private readonly SharedMapSystem _mapSystem = default!;
+    [Dependency] private readonly PopupSystem _popup = default!;
+    [Dependency] private readonly SharedStaminaSystem _stamina = default!;
+    [Dependency] private readonly StatusEffectsSystem _statusEffect = default!;
+    [Dependency] private readonly SharedStunSystem _stun = default!;
+    [Dependency] private readonly TagSystem _tag = default!;
+    [Dependency] private readonly ITileDefinitionManager _tileDefinitionManager = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
+    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
 
     public override void Initialize()
     {
@@ -139,7 +138,9 @@ public sealed class MansusGraspSystem : SharedMansusGraspSystem
             if (!args.ClickLocation.IsValid(EntityManager))
                 return;
 
-            if (!_mapManager.TryFindGridAt(_transform.ToMapCoordinates(args.ClickLocation), out var gridUid, out var mapGrid))
+            if (!_mapManager.TryFindGridAt(_transform.ToMapCoordinates(args.ClickLocation),
+                    out var gridUid,
+                    out var mapGrid))
                 return;
 
             var tileRef = _mapSystem.GetTileRef(gridUid, mapGrid, args.ClickLocation);
@@ -200,7 +201,7 @@ public sealed class MansusGraspSystem : SharedMansusGraspSystem
 
         if (triggerGrasp && TryComp(target, out StatusEffectsComponent? status))
         {
-            _stun.KnockdownOrStun(target, grasp.Comp.KnockdownTime, true);
+            _stun.KnockdownOrStun(target, grasp.Comp.KnockdownTime);
             _stamina.TakeStaminaDamage(target, grasp.Comp.StaminaDamage);
             _language.DoRatvarian(target, grasp.Comp.SpeechTime, true, status);
             _statusEffect.TryAddStatusEffect<MansusGraspAffectedComponent>(target,
@@ -228,7 +229,7 @@ public sealed class MansusGraspSystem : SharedMansusGraspSystem
         // no fumbling!
         if (target == args.User)
             return;
-        args.Handled = GraspTarget(ent, args.User,target);
+        args.Handled = GraspTarget(ent, args.User, target);
     }
 
     private void OnAfterInteract(Entity<MansusGraspComponent> ent, ref AfterInteractEvent args)
@@ -239,7 +240,7 @@ public sealed class MansusGraspSystem : SharedMansusGraspSystem
         if (args.Target == null || args.Target == args.User)
             return;
 
-        args.Handled = GraspTarget(ent, args.User,args.Target.Value);
+        args.Handled = GraspTarget(ent, args.User, args.Target.Value);
     }
 
     public void InvokeGrasp(EntityUid user, Entity<MansusGraspComponent>? ent)
@@ -287,7 +288,11 @@ public sealed class MansusGraspSystem : SharedMansusGraspSystem
         // spawn our rune
         var rune = Spawn(runeProto, args.ClickLocation);
         _transform.AttachToGridOrMap(rune);
-        var dargs = new DoAfterArgs(EntityManager, args.User, time, new DrawRitualRuneDoAfterEvent(rune, args.ClickLocation), args.User)
+        var dargs = new DoAfterArgs(EntityManager,
+            args.User,
+            time,
+            new DrawRitualRuneDoAfterEvent(rune, args.ClickLocation),
+            args.User)
         {
             BreakOnDamage = true,
             BreakOnHandChange = true,
@@ -298,6 +303,7 @@ public sealed class MansusGraspSystem : SharedMansusGraspSystem
         };
         _doAfter.TryStartDoAfter(dargs);
     }
+
     private void OnRitualRuneDoAfter(DrawRitualRuneDoAfterEvent ev)
     {
         // delete the animation rune regardless

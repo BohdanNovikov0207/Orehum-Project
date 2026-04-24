@@ -17,27 +17,32 @@ using Content.Shared.Wires;
 
 namespace Content.Server.Wires;
 
-/// <summary><see cref="IWireAction" /></summary>
+/// <summary>
+///     <see cref="IWireAction" />
+/// </summary>
 [ImplicitDataDefinitionForInheritors]
 public abstract partial class BaseWireAction : IWireAction
 {
     private ISharedAdminLogManager _adminLogger = default!;
 
+    public IEntityManager EntityManager = default!;
+    public WiresSystem WiresSystem = default!;
+
     /// <summary>
-    ///     The loc-string of the text that gets returned by <see cref="GetStatusLightData(Wire)"/>. Also used for admin logging.
+    /// The loc-string of the text that gets returned by <see cref="GetStatusLightData(Wire)" />. Also used for admin logging.
     /// </summary>
     [DataField("name")]
     public abstract string Name { get; set; }
 
     /// <summary>
-    ///     Default color that gets returned by <see cref="GetStatusLightData(Wire)"/>.
+    /// Default color that gets returned by <see cref="GetStatusLightData(Wire)" />.
     /// </summary>
     [DataField("color")]
     public abstract Color Color { get; set; }
 
     /// <summary>
-    ///     If true, the default behavior of <see cref="GetStatusLightData(Wire)"/> will return an off-light when the
-    ///     wire owner is not powered.
+    /// If true, the default behavior of <see cref="GetStatusLightData(Wire)" /> will return an off-light when the
+    /// wire owner is not powered.
     /// </summary>
     [DataField("lightRequiresPower")]
     public virtual bool LightRequiresPower { get; set; } = true;
@@ -52,11 +57,6 @@ public abstract partial class BaseWireAction : IWireAction
             ? null
             : new StatusLightData(Color, state.Value, Loc.GetString(Name));
     }
-
-    public virtual StatusLightState? GetLightState(Wire wire) => null;
-
-    public IEntityManager EntityManager = default!;
-    public WiresSystem WiresSystem = default!;
 
     // not virtual so implementors are aware that they need a nullable here
     public abstract object? StatusKey { get; }
@@ -75,6 +75,12 @@ public abstract partial class BaseWireAction : IWireAction
     public virtual bool Mend(EntityUid user, Wire wire) => Log(user, wire, "mended");
     public virtual void Pulse(EntityUid user, Wire wire) => Log(user, wire, "pulsed");
 
+    public virtual void Update(Wire wire)
+    {
+    }
+
+    public virtual StatusLightState? GetLightState(Wire wire) => null;
+
     private bool Log(EntityUid user, Wire wire, string verb)
     {
         var player = EntityManager.ToPrettyString(user);
@@ -84,20 +90,15 @@ public abstract partial class BaseWireAction : IWireAction
         var action = GetType().Name;
 
         // logs something like "... mended red POWR wire (PowerWireAction) in ...."
-        _adminLogger.Add(LogType.WireHacking, LogImpact.Medium, $"{player} {verb} {color} {name} wire ({action}) in {owner}");
+        _adminLogger.Add(LogType.WireHacking,
+            LogImpact.Medium,
+            $"{player} {verb} {color} {name} wire ({action}) in {owner}");
         return true;
     }
 
-    public virtual void Update(Wire wire)
-    {
-    }
-
     /// <summary>
-    ///     Utility function to check if this given entity is powered.
+    /// Utility function to check if this given entity is powered.
     /// </summary>
     /// <returns>true if powered, false otherwise</returns>
-    protected bool IsPowered(EntityUid uid)
-    {
-        return WiresSystem.IsPowered(uid, EntityManager);
-    }
+    protected bool IsPowered(EntityUid uid) => WiresSystem.IsPowered(uid, EntityManager);
 }

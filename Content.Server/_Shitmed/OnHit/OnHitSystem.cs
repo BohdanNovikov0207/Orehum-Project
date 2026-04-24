@@ -4,28 +4,23 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared._Shitmed.Antags.Abductor;
-using Content.Shared._Shitmed.Medical.Surgery;
 using Content.Shared._Shitmed.OnHit;
-using Content.Shared.Actions;
-using Content.Shared.DoAfter;
-using Robust.Shared.Prototypes;
 using Content.Shared.Cuffs.Components;
-using Content.Shared.Damage.Components;
-using Content.Shared.Weapons.Melee.Events;
 
 namespace Content.Server._Shitmed.OnHit;
 
-public sealed partial class OnHitSystem : SharedOnHitSystem
+public sealed class OnHitSystem : SharedOnHitSystem
 {
     public override void Initialize()
     {
         SubscribeLocalEvent<CuffsOnHitComponent, CuffsOnHitDoAfter>(OnCuffsOnHitDoAfter);
         base.Initialize();
     }
+
     private void OnCuffsOnHitDoAfter(Entity<CuffsOnHitComponent> ent, ref CuffsOnHitDoAfter args)
     {
-        if (!args.Args.Target.HasValue || args.Handled || args.Cancelled) return;
+        if (!args.Args.Target.HasValue || args.Handled || args.Cancelled)
+            return;
 
         var user = args.Args.User;
         var target = args.Args.Target.Value;

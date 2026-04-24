@@ -11,45 +11,44 @@
 using Robust.Shared.Audio;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
 
-namespace Content.Server.PowerSink
+namespace Content.Server.PowerSink;
+
+/// <summary>
+/// Absorbs power up to its capacity when anchored then explodes.
+/// </summary>
+[RegisterComponent] [AutoGenerateComponentPause]
+public sealed partial class PowerSinkComponent : Component
 {
+    [DataField("chargeFireSound")]
+    public SoundSpecifier ChargeFireSound = new SoundPathSpecifier("/Audio/Effects/PowerSink/charge_fire.ogg");
+
+    [DataField("electricSound")] public SoundSpecifier ElectricSound =
+        new SoundPathSpecifier("/Audio/Effects/PowerSink/electric.ogg")
+        {
+            Params = AudioParams.Default
+                .WithVolume(15f) // audible even behind walls
+                .WithRolloffFactor(10),
+        };
+
     /// <summary>
-    /// Absorbs power up to its capacity when anchored then explodes.
+    /// If explosion has been triggered, time at which to explode.
     /// </summary>
-    [RegisterComponent, AutoGenerateComponentPause]
-    public sealed partial class PowerSinkComponent : Component
-    {
-        /// <summary>
-        /// When the power sink is nearing its explosion, warn the crew so they can look for it
-        /// (if they're not already).
-        /// </summary>
-        [DataField("sentImminentExplosionWarning")]
-        [ViewVariables(VVAccess.ReadWrite)]
-        public bool SentImminentExplosionWarningMessage = false;
+    [DataField("explosionTime", customTypeSerializer: typeof(TimeOffsetSerializer))]
+    [AutoPausedField]
+    public TimeSpan? ExplosionTime = null;
 
-        /// <summary>
-        /// If explosion has been triggered, time at which to explode.
-        /// </summary>
-        [DataField("explosionTime", customTypeSerializer:typeof(TimeOffsetSerializer))]
-        [AutoPausedField]
-        public System.TimeSpan? ExplosionTime = null;
+    /// <summary>
+    /// The highest sound warning threshold that has been hit (plays sfx occasionally as explosion nears)
+    /// </summary>
+    [DataField("highestWarningSoundThreshold")]
+    [ViewVariables(VVAccess.ReadWrite)]
+    public float HighestWarningSoundThreshold = 0f;
 
-        /// <summary>
-        /// The highest sound warning threshold that has been hit (plays sfx occasionally as explosion nears)
-        /// </summary>
-        [DataField("highestWarningSoundThreshold")]
-        [ViewVariables(VVAccess.ReadWrite)]
-        public float HighestWarningSoundThreshold = 0f;
-
-        [DataField("chargeFireSound")]
-        public SoundSpecifier ChargeFireSound = new SoundPathSpecifier("/Audio/Effects/PowerSink/charge_fire.ogg");
-
-        [DataField("electricSound")] public SoundSpecifier ElectricSound =
-            new SoundPathSpecifier("/Audio/Effects/PowerSink/electric.ogg")
-            {
-                Params = AudioParams.Default
-                    .WithVolume(15f) // audible even behind walls
-                    .WithRolloffFactor(10)
-            };
-    }
+    /// <summary>
+    /// When the power sink is nearing its explosion, warn the crew so they can look for it
+    /// (if they're not already).
+    /// </summary>
+    [DataField("sentImminentExplosionWarning")]
+    [ViewVariables(VVAccess.ReadWrite)]
+    public bool SentImminentExplosionWarningMessage = false;
 }

@@ -4,7 +4,7 @@ using Content.Shared.Speech;
 
 namespace Content.Server.Speech.EntitySystems;
 
-public sealed partial class SlowAccentSystem : EntitySystem
+public sealed class SlowAccentSystem : EntitySystem
 {
     /// <summary>
     /// Matches whitespace characters or commas (with or without a space after them).
@@ -23,10 +23,8 @@ public sealed partial class SlowAccentSystem : EntitySystem
         SubscribeLocalEvent<SlowAccentComponent, AccentGetEvent>(OnAccentGet);
     }
 
-    private void OnAccentGet(Entity<SlowAccentComponent> ent, ref AccentGetEvent args)
-    {
+    private void OnAccentGet(Entity<SlowAccentComponent> ent, ref AccentGetEvent args) =>
         args.Message = Accentuate(ent, args.Message);
-    }
 
     public string Accentuate(Entity<SlowAccentComponent> ent, string message)
     {

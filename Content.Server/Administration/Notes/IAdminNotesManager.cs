@@ -28,31 +28,50 @@ public interface IAdminNotesManager
     bool CanView(ICommonSession admin);
     Task OpenEui(ICommonSession admin, Guid notedPlayer);
     Task OpenUserNotesEui(ICommonSession player);
-    Task AddAdminRemark(ICommonSession createdBy, Guid player, NoteType type, string message, NoteSeverity? severity, bool secret, DateTime? expiryTime);
+
+    Task AddAdminRemark(ICommonSession createdBy,
+        Guid player,
+        NoteType type,
+        string message,
+        NoteSeverity? severity,
+        bool secret,
+        DateTime? expiryTime);
+
     Task DeleteAdminRemark(int noteId, NoteType type, ICommonSession deletedBy);
-    Task ModifyAdminRemark(int noteId, NoteType type, ICommonSession editedBy, string message, NoteSeverity? severity, bool secret, DateTime? expiryTime);
+
+    Task ModifyAdminRemark(int noteId,
+        NoteType type,
+        ICommonSession editedBy,
+        string message,
+        NoteSeverity? severity,
+        bool secret,
+        DateTime? expiryTime);
+
     /// <summary>
     /// Queries the database and retrieves all notes, secret and visible
     /// </summary>
-    /// <param name="player">Desired player's <see cref="Guid"/></param>
+    /// <param name="player">Desired player's <see cref="Guid" /></param>
     /// <returns>ALL non-deleted notes, secret or not</returns>
     Task<List<IAdminRemarksRecord>> GetAllAdminRemarks(Guid player);
+
     /// <summary>
     /// Queries the database and retrieves the notes a player should see
     /// </summary>
-    /// <param name="player">Desired player's <see cref="Guid"/></param>
+    /// <param name="player">Desired player's <see cref="Guid" /></param>
     /// <returns>All player-visible notes</returns>
     Task<List<IAdminRemarksRecord>> GetVisibleRemarks(Guid player);
+
     /// <summary>
     /// Queries the database and retrieves watchlists that may have been placed on the player
     /// </summary>
-    /// <param name="player">Desired player's <see cref="Guid"/></param>
+    /// <param name="player">Desired player's <see cref="Guid" /></param>
     /// <returns>Active watchlists</returns>
     Task<List<AdminWatchlistRecord>> GetActiveWatchlists(Guid player);
+
     /// <summary>
     /// Queries the database and retrieves new messages a player has gotten
     /// </summary>
-    /// <param name="player">Desired player's <see cref="Guid"/></param>
+    /// <param name="player">Desired player's <see cref="Guid" /></param>
     /// <returns>All unread messages</returns>
     Task<List<AdminMessageRecord>> GetNewMessages(Guid player);
 

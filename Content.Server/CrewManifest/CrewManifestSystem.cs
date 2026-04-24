@@ -35,20 +35,20 @@ namespace Content.Server.CrewManifest;
 
 public sealed class CrewManifestSystem : EntitySystem
 {
-    [Dependency] private readonly StationSystem _stationSystem = default!;
-    [Dependency] private readonly StationRecordsSystem _recordsSystem = default!;
-    [Dependency] private readonly EuiManager _euiManager = default!;
-    [Dependency] private readonly IConfigurationManager _configManager = default!;
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-
     /// <summary>
-    ///     Cached crew manifest entries. The alternative is to outright
-    ///     rebuild the crew manifest every time the state is requested:
-    ///     this is inefficient.
+    /// Cached crew manifest entries. The alternative is to outright
+    /// rebuild the crew manifest every time the state is requested:
+    /// this is inefficient.
     /// </summary>
     private readonly Dictionary<EntityUid, CrewManifestEntries> _cachedEntries = new();
 
+    [Dependency] private readonly IConfigurationManager _configManager = default!;
+    [Dependency] private readonly EuiManager _euiManager = default!;
+
     private readonly Dictionary<EntityUid, Dictionary<ICommonSession, CrewManifestEui>> _openEuis = new();
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    [Dependency] private readonly StationRecordsSystem _recordsSystem = default!;
+    [Dependency] private readonly StationSystem _stationSystem = default!;
 
     public override void Initialize()
     {
@@ -80,9 +80,7 @@ public sealed class CrewManifestSystem : EntitySystem
     {
         if (args.SenderSession is not { } sessionCast
             || !_configManager.GetCVar(CCVars.CrewManifestWithoutEntity))
-        {
             return;
-        }
 
         OpenEui(GetEntity(message.Id), sessionCast);
     }
@@ -115,15 +113,13 @@ public sealed class CrewManifestSystem : EntitySystem
 
         var owningStation = _stationSystem.GetOwningStation(uid);
         if (owningStation == null || !TryComp(ev.Actor, out ActorComponent? actorComp))
-        {
             return;
-        }
 
         CloseEui(owningStation.Value, actorComp.PlayerSession, uid);
     }
 
     /// <summary>
-    ///     Gets the crew manifest for a given station, along with the name of the station.
+    /// Gets the crew manifest for a given station, along with the name of the station.
     /// </summary>
     /// <param name="station">Entity uid of the station.</param>
     /// <returns>The name and crew manifest entries (unordered) of the station.</returns>
@@ -150,26 +146,24 @@ public sealed class CrewManifestSystem : EntitySystem
         {
             Log.Error(
                 "{User} tried to open crew manifest from wrong UI: {Key}. Correct owned is {ExpectedKey}",
-                msg.Actor, msg.UiKey, component.OwnerKey);
+                msg.Actor,
+                msg.UiKey,
+                component.OwnerKey);
             return;
         }
 
         var owningStation = _stationSystem.GetOwningStation(uid);
         if (owningStation == null || !TryComp(msg.Actor, out ActorComponent? actorComp))
-        {
             return;
-        }
 
         if (!_configManager.GetCVar(CCVars.CrewManifestUnsecure) && component.Unsecure)
-        {
             return;
-        }
 
         OpenEui(owningStation.Value, actorComp.PlayerSession, uid);
     }
 
     /// <summary>
-    ///     Opens a crew manifest EUI for a given player.
+    /// Opens a crew manifest EUI for a given player.
     /// </summary>
     /// <param name="station">Station that we're displaying the crew manifest for.</param>
     /// <param name="session">The player's session.</param>
@@ -177,20 +171,16 @@ public sealed class CrewManifestSystem : EntitySystem
     public void OpenEui(EntityUid station, ICommonSession session, EntityUid? owner = null)
     {
         if (!HasComp<StationRecordsComponent>(station))
-        {
             return;
-        }
 
         if (!_openEuis.TryGetValue(station, out var euis))
         {
-            euis = new();
+            euis = new Dictionary<ICommonSession, CrewManifestEui>();
             _openEuis.Add(station, euis);
         }
 
         if (euis.ContainsKey(session))
-        {
             return;
-        }
 
         var eui = new CrewManifestEui(station, owner, this);
         euis.Add(session, eui);
@@ -200,7 +190,7 @@ public sealed class CrewManifestSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Closes an EUI for a given player.
+    /// Closes an EUI for a given player.
     /// </summary>
     /// <param name="station">Station that we're displaying the crew manifest for.</param>
     /// <param name="session">The player's session.</param>
@@ -208,15 +198,11 @@ public sealed class CrewManifestSystem : EntitySystem
     public void CloseEui(EntityUid station, ICommonSession session, EntityUid? owner = null)
     {
         if (!HasComp<StationRecordsComponent>(station))
-        {
             return;
-        }
 
         if (!_openEuis.TryGetValue(station, out var euis)
             || !euis.TryGetValue(session, out var eui))
-        {
             return;
-        }
 
         if (eui.Owner == owner)
         {
@@ -225,13 +211,11 @@ public sealed class CrewManifestSystem : EntitySystem
         }
 
         if (euis.Count == 0)
-        {
             _openEuis.Remove(station);
-        }
     }
 
     /// <summary>
-    ///     Builds the crew manifest for a station. Stores it in the cache afterwards.
+    /// Builds the crew manifest for a station. Stores it in the cache afterwards.
     /// </summary>
     /// <param name="station"></param>
     private void BuildCrewManifest(EntityUid station)
@@ -275,19 +259,19 @@ public sealed class CrewManifestCommand : LocalizedEntityCommands
     {
         if (args.Length != 1)
         {
-            shell.WriteLine(Loc.GetString($"shell-need-exactly-one-argument"));
+            shell.WriteLine(Loc.GetString("shell-need-exactly-one-argument"));
             return;
         }
 
         if (!NetEntity.TryParse(args[0], out var uidNet) || !EntityManager.TryGetEntity(uidNet, out var uid))
         {
-            shell.WriteLine(Loc.GetString($"shell-argument-station-id-invalid", ("index", args[0])));
+            shell.WriteLine(Loc.GetString("shell-argument-station-id-invalid", ("index", args[0])));
             return;
         }
 
         if (shell.Player is not { } session)
         {
-            shell.WriteLine(Loc.GetString($"shell-cannot-run-command-from-server"));
+            shell.WriteLine(Loc.GetString("shell-cannot-run-command-from-server"));
             return;
         }
 

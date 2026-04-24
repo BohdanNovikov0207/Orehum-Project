@@ -20,12 +20,12 @@ namespace Content.Server.Atmos.EntitySystems;
 /// </summary>
 public sealed class FirestarterSystem : SharedFirestarterSystem
 {
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly FlammableSystem _flammable = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedContainerSystem _container = default!;
+    [Dependency] private readonly FlammableSystem _flammable = default!;
 
     private readonly HashSet<Entity<FlammableComponent>> _flammables = new();
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
 
     public override void Initialize()
     {

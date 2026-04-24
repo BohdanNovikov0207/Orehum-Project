@@ -8,11 +8,10 @@ namespace Content.Server.Screens.Components;
 [RegisterComponent]
 public sealed partial class ScreenComponent : Component
 {
-
 }
 
 /// <summary>
-///     Player-facing hashable string consts for NetworkPayload
+/// Player-facing hashable string consts for NetworkPayload
 /// </summary>
 public sealed class ScreenMasks
 {
@@ -21,7 +20,7 @@ public sealed class ScreenMasks
 }
 
 /// <summary>
-///     Player-facing hashable string consts for NetworkPayload
+/// Player-facing hashable string consts for NetworkPayload
 /// </summary>
 public sealed class ShuttleTimerMasks
 {

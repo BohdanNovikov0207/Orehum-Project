@@ -19,15 +19,16 @@ namespace Content.Server.Procedural.DungeonJob;
 public sealed partial class DungeonJob
 {
     /// <summary>
-    /// <see cref="BiomeMarkerLayerDunGen"/>
+    ///     <see cref="BiomeMarkerLayerDunGen" />
     /// </summary>
-    private async Task PostGen(BiomeMarkerLayerDunGen dunGen, Dungeon dungeon, HashSet<Vector2i> reservedTiles, Random random)
+    private async Task PostGen(BiomeMarkerLayerDunGen dunGen,
+        Dungeon dungeon,
+        HashSet<Vector2i> reservedTiles,
+        Random random)
     {
         // If we're adding biome then disable it and just use for markers.
         if (_entManager.EnsureComponent(_gridUid, out BiomeComponent biomeComp))
-        {
             biomeComp.Enabled = false;
-        }
 
         var biomeSystem = _entManager.System<BiomeSystem>();
         var weightedRandom = _prototype.Index(dunGen.MarkerTemplate);
@@ -57,8 +58,17 @@ public sealed partial class DungeonJob
             if (!ValidateResume())
                 return;
 
-            biomeSystem.GetMarkerNodes(_gridUid, biomeComp, _grid, markerTemplate, true, bounds, count,
-                random, out var spawnSet, out var existing, false);
+            biomeSystem.GetMarkerNodes(_gridUid,
+                biomeComp,
+                _grid,
+                markerTemplate,
+                true,
+                bounds,
+                count,
+                random,
+                out var spawnSet,
+                out var existing,
+                false);
 
             await SuspendDungeon();
             if (!ValidateResume())
@@ -68,10 +78,10 @@ public sealed partial class DungeonJob
 
             foreach (var ent in existing)
             {
-                if (checkTile && reservedTiles.Contains(_maps.LocalToTile(_gridUid, _grid, _xformQuery.GetComponent(ent).Coordinates)))
-                {
+                if (checkTile &&
+                    reservedTiles.Contains(
+                        _maps.LocalToTile(_gridUid, _grid, _xformQuery.GetComponent(ent).Coordinates)))
                     continue;
-                }
 
                 _entManager.DeleteEntity(ent);
 
@@ -88,15 +98,12 @@ public sealed partial class DungeonJob
                 string? proto;
 
                 if (mask != null && markerTemplate.EntityMask.TryGetValue(mask, out var maskedProto))
-                {
                     proto = maskedProto;
-                }
                 else
-                {
                     proto = markerTemplate.Prototype;
-                }
 
-                var ent = _entManager.SpawnAtPosition(proto, new EntityCoordinates(_gridUid, node + _grid.TileSizeHalfVector));
+                var ent = _entManager.SpawnAtPosition(proto,
+                    new EntityCoordinates(_gridUid, node + _grid.TileSizeHalfVector));
                 var xform = xformQuery.Get(ent);
 
                 if (!xform.Comp.Anchored)

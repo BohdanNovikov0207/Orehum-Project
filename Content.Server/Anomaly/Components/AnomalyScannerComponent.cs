@@ -15,14 +15,14 @@ namespace Content.Server.Anomaly.Components;
 /// This is used for scanning anomalies and
 /// displaying information about them in the ui
 /// </summary>
-[RegisterComponent, Access(typeof(SharedAnomalySystem))]
+[RegisterComponent] [Access(typeof(SharedAnomalySystem))]
 public sealed partial class AnomalyScannerComponent : Component
 {
     /// <summary>
-    /// The anomaly that was last scanned by this scanner.
+    /// The sound plays when the scan finished
     /// </summary>
-    [ViewVariables]
-    public EntityUid? ScannedAnomaly;
+    [DataField("completeSound")]
+    public SoundSpecifier? CompleteSound = new SoundPathSpecifier("/Audio/Items/beep.ogg");
 
     /// <summary>
     /// How long the scan takes
@@ -31,8 +31,8 @@ public sealed partial class AnomalyScannerComponent : Component
     public float ScanDoAfterDuration = 5;
 
     /// <summary>
-    /// The sound plays when the scan finished
+    /// The anomaly that was last scanned by this scanner.
     /// </summary>
-    [DataField("completeSound")]
-    public SoundSpecifier? CompleteSound = new SoundPathSpecifier("/Audio/Items/beep.ogg");
+    [ViewVariables]
+    public EntityUid? ScannedAnomaly;
 }

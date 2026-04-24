@@ -43,8 +43,14 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Linq;
+using Content.Goobstation.Common.Conversion;
+using Content.Goobstation.Shared.Revolutionary;
 using Content.Server.Administration.Logs;
 using Content.Server.Antag;
+using Content.Server.Antag.Components;
+using Content.Server.Chat.Systems;
+using Content.Server.Communications;
 using Content.Server.EUI;
 using Content.Server.GameTicking.Rules.Components;
 using Content.Server.Mind;
@@ -54,11 +60,12 @@ using Content.Server.Revolutionary.Components;
 using Content.Server.Roles;
 using Content.Server.RoundEnd;
 using Content.Server.Shuttles.Systems;
-using Content.Server.Station.Systems;
-using Content.Server.Speech.EntitySystems;
 using Content.Server.Speech.Components;
+using Content.Server.Station.Systems;
+using Content.Shared._EinsteinEngines.Revolutionary;
+using Content.Shared._EinsteinEngines.Revolutionary.Components;
+using Content.Shared.Cuffs.Components;
 using Content.Shared.Database;
-using Content.Shared.Flash;
 using Content.Shared.GameTicking.Components;
 using Content.Shared.Humanoid;
 using Content.Shared.IdentityManagement;
@@ -69,50 +76,52 @@ using Content.Shared.Mobs.Components;
 using Content.Shared.Mobs.Systems;
 using Content.Shared.NPC.Prototypes;
 using Content.Shared.NPC.Systems;
+using Content.Shared.Revolutionary;
 using Content.Shared.Revolutionary.Components;
-using Content.Shared.Stunnable;
 using Content.Shared.Speech.Muting;
+using Content.Shared.Stunnable;
 using Content.Shared.Zombies;
+using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
-using Content.Shared.Cuffs.Components;
-using Content.Shared.Revolutionary;
-using Content.Server.Communications;
-using System.Linq;
-using Content.Goobstation.Shared.Revolutionary;
-using Content.Server.Antag.Components;
-using Content.Server.Chat.Systems;
-using Content.Shared._EinsteinEngines.Revolutionary;
-using Robust.Shared.Player;
-using Content.Goobstation.Shared.Changeling.Components;
-using Content.Goobstation.Common.Conversion;
-using Content.Shared._EinsteinEngines.Revolutionary.Components;
-
 
 namespace Content.Server.GameTicking.Rules;
 
 /// <summary>
-/// Where all the main stuff for Revolutionaries happens (Assigning Head Revs, Command on station, and checking for the game to end.)
+/// Where all the main stuff for Revolutionaries happens (Assigning Head Revs, Command on station, and checking for the
+/// game to end.)
 /// </summary>
 // Heavily edited by goobstation. If you want to upstream something think twice
 public sealed class RevolutionaryRuleSystem : GameRuleSystem<RevolutionaryRuleComponent>
 {
+    private static readonly string[] Outcomes =
+    {
+        // revs survived and heads survived... how
+        "rev-reverse-stalemate",
+        // revs won and heads died
+        "rev-won",
+        // revs lost and heads survived
+        "rev-lost",
+        // revs lost and heads died
+        "rev-stalemate",
+    };
+
+    [Dependency] private readonly IAdminLogManager _adminLogManager = default!;
     [Dependency] private readonly AntagSelectionSystem _antag = default!;
+    [Dependency] private readonly ChatSystem _chatSystem = default!;
     [Dependency] private readonly EmergencyShuttleSystem _emergencyShuttle = default!;
     [Dependency] private readonly EuiManager _euiMan = default!;
-    [Dependency] private readonly IAdminLogManager _adminLogManager = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly ISharedPlayerManager _player = default!;
     [Dependency] private readonly MindSystem _mind = default!;
     [Dependency] private readonly MobStateSystem _mobState = default!;
     [Dependency] private readonly NpcFactionSystem _npcFaction = default!;
+    [Dependency] private readonly ISharedPlayerManager _player = default!;
     [Dependency] private readonly PopupSystem _popup = default!;
+    [Dependency] private readonly SharedRevolutionarySystem _revolutionarySystem = default!;
     [Dependency] private readonly RoleSystem _role = default!;
     [Dependency] private readonly RoundEndSystem _roundEnd = default!;
-    [Dependency] private readonly SharedStunSystem _stun = default!;
     [Dependency] private readonly StationSystem _stationSystem = default!;
-    [Dependency] private readonly SharedRevolutionarySystem _revolutionarySystem = default!;
-    [Dependency] private readonly ChatSystem _chatSystem = default!;
+    [Dependency] private readonly SharedStunSystem _stun = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     //Used in OnPostFlash, no reference to the rule component is available
     public readonly ProtoId<NpcFactionPrototype> RevolutionaryNpcFaction = "Revolutionary";
@@ -123,21 +132,27 @@ public sealed class RevolutionaryRuleSystem : GameRuleSystem<RevolutionaryRuleCo
         base.Initialize();
         SubscribeLocalEvent<CommandStaffComponent, MobStateChangedEvent>(OnCommandMobStateChanged);
 
-        SubscribeLocalEvent<HeadRevolutionaryComponent, AfterRevolutionaryConvertedEvent>(OnPostConvert); // Einstein Engines - Revolutionary Manifesto
+        SubscribeLocalEvent<HeadRevolutionaryComponent, AfterRevolutionaryConvertedEvent>(
+            OnPostConvert); // Einstein Engines - Revolutionary Manifesto
         SubscribeLocalEvent<CommunicationConsoleCallShuttleAttemptEvent>(OnTryCallEvac); // goob edit
         SubscribeLocalEvent<HeadRevolutionaryComponent, MobStateChangedEvent>(OnHeadRevMobStateChanged);
 
         SubscribeLocalEvent<RevolutionaryRoleComponent, GetBriefingEvent>(OnGetBriefing);
-
     }
 
-    protected override void Started(EntityUid uid, RevolutionaryRuleComponent component, GameRuleComponent gameRule, GameRuleStartedEvent args)
+    protected override void Started(EntityUid uid,
+        RevolutionaryRuleComponent component,
+        GameRuleComponent gameRule,
+        GameRuleStartedEvent args)
     {
         base.Started(uid, component, gameRule, args);
         component.CommandCheck = _timing.CurTime + component.TimerWait;
     }
 
-    protected override void ActiveTick(EntityUid uid, RevolutionaryRuleComponent component, GameRuleComponent gameRule, float frameTime)
+    protected override void ActiveTick(EntityUid uid,
+        RevolutionaryRuleComponent component,
+        GameRuleComponent gameRule,
+        float frameTime)
     {
         base.ActiveTick(uid, component, gameRule, frameTime);
 
@@ -232,7 +247,8 @@ public sealed class RevolutionaryRuleSystem : GameRuleSystem<RevolutionaryRuleCo
             return;
         // Goobstation - Something something check for 30 conditions of mute or otherwise speech impeding shit that makes book pointless
         if ((HasComp<MumbleAccentComponent>(ev.User) // Muzzles to bypass speech is bad
-            || HasComp<MutedComponent>(ev.User)) && !revconv.BypassMuted) // No speech = No convert but still convert if BYPASS
+             || HasComp<MutedComponent>(ev.User)) &&
+            !revconv.BypassMuted) // No speech = No convert but still convert if BYPASS
             return;
         // Goob edit END (for now) of course for now you dumbass
 
@@ -292,9 +308,7 @@ public sealed class RevolutionaryRuleSystem : GameRuleSystem<RevolutionaryRuleCo
         }
 
         if (mindId == default || !_role.MindHasRole<RevolutionaryRoleComponent>(mindId))
-        {
             _role.MindAddRole(mindId, "MindRoleRevolutionary");
-        }
 
         if (mind is { UserId: not null } && _player.TryGetSessionById(mind.UserId, out var session))
             _antag.SendBriefing(session, Loc.GetString("rev-role-greeting"), Color.Red, revComp.RevStartSound);
@@ -368,8 +382,11 @@ public sealed class RevolutionaryRuleSystem : GameRuleSystem<RevolutionaryRuleCo
                 _npcFaction.RemoveFaction(uid, RevolutionaryNpcFaction);
                 _stun.TryUpdateParalyzeDuration(uid, stunTime);
                 RemCompDeferred<RevolutionaryComponent>(uid);
-                _popup.PopupEntity(Loc.GetString("rev-break-control", ("name", Identity.Entity(uid, EntityManager))), uid);
-                _adminLogManager.Add(LogType.Mind, LogImpact.Medium, $"{ToPrettyString(uid)} was deconverted due to all Head Revolutionaries dying.");
+                _popup.PopupEntity(Loc.GetString("rev-break-control", ("name", Identity.Entity(uid, EntityManager))),
+                    uid);
+                _adminLogManager.Add(LogType.Mind,
+                    LogImpact.Medium,
+                    $"{ToPrettyString(uid)} was deconverted due to all Head Revolutionaries dying.");
 
                 // Goobstation - check if command staff was deconverted
                 if (TryComp<CommandStaffComponent>(uid, out var commandComp))
@@ -386,6 +403,7 @@ public sealed class RevolutionaryRuleSystem : GameRuleSystem<RevolutionaryRuleCo
                 if (_player.TryGetSessionById(mind.UserId, out var session))
                     _euiMan.OpenEui(new DeconvertedEui(), session);
             }
+
             return true;
         }
 
@@ -408,11 +426,10 @@ public sealed class RevolutionaryRuleSystem : GameRuleSystem<RevolutionaryRuleCo
         // hardcoded values because idk why not
         // regards
         if (CheckCommandLose() && enemiesNormalized >= .35f
-        || revsNormalized >= .35f)
+            || revsNormalized >= .35f)
         {
             ev.Cancelled = true;
             ev.Reason = Loc.GetString("shuttle-call-error");
-            return;
         }
     }
 
@@ -420,11 +437,17 @@ public sealed class RevolutionaryRuleSystem : GameRuleSystem<RevolutionaryRuleCo
     /// Will take a group of entities and check if these entities are alive, dead or cuffed.
     /// </summary>
     /// <param name="list">The list of the entities</param>
-    /// <param name="checkOffStation">Bool for if you want to check if someone is in space and consider them missing in action. (Won't check when emergency shuttle arrives just in case)</param>
+    /// <param name="checkOffStation">
+    /// Bool for if you want to check if someone is in space and consider them missing in action.
+    /// (Won't check when emergency shuttle arrives just in case)
+    /// </param>
     /// <param name="countCuffed">Bool for if you don't want to count cuffed entities.</param>
     /// <param name="countRevolutionaries">Bool for if you want to count revolutionaries.</param>
     /// <returns></returns>
-    private bool IsGroupDetainedOrDead(List<EntityUid> list, bool checkOffStation, bool countCuffed, bool countRevolutionaries)
+    private bool IsGroupDetainedOrDead(List<EntityUid> list,
+        bool checkOffStation,
+        bool countCuffed,
+        bool countRevolutionaries)
     {
         var gone = 0;
 
@@ -444,7 +467,8 @@ public sealed class RevolutionaryRuleSystem : GameRuleSystem<RevolutionaryRuleCo
                     continue;
                 }
 
-                if (checkOffStation && _stationSystem.GetOwningStation(entity) == null && !_emergencyShuttle.EmergencyShuttleArrived)
+                if (checkOffStation && _stationSystem.GetOwningStation(entity) == null &&
+                    !_emergencyShuttle.EmergencyShuttleArrived)
                 {
                     gone++;
                     continue;
@@ -457,25 +481,11 @@ public sealed class RevolutionaryRuleSystem : GameRuleSystem<RevolutionaryRuleCo
                 continue;
             }
 
-            if ((HasComp<RevolutionaryComponent>(entity) || HasComp<HeadRevolutionaryComponent>(entity)) && countRevolutionaries)
-            {
+            if ((HasComp<RevolutionaryComponent>(entity) || HasComp<HeadRevolutionaryComponent>(entity)) &&
+                countRevolutionaries)
                 gone++;
-                continue;
-            }
         }
 
         return gone == list.Count || list.Count == 0;
     }
-
-    private static readonly string[] Outcomes =
-    {
-        // revs survived and heads survived... how
-        "rev-reverse-stalemate",
-        // revs won and heads died
-        "rev-won",
-        // revs lost and heads survived
-        "rev-lost",
-        // revs lost and heads died
-        "rev-stalemate"
-    };
 }

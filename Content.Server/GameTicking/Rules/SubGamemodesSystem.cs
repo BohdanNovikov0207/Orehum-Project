@@ -13,7 +13,10 @@ namespace Content.Server.GameTicking.Rules;
 
 public sealed class SubGamemodesSystem : GameRuleSystem<SubGamemodesComponent>
 {
-    protected override void Added(EntityUid uid, SubGamemodesComponent comp, GameRuleComponent rule, GameRuleAddedEvent args)
+    protected override void Added(EntityUid uid,
+        SubGamemodesComponent comp,
+        GameRuleComponent rule,
+        GameRuleAddedEvent args)
     {
         var picked = EntitySpawnCollection.GetSpawns(comp.Rules, RobustRandom);
         foreach (var id in picked)

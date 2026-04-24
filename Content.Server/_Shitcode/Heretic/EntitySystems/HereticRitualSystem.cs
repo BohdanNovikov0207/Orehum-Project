@@ -10,47 +10,48 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Linq;
+using System.Text;
 using Content.Server.Heretic.Components;
-using Content.Shared.Heretic.Prototypes;
+using Content.Shared._Goobstation.Heretic.Components;
+using Content.Shared.Examine;
 using Content.Shared.Heretic;
+using Content.Shared.Heretic.Prototypes;
 using Content.Shared.Interaction;
 using Content.Shared.Popups;
+using Content.Shared.Stacks;
 using Content.Shared.Tag;
 using Robust.Shared.Audio;
 using Robust.Shared.Audio.Systems;
-using Robust.Shared.Prototypes;
-using System.Text;
-using System.Linq;
-using Content.Shared.Examine;
-using Content.Shared._Goobstation.Heretic.Components;
-using Content.Shared.Stacks;
 using Robust.Shared.Containers;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
 
 namespace Content.Server.Heretic.EntitySystems;
 
-public sealed partial class HereticRitualSystem : EntitySystem
+public sealed class HereticRitualSystem : EntitySystem
 {
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly SharedContainerSystem _container = default!;
+    [Dependency] private readonly GhoulSystem _ghoul = default!;
+    [Dependency] private readonly HereticSystem _heretic = default!;
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly IPrototypeManager _proto = default!;
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly HereticSystem _heretic = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedUserInterfaceSystem _uiSystem = default!;
-    [Dependency] private readonly SharedContainerSystem _container = default!;
     [Dependency] private readonly SharedStackSystem _stack = default!;
-    [Dependency] private readonly GhoulSystem _ghoul = default!;
+    [Dependency] private readonly SharedUserInterfaceSystem _uiSystem = default!;
 
     public SoundSpecifier RitualSuccessSound = new SoundPathSpecifier("/Audio/_Goobstation/Heretic/castsummon.ogg");
 
     public HereticRitualPrototype GetRitual(ProtoId<HereticRitualPrototype>? id)
     {
-        if (id == null) throw new ArgumentNullException();
+        if (id == null)
+            throw new ArgumentNullException();
         return _proto.Index<HereticRitualPrototype>(id);
     }
 
     /// <summary>
-    ///     Try to perform a selected ritual
+    /// Try to perform a selected ritual
     /// </summary>
     /// <returns> If the ritual succeeded or not </returns>
     public bool TryDoRitual(EntityUid performer,
@@ -92,12 +93,19 @@ public sealed partial class HereticRitualSystem : EntitySystem
 
         // check for all conditions
         // this is god awful but it is that it is
-        var behaviors = rit.CustomBehaviors ?? new();
-        var requiredTags = rit.RequiredTags?.ToDictionary(e => e.Key, e => e.Value) ?? new();
+        var behaviors = rit.CustomBehaviors ?? new List<RitualCustomBehavior>();
+        var requiredTags = rit.RequiredTags?.ToDictionary(e => e.Key, e => e.Value) ??
+                           new Dictionary<ProtoId<TagPrototype>, int>();
 
         foreach (var behavior in behaviors)
         {
-            var ritData = new RitualData(performer, platform, (mind, heretic), ritualId, EntityManager, limited, rit.Limit);
+            var ritData = new RitualData(performer,
+                platform,
+                (mind, heretic),
+                ritualId,
+                EntityManager,
+                limited,
+                rit.Limit);
 
             if (!behavior.Execute(ritData, out var missingStr))
             {
@@ -113,7 +121,7 @@ public sealed partial class HereticRitualSystem : EntitySystem
             foreach (var tag in requiredTags)
             {
                 if (!TryComp<TagComponent>(look, out var tags) // no tags?
-                || _container.IsEntityInContainer(look)) // using your own eyes for amber focus?
+                    || _container.IsEntityInContainer(look)) // using your own eyes for amber focus?
                     continue;
 
                 var ltags = tags.Tags;
@@ -139,15 +147,17 @@ public sealed partial class HereticRitualSystem : EntitySystem
 
         // add missing tags
         foreach (var tag in requiredTags)
+        {
             if (tag.Value > 0)
                 missingList.Add(tag.Key, tag.Value);
+        }
 
         // are we missing anything?
         if (missingList.Count > 0)
         {
             // we are! notify the performer about that!
             var sb = new StringBuilder();
-            for (int i = 0; i < missingList.Keys.Count; i++)
+            for (var i = 0; i < missingList.Keys.Count; i++)
             {
                 var key = missingList.Keys.ToList()[i];
                 var missing = $"{key} x{missingList[key]}";
@@ -155,10 +165,13 @@ public sealed partial class HereticRitualSystem : EntitySystem
                 // makes a nice, list, of, missing, items.
                 if (i != missingList.Count - 1)
                     sb.Append($"{missing}, ");
-                else sb.Append(missing);
+                else
+                    sb.Append(missing);
             }
 
-            _popup.PopupEntity(Loc.GetString("heretic-ritual-fail-items", ("itemlist", sb.ToString())), platform, performer);
+            _popup.PopupEntity(Loc.GetString("heretic-ritual-fail-items", ("itemlist", sb.ToString())),
+                platform,
+                performer);
             return false;
         }
 
@@ -170,13 +183,21 @@ public sealed partial class HereticRitualSystem : EntitySystem
         // finalize all of the custom ones
         foreach (var behavior in behaviors)
         {
-            var ritData = new RitualData(performer, platform, (mind, heretic), ritualId, EntityManager, limited, rit.Limit);
+            var ritData = new RitualData(performer,
+                platform,
+                (mind, heretic),
+                ritualId,
+                EntityManager,
+                limited,
+                rit.Limit);
             behavior.Finalize(ritData);
         }
 
         // ya get some, ya lose some
         foreach (var ent in toDelete)
+        {
             QueueDel(ent);
+        }
 
         foreach (var ((ent, stack), amount) in toSplit)
         {
@@ -186,7 +207,7 @@ public sealed partial class HereticRitualSystem : EntitySystem
         var ghoulQuery = GetEntityQuery<GhoulComponent>();
 
         // add stuff
-        var output = rit.Output ?? new();
+        var output = rit.Output ?? new Dictionary<EntProtoId, int>();
         foreach (var ent in output.Keys)
         {
             for (var i = 0; i < output[ent]; i++)
@@ -209,7 +230,7 @@ public sealed partial class HereticRitualSystem : EntitySystem
             RaiseLocalEvent(mind, rit.OutputEvent, true);
 
         if (rit.OutputKnowledge != null)
-            _heretic.TryAddKnowledge((mind, heretic),  rit.OutputKnowledge.Value, performer);
+            _heretic.TryAddKnowledge((mind, heretic), rit.OutputKnowledge.Value, performer);
 
         return true;
     }

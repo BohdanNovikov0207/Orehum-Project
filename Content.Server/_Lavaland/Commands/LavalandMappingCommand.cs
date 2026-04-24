@@ -33,8 +33,8 @@ namespace Content.Server._Lavaland.Commands;
 [AdminCommand(AdminFlags.Mapping)]
 public sealed class LavalandMappingCommand : IConsoleCommand
 {
-    [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly IEntityManager _entityManager = default!;
+    [Dependency] private readonly IPrototypeManager _proto = default!;
 
     public string Command => "mappinglavaland";
 
@@ -59,6 +59,7 @@ public sealed class LavalandMappingCommand : IConsoleCommand
                     shell.WriteLine(Loc.GetString("Wrong lavaland prototype!"));
                     return;
                 }
+
                 break;
             case 2:
                 if (!_proto.TryIndex(args[0], out lavalandProto))
@@ -72,6 +73,7 @@ public sealed class LavalandMappingCommand : IConsoleCommand
                     shell.WriteLine(Loc.GetString("shell-argument-must-be-number"));
                     return;
                 }
+
                 lavalandSeed = targetId;
                 break;
             default:
@@ -79,13 +81,15 @@ public sealed class LavalandMappingCommand : IConsoleCommand
                 shell.WriteLine(Help);
                 return;
         }
+
         var lavalandSys = _entityManager.System<LavalandSystem>();
 
         if (lavalandSys.GetPreloaderEntity() == null)
             lavalandSys.EnsurePreloaderMap();
 
         if (!lavalandSys.SetupLavalandPlanet(lavalandProto, out var lavaland, lavalandSeed))
-            shell.WriteLine("Failed to load lavaland! Ensure that lavaland.enabled CVar is set to true and check server-side logs.");
+            shell.WriteLine(
+                "Failed to load lavaland! Ensure that lavaland.enabled CVar is set to true and check server-side logs.");
         else
             shell.WriteLine($"Successfully created new lavaland map: {_entityManager.ToPrettyString(lavaland)}");
     }

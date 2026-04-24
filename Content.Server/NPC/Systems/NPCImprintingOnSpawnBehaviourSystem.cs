@@ -18,7 +18,7 @@ using NPCImprintingOnSpawnBehaviourComponent = Content.Server.NPC.Components.NPC
 
 namespace Content.Server.NPC.Systems;
 
-public sealed partial class NPCImprintingOnSpawnBehaviourSystem : SharedNPCImprintingOnSpawnBehaviourSystem
+public sealed class NPCImprintingOnSpawnBehaviourSystem : SharedNPCImprintingOnSpawnBehaviourSystem
 {
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly NPCSystem _npc = default!;
@@ -39,9 +39,7 @@ public sealed partial class NPCImprintingOnSpawnBehaviourSystem : SharedNPCImpri
         foreach (var friend in friends)
         {
             if (_whitelistSystem.IsWhitelistPassOrNull(imprinting.Comp.Whitelist, friend))
-            {
                 AddImprintingTarget(imprinting, friend, imprinting.Comp);
-            }
         }
 
         if (imprinting.Comp.Follow && imprinting.Comp.Friends.Count > 0)
@@ -51,7 +49,9 @@ public sealed partial class NPCImprintingOnSpawnBehaviourSystem : SharedNPCImpri
         }
     }
 
-    public void AddImprintingTarget(EntityUid entity, EntityUid friend, NPCImprintingOnSpawnBehaviourComponent component)
+    public void AddImprintingTarget(EntityUid entity,
+        EntityUid friend,
+        NPCImprintingOnSpawnBehaviourComponent component)
     {
         component.Friends.Add(friend);
         var exception = EnsureComp<FactionExceptionComponent>(entity);

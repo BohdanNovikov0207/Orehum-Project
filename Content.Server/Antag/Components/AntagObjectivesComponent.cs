@@ -14,7 +14,7 @@ namespace Content.Server.Antag.Components;
 /// <summary>
 /// Gives antags selected by this rule a fixed list of objectives.
 /// </summary>
-[RegisterComponent, Access(typeof(AntagObjectivesSystem))]
+[RegisterComponent] [Access(typeof(AntagObjectivesSystem))]
 public sealed partial class AntagObjectivesComponent : Component
 {
     /// <summary>

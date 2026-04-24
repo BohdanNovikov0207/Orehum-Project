@@ -16,7 +16,7 @@ public sealed class ClockSystem : SharedClockSystem
     [Dependency] private readonly PvsOverrideSystem _pvsOverride = default!;
     [Dependency] private readonly IRobustRandom _robustRandom = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();

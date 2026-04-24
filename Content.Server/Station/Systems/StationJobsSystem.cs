@@ -89,7 +89,6 @@ using System.Linq;
 using Content.Server.GameTicking;
 using Content.Server.Station.Components;
 using Content.Shared.CCVar;
-using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.GameTicking;
 using Content.Shared.Preferences;
 using Content.Shared.Roles;
@@ -110,11 +109,11 @@ namespace Content.Server.Station.Systems;
 public sealed partial class StationJobsSystem : EntitySystem
 {
     [Dependency] private readonly IConfigurationManager _configurationManager = default!;
+    [Dependency] private readonly GameTicker _gameTicker = default!;
     [Dependency] private readonly IPlayerManager _player = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly GameTicker _gameTicker = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         SubscribeLocalEvent<StationInitializedEvent>(OnStationInitialized);
@@ -147,10 +146,8 @@ public sealed partial class StationJobsSystem : EntitySystem
         }
     }
 
-    private void OnStationDeletion(EntityUid uid, StationJobsComponent component, ComponentShutdown args)
-    {
+    private void OnStationDeletion(EntityUid uid, StationJobsComponent component, ComponentShutdown args) =>
         UpdateJobsAvailable(); // we no longer exist so the jobs list is changed.
-    }
 
     private void OnStationInitialized(StationInitializedEvent msg)
     {
@@ -159,7 +156,7 @@ public sealed partial class StationJobsSystem : EntitySystem
 
         stationJobs.JobList = stationJobs.SetupAvailableJobs.ToDictionary(
             x => x.Key,
-            x=> (int?)(x.Value[1] < 0 ? null : x.Value[1]));
+            x => (int?) (x.Value[1] < 0 ? null : x.Value[1]));
 
         stationJobs.TotalJobs = stationJobs.JobList.Values.Select(x => x ?? 0).Sum();
 
@@ -168,15 +165,16 @@ public sealed partial class StationJobsSystem : EntitySystem
 
     #region Public API
 
-    /// <inheritdoc cref="TryAssignJob(Robust.Shared.GameObjects.EntityUid,string,NetUserId,Content.Server.Station.Components.StationJobsComponent?)"/>
+    /// <inheritdoc
+    ///     cref="TryAssignJob(Robust.Shared.GameObjects.EntityUid,string,NetUserId,Content.Server.Station.Components.StationJobsComponent?)" />
     /// <param name="station">Station to assign a job on.</param>
     /// <param name="job">Job to assign.</param>
     /// <param name="netUserId">The net user ID of the player we're assigning this job to.</param>
     /// <param name="stationJobs">Resolve pattern, station jobs component of the station.</param>
-    public bool TryAssignJob(EntityUid station, JobPrototype job, NetUserId netUserId, StationJobsComponent? stationJobs = null)
-    {
-        return TryAssignJob(station, job.ID, netUserId, stationJobs);
-    }
+    public bool TryAssignJob(EntityUid station,
+        JobPrototype job,
+        NetUserId netUserId,
+        StationJobsComponent? stationJobs = null) => TryAssignJob(station, job.ID, netUserId, stationJobs);
 
     /// <summary>
     /// Attempts to assign the given job once. (essentially, it decrements the slot if possible).
@@ -187,7 +185,10 @@ public sealed partial class StationJobsSystem : EntitySystem
     /// <param name="stationJobs">Resolve pattern, station jobs component of the station.</param>
     /// <returns>Whether or not assignment was a success.</returns>
     /// <exception cref="ArgumentException">Thrown when the given station is not a station.</exception>
-    public bool TryAssignJob(EntityUid station, string jobPrototypeId, NetUserId netUserId, StationJobsComponent? stationJobs = null)
+    public bool TryAssignJob(EntityUid station,
+        string jobPrototypeId,
+        NetUserId netUserId,
+        StationJobsComponent? stationJobs = null)
     {
         if (!Resolve(station, ref stationJobs, false))
             return false;
@@ -195,23 +196,26 @@ public sealed partial class StationJobsSystem : EntitySystem
         if (!TryAdjustJobSlot(station, jobPrototypeId, -1, false, false, stationJobs))
             return false;
 
-        stationJobs.PlayerJobs.TryAdd(netUserId, new());
+        stationJobs.PlayerJobs.TryAdd(netUserId, new List<ProtoId<JobPrototype>>());
         stationJobs.PlayerJobs[netUserId].Add(jobPrototypeId);
         return true;
     }
 
-    /// <inheritdoc cref="TryAdjustJobSlot(Robust.Shared.GameObjects.EntityUid,string,int,bool,bool,Content.Server.Station.Components.StationJobsComponent?)"/>
+    /// <inheritdoc
+    ///     cref="TryAdjustJobSlot(Robust.Shared.GameObjects.EntityUid,string,int,bool,bool,Content.Server.Station.Components.StationJobsComponent?)" />
     /// <param name="station">Station to adjust the job slot on.</param>
     /// <param name="job">Job to adjust.</param>
     /// <param name="amount">Amount to adjust by.</param>
     /// <param name="createSlot">Whether or not it should create the slot if it doesn't exist.</param>
     /// <param name="clamp">Whether or not to clamp to zero if you'd remove more jobs than are available.</param>
     /// <param name="stationJobs">Resolve pattern, station jobs component of the station.</param>
-    public bool TryAdjustJobSlot(EntityUid station, JobPrototype job, int amount, bool createSlot = false, bool clamp = false,
-        StationJobsComponent? stationJobs = null)
-    {
-        return TryAdjustJobSlot(station, job.ID, amount, createSlot, clamp, stationJobs);
-    }
+    public bool TryAdjustJobSlot(EntityUid station,
+        JobPrototype job,
+        int amount,
+        bool createSlot = false,
+        bool clamp = false,
+        StationJobsComponent? stationJobs = null) =>
+        TryAdjustJobSlot(station, job.ID, amount, createSlot, clamp, stationJobs);
 
     /// <summary>
     /// Attempts to adjust the given job slot by the amount provided.
@@ -260,7 +264,7 @@ public sealed partial class StationJobsSystem : EntitySystem
                 return true;
             case true:
                 // Job is unlimited so just say we adjusted it and do nothing.
-                if (available is not {} avail)
+                if (available is not { } avail)
                     return true;
 
                 // Would remove more jobs than we have available.
@@ -296,18 +300,20 @@ public sealed partial class StationJobsSystem : EntitySystem
         return jobsComponent.PlayerJobs.Remove(userId);
     }
 
-    /// <inheritdoc cref="TrySetJobSlot(Robust.Shared.GameObjects.EntityUid,string,int,bool,Content.Server.Station.Components.StationJobsComponent?)"/>
+    /// <inheritdoc
+    ///     cref="TrySetJobSlot(Robust.Shared.GameObjects.EntityUid,string,int,bool,Content.Server.Station.Components.StationJobsComponent?)" />
     /// <param name="station">Station to adjust the job slot on.</param>
     /// <param name="jobPrototype">Job prototype to adjust.</param>
     /// <param name="amount">Amount to set to.</param>
     /// <param name="createSlot">Whether or not it should create the slot if it doesn't exist.</param>
     /// <param name="stationJobs">Resolve pattern, station jobs component of the station.</param>
     /// <returns></returns>
-    public bool TrySetJobSlot(EntityUid station, JobPrototype jobPrototype, int amount, bool createSlot = false,
-        StationJobsComponent? stationJobs = null)
-    {
-        return TrySetJobSlot(station, jobPrototype.ID, amount, createSlot, stationJobs);
-    }
+    public bool TrySetJobSlot(EntityUid station,
+        JobPrototype jobPrototype,
+        int amount,
+        bool createSlot = false,
+        StationJobsComponent? stationJobs = null) =>
+        TrySetJobSlot(station, jobPrototype.ID, amount, createSlot, stationJobs);
 
     /// <summary>
     /// Attempts to set the given job slot to the amount provided.
@@ -350,14 +356,13 @@ public sealed partial class StationJobsSystem : EntitySystem
         }
     }
 
-    /// <inheritdoc cref="MakeJobUnlimited(Robust.Shared.GameObjects.EntityUid,string,Content.Server.Station.Components.StationJobsComponent?)"/>
+    /// <inheritdoc
+    ///     cref="MakeJobUnlimited(Robust.Shared.GameObjects.EntityUid,string,Content.Server.Station.Components.StationJobsComponent?)" />
     /// <param name="station">Station to make a job unlimited on.</param>
     /// <param name="job">Job to make unlimited.</param>
     /// <param name="stationJobs">Resolve pattern, station jobs component of the station.</param>
-    public void MakeJobUnlimited(EntityUid station, JobPrototype job, StationJobsComponent? stationJobs = null)
-    {
+    public void MakeJobUnlimited(EntityUid station, JobPrototype job, StationJobsComponent? stationJobs = null) =>
         MakeJobUnlimited(station, job.ID, stationJobs);
-    }
 
     /// <summary>
     /// Makes the given job have unlimited slots.
@@ -380,14 +385,13 @@ public sealed partial class StationJobsSystem : EntitySystem
         UpdateJobsAvailable();
     }
 
-    /// <inheritdoc cref="IsJobUnlimited(Robust.Shared.GameObjects.EntityUid,string,Content.Server.Station.Components.StationJobsComponent?)"/>
+    /// <inheritdoc
+    ///     cref="IsJobUnlimited(Robust.Shared.GameObjects.EntityUid,string,Content.Server.Station.Components.StationJobsComponent?)" />
     /// <param name="station">Station to check.</param>
     /// <param name="job">Job to check.</param>
     /// <param name="stationJobs">Resolve pattern, station jobs component of the station.</param>
-    public bool IsJobUnlimited(EntityUid station, JobPrototype job, StationJobsComponent? stationJobs = null)
-    {
-        return IsJobUnlimited(station, job.ID, stationJobs);
-    }
+    public bool IsJobUnlimited(EntityUid station, JobPrototype job, StationJobsComponent? stationJobs = null) =>
+        IsJobUnlimited(station, job.ID, stationJobs);
 
     /// <summary>
     /// Checks if the given job is unlimited.
@@ -405,15 +409,16 @@ public sealed partial class StationJobsSystem : EntitySystem
         return stationJobs.JobList.TryGetValue(jobPrototypeId, out var job) && job == null;
     }
 
-    /// <inheritdoc cref="TryGetJobSlot(Robust.Shared.GameObjects.EntityUid,string,out System.Nullable{uint},Content.Server.Station.Components.StationJobsComponent?)"/>
+    /// <inheritdoc
+    ///     cref="TryGetJobSlot(Robust.Shared.GameObjects.EntityUid,string,out System.Nullable{uint},Content.Server.Station.Components.StationJobsComponent?)" />
     /// <param name="station">Station to get slot info from.</param>
     /// <param name="job">Job to get slot info for.</param>
     /// <param name="slots">The number of slots remaining. Null if infinite.</param>
     /// <param name="stationJobs">Resolve pattern, station jobs component of the station.</param>
-    public bool TryGetJobSlot(EntityUid station, JobPrototype job, out int? slots, StationJobsComponent? stationJobs = null)
-    {
-        return TryGetJobSlot(station, job.ID, out slots, stationJobs);
-    }
+    public bool TryGetJobSlot(EntityUid station,
+        JobPrototype job,
+        out int? slots,
+        StationJobsComponent? stationJobs = null) => TryGetJobSlot(station, job.ID, out slots, stationJobs);
 
     /// <summary>
     /// Returns information about the given job slot.
@@ -425,7 +430,10 @@ public sealed partial class StationJobsSystem : EntitySystem
     /// <returns>Whether or not the slot exists.</returns>
     /// <exception cref="ArgumentException">Thrown when the given station is not a station.</exception>
     /// <remarks>slots will be null if the slot doesn't exist, as well, so make sure to check the return value.</remarks>
-    public bool TryGetJobSlot(EntityUid station, string jobPrototypeId, out int? slots, StationJobsComponent? stationJobs = null)
+    public bool TryGetJobSlot(EntityUid station,
+        string jobPrototypeId,
+        out int? slots,
+        StationJobsComponent? stationJobs = null)
     {
         if (!Resolve(station, ref stationJobs))
             throw new ArgumentException("Tried to use a non-station entity as a station!", nameof(station));
@@ -440,7 +448,8 @@ public sealed partial class StationJobsSystem : EntitySystem
     /// <param name="stationJobs">Resolve pattern, station jobs component of the station.</param>
     /// <returns>Set containing all jobs available.</returns>
     /// <exception cref="ArgumentException">Thrown when the given station is not a station.</exception>
-    public IEnumerable<ProtoId<JobPrototype>> GetAvailableJobs(EntityUid station, StationJobsComponent? stationJobs = null)
+    public IEnumerable<ProtoId<JobPrototype>> GetAvailableJobs(EntityUid station,
+        StationJobsComponent? stationJobs = null)
     {
         if (!Resolve(station, ref stationJobs))
             throw new ArgumentException("Tried to use a non-station entity as a station!", nameof(station));
@@ -457,7 +466,8 @@ public sealed partial class StationJobsSystem : EntitySystem
     /// <param name="stationJobs">Resolve pattern, station jobs component of the station.</param>
     /// <returns>Set containing all overflow jobs available.</returns>
     /// <exception cref="ArgumentException">Thrown when the given station is not a station.</exception>
-    public IReadOnlySet<ProtoId<JobPrototype>> GetOverflowJobs(EntityUid station, StationJobsComponent? stationJobs = null)
+    public IReadOnlySet<ProtoId<JobPrototype>> GetOverflowJobs(EntityUid station,
+        StationJobsComponent? stationJobs = null)
     {
         if (!Resolve(station, ref stationJobs))
             throw new ArgumentException("Tried to use a non-station entity as a station!", nameof(station));
@@ -472,7 +482,8 @@ public sealed partial class StationJobsSystem : EntitySystem
     /// <param name="stationJobs">Resolve pattern, station jobs component of the station.</param>
     /// <returns>List of all jobs on the station.</returns>
     /// <exception cref="ArgumentException">Thrown when the given station is not a station.</exception>
-    public IReadOnlyDictionary<ProtoId<JobPrototype>, int?> GetJobs(EntityUid station, StationJobsComponent? stationJobs = null)
+    public IReadOnlyDictionary<ProtoId<JobPrototype>, int?> GetJobs(EntityUid station,
+        StationJobsComponent? stationJobs = null)
     {
         if (!Resolve(station, ref stationJobs))
             throw new ArgumentException("Tried to use a non-station entity as a station!", nameof(station));
@@ -487,14 +498,15 @@ public sealed partial class StationJobsSystem : EntitySystem
     /// <param name="stationJobs">Resolve pattern, station jobs component of the station.</param>
     /// <returns>List of all round-start jobs.</returns>
     /// <exception cref="ArgumentException">Thrown when the given station is not a station.</exception>
-    public Dictionary<ProtoId<JobPrototype>, int?> GetRoundStartJobs(EntityUid station, StationJobsComponent? stationJobs = null)
+    public Dictionary<ProtoId<JobPrototype>, int?> GetRoundStartJobs(EntityUid station,
+        StationJobsComponent? stationJobs = null)
     {
         if (!Resolve(station, ref stationJobs))
             throw new ArgumentException("Tried to use a non-station entity as a station!", nameof(station));
 
         return stationJobs.SetupAvailableJobs.ToDictionary(
             x => x.Key,
-            x=> (int?)(x.Value[0] < 0 ? null : x.Value[0]));
+            x => (int?) (x.Value[0] < 0 ? null : x.Value[0]));
     }
 
     /// <summary>
@@ -505,20 +517,24 @@ public sealed partial class StationJobsSystem : EntitySystem
     /// <param name="pickOverflows">Whether or not to pick from the overflow list.</param>
     /// <param name="disallowedJobs">A set of disallowed jobs, if any.</param>
     /// <returns>The selected job, if any.</returns>
-    public ProtoId<JobPrototype>? PickBestAvailableJobWithPriority(EntityUid station, IReadOnlyDictionary<ProtoId<JobPrototype>, JobPriority> jobPriorities, bool pickOverflows, IReadOnlySet<ProtoId<JobPrototype>>? disallowedJobs = null)
+    public ProtoId<JobPrototype>? PickBestAvailableJobWithPriority(EntityUid station,
+        IReadOnlyDictionary<ProtoId<JobPrototype>, JobPriority> jobPriorities,
+        bool pickOverflows,
+        IReadOnlySet<ProtoId<JobPrototype>>? disallowedJobs = null)
     {
         if (station == EntityUid.Invalid)
             return null;
 
         var available = GetAvailableJobs(station);
+
         bool TryPick(JobPriority priority, [NotNullWhen(true)] out ProtoId<JobPrototype>? jobId)
         {
             var filtered = jobPriorities
                 .Where(p =>
-                            p.Value == priority
-                            && disallowedJobs != null
-                            && !disallowedJobs.Contains(p.Key)
-                            && available.Contains(p.Key))
+                    p.Value == priority
+                    && disallowedJobs != null
+                    && !disallowedJobs.Contains(p.Key)
+                    && available.Contains(p.Key))
                 .Select(p => p.Key)
                 .ToList();
 
@@ -533,19 +549,13 @@ public sealed partial class StationJobsSystem : EntitySystem
         }
 
         if (TryPick(JobPriority.High, out var picked))
-        {
             return picked;
-        }
 
         if (TryPick(JobPriority.Medium, out picked))
-        {
             return picked;
-        }
 
         if (TryPick(JobPriority.Low, out picked))
-        {
             return picked;
-        }
 
         if (!pickOverflows)
             return null;
@@ -563,7 +573,8 @@ public sealed partial class StationJobsSystem : EntitySystem
 
     private bool _availableJobsDirty;
 
-    private TickerJobsAvailableEvent _cachedAvailableJobs = new(new(), new());
+    private TickerJobsAvailableEvent _cachedAvailableJobs = new(new Dictionary<NetEntity, string>(),
+        new Dictionary<NetEntity, Dictionary<ProtoId<JobPrototype>, int?>>());
 
     /// <summary>
     /// Assembles an event from the current available-to-play jobs.
@@ -574,7 +585,8 @@ public sealed partial class StationJobsSystem : EntitySystem
     {
         // If late join is disallowed, return no available jobs.
         if (_gameTicker.DisallowLateJoin)
-            return new TickerJobsAvailableEvent(new(), new());
+            return new TickerJobsAvailableEvent(new Dictionary<NetEntity, string>(),
+                new Dictionary<NetEntity, Dictionary<ProtoId<JobPrototype>, int?>>());
 
         var jobs = new Dictionary<NetEntity, Dictionary<ProtoId<JobPrototype>, int?>>();
         var stationNames = new Dictionary<NetEntity, string>();
@@ -588,26 +600,20 @@ public sealed partial class StationJobsSystem : EntitySystem
             jobs.Add(netStation, list);
             stationNames.Add(netStation, Name(station));
         }
+
         return new TickerJobsAvailableEvent(stationNames, jobs);
     }
 
     /// <summary>
     /// Updates the cached available jobs. Moderately expensive.
     /// </summary>
-    private void UpdateJobsAvailable()
-    {
-        _availableJobsDirty = true;
-    }
+    private void UpdateJobsAvailable() => _availableJobsDirty = true;
 
-    private void OnPlayerJoinedLobby(PlayerJoinedLobbyEvent ev)
-    {
+    private void OnPlayerJoinedLobby(PlayerJoinedLobbyEvent ev) =>
         RaiseNetworkEvent(_cachedAvailableJobs, ev.PlayerSession.Channel);
-    }
 
-    private void OnStationRenamed(EntityUid uid, StationJobsComponent component, StationRenamedEvent args)
-    {
+    private void OnStationRenamed(EntityUid uid, StationJobsComponent component, StationRenamedEvent args) =>
         UpdateJobsAvailable();
-    }
 
     #endregion
 }

@@ -11,10 +11,10 @@ namespace Content.Server.Salvage.JobBoard;
 public sealed partial class SalvageJobsDataComponent : Component
 {
     /// <summary>
-    /// A dictionary relating the number of completed jobs needed to the different ranks.
+    /// A list of all completed jobs in order.
     /// </summary>
     [DataField]
-    public SortedDictionary<int, SalvageRankDatum> RankThresholds = new();
+    public List<ProtoId<CargoBountyPrototype>> CompletedJobs = new();
 
     /// <summary>
     /// The rank given when all salvage jobs are complete.
@@ -23,10 +23,10 @@ public sealed partial class SalvageJobsDataComponent : Component
     public SalvageRankDatum MaxRank;
 
     /// <summary>
-    /// A list of all completed jobs in order.
+    /// A dictionary relating the number of completed jobs needed to the different ranks.
     /// </summary>
     [DataField]
-    public List<ProtoId<CargoBountyPrototype>> CompletedJobs = new();
+    public SortedDictionary<int, SalvageRankDatum> RankThresholds = new();
 
     /// <summary>
     /// Account where rewards are deposited.
@@ -42,16 +42,16 @@ public sealed partial class SalvageJobsDataComponent : Component
 public partial record struct SalvageRankDatum
 {
     /// <summary>
-    /// The title displayed when this rank is reached
-    /// </summary>
-    [DataField]
-    public LocId Title;
-
-    /// <summary>
     /// The bounties associated with this rank.
     /// </summary>
     [DataField]
     public ProtoId<CargoBountyGroupPrototype>? BountyGroup;
+
+    /// <summary>
+    /// The title displayed when this rank is reached
+    /// </summary>
+    [DataField]
+    public LocId Title;
 
     /// <summary>
     /// The market that is unlocked when you reach this rank

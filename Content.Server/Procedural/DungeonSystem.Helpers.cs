@@ -11,7 +11,7 @@ namespace Content.Server.Procedural;
 
 public sealed partial class DungeonSystem
 {
-    public List<(Vector2i Start, Vector2i End)> MinimumSpanningTree(List<Vector2i> tiles, System.Random random)
+    public List<(Vector2i Start, Vector2i End)> MinimumSpanningTree(List<Vector2i> tiles, Random random)
     {
         // Generate connections between all rooms.
         var connections = new Dictionary<Vector2i, List<(Vector2i Tile, float Distance)>>(tiles.Count);
@@ -132,17 +132,13 @@ public sealed partial class DungeonSystem
                         // FORBIDDEN
                         if (neighbor != end &&
                             forbiddenTiles.Contains(neighbor))
-                        {
                             continue;
-                        }
 
                         var tileCost = SharedPathfindingSystem.ManhattanDistance(node, neighbor);
 
                         // Weight towards existing corridors ig
                         if (corridorTiles.Contains(neighbor))
-                        {
                             tileCost *= 0.10f;
-                        }
 
                         var costMod = tileCallback?.Invoke(neighbor);
                         costMod ??= 1f;
@@ -153,9 +149,7 @@ public sealed partial class DungeonSystem
 
                         // If direction is different then penalise it.
                         if (direction != lastDirection)
-                        {
                             tileCost *= 3f;
-                        }
 
                         // f = g + h
                         // gScore is distance to the start node
@@ -163,9 +157,7 @@ public sealed partial class DungeonSystem
                         var gScore = costSoFar[node] + tileCost;
 
                         if (costSoFar.TryGetValue(neighbor, out var nextValue) && gScore >= nextValue)
-                        {
                             continue;
-                        }
 
                         cameFrom[neighbor] = node;
                         costSoFar[neighbor] = gScore;

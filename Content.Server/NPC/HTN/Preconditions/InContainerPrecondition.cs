@@ -15,7 +15,8 @@ public sealed partial class InContainerPrecondition : HTNPrecondition
 {
     private ContainerSystem _container = default!;
 
-    [ViewVariables(VVAccess.ReadWrite)] [DataField("isInContainer")] public bool IsInContainer = true;
+    [ViewVariables(VVAccess.ReadWrite)] [DataField("isInContainer")]
+    public bool IsInContainer = true;
 
     public override void Initialize(IEntitySystemManager sysManager)
     {

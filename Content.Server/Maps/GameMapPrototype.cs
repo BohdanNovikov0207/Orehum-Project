@@ -40,12 +40,11 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Server.Station;
+using System.Diagnostics;
+using Content.Shared.Station;
 using JetBrains.Annotations;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
-using System.Diagnostics;
-using Content.Shared.Station;
 
 namespace Content.Server.Maps;
 
@@ -56,21 +55,20 @@ namespace Content.Server.Maps;
 /// Forks should not directly edit existing parts of this class.
 /// Make a new partial for your fancy new feature, it'll save you time later.
 /// </remarks>
-[Prototype, PublicAPI]
+[Prototype] [PublicAPI]
 [DebuggerDisplay("GameMapPrototype [{ID} - {MapName}]")]
 public sealed partial class GameMapPrototype : IPrototype
 {
-    /// <inheritdoc/>
-    [IdDataField]
-    public string ID { get; private set; } = default!;
-
-    [DataField]
-    public float MaxRandomOffset = 1000f;
+    [DataField("stations", required: true)]
+    private Dictionary<string, StationConfig> _stations = new();
 
     /// <summary>
     /// Turns out some of the map files are actually secretly grids. Excellent. I love map loading code.
     /// </summary>
     [DataField] public bool IsGrid;
+
+    [DataField]
+    public float MaxRandomOffset = 1000f;
 
     [DataField]
     public bool RandomRotation = true;
@@ -85,27 +83,26 @@ public sealed partial class GameMapPrototype : IPrototype
     /// Relative directory path to the given map, i.e. `/Maps/saltern.yml`
     /// </summary>
     [DataField(required: true)]
-    public ResPath MapPath { get; private set; } = default!;
-
-    [DataField("stations", required: true)]
-    private Dictionary<string, StationConfig> _stations = new();
+    public ResPath MapPath { get; private set; }
 
     /// <summary>
     /// The stations this map contains. The names should match with the BecomesStation components.
     /// </summary>
     public IReadOnlyDictionary<string, StationConfig> Stations => _stations;
 
+    /// <inheritdoc />
+    [IdDataField]
+    public string ID { get; private set; } = default!;
+
     /// <summary>
     /// Performs a shallow clone of this map prototype, replacing <c>MapPath</c> with the argument.
     /// </summary>
-    public GameMapPrototype Persistence(ResPath mapPath)
-    {
-        return new()
+    public GameMapPrototype Persistence(ResPath mapPath) =>
+        new()
         {
             ID = ID,
             MapName = MapName,
             MapPath = mapPath,
-            _stations = _stations
+            _stations = _stations,
         };
-    }
 }

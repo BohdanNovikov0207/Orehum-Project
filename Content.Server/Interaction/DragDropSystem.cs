@@ -9,5 +9,4 @@ namespace Content.Server.Interaction;
 
 public sealed class DragDropSystem : SharedDragDropSystem
 {
-
 }

@@ -37,10 +37,8 @@ public sealed class EssenceSystem : EntitySystem
         SubscribeLocalEvent<EssenceComponent, ExaminedEvent>(OnExamine);
     }
 
-    private void OnMobstateChanged(EntityUid uid, EssenceComponent component, MobStateChangedEvent args)
-    {
+    private void OnMobstateChanged(EntityUid uid, EssenceComponent component, MobStateChangedEvent args) =>
         UpdateEssenceAmount(uid, component);
-    }
 
     private void OnExamine(EntityUid uid, EssenceComponent component, ExaminedEvent args)
     {
@@ -64,10 +62,8 @@ public sealed class EssenceSystem : EntitySystem
         args.PushMarkup(Loc.GetString(message, ("target", uid)));
     }
 
-    private void OnEssenceEventReceived(EntityUid uid, EssenceComponent component, EntityEventArgs args)
-    {
+    private void OnEssenceEventReceived(EntityUid uid, EssenceComponent component, EntityEventArgs args) =>
         UpdateEssenceAmount(uid, component);
-    }
 
     private void UpdateEssenceAmount(EntityUid uid, EssenceComponent component)
     {

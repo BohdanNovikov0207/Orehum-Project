@@ -72,10 +72,7 @@ public sealed partial class StoreSystem
     /// <param name="component">The store to add the listing to</param>
     /// <param name="listing">The listing</param>
     /// <returns>Whether or not the listing was add successfully</returns>
-    public bool TryAddListing(StoreComponent component, ListingPrototype listing)
-    {
-        return component.Listings.Add(listing);
-    }
+    public bool TryAddListing(StoreComponent component, ListingPrototype listing) => component.Listings.Add(listing);
 
     /// <summary>
     /// Gets the available listings for a store
@@ -84,10 +81,8 @@ public sealed partial class StoreSystem
     /// <param name="store"></param>
     /// <param name="component">The store the listings are coming from.</param>
     /// <returns>The available listings.</returns>
-    public IEnumerable<ListingData> GetAvailableListings(EntityUid buyer, EntityUid store, StoreComponent component)
-    {
-        return GetAvailableListings(buyer, component.Listings, component.Categories, store);
-    }
+    public IEnumerable<ListingData> GetAvailableListings(EntityUid buyer, EntityUid store, StoreComponent component) =>
+        GetAvailableListings(buyer, component.Listings, component.Categories, store);
 
     /// <summary>
     /// Gets the available listings for a user given an overall set of listings and categories to filter by.
@@ -145,8 +140,10 @@ public sealed partial class StoreSystem
             if (listing.Categories.Contains(cat))
                 return true;
         }
+
         return false;
     }
+
     private void OnPurchase(ListingData listing) // goob start
     {
         if (!_proto.TryIndex<ListingPrototype>(listing.ID, out var prototype))
@@ -158,10 +155,11 @@ public sealed partial class StoreSystem
             var restockDuration = prototype.RestockDuration;
             listing.RestockTime = _timing.CurTime + restockDuration;
         }
+
         if (listing.ResetRestockOnPurchase)
         {
             var restockDuration = listing.RestockAfterPurchase ?? listing.RestockDuration;
             listing.RestockTime = _timing.CurTime + restockDuration;
         }
-    }// goob end
+    } // goob end
 }

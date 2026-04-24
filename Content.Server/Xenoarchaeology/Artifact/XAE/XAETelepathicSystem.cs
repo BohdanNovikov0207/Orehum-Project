@@ -23,12 +23,12 @@ namespace Content.Server.Xenoarchaeology.Artifact.XAE;
 /// </summary>
 public sealed class XAETelepathicSystem : BaseXAESystem<XAETelepathicComponent>
 {
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
-
     /// <summary> Pre-allocated and re-used collection.</summary>
     private readonly HashSet<EntityUid> _entities = new();
+
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
+    [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
 
     /// <inheritdoc />
     protected override void OnActivated(Entity<XAETelepathicComponent> ent, ref XenoArtifactNodeActivatedEvent args)
@@ -45,13 +45,9 @@ public sealed class XAETelepathicSystem : BaseXAESystem<XAETelepathicComponent>
             // roll if msg should be usual or drastic
             List<string> msgArr;
             if (_random.NextFloat() <= component.DrasticMessageProb && component.DrasticMessages != null)
-            {
                 msgArr = component.DrasticMessages;
-            }
             else
-            {
                 msgArr = component.Messages;
-            }
 
             // pick a random message
             var msgId = _random.Pick(msgArr);

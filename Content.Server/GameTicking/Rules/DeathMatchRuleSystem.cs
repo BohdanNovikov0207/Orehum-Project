@@ -40,13 +40,13 @@ using Robust.Shared.Utility;
 namespace Content.Server.GameTicking.Rules;
 
 /// <summary>
-/// Manages <see cref="DeathMatchRuleComponent"/>
+/// Manages <see cref="DeathMatchRuleComponent" />
 /// </summary>
 public sealed class DeathMatchRuleSystem : GameRuleSystem<DeathMatchRuleComponent>
 {
-    [Dependency] private readonly IPlayerManager _player = default!;
     [Dependency] private readonly MindSystem _mind = default!;
     [Dependency] private readonly OutfitSystem _outfitSystem = default!;
+    [Dependency] private readonly IPlayerManager _player = default!;
     [Dependency] private readonly PointSystem _point = default!;
     [Dependency] private readonly RespawnRuleSystem _respawn = default!;
     [Dependency] private readonly RoundEndSystem _roundEnd = default!;
@@ -65,7 +65,9 @@ public sealed class DeathMatchRuleSystem : GameRuleSystem<DeathMatchRuleComponen
 
     private void OnBeforeSpawn(PlayerBeforeSpawnEvent ev)
     {
-        var query = EntityQueryEnumerator<DeathMatchRuleComponent, RespawnTrackerComponent, PointManagerComponent, GameRuleComponent>();
+        var query =
+            EntityQueryEnumerator<DeathMatchRuleComponent, RespawnTrackerComponent, PointManagerComponent,
+                GameRuleComponent>();
         while (query.MoveNext(out var uid, out var dm, out var tracker, out var point, out var rule))
         {
             if (!GameTicker.IsGameRuleActive(uid, rule))
@@ -140,7 +142,10 @@ public sealed class DeathMatchRuleSystem : GameRuleSystem<DeathMatchRuleComponen
         _roundEnd.EndRound(component.RestartDelay);
     }
 
-    protected override void AppendRoundEndText(EntityUid uid, DeathMatchRuleComponent component, GameRuleComponent gameRule, ref RoundEndTextAppendEvent args)
+    protected override void AppendRoundEndText(EntityUid uid,
+        DeathMatchRuleComponent component,
+        GameRuleComponent gameRule,
+        ref RoundEndTextAppendEvent args)
     {
         if (!TryComp<PointManagerComponent>(uid, out var point))
             return;
@@ -150,6 +155,7 @@ public sealed class DeathMatchRuleSystem : GameRuleSystem<DeathMatchRuleComponen
             args.AddLine(Loc.GetString("point-scoreboard-winner", ("player", data.UserName)));
             args.AddLine("");
         }
+
         args.AddLine(Loc.GetString("point-scoreboard-header"));
         args.AddLine(new FormattedMessage(point.Scoreboard).ToMarkup());
     }

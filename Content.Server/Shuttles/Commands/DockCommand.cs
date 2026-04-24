@@ -29,13 +29,15 @@ public sealed class DockCommand : LocalizedEntityCommands
             return;
         }
 
-        if (!NetEntity.TryParse(args[0], out var airlock1Net) || !EntityManager.TryGetEntity(airlock1Net, out var airlock1))
+        if (!NetEntity.TryParse(args[0], out var airlock1Net) ||
+            !EntityManager.TryGetEntity(airlock1Net, out var airlock1))
         {
             shell.WriteError(Loc.GetString("shell-invalid-entity-uid", ("uid", args[0])));
             return;
         }
 
-        if (!NetEntity.TryParse(args[1], out var airlock2Net) || !EntityManager.TryGetEntity(airlock2Net, out var airlock2))
+        if (!NetEntity.TryParse(args[1], out var airlock2Net) ||
+            !EntityManager.TryGetEntity(airlock2Net, out var airlock2))
         {
             shell.WriteError(Loc.GetString("shell-invalid-entity-uid", ("uid", args[1])));
             return;
@@ -43,13 +45,17 @@ public sealed class DockCommand : LocalizedEntityCommands
 
         if (!EntityManager.TryGetComponent(airlock1, out DockingComponent? dock1))
         {
-            shell.WriteError(Loc.GetString("shell-entity-with-uid-lacks-component", ("uid", args[0]), ("componentName", nameof(DockingComponent))));
+            shell.WriteError(Loc.GetString("shell-entity-with-uid-lacks-component",
+                ("uid", args[0]),
+                ("componentName", nameof(DockingComponent))));
             return;
         }
 
         if (!EntityManager.TryGetComponent(airlock2, out DockingComponent? dock2))
         {
-            shell.WriteError(Loc.GetString("shell-entity-with-uid-lacks-component", ("uid", args[1]), ("componentName", nameof(DockingComponent))));
+            shell.WriteError(Loc.GetString("shell-entity-with-uid-lacks-component",
+                ("uid", args[1]),
+                ("componentName", nameof(DockingComponent))));
             return;
         }
 
@@ -61,13 +67,11 @@ public sealed class DockCommand : LocalizedEntityCommands
             shell.WriteError(Loc.GetString("cmd-dock-fail"));
     }
 
-    public override CompletionResult GetCompletion(IConsoleShell shell, string[] args)
-    {
-        return args.Length switch
+    public override CompletionResult GetCompletion(IConsoleShell shell, string[] args) =>
+        args.Length switch
         {
             1 => CompletionResult.FromOptions(CompletionHelper.Components<DockingComponent>(args[0], EntityManager)),
             2 => CompletionResult.FromOptions(CompletionHelper.Components<DockingComponent>(args[1], EntityManager)),
             _ => CompletionResult.Empty,
         };
-    }
 }

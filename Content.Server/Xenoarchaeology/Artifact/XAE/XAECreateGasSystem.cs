@@ -15,8 +15,8 @@ namespace Content.Server.Xenoarchaeology.Artifact.XAE;
 public sealed class XAECreateGasSystem : BaseXAESystem<XAECreateGasComponent>
 {
     [Dependency] private readonly AtmosphereSystem _atmosphere = default!;
-    [Dependency] private readonly TransformSystem _transform = default!;
     [Dependency] private readonly MapSystem _map = default!;
+    [Dependency] private readonly TransformSystem _transform = default!;
 
     protected override void OnActivated(Entity<XAECreateGasComponent> ent, ref XenoArtifactNodeActivatedEvent args)
     {
@@ -28,7 +28,7 @@ public sealed class XAECreateGasSystem : BaseXAESystem<XAECreateGasComponent>
         var tile = _map.LocalToTile(grid.Value, gridComp, args.Coordinates);
 
         var mixtures = new ValueList<GasMixture>();
-        if (_atmosphere.GetTileMixture(grid.Value, map.Value, tile, excite: true) is { } localMixture)
+        if (_atmosphere.GetTileMixture(grid.Value, map.Value, tile, true) is { } localMixture)
             mixtures.Add(localMixture);
 
         if (_atmosphere.GetAdjacentTileMixtures(grid.Value, tile, excite: true) is var adjacentTileMixtures)

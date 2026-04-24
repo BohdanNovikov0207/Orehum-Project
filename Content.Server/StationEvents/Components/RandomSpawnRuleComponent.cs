@@ -14,7 +14,7 @@ namespace Content.Server.StationEvents.Components;
 /// <summary>
 /// Spawns a single entity at a random tile on a station using TryGetRandomTile.
 /// </summary>
-[RegisterComponent, Access(typeof(RandomSpawnRule))]
+[RegisterComponent] [Access(typeof(RandomSpawnRule))]
 public sealed partial class RandomSpawnRuleComponent : Component
 {
     /// <summary>

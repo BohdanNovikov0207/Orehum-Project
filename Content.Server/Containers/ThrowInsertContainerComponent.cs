@@ -18,16 +18,13 @@ public sealed partial class ThrowInsertContainerComponent : Component
     public string ContainerId = string.Empty;
 
     /// <summary>
-    /// Throw chance of hitting into the container
-    /// </summary>
-    [DataField]
-    public float Probability = 0.25f;
-
-    /// <summary>
     /// Sound played when an object is throw into the container.
     /// </summary>
     [DataField]
     public SoundSpecifier? InsertSound = new SoundPathSpecifier("/Audio/Effects/trashbag1.ogg");
+
+    [DataField]
+    public LocId MissLocString = "container-thrown-missed";
 
     /// <summary>
     /// Sound played when an item is thrown and misses the container.
@@ -35,6 +32,9 @@ public sealed partial class ThrowInsertContainerComponent : Component
     [DataField]
     public SoundSpecifier? MissSound = new SoundPathSpecifier("/Audio/Effects/thudswoosh.ogg");
 
+    /// <summary>
+    /// Throw chance of hitting into the container
+    /// </summary>
     [DataField]
-    public LocId MissLocString = "container-thrown-missed";
+    public float Probability = 0.25f;
 }

@@ -11,16 +11,18 @@
 
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using Content.Shared.Random.Helpers; // Goobstation
+using Content.Shared.Random.Helpers;
 using Robust.Shared.Player;
 using Robust.Shared.Random;
-using Robust.Shared.Utility;
+// Goobstation
 
 namespace Content.Server.Antag;
 
 // Goobstation
-public sealed class AntagSelectionPlayerPool (List<Dictionary<ICommonSession, float>> orderedPools)
+public sealed class AntagSelectionPlayerPool(List<Dictionary<ICommonSession, float>> orderedPools)
 {
+    public int Count => orderedPools.Sum(p => p.Count);
+
     public bool TryPickAndTake(IRobustRandom random, [NotNullWhen(true)] out ICommonSession? session)
     {
         session = null;
@@ -36,6 +38,4 @@ public sealed class AntagSelectionPlayerPool (List<Dictionary<ICommonSession, fl
 
         return session != null;
     }
-
-    public int Count => orderedPools.Sum(p => p.Count);
 }

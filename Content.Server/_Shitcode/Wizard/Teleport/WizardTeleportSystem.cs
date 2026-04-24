@@ -12,16 +12,15 @@ using Content.Server.Actions;
 using Content.Server.Chat.Systems;
 using Content.Server.Pinpointer;
 using Content.Server.Popups;
-using Content.Shared.Warps;
 using Content.Shared._Goobstation.Wizard.FadingTimedDespawn;
 using Content.Shared._Goobstation.Wizard.Teleport;
-using Content.Shared.Actions;
 using Content.Shared.Actions.Components;
 using Content.Shared.Magic.Components;
 using Content.Shared.Movement.Pulling.Systems;
 using Content.Shared.Physics;
 using Content.Shared.Popups;
 using Content.Shared.UserInterface;
+using Content.Shared.Warps;
 using Robust.Server.Audio;
 using Robust.Server.GameObjects;
 using Robust.Shared.Audio;
@@ -32,17 +31,6 @@ namespace Content.Server._Goobstation.Wizard.Teleport;
 
 public sealed class WizardTeleportSystem : SharedWizardTeleportSystem
 {
-    [Dependency] private readonly UserInterfaceSystem _uiSystem = default!;
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly AudioSystem _audio = default!;
-    [Dependency] private readonly PullingSystem _pullingSystem = default!;
-    [Dependency] private readonly ActionsSystem _actions = default!;
-    [Dependency] private readonly ChatSystem _chat = default!;
-    [Dependency] private readonly WizardRuleSystem _wizard = default!;
-    [Dependency] private readonly TransformSystem _transform = default!;
-    [Dependency] private readonly PopupSystem _popup = default!;
-    [Dependency] private readonly SpellsSystem _spells = default!;
-
     private static readonly EntProtoId SmokeProto = "AdminInstantEffectSmoke10";
 
     private static readonly SoundSpecifier TeleportSound =
@@ -50,6 +38,17 @@ public sealed class WizardTeleportSystem : SharedWizardTeleportSystem
 
     private static readonly SoundSpecifier PostTeleportSound =
         new SoundPathSpecifier("/Audio/_Goobstation/Wizard/teleport_app.ogg");
+
+    [Dependency] private readonly ActionsSystem _actions = default!;
+    [Dependency] private readonly AudioSystem _audio = default!;
+    [Dependency] private readonly ChatSystem _chat = default!;
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
+    [Dependency] private readonly PopupSystem _popup = default!;
+    [Dependency] private readonly PullingSystem _pullingSystem = default!;
+    [Dependency] private readonly SpellsSystem _spells = default!;
+    [Dependency] private readonly TransformSystem _transform = default!;
+    [Dependency] private readonly UserInterfaceSystem _uiSystem = default!;
+    [Dependency] private readonly WizardRuleSystem _wizard = default!;
 
     public override void Initialize()
     {

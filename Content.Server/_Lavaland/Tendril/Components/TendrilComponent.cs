@@ -28,21 +28,6 @@ namespace Content.Server._Lavaland.Tendril.Components;
 public sealed partial class TendrilComponent : Component
 {
     [DataField]
-    public int MaxSpawns = 3;
-
-    /// <summary>
-    /// When this amount of mobs is killed, tendril breaks.
-    /// </summary>
-    [DataField]
-    public int MobsToDefeat = 5;
-
-    [ViewVariables]
-    public int DefeatedMobs = 0;
-
-    [DataField]
-    public float SpawnDelay = 10f;
-
-    [DataField]
     public float ChasmDelay = 5f;
 
     [DataField]
@@ -51,17 +36,32 @@ public sealed partial class TendrilComponent : Component
     [DataField]
     public int ChasmRadius = 2;
 
-    [DataField(required: true)]
-    public List<EntProtoId> Spawns = [];
+    [ViewVariables]
+    public int DefeatedMobs = 0;
 
     [ViewVariables]
-    public List<EntityUid> Mobs = [];
+    public bool DestroyedWithMobs;
 
     [ViewVariables(VVAccess.ReadWrite)]
     public TimeSpan LastSpawn = TimeSpan.Zero;
 
+    [DataField]
+    public int MaxSpawns = 3;
+
     [ViewVariables]
-    public bool DestroyedWithMobs;
+    public List<EntityUid> Mobs = [];
+
+    /// <summary>
+    /// When this amount of mobs is killed, tendril breaks.
+    /// </summary>
+    [DataField]
+    public int MobsToDefeat = 5;
+
+    [DataField]
+    public float SpawnDelay = 10f;
+
+    [DataField(required: true)]
+    public List<EntProtoId> Spawns = [];
 
     [ViewVariables]
     public float UpdateAccumulator;

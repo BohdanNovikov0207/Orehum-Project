@@ -41,27 +41,28 @@ using System.Linq;
 using Content.Server.Administration.Logs;
 using Content.Server.Chat.Systems;
 using Content.Server.Kitchen.Components;
+using Content.Server.Kitchen.EntitySystems;
 using Content.Server.Popups;
 using Content.Shared.Access;
 using Content.Shared.Access.Components;
 using Content.Shared.Access.Systems;
-using Content.Shared.Chat; // Einstein Engines - Language
+using Content.Shared.Chat;
 using Content.Shared.Database;
 using Content.Shared.Popups;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
-using Content.Server.Kitchen.EntitySystems;
+// Einstein Engines - Language
 
 namespace Content.Server.Access.Systems;
 
 public sealed class IdCardSystem : SharedIdCardSystem
 {
-    [Dependency] private readonly PopupSystem _popupSystem = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly IAdminLogManager _adminLogger = default!;
     [Dependency] private readonly ChatSystem _chat = default!;
     [Dependency] private readonly MicrowaveSystem _microwave = default!;
+    [Dependency] private readonly PopupSystem _popupSystem = default!;
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
 
     public override void Initialize()
     {
@@ -77,21 +78,20 @@ public sealed class IdCardSystem : SharedIdCardSystem
 
         if (TryComp<AccessComponent>(uid, out var access))
         {
-            float randomPick = _random.NextFloat();
+            var randomPick = _random.NextFloat();
 
             //basically, it does a small check to decide if its mango is to blow up -Space
 
             //roll microwave exploding -Space
             if (!micro.CanMicrowaveIdsSafely)
             {
-                float explodeCheck = _random.NextFloat();
+                var explodeCheck = _random.NextFloat();
 
                 if (explodeCheck <= micro.ExplosionChance)
                 {
                     _microwave.Explode((args.Microwave, micro));
                     return;
                 }
-
             }
 
             // then continue like normal -Space
@@ -103,11 +103,14 @@ public sealed class IdCardSystem : SharedIdCardSystem
                 if (transformComponent != null)
                 {
                     _popupSystem.PopupCoordinates(Loc.GetString("id-card-component-microwave-burnt", ("id", uid)),
-                     transformComponent.Coordinates, PopupType.Medium);
+                        transformComponent.Coordinates,
+                        PopupType.Medium);
                     Spawn("FoodBadRecipe",
                         transformComponent.Coordinates);
                 }
-                _adminLogger.Add(LogType.Action, LogImpact.Medium,
+
+                _adminLogger.Add(LogType.Action,
+                    LogImpact.Medium,
                     $"{ToPrettyString(args.Microwave)} burnt {ToPrettyString(uid):entity}");
                 QueueDel(uid);
                 return;
@@ -122,16 +125,19 @@ public sealed class IdCardSystem : SharedIdCardSystem
                 access.Tags.Clear();
                 Dirty(uid, access);
 
-                _adminLogger.Add(LogType.Action, LogImpact.Medium,
+                _adminLogger.Add(LogType.Action,
+                    LogImpact.Medium,
                     $"{ToPrettyString(args.Microwave)} cleared access on {ToPrettyString(uid):entity}");
             }
             else
-            {
-                _popupSystem.PopupEntity(Loc.GetString("id-card-component-microwave-safe", ("id", uid)), uid, PopupType.Medium);
-            }
+                _popupSystem.PopupEntity(Loc.GetString("id-card-component-microwave-safe", ("id", uid)),
+                    uid,
+                    PopupType.Medium);
 
             // Give them a wonderful new access to compensate for everything
-            var ids = _prototypeManager.EnumeratePrototypes<AccessLevelPrototype>().Where(x => x.CanAddToIdCard).ToArray();
+            var ids = _prototypeManager.EnumeratePrototypes<AccessLevelPrototype>()
+                .Where(x => x.CanAddToIdCard)
+                .ToArray();
 
             if (ids.Length == 0)
                 return;
@@ -141,9 +147,9 @@ public sealed class IdCardSystem : SharedIdCardSystem
             access.Tags.Add(random.ID);
             Dirty(uid, access);
 
-            _adminLogger.Add(LogType.Action, LogImpact.High,
-                    $"{ToPrettyString(args.Microwave)} added {random.ID} access to {ToPrettyString(uid):entity}");
-
+            _adminLogger.Add(LogType.Action,
+                LogImpact.High,
+                $"{ToPrettyString(args.Microwave)} added {random.ID} access to {ToPrettyString(uid):entity}");
         }
     }
 
@@ -159,7 +165,7 @@ public sealed class IdCardSystem : SharedIdCardSystem
             _chat.TrySendInGameICMessage(
                 ent,
                 Loc.GetString(ent.Comp.ExpireMessage),
-                Shared.Chat.InGameICChatType.Speak,
+                InGameICChatType.Speak,
                 ChatTransmitRange.Normal,
                 true);
         }

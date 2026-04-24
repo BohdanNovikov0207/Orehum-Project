@@ -31,10 +31,10 @@ namespace Content.Server.DeviceLinking.Systems;
 
 public sealed class SignalSwitchSystem : EntitySystem
 {
-    [Dependency] private readonly DeviceLinkSystem _deviceLink = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly LockSystem _lock = default!;
     [Dependency] private readonly AppearanceSystem _appearance = default!; // CorvaxGoob-ButtonsVisuals
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly DeviceLinkSystem _deviceLink = default!;
+    [Dependency] private readonly LockSystem _lock = default!;
 
     public override void Initialize()
     {
@@ -64,9 +64,7 @@ public sealed class SignalSwitchSystem : EntitySystem
 
         // only send status if it's a toggle switch and not a button
         if (comp.OnPort != comp.OffPort)
-        {
             _deviceLink.SendSignal(uid, comp.StatusPort, comp.State);
-        }
 
         _audio.PlayPvs(comp.ClickSound, uid, AudioParams.Default.WithVariation(0.125f).WithVolume(8f));
 
@@ -79,7 +77,10 @@ public sealed class SignalSwitchSystem : EntitySystem
     private void UpdateAppearance(Entity<SignalSwitchComponent> entity)
     {
         if (TryComp(entity, out AppearanceComponent? appearance))
-            _appearance.SetData(entity, SignalSwitchVisuals.State, entity.Comp.State ? SignalSwitchState.On : SignalSwitchState.Off, appearance);
+            _appearance.SetData(entity,
+                SignalSwitchVisuals.State,
+                entity.Comp.State ? SignalSwitchState.On : SignalSwitchState.Off,
+                appearance);
     }
     // CorvaxGoob-ButtonsVisuals-End
 }

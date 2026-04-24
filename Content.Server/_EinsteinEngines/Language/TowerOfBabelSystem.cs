@@ -13,7 +13,7 @@ public sealed class TowerOfBabelSystem : EntitySystem
     {
         base.Initialize();
 
-        SubscribeLocalEvent<TowerOfBabelComponent, MapInitEvent>(OnInit, before: [typeof(LanguageSystem)]);
+        SubscribeLocalEvent<TowerOfBabelComponent, MapInitEvent>(OnInit, [typeof(LanguageSystem)]);
     }
 
     private void OnInit(Entity<TowerOfBabelComponent> ent, ref MapInitEvent args)

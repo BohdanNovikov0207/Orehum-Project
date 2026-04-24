@@ -8,17 +8,26 @@ namespace Content.Server._Mono.Radar;
 [RegisterComponent]
 public sealed partial class RadarBlipComponent : Component
 {
-    /// <summary>
-    /// Color that gets shown on the radar screen.
-    /// </summary>
-    [ViewVariables(VVAccess.ReadWrite), DataField("radarColor")]
-    public Color RadarColor = Color.Red;
+    [DataField]
+    public bool Enabled = true;
 
     /// <summary>
     /// Color that gets shown on the radar screen when the blip is highlighted.
     /// </summary>
-    [ViewVariables(VVAccess.ReadWrite), DataField("highlightedRadarColor")]
+    [ViewVariables(VVAccess.ReadWrite)] [DataField("highlightedRadarColor")]
     public Color HighlightedRadarColor = Color.OrangeRed;
+
+    /// <summary>
+    /// Color that gets shown on the radar screen.
+    /// </summary>
+    [ViewVariables(VVAccess.ReadWrite)] [DataField("radarColor")]
+    public Color RadarColor = Color.Red;
+
+    /// <summary>
+    /// Whether this blip should be shown even when parented to a grid.
+    /// </summary>
+    [DataField]
+    public bool RequireNoGrid = false;
 
     /// <summary>
     /// Scale of the blip.
@@ -33,17 +42,8 @@ public sealed partial class RadarBlipComponent : Component
     public RadarBlipShape Shape = RadarBlipShape.Circle;
 
     /// <summary>
-    /// Whether this blip should be shown even when parented to a grid.
-    /// </summary>
-    [DataField]
-    public bool RequireNoGrid = false;
-
-    /// <summary>
     /// Whether this blip should be visible on radar across different grids.
     /// </summary>
     [DataField]
     public bool VisibleFromOtherGrids = false;
-
-    [DataField]
-    public bool Enabled = true;
 }

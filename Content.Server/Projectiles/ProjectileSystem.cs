@@ -65,15 +65,15 @@
 
 using Content.Goobstation.Common.Projectiles;
 using Content.Goobstation.Common.Weapons.Penetration;
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Server.Administration.Logs;
 using Content.Server.Destructible;
 using Content.Server.Effects;
 using Content.Server.Weapons.Ranged.Systems;
+using Content.Shared._Shitmed.Targeting;
 using Content.Shared.Camera;
 using Content.Shared.Damage;
 using Content.Shared.Database;
-using Content.Goobstation.Maths.FixedPoint;
-using Content.Shared._Shitmed.Targeting;
 using Content.Shared.Projectiles;
 using Robust.Shared.Physics.Events;
 using Robust.Shared.Player;
@@ -100,7 +100,8 @@ public sealed class ProjectileSystem : SharedProjectileSystem
     {
         // This is so entities that shouldn't get a collision are ignored.
         if (args.OurFixtureId != ProjectileFixture || !args.OtherFixture.Hard
-            || component.ProjectileSpent || component is { Weapon: null, OnlyCollideWhenShot: true })
+                                                   || component.ProjectileSpent || component is
+                                                       { Weapon: null, OnlyCollideWhenShot: true })
             return;
 
         var target = args.OtherEntity;
@@ -115,7 +116,9 @@ public sealed class ProjectileSystem : SharedProjectileSystem
             return;
         }
 
-        var ev = new ProjectileHitEvent(component.Damage * _damageableSystem.UniversalProjectileDamageModifier, target, component.Shooter);
+        var ev = new ProjectileHitEvent(component.Damage * _damageableSystem.UniversalProjectileDamageModifier,
+            target,
+            component.Shooter);
         RaiseLocalEvent(uid, ref ev);
 
         var otherName = ToPrettyString(target);
@@ -143,9 +146,9 @@ public sealed class ProjectileSystem : SharedProjectileSystem
         if (modifiedDamage is not null && Exists(component.Shooter))
         {
             if (modifiedDamage.AnyPositive() && !deleted)
-            {
-                _color.RaiseEffect(Color.Red, new List<EntityUid> { target }, Filter.Pvs(target, entityManager: EntityManager));
-            }
+                _color.RaiseEffect(Color.Red,
+                    new List<EntityUid> { target },
+                    Filter.Pvs(target, entityManager: EntityManager));
 
             _adminLogger.Add(LogType.BulletHit,
                 LogImpact.Medium,
@@ -167,26 +170,24 @@ public sealed class ProjectileSystem : SharedProjectileSystem
                         break;
                     }
                 }
+
                 if (stopPenetration)
                     component.ProjectileSpent = true;
             }
+
             // Goobstation - Splits penetration change if target have PenetratableComponent
             if (!TryComp<PenetratableComponent>(target, out var penetratable))
             {
                 // If the object won't be destroyed, it "tanks" the penetration hit.
                 if (modifiedDamage.GetTotal() < damageRequired)
-                {
                     component.ProjectileSpent = true;
-                }
 
                 if (!component.ProjectileSpent)
                 {
                     component.PenetrationAmount += damageRequired;
                     // The projectile has dealt enough damage to be spent.
                     if (component.PenetrationAmount >= component.PenetrationThreshold)
-                    {
                         component.ProjectileSpent = true;
-                    }
                 }
             }
             else
@@ -194,18 +195,14 @@ public sealed class ProjectileSystem : SharedProjectileSystem
                 // Goobstation - Here penetration threshold count as "penetration health".
                 // If it's lower than damage than penetation damage entity cause it deletes projectile
                 if (component.PenetrationThreshold < penetratable.PenetrateDamage)
-                {
                     component.ProjectileSpent = true;
-                }
 
                 component.PenetrationThreshold -= FixedPoint2.New(penetratable.PenetrateDamage);
-                component.Damage *= (1 - penetratable.DamagePenaltyModifier);
+                component.Damage *= 1 - penetratable.DamagePenaltyModifier;
             }
         }
         else
-        {
             component.ProjectileSpent = true;
-        }
 
         // Goobstation start
         if (component.Penetrate)
@@ -223,12 +220,13 @@ public sealed class ProjectileSystem : SharedProjectileSystem
                 _sharedCameraRecoil.KickCamera(target, args.OurBody.LinearVelocity.Normalized());
         }
 
-        if ((component.DeleteOnCollide && component.ProjectileSpent) || (component.NoPenetrateMask & args.OtherFixture.CollisionLayer) != 0) // Goobstation - Make x-ray arrows not penetrate blob
+        if (component.DeleteOnCollide && component.ProjectileSpent ||
+            (component.NoPenetrateMask & args.OtherFixture.CollisionLayer) !=
+            0) // Goobstation - Make x-ray arrows not penetrate blob
             QueueDel(uid);
 
         if (component.ImpactEffect != null && TryComp(uid, out TransformComponent? xform))
-        {
-            RaiseNetworkEvent(new ImpactEffectEvent(component.ImpactEffect, GetNetCoordinates(xform.Coordinates)), Filter.Pvs(xform.Coordinates, entityMan: EntityManager));
-        }
+            RaiseNetworkEvent(new ImpactEffectEvent(component.ImpactEffect, GetNetCoordinates(xform.Coordinates)),
+                Filter.Pvs(xform.Coordinates, entityMan: EntityManager));
     }
 }

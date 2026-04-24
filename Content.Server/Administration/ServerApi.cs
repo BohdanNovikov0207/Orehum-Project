@@ -21,8 +21,8 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
-using Content.Server.Administration.Systems;
 using Content.Server.Administration.Managers;
+using Content.Server.Administration.Systems;
 using Content.Server.GameTicking;
 using Content.Server.GameTicking.Presets;
 using Content.Server.Maps;
@@ -42,7 +42,7 @@ using Robust.Shared.Utility;
 namespace Content.Server.Administration;
 
 /// <summary>
-/// Exposes various admin-related APIs via the game server's <see cref="StatusHost"/>.
+/// Exposes various admin-related APIs via the game server's <see cref="StatusHost" />.
 /// </summary>
 public sealed partial class ServerApi : IPostInjectInit
 {
@@ -60,22 +60,25 @@ public sealed partial class ServerApi : IPostInjectInit
         CCVars.PanicBunkerCustomReason.Name,
     ];
 
-    [Dependency] private readonly IStatusHost _statusHost = default!;
-    [Dependency] private readonly IConfigurationManager _config = default!;
-    [Dependency] private readonly ISharedPlayerManager _playerManager = default!;
-    [Dependency] private readonly IAdminManager _adminManager = default!; // Frontier: ISharedAdminManager<IAdminManager>
-    [Dependency] private readonly IGameMapManager _gameMapManager = default!;
-    [Dependency] private readonly IServerNetManager _netManager = default!;
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    [Dependency]
+    private readonly IAdminManager _adminManager = default!; // Frontier: ISharedAdminManager<IAdminManager>
+
     [Dependency] private readonly IComponentFactory _componentFactory = default!;
-    [Dependency] private readonly ITaskManager _taskManager = default!;
+    [Dependency] private readonly IConfigurationManager _config = default!;
     [Dependency] private readonly EntityManager _entityManager = default!;
-    [Dependency] private readonly ILogManager _logManager = default!;
     [Dependency] private readonly IEntitySystemManager _entitySystemManager = default!;
+    [Dependency] private readonly IGameMapManager _gameMapManager = default!;
     [Dependency] private readonly ILocalizationManager _loc = default!;
+    [Dependency] private readonly ILogManager _logManager = default!;
+    [Dependency] private readonly IServerNetManager _netManager = default!;
+    [Dependency] private readonly ISharedPlayerManager _playerManager = default!;
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+
+    [Dependency] private readonly IStatusHost _statusHost = default!;
+    [Dependency] private readonly ITaskManager _taskManager = default!;
+    private ISawmill _sawmill = default!;
 
     private string _token = string.Empty;
-    private ISawmill _sawmill = default!;
 
     void IPostInjectInit.PostInject()
     {
@@ -97,29 +100,134 @@ public sealed partial class ServerApi : IPostInjectInit
         RegisterActorHandler(HttpMethod.Post, "/admin/actions/set_motd", ActionForceMotd);
         RegisterActorHandler(HttpMethod.Patch, "/admin/actions/panic_bunker", ActionPanicPunker);
 
-        RegisterHandler(HttpMethod.Post, "/admin/actions/send_bwoink", ActionSendBwoink); // Frontier - Discord Ahelp Reply
+        RegisterHandler(HttpMethod.Post,
+            "/admin/actions/send_bwoink",
+            ActionSendBwoink); // Frontier - Discord Ahelp Reply
     }
 
-    public void Initialize()
+    public void Initialize() => _config.OnValueChanged(CCVars.AdminApiToken, UpdateToken, true);
+
+    public void Shutdown() => _config.UnsubValueChanged(CCVars.AdminApiToken, UpdateToken);
+
+    private void UpdateToken(string token) => _token = token;
+
+    #region Frontier
+
+    // Creating a region here incase more actions are added in the future
+
+    private async Task ActionSendBwoink(IStatusHandlerContext context)
     {
-        _config.OnValueChanged(CCVars.AdminApiToken, UpdateToken, true);
+        var body = await ReadJson<BwoinkActionBody>(context);
+        if (body == null)
+            return;
+
+        await RunOnMainThread(async () =>
+        {
+            // Player not online or wrong Guid
+            if (!_playerManager.TryGetSessionById(new NetUserId(body.Guid), out var player))
+            {
+                await RespondError(
+                    context,
+                    ErrorCode.PlayerNotFound,
+                    HttpStatusCode.UnprocessableContent,
+                    "Player not found");
+                return;
+            }
+
+            var serverBwoinkSystem = _entitySystemManager.GetEntitySystem<BwoinkSystem>();
+            var message =
+                new SharedBwoinkSystem.BwoinkTextMessage(player.UserId, SharedBwoinkSystem.SystemUserId, body.Text);
+            serverBwoinkSystem.OnWebhookBwoinkTextMessage(message, body);
+
+            // Respond with OK
+            await RespondOk(context);
+        });
     }
 
-    public void Shutdown()
+    #endregion
+
+    private async Task<bool> CheckAccess(IStatusHandlerContext context)
     {
-        _config.UnsubValueChanged(CCVars.AdminApiToken, UpdateToken);
+        var auth = context.RequestHeaders.TryGetValue("Authorization", out var authToken);
+        if (!auth)
+        {
+            await RespondError(
+                context,
+                ErrorCode.AuthenticationNeeded,
+                HttpStatusCode.Unauthorized,
+                "Authorization is required");
+            return false;
+        }
+
+        var authHeaderValue = authToken.ToString();
+        var spaceIndex = authHeaderValue.IndexOf(' ');
+        if (spaceIndex == -1)
+        {
+            await RespondBadRequest(context, "Invalid Authorization header value");
+            return false;
+        }
+
+        var authScheme = authHeaderValue[..spaceIndex];
+        var authValue = authHeaderValue[spaceIndex..].Trim();
+
+        if (authScheme != SS14TokenScheme)
+        {
+            await RespondBadRequest(context, "Invalid Authorization scheme");
+            return false;
+        }
+
+        if (_token == "")
+            _sawmill.Debug("No authorization token set for admin API");
+        else if (CryptographicOperations.FixedTimeEquals(
+                     Encoding.UTF8.GetBytes(authValue),
+                     Encoding.UTF8.GetBytes(_token)))
+            return true;
+
+        await RespondError(
+            context,
+            ErrorCode.AuthenticationInvalid,
+            HttpStatusCode.Unauthorized,
+            "Authorization is invalid");
+
+        // Invalid auth header, no access
+        _sawmill.Info($"Unauthorized access attempt to admin API from {context.RemoteEndPoint}");
+        return false;
     }
 
-    private void UpdateToken(string token)
+    private async Task<Actor?> CheckActor(IStatusHandlerContext context)
     {
-        _token = token;
+        // The actor is JSON encoded in the header
+        var actor = context.RequestHeaders.TryGetValue("Actor", out var actorHeader) ? actorHeader.ToString() : null;
+        if (actor == null)
+        {
+            await RespondBadRequest(context, "Actor must be supplied");
+            return null;
+        }
+
+        Actor? actorData;
+        try
+        {
+            actorData = JsonSerializer.Deserialize<Actor>(actor);
+            if (actorData == null)
+            {
+                await RespondBadRequest(context, "Actor is null");
+                return null;
+            }
+        }
+        catch (JsonException exception)
+        {
+            await RespondBadRequest(context, "Actor field JSON is invalid", ExceptionData.FromException(exception));
+            return null;
+        }
+
+        return actorData;
     }
 
 
     #region Actions
 
     /// <summary>
-    ///     Changes the panic bunker settings.
+    /// Changes the panic bunker settings.
     /// </summary>
     private async Task ActionPanicPunker(IStatusHandlerContext context, Actor actor)
     {
@@ -181,9 +289,7 @@ public sealed partial class ServerApi : IPostInjectInit
                 castValue = s;
             }
             else
-            {
                 throw new NotSupportedException("Unsupported CVar type");
-            }
 
             toSet[cVar] = castValue;
         }
@@ -202,7 +308,7 @@ public sealed partial class ServerApi : IPostInjectInit
     }
 
     /// <summary>
-    ///     Sets the current MOTD.
+    /// Sets the current MOTD.
     /// </summary>
     private async Task ActionForceMotd(IStatusHandlerContext context, Actor actor)
     {
@@ -218,7 +324,7 @@ public sealed partial class ServerApi : IPostInjectInit
     }
 
     /// <summary>
-    ///     Forces the next preset-
+    /// Forces the next preset-
     /// </summary>
     private async Task ActionForcePreset(IStatusHandlerContext context, Actor actor)
     {
@@ -258,7 +364,7 @@ public sealed partial class ServerApi : IPostInjectInit
     }
 
     /// <summary>
-    ///     Ends an active game rule.
+    /// Ends an active game rule.
     /// </summary>
     private async Task ActionEndGameRule(IStatusHandlerContext context, Actor actor)
     {
@@ -292,7 +398,7 @@ public sealed partial class ServerApi : IPostInjectInit
     }
 
     /// <summary>
-    ///     Adds a game rule to the current round.
+    /// Adds a game rule to the current round.
     /// </summary>
     private async Task ActionAddGameRule(IStatusHandlerContext context, Actor actor)
     {
@@ -325,7 +431,7 @@ public sealed partial class ServerApi : IPostInjectInit
     }
 
     /// <summary>
-    ///     Kicks a player.
+    /// Kicks a player.
     /// </summary>
     private async Task ActionKick(IStatusHandlerContext context, Actor actor)
     {
@@ -355,8 +461,7 @@ public sealed partial class ServerApi : IPostInjectInit
         });
     }
 
-    private async Task ActionRoundStart(IStatusHandlerContext context, Actor actor)
-    {
+    private async Task ActionRoundStart(IStatusHandlerContext context, Actor actor) =>
         await RunOnMainThread(async () =>
         {
             var ticker = _entitySystemManager.GetEntitySystem<GameTicker>();
@@ -375,10 +480,8 @@ public sealed partial class ServerApi : IPostInjectInit
             _sawmill.Info($"Forced round start by {FormatLogActor(actor)}");
             await RespondOk(context);
         });
-    }
 
-    private async Task ActionRoundEnd(IStatusHandlerContext context, Actor actor)
-    {
+    private async Task ActionRoundEnd(IStatusHandlerContext context, Actor actor) =>
         await RunOnMainThread(async () =>
         {
             var roundEndSystem = _entitySystemManager.GetEntitySystem<RoundEndSystem>();
@@ -398,10 +501,8 @@ public sealed partial class ServerApi : IPostInjectInit
             _sawmill.Info($"Forced round end by {FormatLogActor(actor)}");
             await RespondOk(context);
         });
-    }
 
-    private async Task ActionRoundRestartNow(IStatusHandlerContext context, Actor actor)
-    {
+    private async Task ActionRoundRestartNow(IStatusHandlerContext context, Actor actor) =>
         await RunOnMainThread(async () =>
         {
             var ticker = _entitySystemManager.GetEntitySystem<GameTicker>();
@@ -410,48 +511,13 @@ public sealed partial class ServerApi : IPostInjectInit
             _sawmill.Info($"Forced instant round restart by {FormatLogActor(actor)}");
             await RespondOk(context);
         });
-    }
-    #endregion
-
-    #region Frontier
-    // Creating a region here incase more actions are added in the future
-
-    private async Task ActionSendBwoink(IStatusHandlerContext context)
-    {
-        var body = await ReadJson<BwoinkActionBody>(context);
-        if (body == null)
-            return;
-
-        await RunOnMainThread(async () =>
-    {
-        // Player not online or wrong Guid
-        if (!_playerManager.TryGetSessionById(new NetUserId(body.Guid), out var player))
-        {
-            await RespondError(
-                context,
-                ErrorCode.PlayerNotFound,
-                HttpStatusCode.UnprocessableContent,
-                "Player not found");
-            return;
-        }
-
-        var serverBwoinkSystem = _entitySystemManager.GetEntitySystem<BwoinkSystem>();
-        var message = new SharedBwoinkSystem.BwoinkTextMessage(player.UserId, SharedBwoinkSystem.SystemUserId, body.Text);
-        serverBwoinkSystem.OnWebhookBwoinkTextMessage(message, body);
-
-        // Respond with OK
-        await RespondOk(context);
-    });
-
-
-    }
 
     #endregion
 
     #region Fetching
 
     /// <summary>
-    ///     Returns an array containing all available presets.
+    /// Returns an array containing all available presets.
     /// </summary>
     private async Task GetPresets(IStatusHandlerContext context)
     {
@@ -465,7 +531,7 @@ public sealed partial class ServerApi : IPostInjectInit
                 {
                     Id = preset.ID,
                     ModeTitle = _loc.GetString(preset.ModeTitle),
-                    Description = _loc.GetString(preset.Description)
+                    Description = _loc.GetString(preset.Description),
                 });
             }
 
@@ -474,12 +540,12 @@ public sealed partial class ServerApi : IPostInjectInit
 
         await context.RespondJsonAsync(new PresetResponse
         {
-            Presets = presets
+            Presets = presets,
         });
     }
 
     /// <summary>
-    ///    Returns an array containing all game rules.
+    /// Returns an array containing all game rules.
     /// </summary>
     private async Task GetGameRules(IStatusHandlerContext context)
     {
@@ -495,13 +561,13 @@ public sealed partial class ServerApi : IPostInjectInit
 
         await context.RespondJsonAsync(new GameruleResponse
         {
-            GameRules = gameRules
+            GameRules = gameRules,
         });
     }
 
 
     /// <summary>
-    ///     Handles fetching information.
+    /// Handles fetching information.
     /// </summary>
     private async Task InfoHandler(IStatusHandlerContext context, Actor actor)
     {
@@ -533,7 +599,7 @@ public sealed partial class ServerApi : IPostInjectInit
                     UserId = player.UserId.UserId,
                     Name = player.Name,
                     IsAdmin = adminData != null,
-                    IsDeadminned = !adminData?.Active ?? false
+                    IsDeadminned = !adminData?.Active ?? false,
                 });
             }
 
@@ -543,7 +609,7 @@ public sealed partial class ServerApi : IPostInjectInit
                 mapInfo = new InfoResponse.MapInfo
                 {
                     Id = mapPrototype.ID,
-                    Name = mapPrototype.MapName
+                    Name = mapPrototype.MapName,
                 };
             }
 
@@ -563,7 +629,7 @@ public sealed partial class ServerApi : IPostInjectInit
                 PanicBunker = panicBunkerCVars,
                 GamePreset = ticker.CurrentPreset?.ID,
                 GameRules = gameRules,
-                MOTD = _config.GetCVar(CCVars.MOTD)
+                MOTD = _config.GetCVar(CCVars.MOTD),
             };
         });
 
@@ -571,87 +637,6 @@ public sealed partial class ServerApi : IPostInjectInit
     }
 
     #endregion
-
-    private async Task<bool> CheckAccess(IStatusHandlerContext context)
-    {
-        var auth = context.RequestHeaders.TryGetValue("Authorization", out var authToken);
-        if (!auth)
-        {
-            await RespondError(
-                context,
-                ErrorCode.AuthenticationNeeded,
-                HttpStatusCode.Unauthorized,
-                "Authorization is required");
-            return false;
-        }
-
-        var authHeaderValue = authToken.ToString();
-        var spaceIndex = authHeaderValue.IndexOf(' ');
-        if (spaceIndex == -1)
-        {
-            await RespondBadRequest(context, "Invalid Authorization header value");
-            return false;
-        }
-
-        var authScheme = authHeaderValue[..spaceIndex];
-        var authValue = authHeaderValue[spaceIndex..].Trim();
-
-        if (authScheme != SS14TokenScheme)
-        {
-            await RespondBadRequest(context, "Invalid Authorization scheme");
-            return false;
-        }
-
-        if (_token == "")
-        {
-            _sawmill.Debug("No authorization token set for admin API");
-        }
-        else if (CryptographicOperations.FixedTimeEquals(
-                Encoding.UTF8.GetBytes(authValue),
-                Encoding.UTF8.GetBytes(_token)))
-        {
-            return true;
-        }
-
-        await RespondError(
-            context,
-            ErrorCode.AuthenticationInvalid,
-            HttpStatusCode.Unauthorized,
-            "Authorization is invalid");
-
-        // Invalid auth header, no access
-        _sawmill.Info($"Unauthorized access attempt to admin API from {context.RemoteEndPoint}");
-        return false;
-    }
-
-    private async Task<Actor?> CheckActor(IStatusHandlerContext context)
-    {
-        // The actor is JSON encoded in the header
-        var actor = context.RequestHeaders.TryGetValue("Actor", out var actorHeader) ? actorHeader.ToString() : null;
-        if (actor == null)
-        {
-            await RespondBadRequest(context, "Actor must be supplied");
-            return null;
-        }
-
-        Actor? actorData;
-        try
-        {
-            actorData = JsonSerializer.Deserialize<Actor>(actor);
-            if (actorData == null)
-            {
-                await RespondBadRequest(context, "Actor is null");
-                return null;
-            }
-        }
-        catch (JsonException exception)
-        {
-            await RespondBadRequest(context, "Actor field JSON is invalid", ExceptionData.FromException(exception));
-            return null;
-        }
-
-        return actorData;
-    }
 
     #region From Client
 
@@ -704,10 +689,7 @@ public sealed partial class ServerApi : IPostInjectInit
 
     private record ExceptionData(string Message, string? StackTrace = null)
     {
-        public static ExceptionData FromException(Exception e)
-        {
-            return new ExceptionData(e.Message, e.StackTrace);
-        }
+        public static ExceptionData FromException(Exception e) => new(e.Message, e.StackTrace);
     }
 
     private enum ErrorCode

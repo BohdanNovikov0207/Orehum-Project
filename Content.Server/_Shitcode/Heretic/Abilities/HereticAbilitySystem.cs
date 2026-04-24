@@ -24,113 +24,114 @@
 
 using System.Linq;
 using Content.Goobstation.Common.Weapons.DelayedKnockdown;
-using Content.Goobstation.Shared.Overlays;
-using Content.Server.Atmos.EntitySystems;
-using Content.Server.Chat.Systems;
-using Content.Server.Flash;
-using Content.Server.Hands.Systems;
-using Content.Server.Polymorph.Systems;
-using Content.Server.Store.Systems;
-using Content.Shared.Damage;
-using Content.Shared.Damage.Systems;
-using Content.Shared.DoAfter;
-using Content.Shared.Heretic;
-using Content.Shared.Mind.Components;
-using Content.Shared.Mobs.Systems;
-using Content.Shared.NPC.Systems;
-using Content.Shared.Store.Components;
-using Robust.Shared.Audio.Systems;
-using Content.Shared.Popups;
-using Robust.Shared.Random;
-using Content.Shared.Body.Systems;
-using Robust.Server.GameObjects;
-using Robust.Server.GameStates;
-using Content.Shared.Stunnable;
-using Robust.Shared.Map;
-using Content.Shared.StatusEffect;
-using Content.Shared.Throwing;
-using Content.Server.Station.Systems;
-using Content.Shared.Localizations;
-using Robust.Shared.Audio;
-using Content.Shared.Mobs.Components;
-using Robust.Shared.Prototypes;
-using Content.Server.Heretic.EntitySystems;
+using Content.Goobstation.Maths.FixedPoint;
+using Content.Goobstation.Shared.MartialArts.Components;
 using Content.Server.Actions;
+using Content.Server.Atmos.EntitySystems;
 using Content.Server.Body.Components;
 using Content.Server.Body.Systems;
-using Content.Server.Temperature.Systems;
-using Content.Shared.Chemistry.EntitySystems;
+using Content.Server.Chat.Systems;
+using Content.Server.Cloning;
+using Content.Server.Flash;
+using Content.Server.Hands.Systems;
 using Content.Server.Heretic.Components;
+using Content.Server.Heretic.EntitySystems;
+using Content.Server.Polymorph.Systems;
+using Content.Server.Station.Systems;
+using Content.Server.Store.Systems;
 using Content.Server.Temperature.Components;
+using Content.Server.Temperature.Systems;
 using Content.Server.Weapons.Ranged.Systems;
 using Content.Shared._Goobstation.Heretic.Components;
 using Content.Shared._Shitcode.Heretic.Components;
 using Content.Shared._Shitcode.Heretic.Systems.Abilities;
-using Content.Shared.Damage.Components;
-using Content.Goobstation.Maths.FixedPoint;
-using Content.Goobstation.Shared.MartialArts.Components;
-using Content.Server.Cloning;
-using Content.Server.Database.Migrations.Sqlite;
-using Content.Shared.Chat;
-using Content.Shared.Heretic.Components;
-using Content.Shared.Movement.Pulling.Systems;
-using Content.Shared.Movement.Systems;
-using Content.Shared.Standing;
 using Content.Shared._Starlight.CollectiveMind;
 using Content.Shared.Body.Components;
+using Content.Shared.Body.Systems;
+using Content.Shared.Chat;
+using Content.Shared.Chemistry.EntitySystems;
+using Content.Shared.Damage;
+using Content.Shared.Damage.Components;
+using Content.Shared.Damage.Systems;
+using Content.Shared.DoAfter;
 using Content.Shared.Hands.Components;
+using Content.Shared.Heretic;
+using Content.Shared.Heretic.Components;
 using Content.Shared.Heretic.Prototypes;
+using Content.Shared.Localizations;
+using Content.Shared.Mind.Components;
+using Content.Shared.Mobs.Components;
+using Content.Shared.Mobs.Systems;
+using Content.Shared.Movement.Pulling.Systems;
+using Content.Shared.Movement.Systems;
+using Content.Shared.NPC.Systems;
+using Content.Shared.Popups;
+using Content.Shared.Standing;
+using Content.Shared.StatusEffect;
+using Content.Shared.Store.Components;
+using Content.Shared.Stunnable;
 using Content.Shared.Tag;
+using Content.Shared.Throwing;
 using Robust.Server.Containers;
+using Robust.Server.GameObjects;
+using Robust.Server.GameStates;
+using Robust.Shared.Audio;
+using Robust.Shared.Audio.Systems;
+using Robust.Shared.Map;
+using Robust.Shared.Prototypes;
+using Robust.Shared.Random;
 
 namespace Content.Server.Heretic.Abilities;
 
 public sealed partial class HereticAbilitySystem : SharedHereticAbilitySystem
 {
-    // keeping track of all systems in a single file
-    [Dependency] private readonly StoreSystem _store = default!;
-    [Dependency] private readonly HandsSystem _hands = default!;
-    [Dependency] private readonly ChatSystem _chat = default!;
-    [Dependency] private readonly PolymorphSystem _poly = default!;
-    [Dependency] private readonly MobStateSystem _mobstate = default!;
-    [Dependency] private readonly FlammableSystem _flammable = default!;
-    [Dependency] private readonly DamageableSystem _dmg = default!;
-    [Dependency] private readonly SharedStaminaSystem _stam = default!;
-    [Dependency] private readonly SharedAudioSystem _aud = default!;
-    [Dependency] private readonly FlashSystem _flash = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly SharedBodySystem _body = default!;
-    [Dependency] private readonly PhysicsSystem _phys = default!;
-    [Dependency] private readonly SharedStunSystem _stun = default!;
-    [Dependency] private readonly ThrowingSystem _throw = default!;
-    [Dependency] private readonly SharedUserInterfaceSystem _ui = default!;
-    [Dependency] private readonly StationSystem _station = default!;
-    [Dependency] private readonly IMapManager _mapMan = default!;
-    [Dependency] private readonly ITileDefinitionManager _tileDefinitionManager = default!;
-    [Dependency] private readonly IComponentFactory _compFactory = default!;
-    [Dependency] private readonly ProtectiveBladeSystem _pblade = default!;
-    [Dependency] private readonly StatusEffectsSystem _statusEffect = default!;
-    [Dependency] private readonly BloodstreamSystem _blood = default!;
-    [Dependency] private readonly SharedSolutionContainerSystem _solution = default!;
-    [Dependency] private readonly ContainerSystem _container = default!;
-    [Dependency] private readonly TemperatureSystem _temperature = default!;
-    [Dependency] private readonly TagSystem _tag = default!;
-    [Dependency] private readonly AppearanceSystem _appearance = default!;
-    [Dependency] private readonly GunSystem _gun = default!;
-    [Dependency] private readonly RespiratorSystem _respirator = default!;
-    [Dependency] private readonly StandingStateSystem _standing = default!;
-    [Dependency] private readonly PullingSystem _pulling = default!;
-    [Dependency] private readonly MansusGraspSystem _mansusGrasp = default!;
-    [Dependency] private readonly ActionsSystem _actions = default!;
-    [Dependency] private readonly NpcFactionSystem _npcFaction = default!;
-    [Dependency] private readonly PvsOverrideSystem _pvs = default!;
-    [Dependency] private readonly CloningSystem _cloning = default!;
-    [Dependency] private readonly MovementSpeedModifierSystem _modifier = default!;
+    private const float LeechingWalkUpdateInterval = 1f;
 
     private static readonly ProtoId<HereticRitualPrototype> BladeBladeRitual = "BladeBlade";
 
-    private const float LeechingWalkUpdateInterval = 1f;
+    public static ProtoId<CollectiveMindPrototype> MansusLinkMind = "MansusLink";
+    [Dependency] private readonly ActionsSystem _actions = default!;
+    [Dependency] private readonly AppearanceSystem _appearance = default!;
+    [Dependency] private readonly SharedAudioSystem _aud = default!;
+    [Dependency] private readonly BloodstreamSystem _blood = default!;
+    [Dependency] private readonly SharedBodySystem _body = default!;
+    [Dependency] private readonly ChatSystem _chat = default!;
+    [Dependency] private readonly CloningSystem _cloning = default!;
+    [Dependency] private readonly IComponentFactory _compFactory = default!;
+    [Dependency] private readonly ContainerSystem _container = default!;
+    [Dependency] private readonly DamageableSystem _dmg = default!;
+    [Dependency] private readonly FlammableSystem _flammable = default!;
+    [Dependency] private readonly FlashSystem _flash = default!;
+    [Dependency] private readonly GunSystem _gun = default!;
+    [Dependency] private readonly HandsSystem _hands = default!;
+    [Dependency] private readonly MansusGraspSystem _mansusGrasp = default!;
+    [Dependency] private readonly IMapManager _mapMan = default!;
+    [Dependency] private readonly MobStateSystem _mobstate = default!;
+    [Dependency] private readonly MovementSpeedModifierSystem _modifier = default!;
+    [Dependency] private readonly NpcFactionSystem _npcFaction = default!;
+    [Dependency] private readonly ProtectiveBladeSystem _pblade = default!;
+    [Dependency] private readonly PhysicsSystem _phys = default!;
+    [Dependency] private readonly PolymorphSystem _poly = default!;
+    [Dependency] private readonly PullingSystem _pulling = default!;
+    [Dependency] private readonly PvsOverrideSystem _pvs = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly RespiratorSystem _respirator = default!;
+    [Dependency] private readonly SharedSolutionContainerSystem _solution = default!;
+    [Dependency] private readonly SharedStaminaSystem _stam = default!;
+    [Dependency] private readonly StandingStateSystem _standing = default!;
+    [Dependency] private readonly StationSystem _station = default!;
+
+    [Dependency] private readonly StatusEffectsSystem _statusEffect = default!;
+
+    // keeping track of all systems in a single file
+    [Dependency] private readonly StoreSystem _store = default!;
+    [Dependency] private readonly SharedStunSystem _stun = default!;
+    [Dependency] private readonly TagSystem _tag = default!;
+    [Dependency] private readonly TemperatureSystem _temperature = default!;
+    [Dependency] private readonly ThrowingSystem _throw = default!;
+    [Dependency] private readonly ITileDefinitionManager _tileDefinitionManager = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
+    [Dependency] private readonly SharedUserInterfaceSystem _ui = default!;
     private float _accumulator;
 
     public override void Initialize()
@@ -181,6 +182,7 @@ public sealed partial class HereticAbilitySystem : SharedHereticAbilitySystem
 
         _store.ToggleUi(args.Performer, ent, store);
     }
+
     private void OnMansusGrasp(EventHereticMansusGrasp args)
     {
         if (!TryUseAbility(args, false))
@@ -201,6 +203,7 @@ public sealed partial class HereticAbilitySystem : SharedHereticAbilitySystem
                 if (HasComp<MansusGraspComponent>(item))
                     QueueDel(item);
             }
+
             heretic.MansusGraspAction = EntityUid.Invalid;
             return;
         }
@@ -301,6 +304,7 @@ public sealed partial class HereticAbilitySystem : SharedHereticAbilitySystem
 
         _ui.OpenUi((mind, uic), HereticLivingHeartKey.Key, uid);
     }
+
     private void OnLivingHeartActivate(EventHereticLivingHeartActivate args)
     {
         string loc;
@@ -332,7 +336,7 @@ public sealed partial class HereticAbilitySystem : SharedHereticAbilitySystem
             var isOnStation = targetStation != null && targetStation == ownStation;
 
             var ang = Angle.Zero;
-            if (_mapMan.TryFindGridAt(_transform.GetMapCoordinates(Transform(uid)), out var grid, out var _))
+            if (_mapMan.TryFindGridAt(_transform.GetMapCoordinates(Transform(uid)), out var grid, out _))
                 ang = Transform(grid).LocalRotation;
 
             var vector = targetMapCoords.Position - ourMapCoords.Position;
@@ -346,10 +350,12 @@ public sealed partial class HereticAbilitySystem : SharedHereticAbilitySystem
         }
 
         Popup.PopupEntity(loc, uid, uid, PopupType.Medium);
-        _aud.PlayPredicted(new SoundPathSpecifier("/Audio/_Goobstation/Heretic/heartbeat.ogg"), uid, uid, AudioParams.Default.WithVolume(-3f));
+        _aud.PlayPredicted(new SoundPathSpecifier("/Audio/_Goobstation/Heretic/heartbeat.ogg"),
+            uid,
+            uid,
+            AudioParams.Default.WithVolume(-3f));
     }
 
-    public static ProtoId<CollectiveMindPrototype> MansusLinkMind = "MansusLink";
     private void OnMansusLink(EventHereticMansusLink args)
     {
         if (!TryUseAbility(args))
@@ -374,12 +380,16 @@ public sealed partial class HereticAbilitySystem : SharedHereticAbilitySystem
             BreakOnDamage = true,
             BreakOnMove = true,
             BreakOnWeightlessMove = true,
-            MultiplyDelay = false
+            MultiplyDelay = false,
         };
         Popup.PopupEntity(Loc.GetString("heretic-manselink-start"), ent, ent);
-        Popup.PopupEntity(Loc.GetString("heretic-manselink-start-target"), args.Target, args.Target, PopupType.MediumCaution);
+        Popup.PopupEntity(Loc.GetString("heretic-manselink-start-target"),
+            args.Target,
+            args.Target,
+            PopupType.MediumCaution);
         DoAfter.TryStartDoAfter(dargs);
     }
+
     private void OnMansusLinkDoafter(HereticMansusLinkDoAfter args)
     {
         if (args.Cancelled)
@@ -389,7 +399,7 @@ public sealed partial class HereticAbilitySystem : SharedHereticAbilitySystem
 
         // this "* 1000f" (divided by 1000 in FlashSystem) is gonna age like fine wine :clueless:
         // updated: get upstream'ed you clanker
-        _flash.Flash(args.Target, null, null, TimeSpan.FromSeconds(2f), 0f, false, true, stunDuration: TimeSpan.FromSeconds(1f));
+        _flash.Flash(args.Target, null, null, TimeSpan.FromSeconds(2f), 0f, false, true, TimeSpan.FromSeconds(1f));
     }
 
     private float GetFleshHealMultiplier(Entity<MartialArtModifiersComponent> ent)
@@ -415,7 +425,8 @@ public sealed partial class HereticAbilitySystem : SharedHereticAbilitySystem
 
         var bloodQuery = GetEntityQuery<BloodstreamComponent>();
 
-        var fleshQuery = EntityQueryEnumerator<FleshPassiveComponent, MartialArtModifiersComponent, DamageableComponent>();
+        var fleshQuery =
+            EntityQueryEnumerator<FleshPassiveComponent, MartialArtModifiersComponent, DamageableComponent>();
         while (fleshQuery.MoveNext(out var uid, out var flesh, out var modifiers, out var dmg))
         {
             flesh.Accumulator += frameTime;

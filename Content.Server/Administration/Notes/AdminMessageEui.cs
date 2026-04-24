@@ -19,13 +19,13 @@ namespace Content.Server.Administration.Notes;
 
 public sealed class AdminMessageEui : BaseEui
 {
-    [Dependency] private readonly IAdminNotesManager _notesMan = default!;
     [Dependency] private readonly IConfigurationManager _cfg = default!;
-    [Dependency] private readonly IGameTiming _gameTiming = default!;
 
     private readonly TimeSpan _closeWait;
     private readonly TimeSpan _endTime;
+    [Dependency] private readonly IGameTiming _gameTiming = default!;
     private readonly AdminMessageRecord[] _messages;
+    [Dependency] private readonly IAdminNotesManager _notesMan = default!;
 
     public AdminMessageEui(AdminMessageRecord[] messages)
     {
@@ -35,21 +35,17 @@ public sealed class AdminMessageEui : BaseEui
         _messages = messages;
     }
 
-    public override void Opened()
-    {
-        StateDirty();
-    }
+    public override void Opened() => StateDirty();
 
-    public override EuiStateBase GetNewState()
-    {
-        return new AdminMessageEuiState(
+    public override EuiStateBase GetNewState() =>
+        new AdminMessageEuiState(
             _closeWait,
             _messages.Select(x => new AdminMessageEuiState.Message(
-                x.Message,
-                x.CreatedBy?.LastSeenUserName ?? Loc.GetString("admin-notes-fallback-admin-name"),
-                x.CreatedAt.UtcDateTime)).ToArray()
+                    x.Message,
+                    x.CreatedBy?.LastSeenUserName ?? Loc.GetString("admin-notes-fallback-admin-name"),
+                    x.CreatedAt.UtcDateTime))
+                .ToArray()
         );
-    }
 
     public override async void HandleMessage(EuiMessageBase msg)
     {
@@ -65,6 +61,7 @@ public sealed class AdminMessageEui : BaseEui
                 {
                     await _notesMan.MarkMessageAsSeen(message.Id, dismiss.Permanent);
                 }
+
                 Close();
                 break;
         }

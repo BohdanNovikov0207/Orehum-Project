@@ -16,24 +16,35 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Goobstation.Shared.Religion;
 using Content.Server.Administration.Systems;
 using Content.Server.Antag;
 using Content.Server.Atmos.Components;
 using Content.Server.Body.Components;
 using Content.Server.Dragon;
 using Content.Server.Ghost.Roles.Components;
-using Content.Shared.Hands.Components;
 using Content.Server.Hands.Systems;
+using Content.Server.Heretic.Abilities;
 using Content.Server.Humanoid;
-using Content.Server.Mind.Commands;
+using Content.Server.NPC;
+using Content.Server.NPC.HTN;
+using Content.Server.NPC.Systems;
+using Content.Server.Roles;
 using Content.Server.Storage.EntitySystems;
 using Content.Server.Temperature.Components;
+using Content.Shared._Shitcode.Heretic.Components;
+using Content.Shared._Shitmed.Medical.Surgery.Consciousness.Components;
+using Content.Shared._Starlight.CollectiveMind;
 using Content.Shared._White.Xenomorphs.Xenomorph;
+using Content.Shared.Body.Components;
 using Content.Shared.Body.Systems;
 using Content.Shared.CombatMode;
 using Content.Shared.CombatMode.Pacification;
+using Content.Shared.Coordinates;
 using Content.Shared.Examine;
 using Content.Shared.Ghost.Roles.Components;
+using Content.Shared.Gibbing.Events;
+using Content.Shared.Hands.Components;
 using Content.Shared.Heretic;
 using Content.Shared.Humanoid;
 using Content.Shared.IdentityManagement;
@@ -47,22 +58,9 @@ using Content.Shared.NPC.Systems;
 using Content.Shared.Nutrition.AnimalHusbandry;
 using Content.Shared.Nutrition.Components;
 using Content.Shared.RatKing;
-using Robust.Server.Audio;
-using Content.Goobstation.Shared.Religion;
-using Content.Server.GameTicking.Rules;
-using Content.Server.Heretic.Abilities;
-using Content.Server.NPC;
-using Content.Server.NPC.HTN;
-using Content.Server.NPC.Systems;
-using Content.Server.Roles;
-using Content.Shared._Shitcode.Heretic.Components;
-using Content.Shared._Shitmed.Medical.Surgery.Consciousness.Components;
-using Content.Shared._Starlight.CollectiveMind;
-using Content.Shared.Body.Components;
-using Content.Shared.Coordinates;
-using Content.Shared.Gibbing.Events;
 using Content.Shared.Roles;
 using Content.Shared.Species.Components;
+using Robust.Server.Audio;
 using Robust.Shared.Audio;
 using Robust.Shared.Prototypes;
 
@@ -72,22 +70,22 @@ public sealed class GhoulSystem : EntitySystem
 {
     private static readonly ProtoId<HTNCompoundPrototype> Compound = "HereticSummonCompound";
     private static readonly EntProtoId<MindRoleComponent> GhoulRole = "MindRoleGhoul";
+    [Dependency] private readonly AntagSelectionSystem _antag = default!;
+    [Dependency] private readonly AudioSystem _audio = default!;
+    [Dependency] private readonly SharedBodySystem _body = default!;
+    [Dependency] private readonly NpcFactionSystem _faction = default!;
+    [Dependency] private readonly HandsSystem _hands = default!;
+    [Dependency] private readonly HereticSystem _heretic = default!;
+    [Dependency] private readonly HTNSystem _htn = default!;
+    [Dependency] private readonly HumanoidAppearanceSystem _humanoid = default!;
+    [Dependency] private readonly InventorySystem _inventory = default!;
 
     [Dependency] private readonly SharedMindSystem _mind = default!;
-    [Dependency] private readonly AntagSelectionSystem _antag = default!;
-    [Dependency] private readonly HumanoidAppearanceSystem _humanoid = default!;
-    [Dependency] private readonly RejuvenateSystem _rejuvenate = default!;
-    [Dependency] private readonly NpcFactionSystem _faction = default!;
-    [Dependency] private readonly MobThresholdSystem _threshold = default!;
-    [Dependency] private readonly SharedBodySystem _body = default!;
-    [Dependency] private readonly StorageSystem _storage = default!;
-    [Dependency] private readonly InventorySystem _inventory = default!;
-    [Dependency] private readonly HandsSystem _hands = default!;
-    [Dependency] private readonly AudioSystem _audio = default!;
     [Dependency] private readonly NPCSystem _npc = default!;
-    [Dependency] private readonly HTNSystem _htn = default!;
+    [Dependency] private readonly RejuvenateSystem _rejuvenate = default!;
     [Dependency] private readonly SharedRoleSystem _role = default!;
-    [Dependency] private readonly HereticSystem _heretic = default!;
+    [Dependency] private readonly StorageSystem _storage = default!;
+    [Dependency] private readonly MobThresholdSystem _threshold = default!;
 
     public override void Initialize()
     {
@@ -126,10 +124,8 @@ public sealed class GhoulSystem : EntitySystem
         args.Append(Loc.GetString("heretic-ghoul-briefing-end"));
     }
 
-    private void OnWeaponExamine(Entity<GhoulWeaponComponent> ent, ref ExaminedEvent args)
-    {
+    private void OnWeaponExamine(Entity<GhoulWeaponComponent> ent, ref ExaminedEvent args) =>
         args.PushMarkup(Loc.GetString(ent.Comp.ExamineMessage));
-    }
 
     public void SetBoundHeretic(Entity<HereticMinionComponent?> ent, EntityUid heretic, bool dirty = true)
     {
@@ -277,10 +273,8 @@ public sealed class GhoulSystem : EntitySystem
         QueueDel(ent.Comp.BoundWeapon.Value);
     }
 
-    private void OnTakeGhostRole(Entity<HereticMinionComponent> ent, ref TakeGhostRoleEvent args)
-    {
+    private void OnTakeGhostRole(Entity<HereticMinionComponent> ent, ref TakeGhostRoleEvent args) =>
         SendBriefing(ent.AsNullable());
-    }
 
     private void OnTryAttack(Entity<HereticMinionComponent> ent, ref AttackAttemptEvent args)
     {

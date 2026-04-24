@@ -18,88 +18,87 @@ using Robust.Shared.Enums;
 using Robust.Shared.Player;
 using Robust.Shared.Timing;
 
-namespace Content.Server.Afk
+namespace Content.Server.Afk;
+
+/// <summary>
+/// Tracks AFK (away from keyboard) status for players.
+/// </summary>
+/// <seealso cref="CCVars.AfkTime" />
+public interface IAfkManager
 {
     /// <summary>
-    /// Tracks AFK (away from keyboard) status for players.
+    /// Check whether this player is currently AFK.
     /// </summary>
-    /// <seealso cref="CCVars.AfkTime"/>
-    public interface IAfkManager
+    /// <param name="player">The player to check.</param>
+    /// <returns>True if the player is AFK, false otherwise.</returns>
+    bool IsAfk(ICommonSession player);
+
+    /// <summary>
+    /// Resets AFK status for the player as if they just did an action and are definitely not AFK.
+    /// </summary>
+    /// <param name="player">The player to set AFK status for.</param>
+    void PlayerDidAction(ICommonSession player);
+
+    void Initialize();
+}
+
+[UsedImplicitly]
+public sealed class AfkManager : IAfkManager
+{
+    [Dependency] private readonly IAdminManager _adminManager = default!;
+    [Dependency] private readonly IConfigurationManager _cfg = default!;
+    [Dependency] private readonly IConsoleHost _consoleHost = default!;
+    [Dependency] private readonly IGameTiming _gameTiming = default!;
+
+    private readonly Dictionary<ICommonSession, TimeSpan> _lastActionTimes = new();
+    [Dependency] private readonly IPlayerManager _playerManager = default!;
+
+    public void Initialize()
     {
-        /// <summary>
-        /// Check whether this player is currently AFK.
-        /// </summary>
-        /// <param name="player">The player to check.</param>
-        /// <returns>True if the player is AFK, false otherwise.</returns>
-        bool IsAfk(ICommonSession player);
+        // Connecting, console commands and input commands all reset AFK status.
 
-        /// <summary>
-        /// Resets AFK status for the player as if they just did an action and are definitely not AFK.
-        /// </summary>
-        /// <param name="player">The player to set AFK status for.</param>
-        void PlayerDidAction(ICommonSession player);
-
-        void Initialize();
+        _playerManager.PlayerStatusChanged += PlayerStatusChanged;
+        _consoleHost.AnyCommandExecuted += ConsoleHostOnAnyCommandExecuted;
     }
 
-    [UsedImplicitly]
-    public sealed class AfkManager : IAfkManager
+    public void PlayerDidAction(ICommonSession player)
     {
-        [Dependency] private readonly IPlayerManager _playerManager = default!;
-        [Dependency] private readonly IGameTiming _gameTiming = default!;
-        [Dependency] private readonly IConfigurationManager _cfg = default!;
-        [Dependency] private readonly IConsoleHost _consoleHost = default!;
-        [Dependency] private readonly IAdminManager _adminManager = default!;
+        if (player.Status == SessionStatus.Disconnected)
+            // Make sure we don't re-add to the dictionary if the player is disconnected now.
+            return;
 
-        private readonly Dictionary<ICommonSession, TimeSpan> _lastActionTimes = new();
+        _lastActionTimes[player] = _gameTiming.RealTime;
+    }
 
-        public void Initialize()
+    public bool IsAfk(ICommonSession player)
+    {
+        if (!_lastActionTimes.TryGetValue(player, out var time))
         {
-            // Connecting, console commands and input commands all reset AFK status.
-
-            _playerManager.PlayerStatusChanged += PlayerStatusChanged;
-            _consoleHost.AnyCommandExecuted += ConsoleHostOnAnyCommandExecuted;
+            // Some weird edge case like disconnected clients. Just say true I guess.
+            return true;
         }
 
-        public void PlayerDidAction(ICommonSession player)
-        {
-            if (player.Status == SessionStatus.Disconnected)
-                // Make sure we don't re-add to the dictionary if the player is disconnected now.
-                return;
+        var timeOut = _adminManager.IsAdmin(player)
+            ? TimeSpan.FromSeconds(_cfg.GetCVar(CCVars.AdminAfkTime))
+            : TimeSpan.FromSeconds(_cfg.GetCVar(CCVars.AfkTime));
 
-            _lastActionTimes[player] = _gameTiming.RealTime;
+        return _gameTiming.RealTime - time > timeOut;
+    }
+
+    private void PlayerStatusChanged(object? sender, SessionStatusEventArgs e)
+    {
+        if (e.NewStatus == SessionStatus.Disconnected)
+        {
+            _lastActionTimes.Remove(e.Session);
+            return;
         }
 
-        public bool IsAfk(ICommonSession player)
-        {
-            if (!_lastActionTimes.TryGetValue(player, out var time))
-            {
-                // Some weird edge case like disconnected clients. Just say true I guess.
-                return true;
-            }
+        PlayerDidAction(e.Session);
+    }
 
-            var timeOut = _adminManager.IsAdmin(player)
-                ? TimeSpan.FromSeconds(_cfg.GetCVar(CCVars.AdminAfkTime))
-                : TimeSpan.FromSeconds(_cfg.GetCVar(CCVars.AfkTime));
-
-            return _gameTiming.RealTime - time > timeOut;
-        }
-
-        private void PlayerStatusChanged(object? sender, SessionStatusEventArgs e)
-        {
-            if (e.NewStatus == SessionStatus.Disconnected)
-            {
-                _lastActionTimes.Remove(e.Session);
-                return;
-            }
-
-            PlayerDidAction(e.Session);
-        }
-
-        private void ConsoleHostOnAnyCommandExecuted(IConsoleShell shell, string commandname, string argstr, string[] args)
-        {
-            if (shell.Player is { } player)
-                PlayerDidAction(player);
-        }
+    private void ConsoleHostOnAnyCommandExecuted(IConsoleShell shell, string commandname, string argstr, string[] args)
+    {
+        if (shell.Player is { } player)
+            PlayerDidAction(player);
     }
 }

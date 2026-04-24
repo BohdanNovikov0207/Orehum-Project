@@ -3,25 +3,24 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Linq;
+using System.Text;
 using Content.Server.Administration.Notes;
 using Content.Server.Database;
 using Content.Server.Discord;
 using Content.Shared.CCVar;
 using Robust.Server;
 using Robust.Server.Player;
-using Robust.Shared.Enums;
 using Robust.Shared.Configuration;
-using Robust.Shared.Network;
+using Robust.Shared.Enums;
 using Robust.Shared.Player;
 using Robust.Shared.Timing;
-using System.Linq;
-using System.Text;
 
 namespace Content.Server.Administration.Managers;
 
 /// <summary>
-///     This manager sends a Discord webhook notification whenever a player with an active
-///     watchlist joins the server.
+/// This manager sends a Discord webhook notification whenever a player with an active
+/// watchlist joins the server.
 /// </summary>
 public sealed class WatchlistWebhookManager : IWatchlistWebhookManager
 {
@@ -32,13 +31,13 @@ public sealed class WatchlistWebhookManager : IWatchlistWebhookManager
     [Dependency] private readonly IGameTiming _gameTiming = default!;
     [Dependency] private readonly IPlayerManager _playerManager = default!;
 
+    private readonly List<WatchlistConnection> watchlistConnections = new();
+    private TimeSpan? _bufferStartTime;
+    private TimeSpan _bufferTime;
+
     private ISawmill _sawmill = default!;
 
     private string _webhookUrl = default!;
-    private TimeSpan _bufferTime;
-
-    private List<WatchlistConnection> watchlistConnections = new();
-    private TimeSpan? _bufferStartTime;
 
     public void Initialize()
     {
@@ -48,15 +47,18 @@ public sealed class WatchlistWebhookManager : IWatchlistWebhookManager
         _playerManager.PlayerStatusChanged += OnPlayerStatusChanged;
     }
 
-    private void SetBufferTime(float bufferTimeSeconds)
+    public void Update()
     {
-        _bufferTime = TimeSpan.FromSeconds(bufferTimeSeconds);
+        if (_bufferStartTime != null && _gameTiming.RealTime > _bufferStartTime + _bufferTime)
+        {
+            SendDiscordMessage();
+            _bufferStartTime = null;
+        }
     }
 
-    private void SetWebhookUrl(string webhookUrl)
-    {
-        _webhookUrl = webhookUrl;
-    }
+    private void SetBufferTime(float bufferTimeSeconds) => _bufferTime = TimeSpan.FromSeconds(bufferTimeSeconds);
+
+    private void SetWebhookUrl(string webhookUrl) => _webhookUrl = webhookUrl;
 
     private async void OnPlayerStatusChanged(object? sender, SessionStatusEventArgs e)
     {
@@ -76,18 +78,7 @@ public sealed class WatchlistWebhookManager : IWatchlistWebhookManager
                 _bufferStartTime = _gameTiming.RealTime;
         }
         else
-        {
             SendDiscordMessage();
-        }
-    }
-
-    public void Update()
-    {
-        if (_bufferStartTime != null && _gameTiming.RealTime > (_bufferStartTime + _bufferTime))
-        {
-            SendDiscordMessage();
-            _bufferStartTime = null;
-        }
     }
 
     private async void SendDiscordMessage()
@@ -104,8 +95,8 @@ public sealed class WatchlistWebhookManager : IWatchlistWebhookManager
             var webhookIdentifier = webhookData.Value.ToIdentifier();
 
             var messageBuilder = new StringBuilder(Loc.GetString("discord-watchlist-connection-header",
-                    ("players", watchlistConnections.Count),
-                    ("serverName", _baseServer.ServerName)));
+                ("players", watchlistConnections.Count),
+                ("serverName", _baseServer.ServerName)));
 
             foreach (var connection in watchlistConnections)
             {
@@ -136,8 +127,8 @@ public sealed class WatchlistWebhookManager : IWatchlistWebhookManager
 
     private sealed class WatchlistConnection
     {
-        public string PlayerName;
-        public List<AdminWatchlistRecord> Watchlists;
+        public readonly string PlayerName;
+        public readonly List<AdminWatchlistRecord> Watchlists;
 
         public WatchlistConnection(string playerName, List<AdminWatchlistRecord> watchlists)
         {

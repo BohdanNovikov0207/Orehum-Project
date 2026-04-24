@@ -79,14 +79,16 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Server.Spawners.Components;
 
-[RegisterComponent, EntityCategory("Spawner"), Access(typeof(ConditionalSpawnerSystem))]
+[RegisterComponent] [EntityCategory("Spawner")] [Access(typeof(ConditionalSpawnerSystem))]
 public sealed partial class EntityTableSpawnerComponent : Component
 {
     /// <summary>
-    /// Table that determines what gets spawned.
+    /// A variable meaning whether the spawn will
+    /// be able to be used again or whether
+    /// it will be destroyed after the first use
     /// </summary>
-    [DataField(required: true)]
-    public EntityTableSelector Table = default!;
+    [DataField]
+    public bool DeleteSpawnerAfterSpawn = true;
 
     /// <summary>
     /// Scatter of entity spawn coordinates
@@ -95,10 +97,8 @@ public sealed partial class EntityTableSpawnerComponent : Component
     public float Offset = 0.2f;
 
     /// <summary>
-    /// A variable meaning whether the spawn will
-    /// be able to be used again or whether
-    /// it will be destroyed after the first use
+    /// Table that determines what gets spawned.
     /// </summary>
-    [DataField]
-    public bool DeleteSpawnerAfterSpawn = true;
+    [DataField(required: true)]
+    public EntityTableSelector Table = default!;
 }

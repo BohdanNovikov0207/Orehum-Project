@@ -6,8 +6,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-using Content.Shared.Chemistry.Reagent;
 using Content.Goobstation.Maths.FixedPoint;
+using Content.Shared.Chemistry.Reagent;
 
 namespace Content.Server.Power.Components;
 
@@ -19,10 +19,10 @@ public sealed partial class RiggableComponent : Component
     public bool IsRigged;
 
     [ViewVariables(VVAccess.ReadWrite)]
-    [DataField("solution")]
-    public string Solution = "battery";
+    [DataField("reagent")]
+    public ReagentQuantity RequiredQuantity = new("Plasma", FixedPoint2.New(5));
 
     [ViewVariables(VVAccess.ReadWrite)]
-    [DataField("reagent")]
-    public ReagentQuantity RequiredQuantity = new("Plasma", FixedPoint2.New(5), null);
+    [DataField("solution")]
+    public string Solution = "battery";
 }

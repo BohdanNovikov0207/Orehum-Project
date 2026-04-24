@@ -14,16 +14,12 @@ namespace Content.Server.Speech.EntitySystems;
 
 public sealed class GermanAccentSystem : EntitySystem
 {
+    private static readonly Regex RegexTh = new(@"(?<=\s|^)th", RegexOptions.IgnoreCase);
+    private static readonly Regex RegexThe = new(@"(?<=\s|^)the(?=\s|$)", RegexOptions.IgnoreCase);
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly ReplacementAccentSystem _replacement = default!;
 
-    private static readonly Regex RegexTh = new(@"(?<=\s|^)th", RegexOptions.IgnoreCase);
-    private static readonly Regex RegexThe = new(@"(?<=\s|^)the(?=\s|$)", RegexOptions.IgnoreCase);
-
-    public override void Initialize()
-    {
-        SubscribeLocalEvent<GermanAccentComponent, AccentGetEvent>(OnAccent);
-    }
+    public override void Initialize() => SubscribeLocalEvent<GermanAccentComponent, AccentGetEvent>(OnAccent);
 
     public string Accentuate(string message)
     {
@@ -37,9 +33,9 @@ public sealed class GermanAccentSystem : EntitySystem
             {
                 // just shift T, H and E over to D, A and S to preserve capitalization
                 msg = msg.Substring(0, match.Index) +
-                      (char)(msg[match.Index] - 16) +
-                      (char)(msg[match.Index + 1] - 7) +
-                      (char)(msg[match.Index + 2] + 14) +
+                      (char) (msg[match.Index] - 16) +
+                      (char) (msg[match.Index + 1] - 7) +
+                      (char) (msg[match.Index + 2] + 14) +
                       msg.Substring(match.Index + 3);
             }
         }
@@ -71,22 +67,18 @@ public sealed class GermanAccentSystem : EntitySystem
                         'o' => 'ö',
                         'U' => 'Ü',
                         'u' => 'ü',
-                        _ => msgBuilder[i]
+                        _ => msgBuilder[i],
                     };
                     umlautCooldown = 4;
                 }
             }
             else
-            {
                 umlautCooldown--;
-            }
         }
 
         return msgBuilder.ToString();
     }
 
-    private void OnAccent(Entity<GermanAccentComponent> ent, ref AccentGetEvent args)
-    {
+    private void OnAccent(Entity<GermanAccentComponent> ent, ref AccentGetEvent args) =>
         args.Message = Accentuate(args.Message);
-    }
 }

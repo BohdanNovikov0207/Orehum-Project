@@ -4,11 +4,11 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Shared._EinsteinEngines.SelfExtinguisher;
 using Content.Shared.Humanoid;
 using Content.Shared.Humanoid.Prototypes;
 using Content.Shared.Inventory;
 using Content.Shared.Roles;
-using Content.Shared._EinsteinEngines.SelfExtinguisher;
 using JetBrains.Annotations;
 
 namespace Content.Server._EinsteinEngines.Jobs;
@@ -16,16 +16,16 @@ namespace Content.Server._EinsteinEngines.Jobs;
 [UsedImplicitly]
 public sealed partial class ModifyEnvirosuitSpecial : JobSpecial
 {
+    [ValidatePrototypeId<SpeciesPrototype>]
+    private const string Species = "Plasmaman";
+
+    private const string Slot = "jumpsuit";
+
     // <summary>
     //   The new charges of the envirosuit's self-extinguisher.
     // </summary>
     [DataField(required: true)]
     public int Charges { get; private set; }
-
-    [ValidatePrototypeId<SpeciesPrototype>]
-    private const string Species = "Plasmaman";
-
-    private const string Slot = "jumpsuit";
 
     public override void AfterEquip(EntityUid mob)
     {

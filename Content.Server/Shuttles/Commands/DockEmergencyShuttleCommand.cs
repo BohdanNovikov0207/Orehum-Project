@@ -22,8 +22,6 @@ public sealed class DockEmergencyShuttleCommand : LocalizedEntityCommands
 
     public override string Command => "dockemergencyshuttle";
 
-    public override void Execute(IConsoleShell shell, string argStr, string[] args)
-    {
+    public override void Execute(IConsoleShell shell, string argStr, string[] args) =>
         _shuttleSystem.DockEmergencyShuttle();
-    }
 }

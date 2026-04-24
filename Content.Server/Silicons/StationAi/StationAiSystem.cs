@@ -23,8 +23,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using System.Linq;
-using Content.Server.Chat.Managers;
 using Content.Server.Chat.Systems;
 using Content.Shared.Chat.Prototypes;
 using Content.Shared.DeviceNetwork.Components;
@@ -41,12 +39,15 @@ namespace Content.Server.Silicons.StationAi;
 
 public sealed class StationAiSystem : SharedStationAiSystem
 {
+    private readonly ProtoId<ChatNotificationPrototype> _aiWireSnippedChatNotificationPrototype = "AiWireSnipped";
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly SharedTransformSystem _xforms = default!;
 
     private readonly HashSet<Entity<StationAiCoreComponent>> _stationAiCores = new();
-    private readonly ProtoId<ChatNotificationPrototype> _turretIsAttackingChatNotificationPrototype = "TurretIsAttacking";
-    private readonly ProtoId<ChatNotificationPrototype> _aiWireSnippedChatNotificationPrototype = "AiWireSnipped";
+
+    private readonly ProtoId<ChatNotificationPrototype> _turretIsAttackingChatNotificationPrototype =
+        "TurretIsAttacking";
+
+    [Dependency] private readonly SharedTransformSystem _xforms = default!;
 
     public override void Initialize()
     {
@@ -76,7 +77,7 @@ public sealed class StationAiSystem : SharedStationAiSystem
 
             var xform = Transform(stationAiCore.Comp.RemoteEntity.Value);
 
-            var range = (xform.MapID != sourceXform.MapID)
+            var range = xform.MapID != sourceXform.MapID
                 ? -1
                 : (sourcePos - _xforms.GetWorldPosition(xform, xformQuery)).Length();
 
@@ -101,7 +102,9 @@ public sealed class StationAiSystem : SharedStationAiSystem
             var ev = new ChatNotificationEvent(_turretIsAttackingChatNotificationPrototype, ent);
 
             if (TryComp<DeviceNetworkComponent>(ent, out var deviceNetwork))
-                ev.SourceNameOverride = Loc.GetString("station-ai-turret-component-name", ("name", Name(ent)), ("address", deviceNetwork.Address));
+                ev.SourceNameOverride = Loc.GetString("station-ai-turret-component-name",
+                    ("name", Name(ent)),
+                    ("address", deviceNetwork.Address));
 
             RaiseLocalEvent(ai, ref ev);
         }
@@ -118,7 +121,9 @@ public sealed class StationAiSystem : SharedStationAiSystem
         return true;
     }
 
-    public override bool SetWhitelistEnabled(Entity<StationAiWhitelistComponent> entity, bool enabled, bool announce = false)
+    public override bool SetWhitelistEnabled(Entity<StationAiWhitelistComponent> entity,
+        bool enabled,
+        bool announce = false)
     {
         if (!base.SetWhitelistEnabled(entity, enabled, announce))
             return false;
@@ -152,15 +157,12 @@ public sealed class StationAiSystem : SharedStationAiSystem
         }
     }
 
-    private bool StationAiCanDetectWireSnipping(EntityUid uid)
-    {
+    private bool StationAiCanDetectWireSnipping(EntityUid uid) =>
         // TODO: The ability to detect snipped AI interaction wires
         // should be a MALF ability and/or a purchased upgrade rather
         // than something available to the station AI by default.
         // When these systems are added, add the appropriate checks here.
-
-        return false;
-    }
+        false;
 
     public HashSet<EntityUid> GetStationAIs(EntityUid gridUid)
     {

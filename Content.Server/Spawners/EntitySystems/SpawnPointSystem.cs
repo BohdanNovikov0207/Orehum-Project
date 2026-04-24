@@ -32,13 +32,10 @@ public sealed class SpawnPointSystem : EntitySystem
 {
     [Dependency] private readonly GameTicker _gameTicker = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly StationSystem _stationSystem = default!;
     [Dependency] private readonly StationSpawningSystem _stationSpawning = default!;
+    [Dependency] private readonly StationSystem _stationSystem = default!;
 
-    public override void Initialize()
-    {
-        SubscribeLocalEvent<PlayerSpawningEvent>(OnPlayerSpawning);
-    }
+    public override void Initialize() => SubscribeLocalEvent<PlayerSpawningEvent>(OnPlayerSpawning);
 
     private void OnPlayerSpawning(PlayerSpawningEvent args)
     {
@@ -49,22 +46,18 @@ public sealed class SpawnPointSystem : EntitySystem
         var points = EntityQueryEnumerator<SpawnPointComponent, TransformComponent>();
         var possiblePositions = new List<EntityCoordinates>();
 
-        while ( points.MoveNext(out var uid, out var spawnPoint, out var xform))
+        while (points.MoveNext(out var uid, out var spawnPoint, out var xform))
         {
             if (args.Station != null && _stationSystem.GetOwningStation(uid, xform) != args.Station)
                 continue;
 
             if (_gameTicker.RunLevel == GameRunLevel.InRound && spawnPoint.SpawnType == SpawnPointType.LateJoin)
-            {
                 possiblePositions.Add(xform.Coordinates);
-            }
 
             if (_gameTicker.RunLevel != GameRunLevel.InRound &&
                 spawnPoint.SpawnType == SpawnPointType.Job &&
                 (args.Job == null || spawnPoint.Job == args.Job))
-            {
                 possiblePositions.Add(xform.Coordinates);
-            }
         }
 
         if (possiblePositions.Count == 0)
@@ -74,9 +67,7 @@ public sealed class SpawnPointSystem : EntitySystem
             var points2 = EntityQueryEnumerator<SpawnPointComponent, TransformComponent>();
 
             if (points2.MoveNext(out var spawnPoint, out var xform))
-            {
                 possiblePositions.Add(xform.Coordinates);
-            }
             else
             {
                 Log.Error("No spawn points were available!");

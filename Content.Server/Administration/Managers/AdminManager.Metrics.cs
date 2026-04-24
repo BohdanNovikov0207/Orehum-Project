@@ -15,13 +15,12 @@ namespace Content.Server.Administration.Managers;
 
 public sealed partial class AdminManager
 {
-    private Dictionary<int, (int active, int afk, int deadminned)>? _adminOnlineCounts;
-
     private const int SentinelRankId = -1;
-
-    [Dependency] private readonly IMetricsManager _metrics = default!;
     [Dependency] private readonly IAfkManager _afkManager = default!;
     [Dependency] private readonly IMeterFactory _meterFactory = default!;
+
+    [Dependency] private readonly IMetricsManager _metrics = default!;
+    private Dictionary<int, (int active, int afk, int deadminned)>? _adminOnlineCounts;
 
     private void InitializeMetrics()
     {
@@ -56,9 +55,7 @@ public sealed partial class AdminManager
                     counts.active += 1;
             }
             else
-            {
                 counts.deadminned += 1;
-            }
         }
 
         // Neither prometheus-net nor dotnet-counters seem to handle stuff well if we STOP returning measurements.

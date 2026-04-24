@@ -35,8 +35,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Goobstation.Common.Traitor;
-using Content.Server.Store.Systems;
 using Content.Goobstation.Maths.FixedPoint;
+using Content.Server.Store.Systems;
 using Content.Shared.Implants;
 using Content.Shared.Mind;
 using Content.Shared.Store;
@@ -49,15 +49,14 @@ namespace Content.Server.Traitor.Uplink;
 // do not touch unless you want to shoot yourself in the leg
 public sealed class UplinkSystem : EntitySystem
 {
-    [Dependency] private readonly IPrototypeManager _proto = default!;
-    [Dependency] private readonly StoreSystem _store = default!;
-    [Dependency] private readonly SharedSubdermalImplantSystem _subdermalImplant = default!;
-    [Dependency] private readonly SharedMindSystem _mind = default!;
-    [Dependency] private readonly GoobCommonUplinkSystem _goobUplink = default!;
-
     public static readonly ProtoId<CurrencyPrototype> TelecrystalCurrencyPrototype = "Telecrystal";
     private static readonly EntProtoId FallbackUplinkImplant = "UplinkImplant";
     private static readonly ProtoId<ListingPrototype> FallbackUplinkCatalog = "UplinkUplinkImplanter";
+    [Dependency] private readonly GoobCommonUplinkSystem _goobUplink = default!;
+    [Dependency] private readonly SharedMindSystem _mind = default!;
+    [Dependency] private readonly IPrototypeManager _proto = default!;
+    [Dependency] private readonly StoreSystem _store = default!;
+    [Dependency] private readonly SharedSubdermalImplantSystem _subdermalImplant = default!;
 
     /// <summary>
     /// Adds an uplink to the target based on their preference

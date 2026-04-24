@@ -2,17 +2,15 @@ using System.Linq;
 using Content.Server._Mono.Projectiles.TargetGuided;
 using Content.Shared._Mono.FireControl;
 using Content.Shared.Projectiles;
+using Content.Shared.Shuttles.Components;
 using Content.Shared.Weapons.Ranged.Components;
 using Content.Shared.Weapons.Ranged.Events;
-using Content.Shared.Shuttles.Components;
 using EntityCoordinates = Robust.Shared.Map.EntityCoordinates;
 
 namespace Content.Server._Mono.FireControl;
 
 public sealed partial class FireControlSystem
 {
-    [Dependency] private readonly TargetGuidedSystem _targetGuided = null!;
-
     /// <summary>
     /// List of active guided missiles that need cursor position updates
     /// </summary>
@@ -22,6 +20,8 @@ public sealed partial class FireControlSystem
     /// Map of console entities to their current mouse positions
     /// </summary>
     private readonly Dictionary<EntityUid, EntityCoordinates> _consoleMousePositions = new();
+
+    [Dependency] private readonly TargetGuidedSystem _targetGuided = null!;
 
     /// <summary>
     /// Registers handlers for events related to target guided projectiles.
@@ -37,11 +37,11 @@ public sealed partial class FireControlSystem
     /// <summary>
     /// Track console fire events to update cursor positions
     /// </summary>
-    private void OnConsoleFireEvent(EntityUid uid, FireControlConsoleComponent component, FireControlConsoleFireEvent args)
-    {
+    private void OnConsoleFireEvent(EntityUid uid,
+        FireControlConsoleComponent component,
+        FireControlConsoleFireEvent args) =>
         // Store the current mouse position for this console
         _consoleMousePositions[uid] = GetCoordinates(args.Coordinates);
-    }
 
     /// <summary>
     /// Subscribed to AmmoShotEvent to check for and configure guided projectiles.
@@ -54,9 +54,7 @@ public sealed partial class FireControlSystem
         // Get the shooter entity
         EntityUid? shooter = null;
         if (TryComp<ProjectileComponent>(args.FiredProjectiles[0], out var projectileComp))
-        {
             shooter = projectileComp.Shooter;
-        }
 
         // We need to get the target coordinates from the gun component
         var targetCoords = component.ShootCoordinates;
@@ -78,9 +76,7 @@ public sealed partial class FireControlSystem
 
                     // Store initial cursor position if we're seeing it for the first time
                     if (!_consoleMousePositions.ContainsKey(consoleUid))
-                    {
                         _consoleMousePositions[consoleUid] = targetCoords.Value;
-                    }
 
                     break;
                 }
@@ -110,19 +106,15 @@ public sealed partial class FireControlSystem
 
             // Record the console this was fired from for position updates
             if (controllingConsole.HasValue)
-            {
                 guidedComp.ControllingConsole = controllingConsole;
-            }
         }
     }
 
     /// <summary>
     /// Cleanup guided missiles when they're destroyed
     /// </summary>
-    private void OnGuidedMissileShutdown(EntityUid uid, TargetGuidedComponent component, ComponentShutdown args)
-    {
+    private void OnGuidedMissileShutdown(EntityUid uid, TargetGuidedComponent component, ComponentShutdown args) =>
         _activeMissiles.Remove(uid);
-    }
 
     /// <summary>
     /// Updates the cursor position for any tracking missiles from a given console
@@ -146,9 +138,7 @@ public sealed partial class FireControlSystem
                 projectileComp.Shooter.HasValue &&
                 Transform(projectileComp.Shooter.Value).GridUid is { } shipGrid &&
                 TryComp<FTLComponent>(shipGrid, out _))
-            {
                 continue;
-            }
 
             guidedComp.TargetPosition = targetCoordinates;
         }
@@ -186,9 +176,7 @@ public sealed partial class FireControlSystem
                 projectileComp.Shooter.HasValue &&
                 Transform(projectileComp.Shooter.Value).GridUid is { } shipGrid &&
                 TryComp<FTLComponent>(shipGrid, out _))
-            {
                 continue;
-            }
 
             // Update the missile's target to the console's current mouse position
             _targetGuided.SetTargetPosition(missileUid, mousePosition);
@@ -209,18 +197,14 @@ public sealed partial class FireControlSystem
         {
             if (TryComp<TargetGuidedComponent>(missileUid, out var guidedComp) &&
                 guidedComp.ControllingConsole.HasValue)
-            {
                 activeConsoles.Add(guidedComp.ControllingConsole.Value);
-            }
         }
 
         // Remove positions for consoles without any missiles
         foreach (var consoleUid in _consoleMousePositions.Keys.ToList())
         {
             if (!activeConsoles.Contains(consoleUid) || !EntityManager.EntityExists(consoleUid))
-            {
                 _consoleMousePositions.Remove(consoleUid);
-            }
         }
     }
 }

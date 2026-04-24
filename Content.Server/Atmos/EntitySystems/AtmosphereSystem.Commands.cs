@@ -33,56 +33,51 @@ public sealed partial class AtmosphereSystem
 {
     [Dependency] private readonly IConsoleHost _consoleHost = default!;
 
-    private void InitializeCommands()
-    {
+    private void InitializeCommands() =>
         // Fix Grid Atmos command.
         _consoleHost.RegisterCommand("fixgridatmos",
             "Makes every tile on a grid have a roundstart gas mix.",
             "fixgridatmos <grid Ids>",
             FixGridAtmosCommand,
             FixGridAtmosCommandCompletions);
-    }
 
-    private void ShutdownCommands()
-    {
-        _consoleHost.UnregisterCommand("fixgridatmos");
-    }
+    private void ShutdownCommands() => _consoleHost.UnregisterCommand("fixgridatmos");
 
     [AdminCommand(AdminFlags.Debug)]
     private void FixGridAtmosCommand(IConsoleShell shell, string argstr, string[] args)
     {
-       if (args.Length == 0)
-       {
-           shell.WriteError("Not enough arguments.");
-           return;
-       }
+        if (args.Length == 0)
+        {
+            shell.WriteError("Not enough arguments.");
+            return;
+        }
 
-       foreach (var arg in args)
-       {
-           if (!NetEntity.TryParse(arg, out var netEntity) || !TryGetEntity(netEntity, out var euid))
-           {
-               shell.WriteError($"Failed to parse euid '{arg}'.");
-               return;
-           }
+        foreach (var arg in args)
+        {
+            if (!NetEntity.TryParse(arg, out var netEntity) || !TryGetEntity(netEntity, out var euid))
+            {
+                shell.WriteError($"Failed to parse euid '{arg}'.");
+                return;
+            }
 
-           if (!TryComp(euid, out MapGridComponent? gridComp))
-           {
-               shell.WriteError($"Euid '{euid}' does not exist or is not a grid.");
-               return;
-           }
+            if (!TryComp(euid, out MapGridComponent? gridComp))
+            {
+                shell.WriteError($"Euid '{euid}' does not exist or is not a grid.");
+                return;
+            }
 
-           if (!TryComp(euid, out GridAtmosphereComponent? gridAtmosphere))
-           {
-               shell.WriteError($"Grid \"{euid}\" has no atmosphere component, try addatmos.");
-               continue;
-           }
+            if (!TryComp(euid, out GridAtmosphereComponent? gridAtmosphere))
+            {
+                shell.WriteError($"Grid \"{euid}\" has no atmosphere component, try addatmos.");
+                continue;
+            }
 
-           RebuildGridAtmosphere((euid.Value, gridAtmosphere, gridComp));
-       }
+            RebuildGridAtmosphere((euid.Value, gridAtmosphere, gridComp));
+        }
     }
 
     /// <summary>
-    /// Rebuilds all <see cref="TileAtmosphere"/>s on a grid to have roundstart gas mixes.
+    /// Rebuilds all <see cref="TileAtmosphere" />s on a grid to have roundstart gas mixes.
     /// </summary>
     /// <remarks>Please be responsible with this method. Used only by tests and fixgridatmos.</remarks>
     public void RebuildGridAtmosphere(Entity<GridAtmosphereComponent, MapGridComponent> ent)
@@ -116,7 +111,9 @@ public sealed partial class AtmosphereSystem
         // 6: (Walk-In) Freezer
         mixtures[6].AdjustMoles(Gas.Oxygen, Atmospherics.OxygenMolesFreezer);
         mixtures[6].AdjustMoles(Gas.Nitrogen, Atmospherics.NitrogenMolesFreezer);
-        mixtures[6].Temperature = Atmospherics.FreezerTemp; // Little colder than an actual freezer but gives a grace period to get e.g. themomachines set up, should keep warm for a few door openings
+        mixtures[6].Temperature =
+            Atmospherics
+                .FreezerTemp; // Little colder than an actual freezer but gives a grace period to get e.g. themomachines set up, should keep warm for a few door openings
 
         // 7: Nitrogen (101kpa) for vox rooms
         mixtures[7].AdjustMoles(Gas.Nitrogen, Atmospherics.MolesCellStandard);
@@ -135,7 +132,7 @@ public sealed partial class AtmosphereSystem
         var query = GetEntityQuery<AtmosFixMarkerComponent>();
         foreach (var (indices, tile) in ent.Comp1.Tiles.ToArray())
         {
-            if (tile.Air is not {Immutable: false} air)
+            if (tile.Air is not { Immutable: false } air)
                 continue;
 
             air.Clear();
@@ -154,7 +151,7 @@ public sealed partial class AtmosphereSystem
     }
 
     /// <summary>
-    /// Clears & re-creates all references to <see cref="TileAtmosphere"/>s stored on a grid.
+    /// Clears & re-creates all references to <see cref="TileAtmosphere" />s stored on a grid.
     /// </summary>
     private void RebuildGridTiles(
         Entity<GridAtmosphereComponent, GasTileOverlayComponent, MapGridComponent, TransformComponent> ent)
@@ -186,7 +183,7 @@ public sealed partial class AtmosphereSystem
         {
             var tile = GetOrNewTile(ent, ent, tileRef.Value.GridIndices);
             UpdateTileData(ent, mapAtmos, tile);
-            UpdateAdjacentTiles(ent, tile, activate: true);
+            UpdateAdjacentTiles(ent, tile, true);
             UpdateTileAir(ent, tile, volume);
         }
     }

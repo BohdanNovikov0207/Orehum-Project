@@ -7,8 +7,10 @@
 //
 // SPDX-License-Identifier: MIT
 
+using Content.Shared._Shitmed.Targeting;
 using Content.Shared.Damage;
-using Content.Shared._Shitmed.Targeting; // EE Plasmeme Change
+
+// EE Plasmeme Change
 
 
 // Damages the entity by a set amount when it hits someone.
@@ -18,13 +20,13 @@ namespace Content.Server.Damage.Components;
 [RegisterComponent]
 public sealed partial class DamageOnHitComponent : Component
 {
-    [DataField("ignoreResistances")]
-    [ViewVariables(VVAccess.ReadWrite)]
-    public bool IgnoreResistances = true;
-
     [DataField("damage", required: true)]
     [ViewVariables(VVAccess.ReadWrite)]
     public DamageSpecifier Damage = default!;
+
+    [DataField("ignoreResistances")]
+    [ViewVariables(VVAccess.ReadWrite)]
+    public bool IgnoreResistances = true;
 
     // <summary>
     //   EE Plasmeme Change: The body parts to deal damage to.

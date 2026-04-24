@@ -89,10 +89,7 @@ public sealed class AccentSystem : EntitySystem
 {
     public static readonly Regex SentenceRegex = new(@"(?<=[\.!\?‽])(?![\.!\?‽])", RegexOptions.Compiled);
 
-    public override void Initialize()
-    {
-        SubscribeLocalEvent<TransformSpeechEvent>(AccentHandler);
-    }
+    public override void Initialize() => SubscribeLocalEvent<TransformSpeechEvent>(AccentHandler);
 
     private void AccentHandler(TransformSpeechEvent args)
     {

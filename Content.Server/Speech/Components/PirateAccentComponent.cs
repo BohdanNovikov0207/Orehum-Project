@@ -16,10 +16,6 @@ namespace Content.Server.Speech.Components;
 [Access(typeof(PirateAccentSystem))]
 public sealed partial class PirateAccentComponent : Component
 {
-    [ViewVariables(VVAccess.ReadWrite)]
-    [DataField("yarrChance")]
-    public float YarrChance = 0.5f;
-
     [ViewVariables]
     public readonly List<string> PirateWords = new()
     {
@@ -28,4 +24,8 @@ public sealed partial class PirateAccentComponent : Component
         "accent-pirate-prefix-3",
         "accent-pirate-prefix-4",
     };
+
+    [ViewVariables(VVAccess.ReadWrite)]
+    [DataField("yarrChance")]
+    public float YarrChance = 0.5f;
 }

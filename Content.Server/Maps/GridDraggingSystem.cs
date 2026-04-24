@@ -78,10 +78,10 @@
 
 using Content.Shared.Maps;
 using Robust.Server.Console;
-using Robust.Shared.Utility;
 using Robust.Shared.Physics.Components;
 using Robust.Shared.Physics.Systems;
 using Robust.Shared.Player;
+using Robust.Shared.Utility;
 
 namespace Content.Server.Maps;
 
@@ -89,10 +89,10 @@ namespace Content.Server.Maps;
 public sealed class GridDraggingSystem : SharedGridDraggingSystem
 {
     [Dependency] private readonly IConGroupController _admin = default!;
-    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
-    [Dependency] private readonly SharedTransformSystem _transformSystem = default!;
 
     private readonly HashSet<ICommonSession> _draggers = new();
+    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
+    [Dependency] private readonly SharedTransformSystem _transformSystem = default!;
 
     public override void Initialize()
     {
@@ -113,17 +113,15 @@ public sealed class GridDraggingSystem : SharedGridDraggingSystem
         // Weird but it's a toggle
         if (_draggers.Add(session))
         {
-
         }
         else
-        {
             _draggers.Remove(session);
-        }
 
-        RaiseNetworkEvent(new GridDragToggleMessage()
-        {
-            Enabled = _draggers.Contains(session),
-        }, session.Channel);
+        RaiseNetworkEvent(new GridDragToggleMessage
+            {
+                Enabled = _draggers.Contains(session),
+            },
+            session.Channel);
     }
 
     private void OnRequestVelocity(GridDragVelocityRequest ev, EntitySessionEventArgs args)
@@ -134,9 +132,7 @@ public sealed class GridDraggingSystem : SharedGridDraggingSystem
             !_admin.CanCommand(playerSession, CommandName) ||
             !Exists(grid) ||
             Deleted(grid))
-        {
             return;
-        }
 
         var gridBody = Comp<PhysicsComponent>(grid);
         _physics.SetLinearVelocity(grid, ev.LinearVelocity, body: gridBody);
@@ -151,9 +147,7 @@ public sealed class GridDraggingSystem : SharedGridDraggingSystem
             !_admin.CanCommand(playerSession, CommandName) ||
             !Exists(grid) ||
             Deleted(grid))
-        {
             return;
-        }
 
         _transformSystem.SetWorldPosition(grid, msg.WorldPosition);
     }

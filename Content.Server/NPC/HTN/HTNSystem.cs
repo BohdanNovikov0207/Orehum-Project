@@ -11,14 +11,14 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using Content.Server.Administration.Managers;
-using Robust.Shared.CPUJob.JobQueues;
-using Robust.Shared.CPUJob.JobQueues.Queues;
 using Content.Server.NPC.HTN.PrimitiveTasks;
 using Content.Server.NPC.Systems;
 using Content.Shared.Administration;
 using Content.Shared.Mobs;
 using Content.Shared.NPC;
 using JetBrains.Annotations;
+using Robust.Shared.CPUJob.JobQueues;
+using Robust.Shared.CPUJob.JobQueues.Queues;
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
@@ -28,13 +28,13 @@ namespace Content.Server.NPC.HTN;
 public sealed partial class HTNSystem : EntitySystem // Goob - Partials
 {
     [Dependency] private readonly IAdminManager _admin = default!;
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly NPCSystem _npc = default!;
-    [Dependency] private readonly NPCUtilitySystem _utility = default!;
 
     private readonly JobQueue _planQueue = new(0.004);
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
 
     private readonly HashSet<ICommonSession> _subscribers = new();
+    [Dependency] private readonly NPCUtilitySystem _utility = default!;
 
     // Hierarchical Task Network
     public override void Initialize()
@@ -92,10 +92,7 @@ public sealed partial class HTNSystem : EntitySystem // Goob - Partials
         }
     }
 
-    private void OnPrototypeLoad(PrototypesReloadedEventArgs obj)
-    {
-        OnLoad();
-    }
+    private void OnPrototypeLoad(PrototypesReloadedEventArgs obj) => OnLoad();
 
     private void UpdateCompound(HTNCompoundPrototype compound)
     {
@@ -145,9 +142,12 @@ public sealed partial class HTNSystem : EntitySystem // Goob - Partials
     /// <summary>
     /// Enable / disable the hierarchical task network of an entity
     /// </summary>
-    /// <param name="ent">The entity and its <see cref="HTNComponent"/></param>
+    /// <param name="ent">The entity and its <see cref="HTNComponent" /></param>
     /// <param name="state">Set 'true' to enable, or 'false' to disable, the HTN</param>
-    /// <param name="planCooldown">Specifies a time in seconds before the entity can start planning a new action (only takes effect when the HTN is enabled)</param>
+    /// <param name="planCooldown">
+    /// Specifies a time in seconds before the entity can start planning a new action (only takes
+    /// effect when the HTN is enabled)
+    /// </param>
     // ReSharper disable once InconsistentNaming
     [PublicAPI]
     public void SetHTNEnabled(Entity<HTNComponent> ent, bool state, float planCooldown = 0f)
@@ -179,10 +179,7 @@ public sealed partial class HTNSystem : EntitySystem // Goob - Partials
     /// Forces the NPC to replan.
     /// </summary>
     [PublicAPI]
-    public void Replan(HTNComponent component)
-    {
-        component.PlanAccumulator = 0f;
-    }
+    public void Replan(HTNComponent component) => component.PlanAccumulator = 0f;
 
     public void UpdateNPC(ref int count, int maxUpdates, float frameTime)
     {
@@ -258,9 +255,9 @@ public sealed partial class HTNSystem : EntitySystem // Goob - Partials
 
                     // Startup the first task and anything else we need to do.
                     if (comp.Plan != null)
-                    {
-                        StartupTask(comp.Plan.Tasks[comp.Plan.Index], comp.Blackboard, comp.Plan.Effects[comp.Plan.Index]);
-                    }
+                        StartupTask(comp.Plan.Tasks[comp.Plan.Index],
+                            comp.Blackboard,
+                            comp.Plan.Effects[comp.Plan.Index]);
 
                     // Send debug info
                     foreach (var session in _subscribers)
@@ -270,25 +267,24 @@ public sealed partial class HTNSystem : EntitySystem // Goob - Partials
                         if (comp.Plan != null)
                         {
                             text.AppendLine($"BTR: {string.Join(", ", comp.Plan.BranchTraversalRecord)}");
-                            text.AppendLine($"tasks:");
+                            text.AppendLine("tasks:");
                             var root = comp.RootTask;
                             var btr = new List<int>();
                             var level = -1;
                             AppendDebugText(root, text, comp.Plan.BranchTraversalRecord, btr, ref level);
                         }
 
-                        RaiseNetworkEvent(new HTNMessage()
-                        {
-                            Uid = GetNetEntity(uid),
-                            Text = text.ToString(),
-                        }, session.Channel);
+                        RaiseNetworkEvent(new HTNMessage
+                            {
+                                Uid = GetNetEntity(uid),
+                                Text = text.ToString(),
+                            },
+                            session.Channel);
                     }
                 }
                 // Keeping old plan
                 else
-                {
                     comp.CheckServices = true;
-                }
 
                 comp.PlanningJob = null;
                 comp.PlanningToken = null;
@@ -356,9 +352,7 @@ public sealed partial class HTNSystem : EntitySystem // Goob - Partials
 
         // We'll still try re-planning occasionally even when we're updating in case new data comes in.
         if ((component.ConstantlyReplan || component.Plan is null) && component.PlanAccumulator <= 0f)
-        {
             RequestPlan(component);
-        }
 
         // Getting a new plan so do nothing.
         if (component.Plan == null)
@@ -410,7 +404,9 @@ public sealed partial class HTNSystem : EntitySystem // Goob - Partials
                     }
 
                     ConditionalShutdown(component.Plan, currentOperator, blackboard, HTNPlanState.TaskFinished);
-                    StartupTask(component.Plan.Tasks[component.Plan.Index], component.Blackboard, component.Plan.Effects[component.Plan.Index]);
+                    StartupTask(component.Plan.Tasks[component.Plan.Index],
+                        component.Blackboard,
+                        component.Plan.Effects[component.Plan.Index]);
                     break;
                 default:
                     throw new InvalidOperationException();
@@ -422,9 +418,7 @@ public sealed partial class HTNSystem : EntitySystem // Goob - Partials
     {
         if (currentOperator is IHtnConditionalShutdown conditional &&
             (conditional.ShutdownState & HTNPlanState.TaskFinished) != 0x0)
-        {
             conditional.ConditionalShutdown(blackboard);
-        }
 
         currentOperator.TaskShutdown(blackboard, status);
     }
@@ -438,9 +432,7 @@ public sealed partial class HTNSystem : EntitySystem // Goob - Partials
         {
             if (task.Operator is IHtnConditionalShutdown conditional &&
                 (conditional.ShutdownState & HTNPlanState.PlanFinished) != 0x0)
-            {
                 conditional.ConditionalShutdown(blackboard);
-            }
 
             task.Operator.PlanShutdown(component.Blackboard);
         }
@@ -451,7 +443,10 @@ public sealed partial class HTNSystem : EntitySystem // Goob - Partials
     /// <summary>
     /// Shuts down the current operator conditionally.
     /// </summary>
-    private void ConditionalShutdown(HTNPlan plan, HTNOperator currentOperator, NPCBlackboard blackboard, HTNPlanState state)
+    private void ConditionalShutdown(HTNPlan plan,
+        HTNOperator currentOperator,
+        NPCBlackboard blackboard,
+        HTNPlanState state)
     {
         if (currentOperator is not IHtnConditionalShutdown conditional)
             return;
@@ -497,7 +492,9 @@ public sealed partial class HTNSystem : EntitySystem // Goob - Partials
             0.02,
             _prototypeManager,
             component.RootTask,
-            component.Blackboard.ShallowClone(), branchTraversal, cancelToken.Token);
+            component.Blackboard.ShallowClone(),
+            branchTraversal,
+            cancelToken.Token);
 
         _planQueue.EnqueueJob(job);
         component.PlanningJob = job;

@@ -20,11 +20,13 @@ namespace Content.Server.Doors;
 
 public sealed partial class DoorTimingWireAction : ComponentWireAction<AirlockComponent>
 {
+    [DataField("timeout")]
+    private int _timeout = 30;
+
     public override Color Color { get; set; } = Color.Orange;
     public override string Name { get; set; } = "wire-name-door-timer";
 
-    [DataField("timeout")]
-    private int _timeout = 30;
+    public override object StatusKey { get; } = AirlockWireStatus.TimingIndicator;
 
     public override StatusLightState? GetLightState(Wire wire, AirlockComponent comp)
     {
@@ -38,8 +40,6 @@ public sealed partial class DoorTimingWireAction : ComponentWireAction<AirlockCo
                 return StatusLightState.On;
         }
     }
-
-    public override object StatusKey { get; } = AirlockWireStatus.TimingIndicator;
 
     public override bool Cut(EntityUid user, Wire wire, AirlockComponent door)
     {
@@ -57,15 +57,16 @@ public sealed partial class DoorTimingWireAction : ComponentWireAction<AirlockCo
     public override void Pulse(EntityUid user, Wire wire, AirlockComponent door)
     {
         EntityManager.System<SharedAirlockSystem>().SetAutoCloseDelayModifier(door, 0.5f);
-        WiresSystem.StartWireAction(wire.Owner, _timeout, PulseTimeoutKey.Key, new TimedWireEvent(AwaitTimingTimerFinish, wire));
+        WiresSystem.StartWireAction(wire.Owner,
+            _timeout,
+            PulseTimeoutKey.Key,
+            new TimedWireEvent(AwaitTimingTimerFinish, wire));
     }
 
     public override void Update(Wire wire)
     {
         if (!IsPowered(wire.Owner))
-        {
             WiresSystem.TryCancelWireAction(wire.Owner, PulseTimeoutKey.Key);
-        }
     }
 
     // timing timer??? ???
@@ -74,14 +75,12 @@ public sealed partial class DoorTimingWireAction : ComponentWireAction<AirlockCo
         if (!wire.IsCut)
         {
             if (EntityManager.TryGetComponent<AirlockComponent>(wire.Owner, out var door))
-            {
                 EntityManager.System<SharedAirlockSystem>().SetAutoCloseDelayModifier(door, 1f);
-            }
         }
     }
 
     private enum PulseTimeoutKey : byte
     {
-        Key
+        Key,
     }
 }

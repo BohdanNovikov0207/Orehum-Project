@@ -16,7 +16,7 @@ using Robust.Shared.Map;
 
 namespace Content.Server.StationEvents.Components;
 
-[RegisterComponent, Access(typeof(GasLeakRule))]
+[RegisterComponent] [Access(typeof(GasLeakRule))]
 public sealed partial class GasLeakRuleComponent : Component
 {
     public readonly Gas[] LeakableGases =
@@ -32,32 +32,34 @@ public sealed partial class GasLeakRuleComponent : Component
         Gas.Pluoxium, // Assmos - /tg/ gases
     };
 
-    /// <summary>
-    ///     Running cooldown of how much time until another leak.
-    /// </summary>
-    public float TimeUntilLeak;
+    public readonly int MinimumMolesPerSecond = 80;
+    public bool FoundTile;
 
     /// <summary>
-    ///     How long between more gas being added to the tile.
+    /// How long between more gas being added to the tile.
     /// </summary>
     public float LeakCooldown = 1.0f;
 
-    // Event variables
-    public EntityUid TargetStation;
-    public EntityUid TargetGrid;
-    public Vector2i TargetTile;
-    public EntityCoordinates TargetCoords;
-    public bool FoundTile;
     public Gas LeakGas;
-    public float MolesPerSecond;
-    public readonly int MinimumMolesPerSecond = 80;
+    public int MaximumGas = 4000;
 
     /// <summary>
-    ///     Don't want to make it too fast to give people time to flee.
+    /// Don't want to make it too fast to give people time to flee.
     /// </summary>
     public int MaximumMolesPerSecond = 200;
 
     public int MinimumGas = 1000;
-    public int MaximumGas = 4000;
+    public float MolesPerSecond;
     public float SparkChance = 0.05f;
+    public EntityCoordinates TargetCoords;
+    public EntityUid TargetGrid;
+
+    // Event variables
+    public EntityUid TargetStation;
+    public Vector2i TargetTile;
+
+    /// <summary>
+    /// Running cooldown of how much time until another leak.
+    /// </summary>
+    public float TimeUntilLeak;
 }

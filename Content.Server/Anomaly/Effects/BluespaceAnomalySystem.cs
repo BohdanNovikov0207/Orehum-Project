@@ -28,13 +28,13 @@ namespace Content.Server.Anomaly.Effects;
 
 public sealed class BluespaceAnomalySystem : EntitySystem
 {
-    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly SharedTransformSystem _xform = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         SubscribeLocalEvent<BluespaceAnomalyComponent, AnomalyPulseEvent>(OnPulse);
@@ -51,8 +51,10 @@ public sealed class BluespaceAnomalySystem : EntitySystem
         // we filter out those inside a container
         // otherwise borg brains get removed from their body, or PAIs from a PDA
         var mobs = new HashSet<Entity<MobStateComponent>>();
-        _lookup.GetEntitiesInRange(xform.Coordinates, range, mobs, flags: LookupFlags.Uncontained);
-        var allEnts = new ValueList<EntityUid>(mobs.Where(m => !HasComp<BlockTeleportComponent>(m)).Select(m => m.Owner)) { uid }; // Goob edit
+        _lookup.GetEntitiesInRange(xform.Coordinates, range, mobs, LookupFlags.Uncontained);
+        var allEnts =
+            new ValueList<EntityUid>(mobs.Where(m => !HasComp<BlockTeleportComponent>(m)).Select(m => m.Owner))
+                { uid }; // Goob edit
         var coords = new ValueList<Vector2>();
         foreach (var ent in allEnts)
         {
@@ -63,7 +65,8 @@ public sealed class BluespaceAnomalySystem : EntitySystem
         _random.Shuffle(coords);
         for (var i = 0; i < allEnts.Count; i++)
         {
-            _adminLogger.Add(LogType.Teleport, $"{ToPrettyString(allEnts[i])} has been shuffled to {coords[i]} by the {ToPrettyString(uid)} at {xform.Coordinates}");
+            _adminLogger.Add(LogType.Teleport,
+                $"{ToPrettyString(allEnts[i])} has been shuffled to {coords[i]} by the {ToPrettyString(uid)} at {xform.Coordinates}");
             _xform.SetWorldPosition(allEnts[i], coords[i]);
         }
     }
@@ -75,7 +78,7 @@ public sealed class BluespaceAnomalySystem : EntitySystem
         var radius = component.SupercriticalTeleportRadius * args.PowerModifier;
         var gridBounds = new Box2(mapPos - new Vector2(radius, radius), mapPos + new Vector2(radius, radius));
         var mobs = new HashSet<Entity<MobStateComponent>>();
-        _lookup.GetEntitiesInRange(xform.Coordinates, component.MaxShuffleRadius, mobs, flags: LookupFlags.Uncontained);
+        _lookup.GetEntitiesInRange(xform.Coordinates, component.MaxShuffleRadius, mobs, LookupFlags.Uncontained);
         foreach (var comp in mobs.Where(x => !HasComp<BlockTeleportComponent>(x))) // Goob edit
         {
             var ent = comp.Owner;
@@ -84,17 +87,21 @@ public sealed class BluespaceAnomalySystem : EntitySystem
 
             var pos = new Vector2(randomX, randomY);
 
-            _adminLogger.Add(LogType.Teleport, $"{ToPrettyString(ent)} has been teleported to {pos} by the supercritical {ToPrettyString(uid)} at {mapPos}");
+            _adminLogger.Add(LogType.Teleport,
+                $"{ToPrettyString(ent)} has been teleported to {pos} by the supercritical {ToPrettyString(uid)} at {mapPos}");
 
             _xform.SetWorldPosition(ent, pos);
             _audio.PlayPvs(component.TeleportSound, ent);
         }
     }
 
-    private void OnSeverityChanged(EntityUid uid, BluespaceAnomalyComponent component, ref AnomalySeverityChangedEvent args)
+    private void OnSeverityChanged(EntityUid uid,
+        BluespaceAnomalyComponent component,
+        ref AnomalySeverityChangedEvent args)
     {
         if (!TryComp<PortalComponent>(uid, out var portal))
             return;
-        portal.MaxRandomRadius = (component.MaxPortalRadius - component.MinPortalRadius) * args.Severity + component.MinPortalRadius;
+        portal.MaxRandomRadius = (component.MaxPortalRadius - component.MinPortalRadius) * args.Severity +
+                                 component.MinPortalRadius;
     }
 }

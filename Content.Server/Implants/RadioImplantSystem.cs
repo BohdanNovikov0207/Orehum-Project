@@ -57,12 +57,11 @@ public sealed class RadioImplantSystem : EntitySystem
             {
                 activeRadioComponent.Channels.Remove(channel);
             }
+
             ent.Comp.ActiveAddedChannels.Clear();
 
             if (activeRadioComponent.Channels.Count == 0)
-            {
                 RemCompDeferred<ActiveRadioComponent>(args.Container.Owner);
-            }
         }
 
         if (!TryComp<IntrinsicRadioTransmitterComponent>(args.Container.Owner, out var radioTransmitterComponent))
@@ -72,11 +71,10 @@ public sealed class RadioImplantSystem : EntitySystem
         {
             radioTransmitterComponent.Channels.Remove(channel);
         }
+
         ent.Comp.TransmitterAddedChannels.Clear();
 
         if (radioTransmitterComponent.Channels.Count == 0 || activeRadioComponent?.Channels.Count == 0)
-        {
             RemCompDeferred<IntrinsicRadioTransmitterComponent>(args.Container.Owner);
-        }
     }
 }

@@ -11,15 +11,12 @@
 //
 // SPDX-License-Identifier: MIT
 
-using Content.Server.DeviceLinking.Components;
-using Content.Server.DeviceNetwork;
-using Content.Server.DeviceNetwork.Components;
 using Content.Server.DeviceNetwork.Systems;
 using Content.Shared.DeviceLinking;
 using Content.Shared.DeviceLinking.Events;
 using Content.Shared.DeviceNetwork;
-using Content.Shared.DeviceNetwork.Events;
 using Content.Shared.DeviceNetwork.Components;
+using Content.Shared.DeviceNetwork.Events;
 
 namespace Content.Server.DeviceLinking.Systems;
 
@@ -36,7 +33,11 @@ public sealed class DeviceLinkSystem : SharedDeviceLinkSystem
     }
 
     #region Sending & Receiving
-    public override void InvokePort(EntityUid uid, string port, NetworkPayload? data = null, DeviceLinkSourceComponent? sourceComponent = null)
+
+    public override void InvokePort(EntityUid uid,
+        string port,
+        NetworkPayload? data = null,
+        DeviceLinkSourceComponent? sourceComponent = null)
     {
         if (!Resolve(uid, ref sourceComponent) || !sourceComponent.Outputs.TryGetValue(port, out var sinks))
             return;
@@ -60,7 +61,11 @@ public sealed class DeviceLinkSystem : SharedDeviceLinkSystem
     /// <summary>
     /// Raises an event on or sends a network packet directly to a sink from a source.
     /// </summary>
-    private void InvokeDirect(Entity<DeviceLinkSourceComponent> source, Entity<DeviceLinkSinkComponent?> sink, string sourcePort, string sinkPort, NetworkPayload? data)
+    private void InvokeDirect(Entity<DeviceLinkSourceComponent> source,
+        Entity<DeviceLinkSinkComponent?> sink,
+        string sourcePort,
+        string sinkPort,
+        NetworkPayload? data)
     {
         if (!Resolve(sink, ref sink.Comp))
             return;
@@ -85,9 +90,9 @@ public sealed class DeviceLinkSystem : SharedDeviceLinkSystem
             return;
         }
 
-        var payload = new NetworkPayload()
+        var payload = new NetworkPayload
         {
-            [InvokedPort] = sinkPort
+            [InvokedPort] = sinkPort,
         };
 
         if (data != null)
@@ -120,7 +125,7 @@ public sealed class DeviceLinkSystem : SharedDeviceLinkSystem
 
     /// <summary>
     /// Checks if the payload has a port defined and if the port is present on the sink.
-    /// Raises a <see cref="SignalReceivedEvent"/> containing the payload when the check passes
+    /// Raises a <see cref="SignalReceivedEvent" /> containing the payload when the check passes
     /// </summary>
     private void OnPacketReceived(EntityUid uid, DeviceLinkSinkComponent component, DeviceNetworkPacketEvent args)
     {
@@ -128,7 +133,7 @@ public sealed class DeviceLinkSystem : SharedDeviceLinkSystem
             return;
 
         var eventArgs = new SignalReceivedEvent(port, args.Sender, args.Data);
-        RaiseLocalEvent(uid,  ref eventArgs);
+        RaiseLocalEvent(uid, ref eventArgs);
     }
 
     /// <summary>
@@ -143,11 +148,12 @@ public sealed class DeviceLinkSystem : SharedDeviceLinkSystem
         if (!ent.Comp.LastSignals.TryGetValue(args.SourcePort, out var signal))
             return;
 
-        var payload = new NetworkPayload()
+        var payload = new NetworkPayload
         {
-            [DeviceNetworkConstants.LogicState] = signal ? SignalState.High : SignalState.Low
+            [DeviceNetworkConstants.LogicState] = signal ? SignalState.High : SignalState.Low,
         };
         InvokeDirect(ent, args.Sink, args.SourcePort, args.SinkPort, payload);
     }
+
     #endregion
 }

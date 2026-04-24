@@ -10,16 +10,14 @@ public sealed class DisposalSignallerSystem : EntitySystem
     {
         base.Initialize();
         SubscribeLocalEvent<DisposalSignallerComponent, ComponentInit>(OnInit);
-        SubscribeLocalEvent<DisposalSignallerComponent, GetDisposalsNextDirectionEvent>(OnGetNextDirection, after: new[] { typeof(DisposalTubeSystem) });
+        SubscribeLocalEvent<DisposalSignallerComponent, GetDisposalsNextDirectionEvent>(OnGetNextDirection,
+            after: new[] { typeof(DisposalTubeSystem) });
     }
 
-    private void OnInit(EntityUid uid, DisposalSignallerComponent comp, ComponentInit args)
-    {
+    private void OnInit(EntityUid uid, DisposalSignallerComponent comp, ComponentInit args) =>
         _link.EnsureSourcePorts(uid, comp.Port);
-    }
 
-    private void OnGetNextDirection(EntityUid uid, DisposalSignallerComponent comp, ref GetDisposalsNextDirectionEvent args)
-    {
-        _link.InvokePort(uid, comp.Port);
-    }
+    private void OnGetNextDirection(EntityUid uid,
+        DisposalSignallerComponent comp,
+        ref GetDisposalsNextDirectionEvent args) => _link.InvokePort(uid, comp.Port);
 }

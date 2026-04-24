@@ -21,27 +21,24 @@ using JetBrains.Annotations;
 using Robust.Server.GameObjects;
 using Robust.Shared.Reflection;
 
-namespace Content.Server.Construction.Completions
+namespace Content.Server.Construction.Completions;
+
+[UsedImplicitly]
+[DataDefinition]
+public sealed partial class VisualizerDataInt : IGraphAction
 {
-    [UsedImplicitly]
-    [DataDefinition]
-    public sealed partial class VisualizerDataInt : IGraphAction
+    [DataField("key")] public string Key { get; private set; } = string.Empty;
+    [DataField("data")] public int Data { get; private set; }
+
+    public void PerformAction(EntityUid uid, EntityUid? userUid, IEntityManager entityManager)
     {
-        [DataField("key")] public string Key { get; private set; } = string.Empty;
-        [DataField("data")] public int Data { get; private set; } = 0;
+        if (string.IsNullOrEmpty(Key))
+            return;
 
-        public void PerformAction(EntityUid uid, EntityUid? userUid, IEntityManager entityManager)
+        if (entityManager.TryGetComponent(uid, out AppearanceComponent? appearance))
         {
-            if (string.IsNullOrEmpty(Key))
-                return;
-
-            if (entityManager.TryGetComponent(uid, out AppearanceComponent? appearance))
-            {
-                if (IoCManager.Resolve<IReflectionManager>().TryParseEnumReference(Key, out var @enum))
-                {
-                    entityManager.System<AppearanceSystem>().SetData(uid, @enum, Data, appearance);
-                }
-            }
+            if (IoCManager.Resolve<IReflectionManager>().TryParseEnumReference(Key, out var @enum))
+                entityManager.System<AppearanceSystem>().SetData(uid, @enum, Data, appearance);
         }
     }
 }

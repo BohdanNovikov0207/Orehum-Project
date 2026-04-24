@@ -15,8 +15,8 @@ namespace Content.Server.Emoting.Systems;
 
 public sealed class BodyEmotesSystem : EntitySystem
 {
-    [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly ChatSystem _chat = default!;
+    [Dependency] private readonly IPrototypeManager _proto = default!;
 
     public override void Initialize()
     {
@@ -39,9 +39,7 @@ public sealed class BodyEmotesSystem : EntitySystem
 
         var cat = args.Emote.Category;
         if (cat.HasFlag(EmoteCategory.Hands))
-        {
             args.Handled = TryEmoteHands(uid, args.Emote, component);
-        }
     }
 
     private bool TryEmoteHands(EntityUid uid, EmotePrototype emote, BodyEmotesComponent component)

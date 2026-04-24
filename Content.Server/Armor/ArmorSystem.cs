@@ -21,12 +21,12 @@
 
 using Content.Server.Cargo.Systems;
 using Content.Shared.Armor;
-using Robust.Shared.Prototypes;
 using Content.Shared.Damage.Prototypes;
+using Robust.Shared.Prototypes;
 
 namespace Content.Server.Armor;
 
-/// <inheritdoc/>
+/// <inheritdoc />
 public sealed class ArmorSystem : SharedArmorSystem
 {
     [Dependency] private readonly IPrototypeManager _protoManager = default!;
@@ -43,7 +43,8 @@ public sealed class ArmorSystem : SharedArmorSystem
         foreach (var modifier in component.Modifiers.Coefficients)
         {
             var damageType = _protoManager.Index<DamageTypePrototype>(modifier.Key);
-            args.Price += component.PriceMultiplier * damageType.ArmorPriceCoefficient * 45 * (1 - modifier.Value); // Shitmed Change
+            args.Price += component.PriceMultiplier * damageType.ArmorPriceCoefficient * 45 *
+                          (1 - modifier.Value); // Shitmed Change
         }
 
         foreach (var modifier in component.Modifiers.FlatReduction)

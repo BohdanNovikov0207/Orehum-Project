@@ -15,58 +15,20 @@ namespace Content.Server.Physics.Components;
 /// <summary>
 /// A component which makes its entity chasing entity with selected component.
 /// </summary>
-[RegisterComponent, Access(typeof(ChasingWalkSystem)), AutoGenerateComponentPause]
+[RegisterComponent] [Access(typeof(ChasingWalkSystem))] [AutoGenerateComponentPause]
 public sealed partial class ChasingWalkComponent : Component
 {
     /// <summary>
-    /// The next moment in time when the entity is pushed toward its goal
+    /// The maximum time interval in which an object can change its motion target.
     /// </summary>
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
-    [AutoPausedField]
-    public TimeSpan NextImpulseTime;
-
-    /// <summary>
-    /// Push-to-target frequency.
-    /// </summary>
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
-    public float ImpulseInterval = 2f;
-
-    /// <summary>
-    /// The minimum speed at which this entity will move.
-    /// </summary>
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
-    public float MinSpeed = 1.5f;
-
-    /// <summary>
-    /// The maximum speed at which this entity will move.
-    /// </summary>
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
-    public float MaxSpeed = 3f;
-
-    /// <summary>
-    /// The current speed.
-    /// </summary>
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
-    public float Speed;
+    [DataField] [ViewVariables(VVAccess.ReadWrite)]
+    public float ChangeVectorMaxInterval = 25f;
 
     /// <summary>
     /// The minimum time interval in which an object can change its motion target.
     /// </summary>
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    [DataField] [ViewVariables(VVAccess.ReadWrite)]
     public float ChangeVectorMinInterval = 5f;
-
-    /// <summary>
-    /// The maximum time interval in which an object can change its motion target.
-    /// </summary>
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
-    public float ChangeVectorMaxInterval = 25f;
-
-    /// <summary>
-    /// The next change of direction time.
-    /// </summary>
-    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer)), ViewVariables(VVAccess.ReadWrite)]
-    [AutoPausedField]
-    public TimeSpan NextChangeVectorTime;
 
     /// <summary>
     /// The component that the entity is chasing
@@ -75,14 +37,52 @@ public sealed partial class ChasingWalkComponent : Component
     public ComponentRegistry ChasingComponent = [];
 
     /// <summary>
+    /// The entity uid, chasing by the component owner
+    /// </summary>
+    [DataField] [ViewVariables(VVAccess.ReadWrite)]
+    public EntityUid? ChasingEntity;
+
+    /// <summary>
+    /// Push-to-target frequency.
+    /// </summary>
+    [DataField] [ViewVariables(VVAccess.ReadWrite)]
+    public float ImpulseInterval = 2f;
+
+    /// <summary>
     /// The maximum radius in which the entity chooses the target component to follow
     /// </summary>
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    [DataField] [ViewVariables(VVAccess.ReadWrite)]
     public float MaxChaseRadius = 25;
 
     /// <summary>
-    /// The entity uid, chasing by the component owner
+    /// The maximum speed at which this entity will move.
     /// </summary>
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
-    public EntityUid? ChasingEntity;
+    [DataField] [ViewVariables(VVAccess.ReadWrite)]
+    public float MaxSpeed = 3f;
+
+    /// <summary>
+    /// The minimum speed at which this entity will move.
+    /// </summary>
+    [DataField] [ViewVariables(VVAccess.ReadWrite)]
+    public float MinSpeed = 1.5f;
+
+    /// <summary>
+    /// The next change of direction time.
+    /// </summary>
+    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))] [ViewVariables(VVAccess.ReadWrite)]
+    [AutoPausedField]
+    public TimeSpan NextChangeVectorTime;
+
+    /// <summary>
+    /// The next moment in time when the entity is pushed toward its goal
+    /// </summary>
+    [DataField] [ViewVariables(VVAccess.ReadWrite)]
+    [AutoPausedField]
+    public TimeSpan NextImpulseTime;
+
+    /// <summary>
+    /// The current speed.
+    /// </summary>
+    [DataField] [ViewVariables(VVAccess.ReadWrite)]
+    public float Speed;
 }

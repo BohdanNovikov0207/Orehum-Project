@@ -16,43 +16,39 @@ using Content.Server.Speech.Components;
 using Content.Shared.Speech;
 using Robust.Shared.Random;
 
-namespace Content.Server.Speech.EntitySystems
+namespace Content.Server.Speech.EntitySystems;
+
+public sealed class BarkAccentSystem : EntitySystem
 {
-    public sealed class BarkAccentSystem : EntitySystem
+    private static readonly IReadOnlyList<string> Barks = new List<string>
     {
-        [Dependency] private readonly IRobustRandom _random = default!;
+        " Woof!", " WOOF", " wof-wof",
+    }.AsReadOnly();
 
-        private static readonly IReadOnlyList<string> Barks = new List<string>{
-            " Woof!", " WOOF", " wof-wof"
-        }.AsReadOnly();
+    private static readonly IReadOnlyDictionary<string, string> SpecialWords = new Dictionary<string, string>
+    {
+        { "ah", "arf" },
+        { "Ah", "Arf" },
+        { "oh", "oof" },
+        { "Oh", "Oof" },
+    };
 
-        private static readonly IReadOnlyDictionary<string, string> SpecialWords = new Dictionary<string, string>()
+    [Dependency] private readonly IRobustRandom _random = default!;
+
+    public override void Initialize() => SubscribeLocalEvent<BarkAccentComponent, AccentGetEvent>(OnAccent);
+
+    public string Accentuate(string message)
+    {
+        foreach (var (word, repl) in SpecialWords)
         {
-            { "ah", "arf" },
-            { "Ah", "Arf" },
-            { "oh", "oof" },
-            { "Oh", "Oof" },
-        };
-
-        public override void Initialize()
-        {
-            SubscribeLocalEvent<BarkAccentComponent, AccentGetEvent>(OnAccent);
+            message = message.Replace(word, repl);
         }
 
-        public string Accentuate(string message)
-        {
-            foreach (var (word, repl) in SpecialWords)
-            {
-                message = message.Replace(word, repl);
-            }
-
-            return message.Replace("!", _random.Pick(Barks))
-                .Replace("l", "r").Replace("L", "R");
-        }
-
-        private void OnAccent(EntityUid uid, BarkAccentComponent component, AccentGetEvent args)
-        {
-            args.Message = Accentuate(args.Message);
-        }
+        return message.Replace("!", _random.Pick(Barks))
+            .Replace("l", "r")
+            .Replace("L", "R");
     }
+
+    private void OnAccent(EntityUid uid, BarkAccentComponent component, AccentGetEvent args) =>
+        args.Message = Accentuate(args.Message);
 }

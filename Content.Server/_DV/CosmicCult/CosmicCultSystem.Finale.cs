@@ -13,7 +13,7 @@ namespace Content.Server._DV.CosmicCult;
 public sealed partial class CosmicCultSystem : SharedCosmicCultSystem
 {
     /// <summary>
-    ///     Used to calculate when the finale song should start playing
+    /// Used to calculate when the finale song should start playing
     /// </summary>
     public void SubscribeFinale()
     {
@@ -33,15 +33,19 @@ public sealed partial class CosmicCultSystem : SharedCosmicCultSystem
             var doargs = new DoAfterArgs(EntityManager,
                 args.User,
                 ent.Comp.InteractionTime,
-                new CancelFinaleDoAfterEvent(), ent, ent)
+                new CancelFinaleDoAfterEvent(),
+                ent,
+                ent)
             {
-                DistanceThreshold = 1f, Hidden = false, BreakOnHandChange = true, BreakOnDamage = true, BreakOnMove = true
+                DistanceThreshold = 1f, Hidden = false, BreakOnHandChange = true, BreakOnDamage = true,
+                BreakOnMove = true,
             };
             _popup.PopupEntity(Loc.GetString("cosmiccult-finale-cancel-begin"), args.User, args.User);
             _doAfter.TryStartDoAfter(doargs);
             args.Handled = true;
         }
-        else if (EntityIsCultist(args.User) && !args.Handled && !ent.Comp.FinaleActive && ent.Comp.CurrentState != FinaleState.Unavailable)
+        else if (EntityIsCultist(args.User) && !args.Handled && !ent.Comp.FinaleActive &&
+                 ent.Comp.CurrentState != FinaleState.Unavailable)
         {
             ent.Comp.Occupied = true;
             var doargs = new DoAfterArgs(EntityManager,
@@ -51,7 +55,8 @@ public sealed partial class CosmicCultSystem : SharedCosmicCultSystem
                 ent,
                 ent)
             {
-                DistanceThreshold = 1f, Hidden = false, BreakOnHandChange = true, BreakOnDamage = true, BreakOnMove = true
+                DistanceThreshold = 1f, Hidden = false, BreakOnHandChange = true, BreakOnDamage = true,
+                BreakOnMove = true,
             };
             _popup.PopupEntity(Loc.GetString("cosmiccult-finale-beckon-begin"), args.User, args.User);
             _doAfter.TryStartDoAfter(doargs);
@@ -66,6 +71,7 @@ public sealed partial class CosmicCultSystem : SharedCosmicCultSystem
             uid.Comp.Occupied = false;
             return;
         }
+
         _popup.PopupEntity(Loc.GetString("cosmiccult-finale-beckon-success"), args.Args.User, args.Args.User);
         StartFinale(uid);
     }
@@ -73,7 +79,8 @@ public sealed partial class CosmicCultSystem : SharedCosmicCultSystem
     private void StartFinale(Entity<CosmicFinaleComponent> uid)
     {
         var comp = uid.Comp;
-        var indicatedLocation = FormattedMessage.RemoveMarkupOrThrow(_navMap.GetNearestBeaconString((uid, Transform(uid))));
+        var indicatedLocation =
+            FormattedMessage.RemoveMarkupOrThrow(_navMap.GetNearestBeaconString((uid, Transform(uid))));
 
         if (!TryComp<MonumentComponent>(uid, out var monument)
             || !TryComp<CosmicCorruptingComponent>(uid, out var corruptingComp))
@@ -89,7 +96,9 @@ public sealed partial class CosmicCultSystem : SharedCosmicCultSystem
 
         _chatSystem.DispatchStationAnnouncement(uid,
             Loc.GetString("cosmiccult-finale-location", ("location", indicatedLocation)),
-            null, false, null,
+            null,
+            false,
+            null,
             Color.FromHex("#cae8e8"));
 
         uid.Comp.CurrentState = FinaleState.ActiveBuffer;
@@ -129,7 +138,7 @@ public sealed partial class CosmicCultSystem : SharedCosmicCultSystem
     private void OnFinaleCancelDoAfter(Entity<CosmicFinaleComponent> uid, ref CancelFinaleDoAfterEvent args)
     {
         var comp = uid.Comp;
-        if (args.Args.Target is not {} target || args.Cancelled || args.Handled)
+        if (args.Args.Target is not { } target || args.Cancelled || args.Handled)
         {
             uid.Comp.Occupied = false;
             return;
@@ -149,9 +158,7 @@ public sealed partial class CosmicCultSystem : SharedCosmicCultSystem
             comp.BufferRemainingTime = comp.BufferTimer - _timing.CurTime + TimeSpan.FromSeconds(15);
         }
         else if (uid.Comp.CurrentState == FinaleState.ActiveFinale)
-        {
             uid.Comp.CurrentState = FinaleState.ReadyFinale;
-        }
 
         if (TryComp<CosmicCorruptingComponent>(uid, out var corruptingComp))
             _corrupting.SetCorruptionTime((uid, corruptingComp), TimeSpan.FromSeconds(6));

@@ -70,6 +70,14 @@ public sealed partial class PathfindingSystem
 
     public record struct WidenArgs()
     {
+        public float MaxWiden = 7f;
+
+        /// <summary>
+        /// Minimum width.
+        /// </summary>
+        public float MinWiden = 2f;
+
+        public required List<Vector2i> Path;
         public bool Square = false;
 
         /// <summary>
@@ -81,15 +89,5 @@ public sealed partial class PathfindingSystem
         /// Maximum amount to vary per tile.
         /// </summary>
         public float Variance = 0.25f;
-
-        /// <summary>
-        /// Minimum width.
-        /// </summary>
-        public float MinWiden = 2f;
-
-
-        public float MaxWiden = 7f;
-
-        public required List<Vector2i> Path;
     }
 }

@@ -11,5 +11,4 @@ namespace Content.Server.Inventory;
 
 public sealed class VirtualItemSystem : SharedVirtualItemSystem
 {
-
 }

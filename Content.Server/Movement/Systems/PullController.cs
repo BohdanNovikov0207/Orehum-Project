@@ -42,7 +42,6 @@ using Content.Shared.Gravity;
 using Content.Shared.Input;
 using Content.Shared.Movement.Pulling.Components;
 using Content.Shared.Movement.Pulling.Events;
-using Content.Shared.Movement.Pulling.Systems;
 using Content.Shared.Rotatable;
 using Robust.Shared.Containers;
 using Robust.Shared.Input.Binding;
@@ -68,47 +67,56 @@ public sealed class PullController : VirtualController
     // Instead, tuning to mass is done via the mass values below.
     // Note that setting the speed too high results in overshoots (stabilized by drag, but bad)
     private const float AccelModifierHigh = 15f;
+
     private const float AccelModifierLow = 60.0f;
+
     // High/low-mass marks. Curve is constant-lerp-constant, i.e. if you can even pull an item,
     // you'll always get at least AccelModifierLow and no more than AccelModifierHigh.
     private const float AccelModifierHighMass = 70.0f; // roundstart saltern emergency closet
+
     private const float AccelModifierLowMass = 5.0f; // roundstart saltern emergency crowbar
+
     // Used to control settling (turns off pulling).
     private const float MaximumSettleVelocity = 0.1f;
+
     private const float MaximumSettleDistance = 0.1f;
+
     // Settle shutdown control.
     // Mustn't be too massive, as that causes severe mispredicts *and can prevent it ever resolving*.
     // Exists to bleed off "I pulled my crowbar" overshoots.
     // Minimum velocity for shutdown to be necessary. This prevents stuff getting stuck b/c too much shutdown.
     private const float SettleMinimumShutdownVelocity = 0.25f;
+
     // Distance in which settle shutdown multiplier is at 0. It then scales upwards linearly with closer distances.
     private const float SettleShutdownDistance = 1.0f;
+
     // Velocity change of -LinearVelocity * frameTime * this
     private const float SettleShutdownMultiplier = 20.0f;
 
     // How much you must move for the puller movement check to actually hit.
     private const float MinimumMovementDistance = 0.005f;
 
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly ActionBlockerSystem _actionBlockerSystem = default!;
-    [Dependency] private readonly SharedContainerSystem _container = default!;
-    [Dependency] private readonly SharedGravitySystem _gravity = default!;
-    [Dependency] private readonly SharedTransformSystem _transformSystem = default!;
-
     /// <summary>
-    ///     If distance between puller and pulled entity lower that this threshold,
-    ///     pulled entity will not change its rotation.
-    ///     Helps with small distance jittering
+    /// If distance between puller and pulled entity lower that this threshold,
+    /// pulled entity will not change its rotation.
+    /// Helps with small distance jittering
     /// </summary>
     private const float ThresholdRotDistance = 1;
 
     /// <summary>
-    ///     If difference between puller and pulled angle  lower that this threshold,
-    ///     pulled entity will not change its rotation.
-    ///     Helps with diagonal movement jittering
-    ///     As of further adjustments, should divide cleanly into 90 degrees
+    /// If difference between puller and pulled angle  lower that this threshold,
+    /// pulled entity will not change its rotation.
+    /// Helps with diagonal movement jittering
+    /// As of further adjustments, should divide cleanly into 90 degrees
     /// </summary>
     private const float ThresholdRotAngle = 22.5f;
+
+    [Dependency] private readonly ActionBlockerSystem _actionBlockerSystem = default!;
+    [Dependency] private readonly SharedContainerSystem _container = default!;
+    [Dependency] private readonly SharedGravitySystem _gravity = default!;
+
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly SharedTransformSystem _transformSystem = default!;
 
     private EntityQuery<PhysicsComponent> _physicsQuery;
     private EntityQuery<PullableComponent> _pullableQuery;
@@ -139,18 +147,14 @@ public sealed class PullController : VirtualController
         CommandBinds.Unregister<PullController>();
     }
 
-    private void OnPullStop(Entity<PullMovingComponent> ent, ref PullStoppedMessage args)
-    {
+    private void OnPullStop(Entity<PullMovingComponent> ent, ref PullStoppedMessage args) =>
         RemCompDeferred<PullMovingComponent>(ent);
-    }
 
     private bool OnRequestMovePulledObject(ICommonSession? session, EntityCoordinates coords, EntityUid uid)
     {
         if (session?.AttachedEntity is not { } player ||
             !player.IsValid())
-        {
             return false;
-        }
 
         if (!_pullerQuery.TryComp(player, out var pullerComp))
             return false;
@@ -186,9 +190,7 @@ public sealed class PullController : VirtualController
                 TryComp(player, out JointComponent? joint) &&
                 joint.GetJoints.TryGetValue(pullable.PullJointId, out var pullJoint) &&
                 pullJoint is DistanceJoint distance)
-            {
                 range = MathF.Max(0.01f, distance.MaxLength - 0.01f);
-            }
 
             fromUserCoords = new EntityCoordinates(player, direction.Normalized() * (range - 0.01f));
             coords = _transformSystem.WithEntityId(fromUserCoords, coords.EntityId);
@@ -217,9 +219,7 @@ public sealed class PullController : VirtualController
         if (args.NewPosition.EntityId == args.OldPosition.EntityId &&
             (args.NewPosition.Position - args.OldPosition.Position).LengthSquared() <
             MinimumMovementDistance * MinimumMovementDistance)
-        {
             return;
-        }
 
         if (_physicsQuery.TryComp(uid, out var physics))
             PhysicsSystem.WakeBody(uid, body: physics);
@@ -257,7 +257,8 @@ public sealed class PullController : VirtualController
                 // So...
                 var baseRotation = pulledData.WorldRotation - pulledXform.LocalRotation;
                 var localRotation = newAngle - baseRotation;
-                var localRotationSnapped = Angle.FromDegrees(Math.Floor((localRotation.Degrees / ThresholdRotAngle) + 0.5f) * ThresholdRotAngle);
+                var localRotationSnapped =
+                    Angle.FromDegrees(Math.Floor(localRotation.Degrees / ThresholdRotAngle + 0.5f) * ThresholdRotAngle);
                 TransformSystem.SetLocalRotation(pulled, localRotationSnapped, pulledXform);
             }
         }
@@ -276,7 +277,7 @@ public sealed class PullController : VirtualController
                 continue;
             }
 
-            if (pullable.Puller is not {Valid: true} puller)
+            if (pullable.Puller is not { Valid: true } puller)
                 continue;
 
             var pullerXform = _xformQuery.Get(puller);
@@ -318,7 +319,8 @@ public sealed class PullController : VirtualController
                 continue;
             }
 
-            var impulseModifierLerp = Math.Min(1.0f, Math.Max(0.0f, (physics.Mass - AccelModifierLowMass) / (AccelModifierHighMass - AccelModifierLowMass)));
+            var impulseModifierLerp = Math.Min(1.0f,
+                Math.Max(0.0f, (physics.Mass - AccelModifierLowMass) / (AccelModifierHighMass - AccelModifierLowMass)));
             var impulseModifier = MathHelper.Lerp(AccelModifierLow, AccelModifierHigh, impulseModifierLerp);
             var multiplier = diffLength < 1 ? impulseModifier * diffLength : impulseModifier;
             // Note the implication that the real rules of physics don't apply to pulling control.
@@ -339,7 +341,8 @@ public sealed class PullController : VirtualController
             // if the puller is weightless or can't move, then we apply the inverse impulse (Newton's third law).
             // doing it under gravity produces an unsatisfying wiggling when pulling.
             // If player can't move, assume they are on a chair and we need to prevent pull-moving.
-            if (_gravity.IsWeightless(puller) && pullerXform.Comp.GridUid == null || !_actionBlockerSystem.CanMove(puller))
+            if (_gravity.IsWeightless(puller) && pullerXform.Comp.GridUid == null ||
+                !_actionBlockerSystem.CanMove(puller))
             {
                 PhysicsSystem.WakeBody(puller);
                 PhysicsSystem.ApplyLinearImpulse(puller, -impulse);

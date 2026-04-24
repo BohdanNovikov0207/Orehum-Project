@@ -11,5 +11,4 @@ namespace Content.Server.NPC.HTN.PrimitiveTasks.Operators;
 /// </summary>
 public sealed partial class NoOperator : HTNOperator
 {
-
 }

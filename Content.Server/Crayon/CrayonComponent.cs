@@ -31,29 +31,28 @@
 using Content.Shared.Crayon;
 using Robust.Shared.Audio;
 
-namespace Content.Server.Crayon
+namespace Content.Server.Crayon;
+
+[RegisterComponent]
+public sealed partial class CrayonComponent : SharedCrayonComponent
 {
-    [RegisterComponent]
-    public sealed partial class CrayonComponent : SharedCrayonComponent
-    {
-        [DataField("useSound")] public SoundSpecifier? UseSound;
+    [ViewVariables(VVAccess.ReadWrite)]
+    [DataField("deleteEmpty")]
+    public bool DeleteEmpty = true;
 
-        [ViewVariables(VVAccess.ReadWrite)]
-        [DataField("selectableColor")]
-        public bool SelectableColor { get; set; }
+    [DataField("useSound")] public SoundSpecifier? UseSound;
 
-        [ViewVariables(VVAccess.ReadWrite)]
-        public int Charges { get; set; }
+    [ViewVariables(VVAccess.ReadWrite)]
+    [DataField("selectableColor")]
+    public bool SelectableColor { get; set; }
 
-        [ViewVariables(VVAccess.ReadWrite)]
-        [DataField("capacity")]
-        public int Capacity { get; set; } = 30;
+    [ViewVariables(VVAccess.ReadWrite)]
+    public int Charges { get; set; }
 
-        [DataField, ViewVariables(VVAccess.ReadWrite)] // Impstation
-        public bool Infinite { get; set; } = false; // Impstation
+    [ViewVariables(VVAccess.ReadWrite)]
+    [DataField("capacity")]
+    public int Capacity { get; set; } = 30;
 
-        [ViewVariables(VVAccess.ReadWrite)]
-        [DataField("deleteEmpty")]
-        public bool DeleteEmpty = true;
-    }
+    [DataField] [ViewVariables(VVAccess.ReadWrite)] // Impstation
+    public bool Infinite { get; set; } = false; // Impstation
 }

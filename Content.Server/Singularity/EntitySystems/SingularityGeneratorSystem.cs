@@ -27,14 +27,6 @@ namespace Content.Server.Singularity.EntitySystems;
 
 public sealed class SingularityGeneratorSystem : SharedSingularityGeneratorSystem
 {
-    #region Dependencies
-    [Dependency] private readonly IViewVariablesManager _vvm = default!;
-    [Dependency] private readonly SharedTransformSystem _transformSystem = default!;
-    [Dependency] private readonly PhysicsSystem _physics = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly MetaDataSystem _metadata = default!;
-    #endregion Dependencies
-
     public override void Initialize()
     {
         base.Initialize();
@@ -74,49 +66,8 @@ public sealed class SingularityGeneratorSystem : SharedSingularityGeneratorSyste
         comp.NextFailsafe = _timing.CurTime + comp.FailsafeCooldown;
     }
 
-    #region Getters/Setters
-    /// <summary>
-    /// Setter for <see cref="SingularityGeneratorComponent.Power"/>
-    /// If the singularity generator passes its threshold it also spawns a singularity.
-    /// </summary>
-    /// <param name="comp">The singularity generator component.</param>
-    /// <param name="value">The new power level for the generator component to have.</param>
-    public void SetPower(EntityUid uid, float value, SingularityGeneratorComponent? comp = null)
-    {
-        if (!Resolve(uid, ref comp))
-            return;
-
-        var oldValue = comp.Power;
-        if (value == oldValue)
-            return;
-
-        comp.Power = value;
-        if (comp.Power >= comp.Threshold && oldValue < comp.Threshold)
-            OnPassThreshold(uid, comp);
-    }
-
-    /// <summary>
-    /// Setter for <see cref="SingularityGeneratorComponent.Threshold"/>
-    /// If the singularity generator has passed its new threshold it also spawns a singularity.
-    /// </summary>
-    /// <param name="comp">The singularity generator component.</param>
-    /// <param name="value">The new threshold power level for the generator component to have.</param>
-    public void SetThreshold(EntityUid uid, float value, SingularityGeneratorComponent? comp = null)
-    {
-        if (!Resolve(uid, ref comp))
-            return;
-
-        var oldValue = comp.Threshold;
-        if (value == comp.Threshold)
-            return;
-
-        comp.Power = value;
-        if (comp.Power >= comp.Threshold && comp.Power < oldValue)
-            OnPassThreshold(uid, comp);
-    }
-    #endregion Getters/Setters
-
     #region Event Handlers
+
     /// <summary>
     /// Handles PA Particles colliding with a singularity generator.
     /// Adds the power from the particles to the generator.
@@ -130,7 +81,8 @@ public sealed class SingularityGeneratorSystem : SharedSingularityGeneratorSyste
         if (!TryComp<SingularityGeneratorComponent>(args.OtherEntity, out var generatorComp))
             return;
 
-        if (_timing.CurTime < _metadata.GetPauseTime(uid) + generatorComp.NextFailsafe && !generatorComp.FailsafeDisabled)
+        if (_timing.CurTime < _metadata.GetPauseTime(uid) + generatorComp.NextFailsafe &&
+            !generatorComp.FailsafeDisabled)
         {
             QueueDel(uid);
             return;
@@ -143,7 +95,9 @@ public sealed class SingularityGeneratorSystem : SharedSingularityGeneratorSyste
             var directions = Enum.GetValues<Direction>().Length;
             for (var i = 0; i < directions - 1; i += 2) // Skip every other direction, checking only cardinals
             {
-                if (!CheckContainmentField((Direction)i, new Entity<SingularityGeneratorComponent>(args.OtherEntity, generatorComp), transform))
+                if (!CheckContainmentField((Direction) i,
+                        new Entity<SingularityGeneratorComponent>(args.OtherEntity, generatorComp),
+                        transform))
                     contained = false;
             }
         }
@@ -151,7 +105,9 @@ public sealed class SingularityGeneratorSystem : SharedSingularityGeneratorSyste
         if (!contained && !generatorComp.FailsafeDisabled)
         {
             generatorComp.NextFailsafe = _timing.CurTime + generatorComp.FailsafeCooldown;
-            PopupSystem.PopupEntity(Loc.GetString("comp-generator-failsafe", ("target", args.OtherEntity)), args.OtherEntity, PopupType.LargeCaution);
+            PopupSystem.PopupEntity(Loc.GetString("comp-generator-failsafe", ("target", args.OtherEntity)),
+                args.OtherEntity,
+                PopupType.LargeCaution);
         }
         else
         {
@@ -164,7 +120,7 @@ public sealed class SingularityGeneratorSystem : SharedSingularityGeneratorSyste
                     ParticleAcceleratorPowerState.Level1 => 2,
                     ParticleAcceleratorPowerState.Level2 => 4,
                     ParticleAcceleratorPowerState.Level3 => 8,
-                    _ => 0
+                    _ => 0,
                 },
                 generatorComp
             );
@@ -172,14 +128,17 @@ public sealed class SingularityGeneratorSystem : SharedSingularityGeneratorSyste
 
         QueueDel(uid);
     }
+
     #endregion Event Handlers
 
     /// <summary>
     /// Checks whether there's a containment field in a given direction away from the generator
     /// </summary>
     /// <param name="transform">The transform component of the singularity generator.</param>
-    /// <remarks>Mostly copied from <see cref="ContainmentFieldGeneratorSystem"/> </remarks>
-    private bool CheckContainmentField(Direction dir, Entity<SingularityGeneratorComponent> generator, TransformComponent transform)
+    /// <remarks>Mostly copied from <see cref="ContainmentFieldGeneratorSystem" /> </remarks>
+    private bool CheckContainmentField(Direction dir,
+        Entity<SingularityGeneratorComponent> generator,
+        TransformComponent transform)
     {
         var component = generator.Comp;
 
@@ -206,6 +165,61 @@ public sealed class SingularityGeneratorSystem : SharedSingularityGeneratorSyste
         var ent = closestResult.Value.HitEntity;
 
         // Check that the field can't be moved. The fields' transform parenting is weird, so skip that
-        return TryComp<PhysicsComponent>(ent, out var collidableComponent) && collidableComponent.BodyType == BodyType.Static;
+        return TryComp<PhysicsComponent>(ent, out var collidableComponent) &&
+               collidableComponent.BodyType == BodyType.Static;
     }
+
+    #region Dependencies
+
+    [Dependency] private readonly IViewVariablesManager _vvm = default!;
+    [Dependency] private readonly SharedTransformSystem _transformSystem = default!;
+    [Dependency] private readonly PhysicsSystem _physics = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly MetaDataSystem _metadata = default!;
+
+    #endregion Dependencies
+
+    #region Getters/Setters
+
+    /// <summary>
+    /// Setter for <see cref="SingularityGeneratorComponent.Power" />
+    /// If the singularity generator passes its threshold it also spawns a singularity.
+    /// </summary>
+    /// <param name="comp">The singularity generator component.</param>
+    /// <param name="value">The new power level for the generator component to have.</param>
+    public void SetPower(EntityUid uid, float value, SingularityGeneratorComponent? comp = null)
+    {
+        if (!Resolve(uid, ref comp))
+            return;
+
+        var oldValue = comp.Power;
+        if (value == oldValue)
+            return;
+
+        comp.Power = value;
+        if (comp.Power >= comp.Threshold && oldValue < comp.Threshold)
+            OnPassThreshold(uid, comp);
+    }
+
+    /// <summary>
+    /// Setter for <see cref="SingularityGeneratorComponent.Threshold" />
+    /// If the singularity generator has passed its new threshold it also spawns a singularity.
+    /// </summary>
+    /// <param name="comp">The singularity generator component.</param>
+    /// <param name="value">The new threshold power level for the generator component to have.</param>
+    public void SetThreshold(EntityUid uid, float value, SingularityGeneratorComponent? comp = null)
+    {
+        if (!Resolve(uid, ref comp))
+            return;
+
+        var oldValue = comp.Threshold;
+        if (value == comp.Threshold)
+            return;
+
+        comp.Power = value;
+        if (comp.Power >= comp.Threshold && comp.Power < oldValue)
+            OnPassThreshold(uid, comp);
+    }
+
+    #endregion Getters/Setters
 }

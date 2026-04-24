@@ -64,11 +64,9 @@ public sealed class GasPowerReceiverSystem : EntitySystem
     [Dependency] private readonly AtmosphereSystem _atmosphereSystem = default!;
     [Dependency] private readonly NodeContainerSystem _nodeContainer = default!;
 
-    /// <inheritdoc/>
-    public override void Initialize()
-    {
+    /// <inheritdoc />
+    public override void Initialize() =>
         SubscribeLocalEvent<GasPowerReceiverComponent, AtmosDeviceUpdateEvent>(OnDeviceUpdated);
-    }
 
     private void OnDeviceUpdated(EntityUid uid, GasPowerReceiverComponent component, ref AtmosDeviceUpdateEvent args)
     {
@@ -87,9 +85,7 @@ public sealed class GasPowerReceiverSystem : EntitySystem
                 SetPowered(uid, component, true);
             }
             else // we do not have enough gas, so we power off
-            {
                 SetPowered(uid, component, false);
-            }
         }
         else // we are exceeding the max temp and are now operating in pressure mode
         {
@@ -109,9 +105,7 @@ public sealed class GasPowerReceiverSystem : EntitySystem
                 SetPowered(uid, component, true);
             }
             else // if we do not have high enough pressure to operate, power off
-            {
                 SetPowered(uid, component, false);
-            }
         }
     }
 

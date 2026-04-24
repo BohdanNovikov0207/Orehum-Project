@@ -14,30 +14,29 @@
 //
 // SPDX-License-Identifier: MIT
 
+using Content.Server._EinsteinEngines.Language;
 using Content.Server.Chat.Systems;
 using Content.Server.Emp;
 using Content.Server.Radio.Components;
-using Content.Server.Speech;
-using Content.Server._EinsteinEngines.Language;
 using Content.Shared.Chat;
 using Content.Shared.Inventory.Events;
 using Content.Shared.Radio;
 using Content.Shared.Radio.Components;
 using Content.Shared.Radio.EntitySystems;
-using Robust.Shared.Network;
-using Robust.Shared.Player;
+using Content.Shared.Whitelist;
 using Robust.Server.Audio;
 using Robust.Shared.Audio;
-using Content.Shared.Whitelist;
+using Robust.Shared.Network;
+using Robust.Shared.Player;
 
 namespace Content.Server.Radio.EntitySystems;
 
 public sealed class HeadsetSystem : SharedHeadsetSystem
 {
-    [Dependency] private readonly INetManager _netMan = default!;
-    [Dependency] private readonly RadioSystem _radio = default!;
     [Dependency] private readonly AudioSystem _audio = default!;
     [Dependency] private readonly LanguageSystem _language = default!;
+    [Dependency] private readonly INetManager _netMan = default!;
+    [Dependency] private readonly RadioSystem _radio = default!;
     [Dependency] private readonly EntityWhitelistSystem _whitelist = default!; // Goobstation
 
     public override void Initialize()
@@ -47,17 +46,18 @@ public sealed class HeadsetSystem : SharedHeadsetSystem
         SubscribeLocalEvent<HeadsetComponent, EncryptionChannelsChangedEvent>(OnKeysChanged);
 
         SubscribeLocalEvent<WearingHeadsetComponent, EntitySpokeEvent>(OnSpeak);
-        SubscribeLocalEvent<HeadsetComponent, RadioReceiveAttemptEvent>(OnHeadsetReceiveAttempt); // Goobstation - Whitelisted radio channel
+        SubscribeLocalEvent<HeadsetComponent, RadioReceiveAttemptEvent>(
+            OnHeadsetReceiveAttempt); // Goobstation - Whitelisted radio channel
 
         SubscribeLocalEvent<HeadsetComponent, EmpPulseEvent>(OnEmpPulse);
     }
 
-    private void OnKeysChanged(EntityUid uid, HeadsetComponent component, EncryptionChannelsChangedEvent args)
-    {
+    private void OnKeysChanged(EntityUid uid, HeadsetComponent component, EncryptionChannelsChangedEvent args) =>
         UpdateRadioChannels(uid, component, args.Component);
-    }
 
-    private void UpdateRadioChannels(EntityUid uid, HeadsetComponent headset, EncryptionKeyHolderComponent? keyHolder = null)
+    private void UpdateRadioChannels(EntityUid uid,
+        HeadsetComponent headset,
+        EncryptionKeyHolderComponent? keyHolder = null)
     {
         // make sure to not add ActiveRadioComponent when headset is being deleted
         if (!headset.Enabled || MetaData(uid).EntityLifeStage >= EntityLifeStage.Terminating)
@@ -69,7 +69,7 @@ public sealed class HeadsetSystem : SharedHeadsetSystem
         if (keyHolder.Channels.Count == 0)
             RemComp<ActiveRadioComponent>(uid);
         else
-            EnsureComp<ActiveRadioComponent>(uid).Channels = new(keyHolder.Channels);
+            EnsureComp<ActiveRadioComponent>(uid).Channels = new HashSet<string>(keyHolder.Channels);
     }
 
     private void OnSpeak(EntityUid uid, WearingHeadsetComponent component, EntitySpokeEvent args)
@@ -140,7 +140,7 @@ public sealed class HeadsetSystem : SharedHeadsetSystem
             var canUnderstand = _language.CanUnderstand(parent, args.Language.ID);
             var msg = new MsgChatMessage
             {
-                Message = canUnderstand ? args.OriginalChatMsg : args.LanguageObfuscatedChatMsg
+                Message = canUnderstand ? args.OriginalChatMsg : args.LanguageObfuscatedChatMsg,
             };
             _netMan.ServerSendMessage(msg, actor.PlayerSession.Channel);
         }
@@ -159,8 +159,7 @@ public sealed class HeadsetSystem : SharedHeadsetSystem
     }
 
     // Goobstation - Whitelisted radio channel
-    private void OnHeadsetReceiveAttempt(EntityUid uid, HeadsetComponent component, ref RadioReceiveAttemptEvent args)
-    {
+    private void
+        OnHeadsetReceiveAttempt(EntityUid uid, HeadsetComponent component, ref RadioReceiveAttemptEvent args) =>
         args.Cancelled |= _whitelist.IsWhitelistFail(args.Channel.ReceiveWhitelist, uid);
-    }
 }

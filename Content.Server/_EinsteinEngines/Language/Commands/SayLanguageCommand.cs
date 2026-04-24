@@ -29,7 +29,7 @@ public sealed class SayLanguageCommand : IConsoleCommand
         if (player.Status != SessionStatus.InGame)
             return;
 
-        if (player.AttachedEntity is not {} playerEntity)
+        if (player.AttachedEntity is not { } playerEntity)
         {
             shell.WriteError(Loc.GetString("shell-must-be-attached-to-entity"));
             return;
@@ -38,7 +38,7 @@ public sealed class SayLanguageCommand : IConsoleCommand
         if (args.Length < 2)
             return;
 
-        var message = string.Join(" ", args, startIndex: 1, count: args.Length - 1).Trim();
+        var message = string.Join(" ", args, 1, args.Length - 1).Trim();
 
         if (string.IsNullOrEmpty(message))
             return;
@@ -46,12 +46,23 @@ public sealed class SayLanguageCommand : IConsoleCommand
         var languages = IoCManager.Resolve<IEntitySystemManager>().GetEntitySystem<LanguageSystem>();
         var chats = IoCManager.Resolve<IEntitySystemManager>().GetEntitySystem<ChatSystem>();
 
-        if (!SelectLanguageCommand.TryParseLanguageArgument(languages, playerEntity, args[0], out var failReason, out var language))
+        if (!SelectLanguageCommand.TryParseLanguageArgument(languages,
+                playerEntity,
+                args[0],
+                out var failReason,
+                out var language))
         {
             shell.WriteError(failReason);
             return;
         }
 
-        chats.TrySendInGameICMessage(playerEntity, message, InGameICChatType.Speak, ChatTransmitRange.Normal, false, shell, player, languageOverride: language);
+        chats.TrySendInGameICMessage(playerEntity,
+            message,
+            InGameICChatType.Speak,
+            ChatTransmitRange.Normal,
+            false,
+            shell,
+            player,
+            languageOverride: language);
     }
 }

@@ -11,15 +11,14 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Server.DeviceNetwork.Components;
 using Content.Server.EUI;
+using Content.Shared.DeviceNetwork.Components;
 using Content.Shared.Eui;
-using Content.Shared.Fax.Components;
 using Content.Shared.Fax;
+using Content.Shared.Fax.Components;
 using Content.Shared.Follower;
 using Content.Shared.Ghost;
 using Content.Shared.Paper;
-using Content.Shared.DeviceNetwork.Components;
 
 namespace Content.Server.Fax.AdminUI;
 
@@ -36,10 +35,7 @@ public sealed class AdminFaxEui : BaseEui
         _followerSystem = IoCManager.Resolve<IEntitySystemManager>().GetEntitySystem<FollowerSystem>();
     }
 
-    public override void Opened()
-    {
-        StateDirty();
-    }
+    public override void Opened() => StateDirty();
 
     public override AdminFaxEuiState GetNewState()
     {
@@ -49,6 +45,7 @@ public sealed class AdminFaxEui : BaseEui
         {
             entries.Add(new AdminFaxEntry(_entityManager.GetNetEntity(uid), fax.FaxName, device.Address));
         }
+
         return new AdminFaxEuiState(entries);
     }
 
@@ -64,14 +61,20 @@ public sealed class AdminFaxEui : BaseEui
                     !_entityManager.HasComponent<GhostComponent>(Player.AttachedEntity.Value))
                     return;
 
-                _followerSystem.StartFollowingEntity(Player.AttachedEntity.Value, _entityManager.GetEntity(followData.TargetFax));
+                _followerSystem.StartFollowingEntity(Player.AttachedEntity.Value,
+                    _entityManager.GetEntity(followData.TargetFax));
                 break;
             }
             case AdminFaxEuiMsg.Send sendData:
             {
-                var printout = new FaxPrintout(sendData.Content, sendData.Title, null, null, sendData.StampState,
-                        new() { new StampDisplayInfo { StampedName = sendData.From, StampedColor = sendData.StampColor } },
-                        locked: sendData.Locked);
+                var printout = new FaxPrintout(sendData.Content,
+                    sendData.Title,
+                    null,
+                    null,
+                    sendData.StampState,
+                    new List<StampDisplayInfo>
+                        { new() { StampedName = sendData.From, StampedColor = sendData.StampColor } },
+                    sendData.Locked);
                 _faxSystem.Receive(_entityManager.GetEntity(sendData.Target), printout);
                 break;
             }

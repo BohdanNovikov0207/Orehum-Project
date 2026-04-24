@@ -4,11 +4,11 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Server.Destructible;
 using Content.Shared.Construction;
 using Content.Shared.Damage;
 using Content.Shared.Examine;
-using Content.Goobstation.Maths.FixedPoint;
 
 namespace Content.Server.Construction.Conditions;
 
@@ -18,6 +18,12 @@ namespace Content.Server.Construction.Conditions;
 [DataDefinition]
 public sealed partial class MinHealth : IGraphCondition
 {
+    [DataField]
+    public bool ByProportion = false;
+
+    [DataField]
+    public bool IncludeEquals = true;
+
     /// <summary>
     /// If ByProportion is true, Threshold is a value less than or equal to 1, but more than 0,
     /// which is compared to the percent of health remaining in the structure.
@@ -26,19 +32,12 @@ public sealed partial class MinHealth : IGraphCondition
     /// </summary>
     [DataField]
     public FixedPoint2 Threshold = 1;
-    [DataField]
-    public bool ByProportion = false;
-
-    [DataField]
-    public bool IncludeEquals = true;
 
     public bool Condition(EntityUid uid, IEntityManager entMan)
     {
         if (!entMan.TryGetComponent(uid, out DestructibleComponent? destructibleComp) ||
             !entMan.TryGetComponent(uid, out DamageableComponent? damageComp))
-        {
             return false;
-        }
 
         var destructionSys = entMan.System<DestructibleSystem>();
         var maxHealth = destructionSys.DestroyedAt(uid, destructibleComp);
@@ -48,25 +47,15 @@ public sealed partial class MinHealth : IGraphCondition
         if (IncludeEquals)
         {
             if (ByProportion)
-            {
                 return proportionHealth >= Threshold;
-            }
-            else
-            {
-                return curHealth >= Threshold;
-            }
+
+            return curHealth >= Threshold;
         }
-        else
-        {
-            if (ByProportion)
-            {
-                return proportionHealth > Threshold;
-            }
-            else
-            {
-                return curHealth > Threshold;
-            }
-        }
+
+        if (ByProportion)
+            return proportionHealth > Threshold;
+
+        return curHealth > Threshold;
     }
 
     public bool DoExamine(ExaminedEvent args)
@@ -75,9 +64,7 @@ public sealed partial class MinHealth : IGraphCondition
         var entity = args.Examined;
 
         if (Condition(entity, entMan))
-        {
             return false;
-        }
         args.PushMarkup(Loc.GetString("construction-examine-condition-low-health"));
 
         return true;
@@ -85,9 +72,9 @@ public sealed partial class MinHealth : IGraphCondition
 
     public IEnumerable<ConstructionGuideEntry> GenerateGuideEntry()
     {
-        yield return new ConstructionGuideEntry()
+        yield return new ConstructionGuideEntry
         {
-            Localization = "construction-step-condition-low-health"
+            Localization = "construction-step-condition-low-health",
         };
     }
 }

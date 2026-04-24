@@ -10,10 +10,10 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Server.Chemistry.Components;
 using Content.Shared.Chemistry.Components;
 using Content.Shared.Chemistry.EntitySystems;
-using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Vapor;
 using Content.Shared.Weapons.Ranged;
 using Content.Shared.Weapons.Ranged.Components;
@@ -33,10 +33,8 @@ public sealed partial class GunSystem
         SubscribeLocalEvent<SolutionAmmoProviderComponent, SolutionContainerChangedEvent>(OnSolutionChanged);
     }
 
-    private void OnSolutionMapInit(Entity<SolutionAmmoProviderComponent> entity, ref MapInitEvent args)
-    {
+    private void OnSolutionMapInit(Entity<SolutionAmmoProviderComponent> entity, ref MapInitEvent args) =>
         UpdateSolutionShots(entity.Owner, entity.Comp);
-    }
 
     private void OnSolutionChanged(Entity<SolutionAmmoProviderComponent> entity, ref SolutionContainerChangedEvent args)
     {
@@ -44,7 +42,9 @@ public sealed partial class GunSystem
             UpdateSolutionShots(entity.Owner, entity.Comp, args.Solution);
     }
 
-    protected override void UpdateSolutionShots(EntityUid uid, SolutionAmmoProviderComponent component, Solution? solution = null)
+    protected override void UpdateSolutionShots(EntityUid uid,
+        SolutionAmmoProviderComponent component,
+        Solution? solution = null)
     {
         var shots = 0;
         var maxShots = 0;
@@ -69,7 +69,9 @@ public sealed partial class GunSystem
         UpdateSolutionAppearance(uid, component);
     }
 
-    protected override (EntityUid Entity, IShootable) GetSolutionShot(EntityUid uid, SolutionAmmoProviderComponent component, EntityCoordinates position)
+    protected override (EntityUid Entity, IShootable) GetSolutionShot(EntityUid uid,
+        SolutionAmmoProviderComponent component,
+        EntityCoordinates position)
     {
         var (ent, shootable) = base.GetSolutionShot(uid, component, position);
 
@@ -89,9 +91,7 @@ public sealed partial class GunSystem
 
         // Add the solution to the vapor and actually send the thing
         if (_solutionContainer.TryGetSolution(ent, VaporComponent.SolutionName, out var vaporSolution, out _))
-        {
             _solutionContainer.TryAddSolution(vaporSolution.Value, newSolution);
-        }
         return (ent, shootable);
     }
 }

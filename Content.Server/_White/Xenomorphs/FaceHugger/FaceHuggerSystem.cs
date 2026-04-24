@@ -1,14 +1,28 @@
+using Content.Goobstation.Maths.FixedPoint;
+using Content.Goobstation.Shared.Clothing.Components;
+using Content.Goobstation.Shared.Xenomorph;
 using Content.Server.Body.Systems;
 using Content.Server.Popups;
 using Content.Server.Stunnable;
+using Content.Shared._White.Xenomorphs.FaceHugger;
+using Content.Shared._White.Xenomorphs.Infection;
+using Content.Shared.Atmos.Components;
+using Content.Shared.Body.Components;
+using Content.Shared.Chemistry;
+using Content.Shared.Chemistry.Components;
+using Content.Shared.Chemistry.EntitySystems;
+using Content.Shared.Chemistry.Reagent;
 using Content.Shared.Clothing.Components;
 using Content.Shared.Damage;
 using Content.Shared.Hands;
 using Content.Shared.IdentityManagement;
 using Content.Shared.Inventory;
 using Content.Shared.Inventory.Events;
+using Content.Shared.Mobs.Components;
 using Content.Shared.Mobs.Systems;
+using Content.Shared.Nutrition.Components;
 using Content.Shared.StepTrigger.Systems;
+using Content.Shared.Throwing;
 using Content.Shared.Weapons.Melee.Events;
 using Content.Shared.Whitelist;
 using Robust.Server.Audio;
@@ -18,31 +32,15 @@ using Robust.Shared.Player;
 using Robust.Shared.Random;
 using Robust.Shared.Timing;
 using Robust.Shared.Utility;
-using Content.Shared._White.Xenomorphs.Infection;
-using Content.Shared.Body.Components; // Goobstation start
-using Content.Shared.Chemistry;
-using Content.Shared.Chemistry.Components;
-using Content.Shared.Chemistry.EntitySystems;
-using Content.Shared.Chemistry.Reagent;
-using Content.Goobstation.Maths.FixedPoint;
-using Content.Goobstation.Shared.Clothing.Components;
-using Content.Shared._White.Xenomorphs.FaceHugger;
-using Content.Shared.Mobs.Components;
-using Content.Shared.Throwing;
-using Content.Shared.Atmos.Components;
-using Content.Shared.Nutrition.Components; // Goobstation end
-using Content.Goobstation.Shared.Xenomorph; // Omu
+// Goobstation start
+// Goobstation end
+
+// Omu
 
 namespace Content.Server._White.Xenomorphs.FaceHugger;
 
 public sealed class FaceHuggerSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly ReactiveSystem _reactiveSystem = default!; // Goobstation
-    [Dependency] private readonly SharedSolutionContainerSystem _solutions = default!; // Goobstation
-    [Dependency] private readonly SharedTransformSystem _transform = default!; // Goobstation
-
     [Dependency] private readonly AudioSystem _audio = default!;
     [Dependency] private readonly BodySystem _body = default!;
     [Dependency] private readonly ContainerSystem _container = default!;
@@ -52,7 +50,12 @@ public sealed class FaceHuggerSystem : EntitySystem
     [Dependency] private readonly InventorySystem _inventory = default!;
     [Dependency] private readonly MobStateSystem _mobState = default!;
     [Dependency] private readonly PopupSystem _popup = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly ReactiveSystem _reactiveSystem = default!; // Goobstation
+    [Dependency] private readonly SharedSolutionContainerSystem _solutions = default!; // Goobstation
     [Dependency] private readonly StunSystem _stun = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!; // Goobstation
 
     public override void Initialize()
     {
@@ -105,7 +108,7 @@ public sealed class FaceHuggerSystem : EntitySystem
             Filter.PvsExcept(args.Equipee),
             true);
 
-        _stun.TryKnockdown(args.Equipee, component.KnockdownTime, true);
+        _stun.TryKnockdown(args.Equipee, component.KnockdownTime);
 
         if (component.InfectionPrototype.HasValue)
             EnsureComp<XenomorphPreventSuicideComponent>(args.Equipee); //Prevent suicide for infected
@@ -121,7 +124,8 @@ public sealed class FaceHuggerSystem : EntitySystem
         BeingUnequippedAttemptEvent args)
     {
         if (component.Slot != args.Slot || args.Unequipee != args.UnEquipTarget ||
-            !component.InfectionPrototype.HasValue || _mobState.IsDead(uid) || HasComp<FacehuggerImmuneComponent>(args.Unequipee)) // Omu, add check for FacehuggerImmune
+            !component.InfectionPrototype.HasValue || _mobState.IsDead(uid) ||
+            HasComp<FacehuggerImmuneComponent>(args.Unequipee)) // Omu, add check for FacehuggerImmune
             return;
 
         _popup.PopupEntity(
@@ -165,10 +169,9 @@ public sealed class FaceHuggerSystem : EntitySystem
                     // Get the entity that has this item equipped
                     if (_container.TryGetContainingContainer(uid, out var container) && container.Owner != uid)
                     {
-                        if (!HasComp<FacehuggerImmuneComponent>(container.Owner)) // Omu, don't inject into people who the facehugger wont infect
-                        {
+                        if (!HasComp<FacehuggerImmuneComponent>(container
+                                .Owner)) // Omu, don't inject into people who the facehugger wont infect
                             InjectChemicals(uid, faceHugger, container.Owner);
-                        }
                         // Set the next injection time based on the current time plus interval
                         faceHugger.NextInjectionTime = time + faceHugger.InjectionInterval;
                     }
@@ -238,14 +241,17 @@ public sealed class FaceHuggerSystem : EntitySystem
                     Loc.GetString("xenomorphs-face-hugger-mask-blocked",
                         ("mask", blocker.Value),
                         ("facehugger", uid)),
-                    target, target);
+                    target,
+                    target);
 
                 _popup.PopupEntity(
                     Loc.GetString("xenomorphs-face-hugger-mask-blocked-other",
                         ("facehugger", uid),
                         ("target", target),
                         ("mask", blocker.Value)),
-                    target, Filter.PvsExcept(target), true);
+                    target,
+                    Filter.PvsExcept(target),
+                    true);
 
                 // Schedule a retry after the delay
                 component.RestIn = _timing.CurTime + component.AttachAttemptDelay;
@@ -271,7 +277,9 @@ public sealed class FaceHuggerSystem : EntitySystem
                     ("equipment", uid),
                     ("equipmentBlocker", blocker.Value),
                     ("target", Identity.Entity(target, EntityManager))),
-                uid, Filter.PvsExcept(target), true);
+                uid,
+                Filter.PvsExcept(target),
+                true);
 
             return false;
         }
@@ -285,7 +293,53 @@ public sealed class FaceHuggerSystem : EntitySystem
         return _inventory.TryEquip(target, uid, component.Slot, true, true);
     } // Gooobstation end
 
+    #region Handle Face Masks
+
+    /// <summary>
+    /// Checks if the target has a breathable mask or any other blocking equipment.
+    /// Returns true if there's a blocker, false otherwise.
+    /// Goobstation
+    /// </summary>
+    private bool CheckAndHandleMaskOrHemet(EntityUid target, out EntityUid? blocker)
+    {
+        blocker = null;
+        if (_inventory.TryGetSlotEntity(target, "head", out var headUid))
+        {
+            // If the headgear has an ingestion blocker component, it's a blocker
+            var sealable = new SealableClothingComponent();
+            if (HasComp<FaceHuggerBlockerComponent>(headUid) && !TryComp(headUid, out sealable) ||
+                HasComp<FaceHuggerBlockerComponent>(headUid) && sealable.IsSealed)
+            {
+                blocker = headUid;
+                return true;
+            }
+
+            // If it's just regular headgear, remove it
+            _inventory.TryUnequip(target, "head", true);
+        }
+
+        // Check for breathable mask
+        if (_inventory.TryGetSlotEntity(target, "mask", out var maskUid))
+        {
+            // If the mask is a breath tool (gas mask) and is functional, block the facehugger
+            if (TryComp<IngestionBlockerComponent>(maskUid, out var ingestionBlocker) &&
+                ingestionBlocker.BlockSmokeIngestion)
+            {
+                blocker = maskUid;
+                return true;
+            }
+
+            // If it's just a regular mask, remove it
+            _inventory.TryUnequip(target, "mask", true);
+        }
+
+        return false;
+    }
+
+    #endregion
+
     #region Injection Code
+
     /// <summary>
     /// Checks if the facehugger can inject chemicals into the target
     /// Goobstation
@@ -302,12 +356,13 @@ public sealed class FaceHuggerSystem : EntitySystem
 
         // Check if target already has the sleep chemical
         if (TryComp<BloodstreamComponent>(target, out var bloodstream) &&
-            _solutions.ResolveSolution(target, bloodstream.ChemicalSolutionName, ref bloodstream.ChemicalSolution, out var chemSolution) &&
+            _solutions.ResolveSolution(target,
+                bloodstream.ChemicalSolutionName,
+                ref bloodstream.ChemicalSolution,
+                out var chemSolution) &&
             chemSolution.TryGetReagentQuantity(new ReagentId(component.SleepChem, null), out var quantity) &&
             quantity > FixedPoint2.New(component.MinChemicalThreshold))
-        {
             return false;
-        }
         return true;
     }
 
@@ -350,44 +405,7 @@ public sealed class FaceHuggerSystem : EntitySystem
         var sleepChem = CreateSleepChemicalSolution(component, component.SleepChemAmount);
         TryInjectIntoBloodstream(target, sleepChem, component.SleepChem, component.SleepChemAmount);
     }
-    #endregion
 
-    #region Handle Face Masks
-    /// <summary>
-    /// Checks if the target has a breathable mask or any other blocking equipment.
-    /// Returns true if there's a blocker, false otherwise.
-    /// Goobstation
-    /// </summary>
-    private bool CheckAndHandleMaskOrHemet(EntityUid target, out EntityUid? blocker)
-    {
-        blocker = null;
-        if (_inventory.TryGetSlotEntity(target, "head", out var headUid))
-        {
-            // If the headgear has an ingestion blocker component, it's a blocker
-            var sealable = new SealableClothingComponent();
-            if ((HasComp<FaceHuggerBlockerComponent>(headUid) && !TryComp<SealableClothingComponent>(headUid, out sealable)) || (HasComp<FaceHuggerBlockerComponent>(headUid) && sealable.IsSealed))
-            {
-                blocker = headUid;
-                return true;
-            }
-            // If it's just regular headgear, remove it
-            _inventory.TryUnequip(target, "head", true);
-        }
-        // Check for breathable mask
-        if (_inventory.TryGetSlotEntity(target, "mask", out var maskUid))
-        {
-            // If the mask is a breath tool (gas mask) and is functional, block the facehugger
-            if (TryComp<IngestionBlockerComponent>(maskUid, out var ingestionBlocker) && ingestionBlocker.BlockSmokeIngestion)
-            {
-                blocker = maskUid;
-                return true;
-            }
-            // If it's just a regular mask, remove it
-            _inventory.TryUnequip(target, "mask", true);
-        }
-
-        return false;
-    }
     #endregion
 
     #region Throwing Behavior

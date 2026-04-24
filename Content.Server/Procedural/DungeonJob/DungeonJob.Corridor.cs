@@ -15,7 +15,7 @@ namespace Content.Server.Procedural.DungeonJob;
 public sealed partial class DungeonJob
 {
     /// <summary>
-    /// <see cref="CorridorDunGen"/>
+    ///     <see cref="CorridorDunGen" />
     /// </summary>
     private async Task PostGen(CorridorDunGen gen, Dungeon dungeon, HashSet<Vector2i> reservedTiles, Random random)
     {
@@ -53,9 +53,7 @@ public sealed partial class DungeonJob
                         if (dungeon.RoomTiles.Contains(neighbor) ||
                             dungeon.RoomExteriorTiles.Contains(neighbor) ||
                             entrances.Contains(neighbor))
-                        {
                             continue;
-                        }
 
                         deterredTiles.Add(neighbor);
                     }
@@ -68,7 +66,9 @@ public sealed partial class DungeonJob
             foreach (var entrance in room.Entrances)
             {
                 // Just so we can still actually get in to the entrance we won't deter from a tile away from it.
-                var normal = (entrance + _grid.TileSizeHalfVector - room.Center).ToWorldAngle().GetCardinalDir().ToIntVec();
+                var normal = (entrance + _grid.TileSizeHalfVector - room.Center).ToWorldAngle()
+                    .GetCardinalDir()
+                    .ToIntVec();
                 deterredTiles.Remove(entrance + normal);
             }
         }
@@ -77,22 +77,22 @@ public sealed partial class DungeonJob
         excludedTiles.UnionWith(dungeon.RoomTiles);
         var corridorTiles = new HashSet<Vector2i>();
 
-        _dungeon.GetCorridorNodes(corridorTiles, edges, gen.PathLimit, excludedTiles, tile =>
-        {
-            var mod = 1f;
-
-            if (corridorTiles.Contains(tile))
+        _dungeon.GetCorridorNodes(corridorTiles,
+            edges,
+            gen.PathLimit,
+            excludedTiles,
+            tile =>
             {
-                mod *= 0.1f;
-            }
+                var mod = 1f;
 
-            if (deterredTiles.Contains(tile))
-            {
-                mod *= 2f;
-            }
+                if (corridorTiles.Contains(tile))
+                    mod *= 0.1f;
 
-            return mod;
-        });
+                if (deterredTiles.Contains(tile))
+                    mod *= 2f;
+
+                return mod;
+            });
 
         WidenCorridor(dungeon, gen.Width, corridorTiles);
 

@@ -21,8 +21,8 @@ namespace Content.Server.Power.SMES;
 [UsedImplicitly]
 public sealed class SmesSystem : EntitySystem // goob edit - made public
 {
-    [Dependency] private readonly IGameTiming _gameTiming = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly IGameTiming _gameTiming = default!;
 
     public override void Initialize()
     {
@@ -34,20 +34,17 @@ public sealed class SmesSystem : EntitySystem // goob edit - made public
         SubscribeLocalEvent<SmesComponent, ChargeChangedEvent>(OnBatteryChargeChanged);
     }
 
-    private void OnMapInit(EntityUid uid, SmesComponent component, MapInitEvent args)
-    {
+    private void OnMapInit(EntityUid uid, SmesComponent component, MapInitEvent args) =>
         UpdateSmesState(uid, component);
-    }
 
-    private void OnBatteryChargeChanged(EntityUid uid, SmesComponent component, ref ChargeChangedEvent args)
-    {
+    private void OnBatteryChargeChanged(EntityUid uid, SmesComponent component, ref ChargeChangedEvent args) =>
         UpdateSmesState(uid, component);
-    }
 
     private void UpdateSmesState(EntityUid uid, SmesComponent smes)
     {
         var newLevel = CalcChargeLevel(uid);
-        if (newLevel != smes.LastChargeLevel && smes.LastChargeLevelTime + smes.VisualsChangeDelay < _gameTiming.CurTime)
+        if (newLevel != smes.LastChargeLevel &&
+            smes.LastChargeLevelTime + smes.VisualsChangeDelay < _gameTiming.CurTime)
         {
             smes.LastChargeLevel = newLevel;
             smes.LastChargeLevelTime = _gameTiming.CurTime;
@@ -56,7 +53,8 @@ public sealed class SmesSystem : EntitySystem // goob edit - made public
         }
 
         var newChargeState = CalcChargeState(uid);
-        if (newChargeState != smes.LastChargeState && smes.LastChargeStateTime + smes.VisualsChangeDelay < _gameTiming.CurTime)
+        if (newChargeState != smes.LastChargeState &&
+            smes.LastChargeStateTime + smes.VisualsChangeDelay < _gameTiming.CurTime)
         {
             smes.LastChargeState = newChargeState;
             smes.LastChargeStateTime = _gameTiming.CurTime;
@@ -82,7 +80,7 @@ public sealed class SmesSystem : EntitySystem // goob edit - made public
         {
             > 0 => ChargeState.Discharging,
             < 0 => ChargeState.Charging,
-            _ => ChargeState.Still
+            _ => ChargeState.Still,
         };
     }
 }

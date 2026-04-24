@@ -67,25 +67,19 @@ public sealed partial class ConstructionSystem
         _container.EnsureContainer<Container>(uid, "board");
 
         if (TryComp<ApcPowerReceiverComponent>(uid, out var powerReceiver))
-        {
             _appearance.SetData(uid, ComputerVisuals.Powered, powerReceiver.Powered);
-        }
     }
 
-    private void OnCompMapInit(Entity<ComputerComponent> component, ref MapInitEvent args)
-    {
+    private void OnCompMapInit(Entity<ComputerComponent> component, ref MapInitEvent args) =>
         CreateComputerBoard(component);
-    }
 
-    private void OnCompPowerChange(EntityUid uid, ComputerComponent component, ref PowerChangedEvent args)
-    {
+    private void OnCompPowerChange(EntityUid uid, ComputerComponent component, ref PowerChangedEvent args) =>
         _appearance.SetData(uid, ComputerVisuals.Powered, args.Powered);
-    }
 
     /// <summary>
-    ///     Creates the corresponding computer board on the computer.
-    ///     This exists so when you deconstruct computers that were serialized with the map,
-    ///     you can retrieve the computer board.
+    /// Creates the corresponding computer board on the computer.
+    /// This exists so when you deconstruct computers that were serialized with the map,
+    /// you can retrieve the computer board.
     /// </summary>
     private void CreateComputerBoard(Entity<ComputerComponent> ent)
     {

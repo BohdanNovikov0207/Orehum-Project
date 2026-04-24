@@ -103,15 +103,11 @@ public sealed class GasMinerSystem : SharedGasMinerSystem
         float toSpawn;
 
         if (!GetValidEnvironment(ent, out var environment) || !Transform(ent).Anchored)
-        {
             miner.MinerState = GasMinerState.Disabled;
-        }
         // SpawnAmount is declared in mol/s so to get the amount of gas we hope to mine, we have to multiply this by
         // how long we have been waiting to spawn it and further cap the number according to the miner's state.
         else if ((toSpawn = CapSpawnAmount(ent, miner.SpawnAmount * args.dt, environment)) == 0)
-        {
             miner.MinerState = GasMinerState.Idle;
-        }
         else
         {
             miner.MinerState = GasMinerState.Working;
@@ -123,9 +119,7 @@ public sealed class GasMinerSystem : SharedGasMinerSystem
         }
 
         if (miner.MinerState != oldState)
-        {
             Dirty(ent);
-        }
     }
 
     private bool GetValidEnvironment(Entity<GasMinerComponent> ent, [NotNullWhen(true)] out GasMixture? environment)
@@ -151,14 +145,14 @@ public sealed class GasMinerSystem : SharedGasMinerSystem
 
         // How many moles could we theoretically spawn. Cap by pressure and amount.
         var allowableMoles = Math.Min(
-            (miner.MaxExternalPressure - environment.Pressure) * environment.Volume / (miner.SpawnTemperature * Atmospherics.R),
+            (miner.MaxExternalPressure - environment.Pressure) * environment.Volume /
+            (miner.SpawnTemperature * Atmospherics.R),
             miner.MaxExternalAmount - environment.TotalMoles);
 
         var toSpawnReal = Math.Clamp(allowableMoles, 0f, toSpawnTarget);
 
-        if (toSpawnReal < Atmospherics.GasMinMoles) {
+        if (toSpawnReal < Atmospherics.GasMinMoles)
             return 0f;
-        }
 
         return toSpawnReal;
     }

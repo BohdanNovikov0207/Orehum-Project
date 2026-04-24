@@ -23,13 +23,13 @@ namespace Content.Server.Fluids.EntitySystems;
 
 public sealed class PuddleDebugDebugOverlaySystem : SharedPuddleDebugOverlaySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly IMapManager _mapManager = default!;
-    [Dependency] private readonly PuddleSystem _puddle = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly SharedMapSystem _map = default!;
+    [Dependency] private readonly IMapManager _mapManager = default!;
 
     private readonly HashSet<ICommonSession> _playerObservers = [];
+    [Dependency] private readonly PuddleSystem _puddle = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
     private List<Entity<MapGridComponent>> _grids = [];
 
     public bool ToggleObserver(ICommonSession observer)
@@ -49,9 +49,7 @@ public sealed class PuddleDebugDebugOverlaySystem : SharedPuddleDebugOverlaySyst
     private void RemoveObserver(ICommonSession observer)
     {
         if (!_playerObservers.Remove(observer))
-        {
             return;
-        }
 
         var message = new PuddleOverlayDisableMessage();
         RaiseNetworkEvent(message, observer.Channel);

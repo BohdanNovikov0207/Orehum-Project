@@ -17,81 +17,79 @@ using Content.Shared.Light.Components;
 using Content.Shared.Throwing;
 using Robust.Shared.Audio.Systems;
 
-namespace Content.Server.Light.EntitySystems
+namespace Content.Server.Light.EntitySystems;
+
+public sealed class LightBulbSystem : EntitySystem
 {
-    public sealed class LightBulbSystem : EntitySystem
+    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+
+    public override void Initialize()
     {
-        [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
-        [Dependency] private readonly SharedAudioSystem _audio = default!;
+        base.Initialize();
 
-        public override void Initialize()
-        {
-            base.Initialize();
+        SubscribeLocalEvent<LightBulbComponent, ComponentInit>(OnInit);
+        SubscribeLocalEvent<LightBulbComponent, LandEvent>(HandleLand);
+        SubscribeLocalEvent<LightBulbComponent, BreakageEventArgs>(OnBreak);
+    }
 
-            SubscribeLocalEvent<LightBulbComponent, ComponentInit>(OnInit);
-            SubscribeLocalEvent<LightBulbComponent, LandEvent>(HandleLand);
-            SubscribeLocalEvent<LightBulbComponent, BreakageEventArgs>(OnBreak);
-        }
+    private void OnInit(EntityUid uid, LightBulbComponent bulb, ComponentInit args)
+    {
+        // update default state of bulbs
+        SetColor(uid, bulb.Color, bulb);
+        SetState(uid, bulb.State, bulb);
+    }
 
-        private void OnInit(EntityUid uid, LightBulbComponent bulb, ComponentInit args)
-        {
-            // update default state of bulbs
-            SetColor(uid, bulb.Color, bulb);
-            SetState(uid, bulb.State, bulb);
-        }
+    private void HandleLand(EntityUid uid, LightBulbComponent bulb, ref LandEvent args)
+    {
+        PlayBreakSound(uid, bulb);
+        SetState(uid, LightBulbState.Broken, bulb);
+    }
 
-        private void HandleLand(EntityUid uid, LightBulbComponent bulb, ref LandEvent args)
-        {
-            PlayBreakSound(uid, bulb);
-            SetState(uid, LightBulbState.Broken, bulb);
-        }
+    private void OnBreak(EntityUid uid, LightBulbComponent component, BreakageEventArgs args) =>
+        SetState(uid, LightBulbState.Broken, component);
 
-        private void OnBreak(EntityUid uid, LightBulbComponent component, BreakageEventArgs args)
-        {
-            SetState(uid, LightBulbState.Broken, component);
-        }
+    /// <summary>
+    /// Set a new color for a light bulb and raise event about change
+    /// </summary>
+    public void SetColor(EntityUid uid, Color color, LightBulbComponent? bulb = null)
+    {
+        if (!Resolve(uid, ref bulb))
+            return;
 
-        /// <summary>
-        ///     Set a new color for a light bulb and raise event about change
-        /// </summary>
-        public void SetColor(EntityUid uid, Color color, LightBulbComponent? bulb = null)
-        {
-            if (!Resolve(uid, ref bulb))
-                return;
+        bulb.Color = color;
+        UpdateAppearance(uid, bulb);
+    }
 
-            bulb.Color = color;
-            UpdateAppearance(uid, bulb);
-        }
+    /// <summary>
+    /// Set a new state for a light bulb (broken, burned) and raise event about change
+    /// </summary>
+    public void SetState(EntityUid uid, LightBulbState state, LightBulbComponent? bulb = null)
+    {
+        if (!Resolve(uid, ref bulb))
+            return;
 
-        /// <summary>
-        ///     Set a new state for a light bulb (broken, burned) and raise event about change
-        /// </summary>
-        public void SetState(EntityUid uid, LightBulbState state, LightBulbComponent? bulb = null)
-        {
-            if (!Resolve(uid, ref bulb))
-                return;
+        bulb.State = state;
+        UpdateAppearance(uid, bulb);
+    }
 
-            bulb.State = state;
-            UpdateAppearance(uid, bulb);
-        }
+    public void PlayBreakSound(EntityUid uid, LightBulbComponent? bulb = null)
+    {
+        if (!Resolve(uid, ref bulb))
+            return;
 
-        public void PlayBreakSound(EntityUid uid, LightBulbComponent? bulb = null)
-        {
-            if (!Resolve(uid, ref bulb))
-                return;
+        _audio.PlayPvs(bulb.BreakSound, uid);
+    }
 
-            _audio.PlayPvs(bulb.BreakSound, uid);
-        }
+    private void UpdateAppearance(EntityUid uid,
+        LightBulbComponent? bulb = null,
+        AppearanceComponent? appearance = null)
+    {
+        if (!Resolve(uid, ref bulb, ref appearance, false))
+            return;
 
-        private void UpdateAppearance(EntityUid uid, LightBulbComponent? bulb = null,
-            AppearanceComponent? appearance = null)
-        {
-            if (!Resolve(uid, ref bulb, ref appearance, logMissing: false))
-                return;
-
-            // try to update appearance and color
-            _appearance.SetData(uid, LightBulbVisuals.State, bulb.State, appearance);
-            _appearance.SetData(uid, LightBulbVisuals.Color, bulb.Color, appearance);
-        }
+        // try to update appearance and color
+        _appearance.SetData(uid, LightBulbVisuals.State, bulb.State, appearance);
+        _appearance.SetData(uid, LightBulbVisuals.Color, bulb.Color, appearance);
     }
 }

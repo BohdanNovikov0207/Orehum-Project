@@ -1,9 +1,6 @@
 using Content.Server.Actions;
 using Content.Server.Chat.Systems;
-using Content.Shared.Inventory;
-using Content.Shared.Whitelist;
 using Content.Shared._Orehum.Callouts;
-using Robust.Shared.Random;
 
 namespace Content.Server._Orehum.Callouts;
 

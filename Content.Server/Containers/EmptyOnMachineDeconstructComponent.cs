@@ -6,15 +6,14 @@
 //
 // SPDX-License-Identifier: MIT
 
-namespace Content.Server.Containers
+namespace Content.Server.Containers;
+
+/// <summary>
+/// Empties a list of containers when the machine is deconstructed via MachineDeconstructedEvent.
+/// </summary>
+[RegisterComponent]
+public sealed partial class EmptyOnMachineDeconstructComponent : Component
 {
-    /// <summary>
-    /// Empties a list of containers when the machine is deconstructed via MachineDeconstructedEvent.
-    /// </summary>
-    [RegisterComponent]
-    public sealed partial class EmptyOnMachineDeconstructComponent : Component
-    {
-        [DataField("containers")]
-        public HashSet<string> Containers { get; set; } = new();
-    }
+    [DataField("containers")]
+    public HashSet<string> Containers { get; set; } = new();
 }

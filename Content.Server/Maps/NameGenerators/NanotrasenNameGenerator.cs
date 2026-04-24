@@ -16,12 +16,12 @@ namespace Content.Server.Maps.NameGenerators;
 public sealed partial class NanotrasenNameGenerator : StationNameGenerator
 {
     /// <summary>
-    ///     Where the map comes from. Should be a two or three letter code, for example "VG" for Packedstation.
+    /// Where the map comes from. Should be a two or three letter code, for example "VG" for Packedstation.
     /// </summary>
     [DataField("prefixCreator")] public string PrefixCreator = default!;
 
     private string Prefix => "NT";
-    private string[] SuffixCodes => new []{ "LV", "NX", "EV", "QT", "PR" };
+    private string[] SuffixCodes => new[] { "LV", "NX", "EV", "QT", "PR" };
 
     public override string FormatName(string input)
     {

@@ -23,25 +23,24 @@ public sealed class DisposalSignalRouterSystem : EntitySystem
 
         SubscribeLocalEvent<DisposalSignalRouterComponent, ComponentInit>(OnInit);
         SubscribeLocalEvent<DisposalSignalRouterComponent, SignalReceivedEvent>(OnSignalReceived);
-        SubscribeLocalEvent<DisposalSignalRouterComponent, GetDisposalsNextDirectionEvent>(OnGetNextDirection, after: new[] { typeof(DisposalTubeSystem) });
+        SubscribeLocalEvent<DisposalSignalRouterComponent, GetDisposalsNextDirectionEvent>(OnGetNextDirection,
+            after: new[] { typeof(DisposalTubeSystem) });
     }
 
-    private void OnInit(EntityUid uid, DisposalSignalRouterComponent comp, ComponentInit args)
-    {
+    private void OnInit(EntityUid uid, DisposalSignalRouterComponent comp, ComponentInit args) =>
         _deviceLink.EnsureSinkPorts(uid, comp.OnPort, comp.OffPort, comp.TogglePort);
-    }
 
-    private void OnSignalReceived(EntityUid uid, DisposalSignalRouterComponent comp, ref SignalReceivedEvent args)
-    {
+    private void OnSignalReceived(EntityUid uid, DisposalSignalRouterComponent comp, ref SignalReceivedEvent args) =>
         // TogglePort flips it
         // OnPort sets it to true
         // OffPort sets it to false
         comp.Routing = args.Port == comp.TogglePort
             ? !comp.Routing
             : args.Port == comp.OnPort;
-    }
 
-    private void OnGetNextDirection(EntityUid uid, DisposalSignalRouterComponent comp, ref GetDisposalsNextDirectionEvent args)
+    private void OnGetNextDirection(EntityUid uid,
+        DisposalSignalRouterComponent comp,
+        ref GetDisposalsNextDirectionEvent args)
     {
         if (!comp.Routing)
         {

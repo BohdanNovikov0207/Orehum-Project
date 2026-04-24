@@ -46,8 +46,6 @@ public sealed partial class VendingMachineEjectItemWireAction : ComponentWireAct
         return true;
     }
 
-    public override void Pulse(EntityUid user, Wire wire, VendingMachineComponent vending)
-    {
+    public override void Pulse(EntityUid user, Wire wire, VendingMachineComponent vending) =>
         _vendingMachineSystem.EjectRandom(wire.Owner, true, vendComponent: vending);
-    }
 }

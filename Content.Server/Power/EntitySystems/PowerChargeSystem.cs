@@ -19,9 +19,9 @@ namespace Content.Server.Power.EntitySystems;
 public sealed class PowerChargeSystem : EntitySystem
 {
     [Dependency] private readonly IAdminLogManager _adminLogger = default!;
-    [Dependency] private readonly UserInterfaceSystem _uiSystem = default!;
-    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
     [Dependency] private readonly AmbientSoundSystem _ambientSoundSystem = default!;
+    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly UserInterfaceSystem _uiSystem = default!;
 
     public override void Initialize()
     {
@@ -43,7 +43,8 @@ public sealed class PowerChargeSystem : EntitySystem
 
         component.Active = false;
         component.Charge = 0;
-        UpdateState(new Entity<PowerChargeComponent, ApcPowerReceiverComponent>(uid, component, powerReceiverComponent));
+        UpdateState(
+            new Entity<PowerChargeComponent, ApcPowerReceiverComponent>(uid, component, powerReceiverComponent));
     }
 
     private void OnAfterUiOpened(EntityUid uid, PowerChargeComponent component, AfterActivatableUIOpenEvent args)
@@ -54,10 +55,8 @@ public sealed class PowerChargeSystem : EntitySystem
         UpdateUI((uid, component, apcPowerReceiver), component.ChargeRate);
     }
 
-    private void OnSwitchGenerator(EntityUid uid, PowerChargeComponent component, SwitchChargingMachineMessage args)
-    {
+    private void OnSwitchGenerator(EntityUid uid, PowerChargeComponent component, SwitchChargingMachineMessage args) =>
         SetSwitchedOn(uid, component, args.On, user: args.Actor);
-    }
 
     private void OnUIOpenAttempt(EntityUid uid, PowerChargeComponent component, ActivatableUIOpenAttemptEvent args)
     {
@@ -86,24 +85,27 @@ public sealed class PowerChargeSystem : EntitySystem
         UpdateState((ent, ent.Comp, powerReceiver));
     }
 
-    private void SetSwitchedOn(EntityUid uid, PowerChargeComponent component, bool on,
-        ApcPowerReceiverComponent? powerReceiver = null, EntityUid? user = null)
+    private void SetSwitchedOn(EntityUid uid,
+        PowerChargeComponent component,
+        bool on,
+        ApcPowerReceiverComponent? powerReceiver = null,
+        EntityUid? user = null)
     {
         if (!Resolve(uid, ref powerReceiver))
             return;
 
-        if (user is { })
-            _adminLogger.Add(LogType.Action, on ? LogImpact.Medium : LogImpact.High, $"{ToPrettyString(user):player} set {ToPrettyString(uid):target} to {(on ? "on" : "off")}");
+        if (user is not null)
+            _adminLogger.Add(LogType.Action,
+                on ? LogImpact.Medium : LogImpact.High,
+                $"{ToPrettyString(user):player} set {ToPrettyString(uid):target} to {(on ? "on" : "off")}");
 
         component.SwitchedOn = on;
         UpdatePowerState(component, powerReceiver);
         component.NeedUIUpdate = true;
     }
 
-    private static void UpdatePowerState(PowerChargeComponent component, ApcPowerReceiverComponent powerReceiver)
-    {
+    private static void UpdatePowerState(PowerChargeComponent component, ApcPowerReceiverComponent powerReceiver) =>
         powerReceiver.Load = component.SwitchedOn ? component.ActivePowerUse : component.IdlePowerUse;
-    }
 
     public override void Update(float frameTime)
     {
@@ -122,9 +124,7 @@ public sealed class PowerChargeSystem : EntitySystem
             if (chargingMachine.SwitchedOn)
             {
                 if (powerReceiver.Powered)
-                {
                     chargeRate = chargingMachine.ChargeRate;
-                }
                 else
                 {
                     // Scale discharge rate such that if we're at 25% active power we discharge at 75% rate.
@@ -135,28 +135,23 @@ public sealed class PowerChargeSystem : EntitySystem
                 }
             }
             else
-            {
                 chargeRate = -chargingMachine.ChargeRate;
-            }
 
             var active = chargingMachine.Active;
             var lastCharge = chargingMachine.Charge;
-            chargingMachine.Charge = Math.Clamp(chargingMachine.Charge + frameTime * chargeRate, 0, chargingMachine.MaxCharge);
+            chargingMachine.Charge =
+                Math.Clamp(chargingMachine.Charge + frameTime * chargeRate, 0, chargingMachine.MaxCharge);
             if (chargeRate > 0)
             {
                 // Charging.
                 if (MathHelper.CloseTo(chargingMachine.Charge, chargingMachine.MaxCharge) && !chargingMachine.Active)
-                {
                     chargingMachine.Active = true;
-                }
             }
             else
             {
                 // Discharging
                 if (MathHelper.CloseTo(chargingMachine.Charge, 0) && chargingMachine.Active)
-                {
                     chargingMachine.Active = false;
-                }
             }
 
             var updateUI = chargingMachine.NeedUIUpdate;
@@ -211,7 +206,7 @@ public sealed class PowerChargeSystem : EntitySystem
             < 0 when atTarget => PowerChargePowerStatus.Off,
             > 0 => PowerChargePowerStatus.Charging,
             < 0 => PowerChargePowerStatus.Discharging,
-            _ => throw new ArgumentOutOfRangeException()
+            _ => throw new ArgumentOutOfRangeException(),
         };
 
         var state = new PowerChargeState(
@@ -240,21 +235,13 @@ public sealed class PowerChargeSystem : EntitySystem
 
 
         if (!machine.Intact)
-        {
             MakeBroken((uid, machine), appearance);
-        }
         else if (powerReceiver.PowerReceived < machine.IdlePowerUse)
-        {
             MakeUnpowered((uid, machine), appearance);
-        }
         else if (!machine.SwitchedOn)
-        {
             MakeOff((uid, machine), appearance);
-        }
         else
-        {
             MakeOn((uid, machine), appearance);
-        }
     }
 
     private void MakeBroken(Entity<PowerChargeComponent> ent, AppearanceComponent? appearance)
@@ -287,4 +274,5 @@ public sealed class PowerChargeSystem : EntitySystem
 }
 
 [ByRefEvent] public record struct ChargedMachineActivatedEvent;
+
 [ByRefEvent] public record struct ChargedMachineDeactivatedEvent;

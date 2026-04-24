@@ -14,7 +14,7 @@ namespace Content.Server.GameTicking.Rules.Components;
 /// Since it's done when added and not when started you can still use normal start logic.
 /// Used for starting subgamemodes in game presets.
 /// </summary>
-[RegisterComponent, Access(typeof(SubGamemodesSystem))]
+[RegisterComponent] [Access(typeof(SubGamemodesSystem))]
 public sealed partial class SubGamemodesComponent : Component
 {
     /// <summary>

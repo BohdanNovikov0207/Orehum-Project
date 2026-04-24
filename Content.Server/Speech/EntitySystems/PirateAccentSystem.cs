@@ -9,10 +9,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Linq;
+using System.Text.RegularExpressions;
 using Content.Server.Speech.Components;
 using Content.Shared.Speech;
 using Robust.Shared.Random;
-using System.Text.RegularExpressions;
 
 namespace Content.Server.Speech.EntitySystems;
 
@@ -53,8 +53,6 @@ public sealed class PirateAccentSystem : EntitySystem
         return msg;
     }
 
-    private void OnAccentGet(EntityUid uid, PirateAccentComponent component, AccentGetEvent args)
-    {
+    private void OnAccentGet(EntityUid uid, PirateAccentComponent component, AccentGetEvent args) =>
         args.Message = Accentuate(args.Message, component);
-    }
 }

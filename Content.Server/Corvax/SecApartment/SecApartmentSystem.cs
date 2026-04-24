@@ -2,10 +2,13 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Linq;
+using System.Numerics;
 using Content.Server.CrewManifest;
 using Content.Server.DeviceLinking.Components;
 using Content.Server.Medical.CrewMonitoring;
 using Content.Server.Pinpointer;
+using Content.Shared.Access.Components;
 using Content.Shared.CrewManifest;
 using Content.Shared.Medical.SuitSensor;
 using Content.Shared.Roles;
@@ -19,33 +22,29 @@ using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Timing;
 using Robust.Shared.Utility;
-using System.Linq;
-using System.Numerics;
-using Content.Shared.Access.Components;
 
 namespace Content.Server.Corvax.SecApartment;
 
-public sealed partial class SecApartmentSystem : EntitySystem
+public sealed class SecApartmentSystem : EntitySystem
 {
-    [Dependency] private readonly SharedStationSystem _station = default!;
-    [Dependency] private readonly CrewManifestSystem _crewManifest = default!;
-    [Dependency] private readonly UserInterfaceSystem _ui = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly IPrototypeManager _prototype = default!;
-    [Dependency] private readonly IGameTiming _gameTiming = default!;
-    [Dependency] private readonly NavMapSystem _navMap = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
-
-    private readonly Dictionary<EntityUid, StationData> _stationData = new();
-    private readonly Dictionary<NetEntity, TimeSpan> _finishedTimers = new();
-
     private const string SecurityDepartment = "Security";
-    private readonly HashSet<string> _securityJobs = new();
-    private TimeSpan _lastSensorUpdate = TimeSpan.Zero;
-    private TimeSpan _lastTimerUpdate = TimeSpan.Zero;
 
     private const int MaxSquadNameLength = 16;
     private const int MaxSquadDescriptionLength = 256;
+    [Dependency] private readonly CrewManifestSystem _crewManifest = default!;
+    private readonly Dictionary<NetEntity, TimeSpan> _finishedTimers = new();
+    [Dependency] private readonly IGameTiming _gameTiming = default!;
+    [Dependency] private readonly NavMapSystem _navMap = default!;
+    [Dependency] private readonly IPrototypeManager _prototype = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    private readonly HashSet<string> _securityJobs = new();
+    [Dependency] private readonly SharedStationSystem _station = default!;
+
+    private readonly Dictionary<EntityUid, StationData> _stationData = new();
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
+    [Dependency] private readonly UserInterfaceSystem _ui = default!;
+    private TimeSpan _lastSensorUpdate = TimeSpan.Zero;
+    private TimeSpan _lastTimerUpdate = TimeSpan.Zero;
 
     public override void Initialize()
     {
@@ -87,7 +86,9 @@ public sealed partial class SecApartmentSystem : EntitySystem
 
             var query = EntityQueryEnumerator<SecApartmentComponent>();
             while (query.MoveNext(out var uid, out var comp))
+            {
                 UpdateSensorStatuses(uid, comp);
+            }
         }
 
         if (currentTime - _lastTimerUpdate >= TimeSpan.FromSeconds(1))
@@ -105,7 +106,9 @@ public sealed partial class SecApartmentSystem : EntitySystem
             if (department.ID == SecurityDepartment)
             {
                 foreach (var role in department.Roles)
+                {
                     _securityJobs.Add(role);
+                }
 
                 break;
             }
@@ -131,7 +134,8 @@ public sealed partial class SecApartmentSystem : EntitySystem
         var squadLocations = new Dictionary<string, (string Location, bool HasLocation)>();
 
         var squads = _stationData.TryGetValue(comp.Station.Value, out var stationData)
-            ? stationData.Squads : new List<Squad>();
+            ? stationData.Squads
+            : new List<Squad>();
 
         foreach (var squad in squads)
         {
@@ -148,7 +152,8 @@ public sealed partial class SecApartmentSystem : EntitySystem
         _ui.SetUiState(uid, SecApartmentUiKey.Key, statusUpdate);
     }
 
-    private void UpdateAndCollectSquadData(Squad squad, List<CrewMemberInfo> securityCrew,
+    private void UpdateAndCollectSquadData(Squad squad,
+        List<CrewMemberInfo> securityCrew,
         Dictionary<string, SuitSensorStatus?> statusDict)
     {
         foreach (var squadMember in squad.Members)
@@ -196,162 +201,8 @@ public sealed partial class SecApartmentSystem : EntitySystem
             args.Cancel();
     }
 
-    private void OnUIOpened(Entity<SecApartmentComponent> ent, ref BoundUIOpenedEvent args)
-    {
+    private void OnUIOpened(Entity<SecApartmentComponent> ent, ref BoundUIOpenedEvent args) =>
         UpdateUi(ent.Owner, ent.Comp);
-    }
-
-    #region UI Message Handlers
-
-    private void OnCreateSquad(EntityUid uid, SecApartmentComponent component, CreateSquadMessage msg)
-    {
-        if (string.IsNullOrWhiteSpace(msg.SquadName) || component.Station == null)
-            return;
-
-        if (!_stationData.TryGetValue(component.Station.Value, out var stationData))
-        {
-            stationData = new StationData();
-            _stationData[component.Station.Value] = stationData;
-        }
-
-        var squadId = $"squad_{_random.Next(1000, 9999)}";
-        var squadName = SanitizeString(msg.SquadName, MaxSquadNameLength);
-        var squad = new Squad(squadId, squadName);
-        stationData.Squads.Add(squad);
-
-        UpdateAllTabletsOnStation(component.Station.Value);
-    }
-
-    private void OnDeleteSquad(EntityUid uid, SecApartmentComponent component, DeleteSquadMessage msg)
-    {
-        if (component.Station == null || !_stationData.TryGetValue(component.Station.Value, out var stationData))
-            return;
-
-        var squad = stationData.Squads.FirstOrDefault(s => s.SquadId == msg.SquadId);
-        if (squad == null)
-            return;
-
-        foreach (var member in squad.Members)
-        {
-            RemoveSquadMemberComponent(member);
-        }
-
-        stationData.Squads.Remove(squad);
-        UpdateAllTabletsOnStation(component.Station.Value);
-    }
-
-    private void OnRenameSquad(EntityUid uid, SecApartmentComponent component, RenameSquadMessage msg)
-    {
-        if (component.Station == null || !_stationData.TryGetValue(component.Station.Value, out var stationData)
-            || string.IsNullOrWhiteSpace(msg.NewName))
-            return;
-
-        var squad = stationData.Squads.FirstOrDefault(s => s.SquadId == msg.SquadId);
-        if (squad == null)
-            return;
-
-        squad.Name = SanitizeString(msg.NewName, MaxSquadNameLength);
-        UpdateAllTabletsOnStation(component.Station.Value);
-    }
-
-    private void OnChangeSquadIcon(EntityUid uid, SecApartmentComponent component, ChangeSquadIconMessage msg)
-    {
-        if (component.Station == null || !_stationData.TryGetValue(component.Station.Value, out var stationData))
-            return;
-
-        var squad = stationData.Squads.FirstOrDefault(s => s.SquadId == msg.SquadId);
-        if (squad == null)
-            return;
-
-        squad.IconId = msg.IconId;
-        UpdateAllTabletsOnStation(component.Station.Value);
-
-        UpdateSquadMemberIcons(squad, uid, component.Station.Value);
-    }
-
-    private void OnUpdateSquadDescription(EntityUid uid, SecApartmentComponent component, UpdateSquadDescriptionMessage msg)
-    {
-        if (component.Station == null || !_stationData.TryGetValue(component.Station.Value, out var stationData))
-            return;
-
-        var squad = stationData.Squads.FirstOrDefault(s => s.SquadId == msg.SquadId);
-        if (squad == null)
-            return;
-
-        squad.Description = SanitizeString(msg.Description, MaxSquadDescriptionLength);
-        UpdateAllTabletsOnStation(component.Station.Value);
-    }
-
-    private void OnAddMemberToSquad(EntityUid uid, SecApartmentComponent component, AddMemberToSquadMessage msg)
-    {
-        if (component.Station == null || !_stationData.TryGetValue(component.Station.Value, out var stationData))
-            return;
-
-        var squad = stationData.Squads.FirstOrDefault(s => s.SquadId == msg.SquadId);
-        if (squad == null)
-            return;
-
-        var securityCrew = GetSecurityCrew(uid, component.Station.Value);
-        var member = securityCrew.FirstOrDefault(c => c.MemberId == msg.MemberId);
-        if (member == null)
-            return;
-
-        foreach (var otherSquad in stationData.Squads)
-        {
-            if (otherSquad.Members.RemoveAll(m => m.MemberId == msg.MemberId) > 0)
-                RemoveSquadMemberComponent(member);
-        }
-
-        if (!squad.Members.Any(m => m.MemberId == msg.MemberId))
-        {
-            squad.Members.Add(member);
-            AddSquadMemberComponent(member, GetIconPrototypeId(squad.IconId));
-        }
-
-        UpdateAllTabletsOnStation(component.Station.Value);
-    }
-
-    private void OnRemoveMemberFromSquad(EntityUid uid, SecApartmentComponent component, RemoveMemberFromSquadMessage msg)
-    {
-        if (component.Station == null || !_stationData.TryGetValue(component.Station.Value, out var stationData))
-            return;
-
-        var squad = stationData.Squads.FirstOrDefault(s => s.SquadId == msg.SquadId);
-        if (squad == null)
-            return;
-
-        var member = squad.Members.FirstOrDefault(m => m.MemberId == msg.MemberId);
-        squad.Members.RemoveAll(m => m.MemberId == msg.MemberId);
-
-        if (member != null)
-        {
-            RemoveSquadMemberComponent(member);
-        }
-
-        UpdateAllTabletsOnStation(component.Station.Value);
-    }
-
-    private void OnChangeSquadStatus(EntityUid uid, SecApartmentComponent component, ChangeSquadStatusMessage msg)
-    {
-        if (component.Station == null || !_stationData.TryGetValue(component.Station.Value, out var stationData))
-            return;
-
-        var squad = stationData.Squads.FirstOrDefault(s => s.SquadId == msg.SquadId);
-        if (squad == null)
-            return;
-
-        squad.Status = msg.Status;
-        UpdateAllTabletsOnStation(component.Station.Value);
-    }
-
-    private void OnRemoveTimer(EntityUid uid, SecApartmentComponent component, RemoveTimerMessage msg)
-    {
-        var timerUid = GetEntity(msg.TimerUid);
-        if (Exists(timerUid))
-            RemoveTimerFromTrack(timerUid);
-    }
-
-    #endregion
 
     private void UpdateSquadMemberIcons(Squad squad, EntityUid tabletUid, EntityUid station)
     {
@@ -403,7 +254,8 @@ public sealed partial class SecApartmentSystem : EntitySystem
         var securityCrew = GetSecurityCrew(uid, comp.Station.Value);
 
         var squads = _stationData.TryGetValue(comp.Station.Value, out var stationData)
-            ? stationData.Squads : new List<Squad>();
+            ? stationData.Squads
+            : new List<Squad>();
 
         var assignedMemberIds = new HashSet<string>();
         foreach (var squad in squads)
@@ -476,12 +328,11 @@ public sealed partial class SecApartmentSystem : EntitySystem
         return result;
     }
 
-    private string GenerateMemberId(CrewManifestEntry entry)
-    {
-        return $"{entry.Name.GetHashCode():X8}_{entry.JobPrototype}_{entry.JobTitle.GetHashCode():X8}";
-    }
+    private string GenerateMemberId(CrewManifestEntry entry) =>
+        $"{entry.Name.GetHashCode():X8}_{entry.JobPrototype}_{entry.JobTitle.GetHashCode():X8}";
 
-    private (string Location, bool HasLocation) GetSquadApproximateLocation(Squad squad, List<CrewMemberInfo> securityCrew)
+    private (string Location, bool HasLocation) GetSquadApproximateLocation(Squad squad,
+        List<CrewMemberInfo> securityCrew)
     {
         var trackedPositions = new List<Vector2>();
         var mapId = MapId.Nullspace;
@@ -514,6 +365,7 @@ public sealed partial class SecApartmentSystem : EntitySystem
         {
             averagePos += pos;
         }
+
         averagePos /= trackedPositions.Count;
 
         try
@@ -530,9 +382,8 @@ public sealed partial class SecApartmentSystem : EntitySystem
         }
     }
 
-    private string GetIconPrototypeId(SquadIconNum icon)
-    {
-        return icon switch
+    private string GetIconPrototypeId(SquadIconNum icon) =>
+        icon switch
         {
             SquadIconNum.Alpha => "SecuritySquadIconAlpha",
             SquadIconNum.Beta => "SecuritySquadIconBeta",
@@ -558,9 +409,8 @@ public sealed partial class SecApartmentSystem : EntitySystem
             SquadIconNum.Hi => "SecuritySquadIconHi",
             SquadIconNum.Psi => "SecuritySquadIconPsi",
             SquadIconNum.Omega => "SecuritySquadIconOmega",
-            _ => "SecuritySquadIconAlpha"
+            _ => "SecuritySquadIconAlpha",
         };
-    }
 
     private static string SanitizeString(string input, int maxLength)
     {
@@ -569,16 +419,168 @@ public sealed partial class SecApartmentSystem : EntitySystem
             sanitized = sanitized[..maxLength];
         return sanitized;
     }
-    #region Timers
-    private void OnTimerStartup(EntityUid uid, ActiveSignalTimerComponent component, ComponentStartup args)
+
+    #region UI Message Handlers
+
+    private void OnCreateSquad(EntityUid uid, SecApartmentComponent component, CreateSquadMessage msg)
     {
-        AddTimerToTrack(uid);
+        if (string.IsNullOrWhiteSpace(msg.SquadName) || component.Station == null)
+            return;
+
+        if (!_stationData.TryGetValue(component.Station.Value, out var stationData))
+        {
+            stationData = new StationData();
+            _stationData[component.Station.Value] = stationData;
+        }
+
+        var squadId = $"squad_{_random.Next(1000, 9999)}";
+        var squadName = SanitizeString(msg.SquadName, MaxSquadNameLength);
+        var squad = new Squad(squadId, squadName);
+        stationData.Squads.Add(squad);
+
+        UpdateAllTabletsOnStation(component.Station.Value);
     }
 
-    private void OnTimerComponentShutdown(EntityUid uid, SignalTimerComponent component, ComponentShutdown args)
+    private void OnDeleteSquad(EntityUid uid, SecApartmentComponent component, DeleteSquadMessage msg)
     {
-        RemoveTimerFromTrack(uid);
+        if (component.Station == null || !_stationData.TryGetValue(component.Station.Value, out var stationData))
+            return;
+
+        var squad = stationData.Squads.FirstOrDefault(s => s.SquadId == msg.SquadId);
+        if (squad == null)
+            return;
+
+        foreach (var member in squad.Members)
+        {
+            RemoveSquadMemberComponent(member);
+        }
+
+        stationData.Squads.Remove(squad);
+        UpdateAllTabletsOnStation(component.Station.Value);
     }
+
+    private void OnRenameSquad(EntityUid uid, SecApartmentComponent component, RenameSquadMessage msg)
+    {
+        if (component.Station == null || !_stationData.TryGetValue(component.Station.Value, out var stationData)
+                                      || string.IsNullOrWhiteSpace(msg.NewName))
+            return;
+
+        var squad = stationData.Squads.FirstOrDefault(s => s.SquadId == msg.SquadId);
+        if (squad == null)
+            return;
+
+        squad.Name = SanitizeString(msg.NewName, MaxSquadNameLength);
+        UpdateAllTabletsOnStation(component.Station.Value);
+    }
+
+    private void OnChangeSquadIcon(EntityUid uid, SecApartmentComponent component, ChangeSquadIconMessage msg)
+    {
+        if (component.Station == null || !_stationData.TryGetValue(component.Station.Value, out var stationData))
+            return;
+
+        var squad = stationData.Squads.FirstOrDefault(s => s.SquadId == msg.SquadId);
+        if (squad == null)
+            return;
+
+        squad.IconId = msg.IconId;
+        UpdateAllTabletsOnStation(component.Station.Value);
+
+        UpdateSquadMemberIcons(squad, uid, component.Station.Value);
+    }
+
+    private void OnUpdateSquadDescription(EntityUid uid,
+        SecApartmentComponent component,
+        UpdateSquadDescriptionMessage msg)
+    {
+        if (component.Station == null || !_stationData.TryGetValue(component.Station.Value, out var stationData))
+            return;
+
+        var squad = stationData.Squads.FirstOrDefault(s => s.SquadId == msg.SquadId);
+        if (squad == null)
+            return;
+
+        squad.Description = SanitizeString(msg.Description, MaxSquadDescriptionLength);
+        UpdateAllTabletsOnStation(component.Station.Value);
+    }
+
+    private void OnAddMemberToSquad(EntityUid uid, SecApartmentComponent component, AddMemberToSquadMessage msg)
+    {
+        if (component.Station == null || !_stationData.TryGetValue(component.Station.Value, out var stationData))
+            return;
+
+        var squad = stationData.Squads.FirstOrDefault(s => s.SquadId == msg.SquadId);
+        if (squad == null)
+            return;
+
+        var securityCrew = GetSecurityCrew(uid, component.Station.Value);
+        var member = securityCrew.FirstOrDefault(c => c.MemberId == msg.MemberId);
+        if (member == null)
+            return;
+
+        foreach (var otherSquad in stationData.Squads)
+        {
+            if (otherSquad.Members.RemoveAll(m => m.MemberId == msg.MemberId) > 0)
+                RemoveSquadMemberComponent(member);
+        }
+
+        if (!squad.Members.Any(m => m.MemberId == msg.MemberId))
+        {
+            squad.Members.Add(member);
+            AddSquadMemberComponent(member, GetIconPrototypeId(squad.IconId));
+        }
+
+        UpdateAllTabletsOnStation(component.Station.Value);
+    }
+
+    private void OnRemoveMemberFromSquad(EntityUid uid,
+        SecApartmentComponent component,
+        RemoveMemberFromSquadMessage msg)
+    {
+        if (component.Station == null || !_stationData.TryGetValue(component.Station.Value, out var stationData))
+            return;
+
+        var squad = stationData.Squads.FirstOrDefault(s => s.SquadId == msg.SquadId);
+        if (squad == null)
+            return;
+
+        var member = squad.Members.FirstOrDefault(m => m.MemberId == msg.MemberId);
+        squad.Members.RemoveAll(m => m.MemberId == msg.MemberId);
+
+        if (member != null)
+            RemoveSquadMemberComponent(member);
+
+        UpdateAllTabletsOnStation(component.Station.Value);
+    }
+
+    private void OnChangeSquadStatus(EntityUid uid, SecApartmentComponent component, ChangeSquadStatusMessage msg)
+    {
+        if (component.Station == null || !_stationData.TryGetValue(component.Station.Value, out var stationData))
+            return;
+
+        var squad = stationData.Squads.FirstOrDefault(s => s.SquadId == msg.SquadId);
+        if (squad == null)
+            return;
+
+        squad.Status = msg.Status;
+        UpdateAllTabletsOnStation(component.Station.Value);
+    }
+
+    private void OnRemoveTimer(EntityUid uid, SecApartmentComponent component, RemoveTimerMessage msg)
+    {
+        var timerUid = GetEntity(msg.TimerUid);
+        if (Exists(timerUid))
+            RemoveTimerFromTrack(timerUid);
+    }
+
+    #endregion
+
+    #region Timers
+
+    private void OnTimerStartup(EntityUid uid, ActiveSignalTimerComponent component, ComponentStartup args) =>
+        AddTimerToTrack(uid);
+
+    private void OnTimerComponentShutdown(EntityUid uid, SignalTimerComponent component, ComponentShutdown args) =>
+        RemoveTimerFromTrack(uid);
 
     private void OnGenpopStartup(EntityUid uid, GenpopIdCardComponent component, ComponentStartup args)
     {
@@ -586,10 +588,8 @@ public sealed partial class SecApartmentSystem : EntitySystem
             AddTimerToTrack(uid);
     }
 
-    private void OnGenpopShutdown(EntityUid uid, GenpopIdCardComponent component, ComponentShutdown args)
-    {
+    private void OnGenpopShutdown(EntityUid uid, GenpopIdCardComponent component, ComponentShutdown args) =>
         RemoveTimerFromTrack(uid);
-    }
 
     private void AddTimerToTrack(EntityUid timerUid)
     {
@@ -636,7 +636,9 @@ public sealed partial class SecApartmentSystem : EntitySystem
         }
 
         foreach (var station in stationsToUpdate)
+        {
             UpdateTimerStateForStation(station);
+        }
     }
 
     private void UpdateTimerStateForStation(EntityUid station)
@@ -659,9 +661,7 @@ public sealed partial class SecApartmentSystem : EntitySystem
                     TimeSpan remaining;
                     var total = TimeSpan.FromSeconds(timerComp.Delay);
                     if (TryComp<ActiveSignalTimerComponent>(timerUid, out var activeComp))
-                    {
                         remaining = activeComp.TriggerTime - _gameTiming.CurTime;
-                    }
                     else
                     {
                         if (!_finishedTimers.TryGetValue(netEntity, out var finishedTime))
@@ -669,12 +669,14 @@ public sealed partial class SecApartmentSystem : EntitySystem
                             finishedTime = _gameTiming.CurTime;
                             _finishedTimers[netEntity] = finishedTime;
                         }
+
                         remaining = finishedTime - _gameTiming.CurTime;
                     }
 
                     timers.Add(new TimerEntry(netEntity, timerComp.Label, remaining, total));
                 }
-                else if (TryComp<GenpopIdCardComponent>(timerUid, out var genpopComp) && TryComp<ExpireIdCardComponent>(timerUid, out var expireComp))
+                else if (TryComp<GenpopIdCardComponent>(timerUid, out var genpopComp) &&
+                         TryComp<ExpireIdCardComponent>(timerUid, out var expireComp))
                 {
                     if (expireComp.Permanent || expireComp.Expired)
                     {
@@ -682,12 +684,13 @@ public sealed partial class SecApartmentSystem : EntitySystem
                         continue;
                     }
 
-                    timers.Add(new TimerEntry(netEntity, MetaData(timerUid).EntityName, expireComp.ExpireTime - _gameTiming.CurTime, genpopComp.SentenceDuration));
+                    timers.Add(new TimerEntry(netEntity,
+                        MetaData(timerUid).EntityName,
+                        expireComp.ExpireTime - _gameTiming.CurTime,
+                        genpopComp.SentenceDuration));
                 }
                 else
-                {
                     stationData.TrackedTimers.Remove(netEntity);
-                }
             }
         }
 
@@ -701,11 +704,12 @@ public sealed partial class SecApartmentSystem : EntitySystem
             }
         }
     }
+
     #endregion
 }
 
 public sealed class StationData
 {
-    public List<Squad> Squads { get; } = new();
     public readonly HashSet<NetEntity> TrackedTimers = new();
+    public List<Squad> Squads { get; } = new();
 }

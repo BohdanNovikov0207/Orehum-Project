@@ -8,7 +8,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Server.Antag;
-using Content.Server.Station.Components;
 using Content.Server.StationEvents.Components;
 using Content.Shared.GameTicking.Components;
 using Robust.Shared.Map;
@@ -30,7 +29,10 @@ public sealed class SpaceSpawnRule : StationEventSystem<SpaceSpawnRuleComponent>
         SubscribeLocalEvent<SpaceSpawnRuleComponent, AntagSelectLocationEvent>(OnSelectLocation);
     }
 
-    protected override void Added(EntityUid uid, SpaceSpawnRuleComponent comp, GameRuleComponent gameRule, GameRuleAddedEvent args)
+    protected override void Added(EntityUid uid,
+        SpaceSpawnRuleComponent comp,
+        GameRuleComponent gameRule,
+        GameRuleAddedEvent args)
     {
         base.Added(uid, comp, gameRule, args);
 
@@ -65,7 +67,7 @@ public sealed class SpaceSpawnRule : StationEventSystem<SpaceSpawnRuleComponent>
 
     private void OnSelectLocation(Entity<SpaceSpawnRuleComponent> ent, ref AntagSelectLocationEvent args)
     {
-        if (ent.Comp.Coords is {} coords)
+        if (ent.Comp.Coords is { } coords)
             args.Coordinates.Add(coords);
     }
 }

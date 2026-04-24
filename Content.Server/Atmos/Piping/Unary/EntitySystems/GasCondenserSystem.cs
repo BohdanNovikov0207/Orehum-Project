@@ -10,6 +10,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Server.Atmos.EntitySystems;
 using Content.Server.Atmos.Piping.Components;
 using Content.Server.Atmos.Piping.Unary.Components;
@@ -19,7 +20,6 @@ using Content.Server.Power.Components;
 using Content.Server.Power.EntitySystems;
 using Content.Shared.Atmos;
 using Content.Shared.Chemistry.EntitySystems;
-using Content.Goobstation.Maths.FixedPoint;
 using JetBrains.Annotations;
 
 namespace Content.Server.Atmos.Piping.Unary.EntitySystems;
@@ -28,8 +28,8 @@ namespace Content.Server.Atmos.Piping.Unary.EntitySystems;
 public sealed class GasCondenserSystem : EntitySystem
 {
     [Dependency] private readonly AtmosphereSystem _atmosphereSystem = default!;
-    [Dependency] private readonly PowerReceiverSystem _power = default!;
     [Dependency] private readonly NodeContainerSystem _nodeContainer = default!;
+    [Dependency] private readonly PowerReceiverSystem _power = default!;
     [Dependency] private readonly SharedSolutionContainerSystem _solution = default!;
 
     public override void Initialize()
@@ -43,10 +43,11 @@ public sealed class GasCondenserSystem : EntitySystem
     {
         if (!(TryComp<ApcPowerReceiverComponent>(entity, out var receiver) && _power.IsPowered(entity, receiver))
             || !_nodeContainer.TryGetNode(entity.Owner, entity.Comp.Inlet, out PipeNode? inlet)
-            || !_solution.ResolveSolution(entity.Owner, entity.Comp.SolutionId, ref entity.Comp.Solution, out var solution))
-        {
+            || !_solution.ResolveSolution(entity.Owner,
+                entity.Comp.SolutionId,
+                ref entity.Comp.Solution,
+                out var solution))
             return;
-        }
 
         if (solution.AvailableVolume == 0 || inlet.Air.TotalMoles == 0)
             return;
@@ -70,7 +71,7 @@ public sealed class GasCondenserSystem : EntitySystem
             solution.AddReagent(gasReagent, amount);
 
             // if we have leftover reagent, then convert it back to moles and put it back in the mixture.
-            inlet.Air.AdjustMoles(i, moles - (amount.Float() / moleToReagentMultiplier));
+            inlet.Air.AdjustMoles(i, moles - amount.Float() / moleToReagentMultiplier);
         }
 
         _solution.UpdateChemicals(entity.Comp.Solution.Value);

@@ -22,7 +22,7 @@ namespace Content.Server.Disposal.Tube;
 public partial class DisposalJunctionComponent : Component
 {
     /// <summary>
-    ///     The angles to connect to.
+    /// The angles to connect to.
     /// </summary>
     [DataField("degrees")] public List<Angle> Degrees = new();
 }

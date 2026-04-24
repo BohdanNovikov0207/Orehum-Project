@@ -20,6 +20,7 @@ namespace Content.Server.Objectives.Systems;
 public sealed class RoleRequirementSystem : EntitySystem
 {
     [Dependency] private readonly SharedRoleSystem _roles = default!;
+
     public override void Initialize()
     {
         base.Initialize();

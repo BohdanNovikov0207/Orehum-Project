@@ -99,9 +99,7 @@ public sealed partial class DockingSystem
             gridDock.Docked ||
             !shuttleDockXform.Anchored ||
             !gridDockXform.Anchored)
-        {
             return false;
-        }
 
         // First, get the station dock's position relative to the shuttle, this is where we rotate it around
         var stationDockPos = shuttleDockXform.LocalPosition +
@@ -136,14 +134,14 @@ public sealed partial class DockingSystem
         DockingComponent gridDock)
     {
         var shuttleDocks = new List<Entity<DockingComponent>>(1)
-       {
-           (shuttleDockUid, shuttleDock)
-       };
+        {
+            (shuttleDockUid, shuttleDock),
+        };
 
         var gridDocks = new List<Entity<DockingComponent>>(1)
-       {
-           (gridDockUid, gridDock)
-       };
+        {
+            (gridDockUid, gridDock),
+        };
 
         return GetDockingConfigPrivate(shuttleUid, targetGrid, shuttleDocks, gridDocks);
     }
@@ -177,15 +175,11 @@ public sealed partial class DockingSystem
         foreach (var config in configs)
         {
             if (config.Coordinates.Equals(coordinates) && config.Angle.EqualsApprox(angle, 0.15))
-            {
                 return config;
-            }
         }
 
         if (fallback && configs.Count > 0)
-        {
             return configs.First();
-        }
 
         return null;
     }
@@ -225,8 +219,10 @@ public sealed partial class DockingSystem
                     var gridXform = _xformQuery.GetComponent(gridDockUid);
 
                     if (!CanDock(
-                            shuttleDock, shuttleDockXform,
-                            gridDock, gridXform,
+                            shuttleDock,
+                            shuttleDockXform,
+                            gridDock,
+                            gridXform,
                             shuttleAABB,
                             targetGridAngle,
                             shuttleFixturesComp,
@@ -235,33 +231,37 @@ public sealed partial class DockingSystem
                             out var matty,
                             out var dockedAABB,
                             out var targetAngle))
-                    {
                         continue;
-                    }
 
                     // Can't just use the AABB as we want to get bounds as tight as possible.
                     var gridPosition = new EntityCoordinates(targetGrid, Vector2.Transform(Vector2.Zero, matty));
-                    var spawnPosition = new EntityCoordinates(targetGridXform.MapUid!.Value, _transform.ToMapCoordinates(gridPosition).Position);
+                    var spawnPosition = new EntityCoordinates(targetGridXform.MapUid!.Value,
+                        _transform.ToMapCoordinates(gridPosition).Position);
 
                     // TODO: use tight bounds
-                    var dockedBounds = new Box2Rotated(shuttleAABB.Translated(spawnPosition.Position), targetAngle, spawnPosition.Position);
+                    var dockedBounds = new Box2Rotated(shuttleAABB.Translated(spawnPosition.Position),
+                        targetAngle,
+                        spawnPosition.Position);
 
                     // Check if there's no intersecting grids (AKA oh god it's docking at cargo).
                     grids.Clear();
-                    _mapManager.FindGridsIntersecting(targetGridXform.MapID, dockedBounds, ref grids, includeMap: false);
+                    _mapManager.FindGridsIntersecting(targetGridXform.MapID,
+                        dockedBounds,
+                        ref grids,
+                        includeMap: false);
                     if (grids.Any(o => o.Owner != targetGrid && o.Owner != targetGridXform.MapUid))
-                    {
                         continue;
-                    }
 
                     // Alright well the spawn is valid now to check how many we can connect
                     // Get the matrix for each shuttle dock and test it against the grid docks to see
                     // if the connected position / direction matches.
 
-                    var dockedPorts = new List<(EntityUid DockAUid, EntityUid DockBUid, DockingComponent DockA, DockingComponent DockB)>()
-                   {
-                       (dockUid, gridDockUid, shuttleDock, gridDock),
-                   };
+                    var dockedPorts =
+                        new List<(EntityUid DockAUid, EntityUid DockBUid, DockingComponent DockA, DockingComponent DockB
+                            )>
+                        {
+                            (dockUid, gridDockUid, shuttleDock, gridDock),
+                        };
 
                     dockedAABB = dockedAABB.Rounded(DockRoundingDigits);
 
@@ -288,24 +288,20 @@ public sealed partial class DockingSystem
                                     out _,
                                     out var otherdockedAABB,
                                     out var otherTargetAngle))
-                            {
                                 continue;
-                            }
 
                             otherdockedAABB = otherdockedAABB.Rounded(DockRoundingDigits);
 
                             // Different setup.
                             if (!targetAngle.Equals(otherTargetAngle) ||
                                 !dockedAABB.Equals(otherdockedAABB))
-                            {
                                 continue;
-                            }
 
                             dockedPorts.Add((otherUid, otherGridUid, other, otherGrid));
                         }
                     }
 
-                    validDockConfigs.Add(new DockingConfig()
+                    validDockConfigs.Add(new DockingConfig
                     {
                         Docks = dockedPorts,
                         Coordinates = gridPosition,
@@ -335,9 +331,10 @@ public sealed partial class DockingSystem
 
         // Prioritise by priority docks, then by maximum connected ports, then by most similar angle.
         validDockConfigs = validDockConfigs
-           .OrderByDescending(x => IsConfigPriority(x, priorityTag))
-           .ThenByDescending(x => x.Docks.Count)
-           .ThenBy(x => Math.Abs(Angle.ShortestDistance(x.Angle.Reduced(), targetGridAngle).Theta)).ToList();
+            .OrderByDescending(x => IsConfigPriority(x, priorityTag))
+            .ThenByDescending(x => x.Docks.Count)
+            .ThenBy(x => Math.Abs(Angle.ShortestDistance(x.Angle.Reduced(), targetGridAngle).Theta))
+            .ToList();
 
         var location = validDockConfigs.First();
         location.TargetGrid = targetGrid;
@@ -346,24 +343,26 @@ public sealed partial class DockingSystem
         return location;
     }
 
-    public bool IsConfigPriority(DockingConfig config, string? priorityTag)
-    {
-        return config.Docks.Any(docks =>
+    public bool IsConfigPriority(DockingConfig config, string? priorityTag) =>
+        config.Docks.Any(docks =>
             TryComp<PriorityDockComponent>(docks.DockBUid, out var priority)
             && priority.Tag?.Equals(priorityTag) == true);
-    }
 
     /// <summary>
     /// Checks whether the shuttle can warp to the specified position.
     /// </summary>
-    private bool ValidSpawn(Entity<MapGridComponent> gridEntity, Matrix3x2 matty, Angle angle, FixturesComponent shuttleFixturesComp, bool isMap)
+    private bool ValidSpawn(Entity<MapGridComponent> gridEntity,
+        Matrix3x2 matty,
+        Angle angle,
+        FixturesComponent shuttleFixturesComp,
+        bool isMap)
     {
         var transform = new Transform(Vector2.Transform(Vector2.Zero, matty), angle);
 
         // Because some docking bounds are tight af need to check each chunk individually
         foreach (var fix in shuttleFixturesComp.Fixtures.Values)
         {
-            var polyShape = (PolygonShape)fix.Shape;
+            var polyShape = (PolygonShape) fix.Shape;
             var aabb = polyShape.ComputeAABB(transform, 0);
             aabb = aabb.Enlarged(-0.01f);
 
@@ -374,16 +373,15 @@ public sealed partial class DockingSystem
 
                 while (localTiles.MoveNext(out var tile))
                 {
-                    var anchoredEnumerator = _mapSystem.GetAnchoredEntitiesEnumerator(gridEntity.Owner, gridEntity.Comp, tile.GridIndices);
+                    var anchoredEnumerator =
+                        _mapSystem.GetAnchoredEntitiesEnumerator(gridEntity.Owner, gridEntity.Comp, tile.GridIndices);
 
                     while (anchoredEnumerator.MoveNext(out var anc))
                     {
                         if (!_physicsQuery.TryGetComponent(anc, out var physics) ||
                             !physics.CanCollide ||
                             !physics.Hard)
-                        {
                             continue;
-                        }
 
                         return false;
                     }

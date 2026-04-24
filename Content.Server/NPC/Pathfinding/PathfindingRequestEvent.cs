@@ -9,8 +9,8 @@ namespace Content.Server.NPC.Pathfinding;
 
 public sealed class PathfindingRequestEvent : EntityEventArgs
 {
-    public EntityCoordinates Start;
     public EntityCoordinates End;
+    public EntityCoordinates Start;
 
     // TODO: Need stuff like can we break shit, can we pry, collision mask, etc
 }

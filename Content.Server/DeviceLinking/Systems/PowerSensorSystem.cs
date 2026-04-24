@@ -6,10 +6,9 @@
 // SPDX-License-Identifier: MIT
 
 using Content.Server.DeviceLinking.Components;
-using Content.Server.NodeContainer;
 using Content.Server.Power.EntitySystems;
-using Content.Server.Power.Nodes;
 using Content.Server.Power.NodeGroups;
+using Content.Server.Power.Nodes;
 using Content.Shared.Examine;
 using Content.Shared.Interaction;
 using Content.Shared.NodeContainer;
@@ -25,11 +24,11 @@ namespace Content.Server.DeviceLinking.Systems;
 
 public sealed class PowerSensorSystem : EntitySystem
 {
-    [Dependency] private readonly DeviceLinkSystem _deviceLink = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly PowerNetSystem _powerNet = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly DeviceLinkSystem _deviceLink = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly PowerNetSystem _powerNet = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SharedToolSystem _tool = default!;
     [Dependency] private readonly UseDelaySystem _useDelay = default!;
 
@@ -62,10 +61,8 @@ public sealed class PowerSensorSystem : EntitySystem
         }
     }
 
-    private void OnInit(EntityUid uid, PowerSensorComponent comp, ComponentInit args)
-    {
+    private void OnInit(EntityUid uid, PowerSensorComponent comp, ComponentInit args) =>
         _deviceLink.EnsureSourcePorts(uid, comp.ChargingPort, comp.DischargingPort);
-    }
 
     private void OnExamined(EntityUid uid, PowerSensorComponent comp, ExaminedEvent args)
     {

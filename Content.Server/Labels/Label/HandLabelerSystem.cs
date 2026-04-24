@@ -25,5 +25,4 @@ namespace Content.Server.Labels.Label;
 
 public sealed class HandLabelerSystem : SharedHandLabelerSystem
 {
-
 }

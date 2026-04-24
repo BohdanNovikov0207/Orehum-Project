@@ -15,15 +15,15 @@ namespace Content.Server.Speech.EntitySystems;
 public sealed class MumbleAccentSystem : EntitySystem
 {
     [Dependency] private readonly ChatSystem _chat = default!;
-    [Dependency] private readonly ReplacementAccentSystem _replacement = default!;
     [Dependency] private readonly IPrototypeManager _prototype = default!;
+    [Dependency] private readonly ReplacementAccentSystem _replacement = default!;
 
     public override void Initialize()
     {
         base.Initialize();
 
         SubscribeLocalEvent<MumbleAccentComponent, AccentGetEvent>(OnAccentGet);
-        SubscribeLocalEvent<MumbleAccentComponent, EmoteEvent>(OnEmote, before: [typeof(VocalSystem)]);
+        SubscribeLocalEvent<MumbleAccentComponent, EmoteEvent>(OnEmote, [typeof(VocalSystem)]);
     }
 
     private void OnEmote(Entity<MumbleAccentComponent> ent, ref EmoteEvent args)
@@ -42,13 +42,9 @@ public sealed class MumbleAccentSystem : EntitySystem
         }
     }
 
-    public string Accentuate(string message, MumbleAccentComponent component)
-    {
-        return _replacement.ApplyReplacements(message, "mumble");
-    }
+    public string Accentuate(string message, MumbleAccentComponent component) =>
+        _replacement.ApplyReplacements(message, "mumble");
 
-    private void OnAccentGet(Entity<MumbleAccentComponent> ent, ref AccentGetEvent args)
-    {
+    private void OnAccentGet(Entity<MumbleAccentComponent> ent, ref AccentGetEvent args) =>
         args.Message = Accentuate(args.Message, ent.Comp);
-    }
 }

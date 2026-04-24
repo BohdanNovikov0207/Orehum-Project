@@ -22,11 +22,9 @@ public sealed class AutoLinkSystem : EntitySystem
 {
     [Dependency] private readonly DeviceLinkSystem _deviceLinkSystem = default!;
 
-    /// <inheritdoc/>
-    public override void Initialize()
-    {
+    /// <inheritdoc />
+    public override void Initialize() =>
         SubscribeLocalEvent<AutoLinkTransmitterComponent, MapInitEvent>(OnAutoLinkMapInit);
-    }
 
     private void OnAutoLinkMapInit(EntityUid uid, AutoLinkTransmitterComponent component, MapInitEvent args)
     {

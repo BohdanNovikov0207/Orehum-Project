@@ -8,18 +8,17 @@ using Robust.Shared.GameStates;
 
 namespace Content.Server.MapText;
 
-/// <inheritdoc/>
+/// <inheritdoc />
 public sealed class MapTextSystem : SharedMapTextSystem
 {
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
         SubscribeLocalEvent<MapTextComponent, ComponentGetState>(GetCompState);
     }
 
-    private void GetCompState(Entity<MapTextComponent> ent, ref ComponentGetState args)
-    {
+    private void GetCompState(Entity<MapTextComponent> ent, ref ComponentGetState args) =>
         args.State = new MapTextComponentState
         {
             Text = ent.Comp.Text,
@@ -27,7 +26,6 @@ public sealed class MapTextSystem : SharedMapTextSystem
             Color = ent.Comp.Color,
             FontId = ent.Comp.FontId,
             FontSize = ent.Comp.FontSize,
-            Offset = ent.Comp.Offset
+            Offset = ent.Comp.Offset,
         };
-    }
 }

@@ -39,8 +39,9 @@ public sealed class AdminInfoSystem : EntitySystem
         if (main == null)
             return;
 
-        _adminLog.Add(LogType.AdminMessage, LogImpact.High, $"{name} is attempting to connect with a userid from {main.Username}");
+        _adminLog.Add(LogType.AdminMessage,
+            LogImpact.High,
+            $"{name} is attempting to connect with a userid from {main.Username}");
         _chatManager.SendAdminAlert($"{name} is attempting to connect with a userid from {main.Username}");
-
     }
 }

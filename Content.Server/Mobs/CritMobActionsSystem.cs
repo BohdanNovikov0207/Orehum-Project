@@ -15,29 +15,30 @@
 using Content.Server.Administration;
 using Content.Server.Chat.Systems;
 using Content.Server.Popups;
+using Content.Shared.Chat;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Mobs.Systems;
+using Content.Shared.Speech.Muting;
 using Robust.Server.Console;
 using Robust.Shared.Player;
-using Content.Shared.Speech.Muting;
-using Content.Shared.Chat; // Einstein Engines - Languages
+
+// Einstein Engines - Languages
 
 namespace Content.Server.Mobs;
 
 /// <summary>
-///     Handles performing crit-specific actions.
+/// Handles performing crit-specific actions.
 /// </summary>
 public sealed partial class CritMobActionsSystem : EntitySystem
 {
+    private const int MaxLastWordsLength = 30;
     [Dependency] private readonly ChatSystem _chat = default!;
     [Dependency] private readonly DeathgaspSystem _deathgasp = default!;
     [Dependency] private readonly IServerConsoleHost _host = default!;
     [Dependency] private readonly MobStateSystem _mobState = default!;
     [Dependency] private readonly PopupSystem _popupSystem = default!;
     [Dependency] private readonly QuickDialogSystem _quickDialog = default!;
-
-    private const int MaxLastWordsLength = 30;
 
     public override void Initialize()
     {
@@ -85,7 +86,9 @@ public sealed partial class CritMobActionsSystem : EntitySystem
         if (args.Handled) // goob edit
             return;
 
-        _quickDialog.OpenDialog(actor.PlayerSession, Loc.GetString("action-name-crit-last-words"), "",
+        _quickDialog.OpenDialog(actor.PlayerSession,
+            Loc.GetString("action-name-crit-last-words"),
+            "",
             (string lastWords) =>
             {
                 // if a person is gibbed/deleted, they can't say last words
@@ -98,12 +101,15 @@ public sealed partial class CritMobActionsSystem : EntitySystem
                     return;
 
                 if (lastWords.Length > MaxLastWordsLength)
-                {
                     lastWords = lastWords.Substring(0, MaxLastWordsLength);
-                }
                 lastWords += "...";
 
-                _chat.TrySendInGameICMessage(uid, lastWords, InGameICChatType.Whisper, ChatTransmitRange.Normal, checkRadioPrefix: false, ignoreActionBlocker: true);
+                _chat.TrySendInGameICMessage(uid,
+                    lastWords,
+                    InGameICChatType.Whisper,
+                    ChatTransmitRange.Normal,
+                    checkRadioPrefix: false,
+                    ignoreActionBlocker: true);
                 _host.ExecuteCommand(actor.PlayerSession, "ghost");
             });
 

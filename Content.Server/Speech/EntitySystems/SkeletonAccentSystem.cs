@@ -45,14 +45,10 @@ public sealed partial class SkeletonAccentSystem : EntitySystem
 
         // Suffix:
         if (_random.Prob(component.ackChance))
-        {
-            msg += (" " + Loc.GetString("skeleton-suffix")); // e.g. "We only want to socialize. ACK ACK!"
-        }
+            msg += " " + Loc.GetString("skeleton-suffix"); // e.g. "We only want to socialize. ACK ACK!"
         return msg;
     }
 
-    private void OnAccentGet(EntityUid uid, SkeletonAccentComponent component, AccentGetEvent args)
-    {
+    private void OnAccentGet(EntityUid uid, SkeletonAccentComponent component, AccentGetEvent args) =>
         args.Message = Accentuate(args.Message, component);
-    }
 }

@@ -13,23 +13,22 @@ using Content.Server.Administration;
 using Content.Shared.Administration;
 using Content.Shared.Verbs;
 using Robust.Shared.Toolshed;
-using Robust.Shared.Toolshed.Syntax;
 using Robust.Shared.Toolshed.TypeParsers;
 
 namespace Content.Server.Toolshed.Commands.Verbs;
 
-[ToolshedCommand, AdminCommand(AdminFlags.Moderator)]
+[ToolshedCommand] [AdminCommand(AdminFlags.Moderator)]
 public sealed class RunVerbAsCommand : ToolshedCommand
 {
     private SharedVerbSystem? _verb;
 
     [CommandImplementation]
     public IEnumerable<EntityUid> RunVerbAs(
-            IInvocationContext ctx,
-            [PipedArgument] IEnumerable<EntityUid> input,
-            EntityUid runner,
-            string verb
-        )
+        IInvocationContext ctx,
+        [PipedArgument] IEnumerable<EntityUid> input,
+        EntityUid runner,
+        string verb
+    )
     {
         _verb ??= GetSys<SharedVerbSystem>();
         verb = verb.ToLowerInvariant();
@@ -51,7 +50,7 @@ public sealed class RunVerbAsCommand : ToolshedCommand
                 var verbTy = verbs.FirstOrDefault(v => v.GetType() == verbType);
                 if (verbTy != null)
                 {
-                    _verb.ExecuteVerb(verbTy, runner, eId, forced: true);
+                    _verb.ExecuteVerb(verbTy, runner, eId, true);
                     yield return eId;
                 }
             }
@@ -60,7 +59,7 @@ public sealed class RunVerbAsCommand : ToolshedCommand
             {
                 if (verbTy.Text.ToLowerInvariant() == verb)
                 {
-                    _verb.ExecuteVerb(verbTy, runner, eId, forced: true);
+                    _verb.ExecuteVerb(verbTy, runner, eId, true);
                     yield return eId;
                 }
             }

@@ -18,10 +18,7 @@ public sealed partial class PolymorphSystem
     /// <summary>
     /// Used to subscribe to the round restart event
     /// </summary>
-    private void InitializeMap()
-    {
-        SubscribeLocalEvent<RoundRestartCleanupEvent>(OnRoundRestart);
-    }
+    private void InitializeMap() => SubscribeLocalEvent<RoundRestartCleanupEvent>(OnRoundRestart);
 
     private void OnRoundRestart(RoundRestartCleanupEvent _)
     {

@@ -33,7 +33,8 @@ public sealed class AddPolymorphActionCommand : IConsoleCommand
             return;
         }
 
-        if (!NetEntity.TryParse(args[0], out var entityUidNet) || !_entityManager.TryGetEntity(entityUidNet, out var entityUid))
+        if (!NetEntity.TryParse(args[0], out var entityUidNet) ||
+            !_entityManager.TryGetEntity(entityUidNet, out var entityUid))
         {
             shell.WriteError(Loc.GetString("shell-entity-uid-must-be-number"));
             return;

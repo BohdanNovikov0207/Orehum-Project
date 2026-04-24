@@ -20,11 +20,10 @@ namespace Content.Server.Movement.Systems;
 /// </summary>
 public sealed class LagCompensationSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-
     // I figured 500 ping is max, so 1.5 is 750.
     // Max ping I've had is 350ms from aus to spain.
     public static readonly TimeSpan BufferTime = TimeSpan.FromMilliseconds(750);
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -67,7 +66,8 @@ public sealed class LagCompensationSystem : EntitySystem
         component.Positions.Enqueue((_timing.CurTime, args.NewPosition, args.NewRotation));
     }
 
-    public (EntityCoordinates Coordinates, Angle Angle) GetCoordinatesAngle(EntityUid uid, ICommonSession? pSession,
+    public (EntityCoordinates Coordinates, Angle Angle) GetCoordinatesAngle(EntityUid uid,
+        ICommonSession? pSession,
         TransformComponent? xform = null)
     {
         if (!Resolve(uid, ref xform))
@@ -98,9 +98,7 @@ public sealed class LagCompensationSystem : EntitySystem
             angle = xform.LocalRotation;
         }
         else
-        {
             Log.Debug($"Actual coords is {xform.Coordinates} and got {coordinates}");
-        }
 
         return (coordinates, angle);
     }

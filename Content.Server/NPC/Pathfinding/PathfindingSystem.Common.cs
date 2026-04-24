@@ -21,14 +21,6 @@ public sealed partial class PathfindingSystem
     /// </summary>
     private const int NodeLimit = 512;
 
-    private sealed class PathComparer : IComparer<ValueTuple<float, PathPoly>>
-    {
-        public int Compare((float, PathPoly) x, (float, PathPoly) y)
-        {
-            return y.Item1.CompareTo(x.Item1);
-        }
-    }
-
     private static readonly PathComparer PathPolyComparer = new();
 
     private List<PathPoly> ReconstructPath(Dictionary<PathPoly, PathPoly> path, PathPoly currentNodeRef)
@@ -52,9 +44,7 @@ public sealed partial class PathfindingSystem
 
         // TODO
         if ((end.Data.Flags & PathfindingBreadcrumbFlag.Space) != 0x0)
-        {
             return 0f;
-        }
 
         if ((request.CollisionLayer & end.Data.CollisionMask) != 0x0 ||
             (request.CollisionMask & end.Data.CollisionLayer) != 0x0)
@@ -66,29 +56,24 @@ public sealed partial class PathfindingSystem
             // TODO: Handling power + door prying
             // Door we should be able to open
             if (isDoor && !isAccess && (request.Flags & PathFlags.Interact) != 0x0)
-            {
                 modifier += 0.5f;
-            }
             // Door we can force open one way or another
             else if (isDoor && isAccess && (request.Flags & PathFlags.Prying) != 0x0)
-            {
                 modifier += 10f;
-            }
             else if ((request.Flags & PathFlags.Smashing) != 0x0 && end.Data.Damage > 0f)
-            {
                 modifier += 10f + end.Data.Damage / 100f;
-            }
             else if (isClimb && (request.Flags & PathFlags.Climbing) != 0x0)
-            {
                 modifier += 0.5f;
-            }
             else
-            {
                 return 0f;
-            }
         }
 
         return modifier * OctileDistance(end, start);
+    }
+
+    private sealed class PathComparer : IComparer<ValueTuple<float, PathPoly>>
+    {
+        public int Compare((float, PathPoly) x, (float, PathPoly) y) => y.Item1.CompareTo(x.Item1);
     }
 
     #region Simplifier
@@ -117,9 +102,7 @@ public sealed partial class PathfindingSystem
                 prevData.Equals(currentData) &&
                 currentData.Equals(nextData) &&
                 IsCollinear(prev, current, next, tolerance))
-            {
                 continue;
-            }
 
             simplified.Add(current);
         }
@@ -139,10 +122,8 @@ public sealed partial class PathfindingSystem
         return simplified;
     }
 
-    private bool IsCollinear(PathPoly prev, PathPoly current, PathPoly next, float tolerance)
-    {
-        return FloatInRange(Area(prev, current, next), -tolerance, tolerance);
-    }
+    private bool IsCollinear(PathPoly prev, PathPoly current, PathPoly next, float tolerance) =>
+        FloatInRange(Area(prev, current, next), -tolerance, tolerance);
 
     private float Area(PathPoly a, PathPoly b, PathPoly c)
     {
@@ -153,10 +134,7 @@ public sealed partial class PathfindingSystem
         return ax * (by - cy) + bx * (cy - ay) + cx * (ay - by);
     }
 
-    private bool FloatInRange(float value, float min, float max)
-    {
-        return (value >= min && value <= max);
-    }
+    private bool FloatInRange(float value, float min, float max) => value >= min && value <= max;
 
     #endregion
 }

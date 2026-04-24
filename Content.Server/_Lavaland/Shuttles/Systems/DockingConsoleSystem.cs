@@ -28,13 +28,13 @@ using Content.Server._Lavaland.Procedural.Components;
 using Content.Server.Shuttles.Components;
 using Content.Server.Shuttles.Events;
 using Content.Server.Shuttles.Systems;
+using Content.Server.Station.Systems;
 using Content.Shared._Lavaland.Shuttles;
 using Content.Shared._Lavaland.Shuttles.Components;
 using Content.Shared._Lavaland.Shuttles.Systems;
-using Content.Server.Station.Components;
-using Content.Server.Station.Systems;
 using Content.Shared.Shuttles.Components;
 using Content.Shared.Shuttles.Systems;
+using Content.Shared.Station.Components;
 using Content.Shared.Timing;
 using Content.Shared.Whitelist;
 using Robust.Server.GameObjects;
@@ -44,21 +44,20 @@ using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Utility;
 using Timer = Robust.Shared.Timing.Timer;
-using Content.Shared.Station.Components;
-using Content.Server.Cargo.Components;
-using Content.Shared.Cargo.Components;
 
 namespace Content.Server._Lavaland.Shuttles.Systems;
 
 public sealed class DockingConsoleSystem : SharedDockingConsoleSystem
 {
-    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
-    [Dependency] private readonly SharedUserInterfaceSystem _ui = default!;
-    [Dependency] private readonly ShuttleSystem _shuttle = default!;
+    [Dependency] private readonly IConfigurationManager _cfg = default!;
     [Dependency] private readonly MapLoaderSystem _mapLoader = default!;
     [Dependency] private readonly MapSystem _mapSystem = default!;
+
+    private readonly ResPath _miningShuttlePath = new("/Maps/_Lavaland/mining.yml");
+    [Dependency] private readonly ShuttleSystem _shuttle = default!;
     [Dependency] private readonly StationSystem _station = default!;
-    [Dependency] private readonly IConfigurationManager _cfg = default!;
+    [Dependency] private readonly SharedUserInterfaceSystem _ui = default!;
+    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
 
     public override void Initialize()
     {
@@ -72,11 +71,11 @@ public sealed class DockingConsoleSystem : SharedDockingConsoleSystem
 
         Subs.BuiEvents<DockingConsoleComponent>(DockingConsoleUiKey.Key,
             subs =>
-        {
-            subs.Event<BoundUIOpenedEvent>(OnOpened);
-            subs.Event<DockingConsoleFTLMessage>(OnFTL);
-            subs.Event<DockingConsoleShuttleCheckMessage>(OnCallShuttle);
-        });
+            {
+                subs.Event<BoundUIOpenedEvent>(OnOpened);
+                subs.Event<DockingConsoleFTLMessage>(OnFTL);
+                subs.Event<DockingConsoleShuttleCheckMessage>(OnCallShuttle);
+            });
     }
 
     private void OnMapInit(Entity<DockingConsoleComponent> ent, ref MapInitEvent args)
@@ -86,10 +85,7 @@ public sealed class DockingConsoleSystem : SharedDockingConsoleSystem
         Dirty(ent);
     }
 
-    private void OnDock(DockEvent args)
-    {
-        UpdateConsoles(args.GridAUid, args.GridBUid);
-    }
+    private void OnDock(DockEvent args) => UpdateConsoles(args.GridAUid, args.GridBUid);
 
     private void OnFTLCompleted(ref FTLCompletedEvent args)
     {
@@ -103,10 +99,7 @@ public sealed class DockingConsoleSystem : SharedDockingConsoleSystem
         Dirty(ent, ftl);
     }
 
-    private void OnUndock(UndockEvent args)
-    {
-        UpdateConsoles(args.GridAUid, args.GridBUid);
-    }
+    private void OnUndock(UndockEvent args) => UpdateConsoles(args.GridAUid, args.GridBUid);
 
     private void OnOpened(Entity<DockingConsoleComponent> ent, ref BoundUIOpenedEvent args)
     {
@@ -140,7 +133,7 @@ public sealed class DockingConsoleSystem : SharedDockingConsoleSystem
 
     public void UpdateUI(Entity<DockingConsoleComponent> ent)
     {
-        if (ent.Comp.Shuttle is not {} shuttle)
+        if (ent.Comp.Shuttle is not { } shuttle)
             return;
 
         var ftlState = FTLState.Available;
@@ -154,9 +147,7 @@ public sealed class DockingConsoleSystem : SharedDockingConsoleSystem
         }
 
         if (TryComp<DockingShuttleComponent>(shuttle, out var docking))
-        {
             destinations = docking.Destinations;
-        }
 
         var state = new DockingConsoleState(ftlState, ftlTime, destinations);
         _ui.SetUiState(ent.Owner, DockingConsoleUiKey.Key, state);
@@ -164,7 +155,7 @@ public sealed class DockingConsoleSystem : SharedDockingConsoleSystem
 
     private void OnFTL(Entity<DockingConsoleComponent> ent, ref DockingConsoleFTLMessage args)
     {
-        if (ent.Comp.Shuttle is not {} shuttle || !TryComp<DockingShuttleComponent>(shuttle, out var docking))
+        if (ent.Comp.Shuttle is not { } shuttle || !TryComp<DockingShuttleComponent>(shuttle, out var docking))
             return;
 
         if (args.Index < 0 || args.Index > docking.Destinations.Count)
@@ -176,15 +167,14 @@ public sealed class DockingConsoleSystem : SharedDockingConsoleSystem
         if (map == Transform(shuttle).MapID)
             return;
 
-        if (FindLargestGrid(map) is not {} grid)
+        if (FindLargestGrid(map) is not { } grid)
             return;
 
-        Log.Debug($"{ToPrettyString(args.Actor):user} is FTL-docking {ToPrettyString(shuttle):shuttle} to {ToPrettyString(grid):grid}");
+        Log.Debug(
+            $"{ToPrettyString(args.Actor):user} is FTL-docking {ToPrettyString(shuttle):shuttle} to {ToPrettyString(grid):grid}");
 
         _shuttle.FTLToDock(shuttle, Comp<ShuttleComponent>(shuttle), grid, priorityTag: docking.DockTag);
     }
-
-    private readonly ResPath _miningShuttlePath = new("/Maps/_Lavaland/mining.yml");
 
     /// <summary>
     /// Load a new mining shuttle if it still doesn't exist
@@ -196,15 +186,13 @@ public sealed class DockingConsoleSystem : SharedDockingConsoleSystem
 
         // Find the target
         var targetMap = Transform(ent).MapID;
-        if (FindLargestGrid(targetMap) is not {} grid)
+        if (FindLargestGrid(targetMap) is not { } grid)
             return;
 
         // Get called station
         var station = _station.GetOwningStation(grid);
         if (station == null)
-        {
             return;
-        }
 
         // Load grid
         _mapSystem.CreateMap(out var dummyMap);
@@ -232,7 +220,7 @@ public sealed class DockingConsoleSystem : SharedDockingConsoleSystem
             if (targetUid == null)
                 return;
 
-            RaiseLocalEvent(shuttleUid.Value, new ShuttleAddStationEvent(targetUid.Value, targetMap), false);
+            RaiseLocalEvent(shuttleUid.Value, new ShuttleAddStationEvent(targetUid.Value, targetMap));
         }
 
         // Finally FTL

@@ -5,63 +5,68 @@
 //
 // SPDX-License-Identifier: MIT
 
-using static Content.Shared.Arcade.SharedSpaceVillainArcadeComponent;
 using Robust.Server.GameObjects;
 using Robust.Shared.Audio;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Random;
+using static Content.Shared.Arcade.SharedSpaceVillainArcadeComponent;
 
 namespace Content.Server.Arcade.SpaceVillain;
-
 
 /// <summary>
 /// A Class to handle all the game-logic of the SpaceVillain-game.
 /// </summary>
 public sealed partial class SpaceVillainGame
 {
-    [Dependency] private readonly IEntityManager _entityManager = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
     private readonly SharedAudioSystem _audioSystem = default!;
-    private readonly UserInterfaceSystem _uiSystem = default!;
-    private readonly SpaceVillainArcadeSystem _svArcade = default!;
-
-
-    [ViewVariables]
-    private readonly EntityUid _owner = default!;
-
-    [ViewVariables]
-    private bool _running = true;
-
-    [ViewVariables]
-    public string Name => $"{_fightVerb} {_villainName}";
+    [Dependency] private readonly IEntityManager _entityManager = default!;
 
     [ViewVariables]
     private readonly string _fightVerb;
 
+
     [ViewVariables]
-    public readonly Fighter PlayerChar;
+    private readonly EntityUid _owner;
+
+    [Dependency] private readonly IRobustRandom _random = default!;
+    private readonly SpaceVillainArcadeSystem _svArcade = default!;
+    private readonly UserInterfaceSystem _uiSystem = default!;
 
     [ViewVariables]
     private readonly string _villainName;
 
     [ViewVariables]
+    public readonly Fighter PlayerChar;
+
+    [ViewVariables]
     public readonly Fighter VillainChar;
 
     [ViewVariables]
-    private int _turtleTracker = 0;
+    private string _latestEnemyActionMessage = "";
 
     [ViewVariables]
     private string _latestPlayerActionMessage = "";
 
     [ViewVariables]
-    private string _latestEnemyActionMessage = "";
+    private bool _running = true;
+
+    [ViewVariables]
+    private int _turtleTracker;
 
     public SpaceVillainGame(EntityUid owner, SpaceVillainArcadeComponent arcade, SpaceVillainArcadeSystem arcadeSystem)
-        : this(owner, arcade, arcadeSystem, arcadeSystem.GenerateFightVerb(arcade), arcadeSystem.GenerateEnemyName(arcade))
+        : this(owner,
+            arcade,
+            arcadeSystem,
+            arcadeSystem.GenerateFightVerb(arcade),
+            arcadeSystem.GenerateEnemyName(arcade))
     {
     }
 
-    public SpaceVillainGame(EntityUid owner, SpaceVillainArcadeComponent arcade, SpaceVillainArcadeSystem arcadeSystem, string fightVerb, string enemyName)
+    public SpaceVillainGame(EntityUid owner,
+        SpaceVillainArcadeComponent arcade,
+        SpaceVillainArcadeSystem arcadeSystem,
+        string fightVerb,
+        string enemyName)
     {
         IoCManager.InjectDependencies(this);
         _audioSystem = _entityManager.System<SharedAudioSystem>();
@@ -73,22 +78,25 @@ public sealed partial class SpaceVillainGame
         _fightVerb = fightVerb;
         _villainName = enemyName;
 
-        PlayerChar = new()
+        PlayerChar = new Fighter
         {
             HpMax = 30,
             Hp = 30,
             MpMax = 10,
-            Mp = 10
+            Mp = 10,
         };
 
-        VillainChar = new()
+        VillainChar = new Fighter
         {
             HpMax = 45,
             Hp = 45,
             MpMax = 20,
-            Mp = 20
+            Mp = 20,
         };
     }
+
+    [ViewVariables]
+    public string Name => $"{_fightVerb} {_villainName}";
 
     /// <summary>
     /// Called by the SpaceVillainArcadeComponent when Userinput is received.

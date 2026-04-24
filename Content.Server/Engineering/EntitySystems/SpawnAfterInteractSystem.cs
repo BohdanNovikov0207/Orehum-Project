@@ -37,70 +37,73 @@ using Content.Shared.Stacks;
 using JetBrains.Annotations;
 using Robust.Shared.Map.Components;
 
-namespace Content.Server.Engineering.EntitySystems
+namespace Content.Server.Engineering.EntitySystems;
+
+[UsedImplicitly]
+public sealed class SpawnAfterInteractSystem : EntitySystem
 {
-    [UsedImplicitly]
-    public sealed class SpawnAfterInteractSystem : EntitySystem
+    [Dependency] private readonly SharedDoAfterSystem _doAfterSystem = default!;
+    [Dependency] private readonly SharedMapSystem _maps = default!;
+    [Dependency] private readonly StackSystem _stackSystem = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
+    [Dependency] private readonly TurfSystem _turfSystem = default!;
+
+    public override void Initialize()
     {
-        [Dependency] private readonly SharedDoAfterSystem _doAfterSystem = default!;
-        [Dependency] private readonly StackSystem _stackSystem = default!;
-        [Dependency] private readonly TurfSystem _turfSystem = default!;
-        [Dependency] private readonly SharedTransformSystem _transform = default!;
-        [Dependency] private readonly SharedMapSystem _maps = default!;
+        base.Initialize();
 
-        public override void Initialize()
+        SubscribeLocalEvent<SpawnAfterInteractComponent, AfterInteractEvent>(HandleAfterInteract);
+    }
+
+    private async void HandleAfterInteract(EntityUid uid,
+        SpawnAfterInteractComponent component,
+        AfterInteractEvent args)
+    {
+        if (!args.CanReach && !component.IgnoreDistance)
+            return;
+        if (string.IsNullOrEmpty(component.Prototype))
+            return;
+
+        var gridUid = _transform.GetGrid(args.ClickLocation);
+        if (!TryComp<MapGridComponent>(gridUid, out var grid))
+            return;
+        if (!_maps.TryGetTileRef(gridUid.Value, grid, args.ClickLocation, out var tileRef))
+            return;
+
+        bool IsTileClear()
         {
-            base.Initialize();
-
-            SubscribeLocalEvent<SpawnAfterInteractComponent, AfterInteractEvent>(HandleAfterInteract);
+            return !tileRef.Tile.IsEmpty && !_turfSystem.IsTileBlocked(tileRef, CollisionGroup.MobMask);
         }
 
-        private async void HandleAfterInteract(EntityUid uid, SpawnAfterInteractComponent component, AfterInteractEvent args)
+        if (!IsTileClear())
+            return;
+
+        if (component.DoAfterTime > 0)
         {
-            if (!args.CanReach && !component.IgnoreDistance)
-                return;
-            if (string.IsNullOrEmpty(component.Prototype))
-                return;
-
-            var gridUid = _transform.GetGrid(args.ClickLocation);
-            if (!TryComp<MapGridComponent>(gridUid, out var grid))
-                return;
-            if (!_maps.TryGetTileRef(gridUid.Value, grid, args.ClickLocation, out var tileRef))
-                return;
-
-            bool IsTileClear()
+            var doAfterArgs = new DoAfterArgs(EntityManager,
+                args.User,
+                component.DoAfterTime,
+                new AwaitedDoAfterEvent(),
+                null)
             {
-                return tileRef.Tile.IsEmpty == false && !_turfSystem.IsTileBlocked(tileRef, CollisionGroup.MobMask);
-            }
+                BreakOnMove = true,
+            };
+            var result = await _doAfterSystem.WaitDoAfter(doAfterArgs);
 
-            if (!IsTileClear())
+            if (result != DoAfterStatus.Finished)
                 return;
-
-            if (component.DoAfterTime > 0)
-            {
-                var doAfterArgs = new DoAfterArgs(EntityManager, args.User, component.DoAfterTime, new AwaitedDoAfterEvent(), null)
-                {
-                    BreakOnMove = true,
-                };
-                var result = await _doAfterSystem.WaitDoAfter(doAfterArgs);
-
-                if (result != DoAfterStatus.Finished)
-                    return;
-            }
-
-            if (component.Deleted || !IsTileClear())
-                return;
-
-            if (TryComp(uid, out StackComponent? stackComp)
-                && component.RemoveOnInteract && !_stackSystem.Use(uid, 1, stackComp))
-            {
-                return;
-            }
-
-            Spawn(component.Prototype, args.ClickLocation.SnapToGrid(grid));
-
-            if (component.RemoveOnInteract && stackComp == null)
-                TryQueueDel(uid);
         }
+
+        if (component.Deleted || !IsTileClear())
+            return;
+
+        if (TryComp(uid, out StackComponent? stackComp)
+            && component.RemoveOnInteract && !_stackSystem.Use(uid, 1, stackComp))
+            return;
+
+        Spawn(component.Prototype, args.ClickLocation.SnapToGrid(grid));
+
+        if (component.RemoveOnInteract && stackComp == null)
+            TryQueueDel(uid);
     }
 }

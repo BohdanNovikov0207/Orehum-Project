@@ -13,7 +13,9 @@ public sealed class XATTemperatureSystem : BaseQueryUpdateXATSystem<XATTemperatu
     [Dependency] private readonly AtmosphereSystem _atmosphere = default!;
 
     /// <inheritdoc />
-    protected override void UpdateXAT(Entity<XenoArtifactComponent> artifact, Entity<XATTemperatureComponent, XenoArtifactNodeComponent> node, float frameTime)
+    protected override void UpdateXAT(Entity<XenoArtifactComponent> artifact,
+        Entity<XATTemperatureComponent, XenoArtifactNodeComponent> node,
+        float frameTime)
     {
         var xform = Transform(artifact);
 

@@ -7,6 +7,7 @@ namespace Content.Server.Security;
 public sealed class GenpopSystem : SharedGenpopSystem
 {
     private const float GenpopIDEjectDistanceFromWall = 1f;
+
     protected override void CreateId(Entity<GenpopLockerComponent> ent, string name, float sentence, string crime)
     {
         // Default to prisoner locker coordinates for ID spawn
@@ -15,9 +16,11 @@ public sealed class GenpopSystem : SharedGenpopSystem
         // Offset prisoner wall locker coordinates in wallmount direction for ID spawn; avoids spawning ID inside wall
         if (TryComp<WallMountComponent>(ent, out var wallMountComponent))
         {
-            var offset = (wallMountComponent.Direction + xform.LocalRotation - Math.PI / 2).ToVec() * GenpopIDEjectDistanceFromWall;
+            var offset = (wallMountComponent.Direction + xform.LocalRotation - Math.PI / 2).ToVec() *
+                         GenpopIDEjectDistanceFromWall;
             spawnCoordinates = spawnCoordinates.Offset(offset);
         }
+
         var uid = Spawn(ent.Comp.IdCardProto, spawnCoordinates);
         ent.Comp.LinkedId = uid;
         IdCard.TryChangeFullName(uid, name);
@@ -28,6 +31,7 @@ public sealed class GenpopSystem : SharedGenpopSystem
             id.SentenceDuration = TimeSpan.FromMinutes(sentence);
             Dirty(uid, id);
         }
+
         if (sentence <= 0)
             IdCard.SetPermanent(uid, true);
         IdCard.SetExpireTime(uid, TimeSpan.FromMinutes(sentence) + Timing.CurTime);

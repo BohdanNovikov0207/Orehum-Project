@@ -1,5 +1,4 @@
 using Content.Server.Heretic.EntitySystems;
-using Content.Shared.Heretic;
 using Content.Shared.Heretic.Prototypes;
 
 namespace Content.Server.Heretic.Ritual;

@@ -48,11 +48,11 @@ namespace Content.Server.Power.EntitySystems;
 public sealed class ApcSystem : EntitySystem
 {
     [Dependency] private readonly AccessReaderSystem _accessReader = default!;
-    [Dependency] private readonly IGameTiming _gameTiming = default!;
-    [Dependency] private readonly EmagSystem _emag = default!;
-    [Dependency] private readonly PopupSystem _popup = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly EmagSystem _emag = default!;
+    [Dependency] private readonly IGameTiming _gameTiming = default!;
+    [Dependency] private readonly PopupSystem _popup = default!;
     [Dependency] private readonly UserInterfaceSystem _ui = default!;
 
     public override void Initialize()
@@ -75,36 +75,29 @@ public sealed class ApcSystem : EntitySystem
         var query = EntityQueryEnumerator<ApcComponent, PowerNetworkBatteryComponent, UserInterfaceComponent>();
         while (query.MoveNext(out var uid, out var apc, out var battery, out var ui))
         {
-            if (apc.LastUiUpdate + ApcComponent.VisualsChangeDelay < _gameTiming.CurTime && _ui.IsUiOpen((uid, ui), ApcUiKey.Key))
+            if (apc.LastUiUpdate + ApcComponent.VisualsChangeDelay < _gameTiming.CurTime &&
+                _ui.IsUiOpen((uid, ui), ApcUiKey.Key))
             {
                 apc.LastUiUpdate = _gameTiming.CurTime;
                 UpdateUIState(uid, apc, battery);
             }
 
             if (apc.NeedStateUpdate)
-            {
                 UpdateApcState(uid, apc, battery);
-            }
         }
     }
 
     // Change the APC's state only when the battery state changes, or when it's first created.
-    private void OnBatteryChargeChanged(EntityUid uid, ApcComponent component, ref ChargeChangedEvent args)
-    {
+    private void OnBatteryChargeChanged(EntityUid uid, ApcComponent component, ref ChargeChangedEvent args) =>
         UpdateApcState(uid, component);
-    }
 
-    private static void OnApcStartup(EntityUid uid, ApcComponent component, ComponentStartup args)
-    {
+    private static void OnApcStartup(EntityUid uid, ApcComponent component, ComponentStartup args) =>
         // We cannot update immediately, as various network/battery state is not valid yet.
         // Defer until the next tick.
         component.NeedStateUpdate = true;
-    }
 
-    private void OnBoundUiOpen(EntityUid uid, ApcComponent component, BoundUIOpenedEvent args)
-    {
+    private void OnBoundUiOpen(EntityUid uid, ApcComponent component, BoundUIOpenedEvent args) =>
         UpdateApcState(uid, component);
-    }
 
     private void OnToggleMainBreaker(EntityUid uid, ApcComponent component, ApcToggleMainBreakerMessage args)
     {
@@ -113,18 +106,18 @@ public sealed class ApcSystem : EntitySystem
         if (attemptEv.Cancelled)
         {
             _popup.PopupCursor(Loc.GetString("apc-component-on-toggle-cancel"),
-                args.Actor, PopupType.Medium);
+                args.Actor,
+                PopupType.Medium);
             return;
         }
 
         if (_accessReader.IsAllowed(args.Actor, uid))
-        {
             ApcToggleBreaker(uid, component);
-        }
         else
         {
             _popup.PopupCursor(Loc.GetString("apc-component-insufficient-access"),
-                args.Actor, PopupType.Medium);
+                args.Actor,
+                PopupType.Medium);
         }
     }
 
@@ -152,13 +145,14 @@ public sealed class ApcSystem : EntitySystem
     }
 
     public void UpdateApcState(EntityUid uid,
-        ApcComponent? apc=null,
+        ApcComponent? apc = null,
         PowerNetworkBatteryComponent? battery = null)
     {
         if (!Resolve(uid, ref apc, ref battery, false))
             return;
 
-        if (apc.LastChargeStateTime == null || apc.LastChargeStateTime + ApcComponent.VisualsChangeDelay < _gameTiming.CurTime)
+        if (apc.LastChargeStateTime == null ||
+            apc.LastChargeStateTime + ApcComponent.VisualsChangeDelay < _gameTiming.CurTime)
         {
             var newState = CalcChargeState(uid, battery.NetworkBattery);
             if (newState != apc.LastChargeState)
@@ -167,9 +161,7 @@ public sealed class ApcSystem : EntitySystem
                 apc.LastChargeStateTime = _gameTiming.CurTime;
 
                 if (TryComp(uid, out AppearanceComponent? appearance))
-                {
                     _appearance.SetData(uid, ApcVisuals.ChargeState, newState, appearance);
-                }
             }
         }
 
@@ -195,10 +187,13 @@ public sealed class ApcSystem : EntitySystem
         const int ChargeAccuracy = 5;
 
         // TODO: Fix ContentHelpers or make a new one coz this is cooked.
-        var charge = ContentHelpers.RoundToNearestLevels(battery.CurrentStorage / battery.Capacity, 1.0, 100 / ChargeAccuracy) / 100f * ChargeAccuracy;
+        var charge =
+            ContentHelpers.RoundToNearestLevels(battery.CurrentStorage / battery.Capacity, 1.0, 100 / ChargeAccuracy) /
+            100f * ChargeAccuracy;
 
         var state = new ApcBoundInterfaceState(apc.MainBreakerEnabled,
-            (int) MathF.Ceiling(battery.CurrentSupply), apc.LastExternalState,
+            (int) MathF.Ceiling(battery.CurrentSupply),
+            apc.LastExternalState,
             charge);
 
         _ui.SetUiState((uid, ui), ApcUiKey.Key, state);
@@ -210,9 +205,7 @@ public sealed class ApcSystem : EntitySystem
             return ApcChargeState.Emag;
 
         if (battery.CurrentStorage / battery.Capacity > ApcComponent.HighPowerThreshold)
-        {
             return ApcChargeState.Full;
-        }
 
         var delta = battery.CurrentSupply - battery.CurrentReceiving;
         return delta < 0 ? ApcChargeState.Charging : ApcChargeState.Lack;
@@ -221,15 +214,11 @@ public sealed class ApcSystem : EntitySystem
     private ApcExternalPowerState CalcExtPowerState(EntityUid uid, PowerState.Battery battery)
     {
         if (battery.CurrentReceiving == 0 && !MathHelper.CloseTo(battery.CurrentStorage / battery.Capacity, 1))
-        {
             return ApcExternalPowerState.None;
-        }
 
         var delta = battery.CurrentSupply - battery.CurrentReceiving;
         if (!MathHelper.CloseToPercent(delta, 0, 0.1f) && delta < 0)
-        {
             return ApcExternalPowerState.Low;
-        }
 
         return ApcExternalPowerState.Good;
     }

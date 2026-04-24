@@ -27,5 +27,4 @@ namespace Content.Server.Weapons;
 
 public sealed class DamageMarkerSystem : SharedDamageMarkerSystem
 {
-
 }

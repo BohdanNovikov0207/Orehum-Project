@@ -24,18 +24,16 @@ public sealed class ServerInfoManager
         (CCVars.InfoLinksGithub,   "github",   "info-link-github"),
         (CCVars.InfoLinksWebsite,  "web",      "info-link-website"),
         (CCVars.InfoLinksWiki,     "wiki",     "info-link-wiki"),
-        (CCVars.InfoLinksTelegram, "telegram", "info-link-telegram")
+        (CCVars.InfoLinksTelegram, "telegram", "info-link-telegram"),
         // @formatter:on
     };
 
-    [Dependency] private readonly IStatusHost _statusHost = default!;
     [Dependency] private readonly IConfigurationManager _cfg = default!;
     [Dependency] private readonly ILocalizationManager _loc = default!;
 
-    public void Initialize()
-    {
-        _statusHost.OnInfoRequest += OnInfoRequest;
-    }
+    [Dependency] private readonly IStatusHost _statusHost = default!;
+
+    public void Initialize() => _statusHost.OnInfoRequest += OnInfoRequest;
 
     private void OnInfoRequest(JsonNode json)
     {

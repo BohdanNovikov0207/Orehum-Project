@@ -30,10 +30,8 @@ public sealed class SignalControlledValveSystem : EntitySystem
         SubscribeLocalEvent<SignalControlledValveComponent, SignalReceivedEvent>(OnSignalReceived);
     }
 
-    private void OnInit(EntityUid uid, SignalControlledValveComponent comp, ComponentInit args)
-    {
+    private void OnInit(EntityUid uid, SignalControlledValveComponent comp, ComponentInit args) =>
         _signal.EnsureSinkPorts(uid, comp.OpenPort, comp.ClosePort, comp.TogglePort);
-    }
 
     private void OnSignalReceived(EntityUid uid, SignalControlledValveComponent comp, ref SignalReceivedEvent args)
     {
@@ -41,16 +39,10 @@ public sealed class SignalControlledValveSystem : EntitySystem
             return;
 
         if (args.Port == comp.OpenPort)
-        {
             _valve.Set(uid, valve, true);
-        }
         else if (args.Port == comp.ClosePort)
-        {
             _valve.Set(uid, valve, false);
-        }
         else if (args.Port == comp.TogglePort)
-        {
             _valve.Toggle(uid, valve);
-        }
     }
 }

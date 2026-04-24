@@ -5,29 +5,27 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Shared._Shitmed.Antags.Abductor;
-using Content.Shared.Actions;
+using Content.Shared.Actions.Components;
 using Content.Shared.DoAfter;
 using Content.Shared.Effects;
+using Content.Shared.Movement.Pulling.Components;
+using Content.Shared.Movement.Pulling.Systems;
+using Robust.Shared.Audio.Systems;
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Spawners;
-using Robust.Shared.Audio.Systems;
-using Content.Shared.Movement.Pulling.Systems;
-using Content.Shared.Movement.Pulling.Components;
-using Content.Shared.Actions.Components;
 
 namespace Content.Server._Shitmed.Antags.Abductor;
 
 public sealed partial class AbductorSystem : SharedAbductorSystem
 {
-    [Dependency] private readonly SharedAudioSystem _audioSystem = default!;
-    [Dependency] private readonly SharedColorFlashEffectSystem _color = default!;
-    [Dependency] private readonly PullingSystem _pullingSystem = default!;
-
     private static readonly EntProtoId<ActionComponent> SendYourself = "ActionSendYourself";
     private static readonly EntProtoId<ActionComponent> ExitAction = "ActionExitConsole";
     private static readonly EntProtoId TeleportationEffect = "EffectTeleportation";
     private static readonly EntProtoId TeleportationEffectEntity = "EffectTeleportationEntity";
+    [Dependency] private readonly SharedAudioSystem _audioSystem = default!;
+    [Dependency] private readonly SharedColorFlashEffectSystem _color = default!;
+    [Dependency] private readonly PullingSystem _pullingSystem = default!;
 
     public void InitializeActions()
     {
@@ -48,29 +46,37 @@ public sealed partial class AbductorSystem : SharedAbductorSystem
     private void OnReturn(AbductorReturnToShipEvent ev)
     {
         EnsureComp<AbductorScientistComponent>(ev.Performer, out var abductorScientistComponent);
-        AddTeleportationEffect(ev.Performer, 3.0f, TeleportationEffectEntity, out var effectEnt, true, true);
+        AddTeleportationEffect(ev.Performer, 3.0f, TeleportationEffectEntity, out var effectEnt);
 
         if (abductorScientistComponent.SpawnPosition.HasValue)
         {
-            var effect = _entityManager.SpawnEntity(TeleportationEffect, abductorScientistComponent.SpawnPosition.Value);
+            var effect =
+                _entityManager.SpawnEntity(TeleportationEffect, abductorScientistComponent.SpawnPosition.Value);
             EnsureComp<TimedDespawnComponent>(effect, out var despawnComp);
             despawnComp.Lifetime = 3.0f;
             _audioSystem.PlayPvs("/Audio/_Shitmed/Misc/alien_teleport.ogg", effect);
         }
 
-        var doAfter = new DoAfterArgs(EntityManager, ev.Performer, TimeSpan.FromSeconds(3), new AbductorReturnDoAfterEvent(), ev.Performer)
+        var doAfter = new DoAfterArgs(EntityManager,
+            ev.Performer,
+            TimeSpan.FromSeconds(3),
+            new AbductorReturnDoAfterEvent(),
+            ev.Performer)
         {
             MultiplyDelay = false,
         };
         _doAfter.TryStartDoAfter(doAfter);
         ev.Handled = true;
     }
+
     private void OnDoAfterAbductorReturn(Entity<AbductorScientistComponent> ent, ref AbductorReturnDoAfterEvent args)
     {
         if (args.Handled || args.Cancelled)
             return;
 
-        _color.RaiseEffect(Color.FromHex("#BA0099"), new List<EntityUid>(1) { ent }, Filter.Pvs(ent, entityManager: EntityManager));
+        _color.RaiseEffect(Color.FromHex("#BA0099"),
+            new List<EntityUid>(1) { ent },
+            Filter.Pvs(ent, entityManager: EntityManager));
         StopPulls(ent);
         if (ent.Comp.SpawnPosition is not null)
             _xformSys.SetCoordinates(ent, ent.Comp.SpawnPosition.Value);
@@ -81,16 +87,20 @@ public sealed partial class AbductorSystem : SharedAbductorSystem
     {
         AddTeleportationEffect(ev.Performer, 5.0f, TeleportationEffectEntity, out var effectEnt, true, false);
         var effect = _entityManager.SpawnEntity(TeleportationEffect, ev.Target);
-        EnsureComp<TimedDespawnComponent>(effect, out var _);
+        EnsureComp<TimedDespawnComponent>(effect, out _);
 
         var @event = new AbductorSendYourselfDoAfterEvent(GetNetCoordinates(ev.Target));
         var doAfter = new DoAfterArgs(EntityManager, ev.Performer, TimeSpan.FromSeconds(5), @event, ev.Performer);
         _doAfter.TryStartDoAfter(doAfter);
         ev.Handled = true;
     }
-    private void OnDoAfterSendYourself(Entity<AbductorScientistComponent> ent, ref AbductorSendYourselfDoAfterEvent args)
+
+    private void OnDoAfterSendYourself(Entity<AbductorScientistComponent> ent,
+        ref AbductorSendYourselfDoAfterEvent args)
     {
-        _color.RaiseEffect(Color.FromHex("#BA0099"), new List<EntityUid>(1) { ent }, Filter.Pvs(ent, entityManager: EntityManager));
+        _color.RaiseEffect(Color.FromHex("#BA0099"),
+            new List<EntityUid>(1) { ent },
+            Filter.Pvs(ent, entityManager: EntityManager));
         StopPulls(ent);
         _xformSys.SetCoordinates(ent, GetCoordinates(args.TargetCoordinates));
         OnCameraExit(ent);
@@ -105,6 +115,7 @@ public sealed partial class AbductorSystem : SharedAbductorSystem
         _actions.AddAction(args.Actor, ref comp.ExitConsole, ExitAction);
         _actions.AddAction(args.Actor, ref comp.SendYourself, SendYourself);
     }
+
     private void RemoveActions(EntityUid actor)
     {
         EnsureComp<AbductorsAbilitiesComponent>(actor, out var comp);
@@ -120,13 +131,15 @@ public sealed partial class AbductorSystem : SharedAbductorSystem
             if (!TryComp<PullerComponent>(ent, out var pullerComp)
                 || pullerComp.Pulling == null
                 || !TryComp<PullableComponent>(pullerComp.Pulling.Value, out var pullableComp)
-                || !_pullingSystem.TryStopPull(pullerComp.Pulling.Value, pullableComp)) return;
+                || !_pullingSystem.TryStopPull(pullerComp.Pulling.Value, pullableComp))
+                return;
         }
 
         if (_pullingSystem.IsPulled(ent))
         {
             if (!TryComp<PullableComponent>(ent, out var pullableComp)
-                || !_pullingSystem.TryStopPull(ent, pullableComp)) return;
+                || !_pullingSystem.TryStopPull(ent, pullableComp))
+                return;
         }
     }
 
@@ -138,7 +151,9 @@ public sealed partial class AbductorSystem : SharedAbductorSystem
         bool playAudio = true)
     {
         if (applyColor)
-            _color.RaiseEffect(Color.FromHex("#BA0099"), new List<EntityUid>(1) { performer }, Filter.Pvs(performer, entityManager: EntityManager));
+            _color.RaiseEffect(Color.FromHex("#BA0099"),
+                new List<EntityUid>(1) { performer },
+                Filter.Pvs(performer, entityManager: EntityManager));
 
         EnsureComp<TransformComponent>(performer, out var xform);
         effectEnt = SpawnAttachedTo(effectEntity, xform.Coordinates);

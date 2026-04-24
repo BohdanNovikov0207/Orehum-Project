@@ -61,39 +61,11 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Server.Body.Components;
-using Content.Server.Body.Systems;
-using Content.Shared.EntityEffects.Effects;
-using Content.Server.Fluids.EntitySystems;
-using Content.Server.Forensics;
-using Content.Server.Inventory;
-using Content.Server.Nutrition.Events;
-using Content.Server.Popups;
-using Content.Shared.Administration.Logs;
-using Content.Shared.Body.Components;
-using Content.Shared.Body.Systems;
-using Content.Shared.Chemistry;
 using Content.Shared.Chemistry.Components;
 using Content.Shared.Chemistry.Components.SolutionManager;
 using Content.Shared.Chemistry.EntitySystems;
-using Content.Shared.Chemistry.Reagent;
-using Content.Shared.Database;
-using Content.Shared.DoAfter;
-using Content.Shared.EntityEffects.Effects;
-using Content.Goobstation.Maths.FixedPoint;
-using Content.Shared.Hands.EntitySystems;
-using Content.Shared.IdentityManagement;
-using Content.Shared.Interaction;
-using Content.Shared.Interaction.Events;
-using Content.Shared.Mobs.Systems;
-using Content.Shared.Nutrition;
 using Content.Shared.Nutrition.Components;
 using Content.Shared.Nutrition.EntitySystems;
-using Robust.Shared.Audio;
-using Robust.Shared.Audio.Systems;
-using Robust.Shared.Player;
-using Robust.Shared.Prototypes;
-using Robust.Shared.Utility;
 
 namespace Content.Server.Nutrition.EntitySystems;
 
@@ -121,9 +93,7 @@ public sealed class DrinkSystem : SharedDrinkSystem
             entity.Comp.Solution = existingDrainable.Solution;
         }
         else
-        {
             _solutionContainer.EnsureSolution(entity.Owner, entity.Comp.Solution, out _);
-        }
 
         UpdateAppearance(entity, entity.Comp);
 
@@ -134,18 +104,14 @@ public sealed class DrinkSystem : SharedDrinkSystem
             drainComp.Solution = entity.Comp.Solution;
     }
 
-    private void OnSolutionChange(Entity<DrinkComponent> entity, ref SolutionContainerChangedEvent args)
-    {
+    private void OnSolutionChange(Entity<DrinkComponent> entity, ref SolutionContainerChangedEvent args) =>
         UpdateAppearance(entity, entity.Comp);
-    }
 
     public void UpdateAppearance(EntityUid uid, DrinkComponent component)
     {
         if (!TryComp<AppearanceComponent>(uid, out var appearance) ||
             !HasComp<SolutionContainerManagerComponent>(uid))
-        {
             return;
-        }
 
         var drainAvailable = DrinkVolume(uid, component);
         _appearance.SetData(uid, FoodVisuals.Visual, drainAvailable.Float(), appearance);

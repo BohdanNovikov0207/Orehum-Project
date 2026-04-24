@@ -20,9 +20,7 @@ internal sealed class ServerAlertsSystem : AlertsSystem
         SubscribeLocalEvent<AlertsComponent, ComponentGetState>(OnGetState);
     }
 
-    private void OnGetState(Entity<AlertsComponent> alerts, ref ComponentGetState args)
-    {
+    private void OnGetState(Entity<AlertsComponent> alerts, ref ComponentGetState args) =>
         // TODO: Use sourcegen when clone-state bug fixed.
-        args.State = new AlertComponentState(new(alerts.Comp.Alerts));
-    }
+        args.State = new AlertComponentState(new Dictionary<AlertKey, AlertState>(alerts.Comp.Alerts));
 }

@@ -23,12 +23,94 @@ namespace Content.Server.Connection.IPIntel;
 // Handles checking/warning if the connecting IP address is sus.
 public sealed class IPIntel
 {
+    public enum IPIntelResultCode : byte
+    {
+        Success = 0,
+        RateLimited,
+        Errored,
+    }
+
+    private static readonly Dictionary<string, string> ErrorMessages = new()
+    {
+        ["-1"] = "Invalid/No input.",
+        ["-2"] = "Invalid IP address.",
+        ["-3"] =
+            "Unroutable address / private address given to the api. Make an issue in upstream as it should have been handled.",
+        ["-4"] = "Unable to reach IPIntel database. Perhaps it's down?",
+        ["-5"] = "Server's IP/Contact may have been banned, go to getipintel.net and make contact to be unbanned.",
+        ["-6"] = "You did not provide any contact information with your query or the contact information is invalid.",
+    };
+
+    // From miniupnpc
+    private static readonly (int ip, int mask)[] ReservedRangesIpv4 =
+    [
+        // @formatter:off
+		(Ipv4(0,   0,   0,   0), 8 ), // RFC1122 "This host on this network"
+		(Ipv4(10,  0,   0,   0), 8 ), // RFC1918 Private-Use
+		(Ipv4(100, 64,  0,   0), 10), // RFC6598 Shared Address Space
+		(Ipv4(127, 0,   0,   0), 8 ), // RFC1122 Loopback
+		(Ipv4(169, 254, 0,   0), 16), // RFC3927 Link-Local
+		(Ipv4(172, 16,  0,   0), 12), // RFC1918 Private-Use
+		(Ipv4(192, 0,   0,   0), 24), // RFC6890 IETF Protocol Assignments
+		(Ipv4(192, 0,   2,   0), 24), // RFC5737 Documentation (TEST-NET-1)
+		(Ipv4(192, 31,  196, 0), 24), // RFC7535 AS112-v4
+		(Ipv4(192, 52,  193, 0), 24), // RFC7450 AMT
+		(Ipv4(192, 88,  99,  0), 24), // RFC7526 6to4 Relay Anycast
+		(Ipv4(192, 168, 0,   0), 16), // RFC1918 Private-Use
+		(Ipv4(192, 175, 48,  0), 24), // RFC7534 Direct Delegation AS112 Service
+		(Ipv4(198, 18,  0,   0), 15), // RFC2544 Benchmarking
+		(Ipv4(198, 51,  100, 0), 24), // RFC5737 Documentation (TEST-NET-2)
+		(Ipv4(203, 0,   113, 0), 24), // RFC5737 Documentation (TEST-NET-3)
+		(Ipv4(224, 0,   0,   0), 4 ), // RFC1112 Multicast
+		(Ipv4(240, 0,   0,   0), 4 ), // RFC1112 Reserved for Future Use + RFC919 Limited Broadcast
+        // @formatter:on
+    ];
+
+    private static readonly (UInt128 ip, int mask)[] ReservedRangesIpv6 =
+    [
+        (ToAddressBytes("::1"), 128), // "This host on this network"
+        (ToAddressBytes("::ffff:0:0"), 96), // IPv4-mapped addresses
+        (ToAddressBytes("::ffff:0:0:0"), 96), // IPv4-translated addresses
+        (ToAddressBytes("64:ff9b:1::"), 48), // IPv4/IPv6 translation
+        (ToAddressBytes("100::"), 64), // Discard prefix
+        (ToAddressBytes("2001:20::"), 28), // ORCHIDv2
+        (ToAddressBytes("2001:db8::"), 32), // Addresses used in documentation and example source code
+        (ToAddressBytes("3fff::"), 20), // Addresses used in documentation and example source code
+        (ToAddressBytes("5f00::"), 16), // IPv6 Segment Routing (SRv6)
+        (ToAddressBytes("fc00::"), 7), // Unique local address
+    ];
+
     private readonly IIPIntelApi _api;
-    private readonly IServerDbManager _db;
     private readonly IChatManager _chatManager;
+    private readonly IServerDbManager _db;
     private readonly IGameTiming _gameTiming;
 
     private readonly ISawmill _sawmill;
+    private bool _alertAdminReject;
+    private float _alertAdminWarn;
+    private int _backoffSeconds;
+    private TimeSpan _cacheDays;
+    private int _cleanupMins;
+
+    // CCVars
+    private string? _contactEmail;
+
+    // Self-managed preemptive rate limits.
+    private Ratelimits _day;
+    private bool _enabled;
+    private TimeSpan _exemptPlaytime;
+
+    // Responsive backoff if we hit a Too Many Requests API error.
+    private int _failedRequests;
+    private Ratelimits _minute;
+
+    // Next time we need to clean the database of stale cached IPIntel results.
+    private TimeSpan _nextClean;
+    private float _rating;
+    private bool _rejectBad;
+    private bool _rejectLimited;
+    private bool _rejectUnknown;
+    private TimeSpan _releasePeriod;
 
     public IPIntel(IIPIntelApi api,
         IServerDbManager db,
@@ -60,58 +142,21 @@ public sealed class IPIntel
         cfg.OnValueChanged(CCVars.GameIPIntelAlertAdminWarnRating, b => _alertAdminWarn = b, true);
     }
 
-    internal struct Ratelimits
-    {
-        public bool RateLimited;
-        public bool LimitHasBeenHandled;
-        public int CurrentRequests;
-        public int Limit;
-        public TimeSpan LastRatelimited;
-    }
-
-    // Self-managed preemptive rate limits.
-    private Ratelimits _day;
-    private Ratelimits _minute;
-
-    // Next time we need to clean the database of stale cached IPIntel results.
-    private TimeSpan _nextClean;
-
-    // Responsive backoff if we hit a Too Many Requests API error.
-    private int _failedRequests;
-    private TimeSpan _releasePeriod;
-
-    // CCVars
-    private string? _contactEmail;
-    private bool _enabled;
-    private bool _rejectUnknown;
-    private bool _rejectBad;
-    private bool _rejectLimited;
-    private bool _alertAdminReject;
-    private int _backoffSeconds;
-    private int _cleanupMins;
-    private TimeSpan _cacheDays;
-    private TimeSpan _exemptPlaytime;
-    private float _rating;
-    private float _alertAdminWarn;
-
     public async Task<(bool IsBad, string Reason)> IsVpnOrProxy(NetConnectingArgs e)
     {
         // Check Exemption flags, let them skip if they have them.
         var flags = await _db.GetBanExemption(e.UserId);
         if ((flags & (ServerBanExemptFlags.Datacenter | ServerBanExemptFlags.BlacklistedRange)) != 0)
-        {
             return (false, string.Empty);
-        }
 
         // Check playtime, if 0 we skip this check. If player has more playtime then _exemptPlaytime is configured for then they get to skip this check.
         // Helps with saving your limited request limit.
         if (_exemptPlaytime != TimeSpan.Zero)
         {
-            var overallTime = ( await _db.GetPlayTimes(e.UserId)).Find(p => p.Tracker == PlayTimeTrackingShared.TrackerOverall);
+            var overallTime =
+                (await _db.GetPlayTimes(e.UserId)).Find(p => p.Tracker == PlayTimeTrackingShared.TrackerOverall);
             if (overallTime != null && overallTime.TimeSpent >= _exemptPlaytime)
-            {
                 return (false, string.Empty);
-            }
         }
 
         var ip = e.IP.Address;
@@ -120,7 +165,8 @@ public sealed class IPIntel
         // Is this a local ip address?
         if (IsAddressReservedIpv4(ip) || IsAddressReservedIpv6(ip))
         {
-            _sawmill.Warning($"{e.UserName} joined using a local address. Do you need IPIntel? Or is something terribly misconfigured on your server? Trusting this connection.");
+            _sawmill.Warning(
+                $"{e.UserName} joined using a local address. Do you need IPIntel? Or is something terribly misconfigured on your server? Trusting this connection.");
             return (false, string.Empty);
         }
 
@@ -141,7 +187,8 @@ public sealed class IPIntel
         // Ensure our contact email is good to use.
         if (string.IsNullOrEmpty(_contactEmail) || !_contactEmail.Contains('@') || !_contactEmail.Contains('.'))
         {
-            _sawmill.Error("IPIntel is enabled, but contact email is empty or not a valid email, treating this connection like an unknown IPIntel response.");
+            _sawmill.Error(
+                "IPIntel is enabled, but contact email is empty or not a valid email, treating this connection like an unknown IPIntel response.");
             return _rejectUnknown ? (true, Loc.GetString("generic-misconfigured")) : (false, string.Empty);
         }
 
@@ -178,7 +225,8 @@ public sealed class IPIntel
 
         if (request.StatusCode == HttpStatusCode.TooManyRequests)
         {
-            _sawmill.Warning($"We hit the IPIntel request limit at some point. (Current limit count: Minute: {_minute.CurrentRequests} Day: {_day.CurrentRequests})");
+            _sawmill.Warning(
+                $"We hit the IPIntel request limit at some point. (Current limit count: Minute: {_minute.CurrentRequests} Day: {_day.CurrentRequests})");
             CalculateSuddenRatelimit();
             return new IPIntelResult(0, IPIntelResultCode.RateLimited);
         }
@@ -193,38 +241,24 @@ public sealed class IPIntel
         }
 
         if (ErrorMessages.TryGetValue(response, out var errorMessage))
-        {
             _sawmill.Error($"IPIntel returned error {response}: {errorMessage}");
-        }
         else
         {
             // Oh boy, we don't know this error.
-            _sawmill.Error($"IPIntel returned {response} (Status code: {request.StatusCode})... we don't know what this error code is. Please make an issue in upstream!");
+            _sawmill.Error(
+                $"IPIntel returned {response} (Status code: {request.StatusCode})... we don't know what this error code is. Please make an issue in upstream!");
         }
 
         return new IPIntelResult(0, IPIntelResultCode.Errored);
     }
 
-    private bool CheckSuddenRateLimit()
-    {
-        return _failedRequests >= 1 && _releasePeriod > _gameTiming.RealTime;
-    }
+    private bool CheckSuddenRateLimit() => _failedRequests >= 1 && _releasePeriod > _gameTiming.RealTime;
 
     private void CalculateSuddenRatelimit()
     {
         _failedRequests++;
         _releasePeriod = _gameTiming.RealTime + TimeSpan.FromSeconds(_failedRequests * _backoffSeconds);
     }
-
-    private static readonly Dictionary<string, string> ErrorMessages = new()
-    {
-        ["-1"] = "Invalid/No input.",
-        ["-2"] = "Invalid IP address.",
-        ["-3"] = "Unroutable address / private address given to the api. Make an issue in upstream as it should have been handled.",
-        ["-4"] = "Unable to reach IPIntel database. Perhaps it's down?",
-        ["-5"] = "Server's IP/Contact may have been banned, go to getipintel.net and make contact to be unbanned.",
-        ["-6"] = "You did not provide any contact information with your query or the contact information is invalid.",
-    };
 
     private void IncrementAndTestRateLimit(ref Ratelimits ratelimits, TimeSpan expireInterval, string name)
     {
@@ -252,11 +286,9 @@ public sealed class IPIntel
         ratelimits.LastRatelimited = _gameTiming.RealTime;
     }
 
-    private bool ShouldLiftRateLimit(in Ratelimits ratelimits, TimeSpan liftingTime)
-    {
+    private bool ShouldLiftRateLimit(in Ratelimits ratelimits, TimeSpan liftingTime) =>
         // Should we raise this limit now?
-        return ratelimits.RateLimited && _gameTiming.RealTime >= ratelimits.LastRatelimited + liftingTime;
-    }
+        ratelimits.RateLimited && _gameTiming.RealTime >= ratelimits.LastRatelimited + liftingTime;
 
     private (bool, string Empty) ScoreCheck(float score, string username)
     {
@@ -293,54 +325,10 @@ public sealed class IPIntel
 
     // Stolen from Lidgren.Network (Space Wizards Edition) (NetReservedAddress.cs)
     // Modified with IPV6 on top
-    private static int Ipv4(byte a, byte b, byte c, byte d)
-    {
-        return (a << 24) | (b << 16) | (c << 8) | d;
-    }
+    private static int Ipv4(byte a, byte b, byte c, byte d) => (a << 24) | (b << 16) | (c << 8) | d;
 
-    // From miniupnpc
-    private static readonly (int ip, int mask)[] ReservedRangesIpv4 =
-    [
-        // @formatter:off
-		(Ipv4(0,   0,   0,   0), 8 ), // RFC1122 "This host on this network"
-		(Ipv4(10,  0,   0,   0), 8 ), // RFC1918 Private-Use
-		(Ipv4(100, 64,  0,   0), 10), // RFC6598 Shared Address Space
-		(Ipv4(127, 0,   0,   0), 8 ), // RFC1122 Loopback
-		(Ipv4(169, 254, 0,   0), 16), // RFC3927 Link-Local
-		(Ipv4(172, 16,  0,   0), 12), // RFC1918 Private-Use
-		(Ipv4(192, 0,   0,   0), 24), // RFC6890 IETF Protocol Assignments
-		(Ipv4(192, 0,   2,   0), 24), // RFC5737 Documentation (TEST-NET-1)
-		(Ipv4(192, 31,  196, 0), 24), // RFC7535 AS112-v4
-		(Ipv4(192, 52,  193, 0), 24), // RFC7450 AMT
-		(Ipv4(192, 88,  99,  0), 24), // RFC7526 6to4 Relay Anycast
-		(Ipv4(192, 168, 0,   0), 16), // RFC1918 Private-Use
-		(Ipv4(192, 175, 48,  0), 24), // RFC7534 Direct Delegation AS112 Service
-		(Ipv4(198, 18,  0,   0), 15), // RFC2544 Benchmarking
-		(Ipv4(198, 51,  100, 0), 24), // RFC5737 Documentation (TEST-NET-2)
-		(Ipv4(203, 0,   113, 0), 24), // RFC5737 Documentation (TEST-NET-3)
-		(Ipv4(224, 0,   0,   0), 4 ), // RFC1112 Multicast
-		(Ipv4(240, 0,   0,   0), 4 ), // RFC1112 Reserved for Future Use + RFC919 Limited Broadcast
-        // @formatter:on
-    ];
-
-    private static UInt128 ToAddressBytes(string ip)
-    {
-        return BinaryPrimitives.ReadUInt128BigEndian(IPAddress.Parse(ip).GetAddressBytes());
-    }
-
-    private static readonly (UInt128 ip, int mask)[] ReservedRangesIpv6 =
-    [
-        (ToAddressBytes("::1"), 128), // "This host on this network"
-        (ToAddressBytes("::ffff:0:0"), 96), // IPv4-mapped addresses
-        (ToAddressBytes("::ffff:0:0:0"), 96), // IPv4-translated addresses
-        (ToAddressBytes("64:ff9b:1::"), 48), // IPv4/IPv6 translation
-        (ToAddressBytes("100::"), 64), // Discard prefix
-        (ToAddressBytes("2001:20::"), 28), // ORCHIDv2
-        (ToAddressBytes("2001:db8::"), 32), // Addresses used in documentation and example source code
-        (ToAddressBytes("3fff::"), 20), // Addresses used in documentation and example source code
-        (ToAddressBytes("5f00::"), 16), // IPv6 Segment Routing (SRv6)
-        (ToAddressBytes("fc00::"), 7), // Unique local address
-    ];
+    private static UInt128 ToAddressBytes(string ip) =>
+        BinaryPrimitives.ReadUInt128BigEndian(IPAddress.Parse(ip).GetAddressBytes());
 
     internal static bool IsAddressReservedIpv4(IPAddress address)
     {
@@ -376,19 +364,21 @@ public sealed class IPIntel
         foreach (var (reservedIp, maskBits) in ReservedRangesIpv6)
         {
             var mask = UInt128.MaxValue << (128 - maskBits);
-            if (((UInt128) ipBits & mask ) == (reservedIp & mask))
+            if (((UInt128) ipBits & mask) == (reservedIp & mask))
                 return true;
         }
 
         return false;
     }
 
-    public readonly record struct IPIntelResult(float Score, IPIntelResultCode Code);
-
-    public enum IPIntelResultCode : byte
+    internal struct Ratelimits
     {
-        Success = 0,
-        RateLimited,
-        Errored,
+        public bool RateLimited;
+        public bool LimitHasBeenHandled;
+        public int CurrentRequests;
+        public int Limit;
+        public TimeSpan LastRatelimited;
     }
+
+    public readonly record struct IPIntelResult(float Score, IPIntelResultCode Code);
 }

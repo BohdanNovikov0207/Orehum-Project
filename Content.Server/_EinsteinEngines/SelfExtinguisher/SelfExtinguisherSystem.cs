@@ -7,13 +7,13 @@
 using Content.Server._EinsteinEngines.Atmos.Components;
 using Content.Server.Atmos.Components;
 using Content.Server.Atmos.EntitySystems;
+using Content.Shared._EinsteinEngines.SelfExtinguisher;
 using Content.Shared.Actions;
 using Content.Shared.Charges.Components;
 using Content.Shared.Charges.Systems;
 using Content.Shared.Effects;
 using Content.Shared.IdentityManagement;
 using Content.Shared.Popups;
-using Content.Shared._EinsteinEngines.SelfExtinguisher;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Containers;
 using Robust.Shared.Player;
@@ -21,20 +21,20 @@ using Robust.Shared.Timing;
 
 namespace Content.Server._EinsteinEngines.SelfExtinguisher;
 
-public sealed partial class SelfExtinguisherSystem : SharedSelfExtinguisherSystem
+public sealed class SelfExtinguisherSystem : SharedSelfExtinguisherSystem
 {
-    [Dependency] private readonly FlammableSystem _flammable = default!;
-    [Dependency] private readonly SharedContainerSystem _container = default!;
-    [Dependency] private readonly SharedChargesSystem _charges = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    private const float ExtinguishAnimationLength = 0.45f;
     [Dependency] private readonly SharedActionsSystem _actions = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly SharedChargesSystem _charges = default!;
     [Dependency] private readonly SharedColorFlashEffectSystem _color = default!;
+    [Dependency] private readonly SharedContainerSystem _container = default!;
 
     // Same color as the water reagent
     private readonly Color _extinguishColor = Color.FromHex("#75b1f0");
-    private const float ExtinguishAnimationLength = 0.45f;
+    [Dependency] private readonly FlammableSystem _flammable = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -43,10 +43,8 @@ public sealed partial class SelfExtinguisherSystem : SharedSelfExtinguisherSyste
         SubscribeLocalEvent<SelfExtinguisherComponent, SelfExtinguishEvent>(OnSelfExtinguish);
     }
 
-    private void OnSelfExtinguish(EntityUid uid, SelfExtinguisherComponent component, SelfExtinguishEvent args)
-    {
+    private void OnSelfExtinguish(EntityUid uid, SelfExtinguisherComponent component, SelfExtinguishEvent args) =>
         TryExtinguish(args.Performer, uid, component);
-    }
 
     private void TryExtinguish(EntityUid user, EntityUid uid, SelfExtinguisherComponent? selfExtinguisher = null)
     {
@@ -67,7 +65,9 @@ public sealed partial class SelfExtinguisherSystem : SharedSelfExtinguisherSyste
                 return;
 
             _popup.PopupEntity(Loc.GetString("self-extinguisher-no-charges", ("item", uid)),
-                target, user, !flammable.OnFire ? PopupType.Small : PopupType.MediumCaution);
+                target,
+                user,
+                !flammable.OnFire ? PopupType.Small : PopupType.MediumCaution);
             return;
         }
 
@@ -76,8 +76,10 @@ public sealed partial class SelfExtinguisherSystem : SharedSelfExtinguisherSyste
             if (!SetPopupCooldown((uid, selfExtinguisher), curTime))
                 return;
 
-            _popup.PopupEntity(Loc.GetString($"self-extinguisher-on-cooldown", ("item", uid)),
-                target, user, !flammable.OnFire ? PopupType.Small : PopupType.MediumCaution);
+            _popup.PopupEntity(Loc.GetString("self-extinguisher-on-cooldown", ("item", uid)),
+                target,
+                user,
+                !flammable.OnFire ? PopupType.Small : PopupType.MediumCaution);
             return;
         }
 
@@ -86,8 +88,11 @@ public sealed partial class SelfExtinguisherSystem : SharedSelfExtinguisherSyste
             if (!SetPopupCooldown((uid, selfExtinguisher), curTime))
                 return;
 
-            _popup.PopupEntity(Loc.GetString($"self-extinguisher-not-on-fire-{locSuffix}", ("item", uid), ("target", targetIdentity)),
-                target, user);
+            _popup.PopupEntity(Loc.GetString($"self-extinguisher-not-on-fire-{locSuffix}",
+                    ("item", uid),
+                    ("target", targetIdentity)),
+                target,
+                user);
             return;
         }
 
@@ -99,22 +104,33 @@ public sealed partial class SelfExtinguisherSystem : SharedSelfExtinguisherSyste
             if (!SetPopupCooldown((uid, selfExtinguisher), curTime))
                 return;
 
-            _popup.PopupEntity(Loc.GetString($"self-extinguisher-not-immune-to-fire-{locSuffix}", ("item", uid), ("target", targetIdentity)),
-                target, user, PopupType.MediumCaution);
+            _popup.PopupEntity(Loc.GetString($"self-extinguisher-not-immune-to-fire-{locSuffix}",
+                    ("item", uid),
+                    ("target", targetIdentity)),
+                target,
+                user,
+                PopupType.MediumCaution);
             return;
         }
 
         _flammable.Extinguish(target, flammable);
-        _color.RaiseEffect(_extinguishColor, [target], Filter.Pvs(target, entityManager: EntityManager), ExtinguishAnimationLength);
+        _color.RaiseEffect(_extinguishColor,
+            [target],
+            Filter.Pvs(target, entityManager: EntityManager),
+            ExtinguishAnimationLength);
         _audio.PlayPvs(selfExtinguisher.Sound, uid, selfExtinguisher.Sound.Params.WithVariation(0.125f));
 
         _popup.PopupPredicted(
             Loc.GetString("self-extinguisher-extinguish-other", ("item", uid), ("target", targetIdentity)),
-            target, target, PopupType.Medium
+            target,
+            target,
+            PopupType.Medium
         );
         _popup.PopupEntity(
             Loc.GetString("self-extinguisher-extinguish-self", ("item", uid)),
-            target, target, PopupType.Medium
+            target,
+            target,
+            PopupType.Medium
         );
 
         if (charges != null)

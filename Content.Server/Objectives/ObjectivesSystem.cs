@@ -30,35 +30,40 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Text;
+using Content.Goobstation.Common.CCVar;
+using Content.Goobstation.Common.ServerCurrency;
+using Content.Goobstation.Shared.ManifestListings;
 using Content.Server.GameTicking;
+using Content.Server.Objectives.Commands;
+using Content.Server.Roles;
 using Content.Server.Shuttles.Systems;
+using Content.Shared._DV.CCVars;
+using Content.Shared._DV.CustomObjectiveSummary;
+using Content.Shared.Administration.Logs;
+using Content.Shared.CCVar;
 using Content.Shared.Cuffs.Components;
+using Content.Shared.Database;
 using Content.Shared.GameTicking.Components;
 using Content.Shared.Mind;
 using Content.Shared.Objectives.Components;
 using Content.Shared.Objectives.Systems;
+using Content.Shared.Prototypes;
 using Content.Shared.Random;
 using Content.Shared.Random.Helpers;
-using Robust.Shared.Prototypes;
-using Robust.Shared.Random;
-using System.Linq;
-using System.Text;
-using Content.Shared._DV.CustomObjectiveSummary; // DeltaV
-using Content.Shared._DV.CCVars;
-using Content.Goobstation.Common.CCVar;
-using Content.Goobstation.Common.ServerCurrency;
-using Content.Goobstation.Shared.ManifestListings;
-using Content.Server.Objectives.Commands;
-using Content.Shared.CCVar;
-using Content.Shared.Prototypes;
+using Content.Shared.Roles;
 using Content.Shared.Roles.Jobs;
 using Robust.Server.Player;
 using Robust.Shared.Configuration;
-using Robust.Shared.Utility;
-using Content.Shared.Administration.Logs;
 using Robust.Shared.Network;
-using Content.Shared.Roles;
-using Content.Server.Roles; //Goobstation
+using Robust.Shared.Prototypes;
+using Robust.Shared.Random;
+using Robust.Shared.Utility;
+// DeltaV
+
+//Goobstation
 
 namespace Content.Server.Objectives;
 
@@ -66,24 +71,25 @@ namespace Content.Server.Objectives;
 // if you wanna upstream something think twice
 public sealed class ObjectivesSystem : SharedObjectivesSystem
 {
-    [Dependency] private readonly GameTicker _gameTicker = default!;
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-    [Dependency] private readonly IPlayerManager _player = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly EmergencyShuttleSystem _emergencyShuttle = default!;
-    [Dependency] private readonly SharedJobSystem _job = default!;
-    [Dependency] private readonly ICommonCurrencyManager _currencyMan = default!;
-    [Dependency] private readonly IConfigurationManager _cfg = default!;
-    [Dependency] private readonly ISharedAdminLogManager _adminLog = default!;
-    [Dependency] private readonly SharedRoleSystem _roles = default!;
+    [Robust.Shared.IoC.Dependency] private readonly ISharedAdminLogManager _adminLog = default!;
+    [Robust.Shared.IoC.Dependency] private readonly IConfigurationManager _cfg = default!;
+    [Robust.Shared.IoC.Dependency] private readonly ICommonCurrencyManager _currencyMan = default!;
+    [Robust.Shared.IoC.Dependency] private readonly EmergencyShuttleSystem _emergencyShuttle = default!;
+    [Robust.Shared.IoC.Dependency] private readonly GameTicker _gameTicker = default!;
+    [Robust.Shared.IoC.Dependency] private readonly SharedJobSystem _job = default!;
+    [Robust.Shared.IoC.Dependency] private readonly IPlayerManager _player = default!;
+    [Robust.Shared.IoC.Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    [Robust.Shared.IoC.Dependency] private readonly IRobustRandom _random = default!;
+    [Robust.Shared.IoC.Dependency] private readonly SharedRoleSystem _roles = default!;
+
+    private int _goobcoinsServerMultiplier = 1;
+
+    private int _maxLengthSummaryLength; // DeltaV
 
     private IEnumerable<string>? _objectives;
 
     private bool _showGreentext;
 
-    private int _maxLengthSummaryLength; // DeltaV
-
-    private int _goobcoinsServerMultiplier = 1;
     public override void Initialize()
     {
         base.Initialize();
@@ -143,9 +149,7 @@ public sealed class ObjectivesSystem : SharedObjectivesSystem
                 summary[prepend.Text].AddRange(info.Minds);
             }
             else
-            {
                 summary[prepend.Text] = info.Minds;
-            }
         }
 
         // convert the data into summary text
@@ -165,9 +169,10 @@ public sealed class ObjectivesSystem : SharedObjectivesSystem
                 var result = new StringBuilder();
                 result.AppendLine(Loc.GetString("objectives-round-end-result", ("count", total), ("agent", faction)));
                 if (agent == Loc.GetString("traitor-round-end-agent-name"))
-                {
-                    result.AppendLine(Loc.GetString("objectives-round-end-result-in-custody", ("count", total), ("custody", totalInCustody), ("agent", faction)));
-                }
+                    result.AppendLine(Loc.GetString("objectives-round-end-result-in-custody",
+                        ("count", total),
+                        ("custody", totalInCustody),
+                        ("agent", faction)));
                 // next add all the players with its own prepended text
                 foreach (var (prepend, minds) in summary)
                 {
@@ -188,7 +193,8 @@ public sealed class ObjectivesSystem : SharedObjectivesSystem
     private void AddSummary(StringBuilder result, string agent, List<(EntityUid, string)> minds)
     {
         var agentSummaries = new List<(string summary, float successRate, int completedObjectives)>();
-        var currencyStorage = new Dictionary<NetUserId, float>(); //goobstation - store all currency and add at end off round
+        var currencyStorage =
+            new Dictionary<NetUserId, float>(); //goobstation - store all currency and add at end off round
 
         foreach (var (mindId, name) in minds)
         {
@@ -215,14 +221,19 @@ public sealed class ObjectivesSystem : SharedObjectivesSystem
             var objectives = mind.Objectives;
             if (objectives.Count == 0)
             {
-                agentSummaries.Add((Loc.GetString("objectives-no-objectives", ("custody", custody), ("title", title), ("agent", agent)), 0f, 0));
+                agentSummaries.Add((
+                    Loc.GetString("objectives-no-objectives", ("custody", custody), ("title", title), ("agent", agent)),
+                    0f, 0));
                 continue;
             }
 
             var completedObjectives = 0;
             var totalObjectives = 0;
             var agentSummary = new StringBuilder();
-            agentSummary.AppendLine(Loc.GetString("objectives-with-objectives", ("custody", custody), ("title", title), ("agent", agent)));
+            agentSummary.AppendLine(Loc.GetString("objectives-with-objectives",
+                ("custody", custody),
+                ("title", title),
+                ("agent", agent)));
 
             // Goobstation start
             var ev = new PrependObjectivesSummaryTextEvent();
@@ -256,11 +267,11 @@ public sealed class ObjectivesSystem : SharedObjectivesSystem
                     if (username is null &&
                         userid.HasValue &&
                         _player.TryGetPlayerData(userid.Value, out var data))
-                        username = System.Runtime.CompilerServices.FormattableStringFactory.Create(data.UserName);
+                        username = FormattableStringFactory.Create(data.UserName);
 
-                    _adminLog.Add(Shared.Database.LogType.AntagObjective,
-                                    Shared.Database.LogImpact.Low,
-                                    $"{username:subject} achieved {progress}% of objective {objectiveTitle}");
+                    _adminLog.Add(LogType.AntagObjective,
+                        LogImpact.Low,
+                        $"{username:subject} achieved {progress}% of objective {objectiveTitle}");
 
                     agentSummary.Append("- ");
                     agentSummary.AppendLine(objectiveTitle);
@@ -281,10 +292,12 @@ public sealed class ObjectivesSystem : SharedObjectivesSystem
                         ));
                         //Goobstation
                         if (userid.HasValue && rewardPartial)
+                        {
                             if (currencyStorage.ContainsKey(userid.Value))
                                 currencyStorage[userid.Value] += reward * progress;
                             else
                                 currencyStorage.Add(userid.Value, reward * progress);
+                        }
                     }
                     else if (progress < 0.5f && progress > 0f)
                     {
@@ -305,7 +318,7 @@ public sealed class ObjectivesSystem : SharedObjectivesSystem
                 }
             }
 
-            var successRate = totalObjectives > 0 ? (float)completedObjectives / totalObjectives : 0f;
+            var successRate = totalObjectives > 0 ? (float) completedObjectives / totalObjectives : 0f;
             // Begin DeltaV Additions - custom objective response.
             if (TryComp<CustomObjectiveSummaryComponent>(mindId, out var customComp) &&
                 customComp.ObjectiveSummary.Length <= _maxLengthSummaryLength)
@@ -328,12 +341,13 @@ public sealed class ObjectivesSystem : SharedObjectivesSystem
 
                 agentSummary.AppendLine(Loc.GetString("custom-objective-format", ("line", currentLine)));
             }
+
             // End DeltaV Additions
             agentSummaries.Add((agentSummary.ToString(), successRate, completedObjectives));
         }
 
         var sortedAgents = agentSummaries.OrderByDescending(x => x.successRate)
-                                       .ThenByDescending(x => x.completedObjectives);
+            .ThenByDescending(x => x.completedObjectives);
 
         foreach (var (summary, _, _) in sortedAgents)
         {
@@ -341,14 +355,20 @@ public sealed class ObjectivesSystem : SharedObjectivesSystem
         }
 
         foreach (var (key, currency) in currencyStorage)
-            _currencyMan.AddCurrency(key, (int)Math.Round( currency * _goobcoinsServerMultiplier));
+        {
+            _currencyMan.AddCurrency(key, (int) Math.Round(currency * _goobcoinsServerMultiplier));
+        }
     }
 
-    public EntityUid? GetRandomObjective(EntityUid mindId, MindComponent mind, ProtoId<WeightedRandomPrototype> objectiveGroupProto, float maxDifficulty)
+    public EntityUid? GetRandomObjective(EntityUid mindId,
+        MindComponent mind,
+        ProtoId<WeightedRandomPrototype> objectiveGroupProto,
+        float maxDifficulty)
     {
         if (!_prototypeManager.TryIndex(objectiveGroupProto, out var groupsProto))
         {
-            Log.Error($"Tried to get a random objective, but can't index WeightedRandomPrototype {objectiveGroupProto}");
+            Log.Error(
+                $"Tried to get a random objective, but can't index WeightedRandomPrototype {objectiveGroupProto}");
             return null;
         }
 
@@ -366,10 +386,12 @@ public sealed class ObjectivesSystem : SharedObjectivesSystem
             var objectives = group.Weights.ShallowClone();
             while (_random.TryPickAndTake(objectives, out var objectiveProto))
             {
-                if (!_prototypeManager.Index(objectiveProto).TryGetComponent<ObjectiveComponent>(out var objectiveComp, EntityManager.ComponentFactory))
+                if (!_prototypeManager.Index(objectiveProto)
+                        .TryGetComponent<ObjectiveComponent>(out var objectiveComp, EntityManager.ComponentFactory))
                     continue;
 
-                if (objectiveComp.Difficulty <= maxDifficulty && TryCreateObjective((mindId, mind), objectiveProto, out var objective))
+                if (objectiveComp.Difficulty <= maxDifficulty &&
+                    TryCreateObjective((mindId, mind), objectiveProto, out var objective))
                     return objective;
             }
         }
@@ -386,16 +408,18 @@ public sealed class ObjectivesSystem : SharedObjectivesSystem
             return false;
 
         // Ghosting will not save you
-        bool originalEntityInCustody = false;
-        EntityUid? originalEntity = GetEntity(mind.OriginalOwnedEntity);
+        var originalEntityInCustody = false;
+        var originalEntity = GetEntity(mind.OriginalOwnedEntity);
         if (originalEntity.HasValue && originalEntity != mind.OwnedEntity)
         {
-            originalEntityInCustody = TryComp<CuffableComponent>(originalEntity, out var origCuffed) && origCuffed.CuffedHandCount > 0
-                   && _emergencyShuttle.IsTargetEscaping(originalEntity.Value);
+            originalEntityInCustody = TryComp<CuffableComponent>(originalEntity, out var origCuffed) &&
+                                      origCuffed.CuffedHandCount > 0
+                                      && _emergencyShuttle.IsTargetEscaping(originalEntity.Value);
         }
 
-        return originalEntityInCustody || (TryComp<CuffableComponent>(mind.OwnedEntity, out var cuffed) && cuffed.CuffedHandCount > 0
-               && _emergencyShuttle.IsTargetEscaping(mind.OwnedEntity.Value));
+        return originalEntityInCustody || TryComp<CuffableComponent>(mind.OwnedEntity, out var cuffed) &&
+            cuffed.CuffedHandCount > 0
+            && _emergencyShuttle.IsTargetEscaping(mind.OwnedEntity.Value);
     }
 
     /// <summary>
@@ -421,14 +445,11 @@ public sealed class ObjectivesSystem : SharedObjectivesSystem
     }
 
 
-    private void CreateCompletions(PrototypesReloadedEventArgs unused)
-    {
-        CreateCompletions();
-    }
+    private void CreateCompletions(PrototypesReloadedEventArgs unused) => CreateCompletions();
 
     /// <summary>
     /// Get all objective prototypes by their IDs.
-    /// This is used for completions in <see cref="AddObjectiveCommand"/>
+    /// This is used for completions in <see cref="AddObjectiveCommand" />
     /// </summary>
     public IEnumerable<string> Objectives()
     {
@@ -438,13 +459,11 @@ public sealed class ObjectivesSystem : SharedObjectivesSystem
         return _objectives!;
     }
 
-    private void CreateCompletions()
-    {
+    private void CreateCompletions() =>
         _objectives = _prototypeManager.EnumeratePrototypes<EntityPrototype>()
             .Where(p => p.HasComponent<ObjectiveComponent>())
             .Select(p => p.ID)
             .Order();
-    }
 }
 
 /// <summary>
@@ -456,7 +475,10 @@ public sealed class ObjectivesSystem : SharedObjectivesSystem
 /// The objectives system already checks if the game rule is added so you don't need to check that in this event's handler.
 /// </remarks>
 [ByRefEvent]
-public record struct ObjectivesTextGetInfoEvent(List<(EntityUid, string)> Minds, string AgentName, string? Faction = null);
+public record struct ObjectivesTextGetInfoEvent(
+    List<(EntityUid, string)> Minds,
+    string AgentName,
+    string? Faction = null);
 
 /// <summary>
 /// Raised on the game rule before text for each agent's objectives is added, letting you prepend something.

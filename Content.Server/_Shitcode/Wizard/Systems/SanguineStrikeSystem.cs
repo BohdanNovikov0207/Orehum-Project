@@ -5,17 +5,16 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Server.Body.Components;
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Server.Body.Systems;
 using Content.Server.Fluids.EntitySystems;
 using Content.Server.Popups;
 using Content.Shared._Goobstation.Wizard.Projectiles;
 using Content.Shared._Goobstation.Wizard.SanguineStrike;
+using Content.Shared.Body.Components;
 using Content.Shared.Chemistry.Components;
 using Content.Shared.Chemistry.Components.SolutionManager;
 using Content.Shared.Chemistry.EntitySystems;
-using Content.Goobstation.Maths.FixedPoint;
-using Content.Shared.Body.Components;
 using Robust.Server.Audio;
 using Robust.Server.GameObjects;
 using Robust.Shared.Map;
@@ -25,14 +24,14 @@ namespace Content.Server._Goobstation.Wizard.Systems;
 
 public sealed class SanguineStrikeSystem : SharedSanguineStrikeSystem
 {
-    [Dependency] private readonly PopupSystem _popup = default!;
-    [Dependency] private readonly PointLightSystem _light = default!;
-    [Dependency] private readonly TransformSystem _transform = default!;
     [Dependency] private readonly AudioSystem _audio = default!;
     [Dependency] private readonly BloodstreamSystem _bloodStream = default!;
-    [Dependency] private readonly SharedSolutionContainerSystem _solution = default!;
-    [Dependency] private readonly PuddleSystem _puddle = default!;
+    [Dependency] private readonly PointLightSystem _light = default!;
+    [Dependency] private readonly PopupSystem _popup = default!;
     [Dependency] private readonly IPrototypeManager _proto = default!;
+    [Dependency] private readonly PuddleSystem _puddle = default!;
+    [Dependency] private readonly SharedSolutionContainerSystem _solution = default!;
+    [Dependency] private readonly TransformSystem _transform = default!;
 
     public override void Initialize()
     {

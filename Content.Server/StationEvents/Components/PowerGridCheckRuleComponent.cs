@@ -14,7 +14,7 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Server.StationEvents.Components;
 
-[RegisterComponent, Access(typeof(PowerGridCheckRule))]
+[RegisterComponent] [Access(typeof(PowerGridCheckRule))]
 public sealed partial class PowerGridCheckRuleComponent : Component
 {
     /// <summary>
@@ -22,21 +22,23 @@ public sealed partial class PowerGridCheckRuleComponent : Component
     /// </summary>
     private static readonly ProtoId<SoundCollectionPrototype> DefaultPowerOn = new("PowerOn");
 
+    public readonly List<EntityUid> Powered = new();
+    public readonly List<EntityUid> Unpowered = new();
+
+    public EntityUid AffectedStation;
+
+    public CancellationTokenSource? AnnounceCancelToken;
+    public float FrameTimeAccumulator = 0.0f;
+
+    public int NumberPerSecond = 0;
+
     /// <summary>
     /// Sound of the announcement to play when power is back on.
     /// </summary>
     [DataField]
-    public SoundSpecifier PowerOnSound = new SoundCollectionSpecifier(DefaultPowerOn, AudioParams.Default.WithVolume(-4f));
-
-    public CancellationTokenSource? AnnounceCancelToken;
-
-    public EntityUid AffectedStation;
-    public readonly List<EntityUid> Powered = new();
-    public readonly List<EntityUid> Unpowered = new();
+    public SoundSpecifier PowerOnSound =
+        new SoundCollectionSpecifier(DefaultPowerOn, AudioParams.Default.WithVolume(-4f));
 
     public float SecondsUntilOff = 30.0f;
-
-    public int NumberPerSecond = 0;
     public float UpdateRate => 1.0f / NumberPerSecond;
-    public float FrameTimeAccumulator = 0.0f;
 }

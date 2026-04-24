@@ -24,29 +24,21 @@ public sealed class EntityStringRepresentationConverter : AdminLogConverter<Enti
         writer.WriteNumber("id", (int) value.Uid);
 
         if (value.Name != null)
-        {
             writer.WriteString("name", value.Name);
-        }
 
         if (value.Session != null)
         {
             writer.WriteString("player", value.Session.UserId.UserId);
 
             if (_adminManager.IsAdmin(value.Uid))
-            {
                 writer.WriteBoolean("admin", true);
-            }
         }
 
         if (value.Prototype != null)
-        {
             writer.WriteString("prototype", value.Prototype);
-        }
 
         if (value.Deleted)
-        {
             writer.WriteBoolean("deleted", true);
-        }
 
         writer.WriteEndObject();
     }

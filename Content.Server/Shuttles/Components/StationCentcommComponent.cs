@@ -17,20 +17,20 @@ namespace Content.Server.Shuttles.Components;
 public sealed partial class StationCentcommComponent : Component
 {
     /// <summary>
-    /// Crude shuttle offset spawning.
-    /// </summary>
-    [DataField]
-    public float ShuttleIndex;
-
-    [DataField]
-    public ResPath Map = new("/Maps/centcomm.yml");
-
-    /// <summary>
     /// Centcomm entity that was loaded.
     /// </summary>
     [DataField]
     public EntityUid? Entity;
 
     [DataField]
+    public ResPath Map = new("/Maps/centcomm.yml");
+
+    [DataField]
     public EntityUid? MapEntity;
+
+    /// <summary>
+    /// Crude shuttle offset spawning.
+    /// </summary>
+    [DataField]
+    public float ShuttleIndex;
 }

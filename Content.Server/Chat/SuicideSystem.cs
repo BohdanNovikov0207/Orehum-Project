@@ -76,6 +76,8 @@
 
 using Content.Server.Ghost;
 using Content.Server.Hands.Systems;
+using Content.Shared._EinsteinEngines.Silicon.Components;
+using Content.Shared._White.Xenomorphs.Infection;
 using Content.Shared.Administration.Logs;
 using Content.Shared.Chat;
 using Content.Shared.Damage;
@@ -91,24 +93,22 @@ using Content.Shared.Popups;
 using Content.Shared.Tag;
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
-using Content.Shared._White.Xenomorphs.Infection;
-using Content.Shared._EinsteinEngines.Silicon.Components;
-using Content.Shared._Shitmed.Medical.Surgery.Consciousness.Components; // Shitmed Change
+
+// Shitmed Change
 
 namespace Content.Server.Chat;
 
 public sealed class SuicideSystem : EntitySystem
 {
-    [Dependency] private readonly EntityLookupSystem _entityLookupSystem = default!;
+    private static readonly ProtoId<TagPrototype> CannotSuicideTag = "CannotSuicide";
     [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
+    [Dependency] private readonly EntityLookupSystem _entityLookupSystem = default!;
+    [Dependency] private readonly GhostSystem _ghostSystem = default!;
     [Dependency] private readonly HandsSystem _hands = default!;
-    [Dependency] private readonly TagSystem _tagSystem = default!;
     [Dependency] private readonly MobStateSystem _mobState = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly GhostSystem _ghostSystem = default!;
     [Dependency] private readonly SharedSuicideSystem _suicide = default!;
-
-    private static readonly ProtoId<TagPrototype> CannotSuicideTag = "CannotSuicide";
+    [Dependency] private readonly TagSystem _tagSystem = default!;
 
     public override void Initialize()
     {
@@ -127,7 +127,8 @@ public sealed class SuicideSystem : EntitySystem
     public bool Suicide(EntityUid victim)
     {
         // Can't suicide if we're already dead
-        if (!TryComp<MobStateComponent>(victim, out var mobState) || _mobState.IsDead(victim, mobState) || _tagSystem.HasTag(victim, "CannotSuicideAny")) // Goobstation
+        if (!TryComp<MobStateComponent>(victim, out var mobState) || _mobState.IsDead(victim, mobState) ||
+            _tagSystem.HasTag(victim, "CannotSuicideAny")) // Goobstation
             return false;
 
         _adminLogger.Add(LogType.Mind, $"{ToPrettyString(victim):player} is attempting to suicide");
@@ -154,13 +155,9 @@ public sealed class SuicideSystem : EntitySystem
 
         // Since the player is already dead the log will not contain their username.
         if (session != null)
-        {
             _adminLogger.Add(LogType.Mind, $"{session:player} suicided.");
-        }
         else
-        {
             _adminLogger.Add(LogType.Mind, $"{ToPrettyString(victim):player} suicided.");
-        }
 
         return true;
     }
@@ -214,7 +211,9 @@ public sealed class SuicideSystem : EntitySystem
         // Try to suicide by nearby entities, like Microwaves or Crematoriums, by raising an event on it
         // Returns upon being handled by any entity
         var itemQuery = GetEntityQuery<ItemComponent>();
-        foreach (var entity in _entityLookupSystem.GetEntitiesInRange(victim, 1, LookupFlags.Approximate | LookupFlags.Static))
+        foreach (var entity in _entityLookupSystem.GetEntitiesInRange(victim,
+                     1,
+                     LookupFlags.Approximate | LookupFlags.Static))
         {
             // Skip any nearby items that can be picked up, we already checked the active held item above
             if (itemQuery.HasComponent(entity))
@@ -238,7 +237,8 @@ public sealed class SuicideSystem : EntitySystem
             || HasComp<XenomorphPreventSuicideComponent>(victim)) // Goob station - Xenomorphs
             return;
 
-        var othersMessage = Loc.GetString("suicide-command-default-text-others", ("name", Identity.Entity(victim, EntityManager)));
+        var othersMessage = Loc.GetString("suicide-command-default-text-others",
+            ("name", Identity.Entity(victim, EntityManager)));
         _popup.PopupEntity(othersMessage, victim, Filter.PvsExcept(victim), true);
 
         var selfMessage = Loc.GetString("suicide-command-default-text-self");

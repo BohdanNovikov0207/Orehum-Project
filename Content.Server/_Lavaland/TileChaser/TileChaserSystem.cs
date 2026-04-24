@@ -20,33 +20,33 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Robust.Shared.Map.Components;
-using Robust.Shared.Random;
 using System.Numerics;
 using Content.Shared._Lavaland.Anger.Systems;
 using Content.Shared._Lavaland.Megafauna.Events;
 using Content.Shared._Lavaland.TileChaser;
+using Robust.Shared.Map.Components;
+using Robust.Shared.Random;
 
 namespace Content.Server._Lavaland.TileChaser;
 
 /// <summary>
-///     Chaser works as a self replicator.
-///     It searches for the player, picks a neat position and spawns itself with something else
+/// Chaser works as a self replicator.
+/// It searches for the player, picks a neat position and spawns itself with something else
 /// </summary>
 public sealed class TileChaserSystem : EntitySystem
 {
+    private static readonly Vector2i[] Directions =
+    {
+        new(1, 0),
+        new(0, 1),
+        new(-1, 0),
+        new(0, -1),
+    };
+
     [Dependency] private readonly AngerSystem _anger = default!;
     [Dependency] private readonly SharedMapSystem _map = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly SharedTransformSystem _xform = default!;
-
-    private static readonly Vector2i[] Directions =
-    {
-        new( 1,  0),
-        new( 0,  1),
-        new(-1,  0),
-        new ( 0, -1),
-    };
 
     private EntityQuery<TileChaserComponent> _chaserQuery;
 
@@ -87,9 +87,9 @@ public sealed class TileChaserSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Crawl one tile away from its initial position.
-    ///     Replicate itself and the prototype designated.
-    ///     Delete itself afterwards.
+    /// Crawl one tile away from its initial position.
+    /// Replicate itself and the prototype designated.
+    /// Delete itself afterwards.
     /// </summary>
     private void Cycle(Entity<TileChaserComponent, TransformComponent> ent)
     {
@@ -154,7 +154,7 @@ public sealed class TileChaserSystem : EntitySystem
         delta = Vector2.Clamp(Vector2.Round(delta), new Vector2(-1, -1), new Vector2(1, 1));
 
         return Math.Abs(delta.X) >= Math.Abs(delta.Y)
-            ? new Vector2i((int)delta.X, 0)
-            : new Vector2i(0, (int)delta.Y);
+            ? new Vector2i((int) delta.X, 0)
+            : new Vector2i(0, (int) delta.Y);
     }
 }

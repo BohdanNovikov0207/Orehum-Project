@@ -24,48 +24,35 @@ public sealed class PowerNetConnectorSystem : EntitySystem
         SubscribeLocalEvent<ApcComponent, ComponentRemove>(OnRemove<ApcComponent, IApcNet>);
         SubscribeLocalEvent<ApcPowerProviderComponent, ComponentRemove>(OnRemove<ApcPowerProviderComponent, IApcNet>);
         SubscribeLocalEvent<BatteryChargerComponent, ComponentRemove>(OnRemove<BatteryChargerComponent, IPowerNet>);
-        SubscribeLocalEvent<BatteryDischargerComponent, ComponentRemove>(OnRemove<BatteryDischargerComponent, IPowerNet>);
+        SubscribeLocalEvent<BatteryDischargerComponent, ComponentRemove>(
+            OnRemove<BatteryDischargerComponent, IPowerNet>);
         SubscribeLocalEvent<PowerConsumerComponent, ComponentRemove>(OnRemove<PowerConsumerComponent, IBasePowerNet>);
         SubscribeLocalEvent<PowerSupplierComponent, ComponentRemove>(OnRemove<PowerSupplierComponent, IBasePowerNet>);
     }
 
     private void OnRemove<TComp, TNet>(EntityUid uid, TComp component, ComponentRemove args)
         where TComp : BaseNetConnectorComponent<TNet>
-        where TNet : class
-    {
+        where TNet : class =>
         component.ClearNet();
-    }
 
-    private void OnPowerSupplierInit(EntityUid uid, PowerSupplierComponent component, ComponentInit args)
-    {
+    private void OnPowerSupplierInit(EntityUid uid, PowerSupplierComponent component, ComponentInit args) =>
         BaseNetConnectorInit(component);
-    }
 
-    private void OnBatteryDischargerInit(EntityUid uid, BatteryDischargerComponent component, ComponentInit args)
-    {
+    private void OnBatteryDischargerInit(EntityUid uid, BatteryDischargerComponent component, ComponentInit args) =>
         BaseNetConnectorInit(component);
-    }
 
-    private void OnBatteryChargerInit(EntityUid uid, BatteryChargerComponent component, ComponentInit args)
-    {
+    private void OnBatteryChargerInit(EntityUid uid, BatteryChargerComponent component, ComponentInit args) =>
         BaseNetConnectorInit(component);
-    }
 
-    private void OnApcPowerProviderInit(EntityUid uid, ApcPowerProviderComponent component, ComponentInit args)
-    {
+    private void OnApcPowerProviderInit(EntityUid uid, ApcPowerProviderComponent component, ComponentInit args) =>
         BaseNetConnectorInit(component);
-    }
 
-    private void OnApcInit(EntityUid uid, ApcComponent component, ComponentInit args)
-    {
+    private void OnApcInit(EntityUid uid, ApcComponent component, ComponentInit args) =>
         BaseNetConnectorInit(component);
-    }
 
     public void BaseNetConnectorInit<T>(BaseNetConnectorComponent<T> component) where T : class
     {
         if (component.NeedsNet)
-        {
             component.TryFindAndSetNet();
-        }
     }
 }

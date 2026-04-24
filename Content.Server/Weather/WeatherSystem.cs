@@ -60,13 +60,13 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Linq;
 using Content.Server.Administration;
 using Content.Shared.Administration;
 using Content.Shared.Weather;
 using Robust.Shared.Console;
 using Robust.Shared.GameStates;
 using Robust.Shared.Map;
-using System.Linq;
 
 namespace Content.Server.Weather;
 
@@ -86,10 +86,8 @@ public sealed class WeatherSystem : SharedWeatherSystem
             WeatherCompletion);
     }
 
-    private void OnWeatherGetState(EntityUid uid, WeatherComponent component, ref ComponentGetState args)
-    {
+    private void OnWeatherGetState(EntityUid uid, WeatherComponent component, ref ComponentGetState args) =>
         args.State = new WeatherComponentState(component.Weather);
-    }
 
     [AdminCommand(AdminFlags.Fun)]
     private void WeatherTwo(IConsoleShell shell, string argStr, string[] args)
@@ -130,13 +128,9 @@ public sealed class WeatherSystem : SharedWeatherSystem
         {
             var curTime = Timing.CurTime;
             if (int.TryParse(args[2], out var durationInt))
-            {
                 endTime = curTime + TimeSpan.FromSeconds(durationInt);
-            }
             else
-            {
                 shell.WriteError(Loc.GetString("cmd-weather-error-wrong-time"));
-            }
         }
 
         SetWeather(mapId, weather, endTime);

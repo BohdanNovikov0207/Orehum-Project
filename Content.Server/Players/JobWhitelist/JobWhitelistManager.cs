@@ -31,10 +31,14 @@ public sealed class JobWhitelistManager : IPostInjectInit
 
     private readonly Dictionary<NetUserId, HashSet<string>> _whitelists = new();
 
-    public void Initialize()
+    void IPostInjectInit.PostInject()
     {
-        _net.RegisterNetMessage<MsgJobWhitelist>();
+        _userDb.AddOnLoadPlayer(LoadData);
+        _userDb.AddOnFinishLoad(FinishLoad);
+        _userDb.AddOnPlayerDisconnect(ClientDisconnected);
     }
+
+    public void Initialize() => _net.RegisterNetMessage<MsgJobWhitelist>();
 
     private async Task LoadData(ICommonSession session, CancellationToken cancel)
     {
@@ -43,15 +47,9 @@ public sealed class JobWhitelistManager : IPostInjectInit
         _whitelists[session.UserId] = whitelists.ToHashSet();
     }
 
-    private void FinishLoad(ICommonSession session)
-    {
-        SendJobWhitelist(session);
-    }
+    private void FinishLoad(ICommonSession session) => SendJobWhitelist(session);
 
-    private void ClientDisconnected(ICommonSession session)
-    {
-        _whitelists.Remove(session.UserId);
-    }
+    private void ClientDisconnected(ICommonSession session) => _whitelists.Remove(session.UserId);
 
     public async void AddWhitelist(NetUserId player, ProtoId<JobPrototype> job)
     {
@@ -71,9 +69,7 @@ public sealed class JobWhitelistManager : IPostInjectInit
 
         if (!_prototypes.TryIndex(job, out var jobPrototype) ||
             !jobPrototype.Whitelisted)
-        {
             return true;
-        }
 
         return IsWhitelisted(session.UserId, job);
     }
@@ -105,16 +101,9 @@ public sealed class JobWhitelistManager : IPostInjectInit
     {
         var msg = new MsgJobWhitelist
         {
-            Whitelist = _whitelists.GetValueOrDefault(player.UserId) ?? new HashSet<string>()
+            Whitelist = _whitelists.GetValueOrDefault(player.UserId) ?? new HashSet<string>(),
         };
 
         _net.ServerSendMessage(msg, player.Channel);
-    }
-
-    void IPostInjectInit.PostInject()
-    {
-        _userDb.AddOnLoadPlayer(LoadData);
-        _userDb.AddOnFinishLoad(FinishLoad);
-        _userDb.AddOnPlayerDisconnect(ClientDisconnected);
     }
 }

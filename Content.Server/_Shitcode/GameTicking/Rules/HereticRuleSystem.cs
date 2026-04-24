@@ -12,37 +12,29 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Text;
+using Content.Server._Goobstation.Objectives.Components;
 using Content.Server.Antag;
 using Content.Server.GameTicking.Rules.Components;
 using Content.Server.Mind;
 using Content.Server.Objectives;
+using Content.Server.Popups;
 using Content.Server.Roles;
 using Content.Shared.Heretic;
+using Content.Shared.Mind;
 using Content.Shared.Roles;
+using Content.Shared.Station.Components;
 using Content.Shared.Store;
 using Content.Shared.Store.Components;
+using Robust.Server.GameObjects;
 using Robust.Shared.Audio;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
-using System.Text;
-using Content.Server._Goobstation.Objectives.Components;
-using Content.Shared.Mind;
-using Robust.Server.GameObjects;
-using Content.Server.Popups;
-using Content.Shared.Station.Components;
 
 namespace Content.Server.GameTicking.Rules;
 
 public sealed class HereticRuleSystem : GameRuleSystem<HereticRuleComponent>
 {
-    [Dependency] private readonly MindSystem _mind = default!;
-    [Dependency] private readonly AntagSelectionSystem _antag = default!;
-    [Dependency] private readonly SharedRoleSystem _role = default!;
-    [Dependency] private readonly ObjectivesSystem _objective = default!;
-    [Dependency] private readonly UserInterfaceSystem _ui = default!;
-    [Dependency] private readonly IRobustRandom _rand = default!;
-    [Dependency] private readonly PopupSystem _popup = default!;
-
     public static readonly SoundSpecifier BriefingSound =
         new SoundPathSpecifier("/Audio/_Goobstation/Heretic/Ambience/Antag/Heretic/heretic_gain.ogg");
 
@@ -52,6 +44,13 @@ public sealed class HereticRuleSystem : GameRuleSystem<HereticRuleComponent>
     public static readonly ProtoId<CurrencyPrototype> Currency = "KnowledgePoint";
 
     public static readonly EntProtoId MindRole = "MindRoleHeretic";
+    [Dependency] private readonly AntagSelectionSystem _antag = default!;
+    [Dependency] private readonly MindSystem _mind = default!;
+    [Dependency] private readonly ObjectivesSystem _objective = default!;
+    [Dependency] private readonly PopupSystem _popup = default!;
+    [Dependency] private readonly IRobustRandom _rand = default!;
+    [Dependency] private readonly SharedRoleSystem _role = default!;
+    [Dependency] private readonly UserInterfaceSystem _ui = default!;
 
     public override void Initialize()
     {
@@ -96,7 +95,7 @@ public sealed class HereticRuleSystem : GameRuleSystem<HereticRuleComponent>
             _antag.SendBriefing(target, Loc.GetString("heretic-role-greeting"), Color.Red, BriefingSound);
 
             if (_role.MindHasRole<HereticRoleComponent>(mindId, out var mr))
-                AddComp(mr.Value, new RoleBriefingComponent { Briefing = briefingShort }, overwrite: true);
+                AddComp(mr.Value, new RoleBriefingComponent { Briefing = briefingShort }, true);
         }
 
         EnsureComp<HereticComponent>(mindId);
@@ -107,6 +106,7 @@ public sealed class HereticRuleSystem : GameRuleSystem<HereticRuleComponent>
         {
             store.Categories.Add(category);
         }
+
         store.CurrencyWhitelist.Add(Currency);
         store.Balance.Add(Currency, 2);
 
@@ -142,7 +142,9 @@ public sealed class HereticRuleSystem : GameRuleSystem<HereticRuleComponent>
             sb.AppendLine(str);
         }
 
-        sb.AppendLine("\n" + Loc.GetString("roundend-prepend-heretic-knowledge-named", ("name", mostKnowledgeName), ("number", mostKnowledge)));
+        sb.AppendLine("\n" + Loc.GetString("roundend-prepend-heretic-knowledge-named",
+            ("name", mostKnowledgeName),
+            ("number", mostKnowledge)));
 
         args.Text = sb.ToString();
     }

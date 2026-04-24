@@ -10,9 +10,8 @@ namespace Content.Server._White.Xenomorphs.Plasma;
 
 public sealed class PlasmaSystem : SharedPlasmaSystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-
     [Dependency] private readonly PhysicsSystem _physics = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {

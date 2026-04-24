@@ -13,7 +13,9 @@ public sealed class XATPressureSystem : BaseQueryUpdateXATSystem<XATPressureComp
     [Dependency] private readonly AtmosphereSystem _atmosphere = default!;
 
     /// <inheritdoc />
-    protected override void UpdateXAT(Entity<XenoArtifactComponent> artifact, Entity<XATPressureComponent, XenoArtifactNodeComponent> node, float frameTime)
+    protected override void UpdateXAT(Entity<XenoArtifactComponent> artifact,
+        Entity<XATPressureComponent, XenoArtifactNodeComponent> node,
+        float frameTime)
     {
         var xform = Transform(artifact);
 
@@ -22,8 +24,6 @@ public sealed class XATPressureSystem : BaseQueryUpdateXATSystem<XATPressureComp
 
         var pressure = mixture.Pressure;
         if (pressure >= node.Comp1.MaxPressureThreshold || pressure <= node.Comp1.MinPressureThreshold)
-        {
             Trigger(artifact, node);
-        }
     }
 }

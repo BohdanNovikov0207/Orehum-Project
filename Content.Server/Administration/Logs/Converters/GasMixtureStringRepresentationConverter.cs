@@ -11,7 +11,9 @@ namespace Content.Server.Administration.Logs.Converters;
 [AdminLogConverter]
 public sealed class GasMixtureStringRepresentationConverter : AdminLogConverter<GasMixtureStringRepresentation>
 {
-    public override void Write(Utf8JsonWriter writer, GasMixtureStringRepresentation value, JsonSerializerOptions options)
+    public override void Write(Utf8JsonWriter writer,
+        GasMixtureStringRepresentation value,
+        JsonSerializerOptions options)
     {
         writer.WriteStartObject();
 
@@ -24,6 +26,7 @@ public sealed class GasMixtureStringRepresentationConverter : AdminLogConverter<
         {
             writer.WriteNumber(x.Key, x.Value);
         }
+
         writer.WriteEndObject();
 
         writer.WriteEndObject();

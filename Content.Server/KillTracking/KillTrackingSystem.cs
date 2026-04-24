@@ -6,9 +6,9 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Server.NPC.HTN;
 using Content.Shared.Damage;
-using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Systems;
 using Robust.Shared.Player;
@@ -16,15 +16,15 @@ using Robust.Shared.Player;
 namespace Content.Server.KillTracking;
 
 /// <summary>
-/// This handles <see cref="KillTrackerComponent"/> and recording who is damaging and killing entities.
+/// This handles <see cref="KillTrackerComponent" /> and recording who is damaging and killing entities.
 /// </summary>
 public sealed class KillTrackingSystem : EntitySystem
 {
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         // Add damage to LifetimeDamage before MobStateChangedEvent gets raised
-        SubscribeLocalEvent<KillTrackerComponent, DamageChangedEvent>(OnDamageChanged, before: [ typeof(MobThresholdSystem) ]);
+        SubscribeLocalEvent<KillTrackerComponent, DamageChangedEvent>(OnDamageChanged, [typeof(MobThresholdSystem)]);
         SubscribeLocalEvent<KillTrackerComponent, MobStateChangedEvent>(OnMobStateChanged);
     }
 
@@ -95,9 +95,11 @@ public sealed class KillTrackingSystem : EntitySystem
         // - the entity that died had an assist on themselves
         var suicide = args.Origin == uid ||
                       killSource is KillNpcSource npc && npc.NpcEnt == uid ||
-                      killSource is KillPlayerSource player && player.PlayerId == CompOrNull<ActorComponent>(uid)?.PlayerSession.UserId ||
+                      killSource is KillPlayerSource player &&
+                      player.PlayerId == CompOrNull<ActorComponent>(uid)?.PlayerSession.UserId ||
                       assistSource is KillNpcSource assistNpc && assistNpc.NpcEnt == uid ||
-                      assistSource is KillPlayerSource assistPlayer && assistPlayer.PlayerId == CompOrNull<ActorComponent>(uid)?.PlayerSession.UserId;
+                      assistSource is KillPlayerSource assistPlayer && assistPlayer.PlayerId ==
+                      CompOrNull<ActorComponent>(uid)?.PlayerSession.UserId;
 
         var ev = new KillReportedEvent(uid, killSource, assistSource, suicide);
         RaiseLocalEvent(uid, ref ev, true);
@@ -129,7 +131,7 @@ public sealed class KillTrackingSystem : EntitySystem
 }
 
 /// <summary>
-/// Event broadcasted and raised by-ref on an entity with <see cref="KillTrackerComponent"/> when they are killed.
+/// Event broadcasted and raised by-ref on an entity with <see cref="KillTrackerComponent" /> when they are killed.
 /// </summary>
 /// <param name="Entity">The entity that was killed</param>
 /// <param name="Primary">The primary source of the kill</param>

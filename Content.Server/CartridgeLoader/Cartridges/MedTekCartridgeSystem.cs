@@ -30,8 +30,6 @@ public sealed class MedTekCartridgeSystem : EntitySystem
     {
         // only remove when the program itself is removed
         if (!_cartridgeLoaderSystem.HasProgram<MedTekCartridgeComponent>(args.Loader))
-        {
             RemComp<HealthAnalyzerComponent>(args.Loader);
-        }
     }
 }

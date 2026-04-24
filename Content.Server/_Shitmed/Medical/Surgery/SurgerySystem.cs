@@ -10,26 +10,21 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Server.Atmos.Rotting;
+using System.Linq;
 using Content.Server.Body.Systems;
 using Content.Server.Chat.Systems;
-using Content.Shared.Body.Part;
 using Content.Server.Popups;
-using Content.Shared.Bed.Sleep;
-using Content.Shared.Damage;
-using Content.Shared.Damage.Prototypes;
-using Content.Shared._Shitmed.Targeting;
-using Content.Shared._Shitmed.Damage;
 using Content.Shared._Shitmed.Medical.Surgery;
-using Content.Shared._Shitmed.Medical.Surgery.Wounds.Systems;
 using Content.Shared._Shitmed.Medical.Surgery.Conditions;
 using Content.Shared._Shitmed.Medical.Surgery.Effects.Step;
-using Content.Shared._Shitmed.Medical.Surgery.Tools;
+using Content.Shared._Shitmed.Medical.Surgery.Wounds.Systems;
+using Content.Shared._Shitmed.Targeting;
+using Content.Shared.Bed.Sleep;
+using Content.Shared.Body.Part;
+using Content.Shared.Damage;
+using Content.Shared.Damage.Prototypes;
 using Robust.Server.GameObjects;
 using Robust.Shared.Prototypes;
-using Robust.Shared.Utility;
-using Content.Shared.Weapons.Melee.Events;
-using System.Linq;
 
 namespace Content.Server._Shitmed.Medical.Surgery;
 
@@ -38,12 +33,12 @@ public sealed class SurgerySystem : SharedSurgerySystem
     [Dependency] private readonly BodySystem _body = default!;
     [Dependency] private readonly ChatSystem _chat = default!;
     [Dependency] private readonly DamageableSystem _damageable = default!;
-    [Dependency] private readonly IPrototypeManager _prototypes = default!;
     [Dependency] private readonly PopupSystem _popup = default!;
-    [Dependency] private readonly WoundSystem _wounds = default!;
-    [Dependency] private readonly UserInterfaceSystem _ui = default!;
+    [Dependency] private readonly IPrototypeManager _prototypes = default!;
 
     private readonly Dictionary<NetEntity, List<EntProtoId>> _surgeries = new();
+    [Dependency] private readonly UserInterfaceSystem _ui = default!;
+    [Dependency] private readonly WoundSystem _wounds = default!;
 
     public override void Initialize()
     {
@@ -76,8 +71,10 @@ public sealed class SurgerySystem : SharedSurgerySystem
 
                 valid.Add(surgery);
             }
+
             _surgeries[GetNetEntity(part.Id)] = valid;
         }
+
         _ui.SetUiState(body, SurgeryUIKey.Key, new SurgeryBuiState(_surgeries));
         /*
             Reason we do this is because when applying a BUI State, it rolls back the state on the entity temporarily,
@@ -87,10 +84,10 @@ public sealed class SurgerySystem : SharedSurgerySystem
         _ui.ServerSendUiMessage(body, SurgeryUIKey.Key, new SurgeryBuiRefreshMessage());
     }
 
-    private DamageGroupPrototype? GetDamageGroupByType(string id)
-    {
-        return (from @group in _prototypes.EnumeratePrototypes<DamageGroupPrototype>() where @group.DamageTypes.Contains(id) select @group).FirstOrDefault();
-    }
+    private DamageGroupPrototype? GetDamageGroupByType(string id) =>
+        (from @group in _prototypes.EnumeratePrototypes<DamageGroupPrototype>()
+            where @group.DamageTypes.Contains(id)
+            select @group).FirstOrDefault();
 
     private void SetDamage(EntityUid body,
         DamageSpecifier damage,
@@ -116,7 +113,8 @@ public sealed class SurgerySystem : SharedSurgerySystem
     private void OnSurgeryStepDamage(Entity<SurgeryTargetComponent> ent, ref SurgeryStepDamageEvent args) =>
         SetDamage(args.Body, args.Damage, args.PartMultiplier, args.User, args.Part);
 
-    private void OnSurgeryDamageChange(Entity<SurgeryDamageChangeEffectComponent> ent, ref SurgeryStepDamageChangeEvent args)
+    private void OnSurgeryDamageChange(Entity<SurgeryDamageChangeEffectComponent> ent,
+        ref SurgeryStepDamageChangeEvent args)
     {
         var damageChange = ent.Comp.Damage;
         if (Status.HasEffectComp<ForcedSleepingStatusEffectComponent>(args.Body))
@@ -124,6 +122,7 @@ public sealed class SurgerySystem : SharedSurgerySystem
 
         SetDamage(args.Body, damageChange, 0.5f, args.User, args.Part, ent.Comp.AffectAll);
     }
+
     private void OnStepScreamComplete(Entity<SurgeryStepEmoteEffectComponent> ent, ref SurgeryStepEvent args)
     {
         if (Status.HasEffectComp<ForcedSleepingStatusEffectComponent>(args.Body))
@@ -131,6 +130,7 @@ public sealed class SurgerySystem : SharedSurgerySystem
 
         _chat.TryEmoteWithChat(args.Body, ent.Comp.Emote);
     }
+
     private void OnStepSpawnComplete(Entity<SurgeryStepSpawnEffectComponent> ent, ref SurgeryStepEvent args) =>
         SpawnAtPosition(ent.Comp.Entity, Transform(args.Body).Coordinates);
 }

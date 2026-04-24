@@ -29,14 +29,13 @@ namespace Content.Server.Ninja.Systems;
 /// </summary>
 public sealed class NinjaSuitSystem : SharedNinjaSuitSystem
 {
+    // How much the cell score should be increased per 1 AutoRechargeRate.
+    private const int AutoRechargeValue = 100;
     [Dependency] private readonly EmpSystem _emp = default!;
     [Dependency] private readonly SharedHandsSystem _hands = default!;
     [Dependency] private readonly SpaceNinjaSystem _ninja = default!;
     [Dependency] private readonly PowerCellSystem _powerCell = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
-
-    // How much the cell score should be increased per 1 AutoRechargeRate.
-    private const int AutoRechargeValue = 100;
 
     public override void Initialize()
     {
@@ -55,9 +54,9 @@ public sealed class NinjaSuitSystem : SharedNinjaSuitSystem
         _ninja.SetSuitPowerAlert(user);
 
         // raise event to let ninja components get starting battery
-        _ninja.GetNinjaBattery(user.Owner, out var uid, out var _);
+        _ninja.GetNinjaBattery(user.Owner, out var uid, out _);
 
-        if (uid is not {} battery_uid)
+        if (uid is not { } battery_uid)
             return;
 
         var ev = new NinjaBatteryChangedEvent(battery_uid, ent.Owner);
@@ -109,16 +108,14 @@ public sealed class NinjaSuitSystem : SharedNinjaSuitSystem
         // if a cell is able to automatically recharge, boost the score drastically depending on the recharge rate,
         // this is to ensure a ninja can still upgrade to a micro reactor cell even if they already have a medium or high.
         if (TryComp<BatterySelfRechargerComponent>(uid, out var selfcomp) && selfcomp.AutoRecharge)
-            return battcomp.MaxCharge + (selfcomp.AutoRechargeRate*AutoRechargeValue);
+            return battcomp.MaxCharge + selfcomp.AutoRechargeRate * AutoRechargeValue;
         return battcomp.MaxCharge;
     }
 
-    private void OnEmpAttempt(EntityUid uid, NinjaSuitComponent comp, EmpAttemptEvent args)
-    {
+    private void OnEmpAttempt(EntityUid uid, NinjaSuitComponent comp, EmpAttemptEvent args) =>
         // ninja suit (battery) is immune to emp
         // powercell relays the event to suit
         args.Cancel();
-    }
 
     protected override void UserUnequippedSuit(Entity<NinjaSuitComponent> ent, Entity<SpaceNinjaComponent> user)
     {

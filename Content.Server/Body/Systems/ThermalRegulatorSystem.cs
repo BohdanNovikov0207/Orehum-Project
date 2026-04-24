@@ -19,9 +19,9 @@ namespace Content.Server.Body.Systems;
 
 public sealed class ThermalRegulatorSystem : EntitySystem
 {
+    [Dependency] private readonly ActionBlockerSystem _actionBlockerSys = default!;
     [Dependency] private readonly IGameTiming _gameTiming = default!;
     [Dependency] private readonly TemperatureSystem _tempSys = default!;
-    [Dependency] private readonly ActionBlockerSystem _actionBlockerSys = default!;
 
     public override void Initialize()
     {
@@ -31,15 +31,11 @@ public sealed class ThermalRegulatorSystem : EntitySystem
         SubscribeLocalEvent<ThermalRegulatorComponent, EntityUnpausedEvent>(OnUnpaused);
     }
 
-    private void OnMapInit(Entity<ThermalRegulatorComponent> ent, ref MapInitEvent args)
-    {
+    private void OnMapInit(Entity<ThermalRegulatorComponent> ent, ref MapInitEvent args) =>
         ent.Comp.NextUpdate = _gameTiming.CurTime + ent.Comp.UpdateInterval;
-    }
 
-    private void OnUnpaused(Entity<ThermalRegulatorComponent> ent, ref EntityUnpausedEvent args)
-    {
+    private void OnUnpaused(Entity<ThermalRegulatorComponent> ent, ref EntityUnpausedEvent args) =>
         ent.Comp.NextUpdate += args.PausedTime;
-    }
 
     public override void Update(float frameTime)
     {
@@ -59,7 +55,7 @@ public sealed class ThermalRegulatorSystem : EntitySystem
     /// </summary>
     private void ProcessThermalRegulation(Entity<ThermalRegulatorComponent, TemperatureComponent?> ent)
     {
-        if (!Resolve(ent, ref ent.Comp2, logMissing: false))
+        if (!Resolve(ent, ref ent.Comp2, false))
             return;
 
         // TODO: Why do we have two datafields for this if they are only ever used once here?
@@ -70,15 +66,11 @@ public sealed class ThermalRegulatorSystem : EntitySystem
         var heatCapacity = _tempSys.GetHeatCapacity(ent, ent);
         var targetHeat = tempDiff * heatCapacity;
         if (ent.Comp2.CurrentTemperature > ent.Comp1.NormalBodyTemperature)
-        {
             totalMetabolismTempChange -= Math.Min(targetHeat, ent.Comp1.ImplicitHeatRegulation);
-        }
         else
-        {
             totalMetabolismTempChange += Math.Min(targetHeat, ent.Comp1.ImplicitHeatRegulation);
-        }
 
-        _tempSys.ChangeHeat(ent, totalMetabolismTempChange, ignoreHeatResistance: true, ent);
+        _tempSys.ChangeHeat(ent, totalMetabolismTempChange, true, ent);
 
         // recalc difference and target heat
         tempDiff = Math.Abs(ent.Comp2.CurrentTemperature - ent.Comp1.NormalBodyTemperature);
@@ -94,14 +86,14 @@ public sealed class ThermalRegulatorSystem : EntitySystem
             if (!_actionBlockerSys.CanSweat(ent))
                 return;
 
-            _tempSys.ChangeHeat(ent, -Math.Min(targetHeat, ent.Comp1.SweatHeatRegulation), ignoreHeatResistance: true, ent);
+            _tempSys.ChangeHeat(ent, -Math.Min(targetHeat, ent.Comp1.SweatHeatRegulation), true, ent);
         }
         else
         {
             if (!_actionBlockerSys.CanShiver(ent))
                 return;
 
-            _tempSys.ChangeHeat(ent, Math.Min(targetHeat, ent.Comp1.ShiveringHeatRegulation), ignoreHeatResistance: true, ent);
+            _tempSys.ChangeHeat(ent, Math.Min(targetHeat, ent.Comp1.ShiveringHeatRegulation), true, ent);
         }
     }
 }

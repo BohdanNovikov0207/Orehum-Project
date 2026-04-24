@@ -10,14 +10,17 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Server.StationEvents.Components;
-﻿using Content.Shared.GameTicking.Components;
+using Content.Shared.GameTicking.Components;
 using Robust.Shared.Random;
 
 namespace Content.Server.StationEvents.Events;
 
 public sealed class BluespaceArtifactRule : StationEventSystem<BluespaceArtifactRuleComponent>
 {
-    protected override void Added(EntityUid uid, BluespaceArtifactRuleComponent component, GameRuleComponent gameRule, GameRuleAddedEvent args)
+    protected override void Added(EntityUid uid,
+        BluespaceArtifactRuleComponent component,
+        GameRuleComponent gameRule,
+        GameRuleAddedEvent args)
     {
         if (!TryComp<StationEventComponent>(uid, out var stationEvent))
             return;
@@ -29,7 +32,10 @@ public sealed class BluespaceArtifactRule : StationEventSystem<BluespaceArtifact
         base.Added(uid, component, gameRule, args);
     }
 
-    protected override void Started(EntityUid uid, BluespaceArtifactRuleComponent component, GameRuleComponent gameRule, GameRuleStartedEvent args)
+    protected override void Started(EntityUid uid,
+        BluespaceArtifactRuleComponent component,
+        GameRuleComponent gameRule,
+        GameRuleStartedEvent args)
     {
         base.Started(uid, component, gameRule, args);
 

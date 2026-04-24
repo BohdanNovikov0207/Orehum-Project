@@ -34,7 +34,7 @@ public sealed class BanExemptionUpdateCommand : LocalizedCommands
         for (var i = 1; i < args.Length; i++)
         {
             var arg = args[i];
-            if (!Enum.TryParse<ServerBanExemptFlags>(arg, ignoreCase: true, out var flag))
+            if (!Enum.TryParse<ServerBanExemptFlags>(arg, true, out var flag))
             {
                 shell.WriteError(LocalizationManager.GetString("cmd-ban_exemption_update-invalid-flag", ("flag", arg)));
                 return;

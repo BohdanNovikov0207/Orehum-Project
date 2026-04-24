@@ -23,15 +23,12 @@ namespace Content.Server.Mind;
 /// </summary>
 public sealed class TransferMindOnGibSystem : EntitySystem
 {
+    [Dependency] private readonly SharedMindSystem _mindSystem = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly TagSystem _tag = default!;
-    [Dependency] private readonly SharedMindSystem _mindSystem = default!;
 
-    /// <inheritdoc/>
-    public override void Initialize()
-    {
-        SubscribeLocalEvent<TransferMindOnGibComponent, BeingGibbedEvent>(OnGib);
-    }
+    /// <inheritdoc />
+    public override void Initialize() => SubscribeLocalEvent<TransferMindOnGibComponent, BeingGibbedEvent>(OnGib);
 
     private void OnGib(EntityUid uid, TransferMindOnGibComponent component, BeingGibbedEvent args)
     {

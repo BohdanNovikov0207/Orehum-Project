@@ -5,8 +5,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Server.Antag.Components;
-using Content.Shared.GameTicking.Components;
 using Content.Server.GameTicking.Rules;
+using Content.Shared.GameTicking.Components;
 
 namespace Content.Server.Antag;
 
@@ -21,7 +21,10 @@ public sealed class AntagRandomSpawnSystem : GameRuleSystem<AntagRandomSpawnComp
         SubscribeLocalEvent<AntagRandomSpawnComponent, AntagSelectLocationEvent>(OnSelectLocation);
     }
 
-    protected override void Added(EntityUid uid, AntagRandomSpawnComponent comp, GameRuleComponent gameRule, GameRuleAddedEvent args)
+    protected override void Added(EntityUid uid,
+        AntagRandomSpawnComponent comp,
+        GameRuleComponent gameRule,
+        GameRuleAddedEvent args)
     {
         base.Added(uid, comp, gameRule, args);
 

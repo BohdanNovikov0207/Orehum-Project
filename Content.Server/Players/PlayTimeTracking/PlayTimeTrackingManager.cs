@@ -40,62 +40,73 @@ public delegate void CalcPlayTimeTrackersCallback(ICommonSession player, HashSet
 /// Tracks play time for players, across all roles.
 /// </summary>
 /// <remarks>
-/// <para>
-/// Play time is tracked in distinct "trackers" (defined in <see cref="PlayTimeTrackerPrototype"/>).
-/// Most jobs correspond to one such tracker, but there are also more trackers like <c>"Overall"</c> which tracks cumulative playtime across all roles.
-/// </para>
-/// <para>
-/// To actually figure out what trackers are active, <see cref="CalcTrackers"/> is invoked in a "refresh".
-/// The next time the trackers are refreshed, these trackers all get the time since the last refresh added.
-/// Refreshes are triggered by <see cref="QueueRefreshTrackers"/>, and should be raised through events such as players' roles changing.
-/// </para>
-/// <para>
-/// Because the calculation system does not persistently keep ticking timers,
-/// APIs like <see cref="GetPlayTimeForTracker"/> will not see live-updating information.
-/// A light-weight form of refresh is a "flush" through <see cref="FlushTracker"/>.
-/// This will not cause active trackers to be re-calculated like a refresh,
-/// but it will ensure stored play time info is up to date.
-/// </para>
-/// <para>
-/// Trackers are auto-saved to DB on a cvar-configured interval. This interval is independent of refreshes,
-/// but does do a flush to get the latest info.
-/// Some things like round restarts and player disconnects cause immediate saving of one or all sessions.
-/// </para>
-/// <para>
-/// Tracker data is loaded from the database when the client connects as part of <see cref="UserDbDataManager"/>.
-/// </para>
-/// <para>
-/// Timing logic in this manager is ran **out** of simulation.
-/// This means that we use real time, not simulation time, for timing everything here.
-/// </para>
-/// <para>
-/// Operations like refreshing and sending play time info to clients are deferred until the next frame (note: not tick).
-/// </para>
+///     <para>
+///     Play time is tracked in distinct "trackers" (defined in <see cref="PlayTimeTrackerPrototype" />).
+///     Most jobs correspond to one such tracker, but there are also more trackers like <c>"Overall"</c> which tracks
+///     cumulative playtime across all roles.
+///     </para>
+///     <para>
+///     To actually figure out what trackers are active, <see cref="CalcTrackers" /> is invoked in a "refresh".
+///     The next time the trackers are refreshed, these trackers all get the time since the last refresh added.
+///     Refreshes are triggered by <see cref="QueueRefreshTrackers" />, and should be raised through events such as
+///     players' roles changing.
+///     </para>
+///     <para>
+///     Because the calculation system does not persistently keep ticking timers,
+///     APIs like <see cref="GetPlayTimeForTracker" /> will not see live-updating information.
+///     A light-weight form of refresh is a "flush" through <see cref="FlushTracker" />.
+///     This will not cause active trackers to be re-calculated like a refresh,
+///     but it will ensure stored play time info is up to date.
+///     </para>
+///     <para>
+///     Trackers are auto-saved to DB on a cvar-configured interval. This interval is independent of refreshes,
+///     but does do a flush to get the latest info.
+///     Some things like round restarts and player disconnects cause immediate saving of one or all sessions.
+///     </para>
+///     <para>
+///     Tracker data is loaded from the database when the client connects as part of <see cref="UserDbDataManager" />.
+///     </para>
+///     <para>
+///     Timing logic in this manager is ran **out** of simulation.
+///     This means that we use real time, not simulation time, for timing everything here.
+///     </para>
+///     <para>
+///     Operations like refreshing and sending play time info to clients are deferred until the next frame (note: not
+///     tick).
+///     </para>
 /// </remarks>
 public sealed class PlayTimeTrackingManager : ISharedPlaytimeManager, IPostInjectInit
 {
+    [Dependency] private readonly IConfigurationManager _cfg = default!;
     [Dependency] private readonly IServerDbManager _db = default!;
     [Dependency] private readonly IServerNetManager _net = default!;
-    [Dependency] private readonly IConfigurationManager _cfg = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly ITaskManager _task = default!;
-    [Dependency] private readonly IRuntimeLog _runtimeLog = default!;
-    [Dependency] private readonly UserDbDataManager _userDb = default!;
-
-    private ISawmill _sawmill = default!;
-
-    // List of players that need some kind of update (refresh timers or resend).
-    private ValueList<ICommonSession> _playersDirty;
-
-    // DB auto-saving logic.
-    private TimeSpan _saveInterval;
-    private TimeSpan _lastSave;
 
     // List of pending DB save operations.
     // We must block server shutdown on these to avoid losing data.
     private readonly List<Task> _pendingSaveTasks = new();
 
     private readonly Dictionary<ICommonSession, PlayTimeData> _playTimeData = new();
+    [Dependency] private readonly IRuntimeLog _runtimeLog = default!;
+    [Dependency] private readonly ITaskManager _task = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly UserDbDataManager _userDb = default!;
+    private TimeSpan _lastSave;
+
+    // List of players that need some kind of update (refresh timers or resend).
+    private ValueList<ICommonSession> _playersDirty;
+
+    // DB auto-saving logic.
+    private TimeSpan _saveInterval;
+
+    private ISawmill _sawmill = default!;
+
+    void IPostInjectInit.PostInject()
+    {
+        _userDb.AddOnLoadPlayer(LoadData);
+        _userDb.AddOnPlayerDisconnect(ClientDisconnected);
+    }
+
+    public IReadOnlyDictionary<string, TimeSpan> GetPlayTimes(ICommonSession session) => GetTrackerTimes(session);
 
     public event CalcPlayTimeTrackersCallback? CalcTrackers;
 
@@ -144,9 +155,7 @@ public sealed class PlayTimeTrackingManager : ISharedPlaytimeManager, IPostInjec
             DebugTools.Assert(data.IsDirty);
 
             if (data.NeedRefreshTackers)
-            {
                 RefreshSingleTracker(player, data, time);
-            }
 
             if (data.NeedSendTimers)
             {
@@ -186,7 +195,7 @@ public sealed class PlayTimeTrackingManager : ISharedPlaytimeManager, IPostInjec
     /// <summary>
     /// Flush all trackers for all players.
     /// </summary>
-    /// <seealso cref="FlushTracker"/>
+    /// <seealso cref="FlushTracker" />
     public void FlushAllTrackers()
     {
         var time = _timing.RealTime;
@@ -199,9 +208,9 @@ public sealed class PlayTimeTrackingManager : ISharedPlaytimeManager, IPostInjec
 
     /// <summary>
     /// Flush time tracker information for a player,
-    /// so APIs like <see cref="GetPlayTimeForTracker"/> return up-to-date info.
+    /// so APIs like <see cref="GetPlayTimeForTracker" /> return up-to-date info.
     /// </summary>
-    /// <seealso cref="FlushAllTrackers"/>
+    /// <seealso cref="FlushAllTrackers" />
     public void FlushTracker(ICommonSession player)
     {
         var time = _timing.RealTime;
@@ -222,18 +231,13 @@ public sealed class PlayTimeTrackingManager : ISharedPlaytimeManager, IPostInjec
         }
     }
 
-    public IReadOnlyDictionary<string, TimeSpan> GetPlayTimes(ICommonSession session)
-    {
-        return GetTrackerTimes(session);
-    }
-
     private void SendPlayTimes(ICommonSession pSession)
     {
         var roles = GetTrackerTimes(pSession);
 
         var msg = new MsgPlayTime
         {
-            Trackers = roles
+            Trackers = roles,
         };
 
         _net.ServerSendMessage(msg, pSession.Channel);
@@ -368,24 +372,18 @@ public sealed class PlayTimeTrackingManager : ISharedPlaytimeManager, IPostInjec
         data.DbTrackersDirty.Add(tracker);
     }
 
-    public void AddTimeToOverallPlaytime(ICommonSession id, TimeSpan time)
-    {
+    public void AddTimeToOverallPlaytime(ICommonSession id, TimeSpan time) =>
         AddTimeToTracker(id, PlayTimeTrackingShared.TrackerOverall, time);
-    }
 
-    public TimeSpan GetOverallPlaytime(ICommonSession id)
-    {
-        return GetPlayTimeForTracker(id, PlayTimeTrackingShared.TrackerOverall);
-    }
+    public TimeSpan GetOverallPlaytime(ICommonSession id) =>
+        GetPlayTimeForTracker(id, PlayTimeTrackingShared.TrackerOverall);
 
     public bool TryGetTrackerTimes(ICommonSession id, [NotNullWhen(true)] out Dictionary<string, TimeSpan>? time)
     {
         time = null;
 
         if (!_playTimeData.TryGetValue(id, out var data) || !data.Initialized)
-        {
             return false;
-        }
 
         time = data.TrackerTimes;
         return true;
@@ -457,14 +455,15 @@ public sealed class PlayTimeTrackingManager : ISharedPlaytimeManager, IPostInjec
     /// </summary>
     private sealed class PlayTimeData
     {
-        // Queued update flags
-        public bool IsDirty;
-        public bool NeedRefreshTackers;
-        public bool NeedSendTimers;
-
         // Active tracking info
         public readonly HashSet<string> ActiveTrackers = new();
-        public TimeSpan LastUpdate;
+
+        /// <summary>
+        /// Set of trackers which are different from their DB values and need to be saved to DB.
+        /// </summary>
+        public readonly HashSet<string> DbTrackersDirty = new();
+
+        public readonly Dictionary<string, TimeSpan> TrackerTimes = new();
 
         // Stored tracked time info.
 
@@ -473,17 +472,10 @@ public sealed class PlayTimeTrackingManager : ISharedPlaytimeManager, IPostInjec
         /// </summary>
         public bool Initialized;
 
-        public readonly Dictionary<string, TimeSpan> TrackerTimes = new();
-
-        /// <summary>
-        /// Set of trackers which are different from their DB values and need to be saved to DB.
-        /// </summary>
-        public readonly HashSet<string> DbTrackersDirty = new();
-    }
-
-    void IPostInjectInit.PostInject()
-    {
-        _userDb.AddOnLoadPlayer(LoadData);
-        _userDb.AddOnPlayerDisconnect(ClientDisconnected);
+        // Queued update flags
+        public bool IsDirty;
+        public TimeSpan LastUpdate;
+        public bool NeedRefreshTackers;
+        public bool NeedSendTimers;
     }
 }

@@ -20,9 +20,9 @@ using Content.Server.Stack;
 using Content.Shared.Construction.Components;
 using Content.Shared.Examine;
 using Content.Shared.Interaction;
+using Content.Shared.Popups;
 using Content.Shared.Stacks;
 using Content.Shared.Tag;
-using Content.Shared.Popups;
 using Robust.Shared.Containers;
 using Robust.Shared.Prototypes;
 
@@ -30,11 +30,11 @@ namespace Content.Server.Construction;
 
 public sealed class MachineFrameSystem : EntitySystem
 {
-    [Dependency] private readonly SharedContainerSystem _container = default!;
-    [Dependency] private readonly TagSystem _tag = default!;
-    [Dependency] private readonly StackSystem _stack = default!;
     [Dependency] private readonly ConstructionSystem _construction = default!;
+    [Dependency] private readonly SharedContainerSystem _container = default!;
     [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
+    [Dependency] private readonly StackSystem _stack = default!;
+    [Dependency] private readonly TagSystem _tag = default!;
 
     public override void Initialize()
     {
@@ -99,7 +99,8 @@ public sealed class MachineFrameSystem : EntitySystem
             // Insert the entity, if it hasn't already been inserted
             if (!args.Handled)
             {
-                if (!_container.TryRemoveFromContainer(args.Used, false, out var wasInContainer) && wasInContainer) // Goobstation - if it wasn't in container that's fine
+                if (!_container.TryRemoveFromContainer(args.Used, false, out var wasInContainer) &&
+                    wasInContainer) // Goobstation - if it wasn't in container that's fine
                     return;
 
                 args.Handled = true;
@@ -131,7 +132,8 @@ public sealed class MachineFrameSystem : EntitySystem
             // Insert the entity, if it hasn't already been inserted
             if (!args.Handled)
             {
-                if (!_container.TryRemoveFromContainer(args.Used, false, out var wasInContainer) && wasInContainer) // Goobstation
+                if (!_container.TryRemoveFromContainer(args.Used, false, out var wasInContainer) &&
+                    wasInContainer) // Goobstation
                     return;
 
                 args.Handled = true;
@@ -189,7 +191,8 @@ public sealed class MachineFrameSystem : EntitySystem
         var count = stack.Count;
         if (count < needed)
         {
-            if (!_container.TryRemoveFromContainer(used, false, out var wasInContainer) && wasInContainer) // Goobstation
+            if (!_container.TryRemoveFromContainer(used, false, out var wasInContainer) &&
+                wasInContainer) // Goobstation
                 return false;
 
             if (!_container.Insert(used, component.PartContainer))
@@ -244,7 +247,8 @@ public sealed class MachineFrameSystem : EntitySystem
     {
         component.MaterialRequirements = new Dictionary<ProtoId<StackPrototype>, int>(machineBoard.StackRequirements);
         component.ComponentRequirements = new Dictionary<string, GenericPartInfo>(machineBoard.ComponentRequirements);
-        component.TagRequirements = new Dictionary<ProtoId<TagPrototype>, GenericPartInfo>(machineBoard.TagRequirements);
+        component.TagRequirements =
+            new Dictionary<ProtoId<TagPrototype>, GenericPartInfo>(machineBoard.TagRequirements);
 
         component.MaterialProgress.Clear();
         component.ComponentProgress.Clear();
@@ -333,6 +337,7 @@ public sealed class MachineFrameSystem : EntitySystem
             }
         }
     }
+
     private void OnMachineFrameExamined(EntityUid uid, MachineFrameComponent component, ExaminedEvent args)
     {
         if (!args.IsInDetailsRange || !component.HasBoard)

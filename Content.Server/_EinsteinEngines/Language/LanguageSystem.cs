@@ -13,7 +13,7 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Server._EinsteinEngines.Language;
 
-public sealed partial class LanguageSystem : SharedLanguageSystem
+public sealed class LanguageSystem : SharedLanguageSystem
 {
     public override void Initialize()
     {
@@ -21,11 +21,13 @@ public sealed partial class LanguageSystem : SharedLanguageSystem
 
         SubscribeLocalEvent<LanguageSpeakerComponent, MapInitEvent>(OnInitLanguageSpeaker);
         SubscribeLocalEvent<LanguageSpeakerComponent, ComponentGetState>(OnGetLanguageState);
-        SubscribeLocalEvent<UniversalLanguageSpeakerComponent, DetermineEntityLanguagesEvent>(OnDetermineUniversalLanguages);
+        SubscribeLocalEvent<UniversalLanguageSpeakerComponent, DetermineEntityLanguagesEvent>(
+            OnDetermineUniversalLanguages);
         SubscribeNetworkEvent<LanguagesSetMessage>(OnClientSetLanguage);
 
         SubscribeLocalEvent<UniversalLanguageSpeakerComponent, MapInitEvent>((uid, _, _) => UpdateEntityLanguages(uid));
-        SubscribeLocalEvent<UniversalLanguageSpeakerComponent, ComponentRemove>((uid, _, _) => UpdateEntityLanguages(uid));
+        SubscribeLocalEvent<UniversalLanguageSpeakerComponent, ComponentRemove>((uid, _, _) =>
+            UpdateEntityLanguages(uid));
     }
 
     #region event handling
@@ -38,17 +40,16 @@ public sealed partial class LanguageSystem : SharedLanguageSystem
         UpdateEntityLanguages(ent!);
     }
 
-    private void OnGetLanguageState(Entity<LanguageSpeakerComponent> entity, ref ComponentGetState args)
-    {
+    private void OnGetLanguageState(Entity<LanguageSpeakerComponent> entity, ref ComponentGetState args) =>
         args.State = new LanguageSpeakerComponent.State
         {
             CurrentLanguage = entity.Comp.CurrentLanguage,
             SpokenLanguages = entity.Comp.SpokenLanguages,
-            UnderstoodLanguages = entity.Comp.UnderstoodLanguages
+            UnderstoodLanguages = entity.Comp.UnderstoodLanguages,
         };
-    }
 
-    private void OnDetermineUniversalLanguages(Entity<UniversalLanguageSpeakerComponent> entity, ref DetermineEntityLanguagesEvent ev)
+    private void OnDetermineUniversalLanguages(Entity<UniversalLanguageSpeakerComponent> entity,
+        ref DetermineEntityLanguagesEvent ev)
     {
         // We only add it as a spoken language: CanUnderstand checks for ULSC itself.
         if (entity.Comp.Enabled)
@@ -76,36 +77,32 @@ public sealed partial class LanguageSystem : SharedLanguageSystem
     //public bool CanSpeak(Entity<LanguageSpeakerComponent?> ent, ProtoId<LanguagePrototype> language) // - Goob : moved to Shared
 
     /// <summary>
-    ///     Returns the current language of the given entity, assumes Universal if it's not a language speaker.
+    /// Returns the current language of the given entity, assumes Universal if it's not a language speaker.
     /// </summary>
     public LanguagePrototype GetLanguage(Entity<LanguageSpeakerComponent?> ent)
     {
-        if (!Resolve(ent, ref ent.Comp, logMissing: false)
+        if (!Resolve(ent, ref ent.Comp, false)
             || string.IsNullOrEmpty(ent.Comp.CurrentLanguage)
             || !_prototype.TryIndex<LanguagePrototype>(ent.Comp.CurrentLanguage, out var proto)
-        )
+           )
             return Universal;
 
         return proto;
     }
 
     /// <summary>
-    ///     Returns the list of languages this entity can speak.
+    /// Returns the list of languages this entity can speak.
     /// </summary>
-    /// <remarks>This simply returns the value of <see cref="LanguageSpeakerComponent.SpokenLanguages"/>.</remarks>
-    public List<ProtoId<LanguagePrototype>> GetSpokenLanguages(EntityUid uid)
-    {
-        return TryComp<LanguageSpeakerComponent>(uid, out var component) ? component.SpokenLanguages : [];
-    }
+    /// <remarks>This simply returns the value of <see cref="LanguageSpeakerComponent.SpokenLanguages" />.</remarks>
+    public List<ProtoId<LanguagePrototype>> GetSpokenLanguages(EntityUid uid) =>
+        TryComp<LanguageSpeakerComponent>(uid, out var component) ? component.SpokenLanguages : [];
 
     /// <summary>
-    ///     Returns the list of languages this entity can understand.
+    /// Returns the list of languages this entity can understand.
     /// </summary
-    /// <remarks>This simply returns the value of <see cref="LanguageSpeakerComponent.SpokenLanguages"/>.</remarks>
-    public List<ProtoId<LanguagePrototype>> GetUnderstoodLanguages(EntityUid uid)
-    {
-        return TryComp<LanguageSpeakerComponent>(uid, out var component) ? component.UnderstoodLanguages : [];
-    }
+    /// <remarks>This simply returns the value of <see cref="LanguageSpeakerComponent.SpokenLanguages" />.</remarks>
+    public List<ProtoId<LanguagePrototype>> GetUnderstoodLanguages(EntityUid uid) =>
+        TryComp<LanguageSpeakerComponent>(uid, out var component) ? component.UnderstoodLanguages : [];
 
     public void SetLanguage(Entity<LanguageSpeakerComponent?> ent, ProtoId<LanguagePrototype> language)
     {
@@ -120,7 +117,7 @@ public sealed partial class LanguageSystem : SharedLanguageSystem
     }
 
     /// <summary>
-    ///     Adds a new language to the respective lists of intrinsically known languages of the given entity.
+    /// Adds a new language to the respective lists of intrinsically known languages of the given entity.
     /// </summary>
     public void AddLanguage(
         EntityUid uid,
@@ -141,7 +138,7 @@ public sealed partial class LanguageSystem : SharedLanguageSystem
     }
 
     /// <summary>
-    ///     Removes a language from the respective lists of intrinsically known languages of the given entity.
+    /// Removes a language from the respective lists of intrinsically known languages of the given entity.
     /// </summary>
     public void RemoveLanguage(
         Entity<LanguageKnowledgeComponent?> ent,
@@ -163,8 +160,8 @@ public sealed partial class LanguageSystem : SharedLanguageSystem
     }
 
     /// <summary>
-    ///   Ensures the given entity has a valid language as its current language.
-    ///   If not, sets it to the first entry of its SpokenLanguages list, or universal if it's empty.
+    /// Ensures the given entity has a valid language as its current language.
+    /// If not, sets it to the first entry of its SpokenLanguages list, or universal if it's empty.
     /// </summary>
     /// <returns>True if the current language was modified, false otherwise.</returns>
     public bool EnsureValidLanguage(Entity<LanguageSpeakerComponent?> ent)
@@ -184,7 +181,7 @@ public sealed partial class LanguageSystem : SharedLanguageSystem
     }
 
     /// <summary>
-    ///     Immediately refreshes the cached lists of spoken and understood languages for the given entity.
+    /// Immediately refreshes the cached lists of spoken and understood languages for the given entity.
     /// </summary>
     public void UpdateEntityLanguages(Entity<LanguageSpeakerComponent?> ent)
     {
@@ -196,10 +193,14 @@ public sealed partial class LanguageSystem : SharedLanguageSystem
         if (TryComp<LanguageKnowledgeComponent>(ent, out var knowledge))
         {
             foreach (var spoken in knowledge.SpokenLanguages)
+            {
                 ev.SpokenLanguages.Add(spoken);
+            }
 
             foreach (var understood in knowledge.UnderstoodLanguages)
+            {
                 ev.UnderstoodLanguages.Add(understood);
+            }
         }
 
         RaiseLocalEvent(ent, ref ev);

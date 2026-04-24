@@ -14,13 +14,12 @@ namespace Content.Server._Shitcode.Heretic.Ui;
 
 public sealed class FeastOfOwlsEui : BaseEui
 {
+    private readonly IEntityManager _entityManager;
     private readonly EntityUid _heretic;
 
     private readonly Entity<HereticComponent> _mind;
 
     private readonly EntityUid _rune;
-
-    private readonly IEntityManager _entityManager;
 
     public FeastOfOwlsEui(EntityUid heretic,
         Entity<HereticComponent> mind,

@@ -30,7 +30,7 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Server.Nutrition.Components;
 
-[RegisterComponent, Access(typeof(SliceableFoodSystem))]
+[RegisterComponent] [Access(typeof(SliceableFoodSystem))]
 public sealed partial class SliceableFoodComponent : Component
 {
     /// <summary>
@@ -40,24 +40,24 @@ public sealed partial class SliceableFoodComponent : Component
     [DataField]
     public EntProtoId? Slice;
 
-    [DataField]
-    public SoundSpecifier Sound = new SoundPathSpecifier("/Audio/Items/Culinary/chop.ogg");
-
-    /// <summary>
-    /// Number of slices the food starts with.
-    /// </summary>
-    [DataField("count")]
-    public ushort TotalCount = 5;
-
     /// <summary>
     /// how long it takes for this food to be sliced
     /// </summary>
     [DataField]
     public float SliceTime = 1f;
 
+    [DataField]
+    public SoundSpecifier Sound = new SoundPathSpecifier("/Audio/Items/Culinary/chop.ogg");
+
     /// <summary>
     /// all the pieces will be shifted in random directions.
     /// </summary>
     [DataField]
     public float SpawnOffset = 0.5f;
+
+    /// <summary>
+    /// Number of slices the food starts with.
+    /// </summary>
+    [DataField("count")]
+    public ushort TotalCount = 5;
 }

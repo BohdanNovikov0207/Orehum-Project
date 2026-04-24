@@ -19,13 +19,14 @@ public sealed partial class HTNPrimitiveTask : HTNTask
     /// </summary>
     [DataField("applyEffectsOnStartup")] public bool ApplyEffectsOnStartup = true;
 
+    [DataField("operator", required: true)]
+    public HTNOperator Operator = default!;
+
     /// <summary>
     /// What needs to be true for this task to be able to run.
     /// The operator may also implement its own checks internally as well if every primitive task using it requires it.
     /// </summary>
     [DataField("preconditions")] public List<HTNPrecondition> Preconditions = new();
-
-    [DataField("operator", required:true)] public HTNOperator Operator = default!;
 
     /// <summary>
     /// Services actively tick and can potentially update keys, such as combat target.

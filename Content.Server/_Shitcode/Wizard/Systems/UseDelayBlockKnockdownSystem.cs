@@ -16,8 +16,8 @@ namespace Content.Server._Goobstation.Wizard.Systems;
 
 public sealed class UseDelayBlockKnockdownSystem : EntitySystem
 {
-    [Dependency] private readonly UseDelaySystem _delay = default!;
     [Dependency] private readonly AudioSystem _audio = default!;
+    [Dependency] private readonly UseDelaySystem _delay = default!;
     [Dependency] private readonly SparksSystem _sparks = default!;
 
     public override void Initialize()

@@ -34,17 +34,16 @@ public sealed class RoomFillSystem : EntitySystem
                 _dungeon.SpawnRoom(
                     xform.GridUid.Value,
                     mapGrid,
-                    _maps.LocalToTile(xform.GridUid.Value, mapGrid, xform.Coordinates) - new Vector2i(room.Size.X/2,room.Size.Y/2),
+                    _maps.LocalToTile(xform.GridUid.Value, mapGrid, xform.Coordinates) -
+                    new Vector2i(room.Size.X / 2, room.Size.Y / 2),
                     room,
                     random,
                     null,
-                    clearExisting: component.ClearExisting,
-                    rotation: component.Rotation);
+                    component.ClearExisting,
+                    component.Rotation);
             }
             else
-            {
                 Log.Error($"Unable to find matching room prototype for {ToPrettyString(uid)}");
-            }
         }
 
         // Final cleanup

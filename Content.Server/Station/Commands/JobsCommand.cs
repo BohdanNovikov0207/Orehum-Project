@@ -12,12 +12,10 @@ using Content.Shared.Administration;
 using Content.Shared.Roles;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Toolshed;
-using Robust.Shared.Toolshed.Syntax;
-using Robust.Shared.Toolshed.TypeParsers;
 
 namespace Content.Server.Station.Commands;
 
-[ToolshedCommand, AdminCommand(AdminFlags.VarEdit)]
+[ToolshedCommand] [AdminCommand(AdminFlags.VarEdit)]
 public sealed class JobsCommand : ToolshedCommand
 {
     private StationJobsSystem? _jobs;
@@ -96,20 +94,19 @@ public sealed class JobsCommand : ToolshedCommand
 }
 
 // Used for Toolshed queries.
-public readonly record struct JobSlotRef(string Job, EntityUid Station, StationJobsSystem Jobs, IEntityManager EntityManager)
+public readonly record struct JobSlotRef(
+    string Job,
+    EntityUid Station,
+    StationJobsSystem Jobs,
+    IEntityManager EntityManager)
 {
     public override string ToString()
     {
         if (!Jobs.TryGetJobSlot(Station, Job, out var slot))
-        {
             return $"{EntityManager.ToPrettyString(Station)} job {Job} : (not a slot)";
-        }
 
         return $"{EntityManager.ToPrettyString(Station)} job {Job} : {slot?.ToString() ?? "infinite"}";
     }
 
-    public bool Infinite()
-    {
-        return Jobs.TryGetJobSlot(Station, Job, out var slot) && slot is null;
-    }
+    public bool Infinite() => Jobs.TryGetJobSlot(Station, Job, out var slot) && slot is null;
 }

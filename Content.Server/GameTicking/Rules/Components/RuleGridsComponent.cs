@@ -11,7 +11,7 @@ using Robust.Shared.Map;
 /// Stores grids created by another gamerule component.
 /// With <c>AntagSelection</c>, spawners on these grids can be used for its antags.
 /// </summary>
-[RegisterComponent, Access(typeof(RuleGridsSystem))]
+[RegisterComponent] [Access(typeof(RuleGridsSystem))]
 public sealed partial class RuleGridsComponent : Component
 {
     /// <summary>

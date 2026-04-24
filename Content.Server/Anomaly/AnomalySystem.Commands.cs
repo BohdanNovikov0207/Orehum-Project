@@ -17,11 +17,15 @@ public sealed partial class AnomalySystem
 
     public void InitializeCommands()
     {
-        _consoleHost.RegisterCommand("pulseanomaly", Loc.GetString("anomaly-command-pulse"), "pulseanomaly <uid>",
+        _consoleHost.RegisterCommand("pulseanomaly",
+            Loc.GetString("anomaly-command-pulse"),
+            "pulseanomaly <uid>",
             PulseAnomalyCommand,
             GetAnomalyCompletion);
 
-        _consoleHost.RegisterCommand("supercriticalanomaly", Loc.GetString("anomaly-command-supercritical"), "supercriticalanomaly <uid>",
+        _consoleHost.RegisterCommand("supercriticalanomaly",
+            Loc.GetString("anomaly-command-supercritical"),
+            "supercriticalanomaly <uid>",
             SupercriticalAnomalyCommand,
             GetAnomalyCompletion);
     }
@@ -56,10 +60,8 @@ public sealed partial class AnomalySystem
         StartSupercriticalEvent((uid.Value, anomaly));
     }
 
-    private CompletionResult GetAnomalyCompletion(IConsoleShell shell, string[] args)
-    {
-        return args.Length != 1
+    private CompletionResult GetAnomalyCompletion(IConsoleShell shell, string[] args) =>
+        args.Length != 1
             ? CompletionResult.Empty
             : CompletionResult.FromHintOptions(CompletionHelper.Components<AnomalyComponent>(args[0]), "<uid>");
-    }
 }

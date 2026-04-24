@@ -28,16 +28,16 @@ namespace Content.Server.Store.Conditions;
 public sealed partial class BuyerAntagCondition : ListingCondition
 {
     /// <summary>
-    /// A whitelist of antag roles that can purchase this listing. Only one needs to be found.
-    /// </summary>
-    [DataField("whitelist", customTypeSerializer: typeof(PrototypeIdHashSetSerializer<AntagPrototype>))]
-    public HashSet<string>? Whitelist;
-
-    /// <summary>
     /// A blacklist of antag roles that cannot purchase this listing. Only one needs to be found.
     /// </summary>
     [DataField("blacklist", customTypeSerializer: typeof(PrototypeIdHashSetSerializer<AntagPrototype>))]
     public HashSet<string>? Blacklist;
+
+    /// <summary>
+    /// A whitelist of antag roles that can purchase this listing. Only one needs to be found.
+    /// </summary>
+    [DataField("whitelist", customTypeSerializer: typeof(PrototypeIdHashSetSerializer<AntagPrototype>))]
+    public HashSet<string>? Whitelist;
 
     public override bool Condition(ListingConditionArgs args)
     {
@@ -66,13 +66,13 @@ public sealed partial class BuyerAntagCondition : ListingCondition
             var found = false;
             foreach (var role in roles)
             {
-
                 if (!role.Antagonist || string.IsNullOrEmpty(role.Prototype))
                     continue;
 
                 if (Whitelist.Contains(role.Prototype))
                     found = true;
             }
+
             if (!found)
                 return false;
         }

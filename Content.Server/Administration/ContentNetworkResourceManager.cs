@@ -15,9 +15,9 @@ namespace Content.Server.Administration;
 
 public sealed class ContentNetworkResourceManager
 {
-    [Dependency] private readonly IServerDbManager _serverDb = default!;
-    [Dependency] private readonly NetworkResourceManager _netRes = default!;
     [Dependency] private readonly IConfigurationManager _cfgManager = default!;
+    [Dependency] private readonly NetworkResourceManager _netRes = default!;
+    [Dependency] private readonly IServerDbManager _serverDb = default!;
 
     [ViewVariables] public bool StoreUploaded { get; set; } = true;
 
@@ -31,7 +31,10 @@ public sealed class ContentNetworkResourceManager
     private async void OnUploadResource(ICommonSession session, NetworkResourceUploadMessage msg)
     {
         if (StoreUploaded)
-            await _serverDb.AddUploadedResourceLogAsync(session.UserId, DateTime.Now, msg.RelativePath.ToString(), msg.Data);
+            await _serverDb.AddUploadedResourceLogAsync(session.UserId,
+                DateTime.Now,
+                msg.RelativePath.ToString(),
+                msg.Data);
     }
 
     private async void AutoDelete(int days)

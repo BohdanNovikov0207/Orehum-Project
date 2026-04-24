@@ -21,17 +21,18 @@ namespace Content.Server.Administration;
 /// </summary>
 public sealed partial class QuickDialogSystem : EntitySystem
 {
-    [Dependency] private readonly IPlayerManager _playerManager = default!;
-
     /// <summary>
     /// Contains the success/cancel actions for a dialog.
     /// </summary>
-    private readonly Dictionary<int, (Action<QuickDialogResponseEvent> okAction, Action cancelAction)> _openDialogs = new();
+    private readonly Dictionary<int, (Action<QuickDialogResponseEvent> okAction, Action cancelAction)> _openDialogs =
+        new();
+
     private readonly Dictionary<NetUserId, List<int>> _openDialogsByUser = new();
+    [Dependency] private readonly IPlayerManager _playerManager = default!;
 
     private int _nextDialogId = 1;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         _playerManager.PlayerStatusChanged += PlayerManagerOnPlayerStatusChanged;
@@ -47,7 +48,8 @@ public sealed partial class QuickDialogSystem : EntitySystem
 
     private void Handler(QuickDialogResponseEvent msg, EntitySessionEventArgs args)
     {
-        if (!_openDialogs.ContainsKey(msg.DialogId) || !_openDialogsByUser[args.SenderSession.UserId].Contains(msg.DialogId))
+        if (!_openDialogs.ContainsKey(msg.DialogId) ||
+            !_openDialogsByUser[args.SenderSession.UserId].Contains(msg.DialogId))
         {
             args.SenderSession.Channel.Disconnect($"Replied with invalid quick dialog data with id {msg.DialogId}.");
             return;
@@ -69,10 +71,7 @@ public sealed partial class QuickDialogSystem : EntitySystem
         _openDialogsByUser[args.SenderSession.UserId].Remove(msg.DialogId);
     }
 
-    private int GetDialogId()
-    {
-        return _nextDialogId++;
-    }
+    private int GetDialogId() => _nextDialogId++;
 
     private void PlayerManagerOnPlayerStatusChanged(object? sender, SessionStatusEventArgs e)
     {
@@ -93,7 +92,12 @@ public sealed partial class QuickDialogSystem : EntitySystem
         _openDialogsByUser.Remove(user);
     }
 
-    private void OpenDialogInternal(ICommonSession session, string title, List<QuickDialogEntry> entries, QuickDialogButtonFlag buttons, Action<QuickDialogResponseEvent> okAction, Action cancelAction)
+    private void OpenDialogInternal(ICommonSession session,
+        string title,
+        List<QuickDialogEntry> entries,
+        QuickDialogButtonFlag buttons,
+        Action<QuickDialogResponseEvent> okAction,
+        Action cancelAction)
     {
         var did = GetDialogId();
         RaiseNetworkEvent(
@@ -182,12 +186,7 @@ public sealed partial class QuickDialogSystem : EntitySystem
 /// <param name="String">The string retrieved.</param>
 public record struct LongString(string String)
 {
-    public static implicit operator string(LongString longString)
-    {
-        return longString.String;
-    }
-    public static explicit operator LongString(string s)
-    {
-        return new(s);
-    }
+    public static implicit operator string(LongString longString) => longString.String;
+
+    public static explicit operator LongString(string s) => new(s);
 }

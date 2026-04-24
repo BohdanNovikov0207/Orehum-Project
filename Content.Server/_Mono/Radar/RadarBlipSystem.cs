@@ -5,9 +5,10 @@ using Content.Shared.Shuttles.Components;
 
 namespace Content.Server._Mono.Radar;
 
-public sealed partial class RadarBlipSystem : EntitySystem
+public sealed class RadarBlipSystem : EntitySystem
 {
     [Dependency] private readonly SharedTransformSystem _xform = default!;
+
     public override void Initialize()
     {
         base.Initialize();
@@ -22,15 +23,16 @@ public sealed partial class RadarBlipSystem : EntitySystem
         if (!TryComp<RadarConsoleComponent>(radarUid, out var radar))
             return;
 
-        var blips = AssembleBlipsReport((EntityUid)radarUid, radar);
-        var hitscans = AssembleHitscanReport((EntityUid)radarUid, radar);
+        var blips = AssembleBlipsReport((EntityUid) radarUid, radar);
+        var hitscans = AssembleHitscanReport((EntityUid) radarUid, radar);
 
         // Combine the blips and hitscan lines
         var giveEv = new GiveBlipsEvent(blips, hitscans);
         RaiseNetworkEvent(giveEv, args.SenderSession);
     }
 
-    private List<(NetEntity? Grid, Vector2 Position, float Scale, Color Color, RadarBlipShape Shape)> AssembleBlipsReport(EntityUid uid, RadarConsoleComponent? component = null)
+    private List<(NetEntity? Grid, Vector2 Position, float Scale, Color Color, RadarBlipShape Shape)>
+        AssembleBlipsReport(EntityUid uid, RadarConsoleComponent? component = null)
     {
         var blips = new List<(NetEntity? Grid, Vector2 Position, float Scale, Color Color, RadarBlipShape Shape)>();
 
@@ -133,7 +135,9 @@ public sealed partial class RadarBlipSystem : EntitySystem
     /// <summary>
     /// Assembles trajectory information for hitscan projectiles to be displayed on radar
     /// </summary>
-    private List<(NetEntity? Grid, Vector2 Start, Vector2 End, float Thickness, Color Color)> AssembleHitscanReport(EntityUid uid, RadarConsoleComponent? component = null)
+    private List<(NetEntity? Grid, Vector2 Start, Vector2 End, float Thickness, Color Color)> AssembleHitscanReport(
+        EntityUid uid,
+        RadarConsoleComponent? component = null)
     {
         var hitscans = new List<(NetEntity? Grid, Vector2 Start, Vector2 End, float Thickness, Color Color)>();
 
@@ -173,7 +177,8 @@ public sealed partial class RadarBlipSystem : EntitySystem
             else
             {
                 // Use world coordinates with null grid
-                hitscans.Add((null, hitscan.StartPosition, hitscan.EndPosition, hitscan.LineThickness, hitscan.RadarColor));
+                hitscans.Add((null, hitscan.StartPosition, hitscan.EndPosition, hitscan.LineThickness,
+                    hitscan.RadarColor));
             }
         }
 

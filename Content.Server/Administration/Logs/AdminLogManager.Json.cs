@@ -34,7 +34,7 @@ public sealed partial class AdminLogManager
     {
         _jsonOptions = new JsonSerializerOptions
         {
-            PropertyNamingPolicy = NamingPolicy
+            PropertyNamingPolicy = NamingPolicy,
         };
 
         foreach (var converter in _reflection.FindTypesWithAttribute<AdminLogConverterAttribute>())
@@ -60,8 +60,9 @@ public sealed partial class AdminLogManager
             value = value switch
             {
                 ICommonSession player => new SerializablePlayer(player),
-                EntityCoordinates entityCoordinates => new SerializableEntityCoordinates(_entityManager, entityCoordinates),
-                _ => value
+                EntityCoordinates entityCoordinates => new SerializableEntityCoordinates(_entityManager,
+                    entityCoordinates),
+                _ => value,
             };
 
             var parsedKey = NamingPolicy.ConvertName(key);
@@ -71,19 +72,15 @@ public sealed partial class AdminLogManager
             {
                 EntityUid id => id,
                 EntityStringRepresentation rep => rep.Uid,
-                ICommonSession {AttachedEntity: {Valid: true}} session => session.AttachedEntity,
+                ICommonSession { AttachedEntity: { Valid: true } } session => session.AttachedEntity,
                 IComponent component => component.Owner,
-                _ => null
+                _ => null,
             };
 
             if (_entityManager.TryGetComponent(entityId, out ActorComponent? actor))
-            {
                 players.Add(actor.PlayerSession.UserId.UserId);
-            }
             else if (value is SerializablePlayer player)
-            {
                 players.Add(player.Player.UserId.UserId);
-            }
         }
 
         return (JsonSerializer.SerializeToDocument(parsed, _jsonOptions), players);

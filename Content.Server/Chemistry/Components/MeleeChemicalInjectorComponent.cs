@@ -25,4 +25,6 @@ namespace Content.Server.Chemistry.Components;
 /// contained solution into a target when used to hit it.
 /// </summary>
 [RegisterComponent]
-public sealed partial class MeleeChemicalInjectorComponent : BaseSolutionInjectOnEventComponent { }
+public sealed partial class MeleeChemicalInjectorComponent : BaseSolutionInjectOnEventComponent
+{
+}

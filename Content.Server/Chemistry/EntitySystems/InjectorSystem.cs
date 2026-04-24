@@ -23,34 +23,38 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared._DV.Chemistry.Components; // DeltaV
-using Content.Server.Body.Components;
+using System.Linq;
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Server.Body.Systems;
+using Content.Shared._DV.Chemistry.Components;
+using Content.Shared.Body.Components;
 using Content.Shared.Chemistry;
 using Content.Shared.Chemistry.Components;
 using Content.Shared.Chemistry.Components.SolutionManager;
 using Content.Shared.Chemistry.EntitySystems;
-using Content.Shared.Body.Components;
+using Content.Shared.Chemistry.Reagent;
 using Content.Shared.Database;
 using Content.Shared.DoAfter;
-using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Forensics;
 using Content.Shared.IdentityManagement;
 using Content.Shared.Interaction;
 using Content.Shared.Mobs.Components;
-using Content.Shared.Stacks;
 using Content.Shared.Nutrition.EntitySystems;
-using Robust.Shared.Timing; // Goobstation
-using System.Linq; // Goobstation
-using Content.Shared.Chemistry.Reagent; // Goobstation
+using Content.Shared.Stacks;
+using Robust.Shared.Timing;
+// DeltaV
+// Goobstation
+// Goobstation
+
+// Goobstation
 
 namespace Content.Server.Chemistry.EntitySystems;
 
 public sealed class InjectorSystem : SharedInjectorSystem
 {
     [Dependency] private readonly BloodstreamSystem _blood = default!;
-    [Dependency] private readonly ReactiveSystem _reactiveSystem = default!;
     [Dependency] private readonly OpenableSystem _openable = default!;
+    [Dependency] private readonly ReactiveSystem _reactiveSystem = default!;
     [Dependency] private readonly IGameTiming _timing = default!; // Goobstation
 
     public override void Initialize()
@@ -67,17 +71,21 @@ public sealed class InjectorSystem : SharedInjectorSystem
         // Handle injecting/drawing for solutions
         if (injector.Comp.ToggleState == InjectorToggleMode.Inject)
         {
-            if (isOpenOrIgnored && SolutionContainers.TryGetInjectableSolution(target, out var injectableSolution, out _))
+            if (isOpenOrIgnored &&
+                SolutionContainers.TryGetInjectableSolution(target, out var injectableSolution, out _))
                 return TryInject(injector, target, injectableSolution.Value, user, false);
 
-            if (isOpenOrIgnored && SolutionContainers.TryGetRefillableSolution(target, out var refillableSolution, out _))
+            if (isOpenOrIgnored &&
+                SolutionContainers.TryGetRefillableSolution(target, out var refillableSolution, out _))
                 return TryInject(injector, target, refillableSolution.Value, user, true);
 
             if (TryComp<BloodstreamComponent>(target, out var bloodstream))
                 return TryInjectIntoBloodstream(injector, (target, bloodstream), user);
 
             Popup.PopupEntity(Loc.GetString("injector-component-cannot-transfer-message",
-                ("target", Identity.Entity(target, EntityManager))), injector, user);
+                    ("target", Identity.Entity(target, EntityManager))),
+                injector,
+                user);
             return false;
         }
 
@@ -86,18 +94,19 @@ public sealed class InjectorSystem : SharedInjectorSystem
             // Draw from a bloodstream, if the target has that
             if (TryComp<BloodstreamComponent>(target, out var stream) &&
                 SolutionContainers.ResolveSolution(target, stream.BloodSolutionName, ref stream.BloodSolution))
-            {
                 return TryDraw(injector, (target, stream), stream.BloodSolution.Value, user);
-            }
 
             // Draw from an object (food, beaker, etc)
             if (isOpenOrIgnored && SolutionContainers.TryGetDrawableSolution(target, out var drawableSolution, out _))
                 return TryDraw(injector, target, drawableSolution.Value, user);
 
             Popup.PopupEntity(Loc.GetString("injector-component-cannot-draw-message",
-                ("target", Identity.Entity(target, EntityManager))), injector.Owner, user);
+                    ("target", Identity.Entity(target, EntityManager))),
+                injector.Owner,
+                user);
             return false;
         }
+
         return false;
     }
 
@@ -146,13 +155,9 @@ public sealed class InjectorSystem : SharedInjectorSystem
 
         // Create a pop-up for the user
         if (injector.Comp.ToggleState == InjectorToggleMode.Draw)
-        {
             Popup.PopupEntity(Loc.GetString("injector-component-drawing-user"), target, user);
-        }
         else
-        {
             Popup.PopupEntity(Loc.GetString("injector-component-injecting-user"), target, user);
-        }
 
         if (!SolutionContainers.TryGetSolution(injector.Owner, injector.Comp.SolutionName, out _, out var solution))
             return;
@@ -162,7 +167,7 @@ public sealed class InjectorSystem : SharedInjectorSystem
         if (injector.Comp.ToggleState == InjectorToggleMode.Draw)
         {
             // additional delay is based on actual volume left to draw in syringe when smaller than transfer amount
-            amountToInject = FixedPoint2.Min(injector.Comp.TransferAmount, (solution.MaxVolume - solution.Volume));
+            amountToInject = FixedPoint2.Min(injector.Comp.TransferAmount, solution.MaxVolume - solution.Volume);
         }
         else
         {
@@ -172,7 +177,8 @@ public sealed class InjectorSystem : SharedInjectorSystem
 
         // Injections take 0.5 seconds longer per 5u of possible space/content
         // First 5u(MinimumTransferAmount) doesn't incur delay
-        actualDelay += injector.Comp.DelayPerVolume * FixedPoint2.Max(0, amountToInject - injector.Comp.MinimumTransferAmount).Double();
+        actualDelay += injector.Comp.DelayPerVolume *
+                       FixedPoint2.Max(0, amountToInject - injector.Comp.MinimumTransferAmount).Double();
 
         // Ensure that minimum delay before incapacitation checks is 1 seconds
         actualDelay = MathHelper.Max(actualDelay, TimeSpan.FromSeconds(1));
@@ -187,20 +193,22 @@ public sealed class InjectorSystem : SharedInjectorSystem
             if (injector.Comp.ToggleState == InjectorToggleMode.Draw)
             {
                 Popup.PopupEntity(Loc.GetString("injector-component-drawing-target",
-    ("user", userName)), user, target);
+                        ("user", userName)),
+                    user,
+                    target);
             }
             else
             {
                 Popup.PopupEntity(Loc.GetString("injector-component-injecting-target",
-    ("user", userName)), user, target);
+                        ("user", userName)),
+                    user,
+                    target);
             }
 
 
             // Check if the target is incapacitated or in combat mode and modify time accordingly.
             if (MobState.IsIncapacitated(target))
-            {
                 actualDelay /= 2.5f;
-            }
             else if (Combat.IsInCombatMode(target))
             {
                 // Slightly increase the delay when the target is in combat mode. Helps prevents cheese injections in
@@ -237,7 +245,13 @@ public sealed class InjectorSystem : SharedInjectorSystem
             }
         }
 
-        DoAfter.TryStartDoAfter(new DoAfterArgs(EntityManager, user, actualDelay, new InjectorDoAfterEvent(), injector.Owner, target: target, used: injector.Owner)
+        DoAfter.TryStartDoAfter(new DoAfterArgs(EntityManager,
+            user,
+            actualDelay,
+            new InjectorDoAfterEvent(),
+            injector.Owner,
+            target,
+            injector.Owner)
         {
             BreakOnMove = true,
             BreakOnWeightlessMove = false,
@@ -248,16 +262,21 @@ public sealed class InjectorSystem : SharedInjectorSystem
         });
     }
 
-    private bool TryInjectIntoBloodstream(Entity<InjectorComponent> injector, Entity<BloodstreamComponent> target,
+    private bool TryInjectIntoBloodstream(Entity<InjectorComponent> injector,
+        Entity<BloodstreamComponent> target,
         EntityUid user)
     {
         // Get transfer amount. May be smaller than _transferAmount if not enough room
-        if (!SolutionContainers.ResolveSolution(target.Owner, target.Comp.ChemicalSolutionName,
-                ref target.Comp.ChemicalSolution, out var chemSolution))
+        if (!SolutionContainers.ResolveSolution(target.Owner,
+                target.Comp.ChemicalSolutionName,
+                ref target.Comp.ChemicalSolution,
+                out var chemSolution))
         {
             Popup.PopupEntity(
                 Loc.GetString("injector-component-cannot-inject-message",
-                    ("target", Identity.Entity(target, EntityManager))), injector.Owner, user);
+                    ("target", Identity.Entity(target, EntityManager))),
+                injector.Owner,
+                user);
             return false;
         }
 
@@ -266,7 +285,9 @@ public sealed class InjectorSystem : SharedInjectorSystem
         {
             Popup.PopupEntity(
                 Loc.GetString("injector-component-cannot-inject-message",
-                    ("target", Identity.Entity(target, EntityManager))), injector.Owner, user);
+                    ("target", Identity.Entity(target, EntityManager))),
+                injector.Owner,
+                user);
             return false;
         }
 
@@ -278,21 +299,28 @@ public sealed class InjectorSystem : SharedInjectorSystem
         _reactiveSystem.DoEntityReaction(target, removedSolution, ReactionMethod.Injection);
 
         Popup.PopupEntity(Loc.GetString("injector-component-inject-success-message",
-            ("amount", removedSolution.Volume),
-            ("target", Identity.Entity(target, EntityManager))), injector.Owner, user);
+                ("amount", removedSolution.Volume),
+                ("target", Identity.Entity(target, EntityManager))),
+            injector.Owner,
+            user);
 
         Dirty(injector);
         AfterInject(injector, target);
         return true;
     }
 
-    private bool TryInject(Entity<InjectorComponent> injector, EntityUid targetEntity,
-        Entity<SolutionComponent> targetSolution, EntityUid user, bool asRefill)
+    private bool TryInject(Entity<InjectorComponent> injector,
+        EntityUid targetEntity,
+        Entity<SolutionComponent> targetSolution,
+        EntityUid user,
+        bool asRefill)
     {
-        if (HasComp<BlockInjectionComponent>(targetEntity))  // DeltaV
+        if (HasComp<BlockInjectionComponent>(targetEntity)) // DeltaV
             return false;
 
-        if (!SolutionContainers.TryGetSolution(injector.Owner, injector.Comp.SolutionName, out var soln,
+        if (!SolutionContainers.TryGetSolution(injector.Owner,
+                injector.Comp.SolutionName,
+                out var soln,
                 out var solution) || solution.Volume == 0)
             return false;
 
@@ -305,7 +333,8 @@ public sealed class InjectorSystem : SharedInjectorSystem
             Popup.PopupEntity(
                 Loc.GetString("injector-component-target-already-full-message",
                     ("target", Identity.Entity(targetEntity, EntityManager))),
-                injector.Owner, user);
+                injector.Owner,
+                user);
             return false;
         }
 
@@ -324,8 +353,10 @@ public sealed class InjectorSystem : SharedInjectorSystem
             SolutionContainers.Refill(targetEntity, targetSolution, removedSolution);
 
         Popup.PopupEntity(Loc.GetString("injector-component-transfer-success-message",
-            ("amount", removedSolution.Volume),
-            ("target", Identity.Entity(targetEntity, EntityManager))), injector.Owner, user);
+                ("amount", removedSolution.Volume),
+                ("target", Identity.Entity(targetEntity, EntityManager))),
+            injector.Owner,
+            user);
 
         Dirty(injector);
         AfterInject(injector, targetEntity);
@@ -335,11 +366,11 @@ public sealed class InjectorSystem : SharedInjectorSystem
     private void AfterInject(Entity<InjectorComponent> injector, EntityUid target)
     {
         // Automatically set syringe to draw after completely draining it.
-        if (SolutionContainers.TryGetSolution(injector.Owner, injector.Comp.SolutionName, out _,
+        if (SolutionContainers.TryGetSolution(injector.Owner,
+                injector.Comp.SolutionName,
+                out _,
                 out var solution) && solution.Volume == 0)
-        {
             SetMode(injector, InjectorToggleMode.Draw);
-        }
 
         // Leave some DNA from the injectee on it
         var ev = new TransferDnaEvent { Donor = target, Recipient = injector };
@@ -349,43 +380,49 @@ public sealed class InjectorSystem : SharedInjectorSystem
     private void AfterDraw(Entity<InjectorComponent> injector, EntityUid target)
     {
         // Automatically set syringe to inject after completely filling it.
-        if (SolutionContainers.TryGetSolution(injector.Owner, injector.Comp.SolutionName, out _,
+        if (SolutionContainers.TryGetSolution(injector.Owner,
+                injector.Comp.SolutionName,
+                out _,
                 out var solution) && solution.AvailableVolume == 0)
-        {
             SetMode(injector, InjectorToggleMode.Inject);
-        }
 
         // Leave some DNA from the drawee on it
         var ev = new TransferDnaEvent { Donor = target, Recipient = injector };
         RaiseLocalEvent(target, ref ev);
     }
 
-    private bool TryDraw(Entity<InjectorComponent> injector, Entity<BloodstreamComponent?> target,
-        Entity<SolutionComponent> targetSolution, EntityUid user)
+    private bool TryDraw(Entity<InjectorComponent> injector,
+        Entity<BloodstreamComponent?> target,
+        Entity<SolutionComponent> targetSolution,
+        EntityUid user)
     {
-        if (!SolutionContainers.TryGetSolution(injector.Owner, injector.Comp.SolutionName, out var soln,
+        if (!SolutionContainers.TryGetSolution(injector.Owner,
+                injector.Comp.SolutionName,
+                out var soln,
                 out var solution) || solution.AvailableVolume == 0)
-        {
             return false;
-        }
 
         var applicableTargetSolution = targetSolution.Comp.Solution;
         // If a whitelist exists, remove all non-whitelisted reagents from the target solution temporarily
         var temporarilyRemovedSolution = new Solution();
         if (injector.Comp.ReagentWhitelist is { } reagentWhitelist)
         {
-            string[] reagentPrototypeWhitelistArray = new string[reagentWhitelist.Count];
+            var reagentPrototypeWhitelistArray = new string[reagentWhitelist.Count];
             var i = 0;
             foreach (var reagent in reagentWhitelist)
             {
                 reagentPrototypeWhitelistArray[i] = reagent;
                 ++i;
             }
-            temporarilyRemovedSolution = applicableTargetSolution.SplitSolutionWithout(applicableTargetSolution.Volume, reagentPrototypeWhitelistArray);
+
+            temporarilyRemovedSolution =
+                applicableTargetSolution.SplitSolutionWithout(applicableTargetSolution.Volume,
+                    reagentPrototypeWhitelistArray);
         }
 
         // Get transfer amount. May be smaller than _transferAmount if not enough room, also make sure there's room in the injector
-        var realTransferAmount = FixedPoint2.Min(injector.Comp.TransferAmount, applicableTargetSolution.Volume,
+        var realTransferAmount = FixedPoint2.Min(injector.Comp.TransferAmount,
+            applicableTargetSolution.Volume,
             solution.AvailableVolume);
 
         if (realTransferAmount <= 0)
@@ -393,7 +430,8 @@ public sealed class InjectorSystem : SharedInjectorSystem
             Popup.PopupEntity(
                 Loc.GetString("injector-component-target-is-empty-message",
                     ("target", Identity.Entity(target, EntityManager))),
-                injector.Owner, user);
+                injector.Owner,
+                user);
             return false;
         }
 
@@ -411,25 +449,29 @@ public sealed class InjectorSystem : SharedInjectorSystem
         SolutionContainers.TryAddSolution(targetSolution, temporarilyRemovedSolution);
 
         if (!SolutionContainers.TryAddSolution(soln.Value, removedSolution))
-        {
             return false;
-        }
 
         Popup.PopupEntity(Loc.GetString("injector-component-draw-success-message",
-            ("amount", removedSolution.Volume),
-            ("target", Identity.Entity(target, EntityManager))), injector.Owner, user);
+                ("amount", removedSolution.Volume),
+                ("target", Identity.Entity(target, EntityManager))),
+            injector.Owner,
+            user);
 
         Dirty(injector);
         AfterDraw(injector, target);
         return true;
     }
 
-    private void DrawFromBlood(Entity<InjectorComponent> injector, Entity<BloodstreamComponent> target,
-        Entity<SolutionComponent> injectorSolution, FixedPoint2 transferAmount, EntityUid user)
+    private void DrawFromBlood(Entity<InjectorComponent> injector,
+        Entity<BloodstreamComponent> target,
+        Entity<SolutionComponent> injectorSolution,
+        FixedPoint2 transferAmount,
+        EntityUid user)
     {
         var drawAmount = (float) transferAmount;
 
-        if (SolutionContainers.ResolveSolution(target.Owner, target.Comp.ChemicalSolutionName,
+        if (SolutionContainers.ResolveSolution(target.Owner,
+                target.Comp.ChemicalSolutionName,
                 ref target.Comp.ChemicalSolution))
         {
             var chemTemp = SolutionContainers.SplitSolution(target.Comp.ChemicalSolution.Value, drawAmount * 0.15f);
@@ -437,24 +479,28 @@ public sealed class InjectorSystem : SharedInjectorSystem
             drawAmount -= (float) chemTemp.Volume;
         }
 
-        if (SolutionContainers.ResolveSolution(target.Owner, target.Comp.BloodSolutionName,
+        if (SolutionContainers.ResolveSolution(target.Owner,
+                target.Comp.BloodSolutionName,
                 ref target.Comp.BloodSolution))
         {
             var bloodTemp = SolutionContainers.SplitSolution(target.Comp.BloodSolution.Value, drawAmount);
             // Goobstation start
             // On blood draw, freshness will almost always be at it's best
             foreach (var dna in bloodTemp
-                .SelectMany(r => r.Reagent.EnsureReagentData().OfType<DnaData>()))
+                         .SelectMany(r => r.Reagent.EnsureReagentData().OfType<DnaData>()))
             {
                 dna.Freshness = _timing.CurTime;
             }
+
             // Goobstation end
             SolutionContainers.TryAddSolution(injectorSolution, bloodTemp);
         }
 
         Popup.PopupEntity(Loc.GetString("injector-component-draw-success-message",
-            ("amount", transferAmount),
-            ("target", Identity.Entity(target, EntityManager))), injector.Owner, user);
+                ("amount", transferAmount),
+                ("target", Identity.Entity(target, EntityManager))),
+            injector.Owner,
+            user);
 
         Dirty(injector);
         AfterDraw(injector, target);

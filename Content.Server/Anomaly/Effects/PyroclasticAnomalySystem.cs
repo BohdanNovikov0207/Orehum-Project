@@ -18,14 +18,14 @@ using Robust.Shared.Map;
 namespace Content.Server.Anomaly.Effects;
 
 /// <summary>
-/// This handles <see cref="PyroclasticAnomalyComponent"/> and the events from <seealso cref="AnomalySystem"/>
+/// This handles <see cref="PyroclasticAnomalyComponent" /> and the events from <seealso cref="AnomalySystem" />
 /// </summary>
 public sealed class PyroclasticAnomalySystem : EntitySystem
 {
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly FlammableSystem _flammable = default!;
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         SubscribeLocalEvent<PyroclasticAnomalyComponent, AnomalyPulseEvent>(OnPulse);
@@ -39,7 +39,9 @@ public sealed class PyroclasticAnomalySystem : EntitySystem
         IgniteNearby(uid, xform.Coordinates, args.Severity, ignitionRadius);
     }
 
-    private void OnSupercritical(EntityUid uid, PyroclasticAnomalyComponent component, ref AnomalySupercriticalEvent args)
+    private void OnSupercritical(EntityUid uid,
+        PyroclasticAnomalyComponent component,
+        ref AnomalySupercriticalEvent args)
     {
         var xform = Transform(uid);
         IgniteNearby(uid, xform.Coordinates, 1, component.MaximumIgnitionRadius * 2 * args.PowerModifier);

@@ -93,13 +93,9 @@ public sealed partial class NPCSteeringSystem
         var mask = 0;
 
         if (TryComp<FixturesComponent>(uid, out var manager))
-        {
             (layer, mask) = PhysicsSystem.GetHardCollision(uid, manager);
-        }
         else
-        {
             return SteeringObstacleStatus.Failed;
-        }
 
         // TODO: Should cache the fact we're doing this somewhere.
         // See https://github.com/space-wizards/space-station-14/issues/11475
@@ -178,13 +174,10 @@ public sealed partial class NPCSteeringSystem
                 if (TryComp<ClimbingComponent>(uid, out var climbing))
                 {
                     if (climbing.IsClimbing)
-                    {
                         return SteeringObstacleStatus.Completed;
-                    }
-                    else if (climbing.NextTransition != null)
-                    {
+
+                    if (climbing.NextTransition != null)
                         return SteeringObstacleStatus.Continuing;
-                    }
 
                     var climbableQuery = GetEntityQuery<ClimbableComponent>();
 
@@ -207,7 +200,8 @@ public sealed partial class NPCSteeringSystem
             // Try smashing obstacles.
             else if ((component.Flags & PathFlags.Smashing) != 0x0)
             {
-                if (_melee.TryGetWeapon(uid, out _, out var meleeWeapon) && meleeWeapon.NextAttack <= Timing.CurTime && TryComp<CombatModeComponent>(uid, out var combatMode))
+                if (_melee.TryGetWeapon(uid, out _, out var meleeWeapon) && meleeWeapon.NextAttack <= Timing.CurTime &&
+                    TryComp<CombatModeComponent>(uid, out var combatMode))
                 {
                     _combat.SetInCombatMode(uid, true, combatMode);
                     var destructibleQuery = GetEntityQuery<DestructibleComponent>();
@@ -249,9 +243,7 @@ public sealed partial class NPCSteeringSystem
     {
         // TODO: Can probably re-use this from pathfinding or something
         if (!TryComp<MapGridComponent>(poly.GraphUid, out var grid))
-        {
             return;
-        }
 
         foreach (var ent in _mapSystem.GetLocalAnchoredEntities(poly.GraphUid, grid, poly.Box))
         {
@@ -259,9 +251,7 @@ public sealed partial class NPCSteeringSystem
                 !body.Hard ||
                 !body.CanCollide ||
                 (body.CollisionMask & layer) == 0x0 && (body.CollisionLayer & mask) == 0x0)
-            {
                 continue;
-            }
 
             ents.Add(ent);
         }
@@ -271,6 +261,6 @@ public sealed partial class NPCSteeringSystem
     {
         Completed,
         Failed,
-        Continuing
+        Continuing,
     }
 }

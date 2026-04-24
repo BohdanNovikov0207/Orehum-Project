@@ -8,7 +8,6 @@
 
 using Content.Server._Goobstation.Wizard.Components;
 using Content.Server.Polymorph.Components;
-using Content.Server.Polymorph.Systems;
 using Content.Shared._Goobstation.Wizard.Projectiles;
 using Content.Shared.Polymorph;
 using Robust.Server.Audio;
@@ -19,8 +18,8 @@ namespace Content.Server._Goobstation.Wizard.Systems;
 
 public sealed class WizardJauntSystem : EntitySystem
 {
-    [Dependency] private readonly TransformSystem _transform = default!;
     [Dependency] private readonly AudioSystem _audio = default!;
+    [Dependency] private readonly TransformSystem _transform = default!;
 
     public override void Initialize()
     {
@@ -38,7 +37,7 @@ public sealed class WizardJauntSystem : EntitySystem
         var query = EntityQueryEnumerator<WizardJauntComponent, PolymorphedEntityComponent, TransformComponent>();
         while (query.MoveNext(out var uid, out var jaunt, out var polymorphed, out var xform))
         {
-            if (jaunt.JauntEndEffectEntity is {} endEffect)
+            if (jaunt.JauntEndEffectEntity is { } endEffect)
             {
                 _transform.SetMapCoordinates(endEffect, _transform.GetMapCoordinates(xform));
                 continue;

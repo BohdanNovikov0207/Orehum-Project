@@ -40,8 +40,11 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Linq;
+using System.Numerics;
 using Content.Server.Chat.Systems;
 using Content.Server.Movement.Systems;
+using Content.Shared.Chat;
 using Content.Shared.Damage.Events;
 using Content.Shared.Damage.Systems;
 using Content.Shared.Effects;
@@ -50,18 +53,26 @@ using Content.Shared.Weapons.Melee;
 using Content.Shared.Weapons.Melee.Events;
 using Robust.Shared.Map;
 using Robust.Shared.Player;
-using System.Linq;
-using System.Numerics;
-using Content.Shared.Chat; // Einstein Engines - Languages
+
+// Einstein Engines - Languages
 
 namespace Content.Server.Weapons.Melee;
 
 public sealed class MeleeWeaponSystem : SharedMeleeWeaponSystem
 {
+    // goob edit - more interactivity for battle cries
+    public static readonly Dictionary<char, InGameICChatType> PrefixToChannel = new()
+    {
+        { SharedChatSystem.LocalPrefix, InGameICChatType.Speak },
+        { SharedChatSystem.WhisperPrefix, InGameICChatType.Whisper },
+        { SharedChatSystem.EmotesPrefix, InGameICChatType.Emote },
+        { SharedChatSystem.EmotesAltPrefix, InGameICChatType.Emote },
+    };
+
     [Dependency] private readonly ChatSystem _chat = default!;
+    [Dependency] private readonly SharedColorFlashEffectSystem _color = default!;
     [Dependency] private readonly DamageExamineSystem _damageExamine = default!;
     [Dependency] private readonly LagCompensationSystem _lag = default!;
-    [Dependency] private readonly SharedColorFlashEffectSystem _color = default!;
 
     public override void Initialize()
     {
@@ -81,15 +92,17 @@ public sealed class MeleeWeaponSystem : SharedMeleeWeaponSystem
         if (damageSpec.Empty)
             return;
 
-        _damageExamine.AddDamageExamine(args.Message, Damageable.ApplyUniversalAllModifiers(damageSpec), Loc.GetString("damage-melee"));
+        _damageExamine.AddDamageExamine(args.Message,
+            Damageable.ApplyUniversalAllModifiers(damageSpec),
+            Loc.GetString("damage-melee"));
 
         // Goobstation - partial armor penetration
-        var ap = component.ResistanceBypass ? 100 : (int)Math.Round(damageSpec.ArmorPenetration * 100);
+        var ap = component.ResistanceBypass ? 100 : (int) Math.Round(damageSpec.ArmorPenetration * 100);
         if (ap == 0)
             return;
 
         var abs = Math.Abs(ap);
-        args.Message.AddMarkupPermissive("\n" + Loc.GetString("armor-penetration", ("arg", ap/abs), ("abs", abs)));
+        args.Message.AddMarkupPermissive("\n" + Loc.GetString("armor-penetration", ("arg", ap / abs), ("abs", abs)));
     }
 
     protected override bool ArcRaySuccessful(EntityUid targetUid,
@@ -129,7 +142,12 @@ public sealed class MeleeWeaponSystem : SharedMeleeWeaponSystem
         if (session is { } pSession)
         {
             (targetCoordinates, targetLocalAngle) = _lag.GetCoordinatesAngle(target, pSession);
-            return Interaction.InRangeUnobstructed(user, target, targetCoordinates, targetLocalAngle, range, overlapCheck: false);
+            return Interaction.InRangeUnobstructed(user,
+                target,
+                targetCoordinates,
+                targetLocalAngle,
+                range,
+                overlapCheck: false);
         }
 
         return Interaction.InRangeUnobstructed(user, target, range);
@@ -137,34 +155,36 @@ public sealed class MeleeWeaponSystem : SharedMeleeWeaponSystem
 
     protected override void DoDamageEffect(List<EntityUid> targets, EntityUid? user, TransformComponent targetXform)
     {
-        var filter = Filter.Pvs(targetXform.Coordinates, entityMan: EntityManager).RemoveWhereAttachedEntity(o => o == user);
+        var filter = Filter.Pvs(targetXform.Coordinates, entityMan: EntityManager)
+            .RemoveWhereAttachedEntity(o => o == user);
         _color.RaiseEffect(Color.Red, targets, filter);
     }
 
-    public override void DoLunge(EntityUid user, EntityUid weapon, Angle angle, Vector2 localPos, string? animation, Angle spriteRotation, bool flipAnimation, bool predicted = true)
+    public override void DoLunge(EntityUid user,
+        EntityUid weapon,
+        Angle angle,
+        Vector2 localPos,
+        string? animation,
+        Angle spriteRotation,
+        bool flipAnimation,
+        bool predicted = true)
     {
         Filter filter;
 
         if (predicted)
-        {
             filter = Filter.PvsExcept(user, entityManager: EntityManager);
-        }
         else
-        {
             filter = Filter.Pvs(user, entityManager: EntityManager);
-        }
 
-        RaiseNetworkEvent(new MeleeLungeEvent(GetNetEntity(user), GetNetEntity(weapon), angle, localPos, animation, spriteRotation, flipAnimation), filter);
+        RaiseNetworkEvent(new MeleeLungeEvent(GetNetEntity(user),
+                GetNetEntity(weapon),
+                angle,
+                localPos,
+                animation,
+                spriteRotation,
+                flipAnimation),
+            filter);
     }
-
-    // goob edit - more interactivity for battle cries
-    public static readonly Dictionary<char, InGameICChatType> PrefixToChannel = new()
-    {
-        {SharedChatSystem.LocalPrefix, InGameICChatType.Speak},
-        {SharedChatSystem.WhisperPrefix, InGameICChatType.Whisper},
-        {SharedChatSystem.EmotesPrefix, InGameICChatType.Emote},
-        {SharedChatSystem.EmotesAltPrefix, InGameICChatType.Emote},
-    };
 
     private void OnSpeechHit(EntityUid owner, MeleeSpeechComponent comp, MeleeHitEvent args)
     {
@@ -172,7 +192,10 @@ public sealed class MeleeWeaponSystem : SharedMeleeWeaponSystem
             return;
 
         var chatType = PrefixToChannel.GetValueOrDefault(comp.Battlecry[0]);
-        var message = chatType == InGameICChatType.Speak ? comp.Battlecry : comp.Battlecry[1..]; // [1..] basically means the first char is removed.
+        var message =
+            chatType == InGameICChatType.Speak
+                ? comp.Battlecry
+                : comp.Battlecry[1..]; // [1..] basically means the first char is removed.
 
         _chat.TrySendInGameICMessage(args.User, message, chatType, true, true, checkRadioPrefix: false, forced: true);
     }

@@ -11,6 +11,7 @@ using System.Linq;
 using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Store;
 using Content.Shared.Store.Components;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 
 namespace Content.Server._White.StoreDiscount;
@@ -27,8 +28,11 @@ public sealed class StoreDiscountSystem : EntitySystem
         var count = _random.Next(store.Sales.MinItems, store.Sales.MaxItems + 1);
 
         listings = listings
-            .Where(l => !l.SaleBlacklist && l.Cost.Any(x => x.Value > 1) && store.Categories.Overlaps(l.Categories)) // goob edit
-            .OrderBy(_ => _random.Next()).Take(count).ToList();
+            .Where(l => !l.SaleBlacklist && l.Cost.Any(x => x.Value > 1) &&
+                        store.Categories.Overlaps(l.Categories)) // goob edit
+            .OrderBy(_ => _random.Next())
+            .Take(count)
+            .ToList();
 
         foreach (var listing in listings)
         {
@@ -44,12 +48,10 @@ public sealed class StoreDiscountSystem : EntitySystem
             listing.DiscountValue = 100 - (newCost[key] / listing.Cost[key] * 100).Int();
             listing.Cost = newCost;
             listing.SaleCost = newCost;
-            listing.Categories = new() { store.Sales.SalesCategory };
+            listing.Categories = new List<ProtoId<StoreCategoryPrototype>> { store.Sales.SalesCategory };
         }
     }
 
-    private float GetDiscount(float minMultiplier, float maxMultiplier)
-    {
-        return _random.NextFloat() * (maxMultiplier - minMultiplier) + minMultiplier;
-    }
+    private float GetDiscount(float minMultiplier, float maxMultiplier) =>
+        _random.NextFloat() * (maxMultiplier - minMultiplier) + minMultiplier;
 }

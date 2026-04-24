@@ -14,7 +14,7 @@ namespace Content.Server.Objectives.Components;
 /// Requires that the player's mind matches a whitelist.
 /// Typical use is checking for (antagonist) roles.
 /// </summary>
-[RegisterComponent, Access(typeof(RoleRequirementSystem))]
+[RegisterComponent] [Access(typeof(RoleRequirementSystem))]
 public sealed partial class RoleRequirementComponent : Component
 {
     /// <summary>

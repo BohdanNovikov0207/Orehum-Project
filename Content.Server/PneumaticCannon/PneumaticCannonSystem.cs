@@ -29,7 +29,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Server.Atmos.Components;
 using Content.Server.Atmos.EntitySystems;
 using Content.Server.Storage.EntitySystems;
 using Content.Server.Stunnable;
@@ -51,15 +50,16 @@ public sealed class PneumaticCannonSystem : SharedPneumaticCannonSystem
     [Dependency] private readonly AtmosphereSystem _atmos = default!;
     [Dependency] private readonly GasTankSystem _gasTank = default!;
     [Dependency] private readonly GunSystem _gun = default!;
-    [Dependency] private readonly StunSystem _stun = default!;
     [Dependency] private readonly ItemSlotsSystem _slots = default!;
+    [Dependency] private readonly StunSystem _stun = default!;
     [Dependency] private readonly SharedToolSystem _toolSystem = default!;
 
     public override void Initialize()
     {
         base.Initialize();
 
-        SubscribeLocalEvent<PneumaticCannonComponent, InteractUsingEvent>(OnInteractUsing, before: new []{ typeof(StorageSystem) });
+        SubscribeLocalEvent<PneumaticCannonComponent, InteractUsingEvent>(OnInteractUsing,
+            new[] { typeof(StorageSystem) });
         SubscribeLocalEvent<PneumaticCannonComponent, GunShotEvent>(OnShoot);
         SubscribeLocalEvent<PneumaticCannonComponent, ContainerIsInsertingAttemptEvent>(OnContainerInserting);
         SubscribeLocalEvent<PneumaticCannonComponent, GunRefreshModifiersEvent>(OnGunRefreshModifiers);
@@ -78,7 +78,9 @@ public sealed class PneumaticCannonSystem : SharedPneumaticCannonSystem
         component.Power = (PneumaticCannonPower) val;
 
         Popup.PopupEntity(Loc.GetString("pneumatic-cannon-component-change-power",
-            ("power", component.Power.ToString())), uid, args.User);
+                ("power", component.Power.ToString())),
+            uid,
+            args.User);
 
         component.ProjectileSpeed = GetProjectileSpeedFromPower(component);
         if (TryComp<GunComponent>(uid, out var gun))
@@ -87,7 +89,9 @@ public sealed class PneumaticCannonSystem : SharedPneumaticCannonSystem
         args.Handled = true;
     }
 
-    private void OnContainerInserting(EntityUid uid, PneumaticCannonComponent component, ContainerIsInsertingAttemptEvent args)
+    private void OnContainerInserting(EntityUid uid,
+        PneumaticCannonComponent component,
+        ContainerIsInsertingAttemptEvent args)
     {
         if (args.Container.ID != PneumaticCannonComponent.TankSlotId)
             return;
@@ -114,7 +118,9 @@ public sealed class PneumaticCannonSystem : SharedPneumaticCannonSystem
             && _stun.TryUpdateParalyzeDuration(args.User, TimeSpan.FromSeconds(component.HighPowerStunTime)))
         {
             Popup.PopupEntity(Loc.GetString("pneumatic-cannon-component-power-stun",
-                ("cannon", uid)), cannon, args.User);
+                    ("cannon", uid)),
+                cannon,
+                args.User);
         }
 
         // ignore gas stuff if the cannon doesn't use any
@@ -125,9 +131,7 @@ public sealed class PneumaticCannonSystem : SharedPneumaticCannonSystem
         var environment = _atmos.GetContainingMixture(cannon.Owner, false, true);
         var removed = _gasTank.RemoveAir(gas.Value, component.GasUsage);
         if (environment != null && removed != null)
-        {
             _atmos.Merge(environment, removed);
-        }
 
         if (gas.Value.Comp.Air.TotalMoles >= component.GasUsage)
             return;
@@ -143,24 +147,22 @@ public sealed class PneumaticCannonSystem : SharedPneumaticCannonSystem
     }
 
     /// <summary>
-    ///     Returns whether the pneumatic cannon has enough gas to shoot an item, as well as the tank itself.
+    /// Returns whether the pneumatic cannon has enough gas to shoot an item, as well as the tank itself.
     /// </summary>
     private Entity<GasTankComponent>? GetGas(EntityUid uid)
     {
         if (!Container.TryGetContainer(uid, PneumaticCannonComponent.TankSlotId, out var container) ||
-            container is not ContainerSlot slot || slot.ContainedEntity is not {} contained)
+            container is not ContainerSlot slot || slot.ContainedEntity is not { } contained)
             return null;
 
         return TryComp<GasTankComponent>(contained, out var gasTank) ? (contained, gasTank) : null;
     }
 
-    private float GetProjectileSpeedFromPower(PneumaticCannonComponent component)
-    {
-        return component.Power switch
+    private float GetProjectileSpeedFromPower(PneumaticCannonComponent component) =>
+        component.Power switch
         {
             PneumaticCannonPower.High => component.BaseProjectileSpeed * 4f,
             PneumaticCannonPower.Medium => component.BaseProjectileSpeed,
             PneumaticCannonPower.Low or _ => component.BaseProjectileSpeed * 0.5f,
         };
-    }
 }

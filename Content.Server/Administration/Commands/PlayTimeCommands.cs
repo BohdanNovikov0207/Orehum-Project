@@ -10,18 +10,19 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Text.RegularExpressions;
 using Content.Server.Players.PlayTimeTracking;
 using Content.Shared.Administration;
 using Content.Shared.Players.PlayTimeTracking;
 using Robust.Server.Player;
 using Robust.Shared.Console;
-using System.Text.RegularExpressions;
 
 namespace Content.Server.Administration.Commands;
 
 public sealed class PlayTimeCommandUtilities
 {
-    private readonly static Dictionary<string, int> Units = new() {
+    private static readonly Dictionary<string, int> Units = new()
+    {
         { "y", 525960 },
         { "mo", 43800 },
         { "w", 10080 },
@@ -29,6 +30,50 @@ public sealed class PlayTimeCommandUtilities
         { "h", 60 },
         { "m", 1 },
     };
+
+    public static List<TimeUnit> ConvertToTimeUnits(string timeString)
+    {
+        // Searching for something similar to 365d24h, etc.
+        List<TimeUnit> result = new();
+
+        // We want to support plain numbers as a translation to just minutes, just in case people don't know things like 30d or 1d are an option.
+        if (int.TryParse(timeString, out var timeValue))
+        {
+            result.Add(new TimeUnit(timeValue, "m"));
+            return result;
+        }
+
+        var timeRegex = Regex.Matches(timeString, "(\\d+)([A-Za-z]+)");
+
+        foreach (Match match in timeRegex)
+        {
+            var isTimeAmountNumber = int.TryParse(match.Groups[1].Value, out var amountOfTime);
+            var timeUnit = match.Groups[2].Value;
+
+            if (!isTimeAmountNumber)
+                continue;
+
+            if (!Units.ContainsKey(timeUnit))
+                continue;
+
+            result.Add(new TimeUnit(amountOfTime, timeUnit));
+        }
+
+        return result;
+    }
+
+    public static int CountMinutes(string timeString)
+    {
+        var timeUnits = ConvertToTimeUnits(timeString);
+        var total = 0;
+
+        foreach (var timeUnit in timeUnits)
+        {
+            total += timeUnit.ToMinutes();
+        }
+
+        return total;
+    }
 
     public struct TimeUnit
     {
@@ -46,59 +91,16 @@ public sealed class PlayTimeCommandUtilities
             TimeValue = timeValue;
             Unit = unit;
         }
+
         public int ToMinutes()
         {
-            var unitExists = Units.TryGetValue(Unit, out int minutes);
+            var unitExists = Units.TryGetValue(Unit, out var minutes);
 
             if (!unitExists)
                 return TimeValue;
 
             return TimeValue * minutes;
         }
-    }
-
-    public static List<TimeUnit> ConvertToTimeUnits(string timeString)
-    {
-        // Searching for something similar to 365d24h, etc.
-        List<TimeUnit> result = new();
-
-        // We want to support plain numbers as a translation to just minutes, just in case people don't know things like 30d or 1d are an option.
-        if (int.TryParse(timeString, out int timeValue))
-        {
-            result.Add(new TimeUnit(timeValue, "m"));
-            return result;
-        }
-
-        MatchCollection timeRegex = Regex.Matches(timeString, "(\\d+)([A-Za-z]+)");
-
-        foreach (Match match in timeRegex)
-        {
-            bool isTimeAmountNumber = int.TryParse(match.Groups[1].Value, out int amountOfTime);
-            string timeUnit = match.Groups[2].Value;
-
-            if (!isTimeAmountNumber)
-                continue;
-
-            if (!Units.ContainsKey(timeUnit))
-                continue;
-
-            result.Add(new TimeUnit(amountOfTime, timeUnit));
-        }
-
-        return result;
-    }
-
-    public static int CountMinutes(string timeString)
-    {
-        List<TimeUnit> timeUnits = ConvertToTimeUnits(timeString);
-        int total = 0;
-
-        foreach (var timeUnit in timeUnits)
-        {
-            total += timeUnit.ToMinutes();
-        }
-
-        return total;
     }
 }
 
@@ -140,8 +142,10 @@ public sealed class PlayTimeAddOverallCommand : IConsoleCommand
     public CompletionResult GetCompletion(IConsoleShell shell, string[] args)
     {
         if (args.Length == 1)
+        {
             return CompletionResult.FromHintOptions(CompletionHelper.SessionNames(),
                 Loc.GetString("cmd-playtime_addoverall-arg-user"));
+        }
 
         if (args.Length == 2)
             return CompletionResult.FromHint(Loc.GetString("cmd-playtime_addoverall-arg-minutes"));
@@ -306,7 +310,8 @@ public sealed class PlayTimeGetRoleCommand : IConsoleCommand
             }
 
             var time = _playTimeTracking.GetPlayTimeForTracker(session, args[1]);
-            shell.WriteLine(Loc.GetString("cmd-playtime_getrole-succeed", ("username", session.Name),
+            shell.WriteLine(Loc.GetString("cmd-playtime_getrole-succeed",
+                ("username", session.Name),
                 ("time", time)));
         }
     }

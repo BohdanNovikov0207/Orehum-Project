@@ -14,20 +14,20 @@ namespace Content.Server._Goobstation.Wizard.Components;
 public sealed partial class UseDelayBlockKnockdownComponent : Component
 {
     [DataField]
+    public EntProtoId CustomEffect = "EffectHearts";
+
+    [DataField]
     public string Delay = "default";
-
-    [DataField]
-    public bool ResetDelayOnSuccess = true;
-
-    [DataField]
-    public SoundSpecifier? KnockdownSound = new SoundPathSpecifier("/Audio/Effects/Lightning/lightningbolt.ogg");
-
-    [DataField]
-    public bool DoSparks = true;
 
     [DataField]
     public bool DoCustom;
 
     [DataField]
-    public EntProtoId CustomEffect = "EffectHearts";
+    public bool DoSparks = true;
+
+    [DataField]
+    public SoundSpecifier? KnockdownSound = new SoundPathSpecifier("/Audio/Effects/Lightning/lightningbolt.ogg");
+
+    [DataField]
+    public bool ResetDelayOnSuccess = true;
 }

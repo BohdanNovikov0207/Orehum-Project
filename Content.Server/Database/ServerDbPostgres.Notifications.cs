@@ -15,7 +15,6 @@ namespace Content.Server.Database;
 
 /// Listens for ban_notification containing the player id and the banning server id using postgres listen/notify.
 /// Players a ban_notification got received for get banned, except when the current server id and the one in the notification payload match.
-
 public sealed partial class ServerDbPostgres
 {
     /// <summary>
@@ -77,7 +76,7 @@ public sealed partial class ServerDbPostgres
 
                     await _notificationConnection.OpenAsync(cancellationToken);
                     _reconnectWaitTime = TimeSpan.Zero;
-                    _notifyLog.Verbose($"Notification connection opened...");
+                    _notifyLog.Verbose("Notification connection opened...");
                 }
 
                 foreach (var channel in NotificationChannels)
@@ -96,7 +95,7 @@ public sealed partial class ServerDbPostgres
             catch (OperationCanceledException)
             {
                 // Abort loop on cancel.
-                _notifyLog.Verbose($"Shutting down notification listener due to cancellation");
+                _notifyLog.Verbose("Shutting down notification listener due to cancellation");
                 return;
             }
             catch (Exception e)

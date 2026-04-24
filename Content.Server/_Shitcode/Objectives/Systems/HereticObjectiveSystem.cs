@@ -13,7 +13,7 @@ using Content.Shared.Objectives.Components;
 
 namespace Content.Server._Goobstation.Objectives.Systems;
 
-public sealed partial class HereticObjectiveSystem : EntitySystem
+public sealed class HereticObjectiveSystem : EntitySystem
 {
     [Dependency] private readonly NumberObjectiveSystem _number = default!;
 
@@ -25,18 +25,23 @@ public sealed partial class HereticObjectiveSystem : EntitySystem
         SubscribeLocalEvent<HereticSacrificeConditionComponent, ObjectiveGetProgressEvent>(OnGetSacrificeProgress);
     }
 
-    private void OnGetKnowledgeProgress(Entity<HereticKnowledgeConditionComponent> ent, ref ObjectiveGetProgressEvent args)
+    private void OnGetKnowledgeProgress(Entity<HereticKnowledgeConditionComponent> ent,
+        ref ObjectiveGetProgressEvent args)
     {
         var target = _number.GetTarget(ent);
         if (target != 0)
             args.Progress = MathF.Min(ent.Comp.Researched / target, 1f);
-        else args.Progress = 1f;
+        else
+            args.Progress = 1f;
     }
-    private void OnGetSacrificeProgress(Entity<HereticSacrificeConditionComponent> ent, ref ObjectiveGetProgressEvent args)
+
+    private void OnGetSacrificeProgress(Entity<HereticSacrificeConditionComponent> ent,
+        ref ObjectiveGetProgressEvent args)
     {
         var target = _number.GetTarget(ent);
         if (target != 0)
             args.Progress = MathF.Min(ent.Comp.Sacrificed / target, 1f);
-        else args.Progress = 1f;
+        else
+            args.Progress = 1f;
     }
 }

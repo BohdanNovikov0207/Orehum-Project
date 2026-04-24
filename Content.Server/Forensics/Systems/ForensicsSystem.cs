@@ -91,461 +91,488 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Server._EinsteinEngines.Forensics.Components;
-using Content.Server.Body.Components;
 using Content.Server.Body.Systems;
 using Content.Server.DoAfter;
 using Content.Server.Fluids.EntitySystems;
 using Content.Server.Forensics.Components;
 using Content.Server.Popups;
 using Content.Shared.Body.Events;
-using Content.Shared.Chemistry.EntitySystems;
-using Content.Shared.Popups;
 using Content.Shared.Chemistry.Components;
-using Content.Shared.Chemistry.Reagent;
 using Content.Shared.Chemistry.Components.SolutionManager;
+using Content.Shared.Chemistry.EntitySystems;
+using Content.Shared.Chemistry.Reagent;
 using Content.Shared.DoAfter;
 using Content.Shared.Forensics;
 using Content.Shared.Forensics.Components;
 using Content.Shared.Forensics.Systems;
+using Content.Shared.Hands.Components;
 using Content.Shared.Interaction;
 using Content.Shared.Interaction.Events;
 using Content.Shared.Inventory;
+using Content.Shared.Inventory.Events;
+using Content.Shared.Popups;
+using Content.Shared.Verbs;
 using Content.Shared.Weapons.Melee.Events;
 using Robust.Shared.Random;
-using Content.Shared.Verbs;
+using Robust.Shared.Timing;
 using Robust.Shared.Utility;
-using Content.Shared.Hands.Components;
-using Content.Shared.Inventory.Events;
-using Robust.Shared.Timing; // Goobstation
 
-namespace Content.Server.Forensics
+// Goobstation
+
+namespace Content.Server.Forensics;
+
+public sealed class ForensicsSystem : SharedForensicsSystem
 {
-    public sealed class ForensicsSystem : SharedForensicsSystem
+    [Dependency] private readonly DoAfterSystem _doAfterSystem = default!;
+    [Dependency] private readonly InventorySystem _inventory = default!;
+    [Dependency] private readonly PopupSystem _popupSystem = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly SharedSolutionContainerSystem _solutionContainerSystem = default!;
+    [Dependency] private readonly IGameTiming _timing = default!; // Goobstation
+
+    public override void Initialize()
     {
-        [Dependency] private readonly IRobustRandom _random = default!;
-        [Dependency] private readonly InventorySystem _inventory = default!;
-        [Dependency] private readonly DoAfterSystem _doAfterSystem = default!;
-        [Dependency] private readonly PopupSystem _popupSystem = default!;
-        [Dependency] private readonly SharedSolutionContainerSystem _solutionContainerSystem = default!;
-        [Dependency] private readonly IGameTiming _timing = default!; // Goobstation
+        SubscribeLocalEvent<HandsComponent, ContactInteractionEvent>(OnInteract);
+        SubscribeLocalEvent<FiberComponent, MapInitEvent>(OnFiberInit, after: new[] { typeof(BloodstreamSystem) });
+        SubscribeLocalEvent<FingerprintComponent, MapInitEvent>(OnFingerprintInit,
+            after: new[] { typeof(BloodstreamSystem) });
+        SubscribeLocalEvent<ScentComponent, DidEquipEvent>(OnEquip); // Einstein Engines
+        // The solution entities are spawned on MapInit as well, so we have to wait for that to be able to set the DNA in the bloodstream correctly without ResolveSolution failing
+        SubscribeLocalEvent<DnaComponent, MapInitEvent>(OnDNAInit, after: new[] { typeof(BloodstreamSystem) });
+        SubscribeLocalEvent<ScentComponent, MapInitEvent>(OnScentInit,
+            after: new[] { typeof(BloodstreamSystem) }); // Einstein Engines
 
-        public override void Initialize()
+        SubscribeLocalEvent<ForensicsComponent, BeingGibbedEvent>(OnBeingGibbed);
+        SubscribeLocalEvent<ForensicsComponent, MeleeHitEvent>(OnMeleeHit);
+        SubscribeLocalEvent<ForensicsComponent, GotRehydratedEvent>(OnRehydrated);
+        SubscribeLocalEvent<CleansForensicsComponent, AfterInteractEvent>(OnAfterInteract,
+            after: new[] { typeof(AbsorbentSystem) });
+        SubscribeLocalEvent<ForensicsComponent, CleanForensicsDoAfterEvent>(OnCleanForensicsDoAfter);
+        SubscribeLocalEvent<DnaComponent, TransferDnaEvent>(OnTransferDnaEvent);
+        SubscribeLocalEvent<DnaSubstanceTraceComponent, SolutionContainerChangedEvent>(OnSolutionChanged);
+        SubscribeLocalEvent<CleansForensicsComponent, GetVerbsEvent<UtilityVerb>>(OnUtilityVerb);
+    }
+
+    private void OnSolutionChanged(Entity<DnaSubstanceTraceComponent> ent, ref SolutionContainerChangedEvent ev)
+    {
+        var soln = GetSolutionsDNA(ev.Solution);
+        if (soln.Count > 0)
         {
-            SubscribeLocalEvent<HandsComponent, ContactInteractionEvent>(OnInteract);
-            SubscribeLocalEvent<FiberComponent, MapInitEvent>(OnFiberInit, after: new[] { typeof(BloodstreamSystem) });
-            SubscribeLocalEvent<FingerprintComponent, MapInitEvent>(OnFingerprintInit, after: new[] { typeof(BloodstreamSystem) });
-            SubscribeLocalEvent<ScentComponent, DidEquipEvent>(OnEquip); // Einstein Engines
-            // The solution entities are spawned on MapInit as well, so we have to wait for that to be able to set the DNA in the bloodstream correctly without ResolveSolution failing
-            SubscribeLocalEvent<DnaComponent, MapInitEvent>(OnDNAInit, after: new[] { typeof(BloodstreamSystem) });
-            SubscribeLocalEvent<ScentComponent, MapInitEvent>(OnScentInit, after: new[] { typeof(BloodstreamSystem) }); // Einstein Engines
-
-            SubscribeLocalEvent<ForensicsComponent, BeingGibbedEvent>(OnBeingGibbed);
-            SubscribeLocalEvent<ForensicsComponent, MeleeHitEvent>(OnMeleeHit);
-            SubscribeLocalEvent<ForensicsComponent, GotRehydratedEvent>(OnRehydrated);
-            SubscribeLocalEvent<CleansForensicsComponent, AfterInteractEvent>(OnAfterInteract, after: new[] { typeof(AbsorbentSystem) });
-            SubscribeLocalEvent<ForensicsComponent, CleanForensicsDoAfterEvent>(OnCleanForensicsDoAfter);
-            SubscribeLocalEvent<DnaComponent, TransferDnaEvent>(OnTransferDnaEvent);
-            SubscribeLocalEvent<DnaSubstanceTraceComponent, SolutionContainerChangedEvent>(OnSolutionChanged);
-            SubscribeLocalEvent<CleansForensicsComponent, GetVerbsEvent<UtilityVerb>>(OnUtilityVerb);
-        }
-
-        private void OnSolutionChanged(Entity<DnaSubstanceTraceComponent> ent, ref SolutionContainerChangedEvent ev)
-        {
-            var soln = GetSolutionsDNA(ev.Solution);
-            if (soln.Count > 0)
+            var comp = EnsureComp<ForensicsComponent>(ent.Owner);
+            foreach (var dna in soln) // Goobstation
             {
-                var comp = EnsureComp<ForensicsComponent>(ent.Owner);
-                foreach (var dna in soln) // Goobstation
-                {
-                    comp.DNAs.Add(dna);
-                }
+                comp.DNAs.Add(dna);
             }
         }
+    }
 
-        private void OnInteract(EntityUid uid, HandsComponent component, ContactInteractionEvent args)
-        {
-            ApplyEvidence(uid, args.Other);
-        }
+    private void OnInteract(EntityUid uid, HandsComponent component, ContactInteractionEvent args) =>
+        ApplyEvidence(uid, args.Other);
 
-        private void OnEquip(EntityUid uid, ScentComponent component, DidEquipEvent args) // Einstein Engines
-        {
+    private void OnEquip(EntityUid uid, ScentComponent component, DidEquipEvent args) // Einstein Engines
+        =>
             ApplyScent(uid, args.Equipment);
-        }
 
-        private void OnFiberInit(EntityUid uid, FiberComponent component, MapInitEvent args)
+    private void OnFiberInit(EntityUid uid, FiberComponent component, MapInitEvent args) =>
+        component.Fiberprint = GenerateFingerprint(7);
+
+    private void OnFingerprintInit(Entity<FingerprintComponent> ent, ref MapInitEvent args)
+    {
+        if (ent.Comp.Fingerprint == null)
+            RandomizeFingerprint((ent.Owner, ent.Comp));
+    }
+
+    private void OnDNAInit(Entity<DnaComponent> ent, ref MapInitEvent args)
+    {
+        if (ent.Comp.DNA == null)
+            RandomizeDNA((ent.Owner, ent.Comp));
+        else
         {
-            component.Fiberprint = GenerateFingerprint(length: 7);
-        }
-
-        private void OnFingerprintInit(Entity<FingerprintComponent> ent, ref MapInitEvent args)
-        {
-            if (ent.Comp.Fingerprint == null)
-                RandomizeFingerprint((ent.Owner, ent.Comp));
-        }
-
-        private void OnDNAInit(Entity<DnaComponent> ent, ref MapInitEvent args)
-        {
-            if (ent.Comp.DNA == null)
-                RandomizeDNA((ent.Owner, ent.Comp));
-            else
-            {
-                // If set manually (for example by cloning) we also need to inform the bloodstream of the correct DNA string so it can be updated
-                var ev = new GenerateDnaEvent { Owner = ent.Owner, DNA = ent.Comp.DNA };
-                RaiseLocalEvent(ent.Owner, ref ev);
-            }
-
-        }
-
-        private void OnScentInit(EntityUid uid, ScentComponent component, MapInitEvent args) // Einstein Engines
-        {
-            component.Scent = GenerateFingerprint(length: 5);
-
-            var updatecomp = EnsureComp<ForensicsComponent>(uid);
-            updatecomp.Scent = component.Scent;
-
-            Dirty(uid, updatecomp);
-        }
-
-        private void OnBeingGibbed(EntityUid uid, ForensicsComponent component, BeingGibbedEvent args)
-        {
-            string dna = Loc.GetString("forensics-dna-unknown");
-
-            if (TryComp(uid, out DnaComponent? dnaComp) && dnaComp.DNA != null)
-                dna = dnaComp.DNA;
-
-            foreach (EntityUid part in args.GibbedParts)
-            {
-                var partComp = EnsureComp<ForensicsComponent>(part);
-                partComp.DNAs.Add((dna, TimeSpan.Zero)); // Goobstation
-                partComp.CanDnaBeCleaned = false;
-                Dirty(part, partComp); // Einstein Engines
-            }
-        }
-
-        private void OnMeleeHit(EntityUid uid, ForensicsComponent component, MeleeHitEvent args)
-        {
-            if ((args.BaseDamage.DamageDict.TryGetValue("Blunt", out var bluntDamage) && bluntDamage.Value > 0) ||
-                (args.BaseDamage.DamageDict.TryGetValue("Slash", out var slashDamage) && slashDamage.Value > 0) ||
-                (args.BaseDamage.DamageDict.TryGetValue("Piercing", out var pierceDamage) && pierceDamage.Value > 0))
-            {
-                foreach (EntityUid hitEntity in args.HitEntities)
-                {
-                    if (TryComp<DnaComponent>(hitEntity, out var hitEntityComp) && hitEntityComp.DNA != null)
-                    { // Goobstation Start
-                        // remove old DNA if it exists because need to refresh the freshness timestamp
-                        // seems to be shitcode but why is it a hashset in the first place, it never gets large so why not just use a list?
-                        component.DNAs.RemoveWhere(x => x.Item1 == hitEntityComp.DNA);
-
-                        component.DNAs.Add((hitEntityComp.DNA, _timing.CurTime));
-                    } // Goobstation End
-                }
-            }
-            Dirty(uid, component); // Einstein Engines
-        }
-
-        private void OnRehydrated(Entity<ForensicsComponent> ent, ref GotRehydratedEvent args)
-        {
-            CopyForensicsFrom(ent.Comp, args.Target);
-            Dirty(args.Target, Comp<ForensicsComponent>(args.Target)); // Einstein Engines
-        }
-
-        /// <summary>
-        /// Copy forensic information from a source entity to a destination.
-        /// Existing forensic information on the target is still kept.
-        /// </summary>
-        public void CopyForensicsFrom(ForensicsComponent src, EntityUid target)
-        {
-            var dest = EnsureComp<ForensicsComponent>(target);
-            foreach (var dna in src.DNAs)
-            {
-                dest.DNAs.Add(dna);
-            }
-
-            foreach (var fiber in src.Fibers)
-            {
-                dest.Fibers.Add(fiber);
-            }
-
-            foreach (var print in src.Fingerprints)
-            {
-                dest.Fingerprints.Add(print);
-            }
-
-            foreach (var residue in src.Residues)
-            {
-                dest.Residues.Add(residue);
-            }
-        }
-
-        public List<(string, TimeSpan)> GetSolutionsDNA(EntityUid uid) // Goobstation
-        {
-            List<(string, TimeSpan)> list = new(); // Goobstation
-            if (TryComp<SolutionContainerManagerComponent>(uid, out var comp))
-            {
-                foreach (var (_, soln) in _solutionContainerSystem.EnumerateSolutions((uid, comp)))
-                {
-                    list.AddRange(GetSolutionsDNA(soln.Comp.Solution));
-                }
-            }
-            return list;
-        }
-
-        public List<(string, TimeSpan)> GetSolutionsDNA(Solution soln) // Goobstation
-        {
-            List<(string, TimeSpan)> list = new(); // Goobstation
-            foreach (var reagent in soln.Contents)
-            {
-                foreach (var data in reagent.Reagent.EnsureReagentData())
-                {
-                    if (data is DnaData)
-                    {
-                        list.Add((((DnaData) data).DNA, ((DnaData) data).Freshness)); // Goobstation
-                    }
-                }
-            }
-            return list;
-        }
-        private void OnAfterInteract(Entity<CleansForensicsComponent> cleanForensicsEntity, ref AfterInteractEvent args)
-        {
-            if (args.Handled || !args.CanReach || args.Target == null)
-                return;
-
-            args.Handled = TryStartCleaning(cleanForensicsEntity, args.User, args.Target.Value);
-        }
-
-        private void OnUtilityVerb(Entity<CleansForensicsComponent> entity, ref GetVerbsEvent<UtilityVerb> args)
-        {
-            if (!args.CanInteract || !args.CanAccess)
-                return;
-
-            // These need to be set outside for the anonymous method!
-            var user = args.User;
-            var target = args.Target;
-
-            var verb = new UtilityVerb()
-            {
-                Act = () => TryStartCleaning(entity, user, target),
-                Icon = new SpriteSpecifier.Texture(new("/Textures/Interface/VerbIcons/bubbles.svg.192dpi.png")),
-                Text = Loc.GetString(Loc.GetString("forensics-verb-text")),
-                Message = Loc.GetString(Loc.GetString("forensics-verb-message")),
-                // This is important because if its true using the cleaning device will count as touching the object.
-                DoContactInteraction = false
-            };
-
-            args.Verbs.Add(verb);
-        }
-
-        /// <summary>
-        ///     Attempts to clean the given item with the given CleansForensics entity.
-        /// </summary>
-        /// <param name="cleanForensicsEntity">The entity that is being used to clean the target.</param>
-        /// <param name="user">The user that is using the cleanForensicsEntity.</param>
-        /// <param name="target">The target of the forensics clean.</param>
-        /// <returns>True if the target can be cleaned and has some sort of DNA or fingerprints / fibers and false otherwise.</returns>
-        public bool TryStartCleaning(Entity<CleansForensicsComponent> cleanForensicsEntity, EntityUid user, EntityUid target)
-        {
-            if (!TryComp<ForensicsComponent>(target, out var forensicsComp))
-            {
-                _popupSystem.PopupEntity(Loc.GetString("forensics-cleaning-cannot-clean", ("target", target)), user, user, PopupType.MediumCaution);
-                return false;
-            }
-
-            var totalPrintsAndFibers = forensicsComp.Fingerprints.Count + forensicsComp.Fibers.Count;
-            var hasRemovableDNA = forensicsComp.DNAs.Count > 0 && forensicsComp.CanDnaBeCleaned;
-
-            if (hasRemovableDNA || totalPrintsAndFibers > 0)
-            {
-                var cleanDelay = cleanForensicsEntity.Comp.CleanDelay;
-                if (HasComp<ScentComponent>(target)) // EinsteinEngines
-                    cleanDelay += 30;
-
-                var doAfterArgs = new DoAfterArgs(EntityManager, user, cleanDelay, new CleanForensicsDoAfterEvent(), cleanForensicsEntity, target: target, used: cleanForensicsEntity)
-                {
-                    NeedHand = true,
-                    BreakOnDamage = true,
-                    BreakOnMove = true,
-                    MovementThreshold = 0.01f,
-                    DistanceThreshold = forensicsComp.CleanDistance,
-                };
-
-                _doAfterSystem.TryStartDoAfter(doAfterArgs);
-
-                _popupSystem.PopupEntity(Loc.GetString("forensics-cleaning", ("target", target)), user, user);
-
-                return true;
-            }
-            else
-            {
-                _popupSystem.PopupEntity(Loc.GetString("forensics-cleaning-cannot-clean", ("target", target)), user, user, PopupType.MediumCaution);
-                return false;
-            }
-
-        }
-
-        private void OnCleanForensicsDoAfter(EntityUid uid, ForensicsComponent component, CleanForensicsDoAfterEvent args)
-        {
-            if (args.Handled || args.Cancelled || args.Args.Target == null)
-                return;
-
-            if (!TryComp<ForensicsComponent>(args.Target, out var targetComp))
-                return;
-
-            targetComp.Fibers = new();
-            targetComp.Fingerprints = new();
-            targetComp.Scent = string.Empty;
-
-            if (targetComp.CanDnaBeCleaned)
-                targetComp.DNAs = new();
-
-            // leave behind evidence it was cleaned
-            if (TryComp<FiberComponent>(args.Used, out var fiber))
-                targetComp.Fibers.Add(string.IsNullOrEmpty(fiber.FiberColor) ? Loc.GetString("forensic-fibers", ("material", fiber.FiberMaterial)) : Loc.GetString("forensic-fibers-colored", ("color", fiber.FiberColor), ("material", fiber.FiberMaterial)));
-
-            if (TryComp<ResidueComponent>(args.Used, out var residue))
-                targetComp.Residues.Add(string.IsNullOrEmpty(residue.ResidueColor) ? Loc.GetString("forensic-residue", ("adjective", residue.ResidueAdjective)) : Loc.GetString("forensic-residue-colored", ("color", residue.ResidueColor), ("adjective", residue.ResidueAdjective)));
-
-            if (TryComp<ScentComponent>(args.Target, out var scentComp)) // Einstein Engines - Start
-            {
-                var generatedscent = GenerateFingerprint(length: 5);
-                scentComp.Scent = generatedscent;
-                targetComp.Scent = generatedscent;
-
-                if (args.Target is { Valid: true } target
-                    && _inventory.TryGetSlots(target, out var slotDefinitions))
-                    foreach (var slot in slotDefinitions)
-                    {
-                        if (!_inventory.TryGetSlotEntity(target, slot.Name, out var slotEnt))
-                            continue;
-
-                        EnsureComp<ForensicsComponent>(slotEnt.Value, out var recipientComp);
-                        recipientComp.Scent = generatedscent;
-
-                        Dirty(slotEnt.Value, recipientComp);
-                    }
-            }
-
-            if (args.Target is { Valid: true } targetuid)
-                Dirty(targetuid, targetComp); // Einstein Engines - End
-
-        }
-
-        public string GenerateFingerprint(int length = 16) // Einstein Engines - Length
-        {
-            var fingerprint = new byte[Math.Clamp(length, 0, 255)]; // Einstein Engins
-            _random.NextBytes(fingerprint);
-            return Convert.ToHexString(fingerprint);
-        }
-
-        public string GenerateDNA()
-        {
-            var letters = new[] { "A", "C", "G", "T" };
-            var DNA = string.Empty;
-
-            for (var i = 0; i < 16; i++)
-            {
-                DNA += letters[_random.Next(letters.Length)];
-            }
-
-            return DNA;
-        }
-
-        private void ApplyEvidence(EntityUid user, EntityUid target)
-        {
-            if (HasComp<IgnoresFingerprintsComponent>(target))
-                return;
-
-            var component = EnsureComp<ForensicsComponent>(target);
-            if (_inventory.TryGetSlotEntity(user, "gloves", out var gloves))
-            {
-                if (TryComp<FiberComponent>(gloves, out var fiber) && !string.IsNullOrEmpty(fiber.FiberMaterial))
-                {
-                    var fiberLocale = string.IsNullOrEmpty(fiber.FiberColor)
-                        ? Loc.GetString("forensic-fibers", ("material", fiber.FiberMaterial))
-                        : Loc.GetString("forensic-fibers-colored", ("color", fiber.FiberColor), ("material", fiber.FiberMaterial));
-                    component.Fibers.Add(fiberLocale + " ; " + fiber.Fiberprint);
-                }
-            }
-            if (TryComp<FingerprintComponent>(user, out var fingerprint) && CanAccessFingerprint(user, out _))
-                component.Fingerprints.Add(fingerprint.Fingerprint ?? "");
-        }
-
-        private void ApplyScent(EntityUid user, EntityUid target) // Einstein Engines
-        {
-            if (HasComp<ScentComponent>(target))
-                return;
-
-            var component = EnsureComp<ForensicsComponent>(target);
-            if (TryComp<ScentComponent>(user, out var scent))
-                component.Scent = scent.Scent;
-
-            Dirty(target, component);
-        }
-
-        private void OnTransferDnaEvent(EntityUid uid, DnaComponent component, ref TransferDnaEvent args)
-        {
-            if (component.DNA == null)
-                return;
-
-            var recipientComp = EnsureComp<ForensicsComponent>(args.Recipient);
-            recipientComp.DNAs.Add((component.DNA, TimeSpan.Zero)); // Goobstation
-            recipientComp.CanDnaBeCleaned = args.CanDnaBeCleaned;
-        }
-
-        #region Public API
-        public override void RandomizeDNA(Entity<DnaComponent?> ent)
-        {
-            if (!Resolve(ent, ref ent.Comp, false))
-                return;
-
-            ent.Comp.DNA = GenerateDNA();
-            Dirty(ent);
-
+            // If set manually (for example by cloning) we also need to inform the bloodstream of the correct DNA string so it can be updated
             var ev = new GenerateDnaEvent { Owner = ent.Owner, DNA = ent.Comp.DNA };
             RaiseLocalEvent(ent.Owner, ref ev);
         }
+    }
 
-        public override void RandomizeFingerprint(Entity<FingerprintComponent?> ent)
+    private void OnScentInit(EntityUid uid, ScentComponent component, MapInitEvent args) // Einstein Engines
+    {
+        component.Scent = GenerateFingerprint(5);
+
+        var updatecomp = EnsureComp<ForensicsComponent>(uid);
+        updatecomp.Scent = component.Scent;
+
+        Dirty(uid, updatecomp);
+    }
+
+    private void OnBeingGibbed(EntityUid uid, ForensicsComponent component, BeingGibbedEvent args)
+    {
+        var dna = Loc.GetString("forensics-dna-unknown");
+
+        if (TryComp(uid, out DnaComponent? dnaComp) && dnaComp.DNA != null)
+            dna = dnaComp.DNA;
+
+        foreach (var part in args.GibbedParts)
         {
-            if (!Resolve(ent, ref ent.Comp, false))
-                return;
-
-            ent.Comp.Fingerprint = GenerateFingerprint();
-            Dirty(ent);
+            var partComp = EnsureComp<ForensicsComponent>(part);
+            partComp.DNAs.Add((dna, TimeSpan.Zero)); // Goobstation
+            partComp.CanDnaBeCleaned = false;
+            Dirty(part, partComp); // Einstein Engines
         }
+    }
 
-        /// <summary>
-        /// Transfer DNA from one entity onto the forensics of another
-        /// </summary>
-        /// <param name="recipient">The entity receiving the DNA</param>
-        /// <param name="donor">The entity applying its DNA</param>
-        /// <param name="canDnaBeCleaned">If this DNA be cleaned off of the recipient. e.g. cleaning a knife vs cleaning a puddle of blood</param>
-        public void TransferDna(EntityUid recipient, EntityUid donor, bool canDnaBeCleaned = true)
+    private void OnMeleeHit(EntityUid uid, ForensicsComponent component, MeleeHitEvent args)
+    {
+        if (args.BaseDamage.DamageDict.TryGetValue("Blunt", out var bluntDamage) && bluntDamage.Value > 0 ||
+            args.BaseDamage.DamageDict.TryGetValue("Slash", out var slashDamage) && slashDamage.Value > 0 ||
+            args.BaseDamage.DamageDict.TryGetValue("Piercing", out var pierceDamage) && pierceDamage.Value > 0)
         {
-            if (TryComp<DnaComponent>(donor, out var donorComp) && donorComp.DNA != null)
+            foreach (var hitEntity in args.HitEntities)
             {
-                EnsureComp<ForensicsComponent>(recipient, out var recipientComp);
-                recipientComp.DNAs.Add((donorComp.DNA, TimeSpan.Zero)); // Goobstation
-                recipientComp.CanDnaBeCleaned = canDnaBeCleaned;
+                if (TryComp<DnaComponent>(hitEntity, out var hitEntityComp) && hitEntityComp.DNA != null)
+                {
+                    // Goobstation Start
+                    // remove old DNA if it exists because need to refresh the freshness timestamp
+                    // seems to be shitcode but why is it a hashset in the first place, it never gets large so why not just use a list?
+                    component.DNAs.RemoveWhere(x => x.Item1 == hitEntityComp.DNA);
+
+                    component.DNAs.Add((hitEntityComp.DNA, _timing.CurTime));
+                } // Goobstation End
             }
         }
 
-        /// <summary>
-        /// Checks if there's a way to access the fingerprint of the target entity.
-        /// </summary>
-        /// <param name="target">The entity with the fingerprint</param>
-        /// <param name="blocker">The entity that blocked accessing the fingerprint</param>
-        public bool CanAccessFingerprint(EntityUid target, out EntityUid? blocker)
+        Dirty(uid, component); // Einstein Engines
+    }
+
+    private void OnRehydrated(Entity<ForensicsComponent> ent, ref GotRehydratedEvent args)
+    {
+        CopyForensicsFrom(ent.Comp, args.Target);
+        Dirty(args.Target, Comp<ForensicsComponent>(args.Target)); // Einstein Engines
+    }
+
+    /// <summary>
+    /// Copy forensic information from a source entity to a destination.
+    /// Existing forensic information on the target is still kept.
+    /// </summary>
+    public void CopyForensicsFrom(ForensicsComponent src, EntityUid target)
+    {
+        var dest = EnsureComp<ForensicsComponent>(target);
+        foreach (var dna in src.DNAs)
         {
-            var ev = new TryAccessFingerprintEvent();
-
-            RaiseLocalEvent(target, ev);
-            if (!ev.Cancelled && TryComp<InventoryComponent>(target, out var inv))
-                _inventory.RelayEvent((target, inv), ev);
-
-            blocker = ev.Blocker;
-            return !ev.Cancelled;
+            dest.DNAs.Add(dna);
         }
 
-        #endregion
+        foreach (var fiber in src.Fibers)
+        {
+            dest.Fibers.Add(fiber);
+        }
+
+        foreach (var print in src.Fingerprints)
+        {
+            dest.Fingerprints.Add(print);
+        }
+
+        foreach (var residue in src.Residues)
+        {
+            dest.Residues.Add(residue);
+        }
     }
+
+    public List<(string, TimeSpan)> GetSolutionsDNA(EntityUid uid) // Goobstation
+    {
+        List<(string, TimeSpan)> list = new(); // Goobstation
+        if (TryComp<SolutionContainerManagerComponent>(uid, out var comp))
+        {
+            foreach (var (_, soln) in _solutionContainerSystem.EnumerateSolutions((uid, comp)))
+            {
+                list.AddRange(GetSolutionsDNA(soln.Comp.Solution));
+            }
+        }
+
+        return list;
+    }
+
+    public List<(string, TimeSpan)> GetSolutionsDNA(Solution soln) // Goobstation
+    {
+        List<(string, TimeSpan)> list = new(); // Goobstation
+        foreach (var reagent in soln.Contents)
+        {
+            foreach (var data in reagent.Reagent.EnsureReagentData())
+            {
+                if (data is DnaData)
+                    list.Add((((DnaData) data).DNA, ((DnaData) data).Freshness)); // Goobstation
+            }
+        }
+
+        return list;
+    }
+
+    private void OnAfterInteract(Entity<CleansForensicsComponent> cleanForensicsEntity, ref AfterInteractEvent args)
+    {
+        if (args.Handled || !args.CanReach || args.Target == null)
+            return;
+
+        args.Handled = TryStartCleaning(cleanForensicsEntity, args.User, args.Target.Value);
+    }
+
+    private void OnUtilityVerb(Entity<CleansForensicsComponent> entity, ref GetVerbsEvent<UtilityVerb> args)
+    {
+        if (!args.CanInteract || !args.CanAccess)
+            return;
+
+        // These need to be set outside for the anonymous method!
+        var user = args.User;
+        var target = args.Target;
+
+        var verb = new UtilityVerb
+        {
+            Act = () => TryStartCleaning(entity, user, target),
+            Icon = new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/VerbIcons/bubbles.svg.192dpi.png")),
+            Text = Loc.GetString(Loc.GetString("forensics-verb-text")),
+            Message = Loc.GetString(Loc.GetString("forensics-verb-message")),
+            // This is important because if its true using the cleaning device will count as touching the object.
+            DoContactInteraction = false,
+        };
+
+        args.Verbs.Add(verb);
+    }
+
+    /// <summary>
+    /// Attempts to clean the given item with the given CleansForensics entity.
+    /// </summary>
+    /// <param name="cleanForensicsEntity">The entity that is being used to clean the target.</param>
+    /// <param name="user">The user that is using the cleanForensicsEntity.</param>
+    /// <param name="target">The target of the forensics clean.</param>
+    /// <returns>True if the target can be cleaned and has some sort of DNA or fingerprints / fibers and false otherwise.</returns>
+    public bool TryStartCleaning(Entity<CleansForensicsComponent> cleanForensicsEntity,
+        EntityUid user,
+        EntityUid target)
+    {
+        if (!TryComp<ForensicsComponent>(target, out var forensicsComp))
+        {
+            _popupSystem.PopupEntity(Loc.GetString("forensics-cleaning-cannot-clean", ("target", target)),
+                user,
+                user,
+                PopupType.MediumCaution);
+            return false;
+        }
+
+        var totalPrintsAndFibers = forensicsComp.Fingerprints.Count + forensicsComp.Fibers.Count;
+        var hasRemovableDNA = forensicsComp.DNAs.Count > 0 && forensicsComp.CanDnaBeCleaned;
+
+        if (hasRemovableDNA || totalPrintsAndFibers > 0)
+        {
+            var cleanDelay = cleanForensicsEntity.Comp.CleanDelay;
+            if (HasComp<ScentComponent>(target)) // EinsteinEngines
+                cleanDelay += 30;
+
+            var doAfterArgs = new DoAfterArgs(EntityManager,
+                user,
+                cleanDelay,
+                new CleanForensicsDoAfterEvent(),
+                cleanForensicsEntity,
+                target,
+                cleanForensicsEntity)
+            {
+                NeedHand = true,
+                BreakOnDamage = true,
+                BreakOnMove = true,
+                MovementThreshold = 0.01f,
+                DistanceThreshold = forensicsComp.CleanDistance,
+            };
+
+            _doAfterSystem.TryStartDoAfter(doAfterArgs);
+
+            _popupSystem.PopupEntity(Loc.GetString("forensics-cleaning", ("target", target)), user, user);
+
+            return true;
+        }
+
+        _popupSystem.PopupEntity(Loc.GetString("forensics-cleaning-cannot-clean", ("target", target)),
+            user,
+            user,
+            PopupType.MediumCaution);
+        return false;
+    }
+
+    private void OnCleanForensicsDoAfter(EntityUid uid, ForensicsComponent component, CleanForensicsDoAfterEvent args)
+    {
+        if (args.Handled || args.Cancelled || args.Args.Target == null)
+            return;
+
+        if (!TryComp<ForensicsComponent>(args.Target, out var targetComp))
+            return;
+
+        targetComp.Fibers = new HashSet<string>();
+        targetComp.Fingerprints = new HashSet<string>();
+        targetComp.Scent = string.Empty;
+
+        if (targetComp.CanDnaBeCleaned)
+            targetComp.DNAs = new HashSet<(string, TimeSpan)>();
+
+        // leave behind evidence it was cleaned
+        if (TryComp<FiberComponent>(args.Used, out var fiber))
+            targetComp.Fibers.Add(string.IsNullOrEmpty(fiber.FiberColor)
+                ? Loc.GetString("forensic-fibers", ("material", fiber.FiberMaterial))
+                : Loc.GetString("forensic-fibers-colored",
+                    ("color", fiber.FiberColor),
+                    ("material", fiber.FiberMaterial)));
+
+        if (TryComp<ResidueComponent>(args.Used, out var residue))
+            targetComp.Residues.Add(string.IsNullOrEmpty(residue.ResidueColor)
+                ? Loc.GetString("forensic-residue", ("adjective", residue.ResidueAdjective))
+                : Loc.GetString("forensic-residue-colored",
+                    ("color", residue.ResidueColor),
+                    ("adjective", residue.ResidueAdjective)));
+
+        if (TryComp<ScentComponent>(args.Target, out var scentComp)) // Einstein Engines - Start
+        {
+            var generatedscent = GenerateFingerprint(5);
+            scentComp.Scent = generatedscent;
+            targetComp.Scent = generatedscent;
+
+            if (args.Target is { Valid: true } target
+                && _inventory.TryGetSlots(target, out var slotDefinitions))
+            {
+                foreach (var slot in slotDefinitions)
+                {
+                    if (!_inventory.TryGetSlotEntity(target, slot.Name, out var slotEnt))
+                        continue;
+
+                    EnsureComp<ForensicsComponent>(slotEnt.Value, out var recipientComp);
+                    recipientComp.Scent = generatedscent;
+
+                    Dirty(slotEnt.Value, recipientComp);
+                }
+            }
+        }
+
+        if (args.Target is { Valid: true } targetuid)
+            Dirty(targetuid, targetComp); // Einstein Engines - End
+    }
+
+    public string GenerateFingerprint(int length = 16) // Einstein Engines - Length
+    {
+        var fingerprint = new byte[Math.Clamp(length, 0, 255)]; // Einstein Engins
+        _random.NextBytes(fingerprint);
+        return Convert.ToHexString(fingerprint);
+    }
+
+    public string GenerateDNA()
+    {
+        var letters = new[] { "A", "C", "G", "T" };
+        var DNA = string.Empty;
+
+        for (var i = 0; i < 16; i++)
+        {
+            DNA += letters[_random.Next(letters.Length)];
+        }
+
+        return DNA;
+    }
+
+    private void ApplyEvidence(EntityUid user, EntityUid target)
+    {
+        if (HasComp<IgnoresFingerprintsComponent>(target))
+            return;
+
+        var component = EnsureComp<ForensicsComponent>(target);
+        if (_inventory.TryGetSlotEntity(user, "gloves", out var gloves))
+        {
+            if (TryComp<FiberComponent>(gloves, out var fiber) && !string.IsNullOrEmpty(fiber.FiberMaterial))
+            {
+                var fiberLocale = string.IsNullOrEmpty(fiber.FiberColor)
+                    ? Loc.GetString("forensic-fibers", ("material", fiber.FiberMaterial))
+                    : Loc.GetString("forensic-fibers-colored",
+                        ("color", fiber.FiberColor),
+                        ("material", fiber.FiberMaterial));
+                component.Fibers.Add(fiberLocale + " ; " + fiber.Fiberprint);
+            }
+        }
+
+        if (TryComp<FingerprintComponent>(user, out var fingerprint) && CanAccessFingerprint(user, out _))
+            component.Fingerprints.Add(fingerprint.Fingerprint ?? "");
+    }
+
+    private void ApplyScent(EntityUid user, EntityUid target) // Einstein Engines
+    {
+        if (HasComp<ScentComponent>(target))
+            return;
+
+        var component = EnsureComp<ForensicsComponent>(target);
+        if (TryComp<ScentComponent>(user, out var scent))
+            component.Scent = scent.Scent;
+
+        Dirty(target, component);
+    }
+
+    private void OnTransferDnaEvent(EntityUid uid, DnaComponent component, ref TransferDnaEvent args)
+    {
+        if (component.DNA == null)
+            return;
+
+        var recipientComp = EnsureComp<ForensicsComponent>(args.Recipient);
+        recipientComp.DNAs.Add((component.DNA, TimeSpan.Zero)); // Goobstation
+        recipientComp.CanDnaBeCleaned = args.CanDnaBeCleaned;
+    }
+
+    #region Public API
+
+    public override void RandomizeDNA(Entity<DnaComponent?> ent)
+    {
+        if (!Resolve(ent, ref ent.Comp, false))
+            return;
+
+        ent.Comp.DNA = GenerateDNA();
+        Dirty(ent);
+
+        var ev = new GenerateDnaEvent { Owner = ent.Owner, DNA = ent.Comp.DNA };
+        RaiseLocalEvent(ent.Owner, ref ev);
+    }
+
+    public override void RandomizeFingerprint(Entity<FingerprintComponent?> ent)
+    {
+        if (!Resolve(ent, ref ent.Comp, false))
+            return;
+
+        ent.Comp.Fingerprint = GenerateFingerprint();
+        Dirty(ent);
+    }
+
+    /// <summary>
+    /// Transfer DNA from one entity onto the forensics of another
+    /// </summary>
+    /// <param name="recipient">The entity receiving the DNA</param>
+    /// <param name="donor">The entity applying its DNA</param>
+    /// <param name="canDnaBeCleaned">
+    /// If this DNA be cleaned off of the recipient. e.g. cleaning a knife vs cleaning a puddle
+    /// of blood
+    /// </param>
+    public void TransferDna(EntityUid recipient, EntityUid donor, bool canDnaBeCleaned = true)
+    {
+        if (TryComp<DnaComponent>(donor, out var donorComp) && donorComp.DNA != null)
+        {
+            EnsureComp<ForensicsComponent>(recipient, out var recipientComp);
+            recipientComp.DNAs.Add((donorComp.DNA, TimeSpan.Zero)); // Goobstation
+            recipientComp.CanDnaBeCleaned = canDnaBeCleaned;
+        }
+    }
+
+    /// <summary>
+    /// Checks if there's a way to access the fingerprint of the target entity.
+    /// </summary>
+    /// <param name="target">The entity with the fingerprint</param>
+    /// <param name="blocker">The entity that blocked accessing the fingerprint</param>
+    public bool CanAccessFingerprint(EntityUid target, out EntityUid? blocker)
+    {
+        var ev = new TryAccessFingerprintEvent();
+
+        RaiseLocalEvent(target, ev);
+        if (!ev.Cancelled && TryComp<InventoryComponent>(target, out var inv))
+            _inventory.RelayEvent((target, inv), ev);
+
+        blocker = ev.Blocker;
+        return !ev.Cancelled;
+    }
+
+    #endregion
 }

@@ -14,9 +14,9 @@ using Content.Server.StationEvents.Components;
 using Content.Server.Storage.Components;
 using Content.Server.Storage.EntitySystems;
 using Content.Shared.Access.Components;
+using Content.Shared.GameTicking.Components;
 using Content.Shared.Station.Components;
 using Content.Shared.Storage.Components;
-using Content.Shared.GameTicking.Components;
 
 namespace Content.Server.StationEvents.Events;
 
@@ -25,7 +25,10 @@ public sealed class BluespaceLockerRule : StationEventSystem<BluespaceLockerRule
     [Dependency] private readonly BluespaceLockerSystem _bluespaceLocker = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
 
-    protected override void Started(EntityUid uid, BluespaceLockerRuleComponent component, GameRuleComponent gameRule, GameRuleStartedEvent args)
+    protected override void Started(EntityUid uid,
+        BluespaceLockerRuleComponent component,
+        GameRuleComponent gameRule,
+        GameRuleStartedEvent args)
     {
         base.Started(uid, component, gameRule, args);
 

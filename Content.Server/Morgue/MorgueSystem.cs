@@ -29,9 +29,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Server.Storage.Components;
-using Content.Shared.Examine;
-using Content.Shared.Mobs.Components;
 using Content.Shared.Morgue;
 using Content.Shared.Morgue.Components;
 using Content.Shared.Storage.Components;
@@ -42,9 +39,9 @@ namespace Content.Server.Morgue;
 
 public sealed class MorgueSystem : SharedMorgueSystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -53,10 +50,8 @@ public sealed class MorgueSystem : SharedMorgueSystem
         SubscribeLocalEvent<MorgueComponent, MapInitEvent>(OnMapInit);
     }
 
-    private void OnMapInit(Entity<MorgueComponent> ent, ref MapInitEvent args)
-    {
+    private void OnMapInit(Entity<MorgueComponent> ent, ref MapInitEvent args) =>
         ent.Comp.NextBeep = _timing.CurTime + ent.Comp.NextBeep;
-    }
 
     /// <summary>
     /// Handles the periodic beeping that morgues do when a live body is inside.
@@ -76,10 +71,10 @@ public sealed class MorgueSystem : SharedMorgueSystem
 
             CheckContents(uid, comp, storage);
 
-            if (comp.DoSoulBeep && _appearance.TryGetData<MorgueContents>(uid, MorgueVisuals.Contents, out var contents, appearance) && contents == MorgueContents.HasSoul)
-            {
+            if (comp.DoSoulBeep &&
+                _appearance.TryGetData<MorgueContents>(uid, MorgueVisuals.Contents, out var contents, appearance) &&
+                contents == MorgueContents.HasSoul)
                 _audio.PlayPvs(comp.OccupantHasSoulAlarmSound, uid);
-            }
         }
     }
 }

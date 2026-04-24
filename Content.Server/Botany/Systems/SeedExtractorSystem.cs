@@ -26,9 +26,9 @@ namespace Content.Server.Botany.Systems;
 
 public sealed class SeedExtractorSystem : EntitySystem
 {
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly PopupSystem _popupSystem = default!;
     [Dependency] private readonly BotanySystem _botanySystem = default!;
+    [Dependency] private readonly PopupSystem _popupSystem = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
 
     public override void Initialize()
     {
@@ -47,12 +47,14 @@ public sealed class SeedExtractorSystem : EntitySystem
         if (!_botanySystem.TryGetSeed(produce, out var seed) || seed.Seedless)
         {
             _popupSystem.PopupCursor(Loc.GetString("seed-extractor-component-no-seeds", ("name", args.Used)),
-                args.User, PopupType.MediumCaution);
+                args.User,
+                PopupType.MediumCaution);
             return;
         }
 
         _popupSystem.PopupCursor(Loc.GetString("seed-extractor-component-interact-message", ("name", args.Used)),
-            args.User, PopupType.Medium);
+            args.User,
+            PopupType.Medium);
 
         QueueDel(args.Used);
         args.Handled = true;

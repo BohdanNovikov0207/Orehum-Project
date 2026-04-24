@@ -11,15 +11,15 @@ using Robust.Shared.Map;
 namespace Content.Server.Trigger.Systems;
 
 /// <summary>
-/// Handles creating smoke when <see cref="SmokeOnTriggerComponent"/> is triggered.
+/// Handles creating smoke when <see cref="SmokeOnTriggerComponent" /> is triggered.
 /// </summary>
 public sealed class SmokeOnTriggerSystem : EntitySystem
 {
-    [Dependency] private readonly IMapManager _mapMan = default!;
     [Dependency] private readonly MapSystem _map = default!;
+    [Dependency] private readonly IMapManager _mapMan = default!;
     [Dependency] private readonly SmokeSystem _smoke = default!;
-    [Dependency] private readonly TransformSystem _transform = default!;
     [Dependency] private readonly SpreaderSystem _spreader = default!;
+    [Dependency] private readonly TransformSystem _transform = default!;
     [Dependency] private readonly TurfSystem _turf = default!;
 
     public override void Initialize()
@@ -45,9 +45,7 @@ public sealed class SmokeOnTriggerSystem : EntitySystem
         if (!_mapMan.TryFindGridAt(mapCoords, out var gridUid, out var gridComp) ||
             !_map.TryGetTileRef(gridUid, gridComp, xform.Coordinates, out var tileRef) ||
             tileRef.Tile.IsEmpty)
-        {
             return;
-        }
 
         if (_spreader.RequiresFloorToSpread(ent.Comp.SmokePrototype.ToString()) && _turf.IsSpace(tileRef))
             return;
@@ -61,7 +59,11 @@ public sealed class SmokeOnTriggerSystem : EntitySystem
             return;
         }
 
-        _smoke.StartSmoke(smoke, ent.Comp.Solution, (float)ent.Comp.Duration.TotalSeconds, ent.Comp.SpreadAmount, smokeComp);
+        _smoke.StartSmoke(smoke,
+            ent.Comp.Solution,
+            (float) ent.Comp.Duration.TotalSeconds,
+            ent.Comp.SpreadAmount,
+            smokeComp);
 
         args.Handled = true;
     }

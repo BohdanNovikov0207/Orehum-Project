@@ -29,7 +29,9 @@ public sealed partial class BorgSwitchableTypeSystem : SharedBorgSwitchableTypeS
     [Dependency] private readonly BorgSystem _borgSystem = default!;
     [Dependency] private readonly ServerInventorySystem _inventorySystem = default!;
 
-    protected override void SelectBorgModule(Entity<BorgSwitchableTypeComponent> ent, ProtoId<BorgTypePrototype> borgType, ProtoId<BorgSubtypePrototype> borgSubtype)
+    protected override void SelectBorgModule(Entity<BorgSwitchableTypeComponent> ent,
+        ProtoId<BorgTypePrototype> borgType,
+        ProtoId<BorgSubtypePrototype> borgSubtype)
     {
         var prototype = Prototypes.Index(borgType);
         var subtypePrototype = Prototypes.Index(borgSubtype); // goob
@@ -45,7 +47,8 @@ public sealed partial class BorgSwitchableTypeSystem : SharedBorgSwitchableTypeS
         // Corvax-Next-AiRemoteControl-Start
         if (TryComp(ent, out AiRemoteControllerComponent? aiRemoteComp))
         {
-            if (TryComp(aiRemoteComp.AiHolder, out IntrinsicRadioTransmitterComponent? stationAiTransmitter) && transmitter != null)
+            if (TryComp(aiRemoteComp.AiHolder, out IntrinsicRadioTransmitterComponent? stationAiTransmitter) &&
+                transmitter != null)
             {
                 aiRemoteComp.PreviouslyTransmitterChannels = [.. radioChannels];
                 transmitter.Channels = [.. stationAiTransmitter.Channels];
@@ -64,7 +67,8 @@ public sealed partial class BorgSwitchableTypeSystem : SharedBorgSwitchableTypeS
         {
             _borgSystem.SetTransponderSprite(
                 (ent.Owner, transponder),
-                new SpriteSpecifier.Rsi(subtypePrototype.SpritePath, prototype.SpriteBodyState)); // goob - Use the subtype `SpritePath` instead of a hardcoded rsi
+                new SpriteSpecifier.Rsi(subtypePrototype.SpritePath,
+                    prototype.SpriteBodyState)); // goob - Use the subtype `SpritePath` instead of a hardcoded rsi
 
             _borgSystem.SetTransponderName(
                 (ent.Owner, transponder),
@@ -103,15 +107,11 @@ public sealed partial class BorgSwitchableTypeSystem : SharedBorgSwitchableTypeS
         }
 
         if (prototype.AddComponents is { } addComponents)
-        {
             EntityManager.AddComponents(ent, addComponents);
-        }
 
         // Configure inventory template (used for hat spacing)
         if (TryComp(ent, out InventoryComponent? inventory))
-        {
             _inventorySystem.SetTemplateId((ent.Owner, inventory), prototype.InventoryTemplateId);
-        }
 
         base.SelectBorgModule(ent, borgType, borgSubtype);
     }

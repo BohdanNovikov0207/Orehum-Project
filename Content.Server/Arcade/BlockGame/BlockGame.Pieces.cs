@@ -3,8 +3,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-using Content.Shared.Arcade;
 using System.Linq;
+using Content.Shared.Arcade;
 
 namespace Content.Server.Arcade.BlockGame;
 
@@ -15,6 +15,19 @@ public sealed partial class BlockGame
     /// Used as templates when creating pieces for the game.
     /// </summary>
     private readonly BlockGamePieceType[] _allBlockGamePieces;
+
+    /// <summary>
+    /// A static extension for the rotations that allows rotating through the possible rotations.
+    /// </summary>
+    private static BlockGamePieceRotation Next(BlockGamePieceRotation rotation, bool inverted) =>
+        rotation switch
+        {
+            BlockGamePieceRotation.North => inverted ? BlockGamePieceRotation.West : BlockGamePieceRotation.East,
+            BlockGamePieceRotation.East => inverted ? BlockGamePieceRotation.North : BlockGamePieceRotation.South,
+            BlockGamePieceRotation.South => inverted ? BlockGamePieceRotation.East : BlockGamePieceRotation.West,
+            BlockGamePieceRotation.West => inverted ? BlockGamePieceRotation.South : BlockGamePieceRotation.North,
+            _ => throw new ArgumentOutOfRangeException(nameof(rotation), rotation, null),
+        };
 
     /// <summary>
     /// The set of types of game pieces that exist.
@@ -28,7 +41,7 @@ public sealed partial class BlockGame
         S,
         SInverted,
         T,
-        O
+        O,
     }
 
     /// <summary>
@@ -39,22 +52,7 @@ public sealed partial class BlockGame
         North,
         East,
         South,
-        West
-    }
-
-    /// <summary>
-    /// A static extension for the rotations that allows rotating through the possible rotations.
-    /// </summary>
-    private static BlockGamePieceRotation Next(BlockGamePieceRotation rotation, bool inverted)
-    {
-        return rotation switch
-        {
-            BlockGamePieceRotation.North => inverted ? BlockGamePieceRotation.West : BlockGamePieceRotation.East,
-            BlockGamePieceRotation.East => inverted ? BlockGamePieceRotation.North : BlockGamePieceRotation.South,
-            BlockGamePieceRotation.South => inverted ? BlockGamePieceRotation.East : BlockGamePieceRotation.West,
-            BlockGamePieceRotation.West => inverted ? BlockGamePieceRotation.South : BlockGamePieceRotation.North,
-            _ => throw new ArgumentOutOfRangeException(nameof(rotation), rotation, null)
-        };
+        West,
     }
 
     /// <summary>
@@ -82,10 +80,8 @@ public sealed partial class BlockGame
         /// </summary>
         /// <param name="center">The position of the game piece in worldspace.</param>
         /// <param name="rotation">The rotation of the game piece in worldspace.</param>
-        public readonly Vector2i[] Positions(Vector2i center, BlockGamePieceRotation rotation)
-        {
-            return RotatedOffsets(rotation).Select(v => center + v).ToArray();
-        }
+        public readonly Vector2i[] Positions(Vector2i center, BlockGamePieceRotation rotation) =>
+            RotatedOffsets(rotation).Select(v => center + v).ToArray();
 
         /// <summary>
         /// Gets the relative position of each block comprising this piece given a rotation.
@@ -101,7 +97,7 @@ public sealed partial class BlockGame
                 BlockGamePieceRotation.East => 1,
                 BlockGamePieceRotation.South => 2,
                 BlockGamePieceRotation.West => 3,
-                _ => 0
+                _ => 0,
             };
 
             for (var i = 0; i < amount; i++)
@@ -154,13 +150,12 @@ public sealed partial class BlockGame
 
         /// <summary>
         /// Generates a game piece for a given type of game piece.
-        /// See <see cref="BlockGamePieceType"/> for the available options.
+        /// See <see cref="BlockGamePieceType" /> for the available options.
         /// </summary>
         /// <param name="type">The type of game piece to generate.</param>
-        public static BlockGamePiece GetPiece(BlockGamePieceType type)
-        {
+        public static BlockGamePiece GetPiece(BlockGamePieceType type) =>
             //switch statement, hardcoded offsets
-            return type switch
+            type switch
             {
                 BlockGamePieceType.I => new BlockGamePiece
                 {
@@ -169,7 +164,7 @@ public sealed partial class BlockGame
                         new Vector2i(0, -1), new Vector2i(0, 0), new Vector2i(0, 1), new Vector2i(0, 2),
                     },
                     _gameBlockColor = BlockGameBlock.BlockGameBlockColor.LightBlue,
-                    CanSpin = true
+                    CanSpin = true,
                 },
                 BlockGamePieceType.L => new BlockGamePiece
                 {
@@ -178,7 +173,7 @@ public sealed partial class BlockGame
                         new Vector2i(0, -1), new Vector2i(0, 0), new Vector2i(0, 1), new Vector2i(1, 1),
                     },
                     _gameBlockColor = BlockGameBlock.BlockGameBlockColor.Orange,
-                    CanSpin = true
+                    CanSpin = true,
                 },
                 BlockGamePieceType.LInverted => new BlockGamePiece
                 {
@@ -188,7 +183,7 @@ public sealed partial class BlockGame
                         new Vector2i(0, 1),
                     },
                     _gameBlockColor = BlockGameBlock.BlockGameBlockColor.Blue,
-                    CanSpin = true
+                    CanSpin = true,
                 },
                 BlockGamePieceType.S => new BlockGamePiece
                 {
@@ -198,7 +193,7 @@ public sealed partial class BlockGame
                         new Vector2i(0, 0),
                     },
                     _gameBlockColor = BlockGameBlock.BlockGameBlockColor.Green,
-                    CanSpin = true
+                    CanSpin = true,
                 },
                 BlockGamePieceType.SInverted => new BlockGamePiece
                 {
@@ -208,7 +203,7 @@ public sealed partial class BlockGame
                         new Vector2i(1, 0),
                     },
                     _gameBlockColor = BlockGameBlock.BlockGameBlockColor.Red,
-                    CanSpin = true
+                    CanSpin = true,
                 },
                 BlockGamePieceType.T => new BlockGamePiece
                 {
@@ -218,7 +213,7 @@ public sealed partial class BlockGame
                         new Vector2i(-1, 0), new Vector2i(0, 0), new Vector2i(1, 0),
                     },
                     _gameBlockColor = BlockGameBlock.BlockGameBlockColor.Purple,
-                    CanSpin = true
+                    CanSpin = true,
                 },
                 BlockGamePieceType.O => new BlockGamePiece
                 {
@@ -228,16 +223,15 @@ public sealed partial class BlockGame
                         new Vector2i(1, 0),
                     },
                     _gameBlockColor = BlockGameBlock.BlockGameBlockColor.Yellow,
-                    CanSpin = false
+                    CanSpin = false,
                 },
                 _ => new BlockGamePiece
                 {
                     Offsets = new[]
                     {
-                        new Vector2i(0, 0)
-                    }
+                        new Vector2i(0, 0),
+                    },
                 },
             };
-        }
     }
 }

@@ -46,5 +46,4 @@ namespace Content.Server.Connection.Whitelist.Conditions;
 /// </summary>
 public sealed partial class ConditionAlwaysMatch : WhitelistCondition
 {
-
 }

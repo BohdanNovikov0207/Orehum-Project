@@ -20,8 +20,8 @@ namespace Content.Server._Goobstation.Heretic.EntitySystems.PathSpecific;
 
 public sealed class VoidCurseSystem : SharedVoidCurseSystem
 {
-    [Dependency] private readonly TemperatureSystem _temp = default!;
     [Dependency] private readonly StatusEffectsSystem _statusEffect = default!;
+    [Dependency] private readonly TemperatureSystem _temp = default!;
 
     public override void Update(float frameTime)
     {
@@ -40,6 +40,7 @@ public sealed class VoidCurseSystem : SharedVoidCurseSystem
                     RefreshLifetime(comp);
                     Dirty(uid, comp);
                 }
+
                 continue;
             }
 

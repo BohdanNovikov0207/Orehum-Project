@@ -90,12 +90,10 @@ using System.Numerics;
 using Content.Server.Shuttles.Components;
 using Content.Server.Shuttles.Events;
 using Content.Server.Station.Events;
-using Content.Shared._Lavaland.Shuttles;
 using Content.Shared._NF.Shuttles;
 using Content.Shared.Body.Components;
 using Content.Shared.CCVar;
 using Content.Shared.Database;
-using Content.Shared.Maps;
 using Content.Shared.Parallax;
 using Content.Shared.Shuttles.Components;
 using Content.Shared.Shuttles.Systems;
@@ -118,32 +116,6 @@ namespace Content.Server.Shuttles.Systems;
 
 public sealed partial class ShuttleSystem
 {
-    /*
-     * This is a way to move a shuttle from one location to another, via an intermediate map for fanciness.
-     */
-
-    private readonly SoundSpecifier _startupSound = new SoundPathSpecifier("/Audio/Effects/Shuttle/hyperspace_begin.ogg")
-    {
-        Params = AudioParams.Default.WithVolume(-5f),
-    };
-
-    private readonly SoundSpecifier _arrivalSound = new SoundPathSpecifier("/Audio/Effects/Shuttle/hyperspace_end.ogg")
-    {
-        Params = AudioParams.Default.WithVolume(-5f),
-    };
-
-    public float DefaultStartupTime;
-    public float DefaultTravelTime;
-    public float DefaultArrivalTime;
-    private float FTLCooldown;
-    public float FTLMassLimit;
-    private TimeSpan _hyperspaceKnockdownTime = TimeSpan.FromSeconds(5);
-
-    /// <summary>
-    /// Left-side of the station we're allowed to use
-    /// </summary>
-    private float _index;
-
     /// <summary>
     /// Space between grids within hyperspace.
     /// </summary>
@@ -154,13 +126,42 @@ public sealed partial class ShuttleSystem
     /// </summary>
     private const int FTLProximityIterations = 5;
 
-    private readonly HashSet<EntityUid> _lookupEnts = new();
+    private readonly SoundSpecifier _arrivalSound = new SoundPathSpecifier("/Audio/Effects/Shuttle/hyperspace_end.ogg")
+    {
+        Params = AudioParams.Default.WithVolume(-5f),
+    };
+
     private readonly HashSet<EntityUid> _immuneEnts = new();
+
+    private readonly HashSet<EntityUid> _lookupEnts = new();
+
     private readonly HashSet<Entity<NoFTLComponent>> _noFtls = new();
+    /*
+     * This is a way to move a shuttle from one location to another, via an intermediate map for fanciness.
+     */
+
+    private readonly SoundSpecifier _startupSound =
+        new SoundPathSpecifier("/Audio/Effects/Shuttle/hyperspace_begin.ogg")
+        {
+            Params = AudioParams.Default.WithVolume(-5f),
+        };
 
     private EntityQuery<BodyComponent> _bodyQuery;
+    private TimeSpan _hyperspaceKnockdownTime = TimeSpan.FromSeconds(5);
     private EntityQuery<FTLSmashImmuneComponent> _immuneQuery;
+
+    /// <summary>
+    /// Left-side of the station we're allowed to use
+    /// </summary>
+    private float _index;
+
     private EntityQuery<StatusEffectsComponent> _statusQuery;
+    public float DefaultArrivalTime;
+
+    public float DefaultStartupTime;
+    public float DefaultTravelTime;
+    private float FTLCooldown;
+    public float FTLMassLimit;
 
     private void InitializeFTL()
     {
@@ -176,7 +177,9 @@ public sealed partial class ShuttleSystem
         _cfg.OnValueChanged(CCVars.FTLArrivalTime, time => DefaultArrivalTime = time, true);
         _cfg.OnValueChanged(CCVars.FTLCooldown, time => FTLCooldown = time, true);
         _cfg.OnValueChanged(CCVars.FTLMassLimit, time => FTLMassLimit = time, true);
-        _cfg.OnValueChanged(CCVars.HyperspaceKnockdownTime, time => _hyperspaceKnockdownTime = TimeSpan.FromSeconds(time), true);
+        _cfg.OnValueChanged(CCVars.HyperspaceKnockdownTime,
+            time => _hyperspaceKnockdownTime = TimeSpan.FromSeconds(time),
+            true);
     }
 
     private void OnFtlShutdown(Entity<FTLComponent> ent, ref ComponentShutdown args)
@@ -193,9 +196,7 @@ public sealed partial class ShuttleSystem
             var gridXform = _xformQuery.GetComponent(gridUid);
 
             if (gridXform.MapUid == null)
-            {
                 continue;
-            }
 
             TryAddFTLDestination(gridXform.MapID, true, false, false, out _);
         }
@@ -264,12 +265,16 @@ public sealed partial class ShuttleSystem
     /// <summary>
     /// Adds the target map as available for FTL.
     /// </summary>
-    public bool TryAddFTLDestination(MapId mapId, bool enabled, [NotNullWhen(true)] out FTLDestinationComponent? component)
-    {
-        return TryAddFTLDestination(mapId, enabled, true, false, out component);
-    }
+    public bool TryAddFTLDestination(MapId mapId,
+        bool enabled,
+        [NotNullWhen(true)] out FTLDestinationComponent? component) =>
+        TryAddFTLDestination(mapId, enabled, true, false, out component);
 
-    public bool TryAddFTLDestination(MapId mapId, bool enabled, bool requireDisk, bool beaconsOnly, [NotNullWhen(true)] out FTLDestinationComponent? component)
+    public bool TryAddFTLDestination(MapId mapId,
+        bool enabled,
+        bool requireDisk,
+        bool beaconsOnly,
+        [NotNullWhen(true)] out FTLDestinationComponent? component)
     {
         var mapUid = _mapSystem.GetMapOrInvalid(mapId);
         component = null;
@@ -279,7 +284,8 @@ public sealed partial class ShuttleSystem
 
         component = EnsureComp<FTLDestinationComponent>(mapUid);
 
-        if (component.Enabled == enabled && component.RequireCoordinateDisk == requireDisk && component.BeaconsOnly == beaconsOnly)
+        if (component.Enabled == enabled && component.RequireCoordinateDisk == requireDisk &&
+            component.BeaconsOnly == beaconsOnly)
             return true;
 
         component.Enabled = enabled;
@@ -314,9 +320,8 @@ public sealed partial class ShuttleSystem
 
         if (TryComp<PhysicsComponent>(shuttleUid, out var shuttlePhysics))
         {
-
             // Too large to FTL
-            if (FTLMassLimit > 0 &&  shuttlePhysics.Mass > FTLMassLimit)
+            if (FTLMassLimit > 0 && shuttlePhysics.Mass > FTLMassLimit)
             {
                 reason = Loc.GetString("shuttle-console-mass");
                 return false;
@@ -343,7 +348,8 @@ public sealed partial class ShuttleSystem
     }
 
     /// <summary>
-    /// Moves a shuttle from its current position to the target one without any checks. Goes through the hyperspace map while the timer is running.
+    /// Moves a shuttle from its current position to the target one without any checks. Goes through the hyperspace map while
+    /// the timer is running.
     /// </summary>
     public void FTLToCoordinates(
         EntityUid shuttleUid,
@@ -419,7 +425,10 @@ public sealed partial class ShuttleSystem
             hyperspace.TargetCoordinates = config.Coordinates;
             hyperspace.TargetAngle = config.Angle;
         }
-        else if (TryGetFTLProximity(shuttleUid, new EntityCoordinates(target, Vector2.Zero), out var coords, out var targAngle))
+        else if (TryGetFTLProximity(shuttleUid,
+                     new EntityCoordinates(target, Vector2.Zero),
+                     out var coords,
+                     out var targAngle))
         {
             hyperspace.TargetCoordinates = coords;
             hyperspace.TargetAngle = targAngle;
@@ -461,7 +470,8 @@ public sealed partial class ShuttleSystem
     /// <summary>
     /// Transitions shuttle to FTL map.
     /// </summary>
-    private void UpdateFTLStarting(Entity<FTLComponent, ShuttleComponent, FTLDriveComponent> entity) // Frontier edit - FTLDrive
+    private void
+        UpdateFTLStarting(Entity<FTLComponent, ShuttleComponent, FTLDriveComponent> entity) // Frontier edit - FTLDrive
     {
         var uid = entity.Owner;
         var comp = entity.Comp1;
@@ -483,8 +493,11 @@ public sealed partial class ShuttleSystem
         // Just so we don't clip
         if (fromMapUid != null && TryComp(comp.StartupStream, out AudioComponent? startupAudio))
         {
-            var clippedAudio = _audio.PlayStatic(_startupSound, Filter.Broadcast(),
-                new EntityCoordinates(fromMapUid.Value, _mapSystem.GetGridPosition(entity.Owner)), true, startupAudio.Params);
+            var clippedAudio = _audio.PlayStatic(_startupSound,
+                Filter.Broadcast(),
+                new EntityCoordinates(fromMapUid.Value, _mapSystem.GetGridPosition(entity.Owner)),
+                true,
+                startupAudio.Params);
 
             _audio.SetPlaybackPosition(clippedAudio, entity.Comp1.StartupTime);
             if (clippedAudio != null)
@@ -504,7 +517,8 @@ public sealed partial class ShuttleSystem
         // Reset rotation so they always face the same direction.
         xform.LocalRotation = Angle.Zero;
         _index += width + Buffer;
-        comp.StateTime = StartEndTime.FromCurTime(_gameTiming, comp.TravelTime - (entity.Comp3.Data.ArrivalTime ?? DefaultArrivalTime)); // Frontier edit
+        comp.StateTime = StartEndTime.FromCurTime(_gameTiming,
+            comp.TravelTime - (entity.Comp3.Data.ArrivalTime ?? DefaultArrivalTime)); // Frontier edit
 
         Enable(uid, component: body);
         _physics.SetLinearVelocity(uid, new Vector2(0f, 20f), body: body);
@@ -525,17 +539,21 @@ public sealed partial class ShuttleSystem
     /// <summary>
     /// Shuttle arriving.
     /// </summary>
-    private void UpdateFTLTravelling(Entity<FTLComponent, ShuttleComponent, FTLDriveComponent> entity) // Frontier edit - FTLDrive
+    private void
+        UpdateFTLTravelling(
+            Entity<FTLComponent, ShuttleComponent, FTLDriveComponent> entity) // Frontier edit - FTLDrive
     {
         var shuttle = entity.Comp2;
         var comp = entity.Comp1;
-        comp.StateTime = StartEndTime.FromCurTime(_gameTiming, entity.Comp3.Data.ArrivalTime ?? DefaultArrivalTime); // Frontier edit
+        comp.StateTime =
+            StartEndTime.FromCurTime(_gameTiming, entity.Comp3.Data.ArrivalTime ?? DefaultArrivalTime); // Frontier edit
         comp.State = FTLState.Arriving;
 
         if (entity.Comp1.VisualizerProto != null)
         {
             comp.VisualizerEntity = SpawnAttachedTo(entity.Comp1.VisualizerProto, entity.Comp1.TargetCoordinates);
-            DebugTools.Assert(Transform(comp.VisualizerEntity.Value).ParentUid == entity.Comp1.TargetCoordinates.EntityId);
+            DebugTools.Assert(Transform(comp.VisualizerEntity.Value).ParentUid ==
+                              entity.Comp1.TargetCoordinates.EntityId);
             var visuals = Comp<FtlVisualizerComponent>(comp.VisualizerEntity.Value);
             visuals.Grid = entity.Owner;
             Dirty(comp.VisualizerEntity.Value, visuals);
@@ -550,9 +568,10 @@ public sealed partial class ShuttleSystem
     }
 
     /// <summary>
-    ///  Shuttle arrived.
+    /// Shuttle arrived.
     /// </summary>
-    private void UpdateFTLArriving(Entity<FTLComponent, ShuttleComponent, FTLDriveComponent> entity) // Frontier edit - FTLDrive
+    private void
+        UpdateFTLArriving(Entity<FTLComponent, ShuttleComponent, FTLDriveComponent> entity) // Frontier edit - FTLDrive
     {
         var uid = entity.Owner;
         var xform = _xformQuery.GetComponent(uid);
@@ -605,7 +624,7 @@ public sealed partial class ShuttleSystem
         {
             // TODO: This should now use tryftlproximity
             mapId = _transform.GetMapId(target);
-            _transform.SetCoordinates(uid, xform, target, rotation: entity.Comp1.TargetAngle);
+            _transform.SetCoordinates(uid, xform, target, entity.Comp1.TargetAngle);
         }
 
         if (_physicsQuery.TryGetComponent(uid, out body))
@@ -616,13 +635,9 @@ public sealed partial class ShuttleSystem
             // Disable shuttle if it's on a planet; unfortunately can't do this in parent change messages due
             // to event ordering and awake body shenanigans (at least for now).
             if (HasComp<MapGridComponent>(xform.MapUid))
-            {
                 Disable(uid, component: body);
-            }
             else
-            {
                 Enable(uid, component: body, shuttle: entity.Comp2);
-            }
         }
 
         _thruster.DisableLinearThrusters(entity.Comp2);
@@ -632,12 +647,11 @@ public sealed partial class ShuttleSystem
         _audio.SetGridAudio(audio);
 
         if (TryComp<FTLDestinationComponent>(uid, out var dest))
-        {
             dest.Enabled = true;
-        }
 
         comp.State = FTLState.Cooldown;
-        comp.StateTime = StartEndTime.FromCurTime(_gameTiming, entity.Comp3.Data.CooldownTime ?? FTLCooldown); // Frontier edit
+        comp.StateTime =
+            StartEndTime.FromCurTime(_gameTiming, entity.Comp3.Data.CooldownTime ?? FTLCooldown); // Frontier edit
         _console.RefreshShuttleConsoles(uid);
         _mapSystem.SetPaused(mapId, false);
         Smimsh(uid, xform: xform);
@@ -646,7 +660,8 @@ public sealed partial class ShuttleSystem
         RaiseLocalEvent(uid, ref ftlEvent, true);
     }
 
-    private void UpdateFTLCooldown(Entity<FTLComponent, ShuttleComponent, FTLDriveComponent> entity) // Frontier edit - FTLDrive
+    private void
+        UpdateFTLCooldown(Entity<FTLComponent, ShuttleComponent, FTLDriveComponent> entity) // Frontier edit - FTLDrive
     {
         RemCompDeferred<FTLComponent>(entity);
         _console.RefreshShuttleConsoles(entity);
@@ -655,7 +670,8 @@ public sealed partial class ShuttleSystem
     private void UpdateHyperspace()
     {
         var curTime = _gameTiming.CurTime;
-        var query = EntityQueryEnumerator<FTLComponent, ShuttleComponent, FTLDriveComponent>(); // Frontier edit - FTLDrive
+        var query =
+            EntityQueryEnumerator<FTLComponent, ShuttleComponent, FTLDriveComponent>(); // Frontier edit - FTLDrive
 
         while (query.MoveNext(out var uid, out var comp, out var shuttle, out var ftlDrive)) // Frontier edit - FTLDrive
         {
@@ -744,7 +760,8 @@ public sealed partial class ShuttleSystem
                 childUid,
                 childXform,
                 new EntityCoordinates(oldMapUid.Value,
-                Vector2.Transform(relative.Position, oldGridMatrix)), rotation: relative.Quaternion2D.Angle + oldGridRotation);
+                    Vector2.Transform(relative.Position, oldGridMatrix)),
+                relative.Quaternion2D.Angle + oldGridRotation);
         }
     }
 
@@ -793,10 +810,8 @@ public sealed partial class ShuttleSystem
         EntityUid shuttleUid,
         ShuttleComponent component,
         EntityUid targetUid,
-        string? priorityTag = null)
-    {
-        return TryFTLDock(shuttleUid, component, targetUid, out _, priorityTag);
-    }
+        string? priorityTag = null) =>
+        TryFTLDock(shuttleUid, component, targetUid, out _, priorityTag);
 
     /// <summary>
     /// Tries to dock with the target grid, otherwise falls back to proximity.
@@ -815,9 +830,7 @@ public sealed partial class ShuttleSystem
             !_xformQuery.TryGetComponent(targetUid, out var targetXform) ||
             targetXform.MapUid == null ||
             !targetXform.MapUid.Value.IsValid())
-        {
             return false;
-        }
 
         config = _dockSystem.GetDockingConfig(shuttleUid, targetUid, priorityTag);
 
@@ -839,7 +852,10 @@ public sealed partial class ShuttleSystem
         // Set position
         var mapCoordinates = _transform.ToMapCoordinates(config.Coordinates);
         var mapUid = _mapSystem.GetMap(mapCoordinates.MapId);
-        _transform.SetCoordinates(shuttle.Owner, shuttle.Comp, new EntityCoordinates(mapUid, mapCoordinates.Position), rotation: config.Angle + _transform.GetWorldRotation(config.Coordinates.EntityId));
+        _transform.SetCoordinates(shuttle.Owner,
+            shuttle.Comp,
+            new EntityCoordinates(mapUid, mapCoordinates.Position),
+            config.Angle + _transform.GetWorldRotation(config.Coordinates.EntityId));
 
         // Connect everything
         foreach (var (dockAUid, dockBUid, dockA, dockB) in config.Docks)
@@ -857,9 +873,12 @@ public sealed partial class ShuttleSystem
     private bool TryGetFTLProximity(
         EntityUid shuttleUid,
         EntityCoordinates targetCoordinates,
-        out EntityCoordinates coordinates, out Angle angle,
-        float minOffset = 0f, float maxOffset = 64f,
-        TransformComponent? xform = null, TransformComponent? targetXform = null)
+        out EntityCoordinates coordinates,
+        out Angle angle,
+        float minOffset = 0f,
+        float maxOffset = 64f,
+        TransformComponent? xform = null,
+        TransformComponent? targetXform = null)
     {
         DebugTools.Assert(minOffset < maxOffset);
         coordinates = EntityCoordinates.Invalid;
@@ -869,9 +888,7 @@ public sealed partial class ShuttleSystem
             targetXform.MapUid == null ||
             !targetXform.MapUid.Value.IsValid() ||
             !Resolve(shuttleUid, ref xform))
-        {
             return false;
-        }
 
         // We essentially expand the Box2 of the target area until nothing else is added then we know it's valid.
         // Can't just get an AABB of every grid as we may spawn very far away.
@@ -913,14 +930,12 @@ public sealed partial class ShuttleSystem
                 // Include the other grid's AABB (expanded by ours) as well.
                 targetAABB = targetAABB.Union(
                     _transform.GetWorldMatrix(grid)
-                    .TransformBox(Comp<MapGridComponent>(grid).LocalAABB.Enlarged(expansionAmount)));
+                        .TransformBox(Comp<MapGridComponent>(grid).LocalAABB.Enlarged(expansionAmount)));
             }
 
             // Can do proximity
             if (nearbyGrids.Count == lastCount)
-            {
                 break;
-            }
 
             iteration++;
             lastCount = nearbyGrids.Count;
@@ -938,7 +953,7 @@ public sealed partial class ShuttleSystem
 
                 targetAABB = targetAABB.Union(
                     _transform.GetWorldMatrix(uid)
-                    .TransformBox(Comp<MapGridComponent>(uid).LocalAABB.Enlarged(expansionAmount)));
+                        .TransformBox(Comp<MapGridComponent>(uid).LocalAABB.Enlarged(expansionAmount)));
             }
 
             break;
@@ -962,33 +977,25 @@ public sealed partial class ShuttleSystem
 
             // Our valid spawn positions are <targetAABB width / height +  offset> away.
             var minRadius = MathF.Max(targetAABB.Width / 2f, targetAABB.Height / 2f);
-            spawnPos = targetAABB.Center + offsetAngle.RotateVec(new Vector2(_random.NextFloat(minRadius + minOffset, minRadius + maxOffset), 0f));
+            spawnPos = targetAABB.Center +
+                       offsetAngle.RotateVec(
+                           new Vector2(_random.NextFloat(minRadius + minOffset, minRadius + maxOffset), 0f));
         }
         else if (shuttleBody != null)
-        {
             (spawnPos, angle) = _transform.GetWorldPositionRotation(targetXform);
-        }
         else
-        {
             spawnPos = _transform.GetWorldPosition(targetXform);
-        }
 
         var offset = Vector2.Zero;
 
         // Offset it because transform does not correspond to AABB position.
         if (TryComp(shuttleUid, out MapGridComponent? shuttleGrid))
-        {
             offset = -shuttleGrid.LocalAABB.Center;
-        }
 
         if (!HasComp<MapComponent>(targetXform.GridUid))
-        {
             angle = _random.NextAngle();
-        }
         else
-        {
             angle = Angle.Zero;
-        }
 
         // Rotate our localcenter around so we spawn exactly where we "think" we should (center of grid on the dot).
         var transform = new Transform(spawnPos, angle);
@@ -1001,20 +1008,26 @@ public sealed partial class ShuttleSystem
     /// <summary>
     /// Tries to arrive nearby without overlapping with other grids.
     /// </summary>
-    public bool TryFTLProximity(EntityUid shuttleUid, EntityUid targetUid, TransformComponent? xform = null, TransformComponent? targetXform = null)
+    public bool TryFTLProximity(EntityUid shuttleUid,
+        EntityUid targetUid,
+        TransformComponent? xform = null,
+        TransformComponent? targetXform = null)
     {
         if (!Resolve(targetUid, ref targetXform) ||
             targetXform.MapUid == null ||
             !targetXform.MapUid.Value.IsValid() ||
             !Resolve(shuttleUid, ref xform))
-        {
-            return false;
-        }
-
-        if (!TryGetFTLProximity(shuttleUid, new EntityCoordinates(targetUid, Vector2.Zero), out var coords, out var angle, xform: xform, targetXform: targetXform))
             return false;
 
-        _transform.SetCoordinates(shuttleUid, xform, coords, rotation: angle);
+        if (!TryGetFTLProximity(shuttleUid,
+                new EntityCoordinates(targetUid, Vector2.Zero),
+                out var coords,
+                out var angle,
+                xform: xform,
+                targetXform: targetXform))
+            return false;
+
+        _transform.SetCoordinates(shuttleUid, xform, coords, angle);
         return true;
     }
 
@@ -1025,21 +1038,22 @@ public sealed partial class ShuttleSystem
     {
         if (!Resolve(shuttle.Owner, ref shuttle.Comp) ||
             _transform.GetMap(targetCoordinates)?.IsValid() != true)
-        {
             return false;
-        }
 
         if (!TryGetFTLProximity(shuttle, targetCoordinates, out var coords, out var angle))
             return false;
 
-        _transform.SetCoordinates(shuttle, shuttle.Comp, coords, rotation: angle);
+        _transform.SetCoordinates(shuttle, shuttle.Comp, coords, angle);
         return true;
     }
 
     /// <summary>
     /// Flattens / deletes everything under the grid upon FTL.
     /// </summary>
-    private void Smimsh(EntityUid uid, FixturesComponent? manager = null, MapGridComponent? grid = null, TransformComponent? xform = null)
+    private void Smimsh(EntityUid uid,
+        FixturesComponent? manager = null,
+        MapGridComponent? grid = null,
+        TransformComponent? xform = null)
     {
         if (!Resolve(uid, ref manager, ref grid, ref xform) || xform.MapUid == null)
             return;
@@ -1070,31 +1084,32 @@ public sealed partial class ShuttleSystem
             _lookupEnts.Clear();
             _immuneEnts.Clear();
             // TODO: Ideally we'd query first BEFORE moving grid but needs adjustments above.
-            _lookup.GetLocalEntitiesIntersecting(xform.MapUid.Value, fixture.Shape, transform, _lookupEnts, flags: LookupFlags.Uncontained, lookup: lookup);
+            _lookup.GetLocalEntitiesIntersecting(xform.MapUid.Value,
+                fixture.Shape,
+                transform,
+                _lookupEnts,
+                LookupFlags.Uncontained,
+                lookup);
 
             foreach (var ent in _lookupEnts)
             {
                 if (ent == uid || _immuneEnts.Contains(ent))
-                {
                     continue;
-                }
 
                 // If it's on our grid ignore it.
                 if (!_xformQuery.TryComp(ent, out var childXform) || childXform.GridUid == uid)
-                {
                     continue;
-                }
 
                 // If it has the FTLSmashImmuneComponent ignore it.
                 if (_immuneQuery.HasComponent(ent))
-                {
                     continue;
-                }
 
                 if (_bodyQuery.TryGetComponent(ent, out var mob))
                 {
-                    _logger.Add(LogType.Gib, LogImpact.Extreme, $"{ToPrettyString(ent):player} got gibbed by the shuttle" +
-                                                                $" {ToPrettyString(uid)} arriving from FTL at {xform.Coordinates:coordinates}");
+                    _logger.Add(LogType.Gib,
+                        LogImpact.Extreme,
+                        $"{ToPrettyString(ent):player} got gibbed by the shuttle" +
+                        $" {ToPrettyString(uid)} arriving from FTL at {xform.Coordinates:coordinates}");
                     var gibs = _bobby.GibBody(ent, body: mob);
                     _immuneEnts.UnionWith(gibs);
                     continue;

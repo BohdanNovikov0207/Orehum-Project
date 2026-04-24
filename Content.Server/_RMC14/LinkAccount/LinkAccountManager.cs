@@ -26,7 +26,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Content.Server.Database;
@@ -41,20 +40,35 @@ namespace Content.Server._RMC14.LinkAccount;
 
 public sealed class LinkAccountManager : IPostInjectInit
 {
+    private readonly List<SharedRMCPatron> _allPatrons = [];
+    private readonly Dictionary<NetUserId, SharedRMCPatronFull> _connected = new();
     [Dependency] private readonly IServerDbManager _db = default!;
-    [Dependency] private readonly INetManager _net = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly UserDbDataManager _userDb = default!;
+    private readonly Dictionary<NetUserId, string> _fauxPatronAssignments = new();
+    private readonly Dictionary<string, SharedRMCPatronTier> _fauxTiers = new();
 
     private readonly Dictionary<NetUserId, TimeSpan> _lastRequest = new();
-    private readonly TimeSpan _minimumWait = TimeSpan.FromSeconds(0.5);
-    private readonly Dictionary<NetUserId, SharedRMCPatronFull> _connected = new();
-    private readonly Dictionary<string, SharedRMCPatronTier> _fauxTiers = new();
-    private readonly Dictionary<NetUserId, string> _fauxPatronAssignments = new();
-    private readonly List<SharedRMCPatron> _allPatrons = [];
     private readonly List<(string Message, string User)> _lobbyMessages = [];
+    private readonly TimeSpan _minimumWait = TimeSpan.FromSeconds(0.5);
+    [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
     private readonly List<string> _shoutouts = [];
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly UserDbDataManager _userDb = default!;
+
+    void IPostInjectInit.PostInject()
+    {
+        _net.RegisterNetMessage<LinkAccountRequestMsg>(OnRequest);
+        _net.RegisterNetMessage<LinkAccountCodeMsg>();
+        _net.RegisterNetMessage<LinkAccountStatusMsg>();
+        _net.RegisterNetMessage<RMCPatronListMsg>();
+        _net.RegisterNetMessage<RMCClearGhostColorMsg>(OnClearGhostColor);
+        _net.RegisterNetMessage<RMCChangeGhostColorMsg>(OnChangeGhostColor);
+        _net.RegisterNetMessage<RMCChangeLobbyMessageMsg>(OnChangeLobbyMessage);
+        _net.RegisterNetMessage<RMCChangeNTShoutoutMsg>(OnChangeNTShoutout);
+        _userDb.AddOnLoadPlayer(LoadData);
+        _userDb.AddOnFinishLoad(FinishLoad);
+        _userDb.AddOnPlayerDisconnect(ClientDisconnected);
+    }
 
     public event Action? PatronsReloaded;
     public event Action<(NetUserId Id, SharedRMCPatronFull Patron)>? PatronUpdated;
@@ -97,20 +111,14 @@ public sealed class LinkAccountManager : IPostInjectInit
         _connected[player.UserId] = new SharedRMCPatronFull(sharedTier, linked, ghostColor, lobbyMessage, shoutouts);
     }
 
-    private void FinishLoad(ICommonSession player)
-    {
-        SendPatronStatus(player);
-    }
+    private void FinishLoad(ICommonSession player) => SendPatronStatus(player);
 
-    private void ClientDisconnected(ICommonSession player)
-    {
-        _connected.Remove(player.UserId);
-    }
+    private void ClientDisconnected(ICommonSession player) => _connected.Remove(player.UserId);
 
     private void SendPatronStatus(ICommonSession player)
     {
         var connected = _connected.GetValueOrDefault(player.UserId);
-        var msg = new LinkAccountStatusMsg { Patron = connected, };
+        var msg = new LinkAccountStatusMsg { Patron = connected };
         _net.ServerSendMessage(msg, player.Channel);
         SendPatrons(player);
     }
@@ -121,9 +129,7 @@ public sealed class LinkAccountManager : IPostInjectInit
         var time = _timing.RealTime;
         if (_lastRequest.TryGetValue(user, out var last) &&
             last + _minimumWait > time)
-        {
             return;
-        }
 
         _lastRequest[user] = time;
 
@@ -134,15 +140,10 @@ public sealed class LinkAccountManager : IPostInjectInit
         _net.ServerSendMessage(response, message.MsgChannel);
     }
 
-    private void OnClearGhostColor(RMCClearGhostColorMsg message)
-    {
-        SetGhostColor(message.MsgChannel.UserId, null);
-    }
+    private void OnClearGhostColor(RMCClearGhostColorMsg message) => SetGhostColor(message.MsgChannel.UserId, null);
 
-    private void OnChangeGhostColor(RMCChangeGhostColorMsg message)
-    {
+    private void OnChangeGhostColor(RMCChangeGhostColorMsg message) =>
         SetGhostColor(message.MsgChannel.UserId, message.Color);
-    }
 
     private void OnChangeLobbyMessage(RMCChangeLobbyMessageMsg message)
     {
@@ -241,10 +242,7 @@ public sealed class LinkAccountManager : IPostInjectInit
         _net.ServerSendMessage(msg, player.Channel);
     }
 
-    public SharedRMCPatronFull? GetPatron(ICommonSession player)
-    {
-        return GetPatron(player.UserId);
-    }
+    public SharedRMCPatronFull? GetPatron(ICommonSession player) => GetPatron(player.UserId);
 
     public SharedRMCPatronFull? GetPatron(NetUserId userId)
     {
@@ -252,26 +250,20 @@ public sealed class LinkAccountManager : IPostInjectInit
             _fauxTiers.TryGetValue(tierId, out var tier))
         {
             return new SharedRMCPatronFull(
-                Tier: tier,
-                Linked: true,
-                GhostColor: null,
-                LobbyMessage: null,
-                RoundEndShoutout: null
+                tier,
+                true,
+                null,
+                null,
+                null
             );
         }
 
         return _connected.GetValueOrDefault(userId);
     }
 
-    public void AddFauxTier(string tierId, SharedRMCPatronTier tier)
-    {
-        _fauxTiers[tierId] = tier;
-    }
+    public void AddFauxTier(string tierId, SharedRMCPatronTier tier) => _fauxTiers[tierId] = tier;
 
-    public bool RemoveFauxTier(string tierId)
-    {
-        return _fauxTiers.Remove(tierId);
-    }
+    public bool RemoveFauxTier(string tierId) => _fauxTiers.Remove(tierId);
 
     public void AssignFauxPatron(NetUserId userId, string? tierId)
     {
@@ -281,28 +273,7 @@ public sealed class LinkAccountManager : IPostInjectInit
             _fauxPatronAssignments[userId] = tierId;
     }
 
-    public Dictionary<string, SharedRMCPatronTier> GetAllFauxTiers()
-    {
-        return _fauxTiers;
-    }
+    public Dictionary<string, SharedRMCPatronTier> GetAllFauxTiers() => _fauxTiers;
 
-    public Dictionary<NetUserId, string> GetAllFauxPatronAssignments()
-    {
-        return _fauxPatronAssignments;
-    }
-
-    void IPostInjectInit.PostInject()
-    {
-        _net.RegisterNetMessage<LinkAccountRequestMsg>(OnRequest);
-        _net.RegisterNetMessage<LinkAccountCodeMsg>();
-        _net.RegisterNetMessage<LinkAccountStatusMsg>();
-        _net.RegisterNetMessage<RMCPatronListMsg>();
-        _net.RegisterNetMessage<RMCClearGhostColorMsg>(OnClearGhostColor);
-        _net.RegisterNetMessage<RMCChangeGhostColorMsg>(OnChangeGhostColor);
-        _net.RegisterNetMessage<RMCChangeLobbyMessageMsg>(OnChangeLobbyMessage);
-        _net.RegisterNetMessage<RMCChangeNTShoutoutMsg>(OnChangeNTShoutout);
-        _userDb.AddOnLoadPlayer(LoadData);
-        _userDb.AddOnFinishLoad(FinishLoad);
-        _userDb.AddOnPlayerDisconnect(ClientDisconnected);
-    }
+    public Dictionary<NetUserId, string> GetAllFauxPatronAssignments() => _fauxPatronAssignments;
 }

@@ -21,5 +21,4 @@ public sealed partial class GhostRoleMarkerRoleComponent : BaseMindRoleComponent
 {
     //TODO does anything still use this? It gets populated by GhostRolesystem but I don't see anything ever reading it
     [DataField] public string? Name;
-
 }

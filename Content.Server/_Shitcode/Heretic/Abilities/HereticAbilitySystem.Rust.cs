@@ -12,8 +12,6 @@
 using System.Linq;
 using System.Numerics;
 using Content.Goobstation.Shared.SecondSkin;
-using Content.Server.Heretic.Components.PathSpecific;
-using Content.Server.Spreader;
 using Content.Shared._Goobstation.Heretic.Components;
 using Content.Shared._Goobstation.Wizard;
 using Content.Shared._Shitmed.Targeting;
@@ -21,7 +19,6 @@ using Content.Shared.Flash;
 using Content.Shared.Heretic;
 using Content.Shared.Maps;
 using Content.Shared.Physics;
-using Content.Shared.Tiles;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Physics;
@@ -196,11 +193,9 @@ public sealed partial class HereticAbilitySystem
         return false;
     }
 
-    public bool CanRustTile(ContentTileDefinition tile)
-    {
-        return tile.ID != RustTile && !tile.Indestructible &&
-               !(tile.DeconstructTools.Count == 0 && tile.Weather);
-    }
+    public bool CanRustTile(ContentTileDefinition tile) =>
+        tile.ID != RustTile && !tile.Indestructible &&
+        !(tile.DeconstructTools.Count == 0 && tile.Weather);
 
     public void MakeRustTile(EntityUid gridUid, MapGridComponent mapGrid, TileRef tileRef, EntProtoId tileRune)
     {
@@ -210,7 +205,9 @@ public sealed partial class HereticAbilitySystem
         Spawn(tileRune, new EntityCoordinates(gridUid, tileRef.GridIndices));
     }
 
-    public bool TryMakeRustWall(EntityUid target, Entity<HereticComponent>? ent = null, int? rustStrengthOverride = null)
+    public bool TryMakeRustWall(EntityUid target,
+        Entity<HereticComponent>? ent = null,
+        int? rustStrengthOverride = null)
     {
         var canRust = CanSurfaceBeRusted(target, ent, out var surfaceStrength);
 
@@ -294,7 +291,7 @@ public sealed partial class HereticAbilitySystem
             if (dir.LengthSquared() < 0.001f)
                 continue;
             _throw.TryThrow(entity, dir.Normalized() * args.ThrowRange, args.ThrowSpeed);
-            _stun.KnockdownOrStun(entity, args.KnockdownTime, true);
+            _stun.KnockdownOrStun(entity, args.KnockdownTime);
             if (entity != args.Performer)
                 _dmg.TryChangeDamage(entity, args.Damage, targetPart: TargetBodyPart.All);
         }

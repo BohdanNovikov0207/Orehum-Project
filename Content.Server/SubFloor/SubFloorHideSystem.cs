@@ -8,7 +8,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Construction.Components;
 using Content.Shared.Eye;
 using Content.Shared.SubFloor;
 using Robust.Server.Player;
@@ -19,10 +18,10 @@ namespace Content.Server.SubFloor;
 
 public sealed class SubFloorHideSystem : SharedSubFloorHideSystem
 {
-    [Dependency] private readonly IPlayerManager _player = default!;
     [Dependency] private readonly SharedEyeSystem _eye = default!;
+    [Dependency] private readonly IPlayerManager _player = default!;
 
-    private HashSet<ICommonSession> _showFloors = new();
+    private readonly HashSet<ICommonSession> _showFloors = new();
 
     public override void Initialize()
     {
@@ -50,9 +49,7 @@ public sealed class SubFloorHideSystem : SharedSubFloorHideSystem
             return;
 
         if (_showFloors.Contains(actor.PlayerSession))
-        {
-            ev.VisibilityMask |= (int)VisibilityFlags.Subfloor;
-        }
+            ev.VisibilityMask |= (int) VisibilityFlags.Subfloor;
     }
 
     private void OnShowSubfloor(ShowSubfloorRequestEvent ev, EntitySessionEventArgs args)
@@ -64,19 +61,16 @@ public sealed class SubFloorHideSystem : SharedSubFloorHideSystem
             return;
 
         if (ev.Value)
-        {
             _showFloors.Add(args.SenderSession);
-        }
         else
-        {
             _showFloors.Remove(args.SenderSession);
-        }
 
         _eye.RefreshVisibilityMask((ent.Value, eyeComp));
 
-        RaiseNetworkEvent(new ShowSubfloorRequestEvent()
-        {
-            Value = ev.Value,
-        }, args.SenderSession);
+        RaiseNetworkEvent(new ShowSubfloorRequestEvent
+            {
+                Value = ev.Value,
+            },
+            args.SenderSession);
     }
 }

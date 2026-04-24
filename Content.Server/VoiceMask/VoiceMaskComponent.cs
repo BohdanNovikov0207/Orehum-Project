@@ -13,62 +13,66 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Shared.Speech;
-using Content.Shared.StatusIcon; // Goobstation
+using Content.Shared.StatusIcon;
 using Robust.Shared.Prototypes;
+// Goobstation
 
 namespace Content.Server.VoiceMask;
 
 /// <summary>
-///     This component is for voice mask items! Adding this component to clothing will give the the voice mask UI
-///     and allow the wearer to change their voice and verb at will.
+/// This component is for voice mask items! Adding this component to clothing will give the the voice mask UI
+/// and allow the wearer to change their voice and verb at will.
 /// </summary>
 /// <remarks>
-///     DO NOT use this if you do not want the interface.
-///     The VoiceOverrideSystem is probably what your looking for (Or you might have to make something similar)!
+/// DO NOT use this if you do not want the interface.
+/// The VoiceOverrideSystem is probably what your looking for (Or you might have to make something similar)!
 /// </remarks>
 [RegisterComponent]
 public sealed partial class VoiceMaskComponent : Component
 {
     /// <summary>
-    ///     The name that will override an entities default name. If null, it will use the default override.
-    /// </summary>
-    [DataField]
-    public string? VoiceMaskName = null;
-
-    /// <summary>
-    ///     The speech verb that will override an entities default one. If null, it will use the entities default verb.
-    /// </summary>
-    [DataField]
-    public ProtoId<SpeechVerbPrototype>? VoiceMaskSpeechVerb;
-
-    /// <summary>
-    ///     The action that gets displayed when the voice mask is equipped.
+    /// The action that gets displayed when the voice mask is equipped.
     /// </summary>
     [DataField]
     public EntProtoId Action = "ActionChangeVoiceMask";
 
     /// <summary>
-    ///     Reference to the action.
+    /// Reference to the action.
     /// </summary>
     [DataField]
     public EntityUid? ActionEntity;
+
     /// <summary>
-    ///     if UI Action shud be added on equipt
+    /// if UI Action shud be added on equipt
     /// </summary>
     [DataField]
     public bool EnableAction = true; //Goobstation
 
-    #region GabyStation
     /// <summary>
-    ///     The job icon to be displayed next to their name when speaking on radio
+    /// The name that will override an entities default name. If null, it will use the default override.
+    /// </summary>
+    [DataField]
+    public string? VoiceMaskName = null;
+
+    /// <summary>
+    /// The speech verb that will override an entities default one. If null, it will use the entities default verb.
+    /// </summary>
+    [DataField]
+    public ProtoId<SpeechVerbPrototype>? VoiceMaskSpeechVerb;
+
+    #region GabyStation
+
+    /// <summary>
+    /// The job icon to be displayed next to their name when speaking on radio
     /// </summary>
     [DataField]
     public ProtoId<JobIconPrototype>? JobIconProtoId; // GabyStation -> Radio icons
 
     /// <summary>
-    ///     The name of the job that should show up when a mouse overs over the job icon on the radio
+    /// The name of the job that should show up when a mouse overs over the job icon on the radio
     /// </summary>
     [DataField]
     public string? JobName; // GabyStation -> Radio icons
+
     #endregion
 }

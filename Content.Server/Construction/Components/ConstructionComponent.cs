@@ -49,41 +49,42 @@ using Content.Goobstation.Common.Construction;
 using Content.Shared.Construction.Prototypes;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype;
 
-namespace Content.Server.Construction.Components
+namespace Content.Server.Construction.Components;
+
+[RegisterComponent] [Access(typeof(ConstructionSystem))]
+public sealed partial class ConstructionComponent : SharedConstructionComponent // Goobstation
 {
-    [RegisterComponent, Access(typeof(ConstructionSystem))]
-    public sealed partial class ConstructionComponent : SharedConstructionComponent // Goobstation
-    {
-        [DataField("graph", required:true, customTypeSerializer:typeof(PrototypeIdSerializer<ConstructionGraphPrototype>))]
-        public string Graph { get; set; } = string.Empty;
+    [ViewVariables]
+    // TODO Force flush interaction queue before serializing to YAML.
+    // Otherwise you can end up with entities stuck in invalid states (e.g., waiting for DoAfters).
+    public readonly Queue<object> InteractionQueue = new();
 
-        [DataField("node", required:true)]
-        public string Node { get; set; } = default!;
+    [DataField("graph",
+        required: true,
+        customTypeSerializer: typeof(PrototypeIdSerializer<ConstructionGraphPrototype>))]
+    public string Graph { get; set; } = string.Empty;
 
-        [DataField("edge")]
-        public int? EdgeIndex { get; set; } = null;
+    [DataField("node", required: true)]
+    public string Node { get; set; } = default!;
 
-        [DataField("step")]
-        public int StepIndex { get; set; } = 0;
+    [DataField("edge")]
+    public int? EdgeIndex { get; set; } = null;
 
-        [DataField("containers")]
-        public HashSet<string> Containers { get; set; } = new();
+    [DataField("step")]
+    public int StepIndex { get; set; } = 0;
 
-        [DataField("defaultTarget")]
-        public string? TargetNode { get; set; } = null;
+    [DataField("containers")]
+    public HashSet<string> Containers { get; set; } = new();
 
-        [ViewVariables]
-        public int? TargetEdgeIndex { get; set; } = null;
+    [DataField("defaultTarget")]
+    public string? TargetNode { get; set; } = null;
 
-        [ViewVariables]
-        public Queue<string>? NodePathfinding { get; set; } = null;
+    [ViewVariables]
+    public int? TargetEdgeIndex { get; set; } = null;
 
-        [DataField("deconstructionTarget")]
-        public string? DeconstructionNode { get; set; } = "start";
+    [ViewVariables]
+    public Queue<string>? NodePathfinding { get; set; } = null;
 
-        [ViewVariables]
-        // TODO Force flush interaction queue before serializing to YAML.
-        // Otherwise you can end up with entities stuck in invalid states (e.g., waiting for DoAfters).
-        public readonly Queue<object> InteractionQueue = new();
-    }
+    [DataField("deconstructionTarget")]
+    public string? DeconstructionNode { get; set; } = "start";
 }

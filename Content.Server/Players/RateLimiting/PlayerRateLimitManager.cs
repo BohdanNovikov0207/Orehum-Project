@@ -55,12 +55,12 @@ namespace Content.Server.Players.RateLimiting;
 public sealed class PlayerRateLimitManager : SharedPlayerRateLimitManager
 {
     [Dependency] private readonly IAdminLogManager _adminLog = default!;
-    [Dependency] private readonly IGameTiming _gameTiming = default!;
     [Dependency] private readonly IConfigurationManager _cfg = default!;
+    [Dependency] private readonly IGameTiming _gameTiming = default!;
     [Dependency] private readonly IPlayerManager _playerManager = default!;
+    private readonly Dictionary<ICommonSession, Dictionary<string, RateLimitDatum>> _rateLimitData = new();
 
     private readonly Dictionary<string, RegistrationData> _registrations = new();
-    private readonly Dictionary<ICommonSession, Dictionary<string, RateLimitDatum>> _rateLimitData = new();
 
     public override RateLimitStatus CountAction(ICommonSession player, string key)
     {
@@ -87,7 +87,7 @@ public sealed class PlayerRateLimitManager : SharedPlayerRateLimitManager
 
         // Breached rate limits, inform admins if configured.
         // Negative delays can be used to disable admin announcements.
-        if (registration.AdminAnnounceDelay is {TotalSeconds: >= 0} cvarAnnounceDelay)
+        if (registration.AdminAnnounceDelay is { TotalSeconds: >= 0 } cvarAnnounceDelay)
         {
             if (datum.NextAdminAnnounce < time)
             {
@@ -120,7 +120,7 @@ public sealed class PlayerRateLimitManager : SharedPlayerRateLimitManager
             Registration = registration,
         };
 
-        if ((registration.AdminAnnounceAction == null) != (registration.CVarAdminAnnounceDelay == null))
+        if (registration.AdminAnnounceAction == null != (registration.CVarAdminAnnounceDelay == null))
         {
             throw new ArgumentException(
                 $"Must set either both {nameof(registration.AdminAnnounceAction)} and {nameof(registration.CVarAdminAnnounceDelay)} or neither");
@@ -129,27 +129,24 @@ public sealed class PlayerRateLimitManager : SharedPlayerRateLimitManager
         _cfg.OnValueChanged(
             registration.CVarLimitCount,
             i => data.LimitCount = i,
-            invokeImmediately: true);
+            true);
         _cfg.OnValueChanged(
             registration.CVarLimitPeriodLength,
             i => data.LimitPeriod = TimeSpan.FromSeconds(i),
-            invokeImmediately: true);
+            true);
 
         if (registration.CVarAdminAnnounceDelay != null)
         {
             _cfg.OnValueChanged(
                 registration.CVarAdminAnnounceDelay,
                 i => data.AdminAnnounceDelay = TimeSpan.FromSeconds(i),
-                invokeImmediately: true);
+                true);
         }
 
         _registrations.Add(key, data);
     }
 
-    public override void Initialize()
-    {
-        _playerManager.PlayerStatusChanged += PlayerManagerOnPlayerStatusChanged;
-    }
+    public override void Initialize() => _playerManager.PlayerStatusChanged += PlayerManagerOnPlayerStatusChanged;
 
     private void PlayerManagerOnPlayerStatusChanged(object? sender, SessionStatusEventArgs e)
     {
@@ -168,7 +165,7 @@ public sealed class PlayerRateLimitManager : SharedPlayerRateLimitManager
     private struct RateLimitDatum
     {
         /// <summary>
-        /// Time stamp (relative to <see cref="IGameTiming.RealTime"/>) this rate limit period will expire at.
+        /// Time stamp (relative to <see cref="IGameTiming.RealTime" />) this rate limit period will expire at.
         /// </summary>
         public TimeSpan CountExpires;
 
@@ -183,7 +180,7 @@ public sealed class PlayerRateLimitManager : SharedPlayerRateLimitManager
         public bool Announced;
 
         /// <summary>
-        /// Time stamp (relative to <see cref="IGameTiming.RealTime"/>) of the
+        /// Time stamp (relative to <see cref="IGameTiming.RealTime" />) of the
         /// next time we can send an announcement to admins about rate limit breach.
         /// </summary>
         public TimeSpan NextAdminAnnounce;

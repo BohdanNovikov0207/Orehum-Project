@@ -14,7 +14,7 @@ public sealed class BluespaceHarvesterRiftSystem : EntitySystem
         while (query.MoveNext(out var uid, out var comp, out var xform))
         {
             comp.PassiveSpawnAccumulator += frameTime;
-          if (comp.PassiveSpawnAccumulator >= comp.PassiveSpawnCooldown)
+            if (comp.PassiveSpawnAccumulator >= comp.PassiveSpawnCooldown)
             {
                 comp.PassiveSpawnAccumulator -= comp.PassiveSpawnCooldown;
                 comp.PassiveSpawnAccumulator += _random.NextFloat(comp.PassiveSpawnCooldown / 2f);

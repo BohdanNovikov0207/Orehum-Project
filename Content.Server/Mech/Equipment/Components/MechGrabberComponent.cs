@@ -25,17 +25,14 @@ namespace Content.Server.Mech.Equipment.Components;
 [RegisterComponent]
 public sealed partial class MechGrabberComponent : Component
 {
-    /// <summary>
-    /// The change in energy after each grab.
-    /// </summary>
-    [DataField("grabEnergyDelta")]
-    public float GrabEnergyDelta = -30;
+    public EntityUid? AudioStream;
 
     /// <summary>
-    /// How long does it take to grab something?
+    /// goobstation start
+    /// Goobstation blacklist for mech grabbers
     /// </summary>
-    [DataField("grabDelay")]
-    public float GrabDelay = 2.5f;
+    [DataField]
+    public EntityWhitelist Blacklist = new();
 
     /// <summary>
     /// The offset from the mech when an item is dropped.
@@ -44,11 +41,20 @@ public sealed partial class MechGrabberComponent : Component
     [DataField("depositOffset")]
     public Vector2 DepositOffset = new(0, -1);
 
+    [DataField] [ViewVariables(VVAccess.ReadOnly)]
+    public DoAfterId? DoAfter;
+
     /// <summary>
-    /// The maximum amount of items that can be fit in this grabber
+    /// How long does it take to grab something?
     /// </summary>
-    [DataField("maxContents")]
-    public int MaxContents = 10;
+    [DataField("grabDelay")]
+    public float GrabDelay = 2.5f;
+
+    /// <summary>
+    /// The change in energy after each grab.
+    /// </summary>
+    [DataField("grabEnergyDelta")]
+    public float GrabEnergyDelta = -30;
 
     /// <summary>
     /// The sound played when a mech is grabbing something
@@ -56,18 +62,13 @@ public sealed partial class MechGrabberComponent : Component
     [DataField("grabSound")]
     public SoundSpecifier GrabSound = new SoundPathSpecifier("/Audio/Mecha/sound_mecha_hydraulic.ogg");
 
-    public EntityUid? AudioStream;
-
     [ViewVariables(VVAccess.ReadWrite)]
     public Container ItemContainer = default!;
 
-    [DataField, ViewVariables(VVAccess.ReadOnly)]
-    public DoAfterId? DoAfter;
-
-    /// <summary> goobstation start
-    /// Goobstation blacklist for mech grabbers
+    /// <summary>
+    /// The maximum amount of items that can be fit in this grabber
     /// </summary>
-    [DataField]
-    public EntityWhitelist Blacklist = new();
+    [DataField("maxContents")]
+    public int MaxContents = 10;
     //goobstation end
 }

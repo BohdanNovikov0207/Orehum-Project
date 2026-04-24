@@ -15,25 +15,27 @@
 using Content.Server.Advertise.Components;
 using Content.Server.Chat.Systems;
 using Content.Server.Power.Components;
-using Content.Shared.Chat; // Einstein Engines - Languages
+using Content.Shared.Chat;
 using Content.Shared.VendingMachines;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Timing;
+// Einstein Engines - Languages
 
 namespace Content.Server.Advertise.EntitySystems;
 
 public sealed class AdvertiseSystem : EntitySystem
 {
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly IGameTiming _gameTiming = default!;
     [Dependency] private readonly ChatSystem _chat = default!;
+    [Dependency] private readonly IGameTiming _gameTiming = default!;
 
     /// <summary>
     /// The maximum amount of time between checking if advertisements should be displayed
     /// </summary>
     private readonly TimeSpan _maximumNextCheckDuration = TimeSpan.FromSeconds(15);
+
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
 
     /// <summary>
     /// The next time the game will check if advertisements should be displayed
@@ -77,7 +79,10 @@ public sealed class AdvertiseSystem : EntitySystem
             return;
 
         if (_prototypeManager.TryIndex(advert.Pack, out var advertisements))
-            _chat.TrySendInGameICMessage(uid, Loc.GetString(_random.Pick(advertisements.Values)), InGameICChatType.Speak, hideChat: true);
+            _chat.TrySendInGameICMessage(uid,
+                Loc.GetString(_random.Pick(advertisements.Values)),
+                InGameICChatType.Speak,
+                true);
     }
 
     public override void Update(float frameTime)
@@ -98,20 +103,19 @@ public sealed class AdvertiseSystem : EntitySystem
                 // The timer is always refreshed when it expires, to prevent mass advertising (ex: all the vending machines have no power, and get it back at the same time).
                 RandomizeNextAdvertTime(advert);
             }
+
             _nextCheckTime = MathHelper.Min(advert.NextAdvertisementTime, _nextCheckTime);
         }
     }
 
 
-    private static void OnPowerReceiverAttemptAdvertiseEvent(EntityUid uid, ApcPowerReceiverComponent powerReceiver, ref AttemptAdvertiseEvent args)
-    {
-        args.Cancelled |= !powerReceiver.Powered;
-    }
+    private static void OnPowerReceiverAttemptAdvertiseEvent(EntityUid uid,
+        ApcPowerReceiverComponent powerReceiver,
+        ref AttemptAdvertiseEvent args) => args.Cancelled |= !powerReceiver.Powered;
 
-    private static void OnVendingAttemptAdvertiseEvent(EntityUid uid, VendingMachineComponent machine, ref AttemptAdvertiseEvent args)
-    {
-        args.Cancelled |= machine.Broken;
-    }
+    private static void OnVendingAttemptAdvertiseEvent(EntityUid uid,
+        VendingMachineComponent machine,
+        ref AttemptAdvertiseEvent args) => args.Cancelled |= machine.Broken;
 }
 
 [ByRefEvent]

@@ -1,6 +1,6 @@
 using System.Numerics;
-using Content.Shared.Interaction;
 using Content.Server.Shuttles.Components;
+using Content.Shared.Interaction;
 using Content.Shared.Projectiles;
 using Robust.Server.GameObjects;
 
@@ -11,9 +11,9 @@ namespace Content.Server._Mono.Projectiles.TargetSeeking;
 /// </summary>
 public sealed class TargetSeekingSystem : EntitySystem
 {
-    [Dependency] private readonly SharedTransformSystem _transform = null!;
-    [Dependency] private readonly RotateToFaceSystem _rotateToFace = null!;
     [Dependency] private readonly PhysicsSystem _physics = null!;
+    [Dependency] private readonly RotateToFaceSystem _rotateToFace = null!;
+    [Dependency] private readonly SharedTransformSystem _transform = null!;
 
     public override void Initialize()
     {
@@ -45,19 +45,13 @@ public sealed class TargetSeekingSystem : EntitySystem
         {
             // Initialize speed if needed
             if (seekingComp.CurrentSpeed < seekingComp.LaunchSpeed)
-            {
                 seekingComp.CurrentSpeed = seekingComp.LaunchSpeed;
-            }
 
             // Accelerate up to max speed
             if (seekingComp.CurrentSpeed < seekingComp.MaxSpeed)
-            {
                 seekingComp.CurrentSpeed += seekingComp.Acceleration * frameTime;
-            }
             else
-            {
                 seekingComp.CurrentSpeed = seekingComp.MaxSpeed;
-            }
 
             // Apply velocity in the direction the projectile is facing
             _physics.SetLinearVelocity(uid, _transform.GetWorldRotation(xform).ToWorldVec() * seekingComp.CurrentSpeed);
@@ -66,13 +60,9 @@ public sealed class TargetSeekingSystem : EntitySystem
             if (seekingComp.CurrentTarget.HasValue)
             {
                 if (seekingComp.TrackingAlgorithm == TrackingMethod.Predictive)
-                {
                     ApplyPredictiveTracking(uid, seekingComp, xform, frameTime);
-                }
                 else
-                {
                     ApplyDirectTracking(uid, seekingComp, xform, frameTime);
-                }
             }
             else
             {
@@ -109,19 +99,15 @@ public sealed class TargetSeekingSystem : EntitySystem
 
             // Check if target is within field of view
             var angleDifference = Angle.ShortestDistance(currentRotation, angleToTarget).Degrees;
-            if (MathF.Abs((float)angleDifference) > component.FieldOfView / 2)
-            {
+            if (MathF.Abs((float) angleDifference) > component.FieldOfView / 2)
                 continue; // Target is outside our field of view
-            }
 
             // Calculate distance to target
             var distance = Vector2.Distance(sourcePos, targetPos);
 
             // Skip if target is out of range
             if (distance > component.DetectionRange)
-            {
                 continue;
-            }
 
             // Skip if the target is our own launcher (don't target our own ship)
             if (TryComp<ProjectileComponent>(uid, out var projectile) &&
@@ -131,9 +117,7 @@ public sealed class TargetSeekingSystem : EntitySystem
 
                 // If the shooter is on the same grid as this potential target, skip it
                 if (targetXform.GridUid.HasValue && shooterGridUid == targetXform.GridUid)
-                {
                     continue;
-                }
             }
 
             // If this is closer than our previous best target, update
@@ -161,12 +145,13 @@ public sealed class TargetSeekingSystem : EntitySystem
     /// <summary>
     /// Advanced tracking that predicts where the target will be based on its velocity.
     /// </summary>
-    public void ApplyPredictiveTracking(EntityUid uid, TargetSeekingComponent comp, TransformComponent xform, float frameTime)
+    public void ApplyPredictiveTracking(EntityUid uid,
+        TargetSeekingComponent comp,
+        TransformComponent xform,
+        float frameTime)
     {
         if (!comp.CurrentTarget.HasValue || !TryComp<TransformComponent>(comp.CurrentTarget.Value, out var targetXform))
-        {
             return;
-        }
 
         // Get current positions
         var currentTargetPosition = _transform.ToMapCoordinates(targetXform.Coordinates).Position;
@@ -179,14 +164,14 @@ public sealed class TargetSeekingSystem : EntitySystem
         var targetVelocity = currentTargetPosition - comp.PreviousTargetPosition;
 
         // Calculate time to intercept (using closing rate)
-        var closingRate = (comp.PreviousDistance - currentDistance);
+        var closingRate = comp.PreviousDistance - currentDistance;
         var timeToIntercept = closingRate > 0.01f ? currentDistance / closingRate : currentDistance / comp.CurrentSpeed;
 
         // Prevent negative or very small intercept times that could cause erratic behavior
         timeToIntercept = MathF.Max(timeToIntercept, 0.1f);
 
         // Predict where the target will be when we reach it
-        var predictedPosition = currentTargetPosition + (targetVelocity * timeToIntercept);
+        var predictedPosition = currentTargetPosition + targetVelocity * timeToIntercept;
 
         // Calculate angle to the predicted position
         var targetAngle = (predictedPosition - sourcePosition).ToWorldAngle();
@@ -209,12 +194,13 @@ public sealed class TargetSeekingSystem : EntitySystem
     /// <summary>
     /// Basic tracking that points directly at the current target position.
     /// </summary>
-    public void ApplyDirectTracking(EntityUid uid, TargetSeekingComponent comp, TransformComponent xform, float frameTime)
+    public void ApplyDirectTracking(EntityUid uid,
+        TargetSeekingComponent comp,
+        TransformComponent xform,
+        float frameTime)
     {
         if (!comp.CurrentTarget.HasValue || !TryComp<TransformComponent>(comp.CurrentTarget.Value, out var targetXform))
-        {
             return;
-        }
 
         // Get the angle directly toward the target
         var angleToTarget = (

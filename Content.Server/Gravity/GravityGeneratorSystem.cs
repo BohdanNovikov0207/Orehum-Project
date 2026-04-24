@@ -48,7 +48,8 @@ public sealed class GravityGeneratorSystem : EntitySystem
                 continue;
 
             _lights.SetEnabled(uid, charge.Charge > 0, pointLight);
-            _lights.SetRadius(uid, MathHelper.Lerp(grav.LightRadiusMin, grav.LightRadiusMax, charge.Charge),
+            _lights.SetRadius(uid,
+                MathHelper.Lerp(grav.LightRadiusMin, grav.LightRadiusMax, charge.Charge),
                 pointLight);
         }
     }
@@ -60,9 +61,7 @@ public sealed class GravityGeneratorSystem : EntitySystem
         var xform = Transform(ent);
 
         if (TryComp(xform.ParentUid, out GravityComponent? gravity))
-        {
             _gravitySystem.EnableGravity(xform.ParentUid, gravity);
-        }
     }
 
     private void OnDeactivated(Entity<GravityGeneratorComponent> ent, ref ChargedMachineDeactivatedEvent args)
@@ -72,16 +71,12 @@ public sealed class GravityGeneratorSystem : EntitySystem
         var xform = Transform(ent);
 
         if (TryComp(xform.ParentUid, out GravityComponent? gravity))
-        {
             _gravitySystem.RefreshGravity(xform.ParentUid, gravity);
-        }
     }
 
     private void OnParentChanged(EntityUid uid, GravityGeneratorComponent component, ref EntParentChangedMessage args)
     {
         if (component.GravityActive && TryComp(args.OldParent, out GravityComponent? gravity))
-        {
             _gravitySystem.RefreshGravity(args.OldParent.Value, gravity);
-        }
     }
 }

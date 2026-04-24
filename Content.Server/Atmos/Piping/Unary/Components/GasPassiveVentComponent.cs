@@ -6,12 +6,11 @@
 //
 // SPDX-License-Identifier: MIT
 
-namespace Content.Server.Atmos.Piping.Unary.Components
+namespace Content.Server.Atmos.Piping.Unary.Components;
+
+[RegisterComponent]
+public sealed partial class GasPassiveVentComponent : Component
 {
-    [RegisterComponent]
-    public sealed partial class GasPassiveVentComponent : Component
-    {
-        [DataField("inlet")]
-        public string InletName = "pipe";
-    }
+    [DataField("inlet")]
+    public string InletName = "pipe";
 }

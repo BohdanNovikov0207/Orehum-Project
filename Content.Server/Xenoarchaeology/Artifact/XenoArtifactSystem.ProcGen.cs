@@ -46,7 +46,8 @@ public sealed partial class XenoArtifactSystem
             // OOPS! We ran out of triggers.
             if (weightsByTriggersLeft.Count == 0)
             {
-                Log.Error($"Insufficient triggers for generating {ToPrettyString(ent)}! Needed {size} but had {triggerPool.Count}");
+                Log.Error(
+                    $"Insufficient triggers for generating {ToPrettyString(ent)}! Needed {size} but had {triggerPool.Count}");
                 return triggerPool;
             }
 
@@ -102,32 +103,25 @@ public sealed partial class XenoArtifactSystem
                     continue;
 
                 var node1Options = segment.Where(n => n.Comp.Depth >= min && n.Comp.Depth <= max)
-                                          .ToList();
+                    .ToList();
                 if (node1Options.Count == 0)
-                {
                     continue;
-                }
 
                 var node1 = RobustRandom.Pick(node1Options);
                 var node1Depth = node1.Comp.Depth;
 
-                var node2Options = parent.Where(n => n.Comp.Depth >= node1Depth - 1 && n.Comp.Depth <= node1Depth + 1 && n.Comp.Depth != node1Depth)
-                                         .ToList();
+                var node2Options = parent.Where(n =>
+                        n.Comp.Depth >= node1Depth - 1 && n.Comp.Depth <= node1Depth + 1 && n.Comp.Depth != node1Depth)
+                    .ToList();
                 if (node2Options.Count == 0)
-                {
                     continue;
-                }
 
                 var node2 = RobustRandom.Pick(node2Options);
 
                 if (node1.Comp.Depth < node2.Comp.Depth)
-                {
                     AddEdge((ent, ent.Comp), node1, node2, false);
-                }
                 else
-                {
                     AddEdge((ent, ent.Comp), node2, node1, false);
-                }
             }
         }
     }
@@ -145,7 +139,7 @@ public sealed partial class XenoArtifactSystem
     )
     {
         if (segmentSize == 0)
-            return new();
+            return new List<Entity<XenoArtifactNodeComponent>>();
 
         // Try and get larger as we create more layers. Prevents excessive layers.
         var mod = RobustRandom.Next((int) (iteration / 1.5f), iteration + 1);
@@ -170,7 +164,7 @@ public sealed partial class XenoArtifactSystem
             ent,
             triggerPool,
             ref segmentSize,
-            iteration: iteration + 1
+            iteration + 1
         );
 
         if (successors.Count == 0)
@@ -179,7 +173,7 @@ public sealed partial class XenoArtifactSystem
         foreach (var successor in successors)
         {
             var node = RobustRandom.Pick(nodes);
-            AddEdge((ent, ent), node, successor, dirty: false);
+            AddEdge((ent, ent), node, successor, false);
         }
 
         // randomly add in some extra edges for variance.
@@ -188,7 +182,7 @@ public sealed partial class XenoArtifactSystem
         {
             var node = RobustRandom.Pick(nodes);
             var successor = RobustRandom.Pick(successors);
-            AddEdge((ent, ent), node, successor, dirty: false);
+            AddEdge((ent, ent), node, successor, false);
         }
 
         return nodes;

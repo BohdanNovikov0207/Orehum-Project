@@ -17,8 +17,6 @@ public sealed class BlockListeningSystem : EntitySystem
         SubscribeLocalEvent<BlockListeningComponent, ListenAttemptEvent>(OnListenAttempt);
     }
 
-    private void OnListenAttempt(EntityUid uid, BlockListeningComponent component, ListenAttemptEvent args)
-    {
+    private void OnListenAttempt(EntityUid uid, BlockListeningComponent component, ListenAttemptEvent args) =>
         args.Cancel();
-    }
 }

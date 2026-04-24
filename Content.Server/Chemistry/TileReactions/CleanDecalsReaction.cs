@@ -76,14 +76,14 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Numerics;
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Server.Decals;
 using Content.Shared.Chemistry.Reaction;
 using Content.Shared.Chemistry.Reagent;
 using Content.Shared.Decals;
-using Content.Goobstation.Maths.FixedPoint;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
-using System.Numerics;
 
 namespace Content.Server.Chemistry.TileReactions;
 
@@ -109,15 +109,14 @@ public sealed partial class CleanDecalsReaction : ITileReaction
         if (reactVolume <= CleanCost ||
             !entityManager.TryGetComponent<MapGridComponent>(tile.GridUid, out var grid) ||
             !entityManager.TryGetComponent<DecalGridComponent>(tile.GridUid, out var decalGrid))
-        {
             return FixedPoint2.Zero;
-        }
 
         var lookupSystem = entityManager.System<EntityLookupSystem>();
         var decalSystem = entityManager.System<DecalSystem>();
         // Very generous hitbox.
         var decals = decalSystem
-            .GetDecalsIntersecting(tile.GridUid, lookupSystem.GetLocalBounds(tile, grid.TileSize).Enlarged(0.5f).Translated(new Vector2(-0.5f, -0.5f)));
+            .GetDecalsIntersecting(tile.GridUid,
+                lookupSystem.GetLocalBounds(tile, grid.TileSize).Enlarged(0.5f).Translated(new Vector2(-0.5f, -0.5f)));
         var amount = FixedPoint2.Zero;
 
         foreach (var decal in decals)

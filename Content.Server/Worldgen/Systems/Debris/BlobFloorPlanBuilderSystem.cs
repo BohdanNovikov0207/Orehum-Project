@@ -18,26 +18,23 @@ using Robust.Shared.Random;
 namespace Content.Server.Worldgen.Systems.Debris;
 
 /// <summary>
-///     This handles building the floor plans for "blobby" debris.
+/// This handles building the floor plans for "blobby" debris.
 /// </summary>
 public sealed class BlobFloorPlanBuilderSystem : BaseWorldSystem
 {
+    [Dependency] private readonly SharedMapSystem _map = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly ITileDefinitionManager _tileDefinition = default!;
     [Dependency] private readonly TileSystem _tiles = default!;
-    [Dependency] private readonly SharedMapSystem _map = default!;
 
     /// <inheritdoc />
-    public override void Initialize()
-    {
+    public override void Initialize() =>
         SubscribeLocalEvent<BlobFloorPlanBuilderComponent, ComponentStartup>(OnBlobFloorPlanBuilderStartup);
-    }
 
-    private void OnBlobFloorPlanBuilderStartup(EntityUid uid, BlobFloorPlanBuilderComponent component,
-        ComponentStartup args)
-    {
+    private void OnBlobFloorPlanBuilderStartup(EntityUid uid,
+        BlobFloorPlanBuilderComponent component,
+        ComponentStartup args) =>
         PlaceFloorplanTiles(uid, component, Comp<MapGridComponent>(uid));
-    }
 
     private void PlaceFloorplanTiles(EntityUid gridUid, BlobFloorPlanBuilderComponent comp, MapGridComponent grid)
     {

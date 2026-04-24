@@ -83,21 +83,22 @@ using Content.Server.Thief.Components;
 using Content.Shared.Examine;
 using Content.Shared.Foldable;
 using Content.Shared.Popups;
-using Content.Shared.Verbs;
 using Content.Shared.Roles;
+using Content.Shared.Verbs;
 using Robust.Shared.Audio.Systems;
 
 namespace Content.Server.Thief.Systems;
 
 /// <summary>
-/// <see cref="ThiefBeaconComponent"/>
+///     <see cref="ThiefBeaconComponent" />
 /// </summary>
 public sealed class ThiefBeaconSystem : EntitySystem
 {
     [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly MindSystem _mind = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly SharedRoleSystem _roles = default!;
+
     public override void Initialize()
     {
         base.Initialize();
@@ -120,7 +121,7 @@ public sealed class ThiefBeaconSystem : EntitySystem
             return;
 
         var user = args.User;
-        args.Verbs.Add(new()
+        args.Verbs.Add(new InteractionVerb
         {
             Act = () =>
             {

@@ -16,18 +16,18 @@ using Robust.Shared.Replays;
 namespace Content.Server.Chat.V2.Repository;
 
 /// <summary>
-/// Stores <see cref="IChatEvent"/>, gives them UIDs, and issues <see cref="MessageCreatedEvent"/>.
+/// Stores <see cref="IChatEvent" />, gives them UIDs, and issues <see cref="MessageCreatedEvent" />.
 /// Allows for deletion of messages.
 /// </summary>
 public sealed class ChatRepositorySystem : EntitySystem
 {
-    [Dependency] private readonly IReplayRecordingManager _replay = default!;
+    private readonly Dictionary<uint, ChatRecord> _messages = new();
     [Dependency] private readonly IPlayerManager _player = default!;
+    private readonly Dictionary<NetUserId, List<uint>> _playerMessages = new();
+    [Dependency] private readonly IReplayRecordingManager _replay = default!;
 
     // Clocks should start at 1, as 0 indicates "clock not set" or "clock forgotten to be set by bad programmer".
     private uint _nextMessageId = 1;
-    private Dictionary<uint, ChatRecord> _messages = new();
-    private Dictionary<NetUserId, List<uint>> _playerMessages = new();
 
     public override void Initialize()
     {
@@ -41,16 +41,14 @@ public sealed class ChatRepositorySystem : EntitySystem
     }
 
     /// <summary>
-    /// Adds an <see cref="IChatEvent"/> to the repo and raises it with a UID for consumption elsewhere.
+    /// Adds an <see cref="IChatEvent" /> to the repo and raises it with a UID for consumption elsewhere.
     /// </summary>
     /// <param name="ev">The event to store and raise</param>
     /// <returns>If storing and raising succeeded.</returns>
     public bool Add(IChatEvent ev)
     {
         if (!_player.TryGetSessionByEntity(ev.Sender, out var session))
-        {
             return false;
-        }
 
         var messageId = _nextMessageId;
 
@@ -63,7 +61,7 @@ public sealed class ChatRepositorySystem : EntitySystem
             UserName = session.Name,
             UserId = session.UserId,
             EntityName = Name(ev.Sender),
-            StoredEvent = ev
+            StoredEvent = ev,
         };
 
         _messages[messageId] = storedEv;
@@ -80,13 +78,10 @@ public sealed class ChatRepositorySystem : EntitySystem
     /// </summary>
     /// <param name="id">The UID of a event.</param>
     /// <returns>The event, if it exists.</returns>
-    public IChatEvent? GetEventFor(uint id)
-    {
-        return _messages.TryGetValue(id, out var record) ? record.StoredEvent : null;
-    }
+    public IChatEvent? GetEventFor(uint id) => _messages.TryGetValue(id, out var record) ? record.StoredEvent : null;
 
     /// <summary>
-    /// Edits a specific message and issues a <see cref="MessagePatchedEvent"/> that says this happened both locally and
+    /// Edits a specific message and issues a <see cref="MessagePatchedEvent" /> that says this happened both locally and
     /// on the network. Note that this doesn't replay the message (yet), so translators and mutators won't act on it.
     /// </summary>
     /// <param name="id">The ID to edit</param>
@@ -96,9 +91,7 @@ public sealed class ChatRepositorySystem : EntitySystem
     public bool Patch(uint id, string message)
     {
         if (!_messages.TryGetValue(id, out var ev))
-        {
             return false;
-        }
 
         ev.StoredEvent.Message = message;
 
@@ -108,7 +101,7 @@ public sealed class ChatRepositorySystem : EntitySystem
     }
 
     /// <summary>
-    /// Deletes a message from the repository and issues a <see cref="MessageDeletedEvent"/> that says this has happened
+    /// Deletes a message from the repository and issues a <see cref="MessageDeletedEvent" /> that says this has happened
     /// both locally and on the network.
     /// </summary>
     /// <param name="id">The ID to delete</param>
@@ -117,16 +110,12 @@ public sealed class ChatRepositorySystem : EntitySystem
     public bool Delete(uint id)
     {
         if (!_messages.TryGetValue(id, out var ev))
-        {
             return false;
-        }
 
         _messages.Remove(id);
 
         if (_playerMessages.TryGetValue(ev.UserId, out var set))
-        {
             set.Remove(id);
-        }
 
         RaiseLocalEvent(new MessageDeletedEvent(id));
 
@@ -134,15 +123,17 @@ public sealed class ChatRepositorySystem : EntitySystem
     }
 
     /// <summary>
-    /// Nukes a user's entire chat history from the repo and issues a <see cref="MessageDeletedEvent"/> saying this has
+    /// Nukes a user's entire chat history from the repo and issues a <see cref="MessageDeletedEvent" /> saying this has
     /// happened.
     /// </summary>
     /// <param name="userName">The user ID to nuke.</param>
     /// <param name="reason">Why nuking failed, if it did.</param>
     /// <returns>If nuking did anything.</returns>
-    /// <remarks>Note that this could be a <b>very large</b> event, as we send every single event ID over the wire.
+    /// <remarks>
+    /// Note that this could be a <b>very large</b> event, as we send every single event ID over the wire.
     /// By necessity we can't leak the player-source of chat messages (or if they even have the same origin) because of
-    /// client modders who could use that information to cheat/metagrudge/etc >:(</remarks>
+    /// client modders who could use that information to cheat/metagrudge/etc >:(
+    /// </remarks>
     public bool NukeForUsername(string userName, [NotNullWhen(false)] out string? reason)
     {
         if (!_player.TryGetUserId(userName, out var userId))
@@ -156,20 +147,23 @@ public sealed class ChatRepositorySystem : EntitySystem
     }
 
     /// <summary>
-    /// Nukes a user's entire chat history from the repo and issues a <see cref="MessageDeletedEvent"/> saying this has
+    /// Nukes a user's entire chat history from the repo and issues a <see cref="MessageDeletedEvent" /> saying this has
     /// happened.
     /// </summary>
     /// <param name="userId">The user ID to nuke.</param>
     /// <param name="reason">Why nuking failed, if it did.</param>
     /// <returns>If nuking did anything.</returns>
-    /// <remarks>Note that this could be a <b>very large</b> event, as we send every single event ID over the wire.
+    /// <remarks>
+    /// Note that this could be a <b>very large</b> event, as we send every single event ID over the wire.
     /// By necessity we can't leak the player-source of chat messages (or if they even have the same origin) because of
-    /// client modders who could use that information to cheat/metagrudge/etc >:(</remarks>
+    /// client modders who could use that information to cheat/metagrudge/etc >:(
+    /// </remarks>
     public bool NukeForUserId(NetUserId userId, [NotNullWhen(false)] out string? reason)
     {
         if (!_playerMessages.TryGetValue(userId, out var dict))
         {
-            reason = Loc.GetString("command-error-nukechatmessages-usernames-usernamenomessages", ("userId", userId.UserId.ToString()));
+            reason = Loc.GetString("command-error-nukechatmessages-usernames-usernamenomessages",
+                ("userId", userId.UserId.ToString()));
 
             return false;
         }

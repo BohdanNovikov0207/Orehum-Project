@@ -8,8 +8,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Server.Administration.BanList;
-using Content.Server.EUI;
 using Content.Server.Database;
+using Content.Server.EUI;
 using Content.Shared.Administration;
 using Robust.Shared.Console;
 
@@ -53,8 +53,11 @@ public sealed class RoleBanListCommand : IConsoleCommand
 
         if (shell.Player is not { } player)
         {
-
-            var bans = await _dbManager.GetServerRoleBansAsync(data.LastAddress, data.UserId, data.LastLegacyHWId, data.LastModernHWIds, includeUnbanned);
+            var bans = await _dbManager.GetServerRoleBansAsync(data.LastAddress,
+                data.UserId,
+                data.LastLegacyHWId,
+                data.LastModernHWIds,
+                includeUnbanned);
 
             if (bans.Count == 0)
             {
@@ -67,24 +70,22 @@ public sealed class RoleBanListCommand : IConsoleCommand
                 var msg = $"ID: {ban.Id}: Role: {ban.Role} Reason: {ban.Reason}";
                 shell.WriteLine(msg);
             }
+
             return;
         }
 
         var ui = new BanListEui();
         _eui.OpenEui(ui, player);
         await ui.ChangeBanListPlayer(data.UserId);
-
     }
 
-    public CompletionResult GetCompletion(IConsoleShell shell, string[] args)
-    {
-        return args.Length switch
+    public CompletionResult GetCompletion(IConsoleShell shell, string[] args) =>
+        args.Length switch
         {
             1 => CompletionResult.FromHintOptions(CompletionHelper.SessionNames(),
                 Loc.GetString("cmd-rolebanlist-hint-1")),
             2 => CompletionResult.FromHintOptions(CompletionHelper.Booleans,
                 Loc.GetString("cmd-rolebanlist-hint-2")),
-            _ => CompletionResult.Empty
+            _ => CompletionResult.Empty,
         };
-    }
 }

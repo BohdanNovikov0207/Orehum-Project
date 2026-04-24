@@ -6,47 +6,48 @@
 
 using Content.Server.Actions;
 using Content.Server.DoAfter;
-using Content.Server.Station.Components;
 using Content.Server.Station.Systems;
 using Content.Shared._Shitmed.Antags.Abductor;
 using Content.Shared.Eye;
+using Content.Shared.Hands.Components;
+using Content.Shared.Hands.EntitySystems;
+using Content.Shared.Interaction.Components;
+using Content.Shared.Inventory.VirtualItem;
 using Content.Shared.Movement.Components;
 using Content.Shared.Movement.Systems;
 using Content.Shared.Pinpointer;
-using Content.Shared.Inventory.VirtualItem;
-using Content.Shared.Interaction.Components;
 using Content.Shared.Silicons.StationAi;
-using Content.Shared.UserInterface;
-using Content.Shared.Hands.Components;
-using Content.Shared.Hands.EntitySystems;
-using Content.Shared.Station.Components;
-using Robust.Server.GameObjects;
 using Content.Shared.Tag;
+using Content.Shared.UserInterface;
 using Robust.Server.Containers;
+using Robust.Server.GameObjects;
 
 namespace Content.Server._Shitmed.Antags.Abductor;
 
 public sealed partial class AbductorSystem : SharedAbductorSystem
 {
-    [Dependency] private readonly StationSystem _stationSystem = default!;
-    [Dependency] private readonly EntityManager _entityManager = default!;
-    [Dependency] private readonly UserInterfaceSystem _uiSystem = default!;
-    [Dependency] private readonly SharedEyeSystem _eye = default!;
-    [Dependency] private readonly SharedMoverController _mover = default!;
     [Dependency] private readonly ActionsSystem _actions = default!;
-    [Dependency] private readonly DoAfterSystem _doAfter = default!;
-    [Dependency] private readonly TransformSystem _xformSys = default!;
-    [Dependency] private readonly TagSystem _tags = default!;
-    [Dependency] private readonly EntityLookupSystem _entityLookup = default!;
     [Dependency] private readonly ContainerSystem _container = default!;
+    [Dependency] private readonly DoAfterSystem _doAfter = default!;
+    [Dependency] private readonly EntityLookupSystem _entityLookup = default!;
+    [Dependency] private readonly EntityManager _entityManager = default!;
+    [Dependency] private readonly SharedEyeSystem _eye = default!;
     [Dependency] private readonly SharedHandsSystem _hands = default!;
+    [Dependency] private readonly SharedMoverController _mover = default!;
+    [Dependency] private readonly StationSystem _stationSystem = default!;
+    [Dependency] private readonly TagSystem _tags = default!;
+    [Dependency] private readonly UserInterfaceSystem _uiSystem = default!;
     [Dependency] private readonly SharedVirtualItemSystem _virtualItem = default!;
+    [Dependency] private readonly TransformSystem _xformSys = default!;
 
     public override void Initialize()
     {
-        SubscribeLocalEvent<AbductorHumanObservationConsoleComponent, BeforeActivatableUIOpenEvent>(OnBeforeActivatableUIOpen);
-        SubscribeLocalEvent<AbductorHumanObservationConsoleComponent, ActivatableUIOpenAttemptEvent>(OnActivatableUIOpenAttempt);
-        Subs.BuiEvents<AbductorHumanObservationConsoleComponent>(AbductorCameraConsoleUIKey.Key, subs => subs.Event<AbductorBeaconChosenBuiMsg>(OnAbductorBeaconChosenBuiMsg));
+        SubscribeLocalEvent<AbductorHumanObservationConsoleComponent, BeforeActivatableUIOpenEvent>(
+            OnBeforeActivatableUIOpen);
+        SubscribeLocalEvent<AbductorHumanObservationConsoleComponent, ActivatableUIOpenAttemptEvent>(
+            OnActivatableUIOpenAttempt);
+        Subs.BuiEvents<AbductorHumanObservationConsoleComponent>(AbductorCameraConsoleUIKey.Key,
+            subs => subs.Event<AbductorBeaconChosenBuiMsg>(OnAbductorBeaconChosenBuiMsg));
         InitializeActions();
         InitializeGizmo();
         InitializeConsole();
@@ -55,7 +56,8 @@ public sealed partial class AbductorSystem : SharedAbductorSystem
         base.Initialize();
     }
 
-    private void OnAbductorBeaconChosenBuiMsg(Entity<AbductorHumanObservationConsoleComponent> ent, ref AbductorBeaconChosenBuiMsg args)
+    private void OnAbductorBeaconChosenBuiMsg(Entity<AbductorHumanObservationConsoleComponent> ent,
+        ref AbductorBeaconChosenBuiMsg args)
     {
         OnCameraExit(args.Actor);
         if (ent.Comp.RemoteEntityProto != null)
@@ -78,14 +80,10 @@ public sealed partial class AbductorSystem : SharedAbductorSystem
                 }
 
                 if (_virtualItem.TrySpawnVirtualItemInHand(ent.Owner, args.Actor, out var virtItem1))
-                {
                     EnsureComp<UnremoveableComponent>(virtItem1.Value);
-                }
 
                 if (_virtualItem.TrySpawnVirtualItemInHand(ent.Owner, args.Actor, out var virtItem2))
-                {
                     EnsureComp<UnremoveableComponent>(virtItem2.Value);
-                }
             }
 
             var visibility = EnsureComp<VisibilityComponent>(eye);
@@ -107,6 +105,7 @@ public sealed partial class AbductorSystem : SharedAbductorSystem
                 }
                 else
                     remoteEyeSourceContainerComponent.Actor = args.Actor;
+
                 Dirty(eye, remoteEyeSourceContainerComponent);
                 Dirty(args.Actor, eyeComp);
             }
@@ -137,12 +136,14 @@ public sealed partial class AbductorSystem : SharedAbductorSystem
                 _eye.SetDrawFov(actor, true);
                 _eye.SetTarget(actor, null, eyeComp);
             }
+
             RemoveActions(actor);
             QueueDel(relay);
         }
     }
 
-    private void OnBeforeActivatableUIOpen(Entity<AbductorHumanObservationConsoleComponent> ent, ref BeforeActivatableUIOpenEvent args)
+    private void OnBeforeActivatableUIOpen(Entity<AbductorHumanObservationConsoleComponent> ent,
+        ref BeforeActivatableUIOpenEvent args)
     {
         if (!TryComp<AbductorScientistComponent>(args.User, out var abductorComp))
             return;
@@ -163,21 +164,24 @@ public sealed partial class AbductorSystem : SharedAbductorSystem
             if (!_entityManager.TryGetComponent<NavMapComponent>(grid, out var navMap))
                 return;
 
-            result.Add(station.Id, new StationBeacons
-            {
-                Name = stationMetaData.EntityName,
-                StationId = station.Id,
-                Beacons = [.. navMap.Beacons.Values],
-            });
+            result.Add(station.Id,
+                new StationBeacons
+                {
+                    Name = stationMetaData.EntityName,
+                    StationId = station.Id,
+                    Beacons = [.. navMap.Beacons.Values],
+                });
         }
 
-        _uiSystem.SetUiState(ent.Owner, AbductorCameraConsoleUIKey.Key, new AbductorCameraConsoleBuiState() { Stations = result });
+        _uiSystem.SetUiState(ent.Owner,
+            AbductorCameraConsoleUIKey.Key,
+            new AbductorCameraConsoleBuiState { Stations = result });
     }
 
-    private void OnActivatableUIOpenAttempt(Entity<AbductorHumanObservationConsoleComponent> ent, ref ActivatableUIOpenAttemptEvent args)
+    private void OnActivatableUIOpenAttempt(Entity<AbductorHumanObservationConsoleComponent> ent,
+        ref ActivatableUIOpenAttemptEvent args)
     {
         if (!HasComp<AbductorScientistComponent>(args.User))
             args.Cancel();
     }
-
 }

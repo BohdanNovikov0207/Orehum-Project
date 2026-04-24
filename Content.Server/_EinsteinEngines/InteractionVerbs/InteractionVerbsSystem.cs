@@ -27,7 +27,11 @@ public sealed class InteractionVerbsSystem : SharedInteractionVerbsSystem
         _occluderQuery = GetEntityQuery<OccluderComponent>();
     }
 
-    protected override void SendChatLog(string message, EntityUid source, Filter filter, InteractionPopupPrototype popup, bool clip)
+    protected override void SendChatLog(string message,
+        EntityUid source,
+        Filter filter,
+        InteractionPopupPrototype popup,
+        bool clip)
     {
         if (filter.Count <= 0)
             return;
@@ -41,9 +45,22 @@ public sealed class InteractionVerbsSystem : SharedInteractionVerbsSystem
             filter.RemoveWhereAttachedEntity(ent => !CanSee(ent, source, popup.VisibilityRange));
 
         if (filter.Count == 1)
-            _chatManager.ChatMessageToOne(popup.LogChannel, message, wrappedMessage, source, false, filter.Recipients.First().Channel, color);
+            _chatManager.ChatMessageToOne(popup.LogChannel,
+                message,
+                wrappedMessage,
+                source,
+                false,
+                filter.Recipients.First().Channel,
+                color);
         else
-            _chatManager.ChatMessageToManyFiltered(filter, popup.LogChannel, message, wrappedMessage, source, false, false, color);
+            _chatManager.ChatMessageToManyFiltered(filter,
+                popup.LogChannel,
+                message,
+                wrappedMessage,
+                source,
+                false,
+                false,
+                color);
     }
 
     private Color InferColor(PopupType popup) => popup switch
@@ -51,17 +68,16 @@ public sealed class InteractionVerbsSystem : SharedInteractionVerbsSystem
         // These are all hardcoded on client-side, so we have to improvise
         PopupType.LargeCaution or PopupType.MediumCaution or PopupType.SmallCaution => Color.Red,
         PopupType.Medium or PopupType.Small => Color.LightGray,
-        _ => Color.White
+        _ => Color.White,
     };
 
-    private bool CanSee(EntityUid source, EntityUid target, float maxRange)
-    {
+    private bool CanSee(EntityUid source, EntityUid target, float maxRange) =>
         // TODO: InRangeUnobstructed has a pretty high performance cost and is not intended to be used like that.
         // We should see if we can move this to client side later, aka make the client check if the target is visible for it.
-        return _interactions.InRangeUnobstructed(
-            source, target, maxRange,
+        _interactions.InRangeUnobstructed(
+            source,
+            target,
+            maxRange,
             CollisionGroup.Opaque,
-            uid => !_occluderQuery.TryComp(uid, out var occluder) || !occluder.Enabled, // We ignore all entities that do not occlude light
-            false);
-    }
+            uid => !_occluderQuery.TryComp(uid, out var occluder) || !occluder.Enabled);
 }

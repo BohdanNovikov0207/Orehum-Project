@@ -22,19 +22,21 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Linq;
+using Content.Goobstation.Common.Pirates;
+using Content.Goobstation.Common.Research;
 using Content.Server.Power.EntitySystems;
 using Content.Server.Research.Components;
-using Content.Shared.UserInterface;
 using Content.Shared.Access.Components;
-using Content.Shared.Emag.Components;
 using Content.Shared.Emag.Systems;
 using Content.Shared.IdentityManagement;
 using Content.Shared.Research.Components;
 using Content.Shared.Research.Prototypes;
-using Content.Goobstation.Common.Pirates;
-using Content.Goobstation.Common.Research; // R&D Console Rework
-using System.Linq;
-using Robust.Shared.Prototypes; // R&D Console Rework
+using Content.Shared.UserInterface;
+using Robust.Shared.Prototypes;
+// R&D Console Rework
+
+// R&D Console Rework
 
 namespace Content.Server.Research.Systems;
 
@@ -49,7 +51,8 @@ public sealed partial class ResearchSystem
         SubscribeLocalEvent<ResearchConsoleComponent, ResearchServerPointsChangedEvent>(OnPointsChanged);
         SubscribeLocalEvent<ResearchConsoleComponent, ResearchRegistrationChangedEvent>(OnConsoleRegistrationChanged);
         SubscribeLocalEvent<ResearchConsoleComponent, TechnologyDatabaseModifiedEvent>(OnConsoleDatabaseModified);
-        SubscribeLocalEvent<ResearchConsoleComponent, TechnologyDatabaseSynchronizedEvent>(OnConsoleDatabaseSynchronized);
+        SubscribeLocalEvent<ResearchConsoleComponent, TechnologyDatabaseSynchronizedEvent>(
+            OnConsoleDatabaseSynchronized);
         SubscribeLocalEvent<ResearchConsoleComponent, GotEmaggedEvent>(OnEmagged);
     }
 
@@ -102,12 +105,13 @@ public sealed partial class ResearchSystem
         UpdateConsoleInterface(uid, component);
     }
 
-    private void OnConsoleBeforeUiOpened(EntityUid uid, ResearchConsoleComponent component, BeforeActivatableUIOpenEvent args)
-    {
-        SyncClientWithServer(uid);
-    }
+    private void OnConsoleBeforeUiOpened(EntityUid uid,
+        ResearchConsoleComponent component,
+        BeforeActivatableUIOpenEvent args) => SyncClientWithServer(uid);
 
-    private void UpdateConsoleInterface(EntityUid uid, ResearchConsoleComponent? component = null, ResearchClientComponent? clientComponent = null)
+    private void UpdateConsoleInterface(EntityUid uid,
+        ResearchConsoleComponent? component = null,
+        ResearchClientComponent? clientComponent = null)
     {
         if (!Resolve(uid, ref component, ref clientComponent, false))
             return;
@@ -131,8 +135,8 @@ public sealed partial class ResearchSystem
                     var prereqsMet = proto.TechnologyPrerequisites.All(p => unlockedTechs.Contains(p));
                     var canAfford = server.Points >= proto.Cost;
 
-                    return prereqsMet ?
-                        (canAfford ? ResearchAvailability.Available : ResearchAvailability.PrereqsMet)
+                    return prereqsMet
+                        ? canAfford ? ResearchAvailability.Available : ResearchAvailability.PrereqsMet
                         : ResearchAvailability.Unavailable;
                 });
 
@@ -140,38 +144,42 @@ public sealed partial class ResearchSystem
                 points = clientComponent.ConnectedToServer ? server.Points : 0;
         }
         else
-        {
             techList = allTechs.ToDictionary(proto => proto.ID, _ => ResearchAvailability.Unavailable);
-        }
 
-        _uiSystem.SetUiState(uid, ResearchConsoleUiKey.Key,
+        _uiSystem.SetUiState(uid,
+            ResearchConsoleUiKey.Key,
             new ResearchConsoleBoundInterfaceState(points, techList));
         // R&D Console Rework End
     }
 
-    private void OnPointsChanged(EntityUid uid, ResearchConsoleComponent component, ref ResearchServerPointsChangedEvent args)
+    private void OnPointsChanged(EntityUid uid,
+        ResearchConsoleComponent component,
+        ref ResearchServerPointsChangedEvent args)
     {
         if (!_uiSystem.IsUiOpen(uid, ResearchConsoleUiKey.Key))
             return;
         UpdateConsoleInterface(uid, component);
     }
 
-    private void OnConsoleRegistrationChanged(EntityUid uid, ResearchConsoleComponent component, ref ResearchRegistrationChangedEvent args)
+    private void OnConsoleRegistrationChanged(EntityUid uid,
+        ResearchConsoleComponent component,
+        ref ResearchRegistrationChangedEvent args)
     {
         SyncClientWithServer(uid);
         UpdateConsoleInterface(uid, component);
     }
 
-    private void OnConsoleDatabaseModified(EntityUid uid, ResearchConsoleComponent component, ref TechnologyDatabaseModifiedEvent args)
+    private void OnConsoleDatabaseModified(EntityUid uid,
+        ResearchConsoleComponent component,
+        ref TechnologyDatabaseModifiedEvent args)
     {
         SyncClientWithServer(uid);
         UpdateConsoleInterface(uid, component);
     }
 
-    private void OnConsoleDatabaseSynchronized(EntityUid uid, ResearchConsoleComponent component, ref TechnologyDatabaseSynchronizedEvent args)
-    {
-        UpdateConsoleInterface(uid, component);
-    }
+    private void OnConsoleDatabaseSynchronized(EntityUid uid,
+        ResearchConsoleComponent component,
+        ref TechnologyDatabaseSynchronizedEvent args) => UpdateConsoleInterface(uid, component);
 
     private void OnEmagged(Entity<ResearchConsoleComponent> ent, ref GotEmaggedEvent args)
     {
@@ -185,4 +193,6 @@ public sealed partial class ResearchSystem
     }
 }
 
-public sealed partial class ResearchConsoleUnlockEvent : CancellableEntityEventArgs { }
+public sealed class ResearchConsoleUnlockEvent : CancellableEntityEventArgs
+{
+}

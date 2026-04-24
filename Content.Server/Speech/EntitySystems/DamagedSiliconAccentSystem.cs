@@ -1,25 +1,26 @@
 using System.Text;
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Server.Destructible;
 using Content.Server.PowerCell;
-using Content.Shared.Speech.Components;
 using Content.Shared.Damage;
-using Content.Goobstation.Maths.FixedPoint;
-using Content.Server.Power.Components; // Goobstation
 using Content.Shared.Speech;
+using Content.Shared.Speech.Components;
 using Robust.Shared.Random;
+// Goobstation
 
 namespace Content.Server.Speech.EntitySystems;
 
 public sealed class DamagedSiliconAccentSystem : EntitySystem
 {
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly PowerCellSystem _powerCell = default!;
     [Dependency] private readonly DestructibleSystem _destructibleSystem = default!;
+    [Dependency] private readonly PowerCellSystem _powerCell = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
 
     public override void Initialize()
     {
         base.Initialize();
-        SubscribeLocalEvent<DamagedSiliconAccentComponent, AccentGetEvent>(OnAccent, after: [typeof(ReplacementAccentSystem)]);
+        SubscribeLocalEvent<DamagedSiliconAccentComponent, AccentGetEvent>(OnAccent,
+            after: [typeof(ReplacementAccentSystem)]);
     }
 
     private void OnAccent(Entity<DamagedSiliconAccentComponent> ent, ref AccentGetEvent args)
@@ -30,14 +31,10 @@ public sealed class DamagedSiliconAccentSystem : EntitySystem
         {
             var currentChargeLevel = 0.0f;
             if (ent.Comp.OverrideChargeLevel.HasValue)
-            {
                 currentChargeLevel = ent.Comp.OverrideChargeLevel.Value;
-            }
             else if (_powerCell.TryGetBatteryFromSlot(uid, out var battery) ||
-                     TryComp<BatteryComponent>(uid, out battery)) // Goobstation - Energycrit: Make this work with BatteryComponent too
-            {
+                     TryComp(uid, out battery)) // Goobstation - Energycrit: Make this work with BatteryComponent too
                 currentChargeLevel = battery.CurrentCharge / battery.MaxCharge;
-            }
             currentChargeLevel = Math.Clamp(currentChargeLevel, 0.0f, 1.0f);
             // Corrupt due to low power (drops characters on longer messages)
             args.Message = CorruptPower(args.Message, currentChargeLevel, ent.Comp);
@@ -47,13 +44,9 @@ public sealed class DamagedSiliconAccentSystem : EntitySystem
         {
             var damage = FixedPoint2.Zero;
             if (ent.Comp.OverrideTotalDamage.HasValue)
-            {
                 damage = ent.Comp.OverrideTotalDamage.Value;
-            }
             else if (TryComp<DamageableComponent>(uid, out var damageable))
-            {
                 damage = damageable.TotalDamage;
-            }
             // Corrupt due to damage (drop, repeat, replace with symbols)
             args.Message = CorruptDamage(args.Message, damage, ent);
         }
@@ -68,9 +61,7 @@ public sealed class DamagedSiliconAccentSystem : EntitySystem
 
         // Fast bails, would not have an effect
         if (chargeLevel > comp.ChargeThresholdForPowerCorruption || message.Length < idxMin)
-        {
             return message;
-        }
 
         var outMsg = new StringBuilder();
 
@@ -89,7 +80,7 @@ public sealed class DamagedSiliconAccentSystem : EntitySystem
             // use an x^2 interpolation to increase the drop probability until we hit idxMax
             var probToDrop = idx >= idxMax
                 ? maxDropProb
-                : (float)Math.Pow(((double)idx - idxMin) / (idxMax - idxMin), 2.0) * maxDropProb;
+                : (float) Math.Pow(((double) idx - idxMin) / (idxMax - idxMin), 2.0) * maxDropProb;
             // Ensure we're in the range for Prob()
             probToDrop = Math.Clamp(probToDrop, 0.0f, 1.0f);
 
@@ -97,15 +88,12 @@ public sealed class DamagedSiliconAccentSystem : EntitySystem
             {
                 // Additional chance to change to dot for flavor instead of full drop
                 if (_random.Prob(comp.ProbToCorruptDotFromPower))
-                {
                     outMsg.Append('.');
-                }
             }
             else // Character is safe
-            {
                 outMsg.Append(letter);
-            }
         }
+
         return outMsg.ToString();
     }
 
@@ -124,19 +112,16 @@ public sealed class DamagedSiliconAccentSystem : EntitySystem
         }
 
         // Linear interpolation of character damage probability
-        var damagePercent = Math.Clamp((float)totalDamage / (float)damageAtMaxCorruption, 0, 1);
+        var damagePercent = Math.Clamp((float) totalDamage / (float) damageAtMaxCorruption, 0, 1);
         var chanceToCorruptLetter = damagePercent * ent.Comp.MaxDamageCorruption;
         foreach (var letter in message)
         {
             if (_random.Prob(chanceToCorruptLetter)) // Corrupt!
-            {
                 outMsg.Append(CorruptLetterDamage(letter));
-            }
             else // Safe!
-            {
                 outMsg.Append(letter);
-            }
         }
+
         return outMsg.ToString();
     }
 
@@ -156,7 +141,7 @@ public sealed class DamagedSiliconAccentSystem : EntitySystem
     private string CorruptPunctuize()
     {
         const string punctuation = "\"\\`~!@#$%^&*()_+-={}[]|\\;:<>,.?/";
-        return punctuation[_random.NextByte((byte)punctuation.Length)].ToString();
+        return punctuation[_random.NextByte((byte) punctuation.Length)].ToString();
     }
 
     private string CorruptRepeat(char letter)

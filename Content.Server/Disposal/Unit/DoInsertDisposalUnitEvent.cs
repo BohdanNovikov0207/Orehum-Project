@@ -5,7 +5,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-namespace Content.Server.Disposal.Unit
-{
-    public record DoInsertDisposalUnitEvent(EntityUid? User, EntityUid ToInsert, EntityUid Unit);
-}
+namespace Content.Server.Disposal.Unit;
+
+public record DoInsertDisposalUnitEvent(EntityUid? User, EntityUid ToInsert, EntityUid Unit);

@@ -12,5 +12,4 @@ namespace Content.Server.Salvage.Expeditions;
 [RegisterComponent]
 public sealed partial class SalvageShuttleComponent : Component
 {
-
 }

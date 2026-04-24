@@ -11,16 +11,13 @@ using Content.Shared.Power.Generator;
 
 namespace Content.Server.Power.Generator;
 
-/// <seealso cref="GeneratorSystem"/>
-/// <seealso cref="GeneratorExhaustGasComponent"/>
+/// <seealso cref="GeneratorSystem" />
+/// <seealso cref="GeneratorExhaustGasComponent" />
 public sealed class GeneratorExhaustGasSystem : EntitySystem
 {
     [Dependency] private readonly AtmosphereSystem _atmosphere = default!;
 
-    public override void Initialize()
-    {
-        SubscribeLocalEvent<GeneratorExhaustGasComponent, GeneratorUseFuel>(FuelUsed);
-    }
+    public override void Initialize() => SubscribeLocalEvent<GeneratorExhaustGasComponent, GeneratorUseFuel>(FuelUsed);
 
     private void FuelUsed(EntityUid uid, GeneratorExhaustGasComponent component, GeneratorUseFuel args)
     {

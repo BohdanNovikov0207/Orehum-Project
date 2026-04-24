@@ -24,11 +24,11 @@ namespace Content.Server.Xenoarchaeology.Artifact.XAE;
 /// </summary>
 public sealed class XAEPortalSystem : BaseXAESystem<XAEPortalComponent>
 {
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly LinkedEntitySystem _link = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly SharedContainerSystem _container = default!;
+    [Dependency] private readonly LinkedEntitySystem _link = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     /// <inheritdoc />
     protected override void OnActivated(Entity<XAEPortalComponent> ent, ref XenoArtifactNodeActivatedEvent args)
@@ -38,24 +38,24 @@ public sealed class XAEPortalSystem : BaseXAESystem<XAEPortalComponent>
 
         var map = Transform(ent).MapID;
         var validMinds = new ValueList<EntityUid>();
-        var mindQuery = EntityQueryEnumerator<MindContainerComponent, MobStateComponent, TransformComponent, MetaDataComponent>();
+        var mindQuery =
+            EntityQueryEnumerator<MindContainerComponent, MobStateComponent, TransformComponent, MetaDataComponent>();
         while (mindQuery.MoveNext(out var uid, out var mc, out _, out var xform, out var meta))
         {
             // check if the MindContainer has a Mind and if the entity is not in a container (this also auto excludes AI) and if they are on the same map
-            if (mc.HasMind && !_container.IsEntityOrParentInContainer(uid, meta: meta, xform: xform) && xform.MapID == map)
-            {
+            if (mc.HasMind && !_container.IsEntityOrParentInContainer(uid, meta, xform) && xform.MapID == map)
                 validMinds.Add(uid);
-            }
         }
+
         // this would only be 0 if there were a station full of AIs and no one else, in that case just stop this function
         if (validMinds.Count == 0)
             return;
 
-        if(!TrySpawnNextTo(ent.Comp.PortalProto, args.Artifact, out var firstPortal))
+        if (!TrySpawnNextTo(ent.Comp.PortalProto, args.Artifact, out var firstPortal))
             return;
 
         var target = _random.Pick(validMinds);
-        if(!TrySpawnNextTo(ent.Comp.PortalProto, target, out var secondPortal))
+        if (!TrySpawnNextTo(ent.Comp.PortalProto, target, out var secondPortal))
             return;
 
         // Manual position swapping, because the portal that opens doesn't trigger a collision, and doesn't teleport targets the first time.

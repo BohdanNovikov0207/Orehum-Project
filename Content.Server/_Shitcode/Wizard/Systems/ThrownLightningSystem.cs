@@ -19,9 +19,9 @@ namespace Content.Server._Goobstation.Wizard.Systems;
 public sealed class ThrownLightningSystem : EntitySystem
 {
     [Dependency] private readonly ElectrocutionSystem _electrocution = default!;
-    [Dependency] private readonly SharedStaminaSystem _stamina = default!;
-    [Dependency] private readonly SpellsSystem _spells = default!;
     [Dependency] private readonly SparksSystem _sparks = default!;
+    [Dependency] private readonly SpellsSystem _spells = default!;
+    [Dependency] private readonly SharedStaminaSystem _stamina = default!;
 
     public override void Initialize()
     {
@@ -76,8 +76,5 @@ public sealed class ThrownLightningSystem : EntitySystem
         _sparks.DoSparks(Transform(ent).Coordinates);
     }
 
-    private bool Deleting(EntityUid ent)
-    {
-        return EntityManager.IsQueuedForDeletion(ent) || TerminatingOrDeleted(ent);
-    }
+    private bool Deleting(EntityUid ent) => EntityManager.IsQueuedForDeletion(ent) || TerminatingOrDeleted(ent);
 }

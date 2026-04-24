@@ -13,13 +13,6 @@ namespace Content.Server.Anomaly.Components;
 [RegisterComponent]
 public sealed partial class TempAffectingAnomalyComponent : Component
 {
-
-    /// <summary>
-    /// The the amount the tempurature should be modified by (negative for decreasing temp)
-    /// </summary>
-    [DataField("tempChangePerSecond")]
-    public float TempChangePerSecond = 0;
-
     /// <summary>
     /// The minimum amount of severity required
     /// before the anomaly becomes a hotspot.
@@ -38,4 +31,10 @@ public sealed partial class TempAffectingAnomalyComponent : Component
     /// </summary>
     [DataField("hotspotExposeVolume")]
     public float HotspotExposeVolume = 50;
+
+    /// <summary>
+    /// The the amount the tempurature should be modified by (negative for decreasing temp)
+    /// </summary>
+    [DataField("tempChangePerSecond")]
+    public float TempChangePerSecond = 0;
 }

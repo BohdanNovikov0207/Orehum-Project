@@ -8,8 +8,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Heretic.Prototypes;
 using Content.Shared.Heretic;
+using Content.Shared.Heretic.Prototypes;
 using Content.Shared.Mind;
 using Robust.Shared.Prototypes;
 

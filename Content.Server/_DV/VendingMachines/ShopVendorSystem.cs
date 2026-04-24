@@ -19,8 +19,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Server.Advertise;
-using Content.Server.Advertise.Components;
 using Content.Shared._DV.VendingMachines;
 using Content.Shared.Advertise.Components;
 using Content.Shared.Advertise.Systems;
@@ -41,7 +39,7 @@ public sealed class ShopVendorSystem : SharedShopVendorSystem
         {
             var ent = (uid, comp);
             var dirty = false;
-            if (comp.Ejecting is {} ejecting && now > comp.NextEject)
+            if (comp.Ejecting is { } ejecting && now > comp.NextEject)
             {
                 Spawn(ejecting, xform.Coordinates);
                 comp.Ejecting = null;

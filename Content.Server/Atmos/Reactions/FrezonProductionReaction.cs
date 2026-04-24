@@ -15,13 +15,17 @@ using JetBrains.Annotations;
 namespace Content.Server.Atmos.Reactions;
 
 /// <summary>
-///     Produces frezon from oxygen and tritium, with nitrogen as a catalyst that also acts as a stopper if too much is present.
-///     Has a max temperature, but paradoxically gets more efficient the hotter it is.
+/// Produces frezon from oxygen and tritium, with nitrogen as a catalyst that also acts as a stopper if too much is
+/// present.
+/// Has a max temperature, but paradoxically gets more efficient the hotter it is.
 /// </summary>
 [UsedImplicitly]
 public sealed partial class FrezonProductionReaction : IGasReactionEffect
 {
-    public ReactionResult React(GasMixture mixture, IGasMixtureHolder? holder, AtmosphereSystem atmosphereSystem, float heatScale)
+    public ReactionResult React(GasMixture mixture,
+        IGasMixtureHolder? holder,
+        AtmosphereSystem atmosphereSystem,
+        float heatScale)
     {
         var initialN2 = mixture.GetMoles(Gas.Nitrogen);
         var initialOxy = mixture.GetMoles(Gas.Oxygen);

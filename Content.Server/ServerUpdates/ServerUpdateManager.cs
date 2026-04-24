@@ -23,26 +23,28 @@ namespace Content.Server.ServerUpdates;
 /// </summary>
 /// <remarks>
 /// This was originally only designed for restarting on *update*,
-/// but now also handles periodic restarting to keep server uptime via <see cref="CCVars.ServerUptimeRestartMinutes"/>.
+/// but now also handles periodic restarting to keep server uptime via <see cref="CCVars.ServerUptimeRestartMinutes" />.
 /// </remarks>
 public sealed class ServerUpdateManager : IPostInjectInit
 {
-    [Dependency] private readonly IGameTiming _gameTiming = default!;
-    [Dependency] private readonly IWatchdogApi _watchdog = default!;
-    [Dependency] private readonly IPlayerManager _playerManager = default!;
-    [Dependency] private readonly IChatManager _chatManager = default!;
-    [Dependency] private readonly IBaseServer _server = default!;
     [Dependency] private readonly IConfigurationManager _cfg = default!;
+    [Dependency] private readonly IChatManager _chatManager = default!;
+    [Dependency] private readonly IGameTiming _gameTiming = default!;
     [Dependency] private readonly ILogManager _logManager = default!;
+    [Dependency] private readonly IPlayerManager _playerManager = default!;
+    [Dependency] private readonly IBaseServer _server = default!;
+    [Dependency] private readonly IWatchdogApi _watchdog = default!;
+
+    private TimeSpan? _restartTime;
 
     private ISawmill _sawmill = default!;
 
     [ViewVariables]
     private bool _updateOnRoundEnd;
 
-    private TimeSpan? _restartTime;
-
     private TimeSpan _uptimeRestart;
+
+    void IPostInjectInit.PostInject() => _sawmill = _logManager.GetSawmill("restart");
 
     public void Initialize()
     {
@@ -60,16 +62,12 @@ public sealed class ServerUpdateManager : IPostInjectInit
         if (_restartTime != null)
         {
             if (_restartTime < _gameTiming.RealTime)
-            {
                 DoShutdown();
-            }
         }
         else
         {
             if (ShouldShutdownDueToUptime())
-            {
                 ServerEmptyUpdateRestartCheck("uptime");
-            }
         }
     }
 
@@ -112,7 +110,7 @@ public sealed class ServerUpdateManager : IPostInjectInit
     }
 
     /// <summary>
-    ///     Checks whether there are still players on the server,
+    /// Checks whether there are still players on the server,
     /// and if not starts a timer to automatically reboot the server if an update is available.
     /// </summary>
     private void ServerEmptyUpdateRestartCheck(string reason)
@@ -146,13 +144,6 @@ public sealed class ServerUpdateManager : IPostInjectInit
         _server.Shutdown(Loc.GetString(reason));
     }
 
-    private bool ShouldShutdownDueToUptime()
-    {
-        return _uptimeRestart != TimeSpan.Zero && _gameTiming.RealTime > _uptimeRestart;
-    }
-
-    void IPostInjectInit.PostInject()
-    {
-        _sawmill = _logManager.GetSawmill("restart");
-    }
+    private bool ShouldShutdownDueToUptime() =>
+        _uptimeRestart != TimeSpan.Zero && _gameTiming.RealTime > _uptimeRestart;
 }

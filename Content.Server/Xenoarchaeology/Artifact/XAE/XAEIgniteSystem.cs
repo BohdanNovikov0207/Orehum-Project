@@ -12,14 +12,14 @@ namespace Content.Server.Xenoarchaeology.Artifact.XAE;
 /// </summary>
 public sealed class XAEIgniteSystem : BaseXAESystem<XAEIgniteComponent>
 {
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly FlammableSystem _flammable = default!;
-
-    private EntityQuery<FlammableComponent> _flammables;
-
     /// <summary> Pre-allocated and re-used collection.</summary>
     private readonly HashSet<EntityUid> _entities = new();
+
+    [Dependency] private readonly FlammableSystem _flammable = default!;
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+
+    private EntityQuery<FlammableComponent> _flammables;
 
     /// <inheritdoc />
     public override void Initialize()

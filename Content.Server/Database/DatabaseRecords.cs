@@ -15,25 +15,25 @@ namespace Content.Server.Database;
 
 public interface IAdminRemarksRecord
 {
-    public int Id { get; }
+    int Id { get; }
 
-    public RoundRecord? Round { get; }
+    RoundRecord? Round { get; }
 
-    public PlayerRecord? Player { get; }
-    public TimeSpan PlaytimeAtNote { get; }
+    PlayerRecord? Player { get; }
+    TimeSpan PlaytimeAtNote { get; }
 
-    public string Message { get; }
+    string Message { get; }
 
-    public PlayerRecord? CreatedBy { get; }
+    PlayerRecord? CreatedBy { get; }
 
-    public DateTimeOffset CreatedAt { get; }
+    DateTimeOffset CreatedAt { get; }
 
-    public PlayerRecord? LastEditedBy { get; }
+    PlayerRecord? LastEditedBy { get; }
 
-    public DateTimeOffset? LastEditedAt { get; }
-    public DateTimeOffset? ExpirationTime { get; }
+    DateTimeOffset? LastEditedAt { get; }
+    DateTimeOffset? ExpirationTime { get; }
 
-    public bool Deleted { get; }
+    bool Deleted { get; }
 }
 
 public sealed record ServerRoleBanNoteRecord(
@@ -117,7 +117,6 @@ public sealed record AdminMessageRecord(
     DateTimeOffset? DeletedAt,
     bool Seen,
     bool Dismissed) : IAdminRemarksRecord;
-
 
 public sealed record PlayerRecord(
     NetUserId UserId,

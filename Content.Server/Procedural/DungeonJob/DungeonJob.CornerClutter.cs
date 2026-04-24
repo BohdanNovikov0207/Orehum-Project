@@ -7,7 +7,6 @@
 using System.Threading.Tasks;
 using Content.Shared.Procedural;
 using Content.Shared.Procedural.PostGeneration;
-using Content.Shared.Storage;
 using Robust.Shared.Random;
 
 namespace Content.Server.Procedural.DungeonJob;
@@ -15,7 +14,7 @@ namespace Content.Server.Procedural.DungeonJob;
 public sealed partial class DungeonJob
 {
     /// <summary>
-    /// <see cref="CornerClutterDunGen"/>
+    ///     <see cref="CornerClutterDunGen" />
     /// </summary>
     private async Task PostGen(CornerClutterDunGen gen, Dungeon dungeon, HashSet<Vector2i> reservedTiles, Random random)
     {

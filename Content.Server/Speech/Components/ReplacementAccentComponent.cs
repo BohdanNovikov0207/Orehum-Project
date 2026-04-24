@@ -27,5 +27,4 @@ public sealed partial class ReplacementAccentComponent : Component
 {
     [DataField(customTypeSerializer: typeof(PrototypeIdSerializer<ReplacementAccentPrototype>), required: true)]
     public string Accent = default!;
-
 }

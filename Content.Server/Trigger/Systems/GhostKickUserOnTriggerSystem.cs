@@ -1,6 +1,6 @@
+using Content.Server.GhostKick;
 using Content.Shared.Trigger;
 using Content.Shared.Trigger.Components.Effects;
-using Content.Server.GhostKick;
 using Robust.Shared.Player;
 
 namespace Content.Server.Trigger.Systems;

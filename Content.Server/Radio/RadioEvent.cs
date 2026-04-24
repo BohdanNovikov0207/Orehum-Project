@@ -7,16 +7,16 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Chat;
 using Content.Shared._EinsteinEngines.Language;
+using Content.Shared.Chat;
 using Content.Shared.Radio;
 
 namespace Content.Server.Radio;
 
 // Einstein Engines - Language begin
 /// <summary>
-/// <param name="OriginalChatMsg">The message to display when the speaker can understand "language"</param>
-/// <param name="LanguageObfuscatedChatMsg">The message to display when the Speaker cannot understand "language"</param>
+///     <param name="OriginalChatMsg">The message to display when the speaker can understand "language"</param>
+///     <param name="LanguageObfuscatedChatMsg">The message to display when the Speaker cannot understand "language"</param>
 /// </summary>
 [ByRefEvent]
 public readonly record struct RadioReceiveEvent(
@@ -26,7 +26,7 @@ public readonly record struct RadioReceiveEvent(
     ChatMessage LanguageObfuscatedChatMsg,
     LanguagePrototype Language,
     EntityUid RadioSource
-    );
+);
 // Einstein Engines - Language end
 
 /// <summary>
@@ -39,11 +39,14 @@ public readonly record struct HeadsetRadioReceiveRelayEvent(RadioReceiveEvent Re
 /// Use this event to cancel sending message per receiver
 /// </summary>
 [ByRefEvent]
-public record struct RadioReceiveAttemptEvent(RadioChannelPrototype Channel, EntityUid RadioSource, EntityUid RadioReceiver)
+public record struct RadioReceiveAttemptEvent(
+    RadioChannelPrototype Channel,
+    EntityUid RadioSource,
+    EntityUid RadioReceiver)
 {
     public readonly RadioChannelPrototype Channel = Channel;
-    public readonly EntityUid RadioSource = RadioSource;
     public readonly EntityUid RadioReceiver = RadioReceiver;
+    public readonly EntityUid RadioSource = RadioSource;
     public bool Cancelled = false;
 }
 

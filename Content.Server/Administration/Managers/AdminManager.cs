@@ -90,6 +90,7 @@
 
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
 using Content.Server.Chat.Managers;
@@ -109,24 +110,27 @@ using Robust.Shared.Toolshed;
 using Robust.Shared.Toolshed.Errors;
 using Robust.Shared.Utility;
 
-
 namespace Content.Server.Administration.Managers
 {
     public sealed partial class AdminManager : IAdminManager, IPostInjectInit, IConGroupControllerImplementation
     {
-        [Dependency] private readonly IPlayerManager _playerManager = default!;
-        [Dependency] private readonly IServerDbManager _dbManager = default!;
-        [Dependency] private readonly IConfigurationManager _cfg = default!;
-        [Dependency] private readonly IServerNetManager _netMgr = default!;
-        [Dependency] private readonly IConGroupController _conGroup = default!;
-        [Dependency] private readonly IResourceManager _res = default!;
-        [Dependency] private readonly IServerConsoleHost _consoleHost = default!;
-        [Dependency] private readonly IChatManager _chat = default!;
-        [Dependency] private readonly ToolshedManager _toolshed = default!;
-        [Dependency] private readonly ILogManager _logManager = default!;
-
         private readonly Dictionary<ICommonSession, AdminReg> _admins = new();
+        [Dependency] private readonly IConfigurationManager _cfg = default!;
+        [Dependency] private readonly IChatManager _chat = default!;
+
+        private readonly AdminCommandPermissions _commandPermissions = new();
+        [Dependency] private readonly IConGroupController _conGroup = default!;
+        [Dependency] private readonly IServerConsoleHost _consoleHost = default!;
+        [Dependency] private readonly IServerDbManager _dbManager = default!;
+        [Dependency] private readonly ILogManager _logManager = default!;
+        [Dependency] private readonly IServerNetManager _netMgr = default!;
+        [Dependency] private readonly IPlayerManager _playerManager = default!;
         private readonly HashSet<NetUserId> _promotedPlayers = new();
+        [Dependency] private readonly IResourceManager _res = default!;
+        [Dependency] private readonly ToolshedManager _toolshed = default!;
+        private readonly AdminCommandPermissions _toolshedCommandPermissions = new();
+
+        private ISawmill _sawmill = default!;
 
         public event Action<AdminPermsChangedEventArgs>? OnPermsChanged;
 
@@ -136,22 +140,13 @@ namespace Content.Server.Administration.Managers
 
         public IEnumerable<ICommonSession> AllAdmins => _admins.Select(p => p.Key);
 
-        private readonly AdminCommandPermissions _commandPermissions = new();
-        private readonly AdminCommandPermissions _toolshedCommandPermissions = new();
-
-        private ISawmill _sawmill = default!;
-
-        public bool IsAdmin(ICommonSession session, bool includeDeAdmin = false)
-        {
-            return GetAdminData(session, includeDeAdmin) != null;
-        }
+        public bool IsAdmin(ICommonSession session, bool includeDeAdmin = false) =>
+            GetAdminData(session, includeDeAdmin) != null;
 
         public AdminData? GetAdminData(ICommonSession session, bool includeDeAdmin = false)
         {
             if (_admins.TryGetValue(session, out var reg) && (reg.Data.Active || includeDeAdmin))
-            {
                 return reg.Data;
-            }
 
             return null;
         }
@@ -167,16 +162,13 @@ namespace Content.Server.Administration.Managers
         public void DeAdmin(ICommonSession session)
         {
             if (!_admins.TryGetValue(session, out var reg))
-            {
                 throw new ArgumentException($"Player {session} is not an admin");
-            }
 
             if (!reg.Data.Active)
-            {
                 return;
-            }
 
-            _chat.SendAdminAnnouncement(Loc.GetString("admin-manager-self-de-admin-message", ("exAdminName", session.Name)));
+            _chat.SendAdminAnnouncement(Loc.GetString("admin-manager-self-de-admin-message",
+                ("exAdminName", session.Name)));
             _chat.DispatchServerMessage(session, Loc.GetString("admin-manager-became-normal-player-message"));
 
             UpdateDatabaseDeadminnedState(session, true);
@@ -186,28 +178,10 @@ namespace Content.Server.Administration.Managers
             UpdateAdminStatus(session);
         }
 
-        private async void UpdateDatabaseDeadminnedState(ICommonSession player, bool newState)
-        {
-            try
-            {
-                // NOTE: This function gets called if you deadmin/readmin from a transient admin status.
-                // (e.g. loginlocal)
-                // In which case there may not be a database record.
-                // The DB function handles this scenario fine, but it's worth noting.
-                await _dbManager.UpdateAdminDeadminnedAsync(player.UserId, newState);
-            }
-            catch (Exception)
-            {
-                _sawmill.Error("Failed to save deadmin state to database for {Admin}", player.UserId);
-            }
-        }
-
         public void Stealth(ICommonSession session)
         {
             if (!_admins.TryGetValue(session, out var reg))
-            {
                 throw new ArgumentException($"Player {session} is not an admin");
-            }
 
             if (reg.Data.Stealth)
                 return;
@@ -217,16 +191,18 @@ namespace Content.Server.Administration.Managers
             reg.Data.Stealth = true;
 
             _chat.DispatchServerMessage(session, Loc.GetString("admin-manager-stealthed-message"));
-            _chat.SendAdminAnnouncement(Loc.GetString("admin-manager-self-de-admin-message", ("exAdminName", session.Name)), AdminFlags.Stealth);
-            _chat.SendAdminAnnouncement(Loc.GetString("admin-manager-self-enable-stealth", ("stealthAdminName", session.Name)), flagWhitelist: AdminFlags.Stealth);
+            _chat.SendAdminAnnouncement(
+                Loc.GetString("admin-manager-self-de-admin-message", ("exAdminName", session.Name)),
+                AdminFlags.Stealth);
+            _chat.SendAdminAnnouncement(
+                Loc.GetString("admin-manager-self-enable-stealth", ("stealthAdminName", session.Name)),
+                flagWhitelist: AdminFlags.Stealth);
         }
 
         public void UnStealth(ICommonSession session)
         {
             if (!_admins.TryGetValue(session, out var reg))
-            {
                 throw new ArgumentException($"Player {session} is not an admin");
-            }
 
             if (!reg.Data.Stealth)
                 return;
@@ -236,21 +212,21 @@ namespace Content.Server.Administration.Managers
             reg.Data.Stealth = false;
 
             _chat.DispatchServerMessage(session, Loc.GetString("admin-manager-unstealthed-message"));
-            _chat.SendAdminAnnouncement(Loc.GetString("admin-manager-self-re-admin-message", ("newAdminName", session.Name)), flagBlacklist: AdminFlags.Stealth);
-            _chat.SendAdminAnnouncement(Loc.GetString("admin-manager-self-disable-stealth", ("exStealthAdminName", session.Name)), flagWhitelist: AdminFlags.Stealth);
+            _chat.SendAdminAnnouncement(
+                Loc.GetString("admin-manager-self-re-admin-message", ("newAdminName", session.Name)),
+                AdminFlags.Stealth);
+            _chat.SendAdminAnnouncement(
+                Loc.GetString("admin-manager-self-disable-stealth", ("exStealthAdminName", session.Name)),
+                flagWhitelist: AdminFlags.Stealth);
         }
 
         public void ReAdmin(ICommonSession session)
         {
             if (!_admins.TryGetValue(session, out var reg))
-            {
                 throw new ArgumentException($"Player {session} is not an admin");
-            }
 
             if (reg.Data.Active)
-            {
                 return;
-            }
 
             _chat.DispatchServerMessage(session, Loc.GetString("admin-manager-became-admin-message"));
 
@@ -258,14 +234,14 @@ namespace Content.Server.Administration.Managers
             reg.Data.Active = true;
 
             if (!reg.Data.Stealth)
-            {
-                _chat.SendAdminAnnouncement(Loc.GetString("admin-manager-self-re-admin-message", ("newAdminName", session.Name)));
-            }
+                _chat.SendAdminAnnouncement(Loc.GetString("admin-manager-self-re-admin-message",
+                    ("newAdminName", session.Name)));
             else
             {
                 _chat.DispatchServerMessage(session, Loc.GetString("admin-manager-stealthed-message"));
                 _chat.SendAdminAnnouncement(Loc.GetString("admin-manager-self-re-admin-message",
-                    ("newAdminName", session.Name)), flagWhitelist: AdminFlags.Stealth);
+                        ("newAdminName", session.Name)),
+                    flagWhitelist: AdminFlags.Stealth);
             }
 
             SendPermsChangedEvent(session);
@@ -299,7 +275,7 @@ namespace Content.Server.Administration.Managers
                     var reg = new AdminReg(player, aData)
                     {
                         IsSpecialLogin = special,
-                        RankId = rankId
+                        RankId = rankId,
                     };
                     _admins.Add(player, reg);
                     _chat.DispatchServerMessage(player, Loc.GetString("admin-manager-became-admin-message"));
@@ -315,14 +291,13 @@ namespace Content.Server.Administration.Managers
                     {
                         aData.Active = true;
 
-                        _chat.DispatchServerMessage(player, Loc.GetString("admin-manager-admin-permissions-updated-message"));
+                        _chat.DispatchServerMessage(player,
+                            Loc.GetString("admin-manager-admin-permissions-updated-message"));
                     }
                 }
 
                 if (player.ContentData()!.Stealthed)
-                {
                     aData.Stealth = true;
-                }
             }
 
             SendPermsChangedEvent(player);
@@ -349,18 +324,12 @@ namespace Content.Server.Administration.Managers
                 var (isAvail, flagsReq) = GetRequiredFlag(cmd);
 
                 if (!isAvail)
-                {
                     continue;
-                }
 
                 if (flagsReq.Length != 0)
-                {
                     _commandPermissions.AdminCommands.Add(cmdName, flagsReq);
-                }
                 else
-                {
                     _commandPermissions.AnyCommands.Add(cmdName);
-                }
             }
 
             foreach (var spec in _toolshed.DefaultEnvironment.AllCommands())
@@ -368,30 +337,20 @@ namespace Content.Server.Administration.Managers
                 var (isAvail, flagsReq) = GetRequiredFlag(spec.Cmd);
 
                 if (!isAvail)
-                {
                     continue;
-                }
 
                 if (flagsReq.Length != 0)
-                {
                     _toolshedCommandPermissions.AdminCommands.TryAdd(spec.Cmd.Name, flagsReq);
-                }
                 else
-                {
                     _toolshedCommandPermissions.AnyCommands.Add(spec.Cmd.Name);
-                }
             }
 
             // Load flags for engine commands, since those don't have the attributes.
             if (_res.TryContentFileRead(new ResPath("/engineCommandPerms.yml"), out var efs))
-            {
                 _commandPermissions.LoadPermissionsFromStream(efs);
-            }
 
             if (_res.TryContentFileRead(new ResPath("/toolshedEngineCommandPerms.yml"), out var toolshedPerms))
-            {
                 _toolshedCommandPermissions.LoadPermissionsFromStream(toolshedPerms);
-            }
 
             _toolshed.ActivePermissionController = this;
 
@@ -405,10 +364,127 @@ namespace Content.Server.Administration.Managers
             ReloadAdmin(player);
         }
 
+        public bool TryGetCommandFlags(CommandSpec command, out AdminFlags[]? flags)
+        {
+            var cmdName = command.Cmd.Name;
+
+            if (_toolshedCommandPermissions.AnyCommands.Contains(cmdName))
+            {
+                // Anybody can use this command.
+                flags = null;
+                return true;
+            }
+
+            if (_toolshedCommandPermissions.AdminCommands.TryGetValue(cmdName, out flags))
+                return true;
+
+            flags = null;
+            return false;
+        }
+
+        public bool CanCommand(ICommonSession session, string cmdName)
+        {
+            if (_commandPermissions.AnyCommands.Contains(cmdName))
+            {
+                // Anybody can use this command.
+                return true;
+            }
+
+            if (!_commandPermissions.AdminCommands.TryGetValue(cmdName, out var flagsReq))
+            {
+                // Server-console only.
+                return false;
+            }
+
+            var data = GetAdminData(session);
+            if (data == null)
+            {
+                // Player isn't an admin.
+                return false;
+            }
+
+            foreach (var flagReq in flagsReq)
+            {
+                if (data.HasFlag(flagReq))
+                    return true;
+            }
+
+            return false;
+        }
+
+        public bool CheckInvokable(CommandSpec command, ICommonSession? user, out IConError? error)
+        {
+            if (user is null)
+            {
+                error = null;
+                return true; // Server console.
+            }
+
+            var name = command.Cmd.Name;
+            if (!TryGetCommandFlags(command, out var flags))
+            {
+                // Command is missing permissions.
+                error = new CommandPermissionsUnassignedError(command);
+                return false;
+            }
+
+            if (flags is null)
+            {
+                // Anyone can execute this.
+                error = null;
+                return true;
+            }
+
+            var data = GetAdminData(user);
+            if (data == null)
+            {
+                // Player isn't an admin.
+                error = new NoPermissionError(command);
+                return false;
+            }
+
+            foreach (var flag in flags)
+            {
+                if (data.HasFlag(flag))
+                {
+                    error = null;
+                    return true;
+                }
+            }
+
+            error = new NoPermissionError(command);
+            return false;
+        }
+
+        public bool CanAdminPlace(ICommonSession session) => GetAdminData(session)?.CanAdminPlace() ?? false;
+
+        public bool CanScript(ICommonSession session) => GetAdminData(session)?.CanScript() ?? false;
+
+        public bool CanAdminMenu(ICommonSession session) => GetAdminData(session)?.CanAdminMenu() ?? false;
+
+        public bool CanAdminReloadPrototypes(ICommonSession session) =>
+            GetAdminData(session)?.CanAdminReloadPrototypes() ?? false;
+
         void IPostInjectInit.PostInject()
         {
             _playerManager.PlayerStatusChanged += PlayerStatusChanged;
             _conGroup.Implementation = this;
+        }
+
+        private async void UpdateDatabaseDeadminnedState(ICommonSession player, bool newState)
+        {
+            try
+            {
+                // NOTE: This function gets called if you deadmin/readmin from a transient admin status.
+                // (e.g. loginlocal)
+                // In which case there may not be a database record.
+                // The DB function handles this scenario fine, but it's worth noting.
+                await _dbManager.UpdateAdminDeadminnedAsync(player.UserId, newState);
+            }
+            catch (Exception)
+            {
+                _sawmill.Error("Failed to save deadmin state to database for {Admin}", player.UserId);
+            }
         }
 
         // NOTE: Also sends commands list for non admins..
@@ -440,18 +516,16 @@ namespace Content.Server.Administration.Managers
                 UpdateAdminStatus(e.Session);
             }
             else if (e.NewStatus == SessionStatus.InGame)
-            {
                 LoginAdminMaybe(e.Session);
-            }
             else if (e.NewStatus == SessionStatus.Disconnected)
             {
-                if (_admins.Remove(e.Session, out var reg ) && _cfg.GetCVar(CCVars.AdminAnnounceLogout))
+                if (_admins.Remove(e.Session, out var reg) && _cfg.GetCVar(CCVars.AdminAnnounceLogout))
                 {
                     if (reg.Data.Stealth)
                     {
                         _chat.SendAdminAnnouncement(Loc.GetString("admin-manager-admin-logout-message",
-                            ("name", e.Session.Name)), flagWhitelist: AdminFlags.Stealth);
-
+                                ("name", e.Session.Name)),
+                            flagWhitelist: AdminFlags.Stealth);
                     }
                     else
                     {
@@ -475,7 +549,7 @@ namespace Content.Server.Administration.Managers
             var reg = new AdminReg(session, dat)
             {
                 IsSpecialLogin = specialLogin,
-                RankId = rankId
+                RankId = rankId,
             };
 
             _admins.Add(session, reg);
@@ -490,10 +564,10 @@ namespace Content.Server.Administration.Managers
                 {
                     if (reg.Data.Stealth)
                     {
-
                         _chat.DispatchServerMessage(session, Loc.GetString("admin-manager-stealthed-message"));
                         _chat.SendAdminAnnouncement(Loc.GetString("admin-manager-admin-login-message",
-                            ("name", session.Name)), flagWhitelist: AdminFlags.Stealth);
+                                ("name", session.Name)),
+                            flagWhitelist: AdminFlags.Stealth);
                     }
                     else
                     {
@@ -555,21 +629,15 @@ namespace Content.Server.Administration.Managers
                 var flags = AdminFlags.None;
 
                 if (dbData.AdminRank != null)
-                {
                     flags = AdminFlagsHelper.NamesToFlags(dbData.AdminRank.Flags.Select(p => p.Flag));
-                }
 
                 foreach (var dbFlag in dbData.Flags)
                 {
                     var flag = AdminFlagsHelper.NameToFlag(dbFlag.Flag);
                     if (dbFlag.Negative)
-                    {
                         flags &= ~flag;
-                    }
                     else
-                    {
                         flags |= flag;
-                    }
                 }
 
                 var data = new AdminData
@@ -578,14 +646,10 @@ namespace Content.Server.Administration.Managers
                     Active = !dbData.Deadminned,
                 };
 
-                if (dbData.Title != null  && _cfg.GetCVar(CCVars.AdminUseCustomNamesAdminRank))
-                {
+                if (dbData.Title != null && _cfg.GetCVar(CCVars.AdminUseCustomNamesAdminRank))
                     data.Title = dbData.Title;
-                }
                 else if (dbData.AdminRank != null)
-                {
                     data.Title = dbData.AdminRank.Name;
-                }
 
                 return (data, dbData.AdminRankId, false);
             }
@@ -596,107 +660,9 @@ namespace Content.Server.Administration.Managers
             var ep = player.Channel.RemoteEndPoint;
             var addr = ep.Address;
             if (addr.IsIPv4MappedToIPv6)
-            {
                 addr = addr.MapToIPv4();
-            }
 
-            return Equals(addr, System.Net.IPAddress.Loopback) || Equals(addr, System.Net.IPAddress.IPv6Loopback);
-        }
-
-        public bool TryGetCommandFlags(CommandSpec command, out AdminFlags[]? flags)
-        {
-            var cmdName = command.Cmd.Name;
-
-            if (_toolshedCommandPermissions.AnyCommands.Contains(cmdName))
-            {
-                // Anybody can use this command.
-                flags = null;
-                return true;
-            }
-
-            if (_toolshedCommandPermissions.AdminCommands.TryGetValue(cmdName, out flags))
-            {
-                return true;
-            }
-
-            flags = null;
-            return false;
-        }
-
-        public bool CanCommand(ICommonSession session, string cmdName)
-        {
-            if (_commandPermissions.AnyCommands.Contains(cmdName))
-            {
-                // Anybody can use this command.
-                return true;
-            }
-
-            if (!_commandPermissions.AdminCommands.TryGetValue(cmdName, out var flagsReq))
-            {
-                // Server-console only.
-                return false;
-            }
-
-            var data = GetAdminData(session);
-            if (data == null)
-            {
-                // Player isn't an admin.
-                return false;
-            }
-
-            foreach (var flagReq in flagsReq)
-            {
-                if (data.HasFlag(flagReq))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        public bool CheckInvokable(CommandSpec command, ICommonSession? user, out IConError? error)
-        {
-            if (user is null)
-            {
-                error = null;
-                return true; // Server console.
-            }
-
-            var name = command.Cmd.Name;
-            if (!TryGetCommandFlags(command, out var flags))
-            {
-                // Command is missing permissions.
-                error = new CommandPermissionsUnassignedError(command);
-                return false;
-            }
-
-            if (flags is null)
-            {
-                // Anyone can execute this.
-                error = null;
-                return true;
-            }
-
-            var data = GetAdminData(user);
-            if (data == null)
-            {
-                // Player isn't an admin.
-                error = new NoPermissionError(command);
-                return false;
-            }
-
-            foreach (var flag in flags)
-            {
-                if (data.HasFlag(flag))
-                {
-                    error = null;
-                    return true;
-                }
-            }
-
-            error = new NoPermissionError(command);
-            return false;
+            return Equals(addr, IPAddress.Loopback) || Equals(addr, IPAddress.IPv6Loopback);
         }
 
         private static (bool isAvail, AdminFlags[] flagsReq) GetRequiredFlag(object cmd)
@@ -704,9 +670,7 @@ namespace Content.Server.Administration.Managers
             MemberInfo type = cmd.GetType();
 
             if (cmd is ConsoleHost.RegisteredCommand registered)
-            {
                 type = registered.Callback.Method;
-            }
 
             if (Attribute.IsDefined(type, typeof(AnyCommandAttribute)))
             {
@@ -724,30 +688,7 @@ namespace Content.Server.Administration.Managers
             return (attribs.Length != 0, attribs);
         }
 
-        public bool CanViewVar(ICommonSession session)
-        {
-            return CanCommand(session, "vv");
-        }
-
-        public bool CanAdminPlace(ICommonSession session)
-        {
-            return GetAdminData(session)?.CanAdminPlace() ?? false;
-        }
-
-        public bool CanScript(ICommonSession session)
-        {
-            return GetAdminData(session)?.CanScript() ?? false;
-        }
-
-        public bool CanAdminMenu(ICommonSession session)
-        {
-            return GetAdminData(session)?.CanAdminMenu() ?? false;
-        }
-
-        public bool CanAdminReloadPrototypes(ICommonSession session)
-        {
-            return GetAdminData(session)?.CanAdminReloadPrototypes() ?? false;
-        }
+        public bool CanViewVar(ICommonSession session) => CanCommand(session, "vv");
 
         private void SendPermsChangedEvent(ICommonSession session)
         {
@@ -760,10 +701,10 @@ namespace Content.Server.Administration.Managers
             public readonly ICommonSession Session;
 
             public AdminData Data;
-            public int? RankId;
 
             // Such as console.loginlocal or promotehost
             public bool IsSpecialLogin;
+            public int? RankId;
 
             public AdminReg(ICommonSession session, AdminData data)
             {
@@ -776,10 +717,9 @@ namespace Content.Server.Administration.Managers
 
 public record struct CommandPermissionsUnassignedError(CommandSpec Command) : IConError
 {
-    public FormattedMessage DescribeInner()
-    {
-        return FormattedMessage.FromMarkupOrThrow($"The command {Command.FullName()} is missing permission flags and cannot be executed.");
-    }
+    public FormattedMessage DescribeInner() =>
+        FormattedMessage.FromMarkupOrThrow(
+            $"The command {Command.FullName()} is missing permission flags and cannot be executed.");
 
     public string? Expression { get; set; }
     public Vector2i? IssueSpan { get; set; }
@@ -789,10 +729,8 @@ public record struct CommandPermissionsUnassignedError(CommandSpec Command) : IC
 
 public record struct NoPermissionError(CommandSpec Command) : IConError
 {
-    public FormattedMessage DescribeInner()
-    {
-        return FormattedMessage.FromMarkupOrThrow($"You do not have permission to execute {Command.FullName()}");
-    }
+    public FormattedMessage DescribeInner() =>
+        FormattedMessage.FromMarkupOrThrow($"You do not have permission to execute {Command.FullName()}");
 
     public string? Expression { get; set; }
     public Vector2i? IssueSpan { get; set; }

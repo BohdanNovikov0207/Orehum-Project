@@ -9,5 +9,4 @@ namespace Content.Server.Roles.RoleCodeword;
 
 public sealed class RoleCodewordSystem : SharedRoleCodewordSystem
 {
-
 }

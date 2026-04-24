@@ -33,14 +33,13 @@ namespace Content.Server.AlertLevel;
 
 public sealed class AlertLevelSystem : EntitySystem
 {
-    [Dependency] private readonly IConfigurationManager _cfg = default!;
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-    [Dependency] private readonly ChatSystem _chatSystem = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly StationSystem _stationSystem = default!;
-
     // Until stations are a prototype, this is how it's going to have to be.
     public const string DefaultAlertLevelSet = "stationAlerts";
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly IConfigurationManager _cfg = default!;
+    [Dependency] private readonly ChatSystem _chatSystem = default!;
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    [Dependency] private readonly StationSystem _stationSystem = default!;
 
     public override void Initialize()
     {
@@ -61,6 +60,7 @@ public sealed class AlertLevelSystem : EntitySystem
                     RaiseLocalEvent(new AlertLevelDelayFinishedEvent());
                     alert.ActiveDelay = false;
                 }
+
                 continue;
             }
 
@@ -74,17 +74,13 @@ public sealed class AlertLevelSystem : EntitySystem
             return;
 
         if (!_prototypeManager.TryIndex(alertLevelComponent.AlertLevelPrototype, out AlertLevelPrototype? alerts))
-        {
             return;
-        }
 
         alertLevelComponent.AlertLevels = alerts;
 
         var defaultLevel = alertLevelComponent.AlertLevels.DefaultLevel;
         if (string.IsNullOrEmpty(defaultLevel))
-        {
             defaultLevel = alertLevelComponent.AlertLevels.Levels.Keys.First();
-        }
 
         SetLevel(args.Station, defaultLevel, false, false, true);
     }
@@ -94,9 +90,7 @@ public sealed class AlertLevelSystem : EntitySystem
         if (!args.ByType.TryGetValue(typeof(AlertLevelPrototype), out var alertPrototypes)
             || !alertPrototypes.Modified.TryGetValue(DefaultAlertLevelSet, out var alertObject)
             || alertObject is not AlertLevelPrototype alerts)
-        {
             return;
-        }
 
         var query = EntityQueryEnumerator<AlertLevelComponent>();
         while (query.MoveNext(out var uid, out var comp))
@@ -107,9 +101,7 @@ public sealed class AlertLevelSystem : EntitySystem
             {
                 var defaultLevel = comp.AlertLevels.DefaultLevel;
                 if (string.IsNullOrEmpty(defaultLevel))
-                {
                     defaultLevel = comp.AlertLevels.Levels.Keys.First();
-                }
 
                 SetLevel(uid, defaultLevel, true, true, true);
             }
@@ -121,9 +113,7 @@ public sealed class AlertLevelSystem : EntitySystem
     public string GetLevel(EntityUid station, AlertLevelComponent? alert = null)
     {
         if (!Resolve(station, ref alert))
-        {
             return string.Empty;
-        }
 
         return alert.CurrentLevel;
     }
@@ -131,9 +121,7 @@ public sealed class AlertLevelSystem : EntitySystem
     public float GetAlertLevelDelay(EntityUid station, AlertLevelComponent? alert = null)
     {
         if (!Resolve(station, ref alert))
-        {
             return float.NaN;
-        }
 
         return alert.CurrentDelay;
     }
@@ -146,9 +134,7 @@ public sealed class AlertLevelSystem : EntitySystem
     public string GetDefaultLevel(Entity<AlertLevelComponent?> station)
     {
         if (!Resolve(station.Owner, ref station.Comp) || station.Comp.AlertLevels == null)
-        {
             return string.Empty;
-        }
         return station.Comp.AlertLevels.DefaultLevel;
     }
 
@@ -161,16 +147,20 @@ public sealed class AlertLevelSystem : EntitySystem
     /// <param name="announce">Say the alert level's announcement.</param>
     /// <param name="force">Force the alert change. This applies if the alert level is not selectable or not.</param>
     /// <param name="locked">Will it be possible to change level by crew.</param>
-    public void SetLevel(EntityUid station, string level, bool playSound, bool announce, bool force = false,
-        bool locked = false, MetaDataComponent? dataComponent = null, AlertLevelComponent? component = null)
+    public void SetLevel(EntityUid station,
+        string level,
+        bool playSound,
+        bool announce,
+        bool force = false,
+        bool locked = false,
+        MetaDataComponent? dataComponent = null,
+        AlertLevelComponent? component = null)
     {
         if (!Resolve(station, ref component, ref dataComponent)
             || component.AlertLevels == null
             || !component.AlertLevels.Levels.TryGetValue(level, out var detail)
             || component.CurrentLevel == level)
-        {
             return;
-        }
 
         if (!force)
         {
@@ -178,9 +168,7 @@ public sealed class AlertLevelSystem : EntitySystem
                 && !detail.EmagSelectable // Goobstation
                 || component.CurrentDelay > 0
                 || component.IsLevelLocked)
-            {
                 return;
-            }
 
             component.CurrentDelay = _cfg.GetCVar(CCVars.GameAlertLevelChangeDelay);
             component.ActiveDelay = true;
@@ -194,20 +182,17 @@ public sealed class AlertLevelSystem : EntitySystem
         var name = level.ToLower();
 
         if (Loc.TryGetString($"alert-level-{level}", out var locName))
-        {
             name = locName.ToLower();
-        }
 
         // Announcement text. Is passed into announcementFull.
         var announcement = detail.Announcement;
 
         if (Loc.TryGetString(detail.Announcement, out var locAnnouncement))
-        {
             announcement = locAnnouncement;
-        }
 
         // The full announcement to be spat out into chat.
-        var announcementFull = Loc.GetString("alert-level-announcement", ("name", name), ("announcement", announcement));
+        var announcementFull =
+            Loc.GetString("alert-level-announcement", ("name", name), ("announcement", announcement));
 
         var playDefault = false;
         if (playSound)
@@ -218,15 +203,16 @@ public sealed class AlertLevelSystem : EntitySystem
                 _audio.PlayGlobal(detail.Sound, filter, true, detail.Sound.Params);
             }
             else
-            {
                 playDefault = true;
-            }
         }
 
         if (announce)
         {
-            _chatSystem.DispatchStationAnnouncement(station, announcementFull, playDefaultSound: playDefault,
-                colorOverride: detail.Color, sender: stationName);
+            _chatSystem.DispatchStationAnnouncement(station,
+                announcementFull,
+                playDefaultSound: playDefault,
+                colorOverride: detail.Color,
+                sender: stationName);
         }
 
         RaiseLocalEvent(new AlertLevelChangedEvent(station, level));
@@ -234,19 +220,21 @@ public sealed class AlertLevelSystem : EntitySystem
 }
 
 public sealed class AlertLevelDelayFinishedEvent : EntityEventArgs
-{}
+{
+}
 
 public sealed class AlertLevelPrototypeReloadedEvent : EntityEventArgs
-{}
+{
+}
 
 public sealed class AlertLevelChangedEvent : EntityEventArgs
 {
-    public EntityUid Station { get; }
-    public string AlertLevel { get; }
-
     public AlertLevelChangedEvent(EntityUid station, string alertLevel)
     {
         Station = station;
         AlertLevel = alertLevel;
     }
+
+    public EntityUid Station { get; }
+    public string AlertLevel { get; }
 }

@@ -3,9 +3,9 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-namespace Content.Server.Mail.Components
+namespace Content.Server.Mail.Components;
+
+[RegisterComponent]
+public sealed partial class MailReceiverComponent : Component
 {
-    [RegisterComponent]
-    public sealed partial class MailReceiverComponent : Component
-    {}
 }

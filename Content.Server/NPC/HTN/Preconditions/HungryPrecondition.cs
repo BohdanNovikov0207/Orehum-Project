@@ -21,10 +21,10 @@ public sealed partial class HungryPrecondition : HTNPrecondition
     public override bool IsMet(NPCBlackboard blackboard)
     {
         if (!blackboard.TryGetValue<EntityUid>(NPCBlackboard.Owner, out var owner, _entManager))
-        {
             return false;
-        }
 
-        return _entManager.TryGetComponent<HungerComponent>(owner, out var hunger) ? hunger.CurrentThreshold <= MinHungerState : false;
+        return _entManager.TryGetComponent<HungerComponent>(owner, out var hunger)
+            ? hunger.CurrentThreshold <= MinHungerState
+            : false;
     }
 }

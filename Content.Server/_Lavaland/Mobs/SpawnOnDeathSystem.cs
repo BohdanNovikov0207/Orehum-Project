@@ -16,8 +16,8 @@ namespace Content.Server._Lavaland.Mobs;
 public sealed class SpawnOnDeathSystem : EntitySystem
 {
     [Dependency] private readonly EntityTableSystem _entityTable = default!;
-    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
     [Dependency] private readonly MobStateSystem _mobState = default!;
+    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
 
     public override void Initialize()
     {
@@ -25,10 +25,8 @@ public sealed class SpawnOnDeathSystem : EntitySystem
         SubscribeLocalEvent<SpawnLootOnDeathComponent, MobStateChangedEvent>(OnDropKilled);
     }
 
-    private void OnDropAttacked(EntityUid uid, SpawnLootOnDeathComponent comp, ref AttackedEvent args)
-    {
+    private void OnDropAttacked(EntityUid uid, SpawnLootOnDeathComponent comp, ref AttackedEvent args) =>
         comp.DoSpecialLoot = _whitelist.IsWhitelistPassOrNull(comp.SpecialWeaponWhitelist, args.Used);
-    }
 
     private void OnDropKilled(EntityUid uid, SpawnLootOnDeathComponent comp, ref MobStateChangedEvent args)
     {

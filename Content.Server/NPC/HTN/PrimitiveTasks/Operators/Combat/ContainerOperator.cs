@@ -14,11 +14,11 @@ public sealed partial class ContainerOperator : HTNOperator
     private ContainerSystem _container = default!;
     private EntityQuery<TransformComponent> _transformQuery;
 
-    [DataField("shutdownState")]
-    public HTNPlanState ShutdownState { get; private set; } = HTNPlanState.TaskFinished;
-
     [DataField("targetKey", required: true)]
     public string TargetKey = default!;
+
+    [DataField("shutdownState")]
+    public HTNPlanState ShutdownState { get; private set; } = HTNPlanState.TaskFinished;
 
     public override void Initialize(IEntitySystemManager sysManager)
     {
@@ -32,15 +32,13 @@ public sealed partial class ContainerOperator : HTNOperator
         base.Startup(blackboard);
         var owner = blackboard.GetValue<EntityUid>(NPCBlackboard.Owner);
 
-        if (!_container.TryGetOuterContainer(owner, _transformQuery.GetComponent(owner), out var outerContainer) && outerContainer == null)
+        if (!_container.TryGetOuterContainer(owner, _transformQuery.GetComponent(owner), out var outerContainer) &&
+            outerContainer == null)
             return;
 
         var target = outerContainer.Owner;
         blackboard.SetValue(TargetKey, target);
     }
 
-    public override HTNOperatorStatus Update(NPCBlackboard blackboard, float frameTime)
-    {
-        return HTNOperatorStatus.Finished;
-    }
+    public override HTNOperatorStatus Update(NPCBlackboard blackboard, float frameTime) => HTNOperatorStatus.Finished;
 }

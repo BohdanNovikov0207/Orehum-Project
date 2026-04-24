@@ -86,10 +86,7 @@ namespace Content.Server.Explosion.EntitySystems;
 // This part of the system handled send visual / overlay data to clients.
 public sealed partial class ExplosionSystem
 {
-    public void InitVisuals()
-    {
-        SubscribeLocalEvent<ExplosionVisualsComponent, ComponentGetState>(OnGetState);
-    }
+    public void InitVisuals() => SubscribeLocalEvent<ExplosionVisualsComponent, ComponentGetState>(OnGetState);
 
     private void OnGetState(EntityUid uid, ExplosionVisualsComponent component, ref ComponentGetState args)
     {
@@ -110,9 +107,14 @@ public sealed partial class ExplosionSystem
     }
 
     /// <summary>
-    ///     Constructor for the shared <see cref="ExplosionEvent"/> using the server-exclusive explosion classes.
+    /// Constructor for the shared <see cref="ExplosionEvent" /> using the server-exclusive explosion classes.
     /// </summary>
-    private EntityUid CreateExplosionVisualEntity(MapCoordinates epicenter, string prototype, Matrix3x2 spaceMatrix, ExplosionSpaceTileFlood? spaceData, IEnumerable<ExplosionGridTileFlood> gridData, List<float> iterationIntensity)
+    private EntityUid CreateExplosionVisualEntity(MapCoordinates epicenter,
+        string prototype,
+        Matrix3x2 spaceMatrix,
+        ExplosionSpaceTileFlood? spaceData,
+        IEnumerable<ExplosionGridTileFlood> gridData,
+        List<float> iterationIntensity)
     {
         var explosionEntity = Spawn(null, MapCoordinates.Nullspace);
         var comp = AddComp<ExplosionVisualsComponent>(explosionEntity);

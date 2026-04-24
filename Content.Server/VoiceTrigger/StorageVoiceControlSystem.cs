@@ -15,9 +15,9 @@ namespace Content.Server.VoiceTrigger;
 /// </summary>
 public sealed class StorageVoiceControlSystem : EntitySystem
 {
+    [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
     [Dependency] private readonly ContainerSystem _container = default!;
     [Dependency] private readonly HandsSystem _hands = default!;
-    [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
     [Dependency] private readonly InventorySystem _inventory = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly StorageSystem _storage = default!;
@@ -46,16 +46,22 @@ public sealed class StorageVoiceControlSystem : EntitySystem
             // Disallow insertion and provide a reason why if the person decides to insert the item into itself
             if (ent.Owner.Equals(activeItem.Value))
             {
-                _popup.PopupEntity(Loc.GetString("comp-storagevoicecontrol-self-insert", ("entity", activeItem.Value)), ent, args.Source);
+                _popup.PopupEntity(Loc.GetString("comp-storagevoicecontrol-self-insert", ("entity", activeItem.Value)),
+                    ent,
+                    args.Source);
                 return;
             }
+
             if (_storage.CanInsert(ent, activeItem.Value, out var failedReason))
             {
                 // We adminlog before insertion, otherwise the logger will attempt to pull info on an entity that no longer is present and throw an exception
-                _adminLogger.Add(LogType.Action, LogImpact.Low, $"{ToPrettyString(args.Source)} inserted {ToPrettyString(activeItem.Value)} into {ToPrettyString(ent)} via voice control");
+                _adminLogger.Add(LogType.Action,
+                    LogImpact.Low,
+                    $"{ToPrettyString(args.Source)} inserted {ToPrettyString(activeItem.Value)} into {ToPrettyString(ent)} via voice control");
                 _storage.Insert(ent, activeItem.Value, out _);
                 return;
             }
+
             {
                 // Tell the player the reason why the item couldn't be inserted
                 if (failedReason == null)
@@ -85,7 +91,7 @@ public sealed class StorageVoiceControlSystem : EntitySystem
     /// <summary>
     /// Extracts an item from storage and places it into the player's hands.
     /// </summary>
-    /// <param name="ent">The entity with the <see cref="StorageVoiceControlComponent"/></param>
+    /// <param name="ent">The entity with the <see cref="StorageVoiceControlComponent" /></param>
     /// <param name="item">The entity to be extracted from the attached storage</param>
     /// <param name="source">The entity wearing the item</param>
     private void ExtractItemFromStorage(Entity<StorageVoiceControlComponent> ent,

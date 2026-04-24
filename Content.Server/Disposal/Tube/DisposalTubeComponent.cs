@@ -37,6 +37,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Server.Disposal.Unit;
 using Content.Shared.Damage;
 using Robust.Shared.Audio;
@@ -49,16 +50,17 @@ namespace Content.Server.Disposal.Tube;
 public sealed partial class DisposalTubeComponent : Component
 {
     [DataField]
-    public string ContainerId = "DisposalTube";
+    public SoundSpecifier ClangSound =
+        new SoundPathSpecifier("/Audio/Effects/clang.ogg", AudioParams.Default.WithVolume(-5f));
 
     [ViewVariables]
     public bool Connected;
 
     [DataField]
-    public SoundSpecifier ClangSound = new SoundPathSpecifier("/Audio/Effects/clang.ogg", AudioParams.Default.WithVolume(-5f));
+    public string ContainerId = "DisposalTube";
 
     /// <summary>
-    ///     Container of entities that are currently inside this tube
+    /// Container of entities that are currently inside this tube
     /// </summary>
     [ViewVariables]
     public Container Contents = default!;
@@ -66,12 +68,12 @@ public sealed partial class DisposalTubeComponent : Component
     /// <summary>
     /// Damage dealt to containing entities on every turn
     /// </summary>
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    [DataField] [ViewVariables(VVAccess.ReadWrite)]
     public DamageSpecifier DamageOnTurn = new()
     {
-        DamageDict = new()
+        DamageDict = new Dictionary<string, FixedPoint2>
         {
             { "Blunt", 0.0 },
-        }
+        },
     };
 }

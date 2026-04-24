@@ -11,30 +11,26 @@ using Content.Server.EUI;
 using Content.Shared.Eui;
 using Content.Shared.Ghost.Roles;
 
-namespace Content.Server.Ghost.Roles.UI
+namespace Content.Server.Ghost.Roles.UI;
+
+public sealed class MakeGhostRoleEui : BaseEui
 {
-    public sealed class MakeGhostRoleEui : BaseEui
+    private readonly IEntityManager _entManager;
+
+    public MakeGhostRoleEui(IEntityManager entManager, NetEntity entity)
     {
-        private IEntityManager _entManager;
+        _entManager = entManager;
+        Entity = entity;
+    }
 
-        public MakeGhostRoleEui(IEntityManager entManager, NetEntity entity)
-        {
-            _entManager = entManager;
-            Entity = entity;
-        }
+    public NetEntity Entity { get; }
 
-        public NetEntity Entity { get; }
+    public override EuiStateBase GetNewState() => new MakeGhostRoleEuiState(Entity);
 
-        public override EuiStateBase GetNewState()
-        {
-            return new MakeGhostRoleEuiState(Entity);
-        }
+    public override void Closed()
+    {
+        base.Closed();
 
-        public override void Closed()
-        {
-            base.Closed();
-
-            _entManager.System<GhostRoleSystem>().CloseMakeGhostRoleEui(Player);
-        }
+        _entManager.System<GhostRoleSystem>().CloseMakeGhostRoleEui(Player);
     }
 }

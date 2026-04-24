@@ -23,19 +23,27 @@ namespace Content.Server.Database;
 /// and ensures data is loaded before allowing players to spawn or such.
 /// </summary>
 /// <remarks>
-/// Actual loading code is handled by separate managers such as <see cref="IServerPreferencesManager"/>.
+/// Actual loading code is handled by separate managers such as <see cref="IServerPreferencesManager" />.
 /// This manager is simply a centralized "is loading done" controller for other code to rely on.
 /// </remarks>
 public sealed class UserDbDataManager : IPostInjectInit
 {
-    [Dependency] private readonly ILogManager _logManager = default!;
+    public delegate void OnFinishLoad(ICommonSession player);
 
-    private readonly Dictionary<NetUserId, UserData> _users = new();
-    private readonly List<OnLoadPlayer> _onLoadPlayer = [];
+    public delegate Task OnLoadPlayer(ICommonSession player, CancellationToken cancel);
+
+    public delegate void OnPlayerDisconnect(ICommonSession player);
+
+    [Dependency] private readonly ILogManager _logManager = default!;
     private readonly List<OnFinishLoad> _onFinishLoad = [];
+    private readonly List<OnLoadPlayer> _onLoadPlayer = [];
     private readonly List<OnPlayerDisconnect> _onPlayerDisconnect = [];
 
+    private readonly Dictionary<NetUserId, UserData> _users = new();
+
     private ISawmill _sawmill = default!;
+
+    void IPostInjectInit.PostInject() => _sawmill = _logManager.GetSawmill("userdb");
 
     // TODO: Ideally connected/disconnected would be subscribed to IPlayerManager directly,
     // but this runs into ordering issues with game ticker.
@@ -117,52 +125,23 @@ public sealed class UserDbDataManager : IPostInjectInit
     /// </summary>
     /// <remarks>
     /// The task returned by this function may end up in a cancelled state
-    /// (throwing <see cref="OperationCanceledException"/>) if the user disconnects while loading or an error occurs.
+    /// (throwing <see cref="OperationCanceledException" />) if the user disconnects while loading or an error occurs.
     /// </remarks>
     /// <param name="session"></param>
     /// <returns>
     /// A task that completes when all on-database data for a user has finished loading.
     /// </returns>
-    public Task WaitLoadComplete(ICommonSession session)
-    {
-        return _users[session.UserId].Task;
-    }
+    public Task WaitLoadComplete(ICommonSession session) => _users[session.UserId].Task;
 
-    public bool IsLoadComplete(ICommonSession session)
-    {
-        return GetLoadTask(session).IsCompletedSuccessfully;
-    }
+    public bool IsLoadComplete(ICommonSession session) => GetLoadTask(session).IsCompletedSuccessfully;
 
-    public Task GetLoadTask(ICommonSession session)
-    {
-        return _users[session.UserId].Task;
-    }
+    public Task GetLoadTask(ICommonSession session) => _users[session.UserId].Task;
 
-    public void AddOnLoadPlayer(OnLoadPlayer action)
-    {
-        _onLoadPlayer.Add(action);
-    }
+    public void AddOnLoadPlayer(OnLoadPlayer action) => _onLoadPlayer.Add(action);
 
-    public void AddOnFinishLoad(OnFinishLoad action)
-    {
-        _onFinishLoad.Add(action);
-    }
+    public void AddOnFinishLoad(OnFinishLoad action) => _onFinishLoad.Add(action);
 
-    public void AddOnPlayerDisconnect(OnPlayerDisconnect action)
-    {
-        _onPlayerDisconnect.Add(action);
-    }
-
-    void IPostInjectInit.PostInject()
-    {
-        _sawmill = _logManager.GetSawmill("userdb");
-    }
+    public void AddOnPlayerDisconnect(OnPlayerDisconnect action) => _onPlayerDisconnect.Add(action);
 
     private sealed record UserData(CancellationTokenSource Cancel, Task Task);
-
-    public delegate Task OnLoadPlayer(ICommonSession player, CancellationToken cancel);
-
-    public delegate void OnFinishLoad(ICommonSession player);
-
-    public delegate void OnPlayerDisconnect(ICommonSession player);
 }

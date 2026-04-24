@@ -21,8 +21,7 @@ public sealed class RoleplayObjectiveSystem : EntitySystem
         SubscribeLocalEvent<RoleplayObjectiveComponent, ObjectiveGetProgressEvent>(OnRoleplayGetProgress);
     }
 
-    private void OnRoleplayGetProgress(EntityUid uid, RoleplayObjectiveComponent comp, ref ObjectiveGetProgressEvent args)
-    {
-        args.Progress = 1f;
-    }
+    private void OnRoleplayGetProgress(EntityUid uid,
+        RoleplayObjectiveComponent comp,
+        ref ObjectiveGetProgressEvent args) => args.Progress = 1f;
 }

@@ -13,7 +13,7 @@ namespace Content.Server.Atmos.EntitySystems;
 /// <summary>
 /// The system responsible for checking and adjusting the connection layering of gas pipes
 /// </summary>
-public sealed partial class AtmosPipeLayersSystem : SharedAtmosPipeLayersSystem
+public sealed class AtmosPipeLayersSystem : SharedAtmosPipeLayersSystem
 {
     [Dependency] private readonly NodeGroupSystem _nodeGroup = default!;
     [Dependency] private readonly PipeRestrictOverlapSystem _pipeRestrictOverlap = default!;
@@ -27,13 +27,14 @@ public sealed partial class AtmosPipeLayersSystem : SharedAtmosPipeLayersSystem
         SubscribeLocalEvent<AtmosPipeLayersComponent, ComponentInit>(OnInit);
     }
 
-    private void OnInit(Entity<AtmosPipeLayersComponent> ent, ref ComponentInit args)
-    {
+    private void OnInit(Entity<AtmosPipeLayersComponent> ent, ref ComponentInit args) =>
         SetPipeLayer(ent, ent.Comp.CurrentPipeLayer);
-    }
 
-    /// <inheritdoc/>
-    public override void SetPipeLayer(Entity<AtmosPipeLayersComponent> ent, AtmosPipeLayer layer, EntityUid? user = null, EntityUid? used = null)
+    /// <inheritdoc />
+    public override void SetPipeLayer(Entity<AtmosPipeLayersComponent> ent,
+        AtmosPipeLayer layer,
+        EntityUid? user = null,
+        EntityUid? used = null)
     {
         if (ent.Comp.PipeLayersLocked)
             return;
@@ -55,7 +56,7 @@ public sealed partial class AtmosPipeLayersSystem : SharedAtmosPipeLayersSystem
             pipeNode.CurrentPipeLayer = ent.Comp.CurrentPipeLayer;
 
             if (pipeNode.NodeGroup != null)
-                _nodeGroup.QueueRemakeGroup((BaseNodeGroup)pipeNode.NodeGroup);
+                _nodeGroup.QueueRemakeGroup((BaseNodeGroup) pipeNode.NodeGroup);
         }
 
         // If a user wasn't responsible for unanchoring the pipe, leave it be
@@ -65,7 +66,8 @@ public sealed partial class AtmosPipeLayersSystem : SharedAtmosPipeLayersSystem
         // Unanchor the pipe if its new layer overlaps with another pipe
         var xform = Transform(ent);
 
-        if (!HasComp<PipeRestrictOverlapComponent>(ent) || !_pipeRestrictOverlap.CheckOverlap((ent, nodeContainer, xform)))
+        if (!HasComp<PipeRestrictOverlapComponent>(ent) ||
+            !_pipeRestrictOverlap.CheckOverlap((ent, nodeContainer, xform)))
             return;
 
         RaiseLocalEvent(ent, new BeforeUnanchoredEvent(user.Value, used.Value));

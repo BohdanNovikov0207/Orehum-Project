@@ -7,18 +7,18 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Server.EUI;
 using Content.Shared.Administration;
 using Robust.Shared.Console;
-using Content.Server.EUI;
 
 namespace Content.Server.Administration.Commands;
 
 [AdminCommand(AdminFlags.Ban)]
 public sealed class BanPanelCommand : LocalizedCommands
 {
+    [Dependency] private readonly EuiManager _euis = default!;
 
     [Dependency] private readonly IPlayerLocator _locator = default!;
-    [Dependency] private readonly EuiManager _euis = default!;
 
     public override string Command => "banpanel";
 
@@ -42,6 +42,7 @@ public sealed class BanPanelCommand : LocalizedCommands
                     shell.WriteError(Loc.GetString("cmd-banpanel-player-err"));
                     return;
                 }
+
                 var ui = new BanPanelEui();
                 _euis.OpenEui(ui, player);
                 ui.ChangePlayer(located.UserId, located.Username, located.LastAddress, located.LastHWId);

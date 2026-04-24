@@ -84,7 +84,8 @@ using Robust.Server.GameObjects;
 namespace Content.Server.Tesla.EntitySystems;
 
 /// <summary>
-/// The component allows lightning to strike this target. And determining the behavior of the target when struck by lightning.
+/// The component allows lightning to strike this target. And determining the behavior of the target when struck by
+/// lightning.
 /// </summary>
 public sealed class LightningTargetSystem : EntitySystem
 {
@@ -110,7 +111,8 @@ public sealed class LightningTargetSystem : EntitySystem
             _explosionSystem.QueueExplosion(
                 _transform.GetMapCoordinates(uid),
                 uid.Comp.ExplosionPrototype,
-                uid.Comp.TotalIntensity, uid.Comp.Dropoff,
+                uid.Comp.TotalIntensity,
+                uid.Comp.Dropoff,
                 uid.Comp.MaxTileIntensity,
                 uid,
                 canCreateVacuum: false);

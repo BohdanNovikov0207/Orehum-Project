@@ -8,33 +8,33 @@ namespace Content.Server._DV.Weather;
 /// <summary>
 /// Makes weather randomly happen every so often.
 /// </summary>
-[RegisterComponent, Access(typeof(WeatherSchedulerSystem))]
+[RegisterComponent] [Access(typeof(WeatherSchedulerSystem))]
 [AutoGenerateComponentPause]
 public sealed partial class WeatherSchedulerComponent : Component
 {
     /// <summary>
-    /// Weather stages to schedule.
+    /// When to go to the next step of the schedule.
     /// </summary>
-    [DataField(required: true)]
-    public List<WeatherStage> Stages = new();
+    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))] [AutoPausedField]
+    public TimeSpan NextUpdate;
 
     /// <summary>
-    /// The index of <see cref="Stages"/> to use next, wraps back to the start.
+    /// The index of <see cref="Stages" /> to use next, wraps back to the start.
     /// </summary>
     [DataField]
     public int Stage;
 
     /// <summary>
-    /// When to go to the next step of the schedule.
+    /// Weather stages to schedule.
     /// </summary>
-    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer)), AutoPausedField]
-    public TimeSpan NextUpdate;
+    [DataField(required: true)]
+    public List<WeatherStage> Stages = new();
 }
 
 /// <summary>
 /// A stage in a weather schedule.
 /// </summary>
-[Serializable, DataDefinition]
+[Serializable] [DataDefinition]
 public partial struct WeatherStage
 {
     /// <summary>

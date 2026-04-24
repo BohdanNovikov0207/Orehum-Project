@@ -14,32 +14,33 @@
 
 using Content.Server.Gateway.Components;
 using Content.Server.Station.Systems;
-using Content.Shared.UserInterface;
 using Content.Shared.Access.Systems;
 using Content.Shared.Gateway;
 using Content.Shared.Popups;
-using Content.Shared.Tag; // Goobstation
+using Content.Shared.Tag;
 using Content.Shared.Teleportation.Components;
 using Content.Shared.Teleportation.Systems;
+using Content.Shared.UserInterface;
 using Robust.Server.GameObjects;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Timing;
 using Robust.Shared.Utility;
+// Goobstation
 
 namespace Content.Server.Gateway.Systems;
 
 public sealed class GatewaySystem : EntitySystem
 {
     [Dependency] private readonly AccessReaderSystem _accessReader = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly LinkedEntitySystem _linkedEntity = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly LinkedEntitySystem _linkedEntity = default!;
     [Dependency] private readonly MetaDataSystem _metadata = default!;
-    [Dependency] private readonly StationSystem _stations = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly UserInterfaceSystem _ui = default!;
+    [Dependency] private readonly StationSystem _stations = default!;
     [Dependency] private readonly TagSystem _tag = default!; // Goobstation
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly UserInterfaceSystem _ui = default!;
 
     public override void Initialize()
     {
@@ -60,11 +61,9 @@ public sealed class GatewaySystem : EntitySystem
         UpdateAllGateways();
     }
 
-    private void OnStartup(EntityUid uid, GatewayComponent comp, ComponentStartup args)
-    {
+    private void OnStartup(EntityUid uid, GatewayComponent comp, ComponentStartup args) =>
         // no need to update ui since its just been created, just do portal
         UpdateAppearance(uid);
-    }
 
     private void OnGatewayOpenAttempt(EntityUid uid, GatewayComponent component, ref ActivatableUIOpenAttemptEvent args)
     {
@@ -72,10 +71,7 @@ public sealed class GatewaySystem : EntitySystem
             args.Cancel();
     }
 
-    private void UpdateUserInterface<T>(EntityUid uid, GatewayComponent comp, T args)
-    {
-        UpdateUserInterface(uid, comp);
-    }
+    private void UpdateUserInterface<T>(EntityUid uid, GatewayComponent comp, T args) => UpdateUserInterface(uid, comp);
 
     public void UpdateAllGateways()
     {
@@ -103,8 +99,8 @@ public sealed class GatewaySystem : EntitySystem
         // - If our map is a generated destination then use the generator that made it
 
         if (TryComp(_stations.GetOwningStation(uid), out GatewayGeneratorComponent? generatorComp) ||
-            (TryComp(xform.MapUid, out GatewayGeneratorDestinationComponent? generatorDestination) &&
-             TryComp(generatorDestination.Generator, out generatorComp)))
+            TryComp(xform.MapUid, out GatewayGeneratorDestinationComponent? generatorDestination) &&
+            TryComp(generatorDestination.Generator, out generatorComp))
         {
             nextUnlock = generatorComp.NextUnlock;
             unlockTime = generatorComp.UnlockCooldown;
@@ -115,23 +111,29 @@ public sealed class GatewaySystem : EntitySystem
             // Goobstation
             if (!dest.Enabled
                 || destUid == uid
-                || (comp.TagRestriction != null && !_tag.HasTag(destUid, comp.TagRestriction.Value)) // if we have a tag restriction and destination doesn't have it, abort
-                || (dest.TagRestriction != null && !_tag.HasTag(uid, dest.TagRestriction.Value))) // if destination has a tag restriction but we don't have the tag, abort
+                || comp.TagRestriction != null &&
+                !_tag.HasTag(destUid,
+                    comp.TagRestriction.Value) // if we have a tag restriction and destination doesn't have it, abort
+                || dest.TagRestriction != null &&
+                !_tag.HasTag(uid,
+                    dest.TagRestriction.Value)) // if destination has a tag restriction but we don't have the tag, abort
                 continue;
 
             // Show destination if either no destination comp on the map or it's ours.
             TryComp<GatewayGeneratorDestinationComponent>(destXform.MapUid, out var gatewayDestination);
 
-            destinations.Add(new GatewayDestinationData()
+            destinations.Add(new GatewayDestinationData
             {
                 Entity = GetNetEntity(destUid),
                 // Fallback to grid's ID if applicable.
-                Name = dest.Name.IsEmpty && destXform.GridUid != null ? FormattedMessage.FromUnformatted(MetaData(destXform.GridUid.Value).EntityName) : dest.Name ,
+                Name = dest.Name.IsEmpty && destXform.GridUid != null
+                    ? FormattedMessage.FromUnformatted(MetaData(destXform.GridUid.Value).EntityName)
+                    : dest.Name,
                 Portal = HasComp<PortalComponent>(destUid),
                 // If NextUnlock < CurTime it's unlocked, however
                 // we'll always send the client if it's locked
                 // It can just infer unlock times locally and not have to worry about it here.
-                Locked = gatewayDestination != null && gatewayDestination.Locked
+                Locked = gatewayDestination != null && gatewayDestination.Locked,
             });
         }
 
@@ -149,18 +151,14 @@ public sealed class GatewaySystem : EntitySystem
         _ui.SetUiState(uid, GatewayUiKey.Key, state);
     }
 
-    private void UpdateAppearance(EntityUid uid)
-    {
+    private void UpdateAppearance(EntityUid uid) =>
         _appearance.SetData(uid, GatewayVisuals.Active, HasComp<PortalComponent>(uid));
-    }
 
     private void OnOpenPortal(EntityUid uid, GatewayComponent comp, GatewayOpenPortalMessage args)
     {
         if (GetNetEntity(uid) == args.Destination ||
             !comp.Enabled || !comp.Interactable)
-        {
             return;
-        }
 
         // if the gateway has an access reader check it before allowing opening
         var user = args.Actor;
@@ -174,16 +172,18 @@ public sealed class GatewaySystem : EntitySystem
         if (!TryComp<GatewayComponent>(desto, out var dest) ||
             !dest.Enabled ||
             _timing.CurTime < _metadata.GetPauseTime(uid) + comp.NextReady)
-        {
             return;
-        }
 
         // TODO: admin log???
         ClosePortal(uid, comp, false);
         OpenPortal(uid, comp, desto, dest);
     }
 
-    private void OpenPortal(EntityUid uid, GatewayComponent comp, EntityUid dest, GatewayComponent destComp, TransformComponent? destXform = null)
+    private void OpenPortal(EntityUid uid,
+        GatewayComponent comp,
+        EntityUid dest,
+        GatewayComponent destComp,
+        TransformComponent? destXform = null)
     {
         if (!Resolve(dest, ref destXform) || destXform.MapUid == null)
             return;
@@ -298,7 +298,9 @@ public sealed class GatewaySystem : EntitySystem
         return true;
     }
 
-    public void SetDestinationName(EntityUid gatewayUid, FormattedMessage gatewayName, GatewayComponent? gatewayComp = null)
+    public void SetDestinationName(EntityUid gatewayUid,
+        FormattedMessage gatewayName,
+        GatewayComponent? gatewayComp = null)
     {
         if (!Resolve(gatewayUid, ref gatewayComp))
             return;
@@ -313,8 +315,8 @@ public sealed class GatewaySystem : EntitySystem
 [ByRefEvent]
 public record struct AttemptGatewayOpenEvent(EntityUid MapUid, EntityUid GatewayDestinationUid)
 {
-    public readonly EntityUid MapUid = MapUid;
     public readonly EntityUid GatewayDestinationUid = GatewayDestinationUid;
+    public readonly EntityUid MapUid = MapUid;
 
     public bool Cancelled = false;
 }

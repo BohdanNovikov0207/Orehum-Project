@@ -10,14 +10,20 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Server.Anomaly.Components;
 
-[RegisterComponent, AutoGenerateComponentPause, Access(typeof(TechAnomalySystem))]
+[RegisterComponent] [AutoGenerateComponentPause] [Access(typeof(TechAnomalySystem))]
 public sealed partial class TechAnomalyComponent : Component
 {
     /// <summary>
-    /// the distance at which random ports will bind to the anomaly. Scales with severity.
+    /// Chance of emag the device, when supercrit
     /// </summary>
     [DataField]
-    public MinMax LinkRadius = new(5, 10);
+    public float EmagSupercritProbability = 0.4f;
+
+    /// <summary>
+    /// A prototype beam shot into devices when pulsed
+    /// </summary>
+    [DataField]
+    public EntProtoId LinkBeamProto = "AnomalyTechBeam";
 
     /// <summary>
     /// the maximum number of entities with which an anomaly is associated during pulsing. Scales with severity
@@ -32,35 +38,29 @@ public sealed partial class TechAnomalyComponent : Component
     public int LinkCountSupercritical = 30;
 
     /// <summary>
+    /// the distance at which random ports will bind to the anomaly. Scales with severity.
+    /// </summary>
+    [DataField]
+    public MinMax LinkRadius = new(5, 10);
+
+    /// <summary>
+    /// time until the next activation of the timer ports
+    /// </summary>
+    [DataField] [AutoPausedField]
+    public TimeSpan NextTimer = TimeSpan.Zero;
+
+    /// <summary>
     /// port activated by pulsation of the anomaly
     /// </summary>
     [DataField]
     public ProtoId<SourcePortPrototype> PulsePort = "Pulse";
+
+    [DataField]
+    public float TimerFrequency = 3f;
 
     /// <summary>
     /// A port that activates every few seconds of an anomaly's lifetime
     /// </summary>
     [DataField]
     public ProtoId<SourcePortPrototype> TimerPort = "Timer";
-
-    /// <summary>
-    /// Chance of emag the device, when supercrit
-    /// </summary>
-    [DataField]
-    public float EmagSupercritProbability = 0.4f;
-
-    /// <summary>
-    /// A prototype beam shot into devices when pulsed
-    /// </summary>
-    [DataField]
-    public EntProtoId LinkBeamProto = "AnomalyTechBeam";
-
-    /// <summary>
-    /// time until the next activation of the timer ports
-    /// </summary>
-    [DataField, AutoPausedField]
-    public TimeSpan NextTimer = TimeSpan.Zero;
-
-    [DataField]
-    public float TimerFrequency = 3f;
 }

@@ -20,7 +20,10 @@ public sealed class MobReplacementRuleSystem : GameRuleSystem<MobReplacementRule
 {
     [Dependency] private readonly IRobustRandom _random = default!;
 
-    protected override void Started(EntityUid uid, MobReplacementRuleComponent component, GameRuleComponent gameRule, GameRuleStartedEvent args)
+    protected override void Started(EntityUid uid,
+        MobReplacementRuleComponent component,
+        GameRuleComponent gameRule,
+        GameRuleStartedEvent args)
     {
         base.Started(uid, component, gameRule, args);
 

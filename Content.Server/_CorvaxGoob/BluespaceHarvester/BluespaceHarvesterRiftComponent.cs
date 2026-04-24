@@ -12,37 +12,38 @@ public sealed partial class BluespaceHarvesterRiftComponent : Component
     public int Danger;
 
     /// <summary>
-    /// The portal also periodically generates a random, weak mob from the PassiveSpawn list.
+    /// A list of weak monsters that will encourage breaking rifts.
     /// </summary>
     [DataField]
-    public float PassiveSpawnCooldown = 30f;
+    public List<EntProtoId> PassiveSpawn = new();
 
     [DataField]
     public float PassiveSpawnAccumulator;
 
     /// <summary>
-    /// A list of weak monsters that will encourage breaking rifts.
+    /// The portal also periodically generates a random, weak mob from the PassiveSpawn list.
     /// </summary>
     [DataField]
-    public List<EntProtoId> PassiveSpawn = new();
+    public float PassiveSpawnCooldown = 30f;
+
+    /// <summary>
+    /// Monsters and their cost for purchase through the portal are described here; there may be expensive but very dangerous
+    /// creatures, for example, kudzu or a dragon.
+    /// </summary>
+    [DataField]
+    public List<EntitySpawn> Spawn = new();
+
+    [DataField]
+    public float SpawnAccumulator;
 
     /// <summary>
     /// Delay between attempts to spawn more than 3 mobs.
     /// </summary>
     [DataField]
     public float SpawnCooldown = 5f;
-
-    [DataField]
-    public float SpawnAccumulator;
-
-    /// <summary>
-    /// Monsters and their cost for purchase through the portal are described here; there may be expensive but very dangerous creatures, for example, kudzu or a dragon.
-    /// </summary>
-    [DataField]
-    public List<EntitySpawn> Spawn = new();
 }
 
-[Serializable, DataDefinition]
+[Serializable] [DataDefinition]
 public partial struct EntitySpawn
 {
     [DataField]

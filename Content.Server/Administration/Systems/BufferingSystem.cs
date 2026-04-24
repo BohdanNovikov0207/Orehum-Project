@@ -31,7 +31,8 @@ public sealed class BufferingSystem : EntitySystem
 
                 Del(buffering.BufferingIcon.Value);
                 RemComp<AdminFrozenComponent>(uid);
-                buffering.TimeTilNextBuffer = _random.NextFloat(buffering.MinimumTimeTilNextBuffer, buffering.MaximumTimeTilNextBuffer);
+                buffering.TimeTilNextBuffer = _random.NextFloat(buffering.MinimumTimeTilNextBuffer,
+                    buffering.MaximumTimeTilNextBuffer);
                 buffering.BufferingIcon = null;
             }
             else

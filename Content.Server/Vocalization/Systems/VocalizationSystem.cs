@@ -13,7 +13,7 @@ namespace Content.Server.Vocalization.Systems;
 /// This is used in combination with systems like ParrotMemorySystem to randomly say messages from memory,
 /// or can be used by other systems to speak pre-set messages
 /// </summary>
-public sealed partial class VocalizationSystem : EntitySystem
+public sealed class VocalizationSystem : EntitySystem
 {
     [Dependency] private readonly ActionBlockerSystem _actionBlocker = default!;
     [Dependency] private readonly ChatSystem _chat = default!;
@@ -28,10 +28,8 @@ public sealed partial class VocalizationSystem : EntitySystem
         SubscribeLocalEvent<VocalizerRequiresPowerComponent, TryVocalizeEvent>(OnRequiresPowerTryVocalize);
     }
 
-    private void OnMapInit(Entity<VocalizerComponent> ent, ref MapInitEvent args)
-    {
-        ent.Comp.NextVocalizeInterval = _random.Next(ent.Comp.MinVocalizeInterval, ent.Comp.MaxVocalizeInterval);
-    }
+    private void OnMapInit(Entity<VocalizerComponent> ent, ref MapInitEvent args) => ent.Comp.NextVocalizeInterval =
+        _random.Next(ent.Comp.MinVocalizeInterval, ent.Comp.MaxVocalizeInterval);
 
     private void OnRequiresPowerTryVocalize(Entity<VocalizerRequiresPowerComponent> ent, ref TryVocalizeEvent args)
     {
@@ -87,7 +85,10 @@ public sealed partial class VocalizationSystem : EntitySystem
             return;
 
         // send the message
-        _chat.TrySendInGameICMessage(entity, message, InGameICChatType.Speak, entity.Comp.HideChat ? ChatTransmitRange.HideChat : ChatTransmitRange.Normal);
+        _chat.TrySendInGameICMessage(entity,
+            message,
+            InGameICChatType.Speak,
+            entity.Comp.HideChat ? ChatTransmitRange.HideChat : ChatTransmitRange.Normal);
     }
 
     public override void Update(float frameTime)

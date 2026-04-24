@@ -11,7 +11,9 @@ public sealed class RogueAscendedObjectiveSystem : EntitySystem
     public override void Initialize() =>
         SubscribeLocalEvent<RogueInfectionConditionComponent, ObjectiveGetProgressEvent>(OnGetInfectionProgress);
 
-    private void OnGetInfectionProgress(EntityUid uid, RogueInfectionConditionComponent comp, ref ObjectiveGetProgressEvent args) =>
+    private void OnGetInfectionProgress(EntityUid uid,
+        RogueInfectionConditionComponent comp,
+        ref ObjectiveGetProgressEvent args) =>
         args.Progress = _number.GetTarget(uid) == 0
             ? 1f
             : MathF.Min(comp.MindsCorrupted / (float) _number.GetTarget(uid), 1f);

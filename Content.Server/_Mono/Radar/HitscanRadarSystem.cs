@@ -1,48 +1,25 @@
-using Robust.Shared.Map;
-using Robust.Shared.Physics.Systems;
 using System.Numerics;
 using Content.Server._Mono.FireControl;
-using Robust.Shared.Timing;
 using Content.Shared.Weapons.Ranged;
+using Robust.Shared.Map;
+using Robust.Shared.Physics.Systems;
+using Robust.Shared.Timing;
 
 namespace Content.Server._Mono.Radar;
 
 /// <summary>
 /// System that handles radar visualization for hitscan projectiles
 /// </summary>
-public sealed partial class HitscanRadarSystem : EntitySystem
+public sealed class HitscanRadarSystem : EntitySystem
 {
     [Dependency] private readonly IMapManager _mapManager = default!;
-    [Dependency] private readonly RadarBlipSystem _radarBlipSystem = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
 
     // Dictionary to track entities that should be deleted after a specific time
     private readonly Dictionary<EntityUid, TimeSpan> _pendingDeletions = new();
-
-    /// <summary>
-    /// Event raised before firing the effects for a hitscan projectile.
-    /// </summary>
-    public sealed class HitscanFireEffectEvent : EntityEventArgs
-    {
-        public EntityCoordinates FromCoordinates { get; }
-        public float Distance { get; }
-        public Angle Angle { get; }
-        public HitscanPrototype Hitscan { get; }
-        public EntityUid? HitEntity { get; }
-        public EntityUid? Shooter { get; }
-
-        public HitscanFireEffectEvent(EntityCoordinates fromCoordinates, float distance, Angle angle, HitscanPrototype hitscan, EntityUid? hitEntity = null, EntityUid? shooter = null)
-        {
-            FromCoordinates = fromCoordinates;
-            Distance = distance;
-            Angle = angle;
-            Hitscan = hitscan;
-            HitEntity = hitEntity;
-            Shooter = shooter;
-        }
-    }
+    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
+    [Dependency] private readonly RadarBlipSystem _radarBlipSystem = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     public override void Initialize()
     {
@@ -117,9 +94,7 @@ public sealed partial class HitscanRadarSystem : EntitySystem
         }
         // For legitimate entities, just remove from pending deletions if present (shouldn't be there anyway)
         else
-        {
             _pendingDeletions.Remove(ent);
-        }
     }
 
     public override void Update(float frameTime)
@@ -147,5 +122,33 @@ public sealed partial class HitscanRadarSystem : EntitySystem
                 _pendingDeletions.Remove(entity);
             }
         }
+    }
+
+    /// <summary>
+    /// Event raised before firing the effects for a hitscan projectile.
+    /// </summary>
+    public sealed class HitscanFireEffectEvent : EntityEventArgs
+    {
+        public HitscanFireEffectEvent(EntityCoordinates fromCoordinates,
+            float distance,
+            Angle angle,
+            HitscanPrototype hitscan,
+            EntityUid? hitEntity = null,
+            EntityUid? shooter = null)
+        {
+            FromCoordinates = fromCoordinates;
+            Distance = distance;
+            Angle = angle;
+            Hitscan = hitscan;
+            HitEntity = hitEntity;
+            Shooter = shooter;
+        }
+
+        public EntityCoordinates FromCoordinates { get; }
+        public float Distance { get; }
+        public Angle Angle { get; }
+        public HitscanPrototype Hitscan { get; }
+        public EntityUid? HitEntity { get; }
+        public EntityUid? Shooter { get; }
     }
 }

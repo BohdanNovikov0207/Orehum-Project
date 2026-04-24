@@ -5,7 +5,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Server.Chat.Systems;
-using Content.Server.Power.EntitySystems; // Goobstation - Check power
+using Content.Server.Power.EntitySystems;
 using Content.Server.Station.Systems;
 using Content.Server.StationRecords.Systems;
 using Content.Shared.CriminalRecords;
@@ -16,6 +16,7 @@ using Content.Shared.Security;
 using Content.Shared.StationRecords;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
+// Goobstation - Check power
 
 namespace Content.Server.CriminalRecords.Systems;
 
@@ -23,11 +24,12 @@ public sealed class CriminalRecordsHackerSystem : SharedCriminalRecordsHackerSys
 {
     [Dependency] private readonly ChatSystem _chat = default!;
     [Dependency] private readonly CriminalRecordsSystem _criminalRecords = default!;
+    [Dependency] private readonly PowerReceiverSystem _powerReceiverSystem = default!; // Goobstation - check power
     [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly StationSystem _station = default!;
     [Dependency] private readonly StationRecordsSystem _records = default!;
-    [Dependency] private readonly PowerReceiverSystem _powerReceiverSystem = default!; // Goobstation - check power
+    [Dependency] private readonly StationSystem _station = default!;
+
     public override void Initialize()
     {
         base.Initialize();
@@ -37,10 +39,11 @@ public sealed class CriminalRecordsHackerSystem : SharedCriminalRecordsHackerSys
 
     private void OnDoAfter(Entity<CriminalRecordsHackerComponent> ent, ref CriminalRecordsHackDoAfterEvent args)
     {
-        if (args.Cancelled || args.Handled || args.Target == null || !_powerReceiverSystem.IsPowered(args.Target.Value)) // Goobstation - check power
+        if (args.Cancelled || args.Handled || args.Target == null ||
+            !_powerReceiverSystem.IsPowered(args.Target.Value)) // Goobstation - check power
             return;
 
-        if (_station.GetOwningStation(ent) is not {} station)
+        if (_station.GetOwningStation(ent) is not { } station)
             return;
 
         var reasons = _proto.Index(ent.Comp.Reasons);
@@ -53,7 +56,9 @@ public sealed class CriminalRecordsHackerSystem : SharedCriminalRecordsHackerSys
             // main damage with this is existing arrest warrants are lost and to anger beepsky
         }
 
-        _chat.DispatchGlobalAnnouncement(Loc.GetString(ent.Comp.Announcement), playSound: true, colorOverride: Color.Red);
+        _chat.DispatchGlobalAnnouncement(Loc.GetString(ent.Comp.Announcement),
+            playSound: true,
+            colorOverride: Color.Red);
 
         // once is enough
         RemComp<CriminalRecordsHackerComponent>(ent);

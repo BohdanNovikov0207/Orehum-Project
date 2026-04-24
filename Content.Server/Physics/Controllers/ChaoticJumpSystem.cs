@@ -5,13 +5,13 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Numerics;
 using Content.Server.Physics.Components;
+using Robust.Shared.Physics;
+using Robust.Shared.Physics.Controllers;
+using Robust.Shared.Physics.Systems;
 using Robust.Shared.Random;
 using Robust.Shared.Timing;
-using Robust.Shared.Physics.Systems;
-using Robust.Shared.Physics;
-using System.Numerics;
-using Robust.Shared.Physics.Controllers;
 using Robust.Shared.Utility;
 
 namespace Content.Server.Physics.Controllers;
@@ -22,9 +22,9 @@ namespace Content.Server.Physics.Controllers;
 public sealed class ChaoticJumpSystem : VirtualController
 {
     [Dependency] private readonly IGameTiming _gameTiming = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly SharedPhysicsSystem _physics = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     public override void Initialize()
     {
@@ -33,11 +33,11 @@ public sealed class ChaoticJumpSystem : VirtualController
         SubscribeLocalEvent<ChaoticJumpComponent, MapInitEvent>(OnMapInit);
     }
 
-    private void OnMapInit(Entity<ChaoticJumpComponent> chaotic, ref MapInitEvent args)
-    {
+    private void OnMapInit(Entity<ChaoticJumpComponent> chaotic, ref MapInitEvent args) =>
         //So the entity doesn't teleport instantly. For tesla, for example, it's important for it to eat tesla's generator.
-        chaotic.Comp.NextJumpTime = _gameTiming.CurTime + TimeSpan.FromSeconds(_random.NextFloat(chaotic.Comp.JumpMinInterval, chaotic.Comp.JumpMaxInterval));
-    }
+        chaotic.Comp.NextJumpTime = _gameTiming.CurTime +
+                                    TimeSpan.FromSeconds(_random.NextFloat(chaotic.Comp.JumpMinInterval,
+                                        chaotic.Comp.JumpMaxInterval));
 
     public override void UpdateBeforeSolve(bool prediction, float frameTime)
     {
@@ -50,7 +50,8 @@ public sealed class ChaoticJumpSystem : VirtualController
             if (chaotic.NextJumpTime <= _gameTiming.CurTime)
             {
                 Jump(uid, chaotic);
-                chaotic.NextJumpTime += TimeSpan.FromSeconds(_random.NextFloat(chaotic.JumpMinInterval, chaotic.JumpMaxInterval));
+                chaotic.NextJumpTime +=
+                    TimeSpan.FromSeconds(_random.NextFloat(chaotic.JumpMinInterval, chaotic.JumpMaxInterval));
             }
         }
     }
@@ -65,17 +66,19 @@ public sealed class ChaoticJumpSystem : VirtualController
         var direction = _random.NextAngle();
         var range = _random.NextFloat(component.RangeMin, component.RangeMax);
         var ray = new CollisionRay(startPos, direction.ToVec(), component.CollisionMask);
-        var rayCastResults = _physics.IntersectRay(transform.MapID, ray, range, uid, returnOnFirstHit: false).FirstOrNull();
+        var rayCastResults = _physics.IntersectRay(transform.MapID, ray, range, uid, false).FirstOrNull();
 
         if (rayCastResults != null)
         {
             targetPos = rayCastResults.Value.HitPos;
-            targetPos = new Vector2(targetPos.X - (float) Math.Cos(direction), targetPos.Y - (float) Math.Sin(direction)); //offset so that the teleport does not take place directly inside the target
+            targetPos = new Vector2(targetPos.X - (float) Math.Cos(direction),
+                targetPos.Y -
+                (float) Math.Sin(
+                    direction)); //offset so that the teleport does not take place directly inside the target
         }
         else
-        {
-            targetPos = new Vector2(startPos.X + range * (float) Math.Cos(direction), startPos.Y + range * (float) Math.Sin(direction));
-        }
+            targetPos = new Vector2(startPos.X + range * (float) Math.Cos(direction),
+                startPos.Y + range * (float) Math.Sin(direction));
 
         Spawn(component.Effect, transform.Coordinates);
 

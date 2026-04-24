@@ -5,24 +5,22 @@
 
 using System.Diagnostics.CodeAnalysis;
 using Content.Server.Administration;
-using Content.Shared.Administration;
 using Content.Shared._EinsteinEngines.Language;
 using Content.Shared._EinsteinEngines.Language.Components;
 using Content.Shared._EinsteinEngines.Language.Components.Translators;
 using Content.Shared._EinsteinEngines.Language.Systems;
+using Content.Shared.Administration;
 using Robust.Server.Containers;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Toolshed;
-using Robust.Shared.Toolshed.Syntax;
-using Robust.Shared.Toolshed.TypeParsers;
 
 namespace Content.Server._EinsteinEngines.Language.Commands;
 
-[ToolshedCommand(Name = "translator"), AdminCommand(AdminFlags.Admin)]
+[ToolshedCommand(Name = "translator")] [AdminCommand(AdminFlags.Admin)]
 public sealed class AdminTranslatorCommand : ToolshedCommand
 {
-    private LanguageSystem? _languagesField;
     private ContainerSystem? _containersField;
+    private LanguageSystem? _languagesField;
 
     private ContainerSystem Containers => _containersField ??= GetSys<ContainerSystem>();
     private LanguageSystem Languages => _languagesField ??= GetSys<LanguageSystem>();

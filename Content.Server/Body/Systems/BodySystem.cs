@@ -74,8 +74,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using System.Numerics;
-using Content.Server.Body.Components;
+using System.Linq;
 using System.Numerics;
 using Content.Server.Ghost;
 using Content.Server.Humanoid;
@@ -85,6 +84,7 @@ using Content.Shared.Body.Events;
 using Content.Shared.Body.Part;
 using Content.Shared.Body.Systems;
 using Content.Shared.Damage.Components;
+using Content.Shared.Gibbing.Events;
 using Content.Shared.Humanoid;
 using Content.Shared.Mind;
 using Content.Shared.Mobs.Systems;
@@ -92,23 +92,19 @@ using Content.Shared.Movement.Events;
 using Content.Shared.Movement.Systems;
 using Robust.Shared.Audio;
 using Robust.Shared.Timing;
-
 // Shitmed Change
-using System.Linq;
-using Content.Shared.Body.Events;
-using Content.Shared.Gibbing.Events;
 
 namespace Content.Server.Body.Systems;
 
 public sealed partial class BodySystem : SharedBodySystem // Shitmed change: made partial
 {
-    [Dependency] private readonly BloodstreamSystem _bloodstream = default!; // Shitmed Change
-    [Dependency] private readonly GhostSystem _ghostSystem = default!;
-    [Dependency] private readonly IGameTiming _gameTiming = default!;
-    [Dependency] private readonly HumanoidAppearanceSystem _humanoidSystem = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!; // Shitmed Change
-    [Dependency] private readonly MobStateSystem _mobState = default!;
+    [Dependency] private readonly BloodstreamSystem _bloodstream = default!; // Shitmed Change
+    [Dependency] private readonly IGameTiming _gameTiming = default!;
+    [Dependency] private readonly GhostSystem _ghostSystem = default!;
+    [Dependency] private readonly HumanoidAppearanceSystem _humanoidSystem = default!;
     [Dependency] private readonly SharedMindSystem _mindSystem = default!;
+    [Dependency] private readonly MobStateSystem _mobState = default!;
 
     public override void Initialize()
     {
@@ -124,14 +120,12 @@ public sealed partial class BodySystem : SharedBodySystem // Shitmed change: mad
         // If they haven't actually moved then ignore it.
         if ((args.Entity.Comp.HeldMoveButtons &
              (MoveButtons.Down | MoveButtons.Left | MoveButtons.Up | MoveButtons.Right)) == 0x0)
-        {
             return;
-        }
 
         if (_mobState.IsDead(ent) && _mindSystem.TryGetMind(ent, out var mindId, out var mind))
         {
             mind.TimeOfDeath ??= _gameTiming.RealTime;
-            _ghostSystem.OnGhostAttempt(mindId, canReturnGlobal: true, mind: mind);
+            _ghostSystem.OnGhostAttempt(mindId, true, mind: mind);
         }
     }
 
@@ -159,7 +153,7 @@ public sealed partial class BodySystem : SharedBodySystem // Shitmed change: mad
             var layers = HumanoidVisualLayersExtension.Sublayers(layer.Value);
             // We dont use the layers object here because we are manually handling hands and feet ents. In the future I'll
             // revert back to effectively upstream code by making them just cosmetic.
-            _humanoidSystem.SetLayersVisibility(bodyEnt.Owner, new[] { layer.Value }, visible: true); // Shitmed Change
+            _humanoidSystem.SetLayersVisibility(bodyEnt.Owner, new[] { layer.Value }, true); // Shitmed Change
         }
     }
 
@@ -179,7 +173,7 @@ public sealed partial class BodySystem : SharedBodySystem // Shitmed change: mad
             return;
 
         var layers = HumanoidVisualLayersExtension.Sublayers(layer.Value);
-        _humanoidSystem.SetLayersVisibility((bodyEnt, humanoid), layers, visible: false);
+        _humanoidSystem.SetLayersVisibility((bodyEnt, humanoid), layers, false);
         _appearance.SetData(bodyEnt, layer, true); // Shitmed Change
     }
 
@@ -198,12 +192,10 @@ public sealed partial class BodySystem : SharedBodySystem // Shitmed change: mad
         List<string>? allowedContainers = null,
         List<string>? excludedContainers = null)
     {
-        if (!Resolve(bodyId, ref body, logMissing: false)
+        if (!Resolve(bodyId, ref body, false)
             || TerminatingOrDeleted(bodyId)
             || EntityManager.IsQueuedForDeletion(bodyId))
-        {
             return new HashSet<EntityUid>();
-        }
 
         if (HasComp<GodmodeComponent>(bodyId))
             return new HashSet<EntityUid>();
@@ -212,9 +204,17 @@ public sealed partial class BodySystem : SharedBodySystem // Shitmed change: mad
         if (xform.MapUid is null)
             return new HashSet<EntityUid>();
 
-        var gibs = base.GibBody(bodyId, gibOrgans, body, launchGibs: launchGibs, splatDirection: splatDirection,
-            splatModifier: splatModifier, splatCone: splatCone, gib: gib, contents: contents,
-            allowedContainers: allowedContainers, excludedContainers: excludedContainers); // Shitmed Change
+        var gibs = base.GibBody(bodyId,
+            gibOrgans,
+            body,
+            launchGibs,
+            splatDirection,
+            splatModifier,
+            splatCone,
+            gib: gib,
+            contents: contents,
+            allowedContainers: allowedContainers,
+            excludedContainers: excludedContainers); // Shitmed Change
 
         var ev = new BeingGibbedEvent(gibs);
         RaiseLocalEvent(bodyId, ref ev);
@@ -234,7 +234,7 @@ public sealed partial class BodySystem : SharedBodySystem // Shitmed change: mad
         Angle splatCone = default,
         SoundSpecifier? gibSoundOverride = null)
     {
-        if (!Resolve(partId, ref part, logMissing: false)
+        if (!Resolve(partId, ref part, false)
             || TerminatingOrDeleted(partId)
             || EntityManager.IsQueuedForDeletion(partId))
             return new HashSet<EntityUid>();
@@ -242,8 +242,12 @@ public sealed partial class BodySystem : SharedBodySystem // Shitmed change: mad
         if (Transform(partId).MapUid is null)
             return new HashSet<EntityUid>();
 
-        var gibs = base.GibPart(partId, part, launchGibs: launchGibs,
-            splatDirection: splatDirection, splatModifier: splatModifier, splatCone: splatCone);
+        var gibs = base.GibPart(partId,
+            part,
+            launchGibs,
+            splatDirection,
+            splatModifier,
+            splatCone);
 
         var ev = new BeingGibbedEvent(gibs);
         RaiseLocalEvent(partId, ref ev);
@@ -256,7 +260,7 @@ public sealed partial class BodySystem : SharedBodySystem // Shitmed change: mad
 
     public override bool BurnPart(EntityUid partId, BodyPartComponent? part = null)
     {
-        if (!Resolve(partId, ref part, logMissing: false)
+        if (!Resolve(partId, ref part, false)
             || TerminatingOrDeleted(partId)
             || EntityManager.IsQueuedForDeletion(partId))
             return false;
@@ -266,14 +270,17 @@ public sealed partial class BodySystem : SharedBodySystem // Shitmed change: mad
 
     protected override void ApplyPartMarkings(EntityUid target, BodyPartAppearanceComponent component)
     {
-        return;
     }
 
-    protected override void RemoveBodyMarkings(EntityUid target, BodyPartAppearanceComponent partAppearance, HumanoidAppearanceComponent bodyAppearance)
+    protected override void RemoveBodyMarkings(EntityUid target,
+        BodyPartAppearanceComponent partAppearance,
+        HumanoidAppearanceComponent bodyAppearance)
     {
         foreach (var (visualLayer, markingList) in partAppearance.Markings)
-            foreach (var marking in markingList)
-                _humanoidSystem.RemoveMarking(target, marking.MarkingId, sync: false, humanoid: bodyAppearance);
+        foreach (var marking in markingList)
+        {
+            _humanoidSystem.RemoveMarking(target, marking.MarkingId, false, bodyAppearance);
+        }
 
         Dirty(target, bodyAppearance);
     }

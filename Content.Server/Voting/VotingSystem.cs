@@ -5,6 +5,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Threading.Tasks;
 using Content.Server.Administration.Managers;
 using Content.Server.Database;
 using Content.Server.GameTicking;
@@ -12,27 +13,26 @@ using Content.Server.Roles.Jobs;
 using Content.Shared.CCVar;
 using Content.Shared.Ghost;
 using Content.Shared.Mind.Components;
+using Content.Shared.Players.PlayTimeTracking;
 using Content.Shared.Voting;
 using Robust.Server.Player;
 using Robust.Shared.Configuration;
 using Robust.Shared.Network;
 using Robust.Shared.Player;
 using Robust.Shared.Timing;
-using System.Threading.Tasks;
-using Content.Shared.Players.PlayTimeTracking;
 
 namespace Content.Server.Voting;
 
 public sealed class VotingSystem : EntitySystem
 {
+    [Dependency] private readonly IAdminManager _adminManager = default!;
+    [Dependency] private readonly IConfigurationManager _cfg = default!;
+    [Dependency] private readonly IServerDbManager _dbManager = default!;
+    [Dependency] private readonly GameTicker _gameTicker = default!;
+    [Dependency] private readonly IGameTiming _gameTiming = default!;
+    [Dependency] private readonly JobSystem _jobs = default!;
 
     [Dependency] private readonly IPlayerManager _playerManager = default!;
-    [Dependency] private readonly IAdminManager _adminManager = default!;
-    [Dependency] private readonly IServerDbManager _dbManager = default!;
-    [Dependency] private readonly IGameTiming _gameTiming = default!;
-    [Dependency] private readonly IConfigurationManager _cfg = default!;
-    [Dependency] private readonly JobSystem _jobs = default!;
-    [Dependency] private readonly GameTicker _gameTicker = default!;
     [Dependency] private readonly ISharedPlaytimeManager _playtimeManager = default!;
 
     public override void Initialize()
@@ -55,9 +55,11 @@ public sealed class VotingSystem : EntitySystem
 
         foreach (var player in _playerManager.Sessions)
         {
-            if (args.SenderSession == player) continue;
+            if (args.SenderSession == player)
+                continue;
 
-            if (_adminManager.IsAdmin(player, false)) continue;
+            if (_adminManager.IsAdmin(player))
+                continue;
 
             if (player.AttachedEntity is not { Valid: true } attached)
             {
@@ -98,11 +100,12 @@ public sealed class VotingSystem : EntitySystem
             return false;
 
         // Being an admin overrides the votekick eligibility
-        if (initiator.AttachedEntity != null && _adminManager.IsAdmin(initiator.AttachedEntity.Value, false))
+        if (initiator.AttachedEntity != null && _adminManager.IsAdmin(initiator.AttachedEntity.Value))
             return true;
 
         // If cvar enabled, skip the ghost requirement in the preround lobby
-        if (!_cfg.GetCVar(CCVars.VotekickIgnoreGhostReqInLobby) || (_cfg.GetCVar(CCVars.VotekickIgnoreGhostReqInLobby) && _gameTicker.RunLevel != GameRunLevel.PreRoundLobby))
+        if (!_cfg.GetCVar(CCVars.VotekickIgnoreGhostReqInLobby) || _cfg.GetCVar(CCVars.VotekickIgnoreGhostReqInLobby) &&
+            _gameTicker.RunLevel != GameRunLevel.PreRoundLobby)
         {
             if (_cfg.GetCVar(CCVars.VotekickInitiatorGhostRequirement))
             {
@@ -111,19 +114,22 @@ public sealed class VotingSystem : EntitySystem
                     return false;
 
                 // Must have been dead for x seconds
-                if ((int)_gameTiming.RealTime.Subtract(ghostComp.TimeOfDeath).TotalSeconds < _cfg.GetCVar(CCVars.VotekickEligibleVoterDeathtime))
+                if ((int) _gameTiming.RealTime.Subtract(ghostComp.TimeOfDeath).TotalSeconds <
+                    _cfg.GetCVar(CCVars.VotekickEligibleVoterDeathtime))
                     return false;
             }
         }
 
         // Must be whitelisted
-        if (!await _dbManager.GetWhitelistStatusAsync(initiator.UserId) && _cfg.GetCVar(CCVars.VotekickInitiatorWhitelistedRequirement))
+        if (!await _dbManager.GetWhitelistStatusAsync(initiator.UserId) &&
+            _cfg.GetCVar(CCVars.VotekickInitiatorWhitelistedRequirement))
             return false;
 
         // Must be eligible to vote
         var playtime = _playtimeManager.GetPlayTimes(initiator);
-        return playtime.TryGetValue(PlayTimeTrackingShared.TrackerOverall, out TimeSpan overallTime) && (overallTime >= TimeSpan.FromHours(_cfg.GetCVar(CCVars.VotekickEligibleVoterPlaytime))
-            || !_cfg.GetCVar(CCVars.VotekickInitiatorTimeRequirement));
+        return playtime.TryGetValue(PlayTimeTrackingShared.TrackerOverall, out var overallTime) &&
+               (overallTime >= TimeSpan.FromHours(_cfg.GetCVar(CCVars.VotekickEligibleVoterPlaytime))
+                || !_cfg.GetCVar(CCVars.VotekickInitiatorTimeRequirement));
     }
 
     /// <summary>

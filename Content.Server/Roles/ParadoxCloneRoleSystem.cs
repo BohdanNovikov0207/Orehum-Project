@@ -6,7 +6,7 @@ using Content.Shared.Roles;
 namespace Content.Server.Roles;
 
 /// <summary>
-///     System responsible for giving a ghost of a paradox clone a name modifier.
+/// System responsible for giving a ghost of a paradox clone a name modifier.
 /// </summary>
 public sealed class ParadoxCloneRoleSystem : EntitySystem
 {
@@ -14,10 +14,12 @@ public sealed class ParadoxCloneRoleSystem : EntitySystem
     {
         base.Initialize();
 
-        SubscribeLocalEvent<ParadoxCloneRoleComponent, MindRelayedEvent<RefreshNameModifiersEvent>>(OnRefreshNameModifiers);
+        SubscribeLocalEvent<ParadoxCloneRoleComponent, MindRelayedEvent<RefreshNameModifiersEvent>>(
+            OnRefreshNameModifiers);
     }
 
-    private void OnRefreshNameModifiers(Entity<ParadoxCloneRoleComponent> ent, ref MindRelayedEvent<RefreshNameModifiersEvent> args)
+    private void OnRefreshNameModifiers(Entity<ParadoxCloneRoleComponent> ent,
+        ref MindRelayedEvent<RefreshNameModifiersEvent> args)
     {
         if (!TryComp<MindRoleComponent>(ent.Owner, out var roleComp))
             return;

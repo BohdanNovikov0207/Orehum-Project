@@ -46,14 +46,16 @@ using System.Diagnostics.CodeAnalysis;
 using Content.Server.DeviceNetwork.Components;
 using Content.Server.Medical.CrewMonitoring;
 using Content.Server.Station.Systems;
-using Content.Shared.Power;
 using Content.Shared.DeviceNetwork.Components;
+using Content.Shared.Power;
 
 namespace Content.Server.DeviceNetwork.Systems;
 
 /// <summary>
-/// Keeps one active server entity per station. Activates another available one if the currently active server becomes unavailable
-/// Server in this context means an entity that manages the devicenet packets like the <see cref="Content.Server.Medical.CrewMonitoring.CrewMonitoringServerSystem"/>
+/// Keeps one active server entity per station. Activates another available one if the currently active server becomes
+/// unavailable
+/// Server in this context means an entity that manages the devicenet packets like the
+/// <see cref="Content.Server.Medical.CrewMonitoring.CrewMonitoringServerSystem" />
 /// </summary>
 public sealed class SingletonDeviceNetServerSystem : EntitySystem
 {
@@ -69,22 +71,23 @@ public sealed class SingletonDeviceNetServerSystem : EntitySystem
     /// <summary>
     /// Returns whether the given entity is an active server or not
     /// </summary>
-    public bool IsActiveServer(EntityUid serverId, SingletonDeviceNetServerComponent? serverComponent = default)
-    {
-        return Resolve(serverId, ref serverComponent) && serverComponent.Active;
-    }
+    public bool IsActiveServer(EntityUid serverId, SingletonDeviceNetServerComponent? serverComponent = default) =>
+        Resolve(serverId, ref serverComponent) && serverComponent.Active;
 
     /// <summary>
-    /// Returns the address of the currently active server for the given station id if there is one.<br/>
-    /// What kind of server you're trying to get the active instance of is determined by the component type parameter TComp.<br/>
-    /// <br/>
-    /// Setting TComp to <see cref="CrewMonitoringServerComponent"/>, for example, gives you the address of an entity containing the crew monitoring server component.<br/>
+    /// Returns the address of the currently active server for the given station id if there is one.<br />
+    /// What kind of server you're trying to get the active instance of is determined by the component type parameter TComp.
+    /// <br />
+    /// <br />
+    /// Setting TComp to <see cref="CrewMonitoringServerComponent" />, for example, gives you the address of an entity
+    /// containing the crew monitoring server component.<br />
     /// </summary>
     /// <param name="stationId">The entityUid of the station</param>
     /// <param name="address">The address of the active server if it exists</param>
     /// <typeparam name="TComp">The component type that determines what type of server you're getting the address of</typeparam>
     /// <returns>True if there is an active serve. False otherwise</returns>
-    public bool TryGetActiveServerAddress<TComp>(EntityUid stationId, [NotNullWhen(true)] out string? address) where TComp : IComponent
+    public bool TryGetActiveServerAddress<TComp>(EntityUid stationId, [NotNullWhen(true)] out string? address)
+        where TComp : IComponent
     {
         var servers = EntityQueryEnumerator<
             SingletonDeviceNetServerComponent,
@@ -101,7 +104,7 @@ public sealed class SingletonDeviceNetServerSystem : EntitySystem
 
             if (!server.Available)
             {
-                DisconnectServer(uid,server, device);
+                DisconnectServer(uid, server, device);
                 continue;
             }
 
@@ -137,7 +140,9 @@ public sealed class SingletonDeviceNetServerSystem : EntitySystem
             DisconnectServer(uid, component);
     }
 
-    private void ConnectServer(EntityUid uid, SingletonDeviceNetServerComponent? server = null, DeviceNetworkComponent? device = null)
+    private void ConnectServer(EntityUid uid,
+        SingletonDeviceNetServerComponent? server = null,
+        DeviceNetworkComponent? device = null)
     {
         if (!Resolve(uid, ref server, ref device))
             return;
@@ -156,7 +161,9 @@ public sealed class SingletonDeviceNetServerSystem : EntitySystem
     /// <summary>
     /// Disconnects a server from the device network and clears the currently active server
     /// </summary>
-    private void DisconnectServer(EntityUid uid, SingletonDeviceNetServerComponent? server = null, DeviceNetworkComponent? device = null)
+    private void DisconnectServer(EntityUid uid,
+        SingletonDeviceNetServerComponent? server = null,
+        DeviceNetworkComponent? device = null)
     {
         if (!Resolve(uid, ref server, ref device))
             return;

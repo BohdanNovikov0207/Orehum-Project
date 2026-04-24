@@ -16,17 +16,14 @@ using Robust.Shared.Audio;
 
 namespace Content.Server.Heretic.Components;
 
-[RegisterComponent, Access(typeof(EldritchInfluenceSystem))]
+[RegisterComponent] [Access(typeof(EldritchInfluenceSystem))]
 public sealed partial class EldritchInfluenceComponent : Component
 {
     [DataField]
-    public bool Spent;
+    public LocId ExamineBaseMessage = "influence-base-message";
 
     [DataField]
     public SoundSpecifier? ExamineSound = new SoundCollectionSpecifier("bloodCrawl");
-
-    [DataField]
-    public LocId ExamineBaseMessage = "influence-base-message";
 
     [DataField]
     public int FontSize = 22;
@@ -55,4 +52,7 @@ public sealed partial class EldritchInfluenceComponent : Component
 
     [DataField]
     public List<List<EntityEffect>> PossibleExamineEffects = new();
+
+    [DataField]
+    public bool Spent;
 }

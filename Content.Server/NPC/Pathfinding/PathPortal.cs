@@ -28,8 +28,5 @@ public struct PathPortal
         CoordinatesB = coordsB;
     }
 
-    public override int GetHashCode()
-    {
-        return Handle;
-    }
+    public override int GetHashCode() => Handle;
 }

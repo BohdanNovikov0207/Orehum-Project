@@ -9,7 +9,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Server.Explosion.EntitySystems;
 using Content.Shared.Armable;
 using Content.Shared.Item.ItemToggle.Components;
 using Content.Shared.LandMines;
@@ -48,17 +47,16 @@ public sealed class LandMineSystem : EntitySystem
                 args.Tripper,
                 PopupType.LargeCaution);
         }
+
         _audioSystem.PlayPvs(component.Sound, uid);
     }
 
     /// <summary>
     /// Sends a trigger when stepped off.
     /// </summary>
-    private void HandleStepOffTriggered(EntityUid uid, LandMineComponent component, ref StepTriggeredOffEvent args)
-    {
+    private void HandleStepOffTriggered(EntityUid uid, LandMineComponent component, ref StepTriggeredOffEvent args) =>
         // TODO: Adjust to the new trigger system
         _trigger.Trigger(uid, args.Tripper, TriggerSystem.DefaultTriggerKey);
-    }
 
     /// <summary>
     /// Presumes that the landmine isn't armable and should be treated as always armed.

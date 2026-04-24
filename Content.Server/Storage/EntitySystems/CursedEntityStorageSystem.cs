@@ -9,21 +9,21 @@
 //
 // SPDX-License-Identifier: MIT
 
+using System.Linq;
 using Content.Server.Storage.Components;
 using Content.Shared.Storage.Components;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Containers;
 using Robust.Shared.Random;
-using System.Linq;
 
 namespace Content.Server.Storage.EntitySystems;
 
 public sealed class CursedEntityStorageSystem : EntitySystem
 {
-    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedContainerSystem _container = default!;
     [Dependency] private readonly EntityStorageSystem _entityStorage = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
 
     public override void Initialize()
     {

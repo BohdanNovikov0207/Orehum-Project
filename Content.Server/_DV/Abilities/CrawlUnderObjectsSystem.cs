@@ -8,10 +8,10 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Shared._DV.Abilities;
 using Content.Shared.Actions;
 using Content.Shared.Climbing.Components;
 using Content.Shared.Climbing.Events;
-using Content.Shared._DV.Abilities;
 using Content.Shared.Maps;
 using Content.Shared.Movement.Systems;
 using Content.Shared.Physics;
@@ -21,10 +21,10 @@ using Robust.Shared.Physics.Systems;
 
 namespace Content.Server._DV.Abilities;
 
-public sealed partial class CrawlUnderObjectsSystem : SharedCrawlUnderObjectsSystem
+public sealed class CrawlUnderObjectsSystem : SharedCrawlUnderObjectsSystem
 {
-    [Dependency] private readonly AppearanceSystem _appearance = default!;
     [Dependency] private readonly SharedActionsSystem _actionsSystem = default!;
+    [Dependency] private readonly AppearanceSystem _appearance = default!;
     [Dependency] private readonly MovementSpeedModifierSystem _movespeed = default!;
     [Dependency] private readonly SharedPhysicsSystem _physics = default!;
     [Dependency] private readonly TurfSystem _turf = default!;
@@ -60,8 +60,8 @@ public sealed partial class CrawlUnderObjectsSystem : SharedCrawlUnderObjectsSys
     private bool EnableSneakMode(EntityUid uid, CrawlUnderObjectsComponent component)
     {
         if (component.Enabled
-            || (TryComp<ClimbingComponent>(uid, out var climbing)
-                && climbing.IsClimbing == true))
+            || TryComp<ClimbingComponent>(uid, out var climbing)
+            && climbing.IsClimbing)
             return false;
 
         component.Enabled = true;
@@ -73,9 +73,9 @@ public sealed partial class CrawlUnderObjectsSystem : SharedCrawlUnderObjectsSys
             foreach (var (key, fixture) in fixtureComponent.Fixtures)
             {
                 var newMask = (fixture.CollisionMask
-                    & (int)~CollisionGroup.HighImpassable
-                    & (int)~CollisionGroup.MidImpassable)
-                    | (int)CollisionGroup.InteractImpassable;
+                               & (int) ~CollisionGroup.HighImpassable
+                               & (int) ~CollisionGroup.MidImpassable)
+                              | (int) CollisionGroup.InteractImpassable;
                 if (fixture.CollisionMask == newMask)
                     continue;
 
@@ -84,17 +84,18 @@ public sealed partial class CrawlUnderObjectsSystem : SharedCrawlUnderObjectsSys
                     key,
                     fixture,
                     newMask,
-                    manager: fixtureComponent);
+                    fixtureComponent);
             }
         }
+
         return true;
     }
 
     private bool DisableSneakMode(EntityUid uid, CrawlUnderObjectsComponent component)
     {
-        if (!component.Enabled || IsOnCollidingTile(uid) || (TryComp<ClimbingComponent>(uid, out var climbing) && climbing.IsClimbing == true)) {
+        if (!component.Enabled || IsOnCollidingTile(uid) ||
+            TryComp<ClimbingComponent>(uid, out var climbing) && climbing.IsClimbing)
             return false;
-        }
 
         component.Enabled = false;
         Dirty(uid, component);
@@ -102,9 +103,13 @@ public sealed partial class CrawlUnderObjectsSystem : SharedCrawlUnderObjectsSys
 
         // Restore normal collision masks
         if (TryComp(uid, out FixturesComponent? fixtureComponent))
+        {
             foreach (var (key, originalMask) in component.ChangedFixtures)
+            {
                 if (fixtureComponent.Fixtures.TryGetValue(key, out var fixture))
                     _physics.SetCollisionMask(uid, key, fixture, originalMask, fixtureComponent);
+            }
+        }
 
         component.ChangedFixtures.Clear();
         return true;
@@ -136,11 +141,13 @@ public sealed partial class CrawlUnderObjectsSystem : SharedCrawlUnderObjectsSys
         CrawlUnderObjectsComponent component,
         AttemptClimbEvent args)
     {
-        if (component.Enabled == true)
+        if (component.Enabled)
             args.Cancelled = true;
     }
 
-    private void OnRefreshMovespeed(EntityUid uid, CrawlUnderObjectsComponent component, RefreshMovementSpeedModifiersEvent args)
+    private void OnRefreshMovespeed(EntityUid uid,
+        CrawlUnderObjectsComponent component,
+        RefreshMovementSpeedModifiersEvent args)
     {
         if (component.Enabled)
             args.ModifySpeed(component.SneakSpeedModifier, component.SneakSpeedModifier);

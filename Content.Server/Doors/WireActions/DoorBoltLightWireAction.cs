@@ -24,10 +24,10 @@ public sealed partial class DoorBoltLightWireAction : ComponentWireAction<DoorBo
     public override Color Color { get; set; } = Color.Lime;
     public override string Name { get; set; } = "wire-name-bolt-light";
 
+    public override object StatusKey { get; } = AirlockWireStatus.BoltLightIndicator;
+
     public override StatusLightState? GetLightState(Wire wire, DoorBoltComponent comp)
         => comp.BoltLightsEnabled ? StatusLightState.On : StatusLightState.Off;
-
-    public override object StatusKey { get; } = AirlockWireStatus.BoltLightIndicator;
 
     public override bool Cut(EntityUid user, Wire wire, DoorBoltComponent door)
     {
@@ -41,8 +41,6 @@ public sealed partial class DoorBoltLightWireAction : ComponentWireAction<DoorBo
         return true;
     }
 
-    public override void Pulse(EntityUid user, Wire wire, DoorBoltComponent door)
-    {
-        EntityManager.System<DoorSystem>().SetBoltLightsEnabled((wire.Owner, door), !door.BoltLightsEnabled);
-    }
+    public override void Pulse(EntityUid user, Wire wire, DoorBoltComponent door) => EntityManager.System<DoorSystem>()
+        .SetBoltLightsEnabled((wire.Owner, door), !door.BoltLightsEnabled);
 }

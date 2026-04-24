@@ -12,20 +12,14 @@ namespace Content.Server.Objectives.Components;
 /// Objective has a target number of something.
 /// When the objective is assigned it randomly picks this target from a minimum to a maximum.
 /// </summary>
-[RegisterComponent, Access(typeof(NumberObjectiveSystem))]
+[RegisterComponent] [Access(typeof(NumberObjectiveSystem))]
 public sealed partial class NumberObjectiveComponent : Component
 {
     /// <summary>
-    /// Number to use in the objective condition.
+    /// Optional description locale id, passed "count" with <see cref="Target" />.
     /// </summary>
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
-    public int Target;
-
-    /// <summary>
-    /// Minimum number for target to roll.
-    /// </summary>
-    [DataField(required: true)]
-    public int Min;
+    [DataField] [ViewVariables(VVAccess.ReadWrite)]
+    public string? Description;
 
     /// <summary>
     /// Maximum number for target to roll.
@@ -34,14 +28,20 @@ public sealed partial class NumberObjectiveComponent : Component
     public int Max;
 
     /// <summary>
-    /// Optional title locale id, passed "count" with <see cref="Target"/>.
+    /// Minimum number for target to roll.
     /// </summary>
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
-    public string? Title;
+    [DataField(required: true)]
+    public int Min;
 
     /// <summary>
-    /// Optional description locale id, passed "count" with <see cref="Target"/>.
+    /// Number to use in the objective condition.
     /// </summary>
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
-    public string? Description;
+    [DataField] [ViewVariables(VVAccess.ReadWrite)]
+    public int Target;
+
+    /// <summary>
+    /// Optional title locale id, passed "count" with <see cref="Target" />.
+    /// </summary>
+    [DataField] [ViewVariables(VVAccess.ReadWrite)]
+    public string? Title;
 }

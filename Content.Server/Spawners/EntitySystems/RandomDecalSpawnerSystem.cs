@@ -92,9 +92,7 @@ public sealed class RandomDecalSpawnerSystem : EntitySystem
             var decalProto = _prototypes.Index(decalProtoId);
             var snapPosition = comp.SnapPosition ?? decalProto.DefaultSnap;
             if (snapPosition)
-            {
                 position = position.WithPosition(tileRef.GridIndices * grid.TileSize);
-            }
 
             var cleanable = comp.Cleanable ?? decalProto.DefaultCleanable;
 
@@ -102,7 +100,7 @@ public sealed class RandomDecalSpawnerSystem : EntitySystem
             if (comp.RandomRotation)
             {
                 if (comp.SnapRotation)
-                    rotation = new Angle((MathF.PI / 2f) * _random.Next(3));
+                    rotation = new Angle(MathF.PI / 2f * _random.Next(3));
                 else
                     rotation = _random.NextAngle();
             }

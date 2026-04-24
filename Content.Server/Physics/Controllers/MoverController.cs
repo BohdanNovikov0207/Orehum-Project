@@ -58,17 +58,16 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using Content.Server.Shuttles.Components;
 using Content.Server.Shuttles.Systems;
-using Content.Shared.Friction;
 using Content.Shared.Movement.Components;
 using Content.Shared.Movement.Systems;
 using Content.Shared.Shuttles.Components;
 using Content.Shared.Shuttles.Systems;
 using Prometheus;
+using Robust.Shared.Map.Components;
 using Robust.Shared.Physics.Components;
 using Robust.Shared.Player;
 using DroneConsoleComponent = Content.Server.Shuttles.DroneConsoleComponent;
 using DependencyAttribute = Robust.Shared.IoC.DependencyAttribute;
-using Robust.Shared.Map.Components;
 
 namespace Content.Server.Physics.Controllers;
 
@@ -78,10 +77,14 @@ public sealed class MoverController : SharedMoverController
         "physics_active_mover_count",
         "Active amount of InputMovers being processed by MoverController");
 
+    private readonly HashSet<EntityUid> _moverAdded = new();
+    private readonly List<Entity<InputMoverComponent>> _movers = new();
+
     [Dependency] private readonly ThrusterSystem _thruster = default!;
     [Dependency] private readonly SharedTransformSystem _xformSystem = default!;
 
-    private Dictionary<EntityUid, (ShuttleComponent, List<(EntityUid, PilotComponent, InputMoverComponent, TransformComponent)>)> _shuttlePilots = new();
+    private Dictionary<EntityUid, (ShuttleComponent,
+        List<(EntityUid, PilotComponent, InputMoverComponent, TransformComponent)>)> _shuttlePilots = new();
 
     public override void Initialize()
     {
@@ -104,23 +107,13 @@ public sealed class MoverController : SharedMoverController
             SetMoveInput((entity.Comp.RelayEntity, inputMover), MoveButtons.None);
     }
 
-    private void OnPlayerAttached(Entity<InputMoverComponent> entity, ref PlayerAttachedEvent args)
-    {
+    private void OnPlayerAttached(Entity<InputMoverComponent> entity, ref PlayerAttachedEvent args) =>
         SetMoveInput(entity, MoveButtons.None);
-    }
 
-    private void OnPlayerDetached(Entity<InputMoverComponent> entity, ref PlayerDetachedEvent args)
-    {
+    private void OnPlayerDetached(Entity<InputMoverComponent> entity, ref PlayerDetachedEvent args) =>
         SetMoveInput(entity, MoveButtons.None);
-    }
 
-    protected override bool CanSound()
-    {
-        return true;
-    }
-
-    private HashSet<EntityUid> _moverAdded = new();
-    private List<Entity<InputMoverComponent>> _movers = new();
+    protected override bool CanSound() => true;
 
     private void InsertMover(Entity<InputMoverComponent> source)
     {
@@ -132,9 +125,7 @@ public sealed class MoverController : SharedMoverController
         if (TryComp(source, out MovementRelayTargetComponent? relay))
         {
             if (TryComp(relay.Source, out InputMoverComponent? relayMover))
-            {
                 InsertMover((relay.Source, relayMover));
-            }
         }
 
         _movers.Add(source);
@@ -186,9 +177,7 @@ public sealed class MoverController : SharedMoverController
             remainingFraction = 1;
         }
         else
-        {
             remainingFraction = (ushort.MaxValue - component.LastInputSubTick) / (float) ushort.MaxValue;
-        }
 
         ApplyTick(component, remainingFraction);
 
@@ -198,7 +187,8 @@ public sealed class MoverController : SharedMoverController
 
     private void ResetSubtick(PilotComponent component)
     {
-        if (Timing.CurTick <= component.LastInputTick) return;
+        if (Timing.CurTick <= component.LastInputTick)
+            return;
 
         component.CurTickStrafeMovement = Vector2.Zero;
         component.CurTickRotationMovement = 0f;
@@ -225,13 +215,9 @@ public sealed class MoverController : SharedMoverController
         var buttons = pilot.HeldButtons;
 
         if (state)
-        {
             buttons |= button;
-        }
         else
-        {
             buttons &= ~button;
-        }
 
         pilot.HeldButtons = buttons;
     }
@@ -244,49 +230,33 @@ public sealed class MoverController : SharedMoverController
         int brake;
 
         if ((component.HeldButtons & ShuttleButtons.StrafeLeft) != 0x0)
-        {
             x -= 1;
-        }
 
         if ((component.HeldButtons & ShuttleButtons.StrafeRight) != 0x0)
-        {
             x += 1;
-        }
 
         component.CurTickStrafeMovement.X += x * fraction;
 
         if ((component.HeldButtons & ShuttleButtons.StrafeUp) != 0x0)
-        {
             y += 1;
-        }
 
         if ((component.HeldButtons & ShuttleButtons.StrafeDown) != 0x0)
-        {
             y -= 1;
-        }
 
         component.CurTickStrafeMovement.Y += y * fraction;
 
         if ((component.HeldButtons & ShuttleButtons.RotateLeft) != 0x0)
-        {
             rot -= 1;
-        }
 
         if ((component.HeldButtons & ShuttleButtons.RotateRight) != 0x0)
-        {
             rot += 1;
-        }
 
         component.CurTickRotationMovement += rot * fraction;
 
         if ((component.HeldButtons & ShuttleButtons.Brake) != 0x0)
-        {
             brake = 1;
-        }
         else
-        {
             brake = 0;
-        }
 
         component.CurTickBraking += brake * fraction;
     }
@@ -308,15 +278,25 @@ public sealed class MoverController : SharedMoverController
 
         var horizIndex = vel.X > 0 ? 1 : 3; // east else west
         var vertIndex = vel.Y > 0 ? 2 : 0; // north else south
-        var horizComp = vel.X != 0 ? MathF.Pow(Vector2.Dot(vel, new (shuttle.LinearThrust[horizIndex] / shuttle.LinearThrust[horizIndex], 0f)), 2) : 0;
-        var vertComp = vel.Y != 0 ? MathF.Pow(Vector2.Dot(vel, new (0f, shuttle.LinearThrust[vertIndex] / shuttle.LinearThrust[vertIndex])), 2) : 0;
+        var horizComp = vel.X != 0
+            ? MathF.Pow(Vector2.Dot(vel,
+                    new Vector2(shuttle.LinearThrust[horizIndex] / shuttle.LinearThrust[horizIndex], 0f)),
+                2)
+            : 0;
+        var vertComp = vel.Y != 0
+            ? MathF.Pow(Vector2.Dot(vel,
+                    new Vector2(0f, shuttle.LinearThrust[vertIndex] / shuttle.LinearThrust[vertIndex])),
+                2)
+            : 0;
 
         return shuttle.BaseMaxLinearVelocity * vel * MathF.ReciprocalSqrtEstimate(horizComp + vertComp);
     }
 
     private void HandleShuttleMovement(float frameTime)
     {
-        var newPilots = new Dictionary<EntityUid, (ShuttleComponent Shuttle, List<(EntityUid PilotUid, PilotComponent Pilot, InputMoverComponent Mover, TransformComponent ConsoleXform)>)>();
+        var newPilots =
+            new Dictionary<EntityUid, (ShuttleComponent Shuttle, List<(EntityUid PilotUid, PilotComponent Pilot,
+                InputMoverComponent Mover, TransformComponent ConsoleXform)>)>();
 
         // We just mark off their movement and the shuttle itself does its own movement
         var activePilotQuery = EntityQueryEnumerator<PilotComponent, InputMoverComponent>();
@@ -327,22 +307,22 @@ public sealed class MoverController : SharedMoverController
 
             // TODO: This is terrible. Just make a new mover and also make it remote piloting + device networks
             if (TryComp<DroneConsoleComponent>(consoleEnt, out var cargoConsole))
-            {
                 consoleEnt = cargoConsole.Entity;
-            }
 
-            if (!TryComp(consoleEnt, out TransformComponent? xform)) continue;
+            if (!TryComp(consoleEnt, out TransformComponent? xform))
+                continue;
 
             var gridId = xform.GridUid;
             // This tries to see if the grid is a shuttle and if the console should work.
-            if (!TryComp<MapGridComponent>(gridId, out var _) ||
+            if (!TryComp<MapGridComponent>(gridId, out _) ||
                 !shuttleQuery.TryGetComponent(gridId, out var shuttleComponent) ||
                 !shuttleComponent.Enabled)
                 continue;
 
             if (!newPilots.TryGetValue(gridId!.Value, out var pilots))
             {
-                pilots = (shuttleComponent, new List<(EntityUid, PilotComponent, InputMoverComponent, TransformComponent)>());
+                pilots = (shuttleComponent,
+                    new List<(EntityUid, PilotComponent, InputMoverComponent, TransformComponent)>());
                 newPilots[gridId.Value] = pilots;
             }
 
@@ -473,23 +453,18 @@ public sealed class MoverController : SharedMoverController
                     PhysicsSystem.ApplyForce(shuttleUid, impulse, body: body);
                 }
                 else
-                {
                     _thruster.DisableLinearThrusters(shuttle);
-                }
 
                 if (body.AngularVelocity != 0f)
                 {
-                    var torque = shuttle.AngularThrust * brakeInput * (body.AngularVelocity > 0f ? -1f : 1f) * ShuttleComponent.BrakeCoefficient;
+                    var torque = shuttle.AngularThrust * brakeInput * (body.AngularVelocity > 0f ? -1f : 1f) *
+                                 ShuttleComponent.BrakeCoefficient;
                     var torqueMul = body.InvI * frameTime;
 
                     if (body.AngularVelocity > 0f)
-                    {
                         torque = MathF.Max(-body.AngularVelocity / torqueMul, torque);
-                    }
                     else
-                    {
                         torque = MathF.Min(-body.AngularVelocity / torqueMul, torque);
-                    }
 
                     if (!torque.Equals(0f))
                     {
@@ -498,9 +473,7 @@ public sealed class MoverController : SharedMoverController
                     }
                 }
                 else
-                {
                     _thruster.SetAngularThrust(shuttle, false);
-                }
             }
 
             if (linearInput.Length().Equals(0f))
@@ -558,7 +531,8 @@ public sealed class MoverController : SharedMoverController
                             force.X -= thrust;
                             break;
                         default:
-                            throw new ArgumentOutOfRangeException($"Attempted to apply thrust to shuttle {shuttleUid} along invalid dir {dir}.");
+                            throw new ArgumentOutOfRangeException(
+                                $"Attempted to apply thrust to shuttle {shuttleUid} along invalid dir {dir}.");
                     }
 
                     _thruster.EnableLinearThrustDirection(shuttle, dir);
@@ -621,16 +595,10 @@ public sealed class MoverController : SharedMoverController
     // .NET 8 seem to miscompile usage of Vector2.Dot above. This manual outline fixes it pending an upstream fix.
     // See PR #24008
     [MethodImpl(MethodImplOptions.NoInlining)]
-    public static float Vector2Dot(Vector2 value1, Vector2 value2)
-    {
-        return Vector2.Dot(value1, value2);
-    }
+    public static float Vector2Dot(Vector2 value1, Vector2 value2) => Vector2.Dot(value1, value2);
 
-    private bool CanPilot(EntityUid shuttleUid)
-    {
-        return TryComp<FTLComponent>(shuttleUid, out var ftl)
+    private bool CanPilot(EntityUid shuttleUid) =>
+        TryComp<FTLComponent>(shuttleUid, out var ftl)
         && (ftl.State & (FTLState.Starting | FTLState.Travelling | FTLState.Arriving)) != 0x0
-            || HasComp<PreventPilotComponent>(shuttleUid);
-    }
-
+        || HasComp<PreventPilotComponent>(shuttleUid);
 }

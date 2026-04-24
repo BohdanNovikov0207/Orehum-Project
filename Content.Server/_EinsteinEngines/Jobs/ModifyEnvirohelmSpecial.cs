@@ -18,12 +18,6 @@ namespace Content.Server._EinsteinEngines.Jobs;
 [UsedImplicitly]
 public sealed partial class ModifyEnvirohelmSpecial : JobSpecial
 {
-    // <summary>
-    //   The new power cell of the envirohelm.
-    // </summary>
-    [DataField(required: true)]
-    public ProtoId<EntityPrototype> PowerCell { get; private set; }
-
     [ValidatePrototypeId<SpeciesPrototype>]
     private const string Species = "Plasmaman";
 
@@ -33,6 +27,12 @@ public sealed partial class ModifyEnvirohelmSpecial : JobSpecial
     private const string Slot = "head";
 
     private const string ItemSlot = "cell_slot";
+
+    // <summary>
+    //   The new power cell of the envirohelm.
+    // </summary>
+    [DataField(required: true)]
+    public ProtoId<EntityPrototype> PowerCell { get; private set; }
 
     public override void AfterEquip(EntityUid mob)
     {
@@ -52,7 +52,7 @@ public sealed partial class ModifyEnvirohelmSpecial : JobSpecial
 
         var powerCell = entMan.Spawn(PowerCell);
 
-        if (!itemSlotsSystem.TryInsert(envirohelm, ItemSlot, powerCell, null, itemSlotsComp, excludeUserAudio: true))
+        if (!itemSlotsSystem.TryInsert(envirohelm, ItemSlot, powerCell, null, itemSlotsComp, true))
             entMan.DeleteEntity(powerCell);
     }
 }

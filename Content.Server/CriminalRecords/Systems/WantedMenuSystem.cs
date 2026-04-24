@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Diagnostics.CodeAnalysis;
 using Content.Server.StationRecords;
 using Content.Shared.Access.Components;
 using Content.Shared.CriminalRecords;
@@ -10,18 +11,17 @@ using Content.Shared.IdentityManagement;
 using Content.Shared.Security;
 using Content.Shared.StationRecords;
 using Robust.Shared.Utility;
-using System.Diagnostics.CodeAnalysis;
 
-namespace Content.Server.CriminalRecords.Systems; // Goobstation-WantedMenu
+namespace Content.Server.CriminalRecords.Systems;
+// Goobstation-WantedMenu
 
 public sealed partial class CriminalRecordsConsoleSystem
 {
-    private void UpdateUserInterface<T>(Entity<IdExaminableComponent> ent, ref T args)
-    {
-        UpdateUserInterface(ent);
-    }
+    private void UpdateUserInterface<T>(Entity<IdExaminableComponent> ent, ref T args) => UpdateUserInterface(ent);
 
-    public bool TryGetTargetRecord(EntityUid target, out KeyValuePair<uint,string>? targetRecord, out EntityUid? owningStation)
+    public bool TryGetTargetRecord(EntityUid target,
+        out KeyValuePair<uint, string>? targetRecord,
+        out EntityUid? owningStation)
     {
         targetRecord = default;
         owningStation = _station.GetOwningStation(target);
@@ -37,16 +37,18 @@ public sealed partial class CriminalRecordsConsoleSystem
             return false;
         return true;
     }
+
     private void UpdateUserInterface(Entity<IdExaminableComponent> ent)
     {
         CriminalRecordsConsoleState? state;
-        var ( uid, component ) = ent;
+        var (uid, component) = ent;
         if (!TryGetTargetRecord(uid, out var targetRecord, out var owningStation))
         {
             state = new CriminalRecordsConsoleState(null, null);
             _ui.SetUiState(uid, SetWantedVerbMenu.Key, state);
             return;
         }
+
         if (!TryComp<StationRecordsComponent>(owningStation, out var stationRecords))
             return;
         var listing = _records.BuildListing((owningStation.Value, stationRecords), null);
@@ -61,8 +63,11 @@ public sealed partial class CriminalRecordsConsoleSystem
 
         _ui.SetUiState(uid, SetWantedVerbMenu.Key, state);
     }
-    private bool CheckSelected(Entity<IdExaminableComponent> ent, EntityUid user,
-        [NotNullWhen(true)] out EntityUid? mob, [NotNullWhen(true)] out StationRecordKey? key)
+
+    private bool CheckSelected(Entity<IdExaminableComponent> ent,
+        EntityUid user,
+        [NotNullWhen(true)] out EntityUid? mob,
+        [NotNullWhen(true)] out StationRecordKey? key)
     {
         key = null;
         mob = null;
@@ -72,6 +77,7 @@ public sealed partial class CriminalRecordsConsoleSystem
             _popup.PopupEntity(Loc.GetString("criminal-records-permission-denied"), ent, user);
             return false;
         }
+
         TryGetTargetRecord(ent, out var targetRecord, out var owningStation);
         if (owningStation is not { } station)
             return false;
@@ -82,6 +88,7 @@ public sealed partial class CriminalRecordsConsoleSystem
         mob = user;
         return true;
     }
+
     private void OnChangeStatus(Entity<IdExaminableComponent> ent, ref CriminalRecordChangeStatus msg)
     {
         // prevent malf client violating wanted/reason nullability
@@ -131,7 +138,8 @@ public sealed partial class CriminalRecordsConsoleSystem
 
         (string, object)[] args;
         if (reason != null)
-            args = new (string, object)[] { ("name", name), ("officer", officer), ("reason", reason), ("job", jobName) };
+            args = new (string, object)[]
+                { ("name", name), ("officer", officer), ("reason", reason), ("job", jobName) };
         else
             args = new (string, object)[] { ("name", name), ("officer", officer), ("job", jobName) };
 
@@ -173,10 +181,12 @@ public sealed partial class CriminalRecordsConsoleSystem
             // person no longer demoted
             (SecurityStatus.Demote, SecurityStatus.None) => "not-demoted", // Goobstation
             // this is impossible
-            _ => "not-wanted"
+            _ => "not-wanted",
         };
-        _radio.SendRadioMessage(msg.Actor, Loc.GetString($"criminal-records-console-{statusString}", args),
-            ent.Comp.SecurityChannel, ent);
+        _radio.SendRadioMessage(msg.Actor,
+            Loc.GetString($"criminal-records-console-{statusString}", args),
+            ent.Comp.SecurityChannel,
+            ent);
 
         UpdateUserInterface(ent);
     }

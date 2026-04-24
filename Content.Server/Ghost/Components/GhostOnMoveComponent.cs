@@ -13,14 +13,13 @@
 //
 // SPDX-License-Identifier: MIT
 
-namespace Content.Server.Ghost.Components
-{
-    [RegisterComponent]
-    public sealed partial class GhostOnMoveComponent : Component
-    {
-        [DataField("canReturn")] public bool CanReturn { get; set; } = true;
+namespace Content.Server.Ghost.Components;
 
-        [DataField("mustBeDead")]
-        public bool MustBeDead = false;
-    }
+[RegisterComponent]
+public sealed partial class GhostOnMoveComponent : Component
+{
+    [DataField("mustBeDead")]
+    public bool MustBeDead = false;
+
+    [DataField("canReturn")] public bool CanReturn { get; set; } = true;
 }

@@ -29,8 +29,8 @@ namespace Content.Server.Clothing.Systems;
 
 public sealed class ChameleonClothingSystem : SharedChameleonClothingSystem
 {
-    [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly IdentitySystem _identity = default!;
+    [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
 
     public override void Initialize()
@@ -42,15 +42,12 @@ public sealed class ChameleonClothingSystem : SharedChameleonClothingSystem
         SubscribeLocalEvent<ChameleonClothingComponent, EmpPulseEvent>(OnEmpPulse);
     }
 
-    private void OnMapInit(EntityUid uid, ChameleonClothingComponent component, MapInitEvent args)
-    {
+    private void OnMapInit(EntityUid uid, ChameleonClothingComponent component, MapInitEvent args) =>
         SetSelectedPrototype(uid, component.Default, true, component);
-    }
 
-    private void OnSelected(EntityUid uid, ChameleonClothingComponent component, ChameleonPrototypeSelectedMessage args)
-    {
+    private void
+        OnSelected(EntityUid uid, ChameleonClothingComponent component, ChameleonPrototypeSelectedMessage args) =>
         SetSelectedPrototype(uid, args.SelectedId, component: component);
-    }
 
     private void OnEmpPulse(EntityUid uid, ChameleonClothingComponent component, ref EmpPulseEvent args)
     {
@@ -77,9 +74,11 @@ public sealed class ChameleonClothingSystem : SharedChameleonClothingSystem
     }
 
     /// <summary>
-    ///     Change chameleon items name, description and sprite to mimic other entity prototype.
+    /// Change chameleon items name, description and sprite to mimic other entity prototype.
     /// </summary>
-    public void SetSelectedPrototype(EntityUid uid, string? protoId, bool forceUpdate = false,
+    public void SetSelectedPrototype(EntityUid uid,
+        string? protoId,
+        bool forceUpdate = false,
         ChameleonClothingComponent? component = null)
     {
         if (!Resolve(uid, ref component, false))
@@ -104,12 +103,10 @@ public sealed class ChameleonClothingSystem : SharedChameleonClothingSystem
     }
 
     /// <summary>
-    ///     Get a random prototype for a given slot.
+    /// Get a random prototype for a given slot.
     /// </summary>
-    public string GetRandomValidPrototype(SlotFlags slot, string? tag = null)
-    {
-        return _random.Pick(GetValidTargets(slot, tag).ToList());
-    }
+    public string GetRandomValidPrototype(SlotFlags slot, string? tag = null) =>
+        _random.Pick(GetValidTargets(slot, tag).ToList());
 
     public override void Update(float frameTime)
     {

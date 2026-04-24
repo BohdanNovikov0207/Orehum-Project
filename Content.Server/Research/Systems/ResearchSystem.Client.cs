@@ -8,7 +8,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using Content.Server.Power.EntitySystems;
 using Content.Shared.Research.Components;
 using Robust.Shared.Utility;
@@ -31,44 +30,9 @@ public sealed partial class ResearchSystem
         SubscribeLocalEvent<ResearchClientComponent, ResearchRegistrationChangedEvent>(OnClientRegistrationChanged);
     }
 
-    #region UI
-
-    private void OnClientSelected(EntityUid uid, ResearchClientComponent component, ResearchClientServerSelectedMessage args)
-    {
-        if (!TryGetServerById(uid, args.ServerId, out var serveruid, out var serverComponent))
-            return;
-
-        // Validate that we can access this server.
-        if (!GetServers(uid).Contains((serveruid.Value, serverComponent)))
-            return;
-
-        UnregisterClient(uid, component);
-        RegisterClient(uid, serveruid.Value, component, serverComponent);
-    }
-
-    private void OnClientDeselected(EntityUid uid, ResearchClientComponent component, ResearchClientServerDeselectedMessage args)
-    {
-        UnregisterClient(uid, clientComponent: component);
-    }
-
-    private void OnClientSyncMessage(EntityUid uid, ResearchClientComponent component, ResearchClientSyncMessage args)
-    {
-        UpdateClientInterface(uid, component);
-    }
-
-    private void OnConsoleSelect(EntityUid uid, ResearchClientComponent component, ConsoleServerSelectionMessage args)
-    {
-        if (!this.IsPowered(uid, EntityManager))
-            return;
-
-        _uiSystem.TryToggleUi(uid, ResearchClientUiKey.Key, args.Actor);
-    }
-    #endregion
-
-    private void OnClientRegistrationChanged(EntityUid uid, ResearchClientComponent component, ref ResearchRegistrationChangedEvent args)
-    {
-        UpdateClientInterface(uid, component);
-    }
+    private void OnClientRegistrationChanged(EntityUid uid,
+        ResearchClientComponent component,
+        ref ResearchRegistrationChangedEvent args) => UpdateClientInterface(uid, component);
 
     private void OnClientMapInit(EntityUid uid, ResearchClientComponent component, MapInitEvent args)
     {
@@ -76,15 +40,11 @@ public sealed partial class ResearchSystem
             RegisterClient(uid, server, component, server);
     }
 
-    private void OnClientShutdown(EntityUid uid, ResearchClientComponent component, ComponentShutdown args)
-    {
+    private void OnClientShutdown(EntityUid uid, ResearchClientComponent component, ComponentShutdown args) =>
         UnregisterClient(uid, component);
-    }
 
-    private void OnClientUIOpen(EntityUid uid, ResearchClientComponent component, BoundUIOpenedEvent args)
-    {
+    private void OnClientUIOpen(EntityUid uid, ResearchClientComponent component, BoundUIOpenedEvent args) =>
         UpdateClientInterface(uid, component);
-    }
 
     private void OnClientAnchorStateChanged(Entity<ResearchClientComponent> ent, ref AnchorStateChangedEvent args)
     {
@@ -97,9 +57,7 @@ public sealed partial class ResearchSystem
                 RegisterClient(ent, server, ent, server);
         }
         else
-        {
             UnregisterClient(ent, ent.Comp);
-        }
     }
 
     private void UpdateClientInterface(EntityUid uid, ResearchClientComponent? component = null)
@@ -128,8 +86,8 @@ public sealed partial class ResearchSystem
     /// <param name="component">The client's Researchclient component</param>
     /// <returns>If the server was successfully retrieved.</returns>
     public bool TryGetClientServer(EntityUid uid,
-        [NotNullWhen(returnValue: true)] out EntityUid? server,
-        [NotNullWhen(returnValue: true)] out ResearchServerComponent? serverComponent,
+        [NotNullWhen(true)] out EntityUid? server,
+        [NotNullWhen(true)] out ResearchServerComponent? serverComponent,
         ResearchClientComponent? component = null)
     {
         server = null;
@@ -147,4 +105,39 @@ public sealed partial class ResearchSystem
         server = component.Server;
         return true;
     }
+
+    #region UI
+
+    private void OnClientSelected(EntityUid uid,
+        ResearchClientComponent component,
+        ResearchClientServerSelectedMessage args)
+    {
+        if (!TryGetServerById(uid, args.ServerId, out var serveruid, out var serverComponent))
+            return;
+
+        // Validate that we can access this server.
+        if (!GetServers(uid).Contains((serveruid.Value, serverComponent)))
+            return;
+
+        UnregisterClient(uid, component);
+        RegisterClient(uid, serveruid.Value, component, serverComponent);
+    }
+
+    private void OnClientDeselected(EntityUid uid,
+        ResearchClientComponent component,
+        ResearchClientServerDeselectedMessage args) => UnregisterClient(uid, component);
+
+    private void
+        OnClientSyncMessage(EntityUid uid, ResearchClientComponent component, ResearchClientSyncMessage args) =>
+        UpdateClientInterface(uid, component);
+
+    private void OnConsoleSelect(EntityUid uid, ResearchClientComponent component, ConsoleServerSelectionMessage args)
+    {
+        if (!this.IsPowered(uid, EntityManager))
+            return;
+
+        _uiSystem.TryToggleUi(uid, ResearchClientUiKey.Key, args.Actor);
+    }
+
+    #endregion
 }

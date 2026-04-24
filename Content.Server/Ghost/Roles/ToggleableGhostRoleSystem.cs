@@ -59,25 +59,26 @@
 
 using Content.Server.Ghost.Roles.Components;
 using Content.Shared.Examine;
-using Content.Shared.Interaction; // Goobstation
+using Content.Shared.Interaction;
 using Content.Shared.Interaction.Events;
 using Content.Shared.Mind;
 using Content.Shared.Mind.Components;
 using Content.Shared.Popups;
 using Content.Shared.Verbs;
+// Goobstation
 
 namespace Content.Server.Ghost.Roles;
 
 /// <summary>
-/// This handles logic and interaction related to <see cref="ToggleableGhostRoleComponent"/>
+/// This handles logic and interaction related to <see cref="ToggleableGhostRoleComponent" />
 /// </summary>
 public sealed class ToggleableGhostRoleSystem : EntitySystem
 {
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly SharedMindSystem _mind = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         SubscribeLocalEvent<ToggleableGhostRoleComponent, UseInHandEvent>(OnUseInHand);
@@ -117,17 +118,11 @@ public sealed class ToggleableGhostRoleSystem : EntitySystem
             return;
 
         if (TryComp<MindContainerComponent>(uid, out var mind) && mind.HasMind)
-        {
             args.PushMarkup(Loc.GetString(component.ExamineTextMindPresent));
-        }
         else if (HasComp<GhostTakeoverAvailableComponent>(uid))
-        {
             args.PushMarkup(Loc.GetString(component.ExamineTextMindSearching));
-        }
         else
-        {
             args.PushMarkup(Loc.GetString(component.ExamineTextNoMind));
-        }
     }
 
     private void OnMindAdded(EntityUid uid, ToggleableGhostRoleComponent pai, MindAddedMessage args)
@@ -144,10 +139,8 @@ public sealed class ToggleableGhostRoleSystem : EntitySystem
         UpdateAppearance(uid, ToggleableGhostRoleStatus.Off);
     }
 
-    private void UpdateAppearance(EntityUid uid, ToggleableGhostRoleStatus status)
-    {
+    private void UpdateAppearance(EntityUid uid, ToggleableGhostRoleStatus status) =>
         _appearance.SetData(uid, ToggleableGhostRoleVisuals.Status, status);
-    }
 
     private void AddWipeVerb(EntityUid uid, ToggleableGhostRoleComponent component, GetVerbsEvent<ActivationVerb> args)
     {
@@ -167,7 +160,7 @@ public sealed class ToggleableGhostRoleSystem : EntitySystem
                     // The shutdown of the Mind should cause automatic reset of the pAI during OnMindRemoved
                     _mind.TransferTo(mindId, null, mind: mind);
                     _popup.PopupEntity(Loc.GetString(component.WipeVerbPopup), uid, args.User, PopupType.Large);
-                }
+                },
             };
             args.Verbs.Add(verb);
         }
@@ -185,7 +178,7 @@ public sealed class ToggleableGhostRoleSystem : EntitySystem
                     RemCompDeferred<GhostRoleComponent>(uid);
                     _popup.PopupEntity(Loc.GetString(component.StopSearchVerbPopup), uid, args.User);
                     UpdateAppearance(uid, ToggleableGhostRoleStatus.Off);
-                }
+                },
             };
             args.Verbs.Add(verb);
         }
@@ -200,11 +193,13 @@ public sealed class ToggleableGhostRoleSystem : EntitySystem
             _popup.PopupEntity(Loc.GetString(component.ExamineTextMindPresent), uid, user, PopupType.Large);
             return;
         }
+
         if (HasComp<GhostTakeoverAvailableComponent>(uid))
         {
             _popup.PopupEntity(Loc.GetString(component.ExamineTextMindSearching), uid, user);
             return;
         }
+
         _popup.PopupEntity(Loc.GetString(component.BeginSearchingText), uid, user);
 
         UpdateAppearance(uid, ToggleableGhostRoleStatus.Searching);
@@ -230,9 +225,7 @@ public sealed class ToggleableGhostRoleSystem : EntitySystem
         if (TryComp<MindContainerComponent>(uid, out var mindContainer) &&
             mindContainer.HasMind &&
             _mind.TryGetMind(uid, out var mindId, out var mind))
-        {
             _mind.TransferTo(mindId, null, mind: mind);
-        }
 
         if (!HasComp<GhostTakeoverAvailableComponent>(uid))
             return;

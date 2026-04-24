@@ -4,14 +4,13 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared;
 using Content.Shared.Light.Components;
 using Content.Shared.Light.EntitySystems;
 using Robust.Shared.Random;
 
 namespace Content.Server.Light.EntitySystems;
 
-/// <inheritdoc/>
+/// <inheritdoc />
 public sealed class LightCycleSystem : SharedLightCycleSystem
 {
     [Dependency] private readonly IRobustRandom _random = default!;
@@ -21,8 +20,6 @@ public sealed class LightCycleSystem : SharedLightCycleSystem
         base.OnCycleMapInit(ent, ref args);
 
         if (ent.Comp.InitialOffset)
-        {
             SetOffset(ent, _random.Next(ent.Comp.Duration));
-        }
     }
 }

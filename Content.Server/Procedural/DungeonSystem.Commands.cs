@@ -70,9 +70,7 @@ public sealed partial class DungeonSystem
             }
         }
         else
-        {
             seed = new Random().Next();
-        }
 
         shell.WriteLine(Loc.GetString("cmd-dungen-start", ("seed", seed)));
         GenerateDungeon(dungeon, dungeonUid, dungeonGrid, position, seed);
@@ -81,29 +79,22 @@ public sealed partial class DungeonSystem
     private CompletionResult CompletionCallback(IConsoleShell shell, string[] args)
     {
         if (args.Length == 1)
-        {
-            return CompletionResult.FromHintOptions(CompletionHelper.MapIds(EntityManager), Loc.GetString("cmd-dungen-hint-map"));
-        }
+            return CompletionResult.FromHintOptions(CompletionHelper.MapIds(EntityManager),
+                Loc.GetString("cmd-dungen-hint-map"));
 
         if (args.Length == 2)
-        {
-            return CompletionResult.FromHintOptions(CompletionHelper.PrototypeIDs<DungeonConfigPrototype>(proto: _prototype), Loc.GetString("cmd-dungen-hint-config"));
-        }
+            return CompletionResult.FromHintOptions(
+                CompletionHelper.PrototypeIDs<DungeonConfigPrototype>(proto: _prototype),
+                Loc.GetString("cmd-dungen-hint-config"));
 
         if (args.Length == 3)
-        {
             return CompletionResult.FromHint(Loc.GetString("cmd-dungen-hint-posx"));
-        }
 
         if (args.Length == 4)
-        {
             return CompletionResult.FromHint(Loc.GetString("cmd-dungen-hint-posy"));
-        }
 
         if (args.Length == 5)
-        {
             return CompletionResult.FromHint(Loc.GetString("cmd-dungen-hint-seed"));
-        }
 
         return CompletionResult.Empty;
     }
@@ -112,22 +103,16 @@ public sealed partial class DungeonSystem
     private void DungeonPackVis(IConsoleShell shell, string argstr, string[] args)
     {
         if (args.Length != 2)
-        {
             return;
-        }
 
         if (!int.TryParse(args[0], out var mapInt))
-        {
             return;
-        }
 
         var mapId = new MapId(mapInt);
         var mapUid = _maps.GetMapOrInvalid(mapId);
 
         if (!_prototype.TryIndex<DungeonRoomPackPrototype>(args[1], out var pack))
-        {
             return;
-        }
 
         var grid = EnsureComp<MapGridComponent>(mapUid);
         var tile = new Tile(_tileDefManager["FloorSteel"].TileId);
@@ -168,22 +153,16 @@ public sealed partial class DungeonSystem
     private void DungeonPresetVis(IConsoleShell shell, string argstr, string[] args)
     {
         if (args.Length != 2)
-        {
             return;
-        }
 
         if (!int.TryParse(args[0], out var mapInt))
-        {
             return;
-        }
 
         var mapId = new MapId(mapInt);
-        var mapUid =_maps.GetMapOrInvalid(mapId);
+        var mapUid = _maps.GetMapOrInvalid(mapId);
 
         if (!_prototype.TryIndex<DungeonPresetPrototype>(args[1], out var preset))
-        {
             return;
-        }
 
         var grid = EnsureComp<MapGridComponent>(mapUid);
         var tile = new Tile(_tileDefManager["FloorSteel"].TileId);
@@ -208,14 +187,12 @@ public sealed partial class DungeonSystem
     private CompletionResult PresetCallback(IConsoleShell shell, string[] args)
     {
         if (args.Length == 1)
-        {
-            return CompletionResult.FromHintOptions(CompletionHelper.MapIds(EntityManager), Loc.GetString("cmd-dungen-hint-map"));
-        }
+            return CompletionResult.FromHintOptions(CompletionHelper.MapIds(EntityManager),
+                Loc.GetString("cmd-dungen-hint-map"));
 
         if (args.Length == 2)
-        {
-            return CompletionResult.FromOptions(CompletionHelper.PrototypeIDs<DungeonPresetPrototype>(proto: _prototype));
-        }
+            return CompletionResult.FromOptions(
+                CompletionHelper.PrototypeIDs<DungeonPresetPrototype>(proto: _prototype));
 
         return CompletionResult.Empty;
     }
@@ -223,14 +200,12 @@ public sealed partial class DungeonSystem
     private CompletionResult PackCallback(IConsoleShell shell, string[] args)
     {
         if (args.Length == 1)
-        {
-            return CompletionResult.FromHintOptions(CompletionHelper.MapIds(EntityManager), Loc.GetString("cmd-dungen-hint-map"));
-        }
+            return CompletionResult.FromHintOptions(CompletionHelper.MapIds(EntityManager),
+                Loc.GetString("cmd-dungen-hint-map"));
 
         if (args.Length == 2)
-        {
-            return CompletionResult.FromOptions(CompletionHelper.PrototypeIDs<DungeonRoomPackPrototype>(proto: _prototype));
-        }
+            return CompletionResult.FromOptions(
+                CompletionHelper.PrototypeIDs<DungeonRoomPackPrototype>(proto: _prototype));
 
         return CompletionResult.Empty;
     }

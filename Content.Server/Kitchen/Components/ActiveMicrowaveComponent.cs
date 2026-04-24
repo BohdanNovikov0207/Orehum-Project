@@ -14,14 +14,11 @@ namespace Content.Server.Kitchen.Components;
 /// <summary>
 /// Attached to a microwave that is currently in the process of cooking
 /// </summary>
-[RegisterComponent, AutoGenerateComponentPause]
+[RegisterComponent] [AutoGenerateComponentPause]
 public sealed partial class ActiveMicrowaveComponent : Component
 {
     [ViewVariables(VVAccess.ReadWrite)]
     public float CookTimeRemaining;
-
-    [ViewVariables(VVAccess.ReadWrite)]
-    public float TotalTime;
 
     [ViewVariables(VVAccess.ReadWrite)]
     [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))]
@@ -30,4 +27,7 @@ public sealed partial class ActiveMicrowaveComponent : Component
 
     [ViewVariables]
     public (FoodRecipePrototype?, int) PortionedRecipe;
+
+    [ViewVariables(VVAccess.ReadWrite)]
+    public float TotalTime;
 }

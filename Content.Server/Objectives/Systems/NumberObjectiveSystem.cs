@@ -16,8 +16,8 @@ namespace Content.Server.Objectives.Systems;
 /// </summary>
 public sealed class NumberObjectiveSystem : EntitySystem
 {
-    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly MetaDataSystem _metaData = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
 
     public override void Initialize()
     {
@@ -27,10 +27,8 @@ public sealed class NumberObjectiveSystem : EntitySystem
         SubscribeLocalEvent<NumberObjectiveComponent, ObjectiveAfterAssignEvent>(OnAfterAssign);
     }
 
-    private void OnAssigned(EntityUid uid, NumberObjectiveComponent comp, ref ObjectiveAssignedEvent args)
-    {
+    private void OnAssigned(EntityUid uid, NumberObjectiveComponent comp, ref ObjectiveAssignedEvent args) =>
         comp.Target = _random.Next(comp.Min, comp.Max);
-    }
 
     private void OnAfterAssign(EntityUid uid, NumberObjectiveComponent comp, ref ObjectiveAfterAssignEvent args)
     {

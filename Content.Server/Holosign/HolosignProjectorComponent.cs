@@ -7,27 +7,27 @@
 //
 // SPDX-License-Identifier: MIT
 
-using Content.Shared.Tag; // Goobstation
+using Content.Shared.Tag;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype;
+// Goobstation
 
-namespace Content.Server.Holosign
+namespace Content.Server.Holosign;
+
+[RegisterComponent]
+public sealed partial class HolosignProjectorComponent : Component
 {
-    [RegisterComponent]
-    public sealed partial class HolosignProjectorComponent : Component
-    {
-        [ViewVariables(VVAccess.ReadWrite)]
-        [DataField("signProto", customTypeSerializer:typeof(PrototypeIdSerializer<EntityPrototype>))]
-        public string SignProto = "HolosignWetFloor";
+    /// <summary>
+    /// How much charge a single use expends.
+    /// </summary>
+    [ViewVariables(VVAccess.ReadWrite)] [DataField("chargeUse")]
+    public float ChargeUse = 50f;
 
-        /// <summary>
-        /// How much charge a single use expends.
-        /// </summary>
-        [ViewVariables(VVAccess.ReadWrite), DataField("chargeUse")]
-        public float ChargeUse = 50f;
+    // Goobstation
+    [DataField]
+    public ProtoId<TagPrototype> HolosignTag = "Holosign";
 
-        // Goobstation
-        [DataField]
-        public ProtoId<TagPrototype> HolosignTag = "Holosign";
-    }
+    [ViewVariables(VVAccess.ReadWrite)]
+    [DataField("signProto", customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
+    public string SignProto = "HolosignWetFloor";
 }

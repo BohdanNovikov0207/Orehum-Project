@@ -20,7 +20,7 @@ namespace Content.Server.Procedural.DungeonJob;
 public sealed partial class DungeonJob
 {
     /// <summary>
-    /// <see cref="WormCorridorDunGen"/>
+    ///     <see cref="WormCorridorDunGen" />
     /// </summary>
     private async Task PostGen(WormCorridorDunGen gen, Dungeon dungeon, HashSet<Vector2i> reservedTiles, Random random)
     {
@@ -51,7 +51,7 @@ public sealed partial class DungeonJob
         for (var i = 0; i < gen.Count; i++)
         {
             // Find a random network to worm from.
-            var startIndex = (i % networks.Count);
+            var startIndex = i % networks.Count;
             var startPos = networks[startIndex].Start;
             var position = startPos + _grid.TileSizeHalfVector;
 
@@ -68,18 +68,14 @@ public sealed partial class DungeonJob
                 // Check if the tile doesn't overlap something it shouldn't
                 if (dungeon.RoomTiles.Contains(roundedPos) ||
                     dungeon.RoomExteriorTiles.Contains(roundedPos))
-                {
                     continue;
-                }
 
                 worm.Add(roundedPos);
             }
 
             // Uhh yeah.
             if (worm.Count == 0)
-            {
                 continue;
-            }
 
             // Find a random part on the existing worm to start.
             var value = random.Pick(worm);
@@ -155,17 +151,13 @@ public sealed partial class DungeonJob
                             // Exclude room tiles.
                             if (dungeon.RoomTiles.Contains(neighbor) ||
                                 dungeon.RoomExteriorTiles.Contains(neighbor))
-                            {
                                 continue;
-                            }
 
                             var tileCost = (neighbor - node).Length;
                             var gScore = costSoFar[node] + tileCost;
 
                             if (costSoFar.TryGetValue(neighbor, out var nextValue) && gScore >= nextValue)
-                            {
                                 continue;
-                            }
 
                             cameFrom[neighbor] = node;
                             costSoFar[neighbor] = gScore;

@@ -8,20 +8,19 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Server._DV.CosmicCult.EntitySystems;
 using Content.Server._DV.CosmicCult.Components;
-using Content.Goobstation.Shared.Religion; // Goobstation - Shitchap
+using Content.Server._DV.CosmicCult.EntitySystems;
 using Content.Server.Actions;
 using Content.Server.AlertLevel;
-using Content.Server.Audio;
 using Content.Server.Antag;
+using Content.Server.Audio;
 using Content.Server.Chat.Systems;
 using Content.Server.GameTicking.Events;
 using Content.Server.Pinpointer;
 using Content.Server.Popups;
 using Content.Server.Station.Systems;
-using Content.Shared._DV.CosmicCult.Components;
 using Content.Shared._DV.CosmicCult;
+using Content.Shared._DV.CosmicCult.Components;
 using Content.Shared.Alert;
 using Content.Shared.DoAfter;
 using Content.Shared.Examine;
@@ -34,44 +33,48 @@ using Content.Shared.StatusEffect;
 using Robust.Server.GameObjects;
 using Robust.Shared.Audio;
 using Robust.Shared.Audio.Systems;
-using Robust.Shared.EntitySerialization.Systems;
 using Robust.Shared.EntitySerialization;
+using Robust.Shared.EntitySerialization.Systems;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Timing;
 using Robust.Shared.Utility;
+// Goobstation - Shitchap
 
 namespace Content.Server._DV.CosmicCult;
 
 public sealed partial class CosmicCultSystem : SharedCosmicCultSystem
 {
+    private static readonly EntProtoId CosmicEchoVfx = "CosmicEchoVfx";
+    private static readonly ProtoId<StatusEffectPrototype> EntropicDegen = "EntropicDegen";
+
+    private static readonly ProtoId<StatusEffectPrototype>
+        EntropicDegenNonCultist = "EntropicDegenNonCultist"; // Goobstation change. For non-cultist equipment debuff
+
     [Dependency] private readonly ActionsSystem _actions = default!;
     [Dependency] private readonly AlertLevelSystem _alert = default!;
     [Dependency] private readonly AlertsSystem _alerts = default!;
     [Dependency] private readonly AntagSelectionSystem _antag = default!;
     [Dependency] private readonly AppearanceSystem _appearance = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly ChatSystem _chatSystem = default!;
     [Dependency] private readonly CosmicCorruptingSystem _corrupting = default!;
     [Dependency] private readonly CosmicCultRuleSystem _cultRule = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
+    [Dependency] private readonly SharedEyeSystem _eye = default!;
+    [Dependency] private readonly SharedMapSystem _map = default!;
     [Dependency] private readonly MapLoaderSystem _mapLoader = default!;
+    private readonly ResPath _mapPath = new("Maps/_DV/Nonstations/cosmicvoid.yml");
     [Dependency] private readonly MonumentSystem _monument = default!;
     [Dependency] private readonly MovementSpeedModifierSystem _movementSpeed = default!;
     [Dependency] private readonly NavMapSystem _navMap = default!;
     [Dependency] private readonly PopupSystem _popup = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly ServerGlobalSoundSystem _sound = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
-    [Dependency] private readonly SharedEyeSystem _eye = default!;
-    [Dependency] private readonly SharedMapSystem _map = default!;
-    [Dependency] private readonly SharedUserInterfaceSystem _ui = default!;
     [Dependency] private readonly StationSystem _station = default!;
     [Dependency] private readonly StatusEffectsSystem _statusEffects = default!;
-    private readonly ResPath _mapPath = new("Maps/_DV/Nonstations/cosmicvoid.yml");
-    private static readonly EntProtoId CosmicEchoVfx = "CosmicEchoVfx";
-    private static readonly ProtoId<StatusEffectPrototype> EntropicDegen = "EntropicDegen";
-    private static readonly ProtoId<StatusEffectPrototype> EntropicDegenNonCultist = "EntropicDegenNonCultist"; // Goobstation change. For non-cultist equipment debuff
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly SharedUserInterfaceSystem _ui = default!;
 
     public override void Initialize()
     {
@@ -133,6 +136,7 @@ public sealed partial class CosmicCultSystem : SharedCosmicCultSystem
     #endregion
 
     #region Init Cult
+
     /// <summary>
     /// Add the starting powers to the cultist.
     /// </summary>
@@ -153,10 +157,10 @@ public sealed partial class CosmicCultSystem : SharedCosmicCultSystem
     /// <summary>
     /// Add the Monument summon action to the cult lead.
     /// </summary>
-    private void OnStartCultLead(Entity<CosmicCultLeadComponent> uid, ref ComponentInit args)
-    {
-        _actions.AddAction(uid, ref uid.Comp.CosmicMonumentPlaceActionEntity, uid.Comp.CosmicMonumentPlaceAction, uid);
-    }
+    private void OnStartCultLead(Entity<CosmicCultLeadComponent> uid, ref ComponentInit args) => _actions.AddAction(uid,
+        ref uid.Comp.CosmicMonumentPlaceActionEntity,
+        uid.Comp.CosmicMonumentPlaceAction,
+        uid);
 
     private void OnCultLeadChanged(Entity<CosmicCultLeadComponent> uid, ref CosmicCultLeadChangedEvent args)
     {
@@ -191,21 +195,24 @@ public sealed partial class CosmicCultSystem : SharedCosmicCultSystem
         cult.Comp.CultLeader = uid;
     }
 
-    private void OnGetVisMask(Entity<CosmicCultComponent> uid, ref GetVisMaskEvent args)
-    {
+    private void OnGetVisMask(Entity<CosmicCultComponent> uid, ref GetVisMaskEvent args) =>
         args.VisibilityMask |= (int) VisibilityFlags.CosmicCultMonument;
-    }
 
     /// <summary>
     /// Called by Cosmic Siphon. Increments the Cult's global objective tracker.
     /// </summary>
+
     #endregion
 
     #region Equipment Pickup
+
     private void OnGotEquipped(Entity<CosmicEquipmentComponent> ent, ref GotEquippedEvent args)
     {
         if (!EntityIsCultist(args.Equipee))
-            _statusEffects.TryAddStatusEffect<CosmicEntropyNonCultistComponent>(args.Equipee, EntropicDegenNonCultist, TimeSpan.FromDays(1), true); // TimeSpan.MaxValue causes a crash here, so we use FromDays(1) instead.
+            _statusEffects.TryAddStatusEffect<CosmicEntropyNonCultistComponent>(args.Equipee,
+                EntropicDegenNonCultist,
+                TimeSpan.FromDays(1),
+                true); // TimeSpan.MaxValue causes a crash here, so we use FromDays(1) instead.
     }
 
     private void OnGotUnequipped(Entity<CosmicEquipmentComponent> ent, ref GotUnequippedEvent args)
@@ -213,12 +220,19 @@ public sealed partial class CosmicCultSystem : SharedCosmicCultSystem
         if (!EntityIsCultist(args.Equipee))
             _statusEffects.TryRemoveStatusEffect(args.Equipee, EntropicDegenNonCultist);
     }
+
     private void OnGotHeld(Entity<CosmicEquipmentComponent> ent, ref GotEquippedHandEvent args)
     {
         if (!EntityIsCultist(args.User))
         {
-            _statusEffects.TryAddStatusEffect<CosmicEntropyNonCultistComponent>(args.User, EntropicDegenNonCultist, TimeSpan.FromDays(1), true);
-            _popup.PopupEntity(Loc.GetString("cosmiccult-gear-pickup", ("ITEM", args.Equipped)), args.User, args.User, PopupType.MediumCaution);
+            _statusEffects.TryAddStatusEffect<CosmicEntropyNonCultistComponent>(args.User,
+                EntropicDegenNonCultist,
+                TimeSpan.FromDays(1),
+                true);
+            _popup.PopupEntity(Loc.GetString("cosmiccult-gear-pickup", ("ITEM", args.Equipped)),
+                args.User,
+                args.User,
+                PopupType.MediumCaution);
         }
     }
 
@@ -227,38 +241,58 @@ public sealed partial class CosmicCultSystem : SharedCosmicCultSystem
         if (!EntityIsCultist(args.User))
             _statusEffects.TryRemoveStatusEffect(args.User, EntropicDegenNonCultist);
     }
+
     #endregion
 
     #region Movespeed
-    private void OnStartInfluenceStride(Entity<InfluenceStrideComponent> uid, ref ComponentInit args) => // i wish movespeed was easier to work with
+
+    private void
+        OnStartInfluenceStride(Entity<InfluenceStrideComponent> uid,
+            ref ComponentInit args) => // i wish movespeed was easier to work with
         _movementSpeed.RefreshMovementSpeedModifiers(uid);
-    private void OnEndInfluenceStride(Entity<InfluenceStrideComponent> uid, ref ComponentRemove args) => // that movespeed applies more-or-less correctly
+
+    private void
+        OnEndInfluenceStride(Entity<InfluenceStrideComponent> uid,
+            ref ComponentRemove args) => // that movespeed applies more-or-less correctly
         _movementSpeed.RefreshMovementSpeedModifiers(uid);
-    private void OnStartImposition(Entity<CosmicImposingComponent> uid, ref ComponentInit args) // these functions just make sure
+
+    private void
+        OnStartImposition(Entity<CosmicImposingComponent> uid, ref ComponentInit args) // these functions just make sure
     {
         _movementSpeed.RefreshMovementSpeedModifiers(uid);
         EnsureComp<CosmicCultExamineComponent>(uid).CultistText = "cosmic-examine-text-malignecho";
     }
-    private void OnEndImposition(Entity<CosmicImposingComponent> uid, ref ComponentRemove args) // as various cosmic cult effects get added and removed
+
+    private void
+        OnEndImposition(Entity<CosmicImposingComponent> uid,
+            ref ComponentRemove args) // as various cosmic cult effects get added and removed
     {
         _movementSpeed.RefreshMovementSpeedModifiers(uid);
         RemComp<CosmicCultExamineComponent>(uid);
     }
 
-    private void OnRefreshMoveSpeed(EntityUid uid, InfluenceStrideComponent comp, RefreshMovementSpeedModifiersEvent args) =>
+    private void OnRefreshMoveSpeed(EntityUid uid,
+        InfluenceStrideComponent comp,
+        RefreshMovementSpeedModifiersEvent args) =>
         args.ModifySpeed(1.1f, 1.1f);
-    private void OnImpositionMoveSpeed(EntityUid uid, CosmicImposingComponent comp, RefreshMovementSpeedModifiersEvent args) =>
+
+    private void OnImpositionMoveSpeed(EntityUid uid,
+        CosmicImposingComponent comp,
+        RefreshMovementSpeedModifiersEvent args) =>
         args.ModifySpeed(0.65f, 0.65f);
 
     // Goob start
     private void OnStartCosmicEmpowered(Entity<CosmicEmpoweredSpeedComponent> uid, ref ComponentInit args) =>
         _movementSpeed.RefreshMovementSpeedModifiers(uid);
+
     private void OnEndCosmicEmpowered(Entity<CosmicEmpoweredSpeedComponent> uid, ref ComponentRemove args) =>
         _movementSpeed.RefreshMovementSpeedModifiers(uid);
-    private void OnCosmicEmpoweredMove(EntityUid uid, CosmicEmpoweredSpeedComponent comp, RefreshMovementSpeedModifiersEvent args) =>
+
+    private void OnCosmicEmpoweredMove(EntityUid uid,
+        CosmicEmpoweredSpeedComponent comp,
+        RefreshMovementSpeedModifiersEvent args) =>
         args.ModifySpeed(comp.SpeedBoost, comp.SpeedBoost);
     // Goob end
 
     #endregion
-
 }

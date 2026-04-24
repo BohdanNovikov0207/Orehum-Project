@@ -24,16 +24,6 @@ namespace Content.Server.NPC.Systems;
 
 public sealed partial class NPCCombatSystem
 {
-    [Dependency] private readonly SharedCombatModeSystem _combat = default!;
-    [Dependency] private readonly RotateToFaceSystem _rotate = default!;
-    [Dependency] private readonly SharedLaserPointerSystem _pointer = default!; // Goobstation
-
-    private EntityQuery<CombatModeComponent> _combatQuery;
-    private EntityQuery<NPCSteeringComponent> _steeringQuery;
-    private EntityQuery<RechargeBasicEntityAmmoComponent> _rechargeQuery;
-    private EntityQuery<PhysicsComponent> _physicsQuery;
-    private EntityQuery<TransformComponent> _xformQuery;
-
     // TODO: Don't predict for hitscan
     private const float ShootSpeed = 20f;
 
@@ -41,6 +31,16 @@ public sealed partial class NPCCombatSystem
     /// Cooldown on raycasting to check LOS.
     /// </summary>
     public const float UnoccludedCooldown = 0.2f;
+
+    [Dependency] private readonly SharedCombatModeSystem _combat = default!;
+    [Dependency] private readonly SharedLaserPointerSystem _pointer = default!; // Goobstation
+    [Dependency] private readonly RotateToFaceSystem _rotate = default!;
+
+    private EntityQuery<CombatModeComponent> _combatQuery;
+    private EntityQuery<PhysicsComponent> _physicsQuery;
+    private EntityQuery<RechargeBasicEntityAmmoComponent> _rechargeQuery;
+    private EntityQuery<NPCSteeringComponent> _steeringQuery;
+    private EntityQuery<TransformComponent> _xformQuery;
 
     private void InitializeRanged()
     {
@@ -57,21 +57,15 @@ public sealed partial class NPCCombatSystem
     private void OnRangedStartup(EntityUid uid, NPCRangedCombatComponent component, ComponentStartup args)
     {
         if (TryComp<CombatModeComponent>(uid, out var combat))
-        {
             _combat.SetInCombatMode(uid, true, combat);
-        }
         else
-        {
             component.Status = CombatStatus.Unspecified;
-        }
     }
 
     private void OnRangedShutdown(EntityUid uid, NPCRangedCombatComponent component, ComponentShutdown args)
     {
         if (TryComp<CombatModeComponent>(uid, out var combat))
-        {
             _combat.SetInCombatMode(uid, false, combat);
-        }
 
         // Goobstation
         if (_gun.TryGetGun(uid, out var gunUid, out _) && TryComp(gunUid, out LaserPointerComponent? laser) &&
@@ -124,9 +118,7 @@ public sealed partial class NPCCombatSystem
             }
 
             if (_combatQuery.TryGetComponent(uid, out var combatMode))
-            {
                 _combat.SetInCombatMode(uid, true, combatMode);
-            }
 
             var ammoEv = new GetAmmoCountEvent();
             RaiseLocalEvent(gunUid, ref ammoEv);
@@ -162,7 +154,9 @@ public sealed partial class NPCCombatSystem
                 comp.LOSAccumulator += UnoccludedCooldown;
 
                 // For consistency with NPC steering.
-                var collisionGroup = comp.UseOpaqueForLOSChecks ? CollisionGroup.Opaque : (CollisionGroup.Impassable | CollisionGroup.InteractImpassable);
+                var collisionGroup = comp.UseOpaqueForLOSChecks
+                    ? CollisionGroup.Opaque
+                    : CollisionGroup.Impassable | CollisionGroup.InteractImpassable;
                 comp.TargetInLOS = _interaction.InRangeUnobstructed(uid, comp.Target, distance + 0.1f, collisionGroup);
             }
 
@@ -172,18 +166,14 @@ public sealed partial class NPCCombatSystem
                 comp.Status = CombatStatus.NotInSight;
 
                 if (TryComp(uid, out steering))
-                {
                     steering.ForceMove = true;
-                }
 
                 UpdatePointerLine(); // Goobstation
                 continue;
             }
 
             if (!oldInLos && comp.SoundTargetInLOS != null)
-            {
                 _audio.PlayPvs(comp.SoundTargetInLOS, uid);
-            }
 
             comp.ShootAccumulator += frameTime;
 
@@ -200,8 +190,13 @@ public sealed partial class NPCCombatSystem
             var goalRotation = (targetSpot - worldPos).ToWorldAngle();
             var rotationSpeed = comp.RotationSpeed;
 
-            if (Double.IsNaN(goalRotation.Theta) ||
-                !_rotate.TryRotateTo(uid, goalRotation, frameTime, comp.AccuracyThreshold, rotationSpeed?.Theta ?? double.MaxValue, xform))
+            if (double.IsNaN(goalRotation.Theta) ||
+                !_rotate.TryRotateTo(uid,
+                    goalRotation,
+                    frameTime,
+                    comp.AccuracyThreshold,
+                    rotationSpeed?.Theta ?? double.MaxValue,
+                    xform))
             {
                 UpdatePointerLine(); // Goobstation
                 continue;
@@ -224,22 +219,16 @@ public sealed partial class NPCCombatSystem
             EntityCoordinates targetCordinates;
 
             if (_mapManager.TryFindGridAt(xform.MapID, targetPos, out var gridUid, out var mapGrid))
-            {
                 targetCordinates = new EntityCoordinates(gridUid, mapGrid.WorldToLocal(targetSpot));
-            }
             else
-            {
                 targetCordinates = new EntityCoordinates(xform.MapUid!.Value, targetSpot);
-            }
 
             comp.Status = CombatStatus.Normal;
 
             UpdatePointerLine(); // Goobstation
 
             if (gun.NextFire > _timing.CurTime)
-            {
                 return;
-            }
 
             _gun.AttemptShoot(uid, gunUid, gun, targetCordinates, comp.Target);
 
@@ -248,7 +237,8 @@ public sealed partial class NPCCombatSystem
             // Goobstation
             void UpdatePointerLineNoTarget()
             {
-                if (TryComp(gunUid, out LaserPointerComponent? pointer) && TryComp(gunUid, out WieldableComponent? wieldable))
+                if (TryComp(gunUid, out LaserPointerComponent? pointer) &&
+                    TryComp(gunUid, out WieldableComponent? wieldable))
                 {
                     _pointer.AddOrRemoveLine(GetNetEntity(gunUid),
                         pointer,
@@ -261,7 +251,8 @@ public sealed partial class NPCCombatSystem
 
             void UpdatePointerLine()
             {
-                if (TryComp(gunUid, out LaserPointerComponent? pointer) && TryComp(gunUid, out WieldableComponent? wieldable))
+                if (TryComp(gunUid, out LaserPointerComponent? pointer) &&
+                    TryComp(gunUid, out WieldableComponent? wieldable))
                 {
                     _pointer.AddOrRemoveLine(GetNetEntity(gunUid),
                         pointer,

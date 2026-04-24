@@ -20,26 +20,26 @@ namespace Content.Server.Atmos.Components;
 public sealed partial class PressureProtectionComponent : Component
 {
     [DataField]
-    public float HighPressureMultiplier = 1f;
-
-    [DataField]
     public float HighPressureModifier;
 
     [DataField]
-    public float LowPressureMultiplier = 1f;
+    public float HighPressureMultiplier = 1f;
 
     [DataField]
     public float LowPressureModifier;
+
+    [DataField]
+    public float LowPressureMultiplier = 1f;
 }
 
 /// <summary>
-/// Event raised on an entity with <see cref="PressureProtectionComponent"/> in order to adjust its default values.
+/// Event raised on an entity with <see cref="PressureProtectionComponent" /> in order to adjust its default values.
 /// </summary>
 [ByRefEvent]
 public record struct GetPressureProtectionValuesEvent
 {
-    public float HighPressureMultiplier;
     public float HighPressureModifier;
-    public float LowPressureMultiplier;
+    public float HighPressureMultiplier;
     public float LowPressureModifier;
+    public float LowPressureMultiplier;
 }

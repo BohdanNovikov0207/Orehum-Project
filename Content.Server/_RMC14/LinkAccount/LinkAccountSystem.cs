@@ -29,14 +29,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Goobstation.Common.CCVar;
-using Content.Server.Chat.Managers;
-using Content.Server.Chat.Systems;
 using Content.Server.Database;
 using Content.Server.GameTicking;
-using Content.Server.RoundEnd;
 using Content.Shared._RMC14.GhostColor;
 using Content.Shared._RMC14.LinkAccount;
-using Content.Shared.GameTicking;
 using Content.Shared.Ghost;
 using Robust.Server.Player;
 using Robust.Shared.Configuration;
@@ -53,12 +49,12 @@ public sealed class LinkAccountSystem : EntitySystem
     [Dependency] private readonly LinkAccountManager _linkAccount = default!;
     [Dependency] private readonly IPlayerManager _player = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
-
-    private TimeSpan _timeBetweenLobbyMessages;
-    private TimeSpan _nextLobbyMessageTime;
     private TimeSpan _lobbyMessageInitialDelay;
     private (string Message, string User)? _nextLobbyMessage;
+    private TimeSpan _nextLobbyMessageTime;
     private string? _nextNTShoutout;
+
+    private TimeSpan _timeBetweenLobbyMessages;
 
     public override void Initialize()
     {
@@ -67,8 +63,14 @@ public sealed class LinkAccountSystem : EntitySystem
 
         SubscribeLocalEvent<GhostColorComponent, PlayerAttachedEvent>(OnGhostColorPlayerAttached);
 
-        Subs.CVar(_config, GoobCVars.RMCPatronLobbyMessageTimeSeconds, v => _timeBetweenLobbyMessages = TimeSpan.FromSeconds(v), true);
-        Subs.CVar(_config, GoobCVars.RMCPatronLobbyMessageInitialDelaySeconds, v => _lobbyMessageInitialDelay = TimeSpan.FromSeconds(v), true);
+        Subs.CVar(_config,
+            GoobCVars.RMCPatronLobbyMessageTimeSeconds,
+            v => _timeBetweenLobbyMessages = TimeSpan.FromSeconds(v),
+            true);
+        Subs.CVar(_config,
+            GoobCVars.RMCPatronLobbyMessageInitialDelaySeconds,
+            v => _lobbyMessageInitialDelay = TimeSpan.FromSeconds(v),
+            true);
 
         ReloadPatrons();
         GetRandomLobbyMessage();
@@ -77,10 +79,7 @@ public sealed class LinkAccountSystem : EntitySystem
         _linkAccount.PatronUpdated += OnPatronUpdated;
     }
 
-    public override void Shutdown()
-    {
-        _linkAccount.PatronUpdated -= OnPatronUpdated;
-    }
+    public override void Shutdown() => _linkAccount.PatronUpdated -= OnPatronUpdated;
 
     private void OnGameRunLevelChanged(GameRunLevelChangedEvent ev)
     {

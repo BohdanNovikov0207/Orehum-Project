@@ -46,7 +46,7 @@ public sealed partial class LavalandSystem
         var pool = _proto.Index(proto.Ruins);
 
         // Basic setup.
-        var lavalandMap = _map.CreateMap(out var lavalandMapId, runMapInit: false);
+        var lavalandMap = _map.CreateMap(out var lavalandMapId, false);
         var mapComp = EnsureComp<LavalandMapComponent>(lavalandMap);
         lavaland = (lavalandMap, mapComp);
 
@@ -110,6 +110,7 @@ public sealed partial class LavalandSystem
         {
             _biome.AddMarkerLayer(lavalandMap, biome, marker);
         }
+
         Dirty(lavalandMap, biome);
 
         // Gravity
@@ -125,9 +126,12 @@ public sealed partial class LavalandSystem
         restricted.Range = prototype.RestrictedRange;
     }
 
-    private void SetupLayout(EntityUid lavaland, MapId lavalandMapId, LavalandLayoutPrototype? proto, out List<EntityUid> spawned)
+    private void SetupLayout(EntityUid lavaland,
+        MapId lavalandMapId,
+        LavalandLayoutPrototype? proto,
+        out List<EntityUid> spawned)
     {
-        spawned = new();
+        spawned = new List<EntityUid>();
 
         if (proto == null)
             return; // nothing to spawn

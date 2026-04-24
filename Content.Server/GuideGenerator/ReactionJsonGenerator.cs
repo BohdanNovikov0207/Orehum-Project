@@ -36,7 +36,7 @@ public sealed class ReactionJsonGenerator
             Converters =
             {
                 new UniversalJsonConverter<EntityEffect>(),
-            }
+            },
         };
 
         file.Write(JsonSerializer.Serialize(reactions, serializeOptions));

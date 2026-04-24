@@ -19,7 +19,6 @@ public sealed partial class CritMobActionsSystem
             _host.ExecuteCommand(actor.PlayerSession, "suicide");
 
             args.Handled = true;
-            return;
         }
     }
 }

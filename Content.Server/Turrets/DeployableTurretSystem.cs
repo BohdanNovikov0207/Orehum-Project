@@ -22,15 +22,15 @@ using Robust.Shared.Timing;
 
 namespace Content.Server.Turrets;
 
-public sealed partial class DeployableTurretSystem : SharedDeployableTurretSystem
+public sealed class DeployableTurretSystem : SharedDeployableTurretSystem
 {
-    [Dependency] private readonly HTNSystem _htn = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly DeviceNetworkSystem _deviceNetwork = default!;
     [Dependency] private readonly BatteryWeaponFireModesSystem _fireModes = default!;
-    [Dependency] private readonly TurretTargetSettingsSystem _turretTargetingSettings = default!;
+    [Dependency] private readonly HTNSystem _htn = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly TurretTargetSettingsSystem _turretTargetingSettings = default!;
 
     public override void Initialize()
     {
@@ -45,20 +45,13 @@ public sealed partial class DeployableTurretSystem : SharedDeployableTurretSyste
         SubscribeLocalEvent<DeployableTurretComponent, BeforeBroadcastAttemptEvent>(OnBeforeBroadcast);
     }
 
-    private void OnAmmoShot(Entity<DeployableTurretComponent> ent, ref AmmoShotEvent args)
-    {
-        UpdateAmmoStatus(ent);
-    }
+    private void OnAmmoShot(Entity<DeployableTurretComponent> ent, ref AmmoShotEvent args) => UpdateAmmoStatus(ent);
 
-    private void OnChargeChanged(Entity<DeployableTurretComponent> ent, ref ChargeChangedEvent args)
-    {
+    private void OnChargeChanged(Entity<DeployableTurretComponent> ent, ref ChargeChangedEvent args) =>
         UpdateAmmoStatus(ent);
-    }
 
-    private void OnPowerChanged(Entity<DeployableTurretComponent> ent, ref PowerChangedEvent args)
-    {
+    private void OnPowerChanged(Entity<DeployableTurretComponent> ent, ref PowerChangedEvent args) =>
         UpdateAmmoStatus(ent);
-    }
 
     private void OnBroken(Entity<DeployableTurretComponent> ent, ref BreakageEventArgs args)
     {
@@ -101,10 +94,7 @@ public sealed partial class DeployableTurretSystem : SharedDeployableTurretSyste
 
         // Received a command to update the device network
         if (command == DeviceNetworkConstants.CmdUpdatedState)
-        {
             SendStateUpdateToDeviceNetwork(ent);
-            return;
-        }
     }
 
     private void OnBeforeBroadcast(Entity<DeployableTurretComponent> ent, ref BeforeBroadcastAttemptEvent args)
@@ -135,7 +125,7 @@ public sealed partial class DeployableTurretSystem : SharedDeployableTurretSyste
         var payload = new NetworkPayload
         {
             [DeviceNetworkConstants.Command] = DeviceNetworkConstants.CmdUpdatedState,
-            [DeviceNetworkConstants.CmdUpdatedState] = GetTurretState(ent)
+            [DeviceNetworkConstants.CmdUpdatedState] = GetTurretState(ent),
         };
 
         _deviceNetwork.QueuePacket(ent, null, payload, device: device);
@@ -150,7 +140,8 @@ public sealed partial class DeployableTurretSystem : SharedDeployableTurretSyste
         DirtyField(ent, ent.Comp, nameof(DeployableTurretComponent.Enabled));
 
         // Determine how much time is remaining in the current animation and the one next in queue
-        var animTimeRemaining = MathF.Max((float)(ent.Comp.AnimationCompletionTime - _timing.CurTime).TotalSeconds, 0f);
+        var animTimeRemaining =
+            MathF.Max((float) (ent.Comp.AnimationCompletionTime - _timing.CurTime).TotalSeconds, 0f);
         var animTimeNext = ent.Comp.Enabled ? ent.Comp.DeploymentLength : ent.Comp.RetractionLength;
 
         // End/restart any tasks the NPC was doing
@@ -161,7 +152,9 @@ public sealed partial class DeployableTurretSystem : SharedDeployableTurretSyste
             _htn.SetHTNEnabled((ent, htn), ent.Comp.Enabled, planCooldown);
 
         // Play audio
-        _audio.PlayPvs(ent.Comp.Enabled ? ent.Comp.DeploymentSound : ent.Comp.RetractionSound, ent, new AudioParams { Volume = -10f });
+        _audio.PlayPvs(ent.Comp.Enabled ? ent.Comp.DeploymentSound : ent.Comp.RetractionSound,
+            ent,
+            new AudioParams { Volume = -10f });
     }
 
     private void UpdateAmmoStatus(Entity<DeployableTurretComponent> ent)
@@ -170,7 +163,9 @@ public sealed partial class DeployableTurretSystem : SharedDeployableTurretSyste
             SetState(ent, false);
     }
 
-    private DeployableTurretState GetTurretState(Entity<DeployableTurretComponent> ent, DestructibleComponent? destructable = null, HTNComponent? htn = null)
+    private DeployableTurretState GetTurretState(Entity<DeployableTurretComponent> ent,
+        DestructibleComponent? destructable = null,
+        HTNComponent? htn = null)
     {
         Resolve(ent, ref destructable, ref htn);
 

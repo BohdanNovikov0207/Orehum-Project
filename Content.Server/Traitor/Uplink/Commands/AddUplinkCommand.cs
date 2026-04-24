@@ -32,8 +32,8 @@ namespace Content.Server.Traitor.Uplink.Commands;
 [AdminCommand(AdminFlags.Admin)]
 public sealed class AddUplinkCommand : LocalizedEntityCommands
 {
-    [Dependency] private readonly UplinkSystem _uplinkSystem = default!;
     [Dependency] private readonly IPlayerManager _playerManager = default!;
+    [Dependency] private readonly UplinkSystem _uplinkSystem = default!;
 
     public override string Command => "adduplink";
 
@@ -96,18 +96,17 @@ public sealed class AddUplinkCommand : LocalizedEntityCommands
         }
 
         // Finally add uplink
-        if (!_uplinkSystem.AddUplinkAutoDetect(user, 100, uplinkEntity: uplinkEntity)) // Goob edit - 100 TC
+        if (!_uplinkSystem.AddUplinkAutoDetect(user, 100, uplinkEntity)) // Goob edit - 100 TC
             shell.WriteLine(Loc.GetString("add-uplink-command-error-2"));
     }
 
-    public override CompletionResult GetCompletion(IConsoleShell shell, string[] args)
-    {
-        return args.Length switch
+    public override CompletionResult GetCompletion(IConsoleShell shell, string[] args) =>
+        args.Length switch
         {
-            1 => CompletionResult.FromHintOptions(CompletionHelper.SessionNames(), Loc.GetString("add-uplink-command-completion-1")),
+            1 => CompletionResult.FromHintOptions(CompletionHelper.SessionNames(),
+                Loc.GetString("add-uplink-command-completion-1")),
             2 => CompletionResult.FromHint(Loc.GetString("add-uplink-command-completion-2")),
             3 => CompletionResult.FromHint(Loc.GetString("add-uplink-command-completion-3")),
             _ => CompletionResult.Empty,
         };
-    }
 }

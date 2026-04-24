@@ -18,14 +18,12 @@ public sealed class ProduceMaterialExtractorSystem : EntitySystem
 {
     [Dependency] private readonly AudioSystem _audio = default!;
     [Dependency] private readonly MaterialStorageSystem _materialStorage = default!;
-    [Dependency] private readonly SharedSolutionContainerSystem _solutionContainer = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly SharedSolutionContainerSystem _solutionContainer = default!;
 
-    /// <inheritdoc/>
-    public override void Initialize()
-    {
+    /// <inheritdoc />
+    public override void Initialize() =>
         SubscribeLocalEvent<ProduceMaterialExtractorComponent, AfterInteractUsingEvent>(OnInteractUsing);
-    }
 
     private void OnInteractUsing(Entity<ProduceMaterialExtractorComponent> ent, ref AfterInteractUsingEvent args)
     {
@@ -47,11 +45,13 @@ public sealed class ProduceMaterialExtractorSystem : EntitySystem
             .Where(r => ent.Comp.ExtractionReagents.Contains(r.Reagent.Prototype))
             .Sum(r => r.Quantity.Float());
 
-        var changed = (int)matAmount;
+        var changed = (int) matAmount;
 
         if (changed == 0)
         {
-            _popup.PopupEntity(Loc.GetString("material-extractor-comp-wrongreagent", ("used", args.Used)), args.User, args.User);
+            _popup.PopupEntity(Loc.GetString("material-extractor-comp-wrongreagent", ("used", args.Used)),
+                args.User,
+                args.User);
             return;
         }
 

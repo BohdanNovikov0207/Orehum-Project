@@ -1,15 +1,15 @@
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using Content.Server.Power.Components;
-using Content.Shared.Audio;
+using Content.Server.Power.EntitySystems;
 using Content.Shared._CorvaxGoob.BluespaceHarvester;
+using Content.Shared.Audio;
 using Content.Shared.Destructible;
 using Content.Shared.Emag.Components;
 using Robust.Server.GameObjects;
-using Robust.Shared.Random;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using Content.Server.Power.EntitySystems;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Map;
+using Robust.Shared.Random;
 using Robust.Shared.Timing;
 using Robust.Shared.Utility;
 
@@ -17,14 +17,12 @@ namespace Content.Server._CorvaxGoob.BluespaceHarvester;
 
 public sealed class BluespaceHarvesterSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
-    [Dependency] private readonly TransformSystem _transform = default!;
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly UserInterfaceSystem _ui = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    private const float UpdateTime = 1.0f;
     [Dependency] private readonly SharedAmbientSoundSystem _ambientSound = default!;
+    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
 
     private readonly List<BluespaceHarvesterTap> _taps =
     [
@@ -36,10 +34,13 @@ public sealed class BluespaceHarvesterSystem : EntitySystem
         new() { Level = 20, Visual = BluespaceHarvesterVisuals.Tap5 },
     ];
 
-    private float _updateTimer;
-    private const float UpdateTime = 1.0f;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly TransformSystem _transform = default!;
+    [Dependency] private readonly UserInterfaceSystem _ui = default!;
 
     private EntityQuery<BluespaceHarvesterComponent> _harvesterQuery;
+
+    private float _updateTimer;
 
     public override void Initialize()
     {
@@ -56,15 +57,9 @@ public sealed class BluespaceHarvesterSystem : EntitySystem
         SubscribeLocalEvent<BluespaceHarvesterComponent, DestructionEventArgs>(OnDestruction);
     }
 
-    private void OnStartup(Entity<BluespaceHarvesterComponent> ent, ref ComponentStartup args)
-    {
-        UpdateCount();
-    }
+    private void OnStartup(Entity<BluespaceHarvesterComponent> ent, ref ComponentStartup args) => UpdateCount();
 
-    private void OnRemove(Entity<BluespaceHarvesterComponent> ent, ref ComponentRemove args)
-    {
-        UpdateCount();
-    }
+    private void OnRemove(Entity<BluespaceHarvesterComponent> ent, ref ComponentRemove args) => UpdateCount();
 
     private void UpdateCount()
     {
@@ -144,10 +139,9 @@ public sealed class BluespaceHarvesterSystem : EntitySystem
                 harvester.Danger = 0;
 
             // If the danger points exceeded the DangerLimit and we were lucky enough to create a portal, then they will be created.
-            if (harvester.Danger > harvester.DangerLimit && _random.NextFloat(0.0f, 1.0f) <= GetRiftChance(uid, harvester))
-            {
+            if (harvester.Danger > harvester.DangerLimit &&
+                _random.NextFloat(0.0f, 1.0f) <= GetRiftChance(uid, harvester))
                 SpawnRifts(uid, harvester);
-            }
 
             if (TryComp<AmbientSoundComponent>(uid, out var ambient))
                 _ambientSound.SetAmbience(uid, harvester.Reset, ambient); // Bzhzh, bzhzh
@@ -157,12 +151,11 @@ public sealed class BluespaceHarvesterSystem : EntitySystem
         }
     }
 
-    private void OnDestruction(Entity<BluespaceHarvesterComponent> harvester, ref DestructionEventArgs args)
-    {
+    private void OnDestruction(Entity<BluespaceHarvesterComponent> harvester, ref DestructionEventArgs args) =>
         SpawnRifts(harvester.Owner, harvester.Comp);
-    }
 
-    private void OnTargetLevel(Entity<BluespaceHarvesterComponent> harvester, ref BluespaceHarvesterTargetLevelMessage args)
+    private void OnTargetLevel(Entity<BluespaceHarvesterComponent> harvester,
+        ref BluespaceHarvesterTargetLevelMessage args)
     {
         // If we switch off, we don't need to be switched on.
         if (!harvester.Comp.Reset)
@@ -226,27 +219,23 @@ public sealed class BluespaceHarvesterSystem : EntitySystem
         _ui.SetUiState(uid,
             BluespaceHarvesterUiKey.Key,
             new BluespaceHarvesterBoundUserInterfaceState(
-            harvester.TargetLevel,
-            harvester.CurrentLevel,
-            harvester.MaxLevel,
-            GetUsagePower(harvester.CurrentLevel),
-            GetUsageNextPower(harvester.CurrentLevel),
-            harvester.Points,
-            harvester.TotalPoints,
-            GetPointGeneration(uid, harvester),
-            harvester.Categories
-        ));
+                harvester.TargetLevel,
+                harvester.CurrentLevel,
+                harvester.MaxLevel,
+                GetUsagePower(harvester.CurrentLevel),
+                GetUsageNextPower(harvester.CurrentLevel),
+                harvester.Points,
+                harvester.TotalPoints,
+                GetPointGeneration(uid, harvester),
+                harvester.Categories
+            ));
     }
 
-    private uint GetUsageNextPower(int level)
-    {
-        return GetUsagePower(level + 1);
-    }
+    private uint GetUsageNextPower(int level) => GetUsagePower(level + 1);
 
-    private uint GetUsagePower(int level)
-    {
+    private uint GetUsagePower(int level) =>
         // Hopefully in the future you will need to put a mathematical formula or function here.
-        return level switch
+        level switch
         {
             0 => 500,
             1 => 1_000,
@@ -271,7 +260,6 @@ public sealed class BluespaceHarvesterSystem : EntitySystem
             20 => 200_000_000,
             _ => 1_000_000_000,
         };
-    }
 
     /// <summary>
     /// Finds a free point in space and creates a prototype there, similar to a bluespace anomaly.
@@ -342,7 +330,10 @@ public sealed class BluespaceHarvesterSystem : EntitySystem
         return Emagged(uid) ? harvester.EmaggedStableLevel : harvester.StableLevel;
     }
 
-    private bool TryGetCategory(EntityUid uid, BluespaceHarvesterCategory target, [NotNullWhen(true)] out BluespaceHarvesterCategoryInfo? info, BluespaceHarvesterComponent? harvester = null)
+    private bool TryGetCategory(EntityUid uid,
+        BluespaceHarvesterCategory target,
+        [NotNullWhen(true)] out BluespaceHarvesterCategoryInfo? info,
+        BluespaceHarvesterComponent? harvester = null)
     {
         info = null;
         if (!Resolve(uid, ref harvester))
@@ -370,17 +361,14 @@ public sealed class BluespaceHarvesterSystem : EntitySystem
         harvester.TargetLevel = 0;
     }
 
-    private bool Emagged(EntityUid uid)
-    {
-        return HasComp<EmaggedComponent>(uid);
-    }
+    private bool Emagged(EntityUid uid) => HasComp<EmaggedComponent>(uid);
 
     private void SpawnRifts(EntityUid uid, BluespaceHarvesterComponent? harvester = null, int? danger = null)
     {
         if (!Resolve(uid, ref harvester))
             return;
 
-        int currentDanger = danger ?? harvester.Danger;
+        var currentDanger = danger ?? harvester.Danger;
 
         var count = _random.Next(harvester.RiftCount);
         for (var i = 0; i < count; i++)

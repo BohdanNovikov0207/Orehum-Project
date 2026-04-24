@@ -13,8 +13,8 @@ namespace Content.Server.Codewords;
 /// </summary>
 public sealed class CodewordSystem : EntitySystem
 {
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly IAdminLogManager _adminLogger = default!;
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
 
     public override void Initialize()
@@ -36,7 +36,7 @@ public sealed class CodewordSystem : EntitySystem
     public string[] GetCodewords(ProtoId<CodewordFactionPrototype> faction)
     {
         var query = EntityQueryEnumerator<CodewordManagerComponent>();
-        while (query.MoveNext(out  _, out var manager))
+        while (query.MoveNext(out _, out var manager))
         {
             if (!manager.Codewords.TryGetValue(faction, out var codewordEntity))
                 return GenerateForFaction(faction, ref manager);
@@ -56,17 +56,19 @@ public sealed class CodewordSystem : EntitySystem
         var factionProto = _prototypeManager.Index<CodewordFactionPrototype>(faction.Id);
 
         var codewords = GenerateCodewords(factionProto.Generator);
-        var codewordsContainer = Spawn(prototype: null, MapCoordinates.Nullspace);
+        var codewordsContainer = Spawn(null, MapCoordinates.Nullspace);
         EnsureComp<CodewordComponent>(codewordsContainer)
             .Codewords = codewords;
         manager.Codewords[faction] = codewordsContainer;
-        _adminLogger.Add(LogType.EventStarted, LogImpact.Low, $"Codewords generated for faction {faction}: {string.Join(", ", codewords)}");
+        _adminLogger.Add(LogType.EventStarted,
+            LogImpact.Low,
+            $"Codewords generated for faction {faction}: {string.Join(", ", codewords)}");
 
         return codewords;
     }
 
     /// <summary>
-    /// Generates codewords as specified by the <see cref="CodewordGeneratorPrototype"/> codeword generator.
+    /// Generates codewords as specified by the <see cref="CodewordGeneratorPrototype" /> codeword generator.
     /// </summary>
     // goob edit
     // instead of gathering all words into a giant list
@@ -78,7 +80,9 @@ public sealed class CodewordSystem : EntitySystem
 
         var codewordPool = new Dictionary<string, List<string>>();
         foreach (var dataset in generator.Words.Select(datasetPrototype => _prototypeManager.Index(datasetPrototype)))
+        {
             codewordPool.Add(dataset.ID, dataset.Values.ToList());
+        }
 
         var codewords = new List<string>();
         for (var i = 0; i < generator.Amount; i++)
@@ -86,6 +90,7 @@ public sealed class CodewordSystem : EntitySystem
             var set = _random.Pick(codewordPool.Keys);
             codewords.Add(Loc.GetString(_random.PickAndTake(codewordPool[set])));
         }
+
         return codewords.ToArray();
     }
     // goob edit end

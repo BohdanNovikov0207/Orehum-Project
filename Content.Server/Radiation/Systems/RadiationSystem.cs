@@ -21,18 +21,18 @@ namespace Content.Server.Radiation.Systems;
 
 public sealed partial class RadiationSystem : EntitySystem
 {
-    [Dependency] private readonly IMapManager _mapManager = default!;
     [Dependency] private readonly IConfigurationManager _cfg = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
+    [Dependency] private readonly IMapManager _mapManager = default!;
+    private readonly List<SourceData> _sources = new();
     [Dependency] private readonly SharedStackSystem _stack = default!;
-
-    private EntityQuery<RadiationBlockingContainerComponent> _blockerQuery;
-    private EntityQuery<RadiationGridResistanceComponent> _resistanceQuery;
-    private EntityQuery<MapGridComponent> _gridQuery;
-    private EntityQuery<StackComponent> _stackQuery;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     private float _accumulator;
-    private List<SourceData> _sources = new();
+
+    private EntityQuery<RadiationBlockingContainerComponent> _blockerQuery;
+    private EntityQuery<MapGridComponent> _gridQuery;
+    private EntityQuery<RadiationGridResistanceComponent> _resistanceQuery;
+    private EntityQuery<StackComponent> _stackQuery;
 
     public override void Initialize()
     {
@@ -74,17 +74,13 @@ public sealed partial class RadiationSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Marks entity to receive/ignore radiation rays.
+    /// Marks entity to receive/ignore radiation rays.
     /// </summary>
     public void SetCanReceive(EntityUid uid, bool canReceive)
     {
         if (canReceive)
-        {
             EnsureComp<RadiationReceiverComponent>(uid);
-        }
         else
-        {
             RemComp<RadiationReceiverComponent>(uid);
-        }
     }
 }

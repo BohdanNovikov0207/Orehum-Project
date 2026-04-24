@@ -17,22 +17,22 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Interaction;
-using Content.Shared.Pinpointer;
 using System.Linq;
 using System.Numerics;
-using Robust.Shared.Utility;
 using Content.Server.Shuttles.Events;
 using Content.Shared.Alert;
+using Content.Shared.Interaction;
+using Content.Shared.Pinpointer;
 using Content.Shared.Whitelist;
+using Robust.Shared.Utility;
 
 namespace Content.Server.Pinpointer;
 
 public sealed class PinpointerSystem : SharedPinpointerSystem
 {
     [Dependency] private readonly AlertsSystem _alerts = default!; // WD EDIT
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     private EntityQuery<TransformComponent> _xformQuery;
 
@@ -153,9 +153,9 @@ public sealed class PinpointerSystem : SharedPinpointerSystem
     }
 
     /// <summary>
-    ///     Try to find the closest entity from whitelist on a current map
-    ///     Will return null if can't find anything
-    ///     Goob edit: requires EntityWhitelist instead of just Type.
+    /// Try to find the closest entity from whitelist on a current map
+    /// Will return null if can't find anything
+    /// Goob edit: requires EntityWhitelist instead of just Type.
     /// </summary>
     private EntityUid? FindTargetFromComponent(
         Entity<TransformComponent?> ent,
@@ -250,7 +250,7 @@ public sealed class PinpointerSystem : SharedPinpointerSystem
     }
 
     /// <summary>
-    ///     Update direction from pinpointer to selected target (if it was set)
+    /// Update direction from pinpointer to selected target (if it was set)
     /// </summary>
     protected override void UpdateDirectionToTarget(EntityUid uid, PinpointerComponent? pinpointer = null)
     {
@@ -278,15 +278,14 @@ public sealed class PinpointerSystem : SharedPinpointerSystem
             SetDistance(uid, dist, pinpointer);
         }
         else
-        {
             SetDistance(uid, Distance.Unknown, pinpointer);
-        }
+
         if (oldDist != pinpointer.DistanceToTarget)
             UpdateAppearance(uid, pinpointer);
     }
 
     /// <summary>
-    ///     Calculate direction from pinUid to trgUid
+    /// Calculate direction from pinUid to trgUid
     /// </summary>
     /// <returns>Null if failed to calculate distance between two entities</returns>
     private Vector2? CalculateDirection(EntityUid pinUid, EntityUid trgUid)
@@ -333,11 +332,10 @@ public sealed class PinpointerSystem : SharedPinpointerSystem
         var dist = vec.Length();
         if (dist <= pinpointer.ReachedDistance)
             return Distance.Reached;
-        else if (dist <= pinpointer.CloseDistance)
+        if (dist <= pinpointer.CloseDistance)
             return Distance.Close;
-        else if (dist <= pinpointer.MediumDistance)
+        if (dist <= pinpointer.MediumDistance)
             return Distance.Medium;
-        else
-            return Distance.Far;
+        return Distance.Far;
     }
 }

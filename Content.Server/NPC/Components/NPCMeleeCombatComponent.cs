@@ -39,10 +39,10 @@ public sealed partial class NPCMeleeCombatComponent : Component
     public float MissChance;
 
     [ViewVariables]
-    public EntityUid Target;
+    public CombatStatus Status = CombatStatus.Normal;
 
     [ViewVariables]
-    public CombatStatus Status = CombatStatus.Normal;
+    public EntityUid Target;
 }
 
 public enum CombatStatus : byte

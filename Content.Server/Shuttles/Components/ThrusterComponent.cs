@@ -22,69 +22,69 @@ using Content.Shared.Damage;
 using Robust.Shared.GameStates;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
 
-namespace Content.Server.Shuttles.Components
+namespace Content.Server.Shuttles.Components;
+
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentPause]
+[Access(typeof(ThrusterSystem))]
+public sealed partial class ThrusterComponent : Component
 {
-    [RegisterComponent, NetworkedComponent, AutoGenerateComponentPause]
-    [Access(typeof(ThrusterSystem))]
-    public sealed partial class ThrusterComponent : Component
+    [DataField("burnShape")] public List<Vector2> BurnPoly = new()
     {
-        /// <summary>
-        /// Whether the thruster has been force to be enabled / disabled (e.g. VV, interaction, etc.)
-        /// </summary>
-        [DataField, ViewVariables(VVAccess.ReadWrite)]
-        public bool Enabled { get; set; } = true;
+        new Vector2(-0.4f, 0.5f),
+        new Vector2(-0.1f, 1.2f),
+        new Vector2(0.1f, 1.2f),
+        new Vector2(0.4f, 0.5f),
+    };
 
-        /// <summary>
-        /// This determines whether the thruster is actually enabled for the purposes of thrust
-        /// </summary>
-        public bool IsOn;
+    // Used for burns
 
-        // Need to serialize this because RefreshParts isn't called on Init and this will break post-mapinit maps!
-        [ViewVariables(VVAccess.ReadWrite), DataField("thrust")]
-        public float Thrust = 100f;
+    public List<EntityUid> Colliding = new();
 
-        [DataField("thrusterType")]
-        public ThrusterType Type = ThrusterType.Linear;
+    /// <summary>
+    /// How much damage is done per second to anything colliding with our thrust.
+    /// </summary>
+    [DataField("damage")] public DamageSpecifier? Damage = new();
 
-        [DataField("burnShape")] public List<Vector2> BurnPoly = new()
-        {
-            new Vector2(-0.4f, 0.5f),
-            new Vector2(-0.1f, 1.2f),
-            new Vector2(0.1f, 1.2f),
-            new Vector2(0.4f, 0.5f)
-        };
+    /// <summary>
+    /// How often thruster deals damage.
+    /// </summary>
+    [DataField]
+    public TimeSpan FireCooldown = TimeSpan.FromSeconds(2);
 
-        /// <summary>
-        /// How much damage is done per second to anything colliding with our thrust.
-        /// </summary>
-        [DataField("damage")] public DamageSpecifier? Damage = new();
+    public bool Firing = false;
 
-        [DataField("requireSpace")]
-        public bool RequireSpace = true;
+    /// <summary>
+    /// This determines whether the thruster is actually enabled for the purposes of thrust
+    /// </summary>
+    public bool IsOn;
 
-        // Used for burns
+    /// <summary>
+    /// Next time we tick damage for anyone colliding.
+    /// </summary>
+    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))] [AutoPausedField]
+    public TimeSpan NextFire = TimeSpan.Zero;
 
-        public List<EntityUid> Colliding = new();
+    [DataField("requireSpace")]
+    public bool RequireSpace = true;
 
-        public bool Firing = false;
+    // Need to serialize this because RefreshParts isn't called on Init and this will break post-mapinit maps!
+    [ViewVariables(VVAccess.ReadWrite)] [DataField("thrust")]
+    public float Thrust = 100f;
 
-        /// <summary>
-        /// How often thruster deals damage.
-        /// </summary>
-        [DataField]
-        public TimeSpan FireCooldown = TimeSpan.FromSeconds(2);
+    [DataField("thrusterType")]
+    public ThrusterType Type = ThrusterType.Linear;
 
-        /// <summary>
-        /// Next time we tick damage for anyone colliding.
-        /// </summary>
-        [DataField(customTypeSerializer: typeof(TimeOffsetSerializer)), AutoPausedField]
-        public TimeSpan NextFire = TimeSpan.Zero;
-    }
+    /// <summary>
+    /// Whether the thruster has been force to be enabled / disabled (e.g. VV, interaction, etc.)
+    /// </summary>
+    [DataField] [ViewVariables(VVAccess.ReadWrite)]
+    public bool Enabled { get; set; } = true;
+}
 
-    public enum ThrusterType
-    {
-        Linear,
-        // Angular meaning rotational.
-        Angular,
-    }
+public enum ThrusterType
+{
+    Linear,
+
+    // Angular meaning rotational.
+    Angular,
 }

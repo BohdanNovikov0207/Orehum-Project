@@ -16,6 +16,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using Content.Server.Popups;
 using Content.Server.Radio.EntitySystems;
 using Content.Server.Station.Systems;
@@ -26,13 +28,11 @@ using Content.Shared.Access.Systems;
 using Content.Shared.CriminalRecords;
 using Content.Shared.CriminalRecords.Components;
 using Content.Shared.CriminalRecords.Systems;
+using Content.Shared.IdentityManagement;
 using Content.Shared.Security;
+using Content.Shared.Security.Components;
 using Content.Shared.StationRecords;
 using Robust.Server.GameObjects;
-using System.Diagnostics.CodeAnalysis;
-using Content.Shared.IdentityManagement;
-using Content.Shared.Security.Components;
-using System.Linq;
 
 namespace Content.Server.CriminalRecords.Systems;
 
@@ -54,29 +54,29 @@ public sealed partial class CriminalRecordsConsoleSystem : SharedCriminalRecords
         SubscribeLocalEvent<CriminalRecordsConsoleComponent, RecordModifiedEvent>(UpdateUserInterface);
         SubscribeLocalEvent<CriminalRecordsConsoleComponent, AfterGeneralRecordCreatedEvent>(UpdateUserInterface);
 
-        Subs.BuiEvents<CriminalRecordsConsoleComponent>(CriminalRecordsConsoleKey.Key, subs =>
-        {
-            subs.Event<BoundUIOpenedEvent>(UpdateUserInterface);
-            subs.Event<SelectStationRecord>(OnKeySelected);
-            subs.Event<SetStationRecordFilter>(OnFiltersChanged);
-            subs.Event<CriminalRecordChangeStatus>(OnChangeStatus);
-            subs.Event<CriminalRecordAddHistory>(OnAddHistory);
-            subs.Event<CriminalRecordDeleteHistory>(OnDeleteHistory);
-            subs.Event<CriminalRecordSetStatusFilter>(OnStatusFilterPressed);
-        });
+        Subs.BuiEvents<CriminalRecordsConsoleComponent>(CriminalRecordsConsoleKey.Key,
+            subs =>
+            {
+                subs.Event<BoundUIOpenedEvent>(UpdateUserInterface);
+                subs.Event<SelectStationRecord>(OnKeySelected);
+                subs.Event<SetStationRecordFilter>(OnFiltersChanged);
+                subs.Event<CriminalRecordChangeStatus>(OnChangeStatus);
+                subs.Event<CriminalRecordAddHistory>(OnAddHistory);
+                subs.Event<CriminalRecordDeleteHistory>(OnDeleteHistory);
+                subs.Event<CriminalRecordSetStatusFilter>(OnStatusFilterPressed);
+            });
 
-        Subs.BuiEvents<IdExaminableComponent>(SetWantedVerbMenu.Key, subs => // Goobstation-WantedMenu
-        {
-            subs.Event<BoundUIOpenedEvent>(UpdateUserInterface);
-            subs.Event<CriminalRecordChangeStatus>(OnChangeStatus);
-        });
+        Subs.BuiEvents<IdExaminableComponent>(SetWantedVerbMenu.Key,
+            subs => // Goobstation-WantedMenu
+            {
+                subs.Event<BoundUIOpenedEvent>(UpdateUserInterface);
+                subs.Event<CriminalRecordChangeStatus>(OnChangeStatus);
+            });
     }
 
-    private void UpdateUserInterface<T>(Entity<CriminalRecordsConsoleComponent> ent, ref T args)
-    {
+    private void UpdateUserInterface<T>(Entity<CriminalRecordsConsoleComponent> ent, ref T args) =>
         // TODO: this is probably wasteful, maybe better to send a message to modify the exact state?
         UpdateUserInterface(ent);
-    }
 
     private void OnKeySelected(Entity<CriminalRecordsConsoleComponent> ent, ref SelectStationRecord msg)
     {
@@ -84,7 +84,9 @@ public sealed partial class CriminalRecordsConsoleSystem : SharedCriminalRecords
         ent.Comp.ActiveKey = msg.SelectedKey;
         UpdateUserInterface(ent);
     }
-    private void OnStatusFilterPressed(Entity<CriminalRecordsConsoleComponent> ent, ref CriminalRecordSetStatusFilter msg)
+
+    private void OnStatusFilterPressed(Entity<CriminalRecordsConsoleComponent> ent,
+        ref CriminalRecordSetStatusFilter msg)
     {
         ent.Comp.FilterStatus = msg.FilterStatus;
         UpdateUserInterface(ent);
@@ -166,7 +168,8 @@ public sealed partial class CriminalRecordsConsoleSystem : SharedCriminalRecords
 
         (string, object)[] args;
         if (reason != null)
-            args = new (string, object)[] { ("name", name), ("officer", officer), ("reason", reason), ("job", jobName) };
+            args = new (string, object)[]
+                { ("name", name), ("officer", officer), ("reason", reason), ("job", jobName) };
         else
             args = new (string, object)[] { ("name", name), ("officer", officer), ("job", jobName) };
 
@@ -208,10 +211,12 @@ public sealed partial class CriminalRecordsConsoleSystem : SharedCriminalRecords
             // person no longer demoted
             (SecurityStatus.Demote, SecurityStatus.None) => "not-demoted", // Goobstation
             // this is impossible
-            _ => "not-wanted"
+            _ => "not-wanted",
         };
-        _radio.SendRadioMessage(ent, Loc.GetString($"criminal-records-console-{statusString}", args),
-            ent.Comp.SecurityChannel, ent);
+        _radio.SendRadioMessage(ent,
+            Loc.GetString($"criminal-records-console-{statusString}", args),
+            ent.Comp.SecurityChannel,
+            ent);
 
         UpdateUserInterface(ent);
     }
@@ -267,7 +272,8 @@ public sealed partial class CriminalRecordsConsoleSystem : SharedCriminalRecords
         if (console.FilterStatus != SecurityStatus.None)
         {
             listing = listing
-                .Where(x => _records.TryGetRecord<CriminalRecord>(new StationRecordKey(x.Key, owningStation.Value), out var record) && record.Status == console.FilterStatus)
+                .Where(x => _records.TryGetRecord<CriminalRecord>(new StationRecordKey(x.Key, owningStation.Value),
+                    out var record) && record.Status == console.FilterStatus)
                 .ToDictionary(x => x.Key, x => x.Value);
         }
 
@@ -291,8 +297,10 @@ public sealed partial class CriminalRecordsConsoleSystem : SharedCriminalRecords
     /// Boilerplate that most actions use, if they require that a record be selected.
     /// Obviously shouldn't be used for selecting records.
     /// </summary>
-    private bool CheckSelected(Entity<CriminalRecordsConsoleComponent> ent, EntityUid user,
-        [NotNullWhen(true)] out EntityUid? mob, [NotNullWhen(true)] out StationRecordKey? key)
+    private bool CheckSelected(Entity<CriminalRecordsConsoleComponent> ent,
+        EntityUid user,
+        [NotNullWhen(true)] out EntityUid? mob,
+        [NotNullWhen(true)] out StationRecordKey? key)
     {
         key = null;
         mob = null;
@@ -338,6 +346,7 @@ public sealed partial class CriminalRecordsConsoleSystem : SharedCriminalRecords
                 }
             }
         }
+
         RemComp<CriminalRecordComponent>(uid);
     }
 }

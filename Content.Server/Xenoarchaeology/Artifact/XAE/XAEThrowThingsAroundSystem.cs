@@ -1,4 +1,3 @@
-using System.Numerics;
 using Content.Server.Xenoarchaeology.Artifact.XAE.Components;
 using Content.Shared.Maps;
 using Content.Shared.Physics;
@@ -16,17 +15,17 @@ namespace Content.Server.Xenoarchaeology.Artifact.XAE;
 /// </summary>
 public sealed class XAEThrowThingsAroundSystem : BaseXAESystem<XAEThrowThingsAroundComponent>
 {
-    [Dependency] private readonly IRobustRandom _random = default!;
+    /// <summary> Pre-allocated and re-used collection.</summary>
+    private readonly HashSet<EntityUid> _entities = new();
+
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
+    [Dependency] private readonly SharedMapSystem _map = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly ThrowingSystem _throwing = default!;
     [Dependency] private readonly TileSystem _tile = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly SharedMapSystem _map = default!;
 
     private EntityQuery<PhysicsComponent> _physQuery;
-
-    /// <summary> Pre-allocated and re-used collection.</summary>
-    private readonly HashSet<EntityUid> _entities = new();
 
     /// <inheritdoc />
     public override void Initialize()
@@ -37,14 +36,15 @@ public sealed class XAEThrowThingsAroundSystem : BaseXAESystem<XAEThrowThingsAro
     }
 
     /// <inheritdoc />
-    protected override void OnActivated(Entity<XAEThrowThingsAroundComponent> ent, ref XenoArtifactNodeActivatedEvent args)
+    protected override void OnActivated(Entity<XAEThrowThingsAroundComponent> ent,
+        ref XenoArtifactNodeActivatedEvent args)
     {
         var component = ent.Comp;
         var xform = Transform(ent);
         if (TryComp<MapGridComponent>(xform.GridUid, out var grid))
         {
             var areaForTilesPry = new Circle(_transform.GetWorldPosition(xform), component.Range);
-            var tiles = _map.GetTilesIntersecting(xform.GridUid.Value, grid, areaForTilesPry, true);
+            var tiles = _map.GetTilesIntersecting(xform.GridUid.Value, grid, areaForTilesPry);
 
             foreach (var tile in tiles)
             {
@@ -60,7 +60,7 @@ public sealed class XAEThrowThingsAroundSystem : BaseXAESystem<XAEThrowThingsAro
         foreach (var entity in _entities)
         {
             if (_physQuery.TryGetComponent(entity, out var phys)
-                && (phys.CollisionMask & (int)CollisionGroup.GhostImpassable) != 0)
+                && (phys.CollisionMask & (int) CollisionGroup.GhostImpassable) != 0)
                 continue;
 
             var tempXform = Transform(entity);

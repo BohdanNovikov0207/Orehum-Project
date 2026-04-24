@@ -21,9 +21,9 @@ namespace Content.Server.StationRecords.Systems;
 
 public sealed class GeneralStationRecordConsoleSystem : EntitySystem
 {
-    [Dependency] private readonly UserInterfaceSystem _ui = default!;
     [Dependency] private readonly StationSystem _station = default!;
     [Dependency] private readonly StationRecordsSystem _stationRecords = default!;
+    [Dependency] private readonly UserInterfaceSystem _ui = default!;
 
     public override void Initialize()
     {
@@ -31,13 +31,14 @@ public sealed class GeneralStationRecordConsoleSystem : EntitySystem
         SubscribeLocalEvent<GeneralStationRecordConsoleComponent, AfterGeneralRecordCreatedEvent>(UpdateUserInterface);
         SubscribeLocalEvent<GeneralStationRecordConsoleComponent, RecordRemovedEvent>(UpdateUserInterface);
 
-        Subs.BuiEvents<GeneralStationRecordConsoleComponent>(GeneralStationRecordConsoleKey.Key, subs =>
-        {
-            subs.Event<BoundUIOpenedEvent>(UpdateUserInterface);
-            subs.Event<SelectStationRecord>(OnKeySelected);
-            subs.Event<SetStationRecordFilter>(OnFiltersChanged);
-            subs.Event<DeleteStationRecord>(OnRecordDelete);
-        });
+        Subs.BuiEvents<GeneralStationRecordConsoleComponent>(GeneralStationRecordConsoleKey.Key,
+            subs =>
+            {
+                subs.Event<BoundUIOpenedEvent>(UpdateUserInterface);
+                subs.Event<SelectStationRecord>(OnKeySelected);
+                subs.Event<SetStationRecordFilter>(OnFiltersChanged);
+                subs.Event<DeleteStationRecord>(OnRecordDelete);
+            });
     }
 
     private void OnRecordDelete(Entity<GeneralStationRecordConsoleComponent> ent, ref DeleteStationRecord args)
@@ -52,10 +53,8 @@ public sealed class GeneralStationRecordConsoleSystem : EntitySystem
         UpdateUserInterface(ent); // Apparently an event does not get raised for this.
     }
 
-    private void UpdateUserInterface<T>(Entity<GeneralStationRecordConsoleComponent> ent, ref T args)
-    {
+    private void UpdateUserInterface<T>(Entity<GeneralStationRecordConsoleComponent> ent, ref T args) =>
         UpdateUserInterface(ent);
-    }
 
     // TODO: instead of copy paste shitcode for each record console, have a shared records console comp they all use
     // then have this somehow play nicely with creating ui state

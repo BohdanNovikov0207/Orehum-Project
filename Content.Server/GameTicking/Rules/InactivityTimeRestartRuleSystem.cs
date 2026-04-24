@@ -42,7 +42,10 @@ public sealed class InactivityTimeRestartRuleSystem : GameRuleSystem<InactivityR
         _playerManager.PlayerStatusChanged -= PlayerStatusChanged;
     }
 
-    protected override void Ended(EntityUid uid, InactivityRuleComponent component, GameRuleComponent gameRule, GameRuleEndedEvent args)
+    protected override void Ended(EntityUid uid,
+        InactivityRuleComponent component,
+        GameRuleComponent gameRule,
+        GameRuleEndedEvent args)
     {
         base.Ended(uid, component, gameRule, args);
 
@@ -74,7 +77,8 @@ public sealed class InactivityTimeRestartRuleSystem : GameRuleSystem<InactivityR
 
         GameTicker.EndRound(Loc.GetString("rule-time-has-run-out"));
 
-        _chatManager.DispatchServerAnnouncement(Loc.GetString("rule-restarting-in-seconds", ("seconds",(int) component.RoundEndDelay.TotalSeconds)));
+        _chatManager.DispatchServerAnnouncement(Loc.GetString("rule-restarting-in-seconds",
+            ("seconds", (int) component.RoundEndDelay.TotalSeconds)));
 
         Timer.Spawn(component.RoundEndDelay, () => GameTicker.RestartRound());
     }
@@ -109,18 +113,12 @@ public sealed class InactivityTimeRestartRuleSystem : GameRuleSystem<InactivityR
                 return;
 
             if (GameTicker.RunLevel != GameRunLevel.InRound)
-            {
                 return;
-            }
 
             if (_playerManager.PlayerCount == 0)
-            {
                 RestartTimer(uid, inactivity);
-            }
             else
-            {
                 StopTimer(uid, inactivity);
-            }
         }
     }
 }

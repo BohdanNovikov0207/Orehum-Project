@@ -8,7 +8,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Server._DV.Cargo.Components;
-using Content.Shared.Cargo;
 using JetBrains.Annotations;
 
 namespace Content.Server._DV.Cargo.Systems;
@@ -21,7 +20,7 @@ public sealed class LogisticStatsSystem : EntitySystem
         component.Metrics = component.Metrics with
         {
             Earnings = component.Metrics.Earnings + earnedMoney,
-            OpenedCount = component.Metrics.OpenedCount + 1
+            OpenedCount = component.Metrics.OpenedCount + 1,
         };
         UpdateLogisticsStats(uid);
     }
@@ -32,7 +31,7 @@ public sealed class LogisticStatsSystem : EntitySystem
         component.Metrics = component.Metrics with
         {
             ExpiredLosses = component.Metrics.ExpiredLosses + lostMoney,
-            ExpiredCount = component.Metrics.ExpiredCount + 1
+            ExpiredCount = component.Metrics.ExpiredCount + 1,
         };
         UpdateLogisticsStats(uid);
     }
@@ -43,7 +42,7 @@ public sealed class LogisticStatsSystem : EntitySystem
         component.Metrics = component.Metrics with
         {
             DamagedLosses = component.Metrics.DamagedLosses + lostMoney,
-            DamagedCount = component.Metrics.DamagedCount + 1
+            DamagedCount = component.Metrics.DamagedCount + 1,
         };
         UpdateLogisticsStats(uid);
     }
@@ -54,7 +53,7 @@ public sealed class LogisticStatsSystem : EntitySystem
         component.Metrics = component.Metrics with
         {
             TamperedLosses = component.Metrics.TamperedLosses + lostMoney,
-            TamperedCount = component.Metrics.TamperedCount + 1
+            TamperedCount = component.Metrics.TamperedCount + 1,
         };
         UpdateLogisticsStats(uid);
     }
@@ -65,6 +64,7 @@ public sealed class LogisticStatsSystem : EntitySystem
 public sealed class LogisticStatsUpdatedEvent : EntityEventArgs
 {
     public EntityUid Station;
+
     public LogisticStatsUpdatedEvent(EntityUid station)
     {
         Station = station;

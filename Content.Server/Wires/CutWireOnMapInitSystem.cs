@@ -8,9 +8,9 @@ using Robust.Shared.Random;
 namespace Content.Server.Wires;
 
 /// <summary>
-/// Handles cutting a random wire on devices that have <see cref="CutWireOnMapInitComponent"/>.
+/// Handles cutting a random wire on devices that have <see cref="CutWireOnMapInitComponent" />.
 /// </summary>
-public sealed partial class CutWireOnMapInitSystem : EntitySystem
+public sealed class CutWireOnMapInitSystem : EntitySystem
 {
     [Dependency] private readonly IRobustRandom _random = default!;
 

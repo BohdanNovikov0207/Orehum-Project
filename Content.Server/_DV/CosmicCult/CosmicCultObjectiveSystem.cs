@@ -16,13 +16,15 @@ public sealed class CosmicCultObjectiveSystem : EntitySystem
         SubscribeLocalEvent<CosmicVictoryConditionComponent, ObjectiveGetProgressEvent>(OnGetVictoryProgress);
     }
 
-    private void OnGetEntropyProgress(Entity<CosmicEntropyConditionComponent> ent, ref ObjectiveGetProgressEvent args) =>
+    private void OnGetEntropyProgress(Entity<CosmicEntropyConditionComponent> ent,
+        ref ObjectiveGetProgressEvent args) =>
         args.Progress = Progress(ent.Comp.Siphoned, _number.GetTarget(ent.Owner));
 
     private void OnGetTierProgress(Entity<CosmicTierConditionComponent> ent, ref ObjectiveGetProgressEvent args) =>
         args.Progress = Progress(ent.Comp.Tier, _number.GetTarget(ent.Owner));
 
-    private void OnGetVictoryProgress(Entity<CosmicVictoryConditionComponent> ent, ref ObjectiveGetProgressEvent args) =>
+    private void OnGetVictoryProgress(Entity<CosmicVictoryConditionComponent> ent,
+        ref ObjectiveGetProgressEvent args) =>
         args.Progress = ent.Comp.Victory ? 1f : 0f;
 
     private static float Progress(int recruited, int target)

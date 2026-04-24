@@ -17,22 +17,22 @@ public sealed partial class AltInteractOperator : HTNOperator
 {
     [Dependency] private readonly IEntityManager _entManager = default!;
 
-    [DataField("targetKey")]
-    public string Key = "Target";
-
     /// <summary>
     /// If this alt-interaction started a do_after where does the key get stored.
     /// </summary>
     [DataField("idleKey")]
     public string IdleKey = "IdleTime";
 
-    public override async Task<(bool Valid, Dictionary<string, object>? Effects)> Plan(NPCBlackboard blackboard, CancellationToken cancelToken)
-    {
-        return new(true, new Dictionary<string, object>()
-        {
-            { IdleKey, 1f }
-        });
-    }
+    [DataField("targetKey")]
+    public string Key = "Target";
+
+    public override async Task<(bool Valid, Dictionary<string, object>? Effects)> Plan(NPCBlackboard blackboard,
+        CancellationToken cancelToken) =>
+        new(true,
+            new Dictionary<string, object>
+            {
+                { IdleKey, 1f },
+            });
 
     public override HTNOperatorStatus Update(NPCBlackboard blackboard, float frameTime)
     {
@@ -43,9 +43,7 @@ public sealed partial class AltInteractOperator : HTNOperator
         var count = 0;
 
         if (_entManager.TryGetComponent<DoAfterComponent>(owner, out var doAfter))
-        {
             count = doAfter.DoAfters.Count;
-        }
 
         var result = intSystem.AltInteract(owner, target);
 
@@ -56,9 +54,7 @@ public sealed partial class AltInteractOperator : HTNOperator
             blackboard.SetValue(IdleKey, (float) wait.TotalSeconds + 0.5f);
         }
         else
-        {
             blackboard.SetValue(IdleKey, 1f);
-        }
 
         return result ? HTNOperatorStatus.Finished : HTNOperatorStatus.Failed;
     }

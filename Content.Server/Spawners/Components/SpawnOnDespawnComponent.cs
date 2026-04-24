@@ -27,7 +27,7 @@ namespace Content.Server.Spawners.Components;
 /// <summary>
 /// When a <c>TimedDespawnComponent"</c> despawns, another one will be spawned in its place.
 /// </summary>
-[RegisterComponent, Access(typeof(SpawnOnDespawnSystem))]
+[RegisterComponent] [Access(typeof(SpawnOnDespawnSystem))]
 public sealed partial class SpawnOnDespawnComponent : Component
 {
     /// <summary>

@@ -21,8 +21,8 @@ using ChunkIndicesEnumerator = Robust.Shared.Map.Enumerators.ChunkIndicesEnumera
 namespace Content.Shared.Chunking;
 
 /// <summary>
-///     This system just exists to provide some utility functions for other systems that chunk data that needs to be
-///     sent to players. In particular, see <see cref="GetChunksForSession"/>.
+/// This system just exists to provide some utility functions for other systems that chunk data that needs to be
+/// sent to players. In particular, see <see cref="GetChunksForSession" />.
 /// </summary>
 public sealed class ChunkingSystem : EntitySystem
 {
@@ -30,9 +30,9 @@ public sealed class ChunkingSystem : EntitySystem
     [Dependency] private readonly IMapManager _mapManager = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
 
-    private EntityQuery<TransformComponent> _xformQuery;
-
     private Box2 _baseViewBounds;
+
+    private EntityQuery<TransformComponent> _xformQuery;
 
     public override void Initialize()
     {
@@ -41,10 +41,7 @@ public sealed class ChunkingSystem : EntitySystem
         Subs.CVar(_configurationManager, CVars.NetMaxUpdateRange, OnPvsRangeChanged, true);
     }
 
-    private void OnPvsRangeChanged(float value)
-    {
-        _baseViewBounds = Box2.UnitCentered.Scale(value);
-    }
+    private void OnPvsRangeChanged(float value) => _baseViewBounds = Box2.UnitCentered.Scale(value);
 
     public Dictionary<NetEntity, HashSet<Vector2i>> GetChunksForSession(
         ICommonSession session,
@@ -56,7 +53,7 @@ public sealed class ChunkingSystem : EntitySystem
         var chunks = viewerPool.Get();
         DebugTools.Assert(chunks.Count == 0);
 
-        if (session.Status != SessionStatus.InGame || session.AttachedEntity is not {} player)
+        if (session.Status != SessionStatus.InGame || session.AttachedEntity is not { } player)
             return chunks;
 
         var enlargement = viewEnlargement ?? chunkSize;

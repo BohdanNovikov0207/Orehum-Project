@@ -21,16 +21,12 @@ namespace Content.Server.Speech.EntitySystems;
 
 public sealed class SlurredSystem : SharedSlurredSystem
 {
-    [Dependency] private readonly StatusEffectsSystem _statusEffectsSystem = default!;
+    private static readonly ProtoId<StatusEffectPrototype> SlurKey = "SlurredSpeech";
     [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly StatusEffectsSystem _statusEffectsSystem = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
 
-    private static readonly ProtoId<StatusEffectPrototype> SlurKey = "SlurredSpeech";
-
-    public override void Initialize()
-    {
-        SubscribeLocalEvent<SlurredAccentComponent, AccentGetEvent>(OnAccent);
-    }
+    public override void Initialize() => SubscribeLocalEvent<SlurredAccentComponent, AccentGetEvent>(OnAccent);
 
     public override void DoSlur(EntityUid uid, TimeSpan time, StatusEffectsComponent? status = null)
     {
@@ -44,7 +40,7 @@ public sealed class SlurredSystem : SharedSlurredSystem
     }
 
     /// <summary>
-    ///     Slur chance scales with "drunkeness", which is just measured using the time remaining on the status effect.
+    /// Slur chance scales with "drunkeness", which is just measured using the time remaining on the status effect.
     /// </summary>
     private float GetProbabilityScale(EntityUid uid)
     {
@@ -88,9 +84,7 @@ public sealed class SlurredSystem : SharedSlurredSystem
             if (_random.Prob(scale / 20f))
             {
                 if (character == ' ')
-                {
                     sb.Append(Loc.GetString("slur-accent-confused"));
-                }
                 else if (character == '.')
                 {
                     sb.Append(' ');
@@ -98,7 +92,7 @@ public sealed class SlurredSystem : SharedSlurredSystem
                 }
             }
 
-            if (!_random.Prob(scale * 3/20))
+            if (!_random.Prob(scale * 3 / 20))
             {
                 sb.Append(character);
                 continue;

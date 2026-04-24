@@ -12,7 +12,6 @@
 
 using System.Linq;
 using Content.Server.Spawners.Components;
-using Content.Server.Storage.Components;
 using Content.Shared.Item;
 using Content.Shared.Prototypes;
 using Content.Shared.Storage;
@@ -30,17 +29,11 @@ public sealed partial class StorageSystem
             return;
 
         if (TryComp<StorageComponent>(uid, out var storageComp))
-        {
             FillStorage((uid, component, storageComp));
-        }
         else if (TryComp<EntityStorageComponent>(uid, out var entityStorageComp))
-        {
             FillEntityStorage((uid, component, entityStorageComp));
-        }
         else
-        {
             Log.Error($"StorageFillComponent couldn't find any StorageComponent ({uid})");
-        }
     }
 
     private void FillStorage(Entity<StorageFillComponent?, StorageComponent?> entity)
@@ -92,7 +85,8 @@ public sealed partial class StorageSystem
                     reason += $", {reasons}";
             }
 
-            Log.Error($"Tried to StorageFill {ToPrettyString(ent)} inside {ToPrettyString(uid)} but can't. reason: {reason}");
+            Log.Error(
+                $"Tried to StorageFill {ToPrettyString(ent)} inside {ToPrettyString(uid)} but can't. reason: {reason}");
             ClearCantFillReasons();
             Del(ent);
         }

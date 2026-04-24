@@ -5,32 +5,29 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Content.Corvax.Interfaces.Server;
 using Content.Corvax.Interfaces.Shared;
-using Content.Shared.Backmen.Sponsors;
 using Content.Shared.Backmen.CCVar;
+using Content.Shared.Backmen.Sponsors;
 using Robust.Server.Player;
 using Robust.Shared.Configuration;
 using Robust.Shared.Network;
-using Robust.Shared.Utility;
 using Exception = System.Exception;
 
 namespace Content.Server.Backmen.Sponsors;
 
 public sealed class SponsorsManager : ISharedSponsorsManager
 {
-    [Dependency] private readonly IServerNetManager _netMgr = default!;
+    private readonly Dictionary<NetUserId, SponsorInfo> _cachedSponsors = new();
     [Dependency] private readonly IConfigurationManager _cfg = default!;
-    [Dependency] private readonly IPlayerManager _playerManager = default!;
 
     private readonly HttpClient _httpClient = new();
 
-    private ISawmill _sawmill = default!;
+    private readonly ReaderWriterLockSlim _lock = new();
+    [Dependency] private readonly IServerNetManager _netMgr = default!;
+    [Dependency] private readonly IPlayerManager _playerManager = default!;
     private string _apiUrl = string.Empty;
 
-    private readonly Dictionary<NetUserId, SponsorInfo> _cachedSponsors = new();
-
-    private readonly ReaderWriterLockSlim _lock = new();
+    private ISawmill _sawmill = default!;
 
     public void Initialize()
     {
@@ -67,15 +64,57 @@ public sealed class SponsorsManager : ISharedSponsorsManager
         return false;
     }
 
-    public int GetServerExtraCharSlots(NetUserId userId)
+    public int GetServerExtraCharSlots(NetUserId userId) =>
+        _cachedSponsors.TryGetValue(userId, out var sponsor) ? sponsor.ExtraSlots : 0;
+
+    public bool HaveServerPriorityJoin(NetUserId userId) =>
+        _cachedSponsors.TryGetValue(userId, out var sponsor) && sponsor.HavePriorityJoin;
+
+    public void Cleanup()
     {
-        return _cachedSponsors.TryGetValue(userId, out var sponsor) ? sponsor.ExtraSlots : 0;
+        _lock.EnterWriteLock();
+        try
+        {
+            var online = _playerManager.SessionsDict.Keys.ToArray();
+            foreach (var userId in _cachedSponsors.Keys.Where(x => !online.Contains(x)).ToArray())
+            {
+                _cachedSponsors.Remove(userId);
+            }
+        }
+        finally
+        {
+            _lock.ExitWriteLock();
+        }
     }
 
-    public bool HaveServerPriorityJoin(NetUserId userId)
+    public bool TryGetGhostTheme(NetUserId userId, [NotNullWhen(true)] out string? ghostTheme)
     {
-        return _cachedSponsors.TryGetValue(userId, out var sponsor) && sponsor.HavePriorityJoin;
+        if (!_cachedSponsors.ContainsKey(userId) || string.IsNullOrEmpty(_cachedSponsors[userId].GhostTheme))
+        {
+            ghostTheme = null;
+            return false;
+        }
+
+        ghostTheme = _cachedSponsors[userId].GhostTheme!;
+        return true;
     }
+
+    public bool TryGetLoadouts(NetUserId userId, [NotNullWhen(true)] out List<string>? prototypes)
+    {
+        if (!_cachedSponsors.ContainsKey(userId) || _cachedSponsors[userId].Loadouts.Length == 0)
+        {
+            prototypes = null;
+            return false;
+        }
+
+        prototypes = new List<string>();
+        prototypes.AddRange(_cachedSponsors[userId].Loadouts);
+
+        return true;
+    }
+
+    public bool IsServerAllRoles(NetUserId userId) =>
+        _cachedSponsors.ContainsKey(userId) && _cachedSponsors[userId].OpenAllRoles;
 
     private async Task OnConnecting(NetConnectingArgs e)
     {
@@ -115,28 +154,11 @@ public sealed class SponsorsManager : ISharedSponsorsManager
         try
         {
             var info = _cachedSponsors.TryGetValue(e.Channel.UserId, out var sponsor) ? sponsor : null;
-            _netMgr.ServerSendMessage(new MsgSponsorInfo() { Info = info }, e.Channel);
+            _netMgr.ServerSendMessage(new MsgSponsorInfo { Info = info }, e.Channel);
         }
         finally
         {
             _lock.ExitReadLock();
-        }
-    }
-
-    public void Cleanup()
-    {
-        _lock.EnterWriteLock();
-        try
-        {
-            var online = _playerManager.SessionsDict.Keys.ToArray();
-            foreach (var userId in _cachedSponsors.Keys.Where(x => !online.Contains(x)).ToArray())
-            {
-                _cachedSponsors.Remove(userId);
-            }
-        }
-        finally
-        {
-            _lock.ExitWriteLock();
         }
     }
 
@@ -163,18 +185,6 @@ public sealed class SponsorsManager : ISharedSponsorsManager
         return await response.Content.ReadFromJsonAsync<SponsorInfo>();
     }
 
-    public bool TryGetGhostTheme(NetUserId userId, [NotNullWhen(true)] out string? ghostTheme)
-    {
-        if (!_cachedSponsors.ContainsKey(userId) || string.IsNullOrEmpty(_cachedSponsors[userId].GhostTheme))
-        {
-            ghostTheme = null;
-            return false;
-        }
-
-        ghostTheme = _cachedSponsors[userId].GhostTheme!;
-        return true;
-    }
-
     public bool TryGetPrototypes(NetUserId userId, [NotNullWhen(true)] out List<string>? prototypes)
     {
         if (!_cachedSponsors.ContainsKey(userId) || _cachedSponsors[userId].AllowedMarkings.Length == 0)
@@ -187,25 +197,6 @@ public sealed class SponsorsManager : ISharedSponsorsManager
         prototypes.AddRange(_cachedSponsors[userId].AllowedMarkings);
 
         return true;
-    }
-
-    public bool TryGetLoadouts(NetUserId userId, [NotNullWhen(true)] out List<string>? prototypes)
-    {
-        if (!_cachedSponsors.ContainsKey(userId) || _cachedSponsors[userId].Loadouts.Length == 0)
-        {
-            prototypes = null;
-            return false;
-        }
-
-        prototypes = new List<string>();
-        prototypes.AddRange(_cachedSponsors[userId].Loadouts);
-
-        return true;
-    }
-
-    public bool IsServerAllRoles(NetUserId userId)
-    {
-        return _cachedSponsors.ContainsKey(userId) && _cachedSponsors[userId].OpenAllRoles;
     }
 
     public bool TryGetOocColor(NetUserId userId, [NotNullWhen(true)] out Color? color)
@@ -224,9 +215,7 @@ public sealed class SponsorsManager : ISharedSponsorsManager
     public int GetExtraCharSlots(NetUserId userId)
     {
         if (!_cachedSponsors.ContainsKey(userId))
-        {
             return 0;
-        }
 
         return _cachedSponsors[userId].ExtraSlots;
     }
@@ -234,9 +223,7 @@ public sealed class SponsorsManager : ISharedSponsorsManager
     public bool HavePriorityJoin(NetUserId userId)
     {
         if (!_cachedSponsors.ContainsKey(userId))
-        {
             return false;
-        }
 
         return _cachedSponsors[userId].HavePriorityJoin;
     }

@@ -63,7 +63,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Server.Power.Components;
 using Content.Server.Wires;
 using Content.Shared.DeviceLinking.Events;
 using Content.Shared.Doors.Components;
@@ -86,7 +85,7 @@ public sealed class AirlockSystem : SharedAirlockSystem
         SubscribeLocalEvent<AirlockComponent, SignalReceivedEvent>(OnSignalReceived);
 
         SubscribeLocalEvent<AirlockComponent, PowerChangedEvent>(OnPowerChanged);
-        SubscribeLocalEvent<AirlockComponent, ActivateInWorldEvent>(OnActivate, before: new[] { typeof(DoorSystem) });
+        SubscribeLocalEvent<AirlockComponent, ActivateInWorldEvent>(OnActivate, new[] { typeof(DoorSystem) });
     }
 
     private void OnSignalReceived(EntityUid uid, AirlockComponent component, ref SignalReceivedEvent args)
@@ -113,9 +112,7 @@ public sealed class AirlockSystem : SharedAirlockSystem
                 DoorSystem.SetNextStateChange(uid, null);
         }
         else
-        {
             UpdateAutoClose(uid, door: door);
-        }
     }
 
     private void OnActivate(EntityUid uid, AirlockComponent component, ActivateInWorldEvent args)

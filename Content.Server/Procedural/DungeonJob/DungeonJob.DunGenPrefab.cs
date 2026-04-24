@@ -20,9 +20,12 @@ namespace Content.Server.Procedural.DungeonJob;
 public sealed partial class DungeonJob
 {
     /// <summary>
-    /// <see cref="PrefabDunGen"/>
+    ///     <see cref="PrefabDunGen" />
     /// </summary>
-    private async Task<Dungeon> GeneratePrefabDunGen(Vector2i position, PrefabDunGen prefab, HashSet<Vector2i> reservedTiles, Random random)
+    private async Task<Dungeon> GeneratePrefabDunGen(Vector2i position,
+        PrefabDunGen prefab,
+        HashSet<Vector2i> reservedTiles,
+        Random random)
     {
         var preset = prefab.Presets[random.Next(prefab.Presets.Count)];
         var gen = _prototype.Index(preset);
@@ -92,9 +95,7 @@ public sealed partial class DungeonJob
 
             // Try every pack rotation
             if (roomPackProtos.TryGetValue(dimensions, out var roomPacks))
-            {
                 availablePacks.AddRange(roomPacks);
-            }
 
             // Try rotated versions if there are any.
             if (dimensions.X != dimensions.Y)
@@ -102,9 +103,7 @@ public sealed partial class DungeonJob
                 var rotatedDimensions = new Vector2i(dimensions.Y, dimensions.X);
 
                 if (roomPackProtos.TryGetValue(rotatedDimensions, out roomPacks))
-                {
                     availablePacks.AddRange(roomPacks);
-                }
             }
 
             // Iterate every pack
@@ -124,13 +123,9 @@ public sealed partial class DungeonJob
                     Vector2i aPackDimensions;
 
                     if ((dir & (DirectionFlag.East | DirectionFlag.West)) != 0x0)
-                    {
                         aPackDimensions = new Vector2i(aPack.Size.Y, aPack.Size.X);
-                    }
                     else
-                    {
                         aPackDimensions = aPack.Size;
-                    }
 
                     // Rotation doesn't match.
                     if (aPackDimensions != bounds.Size)
@@ -154,9 +149,7 @@ public sealed partial class DungeonJob
 
             // Oop
             if (!found)
-            {
                 continue;
-            }
 
             // If we're not the first pack then connect to our edges.
             chosenPacks[i] = pack;
@@ -180,7 +173,7 @@ public sealed partial class DungeonJob
             foreach (var roomSize in pack.Rooms)
             {
                 var roomDimensions = new Vector2i(roomSize.Width, roomSize.Height);
-                Angle roomRotation = Angle.Zero;
+                var roomRotation = Angle.Zero;
                 Matrix3x2 matty;
 
                 // If no room found then try rotated dimensions
@@ -199,7 +192,9 @@ public sealed partial class DungeonJob
                             {
                                 for (var y = roomSize.Bottom; y < roomSize.Top; y++)
                                 {
-                                    var index = Vector2.Transform(new Vector2(x, y) + _grid.TileSizeHalfVector - packCenter, matty).Floored();
+                                    var index = Vector2
+                                        .Transform(new Vector2(x, y) + _grid.TileSizeHalfVector - packCenter, matty)
+                                        .Floored();
 
                                     if (reservedTiles.Contains(index))
                                         continue;
@@ -217,7 +212,7 @@ public sealed partial class DungeonJob
                     }
 
                     roomRotation = new Angle(Math.PI / 2);
-                    _sawmill.Debug($"Using rotated variant for room");
+                    _sawmill.Debug("Using rotated variant for room");
                 }
 
                 var room = roomProto[random.Next(roomProto.Count)];
@@ -228,9 +223,7 @@ public sealed partial class DungeonJob
                     roomRotation = random.Next(4) * Math.PI / 2;
                 }
                 else if (random.Next(2) == 1)
-                {
                     roomRotation += Math.PI;
-                }
 
                 var roomTransform = Matrix3Helpers.CreateTransform(roomSize.Center - packCenter, roomRotation);
 
@@ -251,11 +244,11 @@ public sealed partial class DungeonJob
                     for (var y = -1; y <= room.Size.Y; y++)
                     {
                         if (x != -1 && y != -1 && x != room.Size.X && y != room.Size.Y)
-                        {
                             continue;
-                        }
 
-                        var tilePos = Vector2.Transform(new Vector2i(x + room.Offset.X, y + room.Offset.Y) + tileOffset, dungeonMatty).Floored();
+                        var tilePos = Vector2.Transform(new Vector2i(x + room.Offset.X, y + room.Offset.Y) + tileOffset,
+                                dungeonMatty)
+                            .Floored();
 
                         if (reservedTiles.Contains(tilePos))
                             continue;
@@ -344,9 +337,7 @@ public sealed partial class DungeonJob
                 var blockPos = entrancePos + dir.ToIntVec() * 2;
 
                 if (i != 3 && dungeon.RoomTiles.Contains(blockPos))
-                {
                     continue;
-                }
 
                 if (reservedTiles.Contains(entrancePos))
                     continue;

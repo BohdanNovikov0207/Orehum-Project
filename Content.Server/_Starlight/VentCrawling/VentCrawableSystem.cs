@@ -8,19 +8,18 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Linq;
-using Content.Shared.VentCrawler.Tube.Components;
-using Content.Shared._Starlight.VentCrawling.Components;
 using Content.Shared._Starlight.VentCrawling;
+using Content.Shared._Starlight.VentCrawling.Components;
+using Robust.Shared.Containers;
 using Robust.Shared.Physics.Components;
 using Robust.Shared.Physics.Systems;
-using Robust.Shared.Containers;
 
 namespace Content.Server._Starlight.VentCrawling;
 
 public sealed class VentCrawableSystem : EntitySystem
 {
-    [Dependency] private readonly SharedPhysicsSystem _physicsSystem = default!;
     [Dependency] private readonly SharedContainerSystem _containerSystem = default!;
+    [Dependency] private readonly SharedPhysicsSystem _physicsSystem = default!;
     [Dependency] private readonly SharedTransformSystem _xformSystem = default!;
 
     public override void Initialize()
@@ -31,12 +30,15 @@ public sealed class VentCrawableSystem : EntitySystem
     }
 
     /// <summary>
-    /// Exits the vent craws for the specified VentCrawlerHolderComponent, removing it and any contained entities from the craws.
+    /// Exits the vent craws for the specified VentCrawlerHolderComponent, removing it and any contained entities from the
+    /// craws.
     /// </summary>
     /// <param name="uid">The EntityUid of the VentCrawlerHolderComponent.</param>
     /// <param name="holder">The VentCrawlerHolderComponent instance.</param>
     /// <param name="holderTransform">The TransformComponent instance for the VentCrawlerHolderComponent.</param>
-    private void OnVentCrawlingExitEvent(EntityUid uid, VentCrawlerHolderComponent holder, ref VentCrawlingExitEvent args)
+    private void OnVentCrawlingExitEvent(EntityUid uid,
+        VentCrawlerHolderComponent holder,
+        ref VentCrawlingExitEvent args)
     {
         var holderTransform = args.holderTransform;
 
@@ -59,7 +61,7 @@ public sealed class VentCrawableSystem : EntitySystem
             RemComp<BeingVentCrawlerComponent>(entity);
 
             var meta = MetaData(entity);
-            _containerSystem.Remove(entity, holder.Container, reparent: false, force: true);
+            _containerSystem.Remove(entity, holder.Container, false, true);
 
             var xform = Transform(entity);
             if (xform.ParentUid != uid)
@@ -70,7 +72,7 @@ public sealed class VentCrawableSystem : EntitySystem
             if (TryComp<VentCrawlerComponent>(entity, out var ventCrawComp))
             {
                 ventCrawComp.InTube = false;
-                Dirty(entity , ventCrawComp);
+                Dirty(entity, ventCrawComp);
             }
 
             if (EntityManager.TryGetComponent(entity, out PhysicsComponent? physics))

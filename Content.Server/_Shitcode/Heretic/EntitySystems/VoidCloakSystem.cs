@@ -24,7 +24,8 @@ public sealed class VoidCloakSystem : SharedVoidCloakSystem
         SubscribeLocalEvent<InventoryComponent, GetPressureProtectionValuesEvent>(OnGetPressureProtectionValues);
     }
 
-    private void OnGetPressureProtectionValues(Entity<InventoryComponent> ent, ref GetPressureProtectionValuesEvent args)
+    private void OnGetPressureProtectionValues(Entity<InventoryComponent> ent,
+        ref GetPressureProtectionValuesEvent args)
     {
         if (!_inventory.TryGetSlotEntity(ent, "outerClothing", out var entity, ent.Comp))
             return;

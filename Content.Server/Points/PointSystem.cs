@@ -20,13 +20,13 @@ using Robust.Shared.Utility;
 
 namespace Content.Server.Points;
 
-/// <inheritdoc/>
+/// <inheritdoc />
 public sealed class PointSystem : SharedPointSystem
 {
     [Dependency] private readonly IPlayerManager _player = default!;
     [Dependency] private readonly PvsOverrideSystem _pvsOverride = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
@@ -34,16 +34,18 @@ public sealed class PointSystem : SharedPointSystem
         SubscribeLocalEvent<PointManagerComponent, ComponentStartup>(OnStartup);
     }
 
-    private void OnStartup(EntityUid uid, PointManagerComponent component, ComponentStartup args)
-    {
+    private void OnStartup(EntityUid uid, PointManagerComponent component, ComponentStartup args) =>
         _pvsOverride.AddGlobalOverride(uid);
-    }
 
     /// <summary>
     /// Adds the specified point value to a player.
     /// </summary>
     [PublicAPI]
-    public void AdjustPointValue(EntityUid user, FixedPoint2 value, EntityUid uid, PointManagerComponent? component, ActorComponent? actor = null)
+    public void AdjustPointValue(EntityUid user,
+        FixedPoint2 value,
+        EntityUid uid,
+        PointManagerComponent? component,
+        ActorComponent? actor = null)
     {
         if (!Resolve(uid, ref component) || !Resolve(user, ref actor, false))
             return;
@@ -54,7 +56,11 @@ public sealed class PointSystem : SharedPointSystem
     /// Sets the amount of points for a player
     /// </summary>
     [PublicAPI]
-    public void SetPointValue(EntityUid user, FixedPoint2 value, EntityUid uid, PointManagerComponent? component, ActorComponent? actor = null)
+    public void SetPointValue(EntityUid user,
+        FixedPoint2 value,
+        EntityUid uid,
+        PointManagerComponent? component,
+        ActorComponent? actor = null)
     {
         if (!Resolve(uid, ref component) || !Resolve(user, ref actor, false))
             return;
@@ -65,14 +71,17 @@ public sealed class PointSystem : SharedPointSystem
     /// Gets the amount of points for a given player
     /// </summary>
     [PublicAPI]
-    public FixedPoint2 GetPointValue(EntityUid user, EntityUid uid, PointManagerComponent? component, ActorComponent? actor = null)
+    public FixedPoint2 GetPointValue(EntityUid user,
+        EntityUid uid,
+        PointManagerComponent? component,
+        ActorComponent? actor = null)
     {
         if (!Resolve(uid, ref component) || !Resolve(user, ref actor, false))
             return FixedPoint2.Zero;
         return GetPointValue(actor.PlayerSession.UserId, uid, component);
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override FormattedMessage GetScoreboard(EntityUid uid, PointManagerComponent? component = null)
     {
         var msg = new FormattedMessage();

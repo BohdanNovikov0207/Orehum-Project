@@ -17,10 +17,10 @@ namespace Content.Server.Ghost;
 
 public sealed class SpookySpeakerSystem : EntitySystem
 {
+    [Dependency] private readonly ChatSystem _chat = default!;
     [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly ChatSystem _chat = default!;
 
     public override void Initialize()
     {
@@ -49,7 +49,7 @@ public sealed class SpookySpeakerSystem : EntitySystem
         // So this is a stupid trick to make the "...Oooo"-style messages work.
         message = '>' + message;
         // Say the message
-        _chat.TrySendInGameICMessage(entity, message, InGameICChatType.Speak, hideChat: true);
+        _chat.TrySendInGameICMessage(entity, message, InGameICChatType.Speak, true);
 
         // Set the delay for the next message
         entity.Comp.NextSpeakTime = curTime + entity.Comp.Cooldown;

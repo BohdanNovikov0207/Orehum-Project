@@ -1,4 +1,3 @@
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Content.Server.Decals;
@@ -21,43 +20,41 @@ using Robust.Shared.Map.Components;
 using Robust.Shared.Physics.Components;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
-using Robust.Shared.Utility;
 using IDunGenLayer = Content.Shared.Procedural.IDunGenLayer;
 
 namespace Content.Server.Procedural.DungeonJob;
 
 public sealed partial class DungeonJob : Job<List<Dungeon>>
 {
-    public bool TimeSlice = true;
-
-    private readonly IEntityManager _entManager;
-    private readonly IPrototypeManager _prototype;
-    private readonly ITileDefinitionManager _tileDefManager;
-
     private readonly AnchorableSystem _anchorable;
     private readonly DecalSystem _decals;
     private readonly DungeonSystem _dungeon;
-    private readonly EntityLookupSystem _lookup;
-    private readonly EntityTableSystem _entTable;
-    private readonly TagSystem _tags;
-    private readonly TileSystem _tile;
-    private readonly TurfSystem _turf;
-    private readonly SharedMapSystem _maps;
-    private readonly SharedTransformSystem _transform;
 
-    private EntityQuery<PhysicsComponent> _physicsQuery;
-    private EntityQuery<TransformComponent> _xformQuery;
+    private readonly IEntityManager _entManager;
+    private readonly EntityTableSystem _entTable;
 
     private readonly DungeonConfig _gen;
-    private readonly int _seed;
-    private readonly Vector2i _position;
-
-    private readonly EntityUid _gridUid;
     private readonly MapGridComponent _grid;
 
-    private readonly EntityCoordinates? _targetCoordinates;
+    private readonly EntityUid _gridUid;
+    private readonly EntityLookupSystem _lookup;
+    private readonly SharedMapSystem _maps;
+
+    private readonly EntityQuery<PhysicsComponent> _physicsQuery;
+    private readonly Vector2i _position;
+    private readonly IPrototypeManager _prototype;
 
     private readonly ISawmill _sawmill;
+    private readonly int _seed;
+    private readonly TagSystem _tags;
+
+    private readonly EntityCoordinates? _targetCoordinates;
+    private readonly TileSystem _tile;
+    private readonly ITileDefinitionManager _tileDefManager;
+    private readonly SharedTransformSystem _transform;
+    private readonly TurfSystem _turf;
+    private readonly EntityQuery<TransformComponent> _xformQuery;
+    public bool TimeSlice = true;
 
     public DungeonJob(
         ISawmill sawmill,
@@ -124,9 +121,7 @@ public sealed partial class DungeonJob : Job<List<Dungeon>>
 
         // Don't pass dungeons back up the "stack". They are ref types though it's a caller problem if they start trying to mutate it.
         if (existing != null)
-        {
             dungeons.AddRange(existing);
-        }
 
         var count = random.Next(config.MinCount, config.MaxCount + 1);
 
@@ -288,13 +283,30 @@ public sealed partial class DungeonJob : Job<List<Dungeon>>
                 switch (prototypo.InheritDungeons)
                 {
                     case DungeonInheritance.All:
-                        dungeons.AddRange(await GetDungeons(position, groupConfig, groupConfig.Layers, reservedTiles, seed, random, existing: dungeons));
+                        dungeons.AddRange(await GetDungeons(position,
+                            groupConfig,
+                            groupConfig.Layers,
+                            reservedTiles,
+                            seed,
+                            random,
+                            dungeons));
                         break;
                     case DungeonInheritance.Last:
-                        dungeons.AddRange(await GetDungeons(position, groupConfig, groupConfig.Layers, reservedTiles, seed, random, existing: dungeons.GetRange(dungeons.Count - 1, 1)));
+                        dungeons.AddRange(await GetDungeons(position,
+                            groupConfig,
+                            groupConfig.Layers,
+                            reservedTiles,
+                            seed,
+                            random,
+                            dungeons.GetRange(dungeons.Count - 1, 1)));
                         break;
                     case DungeonInheritance.None:
-                        dungeons.AddRange(await GetDungeons(position, groupConfig, groupConfig.Layers, reservedTiles, seed, random));
+                        dungeons.AddRange(await GetDungeons(position,
+                            groupConfig,
+                            groupConfig.Layers,
+                            reservedTiles,
+                            seed,
+                            random));
                         break;
                 }
 
@@ -319,24 +331,19 @@ public sealed partial class DungeonJob : Job<List<Dungeon>>
         }
     }
 
-    private void LogDataError(Type type)
-    {
-        _sawmill.Error($"Unable to find dungeon data keys for {type}");
-    }
+    private void LogDataError(Type type) => _sawmill.Error($"Unable to find dungeon data keys for {type}");
 
     [Pure]
     private bool ValidateResume()
     {
         if (_entManager.Deleted(_gridUid))
-        {
             return false;
-        }
 
         return true;
     }
 
     /// <summary>
-    /// Wrapper around <see cref="Job{T}.SuspendIfOutOfTime"/>
+    /// Wrapper around <see cref="Job{T}.SuspendIfOutOfTime" />
     /// </summary>
     private async Task SuspendDungeon()
     {

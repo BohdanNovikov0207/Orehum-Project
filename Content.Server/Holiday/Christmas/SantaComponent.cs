@@ -14,5 +14,4 @@ namespace Content.Server.Holiday.Christmas;
 [RegisterComponent]
 public sealed partial class SantaComponent : Component
 {
-
 }

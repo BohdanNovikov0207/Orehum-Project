@@ -8,38 +8,41 @@
 //
 // SPDX-License-Identifier: MIT
 
-using Content.Shared.Atmos;
 using System.Runtime.CompilerServices;
+using Content.Shared.Atmos;
 
 namespace Content.Server.Explosion.EntitySystems;
 
 /// <summary>
-///     This class exists to facilitate the iterative neighbor-finding / flooding algorithm used by explosions in <see
-///     cref="ExplosionSystem.GetExplosionTiles"/>. This is the base class for <see cref="ExplosionSpaceTileFlood"/> and
-///     <see cref="ExplosionGridTileFlood"/>, each of which contains additional code fro logic specific to grids or space.
+/// This class exists to facilitate the iterative neighbor-finding / flooding algorithm used by explosions in
+/// <see
+///     cref="ExplosionSystem.GetExplosionTiles" />
+/// . This is the base class for <see cref="ExplosionSpaceTileFlood" /> and
+/// <see cref="ExplosionGridTileFlood" />, each of which contains additional code fro logic specific to grids or space.
 /// </summary>
 /// <remarks>
-///     The class stores information about the tiles that the explosion has currently reached, and provides functions to
-///     perform a neighbor-finding iteration to expand the explosion area. It also has some functionality that allows
-///     tiles to move between grids/space.
+/// The class stores information about the tiles that the explosion has currently reached, and provides functions to
+/// perform a neighbor-finding iteration to expand the explosion area. It also has some functionality that allows
+/// tiles to move between grids/space.
 /// </remarks>
 public abstract class ExplosionTileFlood
 {
-    // Main tile data sets, mapping iterations onto tile lists
-    public Dictionary<int, List<Vector2i>> TileLists = new();
     protected Dictionary<int, List<Vector2i>> BlockedTileLists = new();
+    protected UniqueVector2iSet EnteredBlockedTiles = new();
     protected Dictionary<int, HashSet<Vector2i>> FreedTileLists = new();
+    protected List<Vector2i> NewBlockedTiles = default!;
+    protected HashSet<Vector2i> NewFreedTiles = default!;
 
     // The new tile lists added each iteration. I **could** just pass these along to every function, but IMO it is more
     // readable if they are just private variables.
     protected List<Vector2i> NewTiles = default!;
-    protected List<Vector2i> NewBlockedTiles = default!;
-    protected HashSet<Vector2i> NewFreedTiles = default!;
 
     // HashSets used to ensure uniqueness of tiles. Prevents the explosion from looping back in on itself.
     protected UniqueVector2iSet ProcessedTiles = new();
+
+    // Main tile data sets, mapping iterations onto tile lists
+    public Dictionary<int, List<Vector2i>> TileLists = new();
     protected UniqueVector2iSet UnenteredBlockedTiles = new();
-    protected UniqueVector2iSet EnteredBlockedTiles = new();
 
     public abstract void InitTile(Vector2i initialTile);
 
@@ -49,7 +52,7 @@ public abstract class ExplosionTileFlood
 
     protected void AddNewDiagonalTiles(int iteration, IEnumerable<Vector2i> tiles, bool ignoreLocalBlocker = false)
     {
-        AtmosDirection entryDirection = AtmosDirection.Invalid;
+        var entryDirection = AtmosDirection.Invalid;
         foreach (var tile in tiles)
         {
             var freeDirections = ignoreLocalBlocker ? AtmosDirection.All : GetUnblockedDirectionOrAll(tile);
@@ -115,7 +118,7 @@ public abstract class ExplosionTileFlood
     }
 
     /// <summary>
-    ///     Merge all tile lists into a single output tile list.
+    /// Merge all tile lists into a single output tile list.
     /// </summary>
     public void CleanUp()
     {
@@ -130,17 +133,17 @@ public abstract class ExplosionTileFlood
 }
 
 /// <summary>
-///     This is a data structure can be used to ensure the uniqueness of Vector2i indices.
+/// This is a data structure can be used to ensure the uniqueness of Vector2i indices.
 /// </summary>
 /// <remarks>
-///     This basically exists to replace the use of HashSet&lt;Vector2i&gt; if all you need is the the functions Contains()
-///     and Add(). This is both faster and apparently allocates less. Does not support iterating over contents
+/// This basically exists to replace the use of HashSet&lt;Vector2i&gt; if all you need is the the functions Contains()
+/// and Add(). This is both faster and apparently allocates less. Does not support iterating over contents
 /// </remarks>
 public sealed class UniqueVector2iSet
 {
     private const int ChunkSize = 32; // # of bits in an integer.
 
-    private Dictionary<Vector2i, VectorChunk> _chunks = new();
+    private readonly Dictionary<Vector2i, VectorChunk> _chunks = new();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Vector2i ToChunkIndices(Vector2i indices)
@@ -155,11 +158,9 @@ public sealed class UniqueVector2iSet
     {
         var chunkIndex = ToChunkIndices(index);
         if (_chunks.TryGetValue(chunkIndex, out var chunk))
-        {
             return chunk.Add(index);
-        }
 
-        chunk = new();
+        chunk = new VectorChunk();
         chunk.Add(index);
         _chunks[chunkIndex] = chunk;
 

@@ -15,14 +15,14 @@ namespace Content.Server.StationEvents.Components;
 public sealed partial class ClericalErrorRuleComponent : Component
 {
     /// <summary>
-    /// The minimum percentage number of records to remove from the station.
-    /// </summary>
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
-    public float MinToRemove = 0.0025f;
-
-    /// <summary>
     /// The maximum percentage number of records to remove from the station.
     /// </summary>
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    [DataField] [ViewVariables(VVAccess.ReadWrite)]
     public float MaxToRemove = 0.1f;
+
+    /// <summary>
+    /// The minimum percentage number of records to remove from the station.
+    /// </summary>
+    [DataField] [ViewVariables(VVAccess.ReadWrite)]
+    public float MinToRemove = 0.0025f;
 }

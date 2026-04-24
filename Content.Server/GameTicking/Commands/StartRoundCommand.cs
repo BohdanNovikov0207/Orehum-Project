@@ -13,28 +13,27 @@ using Content.Server.Administration;
 using Content.Shared.Administration;
 using Robust.Shared.Console;
 
-namespace Content.Server.GameTicking.Commands
+namespace Content.Server.GameTicking.Commands;
+
+[AdminCommand(AdminFlags.Round)]
+internal sealed class StartRoundCommand : IConsoleCommand
 {
-    [AdminCommand(AdminFlags.Round)]
-    sealed class StartRoundCommand : IConsoleCommand
+    [Dependency] private readonly IEntityManager _e = default!;
+
+    public string Command => "startround";
+    public string Description => "Ends PreRoundLobby state and starts the round.";
+    public string Help => string.Empty;
+
+    public void Execute(IConsoleShell shell, string argStr, string[] args)
     {
-        [Dependency] private readonly IEntityManager _e = default!;
+        var ticker = _e.System<GameTicker>();
 
-        public string Command => "startround";
-        public string Description => "Ends PreRoundLobby state and starts the round.";
-        public string Help => String.Empty;
-
-        public void Execute(IConsoleShell shell, string argStr, string[] args)
+        if (ticker.RunLevel != GameRunLevel.PreRoundLobby)
         {
-            var ticker = _e.System<GameTicker>();
-
-            if (ticker.RunLevel != GameRunLevel.PreRoundLobby)
-            {
-                shell.WriteLine("This can only be executed while the game is in the pre-round lobby.");
-                return;
-            }
-
-            ticker.StartRound();
+            shell.WriteLine("This can only be executed while the game is in the pre-round lobby.");
+            return;
         }
+
+        ticker.StartRound();
     }
 }

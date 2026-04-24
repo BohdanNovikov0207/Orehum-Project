@@ -15,20 +15,18 @@ using Content.Shared._Shitmed.Medical.Surgery.Steps;
 using Content.Shared.Database;
 using Content.Shared.Humanoid;
 using Robust.Shared.Player;
+
 namespace Content.Server._Shitmed.Antags.Abductor;
 
 public sealed partial class AbductorSystem : SharedAbductorSystem
 {
+    private static readonly string DefaultAbductorVictimRule = "AbductorVictim";
     [Dependency] private readonly IAdminLogManager _adminLogManager = default!;
+    [Dependency] private readonly AntagSelectionSystem _antag = default!;
     [Dependency] private readonly MindSystem _mind = default!;
     [Dependency] private readonly RoleSystem _role = default!;
-    [Dependency] private readonly AntagSelectionSystem _antag = default!;
+    public void InitializeVictim() => SubscribeLocalEvent<AbductorComponent, SurgeryStepEvent>(OnSurgeryStepComplete);
 
-    private static readonly string DefaultAbductorVictimRule = "AbductorVictim";
-    public void InitializeVictim()
-    {
-        SubscribeLocalEvent<AbductorComponent, SurgeryStepEvent>(OnSurgeryStepComplete);
-    }
     private void OnSurgeryStepComplete(EntityUid uid, AbductorComponent comp, ref SurgeryStepEvent args)
     {
         if (!HasComp<SurgeryAddOrganStepComponent>(args.Step)
@@ -52,8 +50,6 @@ public sealed partial class AbductorSystem : SharedAbductorSystem
             _adminLogManager.Add(LogType.Mind,
                 LogImpact.Medium,
                 $"{ToPrettyString(args.User)} has given {ToPrettyString(args.Body)} an abductee objective.");
-
         }
-
     }
 }

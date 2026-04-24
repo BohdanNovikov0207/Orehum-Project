@@ -12,5 +12,4 @@ namespace Content.Server.RequiresGrid;
 [Access(typeof(RequiresGridSystem))]
 public sealed partial class RequiresGridComponent : Component
 {
-
 }

@@ -32,16 +32,16 @@ namespace Content.Server.Store.Conditions;
 public sealed partial class BuyerDepartmentCondition : ListingCondition
 {
     /// <summary>
-    /// A whitelist of department prototypes that can purchase this listing. Only one needs to be found.
-    /// </summary>
-    [DataField("whitelist", customTypeSerializer: typeof(PrototypeIdHashSetSerializer<DepartmentPrototype>))]
-    public HashSet<string>? Whitelist;
-
-    /// <summary>
     /// A blacklist of department prototypes that can purchase this listing. Only one needs to be found.
     /// </summary>
     [DataField("blacklist", customTypeSerializer: typeof(PrototypeIdHashSetSerializer<DepartmentPrototype>))]
     public HashSet<string>? Blacklist;
+
+    /// <summary>
+    /// A whitelist of department prototypes that can purchase this listing. Only one needs to be found.
+    /// </summary>
+    [DataField("whitelist", customTypeSerializer: typeof(PrototypeIdHashSetSerializer<DepartmentPrototype>))]
+    public HashSet<string>? Whitelist;
 
     public override bool Condition(ListingConditionArgs args)
     {
@@ -51,8 +51,8 @@ public sealed partial class BuyerDepartmentCondition : ListingCondition
 
         var mind = args.Buyer; // Goob start
 
-        if (!ent.TryGetComponent<MindComponent>(args.Buyer, out var _)
-        && !ent.System<SharedMindSystem>().TryGetMind(args.Buyer, out mind, out _))
+        if (!ent.TryGetComponent<MindComponent>(args.Buyer, out _)
+            && !ent.System<SharedMindSystem>().TryGetMind(args.Buyer, out mind, out _))
             return true;
 
         var jobs = ent.System<SharedJobSystem>();

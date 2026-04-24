@@ -12,27 +12,23 @@ using Content.Shared.Administration;
 using Content.Shared.Tag;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Toolshed;
-using Robust.Shared.Toolshed.Syntax;
-using Robust.Shared.Toolshed.TypeParsers;
 
 namespace Content.Server.Administration.Toolshed;
 
-[ToolshedCommand, AdminCommand(AdminFlags.Debug)]
+[ToolshedCommand] [AdminCommand(AdminFlags.Debug)]
 public sealed class TagCommand : ToolshedCommand
 {
     private TagSystem? _tag;
 
     [CommandImplementation("list")]
-    public IEnumerable<ProtoId<TagPrototype>> List([PipedArgument] IEnumerable<EntityUid> ent)
-    {
-        return ent.SelectMany(x =>
+    public IEnumerable<ProtoId<TagPrototype>> List([PipedArgument] IEnumerable<EntityUid> ent) =>
+        ent.SelectMany(x =>
         {
             if (TryComp<TagComponent>(x, out var tags))
                 // Note: Cast is required for C# to figure out the type signature.
-                return (IEnumerable<ProtoId<TagPrototype>>)tags.Tags;
+                return (IEnumerable<ProtoId<TagPrototype>>) tags.Tags;
             return Array.Empty<ProtoId<TagPrototype>>();
         });
-    }
 
     [CommandImplementation("with")]
     public IEnumerable<EntityUid> With(
@@ -77,7 +73,8 @@ public sealed class TagCommand : ToolshedCommand
     }
 
     [CommandImplementation("addmany")]
-    public IEnumerable<EntityUid> AddMany([PipedArgument] IEnumerable<EntityUid> input, IEnumerable<ProtoId<TagPrototype>> tags)
+    public IEnumerable<EntityUid> AddMany([PipedArgument] IEnumerable<EntityUid> input,
+        IEnumerable<ProtoId<TagPrototype>> tags)
         => input.Select(x => AddMany(x, tags.ToArray()));
 
     [CommandImplementation("rmmany")]
@@ -89,6 +86,7 @@ public sealed class TagCommand : ToolshedCommand
     }
 
     [CommandImplementation("rmmany")]
-    public IEnumerable<EntityUid> RmMany([PipedArgument] IEnumerable<EntityUid> input, IEnumerable<ProtoId<TagPrototype>> tags)
+    public IEnumerable<EntityUid> RmMany([PipedArgument] IEnumerable<EntityUid> input,
+        IEnumerable<ProtoId<TagPrototype>> tags)
         => input.Select(x => RmMany(x, tags.ToArray()));
 }

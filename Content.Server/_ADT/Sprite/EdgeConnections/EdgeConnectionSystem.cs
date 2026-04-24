@@ -12,16 +12,17 @@ namespace Content.Server._ADT.Sprite.EdgeConnections;
 /// </summary>
 public sealed class EdgeConnectionSystem : EntitySystem
 {
+    private static readonly (Vector2i Offset, EdgeConnectionDirections Direction, EdgeConnectionDirections Opposite)[]
+        CardinalOffsets =
+        [
+            (new Vector2i(1, 0), EdgeConnectionDirections.East, EdgeConnectionDirections.West),
+            (new Vector2i(-1, 0), EdgeConnectionDirections.West, EdgeConnectionDirections.East),
+            (new Vector2i(0, 1), EdgeConnectionDirections.North, EdgeConnectionDirections.South),
+            (new Vector2i(0, -1), EdgeConnectionDirections.South, EdgeConnectionDirections.North),
+        ];
+
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
     [Dependency] private readonly SharedMapSystem _map = default!;
-
-    private static readonly (Vector2i Offset, EdgeConnectionDirections Direction, EdgeConnectionDirections Opposite)[] CardinalOffsets =
-    [
-        (new Vector2i(1, 0), EdgeConnectionDirections.East, EdgeConnectionDirections.West),
-        (new Vector2i(-1, 0), EdgeConnectionDirections.West, EdgeConnectionDirections.East),
-        (new Vector2i(0, 1), EdgeConnectionDirections.North, EdgeConnectionDirections.South),
-        (new Vector2i(0, -1), EdgeConnectionDirections.South, EdgeConnectionDirections.North),
-    ];
 
     private EntityQuery<EdgeConnectionComponent> _edgeQuery;
 
@@ -63,7 +64,7 @@ public sealed class EdgeConnectionSystem : EntitySystem
     private void OnConnectionMoved(Entity<EdgeConnectionComponent> ent, ref MoveEvent args)
     {
         var movedToNewTile = args.OldPosition.EntityId != args.NewPosition.EntityId
-                            || args.OldPosition.Position.Floored() != args.NewPosition.Position.Floored();
+                             || args.OldPosition.Position.Floored() != args.NewPosition.Position.Floored();
 
         if (!movedToNewTile && args.OldRotation.EqualsApprox(args.NewRotation))
             return;
@@ -82,7 +83,7 @@ public sealed class EdgeConnectionSystem : EntitySystem
             return;
         }
 
-        var worldAllowed = RotateDirections(ent.Comp.AllowedDirections, xform.LocalRotation, clockwise: true);
+        var worldAllowed = RotateDirections(ent.Comp.AllowedDirections, xform.LocalRotation, true);
         var mask = EdgeConnectionDirections.None;
 
         foreach (var (offset, direction, opposite) in CardinalOffsets)
@@ -90,11 +91,17 @@ public sealed class EdgeConnectionSystem : EntitySystem
             if ((worldAllowed & direction) == 0)
                 continue;
 
-            if (HasMatchingNeighbor(ent, xform.LocalRotation, gridUid, grid, tile + offset, ent.Comp.ConnectionKey, opposite))
+            if (HasMatchingNeighbor(ent,
+                    xform.LocalRotation,
+                    gridUid,
+                    grid,
+                    tile + offset,
+                    ent.Comp.ConnectionKey,
+                    opposite))
                 mask |= direction;
         }
 
-        var localMask = RotateDirections(mask, xform.LocalRotation, clockwise: false);
+        var localMask = RotateDirections(mask, xform.LocalRotation, false);
 
         if (GetQuarterTurns(xform.LocalRotation) % 2 != 0)
             localMask = FlipEastWest(localMask);
@@ -102,7 +109,13 @@ public sealed class EdgeConnectionSystem : EntitySystem
         _appearance.SetData(ent, EdgeConnectionVisuals.ConnectionMask, localMask);
     }
 
-    private bool HasMatchingNeighbor(EntityUid self, Angle selfLocalRotation, EntityUid gridUid, MapGridComponent grid, Vector2i tile, string key, EdgeConnectionDirections requiredDirection)
+    private bool HasMatchingNeighbor(EntityUid self,
+        Angle selfLocalRotation,
+        EntityUid gridUid,
+        MapGridComponent grid,
+        Vector2i tile,
+        string key,
+        EdgeConnectionDirections requiredDirection)
     {
         var anchored = _map.GetAnchoredEntitiesEnumerator(gridUid, grid, tile);
         var selfQuarterTurns = GetQuarterTurns(selfLocalRotation);
@@ -126,7 +139,7 @@ public sealed class EdgeConnectionSystem : EntitySystem
             if (selfQuarterTurns % 2 != otherQuarterTurns % 2)
                 continue;
 
-            var otherAllowed = RotateDirections(edge.AllowedDirections, otherXform.LocalRotation, clockwise: true);
+            var otherAllowed = RotateDirections(edge.AllowedDirections, otherXform.LocalRotation, true);
             if ((otherAllowed & requiredDirection) != 0)
                 return true;
         }
@@ -179,7 +192,10 @@ public sealed class EdgeConnectionSystem : EntitySystem
         }
     }
 
-    private bool TryGetGridTile(TransformComponent xform, out EntityUid gridUid, out MapGridComponent grid, out Vector2i tile)
+    private bool TryGetGridTile(TransformComponent xform,
+        out EntityUid gridUid,
+        out MapGridComponent grid,
+        out Vector2i tile)
     {
         gridUid = default;
         grid = default!;
@@ -194,7 +210,9 @@ public sealed class EdgeConnectionSystem : EntitySystem
         return true;
     }
 
-    private static EdgeConnectionDirections RotateDirections(EdgeConnectionDirections flags, Angle rotation, bool clockwise)
+    private static EdgeConnectionDirections RotateDirections(EdgeConnectionDirections flags,
+        Angle rotation,
+        bool clockwise)
     {
         var quarterTurns = GetQuarterTurns(rotation);
         if (!clockwise)
@@ -217,10 +235,7 @@ public sealed class EdgeConnectionSystem : EntitySystem
         return flags;
     }
 
-    private static int GetQuarterTurns(Angle rotation)
-    {
-        return ((int) Math.Round(rotation.Degrees / 90.0) % 4 + 4) % 4;
-    }
+    private static int GetQuarterTurns(Angle rotation) => ((int) Math.Round(rotation.Degrees / 90.0) % 4 + 4) % 4;
 
     private static EdgeConnectionDirections FlipEastWest(EdgeConnectionDirections flags)
     {

@@ -10,5 +10,4 @@ namespace Content.Server.Movement.Systems;
 
 public sealed class FloorOcclusionSystem : SharedFloorOcclusionSystem
 {
-
 }

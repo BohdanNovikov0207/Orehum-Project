@@ -60,13 +60,10 @@ public sealed class AmbientSoundSystem : SharedAmbientSoundSystem
         SubscribeLocalEvent<AmbientOnPoweredComponent, PowerNetBatterySupplyEvent>(HandlePowerSupply);
     }
 
-    private void HandlePowerSupply(EntityUid uid, AmbientOnPoweredComponent component, ref PowerNetBatterySupplyEvent args)
-    {
-        SetAmbience(uid, args.Supply);
-    }
+    private void HandlePowerSupply(EntityUid uid,
+        AmbientOnPoweredComponent component,
+        ref PowerNetBatterySupplyEvent args) => SetAmbience(uid, args.Supply);
 
-    private void HandlePowerChange(EntityUid uid, AmbientOnPoweredComponent component, ref PowerChangedEvent args)
-    {
+    private void HandlePowerChange(EntityUid uid, AmbientOnPoweredComponent component, ref PowerChangedEvent args) =>
         SetAmbience(uid, args.Powered);
-    }
 }

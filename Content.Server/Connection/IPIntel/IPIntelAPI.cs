@@ -22,10 +22,10 @@ public sealed class IPIntelApi : IIPIntelApi
 {
     // Holds-The-HttpClient
     private readonly IHttpClientHolder _http;
+    private string? _baseUrl;
 
     // CCvars
     private string? _contactEmail;
-    private string? _baseUrl;
     private string? _flags;
 
     public IPIntelApi(
@@ -39,8 +39,6 @@ public sealed class IPIntelApi : IIPIntelApi
         cfg.OnValueChanged(CCVars.GameIPIntelFlags, b => _flags = b, true);
     }
 
-    public Task<HttpResponseMessage> GetIPScore(IPAddress ip)
-    {
-        return _http.Client.GetAsync($"{_baseUrl}/check.php?ip={ip}&contact={_contactEmail}&flags={_flags}");
-    }
+    public Task<HttpResponseMessage> GetIPScore(IPAddress ip) =>
+        _http.Client.GetAsync($"{_baseUrl}/check.php?ip={ip}&contact={_contactEmail}&flags={_flags}");
 }

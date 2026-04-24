@@ -7,9 +7,9 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Server._DV.Weapons.Ranged.Systems;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype;
-using Content.Server._DV.Weapons.Ranged.Systems;
 
 namespace Content.Server._DV.Weapons.Ranged.Components;
 
@@ -23,29 +23,23 @@ namespace Content.Server._DV.Weapons.Ranged.Components;
 public sealed partial class EnergyGunComponent : Component
 {
     /// <summary>
-    /// A list of the different firing modes the energy gun can switch between
-    /// </summary>
-    [DataField("fireModes", required: true)]
-    [AutoNetworkedField]
-    public List<EnergyWeaponFireMode> FireModes = new();
-
-    /// <summary>
     /// The currently selected firing mode
     /// </summary>
     [DataField("currentFireMode")]
     [AutoNetworkedField]
     public EnergyWeaponFireMode? CurrentFireMode = default!;
+
+    /// <summary>
+    /// A list of the different firing modes the energy gun can switch between
+    /// </summary>
+    [DataField("fireModes", required: true)]
+    [AutoNetworkedField]
+    public List<EnergyWeaponFireMode> FireModes = new();
 }
 
 [DataDefinition]
 public sealed partial class EnergyWeaponFireMode
 {
-    /// <summary>
-    /// The projectile prototype associated with this firing mode
-    /// </summary>
-    [DataField("proto", required: true, customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
-    public string Prototype = default!;
-
     /// <summary>
     /// The battery cost to fire the projectile associated with this firing mode
     /// </summary>
@@ -57,6 +51,12 @@ public sealed partial class EnergyWeaponFireMode
     /// </summary>
     [DataField("name")]
     public string Name = string.Empty;
+
+    /// <summary>
+    /// The projectile prototype associated with this firing mode
+    /// </summary>
+    [DataField("proto", required: true, customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
+    public string Prototype = default!;
 
     /// <summary>
     /// What RsiState we use for that firemode if it needs to change.

@@ -14,23 +14,21 @@ using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Interaction.Components;
 using Content.Shared.Storage;
 using Content.Shared.Tag;
-using Robust.Shared.Network;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 
 namespace Content.Server.Tools.Innate;
 
 /// <summary>
-///     Spawns a list unremovable tools in hands if possible. Used for drones,
-///     borgs, or maybe even stuff like changeling armblades!
+/// Spawns a list unremovable tools in hands if possible. Used for drones,
+/// borgs, or maybe even stuff like changeling armblades!
 /// </summary>
 public sealed class InnateToolSystem : EntitySystem
 {
+    private static readonly ProtoId<TagPrototype> InnateDontDeleteTag = "InnateDontDelete";
     [Dependency] private readonly IRobustRandom _robustRandom = default!;
     [Dependency] private readonly SharedHandsSystem _sharedHandsSystem = default!;
     [Dependency] private readonly TagSystem _tagSystem = default!;
-
-    private static readonly ProtoId<TagPrototype> InnateDontDeleteTag = "InnateDontDelete";
 
     public override void Initialize()
     {
@@ -60,11 +58,12 @@ public sealed class InnateToolSystem : EntitySystem
 
         var item = Spawn(toSpawn, spawnCoord);
         AddComp<UnremoveableComponent>(item);
-        if (!_sharedHandsSystem.TryPickupAnyHand(uid, item, checkActionBlocker: false))
+        if (!_sharedHandsSystem.TryPickupAnyHand(uid, item, false))
         {
             QueueDel(item);
             component.ToSpawn.Clear();
         }
+
         component.ToSpawn.Remove(toSpawn);
         component.ToolUids.Add(item);
     }
@@ -77,23 +76,17 @@ public sealed class InnateToolSystem : EntitySystem
         }
     }
 
-    private void OnDestroyed(EntityUid uid, InnateToolComponent component, DestructionEventArgs args)
-    {
+    private void OnDestroyed(EntityUid uid, InnateToolComponent component, DestructionEventArgs args) =>
         Cleanup(uid, component);
-    }
 
     public void Cleanup(EntityUid uid, InnateToolComponent component)
     {
         foreach (var tool in component.ToolUids)
         {
             if (_tagSystem.HasTag(tool, InnateDontDeleteTag))
-            {
                 RemComp<UnremoveableComponent>(tool);
-            }
             else
-            {
                 Del(tool);
-            }
 
             if (TryComp<HandsComponent>(uid, out var hands))
             {

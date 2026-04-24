@@ -91,6 +91,7 @@ public sealed class MobsterAccentSystem : EntitySystem
                 var pick = _random.Next(1, 3);
                 suffix = Loc.GetString($"accent-mobster-suffix-minion-{pick}");
             }
+
             if (lastWordAllCaps)
                 suffix = suffix.ToUpper();
             msg = RegexLastPunctuation.Replace(msg, suffix);
@@ -99,8 +100,6 @@ public sealed class MobsterAccentSystem : EntitySystem
         return msg;
     }
 
-    private void OnAccentGet(EntityUid uid, MobsterAccentComponent component, AccentGetEvent args)
-    {
+    private void OnAccentGet(EntityUid uid, MobsterAccentComponent component, AccentGetEvent args) =>
         args.Message = Accentuate(args.Message, component);
-    }
 }

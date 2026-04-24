@@ -15,23 +15,16 @@ using Robust.Shared.Utility;
 namespace Content.Server.StationRecords;
 
 /// <summary>
-///     Set of station records for a single station. StationRecordsComponent stores these.
-///     Keyed by the record id, which should be obtained from
-///     an entity that stores a reference to it.
-///     A StationRecordKey has both the station entity (use to get the record set) and id (use for this).
+/// Set of station records for a single station. StationRecordsComponent stores these.
+/// Keyed by the record id, which should be obtained from
+/// an entity that stores a reference to it.
+/// A StationRecordKey has both the station entity (use to get the record set) and id (use for this).
 /// </summary>
 [DataDefinition]
 public sealed partial class StationRecordSet
 {
     [DataField("currentRecordId")]
     private uint _currentRecordId;
-
-    /// <summary>
-    /// Every key id that has a record(s) stored.
-    /// Presumably this is faster than iterating the dictionary to check if any tables have a key.
-    /// </summary>
-    [DataField]
-    public HashSet<uint> Keys = new();
 
     /// <summary>
     /// Recently accessed key ids which are used to synchronize them efficiently.
@@ -46,23 +39,26 @@ public sealed partial class StationRecordSet
     private Dictionary<Type, Dictionary<uint, object>> _tables = new();
 
     /// <summary>
-    ///     Gets all records of a specific type stored in the record set.
+    /// Every key id that has a record(s) stored.
+    /// Presumably this is faster than iterating the dictionary to check if any tables have a key.
+    /// </summary>
+    [DataField]
+    public HashSet<uint> Keys = new();
+
+    /// <summary>
+    /// Gets all records of a specific type stored in the record set.
     /// </summary>
     /// <typeparam name="T">The type of record to fetch.</typeparam>
     /// <returns>An enumerable object that contains a pair of both a station key, and the record associated with it.</returns>
     public IEnumerable<(uint, T)> GetRecordsOfType<T>()
     {
         if (!_tables.ContainsKey(typeof(T)))
-        {
             yield break;
-        }
 
         foreach (var (key, entry) in _tables[typeof(T)])
         {
             if (entry is not T cast)
-            {
                 continue;
-            }
 
             _recentlyAccessed.Add(key);
 
@@ -87,7 +83,7 @@ public sealed partial class StationRecordSet
     }
 
     /// <summary>
-    ///     Add an entry into an existing record.
+    /// Add an entry into an existing record.
     /// </summary>
     /// <param name="key">Key id for the record.</param>
     /// <param name="entry">Entry to add.</param>
@@ -102,7 +98,7 @@ public sealed partial class StationRecordSet
     }
 
     /// <summary>
-    ///     Try to get an record entry by type, from this record key.
+    /// Try to get an record entry by type, from this record key.
     /// </summary>
     /// <param name="key">The record id to get the entries from.</param>
     /// <param name="entry">The entry that is retrieved from the record set.</param>
@@ -115,9 +111,7 @@ public sealed partial class StationRecordSet
         if (!Keys.Contains(key)
             || !_tables.TryGetValue(typeof(T), out var table)
             || !table.TryGetValue(key, out var entryObject))
-        {
             return false;
-        }
 
         entry = (T) entryObject;
         _recentlyAccessed.Add(key);
@@ -126,45 +120,34 @@ public sealed partial class StationRecordSet
     }
 
     /// <summary>
-    ///     Checks if the record associated with this key has an entry of a certain type.
+    /// Checks if the record associated with this key has an entry of a certain type.
     /// </summary>
     /// <param name="key">The record key id.</param>
     /// <typeparam name="T">Type to check.</typeparam>
     /// <returns>True if the entry exists, false otherwise.</returns>
-    public bool HasRecordEntry<T>(uint key)
-    {
-        return Keys.Contains(key)
-               && _tables.TryGetValue(typeof(T), out var table)
-               && table.ContainsKey(key);
-    }
+    public bool HasRecordEntry<T>(uint key) =>
+        Keys.Contains(key)
+        && _tables.TryGetValue(typeof(T), out var table)
+        && table.ContainsKey(key);
 
     /// <summary>
-    ///     Get the recently accessed keys from this record set.
+    /// Get the recently accessed keys from this record set.
     /// </summary>
     /// <returns>All recently accessed keys from this record set.</returns>
-    public IEnumerable<uint> GetRecentlyAccessed()
-    {
-        return _recentlyAccessed.ToArray();
-    }
+    public IEnumerable<uint> GetRecentlyAccessed() => _recentlyAccessed.ToArray();
 
     /// <summary>
-    ///     Clears the recently accessed keys from the set.
+    /// Clears the recently accessed keys from the set.
     /// </summary>
-    public void ClearRecentlyAccessed()
-    {
-        _recentlyAccessed.Clear();
-    }
+    public void ClearRecentlyAccessed() => _recentlyAccessed.Clear();
 
     /// <summary>
     /// Removes a recently accessed key from the set.
     /// </summary>
-    public void RemoveFromRecentlyAccessed(uint key)
-    {
-        _recentlyAccessed.Remove(key);
-    }
+    public void RemoveFromRecentlyAccessed(uint key) => _recentlyAccessed.Remove(key);
 
     /// <summary>
-    ///     Removes all record entries related to this key from this set.
+    /// Removes all record entries related to this key from this set.
     /// </summary>
     /// <param name="key">The key to remove.</param>
     /// <returns>True if successful, false otherwise.</returns>
@@ -181,4 +164,3 @@ public sealed partial class StationRecordSet
         return true;
     }
 }
-

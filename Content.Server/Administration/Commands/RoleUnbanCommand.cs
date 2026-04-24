@@ -29,7 +29,7 @@ public sealed class RoleUnbanCommand : LocalizedCommands
 
         if (!int.TryParse(args[0], out var banId))
         {
-            shell.WriteLine(Loc.GetString($"cmd-roleunban-unable-to-parse-id", ("id", args[0]), ("help", Help)));
+            shell.WriteLine(Loc.GetString("cmd-roleunban-unable-to-parse-id", ("id", args[0]), ("help", Help)));
             return;
         }
 
@@ -37,13 +37,11 @@ public sealed class RoleUnbanCommand : LocalizedCommands
         shell.WriteLine(response);
     }
 
-    public override CompletionResult GetCompletion(IConsoleShell shell, string[] args)
-    {
+    public override CompletionResult GetCompletion(IConsoleShell shell, string[] args) =>
         // Can't think of good way to do hint options for this
-        return args.Length switch
+        args.Length switch
         {
             1 => CompletionResult.FromHint(Loc.GetString("cmd-roleunban-hint-1")),
-            _ => CompletionResult.Empty
+            _ => CompletionResult.Empty,
         };
-    }
 }

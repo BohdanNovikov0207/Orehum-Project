@@ -8,32 +8,6 @@ namespace Content.Server.NPC.Pathfinding;
 public sealed partial class PathfindingSystem
 {
     /// <summary>
-    /// Pathfinding args for a 1-1 path.
-    /// </summary>
-    public record struct SimplePathArgs()
-    {
-        public Vector2i Start;
-        public Vector2i End;
-
-        public bool Diagonals = false;
-
-        public int Limit = 10000;
-
-        /// <summary>
-        /// Custom tile-costs if applicable.
-        /// </summary>
-        public Func<Vector2i, float>? TileCost;
-    }
-
-    public record struct SimplePathResult
-    {
-        public static SimplePathResult NoPath = new();
-
-        public List<Vector2i> Path;
-        public Dictionary<Vector2i, Vector2i> CameFrom;
-    }
-
-    /// <summary>
     /// Gets simple A* path from start to end. Can also supply an optional tile-cost for tiles.
     /// </summary>
     public SimplePathResult GetPath(SimplePathArgs args)
@@ -55,7 +29,7 @@ public sealed partial class PathfindingSystem
                 // Found target
                 var path = ReconstructPath(args.End, cameFrom);
 
-                return new SimplePathResult()
+                return new SimplePathResult
                 {
                     CameFrom = cameFrom,
                     Path = path,
@@ -74,9 +48,7 @@ public sealed partial class PathfindingSystem
                         var neighborCost = OctileDistance(node, neighbor) * args.TileCost?.Invoke(neighbor) ?? 1f;
 
                         if (neighborCost.Equals(0f))
-                        {
                             continue;
-                        }
 
                         // f = g + h
                         // gScore is distance to the start node
@@ -85,9 +57,7 @@ public sealed partial class PathfindingSystem
 
                         // Slower to get here so just ignore it.
                         if (costSoFar.TryGetValue(neighbor, out var nextValue) && gScore >= nextValue)
-                        {
                             continue;
-                        }
 
                         cameFrom[neighbor] = node;
                         costSoFar[neighbor] = gScore;
@@ -140,7 +110,7 @@ public sealed partial class PathfindingSystem
 
     private List<Vector2i> ReconstructPath(Vector2i end, Dictionary<Vector2i, Vector2i> cameFrom)
     {
-        var path = new List<Vector2i>()
+        var path = new List<Vector2i>
         {
             end,
         };
@@ -155,5 +125,30 @@ public sealed partial class PathfindingSystem
         path.Reverse();
 
         return path;
+    }
+
+    /// <summary>
+    /// Pathfinding args for a 1-1 path.
+    /// </summary>
+    public record struct SimplePathArgs()
+    {
+        public bool Diagonals = false;
+        public Vector2i End;
+
+        public int Limit = 10000;
+        public Vector2i Start;
+
+        /// <summary>
+        /// Custom tile-costs if applicable.
+        /// </summary>
+        public Func<Vector2i, float>? TileCost;
+    }
+
+    public record struct SimplePathResult
+    {
+        public static SimplePathResult NoPath = new();
+        public Dictionary<Vector2i, Vector2i> CameFrom;
+
+        public List<Vector2i> Path;
     }
 }

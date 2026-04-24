@@ -18,8 +18,8 @@ namespace Content.Server.Doors.Electronics;
 
 public sealed class DoorElectronicsSystem : EntitySystem
 {
-    [Dependency] private readonly UserInterfaceSystem _uiSystem = default!;
     [Dependency] private readonly AccessReaderSystem _accessReader = default!;
+    [Dependency] private readonly UserInterfaceSystem _uiSystem = default!;
 
     public override void Initialize()
     {
@@ -58,16 +58,12 @@ public sealed class DoorElectronicsSystem : EntitySystem
     private void OnAccessReaderChanged(
         EntityUid uid,
         DoorElectronicsComponent component,
-        AccessReaderConfigurationChangedEvent args)
-    {
+        AccessReaderConfigurationChangedEvent args) =>
         UpdateUserInterface(uid, component);
-    }
 
     private void OnBoundUIOpened(
         EntityUid uid,
         DoorElectronicsComponent component,
-        BoundUIOpenedEvent args)
-    {
+        BoundUIOpenedEvent args) =>
         UpdateUserInterface(uid, component);
-    }
 }

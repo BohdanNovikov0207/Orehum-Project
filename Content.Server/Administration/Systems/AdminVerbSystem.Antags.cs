@@ -81,14 +81,14 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Server._DV.CosmicCult.Components;
 using Content.Server._Goobstation.Wizard.Components;
-using Content.Server._DV.CosmicCult.Components; // DeltaV
 using Content.Server.Antag;
+using Content.Server.Clothing.Systems;
 using Content.Server.GameTicking;
 using Content.Server.GameTicking.Rules.Components;
 using Content.Server.Zombies;
 using Content.Shared.Administration;
-using Content.Server.Clothing.Systems;
 using Content.Shared.Database;
 using Content.Shared.Humanoid;
 using Content.Shared.Mind.Components;
@@ -97,16 +97,12 @@ using Content.Shared.Verbs;
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
+// DeltaV
 
 namespace Content.Server.Administration.Systems;
 
 public sealed partial class AdminVerbSystem
 {
-    [Dependency] private readonly AntagSelectionSystem _antag = default!;
-    [Dependency] private readonly ZombieSystem _zombie = default!;
-    [Dependency] private readonly GameTicker _gameTicker = default!;
-    [Dependency] private readonly OutfitSystem _outfit = default!;
-
     private static readonly EntProtoId DefaultTraitorRule = "Traitor";
     private static readonly EntProtoId DefaultInitialInfectedRule = "Zombie";
     private static readonly EntProtoId DefaultNukeOpRule = "LoneOpsSpawn";
@@ -115,6 +111,10 @@ public sealed partial class AdminVerbSystem
     private static readonly ProtoId<StartingGearPrototype> PirateGearId = "PirateGear";
 
     private static readonly EntProtoId ParadoxCloneRuleId = "ParadoxCloneSpawn";
+    [Dependency] private readonly AntagSelectionSystem _antag = default!;
+    [Dependency] private readonly GameTicker _gameTicker = default!;
+    [Dependency] private readonly OutfitSystem _outfit = default!;
+    [Dependency] private readonly ZombieSystem _zombie = default!;
 
     // All antag verbs have names so invokeverb works.
     private void AddAntagVerbs(GetVerbsEvent<Verb> args)
@@ -143,7 +143,7 @@ public sealed partial class AdminVerbSystem
                 _antag.ForceMakeAntag<TraitorRuleComponent>(targetPlayer, DefaultTraitorRule);
             },
             Impact = LogImpact.High,
-            Message = string.Join(": ", traitorName,  Loc.GetString("admin-verb-make-traitor")),
+            Message = string.Join(": ", traitorName, Loc.GetString("admin-verb-make-traitor")),
         };
         args.Verbs.Add(traitor);
 
@@ -152,7 +152,7 @@ public sealed partial class AdminVerbSystem
         {
             Text = initialInfectedName,
             Category = VerbCategory.Antag,
-            Icon = new SpriteSpecifier.Rsi(new("/Textures/Interface/Misc/job_icons.rsi"), "InitialInfected"),
+            Icon = new SpriteSpecifier.Rsi(new ResPath("/Textures/Interface/Misc/job_icons.rsi"), "InitialInfected"),
             Act = () =>
             {
                 _antag.ForceMakeAntag<ZombieRuleComponent>(targetPlayer, DefaultInitialInfectedRule);
@@ -167,7 +167,7 @@ public sealed partial class AdminVerbSystem
         {
             Text = zombieName,
             Category = VerbCategory.Antag,
-            Icon = new SpriteSpecifier.Rsi(new("/Textures/Interface/Misc/job_icons.rsi"), "Zombie"),
+            Icon = new SpriteSpecifier.Rsi(new ResPath("/Textures/Interface/Misc/job_icons.rsi"), "Zombie"),
             Act = () =>
             {
                 _zombie.ZombifyEntity(args.Target);
@@ -182,7 +182,7 @@ public sealed partial class AdminVerbSystem
         {
             Text = nukeOpName,
             Category = VerbCategory.Antag,
-            Icon = new SpriteSpecifier.Rsi(new("/Textures/Clothing/Head/Hardsuits/syndicate.rsi"), "icon"),
+            Icon = new SpriteSpecifier.Rsi(new ResPath("/Textures/Clothing/Head/Hardsuits/syndicate.rsi"), "icon"),
             Act = () =>
             {
                 _antag.ForceMakeAntag<NukeopsRuleComponent>(targetPlayer, DefaultNukeOpRule);
@@ -197,7 +197,7 @@ public sealed partial class AdminVerbSystem
         {
             Text = pirateName,
             Category = VerbCategory.Antag,
-            Icon = new SpriteSpecifier.Rsi(new("/Textures/Clothing/Head/Hats/pirate.rsi"), "icon"),
+            Icon = new SpriteSpecifier.Rsi(new ResPath("/Textures/Clothing/Head/Hats/pirate.rsi"), "icon"),
             Act = () =>
             {
                 // pirates just get an outfit because they don't really have logic associated with them
@@ -213,7 +213,7 @@ public sealed partial class AdminVerbSystem
         {
             Text = headRevName,
             Category = VerbCategory.Antag,
-            Icon = new SpriteSpecifier.Rsi(new("/Textures/Interface/Misc/job_icons.rsi"), "HeadRevolutionary"),
+            Icon = new SpriteSpecifier.Rsi(new ResPath("/Textures/Interface/Misc/job_icons.rsi"), "HeadRevolutionary"),
             Act = () =>
             {
                 _antag.ForceMakeAntag<RevolutionaryRuleComponent>(targetPlayer, DefaultRevsRule);
@@ -243,7 +243,7 @@ public sealed partial class AdminVerbSystem
         {
             Text = paradoxCloneName,
             Category = VerbCategory.Antag,
-            Icon = new SpriteSpecifier.Rsi(new("/Textures/Interface/Misc/job_icons.rsi"), "ParadoxClone"),
+            Icon = new SpriteSpecifier.Rsi(new ResPath("/Textures/Interface/Misc/job_icons.rsi"), "ParadoxClone"),
             Act = () =>
             {
                 var ruleEnt = _gameTicker.AddGameRule(ParadoxCloneRuleId);
@@ -268,7 +268,8 @@ public sealed partial class AdminVerbSystem
         {
             Text = hereticName,
             Category = VerbCategory.Antag,
-            Icon = new SpriteSpecifier.Rsi(new ResPath("/Textures/_Goobstation/Heretic/Blades/eldritch_blade.rsi"), "icon"),
+            Icon = new SpriteSpecifier.Rsi(new ResPath("/Textures/_Goobstation/Heretic/Blades/eldritch_blade.rsi"),
+                "icon"),
             Act = () =>
             {
                 _antag.ForceMakeAntag<HereticRuleComponent>(targetPlayer, "Heretic");
@@ -300,7 +301,7 @@ public sealed partial class AdminVerbSystem
         {
             Text = cosmicCultName,
             Category = VerbCategory.Antag,
-            Icon = new SpriteSpecifier.Rsi(new("/Textures/_DV/CosmicCult/Icons/antag_icons.rsi"), "CosmicCult"),
+            Icon = new SpriteSpecifier.Rsi(new ResPath("/Textures/_DV/CosmicCult/Icons/antag_icons.rsi"), "CosmicCult"),
             Act = () =>
             {
                 _antag.ForceMakeAntag<CosmicCultRuleComponent>(targetPlayer, "CosmicCult");

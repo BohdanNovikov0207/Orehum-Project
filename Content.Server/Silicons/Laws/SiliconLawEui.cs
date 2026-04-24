@@ -85,12 +85,12 @@ namespace Content.Server.Silicons.Laws;
 
 public sealed class SiliconLawEui : BaseEui
 {
-    private readonly SiliconLawSystem _siliconLawSystem;
-    private readonly EntityManager _entityManager;
     private readonly IAdminManager _adminManager;
+    private readonly EntityManager _entityManager;
+    private readonly ISawmill _sawmill = default!;
+    private readonly SiliconLawSystem _siliconLawSystem;
 
     private List<SiliconLaw> _laws = new();
-    private ISawmill _sawmill = default!;
     private EntityUid _target;
 
     public SiliconLawEui(SiliconLawSystem siliconLawSystem, EntityManager entityManager, IAdminManager manager)
@@ -101,10 +101,7 @@ public sealed class SiliconLawEui : BaseEui
         _sawmill = Logger.GetSawmill("silicon-law-eui");
     }
 
-    public override EuiStateBase GetNewState()
-    {
-        return new SiliconLawsEuiState(_laws, _entityManager.GetNetEntity(_target));
-    }
+    public override EuiStateBase GetNewState() => new SiliconLawsEuiState(_laws, _entityManager.GetNetEntity(_target));
 
     public void UpdateLaws(SiliconLawBoundComponent? lawBoundComponent, EntityUid player)
     {
@@ -120,9 +117,7 @@ public sealed class SiliconLawEui : BaseEui
     public override void HandleMessage(EuiMessageBase msg)
     {
         if (msg is not SiliconLawsSaveMessage message)
-        {
             return;
-        }
 
         if (!IsAllowed())
             return;

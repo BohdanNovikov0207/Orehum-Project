@@ -12,7 +12,7 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Server.StationEvents.Components;
 
-[RegisterComponent, Access(typeof(BureaucraticErrorRule))]
+[RegisterComponent] [Access(typeof(BureaucraticErrorRule))]
 public sealed partial class BureaucraticErrorRuleComponent : Component
 {
     /// <summary>

@@ -12,25 +12,12 @@ using Content.Server.Singularity.EntitySystems;
 namespace Content.Server.Singularity.Components;
 
 /// <summary>
-/// The server-side version of <see cref="SharedGravityWellComponent"/>.
-/// Primarily managed by <see cref="GravityWellSystem"/>.
+/// The server-side version of <see cref="SharedGravityWellComponent" />.
+/// Primarily managed by <see cref="GravityWellSystem" />.
 /// </summary>
-[RegisterComponent, AutoGenerateComponentPause]
+[RegisterComponent] [AutoGenerateComponentPause]
 public sealed partial class GravityWellComponent : Component
 {
-    /// <summary>
-    /// The maximum range at which the gravity well can push/pull entities.
-    /// </summary>
-    [DataField]
-    public float MaxRange;
-
-    /// <summary>
-    /// The minimum range at which the gravity well can push/pull entities.
-    /// This is effectively hardfloored at <see cref="GravityWellSystem.MinGravPulseRange"/>.
-    /// </summary>
-    [DataField]
-    public float MinRange = 0f;
-
     /// <summary>
     /// The acceleration entities will experience towards the gravity well at a distance of 1m.
     /// Negative values accelerate entities away from the gravity well.
@@ -47,6 +34,19 @@ public sealed partial class GravityWellComponent : Component
     [DataField]
     public float BaseTangentialAcceleration = 0.0f;
 
+    /// <summary>
+    /// The maximum range at which the gravity well can push/pull entities.
+    /// </summary>
+    [DataField]
+    public float MaxRange;
+
+    /// <summary>
+    /// The minimum range at which the gravity well can push/pull entities.
+    /// This is effectively hardfloored at <see cref="GravityWellSystem.MinGravPulseRange" />.
+    /// </summary>
+    [DataField]
+    public float MinRange = 0f;
+
     #region Update Timing
 
     /// <summary>
@@ -60,7 +60,7 @@ public sealed partial class GravityWellComponent : Component
     /// <summary>
     /// The next time at which this gravity well should pulse.
     /// </summary>
-    [DataField, Access(typeof(GravityWellSystem)), AutoPausedField]
+    [DataField] [Access(typeof(GravityWellSystem))] [AutoPausedField]
     public TimeSpan NextPulseTime { get; internal set; } = default!;
 
     /// <summary>

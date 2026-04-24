@@ -7,8 +7,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Arcade;
 using System.Linq;
+using Content.Shared.Arcade;
 
 namespace Content.Server.Arcade.BlockGame;
 
@@ -20,32 +20,32 @@ public sealed partial class BlockGame
     private const float PressCheckSpeed = 0.08f;
 
     /// <summary>
+    /// How long the left button has been pressed.
+    /// </summary>
+    private float _accumulatedLeftPressTime;
+
+    /// <summary>
+    /// How long the right button has been pressed.
+    /// </summary>
+    private float _accumulatedRightPressTime;
+
+    /// <summary>
     /// Whether the left button is pressed.
     /// Moves the active piece left if true.
     /// </summary>
-    private bool _leftPressed = false;
-
-    /// <summary>
-    /// How long the left button has been pressed.
-    /// </summary>
-    private float _accumulatedLeftPressTime = 0f;
+    private bool _leftPressed;
 
     /// <summary>
     /// Whether the right button is pressed.
     /// Moves the active piece right if true.
     /// </summary>
-    private bool _rightPressed = false;
-
-    /// <summary>
-    /// How long the right button has been pressed.
-    /// </summary>
-    private float _accumulatedRightPressTime = 0f;
+    private bool _rightPressed;
 
     /// <summary>
     /// Whether the down button is pressed.
     /// Speeds up how quickly the active piece falls if true.
     /// </summary>
-    private bool _softDropPressed = false;
+    private bool _softDropPressed;
 
 
     /// <summary>
@@ -97,18 +97,23 @@ public sealed partial class BlockGame
                 break;
             case BlockGamePlayerAction.Pause:
                 _running = false;
-                SendMessage(new BlockGameMessages.BlockGameSetScreenMessage(BlockGameMessages.BlockGameScreen.Pause, Started));
+                SendMessage(
+                    new BlockGameMessages.BlockGameSetScreenMessage(BlockGameMessages.BlockGameScreen.Pause, Started));
                 break;
             case BlockGamePlayerAction.Unpause:
                 if (!_gameOver && Started)
                 {
                     _running = true;
-                    SendMessage(new BlockGameMessages.BlockGameSetScreenMessage(BlockGameMessages.BlockGameScreen.Game));
+                    SendMessage(
+                        new BlockGameMessages.BlockGameSetScreenMessage(BlockGameMessages.BlockGameScreen.Game));
                 }
+
                 break;
             case BlockGamePlayerAction.ShowHighscores:
                 _running = false;
-                SendMessage(new BlockGameMessages.BlockGameSetScreenMessage(BlockGameMessages.BlockGameScreen.Highscores, Started));
+                SendMessage(
+                    new BlockGameMessages.BlockGameSetScreenMessage(BlockGameMessages.BlockGameScreen.Highscores,
+                        Started));
                 break;
         }
     }
@@ -126,7 +131,6 @@ public sealed partial class BlockGame
 
             while (_accumulatedLeftPressTime >= PressCheckSpeed)
             {
-
                 if (CurrentPiece.Positions(_currentPiecePosition.AddToX(-1), _currentRotation)
                     .All(MoveCheck))
                 {
@@ -163,20 +167,16 @@ public sealed partial class BlockGame
     /// Handles sending a message to all players/spectators.
     /// </summary>
     /// <param name="message">The message to broadcase to all players/spectators.</param>
-    private void SendMessage(BoundUserInterfaceMessage message)
-    {
+    private void SendMessage(BoundUserInterfaceMessage message) =>
         _uiSystem.ServerSendUiMessage(_owner, BlockGameUiKey.Key, message);
-    }
 
     /// <summary>
     /// Handles sending a message to a specific player/spectator.
     /// </summary>
     /// <param name="message">The message to send to a specific player/spectator.</param>
     /// <param name="actor">The target recipient.</param>
-    private void SendMessage(BoundUserInterfaceMessage message, EntityUid actor)
-    {
+    private void SendMessage(BoundUserInterfaceMessage message, EntityUid actor) =>
         _uiSystem.ServerSendUiMessage(_owner, BlockGameUiKey.Key, message, actor);
-    }
 
     /// <summary>
     /// Handles sending the current state of the game to a player that has just opened the UI.
@@ -186,14 +186,21 @@ public sealed partial class BlockGame
     {
         if (_gameOver)
         {
-            SendMessage(new BlockGameMessages.BlockGameGameOverScreenMessage(Points, _highScorePlacement?.LocalPlacement, _highScorePlacement?.GlobalPlacement), actor);
+            SendMessage(new BlockGameMessages.BlockGameGameOverScreenMessage(Points,
+                    _highScorePlacement?.LocalPlacement,
+                    _highScorePlacement?.GlobalPlacement),
+                actor);
             return;
         }
 
         if (Paused)
-            SendMessage(new BlockGameMessages.BlockGameSetScreenMessage(BlockGameMessages.BlockGameScreen.Pause, Started), actor);
+            SendMessage(
+                new BlockGameMessages.BlockGameSetScreenMessage(BlockGameMessages.BlockGameScreen.Pause, Started),
+                actor);
         else
-            SendMessage(new BlockGameMessages.BlockGameSetScreenMessage(BlockGameMessages.BlockGameScreen.Game, Started), actor);
+            SendMessage(
+                new BlockGameMessages.BlockGameSetScreenMessage(BlockGameMessages.BlockGameScreen.Game, Started),
+                actor);
 
         FullUpdate(actor);
     }
@@ -234,11 +241,13 @@ public sealed partial class BlockGame
             return;
 
         var computedField = ComputeField();
-        SendMessage(new BlockGameMessages.BlockGameVisualUpdateMessage(computedField.ToArray(), BlockGameMessages.BlockGameVisualType.GameField));
+        SendMessage(new BlockGameMessages.BlockGameVisualUpdateMessage(computedField.ToArray(),
+            BlockGameMessages.BlockGameVisualType.GameField));
     }
 
     /// <summary>
-    /// Handles broadcasting the current location of all of the blocks in the playfield + the active piece to a specific player/spectator.
+    /// Handles broadcasting the current location of all of the blocks in the playfield + the active piece to a specific
+    /// player/spectator.
     /// </summary>
     public void UpdateFieldUI(EntityUid actor)
     {
@@ -246,7 +255,9 @@ public sealed partial class BlockGame
             return;
 
         var computedField = ComputeField();
-        SendMessage(new BlockGameMessages.BlockGameVisualUpdateMessage(computedField.ToArray(), BlockGameMessages.BlockGameVisualType.GameField), actor);
+        SendMessage(new BlockGameMessages.BlockGameVisualUpdateMessage(computedField.ToArray(),
+                BlockGameMessages.BlockGameVisualType.GameField),
+            actor);
     }
 
     /// <summary>
@@ -260,7 +271,7 @@ public sealed partial class BlockGame
 
         var dropGhostPosition = _currentPiecePosition;
         while (CurrentPiece.Positions(dropGhostPosition.AddToY(1), _currentRotation)
-                .All(DropCheck))
+               .All(DropCheck))
         {
             dropGhostPosition = dropGhostPosition.AddToY(1);
         }
@@ -270,27 +281,28 @@ public sealed partial class BlockGame
             var blox = CurrentPiece.Blocks(dropGhostPosition, _currentRotation);
             for (var i = 0; i < blox.Length; i++)
             {
-                result.Add(new BlockGameBlock(blox[i].Position, BlockGameBlock.ToGhostBlockColor(blox[i].GameBlockColor)));
+                result.Add(new BlockGameBlock(blox[i].Position,
+                    BlockGameBlock.ToGhostBlockColor(blox[i].GameBlockColor)));
             }
         }
+
         return result;
     }
 
     /// <summary>
     /// Broadcasts the state of the next queued piece to all viewers.
     /// </summary>
-    private void SendNextPieceUpdate()
-    {
-        SendMessage(new BlockGameMessages.BlockGameVisualUpdateMessage(NextPiece.BlocksForPreview(), BlockGameMessages.BlockGameVisualType.NextBlock));
-    }
+    private void SendNextPieceUpdate() =>
+        SendMessage(new BlockGameMessages.BlockGameVisualUpdateMessage(NextPiece.BlocksForPreview(),
+            BlockGameMessages.BlockGameVisualType.NextBlock));
 
     /// <summary>
     /// Broadcasts the state of the next queued piece to a specific viewer.
     /// </summary>
-    private void SendNextPieceUpdate(EntityUid actor)
-    {
-        SendMessage(new BlockGameMessages.BlockGameVisualUpdateMessage(NextPiece.BlocksForPreview(), BlockGameMessages.BlockGameVisualType.NextBlock), actor);
-    }
+    private void SendNextPieceUpdate(EntityUid actor) => SendMessage(
+        new BlockGameMessages.BlockGameVisualUpdateMessage(NextPiece.BlocksForPreview(),
+            BlockGameMessages.BlockGameVisualType.NextBlock),
+        actor);
 
     /// <summary>
     /// Broadcasts the state of the currently held piece to all viewers.
@@ -298,9 +310,11 @@ public sealed partial class BlockGame
     private void SendHoldPieceUpdate()
     {
         if (HeldPiece.HasValue)
-            SendMessage(new BlockGameMessages.BlockGameVisualUpdateMessage(HeldPiece.Value.BlocksForPreview(), BlockGameMessages.BlockGameVisualType.HoldBlock));
+            SendMessage(new BlockGameMessages.BlockGameVisualUpdateMessage(HeldPiece.Value.BlocksForPreview(),
+                BlockGameMessages.BlockGameVisualType.HoldBlock));
         else
-            SendMessage(new BlockGameMessages.BlockGameVisualUpdateMessage(Array.Empty<BlockGameBlock>(), BlockGameMessages.BlockGameVisualType.HoldBlock));
+            SendMessage(new BlockGameMessages.BlockGameVisualUpdateMessage(Array.Empty<BlockGameBlock>(),
+                BlockGameMessages.BlockGameVisualType.HoldBlock));
     }
 
     /// <summary>
@@ -309,56 +323,49 @@ public sealed partial class BlockGame
     private void SendHoldPieceUpdate(EntityUid actor)
     {
         if (HeldPiece.HasValue)
-            SendMessage(new BlockGameMessages.BlockGameVisualUpdateMessage(HeldPiece.Value.BlocksForPreview(), BlockGameMessages.BlockGameVisualType.HoldBlock), actor);
+            SendMessage(new BlockGameMessages.BlockGameVisualUpdateMessage(HeldPiece.Value.BlocksForPreview(),
+                    BlockGameMessages.BlockGameVisualType.HoldBlock),
+                actor);
         else
-            SendMessage(new BlockGameMessages.BlockGameVisualUpdateMessage(Array.Empty<BlockGameBlock>(), BlockGameMessages.BlockGameVisualType.HoldBlock), actor);
+            SendMessage(new BlockGameMessages.BlockGameVisualUpdateMessage(Array.Empty<BlockGameBlock>(),
+                    BlockGameMessages.BlockGameVisualType.HoldBlock),
+                actor);
     }
 
     /// <summary>
     /// Broadcasts the current game level to all viewers.
     /// </summary>
-    private void SendLevelUpdate()
-    {
-        SendMessage(new BlockGameMessages.BlockGameLevelUpdateMessage(Level));
-    }
+    private void SendLevelUpdate() => SendMessage(new BlockGameMessages.BlockGameLevelUpdateMessage(Level));
 
     /// <summary>
     /// Broadcasts the current game level to a specific viewer.
     /// </summary>
-    private void SendLevelUpdate(EntityUid actor)
-    {
+    private void SendLevelUpdate(EntityUid actor) =>
         SendMessage(new BlockGameMessages.BlockGameLevelUpdateMessage(Level), actor);
-    }
 
     /// <summary>
     /// Broadcasts the current game score to all viewers.
     /// </summary>
-    private void SendPointsUpdate()
-    {
-        SendMessage(new BlockGameMessages.BlockGameScoreUpdateMessage(Points));
-    }
+    private void SendPointsUpdate() => SendMessage(new BlockGameMessages.BlockGameScoreUpdateMessage(Points));
 
     /// <summary>
     /// Broadcasts the current game score to a specific viewer.
     /// </summary>
-    private void SendPointsUpdate(EntityUid actor)
-    {
+    private void SendPointsUpdate(EntityUid actor) =>
         SendMessage(new BlockGameMessages.BlockGameScoreUpdateMessage(Points), actor);
-    }
 
     /// <summary>
     /// Broadcasts the current game high score positions to all viewers.
     /// </summary>
-    private void SendHighscoreUpdate()
-    {
-        SendMessage(new BlockGameMessages.BlockGameHighScoreUpdateMessage(_arcadeSystem.GetLocalHighscores(), _arcadeSystem.GetGlobalHighscores()));
-    }
+    private void SendHighscoreUpdate() =>
+        SendMessage(new BlockGameMessages.BlockGameHighScoreUpdateMessage(_arcadeSystem.GetLocalHighscores(),
+            _arcadeSystem.GetGlobalHighscores()));
 
     /// <summary>
     /// Broadcasts the current game high score positions to a specific viewer.
     /// </summary>
-    private void SendHighscoreUpdate(EntityUid actor)
-    {
-        SendMessage(new BlockGameMessages.BlockGameHighScoreUpdateMessage(_arcadeSystem.GetLocalHighscores(), _arcadeSystem.GetGlobalHighscores()), actor);
-    }
+    private void SendHighscoreUpdate(EntityUid actor) => SendMessage(
+        new BlockGameMessages.BlockGameHighScoreUpdateMessage(_arcadeSystem.GetLocalHighscores(),
+            _arcadeSystem.GetGlobalHighscores()),
+        actor);
 }

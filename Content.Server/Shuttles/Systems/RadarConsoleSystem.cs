@@ -27,10 +27,8 @@ public sealed class RadarConsoleSystem : SharedRadarConsoleSystem
         SubscribeLocalEvent<RadarConsoleComponent, ComponentStartup>(OnRadarStartup);
     }
 
-    private void OnRadarStartup(EntityUid uid, RadarConsoleComponent component, ComponentStartup args)
-    {
+    private void OnRadarStartup(EntityUid uid, RadarConsoleComponent component, ComponentStartup args) =>
         UpdateState(uid, component);
-    }
 
     protected override void UpdateState(EntityUid uid, RadarConsoleComponent component)
     {
@@ -51,13 +49,9 @@ public sealed class RadarConsoleSystem : SharedRadarConsoleSystem
             var docks = _console.GetAllDocks();
 
             if (coordinates != null && angle != null)
-            {
                 state = _console.GetNavState(uid, docks, coordinates.Value, angle.Value);
-            }
             else
-            {
                 state = _console.GetNavState(uid, docks);
-            }
 
             state.RotateWithEntity = !component.FollowEntity;
 

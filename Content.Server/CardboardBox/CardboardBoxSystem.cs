@@ -10,7 +10,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Server.Storage.Components;
 using Content.Server.Storage.EntitySystems;
 using Content.Shared.Access.Components;
 using Content.Shared.CardboardBox;
@@ -31,11 +30,11 @@ namespace Content.Server.CardboardBox;
 public sealed class CardboardBoxSystem : SharedCardboardBoxSystem
 {
     [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedMoverController _mover = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly SharedStealthSystem _stealth = default!;
     [Dependency] private readonly DamageableSystem _damageable = default!;
+    [Dependency] private readonly SharedMoverController _mover = default!;
+    [Dependency] private readonly SharedStealthSystem _stealth = default!;
     [Dependency] private readonly EntityStorageSystem _storage = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -75,7 +74,9 @@ public sealed class CardboardBoxSystem : SharedCardboardBoxSystem
         }
     }
 
-    private void OnGetAdditionalAccess(EntityUid uid, CardboardBoxComponent component, ref GetAdditionalAccessEvent args)
+    private void OnGetAdditionalAccess(EntityUid uid,
+        CardboardBoxComponent component,
+        ref GetAdditionalAccessEvent args)
     {
         if (component.Mover == null)
             return;
@@ -99,11 +100,9 @@ public sealed class CardboardBoxSystem : SharedCardboardBoxSystem
         }
     }
 
-    private void AfterStorageOpen(EntityUid uid, CardboardBoxComponent component, ref StorageAfterOpenEvent args)
-    {
+    private void AfterStorageOpen(EntityUid uid, CardboardBoxComponent component, ref StorageAfterOpenEvent args) =>
         // If this box has a stealth/chameleon effect, disable the stealth effect while the box is open.
         _stealth.SetEnabled(uid, false);
-    }
 
     private void AfterStorageClosed(EntityUid uid, CardboardBoxComponent component, ref StorageAfterCloseEvent args)
     {
@@ -119,9 +118,7 @@ public sealed class CardboardBoxSystem : SharedCardboardBoxSystem
     private void OnDamage(EntityUid uid, CardboardBoxComponent component, DamageChangedEvent args)
     {
         if (args.DamageDelta != null && args.DamageIncreased)
-        {
             _damageable.TryChangeDamage(component.Mover, args.DamageDelta, origin: args.Origin);
-        }
     }
 
     private void OnEntInserted(EntityUid uid, CardboardBoxComponent component, EntInsertedIntoContainerMessage args)

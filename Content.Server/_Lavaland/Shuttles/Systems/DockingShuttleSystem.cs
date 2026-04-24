@@ -22,27 +22,22 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Server.Shuttles.Events;
-using Content.Server.Station.Components;
 using Content.Server.Station.Systems;
 using Content.Shared._Lavaland.Shuttles.Components;
 using Content.Shared._Lavaland.Shuttles.Systems;
 using Content.Shared.Shuttles.Components;
-using Content.Shared.Whitelist;
-using Robust.Shared.Map.Components;
-using System.Linq;
-using Content.Server.GameTicking;
 using Content.Shared.Station.Components;
-using Robust.Server.GameObjects;
+using Content.Shared.Whitelist;
 using Robust.Shared.Map;
-using Robust.Shared.Timing;
+using Robust.Shared.Map.Components;
 
 namespace Content.Server._Lavaland.Shuttles.Systems;
 
 public sealed class DockingShuttleSystem : SharedDockingShuttleSystem
 {
     [Dependency] private readonly DockingConsoleSystem _console = default!;
-    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
     [Dependency] private readonly StationSystem _station = default!;
+    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
 
     public override void Initialize()
     {
@@ -66,10 +61,10 @@ public sealed class DockingShuttleSystem : SharedDockingShuttleSystem
             if (!dest.Enabled || _whitelist.IsWhitelistFailOrNull(dest.Whitelist, ent))
                 continue;
 
-            ent.Comp.Destinations.Add(new DockingDestination()
+            ent.Comp.Destinations.Add(new DockingDestination
             {
                 Name = Name(mapUid),
-                Map = map.MapId
+                Map = map.MapId,
             });
         }
 
@@ -84,15 +79,11 @@ public sealed class DockingShuttleSystem : SharedDockingShuttleSystem
         }
     }
 
-    private void OnFTLStarted(Entity<DockingShuttleComponent> ent, ref FTLStartedEvent args)
-    {
+    private void OnFTLStarted(Entity<DockingShuttleComponent> ent, ref FTLStartedEvent args) =>
         _console.UpdateConsolesUsing(ent);
-    }
 
-    private void OnFTLCompleted(Entity<DockingShuttleComponent> ent, ref FTLCompletedEvent args)
-    {
+    private void OnFTLCompleted(Entity<DockingShuttleComponent> ent, ref FTLCompletedEvent args) =>
         _console.UpdateConsolesUsing(ent);
-    }
 
     private void OnStationGridAdded(StationGridAddedEvent args)
     {
@@ -104,33 +95,34 @@ public sealed class DockingShuttleSystem : SharedDockingShuttleSystem
         if (comp.Station != null)
             return;
 
-        if (_station.GetOwningStation(uid) is not {} station || !TryComp<StationDataComponent>(station, out var data))
+        if (_station.GetOwningStation(uid) is not { } station || !TryComp<StationDataComponent>(station, out var data))
             return;
 
         // add the source station as a destination
         comp.Station = station;
-        comp.Destinations.Add(new DockingDestination()
+        comp.Destinations.Add(new DockingDestination
         {
             Name = Name(station),
-            Map = Transform(uid).MapID
+            Map = Transform(uid).MapID,
         });
     }
 
-    private void OnAddStation(EntityUid uid, DockingShuttleComponent component,  ShuttleAddStationEvent args)
+    private void OnAddStation(EntityUid uid, DockingShuttleComponent component, ShuttleAddStationEvent args)
     {
         component.Station = args.MapUid;
-        component.Destinations.Add(new DockingDestination()
+        component.Destinations.Add(new DockingDestination
         {
             Name = Name(args.MapUid),
-            Map = args.MapId
+            Map = args.MapId,
         });
     }
 }
 
 public sealed class ShuttleAddStationEvent : EntityEventArgs
 {
-    public readonly EntityUid MapUid;
     public readonly MapId MapId;
+    public readonly EntityUid MapUid;
+
     public ShuttleAddStationEvent(EntityUid mapUid, MapId mapId)
     {
         MapUid = mapUid;

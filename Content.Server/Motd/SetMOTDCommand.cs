@@ -11,10 +11,10 @@
 
 using Content.Server.Administration;
 using Content.Server.Administration.Logs;
-using Content.Shared.Administration;
-using Content.Shared.Database;
-using Content.Shared.CCVar;
 using Content.Server.Chat.Managers;
+using Content.Shared.Administration;
+using Content.Shared.CCVar;
+using Content.Shared.Database;
 using Robust.Shared.Configuration;
 using Robust.Shared.Console;
 
@@ -34,7 +34,7 @@ public sealed class SetMotdCommand : LocalizedCommands
 
     public override void Execute(IConsoleShell shell, string argStr, string[] args)
     {
-        string motd = "";
+        var motd = "";
         var player = shell.Player;
         if (args.Length > 0)
         {
@@ -43,16 +43,21 @@ public sealed class SetMotdCommand : LocalizedCommands
                 return; // check function prints its own error response
         }
 
-        _configurationManager.SetCVar(CCVars.MOTD, motd); // A hook in MOTDSystem broadcasts changes to the MOTD to everyone so we don't need to do it here.
+        _configurationManager.SetCVar(CCVars.MOTD,
+            motd); // A hook in MOTDSystem broadcasts changes to the MOTD to everyone so we don't need to do it here.
         if (string.IsNullOrEmpty(motd))
         {
             shell.WriteLine(Loc.GetString("cmd-set-motd-cleared-motd-message"));
-            _adminLogManager.Add(LogType.Chat, LogImpact.Low, $"{(player == null ? "LOCALHOST" : player.Channel.UserName):Player} cleared the MOTD for the server.");
+            _adminLogManager.Add(LogType.Chat,
+                LogImpact.Low,
+                $"{(player == null ? "LOCALHOST" : player.Channel.UserName):Player} cleared the MOTD for the server.");
         }
         else
         {
             shell.WriteLine(Loc.GetString("cmd-set-motd-set-motd-message", ("motd", motd)));
-            _adminLogManager.Add(LogType.Chat, LogImpact.Low, $"{(player == null ? "LOCALHOST" : player.Channel.UserName):Player} set the MOTD for the server to \"{motd:motd}\"");
+            _adminLogManager.Add(LogType.Chat,
+                LogImpact.Low,
+                $"{(player == null ? "LOCALHOST" : player.Channel.UserName):Player} set the MOTD for the server to \"{motd:motd}\"");
         }
     }
 

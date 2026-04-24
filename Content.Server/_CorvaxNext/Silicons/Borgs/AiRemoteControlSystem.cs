@@ -25,8 +25,8 @@ public sealed class AiRemoteControlSystem : SharedAiRemoteControlSystem
 {
     [Dependency] private readonly SharedActionsSystem _actions = default!;
     [Dependency] private readonly SiliconLawSystem _lawSystem = default!;
-    [Dependency] private readonly SharedStationAiSystem _stationAiSystem = default!;
     [Dependency] private readonly SharedMindSystem _mind = default!;
+    [Dependency] private readonly SharedStationAiSystem _stationAiSystem = default!;
     [Dependency] private readonly UserInterfaceSystem _userInterface = default!;
     [Dependency] private readonly SharedTransformSystem _xformSystem = default!;
 
@@ -38,7 +38,8 @@ public sealed class AiRemoteControlSystem : SharedAiRemoteControlSystem
         SubscribeLocalEvent<AiRemoteControllerComponent, MapInitEvent>(OnMapInit);
         SubscribeLocalEvent<AiRemoteControllerComponent, ComponentShutdown>(OnShutdown);
         SubscribeLocalEvent<AiRemoteControllerComponent, GetVerbsEvent<AlternativeVerb>>(OnGetVerbs);
-        SubscribeLocalEvent<StationAiHeldComponent, AiRemoteControllerComponent.RemoteDeviceActionMessage>(OnUiRemoteAction);
+        SubscribeLocalEvent<StationAiHeldComponent, AiRemoteControllerComponent.RemoteDeviceActionMessage>(
+            OnUiRemoteAction);
         SubscribeLocalEvent<StationAiHeldComponent, ToggleRemoteDevicesScreenEvent>(OnToggleRemoteDevicesScreen);
     }
 
@@ -81,7 +82,7 @@ public sealed class AiRemoteControlSystem : SharedAiRemoteControlSystem
         var verb = new AlternativeVerb
         {
             Text = Loc.GetString("ai-remote-control"),
-            Act = () => AiTakeControl(user, entity)
+            Act = () => AiTakeControl(user, entity),
         };
         args.Verbs.Add(verb);
     }
@@ -130,7 +131,9 @@ public sealed class AiRemoteControlSystem : SharedAiRemoteControlSystem
         RewriteLaws(ai, entity);
     }
 
-    private void OnToggleRemoteDevicesScreen(EntityUid uid, StationAiHeldComponent component, ToggleRemoteDevicesScreenEvent args)
+    private void OnToggleRemoteDevicesScreen(EntityUid uid,
+        StationAiHeldComponent component,
+        ToggleRemoteDevicesScreenEvent args)
     {
         if (args.Handled || !TryComp<ActorComponent>(uid, out var actor))
             return;
@@ -146,7 +149,7 @@ public sealed class AiRemoteControlSystem : SharedAiRemoteControlSystem
             var data = new RemoteDevicesData
             {
                 NetEntityUid = GetNetEntity(queryUid),
-                DisplayName = Comp<MetaDataComponent>(queryUid).EntityName
+                DisplayName = Comp<MetaDataComponent>(queryUid).EntityName,
             };
 
             remoteDevices.Add(data);
@@ -156,7 +159,9 @@ public sealed class AiRemoteControlSystem : SharedAiRemoteControlSystem
         _userInterface.SetUiState(uid, RemoteDeviceUiKey.Key, state);
     }
 
-    private void OnUiRemoteAction(EntityUid uid, StationAiHeldComponent component, AiRemoteControllerComponent.RemoteDeviceActionMessage msg)
+    private void OnUiRemoteAction(EntityUid uid,
+        StationAiHeldComponent component,
+        AiRemoteControllerComponent.RemoteDeviceActionMessage msg)
     {
         if (msg.RemoteAction == null)
             return;

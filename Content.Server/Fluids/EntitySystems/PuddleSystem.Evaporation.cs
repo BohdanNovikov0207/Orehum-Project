@@ -13,9 +13,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Chemistry.Components;
-using Content.Shared.Chemistry.Reagent;
 using Content.Goobstation.Maths.FixedPoint;
+using Content.Shared.Chemistry.Components;
 using Content.Shared.Fluids.Components;
 
 namespace Content.Server.Fluids.EntitySystems;
@@ -24,17 +23,13 @@ public sealed partial class PuddleSystem
 {
     private static readonly TimeSpan EvaporationCooldown = TimeSpan.FromSeconds(1);
 
-    private void OnEvaporationMapInit(Entity<EvaporationComponent> entity, ref MapInitEvent args)
-    {
+    private void OnEvaporationMapInit(Entity<EvaporationComponent> entity, ref MapInitEvent args) =>
         entity.Comp.NextTick = _timing.CurTime + EvaporationCooldown;
-    }
 
     private void UpdateEvaporation(EntityUid uid, Solution solution)
     {
         if (HasComp<EvaporationComponent>(uid))
-        {
             return;
-        }
 
         if (solution.GetTotalPrototypeQuantity(GetEvaporatingReagents(solution)) > FixedPoint2.Zero)
         {
@@ -58,11 +53,14 @@ public sealed partial class PuddleSystem
 
             evaporation.NextTick += EvaporationCooldown;
 
-            if (!_solutionContainerSystem.ResolveSolution(uid, puddle.SolutionName, ref puddle.Solution, out var puddleSolution))
+            if (!_solutionContainerSystem.ResolveSolution(uid,
+                    puddle.SolutionName,
+                    ref puddle.Solution,
+                    out var puddleSolution))
                 continue;
 
             // Yes, this means that 50u water + 50u holy water evaporates twice as fast as 100u water.
-            foreach ((string evaporatingReagent, FixedPoint2 evaporatingSpeed) in GetEvaporationSpeeds(puddleSolution))
+            foreach (var (evaporatingReagent, evaporatingSpeed) in GetEvaporationSpeeds(puddleSolution))
             {
                 var reagentTick = evaporation.EvaporationAmount * EvaporationCooldown.TotalSeconds * evaporatingSpeed;
                 puddleSolution.SplitSolutionWithOnly(reagentTick, evaporatingReagent);

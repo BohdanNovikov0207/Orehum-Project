@@ -9,8 +9,8 @@
 using Content.Server.StationEvents.Components;
 using Content.Server.StationRecords;
 using Content.Server.StationRecords.Systems;
-using Content.Shared.StationRecords;
 using Content.Shared.GameTicking.Components;
+using Content.Shared.StationRecords;
 using Robust.Shared.Random;
 
 namespace Content.Server.StationEvents.Events;
@@ -19,7 +19,10 @@ public sealed class ClericalErrorRule : StationEventSystem<ClericalErrorRuleComp
 {
     [Dependency] private readonly StationRecordsSystem _stationRecords = default!;
 
-    protected override void Started(EntityUid uid, ClericalErrorRuleComponent component, GameRuleComponent gameRule, GameRuleStartedEvent args)
+    protected override void Started(EntityUid uid,
+        ClericalErrorRuleComponent component,
+        GameRuleComponent gameRule,
+        GameRuleStartedEvent args)
     {
         base.Started(uid, component, gameRule, args);
 

@@ -15,17 +15,17 @@ namespace Content.Server.Heretic.Ritual;
 
 [Virtual] public sealed partial class RitualTemperatureBehavior : RitualCustomBehavior
 {
-    /// <summary>
-    ///     Min temp in celsius
-    /// </summary>
-    [DataField] public float MinThreshold = 0f;
+    private AtmosphereSystem _atmos = default!;
 
     /// <summary>
-    ///     Max temp in celsius
+    /// Max temp in celsius
     /// </summary>
     [DataField] public float MaxThreshold = float.PositiveInfinity;
 
-    private AtmosphereSystem _atmos = default!;
+    /// <summary>
+    /// Min temp in celsius
+    /// </summary>
+    [DataField] public float MinThreshold = 0f;
 
     public override bool Execute(RitualData args, out string? outstr)
     {
@@ -43,6 +43,7 @@ namespace Content.Server.Heretic.Ritual;
             outstr = Loc.GetString("heretic-ritual-fail-temperature-hot");
             return false;
         }
+
         if (mix.Temperature > Atmospherics.T0C + MinThreshold)
         {
             outstr = Loc.GetString("heretic-ritual-fail-temperature-cold");

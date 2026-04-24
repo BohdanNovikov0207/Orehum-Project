@@ -3,9 +3,9 @@
 // SPDX-License-Identifier: MIT
 
 using System.Diagnostics.CodeAnalysis;
-using Content.Shared.Body.Components;
 using Content.Server.Chat.Systems;
 using Content.Shared._RMC14.Medical.IV;
+using Content.Shared.Body.Components;
 using Content.Shared.Chat.Prototypes;
 using Content.Shared.Chemistry.Components;
 using Content.Shared.Chemistry.EntitySystems;
@@ -20,8 +20,8 @@ public sealed class IVDripSystem : SharedIVDripSystem
 {
     [Dependency] private readonly ChatSystem _chat = default!;
     [Dependency] private readonly ItemSlotsSystem _itemSlots = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SharedSolutionContainerSystem _solutionContainer = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     private bool TryGetBloodstream(
         EntityUid attachedTo,
@@ -34,15 +34,17 @@ public sealed class IVDripSystem : SharedIVDripSystem
         bloodstreamSolution = default;
         if (!TryComp(attachedTo, out BloodstreamComponent? attachedStream) ||
             !_solutionContainer.TryGetSolution(attachedTo, attachedStream.BloodSolutionName, out solEnt, out solution))
-        {
             return false;
-        }
 
         bloodstreamSolution = attachedStream.BloodSolution;
         return true;
     }
 
-    protected override void DoRip(DamageSpecifier? damage, EntityUid attached, EntityUid? user, ProtoId<EmotePrototype> ripEmote, bool predict)
+    protected override void DoRip(DamageSpecifier? damage,
+        EntityUid attached,
+        EntityUid? user,
+        ProtoId<EmotePrototype> ripEmote,
+        bool predict)
     {
         base.DoRip(damage, attached, user, ripEmote, predict);
         _chat.TryEmoteWithoutChat(attached, ripEmote);
@@ -95,9 +97,7 @@ public sealed class IVDripSystem : SharedIVDripSystem
                     {
                         // Check if it fits
                         if (streamSol.AvailableVolume >= taken.Volume)
-                        {
                             _solutionContainer.TryAddSolution(streamSolEnt.Value, taken);
-                        }
                         else
                         {
                             // If full, put blood back in pack
@@ -108,11 +108,12 @@ public sealed class IVDripSystem : SharedIVDripSystem
                     // 4. Inject Chems -> Chem Stream
                     if (chems.Volume > 0)
                     {
-                        if (_solutionContainer.TryGetSolution(attachedTo, bsComp.ChemicalSolutionName, out var chemSolEnt, out var chemSol) &&
+                        if (_solutionContainer.TryGetSolution(attachedTo,
+                                bsComp.ChemicalSolutionName,
+                                out var chemSolEnt,
+                                out var chemSol) &&
                             chemSol.AvailableVolume >= chems.Volume)
-                        {
                             _solutionContainer.TryAddSolution(chemSolEnt.Value, chems);
-                        }
                         else
                         {
                             // If full or no chem stream, put drugs back in pack
@@ -171,27 +172,22 @@ public sealed class IVDripSystem : SharedIVDripSystem
                     if (taken.Volume > 0)
                     {
                         if (streamSol.AvailableVolume >= taken.Volume)
-                        {
                             _solutionContainer.TryAddSolution(streamSolEnt.Value, taken);
-                        }
                         else
-                        {
                             _solutionContainer.TryAddSolution(packSolEnt.Value, taken);
-                        }
                     }
 
                     // 4. Inject Chems -> Chem Stream
                     if (chems.Volume > 0)
                     {
-                        if (_solutionContainer.TryGetSolution(attachedTo, bsComp.ChemicalSolutionName, out var chemSolEnt, out var chemSol) &&
+                        if (_solutionContainer.TryGetSolution(attachedTo,
+                                bsComp.ChemicalSolutionName,
+                                out var chemSolEnt,
+                                out var chemSol) &&
                             chemSol.AvailableVolume >= chems.Volume)
-                        {
                             _solutionContainer.TryAddSolution(chemSolEnt.Value, chems);
-                        }
                         else
-                        {
                             _solutionContainer.TryAddSolution(packSolEnt.Value, chems);
-                        }
                     }
 
                     Dirty(packSolEnt.Value);

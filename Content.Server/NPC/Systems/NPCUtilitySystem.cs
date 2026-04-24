@@ -27,6 +27,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Linq;
+using Content.Server._Goobstation.Wizard.NPC;
 using Content.Server.Atmos.Components;
 using Content.Server.Fluids.EntitySystems;
 using Content.Server.Hands.Systems;
@@ -41,10 +43,10 @@ using Content.Shared.Chemistry.EntitySystems;
 using Content.Shared.Damage;
 using Content.Shared.Examine;
 using Content.Shared.Fluids.Components;
-using Content.Shared.Hands.Components;
+using Content.Shared.Foldable;
 using Content.Shared.Inventory;
 using Content.Shared.Mobs;
-using Content.Shared.Mobs.Components; // Goobstation
+using Content.Shared.Mobs.Components;
 using Content.Shared.Mobs.Systems;
 using Content.Shared.NPC.Systems;
 using Content.Shared.Nutrition.Components;
@@ -57,15 +59,13 @@ using Content.Shared.Weapons.Melee;
 using Content.Shared.Weapons.Ranged.Components;
 using Content.Shared.Weapons.Ranged.Events;
 using Content.Shared.Whitelist;
+using Content.Shared.Wieldable;
+using Content.Shared.Wieldable.Components;
 using Microsoft.Extensions.ObjectPool;
 using Robust.Server.Containers;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
-using System.Linq;
-using Content.Server._Goobstation.Wizard.NPC;
-using Content.Shared.Foldable;
-using Content.Shared.Wieldable;
-using Content.Shared.Wieldable.Components;
+// Goobstation
 
 namespace Content.Server.NPC.Systems;
 
@@ -74,36 +74,37 @@ namespace Content.Server.NPC.Systems;
 /// </summary>
 public sealed class NPCUtilitySystem : EntitySystem
 {
-    [Dependency] private readonly IPrototypeManager _proto = default!;
+    private readonly List<EntityPrototype.ComponentRegistryEntry> _compTypes = new();
     [Dependency] private readonly ContainerSystem _container = default!;
     [Dependency] private readonly DrinkSystem _drink = default!;
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
+
+    // Temporary caches.
+    private readonly List<EntityUid> _entityList = new();
+    private readonly HashSet<Entity<IComponent>> _entitySet = new();
+
+    private readonly ObjectPool<HashSet<EntityUid>> _entPool =
+        new DefaultObjectPool<HashSet<EntityUid>>(new SetPolicy<EntityUid>(), 256);
+
+    [Dependency] private readonly ExamineSystemShared _examine = default!;
     [Dependency] private readonly HandsSystem _hands = default!;
-    [Dependency] private readonly InventorySystem _inventory = default!;
     [Dependency] private readonly IngestionSystem _ingestion = default!;
+    [Dependency] private readonly InventorySystem _inventory = default!;
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly MobStateSystem _mobState = default!;
     [Dependency] private readonly NpcFactionSystem _npcFaction = default!;
     [Dependency] private readonly OpenableSystem _openable = default!;
+    [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly PuddleSystem _puddle = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly SharedSolutionContainerSystem _solutions = default!;
-    [Dependency] private readonly WeldableSystem _weldable = default!;
-    [Dependency] private readonly ExamineSystemShared _examine = default!;
-    [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
     [Dependency] private readonly MobThresholdSystem _thresholdSystem = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly TurretTargetSettingsSystem _turretTargetSettings = default!;
+    [Dependency] private readonly WeldableSystem _weldable = default!;
+    [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
     [Dependency] private readonly SharedWieldableSystem _wieldable = default!; // Goobstation
 
     private EntityQuery<PuddleComponent> _puddleQuery;
     private EntityQuery<TransformComponent> _xformQuery;
-
-    private ObjectPool<HashSet<EntityUid>> _entPool =
-        new DefaultObjectPool<HashSet<EntityUid>>(new SetPolicy<EntityUid>(), 256);
-
-    // Temporary caches.
-    private List<EntityUid> _entityList = new();
-    private HashSet<Entity<IComponent>> _entitySet = new();
-    private List<EntityPrototype.ComponentRegistryEntry> _compTypes = new();
 
     public override void Initialize()
     {
@@ -167,9 +168,7 @@ public sealed class NPCUtilitySystem : EntitySystem
                 // If the score is too low OR we only care about best entity then early out.
                 // Due to the adjusted score only being able to decrease it can never exceed the highest from here.
                 if (score <= 0f || bestOnly && score <= highestScore)
-                {
                     break;
-                }
             }
 
             if (score <= 0f)
@@ -196,7 +195,11 @@ public sealed class NPCUtilitySystem : EntitySystem
             case PresetCurve presetCurve:
                 return GetScore(_proto.Index<UtilityCurvePresetPrototype>(presetCurve.Preset).Curve, conScore);
             case QuadraticCurve quadraticCurve:
-                return Math.Clamp(quadraticCurve.Slope * MathF.Pow(conScore - quadraticCurve.XOffset, quadraticCurve.Exponent) + quadraticCurve.YOffset, 0f, 1f);
+                return Math.Clamp(
+                    quadraticCurve.Slope * MathF.Pow(conScore - quadraticCurve.XOffset, quadraticCurve.Exponent) +
+                    quadraticCurve.YOffset,
+                    0f,
+                    1f);
             default:
                 throw new NotImplementedException();
         }
@@ -216,7 +219,8 @@ public sealed class NPCUtilitySystem : EntitySystem
                 var avoidBadFood = !HasComp<IgnoreBadFoodComponent>(owner);
 
                 // only eat when hungry or if it will eat anything
-                if (TryComp<HungerComponent>(owner, out var hunger) && hunger.CurrentThreshold > HungerThreshold.Okay && avoidBadFood)
+                if (TryComp<HungerComponent>(owner, out var hunger) && hunger.CurrentThreshold > HungerThreshold.Okay &&
+                    avoidBadFood)
                     return 0f;
 
                 // no mouse don't eat the uranium-235
@@ -236,7 +240,8 @@ public sealed class NPCUtilitySystem : EntitySystem
                     return 0f;
 
                 // only drink when thirsty
-                if (TryComp<ThirstComponent>(owner, out var thirst) && thirst.CurrentThirstThreshold > ThirstThreshold.Okay)
+                if (TryComp<ThirstComponent>(owner, out var thirst) &&
+                    thirst.CurrentThirstThreshold > ThirstThreshold.Okay)
                     return 0f;
 
                 // no janicow don't drink the blood puddle
@@ -254,7 +259,9 @@ public sealed class NPCUtilitySystem : EntitySystem
             }
             case OrderedTargetCon:
             {
-                if (!blackboard.TryGetValue<EntityUid>(NPCBlackboard.CurrentOrderedTarget, out var orderedTarget, EntityManager))
+                if (!blackboard.TryGetValue<EntityUid>(NPCBlackboard.CurrentOrderedTarget,
+                        out var orderedTarget,
+                        EntityManager))
                     return 0f;
 
                 if (targetUid != orderedTarget)
@@ -272,9 +279,7 @@ public sealed class NPCUtilitySystem : EntitySystem
                     if (TryComp<EntityStorageComponent>(container.Owner, out var storageComponent))
                     {
                         if (storageComponent is { Open: false } && _weldable.IsWelded(container.Owner))
-                        {
                             return 0.0f;
-                        }
                     }
                     else
                     {
@@ -293,32 +298,27 @@ public sealed class NPCUtilitySystem : EntitySystem
                 if (!blackboard.TryGetValue(NPCBlackboard.ActiveHand, out string? activeHand, EntityManager) ||
                     !_hands.TryGetHeldItem(owner, activeHand, out var heldEntity) ||
                     !TryComp<BallisticAmmoProviderComponent>(heldEntity, out var heldGun))
-                {
                     return 0f;
-                }
 
                 if (_whitelistSystem.IsWhitelistFailOrNull(heldGun.Whitelist, targetUid))
-                {
                     return 0f;
-                }
 
                 return 1f;
             }
             case TargetDistanceCon:
             {
-                var radius = blackboard.GetValueOrDefault<float>(blackboard.GetVisionRadiusKey(EntityManager), EntityManager);
+                var radius =
+                    blackboard.GetValueOrDefault<float>(blackboard.GetVisionRadiusKey(EntityManager), EntityManager);
 
                 if (!TryComp(targetUid, out TransformComponent? targetXform) ||
                     !TryComp(owner, out TransformComponent? xform))
-                {
                     return 0f;
-                }
 
-                if (!targetXform.Coordinates.TryDistance(EntityManager, _transform, xform.Coordinates,
+                if (!targetXform.Coordinates.TryDistance(EntityManager,
+                        _transform,
+                        xform.Coordinates,
                         out var distance))
-                {
                     return 0f;
-                }
 
                 return Math.Clamp(distance / radius, 0f, 1f);
             }
@@ -360,34 +360,41 @@ public sealed class NPCUtilitySystem : EntitySystem
                 // Goobstation
                 if (!TryComp(targetUid, out MobThresholdsComponent? thresholds))
                     return 1f; // a bit of a hack but works
-                if (con.TargetState != MobState.Invalid && _thresholdSystem.TryGetPercentageForState(targetUid, con.TargetState, damage.TotalDamage, out var percentage, thresholds))
-                    return Math.Clamp((float)(1 - percentage), 0f, 1f);
+                if (con.TargetState != MobState.Invalid && _thresholdSystem.TryGetPercentageForState(targetUid,
+                        con.TargetState,
+                        damage.TotalDamage,
+                        out var percentage,
+                        thresholds))
+                    return Math.Clamp((float) (1 - percentage), 0f, 1f);
                 if (_thresholdSystem.TryGetIncapPercentage(targetUid, damage.TotalDamage, out var incapPercentage))
-                    return Math.Clamp((float)(1 - incapPercentage), 0f, 1f);
+                    return Math.Clamp((float) (1 - incapPercentage), 0f, 1f);
                 return 0f;
             }
             case TargetInLOSCon:
             {
-                var radius = blackboard.GetValueOrDefault<float>(blackboard.GetVisionRadiusKey(EntityManager), EntityManager);
+                var radius =
+                    blackboard.GetValueOrDefault<float>(blackboard.GetVisionRadiusKey(EntityManager), EntityManager);
 
-                return _examine.InRangeUnOccluded(owner, targetUid, radius + 0.5f, null) ? 1f : 0f;
+                return _examine.InRangeUnOccluded(owner, targetUid, radius + 0.5f) ? 1f : 0f;
             }
             case TargetInLOSOrCurrentCon:
             {
-                var radius = blackboard.GetValueOrDefault<float>(blackboard.GetVisionRadiusKey(EntityManager), EntityManager);
+                var radius =
+                    blackboard.GetValueOrDefault<float>(blackboard.GetVisionRadiusKey(EntityManager), EntityManager);
                 const float bufferRange = 0.5f;
 
                 if (blackboard.TryGetValue<EntityUid>("Target", out var currentTarget, EntityManager) &&
                     currentTarget == targetUid &&
                     TryComp(owner, out TransformComponent? xform) &&
                     TryComp(targetUid, out TransformComponent? targetXform) &&
-                    xform.Coordinates.TryDistance(EntityManager, _transform, targetXform.Coordinates, out var distance) &&
+                    xform.Coordinates.TryDistance(EntityManager,
+                        _transform,
+                        targetXform.Coordinates,
+                        out var distance) &&
                     distance <= radius + bufferRange)
-                {
                     return 1f;
-                }
 
-                return _examine.InRangeUnOccluded(owner, targetUid, radius + bufferRange, null) ? 1f : 0f;
+                return _examine.InRangeUnOccluded(owner, targetUid, radius + bufferRange) ? 1f : 0f;
             }
             case TargetIsAliveCon:
             {
@@ -405,37 +412,35 @@ public sealed class NPCUtilitySystem : EntitySystem
             {
                 if (TryComp<MeleeWeaponComponent>(targetUid, out var melee) &&
                     (!TryComp<FoldableComponent>(targetUid, out var foldable) || foldable.IsFolded)) // Goobstation
-                {
                     return melee.Damage.GetTotal().Float() * melee.AttackRate / 100f;
-                }
 
                 return 0f;
             }
             case TargetOnFireCon:
-                {
-                    if (TryComp(targetUid, out FlammableComponent? fire) && fire.OnFire)
-                        return 1f;
-                    return 0f;
-                }
+            {
+                if (TryComp(targetUid, out FlammableComponent? fire) && fire.OnFire)
+                    return 1f;
+                return 0f;
+            }
             case TargetIsStunnedCon:
-                {
-                    return HasComp<StunnedComponent>(targetUid) ? 1f : 0f;
-                }
+            {
+                return HasComp<StunnedComponent>(targetUid) ? 1f : 0f;
+            }
             case TurretTargetingCon:
-                {
-                    if (!TryComp<TurretTargetSettingsComponent>(owner, out var turretTargetSettings) ||
-                        _turretTargetSettings.EntityIsTargetForTurret((owner, turretTargetSettings), targetUid))
-                        return 1f;
+            {
+                if (!TryComp<TurretTargetSettingsComponent>(owner, out var turretTargetSettings) ||
+                    _turretTargetSettings.EntityIsTargetForTurret((owner, turretTargetSettings), targetUid))
+                    return 1f;
 
-                    return 0f;
-                }
+                return 0f;
+            }
             case TargetLowTempCon con:
-                {
-                    if (!TryComp<TemperatureComponent>(targetUid, out var temperature))
-                        return 0f;
+            {
+                if (!TryComp<TemperatureComponent>(targetUid, out var temperature))
+                    return 0f;
 
-                    return temperature.CurrentTemperature <= con.MinTemp ? 1f : 0f;
-                }
+                return temperature.CurrentTemperature <= con.MinTemp ? 1f : 0f;
+            }
             default:
                 throw new NotImplementedException();
         }
@@ -444,14 +449,14 @@ public sealed class NPCUtilitySystem : EntitySystem
     private float GetAdjustedScore(float score, int considerations)
     {
         /*
-        * Now using the geometric mean
-        * for n scores you take the n-th root of the scores multiplied
-        * e.g. a, b, c scores you take Math.Pow(a * b * c, 1/3)
-        * To get the ACTUAL geometric mean at any one stage you'd need to divide by the running consideration count
-        * however, the downside to this is it will fluctuate up and down over time.
-        * For our purposes if we go below the minimum threshold we want to cut it off, thus we take a
-        * "running geometric mean" which can only ever go down (and by the final value will equal the actual geometric mean).
-        */
+         * Now using the geometric mean
+         * for n scores you take the n-th root of the scores multiplied
+         * e.g. a, b, c scores you take Math.Pow(a * b * c, 1/3)
+         * To get the ACTUAL geometric mean at any one stage you'd need to divide by the running consideration count
+         * however, the downside to this is it will fluctuate up and down over time.
+         * For our purposes if we go below the minimum threshold we want to cut it off, thus we take a
+         * "running geometric mean" which can only ever go down (and by the final value will equal the actual geometric mean).
+         */
 
         var adjusted = MathF.Pow(score, 1 / (float) considerations);
         return Math.Clamp(adjusted, 0f, 1f);
@@ -469,7 +474,7 @@ public sealed class NPCUtilitySystem : EntitySystem
                 if (compQuery.Components.Count == 0)
                     return;
 
-                var mapPos = _transform.GetMapCoordinates(owner, xform: _xformQuery.GetComponent(owner));
+                var mapPos = _transform.GetMapCoordinates(owner, _xformQuery.GetComponent(owner));
                 _compTypes.Clear();
                 var i = -1;
                 EntityPrototype.ComponentRegistryEntry compZero = default!;
@@ -537,6 +542,7 @@ public sealed class NPCUtilitySystem : EntitySystem
                 {
                     entities.Add(ent);
                 }
+
                 break;
             }
             default:
@@ -613,9 +619,7 @@ public sealed class NPCUtilitySystem : EntitySystem
                     if (!_puddleQuery.TryGetComponent(ent, out var puddleComp) ||
                         !_solutions.TryGetSolution(ent, puddleComp.SolutionName, out _, out var sol) ||
                         _puddle.CanFullyEvaporate(sol))
-                    {
                         _entityList.Add(ent);
-                    }
                 }
 
                 foreach (var ent in _entityList)

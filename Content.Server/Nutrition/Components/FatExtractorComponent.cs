@@ -19,52 +19,54 @@ namespace Content.Server.Nutrition.Components;
 /// <summary>
 /// This is used for a machine that extracts hunger from entities and creates meat. Yum!
 /// </summary>
-[RegisterComponent, Access(typeof(FatExtractorSystem)), AutoGenerateComponentPause]
+[RegisterComponent] [Access(typeof(FatExtractorSystem))] [AutoGenerateComponentPause]
 public sealed partial class FatExtractorComponent : Component
 {
     /// <summary>
-    /// Whether or not the extractor is currently extracting fat from someone
+    /// Meat spawned by the extractor.
     /// </summary>
-    [DataField("processing")]
-    public bool Processing = true;
+    [DataField("meatPrototype", customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
+    [ViewVariables(VVAccess.ReadWrite)]
+    public string MeatPrototype = "FoodMeat";
 
     /// <summary>
-    /// How much nutrition is extracted per second.
+    /// A minium hunger threshold for extracting nutrition.
+    /// Ignored when emagged.
     /// </summary>
-    [DataField("nutritionPerSecond"), ViewVariables(VVAccess.ReadWrite)]
-    public int NutritionPerSecond = 10;
+    [DataField("minHungerThreshold")]
+    public HungerThreshold MinHungerThreshold = HungerThreshold.Okay;
+
+    /// <summary>
+    /// When the next update will occur
+    /// </summary>
+    [DataField("nextUpdate", customTypeSerializer: typeof(TimeOffsetSerializer))] [ViewVariables(VVAccess.ReadWrite)]
+    [AutoPausedField]
+    public TimeSpan NextUpdate;
 
     /// <summary>
     /// An accumulator which tracks extracted nutrition to determine
     /// when to spawn a meat.
     /// </summary>
-    [DataField("nutrientAccumulator"), ViewVariables(VVAccess.ReadWrite)]
+    [DataField("nutrientAccumulator")] [ViewVariables(VVAccess.ReadWrite)]
     public int NutrientAccumulator;
 
     /// <summary>
-    /// How high <see cref="NutrientAccumulator"/> has to be to spawn meat
+    /// How high <see cref="NutrientAccumulator" /> has to be to spawn meat
     /// </summary>
-    [DataField("nutrientPerMeat"), ViewVariables(VVAccess.ReadWrite)]
+    [DataField("nutrientPerMeat")] [ViewVariables(VVAccess.ReadWrite)]
     public int NutrientPerMeat = 30;
 
     /// <summary>
-    /// Meat spawned by the extractor.
+    /// How much nutrition is extracted per second.
     /// </summary>
-    [DataField("meatPrototype", customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>)), ViewVariables(VVAccess.ReadWrite)]
-    public string MeatPrototype = "FoodMeat";
+    [DataField("nutritionPerSecond")] [ViewVariables(VVAccess.ReadWrite)]
+    public int NutritionPerSecond = 10;
 
     /// <summary>
-    /// When the next update will occur
+    /// Whether or not the extractor is currently extracting fat from someone
     /// </summary>
-    [DataField("nextUpdate", customTypeSerializer: typeof(TimeOffsetSerializer)), ViewVariables(VVAccess.ReadWrite)]
-    [AutoPausedField]
-    public TimeSpan NextUpdate;
-
-    /// <summary>
-    /// How long each update takes
-    /// </summary>
-    [DataField("updateTime"), ViewVariables(VVAccess.ReadWrite)]
-    public TimeSpan UpdateTime = TimeSpan.FromSeconds(1);
+    [DataField("processing")]
+    public bool Processing = true;
 
     /// <summary>
     /// The sound played when extracting
@@ -75,9 +77,8 @@ public sealed partial class FatExtractorComponent : Component
     public EntityUid? Stream;
 
     /// <summary>
-    /// A minium hunger threshold for extracting nutrition.
-    /// Ignored when emagged.
+    /// How long each update takes
     /// </summary>
-    [DataField("minHungerThreshold")]
-    public HungerThreshold MinHungerThreshold = HungerThreshold.Okay;
+    [DataField("updateTime")] [ViewVariables(VVAccess.ReadWrite)]
+    public TimeSpan UpdateTime = TimeSpan.FromSeconds(1);
 }

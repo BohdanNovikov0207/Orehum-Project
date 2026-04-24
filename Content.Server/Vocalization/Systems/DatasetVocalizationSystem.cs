@@ -5,7 +5,7 @@ using Robust.Shared.Random;
 
 namespace Content.Server.Vocalization.Systems;
 
-/// <inheritdoc cref="DatasetVocalizerComponent"/>
+/// <inheritdoc cref="DatasetVocalizerComponent" />
 public sealed class DatasetVocalizationSystem : EntitySystem
 {
     [Dependency] private readonly IPrototypeManager _protoMan = default!;

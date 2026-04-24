@@ -36,9 +36,21 @@ namespace Content.Server.Spreader;
 /// </summary>
 public sealed class SpreaderSystem : EntitySystem
 {
+    // goob edit - faster smoke.
+    // it's funny how it's stored here and spreader prototype updates have 0 references.
+    public const float SpreadCooldownSeconds = .33f;
+
+    private static readonly ProtoId<TagPrototype> IgnoredTag = "SpreaderIgnore";
+
+    /// <summary>
+    /// Remaining number of updates per grid & prototype.
+    /// </summary>
+    // TODO PERFORMANCE Assign each prototype to an index and convert dictionary to array
+    private readonly Dictionary<EntityUid, Dictionary<string, int>> _gridUpdates = [];
+
+    [Dependency] private readonly SharedMapSystem _map = default!;
     [Dependency] private readonly IPrototypeManager _prototype = default!;
     [Dependency] private readonly IRobustRandom _robustRandom = default!;
-    [Dependency] private readonly SharedMapSystem _map = default!;
     [Dependency] private readonly TagSystem _tag = default!;
     [Dependency] private readonly TurfSystem _turf = default!;
 
@@ -47,21 +59,9 @@ public sealed class SpreaderSystem : EntitySystem
     /// </summary>
     private Dictionary<string, int> _prototypeUpdates = default!;
 
-    /// <summary>
-    /// Remaining number of updates per grid & prototype.
-    /// </summary>
-    // TODO PERFORMANCE Assign each prototype to an index and convert dictionary to array
-    private readonly Dictionary<EntityUid, Dictionary<string, int>> _gridUpdates = [];
-
     private EntityQuery<EdgeSpreaderComponent> _query;
 
-    // goob edit - faster smoke.
-    // it's funny how it's stored here and spreader prototype updates have 0 references.
-    public const float SpreadCooldownSeconds = .33f;
-
-    private static readonly ProtoId<TagPrototype> IgnoredTag = "SpreaderIgnore";
-
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         SubscribeLocalEvent<AirtightChanged>(OnAirtightChanged);
@@ -89,22 +89,14 @@ public sealed class SpreaderSystem : EntitySystem
         }
     }
 
-    private void OnAirtightChanged(ref AirtightChanged ev)
-    {
-        ActivateSpreadableNeighbors(ev.Entity, ev.Position);
-    }
+    private void OnAirtightChanged(ref AirtightChanged ev) => ActivateSpreadableNeighbors(ev.Entity, ev.Position);
 
-    private void OnGridInit(GridInitializeEvent ev)
-    {
-        EnsureComp<SpreaderGridComponent>(ev.EntityUid);
-    }
+    private void OnGridInit(GridInitializeEvent ev) => EnsureComp<SpreaderGridComponent>(ev.EntityUid);
 
-    private void OnTerminating(Entity<EdgeSpreaderComponent> entity, ref EntityTerminatingEvent args)
-    {
+    private void OnTerminating(Entity<EdgeSpreaderComponent> entity, ref EntityTerminatingEvent args) =>
         ActivateSpreadableNeighbors(entity);
-    }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Update(float frameTime)
     {
         // Check which grids are valid for spreading
@@ -128,7 +120,8 @@ public sealed class SpreaderSystem : EntitySystem
         var xforms = GetEntityQuery<TransformComponent>();
         var spreaderQuery = GetEntityQuery<EdgeSpreaderComponent>();
 
-        var spreaders = new List<(EntityUid Uid, ActiveEdgeSpreaderComponent Comp)>(Count<ActiveEdgeSpreaderComponent>());
+        var spreaders =
+            new List<(EntityUid Uid, ActiveEdgeSpreaderComponent Comp)>(Count<ActiveEdgeSpreaderComponent>());
 
         // Build a list of all existing Edgespreaders, shuffle them
         while (query.MoveNext(out var uid, out var comp))
@@ -176,11 +169,14 @@ public sealed class SpreaderSystem : EntitySystem
         }
     }
 
-    private void Spread(EntityUid uid, TransformComponent xform, ProtoId<EdgeSpreaderPrototype> prototype, ref int updates)
+    private void Spread(EntityUid uid,
+        TransformComponent xform,
+        ProtoId<EdgeSpreaderPrototype> prototype,
+        ref int updates)
     {
         GetNeighbors(uid, xform, prototype, out var freeTiles, out _, out var neighbors);
 
-        var ev = new SpreadNeighborsEvent()
+        var ev = new SpreadNeighborsEvent
         {
             NeighborFreeTiles = freeTiles,
             Neighbors = neighbors,
@@ -194,7 +190,12 @@ public sealed class SpreaderSystem : EntitySystem
     /// <summary>
     /// Gets the neighboring node data for the specified entity and the specified node group.
     /// </summary>
-    public void GetNeighbors(EntityUid uid, TransformComponent comp, ProtoId<EdgeSpreaderPrototype> prototype, out ValueList<(MapGridComponent, TileRef)> freeTiles, out ValueList<Vector2i> occupiedTiles, out ValueList<EntityUid> neighbors)
+    public void GetNeighbors(EntityUid uid,
+        TransformComponent comp,
+        ProtoId<EdgeSpreaderPrototype> prototype,
+        out ValueList<(MapGridComponent, TileRef)> freeTiles,
+        out ValueList<Vector2i> occupiedTiles,
+        out ValueList<EntityUid> neighbors)
     {
         freeTiles = [];
         occupiedTiles = [];
@@ -214,7 +215,9 @@ public sealed class SpreaderSystem : EntitySystem
         var blockedAtmosDirs = AtmosDirection.Invalid;
 
         // Due to docking ports they may not necessarily be opposite directions.
-        var neighborTiles = new ValueList<(EntityUid entity, MapGridComponent grid, Vector2i Indices, AtmosDirection OtherDir, AtmosDirection OurDir)>();
+        var neighborTiles =
+            new ValueList<(EntityUid entity, MapGridComponent grid, Vector2i Indices, AtmosDirection OtherDir,
+                AtmosDirection OurDir)>();
 
         // Check if anything on our own tile blocking that direction.
         var ourEnts = _map.GetAnchoredEntitiesEnumerator(comp.GridUid.Value, grid, tile);
@@ -227,9 +230,9 @@ public sealed class SpreaderSystem : EntitySystem
                 xformQuery.TryGetComponent(ent, out var xform) &&
                 xformQuery.TryGetComponent(dock.DockedWith, out var dockedXform) &&
                 TryComp<MapGridComponent>(dockedXform.GridUid, out var dockedGrid))
-            {
-                neighborTiles.Add((dockedXform.GridUid.Value, dockedGrid, _map.CoordinatesToTile(dockedXform.GridUid.Value, dockedGrid, dockedXform.Coordinates), xform.LocalRotation.ToAtmosDirection(), dockedXform.LocalRotation.ToAtmosDirection()));
-            }
+                neighborTiles.Add((dockedXform.GridUid.Value, dockedGrid,
+                    _map.CoordinatesToTile(dockedXform.GridUid.Value, dockedGrid, dockedXform.Coordinates),
+                    xform.LocalRotation.ToAtmosDirection(), dockedXform.LocalRotation.ToAtmosDirection()));
 
             // Goobstation
             if (spreaderPrototype.IgnoreBlockedTiles)
@@ -238,11 +241,10 @@ public sealed class SpreaderSystem : EntitySystem
             // If we're on a blocked tile work out which directions we can go.
             if (!airtightQuery.TryGetComponent(ent, out var airtight) || !airtight.AirBlocked ||
                 _tag.HasTag(ent.Value, IgnoredTag))
-            {
                 continue;
-            }
 
-            foreach (var value in new[] { AtmosDirection.North, AtmosDirection.East, AtmosDirection.South, AtmosDirection.West })
+            foreach (var value in new[]
+                         { AtmosDirection.North, AtmosDirection.East, AtmosDirection.South, AtmosDirection.West })
             {
                 if ((value & airtight.AirBlockedDirection) == 0x0)
                     continue;
@@ -250,6 +252,7 @@ public sealed class SpreaderSystem : EntitySystem
                 blockedAtmosDirs |= value;
                 break;
             }
+
             break;
         }
 
@@ -282,10 +285,9 @@ public sealed class SpreaderSystem : EntitySystem
 
                 while (directionEnumerator.MoveNext(out var ent))
                 {
-                    if (!airtightQuery.TryGetComponent(ent, out var airtight) || !airtight.AirBlocked || _tag.HasTag(ent.Value, IgnoredTag))
-                    {
+                    if (!airtightQuery.TryGetComponent(ent, out var airtight) || !airtight.AirBlocked ||
+                        _tag.HasTag(ent.Value, IgnoredTag))
                         continue;
-                    }
 
                     if ((airtight.AirBlockedDirection & otherAtmosDir) == 0x0)
                         continue;
@@ -374,7 +376,8 @@ public sealed class SpreaderSystem : EntitySystem
 
     public bool RequiresFloorToSpread(EntProtoId<EdgeSpreaderComponent> spreader)
     {
-        if (!_prototype.Index(spreader).TryGetComponent<EdgeSpreaderComponent>(out var spreaderComp, EntityManager.ComponentFactory))
+        if (!_prototype.Index(spreader)
+                .TryGetComponent<EdgeSpreaderComponent>(out var spreaderComp, EntityManager.ComponentFactory))
             return false;
 
         return _prototype.Index(spreaderComp.Id).PreventSpreadOnSpaced;

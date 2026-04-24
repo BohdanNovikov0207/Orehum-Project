@@ -13,7 +13,8 @@ using Robust.Shared.Console;
 namespace Content.Server.Motd;
 
 /// <summary>
-/// A console command which acts as an alias for <see cref="GetMotdCommand"/> or <see cref="SetMotdCommand"/> depending on the number of arguments given.
+/// A console command which acts as an alias for <see cref="GetMotdCommand" /> or <see cref="SetMotdCommand" /> depending
+/// on the number of arguments given.
 /// </summary>
 [AnyCommand]
 internal sealed class MOTDCommand : LocalizedCommands
@@ -25,7 +26,8 @@ internal sealed class MOTDCommand : LocalizedCommands
     public override void Execute(IConsoleShell shell, string argStr, string[] args)
     {
         var player = shell.Player;
-        if (args.Length < 1 || (player != null && _adminManager is AdminManager aMan && !aMan.CanCommand(player, "set-motd")))
+        if (args.Length < 1 ||
+            player != null && _adminManager is AdminManager aMan && !aMan.CanCommand(player, "set-motd"))
             shell.ConsoleHost.ExecuteCommand(shell.Player, "get-motd");
         else
             shell.ConsoleHost.ExecuteCommand(shell.Player, $"set-motd {string.Join(" ", args)}");

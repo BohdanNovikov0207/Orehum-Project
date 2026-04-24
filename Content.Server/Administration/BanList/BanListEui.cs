@@ -19,8 +19,8 @@ namespace Content.Server.Administration.BanList;
 public sealed class BanListEui : BaseEui
 {
     [Dependency] private readonly IAdminManager _admins = default!;
-    [Dependency] private readonly IPlayerLocator _playerLocator = default!;
     [Dependency] private readonly IServerDbManager _db = default!;
+    [Dependency] private readonly IPlayerLocator _playerLocator = default!;
 
     public BanListEui()
     {
@@ -46,17 +46,12 @@ public sealed class BanListEui : BaseEui
         _admins.OnPermsChanged -= OnPermsChanged;
     }
 
-    public override EuiStateBase GetNewState()
-    {
-        return new BanListEuiState(BanListPlayerName, Bans, RoleBans);
-    }
+    public override EuiStateBase GetNewState() => new BanListEuiState(BanListPlayerName, Bans, RoleBans);
 
     private void OnPermsChanged(AdminPermsChangedEventArgs args)
     {
         if (args.Player == Player && !_admins.HasAdminFlag(Player, AdminFlags.Ban))
-        {
             Close();
-        }
     }
 
     private async Task LoadBans(NetUserId userId)
@@ -124,6 +119,7 @@ public sealed class BanListEui : BaseEui
 
                 hwid = ban.HWId?.ToString();
             }
+
             RoleBans.Add(new SharedServerRoleBan(
                 ban.Id,
                 ban.UserId,

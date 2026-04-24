@@ -13,6 +13,6 @@ namespace Content.Server.NPC.Components;
 [RegisterComponent]
 public sealed partial class NPCAvoidanceComponent : Component
 {
-    [ViewVariables(VVAccess.ReadWrite), DataField("enabled")]
+    [ViewVariables(VVAccess.ReadWrite)] [DataField("enabled")]
     public bool Enabled = true;
 }

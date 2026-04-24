@@ -8,9 +8,12 @@
 
 using System.Threading;
 using Content.Server.Spawners.Components;
+using Content.Shared._Shitmed.Spawners.EntitySystems;
+using Content.Shared.Friends.Components;
 using Robust.Shared.Random;
-using Content.Shared.Friends.Components; // Shitmed Change
-using Content.Shared._Shitmed.Spawners.EntitySystems; // Shitmed Change
+// Shitmed Change
+
+// Shitmed Change
 
 namespace Content.Server.Spawners.EntitySystems;
 
@@ -29,7 +32,9 @@ public sealed class SpawnerSystem : EntitySystem
     {
         component.TokenSource?.Cancel();
         component.TokenSource = new CancellationTokenSource();
-        uid.SpawnRepeatingTimer(TimeSpan.FromSeconds(component.IntervalSeconds), () => OnTimerFired(uid, component), component.TokenSource.Token);
+        uid.SpawnRepeatingTimer(TimeSpan.FromSeconds(component.IntervalSeconds),
+            () => OnTimerFired(uid, component),
+            component.TokenSource.Token);
     }
 
     private void OnTimerFired(EntityUid uid, TimedSpawnerComponent component)
@@ -51,8 +56,6 @@ public sealed class SpawnerSystem : EntitySystem
         }
     }
 
-    private void OnTimedSpawnerShutdown(EntityUid uid, TimedSpawnerComponent component, ComponentShutdown args)
-    {
+    private void OnTimedSpawnerShutdown(EntityUid uid, TimedSpawnerComponent component, ComponentShutdown args) =>
         component.TokenSource?.Cancel();
-    }
 }

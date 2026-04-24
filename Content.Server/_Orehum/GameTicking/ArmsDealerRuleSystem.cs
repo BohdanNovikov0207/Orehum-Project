@@ -1,7 +1,6 @@
-using Content.Server.Antag;
 using Content.Server._Orehum.GameTicking.Components;
 using Content.Server._Orehum.Roles;
-using Content.Server.GameTicking.Rules.Components;
+using Content.Server.Antag;
 using Content.Server.GameTicking.Rules;
 using Content.Server.Roles;
 using Content.Shared.Humanoid;

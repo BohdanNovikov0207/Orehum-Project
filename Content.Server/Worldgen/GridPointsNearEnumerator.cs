@@ -11,7 +11,7 @@ using System.Diagnostics.Contracts;
 namespace Content.Server.Worldgen;
 
 /// <summary>
-///     A struct enumerator of points on a grid within the given radius.
+/// A struct enumerator of points on a grid within the given radius.
 /// </summary>
 public struct GridPointsNearEnumerator
 {
@@ -21,7 +21,7 @@ public struct GridPointsNearEnumerator
     private int _y;
 
     /// <summary>
-    ///     Initializes a new enumerator with the given center and radius.
+    /// Initializes a new enumerator with the given center and radius.
     /// </summary>
     public GridPointsNearEnumerator(Vector2i center, int radius)
     {
@@ -32,7 +32,7 @@ public struct GridPointsNearEnumerator
     }
 
     /// <summary>
-    ///     Gets the next point in the enumeration.
+    /// Gets the next point in the enumeration.
     /// </summary>
     /// <param name="chunk">The computed point, if any</param>
     /// <returns>Success</returns>
@@ -53,9 +53,7 @@ public struct GridPointsNearEnumerator
                 _y++;
             }
             else
-            {
                 _x++;
-            }
         }
 
         chunk = _center + new Vector2i(_x, _y);

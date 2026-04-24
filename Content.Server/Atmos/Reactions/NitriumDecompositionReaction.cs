@@ -13,13 +13,16 @@ using JetBrains.Annotations;
 namespace Content.Server.Atmos.Reactions;
 
 /// <summary>
-///     Assmos - /tg/ gases
-///     The decomposition of nitrium in the presence of oxygen at temperatures below 343K.
+/// Assmos - /tg/ gases
+/// The decomposition of nitrium in the presence of oxygen at temperatures below 343K.
 /// </summary>
 [UsedImplicitly]
 public sealed partial class NitriumDecompositionReaction : IGasReactionEffect
 {
-    public ReactionResult React(GasMixture mixture, IGasMixtureHolder? holder, AtmosphereSystem atmosphereSystem, float heatScale)
+    public ReactionResult React(GasMixture mixture,
+        IGasMixtureHolder? holder,
+        AtmosphereSystem atmosphereSystem,
+        float heatScale)
     {
         var initNitrium = mixture.GetMoles(Gas.Nitrium);
         var initOxygen = mixture.GetMoles(Gas.Oxygen);
@@ -43,7 +46,8 @@ public sealed partial class NitriumDecompositionReaction : IGasReactionEffect
         var energyReleased = efficiency * Atmospherics.NitriumDecompositionEnergy;
         var heatCap = atmosphereSystem.GetHeatCapacity(mixture, true);
         if (heatCap > Atmospherics.MinimumHeatCapacity)
-            mixture.Temperature = Math.Max((mixture.Temperature * heatCap + energyReleased) / heatCap, Atmospherics.TCMB);
+            mixture.Temperature =
+                Math.Max((mixture.Temperature * heatCap + energyReleased) / heatCap, Atmospherics.TCMB);
 
         return ReactionResult.Reacting;
     }

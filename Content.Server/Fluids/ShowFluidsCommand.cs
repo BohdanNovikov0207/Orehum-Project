@@ -19,6 +19,7 @@ public sealed class ShowFluidsCommand : IConsoleCommand
     public string Command => "showfluids";
     public string Description => "Toggles seeing puddle debug overlay.";
     public string Help => $"Usage: {Command}";
+
     public void Execute(IConsoleShell shell, string argStr, string[] args)
     {
         var player = shell.Player;

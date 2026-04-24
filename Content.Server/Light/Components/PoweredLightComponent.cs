@@ -138,74 +138,77 @@ using Robust.Shared.Containers;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype;
 
-namespace Content.Server.Light.Components
+namespace Content.Server.Light.Components;
+
+/// <summary>
+/// Component that represents a wall light. It has a light bulb that can be replaced when broken.
+/// </summary>
+[RegisterComponent] [Access(typeof(PoweredLightSystem))]
+public sealed partial class PoweredLightComponent : Component
 {
+    [DataField("bulb")]
+    public LightBulbType BulbType;
+
+    [DataField("burnHandSound")]
+    public SoundSpecifier BurnHandSound = new SoundPathSpecifier("/Audio/Effects/lightburn.ogg");
+
+    [ViewVariables]
+    public bool CurrentLit;
+
     /// <summary>
-    ///     Component that represents a wall light. It has a light bulb that can be replaced when broken.
+    /// How long it takes to eject a bulb from this
     /// </summary>
-    [RegisterComponent, Access(typeof(PoweredLightSystem))]
-    public sealed partial class PoweredLightComponent : Component
-    {
-        [DataField("burnHandSound")]
-        public SoundSpecifier BurnHandSound = new SoundPathSpecifier("/Audio/Effects/lightburn.ogg");
+    [DataField("ejectBulbDelay")]
+    public float EjectBulbDelay = 2;
 
-        [DataField("turnOnSound")]
-        public SoundSpecifier TurnOnSound = new SoundPathSpecifier("/Audio/Machines/light_tube_on.ogg");
+    [DataField("ghostBlinkingCooldown")]
+    public TimeSpan GhostBlinkingCooldown = TimeSpan.FromSeconds(60);
 
-        [DataField("hasLampOnSpawn", customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
-        public string? HasLampOnSpawn = null;
+    [DataField("ghostBlinkingTime")]
+    public TimeSpan GhostBlinkingTime = TimeSpan.FromSeconds(10);
 
-        [DataField("bulb")]
-        public LightBulbType BulbType;
+    [DataField("hasLampOnSpawn", customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
+    public string? HasLampOnSpawn = null;
 
-        [DataField("on")]
-        public bool On = true;
+    [DataField("ignoreGhostsBoo")]
+    public bool IgnoreGhostsBoo;
 
-        [DataField("ignoreGhostsBoo")]
-        public bool IgnoreGhostsBoo;
+    [ViewVariables]
+    public bool IsBlinking;
 
-        [DataField("ghostBlinkingTime")]
-        public TimeSpan GhostBlinkingTime = TimeSpan.FromSeconds(10);
+    [ViewVariables]
+    public TimeSpan? LastGhostBlink;
 
-        [DataField("ghostBlinkingCooldown")]
-        public TimeSpan GhostBlinkingCooldown = TimeSpan.FromSeconds(60);
+    [ViewVariables]
+    public TimeSpan LastThunk;
 
-        [ViewVariables]
-        public ContainerSlot LightBulbContainer = default!;
-        [ViewVariables]
-        public bool CurrentLit;
-        [ViewVariables]
-        public bool IsBlinking;
-        [ViewVariables]
-        public TimeSpan LastThunk;
-        [ViewVariables]
-        public TimeSpan? LastGhostBlink;
+    [ViewVariables]
+    public ContainerSlot LightBulbContainer = default!;
 
-        [DataField("onPort", customTypeSerializer: typeof(PrototypeIdSerializer<SinkPortPrototype>))]
-        public string OnPort = "On";
+    [DataField("offPort", customTypeSerializer: typeof(PrototypeIdSerializer<SinkPortPrototype>))]
+    public string OffPort = "Off";
 
-        [DataField("offPort", customTypeSerializer: typeof(PrototypeIdSerializer<SinkPortPrototype>))]
-        public string OffPort = "Off";
+    [DataField("on")]
+    public bool On = true;
 
-        [DataField("togglePort", customTypeSerializer: typeof(PrototypeIdSerializer<SinkPortPrototype>))]
-        public string TogglePort = "Toggle";
+    [DataField("onPort", customTypeSerializer: typeof(PrototypeIdSerializer<SinkPortPrototype>))]
+    public string OnPort = "On";
 
-        /// <summary>
-        /// How long it takes to eject a bulb from this
-        /// </summary>
-        [DataField("ejectBulbDelay")]
-        public float EjectBulbDelay = 2;
+    [DataField("togglePort", customTypeSerializer: typeof(PrototypeIdSerializer<SinkPortPrototype>))]
+    public string TogglePort = "Toggle";
 
-        /// <summary>
-        /// Shock damage done to a mob that hits the light with an unarmed attack
-        /// </summary>
-        [DataField("unarmedHitShock")]
-        public int UnarmedHitShock = 20;
+    [DataField("turnOnSound")]
+    public SoundSpecifier TurnOnSound = new SoundPathSpecifier("/Audio/Machines/light_tube_on.ogg");
 
-        /// <summary>
-        /// Stun duration applied to a mob that hits the light with an unarmed attack
-        /// </summary>
-        [DataField("unarmedHitStun")]
-        public TimeSpan UnarmedHitStun = TimeSpan.FromSeconds(5);
-    }
+    /// <summary>
+    /// Shock damage done to a mob that hits the light with an unarmed attack
+    /// </summary>
+    [DataField("unarmedHitShock")]
+    public int UnarmedHitShock = 20;
+
+    /// <summary>
+    /// Stun duration applied to a mob that hits the light with an unarmed attack
+    /// </summary>
+    [DataField("unarmedHitStun")]
+    public TimeSpan UnarmedHitStun = TimeSpan.FromSeconds(5);
 }

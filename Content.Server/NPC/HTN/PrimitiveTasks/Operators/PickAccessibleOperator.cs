@@ -20,17 +20,17 @@ public sealed partial class PickAccessibleOperator : HTNOperator
     [Dependency] private readonly IEntityManager _entManager = default!;
     private PathfindingSystem _pathfinding = default!;
 
-    [DataField("rangeKey", required: true)]
-    public string RangeKey = string.Empty;
-
-    [DataField("targetCoordinates")]
-    public string TargetCoordinates = "TargetCoordinates";
-
     /// <summary>
     /// Where the pathfinding result will be stored (if applicable). This gets removed after execution.
     /// </summary>
     [DataField("pathfindKey")]
     public string PathfindKey = NPCBlackboard.PathfindKey;
+
+    [DataField("rangeKey", required: true)]
+    public string RangeKey = string.Empty;
+
+    [DataField("targetCoordinates")]
+    public string TargetCoordinates = "TargetCoordinates";
 
     public override void Initialize(IEntitySystemManager sysManager)
     {
@@ -38,7 +38,7 @@ public sealed partial class PickAccessibleOperator : HTNOperator
         _pathfinding = sysManager.GetEntitySystem<PathfindingSystem>();
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override async Task<(bool Valid, Dictionary<string, object>? Effects)> Plan(NPCBlackboard blackboard,
         CancellationToken cancelToken)
     {
@@ -57,16 +57,14 @@ public sealed partial class PickAccessibleOperator : HTNOperator
             flags: _pathfinding.GetFlags(blackboard));
 
         if (path.Result != PathResult.Path)
-        {
             return (false, null);
-        }
 
         var target = path.Path.Last().Coordinates;
 
-        return (true, new Dictionary<string, object>()
+        return (true, new Dictionary<string, object>
         {
             { TargetCoordinates, target },
-            { PathfindKey, path}
+            { PathfindKey, path },
         });
     }
 }

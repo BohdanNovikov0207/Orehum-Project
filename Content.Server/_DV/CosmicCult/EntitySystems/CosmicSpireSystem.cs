@@ -64,7 +64,9 @@ public sealed class CosmicSpireSystem : EntitySystem
         var enumerator = _atmos.GetAdjacentTileMixtures(grid, position, false, true);
 
         while (enumerator.MoveNext(out var adjacent))
+        {
             Drain(timeDelta, ent, adjacent);
+        }
 
         if (ent.Comp.Storage.TotalMoles >= ent.Comp.DrainThreshHold)
         {
@@ -80,15 +82,13 @@ public sealed class CosmicSpireSystem : EntitySystem
         }
     }
 
-    private bool Drain(float timeDelta, Entity<CosmicSpireComponent> ent, GasMixture? tile)
-    {
-        return _scrub.Scrub(timeDelta,
+    private bool Drain(float timeDelta, Entity<CosmicSpireComponent> ent, GasMixture? tile) =>
+        _scrub.Scrub(timeDelta,
             ent.Comp.DrainRate * _atmos.PumpSpeedup(),
             ScrubberPumpDirection.Scrubbing,
             ent.Comp.DrainGases,
             tile,
             ent.Comp.Storage);
-    }
 
     private void OnSpireAnalyzed(Entity<CosmicSpireComponent> ent, ref GasAnalyzerScanEvent args)
     {

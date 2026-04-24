@@ -14,7 +14,8 @@ using Robust.Shared.Console;
 namespace Content.Server.Administration.Commands;
 
 /// <summary>
-/// Allows admins to change certain CVars. This is different than the "cvar" command which is host only and can change any CVar.
+/// Allows admins to change certain CVars. This is different than the "cvar" command which is host only and can change any
+/// CVar.
 /// </summary>
 /// <remarks>
 /// Possible todo for future, store default values for cvars, and allow resetting to default.
@@ -22,58 +23,14 @@ namespace Content.Server.Administration.Commands;
 [AnyCommand]
 public sealed class ChangeCvarCommand : IConsoleCommand
 {
-    [Dependency] private readonly IConfigurationManager _configurationManager = default!;
     [Dependency] private readonly IAdminLogManager _adminLogManager = default!;
+    [Dependency] private readonly IConfigurationManager _configurationManager = default!;
     [Dependency] private readonly CVarControlManager _cVarControlManager = default!;
-
-    /// <summary>
-    /// Searches the list of cvars for a cvar that matches the search string.
-    /// </summary>
-    private void SearchCVars(IConsoleShell shell, string argStr, string[] args)
-    {
-        if (args.Length < 2)
-        {
-            shell.WriteLine(Loc.GetString("cmd-changecvar-search-no-arguments"));
-            return;
-        }
-
-        var cvars = _cVarControlManager.GetAllRunnableCvars(shell);
-
-        var matches = cvars
-            .Where(c =>
-                c.Name.Contains(args[1], StringComparison.OrdinalIgnoreCase)
-                || c.ShortHelp?.Contains(args[1], StringComparison.OrdinalIgnoreCase) == true
-                || c.LongHelp?.Contains(args[1], StringComparison.OrdinalIgnoreCase) == true
-                ) // Might be very slow and stupid, but eh.
-            .ToList();
-
-        if (matches.Count == 0)
-        {
-            shell.WriteLine(Loc.GetString("cmd-changecvar-search-no-matches"));
-            return;
-        }
-
-        shell.WriteLine(Loc.GetString("cmd-changecvar-search-matches", ("count", matches.Count)));
-        shell.WriteLine(string.Join("\n", matches.Select(FormatCVarFullHelp)));
-    }
-
-    /// <summary>
-    /// Formats a CVar into a string for display.
-    /// </summary>
-    private string FormatCVarFullHelp(ChangableCVar cvar)
-    {
-        if (cvar.LongHelp != null && cvar.ShortHelp != null)
-        {
-            return $"{cvar.Name} - {cvar.LongHelp}";
-        }
-
-        // There is no help, no one is coming. We are all doomed.
-        return cvar.Name;
-    }
 
     public string Command => "changecvar";
     public string Description { get; } = Loc.GetString("cmd-changecvar-desc");
     public string Help { get; } = Loc.GetString("cmd-changecvar-help");
+
     public void Execute(IConsoleShell shell, string argStr, string[] args)
     {
         if (args.Length == 0)
@@ -137,37 +94,29 @@ public sealed class ChangeCvarCommand : IConsoleCommand
                     {
                         case int intVal:
                         {
-                            if (intVal < (int)control.Min || intVal > (int)control.Max)
-                            {
+                            if (intVal < (int) control.Min || intVal > (int) control.Max)
                                 allowed = false;
-                            }
 
                             break;
                         }
                         case float floatVal:
                         {
-                            if (floatVal < (float)control.Min || floatVal > (float)control.Max)
-                            {
+                            if (floatVal < (float) control.Min || floatVal > (float) control.Max)
                                 allowed = false;
-                            }
 
                             break;
                         }
                         case long longVal:
                         {
-                            if (longVal < (long)control.Min || longVal > (long)control.Max)
-                            {
+                            if (longVal < (long) control.Min || longVal > (long) control.Max)
                                 allowed = false;
-                            }
 
                             break;
                         }
                         case ushort ushortVal:
                         {
-                            if (ushortVal < (ushort)control.Min || ushortVal > (ushort)control.Max)
-                            {
+                            if (ushortVal < (ushort) control.Min || ushortVal > (ushort) control.Max)
                                 allowed = false;
-                            }
 
                             break;
                         }
@@ -187,9 +136,12 @@ public sealed class ChangeCvarCommand : IConsoleCommand
                 _adminLogManager.Add(LogType.AdminCommands,
                     LogImpact.Extreme,
                     $"{shell.Player!.Name} ({shell.Player!.UserId}) changed CVAR {cvar} from {oldValue.ToString()} to {parsed.ToString()}"
-                    );
+                );
 
-                shell.WriteLine(Loc.GetString("cmd-changecvar-success", ("cvar", cvar), ("old", oldValue), ("value", parsed)));
+                shell.WriteLine(Loc.GetString("cmd-changecvar-success",
+                    ("cvar", cvar),
+                    ("old", oldValue),
+                    ("value", parsed)));
             }
             catch (FormatException)
             {
@@ -216,5 +168,48 @@ public sealed class ChangeCvarCommand : IConsoleCommand
 
         var type = _configurationManager.GetCVarType(cvar);
         return CompletionResult.FromHint($"<{type.Name}>");
+    }
+
+    /// <summary>
+    /// Searches the list of cvars for a cvar that matches the search string.
+    /// </summary>
+    private void SearchCVars(IConsoleShell shell, string argStr, string[] args)
+    {
+        if (args.Length < 2)
+        {
+            shell.WriteLine(Loc.GetString("cmd-changecvar-search-no-arguments"));
+            return;
+        }
+
+        var cvars = _cVarControlManager.GetAllRunnableCvars(shell);
+
+        var matches = cvars
+            .Where(c =>
+                c.Name.Contains(args[1], StringComparison.OrdinalIgnoreCase)
+                || c.ShortHelp?.Contains(args[1], StringComparison.OrdinalIgnoreCase) == true
+                || c.LongHelp?.Contains(args[1], StringComparison.OrdinalIgnoreCase) == true
+            ) // Might be very slow and stupid, but eh.
+            .ToList();
+
+        if (matches.Count == 0)
+        {
+            shell.WriteLine(Loc.GetString("cmd-changecvar-search-no-matches"));
+            return;
+        }
+
+        shell.WriteLine(Loc.GetString("cmd-changecvar-search-matches", ("count", matches.Count)));
+        shell.WriteLine(string.Join("\n", matches.Select(FormatCVarFullHelp)));
+    }
+
+    /// <summary>
+    /// Formats a CVar into a string for display.
+    /// </summary>
+    private string FormatCVarFullHelp(ChangableCVar cvar)
+    {
+        if (cvar.LongHelp != null && cvar.ShortHelp != null)
+            return $"{cvar.Name} - {cvar.LongHelp}";
+
+        // There is no help, no one is coming. We are all doomed.
+        return cvar.Name;
     }
 }

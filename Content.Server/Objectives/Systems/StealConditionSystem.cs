@@ -83,33 +83,33 @@ using Content.Server.Objectives.Components.Targets;
 using Content.Shared.CartridgeLoader;
 using Content.Shared.Interaction;
 using Content.Shared.Mind;
+using Content.Shared.Mind.Components;
+using Content.Shared.Mobs.Components;
+using Content.Shared.Mobs.Systems;
+using Content.Shared.Movement.Pulling.Components;
 using Content.Shared.Objectives.Components;
 using Content.Shared.Objectives.Systems;
+using Content.Shared.Stacks;
 using Robust.Shared.Containers;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
-using Content.Shared.Mind.Components;
-using Content.Shared.Mobs.Systems;
-using Content.Shared.Mobs.Components;
-using Content.Shared.Movement.Pulling.Components;
-using Content.Shared.Stacks;
 
 namespace Content.Server.Objectives.Systems;
 
 public sealed class StealConditionSystem : EntitySystem
 {
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly IPrototypeManager _proto = default!;
+    private readonly HashSet<EntityUid> _countedItems = new();
+    [Dependency] private readonly SharedInteractionSystem _interaction = default!;
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly MetaDataSystem _metaData = default!;
     [Dependency] private readonly MobStateSystem _mobState = default!;
-    [Dependency] private readonly SharedInteractionSystem _interaction = default!;
+
+    private readonly HashSet<Entity<TransformComponent>> _nearestEnts = new();
     [Dependency] private readonly SharedObjectivesSystem _objectives = default!;
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
+    [Dependency] private readonly IPrototypeManager _proto = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
 
     private EntityQuery<ContainerManagerComponent> _containerQuery;
-
-    private HashSet<Entity<TransformComponent>> _nearestEnts = new();
-    private HashSet<EntityUid> _countedItems = new();
 
     public override void Initialize()
     {
@@ -158,24 +158,27 @@ public sealed class StealConditionSystem : EntitySystem
     private void OnAfterAssign(Entity<StealConditionComponent> condition, ref ObjectiveAfterAssignEvent args)
     {
         var group = _proto.Index(condition.Comp.StealGroup);
-        string localizedName = Loc.GetString(group.Name);
+        var localizedName = Loc.GetString(group.Name);
 
         var title = condition.Comp.OwnerText == null
             ? Loc.GetString(condition.Comp.ObjectiveNoOwnerText, ("itemName", localizedName))
-            : Loc.GetString(condition.Comp.ObjectiveText, ("owner", Loc.GetString(condition.Comp.OwnerText)), ("itemName", localizedName));
+            : Loc.GetString(condition.Comp.ObjectiveText,
+                ("owner", Loc.GetString(condition.Comp.OwnerText)),
+                ("itemName", localizedName));
 
         var description = condition.Comp.CollectionSize > 1
-            ? Loc.GetString(condition.Comp.DescriptionMultiplyText, ("itemName", localizedName), ("count", condition.Comp.CollectionSize))
+            ? Loc.GetString(condition.Comp.DescriptionMultiplyText,
+                ("itemName", localizedName),
+                ("count", condition.Comp.CollectionSize))
             : Loc.GetString(condition.Comp.DescriptionText, ("itemName", localizedName));
 
         _metaData.SetEntityName(condition.Owner, title, args.Meta);
         _metaData.SetEntityDescription(condition.Owner, description, args.Meta);
         _objectives.SetIcon(condition.Owner, group.Sprite, args.Objective);
     }
-    private void OnGetProgress(Entity<StealConditionComponent> condition, ref ObjectiveGetProgressEvent args)
-    {
+
+    private void OnGetProgress(Entity<StealConditionComponent> condition, ref ObjectiveGetProgressEvent args) =>
         args.Progress = GetProgress((args.MindId, args.Mind), condition);
-    }
 
     private float GetProgress(Entity<MindComponent> mind, StealConditionComponent condition)
     {
@@ -197,10 +200,10 @@ public sealed class StealConditionSystem : EntitySystem
                     continue;
 
                 _nearestEnts.Clear();
-                _lookup.GetEntitiesInRange<TransformComponent>(xform.Coordinates, area.Range, _nearestEnts);
+                _lookup.GetEntitiesInRange(xform.Coordinates, area.Range, _nearestEnts);
                 foreach (var ent in _nearestEnts)
                 {
-                    if (!_interaction.InRangeUnobstructed((uid, xform), (ent, ent.Comp), range: area.Range))
+                    if (!_interaction.InRangeUnobstructed((uid, xform), (ent, ent.Comp), area.Range))
                         continue;
 
                     CheckEntity(ent, condition, ref containerStack, ref count);
@@ -209,13 +212,12 @@ public sealed class StealConditionSystem : EntitySystem
         }
 
         //check pulling object
-        if (TryComp<PullerComponent>(mind.Comp.OwnedEntity, out var pull)) //TO DO: to make the code prettier? don't like the repetition
+        if (TryComp<PullerComponent>(mind.Comp.OwnedEntity,
+                out var pull)) //TO DO: to make the code prettier? don't like the repetition
         {
             var pulledEntity = pull.Pulling;
             if (pulledEntity != null)
-            {
                 CheckEntity(pulledEntity.Value, condition, ref containerStack, ref count);
-            }
         }
 
         // recursively check each container for the item
@@ -236,12 +238,15 @@ public sealed class StealConditionSystem : EntitySystem
             }
         } while (containerStack.TryPop(out currentManager));
 
-        var result = count / (float)condition.CollectionSize;
+        var result = count / (float) condition.CollectionSize;
         result = Math.Clamp(result, 0, 1);
         return result;
     }
 
-    private void CheckEntity(EntityUid entity, StealConditionComponent condition, ref Stack<ContainerManagerComponent> containerStack, ref int counter)
+    private void CheckEntity(EntityUid entity,
+        StealConditionComponent condition,
+        ref Stack<ContainerManagerComponent> containerStack,
+        ref int counter)
     {
         // check if this is the item
         counter += CheckStealTarget(entity, condition);

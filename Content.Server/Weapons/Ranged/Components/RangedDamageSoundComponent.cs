@@ -37,6 +37,6 @@ public sealed partial class RangedDamageSoundComponent : Component
     /// Will fallback to defaults if none specified.
     /// </summary>
     [DataField("soundTypes",
-         customTypeSerializer: typeof(PrototypeIdDictionarySerializer<SoundSpecifier, DamageTypePrototype>))]
+        customTypeSerializer: typeof(PrototypeIdDictionarySerializer<SoundSpecifier, DamageTypePrototype>))]
     public Dictionary<string, SoundSpecifier>? SoundTypes;
 }

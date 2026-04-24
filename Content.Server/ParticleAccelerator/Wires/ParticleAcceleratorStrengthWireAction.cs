@@ -17,16 +17,15 @@ using Content.Shared.Wires;
 
 namespace Content.Server.ParticleAccelerator.Wires;
 
-public sealed partial class ParticleAcceleratorStrengthWireAction : ComponentWireAction<ParticleAcceleratorControlBoxComponent>
+public sealed partial class
+    ParticleAcceleratorStrengthWireAction : ComponentWireAction<ParticleAcceleratorControlBoxComponent>
 {
     public override string Name { get; set; } = "wire-name-pa-strength";
     public override Color Color { get; set; } = Color.Blue;
     public override object StatusKey { get; } = ParticleAcceleratorWireStatus.Strength;
 
-    public override StatusLightState? GetLightState(Wire wire, ParticleAcceleratorControlBoxComponent component)
-    {
-        return component.StrengthLocked ? StatusLightState.BlinkingSlow : StatusLightState.On;
-    }
+    public override StatusLightState? GetLightState(Wire wire, ParticleAcceleratorControlBoxComponent component) =>
+        component.StrengthLocked ? StatusLightState.BlinkingSlow : StatusLightState.On;
 
     public override bool Cut(EntityUid user, Wire wire, ParticleAcceleratorControlBoxComponent controller)
     {
@@ -47,6 +46,9 @@ public sealed partial class ParticleAcceleratorStrengthWireAction : ComponentWir
     public override void Pulse(EntityUid user, Wire wire, ParticleAcceleratorControlBoxComponent controller)
     {
         var paSystem = EntityManager.System<ParticleAcceleratorSystem>();
-        paSystem.SetStrength(wire.Owner, (ParticleAcceleratorPowerState) ((int) controller.SelectedStrength + 1), user, controller);
+        paSystem.SetStrength(wire.Owner,
+            (ParticleAcceleratorPowerState) ((int) controller.SelectedStrength + 1),
+            user,
+            controller);
     }
 }

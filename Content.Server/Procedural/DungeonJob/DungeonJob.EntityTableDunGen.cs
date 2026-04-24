@@ -49,9 +49,7 @@ public sealed partial class DungeonJob
                         tile,
                         (int) CollisionGroup.MachineLayer,
                         (int) CollisionGroup.MachineLayer))
-                {
                     continue;
-                }
 
                 var entities = _entManager.System<EntityTableSystem>().GetSpawns(gen.Table, random).ToList();
                 foreach (var ent in entities)
@@ -66,14 +64,10 @@ public sealed partial class DungeonJob
             }
 
             if (gen.PerDungeon)
-            {
                 count = random.Next(gen.MinCount, gen.MaxCount + 1);
-            }
             // Stop if count is 0, otherwise go to next dungeon.
             else if (count == 0)
-            {
                 return;
-            }
         }
     }
 }

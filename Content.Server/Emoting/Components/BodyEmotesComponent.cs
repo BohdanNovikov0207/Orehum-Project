@@ -12,20 +12,20 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototy
 namespace Content.Server.Emoting.Components;
 
 /// <summary>
-///     Component required for entities to be able to do body emotions (clap, flip, etc).
+/// Component required for entities to be able to do body emotions (clap, flip, etc).
 /// </summary>
 [RegisterComponent]
 [Access(typeof(BodyEmotesSystem))]
 public sealed partial class BodyEmotesComponent : Component
 {
     /// <summary>
-    ///     Emote sounds prototype id for body emotes.
+    /// Loaded emote sounds prototype used for body emotes.
+    /// </summary>
+    public EmoteSoundsPrototype? Sounds;
+
+    /// <summary>
+    /// Emote sounds prototype id for body emotes.
     /// </summary>
     [DataField("soundsId", customTypeSerializer: typeof(PrototypeIdSerializer<EmoteSoundsPrototype>))]
     public string? SoundsId;
-
-    /// <summary>
-    ///     Loaded emote sounds prototype used for body emotes.
-    /// </summary>
-    public EmoteSoundsPrototype? Sounds;
 }

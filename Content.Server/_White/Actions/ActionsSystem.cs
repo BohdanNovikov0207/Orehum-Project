@@ -1,10 +1,10 @@
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Server.DoAfter;
 using Content.Shared._White.Actions;
 using Content.Shared._White.Actions.Events;
 using Content.Shared.Construction.EntitySystems;
 using Content.Shared.Coordinates;
 using Content.Shared.DoAfter;
-using Content.Goobstation.Maths.FixedPoint;
 using Robust.Server.Audio;
 using Robust.Server.Containers;
 using Robust.Server.GameObjects;
@@ -17,14 +17,13 @@ namespace Content.Server._White.Actions;
 
 public sealed class ActionsSystem : EntitySystem
 {
-    [Dependency] private readonly ITileDefinitionManager _tileDef = default!;
-
     [Dependency] private readonly AnchorableSystem _anchorable = default!;
     [Dependency] private readonly AudioSystem _audio = default!;
     [Dependency] private readonly ContainerSystem _container = default!;
     [Dependency] private readonly DoAfterSystem _doAfter = default!;
     [Dependency] private readonly MapSystem _mapSystem = default!;
     [Dependency] private readonly PlasmaCostActionSystem _plasmaCost = default!; // Goobstation=
+    [Dependency] private readonly ITileDefinitionManager _tileDef = default!;
     [Dependency] private readonly TransformSystem _transform = default!;
 
     public override void Initialize()
@@ -37,7 +36,13 @@ public sealed class ActionsSystem : EntitySystem
 
     private void OnSpawnTileEntityAction(SpawnTileEntityActionEvent args)
     {
-        if (!args.Handled && CreationTileEntity(args.Performer, args.Performer.ToCoordinates(), args.TileId, args.Entity, args.Audio, args.BlockedCollisionLayer, args.BlockedCollisionMask))
+        if (!args.Handled && CreationTileEntity(args.Performer,
+                args.Performer.ToCoordinates(),
+                args.TileId,
+                args.Entity,
+                args.Audio,
+                args.BlockedCollisionLayer,
+                args.BlockedCollisionMask))
             args.Handled = true;
     }
 
@@ -65,7 +70,7 @@ public sealed class ActionsSystem : EntitySystem
                 BlockedCollisionLayer = args.BlockedCollisionLayer,
                 BlockedCollisionMask = args.BlockedCollisionMask, // Goobstation start
                 PlasmaCost = plasmaCostValue,
-                Action = GetNetEntity(args.Action) // Goobstation end
+                Action = GetNetEntity(args.Action), // Goobstation end
             };
 
             var doAfter = new DoAfterArgs(EntityManager, args.Performer, args.Length, ev, null)
@@ -75,14 +80,20 @@ public sealed class ActionsSystem : EntitySystem
                 BreakOnMove = true, // Goobstation start
                 NeedHand = false,
                 CancelDuplicate = true, // Gooobstation end
-                Broadcast = true
+                Broadcast = true,
             };
 
             _doAfter.TryStartDoAfter(doAfter);
             return;
         }
 
-        if (CreationTileEntity(args.Performer, args.Target, args.TileId, args.Entity, args.Audio, args.BlockedCollisionLayer, args.BlockedCollisionMask))
+        if (CreationTileEntity(args.Performer,
+                args.Target,
+                args.TileId,
+                args.Entity,
+                args.Audio,
+                args.BlockedCollisionLayer,
+                args.BlockedCollisionMask))
             args.Handled = true;
     }
 
@@ -103,13 +114,25 @@ public sealed class ActionsSystem : EntitySystem
 
         _plasmaCost.DeductPlasma(args.User, args.PlasmaCost);
 
-        if (CreationTileEntity(args.User, GetCoordinates(args.Target), args.TileId, args.Entity, args.Audio, args.BlockedCollisionLayer, args.BlockedCollisionMask))
+        if (CreationTileEntity(args.User,
+                GetCoordinates(args.Target),
+                args.TileId,
+                args.Entity,
+                args.Audio,
+                args.BlockedCollisionLayer,
+                args.BlockedCollisionMask))
             args.Handled = true;
     }
 
     #region Helpers
 
-    private bool CreationTileEntity(EntityUid user, EntityCoordinates coordinates, string? tileId, EntProtoId? entProtoId, SoundSpecifier? audio, int collisionLayer = 0, int collisionMask = 0)
+    private bool CreationTileEntity(EntityUid user,
+        EntityCoordinates coordinates,
+        string? tileId,
+        EntProtoId? entProtoId,
+        SoundSpecifier? audio,
+        int collisionLayer = 0,
+        int collisionMask = 0)
     {
         if (_container.IsEntityOrParentInContainer(user))
             return false;

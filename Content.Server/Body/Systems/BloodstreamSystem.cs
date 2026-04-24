@@ -124,11 +124,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.EntityEffects.Effects;
 using Content.Shared.Body.Components;
 using Content.Shared.Body.Systems;
-using Content.Shared.Chemistry.EntitySystems;
-using Content.Shared.Chemistry.Reaction;
 using Content.Shared.Chemistry.Reagent;
 using Content.Shared.Forensics;
 using Content.Shared.Forensics.Components;
@@ -167,17 +164,21 @@ public sealed class BloodstreamSystem : SharedBloodstreamSystem
 
         // Fill blood solution with BLOOD
         // The DNA string might not be initialized yet, but the reagent data gets updated in the GenerateDnaEvent subscription
-        bloodSolution.AddReagent(new ReagentId(entity.Comp.BloodReagent, GetEntityBloodData(entity.Owner)), entity.Comp.BloodMaxVolume - bloodSolution.Volume);
+        bloodSolution.AddReagent(new ReagentId(entity.Comp.BloodReagent, GetEntityBloodData(entity.Owner)),
+            entity.Comp.BloodMaxVolume - bloodSolution.Volume);
     }
 
     // forensics is not predicted yet
     private void OnDnaGenerated(Entity<BloodstreamComponent> entity, ref GenerateDnaEvent args)
     {
-        if (SolutionContainer.ResolveSolution(entity.Owner, entity.Comp.BloodSolutionName, ref entity.Comp.BloodSolution, out var bloodSolution))
+        if (SolutionContainer.ResolveSolution(entity.Owner,
+                entity.Comp.BloodSolutionName,
+                ref entity.Comp.BloodSolution,
+                out var bloodSolution))
         {
             foreach (var reagent in bloodSolution.Contents)
             {
-                List<ReagentData> reagentData = reagent.Reagent.EnsureReagentData();
+                var reagentData = reagent.Reagent.EnsureReagentData();
                 reagentData.RemoveAll(x => x is DnaData);
                 reagentData.AddRange(GetEntityBloodData(entity.Owner));
             }

@@ -17,14 +17,23 @@ namespace Content.Server.NPC.Pathfinding;
 /// </summary>
 public abstract class PathRequest
 {
-    public EntityCoordinates Start;
-
-    public Task<PathResult> Task => Tcs.Task;
     public readonly TaskCompletionSource<PathResult> Tcs;
 
     public List<PathPoly> Polys = new();
+    public EntityCoordinates Start;
 
     public bool Started = false;
+
+    public PathRequest(EntityCoordinates start, PathFlags flags, int layer, int mask, CancellationToken cancelToken)
+    {
+        Start = start;
+        Flags = flags;
+        CollisionLayer = layer;
+        CollisionMask = mask;
+        Tcs = new TaskCompletionSource<PathResult>(cancelToken);
+    }
+
+    public Task<PathResult> Task => Tcs.Task;
 
     #region Pathfinding state
 
@@ -42,25 +51,16 @@ public abstract class PathRequest
     public readonly int CollisionMask;
 
     #endregion
-
-    public PathRequest(EntityCoordinates start, PathFlags flags, int layer, int mask, CancellationToken cancelToken)
-    {
-        Start = start;
-        Flags = flags;
-        CollisionLayer = layer;
-        CollisionMask = mask;
-        Tcs = new TaskCompletionSource<PathResult>(cancelToken);
-    }
 }
 
 public sealed class AStarPathRequest : PathRequest
 {
-    public EntityCoordinates End;
-
     /// <summary>
     /// How close we need to be to the end node to be considered as arrived.
     /// </summary>
     public float Distance;
+
+    public EntityCoordinates End;
 
     public AStarPathRequest(
         EntityCoordinates start,
@@ -79,14 +79,14 @@ public sealed class AStarPathRequest : PathRequest
 public sealed class BFSPathRequest : PathRequest
 {
     /// <summary>
-    /// How far away we're allowed to expand in distance.
-    /// </summary>
-    public float ExpansionRange;
-
-    /// <summary>
     /// How many nodes we're allowed to expand
     /// </summary>
     public int ExpansionLimit;
+
+    /// <summary>
+    /// How far away we're allowed to expand in distance.
+    /// </summary>
+    public float ExpansionRange;
 
     public BFSPathRequest(
         float expansionRange,
@@ -96,10 +96,10 @@ public sealed class BFSPathRequest : PathRequest
         int layer,
         int mask,
         CancellationToken cancelToken) : base(start, flags, layer, mask, cancelToken)
-        {
-            ExpansionRange = expansionRange;
-            ExpansionLimit = expansionLimit;
-        }
+    {
+        ExpansionRange = expansionRange;
+        ExpansionLimit = expansionLimit;
+    }
 }
 
 /// <summary>
@@ -107,8 +107,8 @@ public sealed class BFSPathRequest : PathRequest
 /// </summary>
 public sealed class PathResultEvent
 {
-    public PathResult Result;
     public readonly List<PathPoly> Path;
+    public PathResult Result;
 
     public PathResultEvent(PathResult result, List<PathPoly> path)
     {

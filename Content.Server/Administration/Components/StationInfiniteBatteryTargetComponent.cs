@@ -12,5 +12,4 @@ namespace Content.Server.Administration.Components;
 [RegisterComponent]
 public sealed partial class StationInfiniteBatteryTargetComponent : Component
 {
-
 }

@@ -13,6 +13,9 @@ namespace Content.Server._Goobstation.Wizard.Components;
 [RegisterComponent]
 public sealed partial class SpellsGrantComponent : Component
 {
+    [DataField]
+    public EntProtoId? AntagProfile;
+
     [ViewVariables(VVAccess.ReadWrite)]
     public bool Granted;
 
@@ -24,7 +27,4 @@ public sealed partial class SpellsGrantComponent : Component
 
     [DataField]
     public float TotalWeight;
-
-    [DataField]
-    public EntProtoId? AntagProfile;
 }

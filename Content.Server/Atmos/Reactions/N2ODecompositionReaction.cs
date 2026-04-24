@@ -15,12 +15,15 @@ using JetBrains.Annotations;
 namespace Content.Server.Atmos.Reactions;
 
 /// <summary>
-///     Decomposes Nitrous Oxide into Nitrogen and Oxygen.
+/// Decomposes Nitrous Oxide into Nitrogen and Oxygen.
 /// </summary>
 [UsedImplicitly]
 public sealed partial class N2ODecompositionReaction : IGasReactionEffect
 {
-    public ReactionResult React(GasMixture mixture, IGasMixtureHolder? holder, AtmosphereSystem atmosphereSystem, float heatScale)
+    public ReactionResult React(GasMixture mixture,
+        IGasMixtureHolder? holder,
+        AtmosphereSystem atmosphereSystem,
+        float heatScale)
     {
         var cacheN2O = mixture.GetMoles(Gas.NitrousOxide);
 

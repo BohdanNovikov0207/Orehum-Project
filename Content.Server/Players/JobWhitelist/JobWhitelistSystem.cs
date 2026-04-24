@@ -51,9 +51,7 @@ public sealed class JobWhitelistSystem : EntitySystem
             var jobId = ev.Jobs[i];
             if (_player.TryGetSessionById(ev.Player, out var player) &&
                 !_manager.IsAllowed(player, jobId))
-            {
                 ev.Jobs.RemoveSwap(i);
-            }
         }
     }
 

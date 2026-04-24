@@ -24,25 +24,25 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Linq;
 using Content.Server.Administration;
 using Content.Server.Body.Systems;
 using Content.Server.Cargo.Components;
-using Content.Shared.Chemistry.EntitySystems;
 using Content.Shared.Administration;
 using Content.Shared.Body.Components;
 using Content.Shared.Chemistry.Components.SolutionManager;
+using Content.Shared.Chemistry.EntitySystems;
 using Content.Shared.Chemistry.Reagent;
 using Content.Shared.Materials;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Mobs.Systems;
+using Content.Shared.Research.Prototypes;
 using Content.Shared.Stacks;
 using Robust.Shared.Console;
 using Robust.Shared.Containers;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
-using System.Linq;
-using Content.Shared.Research.Prototypes;
 
 namespace Content.Server.Cargo.Systems;
 
@@ -51,20 +51,21 @@ namespace Content.Server.Cargo.Systems;
 /// </summary>
 public sealed class PricingSystem : EntitySystem
 {
-    [Dependency] private readonly IConsoleHost _consoleHost = default!;
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly BodySystem _bodySystem = default!;
+    [Dependency] private readonly IConsoleHost _consoleHost = default!;
     [Dependency] private readonly MobStateSystem _mobStateSystem = default!;
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly SharedSolutionContainerSystem _solutionContainerSystem = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         SubscribeLocalEvent<MobPriceComponent, PriceCalculationEvent>(CalculateMobPrice);
 
         _consoleHost.RegisterCommand("appraisegrid",
             "Calculates the total value of the given grids.",
-            "appraisegrid <grid Ids>", AppraiseGridCommand);
+            "appraisegrid <grid Ids>",
+            AppraiseGridCommand);
     }
 
     [AdminCommand(AdminFlags.Debug)]
@@ -92,16 +93,18 @@ public sealed class PricingSystem : EntitySystem
 
             List<(double, EntityUid)> mostValuable = new();
 
-            var value = AppraiseGrid(gridId.Value, null, (uid, price) =>
-            {
-                mostValuable.Add((price, uid));
-                mostValuable.Sort((i1, i2) => i2.Item1.CompareTo(i1.Item1));
-                if (mostValuable.Count > 5)
-                    mostValuable.Pop();
-            });
+            var value = AppraiseGrid(gridId.Value,
+                null,
+                (uid, price) =>
+                {
+                    mostValuable.Add((price, uid));
+                    mostValuable.Sort((i1, i2) => i2.Item1.CompareTo(i1.Item1));
+                    if (mostValuable.Count > 5)
+                        mostValuable.Pop();
+                });
 
             shell.WriteLine($"Grid {gid} appraised to {value} spesos.");
-            shell.WriteLine($"The top most valuable items were:");
+            shell.WriteLine("The top most valuable items were:");
             foreach (var (price, ent) in mostValuable)
             {
                 shell.WriteLine($"- {ToPrettyString(ent)} @ {price} spesos");
@@ -117,7 +120,8 @@ public sealed class PricingSystem : EntitySystem
 
         if (!TryComp<MobStateComponent>(uid, out var state))
         {
-            Log.Error($"Tried to get the mob price of {ToPrettyString(uid)}, which has no {nameof(MobStateComponent)}.");
+            Log.Error(
+                $"Tried to get the mob price of {ToPrettyString(uid)}, which has no {nameof(MobStateComponent)}.");
             return;
         }
 
@@ -132,7 +136,8 @@ public sealed class PricingSystem : EntitySystem
             partPenalty = component.Price * (1 - partRatio) * component.MissingBodyPartPenalty;
         }
 
-        args.Price += (component.Price - partPenalty) * (_mobStateSystem.IsAlive(uid, state) ? 1.0 : component.DeathPenalty);
+        args.Price += (component.Price - partPenalty) *
+                      (_mobStateSystem.IsAlive(uid, state) ? 1.0 : component.DeathPenalty);
     }
 
     private double GetSolutionPrice(Entity<SolutionContainerManagerComponent> entity)
@@ -184,6 +189,7 @@ public sealed class PricingSystem : EntitySystem
         {
             price += _prototypeManager.Index<MaterialPrototype>(id).Price * quantity;
         }
+
         return price;
     }
 
@@ -192,9 +198,7 @@ public sealed class PricingSystem : EntitySystem
         var price = 0.0;
 
         if (recipe.Result is { } result)
-        {
             price += GetEstimatedPrice(_prototypeManager.Index(result));
-        }
 
         if (recipe.ResultReagents is { } resultReagents)
         {
@@ -212,7 +216,7 @@ public sealed class PricingSystem : EntitySystem
     /// </summary>
     public double GetEstimatedPrice(EntityPrototype prototype)
     {
-        var ev = new EstimatedPriceCalculationEvent()
+        var ev = new EstimatedPriceCalculationEvent
         {
             Prototype = prototype,
         };
@@ -230,9 +234,7 @@ public sealed class PricingSystem : EntitySystem
         price += GetStackPrice(prototype);
 
         if (oldPrice.Equals(price))
-        {
             price += GetStaticPrice(prototype);
-        }
 
         // TODO: Proper container support.
 
@@ -267,9 +269,7 @@ public sealed class PricingSystem : EntitySystem
         price += GetStackPrice(uid);
 
         if (oldPrice.Equals(price))
-        {
             price += GetStaticPrice(uid);
-        }
 
         if (includeContents && TryComp<ContainerManagerComponent>(uid, out var containers))
         {
@@ -307,15 +307,14 @@ public sealed class PricingSystem : EntitySystem
         double price = 0;
 
         if (prototype.Components.ContainsKey(Factory.GetComponentName<MaterialComponent>()) &&
-            prototype.Components.TryGetValue(Factory.GetComponentName<PhysicalCompositionComponent>(), out var composition))
+            prototype.Components.TryGetValue(Factory.GetComponentName<PhysicalCompositionComponent>(),
+                out var composition))
         {
             var compositionComp = (PhysicalCompositionComponent) composition.Component;
             var matPrice = GetMaterialPrice(compositionComp);
 
             if (prototype.Components.TryGetValue(Factory.GetComponentName<StackComponent>(), out var stackProto))
-            {
                 matPrice *= ((StackComponent) stackProto.Component).Count;
-            }
 
             price += matPrice;
         }
@@ -328,9 +327,7 @@ public sealed class PricingSystem : EntitySystem
         var price = 0.0;
 
         if (TryComp<SolutionContainerManagerComponent>(uid, out var solComp))
-        {
             price += GetSolutionPrice((uid, solComp));
-        }
 
         return price;
     }
@@ -339,7 +336,8 @@ public sealed class PricingSystem : EntitySystem
     {
         var price = 0.0;
 
-        if (prototype.Components.TryGetValue(Factory.GetComponentName<SolutionContainerManagerComponent>(), out var solManager))
+        if (prototype.Components.TryGetValue(Factory.GetComponentName<SolutionContainerManagerComponent>(),
+                out var solManager))
         {
             var solComp = (SolutionContainerManagerComponent) solManager.Component;
             price += GetSolutionPrice(solComp);
@@ -355,9 +353,7 @@ public sealed class PricingSystem : EntitySystem
         if (TryComp<StackPriceComponent>(uid, out var stackPrice) &&
             TryComp<StackComponent>(uid, out var stack) &&
             !HasComp<MaterialComponent>(uid)) // don't double count material prices
-        {
             price += stack.Count * stackPrice.Price;
-        }
 
         return price;
     }
@@ -366,7 +362,8 @@ public sealed class PricingSystem : EntitySystem
     {
         var price = 0.0;
 
-        if (prototype.Components.TryGetValue(Factory.GetComponentName<StackPriceComponent>(), out var stackpriceProto) &&
+        if (prototype.Components.TryGetValue(Factory.GetComponentName<StackPriceComponent>(),
+                out var stackpriceProto) &&
             prototype.Components.TryGetValue(Factory.GetComponentName<StackComponent>(), out var stackProto) &&
             !prototype.Components.ContainsKey(Factory.GetComponentName<MaterialComponent>()))
         {
@@ -383,9 +380,7 @@ public sealed class PricingSystem : EntitySystem
         var price = 0.0;
 
         if (TryComp<StaticPriceComponent>(uid, out var staticPrice))
-        {
             price += staticPrice.Price;
-        }
 
         return price;
     }
@@ -408,9 +403,14 @@ public sealed class PricingSystem : EntitySystem
     /// </summary>
     /// <param name="grid">The grid to appraise.</param>
     /// <param name="predicate">An optional predicate that controls whether or not the entity is counted toward the total.</param>
-    /// <param name="afterPredicate">An optional predicate to run after the price has been calculated. Useful for high scores or similar.</param>
+    /// <param name="afterPredicate">
+    /// An optional predicate to run after the price has been calculated. Useful for high scores
+    /// or similar.
+    /// </param>
     /// <returns>The total value of the grid.</returns>
-    public double AppraiseGrid(EntityUid grid, Func<EntityUid, bool>? predicate = null, Action<EntityUid, double>? afterPredicate = null)
+    public double AppraiseGrid(EntityUid grid,
+        Func<EntityUid, bool>? predicate = null,
+        Action<EntityUid, double>? afterPredicate = null)
     {
         var xform = Transform(grid);
         var price = 0.0;
@@ -436,14 +436,14 @@ public sealed class PricingSystem : EntitySystem
 public record struct PriceCalculationEvent()
 {
     /// <summary>
-    /// The total price of the entity.
-    /// </summary>
-    public double Price = 0;
-
-    /// <summary>
     /// Whether this event was already handled.
     /// </summary>
     public bool Handled = false;
+
+    /// <summary>
+    /// The total price of the entity.
+    /// </summary>
+    public double Price = 0;
 }
 
 /// <summary>
@@ -452,15 +452,15 @@ public record struct PriceCalculationEvent()
 [ByRefEvent]
 public record struct EstimatedPriceCalculationEvent()
 {
-    public required EntityPrototype Prototype;
+    /// <summary>
+    /// Whether this event was already handled.
+    /// </summary>
+    public bool Handled = false;
 
     /// <summary>
     /// The total price of the entity.
     /// </summary>
     public double Price = 0;
 
-    /// <summary>
-    /// Whether this event was already handled.
-    /// </summary>
-    public bool Handled = false;
+    public required EntityPrototype Prototype;
 }

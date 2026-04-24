@@ -1,5 +1,5 @@
-using Content.Shared.CartridgeLoader.Cartridges;
 using Content.Shared.CartridgeLoader;
+using Content.Shared.CartridgeLoader.Cartridges;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Interaction;
 using Content.Shared.Paper;
@@ -11,15 +11,15 @@ using Robust.Shared.Utility;
 namespace Content.Server.CartridgeLoader.Cartridges;
 
 /// <summary>
-///     Server-side class implementing the core UI logic of NanoTask
+/// Server-side class implementing the core UI logic of NanoTask
 /// </summary>
 public sealed class NanoTaskCartridgeSystem : SharedNanoTaskCartridgeSystem
 {
-    [Dependency] private readonly CartridgeLoaderSystem _cartridgeLoader = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly PaperSystem _paper = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly CartridgeLoaderSystem _cartridgeLoader = default!;
     [Dependency] private readonly SharedHandsSystem _hands = default!;
+    [Dependency] private readonly PaperSystem _paper = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -36,24 +36,18 @@ public sealed class NanoTaskCartridgeSystem : SharedNanoTaskCartridgeSystem
     private void OnCartridgeRemoved(Entity<NanoTaskCartridgeComponent> ent, ref CartridgeRemovedEvent args)
     {
         if (!_cartridgeLoader.HasProgram<NanoTaskCartridgeComponent>(args.Loader))
-        {
             RemComp<NanoTaskInteractionComponent>(args.Loader);
-        }
     }
 
     private void OnInteractUsing(Entity<NanoTaskInteractionComponent> ent, ref InteractUsingEvent args)
     {
         if (!_cartridgeLoader.TryGetProgram<NanoTaskCartridgeComponent>(ent.Owner, out var uid, out var program))
-        {
             return;
-        }
         if (!TryComp<NanoTaskPrintedComponent>(args.Used, out var printed))
-        {
             return;
-        }
         if (printed.Task is NanoTaskItem item)
         {
-            program.Tasks.Add(new(program.Counter++, printed.Task));
+            program.Tasks.Add(new NanoTaskItemAndId(program.Counter++, printed.Task));
             args.Handled = true;
             Del(args.Used);
             UpdateUiState(new Entity<NanoTaskCartridgeComponent>(uid.Value, program), ent.Owner);
@@ -63,10 +57,8 @@ public sealed class NanoTaskCartridgeSystem : SharedNanoTaskCartridgeSystem
     /// <summary>
     /// This gets called when the ui fragment needs to be updated for the first time after activating
     /// </summary>
-    private void OnUiReady(Entity<NanoTaskCartridgeComponent> ent, ref CartridgeUiReadyEvent args)
-    {
+    private void OnUiReady(Entity<NanoTaskCartridgeComponent> ent, ref CartridgeUiReadyEvent args) =>
         UpdateUiState(ent, args.Loader);
-    }
 
     private void SetupPrintedTask(EntityUid uid, NanoTaskItem item)
     {
@@ -81,7 +73,8 @@ public sealed class NanoTaskCartridgeSystem : SharedNanoTaskCartridgeSystem
         msg.PushNewline();
         msg.AddText(Loc.GetString("nano-task-printed-requester", ("requester", item.TaskIsFor)));
         msg.PushNewline();
-        msg.AddText(item.Priority switch {
+        msg.AddText(item.Priority switch
+        {
             NanoTaskPriority.High => Loc.GetString("nano-task-printed-high-priority"),
             NanoTaskPriority.Medium => Loc.GetString("nano-task-printed-medium-priority"),
             NanoTaskPriority.Low => Loc.GetString("nano-task-printed-low-priority"),
@@ -92,7 +85,8 @@ public sealed class NanoTaskCartridgeSystem : SharedNanoTaskCartridgeSystem
     }
 
     /// <summary>
-    /// The ui messages received here get wrapped by a CartridgeMessageEvent and are relayed from the <see cref="CartridgeLoaderSystem"/>
+    /// The ui messages received here get wrapped by a CartridgeMessageEvent and are relayed from the
+    /// <see cref="CartridgeLoaderSystem" />
     /// </summary>
     /// <remarks>
     /// The cartridge specific ui message event needs to inherit from the CartridgeMessageEvent
@@ -108,7 +102,7 @@ public sealed class NanoTaskCartridgeSystem : SharedNanoTaskCartridgeSystem
                 if (!task.Item.Validate())
                     return;
 
-                ent.Comp.Tasks.Add(new(ent.Comp.Counter++, task.Item));
+                ent.Comp.Tasks.Add(new NanoTaskItemAndId(ent.Comp.Counter++, task.Item));
                 break;
             case NanoTaskUpdateTask task:
             {

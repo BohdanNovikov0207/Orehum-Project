@@ -8,7 +8,6 @@
 using System.Threading.Tasks;
 using Content.Shared.Procedural;
 using Content.Shared.Procedural.PostGeneration;
-using Content.Shared.Storage;
 using Robust.Shared.Physics.Components;
 using Robust.Shared.Random;
 
@@ -17,9 +16,12 @@ namespace Content.Server.Procedural.DungeonJob;
 public sealed partial class DungeonJob
 {
     /// <summary>
-    /// <see cref="CorridorClutterDunGen"/>
+    ///     <see cref="CorridorClutterDunGen" />
     /// </summary>
-    private async Task PostGen(CorridorClutterDunGen gen, Dungeon dungeon, HashSet<Vector2i> reservedTiles, Random random)
+    private async Task PostGen(CorridorClutterDunGen gen,
+        Dungeon dungeon,
+        HashSet<Vector2i> reservedTiles,
+        Random random)
     {
         var physicsQuery = _entManager.GetEntityQuery<PhysicsComponent>();
         var count = (int) Math.Ceiling(dungeon.CorridorTiles.Count * gen.Chance);
@@ -37,9 +39,7 @@ public sealed partial class DungeonJob
                 if (!physicsQuery.TryGetComponent(ent, out var physics) ||
                     !physics.CanCollide ||
                     !physics.Hard)
-                {
                     continue;
-                }
 
                 blocked = true;
                 break;

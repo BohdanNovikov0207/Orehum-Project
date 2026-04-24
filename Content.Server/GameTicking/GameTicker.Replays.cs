@@ -48,7 +48,8 @@ public sealed partial class GameTicker
 
             if (_replays.IsRecording)
             {
-                _sawmillReplays.Warning("Already an active replay recording before the start of the round, not starting automatic recording.");
+                _sawmillReplays.Warning(
+                    "Already an active replay recording before the start of the round, not starting automatic recording.");
                 return;
             }
 
@@ -77,9 +78,7 @@ public sealed partial class GameTicker
             var recordState = new ReplayRecordState(moveToPath);
 
             if (!_replays.TryStartRecording(_resourceManager.UserData, recordPath.ToString(), state: recordState))
-            {
                 _sawmillReplays.Error("Can't start automatic replay recording!");
-            }
         }
         catch (Exception e)
         {
@@ -95,9 +94,7 @@ public sealed partial class GameTicker
         try
         {
             if (_replays.ActiveRecordingState is ReplayRecordState)
-            {
                 _replays.StopRecording();
-            }
         }
         catch (Exception e)
         {
@@ -135,7 +132,8 @@ public sealed partial class GameTicker
         // Write round info like map and round end summery into the replay_final.yml file. Useful for external parsers.
 
         metadata["map"] = new ValueDataNode(_gameMapManager.GetSelectedMap()?.MapName);
-        metadata["gamemode"] = new ValueDataNode(CurrentPreset != null ? Loc.GetString(CurrentPreset.ModeTitle) : string.Empty);
+        metadata["gamemode"] =
+            new ValueDataNode(CurrentPreset != null ? Loc.GetString(CurrentPreset.ModeTitle) : string.Empty);
         metadata["roundEndPlayers"] = _serialman.WriteValue(_replayRoundPlayerInfo);
         metadata["roundEndText"] = new ValueDataNode(_replayRoundText);
         metadata["server_id"] = new ValueDataNode(_cfg.GetCVar(CCVars.ServerId));

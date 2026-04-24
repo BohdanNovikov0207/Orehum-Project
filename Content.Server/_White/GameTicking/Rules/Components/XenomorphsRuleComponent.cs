@@ -1,4 +1,6 @@
-using Robust.Shared.Audio; // Goobstation - Play music on announcement
+using Robust.Shared.Audio;
+
+// Goobstation - Play music on announcement
 
 namespace Content.Server._White.GameTicking.Rules.Components;
 
@@ -6,7 +8,7 @@ namespace Content.Server._White.GameTicking.Rules.Components;
 public sealed partial class XenomorphsRuleComponent : Component
 {
     [ViewVariables]
-    public List<EntityUid> Xenomorphs = new ();
+    public List<EntityUid> Xenomorphs = new();
 
     #region Check
 
@@ -25,19 +27,19 @@ public sealed partial class XenomorphsRuleComponent : Component
 
     [DataField] // Goobstation - play music on announcement
     public SoundSpecifier XenomorphInfestationSound =
-            new SoundPathSpecifier("/Audio/_Goobstation/Music/Black_Swarm_Short.ogg")
-            {
-                Params = AudioParams.Default
-                    .WithVolume(-8f)
-            };
+        new SoundPathSpecifier("/Audio/_Goobstation/Music/Black_Swarm_Short.ogg")
+        {
+            Params = AudioParams.Default
+                .WithVolume(-8f),
+        };
 
     [DataField] // Goobstation - play music on announcement
     public SoundSpecifier XenomorphTakeoverSound =
-            new SoundPathSpecifier("/Audio/_Goobstation/Music/Colonial_Marines_The_Final_Battle.ogg")
-            {
-                Params = AudioParams.Default
-                    .WithVolume(-8f)
-            };
+        new SoundPathSpecifier("/Audio/_Goobstation/Music/Colonial_Marines_The_Final_Battle.ogg")
+        {
+            Params = AudioParams.Default
+                .WithVolume(-8f),
+        };
 
     [DataField]
     public Color AnnouncementColor = Color.Red;
@@ -86,7 +88,7 @@ public sealed partial class XenomorphsRuleComponent : Component
     public WinType WinType = WinType.Neutral;
 
     [DataField]
-    public List<WinCondition> WinConditions = new ();
+    public List<WinCondition> WinConditions = new();
 
     #endregion
 }
@@ -97,7 +99,7 @@ public enum WinType : byte
     XenoMinor,
     Neutral,
     CrewMinor,
-    CrewMajor
+    CrewMajor,
 }
 
 public enum WinCondition : byte
@@ -107,5 +109,5 @@ public enum WinCondition : byte
     XenoTakeoverStation,
     XenoInfiltratedOnCentCom,
     AllReproduceXenoDead,
-    AllCrewDead
+    AllCrewDead,
 }

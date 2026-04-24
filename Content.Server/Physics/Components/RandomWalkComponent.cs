@@ -18,20 +18,6 @@ namespace Content.Server.Physics.Components;
 public sealed partial class RandomWalkComponent : Component
 {
     /// <summary>
-    /// The minimum speed at which this entity will move.
-    /// </summary>
-    [DataField("minSpeed")]
-    [ViewVariables(VVAccess.ReadWrite)]
-    public float MinSpeed = 7.5f;
-
-    /// <summary>
-    /// The maximum speed at which this entity will move.
-    /// </summary>
-    [DataField("maxSpeed")]
-    [ViewVariables(VVAccess.ReadWrite)]
-    public float MaxSpeed = 10f;
-
-    /// <summary>
     /// The amount of speed carried over when the speed updates.
     /// </summary>
     [DataField("accumulatorRatio")]
@@ -41,13 +27,27 @@ public sealed partial class RandomWalkComponent : Component
     /// <summary>
     /// The vector by which the random walk direction is biased.
     /// </summary>
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
-    public Vector2 BiasVector = new Vector2(0f, 0f);
+    [DataField] [ViewVariables(VVAccess.ReadWrite)]
+    public Vector2 BiasVector = new(0f, 0f);
+
+    /// <summary>
+    /// The maximum speed at which this entity will move.
+    /// </summary>
+    [DataField("maxSpeed")]
+    [ViewVariables(VVAccess.ReadWrite)]
+    public float MaxSpeed = 10f;
+
+    /// <summary>
+    /// The minimum speed at which this entity will move.
+    /// </summary>
+    [DataField("minSpeed")]
+    [ViewVariables(VVAccess.ReadWrite)]
+    public float MinSpeed = 7.5f;
 
     /// <summary>
     /// Whether to set BiasVector to (0, 0) every random walk update.
     /// </summary>
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    [DataField] [ViewVariables(VVAccess.ReadWrite)]
     public bool ResetBiasOnWalk = true;
 
     /// <summary>

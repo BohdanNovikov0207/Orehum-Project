@@ -26,12 +26,12 @@ namespace Content.Server.Mech.Systems;
 /// </summary>
 public sealed class MechEquipmentSystem : EntitySystem
 {
-    [Dependency] private readonly MechSystem _mech = default!;
     [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
+    [Dependency] private readonly MechSystem _mech = default!;
     [Dependency] private readonly PopupSystem _popup = default!;
     [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         SubscribeLocalEvent<MechEquipmentComponent, AfterInteractEvent>(OnUsed);
@@ -61,7 +61,13 @@ public sealed class MechEquipmentSystem : EntitySystem
 
         _popup.PopupEntity(Loc.GetString("mech-equipment-begin-install", ("item", uid)), mech);
 
-        var doAfterEventArgs = new DoAfterArgs(EntityManager, args.User, component.InstallDuration, new InsertEquipmentEvent(), uid, target: mech, used: uid)
+        var doAfterEventArgs = new DoAfterArgs(EntityManager,
+            args.User,
+            component.InstallDuration,
+            new InsertEquipmentEvent(),
+            uid,
+            mech,
+            uid)
         {
             BreakOnMove = true,
         };

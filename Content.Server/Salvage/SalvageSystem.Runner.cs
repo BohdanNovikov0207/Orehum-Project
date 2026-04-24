@@ -18,11 +18,11 @@ using Content.Server.Shuttles.Components;
 using Content.Server.Shuttles.Events;
 using Content.Shared.Chat;
 using Content.Shared.Humanoid;
+using Content.Shared.Localizations;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Mobs.Systems;
 using Content.Shared.Salvage.Expeditions;
 using Content.Shared.Shuttles.Components;
-using Content.Shared.Localizations;
 using Content.Shared.Station.Components;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Player;
@@ -49,9 +49,7 @@ public sealed partial class SalvageSystem
     {
         if (!TryComp(ev.Uid, out TransformComponent? xform) ||
             !TryComp<SalvageExpeditionComponent>(xform.MapUid, out var salvage))
-        {
             return;
-        }
 
         // TODO: This is terrible but need bluespace harnesses or something.
         var query = EntityQueryEnumerator<HumanoidAppearanceComponent, MobStateComponent, TransformComponent>();
@@ -98,9 +96,7 @@ public sealed partial class SalvageSystem
     {
         if (!HasComp<SalvageExpeditionComponent>(ev.MapUid) ||
             !TryComp<FTLDestinationComponent>(ev.MapUid, out var dest))
-        {
             return;
-        }
 
         // Only one shuttle can occupy an expedition.
         dest.Enabled = false;
@@ -116,12 +112,16 @@ public sealed partial class SalvageSystem
         if (component.Stage != ExpeditionStage.Added)
             return;
 
-        Announce(args.MapUid, Loc.GetString("salvage-expedition-announcement-countdown-minutes", ("duration", (component.EndTime - _timing.CurTime).Minutes)));
+        Announce(args.MapUid,
+            Loc.GetString("salvage-expedition-announcement-countdown-minutes",
+                ("duration", (component.EndTime - _timing.CurTime).Minutes)));
 
-         var directionLocalization = ContentLocalizationManager.FormatDirection(component.DungeonLocation.GetDir()).ToLower();
+        var directionLocalization =
+            ContentLocalizationManager.FormatDirection(component.DungeonLocation.GetDir()).ToLower();
 
         if (component.DungeonLocation != Vector2.Zero)
-            Announce(args.MapUid, Loc.GetString("salvage-expedition-announcement-dungeon", ("direction", directionLocalization)));
+            Announce(args.MapUid,
+                Loc.GetString("salvage-expedition-announcement-dungeon", ("direction", directionLocalization)));
 
         component.Stage = ExpeditionStage.Running;
         Dirty(args.MapUid, component);
@@ -131,9 +131,7 @@ public sealed partial class SalvageSystem
     {
         if (!TryComp<SalvageExpeditionComponent>(ev.FromMapUid, out var expedition) ||
             !TryComp<SalvageExpeditionDataComponent>(expedition.Station, out var station))
-        {
             return;
-        }
 
         // Check if any shuttles remain.
         var query = EntityQueryEnumerator<ShuttleComponent, TransformComponent>();
@@ -164,7 +162,9 @@ public sealed partial class SalvageSystem
             {
                 comp.Stage = ExpeditionStage.FinalCountdown;
                 Dirty(uid, comp);
-                Announce(uid, Loc.GetString("salvage-expedition-announcement-countdown-seconds", ("duration", TimeSpan.FromSeconds(45).Seconds)));
+                Announce(uid,
+                    Loc.GetString("salvage-expedition-announcement-countdown-seconds",
+                        ("duration", TimeSpan.FromSeconds(45).Seconds)));
             }
             else if (comp.Stream == null && remaining < audioLength)
             {
@@ -173,13 +173,17 @@ public sealed partial class SalvageSystem
                 _audio.SetMapAudio(audio);
                 comp.Stage = ExpeditionStage.MusicCountdown;
                 Dirty(uid, comp);
-                Announce(uid, Loc.GetString("salvage-expedition-announcement-countdown-minutes", ("duration", audioLength.Minutes)));
+                Announce(uid,
+                    Loc.GetString("salvage-expedition-announcement-countdown-minutes",
+                        ("duration", audioLength.Minutes)));
             }
             else if (comp.Stage < ExpeditionStage.Countdown && remaining < TimeSpan.FromMinutes(4))
             {
                 comp.Stage = ExpeditionStage.Countdown;
                 Dirty(uid, comp);
-                Announce(uid, Loc.GetString("salvage-expedition-announcement-countdown-minutes", ("duration", TimeSpan.FromMinutes(5).Minutes)));
+                Announce(uid,
+                    Loc.GetString("salvage-expedition-announcement-countdown-minutes",
+                        ("duration", TimeSpan.FromMinutes(5).Minutes)));
             }
             // Auto-FTL out any shuttles
             else if (remaining < TimeSpan.FromSeconds(_shuttle.DefaultStartupTime) + TimeSpan.FromSeconds(0.5))
@@ -187,9 +191,7 @@ public sealed partial class SalvageSystem
                 var ftlTime = (float) remaining.TotalSeconds;
 
                 if (remaining < TimeSpan.FromSeconds(_shuttle.DefaultStartupTime))
-                {
                     ftlTime = MathF.Max(0, (float) remaining.TotalSeconds - 0.5f);
-                }
 
                 ftlTime = MathF.Min(ftlTime, _shuttle.DefaultStartupTime);
                 var shuttleQuery = AllEntityQuery<ShuttleComponent, TransformComponent>();
@@ -212,9 +214,7 @@ public sealed partial class SalvageSystem
             }
 
             if (remaining < TimeSpan.Zero)
-            {
                 QueueDel(uid);
-            }
         }
     }
 }

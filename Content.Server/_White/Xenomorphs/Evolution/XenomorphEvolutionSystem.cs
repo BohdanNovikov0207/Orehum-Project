@@ -22,17 +22,16 @@ namespace Content.Server._White.Xenomorphs.Evolution;
 
 public sealed class XenomorphEvolutionSystem : EntitySystem
 {
+    [Dependency] private readonly ActionsSystem _actions = default!;
     [Dependency] private readonly IAdminLogManager _adminLog = default!;
     [Dependency] private readonly IComponentFactory _componentFactory = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly IPrototypeManager _protoManager = default!;
-
-    [Dependency] private readonly ActionsSystem _actions = default!;
     [Dependency] private readonly ContainerSystem _container = default!;
     [Dependency] private readonly DoAfterSystem _doAfter = default!;
     [Dependency] private readonly JitteringSystem _jitter = default!;
     [Dependency] private readonly MindSystem _mind = default!;
     [Dependency] private readonly PopupSystem _popup = default!;
+    [Dependency] private readonly IPrototypeManager _protoManager = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly TransformSystem _transform = default!;
     [Dependency] private readonly UserInterfaceSystem _ui = default!;
 
@@ -50,10 +49,14 @@ public sealed class XenomorphEvolutionSystem : EntitySystem
     private void OnXenomorphEvolutionMapInit(EntityUid uid, XenomorphEvolutionComponent component, MapInitEvent args) =>
         _actions.AddAction(uid, ref component.EvolutionAction, component.EvolutionActionId);
 
-    private void OnXenomorphEvolutionShutdown(EntityUid uid, XenomorphEvolutionComponent component, ComponentShutdown args) =>
+    private void OnXenomorphEvolutionShutdown(EntityUid uid,
+        XenomorphEvolutionComponent component,
+        ComponentShutdown args) =>
         _actions.RemoveAction(uid, component.EvolutionAction);
 
-    private void OnEvolutionsAction(EntityUid uid, XenomorphEvolutionComponent component, ref EvolutionsActionEvent args)
+    private void OnEvolutionsAction(EntityUid uid,
+        XenomorphEvolutionComponent component,
+        ref EvolutionsActionEvent args)
     {
         if (args.Handled)
             return;
@@ -62,7 +65,10 @@ public sealed class XenomorphEvolutionSystem : EntitySystem
         {
             if (component.Points < component.Max)
             {
-                _popup.PopupEntity(Loc.GetString("xenomorphs-evolution-not-enough-points", ("seconds", (component.Max - component.Points) / component.PointsPerSecond)), uid, uid);
+                _popup.PopupEntity(Loc.GetString("xenomorphs-evolution-not-enough-points",
+                        ("seconds", (component.Max - component.Points) / component.PointsPerSecond)),
+                    uid,
+                    uid);
                 return;
             }
 
@@ -76,11 +82,16 @@ public sealed class XenomorphEvolutionSystem : EntitySystem
         args.Handled = true;
     }
 
-    private void OnEvolutionRecieved(EntityUid uid, XenomorphEvolutionComponent component, RadialSelectorSelectedMessage args)
+    private void OnEvolutionRecieved(EntityUid uid,
+        XenomorphEvolutionComponent component,
+        RadialSelectorSelectedMessage args)
     {
         if (component.Points < component.Max)
         {
-            _popup.PopupEntity(Loc.GetString("xenomorphs-evolution-not-enough-points", ("seconds", (component.Max - component.Points) / component.PointsPerSecond)), uid, uid);
+            _popup.PopupEntity(Loc.GetString("xenomorphs-evolution-not-enough-points",
+                    ("seconds", (component.Max - component.Points) / component.PointsPerSecond)),
+                uid,
+                uid);
             return;
         }
 
@@ -91,7 +102,9 @@ public sealed class XenomorphEvolutionSystem : EntitySystem
         _ui.CloseUi(uid, RadialSelectorUiKey.Key, actor);
     }
 
-    private void OnXenomorphEvolutionDoAfter(EntityUid uid, XenomorphEvolutionComponent component, ref XenomorphEvolutionDoAfterEvent args)
+    private void OnXenomorphEvolutionDoAfter(EntityUid uid,
+        XenomorphEvolutionComponent component,
+        ref XenomorphEvolutionDoAfterEvent args)
     {
         if (args.Handled || args.Cancelled || !_mind.TryGetMind(uid, out var mindUid, out var mind))
             return;
@@ -107,7 +120,7 @@ public sealed class XenomorphEvolutionSystem : EntitySystem
         var coordinates = _transform.GetMoverCoordinates(uid);
         var newXeno = Spawn(args.Choice, coordinates);
 
-        _mind.TransferTo(mindUid, newXeno, mind:mind);
+        _mind.TransferTo(mindUid, newXeno, mind: mind);
         _mind.UnVisit(mindUid, mind);
 
         var dropHandItemsEvent = new DropHandItemsEvent();
@@ -130,7 +143,8 @@ public sealed class XenomorphEvolutionSystem : EntitySystem
         var query = EntityQueryEnumerator<XenomorphEvolutionComponent>();
         while (query.MoveNext(out var uid, out var alienEvolution))
         {
-            if (alienEvolution.Points == alienEvolution.Max || time < alienEvolution.NextPointsAt || _container.IsEntityInContainer(uid))
+            if (alienEvolution.Points == alienEvolution.Max || time < alienEvolution.NextPointsAt ||
+                _container.IsEntityInContainer(uid))
                 continue;
 
             alienEvolution.NextPointsAt = time + TimeSpan.FromSeconds(1);
@@ -147,7 +161,8 @@ public sealed class XenomorphEvolutionSystem : EntitySystem
     {
         if (evolveTo == null
             || !_protoManager.TryIndex(evolveTo, out var xenomorphPrototype)
-            || !xenomorphPrototype.TryGetComponent<XenomorphComponent>(out var xenomorph, _componentFactory)) // Goobstation
+            || !xenomorphPrototype.TryGetComponent<XenomorphComponent>(out var xenomorph,
+                _componentFactory)) // Goobstation
             return false;
 
         var ev = new BeforeXenomorphEvolutionEvent(xenomorph.Caste, checkNeedCasteDeath);

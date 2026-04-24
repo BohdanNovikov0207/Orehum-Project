@@ -14,8 +14,8 @@ using Content.Shared.Speech.Muting;
 
 namespace Content.Server.Mobs;
 
-/// <see cref="DeathgaspComponent"/>
-public sealed class DeathgaspSystem: EntitySystem
+/// <see cref="DeathgaspComponent" />
+public sealed class DeathgaspSystem : EntitySystem
 {
     [Dependency] private readonly ChatSystem _chat = default!;
 
@@ -38,7 +38,7 @@ public sealed class DeathgaspSystem: EntitySystem
     }
 
     /// <summary>
-    ///     Causes an entity to perform their deathgasp emote, if they have one.
+    /// Causes an entity to perform their deathgasp emote, if they have one.
     /// </summary>
     public bool Deathgasp(EntityUid uid, DeathgaspComponent? component = null)
     {

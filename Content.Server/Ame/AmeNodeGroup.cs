@@ -16,7 +16,6 @@ using Content.Server.Ame.EntitySystems;
 using Content.Server.Chat.Managers;
 using Content.Server.Explosion.EntitySystems;
 using Content.Server.NodeContainer.NodeGroups;
-using Content.Server.NodeContainer.Nodes;
 using Content.Shared.NodeContainer;
 using Content.Shared.NodeContainer.NodeGroups;
 using Robust.Server.GameObjects;
@@ -32,6 +31,12 @@ namespace Content.Server.Ame;
 public sealed class AmeNodeGroup : BaseNodeGroup
 {
     [Dependency] private readonly IChatManager _chat = default!;
+
+    /// <summary>
+    /// The set of AME shielding units that currently count as cores for the AME.
+    /// </summary>
+    private readonly List<EntityUid> _cores = new();
+
     [Dependency] private readonly IEntityManager _entMan = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
 
@@ -44,11 +49,6 @@ public sealed class AmeNodeGroup : BaseNodeGroup
     private EntityUid? _masterController;
 
     public EntityUid? MasterController => _masterController;
-
-    /// <summary>
-    /// The set of AME shielding units that currently count as cores for the AME.
-    /// </summary>
-    private readonly List<EntityUid> _cores = new();
 
     public int CoreCount => _cores.Count;
 
@@ -90,9 +90,7 @@ public sealed class AmeNodeGroup : BaseNodeGroup
                 // Core visuals will be updated later.
             }
             else
-            {
                 ameShieldingSystem.SetCore(nodeOwner, false, shield);
-            }
         }
 
         // Separate to ensure core count is correctly updated.
@@ -180,17 +178,14 @@ public sealed class AmeNodeGroup : BaseNodeGroup
     /// <summary>
     /// Calculates the amount of power the AME can produce with the given settings
     /// </summary>
-    public float CalculatePower(int fuel, int cores)
-    {
+    public float CalculatePower(int fuel, int cores) =>
         // Balanced around a single core AME with injection level 2 producing 120KW.
         // Two core with four injection is 150kW. Two core with two injection is 90kW.
-
         // Increasing core count creates diminishing returns, increasing injection amount increases 
         // Unlike the previous solution, increasing fuel and cores always leads to an increase in power, even if by very small amounts.
         // Increasing core count without increasing fuel always leads to reduced power as well.
         // At 18+ cores and 2 inject, the power produced is less than 0, the Max ensures the AME can never produce "negative" power.
-        return MathF.Max(200000f * MathF.Log10(2 * fuel * MathF.Pow(cores, (float)-0.5)), 0);
-    }
+        MathF.Max(200000f * MathF.Log10(2 * fuel * MathF.Pow(cores, (float) -0.5)), 0);
 
     public int GetTotalStability()
     {
@@ -213,13 +208,13 @@ public sealed class AmeNodeGroup : BaseNodeGroup
     public void ExplodeCores()
     {
         if (_cores.Count < 1
-        || !_entMan.TryGetComponent<AmeControllerComponent>(MasterController, out var controller))
+            || !_entMan.TryGetComponent<AmeControllerComponent>(MasterController, out var controller))
             return;
 
         /*
-            * todo: add an exact to the shielding and make this find the core closest to the controller
-            * so they chain explode, after helpers have been added to make it not cancer
-        */
+         * todo: add an exact to the shielding and make this find the core closest to the controller
+         * so they chain explode, after helpers have been added to make it not cancer
+         */
         var radius = Math.Min(2 * CoreCount * controller.InjectionAmount, 8f);
         _entMan.System<ExplosionSystem>().TriggerExplosive(MasterController.Value, radius: radius, delete: false);
     }

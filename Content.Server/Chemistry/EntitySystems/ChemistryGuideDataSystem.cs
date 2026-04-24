@@ -16,12 +16,11 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Server.Chemistry.EntitySystems;
 
-
 public sealed class ChemistryGuideDataSystem : SharedChemistryGuideDataSystem
 {
     [Dependency] private readonly IPlayerManager _player = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
@@ -74,8 +73,5 @@ public sealed class ChemistryGuideDataSystem : SharedChemistryGuideDataSystem
         RaiseNetworkEvent(ev);
     }
 
-    public override void ReloadAllReagentPrototypes()
-    {
-        InitializeServerRegistry();
-    }
+    public override void ReloadAllReagentPrototypes() => InitializeServerRegistry();
 }

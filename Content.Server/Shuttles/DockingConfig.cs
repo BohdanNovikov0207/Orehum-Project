@@ -14,14 +14,9 @@ namespace Content.Server.Shuttles;
 public sealed class DockingConfig
 {
     /// <summary>
-    /// The pairs of docks that can connect.
+    /// Local angle of the docking grid relative to the target grid.
     /// </summary>
-    public List<(EntityUid DockAUid, EntityUid DockBUid, DockingComponent DockA, DockingComponent DockB)> Docks = new();
-
-    /// <summary>
-    /// Target grid for docking.
-    /// </summary>
-    public EntityUid TargetGrid;
+    public Angle Angle;
 
     /// <summary>
     /// This is used for debugging.
@@ -31,7 +26,12 @@ public sealed class DockingConfig
     public EntityCoordinates Coordinates;
 
     /// <summary>
-    /// Local angle of the docking grid relative to the target grid.
+    /// The pairs of docks that can connect.
     /// </summary>
-    public Angle Angle;
+    public List<(EntityUid DockAUid, EntityUid DockBUid, DockingComponent DockA, DockingComponent DockB)> Docks = new();
+
+    /// <summary>
+    /// Target grid for docking.
+    /// </summary>
+    public EntityUid TargetGrid;
 }

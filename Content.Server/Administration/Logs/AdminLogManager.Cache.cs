@@ -89,12 +89,6 @@ public sealed partial class AdminLogManager
     private const int MaxRoundsCached = 3;
     private const int LogListInitialSize = 30_000;
 
-    private readonly int _logTypes = Enum.GetValues<LogType>().Length;
-
-    // TODO ADMIN LOGS make this thread safe or remove thread safety from the main partial class
-    private readonly Dictionary<int, List<SharedAdminLog>> _roundsLogCache = new(MaxRoundsCached);
-    private readonly Queue<int> _roundsLogCacheQueue = new();
-
     private static readonly Gauge CacheRoundCount = Metrics.CreateGauge(
         "admin_logs_cache_round_count",
         "How many rounds are in cache.");
@@ -102,6 +96,12 @@ public sealed partial class AdminLogManager
     private static readonly Gauge CacheLogCount = Metrics.CreateGauge(
         "admin_logs_cache_log_count",
         "How many logs are in cache.");
+
+    private readonly int _logTypes = Enum.GetValues<LogType>().Length;
+
+    // TODO ADMIN LOGS make this thread safe or remove thread safety from the main partial class
+    private readonly Dictionary<int, List<SharedAdminLog>> _roundsLogCache = new(MaxRoundsCached);
+    private readonly Queue<int> _roundsLogCacheQueue = new();
 
     // TODO ADMIN LOGS cache previous {MaxRoundsCached} rounds on startup
     public void CacheNewRound()
@@ -148,10 +148,8 @@ public sealed partial class AdminLogManager
         CacheLogCount.Set(cache.Count);
     }
 
-    private bool TryGetCache(int roundId, [NotNullWhen(true)] out List<SharedAdminLog>? cache)
-    {
-        return _roundsLogCache.TryGetValue(roundId, out cache);
-    }
+    private bool TryGetCache(int roundId, [NotNullWhen(true)] out List<SharedAdminLog>? cache) =>
+        _roundsLogCache.TryGetValue(roundId, out cache);
 
     private bool TrySearchCache(LogFilter? filter, [NotNullWhen(true)] out List<SharedAdminLog>? results)
     {
@@ -169,33 +167,23 @@ public sealed partial class AdminLogManager
             DateOrder.Ascending => query,
             DateOrder.Descending => query.Reverse(),
             _ => throw new ArgumentOutOfRangeException(nameof(filter),
-                $"Unknown {nameof(DateOrder)} value {filter.DateOrder}")
+                $"Unknown {nameof(DateOrder)} value {filter.DateOrder}"),
         };
 
         if (filter.Search != null)
-        {
             query = query.Where(log => log.Message.Contains(filter.Search, StringComparison.OrdinalIgnoreCase));
-        }
 
         if (filter.Types != null && filter.Types.Count != _logTypes)
-        {
             query = query.Where(log => filter.Types.Contains(log.Type));
-        }
 
         if (filter.Impacts != null)
-        {
             query = query.Where(log => filter.Impacts.Contains(log.Impact));
-        }
 
         if (filter.Before != null)
-        {
             query = query.Where(log => log.Date < filter.Before);
-        }
 
         if (filter.After != null)
-        {
             query = query.Where(log => log.Date > filter.After);
-        }
 
         if (filter.IncludePlayers)
         {
@@ -214,19 +202,13 @@ public sealed partial class AdminLogManager
             }
         }
         else
-        {
             query = query.Where(log => log.Players.Length == 0);
-        }
 
         if (filter.LogsSent != 0)
-        {
             query = query.Skip(filter.LogsSent);
-        }
 
         if (filter.Limit != null)
-        {
             query = query.Take(filter.Limit.Value);
-        }
 
         // TODO ADMIN LOGS array pool
         results = query.ToList();

@@ -1,5 +1,5 @@
-using Content.Server.Radio.EntitySystems;
 using Content.Server.Pinpointer;
+using Content.Server.Radio.EntitySystems;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Trigger;
 using Content.Shared.Trigger.Components.Effects;
@@ -10,9 +10,9 @@ namespace Content.Server.Trigger.Systems;
 
 public sealed class RattleOnTriggerSystem : EntitySystem
 {
+    [Dependency] private readonly NavMapSystem _navMap = default!;
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly RadioSystem _radio = default!;
-    [Dependency] private readonly NavMapSystem _navMap = default!;
 
     public override void Initialize()
     {

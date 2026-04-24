@@ -11,14 +11,18 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Server.GameTicking.Rules;
-using Content.Server.Mindshield; // GoobStation
+using Content.Server.Mindshield;
+
+// GoobStation
 
 namespace Content.Server.Revolutionary.Components;
 
 /// <summary>
-/// Given to heads at round start. Used for assigning traitors to kill heads and for revs to check if the heads died or not.
+/// Given to heads at round start. Used for assigning traitors to kill heads and for revs to check if the heads died or
+/// not.
 /// </summary>
-[RegisterComponent, Access(typeof(RevolutionaryRuleSystem), typeof(MindShieldSystem))] // GoobStation - typeof MindshieldSystem
+[RegisterComponent]
+[Access(typeof(RevolutionaryRuleSystem), typeof(MindShieldSystem))] // GoobStation - typeof MindshieldSystem
 public sealed partial class CommandStaffComponent : Component
 {
     // Goobstation

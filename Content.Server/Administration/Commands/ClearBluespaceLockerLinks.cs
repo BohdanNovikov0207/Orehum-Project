@@ -16,7 +16,10 @@ public sealed class ClearBluespaceLockerLinks : IConsoleCommand
     [Dependency] private readonly IEntityManager _entityManager = default!;
 
     public string Command => "clearbluespacelockerlinks";
-    public string Description => "Removes the bluespace links of the given uid. Does not remove links this uid is the target of.";
+
+    public string Description =>
+        "Removes the bluespace links of the given uid. Does not remove links this uid is the target of.";
+
     public string Help => "Usage: clearbluespacelockerlinks <storage uid>";
 
     public void Execute(IConsoleShell shell, string argStr, string[] args)
@@ -27,7 +30,8 @@ public sealed class ClearBluespaceLockerLinks : IConsoleCommand
             return;
         }
 
-        if (!NetEntity.TryParse(args[0], out var entityUidNet) || !_entityManager.TryGetEntity(entityUidNet, out var entityUid))
+        if (!NetEntity.TryParse(args[0], out var entityUidNet) ||
+            !_entityManager.TryGetEntity(entityUidNet, out var entityUid))
         {
             shell.WriteError(Loc.GetString("shell-entity-uid-must-be-number"));
             return;

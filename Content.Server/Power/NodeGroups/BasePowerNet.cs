@@ -4,7 +4,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-using Content.Server.NodeContainer.Nodes;
 using Content.Server.Power.Components;
 using Content.Server.Power.EntitySystems;
 using Content.Server.Power.Pow3r;
@@ -23,12 +22,6 @@ public abstract class BasePowerNet<TNetType> : BaseNetConnectorNodeGroup<TNetTyp
     [ViewVariables]
     public PowerState.Network NetworkNode { get; } = new();
 
-    public override void Initialize(Node sourceNode, IEntityManager entMan)
-    {
-        base.Initialize(sourceNode, entMan);
-        PowerNetSystem = entMan.EntitySysManager.GetEntitySystem<PowerNetSystem>();
-    }
-
     public bool IsConnectedNetwork => NodeCount > 1;
 
     public void AddConsumer(PowerConsumerComponent consumer)
@@ -42,7 +35,8 @@ public abstract class BasePowerNet<TNetType> : BaseNetConnectorNodeGroup<TNetTyp
     public void RemoveConsumer(PowerConsumerComponent consumer)
     {
         // Linked network can be default if it was re-connected twice in one tick.
-        DebugTools.Assert(consumer.NetworkLoad.LinkedNetwork == default || consumer.NetworkLoad.LinkedNetwork == NetworkNode.Id);
+        DebugTools.Assert(consumer.NetworkLoad.LinkedNetwork == default ||
+                          consumer.NetworkLoad.LinkedNetwork == NetworkNode.Id);
         consumer.NetworkLoad.LinkedNetwork = default;
         Consumers.Remove(consumer);
         QueueNetworkReconnect();
@@ -59,10 +53,17 @@ public abstract class BasePowerNet<TNetType> : BaseNetConnectorNodeGroup<TNetTyp
     public void RemoveSupplier(PowerSupplierComponent supplier)
     {
         // Linked network can be default if it was re-connected twice in one tick.
-        DebugTools.Assert(supplier.NetworkSupply.LinkedNetwork == default || supplier.NetworkSupply.LinkedNetwork == NetworkNode.Id);
+        DebugTools.Assert(supplier.NetworkSupply.LinkedNetwork == default ||
+                          supplier.NetworkSupply.LinkedNetwork == NetworkNode.Id);
         supplier.NetworkSupply.LinkedNetwork = default;
         Suppliers.Remove(supplier);
         QueueNetworkReconnect();
+    }
+
+    public override void Initialize(Node sourceNode, IEntityManager entMan)
+    {
+        base.Initialize(sourceNode, entMan);
+        PowerNetSystem = entMan.EntitySysManager.GetEntitySystem<PowerNetSystem>();
     }
 
     public abstract void QueueNetworkReconnect();

@@ -7,43 +7,43 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Server.Chemistry.Containers.EntitySystems;
+using Content.Server.Medical;
+using Content.Server.Popups;
 using Content.Shared.Actions;
 using Content.Shared.Actions.Events;
 using Content.Shared.Audio;
-using Content.Shared.StatusEffect;
-using Content.Shared.Throwing;
-using Content.Shared.Item;
-using Content.Shared.Inventory;
+using Content.Shared.Body.Components;
+using Content.Shared.Charges.Systems;
 using Content.Shared.Hands;
 using Content.Shared.IdentityManagement;
+using Content.Shared.Inventory;
+using Content.Shared.Item;
 using Content.Shared.Nutrition.Components;
 using Content.Shared.Nutrition.EntitySystems;
-using Content.Server.Body.Components;
-using Content.Server.Chemistry.Containers.EntitySystems;
-using Content.Server.Medical;
-using Content.Server.Nutrition.Components;
-using Content.Server.Popups;
-using Content.Shared.Body.Components;
+using Content.Shared.Popups;
+using Content.Shared.StatusEffect;
+using Content.Shared.Throwing;
 using Robust.Shared.Audio.Systems;
-using Robust.Shared.Random;
 using Robust.Shared.Prototypes;
-using Content.Shared.Charges.Systems;
+using Robust.Shared.Random;
 
 namespace Content.Server.Abilities.Felinid;
 
-public sealed partial class FelinidSystem : EntitySystem
+public sealed class FelinidSystem : EntitySystem
 {
-
     [Dependency] private readonly SharedActionsSystem _actionsSystem = default!;
-    [Dependency] private readonly HungerSystem _hungerSystem = default!;
-    [Dependency] private readonly VomitSystem _vomitSystem = default!;
-    [Dependency] private readonly SolutionContainerSystem _solutionSystem = default!;
-    [Dependency] private readonly IRobustRandom _robustRandom = default!;
-    [Dependency] private readonly PopupSystem _popupSystem = default!;
-    [Dependency] private readonly InventorySystem _inventorySystem = default!;
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly HungerSystem _hungerSystem = default!;
+    [Dependency] private readonly InventorySystem _inventorySystem = default!;
+    [Dependency] private readonly PopupSystem _popupSystem = default!;
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    [Dependency] private readonly IRobustRandom _robustRandom = default!;
     [Dependency] private readonly SharedChargesSystem _sharedChargesSystem = default!;
+    [Dependency] private readonly SolutionContainerSystem _solutionSystem = default!;
+    [Dependency] private readonly VomitSystem _vomitSystem = default!;
+
+    private readonly Queue<EntityUid> RemQueue = new();
 
     public override void Initialize()
     {
@@ -57,8 +57,6 @@ public sealed partial class FelinidSystem : EntitySystem
         SubscribeLocalEvent<HairballComponent, GettingPickedUpAttemptEvent>(OnHairballPickupAttempt);
     }
 
-    private Queue<EntityUid> RemQueue = new();
-
     public override void Update(float frameTime)
     {
         base.Update(frameTime);
@@ -66,6 +64,7 @@ public sealed partial class FelinidSystem : EntitySystem
         {
             RemComp<CoughingUpHairballComponent>(cat);
         }
+
         RemQueue.Clear();
 
         foreach (var (hairballComp, catComp) in EntityQuery<CoughingUpHairballComponent, FelinidComponent>())
@@ -113,8 +112,8 @@ public sealed partial class FelinidSystem : EntitySystem
     private void OnHairball(EntityUid uid, FelinidComponent component, HairballActionEvent args)
     {
         if (_inventorySystem.TryGetSlotEntity(uid, "mask", out var maskUid) &&
-        EntityManager.TryGetComponent<IngestionBlockerComponent>(maskUid, out var blocker) &&
-        blocker.Enabled)
+            EntityManager.TryGetComponent<IngestionBlockerComponent>(maskUid, out var blocker) &&
+            blocker.Enabled)
         {
             _popupSystem.PopupEntity(Loc.GetString("hairball-mask", ("mask", maskUid)), uid, uid);
             return;
@@ -135,25 +134,33 @@ public sealed partial class FelinidSystem : EntitySystem
         if (!TryComp<HungerComponent>(uid, out var hunger))
             return;
 
-        if (hunger.CurrentThreshold == Shared.Nutrition.Components.HungerThreshold.Overfed)
+        if (hunger.CurrentThreshold == HungerThreshold.Overfed)
         {
-            _popupSystem.PopupEntity(Loc.GetString("ingestion-other-cannot-ingest-any-more"), uid, uid, Shared.Popups.PopupType.SmallCaution);
+            _popupSystem.PopupEntity(Loc.GetString("ingestion-other-cannot-ingest-any-more"),
+                uid,
+                uid,
+                PopupType.SmallCaution);
             return;
         }
 
         if (_inventorySystem.TryGetSlotEntity(uid, "mask", out var maskUid) &&
-        EntityManager.TryGetComponent<IngestionBlockerComponent>(maskUid, out var blocker) &&
-        blocker.Enabled)
+            EntityManager.TryGetComponent<IngestionBlockerComponent>(maskUid, out var blocker) &&
+            blocker.Enabled)
         {
-            _popupSystem.PopupEntity(Loc.GetString("hairball-mask", ("mask", maskUid)), uid, uid, Shared.Popups.PopupType.SmallCaution);
+            _popupSystem.PopupEntity(Loc.GetString("hairball-mask", ("mask", maskUid)),
+                uid,
+                uid,
+                PopupType.SmallCaution);
             return;
         }
 
         if (component.HairballAction != null)
         {
-            _sharedChargesSystem.SetCharges(component.HairballAction.Value, 1); // You get the charge back and that's it. Tough.
+            _sharedChargesSystem.SetCharges(component.HairballAction.Value,
+                1); // You get the charge back and that's it. Tough.
             _actionsSystem.SetEnabled(component.HairballAction, true);
         }
+
         Del(component.EatActionTarget.Value);
         component.EatActionTarget = null;
 
@@ -175,11 +182,10 @@ public sealed partial class FelinidSystem : EntitySystem
             var temp = _solutionSystem.SplitSolution(bloodstream.ChemicalSolution.Value, 20);
 
             if (_solutionSystem.TryGetSolution(hairball, hairballComp.SolutionName, out var hairballSolution))
-            {
                 _solutionSystem.TryAddSolution(hairballSolution.Value, temp);
-            }
         }
     }
+
     private void OnHairballHit(EntityUid uid, HairballComponent component, ThrowDoHitEvent args)
     {
         if (HasComp<FelinidComponent>(args.Target) || !HasComp<StatusEffectsComponent>(args.Target))

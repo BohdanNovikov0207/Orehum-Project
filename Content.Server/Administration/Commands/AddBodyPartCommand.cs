@@ -33,7 +33,9 @@ public sealed class AddBodyPartCommand : LocalizedEntityCommands
 
     public override string Command => "addbodypart";
     public override string Description => "Adds a given entity to a containing body.";
-    public override string Help => "Usage: addbodypart <entity uid> <body uid> <part slot> <part type> <part symmetry>"; // Shitmed Change: part symmetry
+
+    public override string Help =>
+        "Usage: addbodypart <entity uid> <body uid> <part slot> <part type> <part symmetry>"; // Shitmed Change: part symmetry
 
     public override void Execute(IConsoleShell shell, string argStr, string[] args)
     {
@@ -43,13 +45,15 @@ public sealed class AddBodyPartCommand : LocalizedEntityCommands
             return;
         }
 
-        if (!NetEntity.TryParse(args[0], out var childNetId) || !EntityManager.TryGetEntity(childNetId, out var childId))
+        if (!NetEntity.TryParse(args[0], out var childNetId) ||
+            !EntityManager.TryGetEntity(childNetId, out var childId))
         {
             shell.WriteError(Loc.GetString("shell-invalid-entity-uid", ("uid", args[0])));
             return;
         }
 
-        if (!NetEntity.TryParse(args[1], out var parentNetId) || !EntityManager.TryGetEntity(parentNetId, out var parentId))
+        if (!NetEntity.TryParse(args[1], out var parentNetId) ||
+            !EntityManager.TryGetEntity(parentNetId, out var parentId))
         {
             shell.WriteError(Loc.GetString("shell-invalid-entity-uid", ("uid", args[1])));
             return;
@@ -58,9 +62,7 @@ public sealed class AddBodyPartCommand : LocalizedEntityCommands
         if (Enum.TryParse<BodyPartType>(args[3], out var partType) &&
             Enum.TryParse<BodyPartSymmetry>(args[4], out var symmetry) && //Shitmed Change: part symmetry
             _bodySystem.TryCreatePartSlotAndAttach(parentId.Value, args[2], childId.Value, partType, symmetry))
-        {
             shell.WriteLine($"Added {childId} to {parentId}.");
-        }
         else
             shell.WriteError($"Could not add {childId} to {parentId}.");
     }

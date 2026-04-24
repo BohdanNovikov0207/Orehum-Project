@@ -26,22 +26,22 @@ namespace Content.Server.Salvage.JobBoard;
 
 public sealed class SalvageJobBoardSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-    [Dependency] private readonly AudioSystem _audio = default!;
-    [Dependency] private readonly CargoSystem _cargo = default!;
-    [Dependency] private readonly LabelSystem _label = default!;
-    [Dependency] private readonly PaperSystem _paper = default!;
-    [Dependency] private readonly RadioSystem _radio = default!;
-    [Dependency] private readonly StationSystem _station = default!;
-    [Dependency] private readonly UserInterfaceSystem _ui = default!;
-
     /// <summary>
     /// Radio channel that unlock messages are broadcast on.
     /// </summary>
     private static readonly ProtoId<RadioChannelPrototype> UnlockChannel = "Supply";
 
-    /// <inheritdoc/>
+    [Dependency] private readonly AudioSystem _audio = default!;
+    [Dependency] private readonly CargoSystem _cargo = default!;
+    [Dependency] private readonly LabelSystem _label = default!;
+    [Dependency] private readonly PaperSystem _paper = default!;
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    [Dependency] private readonly RadioSystem _radio = default!;
+    [Dependency] private readonly StationSystem _station = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly UserInterfaceSystem _ui = default!;
+
+    /// <inheritdoc />
     public override void Initialize()
     {
         SubscribeLocalEvent<EntitySoldEvent>(OnSold);
@@ -116,12 +116,12 @@ public sealed class SalvageJobBoardSystem : EntitySystem
             // don't worry abooouuuuut it (it'll be O K !)
             var high = i != ent.Comp.RankThresholds.Count - 1
                 ? ent.Comp.RankThresholds.Keys.ElementAt(i + 1)
-                :  _prototypeManager.EnumeratePrototypes<CargoBountyPrototype>()
-                .Count(p => ent.Comp.RankThresholds.Values
-                    .Select(r => r.BountyGroup)
-                    .Contains(p.Group));
+                : _prototypeManager.EnumeratePrototypes<CargoBountyPrototype>()
+                    .Count(p => ent.Comp.RankThresholds.Values
+                        .Select(r => r.BountyGroup)
+                        .Contains(p.Group));
 
-            return (completedCount - low) / (float)(high - low);
+            return (completedCount - low) / (float) (high - low);
         }
 
         return 1f;
@@ -130,10 +130,7 @@ public sealed class SalvageJobBoardSystem : EntitySystem
     /// <summary>
     /// Checks if the current station is the max rank
     /// </summary>
-    public bool IsMaxRank(Entity<SalvageJobsDataComponent> ent)
-    {
-        return GetAvailableJobs(ent).Count == 0;
-    }
+    public bool IsMaxRank(Entity<SalvageJobsDataComponent> ent) => GetAvailableJobs(ent).Count == 0;
 
     /// <summary>
     /// Gets the current rank of the station
@@ -151,12 +148,12 @@ public sealed class SalvageJobBoardSystem : EntitySystem
 
             return rank;
         }
+
         // base case
         return ent.Comp.RankThresholds[0];
     }
 
     /// <summary>
-    ///
     /// </summary>
     /// <param name="ent"></param>
     /// <param name="job"></param>
@@ -180,7 +177,7 @@ public sealed class SalvageJobBoardSystem : EntitySystem
             _cargo.UpdateBankAccount(
                 (ent.Owner, stationBankAccount),
                 jobProto.Reward,
-                _cargo.CreateAccountDistribution((ent,  stationBankAccount)));
+                _cargo.CreateAccountDistribution((ent, stationBankAccount)));
         }
 
         // We ranked up!
@@ -190,16 +187,20 @@ public sealed class SalvageJobBoardSystem : EntitySystem
             var computerQuery = EntityQueryEnumerator<SalvageJobBoardConsoleComponent>();
             while (computerQuery.MoveNext(out var uid, out _))
             {
-                var message = Loc.GetString("job-board-radio-announce", ("rank", FormattedMessage.RemoveMarkupPermissive(Loc.GetString(newRank.Title))));
-                _radio.SendRadioMessage(uid, message, UnlockChannel, uid, null, false); // Einstein Engines - Language (Made it null, might need change later)
+                var message = Loc.GetString("job-board-radio-announce",
+                    ("rank", FormattedMessage.RemoveMarkupPermissive(Loc.GetString(newRank.Title))));
+                _radio.SendRadioMessage(uid,
+                    message,
+                    UnlockChannel,
+                    uid,
+                    null,
+                    false); // Einstein Engines - Language (Made it null, might need change later)
                 break;
             }
 
             if (newRank.UnlockedMarket is { } market &&
                 TryComp<StationCargoOrderDatabaseComponent>(ent, out var stationCargoOrder))
-            {
                 stationCargoOrder.Markets.Add(market);
-            }
         }
 
         var enumerator = EntityQueryEnumerator<SalvageJobBoardConsoleComponent>();
@@ -214,7 +215,9 @@ public sealed class SalvageJobBoardSystem : EntitySystem
     /// <summary>
     /// Checks if a given entity fulfills a bounty for the station.
     /// </summary>
-    public bool FulfillsSalvageJob(EntityUid uid, Entity<SalvageJobsDataComponent>? station, [NotNullWhen(true)] out ProtoId<CargoBountyPrototype>? job)
+    public bool FulfillsSalvageJob(EntityUid uid,
+        Entity<SalvageJobsDataComponent>? station,
+        [NotNullWhen(true)] out ProtoId<CargoBountyPrototype>? job)
     {
         job = null;
 
@@ -283,7 +286,9 @@ public sealed class SalvageJobBoardSystem : EntitySystem
                 ("amount", entry.Amount),
                 ("item", Loc.GetString(entry.Name))));
         }
-        _paper.SetContent(label, Loc.GetString("job-board-label-text", ("target", string.Join(',', target)), ("reward", job.Reward)));
+
+        _paper.SetContent(label,
+            Loc.GetString("job-board-label-text", ("target", string.Join(',', target)), ("reward", job.Reward)));
 
         ent.Comp.NextPrintTime = _timing.CurTime + ent.Comp.PrintDelay;
     }

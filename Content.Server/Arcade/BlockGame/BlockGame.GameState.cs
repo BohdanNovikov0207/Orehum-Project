@@ -3,64 +3,18 @@
 //
 // SPDX-License-Identifier: MIT
 
+using System.Linq;
 using Content.Shared.Arcade;
 using Robust.Shared.Random;
-using System.Linq;
 
 namespace Content.Server.Arcade.BlockGame;
 
 public sealed partial class BlockGame
 {
-    // note: field is 10(0 -> 9) wide and 20(0 -> 19) high
-
     /// <summary>
-    /// Whether the given position is above the bottom of the playfield.
+    /// The base amount of time between piece steps while softdropping.
     /// </summary>
-    private bool LowerBoundCheck(Vector2i position)
-    {
-        return position.Y < 20;
-    }
-
-    /// <summary>
-    /// Whether the given position is horizontally positioned within the playfield.
-    /// </summary>
-    private bool BorderCheck(Vector2i position)
-    {
-        return position.X >= 0 && position.X < 10;
-    }
-
-    /// <summary>
-    /// Whether the given position is currently occupied by a piece.
-    /// Yes this is on O(n) collision check, it works well enough.
-    /// </summary>
-    private bool ClearCheck(Vector2i position)
-    {
-        return _field.All(block => !position.Equals(block.Position));
-    }
-
-    /// <summary>
-    /// Whether a block can be dropped into the given position.
-    /// </summary>
-    private bool DropCheck(Vector2i position)
-    {
-        return LowerBoundCheck(position) && ClearCheck(position);
-    }
-
-    /// <summary>
-    /// Whether a block can be moved horizontally into the given position.
-    /// </summary>
-    private bool MoveCheck(Vector2i position)
-    {
-        return BorderCheck(position) && ClearCheck(position);
-    }
-
-    /// <summary>
-    /// Whether a block can be rotated into the given position.
-    /// </summary>
-    private bool RotateCheck(Vector2i position)
-    {
-        return BorderCheck(position) && LowerBoundCheck(position) && ClearCheck(position);
-    }
+    private const float SoftDropModifier = 0.1f;
 
     /// <summary>
     /// The set of blocks that have landed in the field.
@@ -74,34 +28,7 @@ public sealed partial class BlockGame
     /// </summary>
     private List<BlockGamePieceType> _blockGamePiecesBuffer = new();
 
-    /// <summary>
-    /// Gets a random piece from the pool of pickable pieces. (<see cref="_blockGamePiecesBuffer"/>)
-    /// </summary>
-    private BlockGamePiece GetRandomBlockGamePiece(IRobustRandom random)
-    {
-        if (_blockGamePiecesBuffer.Count == 0)
-        {
-            _blockGamePiecesBuffer = _allBlockGamePieces.ToList();
-        }
-
-        var chosenPiece = random.Pick(_blockGamePiecesBuffer);
-        _blockGamePiecesBuffer.Remove(chosenPiece);
-        return BlockGamePiece.GetPiece(chosenPiece);
-    }
-
-    /// <summary>
-    /// The piece that is currently falling and controllable by the player.
-    /// </summary>
-    private BlockGamePiece CurrentPiece
-    {
-        get => _internalCurrentPiece;
-        set
-        {
-            _internalCurrentPiece = value;
-            UpdateFieldUI();
-        }
-    }
-    private BlockGamePiece _internalCurrentPiece = default!;
+    private int _clearedLines;
 
 
     /// <summary>
@@ -115,36 +42,42 @@ public sealed partial class BlockGame
     private BlockGamePieceRotation _currentRotation;
 
     /// <summary>
+    /// Where the current game has placed amongst the leaderboard.
+    /// </summary>
+    private ArcadeSystem.HighScorePlacement? _highScorePlacement;
+
+    /// <summary>
+    /// Prevents the player from holding the currently falling piece if true.
+    /// Set true when a piece is held and set false when a new piece is created.
+    /// Exists to prevent the player from swapping between two pieces forever and never actually letting the block fall.
+    /// </summary>
+    private bool _holdBlock;
+
+    private BlockGamePiece _internalCurrentPiece;
+    private BlockGamePiece? _internalHeldPiece;
+    private int _internalLevel;
+    private BlockGamePiece _internalNextPiece;
+    private int _internalPoints;
+
+    /// <summary>
+    /// The piece that is currently falling and controllable by the player.
+    /// </summary>
+    private BlockGamePiece CurrentPiece
+    {
+        get => _internalCurrentPiece;
+        set
+        {
+            _internalCurrentPiece = value;
+            UpdateFieldUI();
+        }
+    }
+
+    /// <summary>
     /// The amount of time (in seconds) between piece steps.
     /// Decreased by a constant amount per level.
     /// Decreased heavily by soft dropping the current piece (holding down).
     /// </summary>
     private float Speed => Math.Max(0.03f, (_softDropPressed ? SoftDropModifier : 1f) - 0.03f * Level);
-
-    /// <summary>
-    /// The base amount of time between piece steps while softdropping.
-    /// </summary>
-    private const float SoftDropModifier = 0.1f;
-
-
-    /// <summary>
-    /// Attempts to rotate the falling piece to a new rotation.
-    /// </summary>
-    private void TrySetRotation(BlockGamePieceRotation rotation)
-    {
-        if (!_running)
-            return;
-
-        if (!CurrentPiece.CanSpin)
-            return;
-
-        if (!CurrentPiece.Positions(_currentPiecePosition, rotation)
-            .All(RotateCheck))
-            return;
-
-        _currentRotation = rotation;
-        UpdateFieldUI();
-    }
 
 
     /// <summary>
@@ -159,7 +92,6 @@ public sealed partial class BlockGame
             SendNextPieceUpdate();
         }
     }
-    private BlockGamePiece _internalNextPiece = default!;
 
 
     /// <summary>
@@ -174,14 +106,6 @@ public sealed partial class BlockGame
             SendHoldPieceUpdate();
         }
     }
-    private BlockGamePiece? _internalHeldPiece = null;
-
-    /// <summary>
-    /// Prevents the player from holding the currently falling piece if true.
-    /// Set true when a piece is held and set false when a new piece is created.
-    /// Exists to prevent the player from swapping between two pieces forever and never actually letting the block fall.
-    /// </summary>
-    private bool _holdBlock = false;
 
     /// <summary>
     /// The number of lines that have been cleared in the current level.
@@ -201,7 +125,6 @@ public sealed partial class BlockGame
             Level++;
         }
     }
-    private int _clearedLines = 0;
 
     /// <summary>
     /// The number of lines that must be cleared to advance to the next level.
@@ -224,7 +147,6 @@ public sealed partial class BlockGame
             SendLevelUpdate();
         }
     }
-    private int _internalLevel = 0;
 
 
     /// <summary>
@@ -241,7 +163,72 @@ public sealed partial class BlockGame
             SendPointsUpdate();
         }
     }
-    private int _internalPoints = 0;
+    // note: field is 10(0 -> 9) wide and 20(0 -> 19) high
+
+    /// <summary>
+    /// Whether the given position is above the bottom of the playfield.
+    /// </summary>
+    private bool LowerBoundCheck(Vector2i position) => position.Y < 20;
+
+    /// <summary>
+    /// Whether the given position is horizontally positioned within the playfield.
+    /// </summary>
+    private bool BorderCheck(Vector2i position) => position.X >= 0 && position.X < 10;
+
+    /// <summary>
+    /// Whether the given position is currently occupied by a piece.
+    /// Yes this is on O(n) collision check, it works well enough.
+    /// </summary>
+    private bool ClearCheck(Vector2i position) => _field.All(block => !position.Equals(block.Position));
+
+    /// <summary>
+    /// Whether a block can be dropped into the given position.
+    /// </summary>
+    private bool DropCheck(Vector2i position) => LowerBoundCheck(position) && ClearCheck(position);
+
+    /// <summary>
+    /// Whether a block can be moved horizontally into the given position.
+    /// </summary>
+    private bool MoveCheck(Vector2i position) => BorderCheck(position) && ClearCheck(position);
+
+    /// <summary>
+    /// Whether a block can be rotated into the given position.
+    /// </summary>
+    private bool RotateCheck(Vector2i position) =>
+        BorderCheck(position) && LowerBoundCheck(position) && ClearCheck(position);
+
+    /// <summary>
+    /// Gets a random piece from the pool of pickable pieces. (<see cref="_blockGamePiecesBuffer" />)
+    /// </summary>
+    private BlockGamePiece GetRandomBlockGamePiece(IRobustRandom random)
+    {
+        if (_blockGamePiecesBuffer.Count == 0)
+            _blockGamePiecesBuffer = _allBlockGamePieces.ToList();
+
+        var chosenPiece = random.Pick(_blockGamePiecesBuffer);
+        _blockGamePiecesBuffer.Remove(chosenPiece);
+        return BlockGamePiece.GetPiece(chosenPiece);
+    }
+
+
+    /// <summary>
+    /// Attempts to rotate the falling piece to a new rotation.
+    /// </summary>
+    private void TrySetRotation(BlockGamePieceRotation rotation)
+    {
+        if (!_running)
+            return;
+
+        if (!CurrentPiece.CanSpin)
+            return;
+
+        if (!CurrentPiece.Positions(_currentPiecePosition, rotation)
+                .All(RotateCheck))
+            return;
+
+        _currentRotation = rotation;
+        UpdateFieldUI();
+    }
 
     /// <summary>
     /// Setter for the setter for the number of points accumulated in the current game.
@@ -253,9 +240,4 @@ public sealed partial class BlockGame
 
         Points += amount;
     }
-
-    /// <summary>
-    /// Where the current game has placed amongst the leaderboard.
-    /// </summary>
-    private ArcadeSystem.HighScorePlacement? _highScorePlacement = null;
 }

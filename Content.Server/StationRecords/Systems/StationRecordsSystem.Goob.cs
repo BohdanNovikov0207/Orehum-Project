@@ -2,14 +2,14 @@ namespace Content.Server.StationRecords.Systems;
 
 public sealed partial class StationRecordsSystem
 {
-        private bool IsFilterWithSomeCodeValue(string value, string filter)
+    private bool IsFilterWithSomeCodeValue(string value, string filter)
     {
         // Goob edit start - Partial Prints Feature
-        List<(string, int)> filterletList = ApplyWildcard(filter);
+        var filterletList = ApplyWildcard(filter);
 
         //NOTE TO SELF: IF TRUE, FILTER THIS ENTRY
         //SECOND NOTE TO SELF: ALL FILTERS NEED TO RETURN TRUE, THEN FINALLY RETURN FALSE
-        bool allFiltersPassed = true;
+        var allFiltersPassed = true;
         foreach (var (filterlet, cutoff) in filterletList)
         {
             allFiltersPassed = allFiltersPassed && value.Substring(cutoff).ToLower().StartsWith(filterlet);
@@ -30,13 +30,12 @@ public sealed partial class StationRecordsSystem
     private List<(string, int)> ApplyWildcard(string filter)
     {
         var filterList = new List<(string, int)>();
-        string filterlet = "";
-        int segmentStart = 0;
-        int index = 0;
+        var filterlet = "";
+        var segmentStart = 0;
+        var index = 0;
 
-        foreach (char c in filter)
+        foreach (var c in filter)
         {
-
             if (c == '#')
             {
                 if (!string.IsNullOrEmpty(filterlet)) // The current filterlet string is finished, so-
@@ -61,9 +60,7 @@ public sealed partial class StationRecordsSystem
 
         // Don't forget the last segment
         if (!string.IsNullOrEmpty(filterlet))
-        {
             filterList.Add((filterlet, segmentStart));
-        }
 
         return filterList;
     } // Good edit end - Partial Prints Feature

@@ -19,23 +19,21 @@ namespace Content.Server.Administration.Systems;
 /// </summary>
 public sealed class AdminTestArenaSystem : EntitySystem
 {
-    [Dependency] private readonly MapLoaderSystem _loader = default!;
-    [Dependency] private readonly MetaDataSystem _metaDataSystem = default!;
-    [Dependency] private readonly SharedMapSystem _maps = default!;
-
     public const string ArenaMapPath = "/Maps/Test/admin_test_arena.yml";
+    [Dependency] private readonly MapLoaderSystem _loader = default!;
+    [Dependency] private readonly SharedMapSystem _maps = default!;
+    [Dependency] private readonly MetaDataSystem _metaDataSystem = default!;
 
-    public Dictionary<NetUserId, EntityUid> ArenaMap { get; private set; } = new();
-    public Dictionary<NetUserId, EntityUid?> ArenaGrid { get; private set; } = new();
+    public Dictionary<NetUserId, EntityUid> ArenaMap { get; } = new();
+    public Dictionary<NetUserId, EntityUid?> ArenaGrid { get; } = new();
 
     public (EntityUid Map, EntityUid? Grid) AssertArenaLoaded(ICommonSession admin)
     {
         if (ArenaMap.TryGetValue(admin.UserId, out var arenaMap) && !Deleted(arenaMap) && !Terminating(arenaMap))
         {
-            if (ArenaGrid.TryGetValue(admin.UserId, out var arenaGrid) && !Deleted(arenaGrid) && !Terminating(arenaGrid.Value))
-            {
+            if (ArenaGrid.TryGetValue(admin.UserId, out var arenaGrid) && !Deleted(arenaGrid) &&
+                !Terminating(arenaGrid.Value))
                 return (arenaMap, arenaGrid);
-            }
 
 
             ArenaGrid[admin.UserId] = null;
@@ -48,7 +46,7 @@ public sealed class AdminTestArenaSystem : EntitySystem
         if (!_loader.TryLoadGrid(mapId, path, out var grid))
         {
             QueueDel(mapUid);
-            throw new Exception($"Failed to load admin arena");
+            throw new Exception("Failed to load admin arena");
         }
 
         ArenaMap[admin.UserId] = mapUid;

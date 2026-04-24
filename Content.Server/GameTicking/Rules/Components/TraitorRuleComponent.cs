@@ -37,37 +37,38 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
 
 namespace Content.Server.GameTicking.Rules.Components;
 
-[RegisterComponent, Access(typeof(TraitorRuleSystem))]
+[RegisterComponent] [Access(typeof(TraitorRuleSystem))]
 public sealed partial class TraitorRuleComponent : Component
 {
+    public enum SelectionState
+    {
+        WaitingForSpawn = 0,
+        ReadyToStart = 1,
+        Started = 2,
+    }
+
     public readonly List<EntityUid> TraitorMinds = new();
 
-    [DataField]
-    public ProtoId<AntagPrototype> TraitorPrototypeId = "Traitor";
-
-    [DataField]
-    public ProtoId<CodewordFactionPrototype> CodewordFactionPrototypeId = "Traitor";
-
-    [DataField]
-    public ProtoId<NpcFactionPrototype> NanoTrasenFaction = "NanoTrasen";
-
-    [DataField]
-    public ProtoId<NpcFactionPrototype> SyndicateFaction = "Syndicate";
+    /// <summary>
+    /// When should traitors be selected and the announcement made
+    /// </summary>
+    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))] [ViewVariables(VVAccess.ReadWrite)]
+    public TimeSpan? AnnounceAt;
 
     [DataField]
     public ProtoId<LocalizedDatasetPrototype> CodewordAdjectives = "Adjectives";
 
     [DataField]
+    public ProtoId<CodewordFactionPrototype> CodewordFactionPrototypeId = "Traitor";
+
+    [DataField]
     public ProtoId<LocalizedDatasetPrototype> CodewordVerbs = "Verbs";
 
-    [DataField]
-    public ProtoId<LocalizedDatasetPrototype> ObjectiveIssuers = "TraitorCorporationsFlavor"; // Goobstation Change
-
     /// <summary>
-    /// Give this traitor an Uplink on spawn.
+    /// Give this traitor a briefing in chat.
     /// </summary>
     [DataField]
-    public bool GiveUplink = true;
+    public bool GiveBriefing = true;
 
     /// <summary>
     /// Give this traitor the codewords.
@@ -76,19 +77,22 @@ public sealed partial class TraitorRuleComponent : Component
     public bool GiveCodewords = true;
 
     /// <summary>
-    /// Give this traitor a briefing in chat.
+    /// Give this traitor an Uplink on spawn.
     /// </summary>
     [DataField]
-    public bool GiveBriefing = true;
+    public bool GiveUplink = true;
 
-    public int TotalTraitors => TraitorMinds.Count;
+    /// <summary>
+    /// Path to antagonist alert sound.
+    /// </summary>
+    [DataField]
+    public SoundSpecifier GreetSoundNotification = new SoundPathSpecifier("/Audio/Ambience/Antag/traitor_start.ogg");
 
-    public enum SelectionState
-    {
-        WaitingForSpawn = 0,
-        ReadyToStart = 1,
-        Started = 2,
-    }
+    [DataField]
+    public ProtoId<NpcFactionPrototype> NanoTrasenFaction = "NanoTrasen";
+
+    [DataField]
+    public ProtoId<LocalizedDatasetPrototype> ObjectiveIssuers = "TraitorCorporationsFlavor"; // Goobstation Change
 
     /// <summary>
     /// Current state of the rule
@@ -96,20 +100,16 @@ public sealed partial class TraitorRuleComponent : Component
     public SelectionState SelectionStatus = SelectionState.WaitingForSpawn;
 
     /// <summary>
-    /// When should traitors be selected and the announcement made
-    /// </summary>
-    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer)), ViewVariables(VVAccess.ReadWrite)]
-    public TimeSpan? AnnounceAt;
-
-    /// <summary>
-    ///     Path to antagonist alert sound.
-    /// </summary>
-    [DataField]
-    public SoundSpecifier GreetSoundNotification = new SoundPathSpecifier("/Audio/Ambience/Antag/traitor_start.ogg");
-
-    /// <summary>
     /// The amount of TC traitors start with.
     /// </summary>
     [DataField]
     public int StartingBalance = 100;
+
+    [DataField]
+    public ProtoId<NpcFactionPrototype> SyndicateFaction = "Syndicate";
+
+    [DataField]
+    public ProtoId<AntagPrototype> TraitorPrototypeId = "Traitor";
+
+    public int TotalTraitors => TraitorMinds.Count;
 }

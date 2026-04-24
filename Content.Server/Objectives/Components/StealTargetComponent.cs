@@ -17,6 +17,6 @@ public sealed partial class StealTargetComponent : Component
     /// <summary>
     /// The theft group to which this item belongs.
     /// </summary>
-    [DataField(required: true), ViewVariables(VVAccess.ReadWrite)]
+    [DataField(required: true)] [ViewVariables(VVAccess.ReadWrite)]
     public string StealGroup;
 }

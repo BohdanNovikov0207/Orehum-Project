@@ -22,7 +22,6 @@
 
 using Content.Shared.EntityTable.EntitySelectors;
 using Content.Shared.Whitelist;
-using Robust.Shared.Prototypes;
 
 namespace Content.Server._Lavaland.Mobs;
 
@@ -33,7 +32,21 @@ namespace Content.Server._Lavaland.Mobs;
 public sealed partial class SpawnLootOnDeathComponent : Component
 {
     [DataField]
-    public EntityTableSelector? Table;
+    public bool DeleteOnDeath;
+
+    /// <summary>
+    /// Check if the boss got damaged by crusher only.
+    /// True by default. Will immediately switch to false if anything else hit it. Even the environmental stuff.
+    /// </summary>
+    [ViewVariables]
+    public bool DoSpecialLoot = true;
+
+    /// <summary>
+    /// If true and the mob was killed with special weapon,
+    /// and both loots are not null, drops both loots at once.
+    /// </summary>
+    [DataField]
+    public bool DropBoth;
 
     [DataField]
     public EntityTableSelector? SpecialTable;
@@ -47,19 +60,5 @@ public sealed partial class SpawnLootOnDeathComponent : Component
     public EntityWhitelist? SpecialWeaponWhitelist;
 
     [DataField]
-    public bool DeleteOnDeath;
-
-    /// <summary>
-    /// If true and the mob was killed with special weapon,
-    /// and both loots are not null, drops both loots at once.
-    /// </summary>
-    [DataField]
-    public bool DropBoth;
-
-    /// <summary>
-    /// Check if the boss got damaged by crusher only.
-    /// True by default. Will immediately switch to false if anything else hit it. Even the environmental stuff.
-    /// </summary>
-    [ViewVariables]
-    public bool DoSpecialLoot = true;
+    public EntityTableSelector? Table;
 }

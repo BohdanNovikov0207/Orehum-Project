@@ -17,10 +17,7 @@ public abstract partial class HTNPrecondition
     /// Handles one-time initialization of this precondition.
     /// </summary>
     /// <param name="sysManager"></param>
-    public virtual void Initialize(IEntitySystemManager sysManager)
-    {
-        IoCManager.InjectDependencies(this);
-    }
+    public virtual void Initialize(IEntitySystemManager sysManager) => IoCManager.InjectDependencies(this);
 
     /// <summary>
     /// Has this precondition been met for planning purposes?

@@ -4,51 +4,49 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Linq;
+using Content.Server._EinsteinEngines.Language;
 using Content.Server.Access.Systems;
 using Content.Server.Administration.Logs;
 using Content.Server.Chat.Systems;
 using Content.Server.Interaction;
 using Content.Server.Power.EntitySystems;
-using Content.Server.Speech;
-using Content.Server.Speech.Components;
-using Content.Server._EinsteinEngines.Language;
 using Content.Shared.Chat;
 using Content.Shared.Database;
 using Content.Shared.Labels.Components;
 using Content.Shared.Mind.Components;
 using Content.Shared.Power;
-using Content.Shared.Silicons.StationAi;
 using Content.Shared.Silicons.Borgs.Components;
+using Content.Shared.Silicons.StationAi;
 using Content.Shared.Speech;
 using Content.Shared.Speech.Components;
 using Content.Shared.Telephone;
 using Robust.Server.GameObjects;
 using Robust.Shared.Audio.Systems;
-using Robust.Shared.Timing;
-using Robust.Shared.Utility;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Replays;
-using System.Linq;
+using Robust.Shared.Timing;
+using Robust.Shared.Utility;
 
 namespace Content.Server.Telephone;
 
 public sealed class TelephoneSystem : SharedTelephoneSystem
 {
+    [Dependency] private readonly IAdminLogManager _adminLogger = default!;
     [Dependency] private readonly AppearanceSystem _appearanceSystem = default!;
-    [Dependency] private readonly InteractionSystem _interaction = default!;
-    [Dependency] private readonly IdCardSystem _idCardSystem = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly ChatSystem _chat = default!;
-    [Dependency] private readonly IPrototypeManager _prototype = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly IAdminLogManager _adminLogger = default!;
-    [Dependency] private readonly IReplayRecordingManager _replay = default!;
+    [Dependency] private readonly IdCardSystem _idCardSystem = default!;
+    [Dependency] private readonly InteractionSystem _interaction = default!;
     [Dependency] private readonly LanguageSystem _language = default!; // Einstein Engines - Language
+    [Dependency] private readonly IPrototypeManager _prototype = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
 
     // Has set used to prevent telephone feedback loops
-    private HashSet<(EntityUid, string, Entity<TelephoneComponent>)> _recentChatMessages = new();
+    private readonly HashSet<(EntityUid, string, Entity<TelephoneComponent>)> _recentChatMessages = new();
+    [Dependency] private readonly IReplayRecordingManager _replay = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -60,74 +58,6 @@ public sealed class TelephoneSystem : SharedTelephoneSystem
         SubscribeLocalEvent<TelephoneComponent, ListenEvent>(OnListen);
         SubscribeLocalEvent<TelephoneComponent, TelephoneMessageReceivedEvent>(OnTelephoneMessageReceived);
     }
-
-    #region: Events
-
-    private void OnComponentShutdown(Entity<TelephoneComponent> entity, ref ComponentShutdown ev)
-    {
-        TerminateTelephoneCalls(entity);
-    }
-
-    private void OnPowerChanged(Entity<TelephoneComponent> entity, ref PowerChangedEvent ev)
-    {
-        if (!ev.Powered)
-            TerminateTelephoneCalls(entity);
-    }
-
-    private void OnAttemptListen(Entity<TelephoneComponent> entity, ref ListenAttemptEvent args)
-    {
-        if (!IsTelephonePowered(entity) ||
-            !IsTelephoneEngaged(entity) ||
-            entity.Comp.Muted ||
-            !_interaction.InRangeUnobstructed(args.Source, entity.Owner, 0))
-        {
-            args.Cancel();
-        }
-    }
-
-    private void OnListen(Entity<TelephoneComponent> entity, ref ListenEvent args)
-    {
-        if (args.Source == entity.Owner)
-            return;
-
-        // Ignore background chatter from non-player entities
-        if (!HasComp<MindContainerComponent>(args.Source))
-            return;
-
-        // Simple check to make sure that we haven't sent this message already this frame
-        if (!_recentChatMessages.Add((args.Source, args.Message, entity)))
-            return;
-
-        SendTelephoneMessage(args.Source, args.Message, entity);
-    }
-
-    private void OnTelephoneMessageReceived(Entity<TelephoneComponent> entity, ref TelephoneMessageReceivedEvent args)
-    {
-        // Prevent message feedback loops
-        if (entity == args.TelephoneSource)
-            return;
-
-        if (!IsTelephonePowered(entity) ||
-            !IsSourceConnectedToReceiver(args.TelephoneSource, entity))
-            return;
-
-        var nameEv = new TransformSpeakerNameEvent(args.MessageSource, Name(args.MessageSource));
-        RaiseLocalEvent(args.MessageSource, nameEv);
-
-        // Determine if speech should be relayed via the telephone itself or a designated speaker
-        var speaker = entity.Comp.Speaker != null ? entity.Comp.Speaker.Value.Owner : entity.Owner;
-
-        var name = Loc.GetString("chat-telephone-name-relay",
-            ("originalName", nameEv.VoiceName),
-            ("speaker", Name(speaker)));
-
-        var range = args.TelephoneSource.Comp.LinkedTelephones.Count > 1 ? ChatTransmitRange.HideChat : ChatTransmitRange.GhostRangeLimit;
-        var volume = entity.Comp.SpeakerVolume == TelephoneVolume.Speak ? InGameICChatType.Speak : InGameICChatType.Whisper;
-
-        _chat.TrySendInGameICMessage(speaker, args.Message, volume, range, nameOverride: name, checkRadioPrefix: false, languageOverride: args.Language); // Eisntein Engines - Language
-    }
-
-    #endregion
 
     public override void Update(float frameTime)
     {
@@ -144,9 +74,7 @@ public sealed class TelephoneSystem : SharedTelephoneSystem
                 {
                     if (!IsSourceInRangeOfReceiver(entity, receiver) &&
                         !IsSourceInRangeOfReceiver(receiver, entity))
-                    {
                         EndTelephoneCall(entity, receiver);
-                    }
                 }
             }
 
@@ -158,7 +86,7 @@ public sealed class TelephoneSystem : SharedTelephoneSystem
                         EndTelephoneCalls(entity);
 
                     else if (telephone.RingTone != null &&
-                        _timing.CurTime > telephone.NextRingToneTime)
+                             _timing.CurTime > telephone.NextRingToneTime)
                     {
                         _audio.PlayPvs(telephone.RingTone, uid);
                         telephone.NextRingToneTime = _timing.CurTime + TimeSpan.FromSeconds(telephone.RingInterval);
@@ -185,20 +113,28 @@ public sealed class TelephoneSystem : SharedTelephoneSystem
         _recentChatMessages.Clear();
     }
 
-    public void BroadcastCallToTelephones(Entity<TelephoneComponent> source, HashSet<Entity<TelephoneComponent>> receivers, EntityUid user, TelephoneCallOptions? options = null)
+    public void BroadcastCallToTelephones(Entity<TelephoneComponent> source,
+        HashSet<Entity<TelephoneComponent>> receivers,
+        EntityUid user,
+        TelephoneCallOptions? options = null)
     {
         if (IsTelephoneEngaged(source))
             return;
 
         foreach (var receiver in receivers)
+        {
             TryCallTelephone(source, receiver, user, options);
+        }
 
         // If no connections could be made, hang up the telephone
         if (!IsTelephoneEngaged(source))
             EndTelephoneCalls(source);
     }
 
-    public void CallTelephone(Entity<TelephoneComponent> source, Entity<TelephoneComponent> receiver, EntityUid user, TelephoneCallOptions? options = null)
+    public void CallTelephone(Entity<TelephoneComponent> source,
+        Entity<TelephoneComponent> receiver,
+        EntityUid user,
+        TelephoneCallOptions? options = null)
     {
         if (IsTelephoneEngaged(source))
             return;
@@ -207,7 +143,10 @@ public sealed class TelephoneSystem : SharedTelephoneSystem
             EndTelephoneCalls(source);
     }
 
-    private bool TryCallTelephone(Entity<TelephoneComponent> source, Entity<TelephoneComponent> receiver, EntityUid user, TelephoneCallOptions? options = null)
+    private bool TryCallTelephone(Entity<TelephoneComponent> source,
+        Entity<TelephoneComponent> receiver,
+        EntityUid user,
+        TelephoneCallOptions? options = null)
     {
         if (!IsSourceAbleToReachReceiver(source, receiver) && options?.IgnoreRange != true)
             return false;
@@ -237,13 +176,14 @@ public sealed class TelephoneSystem : SharedTelephoneSystem
         if (TryComp<LabelComponent>(source, out var label))
             deviceName = label.CurrentLabel;
 
-        receiver.Comp.LastCallerId = (callerInfo.Item1, callerInfo.Item2, deviceName); // This will be networked when the state changes
+        receiver.Comp.LastCallerId =
+            (callerInfo.Item1, callerInfo.Item2, deviceName); // This will be networked when the state changes
         receiver.Comp.LinkedTelephones.Add(source);
         receiver.Comp.Muted = options?.MuteReceiver == true;
 
         // Try to open a line of communication immediately
         if (options?.ForceConnect == true ||
-            (options?.ForceJoin == true && receiver.Comp.CurrentState == TelephoneState.InCall))
+            options?.ForceJoin == true && receiver.Comp.CurrentState == TelephoneState.InCall)
         {
             CommenceTelephoneCall(source, receiver);
             return true;
@@ -337,7 +277,10 @@ public sealed class TelephoneSystem : SharedTelephoneSystem
         SetTelephoneMicrophoneState(entity, false);
     }
 
-    private void SendTelephoneMessage(EntityUid messageSource, string message, Entity<TelephoneComponent> source, bool escapeMarkup = true)
+    private void SendTelephoneMessage(EntityUid messageSource,
+        string message,
+        Entity<TelephoneComponent> source,
+        bool escapeMarkup = true)
     {
         // This method assumes that you've already checked that this
         // telephone is able to transmit messages and that it can
@@ -359,7 +302,8 @@ public sealed class TelephoneSystem : SharedTelephoneSystem
             ? FormattedMessage.EscapeText(message)
             : message;
 
-        var wrappedMessage = Loc.GetString(speech.Bold ? "chat-telephone-message-wrap-bold" : "chat-telephone-message-wrap",
+        var wrappedMessage = Loc.GetString(
+            speech.Bold ? "chat-telephone-message-wrap-bold" : "chat-telephone-message-wrap",
             ("color", Color.White),
             ("fontType", speech.FontId),
             ("fontSize", speech.FontSize),
@@ -380,7 +324,11 @@ public sealed class TelephoneSystem : SharedTelephoneSystem
         RaiseLocalEvent(source, ref evSentMessage);
         source.Comp.StateStartTime = _timing.CurTime;
 
-        var evReceivedMessage = new TelephoneMessageReceivedEvent(message, chatMsg, messageSource, source, _language.GetLanguage(messageSource)); // Einstein Engines - Language
+        var evReceivedMessage = new TelephoneMessageReceivedEvent(message,
+            chatMsg,
+            messageSource,
+            source,
+            _language.GetLanguage(messageSource)); // Einstein Engines - Language
 
         foreach (var receiver in source.Comp.LinkedTelephones)
         {
@@ -389,9 +337,13 @@ public sealed class TelephoneSystem : SharedTelephoneSystem
         }
 
         if (name != Name(messageSource))
-            _adminLogger.Add(LogType.Chat, LogImpact.Low, $"Telephone message from {ToPrettyString(messageSource):user} as {name} on {source}: {message}");
+            _adminLogger.Add(LogType.Chat,
+                LogImpact.Low,
+                $"Telephone message from {ToPrettyString(messageSource):user} as {name} on {source}: {message}");
         else
-            _adminLogger.Add(LogType.Chat, LogImpact.Low, $"Telephone message from {ToPrettyString(messageSource):user} on {source}: {message}");
+            _adminLogger.Add(LogType.Chat,
+                LogImpact.Low,
+                $"Telephone message from {ToPrettyString(messageSource):user} on {source}: {message}");
 
         _replay.RecordServerMessage(chat);
     }
@@ -419,15 +371,11 @@ public sealed class TelephoneSystem : SharedTelephoneSystem
         }
 
         if (!microphoneOn && HasComp<ActiveListenerComponent>(entity))
-        {
             RemComp<ActiveListenerComponent>(entity);
-        }
     }
 
-    public void SetSpeakerForTelephone(Entity<TelephoneComponent> entity, Entity<SpeechComponent>? speaker)
-    {
+    public void SetSpeakerForTelephone(Entity<TelephoneComponent> entity, Entity<SpeechComponent>? speaker) =>
         entity.Comp.Speaker = speaker;
-    }
 
     private (string?, string?) GetNameAndJobOfCallingEntity(EntityUid uid)
     {
@@ -455,9 +403,7 @@ public sealed class TelephoneSystem : SharedTelephoneSystem
             !IsTelephonePowered(source) ||
             !IsTelephonePowered(receiver) ||
             !IsSourceInRangeOfReceiver(source, receiver))
-        {
             return false;
-        }
 
         return true;
     }
@@ -492,13 +438,82 @@ public sealed class TelephoneSystem : SharedTelephoneSystem
         return false;
     }
 
-    public bool IsSourceConnectedToReceiver(Entity<TelephoneComponent> source, Entity<TelephoneComponent> receiver)
+    public bool IsSourceConnectedToReceiver(Entity<TelephoneComponent> source, Entity<TelephoneComponent> receiver) =>
+        source.Comp.LinkedTelephones.Contains(receiver);
+
+    public bool IsTelephonePowered(Entity<TelephoneComponent> entity) => this.IsPowered(entity, EntityManager);
+
+    #region: Events
+
+    private void OnComponentShutdown(Entity<TelephoneComponent> entity, ref ComponentShutdown ev) =>
+        TerminateTelephoneCalls(entity);
+
+    private void OnPowerChanged(Entity<TelephoneComponent> entity, ref PowerChangedEvent ev)
     {
-        return source.Comp.LinkedTelephones.Contains(receiver);
+        if (!ev.Powered)
+            TerminateTelephoneCalls(entity);
     }
 
-    public bool IsTelephonePowered(Entity<TelephoneComponent> entity)
+    private void OnAttemptListen(Entity<TelephoneComponent> entity, ref ListenAttemptEvent args)
     {
-        return this.IsPowered(entity, EntityManager);
+        if (!IsTelephonePowered(entity) ||
+            !IsTelephoneEngaged(entity) ||
+            entity.Comp.Muted ||
+            !_interaction.InRangeUnobstructed(args.Source, entity.Owner, 0))
+            args.Cancel();
     }
+
+    private void OnListen(Entity<TelephoneComponent> entity, ref ListenEvent args)
+    {
+        if (args.Source == entity.Owner)
+            return;
+
+        // Ignore background chatter from non-player entities
+        if (!HasComp<MindContainerComponent>(args.Source))
+            return;
+
+        // Simple check to make sure that we haven't sent this message already this frame
+        if (!_recentChatMessages.Add((args.Source, args.Message, entity)))
+            return;
+
+        SendTelephoneMessage(args.Source, args.Message, entity);
+    }
+
+    private void OnTelephoneMessageReceived(Entity<TelephoneComponent> entity, ref TelephoneMessageReceivedEvent args)
+    {
+        // Prevent message feedback loops
+        if (entity == args.TelephoneSource)
+            return;
+
+        if (!IsTelephonePowered(entity) ||
+            !IsSourceConnectedToReceiver(args.TelephoneSource, entity))
+            return;
+
+        var nameEv = new TransformSpeakerNameEvent(args.MessageSource, Name(args.MessageSource));
+        RaiseLocalEvent(args.MessageSource, nameEv);
+
+        // Determine if speech should be relayed via the telephone itself or a designated speaker
+        var speaker = entity.Comp.Speaker != null ? entity.Comp.Speaker.Value.Owner : entity.Owner;
+
+        var name = Loc.GetString("chat-telephone-name-relay",
+            ("originalName", nameEv.VoiceName),
+            ("speaker", Name(speaker)));
+
+        var range = args.TelephoneSource.Comp.LinkedTelephones.Count > 1
+            ? ChatTransmitRange.HideChat
+            : ChatTransmitRange.GhostRangeLimit;
+        var volume = entity.Comp.SpeakerVolume == TelephoneVolume.Speak
+            ? InGameICChatType.Speak
+            : InGameICChatType.Whisper;
+
+        _chat.TrySendInGameICMessage(speaker,
+            args.Message,
+            volume,
+            range,
+            nameOverride: name,
+            checkRadioPrefix: false,
+            languageOverride: args.Language); // Eisntein Engines - Language
+    }
+
+    #endregion
 }

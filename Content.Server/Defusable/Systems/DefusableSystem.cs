@@ -35,19 +35,19 @@ using Robust.Shared.Audio.Systems;
 
 namespace Content.Server.Defusable.Systems;
 
-/// <inheritdoc/>
+/// <inheritdoc />
 public sealed class DefusableSystem : SharedDefusableSystem
 {
+    [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly ExplosionSystem _explosion = default!;
     [Dependency] private readonly PopupSystem _popup = default!;
-    [Dependency] private readonly TriggerSystem _trigger = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly TransformSystem _transform = default!;
-    [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
+    [Dependency] private readonly TriggerSystem _trigger = default!;
     [Dependency] private readonly WiresSystem _wiresSystem = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
@@ -59,8 +59,9 @@ public sealed class DefusableSystem : SharedDefusableSystem
     }
 
     #region Subscribed Events
+
     /// <summary>
-    ///     Adds a verb allowing for the bomb to be started easily.
+    /// Adds a verb allowing for the bomb to be started easily.
     /// </summary>
     private void OnGetAltVerbs(EntityUid uid, DefusableComponent comp, GetVerbsEvent<AlternativeVerb> args)
     {
@@ -75,7 +76,7 @@ public sealed class DefusableSystem : SharedDefusableSystem
             Act = () =>
             {
                 TryStartCountdown(uid, args.User, comp);
-            }
+            },
         });
     }
 
@@ -87,26 +88,21 @@ public sealed class DefusableSystem : SharedDefusableSystem
         using (args.PushGroup(nameof(DefusableComponent)))
         {
             if (!comp.Usable)
-            {
                 args.PushMarkup(Loc.GetString("defusable-examine-defused", ("name", uid)));
-            }
             else if (comp.Activated)
             {
                 var remaining = _trigger.GetRemainingTime(uid);
                 if (comp.DisplayTime && remaining != null)
                 {
-                    args.PushMarkup(Loc.GetString("defusable-examine-live", ("name", uid),
+                    args.PushMarkup(Loc.GetString("defusable-examine-live",
+                        ("name", uid),
                         ("time", Math.Floor(remaining.Value.TotalSeconds))));
                 }
                 else
-                {
                     args.PushMarkup(Loc.GetString("defusable-examine-live-display-off", ("name", uid)));
-                }
             }
             else
-            {
                 args.PushMarkup(Loc.GetString("defusable-examine-inactive", ("name", uid)));
-            }
         }
 
         args.PushMarkup(Loc.GetString("defusable-examine-bolts", ("down", comp.Bolted)));
@@ -157,9 +153,7 @@ public sealed class DefusableSystem : SharedDefusableSystem
 
         _popup.PopupEntity(Loc.GetString("defusable-popup-begun", ("name", uid)), uid);
         if (TryComp<TimerTriggerComponent>(uid, out var timerTrigger))
-        {
             _trigger.ActivateTimerTrigger((uid, timerTrigger));
-        }
 
         RaiseLocalEvent(uid, new BombArmedEvent(uid));
 
@@ -200,6 +194,7 @@ public sealed class DefusableSystem : SharedDefusableSystem
             RemComp<ExplodeOnTriggerComponent>(uid);
             RemComp<TimerTriggerComponent>(uid);
         }
+
         RemComp<ActiveTimerTriggerComponent>(uid);
 
         _audio.PlayPvs(comp.DefusalSound, uid);
@@ -219,15 +214,9 @@ public sealed class DefusableSystem : SharedDefusableSystem
     }
 
     // jesus christ
-    public void SetUsable(DefusableComponent component, bool value)
-    {
-        component.Usable = value;
-    }
+    public void SetUsable(DefusableComponent component, bool value) => component.Usable = value;
 
-    public void SetDisplayTime(DefusableComponent component, bool value)
-    {
-        component.DisplayTime = value;
-    }
+    public void SetDisplayTime(DefusableComponent component, bool value) => component.DisplayTime = value;
 
     /// <summary>
     /// Sets the Activated value of a component to a value.
@@ -235,17 +224,11 @@ public sealed class DefusableSystem : SharedDefusableSystem
     /// <param name="component"></param>
     /// <param name="value"></param>
     /// <remarks>
-    /// Use <see cref="TryDefuseBomb"/> to defuse bomb. This is a setter.
+    /// Use <see cref="TryDefuseBomb" /> to defuse bomb. This is a setter.
     /// </remarks>
-    public void SetActivated(DefusableComponent component, bool value)
-    {
-        component.Activated = value;
-    }
+    public void SetActivated(DefusableComponent component, bool value) => component.Activated = value;
 
-    public void SetBolt(DefusableComponent component, bool value)
-    {
-        component.Bolted = value;
-    }
+    public void SetBolt(DefusableComponent component, bool value) => component.Bolted = value;
 
     #endregion
 
@@ -292,7 +275,8 @@ public sealed class DefusableSystem : SharedDefusableSystem
         {
             TryDefuseBomb(wire.Owner, comp);
 
-            _adminLogger.Add(LogType.Explosion, LogImpact.High,
+            _adminLogger.Add(LogType.Explosion,
+                LogImpact.High,
                 $"{ToPrettyString(user):user} has defused {ToPrettyString(wire.Owner):entity}!");
         }
 
@@ -314,30 +298,22 @@ public sealed class DefusableSystem : SharedDefusableSystem
             }
         }
         else
-        {
             TryStartCountdown(wire.Owner, user, comp);
-        }
     }
 
     public bool BoomWireCut(EntityUid user, Wire wire, DefusableComponent comp)
     {
         if (comp.Activated)
-        {
             TryDetonateBomb(wire.Owner, user, comp);
-        }
         else
-        {
             SetUsable(comp, false);
-        }
         return true;
     }
 
     public bool BoomWireMend(EntityUid user, Wire wire, DefusableComponent comp)
     {
         if (comp is { Activated: false, Usable: false })
-        {
             SetUsable(comp, true);
-        }
         // you're already dead lol
         return true;
     }
@@ -345,9 +321,7 @@ public sealed class DefusableSystem : SharedDefusableSystem
     public void BoomWirePulse(EntityUid user, Wire wire, DefusableComponent comp)
     {
         if (comp.Activated)
-        {
             TryDetonateBomb(wire.Owner, user, comp);
-        }
     }
 
     public bool BoltWireMend(EntityUid user, Wire wire, DefusableComponent comp)
@@ -374,10 +348,8 @@ public sealed class DefusableSystem : SharedDefusableSystem
         return true;
     }
 
-    public void BoltWirePulse(EntityUid user, Wire wire, DefusableComponent comp)
-    {
+    public void BoltWirePulse(EntityUid user, Wire wire, DefusableComponent comp) =>
         _popup.PopupEntity(Loc.GetString("defusable-popup-wire-bolt-pulse", ("name", wire.Owner)), wire.Owner);
-    }
 
     #endregion
 }
@@ -391,6 +363,7 @@ public sealed class BombDefusedEvent : EntityEventArgs
         Entity = entity;
     }
 }
+
 public sealed class BombArmedEvent : EntityEventArgs
 {
     public EntityUid Entity;
@@ -400,6 +373,7 @@ public sealed class BombArmedEvent : EntityEventArgs
         Entity = entity;
     }
 }
+
 public sealed class BombDetonatedEvent : EntityEventArgs
 {
     public EntityUid Entity;

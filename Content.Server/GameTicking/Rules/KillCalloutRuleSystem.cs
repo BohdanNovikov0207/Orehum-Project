@@ -19,7 +19,7 @@ using Robust.Shared.Random;
 namespace Content.Server.GameTicking.Rules;
 
 /// <summary>
-/// This handles calling out kills from <see cref="KillTrackingSystem"/>
+/// This handles calling out kills from <see cref="KillTrackingSystem" />
 /// </summary>
 public sealed class KillCalloutRuleSystem : GameRuleSystem<KillCalloutRuleComponent>
 {
@@ -27,7 +27,7 @@ public sealed class KillCalloutRuleSystem : GameRuleSystem<KillCalloutRuleCompon
     [Dependency] private readonly IPlayerManager _playerManager = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
@@ -64,11 +64,13 @@ public sealed class KillCalloutRuleSystem : GameRuleSystem<KillCalloutRuleCompon
         {
             var secondary = GetCalloutName(ev.Assist);
             killerString = Loc.GetString("death-match-assist",
-                ("primary", primary), ("secondary", secondary));
+                ("primary", primary),
+                ("secondary", secondary));
         }
 
         var callout = $"{component.KillCalloutPrefix}{_random.Next(component.KillCalloutAmount)}";
-        return Loc.GetString(callout, ("killer", killerString),
+        return Loc.GetString(callout,
+            ("killer", killerString),
             ("victim", GetCalloutName(ev.Entity)));
     }
 

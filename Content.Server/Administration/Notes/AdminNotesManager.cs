@@ -27,40 +27,27 @@ namespace Content.Server.Administration.Notes;
 
 public sealed class AdminNotesManager : IAdminNotesManager, IPostInjectInit
 {
-    [Dependency] private readonly IAdminManager _admins = default!;
-    [Dependency] private readonly IServerDbManager _db = default!;
-    [Dependency] private readonly ILogManager _logManager = default!;
-    [Dependency] private readonly EuiManager _euis = default!;
-    [Dependency] private readonly IEntitySystemManager _systems = default!;
-    [Dependency] private readonly IConfigurationManager _config = default!;
-
     public const string SawmillId = "admin.notes";
+    [Dependency] private readonly IAdminManager _admins = default!;
+    [Dependency] private readonly IConfigurationManager _config = default!;
+    [Dependency] private readonly IServerDbManager _db = default!;
+    [Dependency] private readonly EuiManager _euis = default!;
+    [Dependency] private readonly ILogManager _logManager = default!;
+    [Dependency] private readonly IEntitySystemManager _systems = default!;
+
+    private ISawmill _sawmill = default!;
 
     public event Action<SharedAdminNote>? NoteAdded;
     public event Action<SharedAdminNote>? NoteModified;
     public event Action<SharedAdminNote>? NoteDeleted;
 
-    private ISawmill _sawmill = default!;
+    public bool CanCreate(ICommonSession admin) => CanEdit(admin);
 
-    public bool CanCreate(ICommonSession admin)
-    {
-        return CanEdit(admin);
-    }
+    public bool CanDelete(ICommonSession admin) => CanEdit(admin);
 
-    public bool CanDelete(ICommonSession admin)
-    {
-        return CanEdit(admin);
-    }
+    public bool CanEdit(ICommonSession admin) => _admins.HasAdminFlag(admin, AdminFlags.EditNotes);
 
-    public bool CanEdit(ICommonSession admin)
-    {
-        return _admins.HasAdminFlag(admin, AdminFlags.EditNotes);
-    }
-
-    public bool CanView(ICommonSession admin)
-    {
-        return _admins.HasAdminFlag(admin, AdminFlags.ViewNotes);
-    }
+    public bool CanView(ICommonSession admin) => _admins.HasAdminFlag(admin, AdminFlags.ViewNotes);
 
     public async Task OpenEui(ICommonSession admin, Guid notedPlayer)
     {
@@ -78,7 +65,13 @@ public sealed class AdminNotesManager : IAdminNotesManager, IPostInjectInit
         await ui.UpdateNotes();
     }
 
-    public async Task AddAdminRemark(ICommonSession createdBy, Guid player, NoteType type, string message, NoteSeverity? severity, bool secret, DateTime? expiryTime)
+    public async Task AddAdminRemark(ICommonSession createdBy,
+        Guid player,
+        NoteType type,
+        string message,
+        NoteSeverity? severity,
+        bool secret,
+        DateTime? expiryTime)
     {
         message = message.Trim();
 
@@ -91,9 +84,7 @@ public sealed class AdminNotesManager : IAdminNotesManager, IPostInjectInit
         var sb = new StringBuilder($"{createdBy.Name} added a");
 
         if (secret && type == NoteType.Note)
-        {
             sb.Append(" secret");
-        }
 
         sb.Append($" {type} with message {message}");
 
@@ -117,17 +108,19 @@ public sealed class AdminNotesManager : IAdminNotesManager, IPostInjectInit
         }
 
         if (expiryTime is not null)
-        {
             sb.Append($" which expires on {expiryTime.Value.ToUniversalTime(): yyyy-MM-dd HH:mm:ss} UTC");
-        }
 
         _sawmill.Info(sb.ToString());
 
         _systems.TryGetEntitySystem(out GameTicker? ticker);
         int? roundId = ticker == null || ticker.RoundId == 0 ? null : ticker.RoundId;
-        var serverName = _config.GetCVar(CCVars.AdminLogsServerName); // This could probably be done another way, but this is fine. For displaying only.
+        var serverName =
+            _config.GetCVar(CCVars
+                .AdminLogsServerName); // This could probably be done another way, but this is fine. For displaying only.
         var createdAt = DateTime.UtcNow;
-        var playtime = (await _db.GetPlayTimes(player)).Find(p => p.Tracker == PlayTimeTrackingShared.TrackerOverall)?.TimeSpent ?? TimeSpan.Zero;
+        var playtime =
+            (await _db.GetPlayTimes(player)).Find(p => p.Tracker == PlayTimeTrackingShared.TrackerOverall)?.TimeSpent ??
+            TimeSpan.Zero;
         int noteId;
         bool? seen = null;
 
@@ -136,14 +129,34 @@ public sealed class AdminNotesManager : IAdminNotesManager, IPostInjectInit
             case NoteType.Note:
                 if (severity is null)
                     throw new ArgumentException("Severity cannot be null for a note", nameof(severity));
-                noteId = await _db.AddAdminNote(roundId, player, playtime, message, severity.Value, secret, createdBy.UserId, createdAt, expiryTime);
+                noteId = await _db.AddAdminNote(roundId,
+                    player,
+                    playtime,
+                    message,
+                    severity.Value,
+                    secret,
+                    createdBy.UserId,
+                    createdAt,
+                    expiryTime);
                 break;
             case NoteType.Watchlist:
                 secret = true;
-                noteId = await _db.AddAdminWatchlist(roundId, player, playtime, message, createdBy.UserId, createdAt, expiryTime);
+                noteId = await _db.AddAdminWatchlist(roundId,
+                    player,
+                    playtime,
+                    message,
+                    createdBy.UserId,
+                    createdAt,
+                    expiryTime);
                 break;
             case NoteType.Message:
-                noteId = await _db.AddAdminMessage(roundId, player, playtime, message, createdBy.UserId, createdAt, expiryTime);
+                noteId = await _db.AddAdminMessage(roundId,
+                    player,
+                    playtime,
+                    message,
+                    createdBy.UserId,
+                    createdAt,
+                    expiryTime);
                 seen = false;
                 break;
             case NoteType.ServerBan: // Add bans using the ban panel, not note edit
@@ -173,19 +186,6 @@ public sealed class AdminNotesManager : IAdminNotesManager, IPostInjectInit
             seen
         );
         NoteAdded?.Invoke(note);
-    }
-
-    private async Task<SharedAdminNote?> GetAdminRemark(int id, NoteType type)
-    {
-        return type switch
-        {
-            NoteType.Note => (await _db.GetAdminNote(id))?.ToShared(),
-            NoteType.Watchlist => (await _db.GetAdminWatchlist(id))?.ToShared(),
-            NoteType.Message => (await _db.GetAdminMessage(id))?.ToShared(),
-            NoteType.ServerBan => (await _db.GetServerBanAsNoteAsync(id))?.ToShared(),
-            NoteType.RoleBan => (await _db.GetServerRoleBanAsNoteAsync(id))?.ToShared(),
-            _ => throw new ArgumentOutOfRangeException(nameof(type), type, "Unknown note type")
-        };
     }
 
     public async Task DeleteAdminRemark(int noteId, NoteType type, ICommonSession deletedBy)
@@ -224,7 +224,13 @@ public sealed class AdminNotesManager : IAdminNotesManager, IPostInjectInit
         NoteDeleted?.Invoke(note);
     }
 
-    public async Task ModifyAdminRemark(int noteId, NoteType type, ICommonSession editedBy, string message, NoteSeverity? severity, bool secret, DateTime? expiryTime)
+    public async Task ModifyAdminRemark(int noteId,
+        NoteType type,
+        ICommonSession editedBy,
+        string message,
+        NoteSeverity? severity,
+        bool secret,
+        DateTime? expiryTime)
     {
         message = message.Trim();
 
@@ -236,26 +242,18 @@ public sealed class AdminNotesManager : IAdminNotesManager, IPostInjectInit
             note.NoteSeverity == severity &&
             note.Secret == secret &&
             note.ExpiryTime == expiryTime)
-        {
             return;
-        }
 
         var sb = new StringBuilder($"{editedBy.Name} has modified {type} {noteId}");
 
         if (note.Message != message)
-        {
             sb.Append($", modified message from {note.Message} to {message}");
-        }
 
         if (note.Secret != secret)
-        {
             sb.Append($", made it {(secret ? "secret" : "visible")}");
-        }
 
         if (note.NoteSeverity != severity)
-        {
             sb.Append($", updated the severity from {note.NoteSeverity} to {severity}");
-        }
 
         if (note.ExpiryTime != expiryTime)
         {
@@ -311,43 +309,39 @@ public sealed class AdminNotesManager : IAdminNotesManager, IPostInjectInit
             Secret = secret,
             LastEditedAt = editedAt,
             EditedByName = editedBy.Name,
-            ExpiryTime = expiryTime
+            ExpiryTime = expiryTime,
         };
         NoteModified?.Invoke(newNote);
     }
 
-    public async Task<List<IAdminRemarksRecord>> GetAllAdminRemarks(Guid player)
-    {
-        return await _db.GetAllAdminRemarks(player);
-    }
+    public async Task<List<IAdminRemarksRecord>> GetAllAdminRemarks(Guid player) =>
+        await _db.GetAllAdminRemarks(player);
 
     public async Task<List<IAdminRemarksRecord>> GetVisibleRemarks(Guid player)
     {
         if (_config.GetCVar(CCVars.SeeOwnNotes))
-        {
             return await _db.GetVisibleAdminNotes(player);
-        }
         _sawmill.Warning($"Someone tried to call GetVisibleNotes for {player} when see_own_notes was false");
         return new List<IAdminRemarksRecord>();
     }
 
-    public async Task<List<AdminWatchlistRecord>> GetActiveWatchlists(Guid player)
-    {
-        return await _db.GetActiveWatchlists(player);
-    }
+    public async Task<List<AdminWatchlistRecord>> GetActiveWatchlists(Guid player) =>
+        await _db.GetActiveWatchlists(player);
 
-    public async Task<List<AdminMessageRecord>> GetNewMessages(Guid player)
-    {
-        return await _db.GetMessages(player);
-    }
+    public async Task<List<AdminMessageRecord>> GetNewMessages(Guid player) => await _db.GetMessages(player);
 
-    public async Task MarkMessageAsSeen(int id, bool dismissedToo)
-    {
-        await _db.MarkMessageAsSeen(id, dismissedToo);
-    }
+    public async Task MarkMessageAsSeen(int id, bool dismissedToo) => await _db.MarkMessageAsSeen(id, dismissedToo);
 
-    public void PostInject()
-    {
-        _sawmill = _logManager.GetSawmill(SawmillId);
-    }
+    public void PostInject() => _sawmill = _logManager.GetSawmill(SawmillId);
+
+    private async Task<SharedAdminNote?> GetAdminRemark(int id, NoteType type) =>
+        type switch
+        {
+            NoteType.Note => (await _db.GetAdminNote(id))?.ToShared(),
+            NoteType.Watchlist => (await _db.GetAdminWatchlist(id))?.ToShared(),
+            NoteType.Message => (await _db.GetAdminMessage(id))?.ToShared(),
+            NoteType.ServerBan => (await _db.GetServerBanAsNoteAsync(id))?.ToShared(),
+            NoteType.RoleBan => (await _db.GetServerRoleBanAsNoteAsync(id))?.ToShared(),
+            _ => throw new ArgumentOutOfRangeException(nameof(type), type, "Unknown note type"),
+        };
 }

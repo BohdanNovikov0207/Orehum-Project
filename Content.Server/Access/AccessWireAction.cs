@@ -27,18 +27,16 @@ namespace Content.Server.Access;
 
 public sealed partial class AccessWireAction : ComponentWireAction<AccessReaderComponent>
 {
-    public override Color Color { get; set; } = Color.Green;
-    public override string Name { get; set; } = "wire-name-access";
-
     [DataField("pulseTimeout")]
     private int _pulseTimeout = 30;
 
-    public override StatusLightState? GetLightState(Wire wire, AccessReaderComponent comp)
-    {
-        return comp.Enabled ? StatusLightState.On : StatusLightState.Off;
-    }
+    public override Color Color { get; set; } = Color.Green;
+    public override string Name { get; set; } = "wire-name-access";
 
     public override object StatusKey => AccessWireActionKey.Status;
+
+    public override StatusLightState? GetLightState(Wire wire, AccessReaderComponent comp) =>
+        comp.Enabled ? StatusLightState.On : StatusLightState.Off;
 
     public override bool Cut(EntityUid user, Wire wire, AccessReaderComponent comp)
     {
@@ -58,15 +56,16 @@ public sealed partial class AccessWireAction : ComponentWireAction<AccessReaderC
     public override void Pulse(EntityUid user, Wire wire, AccessReaderComponent comp)
     {
         EntityManager.System<AccessReaderSystem>().SetActive((wire.Owner, comp), false);
-        WiresSystem.StartWireAction(wire.Owner, _pulseTimeout, PulseTimeoutKey.Key, new TimedWireEvent(AwaitPulseCancel, wire));
+        WiresSystem.StartWireAction(wire.Owner,
+            _pulseTimeout,
+            PulseTimeoutKey.Key,
+            new TimedWireEvent(AwaitPulseCancel, wire));
     }
 
     public override void Update(Wire wire)
     {
         if (!IsPowered(wire.Owner))
-        {
             WiresSystem.TryCancelWireAction(wire.Owner, PulseTimeoutKey.Key);
-        }
     }
 
     private void AwaitPulseCancel(Wire wire)
@@ -74,14 +73,12 @@ public sealed partial class AccessWireAction : ComponentWireAction<AccessReaderC
         if (!wire.IsCut)
         {
             if (EntityManager.TryGetComponent<AccessReaderComponent>(wire.Owner, out var access))
-            {
                 EntityManager.System<AccessReaderSystem>().SetActive((wire.Owner, access), true);
-            }
         }
     }
 
     private enum PulseTimeoutKey : byte
     {
-        Key
+        Key,
     }
 }

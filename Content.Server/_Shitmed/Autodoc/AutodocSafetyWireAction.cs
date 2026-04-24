@@ -16,10 +16,10 @@ public sealed partial class AutodocSafetyWireAction : ComponentWireAction<Autodo
     public override Color Color { get; set; } = Color.Red;
     public override string Name { get; set; } = "wire-name-autodoc-safety";
 
+    public override object StatusKey { get; } = AutodocWireStatus.SafetyIndicator;
+
     public override StatusLightState? GetLightState(Wire wire, AutodocComponent comp)
         => comp.RequireSleeping ? StatusLightState.On : StatusLightState.Off;
-
-    public override object StatusKey { get; } = AutodocWireStatus.SafetyIndicator;
 
     public override bool Cut(EntityUid user, Wire wire, AutodocComponent comp)
     {

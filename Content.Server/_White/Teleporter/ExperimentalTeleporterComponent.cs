@@ -11,16 +11,16 @@ namespace Content.Server._White.Teleporter;
 public sealed partial class ExperimentalTeleporterComponent : Component
 {
     [DataField]
-    public int MinTeleportRange = 3;
+    public int EmergencyLength = 4;
 
     [DataField]
     public int MaxTeleportRange = 8;
 
     [DataField]
-    public int EmergencyLength = 4;
+    public int MinTeleportRange = 3;
 
     [DataField]
-    public List<int> RandomRotations = new() {90, -90};
+    public List<int> RandomRotations = new() { 90, -90 };
 
     [DataField]
     public string? TeleportInEffect = "ExperimentalTeleporterInEffect";
@@ -29,5 +29,6 @@ public sealed partial class ExperimentalTeleporterComponent : Component
     public string? TeleportOutEffect = "ExperimentalTeleporterOutEffect";
 
     [DataField]
-    public SoundSpecifier TeleportSound = new SoundPathSpecifier("/Audio/_White/Object/Devices/experimentalsyndicateteleport.ogg");
+    public SoundSpecifier TeleportSound =
+        new SoundPathSpecifier("/Audio/_White/Object/Devices/experimentalsyndicateteleport.ogg");
 }

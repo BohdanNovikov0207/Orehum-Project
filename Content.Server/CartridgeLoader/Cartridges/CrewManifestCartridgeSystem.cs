@@ -21,12 +21,11 @@ namespace Content.Server.CartridgeLoader.Cartridges;
 
 public sealed class CrewManifestCartridgeSystem : EntitySystem
 {
+    private static readonly EntProtoId CartridgePrototypeName = "CrewManifestCartridge";
     [Dependency] private readonly CartridgeLoaderSystem _cartridgeLoader = default!;
     [Dependency] private readonly IConfigurationManager _configManager = default!;
     [Dependency] private readonly CrewManifestSystem _crewManifest = default!;
     [Dependency] private readonly StationSystem _stationSystem = default!;
-
-    private static readonly EntProtoId CartridgePrototypeName = "CrewManifestCartridge";
 
     /// <summary>
     /// Flag that shows that if crew manifest is allowed to be viewed from 'unsecure' entities,
@@ -44,23 +43,20 @@ public sealed class CrewManifestCartridgeSystem : EntitySystem
     }
 
     /// <summary>
-    /// The ui messages received here get wrapped by a CartridgeMessageEvent and are relayed from the <see cref="CartridgeLoaderSystem"/>
+    /// The ui messages received here get wrapped by a CartridgeMessageEvent and are relayed from the
+    /// <see cref="CartridgeLoaderSystem" />
     /// </summary>
     /// <remarks>
     /// The cartridge specific ui message event needs to inherit from the CartridgeMessageEvent
     /// </remarks>
-    private void OnUiMessage(EntityUid uid, CrewManifestCartridgeComponent component, CartridgeMessageEvent args)
-    {
+    private void OnUiMessage(EntityUid uid, CrewManifestCartridgeComponent component, CartridgeMessageEvent args) =>
         UpdateUiState(uid, GetEntity(args.LoaderUid), component);
-    }
 
     /// <summary>
     /// This gets called when the ui fragment needs to be updated for the first time after activating
     /// </summary>
-    private void OnUiReady(EntityUid uid, CrewManifestCartridgeComponent component, CartridgeUiReadyEvent args)
-    {
+    private void OnUiReady(EntityUid uid, CrewManifestCartridgeComponent component, CartridgeUiReadyEvent args) =>
         UpdateUiState(uid, args.Loader, component);
-    }
 
     private void UpdateUiState(EntityUid uid, EntityUid loaderUid, CrewManifestCartridgeComponent? component)
     {
@@ -97,7 +93,11 @@ public sealed class CrewManifestCartridgeSystem : EntitySystem
                 return;
             }
 
-            if (_cartridgeLoader.TryGetProgram<CrewManifestCartridgeComponent>(loaderUid, out var program, true, comp, cont))
+            if (_cartridgeLoader.TryGetProgram<CrewManifestCartridgeComponent>(loaderUid,
+                    out var program,
+                    true,
+                    comp,
+                    cont))
                 _cartridgeLoader.UninstallProgram(loaderUid, program.Value, comp);
         }
     }

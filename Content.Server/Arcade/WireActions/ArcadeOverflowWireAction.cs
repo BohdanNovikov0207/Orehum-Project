@@ -26,16 +26,12 @@ public sealed partial class ArcadeOverflowWireAction : BaseToggleWireAction
     public override void ToggleValue(EntityUid owner, bool setting)
     {
         if (EntityManager.TryGetComponent<SpaceVillainArcadeComponent>(owner, out var arcade))
-        {
             arcade.OverflowFlag = !setting;
-        }
     }
 
-    public override bool GetValue(EntityUid owner)
-    {
-        return EntityManager.TryGetComponent<SpaceVillainArcadeComponent>(owner, out var arcade)
-            && !arcade.OverflowFlag;
-    }
+    public override bool GetValue(EntityUid owner) =>
+        EntityManager.TryGetComponent<SpaceVillainArcadeComponent>(owner, out var arcade)
+        && !arcade.OverflowFlag;
 
     public override StatusLightState? GetLightState(Wire wire)
     {

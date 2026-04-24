@@ -45,8 +45,6 @@ public sealed class SpawnOnDespawnSystem : EntitySystem
         Spawn(comp.Prototype, xform.Coordinates);
     }
 
-    public void SetPrototype(Entity<SpawnOnDespawnComponent> entity, EntProtoId prototype)
-    {
+    public void SetPrototype(Entity<SpawnOnDespawnComponent> entity, EntProtoId prototype) =>
         entity.Comp.Prototype = prototype;
-    }
 }

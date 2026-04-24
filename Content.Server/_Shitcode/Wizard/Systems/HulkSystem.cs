@@ -10,14 +10,12 @@ using Content.Server._Goobstation.Wizard.Components;
 using Content.Server.Chat.Systems;
 using Content.Server.Humanoid;
 using Content.Server.Popups;
-using Content.Server.Toolshed.Commands.Misc;
 using Content.Server.Weapons.Ranged.Systems;
 using Content.Shared._Goobstation.Wizard.Mutate;
 using Content.Shared.Chat;
 using Content.Shared.Humanoid;
 using Content.Shared.Sprite;
 using Content.Shared.Weapons.Ranged.Components;
-using Robust.Server.Console.Commands;
 using Robust.Server.GameObjects;
 using Robust.Shared.Physics;
 using Robust.Shared.Physics.Collision.Shapes;
@@ -28,14 +26,14 @@ namespace Content.Server._Goobstation.Wizard.Systems;
 
 public sealed class HulkSystem : SharedHulkSystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly PhysicsSystem _physics = default!;
     [Dependency] private readonly AppearanceSystem _appearance = default!;
-    [Dependency] private readonly HumanoidAppearanceSystem _humanoidAppearance = default!;
-    [Dependency] private readonly GunSystem _gun = default!;
-    [Dependency] private readonly PopupSystem _popup = default!;
     [Dependency] private readonly ChatSystem _chat = default!;
+    [Dependency] private readonly GunSystem _gun = default!;
+    [Dependency] private readonly HumanoidAppearanceSystem _humanoidAppearance = default!;
+    [Dependency] private readonly PhysicsSystem _physics = default!;
+    [Dependency] private readonly PopupSystem _popup = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -85,7 +83,8 @@ public sealed class HulkSystem : SharedHulkSystem
         {
             comp.OldSkinColor = humanoid.SkinColor;
             comp.OldEyeColor = humanoid.EyeColor;
-            comp.OldCustomBaseLayers = new(humanoid.CustomBaseLayers);
+            comp.OldCustomBaseLayers =
+                new Dictionary<HumanoidVisualLayers, CustomBaseLayerInfo>(humanoid.CustomBaseLayers);
 
             _humanoidAppearance.SetSkinColor(uid, comp.SkinColor, true, false, humanoid);
 

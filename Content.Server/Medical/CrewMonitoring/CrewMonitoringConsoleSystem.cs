@@ -20,8 +20,6 @@
 
 using System.Linq;
 using Content.Goobstation.Shared.CrewMonitoring;
-using Content.Server.DeviceNetwork;
-using Content.Server.DeviceNetwork.Systems;
 using Content.Server.PowerCell;
 using Content.Shared.DeviceNetwork;
 using Content.Shared.DeviceNetwork.Events;
@@ -45,12 +43,12 @@ public sealed class CrewMonitoringConsoleSystem : EntitySystem
         SubscribeLocalEvent<CrewMonitoringConsoleComponent, BoundUIOpenedEvent>(OnUIOpened);
     }
 
-    private void OnRemove(EntityUid uid, CrewMonitoringConsoleComponent component, ComponentRemove args)
-    {
+    private void OnRemove(EntityUid uid, CrewMonitoringConsoleComponent component, ComponentRemove args) =>
         component.ConnectedSensors.Clear();
-    }
 
-    private void OnPacketReceived(EntityUid uid, CrewMonitoringConsoleComponent component, DeviceNetworkPacketEvent args)
+    private void OnPacketReceived(EntityUid uid,
+        CrewMonitoringConsoleComponent component,
+        DeviceNetworkPacketEvent args)
     {
         var payload = args.Data;
 
@@ -61,7 +59,8 @@ public sealed class CrewMonitoringConsoleSystem : EntitySystem
         if (command != DeviceNetworkConstants.CmdUpdatedState)
             return;
 
-        if (!payload.TryGetValue(SuitSensorConstants.NET_STATUS_COLLECTION, out Dictionary<string, SuitSensorStatus>? sensorStatus))
+        if (!payload.TryGetValue(SuitSensorConstants.NET_STATUS_COLLECTION,
+                out Dictionary<string, SuitSensorStatus>? sensorStatus))
             return;
         component.ConnectedSensors = sensorStatus;
 

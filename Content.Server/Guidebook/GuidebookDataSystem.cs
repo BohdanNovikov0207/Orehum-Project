@@ -94,7 +94,7 @@ public sealed class GuidebookDataSystem : EntitySystem
                     {
                         FieldInfo field => field.GetValue(entry.Component),
                         PropertyInfo property => property.GetValue(entry.Component),
-                        _ => throw new NotImplementedException("Unsupported member type")
+                        _ => throw new NotImplementedException("Unsupported member type"),
                     };
                     // Add it into the data cache
                     cache.AddData(prototype.ID, component, member.Name, value);
@@ -102,7 +102,8 @@ public sealed class GuidebookDataSystem : EntitySystem
             }
         }
 
-        Log.Debug($"Collected {cache.Count} Guidebook Protodata value(s) - {prototypeCount} matched prototype(s), {_tagged.Count} component(s), {memberCount} member(s)");
+        Log.Debug(
+            $"Collected {cache.Count} Guidebook Protodata value(s) - {prototypeCount} matched prototype(s), {_tagged.Count} component(s), {memberCount} member(s)");
     }
 
     /// <summary>

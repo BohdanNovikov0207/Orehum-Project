@@ -18,16 +18,16 @@ using Robust.Shared.Toolshed.Errors;
 
 namespace Content.Server.Toolshed.Commands;
 
-[ToolshedCommand, AdminCommand(AdminFlags.VarEdit)]
+[ToolshedCommand] [AdminCommand(AdminFlags.VarEdit)]
 public sealed class VisualizeCommand : ToolshedCommand
 {
     [Dependency] private readonly EuiManager _euiManager = default!;
 
     [CommandImplementation]
     public void VisualizeEntities(
-            IInvocationContext ctx,
-            [PipedArgument] IEnumerable<EntityUid> input
-        )
+        IInvocationContext ctx,
+        [PipedArgument] IEnumerable<EntityUid> input
+    )
     {
         if (ctx.Session is null)
         {
@@ -42,6 +42,7 @@ public sealed class VisualizeCommand : ToolshedCommand
         _euiManager.QueueStateUpdate(ui);
     }
 }
+
 internal sealed class ToolshedVisualizeEui : BaseEui
 {
     private readonly (string name, NetEntity entity)[] _entities;
@@ -51,8 +52,5 @@ internal sealed class ToolshedVisualizeEui : BaseEui
         _entities = entities;
     }
 
-    public override EuiStateBase GetNewState()
-    {
-        return new ToolshedVisualizeEuiState(_entities);
-    }
+    public override EuiStateBase GetNewState() => new ToolshedVisualizeEuiState(_entities);
 }

@@ -15,7 +15,7 @@ using Robust.Shared.Serialization.Manager;
 namespace Content.Server.Worldgen.Systems.Biomes;
 
 /// <summary>
-///     This handles biome selection, evaluating which biome to apply to a chunk based on noise channels.
+/// This handles biome selection, evaluating which biome to apply to a chunk based on noise channels.
 /// </summary>
 public sealed class BiomeSelectionSystem : BaseWorldSystem
 {

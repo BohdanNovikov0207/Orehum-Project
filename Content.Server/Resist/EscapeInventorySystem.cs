@@ -85,17 +85,17 @@
 
 using Content.Server.Popups;
 using Content.Shared._DV.Carrying;
-using Content.Shared.Storage;
-using Content.Shared.Inventory;
-using Content.Shared.Hands.EntitySystems;
-using Content.Shared.Storage.Components;
 using Content.Shared.ActionBlocker;
 using Content.Shared.Actions;
 using Content.Shared.Damage;
 using Content.Shared.DoAfter;
+using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Interaction.Events;
+using Content.Shared.Inventory;
 using Content.Shared.Movement.Events;
 using Content.Shared.Resist;
+using Content.Shared.Storage;
+using Content.Shared.Storage.Components;
 using Robust.Shared.Containers;
 using Robust.Shared.Prototypes;
 
@@ -103,22 +103,24 @@ namespace Content.Server.Resist;
 
 public sealed class EscapeInventorySystem : EntitySystem
 {
-    [Dependency] private readonly SharedDoAfterSystem _doAfterSystem = default!;
-    [Dependency] private readonly PopupSystem _popupSystem = default!;
-    [Dependency] private readonly SharedContainerSystem _containerSystem = default!;
-    [Dependency] private readonly ActionBlockerSystem _actionBlockerSystem = default!;
-    [Dependency] private readonly SharedHandsSystem _handsSystem = default!;
-    [Dependency] private readonly SharedActionsSystem _actions = default!; // DeltaV
-
     /// <summary>
     /// You can't escape the hands of an entity this many times more massive than you.
     /// </summary>
     public const float MaximumMassDisadvantage = 6f;
+
+    [Dependency] private readonly ActionBlockerSystem _actionBlockerSystem = default!;
+    [Dependency] private readonly SharedActionsSystem _actions = default!; // DeltaV
+    [Dependency] private readonly SharedContainerSystem _containerSystem = default!;
+    [Dependency] private readonly SharedDoAfterSystem _doAfterSystem = default!;
+
     /// <summary>
     /// DeltaV - action to cancel inventory escape
     /// </summary>
     [ValidatePrototypeId<EntityPrototype>]
     private readonly string _escapeCancelAction = "ActionCancelEscape";
+
+    [Dependency] private readonly SharedHandsSystem _handsSystem = default!;
+    [Dependency] private readonly PopupSystem _popupSystem = default!;
 
     public override void Initialize()
     {
@@ -130,7 +132,7 @@ public sealed class EscapeInventorySystem : EntitySystem
         SubscribeLocalEvent<CanEscapeInventoryComponent, EscapeInventoryCancelActionEvent>(OnCancelEscape); // DeltaV
 
         SubscribeLocalEvent<BeingCarriedComponent, MoveInputEvent>(OnCarriedEscape); // Goob
-        SubscribeLocalEvent<BeingCarriedComponent, DamageChangedEvent>(OnCarriedDamage);   // Goob
+        SubscribeLocalEvent<BeingCarriedComponent, DamageChangedEvent>(OnCarriedDamage); // Goob
     }
 
     private void OnRelayMovement(EntityUid uid, CanEscapeInventoryComponent component, ref MoveInputEvent args)
@@ -138,7 +140,8 @@ public sealed class EscapeInventorySystem : EntitySystem
         if (!args.HasDirectionalMovement)
             return;
 
-        if (!_containerSystem.TryGetContainingContainer((uid, null, null), out var container) || !_actionBlockerSystem.CanInteract(uid, container.Owner))
+        if (!_containerSystem.TryGetContainingContainer((uid, null, null), out var container) ||
+            !_actionBlockerSystem.CanInteract(uid, container.Owner))
             return;
 
         // Make sure there's nothing stopped the removal (like being glued)
@@ -156,16 +159,25 @@ public sealed class EscapeInventorySystem : EntitySystem
         }
 
         // Uncontested
-        if (HasComp<StorageComponent>(container.Owner) || HasComp<InventoryComponent>(container.Owner) || HasComp<SecretStashComponent>(container.Owner))
+        if (HasComp<StorageComponent>(container.Owner) || HasComp<InventoryComponent>(container.Owner) ||
+            HasComp<SecretStashComponent>(container.Owner))
             AttemptEscape(uid, container.Owner, component);
     }
 
-    public void AttemptEscape(EntityUid user, EntityUid container, CanEscapeInventoryComponent component, float multiplier = 1f) //private to public for carrying system.
+    public void AttemptEscape(EntityUid user,
+        EntityUid container,
+        CanEscapeInventoryComponent component,
+        float multiplier = 1f) //private to public for carrying system.
     {
         if (component.IsEscaping)
             return;
 
-        var doAfterEventArgs = new DoAfterArgs(EntityManager, user, component.BaseResistTime * multiplier, new EscapeInventoryEvent(), user, target: container)
+        var doAfterEventArgs = new DoAfterArgs(EntityManager,
+            user,
+            component.BaseResistTime * multiplier,
+            new EscapeInventoryEvent(),
+            user,
+            container)
         {
             BreakOnDamage = true,
             NeedHand = false,
@@ -177,7 +189,9 @@ public sealed class EscapeInventorySystem : EntitySystem
             return;
 
         _popupSystem.PopupEntity(Loc.GetString("escape-inventory-component-start-resisting"), user, user);
-        _popupSystem.PopupEntity(Loc.GetString("escape-inventory-component-start-resisting-target"), container, container);
+        _popupSystem.PopupEntity(Loc.GetString("escape-inventory-component-start-resisting-target"),
+            container,
+            container);
 
         // DeltaV - escape cancel action
         if (component.EscapeCancelAction is not { Valid: true })
@@ -206,7 +220,9 @@ public sealed class EscapeInventorySystem : EntitySystem
     }
 
     // DeltaV
-    private void OnCancelEscape(EntityUid uid, CanEscapeInventoryComponent component, EscapeInventoryCancelActionEvent args)
+    private void OnCancelEscape(EntityUid uid,
+        CanEscapeInventoryComponent component,
+        EscapeInventoryCancelActionEvent args)
     {
         if (component.DoAfter != null)
             _doAfterSystem.Cancel(component.DoAfter);
@@ -214,6 +230,7 @@ public sealed class EscapeInventorySystem : EntitySystem
         _actions.RemoveAction(uid, component.EscapeCancelAction);
         component.EscapeCancelAction = null;
     }
+
     // TODO Goobstation, move ts and the DV stuff to goobmod
     private void OnCarriedEscape(EntityUid uid, BeingCarriedComponent carried, ref MoveInputEvent args)
     {

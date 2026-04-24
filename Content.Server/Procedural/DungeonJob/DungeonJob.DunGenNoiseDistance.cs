@@ -23,7 +23,7 @@ public sealed partial class DungeonJob
      */
 
     /// <summary>
-    /// <see cref="NoiseDistanceDunGen"/>
+    ///     <see cref="NoiseDistanceDunGen" />
     /// </summary>
     private async Task<Dungeon> GenerateNoiseDistanceDunGen(
         Vector2i position,
@@ -77,9 +77,7 @@ public sealed partial class DungeonJob
 
                     // Do this down here because noise has a much higher chance of failing than reserved tiles.
                     if (reservedTiles.Contains(adjusted))
-                    {
                         break;
-                    }
 
                     tiles.Add((adjusted, new Tile(tileDef.TileId, variant: variant)));
                     roomTiles.Add(adjusted);
@@ -93,7 +91,7 @@ public sealed partial class DungeonJob
         var room = new DungeonRoom(roomTiles, area.Center, area, new HashSet<Vector2i>());
 
         _maps.SetTiles(_gridUid, _grid, tiles);
-        var dungeon = new Dungeon(new List<DungeonRoom>()
+        var dungeon = new Dungeon(new List<DungeonRoom>
         {
             room,
         });

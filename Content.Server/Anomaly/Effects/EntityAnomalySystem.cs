@@ -25,12 +25,12 @@ namespace Content.Server.Anomaly.Effects;
 public sealed class EntityAnomalySystem : SharedEntityAnomalySystem
 {
     [Dependency] private readonly SharedAnomalySystem _anomaly = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly SharedMapSystem _mapSystem = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
 
     private EntityQuery<PhysicsComponent> _physicsQuery;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         _physicsQuery = GetEntityQuery<PhysicsComponent>();
@@ -75,7 +75,8 @@ public sealed class EntityAnomalySystem : SharedEntityAnomalySystem
         }
     }
 
-    private void OnStabilityChanged(Entity<EntitySpawnAnomalyComponent> component, ref AnomalyStabilityChangedEvent args)
+    private void OnStabilityChanged(Entity<EntitySpawnAnomalyComponent> component,
+        ref AnomalyStabilityChangedEvent args)
     {
         foreach (var entry in component.Comp.Entries)
         {
@@ -97,7 +98,11 @@ public sealed class EntityAnomalySystem : SharedEntityAnomalySystem
         }
     }
 
-    private void SpawnEntities(Entity<EntitySpawnAnomalyComponent> anomaly, EntitySpawnSettingsEntry entry, float stability, float severity, float powerMod)
+    private void SpawnEntities(Entity<EntitySpawnAnomalyComponent> anomaly,
+        EntitySpawnSettingsEntry entry,
+        float stability,
+        float severity,
+        float powerMod)
     {
         var xform = Transform(anomaly);
         if (!TryComp(xform.GridUid, out MapGridComponent? grid))

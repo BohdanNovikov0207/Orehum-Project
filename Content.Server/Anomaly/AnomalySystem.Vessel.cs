@@ -67,19 +67,15 @@ public sealed partial class AnomalySystem
         anomalyComp.ConnectedVessel = null;
     }
 
-    private void OnVesselMapInit(EntityUid uid, AnomalyVesselComponent component, MapInitEvent args)
-    {
-        UpdateVesselAppearance(uid,  component);
-    }
+    private void OnVesselMapInit(EntityUid uid, AnomalyVesselComponent component, MapInitEvent args) =>
+        UpdateVesselAppearance(uid, component);
 
     private void OnVesselInteractUsing(EntityUid uid, AnomalyVesselComponent component, InteractUsingEvent args)
     {
         if (component.Anomaly != null ||
             !TryComp<AnomalyScannerComponent>(args.Used, out var scanner) ||
             scanner.ScannedAnomaly is not { } anomaly)
-        {
             return;
-        }
 
         if (!TryComp<AnomalyComponent>(anomaly, out var anomalyComponent) || anomalyComponent.ConnectedVessel != null)
             return;
@@ -87,13 +83,15 @@ public sealed partial class AnomalySystem
         component.Anomaly = scanner.ScannedAnomaly;
         anomalyComponent.ConnectedVessel = uid;
         _radiation.SetSourceEnabled(uid, true);
-        UpdateVesselAppearance(uid,  component);
+        UpdateVesselAppearance(uid, component);
         Popup.PopupEntity(Loc.GetString("anomaly-vessel-component-anomaly-assigned"), uid);
     }
 
-    private void OnVesselGetPointsPerSecond(EntityUid uid, AnomalyVesselComponent component, ref ResearchServerGetPointsPerSecondEvent args)
+    private void OnVesselGetPointsPerSecond(EntityUid uid,
+        AnomalyVesselComponent component,
+        ref ResearchServerGetPointsPerSecondEvent args)
     {
-        if (!this.IsPowered(uid, EntityManager) || component.Anomaly is not {} anomaly)
+        if (!this.IsPowered(uid, EntityManager) || component.Anomaly is not { } anomaly)
             return;
 
         args.Points += (int) (GetAnomalyPointValue(anomaly) * component.PointMultiplier);
@@ -108,7 +106,7 @@ public sealed partial class AnomalySystem
                 continue;
 
             component.Anomaly = null;
-            UpdateVesselAppearance(ent,  component);
+            UpdateVesselAppearance(ent, component);
             _radiation.SetSourceEnabled(ent, false);
 
             if (!args.Supercritical)
@@ -125,7 +123,7 @@ public sealed partial class AnomalySystem
             if (args.Anomaly != component.Anomaly)
                 continue;
 
-            UpdateVesselAppearance(ent,  component);
+            UpdateVesselAppearance(ent, component);
         }
     }
 
@@ -155,14 +153,11 @@ public sealed partial class AnomalySystem
         if (TryComp<AnomalyComponent>(component.Anomaly, out var anomalyComp))
         {
             if (anomalyComp.Stability <= anomalyComp.DecayThreshold)
-            {
                 value = 2;
-            }
             else if (anomalyComp.Stability >= anomalyComp.GrowthThreshold)
-            {
                 value = 3;
-            }
         }
+
         Appearance.SetData(uid, AnomalyVesselVisuals.AnomalyState, value, appearanceComponent);
 
         _ambient.SetAmbience(uid, on);
@@ -193,7 +188,8 @@ public sealed partial class AnomalySystem
                 continue;
 
             Audio.PlayPvs(vessel.BeepSound, vesselEnt);
-            var beepInterval = (vessel.MaxBeepInterval - vessel.MinBeepInterval) * (1 - timerPercentage) + vessel.MinBeepInterval;
+            var beepInterval = (vessel.MaxBeepInterval - vessel.MinBeepInterval) * (1 - timerPercentage) +
+                               vessel.MinBeepInterval;
             vessel.NextBeep = beepInterval + Timing.CurTime;
         }
     }

@@ -31,15 +31,16 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Linq;
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Server.Atmos.EntitySystems;
 using Content.Server.Body.Systems;
+using Content.Server.Emp;
 using Content.Server.Mech.Components;
 using Content.Server.Power.Components;
 using Content.Server.Power.EntitySystems;
 using Content.Shared.ActionBlocker;
 using Content.Shared.Damage;
 using Content.Shared.DoAfter;
-using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Interaction;
 using Content.Shared.Mech;
 using Content.Shared.Mech.Components;
@@ -57,14 +58,15 @@ using Robust.Server.GameObjects;
 using Robust.Shared.Containers;
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
-using Content.Shared.Whitelist;
-using Content.Server.Emp; // Goobstation
+
+// Goobstation
 
 namespace Content.Server.Mech.Systems;
 
-/// <inheritdoc/>
-public sealed partial class MechSystem : SharedMechSystem
+/// <inheritdoc />
+public sealed class MechSystem : SharedMechSystem
 {
+    private static readonly ProtoId<ToolQualityPrototype> PryingQuality = "Prying";
     [Dependency] private readonly ActionBlockerSystem _actionBlocker = default!;
     [Dependency] private readonly AtmosphereSystem _atmosphere = default!;
     [Dependency] private readonly BatterySystem _battery = default!;
@@ -72,13 +74,11 @@ public sealed partial class MechSystem : SharedMechSystem
     [Dependency] private readonly DamageableSystem _damageable = default!;
     [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly SharedToolSystem _toolSystem = default!;
     [Dependency] private readonly UserInterfaceSystem _ui = default!;
     [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
-    [Dependency] private readonly SharedToolSystem _toolSystem = default!;
 
-    private static readonly ProtoId<ToolQualityPrototype> PryingQuality = "Prying";
-
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
@@ -108,8 +108,10 @@ public sealed partial class MechSystem : SharedMechSystem
         SubscribeLocalEvent<MechAirComponent, GetFilterAirEvent>(OnGetFilterAir);
 
         #region Equipment UI message relays
+
         SubscribeLocalEvent<MechComponent, MechGrabberEjectMessage>(ReceiveEquipmentUiMesssages);
         SubscribeLocalEvent<MechComponent, MechSoundboardPlayMessage>(ReceiveEquipmentUiMesssages);
+
         #endregion
     }
 
@@ -133,10 +135,15 @@ public sealed partial class MechSystem : SharedMechSystem
 
         if (_toolSystem.HasQuality(args.Used, PryingQuality) && component.BatterySlot.ContainedEntity != null)
         {
-            var doAfterEventArgs = new DoAfterArgs(EntityManager, args.User, component.BatteryRemovalDelay,
-                new RemoveBatteryEvent(), uid, target: uid, used: args.Target)
+            var doAfterEventArgs = new DoAfterArgs(EntityManager,
+                args.User,
+                component.BatteryRemovalDelay,
+                new RemoveBatteryEvent(),
+                uid,
+                uid,
+                args.Target)
             {
-                BreakOnMove = true
+                BreakOnMove = true,
             };
 
             _doAfter.TryStartDoAfter(doAfterEventArgs);
@@ -221,19 +228,24 @@ public sealed partial class MechSystem : SharedMechSystem
                 Text = Loc.GetString("mech-verb-enter"),
                 Act = () =>
                 {
-                    var doAfterEventArgs = new DoAfterArgs(EntityManager, args.User, component.EntryDelay, new MechEntryEvent(), uid, target: uid)
+                    var doAfterEventArgs = new DoAfterArgs(EntityManager,
+                        args.User,
+                        component.EntryDelay,
+                        new MechEntryEvent(),
+                        uid,
+                        uid)
                     {
                         BreakOnMove = true,
                         MultiplyDelay = false, // Goobstation
                     };
 
                     _doAfter.TryStartDoAfter(doAfterEventArgs);
-                }
+                },
             };
             var openUiVerb = new AlternativeVerb //can't hijack someone else's mech
             {
                 Act = () => ToggleMechUi(uid, component, args.User),
-                Text = Loc.GetString("mech-ui-open-verb")
+                Text = Loc.GetString("mech-ui-open-verb"),
             };
             args.Verbs.Add(enterVerb);
             args.Verbs.Add(openUiVerb);
@@ -252,14 +264,21 @@ public sealed partial class MechSystem : SharedMechSystem
                         return;
                     }
 
-                    var doAfterEventArgs = new DoAfterArgs(EntityManager, args.User, component.ExitDelay, new MechExitEvent(), uid, target: uid)
+                    var doAfterEventArgs = new DoAfterArgs(EntityManager,
+                        args.User,
+                        component.ExitDelay,
+                        new MechExitEvent(),
+                        uid,
+                        uid)
                     {
                         BreakOnMove = true,
                     };
-                    _popup.PopupEntity(Loc.GetString("mech-eject-pilot-alert", ("item", uid), ("user", args.User)), uid, PopupType.Large);
+                    _popup.PopupEntity(Loc.GetString("mech-eject-pilot-alert", ("item", uid), ("user", args.User)),
+                        uid,
+                        PopupType.Large);
 
                     _doAfter.TryStartDoAfter(doAfterEventArgs);
-                }
+                },
             };
             args.Verbs.Add(ejectVerb);
         }
@@ -290,6 +309,7 @@ public sealed partial class MechSystem : SharedMechSystem
         TryEject(uid, component);
         args.Handled = true;
     }
+
     //goobstation
     private void OnEmpPulse(EntityUid uid, MechComponent component, EmpPulseEvent args)
     {
@@ -332,7 +352,8 @@ public sealed partial class MechSystem : SharedMechSystem
         UpdateUserInterface(uid, component);
     }
 
-    private void ReceiveEquipmentUiMesssages<T>(EntityUid uid, MechComponent component, T args) where T : MechEquipmentUiMessage
+    private void ReceiveEquipmentUiMesssages<T>(EntityUid uid, MechComponent component, T args)
+        where T : MechEquipmentUiMessage
     {
         var ev = new MechEquipmentUiMessageRelayEvent(args);
         var allEquipment = new List<EntityUid>(component.EquipmentContainer.ContainedEntities);
@@ -360,7 +381,7 @@ public sealed partial class MechSystem : SharedMechSystem
 
         var state = new MechBoundUiState
         {
-            EquipmentStates = ev.States
+            EquipmentStates = ev.States,
         };
         _ui.SetUiState(uid, MechUiKey.Key, state);
     }
@@ -391,15 +412,20 @@ public sealed partial class MechSystem : SharedMechSystem
         _battery.SetCharge(battery!.Value, batteryComp.CurrentCharge + delta.Float(), batteryComp);
         if (batteryComp.CurrentCharge != component.Energy) //if there's a discrepency, we have to resync them
         {
-            Log.Debug($"Battery charge was not equal to mech charge. Battery {batteryComp.CurrentCharge}. Mech {component.Energy}");
+            Log.Debug(
+                $"Battery charge was not equal to mech charge. Battery {batteryComp.CurrentCharge}. Mech {component.Energy}");
             component.Energy = batteryComp.CurrentCharge;
             Dirty(uid, component);
         }
+
         _actionBlocker.UpdateCanMove(uid);
         return true;
     }
 
-    public void InsertBattery(EntityUid uid, EntityUid toInsert, MechComponent? component = null, BatteryComponent? battery = null)
+    public void InsertBattery(EntityUid uid,
+        EntityUid toInsert,
+        MechComponent? component = null,
+        BatteryComponent? battery = null)
     {
         if (!Resolve(uid, ref component, false))
             return;
@@ -433,13 +459,12 @@ public sealed partial class MechSystem : SharedMechSystem
     }
 
     #region Atmos Handling
+
     private void OnInhale(EntityUid uid, MechPilotComponent component, InhaleLocationEvent args)
     {
         if (!TryComp<MechComponent>(component.Mech, out var mech) ||
             !TryComp<MechAirComponent>(component.Mech, out var mechAir))
-        {
             return;
-        }
 
         if (mech.Airtight)
             args.Gas = mechAir.Air;
@@ -449,9 +474,7 @@ public sealed partial class MechSystem : SharedMechSystem
     {
         if (!TryComp<MechComponent>(component.Mech, out var mech) ||
             !TryComp<MechAirComponent>(component.Mech, out var mechAir))
-        {
             return;
-        }
 
         if (mech.Airtight)
             args.Gas = mechAir.Air;
@@ -472,7 +495,7 @@ public sealed partial class MechSystem : SharedMechSystem
             return;
         }
 
-        args.Gas =  _atmosphere.GetContainingMixture(component.Mech, excite: args.Excite);
+        args.Gas = _atmosphere.GetContainingMixture(component.Mech, excite: args.Excite);
         args.Handled = true;
     }
 
@@ -487,5 +510,6 @@ public sealed partial class MechSystem : SharedMechSystem
 
         args.Air = comp.Air;
     }
+
     #endregion
 }

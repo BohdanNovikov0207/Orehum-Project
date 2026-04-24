@@ -17,60 +17,50 @@ using Content.Server.Holiday.Interfaces;
 using Content.Server.Holiday.ShouldCelebrate;
 using Robust.Shared.Prototypes;
 
-namespace Content.Server.Holiday
+namespace Content.Server.Holiday;
+
+[Prototype]
+public sealed class HolidayPrototype : IPrototype
 {
-    [Prototype]
-    public sealed partial class HolidayPrototype : IPrototype
-    {
-        [DataField("name")] public string Name { get; private set; } = string.Empty;
+    [DataField("celebrate")]
+    private readonly IHolidayCelebrate? _celebrate = null;
 
-        [ViewVariables]
-        [IdDataField]
-        public string ID { get; private set; } = default!;
+    [DataField("greet")]
+    private readonly IHolidayGreet _greet = new DefaultHolidayGreet();
 
-        [DataField("beginDay")]
-        public byte BeginDay { get; set; } = 1;
+    [DataField("shouldCelebrate")]
+    private readonly IHolidayShouldCelebrate _shouldCelebrate = new DefaultHolidayShouldCelebrate();
 
-        [DataField("beginMonth")]
-        public Month BeginMonth { get; set; } = Month.Invalid;
+    [DataField("name")] public string Name { get; private set; } = string.Empty;
 
-        /// <summary>
-        ///     Day this holiday will end. Zero means it lasts a single day.
-        /// </summary>
-        [DataField("endDay")]
-        public byte EndDay { get; set; }
+    [DataField("beginDay")]
+    public byte BeginDay { get; set; } = 1;
 
-        /// <summary>
-        ///     Month this holiday will end in. Invalid means it lasts a single month.
-        /// </summary>
-        [DataField("endMonth")]
-        public Month EndMonth { get; set; } = Month.Invalid;
+    [DataField("beginMonth")]
+    public Month BeginMonth { get; set; } = Month.Invalid;
 
-        [DataField("shouldCelebrate")]
-        private IHolidayShouldCelebrate _shouldCelebrate = new DefaultHolidayShouldCelebrate();
+    /// <summary>
+    /// Day this holiday will end. Zero means it lasts a single day.
+    /// </summary>
+    [DataField("endDay")]
+    public byte EndDay { get; set; }
 
-        [DataField("greet")]
-        private IHolidayGreet _greet = new DefaultHolidayGreet();
+    /// <summary>
+    /// Month this holiday will end in. Invalid means it lasts a single month.
+    /// </summary>
+    [DataField("endMonth")]
+    public Month EndMonth { get; set; } = Month.Invalid;
 
-        [DataField("celebrate")]
-        private IHolidayCelebrate? _celebrate = null;
+    [ViewVariables]
+    [IdDataField]
+    public string ID { get; } = default!;
 
-        public bool ShouldCelebrate(DateTime date)
-        {
-            return _shouldCelebrate.ShouldCelebrate(date, this);
-        }
+    public bool ShouldCelebrate(DateTime date) => _shouldCelebrate.ShouldCelebrate(date, this);
 
-        public string Greet()
-        {
-            return _greet.Greet(this);
-        }
+    public string Greet() => _greet.Greet(this);
 
-        /// <summary>
-        ///     Called before the round starts to set up any festive shenanigans.
-        /// </summary>
-        public void Celebrate()
-        {
-            _celebrate?.Celebrate(this);
-        }
-    }
+    /// <summary>
+    /// Called before the round starts to set up any festive shenanigans.
+    /// </summary>
+    public void Celebrate() => _celebrate?.Celebrate(this);
 }

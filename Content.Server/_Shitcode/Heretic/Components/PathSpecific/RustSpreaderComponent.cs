@@ -15,12 +15,6 @@ namespace Content.Server.Heretic.Components.PathSpecific;
 public sealed partial class RustSpreaderComponent : Component
 {
     [NonSerialized]
-    public Queue<TileRef> TilesToRust = new();
-
-    [NonSerialized]
-    public HashSet<TileRef> ProcessedTiles = new();
-
-    [NonSerialized]
     public HashSet<EntityUid> AffectedDocks = new();
 
     [DataField]
@@ -29,6 +23,12 @@ public sealed partial class RustSpreaderComponent : Component
     [DataField]
     public bool Paused;
 
+    [NonSerialized]
+    public HashSet<TileRef> ProcessedTiles = new();
+
     [DataField]
     public EntProtoId TileRune = "TileHereticRustRune";
+
+    [NonSerialized]
+    public Queue<TileRef> TilesToRust = new();
 }

@@ -5,9 +5,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Goobstation.Common.Religion;
+using Content.Goobstation.Shared.Bible;
 using Content.Server._DV.CosmicCult.Components;
 using Content.Server.Atmos.Components;
-using Content.Goobstation.Shared.Bible; // Goobstation - Bible
 using Content.Server.Popups;
 using Content.Shared._DV.CosmicCult;
 using Content.Shared._DV.CosmicCult.Components;
@@ -17,6 +17,7 @@ using Content.Shared.Interaction;
 using Content.Shared.Popups;
 using Content.Shared.Temperature.Components;
 using Robust.Shared.Audio.Systems;
+// Goobstation - Bible
 
 namespace Content.Server._DV.CosmicCult.EntitySystems;
 

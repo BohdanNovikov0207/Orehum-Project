@@ -18,47 +18,10 @@ namespace Content.Server.Arcade.SpaceVillain;
 public sealed partial class SpaceVillainArcadeComponent : SharedSpaceVillainArcadeComponent
 {
     /// <summary>
-    /// Unused flag that can be hacked via wires.
-    /// Name suggests that it was intended to either make the health/mana values underflow while playing the game or turn the arcade machine into an infinite prize fountain.
-    /// </summary>
-    [ViewVariables]
-    public bool OverflowFlag;
-
-    /// <summary>
     /// The current session of the SpaceVillain game for this arcade machine.
     /// </summary>
     [ViewVariables]
     public SpaceVillainGame? Game = null;
-
-    /// <summary>
-    /// The sound played when a new session of the SpaceVillain game is begun.
-    /// </summary>
-    [DataField("newGameSound")]
-    public SoundSpecifier NewGameSound = new SoundPathSpecifier("/Audio/Effects/Arcade/newgame.ogg");
-
-    /// <summary>
-    /// The sound played when the player chooses to attack.
-    /// </summary>
-    [DataField("playerAttackSound")]
-    public SoundSpecifier PlayerAttackSound = new SoundPathSpecifier("/Audio/Effects/Arcade/player_attack.ogg");
-
-    /// <summary>
-    /// The sound played when the player chooses to heal.
-    /// </summary>
-    [DataField("playerHealSound")]
-    public SoundSpecifier PlayerHealSound = new SoundPathSpecifier("/Audio/Effects/Arcade/player_heal.ogg");
-
-    /// <summary>
-    /// The sound played when the player chooses to regain mana.
-    /// </summary>
-    [DataField("playerChargeSound")]
-    public SoundSpecifier PlayerChargeSound = new SoundPathSpecifier("/Audio/Effects/Arcade/player_charge.ogg");
-
-    /// <summary>
-    /// The sound played when the player wins.
-    /// </summary>
-    [DataField("winSound")]
-    public SoundSpecifier WinSound = new SoundPathSpecifier("/Audio/Effects/Arcade/win.ogg");
 
     /// <summary>
     /// The sound played when the player loses.
@@ -67,21 +30,54 @@ public sealed partial class SpaceVillainArcadeComponent : SharedSpaceVillainArca
     public SoundSpecifier GameOverSound = new SoundPathSpecifier("/Audio/Effects/Arcade/gameover.ogg");
 
     /// <summary>
+    /// The sound played when a new session of the SpaceVillain game is begun.
+    /// </summary>
+    [DataField("newGameSound")]
+    public SoundSpecifier NewGameSound = new SoundPathSpecifier("/Audio/Effects/Arcade/newgame.ogg");
+
+    /// <summary>
+    /// Unused flag that can be hacked via wires.
+    /// Name suggests that it was intended to either make the health/mana values underflow while playing the game or turn the
+    /// arcade machine into an infinite prize fountain.
+    /// </summary>
+    [ViewVariables]
+    public bool OverflowFlag;
+
+    /// <summary>
+    /// The sound played when the player chooses to attack.
+    /// </summary>
+    [DataField("playerAttackSound")]
+    public SoundSpecifier PlayerAttackSound = new SoundPathSpecifier("/Audio/Effects/Arcade/player_attack.ogg");
+
+    /// <summary>
+    /// The sound played when the player chooses to regain mana.
+    /// </summary>
+    [DataField("playerChargeSound")]
+    public SoundSpecifier PlayerChargeSound = new SoundPathSpecifier("/Audio/Effects/Arcade/player_charge.ogg");
+
+    /// <summary>
+    /// The sound played when the player chooses to heal.
+    /// </summary>
+    [DataField("playerHealSound")]
+    public SoundSpecifier PlayerHealSound = new SoundPathSpecifier("/Audio/Effects/Arcade/player_heal.ogg");
+
+    /// <summary>
     /// The prefixes that can be used to create the game name.
     /// </summary>
     [ViewVariables(VVAccess.ReadWrite)]
     [DataField("possibleFightVerbs")]
     public List<string> PossibleFightVerbs = new()
-        {"Defeat", "Annihilate", "Save", "Strike", "Stop", "Destroy", "Robust", "Romance", "Pwn", "Own"};
+        { "Defeat", "Annihilate", "Save", "Strike", "Stop", "Destroy", "Robust", "Romance", "Pwn", "Own" };
 
     /// <summary>
     /// The first names/titles that can be used to construct the name of the villain.
     /// </summary>
     [ViewVariables(VVAccess.ReadWrite)]
     [DataField("possibleFirstEnemyNames")]
-    public List<string> PossibleFirstEnemyNames = new(){
+    public List<string> PossibleFirstEnemyNames = new()
+    {
         "the Automatic", "Farmer", "Lord", "Professor", "the Cuban", "the Evil", "the Dread King",
-        "the Space", "Lord", "the Great", "Duke", "General"
+        "the Space", "Lord", "the Great", "Duke", "General",
     };
 
     /// <summary>
@@ -92,7 +88,7 @@ public sealed partial class SpaceVillainArcadeComponent : SharedSpaceVillainArca
     public List<string> PossibleLastEnemyNames = new()
     {
         "Melonoid", "Murdertron", "Sorcerer", "Ruin", "Jeff", "Ectoplasm", "Crushulon", "Uhangoid",
-        "Vhakoid", "Peteoid", "slime", "Griefer", "ERPer", "Lizard Man", "Unicorn"
+        "Vhakoid", "Peteoid", "slime", "Griefer", "ERPer", "Lizard Man", "Unicorn",
     };
 
     /// <summary>
@@ -103,10 +99,10 @@ public sealed partial class SpaceVillainArcadeComponent : SharedSpaceVillainArca
     public List<EntProtoId> PossibleRewards = new();
 
     /// <summary>
-    /// The minimum number of prizes the arcade machine can have.
+    /// The remaining number of prizes the arcade machine can dispense.
     /// </summary>
-    [DataField("rewardMinAmount")]
-    public int RewardMinAmount;
+    [ViewVariables(VVAccess.ReadWrite)]
+    public int RewardAmount = 0;
 
     /// <summary>
     /// The maximum number of prizes the arcade machine can have.
@@ -115,8 +111,14 @@ public sealed partial class SpaceVillainArcadeComponent : SharedSpaceVillainArca
     public int RewardMaxAmount;
 
     /// <summary>
-    /// The remaining number of prizes the arcade machine can dispense.
+    /// The minimum number of prizes the arcade machine can have.
     /// </summary>
-    [ViewVariables(VVAccess.ReadWrite)]
-    public int RewardAmount = 0;
+    [DataField("rewardMinAmount")]
+    public int RewardMinAmount;
+
+    /// <summary>
+    /// The sound played when the player wins.
+    /// </summary>
+    [DataField("winSound")]
+    public SoundSpecifier WinSound = new SoundPathSpecifier("/Audio/Effects/Arcade/win.ogg");
 }

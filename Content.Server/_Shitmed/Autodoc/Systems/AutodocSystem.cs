@@ -5,22 +5,21 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Server.Body.Components;
 using Content.Server.Body.Systems;
 using Content.Server.Chat.Systems;
-using Content.Shared.DoAfter;
-using Content.Shared.Power.EntitySystems;
 using Content.Shared._Shitmed.Autodoc.Components;
 using Content.Shared._Shitmed.Autodoc.Systems;
 using Content.Shared.Body.Components;
 using Content.Shared.Chat;
+using Content.Shared.DoAfter;
+using Content.Shared.Power.EntitySystems;
 
 namespace Content.Server._Shitmed.Autodoc.Systems;
 
 public sealed class AutodocSystem : SharedAutodocSystem
 {
-    [Dependency] private readonly InternalsSystem _internals = default!;
     [Dependency] private readonly ChatSystem _chat = default!;
+    [Dependency] private readonly InternalsSystem _internals = default!;
     [Dependency] private readonly SharedPowerReceiverSystem _power = default!;
 
     public override void Update(float frameTime)
@@ -46,14 +45,13 @@ public sealed class AutodocSystem : SharedAutodocSystem
     protected override void WakePatient(EntityUid patient)
     {
         // incase they are using nitrous, disconnect it so they can get woken up later on
-        if (TryComp<InternalsComponent>(patient, out var internals) && _internals.AreInternalsWorking(patient, internals))
+        if (TryComp<InternalsComponent>(patient, out var internals) &&
+            _internals.AreInternalsWorking(patient, internals))
             _internals.DisconnectTank((patient, internals));
 
         base.WakePatient(patient);
     }
 
-    public override void Say(EntityUid uid, string msg)
-    {
-        _chat.TrySendInGameICMessage(uid, msg, InGameICChatType.Speak, hideChat: false, hideLog: true, checkRadioPrefix: false);
-    }
+    public override void Say(EntityUid uid, string msg) =>
+        _chat.TrySendInGameICMessage(uid, msg, InGameICChatType.Speak, false, true, checkRadioPrefix: false);
 }

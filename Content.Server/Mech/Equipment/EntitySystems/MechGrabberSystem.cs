@@ -94,30 +94,31 @@ using Content.Shared.Mech.Components;
 using Content.Shared.Mech.Equipment.Components;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Wall;
-using Content.Shared.Whitelist; // goobstation - added blacklist
+using Content.Shared.Whitelist;
 using Robust.Server.GameObjects;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Containers;
 using Robust.Shared.Map;
 using Robust.Shared.Physics;
 using Robust.Shared.Physics.Components;
+// goobstation - added blacklist
 
 namespace Content.Server.Mech.Equipment.EntitySystems;
 
 /// <summary>
-/// Handles <see cref="MechGrabberComponent"/> and all related UI logic
+/// Handles <see cref="MechGrabberComponent" /> and all related UI logic
 /// </summary>
 public sealed class MechGrabberSystem : EntitySystem
 {
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedContainerSystem _container = default!;
-    [Dependency] private readonly MechSystem _mech = default!;
     [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
     [Dependency] private readonly InteractionSystem _interaction = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly MechSystem _mech = default!;
     [Dependency] private readonly TransformSystem _transform = default!;
     [Dependency] private readonly EntityWhitelistSystem _whitelist = default!; // Goobstation - added blacklist
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         SubscribeLocalEvent<MechGrabberComponent, MechEquipmentUiMessageRelayEvent>(OnGrabberMessage);
@@ -189,22 +190,19 @@ public sealed class MechGrabberSystem : EntitySystem
         }
     }
 
-    private void OnAttemptRemove(EntityUid uid, MechGrabberComponent component, ref AttemptRemoveMechEquipmentEvent args)
-    {
-        args.Cancelled = component.ItemContainer.ContainedEntities.Any();
-    }
+    private void OnAttemptRemove(EntityUid uid,
+        MechGrabberComponent component,
+        ref AttemptRemoveMechEquipmentEvent args) => args.Cancelled = component.ItemContainer.ContainedEntities.Any();
 
-    private void OnStartup(EntityUid uid, MechGrabberComponent component, ComponentStartup args)
-    {
+    private void OnStartup(EntityUid uid, MechGrabberComponent component, ComponentStartup args) =>
         component.ItemContainer = _container.EnsureContainer<Container>(uid, "item-container");
-    }
 
     private void OnUiStateReady(EntityUid uid, MechGrabberComponent component, MechEquipmentUiStateReadyEvent args)
     {
         var state = new MechGrabberUiState
         {
             Contents = GetNetEntityList(component.ItemContainer.ContainedEntities.ToList()),
-            MaxContents = component.MaxContents
+            MaxContents = component.MaxContents,
         };
         args.States.Add(GetNetEntity(uid), state);
     }
@@ -221,9 +219,7 @@ public sealed class MechGrabberSystem : EntitySystem
         if (TryComp<PhysicsComponent>(target, out var physics) && physics.BodyType == BodyType.Static ||
             HasComp<WallMountComponent>(target) ||
             HasComp<MobStateComponent>(target))
-        {
             return;
-        }
 
         if (_whitelist.IsBlacklistPass(component.Blacklist, target)) // Goobstation - added blackist
             return;
@@ -245,7 +241,13 @@ public sealed class MechGrabberSystem : EntitySystem
 
         args.Handled = true;
         component.AudioStream = _audio.PlayPvs(component.GrabSound, uid)?.Entity;
-        var doAfterArgs = new DoAfterArgs(EntityManager, args.User, component.GrabDelay, new GrabberDoAfterEvent(), uid, target: target, used: uid)
+        var doAfterArgs = new DoAfterArgs(EntityManager,
+            args.User,
+            component.GrabDelay,
+            new GrabberDoAfterEvent(),
+            uid,
+            target,
+            uid)
         {
             BreakOnMove = true,
             MultiplyDelay = false, // Goobstation
@@ -267,7 +269,8 @@ public sealed class MechGrabberSystem : EntitySystem
         if (args.Handled || args.Args.Target == null)
             return;
 
-        if (!TryComp<MechEquipmentComponent>(uid, out var equipmentComponent) || equipmentComponent.EquipmentOwner == null)
+        if (!TryComp<MechEquipmentComponent>(uid, out var equipmentComponent) ||
+            equipmentComponent.EquipmentOwner == null)
             return;
         if (!_mech.TryChangeEnergy(equipmentComponent.EquipmentOwner.Value, component.GrabEnergyDelta))
             return;

@@ -9,5 +9,4 @@ namespace Content.Server.Weapons.Misc;
 
 public sealed class GrapplingGunSystem : SharedGrapplingGunSystem
 {
-
 }

@@ -7,8 +7,8 @@ namespace Content.Server.Trigger.Systems;
 
 public sealed class ReleaseGasOnTriggerSystem : SharedReleaseGasOnTriggerSystem
 {
-    [Dependency] private readonly AtmosphereSystem _atmosphereSystem = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly AtmosphereSystem _atmosphereSystem = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
 
 

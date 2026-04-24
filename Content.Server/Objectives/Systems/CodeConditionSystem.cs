@@ -5,14 +5,14 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Server.Objectives.Components;
-using Content.Shared.Objectives.Components;
 using Content.Shared.Mind;
 using Content.Shared.Mind.Components;
+using Content.Shared.Objectives.Components;
 
 namespace Content.Server.Objectives.Systems;
 
 /// <summary>
-/// Handles <see cref="CodeConditionComponent"/> progress and provides API for systems to use.
+/// Handles <see cref="CodeConditionComponent" /> progress and provides API for systems to use.
 /// </summary>
 public sealed class CodeConditionSystem : EntitySystem
 {
@@ -25,10 +25,8 @@ public sealed class CodeConditionSystem : EntitySystem
         SubscribeLocalEvent<CodeConditionComponent, ObjectiveGetProgressEvent>(OnGetProgress);
     }
 
-    private void OnGetProgress(Entity<CodeConditionComponent> ent, ref ObjectiveGetProgressEvent args)
-    {
+    private void OnGetProgress(Entity<CodeConditionComponent> ent, ref ObjectiveGetProgressEvent args) =>
         args.Progress = ent.Comp.Completed ? 1f : 0f;
-    }
 
     /// <summary>
     /// Returns whether an objective is completed.
@@ -57,7 +55,7 @@ public sealed class CodeConditionSystem : EntitySystem
     /// </summary>
     public void SetCompleted(Entity<MindContainerComponent?> mob, string prototype, bool completed = true)
     {
-        if (_mind.GetMind(mob, mob.Comp) is not {} mindId)
+        if (_mind.GetMind(mob, mob.Comp) is not { } mindId)
             return;
 
         if (!_mind.TryFindObjective(mindId, prototype, out var obj))

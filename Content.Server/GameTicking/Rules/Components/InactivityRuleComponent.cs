@@ -12,7 +12,7 @@ namespace Content.Server.GameTicking.Rules.Components;
 /// <summary>
 /// Gamerule that ends the round after a period of inactivity.
 /// </summary>
-[RegisterComponent, Access(typeof(InactivityTimeRestartRuleSystem))]
+[RegisterComponent] [Access(typeof(InactivityTimeRestartRuleSystem))]
 public sealed partial class InactivityRuleComponent : Component
 {
     /// <summary>
@@ -25,7 +25,7 @@ public sealed partial class InactivityRuleComponent : Component
     /// The delay between announcing round end and the lobby.
     /// </summary>
     [DataField("roundEndDelay", required: true)]
-    public TimeSpan RoundEndDelay  = TimeSpan.FromSeconds(10);
+    public TimeSpan RoundEndDelay = TimeSpan.FromSeconds(10);
 
     public CancellationTokenSource TimerCancel = new();
 }

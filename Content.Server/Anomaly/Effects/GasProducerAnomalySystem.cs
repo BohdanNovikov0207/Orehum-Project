@@ -9,25 +9,25 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Server.Atmos.EntitySystems;
-using Content.Server.Anomaly.Components;
-using Content.Shared.Anomaly.Components;
-using Content.Shared.Atmos;
-using Robust.Shared.Random;
 using System.Linq;
 using System.Numerics;
+using Content.Server.Anomaly.Components;
+using Content.Server.Atmos.EntitySystems;
+using Content.Shared.Anomaly.Components;
+using Content.Shared.Atmos;
 using Robust.Shared.Map.Components;
+using Robust.Shared.Random;
 
 namespace Content.Server.Anomaly.Effects;
 
 /// <summary>
-/// This handles <see cref="GasProducerAnomalyComponent"/> and the events from <seealso cref="AnomalySystem"/>
+/// This handles <see cref="GasProducerAnomalyComponent" /> and the events from <seealso cref="AnomalySystem" />
 /// </summary>
 public sealed class GasProducerAnomalySystem : EntitySystem
 {
     [Dependency] private readonly AtmosphereSystem _atmosphere = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly SharedMapSystem _map = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
 
     public override void Initialize()
     {
@@ -35,12 +35,19 @@ public sealed class GasProducerAnomalySystem : EntitySystem
         SubscribeLocalEvent<GasProducerAnomalyComponent, AnomalySupercriticalEvent>(OnSupercritical);
     }
 
-    private void OnSupercritical(EntityUid uid, GasProducerAnomalyComponent component, ref AnomalySupercriticalEvent args)
+    private void OnSupercritical(EntityUid uid,
+        GasProducerAnomalyComponent component,
+        ref AnomalySupercriticalEvent args)
     {
         if (!component.ReleaseOnMaxSeverity)
             return;
 
-        ReleaseGas(uid, component.ReleasedGas, component.SuperCriticalMoleAmount, component.spawnRadius, component.tileCount, component.tempChange);
+        ReleaseGas(uid,
+            component.ReleasedGas,
+            component.SuperCriticalMoleAmount,
+            component.spawnRadius,
+            component.tileCount,
+            component.tempChange);
     }
 
     public override void Update(float frameTime)
@@ -56,7 +63,12 @@ public sealed class GasProducerAnomalySystem : EntitySystem
             // Yes this is unused code since there are no anomalies that
             // release gas passively *yet*, but since I'm here I figured
             // I'd save someone some time and just add it for the future
-            ReleaseGas(ent, comp.ReleasedGas, comp.PassiveMoleAmount * frameTime, comp.spawnRadius, comp.tileCount, comp.tempChange);
+            ReleaseGas(ent,
+                comp.ReleasedGas,
+                comp.PassiveMoleAmount * frameTime,
+                comp.spawnRadius,
+                comp.tileCount,
+                comp.tempChange);
         }
     }
 
@@ -69,9 +81,9 @@ public sealed class GasProducerAnomalySystem : EntitySystem
 
         var localpos = xform.Coordinates.Position;
         var tilerefs = _map.GetLocalTilesIntersecting(
-            xform.GridUid.Value,
-            grid,
-            new Box2(localpos + new Vector2(-radius, -radius), localpos + new Vector2(radius, radius)))
+                xform.GridUid.Value,
+                grid,
+                new Box2(localpos + new Vector2(-radius, -radius), localpos + new Vector2(radius, radius)))
             .ToArray();
 
         if (tilerefs.Length == 0)
@@ -93,7 +105,7 @@ public sealed class GasProducerAnomalySystem : EntitySystem
         {
             var mix = _atmosphere.GetTileMixture(xform.GridUid, xform.MapUid, tileref.GridIndices, true);
             amountCounter++;
-            if (mix is not { })
+            if (mix is null)
                 continue;
 
             mix.AdjustMoles(gas, mols);

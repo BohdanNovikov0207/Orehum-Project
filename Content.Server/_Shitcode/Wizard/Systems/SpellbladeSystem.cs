@@ -23,10 +23,10 @@ namespace Content.Server._Goobstation.Wizard.Systems;
 
 public sealed class SpellbladeSystem : SharedSpellbladeSystem
 {
-    [Dependency] private readonly LightningSystem _lightning = default!;
-    [Dependency] private readonly FlammableSystem _flammable = default!;
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly DamageableSystem _damageable = default!;
+    [Dependency] private readonly FlammableSystem _flammable = default!;
+    [Dependency] private readonly LightningSystem _lightning = default!;
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
 
     public override void Initialize()
     {

@@ -83,9 +83,8 @@ public sealed class AnnounceCommand : LocalizedEntityCommands
         shell.WriteLine(Loc.GetString("shell-command-success"));
     }
 
-    public override CompletionResult GetCompletion(IConsoleShell shell, string[] args)
-    {
-        return args.Length switch
+    public override CompletionResult GetCompletion(IConsoleShell shell, string[] args) =>
+        args.Length switch
         {
             1 => CompletionResult.FromHint(Loc.GetString("cmd-announce-arg-message")),
             2 => CompletionResult.FromHint(Loc.GetString("cmd-announce-arg-sender")),
@@ -94,7 +93,6 @@ public sealed class AnnounceCommand : LocalizedEntityCommands
                 CompletionHelper.AudioFilePath(args[3], _proto, _res),
                 Loc.GetString("cmd-announce-arg-sound")
             ),
-            _ => CompletionResult.Empty
+            _ => CompletionResult.Empty,
         };
-    }
 }

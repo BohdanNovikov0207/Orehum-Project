@@ -24,7 +24,8 @@ public sealed class SlavedBorgSystem : SharedSlavedBorgSystem
         base.Initialize();
 
         // need to run after so it doesnt get overriden by the actual lawset
-        SubscribeLocalEvent<SlavedBorgComponent, GetSiliconLawsEvent>(OnGetSiliconLaws, after: [ typeof(SiliconLawSystem) ]);
+        SubscribeLocalEvent<SlavedBorgComponent, GetSiliconLawsEvent>(OnGetSiliconLaws,
+            after: [typeof(SiliconLawSystem)]);
         SubscribeLocalEvent<SlavedBorgComponent, ComponentRemove>(OnRemove);
     }
 
@@ -33,7 +34,7 @@ public sealed class SlavedBorgSystem : SharedSlavedBorgSystem
         if (ent.Comp.Added || !TryComp<SiliconLawProviderComponent>(ent, out var provider))
             return;
 
-        if (provider.Lawset is {} lawset)
+        if (provider.Lawset is { } lawset)
             AddLaw(lawset, ent.Comp.Law);
         ent.Comp.Added = true; // prevent opening the ui adding more law 0's
     }
@@ -43,17 +44,15 @@ public sealed class SlavedBorgSystem : SharedSlavedBorgSystem
         if (!ent.Comp.Added || !TryComp<SiliconLawProviderComponent>(ent, out var provider))
             return;
 
-        if (provider.Lawset is {} lawset)
+        if (provider.Lawset is { } lawset)
             RemoveLaw(lawset, ent.Comp.Law);
     }
 
     /// <summary>
     /// Adds the slave law to a lawset without checking if it was added already.
     /// </summary>
-    public void AddLaw(SiliconLawset lawset, ProtoId<SiliconLawPrototype> law)
-    {
+    public void AddLaw(SiliconLawset lawset, ProtoId<SiliconLawPrototype> law) =>
         lawset.Laws.Insert(0, _proto.Index(law).ShallowClone());
-    }
 
     /// <summary>
     /// Removes the slave law from a lawset.

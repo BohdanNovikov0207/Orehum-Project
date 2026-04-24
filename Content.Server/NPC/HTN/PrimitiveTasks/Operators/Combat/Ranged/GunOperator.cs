@@ -21,8 +21,11 @@ public sealed partial class GunOperator : HTNOperator, IHtnConditionalShutdown
 {
     [Dependency] private readonly IEntityManager _entManager = default!;
 
-    [DataField("shutdownState")]
-    public HTNPlanState ShutdownState { get; private set; } = HTNPlanState.TaskFinished;
+    /// <summary>
+    /// Do we require line of sight of the target before failing.
+    /// </summary>
+    [DataField("requireLOS")]
+    public bool RequireLOS = false;
 
     /// <summary>
     /// Key that contains the target entity.
@@ -37,16 +40,21 @@ public sealed partial class GunOperator : HTNOperator, IHtnConditionalShutdown
     public MobState TargetState = MobState.Alive;
 
     /// <summary>
-    /// Do we require line of sight of the target before failing.
-    /// </summary>
-    [DataField("requireLOS")]
-    public bool RequireLOS = false;
-
-    /// <summary>
     /// If true, only opaque objects will block line of sight.
     /// </summary>
     [DataField("opaqueKey")]
     public bool UseOpaqueForLOSChecks = false;
+
+    [DataField("shutdownState")]
+    public HTNPlanState ShutdownState { get; private set; } = HTNPlanState.TaskFinished;
+
+    public void ConditionalShutdown(NPCBlackboard blackboard)
+    {
+        var owner = blackboard.GetValue<EntityUid>(NPCBlackboard.Owner);
+        _entManager.System<SharedCombatModeSystem>().SetInCombatMode(owner, false);
+        _entManager.RemoveComponent<NPCRangedCombatComponent>(owner);
+        blackboard.Remove<EntityUid>(TargetKey);
+    }
 
     // Like movement we add a component and pass it off to the dedicated system.
 
@@ -55,15 +63,11 @@ public sealed partial class GunOperator : HTNOperator, IHtnConditionalShutdown
     {
         // Don't attack if they're already as wounded as we want them.
         if (!blackboard.TryGetValue<EntityUid>(TargetKey, out var target, _entManager))
-        {
             return (false, null);
-        }
 
         if (_entManager.TryGetComponent<MobStateComponent>(target, out var mobState) &&
             mobState.CurrentState > TargetState)
-        {
             return (false, null);
-        }
 
         return (true, null);
     }
@@ -72,27 +76,16 @@ public sealed partial class GunOperator : HTNOperator, IHtnConditionalShutdown
     {
         base.Startup(blackboard);
 
-        var ranged = _entManager.EnsureComponent<NPCRangedCombatComponent>(blackboard.GetValue<EntityUid>(NPCBlackboard.Owner));
+        var ranged =
+            _entManager.EnsureComponent<NPCRangedCombatComponent>(blackboard.GetValue<EntityUid>(NPCBlackboard.Owner));
         ranged.Target = blackboard.GetValue<EntityUid>(TargetKey);
         ranged.UseOpaqueForLOSChecks = UseOpaqueForLOSChecks;
 
         if (blackboard.TryGetValue<float>(NPCBlackboard.RotateSpeed, out var rotSpeed, _entManager))
-        {
             ranged.RotationSpeed = new Angle(rotSpeed);
-        }
 
         if (blackboard.TryGetValue<SoundSpecifier>("SoundTargetInLOS", out var losSound, _entManager))
-        {
             ranged.SoundTargetInLOS = losSound;
-        }
-    }
-
-    public void ConditionalShutdown(NPCBlackboard blackboard)
-    {
-        var owner = blackboard.GetValue<EntityUid>(NPCBlackboard.Owner);
-        _entManager.System<SharedCombatModeSystem>().SetInCombatMode(owner, false);
-        _entManager.RemoveComponent<NPCRangedCombatComponent>(owner);
-        blackboard.Remove<EntityUid>(TargetKey);
     }
 
     public override HTNOperatorStatus Update(NPCBlackboard blackboard, float frameTime)
@@ -109,9 +102,7 @@ public sealed partial class GunOperator : HTNOperator, IHtnConditionalShutdown
             // Success
             if (_entManager.TryGetComponent<MobStateComponent>(combat.Target, out var mobState) &&
                 mobState.CurrentState > TargetState)
-            {
                 status = HTNOperatorStatus.Finished;
-            }
             else
             {
                 switch (combat.Status)
@@ -135,15 +126,11 @@ public sealed partial class GunOperator : HTNOperator, IHtnConditionalShutdown
             }
         }
         else
-        {
             status = HTNOperatorStatus.Failed;
-        }
 
         // Mark it as finished to continue the plan.
         if (status == HTNOperatorStatus.Continuing && ShutdownState == HTNPlanState.PlanFinished)
-        {
             status = HTNOperatorStatus.Finished;
-        }
 
         return status;
     }

@@ -6,9 +6,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Server.Popups;
-using Content.Shared._DV.CosmicCult.Components.Examine;
-using Content.Shared._DV.CosmicCult.Components;
 using Content.Shared._DV.CosmicCult;
+using Content.Shared._DV.CosmicCult.Components;
+using Content.Shared._DV.CosmicCult.Components.Examine;
 using Content.Shared.Damage;
 using Content.Shared.Examine;
 using Content.Shared.Humanoid;
@@ -22,16 +22,16 @@ namespace Content.Server._DV.CosmicCult;
 
 public sealed class CosmicGlyphSystem : EntitySystem
 {
-    [Dependency] private readonly DamageableSystem _damageable = default!;
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly PopupSystem _popup = default!;
-    [Dependency] private readonly MobStateSystem _mobState = default!;
     [Dependency] private readonly AudioSystem _audio = default!;
     [Dependency] private readonly SharedContainerSystem _container = default!;
     [Dependency] private readonly SharedCosmicCultSystem _cosmicCult = default!;
 
     private readonly HashSet<Entity<CosmicCultComponent>> _cultists = [];
+    [Dependency] private readonly DamageableSystem _damageable = default!;
     private readonly HashSet<Entity<HumanoidAppearanceComponent>> _humanoids = [];
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
+    [Dependency] private readonly MobStateSystem _mobState = default!;
+    [Dependency] private readonly PopupSystem _popup = default!;
 
     public override void Initialize()
     {
@@ -53,9 +53,7 @@ public sealed class CosmicGlyphSystem : EntitySystem
             args.PushMarkup(Loc.GetString("cosmic-examine-glyph-cultcount", ("COUNT", requiredCultists)));
         }
         else
-        {
             args.PushMarkup(Loc.GetString("cosmic-examine-text-glyphs"));
-        }
     }
 
     private void OnUseGlyph(Entity<CosmicGlyphComponent> uid, ref ActivateInWorldEvent args)
@@ -91,17 +89,21 @@ public sealed class CosmicGlyphSystem : EntitySystem
         var damage = uid.Comp.ActivationDamage / cultists.Count;
 
         foreach (var cultist in cultists)
+        {
             _damageable.TryChangeDamage(cultist, damage, true);
+        }
 
         _audio.PlayPvs(uid.Comp.GylphSFX, tgtpos, AudioParams.Default.WithVolume(+1f));
         Spawn(uid.Comp.GylphVFX, tgtpos);
         QueueDel(uid);
     }
+
     #endregion
 
     #region Housekeeping
+
     /// <summary>
-    ///     Gets all cultists/constructs near a glyph.
+    /// Gets all cultists/constructs near a glyph.
     /// </summary>
     public HashSet<Entity<CosmicCultComponent>> GatherCultists(EntityUid uid, float range)
     {
@@ -112,12 +114,14 @@ public sealed class CosmicGlyphSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Gets all the humanoids near a glyph.
+    /// Gets all the humanoids near a glyph.
     /// </summary>
     /// <param name="uid">The glyph.</param>
     /// <param name="range">Radius for a lookup.</param>
     /// <param name="exclude">Filter to exclude from return.</param>
-    public HashSet<Entity<HumanoidAppearanceComponent>> GetTargetsNearGlyph(EntityUid uid, float range, Predicate<Entity<HumanoidAppearanceComponent>>? exclude = null)
+    public HashSet<Entity<HumanoidAppearanceComponent>> GetTargetsNearGlyph(EntityUid uid,
+        float range,
+        Predicate<Entity<HumanoidAppearanceComponent>>? exclude = null)
     {
         _humanoids.Clear();
         _lookup.GetEntitiesInRange<HumanoidAppearanceComponent>(Transform(uid).Coordinates, range, _humanoids);
@@ -125,9 +129,11 @@ public sealed class CosmicGlyphSystem : EntitySystem
         if (exclude != null)
             _humanoids.RemoveWhere(exclude);
 
-        _humanoids.RemoveWhere(target => HasComp<CosmicBlankComponent>(target) || HasComp<CosmicLapseComponent>(target)); // We never want these.
+        _humanoids.RemoveWhere(target =>
+            HasComp<CosmicBlankComponent>(target) || HasComp<CosmicLapseComponent>(target)); // We never want these.
 
         return _humanoids;
     }
+
     #endregion
 }

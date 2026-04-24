@@ -11,8 +11,5 @@ namespace Content.Server._Goobstation.Wizard.Systems;
 
 public sealed class FadingTimedDespawnSystem : SharedFadingTimedDespawnSystem
 {
-    protected override bool CanDelete(EntityUid uid)
-    {
-        return true;
-    }
+    protected override bool CanDelete(EntityUid uid) => true;
 }

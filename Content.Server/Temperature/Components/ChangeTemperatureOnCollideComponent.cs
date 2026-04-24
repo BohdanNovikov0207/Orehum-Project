@@ -12,7 +12,7 @@ namespace Content.Server.Temperature.Components;
 /// <summary>
 /// Put this component on a projectile that you would like to change the temperature on whatever it hits.
 /// </summary>
-[RegisterComponent, Access(typeof(TemperatureSystem))]
+[RegisterComponent] [Access(typeof(TemperatureSystem))]
 public sealed partial class ChangeTemperatureOnCollideComponent : Component
 {
     /// <summary>

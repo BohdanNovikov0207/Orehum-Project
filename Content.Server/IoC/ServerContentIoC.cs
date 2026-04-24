@@ -163,13 +163,15 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Corvax.Interfaces.Shared;
 using Content.Server._Goobstation.Antag;
-using Content.Server._RMC14.LinkAccount; // RMC - Patreon
+using Content.Server._RMC14.LinkAccount;
 using Content.Server.Administration;
 using Content.Server.Administration.Logs;
 using Content.Server.Administration.Managers;
 using Content.Server.Administration.Notes;
 using Content.Server.Afk;
+using Content.Server.Backmen.Sponsors;
 using Content.Server.Chat.Managers;
 using Content.Server.Connection;
 using Content.Server.Database;
@@ -196,63 +198,63 @@ using Content.Shared.Chat;
 using Content.Shared.Kitchen;
 using Content.Shared.Players.PlayTimeTracking;
 using Content.Shared.Players.RateLimiting;
+// RMC - Patreon
 
-namespace Content.Server.IoC
+namespace Content.Server.IoC;
+
+internal static class ServerContentIoC
 {
-    internal static class ServerContentIoC
+    public static void Register()
     {
-        public static void Register()
-        {
-            IoCManager.Register<IChatManager, ChatManager>();
-            IoCManager.Register<ISharedChatManager, ChatManager>();
-            IoCManager.Register<IChatSanitizationManager, ChatSanitizationManager>();
-            IoCManager.Register<IMoMMILink, MoMMILink>();
-            IoCManager.Register<IServerPreferencesManager, ServerPreferencesManager>();
-            IoCManager.Register<IServerDbManager, ServerDbManager>();
-            IoCManager.Register<RecipeManager, RecipeManager>();
-            IoCManager.Register<INodeGroupFactory, NodeGroupFactory>();
-            IoCManager.Register<IConnectionManager, ConnectionManager>();
-            IoCManager.Register<ServerUpdateManager>();
-            IoCManager.Register<IAdminManager, AdminManager>();
-            IoCManager.Register<ISharedAdminManager, AdminManager>();
-            IoCManager.Register<EuiManager, EuiManager>();
-            IoCManager.Register<IVoteManager, VoteManager>();
-            IoCManager.Register<IPlayerLocator, PlayerLocator>();
-            IoCManager.Register<IAfkManager, AfkManager>();
-            IoCManager.Register<IGameMapManager, GameMapManager>();
-            IoCManager.Register<RulesManager, RulesManager>();
-            IoCManager.Register<IBanManager, BanManager>();
-            IoCManager.Register<ContentNetworkResourceManager>();
-            IoCManager.Register<IAdminNotesManager, AdminNotesManager>();
-            IoCManager.Register<GhostKickManager>();
-            IoCManager.Register<ISharedAdminLogManager, AdminLogManager>();
-            IoCManager.Register<IAdminLogManager, AdminLogManager>();
-            IoCManager.Register<PlayTimeTrackingManager>();
-            IoCManager.Register<UserDbDataManager>();
-            IoCManager.Register<ServerInfoManager>();
-            IoCManager.Register<PoissonDiskSampler>();
-            IoCManager.Register<DiscordWebhook>();
-            IoCManager.Register<VoteWebhooks>();
-            IoCManager.Register<ServerDbEntryManager>();
-            IoCManager.Register<ISharedPlaytimeManager, PlayTimeTrackingManager>();
-            IoCManager.Register<ServerApi>();
-            IoCManager.Register<JobWhitelistManager>();
-            IoCManager.Register<PlayerRateLimitManager>();
-            IoCManager.Register<SharedPlayerRateLimitManager, PlayerRateLimitManager>();
-            IoCManager.Register<MappingManager>();
-            IoCManager.Register<IWatchlistWebhookManager, WatchlistWebhookManager>();
-            IoCManager.Register<ConnectionManager>();
-            IoCManager.Register<MultiServerKickManager>();
-            IoCManager.Register<CVarControlManager>();
-            IoCManager.Register<LastRolledAntagManager>(); // Goobstation - antag pity
-            IoCManager.Register<LinkAccountManager>(); // RMC - Patreon
+        IoCManager.Register<IChatManager, ChatManager>();
+        IoCManager.Register<ISharedChatManager, ChatManager>();
+        IoCManager.Register<IChatSanitizationManager, ChatSanitizationManager>();
+        IoCManager.Register<IMoMMILink, MoMMILink>();
+        IoCManager.Register<IServerPreferencesManager, ServerPreferencesManager>();
+        IoCManager.Register<IServerDbManager, ServerDbManager>();
+        IoCManager.Register<RecipeManager, RecipeManager>();
+        IoCManager.Register<INodeGroupFactory, NodeGroupFactory>();
+        IoCManager.Register<IConnectionManager, ConnectionManager>();
+        IoCManager.Register<ServerUpdateManager>();
+        IoCManager.Register<IAdminManager, AdminManager>();
+        IoCManager.Register<ISharedAdminManager, AdminManager>();
+        IoCManager.Register<EuiManager, EuiManager>();
+        IoCManager.Register<IVoteManager, VoteManager>();
+        IoCManager.Register<IPlayerLocator, PlayerLocator>();
+        IoCManager.Register<IAfkManager, AfkManager>();
+        IoCManager.Register<IGameMapManager, GameMapManager>();
+        IoCManager.Register<RulesManager, RulesManager>();
+        IoCManager.Register<IBanManager, BanManager>();
+        IoCManager.Register<ContentNetworkResourceManager>();
+        IoCManager.Register<IAdminNotesManager, AdminNotesManager>();
+        IoCManager.Register<GhostKickManager>();
+        IoCManager.Register<ISharedAdminLogManager, AdminLogManager>();
+        IoCManager.Register<IAdminLogManager, AdminLogManager>();
+        IoCManager.Register<PlayTimeTrackingManager>();
+        IoCManager.Register<UserDbDataManager>();
+        IoCManager.Register<ServerInfoManager>();
+        IoCManager.Register<PoissonDiskSampler>();
+        IoCManager.Register<DiscordWebhook>();
+        IoCManager.Register<VoteWebhooks>();
+        IoCManager.Register<ServerDbEntryManager>();
+        IoCManager.Register<ISharedPlaytimeManager, PlayTimeTrackingManager>();
+        IoCManager.Register<ServerApi>();
+        IoCManager.Register<JobWhitelistManager>();
+        IoCManager.Register<PlayerRateLimitManager>();
+        IoCManager.Register<SharedPlayerRateLimitManager, PlayerRateLimitManager>();
+        IoCManager.Register<MappingManager>();
+        IoCManager.Register<IWatchlistWebhookManager, WatchlistWebhookManager>();
+        IoCManager.Register<ConnectionManager>();
+        IoCManager.Register<MultiServerKickManager>();
+        IoCManager.Register<CVarControlManager>();
+        IoCManager.Register<LastRolledAntagManager>(); // Goobstation - antag pity
+        IoCManager.Register<LinkAccountManager>(); // RMC - Patreon
 
-            // start-backmen: IoC
-            IoCManager.Register<Content.Corvax.Interfaces.Shared.ISharedSponsorsManager, Backmen.Sponsors.SponsorsManager>();
-            //IoCManager.Register<Content.Corvax.Interfaces.Server.IServerDiscordAuthManager, Backmen.DiscordAuth.DiscordAuthManager>();
-            //IoCManager.Register<Content.Corvax.Interfaces.Server.IServerJoinQueueManager, Backmen.JoinQueue.JoinQueueManager>();
-            IoCManager.Register<Content.Corvax.Interfaces.Shared.ISharedLoadoutsManager, Backmen.Sponsors.LoadoutsManager>();
-            // end-backmen: IoC
-        }
+        // start-backmen: IoC
+        IoCManager.Register<ISharedSponsorsManager, SponsorsManager>();
+        //IoCManager.Register<Content.Corvax.Interfaces.Server.IServerDiscordAuthManager, Backmen.DiscordAuth.DiscordAuthManager>();
+        //IoCManager.Register<Content.Corvax.Interfaces.Server.IServerJoinQueueManager, Backmen.JoinQueue.JoinQueueManager>();
+        IoCManager.Register<ISharedLoadoutsManager, LoadoutsManager>();
+        // end-backmen: IoC
     }
 }

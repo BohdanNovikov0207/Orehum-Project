@@ -51,9 +51,7 @@ public sealed partial class NPCCombatSystem
     private void OnMeleeShutdown(EntityUid uid, NPCMeleeCombatComponent component, ComponentShutdown args)
     {
         if (TryComp<CombatModeComponent>(uid, out var combatMode))
-        {
             _combat.SetInCombatMode(uid, false, combatMode);
-        }
 
         _steering.Unregister(uid);
     }
@@ -61,9 +59,7 @@ public sealed partial class NPCCombatSystem
     private void OnMeleeStartup(EntityUid uid, NPCMeleeCombatComponent component, ComponentStartup args)
     {
         if (TryComp<CombatModeComponent>(uid, out var combatMode))
-        {
             _combat.SetInCombatMode(uid, true, combatMode);
-        }
     }
 
     private void UpdateMelee(float frameTime)
@@ -86,7 +82,11 @@ public sealed partial class NPCCombatSystem
         }
     }
 
-    private void Attack(EntityUid uid, NPCMeleeCombatComponent component, TimeSpan curTime, EntityQuery<PhysicsComponent> physicsQuery, EntityQuery<TransformComponent> xformQuery)
+    private void Attack(EntityUid uid,
+        NPCMeleeCombatComponent component,
+        TimeSpan curTime,
+        EntityQuery<PhysicsComponent> physicsQuery,
+        EntityQuery<TransformComponent> xformQuery)
     {
         component.Status = CombatStatus.Normal;
 
@@ -137,12 +137,11 @@ public sealed partial class NPCCombatSystem
         if (_random.Prob(component.MissChance) &&
             physicsQuery.TryGetComponent(component.Target, out var targetPhysics) &&
             targetPhysics.LinearVelocity.LengthSquared() != 0f)
-        {
-            _melee.AttemptLightAttackMiss(uid, weaponUid, weapon, targetXform.Coordinates.Offset(_random.NextVector2(0.5f)));
-        }
+            _melee.AttemptLightAttackMiss(uid,
+                weaponUid,
+                weapon,
+                targetXform.Coordinates.Offset(_random.NextVector2(0.5f)));
         else
-        {
             _melee.AttemptLightAttack(uid, weaponUid, weapon, component.Target);
-        }
     }
 }

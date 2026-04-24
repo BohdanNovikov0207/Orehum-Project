@@ -1,5 +1,4 @@
 ﻿using Content.Shared.EntityEffects;
-using Robust.Shared.GameStates;
 
 namespace Content.Server._Lavaland.Weapons.Ranged.Upgrades.Components;
 

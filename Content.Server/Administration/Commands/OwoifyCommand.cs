@@ -23,7 +23,8 @@ public sealed class OwoifyCommand : IConsoleCommand
 
     public string Command => "owoify";
 
-    public string Description => "For when you need everything to be cat. Uses OwOAccent's formatting on the name and description of an entity.";
+    public string Description =>
+        "For when you need everything to be cat. Uses OwOAccent's formatting on the name and description of an entity.";
 
     public string Help => "owoify <id>";
 
@@ -44,9 +45,7 @@ public sealed class OwoifyCommand : IConsoleCommand
         var nent = new NetEntity(targetId);
 
         if (!_entManager.TryGetEntity(nent, out var eUid))
-        {
             return;
-        }
 
         var meta = _entManager.GetComponent<MetaDataComponent>(eUid.Value);
 

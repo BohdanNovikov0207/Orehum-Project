@@ -61,8 +61,8 @@ namespace Content.Server.Maps;
 public sealed class ResaveCommand : LocalizedCommands
 {
     [Dependency] private readonly IEntityManager _entManager = default!;
-    [Dependency] private readonly IResourceManager _res = default!;
     [Dependency] private readonly ILogManager _log = default!;
+    [Dependency] private readonly IResourceManager _res = default!;
 
     public override string Command => "resave";
 
@@ -72,12 +72,11 @@ public sealed class ResaveCommand : LocalizedCommands
 
         var opts = MapLoadOptions.Default with
         {
-
             DeserializationOptions = DeserializationOptions.Default with
             {
                 StoreYamlUids = true,
-                LogOrphanedGrids = false
-            }
+                LogOrphanedGrids = false,
+            },
         };
 
         var log = _log.GetSawmill(Command);
@@ -105,21 +104,15 @@ public sealed class ResaveCommand : LocalizedCommands
             _entManager.CullRemovedComponents();
 
             if (_entManager.HasComponent<LoadedMapComponent>(map))
-            {
                 loader.TrySaveMap(map.Comp.MapId, fn);
-            }
             else if (result.Grids.Count == 1)
-            {
                 loader.TrySaveGrid(result.Grids.First(), fn);
-            }
             else
-            {
                 shell.WriteError($"Failed to resave {fn}");
-            }
 
             loader.Delete(result);
         }
 
-        shell.WriteLine($"Resaved all maps");
+        shell.WriteLine("Resaved all maps");
     }
 }

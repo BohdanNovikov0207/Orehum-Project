@@ -6,21 +6,20 @@
 namespace Content.Server.NPC.HTN.Preconditions.Math;
 
 /// <summary>
-/// Checks if there is a float value for the specified <see cref="KeyFloatGreaterPrecondition.Key"/>
-/// in the <see cref="NPCBlackboard"/> and the specified value is less then <see cref="KeyFloatGreaterPrecondition.Value"/>.
+/// Checks if there is a float value for the specified <see cref="KeyFloatGreaterPrecondition.Key" />
+/// in the <see cref="NPCBlackboard" /> and the specified value is less then
+/// <see cref="KeyFloatGreaterPrecondition.Value" />.
 /// </summary>
 public sealed partial class KeyFloatLessPrecondition : HTNPrecondition
 {
     [Dependency] private readonly IEntityManager _entManager = default!;
 
-    [DataField(required: true), ViewVariables]
+    [DataField(required: true)] [ViewVariables]
     public string Key = string.Empty;
 
-    [DataField(required: true), ViewVariables(VVAccess.ReadWrite)]
+    [DataField(required: true)] [ViewVariables(VVAccess.ReadWrite)]
     public float Value;
 
-    public override bool IsMet(NPCBlackboard blackboard)
-    {
-        return blackboard.TryGetValue<float>(Key, out var value, _entManager) && value < Value;
-    }
+    public override bool IsMet(NPCBlackboard blackboard) =>
+        blackboard.TryGetValue<float>(Key, out var value, _entManager) && value < Value;
 }

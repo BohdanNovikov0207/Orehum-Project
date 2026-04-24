@@ -13,9 +13,11 @@ namespace Content.Server.Traits.Assorted;
 /// <summary>
 /// This is used for the narcolepsy trait.
 /// </summary>
-[RegisterComponent, Access(typeof(NarcolepsySystem))]
+[RegisterComponent] [Access(typeof(NarcolepsySystem))]
 public sealed partial class NarcolepsyComponent : Component
 {
+    public float NextIncidentTime;
+
     /// <summary>
     /// The random time between incidents, (min, max).
     /// </summary>
@@ -27,6 +29,4 @@ public sealed partial class NarcolepsyComponent : Component
     /// </summary>
     [DataField("durationOfIncident", required: true)]
     public Vector2 DurationOfIncident { get; private set; }
-
-    public float NextIncidentTime;
 }

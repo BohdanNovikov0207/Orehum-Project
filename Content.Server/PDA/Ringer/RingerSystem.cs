@@ -27,7 +27,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Linq;
-using System.Runtime.InteropServices;
 using Content.Server.Store.Systems;
 using Content.Shared.PDA;
 using Content.Shared.PDA.Ringer;
@@ -37,13 +36,13 @@ using Robust.Shared.Random;
 namespace Content.Server.PDA.Ringer;
 
 /// <summary>
-/// Handles the server-side logic for <see cref="SharedRingerSystem"/>.
+/// Handles the server-side logic for <see cref="SharedRingerSystem" />.
 /// </summary>
 public sealed class RingerSystem : SharedRingerSystem
 {
     [Dependency] private readonly IRobustRandom _random = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
@@ -51,19 +50,18 @@ public sealed class RingerSystem : SharedRingerSystem
         SubscribeLocalEvent<RingerComponent, MapInitEvent>(OnMapInit);
         SubscribeLocalEvent<RingerComponent, CurrencyInsertAttemptEvent>(OnCurrencyInsert);
 
-        SubscribeLocalEvent<RingerUplinkComponent, GenerateUplinkCodeEvent<Note[]>>(OnGenerateUplinkCode); // Goob - generic ooplink event
+        SubscribeLocalEvent<RingerUplinkComponent, GenerateUplinkCodeEvent<Note[]>>(
+            OnGenerateUplinkCode); // Goob - generic ooplink event
     }
 
     /// <summary>
-    /// Randomizes a ringtone for <see cref="RingerComponent"/> on <see cref="MapInitEvent"/>.
+    /// Randomizes a ringtone for <see cref="RingerComponent" /> on <see cref="MapInitEvent" />.
     /// </summary>
-    private void OnMapInit(Entity<RingerComponent> ent, ref MapInitEvent args)
-    {
+    private void OnMapInit(Entity<RingerComponent> ent, ref MapInitEvent args) =>
         UpdateRingerRingtone(ent, GenerateRingtone());
-    }
 
     /// <summary>
-    /// Handles the <see cref="CurrencyInsertAttemptEvent"/> for <see cref="RingerUplinkComponent"/>.
+    /// Handles the <see cref="CurrencyInsertAttemptEvent" /> for <see cref="RingerUplinkComponent" />.
     /// </summary>
     private void OnCurrencyInsert(Entity<RingerComponent> ent, ref CurrencyInsertAttemptEvent args)
     {
@@ -80,7 +78,7 @@ public sealed class RingerSystem : SharedRingerSystem
     }
 
     /// <summary>
-    /// Handles the <see cref="GenerateUplinkCodeEvent{T}"/> for generating an uplink code.
+    /// Handles the <see cref="GenerateUplinkCodeEvent{T}" /> for generating an uplink code.
     /// </summary>
     private void OnGenerateUplinkCode(Entity<RingerUplinkComponent> ent, ref GenerateUplinkCodeEvent<Note[]> ev)
     {
@@ -93,7 +91,7 @@ public sealed class RingerSystem : SharedRingerSystem
         ev.Code = code;
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override bool TryToggleUplink(EntityUid uid, Note[] ringtone, EntityUid? user = null)
     {
         if (!TryComp<RingerUplinkComponent>(uid, out var uplink))
@@ -118,18 +116,16 @@ public sealed class RingerSystem : SharedRingerSystem
     /// </summary>
     /// <returns>An array of Notes representing the ringtone.</returns>
     /// <remarks>The logic for this is on the Server so that we don't get a different result on the Client every time.</remarks>
-    private Note[] GenerateRingtone()
-    {
+    private Note[] GenerateRingtone() =>
         // Default to using C pentatonic so it at least sounds not terrible.
-        return GenerateRingtone(new[]
+        GenerateRingtone(new[]
         {
             Note.C,
             Note.D,
             Note.E,
             Note.G,
-            Note.A
+            Note.A,
         });
-    }
 
     /// <summary>
     /// Generates a random ringtone using the specified notes.

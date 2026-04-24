@@ -18,7 +18,7 @@ namespace Content.Server.Procedural.DungeonJob;
 public sealed partial class DungeonJob
 {
     /// <summary>
-    /// <see cref="NoiseDunGen"/>
+    ///     <see cref="NoiseDunGen" />
     /// </summary>
     private async Task<Dungeon> GenerateNoiseDunGen(
         Vector2i position,

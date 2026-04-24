@@ -15,9 +15,12 @@ namespace Content.Server.Procedural.DungeonJob;
 public sealed partial class DungeonJob
 {
     /// <summary>
-    /// <see cref="ReplaceTileDunGen"/>
+    ///     <see cref="ReplaceTileDunGen" />
     /// </summary>
-    private async Task GenerateTileReplacementDunGen(ReplaceTileDunGen gen, List<Dungeon> dungeons, HashSet<Vector2i> reservedTiles, Random random)
+    private async Task GenerateTileReplacementDunGen(ReplaceTileDunGen gen,
+        List<Dungeon> dungeons,
+        HashSet<Vector2i> reservedTiles,
+        Random random)
     {
         var replacements = new List<(Vector2i Index, Tile Tile)>();
 
@@ -38,13 +41,9 @@ public sealed partial class DungeonJob
                     Tile tile;
 
                     if (random.Prob(gen.VariantWeight))
-                    {
                         tile = _tileDefManager.GetVariantTile(_prototype.Index(layer.Tile), random);
-                    }
                     else
-                    {
                         tile = new Tile(_prototype.Index(layer.Tile).TileId);
-                    }
 
                     replacements.Add((node, tile));
                     break;

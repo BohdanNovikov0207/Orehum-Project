@@ -10,7 +10,6 @@ using Content.Server.NPC.Systems;
 using Content.Shared.Physics;
 using Content.Shared.Procedural;
 using Content.Shared.Procedural.DungeonLayers;
-using Content.Shared.Storage;
 using Robust.Shared.Collections;
 
 namespace Content.Server.Procedural.DungeonJob;
@@ -18,7 +17,7 @@ namespace Content.Server.Procedural.DungeonJob;
 public sealed partial class DungeonJob
 {
     /// <summary>
-    /// <see cref="MobsDunGen"/>
+    ///     <see cref="MobsDunGen" />
     /// </summary>
     private async Task PostGen(
         MobsDunGen gen,
@@ -39,11 +38,11 @@ public sealed partial class DungeonJob
             {
                 var tile = availableTiles.RemoveSwap(random.Next(availableTiles.Count));
 
-                if (!_anchorable.TileFree(_grid, tile, (int) CollisionGroup.MachineLayer,
+                if (!_anchorable.TileFree(_grid,
+                        tile,
+                        (int) CollisionGroup.MachineLayer,
                         (int) CollisionGroup.MachineLayer))
-                {
                     continue;
-                }
 
                 var entities = _entTable.GetSpawns(contents, random);
 

@@ -15,17 +15,17 @@ namespace Content.Server.GameTicking.Rules.VariationPass.Components;
 public sealed partial class EntitySpawnVariationPassComponent : Component
 {
     /// <summary>
-    ///     Number of tiles before we spawn one entity on average.
+    /// Spawn entries for each chosen location.
+    /// </summary>
+    [DataField(required: true)]
+    public List<EntitySpawnEntry> Entities = default!;
+
+    /// <summary>
+    /// Number of tiles before we spawn one entity on average.
     /// </summary>
     [DataField]
     public float TilesPerEntityAverage = 50f;
 
     [DataField]
     public float TilesPerEntityStdDev = 7f;
-
-    /// <summary>
-    ///     Spawn entries for each chosen location.
-    /// </summary>
-    [DataField(required: true)]
-    public List<EntitySpawnEntry> Entities = default!;
 }

@@ -34,12 +34,12 @@ namespace Content.Server._Lavaland.Salvage;
 
 public sealed class ShelterCapsuleSystem : SharedShelterCapsuleSystem
 {
-    [Dependency] private readonly GridPreloaderSystem _preloader = default!;
     [Dependency] private readonly MapLoaderSystem _mapLoader = default!;
     [Dependency] private readonly MapSystem _mapSystem = default!;
+    [Dependency] private readonly GridPreloaderSystem _preloader = default!;
+    [Dependency] private readonly IPrototypeManager _protoMan = default!;
     [Dependency] private readonly SmokeSystem _smoke = default!;
     [Dependency] private readonly TransformSystem _transform = default!;
-    [Dependency] private readonly IPrototypeManager _protoMan = default!;
 
     public override void Initialize()
     {

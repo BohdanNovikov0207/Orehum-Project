@@ -16,15 +16,11 @@ public sealed class BluespaceHarvesterBundleSystem : EntitySystem
         SubscribeLocalEvent<BluespaceHarvesterBundleComponent, DestructionEventArgs>(OnDestruction);
     }
 
-    private void OnOpen(Entity<BluespaceHarvesterBundleComponent> bundle, ref StorageBeforeOpenEvent args)
-    {
+    private void OnOpen(Entity<BluespaceHarvesterBundleComponent> bundle, ref StorageBeforeOpenEvent args) =>
         CreateLoot(bundle);
-    }
 
-    private void OnDestruction(Entity<BluespaceHarvesterBundleComponent> bundle, ref DestructionEventArgs args)
-    {
+    private void OnDestruction(Entity<BluespaceHarvesterBundleComponent> bundle, ref DestructionEventArgs args) =>
         CreateLoot(bundle);
-    }
 
     private void CreateLoot(Entity<BluespaceHarvesterBundleComponent> bundle)
     {

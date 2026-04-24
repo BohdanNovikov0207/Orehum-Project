@@ -11,7 +11,7 @@ using Content.Shared.Power.Generator;
 
 namespace Content.Server.Power.Generator;
 
-public sealed class GeneratorSignalControlSystem: EntitySystem
+public sealed class GeneratorSignalControlSystem : EntitySystem
 {
     [Dependency] private readonly GeneratorSystem _generator = default!;
     [Dependency] private readonly ActiveGeneratorRevvingSystem _revving = default!;
@@ -31,9 +31,7 @@ public sealed class GeneratorSignalControlSystem: EntitySystem
             return;
 
         if (args.Port == component.OnPort)
-        {
             _revving.StartAutoRevving(uid);
-        }
         else if (args.Port == component.OffPort)
         {
             _generator.SetFuelGeneratorOn(uid, false, generator);
@@ -47,9 +45,7 @@ public sealed class GeneratorSignalControlSystem: EntitySystem
                 _revving.StopAutoRevving(uid);
             }
             else
-            {
                 _revving.StartAutoRevving(uid);
-            }
         }
     }
 }

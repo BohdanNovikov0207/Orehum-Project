@@ -18,46 +18,47 @@ public sealed class EntityCoordinatesConverter : AdminLogConverter<SerializableE
     // Use a weak reference to avoid holding server instances live too long in integration tests.
     private WeakReference<IEntityManager> _entityManager = default!;
 
-    public override void Init(IDependencyCollection dependencies)
-    {
+    public override void Init(IDependencyCollection dependencies) =>
         _entityManager = new WeakReference<IEntityManager>(dependencies.Resolve<IEntityManager>());
-    }
 
-    public void Write(Utf8JsonWriter writer, SerializableEntityCoordinates value, JsonSerializerOptions options, IEntityManager entities)
+    public void Write(Utf8JsonWriter writer,
+        SerializableEntityCoordinates value,
+        JsonSerializerOptions options,
+        IEntityManager entities)
     {
         writer.WriteStartObject();
         WriteEntityInfo(writer, value.EntityUid, entities, "parent");
         writer.WriteNumber("x", value.X);
         writer.WriteNumber("y", value.Y);
         if (value.MapUid.HasValue)
-        {
             WriteEntityInfo(writer, value.MapUid.Value, entities, "map");
-        }
         writer.WriteEndObject();
     }
 
-    private static void WriteEntityInfo(Utf8JsonWriter writer, EntityUid value, IEntityManager entities, string rootName)
+    private static void WriteEntityInfo(Utf8JsonWriter writer,
+        EntityUid value,
+        IEntityManager entities,
+        string rootName)
     {
         writer.WriteStartObject(rootName);
         writer.WriteNumber("uid", value.GetHashCode());
         if (entities.TryGetComponent(value, out MetaDataComponent? metaData))
-        {
             writer.WriteString("name", metaData.EntityName);
-        }
         if (entities.TryGetComponent(value, out MapComponent? mapComponent))
         {
             writer.WriteNumber("mapId", mapComponent.MapId.GetHashCode());
             writer.WriteBoolean("mapPaused", mapComponent.MapPaused);
         }
+
         if (entities.TryGetComponent(value, out StationMemberComponent? stationMemberComponent))
-        {
             WriteEntityInfo(writer, stationMemberComponent.Station, entities, "stationMember");
-        }
 
         writer.WriteEndObject();
     }
 
-    public override void Write(Utf8JsonWriter writer, SerializableEntityCoordinates value, JsonSerializerOptions options)
+    public override void Write(Utf8JsonWriter writer,
+        SerializableEntityCoordinates value,
+        JsonSerializerOptions options)
     {
         if (!_entityManager.TryGetTarget(out var entityManager))
             throw new InvalidOperationException("EntityManager got garbage collected!");

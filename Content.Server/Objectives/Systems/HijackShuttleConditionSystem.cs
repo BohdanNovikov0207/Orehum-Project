@@ -23,8 +23,8 @@ public sealed class HijackShuttleConditionSystem : EntitySystem
 {
     [Dependency] private readonly EmergencyShuttleSystem _emergencyShuttle = default!;
     [Dependency] private readonly SharedMindSystem _mind = default!;
-    [Dependency] private readonly SharedRoleSystem _role = default!;
     [Dependency] private readonly MobStateSystem _mobState = default!;
+    [Dependency] private readonly SharedRoleSystem _role = default!;
 
     public override void Initialize()
     {
@@ -33,10 +33,9 @@ public sealed class HijackShuttleConditionSystem : EntitySystem
         SubscribeLocalEvent<HijackShuttleConditionComponent, ObjectiveGetProgressEvent>(OnGetProgress);
     }
 
-    private void OnGetProgress(EntityUid uid, HijackShuttleConditionComponent comp, ref ObjectiveGetProgressEvent args)
-    {
+    private void
+        OnGetProgress(EntityUid uid, HijackShuttleConditionComponent comp, ref ObjectiveGetProgressEvent args) =>
         args.Progress = GetProgress(args.MindId, args.Mind);
-    }
 
     private float GetProgress(EntityUid mindId, MindComponent mind)
     {

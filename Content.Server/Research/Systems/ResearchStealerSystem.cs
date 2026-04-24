@@ -13,8 +13,8 @@ namespace Content.Server.Research.Systems;
 
 public sealed class ResearchStealerSystem : SharedResearchStealerSystem
 {
-    [Dependency] private readonly SharedResearchSystem _research = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly SharedResearchSystem _research = default!;
 
     public override void Initialize()
     {
@@ -33,7 +33,7 @@ public sealed class ResearchStealerSystem : SharedResearchStealerSystem
         if (!TryComp<TechnologyDatabaseComponent>(target, out var database))
             return;
 
-        var ev = new ResearchStolenEvent(uid, target, new());
+        var ev = new ResearchStolenEvent(uid, target, new List<string>());
         var count = _random.Next(comp.MinToSteal, comp.MaxToSteal + 1);
         for (var i = 0; i < count; i++)
         {
@@ -44,6 +44,7 @@ public sealed class ResearchStealerSystem : SharedResearchStealerSystem
             if (_research.TryRemoveTechnology((target, database), toRemove))
                 ev.Techs.Add(toRemove);
         }
+
         RaiseLocalEvent(uid, ref ev);
 
         args.Handled = true;

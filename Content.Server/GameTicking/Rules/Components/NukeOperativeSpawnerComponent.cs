@@ -19,5 +19,5 @@ namespace Content.Server.GameTicking.Rules.Components;
 /// and providing loadout + name for the operative on spawn.
 /// TODO: Remove once systems can request spawns from the ghost role system directly.
 /// </summary>
-[RegisterComponent, EntityCategory("Spawner")]
+[RegisterComponent] [EntityCategory("Spawner")]
 public sealed partial class NukeOperativeSpawnerComponent : Component;

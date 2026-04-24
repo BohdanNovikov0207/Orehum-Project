@@ -5,70 +5,74 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Server.Chat.Systems;
-using Content.Server.Lightning;
-using Content.Server.Popups;
-using Content.Server.PowerCell;
 using Content.Server._EinsteinEngines.Silicon.Charge;
-using Content.Server.Lightning.Components; // Goobstation - Fix IPC shock loops
-using Content.Server.Power.EntitySystems; // Goobstation - Energycrit
+using Content.Server.Chat.Systems;
+using Content.Server.EUI;
+using Content.Server.Ghost;
+using Content.Server.Lightning;
+using Content.Server.Lightning.Components;
+using Content.Server.Popups;
+using Content.Server.Power.EntitySystems;
+using Content.Server.PowerCell;
 using Content.Shared._EinsteinEngines.Silicon.DeadStartupButton;
 using Content.Shared.Audio;
 using Content.Shared.Damage;
 using Content.Shared.Electrocution;
+using Content.Shared.Mind;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Mobs.Systems;
 using Robust.Shared.Audio.Systems;
-using Robust.Shared.Random;
-
- // Goobstation - Revive notification
-using Content.Server.EUI;
-using Content.Shared.Mind;
-using Content.Server.Ghost;
 using Robust.Shared.Player;
+using Robust.Shared.Random;
+// Goobstation - Fix IPC shock loops
+// Goobstation - Energycrit
+
+// Goobstation - Revive notification
 
 namespace Content.Server._EinsteinEngines.Silicon.DeadStartupButton;
 
 public sealed class DeadStartupButtonSystem : SharedDeadStartupButtonSystem
 {
     [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly BatterySystem _battery = default!; // Goobstation - Energycrit
+    [Dependency] private readonly ChatSystem _chatSystem = default!;
+
+    // Goobstation - Revive notification
+    [Dependency] private readonly EuiManager _euiManager = default!;
+    [Dependency] private readonly LightningSystem _lightning = default!;
+    [Dependency] private readonly SharedMindSystem _mind = default!;
     [Dependency] private readonly MobStateSystem _mobState = default!;
     [Dependency] private readonly MobThresholdSystem _mobThreshold = default!;
-    [Dependency] private readonly PopupSystem _popup = default!;
-    [Dependency] private readonly IRobustRandom _robustRandom = default!;
-    [Dependency] private readonly LightningSystem _lightning = default!;
-    [Dependency] private readonly SiliconChargeSystem _siliconChargeSystem = default!;
-    [Dependency] private readonly PowerCellSystem _powerCell = default!;
-    [Dependency] private readonly ChatSystem _chatSystem = default!;
-    [Dependency] private readonly BatterySystem _battery = default!; // Goobstation - Energycrit
-
-     // Goobstation - Revive notification
-    [Dependency] private readonly EuiManager _euiManager = default!;
-    [Dependency] private readonly SharedMindSystem _mind = default!;
     [Dependency] private readonly ISharedPlayerManager _player = default!;
+    [Dependency] private readonly PopupSystem _popup = default!;
+    [Dependency] private readonly PowerCellSystem _powerCell = default!;
+    [Dependency] private readonly IRobustRandom _robustRandom = default!;
+    [Dependency] private readonly SiliconChargeSystem _siliconChargeSystem = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
         SubscribeLocalEvent<DeadStartupButtonComponent, OnDoAfterButtonPressedEvent>(OnDoAfter);
         SubscribeLocalEvent<DeadStartupButtonComponent, ElectrocutedEvent>(OnElectrocuted);
         SubscribeLocalEvent<DeadStartupButtonComponent, MobStateChangedEvent>(OnMobStateChanged);
-
     }
 
     private void OnDoAfter(EntityUid uid, DeadStartupButtonComponent comp, OnDoAfterButtonPressedEvent args)
     {
         if (args.Handled || args.Cancelled
-            || !TryComp<MobStateComponent>(uid, out var mobStateComponent)
-            || !_mobState.IsDead(uid, mobStateComponent)
-            || !TryComp<MobThresholdsComponent>(uid, out var mobThresholdsComponent)
-            || !TryComp<DamageableComponent>(uid, out var damageable))
+                         || !TryComp<MobStateComponent>(uid, out var mobStateComponent)
+                         || !_mobState.IsDead(uid, mobStateComponent)
+                         || !TryComp<MobThresholdsComponent>(uid, out var mobThresholdsComponent)
+                         || !TryComp<DamageableComponent>(uid, out var damageable))
             return;
 
         // Check if entity have critical state
-        if (_mobThreshold.TryGetThresholdForState(uid, MobState.Critical, out var criticalThreshold, mobThresholdsComponent)
+        if (_mobThreshold.TryGetThresholdForState(uid,
+                MobState.Critical,
+                out var criticalThreshold,
+                mobThresholdsComponent)
             && damageable.TotalDamage < criticalThreshold)
         {
             _mobState.ChangeMobState(uid, MobState.Alive, mobStateComponent);
@@ -84,7 +88,8 @@ public sealed class DeadStartupButtonSystem : SharedDeadStartupButtonSystem
         }
 
         _audio.PlayPvs(comp.BuzzSound, uid, AudioHelpers.WithVariation(0.05f, _robustRandom));
-        _popup.PopupEntity(Loc.GetString("dead-startup-system-reboot-failed", ("target", MetaData(uid).EntityName)), uid);
+        _popup.PopupEntity(Loc.GetString("dead-startup-system-reboot-failed", ("target", MetaData(uid).EntityName)),
+            uid);
         Spawn("EffectSparks", Transform(uid).Coordinates);
     }
 
@@ -93,7 +98,9 @@ public sealed class DeadStartupButtonSystem : SharedDeadStartupButtonSystem
         if (HasComp<LightningComponent>(args.SourceUid) // Goobstation - Fix IPC shock loops.
             || !TryComp<MobStateComponent>(uid, out var mobStateComponent)
             || !_mobState.IsDead(uid, mobStateComponent)
-            || !_siliconChargeSystem.TryGetSiliconBattery(uid, out var bateria, out var batteryEnt) // Goobstation - Added batteryEnt argument
+            || !_siliconChargeSystem.TryGetSiliconBattery(uid,
+                out var bateria,
+                out var batteryEnt) // Goobstation - Added batteryEnt argument
             || bateria.CurrentCharge <= 0)
             return;
 
@@ -106,7 +113,8 @@ public sealed class DeadStartupButtonSystem : SharedDeadStartupButtonSystem
         if (args.NewMobState != MobState.Alive)
             return;
 
-        _popup.PopupEntity(Loc.GetString("dead-startup-system-reboot-success", ("target", MetaData(uid).EntityName)), uid);
+        _popup.PopupEntity(Loc.GetString("dead-startup-system-reboot-success", ("target", MetaData(uid).EntityName)),
+            uid);
         _audio.PlayPvs(comp.Sound, uid);
 
         // GoobStation - Revive notification
@@ -118,5 +126,4 @@ public sealed class DeadStartupButtonSystem : SharedDeadStartupButtonSystem
                 _euiManager.OpenEui(new ReturnToBodyEui(mind, _mind, _player), playerSession);
         }
     }
-
 }

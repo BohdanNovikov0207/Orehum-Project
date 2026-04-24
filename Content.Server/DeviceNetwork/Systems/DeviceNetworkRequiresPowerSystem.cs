@@ -53,17 +53,14 @@ namespace Content.Server.DeviceNetwork.Systems;
 
 public sealed class DeviceNetworkRequiresPowerSystem : EntitySystem
 {
-    public override void Initialize()
-    {
+    public override void Initialize() =>
         SubscribeLocalEvent<DeviceNetworkRequiresPowerComponent, BeforePacketSentEvent>(OnBeforePacketSent);
-    }
 
-    private void OnBeforePacketSent(EntityUid uid, DeviceNetworkRequiresPowerComponent component,
+    private void OnBeforePacketSent(EntityUid uid,
+        DeviceNetworkRequiresPowerComponent component,
         BeforePacketSentEvent args)
     {
         if (!this.IsPowered(uid, EntityManager))
-        {
             args.Cancel();
-        }
     }
 }

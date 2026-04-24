@@ -18,6 +18,9 @@ public sealed partial class JukeOperator : HTNOperator, IHtnConditionalShutdown
     [DataField("shutdownState")]
     public HTNPlanState ShutdownState { get; private set; } = HTNPlanState.PlanFinished;
 
+    public void ConditionalShutdown(NPCBlackboard blackboard) =>
+        _entManager.RemoveComponent<NPCJukeComponent>(blackboard.GetValue<EntityUid>(NPCBlackboard.Owner));
+
     public override void Startup(NPCBlackboard blackboard)
     {
         base.Startup(blackboard);
@@ -25,13 +28,5 @@ public sealed partial class JukeOperator : HTNOperator, IHtnConditionalShutdown
         juke.JukeType = JukeType;
     }
 
-    public override HTNOperatorStatus Update(NPCBlackboard blackboard, float frameTime)
-    {
-        return HTNOperatorStatus.Finished;
-    }
-
-    public void ConditionalShutdown(NPCBlackboard blackboard)
-    {
-        _entManager.RemoveComponent<NPCJukeComponent>(blackboard.GetValue<EntityUid>(NPCBlackboard.Owner));
-    }
+    public override HTNOperatorStatus Update(NPCBlackboard blackboard, float frameTime) => HTNOperatorStatus.Finished;
 }

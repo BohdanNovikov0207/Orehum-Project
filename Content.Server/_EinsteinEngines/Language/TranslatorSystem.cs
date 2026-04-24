@@ -8,16 +8,15 @@
 using System.Linq;
 using Content.Server.Popups;
 using Content.Server.PowerCell;
-using Content.Shared.Interaction;
-using Content.Shared.Interaction.Events;
-using Content.Shared.Item.ItemToggle.Components;
-using Content.Shared.PowerCell;
-using Content.Shared.PowerCell.Components;
 using Content.Shared._EinsteinEngines.Language;
 using Content.Shared._EinsteinEngines.Language.Components;
 using Content.Shared._EinsteinEngines.Language.Components.Translators;
 using Content.Shared._EinsteinEngines.Language.Events;
 using Content.Shared._EinsteinEngines.Language.Systems;
+using Content.Shared.Interaction;
+using Content.Shared.Item.ItemToggle.Components;
+using Content.Shared.PowerCell;
+using Content.Shared.PowerCell.Components;
 using Robust.Shared.Containers;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
@@ -27,8 +26,8 @@ namespace Content.Server._EinsteinEngines.Language;
 public sealed class TranslatorSystem : SharedTranslatorSystem
 {
     [Dependency] private readonly SharedContainerSystem _containers = default!;
-    [Dependency] private readonly PopupSystem _popup = default!;
     [Dependency] private readonly LanguageSystem _language = default!;
+    [Dependency] private readonly PopupSystem _popup = default!;
     [Dependency] private readonly PowerCellSystem _powerCell = default!;
 
     public override void Initialize()
@@ -46,7 +45,9 @@ public sealed class TranslatorSystem : SharedTranslatorSystem
         SubscribeLocalEvent<HandheldTranslatorComponent, ItemToggledEvent>(OnItemToggled);
     }
 
-    private void OnDetermineLanguages(EntityUid uid, IntrinsicTranslatorComponent component, DetermineEntityLanguagesEvent ev)
+    private void OnDetermineLanguages(EntityUid uid,
+        IntrinsicTranslatorComponent component,
+        DetermineEntityLanguagesEvent ev)
     {
         if (!component.Enabled
             || component.LifeStage >= ComponentLifeStage.Removing
@@ -57,7 +58,9 @@ public sealed class TranslatorSystem : SharedTranslatorSystem
         CopyLanguages(component, ev, knowledge);
     }
 
-    private void OnProxyDetermineLanguages(EntityUid uid, HoldsTranslatorComponent component, DetermineEntityLanguagesEvent ev)
+    private void OnProxyDetermineLanguages(EntityUid uid,
+        HoldsTranslatorComponent component,
+        DetermineEntityLanguagesEvent ev)
     {
         if (!TryComp<LanguageKnowledgeComponent>(uid, out var knowledge))
             return;
@@ -77,9 +80,11 @@ public sealed class TranslatorSystem : SharedTranslatorSystem
         }
     }
 
-    private void OnTranslatorInserted(EntityUid translator, HandheldTranslatorComponent component, EntGotInsertedIntoContainerMessage args)
+    private void OnTranslatorInserted(EntityUid translator,
+        HandheldTranslatorComponent component,
+        EntGotInsertedIntoContainerMessage args)
     {
-        if (args.Container.Owner is not {Valid: true} holder || !HasComp<LanguageSpeakerComponent>(holder))
+        if (args.Container.Owner is not { Valid: true } holder || !HasComp<LanguageSpeakerComponent>(holder))
             return;
 
         var intrinsic = EnsureComp<HoldsTranslatorComponent>(holder);
@@ -88,7 +93,9 @@ public sealed class TranslatorSystem : SharedTranslatorSystem
         _language.UpdateEntityLanguages(holder);
     }
 
-    private void OnTranslatorParentChanged(EntityUid translator, HandheldTranslatorComponent component, EntParentChangedMessage args)
+    private void OnTranslatorParentChanged(EntityUid translator,
+        HandheldTranslatorComponent component,
+        EntParentChangedMessage args)
     {
         if (!HasComp<HoldsTranslatorComponent>(args.OldParent))
             return;
@@ -96,14 +103,17 @@ public sealed class TranslatorSystem : SharedTranslatorSystem
         // Update the translator on the next tick - this is necessary because there's a good chance the removal from a container.
         // Was caused by the player moving the translator within their inventory rather than removing it.
         // If that is not the case, then OnProxyDetermineLanguages will remove this translator from HoldsTranslatorComponent.Translators.
-        Timer.Spawn(0, () =>
-        {
-            if (Exists(args.OldParent) && HasComp<LanguageSpeakerComponent>(args.OldParent))
-                _language.UpdateEntityLanguages(args.OldParent.Value);
-        });
+        Timer.Spawn(0,
+            () =>
+            {
+                if (Exists(args.OldParent) && HasComp<LanguageSpeakerComponent>(args.OldParent))
+                    _language.UpdateEntityLanguages(args.OldParent.Value);
+            });
     }
 
-    private void OnTranslatorToggle(EntityUid translator, HandheldTranslatorComponent translatorComp, ActivateInWorldEvent args)
+    private void OnTranslatorToggle(EntityUid translator,
+        HandheldTranslatorComponent translatorComp,
+        ActivateInWorldEvent args)
     {
         if (!translatorComp.ToggleOnInteract)
             return;
@@ -120,11 +130,12 @@ public sealed class TranslatorSystem : SharedTranslatorSystem
             && TryComp<LanguageSpeakerComponent>(holder, out var languageComp))
         {
             // The first new spoken language added by this translator, or null
-            var firstNewLanguage = translatorComp.SpokenLanguages.FirstOrDefault(it => !languageComp.SpokenLanguages.Contains(it));
+            var firstNewLanguage =
+                translatorComp.SpokenLanguages.FirstOrDefault(it => !languageComp.SpokenLanguages.Contains(it));
             _language.UpdateEntityLanguages(holder);
 
             // Update the current language of the entity if necessary
-            if (isEnabled && translatorComp.SetLanguageOnInteract && firstNewLanguage is {})
+            if (isEnabled && translatorComp.SetLanguageOnInteract && firstNewLanguage is { })
                 _language.SetLanguage((holder, languageComp), firstNewLanguage);
         }
 
@@ -138,24 +149,30 @@ public sealed class TranslatorSystem : SharedTranslatorSystem
         }
     }
 
-    private void OnPowerCellSlotEmpty(EntityUid translator, HandheldTranslatorComponent component, PowerCellSlotEmptyEvent args)
+    private void OnPowerCellSlotEmpty(EntityUid translator,
+        HandheldTranslatorComponent component,
+        PowerCellSlotEmptyEvent args)
     {
         component.Enabled = false;
         _powerCell.SetDrawEnabled(translator, false);
         OnAppearanceChange(translator, component);
 
-        if (_containers.TryGetContainingContainer(translator, out var holderCont) && HasComp<LanguageSpeakerComponent>(holderCont.Owner))
+        if (_containers.TryGetContainingContainer(translator, out var holderCont) &&
+            HasComp<LanguageSpeakerComponent>(holderCont.Owner))
             _language.UpdateEntityLanguages(holderCont.Owner);
     }
 
-    private void OnPowerCellChanged(EntityUid translator, HandheldTranslatorComponent component, PowerCellChangedEvent args)
+    private void OnPowerCellChanged(EntityUid translator,
+        HandheldTranslatorComponent component,
+        PowerCellChangedEvent args)
     {
         var hasCharge = _powerCell.HasActivatableCharge(translator);
         component.Enabled = hasCharge;
         _powerCell.SetDrawEnabled(translator, hasCharge);
         OnAppearanceChange(translator, component);
 
-        if (_containers.TryGetContainingContainer((translator, null, null), out var holderCont) && HasComp<LanguageSpeakerComponent>(holderCont.Owner))
+        if (_containers.TryGetContainingContainer((translator, null, null), out var holderCont) &&
+            HasComp<LanguageSpeakerComponent>(holderCont.Owner))
             _language.UpdateEntityLanguages(holderCont.Owner);
     }
 
@@ -168,28 +185,44 @@ public sealed class TranslatorSystem : SharedTranslatorSystem
         _powerCell.SetDrawEnabled(translator, shouldEnable);
         OnAppearanceChange(translator, component);
 
-        if (_containers.TryGetContainingContainer((translator, null, null), out var holderCont) && HasComp<LanguageSpeakerComponent>(holderCont.Owner))
+        if (_containers.TryGetContainingContainer((translator, null, null), out var holderCont) &&
+            HasComp<LanguageSpeakerComponent>(holderCont.Owner))
             _language.UpdateEntityLanguages(holderCont.Owner);
     }
 
-    private void CopyLanguages(BaseTranslatorComponent from, DetermineEntityLanguagesEvent to, LanguageKnowledgeComponent knowledge)
+    private void CopyLanguages(BaseTranslatorComponent from,
+        DetermineEntityLanguagesEvent to,
+        LanguageKnowledgeComponent knowledge)
     {
-        var addSpoken = CheckLanguagesMatch(from.RequiredLanguages, knowledge.SpokenLanguages, from.RequiresAllLanguages);
-        var addUnderstood = CheckLanguagesMatch(from.RequiredLanguages, knowledge.UnderstoodLanguages, from.RequiresAllLanguages);
+        var addSpoken =
+            CheckLanguagesMatch(from.RequiredLanguages, knowledge.SpokenLanguages, from.RequiresAllLanguages);
+        var addUnderstood = CheckLanguagesMatch(from.RequiredLanguages,
+            knowledge.UnderstoodLanguages,
+            from.RequiresAllLanguages);
 
         if (addSpoken)
+        {
             foreach (var language in from.SpokenLanguages)
+            {
                 to.SpokenLanguages.Add(language);
+            }
+        }
 
         if (addUnderstood)
+        {
             foreach (var language in from.UnderstoodLanguages)
+            {
                 to.UnderstoodLanguages.Add(language);
+            }
+        }
     }
 
     /// <summary>
-    ///     Checks whether any OR all required languages are provided. Used for utility purposes.
+    /// Checks whether any OR all required languages are provided. Used for utility purposes.
     /// </summary>
-    public static bool CheckLanguagesMatch(ICollection<ProtoId<LanguagePrototype>> required, ICollection<ProtoId<LanguagePrototype>> provided, bool requireAll)
+    public static bool CheckLanguagesMatch(ICollection<ProtoId<LanguagePrototype>> required,
+        ICollection<ProtoId<LanguagePrototype>> provided,
+        bool requireAll)
     {
         if (required.Count == 0)
             return true;

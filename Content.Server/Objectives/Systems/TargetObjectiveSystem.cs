@@ -6,15 +6,17 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Server.Objectives.Components;
-using Content.Shared.Mind;
-using Content.Shared.Objectives.Components;
-using Content.Shared.Roles.Jobs;
 using System.Diagnostics.CodeAnalysis;
 using Content.Server._Goobstation.Wizard.Components;
 using Content.Server.Mind;
+using Content.Server.Objectives.Components;
+using Content.Shared.Mind;
 using Content.Shared.Mind.Components;
-using Robust.Shared.Utility; // Goob
+using Content.Shared.Objectives.Components;
+using Content.Shared.Roles.Jobs;
+using Robust.Shared.Utility;
+
+// Goob
 
 namespace Content.Server.Objectives.Systems;
 
@@ -23,8 +25,8 @@ namespace Content.Server.Objectives.Systems;
 /// </summary>
 public sealed class TargetObjectiveSystem : EntitySystem
 {
-    [Dependency] private readonly MetaDataSystem _metaData = default!;
     [Dependency] private readonly SharedJobSystem _job = default!;
+    [Dependency] private readonly MetaDataSystem _metaData = default!;
     [Dependency] private readonly MindSystem _mind = default!; // Goobstation
 
     public override void Initialize()
@@ -38,10 +40,8 @@ public sealed class TargetObjectiveSystem : EntitySystem
     }
 
     // Goobstation start
-    private void OnMindAdded(Entity<DynamicObjectiveTargetMindComponent> ent, ref MindGotAddedEvent args)
-    {
+    private void OnMindAdded(Entity<DynamicObjectiveTargetMindComponent> ent, ref MindGotAddedEvent args) =>
         UpdateAllDynamicObjectiveNamesWithTarget(ent.Owner);
-    }
 
     private void OnRenamed(ref EntityRenamedEvent ev)
     {
@@ -129,5 +129,4 @@ public sealed class TargetObjectiveSystem : EntitySystem
         var jobName = _job.MindTryGetJobName(target);
         return Loc.GetString(title, ("targetName", targetName), ("job", jobName));
     }
-
 }

@@ -20,7 +20,7 @@ public sealed partial class AtmosPipeColorComponent : Component
     [DataField]
     public Color Color { get; set; } = Color.White;
 
-    [ViewVariables(VVAccess.ReadWrite), UsedImplicitly]
+    [ViewVariables(VVAccess.ReadWrite)] [UsedImplicitly]
     public Color ColorVV
     {
         get => Color;

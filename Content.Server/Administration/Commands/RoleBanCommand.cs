@@ -24,9 +24,9 @@ namespace Content.Server.Administration.Commands;
 [AdminCommand(AdminFlags.Ban)]
 public sealed class RoleBanCommand : IConsoleCommand
 {
-    [Dependency] private readonly IPlayerLocator _locator = default!;
     [Dependency] private readonly IBanManager _bans = default!;
     [Dependency] private readonly IConfigurationManager _cfg = default!;
+    [Dependency] private readonly IPlayerLocator _locator = default!;
     [Dependency] private readonly IPrototypeManager _proto = default!;
 
     public string Command => "roleban";
@@ -41,7 +41,8 @@ public sealed class RoleBanCommand : IConsoleCommand
         uint minutes;
         if (!Enum.TryParse(_cfg.GetCVar(CCVars.RoleBanDefaultSeverity), out NoteSeverity severity))
         {
-            Logger.WarningS("admin.role_ban", "Role ban severity could not be parsed from config! Defaulting to medium.");
+            Logger.WarningS("admin.role_ban",
+                "Role ban severity could not be parsed from config! Defaulting to medium.");
             severity = NoteSeverity.Medium;
         }
 
@@ -76,7 +77,7 @@ public sealed class RoleBanCommand : IConsoleCommand
                     return;
                 }
 
-                if (!Enum.TryParse(args[4], ignoreCase: true, out severity))
+                if (!Enum.TryParse(args[4], true, out severity))
                 {
                     shell.WriteLine(Loc.GetString("cmd-roleban-severity-parse", ("severity", args[4]), ("help", Help)));
                     return;
@@ -91,7 +92,7 @@ public sealed class RoleBanCommand : IConsoleCommand
 
         if (!_proto.HasIndex<JobPrototype>(job))
         {
-            shell.WriteError(Loc.GetString("cmd-roleban-job-parse",("job", job)));
+            shell.WriteError(Loc.GetString("cmd-roleban-job-parse", ("job", job)));
             return;
         }
 
@@ -105,7 +106,16 @@ public sealed class RoleBanCommand : IConsoleCommand
         var targetUid = located.UserId;
         var targetHWid = located.LastHWId;
 
-        _bans.CreateRoleBan(targetUid, located.Username, shell.Player?.UserId, null, targetHWid, job, minutes, severity, reason, DateTimeOffset.UtcNow);
+        _bans.CreateRoleBan(targetUid,
+            located.Username,
+            shell.Player?.UserId,
+            null,
+            targetHWid,
+            job,
+            minutes,
+            severity,
+            reason,
+            DateTimeOffset.UtcNow);
     }
 
     public CompletionResult GetCompletion(IConsoleShell shell, string[] args)
@@ -137,7 +147,7 @@ public sealed class RoleBanCommand : IConsoleCommand
             3 => CompletionResult.FromHint(Loc.GetString("cmd-roleban-hint-3")),
             4 => CompletionResult.FromHintOptions(durOpts, Loc.GetString("cmd-roleban-hint-4")),
             5 => CompletionResult.FromHintOptions(severities, Loc.GetString("cmd-roleban-hint-5")),
-            _ => CompletionResult.Empty
+            _ => CompletionResult.Empty,
         };
     }
 }

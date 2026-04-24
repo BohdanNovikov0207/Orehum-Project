@@ -25,26 +25,27 @@ using Robust.Shared.Audio;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Random;
 
-namespace Content.Server.Construction.Completions
+namespace Content.Server.Construction.Completions;
+
+[UsedImplicitly]
+[DataDefinition]
+public sealed partial class PlaySound : IGraphAction
 {
-    [UsedImplicitly]
-    [DataDefinition]
-    public sealed partial class PlaySound : IGraphAction
+    [DataField("AudioParams")]
+    public AudioParams AudioParams = AudioParams.Default;
+
+    [ViewVariables(VVAccess.ReadWrite)]
+    [DataField("variation")]
+    public float Variation = 0.125f;
+
+    [DataField("sound", required: true)] public SoundSpecifier Sound { get; private set; } = default!;
+
+    public void PerformAction(EntityUid uid, EntityUid? userUid, IEntityManager entityManager)
     {
-        [DataField("sound", required: true)] public SoundSpecifier Sound { get; private set; } = default!;
-
-        [DataField("AudioParams")]
-        public AudioParams AudioParams = AudioParams.Default;
-
-        [ViewVariables(VVAccess.ReadWrite)]
-        [DataField("variation")]
-        public float Variation = 0.125f;
-
-        public void PerformAction(EntityUid uid, EntityUid? userUid, IEntityManager entityManager)
+        var scale = (float) IoCManager.Resolve<IRobustRandom>().NextGaussian(1, Variation);
+        if (entityManager.TryGetComponent<TransformComponent>(uid, out var xform))
         {
-            var scale = (float) IoCManager.Resolve<IRobustRandom>().NextGaussian(1, Variation);
-            if (entityManager.TryGetComponent<TransformComponent>(uid, out var xform))
-                entityManager.EntitySysManager.GetEntitySystem<SharedAudioSystem>()
+            entityManager.EntitySysManager.GetEntitySystem<SharedAudioSystem>()
                 .PlayPvs(Sound, xform.Coordinates, AudioParams.WithPitchScale(scale));
         }
     }

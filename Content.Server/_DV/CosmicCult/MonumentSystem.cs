@@ -7,9 +7,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Linq;
+using Content.Goobstation.Shared.Religion;
 using Content.Server._DV.CosmicCult.Components;
 using Content.Server._DV.CosmicCult.EntitySystems;
-using Content.Goobstation.Shared.Religion; // Goobstation - Shitchap
 using Content.Server.Actions;
 using Content.Server.Atmos.Components;
 using Content.Server.Audio;
@@ -19,6 +19,7 @@ using Content.Shared._DV.CCVars;
 using Content.Shared._DV.CosmicCult;
 using Content.Shared._DV.CosmicCult.Components;
 using Content.Shared._DV.CosmicCult.Prototypes;
+using Content.Shared._Shitmed.Targeting;
 using Content.Shared.Audio;
 using Content.Shared.Damage;
 using Content.Shared.Interaction;
@@ -31,31 +32,32 @@ using Robust.Shared.Audio.Systems;
 using Robust.Shared.Configuration;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
+// Goobstation - Shitchap
 
-using Content.Shared._Shitmed.Targeting; // Shitmed Change
+// Shitmed Change
 
 namespace Content.Server._DV.CosmicCult;
 
 public sealed class MonumentSystem : SharedMonumentSystem
 {
+    private static readonly EntProtoId CosmicGod = "MobCosmicGodSpawn";
+    private static readonly EntProtoId MonumentCollider = "MonumentCollider";
     [Dependency] private readonly ActionsSystem _actions = default!;
     [Dependency] private readonly AppearanceSystem _appearance = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly ChatSystem _chatSystem = default!;
+    [Dependency] private readonly IConfigurationManager _config = default!;
     [Dependency] private readonly CosmicCorruptingSystem _corrupting = default!;
     [Dependency] private readonly CosmicCultRuleSystem _cosmicRule = default!;
     [Dependency] private readonly DamageableSystem _damage = default!;
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly IConfigurationManager _config = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly IPrototypeManager _protoMan = default!;
-    [Dependency] private readonly ServerGlobalSoundSystem _sound = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedMapSystem _map = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly IPrototypeManager _protoMan = default!;
+    [Dependency] private readonly ServerGlobalSoundSystem _sound = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly SharedUserInterfaceSystem _ui = default!;
-    private static readonly EntProtoId CosmicGod = "MobCosmicGodSpawn";
-    private static readonly EntProtoId MonumentCollider = "MonumentCollider";
     private EntityUid? _monumentStorageMap;
 
     public override void Initialize()
@@ -70,7 +72,8 @@ public sealed class MonumentSystem : SharedMonumentSystem
     {
         base.Update(frameTime);
 
-        var finaleQuery = EntityQueryEnumerator<CosmicFinaleComponent, MonumentComponent>(); // Enumerator for The Monument's Finale
+        var finaleQuery =
+            EntityQueryEnumerator<CosmicFinaleComponent, MonumentComponent>(); // Enumerator for The Monument's Finale
         while (finaleQuery.MoveNext(out var uid, out var comp, out var monuComp))
         {
             if (_timing.CurTime >= monuComp.CheckTimer)
@@ -79,10 +82,12 @@ public sealed class MonumentSystem : SharedMonumentSystem
                 entities.RemoveWhere(entity => !HasComp<InfluenceVitalityComponent>(entity));
 
                 foreach (var entity in entities)
+                {
                     if (TryComp<CosmicCultComponent>(entity, out var cultComp))
-                    {
-                        _damage.TryChangeDamage(entity, monuComp.MonumentHealing * cultComp.ShitMedHeal, targetPart: TargetBodyPart.All); // Shitmed Change
-                    }
+                        _damage.TryChangeDamage(entity,
+                            monuComp.MonumentHealing * cultComp.ShitMedHeal,
+                            targetPart: TargetBodyPart.All); // Shitmed Change
+                }
 
                 monuComp.CheckTimer = _timing.CurTime + monuComp.CheckWait;
             }
@@ -112,12 +117,15 @@ public sealed class MonumentSystem : SharedMonumentSystem
                     Color.FromHex("#cae8e8"));
                 comp.SongTimer = _timing.CurTime + TimeSpan.FromSeconds(1);
             }
-            else if (comp.CurrentState == FinaleState.ActiveFinale && _timing.CurTime >= comp.FinaleTimer) // trigger wincondition on time runout
+            else if (comp.CurrentState == FinaleState.ActiveFinale &&
+                     _timing.CurTime >= comp.FinaleTimer) // trigger wincondition on time runout
             {
                 var victoryQuery = EntityQueryEnumerator<CosmicVictoryConditionComponent>();
 
                 while (victoryQuery.MoveNext(out _, out var victoryComp))
+                {
                     victoryComp.Victory = true;
+                }
 
                 _sound.StopStationEventMusic(uid, StationEventMusicType.CosmicCult);
                 Spawn(CosmicGod, Transform(uid).Coordinates);
@@ -165,7 +173,9 @@ public sealed class MonumentSystem : SharedMonumentSystem
         var colliderQuery = EntityQueryEnumerator<MonumentCollisionComponent>();
 
         while (colliderQuery.MoveNext(out var collider, out _))
+        {
             QueueDel(collider);
+        }
 
         if (ent.Comp.Monument is null)
             return;
@@ -194,7 +204,8 @@ public sealed class MonumentSystem : SharedMonumentSystem
         ent.Comp.PhaseOutTimer = _timing.CurTime + TimeSpan.FromSeconds(0.45);
 
     public void UpdateMonumentProgress(Entity<MonumentComponent> ent, Entity<CosmicCultRuleComponent> cult) =>
-        ent.Comp.CurrentProgress = ent.Comp.TotalEntropy + cult.Comp.TotalCult * _config.GetCVar(DCCVars.CosmicCultistEntropyValue);
+        ent.Comp.CurrentProgress = ent.Comp.TotalEntropy +
+                                   cult.Comp.TotalCult * _config.GetCVar(DCCVars.CosmicCultistEntropyValue);
 
     private void OnInfuseEntropy(Entity<MonumentComponent> uid, ref ActivateInWorldEvent args)
     {
@@ -227,7 +238,7 @@ public sealed class MonumentSystem : SharedMonumentSystem
     {
         _audio.PlayEntity(_audio.ResolveSound(monument.Comp.InfusionSFX), cultist, monument);
         _popup.PopupEntity(Loc.GetString("cosmiccult-entropy-inserted",
-            ("count", cultist.Comp.EntropyStored)),
+                ("count", cultist.Comp.EntropyStored)),
             cultist,
             cultist);
         monument.Comp.TotalEntropy += cultist.Comp.EntropyStored;
@@ -253,7 +264,9 @@ public sealed class MonumentSystem : SharedMonumentSystem
         return true;
     }
 
-    public void UpdateMonumentAppearance(Entity<MonumentComponent> ent, bool tierUp) // this is kinda awful, but it works, and i've seen worse. improve it at thine leisure
+    public void
+        UpdateMonumentAppearance(Entity<MonumentComponent> ent,
+            bool tierUp) // this is kinda awful, but it works, and i've seen worse. improve it at thine leisure
     {
         if (_cosmicRule.AssociatedGamerule(ent) is not { } cult
             || !TryComp<CosmicFinaleComponent>(ent, out var finaleComp))
@@ -291,21 +304,30 @@ public sealed class MonumentSystem : SharedMonumentSystem
         if (_cosmicRule.AssociatedGamerule(monument) is not { } cult)
             return;
 
-        var numberOfCrewForTier3 = Math.Round((double) cult.Comp.TotalCrew / 100 * _config.GetCVar(DCCVars.CosmicCultTargetConversionPercent)); // 40% of current pop
+        var numberOfCrewForTier3 = Math.Round((double) cult.Comp.TotalCrew / 100 *
+                                              _config.GetCVar(DCCVars
+                                                  .CosmicCultTargetConversionPercent)); // 40% of current pop
         var difficultyMultiplier = _config.GetCVar(DCCVars.CosmicCultistDifficultyMultiplier);
         switch (tier)
         {
             case 1:
                 monument.Comp.ProgressOffset = 0;
-                monument.Comp.TargetProgress = (int) (difficultyMultiplier * numberOfCrewForTier3 / 2 * _config.GetCVar(DCCVars.CosmicCultistEntropyValue));
+                monument.Comp.TargetProgress = (int) (difficultyMultiplier * numberOfCrewForTier3 / 2 *
+                                                      _config.GetCVar(DCCVars.CosmicCultistEntropyValue));
                 break;
             case 2:
-                monument.Comp.ProgressOffset = (int) (difficultyMultiplier * numberOfCrewForTier3 / 2 * _config.GetCVar(DCCVars.CosmicCultistEntropyValue)); //reset the progress offset
-                monument.Comp.TargetProgress = (int) (difficultyMultiplier * numberOfCrewForTier3 * _config.GetCVar(DCCVars.CosmicCultistEntropyValue));
+                monument.Comp.ProgressOffset = (int) (difficultyMultiplier * numberOfCrewForTier3 / 2 *
+                                                      _config.GetCVar(DCCVars
+                                                          .CosmicCultistEntropyValue)); //reset the progress offset
+                monument.Comp.TargetProgress = (int) (difficultyMultiplier * numberOfCrewForTier3 *
+                                                      _config.GetCVar(DCCVars.CosmicCultistEntropyValue));
                 break;
             case 3:
-                monument.Comp.ProgressOffset = (int) (difficultyMultiplier * numberOfCrewForTier3 * _config.GetCVar(DCCVars.CosmicCultistEntropyValue));
-                monument.Comp.TargetProgress = (int) (difficultyMultiplier * numberOfCrewForTier3 * _config.GetCVar(DCCVars.CosmicCultistEntropyValue)); //removed offset; replaced with timer
+                monument.Comp.ProgressOffset = (int) (difficultyMultiplier * numberOfCrewForTier3 *
+                                                      _config.GetCVar(DCCVars.CosmicCultistEntropyValue));
+                monument.Comp.TargetProgress = (int) (difficultyMultiplier * numberOfCrewForTier3 *
+                                                      _config.GetCVar(DCCVars
+                                                          .CosmicCultistEntropyValue)); //removed offset; replaced with timer
                 break;
         }
     }
@@ -331,18 +353,22 @@ public sealed class MonumentSystem : SharedMonumentSystem
 
         //this is probably unnecessary but I have no idea where they get added to the list atm - ruddygreat
         foreach (var glyphProto in _protoMan
-            .EnumeratePrototypes<GlyphPrototype>()
-            .Where(proto => proto.Tier == 1))
+                     .EnumeratePrototypes<GlyphPrototype>()
+                     .Where(proto => proto.Tier == 1))
+        {
             uid.Comp.UnlockedGlyphs.Add(glyphProto.ID);
+        }
 
         //basically completely unnecessary, but putting this here for sanity & futureproofing - ruddygreat
         var query = EntityQueryEnumerator<CosmicCultComponent>();
         while (query.MoveNext(out var cultist, out var cultComp))
         {
             foreach (var influenceProto in _protoMan
-                .EnumeratePrototypes<InfluencePrototype>()
-                .Where(influenceProto => influenceProto.Tier == 1))
+                         .EnumeratePrototypes<InfluencePrototype>()
+                         .Where(influenceProto => influenceProto.Tier == 1))
+            {
                 cultComp.UnlockedInfluences.Add(influenceProto.ID);
+            }
 
             Dirty(cultist, cultComp);
         }
@@ -350,12 +376,19 @@ public sealed class MonumentSystem : SharedMonumentSystem
         var objectiveQuery = EntityQueryEnumerator<CosmicTierConditionComponent>();
 
         while (objectiveQuery.MoveNext(out _, out var objectiveComp))
+        {
             objectiveComp.Tier = 1;
+        }
 
         //add the move action
         var leaderQuery = EntityQueryEnumerator<CosmicCultLeadComponent>();
         while (leaderQuery.MoveNext(out var leader, out var leaderComp))
-            _actions.AddAction(leader, ref leaderComp.CosmicMonumentMoveActionEntity, leaderComp.CosmicMonumentMoveAction, leader);
+        {
+            _actions.AddAction(leader,
+                ref leaderComp.CosmicMonumentMoveActionEntity,
+                leaderComp.CosmicMonumentMoveAction,
+                leader);
+        }
     }
 
     public void MonumentTier2(Entity<MonumentComponent> uid)
@@ -366,22 +399,30 @@ public sealed class MonumentSystem : SharedMonumentSystem
         UpdateMonumentAppearance(uid, true);
 
         foreach (var glyphProto in _protoMan
-            .EnumeratePrototypes<GlyphPrototype>()
-            .Where(proto => proto.Tier == 2))
+                     .EnumeratePrototypes<GlyphPrototype>()
+                     .Where(proto => proto.Tier == 2))
+        {
             uid.Comp.UnlockedGlyphs.Add(glyphProto.ID);
+        }
 
         var objectiveQuery = EntityQueryEnumerator<CosmicTierConditionComponent>();
 
         while (objectiveQuery.MoveNext(out _, out var objectiveComp))
+        {
             objectiveComp.Tier = 2;
+        }
 
         var query = EntityQueryEnumerator<CosmicCultComponent>();
         while (query.MoveNext(out var cultist, out var cultComp))
         {
-            foreach (var influenceProto in _protoMan.EnumeratePrototypes<InfluencePrototype>().Where(influenceProto => influenceProto.Tier == 2))
+            foreach (var influenceProto in _protoMan.EnumeratePrototypes<InfluencePrototype>()
+                         .Where(influenceProto => influenceProto.Tier == 2))
+            {
                 cultComp.UnlockedInfluences.Add(influenceProto.ID);
+            }
 
-            cultComp.EntropyBudget += cult.Comp.TotalCrew / 100 * 10; // pity system. 10% of the playercount worth of entropy on tier up
+            cultComp.EntropyBudget +=
+                cult.Comp.TotalCrew / 100 * 10; // pity system. 10% of the playercount worth of entropy on tier up
 
             Dirty(cultist, cultComp);
         }
@@ -395,15 +436,19 @@ public sealed class MonumentSystem : SharedMonumentSystem
             return;
 
         foreach (var glyphProto in _protoMan
-            .EnumeratePrototypes<GlyphPrototype>()
-            .Where(proto => proto.Tier == 3))
+                     .EnumeratePrototypes<GlyphPrototype>()
+                     .Where(proto => proto.Tier == 3))
+        {
             uid.Comp.UnlockedGlyphs.Add(glyphProto.ID);
+        }
 
         UpdateMonumentAppearance(uid, true);
 
         var objectiveQuery = EntityQueryEnumerator<CosmicTierConditionComponent>();
-        while (objectiveQuery.MoveNext(out var _, out var objectiveComp))
+        while (objectiveQuery.MoveNext(out _, out var objectiveComp))
+        {
             objectiveComp.Tier = 3;
+        }
 
         var query = EntityQueryEnumerator<CosmicCultComponent>();
         while (query.MoveNext(out var cultist, out var cultComp))
@@ -417,18 +462,25 @@ public sealed class MonumentSystem : SharedMonumentSystem
             else
                 cultComp.WasWeakToHoly = true;
 
-            foreach (var influenceProto in _protoMan.EnumeratePrototypes<InfluencePrototype>().Where(influenceProto => influenceProto.Tier == 3))
+            foreach (var influenceProto in _protoMan.EnumeratePrototypes<InfluencePrototype>()
+                         .Where(influenceProto => influenceProto.Tier == 3))
+            {
                 cultComp.UnlockedInfluences.Add(influenceProto.ID);
+            }
 
             cultComp.Respiration = false;
-            cultComp.EntropyBudget += cult.Comp.TotalCrew / 100 * 10; //pity system. 10% of the playercount worth of entropy on tier up
+            cultComp.EntropyBudget +=
+                cult.Comp.TotalCrew / 100 * 10; //pity system. 10% of the playercount worth of entropy on tier up
             Dirty(cultist, cultComp);
         }
 
         //remove the move action
         var leaderQuery = EntityQueryEnumerator<CosmicCultLeadComponent>();
         while (leaderQuery.MoveNext(out var leader, out var leaderComp))
+        {
             _actions.RemoveAction(leader, leaderComp.CosmicMonumentMoveActionEntity);
+        }
+
         Dirty(uid);
     }
 

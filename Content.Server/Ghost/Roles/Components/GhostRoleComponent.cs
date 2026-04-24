@@ -42,30 +42,42 @@ namespace Content.Server.Ghost.Roles.Components;
 [Access(typeof(GhostRoleSystem))]
 public sealed partial class GhostRoleComponent : Component
 {
+    [DataField("description")] private string _roleDescription = "Unknown";
     [DataField("name")] private string _roleName = "Unknown";
 
-    [DataField("description")] private string _roleDescription = "Unknown";
-
     [DataField("rules")] private string _roleRules = "ghost-role-component-default-rules";
+
+    /// <summary>
+    /// Job the entity will receive after adding the mind.
+    /// </summary>
+    [DataField("job")]
+    [Access(typeof(GhostRoleSystem), Other = AccessPermissions.ReadWriteExecute)] // also FIXME Friends
+    public ProtoId<JobPrototype>? JobProto = null;
+
+    /// <summary>
+    /// Whether the <see cref="MakeSentientCommand" /> should run on the mob.
+    /// </summary>
+    [ViewVariables(VVAccess.ReadWrite)] [DataField("makeSentient")]
+    public bool MakeSentient = true;
+
+    /// <summary>
+    /// The mind roles that will be added to the mob's mind entity
+    /// </summary>
+    [DataField] [Access(typeof(GhostRoleSystem), Other = AccessPermissions.ReadWriteExecute)] // Don't make eye contact
+    public List<EntProtoId> MindRoles = new() { "MindRoleGhostRoleNeutral" };
+
+    /// <summary>
+    /// The probability that this ghost role will be available after init.
+    /// Used mostly for takeover roles that want some probability of being takeover, but not 100%.
+    /// </summary>
+    [DataField("prob")]
+    public float Probability = 1f;
 
     // Actually make use of / enforce this requirement?
     // Why is this even here.
     // Move to ghost role prototype & respect CCvars.GameRoleTimerOverride
     [DataField("requirements")]
     public HashSet<JobRequirement>? Requirements;
-
-    /// <summary>
-    /// Whether the <see cref="MakeSentientCommand"/> should run on the mob.
-    /// </summary>
-    [ViewVariables(VVAccess.ReadWrite)] [DataField("makeSentient")]
-    public bool MakeSentient = true;
-
-    /// <summary>
-    ///     The probability that this ghost role will be available after init.
-    ///     Used mostly for takeover roles that want some probability of being takeover, but not 100%.
-    /// </summary>
-    [DataField("prob")]
-    public float Probability = 1f;
 
     // We do this so updating RoleName and RoleDescription in VV updates the open EUIs.
 
@@ -105,12 +117,6 @@ public sealed partial class GhostRoleComponent : Component
         }
     }
 
-    /// <summary>
-    /// The mind roles that will be added to the mob's mind entity
-    /// </summary>
-    [DataField, Access(typeof(GhostRoleSystem), Other = AccessPermissions.ReadWriteExecute)] // Don't make eye contact
-    public List<EntProtoId> MindRoles = new() { "MindRoleGhostRoleNeutral" };
-
     [DataField]
     public bool AllowSpeech { get; set; } = true;
 
@@ -136,12 +142,4 @@ public sealed partial class GhostRoleComponent : Component
     [DataField("raffle")]
     [Access(typeof(GhostRoleSystem), Other = AccessPermissions.ReadWriteExecute)] // FIXME Friends
     public GhostRoleRaffleConfig? RaffleConfig { get; set; }
-
-    /// <summary>
-    /// Job the entity will receive after adding the mind.
-    /// </summary>
-    [DataField("job")]
-    [Access(typeof(GhostRoleSystem), Other = AccessPermissions.ReadWriteExecute)] // also FIXME Friends
-    public ProtoId<JobPrototype>? JobProto = null;
 }
-

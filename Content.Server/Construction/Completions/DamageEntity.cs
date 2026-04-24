@@ -22,8 +22,6 @@ public sealed partial class DamageEntity : IGraphAction
     [DataField]
     public DamageSpecifier Damage;
 
-    public void PerformAction(EntityUid uid, EntityUid? userUid, IEntityManager entityManager)
-    {
+    public void PerformAction(EntityUid uid, EntityUid? userUid, IEntityManager entityManager) =>
         entityManager.System<DamageableSystem>().TryChangeDamage(uid, Damage, origin: userUid);
-    }
 }

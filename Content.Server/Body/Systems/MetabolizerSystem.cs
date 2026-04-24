@@ -60,11 +60,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Linq;
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Server.Body.Components;
 using Content.Shared.Administration.Logs;
-using Content.Shared.Bed.Sleep; // Shitmed Change
+using Content.Shared.Bed.Sleep;
 using Content.Shared.Body.Events;
 using Content.Shared.Body.Organ;
+using Content.Shared.Body.Prototypes;
 using Content.Shared.Body.Systems;
 using Content.Shared.Chemistry.Components;
 using Content.Shared.Chemistry.Components.SolutionManager;
@@ -72,7 +74,6 @@ using Content.Shared.Chemistry.EntitySystems;
 using Content.Shared.Chemistry.Reagent;
 using Content.Shared.Database;
 using Content.Shared.EntityEffects;
-using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Heretic;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Mobs.Systems;
@@ -80,227 +81,221 @@ using Robust.Shared.Collections;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Timing;
+// Shitmed Change
 
-namespace Content.Server.Body.Systems
+namespace Content.Server.Body.Systems;
+
+/// <inheritdoc />
+public sealed class MetabolizerSystem : SharedMetabolizerSystem
 {
-    /// <inheritdoc/>
-    public sealed class MetabolizerSystem : SharedMetabolizerSystem
+    [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
+    [Dependency] private readonly SharedEntityEffectSystem _effect = default!; // goob edit
+    [Dependency] private readonly IGameTiming _gameTiming = default!;
+    [Dependency] private readonly MobStateSystem _mobStateSystem = default!;
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly SharedSolutionContainerSystem _solutionContainerSystem = default!;
+
+    private EntityQuery<OrganComponent> _organQuery;
+    private EntityQuery<SolutionContainerManagerComponent> _solutionQuery;
+
+    public override void Initialize()
     {
-        [Dependency] private readonly IGameTiming _gameTiming = default!;
-        [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-        [Dependency] private readonly IRobustRandom _random = default!;
-        [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
-        [Dependency] private readonly MobStateSystem _mobStateSystem = default!;
-        [Dependency] private readonly SharedSolutionContainerSystem _solutionContainerSystem = default!;
-        [Dependency] private readonly SharedEntityEffectSystem _effect = default!; // goob edit
+        base.Initialize();
 
-        private EntityQuery<OrganComponent> _organQuery;
-        private EntityQuery<SolutionContainerManagerComponent> _solutionQuery;
+        _organQuery = GetEntityQuery<OrganComponent>();
+        _solutionQuery = GetEntityQuery<SolutionContainerManagerComponent>();
 
-        public override void Initialize()
+        SubscribeLocalEvent<MetabolizerComponent, ComponentInit>(OnMetabolizerInit);
+        SubscribeLocalEvent<MetabolizerComponent, MapInitEvent>(OnMapInit);
+        SubscribeLocalEvent<MetabolizerComponent, EntityUnpausedEvent>(OnUnpaused);
+        SubscribeLocalEvent<MetabolizerComponent, ApplyMetabolicMultiplierEvent>(OnApplyMetabolicMultiplier);
+    }
+
+    private void OnMapInit(Entity<MetabolizerComponent> ent, ref MapInitEvent args) =>
+        ent.Comp.NextUpdate = _gameTiming.CurTime + ent.Comp.AdjustedUpdateInterval;
+
+    private void OnUnpaused(Entity<MetabolizerComponent> ent, ref EntityUnpausedEvent args) =>
+        ent.Comp.NextUpdate += args.PausedTime;
+
+    private void OnMetabolizerInit(Entity<MetabolizerComponent> entity, ref ComponentInit args)
+    {
+        if (!entity.Comp.SolutionOnBody)
+            _solutionContainerSystem.EnsureSolution(entity.Owner, entity.Comp.SolutionName, out _);
+        else if (_organQuery.CompOrNull(entity)?.Body is { } body)
+            _solutionContainerSystem.EnsureSolution(body, entity.Comp.SolutionName, out _);
+    }
+
+    private void OnApplyMetabolicMultiplier(Entity<MetabolizerComponent> ent, ref ApplyMetabolicMultiplierEvent args) =>
+        ent.Comp.UpdateIntervalMultiplier = args.Multiplier;
+
+    public override void Update(float frameTime)
+    {
+        base.Update(frameTime);
+
+        var metabolizers =
+            new ValueList<(EntityUid Uid, MetabolizerComponent Component)>(Count<MetabolizerComponent>());
+        var query = EntityQueryEnumerator<MetabolizerComponent>();
+
+        while (query.MoveNext(out var uid, out var comp))
         {
-            base.Initialize();
-
-            _organQuery = GetEntityQuery<OrganComponent>();
-            _solutionQuery = GetEntityQuery<SolutionContainerManagerComponent>();
-
-            SubscribeLocalEvent<MetabolizerComponent, ComponentInit>(OnMetabolizerInit);
-            SubscribeLocalEvent<MetabolizerComponent, MapInitEvent>(OnMapInit);
-            SubscribeLocalEvent<MetabolizerComponent, EntityUnpausedEvent>(OnUnpaused);
-            SubscribeLocalEvent<MetabolizerComponent, ApplyMetabolicMultiplierEvent>(OnApplyMetabolicMultiplier);
+            metabolizers.Add((uid, comp));
         }
 
-        private void OnMapInit(Entity<MetabolizerComponent> ent, ref MapInitEvent args)
+        foreach (var (uid, metab) in metabolizers)
         {
-            ent.Comp.NextUpdate = _gameTiming.CurTime + ent.Comp.AdjustedUpdateInterval;
+            // Only update as frequently as it should
+            if (_gameTiming.CurTime < metab.NextUpdate)
+                continue;
+
+            metab.NextUpdate += metab.AdjustedUpdateInterval;
+            TryMetabolize((uid, metab));
         }
+    }
 
-        private void OnUnpaused(Entity<MetabolizerComponent> ent, ref EntityUnpausedEvent args)
+    private void TryMetabolize(Entity<MetabolizerComponent, OrganComponent?, SolutionContainerManagerComponent?> ent)
+    {
+        _organQuery.Resolve(ent, ref ent.Comp2, false);
+
+        // First step is get the solution we actually care about
+        var solutionName = ent.Comp1.SolutionName;
+        Solution? solution = null;
+        Entity<SolutionComponent>? soln = default!;
+        EntityUid? solutionEntityUid = null;
+
+        if (ent.Comp1.SolutionOnBody)
         {
-            ent.Comp.NextUpdate += args.PausedTime;
-        }
-
-        private void OnMetabolizerInit(Entity<MetabolizerComponent> entity, ref ComponentInit args)
-        {
-            if (!entity.Comp.SolutionOnBody)
+            if (ent.Comp2?.Body is { } body)
             {
-                _solutionContainerSystem.EnsureSolution(entity.Owner, entity.Comp.SolutionName, out _);
-            }
-            else if (_organQuery.CompOrNull(entity)?.Body is { } body)
-            {
-                _solutionContainerSystem.EnsureSolution(body, entity.Comp.SolutionName, out _);
-            }
-        }
-
-        private void OnApplyMetabolicMultiplier(Entity<MetabolizerComponent> ent, ref ApplyMetabolicMultiplierEvent args)
-        {
-            ent.Comp.UpdateIntervalMultiplier = args.Multiplier;
-        }
-
-        public override void Update(float frameTime)
-        {
-            base.Update(frameTime);
-
-            var metabolizers = new ValueList<(EntityUid Uid, MetabolizerComponent Component)>(Count<MetabolizerComponent>());
-            var query = EntityQueryEnumerator<MetabolizerComponent>();
-
-            while (query.MoveNext(out var uid, out var comp))
-            {
-                metabolizers.Add((uid, comp));
-            }
-
-            foreach (var (uid, metab) in metabolizers)
-            {
-                // Only update as frequently as it should
-                if (_gameTiming.CurTime < metab.NextUpdate)
-                    continue;
-
-                metab.NextUpdate += metab.AdjustedUpdateInterval;
-                TryMetabolize((uid, metab));
-            }
-        }
-
-        private void TryMetabolize(Entity<MetabolizerComponent, OrganComponent?, SolutionContainerManagerComponent?> ent)
-        {
-            _organQuery.Resolve(ent, ref ent.Comp2, logMissing: false);
-
-            // First step is get the solution we actually care about
-            var solutionName = ent.Comp1.SolutionName;
-            Solution? solution = null;
-            Entity<SolutionComponent>? soln = default!;
-            EntityUid? solutionEntityUid = null;
-
-            if (ent.Comp1.SolutionOnBody)
-            {
-                if (ent.Comp2?.Body is { } body)
-                {
-                    if (!_solutionQuery.Resolve(body, ref ent.Comp3, logMissing: false))
-                        return;
-
-                    _solutionContainerSystem.TryGetSolution((body, ent.Comp3), solutionName, out soln, out solution);
-                    solutionEntityUid = body;
-                }
-            }
-            else
-            {
-                if (!_solutionQuery.Resolve(ent, ref ent.Comp3, logMissing: false))
+                if (!_solutionQuery.Resolve(body, ref ent.Comp3, false))
                     return;
 
-                _solutionContainerSystem.TryGetSolution((ent, ent), solutionName, out soln, out solution);
-                solutionEntityUid = ent;
+                _solutionContainerSystem.TryGetSolution((body, ent.Comp3), solutionName, out soln, out solution);
+                solutionEntityUid = body;
             }
-
-            if (solutionEntityUid is null
-                || soln is null
-                || solution is null
-                || solution.Contents.Count == 0)
-            {
+        }
+        else
+        {
+            if (!_solutionQuery.Resolve(ent, ref ent.Comp3, false))
                 return;
+
+            _solutionContainerSystem.TryGetSolution((ent, ent), solutionName, out soln, out solution);
+            solutionEntityUid = ent;
+        }
+
+        if (solutionEntityUid is null
+            || soln is null
+            || solution is null
+            || solution.Contents.Count == 0)
+            return;
+
+        // randomize the reagent list so we don't have any weird quirks
+        // like alphabetical order or insertion order mattering for processing
+        var list = solution.Contents.ToArray();
+        _random.Shuffle(list);
+
+        var poisons = 0;
+        foreach (var (reagent, quantity) in list)
+        {
+            if (!_prototypeManager.TryIndex<ReagentPrototype>(reagent.Prototype, out var proto))
+                continue;
+
+            var mostToRemove = FixedPoint2.Zero;
+            if (proto.Metabolisms is null)
+            {
+                if (ent.Comp1.RemoveEmpty)
+                    solution.RemoveReagent(reagent, FixedPoint2.New(1));
+
+                continue;
             }
 
-            // randomize the reagent list so we don't have any weird quirks
-            // like alphabetical order or insertion order mattering for processing
-            var list = solution.Contents.ToArray();
-            _random.Shuffle(list);
+            // Already processed all poisons, skip to the next reagent.
+            if (poisons >= ent.Comp1.MaxPoisonsProcessable && proto.Metabolisms.ContainsKey("Poison"))
+                continue;
 
-            int poisons = 0;
-            foreach (var (reagent, quantity) in list)
+
+            // loop over all our groups and see which ones apply
+            if (ent.Comp1.MetabolismGroups is null)
+                continue;
+
+            // Goob edit start
+            var ev = new ExcludeMetabolismGroupsEvent(ent.Owner);
+            RaiseLocalEvent(solutionEntityUid.Value, ref ev);
+            var exclude = ev.Groups ?? new List<ProtoId<MetabolismGroupPrototype>>();
+
+            foreach (var group in ent.Comp1.MetabolismGroups.ExceptBy(exclude, x => x.Id)) // Goob edit end
             {
-                if (!_prototypeManager.TryIndex<ReagentPrototype>(reagent.Prototype, out var proto))
+                if (!proto.Metabolisms.TryGetValue(group.Id, out var entry))
                     continue;
 
-                var mostToRemove = FixedPoint2.Zero;
-                if (proto.Metabolisms is null)
+                var rate = entry.MetabolismRate * group.MetabolismRateModifier;
+
+                // Remove $rate, as long as there's enough reagent there to actually remove that much
+                mostToRemove = FixedPoint2.Clamp(rate, 0, quantity);
+
+                var scale = (float) mostToRemove / (float) rate;
+
+                // if it's possible for them to be dead, and they are,
+                // then we shouldn't process any effects, but should probably
+                // still remove reagents
+                if (TryComp<MobStateComponent>(solutionEntityUid.Value, out var state))
                 {
-                    if (ent.Comp1.RemoveEmpty)
-                    {
-                        solution.RemoveReagent(reagent, FixedPoint2.New(1));
-                    }
+                    // Shitmed Change Start
 
-                    continue;
-                }
-
-                // Already processed all poisons, skip to the next reagent.
-                if (poisons >= ent.Comp1.MaxPoisonsProcessable && proto.Metabolisms.ContainsKey("Poison"))
-                    continue;
-
-
-                // loop over all our groups and see which ones apply
-                if (ent.Comp1.MetabolismGroups is null)
-                    continue;
-
-                // Goob edit start
-                var ev = new ExcludeMetabolismGroupsEvent(ent.Owner);
-                RaiseLocalEvent(solutionEntityUid.Value, ref ev);
-                var exclude = ev.Groups ?? new();
-
-                foreach (var group in ent.Comp1.MetabolismGroups.ExceptBy(exclude, x => x.Id)) // Goob edit end
-                {
-                    if (!proto.Metabolisms.TryGetValue(group.Id, out var entry))
+                    if (!proto.WorksOnTheDead && _mobStateSystem.IsDead(solutionEntityUid.Value, state))
                         continue;
 
-                    var rate = entry.MetabolismRate * group.MetabolismRateModifier;
+                    if (proto.WorksOnUnconscious == true &&
+                        (_mobStateSystem.IsCritical(solutionEntityUid.Value, state) ||
+                         HasComp<SleepingComponent>(solutionEntityUid.Value)))
+                        continue;
 
-                    // Remove $rate, as long as there's enough reagent there to actually remove that much
-                    mostToRemove = FixedPoint2.Clamp(rate, 0, quantity);
-
-                    float scale = (float) mostToRemove / (float) rate;
-
-                    // if it's possible for them to be dead, and they are,
-                    // then we shouldn't process any effects, but should probably
-                    // still remove reagents
-                    if (TryComp<MobStateComponent>(solutionEntityUid.Value, out var state))
-                    {
-                        // Shitmed Change Start
-
-                        if (!proto.WorksOnTheDead && _mobStateSystem.IsDead(solutionEntityUid.Value, state))
-                            continue;
-
-                        if (proto.WorksOnUnconscious == true &&
-                            (_mobStateSystem.IsCritical(solutionEntityUid.Value, state) ||
-                             HasComp<SleepingComponent>(solutionEntityUid.Value)))
-                            continue;
-
-                        // Shitmed Change End
-                    }
-
-                    var actualEntity = ent.Comp2?.Body ?? solutionEntityUid.Value;
-                    var args = new EntityEffectReagentArgs(actualEntity, EntityManager, ent, solution, mostToRemove, proto, null, scale);
-
-                    // do all effects, if conditions apply
-                    foreach (var effect in entry.Effects)
-                    {
-                        if (!effect.ShouldApply(args, _random))
-                            continue;
-
-                        if (effect.ShouldLog)
-                        {
-                            _adminLogger.Add(
-                                LogType.ReagentEffect,
-                                effect.LogImpact,
-                                $"Metabolism effect {effect.GetType().Name:effect}"
-                                + $" of reagent {proto.LocalizedName:reagent}"
-                                + $" applied on entity {actualEntity:entity}"
-                                + $" at {Transform(actualEntity).Coordinates:coordinates}"
-                            );
-                        }
-
-                        _effect.Effect(effect, args); // goob edit - use system instead
-                    }
+                    // Shitmed Change End
                 }
 
-                // remove a certain amount of reagent
-                if (mostToRemove > FixedPoint2.Zero)
-                {
-                    solution.RemoveReagent(reagent, mostToRemove);
+                var actualEntity = ent.Comp2?.Body ?? solutionEntityUid.Value;
+                var args = new EntityEffectReagentArgs(actualEntity,
+                    EntityManager,
+                    ent,
+                    solution,
+                    mostToRemove,
+                    proto,
+                    null,
+                    scale);
 
-                    // We have processed a poison, so count it towards the cap
-                    if (proto.Metabolisms.ContainsKey("Poison"))
-                        poisons++;
+                // do all effects, if conditions apply
+                foreach (var effect in entry.Effects)
+                {
+                    if (!effect.ShouldApply(args, _random))
+                        continue;
+
+                    if (effect.ShouldLog)
+                    {
+                        _adminLogger.Add(
+                            LogType.ReagentEffect,
+                            effect.LogImpact,
+                            $"Metabolism effect {effect.GetType().Name:effect}"
+                            + $" of reagent {proto.LocalizedName:reagent}"
+                            + $" applied on entity {actualEntity:entity}"
+                            + $" at {Transform(actualEntity).Coordinates:coordinates}"
+                        );
+                    }
+
+                    _effect.Effect(effect, args); // goob edit - use system instead
                 }
             }
 
-            _solutionContainerSystem.UpdateChemicals(soln.Value);
+            // remove a certain amount of reagent
+            if (mostToRemove > FixedPoint2.Zero)
+            {
+                solution.RemoveReagent(reagent, mostToRemove);
+
+                // We have processed a poison, so count it towards the cap
+                if (proto.Metabolisms.ContainsKey("Poison"))
+                    poisons++;
+            }
         }
+
+        _solutionContainerSystem.UpdateChemicals(soln.Value);
     }
 }

@@ -91,8 +91,8 @@ namespace Content.Server.Whitelist;
 [AdminCommand(AdminFlags.Ban)]
 public sealed class AddWhitelistCommand : LocalizedCommands
 {
-    [Dependency] private readonly IPlayerLocator _locator = default!;
     [Dependency] private readonly IServerDbManager _dbManager = default!;
+    [Dependency] private readonly IPlayerLocator _locator = default!;
     public override string Command => "whitelistadd";
 
     public override async void Execute(IConsoleShell shell, string argStr, string[] args)
@@ -128,9 +128,7 @@ public sealed class AddWhitelistCommand : LocalizedCommands
     public override CompletionResult GetCompletion(IConsoleShell shell, string[] args)
     {
         if (args.Length == 1)
-        {
             return CompletionResult.FromHint(Loc.GetString("cmd-whitelistadd-arg-player"));
-        }
 
         return CompletionResult.Empty;
     }
@@ -139,8 +137,8 @@ public sealed class AddWhitelistCommand : LocalizedCommands
 [AdminCommand(AdminFlags.Ban)]
 public sealed class RemoveWhitelistCommand : LocalizedCommands
 {
-    [Dependency] private readonly IPlayerLocator _locator = default!;
     [Dependency] private readonly IServerDbManager _dbManager = default!;
+    [Dependency] private readonly IPlayerLocator _locator = default!;
 
     public override string Command => "whitelistremove";
 
@@ -177,9 +175,7 @@ public sealed class RemoveWhitelistCommand : LocalizedCommands
     public override CompletionResult GetCompletion(IConsoleShell shell, string[] args)
     {
         if (args.Length == 1)
-        {
             return CompletionResult.FromHint(Loc.GetString("cmd-whitelistremove-arg-player"));
-        }
 
         return CompletionResult.Empty;
     }
@@ -189,9 +185,9 @@ public sealed class RemoveWhitelistCommand : LocalizedCommands
 public sealed class KickNonWhitelistedCommand : LocalizedCommands
 {
     [Dependency] private readonly IConfigurationManager _configManager = default!;
+    [Dependency] private readonly IServerDbManager _dbManager = default!;
     [Dependency] private readonly IServerNetManager _netManager = default!;
     [Dependency] private readonly IPlayerManager _playerManager = default!;
-    [Dependency] private readonly IServerDbManager _dbManager = default!;
 
     public override string Command => "kicknonwhitelisted";
 
@@ -199,7 +195,9 @@ public sealed class KickNonWhitelistedCommand : LocalizedCommands
     {
         if (args.Length != 0)
         {
-            shell.WriteError(Loc.GetString("shell-wrong-arguments-number-need-specific", ("properAmount", 0), ("currentAmount", args.Length)));
+            shell.WriteError(Loc.GetString("shell-wrong-arguments-number-need-specific",
+                ("properAmount", 0),
+                ("currentAmount", args.Length)));
             shell.WriteLine(Help);
             return;
         }

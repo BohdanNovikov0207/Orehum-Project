@@ -56,13 +56,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Goobstation.Common.Solutions;
+using Content.Goobstation.Maths.FixedPoint;
+using Content.Shared._Adventure.Bartender.Systems;
+using Content.Shared.Chemistry;
 using Content.Shared.Chemistry.Components;
-using Content.Shared._Adventure.Bartender.Systems; // Adventure
 using Content.Shared.Chemistry.EntitySystems;
 using Content.Shared.Chemistry.Reaction;
-using Content.Shared.Chemistry;
 using Content.Shared.Database;
-using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Fluids.Components;
 using Content.Shared.IdentityManagement;
 using Content.Shared.Nutrition.EntitySystems;
@@ -70,15 +70,19 @@ using Content.Shared.Popups;
 using Content.Shared.Spillable;
 using Content.Shared.Throwing;
 using Content.Shared.Weapons.Melee.Events;
+using Robust.Shared.Physics.Systems;
 using Robust.Shared.Player;
-using Robust.Shared.Physics.Systems; // Adventure
+// Adventure
+
+// Adventure
 
 namespace Content.Server.Fluids.EntitySystems;
 
 public sealed partial class PuddleSystem
 {
-    [Dependency] private readonly SharedPhysicsSystem _physics = default!; // Adventure
     [Dependency] private readonly SpillProofThrowerSystem _nonspillthrower = default!; // Adventure
+    [Dependency] private readonly SharedPhysicsSystem _physics = default!; // Adventure
+
     protected override void InitializeSpillable()
     {
         base.InitializeSpillable();
@@ -116,9 +120,7 @@ public sealed partial class PuddleSystem
 
         var totalSplit = FixedPoint2.Min(solution.MaxVolume * 0.25, solution.Volume);
         if (TryComp<SolutionTransferComponent>(entity, out var transfer))
-        {
             totalSplit = FixedPoint2.Min(transfer.TransferAmount, solution.Volume);
-        }
 
         // a little lame, but reagent quantity is not very balanced and we don't want people
         // spilling like 100u of reagent on someone at once!
@@ -151,24 +153,36 @@ public sealed partial class PuddleSystem
 
             var splitSolution = _solutionContainerSystem.SplitSolution(soln.Value, totalSplit / hitCount);
 
-            _adminLogger.Add(LogType.MeleeHit, $"{ToPrettyString(args.User)} splashed {SharedSolutionContainerSystem.ToPrettyString(splitSolution):solution} from {ToPrettyString(entity.Owner):entity} onto {ToPrettyString(hit):target}");
+            _adminLogger.Add(LogType.MeleeHit,
+                $"{ToPrettyString(args.User)} splashed {SharedSolutionContainerSystem.ToPrettyString(splitSolution):solution} from {ToPrettyString(entity.Owner):entity} onto {ToPrettyString(hit):target}");
             _reactive.DoEntityReaction(hit, splitSolution, ReactionMethod.Touch);
 
             _popups.PopupEntity(
-                Loc.GetString("spill-melee-hit-attacker", ("amount", totalSplit / hitCount), ("spillable", entity.Owner),
+                Loc.GetString("spill-melee-hit-attacker",
+                    ("amount", totalSplit / hitCount),
+                    ("spillable", entity.Owner),
                     ("target", Identity.Entity(hit, EntityManager))),
-                hit, args.User);
+                hit,
+                args.User);
 
             _popups.PopupEntity(
-                Loc.GetString("spill-melee-hit-others", ("attacker", Identity.Name(args.User, EntityManager)), ("spillable", entity.Owner), // Goobstation - indentity hidden on splash
+                Loc.GetString("spill-melee-hit-others",
+                    ("attacker", Identity.Name(args.User, EntityManager)),
+                    ("spillable", entity.Owner), // Goobstation - indentity hidden on splash
                     ("target", Identity.Entity(hit, EntityManager))),
-                hit, Filter.PvsExcept(args.User), true, PopupType.SmallCaution);
+                hit,
+                Filter.PvsExcept(args.User),
+                true,
+                PopupType.SmallCaution);
         }
     }
 
     private void SpillOnLand(Entity<SpillableComponent> entity, ref LandEvent args)
     {
-        if (!_solutionContainerSystem.TryGetSolution(entity.Owner, entity.Comp.SolutionName, out var soln, out var solution))
+        if (!_solutionContainerSystem.TryGetSolution(entity.Owner,
+                entity.Comp.SolutionName,
+                out var soln,
+                out var solution))
             return;
 
         if (Openable.IsClosed(entity.Owner))
@@ -179,7 +193,6 @@ public sealed partial class PuddleSystem
 
         if (args.User != null)
         {
-
             // Adventure start
             if (_nonspillthrower.GetSpillProofThrow(args.User.Value))
             {
@@ -187,9 +200,9 @@ public sealed partial class PuddleSystem
                 Transform(entity).LocalRotation = Angle.Zero;
                 return;
             }
+
             // Adventure end
             _adminLogger.Add(LogType.Landed,
-
                 $"{ToPrettyString(entity.Owner):entity} spilled a solution {SharedSolutionContainerSystem.ToPrettyString(solution):solution} on landing");
         }
 
@@ -203,7 +216,8 @@ public sealed partial class PuddleSystem
             return;
 
         //solution gone by other means before doafter completes
-        if (!_solutionContainerSystem.TryGetDrainableSolution(entity.Owner, out var soln, out var solution) || solution.Volume == 0)
+        if (!_solutionContainerSystem.TryGetDrainableSolution(entity.Owner, out var soln, out var solution) ||
+            solution.Volume == 0)
             return;
 
         var puddleSolution = _solutionContainerSystem.SplitSolution(soln.Value, solution.Volume);

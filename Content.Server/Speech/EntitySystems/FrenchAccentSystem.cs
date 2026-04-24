@@ -85,11 +85,10 @@ namespace Content.Server.Speech.EntitySystems;
 /// </summary>
 public sealed class FrenchAccentSystem : EntitySystem
 {
-    [Dependency] private readonly ReplacementAccentSystem _replacement = default!;
-
     private static readonly Regex RegexTh = new(@"th", RegexOptions.IgnoreCase);
     private static readonly Regex RegexStartH = new(@"(?<!\w)h", RegexOptions.IgnoreCase);
     private static readonly Regex RegexSpacePunctuation = new(@"(?<=\w\w)[!?;:](?!\w)", RegexOptions.IgnoreCase);
+    [Dependency] private readonly ReplacementAccentSystem _replacement = default!;
 
     public override void Initialize()
     {
@@ -119,9 +118,10 @@ public sealed class FrenchAccentSystem : EntitySystem
             var idxLetter = match.Index + 2;
 
             // If th is alone, just do 'z
-            if (msg.Length <= idxLetter) {
+            if (msg.Length <= idxLetter)
                 msg = msg.Substring(0, match.Index) + "'" + Z;
-            } else {
+            else
+            {
                 var c = "aeiouy".Contains(msg.Substring(idxLetter, 1).ToLower()) ? Z : S;
                 msg = msg.Substring(0, match.Index) + "'" + c + msg.Substring(idxLetter);
             }
@@ -130,8 +130,6 @@ public sealed class FrenchAccentSystem : EntitySystem
         return msg;
     }
 
-    private void OnAccentGet(EntityUid uid, FrenchAccentComponent component, AccentGetEvent args)
-    {
+    private void OnAccentGet(EntityUid uid, FrenchAccentComponent component, AccentGetEvent args) =>
         args.Message = Accentuate(args.Message, component);
-    }
 }

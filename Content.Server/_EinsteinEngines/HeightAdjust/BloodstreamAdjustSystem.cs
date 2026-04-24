@@ -4,12 +4,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Server.Body.Systems;
-using Content.Shared.CCVar;
-using Content.Shared.Chemistry.EntitySystems;
-using Content.Shared.Chemistry.Reagent;
 using Content.Shared._EinsteinEngines.Contests;
 using Content.Shared._EinsteinEngines.HeightAdjust;
 using Content.Shared.Body.Components;
+using Content.Shared.CCVar;
+using Content.Shared.Chemistry.EntitySystems;
 using Robust.Shared.Configuration;
 
 namespace Content.Server._EinsteinEngines.HeightAdjust;
@@ -23,12 +22,14 @@ public sealed class BloodstreamAdjustSystem : EntitySystem
 
     public override void Initialize()
     {
-        SubscribeLocalEvent<BloodstreamAffectedByMassComponent, MapInitEvent>((uid, comp, _) => TryAdjustBloodstream((uid, comp)));
-        SubscribeLocalEvent<BloodstreamAffectedByMassComponent, HeightAdjustedEvent>((uid, comp, _) => TryAdjustBloodstream((uid, comp)));
+        SubscribeLocalEvent<BloodstreamAffectedByMassComponent, MapInitEvent>((uid, comp, _) =>
+            TryAdjustBloodstream((uid, comp)));
+        SubscribeLocalEvent<BloodstreamAffectedByMassComponent, HeightAdjustedEvent>((uid, comp, _) =>
+            TryAdjustBloodstream((uid, comp)));
     }
 
     /// <summary>
-    ///     Adjusts the bloodstream of the specified entity based on the settings provided by the component.
+    /// Adjusts the bloodstream of the specified entity based on the settings provided by the component.
     /// </summary>
     public bool TryAdjustBloodstream(Entity<BloodstreamAffectedByMassComponent> ent)
     {
@@ -40,7 +41,7 @@ public sealed class BloodstreamAdjustSystem : EntitySystem
 
         var bloodSolution = bloodSolutionEnt.Value.Comp.Solution;
 
-        var factor = Math.Pow(_contests.MassContest(ent, bypassClamp: true, rangeFactor: 4f), ent.Comp.Power);
+        var factor = Math.Pow(_contests.MassContest(ent, true, 4f), ent.Comp.Power);
         factor = Math.Clamp(factor, ent.Comp.Min, ent.Comp.Max);
         var newVolume = bloodstream.BloodMaxVolume * factor;
         var newBloodLevel = bloodSolution.FillFraction * newVolume;

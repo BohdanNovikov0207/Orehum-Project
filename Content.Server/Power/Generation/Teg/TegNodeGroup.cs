@@ -5,7 +5,6 @@
 // SPDX-License-Identifier: MIT
 
 using System.Linq;
-using Content.Server.NodeContainer;
 using Content.Server.NodeContainer.NodeGroups;
 using Content.Server.NodeContainer.Nodes;
 using Content.Shared.NodeContainer;
@@ -18,12 +17,14 @@ namespace Content.Server.Power.Generation.Teg;
 /// <summary>
 /// Node group that connects the central TEG with its two circulators.
 /// </summary>
-/// <seealso cref="TegNodeGenerator"/>
-/// <seealso cref="TegNodeCirculator"/>
-/// <seealso cref="TegSystem"/>
+/// <seealso cref="TegNodeGenerator" />
+/// <seealso cref="TegNodeCirculator" />
+/// <seealso cref="TegSystem" />
 [NodeGroup(NodeGroupID.Teg)]
 public sealed class TegNodeGroup : BaseNodeGroup
 {
+    private IEntityManager? _entityManager;
+
     /// <summary>
     /// If true, this TEG is fully built and has all its parts properly connected.
     /// </summary>
@@ -33,7 +34,7 @@ public sealed class TegNodeGroup : BaseNodeGroup
     /// <summary>
     /// The central generator component.
     /// </summary>
-    /// <seealso cref="TegGeneratorComponent"/>
+    /// <seealso cref="TegGeneratorComponent" />
     [ViewVariables(VVAccess.ReadWrite)]
     public TegNodeGenerator? Generator { get; private set; }
 
@@ -49,21 +50,19 @@ public sealed class TegNodeGroup : BaseNodeGroup
     /// <remarks>
     /// Not filled in if there is no center piece to deduce relative rotation from.
     /// </remarks>
-    /// <seealso cref="TegCirculatorComponent"/>
+    /// <seealso cref="TegCirculatorComponent" />
     [ViewVariables(VVAccess.ReadWrite)]
     public TegNodeCirculator? CirculatorA { get; private set; }
 
     /// <summary>
-    /// The B-side circulator. This circulator is opposite <see cref="CirculatorA"/>.
+    /// The B-side circulator. This circulator is opposite <see cref="CirculatorA" />.
     /// </summary>
     /// <remarks>
     /// Not filled in if there is no center piece to deduce relative rotation from.
     /// </remarks>
-    /// <seealso cref="TegCirculatorComponent"/>
+    /// <seealso cref="TegCirculatorComponent" />
     [ViewVariables(VVAccess.ReadWrite)]
     public TegNodeCirculator? CirculatorB { get; private set; }
-
-    private IEntityManager? _entityManager;
 
     public override void Initialize(Node sourceNode, IEntityManager entMan)
     {
@@ -99,15 +98,10 @@ public sealed class TegNodeGroup : BaseNodeGroup
                 var xform = _entityManager.GetComponent<TransformComponent>(node.Owner);
                 var dir = xform.LocalRotation.GetDir();
                 if (genDir.GetClockwise90Degrees() == dir)
-                {
                     CirculatorA = circulator;
-                }
                 else
-                {
                     CirculatorB = circulator;
-                }
             }
-
         }
 
         IsFullyBuilt = Generator != null && CirculatorA != null && CirculatorB != null;
@@ -127,8 +121,8 @@ public sealed class TegNodeGroup : BaseNodeGroup
 /// <summary>
 /// Node used by the central TEG generator component.
 /// </summary>
-/// <seealso cref="TegNodeGroup"/>
-/// <seealso cref="TegGeneratorComponent"/>
+/// <seealso cref="TegNodeGroup" />
+/// <seealso cref="TegGeneratorComponent" />
 [DataDefinition]
 public sealed partial class TegNodeGenerator : Node
 {
@@ -179,8 +173,8 @@ public sealed partial class TegNodeGenerator : Node
 /// <summary>
 /// Node used by the central TEG circulator entities.
 /// </summary>
-/// <seealso cref="TegNodeGroup"/>
-/// <seealso cref="TegCirculatorComponent"/>
+/// <seealso cref="TegNodeGroup" />
+/// <seealso cref="TegCirculatorComponent" />
 [DataDefinition]
 public sealed partial class TegNodeCirculator : Node
 {

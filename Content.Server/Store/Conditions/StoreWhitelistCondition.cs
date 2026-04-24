@@ -16,16 +16,16 @@ namespace Content.Server.Store.Conditions;
 public sealed partial class StoreWhitelistCondition : ListingCondition
 {
     /// <summary>
-    /// A whitelist of tags or components.
-    /// </summary>
-    [DataField("whitelist")]
-    public EntityWhitelist? Whitelist;
-
-    /// <summary>
     /// A blacklist of tags or components.
     /// </summary>
     [DataField("blacklist")]
     public EntityWhitelist? Blacklist;
+
+    /// <summary>
+    /// A whitelist of tags or components.
+    /// </summary>
+    [DataField("whitelist")]
+    public EntityWhitelist? Whitelist;
 
     public override bool Condition(ListingConditionArgs args)
     {

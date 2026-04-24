@@ -21,14 +21,14 @@ public sealed partial class SayKeyOperator : HTNOperator
 
     private ChatSystem _chat = default!;
 
-    [DataField(required: true)]
-    public string Key = string.Empty;
-
     /// <summary>
     /// Whether to hide message from chat window and logs.
     /// </summary>
     [DataField]
     public bool Hidden;
+
+    [DataField(required: true)]
+    public string Key = string.Empty;
 
     public override void Initialize(IEntitySystemManager sysManager)
     {
@@ -43,11 +43,11 @@ public sealed partial class SayKeyOperator : HTNOperator
             return HTNOperatorStatus.Failed;
 
         var @string = value.ToString();
-        if (@string is not { })
+        if (@string is null)
             return HTNOperatorStatus.Failed;
 
         var speaker = blackboard.GetValue<EntityUid>(NPCBlackboard.Owner);
-        _chat.TrySendInGameICMessage(speaker, @string, InGameICChatType.Speak, hideChat: Hidden, hideLog: Hidden);
+        _chat.TrySendInGameICMessage(speaker, @string, InGameICChatType.Speak, Hidden, Hidden);
 
         return base.Update(blackboard, frameTime);
     }

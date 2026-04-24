@@ -25,16 +25,16 @@ namespace Content.Server._White.Teleporter;
 
 public sealed class ExperimentalTeleporterSystem : EntitySystem
 {
-    [Dependency] private readonly TransformSystem _transform = default!;
-    [Dependency] private readonly BodySystem _bodySystem = default!;
-    [Dependency] private readonly MapSystem _mapSystem = default!;
-    [Dependency] private readonly IEntityManager _entManager = default!;
     [Dependency] private readonly AudioSystem _audio = default!;
-    [Dependency] private readonly ContainerSystem _containerSystem = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly BodySystem _bodySystem = default!;
     [Dependency] private readonly SharedChargesSystem _charges = default!;
+    [Dependency] private readonly ContainerSystem _containerSystem = default!;
+    [Dependency] private readonly IEntityManager _entManager = default!;
+    [Dependency] private readonly MapSystem _mapSystem = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly TagSystem _tag = default!;
     [Dependency] private readonly TelefragSystem _telefrag = default!;
+    [Dependency] private readonly TransformSystem _transform = default!;
     [Dependency] private readonly TurfSystem _turf = default!;
 
     public override void Initialize()
@@ -47,8 +47,8 @@ public sealed class ExperimentalTeleporterSystem : EntitySystem
     {
         if (_charges.IsEmpty(uid)
             || !TryComp<TransformComponent>(args.User, out var xform)
-            || (_containerSystem.IsEntityInContainer(args.User)
-                && !_containerSystem.TryRemoveFromContainer(args.User)))
+            || _containerSystem.IsEntityInContainer(args.User)
+            && !_containerSystem.TryRemoveFromContainer(args.User))
             return;
 
         var ev = new TeleportAttemptEvent(false);
@@ -73,7 +73,12 @@ public sealed class ExperimentalTeleporterSystem : EntitySystem
         _bodySystem.GibBody(args.User, true, splatModifier: 3F);
     }
 
-    private bool EmergencyTeleportation(EntityUid uid, EntityUid teleporterUid, ExperimentalTeleporterComponent component, TransformComponent xform, EntityCoordinates oldCoords, Vector2 offset)
+    private bool EmergencyTeleportation(EntityUid uid,
+        EntityUid teleporterUid,
+        ExperimentalTeleporterComponent component,
+        TransformComponent xform,
+        EntityCoordinates oldCoords,
+        Vector2 offset)
     {
         var newOffset = offset + VectorRandomDirection(component, offset, component.EmergencyLength);
         var coords = xform.Coordinates.Offset(newOffset).SnapToGrid(EntityManager);
@@ -86,7 +91,11 @@ public sealed class ExperimentalTeleporterSystem : EntitySystem
         return !TryCheckWall(coords);
     }
 
-    private void Teleport(EntityUid uid, EntityUid teleporterUid, ExperimentalTeleporterComponent component, EntityCoordinates coords, EntityCoordinates oldCoords)
+    private void Teleport(EntityUid uid,
+        EntityUid teleporterUid,
+        ExperimentalTeleporterComponent component,
+        EntityCoordinates coords,
+        EntityCoordinates oldCoords)
     {
         PlaySoundAndEffects(component, coords, oldCoords);
 
@@ -96,7 +105,9 @@ public sealed class ExperimentalTeleporterSystem : EntitySystem
         _charges.TryUseCharge(teleporterUid);
     }
 
-    private void PlaySoundAndEffects(ExperimentalTeleporterComponent component, EntityCoordinates coords, EntityCoordinates oldCoords)
+    private void PlaySoundAndEffects(ExperimentalTeleporterComponent component,
+        EntityCoordinates coords,
+        EntityCoordinates oldCoords)
     {
         _audio.PlayPvs(component.TeleportSound, coords);
         _audio.PlayPvs(component.TeleportSound, oldCoords);

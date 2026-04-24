@@ -54,11 +54,11 @@ namespace Content.Server.NPC.Systems;
 
 public sealed class NPCJukeSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly MeleeWeaponSystem _melee = default!;
     [Dependency] private readonly SharedMapSystem _mapSystem = default!;
+    [Dependency] private readonly MeleeWeaponSystem _melee = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     private EntityQuery<NPCMeleeCombatComponent> _npcMeleeQuery;
@@ -98,7 +98,8 @@ public sealed class NPCJukeSystem : EntitySystem
                 return;
             }
 
-            var currentTile = _mapSystem.CoordinatesToTile(args.Transform.GridUid.Value, grid, args.Transform.Coordinates);
+            var currentTile =
+                _mapSystem.CoordinatesToTile(args.Transform.GridUid.Value, grid, args.Transform.Coordinates);
 
             if (component.TargetTile == null)
             {
@@ -111,7 +112,7 @@ public sealed class NPCJukeSystem : EntitySystem
                 for (var i = 0; i < 8; i++)
                 {
                     var index = (startIndex + i) % 8;
-                    var neighbor = ((Direction)index).ToIntVec() + currentTile;
+                    var neighbor = ((Direction) index).ToIntVec() + currentTile;
                     var valid = true;
 
                     // TODO: Probably make this a helper on engine maybe
@@ -124,11 +125,9 @@ public sealed class NPCJukeSystem : EntitySystem
                             !_physicsQuery.TryGetComponent(ent, out var physics) ||
                             !physics.CanCollide ||
                             !physics.Hard ||
-                            ((physics.CollisionMask & collisionLayer) == 0x0 &&
-                            (physics.CollisionLayer & collisionMask) == 0x0))
-                        {
+                            (physics.CollisionMask & collisionLayer) == 0x0 &&
+                            (physics.CollisionLayer & collisionMask) == 0x0)
                             continue;
-                        }
 
                         valid = false;
                         break;
@@ -155,8 +154,9 @@ public sealed class NPCJukeSystem : EntitySystem
                 return;
             }
 
-            var targetCoords = _mapSystem.GridTileToWorld(args.Transform.GridUid.Value, grid, component.TargetTile.Value);
-            var targetDir = (targetCoords.Position - args.WorldPosition);
+            var targetCoords =
+                _mapSystem.GridTileToWorld(args.Transform.GridUid.Value, grid, component.TargetTile.Value);
+            var targetDir = targetCoords.Position - args.WorldPosition;
             targetDir = args.OffsetRotation.RotateVec(targetDir);
             const float weight = 1f;
             var norm = targetDir.Normalized();
@@ -197,18 +197,14 @@ public sealed class NPCJukeSystem : EntitySystem
                 var obstacleDirection = _transform.GetWorldPosition(melee.Target) - args.WorldPosition;
 
                 if (obstacleDirection == Vector2.Zero)
-                {
                     obstacleDirection = _random.NextVector2();
-                }
 
                 // If they're moving away then pursue anyway.
                 // If just hit then always back up a bit.
                 if (cdRemaining < attackCooldown * 0.90f &&
                     _physicsQuery.TryGetComponent(melee.Target, out var targetPhysics) &&
                     Vector2.Dot(targetPhysics.LinearVelocity, obstacleDirection) > 0f)
-                {
                     return;
-                }
 
                 if (cdRemaining < TimeSpan.FromSeconds(1f / _melee.GetAttackRate(weaponUid, uid, weapon)) * 0.45f)
                     return;

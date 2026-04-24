@@ -39,10 +39,8 @@ public partial class AtmosphereSystem
             RefreshAllGridMapAtmospheres(uid);
     }
 
-    private void OnMapGetState(EntityUid uid, MapAtmosphereComponent component, ref ComponentGetState args)
-    {
+    private void OnMapGetState(EntityUid uid, MapAtmosphereComponent component, ref ComponentGetState args) =>
         args.State = new MapAtmosphereComponentState(component.Overlay);
-    }
 
     public void SetMapAtmosphere(EntityUid uid, bool space, GasMixture mixture)
     {
@@ -53,7 +51,10 @@ public partial class AtmosphereSystem
         RefreshAllGridMapAtmospheres(uid);
     }
 
-    public void SetMapGasMixture(EntityUid uid, GasMixture mixture, MapAtmosphereComponent? component = null, bool updateTiles = true)
+    public void SetMapGasMixture(EntityUid uid,
+        GasMixture mixture,
+        MapAtmosphereComponent? component = null,
+        bool updateTiles = true)
     {
         if (!Resolve(uid, ref component))
             return;
@@ -71,7 +72,10 @@ public partial class AtmosphereSystem
             RefreshAllGridMapAtmospheres(uid);
     }
 
-    public void SetMapSpace(EntityUid uid, bool space, MapAtmosphereComponent? component = null, bool updateTiles = true)
+    public void SetMapSpace(EntityUid uid,
+        bool space,
+        MapAtmosphereComponent? component = null,
+        bool updateTiles = true)
     {
         if (!Resolve(uid, ref component))
             return;
@@ -113,6 +117,7 @@ public partial class AtmosphereSystem
             RemoveMapAtmos(atmos, tile);
             atmos.InvalidatedCoords.Add(tile.GridIndices);
         }
+
         atmos.MapTiles.Clear();
     }
 
@@ -129,8 +134,6 @@ public partial class AtmosphereSystem
         if (args.OldParent == null
             || HasComp<MapAtmosphereComponent>(args.OldParent)
             || HasComp<MapAtmosphereComponent>(args.Transform.ParentUid))
-        {
             RefreshMapAtmosphereTiles((grid, grid));
-        }
     }
 }

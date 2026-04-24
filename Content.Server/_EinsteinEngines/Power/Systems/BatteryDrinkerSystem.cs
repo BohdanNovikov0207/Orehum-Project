@@ -5,26 +5,27 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using System.Linq;
-using Content.Server.Power.Components;
-using Content.Shared.Containers.ItemSlots;
-using Content.Shared.DoAfter;
-using Content.Shared.PowerCell.Components;
-using Content.Shared._EinsteinEngines.Silicon;
-using Content.Shared.Verbs;
-using Robust.Shared.Utility;
 using Content.Server._EinsteinEngines.Silicon.Charge;
-using Content.Shared._EinsteinEngines.Silicon.Charge; // Goobstation - Energycrit: BatteryDrinkerSourceComponent moved to shared
-using Content.Server.Power.EntitySystems;
 using Content.Server.Popups;
+using Content.Server.Power.Components;
+using Content.Server.Power.EntitySystems;
 using Content.Server.PowerCell;
-using Content.Shared.Popups;
-using Robust.Shared.Audio.Systems;
-using Robust.Shared.Containers;
-// Goobstation Start - Energycrit
 using Content.Shared._EinsteinEngines.Power.Components;
 using Content.Shared._EinsteinEngines.Power.Systems;
+using Content.Shared._EinsteinEngines.Silicon;
+using Content.Shared._EinsteinEngines.Silicon.Charge;
+using Content.Shared.Containers.ItemSlots;
+using Content.Shared.DoAfter;
+using Content.Shared.Popups;
+using Content.Shared.PowerCell.Components;
+using Content.Shared.Verbs;
 using Content.Shared.Whitelist;
+using Robust.Shared.Audio.Systems;
+using Robust.Shared.Containers;
+using Robust.Shared.Utility;
+// Goobstation - Energycrit: BatteryDrinkerSourceComponent moved to shared
+// Goobstation Start - Energycrit
+
 // Goobstation End
 
 namespace Content.Server._EinsteinEngines.Power;
@@ -32,15 +33,15 @@ namespace Content.Server._EinsteinEngines.Power;
 // Goobstation - Energycrit: Create SharedBatteryDrinkerSystem and Client BatteryDrinkerSystem so client can predict drink verbs
 public sealed class BatteryDrinkerSystem : SharedBatteryDrinkerSystem
 {
-    [Dependency] private readonly ItemSlotsSystem _slots = default!;
-    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly BatterySystem _battery = default!;
-    [Dependency] private readonly SiliconChargeSystem _silicon = default!;
+    [Dependency] private readonly ChargerSystem _chargers = default!; // Goobstation
+    [Dependency] private readonly SharedContainerSystem _container = default!;
+    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
     [Dependency] private readonly PopupSystem _popup = default!;
     [Dependency] private readonly PowerCellSystem _powerCell = default!;
-    [Dependency] private readonly SharedContainerSystem _container = default!;
-    [Dependency] private readonly ChargerSystem _chargers = default!; // Goobstation
+    [Dependency] private readonly SiliconChargeSystem _silicon = default!;
+    [Dependency] private readonly ItemSlotsSystem _slots = default!;
     [Dependency] private readonly EntityWhitelistSystem _whitelist = default!; // Goobstation - Energycrit
 
     public override void Initialize()
@@ -48,7 +49,8 @@ public sealed class BatteryDrinkerSystem : SharedBatteryDrinkerSystem
         base.Initialize();
 
         SubscribeLocalEvent<BatteryComponent, GetVerbsEvent<AlternativeVerb>>(AddAltVerb);
-        SubscribeLocalEvent<PowerCellSlotComponent, GetVerbsEvent<AlternativeVerb>>(AddAltVerb); // Goobstation - Energycrit
+        SubscribeLocalEvent<PowerCellSlotComponent, GetVerbsEvent<AlternativeVerb>>(
+            AddAltVerb); // Goobstation - Energycrit
 
         SubscribeLocalEvent<BatteryDrinkerComponent, BatteryDrinkerDoAfterEvent>(OnDoAfter);
     }
@@ -75,7 +77,7 @@ public sealed class BatteryDrinkerSystem : SharedBatteryDrinkerSystem
             Text = Loc.GetString("battery-drinker-verb-drink"),
             Icon = new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/VerbIcons/smite.svg.192dpi.png")),
             // Goobstation - Energycrit: dont block removing power cells
-            Priority = -5
+            Priority = -5,
         };
 
         args.Verbs.Add(verb);
@@ -100,16 +102,22 @@ public sealed class BatteryDrinkerSystem : SharedBatteryDrinkerSystem
         else
             return;
 
-        var args = new DoAfterArgs(EntityManager, user, doAfterTime, new BatteryDrinkerDoAfterEvent(), user, target) // TODO: Make this doafter loop, once we merge Upstream.
-        {
-            BreakOnDamage = true,
-            BreakOnMove = true,
-            Broadcast = false,
-            DistanceThreshold = 1.35f,
-            RequireCanInteract = true,
-            CancelDuplicate = false,
-            MultiplyDelay = false, // Goobstation
-        };
+        var args =
+            new DoAfterArgs(EntityManager,
+                    user,
+                    doAfterTime,
+                    new BatteryDrinkerDoAfterEvent(),
+                    user,
+                    target) // TODO: Make this doafter loop, once we merge Upstream.
+                {
+                    BreakOnDamage = true,
+                    BreakOnMove = true,
+                    Broadcast = false,
+                    DistanceThreshold = 1.35f,
+                    RequireCanInteract = true,
+                    CancelDuplicate = false,
+                    MultiplyDelay = false, // Goobstation
+                };
 
         _doAfter.TryStartDoAfter(args);
     }
@@ -133,7 +141,8 @@ public sealed class BatteryDrinkerSystem : SharedBatteryDrinkerSystem
         var amountToDrink = drinkerComp.DrinkMultiplier * 1000;
 
         amountToDrink = MathF.Min(amountToDrink, sourceBattery.CurrentCharge);
-        amountToDrink = MathF.Min(amountToDrink, drinkerBatteryComponent!.MaxCharge - drinkerBatteryComponent.CurrentCharge);
+        amountToDrink = MathF.Min(amountToDrink,
+            drinkerBatteryComponent!.MaxCharge - drinkerBatteryComponent.CurrentCharge);
 
         if (sourceComp != null && sourceComp.MaxAmount > 0)
             amountToDrink = MathF.Min(amountToDrink, (float) sourceComp.MaxAmount);
@@ -145,14 +154,19 @@ public sealed class BatteryDrinkerSystem : SharedBatteryDrinkerSystem
         }
 
         if (_battery.TryUseCharge(source, amountToDrink))
-            _battery.SetCharge(drinkerBattery.Value, drinkerBatteryComponent.CurrentCharge + amountToDrink, drinkerBatteryComponent); // DeltaV - people with augment power cells can drink batteries
+            _battery.SetCharge(drinkerBattery.Value,
+                drinkerBatteryComponent.CurrentCharge + amountToDrink,
+                drinkerBatteryComponent); // DeltaV - people with augment power cells can drink batteries
         else
         {
-            _battery.SetCharge(drinkerBattery.Value, sourceBattery.CurrentCharge + drinkerBatteryComponent.CurrentCharge, drinkerBatteryComponent); // DeltaV - people with augment power cells can drink batteries
+            _battery.SetCharge(drinkerBattery.Value,
+                sourceBattery.CurrentCharge + drinkerBatteryComponent.CurrentCharge,
+                drinkerBatteryComponent); // DeltaV - people with augment power cells can drink batteries
             _battery.SetCharge(source, 0);
         }
 
-        if (sourceComp != null && sourceComp.DrinkSound != null){
+        if (sourceComp != null && sourceComp.DrinkSound != null)
+        {
             _popup.PopupEntity(Loc.GetString("ipc-recharge-tip"), drinker, drinker, PopupType.SmallCaution);
             _audio.PlayPvs(sourceComp.DrinkSound, source);
             Spawn("EffectSparks", Transform(source).Coordinates);

@@ -10,6 +10,8 @@ namespace Content.Server.Maps;
 
 public sealed partial class GameMapPrototype
 {
+    [DataField("conditions")] private List<GameMapCondition> _conditions = new();
+
     /// <summary>
     /// Controls if the map can be used as a fallback if no maps are eligible.
     /// </summary>
@@ -27,8 +29,6 @@ public sealed partial class GameMapPrototype
     /// </summary>
     [DataField("maxPlayers")]
     public uint MaxPlayers { get; private set; } = uint.MaxValue;
-
-    [DataField("conditions")] private  List<GameMapCondition> _conditions = new();
 
     /// <summary>
     /// The game map conditions that must be fulfilled for this map to be selectable.

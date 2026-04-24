@@ -14,7 +14,10 @@ namespace Content.Server.StationEvents.Events;
 
 public sealed class KudzuGrowthRule : StationEventSystem<KudzuGrowthRuleComponent>
 {
-    protected override void Started(EntityUid uid, KudzuGrowthRuleComponent component, GameRuleComponent gameRule, GameRuleStartedEvent args)
+    protected override void Started(EntityUid uid,
+        KudzuGrowthRuleComponent component,
+        GameRuleComponent gameRule,
+        GameRuleStartedEvent args)
     {
         base.Started(uid, component, gameRule, args);
 
@@ -23,6 +26,5 @@ public sealed class KudzuGrowthRule : StationEventSystem<KudzuGrowthRuleComponen
             return;
         Spawn("Kudzu", targetCoords);
         Sawmill.Info($"Spawning a Kudzu at {targetTile} on {targetGrid}");
-
     }
 }

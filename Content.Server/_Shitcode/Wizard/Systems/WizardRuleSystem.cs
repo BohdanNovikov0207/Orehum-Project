@@ -18,13 +18,11 @@ using Content.Server.GameTicking;
 using Content.Server.GameTicking.Rules;
 using Content.Server.Mind;
 using Content.Server.Roles;
-using Content.Server.Station.Components;
 using Content.Server.Station.Systems;
 using Content.Shared._Goobstation.Wizard;
 using Content.Shared._Goobstation.Wizard.BindSoul;
 using Content.Shared.Atmos;
 using Content.Shared.Chat;
-using Content.Shared.Cloning;
 using Content.Shared.Cloning.Events;
 using Content.Shared.Database;
 using Content.Shared.GameTicking.Components;
@@ -47,21 +45,20 @@ namespace Content.Server._Goobstation.Wizard.Systems;
 
 public sealed class WizardRuleSystem : GameRuleSystem<WizardRuleComponent>
 {
-    [Dependency] private readonly StationSystem _station = default!;
-    [Dependency] private readonly AntagSelectionSystem _antag = default!;
-    [Dependency] private readonly MindSystem _mind = default!;
-    [Dependency] private readonly RoleSystem _role = default!;
-    [Dependency] private readonly GameTicker _gameTicker = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly AtmosphereSystem _atmos = default!;
-    [Dependency] private readonly AudioSystem _audio = default!;
-    [Dependency] private readonly NpcFactionSystem _faction = default!;
-    [Dependency] private readonly IAdminLogManager _log = default!;
-    [Dependency] private readonly IChatManager _chatManager = default!;
-
     public static readonly ProtoId<NpcFactionPrototype> Faction = "Wizard";
 
     public static readonly EntProtoId Role = "MindRoleWizard";
+    [Dependency] private readonly AntagSelectionSystem _antag = default!;
+    [Dependency] private readonly AtmosphereSystem _atmos = default!;
+    [Dependency] private readonly AudioSystem _audio = default!;
+    [Dependency] private readonly IChatManager _chatManager = default!;
+    [Dependency] private readonly NpcFactionSystem _faction = default!;
+    [Dependency] private readonly GameTicker _gameTicker = default!;
+    [Dependency] private readonly IAdminLogManager _log = default!;
+    [Dependency] private readonly MindSystem _mind = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly RoleSystem _role = default!;
+    [Dependency] private readonly StationSystem _station = default!;
 
     public override void Initialize()
     {
@@ -85,10 +82,8 @@ public sealed class WizardRuleSystem : GameRuleSystem<WizardRuleComponent>
         SubscribeLocalEvent<NpcFactionMemberComponent, GrantFactionsEvent>(OnGrantFactions);
     }
 
-    private void OnGrantFactions(Entity<NpcFactionMemberComponent> ent, ref GrantFactionsEvent args)
-    {
+    private void OnGrantFactions(Entity<NpcFactionMemberComponent> ent, ref GrantFactionsEvent args) =>
         _faction.AddFactions(ent.AsNullable(), args.Factions);
-    }
 
     private void OnApprenticeClone(Entity<ApprenticeComponent> ent, ref CloningEvent args)
     {
@@ -161,8 +156,6 @@ public sealed class WizardRuleSystem : GameRuleSystem<WizardRuleComponent>
         _audio.PlayGlobal(ev.Sound, Filter.Broadcast(), true);
 
         _log.Add(LogType.EventRan, LogImpact.Extreme, $"Station map changed via wizard spellbook dimension shift.");
-
-        return;
     }
 
     private void OnParentChanged(ref EntParentChangedMessage args)
@@ -189,10 +182,7 @@ public sealed class WizardRuleSystem : GameRuleSystem<WizardRuleComponent>
         return false;
     }
 
-    private void OnRemove(EntityUid uid, Component component, ComponentRemove args)
-    {
-        CheckRoundShouldEnd();
-    }
+    private void OnRemove(EntityUid uid, Component component, ComponentRemove args) => CheckRoundShouldEnd();
 
     private void OnStateChanged(EntityUid uid, Component component, MobStateChangedEvent args)
     {
@@ -249,10 +239,8 @@ public sealed class WizardRuleSystem : GameRuleSystem<WizardRuleComponent>
         }
     }
 
-    public IEnumerable<EntityUid?> GetWizardTargetStationGrids()
-    {
-        return GetWizardTargetStations().Select(station => _station.GetLargestGrid(station.Owner));
-    }
+    public IEnumerable<EntityUid?> GetWizardTargetStationGrids() =>
+        GetWizardTargetStations().Select(station => _station.GetLargestGrid(station.Owner));
 
     public EntityUid? GetWizardTargetRandomStationGrid()
     {
@@ -271,24 +259,18 @@ public sealed class WizardRuleSystem : GameRuleSystem<WizardRuleComponent>
         component.TargetStation = _random.Pick(stations);
     }
 
-    private void OnWizardGetBriefing(Entity<WizardRoleComponent> ent, ref GetBriefingEvent args)
-    {
+    private void OnWizardGetBriefing(Entity<WizardRoleComponent> ent, ref GetBriefingEvent args) =>
         args.Append(Loc.GetString("wizard-role-briefing"));
-    }
 
-    private void OnApprenticeGetBriefing(Entity<ApprenticeRoleComponent> ent, ref GetBriefingEvent args)
-    {
+    private void OnApprenticeGetBriefing(Entity<ApprenticeRoleComponent> ent, ref GetBriefingEvent args) =>
         args.Append(Loc.GetString("apprentice-role-briefing"));
-    }
 
-    private void OnAfterAntagSelected(Entity<WizardRuleComponent> ent, ref AfterAntagEntitySelectedEvent args)
-    {
+    private void OnAfterAntagSelected(Entity<WizardRuleComponent> ent, ref AfterAntagEntitySelectedEvent args) =>
         MakeWizard(args.EntityUid, ent.Comp);
-    }
 
     public bool MakeWizard(EntityUid target, WizardRuleComponent rule)
     {
-        var station = (rule.TargetStation is not null) ? Name(rule.TargetStation.Value) : "the station";
+        var station = rule.TargetStation is not null ? Name(rule.TargetStation.Value) : "the station";
 
         _antag.SendBriefing(target, Loc.GetString("wizard-role-greeting", ("station", station)), Color.Cyan, null);
 

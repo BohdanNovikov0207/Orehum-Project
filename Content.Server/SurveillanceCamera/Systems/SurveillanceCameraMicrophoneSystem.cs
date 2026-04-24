@@ -19,8 +19,9 @@ namespace Content.Server.SurveillanceCamera;
 
 public sealed class SurveillanceCameraMicrophoneSystem : EntitySystem
 {
-    [Dependency] private readonly SharedTransformSystem _xforms = default!;
     [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
+    [Dependency] private readonly SharedTransformSystem _xforms = default!;
+
     public override void Initialize()
     {
         base.Initialize();
@@ -37,13 +38,14 @@ public sealed class SurveillanceCameraMicrophoneSystem : EntitySystem
         var sourcePos = _xforms.GetWorldPosition(sourceXform, xformQuery);
 
         // This function ensures that chat popups appear on camera views that have connected microphones.
-        foreach (var (_, __, camera, xform) in EntityQuery<SurveillanceCameraMicrophoneComponent, ActiveListenerComponent, SurveillanceCameraComponent, TransformComponent>())
+        foreach (var (_, __, camera, xform) in EntityQuery<SurveillanceCameraMicrophoneComponent,
+                     ActiveListenerComponent, SurveillanceCameraComponent, TransformComponent>())
         {
             if (camera.ActiveViewers.Count == 0)
                 continue;
 
             // get range to camera. This way wispers will still appear as obfuscated if they are too far from the camera's microphone
-            var range = (xform.MapID != sourceXform.MapID)
+            var range = xform.MapID != sourceXform.MapID
                 ? -1
                 : (sourcePos - _xforms.GetWorldPosition(xform, xformQuery)).Length();
 
@@ -107,12 +109,12 @@ public sealed class SurveillanceCameraMicrophoneSystem : EntitySystem
 
 public sealed class SurveillanceCameraSpeechSendEvent : EntityEventArgs
 {
-    public EntityUid Speaker { get; }
-    public string Message { get; }
-
     public SurveillanceCameraSpeechSendEvent(EntityUid speaker, string message)
     {
         Speaker = speaker;
         Message = message;
     }
+
+    public EntityUid Speaker { get; }
+    public string Message { get; }
 }

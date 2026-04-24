@@ -11,14 +11,14 @@ using Content.Server.Popups;
 using Content.Shared.IdentityManagement;
 using Content.Shared.Popups;
 using Content.Shared.Tag;
-using Content.Shared.Weapons.Melee.Events;
 using Content.Shared.Throwing;
+using Content.Shared.Weapons.Melee.Events;
 using Robust.Shared.Audio.Systems;
 
 namespace Content.Server.Weapons.Melee.Balloon;
 
 /// <summary>
-/// This handles popping ballons when attacked with <see cref="BalloonPopperComponent"/>
+/// This handles popping ballons when attacked with <see cref="BalloonPopperComponent" />
 /// </summary>
 public sealed class BalloonPopperSystem : EntitySystem
 {
@@ -27,7 +27,7 @@ public sealed class BalloonPopperSystem : EntitySystem
     [Dependency] private readonly PopupSystem _popup = default!;
     [Dependency] private readonly TagSystem _tag = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         SubscribeLocalEvent<BalloonPopperComponent, MeleeHitEvent>(OnMeleeHit);
@@ -68,7 +68,9 @@ public sealed class BalloonPopperSystem : EntitySystem
 
         _audio.PlayPvs(component.PopSound, balloon);
         _popup.PopupCoordinates(Loc.GetString("melee-balloon-pop",
-            ("balloon", Identity.Entity(balloon, EntityManager))), Transform(balloon).Coordinates, PopupType.Large);
+                ("balloon", Identity.Entity(balloon, EntityManager))),
+            Transform(balloon).Coordinates,
+            PopupType.Large);
         QueueDel(balloon);
     }
 }

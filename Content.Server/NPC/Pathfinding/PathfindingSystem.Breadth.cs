@@ -8,25 +8,6 @@ namespace Content.Server.NPC.Pathfinding;
 
 public sealed partial class PathfindingSystem
 {
-    /*
-     * Handle BFS searches from Start->End. Doesn't consider NPC pathfinding.
-     */
-
-    /// <summary>
-    /// Pathfinding args for a 1-many path.
-    /// </summary>
-    public record struct BreadthPathArgs()
-    {
-        public required Vector2i Start;
-        public required List<Vector2i> Ends;
-
-        public bool Diagonals = false;
-
-        public Func<Vector2i, float>? TileCost;
-
-        public int Limit = 10000;
-    }
-
     /// <summary>
     /// Gets a BFS path from start to any end. Can also supply an optional tile-cost for tiles.
     /// </summary>
@@ -49,7 +30,7 @@ public sealed partial class PathfindingSystem
                 // Found target
                 var path = ReconstructPath(node, cameFrom);
 
-                return new SimplePathResult()
+                return new SimplePathResult
                 {
                     CameFrom = cameFrom,
                     Path = path,
@@ -68,9 +49,7 @@ public sealed partial class PathfindingSystem
                         var neighborCost = OctileDistance(node, neighbor) * args.TileCost?.Invoke(neighbor) ?? 1f;
 
                         if (neighborCost.Equals(0f))
-                        {
                             continue;
-                        }
 
                         // f = g + h
                         // gScore is distance to the start node
@@ -79,9 +58,7 @@ public sealed partial class PathfindingSystem
 
                         // Slower to get here so just ignore it.
                         if (costSoFar.TryGetValue(neighbor, out var nextValue) && gScore >= nextValue)
-                        {
                             continue;
-                        }
 
                         cameFrom[neighbor] = node;
                         costSoFar[neighbor] = gScore;
@@ -125,5 +102,22 @@ public sealed partial class PathfindingSystem
         }
 
         return SimplePathResult.NoPath;
+    }
+    /*
+     * Handle BFS searches from Start->End. Doesn't consider NPC pathfinding.
+     */
+
+    /// <summary>
+    /// Pathfinding args for a 1-many path.
+    /// </summary>
+    public record struct BreadthPathArgs()
+    {
+        public bool Diagonals = false;
+        public required List<Vector2i> Ends;
+
+        public int Limit = 10000;
+        public required Vector2i Start;
+
+        public Func<Vector2i, float>? TileCost;
     }
 }

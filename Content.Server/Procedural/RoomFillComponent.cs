@@ -16,23 +16,22 @@ namespace Content.Server.Procedural;
 public sealed partial class RoomFillComponent : Component
 {
     /// <summary>
-    /// Are we allowed to rotate room templates?
-    /// If the room is not a square this will only do 180 degree rotations.
+    /// Should any existing entities / decals be bulldozed first.
     /// </summary>
     [DataField]
-    public bool Rotation = true;
-
-    /// <summary>
-    /// Min size of the possible selected room.
-    /// </summary>
-    [DataField]
-    public Vector2i MinSize = new (3, 3);
+    public bool ClearExisting = true;
 
     /// <summary>
     /// Max size of the possible selected room.
     /// </summary>
     [DataField]
-    public Vector2i MaxSize = new (10, 10);
+    public Vector2i MaxSize = new(10, 10);
+
+    /// <summary>
+    /// Min size of the possible selected room.
+    /// </summary>
+    [DataField]
+    public Vector2i MinSize = new(3, 3);
 
     /// <summary>
     /// Rooms allowed for the marker.
@@ -41,8 +40,9 @@ public sealed partial class RoomFillComponent : Component
     public EntityWhitelist? RoomWhitelist;
 
     /// <summary>
-    /// Should any existing entities / decals be bulldozed first.
+    /// Are we allowed to rotate room templates?
+    /// If the room is not a square this will only do 180 degree rotations.
     /// </summary>
     [DataField]
-    public bool ClearExisting = true;
+    public bool Rotation = true;
 }

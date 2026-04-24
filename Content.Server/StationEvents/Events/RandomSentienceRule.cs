@@ -19,9 +19,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Linq;
-using Content.Shared.Dataset;
 using Content.Server.Ghost.Roles.Components;
 using Content.Server.StationEvents.Components;
+using Content.Shared.Dataset;
 using Content.Shared.GameTicking.Components;
 using Content.Shared.Random.Helpers;
 using Robust.Shared.Prototypes;
@@ -36,7 +36,11 @@ public sealed class RandomSentienceRule : StationEventSystem<RandomSentienceRule
 
     [Dependency] private readonly IPrototypeManager _prototype = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
-    protected override void Started(EntityUid uid, RandomSentienceRuleComponent component, GameRuleComponent gameRule, GameRuleStartedEvent args)
+
+    protected override void Started(EntityUid uid,
+        RandomSentienceRuleComponent component,
+        GameRuleComponent gameRule,
+        GameRuleStartedEvent args)
     {
         if (!TryGetRandomStation(out var station))
             return;
@@ -73,13 +77,15 @@ public sealed class RandomSentienceRule : StationEventSystem<RandomSentienceRule
                     break;
                 }
             }
+
             targetList.Remove(target);
 
             RemComp<SentienceTargetComponent>(target);
             var ghostRole = EnsureComp<GhostRoleComponent>(target);
             EnsureComp<GhostTakeoverAvailableComponent>(target);
             ghostRole.RoleName = MetaData(target).EntityName;
-            ghostRole.RoleDescription = Loc.GetString("station-event-random-sentience-role-description", ("name", ghostRole.RoleName));
+            ghostRole.RoleDescription = Loc.GetString("station-event-random-sentience-role-description",
+                ("name", ghostRole.RoleName));
             groups.Add(Loc.GetString(target.Comp.FlavorKind));
         }
 
@@ -94,7 +100,10 @@ public sealed class RandomSentienceRule : StationEventSystem<RandomSentienceRule
         ChatSystem.DispatchStationAnnouncement(
             station.Value,
             Loc.GetString("station-event-random-sentience-announcement",
-                ("kind1", kind1), ("kind2", kind2), ("kind3", kind3), ("amount", groupList.Count),
+                ("kind1", kind1),
+                ("kind2", kind2),
+                ("kind3", kind3),
+                ("amount", groupList.Count),
                 ("data", _random.Pick(_prototype.Index(DataSourceNames))),
                 ("strength", _random.Pick(_prototype.Index(IntelligenceLevelNames)))
             ),

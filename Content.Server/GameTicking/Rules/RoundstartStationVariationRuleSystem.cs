@@ -18,7 +18,7 @@ using Robust.Shared.Random;
 
 namespace Content.Server.GameTicking.Rules;
 
-/// <inheritdoc cref="RoundstartStationVariationRuleComponent"/>
+/// <inheritdoc cref="RoundstartStationVariationRuleComponent" />
 public sealed class RoundstartStationVariationRuleSystem : GameRuleSystem<RoundstartStationVariationRuleComponent>
 {
     [Dependency] private readonly IRobustRandom _random = default!;
@@ -27,10 +27,13 @@ public sealed class RoundstartStationVariationRuleSystem : GameRuleSystem<Rounds
     {
         base.Initialize();
 
-        SubscribeLocalEvent<StationPostInitEvent>(OnStationPostInit, after: new []{typeof(ShuttleSystem)});
+        SubscribeLocalEvent<StationPostInitEvent>(OnStationPostInit, after: new[] { typeof(ShuttleSystem) });
     }
 
-    protected override void Added(EntityUid uid, RoundstartStationVariationRuleComponent component, GameRuleComponent gameRule, GameRuleAddedEvent args)
+    protected override void Added(EntityUid uid,
+        RoundstartStationVariationRuleComponent component,
+        GameRuleComponent gameRule,
+        GameRuleAddedEvent args)
     {
         var spawns = EntitySpawnCollection.GetSpawns(component.Rules, _random);
         foreach (var rule in spawns)
@@ -71,8 +74,8 @@ public sealed class RoundstartStationVariationRuleSystem : GameRuleSystem<Rounds
 }
 
 /// <summary>
-///     Raised directed on game rule entities which are added and marked as <see cref="StationVariationPassRuleComponent"/>
-///     when a new station is initialized that should be varied.
+/// Raised directed on game rule entities which are added and marked as <see cref="StationVariationPassRuleComponent" />
+/// when a new station is initialized that should be varied.
 /// </summary>
 /// <param name="Station">The new station that was added, and its config & grids.</param>
 [ByRefEvent]

@@ -76,6 +76,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Numerics;
 using Content.Server.Atmos.Piping.Components;
 using Content.Server.Atmos.Piping.EntitySystems;
 using Content.Server.Charges;
@@ -93,7 +94,6 @@ using Content.Shared.SprayPainter;
 using Content.Shared.SprayPainter.Components;
 using Robust.Server.Audio;
 using Robust.Server.GameObjects;
-using Robust.Shared.Prototypes;
 
 namespace Content.Server.SprayPainter;
 
@@ -103,11 +103,11 @@ namespace Content.Server.SprayPainter;
 /// </summary>
 public sealed class SprayPainterSystem : SharedSprayPainterSystem
 {
-    [Dependency] private readonly AtmosPipeColorSystem _pipeColor = default!;
-    [Dependency] private readonly PopupSystem _popup = default!;
-    [Dependency] private readonly DecalSystem _decals = default!;
     [Dependency] private readonly AudioSystem _audio = default!;
     [Dependency] private readonly ChargesSystem _charges = default!;
+    [Dependency] private readonly DecalSystem _decals = default!;
+    [Dependency] private readonly AtmosPipeColorSystem _pipeColor = default!;
+    [Dependency] private readonly PopupSystem _popup = default!;
     [Dependency] private readonly TransformSystem _transform = default!;
 
     public override void Initialize()
@@ -147,9 +147,13 @@ public sealed class SprayPainterSystem : SharedSprayPainterSystem
         if (ent.Comp.DecalMode == DecalPaintMode.Add)
         {
             // Offset painting for adding decals
-            position = position.Offset(new(-0.5f));
+            position = position.Offset(new Vector2(-0.5f));
 
-            if (!_decals.TryAddDecal(ent.Comp.SelectedDecal, position, out _, ent.Comp.SelectedDecalColor, Angle.FromDegrees(ent.Comp.SelectedDecalAngle), 0, false))
+            if (!_decals.TryAddDecal(ent.Comp.SelectedDecal,
+                    position,
+                    out _,
+                    ent.Comp.SelectedDecalColor,
+                    Angle.FromDegrees(ent.Comp.SelectedDecalAngle)))
                 return;
         }
         else
@@ -178,7 +182,9 @@ public sealed class SprayPainterSystem : SharedSprayPainterSystem
 
         _charges.TryUseCharges((ent, charges), ent.Comp.DecalChargeCost);
 
-        AdminLogger.Add(LogType.CrayonDraw, LogImpact.Low, $"{EntityManager.ToPrettyString(args.User):user} painted a {ent.Comp.SelectedDecal}");
+        AdminLogger.Add(LogType.CrayonDraw,
+            LogImpact.Low,
+            $"{EntityManager.ToPrettyString(args.User):user} painted a {ent.Comp.SelectedDecal}");
     }
 
     /// <summary>
@@ -191,8 +197,8 @@ public sealed class SprayPainterSystem : SharedSprayPainterSystem
             return false;
 
         return (decalProto.Tags.Contains("station")
-            || decalProto.Tags.Contains("markings"))
-            && !decalProto.Tags.Contains("dirty");
+                || decalProto.Tags.Contains("markings"))
+               && !decalProto.Tags.Contains("dirty");
     }
 
     /// <summary>
@@ -255,8 +261,8 @@ public sealed class SprayPainterSystem : SharedSprayPainterSystem
             painter.PipeSprayTime,
             new SprayPainterPipeDoAfterEvent(color),
             args.Used,
-            target: ent,
-            used: args.Used)
+            ent,
+            args.Used)
         {
             BreakOnMove = true,
             BreakOnDamage = true,

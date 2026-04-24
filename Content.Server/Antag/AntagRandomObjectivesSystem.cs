@@ -20,9 +20,9 @@ namespace Content.Server.Antag;
 /// </summary>
 public sealed class AntagRandomObjectivesSystem : EntitySystem
 {
-    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly SharedMindSystem _mind = default!;
     [Dependency] private readonly ObjectivesSystem _objectives = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
 
     public override void Initialize()
     {
@@ -35,7 +35,8 @@ public sealed class AntagRandomObjectivesSystem : EntitySystem
     {
         if (!_mind.TryGetMind(args.Session, out var mindId, out var mind))
         {
-            Log.Error($"Antag {ToPrettyString(args.EntityUid):player} was selected by {ToPrettyString(ent):rule} but had no mind attached!");
+            Log.Error(
+                $"Antag {ToPrettyString(args.EntityUid):player} was selected by {ToPrettyString(ent):rule} but had no mind attached!");
             return;
         }
 
@@ -54,7 +55,8 @@ public sealed class AntagRandomObjectivesSystem : EntitySystem
                 _mind.AddObjective(mindId, mind, objective);
                 var adding = Comp<ObjectiveComponent>(objective).Difficulty;
                 difficulty += adding;
-                Log.Debug($"Added objective {ToPrettyString(objective):objective} to {ToPrettyString(args.EntityUid):player} with {adding} difficulty");
+                Log.Debug(
+                    $"Added objective {ToPrettyString(objective):objective} to {ToPrettyString(args.EntityUid):player} with {adding} difficulty");
             }
         }
     }

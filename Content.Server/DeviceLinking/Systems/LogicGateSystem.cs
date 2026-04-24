@@ -11,7 +11,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Server.DeviceLinking.Components;
-using Content.Server.DeviceNetwork;
 using Content.Shared.DeviceLinking;
 using Content.Shared.DeviceLinking.Events;
 using Content.Shared.DeviceNetwork;
@@ -26,9 +25,9 @@ namespace Content.Server.DeviceLinking.Systems;
 
 public sealed class LogicGateSystem : EntitySystem
 {
-    [Dependency] private readonly DeviceLinkSystem _deviceLink = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly DeviceLinkSystem _deviceLink = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly SharedToolSystem _tool = default!;
     [Dependency] private readonly UseDelaySystem _useDelay = default!;
@@ -52,13 +51,9 @@ public sealed class LogicGateSystem : EntitySystem
         {
             // handle momentary pulses - high when received then low the next tick
             if (comp.StateA == SignalState.Momentary)
-            {
                 comp.StateA = SignalState.Low;
-            }
             if (comp.StateB == SignalState.Momentary)
-            {
                 comp.StateB = SignalState.Low;
-            }
 
             // output most likely changed so update it
             UpdateOutput(uid, comp);
@@ -115,12 +110,16 @@ public sealed class LogicGateSystem : EntitySystem
         if (args.Port == comp.InputPortA)
         {
             comp.StateA = state;
-            _appearance.SetData(uid, LogicGateVisuals.InputA, state == SignalState.High); //If A == High => Sets input A sprite to True
+            _appearance.SetData(uid,
+                LogicGateVisuals.InputA,
+                state == SignalState.High); //If A == High => Sets input A sprite to True
         }
         else if (args.Port == comp.InputPortB)
         {
             comp.StateB = state;
-            _appearance.SetData(uid, LogicGateVisuals.InputB, state == SignalState.High); //If B == High => Sets input B sprite to True
+            _appearance.SetData(uid,
+                LogicGateVisuals.InputB,
+                state == SignalState.High); //If B == High => Sets input B sprite to True
         }
 
         UpdateOutput(uid, comp);

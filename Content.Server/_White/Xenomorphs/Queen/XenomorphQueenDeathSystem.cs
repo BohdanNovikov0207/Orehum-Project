@@ -1,10 +1,9 @@
 using Content.Server.Chat.Systems;
 using Content.Shared._White.Xenomorphs.Queen;
-using Content.Shared.Mobs;
 using Content.Shared._White.Xenomorphs.Xenomorph;
-using Robust.Shared.Player;
-using System.Linq;
+using Content.Shared.Mobs;
 using Robust.Shared.Audio;
+using Robust.Shared.Player;
 
 namespace Content.Server._White.Xenomorphs.Queen;
 
@@ -36,13 +35,13 @@ public sealed class XenomorphQueenDeathSystem : EntitySystem
         }
 
         // Only send if we have players to send to
-            _chat.DispatchFilteredAnnouncement(
-                filter,
-                "A terrible wail echoes through the tunnels as the Xenomorph Queen falls!",
-                uid,
-                "Xenomorph Hivemind",
-                true,
-                new SoundPathSpecifier("/Audio/_RMC14/Xeno/alien_queen_died.ogg"),
-                Color.Red);
+        _chat.DispatchFilteredAnnouncement(
+            filter,
+            "A terrible wail echoes through the tunnels as the Xenomorph Queen falls!",
+            uid,
+            "Xenomorph Hivemind",
+            true,
+            new SoundPathSpecifier("/Audio/_RMC14/Xeno/alien_queen_died.ogg"),
+            Color.Red);
     }
 }

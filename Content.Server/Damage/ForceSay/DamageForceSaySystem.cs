@@ -8,11 +8,11 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Bed.Sleep;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Events;
 using Content.Shared.Damage.ForceSay;
-using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Systems;
 using Content.Shared.Stunnable;
@@ -23,12 +23,12 @@ using Robust.Shared.Timing;
 
 namespace Content.Server.Damage.ForceSay;
 
-/// <inheritdoc cref="DamageForceSayComponent"/>
+/// <inheritdoc cref="DamageForceSayComponent" />
 public sealed class DamageForceSaySystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly IPrototypeManager _prototype = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -40,7 +40,8 @@ public sealed class DamageForceSaySystem : EntitySystem
         // need to raise after mobthreshold
         // so that we don't accidentally raise one for damage before one for mobstate
         // (this won't double raise, because of the cooldown)
-        SubscribeLocalEvent<DamageForceSayComponent, DamageChangedEvent>(OnDamageChanged, after: new []{ typeof(MobThresholdSystem)} );
+        SubscribeLocalEvent<DamageForceSayComponent, DamageChangedEvent>(OnDamageChanged,
+            after: new[] { typeof(MobThresholdSystem) });
         SubscribeLocalEvent<DamageForceSayComponent, SleepStateChangedEvent>(OnSleep);
     }
 
@@ -58,7 +59,7 @@ public sealed class DamageForceSaySystem : EntitySystem
         }
     }
 
-    private void TryForceSay(EntityUid uid, DamageForceSayComponent component, bool useSuffix=true)
+    private void TryForceSay(EntityUid uid, DamageForceSayComponent component, bool useSuffix = true)
     {
         if (!TryComp<ActorComponent>(uid, out var actor))
             return;
@@ -101,14 +102,13 @@ public sealed class DamageForceSaySystem : EntitySystem
         AllowNextSpeech(uid);
     }
 
-    private void OnStunned(EntityUid uid, DamageForceSayComponent component, ref StunnedEvent args)
-    {
+    private void OnStunned(EntityUid uid, DamageForceSayComponent component, ref StunnedEvent args) =>
         TryForceSay(uid, component);
-    }
 
     private void OnDamageChanged(EntityUid uid, DamageForceSayComponent component, DamageChangedEvent args)
     {
-        if (args.DamageDelta == null || !args.DamageIncreased || args.DamageDelta.GetTotal() < component.DamageThreshold)
+        if (args.DamageDelta == null || !args.DamageIncreased ||
+            args.DamageDelta.GetTotal() < component.DamageThreshold)
             return;
 
         if (component.ValidDamageGroups != null)

@@ -46,10 +46,10 @@ using Content.Shared.Power;
 
 namespace Content.Server.Chemistry.EntitySystems;
 
-/// <inheritdoc/>
+/// <inheritdoc />
 public sealed class SolutionContainerMixerSystem : SharedSolutionContainerMixerSystem
 {
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
@@ -63,8 +63,6 @@ public sealed class SolutionContainerMixerSystem : SharedSolutionContainerMixerS
             StopMix(ent);
     }
 
-    protected override bool HasPower(Entity<SolutionContainerMixerComponent> entity)
-    {
-        return this.IsPowered(entity, EntityManager);
-    }
+    protected override bool HasPower(Entity<SolutionContainerMixerComponent> entity) =>
+        this.IsPowered(entity, EntityManager);
 }

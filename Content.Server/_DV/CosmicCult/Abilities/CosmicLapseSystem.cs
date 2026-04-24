@@ -6,8 +6,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Goobstation.Shared.Bible;
-using Content.Goobstation.Shared.Religion; // Goobstation - Bible
+using Content.Goobstation.Shared.Religion;
 using Content.Server.Polymorph.Systems;
 using Content.Server.Popups;
 using Content.Shared._DV.CosmicCult;
@@ -17,18 +16,18 @@ using Content.Shared.Humanoid;
 using Content.Shared.IdentityManagement;
 using Content.Shared.Polymorph;
 using Robust.Shared.Prototypes;
+// Goobstation - Bible
 
 namespace Content.Server._DV.CosmicCult.Abilities;
 
 public sealed class CosmicLapseSystem : EntitySystem
 {
+    private static readonly ProtoId<PolymorphPrototype> HumanLapse = "CosmicLapseMobHuman";
     [Dependency] private readonly CosmicCultSystem _cult = default!;
-    [Dependency] private readonly IPrototypeManager _prototype = default!;
+    [Dependency] private readonly DivineInterventionSystem _divineIntervention = default!;
     [Dependency] private readonly PolymorphSystem _polymorph = default!;
     [Dependency] private readonly PopupSystem _popup = default!;
-    [Dependency] private readonly DivineInterventionSystem _divineIntervention = default!;
-
-    private static readonly ProtoId<PolymorphPrototype> HumanLapse = "CosmicLapseMobHuman";
+    [Dependency] private readonly IPrototypeManager _prototype = default!;
 
     public override void Initialize()
     {
@@ -54,7 +53,7 @@ public sealed class CosmicLapseSystem : EntitySystem
         var tgtpos = Transform(action.Target).Coordinates;
         Spawn(uid.Comp.LapseVFX, tgtpos);
         _popup.PopupEntity(Loc.GetString("cosmicability-lapse-success",
-            ("target", Identity.Entity(action.Target, EntityManager))),
+                ("target", Identity.Entity(action.Target, EntityManager))),
             uid,
             uid);
         var species = Comp<HumanoidAppearanceComponent>(action.Target).Species;

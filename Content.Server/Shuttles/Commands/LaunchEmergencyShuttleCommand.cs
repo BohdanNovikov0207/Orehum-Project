@@ -21,8 +21,5 @@ public sealed class LaunchEmergencyShuttleCommand : LocalizedEntityCommands
 
     public override string Command => "launchemergencyshuttle";
 
-    public override void Execute(IConsoleShell shell, string argStr, string[] args)
-    {
-        _shuttleSystem.EarlyLaunch();
-    }
+    public override void Execute(IConsoleShell shell, string argStr, string[] args) => _shuttleSystem.EarlyLaunch();
 }

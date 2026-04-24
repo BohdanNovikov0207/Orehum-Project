@@ -16,46 +16,37 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using Content.Server.Station.Components;
 using Content.Server.Station.Systems;
 using Content.Shared.GameTicking.Components;
 using Content.Shared.Maps;
-using Content.Shared.Random.Helpers;
 using Content.Shared.Station.Components;
 using Robust.Shared.Collections;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
-using Robust.Shared.Random;
 using Robust.Shared.Utility;
 
 namespace Content.Server.GameTicking.Rules;
 
-public abstract partial class GameRuleSystem<T> where T: IComponent
+public abstract partial class GameRuleSystem<T> where T : IComponent
 {
     [Dependency] private readonly StationSystem _station = default!; // Goobstation
     [Dependency] private readonly TurfSystem _turf = default!; // Goobstation
 
-    protected EntityQueryEnumerator<ActiveGameRuleComponent, T, GameRuleComponent> QueryActiveRules()
-    {
-        return EntityQueryEnumerator<ActiveGameRuleComponent, T, GameRuleComponent>();
-    }
+    protected EntityQueryEnumerator<ActiveGameRuleComponent, T, GameRuleComponent> QueryActiveRules() =>
+        EntityQueryEnumerator<ActiveGameRuleComponent, T, GameRuleComponent>();
 
-    protected EntityQueryEnumerator<DelayedStartRuleComponent, T, GameRuleComponent> QueryDelayedRules()
-    {
-        return EntityQueryEnumerator<DelayedStartRuleComponent, T, GameRuleComponent>();
-    }
+    protected EntityQueryEnumerator<DelayedStartRuleComponent, T, GameRuleComponent> QueryDelayedRules() =>
+        EntityQueryEnumerator<DelayedStartRuleComponent, T, GameRuleComponent>();
 
     /// <summary>
     /// Queries all gamerules, regardless of if they're active or not.
     /// </summary>
-    protected EntityQueryEnumerator<T, GameRuleComponent> QueryAllRules()
-    {
-        return EntityQueryEnumerator<T, GameRuleComponent>();
-    }
+    protected EntityQueryEnumerator<T, GameRuleComponent> QueryAllRules() =>
+        EntityQueryEnumerator<T, GameRuleComponent>();
 
     /// <summary>
-    ///     Utility function for finding a random event-eligible station entity
+    /// Utility function for finding a random event-eligible station entity
     /// </summary>
     protected bool TryGetRandomStation([NotNullWhen(true)] out EntityUid? station, Func<EntityUid, bool>? filter = null)
     {
@@ -123,7 +114,8 @@ public abstract partial class GameRuleSystem<T> where T: IComponent
 
     protected Entity<MapGridComponent>? GetStationMainGrid(StationDataComponent station)
     {
-        if ((station.Grids.FirstOrNull(HasComp<BecomesStationComponent>) ?? _station.GetLargestGrid(station.Owner)) is not //todo goobstation station.owner obsolete patchup
+        if ((station.Grids.FirstOrNull(HasComp<BecomesStationComponent>) ?? _station.GetLargestGrid(station.Owner)) is
+            not //todo goobstation station.owner obsolete patchup
             { } grid || !TryComp(grid, out MapGridComponent? gridComp))
             return null;
 
@@ -163,8 +155,6 @@ public abstract partial class GameRuleSystem<T> where T: IComponent
     }
     // Goobstation end
 
-    protected void ForceEndSelf(EntityUid uid, GameRuleComponent? component = null)
-    {
+    protected void ForceEndSelf(EntityUid uid, GameRuleComponent? component = null) =>
         GameTicker.EndGameRule(uid, component);
-    }
 }

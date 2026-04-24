@@ -27,51 +27,44 @@ public sealed partial class HumanoidAppearanceSystem
     private void OnVerbsRequest(EntityUid uid, HumanoidAppearanceComponent component, GetVerbsEvent<Verb> args)
     {
         if (!TryComp<ActorComponent>(args.User, out var actor))
-        {
             return;
-        }
 
         if (!_adminManager.HasAdminFlag(actor.PlayerSession, AdminFlags.Fun))
-        {
             return;
-        }
 
         args.Verbs.Add(new Verb
         {
             Text = "Modify markings",
             Category = VerbCategory.Tricks,
-            Icon = new SpriteSpecifier.Rsi(new("/Textures/Mobs/Customization/reptilian_parts.rsi"), "tail_smooth"),
+            Icon = new SpriteSpecifier.Rsi(new ResPath("/Textures/Mobs/Customization/reptilian_parts.rsi"),
+                "tail_smooth"),
             Act = () =>
             {
                 _uiSystem.OpenUi(uid, HumanoidMarkingModifierKey.Key, actor.PlayerSession);
                 _uiSystem.SetUiState(
                     uid,
                     HumanoidMarkingModifierKey.Key,
-                    new HumanoidMarkingModifierState(component.MarkingSet, component.Species,
+                    new HumanoidMarkingModifierState(component.MarkingSet,
+                        component.Species,
                         component.Sex,
                         component.SkinColor,
                         component.CustomBaseLayers
                     ));
-            }
+            },
         });
     }
 
-    private void OnBaseLayersSet(EntityUid uid, HumanoidAppearanceComponent component,
+    private void OnBaseLayersSet(EntityUid uid,
+        HumanoidAppearanceComponent component,
         HumanoidMarkingModifierBaseLayersSetMessage message)
     {
         if (!_adminManager.HasAdminFlag(message.Actor, AdminFlags.Fun))
-        {
             return;
-        }
 
         if (message.Info == null)
-        {
             component.CustomBaseLayers.Remove(message.Layer);
-        }
         else
-        {
             component.CustomBaseLayers[message.Layer] = message.Info.Value;
-        }
 
         Dirty(uid, component);
 
@@ -80,21 +73,21 @@ public sealed partial class HumanoidAppearanceSystem
             _uiSystem.SetUiState(
                 uid,
                 HumanoidMarkingModifierKey.Key,
-                new HumanoidMarkingModifierState(component.MarkingSet, component.Species,
-                        component.Sex,
-                        component.SkinColor,
-                        component.CustomBaseLayers
-                    ));
+                new HumanoidMarkingModifierState(component.MarkingSet,
+                    component.Species,
+                    component.Sex,
+                    component.SkinColor,
+                    component.CustomBaseLayers
+                ));
         }
     }
 
-    private void OnMarkingsSet(EntityUid uid, HumanoidAppearanceComponent component,
+    private void OnMarkingsSet(EntityUid uid,
+        HumanoidAppearanceComponent component,
         HumanoidMarkingModifierMarkingSetMessage message)
     {
         if (!_adminManager.HasAdminFlag(message.Actor, AdminFlags.Fun))
-        {
             return;
-        }
 
         component.MarkingSet = message.MarkingSet;
         Dirty(uid, component);
@@ -104,12 +97,12 @@ public sealed partial class HumanoidAppearanceSystem
             _uiSystem.SetUiState(
                 uid,
                 HumanoidMarkingModifierKey.Key,
-                new HumanoidMarkingModifierState(component.MarkingSet, component.Species,
-                        component.Sex,
-                        component.SkinColor,
-                        component.CustomBaseLayers
-                    ));
+                new HumanoidMarkingModifierState(component.MarkingSet,
+                    component.Species,
+                    component.Sex,
+                    component.SkinColor,
+                    component.CustomBaseLayers
+                ));
         }
-
     }
 }

@@ -84,23 +84,21 @@ namespace Content.Server.Access;
 
 public sealed partial class LogWireAction : ComponentWireAction<AccessReaderComponent>
 {
-    public override Color Color { get; set; } = Color.Blue;
-    public override string Name { get; set; } = "wire-name-log";
-
-    [DataField]
-    public int PulseTimeout = 30;
+    private AccessReaderSystem _access = default!;
 
     [DataField]
     public LocId PulseLog = "log-wire-pulse-access-log";
 
-    private AccessReaderSystem _access = default!;
+    [DataField]
+    public int PulseTimeout = 30;
 
-    public override StatusLightState? GetLightState(Wire wire, AccessReaderComponent comp)
-    {
-        return comp.LoggingDisabled ? StatusLightState.Off : StatusLightState.On;
-    }
+    public override Color Color { get; set; } = Color.Blue;
+    public override string Name { get; set; } = "wire-name-log";
 
     public override object StatusKey => LogWireActionKey.Status;
+
+    public override StatusLightState? GetLightState(Wire wire, AccessReaderComponent comp) =>
+        comp.LoggingDisabled ? StatusLightState.Off : StatusLightState.On;
 
     public override void Initialize()
     {
@@ -127,7 +125,10 @@ public sealed partial class LogWireAction : ComponentWireAction<AccessReaderComp
     {
         _access.LogAccess((wire.Owner, comp), Loc.GetString(PulseLog));
         EntityManager.System<AccessReaderSystem>().SetLoggingActive((wire.Owner, comp), false);
-        WiresSystem.StartWireAction(wire.Owner, PulseTimeout, PulseTimeoutKey.Key, new TimedWireEvent(AwaitPulseCancel, wire));
+        WiresSystem.StartWireAction(wire.Owner,
+            PulseTimeout,
+            PulseTimeoutKey.Key,
+            new TimedWireEvent(AwaitPulseCancel, wire));
     }
 
     public override void Update(Wire wire)
@@ -144,6 +145,6 @@ public sealed partial class LogWireAction : ComponentWireAction<AccessReaderComp
 
     private enum PulseTimeoutKey : byte
     {
-        Key
+        Key,
     }
 }

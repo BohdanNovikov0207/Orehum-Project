@@ -12,64 +12,63 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Linq;
-using Content.Goobstation.Common.Heretic;
 using Content.Server._Goobstation.Objectives.Components;
 using Content.Server.Body.Systems;
 using Content.Server.Heretic.Components;
-using Content.Shared.Heretic.Prototypes;
-using Content.Shared.Mobs.Components;
-using Robust.Shared.Prototypes;
-using Content.Shared.Humanoid;
-using Content.Server.Revolutionary.Components;
-using Content.Shared.Mind;
-using Content.Shared.Heretic;
 using Content.Server.Heretic.EntitySystems;
-using Content.Shared.Gibbing.Events;
+using Content.Server.Revolutionary.Components;
+using Content.Shared.Heretic.Prototypes;
+using Content.Shared.Humanoid;
+using Content.Shared.Mind;
+using Content.Shared.Mobs;
+using Content.Shared.Mobs.Components;
 using Content.Shared.Silicons.Borgs.Components;
 using Content.Shared.Store.Components;
+using Robust.Shared.Prototypes;
 
 namespace Content.Server.Heretic.Ritual;
 
 /// <summary>
-///     Checks for a nearest dead body,
-///     gibs it and gives the heretic knowledge points.
+/// Checks for a nearest dead body,
+/// gibs it and gives the heretic knowledge points.
 /// </summary>
 // these classes should be lead out and shot
 [Virtual] public partial class RitualSacrificeBehavior : RitualCustomBehavior
 {
-    /// <summary>
-    ///     Minimal amount of corpses.
-    /// </summary>
-    [DataField]
-    public float Min = 1;
+    protected BodySystem _body = default!;
+    protected HereticSystem _heretic = default!;
+    [Dependency] protected ILogManager _log = default!;
+    protected EntityLookupSystem _lookup = default!;
+
+    // this is awful but it works so i'm not complaining
+    protected SharedMindSystem _mind = default!;
+    [Dependency] protected IPrototypeManager _proto = default!;
+
+    private ISawmill? _sawmill;
 
     /// <summary>
-    ///     Maximum amount of corpses.
+    /// Maximum amount of corpses.
     /// </summary>
     [DataField]
     public float Max = 1;
 
     /// <summary>
-    ///     Should we count only targets?
+    /// Minimal amount of corpses.
     /// </summary>
     [DataField]
-    public bool OnlyTargets;
+    public float Min = 1;
 
     /// <summary>
-    ///     Should we count only humanoids?
+    /// Should we count only humanoids?
     /// </summary>
     [DataField]
     public bool OnlyHumanoid = true;
 
-    // this is awful but it works so i'm not complaining
-    protected SharedMindSystem _mind = default!;
-    protected HereticSystem _heretic = default!;
-    protected BodySystem _body = default!;
-    protected EntityLookupSystem _lookup = default!;
-    [Dependency] protected IPrototypeManager _proto = default!;
-    [Dependency] protected ILogManager _log = default!;
-
-    private ISawmill? _sawmill;
+    /// <summary>
+    /// Should we count only targets?
+    /// </summary>
+    [DataField]
+    public bool OnlyTargets;
 
     protected List<EntityUid> uids = new();
 
@@ -82,7 +81,7 @@ namespace Content.Server.Heretic.Ritual;
         _proto = IoCManager.Resolve<IPrototypeManager>();
         _log = IoCManager.Resolve<ILogManager>();
 
-        uids = new();
+        uids = new List<EntityUid>();
 
         var hereticComp = args.Mind.Comp;
 
@@ -97,14 +96,15 @@ namespace Content.Server.Heretic.Ritual;
         foreach (var look in lookup)
         {
             if (!args.EntityManager.TryGetComponent<MobStateComponent>(look, out var mobstate) // only mobs
-            || OnlyHumanoid && !args.EntityManager.HasComponent<HumanoidAppearanceComponent>(look) // only humans
-            || args.EntityManager.HasComponent<BorgChassisComponent>(look) // no borgs
-            || OnlyTargets
-                && hereticComp.SacrificeTargets.All(x => x.Entity != args.EntityManager.GetNetEntity(look)) // only targets
+                || OnlyHumanoid && !args.EntityManager.HasComponent<HumanoidAppearanceComponent>(look) // only humans
+                || args.EntityManager.HasComponent<BorgChassisComponent>(look) // no borgs
+                || OnlyTargets
+                && hereticComp.SacrificeTargets.All(x =>
+                    x.Entity != args.EntityManager.GetNetEntity(look)) // only targets
                 && !_heretic.TryGetHereticComponent(look, out _, out _)) // or other heretics
                 continue;
 
-            if (mobstate.CurrentState != Shared.Mobs.MobState.Alive)
+            if (mobstate.CurrentState != MobState.Alive)
                 uids.Add(look);
         }
 
@@ -164,12 +164,13 @@ namespace Content.Server.Heretic.Ritual;
             // update objectives
             // this is godawful dogshit. but it works :)
             if (_mind.TryFindObjective((args.Mind, mind), "HereticSacrificeObjective", out var crewObj)
-            && args.EntityManager.TryGetComponent<HereticSacrificeConditionComponent>(crewObj, out var crewObjComp))
+                && args.EntityManager.TryGetComponent<HereticSacrificeConditionComponent>(crewObj, out var crewObjComp))
                 crewObjComp.Sacrificed += 1;
 
             if (_mind.TryFindObjective((args.Mind, mind), "HereticSacrificeHeadObjective", out var crewHeadObj)
-            && args.EntityManager.TryGetComponent<HereticSacrificeConditionComponent>(crewHeadObj, out var crewHeadObjComp)
-            && isCommand)
+                && args.EntityManager.TryGetComponent<HereticSacrificeConditionComponent>(crewHeadObj,
+                    out var crewHeadObjComp)
+                && isCommand)
                 crewHeadObjComp.Sacrificed += 1;
         }
 
@@ -177,7 +178,7 @@ namespace Content.Server.Heretic.Ritual;
             _heretic.UpdateMindKnowledge((args.Mind, args.Mind.Comp, store, mind), args.Performer, knowledgeGain);
 
         // reset it because it refuses to work otherwise.
-        uids = new();
+        uids = new List<EntityUid>();
         args.EntityManager.EventBus.RaiseLocalEvent(args.Mind, new EventHereticUpdateTargets());
     }
 }

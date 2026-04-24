@@ -9,7 +9,7 @@ public sealed partial class RespiratorComponent : Component
     /// <summary>
     /// Goob: Multiplier on saturation passively lost.
     /// Higher values require more air, lower require less.
-    /// Multiplicative with a lung's <see cref="LungComponent.SaturationLoss"/>
+    /// Multiplicative with a lung's <see cref="LungComponent.SaturationLoss" />
     /// </summary>
     [DataField]
     public float SaturationLoss = 1f;

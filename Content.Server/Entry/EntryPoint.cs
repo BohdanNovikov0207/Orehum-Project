@@ -134,6 +134,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Corvax.Interfaces.Shared;
 using Content.Server._Goobstation.Antag;
 using Content.Server.Acz;
 using Content.Server.Administration;
@@ -169,192 +170,192 @@ using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
 using Robust.Shared.Utility;
 
-namespace Content.Server.Entry
+namespace Content.Server.Entry;
+
+public sealed class EntryPoint : GameServer
 {
-    public sealed class EntryPoint : GameServer
+    internal const string ConfigPresetsDir = "/ConfigPresets/";
+    private const string ConfigPresetsDirBuild = $"{ConfigPresetsDir}Build/";
+    private IConnectionManager? _connectionManager;
+    private IServerDbManager? _dbManager;
+
+    private EuiManager _euiManager = default!;
+    private LastRolledAntagManager? _lastAntagManager; // Goobstation
+    private PlayTimeTrackingManager? _playTimeTracking;
+    private IEntitySystemManager? _sysMan;
+    private ServerUpdateManager _updateManager = default!;
+    private IVoteManager _voteManager = default!;
+    private IWatchlistWebhookManager _watchlistWebhookManager = default!;
+
+    /// <inheritdoc />
+    public override void Init()
     {
-        internal const string ConfigPresetsDir = "/ConfigPresets/";
-        private const string ConfigPresetsDirBuild = $"{ConfigPresetsDir}Build/";
+        base.Init();
 
-        private EuiManager _euiManager = default!;
-        private IVoteManager _voteManager = default!;
-        private ServerUpdateManager _updateManager = default!;
-        private PlayTimeTrackingManager? _playTimeTracking;
-        private IEntitySystemManager? _sysMan;
-        private IServerDbManager? _dbManager;
-        private IWatchlistWebhookManager _watchlistWebhookManager = default!;
-        private IConnectionManager? _connectionManager;
-        private LastRolledAntagManager? _lastAntagManager; // Goobstation
+        var cfg = IoCManager.Resolve<IConfigurationManager>();
+        var res = IoCManager.Resolve<IResourceManager>();
+        var logManager = IoCManager.Resolve<ILogManager>();
 
-        /// <inheritdoc />
-        public override void Init()
+        LoadConfigPresets(cfg, res, logManager.GetSawmill("configpreset"));
+
+        var aczProvider = new ContentMagicAczProvider(IoCManager.Resolve<IDependencyCollection>());
+        IoCManager.Resolve<IStatusHost>().SetMagicAczProvider(aczProvider);
+
+        var factory = IoCManager.Resolve<IComponentFactory>();
+        var prototypes = IoCManager.Resolve<IPrototypeManager>();
+
+        factory.DoAutoRegistrations();
+        factory.IgnoreMissingComponents("Visuals");
+
+        factory.RegisterIgnore(IgnoredComponents.List);
+
+        prototypes.RegisterIgnore("parallax");
+
+        ServerContentIoC.Register();
+
+        foreach (var callback in TestingCallbacks)
         {
-            base.Init();
-
-            var cfg = IoCManager.Resolve<IConfigurationManager>();
-            var res = IoCManager.Resolve<IResourceManager>();
-            var logManager = IoCManager.Resolve<ILogManager>();
-
-            LoadConfigPresets(cfg, res, logManager.GetSawmill("configpreset"));
-
-            var aczProvider = new ContentMagicAczProvider(IoCManager.Resolve<IDependencyCollection>());
-            IoCManager.Resolve<IStatusHost>().SetMagicAczProvider(aczProvider);
-
-            var factory = IoCManager.Resolve<IComponentFactory>();
-            var prototypes = IoCManager.Resolve<IPrototypeManager>();
-
-            factory.DoAutoRegistrations();
-            factory.IgnoreMissingComponents("Visuals");
-
-            factory.RegisterIgnore(IgnoredComponents.List);
-
-            prototypes.RegisterIgnore("parallax");
-
-            ServerContentIoC.Register();
-
-            foreach (var callback in TestingCallbacks)
-            {
-                var cast = (ServerModuleTestingCallbacks) callback;
-                cast.ServerBeforeIoC?.Invoke();
-            }
-
-            IoCManager.BuildGraph();
-            factory.GenerateNetIds();
-            var configManager = IoCManager.Resolve<IConfigurationManager>();
-            var dest = configManager.GetCVar(CCVars.DestinationFile);
-            IoCManager.Resolve<ContentLocalizationManager>().Initialize();
-            if (string.IsNullOrEmpty(dest)) //hacky but it keeps load times for the generator down.
-            {
-                _euiManager = IoCManager.Resolve<EuiManager>();
-                _voteManager = IoCManager.Resolve<IVoteManager>();
-                _updateManager = IoCManager.Resolve<ServerUpdateManager>();
-                _playTimeTracking = IoCManager.Resolve<PlayTimeTrackingManager>();
-                _connectionManager = IoCManager.Resolve<IConnectionManager>();
-                _sysMan = IoCManager.Resolve<IEntitySystemManager>();
-                _dbManager = IoCManager.Resolve<IServerDbManager>();
-                _watchlistWebhookManager = IoCManager.Resolve<IWatchlistWebhookManager>();
-
-                logManager.GetSawmill("Storage").Level = LogLevel.Info;
-                logManager.GetSawmill("db.ef").Level = LogLevel.Info;
-
-                IoCManager.Resolve<IAdminLogManager>().Initialize();
-                IoCManager.Resolve<IConnectionManager>().Initialize();
-                _dbManager.Init();
-                IoCManager.Resolve<IServerPreferencesManager>().Init();
-                IoCManager.Resolve<INodeGroupFactory>().Initialize();
-                IoCManager.Resolve<ContentNetworkResourceManager>().Initialize();
-                IoCManager.Resolve<GhostKickManager>().Initialize();
-                IoCManager.Resolve<ServerInfoManager>().Initialize();
-                IoCManager.Resolve<ServerApi>().Initialize();
-
-                // start-backmen: IoC
-                IoCManager.Resolve<Content.Corvax.Interfaces.Shared.ISharedSponsorsManager>().Initialize();
-                //IoCManager.Resolve<Content.Corvax.Interfaces.Server.IServerDiscordAuthManager>().Initialize();
-                //IoCManager.Resolve<Content.Corvax.Interfaces.Server.IServerJoinQueueManager>().Initialize();
-                IoCManager.Resolve<Content.Corvax.Interfaces.Shared.ISharedLoadoutsManager>().Initialize();
-                // end-backmen: IoC
-
-                _voteManager.Initialize();
-                _updateManager.Initialize();
-                _playTimeTracking.Initialize();
-                _watchlistWebhookManager.Initialize();
-                IoCManager.Resolve<JobWhitelistManager>().Initialize();
-                IoCManager.Resolve<PlayerRateLimitManager>().Initialize();
-                _lastAntagManager = IoCManager.Resolve<LastRolledAntagManager>(); // Goobstation
-                _lastAntagManager.Initialize(); // Goobstation
-            }
+            var cast = (ServerModuleTestingCallbacks) callback;
+            cast.ServerBeforeIoC?.Invoke();
         }
 
-        public override void PostInit()
+        IoCManager.BuildGraph();
+        factory.GenerateNetIds();
+        var configManager = IoCManager.Resolve<IConfigurationManager>();
+        var dest = configManager.GetCVar(CCVars.DestinationFile);
+        IoCManager.Resolve<ContentLocalizationManager>().Initialize();
+        if (string.IsNullOrEmpty(dest)) //hacky but it keeps load times for the generator down.
         {
-            base.PostInit();
+            _euiManager = IoCManager.Resolve<EuiManager>();
+            _voteManager = IoCManager.Resolve<IVoteManager>();
+            _updateManager = IoCManager.Resolve<ServerUpdateManager>();
+            _playTimeTracking = IoCManager.Resolve<PlayTimeTrackingManager>();
+            _connectionManager = IoCManager.Resolve<IConnectionManager>();
+            _sysMan = IoCManager.Resolve<IEntitySystemManager>();
+            _dbManager = IoCManager.Resolve<IServerDbManager>();
+            _watchlistWebhookManager = IoCManager.Resolve<IWatchlistWebhookManager>();
 
-            IoCManager.Resolve<IChatSanitizationManager>().Initialize();
-            IoCManager.Resolve<IChatManager>().Initialize();
-            var configManager = IoCManager.Resolve<IConfigurationManager>();
-            var resourceManager = IoCManager.Resolve<IResourceManager>();
-            var dest = configManager.GetCVar(CCVars.DestinationFile);
-            if (!string.IsNullOrEmpty(dest))
-            {
-                var resPath = new ResPath(dest).ToRootedPath();
-                var file = resourceManager.UserData.OpenWriteText(resPath.WithName("chem_" + dest));
-                ChemistryJsonGenerator.PublishJson(file);
-                file.Flush();
-                file = resourceManager.UserData.OpenWriteText(resPath.WithName("react_" + dest));
-                ReactionJsonGenerator.PublishJson(file);
-                file.Flush();
-                IoCManager.Resolve<IBaseServer>().Shutdown("Data generation done");
-            }
-            else
-            {
-                IoCManager.Resolve<RecipeManager>().Initialize();
-                IoCManager.Resolve<IAdminManager>().Initialize();
-                IoCManager.Resolve<IAfkManager>().Initialize();
-                IoCManager.Resolve<RulesManager>().Initialize();
-                _euiManager.Initialize();
+            logManager.GetSawmill("Storage").Level = LogLevel.Info;
+            logManager.GetSawmill("db.ef").Level = LogLevel.Info;
 
-                IoCManager.Resolve<IGameMapManager>().Initialize();
-                IoCManager.Resolve<IEntitySystemManager>().GetEntitySystem<GameTicker>().PostInitialize();
-                IoCManager.Resolve<IBanManager>().Initialize();
-                IoCManager.Resolve<IConnectionManager>().PostInit();
-                IoCManager.Resolve<MultiServerKickManager>().Initialize();
-                IoCManager.Resolve<CVarControlManager>().Initialize();
-            }
+            IoCManager.Resolve<IAdminLogManager>().Initialize();
+            IoCManager.Resolve<IConnectionManager>().Initialize();
+            _dbManager.Init();
+            IoCManager.Resolve<IServerPreferencesManager>().Init();
+            IoCManager.Resolve<INodeGroupFactory>().Initialize();
+            IoCManager.Resolve<ContentNetworkResourceManager>().Initialize();
+            IoCManager.Resolve<GhostKickManager>().Initialize();
+            IoCManager.Resolve<ServerInfoManager>().Initialize();
+            IoCManager.Resolve<ServerApi>().Initialize();
+
+            // start-backmen: IoC
+            IoCManager.Resolve<ISharedSponsorsManager>().Initialize();
+            //IoCManager.Resolve<Content.Corvax.Interfaces.Server.IServerDiscordAuthManager>().Initialize();
+            //IoCManager.Resolve<Content.Corvax.Interfaces.Server.IServerJoinQueueManager>().Initialize();
+            IoCManager.Resolve<ISharedLoadoutsManager>().Initialize();
+            // end-backmen: IoC
+
+            _voteManager.Initialize();
+            _updateManager.Initialize();
+            _playTimeTracking.Initialize();
+            _watchlistWebhookManager.Initialize();
+            IoCManager.Resolve<JobWhitelistManager>().Initialize();
+            IoCManager.Resolve<PlayerRateLimitManager>().Initialize();
+            _lastAntagManager = IoCManager.Resolve<LastRolledAntagManager>(); // Goobstation
+            _lastAntagManager.Initialize(); // Goobstation
         }
+    }
 
-        public override void Update(ModUpdateLevel level, FrameEventArgs frameEventArgs)
+    public override void PostInit()
+    {
+        base.PostInit();
+
+        IoCManager.Resolve<IChatSanitizationManager>().Initialize();
+        IoCManager.Resolve<IChatManager>().Initialize();
+        var configManager = IoCManager.Resolve<IConfigurationManager>();
+        var resourceManager = IoCManager.Resolve<IResourceManager>();
+        var dest = configManager.GetCVar(CCVars.DestinationFile);
+        if (!string.IsNullOrEmpty(dest))
         {
-            base.Update(level, frameEventArgs);
+            var resPath = new ResPath(dest).ToRootedPath();
+            var file = resourceManager.UserData.OpenWriteText(resPath.WithName("chem_" + dest));
+            ChemistryJsonGenerator.PublishJson(file);
+            file.Flush();
+            file = resourceManager.UserData.OpenWriteText(resPath.WithName("react_" + dest));
+            ReactionJsonGenerator.PublishJson(file);
+            file.Flush();
+            IoCManager.Resolve<IBaseServer>().Shutdown("Data generation done");
+        }
+        else
+        {
+            IoCManager.Resolve<RecipeManager>().Initialize();
+            IoCManager.Resolve<IAdminManager>().Initialize();
+            IoCManager.Resolve<IAfkManager>().Initialize();
+            IoCManager.Resolve<RulesManager>().Initialize();
+            _euiManager.Initialize();
 
-            switch (level)
+            IoCManager.Resolve<IGameMapManager>().Initialize();
+            IoCManager.Resolve<IEntitySystemManager>().GetEntitySystem<GameTicker>().PostInitialize();
+            IoCManager.Resolve<IBanManager>().Initialize();
+            IoCManager.Resolve<IConnectionManager>().PostInit();
+            IoCManager.Resolve<MultiServerKickManager>().Initialize();
+            IoCManager.Resolve<CVarControlManager>().Initialize();
+        }
+    }
+
+    public override void Update(ModUpdateLevel level, FrameEventArgs frameEventArgs)
+    {
+        base.Update(level, frameEventArgs);
+
+        switch (level)
+        {
+            case ModUpdateLevel.PostEngine:
             {
-                case ModUpdateLevel.PostEngine:
-                {
-                    _euiManager.SendUpdates();
-                    _voteManager.Update();
-                    break;
-                }
-
-                case ModUpdateLevel.FramePostEngine:
-                    _updateManager.Update();
-                    _playTimeTracking?.Update();
-                    _watchlistWebhookManager.Update();
-                    _connectionManager?.Update();
-                    break;
+                _euiManager.SendUpdates();
+                _voteManager.Update();
+                break;
             }
+
+            case ModUpdateLevel.FramePostEngine:
+                _updateManager.Update();
+                _playTimeTracking?.Update();
+                _watchlistWebhookManager.Update();
+                _connectionManager?.Update();
+                break;
         }
+    }
 
-        protected override void Dispose(bool disposing)
+    protected override void Dispose(bool disposing)
+    {
+        _playTimeTracking?.Shutdown();
+        _dbManager?.Shutdown();
+        IoCManager.Resolve<ServerApi>().Shutdown();
+    }
+
+    private static void LoadConfigPresets(IConfigurationManager cfg, IResourceManager res, ISawmill sawmill)
+    {
+        LoadBuildConfigPresets(cfg, res, sawmill);
+
+        var presets = cfg.GetCVar(CCVars.ConfigPresets);
+        if (presets == "")
+            return;
+
+        foreach (var preset in presets.Split(','))
         {
-            _playTimeTracking?.Shutdown();
-            _dbManager?.Shutdown();
-            IoCManager.Resolve<ServerApi>().Shutdown();
-        }
-
-        private static void LoadConfigPresets(IConfigurationManager cfg, IResourceManager res, ISawmill sawmill)
-        {
-            LoadBuildConfigPresets(cfg, res, sawmill);
-
-            var presets = cfg.GetCVar(CCVars.ConfigPresets);
-            if (presets == "")
-                return;
-
-            foreach (var preset in presets.Split(','))
+            var path = $"{ConfigPresetsDir}{preset}.toml";
+            if (!res.TryContentFileRead(path, out var file))
             {
-                var path = $"{ConfigPresetsDir}{preset}.toml";
-                if (!res.TryContentFileRead(path, out var file))
-                {
-                    sawmill.Error("Unable to load config preset {Preset}!", path);
-                    continue;
-                }
-
-                cfg.LoadDefaultsFromTomlStream(file);
-                sawmill.Info("Loaded config preset: {Preset}", path);
+                sawmill.Error("Unable to load config preset {Preset}!", path);
+                continue;
             }
-        }
 
-        private static void LoadBuildConfigPresets(IConfigurationManager cfg, IResourceManager res, ISawmill sawmill)
-        {
+            cfg.LoadDefaultsFromTomlStream(file);
+            sawmill.Info("Loaded config preset: {Preset}", path);
+        }
+    }
+
+    private static void LoadBuildConfigPresets(IConfigurationManager cfg, IResourceManager res, ISawmill sawmill)
+    {
 #if TOOLS
             Load(CCVars.ConfigPresetDevelopment, "development");
 #endif
@@ -363,16 +364,15 @@ namespace Content.Server.Entry
 #endif
 
 #pragma warning disable CS8321
-            void Load(CVarDef<bool> cVar, string name)
+        void Load(CVarDef<bool> cVar, string name)
+        {
+            var path = $"{ConfigPresetsDirBuild}{name}.toml";
+            if (cfg.GetCVar(cVar) && res.TryContentFileRead(path, out var file))
             {
-                var path = $"{ConfigPresetsDirBuild}{name}.toml";
-                if (cfg.GetCVar(cVar) && res.TryContentFileRead(path, out var file))
-                {
-                    cfg.LoadDefaultsFromTomlStream(file);
-                    sawmill.Info("Loaded config preset: {Preset}", path);
-                }
+                cfg.LoadDefaultsFromTomlStream(file);
+                sawmill.Info("Loaded config preset: {Preset}", path);
             }
-#pragma warning restore CS8321
         }
+#pragma warning restore CS8321
     }
 }

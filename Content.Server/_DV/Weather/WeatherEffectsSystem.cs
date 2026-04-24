@@ -12,14 +12,14 @@ namespace Content.Server._DV.Weather;
 /// <summary>
 /// Handles weather damage for exposed entities.
 /// </summary>
-public sealed partial class WeatherEffectsSystem : EntitySystem
+public sealed class WeatherEffectsSystem : EntitySystem
 {
     [Dependency] private readonly DamageableSystem _damageable = default!;
-    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly SharedMapSystem _map = default!;
+    [Dependency] private readonly IPrototypeManager _proto = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SharedWeatherSystem _weather = default!;
+    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
 
     private EntityQuery<MapGridComponent> _gridQuery;
 
@@ -57,7 +57,7 @@ public sealed partial class WeatherEffectsSystem : EntitySystem
     private void UpdateDamage(EntityUid map, ProtoId<WeatherPrototype> id)
     {
         var weather = _proto.Index(id);
-        if (weather.Damage is not {} damage)
+        if (weather.Damage is not { } damage)
             return;
 
         var query = EntityQueryEnumerator<MobStateComponent, TransformComponent>();
@@ -68,7 +68,7 @@ public sealed partial class WeatherEffectsSystem : EntitySystem
                 continue;
 
             // if not in space, check for being indoors
-            if (xform.GridUid is {} gridUid && _gridQuery.TryComp(gridUid, out var grid))
+            if (xform.GridUid is { } gridUid && _gridQuery.TryComp(gridUid, out var grid))
             {
                 var tile = _map.GetTileRef((gridUid, grid), xform.Coordinates);
                 if (!_weather.CanWeatherAffect(gridUid, grid, tile))

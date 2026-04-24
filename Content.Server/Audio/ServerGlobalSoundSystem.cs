@@ -25,9 +25,9 @@ namespace Content.Server.Audio;
 
 public sealed class ServerGlobalSoundSystem : SharedGlobalSoundSystem
 {
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly IConsoleHost _conHost = default!;
     [Dependency] private readonly StationSystem _stationSystem = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
 
     public override void Shutdown()
     {
@@ -35,10 +35,13 @@ public sealed class ServerGlobalSoundSystem : SharedGlobalSoundSystem
         _conHost.UnregisterCommand("playglobalsound");
     }
 
-    public void PlayAdminGlobal(Filter playerFilter, ResolvedSoundSpecifier specifier, AudioParams? audioParams = null, bool replay = true)
+    public void PlayAdminGlobal(Filter playerFilter,
+        ResolvedSoundSpecifier specifier,
+        AudioParams? audioParams = null,
+        bool replay = true)
     {
         var msg = new AdminSoundEvent(specifier, audioParams);
-        RaiseNetworkEvent(msg, playerFilter, recordReplay: replay);
+        RaiseNetworkEvent(msg, playerFilter, replay);
     }
 
     private Filter GetStationAndPvs(EntityUid source)
@@ -66,12 +69,17 @@ public sealed class ServerGlobalSoundSystem : SharedGlobalSoundSystem
         RaiseNetworkEvent(msg, filter);
     }
 
-    public void DispatchStationEventMusic(EntityUid source, SoundSpecifier sound, StationEventMusicType type, AudioParams? audioParams = null) // goob edit
-    {
-        DispatchStationEventMusic(source, _audio.ResolveSound(sound), type, audioParams); // goob edit
-    }
+    public void DispatchStationEventMusic(EntityUid source,
+        SoundSpecifier sound,
+        StationEventMusicType type,
+        AudioParams? audioParams = null) // goob edit
+        =>
+            DispatchStationEventMusic(source, _audio.ResolveSound(sound), type, audioParams); // goob edit
 
-    public void DispatchStationEventMusic(EntityUid source, ResolvedSoundSpecifier specifier, StationEventMusicType type, AudioParams? audioParams = null) // goob edit
+    public void DispatchStationEventMusic(EntityUid source,
+        ResolvedSoundSpecifier specifier,
+        StationEventMusicType type,
+        AudioParams? audioParams = null) // goob edit
     {
         var audio = audioParams ?? AudioParams.Default.WithVolume(-8); // goob edit
         var msg = new StationEventMusicEvent(specifier, type, audio);

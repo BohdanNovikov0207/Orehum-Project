@@ -11,46 +11,40 @@ using Content.Server.Speech.Components;
 using Content.Shared.Speech;
 using Robust.Shared.Random;
 
-namespace Content.Server.Speech.EntitySystems
+namespace Content.Server.Speech.EntitySystems;
+
+public sealed class ScrambledAccentSystem : EntitySystem
 {
-    public sealed class ScrambledAccentSystem : EntitySystem
+    private static readonly Regex RegexLoneI = new(@"(?<=\ )i(?=[\ \.\?]|$)");
+
+    [Dependency] private readonly IRobustRandom _random = default!;
+
+    public override void Initialize() => SubscribeLocalEvent<ScrambledAccentComponent, AccentGetEvent>(OnAccent);
+
+    public string Accentuate(string message)
     {
-        private static readonly Regex RegexLoneI = new(@"(?<=\ )i(?=[\ \.\?]|$)");
+        var words = message.ToLower().Split();
 
-        [Dependency] private readonly IRobustRandom _random = default!;
-
-        public override void Initialize()
+        if (words.Length < 2)
         {
-            SubscribeLocalEvent<ScrambledAccentComponent, AccentGetEvent>(OnAccent);
+            var pick = _random.Next(1, 8);
+            // If they try to weasel out of it by saying one word at a time we give them this.
+            return Loc.GetString($"accent-scrambled-words-{pick}");
         }
 
-        public string Accentuate(string message)
-        {
-            var words = message.ToLower().Split();
+        // Scramble the words
+        var scrambled = words.OrderBy(x => _random.Next()).ToArray();
 
-            if (words.Length < 2)
-            {
-                var pick = _random.Next(1, 8);
-                // If they try to weasel out of it by saying one word at a time we give them this.
-                return Loc.GetString($"accent-scrambled-words-{pick}");
-            }
+        var msg = string.Join(" ", scrambled);
 
-            // Scramble the words
-            var scrambled = words.OrderBy(x => _random.Next()).ToArray();
+        // First letter should be capital
+        msg = msg[0].ToString().ToUpper() + msg.Remove(0, 1);
 
-            var msg = string.Join(" ", scrambled);
-
-            // First letter should be capital
-            msg = msg[0].ToString().ToUpper() + msg.Remove(0, 1);
-
-            // Capitalize lone i's
-            msg = RegexLoneI.Replace(msg, "I");
-            return msg;
-        }
-
-        private void OnAccent(EntityUid uid, ScrambledAccentComponent component, AccentGetEvent args)
-        {
-            args.Message = Accentuate(args.Message);
-        }
+        // Capitalize lone i's
+        msg = RegexLoneI.Replace(msg, "I");
+        return msg;
     }
+
+    private void OnAccent(EntityUid uid, ScrambledAccentComponent component, AccentGetEvent args) =>
+        args.Message = Accentuate(args.Message);
 }

@@ -6,7 +6,7 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Server.Trigger.Systems;
 
-public sealed partial class PolymorphOnTriggerSystem : EntitySystem
+public sealed class PolymorphOnTriggerSystem : EntitySystem
 {
     [Dependency] private readonly PolymorphSystem _polymorph = default!;
 
@@ -15,7 +15,7 @@ public sealed partial class PolymorphOnTriggerSystem : EntitySystem
     /// an entity we're colliding with in case of TriggerOnCollide.
     /// Also makes sure other trigger effects don't activate in nullspace after we have polymorphed.
     /// </summary>
-    private Queue<(EntityUid Uid, ProtoId<PolymorphPrototype> Polymorph)> _queuedPolymorphUpdates = new();
+    private readonly Queue<(EntityUid Uid, ProtoId<PolymorphPrototype> Polymorph)> _queuedPolymorphUpdates = new();
 
     public override void Initialize()
     {

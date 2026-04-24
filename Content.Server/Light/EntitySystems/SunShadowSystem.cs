@@ -4,5 +4,4 @@ namespace Content.Server.Light.EntitySystems;
 
 public sealed class SunShadowSystem : SharedSunShadowSystem
 {
-
 }

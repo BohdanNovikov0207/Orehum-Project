@@ -9,10 +9,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using System.Text.RegularExpressions;
-using Content.Goobstation.Common.Heretic;
 using Content.Server.Chat.Managers;
-using Content.Server.EntityEffects;
 using Content.Server.Heretic.Components;
 using Content.Server.Mind;
 using Content.Server.Popups;
@@ -33,15 +30,15 @@ namespace Content.Server.Heretic.EntitySystems;
 
 public sealed class EldritchInfluenceSystem : EntitySystem
 {
-    [Dependency] private readonly SharedDoAfterSystem _doafter = default!;
-    [Dependency] private readonly PopupSystem _popup = default!;
-    [Dependency] private readonly HereticSystem _heretic = default!;
-    [Dependency] private readonly MindSystem _mind = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly IChatManager _chatMan = default!;
-    [Dependency] private readonly IPlayerManager _playerMan = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly SharedDoAfterSystem _doafter = default!;
     [Dependency] private readonly SharedEntityEffectSystem _effect = default!;
+    [Dependency] private readonly HereticSystem _heretic = default!;
+    [Dependency] private readonly MindSystem _mind = default!;
+    [Dependency] private readonly IPlayerManager _playerMan = default!;
+    [Dependency] private readonly PopupSystem _popup = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
 
     public override void Initialize()
     {
@@ -72,7 +69,13 @@ public sealed class EldritchInfluenceSystem : EntitySystem
         var size = ent.Comp.FontSize;
         var loc = Loc.GetString(baseMessage, ("size", size), ("text", message));
         SharedChatSystem.UpdateFontSize(size, ref message, ref loc);
-        _chatMan.ChatMessageToOne(ChatChannel.Server, message, loc, default, false, session.Channel, canCoalesce: false);
+        _chatMan.ChatMessageToOne(ChatChannel.Server,
+            message,
+            loc,
+            default,
+            false,
+            session.Channel,
+            canCoalesce: false);
 
         var effectArgs = new EntityEffectBaseArgs(args.Examiner, EntityManager);
         var effects = _random.Pick(ent.Comp.PossibleExamineEffects);
@@ -114,6 +117,7 @@ public sealed class EldritchInfluenceSystem : EntitySystem
 
         args.Handled = CollectInfluence(ent, args.User);
     }
+
     private void OnInteractUsing(Entity<EldritchInfluenceComponent> ent, ref InteractUsingEvent args)
     {
         if (args.Handled || !_heretic.TryGetHereticComponent(args.User, out _, out _))
@@ -121,9 +125,11 @@ public sealed class EldritchInfluenceSystem : EntitySystem
 
         args.Handled = CollectInfluence(ent, args.User, args.Used);
     }
+
     private void OnDoAfter(Entity<EldritchInfluenceComponent> ent, ref EldritchInfluenceDoAfterEvent args)
     {
-        if (args.Cancelled || args.Target == null || !_heretic.TryGetHereticComponent(args.User, out var heretic, out _))
+        if (args.Cancelled || args.Target == null ||
+            !_heretic.TryGetHereticComponent(args.User, out var heretic, out _))
             return;
 
         var knowledge = TryComp(args.Used, out EldritchInfluenceDrainerComponent? drainer)

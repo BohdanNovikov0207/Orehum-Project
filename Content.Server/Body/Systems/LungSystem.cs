@@ -30,17 +30,13 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Server.Atmos.Components;
 using Content.Server.Atmos.EntitySystems;
 using Content.Server.Body.Components;
-using Content.Shared.Chemistry.EntitySystems;
 using Content.Shared.Atmos;
 using Content.Shared.Chemistry.Components;
-using Content.Shared.Clothing;
-using Content.Shared.Inventory.Events;
+using Content.Shared.Chemistry.EntitySystems;
 using Content.Shared.Inventory;
-using Content.Server.Power.EntitySystems;
-using Robust.Server.Containers;
+using Content.Shared.Inventory.Events;
 using BreathToolComponent = Content.Shared.Atmos.Components.BreathToolComponent;
 using InternalsComponent = Content.Shared.Body.Components.InternalsComponent;
 
@@ -48,33 +44,29 @@ namespace Content.Server.Body.Systems;
 
 public sealed class LungSystem : EntitySystem
 {
-    [Dependency] private readonly AtmosphereSystem _atmos = default!;
-    [Dependency] private readonly InventorySystem _inventory = default!; // Goobstaiton
-    [Dependency] private readonly InternalsSystem _internals = default!;
-    [Dependency] private readonly SharedSolutionContainerSystem _solutionContainerSystem = default!;
-
     public static string LungSolutionName = "Lung";
+    [Dependency] private readonly AtmosphereSystem _atmos = default!;
+    [Dependency] private readonly InternalsSystem _internals = default!;
+    [Dependency] private readonly InventorySystem _inventory = default!; // Goobstaiton
+    [Dependency] private readonly SharedSolutionContainerSystem _solutionContainerSystem = default!;
 
     public override void Initialize()
     {
         base.Initialize();
         SubscribeLocalEvent<LungComponent, ComponentInit>(OnComponentInit);
-        SubscribeLocalEvent<BreathToolComponent, ComponentInit>(OnBreathToolInit); // Goobstation - Modsuits - Update on component toggle
+        SubscribeLocalEvent<BreathToolComponent, ComponentInit>(
+            OnBreathToolInit); // Goobstation - Modsuits - Update on component toggle
         SubscribeLocalEvent<BreathToolComponent, GotEquippedEvent>(OnGotEquipped);
         SubscribeLocalEvent<BreathToolComponent, GotUnequippedEvent>(OnGotUnequipped);
     }
 
-    private void OnGotUnequipped(Entity<BreathToolComponent> ent, ref GotUnequippedEvent args)
-    {
+    private void OnGotUnequipped(Entity<BreathToolComponent> ent, ref GotUnequippedEvent args) =>
         _atmos.DisconnectInternals(ent);
-    }
 
     private void OnGotEquipped(Entity<BreathToolComponent> ent, ref GotEquippedEvent args)
     {
         if ((args.SlotFlags & ent.Comp.AllowedSlots) == 0)
-        {
             return;
-        }
 
         if (TryComp(args.Equipee, out InternalsComponent? internals))
         {
@@ -97,7 +89,8 @@ public sealed class LungSystem : EntitySystem
     {
         var comp = ent.Comp;
 
-        if (!_inventory.TryGetContainingEntity(ent.Owner, out var parent) || !_inventory.TryGetContainingSlot(ent.Owner, out var slot))
+        if (!_inventory.TryGetContainingEntity(ent.Owner, out var parent) ||
+            !_inventory.TryGetContainingSlot(ent.Owner, out var slot))
             return;
 
         if ((slot.SlotFlags & comp.AllowedSlots) == 0)
@@ -136,7 +129,8 @@ public sealed class LungSystem : EntitySystem
                 continue;
 
             var amount = moles * Atmospherics.BreathMolesToReagentMultiplier;
-            amount = MathF.Min(amount, 30); // Goobstation - Prevent absurd amounts of reagent from being added. The maximum is arbitrary and as once wise Wizden contributor said Suck my Dick.
+            amount = MathF.Min(amount,
+                30); // Goobstation - Prevent absurd amounts of reagent from being added. The maximum is arbitrary and as once wise Wizden contributor said Suck my Dick.
             solution.AddReagent(reagent, amount);
         }
     }

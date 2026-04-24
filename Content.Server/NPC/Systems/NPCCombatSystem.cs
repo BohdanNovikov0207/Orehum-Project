@@ -22,14 +22,14 @@ namespace Content.Server.NPC.Systems;
 /// </summary>
 public sealed partial class NPCCombatSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly IMapManager _mapManager = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly GunSystem _gun = default!;
     [Dependency] private readonly InteractionSystem _interaction = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly NPCSteeringSystem _steering = default!;
+    [Dependency] private readonly IMapManager _mapManager = default!;
     [Dependency] private readonly SharedMeleeWeaponSystem _melee = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly NPCSteeringSystem _steering = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     /// <summary>

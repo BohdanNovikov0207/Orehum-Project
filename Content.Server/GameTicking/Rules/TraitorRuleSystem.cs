@@ -111,30 +111,29 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Linq;
+using System.Text;
+using Content.Goobstation.Common.CCVar;
 using Content.Goobstation.Common.Traitor;
 using Content.Server.Antag;
+using Content.Server.Codewords;
 using Content.Server.GameTicking.Rules.Components;
 using Content.Server.Mind;
 using Content.Server.Objectives;
+using Content.Server.Popups;
 using Content.Server.Roles;
 using Content.Server.Traitor.Uplink;
+using Content.Shared.Clumsy;
 using Content.Shared.Mind;
 using Content.Shared.NPC.Systems;
+using Content.Shared.Popups;
 using Content.Shared.Random.Helpers;
 using Content.Shared.Roles;
 using Content.Shared.Roles.Jobs;
 using Content.Shared.Roles.RoleCodeword;
+using Robust.Shared.Configuration;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
-using System.Linq;
-using System.Text;
-using Content.Server.Codewords;
-using Content.Server.Database;
-using Content.Shared.Clumsy;
-using Content.Server.Popups;
-using Content.Shared.CCVar;
-using Content.Goobstation.Common.CCVar;
-using Robust.Shared.Configuration;
 
 namespace Content.Server.GameTicking.Rules;
 
@@ -145,18 +144,18 @@ public sealed class TraitorRuleSystem : GameRuleSystem<TraitorRuleComponent>
     private static readonly Color TraitorCodewordColor = Color.FromHex("#cc3b3b");
 
     [Dependency] private readonly AntagSelectionSystem _antag = default!;
+    [Dependency] private readonly IConfigurationManager _cfg = default!; // goob edit
+    [Dependency] private readonly CodewordSystem _codewordSystem = default!;
+    [Dependency] private readonly GoobCommonUplinkSystem _goobUplink = default!;
     [Dependency] private readonly SharedJobSystem _jobs = default!;
     [Dependency] private readonly MindSystem _mindSystem = default!;
     [Dependency] private readonly NpcFactionSystem _npcFaction = default!;
+    [Dependency] private readonly PopupSystem _popup = default!; // goob edit
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly SharedRoleCodewordSystem _roleCodewordSystem = default!;
     [Dependency] private readonly SharedRoleSystem _roleSystem = default!;
     [Dependency] private readonly UplinkSystem _uplink = default!;
-    [Dependency] private readonly CodewordSystem _codewordSystem = default!;
-    [Dependency] private readonly PopupSystem _popup = default!; // goob edit
-    [Dependency] private readonly IConfigurationManager _cfg = default!; // goob edit
-    [Dependency] private readonly GoobCommonUplinkSystem _goobUplink = default!;
 
     public override void Initialize()
     {
@@ -216,14 +215,18 @@ public sealed class TraitorRuleSystem : GameRuleSystem<TraitorRuleComponent>
         if (component.GiveCodewords)
         {
             Log.Debug($"MakeTraitor {ToPrettyString(traitor)} - added codewords flufftext to briefing");
-            briefing = Loc.GetString("traitor-role-codewords-short", ("codewords", string.Join(", ", factionCodewords)));
+            briefing = Loc.GetString("traitor-role-codewords-short",
+                ("codewords", string.Join(", ", factionCodewords)));
             Log.Debug($"MakeTraitor {ToPrettyString(traitor)} - set codewords from component");
             codewords = factionCodewords;
         }
 
         if (component.GiveBriefing)
         {
-            _antag.SendBriefing(traitor, GenerateBriefing(codewords, uplinkBriefing, issuer), Color.Crimson, component.GreetSoundNotification);
+            _antag.SendBriefing(traitor,
+                GenerateBriefing(codewords, uplinkBriefing, issuer),
+                Color.Crimson,
+                component.GreetSoundNotification);
             Log.Debug($"MakeTraitor {ToPrettyString(traitor)} - Sent the Briefing");
         }
 
@@ -266,7 +269,7 @@ public sealed class TraitorRuleSystem : GameRuleSystem<TraitorRuleComponent>
             clumsy.ClumsyVaulting = false;
             clumsy.ClumsyHypo = false;
 
-            _popup.PopupEntity(Loc.GetString("antag-gain-remove-clumsy"), traitor, traitor, Shared.Popups.PopupType.Medium);
+            _popup.PopupEntity(Loc.GetString("antag-gain-remove-clumsy"), traitor, traitor, PopupType.Medium);
         }
 
         return true;
@@ -276,7 +279,8 @@ public sealed class TraitorRuleSystem : GameRuleSystem<TraitorRuleComponent>
     private void OnObjectivesTextPrepend(EntityUid uid, TraitorRuleComponent comp, ref ObjectivesTextPrependEvent args)
     {
         if (comp.GiveCodewords)
-            args.Text += "\n" + Loc.GetString("traitor-round-end-codewords", ("codewords", string.Join(", ", _codewordSystem.GetCodewords(comp.CodewordFactionPrototypeId))));
+            args.Text += "\n" + Loc.GetString("traitor-round-end-codewords",
+                ("codewords", string.Join(", ", _codewordSystem.GetCodewords(comp.CodewordFactionPrototypeId))));
     }
 
     // TODO: figure out how to handle this? add priority to briefing event?
@@ -291,7 +295,8 @@ public sealed class TraitorRuleSystem : GameRuleSystem<TraitorRuleComponent>
             sb.AppendLine("\n" + Loc.GetString($"traitor-{issuer}-uplink"));
             sb.AppendLine(uplinkBriefing);
         }
-        else sb.AppendLine(Loc.GetString("traitor-role-nouplink"));
+        else
+            sb.AppendLine(Loc.GetString("traitor-role-nouplink"));
 
         if (codewords != null)
             sb.AppendLine("\n" + Loc.GetString("traitor-role-codewords", ("codewords", string.Join(", ", codewords))));
@@ -310,15 +315,17 @@ public sealed class TraitorRuleSystem : GameRuleSystem<TraitorRuleComponent>
 
         if (uplinkBriefingShort != null)
             sb.AppendLine(uplinkBriefingShort);
-        else sb.AppendLine("\n" + Loc.GetString($"traitor-role-nouplink"));
+        else
+            sb.AppendLine("\n" + Loc.GetString("traitor-role-nouplink"));
 
         if (codewords != null)
-            sb.AppendLine("\n" + Loc.GetString($"traitor-role-codewords-short", ("codewords", string.Join(", ", codewords))));
+            sb.AppendLine("\n" +
+                          Loc.GetString("traitor-role-codewords-short", ("codewords", string.Join(", ", codewords))));
 
-        sb.AppendLine("\n" + Loc.GetString($"traitor-role-allegiances"));
+        sb.AppendLine("\n" + Loc.GetString("traitor-role-allegiances"));
         sb.AppendLine(Loc.GetString($"traitor-{issuer}-allies"));
 
-        sb.AppendLine("\n" + Loc.GetString($"traitor-role-notes"));
+        sb.AppendLine("\n" + Loc.GetString("traitor-role-notes"));
         sb.AppendLine(Loc.GetString($"traitor-{issuer}-goal"));
 
         return sb.ToString();
@@ -341,7 +348,8 @@ public sealed class TraitorRuleSystem : GameRuleSystem<TraitorRuleComponent>
         return allTraitors;
     }
 
-    private List<(EntityUid Id, MindComponent Mind)> GetOtherTraitorMindsAliveAndConnected(MindComponent ourMind, Entity<TraitorRuleComponent> rule)
+    private List<(EntityUid Id, MindComponent Mind)> GetOtherTraitorMindsAliveAndConnected(MindComponent ourMind,
+        Entity<TraitorRuleComponent> rule)
     {
         var traitors = new List<(EntityUid Id, MindComponent Mind)>();
         foreach (var mind in _antag.GetAntagMinds(rule.Owner))

@@ -17,10 +17,7 @@ public sealed class MonkeyAccentSystem : EntitySystem
 {
     [Dependency] private readonly IRobustRandom _random = default!;
 
-    public override void Initialize()
-    {
-        SubscribeLocalEvent<MonkeyAccentComponent, AccentGetEvent>(OnAccent);
-    }
+    public override void Initialize() => SubscribeLocalEvent<MonkeyAccentComponent, AccentGetEvent>(OnAccent);
 
     public string Accentuate(string message)
     {
@@ -55,7 +52,6 @@ public sealed class MonkeyAccentSystem : EntitySystem
                     else
                         accentedMessage.Append('A');
                 }
-
             }
 
             if (i < words.Length - 1)
@@ -67,8 +63,6 @@ public sealed class MonkeyAccentSystem : EntitySystem
         return accentedMessage.ToString();
     }
 
-    private void OnAccent(EntityUid uid, MonkeyAccentComponent component, AccentGetEvent args)
-    {
+    private void OnAccent(EntityUid uid, MonkeyAccentComponent component, AccentGetEvent args) =>
         args.Message = Accentuate(args.Message);
-    }
 }

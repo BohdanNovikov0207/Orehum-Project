@@ -12,12 +12,12 @@ namespace Content.Server.Vocalization.Systems;
 /// <summary>
 /// RadioVocalizationSystem handles vocalizing things via equipped radios when a VocalizeEvent is fired
 /// </summary>
-public sealed partial class RadioVocalizationSystem : EntitySystem
+public sealed class RadioVocalizationSystem : EntitySystem
 {
     [Dependency] private readonly ChatSystem _chat = default!;
+    [Dependency] private readonly InventorySystem _inventory = default!;
     [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly InventorySystem _inventory = default!;
 
     public override void Initialize()
     {

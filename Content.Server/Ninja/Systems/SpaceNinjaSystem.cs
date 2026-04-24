@@ -15,6 +15,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Diagnostics.CodeAnalysis;
 using Content.Goobstation.Common.Effects;
 using Content.Server.Communications;
 using Content.Server.CriminalRecords.Systems;
@@ -32,7 +33,6 @@ using Content.Shared.Ninja.Components;
 using Content.Shared.Ninja.Systems;
 using Content.Shared.Popups;
 using Content.Shared.Rounding;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Content.Server.Ninja.Systems;
 
@@ -44,8 +44,8 @@ public sealed class SpaceNinjaSystem : SharedSpaceNinjaSystem
     [Dependency] private readonly AlertsSystem _alerts = default!;
     [Dependency] private readonly BatterySystem _battery = default!;
     [Dependency] private readonly CodeConditionSystem _codeCondition = default!;
-    [Dependency] private readonly PowerCellSystem _powerCell = default!;
     [Dependency] private readonly SharedMindSystem _mind = default!;
+    [Dependency] private readonly PowerCellSystem _powerCell = default!;
     [Dependency] private readonly SparksSystem _sparks = default!; // goob edit - sparks everywhere
 
     public override void Initialize()
@@ -100,33 +100,29 @@ public sealed class SpaceNinjaSystem : SharedSpaceNinjaSystem
             _alerts.ShowAlert(uid, comp.SuitPowerAlert, (short) severity);
         }
         else
-        {
             _alerts.ClearAlert(uid, comp.SuitPowerAlert);
-        }
     }
 
     /// <summary>
     /// Get the battery component in a ninja's suit, if it's worn.
     /// </summary>
-    public bool GetNinjaBattery(EntityUid user, [NotNullWhen(true)] out EntityUid? uid, [NotNullWhen(true)] out BatteryComponent? battery)
+    public bool GetNinjaBattery(EntityUid user,
+        [NotNullWhen(true)] out EntityUid? uid,
+        [NotNullWhen(true)] out BatteryComponent? battery)
     {
         if (TryComp<SpaceNinjaComponent>(user, out var ninja)
             && ninja.Suit != null
             && _powerCell.TryGetBatteryFromSlot(ninja.Suit.Value, out uid, out battery))
-        {
             return true;
-        }
 
         uid = null;
         battery = null;
         return false;
     }
 
-    /// <inheritdoc/>
-    public override bool TryUseCharge(EntityUid user, float charge)
-    {
-        return GetNinjaBattery(user, out var uid, out var battery) && _battery.TryUseCharge(uid.Value, charge, battery);
-    }
+    /// <inheritdoc />
+    public override bool TryUseCharge(EntityUid user, float charge) =>
+        GetNinjaBattery(user, out var uid, out var battery) && _battery.TryUseCharge(uid.Value, charge, battery);
 
     /// <summary>
     /// Increment greentext when emagging a door.
@@ -138,7 +134,11 @@ public sealed class SpaceNinjaSystem : SharedSpaceNinjaSystem
             return;
 
         // this popup is serverside since door emag logic is serverside (power funnies)
-        Popup.PopupEntity(Loc.GetString("ninja-doorjack-success", ("target", Identity.Entity(args.Target, EntityManager))), uid, uid, PopupType.Medium);
+        Popup.PopupEntity(
+            Loc.GetString("ninja-doorjack-success", ("target", Identity.Entity(args.Target, EntityManager))),
+            uid,
+            uid,
+            PopupType.Medium);
 
         // handle greentext
         if (_mind.TryGetObjectiveComp<DoorjackConditionComponent>(uid, out var obj))
@@ -172,10 +172,8 @@ public sealed class SpaceNinjaSystem : SharedSpaceNinjaSystem
     }
 
     /// <summary>
-    /// Called by <see cref="SpiderChargeSystem"/> when it detonates.
+    /// Called by <see cref="SpiderChargeSystem" /> when it detonates.
     /// </summary>
-    public void DetonatedSpiderCharge(Entity<SpaceNinjaComponent> ent)
-    {
+    public void DetonatedSpiderCharge(Entity<SpaceNinjaComponent> ent) =>
         _codeCondition.SetCompleted(ent.Owner, ent.Comp.SpiderChargeObjective);
-    }
 }

@@ -42,7 +42,6 @@
 using Content.Server.NPC.Components;
 using Content.Server.NPC.HTN;
 using Content.Shared.Actions;
-using Robust.Shared.Timing;
 
 namespace Content.Server.NPC.Systems;
 
@@ -50,7 +49,7 @@ public sealed class NPCUseActionOnTargetSystem : EntitySystem
 {
     [Dependency] private readonly SharedActionsSystem _actions = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
@@ -58,17 +57,15 @@ public sealed class NPCUseActionOnTargetSystem : EntitySystem
         SubscribeLocalEvent<NPCUseActionOnTargetComponent, MapInitEvent>(OnMapInit);
     }
 
-    private void OnMapInit(Entity<NPCUseActionOnTargetComponent> ent, ref MapInitEvent args)
-    {
+    private void OnMapInit(Entity<NPCUseActionOnTargetComponent> ent, ref MapInitEvent args) =>
         ent.Comp.ActionEnt = _actions.AddAction(ent, ent.Comp.ActionId);
-    }
 
     public bool TryUseTentacleAttack(Entity<NPCUseActionOnTargetComponent?> user, EntityUid target)
     {
         if (!Resolve(user, ref user.Comp, false))
             return false;
 
-        if (_actions.GetAction(user.Comp.ActionEnt) is not {} action)
+        if (_actions.GetAction(user.Comp.ActionEnt) is not { } action)
             return false;
 
         if (!_actions.ValidAction(action))

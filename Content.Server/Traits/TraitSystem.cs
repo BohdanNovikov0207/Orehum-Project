@@ -19,7 +19,6 @@ using Content.Shared.GameTicking;
 using Content.Shared.Hands.Components;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Roles;
-using Content.Shared.Traits;
 using Content.Shared.Whitelist;
 using Robust.Shared.Prototypes;
 
@@ -45,13 +44,11 @@ public sealed class TraitSystem : EntitySystem
         if (args.JobId == null ||
             !_prototypeManager.TryIndex<JobPrototype>(args.JobId ?? string.Empty, out var protoJob) ||
             !protoJob.ApplyTraits)
-        {
             return;
-        }
 
         foreach (var traitId in args.Profile.TraitPreferences)
         {
-            if (!_prototypeManager.TryIndex<TraitPrototype>(traitId, out var traitPrototype))
+            if (!_prototypeManager.TryIndex(traitId, out var traitPrototype))
             {
                 Log.Warning($"No trait found with ID {traitId}!");
                 return;
@@ -61,7 +58,8 @@ public sealed class TraitSystem : EntitySystem
                 continue;
 
             // Begin Goobstation: Species trait support
-            if (traitPrototype.IncludedSpecies.Count > 0 && !traitPrototype.IncludedSpecies.Contains(args.Profile.Species) ||
+            if (traitPrototype.IncludedSpecies.Count > 0 &&
+                !traitPrototype.IncludedSpecies.Contains(args.Profile.Species) ||
                 traitPrototype.ExcludedSpecies.Contains(args.Profile.Species))
                 continue;
             // End Goobstation: Species trait support
@@ -74,20 +72,36 @@ public sealed class TraitSystem : EntitySystem
             var language = EntityManager.System<LanguageSystem>();
 
             if (traitPrototype.RemoveLanguagesSpoken is not null)
+            {
                 foreach (var lang in traitPrototype.RemoveLanguagesSpoken)
+                {
                     language.RemoveLanguage(args.Mob, lang, true, false);
+                }
+            }
 
             if (traitPrototype.RemoveLanguagesUnderstood is not null)
+            {
                 foreach (var lang in traitPrototype.RemoveLanguagesUnderstood)
-                    language.RemoveLanguage(args.Mob, lang, false, true);
+                {
+                    language.RemoveLanguage(args.Mob, lang, false);
+                }
+            }
 
             if (traitPrototype.LanguagesSpoken is not null)
+            {
                 foreach (var lang in traitPrototype.LanguagesSpoken)
+                {
                     language.AddLanguage(args.Mob, lang, true, false);
+                }
+            }
 
             if (traitPrototype.LanguagesUnderstood is not null)
+            {
                 foreach (var lang in traitPrototype.LanguagesUnderstood)
-                    language.AddLanguage(args.Mob, lang, false, true);
+                {
+                    language.AddLanguage(args.Mob, lang, false);
+                }
+            }
             // Einstein Engines - Language end
 
             // Add item required by the trait

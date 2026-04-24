@@ -19,15 +19,15 @@ namespace Content.Server.Polymorph.Components;
 [Access(typeof(PolymorphSystem))]
 public sealed partial class OnPolymorphProjectileHitComponent : Component
 {
-    [DataField(required: true)]
-    public ProtoId<PolymorphPrototype> Polymorph;
-
-    [DataField(required: true)]
-    public EntityWhitelist Whitelist = default!;
-
     [DataField]
     public EntityWhitelist? Blacklist;
 
+    [DataField(required: true)]
+    public ProtoId<PolymorphPrototype> Polymorph;
+
     [DataField]
     public SoundSpecifier Sound = new SoundPathSpecifier("/Audio/Magic/forcewall.ogg");
+
+    [DataField(required: true)]
+    public EntityWhitelist Whitelist = default!;
 }

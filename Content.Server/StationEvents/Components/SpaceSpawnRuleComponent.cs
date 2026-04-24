@@ -14,18 +14,18 @@ namespace Content.Server.StationEvents.Components;
 /// Component for spawning antags in space around a station.
 /// Requires <c>AntagSelectionComponent</c>.
 /// </summary>
-[RegisterComponent, Access(typeof(SpaceSpawnRule))]
+[RegisterComponent] [Access(typeof(SpaceSpawnRule))]
 public sealed partial class SpaceSpawnRuleComponent : Component
 {
-    /// <summary>
-    /// Distance that the entity spawns from the station's half AABB radius
-    /// </summary>
-    [DataField]
-    public float SpawnDistance = 20f;
-
     /// <summary>
     /// Location that was picked.
     /// </summary>
     [DataField]
     public MapCoordinates? Coords;
+
+    /// <summary>
+    /// Distance that the entity spawns from the station's half AABB radius
+    /// </summary>
+    [DataField]
+    public float SpawnDistance = 20f;
 }

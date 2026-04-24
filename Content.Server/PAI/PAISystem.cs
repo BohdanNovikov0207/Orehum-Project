@@ -22,37 +22,35 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Text;
 using Content.Server.Ghost.Roles;
 using Content.Server.Ghost.Roles.Components;
 using Content.Server.Instruments;
 using Content.Server.Kitchen.Components;
 using Content.Server.Store.Systems;
+using Content.Shared.Instruments;
 using Content.Shared.Interaction.Events;
 using Content.Shared.Mind.Components;
 using Content.Shared.PAI;
 using Content.Shared.Popups;
-using Content.Shared.Store;
 using Content.Shared.Store.Components;
-using Content.Shared.Instruments;
 using Robust.Shared.Random;
-using Robust.Shared.Prototypes;
-using System.Text;
 
 namespace Content.Server.PAI;
 
 public sealed class PAISystem : SharedPAISystem
 {
-    [Dependency] private readonly InstrumentSystem _instrumentSystem = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly MetaDataSystem _metaData = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly StoreSystem _store = default!;
-    [Dependency] private readonly ToggleableGhostRoleSystem _toggleableGhostRole = default!;
-
     /// <summary>
     /// Possible symbols that can be part of a scrambled pai's name.
     /// </summary>
     private static readonly char[] SYMBOLS = new[] { '#', '~', '-', '@', '&', '^', '%', '$', '*', ' ' };
+
+    [Dependency] private readonly InstrumentSystem _instrumentSystem = default!;
+    [Dependency] private readonly MetaDataSystem _metaData = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly StoreSystem _store = default!;
+    [Dependency] private readonly ToggleableGhostRoleSystem _toggleableGhostRole = default!;
 
     public override void Initialize()
     {
@@ -90,11 +88,9 @@ public sealed class PAISystem : SharedPAISystem
         _metaData.SetEntityName(uid, val);
     }
 
-    private void OnMindRemoved(EntityUid uid, PAIComponent component, MindRemovedMessage args)
-    {
+    private void OnMindRemoved(EntityUid uid, PAIComponent component, MindRemovedMessage args) =>
         // Mind was removed, shutdown the PAI.
         PAITurningOff(uid);
-    }
 
     private void OnMicrowaved(EntityUid uid, PAIComponent comp, BeingMicrowavedEvent args)
     {
@@ -121,7 +117,7 @@ public sealed class PAISystem : SharedPAISystem
         // create a new random name
         var len = _random.Next(6, 18);
         var name = new StringBuilder(len);
-        for (int i = 0; i < len; i++)
+        for (var i = 0; i < len; i++)
         {
             name.Append(_random.Pick(SYMBOLS));
         }
@@ -144,9 +140,7 @@ public sealed class PAISystem : SharedPAISystem
         //  Close the instrument interface if it was open
         //  before closing
         if (HasComp<ActiveInstrumentComponent>(uid))
-        {
             _instrumentSystem.ToggleInstrumentUi(uid, uid);
-        }
 
         //  Stop instrument
         if (TryComp<InstrumentComponent>(uid, out var instrument))

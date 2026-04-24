@@ -11,7 +11,7 @@ using Robust.Shared.Toolshed;
 
 namespace Content.Server.Administration.Toolshed;
 
-[ToolshedCommand, AnyCommand]
+[ToolshedCommand] [AnyCommand]
 public sealed class MarkedCommand : ToolshedCommand
 {
     [CommandImplementation]

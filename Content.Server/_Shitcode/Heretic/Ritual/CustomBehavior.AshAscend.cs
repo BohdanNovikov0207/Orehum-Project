@@ -9,16 +9,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Server.Atmos.Components;
-using Content.Shared.Damage;
-using Content.Shared.Damage.Prototypes;
 using Content.Shared.Heretic.Prototypes;
-using Robust.Shared.Prototypes;
 
 namespace Content.Server.Heretic.Ritual;
 
 public sealed partial class RitualAshAscendBehavior : RitualSacrificeBehavior
 {
-    private List<EntityUid> burningUids = new();
+    private readonly List<EntityUid> burningUids = new();
 
     // check for burning corpses
     public override bool Execute(RitualData args, out string? outstr)

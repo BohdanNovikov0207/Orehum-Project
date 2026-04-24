@@ -21,7 +21,9 @@ namespace Content.Server.ParticleAccelerator.EntitySystems;
 
 public sealed partial class ParticleAcceleratorSystem
 {
-    private void FireEmitter(EntityUid uid, ParticleAcceleratorPowerState strength, ParticleAcceleratorEmitterComponent? emitter = null)
+    private void FireEmitter(EntityUid uid,
+        ParticleAcceleratorPowerState strength,
+        ParticleAcceleratorEmitterComponent? emitter = null)
     {
         if (!Resolve(uid, ref emitter))
             return;
@@ -29,7 +31,8 @@ public sealed partial class ParticleAcceleratorSystem
         var xformQuery = GetEntityQuery<TransformComponent>();
         if (!xformQuery.TryGetComponent(uid, out var xform))
         {
-            Log.Error("ParticleAccelerator attempted to emit a particle without (having) a transform from which to base its initial position and orientation.");
+            Log.Error(
+                "ParticleAccelerator attempted to emit a particle without (having) a transform from which to base its initial position and orientation.");
             return;
         }
 
@@ -45,7 +48,8 @@ public sealed partial class ParticleAcceleratorSystem
 
             var velocity = angle.ToWorldVec() * 20f;
             if (TryComp<PhysicsComponent>(uid, out var phys))
-                velocity += phys.LinearVelocity; // Inherit velocity from parent so if the clown has strapped a dozen engines to departures we don't outpace the particles.
+                velocity += phys
+                    .LinearVelocity; // Inherit velocity from parent so if the clown has strapped a dozen engines to departures we don't outpace the particles.
 
             _physicsSystem.SetLinearVelocity(emitted, velocity, body: particlePhys);
         }

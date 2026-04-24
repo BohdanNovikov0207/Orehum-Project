@@ -12,9 +12,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Server.Anomaly.Components;
-using Content.Shared.Chemistry.EntitySystems;
 using Content.Server.Fluids.EntitySystems;
 using Content.Shared.Anomaly.Components;
+using Content.Shared.Chemistry.EntitySystems;
 
 namespace Content.Server.Anomaly.Effects;
 
@@ -29,7 +29,8 @@ public sealed class PuddleCreateAnomalySystem : EntitySystem
     public override void Initialize()
     {
         SubscribeLocalEvent<PuddleCreateAnomalyComponent, AnomalyPulseEvent>(OnPulse);
-        SubscribeLocalEvent<PuddleCreateAnomalyComponent, AnomalySupercriticalEvent>(OnSupercritical, before: new[] { typeof(InjectionAnomalySystem) });
+        SubscribeLocalEvent<PuddleCreateAnomalyComponent, AnomalySupercriticalEvent>(OnSupercritical,
+            new[] { typeof(InjectionAnomalySystem) });
     }
 
     private void OnPulse(Entity<PuddleCreateAnomalyComponent> entity, ref AnomalyPulseEvent args)
@@ -38,7 +39,8 @@ public sealed class PuddleCreateAnomalySystem : EntitySystem
             return;
 
         var xform = Transform(entity.Owner);
-        var puddleSol = _solutionContainer.SplitSolution(sol.Value, entity.Comp.MaxPuddleSize * args.Severity * args.PowerModifier);
+        var puddleSol =
+            _solutionContainer.SplitSolution(sol.Value, entity.Comp.MaxPuddleSize * args.Severity * args.PowerModifier);
         _puddle.TrySplashSpillAt(entity.Owner, xform.Coordinates, puddleSol, out _);
     }
 

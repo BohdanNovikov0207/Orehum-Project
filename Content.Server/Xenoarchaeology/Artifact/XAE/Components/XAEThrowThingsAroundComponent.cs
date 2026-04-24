@@ -10,7 +10,7 @@ namespace Content.Server.Xenoarchaeology.Artifact.XAE.Components;
 /// Throws all nearby entities backwards.
 /// Also pries nearby tiles.
 /// </summary>
-[RegisterComponent, Access(typeof(XAEThrowThingsAroundSystem))]
+[RegisterComponent] [Access(typeof(XAEThrowThingsAroundSystem))]
 public sealed partial class XAEThrowThingsAroundComponent : Component
 {
     /// <summary>
@@ -20,14 +20,14 @@ public sealed partial class XAEThrowThingsAroundComponent : Component
     public float Range = 2f;
 
     /// <summary>
+    /// How strongly does stuff get thrown?
+    /// </summary>
+    [DataField("throwStrength")] [ViewVariables(VVAccess.ReadWrite)]
+    public float ThrowStrength = 5f;
+
+    /// <summary>
     /// How likely is it that an individual tile will get pried?
     /// </summary>
     [DataField("tilePryChance")]
     public float TilePryChance = 0.5f;
-
-    /// <summary>
-    /// How strongly does stuff get thrown?
-    /// </summary>
-    [DataField("throwStrength"), ViewVariables(VVAccess.ReadWrite)]
-    public float ThrowStrength = 5f;
 }

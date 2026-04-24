@@ -44,7 +44,8 @@ public sealed class RechargeableBlockingSystem : EntitySystem
         }
 
         args.PushMarkup(Loc.GetString("rechargeable-blocking-discharged"));
-        args.PushMarkup(Loc.GetString("rechargeable-blocking-remaining-time", ("remainingTime", GetRemainingTime(uid))));
+        args.PushMarkup(Loc.GetString("rechargeable-blocking-remaining-time",
+            ("remainingTime", GetRemainingTime(uid))));
     }
 
     private int GetRemainingTime(EntityUid uid)
@@ -69,27 +70,28 @@ public sealed class RechargeableBlockingSystem : EntitySystem
         _battery.TryUseCharge(batteryUid.Value, batteryUse, batteryComponent);
     }
 
-    private void AttemptToggle(EntityUid uid, RechargeableBlockingComponent component, ref ItemToggleActivateAttemptEvent args)
+    private void AttemptToggle(EntityUid uid,
+        RechargeableBlockingComponent component,
+        ref ItemToggleActivateAttemptEvent args)
     {
         if (!component.Discharged)
             return;
 
         if (HasComp<BatterySelfRechargerComponent>(uid))
-            args.Popup = Loc.GetString("rechargeable-blocking-remaining-time-popup", ("remainingTime", GetRemainingTime(uid)));
+            args.Popup = Loc.GetString("rechargeable-blocking-remaining-time-popup",
+                ("remainingTime", GetRemainingTime(uid)));
         else
             args.Popup = Loc.GetString("rechargeable-blocking-not-enough-charge-popup");
 
         args.Cancelled = true;
     }
-    private void OnChargeChanged(EntityUid uid, RechargeableBlockingComponent component, ChargeChangedEvent args)
-    {
-        CheckCharge(uid, component);
-    }
 
-    private void OnPowerCellChanged(EntityUid uid, RechargeableBlockingComponent component, PowerCellChangedEvent args)
-    {
+    private void OnChargeChanged(EntityUid uid, RechargeableBlockingComponent component, ChargeChangedEvent args) =>
         CheckCharge(uid, component);
-    }
+
+    private void
+        OnPowerCellChanged(EntityUid uid, RechargeableBlockingComponent component, PowerCellChangedEvent args) =>
+        CheckCharge(uid, component);
 
     private void CheckCharge(EntityUid uid, RechargeableBlockingComponent component)
     {

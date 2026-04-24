@@ -6,10 +6,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-namespace Content.Server.Holiday.Interfaces
+namespace Content.Server.Holiday.Interfaces;
+
+public interface IHolidayGreet
 {
-    public interface IHolidayGreet
-    {
-        string Greet(HolidayPrototype holiday);
-    }
+    string Greet(HolidayPrototype holiday);
 }

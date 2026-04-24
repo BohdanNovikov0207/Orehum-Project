@@ -22,9 +22,9 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Shared._Shitmed.Medical.HealthAnalyzer;
 using Robust.Shared.Audio;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
-using Content.Shared._Shitmed.Medical.HealthAnalyzer;
 
 namespace Content.Server.Medical.Components;
 
@@ -34,22 +34,34 @@ namespace Content.Server.Medical.Components;
 /// <remarks>
 /// Requires <c>ItemToggleComponent</c>.
 /// </remarks>
-[RegisterComponent, AutoGenerateComponentPause]
+[RegisterComponent] [AutoGenerateComponentPause]
 [Access(typeof(HealthAnalyzerSystem), typeof(CryoPodSystem))]
 public sealed partial class HealthAnalyzerComponent : Component
 {
+    /// <summary>
+    /// Shitmed Change: The body part that is currently being scanned.
+    /// </summary>
+    [DataField]
+    public EntityUid? CurrentBodyPart;
+
+    /// <summary>
+    /// Shitmed Change: The current mode of the scanner.
+    /// </summary>
+    [DataField]
+    public HealthAnalyzerMode CurrentMode = HealthAnalyzerMode.Body;
+
+    /// <summary>
+    /// The maximum range in tiles at which the analyzer can receive continuous updates, a value of null will be infinite range
+    /// </summary>
+    [DataField]
+    public float? MaxScanRange = 2.5f;
+
     /// <summary>
     /// When should the next update be sent for the patient
     /// </summary>
     [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))]
     [AutoPausedField]
     public TimeSpan NextUpdate = TimeSpan.Zero;
-
-    /// <summary>
-    /// The delay between patient health updates
-    /// </summary>
-    [DataField]
-    public TimeSpan UpdateInterval = TimeSpan.FromSeconds(1);
 
     /// <summary>
     /// How long it takes to scan someone.
@@ -62,18 +74,6 @@ public sealed partial class HealthAnalyzerComponent : Component
     /// </summary>
     [DataField]
     public EntityUid? ScannedEntity;
-
-    /// <summary>
-    /// Shitmed Change: The body part that is currently being scanned.
-    /// </summary>
-    [DataField]
-    public EntityUid? CurrentBodyPart;
-
-    /// <summary>
-    /// The maximum range in tiles at which the analyzer can receive continuous updates, a value of null will be infinite range
-    /// </summary>
-    [DataField]
-    public float? MaxScanRange = 2.5f;
 
     /// <summary>
     /// Sound played on scanning begin
@@ -94,8 +94,8 @@ public sealed partial class HealthAnalyzerComponent : Component
     public bool Silent;
 
     /// <summary>
-    /// Shitmed Change: The current mode of the scanner.
+    /// The delay between patient health updates
     /// </summary>
     [DataField]
-    public HealthAnalyzerMode CurrentMode = HealthAnalyzerMode.Body;
+    public TimeSpan UpdateInterval = TimeSpan.FromSeconds(1);
 }

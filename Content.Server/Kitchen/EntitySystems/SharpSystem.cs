@@ -94,7 +94,6 @@
 using Content.Server.Body.Systems;
 using Content.Server.Kitchen.Components;
 using Content.Shared.Administration.Logs;
-using Content.Shared.Body.Components;
 using Content.Shared.Database;
 using Content.Shared.Destructible;
 using Content.Shared.DoAfter;
@@ -117,21 +116,21 @@ namespace Content.Server.Kitchen.EntitySystems;
 
 public sealed class SharpSystem : EntitySystem
 {
+    [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
     [Dependency] private readonly BodySystem _bodySystem = default!;
+    [Dependency] private readonly ContainerSystem _containerSystem = default!;
     [Dependency] private readonly SharedDestructibleSystem _destructibleSystem = default!;
     [Dependency] private readonly SharedDoAfterSystem _doAfterSystem = default!;
-    [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
-    [Dependency] private readonly ContainerSystem _containerSystem = default!;
     [Dependency] private readonly MobStateSystem _mobStateSystem = default!;
-    [Dependency] private readonly TransformSystem _transform = default!;
+    [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
     [Dependency] private readonly IRobustRandom _robustRandom = default!;
-    [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
+    [Dependency] private readonly TransformSystem _transform = default!;
 
     public override void Initialize()
     {
         base.Initialize();
 
-        SubscribeLocalEvent<SharpComponent, AfterInteractEvent>(OnAfterInteract, before: [typeof(IngestionSystem)]);
+        SubscribeLocalEvent<SharpComponent, AfterInteractEvent>(OnAfterInteract, [typeof(IngestionSystem)]);
         SubscribeLocalEvent<SharpComponent, SharpDoAfterEvent>(OnDoAfter);
 
         SubscribeLocalEvent<ButcherableComponent, GetVerbsEvent<InteractionVerb>>(OnGetInteractionVerbs);
@@ -172,7 +171,13 @@ public sealed class SharpSystem : EntitySystem
         var needHand = user != knife;
 
         var doAfter =
-            new DoAfterArgs(EntityManager, user, sharp.ButcherDelayModifier * butcher.ButcherDelay, new SharpDoAfterEvent(), knife, target: target, used: knife)
+            new DoAfterArgs(EntityManager,
+                user,
+                sharp.ButcherDelayModifier * butcher.ButcherDelay,
+                new SharpDoAfterEvent(),
+                knife,
+                target,
+                knife)
             {
                 BreakOnDamage = true,
                 BreakOnMove = true,
@@ -216,7 +221,9 @@ public sealed class SharpSystem : EntitySystem
             ? PopupType.LargeCaution
             : PopupType.Small;
 
-        _popupSystem.PopupEntity(Loc.GetString("butcherable-knife-butchered-success", ("target", args.Args.Target.Value), ("knife", Identity.Entity(uid, EntityManager))),
+        _popupSystem.PopupEntity(Loc.GetString("butcherable-knife-butchered-success",
+                ("target", args.Args.Target.Value),
+                ("knife", Identity.Entity(uid, EntityManager))),
             popupEnt,
             args.Args.User,
             popupType);
@@ -232,7 +239,9 @@ public sealed class SharpSystem : EntitySystem
             $"with {ToPrettyString(args.Used):knife}");
     }
 
-    private void OnGetInteractionVerbs(EntityUid uid, ButcherableComponent component, GetVerbsEvent<InteractionVerb> args)
+    private void OnGetInteractionVerbs(EntityUid uid,
+        ButcherableComponent component,
+        GetVerbsEvent<InteractionVerb> args)
     {
         if (component.Type != ButcheringType.Knife || !args.CanAccess || !args.CanInteract)
             return;
@@ -282,7 +291,7 @@ public sealed class SharpSystem : EntitySystem
             },
             Message = message,
             Disabled = disabled,
-            Icon = new SpriteSpecifier.Texture(new ("/Textures/Interface/VerbIcons/cutlery.svg.192dpi.png")),
+            Icon = new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/VerbIcons/cutlery.svg.192dpi.png")),
             Text = Loc.GetString("butcherable-verb-name"),
         };
 

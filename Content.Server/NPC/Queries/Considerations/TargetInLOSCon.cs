@@ -11,5 +11,4 @@ namespace Content.Server.NPC.Queries.Considerations;
 /// </summary>
 public sealed partial class TargetInLOSCon : UtilityConsideration
 {
-
 }

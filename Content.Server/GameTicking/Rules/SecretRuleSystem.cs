@@ -26,23 +26,23 @@ using System.Linq;
 using Content.Server.Administration.Logs;
 using Content.Server.GameTicking.Presets;
 using Content.Server.GameTicking.Rules.Components;
-using Content.Shared.GameTicking.Components;
-using Content.Shared.Random;
 using Content.Shared.CCVar;
 using Content.Shared.Database;
+using Content.Shared.GameTicking.Components;
+using Content.Shared.Random;
+using Robust.Shared.Configuration;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
-using Robust.Shared.Configuration;
 using Robust.Shared.Utility;
 
 namespace Content.Server.GameTicking.Rules;
 
 public sealed class SecretRuleSystem : GameRuleSystem<SecretRuleComponent>
 {
+    [Dependency] private readonly IAdminLogManager _adminLogger = default!;
+    [Dependency] private readonly IConfigurationManager _configurationManager = default!;
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly IConfigurationManager _configurationManager = default!;
-    [Dependency] private readonly IAdminLogManager _adminLogger = default!;
 
     private string _ruleCompName = default!;
 
@@ -52,7 +52,10 @@ public sealed class SecretRuleSystem : GameRuleSystem<SecretRuleComponent>
         _ruleCompName = Factory.GetComponentName<GameRuleComponent>();
     }
 
-    protected override void Added(EntityUid uid, SecretRuleComponent component, GameRuleComponent gameRule, GameRuleAddedEvent args)
+    protected override void Added(EntityUid uid,
+        SecretRuleComponent component,
+        GameRuleComponent gameRule,
+        GameRuleAddedEvent args)
     {
         base.Added(uid, component, gameRule, args);
         var weights = _configurationManager.GetCVar(CCVars.SecretWeightPrototype);
@@ -83,7 +86,10 @@ public sealed class SecretRuleSystem : GameRuleSystem<SecretRuleComponent>
         }
     }
 
-    protected override void Ended(EntityUid uid, SecretRuleComponent component, GameRuleComponent gameRule, GameRuleEndedEvent args)
+    protected override void Ended(EntityUid uid,
+        SecretRuleComponent component,
+        GameRuleComponent gameRule,
+        GameRuleEndedEvent args)
     {
         base.Ended(uid, component, gameRule, args);
 
@@ -93,7 +99,8 @@ public sealed class SecretRuleSystem : GameRuleSystem<SecretRuleComponent>
         }
     }
 
-    private bool TryPickPreset(ProtoId<WeightedRandomPrototype> weights, [NotNullWhen(true)] out GamePresetPrototype? preset)
+    private bool TryPickPreset(ProtoId<WeightedRandomPrototype> weights,
+        [NotNullWhen(true)] out GamePresetPrototype? preset)
     {
         var options = _prototypeManager.Index(weights).Weights.ShallowClone();
         var players = GameTicker.ReadyPlayerCount();
@@ -143,7 +150,8 @@ public sealed class SecretRuleSystem : GameRuleSystem<SecretRuleComponent>
     /// </summary>
     public bool CanPickAny(ProtoId<WeightedRandomPrototype> weightedPresets)
     {
-        var ids = _prototypeManager.Index(weightedPresets).Weights.Keys
+        var ids = _prototypeManager.Index(weightedPresets)
+            .Weights.Keys
             .Select(x => new ProtoId<GamePresetPrototype>(x));
 
         return CanPickAny(ids);
@@ -177,7 +185,7 @@ public sealed class SecretRuleSystem : GameRuleSystem<SecretRuleComponent>
 
         foreach (var ruleId in selected.Rules)
         {
-            if (!_prototypeManager.TryIndex(ruleId, out EntityPrototype? rule)
+            if (!_prototypeManager.TryIndex(ruleId, out var rule)
                 || !rule.TryGetComponent(_ruleCompName, out GameRuleComponent? ruleComp))
             {
                 Log.Error($"Encountered invalid rule {ruleId} in preset {selected.ID}");

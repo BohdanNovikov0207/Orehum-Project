@@ -8,10 +8,7 @@ namespace Content.Server._White.Xenomorphs.Infection;
 public sealed partial class XenomorphInfectionComponent : SharedXenomorphInfectionComponent
 {
     [DataField]
-    public int MaxGrowthStage = 1;
-
-    [DataField]
-    public EntProtoId LarvaPrototype = "MobXenomorphLarva";
+    public Dictionary<int, List<EntityEffect>> Effects = new();
 
     /// <summary>
     /// The probability of infection growth per GrowTime.
@@ -25,13 +22,15 @@ public sealed partial class XenomorphInfectionComponent : SharedXenomorphInfecti
     [DataField]
     public TimeSpan GrowTime = TimeSpan.FromSeconds(25);
 
-    [DataField]
-    public Dictionary<int, List<EntityEffect>> Effects = new ();
-
-    [ViewVariables]
-    public TimeSpan NextPointsAt;
-
     [ViewVariables]
     public EntityUid? Infected;
 
+    [DataField]
+    public EntProtoId LarvaPrototype = "MobXenomorphLarva";
+
+    [DataField]
+    public int MaxGrowthStage = 1;
+
+    [ViewVariables]
+    public TimeSpan NextPointsAt;
 }

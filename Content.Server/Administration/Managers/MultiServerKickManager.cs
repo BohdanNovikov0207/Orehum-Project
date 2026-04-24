@@ -19,23 +19,23 @@ namespace Content.Server.Administration.Managers;
 /// <summary>
 /// Handles kicking people that connect to multiple servers on the same DB at once.
 /// </summary>
-/// <seealso cref="CCVars.AdminAllowMultiServerPlay"/>
+/// <seealso cref="CCVars.AdminAllowMultiServerPlay" />
 public sealed class MultiServerKickManager
 {
     public const string NotificationChannel = "multi_server_kick";
+    [Dependency] private readonly IAdminManager _adminManager = null!;
+    [Dependency] private readonly IConfigurationManager _cfg = null!;
+    [Dependency] private readonly IServerDbManager _dbManager = null!;
+    [Dependency] private readonly ILocalizationManager _loc = null!;
+    [Dependency] private readonly ILogManager _logManager = null!;
+    [Dependency] private readonly IServerNetManager _netManager = null!;
 
     [Dependency] private readonly IPlayerManager _playerManager = null!;
-    [Dependency] private readonly IServerDbManager _dbManager = null!;
-    [Dependency] private readonly ILogManager _logManager = null!;
-    [Dependency] private readonly IConfigurationManager _cfg = null!;
-    [Dependency] private readonly IAdminManager _adminManager = null!;
-    [Dependency] private readonly ITaskManager _taskManager = null!;
-    [Dependency] private readonly IServerNetManager _netManager = null!;
-    [Dependency] private readonly ILocalizationManager _loc = null!;
     [Dependency] private readonly ServerDbEntryManager _serverDbEntry = null!;
+    [Dependency] private readonly ITaskManager _taskManager = null!;
+    private bool _allowed;
 
     private ISawmill _sawmill = null!;
-    private bool _allowed;
 
     public void Initialize()
     {
@@ -85,7 +85,8 @@ public sealed class MultiServerKickManager
     {
         if (_allowed)
         {
-            _sawmill.Verbose("Received notification for player join, but multi server play is allowed on this server. Ignoring");
+            _sawmill.Verbose(
+                "Received notification for player join, but multi server play is allowed on this server. Ignoring");
             return false;
         }
 
@@ -101,7 +102,7 @@ public sealed class MultiServerKickManager
         if (notification.ServerId == (await _serverDbEntry.ServerEntity).Id)
             return;
 
-        if (_adminManager.IsAdmin(player, includeDeAdmin: true))
+        if (_adminManager.IsAdmin(player, true))
             return;
 
         _sawmill.Info($"Kicking {player} for connecting to another server. Multi-server play is not allowed.");

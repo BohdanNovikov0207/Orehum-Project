@@ -21,16 +21,14 @@ public sealed class PlayerSessionConverter : AdminLogConverter<SerializablePlaye
     // Use a weak reference to avoid holding server instances live too long in integration tests.
     private WeakReference<IEntityManager> _entityManager = default!;
 
-    public override void Init(IDependencyCollection dependencies)
-    {
+    public override void Init(IDependencyCollection dependencies) =>
         _entityManager = new WeakReference<IEntityManager>(dependencies.Resolve<IEntityManager>());
-    }
 
     public override void Write(Utf8JsonWriter writer, SerializablePlayer value, JsonSerializerOptions options)
     {
         writer.WriteStartObject();
 
-        if (value.Player.AttachedEntity is {Valid: true} playerEntity)
+        if (value.Player.AttachedEntity is { Valid: true } playerEntity)
         {
             if (!_entityManager.TryGetTarget(out var entityManager))
                 throw new InvalidOperationException("EntityManager got garbage collected!");

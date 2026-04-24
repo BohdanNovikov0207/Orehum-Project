@@ -34,16 +34,12 @@ public sealed class BeingDisposedSystem : EntitySystem
     private void OnInhaleLocation(EntityUid uid, BeingDisposedComponent component, InhaleLocationEvent args)
     {
         if (TryComp<DisposalHolderComponent>(component.Holder, out var holder))
-        {
             args.Gas = holder.Air;
-        }
     }
 
     private void OnExhaleLocation(EntityUid uid, BeingDisposedComponent component, ExhaleLocationEvent args)
     {
         if (TryComp<DisposalHolderComponent>(component.Holder, out var holder))
-        {
             args.Gas = holder.Air;
-        }
     }
 }

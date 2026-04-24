@@ -39,24 +39,25 @@ using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Item;
 using Content.Shared.Storage.EntitySystems;
 using Content.Shared.Thief;
-using Robust.Server.GameObjects;
 using Robust.Server.Audio;
+using Robust.Server.GameObjects;
 using Robust.Shared.Prototypes;
 
 namespace Content.Server.Thief.Systems;
 
 /// <summary>
-/// <see cref="ThiefUndeterminedBackpackComponent"/>
-/// this system links the interface to the logic, and will output to the player a set of items selected by him in the interface
+/// <see cref="ThiefUndeterminedBackpackComponent" />
+/// this system links the interface to the logic, and will output to the player a set of items selected by him in the
+/// interface
 /// </summary>
 public sealed class ThiefUndeterminedBackpackSystem : EntitySystem
 {
     [Dependency] private readonly AudioSystem _audio = default!;
+    [Dependency] private readonly SharedHandsSystem _hands = default!;
     [Dependency] private readonly IPrototypeManager _proto = default!;
+    [Dependency] private readonly SharedStorageSystem _storage = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly UserInterfaceSystem _ui = default!;
-    [Dependency] private readonly SharedStorageSystem _storage = default!;
-    [Dependency] private readonly SharedHandsSystem _hands = default!;
 
     public override void Initialize()
     {
@@ -67,10 +68,8 @@ public sealed class ThiefUndeterminedBackpackSystem : EntitySystem
         SubscribeLocalEvent<ThiefUndeterminedBackpackComponent, ThiefBackpackChangeSetMessage>(OnChangeSet);
     }
 
-    private void OnUIOpened(Entity<ThiefUndeterminedBackpackComponent> backpack, ref BoundUIOpenedEvent args)
-    {
+    private void OnUIOpened(Entity<ThiefUndeterminedBackpackComponent> backpack, ref BoundUIOpenedEvent args) =>
         UpdateUI(backpack.Owner, backpack.Comp);
-    }
 
     private void OnApprove(Entity<ThiefUndeterminedBackpackComponent> backpack, ref ThiefBackpackApproveMessage args)
     {
@@ -104,7 +103,9 @@ public sealed class ThiefUndeterminedBackpackSystem : EntitySystem
         _audio.PlayPvs(backpack.Comp.ApproveSound, Transform(backpack.Owner).Coordinates);
         QueueDel(backpack);
     }
-    private void OnChangeSet(Entity<ThiefUndeterminedBackpackComponent> backpack, ref ThiefBackpackChangeSetMessage args)
+
+    private void OnChangeSet(Entity<ThiefUndeterminedBackpackComponent> backpack,
+        ref ThiefBackpackChangeSetMessage args)
     {
         //Swith selecting set
         if (!backpack.Comp.SelectedSets.Remove(args.SetNumber))
@@ -120,7 +121,7 @@ public sealed class ThiefUndeterminedBackpackSystem : EntitySystem
 
         Dictionary<int, ThiefBackpackSetInfo> data = new();
 
-        for (int i = 0; i < component.PossibleSets.Count; i++)
+        for (var i = 0; i < component.PossibleSets.Count; i++)
         {
             var set = _proto.Index(component.PossibleSets[i]);
             var selected = component.SelectedSets.Contains(i);
@@ -132,6 +133,8 @@ public sealed class ThiefUndeterminedBackpackSystem : EntitySystem
             data.Add(i, info);
         }
 
-        _ui.SetUiState(uid, ThiefBackpackUIKey.Key, new ThiefBackpackBoundUserInterfaceState(data, component.MaxSelectedSets));
+        _ui.SetUiState(uid,
+            ThiefBackpackUIKey.Key,
+            new ThiefBackpackBoundUserInterfaceState(data, component.MaxSelectedSets));
     }
 }

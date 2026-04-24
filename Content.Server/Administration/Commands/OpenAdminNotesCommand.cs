@@ -17,10 +17,9 @@ namespace Content.Server.Administration.Commands;
 [AdminCommand(AdminFlags.ViewNotes)]
 public sealed class OpenAdminNotesCommand : LocalizedCommands
 {
+    public const string CommandName = "adminnotes";
     [Dependency] private readonly IAdminNotesManager _adminNotes = default!;
     [Dependency] private readonly IPlayerLocator _locator = default!;
-
-    public const string CommandName = "adminnotes";
 
     public override string Command => CommandName;
 

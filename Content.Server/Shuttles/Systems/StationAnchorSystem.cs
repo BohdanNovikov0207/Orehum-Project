@@ -19,8 +19,8 @@ namespace Content.Server.Shuttles.Systems;
 
 public sealed class StationAnchorSystem : EntitySystem
 {
-    [Dependency] private readonly ShuttleSystem _shuttleSystem = default!;
     [Dependency] private readonly PopupSystem _popupSystem = default!;
+    [Dependency] private readonly ShuttleSystem _shuttleSystem = default!;
 
     public override void Initialize()
     {
@@ -42,15 +42,11 @@ public sealed class StationAnchorSystem : EntitySystem
         SetStatus(ent, true);
     }
 
-    private void OnActivated(Entity<StationAnchorComponent> ent, ref ChargedMachineActivatedEvent args)
-    {
+    private void OnActivated(Entity<StationAnchorComponent> ent, ref ChargedMachineActivatedEvent args) =>
         SetStatus(ent, true);
-    }
 
-    private void OnDeactivated(Entity<StationAnchorComponent> ent, ref ChargedMachineDeactivatedEvent args)
-    {
+    private void OnDeactivated(Entity<StationAnchorComponent> ent, ref ChargedMachineDeactivatedEvent args) =>
         SetStatus(ent, false);
-    }
 
     /// <summary>
     /// Prevent unanchoring when anchor is active
@@ -75,7 +71,9 @@ public sealed class StationAnchorSystem : EntitySystem
             SetStatus(ent, false);
     }
 
-    public void SetStatus(Entity<StationAnchorComponent> ent, bool enabled, ShuttleComponent? shuttleComponent = default)
+    public void SetStatus(Entity<StationAnchorComponent> ent,
+        bool enabled,
+        ShuttleComponent? shuttleComponent = default)
     {
         var transform = Transform(ent);
         var grid = transform.GridUid;
@@ -83,13 +81,9 @@ public sealed class StationAnchorSystem : EntitySystem
             return;
 
         if (enabled)
-        {
             _shuttleSystem.Disable(grid.Value);
-        }
         else
-        {
             _shuttleSystem.Enable(grid.Value);
-        }
 
         shuttleComponent.Enabled = !enabled;
         ent.Comp.SwitchedOn = enabled;

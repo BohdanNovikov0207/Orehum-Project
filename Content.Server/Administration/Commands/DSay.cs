@@ -21,8 +21,9 @@
 
 using Content.Server.Chat.Systems;
 using Content.Shared.Administration;
-using Content.Shared.Chat; // Einstein Engines - Languages
+using Content.Shared.Chat;
 using Robust.Shared.Console;
+// Einstein Engines - Languages
 
 namespace Content.Server.Administration.Commands;
 

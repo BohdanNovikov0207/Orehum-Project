@@ -44,8 +44,5 @@ public sealed class PendingAntagSystem : EntitySystem
         _selection.TryMakeAntag(pendingAntag.Item2, ev.Player, pendingAntag.Item1, true);
     }
 
-    private void OnRoundRestart(RoundRestartCleanupEvent ev)
-    {
-        PendingAntags.Clear();
-    }
+    private void OnRoundRestart(RoundRestartCleanupEvent ev) => PendingAntags.Clear();
 }

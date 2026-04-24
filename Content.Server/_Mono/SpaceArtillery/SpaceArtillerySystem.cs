@@ -19,18 +19,17 @@ using Robust.Shared.Player;
 
 namespace Content.Server._Mono.SpaceArtillery;
 
-public sealed partial class SpaceArtillerySystem : EntitySystem
+public sealed class SpaceArtillerySystem : EntitySystem
 {
-    [Dependency] private readonly GunSystem _gun = default!;
-    [Dependency] private readonly DeviceLinkSystem _deviceLink = default!;
-    [Dependency] private readonly BatterySystem _battery = default!;
-    [Dependency] private readonly SharedTransformSystem _xform = default!;
-    [Dependency] private readonly SharedCameraRecoilSystem _recoilSystem = default!;
-    [Dependency] private readonly FireControlSystem _fireControl = default!;
-
     private const float DISTANCE = 100;
     private const float BIG_DAMAGE = 1000;
     private const float BIG_DAMAGE_KICK = 35;
+    [Dependency] private readonly BatterySystem _battery = default!;
+    [Dependency] private readonly DeviceLinkSystem _deviceLink = default!;
+    [Dependency] private readonly FireControlSystem _fireControl = default!;
+    [Dependency] private readonly GunSystem _gun = default!;
+    [Dependency] private readonly SharedCameraRecoilSystem _recoilSystem = default!;
+    [Dependency] private readonly SharedTransformSystem _xform = default!;
     private ISawmill _sawmill = default!;
 
     public override void Initialize()
@@ -87,18 +86,17 @@ public sealed partial class SpaceArtillerySystem : EntitySystem
 
     private void OnBatteryChargeChanged(EntityUid uid, SpaceArtilleryComponent component, ref ChargeChangedEvent args)
     {
-        if (TryComp<ApcPowerReceiverComponent>(uid, out var apcPowerReceiver) && TryComp<BatteryComponent>(uid, out var battery))
-        {
-            apcPowerReceiver.Load = battery.CurrentCharge >= battery.MaxCharge * 0.99 ? component.PowerUsePassive : component.PowerUsePassive + component.PowerChargeRate;
-        }
+        if (TryComp<ApcPowerReceiverComponent>(uid, out var apcPowerReceiver) &&
+            TryComp<BatteryComponent>(uid, out var battery))
+            apcPowerReceiver.Load = battery.CurrentCharge >= battery.MaxCharge * 0.99
+                ? component.PowerUsePassive
+                : component.PowerUsePassive + component.PowerChargeRate;
     }
 
     private void TryFireArtillery(EntityUid uid, TransformComponent xform, SpaceArtilleryComponent component)
     {
         if (xform.GridUid == null && !xform.MapUid.HasValue)
-        {
             return;
-        }
 
         if (!_gun.TryGetGun(uid, out var gunUid, out var gun))
         {
@@ -109,7 +107,8 @@ public sealed partial class SpaceArtillerySystem : EntitySystem
         var worldPosX = _xform.GetWorldPosition(uid).X;
         var worldPosY = _xform.GetWorldPosition(uid).Y;
         var worldRot = _xform.GetWorldRotation(uid) + Math.PI;
-        var targetSpot = new Vector2(worldPosX - DISTANCE * (float)Math.Sin(worldRot), worldPosY + DISTANCE * (float)Math.Cos(worldRot));
+        var targetSpot = new Vector2(worldPosX - DISTANCE * (float) Math.Sin(worldRot),
+            worldPosY + DISTANCE * (float) Math.Cos(worldRot));
 
         // Create coordinates for the target and source positions
         var sourceCoordinates = xform.Coordinates;
@@ -133,15 +132,11 @@ public sealed partial class SpaceArtillerySystem : EntitySystem
         }
 
         if (TryComp<BatteryComponent>(uid, out var battery))
-        {
             _battery.UseCharge(uid, component.PowerUseActive, battery);
-        }
     }
 
-    private void OnEmptyShotEvent(EntityUid uid, SpaceArtilleryComponent component, OnEmptyGunShotEvent args)
-    {
+    private void OnEmptyShotEvent(EntityUid uid, SpaceArtilleryComponent component, OnEmptyGunShotEvent args) =>
         OnMalfunction(uid, component);
-    }
 
     private void OnMalfunction(EntityUid uid, SpaceArtilleryComponent component)
     {
@@ -154,7 +149,7 @@ public sealed partial class SpaceArtillerySystem : EntitySystem
             return;
 
         var players = Filter.Empty();
-        players.AddInGrid((EntityUid)grid);
+        players.AddInGrid((EntityUid) grid);
 
         foreach (var player in players.Recipients)
         {
@@ -163,7 +158,8 @@ public sealed partial class SpaceArtillerySystem : EntitySystem
 
             var vector = _xform.GetWorldPosition(uid) - _xform.GetWorldPosition(playerEnt);
 
-            _recoilSystem.KickCamera(playerEnt, vector.Normalized() * (float)hitEvent.Damage.GetTotal() / BIG_DAMAGE * BIG_DAMAGE_KICK);
+            _recoilSystem.KickCamera(playerEnt,
+                vector.Normalized() * (float) hitEvent.Damage.GetTotal() / BIG_DAMAGE * BIG_DAMAGE_KICK);
         }
     }
 

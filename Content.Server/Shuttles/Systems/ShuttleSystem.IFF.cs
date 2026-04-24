@@ -25,7 +25,8 @@ public sealed partial class ShuttleSystem
         SubscribeLocalEvent<IFFConsoleComponent, IFFShowIFFMessage>(OnIFFShow);
         SubscribeLocalEvent<IFFConsoleComponent, IFFShowVesselMessage>(OnIFFShowVessel);
 
-        SubscribeLocalEvent<IFFConsoleComponent, IFFApplyRadarSettingsMessage>(OnIFFApplyRadarSettings); // CorvaxGoob-IIF-Improves
+        SubscribeLocalEvent<IFFConsoleComponent, IFFApplyRadarSettingsMessage>(
+            OnIFFApplyRadarSettings); // CorvaxGoob-IIF-Improves
 
         SubscribeLocalEvent<IFFConsoleComponent, GotEmaggedEvent>(OnGotEmagged); // CorvaxGoob-IIF-Improves
 
@@ -43,9 +44,7 @@ public sealed partial class ShuttleSystem
         {
             if (!_physicsQuery.TryGetComponent(grid, out var physics) ||
                 physics.Mass > splitMass)
-            {
                 continue;
-            }
 
             AddIFFFlag(grid, IFFFlags.HideLabel);
         }
@@ -86,13 +85,15 @@ public sealed partial class ShuttleSystem
         if (!EnsureComp<IFFComponent>(gridUid.Value, out var iff))
             return;
 
-        _uiSystem.SetUiState(entity.Owner, IFFConsoleUiKey.Key, new IFFConsoleBoundUserInterfaceState()
-        {
-            AllowedFlags = entity.Comp.AllowedFlags,
-            Flags = iff.Flags,
-            Name = MetaData(gridUid.Value).EntityName,
-            Color = iff.Color
-        });
+        _uiSystem.SetUiState(entity.Owner,
+            IFFConsoleUiKey.Key,
+            new IFFConsoleBoundUserInterfaceState
+            {
+                AllowedFlags = entity.Comp.AllowedFlags,
+                Flags = iff.Flags,
+                Name = MetaData(gridUid.Value).EntityName,
+                Color = iff.Color,
+            });
     }
 
     private void OnIFFApplyRadarSettings(Entity<IFFConsoleComponent> entity, ref IFFApplyRadarSettingsMessage args)
@@ -122,9 +123,7 @@ public sealed partial class ShuttleSystem
     {
         if (!TryComp(uid, out TransformComponent? xform) || xform.GridUid == null ||
             (component.AllowedFlags & IFFFlags.HideLabel) == 0x0)
-        {
             return;
-        }
 
         if (HasComp<BecomesStationComponent>(xform.GridUid)) // CorvaxGoob-IIF-Improves
         {
@@ -133,22 +132,16 @@ public sealed partial class ShuttleSystem
         }
 
         if (!args.Show)
-        {
             AddIFFFlag(xform.GridUid.Value, IFFFlags.HideLabel);
-        }
         else
-        {
             RemoveIFFFlag(xform.GridUid.Value, IFFFlags.HideLabel);
-        }
     }
 
     private void OnIFFShowVessel(EntityUid uid, IFFConsoleComponent component, IFFShowVesselMessage args)
     {
         if (!TryComp(uid, out TransformComponent? xform) || xform.GridUid == null ||
             (component.AllowedFlags & IFFFlags.Hide) == 0x0)
-        {
             return;
-        }
 
         if (HasComp<BecomesStationComponent>(xform.GridUid)) // CorvaxGoob-IIF-Improves
         {
@@ -157,13 +150,9 @@ public sealed partial class ShuttleSystem
         }
 
         if (!args.Show)
-        {
             AddIFFFlag(xform.GridUid.Value, IFFFlags.Hide);
-        }
         else
-        {
             RemoveIFFFlag(xform.GridUid.Value, IFFFlags.Hide);
-        }
     }
 
     private void OnIFFConsoleAnchor(EntityUid uid, IFFConsoleComponent component, ref AnchorStateChangedEvent args)
@@ -173,25 +162,32 @@ public sealed partial class ShuttleSystem
 
         // If we anchor / re-anchor then make sure flags up to date.
         if (!args.Anchored ||
-            !TryComp<IFFComponent>(xform.GridUid, out var iff)) // CorvaxGoob-IFF-Changes : removed !TryComp(uid, out TransformComponent? xform)
+            !TryComp<IFFComponent>(xform.GridUid,
+                out var iff)) // CorvaxGoob-IFF-Changes : removed !TryComp(uid, out TransformComponent? xform)
         {
-            _uiSystem.SetUiState(uid, IFFConsoleUiKey.Key, new IFFConsoleBoundUserInterfaceState()
-            {
-                AllowedFlags = component.AllowedFlags,
-                Flags = IFFFlags.None,
-                Name = xform.GridUid.HasValue ? MetaData(xform.GridUid.Value).EntityName : null, // CorvaxGoob-IIF-Improves
-                Color = Color.Gold // CorvaxGoob-IIF-Improves
-            });
+            _uiSystem.SetUiState(uid,
+                IFFConsoleUiKey.Key,
+                new IFFConsoleBoundUserInterfaceState
+                {
+                    AllowedFlags = component.AllowedFlags,
+                    Flags = IFFFlags.None,
+                    Name = xform.GridUid.HasValue
+                        ? MetaData(xform.GridUid.Value).EntityName
+                        : null, // CorvaxGoob-IIF-Improves
+                    Color = Color.Gold, // CorvaxGoob-IIF-Improves
+                });
         }
         else
         {
-            _uiSystem.SetUiState(uid, IFFConsoleUiKey.Key, new IFFConsoleBoundUserInterfaceState()
-            {
-                AllowedFlags = component.AllowedFlags,
-                Flags = iff.Flags,
-                Name = MetaData(xform.GridUid.Value).EntityName, // CorvaxGoob-IIF-Improves
-                Color = iff.Color // CorvaxGoob-IIF-Improves
-            });
+            _uiSystem.SetUiState(uid,
+                IFFConsoleUiKey.Key,
+                new IFFConsoleBoundUserInterfaceState
+                {
+                    AllowedFlags = component.AllowedFlags,
+                    Flags = iff.Flags,
+                    Name = MetaData(xform.GridUid.Value).EntityName, // CorvaxGoob-IIF-Improves
+                    Color = iff.Color, // CorvaxGoob-IIF-Improves
+                });
         }
     }
 
@@ -205,13 +201,15 @@ public sealed partial class ShuttleSystem
             if (xform.GridUid != gridUid)
                 continue;
 
-            _uiSystem.SetUiState(uid, IFFConsoleUiKey.Key, new IFFConsoleBoundUserInterfaceState()
-            {
-                AllowedFlags = comp.AllowedFlags,
-                Flags = component.Flags,
-                Name = MetaData(gridUid).EntityName, // CorvaxGoob-IIF-Improves
-                Color = component.Color // CorvaxGoob-IIF-Improves
-            });
+            _uiSystem.SetUiState(uid,
+                IFFConsoleUiKey.Key,
+                new IFFConsoleBoundUserInterfaceState
+                {
+                    AllowedFlags = comp.AllowedFlags,
+                    Flags = component.Flags,
+                    Name = MetaData(gridUid).EntityName, // CorvaxGoob-IIF-Improves
+                    Color = component.Color, // CorvaxGoob-IIF-Improves
+                });
         }
     }
 }

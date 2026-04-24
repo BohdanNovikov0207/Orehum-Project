@@ -17,7 +17,7 @@ using Robust.Shared.Containers;
 namespace Content.Server.Mech.Systems;
 
 /// <summary>
-/// Handles <see cref="MechAssemblyComponent"/> and the insertion
+/// Handles <see cref="MechAssemblyComponent" /> and the insertion
 /// and removal of parts from the assembly.
 /// </summary>
 public sealed class MechAssemblySystem : EntitySystem
@@ -26,17 +26,15 @@ public sealed class MechAssemblySystem : EntitySystem
     [Dependency] private readonly TagSystem _tag = default!;
     [Dependency] private readonly SharedToolSystem _toolSystem = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         SubscribeLocalEvent<MechAssemblyComponent, ComponentInit>(OnInit);
         SubscribeLocalEvent<MechAssemblyComponent, InteractUsingEvent>(OnInteractUsing);
     }
 
-    private void OnInit(EntityUid uid, MechAssemblyComponent component, ComponentInit args)
-    {
+    private void OnInit(EntityUid uid, MechAssemblyComponent component, ComponentInit args) =>
         component.PartsContainer = _container.EnsureContainer<Container>(uid, "mech-assembly-container");
-    }
 
     private void OnInteractUsing(EntityUid uid, MechAssemblyComponent component, InteractUsingEvent args)
     {
@@ -46,6 +44,7 @@ public sealed class MechAssemblySystem : EntitySystem
             {
                 component.RequiredParts[tag] = false;
             }
+
             _container.EmptyContainer(component.PartsContainer);
             return;
         }
@@ -69,6 +68,7 @@ public sealed class MechAssemblySystem : EntitySystem
             if (!val)
                 return;
         }
+
         Spawn(component.FinishedPrototype, Transform(uid).Coordinates);
         Del(uid);
     }

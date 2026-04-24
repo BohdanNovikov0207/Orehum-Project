@@ -10,7 +10,7 @@ using Robust.Shared.Configuration;
 namespace Content.Server.Database;
 
 /// <summary>
-/// Stupid tiny manager whose sole purpose is keeping track of the <see cref="Server"/> database entry for this server.
+/// Stupid tiny manager whose sole purpose is keeping track of the <see cref="Server" /> database entry for this server.
 /// </summary>
 /// <remarks>
 /// This allows the value to be cached,
@@ -29,7 +29,7 @@ public sealed class ServerDbEntryManager
     /// </summary>
     /// <remarks>
     /// This value is cached when first requested. Do not re-use this entity; if you need data like the rounds,
-    /// request it manually with <see cref="IServerDbManager.AddOrGetServer"/>.
+    /// request it manually with <see cref="IServerDbManager.AddOrGetServer" />.
     /// </remarks>
     public Task<Server> ServerEntity => _serverEntityTask ??= GetServerEntity();
 

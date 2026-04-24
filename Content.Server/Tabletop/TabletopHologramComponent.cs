@@ -12,5 +12,4 @@ namespace Content.Server.Tabletop;
 [RegisterComponent]
 public sealed partial class TabletopHologramComponent : Component
 {
-
 }

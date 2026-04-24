@@ -4,7 +4,7 @@ namespace Content.Server.Objectives.Components;
 public sealed partial class CosmicEntropyConditionComponent : Component
 {
     /// <summary>
-    ///     The amount of entropy this objective would like to be siphoned
+    /// The amount of entropy this objective would like to be siphoned
     /// </summary>
     [DataField]
     public int Siphoned;

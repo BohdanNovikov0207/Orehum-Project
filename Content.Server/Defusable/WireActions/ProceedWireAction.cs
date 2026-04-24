@@ -22,25 +22,16 @@ public sealed partial class ProceedWireAction : ComponentWireAction<DefusableCom
     public override string Name { get; set; } = "wire-name-bomb-proceed";
     public override bool LightRequiresPower { get; set; } = false;
 
-    public override StatusLightState? GetLightState(Wire wire, DefusableComponent comp)
-    {
-        return comp.Activated ? StatusLightState.Off : StatusLightState.BlinkingFast;
-    }
-
     public override object StatusKey { get; } = DefusableWireStatus.ProceedIndicator;
 
-    public override bool Cut(EntityUid user, Wire wire, DefusableComponent comp)
-    {
-        return EntityManager.System<DefusableSystem>().ProceedWireCut(user, wire, comp);
-    }
+    public override StatusLightState? GetLightState(Wire wire, DefusableComponent comp) =>
+        comp.Activated ? StatusLightState.Off : StatusLightState.BlinkingFast;
 
-    public override bool Mend(EntityUid user, Wire wire, DefusableComponent comp)
-    {
-        return true;
-    }
+    public override bool Cut(EntityUid user, Wire wire, DefusableComponent comp) =>
+        EntityManager.System<DefusableSystem>().ProceedWireCut(user, wire, comp);
 
-    public override void Pulse(EntityUid user, Wire wire, DefusableComponent comp)
-    {
+    public override bool Mend(EntityUid user, Wire wire, DefusableComponent comp) => true;
+
+    public override void Pulse(EntityUid user, Wire wire, DefusableComponent comp) =>
         EntityManager.System<DefusableSystem>().ProceedWirePulse(user, wire, comp);
-    }
 }

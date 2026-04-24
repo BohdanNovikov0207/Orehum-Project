@@ -10,7 +10,7 @@ namespace Content.Server.Traits.Assorted;
 /// <summary>
 /// Upon MapInit buckles the attached entity to a newly spawned prototype.
 /// </summary>
-[RegisterComponent, Access(typeof(BuckleOnMapInitSystem))]
+[RegisterComponent] [Access(typeof(BuckleOnMapInitSystem))]
 public sealed partial class BuckleOnMapInitComponent : Component
 {
     [ViewVariables(VVAccess.ReadWrite)]

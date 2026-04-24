@@ -7,9 +7,9 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Silicons.Laws.Components;
 using Content.Shared.Administration.Logs;
 using Content.Shared.Database;
+using Content.Shared.Silicons.Laws.Components;
 
 namespace Content.Server.Silicons.Laws;
 
@@ -18,8 +18,8 @@ namespace Content.Server.Silicons.Laws;
 /// </summary>
 public sealed class StartIonStormedSystem : EntitySystem
 {
-    [Dependency] private readonly IonStormSystem _ionStorm = default!;
     [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
+    [Dependency] private readonly IonStormSystem _ionStorm = default!;
     [Dependency] private readonly SiliconLawSystem _siliconLaw = default!;
 
     public override void Initialize()
@@ -35,12 +35,14 @@ public sealed class StartIonStormedSystem : EntitySystem
         if (!TryComp<IonStormTargetComponent>(ent.Owner, out var target))
             return;
 
-        for (int currentIonStorm = 0; currentIonStorm < ent.Comp.IonStormAmount; currentIonStorm++)
+        for (var currentIonStorm = 0; currentIonStorm < ent.Comp.IonStormAmount; currentIonStorm++)
         {
             _ionStorm.IonStormTarget((ent.Owner, lawBound, target), false);
         }
 
         var laws = _siliconLaw.GetLaws(ent.Owner, lawBound);
-        _adminLogger.Add(LogType.SiliconLaws, LogImpact.High, $"{ToPrettyString(ent.Owner):silicon} spawned with ion stormed laws: {laws.LoggingString()}");
+        _adminLogger.Add(LogType.SiliconLaws,
+            LogImpact.High,
+            $"{ToPrettyString(ent.Owner):silicon} spawned with ion stormed laws: {laws.LoggingString()}");
     }
 }

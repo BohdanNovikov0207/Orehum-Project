@@ -22,7 +22,8 @@ public sealed class StripAllCommand : LocalizedEntityCommands
             return;
         }
 
-        if (!NetEntity.TryParse(args[0], out var targetUidNet) || !EntityManager.TryGetEntity(targetUidNet, out var targetEntity))
+        if (!NetEntity.TryParse(args[0], out var targetUidNet) ||
+            !EntityManager.TryGetEntity(targetUidNet, out var targetEntity))
         {
             shell.WriteLine(Loc.GetString("shell-entity-uid-must-be-number"));
             return;
@@ -30,14 +31,20 @@ public sealed class StripAllCommand : LocalizedEntityCommands
 
         if (!EntityManager.TryGetComponent<InventoryComponent>(targetEntity, out var inventory))
         {
-            shell.WriteLine(Loc.GetString("shell-entity-target-lacks-component", ("componentName", nameof(InventoryComponent))));
+            shell.WriteLine(Loc.GetString("shell-entity-target-lacks-component",
+                ("componentName", nameof(InventoryComponent))));
             return;
         }
 
         var slots = _inventorySystem.GetSlotEnumerator((targetEntity.Value, inventory));
         while (slots.NextItem(out _, out var slot))
         {
-            _inventorySystem.TryUnequip(targetEntity.Value, targetEntity.Value, slot.Name, true, true, inventory: inventory);
+            _inventorySystem.TryUnequip(targetEntity.Value,
+                targetEntity.Value,
+                slot.Name,
+                true,
+                true,
+                inventory: inventory);
         }
 
         if (EntityManager.TryGetComponent<HandsComponent>(targetEntity, out var hands))
@@ -64,4 +71,3 @@ public sealed class StripAllCommand : LocalizedEntityCommands
         return CompletionResult.Empty;
     }
 }
-

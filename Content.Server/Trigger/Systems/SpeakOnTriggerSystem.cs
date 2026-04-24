@@ -6,10 +6,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Server.Explosion.EntitySystems;
-using Content.Shared.Chat;
-using Content.Shared.Timing;
 using Content.Server.Chat.Systems;
+using Content.Shared.Chat;
 using Content.Shared.Trigger;
 using Content.Shared.Trigger.Components.Effects;
 using Robust.Shared.Prototypes;
@@ -19,9 +17,9 @@ namespace Content.Server.Trigger.Systems;
 
 public sealed class SpeakOnTriggerSystem : EntitySystem
 {
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly ChatSystem _chat = default!;
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
 
     public override void Initialize()
     {
@@ -49,6 +47,7 @@ public sealed class SpeakOnTriggerSystem : EntitySystem
                 return;
             message = Loc.GetString(_random.Pick(messagePack.Values));
         }
+
         // Chatcode moment: messages starting with "." are considered radio messages.
         // Prepending ">" forces the message to be spoken instead.
         // TODO chat refactor: remove this

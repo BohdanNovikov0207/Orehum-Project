@@ -23,7 +23,6 @@
 
 using Content.Server._Lavaland.Pressure;
 using Content.Server._Lavaland.Weapons.Ranged.Upgrades.Components;
-using Content.Server.EntityEffects;
 using Content.Shared._Lavaland.Weapons.Ranged.Events;
 using Content.Shared._Lavaland.Weapons.Ranged.Upgrades;
 using Content.Shared._Lavaland.Weapons.Ranged.Upgrades.Components;
@@ -37,8 +36,8 @@ namespace Content.Server._Lavaland.Weapons.Ranged.Upgrades;
 
 public sealed class GunUpgradeSystem : SharedGunUpgradeSystem
 {
-    [Dependency] private readonly PressureEfficiencyChangeSystem _pressure = default!;
     [Dependency] private readonly SharedEntityEffectSystem _entityEffect = default!;
+    [Dependency] private readonly PressureEfficiencyChangeSystem _pressure = default!;
 
     public override void Initialize()
     {
@@ -89,7 +88,8 @@ public sealed class GunUpgradeSystem : SharedGunUpgradeSystem
         projectile.Damage *= ent.Comp.Modifier;
     }
 
-    private void OnPressureUpgradeInserted(Entity<GunUpgradePressureComponent> ent, ref EntGotInsertedIntoContainerMessage args)
+    private void OnPressureUpgradeInserted(Entity<GunUpgradePressureComponent> ent,
+        ref EntGotInsertedIntoContainerMessage args)
     {
         var comp = ent.Comp;
         if (!TryComp<PressureDamageChangeComponent>(args.Container.Owner, out var pdc))
@@ -110,7 +110,8 @@ public sealed class GunUpgradeSystem : SharedGunUpgradeSystem
             pdc.UpperBound = comp.NewUpperBound.Value;
     }
 
-    private void OnPressureUpgradeRemoved(Entity<GunUpgradePressureComponent> ent, ref EntGotRemovedFromContainerMessage args)
+    private void OnPressureUpgradeRemoved(Entity<GunUpgradePressureComponent> ent,
+        ref EntGotRemovedFromContainerMessage args)
     {
         var comp = ent.Comp;
         if (!TryComp<PressureDamageChangeComponent>(args.Container.Owner, out var pdc))

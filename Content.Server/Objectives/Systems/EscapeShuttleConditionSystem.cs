@@ -24,10 +24,9 @@ public sealed class EscapeShuttleConditionSystem : EntitySystem
         SubscribeLocalEvent<EscapeShuttleConditionComponent, ObjectiveGetProgressEvent>(OnGetProgress);
     }
 
-    private void OnGetProgress(EntityUid uid, EscapeShuttleConditionComponent comp, ref ObjectiveGetProgressEvent args)
-    {
+    private void
+        OnGetProgress(EntityUid uid, EscapeShuttleConditionComponent comp, ref ObjectiveGetProgressEvent args) =>
         args.Progress = GetProgress(args.MindId, args.Mind);
-    }
 
     private float GetProgress(EntityUid mindId, MindComponent mind)
     {

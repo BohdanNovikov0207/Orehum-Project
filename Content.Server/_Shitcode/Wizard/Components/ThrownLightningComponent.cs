@@ -11,8 +11,8 @@ namespace Content.Server._Goobstation.Wizard.Components;
 public sealed partial class ThrownLightningComponent : Component
 {
     [DataField]
-    public TimeSpan StunTime = TimeSpan.FromSeconds(6);
+    public LocId? Speech = "action-speech-spell-thrown-lightning";
 
     [DataField]
-    public LocId? Speech = "action-speech-spell-thrown-lightning";
+    public TimeSpan StunTime = TimeSpan.FromSeconds(6);
 }

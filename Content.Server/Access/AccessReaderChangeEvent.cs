@@ -7,18 +7,17 @@
 //
 // SPDX-License-Identifier: MIT
 
-namespace Content.Server.Access
+namespace Content.Server.Access;
+
+public sealed class AccessReaderChangeEvent : EntityEventArgs
 {
-    public sealed class AccessReaderChangeEvent : EntityEventArgs
+    public AccessReaderChangeEvent(EntityUid entity, bool enabled)
     {
-        public EntityUid Sender { get; }
-
-        public bool Enabled { get; }
-
-        public AccessReaderChangeEvent(EntityUid entity, bool enabled)
-        {
-            Sender = entity;
-            Enabled = enabled;
-        }
+        Sender = entity;
+        Enabled = enabled;
     }
+
+    public EntityUid Sender { get; }
+
+    public bool Enabled { get; }
 }

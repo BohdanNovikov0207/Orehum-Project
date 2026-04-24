@@ -32,11 +32,10 @@ namespace Content.Server.Construction.Commands;
 [AdminCommand(AdminFlags.Mapping)]
 public sealed class FixRotationsCommand : IConsoleCommand
 {
-    [Dependency] private readonly IEntityManager _entManager = default!;
-
     private static readonly ProtoId<TagPrototype> ForceFixRotationsTag = "ForceFixRotations";
     private static readonly ProtoId<TagPrototype> ForceNoFixRotationsTag = "ForceNoFixRotations";
     private static readonly ProtoId<TagPrototype> DiagonalTag = "Diagonal";
+    [Dependency] private readonly IEntityManager _entManager = default!;
 
     // ReSharper disable once StringLiteralTypo
     public string Command => "fixrotations";
@@ -94,18 +93,14 @@ public sealed class FixRotationsCommand : IConsoleCommand
         while (enumerator.MoveNext(out var child))
         {
             if (!_entManager.EntityExists(child))
-            {
                 continue;
-            }
 
             var valid = false;
 
             // Occluders should only count if the state of it right now is enabled.
             // This prevents issues with edge firelocks.
             if (_entManager.TryGetComponent<OccluderComponent>(child, out var occluder))
-            {
                 valid |= occluder.Enabled;
-            }
             // low walls & grilles
             valid |= _entManager.HasComponent<SharedCanBuildWindowOnTopComponent>(child);
             // cables

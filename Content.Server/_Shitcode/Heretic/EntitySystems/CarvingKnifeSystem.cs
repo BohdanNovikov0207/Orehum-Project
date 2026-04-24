@@ -40,29 +40,28 @@ namespace Content.Server.Heretic.EntitySystems;
 
 public sealed class CarvingKnifeSystem : EntitySystem
 {
-    [Dependency] private readonly PopupSystem _popup = default!;
-    [Dependency] private readonly DoAfterSystem _doAfter = default!;
+    private static readonly ProtoId<TagPrototype> CarvingTag = "HereticCarving";
+    private static readonly EntProtoId AlertEffect = "CarvingAlertedStatusEffect";
+    [Dependency] private readonly SharedActionsSystem _actions = default!;
     [Dependency] private readonly AudioSystem _audio = default!;
-    [Dependency] private readonly TransformSystem _transform = default!;
-    [Dependency] private readonly MapSystem _map = default!;
+    [Dependency] private readonly IChatManager _chatManager = default!;
+    [Dependency] private readonly DoAfterSystem _doAfter = default!;
     [Dependency] private readonly GravitySystem _gravity = default!;
-    [Dependency] private readonly TagSystem _tag = default!;
+    [Dependency] private readonly HereticSystem _heretic = default!;
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
+    [Dependency] private readonly MapSystem _map = default!;
+
+    [Dependency] private readonly IMapManager _mapMan = default!;
+    [Dependency] private readonly MindSystem _mind = default!;
     [Dependency] private readonly NavMapSystem _navMap = default!;
+    [Dependency] private readonly PopupSystem _popup = default!;
+    [Dependency] private readonly IPrototypeManager _prototype = default!;
+    [Dependency] private readonly PullingSystem _pulling = default!;
     [Dependency] private readonly SharedStaminaSystem _stamina = default!;
     [Dependency] private readonly StatusEffectsSystem _status = default!;
     [Dependency] private readonly Shared.StatusEffectNew.StatusEffectsSystem _statusNew = default!;
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly MindSystem _mind = default!;
-    [Dependency] private readonly SharedActionsSystem _actions = default!;
-    [Dependency] private readonly PullingSystem _pulling = default!;
-    [Dependency] private readonly HereticSystem _heretic = default!;
-
-    [Dependency] private readonly IMapManager _mapMan = default!;
-    [Dependency] private readonly IPrototypeManager _prototype = default!;
-    [Dependency] private readonly IChatManager _chatManager = default!;
-
-    private static readonly ProtoId<TagPrototype> CarvingTag = "HereticCarving";
-    private static readonly EntProtoId AlertEffect = "CarvingAlertedStatusEffect";
+    [Dependency] private readonly TagSystem _tag = default!;
+    [Dependency] private readonly TransformSystem _transform = default!;
 
     public override void Initialize()
     {
@@ -119,10 +118,8 @@ public sealed class CarvingKnifeSystem : EntitySystem
         args.AddAction(ent.Comp.RunebreakActionEntity);
     }
 
-    private void OnMapInit(Entity<CarvingKnifeComponent> ent, ref MapInitEvent args)
-    {
+    private void OnMapInit(Entity<CarvingKnifeComponent> ent, ref MapInitEvent args) =>
         _actions.AddAction(ent.Owner, ref ent.Comp.RunebreakActionEntity, ent.Comp.RunebreakAction);
-    }
 
     private void OnMadTriggered(Entity<MadCarvingComponent> ent, ref TrapTriggeredEvent args)
     {
@@ -198,10 +195,7 @@ public sealed class CarvingKnifeSystem : EntitySystem
         ent.Comp.DrawnRunes.Clear();
     }
 
-    private void OnRuneCarved(Entity<AlertCarvingComponent> ent, ref RuneCarvedEvent args)
-    {
-        ent.Comp.User = args.User;
-    }
+    private void OnRuneCarved(Entity<AlertCarvingComponent> ent, ref RuneCarvedEvent args) => ent.Comp.User = args.User;
 
     private void OnExamine(Entity<CarvingKnifeComponent> ent, ref ExaminedEvent args)
     {
@@ -263,10 +257,7 @@ public sealed class CarvingKnifeSystem : EntitySystem
         Dirty(rune, trap);
     }
 
-    private void UpdateRunes(Entity<CarvingKnifeComponent> ent)
-    {
-        ent.Comp.DrawnRunes.RemoveAll(x => !Exists(x));
-    }
+    private void UpdateRunes(Entity<CarvingKnifeComponent> ent) => ent.Comp.DrawnRunes.RemoveAll(x => !Exists(x));
 
     private bool CanDrawRune(EntityUid user, MapCoordinates mapCoords)
     {
@@ -346,7 +337,6 @@ public sealed class CarvingKnifeSystem : EntitySystem
         _audio.PlayPvs(comp.Sound, xform.Coordinates);
     }
 }
-
 
 [ByRefEvent]
 public readonly record struct RuneCarvedEvent(EntityUid User);

@@ -16,43 +16,42 @@ using Content.Server.Maps;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype;
 
-namespace Content.Server.GameTicking.Presets
+namespace Content.Server.GameTicking.Presets;
+
+/// <summary>
+/// A round-start setup preset, such as which antagonists to spawn.
+/// </summary>
+[Prototype]
+public sealed class GamePresetPrototype : IPrototype
 {
+    [DataField("alias")]
+    public string[] Alias = Array.Empty<string>();
+
+    [DataField("description")]
+    public string Description = string.Empty;
+
     /// <summary>
-    ///     A round-start setup preset, such as which antagonists to spawn.
+    /// If specified, the gamemode will only be run with these maps.
+    /// If none are elligible, the global fallback will be used.
     /// </summary>
-    [Prototype]
-    public sealed partial class GamePresetPrototype : IPrototype
-    {
-        [IdDataField]
-        public string ID { get; private set; } = default!;
+    [DataField("supportedMaps", customTypeSerializer: typeof(PrototypeIdSerializer<GameMapPoolPrototype>))]
+    public string? MapPool;
 
-        [DataField("alias")]
-        public string[] Alias = Array.Empty<string>();
+    [DataField("maxPlayers")]
+    public int? MaxPlayers;
 
-        [DataField("name")]
-        public string ModeTitle = "????";
+    [DataField("minPlayers")]
+    public int? MinPlayers;
 
-        [DataField("description")]
-        public string Description = string.Empty;
+    [DataField("name")]
+    public string ModeTitle = "????";
 
-        [DataField("showInVote")]
-        public bool ShowInVote;
+    [DataField("showInVote")]
+    public bool ShowInVote;
 
-        [DataField("minPlayers")]
-        public int? MinPlayers;
+    [DataField]
+    public IReadOnlyList<EntProtoId> Rules { get; private set; } = Array.Empty<EntProtoId>();
 
-        [DataField("maxPlayers")]
-        public int? MaxPlayers;
-
-        [DataField]
-        public IReadOnlyList<EntProtoId> Rules { get; private set; } = Array.Empty<EntProtoId>();
-
-        /// <summary>
-        /// If specified, the gamemode will only be run with these maps.
-        /// If none are elligible, the global fallback will be used.
-        /// </summary>
-        [DataField("supportedMaps", customTypeSerializer: typeof(PrototypeIdSerializer<GameMapPoolPrototype>))]
-        public string? MapPool;
-    }
+    [IdDataField]
+    public string ID { get; } = default!;
 }

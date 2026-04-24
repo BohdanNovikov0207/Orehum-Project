@@ -32,23 +32,23 @@ namespace Content.Server.Administration.Logs;
 
 public sealed class AdminLogsEui : BaseEui
 {
+    private readonly DefaultObjectPool<List<SharedAdminLog>> _adminLogListPool =
+        new(new ListPolicy<SharedAdminLog>());
+
     [Dependency] private readonly IAdminLogManager _adminLogs = default!;
     [Dependency] private readonly IAdminManager _adminManager = default!;
-    [Dependency] private readonly ILogManager _logManager = default!;
     [Dependency] private readonly IConfigurationManager _configuration = default!;
     [Dependency] private readonly IEntityManager _e = default!;
+    [Dependency] private readonly ILogManager _logManager = default!;
+    private readonly Dictionary<Guid, string> _players = new();
 
     private readonly ISawmill _sawmill;
 
     private int _clientBatchSize;
-    private bool _isLoading = true;
-    private readonly Dictionary<Guid, string> _players = new();
-    private int _roundLogs;
-    private CancellationTokenSource _logSendCancellation = new();
     private LogFilter _filter;
-
-    private readonly DefaultObjectPool<List<SharedAdminLog>> _adminLogListPool =
-        new(new ListPolicy<SharedAdminLog>());
+    private bool _isLoading = true;
+    private CancellationTokenSource _logSendCancellation = new();
+    private int _roundLogs;
 
     public AdminLogsEui()
     {
@@ -61,7 +61,7 @@ public sealed class AdminLogsEui : BaseEui
         _filter = new LogFilter
         {
             CancellationToken = _logSendCancellation.Token,
-            Limit = _clientBatchSize
+            Limit = _clientBatchSize,
         };
     }
 
@@ -77,17 +77,12 @@ public sealed class AdminLogsEui : BaseEui
         await LoadFromDb(roundId);
     }
 
-    private void ClientBatchSizeChanged(int value)
-    {
-        _clientBatchSize = value;
-    }
+    private void ClientBatchSizeChanged(int value) => _clientBatchSize = value;
 
     private void OnPermsChanged(AdminPermsChangedEventArgs args)
     {
         if (args.Player == Player && !_adminManager.HasAdminFlag(Player, AdminFlags.Logs))
-        {
             Close();
-        }
     }
 
     public override EuiStateBase GetNewState()
@@ -96,7 +91,7 @@ public sealed class AdminLogsEui : BaseEui
         {
             return new AdminLogsEuiState(CurrentRoundId, new Dictionary<Guid, string>(), 0)
             {
-                IsLoading = true
+                IsLoading = true,
             };
         }
 
@@ -110,9 +105,7 @@ public sealed class AdminLogsEui : BaseEui
         base.HandleMessage(msg);
 
         if (!_adminManager.HasAdminFlag(Player, AdminFlags.Logs))
-        {
             return;
-        }
 
         switch (msg)
         {
@@ -136,7 +129,7 @@ public sealed class AdminLogsEui : BaseEui
                     AllPlayers = request.AllPlayers,
                     IncludeNonPlayers = request.IncludeNonPlayers,
                     LastLogId = null,
-                    Limit = _clientBatchSize
+                    Limit = _clientBatchSize,
                 };
 
                 var roundId = _filter.Round ??= CurrentRoundId;
@@ -147,7 +140,8 @@ public sealed class AdminLogsEui : BaseEui
             }
             case NextLogsRequest:
             {
-                _sawmill.Info($"Admin log next batch request from admin with id {Player.UserId.UserId} and name {Player.Name}");
+                _sawmill.Info(
+                    $"Admin log next batch request from admin with id {Player.UserId.UserId} and name {Player.Name}");
 
                 SendLogs(false);
                 break;
@@ -181,7 +175,7 @@ public sealed class AdminLogsEui : BaseEui
             {
                 DateOrder.Ascending => 0,
                 DateOrder.Descending => ^1,
-                _ => throw new ArgumentOutOfRangeException(nameof(_filter.DateOrder), _filter.DateOrder, null)
+                _ => throw new ArgumentOutOfRangeException(nameof(_filter.DateOrder), _filter.DateOrder, null),
             };
 
             _filter.LastLogId = logs[largestId].Id;

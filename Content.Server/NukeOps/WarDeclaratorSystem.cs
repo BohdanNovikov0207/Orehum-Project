@@ -33,18 +33,18 @@ using Robust.Shared.Timing;
 namespace Content.Server.NukeOps;
 
 /// <summary>
-///     This handles nukeops special war mode declaration device and directly using nukeops game rule
+/// This handles nukeops special war mode declaration device and directly using nukeops game rule
 /// </summary>
 public sealed class WarDeclaratorSystem : EntitySystem
 {
+    [Dependency] private readonly AccessReaderSystem _accessReaderSystem = default!;
     [Dependency] private readonly IAdminLogManager _adminLogger = default!;
     [Dependency] private readonly IConfigurationManager _cfg = default!;
-    [Dependency] private readonly IGameTiming _gameTiming = default!;
-    [Dependency] private readonly UserInterfaceSystem _userInterfaceSystem = default!;
     [Dependency] private readonly ChatSystem _chat = default!;
+    [Dependency] private readonly IGameTiming _gameTiming = default!;
     [Dependency] private readonly PopupSystem _popupSystem = default!;
-    [Dependency] private readonly AccessReaderSystem _accessReaderSystem = default!;
     [Dependency] private readonly SharedSpecialAnimationSystem _specialAnimation = default!; // Goob edit
+    [Dependency] private readonly UserInterfaceSystem _userInterfaceSystem = default!;
 
     public override void Initialize()
     {
@@ -92,18 +92,18 @@ public sealed class WarDeclaratorSystem : EntitySystem
         {
             var title = Loc.GetString(ent.Comp.SenderTitle);
             _chat.DispatchGlobalAnnouncement(ent.Comp.Message, title, true, ent.Comp.Sound, ent.Comp.Color);
-            _adminLogger.Add(LogType.Chat, LogImpact.Low, $"{ToPrettyString(args.Actor):player} has declared war with this text: {ent.Comp.Message}");
+            _adminLogger.Add(LogType.Chat,
+                LogImpact.Low,
+                $"{ToPrettyString(args.Actor):player} has declared war with this text: {ent.Comp.Message}");
             _specialAnimation.PlayAnimationFiltered(args.Actor, Filter.Broadcast(), "NukeOpsWarAnimation"); // Goob edit
         }
 
         UpdateUI(ent, ev.Status);
     }
 
-    private void UpdateUI(Entity<WarDeclaratorComponent> ent, WarConditionStatus? status = null)
-    {
+    private void UpdateUI(Entity<WarDeclaratorComponent> ent, WarConditionStatus? status = null) =>
         _userInterfaceSystem.SetUiState(
             ent.Owner,
             WarDeclaratorUiKey.Key,
             new WarDeclaratorBoundUserInterfaceState(status, ent.Comp.DisableAt, ent.Comp.ShuttleDisabledTime));
-    }
 }

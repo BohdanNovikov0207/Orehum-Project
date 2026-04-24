@@ -12,26 +12,28 @@ namespace Content.Server.Chat.Systems;
 /// <summary>
 /// This system is used to notify specific players of the occurance of predefined events.
 /// </summary>
-public sealed partial class ChatNotificationSystem : EntitySystem
+public sealed class ChatNotificationSystem : EntitySystem
 {
-    [Dependency] private readonly IPrototypeManager _proto = default!;
-    [Dependency] private readonly IChatManager _chats = default!;
-    [Dependency] private readonly SharedMindSystem _mind = default!;
-    [Dependency] private readonly SharedRoleSystem _roles = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly ILogManager _logManager = default!;
-
-    private ISawmill _sawmill = default!;
-
     // The following data does not need to be saved
 
     // Local cache for rate limiting chat notifications by source
     // (Recipient, ChatNotification) -> Dictionary<Source, next allowed TOA>
-    private readonly Dictionary<(EntityUid, ProtoId<ChatNotificationPrototype>), Dictionary<EntityUid, TimeSpan>> _chatNotificationsBySource = new();
+    private readonly Dictionary<(EntityUid, ProtoId<ChatNotificationPrototype>), Dictionary<EntityUid, TimeSpan>>
+        _chatNotificationsBySource = new();
 
     // Local cache for rate limiting chat notifications by type
     // (Recipient, ChatNotification) -> next allowed TOA
-    private readonly Dictionary<(EntityUid, ProtoId<ChatNotificationPrototype>), TimeSpan> _chatNotificationsByType = new();
+    private readonly Dictionary<(EntityUid, ProtoId<ChatNotificationPrototype>), TimeSpan> _chatNotificationsByType =
+        new();
+
+    [Dependency] private readonly IChatManager _chats = default!;
+    [Dependency] private readonly ILogManager _logManager = default!;
+    [Dependency] private readonly SharedMindSystem _mind = default!;
+    [Dependency] private readonly IPrototypeManager _proto = default!;
+    [Dependency] private readonly SharedRoleSystem _roles = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+
+    private ISawmill _sawmill = default!;
 
     public override void Initialize()
     {
@@ -51,7 +53,8 @@ public sealed partial class ChatNotificationSystem : EntitySystem
     {
         if (!_proto.TryIndex(args.ChatNotification, out var chatNotification))
         {
-            _sawmill.Warning("Attempted to index ChatNotificationPrototype " + args.ChatNotification + " but the prototype does not exist.");
+            _sawmill.Warning("Attempted to index ChatNotificationPrototype " + args.ChatNotification +
+                             " but the prototype does not exist.");
             return;
         }
 
@@ -63,7 +66,7 @@ public sealed partial class ChatNotificationSystem : EntitySystem
         if (chatNotification.NotifyBySource)
         {
             if (!_chatNotificationsBySource.TryGetValue(playerNotification, out var trackedSources))
-                trackedSources = new();
+                trackedSources = new Dictionary<EntityUid, TimeSpan>();
 
             trackedSources.TryGetValue(source, out var timeSpan);
             trackedSources[source] = _timing.CurTime + chatNotification.NextDelay;
@@ -86,7 +89,10 @@ public sealed partial class ChatNotificationSystem : EntitySystem
         var userName = args.UserNameOverride ?? (args.User.HasValue ? Name(args.User.Value) : string.Empty);
         var targetName = Name(ent);
 
-        var message = Loc.GetString(chatNotification.Message, ("source", sourceName), ("user", userName), ("target", targetName));
+        var message = Loc.GetString(chatNotification.Message,
+            ("source", sourceName),
+            ("user", userName),
+            ("target", targetName));
         var wrappedMessage = Loc.GetString("chat-manager-server-wrap-message", ("message", message));
 
         _chats.ChatMessageToOne(
@@ -96,7 +102,7 @@ public sealed partial class ChatNotificationSystem : EntitySystem
             default,
             false,
             ent.Comp.PlayerSession.Channel,
-            colorOverride: chatNotification.Color
+            chatNotification.Color
         );
 
         if (chatNotification.Sound != null && _mind.TryGetMind(ent, out var mindId, out _))

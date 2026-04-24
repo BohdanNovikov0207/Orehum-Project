@@ -3,16 +3,16 @@ using Content.Shared._DV.CustomObjectiveSummary;
 using Content.Shared.Database;
 using Content.Shared.GameTicking;
 using Content.Shared.Mind;
-using Robust.Shared.Network;
 using Robust.Server.Player;
+using Robust.Shared.Network;
 
 namespace Content.Server._DV.CustomObjectiveSummary;
 
 public sealed class CustomObjectiveSummarySystem : EntitySystem
 {
-    [Dependency] private readonly IServerNetManager _net = default!;
-    [Dependency] private readonly SharedMindSystem _mind = default!;
     [Dependency] private readonly IAdminLogManager _adminLog = default!;
+    [Dependency] private readonly SharedMindSystem _mind = default!;
+    [Dependency] private readonly IServerNetManager _net = default!;
     [Dependency] private readonly IPlayerManager _playerManager = default!;
 
     public override void Initialize()
@@ -36,7 +36,8 @@ public sealed class CustomObjectiveSummarySystem : EntitySystem
         comp.ObjectiveSummary = msg.Summary;
         Dirty(mind.Value.Owner, comp);
 
-        _adminLog.Add(LogType.Action, $"{ToPrettyString(mind.Value.Comp.OwnedEntity)} wrote objective summery: {msg.Summary}");
+        _adminLog.Add(LogType.Action,
+            $"{ToPrettyString(mind.Value.Comp.OwnedEntity)} wrote objective summery: {msg.Summary}");
     }
 
     private void OnEvacShuttleLeft(EvacShuttleLeftEvent args)

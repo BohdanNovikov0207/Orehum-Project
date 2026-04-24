@@ -11,11 +11,11 @@ namespace Content.Server._White.Xenomorphs.Infection;
 
 public sealed class XenomorphInfectionSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly ContainerSystem _container = default!;
-    [Dependency] private readonly MobStateSystem _mobState = default!;
     [Dependency] private readonly SharedEntityEffectSystem _effect = default!;
+    [Dependency] private readonly MobStateSystem _mobState = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -42,7 +42,9 @@ public sealed class XenomorphInfectionSystem : EntitySystem
         component.Infected = args.Body;
     }
 
-    private void OnOrganRemovedFromBody(EntityUid uid, XenomorphInfectionComponent component, OrganRemovedFromBodyEvent args)
+    private void OnOrganRemovedFromBody(EntityUid uid,
+        XenomorphInfectionComponent component,
+        OrganRemovedFromBodyEvent args)
     {
         RemComp<XenomorphPreventSuicideComponent>(args.OldBody);
         RemComp<XenomorphInfectedComponent>(args.OldBody);
@@ -58,7 +60,8 @@ public sealed class XenomorphInfectionSystem : EntitySystem
         var query = EntityQueryEnumerator<XenomorphInfectionComponent>();
         while (query.MoveNext(out var uid, out var infection))
         {
-            if (!infection.Infected.HasValue || infection.GrowthStage >= infection.MaxGrowthStage || time < infection.NextPointsAt)
+            if (!infection.Infected.HasValue || infection.GrowthStage >= infection.MaxGrowthStage ||
+                time < infection.NextPointsAt)
                 continue;
 
             infection.NextPointsAt = time + infection.GrowTime;
@@ -77,7 +80,9 @@ public sealed class XenomorphInfectionSystem : EntitySystem
             {
                 var effectsArgs = new EntityEffectBaseArgs(infection.Infected.Value, EntityManager);
                 foreach (var effect in effects)
+                {
                     _effect.Effect(effect, effectsArgs); // goob edit - use new effect system
+                }
             }
 
             if (infection.GrowthStage < infection.MaxGrowthStage)

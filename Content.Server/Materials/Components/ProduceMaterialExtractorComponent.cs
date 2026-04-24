@@ -13,7 +13,7 @@ namespace Content.Server.Materials.Components;
 /// <summary>
 /// This is used for a machine that turns produce into a specified material.
 /// </summary>
-[RegisterComponent, Access(typeof(ProduceMaterialExtractorSystem))]
+[RegisterComponent] [Access(typeof(ProduceMaterialExtractorSystem))]
 public sealed partial class ProduceMaterialExtractorComponent : Component
 {
     /// <summary>
@@ -28,7 +28,7 @@ public sealed partial class ProduceMaterialExtractorComponent : Component
     [DataField]
     public List<ProtoId<ReagentPrototype>> ExtractionReagents = new()
     {
-        "Nutriment"
+        "Nutriment",
     };
 
     [DataField]

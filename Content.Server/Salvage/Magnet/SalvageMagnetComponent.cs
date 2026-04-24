@@ -11,15 +11,15 @@ namespace Content.Server.Salvage.Magnet;
 public sealed partial class SalvageMagnetComponent : Component
 {
     /// <summary>
+    /// How far offset to either side will the magnet wreck spawn.
+    /// </summary>
+    [DataField]
+    public float LateralOffset = 16f;
+
+    /// <summary>
     /// The max distance at which the magnet will pull in wrecks.
     /// Scales from 50% to 100%.
     /// </summary>
     [DataField]
     public float MagnetSpawnDistance = 64f;
-
-    /// <summary>
-    /// How far offset to either side will the magnet wreck spawn.
-    /// </summary>
-    [DataField]
-    public float LateralOffset = 16f;
 }

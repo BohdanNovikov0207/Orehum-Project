@@ -4,7 +4,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-using Content.Shared.Hands.Components;
 using Content.Server.Hands.Systems;
 
 namespace Content.Server.NPC.HTN.Preconditions;
@@ -20,9 +19,7 @@ public sealed partial class ActiveHandEntityPrecondition : HTNPrecondition
     {
         if (!blackboard.TryGetValue(NPCBlackboard.Owner, out EntityUid owner, _entManager) ||
             !blackboard.TryGetValue(NPCBlackboard.ActiveHand, out string? activeHand, _entManager))
-        {
             return false;
-        }
 
         return !_entManager.System<HandsSystem>().HandIsEmpty(owner, activeHand);
     }

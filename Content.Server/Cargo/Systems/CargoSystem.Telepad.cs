@@ -109,6 +109,7 @@ public sealed partial class CargoSystem
             {
                 tele.CurrentOrders.Add(args.Order);
             }
+
             tele.Accumulator = tele.Delay;
             args.Handled = true;
             args.FulfillmentEntity = uid;
@@ -181,10 +182,8 @@ public sealed partial class CargoSystem
         }
     }
 
-    private void OnInit(EntityUid uid, CargoTelepadComponent telepad, ComponentInit args)
-    {
+    private void OnInit(EntityUid uid, CargoTelepadComponent telepad, ComponentInit args) =>
         _linker.EnsureSinkPorts(uid, telepad.ReceiverPort);
-    }
 
     private void OnShutdown(Entity<CargoTelepadComponent> ent, ref ComponentShutdown args)
     {
@@ -195,9 +194,7 @@ public sealed partial class CargoSystem
             return;
 
         if (_station.GetOwningStation(ent) is not { } station)
-        {
             station = _random.Pick(_station.GetStations().Where(HasComp<StationCargoOrderDatabaseComponent>).ToList());
-        }
 
         if (!TryComp<StationCargoOrderDatabaseComponent>(station, out var db) ||
             !TryComp<StationDataComponent>(station, out var data))
@@ -212,7 +209,9 @@ public sealed partial class CargoSystem
         }
     }
 
-    private void SetEnabled(EntityUid uid, CargoTelepadComponent component, ApcPowerReceiverComponent? receiver = null,
+    private void SetEnabled(EntityUid uid,
+        CargoTelepadComponent component,
+        ApcPowerReceiverComponent? receiver = null,
         TransformComponent? xform = null)
     {
         // False due to AllCompsOneEntity test where they may not have the powerreceiver.
@@ -230,13 +229,10 @@ public sealed partial class CargoSystem
         _appearance.SetData(uid, CargoTelepadVisuals.State, CargoTelepadState.Unpowered, appearance);
     }
 
-    private void OnTelepadPowerChange(EntityUid uid, CargoTelepadComponent component, ref PowerChangedEvent args)
-    {
+    private void OnTelepadPowerChange(EntityUid uid, CargoTelepadComponent component, ref PowerChangedEvent args) =>
         SetEnabled(uid, component);
-    }
 
-    private void OnTelepadAnchorChange(EntityUid uid, CargoTelepadComponent component, ref AnchorStateChangedEvent args)
-    {
+    private void
+        OnTelepadAnchorChange(EntityUid uid, CargoTelepadComponent component, ref AnchorStateChangedEvent args) =>
         SetEnabled(uid, component);
-    }
 }

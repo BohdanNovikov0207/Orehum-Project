@@ -16,6 +16,7 @@ using System.Numerics;
 using Content.Server.Administration;
 using Content.Shared.Administration;
 using Robust.Shared.Console;
+using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
 
 namespace Content.Server.Decals;
@@ -27,6 +28,7 @@ public sealed class EditDecalCommand : IConsoleCommand
 
     public string Command => "editdecal";
     public string Description => "Edits a decal.";
+
     public string Help => $@"{Command} <gridId> <uid> <mode>\n
 Possible modes are:\n
 - position <x position> <y position>\n
@@ -36,6 +38,7 @@ Possible modes are:\n
 - zindex <zIndex>\n
 - clean <cleanable>
 ";
+
     public void Execute(IConsoleShell shell, string argStr, string[] args)
     {
         if (args.Length < 4)
@@ -66,7 +69,7 @@ Possible modes are:\n
         switch (args[2].ToLower())
         {
             case "position":
-                if(args.Length != 5)
+                if (args.Length != 5)
                 {
                     shell.WriteError("Expected 6 arguments.");
                     return;
@@ -78,13 +81,13 @@ Possible modes are:\n
                     return;
                 }
 
-                if (!decalSystem.SetDecalPosition(gridId.Value, uid, new(gridId.Value, new Vector2(x, y))))
-                {
+                if (!decalSystem.SetDecalPosition(gridId.Value,
+                        uid,
+                        new EntityCoordinates(gridId.Value, new Vector2(x, y))))
                     shell.WriteError("Failed changing decalposition.");
-                }
                 break;
             case "color":
-                if(args.Length != 4)
+                if (args.Length != 4)
                 {
                     shell.WriteError("Expected 5 arguments.");
                     return;
@@ -97,24 +100,20 @@ Possible modes are:\n
                 }
 
                 if (!decalSystem.SetDecalColor(gridId.Value, uid, color))
-                {
                     shell.WriteError("Failed changing decal color.");
-                }
                 break;
             case "id":
-                if(args.Length != 4)
+                if (args.Length != 4)
                 {
                     shell.WriteError("Expected 5 arguments.");
                     return;
                 }
 
                 if (!decalSystem.SetDecalId(gridId.Value, uid, args[3]))
-                {
                     shell.WriteError("Failed changing decal id.");
-                }
                 break;
             case "rotation":
-                if(args.Length != 4)
+                if (args.Length != 4)
                 {
                     shell.WriteError("Expected 5 arguments.");
                     return;
@@ -127,12 +126,10 @@ Possible modes are:\n
                 }
 
                 if (!decalSystem.SetDecalRotation(gridId.Value, uid, Angle.FromDegrees(degrees)))
-                {
                     shell.WriteError("Failed changing decal rotation.");
-                }
                 break;
             case "zindex":
-                if(args.Length != 4)
+                if (args.Length != 4)
                 {
                     shell.WriteError("Expected 5 arguments.");
                     return;
@@ -145,12 +142,10 @@ Possible modes are:\n
                 }
 
                 if (!decalSystem.SetDecalZIndex(gridId.Value, uid, zIndex))
-                {
                     shell.WriteError("Failed changing decal zIndex.");
-                }
                 break;
             case "clean":
-                if(args.Length != 4)
+                if (args.Length != 4)
                 {
                     shell.WriteError("Expected 5 arguments.");
                     return;
@@ -163,9 +158,7 @@ Possible modes are:\n
                 }
 
                 if (!decalSystem.SetDecalCleanable(gridId.Value, uid, cleanable))
-                {
                     shell.WriteError("Failed changing decal cleanable flag.");
-                }
                 break;
             default:
                 shell.WriteError("Invalid mode.");

@@ -16,8 +16,8 @@ namespace Content.Server.Zombies;
 public sealed partial class IncurableZombieComponent : Component
 {
     [DataField]
-    public EntProtoId ZombifySelfActionPrototype = "ActionTurnUndead";
+    public EntityUid? Action;
 
     [DataField]
-    public EntityUid? Action;
+    public EntProtoId ZombifySelfActionPrototype = "ActionTurnUndead";
 }

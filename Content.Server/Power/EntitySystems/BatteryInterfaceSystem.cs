@@ -10,14 +10,14 @@ namespace Content.Server.Power.EntitySystems;
 /// Handles logic for the battery interface on SMES/substations.
 /// </summary>
 /// <remarks>
-/// <para>
-/// These devices have interfaces that allow user to toggle input and output,
-/// and configure charge/discharge power limits.
-/// </para>
-/// <para>
-/// This system is not responsible for any power logic on its own,
-/// it merely reconfigures parameters on <see cref="PowerNetworkBatteryComponent"/> from the UI.
-/// </para>
+///     <para>
+///     These devices have interfaces that allow user to toggle input and output,
+///     and configure charge/discharge power limits.
+///     </para>
+///     <para>
+///     This system is not responsible for any power logic on its own,
+///     it merely reconfigures parameters on <see cref="PowerNetworkBatteryComponent" /> from the UI.
+///     </para>
 /// </remarks>
 public sealed class BatteryInterfaceSystem : EntitySystem
 {
@@ -47,7 +47,8 @@ public sealed class BatteryInterfaceSystem : EntitySystem
         var netBattery = Comp<PowerNetworkBatteryComponent>(ent);
         netBattery.CanCharge = args.On;
 
-        _adminLog.Add(LogType.Action,$"{ToPrettyString(args.Actor):actor} set input breaker to {args.On} on {ToPrettyString(ent):target}");
+        _adminLog.Add(LogType.Action,
+            $"{ToPrettyString(args.Actor):actor} set input breaker to {args.On} on {ToPrettyString(ent):target}");
     }
 
     private void HandleSetOutputBreaker(Entity<BatteryInterfaceComponent> ent, ref BatterySetOutputBreakerMessage args)
@@ -55,7 +56,8 @@ public sealed class BatteryInterfaceSystem : EntitySystem
         var netBattery = Comp<PowerNetworkBatteryComponent>(ent);
         netBattery.CanDischarge = args.On;
 
-        _adminLog.Add(LogType.Action,$"{ToPrettyString(args.Actor):actor} set output breaker to {args.On} on {ToPrettyString(ent):target}");
+        _adminLog.Add(LogType.Action,
+            $"{ToPrettyString(args.Actor):actor} set output breaker to {args.On} on {ToPrettyString(ent):target}");
     }
 
     private void HandleSetChargeRate(Entity<BatteryInterfaceComponent> ent, ref BatterySetChargeRateMessage args)

@@ -20,10 +20,10 @@ namespace Content.Server.Polymorph.Components;
 public sealed partial class PolymorphableComponent : Component
 {
     /// <summary>
-    /// A list of all the polymorphs that the entity has.
-    /// Used to manage them and remove them if needed.
+    /// The polymorphs that the entity starts out being able to do.
     /// </summary>
-    public Dictionary<ProtoId<PolymorphPrototype>, EntityUid>? PolymorphActions = null;
+    [DataField]
+    public List<ProtoId<PolymorphPrototype>>? InnatePolymorphs;
 
     /// <summary>
     /// Timestamp for when the most recent polymorph ended.
@@ -31,9 +31,9 @@ public sealed partial class PolymorphableComponent : Component
     [ViewVariables(VVAccess.ReadOnly)]
     public TimeSpan? LastPolymorphEnd = null;
 
-        /// <summary>
-    /// The polymorphs that the entity starts out being able to do.
+    /// <summary>
+    /// A list of all the polymorphs that the entity has.
+    /// Used to manage them and remove them if needed.
     /// </summary>
-    [DataField]
-    public List<ProtoId<PolymorphPrototype>>? InnatePolymorphs;
+    public Dictionary<ProtoId<PolymorphPrototype>, EntityUid>? PolymorphActions = null;
 }

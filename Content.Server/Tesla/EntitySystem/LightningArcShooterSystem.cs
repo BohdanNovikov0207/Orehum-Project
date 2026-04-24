@@ -27,10 +27,8 @@ public sealed class LightningArcShooterSystem : EntitySystem
         SubscribeLocalEvent<LightningArcShooterComponent, MapInitEvent>(OnShooterMapInit);
     }
 
-    private void OnShooterMapInit(EntityUid uid, LightningArcShooterComponent component, ref MapInitEvent args)
-    {
+    private void OnShooterMapInit(EntityUid uid, LightningArcShooterComponent component, ref MapInitEvent args) =>
         component.NextShootTime = _gameTiming.CurTime + TimeSpan.FromSeconds(component.ShootMaxInterval);
-    }
 
     public override void Update(float frameTime)
     {
@@ -43,7 +41,8 @@ public sealed class LightningArcShooterSystem : EntitySystem
                 continue;
 
             ArcShoot(uid, arcShooter);
-            var delay = TimeSpan.FromSeconds(_random.NextFloat(arcShooter.ShootMinInterval, arcShooter.ShootMaxInterval));
+            var delay = TimeSpan.FromSeconds(
+                _random.NextFloat(arcShooter.ShootMinInterval, arcShooter.ShootMaxInterval));
             arcShooter.NextShootTime += delay;
         }
     }
@@ -51,6 +50,10 @@ public sealed class LightningArcShooterSystem : EntitySystem
     private void ArcShoot(EntityUid uid, LightningArcShooterComponent component)
     {
         var arcs = _random.Next(1, component.MaxLightningArc);
-        _lightning.ShootRandomLightnings(uid, component.ShootRange, arcs, component.LightningPrototype, component.ArcDepth);
+        _lightning.ShootRandomLightnings(uid,
+            component.ShootRange,
+            arcs,
+            component.LightningPrototype,
+            component.ArcDepth);
     }
 }

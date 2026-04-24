@@ -10,7 +10,7 @@
 namespace Content.Server.Heretic.Components;
 
 /// <summary>
-///     Indicates that an entity can act as a protective blade.
+/// Indicates that an entity can act as a protective blade.
 /// </summary>
 [RegisterComponent]
 public sealed partial class ProtectiveBladeComponent : Component

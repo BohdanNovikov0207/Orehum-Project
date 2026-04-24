@@ -9,18 +9,15 @@
 namespace Content.Server.Nuke;
 
 /// <summary>
-///     This handles labelling an entity with a nuclear bomb label.
+/// This handles labelling an entity with a nuclear bomb label.
 /// </summary>
 public sealed class NukeLabelSystem : EntitySystem
 {
-    [Dependency] private readonly NukeSystem _nuke = default!;
     [Dependency] private readonly MetaDataSystem _metaData = default!;
+    [Dependency] private readonly NukeSystem _nuke = default!;
 
-    /// <inheritdoc/>
-    public override void Initialize()
-    {
-        SubscribeLocalEvent<NukeLabelComponent, MapInitEvent>(OnMapInit);
-    }
+    /// <inheritdoc />
+    public override void Initialize() => SubscribeLocalEvent<NukeLabelComponent, MapInitEvent>(OnMapInit);
 
     private void OnMapInit(EntityUid uid, NukeLabelComponent nuke, MapInitEvent args)
     {

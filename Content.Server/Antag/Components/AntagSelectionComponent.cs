@@ -97,51 +97,9 @@ namespace Content.Server.Antag.Components;
 // goob edit - no more specified access.
 // will it turn out to be a bad decision? probably yes
 // do i care? :trollface:
-[RegisterComponent, /*Access(typeof(AntagSelectionSystem), typeof(AdminVerbSystem))*/]
+[RegisterComponent /*Access(typeof(AntagSelectionSystem), typeof(AdminVerbSystem))*/]
 public sealed partial class AntagSelectionComponent : Component
 {
-    /// <summary>
-    /// Has the primary assignment of antagonists finished yet?
-    /// </summary>
-    [DataField]
-    public bool AssignmentComplete;
-
-    /// <summary>
-    /// Has the antagonists been preselected but yet to be fully assigned?
-    /// </summary>
-    [DataField]
-    public bool PreSelectionsComplete;
-
-    /// <summary>
-    /// The definitions for the antagonists
-    /// </summary>
-    [DataField]
-    public List<AntagSelectionDefinition> Definitions = new();
-
-    /// <summary>
-    /// The minds and original names of the players assigned to be antagonists.
-    /// </summary>
-    [DataField]
-    public List<(EntityUid, string)> AssignedMinds = new();
-
-    /// <summary>
-    /// When the antag selection will occur.
-    /// </summary>
-    [DataField]
-    public AntagSelectionTime SelectionTime = AntagSelectionTime.PostPlayerSpawn;
-
-    /// <summary>
-    /// Cached sessions of antag definitions and selected players. Players in this dict are not guaranteed to have been assigned the role yet.
-    /// </summary>
-    [DataField]
-    public Dictionary<AntagSelectionDefinition, HashSet<ICommonSession>>PreSelectedSessions = new();
-
-    /// <summary>
-    /// Cached sessions of players who are chosen. Used so we don't have to rebuild the pool multiple times in a tick.
-    /// Is not serialized.
-    /// </summary>
-    public HashSet<ICommonSession> AssignedSessions = new();
-
     /// <summary>
     /// Locale id for the name of the antag.
     /// If this is set then the antag is listed in the round-end summary.
@@ -150,11 +108,54 @@ public sealed partial class AntagSelectionComponent : Component
     public LocId? AgentName;
 
     /// <summary>
+    /// The minds and original names of the players assigned to be antagonists.
+    /// </summary>
+    [DataField]
+    public List<(EntityUid, string)> AssignedMinds = new();
+
+    /// <summary>
+    /// Cached sessions of players who are chosen. Used so we don't have to rebuild the pool multiple times in a tick.
+    /// Is not serialized.
+    /// </summary>
+    public HashSet<ICommonSession> AssignedSessions = new();
+
+    /// <summary>
+    /// Has the primary assignment of antagonists finished yet?
+    /// </summary>
+    [DataField]
+    public bool AssignmentComplete;
+
+    /// <summary>
+    /// The definitions for the antagonists
+    /// </summary>
+    [DataField]
+    public List<AntagSelectionDefinition> Definitions = new();
+
+    /// <summary>
+    /// Cached sessions of antag definitions and selected players. Players in this dict are not guaranteed to have been
+    /// assigned the role yet.
+    /// </summary>
+    [DataField]
+    public Dictionary<AntagSelectionDefinition, HashSet<ICommonSession>> PreSelectedSessions = new();
+
+    /// <summary>
+    /// Has the antagonists been preselected but yet to be fully assigned?
+    /// </summary>
+    [DataField]
+    public bool PreSelectionsComplete;
+
+    /// <summary>
     /// If the player is pre-selected but fails to spawn in (e.g. due to only having antag-immune jobs selected),
     /// should they be removed from the pre-selection list?
     /// </summary>
     [DataField]
     public bool RemoveUponFailedSpawn = true;
+
+    /// <summary>
+    /// When the antag selection will occur.
+    /// </summary>
+    [DataField]
+    public AntagSelectionTime SelectionTime = AntagSelectionTime.PostPlayerSpawn;
 
     /// <summary>
     /// Goobstation.
@@ -180,7 +181,7 @@ public partial struct AntagSelectionDefinition()
     public List<ProtoId<AntagPrototype>> PrefRoles = new();
 
     /// <summary>
-    /// Fallback for <see cref="PrefRoles"/>. Useful if you need multiple role preferences for a team antagonist.
+    /// Fallback for <see cref="PrefRoles" />. Useful if you need multiple role preferences for a team antagonist.
     /// </summary>
     [DataField]
     public List<ProtoId<AntagPrototype>> FallbackRoles = new();
@@ -204,13 +205,13 @@ public partial struct AntagSelectionDefinition()
     public int Max = 1;
 
     /// <summary>
-    /// A range used to randomly select <see cref="Min"/>
+    /// A range used to randomly select <see cref="Min" />
     /// </summary>
     [DataField]
     public MinMax? MinRange;
 
     /// <summary>
-    /// A range used to randomly select <see cref="Max"/>
+    /// A range used to randomly select <see cref="Max" />
     /// </summary>
     [DataField]
     public MinMax? MaxRange;
@@ -223,7 +224,7 @@ public partial struct AntagSelectionDefinition()
 
     /// <summary>
     /// Whether or not players should be picked to inhabit this antag or not.
-    /// If no players are left and <see cref="SpawnerPrototype"/> is set, it will make a ghost role.
+    /// If no players are left and <see cref="SpawnerPrototype" /> is set, it will make a ghost role.
     /// </summary>
     [DataField]
     public bool PickPlayer = true;

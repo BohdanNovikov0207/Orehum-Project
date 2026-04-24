@@ -7,9 +7,8 @@ namespace Content.Server._Mono.Ships;
 
 public sealed class FTLDriveSystem : EntitySystem
 {
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
-
     private readonly HashSet<Entity<FTLDriveGeneratorComponent>> _drives = new();
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
 
     public override void Initialize()
     {
@@ -44,7 +43,9 @@ public sealed class FTLDriveSystem : EntitySystem
         UpdateFtlDrives((grid.Value, ftl));
     }
 
-    private void OnPowerChanged(EntityUid uid, FTLDriveGeneratorComponent generatorComponent, ref PowerChangedEvent args)
+    private void OnPowerChanged(EntityUid uid,
+        FTLDriveGeneratorComponent generatorComponent,
+        ref PowerChangedEvent args)
     {
         generatorComponent.Powered = args.Powered;
 

@@ -23,20 +23,19 @@ using Content.Server._Lavaland.Procedural.Components;
 using Content.Server.Atmos.EntitySystems;
 using Content.Shared.EntityEffects;
 using Robust.Shared.Prototypes;
-using Content.Shared.Atmos.EntitySystems;
 
 namespace Content.Server.EntityEffects.EffectConditions;
 
 public sealed partial class PressureThreshold : EntityEffectCondition
 {
     [DataField]
-    public bool WorksOnLavaland = false;
+    public float Max = float.MaxValue;
 
     [DataField]
     public float Min = float.MinValue;
 
     [DataField]
-    public float Max = float.MaxValue;
+    public bool WorksOnLavaland = false;
 
     public override bool Condition(EntityEffectBaseArgs args)
     {
@@ -51,10 +50,8 @@ public sealed partial class PressureThreshold : EntityEffectCondition
         return pressure >= Min && pressure <= Max;
     }
 
-    public override string GuidebookExplanation(IPrototypeManager prototype)
-    {
-        return Loc.GetString("reagent-effect-condition-pressure-threshold",
+    public override string GuidebookExplanation(IPrototypeManager prototype) =>
+        Loc.GetString("reagent-effect-condition-pressure-threshold",
             ("min", Min),
             ("max", Max));
-    }
 }

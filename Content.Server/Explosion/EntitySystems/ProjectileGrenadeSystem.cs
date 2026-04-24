@@ -17,9 +17,9 @@ namespace Content.Server.Explosion.EntitySystems;
 
 public sealed class ProjectileGrenadeSystem : EntitySystem
 {
+    [Dependency] private readonly SharedContainerSystem _container = default!;
     [Dependency] private readonly GunSystem _gun = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly SharedContainerSystem _container = default!;
     [Dependency] private readonly TransformSystem _transformSystem = default!;
 
 
@@ -32,10 +32,8 @@ public sealed class ProjectileGrenadeSystem : EntitySystem
         SubscribeLocalEvent<ProjectileGrenadeComponent, TriggerEvent>(OnFragTrigger);
     }
 
-    private void OnFragInit(Entity<ProjectileGrenadeComponent> entity, ref ComponentInit args)
-    {
+    private void OnFragInit(Entity<ProjectileGrenadeComponent> entity, ref ComponentInit args) =>
         entity.Comp.Container = _container.EnsureContainer<Container>(entity.Owner, "cluster-payload");
-    }
 
     /// <summary>
     /// Setting the unspawned count based on capacity so we know how many new entities to spawn
@@ -105,7 +103,9 @@ public sealed class ProjectileGrenadeSystem : EntitySystem
     /// <summary>
     /// Spawns one instance of the fill prototype or contained entity at the coordinate indicated
     /// </summary>
-    private bool TrySpawnContents(MapCoordinates spawnCoordinates, ProjectileGrenadeComponent component, out EntityUid contentUid)
+    private bool TrySpawnContents(MapCoordinates spawnCoordinates,
+        ProjectileGrenadeComponent component,
+        out EntityUid contentUid)
     {
         contentUid = default;
 

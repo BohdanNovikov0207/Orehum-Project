@@ -21,8 +21,6 @@ public sealed class DieConditionSystem : EntitySystem
         SubscribeLocalEvent<DieConditionComponent, ObjectiveGetProgressEvent>(OnGetProgress);
     }
 
-    private void OnGetProgress(EntityUid uid, DieConditionComponent comp, ref ObjectiveGetProgressEvent args)
-    {
+    private void OnGetProgress(EntityUid uid, DieConditionComponent comp, ref ObjectiveGetProgressEvent args) =>
         args.Progress = _mind.IsCharacterDeadIc(args.Mind) ? 1f : 0f;
-    }
 }

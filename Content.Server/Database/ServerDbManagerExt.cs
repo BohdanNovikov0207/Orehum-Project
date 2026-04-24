@@ -41,8 +41,7 @@ public static class ServerDbManagerExt
         string channel,
         Action<TData> action,
         Func<bool>? earlyFilter = null,
-        Func<TData, bool>? filter = null)
-    {
+        Func<TData, bool>? filter = null) =>
         dbManager.SubscribeToNotifications(notification =>
         {
             if (notification.Channel != channel)
@@ -77,5 +76,4 @@ public static class ServerDbManagerExt
                 action(data);
             });
         });
-    }
 }

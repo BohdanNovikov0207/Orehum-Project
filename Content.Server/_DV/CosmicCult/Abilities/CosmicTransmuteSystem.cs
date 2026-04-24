@@ -8,12 +8,11 @@ namespace Content.Server._DV.CosmicCult.Abilities;
 
 public sealed class CosmicTransmuteSystem : EntitySystem
 {
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly EntityWhitelistSystem _entityWhitelist = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-
     private readonly HashSet<EntityUid> _entities = [];
+    [Dependency] private readonly EntityWhitelistSystem _entityWhitelist = default!;
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
 
     public override void Initialize()
     {
@@ -32,6 +31,7 @@ public sealed class CosmicTransmuteSystem : EntitySystem
             args.Cancel();
             return;
         }
+
         if (possibleTargets.Count > 1)
         {
             _popup.PopupEntity(Loc.GetString("cult-glyph-too-many-targets"), uid, args.User);
@@ -45,7 +45,7 @@ public sealed class CosmicTransmuteSystem : EntitySystem
 
 
     /// <summary>
-    ///     Gets all whitelisted entities near a glyph.
+    /// Gets all whitelisted entities near a glyph.
     /// </summary>
     private HashSet<EntityUid> GatherEntities(Entity<CosmicGlyphTransmuteComponent> ent)
     {

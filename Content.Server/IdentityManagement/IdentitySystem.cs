@@ -45,20 +45,24 @@ using Robust.Shared.GameObjects.Components.Localization;
 namespace Content.Server.IdentityManagement;
 
 /// <summary>
-///     Responsible for updating the identity of an entity on init or clothing equip/unequip.
+/// Responsible for updating the identity of an entity on init or clothing equip/unequip.
 /// </summary>
 public sealed class IdentitySystem : SharedIdentitySystem
 {
-    [Dependency] private readonly IdCardSystem _idCard = default!;
     [Dependency] private readonly IAdminLogManager _adminLog = default!;
-    [Dependency] private readonly MetaDataSystem _metaData = default!;
     [Dependency] private readonly SharedContainerSystem _container = default!;
-    [Dependency] private readonly HumanoidAppearanceSystem _humanoid = default!;
     [Dependency] private readonly CriminalRecordsConsoleSystem _criminalRecordsConsole = default!;
     [Dependency] private readonly GrammarSystem _grammarSystem = default!;
-    [Dependency] private readonly InventorySystem _inventorySystem = default!; // Goobstation - Update component state on component toggle
+    [Dependency] private readonly HumanoidAppearanceSystem _humanoid = default!;
+    [Dependency] private readonly IdCardSystem _idCard = default!;
 
-    private HashSet<EntityUid> _queuedIdentityUpdates = new();
+    [Dependency]
+    private readonly InventorySystem
+        _inventorySystem = default!; // Goobstation - Update component state on component toggle
+
+    [Dependency] private readonly MetaDataSystem _metaData = default!;
+
+    private readonly HashSet<EntityUid> _queuedIdentityUpdates = new();
 
     public override void Initialize()
     {
@@ -72,8 +76,10 @@ public sealed class IdentitySystem : SharedIdentitySystem
         SubscribeLocalEvent<IdentityComponent, EntityRenamedEvent>((uid, _, _) => QueueIdentityUpdate(uid));
         SubscribeLocalEvent<IdentityComponent, MapInitEvent>(OnMapInit);
 
-        SubscribeLocalEvent<IdentityBlockerComponent, ComponentInit>(BlockerUpdateIdentity); // Goobstation - Update component state on component toggle
-        SubscribeLocalEvent<IdentityBlockerComponent, ComponentRemove>(BlockerUpdateIdentity); // Goobstation - Update component state on component toggle
+        SubscribeLocalEvent<IdentityBlockerComponent, ComponentInit>(
+            BlockerUpdateIdentity); // Goobstation - Update component state on component toggle
+        SubscribeLocalEvent<IdentityBlockerComponent, ComponentRemove>(
+            BlockerUpdateIdentity); // Goobstation - Update component state on component toggle
     }
 
     public override void Update(float frameTime)
@@ -102,12 +108,9 @@ public sealed class IdentitySystem : SharedIdentitySystem
     }
 
     /// <summary>
-    ///     Queues an identity update to the start of the next tick.
+    /// Queues an identity update to the start of the next tick.
     /// </summary>
-    public override void QueueIdentityUpdate(EntityUid uid)
-    {
-        _queuedIdentityUpdates.Add(uid);
-    }
+    public override void QueueIdentityUpdate(EntityUid uid) => _queuedIdentityUpdates.Add(uid);
 
     // WWDP simple public API
     public string GetEntityIdentity(EntityUid uid)
@@ -122,7 +125,7 @@ public sealed class IdentitySystem : SharedIdentitySystem
     #region Private API
 
     /// <summary>
-    ///     Updates the metadata name for the id(entity) from the current state of the character.
+    /// Updates the metadata name for the id(entity) from the current state of the character.
     /// </summary>
     private void UpdateIdentityInfo(EntityUid uid, IdentityComponent identity)
     {
@@ -170,22 +173,19 @@ public sealed class IdentitySystem : SharedIdentitySystem
     }
 
     /// <summary>
-    ///     When the identity of a person is changed, searches the criminal records to see if the name of the new identity
-    ///     has a record. If the new name has a criminal status attached to it, the person will get the criminal status
-    ///     until they change identity again.
+    /// When the identity of a person is changed, searches the criminal records to see if the name of the new identity
+    /// has a record. If the new name has a criminal status attached to it, the person will get the criminal status
+    /// until they change identity again.
     /// </summary>
-    private void SetIdentityCriminalIcon(EntityUid uid)
-    {
-        _criminalRecordsConsole.CheckNewIdentity(uid);
-    }
+    private void SetIdentityCriminalIcon(EntityUid uid) => _criminalRecordsConsole.CheckNewIdentity(uid);
 
     /// <summary>
-    ///     Gets an 'identity representation' of an entity, with their true name being the entity name
-    ///     and their 'presumed name' and 'presumed job' being the name/job on their ID card, if they have one.
+    /// Gets an 'identity representation' of an entity, with their true name being the entity name
+    /// and their 'presumed name' and 'presumed job' being the name/job on their ID card, if they have one.
     /// </summary>
     private IdentityRepresentation GetIdentityRepresentation(EntityUid target,
-        InventoryComponent? inventory=null,
-        HumanoidAppearanceComponent? appearance=null,
+        InventoryComponent? inventory = null,
+        HumanoidAppearanceComponent? appearance = null,
         bool raiseIdentityRepresentationEntityEvent = true)
     {
         // Goobstation start
@@ -198,8 +198,8 @@ public sealed class IdentitySystem : SharedIdentitySystem
         }
         // Goobstation end
 
-        int age = 18;
-        Gender gender = Gender.Epicene;
+        var age = 18;
+        var gender = Gender.Epicene;
         string species = SharedHumanoidAppearanceSystem.DefaultSpecies;
 
         // Always use their actual age and gender, since that can't really be changed by an ID.
@@ -213,7 +213,7 @@ public sealed class IdentitySystem : SharedIdentitySystem
         var ageString = _humanoid.GetAgeRepresentation(species, age);
         var trueName = Name(target);
         if (!Resolve(target, ref inventory, false))
-            return new(trueName, gender, ageString, string.Empty);
+            return new IdentityRepresentation(trueName, gender, ageString, string.Empty);
 
         string? presumedJob = null;
         string? presumedName = null;
@@ -226,7 +226,7 @@ public sealed class IdentitySystem : SharedIdentitySystem
         }
 
         // If it didn't find a job, that's fine.
-        return new(trueName, gender, ageString, presumedName, presumedJob);
+        return new IdentityRepresentation(trueName, gender, ageString, presumedName, presumedJob);
     }
 
     // Goobstation - Update component state on component toggle

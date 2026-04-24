@@ -33,8 +33,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Server.Administration.Logs;
-using Content.Server.Atmos.Components;
 using Content.Server.Atmos.EntitySystems;
 using Content.Server.Atmos.Piping.Components;
 using Content.Server.Cargo.Systems;
@@ -53,8 +51,8 @@ namespace Content.Server.Atmos.Piping.Unary.EntitySystems;
 
 public sealed class GasCanisterSystem : SharedGasCanisterSystem
 {
-    [Dependency] private readonly AtmosphereSystem _atmos = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly AtmosphereSystem _atmos = default!;
     [Dependency] private readonly NodeContainerSystem _nodeContainer = default!;
 
     public override void Initialize()
@@ -69,7 +67,9 @@ public sealed class GasCanisterSystem : SharedGasCanisterSystem
     /// <summary>
     /// Completely dumps the content of the canister into the world.
     /// </summary>
-    public void PurgeContents(EntityUid uid, GasCanisterComponent? canister = null, TransformComponent? transform = null)
+    public void PurgeContents(EntityUid uid,
+        GasCanisterComponent? canister = null,
+        TransformComponent? transform = null)
     {
         if (!Resolve(uid, ref canister, ref transform))
             return;
@@ -79,11 +79,15 @@ public sealed class GasCanisterSystem : SharedGasCanisterSystem
         if (environment is not null)
             _atmos.Merge(environment, canister.Air);
 
-        AdminLogger.Add(LogType.CanisterPurged, LogImpact.Medium, $"Canister {ToPrettyString(uid):canister} purged its contents of {canister.Air:gas} into the environment.");
+        AdminLogger.Add(LogType.CanisterPurged,
+            LogImpact.Medium,
+            $"Canister {ToPrettyString(uid):canister} purged its contents of {canister.Air:gas} into the environment.");
         canister.Air.Clear();
     }
 
-    protected override void DirtyUI(EntityUid uid, GasCanisterComponent? canister = null, NodeContainerComponent? nodeContainer = null)
+    protected override void DirtyUI(EntityUid uid,
+        GasCanisterComponent? canister = null,
+        NodeContainerComponent? nodeContainer = null)
     {
         if (!Resolve(uid, ref canister, ref nodeContainer))
             return;
@@ -91,7 +95,8 @@ public sealed class GasCanisterSystem : SharedGasCanisterSystem
         var portStatus = false;
         var tankPressure = 0f;
 
-        if (_nodeContainer.TryGetNode(nodeContainer, canister.PortName, out PipeNode? portNode) && portNode.NodeGroup?.Nodes.Count > 1)
+        if (_nodeContainer.TryGetNode(nodeContainer, canister.PortName, out PipeNode? portNode) &&
+            portNode.NodeGroup?.Nodes.Count > 1)
             portStatus = true;
 
         if (canister.GasTankSlot.Item != null)
@@ -101,7 +106,8 @@ public sealed class GasCanisterSystem : SharedGasCanisterSystem
             tankPressure = tankComponent.Air.Pressure;
         }
 
-        UI.SetUiState(uid, GasCanisterUiKey.Key,
+        UI.SetUiState(uid,
+            GasCanisterUiKey.Key,
             new GasCanisterBoundUserInterfaceState(canister.Air.Pressure, portStatus, tankPressure));
     }
 
@@ -116,10 +122,8 @@ public sealed class GasCanisterSystem : SharedGasCanisterSystem
         if (!_nodeContainer.TryGetNode(nodeContainer, canister.PortName, out PortablePipeNode? portNode))
             return;
 
-        if (portNode.NodeGroup is PipeNet {NodeCount: > 1} net)
-        {
+        if (portNode.NodeGroup is PipeNet { NodeCount: > 1 } net)
             MixContainerWithPipeNet(canister.Air, net.Air);
-        }
 
         // Release valve is open, release gas.
         if (canister.ReleaseValve)
@@ -145,21 +149,13 @@ public sealed class GasCanisterSystem : SharedGasCanisterSystem
         canister.LastPressure = canister.Air.Pressure;
 
         if (canister.Air.Pressure < 10)
-        {
             _appearance.SetData(uid, GasCanisterVisuals.PressureState, 0, appearance);
-        }
         else if (canister.Air.Pressure < Atmospherics.OneAtmosphere)
-        {
             _appearance.SetData(uid, GasCanisterVisuals.PressureState, 1, appearance);
-        }
-        else if (canister.Air.Pressure < (15 * Atmospherics.OneAtmosphere))
-        {
+        else if (canister.Air.Pressure < 15 * Atmospherics.OneAtmosphere)
             _appearance.SetData(uid, GasCanisterVisuals.PressureState, 2, appearance);
-        }
         else
-        {
             _appearance.SetData(uid, GasCanisterVisuals.PressureState, 3, appearance);
-        }
     }
 
     /// <summary>
@@ -182,10 +178,9 @@ public sealed class GasCanisterSystem : SharedGasCanisterSystem
         containerAir.Multiply(containerAir.Volume / buffer.Volume);
     }
 
-    private void CalculateCanisterPrice(EntityUid uid, GasCanisterComponent component, ref PriceCalculationEvent args)
-    {
+    private void
+        CalculateCanisterPrice(EntityUid uid, GasCanisterComponent component, ref PriceCalculationEvent args) =>
         args.Price += _atmos.GetPrice(component.Air);
-    }
 
     /// <summary>
     /// Returns the gas mixture for the gas analyzer

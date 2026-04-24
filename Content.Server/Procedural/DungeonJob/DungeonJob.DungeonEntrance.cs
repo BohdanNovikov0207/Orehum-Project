@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Content.Shared.Maps;
 using Content.Shared.Procedural;
 using Content.Shared.Procedural.PostGeneration;
-using Content.Shared.Storage;
 using Robust.Shared.Random;
 
 namespace Content.Server.Procedural.DungeonJob;
@@ -15,9 +14,12 @@ namespace Content.Server.Procedural.DungeonJob;
 public sealed partial class DungeonJob
 {
     /// <summary>
-    /// <see cref="DungeonEntranceDunGen"/>
+    ///     <see cref="DungeonEntranceDunGen" />
     /// </summary>
-    private async Task PostGen(DungeonEntranceDunGen gen, Dungeon dungeon, HashSet<Vector2i> reservedTiles, Random random)
+    private async Task PostGen(DungeonEntranceDunGen gen,
+        Dungeon dungeon,
+        HashSet<Vector2i> reservedTiles,
+        Random random)
     {
         var rooms = new List<DungeonRoom>(dungeon.Rooms);
         var roomTiles = new List<Vector2i>();
@@ -48,29 +50,21 @@ public sealed partial class DungeonJob
                     var oppositeDirVec = tile + oppositeDir.ToIntVec();
 
                     if (!dungeon.RoomTiles.Contains(dirVec))
-                    {
                         continue;
-                    }
 
                     if (dungeon.RoomTiles.Contains(oppositeDirVec) ||
                         dungeon.RoomExteriorTiles.Contains(oppositeDirVec) ||
                         dungeon.CorridorExteriorTiles.Contains(oppositeDirVec) ||
                         dungeon.CorridorTiles.Contains(oppositeDirVec))
-                    {
                         continue;
-                    }
 
                     // Check if exterior spot free.
                     if (!_anchorable.TileFree(_grid, tile, DungeonSystem.CollisionLayer, DungeonSystem.CollisionMask))
-                    {
                         continue;
-                    }
 
                     // Check if interior spot free (no guarantees on exterior but ClearDoor should handle it)
                     if (!_anchorable.TileFree(_grid, dirVec, DungeonSystem.CollisionLayer, DungeonSystem.CollisionMask))
-                    {
                         continue;
-                    }
 
                     // Valid pick!
                     isValid = true;
@@ -87,15 +81,16 @@ public sealed partial class DungeonJob
                     }
 
                     // Clear out any biome tiles nearby to avoid blocking it
-                    foreach (var nearTile in _maps.GetLocalTilesIntersecting(_gridUid, _grid, new Circle(gridCoords.Position, 1.5f), false))
+                    foreach (var nearTile in _maps.GetLocalTilesIntersecting(_gridUid,
+                                 _grid,
+                                 new Circle(gridCoords.Position, 1.5f),
+                                 false))
                     {
                         if (dungeon.RoomTiles.Contains(nearTile.GridIndices) ||
                             dungeon.RoomExteriorTiles.Contains(nearTile.GridIndices) ||
                             dungeon.CorridorTiles.Contains(nearTile.GridIndices) ||
                             dungeon.CorridorExteriorTiles.Contains(nearTile.GridIndices))
-                        {
                             continue;
-                        }
 
                         _maps.SetTile(_gridUid, _grid, nearTile.GridIndices, _tile.GetVariantTile(tileDef, random));
                     }

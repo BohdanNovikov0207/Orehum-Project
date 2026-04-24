@@ -17,10 +17,10 @@ namespace Content.Server.Cargo.Components;
 public sealed partial class CargoBountyLabelComponent : Component
 {
     /// <summary>
-    /// The ID for the bounty this label corresponds to.
+    /// The Station System to check and remove bounties from
     /// </summary>
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
-    public string Id = string.Empty;
+    [DataField]
+    public EntityUid? AssociatedStationId;
 
     /// <summary>
     /// Used to prevent recursion in calculating the price.
@@ -28,8 +28,8 @@ public sealed partial class CargoBountyLabelComponent : Component
     public bool Calculating;
 
     /// <summary>
-    /// The Station System to check and remove bounties from
+    /// The ID for the bounty this label corresponds to.
     /// </summary>
-    [DataField]
-    public EntityUid? AssociatedStationId;
+    [DataField] [ViewVariables(VVAccess.ReadWrite)]
+    public string Id = string.Empty;
 }

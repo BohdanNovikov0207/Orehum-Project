@@ -15,7 +15,7 @@ namespace Content.Server.Procedural.DungeonJob;
 public sealed partial class DungeonJob
 {
     /// <summary>
-    /// <see cref="BoundaryWallDunGen"/>
+    ///     <see cref="BoundaryWallDunGen" />
     /// </summary>
     private async Task PostGen(BoundaryWallDunGen gen, Dungeon dungeon, HashSet<Vector2i> reservedTiles, Random random)
     {
@@ -48,7 +48,7 @@ public sealed partial class DungeonJob
             if (!_anchorable.TileFree(_grid, index, DungeonSystem.CollisionLayer, DungeonSystem.CollisionMask))
                 continue;
 
-            tiles.Add((index, _tile.GetVariantTile((ContentTileDefinition)tileDef, random)));
+            tiles.Add((index, _tile.GetVariantTile((ContentTileDefinition) tileDef, random)));
         }
 
         _maps.SetTiles(_gridUid, _grid, tiles);
@@ -69,9 +69,7 @@ public sealed partial class DungeonJob
                 for (var y = -1; y <= 1; y++)
                 {
                     if (x != 0 && y != 0)
-                    {
                         continue;
-                    }
 
                     var neighbor = new Vector2i(index.Index.X + x, index.Index.Y + y);
 

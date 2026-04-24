@@ -20,17 +20,16 @@ using Robust.Shared.Configuration;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 
-
 namespace Content.Server.Audio;
 
 public sealed class ContentAudioSystem : SharedContentAudioSystem
 {
-    [Dependency] private readonly AudioSystem _serverAudio = default!;
-    [Dependency] private readonly IRobustRandom _robustRandom = default!;
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly IConfigurationManager _cfg = default!;
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    [Dependency] private readonly IRobustRandom _robustRandom = default!;
+    [Dependency] private readonly AudioSystem _serverAudio = default!;
 
-    private SoundCollectionPrototype? _lobbyMusicCollection = default!;
+    private SoundCollectionPrototype? _lobbyMusicCollection;
     private string[]? _lobbyPlaylist;
 
     public override void Initialize()
@@ -45,10 +44,8 @@ public sealed class ContentAudioSystem : SharedContentAudioSystem
             {
                 //Checks to see if the sound collection exists. If it does change it if not defaults to null
                 // as the new _lobbyMusicCollection meaning it wont play anything in the lobby.
-                if(_prototypeManager.TryIndex<SoundCollectionPrototype>(x, out var outputSoundCollection))
-                {
+                if (_prototypeManager.TryIndex<SoundCollectionPrototype>(x, out var outputSoundCollection))
                     _lobbyMusicCollection = outputSoundCollection;
-                }
                 else
                 {
                     Log.Error($"Invalid Lobby Music sound collection specified: {x}");
@@ -66,10 +63,7 @@ public sealed class ContentAudioSystem : SharedContentAudioSystem
         SubscribeLocalEvent<PrototypesReloadedEventArgs>(OnProtoReload);
     }
 
-    private void OnRoundCleanup(RoundRestartCleanupEvent ev)
-    {
-        SilenceAudio();
-    }
+    private void OnRoundCleanup(RoundRestartCleanupEvent ev) => SilenceAudio();
 
     private void OnProtoReload(PrototypesReloadedEventArgs obj)
     {
@@ -77,12 +71,10 @@ public sealed class ContentAudioSystem : SharedContentAudioSystem
             _serverAudio.ReloadPresets();
     }
 
-    private void OnRoundStart(RoundStartingEvent ev)
-    {
+    private void OnRoundStart(RoundStartingEvent ev) =>
         // On cleanup all entities get purged so need to ensure audio presets are still loaded
         // yeah it's whacky af.
         _serverAudio.ReloadPresets();
-    }
 
     private void OnPlayerJoinedLobby(PlayerJoinedLobbyEvent ev)
     {
@@ -106,13 +98,11 @@ public sealed class ContentAudioSystem : SharedContentAudioSystem
     private string[] ShuffleLobbyPlaylist()
     {
         if (_lobbyMusicCollection == null)
-        {
             return [];
-        }
 
         var playlist = _lobbyMusicCollection.PickFiles
-                                            .Select(x => x.ToString())
-                                            .ToArray();
+            .Select(x => x.ToString())
+            .ToArray();
         _robustRandom.Shuffle(playlist);
 
         return playlist;

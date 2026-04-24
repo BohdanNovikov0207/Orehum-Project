@@ -12,10 +12,11 @@ namespace Content.Server.Xenoarchaeology.Artifact.XAE;
 public sealed class XAEChargeBatterySystem : BaseXAESystem<XAEChargeBatteryComponent>
 {
     [Dependency] private readonly BatterySystem _battery = default!;
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
 
     /// <summary> Pre-allocated and re-used collection.</summary>
     private readonly HashSet<Entity<BatteryComponent>> _batteryEntities = new();
+
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
 
     /// <inheritdoc />
     protected override void OnActivated(Entity<XAEChargeBatteryComponent> ent, ref XenoArtifactNodeActivatedEvent args)

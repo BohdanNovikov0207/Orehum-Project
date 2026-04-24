@@ -39,7 +39,7 @@ using Content.Shared._Goobstation.Wizard.BindSoul;
 using Content.Shared._Goobstation.Wizard.Chuuni;
 using Content.Shared._Goobstation.Wizard.FadingTimedDespawn;
 using Content.Shared._Goobstation.Wizard.SpellCards;
-using Content.Shared._Shitmed.Damage; // Shitmed Change
+using Content.Shared._Shitmed.Damage;
 using Content.Shared._Shitmed.Medical.Surgery.Wounds.Components;
 using Content.Shared._Shitmed.Medical.Surgery.Wounds.Systems;
 using Content.Shared._Shitmed.Targeting;
@@ -82,36 +82,38 @@ using Robust.Shared.Random;
 using Robust.Shared.Spawners;
 using Robust.Shared.Timing;
 using Robust.Shared.Utility;
+// Shitmed Change
 
-namespace Content.Server._Goobstation.Wizard.Systems; //todo refactor wiz
+namespace Content.Server._Goobstation.Wizard.Systems;
+//todo refactor wiz
 
 public sealed class SpellsSystem : SharedSpellsSystem
 {
+    [Dependency] private readonly AntagSelectionSystem _antag = default!;
+    [Dependency] private readonly BatterySystem _battery = default!;
+    [Dependency] private readonly BloodstreamSystem _bloodstream = default!;
+    [Dependency] private readonly ChatSystem _chat = default!;
     [Dependency] private readonly IChatManager _chatManager = default!;
     [Dependency] private readonly EmpSystem _emp = default!;
-    [Dependency] private readonly SmokeSystem _smoke = default!;
-    [Dependency] private readonly SpreaderSystem _spreader = default!;
-    [Dependency] private readonly GravityWellSystem _gravityWell = default!;
     [Dependency] private readonly ExplosionSystem _explosion = default!;
-    [Dependency] private readonly ChatSystem _chat = default!;
-    [Dependency] private readonly ServerInventorySystem _inventory = default!;
-    [Dependency] private readonly AntagSelectionSystem _antag = default!;
-    [Dependency] private readonly PolymorphSystem _polymorph = default!;
-    [Dependency] private readonly GunSystem _gun = default!;
-    [Dependency] private readonly BloodstreamSystem _bloodstream = default!;
-    [Dependency] private readonly IdentitySystem _identity = default!;
-    [Dependency] private readonly BatterySystem _battery = default!;
-    [Dependency] private readonly SharedRandomTeleportSystem _teleport = default!;
     [Dependency] private readonly NpcFactionSystem _faction = default!;
-    [Dependency] private readonly IPlayerManager _player = default!;
-    [Dependency] private readonly TurfSystem _turf = default!;
+    [Dependency] private readonly GravityWellSystem _gravityWell = default!;
+    [Dependency] private readonly GunSystem _gun = default!;
+    [Dependency] private readonly IdentitySystem _identity = default!;
+    [Dependency] private readonly ServerInventorySystem _inventory = default!;
     [Dependency] private readonly SharedItemSystem _item = default!;
-    [Dependency] private readonly TileFrictionController _tileFriction = default!;
     [Dependency] private readonly MobStateSystem _mobState = default!;
-    [Dependency] private readonly WoundSystem _wounds = default!;
+    [Dependency] private readonly IPlayerManager _player = default!;
+    [Dependency] private readonly PolymorphSystem _polymorph = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly PuddleSystem _puddle = default!;
+    [Dependency] private readonly SmokeSystem _smoke = default!;
     [Dependency] private readonly SharedSolutionContainerSystem _solutionContainer = default!;
+    [Dependency] private readonly SpreaderSystem _spreader = default!;
+    [Dependency] private readonly SharedRandomTeleportSystem _teleport = default!;
+    [Dependency] private readonly TileFrictionController _tileFriction = default!;
+    [Dependency] private readonly TurfSystem _turf = default!;
+    [Dependency] private readonly WoundSystem _wounds = default!;
 
     public override void Initialize()
     {
@@ -119,25 +121,20 @@ public sealed class SpellsSystem : SharedSpellsSystem
 
         SubscribeLocalEvent<MindContainerComponent, SummonSimiansMaxedOutEvent>(OnMonkeyAscension);
         SubscribeLocalEvent<BloodlossDamageMultiplierComponent, StoppedTakingBloodlossDamageEvent>(OnBloodlossStopped);
-        SubscribeLocalEvent<BloodlossDamageMultiplierComponent, GetBloodlossDamageMultiplierEvent>(OnGetBloodlossMultiplier);
+        SubscribeLocalEvent<BloodlossDamageMultiplierComponent, GetBloodlossDamageMultiplierEvent>(
+            OnGetBloodlossMultiplier);
     }
 
     private void OnGetBloodlossMultiplier(Entity<BloodlossDamageMultiplierComponent> ent,
-        ref GetBloodlossDamageMultiplierEvent args)
-    {
+        ref GetBloodlossDamageMultiplierEvent args) =>
         args.Multiplier *= ent.Comp.Multiplier;
-    }
 
-    protected override void CreateChargeEffect(EntityUid uid, ChargeSpellRaysEffectEvent ev)
-    {
+    protected override void CreateChargeEffect(EntityUid uid, ChargeSpellRaysEffectEvent ev) =>
         RaiseNetworkEvent(ev, Filter.PvsExcept(uid));
-    }
 
     private void OnBloodlossStopped(Entity<BloodlossDamageMultiplierComponent> ent,
-        ref StoppedTakingBloodlossDamageEvent args)
-    {
+        ref StoppedTakingBloodlossDamageEvent args) =>
         RemCompDeferred(ent.Owner, ent.Comp);
-    }
 
     private void OnMonkeyAscension(Entity<MindContainerComponent> ent, ref SummonSimiansMaxedOutEvent args)
     {
@@ -236,7 +233,7 @@ public sealed class SpellsSystem : SharedSpellsSystem
 
         foreach (var (entity, physics) in Lookup.GetEntitiesInRange<PhysicsComponent>(mapPos,
                      ev.MaxRange,
-                     flags: LookupFlags.Dynamic | LookupFlags.Sundries))
+                     LookupFlags.Dynamic | LookupFlags.Sundries))
         {
             if (physics.BodyType == BodyType.Static)
                 continue;
@@ -258,7 +255,7 @@ public sealed class SpellsSystem : SharedSpellsSystem
 
             Spawn(ev.EffectProto, TransformSystem.GetMapCoordinates(entity, xform));
 
-            var scaling = (1f / distance2) * physics.Mass;
+            var scaling = 1f / distance2 * physics.Mass;
             Physics.ApplyLinearImpulse(entity,
                 Vector2.TransformNormal(displacement, baseMatrixDeltaV) * scaling,
                 body: physics);
@@ -417,15 +414,14 @@ public sealed class SpellsSystem : SharedSpellsSystem
 
         return true;
     }
-    private void DelayedSpeech(string? speech, EntityUid speaker, EntityUid caster, MagicSchool school)
-    {
+
+    private void DelayedSpeech(string? speech, EntityUid speaker, EntityUid caster, MagicSchool school) =>
         Timer.Spawn(200,
             () =>
             {
                 var toSpeak = speech == null ? string.Empty : Loc.GetString(speech);
                 SpeakSpell(speaker, caster, toSpeak, school);
             });
-    }
 
     protected override void ShootSpellCards(SpellCardsEvent ev, EntProtoId proto)
     {
@@ -694,7 +690,7 @@ public sealed class SpellsSystem : SharedSpellsSystem
                 || _mobState.IsDead(target))
                 continue;
 
-            Stun.KnockdownOrStun(target, stunTime, true);
+            Stun.KnockdownOrStun(target, stunTime);
 
             if (!fart.SuperFarted)
             {
@@ -704,10 +700,10 @@ public sealed class SpellsSystem : SharedSpellsSystem
             else
             {
                 _popup.PopupEntity(
-                Loc.GetString("spell-rathen-gut-popup"),
-                target,
-                target,
-                PopupType.LargeCaution);
+                    Loc.GetString("spell-rathen-gut-popup"),
+                    target,
+                    target,
+                    PopupType.LargeCaution);
 
                 Damageable.TryChangeDamage(target,
                     ev.SuperFartDamage,
@@ -715,20 +711,22 @@ public sealed class SpellsSystem : SharedSpellsSystem
                     origin: ev.Performer);
 
                 if (TryComp<BloodstreamComponent>(target, out var bloodstream)
-                    && _solutionContainer.ResolveSolution(target, bloodstream.BloodSolutionName, ref bloodstream.BloodSolution))
+                    && _solutionContainer.ResolveSolution(target,
+                        bloodstream.BloodSolutionName,
+                        ref bloodstream.BloodSolution))
                 {
                     var toSpill = _solutionContainer.SplitSolution(bloodstream.BloodSolution.Value, 15);
                     _puddle.TrySpillAt(target, toSpill, out _);
                 }
 
                 foreach (var limbType in new[] { BodyPartType.Arm, BodyPartType.Leg })
-                    foreach (var (partId, _) in Body.GetBodyChildrenOfType(target, limbType, body))
-                    {
-                        if (Random.Prob(ev.LimbTearChance)
-                            && TryComp<WoundableComponent>(partId, out var woundable)
-                            && woundable.ParentWoundable.HasValue)
-                            _wounds.AmputateWoundable(woundable.ParentWoundable.Value, partId, woundable);
-                    }
+                foreach (var (partId, _) in Body.GetBodyChildrenOfType(target, limbType, body))
+                {
+                    if (Random.Prob(ev.LimbTearChance)
+                        && TryComp<WoundableComponent>(partId, out var woundable)
+                        && woundable.ParentWoundable.HasValue)
+                        _wounds.AmputateWoundable(woundable.ParentWoundable.Value, partId, woundable);
+                }
             }
         }
     }
