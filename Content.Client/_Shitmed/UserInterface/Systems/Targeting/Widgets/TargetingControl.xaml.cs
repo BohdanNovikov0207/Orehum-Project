@@ -22,8 +22,8 @@ namespace Content.Client._Shitmed.UserInterface.Systems.Targeting.Widgets;
 [GenerateTypedNameReferences]
 public sealed partial class TargetingControl : UIWidget
 {
-    private readonly TargetingUIController _controller;
     private readonly Dictionary<TargetBodyPart, TextureButton> _bodyPartControls;
+    private readonly TargetingUIController _controller;
 
     public TargetingControl()
     {
@@ -60,11 +60,12 @@ public sealed partial class TargetingControl : UIWidget
     public void SetBodyPartsVisible(TargetBodyPart bodyPart)
     {
         foreach (var bodyPartButton in _bodyPartControls)
+        {
             bodyPartButton.Value.Children.First().Visible = bodyPartButton.Key == bodyPart;
+        }
     }
 
     protected override void OnThemeUpdated() => TargetDoll.Texture = Theme.ResolveTexture("target_doll");
 
     public void SetTargetDollVisible(bool visible) => Visible = visible;
-
 }

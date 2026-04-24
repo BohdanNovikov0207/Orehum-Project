@@ -93,10 +93,10 @@ namespace Content.Client.Movement.Systems;
 
 public sealed class JetpackSystem : SharedJetpackSystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly ClothingSystem _clothing = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly SharedMapSystem _mapSystem = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     public override void Initialize()
     {
@@ -104,11 +104,9 @@ public sealed class JetpackSystem : SharedJetpackSystem
         SubscribeLocalEvent<JetpackComponent, AppearanceChangeEvent>(OnJetpackAppearance);
     }
 
-    protected override bool CanEnable(EntityUid uid, JetpackComponent component)
-    {
+    protected override bool CanEnable(EntityUid uid, JetpackComponent component) =>
         // No predicted atmos so you'd have to do a lot of funny to get this working.
-        return false;
-    }
+        false;
 
     private void OnJetpackAppearance(EntityUid uid, JetpackComponent component, ref AppearanceChangeEvent args)
     {
@@ -151,25 +149,18 @@ public sealed class JetpackSystem : SharedJetpackSystem
         if (Container.TryGetContainingContainer((uid, uidXform, null), out var container) &&
             TryComp<PhysicsComponent>(container.Owner, out var body) &&
             body.LinearVelocity.LengthSquared() < 1f)
-        {
             return;
-        }
 
         var coordinates = uidXform.Coordinates;
         var gridUid = _transform.GetGrid(coordinates);
 
         if (TryComp<MapGridComponent>(gridUid, out var grid))
-        {
-            coordinates = new EntityCoordinates(gridUid.Value, _mapSystem.WorldToLocal(gridUid.Value, grid, _transform.ToMapCoordinates(coordinates).Position));
-        }
+            coordinates = new EntityCoordinates(gridUid.Value,
+                _mapSystem.WorldToLocal(gridUid.Value, grid, _transform.ToMapCoordinates(coordinates).Position));
         else if (uidXform.MapUid != null)
-        {
             coordinates = new EntityCoordinates(uidXform.MapUid.Value, _transform.GetWorldPosition(uidXform));
-        }
         else
-        {
             return;
-        }
 
         Spawn("JetpackEffect", coordinates);
     }

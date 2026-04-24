@@ -26,23 +26,15 @@ public sealed partial class GatewayWindow : FancyWindow,
     IComputerWindow<EmergencyConsoleBoundUserInterfaceState>
 {
     private readonly IGameTiming _timing;
-
-    public event Action<NetEntity>? OpenPortal;
-    private List<GatewayDestinationData> _destinations = new();
-
-    public NetEntity Owner;
-
-    private NetEntity? _current;
-    private TimeSpan _nextReady;
     private TimeSpan _cooldown;
 
-    private TimeSpan _unlockTime;
-    private TimeSpan _nextUnlock;
+    private NetEntity? _current;
+    private List<GatewayDestinationData> _destinations = new();
 
     /// <summary>
-    /// Re-apply the state if the timer has elapsed.
+    /// Are we currently waiting on a cooldown timer.
     /// </summary>
-    private GatewayBoundUserInterfaceState? _lastState;
+    private bool _isCooldownPending = true;
 
     /// <summary>
     /// Are we currently waiting on an unlock timer.
@@ -50,9 +42,16 @@ public sealed partial class GatewayWindow : FancyWindow,
     private bool _isUnlockPending = true;
 
     /// <summary>
-    /// Are we currently waiting on a cooldown timer.
+    /// Re-apply the state if the timer has elapsed.
     /// </summary>
-    private bool _isCooldownPending = true;
+    private GatewayBoundUserInterfaceState? _lastState;
+
+    private TimeSpan _nextReady;
+    private TimeSpan _nextUnlock;
+
+    private TimeSpan _unlockTime;
+
+    public NetEntity Owner;
 
     public GatewayWindow()
     {
@@ -63,9 +62,10 @@ public sealed partial class GatewayWindow : FancyWindow,
         NextUnlockBar.ForegroundStyleBoxOverride = new StyleBoxFlat(Color.FromHex("#C74EBD"));
     }
 
+    public event Action<NetEntity>? OpenPortal;
+
     public void SetEntity(NetEntity entity)
     {
-
     }
 
     public void UpdateState(GatewayBoundUserInterfaceState state)
@@ -84,18 +84,18 @@ public sealed partial class GatewayWindow : FancyWindow,
 
         if (_destinations.Count == 0)
         {
-            Container.AddChild(new BoxContainer()
+            Container.AddChild(new BoxContainer
             {
                 HorizontalExpand = true,
                 VerticalExpand = true,
                 Children =
                 {
-                    new Label()
+                    new Label
                     {
                         Text = Loc.GetString("gateway-window-no-destinations"),
-                        HorizontalAlignment = HAlignment.Center
-                    }
-                }
+                        HorizontalAlignment = HAlignment.Center,
+                    },
+                },
             });
             return;
         }
@@ -108,14 +108,14 @@ public sealed partial class GatewayWindow : FancyWindow,
             var name = dest.Name;
             var locked = dest.Locked && _nextUnlock > _timing.CurTime;
 
-            var box = new BoxContainer()
+            var box = new BoxContainer
             {
                 Orientation = BoxContainer.LayoutOrientation.Horizontal,
                 Margin = new Thickness(5f, 5f),
             };
 
             // HOW DO I ALIGN THESE GOODER
-            var nameLabel = new RichTextLabel()
+            var nameLabel = new RichTextLabel
             {
                 VerticalAlignment = VAlignment.Center,
                 SetWidth = 156f,
@@ -124,14 +124,17 @@ public sealed partial class GatewayWindow : FancyWindow,
             nameLabel.SetMessage(name);
             box.AddChild(nameLabel);
             // Buffer
-            box.AddChild(new Control()
+            box.AddChild(new Control
             {
                 HorizontalExpand = true,
             });
 
-            bool Pressable() => ent == _current || ent == Owner;
+            bool Pressable()
+            {
+                return ent == _current || ent == Owner;
+            }
 
-            var buttonStripe = new StripeBack()
+            var buttonStripe = new StripeBack
             {
                 Visible = locked,
                 HorizontalExpand = true,
@@ -139,16 +142,16 @@ public sealed partial class GatewayWindow : FancyWindow,
                 Margin = new Thickness(10f, 0f, 0f, 0f),
                 Children =
                 {
-                    new Label()
+                    new Label
                     {
                         Text = Loc.GetString("gateway-window-locked"),
                         HorizontalAlignment = HAlignment.Center,
                         VerticalAlignment = VAlignment.Center,
-                    }
-                }
+                    },
+                },
             };
 
-            var openButton = new Button()
+            var openButton = new Button
             {
                 Text = Loc.GetString("gateway-window-open-portal"),
                 Pressed = Pressable(),
@@ -166,11 +169,9 @@ public sealed partial class GatewayWindow : FancyWindow,
             };
 
             if (Pressable())
-            {
                 openButton.AddStyleClass(StyleBase.ButtonCaution);
-            }
 
-            var buttonContainer = new BoxContainer()
+            var buttonContainer = new BoxContainer
             {
                 Children =
                 {
@@ -182,14 +183,14 @@ public sealed partial class GatewayWindow : FancyWindow,
 
             box.AddChild(buttonContainer);
 
-            Container.AddChild(new PanelContainer()
+            Container.AddChild(new PanelContainer
             {
                 PanelOverride = new StyleBoxFlat(new Color(30, 30, 34)),
                 Margin = new Thickness(10f, 5f),
                 Children =
                 {
-                    box
-                }
+                    box,
+                },
             });
         }
 

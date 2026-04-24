@@ -15,8 +15,8 @@ namespace Content.Client.Cargo.UI;
 [GenerateTypedNameReferences]
 public sealed partial class CargoPalletMenu : FancyWindow
 {
-    public Action? SellRequested;
     public Action? AppraiseRequested;
+    public Action? SellRequested;
 
     public CargoPalletMenu()
     {
@@ -25,28 +25,18 @@ public sealed partial class CargoPalletMenu : FancyWindow
         AppraiseButton.OnPressed += OnAppraisePressed;
     }
 
-    public void SetAppraisal(int amount)
-    {
-        AppraisalLabel.Text = Loc.GetString("cargo-console-menu-points-amount", ("amount", amount.ToString()));
-    }
+    public void SetAppraisal(int amount) => AppraisalLabel.Text =
+        Loc.GetString("cargo-console-menu-points-amount", ("amount", amount.ToString()));
 
-    public void SetCount(int count)
-    {
-        CountLabel.Text = count.ToString();
-    }
+    public void SetCount(int count) => CountLabel.Text = count.ToString();
+
     public void SetEnabled(bool enabled)
     {
         AppraiseButton.Disabled = !enabled;
         SellButton.Disabled = !enabled;
     }
 
-    private void OnSellPressed(BaseButton.ButtonEventArgs obj)
-    {
-        SellRequested?.Invoke();
-    }
+    private void OnSellPressed(BaseButton.ButtonEventArgs obj) => SellRequested?.Invoke();
 
-    private void OnAppraisePressed(BaseButton.ButtonEventArgs obj)
-    {
-        AppraiseRequested?.Invoke();
-    }
+    private void OnAppraisePressed(BaseButton.ButtonEventArgs obj) => AppraiseRequested?.Invoke();
 }

@@ -14,7 +14,7 @@ SPDX-License-Identifier: MIT
                       SetSize="648 672"
                       MinSize="256 256">
     <ui:ShuttleNavControl Name="RadarScreen"
-                     Margin="4"
-                     HorizontalExpand = "True"
-                     VerticalExpand = "True"/>
+                          Margin="4"
+                          HorizontalExpand="True"
+                          VerticalExpand="True" />
 </controls:FancyWindow>

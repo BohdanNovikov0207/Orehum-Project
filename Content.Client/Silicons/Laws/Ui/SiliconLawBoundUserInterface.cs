@@ -17,10 +17,11 @@ namespace Content.Client.Silicons.Laws.Ui;
 [UsedImplicitly]
 public sealed class SiliconLawBoundUserInterface : BoundUserInterface
 {
+    private readonly EntityUid _owner;
+    private List<SiliconLaw>? _laws;
+
     [ViewVariables]
     private SiliconLawMenu? _menu;
-    private EntityUid _owner;
-    private List<SiliconLaw>? _laws;
 
     public SiliconLawBoundUserInterface(EntityUid owner, Enum uiKey) : base(owner, uiKey)
     {

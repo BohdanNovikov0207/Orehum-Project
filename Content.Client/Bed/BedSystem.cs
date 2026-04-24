@@ -4,5 +4,4 @@ namespace Content.Client.Bed;
 
 public sealed class BedSystem : SharedBedSystem
 {
-
 }

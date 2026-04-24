@@ -12,7 +12,10 @@ public sealed class CosmicRoundStartEui : BaseEui
 {
     private readonly CosmicRoundStartMenu _menu;
 
-    public CosmicRoundStartEui() => _menu = new CosmicRoundStartMenu();
+    public CosmicRoundStartEui()
+    {
+        _menu = new CosmicRoundStartMenu();
+    }
 
     public override void Opened() => _menu.OpenCentered();
 

@@ -8,17 +8,17 @@
 
 using System.Linq;
 using Content.Client.Light.Components;
-using Robust.Client.GameObjects;
 using Robust.Client.Animations;
-using Robust.Shared.Random;
+using Robust.Client.GameObjects;
 using Robust.Shared.Animations;
+using Robust.Shared.Random;
 
 namespace Content.Client.Light.EntitySystems;
 
 public sealed class LightBehaviorSystem : EntitySystem
 {
-    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly AnimationPlayerSystem _player = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
 
     public override void Initialize()
     {
@@ -27,7 +27,9 @@ public sealed class LightBehaviorSystem : EntitySystem
         SubscribeLocalEvent<LightBehaviourComponent, AnimationCompletedEvent>(OnBehaviorAnimationCompleted);
     }
 
-    private void OnBehaviorAnimationCompleted(EntityUid uid, LightBehaviourComponent component, AnimationCompletedEvent args)
+    private void OnBehaviorAnimationCompleted(EntityUid uid,
+        LightBehaviourComponent component,
+        AnimationCompletedEvent args)
     {
         if (!args.Finished)
             return;
@@ -35,9 +37,7 @@ public sealed class LightBehaviorSystem : EntitySystem
         var container = component.Animations.FirstOrDefault(x => x.FullKey == args.Key);
 
         if (container == null)
-        {
             return;
-        }
 
         if (container.LightBehaviour.IsLooped)
         {
@@ -60,9 +60,7 @@ public sealed class LightBehaviorSystem : EntitySystem
         foreach (var container in entity.Comp.Animations)
         {
             if (container.LightBehaviour.Enabled)
-            {
                 StartLightBehaviour(entity, container.LightBehaviour.ID);
-            }
         }
     }
 
@@ -75,27 +73,23 @@ public sealed class LightBehaviorSystem : EntitySystem
         {
             var propertyValue = AnimationHelper.GetAnimatableProperty(light, property);
             if (propertyValue != null)
-            {
                 entity.Comp.OriginalPropertyValues.Add(property, propertyValue);
-            }
         }
         else
-        {
-            Log.Warning($"{Comp<MetaDataComponent>(entity).EntityName} has a {nameof(LightBehaviourComponent)} but it has no {nameof(PointLightComponent)}! Check the prototype!");
-        }
+            Log.Warning(
+                $"{Comp<MetaDataComponent>(entity).EntityName} has a {nameof(LightBehaviourComponent)} but it has no {nameof(PointLightComponent)}! Check the prototype!");
     }
 
     /// <summary>
-    /// Start animating a light behaviour with the specified ID. If the specified ID is empty, it will start animating all light behaviour entries.
+    /// Start animating a light behaviour with the specified ID. If the specified ID is empty, it will start animating all
+    /// light behaviour entries.
     /// If specified light behaviours are already animating, calling this does nothing.
     /// Multiple light behaviours can have the same ID.
     /// </summary>
     public void StartLightBehaviour(Entity<LightBehaviourComponent> entity, string id = "")
     {
         if (!TryComp(entity, out AnimationPlayerComponent? animation))
-        {
             return;
-        }
 
         foreach (var container in entity.Comp.Animations)
         {
@@ -119,12 +113,13 @@ public sealed class LightBehaviorSystem : EntitySystem
     /// <param name="id"></param>
     /// <param name="removeBehaviour">Should the behaviour(s) also be removed permanently?</param>
     /// <param name="resetToOriginalSettings">Should the light have its original settings applied?</param>
-    public void StopLightBehaviour(Entity<LightBehaviourComponent> entity, string id = "", bool removeBehaviour = false, bool resetToOriginalSettings = false)
+    public void StopLightBehaviour(Entity<LightBehaviourComponent> entity,
+        string id = "",
+        bool removeBehaviour = false,
+        bool resetToOriginalSettings = false)
     {
         if (!TryComp(entity, out AnimationPlayerComponent? animation))
-        {
             return;
-        }
 
         var comp = entity.Comp;
 
@@ -135,14 +130,10 @@ public sealed class LightBehaviorSystem : EntitySystem
             if (container.LightBehaviour.ID == id || id == string.Empty)
             {
                 if (_player.HasRunningAnimation(entity, animation, LightBehaviourComponent.KeyPrefix + container.Key))
-                {
                     _player.Stop(entity, animation, LightBehaviourComponent.KeyPrefix + container.Key);
-                }
 
                 if (removeBehaviour)
-                {
                     toRemove.Add(container);
-                }
             }
         }
 
@@ -170,17 +161,18 @@ public sealed class LightBehaviorSystem : EntitySystem
     {
         //var uid = Owner;
         if (!TryComp(entity, out AnimationPlayerComponent? animation))
-        {
             return false;
-        }
 
-        return entity.Comp.Animations.Any(container => _player.HasRunningAnimation(entity, animation, LightBehaviourComponent.KeyPrefix + container.Key));
+        return entity.Comp.Animations.Any(container =>
+            _player.HasRunningAnimation(entity, animation, LightBehaviourComponent.KeyPrefix + container.Key));
     }
 
     /// <summary>
     /// Add a new light behaviour to the component and start it immediately unless otherwise specified.
     /// </summary>
-    public void AddNewLightBehaviour(Entity<LightBehaviourComponent> entity, LightBehaviourAnimationTrack behaviour, bool playImmediately = true)
+    public void AddNewLightBehaviour(Entity<LightBehaviourComponent> entity,
+        LightBehaviourAnimationTrack behaviour,
+        bool playImmediately = true)
     {
         var key = 0;
         var comp = entity.Comp;
@@ -190,9 +182,9 @@ public sealed class LightBehaviorSystem : EntitySystem
             key++;
         }
 
-        var animation = new Animation()
+        var animation = new Animation
         {
-            AnimationTracks = { behaviour }
+            AnimationTracks = { behaviour },
         };
 
         behaviour.Initialize(entity.Owner, _random, EntityManager);
@@ -201,8 +193,6 @@ public sealed class LightBehaviorSystem : EntitySystem
         comp.Animations.Add(container);
 
         if (playImmediately)
-        {
             StartLightBehaviour(entity, behaviour.ID);
-        }
     }
 }

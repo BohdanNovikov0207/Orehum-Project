@@ -1,41 +1,35 @@
 using Content.Client.Eye;
 using Content.Shared._ES.Viewcone;
-using Content.Shared.MouseRotator;
 using Robust.Client.Graphics;
-using Robust.Client.Input;
-using Robust.Client.Player;
 using Robust.Shared.Enums;
-using Robust.Shared.Map;
 using Robust.Shared.Prototypes;
-using Robust.Shared.Timing;
 
 namespace Content.Client._ES.Viewcone.Overlays;
 
 /// <summary>
-///     Renders the actual "cone" part of the viewcone, no alpha modulation
+/// Renders the actual "cone" part of the viewcone, no alpha modulation
 /// </summary>
 public sealed class ESViewconeConeOverlay : Overlay
 {
+    public static ProtoId<ShaderPrototype> ShaderPrototype = "Viewcone";
     [Dependency] private readonly IEntityManager _ent = default!;
     [Dependency] private readonly IPrototypeManager _proto = default!;
-
-    public override OverlaySpace Space => OverlaySpace.WorldSpace;
-    public override bool RequestScreenTexture => true;
-
-    public static ProtoId<ShaderPrototype> ShaderPrototype = "Viewcone";
     private readonly ShaderInstance _viewconeShader;
-
-    private Entity<EyeComponent, ESViewconeComponent, TransformComponent>? _eyeEntity;
     private float _coneAngle;
     private float _coneFeather;
-    private float _coneIgnoreRadius;
     private float _coneIgnoreFeather;
+    private float _coneIgnoreRadius;
+
+    private Entity<EyeComponent, ESViewconeComponent, TransformComponent>? _eyeEntity;
 
     public ESViewconeConeOverlay()
     {
         IoCManager.InjectDependencies(this);
         _viewconeShader = _proto.Index(ShaderPrototype).InstanceUnique();
     }
+
+    public override OverlaySpace Space => OverlaySpace.WorldSpace;
+    public override bool RequestScreenTexture => true;
 
     protected override bool BeforeDraw(in OverlayDrawArgs args)
     {
@@ -45,8 +39,9 @@ public sealed class ESViewconeConeOverlay : Overlay
         // It's not really inefficient though. theres barely any of those fuckin things anyway
         // lerpingeye used because that system already does the busywork of figuring out which eyes are 'rendering' sort of
         // so we dont have to query other players eyes (probably barely makes a difference anyway)
-        var enumerator = _ent.AllEntityQueryEnumerator<LerpingEyeComponent, EyeComponent, ESViewconeComponent, TransformComponent>();
-        while (enumerator.MoveNext(out var uid, out var _, out var eye, out var viewcone, out var xform))
+        var enumerator =
+            _ent.AllEntityQueryEnumerator<LerpingEyeComponent, EyeComponent, ESViewconeComponent, TransformComponent>();
+        while (enumerator.MoveNext(out var uid, out _, out var eye, out var viewcone, out var xform))
         {
             if (args.Viewport.Eye != eye.Eye)
                 continue;

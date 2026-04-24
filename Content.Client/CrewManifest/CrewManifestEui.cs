@@ -19,7 +19,7 @@ public sealed class CrewManifestEui : BaseEui
 
     public CrewManifestEui()
     {
-        _window = new();
+        _window = new CrewManifestUi();
 
         _window.OnClose += () =>
         {
@@ -46,9 +46,7 @@ public sealed class CrewManifestEui : BaseEui
         base.HandleState(state);
 
         if (state is not CrewManifestEuiState cast)
-        {
             return;
-        }
 
         _window.Populate(cast.StationName, cast.Entries);
     }

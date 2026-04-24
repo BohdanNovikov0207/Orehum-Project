@@ -54,6 +54,7 @@ public sealed class BlockGameBoundUserInterface : BoundUserInterface
                         _menu?.UpdateNextBlock(updateMessage.Blocks);
                         break;
                 }
+
                 break;
             case BlockGameMessages.BlockGameScoreUpdateMessage scoreUpdate:
                 _menu?.UpdatePoints(scoreUpdate.Points);
@@ -62,10 +63,13 @@ public sealed class BlockGameBoundUserInterface : BoundUserInterface
                 _menu?.SetUsability(userMessage.IsPlayer);
                 break;
             case BlockGameMessages.BlockGameSetScreenMessage statusMessage:
-                if (statusMessage.IsStarted) _menu?.SetStarted();
+                if (statusMessage.IsStarted)
+                    _menu?.SetStarted();
                 _menu?.SetScreen(statusMessage.Screen);
                 if (statusMessage is BlockGameMessages.BlockGameGameOverScreenMessage gameOverScreenMessage)
-                    _menu?.SetGameoverInfo(gameOverScreenMessage.FinalScore, gameOverScreenMessage.LocalPlacement, gameOverScreenMessage.GlobalPlacement);
+                    _menu?.SetGameoverInfo(gameOverScreenMessage.FinalScore,
+                        gameOverScreenMessage.LocalPlacement,
+                        gameOverScreenMessage.GlobalPlacement);
                 break;
             case BlockGameMessages.BlockGameHighScoreUpdateMessage highScoreUpdateMessage:
                 _menu?.UpdateHighscores(highScoreUpdateMessage.LocalHighscores,
@@ -77,10 +81,8 @@ public sealed class BlockGameBoundUserInterface : BoundUserInterface
         }
     }
 
-    public void SendAction(BlockGamePlayerAction action)
-    {
+    public void SendAction(BlockGamePlayerAction action) =>
         SendMessage(new BlockGameMessages.BlockGamePlayerActionMessage(action));
-    }
 
     protected override void Dispose(bool disposing)
     {

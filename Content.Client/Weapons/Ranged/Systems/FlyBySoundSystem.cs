@@ -28,9 +28,9 @@ namespace Content.Client.Weapons.Ranged.Systems;
 
 public sealed class FlyBySoundSystem : SharedFlyBySoundSystem
 {
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly IPlayerManager _player = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
 
     public override void Initialize()
     {
@@ -47,15 +47,11 @@ public sealed class FlyBySoundSystem : SharedFlyBySoundSystem
             args.OtherEntity != attachedEnt ||
             TryComp<ProjectileComponent>(uid, out var projectile) &&
             projectile.Shooter == attachedEnt)
-        {
             return;
-        }
 
         if (args.OurFixtureId != FlyByFixture ||
             !_random.Prob(component.Prob))
-        {
             return;
-        }
 
         // Play attached to our entity because the projectile may immediately delete or the likes.
         _audio.PlayPredicted(component.Sound, attachedEnt.Value, attachedEnt.Value);

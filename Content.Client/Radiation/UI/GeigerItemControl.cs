@@ -45,12 +45,11 @@ public sealed class GeigerItemControl : Control
             var currentRads = _component.CurrentRadiation;
             var rads = currentRads.ToString("N1");
             msg = Loc.GetString("geiger-item-control-status",
-                ("rads", rads), ("color", color));
+                ("rads", rads),
+                ("color", color));
         }
         else
-        {
             msg = Loc.GetString("geiger-item-control-disabled");
-        }
 
         _label.SetMarkup(msg);
         _component.UiUpdateNeeded = false;

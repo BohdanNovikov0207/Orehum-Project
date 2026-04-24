@@ -43,7 +43,6 @@
 
 using System.Linq;
 using Content.Client.Materials;
-using Content.Client.Materials.UI;
 using Content.Client.Message;
 using Content.Client.UserInterface.Controls;
 using Content.Shared.Construction.Components;
@@ -60,20 +59,17 @@ namespace Content.Client.Construction.UI;
 [GenerateTypedNameReferences]
 public sealed partial class FlatpackCreatorMenu : FancyWindow
 {
+    public static readonly EntProtoId NoBoardEffectId = "FlatpackerNoBoardEffect";
     [Dependency] private readonly IEntityManager _entityManager = default!;
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    private readonly FlatpackSystem _flatpack;
 
     private readonly ItemSlotsSystem _itemSlots;
-    private readonly FlatpackSystem _flatpack;
     private readonly MaterialStorageSystem _materialStorage;
-
-    private EntityUid _owner;
-
-    public static readonly EntProtoId NoBoardEffectId = "FlatpackerNoBoardEffect";
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
 
     private EntityUid? _currentBoard = EntityUid.Invalid;
 
-    public event Action? PackButtonPressed;
+    private EntityUid _owner;
 
     public FlatpackCreatorMenu()
     {
@@ -88,6 +84,8 @@ public sealed partial class FlatpackCreatorMenu : FancyWindow
 
         InsertLabel.SetMarkup(Loc.GetString("flatpacker-ui-insert-board"));
     }
+
+    public event Action? PackButtonPressed;
 
     public void SetEntity(EntityUid uid)
     {
@@ -104,9 +102,7 @@ public sealed partial class FlatpackCreatorMenu : FancyWindow
             return;
 
         if (flatpacker.Packing)
-        {
             PackButton.Disabled = true;
-        }
         else if (_currentBoard != null)
         {
             Dictionary<string, int> cost;
@@ -133,7 +129,8 @@ public sealed partial class FlatpackCreatorMenu : FancyWindow
             if (_entityManager.TryGetComponent<MachineBoardComponent>(_currentBoard, out var newMachineBoardComp))
             {
                 prototype = newMachineBoardComp.Prototype;
-                cost = _flatpack.GetFlatpackCreationCost((_owner, flatpacker), (_currentBoard.Value, newMachineBoardComp));
+                cost = _flatpack.GetFlatpackCreationCost((_owner, flatpacker),
+                    (_currentBoard.Value, newMachineBoardComp));
             }
             else if (_entityManager.TryGetComponent<ComputerBoardComponent>(_currentBoard, out var computerBoard))
             {

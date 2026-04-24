@@ -18,10 +18,7 @@ public sealed partial class MechSoundboardUi : UIFragment
 {
     private MechSoundboardUiFragment? _fragment;
 
-    public override Control GetUIFragmentRoot()
-    {
-        return _fragment!;
-    }
+    public override Control GetUIFragmentRoot() => _fragment!;
 
     public override void Setup(BoundUserInterface userInterface, EntityUid? fragmentOwner)
     {
@@ -32,7 +29,9 @@ public sealed partial class MechSoundboardUi : UIFragment
         _fragment.OnPlayAction += sound =>
         {
             // TODO: IDK dog
-            userInterface.SendMessage(new MechSoundboardPlayMessage(IoCManager.Resolve<IEntityManager>().GetNetEntity(fragmentOwner.Value), sound));
+            userInterface.SendMessage(
+                new MechSoundboardPlayMessage(IoCManager.Resolve<IEntityManager>().GetNetEntity(fragmentOwner.Value),
+                    sound));
         };
     }
 

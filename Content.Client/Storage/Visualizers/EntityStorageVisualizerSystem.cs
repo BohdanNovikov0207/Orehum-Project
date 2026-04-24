@@ -14,8 +14,8 @@ namespace Content.Client.Storage.Visualizers;
 
 public sealed class EntityStorageVisualizerSystem : VisualizerSystem<EntityStorageVisualsComponent>
 {
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly IComponentFactory _componentFactory = default!;
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
 
     public override void Initialize()
     {
@@ -52,9 +52,7 @@ public sealed class EntityStorageVisualizerSystem : VisualizerSystem<EntityStora
             if (_prototypeManager.TryIndex(prototype, out var proto))
             {
                 if (proto.TryGetComponent(out SpriteComponent? sprite, _componentFactory))
-                {
                     SpriteSystem.SetBaseRsi((uid, args.Sprite), sprite.BaseRSI);
-                }
                 if (proto.TryGetComponent(out EntityStorageVisualsComponent? visuals, _componentFactory))
                 {
                     comp.StateBaseOpen = visuals.StateBaseOpen;
@@ -80,9 +78,7 @@ public sealed class EntityStorageVisualizerSystem : VisualizerSystem<EntityStora
                     SpriteSystem.LayerSetVisible((uid, args.Sprite), StorageVisualLayers.Door, true);
                 }
                 else
-                {
                     SpriteSystem.LayerSetVisible((uid, args.Sprite), StorageVisualLayers.Door, false);
-                }
 
                 if (comp.StateBaseOpen != null)
                     SpriteSystem.LayerSetRsiState((uid, args.Sprite), StorageVisualLayers.Base, comp.StateBaseOpen);
@@ -114,5 +110,5 @@ public sealed class EntityStorageVisualizerSystem : VisualizerSystem<EntityStora
 public enum StorageVisualLayers : byte
 {
     Base,
-    Door
+    Door,
 }

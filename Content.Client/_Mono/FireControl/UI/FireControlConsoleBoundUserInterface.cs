@@ -30,16 +30,14 @@ public sealed class FireControlConsoleBoundUserInterface : BoundUserInterface
 
         _window.OnServerRefresh += OnRefreshServer;
 
-        _window.Radar.OnRadarClick += (coords) =>
+        _window.Radar.OnRadarClick += coords =>
         {
             var netCoords = EntMan.GetNetCoordinates(coords);
 
             // Send empty list of weapons for cursor tracking only when not clicking
             // This allows guided missiles to follow the cursor without firing weapons
             if (!_window.Radar.IsMouseDown())
-            {
                 SendCursorUpdateMessage(netCoords);
-            }
             else
             {
                 // Normal fire message when actually clicking
@@ -53,10 +51,7 @@ public sealed class FireControlConsoleBoundUserInterface : BoundUserInterface
         _window.OnWeaponSelectionChanged += UpdateSelectedWeapons;
     }
 
-    private void OnRefreshServer()
-    {
-        SendMessage(new FireControlConsoleRefreshServerMessage());
-    }
+    private void OnRefreshServer() => SendMessage(new FireControlConsoleRefreshServerMessage());
 
     private void UpdateSelectedWeapons()
     {
@@ -89,11 +84,9 @@ public sealed class FireControlConsoleBoundUserInterface : BoundUserInterface
             SendMessage(new FireControlConsoleFireMessage(selected, coordinates));
     }
 
-    private void SendCursorUpdateMessage(NetCoordinates coordinates)
-    {
+    private void SendCursorUpdateMessage(NetCoordinates coordinates) =>
         // Send an empty weapon list to indicate this is just a cursor update, not a firing action
         SendMessage(new FireControlConsoleFireMessage(new List<NetEntity>(), coordinates));
-    }
 
     protected override void UpdateState(BoundUserInterfaceState state)
     {

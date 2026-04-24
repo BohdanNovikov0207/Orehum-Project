@@ -20,9 +20,6 @@ public sealed partial class CrewMemberEntry : PanelContainer
 {
     private readonly SpriteSystem _sprite;
 
-    public CrewMemberInfo CrewMember { get; }
-    public List<Squad> Squads { get; }
-
     private readonly Dictionary<int, string> _squadIdMap = new();
 
     public Action<string>? OnAssignPressed;
@@ -39,6 +36,9 @@ public sealed partial class CrewMemberEntry : PanelContainer
         SetupUI(jobIcon);
     }
 
+    public CrewMemberInfo CrewMember { get; }
+    public List<Squad> Squads { get; }
+
     private void SetupUI(SpriteSpecifier? jobIcon)
     {
         MemberNameLabel.Text = CrewMember.Name;
@@ -46,14 +46,14 @@ public sealed partial class CrewMemberEntry : PanelContainer
 
         if (jobIcon != null)
         {
-            var icon = new TextureRect()
+            var icon = new TextureRect
             {
                 TextureScale = new Vector2(2, 2),
                 VerticalAlignment = VAlignment.Center,
                 HorizontalAlignment = HAlignment.Left,
                 Texture = _sprite.Frame0(jobIcon),
                 Margin = new Thickness(0, 0, 4, 0),
-                Stretch = TextureRect.StretchMode.KeepCentered
+                Stretch = TextureRect.StretchMode.KeepCentered,
             };
 
             JobContaiber.AddChild(icon);
@@ -79,7 +79,7 @@ public sealed partial class CrewMemberEntry : PanelContainer
             ContentMarginBottomOverride = 4,
             ContentMarginLeftOverride = 8,
             ContentMarginRightOverride = 8,
-            ContentMarginTopOverride = 4
+            ContentMarginTopOverride = 4,
         };
 
         SquadDropdown.AddStyleClass(SecApartmentStyles.StyleClassOptionButton);

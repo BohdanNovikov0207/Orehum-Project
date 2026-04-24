@@ -7,7 +7,7 @@ namespace Content.Client.Communications;
 public sealed partial class CommunicationsConsoleComponent : SharedCommunicationsConsoleComponent
 {
     /// <summary>
-    ///     The prototype ID to use in the UI to show what entities a broadcast will display on
+    /// The prototype ID to use in the UI to show what entities a broadcast will display on
     /// </summary>
     [DataField]
     public EntProtoId ScreenDisplayId = "Screen";

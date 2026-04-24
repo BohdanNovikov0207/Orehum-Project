@@ -19,14 +19,14 @@ namespace Content.Client.UserInterface.Systems.Inventory.Controls;
 
 public sealed class InventoryDisplay : LayoutContainer
 {
-    private int Columns = 0;
-    private int Rows = 0;
     private const int MarginThickness = 10;
     private const int ButtonSpacing = 5;
     private const int ButtonSize = 75;
-    private readonly Control resizer;
 
     private readonly Dictionary<string, (SlotControl, Vector2i)> _buttons = new();
+    private readonly Control resizer;
+    private int Columns;
+    private int Rows;
 
     public InventoryDisplay()
     {
@@ -47,10 +47,8 @@ public sealed class InventoryDisplay : LayoutContainer
         return newButton;
     }
 
-    public SlotControl? GetButton(string slotName)
-    {
-        return !_buttons.TryGetValue(slotName, out var foundButton) ? null : foundButton.Item1;
-    }
+    public SlotControl? GetButton(string slotName) =>
+        !_buttons.TryGetValue(slotName, out var foundButton) ? null : foundButton.Item1;
 
     private void UpdateSizeData(Vector2i buttonOffset)
     {
@@ -84,8 +82,5 @@ public sealed class InventoryDisplay : LayoutContainer
         }
     }
 
-    public void ClearButtons()
-    {
-        Children.Clear();
-    }
+    public void ClearButtons() => Children.Clear();
 }

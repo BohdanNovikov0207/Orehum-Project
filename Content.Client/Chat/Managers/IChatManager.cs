@@ -24,18 +24,18 @@
 
 using Content.Shared.Chat;
 
-namespace Content.Client.Chat.Managers
+namespace Content.Client.Chat.Managers;
+
+public interface IChatManager : ISharedChatManager
 {
-    public interface IChatManager : ISharedChatManager
-    {
-        void Initialize(); // Goobstation - Starlight collective mind port
+    void Initialize(); // Goobstation - Starlight collective mind port
 
-        public void SendMessage(string text, ChatSelectChannel channel);
+    void SendMessage(string text, ChatSelectChannel channel);
 
-        /// <summary>
-        ///     Will refresh perms.
-        /// </summary>
-        event Action PermissionsUpdated;
-        public void UpdatePermissions();
-    }
+    /// <summary>
+    /// Will refresh perms.
+    /// </summary>
+    event Action PermissionsUpdated;
+
+    void UpdatePermissions();
 }

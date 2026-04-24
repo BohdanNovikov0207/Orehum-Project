@@ -31,31 +31,8 @@ namespace Content.Client.Audio;
 
 public sealed partial class ContentAudioSystem
 {
-    [Dependency] private readonly IConfigurationManager _configManager = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly IPlayerManager _player = default!;
-    [Dependency] private readonly IPrototypeManager _proto = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly IStateManager _state = default!;
-    [Dependency] private readonly RulesSystem _rules = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-
-    private readonly TimeSpan _minAmbienceTime = TimeSpan.FromSeconds(30);
-    private readonly TimeSpan _maxAmbienceTime = TimeSpan.FromSeconds(60);
-
     private const float AmbientMusicFadeTime = 10f;
     private static float _volumeSlider;
-
-    // Don't need to worry about this being serializable or pauseable as it doesn't affect the sim.
-    private TimeSpan _nextAudio;
-
-    private EntityUid? _ambientMusicStream;
-    private AmbientMusicPrototype? _musicProto;
-
-    /// <summary>
-    /// If we find a better ambient music proto can we interrupt this one.
-    /// </summary>
-    private bool _interruptable;
 
     /// <summary>
     /// Track what ambient sounds we've played. This is so they all get played an even
@@ -63,6 +40,30 @@ public sealed partial class ContentAudioSystem
     /// When we get to the end of the list we'll re-shuffle
     /// </summary>
     private readonly Dictionary<string, List<ResPath>> _ambientSounds = new();
+
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly IConfigurationManager _configManager = default!;
+    private readonly TimeSpan _maxAmbienceTime = TimeSpan.FromSeconds(60);
+
+    private readonly TimeSpan _minAmbienceTime = TimeSpan.FromSeconds(30);
+    [Dependency] private readonly IPlayerManager _player = default!;
+    [Dependency] private readonly IPrototypeManager _proto = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly RulesSystem _rules = default!;
+    [Dependency] private readonly IStateManager _state = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+
+    private EntityUid? _ambientMusicStream;
+
+    /// <summary>
+    /// If we find a better ambient music proto can we interrupt this one.
+    /// </summary>
+    private bool _interruptable;
+
+    private AmbientMusicPrototype? _musicProto;
+
+    // Don't need to worry about this being serializable or pauseable as it doesn't affect the sim.
+    private TimeSpan _nextAudio;
 
     private ISawmill _sawmill = default!;
 
@@ -86,9 +87,7 @@ public sealed partial class ContentAudioSystem
         _volumeSlider = SharedAudioSystem.GainToVolume(obj);
 
         if (_ambientMusicStream != null && _musicProto != null)
-        {
             _audio.SetVolume(_ambientMusicStream, _musicProto.Sound.Params.Volume + _volumeSlider);
-        }
     }
 
     private void ShutdownAmbientMusic()
@@ -150,9 +149,7 @@ public sealed partial class ContentAudioSystem
 
         // Just so the same track doesn't play twice
         if (tracks.Count > 1 && tracks[^1] == lastPlayed)
-        {
             (tracks[0], tracks[^1]) = (tracks[^1], tracks[0]);
-        }
     }
 
     private void UpdateAmbientMusic()
@@ -168,15 +165,14 @@ public sealed partial class ContentAudioSystem
         bool? isDone = null;
 
         if (TryComp(_ambientMusicStream, out AudioComponent? audioComp))
-        {
             isDone = !audioComp.Playing;
-        }
 
         if (_interruptable)
         {
             var player = _player.LocalSession?.AttachedEntity;
 
-            if (player == null || _musicProto == null || !_rules.IsTrue(player.Value, _proto.Index<RulesPrototype>(_musicProto.Rules)))
+            if (player == null || _musicProto == null ||
+                !_rules.IsTrue(player.Value, _proto.Index<RulesPrototype>(_musicProto.Rules)))
             {
                 FadeOut(_ambientMusicStream, duration: AmbientMusicFadeTime);
                 _musicProto = null;
@@ -224,15 +220,11 @@ public sealed partial class ContentAudioSystem
         _ambientMusicStream = strim?.Entity;
 
         if (_musicProto.FadeIn && strim != null)
-        {
             FadeIn(_ambientMusicStream, strim.Value.Component, AmbientMusicFadeTime);
-        }
 
         // Refresh the list
         if (tracks.Count == 0)
-        {
             RefreshTracks(_musicProto.Sound, tracks, track);
-        }
     }
 
     private AmbientMusicPrototype? GetAmbience()
@@ -259,7 +251,7 @@ public sealed partial class ContentAudioSystem
             return amb;
         }
 
-        _sawmill.Warning($"Unable to find fallback ambience track");
+        _sawmill.Warning("Unable to find fallback ambience track");
         return null;
     }
 

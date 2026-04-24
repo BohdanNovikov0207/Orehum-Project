@@ -89,7 +89,7 @@ public sealed class SiliconLawEui : BaseEui
 {
     private readonly EntityManager _entityManager;
 
-    private SiliconLawUi _siliconLawUi;
+    private readonly SiliconLawUi _siliconLawUi;
     private EntityUid _target;
 
     public SiliconLawEui()
@@ -98,22 +98,18 @@ public sealed class SiliconLawEui : BaseEui
 
         _siliconLawUi = new SiliconLawUi();
         _siliconLawUi.OnClose += () => SendMessage(new CloseEuiMessage());
-        _siliconLawUi.Save.OnPressed += _ => SendMessage(new SiliconLawsSaveMessage(_siliconLawUi.GetLaws(), _entityManager.GetNetEntity(_target)));
+        _siliconLawUi.Save.OnPressed += _ =>
+            SendMessage(new SiliconLawsSaveMessage(_siliconLawUi.GetLaws(), _entityManager.GetNetEntity(_target)));
     }
 
     public override void HandleState(EuiStateBase state)
     {
         if (state is not SiliconLawsEuiState s)
-        {
             return;
-        }
 
         _target = _entityManager.GetEntity(s.Target);
         _siliconLawUi.SetLaws(s.Laws);
     }
 
-    public override void Opened()
-    {
-        _siliconLawUi.OpenCentered();
-    }
+    public override void Opened() => _siliconLawUi.OpenCentered();
 }

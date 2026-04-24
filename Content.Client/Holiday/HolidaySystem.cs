@@ -13,15 +13,13 @@ namespace Content.Client.Holiday;
 
 public sealed class HolidaySystem : EntitySystem
 {
-    [Dependency] private readonly IResourceCache _rescache = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly IResourceCache _rescache = default!;
     [Dependency] private readonly SpriteSystem _sprite = default!;
 
-    /// <inheritdoc/>
-    public override void Initialize()
-    {
+    /// <inheritdoc />
+    public override void Initialize() =>
         SubscribeLocalEvent<HolidayRsiSwapComponent, AppearanceChangeEvent>(OnAppearanceChange);
-    }
 
     private void OnAppearanceChange(Entity<HolidayRsiSwapComponent> ent, ref AppearanceChangeEvent args)
     {

@@ -4,9 +4,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Numerics;
-using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
-using static Robust.Client.UserInterface.Controls.BaseButton;
 using static Robust.Client.UserInterface.Controls.BoxContainer;
 
 namespace Content.Client._Shitcode.UserActions.Controls;
@@ -17,6 +15,7 @@ public class IconButton : Button
     private readonly BoxContainer _mainContainer;
 
     public readonly TextureRect Icon;
+
     public readonly RichTextLabel Label;
     //public readonly PanelContainer HighlightRect;
 
@@ -31,7 +30,7 @@ public class IconButton : Button
             Orientation = LayoutOrientation.Horizontal,
             //HorizontalExpand = true,
             MinSize = new Vector2(0, 24),
-            Margin = new Thickness(1)
+            Margin = new Thickness(1),
         };
         AddChild(_mainContainer);
 
@@ -46,7 +45,7 @@ public class IconButton : Button
             TextureScale = new Vector2(1, 1),
             MinSize = new Vector2(24, 24),
             MaxSize = new Vector2(24, 24),
-            Visible = true
+            Visible = true,
         };
         _mainContainer.AddChild(Icon);
 
@@ -58,18 +57,12 @@ public class IconButton : Button
             VerticalAlignment = VAlignment.Center,
             Margin = new Thickness(1),
             Text = name,
-            Visible = true
+            Visible = true,
         };
         _mainContainer.AddChild(Label);
     }
 
-    protected override void MouseExited()
-    {
-        base.MouseExited();
-    }
+    protected override void MouseExited() => base.MouseExited();
 
-    protected override void MouseEntered()
-    {
-        base.MouseEntered();
-    }
+    protected override void MouseEntered() => base.MouseEntered();
 }

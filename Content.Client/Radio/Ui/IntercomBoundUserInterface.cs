@@ -20,7 +20,6 @@ public sealed class IntercomBoundUserInterface : BoundUserInterface
 
     public IntercomBoundUserInterface(EntityUid owner, Enum uiKey) : base(owner, uiKey)
     {
-
     }
 
     protected override void Open()
@@ -30,9 +29,7 @@ public sealed class IntercomBoundUserInterface : BoundUserInterface
         _menu = this.CreateWindow<IntercomMenu>();
 
         if (EntMan.TryGetComponent(Owner, out IntercomComponent? intercom))
-        {
             _menu.Update((Owner, intercom));
-        }
 
         _menu.OnMicPressed += enabled =>
         {
@@ -48,8 +45,5 @@ public sealed class IntercomBoundUserInterface : BoundUserInterface
         };
     }
 
-    public void Update(Entity<IntercomComponent> ent)
-    {
-        _menu?.Update(ent);
-    }
+    public void Update(Entity<IntercomComponent> ent) => _menu?.Update(ent);
 }

@@ -22,9 +22,9 @@ using Content.Client.Administration.Managers;
 using Content.Client.Gameplay;
 using Content.Client.Markers;
 using Content.Client.Sandbox;
-using Content.Client.SubFloor;
 using Content.Client.UserInterface.Controls;
 using Content.Client.UserInterface.Systems.DecalPlacer;
+using Content.Client.UserInterface.Systems.MenuBar.Widgets;
 using Content.Client.UserInterface.Systems.Sandbox.Windows;
 using Content.Shared.Input;
 using JetBrains.Annotations;
@@ -48,25 +48,27 @@ namespace Content.Client.UserInterface.Systems.Sandbox;
 [UsedImplicitly]
 public sealed class SandboxUIController : UIController, IOnStateChanged<GameplayState>, IOnSystemChanged<SandboxSystem>
 {
+    [Dependency] private readonly IClientAdminManager _admin = default!;
     [Dependency] private readonly IConsoleHost _console = default!;
+
+    [UISystemDependency] private readonly DebugPhysicsSystem _debugPhysics = default!;
     [Dependency] private readonly IEyeManager _eye = default!;
     [Dependency] private readonly IInputManager _input = default!;
     [Dependency] private readonly ILightManager _light = default!;
-    [Dependency] private readonly IClientAdminManager _admin = default!;
-    [Dependency] private readonly IPlayerManager _player = default!;
-
-    [UISystemDependency] private readonly DebugPhysicsSystem _debugPhysics = default!;
     [UISystemDependency] private readonly MarkerSystem _marker = default!;
+    [Dependency] private readonly IPlayerManager _player = default!;
     [UISystemDependency] private readonly SandboxSystem _sandbox = default!;
 
     private SandboxWindow? _window;
 
     // TODO hud refactor cache
-    private EntitySpawningUIController EntitySpawningController => UIManager.GetUIController<EntitySpawningUIController>();
+    private EntitySpawningUIController EntitySpawningController =>
+        UIManager.GetUIController<EntitySpawningUIController>();
+
     private TileSpawningUIController TileSpawningController => UIManager.GetUIController<TileSpawningUIController>();
     private DecalPlacerUIController DecalPlacerController => UIManager.GetUIController<DecalPlacerUIController>();
 
-    private MenuButton? SandboxButton => UIManager.GetActiveUIWidgetOrNull<MenuBar.Widgets.GameTopMenuBar>()?.SandboxButton;
+    private MenuButton? SandboxButton => UIManager.GetActiveUIWidgetOrNull<GameTopMenuBar>()?.SandboxButton;
 
     public void OnStateEntered(GameplayState state)
     {
@@ -104,12 +106,35 @@ public sealed class SandboxUIController : UIController, IOnStateChanged<Gameplay
             .Register<SandboxSystem>();
     }
 
+    public void OnStateExited(GameplayState state)
+    {
+        if (_window != null)
+        {
+            _window.Close();
+            _window = null;
+        }
+
+        CommandBinds.Unregister<SandboxSystem>();
+    }
+
+    public void OnSystemLoaded(SandboxSystem system)
+    {
+        system.SandboxDisabled += CloseAll;
+        system.SandboxEnabled += CheckSandboxVisibility;
+        system.SandboxDisabled += CheckSandboxVisibility;
+    }
+
+    public void OnSystemUnloaded(SandboxSystem system)
+    {
+        system.SandboxDisabled -= CloseAll;
+        system.SandboxEnabled -= CheckSandboxVisibility;
+        system.SandboxDisabled -= CheckSandboxVisibility;
+    }
+
     public void UnloadButton()
     {
         if (SandboxButton == null)
-        {
             return;
-        }
 
         SandboxButton.OnPressed -= SandboxButtonPressed;
     }
@@ -117,9 +142,7 @@ public sealed class SandboxUIController : UIController, IOnStateChanged<Gameplay
     public void LoadButton()
     {
         if (SandboxButton == null)
-        {
             return;
-        }
 
         SandboxButton.OnPressed += SandboxButtonPressed;
     }
@@ -181,35 +204,7 @@ public sealed class SandboxUIController : UIController, IOnStateChanged<Gameplay
         SandboxButton.Visible = _sandbox.SandboxAllowed;
     }
 
-    public void OnStateExited(GameplayState state)
-    {
-        if (_window != null)
-        {
-            _window.Close();
-            _window = null;
-        }
-
-        CommandBinds.Unregister<SandboxSystem>();
-    }
-
-    public void OnSystemLoaded(SandboxSystem system)
-    {
-        system.SandboxDisabled += CloseAll;
-        system.SandboxEnabled += CheckSandboxVisibility;
-        system.SandboxDisabled += CheckSandboxVisibility;
-    }
-
-    public void OnSystemUnloaded(SandboxSystem system)
-    {
-        system.SandboxDisabled -= CloseAll;
-        system.SandboxEnabled -= CheckSandboxVisibility;
-        system.SandboxDisabled -= CheckSandboxVisibility;
-    }
-
-    private void SandboxButtonPressed(ButtonEventArgs args)
-    {
-        ToggleWindow();
-    }
+    private void SandboxButtonPressed(ButtonEventArgs args) => ToggleWindow();
 
     private void CloseAll()
     {
@@ -218,16 +213,14 @@ public sealed class SandboxUIController : UIController, IOnStateChanged<Gameplay
         TileSpawningController.CloseWindow();
     }
 
-    private bool Copy(ICommonSession? session, EntityCoordinates coords, EntityUid uid)
-    {
-        return _sandbox.Copy(session, coords, uid);
-    }
+    private bool Copy(ICommonSession? session, EntityCoordinates coords, EntityUid uid) =>
+        _sandbox.Copy(session, coords, uid);
 
     public void ToggleWindow()
     {
         if (_window == null)
             return;
-        if (_sandbox.SandboxAllowed && _window.IsOpen != true)
+        if (_sandbox.SandboxAllowed && !_window.IsOpen)
         {
             UIManager.ClickSound();
             _window.Open();

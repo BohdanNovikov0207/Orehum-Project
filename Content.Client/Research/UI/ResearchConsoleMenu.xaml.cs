@@ -35,17 +35,17 @@ namespace Content.Client.Research.UI;
 [GenerateTypedNameReferences]
 public sealed partial class ResearchConsoleMenu : FancyWindow
 {
-    public Action<string>? OnTechnologyCardPressed;
-    public Action? OnServerButtonPressed;
-
-    [Dependency] private readonly IEntityManager _entity = default!;
-    [Dependency] private readonly IPrototypeManager _prototype = default!;
-    [Dependency] private readonly IPlayerManager _player = default!;
-    private readonly ResearchSystem _research;
-    private readonly SpriteSystem _sprite;
     private readonly AccessReaderSystem _accessReader;
 
+    [Dependency] private readonly IEntityManager _entity = default!;
+    [Dependency] private readonly IPlayerManager _player = default!;
+    [Dependency] private readonly IPrototypeManager _prototype = default!;
+    private readonly ResearchSystem _research;
+    private readonly SpriteSystem _sprite;
+
     public EntityUid Entity;
+    public Action? OnServerButtonPressed;
+    public Action<string>? OnTechnologyCardPressed;
 
     public ResearchConsoleMenu()
     {
@@ -59,10 +59,7 @@ public sealed partial class ResearchConsoleMenu : FancyWindow
         ServerButton.OnPressed += _ => OnServerButtonPressed?.Invoke();
     }
 
-    public void SetEntity(EntityUid entity)
-    {
-        Entity = entity;
-    }
+    public void SetEntity(EntityUid entity) => Entity = entity;
 
     public void UpdatePanels(ResearchConsoleBoundInterfaceState state)
     {
@@ -77,7 +74,7 @@ public sealed partial class ResearchConsoleMenu : FancyWindow
         // i can't figure out the spacing so here you go
         TechnologyCardsContainer.AddChild(new Control
         {
-            MinHeight = 10
+            MinHeight = 10,
         });
 
         var hasAccess = _player.LocalEntity is not { } local ||
@@ -86,12 +83,17 @@ public sealed partial class ResearchConsoleMenu : FancyWindow
         foreach (var techId in database.CurrentTechnologyCards)
         {
             var tech = _prototype.Index<TechnologyPrototype>(techId);
-            var cardControl = new TechnologyCardControl(tech, _prototype, _sprite, _research.GetTechnologyDescription(tech, includeTier: false), state.Points, hasAccess);
+            var cardControl = new TechnologyCardControl(tech,
+                _prototype,
+                _sprite,
+                _research.GetTechnologyDescription(tech, includeTier: false),
+                state.Points,
+                hasAccess);
             cardControl.OnPressed += () => OnTechnologyCardPressed?.Invoke(techId);
             TechnologyCardsContainer.AddChild(cardControl);
         }
 
-        var unlockedTech = database.UnlockedTechnologies.Select(x => _prototype.Index<TechnologyPrototype>(x));
+        var unlockedTech = database.UnlockedTechnologies.Select(x => _prototype.Index(x));
         SyncTechnologyList(UnlockedCardsContainer, unlockedTech);
     }
 
@@ -116,13 +118,14 @@ public sealed partial class ResearchConsoleMenu : FancyWindow
 
         var msg = new FormattedMessage();
         msg.AddMarkupOrThrow(Loc.GetString("research-console-menu-main-discipline",
-            ("name", disciplineText), ("color", disciplineColor)));
+            ("name", disciplineText),
+            ("color", disciplineColor)));
         MainDisciplineLabel.SetMessage(msg);
 
         TierDisplayContainer.Children.Clear();
         foreach (var disciplineId in database.SupportedDisciplines)
         {
-            var discipline = _prototype.Index<TechDisciplinePrototype>(disciplineId);
+            var discipline = _prototype.Index(disciplineId);
             var tier = _research.GetHighestDisciplineTier(database, discipline);
 
             // don't show tiers with no available tech
@@ -132,8 +135,8 @@ public sealed partial class ResearchConsoleMenu : FancyWindow
             // i'm building the small-ass control here to spare me some mild annoyance in making a new file
             var texture = new TextureRect
             {
-                TextureScale = new Vector2( 2, 2 ),
-                VerticalAlignment = VAlignment.Center
+                TextureScale = new Vector2(2, 2),
+                VerticalAlignment = VAlignment.Center,
             };
             var label = new RichTextLabel();
             texture.Texture = _sprite.Frame0(discipline.Icon);
@@ -147,17 +150,17 @@ public sealed partial class ResearchConsoleMenu : FancyWindow
                     label,
                     new Control
                     {
-                        MinWidth = 10
-                    }
-                }
+                        MinWidth = 10,
+                    },
+                },
             };
             TierDisplayContainer.AddChild(control);
         }
     }
 
     /// <summary>
-    ///     Synchronize a container for technology cards with a list of technologies,
-    ///     creating or removing UI cards as appropriate.
+    /// Synchronize a container for technology cards with a list of technologies,
+    /// creating or removing UI cards as appropriate.
     /// </summary>
     /// <param name="container">The container which contains the UI cards</param>
     /// <param name="technologies">The current set of technologies for which there should be cards</param>
@@ -168,9 +171,7 @@ public sealed partial class ResearchConsoleMenu : FancyWindow
         foreach (var child in container.Children)
         {
             if (child is MiniTechnologyCardControl)
-            {
                 currentTechControls.Add((child as MiniTechnologyCardControl)!.Technology, child);
-            }
         }
 
         foreach (var tech in technologies)
@@ -178,7 +179,10 @@ public sealed partial class ResearchConsoleMenu : FancyWindow
             if (!currentTechControls.ContainsKey(tech))
             {
                 // Create a card for any technology which doesn't already have one.
-                var mini = new MiniTechnologyCardControl(tech, _prototype, _sprite, _research.GetTechnologyDescription(tech));
+                var mini = new MiniTechnologyCardControl(tech,
+                    _prototype,
+                    _sprite,
+                    _research.GetTechnologyDescription(tech));
                 container.AddChild(mini);
             }
             else

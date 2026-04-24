@@ -16,17 +16,16 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     VerticalExpand="True"
     Resizable="True"
     MinHeight="300"
-    MinWidth="300"
->
+    MinWidth="300">
     <BoxContainer Orientation="Vertical">
         <BoxContainer Name="SearchContainer" Orientation="Horizontal">
             <LineEdit Name="SearchBar" Access="Public" StyleClasses="actionSearchBox" HorizontalExpand="True"
-                      PlaceHolder="{Loc ui-actionmenu-search-bar-placeholder-text}"/>
+                      PlaceHolder="{Loc ui-actionmenu-search-bar-placeholder-text}" />
         </BoxContainer>
-        <Button Name="ClearButton" Access="Public" Text="{Loc ui-actionmenu-clear-button}"/>
-        <Label Name="FilterLabel" Access="Public"/>
+        <Button Name="ClearButton" Access="Public" Text="{Loc ui-actionmenu-clear-button}" />
+        <Label Name="FilterLabel" Access="Public" />
         <ScrollContainer VerticalExpand="True" HorizontalExpand="True">
-            <GridContainer Name="ResultsGrid" Access="Public" MaxGridWidth="300"/>
+            <GridContainer Name="ResultsGrid" Access="Public" MaxGridWidth="300" />
         </ScrollContainer>
     </BoxContainer>
 </windows:ActionsWindow>

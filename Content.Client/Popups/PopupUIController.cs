@@ -19,22 +19,12 @@ namespace Content.Client.Popups;
 public sealed class PopupUIController : UIController, IOnStateEntered<GameplayState>, IOnStateExited<GameplayState>
 {
     [UISystemDependency] private readonly PopupSystem? _popup = default!;
-
-    private Font _smallFont = default!;
-    private Font _mediumFont = default!;
     private Font _largeFont = default!;
+    private Font _mediumFont = default!;
 
     private PopupRootControl? _popupControl;
 
-    public override void Initialize()
-    {
-        base.Initialize();
-        var cache = IoCManager.Resolve<IResourceCache>();
-
-        _smallFont = new VectorFont(cache.GetResource<FontResource>("/Fonts/NotoSans/NotoSans-Italic.ttf"), 10);
-        _mediumFont = new VectorFont(cache.GetResource<FontResource>("/Fonts/NotoSans/NotoSans-Italic.ttf"), 12);
-        _largeFont = new VectorFont(cache.GetResource<FontResource>("/Fonts/NotoSans/NotoSans-BoldItalic.ttf"), 14);
-    }
+    private Font _smallFont = default!;
 
     public void OnStateEntered(GameplayState state)
     {
@@ -52,6 +42,16 @@ public sealed class PopupUIController : UIController, IOnStateEntered<GameplaySt
         _popupControl = null;
     }
 
+    public override void Initialize()
+    {
+        base.Initialize();
+        var cache = IoCManager.Resolve<IResourceCache>();
+
+        _smallFont = new VectorFont(cache.GetResource<FontResource>("/Fonts/NotoSans/NotoSans-Italic.ttf"), 10);
+        _mediumFont = new VectorFont(cache.GetResource<FontResource>("/Fonts/NotoSans/NotoSans-Italic.ttf"), 12);
+        _largeFont = new VectorFont(cache.GetResource<FontResource>("/Fonts/NotoSans/NotoSans-BoldItalic.ttf"), 14);
+    }
+
     public void DrawPopup(PopupSystem.PopupLabel popup, DrawingHandleScreen handle, Vector2 position, float scale)
     {
         var lifetime = PopupSystem.GetPopupLifetime(popup);
@@ -59,7 +59,9 @@ public sealed class PopupUIController : UIController, IOnStateEntered<GameplaySt
         // Keep alpha at 1 until TotalTime passes half its lifetime, then gradually decrease to 0.
         var alpha = MathF.Min(1f, 1f - MathF.Max(0f, popup.TotalTime - lifetime / 2) * 2 / lifetime);
 
-        var updatedPosition = position - new Vector2(0f, MathF.Min(8f, 12f * (popup.TotalTime * popup.TotalTime + popup.TotalTime)));
+        var updatedPosition = position -
+                              new Vector2(0f,
+                                  MathF.Min(8f, 12f * (popup.TotalTime * popup.TotalTime + popup.TotalTime)));
         var font = _smallFont;
         var color = Color.White.WithAlpha(alpha);
 
@@ -95,8 +97,8 @@ public sealed class PopupUIController : UIController, IOnStateEntered<GameplaySt
     /// </summary>
     private sealed class PopupRootControl : Control
     {
-        private readonly PopupSystem? _popup;
         private readonly PopupUIController _controller;
+        private readonly PopupSystem? _popup;
 
         public PopupRootControl(PopupSystem? system, PopupUIController controller)
         {

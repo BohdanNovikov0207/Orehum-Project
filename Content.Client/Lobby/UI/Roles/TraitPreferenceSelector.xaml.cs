@@ -17,14 +17,6 @@ public sealed partial class TraitPreferenceSelector : Control
 {
     public int Cost;
 
-    public bool Preference
-    {
-        get => Checkbox.Pressed;
-        set => Checkbox.Pressed = value;
-    }
-
-    public event Action<bool>? PreferenceChanged;
-
     public TraitPreferenceSelector(TraitPrototype trait)
     {
         RobustXamlLoader.Load(this);
@@ -37,13 +29,16 @@ public sealed partial class TraitPreferenceSelector : Control
         Checkbox.OnToggled += OnCheckBoxToggled;
 
         if (trait.Description is { } desc)
-        {
             Checkbox.ToolTip = Loc.GetString(desc);
-        }
     }
 
-    private void OnCheckBoxToggled(BaseButton.ButtonToggledEventArgs args)
+    public bool Preference
     {
-        PreferenceChanged?.Invoke(Preference);
+        get => Checkbox.Pressed;
+        set => Checkbox.Pressed = value;
     }
+
+    public event Action<bool>? PreferenceChanged;
+
+    private void OnCheckBoxToggled(BaseButton.ButtonToggledEventArgs args) => PreferenceChanged?.Invoke(Preference);
 }

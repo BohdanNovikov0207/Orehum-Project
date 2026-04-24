@@ -19,13 +19,14 @@ namespace Content.Client.Light.EntitySystems;
 
 public sealed class RotatingLightSystem : SharedRotatingLightSystem
 {
+    private const string AnimKey = "rotating_light";
     [Dependency] private readonly AnimationPlayerSystem _animations = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
 
     private Animation GetAnimation(float speed, int dir) // Goob edit
     {
         var third = 120f / speed;
-        return new Animation()
+        return new Animation
         {
             Length = TimeSpan.FromSeconds(360f / speed),
             AnimationTracks =
@@ -41,15 +42,13 @@ public sealed class RotatingLightSystem : SharedRotatingLightSystem
                         // Goob edit start
                         new AnimationTrackProperty.KeyFrame(Angle.FromDegrees(120 * dir), third),
                         new AnimationTrackProperty.KeyFrame(Angle.FromDegrees(240 * dir), third),
-                        new AnimationTrackProperty.KeyFrame(Angle.FromDegrees(360 * dir), third)
+                        new AnimationTrackProperty.KeyFrame(Angle.FromDegrees(360 * dir), third),
                         // Goob edit end
-                    }
-                }
-            }
+                    },
+                },
+            },
         };
     }
-
-    private const string AnimKey = "rotating_light";
 
     public override void Initialize()
     {
@@ -78,13 +77,9 @@ public sealed class RotatingLightSystem : SharedRotatingLightSystem
             return;
 
         if (comp.Enabled)
-        {
             PlayAnimation(uid, comp, player);
-        }
         else
-        {
             _animations.Stop(uid, player, AnimKey);
-        }
     }
 
     private void OnAnimationComplete(EntityUid uid, RotatingLightComponent comp, AnimationCompletedEvent args)
@@ -98,14 +93,14 @@ public sealed class RotatingLightSystem : SharedRotatingLightSystem
     /// <summary>
     /// Play the light rotation animation.
     /// </summary>
-    public void PlayAnimation(EntityUid uid, RotatingLightComponent? comp = null, AnimationPlayerComponent? player = null)
+    public void PlayAnimation(EntityUid uid,
+        RotatingLightComponent? comp = null,
+        AnimationPlayerComponent? player = null)
     {
         if (!Resolve(uid, ref comp, ref player) || !comp.Enabled)
             return;
 
         if (!_animations.HasRunningAnimation(uid, player, AnimKey))
-        {
             _animations.Play((uid, player), GetAnimation(comp.Speed, comp.Direction), AnimKey); // Goob edit
-        }
     }
 }

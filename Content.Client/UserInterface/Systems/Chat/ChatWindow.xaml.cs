@@ -33,7 +33,7 @@ public sealed partial class ChatWindow : FancyWindow
         var filter = Chatbox.ChatInput.FilterButton.Popup;
         foreach (var c in Enum.GetValues(typeof(ChatChannel)))
         {
-            var channel = (ChatChannel)c;
+            var channel = (ChatChannel) c;
             var isAdminInterest = channel == ChatChannel.Admin
                                   || channel == ChatChannel.AdminChat
                                   || channel == ChatChannel.AdminAlert

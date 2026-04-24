@@ -11,9 +11,9 @@ SPDX-License-Identifier: MIT
 -->
 
 <DefaultWindow xmlns="https://spacestation14.io"
-            xmlns:power="clr-namespace:Content.Client.Power"
-            Title="{Loc 'solar-control-window-title'}"
-            Resizable="False">
+               xmlns:power="clr-namespace:Content.Client.Power"
+               Title="{Loc 'solar-control-window-title'}"
+               Resizable="False">
     <BoxContainer Orientation="Horizontal">
         <GridContainer Columns="2">
             <!--
@@ -22,23 +22,24 @@ SPDX-License-Identifier: MIT
                 layouter autoresizes the window to be too small
             -->
 
-            <Label Text="{Loc 'solar-control-window-output-power'}"/><Label Text=""/>
-            <Label Name="OutputPower"/><Label Text="{Loc 'solar-control-window-watts'}"/>
+            <Label Text="{Loc 'solar-control-window-output-power'}" /><Label Text="" />
+            <Label Name="OutputPower" /><Label Text="{Loc 'solar-control-window-watts'}" />
 
-            <Label Text="{Loc 'solar-control-window-sun-angle'}"/><Label Text=""/>
-            <Label Name="SunAngle"/><Label Text="{Loc 'solar-control-window-degrees'}"/>
-
-
-            <Label Text="{Loc 'solar-control-window-panel-angle'}"/><Label Text=""/>
-            <LineEdit Name="PanelRotation" HorizontalExpand="True"/><Label Text="{Loc 'solar-control-window-degrees'}"/>
-
-            <Label Text="{Loc 'solar-control-window-panel-angular-velocity'}"/><Label Text=""/>
-            <LineEdit Name="PanelVelocity" HorizontalExpand="True"/><Label Text="{Loc 'solar-control-window-degrees-per-minute'}"/>
+            <Label Text="{Loc 'solar-control-window-sun-angle'}" /><Label Text="" />
+            <Label Name="SunAngle" /><Label Text="{Loc 'solar-control-window-degrees'}" />
 
 
-            <Label Text="{Loc 'solar-control-window-press-enter-to-confirm'}"/><Label Text=""/>
+            <Label Text="{Loc 'solar-control-window-panel-angle'}" /><Label Text="" />
+            <LineEdit Name="PanelRotation" HorizontalExpand="True" />
+            <Label Text="{Loc 'solar-control-window-degrees'}" />
+
+            <Label Text="{Loc 'solar-control-window-panel-angular-velocity'}" /><Label Text="" />
+            <LineEdit Name="PanelVelocity" HorizontalExpand="True" />
+            <Label Text="{Loc 'solar-control-window-degrees-per-minute'}" />
+
+
+            <Label Text="{Loc 'solar-control-window-press-enter-to-confirm'}" /><Label Text="" />
         </GridContainer>
-        <power:SolarControlNotARadar Name="NotARadar"/>
+        <power:SolarControlNotARadar Name="NotARadar" />
     </BoxContainer>
 </DefaultWindow>
-

@@ -20,14 +20,9 @@ public sealed partial class IFFConsoleWindow : FancyWindow,
 {
     private readonly ButtonGroup _showIFFButtonGroup = new();
     private readonly ButtonGroup _showVesselButtonGroup = new();
-    public event Action<bool>? ShowIFF;
-    public event Action<bool>? ShowVessel;
-
-    // CorvaxGoob-IIF-Improves-Start
-    public event Action<Color, string>? ApplyRadarSettings; 
+    private Color _currentColor = Color.Gold;
 
     private string? _currentGridName;
-    private Color _currentColor = Color.Gold;
     // CorvaxGoob-IIF-End
 
     public IFFConsoleWindow()
@@ -43,29 +38,8 @@ public sealed partial class IFFConsoleWindow : FancyWindow,
         ShowVesselOnButton.OnPressed += args => ShowVesselPressed(true);
         ShowVesselOffButton.OnPressed += args => ShowVesselPressed(false);
 
-        ApplySettings.OnPressed += args => ApplySettingsPressed(ColorPicker.Color, ShuttleName.Text); // CorvaxGoob-IIF-Improves
-    }
-
-    private void ShowIFFPressed(bool pressed)
-    {
-        ShowIFF?.Invoke(pressed);
-    }
-
-    private void ShowVesselPressed(bool pressed)
-    {
-        ShowVessel?.Invoke(pressed);
-    }
-
-    // CorvaxGoob-IIF-Improves-Start
-    private void ApplySettingsPressed(Color newColor, string newGridName)
-    {
-        if (newColor != _currentColor || newGridName != _currentGridName)
-        {
-            _currentColor = newColor;
-            _currentGridName = newGridName;
-
-            ApplyRadarSettings?.Invoke(newColor, newGridName);
-        }
+        ApplySettings.OnPressed +=
+            args => ApplySettingsPressed(ColorPicker.Color, ShuttleName.Text); // CorvaxGoob-IIF-Improves
     }
     // CorvaxGoob-IIF-Improves-End
 
@@ -77,13 +51,9 @@ public sealed partial class IFFConsoleWindow : FancyWindow,
             ShowIFFOnButton.Disabled = false;
 
             if ((state.Flags & IFFFlags.HideLabel) != 0x0)
-            {
                 ShowIFFOffButton.Pressed = true;
-            }
             else
-            {
                 ShowIFFOnButton.Pressed = true;
-            }
         }
         else
         {
@@ -97,13 +67,9 @@ public sealed partial class IFFConsoleWindow : FancyWindow,
             ShowVesselOnButton.Disabled = false;
 
             if ((state.Flags & IFFFlags.Hide) != 0x0)
-            {
                 ShowVesselOffButton.Pressed = true;
-            }
             else
-            {
                 ShowVesselOnButton.Pressed = true;
-            }
         }
         else
         {
@@ -117,5 +83,27 @@ public sealed partial class IFFConsoleWindow : FancyWindow,
 
         ColorPicker.Color = state.Color;
         // CorvaxGoob-IIF-Improves-End
+    }
+
+    public event Action<bool>? ShowIFF;
+    public event Action<bool>? ShowVessel;
+
+    // CorvaxGoob-IIF-Improves-Start
+    public event Action<Color, string>? ApplyRadarSettings;
+
+    private void ShowIFFPressed(bool pressed) => ShowIFF?.Invoke(pressed);
+
+    private void ShowVesselPressed(bool pressed) => ShowVessel?.Invoke(pressed);
+
+    // CorvaxGoob-IIF-Improves-Start
+    private void ApplySettingsPressed(Color newColor, string newGridName)
+    {
+        if (newColor != _currentColor || newGridName != _currentGridName)
+        {
+            _currentColor = newColor;
+            _currentGridName = newGridName;
+
+            ApplyRadarSettings?.Invoke(newColor, newGridName);
+        }
     }
 }

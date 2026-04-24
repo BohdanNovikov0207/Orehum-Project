@@ -86,9 +86,9 @@ public sealed class MappingManager : IPostInjectInit
 {
     [Dependency] private readonly IFileDialogManager _file = default!;
     [Dependency] private readonly IClientNetManager _net = default!;
+    private MappingMapDataMessage? _mapData;
 
     private Stream? _saveStream;
-    private MappingMapDataMessage? _mapData;
 
     public void PostInject()
     {

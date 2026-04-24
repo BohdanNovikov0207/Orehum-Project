@@ -89,14 +89,14 @@ public sealed class HTNOverlay : Overlay
     private readonly Font _font = default!;
     private readonly SharedTransformSystem _transformSystem;
 
-    public override OverlaySpace Space => OverlaySpace.ScreenSpace;
-
     public HTNOverlay(IEntityManager entManager, IResourceCache resourceCache)
     {
         _entManager = entManager;
         _font = new VectorFont(resourceCache.GetResource<FontResource>("/Fonts/NotoSans/NotoSans-Regular.ttf"), 10);
         _transformSystem = _entManager.System<SharedTransformSystem>();
     }
+
+    public override OverlaySpace Space => OverlaySpace.ScreenSpace;
 
     protected override void Draw(in OverlayDrawArgs args)
     {

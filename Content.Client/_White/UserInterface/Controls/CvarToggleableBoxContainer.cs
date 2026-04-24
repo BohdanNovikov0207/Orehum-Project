@@ -8,10 +8,17 @@ public sealed class CvarToggleableBoxContainer : BoxContainer
     [Dependency] private readonly IConfigurationManager _cfg = default!;
 
     private string? _cvar;
+
+    private bool _flip;
+
+    public CvarToggleableBoxContainer()
+    {
+        IoCManager.InjectDependencies(this);
+    }
+
     [ViewVariables]
     public string? CVar { get => _cvar; set => Subscribe(value); }
 
-    private bool _flip;
     [ViewVariables]
     public bool Flip
     {
@@ -21,11 +28,6 @@ public sealed class CvarToggleableBoxContainer : BoxContainer
             _flip = value;
             Refresh();
         }
-    }
-
-    public CvarToggleableBoxContainer() : base()
-    {
-        IoCManager.InjectDependencies(this);
     }
 
     private void UpdateVisibility(bool value) => Visible = value ^ _flip;

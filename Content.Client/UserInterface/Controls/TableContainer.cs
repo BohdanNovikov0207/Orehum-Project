@@ -17,32 +17,31 @@ namespace Content.Client.UserInterface.Controls;
 // EMO: thank you PJB i was going to kill myself.
 
 /// <summary>
-/// Displays children in a tabular grid. Unlike <see cref="GridContainer"/>,
-/// properly handles layout constraints so putting word-wrapping <see cref="RichTextLabel"/> in it should work.
+/// Displays children in a tabular grid. Unlike <see cref="GridContainer" />,
+/// properly handles layout constraints so putting word-wrapping <see cref="RichTextLabel" /> in it should work.
 /// </summary>
 /// <remarks>
-/// All children are automatically laid out in <see cref="Columns"/> columns.
+/// All children are automatically laid out in <see cref="Columns" /> columns.
 /// The first control is in the top left, laid out per row from there.
 /// </remarks>
 [Virtual]
 public class TableContainer : Container
 {
+    // Scratch space used while calculating layout, cached to avoid regular allocations during layout pass.
+    private ColumnData[] _columnDataCache = [];
     private int _columns = 1;
+    private RowData[] _rowDataCache = [];
 
     /// <summary>
     /// The absolute minimum width a column can be forced to.
     /// </summary>
     /// <remarks>
-    /// <para>
-    /// If a column *asks* for less width than this (small contents), it can still be smaller.
-    /// But if it asks for more it cannot go below this width.
-    /// </para>
+    ///     <para>
+    ///     If a column *asks* for less width than this (small contents), it can still be smaller.
+    ///     But if it asks for more it cannot go below this width.
+    ///     </para>
     /// </remarks>
     public float MinForcedColumnWidth { get; set; } = 50;
-
-    // Scratch space used while calculating layout, cached to avoid regular allocations during layout pass.
-    private ColumnData[] _columnDataCache = [];
-    private RowData[] _rowDataCache = [];
 
     /// <summary>
     /// How many columns should be displayed.
@@ -52,7 +51,7 @@ public class TableContainer : Container
         get => _columns;
         set
         {
-            ArgumentOutOfRangeException.ThrowIfLessThan(value, 1, nameof(value));
+            ArgumentOutOfRangeException.ThrowIfLessThan(value, 1);
 
             _columns = value;
         }
@@ -116,7 +115,7 @@ public class TableContainer : Container
             // at least without causing *some* sort of word wrapping (assuming text contents).
             //
             // Assign horizontal space proportional to the wanted maximum size of the columns.
-            var assignableWidth =  Math.Max(0, availableSize.X - totalMinWidth);
+            var assignableWidth = Math.Max(0, availableSize.X - totalMinWidth);
             for (var c = 0; c < _columns; c++)
             {
                 ref var column = ref _columnDataCache[c];
@@ -204,7 +203,10 @@ public class TableContainer : Container
                     break;
                 var child = GetChild(c + r * _columns);
 
-                child.Arrange(UIBox2.FromDimensions(column.ArrangedX, arrangeY, column.ArrangedWidth, row.MeasuredHeight));
+                child.Arrange(UIBox2.FromDimensions(column.ArrangedX,
+                    arrangeY,
+                    column.ArrangedWidth,
+                    row.MeasuredHeight));
             }
 
             arrangeY += row.MeasuredHeight;
@@ -250,7 +252,7 @@ public class TableContainer : Container
 
         /// <summary>
         /// The minimum width this column may be given.
-        /// This is either <see cref="MaxWidth"/> or <see cref="TableContainer.MinForcedColumnWidth"/>.
+        /// This is either <see cref="MaxWidth" /> or <see cref="TableContainer.MinForcedColumnWidth" />.
         /// </summary>
         public float MinWidth;
 

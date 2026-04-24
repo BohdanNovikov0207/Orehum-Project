@@ -25,7 +25,8 @@ public sealed class WieldableSystem : SharedWieldableSystem
         base.Initialize();
 
         SubscribeLocalEvent<CursorOffsetRequiresWieldComponent, ItemUnwieldedEvent>(OnEyeOffsetUnwielded);
-        SubscribeLocalEvent<CursorOffsetRequiresWieldComponent, HeldRelayedEvent<GetEyeOffsetRelayedEvent>>(OnGetEyeOffset);
+        SubscribeLocalEvent<CursorOffsetRequiresWieldComponent, HeldRelayedEvent<GetEyeOffsetRelayedEvent>>(
+            OnGetEyeOffset);
     }
 
     public void OnEyeOffsetUnwielded(Entity<CursorOffsetRequiresWieldComponent> entity, ref ItemUnwieldedEvent args)
@@ -37,7 +38,8 @@ public sealed class WieldableSystem : SharedWieldableSystem
             cursorOffsetComp.CurrentPosition = Vector2.Zero;
     }
 
-    public void OnGetEyeOffset(Entity<CursorOffsetRequiresWieldComponent> entity, ref HeldRelayedEvent<GetEyeOffsetRelayedEvent> args)
+    public void OnGetEyeOffset(Entity<CursorOffsetRequiresWieldComponent> entity,
+        ref HeldRelayedEvent<GetEyeOffsetRelayedEvent> args)
     {
         if (!TryComp(entity.Owner, out WieldableComponent? wieldableComp))
             return;

@@ -18,26 +18,26 @@ public sealed class AmbientOcclusionOverlay : Overlay
     private static readonly ProtoId<ShaderPrototype> UnshadedShader = "unshaded";
     private static readonly ProtoId<ShaderPrototype> StencilMaskShader = "StencilMask";
     private static readonly ProtoId<ShaderPrototype> StencilEqualDrawShader = "StencilEqualDraw";
+    [Dependency] private readonly IConfigurationManager _cfgManager = default!;
 
     [Dependency] private readonly IClyde _clyde = default!;
-    [Dependency] private readonly IConfigurationManager _cfgManager = default!;
     [Dependency] private readonly IEntityManager _entManager = default!;
     [Dependency] private readonly IMapManager _mapManager = default!;
     [Dependency] private readonly IPrototypeManager _proto = default!;
-
-    public override OverlaySpace Space => OverlaySpace.WorldSpaceBelowEntities;
-
-    private IRenderTexture? _aoTarget;
     private IRenderTexture? _aoBlurBuffer;
 
     // Couldn't figure out a way to avoid this so if you can then please do.
     private IRenderTexture? _aoStencilTarget;
+
+    private IRenderTexture? _aoTarget;
 
     public AmbientOcclusionOverlay()
     {
         IoCManager.InjectDependencies(this);
         ZIndex = AfterLightTargetOverlay.ContentZIndex + 1;
     }
+
+    public override OverlaySpace Space => OverlaySpace.WorldSpaceBelowEntities;
 
     protected override void Draw(in OverlayDrawArgs args)
     {
@@ -72,19 +72,25 @@ public sealed class AmbientOcclusionOverlay : Overlay
         if (_aoTarget?.Texture.Size != target.Size)
         {
             _aoTarget?.Dispose();
-            _aoTarget = _clyde.CreateRenderTarget(target.Size, new RenderTargetFormatParameters(RenderTargetColorFormat.Rgba8Srgb), name: "ambient-occlusion-target");
+            _aoTarget = _clyde.CreateRenderTarget(target.Size,
+                new RenderTargetFormatParameters(RenderTargetColorFormat.Rgba8Srgb),
+                name: "ambient-occlusion-target");
         }
 
         if (_aoBlurBuffer?.Texture.Size != target.Size)
         {
             _aoBlurBuffer?.Dispose();
-            _aoBlurBuffer = _clyde.CreateRenderTarget(target.Size, new RenderTargetFormatParameters(RenderTargetColorFormat.Rgba8Srgb), name: "ambient-occlusion-blur-target");
+            _aoBlurBuffer = _clyde.CreateRenderTarget(target.Size,
+                new RenderTargetFormatParameters(RenderTargetColorFormat.Rgba8Srgb),
+                name: "ambient-occlusion-blur-target");
         }
 
         if (_aoStencilTarget?.Texture.Size != target.Size)
         {
             _aoStencilTarget?.Dispose();
-            _aoStencilTarget = _clyde.CreateRenderTarget(target.Size, new RenderTargetFormatParameters(RenderTargetColorFormat.Rgba8Srgb), name: "ambient-occlusion-stencil-target");
+            _aoStencilTarget = _clyde.CreateRenderTarget(target.Size,
+                new RenderTargetFormatParameters(RenderTargetColorFormat.Rgba8Srgb),
+                name: "ambient-occlusion-stencil-target");
         }
 
         // Draw the texture data to the texture.
@@ -104,7 +110,8 @@ public sealed class AmbientOcclusionOverlay : Overlay
                     // 4 pixels
                     worldHandle.DrawRect(Box2.UnitCentered.Enlarged(distance / EyeManager.PixelsPerMeter), Color.White);
                 }
-            }, Color.Transparent);
+            },
+            Color.Transparent);
 
         _clyde.BlurRenderTarget(viewport, _aoTarget, _aoBlurBuffer, viewport.Eye!, 14f);
 
@@ -131,8 +138,8 @@ public sealed class AmbientOcclusionOverlay : Overlay
                         worldHandle.DrawRect(bounds, Color.White);
                     }
                 }
-
-            }, Color.Transparent);
+            },
+            Color.Transparent);
 
         // Draw the stencil texture to depth buffer.
         worldHandle.UseShader(_proto.Index(StencilMaskShader).Instance());

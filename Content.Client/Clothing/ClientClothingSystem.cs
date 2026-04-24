@@ -61,31 +61,33 @@ public sealed class ClientClothingSystem : ClothingSystem
 
     /// <summary>
     /// This is a shitty hotfix written by me (Paul) to save me from renaming all files.
-    /// For some context, im currently refactoring inventory. Part of that is slots not being indexed by a massive enum anymore, but by strings.
-    /// Problem here: Every rsi-state is using the old enum-names in their state. I already used the new inventoryslots ALOT. tldr: its this or another week of renaming files.
+    /// For some context, im currently refactoring inventory. Part of that is slots not being indexed by a massive enum
+    /// anymore, but by strings.
+    /// Problem here: Every rsi-state is using the old enum-names in their state. I already used the new inventoryslots ALOT.
+    /// tldr: its this or another week of renaming files.
     /// </summary>
     private static readonly Dictionary<string, string> TemporarySlotMap = new()
     {
-        {"head", "HELMET"},
-        {"eyes", "EYES"},
-        {"ears", "EARS"},
-        {"mask", "MASK"},
-        {"outerClothing", "OUTERCLOTHING"},
-        {Jumpsuit, "INNERCLOTHING"},
-        {"neck", "NECK"},
-        {"back", "BACKPACK"},
-        {"belt", "BELT"},
-        {"gloves", "HAND"},
-        {"shoes", "FEET"},
-        {"id", "IDCARD"},
-        {"pocket1", "POCKET1"},
-        {"pocket2", "POCKET2"},
-        {"suitstorage", "SUITSTORAGE"},
+        { "head", "HELMET" },
+        { "eyes", "EYES" },
+        { "ears", "EARS" },
+        { "mask", "MASK" },
+        { "outerClothing", "OUTERCLOTHING" },
+        { Jumpsuit, "INNERCLOTHING" },
+        { "neck", "NECK" },
+        { "back", "BACKPACK" },
+        { "belt", "BELT" },
+        { "gloves", "HAND" },
+        { "shoes", "FEET" },
+        { "id", "IDCARD" },
+        { "pocket1", "POCKET1" },
+        { "pocket2", "POCKET2" },
+        { "suitstorage", "SUITSTORAGE" },
     };
 
     [Dependency] private readonly IResourceCache _cache = default!;
-    [Dependency] private readonly InventorySystem _inventorySystem = default!;
     [Dependency] private readonly DisplacementMapSystem _displacement = default!;
+    [Dependency] private readonly InventorySystem _inventorySystem = default!;
     [Dependency] private readonly SpriteSystem _sprite = default!;
 
     public override void Initialize()
@@ -116,10 +118,8 @@ public sealed class ClientClothingSystem : ClothingSystem
         }
     }
 
-    private void OnInventoryTemplateUpdated(Entity<InventoryComponent> ent, ref InventoryTemplateUpdated args)
-    {
+    private void OnInventoryTemplateUpdated(Entity<InventoryComponent> ent, ref InventoryTemplateUpdated args) =>
         UpdateAllSlots(ent.Owner, ent.Comp);
-    }
 
     private void UpdateAllSlots(
         EntityUid uid,
@@ -169,12 +169,15 @@ public sealed class ClientClothingSystem : ClothingSystem
     }
 
     /// <summary>
-    ///     If no explicit clothing visuals were specified, this attempts to populate with default values.
+    /// If no explicit clothing visuals were specified, this attempts to populate with default values.
     /// </summary>
     /// <remarks>
-    ///     Useful for lazily adding clothing sprites without modifying yaml. And for backwards compatibility.
+    /// Useful for lazily adding clothing sprites without modifying yaml. And for backwards compatibility.
     /// </remarks>
-    private bool TryGetDefaultVisuals(EntityUid uid, ClothingComponent clothing, string slot, string? speciesId,
+    private bool TryGetDefaultVisuals(EntityUid uid,
+        ClothingComponent clothing,
+        string slot,
+        string? speciesId,
         [NotNullWhen(true)] out List<PrototypeLayerData>? layers)
     {
         layers = null;
@@ -191,7 +194,6 @@ public sealed class ClientClothingSystem : ClothingSystem
 
         var correctedSlot = slot;
         TemporarySlotMap.TryGetValue(correctedSlot, out correctedSlot);
-
 
 
         var state = $"equipped-{correctedSlot}";
@@ -211,7 +213,7 @@ public sealed class ClientClothingSystem : ClothingSystem
         var layer = new PrototypeLayerData();
         layer.RsiPath = rsi.Path.ToString();
         layer.State = state;
-        layers = new() { layer };
+        layers = new List<PrototypeLayerData> { layer };
 
         return true;
     }
@@ -240,6 +242,7 @@ public sealed class ClientClothingSystem : ClothingSystem
         {
             _sprite.RemoveLayer(entity.AsNullable(), layer);
         }
+
         revealedLayers.Clear();
     }
 
@@ -262,15 +265,17 @@ public sealed class ClientClothingSystem : ClothingSystem
         RenderEquipment(args.Equipee, uid, args.Slot, clothingComponent: component);
     }
 
-    private void RenderEquipment(EntityUid equipee, EntityUid equipment, string slot,
-        InventoryComponent? inventory = null, SpriteComponent? sprite = null, ClothingComponent? clothingComponent = null,
+    private void RenderEquipment(EntityUid equipee,
+        EntityUid equipment,
+        string slot,
+        InventoryComponent? inventory = null,
+        SpriteComponent? sprite = null,
+        ClothingComponent? clothingComponent = null,
         InventorySlotsComponent? inventorySlots = null)
     {
         if (!Resolve(equipee, ref inventory, ref sprite, ref inventorySlots) ||
-           !Resolve(equipment, ref clothingComponent, false))
-        {
+            !Resolve(equipment, ref clothingComponent, false))
             return;
-        }
 
         if (!_inventorySystem.TryGetSlot(equipee, slot, out var slotDef, inventory))
             return;
@@ -283,11 +288,12 @@ public sealed class ClientClothingSystem : ClothingSystem
             {
                 _sprite.RemoveLayer((equipee, sprite), key);
             }
+
             revealedLayers.Clear();
         }
         else
         {
-            revealedLayers = new();
+            revealedLayers = new HashSet<string>();
             inventorySlots.VisualLayerKeys[slot] = revealedLayers;
         }
 
@@ -341,7 +347,8 @@ public sealed class ClientClothingSystem : ClothingSystem
         {
             if (!revealedLayers.Add(key))
             {
-                Log.Warning($"Duplicate key for clothing visuals: {key}. Are multiple components attempting to modify the same layer? Equipment: {ToPrettyString(equipment)}");
+                Log.Warning(
+                    $"Duplicate key for clothing visuals: {key}. Are multiple components attempting to modify the same layer? Equipment: {ToPrettyString(equipment)}");
                 continue;
             }
 
@@ -370,9 +377,7 @@ public sealed class ClientClothingSystem : ClothingSystem
                 && layerData.TexturePath == null
                 && layer.RSI == null
                 && TryComp(equipment, out SpriteComponent? clothingSprite))
-            {
                 _sprite.LayerSetRsi(layer, clothingSprite.BaseRSI);
-            }
 
             _sprite.LayerSetData((equipee, sprite), index, layerData);
             _sprite.LayerSetOffset(layer, layer.Offset + slotDef.Offset);
@@ -382,10 +387,15 @@ public sealed class ClientClothingSystem : ClothingSystem
             if (displacementData is not null)
             {
                 //Checking that the state is not tied to the current race. In this case we don't need to use the displacement maps.
-                if (layerData.State is not null && inventory.SpeciesId is not null && layerData.State.EndsWith(inventory.SpeciesId))
+                if (layerData.State is not null && inventory.SpeciesId is not null &&
+                    layerData.State.EndsWith(inventory.SpeciesId))
                     continue;
 
-                if (_displacement.TryAddDisplacement(displacementData, (equipee, sprite), index, key, out var displacementKey))
+                if (_displacement.TryAddDisplacement(displacementData,
+                        (equipee, sprite),
+                        index,
+                        key,
+                        out var displacementKey))
                 {
                     revealedLayers.Add(displacementKey);
                     index++;

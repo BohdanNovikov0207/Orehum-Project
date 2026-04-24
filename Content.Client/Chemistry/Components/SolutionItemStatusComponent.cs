@@ -15,14 +15,14 @@ namespace Content.Client.Chemistry.Components;
 /// <remarks>
 /// Shows the solution volume, max volume, and transfer amount.
 /// </remarks>
-/// <seealso cref="SolutionItemStatusSystem"/>
-/// <seealso cref="SolutionStatusControl"/>
+/// <seealso cref="SolutionItemStatusSystem" />
+/// <seealso cref="SolutionStatusControl" />
 [RegisterComponent]
 public sealed partial class SolutionItemStatusComponent : Component
 {
     /// <summary>
     /// The ID of the solution that will be shown on the item status control.
     /// </summary>
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    [DataField] [ViewVariables(VVAccess.ReadWrite)]
     public string Solution = "default";
 }

@@ -35,8 +35,6 @@ namespace Content.Client.Administration.UI;
 [GenerateTypedNameReferences]
 public sealed partial class AdminMenuWindow : DefaultWindow
 {
-    public event Action? OnDisposed;
-
     public AdminMenuWindow()
     {
         MinSize = new Vector2(650, 250);
@@ -53,9 +51,11 @@ public sealed partial class AdminMenuWindow : DefaultWindow
         MasterTabContainer.OnTabChanged += OnTabChanged;
     }
 
+    public event Action? OnDisposed;
+
     private void OnTabChanged(int tabIndex)
     {
-        var tabEnum = (TabIndex)tabIndex;
+        var tabEnum = (TabIndex) tabIndex;
         if (tabEnum == TabIndex.Objects)
             ObjectsTabControl.RefreshObjectList();
     }

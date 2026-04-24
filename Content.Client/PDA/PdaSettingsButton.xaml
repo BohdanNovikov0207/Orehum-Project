@@ -11,9 +11,9 @@ SPDX-License-Identifier: MIT
                        HorizontalExpand="True"
                        MinHeight="48"
                        Margin="5 4 6 0">
-<PanelContainer Name="Panel"/>
-<BoxContainer Orientation="Vertical" HorizontalExpand="True" VerticalExpand="True" Margin="8 4 0 4">
-    <Label Name="OptionName"/>
-    <Label Name="OptionDescription"/>
-</BoxContainer>
+    <PanelContainer Name="Panel" />
+    <BoxContainer Orientation="Vertical" HorizontalExpand="True" VerticalExpand="True" Margin="8 4 0 4">
+        <Label Name="OptionName" />
+        <Label Name="OptionDescription" />
+    </BoxContainer>
 </pda:PdaSettingsButton>

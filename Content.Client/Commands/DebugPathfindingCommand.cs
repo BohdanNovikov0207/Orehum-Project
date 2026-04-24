@@ -12,11 +12,11 @@
 //
 // SPDX-License-Identifier: MIT
 
+using System.Linq;
 using Content.Client.NPC;
 using Content.Shared.NPC;
 using JetBrains.Annotations;
 using Robust.Shared.Console;
-using System.Linq;
 
 namespace Content.Client.Commands;
 
@@ -48,16 +48,16 @@ public sealed class DebugPathfindingCommand : LocalizedCommands
             }
 
             system.Modes ^= mode;
-            shell.WriteLine(LocalizationManager.GetString($"cmd-{Command}-notify", ("arg", arg), ("newMode", (system.Modes & mode) != 0x0)));
+            shell.WriteLine(LocalizationManager.GetString($"cmd-{Command}-notify",
+                ("arg", arg),
+                ("newMode", (system.Modes & mode) != 0x0)));
         }
     }
 
     public override CompletionResult GetCompletion(IConsoleShell shell, string[] args)
     {
         if (args.Length > 1)
-        {
             return CompletionResult.Empty;
-        }
 
         var values = Enum.GetValues<PathfindingDebugMode>().ToList();
         var options = new List<CompletionOption>();

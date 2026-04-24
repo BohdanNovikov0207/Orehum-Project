@@ -22,11 +22,7 @@ public sealed class CarvingKnifeMenu : RadialMenu
     [Dependency] private readonly EntityManager _ent = default!;
     [Dependency] private readonly IPrototypeManager _prot = default!;
 
-    private SpriteSystem _sprites;
-
-    public EntityUid Entity { get; private set; }
-
-    public event Action<ProtoId<RuneCarvingPrototype>>? SendCarvingKnifeSystemMessageAction;
+    private readonly SpriteSystem _sprites;
 
     public CarvingKnifeMenu()
     {
@@ -34,6 +30,10 @@ public sealed class CarvingKnifeMenu : RadialMenu
         RobustXamlLoader.Load(this);
         _sprites = _ent.System<SpriteSystem>();
     }
+
+    public EntityUid Entity { get; private set; }
+
+    public event Action<ProtoId<RuneCarvingPrototype>>? SendCarvingKnifeSystemMessageAction;
 
     public void SetEntity(EntityUid ent)
     {
@@ -58,7 +58,7 @@ public sealed class CarvingKnifeMenu : RadialMenu
             {
                 SetSize = new Vector2(64, 64),
                 ToolTip = Loc.GetString(prototype.Desc),
-                ProtoId = prototype.ID
+                ProtoId = prototype.ID,
             };
 
             var texture = new TextureRect
@@ -66,7 +66,7 @@ public sealed class CarvingKnifeMenu : RadialMenu
                 VerticalAlignment = VAlignment.Center,
                 HorizontalAlignment = HAlignment.Center,
                 Texture = _sprites.Frame0(prototype.Icon),
-                TextureScale = new Vector2(2f, 2f)
+                TextureScale = new Vector2(2f, 2f),
             };
 
             button.AddChild(texture);

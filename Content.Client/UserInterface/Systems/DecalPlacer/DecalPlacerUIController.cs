@@ -16,26 +16,13 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Client.UserInterface.Systems.DecalPlacer;
 
-public sealed class DecalPlacerUIController : UIController, IOnStateExited<GameplayState>, IOnSystemChanged<SandboxSystem>
+public sealed class DecalPlacerUIController : UIController, IOnStateExited<GameplayState>,
+    IOnSystemChanged<SandboxSystem>
 {
     [Dependency] private readonly IPrototypeManager _prototypes = default!;
     [UISystemDependency] private readonly SandboxSystem _sandbox = default!;
 
     private DecalPlacerWindow? _window;
-
-    public void ToggleWindow()
-    {
-        EnsureWindow();
-
-        if (_window!.IsOpen)
-        {
-            _window.Close();
-        }
-        else if(_sandbox.SandboxAllowed)
-        {
-            _window.Open();
-        }
-    }
 
     public void OnStateExited(GameplayState state)
     {
@@ -55,6 +42,16 @@ public sealed class DecalPlacerUIController : UIController, IOnStateExited<Gamep
     {
         _sandbox.SandboxDisabled -= CloseWindow;
         _prototypes.PrototypesReloaded -= OnPrototypesReloaded;
+    }
+
+    public void ToggleWindow()
+    {
+        EnsureWindow();
+
+        if (_window!.IsOpen)
+            _window.Close();
+        else if (_sandbox.SandboxAllowed)
+            _window.Open();
     }
 
     private void OnPrototypesReloaded(PrototypesReloadedEventArgs obj)

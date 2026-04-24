@@ -16,7 +16,10 @@ namespace Content.Client._Shitmed.Choice.UI;
 [Virtual]
 public partial class ChoiceControl : Control
 {
-    public ChoiceControl() => RobustXamlLoader.Load(this);
+    public ChoiceControl()
+    {
+        RobustXamlLoader.Load(this);
+    }
 
     public void Set(string name, Texture? texture)
     {

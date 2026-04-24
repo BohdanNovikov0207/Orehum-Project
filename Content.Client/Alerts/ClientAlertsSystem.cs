@@ -96,11 +96,21 @@ namespace Content.Client.Alerts;
 [UsedImplicitly]
 public sealed class ClientAlertsSystem : AlertsSystem
 {
-    public AlertOrderPrototype? AlertOrder { get; set; }
-
     [Dependency] private readonly IPlayerManager _playerManager = default!;
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly IUserInterfaceManager _ui = default!;
+    public AlertOrderPrototype? AlertOrder { get; set; }
+
+    public IReadOnlyDictionary<AlertKey, AlertState>? ActiveAlerts
+    {
+        get
+        {
+            var ent = _playerManager.LocalEntity;
+            return ent is not null
+                ? GetActiveAlerts(ent.Value)
+                : null;
+        }
+    }
 
     public event EventHandler? ClearAlerts;
     public event EventHandler<IReadOnlyDictionary<AlertKey, AlertState>>? SyncAlerts;
@@ -114,10 +124,7 @@ public sealed class ClientAlertsSystem : AlertsSystem
         SubscribeLocalEvent<AlertsComponent, ComponentHandleState>(OnHandleState);
     }
 
-    protected override void HandledAlert()
-    {
-        _ui.ClickSound();
-    }
+    protected override void HandledAlert() => _ui.ClickSound();
 
     protected override void LoadPrototypes()
     {
@@ -126,17 +133,6 @@ public sealed class ClientAlertsSystem : AlertsSystem
         AlertOrder = _prototypeManager.EnumeratePrototypes<AlertOrderPrototype>().FirstOrDefault();
         if (AlertOrder == null)
             Log.Error("No alertOrder prototype found, alerts will be in random order");
-    }
-
-    public IReadOnlyDictionary<AlertKey, AlertState>? ActiveAlerts
-    {
-        get
-        {
-            var ent = _playerManager.LocalEntity;
-            return ent is not null
-                ? GetActiveAlerts(ent.Value)
-                : null;
-        }
     }
 
     private void OnHandleState(Entity<AlertsComponent> alerts, ref ComponentHandleState args)
@@ -155,7 +151,7 @@ public sealed class ClientAlertsSystem : AlertsSystem
             }
         }
 
-        alerts.Comp.Alerts = new(cast.Alerts);
+        alerts.Comp.Alerts = new Dictionary<AlertKey, AlertState>(cast.Alerts);
 
         foreach (var alert in clientAlerts)
         {
@@ -165,15 +161,9 @@ public sealed class ClientAlertsSystem : AlertsSystem
         UpdateHud(alerts);
     }
 
-    protected override void AfterShowAlert(Entity<AlertsComponent> alerts)
-    {
-        UpdateHud(alerts);
-    }
+    protected override void AfterShowAlert(Entity<AlertsComponent> alerts) => UpdateHud(alerts);
 
-    protected override void AfterClearAlert(Entity<AlertsComponent> alerts)
-    {
-        UpdateHud(alerts);
-    }
+    protected override void AfterClearAlert(Entity<AlertsComponent> alerts) => UpdateHud(alerts);
 
     private void UpdateHud(Entity<AlertsComponent> entity)
     {
@@ -199,13 +189,8 @@ public sealed class ClientAlertsSystem : AlertsSystem
         ClearAlerts?.Invoke(this, EventArgs.Empty);
     }
 
-    private void OnPlayerDetached(EntityUid uid, AlertsComponent component, LocalPlayerDetachedEvent args)
-    {
+    private void OnPlayerDetached(EntityUid uid, AlertsComponent component, LocalPlayerDetachedEvent args) =>
         ClearAlerts?.Invoke(this, EventArgs.Empty);
-    }
 
-    public void AlertClicked(ProtoId<AlertPrototype> alertType)
-    {
-        RaisePredictiveEvent(new ClickAlertEvent(alertType));
-    }
+    public void AlertClicked(ProtoId<AlertPrototype> alertType) => RaisePredictiveEvent(new ClickAlertEvent(alertType));
 }

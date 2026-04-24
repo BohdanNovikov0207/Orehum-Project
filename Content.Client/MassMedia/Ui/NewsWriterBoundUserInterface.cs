@@ -8,9 +8,9 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using JetBrains.Annotations;
-using Content.Shared.MassMedia.Systems;
 using Content.Shared.MassMedia.Components;
+using Content.Shared.MassMedia.Systems;
+using JetBrains.Annotations;
 using Robust.Client.UserInterface;
 using Robust.Shared.Utility;
 
@@ -24,7 +24,6 @@ public sealed class NewsWriterBoundUserInterface : BoundUserInterface
 
     public NewsWriterBoundUserInterface(EntityUid owner, Enum uiKey) : base(owner, uiKey)
     {
-
     }
 
     protected override void Open()
@@ -82,13 +81,8 @@ public sealed class NewsWriterBoundUserInterface : BoundUserInterface
         SendMessage(new NewsWriterDeleteMessage(articleNum));
     }
 
-    private void OnCreateButtonPressed()
-    {
-        SendMessage(new NewsWriterRequestDraftMessage());
-    }
+    private void OnCreateButtonPressed() => SendMessage(new NewsWriterRequestDraftMessage());
 
-    private void OnArticleDraftUpdated(string title, string content)
-    {
+    private void OnArticleDraftUpdated(string title, string content) =>
         SendMessage(new NewsWriterSaveDraftMessage(title, content));
-    }
 }

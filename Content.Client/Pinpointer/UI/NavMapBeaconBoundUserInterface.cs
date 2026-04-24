@@ -28,9 +28,7 @@ public sealed class NavMapBeaconBoundUserInterface : BoundUserInterface
         _window = this.CreateWindow<NavMapBeaconWindow>();
 
         if (EntMan.TryGetComponent(Owner, out NavMapBeaconComponent? beacon))
-        {
             _window.SetEntity(Owner, beacon);
-        }
 
         _window.OnApplyButtonPressed += (label, enabled, color) =>
         {

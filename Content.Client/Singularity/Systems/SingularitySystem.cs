@@ -16,8 +16,8 @@ using Robust.Shared.GameStates;
 namespace Content.Client.Singularity.Systems;
 
 /// <summary>
-/// The client-side version of <see cref="SharedSingularitySystem"/>.
-/// Primarily manages <see cref="SingularityComponent"/>s.
+/// The client-side version of <see cref="SharedSingularitySystem" />.
+/// Primarily manages <see cref="SingularityComponent" />s.
 /// </summary>
 public sealed class SingularitySystem : SharedSingularitySystem
 {

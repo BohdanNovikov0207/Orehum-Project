@@ -52,11 +52,11 @@ public sealed class StorageBoundUserInterface : BoundUserInterface
 {
     private StorageWindow? _window;
 
-    public Vector2? Position => _window?.Position;
-
     public StorageBoundUserInterface(EntityUid owner, Enum uiKey) : base(owner, uiKey)
     {
     }
+
+    public Vector2? Position => _window?.Position;
 
     protected override void Open()
     {
@@ -67,18 +67,13 @@ public sealed class StorageBoundUserInterface : BoundUserInterface
             .CreateStorageWindow(this);
 
         if (EntMan.TryGetComponent(Owner, out StorageComponent? storage))
-        {
             _window.UpdateContainer((Owner, storage));
-        }
 
         _window.OnClose += Close;
         _window.FlagDirty();
     }
 
-    public void Refresh()
-    {
-        _window?.FlagDirty();
-    }
+    public void Refresh() => _window?.FlagDirty();
 
     public void Reclaim()
     {

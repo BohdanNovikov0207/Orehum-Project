@@ -16,9 +16,9 @@ namespace Content.Client.Silicons.Borgs;
 /// <summary>
 /// User interface used by borgs to select their type.
 /// </summary>
-/// <seealso cref="BorgSelectTypeMenu"/>
-/// <seealso cref="BorgSwitchableTypeComponent"/>
-/// <seealso cref="BorgSwitchableTypeUiKey"/>
+/// <seealso cref="BorgSelectTypeMenu" />
+/// <seealso cref="BorgSwitchableTypeComponent" />
+/// <seealso cref="BorgSwitchableTypeUiKey" />
 [UsedImplicitly]
 public sealed class BorgSelectTypeUserInterface : BoundUserInterface
 {
@@ -34,6 +34,7 @@ public sealed class BorgSelectTypeUserInterface : BoundUserInterface
         base.Open();
 
         _menu = this.CreateWindow<BorgSelectTypeMenu>();
-        _menu.ConfirmedBorgType += (prototype, subtype) => SendPredictedMessage(new BorgSelectTypeMessage(prototype, subtype));
+        _menu.ConfirmedBorgType += (prototype, subtype) =>
+            SendPredictedMessage(new BorgSelectTypeMessage(prototype, subtype));
     }
 }

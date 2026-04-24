@@ -40,184 +40,184 @@ using Robust.Client.UserInterface.CustomControls;
 using Robust.Client.UserInterface.XAML;
 using Robust.Shared.Prototypes;
 
-namespace Content.Client.Construction.UI
+namespace Content.Client.Construction.UI;
+
+/// <summary>
+/// This is the interface for a UI View of the construction window. The point of it is to abstract away the actual
+/// UI controls and just provide higher level operations on the entire window. This View is completely passive and
+/// just raises events to the outside world. This class is controlled by the <see cref="ConstructionMenuPresenter" />.
+/// </summary>
+public interface IConstructionMenuView : IDisposable
 {
-    /// <summary>
-    /// This is the interface for a UI View of the construction window. The point of it is to abstract away the actual
-    /// UI controls and just provide higher level operations on the entire window. This View is completely passive and
-    /// just raises events to the outside world. This class is controlled by the <see cref="ConstructionMenuPresenter"/>.
-    /// </summary>
-    public interface IConstructionMenuView : IDisposable
+    // It isn't optimal to expose UI controls like this, but the UI control design is
+    // questionable so it can't be helped.
+    string[] Categories { get; set; }
+    LineEdit SearchBar { get; } // Goobstation
+    OptionButton OptionCategories { get; }
+
+    bool EraseButtonPressed { get; set; }
+    bool GridViewButtonPressed { get; set; }
+    bool BuildButtonPressed { get; set; }
+
+    ListContainer Recipes { get; }
+    ItemList RecipeStepList { get; }
+
+
+    ScrollContainer RecipesGridScrollContainer { get; }
+    GridContainer RecipesGrid { get; }
+
+    event EventHandler<(string search, string catagory)> PopulateRecipes;
+    event EventHandler<ConstructionMenu.ConstructionMenuListData?> RecipeSelected;
+    event EventHandler RecipeFavorited;
+    event EventHandler<bool> BuildButtonToggled;
+    event EventHandler<bool> EraseButtonToggled;
+    event EventHandler ClearAllGhosts;
+
+    void ClearRecipeInfo();
+    void SetRecipeInfo(string name, string description, EntityPrototype? targetPrototype, bool isItem, bool isFavorite);
+    void ResetPlacement();
+
+    #region Window Control
+
+    event Action? OnClose;
+
+    bool IsOpen { get; }
+
+    void OpenCentered();
+    void MoveToFront();
+    bool IsAtFront();
+    void Close();
+
+    #endregion
+}
+
+[GenerateTypedNameReferences]
+public sealed partial class ConstructionMenu : DefaultWindow, IConstructionMenuView
+{
+    public ConstructionMenu()
     {
-        // It isn't optimal to expose UI controls like this, but the UI control design is
-        // questionable so it can't be helped.
-        string[] Categories { get; set; }
-        LineEdit SearchBar { get; } // Goobstation
-        OptionButton OptionCategories { get; }
+        SetSize = new Vector2(560, 450);
+        MinSize = new Vector2(560, 320);
 
-        bool EraseButtonPressed { get; set; }
-        bool GridViewButtonPressed { get; set; }
-        bool BuildButtonPressed { get; set; }
+        IoCManager.InjectDependencies(this);
+        RobustXamlLoader.Load(this);
 
-        ListContainer Recipes { get; }
-        ItemList RecipeStepList { get; }
+        Title = Loc.GetString("construction-menu-title");
 
-
-        ScrollContainer RecipesGridScrollContainer { get; }
-        GridContainer RecipesGrid { get; }
-
-        event EventHandler<(string search, string catagory)> PopulateRecipes;
-        event EventHandler<ConstructionMenu.ConstructionMenuListData?> RecipeSelected;
-        event EventHandler RecipeFavorited;
-        event EventHandler<bool> BuildButtonToggled;
-        event EventHandler<bool> EraseButtonToggled;
-        event EventHandler ClearAllGhosts;
-
-        void ClearRecipeInfo();
-        void SetRecipeInfo(string name, string description, EntityPrototype? targetPrototype, bool isItem, bool isFavorite);
-        void ResetPlacement();
-
-        #region Window Control
-
-        event Action? OnClose;
-
-        bool IsOpen { get; }
-
-        void OpenCentered();
-        void MoveToFront();
-        bool IsAtFront();
-        void Close();
-
-        #endregion
-    }
-
-    [GenerateTypedNameReferences]
-    public sealed partial class ConstructionMenu : DefaultWindow, IConstructionMenuView
-    {
-        public bool BuildButtonPressed
+        BuildButton.Text = Loc.GetString("construction-menu-place-ghost");
+        Recipes.ItemPressed += (_, data) => RecipeSelected?.Invoke(this, data as ConstructionMenuListData);
+        Recipes.NoItemSelected += () => RecipeSelected?.Invoke(this, null);
+        Recipes.GenerateItem += (data, button) =>
         {
-            get => BuildButton.Pressed;
-            set => BuildButton.Pressed = value;
-        }
+            if (data is not ConstructionMenuListData (var prototype, var targetPrototype))
+                return;
 
-        public string[] Categories { get; set; } = Array.Empty<string>();
-
-        public bool EraseButtonPressed
-        {
-            get => EraseButton.Pressed;
-            set => EraseButton.Pressed = value;
-        }
-
-        public bool GridViewButtonPressed
-        {
-            get => MenuGridViewButton.Pressed;
-            set => MenuGridViewButton.Pressed = value;
-        }
-
-        public ConstructionMenu()
-        {
-            SetSize = new Vector2(560, 450);
-            MinSize = new Vector2(560, 320);
-
-            IoCManager.InjectDependencies(this);
-            RobustXamlLoader.Load(this);
-
-            Title = Loc.GetString("construction-menu-title");
-
-            BuildButton.Text = Loc.GetString("construction-menu-place-ghost");
-            Recipes.ItemPressed += (_, data) => RecipeSelected?.Invoke(this, data as ConstructionMenuListData);
-            Recipes.NoItemSelected += () => RecipeSelected?.Invoke(this, null);
-            Recipes.GenerateItem += (data, button) =>
+            var entProtoView = new EntityPrototypeView
             {
-                if (data is not ConstructionMenuListData (var prototype, var targetPrototype))
-                    return;
+                SetSize = new Vector2(32f),
+                Stretch = SpriteView.StretchMode.Fill,
+                Scale = new Vector2(2),
+                Margin = new Thickness(0, 2),
+            };
+            entProtoView.SetPrototype(targetPrototype);
 
-                var entProtoView = new EntityPrototypeView()
-                {
-                    SetSize = new(32f),
-                    Stretch = SpriteView.StretchMode.Fill,
-                    Scale = new(2),
-                    Margin = new(0, 2),
-                };
-                entProtoView.SetPrototype(targetPrototype);
-
-                var label = new Label()
-                {
-                    Text = prototype.Name,
-                    Margin = new(5, 0),
-                };
-
-                var box = new BoxContainer();
-                box.AddChild(entProtoView);
-                box.AddChild(label);
-
-                button.AddChild(box);
-                button.ToolTip = prototype.Description;
-                button.AddStyleClass(ListContainer.StyleClassListContainerButton);
+            var label = new Label
+            {
+                Text = prototype.Name,
+                Margin = new Thickness(5, 0),
             };
 
-            SearchBar.OnTextChanged += _ =>
-                PopulateRecipes?.Invoke(this, (SearchBar.Text, Categories[OptionCategories.SelectedId]));
-            OptionCategories.OnItemSelected += obj =>
-            {
-                OptionCategories.SelectId(obj.Id);
-                SearchBar.SetText(string.Empty);
-                PopulateRecipes?.Invoke(this, (SearchBar.Text, Categories[obj.Id]));
-            };
+            var box = new BoxContainer();
+            box.AddChild(entProtoView);
+            box.AddChild(label);
 
-            BuildButton.Text = Loc.GetString("construction-menu-place-ghost");
-            BuildButton.OnToggled += args => BuildButtonToggled?.Invoke(this, args.Pressed);
-            ClearButton.Text = Loc.GetString("construction-menu-clear-all");
-            ClearButton.OnPressed += _ => ClearAllGhosts?.Invoke(this, EventArgs.Empty);
-            EraseButton.Text = Loc.GetString("construction-menu-eraser-mode");
-            EraseButton.OnToggled += args => EraseButtonToggled?.Invoke(this, args.Pressed);
+            button.AddChild(box);
+            button.ToolTip = prototype.Description;
+            button.AddStyleClass(ListContainer.StyleClassListContainerButton);
+        };
 
-            FavoriteButton.OnPressed += args => RecipeFavorited?.Invoke(this, EventArgs.Empty);
-
-            MenuGridViewButton.OnPressed += _ =>
-                PopulateRecipes?.Invoke(this, (SearchBar.Text, Categories[OptionCategories.SelectedId]));
-        }
-
-        public event EventHandler? ClearAllGhosts;
-        public event EventHandler<(string search, string catagory)>? PopulateRecipes;
-        public event EventHandler<ConstructionMenuListData?>? RecipeSelected;
-        public event EventHandler? RecipeFavorited;
-        public event EventHandler<bool>? BuildButtonToggled;
-        public event EventHandler<bool>? EraseButtonToggled;
-
-        public void ResetPlacement()
+        SearchBar.OnTextChanged += _ =>
+            PopulateRecipes?.Invoke(this, (SearchBar.Text, Categories[OptionCategories.SelectedId]));
+        OptionCategories.OnItemSelected += obj =>
         {
-            BuildButton.Pressed = false;
-            EraseButton.Pressed = false;
-        }
+            OptionCategories.SelectId(obj.Id);
+            SearchBar.SetText(string.Empty);
+            PopulateRecipes?.Invoke(this, (SearchBar.Text, Categories[obj.Id]));
+        };
 
-        public void SetRecipeInfo(
-            string name,
-            string description,
-            EntityPrototype? targetPrototype,
-            bool isItem,
-            bool isFavorite)
-        {
-            BuildButton.Disabled = false;
-            BuildButton.Text = Loc.GetString(isItem ? "construction-menu-place-ghost" : "construction-menu-craft");
-            TargetName.SetMessage(name);
-            TargetDesc.SetMessage(description);
-            TargetTexture.SetPrototype(targetPrototype?.ID);
-            FavoriteButton.Visible = true;
-            FavoriteButton.Text = Loc.GetString(
-                            isFavorite ? "construction-add-favorite-button" : "construction-remove-from-favorite-button");
-        }
+        BuildButton.Text = Loc.GetString("construction-menu-place-ghost");
+        BuildButton.OnToggled += args => BuildButtonToggled?.Invoke(this, args.Pressed);
+        ClearButton.Text = Loc.GetString("construction-menu-clear-all");
+        ClearButton.OnPressed += _ => ClearAllGhosts?.Invoke(this, EventArgs.Empty);
+        EraseButton.Text = Loc.GetString("construction-menu-eraser-mode");
+        EraseButton.OnToggled += args => EraseButtonToggled?.Invoke(this, args.Pressed);
 
-        public void ClearRecipeInfo()
-        {
-            BuildButton.Disabled = true;
-            TargetName.SetMessage(string.Empty);
-            TargetDesc.SetMessage(string.Empty);
-            TargetTexture.SetPrototype(null);
-            FavoriteButton.Visible = false;
-            RecipeStepList.Clear();
-        }
+        FavoriteButton.OnPressed += args => RecipeFavorited?.Invoke(this, EventArgs.Empty);
 
-        public sealed record ConstructionMenuListData(ConstructionPrototype Prototype, EntityPrototype TargetPrototype) : ListData;
+        MenuGridViewButton.OnPressed += _ =>
+            PopulateRecipes?.Invoke(this, (SearchBar.Text, Categories[OptionCategories.SelectedId]));
     }
+
+    public bool BuildButtonPressed
+    {
+        get => BuildButton.Pressed;
+        set => BuildButton.Pressed = value;
+    }
+
+    public string[] Categories { get; set; } = Array.Empty<string>();
+
+    public bool EraseButtonPressed
+    {
+        get => EraseButton.Pressed;
+        set => EraseButton.Pressed = value;
+    }
+
+    public bool GridViewButtonPressed
+    {
+        get => MenuGridViewButton.Pressed;
+        set => MenuGridViewButton.Pressed = value;
+    }
+
+    public event EventHandler? ClearAllGhosts;
+    public event EventHandler<(string search, string catagory)>? PopulateRecipes;
+    public event EventHandler<ConstructionMenuListData?>? RecipeSelected;
+    public event EventHandler? RecipeFavorited;
+    public event EventHandler<bool>? BuildButtonToggled;
+    public event EventHandler<bool>? EraseButtonToggled;
+
+    public void ResetPlacement()
+    {
+        BuildButton.Pressed = false;
+        EraseButton.Pressed = false;
+    }
+
+    public void SetRecipeInfo(
+        string name,
+        string description,
+        EntityPrototype? targetPrototype,
+        bool isItem,
+        bool isFavorite)
+    {
+        BuildButton.Disabled = false;
+        BuildButton.Text = Loc.GetString(isItem ? "construction-menu-place-ghost" : "construction-menu-craft");
+        TargetName.SetMessage(name);
+        TargetDesc.SetMessage(description);
+        TargetTexture.SetPrototype(targetPrototype?.ID);
+        FavoriteButton.Visible = true;
+        FavoriteButton.Text = Loc.GetString(
+            isFavorite ? "construction-add-favorite-button" : "construction-remove-from-favorite-button");
+    }
+
+    public void ClearRecipeInfo()
+    {
+        BuildButton.Disabled = true;
+        TargetName.SetMessage(string.Empty);
+        TargetDesc.SetMessage(string.Empty);
+        TargetTexture.SetPrototype(null);
+        FavoriteButton.Visible = false;
+        RecipeStepList.Clear();
+    }
+
+    public sealed record ConstructionMenuListData(ConstructionPrototype Prototype, EntityPrototype TargetPrototype)
+        : ListData;
 }

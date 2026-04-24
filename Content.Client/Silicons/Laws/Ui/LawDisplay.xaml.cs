@@ -27,14 +27,13 @@ namespace Content.Client.Silicons.Laws.Ui;
 [GenerateTypedNameReferences]
 public sealed partial class LawDisplay : Control
 {
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    private static readonly TimeSpan PressCooldown = TimeSpan.FromSeconds(3);
     [Dependency] private readonly IChatManager _chatManager = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly EntityManager _entityManager = default!;
 
-    private static readonly TimeSpan PressCooldown = TimeSpan.FromSeconds(3);
-
     private readonly Dictionary<Button, TimeSpan> _nextAllowedPress = new();
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public LawDisplay(EntityUid uid, SiliconLaw law, HashSet<string>? radioChannels)
     {
@@ -95,13 +94,13 @@ public sealed partial class LawDisplay : Control
             radioChannelButton.OnPressed += _ =>
             {
                 if (radioChannel == SharedChatSystem.CommonChannel)
-                {
-                    _chatManager.SendMessage($"{SharedChatSystem.RadioCommonPrefix} {lawIdentifierPlaintext}: {lawDescriptionPlaintext}", ChatSelectChannel.Radio);
-                }
+                    _chatManager.SendMessage(
+                        $"{SharedChatSystem.RadioCommonPrefix} {lawIdentifierPlaintext}: {lawDescriptionPlaintext}",
+                        ChatSelectChannel.Radio);
                 else
-                {
-                    _chatManager.SendMessage($"{SharedChatSystem.RadioChannelPrefix}{radioChannelProto.KeyCode} {lawIdentifierPlaintext}: {lawDescriptionPlaintext}", ChatSelectChannel.Radio);
-                }
+                    _chatManager.SendMessage(
+                        $"{SharedChatSystem.RadioChannelPrefix}{radioChannelProto.KeyCode} {lawIdentifierPlaintext}: {lawDescriptionPlaintext}",
+                        ChatSelectChannel.Radio);
                 _nextAllowedPress[radioChannelButton] = _timing.CurTime + PressCooldown;
             };
 

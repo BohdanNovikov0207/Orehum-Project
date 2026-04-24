@@ -62,8 +62,8 @@ namespace Content.Client.Chat.Managers;
 
 internal sealed class ChatManager : IChatManager
 {
-    [Dependency] private readonly IClientConsoleHost _consoleHost = default!;
     [Dependency] private readonly IClientAdminManager _adminMgr = default!;
+    [Dependency] private readonly IClientConsoleHost _consoleHost = default!;
     [Dependency] private readonly IEntitySystemManager _systems = default!;
 
     private ISawmill _sawmill = default!;
@@ -85,26 +85,9 @@ internal sealed class ChatManager : IChatManager
         // See server-side manager. This just exists for shared code.
     }
 
-    public void ChatMessageToAll( // Einstein Engines: Make ChatMessageToAll available in Shared
-        ChatChannel channel,
-        string message,
-        string wrappedMessage,
-        EntityUid source,
-        bool hideChat,
-        bool recordReplay,
-        Color? colorOverride = null,
-        string? audioPath = null,
-        float audioVolume = 0,
-        NetUserId? author = null,
-        bool ignoreChatStack = false
-    )
-    {
-        // See server-side code. This method only exists for shared.
-    }
-
     public void SendMessage(string text, ChatSelectChannel channel)
     {
-        var str = text.ToString();
+        var str = text;
         switch (channel)
         {
             case ChatSelectChannel.Console:
@@ -129,7 +112,7 @@ internal sealed class ChatManager : IChatManager
                 break;
 
             case ChatSelectChannel.Dead:
-                if (_systems.GetEntitySystemOrNull<GhostSystem>() is {IsGhost: true})
+                if (_systems.GetEntitySystemOrNull<GhostSystem>() is { IsGhost: true })
                     goto case ChatSelectChannel.Local;
 
                 if (_adminMgr.HasFlag(AdminFlags.Admin))
@@ -163,8 +146,22 @@ internal sealed class ChatManager : IChatManager
     }
 
     //Nyano - Summary: fires off the update permissions script.
-    public void UpdatePermissions()
+    public void UpdatePermissions() => PermissionsUpdated?.Invoke();
+
+    public void ChatMessageToAll( // Einstein Engines: Make ChatMessageToAll available in Shared
+        ChatChannel channel,
+        string message,
+        string wrappedMessage,
+        EntityUid source,
+        bool hideChat,
+        bool recordReplay,
+        Color? colorOverride = null,
+        string? audioPath = null,
+        float audioVolume = 0,
+        NetUserId? author = null,
+        bool ignoreChatStack = false
+    )
     {
-        PermissionsUpdated?.Invoke();
+        // See server-side code. This method only exists for shared.
     }
 }

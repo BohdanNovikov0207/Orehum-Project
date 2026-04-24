@@ -36,9 +36,7 @@ public sealed class CrewManifestListing : BoxContainer
             {
                 // this is a little expensive, and could be better
                 if (department.Roles.Contains(entry.JobPrototype))
-                {
                     entryDict.GetOrNew(department).Add(entry);
-                }
             }
         }
 

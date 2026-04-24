@@ -17,6 +17,13 @@ namespace Content.Client.Parallax.Data;
 public sealed partial class ParallaxLayerConfig
 {
     /// <summary>
+    /// Should the parallax scroll at a specific rate per second.
+    /// </summary>
+    [DataField("scrolling")] public Vector2 Scrolling = Vector2.Zero;
+
+    [DataField("shader")] public string? Shader = "unshaded";
+
+    /// <summary>
     /// The texture source for this layer.
     /// </summary>
     [DataField("texture", required: true)]
@@ -39,7 +46,8 @@ public sealed partial class ParallaxLayerConfig
     /// <summary>
     /// A position relative to the centre of a ParallaxControl that this parallax should be drawn at, in pixels.
     /// Used for menus.
-    /// Note that this is ignored if the parallax layer is tiled - in that event a random pixel offset is used and slowness is applied.
+    /// Note that this is ignored if the parallax layer is tiled - in that event a random pixel offset is used and slowness is
+    /// applied.
     /// </summary>
     [DataField("controlHomePosition")]
     public Vector2 ControlHomePosition { get; set; }
@@ -67,11 +75,4 @@ public sealed partial class ParallaxLayerConfig
     /// </summary>
     [DataField("slowness")]
     public float Slowness { get; set; } = 0.5f;
-
-    /// <summary>
-    /// Should the parallax scroll at a specific rate per second.
-    /// </summary>
-    [DataField("scrolling")] public Vector2 Scrolling = Vector2.Zero;
-
-    [DataField("shader")] public string? Shader = "unshaded";
 }

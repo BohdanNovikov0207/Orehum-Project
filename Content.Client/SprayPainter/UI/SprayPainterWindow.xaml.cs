@@ -22,10 +22,42 @@ namespace Content.Client.SprayPainter.UI;
 [GenerateTypedNameReferences]
 public sealed partial class SprayPainterWindow : DefaultWindow
 {
-    [Dependency] private readonly IEntitySystemManager _sysMan = default!;
+    private const string ColorLocKeyPrefix = "pipe-painter-color-";
+
+    private readonly SpriteSpecifier _colorEntryIconTexture = new SpriteSpecifier.Rsi(
+        new ResPath("Structures/Piping/Atmospherics/pipe.rsi"),
+        "pipeStraight");
+
+    private readonly Dictionary<string, List<string>> _currentGroupsByCategory = new();
     [Dependency] private readonly ILocalizationManager _loc = default!;
 
+    // Tab controls
+    private readonly Dictionary<string, SprayPainterGroup> _paintableControls = new();
+
     private readonly SpriteSystem _spriteSystem;
+    [Dependency] private readonly IEntitySystemManager _sysMan = default!;
+
+    // Pipe color data
+    private ItemList _colorList = default!;
+
+    // Decals
+    private List<SprayPainterDecalEntry> _currentDecals = [];
+
+    private Dictionary<string, Color> _currentPalette = new();
+
+    // Paintable objects
+    private Dictionary<string, Dictionary<string, EntProtoId>> _currentStylesByGroup = new();
+    private BoxContainer? _pipeControl;
+    private SprayPainterDecals? _sprayPainterDecals;
+    public Dictionary<string, int> ItemColorIndex = new();
+
+    public SprayPainterWindow()
+    {
+        RobustXamlLoader.Load(this);
+        IoCManager.InjectDependencies(this);
+        _spriteSystem = _sysMan.GetEntitySystem<SpriteSystem>();
+        Tabs.OnTabChanged += index => OnTabChanged?.Invoke(index, _sprayPainterDecals?.GetPositionInParent() == index);
+    }
 
     // Events
     public event Action<string, string>? OnSpritePicked;
@@ -35,37 +67,6 @@ public sealed partial class SprayPainterWindow : DefaultWindow
     public event Action<Color?>? OnDecalColorChanged;
     public event Action<int>? OnDecalAngleChanged;
     public event Action<bool>? OnDecalSnapChanged;
-
-    // Pipe color data
-    private ItemList _colorList = default!;
-    public Dictionary<string, int> ItemColorIndex = new();
-
-    private Dictionary<string, Color> _currentPalette = new();
-    private const string ColorLocKeyPrefix = "pipe-painter-color-";
-
-    // Paintable objects
-    private Dictionary<string, Dictionary<string, EntProtoId>> _currentStylesByGroup = new();
-    private Dictionary<string, List<string>> _currentGroupsByCategory = new();
-
-    // Tab controls
-    private Dictionary<string, SprayPainterGroup> _paintableControls = new();
-    private BoxContainer? _pipeControl;
-
-    // Decals
-    private List<SprayPainterDecalEntry> _currentDecals = [];
-    private SprayPainterDecals? _sprayPainterDecals;
-
-    private readonly SpriteSpecifier _colorEntryIconTexture = new SpriteSpecifier.Rsi(
-        new ResPath("Structures/Piping/Atmospherics/pipe.rsi"),
-        "pipeStraight");
-
-    public SprayPainterWindow()
-    {
-        RobustXamlLoader.Load(this);
-        IoCManager.InjectDependencies(this);
-        _spriteSystem = _sysMan.GetEntitySystem<SpriteSystem>();
-        Tabs.OnTabChanged += (index) => OnTabChanged?.Invoke(index, _sprayPainterDecals?.GetPositionInParent() == index);
-    }
 
     private string GetColorLocString(string? colorKey)
     {
@@ -79,10 +80,7 @@ public sealed partial class SprayPainterWindow : DefaultWindow
         return locString;
     }
 
-    public string? IndexToColorKey(int index)
-    {
-        return _colorList[index].Text;
-    }
+    public string? IndexToColorKey(int index) => _colorList[index].Text;
 
     private void OnStyleSelected(ListData data)
     {
@@ -93,10 +91,7 @@ public sealed partial class SprayPainterWindow : DefaultWindow
     /// <summary>
     /// Wrapper to allow for selecting/deselecting the event to avoid loops
     /// </summary>
-    private void OnColorPicked(ItemList.ItemListSelectedEventArgs args)
-    {
-        OnSetPipeColor?.Invoke(args);
-    }
+    private void OnColorPicked(ItemList.ItemListSelectedEventArgs args) => OnSetPipeColor?.Invoke(args);
 
     /// <summary>
     /// Setup function for the window.
@@ -104,9 +99,11 @@ public sealed partial class SprayPainterWindow : DefaultWindow
     /// <param name="stylesByGroup">Each group, mapped by name to the set of named styles by their associated entity prototype.</param>
     /// <param name="groupsByCategory">The set of categories and the groups associated with them.</param>
     /// <param name="decals">A list of each decal.</param>
-    public void PopulateCategories(Dictionary<string, Dictionary<string, EntProtoId>> stylesByGroup, Dictionary<string, List<string>> groupsByCategory, List<SprayPainterDecalEntry> decals)
+    public void PopulateCategories(Dictionary<string, Dictionary<string, EntProtoId>> stylesByGroup,
+        Dictionary<string, List<string>> groupsByCategory,
+        List<SprayPainterDecalEntry> decals)
     {
-        bool tabsCleared = false;
+        var tabsCleared = false;
         var lastTab = Tabs.CurrentTab;
 
         if (!_currentGroupsByCategory.Equals(groupsByCategory))
@@ -137,7 +134,7 @@ public sealed partial class SprayPainterWindow : DefaultWindow
                 {
                     TabContainer? subTabs = null;
                     if (categoryGroups.Count > 1)
-                        subTabs = new();
+                        subTabs = new TabContainer();
 
                     foreach (var group in categoryGroups)
                     {
@@ -157,9 +154,7 @@ public sealed partial class SprayPainterWindow : DefaultWindow
                             }
                         }
                         else
-                        {
                             Tabs.AddChild(groupControl);
-                        }
                     }
 
                     if (subTabs != null)
@@ -215,14 +210,14 @@ public sealed partial class SprayPainterWindow : DefaultWindow
     public void PopulateColors(Dictionary<string, Color> palette)
     {
         // Create pipe tab controls if they don't exist
-        bool tabCreated = false;
+        var tabCreated = false;
         if (_pipeControl == null)
         {
-            _pipeControl = new BoxContainer() { Orientation = BoxContainer.LayoutOrientation.Vertical };
+            _pipeControl = new BoxContainer { Orientation = BoxContainer.LayoutOrientation.Vertical };
 
-            var label = new Label() { Text = Loc.GetString("spray-painter-selected-color") };
+            var label = new Label { Text = Loc.GetString("spray-painter-selected-color") };
 
-            _colorList = new ItemList() { VerticalExpand = true };
+            _colorList = new ItemList { VerticalExpand = true };
             _colorList.OnItemSelected += OnColorPicked;
 
             _pipeControl.AddChild(label);
@@ -240,11 +235,13 @@ public sealed partial class SprayPainterWindow : DefaultWindow
             ItemColorIndex.Clear();
             _colorList.Clear();
 
-            int index = 0;
+            var index = 0;
             foreach (var color in palette)
             {
                 var locString = GetColorLocString(color.Key);
-                var item = _colorList.AddItem(locString, _spriteSystem.Frame0(_colorEntryIconTexture), metadata: color.Key);
+                var item = _colorList.AddItem(locString,
+                    _spriteSystem.Frame0(_colorEntryIconTexture),
+                    metadata: color.Key);
                 item.IconModulate = color.Value;
 
                 ItemColorIndex.Add(color.Key, index);
@@ -254,6 +251,7 @@ public sealed partial class SprayPainterWindow : DefaultWindow
     }
 
     # region Setters
+
     public void SetSelectedStyles(Dictionary<string, string> selectedStyles)
     {
         foreach (var (group, style) in selectedStyles)
@@ -275,10 +273,7 @@ public sealed partial class SprayPainterWindow : DefaultWindow
         }
     }
 
-    public void SetSelectedTab(int tab)
-    {
-        Tabs.CurrentTab = int.Min(tab, Tabs.ChildCount - 1);
-    }
+    public void SetSelectedTab(int tab) => Tabs.CurrentTab = int.Min(tab, Tabs.ChildCount - 1);
 
     public void SetSelectedDecal(string decal)
     {
@@ -303,6 +298,7 @@ public sealed partial class SprayPainterWindow : DefaultWindow
         if (_sprayPainterDecals != null)
             _sprayPainterDecals.SetSnap(snap);
     }
+
     # endregion
 }
 

@@ -12,16 +12,16 @@ namespace Content.Client.Guidebook.RichText;
 /// <summary>
 /// RichText tag that can display values extracted from entity prototypes.
 /// In order to be accessed by this tag, the desired field/property must
-/// be tagged with <see cref="Shared.Guidebook.GuidebookDataAttribute"/>.
+/// be tagged with <see cref="Shared.Guidebook.GuidebookDataAttribute" />.
 /// </summary>
 public sealed class ProtodataTag : IMarkupTagHandler
 {
-    [Dependency] private readonly ILogManager _logMan = default!;
     [Dependency] private readonly IEntityManager _entMan = default!;
+    [Dependency] private readonly ILogManager _logMan = default!;
+    private ISawmill? _log;
+    private ISawmill Log => _log ??= _logMan.GetSawmill("protodata_tag");
 
     public string Name => "protodata";
-    private ISawmill Log => _log ??= _logMan.GetSawmill("protodata_tag");
-    private ISawmill? _log;
 
     public string TextBefore(MarkupNode node)
     {

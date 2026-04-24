@@ -15,9 +15,9 @@ namespace Content.Client.Light.EntitySystems;
 
 public sealed class SunShadowSystem : SharedSunShadowSystem
 {
+    [Dependency] private readonly MetaDataSystem _metadata = default!;
     [Dependency] private readonly ClientGameTicker _ticker = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly MetaDataSystem _metadata = default!;
 
     public override void Update(float frameTime)
     {
@@ -27,14 +27,14 @@ public sealed class SunShadowSystem : SharedSunShadowSystem
             return;
 
         var mapQuery = AllEntityQuery<SunShadowCycleComponent, SunShadowComponent>();
-        while (mapQuery.MoveNext(out var uid,  out var cycle, out var shadow))
+        while (mapQuery.MoveNext(out var uid, out var cycle, out var shadow))
         {
             if (!cycle.Running || cycle.Directions.Count == 0)
                 continue;
 
             var pausedTime = _metadata.GetPauseTime(uid);
 
-            var time = (float)(_timing.CurTime
+            var time = (float) (_timing.CurTime
                 .Add(cycle.Offset)
                 .Subtract(_ticker.RoundStartTimeSpan)
                 .Subtract(pausedTime)
@@ -65,13 +65,9 @@ public sealed class SunShadowSystem : SharedSunShadowSystem
 
                 // Last entry
                 if (i == entity.Comp.Directions.Count - 1)
-                {
                     nextRatio = next.Ratio + 1f;
-                }
                 else
-                {
                     nextRatio = next.Ratio;
-                }
 
                 var range = nextRatio - dir.Ratio;
                 var diff = (ratio - dir.Ratio) / range;

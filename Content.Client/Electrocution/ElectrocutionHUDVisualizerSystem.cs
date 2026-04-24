@@ -28,30 +28,22 @@ public sealed class ElectrocutionHUDVisualizerSystem : VisualizerSystem<Electroc
         SubscribeLocalEvent<ShowElectrocutionHUDComponent, LocalPlayerDetachedEvent>(OnPlayerDetached);
     }
 
-    private void OnPlayerAttached(Entity<ShowElectrocutionHUDComponent> ent, ref LocalPlayerAttachedEvent args)
-    {
+    private void OnPlayerAttached(Entity<ShowElectrocutionHUDComponent> ent, ref LocalPlayerAttachedEvent args) =>
         ShowHUD();
-    }
 
-    private void OnPlayerDetached(Entity<ShowElectrocutionHUDComponent> ent, ref LocalPlayerDetachedEvent args)
-    {
+    private void OnPlayerDetached(Entity<ShowElectrocutionHUDComponent> ent, ref LocalPlayerDetachedEvent args) =>
         RemoveHUD();
-    }
 
     private void OnInit(Entity<ShowElectrocutionHUDComponent> ent, ref ComponentInit args)
     {
         if (_playerMan.LocalEntity == ent)
-        {
             ShowHUD();
-        }
     }
 
     private void OnShutdown(Entity<ShowElectrocutionHUDComponent> ent, ref ComponentShutdown args)
     {
         if (_playerMan.LocalEntity == ent)
-        {
             RemoveHUD();
-        }
     }
 
     // Show the HUD to the client.
@@ -61,7 +53,10 @@ public sealed class ElectrocutionHUDVisualizerSystem : VisualizerSystem<Electroc
         var electrifiedQuery = AllEntityQuery<ElectrocutionHUDVisualsComponent, AppearanceComponent, SpriteComponent>();
         while (electrifiedQuery.MoveNext(out var uid, out _, out var appearanceComp, out var spriteComp))
         {
-            if (!AppearanceSystem.TryGetData<bool>(uid, ElectrifiedVisuals.IsElectrified, out var electrified, appearanceComp))
+            if (!AppearanceSystem.TryGetData<bool>(uid,
+                    ElectrifiedVisuals.IsElectrified,
+                    out var electrified,
+                    appearanceComp))
                 continue;
 
             _sprite.LayerSetVisible((uid, spriteComp), ElectrifiedLayers.HUD, electrified);
@@ -80,15 +75,22 @@ public sealed class ElectrocutionHUDVisualizerSystem : VisualizerSystem<Electroc
     }
 
     // Toggle the HUD layer if an entity becomes (de-)electrified
-    protected override void OnAppearanceChange(EntityUid uid, ElectrocutionHUDVisualsComponent comp, ref AppearanceChangeEvent args)
+    protected override void OnAppearanceChange(EntityUid uid,
+        ElectrocutionHUDVisualsComponent comp,
+        ref AppearanceChangeEvent args)
     {
         if (args.Sprite == null)
             return;
 
-        if (!AppearanceSystem.TryGetData<bool>(uid, ElectrifiedVisuals.IsElectrified, out var electrified, args.Component))
+        if (!AppearanceSystem.TryGetData<bool>(uid,
+                ElectrifiedVisuals.IsElectrified,
+                out var electrified,
+                args.Component))
             return;
 
         var player = _playerMan.LocalEntity;
-        _sprite.LayerSetVisible((uid, args.Sprite), ElectrifiedLayers.HUD, electrified && HasComp<ShowElectrocutionHUDComponent>(player));
+        _sprite.LayerSetVisible((uid, args.Sprite),
+            ElectrifiedLayers.HUD,
+            electrified && HasComp<ShowElectrocutionHUDComponent>(player));
     }
 }

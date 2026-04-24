@@ -66,26 +66,25 @@ namespace Content.Client.Credits;
 [GenerateTypedNameReferences]
 public sealed partial class CreditsWindow : DefaultWindow
 {
-    [Dependency] private readonly IResourceManager _resourceManager = default!;
-    [Dependency] private readonly IConfigurationManager _cfg = default!;
-    [Dependency] private readonly ISerializationManager _serialization = default!;
-    [Dependency] private readonly IPrototypeManager _protoManager = default!;
-    [Dependency] private readonly ILocalizationManager _loc = default!;
-    [Dependency] private readonly LinkAccountManager _linkAccount = default!;
+    private const int AttributionsSourcesPerPage = 50;
 
     private static readonly Dictionary<string, int> PatronTierPriority = new()
-        {
-            ["Central Command"] = 1,
-            ["Captain"] = 2,
-            ["Station AI"] = 3,
-            ["Janitor"] = 4,
-            ["Assistant"] = 5,
-        };
+    {
+        ["Central Command"] = 1,
+        ["Captain"] = 2,
+        ["Station AI"] = 3,
+        ["Janitor"] = 4,
+        ["Assistant"] = 5,
+    };
 
     private readonly List<FormattedMessage> _attributions = [];
+    [Dependency] private readonly IConfigurationManager _cfg = default!;
+    [Dependency] private readonly LinkAccountManager _linkAccount = default!;
+    [Dependency] private readonly ILocalizationManager _loc = default!;
+    [Dependency] private readonly IPrototypeManager _protoManager = default!;
+    [Dependency] private readonly IResourceManager _resourceManager = default!;
     private readonly ISawmill _sawmill = Logger.GetSawmill("Credits");
-
-    private const int AttributionsSourcesPerPage = 50;
+    [Dependency] private readonly ISerializationManager _serialization = default!;
 
     public CreditsWindow()
     {
@@ -160,9 +159,8 @@ public sealed partial class CreditsWindow : DefaultWindow
         attributionsContainer.AddChild(container);
     }
 
-    private Task<List<FormattedMessage>> CollectRSiAttributions()
-    {
-        return Task.Run(() =>
+    private Task<List<FormattedMessage>> CollectRSiAttributions() =>
+        Task.Run(() =>
         {
             var rsiStreams = _resourceManager.ContentFindFiles("/Textures/")
                 .Where(p => p.ToString().EndsWith(".rsi/meta.json"));
@@ -190,7 +188,7 @@ public sealed partial class CreditsWindow : DefaultWindow
                         throw new Exception("Missing a list of states.");
 
                     var copyright = copyrightNode.ToString();
-                    var files = states.Select(n => (MappingDataNode)n)
+                    var files = states.Select(n => (MappingDataNode) n)
                         .Select(n => n.Get("name") + ".png");
 
                     m.AddMarkupPermissive(_loc.GetString("credits-window-attributions-directory",
@@ -218,11 +216,9 @@ public sealed partial class CreditsWindow : DefaultWindow
 
             return attrs;
         });
-    }
 
-    private Task<List<FormattedMessage>> CollectRgaAttributions()
-    {
-        return Task.Run(() =>
+    private Task<List<FormattedMessage>> CollectRgaAttributions() =>
+        Task.Run(() =>
         {
             var rgaStreams = _resourceManager.ContentFindFiles("/")
                 .Where(p => p.Filename == "attributions.yml");
@@ -293,7 +289,6 @@ public sealed partial class CreditsWindow : DefaultWindow
 
             return attrs;
         });
-    }
 
     private void PopulateLicenses(BoxContainer licensesContainer)
     {
@@ -315,15 +310,15 @@ public sealed partial class CreditsWindow : DefaultWindow
     {
         var patrons = LoadPatrons();
 
-            var linkPatreon = _cfg.GetCVar(CCVars.InfoLinksPatreon);
-            if (linkPatreon != "")
+        var linkPatreon = _cfg.GetCVar(CCVars.InfoLinksPatreon);
+        if (linkPatreon != "")
+        {
+            Button patronButton;
+            patronsContainer.AddChild(patronButton = new Button
             {
-                Button patronButton;
-                patronsContainer.AddChild(patronButton = new Button
-                {
-                    Text = Loc.GetString("credits-window-become-patron-button"),
-                    HorizontalAlignment = HAlignment.Center
-                });
+                Text = Loc.GetString("credits-window-become-patron-button"),
+                HorizontalAlignment = HAlignment.Center,
+            });
 
             patronButton.OnPressed +=
                 _ => IoCManager.Resolve<IUriOpener>().OpenUri(linkPatreon);
@@ -348,11 +343,11 @@ public sealed partial class CreditsWindow : DefaultWindow
         }
     }
 
-        private IEnumerable<PatronEntry> LoadPatrons()
-        {
-            return _linkAccount.GetPatrons().Select(p => new PatronEntry(p.Name, p.Tier));
-            var yamlStream = _resourceManager.ContentFileReadYaml(new ("/Credits/Patrons.yml"));
-            var sequence = (YamlSequenceNode) yamlStream.Documents[0].RootNode;
+    private IEnumerable<PatronEntry> LoadPatrons()
+    {
+        return _linkAccount.GetPatrons().Select(p => new PatronEntry(p.Name, p.Tier));
+        var yamlStream = _resourceManager.ContentFileReadYaml(new ResPath("/Credits/Patrons.yml"));
+        var sequence = (YamlSequenceNode) yamlStream.Documents[0].RootNode;
 
         return sequence
             .Cast<YamlMappingNode>()
@@ -412,13 +407,13 @@ public sealed partial class CreditsWindow : DefaultWindow
 
     private sealed class PatronEntry
     {
-        public string Name { get; }
-        public string Tier { get; }
-
         public PatronEntry(string name, string tier)
         {
             Name = name;
             Tier = tier;
         }
+
+        public string Name { get; }
+        public string Tier { get; }
     }
 }

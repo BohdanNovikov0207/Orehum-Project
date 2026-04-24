@@ -14,12 +14,10 @@ namespace Content.Client.Light;
 /// </summary>
 public sealed class LightBlurOverlay : Overlay
 {
-    public override OverlaySpace Space => OverlaySpace.BeforeLighting;
+    public const int ContentZIndex = TileEmissionOverlay.ContentZIndex + 1;
 
     [Dependency] private readonly IClyde _clyde = default!;
     [Dependency] private readonly IOverlayManager _overlay = default!;
-
-    public const int ContentZIndex = TileEmissionOverlay.ContentZIndex + 1;
 
     private IRenderTarget? _blurTarget;
 
@@ -28,6 +26,8 @@ public sealed class LightBlurOverlay : Overlay
         IoCManager.InjectDependencies(this);
         ZIndex = ContentZIndex;
     }
+
+    public override OverlaySpace Space => OverlaySpace.BeforeLighting;
 
     protected override void Draw(in OverlayDrawArgs args)
     {
@@ -40,7 +40,9 @@ public sealed class LightBlurOverlay : Overlay
         if (_blurTarget?.Size != size)
         {
             _blurTarget = _clyde
-                .CreateRenderTarget(size, new RenderTargetFormatParameters(RenderTargetColorFormat.Rgba8Srgb), name: "enlarged-light-blur");
+                .CreateRenderTarget(size,
+                    new RenderTargetFormatParameters(RenderTargetColorFormat.Rgba8Srgb),
+                    name: "enlarged-light-blur");
         }
 
         var target = beforeOverlay.EnlargedLightTarget;

@@ -11,5 +11,4 @@ namespace Content.Client.DeviceNetwork;
 
 public sealed class JammerSystem : SharedJammerSystem
 {
-
 }

@@ -58,7 +58,7 @@ public sealed partial class PowerChargeWindow : FancyWindow
             PowerChargePowerStatus.Discharging => "power-charge-window-status-discharging",
             PowerChargePowerStatus.Charging => "power-charge-window-status-charging",
             PowerChargePowerStatus.FullyCharged => "power-charge-window-status-fully-charged",
-            _ => throw new ArgumentOutOfRangeException()
+            _ => throw new ArgumentOutOfRangeException(),
         });
 
         StatusLabel.SetOnlyStyleClass(state.PowerStatus switch
@@ -67,7 +67,7 @@ public sealed partial class PowerChargeWindow : FancyWindow
             PowerChargePowerStatus.Discharging => "Caution",
             PowerChargePowerStatus.Charging => "Caution",
             PowerChargePowerStatus.FullyCharged => "Good",
-            _ => throw new ArgumentOutOfRangeException()
+            _ => throw new ArgumentOutOfRangeException(),
         });
 
         EtaLabel.Text = state.EtaSeconds >= 0

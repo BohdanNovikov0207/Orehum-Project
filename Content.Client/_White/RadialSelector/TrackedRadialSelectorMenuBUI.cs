@@ -14,7 +14,7 @@ public sealed class TrackedRadialSelectorMenuBUI(EntityUid owner, Enum uiKey) : 
         HorizontalExpand = true,
         VerticalExpand = true,
         BackButtonStyleClass = "RadialMenuBackButton",
-        CloseButtonStyleClass = "RadialMenuCloseButton"
+        CloseButtonStyleClass = "RadialMenuCloseButton",
     };
 
     private EntityUid? _trackedEntity;

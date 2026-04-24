@@ -87,9 +87,9 @@ namespace Content.Client.Administration.UI.Tabs.ObjectsTab;
 public sealed partial class ObjectsTabEntry : PanelContainer
 {
     public NetEntity AssocEntity;
+    public Action<NetEntity>? OnDelete;
 
     public Action<NetEntity>? OnTeleport;
-    public Action<NetEntity>? OnDelete;
 
     public ObjectsTabEntry(IClientAdminManager manager, string name, NetEntity nent, StyleBox styleBox)
     {

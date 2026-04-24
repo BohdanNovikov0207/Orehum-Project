@@ -1,11 +1,10 @@
 <controls:FancyWindow xmlns="https://spacestation14.io"
-    xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls"
-    Title="{Loc 'node-scan-display-title'}"
-    MinSize="305 180"
-    SetSize="305 180"
-    Resizable="False"
-    >
-    <BoxContainer Orientation="Vertical" >
+                      xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls"
+                      Title="{Loc 'node-scan-display-title'}"
+                      MinSize="305 180"
+                      SetSize="305 180"
+                      Resizable="False">
+    <BoxContainer Orientation="Vertical">
         <controls:StripeBack>
             <Label Name="NodeScannerState" HorizontalAlignment="Center" StyleClasses="LabelSubText" Margin="4 0 0 4" />
         </controls:StripeBack>

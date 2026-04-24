@@ -18,13 +18,13 @@ public sealed class ChannelFilterCheckbox : CheckBox
 {
     public readonly ChatChannel Channel;
 
-    public bool IsHidden => Parent == null;
-
     public ChannelFilterCheckbox(ChatChannel channel)
     {
         Channel = channel;
         Text = Loc.GetString($"hud-chatbox-channel-{Channel}");
     }
+
+    public bool IsHidden => Parent == null;
 
     private void UpdateText(int? unread)
     {
@@ -37,8 +37,5 @@ public sealed class ChannelFilterCheckbox : CheckBox
         Text = name;
     }
 
-    public void UpdateUnreadCount(int? unread)
-    {
-        UpdateText(unread);
-    }
+    public void UpdateUnreadCount(int? unread) => UpdateText(unread);
 }

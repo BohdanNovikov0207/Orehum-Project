@@ -20,6 +20,11 @@ public sealed class ItemSlotButtonContainer : ItemSlotUIContainer<SlotControl>
     private readonly InventoryUIController _inventoryController;
     private string _slotGroup = "";
 
+    public ItemSlotButtonContainer()
+    {
+        _inventoryController = UserInterfaceManager.GetUIController<InventoryUIController>();
+    }
+
     public string SlotGroup
     {
         get => _slotGroup;
@@ -29,10 +34,5 @@ public sealed class ItemSlotButtonContainer : ItemSlotUIContainer<SlotControl>
             _slotGroup = value;
             _inventoryController.RegisterSlotGroupContainer(this);
         }
-    }
-
-    public ItemSlotButtonContainer()
-    {
-        _inventoryController = UserInterfaceManager.GetUIController<InventoryUIController>();
     }
 }

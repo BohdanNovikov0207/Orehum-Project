@@ -141,7 +141,7 @@ public sealed partial class DocumentParsingManager
                     var rt = new RichTextLabel
                     {
                         HorizontalExpand = true,
-                        Margin = new Thickness(0, 0, 0, 15.0f)
+                        Margin = new Thickness(0, 0, 0, 15.0f),
                     };
 
                     var msg = new FormattedMessage();
@@ -170,7 +170,7 @@ public sealed partial class DocumentParsingManager
         .Then(SkipWhitespaces.Then(Map(text => new Label
                 {
                     Text = text,
-                    StyleClasses = { "LabelHeadingBigger" }
+                    StyleClasses = { "LabelHeadingBigger" },
                 },
                 AnyCharExcept('\n').AtLeastOnceString())
             .Cast<Control>()))
@@ -180,7 +180,7 @@ public sealed partial class DocumentParsingManager
         .Then(SkipWhitespaces.Then(Map(text => new Label
                 {
                     Text = text,
-                    StyleClasses = { "LabelHeading" }
+                    StyleClasses = { "LabelHeading" },
                 },
                 AnyCharExcept('\n').AtLeastOnceString())
             .Cast<Control>()))
@@ -190,13 +190,14 @@ public sealed partial class DocumentParsingManager
         .Then(SkipWhitespaces.Then(Map(text => new Label
                 {
                     Text = text,
-                    StyleClasses = { "LabelKeyText" }
+                    StyleClasses = { "LabelKeyText" },
                 },
                 AnyCharExcept('\n').AtLeastOnceString())
             .Cast<Control>()))
         .Labelled("tertiaryheader");
 
-    private static readonly Parser<char, Control> TryHeaderControl = OneOf(TertiaryHeaderControlParser, SubHeaderControlParser, HeaderControlParser);
+    private static readonly Parser<char, Control> TryHeaderControl =
+        OneOf(TertiaryHeaderControlParser, SubHeaderControlParser, HeaderControlParser);
 
     private static readonly Parser<char, Control> ListControlParser = Try(Char('-'))
         .Then(SkipWhitespaces)
@@ -204,7 +205,7 @@ public sealed partial class DocumentParsingManager
                 control => new BoxContainer
                 {
                     Children = { new Label { Text = ListBullet, VerticalAlignment = VAlignment.Top }, control },
-                    Orientation = LayoutOrientation.Horizontal
+                    Orientation = LayoutOrientation.Horizontal,
                 },
                 TextControlParser)
             .Cast<Control>())
@@ -224,15 +225,7 @@ public sealed partial class DocumentParsingManager
 
     #endregion
 
-    #region rich text-end markers
-
-    #endregion
-
     // parses text characters until it hits a text-end
-
-    #endregion
-
-    #region Headers
 
     #endregion
 
@@ -264,22 +257,18 @@ public sealed partial class DocumentParsingManager
             .Select(string.Concat)
             .Labelled("opening tag");
 
-    private static Parser<char, Dictionary<string, string>> ParseTagArgs(string tag)
-    {
-        return TagArgsParser.Labelled($"{tag} arguments")
+    private static Parser<char, Dictionary<string, string>> ParseTagArgs(string tag) =>
+        TagArgsParser.Labelled($"{tag} arguments")
             .Select(x => x.ToDictionary(y => y.Item1, y => y.Item2))
             .Before(SkipWhitespaces);
-    }
 
-    private static Parser<char, Unit> TryTagTerminator(string tag)
-    {
-        return Try(String("</"))
+    private static Parser<char, Unit> TryTagTerminator(string tag) =>
+        Try(String("</"))
             .Then(SkipWhitespaces)
             .Then(String(tag))
             .Then(SkipWhitespaces)
             .Then(TagEnd)
             .Labelled($"closing {tag} tag");
-    }
 
     #endregion
 }

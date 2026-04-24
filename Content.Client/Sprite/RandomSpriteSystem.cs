@@ -19,8 +19,8 @@ namespace Content.Client.Sprite;
 
 public sealed class RandomSpriteSystem : SharedRandomSpriteSystem
 {
-    [Dependency] private readonly IReflectionManager _reflection = default!;
     [Dependency] private readonly ClientClothingSystem _clothing = default!;
+    [Dependency] private readonly IReflectionManager _reflection = default!;
     [Dependency] private readonly SpriteSystem _sprite = default!;
 
     public override void Initialize()
@@ -49,7 +49,9 @@ public sealed class RandomSpriteSystem : SharedRandomSpriteSystem
         UpdateClothingComponentAppearance(uid, component);
     }
 
-    private void UpdateClothingComponentAppearance(EntityUid uid, RandomSpriteComponent component, ClothingComponent? clothing = null)
+    private void UpdateClothingComponentAppearance(EntityUid uid,
+        RandomSpriteComponent component,
+        ClothingComponent? clothing = null)
     {
         if (!Resolve(uid, ref clothing, false))
             return;
@@ -64,7 +66,9 @@ public sealed class RandomSpriteSystem : SharedRandomSpriteSystem
         }
     }
 
-    private void UpdateSpriteComponentAppearance(EntityUid uid, RandomSpriteComponent component, SpriteComponent? sprite = null)
+    private void UpdateSpriteComponentAppearance(EntityUid uid,
+        RandomSpriteComponent component,
+        SpriteComponent? sprite = null)
     {
         if (!Resolve(uid, ref sprite, false))
             return;
@@ -74,7 +78,7 @@ public sealed class RandomSpriteSystem : SharedRandomSpriteSystem
             int index;
             if (_reflection.TryParseEnumReference(layer.Key, out var @enum))
             {
-                if (!_sprite.LayerMapTryGet((uid, sprite), @enum, out index, logMissing: true))
+                if (!_sprite.LayerMapTryGet((uid, sprite), @enum, out index, true))
                     continue;
             }
             else if (!_sprite.LayerMapTryGet((uid, sprite), layer.Key, out index, false))
@@ -85,6 +89,7 @@ public sealed class RandomSpriteSystem : SharedRandomSpriteSystem
                     continue;
                 }
             }
+
             _sprite.LayerSetRsiState((uid, sprite), index, layer.Value.State);
             _sprite.LayerSetColor((uid, sprite), index, layer.Value.Color ?? Color.White);
         }

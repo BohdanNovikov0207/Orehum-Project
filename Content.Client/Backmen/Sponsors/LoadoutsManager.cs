@@ -6,26 +6,24 @@ namespace Content.Client.Backmen.Sponsors;
 
 public sealed class LoadoutsManager : ISharedLoadoutsManager
 {
-    [Dependency] private readonly ISharedSponsorsManager _sponsorsManager = default!;
     [Dependency] private readonly IPrototypeManager _prototype = default!;
+    [Dependency] private readonly ISharedSponsorsManager _sponsorsManager = default!;
 
     public void Initialize()
     {
     }
 
-    public List<string> GetClientPrototypes()
-    {
-        return _sponsorsManager.GetClientLoadouts();
-    }
+    public List<string> GetClientPrototypes() => _sponsorsManager.GetClientLoadouts();
 
     public List<LoadoutPrototype> GetClientLoadoutPrototypes()
     {
         var r = new List<LoadoutPrototype>();
         foreach (var clientPrototype in GetClientPrototypes())
         {
-            if(_prototype.TryIndex<LoadoutPrototype>(clientPrototype, out var loadout))
+            if (_prototype.TryIndex<LoadoutPrototype>(clientPrototype, out var loadout))
                 r.Add(loadout);
         }
+
         return r;
     }
 }

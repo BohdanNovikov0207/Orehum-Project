@@ -30,42 +30,40 @@ namespace Content.Client.UserInterface.Systems.DamageOverlays.Overlays;
 public sealed class DamageOverlay : Overlay
 {
     private static readonly ProtoId<ShaderPrototype> CircleMaskShader = "GradientCircleMask";
-
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-    [Dependency] private readonly IEntityManager _entityManager = default!;
-    [Dependency] private readonly IPlayerManager _playerManager = default!;
-
-    public override OverlaySpace Space => OverlaySpace.WorldSpace;
-
-    private readonly ShaderInstance _critShader;
-    private readonly ShaderInstance _oxygenShader;
     private readonly ShaderInstance _bruteShader;
 
-    public MobState State = MobState.Alive;
+    private readonly ShaderInstance _critShader;
+    [Dependency] private readonly IEntityManager _entityManager = default!;
+    private readonly ShaderInstance _oxygenShader;
+    [Dependency] private readonly IPlayerManager _playerManager = default!;
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
 
-    /// <summary>
-    /// Shitmed Change: Handles the red pulsing overlay
-    /// </summary>
-    public float PainLevel = 0f;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
-    private float _oldPainLevel = 0f;
+    private float _oldCritLevel;
 
-    /// <summary>
-    /// Handles the darkening overlay.
-    /// </summary>
-    public float OxygenLevel = 0f;
+    private float _oldOxygenLevel;
 
-    private float _oldOxygenLevel = 0f;
+    private float _oldPainLevel;
 
     /// <summary>
     /// Handles the white overlay when crit.
     /// </summary>
     public float CritLevel = 0f;
 
-    private float _oldCritLevel = 0f;
-
     public float DeadLevel = 1f;
+
+    /// <summary>
+    /// Handles the darkening overlay.
+    /// </summary>
+    public float OxygenLevel = 0f;
+
+    /// <summary>
+    /// Shitmed Change: Handles the red pulsing overlay
+    /// </summary>
+    public float PainLevel = 0f;
+
+    public MobState State = MobState.Alive;
 
     public DamageOverlay()
     {
@@ -75,6 +73,8 @@ public sealed class DamageOverlay : Overlay
         _critShader = _prototypeManager.Index(CircleMaskShader).InstanceUnique();
         _bruteShader = _prototypeManager.Index(CircleMaskShader).InstanceUnique();
     }
+
+    public override OverlaySpace Space => OverlaySpace.WorldSpace;
 
     protected override void Draw(in OverlayDrawArgs args)
     {
@@ -101,18 +101,14 @@ public sealed class DamageOverlay : Overlay
 
         // If they just died then lerp out the white overlay.
         if (State != MobState.Dead)
-        {
             DeadLevel = 1f;
-        }
         else if (!MathHelper.CloseTo(0f, DeadLevel, 0.001f))
         {
             var diff = -DeadLevel;
             DeadLevel += GetDiff(diff, lastFrameTime);
         }
         else
-        {
             DeadLevel = 0f;
-        }
 
         if (!MathHelper.CloseTo(_oldPainLevel, PainLevel, 0.001f))
         {
@@ -120,9 +116,7 @@ public sealed class DamageOverlay : Overlay
             _oldPainLevel += GetDiff(diff, lastFrameTime);
         }
         else
-        {
             _oldPainLevel = PainLevel;
-        }
 
         if (!MathHelper.CloseTo(_oldOxygenLevel, OxygenLevel, 0.001f))
         {
@@ -130,9 +124,7 @@ public sealed class DamageOverlay : Overlay
             _oldOxygenLevel += GetDiff(diff, lastFrameTime);
         }
         else
-        {
             _oldOxygenLevel = OxygenLevel;
-        }
 
         if (!MathHelper.CloseTo(_oldCritLevel, CritLevel, 0.001f))
         {
@@ -140,9 +132,7 @@ public sealed class DamageOverlay : Overlay
             _oldCritLevel += GetDiff(diff, lastFrameTime);
         }
         else
-        {
             _oldCritLevel = CritLevel;
-        }
 
         /*
          * darknessAlphaOuter is the maximum alpha for anything outside of the larger circle
@@ -157,16 +147,16 @@ public sealed class DamageOverlay : Overlay
 
         // Only show pain overlay if there's actual pain and we're not in critical stat
         // Goobstation start
-        float level = 0f;
+        var level = 0f;
         level = _oldPainLevel;
         if (_oldPainLevel > 0f && _oldCritLevel <= 0f)
         {
             var pulseRate = 3f;
             var adjustedTime = time * pulseRate;
-            float outerMaxLevel = 2.0f * distance;
-            float outerMinLevel = 0.8f * distance;
-            float innerMaxLevel = 0.6f * distance;
-            float innerMinLevel = 0.2f * distance;
+            var outerMaxLevel = 2.0f * distance;
+            var outerMinLevel = 0.8f * distance;
+            var innerMaxLevel = 0.6f * distance;
+            var innerMinLevel = 0.2f * distance;
 
             var outerRadius = outerMaxLevel - _oldPainLevel * (outerMaxLevel - outerMinLevel);
             var innerRadius = innerMaxLevel - _oldPainLevel * (innerMaxLevel - innerMinLevel);
@@ -185,18 +175,16 @@ public sealed class DamageOverlay : Overlay
             handle.DrawRect(viewport, Color.White);
         }
         else
-        {
             _oldPainLevel = PainLevel;
-        }
 
         level = State != MobState.Critical ? _oldOxygenLevel : 1f;
 
         if (level > 0f)
         {
-            float outerMaxLevel = 0.6f * distance;
-            float outerMinLevel = 0.06f * distance;
-            float innerMaxLevel = 0.02f * distance;
-            float innerMinLevel = 0.02f * distance;
+            var outerMaxLevel = 0.6f * distance;
+            var outerMinLevel = 0.06f * distance;
+            var innerMaxLevel = 0.02f * distance;
+            var innerMinLevel = 0.02f * distance;
 
             var outerRadius = outerMaxLevel - level * (outerMaxLevel - outerMinLevel);
             var innerRadius = innerMaxLevel - level * (innerMaxLevel - innerMinLevel);
@@ -208,21 +196,16 @@ public sealed class DamageOverlay : Overlay
             if (_oldCritLevel > 0f)
             {
                 var adjustedTime = time * 2f;
-                critTime = MathF.Max(0, MathF.Sin(adjustedTime) + 2 * MathF.Sin(2 * adjustedTime / 4f) + MathF.Sin(adjustedTime / 4f) - 3f);
+                critTime = MathF.Max(0,
+                    MathF.Sin(adjustedTime) + 2 * MathF.Sin(2 * adjustedTime / 4f) + MathF.Sin(adjustedTime / 4f) - 3f);
 
                 if (critTime > 0f)
-                {
                     outerDarkness = 1f - critTime / 1.5f;
-                }
                 else
-                {
                     outerDarkness = 1f;
-                }
             }
             else
-            {
                 outerDarkness = MathF.Min(0.98f, 0.3f * MathF.Log(level) + 1f);
-            }
 
             _oxygenShader.SetParameter("time", 0.0f);
             _oxygenShader.SetParameter("color", new Vector3(0f, 0f, 0f));
@@ -239,10 +222,10 @@ public sealed class DamageOverlay : Overlay
 
         if (level > 0f)
         {
-            float outerMaxLevel = 2.0f * distance;
-            float outerMinLevel = 1.0f * distance;
-            float innerMaxLevel = 0.6f * distance;
-            float innerMinLevel = 0.02f * distance;
+            var outerMaxLevel = 2.0f * distance;
+            var outerMinLevel = 1.0f * distance;
+            var innerMaxLevel = 0.6f * distance;
+            var innerMinLevel = 0.02f * distance;
 
             var outerRadius = outerMaxLevel - level * (outerMaxLevel - outerMinLevel);
             var innerRadius = innerMaxLevel - level * (innerMaxLevel - innerMinLevel);

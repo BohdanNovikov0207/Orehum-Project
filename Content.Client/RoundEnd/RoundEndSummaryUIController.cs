@@ -24,15 +24,17 @@ public sealed class RoundEndSummaryUIController : UIController,
 
     private RoundEndSummaryWindow? _window;
 
+    public void OnSystemLoaded(ClientGameTicker system) =>
+        _input.SetInputCommand(ContentKeyFunctions.ToggleRoundEndSummaryWindow,
+            InputCmdHandler.FromDelegate(ToggleScoreboardWindow));
+
     private void ToggleScoreboardWindow(ICommonSession? session = null)
     {
         if (_window == null)
             return;
 
         if (_window.IsOpen)
-        {
             _window.Close();
-        }
         else
         {
             _window.OpenCenteredRight();
@@ -46,13 +48,11 @@ public sealed class RoundEndSummaryUIController : UIController,
         if (_window?.RoundId == message.RoundId)
             return;
 
-        _window = new RoundEndSummaryWindow(message.GamemodeTitle, message.RoundEndText,
-            message.RoundDuration, message.RoundId, message.AllPlayersEndInfo, EntityManager);
-    }
-
-    public void OnSystemLoaded(ClientGameTicker system)
-    {
-        _input.SetInputCommand(ContentKeyFunctions.ToggleRoundEndSummaryWindow,
-            InputCmdHandler.FromDelegate(ToggleScoreboardWindow));
+        _window = new RoundEndSummaryWindow(message.GamemodeTitle,
+            message.RoundEndText,
+            message.RoundDuration,
+            message.RoundId,
+            message.AllPlayersEndInfo,
+            EntityManager);
     }
 }

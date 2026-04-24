@@ -28,15 +28,10 @@ public sealed class HereticCombatMarkSystem : SharedHereticCombatMarkSystem
         SubscribeLocalEvent<HereticCombatMarkComponent, AfterAutoHandleStateEvent>(OnAfterAutoHandleState);
     }
 
-    private void OnAfterAutoHandleState(Entity<HereticCombatMarkComponent> ent, ref AfterAutoHandleStateEvent args)
-    {
+    private void OnAfterAutoHandleState(Entity<HereticCombatMarkComponent> ent, ref AfterAutoHandleStateEvent args) =>
         AddLayer(ent);
-    }
 
-    private void OnStartup(Entity<HereticCombatMarkComponent> ent, ref ComponentStartup args)
-    {
-        AddLayer(ent);
-    }
+    private void OnStartup(Entity<HereticCombatMarkComponent> ent, ref ComponentStartup args) => AddLayer(ent);
 
     private void AddLayer(Entity<HereticCombatMarkComponent> ent)
     {

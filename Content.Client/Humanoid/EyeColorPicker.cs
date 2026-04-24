@@ -10,24 +10,15 @@ namespace Content.Client.Humanoid;
 
 public sealed class EyeColorPicker : Control
 {
-    public event Action<Color>? OnEyeColorPicked;
-
     private readonly ColorSelectorSliders _colorSelectors;
 
     private Color _lastColor;
-
-    public void SetData(Color color)
-    {
-        _lastColor = color;
-
-        _colorSelectors.Color = color;
-    }
 
     public EyeColorPicker()
     {
         var vBox = new BoxContainer
         {
-            Orientation = BoxContainer.LayoutOrientation.Vertical
+            Orientation = BoxContainer.LayoutOrientation.Vertical,
         };
         AddChild(vBox);
 
@@ -35,6 +26,15 @@ public sealed class EyeColorPicker : Control
         _colorSelectors.SelectorType = ColorSelectorSliders.ColorSelectorType.Hsv; // defaults color selector to HSV
 
         _colorSelectors.OnColorChanged += ColorValueChanged;
+    }
+
+    public event Action<Color>? OnEyeColorPicked;
+
+    public void SetData(Color color)
+    {
+        _lastColor = color;
+
+        _colorSelectors.Color = color;
     }
 
     private void ColorValueChanged(Color newColor)

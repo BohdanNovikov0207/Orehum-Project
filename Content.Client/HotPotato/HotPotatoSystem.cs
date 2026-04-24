@@ -9,19 +9,18 @@
 // SPDX-License-Identifier: MIT
 
 using Content.Shared.HotPotato;
-using Robust.Shared.Random;
 using Robust.Shared.Prototypes;
+using Robust.Shared.Random;
 using Robust.Shared.Timing;
 
 namespace Content.Client.HotPotato;
 
 public sealed class HotPotatoSystem : SharedHotPotatoSystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
-
     private readonly EntProtoId _hotPotatoEffectId = "HotPotatoEffect";
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     // TODO: particle system
     public override void Update(float frameTime)

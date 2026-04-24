@@ -35,13 +35,9 @@ public sealed class JukeboxBoundUserInterface : BoundUserInterface
         _menu.OnPlayPressed += args =>
         {
             if (args)
-            {
                 SendMessage(new JukeboxPlayingMessage());
-            }
             else
-            {
                 SendMessage(new JukeboxPauseMessage());
-            }
         };
 
         _menu.OnLoopPressed += () =>
@@ -77,23 +73,15 @@ public sealed class JukeboxBoundUserInterface : BoundUserInterface
         if (_protoManager.TryIndex(jukebox.SelectedSongId, out var songProto))
         {
             var length = EntMan.System<AudioSystem>().GetAudioLength(songProto.Path.Path.ToString());
-            _menu.SetSelectedSong(songProto.Name, (float)length.TotalSeconds);
+            _menu.SetSelectedSong(songProto.Name, (float) length.TotalSeconds);
         }
         else
-        {
             _menu.SetSelectedSong(string.Empty, 0f);
-        }
     }
 
-    public void PopulateMusic()
-    {
-        _menu?.Populate(_protoManager.EnumeratePrototypes<JukeboxPrototype>());
-    }
+    public void PopulateMusic() => _menu?.Populate(_protoManager.EnumeratePrototypes<JukeboxPrototype>());
 
-    public void SelectSong(ProtoId<JukeboxPrototype> songid)
-    {
-        SendMessage(new JukeboxSelectedMessage(songid));
-    }
+    public void SelectSong(ProtoId<JukeboxPrototype> songid) => SendMessage(new JukeboxSelectedMessage(songid));
 
     public void SetTime(float time)
     {
@@ -107,9 +95,7 @@ public sealed class JukeboxBoundUserInterface : BoundUserInterface
         // that's still on engine so our playback position never gets corrected.
         if (EntMan.TryGetComponent(Owner, out JukeboxComponent? jukebox) &&
             EntMan.TryGetComponent(jukebox.AudioStream, out AudioComponent? audioComp))
-        {
             audioComp.PlaybackPosition = time;
-        }
 
         SendMessage(new JukeboxSetTimeMessage(sentTime));
     }
@@ -119,18 +105,18 @@ public sealed class JukeboxBoundUserInterface : BoundUserInterface
     /// Uses MapToRange to convert the slider value to the actual audio component volume range.
     /// </summary>
     /// <param name="volume">Volume value from the UI slider (typically from 0 to 1).</param>
-
     public void SetVolume(float volume)
     {
-         var sentVolume = volume;
+        var sentVolume = volume;
 
-         if (EntMan.TryGetComponent(Owner, out JukeboxComponent? jukebox) &&
+        if (EntMan.TryGetComponent(Owner, out JukeboxComponent? jukebox) &&
             EntMan.TryGetComponent(jukebox.AudioStream, out AudioComponent? audioComp))
-        {
-            audioComp.Volume = SharedJukeboxSystem.MapToRange(volume, jukebox.MinSlider, jukebox.MaxSlider, jukebox.MinVolume, jukebox.MaxVolume);
-        }
+            audioComp.Volume = SharedJukeboxSystem.MapToRange(volume,
+                jukebox.MinSlider,
+                jukebox.MaxSlider,
+                jukebox.MinVolume,
+                jukebox.MaxVolume);
 
         SendMessage(new JukeboxSetVolumeMessage(sentVolume));
-
     }
 }

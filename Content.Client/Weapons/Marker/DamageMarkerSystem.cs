@@ -15,15 +15,15 @@ namespace Content.Client.Weapons.Marker;
 
 public sealed class DamageMarkerSystem : SharedDamageMarkerSystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SpriteSystem _sprite = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
         base.Initialize();
-        SubscribeLocalEvent<DamageMarkerComponent, AfterAutoHandleStateEvent>(OnMarkerStartup); //ShitChap - Un-hardcoded the sprites and sfx for the markers
+        SubscribeLocalEvent<DamageMarkerComponent, AfterAutoHandleStateEvent>(
+            OnMarkerStartup); //ShitChap - Un-hardcoded the sprites and sfx for the markers
         SubscribeLocalEvent<DamageMarkerComponent, ComponentShutdown>(OnMarkerShutdown);
-
     }
 
     private void OnMarkerStartup(EntityUid uid, DamageMarkerComponent component, AfterAutoHandleStateEvent args)
@@ -37,7 +37,8 @@ public sealed class DamageMarkerSystem : SharedDamageMarkerSystem
 
     private void OnMarkerShutdown(EntityUid uid, DamageMarkerComponent component, ComponentShutdown args)
     {
-        if (!_timing.ApplyingState || !TryComp<SpriteComponent>(uid, out var sprite) || !_sprite.LayerMapTryGet((uid, sprite), DamageMarkerKey.Key, out var weh, false))
+        if (!_timing.ApplyingState || !TryComp<SpriteComponent>(uid, out var sprite) ||
+            !_sprite.LayerMapTryGet((uid, sprite), DamageMarkerKey.Key, out var weh, false))
             return;
 
         _sprite.RemoveLayer((uid, sprite), weh);
@@ -45,6 +46,6 @@ public sealed class DamageMarkerSystem : SharedDamageMarkerSystem
 
     private enum DamageMarkerKey : byte
     {
-        Key
+        Key,
     }
 }

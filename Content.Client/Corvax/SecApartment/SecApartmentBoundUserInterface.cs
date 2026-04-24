@@ -73,6 +73,5 @@ public sealed class SecApartmentBoundUserInterface : BoundUserInterface
                 _window.UpdateTimerState(timerState);
                 break;
         }
-
     }
 }

@@ -39,21 +39,18 @@ using DebugMessage = Content.Shared.Atmos.EntitySystems.SharedAtmosDebugOverlayS
 
 namespace Content.Client.Atmos.Overlays;
 
-
 public sealed class AtmosDebugOverlay : Overlay
 {
-    [Dependency] private readonly IEntityManager _entManager = default!;
-    [Dependency] private readonly IMapManager _mapManager = default!;
-    [Dependency] private readonly IInputManager _input = default!;
-    [Dependency] private readonly IUserInterfaceManager _ui = default!;
     [Dependency] private readonly IResourceCache _cache = default!;
-    private readonly SharedTransformSystem _transform;
-    private readonly AtmosDebugOverlaySystem _system;
-    private readonly SharedMapSystem _map;
+    [Dependency] private readonly IEntityManager _entManager = default!;
     private readonly Font _font;
+    [Dependency] private readonly IInputManager _input = default!;
+    private readonly SharedMapSystem _map;
+    [Dependency] private readonly IMapManager _mapManager = default!;
+    private readonly AtmosDebugOverlaySystem _system;
+    private readonly SharedTransformSystem _transform;
+    [Dependency] private readonly IUserInterfaceManager _ui = default!;
     private List<(Entity<MapGridComponent>, DebugMessage)> _grids = new();
-
-    public override OverlaySpace Space => OverlaySpace.WorldSpace | OverlaySpace.ScreenSpace;
 
     internal AtmosDebugOverlay(AtmosDebugOverlaySystem system)
     {
@@ -64,6 +61,8 @@ public sealed class AtmosDebugOverlay : Overlay
         _map = _entManager.System<SharedMapSystem>();
         _font = _cache.GetFont("/Fonts/NotoSans/NotoSans-Regular.ttf", 12);
     }
+
+    public override OverlaySpace Space => OverlaySpace.WorldSpace | OverlaySpace.ScreenSpace;
 
     protected override void Draw(in OverlayDrawArgs args)
     {
@@ -166,16 +165,12 @@ public sealed class AtmosDebugOverlay : Overlay
 
         // -- Pressure Direction --
         if (data.PressureDirection != AtmosDirection.Invalid)
-        {
             DrawPressureDirection(handle, data.PressureDirection, tileCentre, Color.Blue);
-        }
         else if (data.LastPressureDirection != AtmosDirection.Invalid)
-        {
             DrawPressureDirection(handle, data.LastPressureDirection, tileCentre, Color.LightGray);
-        }
 
         // -- Excited Groups --
-        if (data.InExcitedGroup is {} grp)
+        if (data.InExcitedGroup is { } grp)
         {
             var basisA = tile;
             var basisB = tile + new Vector2(1.0f, 1.0f);
@@ -239,7 +234,7 @@ public sealed class AtmosDebugOverlay : Overlay
         if (_ui.MouseGetControl(mousePos) is not IViewportControl viewport)
             return;
 
-        var coords= viewport.PixelToMap(mousePos.Position);
+        var coords = viewport.PixelToMap(mousePos.Position);
         var box = Box2.CenteredAround(coords.Position, 3 * Vector2.One);
         GetGrids(coords.MapId, new Box2Rotated(box));
 
@@ -260,7 +255,7 @@ public sealed class AtmosDebugOverlay : Overlay
     private void DrawTooltip(DrawingHandleScreen handle, Vector2 pos, AtmosDebugOverlayData data)
     {
         var lineHeight = _font.GetLineHeight(1f);
-        var offset  = new Vector2(0, lineHeight);
+        var offset = new Vector2(0, lineHeight);
 
         var moles = data.Moles == null
             ? "No Air"
@@ -290,11 +285,11 @@ public sealed class AtmosDebugOverlay : Overlay
             ref _grids,
             (EntityUid uid,
                 MapGridComponent grid,
-            ref List<(Entity<MapGridComponent>, DebugMessage)> state) =>
-        {
-            if (_system.TileData.TryGetValue(uid, out var data))
-                state.Add(((uid, grid), data));
-            return true;
-        });
+                ref List<(Entity<MapGridComponent>, DebugMessage)> state) =>
+            {
+                if (_system.TileData.TryGetValue(uid, out var data))
+                    state.Add(((uid, grid), data));
+                return true;
+            });
     }
 }

@@ -25,22 +25,32 @@ public sealed class RCDMenuBoundUserInterface : BoundUserInterface
     private const string TopLevelActionCategory = "Main";
 
     private static readonly Dictionary<string, (string Tooltip, SpriteSpecifier Sprite)> PrototypesGroupingInfo
-        = new Dictionary<string, (string Tooltip, SpriteSpecifier Sprite)>
+        = new()
         {
-            ["WallsAndFlooring"] = ("rcd-component-walls-and-flooring", new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/Radial/RCD/walls_and_flooring.png"))),
-            ["WindowsAndGrilles"] = ("rcd-component-windows-and-grilles", new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/Radial/RCD/windows_and_grilles.png"))),
-            ["Airlocks"] = ("rcd-component-airlocks", new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/Radial/RCD/airlocks.png"))),
-            ["Electrical"] = ("rcd-component-electrical", new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/Radial/RCD/multicoil.png"))),
-            ["Lighting"] = ("rcd-component-lighting", new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/Radial/RCD/lighting.png"))),
+            ["WallsAndFlooring"] = ("rcd-component-walls-and-flooring",
+                new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/Radial/RCD/walls_and_flooring.png"))),
+            ["WindowsAndGrilles"] = ("rcd-component-windows-and-grilles",
+                new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/Radial/RCD/windows_and_grilles.png"))),
+            ["Airlocks"] = ("rcd-component-airlocks",
+                new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/Radial/RCD/airlocks.png"))),
+            ["Electrical"] = ("rcd-component-electrical",
+                new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/Radial/RCD/multicoil.png"))),
+            ["Lighting"] = ("rcd-component-lighting",
+                new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/Radial/RCD/lighting.png"))),
             // Goobstation - RPD (13 of stars)
-            ["Piping"] = ("rcd-component-piping", new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/Radial/RPD/fourway.png"))),
-            ["AtmosphericUtility"] = ("rcd-component-atmosphericutility", new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/Radial/RPD/port.png"))),
-            ["PumpsValves"] = ("rcd-component-pumpsvalves", new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/Radial/RPD/pump_volume.png"))),
-            ["Vents"] = ("rcd-component-vents", new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/Radial/RPD/vent_passive.png"))),
+            ["Piping"] = ("rcd-component-piping",
+                new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/Radial/RPD/fourway.png"))),
+            ["AtmosphericUtility"] = ("rcd-component-atmosphericutility",
+                new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/Radial/RPD/port.png"))),
+            ["PumpsValves"] = ("rcd-component-pumpsvalves",
+                new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/Radial/RPD/pump_volume.png"))),
+            ["Vents"] = ("rcd-component-vents",
+                new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/Radial/RPD/vent_passive.png"))),
         };
 
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly ISharedPlayerManager _playerManager = default!;
+
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
 
     private SimpleRadialMenu? _menu;
 
@@ -76,7 +86,7 @@ public sealed class RCDMenuBoundUserInterface : BoundUserInterface
                 var topLevelActionOption = new RadialMenuActionOption<RCDPrototype>(HandleMenuOptionClick, prototype)
                 {
                     Sprite = prototype.Sprite,
-                    ToolTip = GetTooltip(prototype)
+                    ToolTip = GetTooltip(prototype),
                 };
                 topLevelActions.Add(topLevelActionOption);
                 continue;
@@ -94,7 +104,7 @@ public sealed class RCDMenuBoundUserInterface : BoundUserInterface
             var actionOption = new RadialMenuActionOption<RCDPrototype>(HandleMenuOptionClick, prototype)
             {
                 Sprite = prototype.Sprite,
-                ToolTip = GetTooltip(prototype)
+                ToolTip = GetTooltip(prototype),
             };
             list.Add(actionOption);
         }
@@ -107,7 +117,7 @@ public sealed class RCDMenuBoundUserInterface : BoundUserInterface
             models[i] = new RadialMenuNestedLayerOption(list)
             {
                 Sprite = groupInfo.Sprite,
-                ToolTip = Loc.GetString(groupInfo.Tooltip)
+                ToolTip = Loc.GetString(groupInfo.Tooltip),
             };
             i++;
         }
@@ -138,7 +148,7 @@ public sealed class RCDMenuBoundUserInterface : BoundUserInterface
             var name = Loc.GetString(proto.SetName);
 
             if (proto.Prototype != null &&
-                _prototypeManager.TryIndex(proto.Prototype, out var entProto, logError: false))
+                _prototypeManager.TryIndex(proto.Prototype, out var entProto, false))
                 name = entProto.Name;
 
             msg = Loc.GetString("rcd-component-change-build-mode", ("name", name));
@@ -155,23 +165,17 @@ public sealed class RCDMenuBoundUserInterface : BoundUserInterface
 
         if (proto.Mode is RcdMode.ConstructTile or RcdMode.ConstructObject
             && proto.Prototype != null
-            && _prototypeManager.TryIndex(proto.Prototype, out var entProto, logError: false))
-        {
+            && _prototypeManager.TryIndex(proto.Prototype, out var entProto, false))
             tooltip = Loc.GetString(entProto.Name);
-        }
         else
-        {
             tooltip = Loc.GetString(proto.SetName);
-        }
 
         tooltip = OopsConcat(char.ToUpper(tooltip[0]).ToString(), tooltip.Remove(0, 1));
 
         return tooltip;
     }
 
-    private static string OopsConcat(string a, string b)
-    {
+    private static string OopsConcat(string a, string b) =>
         // This exists to prevent Roslyn being clever and compiling something that fails sandbox checks.
-        return a + b;
-    }
+        a + b;
 }

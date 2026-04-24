@@ -28,9 +28,9 @@ namespace Content.Client.Info;
 public sealed partial class RulesControl : BoxContainer, ILinkClickHandler
 {
     [Dependency] private readonly DocumentParsingManager _parsingMan = default!;
+    private readonly Stack<string> _priorEntries = new();
 
     private string? _currentEntry;
-    private readonly Stack<string> _priorEntries = new();
 
     public RulesControl()
     {
@@ -44,10 +44,7 @@ public sealed partial class RulesControl : BoxContainer, ILinkClickHandler
         BackButton.OnPressed += _ => SetGuide(_priorEntries.Pop(), false);
     }
 
-    public void HandleClick(string link)
-    {
-        SetGuide(link);
-    }
+    public void HandleClick(string link) => SetGuide(link);
 
     private void SetGuide(ProtoId<GuideEntryPrototype>? entry = null, bool addToPrior = true)
     {

@@ -5,14 +5,14 @@
 
 using System.Linq;
 using System.Numerics;
+using Content.Client._Mono.Radar;
 using Content.Client.Shuttles.UI;
 using Content.Shared._Mono.FireControl;
+using Content.Shared._Mono.Radar;
 using Content.Shared.Physics;
 using Content.Shared.Shuttles.BUIStates;
 using Content.Shared.Shuttles.Components;
 using Content.Shared.Shuttles.Systems;
-using Content.Client._Mono.Radar;
-using Content.Shared._Mono.Radar;
 using Robust.Client.Graphics;
 using Robust.Client.UserInterface;
 using Robust.Shared.Input;
@@ -27,43 +27,35 @@ namespace Content.Client._Mono.FireControl.UI;
 
 public sealed class FireControlNavControl : BaseShuttleControl
 {
-    [Dependency] private readonly IMapManager _mapManager = default!;
-    private readonly SharedShuttleSystem _shuttles;
-    private readonly SharedTransformSystem _transform;
-    private readonly IEntitySystemManager _sysManager = default!;
+    private const float FireRateLimit = 0.1f;
+    private const float CursorUpdateInterval = 0.1f; // 10 updates per second
     private readonly RadarBlipsSystem _blips;
+    [Dependency] private readonly IMapManager _mapManager = default!;
     private readonly SharedPhysicsSystem _physics;
-
-    private EntityCoordinates? _coordinates;
-    private EntityUid? _consoleEntity;
-    private Angle? _rotation;
-    private Dictionary<NetEntity, List<DockingPortState>> _docks = new();
+    private readonly SharedShuttleSystem _shuttles;
+    private readonly IEntitySystemManager _sysManager = default!;
+    private readonly SharedTransformSystem _transform;
 
     private EntityUid? _activeConsole;
+    private EntityUid? _consoleEntity;
     private FireControllableEntry[]? _controllables;
-    private HashSet<NetEntity> _selectedWeapons = new();
+
+    private EntityCoordinates? _coordinates;
+    private Dictionary<NetEntity, List<DockingPortState>> _docks = new();
 
     private List<Entity<MapGridComponent>> _grids = new();
 
-    #region Mono
-
-    private const float RadarUpdateInterval = 0f;
-    private float _updateAccumulator = 0f;
-    #endregion
-
     private bool _isMouseDown;
     private bool _isMouseInside;
-    private Vector2 _lastMousePos;
-    private float _lastFireTime;
-    private const float FireRateLimit = 0.1f;
-
-    public Action<EntityCoordinates>? OnRadarClick;
-    public bool ShowIFF { get; set; } = true;
-    public bool RotateWithEntity { get; set; } = true;
 
     // Add a limit to how often we update the cursor position to prevent network spam
-    private float _lastCursorUpdateTime = 0f;
-    private const float CursorUpdateInterval = 0.1f; // 10 updates per second
+    private float _lastCursorUpdateTime;
+    private float _lastFireTime;
+    private Vector2 _lastMousePos;
+    private Angle? _rotation;
+    private HashSet<NetEntity> _selectedWeapons = new();
+
+    public Action<EntityCoordinates>? OnRadarClick;
 
     public FireControlNavControl() : base(64f, 512f, 512f)
     {
@@ -76,6 +68,9 @@ public sealed class FireControlNavControl : BaseShuttleControl
         OnMouseEntered += HandleMouseEntered;
         OnMouseExited += HandleMouseExited;
     }
+
+    public bool ShowIFF { get; set; } = true;
+    public bool RotateWithEntity { get; set; } = true;
 
     protected override void MouseMove(GUIMouseMoveEventArgs args)
     {
@@ -95,10 +90,7 @@ public sealed class FireControlNavControl : BaseShuttleControl
         _lastMousePos = UserInterfaceManager.MousePositionScaled.Position - GlobalPosition;
     }
 
-    private void HandleMouseExited(GUIMouseHoverEventArgs args)
-    {
-        _isMouseInside = false;
-    }
+    private void HandleMouseExited(GUIMouseHoverEventArgs args) => _isMouseInside = false;
 
     protected override void KeyBindDown(GUIBoundKeyEventArgs args)
     {
@@ -133,7 +125,7 @@ public sealed class FireControlNavControl : BaseShuttleControl
             _updateAccumulator = 0;
 
             if (_consoleEntity != null)
-                _blips.RequestBlips((EntityUid)_consoleEntity);
+                _blips.RequestBlips((EntityUid) _consoleEntity);
         }
 
         if (_isMouseDown && _isMouseInside)
@@ -143,11 +135,9 @@ public sealed class FireControlNavControl : BaseShuttleControl
             {
                 var mousePos = UserInterfaceManager.MousePositionScaled.Position - GlobalPosition;
                 if (mousePos != _lastMousePos)
-                {
                     _lastMousePos = mousePos;
-                }
                 TryFireAtPosition(_lastMousePos);
-                _lastFireTime = (float)currentTime;
+                _lastFireTime = (float) currentTime;
             }
         }
     }
@@ -170,10 +160,7 @@ public sealed class FireControlNavControl : BaseShuttleControl
         _rotation = angle;
     }
 
-    public void SetConsole(EntityUid? consoleEntity)
-    {
-        _consoleEntity = consoleEntity;
-    }
+    public void SetConsole(EntityUid? consoleEntity) => _consoleEntity = consoleEntity;
 
     public void UpdateState(NavInterfaceState state)
     {
@@ -201,9 +188,7 @@ public sealed class FireControlNavControl : BaseShuttleControl
 
         if (!xformQuery.TryGetComponent(_coordinates.Value.EntityId, out var xform)
             || xform.MapID == MapId.Nullspace)
-        {
             return;
-        }
 
         var mapPos = _transform.ToMapCoordinates(_coordinates.Value);
         var posMatrix = Matrix3Helpers.CreateTransform(_coordinates.Value.Position, _rotation.Value);
@@ -211,7 +196,8 @@ public sealed class FireControlNavControl : BaseShuttleControl
         var ourEntMatrix = Matrix3Helpers.CreateTransform(_transform.GetWorldPosition(xform), ourEntRot);
         var shuttleToWorld = Matrix3x2.Multiply(posMatrix, ourEntMatrix);
         Matrix3x2.Invert(shuttleToWorld, out var worldToShuttle);
-        var shuttleToView = Matrix3x2.CreateScale(new Vector2(MinimapScale, -MinimapScale)) * Matrix3x2.CreateTranslation(MidPointVector);
+        var shuttleToView = Matrix3x2.CreateScale(new Vector2(MinimapScale, -MinimapScale)) *
+                            Matrix3x2.CreateTranslation(MidPointVector);
 
         var ourGridId = xform.GridUid;
         if (EntManager.TryGetComponent<MapGridComponent>(ourGridId, out var ourGrid) &&
@@ -220,13 +206,13 @@ public sealed class FireControlNavControl : BaseShuttleControl
             var ourGridToWorld = _transform.GetWorldMatrix(ourGridId.Value);
             var ourGridToShuttle = Matrix3x2.Multiply(ourGridToWorld, worldToShuttle);
             var ourGridToView = ourGridToShuttle * shuttleToView;
-            var color = _shuttles.GetIFFColor(ourGridId.Value, self: true);
+            var color = _shuttles.GetIFFColor(ourGridId.Value, true);
 
             DrawGrid(handle, ourGridToView, (ourGridId.Value, ourGrid), color);
         }
 
         const float radarVertRadius = 2f;
-        var radarPosVerts = new Vector2[]
+        var radarPosVerts = new[]
         {
             ScalePosition(new Vector2(0f, -radarVertRadius)),
             ScalePosition(new Vector2(radarVertRadius / 2f, 0f)),
@@ -238,7 +224,11 @@ public sealed class FireControlNavControl : BaseShuttleControl
 
         _grids.Clear();
         var maxRange = new Vector2(WorldRange, WorldRange);
-        _mapManager.FindGridsIntersecting(xform.MapID, new Box2(mapPos.Position - maxRange, mapPos.Position + maxRange), ref _grids, approx: true, includeMap: false);
+        _mapManager.FindGridsIntersecting(xform.MapID,
+            new Box2(mapPos.Position - maxRange, mapPos.Position + maxRange),
+            ref _grids,
+            true,
+            false);
 
         foreach (var grid in _grids)
         {
@@ -255,21 +245,22 @@ public sealed class FireControlNavControl : BaseShuttleControl
             var curGridToWorld = _transform.GetWorldMatrix(gUid);
             var curGridToView = curGridToWorld * worldToShuttle * shuttleToView;
 
-            var labelColor = _shuttles.GetIFFColor(grid, self: false, iff);
+            var labelColor = _shuttles.GetIFFColor(grid, false, iff);
             var coordColor = new Color(labelColor.R * 0.8f, labelColor.G * 0.8f, labelColor.B * 0.8f, 0.5f);
 
             DrawGrid(handle, curGridToView, grid, labelColor);
 
             if (ShowIFF)
             {
-                var labelName = _shuttles.GetIFFLabel(grid, self: false, iff);
+                var labelName = _shuttles.GetIFFLabel(grid, false, iff);
                 if (labelName != null)
                 {
                     var gridBounds = grid.Comp.LocalAABB;
                     var gridCentre = Vector2.Transform(gridBody.LocalCenter, curGridToView);
 
                     var distance = gridCentre.Length();
-                    var labelText = Loc.GetString("shuttle-console-iff-label", ("name", labelName),
+                    var labelText = Loc.GetString("shuttle-console-iff-label",
+                        ("name", labelName),
                         ("distance", $"{distance:0.0}"));
 
                     var mapCoords = _transform.GetWorldPosition(gUid);
@@ -299,9 +290,7 @@ public sealed class FireControlNavControl : BaseShuttleControl
                     handle.DrawString(Font, labelUiPosition, labelText, labelColor);
 
                     if (offsetMax < 1)
-                    {
                         handle.DrawString(Font, coordUiPosition, coordsText, 0.7f, coordColor);
-                    }
                 }
             }
         }
@@ -334,7 +323,8 @@ public sealed class FireControlNavControl : BaseShuttleControl
             if (_isMouseInside && _controllables != null)
             {
                 var worldPos = blip.Item1;
-                var isFireControllable = _controllables.Any(c => {
+                var isFireControllable = _controllables.Any(c =>
+                {
                     var coords = EntManager.GetCoordinates(c.Coordinates);
                     var entityMapPos = _transform.ToMapCoordinates(coords);
                     return Vector2.Distance(entityMapPos.Position, worldPos) < 0.1f &&
@@ -350,14 +340,12 @@ public sealed class FireControlNavControl : BaseShuttleControl
                     var cursorWorldPos = Vector2.Transform(cursorViewPos, viewToWorld);
 
                     var direction = cursorWorldPos - worldPos;
-                    var ray = new CollisionRay(worldPos, direction.Normalized(), (int)CollisionGroup.Impassable);
+                    var ray = new CollisionRay(worldPos, direction.Normalized(), (int) CollisionGroup.Impassable);
 
-                    var results = _physics.IntersectRay(xform.MapID, ray, direction.Length(), ignoredEnt: _coordinates?.EntityId);
+                    var results = _physics.IntersectRay(xform.MapID, ray, direction.Length(), _coordinates?.EntityId);
 
                     if (!results.Any())
-                    {
                         handle.DrawLine(blipPos, cursorViewPos, blip.Item3.WithAlpha(0.3f));
-                    }
                 }
             }
         }
@@ -407,10 +395,9 @@ public sealed class FireControlNavControl : BaseShuttleControl
             );
 
             if (viewBounds.Intersects(lineBounds))
-            {
                 handle.DrawLine(startPosInView, endPosInView, line.Color.WithAlpha(0.8f));
-            }
         }
+
         #endregion
     }
 
@@ -427,7 +414,11 @@ public sealed class FireControlNavControl : BaseShuttleControl
         return (scaledValue - MidPointVector) / MinimapScale;
     }
 
-    private void DrawBlipShape(DrawingHandleScreen handle, Vector2 position, float size, Color color, RadarBlipShape shape)
+    private void DrawBlipShape(DrawingHandleScreen handle,
+        Vector2 position,
+        float size,
+        Color color,
+        RadarBlipShape shape)
     {
         switch (shape)
         {
@@ -445,11 +436,11 @@ public sealed class FireControlNavControl : BaseShuttleControl
                 handle.DrawRect(rect, color);
                 break;
             case RadarBlipShape.Triangle:
-                var points = new Vector2[]
+                var points = new[]
                 {
                     position + new Vector2(0, -size),
                     position + new Vector2(-size * 0.866f, size * 0.5f),
-                    position + new Vector2(size * 0.866f, size * 0.5f)
+                    position + new Vector2(size * 0.866f, size * 0.5f),
                 };
                 handle.DrawPrimitives(DrawPrimitiveTopology.TriangleList, points, color);
                 break;
@@ -457,12 +448,12 @@ public sealed class FireControlNavControl : BaseShuttleControl
                 DrawStar(handle, position, size, color);
                 break;
             case RadarBlipShape.Diamond:
-                var diamondPoints = new Vector2[]
+                var diamondPoints = new[]
                 {
                     position + new Vector2(0, -size),
                     position + new Vector2(size, 0),
                     position + new Vector2(0, size),
-                    position + new Vector2(-size, 0)
+                    position + new Vector2(-size, 0),
                 };
                 handle.DrawPrimitives(DrawPrimitiveTopology.TriangleFan, diamondPoints, color);
                 break;
@@ -513,12 +504,12 @@ public sealed class FireControlNavControl : BaseShuttleControl
 
     private void DrawArrow(DrawingHandleScreen handle, Vector2 position, float size, Color color)
     {
-        var points = new Vector2[]
+        var points = new[]
         {
             position + new Vector2(0, -size),
             position + new Vector2(size * 0.5f, 0),
             position + new Vector2(0, size),
-            position + new Vector2(-size * 0.5f, 0)
+            position + new Vector2(-size * 0.5f, 0),
         };
 
         handle.DrawPrimitives(DrawPrimitiveTopology.TriangleFan, points, color);
@@ -539,10 +530,7 @@ public sealed class FireControlNavControl : BaseShuttleControl
         }
     }
 
-    public void UpdateSelectedWeapons(HashSet<NetEntity> selectedWeapons)
-    {
-        _selectedWeapons = selectedWeapons;
-    }
+    public void UpdateSelectedWeapons(HashSet<NetEntity> selectedWeapons) => _selectedWeapons = selectedWeapons;
 
     private void TryUpdateCursorPosition(Vector2 relativePosition)
     {
@@ -550,7 +538,7 @@ public sealed class FireControlNavControl : BaseShuttleControl
         if (currentTime - _lastCursorUpdateTime < CursorUpdateInterval)
             return;
 
-        _lastCursorUpdateTime = (float)currentTime;
+        _lastCursorUpdateTime = (float) currentTime;
 
         // Convert mouse position to world coordinates for missile tracking
         if (_coordinates == null || _rotation == null || OnRadarClick == null)
@@ -569,4 +557,11 @@ public sealed class FireControlNavControl : BaseShuttleControl
     /// Returns true if the mouse button is currently pressed down
     /// </summary>
     public bool IsMouseDown() => _isMouseDown;
+
+    #region Mono
+
+    private const float RadarUpdateInterval = 0f;
+    private float _updateAccumulator;
+
+    #endregion
 }

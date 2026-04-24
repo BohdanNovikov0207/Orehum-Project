@@ -10,8 +10,8 @@ SPDX-License-Identifier: MIT
 -->
 
 <DefaultWindow xmlns="https://spacestation14.io"
-            Title="{Loc 'ame-window-title'}"
-            MinSize="250 250">
+               Title="{Loc 'ame-window-title'}"
+               MinSize="250 250">
     <GridContainer Columns="2">
         <BoxContainer Orientation="Horizontal">
             <Label Text="{Loc 'ame-window-engine-status-label'}" />
@@ -53,14 +53,14 @@ SPDX-License-Identifier: MIT
             <Label Text=" " />
             <Label Name="CoreCount" Text="0" />
         </BoxContainer>
-        <BoxContainer></BoxContainer>
+        <BoxContainer />
         <BoxContainer Orientation="Horizontal">
             <Label Text="{Loc 'ame-window-power-currentsupply-label'}" />
             <Label Text=" " />
             <Label Name="CurrentPowerSupply" Text="0" />
             <Label Text=" kW" />
         </BoxContainer>
-        <BoxContainer></BoxContainer>
+        <BoxContainer />
         <BoxContainer Orientation="Horizontal">
             <Label Text="{Loc 'ame-window-power-targetsupply-label'}" />
             <Label Text=" " />

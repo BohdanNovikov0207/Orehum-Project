@@ -35,56 +35,20 @@ namespace Content.Client.Administration.UI.BanPanel;
 [GenerateTypedNameReferences]
 public sealed partial class BanPanel : DefaultWindow
 {
-    public event Action<string?, (IPAddress, int)?, bool, ImmutableTypedHwid?, bool, uint, string, NoteSeverity, string[]?, bool>? BanSubmitted;
-    public event Action<string>? PlayerChanged;
-    private string? PlayerUsername { get; set; }
-    private (IPAddress, int)? IpAddress { get; set; }
-    private ImmutableTypedHwid? Hwid { get; set; }
-    private double TimeEntered { get; set; }
-    private uint Multiplier { get; set; }
-    private bool HasBanFlag { get; set; }
-    private TimeSpan? ButtonResetOn { get; set; }
+    private const string ExpandedArrow = "▼";
+    private const string ContractedArrow = "▶";
+    private readonly ISawmill _banpanelSawmill;
+    [Dependency] private readonly IConfigurationManager _cfg = default!;
+    [Dependency] private readonly IEntityManager _entMan = default!;
+
+    [Dependency] private readonly IGameTiming _gameTiming = default!;
+    [Dependency] private readonly ILogManager _logManager = default!;
+    [Dependency] private readonly IPrototypeManager _protoMan = default!;
 
     // This is less efficient than just holding a reference to the root control and enumerating children, but you
     // have to know how the controls are nested, which makes the code more complicated.
     // Role group name -> the role buttons themselves.
     private readonly Dictionary<string, List<Button>> _roleCheckboxes = new();
-    private readonly ISawmill _banpanelSawmill;
-
-    [Dependency] private readonly IGameTiming _gameTiming = default!;
-    [Dependency] private readonly IConfigurationManager _cfg = default!;
-    [Dependency] private readonly ILogManager _logManager = default!;
-    [Dependency] private readonly IEntityManager _entMan = default!;
-    [Dependency] private readonly IPrototypeManager _protoMan = default!;
-
-    private const string ExpandedArrow = "▼";
-    private const string ContractedArrow = "▶";
-
-    private enum TabNumbers
-    {
-        BasicInfo,
-        //Text,
-        Players,
-        Roles
-    }
-
-    private enum Multipliers
-    {
-        Minutes,
-        Hours,
-        Days,
-        Weeks,
-        Months,
-        Years,
-        Permanent
-    }
-
-    private enum Types
-    {
-        None,
-        Server,
-        Role
-    }
 
     public BanPanel()
     {
@@ -165,18 +129,34 @@ public sealed partial class BanPanel : DefaultWindow
         ReasonTextEdit.Placeholder = new Rope.Leaf(Loc.GetString("ban-panel-reason"));
 
         var departmentJobs = _protoMan.EnumeratePrototypes<DepartmentPrototype>()
-                                      .OrderBy(x => x.Weight);
+            .OrderBy(x => x.Weight);
         foreach (var proto in departmentJobs)
         {
             var roles = proto.Roles.Select(x => _protoMan.Index(x))
-                             .OrderBy(x => x.ID);
+                .OrderBy(x => x.ID);
             CreateRoleGroup(proto.ID, proto.Color, roles);
         }
 
         var antagRoles = _protoMan.EnumeratePrototypes<AntagPrototype>()
-                                  .OrderBy(x => x.ID);
+            .OrderBy(x => x.ID);
         CreateRoleGroup("Antagonist", Color.Red, antagRoles);
     }
+
+    private string? PlayerUsername { get; set; }
+    private (IPAddress, int)? IpAddress { get; set; }
+    private ImmutableTypedHwid? Hwid { get; set; }
+    private double TimeEntered { get; set; }
+    private uint Multiplier { get; set; }
+    private bool HasBanFlag { get; set; }
+    private TimeSpan? ButtonResetOn { get; set; }
+
+    private ErrorLevelEnum ErrorLevel { get; set; }
+
+    public event
+        Action<string?, (IPAddress, int)?, bool, ImmutableTypedHwid?, bool, uint, string, NoteSeverity, string[]?, bool>
+        ? BanSubmitted;
+
+    public event Action<string>? PlayerChanged;
 
     /// <summary>
     /// Creates a "Role group" which stores information and logic for one "group" of roll bans.
@@ -225,14 +205,17 @@ public sealed partial class BanPanel : DefaultWindow
         {
             PanelOverride = new StyleBoxFlat
             {
-                BackgroundColor = color
-            }
+                BackgroundColor = color,
+            },
         });
         RolesContainer.AddChild(outerContainer);
         RolesContainer.AddChild(new HSeparator());
     }
 
-    private Button CreateRoleGroupHeader(string groupName, BoxContainer header, Color color, GridContainer innerContainer)
+    private Button CreateRoleGroupHeader(string groupName,
+        BoxContainer header,
+        Color color,
+        GridContainer innerContainer)
     {
         var roleGroupCheckbox = new Button
         {
@@ -252,12 +235,15 @@ public sealed partial class BanPanel : DefaultWindow
 
             if (args.Pressed)
             {
-                if (!Enum.TryParse(_cfg.GetCVar(CCVars.DepartmentBanDefaultSeverity), true, out NoteSeverity newSeverity))
+                if (!Enum.TryParse(_cfg.GetCVar(CCVars.DepartmentBanDefaultSeverity),
+                        true,
+                        out NoteSeverity newSeverity))
                 {
                     _banpanelSawmill
                         .Warning("Departmental role ban severity could not be parsed from config!");
                     return;
                 }
+
                 SeverityOption.SelectId((int) newSeverity);
             }
             else
@@ -277,6 +263,7 @@ public sealed partial class BanPanel : DefaultWindow
                         .Warning("Role ban severity could not be parsed from config!");
                     return;
                 }
+
                 SeverityOption.SelectId((int) newSeverity);
             }
         };
@@ -289,7 +276,7 @@ public sealed partial class BanPanel : DefaultWindow
         hideButton.OnPressed += args =>
         {
             innerContainer.Visible = args.Button.Pressed;
-            ((Button)args.Button).Text = args.Button.Pressed
+            ((Button) args.Button).Text = args.Button.Pressed
                 ? Loc.GetString("role-bans-contract-roles") + " " + ExpandedArrow
                 : Loc.GetString("role-bans-expand-roles") + " " + ContractedArrow;
         };
@@ -308,7 +295,10 @@ public sealed partial class BanPanel : DefaultWindow
     /// Adds a checkbutton specifically for one "role" in a "group"
     /// E.g. it would add the Chief Medical Officer "role" into the "Medical" group.
     /// </summary>
-    private void AddRoleCheckbox(string group, string role, GridContainer roleGroupInnerContainer, Button roleGroupCheckbox)
+    private void AddRoleCheckbox(string group,
+        string role,
+        GridContainer roleGroupInnerContainer,
+        Button roleGroupCheckbox)
     {
         var roleCheckboxContainer = new BoxContainer();
         var roleCheckButton = new Button
@@ -328,7 +318,8 @@ public sealed partial class BanPanel : DefaultWindow
 
         // This is adding the icon before the role name
         // Yeah, this is sus, but having to split the functions up and stuff is worse imo.
-        if (_protoMan.TryIndex<JobPrototype>(role, out var jobPrototype) && _protoMan.TryIndex(jobPrototype.Icon, out var iconProto))
+        if (_protoMan.TryIndex<JobPrototype>(role, out var jobPrototype) &&
+            _protoMan.TryIndex(jobPrototype.Icon, out var iconProto))
         {
             var jobIconTexture = new TextureRect
             {
@@ -364,24 +355,13 @@ public sealed partial class BanPanel : DefaultWindow
             UpdateSubmitEnabled();
             return;
         }
+
         PlayerNameLine.ModulateSelfOverride = null;
         ErrorLevel &= ~ErrorLevelEnum.PlayerName;
         UpdateSubmitEnabled();
         PlayerUsername = playerName;
         PlayerNameLine.Text = playerName;
     }
-
-    [Flags]
-    private enum ErrorLevelEnum : byte
-    {
-        None = 0,
-        Minutes = 1 << 0,
-        PlayerName = 1 << 1,
-        IpAddress = 1 << 2,
-        Hwid = 1 << 3,
-    }
-
-    private ErrorLevelEnum ErrorLevel { get; set; }
 
     private void OnMinutesChanged(LineEdit.LineEditEventArgs args)
     {
@@ -414,7 +394,7 @@ public sealed partial class BanPanel : DefaultWindow
             (int) Multipliers.Months => 60 * 24 * 30,
             (int) Multipliers.Years => 60 * 24 * 365,
             (int) Multipliers.Permanent => 0,
-            _ => throw new ArgumentOutOfRangeException(nameof(MultiplierOption.SelectedId), "Multiplier out of range")
+            _ => throw new ArgumentOutOfRangeException(nameof(MultiplierOption.SelectedId), "Multiplier out of range"),
         };
         UpdateExpiresLabel();
     }
@@ -437,6 +417,7 @@ public sealed partial class BanPanel : DefaultWindow
             UpdateSubmitEnabled();
             return;
         }
+
         var ip = IpLine.Text;
         var hid = "0";
         if (ip.Contains('/'))
@@ -446,7 +427,8 @@ public sealed partial class BanPanel : DefaultWindow
             hid = split[1];
         }
 
-        if (!IPAddress.TryParse(ip, out var parsedIp) || !byte.TryParse(hid, out var hidInt) || hidInt > 128 || hidInt > 32 && parsedIp.AddressFamily == AddressFamily.InterNetwork)
+        if (!IPAddress.TryParse(ip, out var parsedIp) || !byte.TryParse(hid, out var hidInt) || hidInt > 128 ||
+            hidInt > 32 && parsedIp.AddressFamily == AddressFamily.InterNetwork)
         {
             ErrorLevel |= ErrorLevelEnum.IpAddress;
             IpLine.ModulateSelfOverride = Color.Red;
@@ -466,7 +448,8 @@ public sealed partial class BanPanel : DefaultWindow
     {
         var hwidString = HwidLine.Text;
         ImmutableTypedHwid? hwid = null;
-        if (HwidCheckbox.Pressed && !(string.IsNullOrEmpty(hwidString) && LastConnCheckbox.Pressed) && !ImmutableTypedHwid.TryParse(hwidString, out hwid))
+        if (HwidCheckbox.Pressed && !(string.IsNullOrEmpty(hwidString) && LastConnCheckbox.Pressed) &&
+            !ImmutableTypedHwid.TryParse(hwidString, out hwid))
         {
             ErrorLevel |= ErrorLevelEnum.Hwid;
             HwidLine.ModulateSelfOverride = Color.Red;
@@ -483,6 +466,7 @@ public sealed partial class BanPanel : DefaultWindow
             Hwid = null;
             return;
         }
+
         Hwid = hwid;
     }
 
@@ -490,10 +474,10 @@ public sealed partial class BanPanel : DefaultWindow
     {
         TypeOption.ModulateSelfOverride = null;
         Tabs.SetTabVisible((int) TabNumbers.Roles, TypeOption.SelectedId == (int) Types.Role);
-            NoteSeverity? newSeverity = null;
-            switch (TypeOption.SelectedId)
-            {
-                case (int)Types.Server:
+        NoteSeverity? newSeverity = null;
+        switch (TypeOption.SelectedId)
+        {
+            case (int) Types.Server:
                 if (Enum.TryParse(_cfg.GetCVar(CCVars.ServerBanDefaultSeverity), true, out NoteSeverity serverSeverity))
                     newSeverity = serverSeverity;
                 else
@@ -503,28 +487,24 @@ public sealed partial class BanPanel : DefaultWindow
                 }
 
                 break;
-                case (int) Types.Role:
+            case (int) Types.Role:
 
-                    if (Enum.TryParse(_cfg.GetCVar(CCVars.RoleBanDefaultSeverity), true, out NoteSeverity roleSeverity))
-                    {
-                        newSeverity = roleSeverity;
-                    }
-                    else
-                    {
-                        _banpanelSawmill
-                            .Warning("Role ban severity could not be parsed from config!");
-                    }
-                    break;
-            }
+                if (Enum.TryParse(_cfg.GetCVar(CCVars.RoleBanDefaultSeverity), true, out NoteSeverity roleSeverity))
+                    newSeverity = roleSeverity;
+                else
+                {
+                    _banpanelSawmill
+                        .Warning("Role ban severity could not be parsed from config!");
+                }
 
-            if (newSeverity != null)
-                SeverityOption.SelectId((int) newSeverity.Value);
+                break;
+        }
+
+        if (newSeverity != null)
+            SeverityOption.SelectId((int) newSeverity.Value);
     }
 
-    private void UpdateSubmitEnabled()
-    {
-        SubmitButton.Disabled = ErrorLevel != ErrorLevelEnum.None;
-    }
+    private void UpdateSubmitEnabled() => SubmitButton.Disabled = ErrorLevel != ErrorLevelEnum.None;
 
     private void OnPlayerNameChanged()
     {
@@ -566,9 +546,7 @@ public sealed partial class BanPanel : DefaultWindow
             foreach (var button in _roleCheckboxes.Values.SelectMany(departmentButtons => departmentButtons))
             {
                 if (button is { Pressed: true, Text: not null })
-                {
                     rolesList.Add(button.Text);
-                }
             }
 
             if (rolesList.Count == 0)
@@ -611,7 +589,16 @@ public sealed partial class BanPanel : DefaultWindow
         var useLastHwid = HwidCheckbox.Pressed && LastConnCheckbox.Pressed && Hwid is null;
         var severity = (NoteSeverity) SeverityOption.SelectedId;
         var erase = EraseCheckbox.Pressed;
-        BanSubmitted?.Invoke(player, IpAddress, useLastIp, Hwid, useLastHwid, (uint) (TimeEntered * Multiplier), reason, severity, roles, erase);
+        BanSubmitted?.Invoke(player,
+            IpAddress,
+            useLastIp,
+            Hwid,
+            useLastHwid,
+            (uint) (TimeEntered * Multiplier),
+            reason,
+            severity,
+            roles,
+            erase);
     }
 
     protected override void FrameUpdate(FrameEventArgs args)
@@ -625,5 +612,42 @@ public sealed partial class BanPanel : DefaultWindow
             SubmitButton.ModulateSelfOverride = null;
             SubmitButton.Text = Loc.GetString("ban-panel-submit");
         }
+    }
+
+    private enum TabNumbers
+    {
+        BasicInfo,
+
+        //Text,
+        Players,
+        Roles,
+    }
+
+    private enum Multipliers
+    {
+        Minutes,
+        Hours,
+        Days,
+        Weeks,
+        Months,
+        Years,
+        Permanent,
+    }
+
+    private enum Types
+    {
+        None,
+        Server,
+        Role,
+    }
+
+    [Flags]
+    private enum ErrorLevelEnum : byte
+    {
+        None = 0,
+        Minutes = 1 << 0,
+        PlayerName = 1 << 1,
+        IpAddress = 1 << 2,
+        Hwid = 1 << 3,
     }
 }

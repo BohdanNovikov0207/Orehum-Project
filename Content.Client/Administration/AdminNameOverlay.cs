@@ -110,7 +110,6 @@ using Content.Client.Stylesheets;
 using Content.Goobstation.Common.CCVar;
 using Content.Shared.Administration;
 using Content.Shared.CCVar;
-using Content.Shared.Ghost;
 using Content.Shared.Mind;
 using Content.Shared.Roles;
 using Robust.Client.Graphics;
@@ -124,35 +123,38 @@ namespace Content.Client.Administration;
 
 internal sealed class AdminNameOverlay : Overlay
 {
-    private readonly AdminSystem _system;
-    private readonly IEntityManager _entityManager;
-    private readonly IEyeManager _eyeManager;
-    private readonly EntityLookupSystem _entityLookup;
-    private readonly IUserInterfaceManager _userInterfaceManager;
-    private readonly SharedRoleSystem _roles;
-    private readonly IPrototypeManager _prototypeManager;
-    private readonly Font _font;
-    private readonly Font _fontBold;
-    private AdminOverlayAntagFormat _overlayFormat;
-    private AdminOverlayAntagSymbolStyle _overlaySymbolStyle;
-    private bool _overlayPlaytime;
-    private bool _overlayStartingJob;
-    private float _ghostFadeDistance;
-    private float _ghostHideDistance;
-    private int _overlayStackMax;
-    private float _overlayMergeDistance;
-
-    // Goobstation - Start
-    private bool _showCharacterName;
-    private bool _showUserName;
     // Goobstation - End
 
     //TODO make this adjustable via GUI?
     private static readonly FrozenSet<ProtoId<RoleTypePrototype>> Filter =
-        new ProtoId<RoleTypePrototype>[] {"SoloAntagonist", "TeamAntagonist", "SiliconAntagonist", "FreeAgent", "SentientAnimal"} // Goobstation - Sentient Animals adds SentientAnimal
-        .ToFrozenSet();
+        new ProtoId<RoleTypePrototype>[]
+            {
+                "SoloAntagonist", "TeamAntagonist", "SiliconAntagonist", "FreeAgent", "SentientAnimal",
+            } // Goobstation - Sentient Animals adds SentientAnimal
+            .ToFrozenSet();
 
     private readonly string _antagLabelClassic = Loc.GetString("admin-overlay-antag-classic");
+    private readonly EntityLookupSystem _entityLookup;
+    private readonly IEntityManager _entityManager;
+    private readonly IEyeManager _eyeManager;
+    private readonly Font _font;
+    private readonly Font _fontBold;
+    private readonly IPrototypeManager _prototypeManager;
+    private readonly SharedRoleSystem _roles;
+    private readonly AdminSystem _system;
+    private readonly IUserInterfaceManager _userInterfaceManager;
+    private float _ghostFadeDistance;
+    private float _ghostHideDistance;
+    private AdminOverlayAntagFormat _overlayFormat;
+    private float _overlayMergeDistance;
+    private bool _overlayPlaytime;
+    private int _overlayStackMax;
+    private bool _overlayStartingJob;
+    private AdminOverlayAntagSymbolStyle _overlaySymbolStyle;
+
+    // Goobstation - Start
+    private bool _showCharacterName;
+    private bool _showUserName;
 
     public AdminNameOverlay(
         AdminSystem system,
@@ -175,22 +177,28 @@ internal sealed class AdminNameOverlay : Overlay
         ZIndex = 200;
         // Setting these to a specific ttf would break the antag symbols
         _font = resourceCache.NotoStack();
-        _fontBold = resourceCache.NotoStack(variation: "Bold");
+        _fontBold = resourceCache.NotoStack("Bold");
 
-        config.OnValueChanged(CCVars.AdminOverlayAntagFormat, (show) => { _overlayFormat = UpdateOverlayFormat(show); }, true);
-        config.OnValueChanged(CCVars.AdminOverlaySymbolStyle, (show) => { _overlaySymbolStyle = UpdateOverlaySymbolStyle(show); }, true);
-        config.OnValueChanged(CCVars.AdminOverlayPlaytime, (show) => { _overlayPlaytime = show; }, true);
-        config.OnValueChanged(CCVars.AdminOverlayStartingJob, (show) => { _overlayStartingJob = show; }, true);
-        config.OnValueChanged(CCVars.AdminOverlayGhostHideDistance, (f) => { _ghostHideDistance = f; }, true);
-        config.OnValueChanged(CCVars.AdminOverlayGhostFadeDistance, (f) => { _ghostFadeDistance = f; }, true);
-        config.OnValueChanged(CCVars.AdminOverlayStackMax, (i) => { _overlayStackMax = i; }, true);
-        config.OnValueChanged(CCVars.AdminOverlayMergeDistance, (f) => { _overlayMergeDistance = f; }, true);
+        config.OnValueChanged(CCVars.AdminOverlayAntagFormat,
+            show => { _overlayFormat = UpdateOverlayFormat(show); },
+            true);
+        config.OnValueChanged(CCVars.AdminOverlaySymbolStyle,
+            show => { _overlaySymbolStyle = UpdateOverlaySymbolStyle(show); },
+            true);
+        config.OnValueChanged(CCVars.AdminOverlayPlaytime, show => { _overlayPlaytime = show; }, true);
+        config.OnValueChanged(CCVars.AdminOverlayStartingJob, show => { _overlayStartingJob = show; }, true);
+        config.OnValueChanged(CCVars.AdminOverlayGhostHideDistance, f => { _ghostHideDistance = f; }, true);
+        config.OnValueChanged(CCVars.AdminOverlayGhostFadeDistance, f => { _ghostFadeDistance = f; }, true);
+        config.OnValueChanged(CCVars.AdminOverlayStackMax, i => { _overlayStackMax = i; }, true);
+        config.OnValueChanged(CCVars.AdminOverlayMergeDistance, f => { _overlayMergeDistance = f; }, true);
 
         // Goobstation - Start
-        config.OnValueChanged(GoobCVars.AdminOverlayShowCharacterName, (show) => { _showCharacterName = show; }, true);
-        config.OnValueChanged(GoobCVars.AdminOverlayShowUserName, (show) => { _showUserName = show; }, true);
+        config.OnValueChanged(GoobCVars.AdminOverlayShowCharacterName, show => { _showCharacterName = show; }, true);
+        config.OnValueChanged(GoobCVars.AdminOverlayShowUserName, show => { _showUserName = show; }, true);
         // Goobstation - End
     }
+
+    public override OverlaySpace Space => OverlaySpace.ScreenSpace;
 
     private AdminOverlayAntagFormat UpdateOverlayFormat(string formatString)
     {
@@ -208,15 +216,13 @@ internal sealed class AdminNameOverlay : Overlay
         return symbolStyle;
     }
 
-    public override OverlaySpace Space => OverlaySpace.ScreenSpace;
-
     protected override void Draw(in OverlayDrawArgs args)
     {
         var viewport = args.WorldAABB;
         var colorDisconnected = Color.White;
         var uiScale = _userInterfaceManager.RootControl.UIScale;
         var lineoffset = new Vector2(0f, 14f) * uiScale;
-        var drawnOverlays = new List<(Vector2,Vector2)>() ; // A saved list of the overlays already drawn
+        var drawnOverlays = new List<(Vector2, Vector2)>(); // A saved list of the overlays already drawn
 
         // Get all player positions before drawing overlays, so they can be sorted before iteration
         var sortable = new List<(PlayerInfo, Box2, EntityUid, Vector2)>();
@@ -296,7 +302,7 @@ internal sealed class AdminNameOverlay : Overlay
                 {
                     // additional entries after maximum stack size is reached will be drawn over the last entry
                     if (i <= _overlayStackMax - 1)
-                        currentOffset = lineoffset + s.Item2 ;
+                        currentOffset = lineoffset + s.Item2;
                     i++;
                 }
             }
@@ -307,7 +313,11 @@ internal sealed class AdminNameOverlay : Overlay
             if (_showCharacterName) // Goobstation
             {
                 color.A = alpha;
-                args.ScreenHandle.DrawString(_font, screenCoordinates + currentOffset, playerInfo.CharacterName, uiScale, playerInfo.Connected ? color : colorDisconnected);
+                args.ScreenHandle.DrawString(_font,
+                    screenCoordinates + currentOffset,
+                    playerInfo.CharacterName,
+                    uiScale,
+                    playerInfo.Connected ? color : colorDisconnected);
                 currentOffset += lineoffset;
             }
 
@@ -316,7 +326,11 @@ internal sealed class AdminNameOverlay : Overlay
             {
                 color = Color.Yellow;
                 color.A = alpha;
-                args.ScreenHandle.DrawString(_font, screenCoordinates + currentOffset, playerInfo.Username, uiScale, playerInfo.Connected ? color : colorDisconnected);
+                args.ScreenHandle.DrawString(_font,
+                    screenCoordinates + currentOffset,
+                    playerInfo.Username,
+                    uiScale,
+                    playerInfo.Connected ? color : colorDisconnected);
                 currentOffset += lineoffset;
             }
 
@@ -325,7 +339,11 @@ internal sealed class AdminNameOverlay : Overlay
             {
                 color = Color.Orange;
                 color.A = alpha;
-                args.ScreenHandle.DrawString(_font, screenCoordinates + currentOffset, playerInfo.PlaytimeString, uiScale, playerInfo.Connected ? color : colorDisconnected);
+                args.ScreenHandle.DrawString(_font,
+                    screenCoordinates + currentOffset,
+                    playerInfo.PlaytimeString,
+                    uiScale,
+                    playerInfo.Connected ? color : colorDisconnected);
                 currentOffset += lineoffset;
             }
 
@@ -334,7 +352,11 @@ internal sealed class AdminNameOverlay : Overlay
             {
                 color = Color.GreenYellow;
                 color.A = alpha;
-                args.ScreenHandle.DrawString(_font, screenCoordinates + currentOffset, Loc.GetString(playerInfo.StartingJob), uiScale, playerInfo.Connected ? color : colorDisconnected);
+                args.ScreenHandle.DrawString(_font,
+                    screenCoordinates + currentOffset,
+                    Loc.GetString(playerInfo.StartingJob),
+                    uiScale,
+                    playerInfo.Connected ? color : colorDisconnected);
                 currentOffset += lineoffset;
             }
 

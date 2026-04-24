@@ -9,7 +9,7 @@ public sealed partial class WeatherSystem
     /// </summary>
     private bool CanHearWeather(EntityUid uid, WeatherData weather)
     {
-        if (_playerManager.LocalEntity is not {} ent)
+        if (_playerManager.LocalEntity is not { } ent)
             return false;
 
         var map = Transform(uid).MapUid;

@@ -23,7 +23,8 @@ SPDX-License-Identifier: MIT
                 <RichTextLabel Name="Description" />
 
                 <!-- Contains actual messages -->
-                <ScrollContainer HScrollEnabled="False" Margin="4" VerticalExpand="True" ReturnMeasure="True" MaxHeight="400">
+                <ScrollContainer HScrollEnabled="False" Margin="4" VerticalExpand="True" ReturnMeasure="True"
+                                 MaxHeight="400">
                     <BoxContainer Orientation="Vertical" Name="MessageContainer" Margin="0 2 0 0" />
                 </ScrollContainer>
 

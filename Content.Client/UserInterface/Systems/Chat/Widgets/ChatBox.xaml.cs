@@ -26,9 +26,9 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using System.Linq;
+// Goobstation Change
 using Content.Client.UserInterface.Systems.Chat.Controls;
-using Content.Goobstation.Common.CCVar; // Goobstation Change
+using Content.Goobstation.Common.CCVar;
 using Content.Shared.Chat;
 using Content.Shared.Input;
 using Robust.Client.Audio;
@@ -49,21 +49,19 @@ namespace Content.Client.UserInterface.Systems.Chat.Widgets;
 [Virtual]
 public partial class ChatBox : UIWidget
 {
+    private readonly IConfigurationManager _cfg; // WD EDIT
+    private readonly ChatUIController _controller;
     [Dependency] private readonly IEntityManager _entManager = default!;
+    private readonly ILocalizationManager _loc; // WD EDIT
     [Dependency] private readonly ILogManager _log = default!;
 
     private readonly ISawmill _sawmill;
-    private readonly ChatUIController _controller;
-    private readonly IConfigurationManager _cfg; // WD EDIT
-    private readonly ILocalizationManager _loc; // WD EDIT
 
-    public bool Main { get; set; }
-
-    public ChatSelectChannel SelectedChannel => ChatInput.ChannelSelector.SelectedChannel;
     // WD EDIT START
-    private bool _coalescence = false; // op ult btw
+    private bool _coalescence; // op ult btw
     private (string, Color)? _lastLine;
-    private int _lastLineRepeatCount = 0;
+
+    private int _lastLineRepeatCount;
     // WD EDIT END
 
     public ChatBox()
@@ -87,26 +85,30 @@ public partial class ChatBox : UIWidget
 
         // WD EDIT START
         _cfg = IoCManager.Resolve<IConfigurationManager>();
-        _coalescence = _cfg.GetCVar(GoobCVars.CoalesceIdenticalMessages); // i am uncomfortable calling repopulate on chatbox in its ctor, even though it worked in testing i'll still err on the side of caution
-        _cfg.OnValueChanged(GoobCVars.CoalesceIdenticalMessages, UpdateCoalescence, true); // eplicitly false to underline the above comment
+        _coalescence =
+            _cfg.GetCVar(GoobCVars
+                .CoalesceIdenticalMessages); // i am uncomfortable calling repopulate on chatbox in its ctor, even though it worked in testing i'll still err on the side of caution
+        _cfg.OnValueChanged(GoobCVars.CoalesceIdenticalMessages,
+            UpdateCoalescence,
+            true); // eplicitly false to underline the above comment
         // WD EDIT END
     }
 
-    private void OnTextEntered(LineEditEventArgs args)
-    {
-        _controller.SendMessage(this, SelectedChannel);
-    }
+    public bool Main { get; set; }
+
+    public ChatSelectChannel SelectedChannel => ChatInput.ChannelSelector.SelectedChannel;
+
+    private void OnTextEntered(LineEditEventArgs args) => _controller.SendMessage(this, SelectedChannel);
 
     private void OnMessageAdded(ChatMessage msg)
     {
         _sawmill.Debug($"{msg.Channel}: {msg.Message}");
         if (!ChatInput.FilterButton.Popup.IsActive(msg.Channel))
-        {
             return;
-        }
 
-        if (msg is { Read: false, AudioPath: { } })
-            _entManager.System<AudioSystem>().PlayGlobal(msg.AudioPath, Filter.Local(), false, AudioParams.Default.WithVolume(msg.AudioVolume));
+        if (msg is { Read: false, AudioPath: not null })
+            _entManager.System<AudioSystem>()
+                .PlayGlobal(msg.AudioPath, Filter.Local(), false, AudioParams.Default.WithVolume(msg.AudioVolume));
 
         msg.Read = true;
 
@@ -134,64 +136,31 @@ public partial class ChatBox : UIWidget
         } // WD EDIT END
     }
 
-    private void OnHighlightsUpdated(string highlights)
-    {
-        ChatInput.FilterButton.Popup.UpdateHighlights(highlights);
-    }
+    private void OnHighlightsUpdated(string highlights) => ChatInput.FilterButton.Popup.UpdateHighlights(highlights);
 
-    private void OnChannelSelect(ChatSelectChannel channel)
-    {
-        _controller.UpdateSelectedChannel(this);
-    }
-
-    // Goobstation moved to .Goob.cs
-    #region Moved to .Goob.cs
-    /*
-    public void Repopulate()
-    {
-        Contents.Clear();
-
-        foreach (var message in _controller.History)
-        {
-            OnMessageAdded(message.Item2);
-        }
-    }
-    */
-
-    /*
-    private void OnChannelFilter(ChatChannel channel, bool active)
-    {
-        Contents.Clear();
-
-        if (active)
-        {
-            _controller.ClearUnfilteredUnreads(channel);
-        }
-    }
-    */
-    #endregion
+    private void OnChannelSelect(ChatSelectChannel channel) => _controller.UpdateSelectedChannel(this);
 
 
-    private void OnNewHighlights(string highlighs)
-    {
-        _controller.UpdateHighlights(highlighs);
-    }
+    private void OnNewHighlights(string highlighs) => _controller.UpdateHighlights(highlighs);
 
     public void AddLine(string message, Color color, int repeat = 0)
     {
-        var formatted = new FormattedMessage(4); // WD EDIT // specifying size beforehand smells like a useless microoptimisation, but i'll give them the benefit of doubt
+        var formatted =
+            new FormattedMessage(
+                4); // WD EDIT // specifying size beforehand smells like a useless microoptimisation, but i'll give them the benefit of doubt
         formatted.PushColor(color);
         formatted.AddMarkupOrThrow(message);
         formatted.Pop();
-        if(repeat != 0) // WD EDIT START
+        if (repeat != 0) // WD EDIT START
         {
-            int displayRepeat = repeat + 1;
-            int sizeIncrease = Math.Min(displayRepeat / 6, 5);
+            var displayRepeat = repeat + 1;
+            var sizeIncrease = Math.Min(displayRepeat / 6, 5);
             formatted.AddMarkupOrThrow(_loc.GetString("chat-system-repeated-message-counter",
-                                ("count", displayRepeat),
-                                ("size", 8+sizeIncrease)
-                                ));
+                ("count", displayRepeat),
+                ("size", 8 + sizeIncrease)
+            ));
         } // WD EDIT END
+
         Contents.AddMessage(formatted);
     }
 
@@ -265,23 +234,20 @@ public partial class ChatBox : UIWidget
         _controller.NotifyChatTextChange();
     }
 
-    private void OnFocusEnter(LineEditEventArgs args)
-    {
+    private void OnFocusEnter(LineEditEventArgs args) =>
         // Warn typing indicator about focus
         _controller.NotifyChatFocus(true);
-    }
 
-    private void OnFocusExit(LineEditEventArgs args)
-    {
+    private void OnFocusExit(LineEditEventArgs args) =>
         // Warn typing indicator about focus
         _controller.NotifyChatFocus(false);
-    }
 
     protected override void Dispose(bool disposing)
     {
         base.Dispose(disposing);
 
-        if (!disposing) return;
+        if (!disposing)
+            return;
         _controller.UnregisterChat(this);
         ChatInput.Input.OnTextEntered -= OnTextEntered;
         ChatInput.Input.OnKeyBindDown -= OnInputKeyBindDown;
@@ -289,4 +255,34 @@ public partial class ChatBox : UIWidget
         ChatInput.ChannelSelector.OnChannelSelect -= OnChannelSelect;
         _cfg.UnsubValueChanged(GoobCVars.CoalesceIdenticalMessages, UpdateCoalescence); // WD EDIT
     }
+
+    // Goobstation moved to .Goob.cs
+
+    #region Moved to .Goob.cs
+
+    /*
+    public void Repopulate()
+    {
+        Contents.Clear();
+
+        foreach (var message in _controller.History)
+        {
+            OnMessageAdded(message.Item2);
+        }
+    }
+    */
+
+    /*
+    private void OnChannelFilter(ChatChannel channel, bool active)
+    {
+        Contents.Clear();
+
+        if (active)
+        {
+            _controller.ClearUnfilteredUnreads(channel);
+        }
+    }
+    */
+
+    #endregion
 }

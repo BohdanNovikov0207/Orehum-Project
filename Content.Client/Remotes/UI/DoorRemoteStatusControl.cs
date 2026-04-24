@@ -44,7 +44,7 @@ public sealed class DoorRemoteStatusControl : Control
             OperatingMode.OpenClose => "door-remote-open-close-text",
             OperatingMode.ToggleBolts => "door-remote-toggle-bolt-text",
             OperatingMode.ToggleEmergencyAccess => "door-remote-emergency-access-text",
-            _ => "door-remote-invalid-text"
+            _ => "door-remote-invalid-text",
         });
 
         _label.SetMarkup(Loc.GetString("door-remote-mode-label", ("modeString", modeStringLocalized)));

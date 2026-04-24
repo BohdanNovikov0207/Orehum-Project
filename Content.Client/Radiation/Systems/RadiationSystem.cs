@@ -53,8 +53,5 @@ public sealed class RadiationSystem : EntitySystem
         Rays = ev.Rays;
     }
 
-    private void OnResistanceUpdate(OnRadiationOverlayResistanceUpdateEvent ev)
-    {
-        ResistanceGrids = ev.Grids;
-    }
+    private void OnResistanceUpdate(OnRadiationOverlayResistanceUpdateEvent ev) => ResistanceGrids = ev.Grids;
 }

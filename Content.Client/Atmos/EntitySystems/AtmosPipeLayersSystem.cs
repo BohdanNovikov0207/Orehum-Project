@@ -4,6 +4,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Diagnostics.CodeAnalysis;
 using Content.Shared.Atmos.Components;
 using Content.Shared.Atmos.EntitySystems;
 using Robust.Client.GameObjects;
@@ -11,14 +12,13 @@ using Robust.Client.ResourceManagement;
 using Robust.Shared.Reflection;
 using Robust.Shared.Serialization.TypeSerializers.Implementations;
 using Robust.Shared.Utility;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Content.Client.Atmos.EntitySystems;
 
 /// <summary>
 /// The system responsible for updating the appearance of layered gas pipe
 /// </summary>
-public sealed partial class AtmosPipeLayersSystem : SharedAtmosPipeLayersSystem
+public sealed class AtmosPipeLayersSystem : SharedAtmosPipeLayersSystem
 {
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
     [Dependency] private readonly IReflectionManager _reflection = default!;
@@ -39,11 +39,11 @@ public sealed partial class AtmosPipeLayersSystem : SharedAtmosPipeLayersSystem
 
         if (_appearance.TryGetData<string>(ent, AtmosPipeLayerVisuals.Sprite, out var spriteRsi) &&
             _resourceCache.TryGetResource(SpriteSpecifierSerializer.TextureRoot / spriteRsi, out RSIResource? resource))
-        {
             _sprite.SetBaseRsi((ent, sprite), resource.RSI);
-        }
 
-        if (_appearance.TryGetData<Dictionary<string, string>>(ent, AtmosPipeLayerVisuals.SpriteLayers, out var pipeState))
+        if (_appearance.TryGetData<Dictionary<string, string>>(ent,
+                AtmosPipeLayerVisuals.SpriteLayers,
+                out var pipeState))
         {
             foreach (var (layerKey, rsiPath) in pipeState)
             {
@@ -55,8 +55,6 @@ public sealed partial class AtmosPipeLayersSystem : SharedAtmosPipeLayersSystem
         }
     }
 
-    private bool TryParseKey(string keyString, [NotNullWhen(true)] out Enum? @enum)
-    {
-        return _reflection.TryParseEnumReference(keyString, out @enum);
-    }
+    private bool TryParseKey(string keyString, [NotNullWhen(true)] out Enum? @enum) =>
+        _reflection.TryParseEnumReference(keyString, out @enum);
 }

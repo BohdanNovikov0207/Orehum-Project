@@ -23,9 +23,7 @@ public sealed partial class SpellbladeMenu : RadialMenu
     [Dependency] private readonly EntityManager _entManager = default!;
     [Dependency] private readonly IPrototypeManager _protoManager = default!;
 
-    private SpriteSystem _sprites;
-
-    public event Action<ProtoId<SpellbladeEnchantmentPrototype>>? SendSpellbladeSystemMessageAction;
+    private readonly SpriteSystem _sprites;
 
     private EntityUid _item;
 
@@ -35,6 +33,8 @@ public sealed partial class SpellbladeMenu : RadialMenu
         RobustXamlLoader.Load(this);
         _sprites = _entManager.System<SpriteSystem>();
     }
+
+    public event Action<ProtoId<SpellbladeEnchantmentPrototype>>? SendSpellbladeSystemMessageAction;
 
     public void SetEntity(EntityUid uid)
     {
@@ -59,7 +59,7 @@ public sealed partial class SpellbladeMenu : RadialMenu
             {
                 SetSize = new Vector2(64, 64),
                 ToolTip = Loc.GetString(prototype.Desc),
-                ProtoId = prototype.ID
+                ProtoId = prototype.ID,
             };
 
             var texture = new TextureRect
@@ -67,7 +67,7 @@ public sealed partial class SpellbladeMenu : RadialMenu
                 VerticalAlignment = VAlignment.Center,
                 HorizontalAlignment = HAlignment.Center,
                 Texture = _sprites.Frame0(prototype.Icon),
-                TextureScale = new Vector2(2f, 2f)
+                TextureScale = new Vector2(2f, 2f),
             };
 
             button.AddChild(texture);

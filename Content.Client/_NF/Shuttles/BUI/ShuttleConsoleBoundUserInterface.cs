@@ -6,6 +6,7 @@
 // New Frontiers - This file is licensed under AGPLv3
 // Copyright (c) 2024 New Frontiers Contributors
 // See AGPLv3.txt for details.
+
 using Content.Client.Shuttles.UI;
 using Content.Shared._NF.Shuttles.Events;
 
@@ -19,20 +20,17 @@ public sealed partial class ShuttleConsoleBoundUserInterface
         _window.OnInertiaDampeningModeChanged += OnInertiaDampeningModeChanged;
         _window.OnNetworkPortButtonPressed += OnNetworkPortButtonPressed;
     }
-    private void OnInertiaDampeningModeChanged(NetEntity? entityUid, InertiaDampeningMode mode)
-    {
+
+    private void OnInertiaDampeningModeChanged(NetEntity? entityUid, InertiaDampeningMode mode) =>
         SendMessage(new SetInertiaDampeningRequest
         {
             ShuttleEntityUid = entityUid,
             Mode = mode,
         });
-    }
 
-    private void OnNetworkPortButtonPressed(string sourcePort)
-    {
+    private void OnNetworkPortButtonPressed(string sourcePort) =>
         SendMessage(new ShuttlePortButtonPressedMessage
         {
             SourcePort = sourcePort,
         });
-    }
 }

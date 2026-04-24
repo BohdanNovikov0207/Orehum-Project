@@ -25,12 +25,14 @@
 
 using System.Linq;
 using Content.Client.Message;
-using Content.Shared._DV.Salvage.Systems; // DeltaV
+using Content.Shared._DV.Salvage.Systems;
 using Content.Shared.Salvage;
 using Content.Shared.Salvage.Magnet;
-using Robust.Client.Player; // DeltaV
+using Robust.Client.Player;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
+// DeltaV
+// DeltaV
 
 namespace Content.Client.Salvage.UI;
 
@@ -87,20 +89,20 @@ public sealed class SalvageMagnetBoundUserInterface : BoundUserInterface
             {
                 SendMessage(new MagnetClaimOfferEvent
                 {
-                    Index = claimIndex
+                    Index = claimIndex,
                 });
             };
 
             // Begin DeltaV Additions: Mining points cost for wrecks
             if (offer.Cost > 0)
             {
-                if (_player.LocalSession?.AttachedEntity is not {} user || !_points.UserHasPoints(user, offer.Cost))
+                if (_player.LocalSession?.AttachedEntity is not { } user || !_points.UserHasPoints(user, offer.Cost))
                     option.Disabled = true;
 
                 var label = new Label
                 {
                     Text = Loc.GetString("salvage-magnet-mining-points-cost", ("points", offer.Cost)),
-                    HorizontalAlignment = Control.HAlignment.Center
+                    HorizontalAlignment = Control.HAlignment.Center,
                 };
                 option.AddContent(label);
             }
@@ -148,7 +150,7 @@ public sealed class SalvageMagnetBoundUserInterface : BoundUserInterface
                     option.Title = Loc.GetString($"salvage-magnet-debris-{debris.Id}");
                     break;
                 case SalvageOffering salvage:
-                    option.Title = Loc.GetString($"salvage-map-wreck");
+                    option.Title = Loc.GetString("salvage-map-wreck");
 
                     var salvContainer = new BoxContainer
                     {

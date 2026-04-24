@@ -17,7 +17,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
          xmlns:gfx="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client"
          xmlns:parallax="clr-namespace:Content.Client.Parallax"
          xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls">
-    <parallax:ParallaxControl SpeedX="20"/>
+    <parallax:ParallaxControl SpeedX="20" />
     <Control HorizontalAlignment="Center" VerticalAlignment="Center">
         <PanelContainer StyleClasses="AngleRect" />
         <BoxContainer Orientation="Vertical" MinSize="300 200">
@@ -35,18 +35,18 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                         <Label Name="ConnectStatus" StyleClasses="LabelSubText" Align="Center" />
                     </BoxContainer>
                     <BoxContainer Orientation="Vertical" Name="ConnectFail" Visible="False" SeparationOverride="10">
-                        <RichTextLabel Name="ConnectFailReason" VerticalAlignment="Stretch"/>
+                        <RichTextLabel Name="ConnectFailReason" VerticalAlignment="Stretch" />
                         <BoxContainer Orientation="Horizontal" Align="Center">
                             <Button Name="RetryButton"
                                     Text="{Loc 'connecting-retry'}"
                                     HorizontalAlignment="Center"
                                     VerticalAlignment="Bottom"
-                                    StyleClasses="OpenRight"/>
+                                    StyleClasses="OpenRight" />
                             <Button Name="CopyButton"
                                     Text="{Loc 'connecting-copy'}"
                                     HorizontalAlignment="Center"
                                     VerticalAlignment="Bottom"
-                                    StyleClasses="OpenLeft"/>
+                                    StyleClasses="OpenLeft" />
                         </BoxContainer>
                     </BoxContainer>
                     <BoxContainer Orientation="Vertical" Name="Disconnected" Visible="False" SeparationOverride="10">
@@ -57,12 +57,12 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                                     Text="{Loc 'connecting-reconnect'}"
                                     HorizontalAlignment="Center"
                                     VerticalAlignment="Bottom"
-                                    StyleClasses="OpenRight"/>
+                                    StyleClasses="OpenRight" />
                             <Button Name="CopyButtonDisconnected"
                                     Text="{Loc 'connecting-copy'}"
                                     HorizontalAlignment="Center"
                                     VerticalAlignment="Bottom"
-                                    StyleClasses="OpenLeft"/>
+                                    StyleClasses="OpenLeft" />
                         </BoxContainer>
                     </BoxContainer>
                 </Control>
@@ -82,14 +82,15 @@ SPDX-License-Identifier: AGPL-3.0-or-later
         </BoxContainer>
     </Control>
     <!-- Bottom window for tips -->
-    <PanelContainer Name="LoginTips" StyleClasses="AngleRect" Margin="0 10" MaxWidth="600" VerticalExpand="True" VerticalAlignment="Bottom">
+    <PanelContainer Name="LoginTips" StyleClasses="AngleRect" Margin="0 10" MaxWidth="600" VerticalExpand="True"
+                    VerticalAlignment="Bottom">
         <BoxContainer Orientation="Vertical" VerticalExpand="True">
             <controls:StripeBack>
                 <BoxContainer Orientation="Horizontal" HorizontalAlignment="Center">
-                    <Label Name="LoginTipTitle" Text="Tip" StyleClasses="LabelHeading" Align="Center"/>
+                    <Label Name="LoginTipTitle" Text="Tip" StyleClasses="LabelHeading" Align="Center" />
                 </BoxContainer>
             </controls:StripeBack>
-            <BoxContainer Orientation="Vertical" Margin="5 5 5 5" >
+            <BoxContainer Orientation="Vertical" Margin="5 5 5 5">
                 <RichTextLabel Name="LoginTip" VerticalExpand="True" />
             </BoxContainer>
         </BoxContainer>

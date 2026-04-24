@@ -28,7 +28,7 @@ public sealed partial class ChannelsMenu : DefaultWindow
 
     private readonly InstrumentBoundUserInterface _owner;
 
-    public ChannelsMenu(InstrumentBoundUserInterface owner) : base()
+    public ChannelsMenu(InstrumentBoundUserInterface owner)
     {
         RobustXamlLoader.Load(this);
         IoCManager.InjectDependencies(this);
@@ -54,10 +54,8 @@ public sealed partial class ChannelsMenu : DefaultWindow
         Populate();
     }
 
-    private void UpdateChannelList()
-    {
+    private void UpdateChannelList() =>
         Populate(); // This is kind of in-efficent because we don't filter for which instrument updated its channels, but idc
-    }
 
     protected override void ExitedTree()
     {
@@ -66,15 +64,11 @@ public sealed partial class ChannelsMenu : DefaultWindow
         _owner.Instruments.OnChannelsUpdated -= UpdateChannelList;
     }
 
-    private void OnItemSelected(ItemList.ItemListSelectedEventArgs args)
-    {
-        _owner.Instruments.SetFilteredChannel(_owner.Owner, (int)ChannelList[args.ItemIndex].Metadata!, false);
-    }
+    private void OnItemSelected(ItemList.ItemListSelectedEventArgs args) =>
+        _owner.Instruments.SetFilteredChannel(_owner.Owner, (int) ChannelList[args.ItemIndex].Metadata!, false);
 
-    private void OnItemDeselected(ItemList.ItemListDeselectedEventArgs args)
-    {
-        _owner.Instruments.SetFilteredChannel(_owner.Owner, (int)ChannelList[args.ItemIndex].Metadata!, true);
-    }
+    private void OnItemDeselected(ItemList.ItemListDeselectedEventArgs args) =>
+        _owner.Instruments.SetFilteredChannel(_owner.Owner, (int) ChannelList[args.ItemIndex].Metadata!, true);
 
     private void OnAllPressed(BaseButton.ButtonEventArgs obj)
     {
@@ -108,8 +102,8 @@ public sealed partial class ChannelsMenu : DefaultWindow
             if (instrument.Comp.Master == null)
                 break;
 
-            instrument = new Entity<InstrumentComponent>((EntityUid)instrument.Comp.Master,
-                _entityManager.GetComponent<InstrumentComponent>((EntityUid)instrument.Comp.Master));
+            instrument = new Entity<InstrumentComponent>((EntityUid) instrument.Comp.Master,
+                _entityManager.GetComponent<InstrumentComponent>((EntityUid) instrument.Comp.Master));
         }
 
         return _entityManager.GetComponent<ActiveInstrumentComponent>(instrument.Owner);
@@ -121,7 +115,7 @@ public sealed partial class ChannelsMenu : DefaultWindow
         var instrument = _entityManager.GetComponent<InstrumentComponent>(_owner.Owner);
         var activeInstrument = ResolveActiveInstrument(instrument);
 
-        for (int i = 0; i < RobustMidiEvent.MaxChannels; i++)
+        for (var i = 0; i < RobustMidiEvent.MaxChannels; i++)
         {
             var label = _owner.Loc.GetString("instrument-component-channel-name",
                 ("number", i));
@@ -140,8 +134,8 @@ public sealed partial class ChannelsMenu : DefaultWindow
                                 ("other", resolvedMidiChannel.InstrumentName)),
                         { TrackName: not null } =>
                             Loc.GetString("instruments-component-channels-single",
-                            ("channel", i),
-                            ("name", resolvedMidiChannel.TrackName)),
+                                ("channel", i),
+                                ("name", resolvedMidiChannel.TrackName)),
                         _ => label,
                     };
                 }

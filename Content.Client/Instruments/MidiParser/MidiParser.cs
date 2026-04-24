@@ -65,9 +65,7 @@ public static class MidiParser
 
                 var firstByte = stream.ReadByte();
                 if (firstByte >= 0x80)
-                {
                     lastStatusByte = firstByte;
-                }
                 else
                 {
                     // Running status: push byte back for reading as data
@@ -82,7 +80,7 @@ public static class MidiParser
                     return false;
                 }
 
-                var eventType = (byte)(lastStatusByte & 0xF0);
+                var eventType = (byte) (lastStatusByte & 0xF0);
 
                 switch (lastStatusByte)
                 {
@@ -91,7 +89,7 @@ public static class MidiParser
                     {
                         var metaType = stream.ReadByte();
                         var metaLength = stream.ReadVariableLengthQuantity();
-                        var metaData = stream.ReadBytes((int)metaLength);
+                        var metaData = stream.ReadBytes((int) metaLength);
                         if (metaType == 0x00) // SequenceNumber event
                             continue;
 
@@ -104,7 +102,7 @@ public static class MidiParser
 
                         // This string can potentially contain control characters, including 0x00 which can cause problems if it ends up in database entries via admin logs
                         // we sanitize TrackName and InstrumentName after they have been send to the server
-                        var text = Encoding.ASCII.GetString(metaData, 0, (int)metaLength);
+                        var text = Encoding.ASCII.GetString(metaData, 0, (int) metaLength);
                         switch (metaType)
                         {
                             case 0x03 when track.TrackName == null:
@@ -124,7 +122,7 @@ public static class MidiParser
                     case 0xF7:
                     {
                         var sysexLength = stream.ReadVariableLengthQuantity();
-                        stream.Skip((int)sysexLength);
+                        stream.Skip((int) sysexLength);
                         // Sysex events and meta-events cancel any running status which was in effect.
                         // Running status does not apply to and may not be used for these messages.
                         lastStatusByte = null;
@@ -142,8 +140,11 @@ public static class MidiParser
                                 if (track.ProgramName == null)
                                 {
                                     if (programNumber < Enum.GetValues<MidiInstrument>().Length)
-                                        track.ProgramName = Loc.GetString($"instruments-component-menu-midi-channel-{((MidiInstrument)programNumber).GetStringRep()}");
+                                        track.ProgramName =
+                                            Loc.GetString(
+                                                $"instruments-component-menu-midi-channel-{((MidiInstrument) programNumber).GetStringRep()}");
                                 }
+
                                 break;
                             }
 
@@ -170,6 +171,7 @@ public static class MidiParser
                                 tracks = null;
                                 return false;
                         }
+
                         break;
                 }
             }

@@ -7,10 +7,9 @@
 
 using Content.Shared.Module;
 
-namespace Content.Client.IoC
+namespace Content.Client.IoC;
+
+public sealed class ClientModuleTestingCallbacks : SharedModuleTestingCallbacks
 {
-    public sealed class ClientModuleTestingCallbacks : SharedModuleTestingCallbacks
-    {
-        public Action? ClientBeforeIoC { get; set; }
-    }
+    public Action? ClientBeforeIoC { get; set; }
 }

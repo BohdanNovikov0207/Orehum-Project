@@ -21,20 +21,20 @@ public sealed partial class VaporVisualsComponent : Component
     public const string AnimationKey = "flick_animation";
 
     /// <summary>
-    /// The amount of time over which the spray animation is played.
-    /// </summary>
-    [DataField("animationTime")]
-    public float AnimationTime = 0.25f;
-
-    /// <summary>
     /// The RSI state that is flicked when the vapor is sprayed.
     /// </summary>
     [DataField("animationState")]
     public string AnimationState = "chempuff";
 
     /// <summary>
+    /// The amount of time over which the spray animation is played.
+    /// </summary>
+    [DataField("animationTime")]
+    public float AnimationTime = 0.25f;
+
+    /// <summary>
     /// The animation that plays when the vapor is sprayed.
-    /// Generated in <see cref="VaporVisualizerSystem.OnComponentInit"/>
+    /// Generated in <see cref="VaporVisualizerSystem.OnComponentInit" />
     /// </summary>
     public Animation VaporFlick = default!;
 }

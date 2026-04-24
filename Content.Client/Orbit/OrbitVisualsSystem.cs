@@ -19,12 +19,12 @@ namespace Content.Client.Orbit;
 
 public sealed class OrbitVisualsSystem : EntitySystem
 {
-    [Dependency] private readonly IRobustRandom _robustRandom = default!;
     [Dependency] private readonly AnimationPlayerSystem _animations = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly SpriteSystem _sprite = default!;
 
     private readonly string _orbitStopKey = "orbiting_stop";
+    [Dependency] private readonly IRobustRandom _robustRandom = default!;
+    [Dependency] private readonly SpriteSystem _sprite = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -36,7 +36,7 @@ public sealed class OrbitVisualsSystem : EntitySystem
 
     private void OnComponentInit(EntityUid uid, OrbitVisualsComponent component, ComponentInit args)
     {
-        _robustRandom.SetSeed((int)_timing.CurTime.TotalMilliseconds);
+        _robustRandom.SetSeed((int) _timing.CurTime.TotalMilliseconds);
         component.OrbitDistance =
             _robustRandom.NextFloat(0.75f * component.OrbitDistance, 1.25f * component.OrbitDistance);
 
@@ -50,9 +50,7 @@ public sealed class OrbitVisualsSystem : EntitySystem
 
         var animationPlayer = EnsureComp<AnimationPlayerComponent>(uid);
         if (_animations.HasRunningAnimation(uid, animationPlayer, _orbitStopKey))
-        {
             _animations.Stop((uid, animationPlayer), _orbitStopKey);
-        }
     }
 
     private void OnComponentRemove(EntityUid uid, OrbitVisualsComponent component, ComponentRemove args)
@@ -64,9 +62,7 @@ public sealed class OrbitVisualsSystem : EntitySystem
 
         var animationPlayer = EnsureComp<AnimationPlayerComponent>(uid);
         if (!_animations.HasRunningAnimation(uid, animationPlayer, _orbitStopKey))
-        {
             _animations.Play((uid, animationPlayer), GetStopAnimation(component, sprite), _orbitStopKey);
-        }
     }
 
     public override void FrameUpdate(float frameTime)
@@ -76,7 +72,7 @@ public sealed class OrbitVisualsSystem : EntitySystem
         var query = EntityQueryEnumerator<OrbitVisualsComponent, SpriteComponent>();
         while (query.MoveNext(out var uid, out var orbit, out var sprite))
         {
-            var progress = (float)(_timing.CurTime.TotalSeconds / orbit.OrbitLength) % 1;
+            var progress = (float) (_timing.CurTime.TotalSeconds / orbit.OrbitLength) % 1;
             var angle = new Angle(Math.PI * 2 * progress);
             var vec = angle.RotateVec(new Vector2(orbit.OrbitDistance, 0));
 
@@ -89,12 +85,12 @@ public sealed class OrbitVisualsSystem : EntitySystem
     {
         var length = component.OrbitStopLength;
 
-        return new Animation()
+        return new Animation
         {
             Length = TimeSpan.FromSeconds(length),
             AnimationTracks =
             {
-                new AnimationTrackComponentProperty()
+                new AnimationTrackComponentProperty
                 {
                     ComponentType = typeof(SpriteComponent),
                     Property = nameof(SpriteComponent.Offset),
@@ -103,9 +99,9 @@ public sealed class OrbitVisualsSystem : EntitySystem
                         new AnimationTrackProperty.KeyFrame(sprite.Offset, 0f),
                         new AnimationTrackProperty.KeyFrame(Vector2.Zero, length),
                     },
-                    InterpolationMode = AnimationInterpolationMode.Linear
+                    InterpolationMode = AnimationInterpolationMode.Linear,
                 },
-                new AnimationTrackComponentProperty()
+                new AnimationTrackComponentProperty
                 {
                     ComponentType = typeof(SpriteComponent),
                     Property = nameof(SpriteComponent.Rotation),
@@ -114,9 +110,9 @@ public sealed class OrbitVisualsSystem : EntitySystem
                         new AnimationTrackProperty.KeyFrame(sprite.Rotation.Reduced(), 0f),
                         new AnimationTrackProperty.KeyFrame(Angle.Zero, length),
                     },
-                    InterpolationMode = AnimationInterpolationMode.Linear
-                }
-            }
+                    InterpolationMode = AnimationInterpolationMode.Linear,
+                },
+            },
         };
     }
 }

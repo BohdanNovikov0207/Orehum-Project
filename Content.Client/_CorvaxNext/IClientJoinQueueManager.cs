@@ -2,5 +2,5 @@
 
 public interface IClientJoinQueueManager
 {
-    public void Initialize();
+    void Initialize();
 }

@@ -13,7 +13,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Linq;
-using System.Numerics;
 using Content.Client.Examine;
 using Content.Client.Hands.Systems;
 using Content.Client.Interaction;
@@ -41,6 +40,7 @@ namespace Content.Client.UserInterface.Systems.Storage;
 
 public sealed class StorageUIController : UIController, IOnSystemChanged<StorageSystem>
 {
+    [Dependency] private readonly CloseRecentWindowUIController _closeRecentWindowUIController = default!;
     /*
      * Things are a bit over the shop but essentially
      * - Clicking into storagewindow is handled via storagewindow
@@ -52,28 +52,31 @@ public sealed class StorageUIController : UIController, IOnSystemChanged<Storage
 
     [Dependency] private readonly IConfigurationManager _configuration = default!;
     [Dependency] private readonly IInputManager _input = default!;
-    [Dependency] private readonly IPlayerManager _player = default!;
-    [Dependency] private readonly CloseRecentWindowUIController _closeRecentWindowUIController = default!;
-    [UISystemDependency] private readonly StorageSystem _storage = default!;
-    [UISystemDependency] private readonly UserInterfaceSystem _ui = default!;
 
     private readonly DragDropHelper<ItemGridPiece> _menuDragHelper;
-
-    public ItemGridPiece? DraggingGhost => _menuDragHelper.Dragged;
-    public Angle DraggingRotation = Angle.Zero;
-    public bool StaticStorageUIEnabled;
-    public bool OpaqueStorageWindow;
+    [Dependency] private readonly IPlayerManager _player = default!;
+    [UISystemDependency] private readonly StorageSystem _storage = default!;
+    [UISystemDependency] private readonly UserInterfaceSystem _ui = default!;
     private int _openStorageLimit = -1;
-
-    public bool IsDragging => _menuDragHelper.IsDragging;
-    public ItemGridPiece? CurrentlyDragging => _menuDragHelper.Dragged;
-
-    public bool WindowTitle { get; private set; } = false;
+    public Angle DraggingRotation = Angle.Zero;
+    public bool OpaqueStorageWindow;
+    public bool StaticStorageUIEnabled;
 
     public StorageUIController()
     {
         _menuDragHelper = new DragDropHelper<ItemGridPiece>(OnMenuBeginDrag, OnMenuContinueDrag, OnMenuEndDrag);
     }
+
+    public ItemGridPiece? DraggingGhost => _menuDragHelper.Dragged;
+
+    public bool IsDragging => _menuDragHelper.IsDragging;
+    public ItemGridPiece? CurrentlyDragging => _menuDragHelper.Dragged;
+
+    public bool WindowTitle { get; private set; }
+
+    public void OnSystemLoaded(StorageSystem system) => _input.FirstChanceOnKeyEvent += OnMiddleMouse;
+
+    public void OnSystemUnloaded(StorageSystem system) => _input.FirstChanceOnKeyEvent -= OnMiddleMouse;
 
     public override void Initialize()
     {
@@ -85,25 +88,13 @@ public sealed class StorageUIController : UIController, IOnSystemChanged<Storage
         _configuration.OnValueChanged(CCVars.StorageLimit, OnStorageLimitChanged, true);
     }
 
-    private void OnStorageLimitChanged(int obj)
-    {
-        _openStorageLimit = obj;
-    }
+    private void OnStorageLimitChanged(int obj) => _openStorageLimit = obj;
 
-    private void OnStorageWindowTitle(bool obj)
-    {
-        WindowTitle = obj;
-    }
+    private void OnStorageWindowTitle(bool obj) => WindowTitle = obj;
 
-    private void OnOpaqueWindowChanged(bool obj)
-    {
-        OpaqueStorageWindow = obj;
-    }
+    private void OnOpaqueWindowChanged(bool obj) => OpaqueStorageWindow = obj;
 
-    private void OnStaticStorageChanged(bool obj)
-    {
-        StaticStorageUIEnabled = obj;
-    }
+    private void OnStaticStorageChanged(bool obj) => StaticStorageUIEnabled = obj;
 
     public StorageWindow CreateStorageWindow(StorageBoundUserInterface sBui)
     {
@@ -134,7 +125,7 @@ public sealed class StorageUIController : UIController, IOnSystemChanged<Storage
                     return;
 
                 var parentChildren = parent.Children.ToList();
-                var invisibleIndex = parentChildren.FindIndex(c => c.Visible == false);
+                var invisibleIndex = parentChildren.FindIndex(c => !c.Visible);
                 if (invisibleIndex == -1)
                     return;
                 child.SetPositionInParent(invisibleIndex);
@@ -148,7 +139,8 @@ public sealed class StorageUIController : UIController, IOnSystemChanged<Storage
 
             if (_openStorageLimit == 2)
             {
-                if (hotbar?.LeftStorageContainer.Children.Any(c => c.Visible) == false) // we're comparing booleans because it's bool? and not bool from the optional chaining
+                if (hotbar?.LeftStorageContainer.Children.Any(c => c.Visible) ==
+                    false) // we're comparing booleans because it's bool? and not bool from the optional chaining
                 {
                     hotbar?.LeftStorageContainer.AddChild(window);
                     reorder(hotbar?.LeftStorageContainer, window);
@@ -164,40 +156,27 @@ public sealed class StorageUIController : UIController, IOnSystemChanged<Storage
                 hotbar?.SingleStorageContainer.AddChild(window);
                 reorder(hotbar?.SingleStorageContainer, window);
             }
+
             _closeRecentWindowUIController.SetMostRecentlyInteractedWindow(window);
         }
         else
         {
             // Open at parent position if it's open.
-            if (_ui.TryGetOpenUi<StorageBoundUserInterface>(EntityManager.GetComponent<TransformComponent>(sBui.Owner).ParentUid,
-                    StorageComponent.StorageUiKey.Key, out var bui) && bui.Position != null)
-            {
+            if (_ui.TryGetOpenUi<StorageBoundUserInterface>(
+                    EntityManager.GetComponent<TransformComponent>(sBui.Owner).ParentUid,
+                    StorageComponent.StorageUiKey.Key,
+                    out var bui) && bui.Position != null)
                 window.Open(bui.Position.Value);
-            }
             // Open at the saved position if it exists.
             else if (_ui.TryGetPosition(sBui.Owner, StorageComponent.StorageUiKey.Key, out var pos))
-            {
                 window.Open(pos);
-            }
             // Open at the default position.
             else
-            {
                 window.OpenCenteredLeft();
-            }
         }
 
         _ui.RegisterControl(sBui, window);
         return window;
-    }
-
-    public void OnSystemLoaded(StorageSystem system)
-    {
-        _input.FirstChanceOnKeyEvent += OnMiddleMouse;
-    }
-
-    public void OnSystemUnloaded(StorageSystem system)
-    {
-        _input.FirstChanceOnKeyEvent -= OnMiddleMouse;
     }
 
     /// One might ask, Hey Emo, why are you parsing raw keyboard input just to rotate a rectangle?
@@ -267,7 +246,7 @@ public sealed class StorageUIController : UIController, IOnSystemChanged<Storage
         }
         else if (args.Function == ContentKeyFunctions.SaveItemLocation)
         {
-            if (window.StorageEntity is not {} storage)
+            if (window.StorageEntity is not { } storage)
                 return;
 
             EntityManager.RaisePredictiveEvent(new StorageSaveItemLocationEvent(
@@ -288,12 +267,13 @@ public sealed class StorageUIController : UIController, IOnSystemChanged<Storage
         else if (args.Function == ContentKeyFunctions.ActivateItemInWorld)
         {
             EntityManager.RaisePredictiveEvent(
-                new InteractInventorySlotEvent(EntityManager.GetNetEntity(control.Entity), altInteract: false));
+                new InteractInventorySlotEvent(EntityManager.GetNetEntity(control.Entity), false));
             args.Handle();
         }
         else if (args.Function == ContentKeyFunctions.AltActivateItemInWorld)
         {
-            EntityManager.RaisePredictiveEvent(new InteractInventorySlotEvent(EntityManager.GetNetEntity(control.Entity), altInteract: true));
+            EntityManager.RaisePredictiveEvent(
+                new InteractInventorySlotEvent(EntityManager.GetNetEntity(control.Entity), true));
             args.Handle();
         }
 
@@ -338,9 +318,7 @@ public sealed class StorageUIController : UIController, IOnSystemChanged<Storage
                 var newLocation = new ItemStorageLocation(DraggingRotation, position);
 
                 if (!_storage.ItemFitsInGridLocation(dragEnt, sourceStorage, newLocation))
-                {
                     window.Reclaim(control.Location, control);
-                }
                 else
                 {
                     EntityManager.RaisePredictiveEvent(new StorageSetItemLocationEvent(
@@ -437,7 +415,7 @@ public sealed class StorageUIController : UIController, IOnSystemChanged<Storage
             EntityManager);
 
         // I don't know why it divides the position by 2. Hope this helps! -emo
-        LayoutContainer.SetPosition(DraggingGhost, UIManager.MousePositionScaled.Position / 2 - offset );
+        LayoutContainer.SetPosition(DraggingGhost, UIManager.MousePositionScaled.Position / 2 - offset);
     }
 
     private void OnMenuEndDrag()

@@ -17,16 +17,15 @@ namespace Content.Client._White.RadialSelector;
 
 public abstract class BasedRadialSelectorMenuBUI : BoundUserInterface
 {
-    [Dependency] protected readonly IPrototypeManager ProtoManager = default!;
-    [Dependency] protected readonly IResourceCache Resources = default!;
+    // Used to clearing on state changing
+    private readonly HashSet<RadialContainer> _cachedContainers = new();
 
     protected readonly ConstructionSystem _constructionSystem;
     protected readonly SpriteSystem _spriteSystem;
 
-    // Used to clearing on state changing
-    private readonly HashSet<RadialContainer> _cachedContainers = new();
-
     private readonly Vector2 ItemSize = Vector2.One * 64;
+    [Dependency] protected readonly IPrototypeManager ProtoManager = default!;
+    [Dependency] protected readonly IResourceCache Resources = default!;
 
     protected BasedRadialSelectorMenuBUI(EntityUid owner, Enum uiKey) : base(owner, uiKey)
     {
@@ -114,7 +113,7 @@ public abstract class BasedRadialSelectorMenuBUI : BoundUserInterface
         {
             ToolTip = Loc.GetString(name),
             StyleClasses = { "RadialMenuButton" },
-            SetSize = ItemSize
+            SetSize = ItemSize,
         };
 
         var iconScale = ItemSize / icon.Size;
@@ -123,7 +122,7 @@ public abstract class BasedRadialSelectorMenuBUI : BoundUserInterface
             VerticalAlignment = Control.VAlignment.Center,
             HorizontalAlignment = Control.HAlignment.Center,
             Texture = icon,
-            TextureScale = iconScale
+            TextureScale = iconScale,
         };
 
         button.AddChild(texture);
@@ -136,7 +135,7 @@ public abstract class BasedRadialSelectorMenuBUI : BoundUserInterface
         {
             ToolTip = Loc.GetString(name),
             StyleClasses = { "RadialMenuButton" },
-            SetSize = ItemSize
+            SetSize = ItemSize,
         };
 
         var iconScale = ItemSize / icons[0].Size;
@@ -145,7 +144,7 @@ public abstract class BasedRadialSelectorMenuBUI : BoundUserInterface
             VerticalAlignment = Control.VAlignment.Center,
             HorizontalAlignment = Control.HAlignment.Center,
             Textures = icons,
-            TextureScale = iconScale
+            TextureScale = iconScale,
         };
 
         button.AddChild(texture);
@@ -155,7 +154,9 @@ public abstract class BasedRadialSelectorMenuBUI : BoundUserInterface
     protected void ClearExistingContainers(RadialMenu menu)
     {
         foreach (var container in _cachedContainers)
+        {
             menu.RemoveChild(container);
+        }
 
         _cachedContainers.Clear();
     }

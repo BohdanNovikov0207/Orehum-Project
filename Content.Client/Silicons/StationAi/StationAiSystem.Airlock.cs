@@ -32,7 +32,7 @@ namespace Content.Client.Silicons.StationAi;
 
 public sealed partial class StationAiSystem
 {
-    private readonly ResPath _aiActionsRsi = new ResPath("/Textures/Interface/Actions/actions_ai.rsi");
+    private readonly ResPath _aiActionsRsi = new("/Textures/Interface/Actions/actions_ai.rsi");
 
     private void InitializeAirlock()
     {
@@ -41,8 +41,7 @@ public sealed partial class StationAiSystem
         SubscribeLocalEvent<ElectrifiedComponent, GetStationAiRadialEvent>(OnDoorElectrifiedGetRadial);
     }
 
-    private void OnDoorBoltGetRadial(Entity<DoorBoltComponent> ent, ref GetStationAiRadialEvent args)
-    {
+    private void OnDoorBoltGetRadial(Entity<DoorBoltComponent> ent, ref GetStationAiRadialEvent args) =>
         args.Actions.Add(
             new StationAiRadial
             {
@@ -55,13 +54,11 @@ public sealed partial class StationAiSystem
                 Event = new StationAiBoltEvent
                 {
                     Bolted = !ent.Comp.BoltsDown,
-                }
+                },
             }
         );
-    }
 
-    private void OnEmergencyAccessGetRadial(Entity<AirlockComponent> ent, ref GetStationAiRadialEvent args)
-    {
+    private void OnEmergencyAccessGetRadial(Entity<AirlockComponent> ent, ref GetStationAiRadialEvent args) =>
         args.Actions.Add(
             new StationAiRadial
             {
@@ -74,13 +71,11 @@ public sealed partial class StationAiSystem
                 Event = new StationAiEmergencyAccessEvent
                 {
                     EmergencyAccess = !ent.Comp.EmergencyAccess,
-                }
+                },
             }
         );
-    }
 
-    private void OnDoorElectrifiedGetRadial(Entity<ElectrifiedComponent> ent, ref GetStationAiRadialEvent args)
-    {
+    private void OnDoorElectrifiedGetRadial(Entity<ElectrifiedComponent> ent, ref GetStationAiRadialEvent args) =>
         args.Actions.Add(
             new StationAiRadial
             {
@@ -93,8 +88,7 @@ public sealed partial class StationAiSystem
                 Event = new StationAiElectrifiedEvent
                 {
                     Electrified = !ent.Comp.Enabled,
-                }
+                },
             }
         );
-    }
 }

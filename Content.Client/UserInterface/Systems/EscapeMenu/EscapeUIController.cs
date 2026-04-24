@@ -41,100 +41,74 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Corvax.Interfaces.Shared;
+using Content.Client._RMC14.LinkAccount;
 using Content.Client.Gameplay;
+using Content.Client.Guidebook;
+using Content.Client.Lobby;
+using Content.Client.Lobby.UI;
+using Content.Client.Players.PlayTimeTracking;
 using Content.Client.UserInterface.Controls;
 using Content.Client.UserInterface.Systems.Guidebook;
 using Content.Client.UserInterface.Systems.Info;
+using Content.Client.UserInterface.Systems.MenuBar.Widgets;
+using Content.Corvax.Interfaces.Shared;
 using Content.Shared.CCVar;
+using Content.Shared.Humanoid.Markings;
+using Content.Shared.Preferences;
 using JetBrains.Annotations;
 using Robust.Client.Console;
+using Robust.Client.Player;
+using Robust.Client.ResourceManagement;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controllers;
+using Robust.Client.UserInterface.CustomControls;
 using Robust.Shared.Configuration;
 using Robust.Shared.Input;
 using Robust.Shared.Input.Binding;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
 using static Robust.Client.UserInterface.Controls.BaseButton;
-using Content.Client.UserInterface.Systems.MenuBar.Widgets;  // RMC - Patreon
-using Content.Client._RMC14.LinkAccount; // RMC - Patreon
+// RMC - Patreon
+// RMC - Patreon
 // Goobstation - Character customization in escape menu
-using Content.Client.Lobby;
-using Robust.Client.Player;
-using Robust.Client.ResourceManagement;
-using Robust.Shared.Prototypes;
-using Robust.Client.UserInterface.CustomControls;
-using Content.Shared.Humanoid.Markings;
-using Content.Shared.Preferences;
-using Content.Client.Guidebook;
-using Content.Client.Lobby.UI;
-using Content.Client.Players.PlayTimeTracking;
 
 namespace Content.Client.UserInterface.Systems.EscapeMenu;
 
 [UsedImplicitly]
 public sealed class EscapeUIController : UIController, IOnStateEntered<GameplayState>, IOnStateExited<GameplayState>
 {
-    [Dependency] private readonly IClientConsoleHost _console = default!;
     [Dependency] private readonly IConfigurationManager _cfg = default!;
     [Dependency] private readonly ChangelogUIController _changelog = default!;
-    [Dependency] private readonly InfoUIController _info = default!;
-    [Dependency] private readonly OptionsUIController _options = default!;
-    [Dependency] private readonly GuidebookUIController _guidebook = default!;
-    [Dependency] private readonly LinkAccountManager _linkAccount = default!; // RMC - Patreon
-    // Goobstation - Character customization in escape menu
-    [Dependency] private readonly IClientPreferencesManager _preferencesManager = default!;
-    [Dependency] private readonly IFileDialogManager _dialogManager = default!;
-    [Dependency] private readonly IPlayerManager _playerManager = default!;
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-    [Dependency] private readonly IResourceCache _resourceCache = default!;
-    [Dependency] private readonly IUriOpener _uri = default!;
-    [Dependency] private readonly JobRequirementsManager _requirements = default!;
-    [Dependency] private readonly MarkingManager _markings = default!;
-    [UISystemDependency] private readonly GuidebookSystem? _guide = default!;
 
     [Dependency] private readonly ISharedSponsorsManager _clientSponsorsManager = default!; // sponsor
+    [Dependency] private readonly IClientConsoleHost _console = default!;
+    [Dependency] private readonly IFileDialogManager _dialogManager = default!;
+    [UISystemDependency] private readonly GuidebookSystem? _guide = default!;
+    [Dependency] private readonly GuidebookUIController _guidebook = default!;
+    [Dependency] private readonly InfoUIController _info = default!;
+    [Dependency] private readonly LinkAccountManager _linkAccount = default!; // RMC - Patreon
+    [Dependency] private readonly MarkingManager _markings = default!;
+    [Dependency] private readonly OptionsUIController _options = default!;
 
-    private Options.UI.EscapeMenu? _escapeWindow;
+    [Dependency] private readonly IPlayerManager _playerManager = default!;
+
+    // Goobstation - Character customization in escape menu
+    [Dependency] private readonly IClientPreferencesManager _preferencesManager = default!;
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    [Dependency] private readonly JobRequirementsManager _requirements = default!;
+    [Dependency] private readonly IResourceCache _resourceCache = default!;
+    [Dependency] private readonly IUriOpener _uri = default!;
+
+    private CharacterSetupGui? _characterSetup;
+
     // Goobstation - Character customization in escape menu
     private DefaultWindow? _characterWindow;
-    private CharacterSetupGui? _characterSetup;
+
+    private Options.UI.EscapeMenu? _escapeWindow;
     private HumanoidProfileEditor? _profileEditor;
 
-    private MenuButton? EscapeButton => UIManager.GetActiveUIWidgetOrNull<GameTopMenuBar>()?.EscapeButton; // RMC - Patreon
-
-    public override void Initialize()  // RMC - Patreon
-    {
-        _linkAccount.Updated += () =>
-        {
-            if (_escapeWindow != null)
-                _escapeWindow.PatronPerksButton.Visible = _linkAccount.CanViewPatronPerks();
-        };
-    }
-
-    public void UnloadButton()
-    {
-        if (EscapeButton == null)
-        {
-            return;
-        }
-
-        EscapeButton.Pressed = false;
-        EscapeButton.OnPressed -= EscapeButtonOnOnPressed;
-    }
-
-    public void LoadButton()
-    {
-        if (EscapeButton == null)
-        {
-            return;
-        }
-
-        EscapeButton.OnPressed += EscapeButtonOnOnPressed;
-    }
-
-    private void ActivateButton() => EscapeButton!.SetClickPressed(true);
-    private void DeactivateButton() => EscapeButton!.SetClickPressed(false);
+    private MenuButton? EscapeButton =>
+        UIManager.GetActiveUIWidgetOrNull<GameTopMenuBar>()?.EscapeButton; // RMC - Patreon
 
     public void OnStateEntered(GameplayState state)
     {
@@ -220,15 +194,37 @@ public sealed class EscapeUIController : UIController, IOnStateEntered<GameplayS
         CommandBinds.Unregister<EscapeUIController>();
     }
 
-    private void EscapeButtonOnOnPressed(ButtonEventArgs obj)
+    public override void Initialize() // RMC - Patreon
+        =>
+            _linkAccount.Updated += () =>
+            {
+                if (_escapeWindow != null)
+                    _escapeWindow.PatronPerksButton.Visible = _linkAccount.CanViewPatronPerks();
+            };
+
+    public void UnloadButton()
     {
-        ToggleWindow();
+        if (EscapeButton == null)
+            return;
+
+        EscapeButton.Pressed = false;
+        EscapeButton.OnPressed -= EscapeButtonOnOnPressed;
     }
 
-    private void CloseEscapeWindow()
+    public void LoadButton()
     {
-        _escapeWindow?.Close();
+        if (EscapeButton == null)
+            return;
+
+        EscapeButton.OnPressed += EscapeButtonOnOnPressed;
     }
+
+    private void ActivateButton() => EscapeButton!.SetClickPressed(true);
+    private void DeactivateButton() => EscapeButton!.SetClickPressed(false);
+
+    private void EscapeButtonOnOnPressed(ButtonEventArgs obj) => ToggleWindow();
+
+    private void CloseEscapeWindow() => _escapeWindow?.Close();
 
     /// <summary>
     /// Toggles the game menu.
@@ -314,7 +310,7 @@ public sealed class EscapeUIController : UIController, IOnStateEntered<GameplayS
             MinWidth = 1050,
             MinHeight = 550,
             SetWidth = 1050,
-            SetHeight = 700
+            SetHeight = 700,
         };
 
         _characterWindow.Contents.AddChild(_characterSetup);

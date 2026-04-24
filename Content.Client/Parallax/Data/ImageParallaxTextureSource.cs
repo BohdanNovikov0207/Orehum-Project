@@ -11,9 +11,9 @@
 
 using System.Threading;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
-using Content.Client.Resources;
 using Content.Client.IoC;
+using Content.Client.Resources;
+using JetBrains.Annotations;
 using Robust.Client.Graphics;
 using Robust.Shared.Utility;
 
@@ -27,10 +27,8 @@ public sealed partial class ImageParallaxTextureSource : IParallaxTextureSource
     /// Texture path.
     /// </summary>
     [DataField("path", required: true)]
-    public ResPath Path { get; private set; } = default!;
+    public ResPath Path { get; private set; }
 
-    Task<Texture> IParallaxTextureSource.GenerateTexture(CancellationToken cancel)
-    {
-        return Task.FromResult(StaticIoC.ResC.GetTexture(Path));
-    }
+    Task<Texture> IParallaxTextureSource.GenerateTexture(CancellationToken cancel) =>
+        Task.FromResult(StaticIoC.ResC.GetTexture(Path));
 }

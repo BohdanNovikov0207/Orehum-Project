@@ -9,7 +9,6 @@
 using System.Numerics;
 using Content.Client.Gameplay;
 using Content.Client.Hands.Systems;
-using Content.Shared.Hands.Components;
 using Content.Shared.Interaction;
 using Content.Shared.RCD.Components;
 using Content.Shared.RCD.Systems;
@@ -23,19 +22,18 @@ namespace Content.Client.RCD;
 
 public sealed class AlignRCDConstruction : PlacementMode
 {
-    [Dependency] private readonly IEntityManager _entityManager = default!;
-    [Dependency] private readonly IMapManager _mapManager = default!;
-    private readonly SharedMapSystem _mapSystem;
-    private readonly HandsSystem _handsSystem;
-    private readonly RCDSystem _rcdSystem;
-    private readonly SharedTransformSystem _transformSystem;
-    [Dependency] private readonly IPlayerManager _playerManager = default!;
-    [Dependency] private readonly IStateManager _stateManager = default!;
-
     private const float SearchBoxSize = 2f;
     private const float PlaceColorBaseAlpha = 0.5f;
+    [Dependency] private readonly IEntityManager _entityManager = default!;
+    private readonly HandsSystem _handsSystem;
+    [Dependency] private readonly IMapManager _mapManager = default!;
+    private readonly SharedMapSystem _mapSystem;
+    [Dependency] private readonly IPlayerManager _playerManager = default!;
+    private readonly RCDSystem _rcdSystem;
+    [Dependency] private readonly IStateManager _stateManager = default!;
+    private readonly SharedTransformSystem _transformSystem;
 
-    private EntityCoordinates _unalignedMouseCoords = default;
+    private EntityCoordinates _unalignedMouseCoords;
 
     /// <summary>
     /// This placement mode is not on the engine because it is content specific (i.e., for the RCD)
@@ -68,13 +66,15 @@ public sealed class AlignRCDConstruction : PlacementMode
 
         if (pManager.CurrentPermission!.IsTile)
         {
-            MouseCoords = new EntityCoordinates(MouseCoords.EntityId, new Vector2(CurrentTile.X + tileSize / 2,
-                CurrentTile.Y + tileSize / 2));
+            MouseCoords = new EntityCoordinates(MouseCoords.EntityId,
+                new Vector2(CurrentTile.X + tileSize / 2,
+                    CurrentTile.Y + tileSize / 2));
         }
         else
         {
-            MouseCoords = new EntityCoordinates(MouseCoords.EntityId, new Vector2(CurrentTile.X + tileSize / 2 + pManager.PlacementOffset.X,
-                CurrentTile.Y + tileSize / 2 + pManager.PlacementOffset.Y));
+            MouseCoords = new EntityCoordinates(MouseCoords.EntityId,
+                new Vector2(CurrentTile.X + tileSize / 2 + pManager.PlacementOffset.X,
+                    CurrentTile.Y + tileSize / 2 + pManager.PlacementOffset.Y));
         }
     }
 
@@ -93,10 +93,8 @@ public sealed class AlignRCDConstruction : PlacementMode
         }
 
         // Otherwise restore the alpha value
-        else
-        {
-            InvalidPlaceColor = InvalidPlaceColor.WithAlpha(PlaceColorBaseAlpha);
-        }
+
+        InvalidPlaceColor = InvalidPlaceColor.WithAlpha(PlaceColorBaseAlpha);
 
         // Determine if player is carrying an RCD in their active hand
         if (!_handsSystem.TryGetActiveItem(player.Value, out var heldEntity))
@@ -120,7 +118,15 @@ public sealed class AlignRCDConstruction : PlacementMode
         var target = screen.GetClickedEntity(_transformSystem.ToMapCoordinates(_unalignedMouseCoords));
 
         // Determine if the RCD operation is valid or not
-        if (!_rcdSystem.IsRCDOperationStillValid(heldEntity.Value, rcd, gridUid.Value, mapGrid, tile, posVector, target, player.Value, false))
+        if (!_rcdSystem.IsRCDOperationStillValid(heldEntity.Value,
+                rcd,
+                gridUid.Value,
+                mapGrid,
+                tile,
+                posVector,
+                target,
+                player.Value,
+                false))
             return false;
 
         return true;

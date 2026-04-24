@@ -23,17 +23,21 @@ namespace Content.Client.Weapons.Melee;
 /// </summary>
 public sealed class MeleeArcOverlay : Overlay
 {
+    private readonly SharedCombatModeSystem _combatMode;
     private readonly IEntityManager _entManager;
     private readonly IEyeManager _eyeManager;
     private readonly IInputManager _inputManager;
-    private readonly IPlayerManager _playerManager;
     private readonly MeleeWeaponSystem _melee;
-    private readonly SharedCombatModeSystem _combatMode;
+    private readonly IPlayerManager _playerManager;
     private readonly SharedTransformSystem _transform = default!;
 
-    public override OverlaySpace Space => OverlaySpace.WorldSpaceBelowFOV;
-
-    public MeleeArcOverlay(IEntityManager entManager, IEyeManager eyeManager, IInputManager inputManager, IPlayerManager playerManager, MeleeWeaponSystem melee, SharedCombatModeSystem combatMode, SharedTransformSystem transform)
+    public MeleeArcOverlay(IEntityManager entManager,
+        IEyeManager eyeManager,
+        IInputManager inputManager,
+        IPlayerManager playerManager,
+        MeleeWeaponSystem melee,
+        SharedCombatModeSystem combatMode,
+        SharedTransformSystem transform)
     {
         _entManager = entManager;
         _eyeManager = eyeManager;
@@ -44,15 +48,15 @@ public sealed class MeleeArcOverlay : Overlay
         _transform = transform;
     }
 
+    public override OverlaySpace Space => OverlaySpace.WorldSpaceBelowFOV;
+
     protected override void Draw(in OverlayDrawArgs args)
     {
         var player = _playerManager.LocalEntity;
 
         if (!_entManager.TryGetComponent<TransformComponent>(player, out var xform) ||
             !_combatMode.IsInCombatMode(player))
-        {
             return;
-        }
 
         if (!_melee.TryGetWeapon(player.Value, out _, out var weapon))
             return;
@@ -63,7 +67,7 @@ public sealed class MeleeArcOverlay : Overlay
         if (mapPos.MapId != args.MapId)
             return;
 
-        var playerPos = _transform.GetMapCoordinates(player.Value, xform: xform);
+        var playerPos = _transform.GetMapCoordinates(player.Value, xform);
 
         if (mapPos.MapId != playerPos.MapId)
             return;
@@ -79,7 +83,11 @@ public sealed class MeleeArcOverlay : Overlay
         if (weapon.Angle.Theta == 0)
             return;
 
-        args.WorldHandle.DrawLine(playerPos.Position, playerPos.Position + new Angle(-weapon.Angle / 2).RotateVec(diff), Color.Orange);
-        args.WorldHandle.DrawLine(playerPos.Position, playerPos.Position + new Angle(weapon.Angle / 2).RotateVec(diff), Color.Orange);
+        args.WorldHandle.DrawLine(playerPos.Position,
+            playerPos.Position + new Angle(-weapon.Angle / 2).RotateVec(diff),
+            Color.Orange);
+        args.WorldHandle.DrawLine(playerPos.Position,
+            playerPos.Position + new Angle(weapon.Angle / 2).RotateVec(diff),
+            Color.Orange);
     }
 }

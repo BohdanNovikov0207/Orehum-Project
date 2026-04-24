@@ -13,16 +13,16 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
 <DefaultWindow xmlns="https://spacestation14.io"
-            MinSize="650 290">
+               MinSize="650 290">
     <BoxContainer Orientation="Vertical">
         <GridContainer Columns="2">
             <GridContainer Columns="3" HorizontalExpand="True">
                 <Label Text="{Loc 'id-card-console-window-privileged-id'}" />
-                <Button Name="PrivilegedIdButton" Access="Public"/>
+                <Button Name="PrivilegedIdButton" Access="Public" />
                 <Label Name="PrivilegedIdLabel" />
 
                 <Label Text="{Loc 'id-card-console-window-target-id'}" />
-                <Button Name="TargetIdButton" Access="Public"/>
+                <Button Name="TargetIdButton" Access="Public" />
                 <Label Name="TargetIdLabel" />
             </GridContainer>
             <BoxContainer Orientation="Vertical">
@@ -49,8 +49,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
             <Label Text="{Loc 'id-card-console-window-job-search-label'}" />
             <TextureRect SetSize="16 16"
                          Stretch="KeepAspectCentered"
-                         TexturePath="/Textures/Interface/VerbIcons/examine.svg.192dpi.png">
-            </TextureRect>
+                         TexturePath="/Textures/Interface/VerbIcons/examine.svg.192dpi.png" />
             <LineEdit Name="SearchLineEdit" HorizontalExpand="True" />
         </GridContainer>
         <Control Name="AccessLevelControlContainer" />

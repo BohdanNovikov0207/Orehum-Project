@@ -17,18 +17,16 @@ namespace Content.Client.Parallax;
 
 public sealed class BiomeDebugOverlay : Overlay
 {
-    public override OverlaySpace Space => OverlaySpace.ScreenSpace;
+    private readonly BiomeSystem _biomes;
+    [Dependency] private readonly IResourceCache _cache = default!;
 
     [Dependency] private readonly IEntityManager _entManager = default!;
     [Dependency] private readonly IEyeManager _eyeManager = default!;
+
+    private readonly Font _font;
     [Dependency] private readonly IInputManager _inputManager = default!;
-    [Dependency] private readonly IResourceCache _cache = default!;
+    private readonly SharedMapSystem _maps;
     [Dependency] private readonly ITileDefinitionManager _tileDefManager = default!;
-
-    private BiomeSystem _biomes;
-    private SharedMapSystem _maps;
-
-    private Font _font;
 
     public BiomeDebugOverlay()
     {
@@ -39,6 +37,8 @@ public sealed class BiomeDebugOverlay : Overlay
 
         _font = new VectorFont(_cache.GetResource<FontResource>("/EngineFonts/NotoSans/NotoSans-Regular.ttf"), 12);
     }
+
+    public override OverlaySpace Space => OverlaySpace.ScreenSpace;
 
     protected override bool BeforeDraw(in OverlayDrawArgs args)
     {
@@ -57,7 +57,8 @@ public sealed class BiomeDebugOverlay : Overlay
 
         var mapUid = _maps.GetMapOrInvalid(args.MapId);
 
-        if (!_entManager.TryGetComponent(mapUid, out BiomeComponent? biomeComp) || !_entManager.TryGetComponent(mapUid, out MapGridComponent? grid))
+        if (!_entManager.TryGetComponent(mapUid, out BiomeComponent? biomeComp) ||
+            !_entManager.TryGetComponent(mapUid, out MapGridComponent? grid))
             return;
 
         var sb = new StringBuilder();

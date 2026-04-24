@@ -24,10 +24,6 @@ public sealed partial class AdminMessagePopupWindow : Control
 {
     private float _timer = float.MaxValue;
 
-    public event Action? OnDismissPressed;
-
-    public event Action? OnAcceptPressed;
-
     public AdminMessagePopupWindow()
     {
         RobustXamlLoader.Load(this);
@@ -48,6 +44,10 @@ public sealed partial class AdminMessagePopupWindow : Control
         }
     }
 
+    public event Action? OnDismissPressed;
+
+    public event Action? OnAcceptPressed;
+
     public void SetState(AdminMessageEuiState state)
     {
         Timer = (float) state.Time.TotalSeconds;
@@ -59,18 +59,13 @@ public sealed partial class AdminMessagePopupWindow : Control
             MessageContainer.AddChild(new AdminMessagePopupMessage(message));
         }
 
-        Description.SetMessage(FormattedMessage.FromMarkupOrThrow(Loc.GetString("admin-notes-message-desc", ("count", state.Messages.Length))));
+        Description.SetMessage(FormattedMessage.FromMarkupOrThrow(Loc.GetString("admin-notes-message-desc",
+            ("count", state.Messages.Length))));
     }
 
-    private void OnDismissButtonPressed(BaseButton.ButtonEventArgs obj)
-    {
-        OnDismissPressed?.Invoke();
-    }
+    private void OnDismissButtonPressed(BaseButton.ButtonEventArgs obj) => OnDismissPressed?.Invoke();
 
-    private void OnAcceptButtonPressed(BaseButton.ButtonEventArgs obj)
-    {
-        OnAcceptPressed?.Invoke();
-    }
+    private void OnAcceptButtonPressed(BaseButton.ButtonEventArgs obj) => OnAcceptPressed?.Invoke();
 
     protected override void FrameUpdate(FrameEventArgs args)
     {

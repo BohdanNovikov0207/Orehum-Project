@@ -1,3 +1,4 @@
+using System.Numerics;
 using Content.Client.Stylesheets;
 using Content.Client.UserInterface.Controls;
 using Content.Shared.Access;
@@ -11,35 +12,36 @@ using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.CustomControls;
 using Robust.Client.UserInterface.XAML;
 using Robust.Shared.Prototypes;
-using System.Numerics;
 
 namespace Content.Client.TurretController;
 
 [GenerateTypedNameReferences]
 public sealed partial class TurretControllerWindow : BaseWindow
 {
-    [Dependency] private readonly IEntityManager _entManager = default!;
-    [Dependency] private readonly IPlayerManager _playerManager = default!;
-    [Dependency] private readonly IResourceCache _cache = default!;
-
-    private readonly AccessReaderSystem _accessReaderSystem;
-
-    private EntityUid? _owner;
-
-    // Button groups
-    private readonly ButtonGroup _armamentButtons = new();
-
-    // Events
-    public event Action<HashSet<ProtoId<AccessLevelPrototype>>, bool>? OnAccessLevelsChangedEvent;
-    public event Action<TurretArmamentSetting>? OnArmamentSettingChangedEvent;
+    public enum TurretArmamentSetting
+    {
+        Safe = -1,
+        Stun = 0,
+        Lethal = 1,
+    }
 
     // Colors
     private static readonly Dictionary<TurretArmamentSetting, Color> ThemeColors = new()
     {
         [TurretArmamentSetting.Safe] = Color.FromHex("#33e633"),
         [TurretArmamentSetting.Stun] = Color.FromHex("#dfb827"),
-        [TurretArmamentSetting.Lethal] = Color.FromHex("#da2a2a")
+        [TurretArmamentSetting.Lethal] = Color.FromHex("#da2a2a"),
     };
+
+    private readonly AccessReaderSystem _accessReaderSystem;
+
+    // Button groups
+    private readonly ButtonGroup _armamentButtons = new();
+    [Dependency] private readonly IResourceCache _cache = default!;
+    [Dependency] private readonly IEntityManager _entManager = default!;
+    [Dependency] private readonly IPlayerManager _playerManager = default!;
+
+    private EntityUid? _owner;
 
     public TurretControllerWindow()
     {
@@ -73,10 +75,12 @@ public sealed partial class TurretControllerWindow : BaseWindow
         Footer.FontOverride = smallFont;
     }
 
-    private void OnAccessLevelsChanged(HashSet<ProtoId<AccessLevelPrototype>> accessLevels, bool isPressed)
-    {
+    // Events
+    public event Action<HashSet<ProtoId<AccessLevelPrototype>>, bool>? OnAccessLevelsChangedEvent;
+    public event Action<TurretArmamentSetting>? OnArmamentSettingChangedEvent;
+
+    private void OnAccessLevelsChanged(HashSet<ProtoId<AccessLevelPrototype>> accessLevels, bool isPressed) =>
         OnAccessLevelsChangedEvent?.Invoke(accessLevels, isPressed);
-    }
 
     private void OnArmamentButtonPressed(MonotoneButton pressedButton, TurretArmamentSetting setting)
     {
@@ -86,19 +90,17 @@ public sealed partial class TurretControllerWindow : BaseWindow
 
     private void Initialize()
     {
-        RefreshLinkedTurrets(new());
+        RefreshLinkedTurrets(new Dictionary<string, string>());
 
         if (_entManager.TryGetComponent<DeployableTurretControllerComponent>(_owner, out var turretController))
         {
             AccessConfiguration.SetAccessGroups(turretController.AccessGroups);
             AccessConfiguration.SetAccessLevels(turretController.AccessLevels);
-            UpdateTheme((TurretArmamentSetting)turretController.ArmamentState);
+            UpdateTheme((TurretArmamentSetting) turretController.ArmamentState);
         }
 
         if (_entManager.TryGetComponent<TurretTargetSettingsComponent>(_owner, out var turretTargetSettings))
-        {
             RefreshAccessControls(turretTargetSettings.ExemptAccessLevels);
-        }
     }
 
     public void SetOwner(EntityUid owner)
@@ -131,7 +133,7 @@ public sealed partial class TurretControllerWindow : BaseWindow
     public void UpdateState(DeployableTurretControllerBoundInterfaceState state)
     {
         if (_entManager.TryGetComponent<DeployableTurretControllerComponent>(_owner, out var turretController))
-            UpdateTheme((TurretArmamentSetting)turretController.ArmamentState);
+            UpdateTheme((TurretArmamentSetting) turretController.ArmamentState);
 
         if (_entManager.TryGetComponent<TurretTargetSettingsComponent>(_owner, out var turretTargetSettings))
             RefreshAccessControls(turretTargetSettings.ExemptAccessLevels);
@@ -180,10 +182,7 @@ public sealed partial class TurretControllerWindow : BaseWindow
         AccessConfiguration.SetLocalPlayerAccessibility(IsLocalPlayerAllowedToInteract());
     }
 
-    protected override DragMode GetDragModeFor(Vector2 relativeMousePos)
-    {
-        return DragMode.Move;
-    }
+    protected override DragMode GetDragModeFor(Vector2 relativeMousePos) => DragMode.Move;
 
     private bool IsLocalPlayerAllowedToInteract()
     {
@@ -191,12 +190,5 @@ public sealed partial class TurretControllerWindow : BaseWindow
             return false;
 
         return _accessReaderSystem.IsAllowed(_playerManager.LocalSession.AttachedEntity.Value, _owner.Value);
-    }
-
-    public enum TurretArmamentSetting
-    {
-        Safe = -1,
-        Stun = 0,
-        Lethal = 1,
     }
 }

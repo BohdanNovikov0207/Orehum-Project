@@ -14,13 +14,12 @@ namespace Content.Client._Orehum.Interaction;
 
 public sealed class InteractionParticleSystem : EntitySystem
 {
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly SpriteSystem _sprite = default!;
-    [Dependency] private readonly AnimationPlayerSystem _animation = default!;
-
     private const string AnimateKey = "particle-animation";
 
     private static readonly EntProtoId InteractionParticleId = "InteractionParticle";
+    [Dependency] private readonly AnimationPlayerSystem _animation = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly SpriteSystem _sprite = default!;
 
     public override void Initialize()
     {
@@ -50,9 +49,7 @@ public sealed class InteractionParticleSystem : EntitySystem
         var particle = Spawn(InteractionParticleId, performerXform.Coordinates);
 
         if (used is { } usedEntity && Exists(usedEntity) && TryComp<SpriteComponent>(usedEntity, out var usedSprite))
-        {
             _sprite.CopySprite((usedEntity, usedSprite), particle);
-        }
 
         var spriteColor = Comp<SpriteComponent>(particle).Color;
         _animation.Play(particle, GetAnimation(performerTargetDelta, spriteColor), AnimateKey);
@@ -73,51 +70,51 @@ public sealed class InteractionParticleSystem : EntitySystem
         var endColor = color.WithAlpha(0f);
         var colorLength = rotationLength + offsetLength;
 
-        return new Animation()
+        return new Animation
         {
             Length = colorLength,
 
             AnimationTracks =
             {
-                new AnimationTrackComponentProperty()
+                new AnimationTrackComponentProperty
                 {
                     ComponentType = typeof(SpriteComponent),
                     Property = nameof(SpriteComponent.Rotation),
                     KeyFrames =
                     {
                         new AnimationTrackProperty.KeyFrame(startRotation, 0f),
-                        new AnimationTrackProperty.KeyFrame(endRotation, (float)rotationLength.TotalSeconds),
+                        new AnimationTrackProperty.KeyFrame(endRotation, (float) rotationLength.TotalSeconds),
                     },
                 },
-                new AnimationTrackComponentProperty()
+                new AnimationTrackComponentProperty
                 {
                     ComponentType = typeof(SpriteComponent),
                     Property = nameof(SpriteComponent.Scale),
                     KeyFrames =
                     {
                         new AnimationTrackProperty.KeyFrame(startScale, 0f),
-                        new AnimationTrackProperty.KeyFrame(endScale, (float)rotationLength.TotalSeconds),
+                        new AnimationTrackProperty.KeyFrame(endScale, (float) rotationLength.TotalSeconds),
                     },
                 },
-                new AnimationTrackComponentProperty()
+                new AnimationTrackComponentProperty
                 {
                     ComponentType = typeof(SpriteComponent),
                     Property = nameof(SpriteComponent.Offset),
                     KeyFrames =
                     {
                         new AnimationTrackProperty.KeyFrame(startOffset, 0f),
-                        new AnimationTrackProperty.KeyFrame(endOffset, (float)offsetLength.TotalSeconds),
+                        new AnimationTrackProperty.KeyFrame(endOffset, (float) offsetLength.TotalSeconds),
                     },
                 },
-                new AnimationTrackComponentProperty()
+                new AnimationTrackComponentProperty
                 {
                     ComponentType = typeof(SpriteComponent),
                     Property = nameof(SpriteComponent.Color),
                     KeyFrames =
                     {
                         new AnimationTrackProperty.KeyFrame(startColor, 0f),
-                        new AnimationTrackProperty.KeyFrame(startColor, (float)rotationLength.TotalSeconds),
-                        new AnimationTrackProperty.KeyFrame(endColor, (float)offsetLength.TotalSeconds),
+                        new AnimationTrackProperty.KeyFrame(startColor, (float) rotationLength.TotalSeconds),
+                        new AnimationTrackProperty.KeyFrame(endColor, (float) offsetLength.TotalSeconds),
                     },
                 },
             },

@@ -14,13 +14,13 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Atmos.Components;  //Goobstation - Ventcrawler
-using Content.Shared.DrawDepth;
 using Content.Client.UserInterface.Systems.Sandbox;
+using Content.Shared.Atmos.Components;
 using Content.Shared.SubFloor;
 using Robust.Client.GameObjects;
 using Robust.Client.UserInterface;
 using Robust.Shared.Player;
+//Goobstation - Ventcrawler
 
 namespace Content.Client.SubFloor;
 
@@ -39,11 +39,12 @@ public sealed class SubFloorHideSystem : SharedSubFloorHideSystem
         get => _showAll;
         set
         {
-            if (_showAll == value) return;
+            if (_showAll == value)
+                return;
             _showAll = value;
             _ui.GetUIController<SandboxUIController>().SetToggleSubfloors(value);
 
-            var ev = new ShowSubfloorRequestEvent()
+            var ev = new ShowSubfloorRequestEvent
             {
                 Value = value,
             };
@@ -52,7 +53,7 @@ public sealed class SubFloorHideSystem : SharedSubFloorHideSystem
     }
 
     [ViewVariables(VVAccess.ReadWrite)]
-    public bool ShowVentPipe     //Goobstation - Ventcrawler
+    public bool ShowVentPipe //Goobstation - Ventcrawler
     {
         get => _showVentPipe;
         set
@@ -74,17 +75,13 @@ public sealed class SubFloorHideSystem : SharedSubFloorHideSystem
         SubscribeLocalEvent<LocalPlayerDetachedEvent>(OnPlayerDetached);
     }
 
-    private void OnPlayerDetached(LocalPlayerDetachedEvent ev)
-    {
+    private void OnPlayerDetached(LocalPlayerDetachedEvent ev) =>
         // Vismask resets so need to reset this.
         ShowAll = false;
-    }
 
-    private void OnRequestReceived(ShowSubfloorRequestEvent ev)
-    {
+    private void OnRequestReceived(ShowSubfloorRequestEvent ev) =>
         // When client receives request Queue an update on all vis.
         UpdateAll();
-    }
 
     private void OnAppearanceChanged(EntityUid uid, SubFloorHideComponent component, ref AppearanceChangeEvent args)
     {
@@ -96,8 +93,8 @@ public sealed class SubFloorHideSystem : SharedSubFloorHideSystem
 
         scannerRevealed &= !ShowAll; // no transparency for show-subfloor mode.
 
-        var showVentPipe = HasComp<PipeAppearanceComponent>(uid) && ShowVentPipe;    //Goobstation - Ventcrawler
-        var revealed = !covered || ShowAll || scannerRevealed || showVentPipe;   //Goobstation - Ventcrawler
+        var showVentPipe = HasComp<PipeAppearanceComponent>(uid) && ShowVentPipe; //Goobstation - Ventcrawler
+        var revealed = !covered || ShowAll || scannerRevealed || showVentPipe; //Goobstation - Ventcrawler
 
         // set visibility & color of each layer
         foreach (var layer in args.Sprite.AllLayers)
@@ -125,7 +122,7 @@ public sealed class SubFloorHideSystem : SharedSubFloorHideSystem
         {
             // Allows sandbox mode to make wires visible over other stuff.
             component.OriginalDrawDepth ??= args.Sprite.DrawDepth;
-            _sprite.SetDrawDepth((uid, args.Sprite), (int)Shared.DrawDepth.DrawDepth.Overdoors);
+            _sprite.SetDrawDepth((uid, args.Sprite), (int) Shared.DrawDepth.DrawDepth.Overdoors);
         }
         else if (scannerRevealed)
         {

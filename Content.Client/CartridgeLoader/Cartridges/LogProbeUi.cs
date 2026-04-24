@@ -22,10 +22,7 @@ public sealed partial class LogProbeUi : UIFragment
 {
     private LogProbeUiFragment? _fragment;
 
-    public override Control GetUIFragmentRoot()
-    {
-        return _fragment!;
-    }
+    public override Control GetUIFragmentRoot() => _fragment!;
 
     public override void Setup(BoundUserInterface ui, EntityUid? fragmentOwner)
     {

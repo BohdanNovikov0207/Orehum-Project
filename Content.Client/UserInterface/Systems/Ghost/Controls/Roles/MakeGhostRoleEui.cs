@@ -30,9 +30,9 @@ namespace Content.Client.UserInterface.Systems.Ghost.Controls.Roles;
 [UsedImplicitly]
 public sealed class MakeGhostRoleEui : BaseEui
 {
+    [Dependency] private readonly IClientConsoleHost _consoleHost = default!;
     [Dependency] private readonly IEntityManager _entManager = default!;
     [Dependency] private readonly IPlayerManager _playerManager = default!;
-    [Dependency] private readonly IClientConsoleHost _consoleHost = default!;
 
     private readonly MakeGhostRoleWindow _window;
 
@@ -47,9 +47,7 @@ public sealed class MakeGhostRoleEui : BaseEui
     public override void HandleState(EuiStateBase state)
     {
         if (state is not MakeGhostRoleEuiState uiState)
-        {
             return;
-        }
 
         _window.SetEntity(_entManager, uiState.Entity);
     }
@@ -60,13 +58,16 @@ public sealed class MakeGhostRoleEui : BaseEui
         _window.OpenCentered();
     }
 
-    private void OnMake(NetEntity entity, string name, string description, string rules, bool makeSentient, GhostRoleRaffleSettings? raffleSettings)
+    private void OnMake(NetEntity entity,
+        string name,
+        string description,
+        string rules,
+        bool makeSentient,
+        GhostRoleRaffleSettings? raffleSettings)
     {
         var session = _playerManager.LocalSession;
         if (session == null)
-        {
             return;
-        }
 
         var command = raffleSettings is not null ? "makeghostroleraffled" : "makeghostrole";
 
@@ -98,7 +99,7 @@ public sealed class MakeGhostRoleEui : BaseEui
 
     private void OnClose()
     {
-        base.Closed();
+        Closed();
         SendMessage(new CloseEuiMessage());
     }
 }

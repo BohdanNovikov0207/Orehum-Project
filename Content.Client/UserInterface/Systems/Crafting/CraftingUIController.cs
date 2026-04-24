@@ -16,6 +16,7 @@
 using Content.Client.Construction.UI;
 using Content.Client.Gameplay;
 using Content.Client.UserInterface.Controls;
+using Content.Client.UserInterface.Systems.MenuBar.Widgets;
 using JetBrains.Annotations;
 using Robust.Client.UserInterface.Controllers;
 using Robust.Client.UserInterface.Controls;
@@ -27,7 +28,7 @@ namespace Content.Client.UserInterface.Systems.Crafting;
 public sealed class CraftingUIController : UIController, IOnStateChanged<GameplayState>
 {
     private ConstructionMenuPresenter? _presenter;
-    private MenuButton? CraftingButton => UIManager.GetActiveUIWidgetOrNull<MenuBar.Widgets.GameTopMenuBar>()?.CraftingButton;
+    private MenuButton? CraftingButton => UIManager.GetActiveUIWidgetOrNull<GameTopMenuBar>()?.CraftingButton;
 
     public void OnStateEntered(GameplayState state)
     {
@@ -47,17 +48,13 @@ public sealed class CraftingUIController : UIController, IOnStateChanged<Gamepla
     internal void UnloadButton(ConstructionMenuPresenter? presenter = null)
     {
         if (CraftingButton == null)
-        {
             return;
-        }
 
         if (presenter == null)
         {
             presenter ??= _presenter;
             if (presenter == null)
-            {
                 return;
-            }
         }
 
         CraftingButton.Pressed = false;
@@ -67,20 +64,12 @@ public sealed class CraftingUIController : UIController, IOnStateChanged<Gamepla
     public void LoadButton()
     {
         if (CraftingButton == null)
-        {
             return;
-        }
 
         CraftingButton.OnToggled += ButtonToggled;
     }
 
-    public void Toggle()
-    {
-        _presenter?.ToggleMenu();
-    }
+    public void Toggle() => _presenter?.ToggleMenu();
 
-    private void ButtonToggled(BaseButton.ButtonToggledEventArgs obj)
-    {
-        _presenter?.OnHudCraftingButtonToggled(obj);
-    }
+    private void ButtonToggled(BaseButton.ButtonToggledEventArgs obj) => _presenter?.OnHudCraftingButtonToggled(obj);
 }

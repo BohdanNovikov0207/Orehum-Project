@@ -51,13 +51,8 @@ namespace Content.Client.Radio.Ui;
 [GenerateTypedNameReferences]
 public sealed partial class IntercomMenu : FancyWindow
 {
-    [Dependency] private readonly IPrototypeManager _prototype = default!;
-
-    public event Action<bool>? OnMicPressed;
-    public event Action<bool>? OnSpeakerPressed;
-    public event Action<string>? OnChannelSelected;
-
     private readonly List<string> _channels = new();
+    [Dependency] private readonly IPrototypeManager _prototype = default!;
 
     public IntercomMenu()
     {
@@ -67,6 +62,10 @@ public sealed partial class IntercomMenu : FancyWindow
         MicButton.OnPressed += args => OnMicPressed?.Invoke(args.Button.Pressed);
         SpeakerButton.OnPressed += args => OnSpeakerPressed?.Invoke(args.Button.Pressed);
     }
+
+    public event Action<bool>? OnMicPressed;
+    public event Action<bool>? OnSpeakerPressed;
+    public event Action<string>? OnChannelSelected;
 
     public void Update(Entity<IntercomComponent> entity)
     {

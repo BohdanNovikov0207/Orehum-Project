@@ -14,15 +14,12 @@ using Robust.Shared.Console;
 
 namespace Content.Client.Commands;
 
-[UsedImplicitly, AnyCommand]
+[UsedImplicitly] [AnyCommand]
 public sealed class CreditsCommand : LocalizedCommands
 {
     public override string Command => "credits";
 
     public override string Help => LocalizationManager.GetString($"cmd-{Command}-help", ("command", Command));
 
-    public override void Execute(IConsoleShell shell, string argStr, string[] args)
-    {
-        new CreditsWindow().Open();
-    }
+    public override void Execute(IConsoleShell shell, string argStr, string[] args) => new CreditsWindow().Open();
 }

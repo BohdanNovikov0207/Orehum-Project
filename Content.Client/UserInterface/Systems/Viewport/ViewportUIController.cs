@@ -93,12 +93,12 @@ namespace Content.Client.UserInterface.Systems.Viewport;
 
 public sealed class ViewportUIController : UIController
 {
+    public const int ViewportHeight = 15;
+    public static readonly Vector2i ViewportSize = (EyeManager.PixelsPerMeter * 21, EyeManager.PixelsPerMeter * 15);
+    [Dependency] private readonly IConfigurationManager _configurationManager = default!;
+    [Dependency] private readonly IEntityManager _entMan = default!;
     [Dependency] private readonly IEyeManager _eyeManager = default!;
     [Dependency] private readonly IPlayerManager _playerMan = default!;
-    [Dependency] private readonly IEntityManager _entMan = default!;
-    [Dependency] private readonly IConfigurationManager _configurationManager = default!;
-    public static readonly Vector2i ViewportSize = (EyeManager.PixelsPerMeter * 21, EyeManager.PixelsPerMeter * 15);
-    public const int ViewportHeight = 15;
     private MainViewport? Viewport => UIManager.ActiveScreen?.GetWidget<MainViewport>();
 
     public override void Initialize()
@@ -112,42 +112,33 @@ public sealed class ViewportUIController : UIController
         gameplayStateLoad.OnScreenLoad += OnScreenLoad;
     }
 
-    private void OnScreenLoad()
-    {
-        ReloadViewport();
-    }
+    private void OnScreenLoad() => ReloadViewport();
 
     private void UpdateViewportRatio()
     {
         if (Viewport == null)
-        {
             return;
-        }
 
         var min = _configurationManager.GetCVar(CCVars.ViewportMinimumWidth);
         var max = _configurationManager.GetCVar(CCVars.ViewportMaximumWidth);
         var width = _configurationManager.GetCVar(CCVars.ViewportWidth);
-        var verticalfit = _configurationManager.GetCVar(CCVars.ViewportVerticalFit) && _configurationManager.GetCVar(CCVars.ViewportStretch);
+        var verticalfit = _configurationManager.GetCVar(CCVars.ViewportVerticalFit) &&
+                          _configurationManager.GetCVar(CCVars.ViewportStretch);
 
         if (verticalfit)
-        {
             width = max;
-        }
         else if (width < min || width > max)
-        {
             width = CCVars.ViewportWidth.DefaultValue;
-        }
 
-        Viewport.Viewport.ViewportSize = (EyeManager.PixelsPerMeter * width, EyeManager.PixelsPerMeter * ViewportHeight);
+        Viewport.Viewport.ViewportSize =
+            (EyeManager.PixelsPerMeter * width, EyeManager.PixelsPerMeter * ViewportHeight);
         Viewport.UpdateCfg();
     }
 
     public void ReloadViewport()
     {
         if (Viewport == null)
-        {
             return;
-        }
 
         UpdateViewportRatio();
         Viewport.Viewport.HorizontalExpand = true;
@@ -158,9 +149,7 @@ public sealed class ViewportUIController : UIController
     public override void FrameUpdate(FrameEventArgs e)
     {
         if (Viewport == null)
-        {
             return;
-        }
 
         base.FrameUpdate(e);
 
@@ -183,6 +172,7 @@ public sealed class ViewportUIController : UIController
 
         // Currently, this shouldn't happen. This likely happened because the main eye was set to null. When this
         // does happen it can create hard to troubleshoot bugs, so lets print some helpful warnings:
-        Log.Warning($"Main viewport's eye is in nullspace (main eye is null?). Attached entity: {_entMan.ToPrettyString(ent.Value)}. Entity has eye comp: {eye != null}");
+        Log.Warning(
+            $"Main viewport's eye is in nullspace (main eye is null?). Attached entity: {_entMan.ToPrettyString(ent.Value)}. Entity has eye comp: {eye != null}");
     }
 }

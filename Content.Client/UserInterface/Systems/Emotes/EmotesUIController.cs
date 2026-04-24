@@ -4,9 +4,9 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Client.Chat.UI;
 using Content.Client.Gameplay;
 using Content.Client.UserInterface.Controls;
+using Content.Client.UserInterface.Systems.MenuBar.Widgets;
 using Content.Shared.Chat;
 using Content.Shared.Chat.Prototypes;
 using Content.Shared.Input;
@@ -25,13 +25,6 @@ namespace Content.Client.UserInterface.Systems.Emotes;
 [UsedImplicitly]
 public sealed class EmotesUIController : UIController, IOnStateChanged<GameplayState>
 {
-    [Dependency] private readonly IEntityManager _entityManager = default!;
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-    [Dependency] private readonly IPlayerManager _playerManager = default!;
-
-    private MenuButton? EmotesButton => UIManager.GetActiveUIWidgetOrNull<MenuBar.Widgets.GameTopMenuBar>()?.EmotesButton;
-    private SimpleRadialMenu? _menu;
-
     private static readonly Dictionary<EmoteCategory, (string Tooltip, SpriteSpecifier Sprite)> EmoteGroupingInfo =
         new()
         {
@@ -42,21 +35,24 @@ public sealed class EmotesUIController : UIController, IOnStateChanged<GameplayS
             [EmoteCategory.Vocal] = ("emote-menu-category-vocal",
                 new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/Emotes/vocal.png"))),
             [EmoteCategory.Farts] = ("emote-menu-category-farts",
-                new SpriteSpecifier.Texture(new ResPath("/Textures/_Goobstation/Interface/Emotes/fart.png"))), // Goobstation (obviously)
+                new SpriteSpecifier.Texture(
+                    new ResPath("/Textures/_Goobstation/Interface/Emotes/fart.png"))), // Goobstation (obviously)
         };
 
-    public void OnStateEntered(GameplayState state)
-    {
+    [Dependency] private readonly IEntityManager _entityManager = default!;
+    [Dependency] private readonly IPlayerManager _playerManager = default!;
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    private SimpleRadialMenu? _menu;
+
+    private MenuButton? EmotesButton => UIManager.GetActiveUIWidgetOrNull<GameTopMenuBar>()?.EmotesButton;
+
+    public void OnStateEntered(GameplayState state) =>
         CommandBinds.Builder
             .Bind(ContentKeyFunctions.OpenEmotesMenu,
                 InputCmdHandler.FromDelegate(_ => ToggleEmotesMenu(false)))
             .Register<EmotesUIController>();
-    }
 
-    public void OnStateExited(GameplayState state)
-    {
-        CommandBinds.Unregister<EmotesUIController>();
-    }
+    public void OnStateExited(GameplayState state) => CommandBinds.Unregister<EmotesUIController>();
 
     private void ToggleEmotesMenu(bool centered)
     {
@@ -78,13 +74,9 @@ public sealed class EmotesUIController : UIController, IOnStateChanged<GameplayS
                 EmotesButton.SetClickPressed(true);
 
             if (centered)
-            {
                 _menu.OpenCentered();
-            }
             else
-            {
                 _menu.OpenOverMouseScreenPosition();
-            }
         }
         else
         {
@@ -114,10 +106,7 @@ public sealed class EmotesUIController : UIController, IOnStateChanged<GameplayS
         EmotesButton.OnPressed += ActionButtonPressed;
     }
 
-    private void ActionButtonPressed(BaseButton.ButtonEventArgs args)
-    {
-        ToggleEmotesMenu(true);
-    }
+    private void ActionButtonPressed(BaseButton.ButtonEventArgs args) => ToggleEmotesMenu(true);
 
     private void OnWindowClosed()
     {
@@ -150,7 +139,7 @@ public sealed class EmotesUIController : UIController, IOnStateChanged<GameplayS
         Dictionary<EmoteCategory, List<RadialMenuOption>> emotesByCategory = new();
         foreach (var emote in emotePrototypes)
         {
-            if(emote.Category == EmoteCategory.Invalid)
+            if (emote.Category == EmoteCategory.Invalid)
                 continue;
 
             // only valid emotes that have ways to be triggered by chat and player have access / no restriction on
@@ -174,7 +163,7 @@ public sealed class EmotesUIController : UIController, IOnStateChanged<GameplayS
             var actionOption = new RadialMenuActionOption<EmotePrototype>(HandleRadialButtonClick, emote)
             {
                 Sprite = emote.Icon,
-                ToolTip = Loc.GetString(emote.Name)
+                ToolTip = Loc.GetString(emote.Name),
             };
             list.Add(actionOption);
         }
@@ -188,7 +177,7 @@ public sealed class EmotesUIController : UIController, IOnStateChanged<GameplayS
             models[i] = new RadialMenuNestedLayerOption(list)
             {
                 Sprite = tuple.Sprite,
-                ToolTip = Loc.GetString(tuple.Tooltip)
+                ToolTip = Loc.GetString(tuple.Tooltip),
             };
             i++;
         }
@@ -196,8 +185,6 @@ public sealed class EmotesUIController : UIController, IOnStateChanged<GameplayS
         return models;
     }
 
-    private void HandleRadialButtonClick(EmotePrototype prototype)
-    {
+    private void HandleRadialButtonClick(EmotePrototype prototype) =>
         _entityManager.RaisePredictiveEvent(new PlayEmoteMessage(prototype.ID));
-    }
 }

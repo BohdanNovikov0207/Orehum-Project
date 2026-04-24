@@ -72,34 +72,12 @@ namespace Content.Client.Atmos.Monitor.UI;
 [GenerateTypedNameReferences]
 public sealed partial class AirAlarmWindow : FancyWindow
 {
-    public event Action<string, IAtmosDeviceData>? AtmosDeviceDataChanged;
-	public event Action<IAtmosDeviceData>? AtmosDeviceDataCopied;
-    public event Action<string, AtmosMonitorThresholdType, AtmosAlarmThreshold, Gas?>? AtmosAlarmThresholdChanged;
-    public event Action<AirAlarmMode>? AirAlarmModeChanged;
-    public event Action<bool>? AutoModeChanged;
-    public event Action? ResyncAllRequested;
-
-    private RichTextLabel _address => CDeviceAddress;
-    private RichTextLabel _deviceTotal => CDeviceTotal;
-    private RichTextLabel _pressure => CPressureLabel;
-    private RichTextLabel _temperature => CTemperatureLabel;
-    private RichTextLabel _alarmState => CStatusLabel;
-
-    private TabContainer _tabContainer => CTabContainer;
-    private BoxContainer _ventDevices => CVentContainer;
-    private BoxContainer _scrubberDevices => CScrubberContainer;
-
-    private Dictionary<string, PumpControl> _pumps = new();
-    private Dictionary<string, ScrubberControl> _scrubbers = new();
-    private Dictionary<string, SensorInfo> _sensors = new();
-    private Button _resyncDevices => CResyncButton;
+    private readonly Dictionary<string, PumpControl> _pumps = new();
+    private readonly Dictionary<string, ScrubberControl> _scrubbers = new();
+    private readonly Dictionary<string, SensorInfo> _sensors = new();
 
 
     private Dictionary<Gas, Label> _gasLabels = new();
-
-    private OptionButton _modes => CModeButton;
-
-    private CheckBox _autoMode => AutoModeCheckBox;
 
     public AirAlarmWindow()
     {
@@ -146,39 +124,55 @@ public sealed partial class AirAlarmWindow : FancyWindow
         };
     }
 
-    public void SetEntity(EntityUid uid)
-    {
-        EntityView.SetEntity(uid);
-    }
+    private RichTextLabel _address => CDeviceAddress;
+    private RichTextLabel _deviceTotal => CDeviceTotal;
+    private RichTextLabel _pressure => CPressureLabel;
+    private RichTextLabel _temperature => CTemperatureLabel;
+    private RichTextLabel _alarmState => CStatusLabel;
+
+    private TabContainer _tabContainer => CTabContainer;
+    private BoxContainer _ventDevices => CVentContainer;
+    private BoxContainer _scrubberDevices => CScrubberContainer;
+    private Button _resyncDevices => CResyncButton;
+
+    private OptionButton _modes => CModeButton;
+
+    private CheckBox _autoMode => AutoModeCheckBox;
+    public event Action<string, IAtmosDeviceData>? AtmosDeviceDataChanged;
+    public event Action<IAtmosDeviceData>? AtmosDeviceDataCopied;
+    public event Action<string, AtmosMonitorThresholdType, AtmosAlarmThreshold, Gas?>? AtmosAlarmThresholdChanged;
+    public event Action<AirAlarmMode>? AirAlarmModeChanged;
+    public event Action<bool>? AutoModeChanged;
+    public event Action? ResyncAllRequested;
+
+    public void SetEntity(EntityUid uid) => EntityView.SetEntity(uid);
 
     public void UpdateState(AirAlarmUIState state)
     {
         _address.SetMarkup(state.Address);
         _deviceTotal.SetMarkup($"{state.DeviceCount}");
-        _pressure.SetMarkup(Loc.GetString("air-alarm-ui-window-pressure", ("pressure", $"{state.PressureAverage:0.##}")));
-        _temperature.SetMarkup(Loc.GetString("air-alarm-ui-window-temperature", ("tempC", $"{TemperatureHelpers.KelvinToCelsius(state.TemperatureAverage):0.#}"), ("temperature", $"{state.TemperatureAverage:0.##}")));
+        _pressure.SetMarkup(
+            Loc.GetString("air-alarm-ui-window-pressure", ("pressure", $"{state.PressureAverage:0.##}")));
+        _temperature.SetMarkup(Loc.GetString("air-alarm-ui-window-temperature",
+            ("tempC", $"{TemperatureHelpers.KelvinToCelsius(state.TemperatureAverage):0.#}"),
+            ("temperature", $"{state.TemperatureAverage:0.##}")));
         _alarmState.SetMarkup(Loc.GetString("air-alarm-ui-window-alarm-state",
-                    ("color", ColorForAlarm(state.AlarmType)),
-                    ("state", state.AlarmType)));
+            ("color", ColorForAlarm(state.AlarmType)),
+            ("state", state.AlarmType)));
         UpdateModeSelector(state.Mode);
         UpdateAutoMode(state.AutoMode);
         foreach (var (addr, dev) in state.DeviceData)
         {
             UpdateDeviceData(addr, dev);
         }
+
         _modes.Visible = !state.PanicWireCut;
         CModeSelectLocked.Visible = state.PanicWireCut;
     }
 
-    public void UpdateModeSelector(AirAlarmMode mode)
-    {
-        _modes.SelectId((int) mode);
-    }
+    public void UpdateModeSelector(AirAlarmMode mode) => _modes.SelectId((int) mode);
 
-    public void UpdateAutoMode(bool enabled)
-    {
-        _autoMode.Pressed = enabled;
-    }
+    public void UpdateAutoMode(bool enabled) => _autoMode.Pressed = enabled;
 
     public void UpdateDeviceData(string addr, IAtmosDeviceData device)
     {
@@ -187,16 +181,14 @@ public sealed partial class AirAlarmWindow : FancyWindow
             case GasVentPumpData pump:
                 if (!_pumps.TryGetValue(addr, out var pumpControl))
                 {
-                    var control= new PumpControl(pump, addr);
+                    var control = new PumpControl(pump, addr);
                     control.PumpDataChanged += AtmosDeviceDataChanged;
                     control.PumpDataCopied += AtmosDeviceDataCopied;
                     _pumps.Add(addr, control);
                     CVentContainer.AddChild(control);
                 }
                 else
-                {
                     pumpControl.ChangeData(pump);
-                }
 
                 break;
             case GasVentScrubberData scrubber:
@@ -204,14 +196,12 @@ public sealed partial class AirAlarmWindow : FancyWindow
                 {
                     var control = new ScrubberControl(scrubber, addr);
                     control.ScrubberDataChanged += AtmosDeviceDataChanged;
-					control.ScrubberDataCopied += AtmosDeviceDataCopied;
+                    control.ScrubberDataCopied += AtmosDeviceDataCopied;
                     _scrubbers.Add(addr, control);
                     CScrubberContainer.AddChild(control);
                 }
                 else
-                {
                     scrubberControl.ChangeData(scrubber);
-                }
 
                 break;
             case AtmosSensorData sensor:
@@ -224,9 +214,7 @@ public sealed partial class AirAlarmWindow : FancyWindow
                     CSensorContainer.AddChild(control);
                 }
                 else
-                {
                     sensorControl.ChangeData(sensor);
-                }
 
                 break;
         }
@@ -238,15 +226,11 @@ public sealed partial class AirAlarmWindow : FancyWindow
         return ColorForAlarm(curAlarm);
     }
 
-    public static Color ColorForAlarm(AtmosAlarmType curAlarm)
-    {
-        return curAlarm switch
+    public static Color ColorForAlarm(AtmosAlarmType curAlarm) =>
+        curAlarm switch
         {
             AtmosAlarmType.Danger => StyleNano.DangerousRedFore,
             AtmosAlarmType.Warning => StyleNano.ConcerningOrangeFore,
             _ => StyleNano.GoodGreenFore,
         };
-    }
-
-
 }

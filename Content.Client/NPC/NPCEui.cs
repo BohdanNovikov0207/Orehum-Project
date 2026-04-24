@@ -22,10 +22,7 @@ public sealed class NPCEui : BaseEui
         _window.OnClose += OnClosed;
     }
 
-    private void OnClosed()
-    {
-        SendMessage(new CloseEuiMessage());
-    }
+    private void OnClosed() => SendMessage(new CloseEuiMessage());
 
     public override void Closed()
     {

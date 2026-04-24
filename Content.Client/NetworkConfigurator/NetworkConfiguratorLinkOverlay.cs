@@ -91,15 +91,13 @@ namespace Content.Client.NetworkConfigurator;
 
 public sealed class NetworkConfiguratorLinkOverlay : Overlay
 {
+    private readonly DeviceListSystem _deviceListSystem;
     [Dependency] private readonly IEntityManager _entityManager = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
-    private readonly DeviceListSystem _deviceListSystem;
     private readonly SharedTransformSystem _transformSystem;
-
-    public Dictionary<EntityUid, Color> Colors = new();
     public EntityUid? Action;
 
-    public override OverlaySpace Space => OverlaySpace.WorldSpace;
+    public Dictionary<EntityUid, Color> Colors = new();
 
     public NetworkConfiguratorLinkOverlay()
     {
@@ -109,12 +107,15 @@ public sealed class NetworkConfiguratorLinkOverlay : Overlay
         _transformSystem = _entityManager.System<SharedTransformSystem>();
     }
 
+    public override OverlaySpace Space => OverlaySpace.WorldSpace;
+
     protected override void Draw(in OverlayDrawArgs args)
     {
         var query = _entityManager.EntityQueryEnumerator<NetworkConfiguratorActiveLinkOverlayComponent>();
         while (query.MoveNext(out var uid, out _))
         {
-            if (_entityManager.Deleted(uid) || !_entityManager.TryGetComponent(uid, out DeviceListComponent? deviceList))
+            if (_entityManager.Deleted(uid) ||
+                !_entityManager.TryGetComponent(uid, out DeviceListComponent? deviceList))
             {
                 _entityManager.RemoveComponentDeferred<NetworkConfiguratorActiveLinkOverlayComponent>(uid);
                 continue;
@@ -140,17 +141,15 @@ public sealed class NetworkConfiguratorLinkOverlay : Overlay
             foreach (var device in _deviceListSystem.GetAllDevices(uid, deviceList))
             {
                 if (_entityManager.Deleted(device))
-                {
                     continue;
-                }
 
                 var linkTransform = _entityManager.GetComponent<TransformComponent>(device);
                 if (linkTransform.MapID == MapId.Nullspace)
-                {
                     continue;
-                }
 
-                args.WorldHandle.DrawLine(_transformSystem.GetWorldPosition(sourceTransform), _transformSystem.GetWorldPosition(linkTransform), Colors[uid]);
+                args.WorldHandle.DrawLine(_transformSystem.GetWorldPosition(sourceTransform),
+                    _transformSystem.GetWorldPosition(linkTransform),
+                    Colors[uid]);
             }
         }
     }

@@ -18,17 +18,15 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Numerics;
-using Content.Shared._Starlight.CollectiveMind; // Goobstation - Starlight collective mind port
+using Content.Shared._Starlight.CollectiveMind;
 using Content.Shared.Chat;
+using Content.Shared.Radio;
+// Goobstation - Starlight collective mind port
 
 namespace Content.Client.UserInterface.Systems.Chat.Controls;
 
 public sealed class ChannelSelectorButton : ChatPopupButton<ChannelSelectorPopup>
 {
-    public event Action<ChatSelectChannel>? OnChannelSelect;
-
-    public ChatSelectChannel SelectedChannel { get; private set; }
-
     private const int SelectorDropdownOffset = 38;
 
     public ChannelSelectorButton()
@@ -38,10 +36,11 @@ public sealed class ChannelSelectorButton : ChatPopupButton<ChannelSelectorPopup
         Popup.Selected += OnChannelSelected;
 
         if (Popup.FirstChannel is { } firstSelector)
-        {
             Select(firstSelector);
-        }
     }
+
+    public ChatSelectChannel SelectedChannel { get; private set; }
+    public event Action<ChatSelectChannel>? OnChannelSelect;
 
     protected override UIBox2 GetPopupPosition()
     {
@@ -52,17 +51,12 @@ public sealed class ChannelSelectorButton : ChatPopupButton<ChannelSelectorPopup
             new Vector2(SizeBox.Width, SelectorDropdownOffset));
     }
 
-    private void OnChannelSelected(ChatSelectChannel channel)
-    {
-        Select(channel);
-    }
+    private void OnChannelSelected(ChatSelectChannel channel) => Select(channel);
 
     public void Select(ChatSelectChannel channel)
     {
         if (Popup.Visible)
-        {
             Popup.Close();
-        }
 
         if (SelectedChannel == channel)
             return;
@@ -70,14 +64,11 @@ public sealed class ChannelSelectorButton : ChatPopupButton<ChannelSelectorPopup
         OnChannelSelect?.Invoke(channel);
     }
 
-    public static string ChannelSelectorName(ChatSelectChannel channel)
-    {
-        return Loc.GetString($"hud-chatbox-select-channel-{channel}");
-    }
+    public static string ChannelSelectorName(ChatSelectChannel channel) =>
+        Loc.GetString($"hud-chatbox-select-channel-{channel}");
 
-    public Color ChannelSelectColor(ChatSelectChannel channel)
-    {
-        return channel switch
+    public Color ChannelSelectColor(ChatSelectChannel channel) =>
+        channel switch
         {
             ChatSelectChannel.Radio => Color.LimeGreen,
             ChatSelectChannel.LOOC => Color.MediumTurquoise,
@@ -85,12 +76,13 @@ public sealed class ChannelSelectorButton : ChatPopupButton<ChannelSelectorPopup
             ChatSelectChannel.Dead => Color.MediumPurple,
             ChatSelectChannel.Admin => Color.HotPink,
             ChatSelectChannel.Telepathic => Color.PaleVioletRed, //Nyano - Summary: determines the color for the chat.
-            _ => Color.DarkGray
+            _ => Color.DarkGray,
         };
-    }
 
     // Goobstation - Starlight collective mind port
-    public void UpdateChannelSelectButton(ChatSelectChannel channel, Shared.Radio.RadioChannelPrototype? radio, CollectiveMindPrototype? collectiveMind = null)
+    public void UpdateChannelSelectButton(ChatSelectChannel channel,
+        RadioChannelPrototype? radio,
+        CollectiveMindPrototype? collectiveMind = null)
     {
         if (radio != null)
         {

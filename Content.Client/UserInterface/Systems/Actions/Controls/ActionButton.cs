@@ -27,7 +27,6 @@ using Content.Client.Actions;
 using Content.Client.Actions.UI;
 using Content.Client.Cooldown;
 using Content.Client.Stylesheets;
-using Content.Shared.Actions;
 using Content.Shared.Actions.Components;
 using Content.Shared.Charges.Components;
 using Content.Shared.Charges.Systems;
@@ -46,45 +45,26 @@ namespace Content.Client.UserInterface.Systems.Actions.Controls;
 
 public sealed class ActionButton : Control, IEntityControl
 {
-    private IEntityManager _entities;
-    private SpriteSystem? _spriteSys;
-    private ActionUIController? _controller;
-    private SharedChargesSystem _sharedChargesSys;
-    private bool _beingHovered;
-    private bool _depressed;
-    private bool _toggled;
-
-    public BoundKeyFunction? KeyBind
-    {
-        set
-        {
-            _keybind = value;
-            if (_keybind != null)
-            {
-                Label.Text = BoundKeyHelper.ShortKeyName(_keybind.Value);
-            }
-        }
-    }
-
-    private BoundKeyFunction? _keybind;
+    private readonly TextureRect _bigActionIcon;
+    private readonly SpriteView _bigItemSpriteView;
+    private readonly IEntityManager _entities;
+    private readonly SharedChargesSystem _sharedChargesSys;
+    private readonly TextureRect _smallActionIcon;
+    private readonly SpriteView _smallItemSpriteView;
 
     public readonly TextureRect Button;
-    public readonly PanelContainer HighlightRect;
-    private readonly TextureRect _bigActionIcon;
-    private readonly TextureRect _smallActionIcon;
-    public readonly Label Label;
     public readonly CooldownGraphic Cooldown;
-    private readonly SpriteView _smallItemSpriteView;
-    private readonly SpriteView _bigItemSpriteView;
+    public readonly PanelContainer HighlightRect;
+    public readonly Label Label;
+    private bool _beingHovered;
 
     private Texture? _buttonBackgroundTexture;
+    private ActionUIController? _controller;
+    private bool _depressed;
 
-    public Entity<ActionComponent>? Action { get; private set; }
-    public bool Locked { get; set; }
-
-    public event Action<GUIBoundKeyEventArgs, ActionButton>? ActionPressed;
-    public event Action<GUIBoundKeyEventArgs, ActionButton>? ActionUnpressed;
-    public event Action<ActionButton>? ActionFocusExited;
+    private BoundKeyFunction? _keybind;
+    private SpriteSystem? _spriteSys;
+    private bool _toggled;
 
     public ActionButton(IEntityManager entities, SpriteSystem? spriteSys = null, ActionUIController? controller = null)
     {
@@ -99,34 +79,34 @@ public sealed class ActionButton : Control, IEntityControl
         Button = new TextureRect
         {
             Name = "Button",
-            TextureScale = new Vector2(2, 2)
+            TextureScale = new Vector2(2, 2),
         };
         HighlightRect = new PanelContainer
         {
-            StyleClasses = {StyleNano.StyleClassHandSlotHighlight},
+            StyleClasses = { StyleNano.StyleClassHandSlotHighlight },
             MinSize = new Vector2(32, 32),
-            Visible = false
+            Visible = false,
         };
         _bigActionIcon = new TextureRect
         {
             HorizontalExpand = true,
             VerticalExpand = true,
             Stretch = StretchMode.Scale,
-            Visible = false
+            Visible = false,
         };
         _smallActionIcon = new TextureRect
         {
             HorizontalAlignment = HAlignment.Right,
             VerticalAlignment = VAlignment.Bottom,
             Stretch = StretchMode.Scale,
-            Visible = false
+            Visible = false,
         };
         Label = new Label
         {
             Name = "Label",
             HorizontalAlignment = HAlignment.Left,
             VerticalAlignment = VAlignment.Top,
-            Margin = new Thickness(5, 0, 0, 0)
+            Margin = new Thickness(5, 0, 0, 0),
         };
         _bigItemSpriteView = new SpriteView
         {
@@ -152,9 +132,9 @@ public sealed class ActionButton : Control, IEntityControl
             Orientation = LayoutOrientation.Horizontal,
             HorizontalExpand = true,
             VerticalExpand = true,
-            MinSize = new Vector2(64, 64)
+            MinSize = new Vector2(64, 64),
         };
-        paddingBoxItemIcon.AddChild(new Control()
+        paddingBoxItemIcon.AddChild(new Control
         {
             MinSize = new Vector2(32, 32),
         });
@@ -163,10 +143,10 @@ public sealed class ActionButton : Control, IEntityControl
             Children =
             {
                 _smallActionIcon,
-                _smallItemSpriteView
-            }
+                _smallItemSpriteView,
+            },
         });
-        Cooldown = new CooldownGraphic {Visible = false};
+        Cooldown = new CooldownGraphic { Visible = false };
 
         AddChild(Button);
         AddChild(_bigActionIcon);
@@ -185,6 +165,25 @@ public sealed class ActionButton : Control, IEntityControl
 
         TooltipSupplier = SupplyTooltip;
     }
+
+    public BoundKeyFunction? KeyBind
+    {
+        set
+        {
+            _keybind = value;
+            if (_keybind != null)
+                Label.Text = BoundKeyHelper.ShortKeyName(_keybind.Value);
+        }
+    }
+
+    public Entity<ActionComponent>? Action { get; private set; }
+    public bool Locked { get; set; }
+
+    EntityUid? IEntityControl.UiEntity => Action;
+
+    public event Action<GUIBoundKeyEventArgs, ActionButton>? ActionPressed;
+    public event Action<GUIBoundKeyEventArgs, ActionButton>? ActionUnpressed;
+    public event Action<ActionButton>? ActionFocusExited;
 
     protected override void OnThemeUpdated()
     {
@@ -228,11 +227,14 @@ public sealed class ActionButton : Control, IEntityControl
         if (_entities.TryGetComponent(Action, out LimitedChargesComponent? actionCharges))
         {
             var charges = _sharedChargesSys.GetCurrentCharges((Action.Value, actionCharges, null));
-            chargesText = FormattedMessage.FromMarkupPermissive(Loc.GetString($"Charges: {charges.ToString()}/{actionCharges.MaxCharges}"));
+            chargesText =
+                FormattedMessage.FromMarkupPermissive(
+                    Loc.GetString($"Charges: {charges.ToString()}/{actionCharges.MaxCharges}"));
 
             if (_entities.TryGetComponent(Action, out AutoRechargeComponent? autoRecharge))
             {
-                var chargeTimeRemaining = _sharedChargesSys.GetNextRechargeTime((Action.Value, actionCharges, autoRecharge));
+                var chargeTimeRemaining =
+                    _sharedChargesSys.GetNextRechargeTime((Action.Value, actionCharges, autoRecharge));
                 chargesText.AddText(Loc.GetString($"{Environment.NewLine}Time Til Recharge: {chargeTimeRemaining}"));
             }
         }
@@ -240,14 +242,11 @@ public sealed class ActionButton : Control, IEntityControl
         return new ActionAlertTooltip(name, decr, charges: chargesText);
     }
 
-    protected override void ControlFocusExited()
-    {
-        ActionFocusExited?.Invoke(this);
-    }
+    protected override void ControlFocusExited() => ActionFocusExited?.Invoke(this);
 
     private void UpdateItemIcon()
     {
-        if (Action?.Comp is not {EntityIcon: { } entity} ||
+        if (Action?.Comp is not { EntityIcon: { } entity } ||
             !_entities.HasComponent<SpriteComponent>(entity))
         {
             _bigItemSpriteView.Visible = false;
@@ -283,7 +282,7 @@ public sealed class ActionButton : Control, IEntityControl
 
     private void SetActionIcon(Texture? texture)
     {
-        if (Action?.Comp is not {} action || texture == null)
+        if (Action?.Comp is not { } action || texture == null)
         {
             _bigActionIcon.Texture = null;
             _bigActionIcon.Visible = false;
@@ -313,7 +312,7 @@ public sealed class ActionButton : Control, IEntityControl
         UpdateItemIcon();
         UpdateBackground();
 
-        if (Action is not {} action)
+        if (Action is not { } action)
         {
             SetActionIcon(null);
             return;
@@ -324,16 +323,14 @@ public sealed class ActionButton : Control, IEntityControl
         var icon = action.Comp.Icon;
         if (_controller.SelectingTargetFor == action || action.Comp.Toggled)
         {
-            if (action.Comp.IconOn is {} iconOn)
+            if (action.Comp.IconOn is { } iconOn)
                 icon = iconOn;
 
-            if (action.Comp.BackgroundOn is {} background)
+            if (action.Comp.BackgroundOn is { } background)
                 _buttonBackgroundTexture = _spriteSys.Frame0(background);
         }
         else
-        {
             _buttonBackgroundTexture = Theme.ResolveTexture("SlotBackground");
-        }
 
         SetActionIcon(icon != null ? _spriteSys.Frame0(icon) : null);
     }
@@ -343,13 +340,9 @@ public sealed class ActionButton : Control, IEntityControl
         _controller ??= UserInterfaceManager.GetUIController<ActionUIController>();
         if (Action != null ||
             _controller.IsDragging && GetPositionInParent() == Parent?.ChildCount - 1)
-        {
             Button.Texture = _buttonBackgroundTexture;
-        }
         else
-        {
             Button.Texture = null;
-        }
     }
 
     public bool TryReplaceWith(EntityUid actionId, ActionsSystem system)
@@ -385,10 +378,10 @@ public sealed class ActionButton : Control, IEntityControl
         UpdateBackground();
 
         Cooldown.Visible = Action?.Comp.Cooldown != null;
-        if (Action?.Comp is not {} action)
+        if (Action?.Comp is not { } action)
             return;
 
-        if (action.Cooldown is {} cooldown)
+        if (action.Cooldown is { } cooldown)
             Cooldown.FromTime(cooldown.Start, cooldown.End);
 
         if (_toggled != action.Toggled)
@@ -419,7 +412,7 @@ public sealed class ActionButton : Control, IEntityControl
     public void Depress(GUIBoundKeyEventArgs args, bool depress)
     {
         // action can still be toggled if it's allowed to stay selected
-        if (Action?.Comp is not {Enabled: true})
+        if (Action?.Comp is not { Enabled: true })
             return;
 
         _depressed = depress;
@@ -432,7 +425,7 @@ public sealed class ActionButton : Control, IEntityControl
         HighlightRect.Visible = _beingHovered && (Action != null || _controller.IsDragging);
 
         // always show the normal empty button style if no action in this slot
-        if (Action?.Comp is not {} action)
+        if (Action?.Comp is not { } action)
         {
             SetOnlyStylePseudoClass(ContainerButton.StylePseudoClassNormal);
             return;
@@ -440,9 +433,7 @@ public sealed class ActionButton : Control, IEntityControl
 
         // show a hover only if the action is usable or another action is being dragged on top of this
         if (_beingHovered && (_controller.IsDragging || action.Enabled))
-        {
             SetOnlyStylePseudoClass(ContainerButton.StylePseudoClassHover);
-        }
 
         // it's only depress-able if it's usable, so if we're depressed
         // show the depressed style
@@ -471,6 +462,4 @@ public sealed class ActionButton : Control, IEntityControl
 
         SetOnlyStylePseudoClass(ContainerButton.StylePseudoClassNormal);
     }
-
-    EntityUid? IEntityControl.UiEntity => Action;
 }

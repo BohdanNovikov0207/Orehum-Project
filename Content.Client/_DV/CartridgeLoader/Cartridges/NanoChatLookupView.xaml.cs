@@ -27,26 +27,26 @@ public sealed partial class NanoChatLookupView : PanelContainer
         ContactsList.RemoveAllChildren();
         if (state.Contacts is not { } contacts)
         {
-            ContactsList.AddChild(new Label() { Text = Loc.GetString("nano-chat-look-up-no-server") });
+            ContactsList.AddChild(new Label { Text = Loc.GetString("nano-chat-look-up-no-server") });
             return;
         }
 
         for (var idx = 0; idx < contacts.Count; idx++)
         {
             var contact = contacts[idx];
-            var nameLabel = new Label()
+            var nameLabel = new Label
             {
                 Text = contact.Name,
                 HorizontalAlignment = HAlignment.Left,
-                HorizontalExpand = true
+                HorizontalExpand = true,
             };
-            var numberLabel = new Label()
+            var numberLabel = new Label
             {
                 Text = $"#{contacts[idx].Number:D4}",
                 HorizontalAlignment = HAlignment.Right,
                 Margin = new Thickness(0, 0, 36, 0),
             };
-            var startChatButton = new Button()
+            var startChatButton = new Button
             {
                 Text = "+",
                 HorizontalAlignment = HAlignment.Right,
@@ -55,13 +55,12 @@ public sealed partial class NanoChatLookupView : PanelContainer
                 ToolTip = Loc.GetString("nano-chat-new-chat"),
             };
             startChatButton.AddStyleClass("OpenBoth");
-            if (contact.Number == state.OwnNumber || state.Recipients.ContainsKey(contact.Number) || state.MaxRecipients <= state.Recipients.Count)
-            {
+            if (contact.Number == state.OwnNumber || state.Recipients.ContainsKey(contact.Number) ||
+                state.MaxRecipients <= state.Recipients.Count)
                 startChatButton.Disabled = true;
-            }
             startChatButton.OnPressed += _ => OnStartChat?.Invoke(contact);
 
-            var panel = new PanelContainer()
+            var panel = new PanelContainer
             {
                 HorizontalExpand = true,
             };

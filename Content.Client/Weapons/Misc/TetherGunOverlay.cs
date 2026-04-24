@@ -11,14 +11,14 @@ namespace Content.Client.Weapons.Misc;
 
 public sealed class TetherGunOverlay : Overlay
 {
-    public override OverlaySpace Space => OverlaySpace.WorldSpaceBelowFOV;
-
-    private IEntityManager _entManager;
+    private readonly IEntityManager _entManager;
 
     public TetherGunOverlay(IEntityManager entManager)
     {
         _entManager = entManager;
     }
+
+    public override OverlaySpace Space => OverlaySpace.WorldSpaceBelowFOV;
 
     protected override void Draw(in OverlayDrawArgs args)
     {
@@ -35,9 +35,7 @@ public sealed class TetherGunOverlay : Overlay
 
             if (!xformQuery.TryGetComponent(gun, out var gunXform) ||
                 !xformQuery.TryGetComponent(uid, out var xform))
-            {
                 continue;
-            }
 
             if (xform.MapID != gunXform.MapID)
                 continue;
@@ -56,13 +54,9 @@ public sealed class TetherGunOverlay : Overlay
             var color = Color.Red;
 
             if (forceQuery.TryGetComponent(tethered.Tetherer, out var force))
-            {
                 color = force.LineColor;
-            }
             else if (tetherQuery.TryGetComponent(tethered.Tetherer, out var tether))
-            {
                 color = tether.LineColor;
-            }
 
             worldHandle.DrawRect(rotated, color.WithAlpha(0.3f));
         }

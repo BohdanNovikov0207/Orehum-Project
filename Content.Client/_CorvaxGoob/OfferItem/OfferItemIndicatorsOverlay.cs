@@ -14,20 +14,21 @@ namespace Content.Client._CorvaxGoob.OfferItem;
 
 public sealed class OfferItemIndicatorsOverlay : Overlay
 {
-    private readonly IInputManager _inputManager;
     private readonly IEntityManager _entMan;
     private readonly IEyeManager _eye;
-    private readonly OfferItemSystem _offer;
-
-    private readonly Texture _sight;
-
-    public override OverlaySpace Space => OverlaySpace.ScreenSpace;
+    private readonly IInputManager _inputManager;
 
     private readonly Color _mainColor = Color.White.WithAlpha(0.3f);
-    private readonly Color _strokeColor = Color.Black.WithAlpha(0.5f);
-    private readonly float _scale = 0.6f;  // 1 is a little big
+    private readonly OfferItemSystem _offer;
+    private readonly float _scale = 0.6f; // 1 is a little big
 
-    public OfferItemIndicatorsOverlay(IInputManager input, IEntityManager entMan, IEyeManager eye, OfferItemSystem offerSys)
+    private readonly Texture _sight;
+    private readonly Color _strokeColor = Color.Black.WithAlpha(0.5f);
+
+    public OfferItemIndicatorsOverlay(IInputManager input,
+        IEntityManager entMan,
+        IEyeManager eye,
+        OfferItemSystem offerSys)
     {
         _inputManager = input;
         _entMan = entMan;
@@ -35,13 +36,13 @@ public sealed class OfferItemIndicatorsOverlay : Overlay
         _offer = offerSys;
 
         var spriteSys = _entMan.EntitySysManager.GetEntitySystem<SpriteSystem>();
-        _sight = spriteSys.Frame0(new SpriteSpecifier.Rsi(new ResPath("/Textures/_CorvaxGoob/Misc/give_item.rsi"), "give_item"));
+        _sight = spriteSys.Frame0(new SpriteSpecifier.Rsi(new ResPath("/Textures/_CorvaxGoob/Misc/give_item.rsi"),
+            "give_item"));
     }
 
-    protected override bool BeforeDraw(in OverlayDrawArgs args)
-    {
-        return _offer.IsInOfferMode() && base.BeforeDraw(in args);
-    }
+    public override OverlaySpace Space => OverlaySpace.ScreenSpace;
+
+    protected override bool BeforeDraw(in OverlayDrawArgs args) => _offer.IsInOfferMode() && base.BeforeDraw(in args);
 
     protected override void Draw(in OverlayDrawArgs args)
     {

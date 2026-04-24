@@ -11,23 +11,23 @@ using Content.Client.Chemistry.EntitySystems;
 using Content.Client.Items.UI;
 using Content.Client.Message;
 using Content.Client.Stylesheets;
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Chemistry.Components;
 using Content.Shared.Chemistry.EntitySystems;
-using Content.Goobstation.Maths.FixedPoint;
 using Robust.Client.UserInterface.Controls;
 
 namespace Content.Client.Chemistry.UI;
 
 /// <summary>
-/// Displays basic solution information for <see cref="SolutionItemStatusComponent"/>.
+/// Displays basic solution information for <see cref="SolutionItemStatusComponent" />.
 /// </summary>
-/// <seealso cref="SolutionItemStatusSystem"/>
+/// <seealso cref="SolutionItemStatusSystem" />
 public sealed class SolutionStatusControl : PollingItemStatusControl<SolutionStatusControl.Data>
 {
-    private readonly Entity<SolutionItemStatusComponent> _parent;
     private readonly IEntityManager _entityManager;
-    private readonly SharedSolutionContainerSystem _solutionContainers;
     private readonly RichTextLabel _label;
+    private readonly Entity<SolutionItemStatusComponent> _parent;
+    private readonly SharedSolutionContainerSystem _solutionContainers;
 
     public SolutionStatusControl(
         Entity<SolutionItemStatusComponent> parent,

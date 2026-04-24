@@ -17,13 +17,13 @@ using Robust.Shared.Timing;
 
 namespace Content.Client.MouseRotator;
 
-/// <inheritdoc/>
+/// <inheritdoc />
 public sealed class MouseRotatorSystem : SharedMouseRotatorSystem
 {
+    [Dependency] private readonly IEyeManager _eye = default!;
     [Dependency] private readonly IInputManager _input = default!;
     [Dependency] private readonly IPlayerManager _player = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly IEyeManager _eye = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     public override void Update(float frameTime)
@@ -47,7 +47,7 @@ public sealed class MouseRotatorSystem : SharedMouseRotatorSystem
         if (mapPos.MapId == MapId.Nullspace)
             return;
 
-        var angle = (mapPos.Position - _transform.GetMapCoordinates(player.Value, xform: xform).Position).ToWorldAngle();
+        var angle = (mapPos.Position - _transform.GetMapCoordinates(player.Value, xform).Position).ToWorldAngle();
 
         var curRot = _transform.GetWorldRotation(xform);
 
@@ -56,7 +56,8 @@ public sealed class MouseRotatorSystem : SharedMouseRotatorSystem
         if (rotator.Simple4DirMode)
         {
             var eyeRot = _eye.CurrentEye.Rotation; // camera rotation
-            var angleDir = (angle + eyeRot).GetCardinalDir(); // apply GetCardinalDir in the camera frame, not in the world frame
+            var angleDir =
+                (angle + eyeRot).GetCardinalDir(); // apply GetCardinalDir in the camera frame, not in the world frame
             if (angleDir == (curRot + eyeRot).GetCardinalDir())
                 return;
 
@@ -68,7 +69,7 @@ public sealed class MouseRotatorSystem : SharedMouseRotatorSystem
             RaisePredictiveEvent(new RequestMouseRotatorRotationEvent
             {
                 Rotation = rotation,
-                User = GetNetEntity(player)
+                User = GetNetEntity(player),
             });
 
             return;
@@ -89,7 +90,7 @@ public sealed class MouseRotatorSystem : SharedMouseRotatorSystem
         RaisePredictiveEvent(new RequestMouseRotatorRotationEvent
         {
             Rotation = angle,
-            User = GetNetEntity(player)
+            User = GetNetEntity(player),
         });
     }
 }

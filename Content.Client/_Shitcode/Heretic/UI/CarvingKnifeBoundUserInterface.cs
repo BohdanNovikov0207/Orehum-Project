@@ -39,8 +39,6 @@ public sealed class CarvingKnifeBoundUserInterface : BoundUserInterface
         _menu.OpenCenteredAt(_inputManager.MouseScreenPosition.Position / _displayManager.ScreenSize);
     }
 
-    private void SendMessage(ProtoId<RuneCarvingPrototype> protoId)
-    {
+    private void SendMessage(ProtoId<RuneCarvingPrototype> protoId) =>
         SendMessage(new RuneCarvingSelectedMessage(protoId));
-    }
 }

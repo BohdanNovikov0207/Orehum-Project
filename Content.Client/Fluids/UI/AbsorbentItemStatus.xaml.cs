@@ -13,47 +13,46 @@ using Robust.Client.UserInterface.XAML;
 using Robust.Shared.Timing;
 using Robust.Shared.Utility;
 
-namespace Content.Client.Fluids.UI
+namespace Content.Client.Fluids.UI;
+
+[GenerateTypedNameReferences]
+public sealed partial class AbsorbentItemStatus : SplitBar
 {
-    [GenerateTypedNameReferences]
-    public sealed partial class AbsorbentItemStatus : SplitBar
+    private readonly IEntityManager _entManager;
+    private readonly Dictionary<Color, float> _progress = new();
+    private readonly EntityUid _uid;
+
+    public AbsorbentItemStatus(EntityUid uid, IEntityManager entManager)
     {
-        private readonly IEntityManager _entManager;
-        private readonly EntityUid _uid;
-        private Dictionary<Color, float> _progress = new();
+        RobustXamlLoader.Load(this);
+        _uid = uid;
+        _entManager = entManager;
 
-        public AbsorbentItemStatus(EntityUid uid, IEntityManager entManager)
+        MinBarSize = new Vector2(10, 0);
+    }
+
+    protected override void FrameUpdate(FrameEventArgs args)
+    {
+        base.FrameUpdate(args);
+        if (!_entManager.TryGetComponent<AbsorbentComponent>(_uid, out var absorbent))
+            return;
+
+        var oldProgress = _progress.ShallowClone();
+        _progress.Clear();
+
+        foreach (var item in absorbent.Progress)
         {
-            RobustXamlLoader.Load(this);
-            _uid = uid;
-            _entManager = entManager;
-
-            MinBarSize = new Vector2(10, 0);
+            _progress[item.Key] = item.Value;
         }
 
-        protected override void FrameUpdate(FrameEventArgs args)
+        if (oldProgress.OrderBy(x => x.Key.ToArgb()).SequenceEqual(_progress))
+            return;
+
+        Bar.Clear();
+
+        foreach (var (key, value) in absorbent.Progress)
         {
-            base.FrameUpdate(args);
-            if (!_entManager.TryGetComponent<AbsorbentComponent>(_uid, out var absorbent))
-                return;
-
-            var oldProgress = _progress.ShallowClone();
-            _progress.Clear();
-
-            foreach (var item in absorbent.Progress)
-            {
-                _progress[item.Key] = item.Value;
-            }
-
-            if (oldProgress.OrderBy(x => x.Key.ToArgb()).SequenceEqual(_progress))
-                return;
-
-            Bar.Clear();
-
-            foreach (var (key, value) in absorbent.Progress)
-            {
-                Bar.AddEntry(value, key);
-            }
+            Bar.AddEntry(value, key);
         }
     }
 }

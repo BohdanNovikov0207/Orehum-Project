@@ -18,6 +18,9 @@ namespace Content.Client._Shitcode.Heretic;
 
 public sealed class VoidCurseSystem : SharedVoidCurseSystem
 {
+    private readonly string _overlayStateNormal = "void_chill_partial",
+        _overlayStateMax = "void_chill_oh_fuck";
+
     public override void Initialize()
     {
         base.Initialize();
@@ -25,9 +28,6 @@ public sealed class VoidCurseSystem : SharedVoidCurseSystem
         SubscribeLocalEvent<VoidCurseComponent, ComponentStartup>(OnStartup);
         SubscribeLocalEvent<VoidCurseComponent, ComponentShutdown>(OnShutdown);
     }
-
-    private readonly string _overlayStateNormal = "void_chill_partial",
-                            _overlayStateMax = "void_chill_oh_fuck";
 
     public override void Update(float frameTime)
     {
@@ -67,6 +67,7 @@ public sealed class VoidCurseSystem : SharedVoidCurseSystem
         sprite.LayerMapSet(0, layer);
         sprite.LayerSetShader(layer, "unshaded");
     }
+
     private void OnShutdown(Entity<VoidCurseComponent> ent, ref ComponentShutdown args)
     {
         if (!TryComp<SpriteComponent>(ent, out var sprite))

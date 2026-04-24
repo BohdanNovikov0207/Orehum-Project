@@ -10,7 +10,7 @@ public sealed class ArtifactAnalyzerSystem : SharedArtifactAnalyzerSystem
 {
     [Dependency] private readonly UserInterfaceSystem _ui = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
@@ -19,12 +19,11 @@ public sealed class ArtifactAnalyzerSystem : SharedArtifactAnalyzerSystem
         SubscribeLocalEvent<ArtifactAnalyzerComponent, AfterAutoHandleStateEvent>(OnAnalyzerAfterAutoHandleState);
     }
 
-    private void OnAnalysisConsoleAfterAutoHandleState(Entity<AnalysisConsoleComponent> ent, ref AfterAutoHandleStateEvent args)
-    {
-        UpdateBuiIfCanGetAnalysisConsoleUi(ent);
-    }
+    private void OnAnalysisConsoleAfterAutoHandleState(Entity<AnalysisConsoleComponent> ent,
+        ref AfterAutoHandleStateEvent args) => UpdateBuiIfCanGetAnalysisConsoleUi(ent);
 
-    private void OnAnalyzerAfterAutoHandleState(Entity<ArtifactAnalyzerComponent> ent, ref AfterAutoHandleStateEvent args)
+    private void OnAnalyzerAfterAutoHandleState(Entity<ArtifactAnalyzerComponent> ent,
+        ref AfterAutoHandleStateEvent args)
     {
         if (!TryGetAnalysisConsole(ent, out var analysisConsole))
             return;
@@ -34,7 +33,9 @@ public sealed class ArtifactAnalyzerSystem : SharedArtifactAnalyzerSystem
 
     private void UpdateBuiIfCanGetAnalysisConsoleUi(Entity<AnalysisConsoleComponent> analysisConsole)
     {
-        if (_ui.TryGetOpenUi<AnalysisConsoleBoundUserInterface>(analysisConsole.Owner, ArtifactAnalyzerUiKey.Key, out var bui))
+        if (_ui.TryGetOpenUi<AnalysisConsoleBoundUserInterface>(analysisConsole.Owner,
+                ArtifactAnalyzerUiKey.Key,
+                out var bui))
             bui.Update(analysisConsole);
     }
 }

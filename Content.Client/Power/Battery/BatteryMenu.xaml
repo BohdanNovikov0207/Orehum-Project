@@ -1,7 +1,6 @@
 ﻿<controls:FancyWindow xmlns="https://spacestation14.io"
                       xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls"
                       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                      xmlns:gfx="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client"
                       SetSize="650 330"
                       Resizable="False">
     <BoxContainer Orientation="Vertical">
@@ -34,7 +33,8 @@
 
                     <BoxContainer Orientation="Vertical" VerticalAlignment="Center" HorizontalExpand="True"
                                   HorizontalAlignment="Right">
-                        <Label HorizontalAlignment="Right" Text="{Loc 'battery-menu-passthrough'}" StyleClasses="StatusFieldTitle" />
+                        <Label HorizontalAlignment="Right" Text="{Loc 'battery-menu-passthrough'}"
+                               StyleClasses="StatusFieldTitle" />
                         <Label HorizontalAlignment="Right" Name="PassthroughValue" />
                     </BoxContainer>
                 </BoxContainer>
@@ -62,7 +62,8 @@
             <!-- Separator connecting panes with some wires -->
             <BoxContainer Orientation="Vertical" SetWidth="22" Margin="2 16">
                 <PanelContainer Name="InSecondPowerLine" SetHeight="2" />
-                <PanelContainer Name="PassthroughPowerLine" SetWidth="2" HorizontalAlignment="Center" VerticalExpand="True" />
+                <PanelContainer Name="PassthroughPowerLine" SetWidth="2" HorizontalAlignment="Center"
+                                VerticalExpand="True" />
                 <PanelContainer Name="OutSecondPowerLine" SetHeight="2" />
             </BoxContainer>
 
@@ -75,12 +76,14 @@
                         <BoxContainer Orientation="Vertical" VerticalExpand="True" VerticalAlignment="Center">
                             <Slider Name="ChargeRateSlider" />
                             <BoxContainer Orientation="Horizontal">
-                                <Label Text="{Loc 'battery-menu-max'}" StyleClasses="StatusFieldTitle" HorizontalExpand="True" />
+                                <Label Text="{Loc 'battery-menu-max'}" StyleClasses="StatusFieldTitle"
+                                       HorizontalExpand="True" />
                                 <Label Name="ChargeMaxValue" />
                             </BoxContainer>
                         </BoxContainer>
                         <BoxContainer Orientation="Horizontal">
-                            <Label Text="{Loc 'battery-menu-current'}" StyleClasses="StatusFieldTitle" HorizontalExpand="True" />
+                            <Label Text="{Loc 'battery-menu-current'}" StyleClasses="StatusFieldTitle"
+                                   HorizontalExpand="True" />
                             <Label Name="ChargeCurrentValue" />
                         </BoxContainer>
                     </BoxContainer>
@@ -92,12 +95,14 @@
                         <BoxContainer Orientation="Vertical" VerticalExpand="True" VerticalAlignment="Center">
                             <Slider Name="DischargeRateSlider" />
                             <BoxContainer Orientation="Horizontal">
-                                <Label Text="{Loc 'battery-menu-max'}" StyleClasses="StatusFieldTitle" HorizontalExpand="True" />
+                                <Label Text="{Loc 'battery-menu-max'}" StyleClasses="StatusFieldTitle"
+                                       HorizontalExpand="True" />
                                 <Label Name="DischargeMaxValue" />
                             </BoxContainer>
                         </BoxContainer>
                         <BoxContainer Orientation="Horizontal">
-                            <Label Text="{Loc 'battery-menu-current'}" StyleClasses="StatusFieldTitle" HorizontalExpand="True" />
+                            <Label Text="{Loc 'battery-menu-current'}" StyleClasses="StatusFieldTitle"
+                                   HorizontalExpand="True" />
                             <Label Name="DischargeCurrentValue" />
                         </BoxContainer>
                     </BoxContainer>
@@ -107,7 +112,8 @@
             <!-- Separator connecting panes with some wires -->
             <BoxContainer Orientation="Vertical" SetWidth="22" Margin="2 16">
                 <PanelContainer Name="ChargePowerLine" SetHeight="2" VerticalAlignment="Top" VerticalExpand="True" />
-                <PanelContainer Name="DischargePowerLine" SetHeight="2" VerticalAlignment="Bottom" VerticalExpand="True" />
+                <PanelContainer Name="DischargePowerLine" SetHeight="2" VerticalAlignment="Bottom"
+                                VerticalExpand="True" />
             </BoxContainer>
 
             <!-- Right pane: storage -->
@@ -124,9 +130,7 @@
                     </GridContainer>
 
                     <!-- Charge meter -->
-                    <GridContainer Name="ChargeMeter" Columns="3" VerticalExpand="True" Margin="0 24 0 0">
-
-                    </GridContainer>
+                    <GridContainer Name="ChargeMeter" Columns="3" VerticalExpand="True" Margin="0 24 0 0" />
                 </BoxContainer>
             </PanelContainer>
         </BoxContainer>

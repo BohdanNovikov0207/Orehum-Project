@@ -4,7 +4,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using System.Numerics;
 using Robust.Client.Graphics;
 using Robust.Shared.Enums;
 
@@ -15,25 +14,26 @@ namespace Content.Client.Light;
 /// </summary>
 public sealed class BeforeLightTargetOverlay : Overlay
 {
-    public override OverlaySpace Space => OverlaySpace.BeforeLighting;
+    public const int ContentZIndex = -10;
 
     [Dependency] private readonly IClyde _clyde = default!;
-
-    public IRenderTexture EnlargedLightTarget = default!;
-    public Box2Rotated EnlargedBounds;
 
     /// <summary>
     /// In metres
     /// </summary>
-    private float _skirting = 2f;
+    private readonly float _skirting = 2f;
 
-    public const int ContentZIndex = -10;
+    public Box2Rotated EnlargedBounds;
+
+    public IRenderTexture EnlargedLightTarget = default!;
 
     public BeforeLightTargetOverlay()
     {
         IoCManager.InjectDependencies(this);
         ZIndex = ContentZIndex;
     }
+
+    public override OverlaySpace Space => OverlaySpace.BeforeLighting;
 
     protected override void Draw(in OverlayDrawArgs args)
     {
@@ -46,12 +46,15 @@ public sealed class BeforeLightTargetOverlay : Overlay
         if (EnlargedLightTarget?.Size != size)
         {
             EnlargedLightTarget = _clyde
-                .CreateRenderTarget(size, new RenderTargetFormatParameters(RenderTargetColorFormat.Rgba8Srgb), name: "enlarged-light-copy");
+                .CreateRenderTarget(size,
+                    new RenderTargetFormatParameters(RenderTargetColorFormat.Rgba8Srgb),
+                    name: "enlarged-light-copy");
         }
 
         args.WorldHandle.RenderInRenderTarget(EnlargedLightTarget,
             () =>
             {
-            }, _clyde.GetClearColor(args.MapUid));
+            },
+            _clyde.GetClearColor(args.MapUid));
     }
 }

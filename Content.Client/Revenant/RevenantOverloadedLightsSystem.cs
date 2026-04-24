@@ -64,6 +64,5 @@ public sealed class RevenantOverloadedLightsSystem : SharedRevenantOverloadedLig
 
     protected override void OnZap(Entity<RevenantOverloadedLightsComponent> component)
     {
-
     }
 }

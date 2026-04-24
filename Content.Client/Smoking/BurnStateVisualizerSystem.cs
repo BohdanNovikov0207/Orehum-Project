@@ -3,14 +3,16 @@
 //
 // SPDX-License-Identifier: MIT
 
-using Robust.Client.GameObjects;
 using Content.Shared.Smoking;
+using Robust.Client.GameObjects;
 
 namespace Content.Client.Smoking;
 
 public sealed class BurnStateVisualizerSystem : VisualizerSystem<BurnStateVisualsComponent>
 {
-    protected override void OnAppearanceChange(EntityUid uid, BurnStateVisualsComponent component, ref AppearanceChangeEvent args)
+    protected override void OnAppearanceChange(EntityUid uid,
+        BurnStateVisualsComponent component,
+        ref AppearanceChangeEvent args)
     {
         if (args.Sprite == null)
             return;
@@ -21,7 +23,7 @@ public sealed class BurnStateVisualizerSystem : VisualizerSystem<BurnStateVisual
         {
             SmokableState.Lit => component.LitIcon,
             SmokableState.Burnt => component.BurntIcon,
-            _ => component.UnlitIcon
+            _ => component.UnlitIcon,
         };
 
         SpriteSystem.LayerSetRsiState((uid, args.Sprite), 0, state);

@@ -9,32 +9,26 @@
 using System.Numerics;
 using Content.Shared.Light.Components;
 using Content.Shared.Light.EntitySystems;
-using Content.Shared.Maps;
 using Robust.Client.Graphics;
 using Robust.Shared.Enums;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
-using Robust.Shared.Map.Enumerators;
-using Robust.Shared.Physics;
 
 namespace Content.Client.Light;
 
 public sealed class RoofOverlay : Overlay
 {
+    public const int ContentZIndex = BeforeLightTargetOverlay.ContentZIndex + 1;
     private readonly IEntityManager _entManager;
-    [Dependency] private readonly IMapManager _mapManager = default!;
-    [Dependency] private readonly IOverlayManager _overlay = default!;
 
     private readonly EntityLookupSystem _lookup;
+    [Dependency] private readonly IMapManager _mapManager = default!;
     private readonly SharedMapSystem _mapSystem;
+    [Dependency] private readonly IOverlayManager _overlay = default!;
     private readonly SharedRoofSystem _roof = default!;
     private readonly SharedTransformSystem _xformSystem;
 
     private List<Entity<MapGridComponent>> _grids = new();
-
-    public override OverlaySpace Space => OverlaySpace.BeforeLighting;
-
-    public const int ContentZIndex = BeforeLightTargetOverlay.ContentZIndex + 1;
 
     public RoofOverlay(IEntityManager entManager)
     {
@@ -48,6 +42,8 @@ public sealed class RoofOverlay : Overlay
 
         ZIndex = ContentZIndex;
     }
+
+    public override OverlaySpace Space => OverlaySpace.BeforeLighting;
 
     protected override void Draw(in OverlayDrawArgs args)
     {
@@ -63,7 +59,7 @@ public sealed class RoofOverlay : Overlay
         var target = lightoverlay.EnlargedLightTarget;
 
         _grids.Clear();
-        _mapManager.FindGridsIntersecting(args.MapId, bounds, ref _grids, approx: true, includeMap: true);
+        _mapManager.FindGridsIntersecting(args.MapId, bounds, ref _grids, true, true);
         var lightScale = viewport.LightRenderTarget.Size / (Vector2) viewport.Size;
         var scale = viewport.RenderScale / (Vector2.One / lightScale);
 
@@ -97,7 +93,8 @@ public sealed class RoofOverlay : Overlay
                     _grids.RemoveAt(i);
                     i--;
                 }
-            }, null);
+            },
+            null);
 
         worldHandle.RenderInRenderTarget(target,
             () =>
@@ -123,15 +120,14 @@ public sealed class RoofOverlay : Overlay
                         var color = _roof.GetColor(roofEnt, tileRef.GridIndices);
 
                         if (color == null)
-                        {
                             continue;
-                        }
 
                         var local = _lookup.GetLocalBounds(tileRef, grid.Comp.TileSize);
                         worldHandle.DrawRect(local, color.Value);
                     }
                 }
-            }, null);
+            },
+            null);
 
         worldHandle.SetTransform(Matrix3x2.Identity);
     }

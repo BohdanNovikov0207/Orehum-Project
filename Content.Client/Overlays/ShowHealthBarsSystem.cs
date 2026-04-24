@@ -9,11 +9,12 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Hands; // Goobstation
+using Content.Shared.Hands;
 using Content.Shared.Inventory.Events;
 using Content.Shared.Overlays;
 using Robust.Client.Graphics;
 using Robust.Shared.Prototypes;
+// Goobstation
 
 namespace Content.Client.Overlays;
 
@@ -35,13 +36,11 @@ public sealed class ShowHealthBarsSystem : EquipmentHudSystem<ShowHealthBarsComp
 
         SubscribeLocalEvent<ShowHealthBarsComponent, AfterAutoHandleStateEvent>(OnHandleState);
 
-        _overlay = new(EntityManager, _prototype);
+        _overlay = new EntityHealthBarOverlay(EntityManager, _prototype);
     }
 
-    private void OnHandleState(Entity<ShowHealthBarsComponent> ent, ref AfterAutoHandleStateEvent args)
-    {
+    private void OnHandleState(Entity<ShowHealthBarsComponent> ent, ref AfterAutoHandleStateEvent args) =>
         RefreshOverlay();
-    }
 
     protected override void UpdateInternal(RefreshEquipmentHudEvent<ShowHealthBarsComponent> component)
     {
@@ -58,9 +57,7 @@ public sealed class ShowHealthBarsSystem : EquipmentHudSystem<ShowHealthBarsComp
         }
 
         if (!_overlayMan.HasOverlay<EntityHealthBarOverlay>())
-        {
             _overlayMan.AddOverlay(_overlay);
-        }
     }
 
     protected override void DeactivateInternal()

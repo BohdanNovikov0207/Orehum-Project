@@ -22,9 +22,9 @@ public sealed partial class GasThermomachineWindow : FancyWindow
 
     public bool Active = true;
 
-    public FloatSpinBox TemperatureSpinbox;
-
     public EntityUid Entity;
+
+    public FloatSpinBox TemperatureSpinbox;
 
     public GasThermomachineWindow()
     {
@@ -33,34 +33,25 @@ public sealed partial class GasThermomachineWindow : FancyWindow
 
         SpinboxHBox.AddChild(
             TemperatureSpinbox = new FloatSpinBox(.1f, 2) { MinWidth = 150, HorizontalExpand = true }
-            );
+        );
     }
 
     public void SetActive(bool active)
     {
         Active = active;
         if (active)
-        {
             ToggleStatusButton.Text = Loc.GetString("comp-gas-thermomachine-ui-status-enabled");
-        }
         else
-        {
             ToggleStatusButton.Text = Loc.GetString("comp-gas-thermomachine-ui-status-disabled");
-        }
     }
 
-    public void SetTemperature(float temperature)
-    {
-        TemperatureSpinbox.Value = temperature;
-    }
+    public void SetTemperature(float temperature) => TemperatureSpinbox.Value = temperature;
 
     protected override void FrameUpdate(FrameEventArgs args)
     {
         base.FrameUpdate(args);
 
         if (_entManager.TryGetComponent(Entity, out ApcPowerReceiverComponent? receiver))
-        {
             SetActive(!receiver.PowerDisabled);
-        }
     }
 }

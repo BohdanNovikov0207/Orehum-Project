@@ -38,10 +38,7 @@ public sealed partial class AnomalyGeneratorWindow : FancyWindow
         GenerateButton.OnPressed += _ => OnGenerateButtonPressed?.Invoke();
     }
 
-    public void SetEntity(EntityUid uid)
-    {
-        EntityView.SetEntity(uid);
-    }
+    public void SetEntity(EntityUid uid) => EntityView.SetEntity(uid);
 
     public void UpdateState(AnomalyGeneratorUserInterfaceState state)
     {
@@ -62,9 +59,7 @@ public sealed partial class AnomalyGeneratorWindow : FancyWindow
     public void UpdateTimer()
     {
         if (_timing.CurTime > _cooldownEnd)
-        {
             CooldownLabel.SetMarkup(Loc.GetString("anomaly-generator-no-cooldown"));
-        }
         else
         {
             var timeLeft = _cooldownEnd - _timing.CurTime;

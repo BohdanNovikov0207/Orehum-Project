@@ -16,11 +16,9 @@ namespace Content.Client.Pinpointer.UI;
 [GenerateTypedNameReferences]
 public sealed partial class StationMapBeaconControl : Control, IComparable<StationMapBeaconControl>
 {
+    private readonly StyleBoxFlat _styleBox;
     public readonly EntityCoordinates BeaconPosition;
     public Action<EntityCoordinates>? OnPressed;
-    public string? Label => BeaconNameLabel.Text;
-    private StyleBoxFlat _styleBox;
-    public Color Color => _styleBox.BackgroundColor;
 
     public StationMapBeaconControl(EntityUid mapUid, SharedNavMapSystem.NavMapBeacon beacon)
     {
@@ -36,6 +34,9 @@ public sealed partial class StationMapBeaconControl : Control, IComparable<Stati
         MainButton.OnPressed += args => OnPressed?.Invoke(BeaconPosition);
     }
 
+    public string? Label => BeaconNameLabel.Text;
+    public Color Color => _styleBox.BackgroundColor;
+
     public int CompareTo(StationMapBeaconControl? other)
     {
         if (other == null)
@@ -44,9 +45,7 @@ public sealed partial class StationMapBeaconControl : Control, IComparable<Stati
         // Group by color
         var colorCompare = Color.ToArgb().CompareTo(other.Color.ToArgb());
         if (colorCompare != 0)
-        {
             return colorCompare;
-        }
 
         // If same color, sort by text
         return string.Compare(Label, other.Label);

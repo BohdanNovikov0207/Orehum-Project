@@ -21,9 +21,9 @@ namespace Content.Client.Implants.UI;
 
 public sealed class ImplanterStatusControl : Control
 {
-    [Dependency] private readonly IPrototypeManager _prototype = default!;
-    private readonly ImplanterComponent _parent;
     private readonly RichTextLabel _label;
+    private readonly ImplanterComponent _parent;
+    [Dependency] private readonly IPrototypeManager _prototype = default!;
 
     public ImplanterStatusControl(ImplanterComponent parent)
     {
@@ -53,18 +53,20 @@ public sealed class ImplanterStatusControl : Control
         {
             ImplanterToggleMode.Draw => Loc.GetString("implanter-draw-text"),
             ImplanterToggleMode.Inject => Loc.GetString("implanter-inject-text"),
-            _ => Loc.GetString("injector-invalid-injector-toggle-mode")
+            _ => Loc.GetString("injector-invalid-injector-toggle-mode"),
         };
 
         if (_parent.CurrentMode == ImplanterToggleMode.Draw)
         {
-            string implantName = _parent.DeimplantChosen != null
-                ? (_prototype.TryIndex(_parent.DeimplantChosen.Value, out EntityPrototype? implantProto) ? implantProto.Name : Loc.GetString("implanter-empty-text"))
+            var implantName = _parent.DeimplantChosen != null
+                ? _prototype.TryIndex(_parent.DeimplantChosen.Value, out var implantProto)
+                    ? implantProto.Name
+                    : Loc.GetString("implanter-empty-text")
                 : Loc.GetString("implanter-empty-text");
 
             _label.SetMarkup(Loc.GetString("implanter-label-draw",
-                    ("implantName", implantName),
-                    ("modeString", modeStringLocalized)));
+                ("implantName", implantName),
+                ("modeString", modeStringLocalized)));
         }
         else
         {
@@ -73,8 +75,8 @@ public sealed class ImplanterStatusControl : Control
                 : Loc.GetString("implanter-empty-text");
 
             _label.SetMarkup(Loc.GetString("implanter-label-inject",
-                    ("implantName", implantName),
-                    ("modeString", modeStringLocalized)));
+                ("implantName", implantName),
+                ("modeString", modeStringLocalized)));
         }
     }
 }

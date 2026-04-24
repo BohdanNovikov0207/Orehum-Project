@@ -86,11 +86,9 @@ namespace Content.Client.Administration.UI.PlayerPanel;
 [UsedImplicitly]
 public sealed class PlayerPanelEui : BaseEui
 {
-    [Dependency] private readonly IClientConsoleHost _console = default!;
     [Dependency] private readonly IClientAdminManager _admin = default!;
     [Dependency] private readonly IClipboardManager _clipboard = default!;
-
-    private PlayerPanel PlayerPanel { get; }
+    [Dependency] private readonly IClientConsoleHost _console = default!;
 
     public PlayerPanelEui()
     {
@@ -119,15 +117,11 @@ public sealed class PlayerPanelEui : BaseEui
         PlayerPanel.OnClose += () => SendMessage(new CloseEuiMessage());
     }
 
-    public override void Opened()
-    {
-        PlayerPanel.OpenCentered();
-    }
+    private PlayerPanel PlayerPanel { get; }
 
-    public override void Closed()
-    {
-        PlayerPanel.Close();
-    }
+    public override void Opened() => PlayerPanel.OpenCentered();
+
+    public override void Closed() => PlayerPanel.Close();
 
     public override void HandleState(EuiStateBase state)
     {

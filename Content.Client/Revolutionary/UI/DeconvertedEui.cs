@@ -17,10 +17,7 @@ public sealed class DeconvertedEui : BaseEui
         _menu = new DeconvertedMenu();
     }
 
-    public override void Opened()
-    {
-        _menu.OpenCentered();
-    }
+    public override void Opened() => _menu.OpenCentered();
 
     public override void Closed()
     {

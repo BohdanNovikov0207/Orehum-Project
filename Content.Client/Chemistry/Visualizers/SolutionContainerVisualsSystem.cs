@@ -19,26 +19,28 @@
 using Content.Client.Items.Systems;
 using Content.Shared.Chemistry;
 using Content.Shared.Chemistry.Components;
-using Content.Shared.Chemistry.EntitySystems; // Goobstation
+using Content.Shared.Chemistry.EntitySystems;
 using Content.Shared.Chemistry.Reagent;
 using Content.Shared.Clothing;
 using Content.Shared.Clothing.Components;
-using Content.Shared.Containers.ItemSlots; // Goobstation
+using Content.Shared.Containers.ItemSlots;
 using Content.Shared.Hands;
 using Content.Shared.Item;
 using Content.Shared.Rounding;
 using Robust.Client.GameObjects;
 using Robust.Shared.Prototypes;
+// Goobstation
+// Goobstation
 
 namespace Content.Client.Chemistry.Visualizers;
 
 public sealed class SolutionContainerVisualsSystem : VisualizerSystem<SolutionContainerVisualsComponent>
 {
-    [Dependency] private readonly IPrototypeManager _prototype = default!;
-    [Dependency] private readonly ItemSystem _itemSystem = default!;
-    [Dependency] private readonly SpriteSystem _sprite = default!;
     [Dependency] private readonly AppearanceSystem _appearance = default!; // Goobstation
+    [Dependency] private readonly ItemSystem _itemSystem = default!;
+    [Dependency] private readonly IPrototypeManager _prototype = default!;
     [Dependency] private readonly SharedSolutionContainerSystem _solutionContainers = default!; // Goobstation
+    [Dependency] private readonly SpriteSystem _sprite = default!;
 
     public override void Initialize()
     {
@@ -54,16 +56,18 @@ public sealed class SolutionContainerVisualsSystem : VisualizerSystem<SolutionCo
         component.InitialDescription = meta.EntityDescription;
     }
 
-    protected override void OnAppearanceChange(EntityUid uid, SolutionContainerVisualsComponent component, ref AppearanceChangeEvent args)
+    protected override void OnAppearanceChange(EntityUid uid,
+        SolutionContainerVisualsComponent component,
+        ref AppearanceChangeEvent args)
     {
         // Check if the solution that was updated is the one set as represented
         if (!string.IsNullOrEmpty(component.SolutionName))
         {
-            if (AppearanceSystem.TryGetData<string>(uid, SolutionContainerVisuals.SolutionName, out var name,
-                args.Component) && name != component.SolutionName)
-            {
+            if (AppearanceSystem.TryGetData<string>(uid,
+                    SolutionContainerVisuals.SolutionName,
+                    out var name,
+                    args.Component) && name != component.SolutionName)
                 return;
-            }
         }
 
         // Goobstation start
@@ -76,7 +80,7 @@ public sealed class SolutionContainerVisualsSystem : VisualizerSystem<SolutionCo
             if (solutionComponent != null)
                 fraction = solutionComponent.Solution.FillFraction;
         }
-        else if (!AppearanceSystem.TryGetData<float>(uid, SolutionContainerVisuals.FillFraction, out fraction, args.Component))
+        else if (!AppearanceSystem.TryGetData(uid, SolutionContainerVisuals.FillFraction, out fraction, args.Component))
             return;
 
         // GoobStation end
@@ -97,16 +101,22 @@ public sealed class SolutionContainerVisualsSystem : VisualizerSystem<SolutionCo
         // a giant error sign and error for debug.
         if (fraction > 1f)
         {
-            Log.Error("Attempted to set solution container visuals volume ratio on " + ToPrettyString(uid) + " to a value greater than 1. Volume should never be greater than max volume!");
+            Log.Error("Attempted to set solution container visuals volume ratio on " + ToPrettyString(uid) +
+                      " to a value greater than 1. Volume should never be greater than max volume!");
             fraction = 1f;
         }
+
         if (component.Metamorphic)
         {
             if (_sprite.LayerMapTryGet((uid, args.Sprite), component.BaseLayer, out var baseLayer, false))
             {
-                var hasOverlay = _sprite.LayerMapTryGet((uid, args.Sprite), component.OverlayLayer, out var overlayLayer, false);
+                var hasOverlay = _sprite.LayerMapTryGet((uid, args.Sprite),
+                    component.OverlayLayer,
+                    out var overlayLayer,
+                    false);
 
-                if (AppearanceSystem.TryGetData<string>(uid, SolutionContainerVisuals.BaseOverride,
+                if (AppearanceSystem.TryGetData<string>(uid,
+                        SolutionContainerVisuals.BaseOverride,
                         out var baseOverride,
                         args.Component))
                 {
@@ -141,9 +151,7 @@ public sealed class SolutionContainerVisualsSystem : VisualizerSystem<SolutionCo
             }
         }
         else
-        {
             _sprite.LayerSetVisible((uid, args.Sprite), fillLayer, true);
-        }
 
         var closestFillSprite = ContentHelpers.RoundToLevels(fraction, 1, maxFillLevels + 1);
 
@@ -159,7 +167,11 @@ public sealed class SolutionContainerVisualsSystem : VisualizerSystem<SolutionCo
 
             if (component.InsertedItemSlotID != null && solutionComponent != null) // Goobstation start
                 _sprite.LayerSetColor((uid, args.Sprite), fillLayer, solutionComponent.Solution.GetColor(_prototype));
-            else if (changeColor && AppearanceSystem.TryGetData<Color>(uid, SolutionContainerVisuals.Color, out var color, args.Component))
+            else if (changeColor &&
+                     AppearanceSystem.TryGetData<Color>(uid,
+                         SolutionContainerVisuals.Color,
+                         out var color,
+                         args.Component))
                 _sprite.LayerSetColor((uid, args.Sprite), fillLayer, color); // Goobstation end
             else
                 _sprite.LayerSetColor((uid, args.Sprite), fillLayer, Color.White);
@@ -190,15 +202,18 @@ public sealed class SolutionContainerVisualsSystem : VisualizerSystem<SolutionCo
     }
 
     // Goobstation start
-    private bool GetSolutionFromEntity(EntityUid containerUid, string insertedItemSlotID, out SolutionComponent? solutionComponent)
+    private bool GetSolutionFromEntity(EntityUid containerUid,
+        string insertedItemSlotID,
+        out SolutionComponent? solutionComponent)
     {
         solutionComponent = null;
         var itemSlotsComponent = CompOrNull<ItemSlotsComponent>(containerUid);
 
-        if (itemSlotsComponent == null) return false;
+        if (itemSlotsComponent == null)
+            return false;
 
         var slot = itemSlotsComponent.Slots[insertedItemSlotID];
-        var insertedUid = slot.Item;  //Uid of item (beaker for example) inserted into machine 
+        var insertedUid = slot.Item; //Uid of item (beaker for example) inserted into machine 
 
         if (insertedUid == null ||
             !_solutionContainers.TryGetFitsInDispenser(insertedUid.Value, out var solution, out _) ||
@@ -211,7 +226,9 @@ public sealed class SolutionContainerVisualsSystem : VisualizerSystem<SolutionCo
 
     // Goobstation end
 
-    private void OnGetHeldVisuals(EntityUid uid, SolutionContainerVisualsComponent component, GetInhandVisualsEvent args)
+    private void OnGetHeldVisuals(EntityUid uid,
+        SolutionContainerVisualsComponent component,
+        GetInhandVisualsEvent args)
     {
         if (component.InHandsFillBaseName == null)
             return;
@@ -222,7 +239,10 @@ public sealed class SolutionContainerVisualsSystem : VisualizerSystem<SolutionCo
         if (!TryComp<ItemComponent>(uid, out var item))
             return;
 
-        if (!AppearanceSystem.TryGetData<float>(uid, SolutionContainerVisuals.FillFraction, out var fraction, appearance))
+        if (!AppearanceSystem.TryGetData<float>(uid,
+                SolutionContainerVisuals.FillFraction,
+                out var fraction,
+                appearance))
             return;
 
         var closestFillSprite = ContentHelpers.RoundToLevels(fraction, 1, component.InHandsMaxFillLevels + 1);
@@ -232,11 +252,13 @@ public sealed class SolutionContainerVisualsSystem : VisualizerSystem<SolutionCo
             var layer = new PrototypeLayerData();
 
             var heldPrefix = item.HeldPrefix == null ? "inhand-" : $"{item.HeldPrefix}-inhand-";
-            var key = heldPrefix + args.Location.ToString().ToLowerInvariant() + component.InHandsFillBaseName + closestFillSprite;
+            var key = heldPrefix + args.Location.ToString().ToLowerInvariant() + component.InHandsFillBaseName +
+                      closestFillSprite;
 
             layer.State = key;
 
-            if (component.ChangeColor && AppearanceSystem.TryGetData<Color>(uid, SolutionContainerVisuals.Color, out var color, appearance))
+            if (component.ChangeColor &&
+                AppearanceSystem.TryGetData<Color>(uid, SolutionContainerVisuals.Color, out var color, appearance))
                 layer.Color = color;
 
             args.Layers.Add((key, layer));
@@ -254,7 +276,10 @@ public sealed class SolutionContainerVisualsSystem : VisualizerSystem<SolutionCo
         if (!TryComp<ClothingComponent>(ent, out var clothing))
             return;
 
-        if (!AppearanceSystem.TryGetData<float>(ent, SolutionContainerVisuals.FillFraction, out var fraction, appearance))
+        if (!AppearanceSystem.TryGetData<float>(ent,
+                SolutionContainerVisuals.FillFraction,
+                out var fraction,
+                appearance))
             return;
 
         var closestFillSprite = ContentHelpers.RoundToLevels(fraction, 1, ent.Comp.EquippedMaxFillLevels + 1);
@@ -263,17 +288,21 @@ public sealed class SolutionContainerVisualsSystem : VisualizerSystem<SolutionCo
         {
             var layer = new PrototypeLayerData();
 
-            var equippedPrefix = clothing.EquippedPrefix == null ? $"equipped-{args.Slot}" : $" {clothing.EquippedPrefix}-equipped-{args.Slot}";
+            var equippedPrefix = clothing.EquippedPrefix == null
+                ? $"equipped-{args.Slot}"
+                : $" {clothing.EquippedPrefix}-equipped-{args.Slot}";
             var key = equippedPrefix + ent.Comp.EquippedFillBaseName + closestFillSprite;
 
             // Make sure the sprite state is valid so we don't show a big red error message
             // This saves us from having to make fill level sprites for every possible slot the item could be in (including pockets).
-            if (!TryComp<SpriteComponent>(ent, out var sprite) || sprite.BaseRSI == null || !sprite.BaseRSI.TryGetState(key, out _))
+            if (!TryComp<SpriteComponent>(ent, out var sprite) || sprite.BaseRSI == null ||
+                !sprite.BaseRSI.TryGetState(key, out _))
                 return;
 
             layer.State = key;
 
-            if (ent.Comp.ChangeColor && AppearanceSystem.TryGetData<Color>(ent, SolutionContainerVisuals.Color, out var color, appearance))
+            if (ent.Comp.ChangeColor &&
+                AppearanceSystem.TryGetData<Color>(ent, SolutionContainerVisuals.Color, out var color, appearance))
                 layer.Color = color;
 
             args.Layers.Add((key, layer));

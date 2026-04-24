@@ -20,9 +20,6 @@ namespace Content.Client.Administration.UI.Notes;
 [GenerateTypedNameReferences]
 public sealed partial class AdminNotesLinePopup : Popup
 {
-    public event Action<int, NoteType>? OnEditPressed;
-    public event Action<int, NoteType>? OnDeletePressed;
-
     [Dependency] private readonly IGameTiming _gameTiming = default!;
 
     public AdminNotesLinePopup(SharedAdminNote note, string playerName, bool showDelete, bool showEdit)
@@ -40,23 +37,27 @@ public sealed partial class AdminNotesLinePopup : Popup
         PlayerNameLabel.Text = Loc.GetString("admin-notes-for", ("player", playerName));
         IdLabel.Text = Loc.GetString("admin-notes-id", ("id", note.Id));
         TypeLabel.Text = Loc.GetString("admin-notes-type", ("type", note.NoteType));
-        SeverityLabel.Text = Loc.GetString("admin-notes-severity", ("severity", note.NoteSeverity ?? NoteSeverity.None));
+        SeverityLabel.Text =
+            Loc.GetString("admin-notes-severity", ("severity", note.NoteSeverity ?? NoteSeverity.None));
         RoundIdLabel.Text = note.Round == null
             ? Loc.GetString("admin-notes-round-id-unknown")
             : Loc.GetString("admin-notes-round-id", ("id", note.Round));
         CreatedByLabel.Text = Loc.GetString("admin-notes-created-by", ("author", note.CreatedByName));
-        CreatedAtLabel.Text = Loc.GetString("admin-notes-created-at", ("date", note.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")));
+        CreatedAtLabel.Text = Loc.GetString("admin-notes-created-at",
+            ("date", note.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")));
         EditedByLabel.Text = Loc.GetString("admin-notes-last-edited-by", ("author", note.EditedByName));
-        EditedAtLabel.Text = Loc.GetString("admin-notes-last-edited-at", ("date", note.LastEditedAt?.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss") ?? Loc.GetString("admin-notes-edited-never")));
+        EditedAtLabel.Text = Loc.GetString("admin-notes-last-edited-at",
+            ("date",
+                note.LastEditedAt?.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss") ??
+                Loc.GetString("admin-notes-edited-never")));
         ExpiryTimeLabel.Text = note.ExpiryTime == null
             ? Loc.GetString("admin-notes-expires-never")
-            : Loc.GetString("admin-notes-expires", ("expires", note.ExpiryTime.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")));
+            : Loc.GetString("admin-notes-expires",
+                ("expires", note.ExpiryTime.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")));
         NoteTextEdit.InsertAtCursor(note.Message);
 
         if (note.NoteType is NoteType.ServerBan or NoteType.RoleBan)
-        {
             DeleteButton.Text = Loc.GetString("admin-notes-hide");
-        }
 
         EditButton.OnPressed += EditPressed;
         DeleteButton.OnPressed += DeletePressed;
@@ -65,6 +66,8 @@ public sealed partial class AdminNotesLinePopup : Popup
     public int NoteId { get; }
     public NoteType NoteType { get; }
     private TimeSpan? DeleteResetOn { get; set; }
+    public event Action<int, NoteType>? OnEditPressed;
+    public event Action<int, NoteType>? OnDeletePressed;
 
     private void EditPressed(ButtonEventArgs args)
     {
@@ -109,9 +112,7 @@ public sealed partial class AdminNotesLinePopup : Popup
         base.Dispose(disposing);
 
         if (!disposing)
-        {
             return;
-        }
 
         EditButton.OnPressed -= EditPressed;
         DeleteButton.OnPressed -= DeletePressed;

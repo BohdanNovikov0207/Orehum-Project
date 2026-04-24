@@ -36,46 +36,44 @@ namespace Content.Client.Shuttles.UI;
 [GenerateTypedNameReferences]
 public sealed partial class MapScreen : BoxContainer
 {
-    [Dependency] private readonly IEntityManager _entManager = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly IMapManager _mapManager = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
     private readonly SharedAudioSystem _audio;
-    private readonly SharedMapSystem _maps;
-    private readonly ShuttleSystem _shuttles;
-    private readonly SharedTransformSystem _xformSystem;
+    [Dependency] private readonly IEntityManager _entManager = default!;
 
-    private EntityUid? _console;
-    private EntityUid? _shuttleEntity;
-
-    private FTLState _state;
-    private StartEndTime _ftlTime;
-
-    private List<ShuttleBeaconObject> _beacons = new();
-    private List<ShuttleExclusionObject> _exclusions = new();
-
-    private TimeSpan _nextPing;
-    private TimeSpan _pingCooldown = TimeSpan.FromSeconds(3);
-    private TimeSpan _nextMapDequeue;
-
-    private float _minMapDequeue = 0.05f;
-    private float _maxMapDequeue = 0.25f;
-
-    private StyleBoxFlat _ftlStyle;
-
-    public event Action<MapCoordinates, Angle>? RequestFTL;
-    public event Action<NetEntity, Angle>? RequestBeaconFTL;
+    private readonly StyleBoxFlat _ftlStyle;
 
     private readonly Dictionary<MapId, BoxContainer> _mapHeadings = new();
-    private readonly Dictionary<MapId, List<IMapObject>> _mapObjects = new();
-    private readonly List<(MapId mapId, IMapObject mapobj)> _pendingMapObjects = new();
+    [Dependency] private readonly IMapManager _mapManager = default!;
 
     /// <summary>
     /// Store the names of map object controls for re-sorting later.
     /// </summary>
-    private Dictionary<Control, string> _mapObjectControls = new();
+    private readonly Dictionary<Control, string> _mapObjectControls = new();
 
-    private List<Control> _sortChildren = new();
+    private readonly Dictionary<MapId, List<IMapObject>> _mapObjects = new();
+    private readonly SharedMapSystem _maps;
+    private readonly float _maxMapDequeue = 0.25f;
+
+    private readonly float _minMapDequeue = 0.05f;
+    private readonly List<(MapId mapId, IMapObject mapobj)> _pendingMapObjects = new();
+    private readonly TimeSpan _pingCooldown = TimeSpan.FromSeconds(3);
+    [Dependency] private readonly IRobustRandom _random = default!;
+    private readonly ShuttleSystem _shuttles;
+
+    private readonly List<Control> _sortChildren = new();
+    [Dependency] private readonly IGameTiming _timing = default!;
+    private readonly SharedTransformSystem _xformSystem;
+
+    private List<ShuttleBeaconObject> _beacons = new();
+
+    private EntityUid? _console;
+    private List<ShuttleExclusionObject> _exclusions = new();
+    private StartEndTime _ftlTime;
+    private TimeSpan _nextMapDequeue;
+
+    private TimeSpan _nextPing;
+    private EntityUid? _shuttleEntity;
+
+    private FTLState _state;
 
     public MapScreen()
     {
@@ -113,6 +111,9 @@ public sealed partial class MapScreen : BoxContainer
         };
     }
 
+    public event Action<MapCoordinates, Angle>? RequestFTL;
+    public event Action<NetEntity, Angle>? RequestBeaconFTL;
+
     public void UpdateState(ShuttleMapInterfaceState state)
     {
         // Only network the accumulator due to ping making the thing fonky.
@@ -149,7 +150,7 @@ public sealed partial class MapScreen : BoxContainer
                 if (_entManager.TryGetComponent(_shuttleEntity, out TransformComponent? shuttleXform))
                 {
                     var targetOffset = _maps.GetGridPosition(_shuttleEntity.Value);
-                    MapRadar.SetMap(shuttleXform.MapID, targetOffset, recentering: true);
+                    MapRadar.SetMap(shuttleXform.MapID, targetOffset, true);
                 }
 
                 _ftlStyle.BackgroundColor = Color.FromHex("#B02E26");
@@ -173,9 +174,7 @@ public sealed partial class MapScreen : BoxContainer
     private void SetFTLAllowed(bool value)
     {
         if (value)
-        {
             MapFTLButton.Disabled = false;
-        }
         else
         {
             // Unselect FTL
@@ -185,15 +184,9 @@ public sealed partial class MapScreen : BoxContainer
         }
     }
 
-    private void FtlPreviewToggled(BaseButton.ButtonToggledEventArgs obj)
-    {
-        MapRadar.FtlMode = obj.Pressed;
-    }
+    private void FtlPreviewToggled(BaseButton.ButtonToggledEventArgs obj) => MapRadar.FtlMode = obj.Pressed;
 
-    public void SetConsole(EntityUid? console)
-    {
-        _console = console;
-    }
+    public void SetConsole(EntityUid? console) => _console = console;
 
     public void SetShuttle(EntityUid? shuttle)
     {
@@ -220,9 +213,10 @@ public sealed partial class MapScreen : BoxContainer
     public void PingMap()
     {
         if (_console != null)
-        {
-            _audio.PlayEntity(new SoundPathSpecifier("/Audio/Effects/Shuttle/radar_ping.ogg"), Filter.Local(), _console.Value, true);
-        }
+            _audio.PlayEntity(new SoundPathSpecifier("/Audio/Effects/Shuttle/radar_ping.ogg"),
+                Filter.Local(),
+                _console.Value,
+                true);
 
         RebuildMapObjects();
         BumpMapDequeue();
@@ -231,15 +225,10 @@ public sealed partial class MapScreen : BoxContainer
         MapRebuildButton.Disabled = true;
     }
 
-    private void BumpMapDequeue()
-    {
-        _nextMapDequeue = _timing.CurTime + TimeSpan.FromSeconds(_random.NextFloat(_minMapDequeue, _maxMapDequeue));
-    }
+    private void BumpMapDequeue() => _nextMapDequeue =
+        _timing.CurTime + TimeSpan.FromSeconds(_random.NextFloat(_minMapDequeue, _maxMapDequeue));
 
-    private void MapRebuildPressed(BaseButton.ButtonEventArgs obj)
-    {
-        PingMap();
-    }
+    private void MapRebuildPressed(BaseButton.ButtonEventArgs obj) => PingMap();
 
     /// <summary>
     /// Clears all sector objects across all maps (e.g. if we start FTLing or need to re-ping).
@@ -264,25 +253,19 @@ public sealed partial class MapScreen : BoxContainer
             return;
 
         var mapComps = _entManager.AllEntityQueryEnumerator<MapComponent, TransformComponent, MetaDataComponent>();
-        MapId ourMap = MapId.Nullspace;
+        var ourMap = MapId.Nullspace;
 
         if (_entManager.TryGetComponent(_shuttleEntity, out TransformComponent? shuttleXform))
-        {
             ourMap = shuttleXform.MapID;
-        }
 
         while (mapComps.MoveNext(out var mapUid, out var mapComp, out var mapXform, out var mapMetadata))
         {
             if (_console != null && !_shuttles.CanFTLTo(_shuttleEntity.Value, mapComp.MapId, _console.Value))
-            {
                 continue;
-            }
             var mapName = mapMetadata.EntityName;
 
             if (string.IsNullOrEmpty(mapName))
-            {
                 mapName = Loc.GetString("shuttle-console-unknown");
-            }
 
             var heading = new CollapsibleHeading(mapName);
 
@@ -293,21 +276,21 @@ public sealed partial class MapScreen : BoxContainer
             heading.Label.HorizontalExpand = true;
             heading.HorizontalExpand = true;
 
-            var gridContents = new BoxContainer()
+            var gridContents = new BoxContainer
             {
                 Orientation = LayoutOrientation.Vertical,
                 VerticalExpand = true,
             };
 
-            var body = new CollapsibleBody()
+            var body = new CollapsibleBody
             {
                 HorizontalAlignment = HAlignment.Stretch,
                 VerticalAlignment = VAlignment.Top,
                 HorizontalExpand = true,
                 Children =
                 {
-                    gridContents
-                }
+                    gridContents,
+                },
             };
 
             var mapButton = new Collapsible(heading, body);
@@ -315,9 +298,7 @@ public sealed partial class MapScreen : BoxContainer
             heading.OnToggled += args =>
             {
                 if (args.Pressed)
-                {
                     HideOtherCollapsibles(mapButton);
-                }
             };
 
             _mapHeadings.Add(mapComp.MapId, gridContents);
@@ -325,7 +306,7 @@ public sealed partial class MapScreen : BoxContainer
             {
                 _entManager.TryGetComponent(grid.Owner, out IFFComponent? iffComp);
 
-                var gridObj = new GridMapObject()
+                var gridObj = new GridMapObject
                 {
                     Name = _entManager.GetComponent<MetaDataComponent>(grid.Owner).EntityName,
                     Entity = grid.Owner,
@@ -334,16 +315,12 @@ public sealed partial class MapScreen : BoxContainer
 
                 // Always show our shuttle immediately
                 if (grid.Owner == _shuttleEntity)
-                {
                     AddMapObject(mapComp.MapId, gridObj);
-                }
                 // If we can show it then add it to pending.
                 else if (!_shuttles.IsBeaconMap(mapUid) && (iffComp == null ||
-                         (iffComp.Flags & IFFFlags.Hide) == 0x0) &&
+                                                            (iffComp.Flags & IFFFlags.Hide) == 0x0) &&
                          !gridObj.HideButton)
-                {
                     _pendingMapObjects.Add((mapComp.MapId, gridObj));
-                }
             }
 
             foreach (var (beacon, _) in _shuttles.GetExclusions(mapComp.MapId, _exclusions))
@@ -366,9 +343,7 @@ public sealed partial class MapScreen : BoxContainer
 
             // Zoom in to our map
             if (mapComp.MapId == MapRadar.ViewingMap)
-            {
                 mapButton.BodyVisible = true;
-            }
         }
 
         // Need to sort from furthest way to nearest (as we will pop from the end of the list first).
@@ -426,7 +401,7 @@ public sealed partial class MapScreen : BoxContainer
         var coordinates = _shuttles.GetMapCoordinates(mapObject);
 
         // If it's our map then scroll, otherwise just set position there.
-        MapRadar.SetMap(coordinates.MapId, coordinates.Position, recentering: true);
+        MapRadar.SetMap(coordinates.MapId, coordinates.Position, true);
     }
 
     public void SetMap(MapId mapId, Vector2 position)
@@ -445,22 +420,22 @@ public sealed partial class MapScreen : BoxContainer
 
         var gridContents = _mapHeadings[mapId];
 
-        var gridButton = new Button()
+        var gridButton = new Button
         {
             Text = mapObj.Name,
             HorizontalExpand = true,
         };
 
-        var gridContainer = new BoxContainer()
+        var gridContainer = new BoxContainer
         {
             Children =
             {
-                new Control()
+                new Control
                 {
                     MinWidth = 32f,
                 },
-                gridButton
-            }
+                gridButton,
+            },
         };
 
         _mapObjectControls.Add(gridContainer, mapObj.Name);
@@ -517,9 +492,7 @@ public sealed partial class MapScreen : BoxContainer
         }
 
         if (!IsFTLBlocked() && _nextPing < curTime)
-        {
             MapRebuildButton.Disabled = false;
-        }
 
         var progress = _ftlTime.ProgressAt(curTime);
         FTLBar.Value = float.IsFinite(progress) ? progress : 1;
@@ -534,8 +507,6 @@ public sealed partial class MapScreen : BoxContainer
     public void Startup()
     {
         if (_entManager.TryGetComponent(_shuttleEntity, out TransformComponent? shuttleXform))
-        {
             SetMap(shuttleXform.MapID, _maps.GetGridPosition((_shuttleEntity.Value, null, shuttleXform)));
-        }
     }
 }

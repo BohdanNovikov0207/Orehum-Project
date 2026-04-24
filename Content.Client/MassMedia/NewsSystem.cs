@@ -9,5 +9,4 @@ namespace Content.Client.MassMedia;
 
 public sealed class NewsSystem : SharedNewsSystem
 {
-
 }

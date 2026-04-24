@@ -14,15 +14,15 @@ SPDX-License-Identifier: MIT
         <Label Name="NumberLabel"
                Align="Right"
                SetWidth="26"
-               ClipText="True"/>
+               ClipText="True" />
         <Label Name="TimeLabel"
                Align="Center"
                SetWidth="100"
-               ClipText="True"/>
+               ClipText="True" />
         <Label Name="AccessorLabel"
                Align="Left"
                SetWidth="390"
-               ClipText="True"/>
+               ClipText="True" />
     </BoxContainer>
-    <customControls:HSeparator Margin="0 5 0 5"/>
+    <customControls:HSeparator Margin="0 5 0 5" />
 </BoxContainer>

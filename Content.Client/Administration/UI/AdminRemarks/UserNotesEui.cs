@@ -26,15 +26,10 @@ public sealed class UserNotesEui : BaseEui
     public override void HandleState(EuiStateBase state)
     {
         if (state is not UserNotesEuiState s)
-        {
             return;
-        }
 
         NoteWindow.SetNotes(s.Notes);
     }
 
-    public override void Opened()
-    {
-        NoteWindow.OpenCentered();
-    }
+    public override void Opened() => NoteWindow.OpenCentered();
 }

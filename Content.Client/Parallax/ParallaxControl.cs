@@ -9,41 +9,24 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Numerics;
-using Content.Client.Parallax.Data;
 using Content.Client.Parallax.Managers;
 using Robust.Client.Graphics;
 using Robust.Client.UserInterface;
-using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Timing;
 
 namespace Content.Client.Parallax;
 
 /// <summary>
-///     Renders the parallax background as a UI control.
+/// Renders the parallax background as a UI control.
 /// </summary>
 public sealed class ParallaxControl : Control
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly IParallaxManager _parallaxManager = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     private string _parallaxPrototype = "FastSpace";
-
-    [ViewVariables(VVAccess.ReadWrite)] public Vector2 Offset { get; set; }
-    [ViewVariables(VVAccess.ReadWrite)] public float SpeedX { get; set; } = 0.0f;
-    [ViewVariables(VVAccess.ReadWrite)] public float SpeedY { get; set; } = 0.0f;
-    [ViewVariables(VVAccess.ReadWrite)] public float ScaleX { get; set; } = 1.0f;
-    [ViewVariables(VVAccess.ReadWrite)] public float ScaleY { get; set; } = 1.0f;
-    [ViewVariables(VVAccess.ReadWrite)] public string ParallaxPrototype
-    {
-        get => _parallaxPrototype;
-        set
-        {
-            _parallaxPrototype = value;
-            _parallaxManager.LoadParallaxByName(value);
-        }
-    }
 
     public ParallaxControl()
     {
@@ -55,6 +38,22 @@ public sealed class ParallaxControl : Control
         _parallaxManager.LoadParallaxByName(_parallaxPrototype);
     }
 
+    [ViewVariables(VVAccess.ReadWrite)] public Vector2 Offset { get; set; }
+    [ViewVariables(VVAccess.ReadWrite)] public float SpeedX { get; set; } = 0.0f;
+    [ViewVariables(VVAccess.ReadWrite)] public float SpeedY { get; set; } = 0.0f;
+    [ViewVariables(VVAccess.ReadWrite)] public float ScaleX { get; set; } = 1.0f;
+    [ViewVariables(VVAccess.ReadWrite)] public float ScaleY { get; set; } = 1.0f;
+
+    [ViewVariables(VVAccess.ReadWrite)] public string ParallaxPrototype
+    {
+        get => _parallaxPrototype;
+        set
+        {
+            _parallaxPrototype = value;
+            _parallaxManager.LoadParallaxByName(value);
+        }
+    }
+
     protected override void Draw(DrawingHandleScreen handle)
     {
         var currentTime = (float) _timing.RealTime.TotalSeconds;
@@ -64,8 +63,8 @@ public sealed class ParallaxControl : Control
         {
             var tex = layer.Texture;
             var texSize = new Vector2i(
-                (int)(tex.Size.X * Size.X * layer.Config.Scale.X / 1920 * ScaleX),
-                (int)(tex.Size.Y * Size.X * layer.Config.Scale.Y / 1920 * ScaleY)
+                (int) (tex.Size.X * Size.X * layer.Config.Scale.X / 1920 * ScaleX),
+                (int) (tex.Size.Y * Size.X * layer.Config.Scale.Y / 1920 * ScaleY)
             );
             var ourSize = PixelSize;
 
@@ -95,7 +94,7 @@ public sealed class ParallaxControl : Control
             }
             else
             {
-                var origin = ((ourSize - texSize) / 2) + layer.Config.ControlHomePosition;
+                var origin = (ourSize - texSize) / 2 + layer.Config.ControlHomePosition;
                 handle.DrawTextureRect(tex, UIBox2.FromDimensions(origin, texSize));
             }
         }

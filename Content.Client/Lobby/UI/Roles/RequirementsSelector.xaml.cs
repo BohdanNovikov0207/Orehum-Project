@@ -24,14 +24,9 @@ namespace Content.Client.Lobby.UI.Roles;
 [GenerateTypedNameReferences]
 public sealed partial class RequirementsSelector : BoxContainer
 {
-    private readonly RadioOptions<int> _options;
     private readonly StripeBack _lockStripe;
+    private readonly RadioOptions<int> _options;
     private List<ProtoId<GuideEntryPrototype>>? _guides;
-
-    public event Action<int>? OnSelected;
-    public event Action<List<ProtoId<GuideEntryPrototype>>>? OnOpenGuidebook;
-
-    public int Selected => _options.SelectedId;
 
     public RequirementsSelector()
     {
@@ -52,15 +47,15 @@ public sealed partial class RequirementsSelector : BoxContainer
             OnSelected?.Invoke(args.Id);
         };
 
-        var requirementsLabel = new Label()
+        var requirementsLabel = new Label
         {
             Text = Loc.GetString("role-timer-locked"),
             Visible = true,
             HorizontalAlignment = HAlignment.Center,
-            StyleClasses = {StyleBase.StyleClassLabelSubText},
+            StyleClasses = { StyleBase.StyleClassLabelSubText },
         };
 
-        _lockStripe = new StripeBack()
+        _lockStripe = new StripeBack
         {
             Visible = false,
             HorizontalExpand = true,
@@ -68,8 +63,8 @@ public sealed partial class RequirementsSelector : BoxContainer
             MouseFilter = MouseFilterMode.Stop,
             Children =
             {
-                requirementsLabel
-            }
+                requirementsLabel,
+            },
         };
 
         Help.OnPressed += _ =>
@@ -78,6 +73,11 @@ public sealed partial class RequirementsSelector : BoxContainer
                 OnOpenGuidebook?.Invoke(_guides);
         };
     }
+
+    public int Selected => _options.SelectedId;
+
+    public event Action<int>? OnSelected;
+    public event Action<List<ProtoId<GuideEntryPrototype>>>? OnOpenGuidebook;
 
     /// <summary>
     /// Actually adds the controls.
@@ -127,18 +127,13 @@ public sealed partial class RequirementsSelector : BoxContainer
         _options.Visible = true;
     }
 
-    private Button GenerateButton(string text, int value)
-    {
-        return new Button
+    private Button GenerateButton(string text, int value) =>
+        new()
         {
             Text = text,
             MinWidth = 90,
             HorizontalExpand = true,
         };
-    }
 
-    public void Select(int id)
-    {
-        _options.Select(id);
-    }
+    public void Select(int id) => _options.Select(id);
 }

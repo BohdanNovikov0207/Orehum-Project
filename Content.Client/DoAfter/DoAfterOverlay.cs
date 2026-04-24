@@ -22,47 +22,47 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Numerics;
-using Content.Shared.DoAfter;
 using Content.Client.UserInterface.Systems;
+using Content.Shared.DoAfter;
 using Robust.Client.GameObjects;
 using Robust.Client.Graphics;
-using Robust.Shared.Enums;
 using Robust.Client.Player;
+using Robust.Shared.Containers;
+using Robust.Shared.Enums;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
 using Robust.Shared.Utility;
-using Robust.Shared.Containers;
 
 namespace Content.Client.DoAfter;
 
 public sealed class DoAfterOverlay : Overlay
 {
-    private static readonly ProtoId<ShaderPrototype> UnshadedShader = "unshaded";
-
-    private readonly IEntityManager _entManager;
-    private readonly IGameTiming _timing;
-    private readonly IPlayerManager _player;
-    private readonly SharedTransformSystem _transform;
-    private readonly MetaDataSystem _meta;
-    private readonly ProgressColorSystem _progressColor;
-    private readonly SharedContainerSystem _container;
-    private readonly SpriteSystem _sprite;
-
-    private readonly Texture _barTexture;
-    private readonly ShaderInstance _unshadedShader;
-
     /// <summary>
-    ///     Flash time for cancelled DoAfters
+    /// Flash time for cancelled DoAfters
     /// </summary>
     private const float FlashTime = 0.125f;
 
     // Hardcoded width of the progress bar because it doesn't match the texture.
     private const float StartX = 2;
     private const float EndX = 22f;
+    private static readonly ProtoId<ShaderPrototype> UnshadedShader = "unshaded";
 
-    public override OverlaySpace Space => OverlaySpace.WorldSpaceBelowFOV;
+    private readonly Texture _barTexture;
+    private readonly SharedContainerSystem _container;
 
-    public DoAfterOverlay(IEntityManager entManager, IPrototypeManager protoManager, IGameTiming timing, IPlayerManager player)
+    private readonly IEntityManager _entManager;
+    private readonly MetaDataSystem _meta;
+    private readonly IPlayerManager _player;
+    private readonly ProgressColorSystem _progressColor;
+    private readonly SpriteSystem _sprite;
+    private readonly IGameTiming _timing;
+    private readonly SharedTransformSystem _transform;
+    private readonly ShaderInstance _unshadedShader;
+
+    public DoAfterOverlay(IEntityManager entManager,
+        IPrototypeManager protoManager,
+        IGameTiming timing,
+        IPlayerManager player)
     {
         _entManager = entManager;
         _timing = timing;
@@ -72,11 +72,13 @@ public sealed class DoAfterOverlay : Overlay
         _container = _entManager.EntitySysManager.GetEntitySystem<SharedContainerSystem>();
         _progressColor = _entManager.System<ProgressColorSystem>();
         _sprite = _entManager.System<SpriteSystem>();
-        var sprite = new SpriteSpecifier.Rsi(new("/Textures/Interface/Misc/progress_bar.rsi"), "icon");
+        var sprite = new SpriteSpecifier.Rsi(new ResPath("/Textures/Interface/Misc/progress_bar.rsi"), "icon");
         _barTexture = _entManager.EntitySysManager.GetEntitySystem<SpriteSystem>().Frame0(sprite);
 
         _unshadedShader = protoManager.Index(UnshadedShader).Instance();
     }
+
+    public override OverlaySpace Space => OverlaySpace.WorldSpaceBelowFOV;
 
     protected override void Draw(in OverlayDrawArgs args)
     {
@@ -95,7 +97,8 @@ public sealed class DoAfterOverlay : Overlay
         var localEnt = _player.LocalSession?.AttachedEntity;
 
         var metaQuery = _entManager.GetEntityQuery<MetaDataComponent>();
-        var enumerator = _entManager.AllEntityQueryEnumerator<ActiveDoAfterComponent, DoAfterComponent, SpriteComponent, TransformComponent>();
+        var enumerator = _entManager
+            .AllEntityQueryEnumerator<ActiveDoAfterComponent, DoAfterComponent, SpriteComponent, TransformComponent>();
         while (enumerator.MoveNext(out var uid, out _, out var comp, out var sprite, out var xform))
         {
             if (xform.MapID != args.MapId)
@@ -164,7 +167,7 @@ public sealed class DoAfterOverlay : Overlay
                 if (doAfter.CancelledTime != null)
                 {
                     var elapsed = doAfter.CancelledTime.Value - doAfter.StartTime;
-                    elapsedRatio = (float)Math.Min(1, elapsed.TotalSeconds / doAfter.Args.Delay.TotalSeconds);
+                    elapsedRatio = (float) Math.Min(1, elapsed.TotalSeconds / doAfter.Args.Delay.TotalSeconds);
                     var cancelElapsed = (time - doAfter.CancelledTime.Value).TotalSeconds;
                     var flash = Math.Floor(cancelElapsed / FlashTime) % 2 == 0;
                     color = GetProgressColor(0, flash ? alpha : 0);
@@ -172,12 +175,13 @@ public sealed class DoAfterOverlay : Overlay
                 else
                 {
                     var elapsed = time - doAfter.StartTime;
-                    elapsedRatio = (float)Math.Min(1, elapsed.TotalSeconds / doAfter.Args.Delay.TotalSeconds);
+                    elapsedRatio = (float) Math.Min(1, elapsed.TotalSeconds / doAfter.Args.Delay.TotalSeconds);
                     color = GetProgressColor(elapsedRatio, alpha);
                 }
 
                 var xProgress = (EndX - StartX) * elapsedRatio + StartX;
-                var box = new Box2(new Vector2(StartX, 3f) / EyeManager.PixelsPerMeter, new Vector2(xProgress, 4f) / EyeManager.PixelsPerMeter);
+                var box = new Box2(new Vector2(StartX, 3f) / EyeManager.PixelsPerMeter,
+                    new Vector2(xProgress, 4f) / EyeManager.PixelsPerMeter);
                 box = box.Translated(position);
                 handle.DrawRect(box, doAfter.Args.ColorOverride ?? color); // Goob edit
                 offset += _barTexture.Height / scale;
@@ -188,8 +192,6 @@ public sealed class DoAfterOverlay : Overlay
         handle.SetTransform(Matrix3x2.Identity);
     }
 
-    public Color GetProgressColor(float progress, float alpha = 1f)
-    {
-        return _progressColor.GetProgressColor(progress).WithAlpha(alpha);
-    }
+    public Color GetProgressColor(float progress, float alpha = 1f) =>
+        _progressColor.GetProgressColor(progress).WithAlpha(alpha);
 }

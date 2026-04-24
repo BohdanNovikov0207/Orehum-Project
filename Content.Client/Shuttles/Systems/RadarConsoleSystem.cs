@@ -9,5 +9,4 @@ namespace Content.Client.Shuttles.Systems;
 
 public sealed class RadarConsoleSystem : SharedRadarConsoleSystem
 {
-
 }

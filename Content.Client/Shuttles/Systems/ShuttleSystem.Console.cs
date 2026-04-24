@@ -27,9 +27,7 @@ public sealed partial class ShuttleSystem
     public Texture GetTexture(Entity<ShuttleMapParallaxComponent?> entity)
     {
         if (!Resolve(entity, ref entity.Comp, false))
-        {
             return _resource.GetTexture(ShuttleMapParallaxComponent.FallbackTexture);
-        }
 
         return _resource.GetTexture(entity.Comp.TexturePath);
     }
@@ -49,9 +47,7 @@ public sealed partial class ShuttleSystem
                 var gridXform = Transform(grid.Entity);
 
                 if (HasComp<MapComponent>(grid.Entity))
-                {
                     return new MapCoordinates(gridXform.LocalPosition, gridXform.MapID);
-                }
 
                 Entity<PhysicsComponent?, TransformComponent?> gridEnt = (grid.Entity, null, gridXform);
                 return new MapCoordinates(Maps.GetGridPosition(gridEnt), gridXform.MapID);

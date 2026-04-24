@@ -46,26 +46,16 @@ public sealed class HumanoidMarkingModifierBoundUserInterface : BoundUserInterfa
         base.UpdateState(state);
 
         if (_window == null || state is not HumanoidMarkingModifierState cast)
-        {
             return;
-        }
 
         _window.SetState(cast.MarkingSet, cast.Species, cast.Sex, cast.SkinColor, cast.CustomBaseLayers);
     }
 
-    private void SendMarkingSet(MarkingSet set)
-    {
-        SendMessage(new HumanoidMarkingModifierMarkingSetMessage(set, true));
-    }
+    private void SendMarkingSet(MarkingSet set) => SendMessage(new HumanoidMarkingModifierMarkingSetMessage(set, true));
 
-    private void SendMarkingSetNoResend(MarkingSet set)
-    {
+    private void SendMarkingSetNoResend(MarkingSet set) =>
         SendMessage(new HumanoidMarkingModifierMarkingSetMessage(set, false));
-    }
 
-    private void SendBaseLayer(HumanoidVisualLayers layer, CustomBaseLayerInfo? info)
-    {
+    private void SendBaseLayer(HumanoidVisualLayers layer, CustomBaseLayerInfo? info) =>
         SendMessage(new HumanoidMarkingModifierBaseLayersSetMessage(layer, info, true));
-    }
 }
-

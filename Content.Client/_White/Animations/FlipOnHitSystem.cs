@@ -70,10 +70,10 @@ public sealed class FlipOnHitSystem : SharedFlipOnHitSystem
                     {
                         new AnimationTrackProperty.KeyFrame(Angle.FromDegrees(degrees + 180), 0.2f),
                         new AnimationTrackProperty.KeyFrame(Angle.FromDegrees(degrees + 360), 0.2f),
-                        new AnimationTrackProperty.KeyFrame(Angle.FromDegrees(degrees), 0f)
-                    }
-                }
-            }
+                        new AnimationTrackProperty.KeyFrame(Angle.FromDegrees(degrees), 0f),
+                    },
+                },
+            },
         };
 
         _animationSystem.Play(user, animation, FlippingComponent.AnimationKey);

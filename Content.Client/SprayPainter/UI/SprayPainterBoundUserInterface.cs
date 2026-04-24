@@ -42,7 +42,9 @@ public sealed class SprayPainterBoundUserInterface(EntityUid owner, Enum uiKey) 
         }
 
         var sprayPainter = EntMan.System<SprayPainterSystem>();
-        _window.PopulateCategories(sprayPainter.PaintableStylesByGroup, sprayPainter.PaintableGroupsByCategory, sprayPainter.Decals);
+        _window.PopulateCategories(sprayPainter.PaintableStylesByGroup,
+            sprayPainter.PaintableGroupsByCategory,
+            sprayPainter.Decals);
         Update();
 
         if (EntMan.TryGetComponent(Owner, out SprayPainterComponent? sprayPainterComp))
@@ -67,35 +69,20 @@ public sealed class SprayPainterBoundUserInterface(EntityUid owner, Enum uiKey) 
         _window.SetDecalSnap(sprayPainter.SnapDecals);
     }
 
-    private void OnDecalSnapChanged(bool snap)
-    {
-        SendPredictedMessage(new SprayPainterSetDecalSnapMessage(snap));
-    }
+    private void OnDecalSnapChanged(bool snap) => SendPredictedMessage(new SprayPainterSetDecalSnapMessage(snap));
 
-    private void OnDecalAngleChanged(int angle)
-    {
-        SendPredictedMessage(new SprayPainterSetDecalAngleMessage(angle));
-    }
+    private void OnDecalAngleChanged(int angle) => SendPredictedMessage(new SprayPainterSetDecalAngleMessage(angle));
 
-    private void OnDecalColorChanged(Color? color)
-    {
-        SendPredictedMessage(new SprayPainterSetDecalColorMessage(color));
-    }
+    private void OnDecalColorChanged(Color? color) => SendPredictedMessage(new SprayPainterSetDecalColorMessage(color));
 
-    private void OnDecalChanged(ProtoId<DecalPrototype> protoId)
-    {
+    private void OnDecalChanged(ProtoId<DecalPrototype> protoId) =>
         SendPredictedMessage(new SprayPainterSetDecalMessage(protoId));
-    }
 
-    private void OnTabChanged(int index, bool isSelectedTabWithDecals)
-    {
+    private void OnTabChanged(int index, bool isSelectedTabWithDecals) =>
         SendPredictedMessage(new SprayPainterTabChangedMessage(index, isSelectedTabWithDecals));
-    }
 
-    private void OnSpritePicked(string group, string style)
-    {
+    private void OnSpritePicked(string group, string style) =>
         SendPredictedMessage(new SprayPainterSetPaintableStyleMessage(group, style));
-    }
 
     private void OnSetPipeColor(ItemList.ItemListSelectedEventArgs args)
     {

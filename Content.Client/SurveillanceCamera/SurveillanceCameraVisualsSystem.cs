@@ -20,7 +20,8 @@ public sealed class SurveillanceCameraVisualsSystem : EntitySystem
         SubscribeLocalEvent<SurveillanceCameraVisualsComponent, AppearanceChangeEvent>(OnAppearanceChange);
     }
 
-    private void OnAppearanceChange(EntityUid uid, SurveillanceCameraVisualsComponent component,
+    private void OnAppearanceChange(EntityUid uid,
+        SurveillanceCameraVisualsComponent component,
         ref AppearanceChangeEvent args)
     {
         if (!args.AppearanceData.TryGetValue(SurveillanceCameraVisualsKey.Key, out var data)
@@ -28,9 +29,7 @@ public sealed class SurveillanceCameraVisualsSystem : EntitySystem
             || args.Sprite == null
             || !_sprite.LayerMapTryGet((uid, args.Sprite), SurveillanceCameraVisualsKey.Layer, out var layer, false)
             || !component.CameraSprites.TryGetValue(key, out var state))
-        {
             return;
-        }
 
         _sprite.LayerSetRsiState((uid, args.Sprite), layer, state);
     }

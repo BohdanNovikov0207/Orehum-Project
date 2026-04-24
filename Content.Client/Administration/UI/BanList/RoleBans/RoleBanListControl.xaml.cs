@@ -14,12 +14,12 @@ namespace Content.Client.Administration.UI.BanList.RoleBans;
 [GenerateTypedNameReferences]
 public sealed partial class RoleBanListControl : Control
 {
-    public event Action<RoleBanListLine>? LineIdsClicked;
-
     public RoleBanListControl()
     {
         RobustXamlLoader.Load(this);
     }
+
+    public event Action<RoleBanListLine>? LineIdsClicked;
 
     public void SetRoleBans(List<SharedServerRoleBan> bans)
     {

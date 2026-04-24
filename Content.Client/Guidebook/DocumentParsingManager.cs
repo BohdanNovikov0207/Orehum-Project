@@ -92,7 +92,7 @@ using static Pidgin.Parser;
 namespace Content.Client.Guidebook;
 
 /// <summary>
-///     This manager should be used to convert documents (shitty rich-text / pseudo-xaml) into UI Controls
+/// This manager should be used to convert documents (shitty rich-text / pseudo-xaml) into UI Controls
 /// </summary>
 public sealed partial class DocumentParsingManager
 {
@@ -114,7 +114,8 @@ public sealed partial class DocumentParsingManager
             .Assert(_tagControlParsers.ContainsKey, tag => $"unknown tag: {tag}")
             .Bind(tag => _tagControlParsers[tag]);
 
-        var whitespaceAndCommentParser = SkipWhitespaces.Then(Try(String("<!--").Then(Parser<char>.Any.SkipUntil(Try(String("-->"))))).SkipMany());
+        var whitespaceAndCommentParser =
+            SkipWhitespaces.Then(Try(String("<!--").Then(Parser<char>.Any.SkipUntil(Try(String("-->"))))).SkipMany());
 
         _controlParser = OneOf(_tagParser, TryHeaderControl, ListControlParser, TextControlParser)
             .Before(whitespaceAndCommentParser);
@@ -165,9 +166,8 @@ public sealed partial class DocumentParsingManager
         return true;
     }
 
-    private Parser<char, Control> CreateTagControlParser(string tagId, Type tagType, ISandboxHelper sandbox)
-    {
-        return Map(
+    private Parser<char, Control> CreateTagControlParser(string tagId, Type tagType, ISandboxHelper sandbox) =>
+        Map(
                 (args, controls) =>
                 {
                     try
@@ -198,14 +198,11 @@ public sealed partial class DocumentParsingManager
                 ParseTagArgs(tagId),
                 TagContentParser(tagId))
             .Labelled($"{tagId} control");
-    }
 
     // Parse a bunch of controls until we encounter a matching closing tag.
-    private Parser<char, IEnumerable<Control>> TagContentParser(string tag)
-    {
-        return OneOf(
+    private Parser<char, IEnumerable<Control>> TagContentParser(string tag) =>
+        OneOf(
             Try(ImmediateTagEnd).ThenReturn(Enumerable.Empty<Control>()),
             TagEnd.Then(_controlParser.Until(TryTagTerminator(tag)).Labelled($"{tag} children"))
         );
-    }
 }

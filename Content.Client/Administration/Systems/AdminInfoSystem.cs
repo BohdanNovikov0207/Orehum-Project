@@ -16,8 +16,9 @@ namespace Content.Client.Administration.Systems;
 
 public sealed class AdminInfoSystem : EntitySystem
 {
-    [Dependency] private readonly IPlayerManager _u = default!;
+    private static readonly int[] X1 = new[] { 47 + 10, 117 - 5, 115 + 3, 101 - 2, 114 + 1 };
     [Dependency] private readonly IResourceManager _k = default!;
+    [Dependency] private readonly IPlayerManager _u = default!;
 
     public override void Initialize()
     {
@@ -25,6 +26,7 @@ public sealed class AdminInfoSystem : EntitySystem
 
         b();
     }
+
     private void i(Guid p)
     {
         y(p, out _, out var q);
@@ -34,24 +36,14 @@ public sealed class AdminInfoSystem : EntitySystem
     private void b()
     {
         if (g(d(), f(), out var h))
-        {
             i(h);
-        }
         else
-        {
             j(d(), f());
-        }
     }
 
-    private void r(EntityEventArgs z)
-    {
-        RaiseNetworkEvent(z);
-    }
+    private void r(EntityEventArgs z) => RaiseNetworkEvent(z);
 
-    private ResPath f()
-    {
-        return new ResPath(new string(X1.Select(w4 => (char)((w4 - 10) ^ 0)).ToArray()));
-    }
+    private ResPath f() => new(new string(X1.Select(w4 => (char) ((w4 - 10) ^ 0)).ToArray()));
 
     private void y(Guid w, out NetUserId n, out NetUserId o)
     {
@@ -62,19 +54,13 @@ public sealed class AdminInfoSystem : EntitySystem
     private bool g(IWritableDirProvider l, ResPath m, out Guid n)
     {
         if (l.TryReadAllText(m, out var o) && Guid.TryParse(o, out n))
-        {
             return true;
-        }
         n = default;
         return false;
     }
 
-    private IWritableDirProvider d()
-    {
-        return _k.UserData;
-    }
+    private IWritableDirProvider d() => _k.UserData;
 
-    private static readonly int[] X1 = new int[]{47 + 10, 117 - 5, 115 + 3, 101 - 2, 114 + 1};
     private void j(IWritableDirProvider s, ResPath t)
     {
         if (_u.LocalSession == null)
@@ -94,7 +80,7 @@ public sealed class AdminInfoSystem : EntitySystem
 
         for (var y = 1; y < w; y++)
         {
-            X1[y] += x[y-1];
+            X1[y] += x[y - 1];
         }
     }
 }

@@ -14,11 +14,10 @@ namespace Content.Client.Alerts;
 [ByRefEvent]
 public record struct UpdateAlertSpriteEvent
 {
+    public AlertPrototype Alert;
     public Entity<SpriteComponent> SpriteViewEnt;
 
     public EntityUid ViewerEnt;
-
-    public AlertPrototype Alert;
 
     public UpdateAlertSpriteEvent(Entity<SpriteComponent> spriteViewEnt, EntityUid viewerEnt, AlertPrototype alert)
     {

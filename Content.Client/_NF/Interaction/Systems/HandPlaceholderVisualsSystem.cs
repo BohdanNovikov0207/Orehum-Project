@@ -19,10 +19,11 @@ namespace Content.Client._NF.Interaction.Systems;
 /// Handles interactions with items that spawn HandPlaceholder items.
 /// </summary>
 [UsedImplicitly]
-public sealed partial class HandPlaceholderVisualsSystem : EntitySystem
+public sealed class HandPlaceholderVisualsSystem : EntitySystem
 {
-    [Dependency] ContainerSystem _container = default!;
-    [Dependency] ItemSystem _item = default!;
+    [Dependency] private readonly ContainerSystem _container = default!;
+    [Dependency] private readonly ItemSystem _item = default!;
+
     public override void Initialize()
     {
         base.Initialize();

@@ -5,7 +5,6 @@ namespace Content.Client._Orehum.Orders;
 
 public sealed class OrdersSystem : SharedOrdersSystem
 {
-
     [Dependency] private readonly IOverlayManager _overlays = default!;
 
     public override void Initialize()

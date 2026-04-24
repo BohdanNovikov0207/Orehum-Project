@@ -16,16 +16,15 @@ namespace Content.Client.Audio;
 
 public sealed class AudioUIController : UIController
 {
+    private const float ClickGain = 0.25f;
+    private const float HoverGain = 0.05f;
     [Dependency] private readonly IAudioManager _audioManager = default!;
-    [Dependency] private readonly IConfigurationManager _configManager = default!;
     [Dependency] private readonly IResourceCache _cache = default!;
-
-    private float _interfaceGain;
+    [Dependency] private readonly IConfigurationManager _configManager = default!;
     private IAudioSource? _clickSource;
     private IAudioSource? _hoverSource;
 
-    private const float ClickGain = 0.25f;
-    private const float HoverGain = 0.05f;
+    private float _interfaceGain;
 
     public override void Initialize()
     {
@@ -47,14 +46,10 @@ public sealed class AudioUIController : UIController
         _interfaceGain = obj;
 
         if (_clickSource != null)
-        {
             _clickSource.Gain = ClickGain * _interfaceGain;
-        }
 
         if (_hoverSource != null)
-        {
             _hoverSource.Gain = HoverGain * _interfaceGain;
-        }
     }
 
     private void SetClickSound(string value)
@@ -75,9 +70,7 @@ public sealed class AudioUIController : UIController
             UIManager.SetClickSound(source);
         }
         else
-        {
             UIManager.SetClickSound(null);
-        }
     }
 
     private void SetHoverSound(string value)
@@ -98,9 +91,7 @@ public sealed class AudioUIController : UIController
             UIManager.SetHoverSound(hoverSource);
         }
         else
-        {
             UIManager.SetHoverSound(null);
-        }
     }
 
     private AudioResource GetSoundOrFallback(string path, string fallback)

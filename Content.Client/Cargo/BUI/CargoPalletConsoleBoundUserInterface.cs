@@ -32,15 +32,9 @@ public sealed class CargoPalletConsoleBoundUserInterface : BoundUserInterface
         _menu.SellRequested += OnSell;
     }
 
-    private void OnAppraisal()
-    {
-        SendMessage(new CargoPalletAppraiseMessage());
-    }
+    private void OnAppraisal() => SendMessage(new CargoPalletAppraiseMessage());
 
-    private void OnSell()
-    {
-        SendMessage(new CargoPalletSellMessage());
-    }
+    private void OnSell() => SendMessage(new CargoPalletSellMessage());
 
     protected override void UpdateState(BoundUserInterfaceState state)
     {

@@ -5,10 +5,10 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Robust.Client.GameObjects;
-using Content.Shared.Fax.Components;
 using Content.Shared.Fax;
+using Content.Shared.Fax.Components;
 using Robust.Client.Animations;
+using Robust.Client.GameObjects;
 
 namespace Content.Client.Fax.System;
 
@@ -17,8 +17,8 @@ namespace Content.Client.Fax.System;
 /// </summary>
 public sealed class FaxVisualsSystem : EntitySystem
 {
-    [Dependency] private readonly AnimationPlayerSystem _player = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly AnimationPlayerSystem _player = default!;
 
     public override void Initialize()
     {
@@ -39,12 +39,12 @@ public sealed class FaxVisualsSystem : EntitySystem
             visuals == FaxMachineVisualState.Inserting)
         {
             _player.Play(uid,
-                new Animation()
+                new Animation
                 {
                     Length = TimeSpan.FromSeconds(2.4),
                     AnimationTracks =
                     {
-                        new AnimationTrackSpriteFlick()
+                        new AnimationTrackSpriteFlick
                         {
                             LayerKey = FaxMachineVisuals.VisualState,
                             KeyFrames =

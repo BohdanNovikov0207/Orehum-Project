@@ -3,11 +3,11 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Numerics;
 using Content.Shared.Holopad;
 using Content.Shared.Silicons.StationAi;
 using Robust.Client.UserInterface;
 using Robust.Shared.Player;
-using System.Numerics;
 
 namespace Content.Client.Holopad;
 
@@ -28,18 +28,20 @@ public sealed class HolopadBoundUserInterface : BoundUserInterface
         base.Open();
 
         _window = this.CreateWindow<HolopadWindow>();
-        _window.Title = Loc.GetString("holopad-window-title", ("title", EntMan.GetComponent<MetaDataComponent>(Owner).EntityName));
+        _window.Title = Loc.GetString("holopad-window-title",
+            ("title", EntMan.GetComponent<MetaDataComponent>(Owner).EntityName));
 
-        if (this.UiKey is not HolopadUiKey)
+        if (UiKey is not HolopadUiKey)
         {
             Close();
             return;
         }
 
-        var uiKey = (HolopadUiKey)this.UiKey;
+        var uiKey = (HolopadUiKey) UiKey;
 
         // AIs will see a different holopad interface to crew when interacting with them in the world
-        if (uiKey == HolopadUiKey.InteractionWindow && EntMan.HasComponent<StationAiHeldComponent>(_playerManager.LocalEntity))
+        if (uiKey == HolopadUiKey.InteractionWindow &&
+            EntMan.HasComponent<StationAiHeldComponent>(_playerManager.LocalEntity))
             uiKey = HolopadUiKey.InteractionWindowForAi;
 
         _window.SetState(Owner, uiKey);
@@ -66,39 +68,22 @@ public sealed class HolopadBoundUserInterface : BoundUserInterface
     {
         base.UpdateState(state);
 
-        var castState = (HolopadBoundInterfaceState)state;
+        var castState = (HolopadBoundInterfaceState) state;
         EntMan.TryGetComponent<TransformComponent>(Owner, out var xform);
 
         _window?.UpdateState(castState.Holopads);
     }
 
-    public void SendHolopadStartNewCallMessage(NetEntity receiver)
-    {
+    public void SendHolopadStartNewCallMessage(NetEntity receiver) =>
         SendMessage(new HolopadStartNewCallMessage(receiver));
-    }
 
-    public void SendHolopadAnswerCallMessage()
-    {
-        SendMessage(new HolopadAnswerCallMessage());
-    }
+    public void SendHolopadAnswerCallMessage() => SendMessage(new HolopadAnswerCallMessage());
 
-    public void SendHolopadEndCallMessage()
-    {
-        SendMessage(new HolopadEndCallMessage());
-    }
+    public void SendHolopadEndCallMessage() => SendMessage(new HolopadEndCallMessage());
 
-    public void SendHolopadStartBroadcastMessage()
-    {
-        SendMessage(new HolopadStartBroadcastMessage());
-    }
+    public void SendHolopadStartBroadcastMessage() => SendMessage(new HolopadStartBroadcastMessage());
 
-    public void SendHolopadActivateProjectorMessage()
-    {
-        SendMessage(new HolopadActivateProjectorMessage());
-    }
+    public void SendHolopadActivateProjectorMessage() => SendMessage(new HolopadActivateProjectorMessage());
 
-    public void SendHolopadRequestStationAiMessage()
-    {
-        SendMessage(new HolopadStationAiRequestMessage());
-    }
+    public void SendHolopadRequestStationAiMessage() => SendMessage(new HolopadStationAiRequestMessage());
 }

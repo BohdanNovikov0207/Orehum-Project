@@ -25,8 +25,8 @@ public sealed class VSeparator : PanelContainer
         {
             PanelOverride = new StyleBoxFlat
             {
-                BackgroundColor = color
-            }
+                BackgroundColor = color,
+            },
         });
     }
 

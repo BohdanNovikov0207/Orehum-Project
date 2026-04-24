@@ -19,12 +19,12 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     <BoxContainer Orientation="Vertical"
                   HorizontalExpand="True"
                   SizeFlagsStretchRatio="0.4">
-        <BoxContainer Orientation="Horizontal" SeparationOverride="5" Margin="0 4" >
+        <BoxContainer Orientation="Horizontal" SeparationOverride="5" Margin="0 4">
             <Button Name="GhostnadoButton"
-                    Text="{Loc 'ghost-target-window-warp-to-most-followed'}"/>
+                    Text="{Loc 'ghost-target-window-warp-to-most-followed'}" />
             <LineEdit Name="SearchBar"
                       PlaceHolder="{Loc 'entity-spawn-window-search-bar-placeholder'}"
-                      HorizontalExpand="True"/>
+                      HorizontalExpand="True" />
         </BoxContainer>
         <ScrollContainer Name="GhostScroll"
                          VerticalExpand="True"

@@ -17,11 +17,11 @@ namespace Content.Client.Anomaly;
 
 public sealed class AnomalySystem : SharedAnomalySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly FloatingVisualizerSystem _floating = default!;
     [Dependency] private readonly SpriteSystem _sprite = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
@@ -32,10 +32,9 @@ public sealed class AnomalySystem : SharedAnomalySystem
 
         SubscribeLocalEvent<AnomalySupercriticalComponent, ComponentShutdown>(OnShutdown);
     }
-    private void OnStartup(EntityUid uid, AnomalyComponent component, ComponentStartup args)
-    {
+
+    private void OnStartup(EntityUid uid, AnomalyComponent component, ComponentStartup args) =>
         _floating.FloatAnimation(uid, component.FloatingOffset, component.AnimationKey, component.AnimationTime);
-    }
 
     private void OnAnimationComplete(EntityUid uid, AnomalyComponent component, AnimationCompletedEvent args)
     {
@@ -78,11 +77,9 @@ public sealed class AnomalySystem : SharedAnomalySystem
             var scale = completion * (super.MaxScaleAmount - 1f) + 1f;
             _sprite.SetScale((uid, sprite), new Vector2(scale, scale));
 
-            var transparency = (byte)(65 * (1f - completion) + 190);
+            var transparency = (byte) (65 * (1f - completion) + 190);
             if (transparency < sprite.Color.AByte)
-            {
                 _sprite.SetColor((uid, sprite), sprite.Color.WithAlpha(transparency));
-            }
         }
     }
 

@@ -13,18 +13,19 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
 <controls:FancyWindow xmlns="https://spacestation14.io"
-                xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls"
-                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                xmlns:gfx="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client"
-                MinSize="620 670"
-                Title="{Loc 'chem-master-bound-user-interface-title'}">
+                      xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls"
+                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                      xmlns:gfx="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client"
+                      MinSize="620 670"
+                      Title="{Loc 'chem-master-bound-user-interface-title'}">
     <TabContainer Name="Tabs" Margin="5 5 7 5">
         <BoxContainer Orientation="Vertical" HorizontalExpand="True" Margin="5" SeparationOverride="10">
             <!-- Input container info -->
             <BoxContainer Orientation="Horizontal">
                 <Label Text="{Loc 'chem-master-window-container-label'}" />
                 <Control HorizontalExpand="True" />
-                <Button MinSize="80 0" Name="InputEjectButton" Access="Public" Text="{Loc 'chem-master-window-eject-button'}" />
+                <Button MinSize="80 0" Name="InputEjectButton" Access="Public"
+                        Text="{Loc 'chem-master-window-eject-button'}" />
             </BoxContainer>
 
             <PanelContainer VerticalExpand="True" MinSize="0 200">
@@ -47,9 +48,12 @@ SPDX-License-Identifier: AGPL-3.0-or-later
             <BoxContainer Orientation="Horizontal">
                 <Label Text="{Loc 'chem-master-window-buffer-text'}" />
                 <Control HorizontalExpand="True" />
-                <Button MinSize="80 0" Name="BufferTransferButton" Access="Public" Text="{Loc 'chem-master-window-transfer-button'}" ToggleMode="True" StyleClasses="OpenRight" />
-                <Button MinSize="80 0" Name="BufferSortButton" Access="Public" Text="{Loc 'chem-master-window-sort-type-none'}" StyleClasses="OpenBoth" />
-                <Button MinSize="80 0" Name="BufferDiscardButton" Access="Public" Text="{Loc 'chem-master-window-discard-button'}" ToggleMode="True" StyleClasses="OpenLeft" />
+                <Button MinSize="80 0" Name="BufferTransferButton" Access="Public"
+                        Text="{Loc 'chem-master-window-transfer-button'}" ToggleMode="True" StyleClasses="OpenRight" />
+                <Button MinSize="80 0" Name="BufferSortButton" Access="Public"
+                        Text="{Loc 'chem-master-window-sort-type-none'}" StyleClasses="OpenBoth" />
+                <Button MinSize="80 0" Name="BufferDiscardButton" Access="Public"
+                        Text="{Loc 'chem-master-window-discard-button'}" ToggleMode="True" StyleClasses="OpenLeft" />
             </BoxContainer>
 
             <!-- Buffer info -->
@@ -72,7 +76,8 @@ SPDX-License-Identifier: AGPL-3.0-or-later
             <BoxContainer Orientation="Horizontal">
                 <Label Text="{Loc 'chem-master-window-container-label'}" />
                 <Control HorizontalExpand="True" />
-                <Button MinSize="80 0" Name="OutputEjectButton" Access="Public" Text="{Loc 'chem-master-window-eject-button'}" />
+                <Button MinSize="80 0" Name="OutputEjectButton" Access="Public"
+                        Text="{Loc 'chem-master-window-eject-button'}" />
             </BoxContainer>
 
             <PanelContainer VerticalExpand="True" MinSize="0 200">
@@ -94,7 +99,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
             <!-- Packaging -->
             <BoxContainer Orientation="Horizontal">
                 <Label Text="{Loc 'chem-master-window-packaging-text'}" />
-                <Control HorizontalExpand="True"/>
+                <Control HorizontalExpand="True" />
                 <Label Text="{Loc 'chem-master-window-buffer-label'}" />
                 <Label Name="BufferCurrentVolume" StyleClasses="LabelSecondaryColor" />
             </BoxContainer>
@@ -106,18 +111,19 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                 </PanelContainer.PanelOverride>
 
                 <!-- Packaging Info -->
-                <BoxContainer Orientation="Vertical" Margin="4" HorizontalExpand="True" VerticalExpand="True" SeparationOverride="5">
+                <BoxContainer Orientation="Vertical" Margin="4" HorizontalExpand="True" VerticalExpand="True"
+                              SeparationOverride="5">
                     <!-- Label for output -->
                     <BoxContainer Orientation="Horizontal">
                         <Label Text="{Loc 'chem-master-current-text-label'}" />
-                        <Control HorizontalExpand="True" MinSize="50 0"/>
-                        <LineEdit Name="LabelLineEdit" SetWidth="455"/>
+                        <Control HorizontalExpand="True" MinSize="50 0" />
+                        <LineEdit Name="LabelLineEdit" SetWidth="455" />
                     </BoxContainer>
 
                     <!-- Pills Type Buttons -->
                     <BoxContainer Orientation="Horizontal">
-                        <Label Text="{Loc 'chem-master-window-pill-type-label'}"/>
-                        <Control HorizontalExpand="True" MinSize="50 0"/>
+                        <Label Text="{Loc 'chem-master-window-pill-type-label'}" />
+                        <Control HorizontalExpand="True" MinSize="50 0" />
                         <GridContainer Name="Grid" Columns="10">
                             <!-- Pills type buttons are generated in the code -->
                         </GridContainer>
@@ -126,19 +132,24 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                     <BoxContainer Orientation="Horizontal">
                         <Label Text="{Loc 'chem-master-window-pills-label'}" />
                         <Control HorizontalExpand="True" MinSize="50 0" />
-                        <Label Text="{Loc 'chem-master-window-pills-number-label'}" Margin="5 0 0 0" StyleClasses="LabelSecondaryColor" />
+                        <Label Text="{Loc 'chem-master-window-pills-number-label'}" Margin="5 0 0 0"
+                               StyleClasses="LabelSecondaryColor" />
                         <SpinBox MinSize="100 0" Name="PillNumber" Access="Public" Value="0" />
-                        <Label Text="{Loc 'chem-master-window-dose-label'}" Margin="5 0 0 0" StyleClasses="LabelSecondaryColor" />
+                        <Label Text="{Loc 'chem-master-window-dose-label'}" Margin="5 0 0 0"
+                               StyleClasses="LabelSecondaryColor" />
                         <SpinBox MinSize="100 0" Name="PillDosage" Access="Public" Value="1" />
-                        <Button MinSize="80 0" Name="CreatePillButton" Access="Public" Text="{Loc 'chem-master-window-create-button'}" />
+                        <Button MinSize="80 0" Name="CreatePillButton" Access="Public"
+                                Text="{Loc 'chem-master-window-create-button'}" />
                     </BoxContainer>
 
                     <BoxContainer Orientation="Horizontal">
                         <Label Text="{Loc 'chem-master-window-bottles-label'}" />
                         <Control HorizontalExpand="True" MinSize="50 0" />
-                        <Label Text="{Loc 'chem-master-window-dose-label'}" Margin="5 0 0 0" StyleClasses="LabelSecondaryColor" />
+                        <Label Text="{Loc 'chem-master-window-dose-label'}" Margin="5 0 0 0"
+                               StyleClasses="LabelSecondaryColor" />
                         <SpinBox MinSize="100 0" Name="BottleDosage" Access="Public" Value="0" />
-                        <Button MinSize="80 0" Name="CreateBottleButton" Access="Public" Text="{Loc 'chem-master-window-create-button'}" />
+                        <Button MinSize="80 0" Name="CreateBottleButton" Access="Public"
+                                Text="{Loc 'chem-master-window-create-button'}" />
                     </BoxContainer>
                 </BoxContainer>
             </PanelContainer>

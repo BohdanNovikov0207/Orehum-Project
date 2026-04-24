@@ -91,30 +91,31 @@ using Content.Shared.Ghost.Roles;
 using JetBrains.Annotations;
 using Robust.Client.GameObjects;
 
-namespace Content.Client.UserInterface.Systems.Ghost.Controls.Roles
+namespace Content.Client.UserInterface.Systems.Ghost.Controls.Roles;
+
+[UsedImplicitly]
+public sealed class GhostRolesEui : BaseEui
 {
-    [UsedImplicitly]
-    public sealed class GhostRolesEui : BaseEui
+    private readonly GhostRolesWindow _window;
+    private GhostRoleRulesWindow? _windowRules;
+    private uint _windowRulesId;
+
+    public GhostRolesEui()
     {
-        private readonly GhostRolesWindow _window;
-        private GhostRoleRulesWindow? _windowRules = null;
-        private uint _windowRulesId = 0;
+        _window = new GhostRolesWindow();
 
-        public GhostRolesEui()
+        _window.OnRoleRequestButtonClicked += info =>
         {
-            _window = new GhostRolesWindow();
+            _windowRules?.Close();
 
-            _window.OnRoleRequestButtonClicked += info =>
+            if (info.Kind == GhostRoleKind.RaffleJoined)
             {
-                _windowRules?.Close();
+                SendMessage(new LeaveGhostRoleRaffleMessage(info.Identifier));
+                return;
+            }
 
-                if (info.Kind == GhostRoleKind.RaffleJoined)
-                {
-                    SendMessage(new LeaveGhostRoleRaffleMessage(info.Identifier));
-                    return;
-                }
-
-                _windowRules = new GhostRoleRulesWindow(info.Rules, _ =>
+            _windowRules = new GhostRoleRulesWindow(info.Rules,
+                _ =>
                 {
                     SendMessage(new RequestGhostRoleMessage(info.Identifier));
 
@@ -123,86 +124,86 @@ namespace Content.Client.UserInterface.Systems.Ghost.Controls.Roles
                     if (info.Kind != GhostRoleKind.FirstComeFirstServe)
                         _windowRules?.Close();
                 });
-                _windowRulesId = info.Identifier;
-                _windowRules.OnClose += () =>
-                {
-                    _windowRules = null;
-                };
-                _windowRules.OpenCentered();
-            };
-
-            _window.OnRoleFollow += info =>
+            _windowRulesId = info.Identifier;
+            _windowRules.OnClose += () =>
             {
-                SendMessage(new FollowGhostRoleMessage(info.Identifier));
+                _windowRules = null;
             };
+            _windowRules.OpenCentered();
+        };
 
-            _window.OnClose += () =>
-            {
-                SendMessage(new CloseEuiMessage());
-            };
+        _window.OnRoleFollow += info =>
+        {
+            SendMessage(new FollowGhostRoleMessage(info.Identifier));
+        };
+
+        _window.OnClose += () =>
+        {
+            SendMessage(new CloseEuiMessage());
+        };
+    }
+
+    public override void Opened()
+    {
+        base.Opened();
+        _window.OpenCentered();
+    }
+
+    public override void Closed()
+    {
+        base.Closed();
+        _window.Close();
+        _windowRules?.Close();
+    }
+
+    public override void HandleState(EuiStateBase state)
+    {
+        base.HandleState(state);
+
+        if (state is not GhostRolesEuiState ghostState)
+            return;
+
+        // We must save BodyVisible state, so all Collapsible boxes will not close
+        // on adding new ghost role.
+        // Save the current state of each Collapsible box being visible or not
+        _window.SaveCollapsibleBoxesStates();
+
+        // Clearing the container before adding new roles
+        _window.ClearEntries();
+
+        var entityManager = IoCManager.Resolve<IEntityManager>();
+        var sysManager = entityManager.EntitySysManager;
+        var spriteSystem = sysManager.GetEntitySystem<SpriteSystem>();
+        var requirementsManager = IoCManager.Resolve<JobRequirementsManager>();
+
+        // We only use the name and description for grouping,
+        // and take the requirements from the first role in each group.
+        // TLDR: DON'T USE THE SAME NAME AND DESC FOR DIFFERENT ROLE REQUIREMENTS OR I WILL BEAT YOU WITH HAMMERS (PLURAL)
+        var groupedRoles =
+            ghostState.GhostRoles.GroupBy(role =>
+                (role.Name, role.Description)); //goobstation edit, less polluted ghost spawners menu
+
+        // Add a new entry for each role group
+        foreach (var group in groupedRoles)
+        {
+            var name = group.Key.Name;
+            var description = group.Key.Description;
+            var groupReq = group.First(); //goobstation edit - since reqs can't be grouped fuckery
+            var hasAccess = requirementsManager.CheckRoleRequirements(
+                groupReq.Requirements, //goobstation edit, less polluted ghost spawners menu
+                null,
+                out var reason);
+
+            // Adding a new role
+            _window.AddEntry(name, description, hasAccess, reason, group, spriteSystem);
         }
 
-        public override void Opened()
-        {
-            base.Opened();
-            _window.OpenCentered();
-        }
+        // Restore the Collapsible box state if it is saved
+        _window.RestoreCollapsibleBoxesStates();
 
-        public override void Closed()
-        {
-            base.Closed();
-            _window.Close();
+        // Close the rules window if it is no longer needed
+        var closeRulesWindow = ghostState.GhostRoles.All(role => role.Identifier != _windowRulesId);
+        if (closeRulesWindow)
             _windowRules?.Close();
-        }
-
-        public override void HandleState(EuiStateBase state)
-        {
-            base.HandleState(state);
-
-            if (state is not GhostRolesEuiState ghostState)
-                return;
-
-            // We must save BodyVisible state, so all Collapsible boxes will not close
-            // on adding new ghost role.
-            // Save the current state of each Collapsible box being visible or not
-            _window.SaveCollapsibleBoxesStates();
-
-            // Clearing the container before adding new roles
-            _window.ClearEntries();
-
-            var entityManager = IoCManager.Resolve<IEntityManager>();
-            var sysManager = entityManager.EntitySysManager;
-            var spriteSystem = sysManager.GetEntitySystem<SpriteSystem>();
-            var requirementsManager = IoCManager.Resolve<JobRequirementsManager>();
-
-            // We only use the name and description for grouping,
-            // and take the requirements from the first role in each group.
-            // TLDR: DON'T USE THE SAME NAME AND DESC FOR DIFFERENT ROLE REQUIREMENTS OR I WILL BEAT YOU WITH HAMMERS (PLURAL)
-            var groupedRoles = ghostState.GhostRoles.GroupBy(
-                role => (role.Name, role.Description)); //goobstation edit, less polluted ghost spawners menu
-
-            // Add a new entry for each role group
-            foreach (var group in groupedRoles)
-            {
-                var name = group.Key.Name;
-                var description = group.Key.Description;
-                var groupReq = group.First(); //goobstation edit - since reqs can't be grouped fuckery
-                var hasAccess = requirementsManager.CheckRoleRequirements(
-                    groupReq.Requirements, //goobstation edit, less polluted ghost spawners menu
-                    null,
-                    out var reason);
-
-                // Adding a new role
-                _window.AddEntry(name, description, hasAccess, reason, group, spriteSystem);
-            }
-
-            // Restore the Collapsible box state if it is saved
-            _window.RestoreCollapsibleBoxesStates();
-
-            // Close the rules window if it is no longer needed
-            var closeRulesWindow = ghostState.GhostRoles.All(role => role.Identifier != _windowRulesId);
-            if (closeRulesWindow)
-                _windowRules?.Close();
-        }
     }
 }

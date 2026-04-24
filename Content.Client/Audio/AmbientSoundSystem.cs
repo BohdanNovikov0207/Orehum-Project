@@ -19,70 +19,70 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Linq;
+using System.Numerics;
 using Content.Shared.Audio;
 using Content.Shared.CCVar;
 using Robust.Client.Graphics;
 using Robust.Client.Player;
 using Robust.Shared.Audio;
+using Robust.Shared.Audio.Systems;
 using Robust.Shared.Configuration;
 using Robust.Shared.Physics;
+using Robust.Shared.Player;
 using Robust.Shared.Random;
 using Robust.Shared.Timing;
 using Robust.Shared.Utility;
-using System.Linq;
-using System.Numerics;
-using Robust.Shared.Audio.Systems;
-using Robust.Shared.Player;
 
 namespace Content.Client.Audio;
 //TODO: This is using a incomplete version of the whole "only play nearest sounds" algo, that breaks down a bit should the ambient sound cap get hit.
 //TODO: This'll be fixed when GetEntitiesInRange produces consistent outputs.
 
 /// <summary>
-/// Samples nearby <see cref="AmbientSoundComponent"/> and plays audio.
+/// Samples nearby <see cref="AmbientSoundComponent" /> and plays audio.
 /// </summary>
 public sealed class AmbientSoundSystem : SharedAmbientSoundSystem
 {
-    [Dependency] private readonly AmbientSoundTreeSystem _treeSys = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedTransformSystem _xformSystem = default!;
-    [Dependency] private readonly IConfigurationManager _cfg = default!;
-    [Dependency] private readonly IGameTiming _gameTiming = default!;
-    [Dependency] private readonly IPlayerManager _playerManager = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
-
-    protected override void QueueUpdate(EntityUid uid, AmbientSoundComponent ambience)
-        => _treeSys.QueueTreeUpdate(uid, ambience);
-
-    private AmbientSoundOverlay? _overlay;
-    private int _maxAmbientCount;
-    private bool _overlayEnabled;
-    private float _maxAmbientRange;
-    private Vector2 MaxAmbientVector => new(_maxAmbientRange, _maxAmbientRange);
-
-    private float _cooldown;
-    private TimeSpan _targetTime = TimeSpan.Zero;
-    private float _ambienceVolume = 0.0f;
-
     private static AudioParams _params = AudioParams.Default
         .WithVariation(0.01f)
         .WithLoop(true)
         .WithMaxDistance(7f);
+
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly IConfigurationManager _cfg = default!;
+    [Dependency] private readonly IGameTiming _gameTiming = default!;
+    [Dependency] private readonly IPlayerManager _playerManager = default!;
+    private readonly Dictionary<string, int> _playingCount = new();
+
+    private readonly Dictionary<Entity<AmbientSoundComponent>, (EntityUid? Stream, SoundSpecifier Sound, string Path)>
+        _playingSounds = new();
+
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly AmbientSoundTreeSystem _treeSys = default!;
+    [Dependency] private readonly SharedTransformSystem _xformSystem = default!;
+    private float _ambienceVolume;
+
+    private float _cooldown;
+    private int _maxAmbientCount;
+    private float _maxAmbientRange;
+
+    private AmbientSoundOverlay? _overlay;
+    private bool _overlayEnabled;
+    private TimeSpan _targetTime = TimeSpan.Zero;
+    private Vector2 MaxAmbientVector => new(_maxAmbientRange, _maxAmbientRange);
 
     /// <summary>
     /// How many times we can be playing 1 particular sound at once.
     /// </summary>
     private int MaxSingleSound => (int) (_maxAmbientCount / (16.0f / 6.0f));
 
-    private readonly Dictionary<Entity<AmbientSoundComponent>, (EntityUid? Stream, SoundSpecifier Sound, string Path)> _playingSounds = new();
-    private readonly Dictionary<string, int> _playingCount = new();
-
     public bool OverlayEnabled
     {
         get => _overlayEnabled;
         set
         {
-            if (_overlayEnabled == value) return;
+            if (_overlayEnabled == value)
+                return;
             _overlayEnabled = value;
             var overlayManager = IoCManager.Resolve<IOverlayManager>();
 
@@ -99,15 +99,15 @@ public sealed class AmbientSoundSystem : SharedAmbientSoundSystem
         }
     }
 
+    protected override void QueueUpdate(EntityUid uid, AmbientSoundComponent ambience)
+        => _treeSys.QueueTreeUpdate(uid, ambience);
+
     /// <summary>
     /// Is this AmbientSound actively playing right now?
     /// </summary>
     /// <param name="component"></param>
     /// <returns></returns>
-    public bool IsActive(Entity<AmbientSoundComponent> component)
-    {
-        return _playingSounds.ContainsKey(component);
-    }
+    public bool IsActive(Entity<AmbientSoundComponent> component) => _playingSounds.ContainsKey(component);
 
     public override void Initialize()
     {
@@ -146,6 +146,7 @@ public sealed class AmbientSoundSystem : SharedAmbientSoundSystem
             _audio.SetVolume(stream, _params.Volume + ent.Comp.Volume + _ambienceVolume);
         }
     }
+
     private void SetCooldown(float value) => _cooldown = value;
     private void SetAmbientCount(int value) => _maxAmbientCount = value;
     private void SetAmbientRange(float value) => _maxAmbientRange = value;
@@ -205,21 +206,6 @@ public sealed class AmbientSoundSystem : SharedAmbientSoundSystem
         _playingCount.Clear();
     }
 
-    private readonly struct QueryState
-    {
-        public readonly Dictionary<string, List<(float Importance, Entity<AmbientSoundComponent>)>> SourceDict = new();
-        public readonly Vector2 MapPos;
-        public readonly TransformComponent Player;
-        public readonly SharedTransformSystem TransformSystem;
-
-        public QueryState(Vector2 mapPos, TransformComponent player, SharedTransformSystem transformSystem)
-        {
-            MapPos = mapPos;
-            Player = player;
-            TransformSystem = transformSystem;
-        }
-    }
-
     private static bool Callback(
         ref QueryState state,
         in ComponentTreeEntry<AmbientSoundComponent> value)
@@ -241,7 +227,7 @@ public sealed class AmbientSoundSystem : SharedAmbientSoundSystem
         if (ambientComp.Sound is SoundPathSpecifier path)
             key = path.Path.ToString();
         else
-            key = ((SoundCollectionSpecifier)ambientComp.Sound).Collection ?? string.Empty;
+            key = ((SoundCollectionSpecifier) ambientComp.Sound).Collection ?? string.Empty;
 
         // Prioritize far away & loud sounds.
         var importance = range * (ambientComp.Volume + 32);
@@ -273,7 +259,7 @@ public sealed class AmbientSoundSystem : SharedAmbientSoundSystem
                 !metaQuery.GetComponent(owner).EntityPaused)
             {
                 // TODO: This is just trydistance for coordinates.
-                var distance = (xform.ParentUid == playerXform.ParentUid)
+                var distance = xform.ParentUid == playerXform.ParentUid
                     ? xform.LocalPosition - playerXform.LocalPosition
                     : _xformSystem.GetWorldPosition(xform) - mapPos.Position;
 
@@ -338,5 +324,20 @@ public sealed class AmbientSoundSystem : SharedAmbientSoundSystem
         }
 
         DebugTools.Assert(_playingCount.All(x => x.Value == PlayingCount(x.Key)));
+    }
+
+    private readonly struct QueryState
+    {
+        public readonly Dictionary<string, List<(float Importance, Entity<AmbientSoundComponent>)>> SourceDict = new();
+        public readonly Vector2 MapPos;
+        public readonly TransformComponent Player;
+        public readonly SharedTransformSystem TransformSystem;
+
+        public QueryState(Vector2 mapPos, TransformComponent player, SharedTransformSystem transformSystem)
+        {
+            MapPos = mapPos;
+            Player = player;
+            TransformSystem = transformSystem;
+        }
     }
 }

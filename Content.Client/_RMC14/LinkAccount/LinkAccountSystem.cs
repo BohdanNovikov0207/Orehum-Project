@@ -34,13 +34,8 @@ public sealed class LinkAccountSystem : EntitySystem
 {
     public event Action<SharedRMCDisplayLobbyMessageEvent>? LobbyMessageReceived;
 
-    public override void Initialize()
-    {
+    public override void Initialize() =>
         SubscribeNetworkEvent<SharedRMCDisplayLobbyMessageEvent>(OnDisplayLobbyMessage);
-    }
 
-    private void OnDisplayLobbyMessage(SharedRMCDisplayLobbyMessageEvent ev)
-    {
-        LobbyMessageReceived?.Invoke(ev);
-    }
+    private void OnDisplayLobbyMessage(SharedRMCDisplayLobbyMessageEvent ev) => LobbyMessageReceived?.Invoke(ev);
 }

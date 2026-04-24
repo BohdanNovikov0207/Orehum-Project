@@ -90,10 +90,8 @@ public sealed class DecalPlacementOverlay : Overlay
     [Dependency] private readonly IInputManager _inputManager = default!;
     [Dependency] private readonly IMapManager _mapManager = default!;
     private readonly DecalPlacementSystem _placement;
-    private readonly SharedTransformSystem _transform;
     private readonly SpriteSystem _sprite;
-
-    public override OverlaySpace Space => OverlaySpace.WorldSpaceEntities;
+    private readonly SharedTransformSystem _transform;
 
     public DecalPlacementOverlay(DecalPlacementSystem placement, SharedTransformSystem transform, SpriteSystem sprite)
     {
@@ -103,6 +101,8 @@ public sealed class DecalPlacementOverlay : Overlay
         _sprite = sprite;
         ZIndex = 1000;
     }
+
+    public override OverlaySpace Space => OverlaySpace.WorldSpaceEntities;
 
     protected override void Draw(in OverlayDrawArgs args)
     {
@@ -119,9 +119,7 @@ public sealed class DecalPlacementOverlay : Overlay
 
         // No map support for decals
         if (!_mapManager.TryFindGridAt(mousePos, out var gridUid, out var grid))
-        {
             return;
-        }
 
         var worldMatrix = _transform.GetWorldMatrix(gridUid);
         var invMatrix = _transform.GetInvWorldMatrix(gridUid);
@@ -132,9 +130,7 @@ public sealed class DecalPlacementOverlay : Overlay
         var localPos = Vector2.Transform(mousePos.Position, invMatrix);
 
         if (snap)
-        {
             localPos = localPos.Floored() + grid.TileSizeHalfVector;
-        }
 
         // Nothing uses snap cardinals so probably don't need preview?
         var aabb = Box2.UnitCentered.Translated(localPos);

@@ -11,14 +11,13 @@ using Content.Shared.Verbs;
 using Robust.Client.GameObjects;
 using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.CustomControls;
-using Robust.Client.Utility;
 using Robust.Shared.Utility;
 
 namespace Content.Client.Examine;
 
 /// <summary>
-///     Buttons that show up in the examine tooltip to specify more detailed
-///     ways to examine an item.
+/// Buttons that show up in the examine tooltip to specify more detailed
+/// ways to examine an item.
 /// </summary>
 public sealed class ExamineButton : ContainerButton
 {
@@ -28,11 +27,11 @@ public sealed class ExamineButton : ContainerButton
     public const int ElementWidth = 32;
 
     private const int Thickness = 4;
+    private readonly SpriteSystem _sprite;
 
     public TextureRect Icon;
 
     public ExamineVerb Verb;
-    private SpriteSystem _sprite;
 
     public ExamineButton(ExamineVerb verb, SpriteSystem spriteSystem)
     {
@@ -44,9 +43,7 @@ public sealed class ExamineButton : ContainerButton
         _sprite = spriteSystem;
 
         if (verb.Disabled)
-        {
             Disabled = true;
-        }
 
         TooltipSupplier = sender =>
         {
@@ -63,7 +60,7 @@ public sealed class ExamineButton : ContainerButton
         Icon = new TextureRect
         {
             SetWidth = ElementWidth,
-            SetHeight = ElementHeight
+            SetHeight = ElementHeight,
         };
 
         if (verb.Icon != null)

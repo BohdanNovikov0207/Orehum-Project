@@ -7,7 +7,8 @@
               MinHeight="70">
 
     <!-- Access groups -->
-    <BoxContainer Name="AccessGroupList" Access="Public" Orientation="Vertical" HorizontalExpand="True" SizeFlagsStretchRatio="0.5" Margin="0 0 10 0">
+    <BoxContainer Name="AccessGroupList" Access="Public" Orientation="Vertical" HorizontalExpand="True"
+                  SizeFlagsStretchRatio="0.5" Margin="0 0 10 0">
         <!-- Populated with C# code -->
     </BoxContainer>
 

@@ -16,13 +16,13 @@ public sealed partial class MechGrabberUiFragment : BoxContainer
 {
     [Dependency] private readonly IEntityManager _entity = default!;
 
-    public event Action<EntityUid>? OnEjectAction;
-
     public MechGrabberUiFragment()
     {
         RobustXamlLoader.Load(this);
         IoCManager.InjectDependencies(this);
     }
+
+    public event Action<EntityUid>? OnEjectAction;
 
     public void UpdateContents(MechGrabberUiState state)
     {

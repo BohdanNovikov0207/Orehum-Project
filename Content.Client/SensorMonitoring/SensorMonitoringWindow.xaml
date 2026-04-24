@@ -10,8 +10,6 @@ SPDX-License-Identifier: MIT
     xmlns:contentControls="clr-namespace:Content.Client.UserInterface.Controls"
     Title="{Loc 'sensor-monitoring-window-title'}" MinWidth="640" MinHeight="480">
     <ScrollContainer>
-        <BoxContainer Name="Asdf" Orientation="Vertical" Margin="4 0">
-
-        </BoxContainer>
+        <BoxContainer Name="Asdf" Orientation="Vertical" Margin="4 0" />
     </ScrollContainer>
 </contentControls:FancyWindow>

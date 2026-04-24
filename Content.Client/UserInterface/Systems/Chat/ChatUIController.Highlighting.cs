@@ -1,13 +1,13 @@
 using System.Linq;
 using System.Text.RegularExpressions;
+using Content.Client.CharacterInfo;
+using Content.Client.Gameplay;
+using Content.Shared.CCVar;
 using Robust.Client.Audio;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controllers;
 using Robust.Shared.Audio;
 using Robust.Shared.Player;
-using Content.Shared.CCVar;
-using Content.Client.CharacterInfo;
-using Content.Client.Gameplay;
 using Robust.Shared.Utility;
 using static Content.Client.CharacterInfo.CharacterInfoSystem;
 
@@ -19,36 +19,43 @@ namespace Content.Client.UserInterface.Systems.Chat;
 /// </summary>
 public sealed partial class ChatUIController : IOnSystemChanged<CharacterInfoSystem>
 {
-    [Dependency] private readonly ILocalizationManager _loc = default!;
-    [UISystemDependency] private readonly CharacterInfoSystem _characterInfo = default!;
-
     // Goobstation - Highlight chat ping sound!
-    private static readonly ResPath HighlightSoundPath = new("/Audio/_Goobstation/Interface/HighlightChatPings/Beep.ogg");
+    private static readonly ResPath HighlightSoundPath =
+        new("/Audio/_Goobstation/Interface/HighlightChatPings/Beep.ogg");
 
     private static readonly Regex StartDoubleQuote = new("\"$");
     private static readonly Regex EndDoubleQuote = new("^\"|(?<=^@)\"");
     private static readonly Regex StartAtSign = new("^@");
+    [UISystemDependency] private readonly CharacterInfoSystem _characterInfo = default!;
 
     /// <summary>
-    ///     The list of words to be highlighted in the chatbox.
+    /// The list of words to be highlighted in the chatbox.
     /// </summary>
     private readonly List<string> _highlights = new();
 
-    /// <summary>
-    ///     The string holding the hex color used to highlight words.
-    /// </summary>
-    private string? _highlightsColor;
+    [Dependency] private readonly ILocalizationManager _loc = default!;
 
     private bool _autoFillHighlightsEnabled;
 
     /// <summary>
-    ///     The boolean that keeps track of the 'OnCharacterUpdated' event, whenever it's a player attaching or opening the character info panel.
+    /// The boolean that keeps track of the 'OnCharacterUpdated' event, whenever it's a player attaching or opening the
+    /// character info panel.
     /// </summary>
-    private bool _charInfoIsAttach = false;
+    private bool _charInfoIsAttach;
+
+    /// <summary>
+    /// The string holding the hex color used to highlight words.
+    /// </summary>
+    private string? _highlightsColor;
+
+    public void OnSystemLoaded(CharacterInfoSystem system) => system.OnCharacterUpdate += OnCharacterUpdated;
+
+    public void OnSystemUnloaded(CharacterInfoSystem system) => system.OnCharacterUpdate -= OnCharacterUpdated;
 
     public event Action<string>? HighlightsUpdated;
 
     #region Highlight chat ping sound!
+
     // Goobstation
     /// <summary>
     /// Plays the highlight sound effect if enabled in settings
@@ -70,31 +77,21 @@ public sealed partial class ChatUIController : IOnSystemChanged<CharacterInfoSys
         // Play the sound using the audio system
         _ent.System<AudioSystem>().PlayGlobal(HighlightSoundPath, Filter.Local(), false, audioParams);
     }
+
     // Goobstation End
+
     #endregion
 
     private void InitializeHighlights()
     {
-        _config.OnValueChanged(CCVars.ChatAutoFillHighlights, (value) => { _autoFillHighlightsEnabled = value; }, true);
-        _config.OnValueChanged(CCVars.ChatHighlightsColor, (value) => { _highlightsColor = value; }, true);
+        _config.OnValueChanged(CCVars.ChatAutoFillHighlights, value => { _autoFillHighlightsEnabled = value; }, true);
+        _config.OnValueChanged(CCVars.ChatHighlightsColor, value => { _highlightsColor = value; }, true);
 
         // Load highlights if any were saved.
         var highlights = _config.GetCVar(CCVars.ChatHighlights);
 
         if (!string.IsNullOrEmpty(highlights))
-        {
             UpdateHighlights(highlights, true);
-        }
-    }
-
-    public void OnSystemLoaded(CharacterInfoSystem system)
-    {
-        system.OnCharacterUpdate += OnCharacterUpdated;
-    }
-
-    public void OnSystemUnloaded(CharacterInfoSystem system)
-    {
-        system.OnCharacterUpdate -= OnCharacterUpdated;
     }
 
     private void UpdateAutoFillHighlights()
@@ -111,7 +108,8 @@ public sealed partial class ChatUIController : IOnSystemChanged<CharacterInfoSys
     public void UpdateHighlights(string newHighlights, bool firstLoad = false)
     {
         // Do nothing if the provided highlights are the same as the old ones and it is not the first time.
-        if (!firstLoad && _config.GetCVar(CCVars.ChatHighlights).Equals(newHighlights, StringComparison.CurrentCultureIgnoreCase))
+        if (!firstLoad && _config.GetCVar(CCVars.ChatHighlights)
+                .Equals(newHighlights, StringComparison.CurrentCultureIgnoreCase))
             return;
 
         _config.SetCVar(CCVars.ChatHighlights, newHighlights);
@@ -121,7 +119,8 @@ public sealed partial class ChatUIController : IOnSystemChanged<CharacterInfoSys
 
         // We first subdivide the highlights based on newlines to prevent replacing
         // a valid "\n" tag and adding it to the final regex.
-        var splittedHighlights = newHighlights.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        var splittedHighlights =
+            newHighlights.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
         for (var i = 0; i < splittedHighlights.Length; i++)
         {
@@ -172,7 +171,7 @@ public sealed partial class ChatUIController : IOnSystemChanged<CharacterInfoSys
         var newHighlights = "@" + entityName;
 
         // Subdivide the character's name based on spaces or hyphens so that every word gets highlighted.
-        if (newHighlights.Count(c => (c == ' ' || c == '-')) == 1)
+        if (newHighlights.Count(c => c == ' ' || c == '-') == 1)
             newHighlights = newHighlights.Replace("-", "\n@").Replace(" ", "\n@");
 
         // If the character has a name with more than one hyphen assume it is a lizard name and extract the first and

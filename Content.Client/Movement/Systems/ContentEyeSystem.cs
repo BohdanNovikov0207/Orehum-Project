@@ -12,7 +12,6 @@
 using System.Numerics;
 using Content.Shared.Movement.Components;
 using Content.Shared.Movement.Systems;
-using Robust.Client.GameObjects;
 using Robust.Client.Player;
 
 namespace Content.Client.Movement.Systems;
@@ -21,12 +20,16 @@ public sealed class ContentEyeSystem : SharedContentEyeSystem
 {
     [Dependency] private readonly IPlayerManager _player = default!;
 
-    public void RequestZoom(EntityUid uid, Vector2 zoom, bool ignoreLimit, bool scalePvs, ContentEyeComponent? content = null)
+    public void RequestZoom(EntityUid uid,
+        Vector2 zoom,
+        bool ignoreLimit,
+        bool scalePvs,
+        ContentEyeComponent? content = null)
     {
         if (!Resolve(uid, ref content, false))
             return;
 
-        RaisePredictiveEvent(new RequestTargetZoomEvent()
+        RaisePredictiveEvent(new RequestTargetZoomEvent
         {
             TargetZoom = zoom,
             IgnoreLimit = ignoreLimit,
@@ -36,10 +39,7 @@ public sealed class ContentEyeSystem : SharedContentEyeSystem
             RequestPvsScale(Math.Max(zoom.X, zoom.Y));
     }
 
-    public void RequestPvsScale(float scale)
-    {
-        RaiseNetworkEvent(new RequestPvsScaleEvent(scale));
-    }
+    public void RequestPvsScale(float scale) => RaiseNetworkEvent(new RequestPvsScaleEvent(scale));
 
     public void RequestToggleFov()
     {
@@ -60,16 +60,14 @@ public sealed class ContentEyeSystem : SharedContentEyeSystem
     }
 
 
-    public void RequestEye(bool drawFov, bool drawLight)
-    {
+    public void RequestEye(bool drawFov, bool drawLight) =>
         RaisePredictiveEvent(new RequestEyeEvent(drawFov, drawLight));
-    }
 
     public override void FrameUpdate(float frameTime)
     {
         base.FrameUpdate(frameTime);
         var eyeEntities = AllEntityQuery<ContentEyeComponent, EyeComponent>();
-        while (eyeEntities.MoveNext(out var entity, out ContentEyeComponent? contentComponent, out EyeComponent? eyeComponent))
+        while (eyeEntities.MoveNext(out var entity, out var contentComponent, out var eyeComponent))
         {
             UpdateEyeOffset((entity, eyeComponent));
         }
@@ -80,7 +78,7 @@ public sealed class ContentEyeSystem : SharedContentEyeSystem
     {
         base.Update(frameTime);
         var eyeEntities = AllEntityQuery<ContentEyeComponent, EyeComponent>();
-        while (eyeEntities.MoveNext(out var entity, out ContentEyeComponent? contentComponent, out EyeComponent? eyeComponent))
+        while (eyeEntities.MoveNext(out var entity, out var contentComponent, out var eyeComponent))
         {
             UpdateEyeOffset((entity, eyeComponent));
         }

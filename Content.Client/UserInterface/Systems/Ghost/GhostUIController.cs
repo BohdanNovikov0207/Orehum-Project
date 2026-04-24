@@ -39,29 +39,6 @@ public sealed class GhostUIController : UIController, IOnSystemChanged<GhostSyst
 
     private GhostGui? Gui => UIManager.GetActiveUIWidgetOrNull<GhostGui>();
 
-    public override void Initialize()
-    {
-        base.Initialize();
-
-        var gameplayStateLoad = UIManager.GetUIController<GameplayStateLoadController>();
-        gameplayStateLoad.OnScreenLoad += OnScreenLoad;
-        gameplayStateLoad.OnScreenUnload += OnScreenUnload;
-
-        // Goobstation - Thunderdome
-        _entManager.EventBus.SubscribeEvent<ThunderdomePlayerCountEvent>
-            (EventSource.Network, this, OnThunderdomePlayerCount);
-    }
-
-    private void OnScreenLoad()
-    {
-        LoadGui();
-    }
-
-    private void OnScreenUnload()
-    {
-        UnloadGui();
-    }
-
     public void OnSystemLoaded(GhostSystem system)
     {
         system.PlayerRemoved += OnPlayerRemoved;
@@ -82,26 +59,38 @@ public sealed class GhostUIController : UIController, IOnSystemChanged<GhostSyst
         system.GhostRoleCountUpdated -= OnRoleCountUpdated;
     }
 
+    public override void Initialize()
+    {
+        base.Initialize();
+
+        var gameplayStateLoad = UIManager.GetUIController<GameplayStateLoadController>();
+        gameplayStateLoad.OnScreenLoad += OnScreenLoad;
+        gameplayStateLoad.OnScreenUnload += OnScreenUnload;
+
+        // Goobstation - Thunderdome
+        _entManager.EventBus.SubscribeEvent<ThunderdomePlayerCountEvent>(EventSource.Network,
+            this,
+            OnThunderdomePlayerCount);
+    }
+
+    private void OnScreenLoad() => LoadGui();
+
+    private void OnScreenUnload() => UnloadGui();
+
     public void UpdateGui()
     {
         if (Gui == null)
-        {
             return;
-        }
 
         Gui.Visible = _system?.IsGhost ?? false;
-        Gui.Update(_system?.AvailableGhostRoleCount, _system?.Player?.CanReturnToBody, _system?.Player?.CanTakeGhostRoles);
+        Gui.Update(_system?.AvailableGhostRoleCount,
+            _system?.Player?.CanReturnToBody,
+            _system?.Player?.CanTakeGhostRoles);
     }
 
-    private void OnPlayerRemoved(GhostComponent component)
-    {
-        Gui?.Hide();
-    }
+    private void OnPlayerRemoved(GhostComponent component) => Gui?.Hide();
 
-    private void OnPlayerUpdated(GhostComponent component)
-    {
-        UpdateGui();
-    }
+    private void OnPlayerUpdated(GhostComponent component) => UpdateGui();
 
     private void OnPlayerAttached(GhostComponent component)
     {
@@ -112,10 +101,7 @@ public sealed class GhostUIController : UIController, IOnSystemChanged<GhostSyst
         UpdateGui();
     }
 
-    private void OnPlayerDetached()
-    {
-        Gui?.Hide();
-    }
+    private void OnPlayerDetached() => Gui?.Hide();
 
     private void OnWarpsResponse(GhostWarpsResponseEvent msg)
     {
@@ -126,10 +112,7 @@ public sealed class GhostUIController : UIController, IOnSystemChanged<GhostSyst
         window.Populate();
     }
 
-    private void OnRoleCountUpdated(GhostUpdateGhostRoleCountEvent msg)
-    {
-        UpdateGui();
-    }
+    private void OnRoleCountUpdated(GhostUpdateGhostRoleCountEvent msg) => UpdateGui();
 
     private void OnWarpClicked(NetEntity player)
     {
@@ -172,10 +155,7 @@ public sealed class GhostUIController : UIController, IOnSystemChanged<GhostSyst
         Gui.Hide();
     }
 
-    private void ReturnToBody()
-    {
-        _system?.ReturnToBody();
-    }
+    private void ReturnToBody() => _system?.ReturnToBody();
 
     private void RequestWarps()
     {
@@ -184,19 +164,10 @@ public sealed class GhostUIController : UIController, IOnSystemChanged<GhostSyst
         Gui?.TargetWindow.OpenCentered();
     }
 
-    private void GhostRolesPressed()
-    {
-        _system?.OpenGhostRoles();
-    }
+    private void GhostRolesPressed() => _system?.OpenGhostRoles();
 
     // Goobstation - Thunderdome
-    private void ThunderdomePressed()
-    {
-        _net.SendSystemNetworkMessage(new ThunderdomeJoinRequestEvent());
-    }
+    private void ThunderdomePressed() => _net.SendSystemNetworkMessage(new ThunderdomeJoinRequestEvent());
 
-    private void OnThunderdomePlayerCount(ThunderdomePlayerCountEvent ev)
-    {
-        Gui?.UpdateThunderdome(ev.Count);
-    }
+    private void OnThunderdomePlayerCount(ThunderdomePlayerCountEvent ev) => Gui?.UpdateThunderdome(ev.Count);
 }

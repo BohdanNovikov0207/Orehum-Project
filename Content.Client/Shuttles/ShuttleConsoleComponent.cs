@@ -20,6 +20,6 @@ public sealed partial class ShuttleConsoleComponent : SharedShuttleConsoleCompon
     /// Custom display names for network port buttons.
     /// Key is the port ID, value is the display name.
     /// </summary>
-    [DataField("portLabels"), AutoNetworkedField]
+    [DataField("portLabels")] [AutoNetworkedField]
     public new Dictionary<string, string> PortNames = new();
 }

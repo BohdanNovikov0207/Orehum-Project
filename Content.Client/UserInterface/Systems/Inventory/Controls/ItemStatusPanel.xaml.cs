@@ -107,10 +107,7 @@ public sealed partial class ItemStatusPanel : Control
         return new Thickness(color.RByte, color.GByte, color.BByte, color.AByte);
     }
 
-    protected override void OnThemeUpdated()
-    {
-        SetSide(_side);
-    }
+    protected override void OnThemeUpdated() => SetSide(_side);
 
     protected override void FrameUpdate(FrameEventArgs args)
     {
@@ -140,10 +137,7 @@ public sealed partial class ItemStatusPanel : Control
         }
     }
 
-    public void UpdateHighlight(bool highlight)
-    {
-        HighlightPanel.Visible = highlight;
-    }
+    public void UpdateHighlight(bool highlight) => HighlightPanel.Visible = highlight;
 
     private void UpdateItemName()
     {
@@ -163,15 +157,10 @@ public sealed partial class ItemStatusPanel : Control
             ItemNameLabel.Text = Identity.Name(virtualItem.BlockingEntity, _entityManager);
         }
         else
-        {
             ItemNameLabel.Text = Identity.Name(_entity.Value, _entityManager);
-        }
     }
 
-    private void ClearOldStatus()
-    {
-        StatusContents.RemoveAllChildren();
-    }
+    private void ClearOldStatus() => StatusContents.RemoveAllChildren();
 
     private void BuildNewEntityStatus()
     {

@@ -12,7 +12,7 @@ using Robust.Shared.Containers;
 
 namespace Content.Client.Silicons.Borgs;
 
-/// <inheritdoc/>
+/// <inheritdoc />
 public sealed class BorgSystem : SharedBorgSystem
 {
     [Dependency] private readonly AppearanceSystem _appearance = default!;
@@ -33,7 +33,9 @@ public sealed class BorgSystem : SharedBorgSystem
         UpdateBorgAppearance(uid, component, args.Component, args.Sprite);
     }
 
-    protected override void OnInserted(EntityUid uid, BorgChassisComponent component, EntInsertedIntoContainerMessage args)
+    protected override void OnInserted(EntityUid uid,
+        BorgChassisComponent component,
+        EntInsertedIntoContainerMessage args)
     {
         if (!component.Initialized)
             return;
@@ -42,7 +44,9 @@ public sealed class BorgSystem : SharedBorgSystem
         UpdateBorgAppearance(uid, component);
     }
 
-    protected override void OnRemoved(EntityUid uid, BorgChassisComponent component, EntRemovedFromContainerMessage args)
+    protected override void OnRemoved(EntityUid uid,
+        BorgChassisComponent component,
+        EntRemovedFromContainerMessage args)
     {
         if (!component.Initialized)
             return;
@@ -72,7 +76,9 @@ public sealed class BorgSystem : SharedBorgSystem
             hasPlayer = false;
 
         _sprite.LayerSetVisible((uid, sprite), BorgVisualLayers.Light, component.BrainEntity != null || hasPlayer);
-        _sprite.LayerSetRsiState((uid, sprite), BorgVisualLayers.Light, hasPlayer ? component.HasMindState : component.NoMindState);
+        _sprite.LayerSetRsiState((uid, sprite),
+            BorgVisualLayers.Light,
+            hasPlayer ? component.HasMindState : component.NoMindState);
     }
 
     private void OnMMIAppearanceChanged(EntityUid uid, MMIComponent component, ref AppearanceChangeEvent args)
@@ -88,9 +94,7 @@ public sealed class BorgSystem : SharedBorgSystem
 
         _sprite.LayerSetVisible((uid, sprite), MMIVisualLayers.Brain, brain);
         if (!brain)
-        {
             _sprite.LayerSetRsiState((uid, sprite), MMIVisualLayers.Base, component.NoBrainState);
-        }
         else
         {
             var state = hasMind
@@ -106,8 +110,8 @@ public sealed class BorgSystem : SharedBorgSystem
     /// <param name="borg">The entity and component to modify.</param>
     /// <param name="hasMindState">The state to use if the borg has a mind.</param>
     /// <param name="noMindState">The state to use if the borg has no mind.</param>
-    /// <seealso cref="BorgChassisComponent.HasMindState"/>
-    /// <seealso cref="BorgChassisComponent.NoMindState"/>
+    /// <seealso cref="BorgChassisComponent.HasMindState" />
+    /// <seealso cref="BorgChassisComponent.NoMindState" />
     public void SetMindStates(Entity<BorgChassisComponent> borg, string hasMindState, string noMindState)
     {
         borg.Comp.HasMindState = hasMindState;

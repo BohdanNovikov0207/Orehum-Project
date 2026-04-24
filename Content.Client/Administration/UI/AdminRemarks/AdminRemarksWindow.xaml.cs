@@ -19,8 +19,8 @@ namespace Content.Client.Administration.UI.AdminRemarks;
 public sealed partial class AdminRemarksWindow : FancyWindow
 {
     [Dependency] private readonly IEntitySystemManager _entitySystem = default!;
-    private readonly SpriteSystem _sprites;
     private readonly Dictionary<(int, NoteType), AdminNotesLine> _inputs = new();
+    private readonly SpriteSystem _sprites;
 
     public AdminRemarksWindow()
     {

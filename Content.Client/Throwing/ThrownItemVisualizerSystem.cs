@@ -15,14 +15,13 @@ using Robust.Shared.Animations;
 namespace Content.Client.Throwing;
 
 /// <summary>
-///     Handles animating thrown items.
+/// Handles animating thrown items.
 /// </summary>
 public sealed class ThrownItemVisualizerSystem : EntitySystem
 {
+    private const string AnimationKey = "thrown-item";
     [Dependency] private readonly AnimationPlayerSystem _anim = default!;
     [Dependency] private readonly SpriteSystem _sprite = default!;
-
-    private const string AnimationKey = "thrown-item";
 
     public override void Initialize()
     {
@@ -85,7 +84,7 @@ public sealed class ThrownItemVisualizerSystem : EntitySystem
 
         length += TimeSpan.FromSeconds(ThrowingSystem.FlyTimePercentage);
         var scale = ent.Comp2.Scale;
-        var lenFloat = (float)length.TotalSeconds;
+        var lenFloat = (float) length.TotalSeconds;
 
         // TODO use like actual easings here
         return new Animation
@@ -101,11 +100,11 @@ public sealed class ThrownItemVisualizerSystem : EntitySystem
                     {
                         new AnimationTrackProperty.KeyFrame(scale, 0.0f),
                         new AnimationTrackProperty.KeyFrame(scale * 1.4f, lenFloat * 0.25f),
-                        new AnimationTrackProperty.KeyFrame(scale, lenFloat * 0.75f)
+                        new AnimationTrackProperty.KeyFrame(scale, lenFloat * 0.75f),
                     },
-                    InterpolationMode = AnimationInterpolationMode.Linear
-                }
-            }
+                    InterpolationMode = AnimationInterpolationMode.Linear,
+                },
+            },
         };
     }
 }

@@ -27,32 +27,18 @@ public sealed partial class SensorMonitoringWindow : FancyWindow, IComputerWindo
 {
     [Dependency] private readonly IGameTiming _gameTiming = default!;
     [Dependency] private readonly ILocalizationManager _loc = default!;
-
-    private TimeSpan _retentionTime;
     private readonly Dictionary<int, SensorData> _sensorData = new();
 
-    /// <summary>
-    /// <para>A shared array used to store vertices for drawing graphs in <see cref="GraphView"/>.
-    /// Prevents excessive allocations by reusing the same array across multiple graph views.</para>
-    /// <para>This effectively makes it so that each <see cref="SensorMonitoringWindow"/> has its own pooled array.</para>
-    /// </summary>
-    private Vector2[] _sharedVertices = [];
+    private TimeSpan _retentionTime;
 
     /// <summary>
-    /// Retrieves a shared array of vertices, ensuring that it has at least the requested size.
-    /// Assigns a new array of the requested size if the current shared array is smaller than the requested size.
+    ///     <para>
+    ///     A shared array used to store vertices for drawing graphs in <see cref="GraphView" />.
+    ///     Prevents excessive allocations by reusing the same array across multiple graph views.
+    ///     </para>
+    ///     <para>This effectively makes it so that each <see cref="SensorMonitoringWindow" /> has its own pooled array.</para>
     /// </summary>
-    /// <param name="requestedSize">The minimum number of vertices required in the shared array.</param>
-    /// <returns>An array of <see cref="System.Numerics.Vector2"/> representing the shared vertices.</returns>
-    /// <remarks>This does not prevent other threads from accessing the same shared pool.</remarks>
-    public Vector2[] GetSharedVertices(int requestedSize)
-    {
-        if (_sharedVertices.Length < requestedSize)
-        {
-            _sharedVertices = new Vector2[requestedSize];
-        }
-        return _sharedVertices;
-    }
+    private Vector2[] _sharedVertices = [];
 
     public SensorMonitoringWindow()
     {
@@ -72,7 +58,7 @@ public sealed partial class SensorMonitoringWindow : FancyWindow, IComputerWindo
             {
                 Name = netSensor.Name,
                 Address = netSensor.Address,
-                DeviceType = netSensor.DeviceType
+                DeviceType = netSensor.DeviceType,
             };
 
             _sensorData.Add(netSensor.NetId, sensor);
@@ -82,7 +68,7 @@ public sealed partial class SensorMonitoringWindow : FancyWindow, IComputerWindo
                 var stream = new SensorStream
                 {
                     Name = netStream.Name,
-                    Unit = netStream.Unit
+                    Unit = netStream.Unit,
                 };
 
                 sensor.Streams.Add(netStream.NetId, stream);
@@ -130,6 +116,20 @@ public sealed partial class SensorMonitoringWindow : FancyWindow, IComputerWindo
         Update();
     }
 
+    /// <summary>
+    /// Retrieves a shared array of vertices, ensuring that it has at least the requested size.
+    /// Assigns a new array of the requested size if the current shared array is smaller than the requested size.
+    /// </summary>
+    /// <param name="requestedSize">The minimum number of vertices required in the shared array.</param>
+    /// <returns>An array of <see cref="System.Numerics.Vector2" /> representing the shared vertices.</returns>
+    /// <remarks>This does not prevent other threads from accessing the same shared pool.</remarks>
+    public Vector2[] GetSharedVertices(int requestedSize)
+    {
+        if (_sharedVertices.Length < requestedSize)
+            _sharedVertices = new Vector2[requestedSize];
+        return _sharedVertices;
+    }
+
     private void Update()
     {
         Asdf.RemoveAllChildren();
@@ -145,7 +145,7 @@ public sealed partial class SensorMonitoringWindow : FancyWindow, IComputerWindo
                 Text = sensor.Address,
                 Margin = new Thickness(4, 0),
                 VerticalAlignment = VAlignment.Bottom,
-                StyleClasses = { StyleNano.StyleClassLabelSecondaryColor }
+                StyleClasses = { StyleNano.StyleClassLabelSecondaryColor },
             };
 
             Asdf.AddChild(new BoxContainer
@@ -153,8 +153,8 @@ public sealed partial class SensorMonitoringWindow : FancyWindow, IComputerWindo
                 Orientation = BoxContainer.LayoutOrientation.Horizontal, Children =
                 {
                     labelName,
-                    labelAddress
-                }
+                    labelAddress,
+                },
             });
 
             foreach (var stream in sensor.Streams.Values)
@@ -170,23 +170,22 @@ public sealed partial class SensorMonitoringWindow : FancyWindow, IComputerWindo
                     Children =
                     {
                         new Label { Text = stream.Name, StyleClasses = { "monospace" }, HorizontalExpand = true },
-                        new Label { Text = FormatValue(stream.Unit, lastSample.Value) }
-                    }
+                        new Label { Text = FormatValue(stream.Unit, lastSample.Value) },
+                    },
                 });
 
-                Asdf.AddChild(new GraphView(stream.Samples, startTime, curTime, maxValue * 1.1f, this) { MinHeight = 150 });
+                Asdf.AddChild(new GraphView(stream.Samples, startTime, curTime, maxValue * 1.1f, this)
+                    { MinHeight = 150 });
                 Asdf.AddChild(new PanelContainer { StyleClasses = { StyleBase.ClassLowDivider } });
             }
         }
     }
 
-    private string FormatValue(SensorUnit unit, float value)
-    {
-        return _loc.GetString(
+    private string FormatValue(SensorUnit unit, float value) =>
+        _loc.GetString(
             "sensor-monitoring-value-display",
             ("unit", unit.ToString()),
             ("value", value));
-    }
 
     private void CullOldSamples()
     {
@@ -206,27 +205,26 @@ public sealed partial class SensorMonitoringWindow : FancyWindow, IComputerWindo
 
     private sealed class SensorData
     {
-        public string Name = "";
+        public readonly Dictionary<int, SensorStream> Streams = new();
         public string Address = "";
         public SensorDeviceType DeviceType;
-
-        public readonly Dictionary<int, SensorStream> Streams = new();
+        public string Name = "";
     }
 
     private sealed class SensorStream
     {
+        public readonly Queue<SensorSample> Samples = new();
         public string Name = "";
         public SensorUnit Unit;
-        public readonly Queue<SensorSample> Samples = new();
     }
 
     private sealed class GraphView : Control
     {
-        private readonly Queue<SensorSample> _samples;
-        private readonly TimeSpan _startTime;
         private readonly TimeSpan _curTime;
         private readonly float _maxY;
         private readonly SensorMonitoringWindow _parentWindow;
+        private readonly Queue<SensorSample> _samples;
+        private readonly TimeSpan _startTime;
 
         public GraphView(Queue<SensorSample> samples,
             TimeSpan startTime,
@@ -246,7 +244,7 @@ public sealed partial class SensorMonitoringWindow : FancyWindow, IComputerWindo
         {
             base.Draw(handle);
 
-            var window = (float)(_curTime - _startTime).TotalSeconds;
+            var window = (float) (_curTime - _startTime).TotalSeconds;
             var countVtx = 0;
 
             var lastPoint = new Vector2(float.NaN, float.NaN);
@@ -256,10 +254,10 @@ public sealed partial class SensorMonitoringWindow : FancyWindow, IComputerWindo
 
             foreach (var (time, sample) in _samples)
             {
-                var relTime = (float)(time - _startTime).TotalSeconds;
+                var relTime = (float) (time - _startTime).TotalSeconds;
 
-                var posY = PixelHeight - (sample / _maxY) * PixelHeight;
-                var posX = (relTime / window) * PixelWidth;
+                var posY = PixelHeight - sample / _maxY * PixelHeight;
+                var posX = relTime / window * PixelWidth;
 
                 var newPoint = new Vector2(posX, posY);
 
@@ -277,6 +275,7 @@ public sealed partial class SensorMonitoringWindow : FancyWindow, IComputerWindo
 
                 lastPoint = newPoint;
             }
+
             handle.DrawPrimitives(DrawPrimitiveTopology.TriangleList,
                 vertices.AsSpan(0, countVtx),
                 Color.White.WithAlpha(0.1f));

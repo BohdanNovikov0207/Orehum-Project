@@ -12,8 +12,7 @@
                           HorizontalExpand="True"
                           VerticalExpand="True"
                           Margin="2">
-                <GridContainer Name="MenuList" Access="Public" Columns="2" HorizontalExpand="True">
-                </GridContainer>
+                <GridContainer Name="MenuList" Access="Public" Columns="2" HorizontalExpand="True" />
             </BoxContainer>
         </ScrollContainer>
     </PanelContainer>

@@ -15,8 +15,8 @@ namespace Content.Client.Materials;
 public sealed class MaterialStorageSystem : SharedMaterialStorageSystem
 {
     [Dependency] private readonly AppearanceSystem _appearance = default!;
-    [Dependency] private readonly TransformSystem _transform = default!;
     [Dependency] private readonly SpriteSystem _sprite = default!;
+    [Dependency] private readonly TransformSystem _transform = default!;
 
     public override void Initialize()
     {
@@ -45,9 +45,7 @@ public sealed class MaterialStorageSystem : SharedMaterialStorageSystem
                 _sprite.LayerSetColor((uid, args.Sprite), layer, insertingComp.MaterialColor.Value);
         }
         else
-        {
             _sprite.LayerSetVisible((uid, args.Sprite), layer, false);
-        }
     }
 
     public override bool TryInsertMaterialEntity(EntityUid user,
@@ -66,5 +64,5 @@ public sealed class MaterialStorageSystem : SharedMaterialStorageSystem
 
 public enum MaterialStorageVisualLayers : byte
 {
-    Inserting
+    Inserting,
 }

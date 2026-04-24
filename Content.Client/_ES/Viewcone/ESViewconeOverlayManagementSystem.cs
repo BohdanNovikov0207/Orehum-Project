@@ -1,35 +1,34 @@
 using Content.Client._ES.Viewcone.Overlays;
 using Content.Client.Eye;
 using Content.Shared._ES.Viewcone;
-using Content.Shared.MouseRotator;
 using Content.Shared.Ghost;
+using Content.Shared.MouseRotator;
 using Robust.Client.GameObjects;
 using Robust.Client.Graphics;
 using Robust.Client.Input;
 using Robust.Client.Player;
 using Robust.Shared.Map;
-using Robust.Shared.Physics;
 using Robust.Shared.Player;
 
 namespace Content.Client._ES.Viewcone;
 
 /// <summary>
-///     Handles adding and removing the viewcone overlays, as well as ferrying data between them
+/// Handles adding and removing the viewcone overlays, as well as ferrying data between them
 /// </summary>
 public sealed class ESViewconeOverlayManagementSystem : EntitySystem
 {
-    [Dependency] private readonly IPlayerManager _playerManager = default!;
-    [Dependency] private readonly IOverlayManager _overlayMan = default!;
-    [Dependency] private readonly IInputManager _input = default!;
-    [Dependency] private readonly IEyeManager _eye = default!;
+    private const float LerpHalfLife = 0.1f;
     [Dependency] private readonly IEntityManager _entMan = default!;
+    [Dependency] private readonly IEyeManager _eye = default!;
+    [Dependency] private readonly IInputManager _input = default!;
+    [Dependency] private readonly IOverlayManager _overlayMan = default!;
+    [Dependency] private readonly IPlayerManager _playerManager = default!;
     [Dependency] private readonly SharedTransformSystem _xform = default!;
     private ESViewconeConeOverlay _coneOverlay = default!;
-    private ESViewconeSetAlphaOverlay _setAlphaOverlay = default!;
     private ESViewconeResetAlphaOverlay _resetAlphaOverlay = default!;
 
+    private ESViewconeSetAlphaOverlay _setAlphaOverlay = default!;
 
-    private const float LerpHalfLife = 0.1f;
     // slightly balls state management, but
     // done so we don't have to requery within the same frame
     // this is always cleared at the end of resetting alpha
@@ -49,9 +48,9 @@ public sealed class ESViewconeOverlayManagementSystem : EntitySystem
         SubscribeLocalEvent<ESViewconeComponent, LocalPlayerAttachedEvent>(OnPlayerAttached);
         SubscribeLocalEvent<ESViewconeComponent, LocalPlayerDetachedEvent>(OnPlayerDetached);
 
-        _coneOverlay = new();
-        _setAlphaOverlay = new();
-        _resetAlphaOverlay = new();
+        _coneOverlay = new ESViewconeConeOverlay();
+        _setAlphaOverlay = new ESViewconeSetAlphaOverlay();
+        _resetAlphaOverlay = new ESViewconeResetAlphaOverlay();
     }
 
     public override void FrameUpdate(float frameTime)
@@ -73,7 +72,8 @@ public sealed class ESViewconeOverlayManagementSystem : EntitySystem
             {
                 var mousePos = _eye.PixelToMap(_input.MouseScreenPosition);
                 if (mousePos.MapId != MapId.Nullspace)
-                    playerAngle = (mousePos.Position - _xform.GetMapCoordinates(xform).Position).ToAngle() + Angle.FromDegrees(90);
+                    playerAngle = (mousePos.Position - _xform.GetMapCoordinates(xform).Position).ToAngle() +
+                                  Angle.FromDegrees(90);
 
                 viewcone.LastMouseRotationAngle = playerAngle;
             }
@@ -84,13 +84,9 @@ public sealed class ESViewconeOverlayManagementSystem : EntitySystem
                 // but, we should keep the old mouse angle for viewcone, at least until the real angle actually changes
                 if (MathHelper.CloseToPercent(viewcone.LastWorldRotationAngle, playerAngle, .001d)
                     && viewcone.LastWorldPos == position)
-                {
                     playerAngle = viewcone.LastMouseRotationAngle;
-                }
                 else
-                {
                     viewcone.LastMouseRotationAngle = 0f;
-                }
             }
 
             viewcone.LastWorldPos = position;
@@ -109,32 +105,26 @@ public sealed class ESViewconeOverlayManagementSystem : EntitySystem
             // framerate-independent lerp
             // https://twitter.com/FreyaHolmer/status/1757836988495847568
             // convert to angle first so we lerp thru shortestdistance
-            viewcone.ViewAngle = Angle.Lerp(viewcone.ViewAngle, viewcone.DesiredViewAngle.Value, 1f - MathF.Pow(2f, -(frameTime / LerpHalfLife)));
-
+            viewcone.ViewAngle = Angle.Lerp(viewcone.ViewAngle,
+                viewcone.DesiredViewAngle.Value,
+                1f - MathF.Pow(2f, -(frameTime / LerpHalfLife)));
         }
-
     }
 
     private void OnPlayerAttached(Entity<ESViewconeComponent> entity, ref LocalPlayerAttachedEvent args)
     {
         if (_entMan.HasComponent<GhostComponent>(entity.Owner))
-        {
             return;
-        }
         AddOverlays();
     }
 
-    private void OnPlayerDetached(Entity<ESViewconeComponent> entity, ref LocalPlayerDetachedEvent args)
-    {
+    private void OnPlayerDetached(Entity<ESViewconeComponent> entity, ref LocalPlayerDetachedEvent args) =>
         RemoveOverlays();
-    }
 
     private void OnConeManInit(Entity<ESViewconeComponent> entity, ref ComponentInit args)
     {
         if (_entMan.HasComponent<GhostComponent>(entity.Owner))
-        {
             return;
-        }
         if (_playerManager.LocalSession?.AttachedEntity == entity.Owner)
             AddOverlays();
     }
@@ -142,9 +132,7 @@ public sealed class ESViewconeOverlayManagementSystem : EntitySystem
     private void OnConeManShutdown(Entity<ESViewconeComponent> entity, ref ComponentShutdown args)
     {
         if (_playerManager.LocalSession?.AttachedEntity == entity.Owner)
-        {
             RemoveOverlays();
-        }
     }
 
     private void AddOverlays()

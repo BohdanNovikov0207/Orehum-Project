@@ -17,10 +17,7 @@ public sealed partial class NotekeeperUi : UIFragment
 {
     private NotekeeperUiFragment? _fragment;
 
-    public override Control GetUIFragmentRoot()
-    {
-        return _fragment!;
-    }
+    public override Control GetUIFragmentRoot() => _fragment!;
 
     public override void Setup(BoundUserInterface userInterface, EntityUid? fragmentOwner)
     {

@@ -7,8 +7,7 @@ using Content.Shared.Armor;
 
 namespace Content.Client.Armor;
 
-/// <inheritdoc/>
+/// <inheritdoc />
 public sealed class ArmorSystem : SharedArmorSystem
 {
-
 }

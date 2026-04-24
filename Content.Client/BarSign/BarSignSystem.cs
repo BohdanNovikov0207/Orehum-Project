@@ -33,12 +33,14 @@ public sealed class BarSignSystem : VisualizerSystem<BarSignComponent>
         UpdateAppearance(uid, component);
     }
 
-    protected override void OnAppearanceChange(EntityUid uid, BarSignComponent component, ref AppearanceChangeEvent args)
-    {
-        UpdateAppearance(uid, component, args.Component, args.Sprite);
-    }
+    protected override void OnAppearanceChange(EntityUid uid,
+        BarSignComponent component,
+        ref AppearanceChangeEvent args) => UpdateAppearance(uid, component, args.Component, args.Sprite);
 
-    private void UpdateAppearance(EntityUid id, BarSignComponent sign, AppearanceComponent? appearance = null, SpriteComponent? sprite = null)
+    private void UpdateAppearance(EntityUid id,
+        BarSignComponent sign,
+        AppearanceComponent? appearance = null,
+        SpriteComponent? sprite = null)
     {
         if (!Resolve(id, ref appearance, ref sprite))
             return;

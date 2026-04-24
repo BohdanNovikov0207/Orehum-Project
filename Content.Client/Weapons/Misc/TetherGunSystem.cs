@@ -22,13 +22,13 @@ namespace Content.Client.Weapons.Misc;
 public sealed class TetherGunSystem : SharedTetherGunSystem
 {
     [Dependency] private readonly IEyeManager _eyeManager = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly IInputManager _input = default!;
     [Dependency] private readonly IMapManager _mapManager = default!;
+    [Dependency] private readonly MapSystem _mapSystem = default!;
     [Dependency] private readonly IOverlayManager _overlay = default!;
     [Dependency] private readonly IPlayerManager _player = default!;
-    [Dependency] private readonly MapSystem _mapSystem = default!;
     [Dependency] private readonly SpriteSystem _sprite = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -54,11 +54,12 @@ public sealed class TetherGunSystem : SharedTetherGunSystem
         _overlay.RemoveOverlay<TetherGunOverlay>();
     }
 
-    protected override bool CanTether(EntityUid uid, BaseForceGunComponent component, EntityUid target, EntityUid? user)
-    {
+    protected override bool CanTether(EntityUid uid,
+        BaseForceGunComponent component,
+        EntityUid target,
+        EntityUid? user) =>
         // Need powercells predicted sadly :<
-        return false;
-    }
+        false;
 
     public override void Update(float frameTime)
     {
@@ -72,9 +73,7 @@ public sealed class TetherGunSystem : SharedTetherGunSystem
         if (player == null ||
             !TryGetTetherGun(player.Value, out _, out var gun) ||
             gun.TetherEntity == null)
-        {
             return;
-        }
 
         var mousePos = _input.MouseScreenPosition;
         var mouseWorldPos = _eyeManager.PixelToMap(mousePos);
@@ -85,44 +84,32 @@ public sealed class TetherGunSystem : SharedTetherGunSystem
         EntityCoordinates coords;
 
         if (_mapManager.TryFindGridAt(mouseWorldPos, out var gridUid, out _))
-        {
             coords = TransformSystem.ToCoordinates(gridUid, mouseWorldPos);
-        }
         else
-        {
             coords = TransformSystem.ToCoordinates(_mapSystem.GetMap(mouseWorldPos.MapId), mouseWorldPos);
-        }
 
         const float bufferDistance = 0.1f;
 
         if (TryComp(gun.TetherEntity, out TransformComponent? tetherXform) &&
             tetherXform.Coordinates.TryDistance(EntityManager, TransformSystem, coords, out var distance) &&
             distance < bufferDistance)
-        {
             return;
-        }
 
-        RaisePredictiveEvent(new RequestTetherMoveEvent()
+        RaisePredictiveEvent(new RequestTetherMoveEvent
         {
-            Coordinates = GetNetCoordinates(coords)
+            Coordinates = GetNetCoordinates(coords),
         });
     }
 
     private void OnTetheredStartup(EntityUid uid, TetheredComponent component, ComponentStartup args)
     {
         if (!TryComp<SpriteComponent>(uid, out var sprite))
-        {
             return;
-        }
 
         if (TryComp<ForceGunComponent>(component.Tetherer, out var force))
-        {
             _sprite.SetColor((uid, sprite), force.LineColor);
-        }
         else if (TryComp<TetherGunComponent>(component.Tetherer, out var tether))
-        {
             _sprite.SetColor((uid, sprite), tether.LineColor);
-        }
     }
 
     private void OnTetheredShutdown(EntityUid uid, TetheredComponent component, ComponentShutdown args)

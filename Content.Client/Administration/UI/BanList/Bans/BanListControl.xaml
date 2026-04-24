@@ -12,7 +12,7 @@ SPDX-License-Identifier: MIT
     <PanelContainer StyleClasses="BackgroundDark">
         <ScrollContainer>
             <BoxContainer Name="Bans" Access="Public" Orientation="Vertical">
-                <bans:BanListHeader Name="BansHeader"/>
+                <bans:BanListHeader Name="BansHeader" />
             </BoxContainer>
         </ScrollContainer>
     </PanelContainer>

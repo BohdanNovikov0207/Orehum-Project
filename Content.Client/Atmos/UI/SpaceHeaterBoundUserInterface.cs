@@ -13,7 +13,7 @@ using Robust.Client.UserInterface.Controls;
 namespace Content.Client.Atmos.UI;
 
 /// <summary>
-///     Initializes a <see cref="SpaceHeaterWindow"/> and updates it when new server messages are received.
+/// Initializes a <see cref="SpaceHeaterWindow" /> and updates it when new server messages are received.
 /// </summary>
 [UsedImplicitly]
 public sealed class SpaceHeaterBoundUserInterface : BoundUserInterface
@@ -45,25 +45,23 @@ public sealed class SpaceHeaterBoundUserInterface : BoundUserInterface
         SendMessage(new SpaceHeaterToggleMessage());
     }
 
-    private void OnTemperatureRangeChanged(float changeAmount)
-    {
+    private void OnTemperatureRangeChanged(float changeAmount) =>
         SendMessage(new SpaceHeaterChangeTemperatureMessage(changeAmount));
-    }
 
     private void OnModeChanged(OptionButton.ItemSelectedEventArgs args)
     {
         _window?.ModeSelector.SelectId(args.Id);
-        SendMessage(new SpaceHeaterChangeModeMessage((SpaceHeaterMode)args.Id));
+        SendMessage(new SpaceHeaterChangeModeMessage((SpaceHeaterMode) args.Id));
     }
 
     private void OnPowerLevelChange(RadioOptionItemSelectedEventArgs<int> args)
     {
         _window?.PowerLevelSelector.Select(args.Id);
-        SendMessage(new SpaceHeaterChangePowerLevelMessage((SpaceHeaterPowerLevel)args.Id));
+        SendMessage(new SpaceHeaterChangePowerLevelMessage((SpaceHeaterPowerLevel) args.Id));
     }
 
     /// <summary>
-    ///     Update the UI state based on server-sent info
+    /// Update the UI state based on server-sent info
     /// </summary>
     /// <param name="state"></param>
     protected override void UpdateState(BoundUserInterfaceState state)
@@ -73,8 +71,8 @@ public sealed class SpaceHeaterBoundUserInterface : BoundUserInterface
             return;
 
         _window.SetActive(cast.Enabled);
-        _window.ModeSelector.SelectId((int)cast.Mode);
-        _window.PowerLevelSelector.Select((int)cast.PowerLevel);
+        _window.ModeSelector.SelectId((int) cast.Mode);
+        _window.PowerLevelSelector.Select((int) cast.PowerLevel);
 
         _window.MinTemp = cast.MinTemperature;
         _window.MaxTemp = cast.MaxTemperature;

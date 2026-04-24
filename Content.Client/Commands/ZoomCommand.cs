@@ -5,13 +5,13 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Numerics;
 using Content.Client.Movement.Systems;
 using Content.Shared.Movement.Components;
 using JetBrains.Annotations;
 using Robust.Client.Graphics;
 using Robust.Client.Player;
 using Robust.Shared.Console;
-using System.Numerics;
 
 namespace Content.Client.Commands;
 
@@ -40,7 +40,7 @@ public sealed class ZoomCommand : LocalizedCommands
         }
 
         if (arg0 > 0)
-            zoom = new(arg0, arg0);
+            zoom = new Vector2(arg0, arg0);
         else
         {
             shell.WriteError(LocalizationManager.GetString($"cmd-{Command}-error"));

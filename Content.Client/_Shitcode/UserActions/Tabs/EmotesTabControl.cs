@@ -4,7 +4,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Linq;
-using System.Numerics;
 using Content.Goobstation.UIKit.UserActions.Controls;
 using Content.Shared.Chat;
 using Content.Shared.Chat.Prototypes;
@@ -23,13 +22,13 @@ namespace Content.Client._Shitcode.UserActions.Tabs;
 [GenerateTypedNameReferences]
 public sealed partial class EmotesTabControl : BaseTabControl
 {
+    private static readonly TimeSpan EmoteCooldown = TimeSpan.FromSeconds(0);
     [Dependency] private readonly EntityManager _entManager = default!;
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-    [Dependency] private readonly ISharedPlayerManager _playerManager = default!;
     [Dependency] private readonly IGameTiming _gameTiming = default!;
+    [Dependency] private readonly ISharedPlayerManager _playerManager = default!;
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
 
     private TimeSpan _lastEmoteTime;
-    private static readonly TimeSpan EmoteCooldown = TimeSpan.FromSeconds(0);
 
     public EmotesTabControl()
     {
@@ -63,14 +62,12 @@ public sealed partial class EmotesTabControl : BaseTabControl
         return true;
     }
 
-    private BoxContainer CreateNewRow()
-    {
-        return new BoxContainer
+    private BoxContainer CreateNewRow() =>
+        new()
         {
             Orientation = BoxContainer.LayoutOrientation.Horizontal,
             HorizontalExpand = true,
         };
-    }
 
     private IconButton CreateEmoteButton(EmotePrototype emote)
     {

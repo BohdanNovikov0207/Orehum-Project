@@ -26,8 +26,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                       Access="Public"
                       HorizontalAlignment="Center"
                       HorizontalExpand="True"
-                      Margin="10">
-        </BoxContainer>
+                      Margin="10" />
         <BoxContainer Name="DoubleStorageContainer"
                       Access="Public"
                       HorizontalAlignment="Stretch"
@@ -38,15 +37,13 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                           HorizontalAlignment="Left"
                           HorizontalExpand="True"
                           VerticalAlignment="Bottom"
-                          Margin="10">
-            </BoxContainer>
+                          Margin="10" />
             <BoxContainer Name="RightStorageContainer"
                           Access="Public"
                           HorizontalAlignment="Right"
                           HorizontalExpand="True"
                           VerticalAlignment="Bottom"
-                          Margin="10">
-            </BoxContainer>
+                          Margin="10" />
         </BoxContainer>
         <BoxContainer Orientation="Horizontal" Name="Hotbar" HorizontalAlignment="Center">
             <inventory:ItemSlotButtonContainer
@@ -57,23 +54,23 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                 VerticalExpand="False"
                 ExpandBackwards="True"
                 Columns="6"
-                HorizontalExpand="False"/>
+                HorizontalExpand="False" />
             <inventory:ItemStatusPanel
                 Name="StatusPanelRight"
                 HorizontalAlignment="Center" Margin="0 0 -2 2"
                 SetWidth="125"
-                SetHeight="60"/>
+                SetHeight="60" />
             <hands:HandsContainer
                 Name="HandContainer"
                 Access="Public"
                 HorizontalAlignment="Center"
                 HorizontalExpand="False"
-                ColumnLimit="6"/>
+                ColumnLimit="6" />
             <inventory:ItemStatusPanel
                 Name="StatusPanelLeft"
                 HorizontalAlignment="Center" Margin="-2 0 0 2"
                 SetWidth="125"
-                SetHeight="60"/>
+                SetHeight="60" />
             <inventory:ItemSlotButtonContainer
                 Name="MainHotbar"
                 SlotGroup="MainHotbar"
@@ -82,8 +79,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                 VerticalAlignment="Bottom"
                 HorizontalExpand="False"
                 ExpandBackwards="True"
-                Columns="6"
-                />
+                Columns="6" />
         </BoxContainer>
     </BoxContainer>
 </widgets:HotbarGui>

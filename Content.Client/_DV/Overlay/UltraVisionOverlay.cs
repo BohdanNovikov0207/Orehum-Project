@@ -7,24 +7,20 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Numerics;
+using Content.Shared.Abilities;
 using Robust.Client.Graphics;
 using Robust.Client.Player;
 using Robust.Shared.Enums;
 using Robust.Shared.Prototypes;
-using Content.Shared.Abilities;
-using System.Numerics;
 
 namespace Content.Client._DV.Overlays;
 
-public sealed partial class UltraVisionOverlay : Overlay
+public sealed class UltraVisionOverlay : Overlay
 {
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    [Dependency] private readonly IEntityManager _entityManager = default!;
     [Dependency] private readonly IPlayerManager _playerManager = default!;
-    [Dependency] IEntityManager _entityManager = default!;
-
-
-    public override bool RequestScreenTexture => true;
-    public override OverlaySpace Space => OverlaySpace.WorldSpace;
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     private readonly ShaderInstance _ultraVisionShader;
 
     public UltraVisionOverlay()
@@ -33,13 +29,15 @@ public sealed partial class UltraVisionOverlay : Overlay
         _ultraVisionShader = _prototypeManager.Index<ShaderPrototype>("UltraVision").Instance().Duplicate();
     }
 
+
+    public override bool RequestScreenTexture => true;
+    public override OverlaySpace Space => OverlaySpace.WorldSpace;
+
     protected override bool BeforeDraw(in OverlayDrawArgs args)
     {
         if (_playerManager.LocalEntity is not { Valid: true } player
             || !_entityManager.HasComponent<UltraVisionComponent>(player))
-        {
             return false;
-        }
 
         return base.BeforeDraw(in args);
     }

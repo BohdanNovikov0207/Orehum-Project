@@ -5,7 +5,7 @@ public enum AdminPlayerTabColorOption
     Off,
     Character,
     Roletype,
-    Both
+    Both,
 }
 
 public enum AdminPlayerTabRoleTypeOption
@@ -13,12 +13,12 @@ public enum AdminPlayerTabRoleTypeOption
     RoleType,
     Subtype,
     RoleTypeSubtype,
-    SubtypeRoleType
+    SubtypeRoleType,
 }
 
 public enum AdminPlayerTabSymbolOption
 {
     Off,
     Basic,
-    Specific
+    Specific,
 }

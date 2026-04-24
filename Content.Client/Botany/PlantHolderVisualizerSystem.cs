@@ -31,7 +31,9 @@ public sealed class PlantHolderVisualizerSystem : VisualizerSystem<PlantHolderVi
         _sprite.LayerSetVisible((uid, sprite), PlantHolderLayers.Plant, false);
     }
 
-    protected override void OnAppearanceChange(EntityUid uid, PlantHolderVisualsComponent component, ref AppearanceChangeEvent args)
+    protected override void OnAppearanceChange(EntityUid uid,
+        PlantHolderVisualsComponent component,
+        ref AppearanceChangeEvent args)
     {
         if (args.Sprite == null)
             return;

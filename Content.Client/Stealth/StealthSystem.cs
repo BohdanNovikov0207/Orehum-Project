@@ -94,8 +94,8 @@ public sealed class StealthSystem : SharedStealthSystem
     private static readonly ProtoId<ShaderPrototype> Shader = "Stealth";
 
     [Dependency] private readonly IPrototypeManager _protoMan = default!;
-    [Dependency] private readonly SharedTransformSystem _transformSystem = default!;
     [Dependency] private readonly SpriteSystem _sprite = default!;
+    [Dependency] private readonly SharedTransformSystem _transformSystem = default!;
 
     private ShaderInstance _shader = default!;
 
@@ -119,7 +119,10 @@ public sealed class StealthSystem : SharedStealthSystem
         SetShader(uid, value, component);
     }
 
-    private void SetShader(EntityUid uid, bool enabled, StealthComponent? component = null, SpriteComponent? sprite = null)
+    private void SetShader(EntityUid uid,
+        bool enabled,
+        StealthComponent? component = null,
+        SpriteComponent? sprite = null)
     {
         if (!Resolve(uid, ref component, ref sprite, false))
             return;
@@ -143,10 +146,8 @@ public sealed class StealthSystem : SharedStealthSystem
         }
     }
 
-    private void OnStartup(EntityUid uid, StealthComponent component, ComponentStartup args)
-    {
+    private void OnStartup(EntityUid uid, StealthComponent component, ComponentStartup args) =>
         SetShader(uid, component.Enabled, component);
-    }
 
     private void OnShutdown(EntityUid uid, StealthComponent component, ComponentShutdown args)
     {
@@ -178,6 +179,6 @@ public sealed class StealthSystem : SharedStealthSystem
         _shader.SetParameter("visibility", visibility);
 
         visibility = MathF.Max(0, visibility);
-        _sprite.SetColor((uid, args.Sprite), new Color(visibility, visibility, 1, 1));
+        _sprite.SetColor((uid, args.Sprite), new Color(visibility, visibility, 1));
     }
 }

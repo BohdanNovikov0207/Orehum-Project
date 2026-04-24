@@ -16,10 +16,10 @@ namespace Content.Client.UserInterface.Systems.Ghost.Controls.Roles;
 [GenerateTypedNameReferences]
 public sealed partial class GhostRoleEntryButtons : BoxContainer
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
     private readonly GhostRoleKind _ghostRoleKind;
     private readonly uint _playerCount;
     private readonly TimeSpan _raffleEndTime = TimeSpan.MinValue;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public GhostRoleEntryButtons(GhostRoleInfo ghostRoleInfo)
     {
@@ -45,7 +45,7 @@ public sealed partial class GhostRoleEntryButtons : BoxContainer
             GhostRoleKind.RaffleInProgress => "ghost-roles-window-raffle-in-progress-button",
             GhostRoleKind.RaffleJoined => "ghost-roles-window-leave-raffle-button",
             _ => throw new ArgumentOutOfRangeException(nameof(_ghostRoleKind),
-                $"Unknown {nameof(GhostRoleKind)} '{_ghostRoleKind}'")
+                $"Unknown {nameof(GhostRoleKind)} '{_ghostRoleKind}'"),
         };
 
         if (IsActiveRaffle(_ghostRoleKind))
@@ -58,22 +58,16 @@ public sealed partial class GhostRoleEntryButtons : BoxContainer
             RequestButton.Text = Loc.GetString(messageId, ("time", timeString), ("players", _playerCount));
         }
         else
-        {
             RequestButton.Text = Loc.GetString(messageId);
-        }
     }
 
-    private static bool IsActiveRaffle(GhostRoleKind kind)
-    {
-        return kind is GhostRoleKind.RaffleInProgress or GhostRoleKind.RaffleJoined;
-    }
+    private static bool IsActiveRaffle(GhostRoleKind kind) =>
+        kind is GhostRoleKind.RaffleInProgress or GhostRoleKind.RaffleJoined;
 
     protected override void FrameUpdate(FrameEventArgs args)
     {
         base.FrameUpdate(args);
         if (IsActiveRaffle(_ghostRoleKind))
-        {
             UpdateRequestButton();
-        }
     }
 }

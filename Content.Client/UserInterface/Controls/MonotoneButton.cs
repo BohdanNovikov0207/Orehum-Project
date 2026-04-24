@@ -1,6 +1,4 @@
-using JetBrains.Annotations;
 using Robust.Client.UserInterface.Controls;
-using static Robust.Client.UserInterface.Controls.Label;
 
 namespace Content.Client.UserInterface.Controls;
 
@@ -9,17 +7,17 @@ namespace Content.Client.UserInterface.Controls;
 /// </summary>
 public sealed class MonotoneButton : Button
 {
-    /// <summary>
-    /// Specifies the color of the label text when the button is pressed.
-    /// </summary>
-    [ViewVariables]
-    public Color AltTextColor { set; get; } = new Color(0.2f, 0.2f, 0.2f);
-
     public MonotoneButton()
     {
         RemoveStyleClass("button");
         UpdateAppearance();
     }
+
+    /// <summary>
+    /// Specifies the color of the label text when the button is pressed.
+    /// </summary>
+    [ViewVariables]
+    public Color AltTextColor { set; get; } = new(0.2f, 0.2f, 0.2f);
 
     private void UpdateAppearance()
     {

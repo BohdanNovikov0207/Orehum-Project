@@ -20,54 +20,6 @@ namespace Content.Client.UserInterface.Controls;
 [Virtual]
 public class RadialMenu : BaseWindow
 {
-    /// <summary>
-    /// Contextual button used to traverse through previous layers of the radial menu
-    /// </summary>
-    public RadialMenuContextualCentralTextureButton ContextualButton { get; }
-
-    /// <summary>
-    /// Button that represents outer area of menu (closes menu on outside clicks).
-    /// </summary>
-    public RadialMenuOuterAreaButton MenuOuterAreaButton { get; }
-
-    /// <summary>
-    /// Set a style class to be applied to the contextual button when it is set to move the user back through previous layers of the radial menu
-    /// </summary>
-    public string? BackButtonStyleClass
-    {
-        get
-        {
-            return _backButtonStyleClass;
-        }
-
-        set
-        {
-            _backButtonStyleClass = value;
-
-            if (_path.Count > 0 && ContextualButton != null && _backButtonStyleClass != null)
-                ContextualButton.SetOnlyStyleClass(_backButtonStyleClass);
-        }
-    }
-
-    /// <summary>
-    /// Set a style class to be applied to the contextual button when it will close the radial menu
-    /// </summary>
-    public string? CloseButtonStyleClass
-    {
-        get
-        {
-            return _closeButtonStyleClass;
-        }
-
-        set
-        {
-            _closeButtonStyleClass = value;
-
-            if (_path.Count == 0 && ContextualButton != null && _closeButtonStyleClass != null)
-                ContextualButton.SetOnlyStyleClass(_closeButtonStyleClass);
-        }
-    }
-
     private readonly List<Control> _path = new();
     private string? _backButtonStyleClass;
     private string? _closeButtonStyleClass;
@@ -89,8 +41,10 @@ public class RadialMenu : BaseWindow
         // Hide all starting children (if any) except the first (this is the active layer)
         if (ChildCount > 1)
         {
-            for (int i = 1; i < ChildCount; i++)
+            for (var i = 1; i < ChildCount; i++)
+            {
                 GetChild(i).Visible = false;
+            }
         }
 
         // Auto generate a contextual button for moving back through visited layers
@@ -115,6 +69,49 @@ public class RadialMenu : BaseWindow
         };
     }
 
+    /// <summary>
+    /// Contextual button used to traverse through previous layers of the radial menu
+    /// </summary>
+    public RadialMenuContextualCentralTextureButton ContextualButton { get; }
+
+    /// <summary>
+    /// Button that represents outer area of menu (closes menu on outside clicks).
+    /// </summary>
+    public RadialMenuOuterAreaButton MenuOuterAreaButton { get; }
+
+    /// <summary>
+    /// Set a style class to be applied to the contextual button when it is set to move the user back through previous layers
+    /// of the radial menu
+    /// </summary>
+    public string? BackButtonStyleClass
+    {
+        get => _backButtonStyleClass;
+
+        set
+        {
+            _backButtonStyleClass = value;
+
+            if (_path.Count > 0 && ContextualButton != null && _backButtonStyleClass != null)
+                ContextualButton.SetOnlyStyleClass(_backButtonStyleClass);
+        }
+    }
+
+    /// <summary>
+    /// Set a style class to be applied to the contextual button when it will close the radial menu
+    /// </summary>
+    public string? CloseButtonStyleClass
+    {
+        get => _closeButtonStyleClass;
+
+        set
+        {
+            _closeButtonStyleClass = value;
+
+            if (_path.Count == 0 && ContextualButton != null && _closeButtonStyleClass != null)
+                ContextualButton.SetOnlyStyleClass(_closeButtonStyleClass);
+        }
+    }
+
     private void SetupContextualButtonData(Control child)
     {
         if (child is RadialContainer { Visible: true } container)
@@ -134,9 +131,7 @@ public class RadialMenu : BaseWindow
 
         var currentLayer = GetCurrentActiveLayer();
         if (currentLayer != null)
-        {
             SetupContextualButtonData(currentLayer);
-        }
 
         return result;
     }
@@ -166,10 +161,8 @@ public class RadialMenu : BaseWindow
                 continue;
 
             // Hide layers which are not of interest
-            if (result == true || child != newLayer)
-            {
+            if (result || child != newLayer)
                 child.Visible = false;
-            }
 
             // Show the layer of interest
             else
@@ -196,9 +189,7 @@ public class RadialMenu : BaseWindow
         foreach (var child in Children)
         {
             if (child.Name == targetLayerControlName && child is RadialContainer)
-            {
                 return TryToMoveToNewLayer(child);
-            }
         }
 
         return false;
@@ -256,7 +247,7 @@ public class RadialMenuTextureButtonBase : TextureButton
 
 /// <summary>
 /// Special button for closing radial menu or going back between radial menu levels.
-/// Is looking like just <see cref="TextureButton "/> but considers whole space around
+/// Is looking like just <see cref="TextureButton " /> but considers whole space around
 /// itself (til radial menu buttons) as itself in case of clicking. But this 'effect'
 /// works only if control have parent, and ActiveContainer property is set.
 /// Also considers all space outside of radial menu buttons as itself for clicking.
@@ -271,9 +262,7 @@ public sealed class RadialMenuContextualCentralTextureButton : RadialMenuTexture
     protected override bool HasPoint(Vector2 point)
     {
         if (ParentCenter == null)
-        {
             return base.HasPoint(point);
-        }
 
         var distSquared = (point + Position - ParentCenter.Value).LengthSquared();
 
@@ -299,9 +288,7 @@ public sealed class RadialMenuOuterAreaButton : RadialMenuTextureButtonBase
         return false; // Goobstation edit
 
         if (ParentCenter == null)
-        {
             return base.HasPoint(point);
-        }
 
         var distSquared = (point + Position - ParentCenter.Value).LengthSquared();
 
@@ -316,17 +303,6 @@ public sealed class RadialMenuOuterAreaButton : RadialMenuTextureButtonBase
 public class RadialMenuTextureButton : RadialMenuTextureButtonBase
 {
     /// <summary>
-    /// Upon clicking this button the radial menu will be moved to the layer of this control.
-    /// </summary>
-    public Control? TargetLayer { get; set; }
-
-    /// <summary>
-    /// Other way to set navigation to other container, as <see cref="TargetLayer"/>,
-    /// but using <see cref="Control.Name"/> property of target <see cref="RadialContainer"/>.
-    /// </summary>
-    public string? TargetLayerControlName { get; set; }
-
-    /// <summary>
     /// A simple texture button that can move the user to a different layer within a radial menu
     /// </summary>
     public RadialMenuTextureButton()
@@ -334,6 +310,17 @@ public class RadialMenuTextureButton : RadialMenuTextureButtonBase
         EnableAllKeybinds = true;
         OnButtonUp += OnClicked;
     }
+
+    /// <summary>
+    /// Upon clicking this button the radial menu will be moved to the layer of this control.
+    /// </summary>
+    public Control? TargetLayer { get; set; }
+
+    /// <summary>
+    /// Other way to set navigation to other container, as <see cref="TargetLayer" />,
+    /// but using <see cref="Control.Name" /> property of target <see cref="RadialContainer" />.
+    /// </summary>
+    public string? TargetLayerControlName { get; set; }
 
     private void OnClicked(ButtonEventArgs args)
     {
@@ -346,13 +333,9 @@ public class RadialMenuTextureButton : RadialMenuTextureButtonBase
             return;
 
         if (TargetLayer != null)
-        {
             parent.TryToMoveToNewLayer(TargetLayer);
-        }
         else
-        {
             parent.TryToMoveToNewLayer(TargetLayerControlName!);
-        }
     }
 
     private RadialMenu? FindParentMultiLayerContainer(Control control)
@@ -372,59 +355,66 @@ public interface IRadialMenuItemWithSector
     /// <summary>
     /// Angle in radian where button sector should start.
     /// </summary>
-    public float AngleSectorFrom { set; }
+    float AngleSectorFrom { set; }
 
     /// <summary>
     /// Angle in radian where button sector should end.
     /// </summary>
-    public float AngleSectorTo { set; }
+    float AngleSectorTo { set; }
 
     /// <summary>
     /// Outer radius for drawing segment and pointer detection.
     /// </summary>
-    public float OuterRadius { set; }
+    float OuterRadius { set; }
 
     /// <summary>
     /// Outer radius for drawing segment and pointer detection.
     /// </summary>
-    public float InnerRadius { set; }
+    float InnerRadius { set; }
 
     /// <summary>
     /// Offset in radian by which menu button should be rotated.
     /// </summary>
-    public float AngleOffset { set; }
+    float AngleOffset { set; }
 
     /// <summary>
     /// Coordinates of center in parent component - button container.
     /// </summary>
-    public Vector2 ParentCenter { set; }
+    Vector2 ParentCenter { set; }
 }
 
 [Virtual]
 public class RadialMenuTextureButtonWithSector : RadialMenuTextureButton, IRadialMenuItemWithSector
 {
-    private Vector2[]? _sectorPointsForDrawing;
+    private float _angleOffset;
 
     private float _angleSectorFrom;
     private float _angleSectorTo;
-    private float _outerRadius;
-    private float _innerRadius;
-    private float _angleOffset;
-
-    private bool _isWholeCircle;
-    private Vector2? _parentCenter;
 
     private Color _backgroundColorSrgb = Color.ToSrgb(new Color(70, 73, 102, 128));
-    private Color _hoverBackgroundColorSrgb = Color.ToSrgb(new Color(87, 91, 127, 128));
     private Color _borderColorSrgb = Color.ToSrgb(new Color(173, 216, 230, 70));
+    private Color _hoverBackgroundColorSrgb = Color.ToSrgb(new Color(87, 91, 127, 128));
     private Color _hoverBorderColorSrgb = Color.ToSrgb(new Color(87, 91, 127, 128));
+    private float _innerRadius;
+
+    private bool _isWholeCircle;
+    private float _outerRadius;
+    private Vector2? _parentCenter;
+    private Vector2[]? _sectorPointsForDrawing;
+
+    /// <summary>
+    /// A simple texture button that can move the user to a different layer within a radial menu
+    /// </summary>
+    public RadialMenuTextureButtonWithSector()
+    {
+    }
 
     /// <summary>
     /// Marker, that controls if border of segment should be rendered. Is false by default.
     /// </summary>
     /// <remarks>
-    /// By default color of border is same as color of background. Use <see cref="BorderColor"/>
-    /// and <see cref="HoverBorderColor"/> to change it.
+    /// By default color of border is same as color of background. Use <see cref="BorderColor" />
+    /// and <see cref="HoverBorderColor" /> to change it.
     /// </remarks>
     public bool DrawBorder { get; set; } = false;
 
@@ -473,7 +463,7 @@ public class RadialMenuTextureButtonWithSector : RadialMenuTextureButton, IRadia
     /// Color of separator lines.
     /// Separator lines are used to visually separate sector of radial menu items.
     /// </summary>
-    public Color SeparatorColor { get; set; } = new Color(128, 128, 128, 128);
+    public Color SeparatorColor { get; set; } = new(128, 128, 128, 128);
 
     /// <inheritdoc />
     float IRadialMenuItemWithSector.AngleSectorFrom
@@ -507,22 +497,13 @@ public class RadialMenuTextureButtonWithSector : RadialMenuTextureButton, IRadia
     /// <inheritdoc />
     Vector2 IRadialMenuItemWithSector.ParentCenter { set => _parentCenter = value; }
 
-    /// <summary>
-    /// A simple texture button that can move the user to a different layer within a radial menu
-    /// </summary>
-    public RadialMenuTextureButtonWithSector()
-    {
-    }
-
     /// <inheritdoc />
     protected override void Draw(DrawingHandleScreen handle)
     {
         base.Draw(handle);
 
         if (_parentCenter == null)
-        {
             return;
-        }
 
         // draw sector where space that button occupies actually is
         var containerCenter = (_parentCenter.Value - Position) * UIScale;
@@ -535,7 +516,13 @@ public class RadialMenuTextureButtonWithSector : RadialMenuTextureButton, IRadia
                 ? _hoverBackgroundColorSrgb
                 : _backgroundColorSrgb;
 
-            DrawAnnulusSector(handle, containerCenter, _innerRadius * UIScale, _outerRadius * UIScale, angleFrom, angleTo, segmentColor);
+            DrawAnnulusSector(handle,
+                containerCenter,
+                _innerRadius * UIScale,
+                _outerRadius * UIScale,
+                angleFrom,
+                angleTo,
+                segmentColor);
         }
 
         if (DrawBorder)
@@ -543,22 +530,31 @@ public class RadialMenuTextureButtonWithSector : RadialMenuTextureButton, IRadia
             var borderColor = DrawMode == DrawModeEnum.Hover
                 ? _hoverBorderColorSrgb
                 : _borderColorSrgb;
-            DrawAnnulusSector(handle, containerCenter, _innerRadius * UIScale, _outerRadius * UIScale, angleFrom, angleTo, borderColor, false);
+            DrawAnnulusSector(handle,
+                containerCenter,
+                _innerRadius * UIScale,
+                _outerRadius * UIScale,
+                angleFrom,
+                angleTo,
+                borderColor,
+                false);
         }
 
         if (!_isWholeCircle && DrawBorder)
-        {
-            DrawSeparatorLines(handle, containerCenter, _innerRadius * UIScale, _outerRadius * UIScale, angleFrom, angleTo, SeparatorColor);
-        }
+            DrawSeparatorLines(handle,
+                containerCenter,
+                _innerRadius * UIScale,
+                _outerRadius * UIScale,
+                angleFrom,
+                angleTo,
+                SeparatorColor);
     }
 
     /// <inheritdoc />
     protected override bool HasPoint(Vector2 point)
     {
         if (_parentCenter == null)
-        {
             return base.HasPoint(point);
-        }
 
         var outerRadiusSquared = _outerRadius * _outerRadius;
         var innerRadiusSquared = _innerRadius * _innerRadius;
@@ -566,9 +562,7 @@ public class RadialMenuTextureButtonWithSector : RadialMenuTextureButton, IRadia
         var distSquared = (point + Position - _parentCenter.Value).LengthSquared();
         var isInRadius = distSquared < outerRadiusSquared && distSquared > innerRadiusSquared;
         if (!isInRadius)
-        {
             return false;
-        }
 
         // difference from the center of the parent to the `point`
         var pointFromParent = point + Position - _parentCenter.Value;
@@ -611,14 +605,12 @@ public class RadialMenuTextureButtonWithSector : RadialMenuTextureButton, IRadia
         const float minimalSegmentSize = MathF.Tau / 128f;
 
         var requestedSegmentSize = angleSectorTo - angleSectorFrom;
-        var segmentCount = (int)(requestedSegmentSize / minimalSegmentSize) + 1;
+        var segmentCount = (int) (requestedSegmentSize / minimalSegmentSize) + 1;
         var anglePerSegment = requestedSegmentSize / (segmentCount - 1);
 
         var bufferSize = segmentCount * 2;
         if (_sectorPointsForDrawing == null || _sectorPointsForDrawing.Length != bufferSize)
-        {
             _sectorPointsForDrawing ??= new Vector2[bufferSize];
-        }
 
         for (var i = 0; i < segmentCount; i++)
         {
@@ -673,8 +665,6 @@ public class RadialMenuTextureButtonWithSector : RadialMenuTextureButton, IRadia
         );
     }
 
-    private static bool IsWholeCircle(float angleSectorFrom, float angleSectorTo)
-    {
-        return new Angle(angleSectorFrom).EqualsApprox(new Angle(angleSectorTo));
-    }
+    private static bool IsWholeCircle(float angleSectorFrom, float angleSectorTo) =>
+        new Angle(angleSectorFrom).EqualsApprox(new Angle(angleSectorTo));
 }

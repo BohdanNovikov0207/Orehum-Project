@@ -17,19 +17,16 @@ namespace Content.Client.Mining;
 public sealed class MiningOverlay : Overlay
 {
     [Dependency] private readonly IEntityManager _entityManager = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly IPlayerManager _player = default!;
     private readonly EntityLookupSystem _lookup;
+    [Dependency] private readonly IPlayerManager _player = default!;
     private readonly SpriteSystem _sprite;
-    private readonly TransformSystem _xform;
 
     private readonly EntityQuery<SpriteComponent> _spriteQuery;
-    private readonly EntityQuery<TransformComponent> _xformQuery;
-
-    public override OverlaySpace Space => OverlaySpace.WorldSpace;
-    public override bool RequestScreenTexture => false;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     private readonly HashSet<Entity<MiningScannerViewableComponent>> _viewableEnts = new();
+    private readonly TransformSystem _xform;
+    private readonly EntityQuery<TransformComponent> _xformQuery;
 
     public MiningOverlay()
     {
@@ -42,6 +39,9 @@ public sealed class MiningOverlay : Overlay
         _spriteQuery = _entityManager.GetEntityQuery<SpriteComponent>();
         _xformQuery = _entityManager.GetEntityQuery<TransformComponent>();
     }
+
+    public override OverlaySpace Space => OverlaySpace.WorldSpace;
+    public override bool RequestScreenTexture => false;
 
     protected override void Draw(in OverlayDrawArgs args)
     {
@@ -90,12 +90,15 @@ public sealed class MiningOverlay : Overlay
 
             var alpha = animTime < viewerComp.AnimationDuration
                 ? 0
-                : (float)Math.Clamp((animTime - viewerComp.AnimationDuration) / viewerComp.AnimationDuration, 0f, 1f);
+                : (float) Math.Clamp((animTime - viewerComp.AnimationDuration) / viewerComp.AnimationDuration, 0f, 1f);
             var color = Color.White.WithAlpha(alpha);
 
-            handle.DrawTexture(texture, -(Vector2)texture.Size / 2f / EyeManager.PixelsPerMeter, layer.Rotation, modulate: color);
-
+            handle.DrawTexture(texture,
+                -(Vector2) texture.Size / 2f / EyeManager.PixelsPerMeter,
+                layer.Rotation,
+                color);
         }
+
         handle.SetTransform(Matrix3x2.Identity);
     }
 }

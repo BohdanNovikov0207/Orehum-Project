@@ -31,24 +31,24 @@ namespace Content.Client.Shuttles.UI;
 [Virtual]
 public partial class BaseShuttleControl : MapGridControl
 {
-    [Dependency] private readonly IParallelManager _parallel = default!;
-    protected readonly SharedMapSystem Maps;
-
-    protected readonly Font Font;
-
-    private GridDrawJob _drawJob;
-
-    // Cache grid drawing data as it can be expensive to build
-    public readonly Dictionary<EntityUid, GridDrawData> GridData = new();
+    private readonly List<(Vector2 Start, Vector2 End)> _edges = new();
+    private readonly HashSet<Vector2i> _gridNeighborSet = new();
 
     // Per-draw caching
     private readonly List<Vector2i> _gridTileList = new();
-    private readonly HashSet<Vector2i> _gridNeighborSet = new();
-    private readonly List<(Vector2 Start, Vector2 End)> _edges = new();
+
+    private readonly (DirectionFlag, Vector2i)[] _neighborDirections;
+    [Dependency] private readonly IParallelManager _parallel = default!;
+
+    protected readonly Font Font;
+
+    // Cache grid drawing data as it can be expensive to build
+    public readonly Dictionary<EntityUid, GridDrawData> GridData = new();
+    protected readonly SharedMapSystem Maps;
 
     private Vector2[] _allVertices = Array.Empty<Vector2>();
 
-    private (DirectionFlag, Vector2i)[] _neighborDirections;
+    private GridDrawJob _drawJob;
 
     public BaseShuttleControl() : this(32f, 32f, 32f)
     {
@@ -58,9 +58,11 @@ public partial class BaseShuttleControl : MapGridControl
     {
         RobustXamlLoader.Load(this);
         Maps = EntManager.System<SharedMapSystem>();
-        Font = new VectorFont(IoCManager.Resolve<IResourceCache>().GetResource<FontResource>("/Fonts/NotoSans/NotoSans-Regular.ttf"), 12);
+        Font = new VectorFont(IoCManager.Resolve<IResourceCache>()
+                .GetResource<FontResource>("/Fonts/NotoSans/NotoSans-Regular.ttf"),
+            12);
 
-        _drawJob = new GridDrawJob()
+        _drawJob = new GridDrawJob
         {
             ScaledVertices = _allVertices,
         };
@@ -111,14 +113,18 @@ public partial class BaseShuttleControl : MapGridControl
             var textDimensions = handle.GetDimensions(Font, text, UIScale);
 
             handle.DrawCircle(origin, scaledRadius, color, false);
-            handle.DrawString(Font, ScalePosition(new Vector2(0f, -radius)) - new Vector2(0f, textDimensions.Y), text, UIScale, color);
+            handle.DrawString(Font,
+                ScalePosition(new Vector2(0f, -radius)) - new Vector2(0f, textDimensions.Y),
+                text,
+                UIScale,
+                color);
         }
 
         const int gridLinesRadial = 8;
 
         for (var i = 0; i < gridLinesRadial; i++)
         {
-            Angle angle = (Math.PI / gridLinesRadial) * i;
+            Angle angle = Math.PI / gridLinesRadial * i;
             // TODO: Handle distance properly.
             var aExtent = angle.ToVec() * ScaledMinimapRadius * 1.42f;
             var lineColor = Color.MediumSpringGreen.WithAlpha(0.02f);
@@ -136,7 +142,11 @@ public partial class BaseShuttleControl : MapGridControl
     }
     // End Frontier Corvax
 
-    protected void DrawGrid(DrawingHandleScreen handle, Matrix3x2 gridToView, Entity<MapGridComponent> grid, Color color, float alpha = 0.01f)
+    protected void DrawGrid(DrawingHandleScreen handle,
+        Matrix3x2 gridToView,
+        Entity<MapGridComponent> grid,
+        Color color,
+        float alpha = 0.01f)
     {
         var rator = Maps.GetAllTilesEnumerator(grid.Owner, grid.Comp);
         var tileSize = grid.Comp.TileSize;
@@ -237,7 +247,7 @@ public partial class BaseShuttleControl : MapGridControl
                     var neighborFound = false;
                     var neighborIndex = 0;
                     Vector2 neighborStart;
-                    Vector2 neighborEnd = Vector2.Zero;
+                    var neighborEnd = Vector2.Zero;
 
                     // Does our end correspond with another start?
                     for (var j = i + 1; j < _edges.Count; j++)
@@ -294,40 +304,39 @@ public partial class BaseShuttleControl : MapGridControl
             var start = (int) (i * BatchSize);
             var end = (int) Math.Min(triCount, start + BatchSize);
             var count = end - start;
-            handle.DrawPrimitives(DrawPrimitiveTopology.TriangleList, new Span<Vector2>(_allVertices, start, count), color.WithAlpha(alpha));
+            handle.DrawPrimitives(DrawPrimitiveTopology.TriangleList,
+                new Span<Vector2>(_allVertices, start, count),
+                color.WithAlpha(alpha));
         }
 
-        handle.DrawPrimitives(DrawPrimitiveTopology.LineList, new Span<Vector2>(_allVertices, gridData.EdgeIndex, edgeCount), color);
+        handle.DrawPrimitives(DrawPrimitiveTopology.LineList,
+            new Span<Vector2>(_allVertices, gridData.EdgeIndex, edgeCount),
+            color);
     }
 
     private record struct GridDrawJob : IParallelRobustJob
     {
-        public int BatchSize => 64;
-
         public Matrix3x2 Matrix;
-
-        public List<Vector2> Vertices;
         public Vector2[] ScaledVertices;
 
-        public void Execute(int index)
-        {
-            ScaledVertices[index] = Vector2.Transform(Vertices[index], Matrix);
-        }
+        public List<Vector2> Vertices;
+        public int BatchSize => 64;
+
+        public void Execute(int index) => ScaledVertices[index] = Vector2.Transform(Vertices[index], Matrix);
     }
 }
 
 public sealed class GridDrawData
 {
-    /*
-     * List of lists because we use LineStrip and TriangleStrip respectively (less data to pass to the GPU).
-     */
-
-    public List<Vector2> Vertices = new();
-
     /// <summary>
     /// Vertices index from when edges start.
     /// </summary>
     public int EdgeIndex;
 
     public GameTick LastBuild;
+    /*
+     * List of lists because we use LineStrip and TriangleStrip respectively (less data to pass to the GPU).
+     */
+
+    public List<Vector2> Vertices = new();
 }

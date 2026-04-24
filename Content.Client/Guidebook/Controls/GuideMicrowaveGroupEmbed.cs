@@ -8,8 +8,8 @@ using System.Linq;
 using Content.Client.Guidebook.Richtext;
 using Content.Shared.Kitchen;
 using JetBrains.Annotations;
-using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface;
+using Robust.Client.UserInterface.Controls;
 using Robust.Shared.Prototypes;
 
 namespace Content.Client.Guidebook.Controls;
@@ -18,7 +18,7 @@ namespace Content.Client.Guidebook.Controls;
 /// Control for listing microwave recipes in a guidebook
 /// </summary>
 [UsedImplicitly]
-public sealed partial class GuideMicrowaveGroupEmbed : BoxContainer, IDocumentTag
+public sealed class GuideMicrowaveGroupEmbed : BoxContainer, IDocumentTag
 {
     [Dependency] private readonly IPrototypeManager _prototype = default!;
 

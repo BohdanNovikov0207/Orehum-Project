@@ -16,10 +16,7 @@ public sealed partial class MechGrabberUi : UIFragment
 {
     private MechGrabberUiFragment? _fragment;
 
-    public override Control GetUIFragmentRoot()
-    {
-        return _fragment!;
-    }
+    public override Control GetUIFragmentRoot() => _fragment!;
 
     public override void Setup(BoundUserInterface userInterface, EntityUid? fragmentOwner)
     {
@@ -31,7 +28,8 @@ public sealed partial class MechGrabberUi : UIFragment
         _fragment.OnEjectAction += e =>
         {
             var entManager = IoCManager.Resolve<IEntityManager>();
-            userInterface.SendMessage(new MechGrabberEjectMessage(entManager.GetNetEntity(fragmentOwner.Value), entManager.GetNetEntity(e)));
+            userInterface.SendMessage(new MechGrabberEjectMessage(entManager.GetNetEntity(fragmentOwner.Value),
+                entManager.GetNetEntity(e)));
         };
     }
 

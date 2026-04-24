@@ -274,7 +274,7 @@ public abstract partial class SharedDiseaseSystem : EntitySystem
     public bool TryInfect(Entity<DiseaseCarrierComponent?> ent, EntityUid disease, bool force = false)
     {
         if (force)
-            EnsureComp(ent, out ent.Comp);
+            EnsureComp<DiseaseCarrierComponent>(ent, out ent.Comp);
 
         if (!Resolve(ent, ref ent.Comp, false))
             return false;

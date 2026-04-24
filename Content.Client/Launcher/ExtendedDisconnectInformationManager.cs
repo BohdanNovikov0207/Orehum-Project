@@ -17,7 +17,7 @@ public sealed class ExtendedDisconnectInformationManager
 {
     [Dependency] private readonly IClientNetManager _clientNetManager = default!;
 
-    private NetDisconnectedArgs? _lastNetDisconnectedArgs = null;
+    private NetDisconnectedArgs? _lastNetDisconnectedArgs;
 
     public NetDisconnectedArgs? LastNetDisconnectedArgs
     {
@@ -33,13 +33,7 @@ public sealed class ExtendedDisconnectInformationManager
     // This may fire at an arbitrary time before or after whatever code that needs it.
     public event Action<NetDisconnectedArgs?>? LastNetDisconnectedArgsChanged;
 
-    public void Initialize()
-    {
-        _clientNetManager.Disconnect += OnNetDisconnect;
-    }
+    public void Initialize() => _clientNetManager.Disconnect += OnNetDisconnect;
 
-    private void OnNetDisconnect(object? sender, NetDisconnectedArgs args)
-    {
-        LastNetDisconnectedArgs = args;
-    }
+    private void OnNetDisconnect(object? sender, NetDisconnectedArgs args) => LastNetDisconnectedArgs = args;
 }

@@ -9,83 +9,72 @@ using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.XAML;
 using Robust.Shared.Input;
 
-namespace Content.Client.Administration.UI.Tabs.ObjectsTab
+namespace Content.Client.Administration.UI.Tabs.ObjectsTab;
+
+[GenerateTypedNameReferences]
+public sealed partial class ObjectsTabHeader : Control
 {
-    [GenerateTypedNameReferences]
-    public sealed partial class ObjectsTabHeader : Control
+    public enum Header
     {
-        public event Action<Header>? OnHeaderClicked;
+        ObjectName,
+        EntityID,
+    }
 
-        private const string ArrowUp = "↑";
-        private const string ArrowDown = "↓";
+    private const string ArrowUp = "↑";
+    private const string ArrowDown = "↓";
 
-        public ObjectsTabHeader()
+    public ObjectsTabHeader()
+    {
+        RobustXamlLoader.Load(this);
+
+        ObjectNameLabel.OnKeyBindDown += ObjectNameClicked;
+        EntityIDLabel.OnKeyBindDown += EntityIDClicked;
+    }
+
+    public event Action<Header>? OnHeaderClicked;
+
+    public Label GetHeader(Header header) =>
+        header switch
         {
-            RobustXamlLoader.Load(this);
+            Header.ObjectName => ObjectNameLabel,
+            Header.EntityID => EntityIDLabel,
+            _ => throw new ArgumentOutOfRangeException(nameof(header), header, null),
+        };
 
-            ObjectNameLabel.OnKeyBindDown += ObjectNameClicked;
-            EntityIDLabel.OnKeyBindDown += EntityIDClicked;
-        }
+    public void ResetHeaderText()
+    {
+        ObjectNameLabel.Text = Loc.GetString("object-tab-object-name");
+        EntityIDLabel.Text = Loc.GetString("object-tab-entity-id");
+    }
 
-        public Label GetHeader(Header header)
+    public void UpdateHeaderSymbols(Header headerClicked, bool ascending)
+    {
+        ResetHeaderText();
+        var arrow = ascending ? ArrowUp : ArrowDown;
+        GetHeader(headerClicked).Text += $" {arrow}";
+    }
+
+    private void HeaderClicked(GUIBoundKeyEventArgs args, Header header)
+    {
+        if (args.Function != EngineKeyFunctions.UIClick)
+            return;
+
+        OnHeaderClicked?.Invoke(header);
+        args.Handle();
+    }
+
+    private void ObjectNameClicked(GUIBoundKeyEventArgs args) => HeaderClicked(args, Header.ObjectName);
+
+    private void EntityIDClicked(GUIBoundKeyEventArgs args) => HeaderClicked(args, Header.EntityID);
+
+    protected override void Dispose(bool disposing)
+    {
+        base.Dispose(disposing);
+
+        if (disposing)
         {
-            return header switch
-            {
-                Header.ObjectName => ObjectNameLabel,
-                Header.EntityID => EntityIDLabel,
-                _ => throw new ArgumentOutOfRangeException(nameof(header), header, null)
-            };
-        }
-
-        public void ResetHeaderText()
-        {
-            ObjectNameLabel.Text = Loc.GetString("object-tab-object-name");
-            EntityIDLabel.Text = Loc.GetString("object-tab-entity-id");
-        }
-
-        public void UpdateHeaderSymbols(Header headerClicked, bool ascending)
-        {
-            ResetHeaderText();
-            var arrow = ascending ? ArrowUp : ArrowDown;
-            GetHeader(headerClicked).Text += $" {arrow}";
-        }
-
-        private void HeaderClicked(GUIBoundKeyEventArgs args, Header header)
-        {
-            if (args.Function != EngineKeyFunctions.UIClick)
-            {
-                return;
-            }
-
-            OnHeaderClicked?.Invoke(header);
-            args.Handle();
-        }
-
-        private void ObjectNameClicked(GUIBoundKeyEventArgs args)
-        {
-            HeaderClicked(args, Header.ObjectName);
-        }
-
-        private void EntityIDClicked(GUIBoundKeyEventArgs args)
-        {
-            HeaderClicked(args, Header.EntityID);
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
-
-            if (disposing)
-            {
-                ObjectNameLabel.OnKeyBindDown -= ObjectNameClicked;
-                EntityIDLabel.OnKeyBindDown -= EntityIDClicked;
-            }
-        }
-
-        public enum Header
-        {
-            ObjectName,
-            EntityID
+            ObjectNameLabel.OnKeyBindDown -= ObjectNameClicked;
+            EntityIDLabel.OnKeyBindDown -= EntityIDClicked;
         }
     }
 }

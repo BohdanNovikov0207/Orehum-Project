@@ -18,6 +18,9 @@ namespace Content.Client.Shuttles.Systems;
 
 public sealed partial class ShuttleSystem : SharedShuttleSystem
 {
+    private bool _enableShuttlePosition;
+    private EmergencyShuttleOverlay? _overlay;
+
     /// <summary>
     /// Should we show the expected emergency shuttle position.
     /// </summary>
@@ -26,7 +29,8 @@ public sealed partial class ShuttleSystem : SharedShuttleSystem
         get => _enableShuttlePosition;
         set
         {
-            if (_enableShuttlePosition == value) return;
+            if (_enableShuttlePosition == value)
+                return;
 
             _enableShuttlePosition = value;
             var overlayManager = IoCManager.Resolve<IOverlayManager>();
@@ -45,17 +49,12 @@ public sealed partial class ShuttleSystem : SharedShuttleSystem
         }
     }
 
-    private bool _enableShuttlePosition;
-    private EmergencyShuttleOverlay? _overlay;
-
-    private void InitializeEmergency()
-    {
-        SubscribeNetworkEvent<EmergencyShuttlePositionMessage>(OnShuttlePosMessage);
-    }
+    private void InitializeEmergency() => SubscribeNetworkEvent<EmergencyShuttlePositionMessage>(OnShuttlePosMessage);
 
     private void OnShuttlePosMessage(EmergencyShuttlePositionMessage ev)
     {
-        if (_overlay == null) return;
+        if (_overlay == null)
+            return;
 
         _overlay.StationUid = GetEntity(ev.StationUid);
         _overlay.Position = ev.Position;
@@ -69,17 +68,18 @@ public sealed class EmergencyShuttleOverlay : Overlay
 {
     private readonly EntityQuery<TransformComponent> _transformQuery;
     private readonly SharedTransformSystem _transformSystem;
-
-    public override OverlaySpace Space => OverlaySpace.WorldSpace;
-
-    public EntityUid? StationUid;
     public Box2? Position;
 
-    public EmergencyShuttleOverlay(EntityQuery<TransformComponent> transformQuery, SharedTransformSystem transformSystem)
+    public EntityUid? StationUid;
+
+    public EmergencyShuttleOverlay(EntityQuery<TransformComponent> transformQuery,
+        SharedTransformSystem transformSystem)
     {
         _transformQuery = transformQuery;
         _transformSystem = transformSystem;
     }
+
+    public override OverlaySpace Space => OverlaySpace.WorldSpace;
 
     protected override void Draw(in OverlayDrawArgs args)
     {

@@ -11,9 +11,8 @@ namespace Content.Client.PDA;
 [RegisterComponent]
 public sealed partial class PdaVisualsComponent : Component
 {
-    public string? BorderColor;
-
     public string? AccentHColor;
 
     public string? AccentVColor;
+    public string? BorderColor;
 }

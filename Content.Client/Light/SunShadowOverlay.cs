@@ -18,18 +18,18 @@ public sealed class SunShadowOverlay : Overlay
 {
     private static readonly ProtoId<ShaderPrototype> MixShader = "Mix";
 
-    public override OverlaySpace Space => OverlaySpace.BeforeLighting;
-
     [Dependency] private readonly IClyde _clyde = default!;
     [Dependency] private readonly IEntityManager _entManager = default!;
+    private readonly EntityLookupSystem _lookup;
     [Dependency] private readonly IMapManager _mapManager = default!;
     [Dependency] private readonly IPrototypeManager _protoManager = default!;
-    private readonly EntityLookupSystem _lookup;
-    private readonly SharedTransformSystem _xformSys;
 
     private readonly HashSet<Entity<SunShadowCastComponent>> _shadows = new();
+    private readonly SharedTransformSystem _xformSys;
 
     private IRenderTexture? _blurTarget;
+
+    private List<Entity<MapGridComponent>> _grids = new();
     private IRenderTexture? _target;
 
     public SunShadowOverlay()
@@ -40,7 +40,7 @@ public sealed class SunShadowOverlay : Overlay
         ZIndex = AfterLightTargetOverlay.ContentZIndex + 1;
     }
 
-    private List<Entity<MapGridComponent>> _grids = new();
+    public override OverlaySpace Space => OverlaySpace.BeforeLighting;
 
     protected override void Draw(in OverlayDrawArgs args)
     {
@@ -70,19 +70,19 @@ public sealed class SunShadowOverlay : Overlay
             if (_blurTarget?.Size != targetSize)
             {
                 _blurTarget = _clyde
-                    .CreateRenderTarget(targetSize, new RenderTargetFormatParameters(RenderTargetColorFormat.Rgba8Srgb), name: "sun-shadow-blur");
+                    .CreateRenderTarget(targetSize,
+                        new RenderTargetFormatParameters(RenderTargetColorFormat.Rgba8Srgb),
+                        name: "sun-shadow-blur");
             }
         }
 
-        var lightScale = viewport.LightRenderTarget.Size / (Vector2)viewport.Size;
+        var lightScale = viewport.LightRenderTarget.Size / (Vector2) viewport.Size;
         var scale = viewport.RenderScale / (Vector2.One / lightScale);
 
         foreach (var grid in _grids)
         {
             if (!_entManager.TryGetComponent(grid.Owner, out SunShadowComponent? sun))
-            {
                 continue;
-            }
 
             var direction = sun.Direction;
             var alpha = Math.Clamp(sun.Alpha, 0f, 1f);
@@ -161,7 +161,8 @@ public sealed class SunShadowOverlay : Overlay
                     worldHandle.UseShader(maskShader);
 
                     worldHandle.DrawTextureRect(_target.Texture, worldBounds, Color.Black.WithAlpha(alpha));
-                }, null);
+                },
+                null);
         }
     }
 }

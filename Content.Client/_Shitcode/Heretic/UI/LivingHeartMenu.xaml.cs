@@ -12,7 +12,6 @@
 using System.Numerics;
 using Content.Client.Lobby;
 using Content.Client.UserInterface.Controls;
-using Content.Shared.Heretic;
 using Robust.Client.Player;
 using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.XAML;
@@ -22,17 +21,12 @@ namespace Content.Client._Shitcode.Heretic.UI;
 
 public sealed class LivingHeartMenu : RadialMenu
 {
-    [Dependency] private readonly EntityManager _ent = default!;
-    [Dependency] private readonly IPrototypeManager _prot = default!;
-    [Dependency] private readonly IPlayerManager _player = default!;
-
     private readonly LobbyUIController _controller;
+    [Dependency] private readonly EntityManager _ent = default!;
 
     private readonly HereticSystem _heretic;
-
-    public EntityUid Entity { get; private set; }
-
-    public event Action<NetEntity>? SendActivateMessageAction;
+    [Dependency] private readonly IPlayerManager _player = default!;
+    [Dependency] private readonly IPrototypeManager _prot = default!;
 
     public LivingHeartMenu()
     {
@@ -43,6 +37,10 @@ public sealed class LivingHeartMenu : RadialMenu
         _heretic = _ent.System<HereticSystem>();
     }
 
+    public EntityUid Entity { get; private set; }
+
+    public event Action<NetEntity>? SendActivateMessageAction;
+
     public void SetEntity(EntityUid ent)
     {
         Entity = ent;
@@ -52,7 +50,8 @@ public sealed class LivingHeartMenu : RadialMenu
     private void UpdateUI()
     {
         var main = FindControl<RadialContainer>("Main");
-        if (main == null) return;
+        if (main == null)
+            return;
 
         var player = _player.LocalEntity;
 
@@ -83,6 +82,7 @@ public sealed class LivingHeartMenu : RadialMenu
 
             main.AddChild(button);
         }
+
         AddAction(main);
     }
 

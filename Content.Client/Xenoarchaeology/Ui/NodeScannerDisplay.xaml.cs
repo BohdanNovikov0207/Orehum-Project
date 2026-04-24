@@ -13,14 +13,13 @@ namespace Content.Client.Xenoarchaeology.Ui;
 [GenerateTypedNameReferences]
 public sealed partial class NodeScannerDisplay : FancyWindow
 {
-    [Dependency] private readonly IEntityManager _ent = default!;
-    [Dependency] private readonly IGameTiming _timing= default!;
-
     private readonly SharedXenoArtifactSystem _artifact;
+    [Dependency] private readonly IEntityManager _ent = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    private readonly HashSet<string> _triggeredNodeNames = new();
     private TimeSpan? _nextUpdate;
     private EntityUid _owner;
     private TimeSpan _updateFromAttachedFrequency;
-    private readonly HashSet<string> _triggeredNodeNames = new();
 
     public NodeScannerDisplay()
     {
@@ -33,7 +32,7 @@ public sealed partial class NodeScannerDisplay : FancyWindow
 
     /// <summary>
     /// Sets entity that represents hand-held xeno artifact node scanner for which window is opened.
-    /// Closes window if <see cref="NodeScannerComponent"/> is not present on entity.
+    /// Closes window if <see cref="NodeScannerComponent" /> is not present on entity.
     /// </summary>
     public void SetOwner(EntityUid scannerEntityUid)
     {
@@ -52,7 +51,7 @@ public sealed partial class NodeScannerDisplay : FancyWindow
     {
         base.FrameUpdate(args);
 
-        if(_nextUpdate  != null && _timing.CurTime < _nextUpdate)
+        if (_nextUpdate != null && _timing.CurTime < _nextUpdate)
             return;
 
         _nextUpdate = _timing.CurTime + _updateFromAttachedFrequency;
@@ -85,7 +84,8 @@ public sealed partial class NodeScannerDisplay : FancyWindow
             foreach (var triggeredIndex in triggeredIndexes)
             {
                 var node = _artifact.GetNode((attachedArtifactEnt, artifactComponent), triggeredIndex);
-                var triggeredNodeName = (_ent.GetComponentOrNull<NameIdentifierComponent>(node)?.Identifier ?? 0).ToString("D3");
+                var triggeredNodeName =
+                    (_ent.GetComponentOrNull<NameIdentifierComponent>(node)?.Identifier ?? 0).ToString("D3");
                 _triggeredNodeNames.Add(triggeredNodeName);
             }
 
@@ -123,7 +123,7 @@ public sealed partial class NodeScannerDisplay : FancyWindow
                     Text = nodeId,
                     Margin = new Thickness(15, 5, 0, 0),
                     MaxHeight = 40,
-                    Disabled = true
+                    Disabled = true,
                 };
                 ActiveNodesList.Children.Add(nodeLabel);
             }
@@ -136,9 +136,8 @@ public sealed partial class NodeScannerDisplay : FancyWindow
         }
     }
 
-    private string GetStateText(ArtifactState state)
-    {
-        return state switch
+    private string GetStateText(ArtifactState state) =>
+        state switch
         {
             ArtifactState.None => "\u2800", // placeholder for line to not be squeezed
             ArtifactState.Ready => Loc.GetString("node-scanner-artifact-state-ready"),
@@ -146,5 +145,4 @@ public sealed partial class NodeScannerDisplay : FancyWindow
             ArtifactState.Cooldown => Loc.GetString("node-scanner-artifact-state-cooldown"),
             _ => throw new ArgumentException("Invalid state"),
         };
-    }
 }

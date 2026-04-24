@@ -18,11 +18,11 @@ namespace Content.Client._EstacaoPirata.Cards.Hand;
 /// </summary>
 public sealed class CardHandSystem : EntitySystem
 {
-    private readonly Dictionary<Entity<CardHandComponent>, int> _notInit = [];
     [Dependency] private readonly CardSpriteSystem _cardSpriteSystem = default!;
+    private readonly Dictionary<Entity<CardHandComponent>, int> _notInit = [];
 
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         SubscribeLocalEvent<CardHandComponent, ComponentStartup>(OnComponentStartupEvent);
@@ -42,8 +42,9 @@ public sealed class CardHandSystem : EntitySystem
                 _notInit.Remove(ent);
                 continue;
             }
+
             _notInit[ent] = value + 1;
-            if(!TryComp(ent.Owner, out CardStackComponent? stack) || stack.Cards.Count <= 0)
+            if (!TryComp(ent.Owner, out CardStackComponent? stack) || stack.Cards.Count <= 0)
                 continue;
 
             // If cards were correctly initialized, we update the sprite
@@ -110,7 +111,7 @@ public sealed class CardHandSystem : EntitySystem
         }
         else
         {
-            var intervalAngle = comp.Angle / (cardCount-1);
+            var intervalAngle = comp.Angle / (cardCount - 1);
             var intervalSize = comp.XOffset / (cardCount - 1);
 
             _cardSpriteSystem.TryHandleLayerConfiguration(
@@ -118,8 +119,8 @@ public sealed class CardHandSystem : EntitySystem
                 cardCount,
                 (sprt, cardIndex, layerIndex) =>
                 {
-                    var angle = (-(comp.Angle/2)) + cardIndex * intervalAngle;
-                    var x = (-(comp.XOffset / 2)) + cardIndex * intervalSize;
+                    var angle = -(comp.Angle / 2) + cardIndex * intervalAngle;
+                    var x = -(comp.XOffset / 2) + cardIndex * intervalSize;
                     var y = -(x * x) + 0.10f;
 
                     sprt.Comp.LayerSetRotation(layerIndex, Angle.FromDegrees(-angle));
@@ -147,6 +148,7 @@ public sealed class CardHandSystem : EntitySystem
 
         UpdateSprite(entity, comp);
     }
+
     private void OnComponentStartupEvent(EntityUid uid, CardHandComponent comp, ComponentStartup args)
     {
         if (!TryComp(uid, out CardStackComponent? stack))
@@ -154,7 +156,8 @@ public sealed class CardHandSystem : EntitySystem
             _notInit[(uid, comp)] = 0;
             return;
         }
-        if(stack.Cards.Count <= 0)
+
+        if (stack.Cards.Count <= 0)
             _notInit[(uid, comp)] = 0;
         UpdateSprite(uid, comp);
     }

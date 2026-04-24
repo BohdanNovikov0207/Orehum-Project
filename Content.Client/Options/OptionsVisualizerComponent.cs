@@ -13,7 +13,6 @@ namespace Content.Client.Options;
 /// <remarks>
 /// A list of layer mappings is given that the component applies to,
 /// and it will pick one entry to apply based on the settings configuration. Example:
-///
 /// <code>
 /// - type: Sprite
 ///   sprite: Effects/optionsvisualizertest.rsi
@@ -33,8 +32,8 @@ namespace Content.Client.Options;
 ///       data: { state: both }
 /// </code>
 /// </remarks>
-/// <seealso cref="OptionsVisualizerSystem"/>
-/// <seealso cref="OptionVisualizerOptions"/>
+/// <seealso cref="OptionsVisualizerSystem" />
+/// <seealso cref="OptionVisualizerOptions" />
 [RegisterComponent]
 public sealed partial class OptionsVisualizerComponent : Component
 {
@@ -43,7 +42,7 @@ public sealed partial class OptionsVisualizerComponent : Component
     /// </summary>
     /// <remarks>
     /// Each layer stores an array of possible options. The last entry with a
-    /// <see cref="LayerDatum.Options"/> matching the active user preferences will be picked.
+    /// <see cref="LayerDatum.Options" /> matching the active user preferences will be picked.
     /// This allows choosing a priority if multiple entries are matched.
     /// </remarks>
     [DataField(required: true)]
@@ -78,12 +77,12 @@ public enum OptionVisualizerOptions
     Default = 0,
 
     /// <summary>
-    /// Corresponds to the <see cref="CCVars.DebugOptionVisualizerTest"/> CVar being set.
+    /// Corresponds to the <see cref="CCVars.DebugOptionVisualizerTest" /> CVar being set.
     /// </summary>
     Test = 1 << 0,
 
     /// <summary>
-    /// Corresponds to the <see cref="CCVars.ReducedMotion"/> CVar being set.
+    /// Corresponds to the <see cref="CCVars.ReducedMotion" /> CVar being set.
     /// </summary>
     ReducedMotion = 1 << 1,
 }

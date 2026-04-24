@@ -15,16 +15,17 @@ public sealed class AtmosAlarmableVisualsSystem : VisualizerSystem<AtmosAlarmabl
 {
     [Dependency] private readonly SpriteSystem _sprite = default!;
 
-    protected override void OnAppearanceChange(EntityUid uid, AtmosAlarmableVisualsComponent component, ref AppearanceChangeEvent args)
+    protected override void OnAppearanceChange(EntityUid uid,
+        AtmosAlarmableVisualsComponent component,
+        ref AppearanceChangeEvent args)
     {
-        if (args.Sprite == null || !_sprite.LayerMapTryGet((uid, args.Sprite), component.LayerMap, out var layer, false))
+        if (args.Sprite == null ||
+            !_sprite.LayerMapTryGet((uid, args.Sprite), component.LayerMap, out var layer, false))
             return;
 
         if (!args.AppearanceData.TryGetValue(PowerDeviceVisuals.Powered, out var poweredObject) ||
             poweredObject is not bool powered)
-        {
             return;
-        }
 
         if (component.HideOnDepowered != null)
         {
@@ -48,8 +49,6 @@ public sealed class AtmosAlarmableVisualsSystem : VisualizerSystem<AtmosAlarmabl
             && alarmTypeObject is AtmosAlarmType alarmType
             && powered
             && component.AlarmStates.TryGetValue(alarmType, out var state))
-        {
             _sprite.LayerSetRsiState((uid, args.Sprite), layer, new RSI.StateId(state));
-        }
     }
 }

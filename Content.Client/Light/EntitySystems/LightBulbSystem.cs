@@ -38,8 +38,6 @@ public sealed class LightBulbSystem : VisualizerSystem<LightBulbComponent>
 
         // also update sprites color
         if (AppearanceSystem.TryGetData<Color>(uid, LightBulbVisuals.Color, out var color, args.Component))
-        {
             _sprite.SetColor((uid, args.Sprite), color);
-        }
     }
 }

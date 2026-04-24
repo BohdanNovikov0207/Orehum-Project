@@ -18,11 +18,11 @@ namespace Content.Client._EstacaoPirata.Cards.Deck;
 /// </summary>
 public sealed class CardDeckSystem : EntitySystem
 {
-    private readonly Dictionary<Entity<CardDeckComponent>, int> _notInitialized = [];
     [Dependency] private readonly CardSpriteSystem _cardSpriteSystem = default!;
+    private readonly Dictionary<Entity<CardDeckComponent>, int> _notInitialized = [];
 
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         UpdatesOutsidePrediction = false;
@@ -56,14 +56,13 @@ public sealed class CardDeckSystem : EntitySystem
 
 
             // If the card was STILL not initialized, we skip it
-            if (!TryGetCardLayer(stack.Cards.Last(), out var _))
+            if (!TryGetCardLayer(stack.Cards.Last(), out _))
                 continue;
 
             // If cards were correctly initialized, we update the sprite
             UpdateSprite(ent.Owner, ent.Comp);
             _notInitialized.Remove(ent);
         }
-
     }
 
 
@@ -105,7 +104,7 @@ public sealed class CardDeckSystem : EntitySystem
             (_, cardIndex, layerIndex) =>
             {
                 sprite.LayerSetRotation(layerIndex, Angle.FromDegrees(90));
-                sprite.LayerSetOffset(layerIndex, new Vector2(0, (comp.YOffset * cardIndex)));
+                sprite.LayerSetOffset(layerIndex, new Vector2(0, comp.YOffset * cardIndex));
                 sprite.LayerSetScale(layerIndex, new Vector2(comp.Scale, comp.Scale));
                 return true;
             }
@@ -133,10 +132,9 @@ public sealed class CardDeckSystem : EntitySystem
         UpdateSprite(GetEntity(args.Stack), comp);
     }
 
-    private void OnAppearanceChanged(EntityUid uid, CardDeckComponent comp, AppearanceChangeEvent args)
-    {
+    private void OnAppearanceChanged(EntityUid uid, CardDeckComponent comp, AppearanceChangeEvent args) =>
         UpdateSprite(uid, comp);
-    }
+
     private void OnComponentStartupEvent(EntityUid uid, CardDeckComponent comp, ComponentStartup args)
     {
         if (!TryComp(uid, out CardStackComponent? stack))
@@ -145,7 +143,7 @@ public sealed class CardDeckSystem : EntitySystem
             return;
         }
 
-        if(stack.Cards.Count <= 0)
+        if (stack.Cards.Count <= 0)
             _notInitialized[(uid, comp)] = 0;
         UpdateSprite(uid, comp);
     }
@@ -159,5 +157,4 @@ public sealed class CardDeckSystem : EntitySystem
 
         UpdateSprite(entity, comp);
     }
-
 }

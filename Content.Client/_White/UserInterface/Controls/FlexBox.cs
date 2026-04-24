@@ -15,7 +15,7 @@ public class FlexBox : Container
         Center,
         Stretch,
         SpaceBetween,
-        SpaceAround
+        SpaceAround,
     }
 
     public enum FlexAlignItems
@@ -23,7 +23,7 @@ public class FlexBox : Container
         FlexStart,
         FlexEnd,
         Center,
-        Stretch
+        Stretch,
     }
 
     public enum FlexDirection
@@ -31,7 +31,7 @@ public class FlexBox : Container
         Row,
         RowReverse,
         Column,
-        ColumnReverse
+        ColumnReverse,
     }
 
     public enum FlexJustifyContent
@@ -41,14 +41,14 @@ public class FlexBox : Container
         Center,
         SpaceBetween,
         SpaceAround,
-        SpaceEvenly
+        SpaceEvenly,
     }
 
     public enum FlexWrap
     {
         NoWrap,
         Wrap,
-        WrapReverse
+        WrapReverse,
     }
 
     public const string StylePropertyGap = "gap";
@@ -72,6 +72,17 @@ public class FlexBox : Container
     private float ActualGap => GetStyleFloat(StylePropertyGap, GapOverride, DefaultGap);
     private float ActualRowGap => GetStyleFloat(StylePropertyRowGap, RowGapOverride, ActualGap);
     private float ActualColumnGap => GetStyleFloat(StylePropertyColumnGap, ColumnGapOverride, ActualGap);
+
+    private bool IsRow =>
+        Direction == FlexDirection.Row ||
+        Direction == FlexDirection.RowReverse;
+
+    private bool IsReverse =>
+        Direction == FlexDirection.RowReverse ||
+        Direction == FlexDirection.ColumnReverse;
+
+    private float MainGap => IsRow ? ActualColumnGap : ActualRowGap;
+    private float CrossGap => IsRow ? ActualRowGap : ActualColumnGap;
 
     private float GetStyleFloat(string property, float? overrideValue, float defaultValue)
     {
@@ -97,7 +108,9 @@ public class FlexBox : Container
             return Vector2.Zero;
 
         foreach (var child in children)
+        {
             child.Measure(Vector2.PositiveInfinity);
+        }
 
         var lines = BuildLines(children, availableSize);
 
@@ -122,21 +135,12 @@ public class FlexBox : Container
         PositionLines(lines, finalSize);
 
         foreach (var line in lines)
+        {
             PositionItems(line, finalSize);
+        }
 
         return finalSize;
     }
-
-    private bool IsRow =>
-        Direction == FlexDirection.Row ||
-        Direction == FlexDirection.RowReverse;
-
-    private bool IsReverse =>
-        Direction == FlexDirection.RowReverse ||
-        Direction == FlexDirection.ColumnReverse;
-
-    private float MainGap => IsRow ? ActualColumnGap : ActualRowGap;
-    private float CrossGap => IsRow ? ActualRowGap : ActualColumnGap;
 
     private List<FlexLine> BuildLines(
         List<Control> children,
@@ -193,7 +197,9 @@ public class FlexBox : Container
         float extraGap = 0;
 
         foreach (var l in lines)
+        {
             l.ExtraCrossSize = 0;
+        }
 
         switch (AlignContent)
         {
@@ -214,7 +220,10 @@ public class FlexBox : Container
             case FlexAlignContent.Stretch:
                 var add = free / lines.Count;
                 foreach (var l in lines)
+                {
                     l.ExtraCrossSize = add;
+                }
+
                 break;
         }
 
@@ -267,12 +276,16 @@ public class FlexBox : Container
         if (IsReverse)
         {
             for (var i = line.Items.Count - 1; i >= 0; i--)
+            {
                 PositionItem(line.Items[i]);
+            }
         }
         else
         {
             for (var i = 0; i < line.Items.Count; i++)
+            {
                 PositionItem(line.Items[i]);
+            }
         }
 
         return;
@@ -288,7 +301,7 @@ public class FlexBox : Container
             {
                 FlexAlignItems.Center => line.CrossPos + (line.FinalCrossSize - crossSize) / 2,
                 FlexAlignItems.FlexEnd => line.CrossPos + line.FinalCrossSize - crossSize,
-                _ => line.CrossPos
+                _ => line.CrossPos,
             };
 
             var rect = IsRow
@@ -312,10 +325,10 @@ public class FlexBox : Container
     private sealed class FlexLine
     {
         public readonly List<FlexItem> Items = new();
-        public float MainSize;
+        public float CrossPos;
         public float CrossSize;
         public float ExtraCrossSize;
-        public float CrossPos;
+        public float MainSize;
         public float FinalCrossSize => CrossSize + ExtraCrossSize;
 
         public void Add(Control c, float main, float cross, float gap)
@@ -332,8 +345,8 @@ public class FlexBox : Container
     private sealed class FlexItem
     {
         public readonly Control Control;
-        public readonly float MainSize;
         public readonly float CrossSize;
+        public readonly float MainSize;
 
         public FlexItem(Control c, float main, float cross)
         {

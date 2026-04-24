@@ -4,13 +4,13 @@
 //
 // SPDX-License-Identifier: MIT
 
+using System.Linq;
 using Content.Client.Disposal.Unit;
 using Content.Client.Power.EntitySystems;
 using Content.Shared.Disposal;
 using Content.Shared.Disposal.Components;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
-using System.Linq;
 
 namespace Content.Client.Disposal.Mailing;
 
@@ -23,13 +23,11 @@ public sealed class MailingUnitBoundUserInterface : BoundUserInterface
     {
     }
 
-    private void ButtonPressed(DisposalUnitComponent.UiButton button)
-    {
+    private void ButtonPressed(DisposalUnitComponent.UiButton button) =>
         SendMessage(new DisposalUnitComponent.UiButtonPressedMessage(button));
-        // If we get client-side power stuff then we can predict the button presses but for now we won't as it stuffs
-        // the pressure lerp up.
-    }
 
+    // If we get client-side power stuff then we can predict the button presses but for now we won't as it stuffs
+    // the pressure lerp up.
     private void TargetSelected(ItemList.ItemListSelectedEventArgs args)
     {
         var item = args.ItemList[args.ItemIndex];
@@ -77,10 +75,12 @@ public sealed class MailingUnitBoundUserInterface : BoundUserInterface
         //UnitTag.Text = state.Tag;
         MailingUnitWindow.Target.Text = entity.Comp.Target;
 
-        var entries = entity.Comp.TargetList.Select(target => new ItemList.Item(MailingUnitWindow.TargetListContainer) {
-            Text = target,
-            Selected = target == entity.Comp.Target
-        }).ToList();
+        var entries = entity.Comp.TargetList.Select(target => new ItemList.Item(MailingUnitWindow.TargetListContainer)
+            {
+                Text = target,
+                Selected = target == entity.Comp.Target,
+            })
+            .ToList();
         MailingUnitWindow.TargetListContainer.SetItems(entries);
     }
 }

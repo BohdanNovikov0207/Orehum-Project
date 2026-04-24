@@ -19,18 +19,25 @@ public sealed partial class TechnologyCardControl : Control
 {
     public Action? OnPressed;
 
-    public TechnologyCardControl(TechnologyPrototype technology, IPrototypeManager prototypeManager, SpriteSystem spriteSys, FormattedMessage description, int points, bool hasAccess)
+    public TechnologyCardControl(TechnologyPrototype technology,
+        IPrototypeManager prototypeManager,
+        SpriteSystem spriteSys,
+        FormattedMessage description,
+        int points,
+        bool hasAccess)
     {
         RobustXamlLoader.Load(this);
 
-        var discipline = prototypeManager.Index<TechDisciplinePrototype>(technology.Discipline);
+        var discipline = prototypeManager.Index(technology.Discipline);
         Background.ModulateSelfOverride = discipline.Color;
 
         DisciplineTexture.Texture = spriteSys.Frame0(discipline.Icon);
         TechnologyNameLabel.Text = Loc.GetString(technology.Name);
         var message = new FormattedMessage();
         message.AddMarkupOrThrow(Loc.GetString("research-console-tier-discipline-info",
-            ("tier", technology.Tier), ("color", discipline.Color), ("discipline", Loc.GetString(discipline.Name))));
+            ("tier", technology.Tier),
+            ("color", discipline.Color),
+            ("discipline", Loc.GetString(discipline.Name))));
         TierLabel.SetMessage(message);
         UnlocksLabel.SetMessage(description);
 

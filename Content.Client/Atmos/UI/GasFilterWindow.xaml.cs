@@ -23,104 +23,95 @@ using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.CustomControls;
 using Robust.Client.UserInterface.XAML;
 
-namespace Content.Client.Atmos.UI
+namespace Content.Client.Atmos.UI;
+
+/// <summary>
+/// Client-side UI used to control a gas filter.
+/// </summary>
+[GenerateTypedNameReferences]
+public sealed partial class GasFilterWindow : DefaultWindow
 {
-    /// <summary>
-    /// Client-side UI used to control a gas filter.
-    /// </summary>
-    [GenerateTypedNameReferences]
-    public sealed partial class GasFilterWindow : DefaultWindow
+    private readonly ButtonGroup _buttonGroup = new();
+    public string? CurrentGasId;
+
+    public bool FilterStatus = true;
+    public string? SelectedGas;
+
+    public GasFilterWindow()
     {
-        private readonly ButtonGroup _buttonGroup = new();
+        RobustXamlLoader.Load(this);
 
-        public bool FilterStatus = true;
-        public string? SelectedGas;
-        public string? CurrentGasId;
+        ToggleStatusButton.OnPressed += _ => SetFilterStatus(!FilterStatus);
+        ToggleStatusButton.OnPressed += _ => ToggleStatusButtonPressed?.Invoke();
 
-        public event Action? ToggleStatusButtonPressed;
-        public event Action<string>? FilterTransferRateChanged;
-        public event Action? SelectGasPressed;
-
-        public GasFilterWindow()
+        FilterTransferRateInput.OnTextChanged += _ => SetFilterRate.Disabled = false;
+        SetFilterRate.OnPressed += _ =>
         {
-            RobustXamlLoader.Load(this);
+            FilterTransferRateChanged?.Invoke(FilterTransferRateInput.Text);
+            SetFilterRate.Disabled = true;
+        };
 
-            ToggleStatusButton.OnPressed += _ => SetFilterStatus(!FilterStatus);
-            ToggleStatusButton.OnPressed += _ => ToggleStatusButtonPressed?.Invoke();
+        SelectGasButton.OnPressed += _ => SelectGasPressed?.Invoke();
 
-            FilterTransferRateInput.OnTextChanged += _ => SetFilterRate.Disabled = false;
-            SetFilterRate.OnPressed += _ =>
-            {
-                FilterTransferRateChanged?.Invoke(FilterTransferRateInput.Text);
-                SetFilterRate.Disabled = true;
-            };
+        GasList.OnItemSelected += GasListOnItemSelected;
+        GasList.OnItemDeselected += GasListOnItemDeselected;
+    }
 
-            SelectGasButton.OnPressed += _ => SelectGasPressed?.Invoke();
+    public event Action? ToggleStatusButtonPressed;
+    public event Action<string>? FilterTransferRateChanged;
+    public event Action? SelectGasPressed;
 
-            GasList.OnItemSelected += GasListOnItemSelected;
-            GasList.OnItemDeselected += GasListOnItemDeselected;
-        }
+    public void SetTransferRate(float rate) => FilterTransferRateInput.Text = rate.ToString(CultureInfo.CurrentCulture);
 
-        public void SetTransferRate(float rate)
+    public void SetFilterStatus(bool enabled)
+    {
+        FilterStatus = enabled;
+        if (enabled)
+            ToggleStatusButton.Text = Loc.GetString("comp-gas-filter-ui-status-enabled");
+        else
+            ToggleStatusButton.Text = Loc.GetString("comp-gas-filter-ui-status-disabled");
+    }
+
+    public void SetGasFiltered(string? id, string name)
+    {
+        CurrentGasId = id;
+        CurrentGasLabel.Text = Loc.GetString("comp-gas-filter-ui-filter-gas-current") + $" {name}";
+        GasList.ClearSelected();
+        SelectGasButton.Disabled = true;
+    }
+
+    public void PopulateGasList(IEnumerable<GasPrototype> gases)
+    {
+        GasList.Add(new ItemList.Item(GasList)
         {
-            FilterTransferRateInput.Text = rate.ToString(CultureInfo.CurrentCulture);
-        }
+            Metadata = null,
+            Text = Loc.GetString("comp-gas-filter-ui-filter-gas-none"),
+        });
 
-        public void SetFilterStatus(bool enabled)
+        foreach (var gas in gases)
         {
-            FilterStatus = enabled;
-            if (enabled)
-            {
-                ToggleStatusButton.Text = Loc.GetString("comp-gas-filter-ui-status-enabled");
-            }
-            else
-            {
-                ToggleStatusButton.Text = Loc.GetString("comp-gas-filter-ui-status-disabled");
-            }
+            var gasName = Loc.GetString(gas.Name);
+            GasList.Add(GetGasItem(gas.ID, gasName, GasList));
         }
+    }
 
-        public void SetGasFiltered(string? id, string name)
+    private static ItemList.Item GetGasItem(string id, string name, ItemList itemList) =>
+        new(itemList)
         {
-            CurrentGasId = id;
-            CurrentGasLabel.Text = Loc.GetString("comp-gas-filter-ui-filter-gas-current") + $" {name}";
-            GasList.ClearSelected();
-            SelectGasButton.Disabled = true;
-        }
+            Metadata = id,
+            Text = name,
+        };
 
-        public void PopulateGasList(IEnumerable<GasPrototype> gases)
-        {
-            GasList.Add(new ItemList.Item(GasList)
-            {
-                Metadata = null,
-                Text = Loc.GetString("comp-gas-filter-ui-filter-gas-none")
-            });
+    private void GasListOnItemSelected(ItemList.ItemListSelectedEventArgs obj)
+    {
+        SelectedGas = (string) obj.ItemList[obj.ItemIndex].Metadata!;
+        if (SelectedGas != CurrentGasId)
+            SelectGasButton.Disabled = false;
+    }
 
-            foreach (var gas in gases)
-            {
-                var gasName = Loc.GetString(gas.Name);
-                GasList.Add(GetGasItem(gas.ID, gasName, GasList));
-            }
-        }
-
-        private static ItemList.Item GetGasItem(string id, string name, ItemList itemList)
-        {
-            return new(itemList)
-            {
-                Metadata = id,
-                Text = name
-            };
-        }
-
-        private void GasListOnItemSelected(ItemList.ItemListSelectedEventArgs obj)
-        {
-            SelectedGas = (string) obj.ItemList[obj.ItemIndex].Metadata!;
-            if(SelectedGas != CurrentGasId) SelectGasButton.Disabled = false;
-        }
-
-        private void GasListOnItemDeselected(ItemList.ItemListDeselectedEventArgs obj)
-        {
-            SelectedGas = CurrentGasId;
-            SelectGasButton.Disabled = true;
-        }
+    private void GasListOnItemDeselected(ItemList.ItemListDeselectedEventArgs obj)
+    {
+        SelectedGas = CurrentGasId;
+        SelectGasButton.Disabled = true;
     }
 }

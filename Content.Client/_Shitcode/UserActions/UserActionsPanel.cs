@@ -13,7 +13,7 @@ namespace Content.Client._Shitcode.UserActions;
 [GenerateTypedNameReferences]
 public sealed partial class UserActionsPanel : Control
 {
-    private UserActionUIController _controller;
+    private readonly UserActionUIController _controller;
 
     public UserActionsPanel()
     {

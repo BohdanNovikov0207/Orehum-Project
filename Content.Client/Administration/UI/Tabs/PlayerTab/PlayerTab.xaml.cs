@@ -95,26 +95,23 @@ namespace Content.Client.Administration.UI.Tabs.PlayerTab;
 [GenerateTypedNameReferences]
 public sealed partial class PlayerTab : Control
 {
-    [Dependency] private readonly IEntityManager _entManager = default!;
-    [Dependency] private readonly IConfigurationManager _config = default!;
-    [Dependency] private readonly IPlayerManager _playerMan = default!;
-
     private const string ArrowUp = "↑";
     private const string ArrowDown = "↓";
-    private readonly Color _altColor = Color.FromHex("#292B38");
-    private readonly Color _defaultColor = Color.FromHex("#2F2F3B");
     private readonly AdminSystem _adminSystem;
-    private IReadOnlyList<PlayerInfo> _players = new List<PlayerInfo>();
+    private readonly Color _altColor = Color.FromHex("#292B38");
+    [Dependency] private readonly IConfigurationManager _config = default!;
+    private readonly Color _defaultColor = Color.FromHex("#2F2F3B");
+    [Dependency] private readonly IEntityManager _entManager = default!;
+    [Dependency] private readonly IPlayerManager _playerMan = default!;
+    private bool _ascending = true;
 
     private Header _headerClicked = Header.Username;
-    private bool _ascending = true;
-    private bool _showDisconnected;
+    private IReadOnlyList<PlayerInfo> _players = new List<PlayerInfo>();
 
     private AdminPlayerTabColorOption _playerTabColorSetting;
     private AdminPlayerTabRoleTypeOption _playerTabRoleSetting;
     private AdminPlayerTabSymbolOption _playerTabSymbolSetting;
-
-    public event Action<GUIBoundKeyEventArgs, ListData>? OnEntryKeyBindDown;
+    private bool _showDisconnected;
 
     public PlayerTab()
     {
@@ -143,34 +140,9 @@ public sealed partial class PlayerTab : Control
         SearchList.ItemKeyBindDown += (args, data) => OnEntryKeyBindDown?.Invoke(args, data);
 
         RefreshPlayerList(_adminSystem.PlayerList);
-
     }
 
-    #region Antag Overlay
-
-    private void OverlayEnabled()
-    {
-        OverlayButton.Pressed = true;
-    }
-
-    private void OverlayDisabled()
-    {
-        OverlayButton.Pressed = false;
-    }
-
-    private void OverlayButtonPressed(ButtonEventArgs args)
-    {
-        if (args.Button.Pressed)
-        {
-            _adminSystem.AdminOverlayOn();
-        }
-        else
-        {
-            _adminSystem.AdminOverlayOff();
-        }
-    }
-
-    #endregion
+    public event Action<GUIBoundKeyEventArgs, ListData>? OnEntryKeyBindDown;
 
     private void ShowDisconnectedPressed(ButtonEventArgs args)
     {
@@ -193,6 +165,22 @@ public sealed partial class PlayerTab : Control
             ListHeader.OnHeaderClicked -= HeaderClicked;
         }
     }
+
+    #region Antag Overlay
+
+    private void OverlayEnabled() => OverlayButton.Pressed = true;
+
+    private void OverlayDisabled() => OverlayButton.Pressed = false;
+
+    private void OverlayButtonPressed(ButtonEventArgs args)
+    {
+        if (args.Button.Pressed)
+            _adminSystem.AdminOverlayOn();
+        else
+            _adminSystem.AdminOverlayOff();
+    }
+
+    #endregion
 
     #region ListContainer
 
@@ -239,7 +227,7 @@ public sealed partial class PlayerTab : Control
 
     private void GenerateButton(ListData data, ListContainerButton button)
     {
-        if (data is not PlayerListData { Info: var player})
+        if (data is not PlayerListData { Info: var player })
             return;
 
         var entry = new PlayerTabEntry(
@@ -254,16 +242,16 @@ public sealed partial class PlayerTab : Control
     }
 
     /// <summary>
-    /// Determines whether <paramref name="filter"/> is contained in <paramref name="listData"/>.FilteringString.
+    /// Determines whether <paramref name="filter" /> is contained in <paramref name="listData" />.FilteringString.
     /// If all characters are lowercase, the comparison ignores case.
     /// If there is an uppercase character, the comparison is case sensitive.
     /// </summary>
     /// <param name="filter"></param>
     /// <param name="listData"></param>
-    /// <returns>Whether <paramref name="filter"/> is contained in <paramref name="listData"/>.FilteringString.</returns>
+    /// <returns>Whether <paramref name="filter" /> is contained in <paramref name="listData" />.FilteringString.</returns>
     private bool DataFilterCondition(string filter, ListData listData)
     {
-        if (listData is not PlayerListData {Info: var info, FilteringString: var playerString})
+        if (listData is not PlayerListData { Info: var info, FilteringString: var playerString })
             return false;
 
         if (!_showDisconnected && !info.Connected)
@@ -307,9 +295,7 @@ public sealed partial class PlayerTab : Control
     private int Compare(PlayerInfo x, PlayerInfo y)
     {
         if (!_ascending)
-        {
             (x, y) = (y, x);
-        }
 
         return _headerClicked switch
         {
@@ -318,21 +304,16 @@ public sealed partial class PlayerTab : Control
             Header.Job => Compare(x.StartingJob, y.StartingJob),
             Header.RoleType => y.SortWeight - x.SortWeight,
             Header.Playtime => TimeSpan.Compare(x.OverallPlaytime ?? default, y.OverallPlaytime ?? default),
-            _ => 1
+            _ => 1,
         };
     }
 
-    private int Compare(string x, string y)
-    {
-        return string.Compare(x, y, StringComparison.OrdinalIgnoreCase);
-    }
+    private int Compare(string x, string y) => string.Compare(x, y, StringComparison.OrdinalIgnoreCase);
 
     private void HeaderClicked(Header header)
     {
         if (_headerClicked == header)
-        {
             _ascending = !_ascending;
-        }
         else
         {
             _headerClicked = header;

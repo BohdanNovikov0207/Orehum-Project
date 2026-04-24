@@ -18,7 +18,7 @@ public sealed class TextLinkTag : IMarkupTagHandler
 {
     public string Name => "textlink";
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public bool TryCreateControl(MarkupNode node, [NotNullWhen(true)] out Control? control)
     {
         if (!node.Value.TryGetString(out var text)
@@ -67,5 +67,5 @@ public sealed class TextLinkTag : IMarkupTagHandler
 
 public interface ILinkClickHandler
 {
-    public void HandleClick(string link);
+    void HandleClick(string link);
 }

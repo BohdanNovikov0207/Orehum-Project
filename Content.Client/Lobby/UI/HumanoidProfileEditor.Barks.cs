@@ -3,8 +3,9 @@
 // SPDX-FileCopyrightText: 2025 pheenty <fedorlukin2006@gmail.com>
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
-using Content.Goobstation.Common.Barks;
+
 using System.Linq;
+using Content.Goobstation.Common.Barks;
 
 namespace Content.Client.Lobby.UI;
 
@@ -14,7 +15,6 @@ public sealed partial class HumanoidProfileEditor
 
     private void InitializeBarkVoice()
     {
-
         BarkVoiceButton.OnItemSelected += args =>
         {
             BarkVoiceButton.SelectId(args.Id);

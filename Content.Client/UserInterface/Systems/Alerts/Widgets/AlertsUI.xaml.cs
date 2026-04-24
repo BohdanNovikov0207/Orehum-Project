@@ -25,7 +25,7 @@ using Robust.Shared.Prototypes;
 namespace Content.Client.UserInterface.Systems.Alerts.Widgets;
 
 /// <summary>
-///     The status effects display on the right side of the screen.
+/// The status effects display on the right side of the screen.
 /// </summary>
 [GenerateTypedNameReferences]
 public sealed partial class AlertsUI : UIWidget
@@ -42,7 +42,7 @@ public sealed partial class AlertsUI : UIWidget
     public void SyncControls(AlertsSystem alertsSystem,
         AlertOrderPrototype? alertOrderPrototype,
         IReadOnlyDictionary<AlertKey,
-        AlertState> alertStates)
+            AlertState> alertStates)
     {
         // remove any controls with keys no longer present
         if (SyncRemoveControls(alertStates))
@@ -88,15 +88,18 @@ public sealed partial class AlertsUI : UIWidget
         return false;
     }
 
-    private void SyncUpdateControls(AlertsSystem alertsSystem, AlertOrderPrototype? alertOrderPrototype,
+    private void SyncUpdateControls(AlertsSystem alertsSystem,
+        AlertOrderPrototype? alertOrderPrototype,
         IReadOnlyDictionary<AlertKey, AlertState> alertStates)
     {
         foreach (var (alertKey, alertState) in alertStates)
         {
             if (!alertKey.AlertType.HasValue)
             {
-                Logger.WarningS("alert", "found alertkey without alerttype," +
-                                         " alert keys should never be stored without an alerttype set: {0}", alertKey);
+                Logger.WarningS("alert",
+                    "found alertkey without alerttype," +
+                    " alert keys should never be stored without an alerttype set: {0}",
+                    alertKey);
                 continue;
             }
 
@@ -144,9 +147,7 @@ public sealed partial class AlertsUI : UIWidget
                         AlertContainer.Children.Add(newAlertControl);
                 }
                 else
-                {
                     AlertContainer.Children.Add(newAlertControl);
-                }
 
                 _alertControls[newAlert.AlertKey] = newAlertControl;
             }
@@ -161,7 +162,7 @@ public sealed partial class AlertsUI : UIWidget
 
         var alertControl = new AlertControl(alert, alertState.Severity)
         {
-            Cooldown = cooldown
+            Cooldown = cooldown,
         };
         alertControl.OnPressed += AlertControlPressed;
         return alertControl;

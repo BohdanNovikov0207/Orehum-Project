@@ -44,10 +44,10 @@
 
 using System.Diagnostics.CodeAnalysis;
 using Content.Client.Power.Components;
-using Content.Shared.Power.Components;
-using Content.Shared.Power.EntitySystems;
 using Content.Shared.Examine;
 using Content.Shared.Power;
+using Content.Shared.Power.Components;
+using Content.Shared.Power.EntitySystems;
 using Robust.Shared.GameStates;
 
 namespace Content.Client.Power.EntitySystems;
@@ -61,10 +61,8 @@ public sealed class PowerReceiverSystem : SharedPowerReceiverSystem
         SubscribeLocalEvent<ApcPowerReceiverComponent, ComponentHandleState>(OnHandleState);
     }
 
-    private void OnExamined(Entity<ApcPowerReceiverComponent> ent, ref ExaminedEvent args)
-    {
+    private void OnExamined(Entity<ApcPowerReceiverComponent> ent, ref ExaminedEvent args) =>
         args.PushMarkup(GetExamineText(ent.Comp.Powered));
-    }
 
     private void OnHandleState(EntityUid uid, ApcPowerReceiverComponent component, ref ComponentHandleState args)
     {
@@ -87,7 +85,8 @@ public sealed class PowerReceiverSystem : SharedPowerReceiverSystem
         RaiseLocalEvent(entity.Owner, ref ev);
     }
 
-    public override bool ResolveApc(EntityUid entity, [NotNullWhen(true)] ref SharedApcPowerReceiverComponent? component)
+    public override bool ResolveApc(EntityUid entity,
+        [NotNullWhen(true)] ref SharedApcPowerReceiverComponent? component)
     {
         if (component != null)
             return true;

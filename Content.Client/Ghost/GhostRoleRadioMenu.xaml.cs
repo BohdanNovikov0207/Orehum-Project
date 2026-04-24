@@ -75,6 +75,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Numerics;
 using Content.Client.UserInterface.Controls;
 using Content.Shared.Ghost.Roles;
 using Content.Shared.Ghost.Roles.Components;
@@ -82,24 +83,23 @@ using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.XAML;
 using Robust.Shared.Prototypes;
-using System.Numerics;
 
 namespace Content.Client.Ghost;
 
-public sealed partial class GhostRoleRadioMenu : RadialMenu
+public sealed class GhostRoleRadioMenu : RadialMenu
 {
     [Dependency] private readonly EntityManager _entityManager = default!;
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-
-    public event Action<ProtoId<GhostRolePrototype>>? SendGhostRoleRadioMessageAction;
-
-    public EntityUid Entity { get; set; }
 
     public GhostRoleRadioMenu()
     {
         IoCManager.InjectDependencies(this);
         RobustXamlLoader.Load(this);
     }
+
+    public EntityUid Entity { get; set; }
+
+    public event Action<ProtoId<GhostRolePrototype>>? SendGhostRoleRadioMessageAction;
 
     public void SetEntity(EntityUid uid)
     {
@@ -126,19 +126,19 @@ public sealed partial class GhostRoleRadioMenu : RadialMenu
             if (!_prototypeManager.TryIndex<GhostRolePrototype>(ghostRoleProtoString, out var ghostRoleProto))
                 continue;
 
-            var button = new GhostRoleRadioMenuButton()
+            var button = new GhostRoleRadioMenuButton
             {
                 SetSize = new Vector2(64, 64),
                 ToolTip = Loc.GetString(ghostRoleProto.Name),
                 ProtoId = ghostRoleProto.ID,
             };
 
-            var entProtoView = new EntityPrototypeView()
+            var entProtoView = new EntityPrototypeView
             {
                 SetSize = new Vector2(48, 48),
                 VerticalAlignment = VAlignment.Center,
                 HorizontalAlignment = HAlignment.Center,
-                Stretch = SpriteView.StretchMode.Fill
+                Stretch = SpriteView.StretchMode.Fill,
             };
 
             // pick the icon if it exists, otherwise fallback to the ghost role's entity

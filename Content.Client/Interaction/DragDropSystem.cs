@@ -130,26 +130,6 @@ namespace Content.Client.Interaction;
 /// </summary>
 public sealed class DragDropSystem : SharedDragDropSystem
 {
-    private static readonly ProtoId<ShaderPrototype> ShaderDropTargetInRange = "SelectionOutlineInrange";
-
-    private static readonly ProtoId<ShaderPrototype> ShaderDropTargetOutOfRange = "SelectionOutline";
-
-    [Dependency] private readonly IStateManager _stateManager = default!;
-    [Dependency] private readonly IInputManager _inputManager = default!;
-    [Dependency] private readonly IEyeManager _eyeManager = default!;
-    [Dependency] private readonly IPlayerManager _playerManager = default!;
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-    [Dependency] private readonly IConfigurationManager _cfgMan = default!;
-    [Dependency] private readonly InteractionOutlineSystem _outline = default!;
-    [Dependency] private readonly SharedInteractionSystem _interactionSystem = default!;
-    [Dependency] private readonly CombatModeSystem _combatMode = default!;
-    [Dependency] private readonly InputSystem _inputSystem = default!;
-    [Dependency] private readonly ActionBlockerSystem _actionBlockerSystem = default!;
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly SharedTransformSystem _transformSystem = default!;
-    [Dependency] private readonly SpriteSystem _sprite = default!;
-
     // how often to recheck possible targets (prevents calling expensive
     // check logic each update)
     private const float TargetRecheckInterval = 0.25f;
@@ -158,6 +138,27 @@ public sealed class DragDropSystem : SharedDragDropSystem
     // amount of time since the mousedown, we will "replay" the original
     // mousedown event so it can be treated like a regular click
     private const float MaxMouseDownTimeForReplayingClick = 0.85f;
+    private static readonly ProtoId<ShaderPrototype> ShaderDropTargetInRange = "SelectionOutlineInrange";
+
+    private static readonly ProtoId<ShaderPrototype> ShaderDropTargetOutOfRange = "SelectionOutline";
+    [Dependency] private readonly ActionBlockerSystem _actionBlockerSystem = default!;
+    [Dependency] private readonly IConfigurationManager _cfgMan = default!;
+    [Dependency] private readonly CombatModeSystem _combatMode = default!;
+    [Dependency] private readonly IEyeManager _eyeManager = default!;
+
+    private readonly List<SpriteComponent> _highlightedSprites = new();
+    [Dependency] private readonly IInputManager _inputManager = default!;
+    [Dependency] private readonly InputSystem _inputSystem = default!;
+    [Dependency] private readonly SharedInteractionSystem _interactionSystem = default!;
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
+    [Dependency] private readonly InteractionOutlineSystem _outline = default!;
+    [Dependency] private readonly IPlayerManager _playerManager = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    [Dependency] private readonly SpriteSystem _sprite = default!;
+
+    [Dependency] private readonly IStateManager _stateManager = default!;
+    [Dependency] private readonly SharedTransformSystem _transformSystem = default!;
 
     /// <summary>
     /// Current entity being dragged around.
@@ -169,20 +170,8 @@ public sealed class DragDropSystem : SharedDragDropSystem
     /// </summary>
     private EntityUid? _dragShadow;
 
-    /// <summary>
-    /// Time since mouse down over the dragged entity
-    /// </summary>
-    private float _mouseDownTime;
-
-    /// <summary>
-    /// how much time since last recheck of all possible targets
-    /// </summary>
-    private float _targetRecheckTime;
-
-    /// <summary>
-    /// Reserved initial mousedown event so we can replay it if no drag ends up being performed
-    /// </summary>
-    private PointerInputCmdHandler.PointerInputCmdArgs? _savedMouseDown;
+    private ShaderInstance? _dropTargetInRangeShader;
+    private ShaderInstance? _dropTargetOutOfRangeShader;
 
     /// <summary>
     /// Whether we are currently replaying the original mouse down, so we
@@ -190,19 +179,29 @@ public sealed class DragDropSystem : SharedDragDropSystem
     /// </summary>
     private bool _isReplaying;
 
-    public float Deadzone;
-
-    private DragState _state = DragState.NotDragging;
-
     /// <summary>
     /// screen pos where the mouse down began for the drag
     /// </summary>
     private ScreenCoordinates? _mouseDownScreenPos;
 
-    private ShaderInstance? _dropTargetInRangeShader;
-    private ShaderInstance? _dropTargetOutOfRangeShader;
+    /// <summary>
+    /// Time since mouse down over the dragged entity
+    /// </summary>
+    private float _mouseDownTime;
 
-    private readonly List<SpriteComponent> _highlightedSprites = new();
+    /// <summary>
+    /// Reserved initial mousedown event so we can replay it if no drag ends up being performed
+    /// </summary>
+    private PointerInputCmdHandler.PointerInputCmdArgs? _savedMouseDown;
+
+    private DragState _state = DragState.NotDragging;
+
+    /// <summary>
+    /// how much time since last recheck of all possible targets
+    /// </summary>
+    private float _targetRecheckTime;
+
+    public float Deadzone;
 
     public override void Initialize()
     {
@@ -216,14 +215,13 @@ public sealed class DragDropSystem : SharedDragDropSystem
         _dropTargetOutOfRangeShader = _prototypeManager.Index(ShaderDropTargetOutOfRange).Instance();
         // needs to fire on mouseup and mousedown so we can detect a drag / drop
         CommandBinds.Builder
-            .BindBefore(EngineKeyFunctions.Use, new PointerInputCmdHandler(OnUse, false, true), new[] { typeof(SharedInteractionSystem) })
+            .BindBefore(EngineKeyFunctions.Use,
+                new PointerInputCmdHandler(OnUse, false, true),
+                typeof(SharedInteractionSystem))
             .Register<DragDropSystem>();
     }
 
-    private void SetDeadZone(float deadZone)
-    {
-        Deadzone = deadZone;
-    }
+    private void SetDeadZone(float deadZone) => Deadzone = deadZone;
 
     public override void Shutdown()
     {
@@ -243,14 +241,10 @@ public sealed class DragDropSystem : SharedDragDropSystem
             return false;
 
         if (args.State == BoundKeyState.Down)
-        {
             return OnUseMouseDown(args);
-        }
 
         if (args.State == BoundKeyState.Up)
-        {
             return OnUseMouseUp(args);
-        }
 
         return false;
     }
@@ -280,9 +274,7 @@ public sealed class DragDropSystem : SharedDragDropSystem
     {
         if (args.Session?.AttachedEntity is not { Valid: true } dragger ||
             _combatMode.IsInCombatMode())
-        {
             return false;
-        }
 
         // cancel any current dragging if there is one (shouldn't be because they would've had to have lifted
         // the mouse, canceling the drag, but just being cautious)
@@ -293,21 +285,17 @@ public sealed class DragDropSystem : SharedDragDropSystem
         // possibly initiating a drag
         // check if the clicked entity is draggable
         if (!Exists(entity))
-        {
             return false;
-        }
 
         // check if the entity is reachable
         if (!_interactionSystem.InRangeUnobstructed(dragger, entity))
-        {
             return false;
-        }
 
         var ev = new CanDragEvent();
 
         RaiseLocalEvent(entity, ref ev);
 
-        if (ev.Handled != true)
+        if (!ev.Handled)
             return false;
 
         _draggedEntity = entity;
@@ -321,7 +309,6 @@ public sealed class DragDropSystem : SharedDragDropSystem
         _savedMouseDown = args;
 
         return true;
-
     }
 
     private void StartDrag()
@@ -353,17 +340,17 @@ public sealed class DragDropSystem : SharedDragDropSystem
             dragSprite.RenderOrder = EntityManager.CurrentTick.Value;
             _sprite.SetColor((_dragShadow.Value, dragSprite), dragSprite.Color.WithAlpha(0.7f));
             // keep it on top of everything
-            _sprite.SetDrawDepth((_dragShadow.Value, dragSprite), (int)DrawDepth.Overlays);
+            _sprite.SetDrawDepth((_dragShadow.Value, dragSprite), (int) DrawDepth.Overlays);
             if (!dragSprite.NoRotation)
-            {
-                _transformSystem.SetWorldRotationNoLerp(_dragShadow.Value, _transformSystem.GetWorldRotation(_draggedEntity.Value));
-            }
+                _transformSystem.SetWorldRotationNoLerp(_dragShadow.Value,
+                    _transformSystem.GetWorldRotation(_draggedEntity.Value));
 
             // drag initiated
             return;
         }
 
-        Log.Warning($"Unable to display drag shadow for {ToPrettyString(_draggedEntity.Value)} because it has no sprite component.");
+        Log.Warning(
+            $"Unable to display drag shadow for {ToPrettyString(_draggedEntity.Value)} because it has no sprite component.");
     }
 
     private bool UpdateDrag(float frameTime)
@@ -378,9 +365,7 @@ public sealed class DragDropSystem : SharedDragDropSystem
 
         // still in range of the thing we are dragging?
         if (player == null || !_interactionSystem.InRangeUnobstructed(player.Value, _draggedEntity.Value))
-        {
             return false;
-        }
 
         if (_dragShadow == null)
             return false;
@@ -427,7 +412,10 @@ public sealed class DragDropSystem : SharedDragDropSystem
                         case FullInputCmdMessage fullInput:
                             replayMsg = new FullInputCmdMessage(args.OriginalMessage.Tick,
                                 args.OriginalMessage.SubTick,
-                                replayMsg.InputFunctionId, replayMsg.State, fullInput.Coordinates, fullInput.ScreenCoordinates,
+                                replayMsg.InputFunctionId,
+                                replayMsg.State,
+                                fullInput.Coordinates,
+                                fullInput.ScreenCoordinates,
                                 fullInput.Uid);
                             break;
                         default:
@@ -436,7 +424,9 @@ public sealed class DragDropSystem : SharedDragDropSystem
 
                     if (savedValue.Session != null)
                     {
-                        _inputSystem.HandleInputCommand(savedValue.Session, EngineKeyFunctions.Use, replayMsg,
+                        _inputSystem.HandleInputCommand(savedValue.Session,
+                            EngineKeyFunctions.Use,
+                            replayMsg,
                             true);
                     }
 
@@ -463,13 +453,9 @@ public sealed class DragDropSystem : SharedDragDropSystem
         var coords = args.Coordinates;
 
         if (_stateManager.CurrentState is GameplayState screen)
-        {
             entities = screen.GetClickableEntities(coords);
-        }
         else
-        {
             entities = Array.Empty<EntityUid>();
-        }
 
         var outOfRange = false;
         var user = localPlayer.Value;
@@ -482,7 +468,8 @@ public sealed class DragDropSystem : SharedDragDropSystem
             // check if it's able to be dropped on by current dragged entity
             var valid = ValidDragDrop(user, _draggedEntity.Value, entity);
 
-            if (valid != true) continue;
+            if (valid != true)
+                continue;
 
             if (!_interactionSystem.InRangeUnobstructed(user, entity)
                 || !_interactionSystem.InRangeUnobstructed(user, _draggedEntity.Value))
@@ -498,9 +485,10 @@ public sealed class DragDropSystem : SharedDragDropSystem
         }
 
         if (outOfRange)
-        {
-            _popup.PopupEntity(Loc.GetString("drag-drop-system-out-of-range-text"), _draggedEntity.Value, Filter.Local(), true);
-        }
+            _popup.PopupEntity(Loc.GetString("drag-drop-system-out-of-range-text"),
+                _draggedEntity.Value,
+                Filter.Local(),
+                true);
 
         EndDrag();
         return false;
@@ -511,9 +499,7 @@ public sealed class DragDropSystem : SharedDragDropSystem
     {
         if (!Exists(_draggedEntity) ||
             !Exists(_dragShadow))
-        {
             return;
-        }
 
         var user = _playerManager.LocalEntity;
 
@@ -541,9 +527,7 @@ public sealed class DragDropSystem : SharedDragDropSystem
             if (!spriteQuery.TryGetComponent(entity, out var inRangeSprite) ||
                 !inRangeSprite.Visible ||
                 entity == _draggedEntity)
-            {
                 continue;
-            }
 
             var valid = ValidDragDrop(user.Value, _draggedEntity.Value, entity);
 
@@ -561,9 +545,7 @@ public sealed class DragDropSystem : SharedDragDropSystem
             if (inRangeSprite.PostShader != null &&
                 inRangeSprite.PostShader != _dropTargetInRangeShader &&
                 inRangeSprite.PostShader != _dropTargetOutOfRangeShader)
-            {
                 continue;
-            }
 
             // highlight depending on whether its in or out of range
             inRangeSprite.PostShader = valid.Value ? _dropTargetInRangeShader : _dropTargetOutOfRangeShader;
@@ -576,7 +558,8 @@ public sealed class DragDropSystem : SharedDragDropSystem
     {
         foreach (var highlightedSprite in _highlightedSprites)
         {
-            if (highlightedSprite.PostShader != _dropTargetInRangeShader && highlightedSprite.PostShader != _dropTargetOutOfRangeShader)
+            if (highlightedSprite.PostShader != _dropTargetInRangeShader &&
+                highlightedSprite.PostShader != _dropTargetOutOfRangeShader)
                 continue;
 
             highlightedSprite.PostShader = null;
@@ -587,7 +570,7 @@ public sealed class DragDropSystem : SharedDragDropSystem
     }
 
     /// <summary>
-    ///     Are these args valid for drag-drop?
+    /// Are these args valid for drag-drop?
     /// </summary>
     /// <returns>
     /// Returns null if no interactions are available or the user / target cannot interact with each other.
@@ -640,9 +623,7 @@ public sealed class DragDropSystem : SharedDragDropSystem
             {
                 var screenPos = _inputManager.MouseScreenPosition;
                 if ((_mouseDownScreenPos!.Value.Position - screenPos.Position).Length() > Deadzone)
-                {
                     StartDrag();
-                }
 
                 break;
             }

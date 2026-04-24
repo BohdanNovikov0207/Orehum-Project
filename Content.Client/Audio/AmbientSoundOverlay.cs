@@ -15,11 +15,9 @@ namespace Content.Client.Audio;
 /// </summary>
 public sealed class AmbientSoundOverlay : Overlay
 {
-    private readonly IEntityManager _entManager;
     private readonly AmbientSoundSystem _ambient;
+    private readonly IEntityManager _entManager;
     private readonly EntityLookupSystem _lookup;
-
-    public override OverlaySpace Space => OverlaySpace.WorldSpace;
 
     public AmbientSoundOverlay(IEntityManager entManager, AmbientSoundSystem ambient, EntityLookupSystem lookup)
     {
@@ -27,6 +25,8 @@ public sealed class AmbientSoundOverlay : Overlay
         _ambient = ambient;
         _lookup = lookup;
     }
+
+    public override OverlaySpace Space => OverlaySpace.WorldSpace;
 
     protected override void Draw(in OverlayDrawArgs args)
     {
@@ -41,23 +41,20 @@ public sealed class AmbientSoundOverlay : Overlay
         foreach (var ent in _lookup.GetEntitiesIntersecting(args.MapId, args.WorldBounds))
         {
             if (!ambientQuery.TryGetComponent(ent, out var ambientSound) ||
-                !xformQuery.TryGetComponent(ent, out var xform)) continue;
+                !xformQuery.TryGetComponent(ent, out var xform))
+                continue;
 
             if (ambientSound.Enabled)
             {
                 if (_ambient.IsActive((ent, ambientSound)))
-                {
-                    worldHandle.DrawCircle(xformSystem.GetWorldPosition(xform), Size, Color.LightGreen.WithAlpha(Alpha * 2f));
-                }
+                    worldHandle.DrawCircle(xformSystem.GetWorldPosition(xform),
+                        Size,
+                        Color.LightGreen.WithAlpha(Alpha * 2f));
                 else
-                {
                     worldHandle.DrawCircle(xformSystem.GetWorldPosition(xform), Size, Color.Orange.WithAlpha(Alpha));
-                }
             }
             else
-            {
                 worldHandle.DrawCircle(xformSystem.GetWorldPosition(xform), Size, Color.Red.WithAlpha(Alpha));
-            }
         }
     }
 }

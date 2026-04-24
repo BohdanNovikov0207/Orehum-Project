@@ -14,9 +14,9 @@ namespace Content.Client.GameTicking.Managers;
 
 public sealed class TitleWindowManager
 {
+    [Dependency] private readonly IConfigurationManager _cfg = default!;
     [Dependency] private readonly IBaseClient _client = default!;
     [Dependency] private readonly IClyde _clyde = default!;
-    [Dependency] private readonly IConfigurationManager _cfg = default!;
     [Dependency] private readonly IGameController _gameController = default!;
 
     public void Initialize()
@@ -55,14 +55,9 @@ public sealed class TitleWindowManager
     // Clients by default assume game.hostname_in_titlebar is true
     // but we need to clear it as soon as we join and actually receive the servers preference on this.
     // This will ensure we rerun OnHostnameChange and set the correct title bar name.
-    private void OnHostnameTitleChange(bool colonthree)
-    {
-        OnHostnameChange(_cfg.GetCVar(CVars.GameHostName));
-    }
+    private void OnHostnameTitleChange(bool colonthree) => OnHostnameChange(_cfg.GetCVar(CVars.GameHostName));
 
     // This is just used we can rerun the hostname change function when we disconnect to revert back to just the games title.
-    private void OnRunLevelChangedChange(object? sender, RunLevelChangedEventArgs runLevelChangedEventArgs)
-    {
+    private void OnRunLevelChangedChange(object? sender, RunLevelChangedEventArgs runLevelChangedEventArgs) =>
         OnHostnameChange(_cfg.GetCVar(CVars.GameHostName));
-    }
 }

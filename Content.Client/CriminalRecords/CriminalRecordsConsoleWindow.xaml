@@ -57,11 +57,11 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                        FontColorOverride="DarkGray" />
                 <!-- Selected record info -->
                 <BoxContainer Name="PersonContainer"
-                        Orientation="Vertical"
-                        VerticalExpand="True"
-                        HorizontalExpand="True"
-                        Margin="5"
-                        Visible="False">
+                              Orientation="Vertical"
+                              VerticalExpand="True"
+                              HorizontalExpand="True"
+                              Margin="5"
+                              Visible="False">
                     <Label Name="PersonName"
                            Margin="0 0 0 5"
                            StyleClasses="LabelBig" />

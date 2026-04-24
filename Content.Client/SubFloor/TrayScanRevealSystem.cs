@@ -12,8 +12,8 @@ namespace Content.Client.SubFloor;
 
 public sealed class TrayScanRevealSystem : EntitySystem
 {
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly SharedMapSystem _map = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     public bool IsUnderRevealingEntity(EntityUid uid)
     {
@@ -24,7 +24,7 @@ public sealed class TrayScanRevealSystem : EntitySystem
         var gridComp = Comp<MapGridComponent>(gridUid.Value);
         var position = _transform.GetGridOrMapTilePosition(uid);
 
-        return HasTrayScanReveal(((EntityUid)gridUid, gridComp), position);
+        return HasTrayScanReveal(((EntityUid) gridUid, gridComp), position);
     }
 
     private bool HasTrayScanReveal(Entity<MapGridComponent> ent, Vector2i position)

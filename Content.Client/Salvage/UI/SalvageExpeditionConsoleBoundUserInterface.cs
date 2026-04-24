@@ -24,12 +24,12 @@ namespace Content.Client.Salvage.UI;
 [UsedImplicitly]
 public sealed class SalvageExpeditionConsoleBoundUserInterface : BoundUserInterface
 {
-    [ViewVariables]
-    private OfferingWindow? _window;
-
     [Dependency] private readonly IConfigurationManager _cfgManager = default!;
     [Dependency] private readonly IEntityManager _entManager = default!;
     [Dependency] private readonly IPrototypeManager _protoManager = default!;
+
+    [ViewVariables]
+    private OfferingWindow? _window;
 
     public SalvageExpeditionConsoleBoundUserInterface(EntityUid owner, Enum uiKey) : base(owner, uiKey)
     {
@@ -62,7 +62,7 @@ public sealed class SalvageExpeditionConsoleBoundUserInterface : BoundUserInterf
             var missionParams = current.Missions[i];
 
             var offering = new OfferingWindowOption();
-            offering.Title = Loc.GetString($"salvage-expedition-type");
+            offering.Title = Loc.GetString("salvage-expedition-type");
 
             var difficultyId = "Moderate";
             var difficultyProto = _protoManager.Index<SalvageDifficultyPrototype>(difficultyId);
@@ -71,9 +71,9 @@ public sealed class SalvageExpeditionConsoleBoundUserInterface : BoundUserInterf
 
             // Difficulty
             // Details
-            offering.AddContent(new Label()
+            offering.AddContent(new Label
             {
-                Text = Loc.GetString("salvage-expedition-window-difficulty")
+                Text = Loc.GetString("salvage-expedition-window-difficulty"),
             });
 
             var difficultyColor = difficultyProto.Color;
@@ -103,16 +103,17 @@ public sealed class SalvageExpeditionConsoleBoundUserInterface : BoundUserInterf
             // Details
             offering.AddContent(new Label
             {
-                Text = Loc.GetString("salvage-expedition-window-hostiles")
+                Text = Loc.GetString("salvage-expedition-window-hostiles"),
             });
 
             var faction = mission.Faction;
 
             offering.AddContent(new Label
             {
-                Text = string.IsNullOrWhiteSpace(Loc.GetString(_protoManager.Index<SalvageFactionPrototype>(faction).Description))
-                        ? LogAndReturnDefaultFactionDescription(faction)
-                        : Loc.GetString(_protoManager.Index<SalvageFactionPrototype>(faction).Description),
+                Text = string.IsNullOrWhiteSpace(Loc.GetString(_protoManager.Index<SalvageFactionPrototype>(faction)
+                    .Description))
+                    ? LogAndReturnDefaultFactionDescription(faction)
+                    : Loc.GetString(_protoManager.Index<SalvageFactionPrototype>(faction).Description),
                 FontColorOverride = StyleNano.NanoGold,
                 HorizontalAlignment = Control.HAlignment.Left,
                 Margin = new Thickness(0f, 0f, 0f, 5f),
@@ -128,7 +129,7 @@ public sealed class SalvageExpeditionConsoleBoundUserInterface : BoundUserInterf
             // Duration
             offering.AddContent(new Label
             {
-                Text = Loc.GetString("salvage-expedition-window-duration")
+                Text = Loc.GetString("salvage-expedition-window-duration"),
             });
 
             offering.AddContent(new Label
@@ -142,16 +143,17 @@ public sealed class SalvageExpeditionConsoleBoundUserInterface : BoundUserInterf
             // Biome
             offering.AddContent(new Label
             {
-                Text = Loc.GetString("salvage-expedition-window-biome")
+                Text = Loc.GetString("salvage-expedition-window-biome"),
             });
 
             var biome = mission.Biome;
 
             offering.AddContent(new Label
             {
-                Text = string.IsNullOrWhiteSpace(Loc.GetString(_protoManager.Index<SalvageBiomeModPrototype>(biome).Description))
-                        ? LogAndReturnDefaultBiomDescription(biome)
-                        : Loc.GetString(_protoManager.Index<SalvageBiomeModPrototype>(biome).Description),
+                Text = string.IsNullOrWhiteSpace(Loc.GetString(_protoManager.Index<SalvageBiomeModPrototype>(biome)
+                    .Description))
+                    ? LogAndReturnDefaultBiomDescription(biome)
+                    : Loc.GetString(_protoManager.Index<SalvageBiomeModPrototype>(biome).Description),
                 FontColorOverride = StyleNano.NanoGold,
                 HorizontalAlignment = Control.HAlignment.Left,
                 Margin = new Thickness(0f, 0f, 0f, 5f),
@@ -166,7 +168,7 @@ public sealed class SalvageExpeditionConsoleBoundUserInterface : BoundUserInterf
             // Modifiers
             offering.AddContent(new Label
             {
-                Text = Loc.GetString("salvage-expedition-window-modifiers")
+                Text = Loc.GetString("salvage-expedition-window-modifiers"),
             });
 
             var mods = mission.Modifiers;
@@ -181,7 +183,7 @@ public sealed class SalvageExpeditionConsoleBoundUserInterface : BoundUserInterf
 
             offering.ClaimPressed += args =>
             {
-                SendMessage(new ClaimSalvageMessage()
+                SendMessage(new ClaimSalvageMessage
                 {
                     Index = missionParams.Index,
                 });

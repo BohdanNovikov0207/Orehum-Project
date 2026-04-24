@@ -16,12 +16,10 @@ using Robust.Client.ResourceManagement;
 
 namespace Content.Client.UserInterface.XamlExtensions;
 
-
 [PublicAPI]
 public sealed class TexExtension
 {
     private IResourceCache _resourceCache;
-    public string Path { get; }
 
     public TexExtension(string path)
     {
@@ -29,8 +27,7 @@ public sealed class TexExtension
         Path = path;
     }
 
-    public object ProvideValue()
-    {
-        return _resourceCache.GetTexture(Path);
-    }
+    public string Path { get; }
+
+    public object ProvideValue() => _resourceCache.GetTexture(Path);
 }

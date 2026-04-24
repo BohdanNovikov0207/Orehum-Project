@@ -9,5 +9,4 @@ namespace Content.Client.Telephone;
 
 public sealed class TelephoneSystem : SharedTelephoneSystem
 {
-
 }

@@ -20,6 +20,6 @@ public sealed class AmbientOverlayCommand : LocalizedEntityCommands
     {
         _ambient.OverlayEnabled ^= true;
 
-        shell.WriteLine(Loc.GetString($"cmd-showambient-status", ("status", _ambient.OverlayEnabled)));
+        shell.WriteLine(Loc.GetString("cmd-showambient-status", ("status", _ambient.OverlayEnabled)));
     }
 }

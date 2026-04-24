@@ -42,7 +42,7 @@ using Content.Client.Weapons.Ranged.Components;
 using Content.Shared._Goobstation.Heretic.Components;
 using Content.Shared.Camera;
 using Content.Shared.CombatMode;
-using Content.Shared.Mech.Components; // Goobstation
+using Content.Shared.Mech.Components;
 using Content.Shared.Weapons.Ranged;
 using Content.Shared.Weapons.Ranged.Components;
 using Content.Shared.Weapons.Ranged.Events;
@@ -59,6 +59,7 @@ using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
+// Goobstation
 using SharedGunSystem = Content.Shared.Weapons.Ranged.Systems.SharedGunSystem;
 using TimedDespawnComponent = Robust.Shared.Spawners.TimedDespawnComponent;
 
@@ -66,18 +67,19 @@ namespace Content.Client.Weapons.Ranged.Systems;
 
 public sealed partial class GunSystem : SharedGunSystem
 {
+    public static readonly EntProtoId HitscanProto = "HitscanEffect";
+    [Dependency] private readonly AnimationPlayerSystem _animPlayer = default!;
     [Dependency] private readonly IEyeManager _eyeManager = default!;
     [Dependency] private readonly IInputManager _inputManager = default!;
-    [Dependency] private readonly IPlayerManager _player = default!;
-    [Dependency] private readonly IStateManager _state = default!;
-    [Dependency] private readonly AnimationPlayerSystem _animPlayer = default!;
     [Dependency] private readonly InputSystem _inputSystem = default!;
-    [Dependency] private readonly SharedCameraRecoilSystem _recoil = default!;
     [Dependency] private readonly SharedMapSystem _maps = default!;
-    [Dependency] private readonly SharedTransformSystem _xform = default!;
+    [Dependency] private readonly IPlayerManager _player = default!;
+    [Dependency] private readonly SharedCameraRecoilSystem _recoil = default!;
     [Dependency] private readonly SpriteSystem _sprite = default!;
+    [Dependency] private readonly IStateManager _state = default!;
+    [Dependency] private readonly SharedTransformSystem _xform = default!;
 
-    public static readonly EntProtoId HitscanProto = "HitscanEffect";
+    private bool _spreadOverlay;
 
     public bool SpreadOverlay
     {
@@ -102,13 +104,9 @@ public sealed partial class GunSystem : SharedGunSystem
                     TransformSystem));
             }
             else
-            {
                 overlayManager.RemoveOverlay<GunSpreadOverlay>();
-            }
         }
     }
-
-    private bool _spreadOverlay;
 
     public override void Initialize()
     {
@@ -125,10 +123,8 @@ public sealed partial class GunSystem : SharedGunSystem
         InitializeSpentAmmo();
     }
 
-    private void OnUpdateClientAmmo(EntityUid uid, AmmoCounterComponent ammoComp, ref UpdateClientAmmoEvent args)
-    {
+    private void OnUpdateClientAmmo(EntityUid uid, AmmoCounterComponent ammoComp, ref UpdateClientAmmoEvent args) =>
         UpdateAmmoCount(uid, ammoComp);
-    }
 
     private void OnMuzzleFlash(MuzzleFlashEvent args)
     {
@@ -171,20 +167,20 @@ public sealed partial class GunSystem : SharedGunSystem
             _sprite.SetScale((ent, sprite), new Vector2(a.Distance, 1f));
             sprite[EffectLayers.Unshaded].Visible = true;
 
-            var anim = new Animation()
+            var anim = new Animation
             {
                 Length = TimeSpan.FromSeconds(0.48f),
                 AnimationTracks =
                 {
-                    new AnimationTrackSpriteFlick()
+                    new AnimationTrackSpriteFlick
                     {
                         LayerKey = EffectLayers.Unshaded,
                         KeyFrames =
                         {
                             new AnimationTrackSpriteFlick.KeyFrame(rsi.RsiState, 0f),
-                        }
-                    }
-                }
+                        },
+                    },
+                },
             };
 
             _animPlayer.Play(ent, anim, "hitscan-effect");
@@ -199,9 +195,7 @@ public sealed partial class GunSystem : SharedGunSystem
         var entityNull = _player.LocalEntity;
 
         if (entityNull == null || !TryComp<CombatModeComponent>(entityNull, out var combat) || !combat.IsInCombatMode)
-        {
             return;
-        }
 
         var entity = entityNull.Value;
 
@@ -209,9 +203,7 @@ public sealed partial class GunSystem : SharedGunSystem
             entity = mechPilot.Mech;
 
         if (!TryGetGun(entity, out var gunUid, out var gun))
-        {
             return;
-        }
 
         if (TryComp<EntropicPlumeAffectedComponent>(entity, out var affected) &&
             affected.NextAttack + TimeSpan.FromSeconds(0.1f) > Timing.CurTime) // Goobstation
@@ -256,15 +248,22 @@ public sealed partial class GunSystem : SharedGunSystem
         });
     }
 
-    public override void Shoot(EntityUid gunUid, GunComponent gun, List<(EntityUid? Entity, IShootable Shootable)> ammo,
-        EntityCoordinates fromCoordinates, EntityCoordinates toCoordinates, out bool userImpulse, EntityUid? user = null, bool throwItems = false)
+    public override void Shoot(EntityUid gunUid,
+        GunComponent gun,
+        List<(EntityUid? Entity, IShootable Shootable)> ammo,
+        EntityCoordinates fromCoordinates,
+        EntityCoordinates toCoordinates,
+        out bool userImpulse,
+        EntityUid? user = null,
+        bool throwItems = false)
     {
         userImpulse = true;
 
         // Rather than splitting client / server for every ammo provider it's easier
         // to just delete the spawned entities. This is for programmer sanity despite the wasted perf.
         // This also means any ammo specific stuff can be grabbed as necessary.
-        var direction = TransformSystem.ToMapCoordinates(fromCoordinates).Position - TransformSystem.ToMapCoordinates(toCoordinates).Position;
+        var direction = TransformSystem.ToMapCoordinates(fromCoordinates).Position -
+                        TransformSystem.ToMapCoordinates(toCoordinates).Position;
         var worldAngle = direction.ToAngle().Opposite();
 
         foreach (var (ent, shootable) in ammo)
@@ -344,7 +343,8 @@ public sealed partial class GunSystem : SharedGunSystem
         // TODO: Check to see why invalid entities are firing effects.
         if (gunUid == EntityUid.Invalid)
         {
-            Log.Debug($"Invalid Entity sent MuzzleFlashEvent (proto: {message.Prototype}, gun: {ToPrettyString(gunUid)})");
+            Log.Debug(
+                $"Invalid Entity sent MuzzleFlashEvent (proto: {message.Prototype}, gun: {ToPrettyString(gunUid)})");
             return;
         }
 
@@ -353,17 +353,12 @@ public sealed partial class GunSystem : SharedGunSystem
         EntityCoordinates coordinates;
 
         if (TryComp(gridUid, out MapGridComponent? mapGrid))
-        {
-            coordinates = new EntityCoordinates(gridUid.Value, _maps.LocalToGrid(gridUid.Value, mapGrid, gunXform.Coordinates));
-        }
+            coordinates = new EntityCoordinates(gridUid.Value,
+                _maps.LocalToGrid(gridUid.Value, mapGrid, gunXform.Coordinates));
         else if (gunXform.MapUid != null)
-        {
             coordinates = new EntityCoordinates(gunXform.MapUid.Value, TransformSystem.GetWorldPosition(gunXform));
-        }
         else
-        {
             return;
-        }
 
         var ent = Spawn(message.Prototype, coordinates);
         TransformSystem.SetWorldRotationNoLerp(ent, message.Angle);
@@ -378,11 +373,9 @@ public sealed partial class GunSystem : SharedGunSystem
         var lifetime = 0.4f;
 
         if (TryComp<TimedDespawnComponent>(gunUid, out var despawn))
-        {
             lifetime = despawn.Lifetime;
-        }
 
-        var anim = new Animation()
+        var anim = new Animation
         {
             Length = TimeSpan.FromSeconds(lifetime),
             AnimationTracks =
@@ -395,10 +388,10 @@ public sealed partial class GunSystem : SharedGunSystem
                     KeyFrames =
                     {
                         new AnimationTrackProperty.KeyFrame(Color.White.WithAlpha(1f), 0),
-                        new AnimationTrackProperty.KeyFrame(Color.White.WithAlpha(0f), lifetime)
-                    }
-                }
-            }
+                        new AnimationTrackProperty.KeyFrame(Color.White.WithAlpha(0f), lifetime),
+                    },
+                },
+            },
         };
 
         _animPlayer.Play(ent, anim, "muzzle-flash");
@@ -414,7 +407,7 @@ public sealed partial class GunSystem : SharedGunSystem
         Lights.SetColor(gunUid, Color.FromHex("#cc8e2b"), light);
         Lights.SetEnergy(gunUid, 5f, light);
 
-        var animTwo = new Animation()
+        var animTwo = new Animation
         {
             Length = TimeSpan.FromSeconds(lifetime),
             AnimationTracks =
@@ -427,8 +420,8 @@ public sealed partial class GunSystem : SharedGunSystem
                     KeyFrames =
                     {
                         new AnimationTrackProperty.KeyFrame(5f, 0),
-                        new AnimationTrackProperty.KeyFrame(0f, lifetime)
-                    }
+                        new AnimationTrackProperty.KeyFrame(0f, lifetime),
+                    },
                 },
                 new AnimationTrackComponentProperty
                 {
@@ -438,10 +431,10 @@ public sealed partial class GunSystem : SharedGunSystem
                     KeyFrames =
                     {
                         new AnimationTrackProperty.KeyFrame(true, 0),
-                        new AnimationTrackProperty.KeyFrame(false, lifetime)
-                    }
-                }
-            }
+                        new AnimationTrackProperty.KeyFrame(false, lifetime),
+                    },
+                },
+            },
         };
 
         var uidPlayer = EnsureComp<AnimationPlayerComponent>(gunUid);

@@ -6,24 +6,21 @@ using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.XAML;
 using Robust.Shared.Prototypes;
 
-
 namespace Content.Client._White.UserInterface.Controls;
-
 
 [GenerateTypedNameReferences]
 public sealed partial class SpeciesGroupContainer : Control
 {
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-
     private readonly List<(Button, Action<BaseButton.ButtonEventArgs>)> _buttonsEvents = new();
-
-    public Action<ProtoId<SpeciesPrototype>>? OnSpeciesSelected { get; set; }
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
 
     public SpeciesGroupContainer()
     {
         RobustXamlLoader.Load(this);
         IoCManager.InjectDependencies(this);
     }
+
+    public Action<ProtoId<SpeciesPrototype>>? OnSpeciesSelected { get; set; }
 
     public void Initialize(SpeciesDictionaryGroupPrototype group)
     {
@@ -32,24 +29,24 @@ public sealed partial class SpeciesGroupContainer : Control
         GroupLabel.Text = Loc.GetString($"species-window-group-{group.ID.ToLower()}");
         foreach (var species in _prototypeManager.EnumeratePrototypes<SpeciesDictionaryPrototype>())
         {
-            if(species.GroupPrototype != group.ID)
+            if (species.GroupPrototype != group.ID)
                 continue;
 
-            if(!_prototypeManager.TryIndex<SpeciesPrototype>(species.ID, out var speciesPrototype) || !speciesPrototype.RoundStart)
+            if (!_prototypeManager.TryIndex<SpeciesPrototype>(species.ID, out var speciesPrototype) ||
+                !speciesPrototype.RoundStart)
                 continue;
 
-            var button = new Button()
+            var button = new Button
             {
                 Text = Loc.GetString($"species-name-{species.ID.ToLower()}"),
-                HorizontalAlignment = HAlignment.Stretch
+                HorizontalAlignment = HAlignment.Stretch,
             };
 
             if (group.Color.HasValue)
-            {
                 button.Modulate = group.Color.Value;
-            }
 
-            Action<BaseButton.ButtonEventArgs> onSelected = _ => OnSpeciesSelected?.Invoke(new(species.ID));
+            Action<BaseButton.ButtonEventArgs> onSelected = _ =>
+                OnSpeciesSelected?.Invoke(new ProtoId<SpeciesPrototype>(species.ID));
             button.OnPressed += onSelected;
             _buttonsEvents.Add((button, onSelected));
             SpeciesButtonContainer.AddChild(button);
@@ -62,9 +59,9 @@ public sealed partial class SpeciesGroupContainer : Control
         {
             button.OnPressed -= eventInternal;
         }
+
         _buttonsEvents.Clear();
 
         SpeciesButtonContainer.Children.Clear();
     }
 }
-

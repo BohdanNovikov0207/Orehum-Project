@@ -14,8 +14,8 @@ namespace Content.Client._Shitcode.Wizard.Teleport;
 [UsedImplicitly]
 public sealed class WizardTeleportBoundUserInterface : BoundUserInterface
 {
-    private WizardTeleportTargetWindow? _menu;
     private NetEntity? _action;
+    private WizardTeleportTargetWindow? _menu;
 
     public WizardTeleportBoundUserInterface(EntityUid owner, Enum uiKey) : base(owner, uiKey)
     {
@@ -43,8 +43,6 @@ public sealed class WizardTeleportBoundUserInterface : BoundUserInterface
         _menu?.Populate();
     }
 
-    public void SendWizardTeleportSystemMessage(NetEntity warpUid, string name)
-    {
+    public void SendWizardTeleportSystemMessage(NetEntity warpUid, string name) =>
         SendMessage(new WizardTeleportLocationSelectedMessage(warpUid, name, _action));
-    }
 }

@@ -44,12 +44,14 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Linq;
+using System.Numerics;
 using Content.Client.Gameplay;
 using Content.Client.Guidebook;
 using Content.Client.Guidebook.Controls;
 using Content.Client.Lobby;
 using Content.Client.Players.PlayTimeTracking;
 using Content.Client.UserInterface.Controls;
+using Content.Client.UserInterface.Systems.MenuBar.Widgets;
 using Content.Shared.CCVar;
 using Content.Shared.Guidebook;
 using Content.Shared.Input;
@@ -57,35 +59,37 @@ using Robust.Client.State;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controllers;
 using Robust.Shared.Configuration;
-using static Robust.Client.UserInterface.Controls.BaseButton;
 using Robust.Shared.Input.Binding;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
+using static Robust.Client.UserInterface.Controls.BaseButton;
 
 namespace Content.Client.UserInterface.Systems.Guidebook;
 
-public sealed class GuidebookUIController : UIController, IOnStateEntered<LobbyState>, IOnStateEntered<GameplayState>, IOnStateExited<LobbyState>, IOnStateExited<GameplayState>, IOnSystemChanged<GuidebookSystem>
+public sealed class GuidebookUIController : UIController, IOnStateEntered<LobbyState>, IOnStateEntered<GameplayState>,
+    IOnStateExited<LobbyState>, IOnStateExited<GameplayState>, IOnSystemChanged<GuidebookSystem>
 {
-    [UISystemDependency] private readonly GuidebookSystem _guidebookSystem = default!;
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-    [Dependency] private readonly IConfigurationManager _configuration = default!;
-    [Dependency] private readonly JobRequirementsManager _jobRequirements = default!;
-
     private const int PlaytimeOpenGuidebook = 60;
+    [Dependency] private readonly IConfigurationManager _configuration = default!;
+    [UISystemDependency] private readonly GuidebookSystem _guidebookSystem = default!;
+    [Dependency] private readonly JobRequirementsManager _jobRequirements = default!;
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
 
     private GuidebookWindow? _guideWindow;
-    private MenuButton? GuidebookButton => UIManager.GetActiveUIWidgetOrNull<MenuBar.Widgets.GameTopMenuBar>()?.GuidebookButton;
     private ProtoId<GuideEntryPrototype>? _lastEntry;
+    private MenuButton? GuidebookButton => UIManager.GetActiveUIWidgetOrNull<GameTopMenuBar>()?.GuidebookButton;
 
-    public void OnStateEntered(LobbyState state)
-    {
-        HandleStateEntered(state);
-    }
+    public void OnStateEntered(GameplayState state) => HandleStateEntered(state);
 
-    public void OnStateEntered(GameplayState state)
-    {
-        HandleStateEntered(state);
-    }
+    public void OnStateEntered(LobbyState state) => HandleStateEntered(state);
+
+    public void OnStateExited(GameplayState state) => HandleStateExited();
+
+    public void OnStateExited(LobbyState state) => HandleStateExited();
+
+    public void OnSystemLoaded(GuidebookSystem system) => _guidebookSystem.OnGuidebookOpen += OpenGuidebook;
+
+    public void OnSystemUnloaded(GuidebookSystem system) => _guidebookSystem.OnGuidebookOpen -= OpenGuidebook;
 
     private void HandleStateEntered(State state)
     {
@@ -100,7 +104,7 @@ public sealed class GuidebookUIController : UIController, IOnStateEntered<LobbyS
             _jobRequirements.FetchOverallPlaytime() < TimeSpan.FromMinutes(PlaytimeOpenGuidebook))
         {
             OpenGuidebook();
-            _guideWindow.RecenterWindow(new(0.5f, 0.5f));
+            _guideWindow.RecenterWindow(new Vector2(0.5f, 0.5f));
             _guideWindow.SetPositionFirst();
         }
 
@@ -109,16 +113,6 @@ public sealed class GuidebookUIController : UIController, IOnStateEntered<LobbyS
             .Bind(ContentKeyFunctions.OpenGuidebook,
                 InputCmdHandler.FromDelegate(_ => ToggleGuidebook()))
             .Register<GuidebookUIController>();
-    }
-
-    public void OnStateExited(LobbyState state)
-    {
-        HandleStateExited();
-    }
-
-    public void OnStateExited(GameplayState state)
-    {
-        HandleStateExited();
     }
 
     private void HandleStateExited()
@@ -133,16 +127,6 @@ public sealed class GuidebookUIController : UIController, IOnStateEntered<LobbyS
         _guideWindow.Dispose();
         _guideWindow = null;
         CommandBinds.Unregister<GuidebookUIController>();
-    }
-
-    public void OnSystemLoaded(GuidebookSystem system)
-    {
-        _guidebookSystem.OnGuidebookOpen += OpenGuidebook;
-    }
-
-    public void OnSystemUnloaded(GuidebookSystem system)
-    {
-        _guidebookSystem.OnGuidebookOpen -= OpenGuidebook;
     }
 
     internal void UnloadButton()
@@ -161,10 +145,7 @@ public sealed class GuidebookUIController : UIController, IOnStateEntered<LobbyS
         GuidebookButton.OnPressed += GuidebookButtonOnPressed;
     }
 
-    private void GuidebookButtonOnPressed(ButtonEventArgs obj)
-    {
-        ToggleGuidebook();
-    }
+    private void GuidebookButtonOnPressed(ButtonEventArgs obj) => ToggleGuidebook();
 
     public void ToggleGuidebook()
     {
@@ -177,9 +158,7 @@ public sealed class GuidebookUIController : UIController, IOnStateEntered<LobbyS
             _guideWindow.Close();
         }
         else
-        {
             OpenGuidebook();
-        }
     }
 
     private void OnWindowClosed()
@@ -201,16 +180,22 @@ public sealed class GuidebookUIController : UIController, IOnStateEntered<LobbyS
     }
 
     /// <summary>
-    ///     Opens or closes the guidebook.
+    /// Opens or closes the guidebook.
     /// </summary>
     /// <param name="guides">What guides should be shown. If not specified, this will instead list all the entries</param>
-    /// <param name="rootEntries">A list of guides that should form the base of the table of contents. If not specified,
-    /// this will automatically simply be a list of all guides that have no parent.</param>
-    /// <param name="forceRoot">This forces a singular guide to contain all other guides. This guide will
+    /// <param name="rootEntries">
+    /// A list of guides that should form the base of the table of contents. If not specified,
+    /// this will automatically simply be a list of all guides that have no parent.
+    /// </param>
+    /// <param name="forceRoot">
+    /// This forces a singular guide to contain all other guides. This guide will
     /// contain its own children, in addition to what would normally be the root guides if this were not
-    /// specified.</param>
-    /// <param name="includeChildren">Whether or not to automatically include child entries. If false, this will ONLY
-    /// show the specified entries</param>
+    /// specified.
+    /// </param>
+    /// <param name="includeChildren">
+    /// Whether or not to automatically include child entries. If false, this will ONLY
+    /// show the specified entries
+    /// </param>
     /// <param name="selected">The guide whose contents should be displayed when the guidebook is opened</param>
     public void OpenGuidebook(
         Dictionary<ProtoId<GuideEntryPrototype>, GuideEntry>? guides = null,
@@ -233,7 +218,7 @@ public sealed class GuidebookUIController : UIController, IOnStateEntered<LobbyS
         else if (includeChildren)
         {
             var oldGuides = guides;
-            guides = new(oldGuides);
+            guides = new Dictionary<ProtoId<GuideEntryPrototype>, GuideEntry>(oldGuides);
             foreach (var guide in oldGuides.Values)
             {
                 RecursivelyAddChildren(guide, guides);
@@ -243,14 +228,11 @@ public sealed class GuidebookUIController : UIController, IOnStateEntered<LobbyS
         if (selected == null)
         {
             if (_lastEntry is { } lastEntry && guides.ContainsKey(lastEntry))
-            {
                 selected = _lastEntry;
-            }
             else
-            {
                 selected = _configuration.GetCVar(CCVars.DefaultGuide);
-            }
         }
+
         _guideWindow.UpdateGuides(guides, rootEntries, forceRoot, selected);
 
         // Expand up to depth-2.
@@ -275,6 +257,7 @@ public sealed class GuidebookUIController : UIController, IOnStateEntered<LobbyS
                 Log.Error($"Encountered unknown guide prototype: {guideId}");
                 continue;
             }
+
             guides.Add(guideId, guide);
         }
 
@@ -302,7 +285,8 @@ public sealed class GuidebookUIController : UIController, IOnStateEntered<LobbyS
 
             if (!_prototypeManager.TryIndex(childId, out var child))
             {
-                Log.Error($"Encountered unknown guide prototype: {childId} as a child of {guide.Id}. If the child is not a prototype, it must be directly provided.");
+                Log.Error(
+                    $"Encountered unknown guide prototype: {childId} as a child of {guide.Id}. If the child is not a prototype, it must be directly provided.");
                 continue;
             }
 

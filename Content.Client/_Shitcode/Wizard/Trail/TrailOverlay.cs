@@ -18,13 +18,11 @@ namespace Content.Client._Shitcode.Wizard.Trail;
 
 public sealed class TrailOverlay : Overlay
 {
-    public override OverlaySpace Space => OverlaySpace.WorldSpaceEntities;
-
     private readonly IEntityManager _entManager;
     private readonly IPrototypeManager _protoMan;
-    private readonly IGameTiming _timing;
 
     private readonly SpriteSystem _sprite;
+    private readonly IGameTiming _timing;
     private readonly TransformSystem _transform;
 
     public TrailOverlay(IEntityManager entManager, IPrototypeManager protoMan, IGameTiming timing)
@@ -37,6 +35,8 @@ public sealed class TrailOverlay : Overlay
         _sprite = _entManager.System<SpriteSystem>();
         _transform = _entManager.System<TransformSystem>();
     }
+
+    public override OverlaySpace Space => OverlaySpace.WorldSpaceEntities;
 
     protected override void Draw(in OverlayDrawArgs args)
     {
@@ -76,6 +76,7 @@ public sealed class TrailOverlay : Overlay
                             break;
                     }
                 }
+
                 handle.UseShader(shader);
             }
             else
@@ -120,6 +121,7 @@ public sealed class TrailOverlay : Overlay
                         sprite.Scale = originalScale;
                     }
                 }
+
                 continue;
             }
 

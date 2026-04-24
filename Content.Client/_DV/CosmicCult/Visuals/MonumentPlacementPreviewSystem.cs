@@ -8,7 +8,6 @@ using System.Numerics;
 using System.Threading;
 using Content.Shared._DV.CosmicCult;
 using Content.Shared._DV.CosmicCult.Components;
-using Content.Shared.Actions;
 using Content.Shared.Actions.Components;
 using Content.Shared.Actions.Events;
 using Content.Shared.Maps;
@@ -19,7 +18,6 @@ using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
-
 using Timer = Robust.Shared.Timing.Timer;
 
 namespace Content.Client._DV.CosmicCult.Visuals;
@@ -29,22 +27,22 @@ namespace Content.Client._DV.CosmicCult.Visuals;
 /// </summary>
 public sealed class MonumentPlacementPreviewSystem : EntitySystem
 {
+    private const int MinimumDistanceFromSpace = 3;
+
     //most of these aren't used by this system, see MonumentPlacementPreviewOverlay for a note on why they're here
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly SharedMapSystem _map = default!;
     [Dependency] private readonly IOverlayManager _overlay = default!;
     [Dependency] private readonly IPlayerManager _player = default!;
     [Dependency] private readonly IPrototypeManager _proto = default!;
-    [Dependency] private readonly SharedMapSystem _map = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly TransformSystem _transform = default!;
     [Dependency] private readonly TurfSystem _turf = default!;
 
     private MonumentPlacementPreviewOverlay? _cachedOverlay;
     private CancellationTokenSource? _cancellationTokenSource;
 
-    private const int MinimumDistanceFromSpace = 3;
-
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
@@ -95,9 +93,13 @@ public sealed class MonumentPlacementPreviewSystem : EntitySystem
         //CHECK IF IT'S BEING PLACED CHEESILY CLOSE TO SPACE
         var worldPos = _transform.GetWorldPosition(xform); // this is technically wrong but basically fine
 
-        foreach (var tile in _map.GetTilesIntersecting(xform.GridUid.Value, grid, new Circle(worldPos, MinimumDistanceFromSpace)))
+        foreach (var tile in _map.GetTilesIntersecting(xform.GridUid.Value,
+                     grid,
+                     new Circle(worldPos, MinimumDistanceFromSpace)))
+        {
             if (_turf.IsSpace(tile))
                 return false;
+        }
 
         var localTile = _map.GetTileRef(xform.GridUid.Value, grid, xform.Coordinates);
         var targetIndices = localTile.GridIndices + new Vector2i(0, 1);
@@ -106,7 +108,10 @@ public sealed class MonumentPlacementPreviewSystem : EntitySystem
         var box = new Box2(pos.Position + new Vector2(-1.4f, -0.4f), pos.Position + new Vector2(1.4f, 0.4f));
 
         //CHECK FOR ENTITY AND ENVIRONMENTAL INTERSECTIONS
-        if (_lookup.AnyLocalEntitiesIntersecting(xform.GridUid.Value, box, LookupFlags.Dynamic | LookupFlags.Static, _player.LocalEntity))
+        if (_lookup.AnyLocalEntitiesIntersecting(xform.GridUid.Value,
+                box,
+                LookupFlags.Dynamic | LookupFlags.Static,
+                _player.LocalEntity))
             return false;
 
         //if all of those aren't false, return true
@@ -133,7 +138,9 @@ public sealed class MonumentPlacementPreviewSystem : EntitySystem
             {
                 _cachedOverlay.FadingOut = false; //stop it
 
-                var progress = (1 - (_cachedOverlay.FadeOutProgress / _cachedOverlay.FadeOutTime)) * _cachedOverlay.FadeInTime; //set fade in progress to 1 - fade out progress (so 70% out becomes 30% in)
+                var progress = (1 - _cachedOverlay.FadeOutProgress / _cachedOverlay.FadeOutTime) *
+                               _cachedOverlay
+                                   .FadeInTime; //set fade in progress to 1 - fade out progress (so 70% out becomes 30% in)
                 _cachedOverlay.FadeInProgress = progress;
                 _cachedOverlay.FadingIn = true; //start fading in again
                 _cachedOverlay.FadeOutProgress = 0; //stop the fadeout entirely
@@ -151,7 +158,9 @@ public sealed class MonumentPlacementPreviewSystem : EntitySystem
         StartTimers(confirmableAction, _cancellationTokenSource, _cachedOverlay);
     }
 
-    private void StartTimers(ConfirmableActionComponent comp, CancellationTokenSource tokenSource, MonumentPlacementPreviewOverlay overlay)
+    private void StartTimers(ConfirmableActionComponent comp,
+        CancellationTokenSource tokenSource,
+        MonumentPlacementPreviewOverlay overlay)
     {
         //remove the overlay automatically after the primeTime expires
         Timer.Spawn(comp.PrimeTime + comp.ConfirmDelay,

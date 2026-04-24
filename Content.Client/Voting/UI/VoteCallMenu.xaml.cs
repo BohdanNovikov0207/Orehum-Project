@@ -32,285 +32,296 @@ using Robust.Shared.Console;
 using Robust.Shared.Network;
 using Robust.Shared.Timing;
 
-namespace Content.Client.Voting.UI
+namespace Content.Client.Voting.UI;
+
+[GenerateTypedNameReferences]
+public sealed partial class VoteCallMenu : BaseWindow
 {
-    [GenerateTypedNameReferences]
-    public sealed partial class VoteCallMenu : BaseWindow
+    [Dependency] private readonly IConfigurationManager _cfg = default!;
+    [Dependency] private readonly IClientConsoleHost _consoleHost = default!;
+    [Dependency] private readonly IEntityManager _entityManager = default!;
+    [Dependency] private readonly IEntityNetworkManager _entNetManager = default!;
+    [Dependency] private readonly IGameTiming _gameTiming = default!;
+    [Dependency] private readonly IClientNetManager _netManager = default!;
+    [Dependency] private readonly IStateManager _state = default!;
+    [Dependency] private readonly IVoteManager _voteManager = default!;
+
+    private readonly VotingSystem _votingSystem;
+
+    public OptionButton? _followDropdown;
+
+    public Dictionary<StandardVoteType, CreateVoteOption> AvailableVoteOptions = new()
     {
-        [Dependency] private readonly IClientConsoleHost _consoleHost = default!;
-        [Dependency] private readonly IVoteManager _voteManager = default!;
-        [Dependency] private readonly IGameTiming _gameTiming = default!;
-        [Dependency] private readonly IClientNetManager _netManager = default!;
-        [Dependency] private readonly IEntityManager _entityManager = default!;
-        [Dependency] private readonly IEntityNetworkManager _entNetManager = default!;
-        [Dependency] private readonly IConfigurationManager _cfg = default!;
-        [Dependency] private readonly IStateManager _state = default!;
-
-        private VotingSystem _votingSystem;
-
-        public StandardVoteType Type;
-
-        public Dictionary<StandardVoteType, CreateVoteOption> AvailableVoteOptions = new Dictionary<StandardVoteType, CreateVoteOption>()
         {
-            { StandardVoteType.Restart, new CreateVoteOption("ui-vote-type-restart", new(), false, null) },
-            { StandardVoteType.Preset, new CreateVoteOption("ui-vote-type-gamemode", new(), false, null) },
-            { StandardVoteType.Map, new CreateVoteOption("ui-vote-type-map", new(), false, null) },
-            { StandardVoteType.Votekick, new CreateVoteOption("ui-vote-type-votekick", new(), true, 0) }
-        };
-
-        public Dictionary<string, string> VotekickReasons = new Dictionary<string, string>()
+            StandardVoteType.Restart,
+            new CreateVoteOption("ui-vote-type-restart", new List<Dictionary<string, string>>(), false, null)
+        },
         {
-            { VotekickReasonType.Raiding.ToString(), Loc.GetString("ui-vote-votekick-type-raiding") },
-            { VotekickReasonType.Cheating.ToString(), Loc.GetString("ui-vote-votekick-type-cheating") },
-            { VotekickReasonType.Spam.ToString(), Loc.GetString("ui-vote-votekick-type-spamming") }
-        };
-
-        public Dictionary<NetUserId, (NetEntity, string)> PlayerList = new();
-
-        public OptionButton? _followDropdown = null;
-
-        public bool IsAllowedVotekick = false;
-
-        public VoteCallMenu()
+            StandardVoteType.Preset,
+            new CreateVoteOption("ui-vote-type-gamemode", new List<Dictionary<string, string>>(), false, null)
+        },
         {
-            IoCManager.InjectDependencies(this);
-            RobustXamlLoader.Load(this);
-            _votingSystem = _entityManager.System<VotingSystem>();
+            StandardVoteType.Map,
+            new CreateVoteOption("ui-vote-type-map", new List<Dictionary<string, string>>(), false, null)
+        },
+        {
+            StandardVoteType.Votekick,
+            new CreateVoteOption("ui-vote-type-votekick", new List<Dictionary<string, string>>(), true, 0)
+        },
+    };
 
-            Stylesheet = IoCManager.Resolve<IStylesheetManager>().SheetSpace;
-            CloseButton.OnPressed += _ => Close();
-            VoteNotTrustedLabel.Text = Loc.GetString("ui-vote-trusted-users-notice", ("timeReq", _cfg.GetCVar(CCVars.VotekickEligibleVoterDeathtime)));
+    public bool IsAllowedVotekick;
 
-            foreach (StandardVoteType voteType in Enum.GetValues<StandardVoteType>())
-            {
-                var option = AvailableVoteOptions[voteType];
-                VoteTypeButton.AddItem(Loc.GetString(option.Name), (int)voteType);
-            }
+    public Dictionary<NetUserId, (NetEntity, string)> PlayerList = new();
 
-            _state.OnStateChanged += OnStateChanged;
-            VoteTypeButton.OnItemSelected += VoteTypeSelected;
-            CreateButton.OnPressed += CreatePressed;
-            FollowButton.OnPressed += FollowSelected;
+    public StandardVoteType Type;
+
+    public Dictionary<string, string> VotekickReasons = new()
+    {
+        { VotekickReasonType.Raiding.ToString(), Loc.GetString("ui-vote-votekick-type-raiding") },
+        { VotekickReasonType.Cheating.ToString(), Loc.GetString("ui-vote-votekick-type-cheating") },
+        { VotekickReasonType.Spam.ToString(), Loc.GetString("ui-vote-votekick-type-spamming") },
+    };
+
+    public VoteCallMenu()
+    {
+        IoCManager.InjectDependencies(this);
+        RobustXamlLoader.Load(this);
+        _votingSystem = _entityManager.System<VotingSystem>();
+
+        Stylesheet = IoCManager.Resolve<IStylesheetManager>().SheetSpace;
+        CloseButton.OnPressed += _ => Close();
+        VoteNotTrustedLabel.Text = Loc.GetString("ui-vote-trusted-users-notice",
+            ("timeReq", _cfg.GetCVar(CCVars.VotekickEligibleVoterDeathtime)));
+
+        foreach (var voteType in Enum.GetValues<StandardVoteType>())
+        {
+            var option = AvailableVoteOptions[voteType];
+            VoteTypeButton.AddItem(Loc.GetString(option.Name), (int) voteType);
         }
 
-        protected override void Opened()
-        {
-            base.Opened();
+        _state.OnStateChanged += OnStateChanged;
+        VoteTypeButton.OnItemSelected += VoteTypeSelected;
+        CreateButton.OnPressed += CreatePressed;
+        FollowButton.OnPressed += FollowSelected;
+    }
 
-            _netManager.ClientSendMessage(new MsgVoteMenu());
+    protected override void Opened()
+    {
+        base.Opened();
 
-            _voteManager.CanCallVoteChanged += CanCallVoteChanged;
-            _votingSystem.VotePlayerListResponse += UpdateVotePlayerList;
-            _votingSystem.RequestVotePlayerList();
-        }
+        _netManager.ClientSendMessage(new MsgVoteMenu());
 
-        public override void Close()
-        {
-            base.Close();
+        _voteManager.CanCallVoteChanged += CanCallVoteChanged;
+        _votingSystem.VotePlayerListResponse += UpdateVotePlayerList;
+        _votingSystem.RequestVotePlayerList();
+    }
 
-            _voteManager.CanCallVoteChanged -= CanCallVoteChanged;
-            _votingSystem.VotePlayerListResponse -= UpdateVotePlayerList;
-        }
+    public override void Close()
+    {
+        base.Close();
 
-        protected override void FrameUpdate(FrameEventArgs args)
-        {
-            base.FrameUpdate(args);
+        _voteManager.CanCallVoteChanged -= CanCallVoteChanged;
+        _votingSystem.VotePlayerListResponse -= UpdateVotePlayerList;
+    }
 
-            UpdateVoteTimeout();
-        }
+    protected override void FrameUpdate(FrameEventArgs args)
+    {
+        base.FrameUpdate(args);
 
-        private void OnStateChanged(StateChangedEventArgs obj)
-        {
-            if (obj.NewState is not GameplayState)
-                return;
+        UpdateVoteTimeout();
+    }
 
+    private void OnStateChanged(StateChangedEventArgs obj)
+    {
+        if (obj.NewState is not GameplayState)
+            return;
+
+        Close();
+    }
+
+    private void CanCallVoteChanged(bool obj)
+    {
+        if (!obj)
             Close();
+    }
+
+    private void UpdateVotePlayerList(VotePlayerListResponseEvent msg)
+    {
+        Dictionary<string, string> optionsList = new();
+        Dictionary<NetUserId, (NetEntity, string)> playerList = new();
+        foreach (var player in msg.Players)
+        {
+            optionsList.Add(player.Item1.ToString(), player.Item3);
+            playerList.Add(player.Item1, (player.Item2, player.Item3));
         }
 
-        private void CanCallVoteChanged(bool obj)
+        if (optionsList.Count == 0)
+            optionsList.Add(" ", " ");
+
+        PlayerList = playerList;
+
+        IsAllowedVotekick = !msg.Denied;
+
+        var updatedDropdownOption = AvailableVoteOptions[StandardVoteType.Votekick];
+        updatedDropdownOption.Dropdowns = new List<Dictionary<string, string>> { optionsList, VotekickReasons };
+        AvailableVoteOptions[StandardVoteType.Votekick] = updatedDropdownOption;
+    }
+
+    private void CreatePressed(BaseButton.ButtonEventArgs obj)
+    {
+        var typeId = VoteTypeButton.SelectedId;
+        var voteType = AvailableVoteOptions[(StandardVoteType) typeId];
+
+        var commandArgs = "";
+
+        if (voteType.Dropdowns == null || voteType.Dropdowns.Count == 0)
+            _consoleHost.LocalShell.RemoteExecuteCommand($"createvote {((StandardVoteType) typeId).ToString()}");
+        else
         {
-            if (!obj)
-                Close();
-        }
-
-        private void UpdateVotePlayerList(VotePlayerListResponseEvent msg)
-        {
-            Dictionary<string, string> optionsList = new();
-            Dictionary<NetUserId, (NetEntity, string)> playerList = new();
-            foreach ((NetUserId, NetEntity, string) player in msg.Players)
+            var i = 0;
+            foreach (var dropdowns in VoteOptionsButtonContainer.Children)
             {
-                optionsList.Add(player.Item1.ToString(), player.Item3);
-                playerList.Add(player.Item1, (player.Item2, player.Item3));
-            }
-            if (optionsList.Count == 0)
-                optionsList.Add(" ", " ");
-
-            PlayerList = playerList;
-
-            IsAllowedVotekick = !msg.Denied;
-
-            var updatedDropdownOption = AvailableVoteOptions[StandardVoteType.Votekick];
-            updatedDropdownOption.Dropdowns = new List<Dictionary<string, string>>() { optionsList, VotekickReasons };
-            AvailableVoteOptions[StandardVoteType.Votekick] = updatedDropdownOption;
-        }
-
-        private void CreatePressed(BaseButton.ButtonEventArgs obj)
-        {
-            var typeId = VoteTypeButton.SelectedId;
-            var voteType = AvailableVoteOptions[(StandardVoteType)typeId];
-
-            var commandArgs = "";
-
-            if (voteType.Dropdowns == null || voteType.Dropdowns.Count == 0)
-            {
-                _consoleHost.LocalShell.RemoteExecuteCommand($"createvote {((StandardVoteType)typeId).ToString()}");
-            }
-            else
-            {
-                int i = 0;
-                foreach(var dropdowns in VoteOptionsButtonContainer.Children)
+                if (dropdowns is OptionButton optionButton &&
+                    AvailableVoteOptions[(StandardVoteType) typeId].Dropdowns != null)
                 {
-                    if (dropdowns is OptionButton optionButton && AvailableVoteOptions[(StandardVoteType)typeId].Dropdowns != null)
-                    {
-                        commandArgs += AvailableVoteOptions[(StandardVoteType)typeId].Dropdowns[i].ElementAt(optionButton.SelectedId).Key + " ";
-                        i++;
-                    }
-                }
-                _consoleHost.LocalShell.RemoteExecuteCommand($"createvote {((StandardVoteType)typeId).ToString()} {commandArgs}");
-            }
-
-            Close();
-        }
-
-        private void UpdateVoteTimeout()
-        {
-            var typeKey = (StandardVoteType)VoteTypeButton.SelectedId;
-            var isAvailable = _voteManager.CanCallStandardVote(typeKey, out var timeout);
-            if (typeKey == StandardVoteType.Votekick && !IsAllowedVotekick)
-            {
-                CreateButton.Disabled = true;
-            }
-            else
-            {
-                CreateButton.Disabled = !isAvailable;
-            }
-            VoteTypeTimeoutLabel.Visible = !isAvailable;
-
-            if (!isAvailable)
-            {
-                if (timeout == TimeSpan.Zero)
-                {
-                    VoteTypeTimeoutLabel.Text = Loc.GetString("ui-vote-type-not-available");
-                }
-                else
-                {
-                    var remaining = timeout - _gameTiming.RealTime;
-                    VoteTypeTimeoutLabel.Text = Loc.GetString("ui-vote-type-timeout", ("remaining", remaining.ToString("mm\\:ss")));
-                }
-            }
-        }
-
-        private static void ButtonSelected(OptionButton.ItemSelectedEventArgs obj)
-        {
-            obj.Button.SelectId(obj.Id);
-        }
-
-        private void FollowSelected(Button.ButtonEventArgs obj)
-        {
-            if (_followDropdown == null)
-                return;
-
-            if (_followDropdown.SelectedId >= PlayerList.Count)
-                return;
-
-            var netEntity = PlayerList.ElementAt(_followDropdown.SelectedId).Value.Item1;
-
-            var msg = new GhostWarpToTargetRequestEvent(netEntity);
-            _entNetManager.SendSystemNetworkMessage(msg);
-        }
-
-        private void VoteTypeSelected(OptionButton.ItemSelectedEventArgs obj)
-        {
-            VoteTypeButton.SelectId(obj.Id);
-
-            VoteNotTrustedLabel.Visible = false;
-            if ((StandardVoteType)obj.Id == StandardVoteType.Votekick)
-            {
-                if (!IsAllowedVotekick)
-                {
-                    VoteNotTrustedLabel.Visible = true;
-                    var updatedDropdownOption = AvailableVoteOptions[StandardVoteType.Votekick];
-                    updatedDropdownOption.Dropdowns = new List<Dictionary<string, string>>();
-                    AvailableVoteOptions[StandardVoteType.Votekick] = updatedDropdownOption;
-                }
-                else
-                {
-                    _votingSystem.RequestVotePlayerList();
-                }
-            }
-
-            VoteWarningLabel.Visible = AvailableVoteOptions[(StandardVoteType)obj.Id].EnableVoteWarning;
-            FollowButton.Visible = false;
-
-            var voteList = AvailableVoteOptions[(StandardVoteType)obj.Id].Dropdowns;
-
-            VoteOptionsButtonContainer.RemoveAllChildren();
-            if (voteList != null)
-            {
-                int i = 0;
-                foreach (var voteDropdown in voteList)
-                {
-                    var optionButton = new OptionButton();
-                    int j = 0;
-                    foreach (var (key, value) in voteDropdown)
-                    {
-                        optionButton.AddItem(Loc.GetString(value), j);
-                        j++;
-                    }
-                    VoteOptionsButtonContainer.AddChild(optionButton);
-                    optionButton.Visible = true;
-                    optionButton.OnItemSelected += ButtonSelected;
-                    optionButton.Margin = new Thickness(2, 1);
-                    if (AvailableVoteOptions[(StandardVoteType)obj.Id].FollowDropdownId != null && AvailableVoteOptions[(StandardVoteType)obj.Id].FollowDropdownId == i)
-                    {
-                        _followDropdown = optionButton;
-                        FollowButton.Visible = true;
-                    }
+                    commandArgs += AvailableVoteOptions[(StandardVoteType) typeId]
+                        .Dropdowns[i]
+                        .ElementAt(optionButton.SelectedId)
+                        .Key + " ";
                     i++;
                 }
             }
+
+            _consoleHost.LocalShell.RemoteExecuteCommand(
+                $"createvote {((StandardVoteType) typeId).ToString()} {commandArgs}");
         }
 
-        protected override DragMode GetDragModeFor(Vector2 relativeMousePos)
+        Close();
+    }
+
+    private void UpdateVoteTimeout()
+    {
+        var typeKey = (StandardVoteType) VoteTypeButton.SelectedId;
+        var isAvailable = _voteManager.CanCallStandardVote(typeKey, out var timeout);
+        if (typeKey == StandardVoteType.Votekick && !IsAllowedVotekick)
+            CreateButton.Disabled = true;
+        else
+            CreateButton.Disabled = !isAvailable;
+        VoteTypeTimeoutLabel.Visible = !isAvailable;
+
+        if (!isAvailable)
         {
-            return DragMode.Move;
+            if (timeout == TimeSpan.Zero)
+                VoteTypeTimeoutLabel.Text = Loc.GetString("ui-vote-type-not-available");
+            else
+            {
+                var remaining = timeout - _gameTiming.RealTime;
+                VoteTypeTimeoutLabel.Text =
+                    Loc.GetString("ui-vote-type-timeout", ("remaining", remaining.ToString("mm\\:ss")));
+            }
         }
     }
 
-    [UsedImplicitly, AnyCommand]
-    public sealed class VoteMenuCommand : LocalizedCommands
-    {
-        public override string Command => "votemenu";
+    private static void ButtonSelected(OptionButton.ItemSelectedEventArgs obj) => obj.Button.SelectId(obj.Id);
 
-        public override void Execute(IConsoleShell shell, string argStr, string[] args)
+    private void FollowSelected(BaseButton.ButtonEventArgs obj)
+    {
+        if (_followDropdown == null)
+            return;
+
+        if (_followDropdown.SelectedId >= PlayerList.Count)
+            return;
+
+        var netEntity = PlayerList.ElementAt(_followDropdown.SelectedId).Value.Item1;
+
+        var msg = new GhostWarpToTargetRequestEvent(netEntity);
+        _entNetManager.SendSystemNetworkMessage(msg);
+    }
+
+    private void VoteTypeSelected(OptionButton.ItemSelectedEventArgs obj)
+    {
+        VoteTypeButton.SelectId(obj.Id);
+
+        VoteNotTrustedLabel.Visible = false;
+        if ((StandardVoteType) obj.Id == StandardVoteType.Votekick)
         {
-            new VoteCallMenu().OpenCentered();
+            if (!IsAllowedVotekick)
+            {
+                VoteNotTrustedLabel.Visible = true;
+                var updatedDropdownOption = AvailableVoteOptions[StandardVoteType.Votekick];
+                updatedDropdownOption.Dropdowns = new List<Dictionary<string, string>>();
+                AvailableVoteOptions[StandardVoteType.Votekick] = updatedDropdownOption;
+            }
+            else
+                _votingSystem.RequestVotePlayerList();
+        }
+
+        VoteWarningLabel.Visible = AvailableVoteOptions[(StandardVoteType) obj.Id].EnableVoteWarning;
+        FollowButton.Visible = false;
+
+        var voteList = AvailableVoteOptions[(StandardVoteType) obj.Id].Dropdowns;
+
+        VoteOptionsButtonContainer.RemoveAllChildren();
+        if (voteList != null)
+        {
+            var i = 0;
+            foreach (var voteDropdown in voteList)
+            {
+                var optionButton = new OptionButton();
+                var j = 0;
+                foreach (var (key, value) in voteDropdown)
+                {
+                    optionButton.AddItem(Loc.GetString(value), j);
+                    j++;
+                }
+
+                VoteOptionsButtonContainer.AddChild(optionButton);
+                optionButton.Visible = true;
+                optionButton.OnItemSelected += ButtonSelected;
+                optionButton.Margin = new Thickness(2, 1);
+                if (AvailableVoteOptions[(StandardVoteType) obj.Id].FollowDropdownId != null &&
+                    AvailableVoteOptions[(StandardVoteType) obj.Id].FollowDropdownId == i)
+                {
+                    _followDropdown = optionButton;
+                    FollowButton.Visible = true;
+                }
+
+                i++;
+            }
         }
     }
 
-    public record struct CreateVoteOption
-    {
-        public string Name;
-        public List<Dictionary<string, string>> Dropdowns;
-        public bool EnableVoteWarning;
-        public int? FollowDropdownId;  // If set, this will enable the Follow button and use the dropdown matching the ID as input.
+    protected override DragMode GetDragModeFor(Vector2 relativeMousePos) => DragMode.Move;
+}
 
-        public CreateVoteOption(string name, List<Dictionary<string, string>> dropdowns, bool enableVoteWarning, int? followDropdownId)
-        {
-            Name = name;
-            Dropdowns = dropdowns;
-            EnableVoteWarning = enableVoteWarning;
-            FollowDropdownId = followDropdownId;
-        }
+[UsedImplicitly] [AnyCommand]
+public sealed class VoteMenuCommand : LocalizedCommands
+{
+    public override string Command => "votemenu";
+
+    public override void Execute(IConsoleShell shell, string argStr, string[] args) =>
+        new VoteCallMenu().OpenCentered();
+}
+
+public record struct CreateVoteOption
+{
+    public List<Dictionary<string, string>> Dropdowns;
+    public bool EnableVoteWarning;
+
+    public int?
+        FollowDropdownId; // If set, this will enable the Follow button and use the dropdown matching the ID as input.
+
+    public string Name;
+
+    public CreateVoteOption(string name,
+        List<Dictionary<string, string>> dropdowns,
+        bool enableVoteWarning,
+        int? followDropdownId)
+    {
+        Name = name;
+        Dropdowns = dropdowns;
+        EnableVoteWarning = enableVoteWarning;
+        FollowDropdownId = followDropdownId;
     }
 }

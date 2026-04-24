@@ -11,31 +11,6 @@ namespace Content.Client.UserInterface.Controls;
 
 public sealed class HLine : Container
 {
-    public Color? Color
-    {
-        get
-        {
-            if (_line.PanelOverride is StyleBoxFlat styleBox) return styleBox.BackgroundColor;
-            return null;
-        }
-        set
-        {
-            if (_line.PanelOverride is StyleBoxFlat styleBox) styleBox.BackgroundColor = value!.Value;
-        }
-    }
-
-    public float? Thickness {
-        get
-        {
-            if (_line.PanelOverride is StyleBoxFlat styleBox) return styleBox.ContentMarginTopOverride;
-            return null;
-        }
-        set
-        {
-            if (_line.PanelOverride is StyleBoxFlat styleBox) styleBox.ContentMarginTopOverride = value!.Value;
-        }
-    }
-
     private readonly PanelContainer _line;
 
     public HLine()
@@ -46,4 +21,33 @@ public sealed class HLine : Container
         AddChild(_line);
     }
 
+    public Color? Color
+    {
+        get
+        {
+            if (_line.PanelOverride is StyleBoxFlat styleBox)
+                return styleBox.BackgroundColor;
+            return null;
+        }
+        set
+        {
+            if (_line.PanelOverride is StyleBoxFlat styleBox)
+                styleBox.BackgroundColor = value!.Value;
+        }
+    }
+
+    public float? Thickness
+    {
+        get
+        {
+            if (_line.PanelOverride is StyleBoxFlat styleBox)
+                return styleBox.ContentMarginTopOverride;
+            return null;
+        }
+        set
+        {
+            if (_line.PanelOverride is StyleBoxFlat styleBox)
+                styleBox.ContentMarginTopOverride = value!.Value;
+        }
+    }
 }

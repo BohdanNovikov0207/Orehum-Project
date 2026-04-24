@@ -13,21 +13,21 @@ using Robust.Shared.Enums;
 namespace Content.Client.Light;
 
 /// <summary>
-/// This exists just to copy <see cref="BeforeLightTargetOverlay"/> to the light render target
+/// This exists just to copy <see cref="BeforeLightTargetOverlay" /> to the light render target
 /// </summary>
 public sealed class AfterLightTargetOverlay : Overlay
 {
-    public override OverlaySpace Space => OverlaySpace.BeforeLighting;
+    public const int ContentZIndex = LightBlurOverlay.ContentZIndex + 1;
 
     [Dependency] private readonly IOverlayManager _overlay = default!;
-
-    public const int ContentZIndex = LightBlurOverlay.ContentZIndex + 1;
 
     public AfterLightTargetOverlay()
     {
         IoCManager.InjectDependencies(this);
         ZIndex = ContentZIndex;
     }
+
+    public override OverlaySpace Space => OverlaySpace.BeforeLighting;
 
     protected override void Draw(in OverlayDrawArgs args)
     {
@@ -46,7 +46,7 @@ public sealed class AfterLightTargetOverlay : Overlay
 
         var localMatrix =
             viewport.LightRenderTarget.GetWorldToLocalMatrix(viewport.Eye, newScale);
-        var diff = (lightOverlay.EnlargedLightTarget.Size - viewport.LightRenderTarget.Size);
+        var diff = lightOverlay.EnlargedLightTarget.Size - viewport.LightRenderTarget.Size;
         var halfDiff = diff / 2;
 
         // Pixels -> Metres -> Half distance.
@@ -61,7 +61,10 @@ public sealed class AfterLightTargetOverlay : Overlay
                     viewport.LightRenderTarget.Size.Y + halfDiff.Y);
 
                 worldHandle.SetTransform(localMatrix);
-                worldHandle.DrawTextureRectRegion(lightOverlay.EnlargedLightTarget.Texture, bounds, subRegion: subRegion);
-            }, Color.Transparent);
+                worldHandle.DrawTextureRectRegion(lightOverlay.EnlargedLightTarget.Texture,
+                    bounds,
+                    subRegion: subRegion);
+            },
+            Color.Transparent);
     }
 }

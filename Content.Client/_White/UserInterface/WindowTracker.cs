@@ -1,22 +1,21 @@
-using Robust.Client.UserInterface.CustomControls;
-using Robust.Shared.Sandboxing;
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
+using Robust.Client.UserInterface.CustomControls;
+using Robust.Shared.Sandboxing;
 
 namespace Content.Client._White.UserInterface;
 
-
 /// <summary>
-/// Used for buttons that open a window when pressed, and, if pressed again, close that window instead of opening another one.
+/// Used for buttons that open a window when pressed, and, if pressed again, close that window instead of opening another
+/// one.
 /// This kills the boilerplate.
 /// </summary>
 /// <typeparam name="T"></typeparam>
 public sealed class WindowTracker<T> where T : BaseWindow, new()
 {
+    private static ISandboxHelper? _sandbox;
     public T? Window { get; private set; }
     public bool IsOpen => Window is not null;
-
-    private static ISandboxHelper? _sandbox = null;
 
     [MemberNotNullWhen(true, nameof(Window))]
     private bool Toggle()
@@ -27,6 +26,7 @@ public sealed class WindowTracker<T> where T : BaseWindow, new()
             Window.Close();
             return false;
         }
+
         Window = (T) _sandbox.CreateInstance(typeof(T));
         Window.OnClose += () => Window = null;
         return true;
@@ -105,4 +105,3 @@ public sealed class WindowTracker<T> where T : BaseWindow, new()
         return true;
     }
 }
-

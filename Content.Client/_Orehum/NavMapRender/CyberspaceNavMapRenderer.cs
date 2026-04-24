@@ -12,24 +12,29 @@ namespace Content.Client._Orehum.NavMapRender;
 /// </summary>
 internal sealed class CyberspaceNavMapRenderer(IPrototypeManager proto)
 {
+    private const float NavDataUpdateInterval = 1.0f;
+    private const float RebuildMoveThreshold = 8f;
     private static readonly ProtoId<ShaderPrototype> _floorShader = "CyberspaceFloor";
     private static readonly ProtoId<ShaderPrototype> _wallShader = "CyberspaceWall";
     private static readonly ProtoId<ShaderPrototype> _doorShader = "CyberspaceDoor";
+    private readonly List<Vector2> _doorVerts = [];
 
     private readonly List<Vector2> _floorVerts = [];
     private readonly List<Vector2> _wallVerts = [];
-    private readonly List<Vector2> _doorVerts = [];
-
-    private float _navDataTimer;
     private EntityUid _lastGridUid;
     private Vector2 _lastRebuildCenter;
-    private const float NavDataUpdateInterval = 1.0f;
-    private const float RebuildMoveThreshold = 8f;
+
+    private float _navDataTimer;
 
     /// <summary>
     /// Updates geometry caches: rebuilds vertex arrays when grid, camera, or timer threshold changes.
     /// </summary>
-    public void Update(float frameTime, EntityUid gridUid, NavMapComponent? navMap, MapGridComponent grid, SharedTransformSystem xforms, Box2Rotated worldBounds)
+    public void Update(float frameTime,
+        EntityUid gridUid,
+        NavMapComponent? navMap,
+        MapGridComponent grid,
+        SharedTransformSystem xforms,
+        Box2Rotated worldBounds)
     {
         _navDataTimer += frameTime;
         var gridChanged = _lastGridUid != gridUid;
@@ -40,7 +45,8 @@ internal sealed class CyberspaceNavMapRenderer(IPrototypeManager proto)
         var gridInvMatrix = xforms.GetInvWorldMatrix(gridUid);
         var localAabb = gridInvMatrix.TransformBox(worldBounds);
         var viewCenter = localAabb.Center;
-        var cameraMoved = (viewCenter - _lastRebuildCenter).LengthSquared() > RebuildMoveThreshold * RebuildMoveThreshold;
+        var cameraMoved = (viewCenter - _lastRebuildCenter).LengthSquared() >
+                          RebuildMoveThreshold * RebuildMoveThreshold;
 
         if (navMap == null)
         {
@@ -78,7 +84,8 @@ internal sealed class CyberspaceNavMapRenderer(IPrototypeManager proto)
 
         void Draw(ProtoId<ShaderPrototype> shader, List<Vector2> verts)
         {
-            if (verts.Count == 0) return;
+            if (verts.Count == 0)
+                return;
             handle.UseShader(proto.Index(shader).Instance());
             handle.DrawPrimitives(DrawPrimitiveTopology.TriangleList, verts, Color.White);
         }
@@ -86,7 +93,7 @@ internal sealed class CyberspaceNavMapRenderer(IPrototypeManager proto)
 
     /// <summary>
     /// Rebuilds floor/wall/door vertex arrays from NavMapComponent chunk bitmasks.
-    /// Only processes chunks that intersect <paramref name="cullBounds"/> (grid-local space).
+    /// Only processes chunks that intersect <paramref name="cullBounds" /> (grid-local space).
     /// Each tile that matches a category becomes a 1×1 quad (6 vertices, 2 triangles).
     /// </summary>
     private void RebuildNavMapGeometry(NavMapComponent navMap, int tileSize, Box2 cullBounds)
@@ -114,11 +121,11 @@ internal sealed class CyberspaceNavMapRenderer(IPrototypeManager proto)
                     continue;
 
                 var relative = SharedNavMapSystem.GetTileFromIndex(i);
-                var gridTile = (chunk.Origin * SharedNavMapSystem.ChunkSize) + relative;
+                var gridTile = chunk.Origin * SharedNavMapSystem.ChunkSize + relative;
 
-                var x = (float)(gridTile.X * tileSize);
-                var y = (float)(gridTile.Y * tileSize);
-                var s = (float)tileSize;
+                var x = (float) (gridTile.X * tileSize);
+                var y = (float) (gridTile.Y * tileSize);
+                var s = (float) tileSize;
 
                 if ((tileData & SharedNavMapSystem.FloorMask) != 0)
                     AddQuad(_floorVerts, x, y, s);

@@ -38,7 +38,8 @@ public sealed class EnsnareableSystem : SharedEnsnareableSystem
 
     private void OnAppearanceChange(EntityUid uid, EnsnareableComponent component, ref AppearanceChangeEvent args)
     {
-        if (args.Sprite == null || !_sprite.LayerMapTryGet((uid, args.Sprite), EnsnaredVisualLayers.Ensnared, out var layer, false))
+        if (args.Sprite == null ||
+            !_sprite.LayerMapTryGet((uid, args.Sprite), EnsnaredVisualLayers.Ensnared, out var layer, false))
             return;
 
         if (_appearance.TryGetData<bool>(uid, EnsnareableVisuals.IsEnsnared, out var isEnsnared, args.Component))

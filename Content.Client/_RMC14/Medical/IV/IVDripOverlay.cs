@@ -15,12 +15,12 @@ public sealed class IVDripOverlay : Overlay
 {
     [Dependency] private readonly IEntityManager _entity = default!;
 
-    public override OverlaySpace Space => OverlaySpace.WorldSpaceBelowEntities;
-
     public IVDripOverlay()
     {
         IoCManager.InjectDependencies(this);
     }
+
+    public override OverlaySpace Space => OverlaySpace.WorldSpaceBelowEntities;
 
     protected override void Draw(in OverlayDrawArgs args)
     {
@@ -31,9 +31,7 @@ public sealed class IVDripOverlay : Overlay
         while (ivDrips.MoveNext(out var ivDripId, out var ivDripComponent))
         {
             if (ivDripComponent.AttachedTo is not { Valid: true } attachedTo)
-            {
                 continue;
-            }
 
             var ivDripPosition = transformSystem.GetMapCoordinates(ivDripId);
             var attachedPosition = transformSystem.GetMapCoordinates(attachedTo);

@@ -18,7 +18,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
             <Button Name="BeaconsButton" Access="Public" Text="{Loc 'abductors-ui-beacons'}"
                     HorizontalExpand="True" StyleClasses="OpenBoth" />
         </BoxContainer>
-        <cc:HSeparator/>
+        <cc:HSeparator />
         <ScrollContainer VScrollEnabled="True" HorizontalExpand="True" VerticalExpand="True">
             <BoxContainer Name="Stations" Access="Public" Orientation="Vertical" Visible="False" />
             <BoxContainer Name="Beacons" Access="Public" Orientation="Vertical" Visible="False" />

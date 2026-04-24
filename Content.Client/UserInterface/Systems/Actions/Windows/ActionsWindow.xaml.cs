@@ -21,7 +21,14 @@ namespace Content.Client.UserInterface.Systems.Actions.Windows;
 [GenerateTypedNameReferences]
 public sealed partial class ActionsWindow : DefaultWindow
 {
-    public MultiselectOptionButton<Filters> FilterButton { get; private set; }
+    public enum Filters
+    {
+        Enabled,
+        Item,
+        Innate,
+        Instant,
+        Targeted,
+    }
 
     /// <summary>
     /// Whether the displayed actions or search filter needs updating.
@@ -34,7 +41,7 @@ public sealed partial class ActionsWindow : DefaultWindow
 
         SearchContainer.AddChild(FilterButton = new MultiselectOptionButton<Filters>
         {
-            Label = Loc.GetString("ui-actionmenu-filter-button")
+            Label = Loc.GetString("ui-actionmenu-filter-button"),
         });
 
         foreach (var filter in Enum.GetValues<Filters>())
@@ -43,12 +50,5 @@ public sealed partial class ActionsWindow : DefaultWindow
         }
     }
 
-    public enum Filters
-    {
-        Enabled,
-        Item,
-        Innate,
-        Instant,
-        Targeted
-    }
+    public MultiselectOptionButton<Filters> FilterButton { get; }
 }

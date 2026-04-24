@@ -14,9 +14,9 @@ namespace Content.Client.Power.APC;
 [Access(typeof(ApcVisualizerSystem))]
 public sealed partial class ApcVisualsComponent : Component
 {
-#region Indicators
+    #region Indicators
 
-#region Locks
+    #region Locks
 
     /// <summary>
     /// The number of lock indicators on the APC.
@@ -39,11 +39,11 @@ public sealed partial class ApcVisualsComponent : Component
     /// </summary>
     [DataField("lockIndicatorSuffixes")]
     [ViewVariables(VVAccess.ReadWrite)]
-    public string[] LockSuffixes = new string[(byte)(2 << (sbyte)ApcLockState.LogWidth)]{"unlocked", "locked"};
+    public string[] LockSuffixes = new string[2 << (sbyte) ApcLockState.LogWidth] { "unlocked", "locked" };
 
-#endregion Locks
+    #endregion Locks
 
-#region Channels
+    #region Channels
 
     /// <summary>
     /// The number of output channel indicator lights on the APC.
@@ -66,13 +66,14 @@ public sealed partial class ApcVisualsComponent : Component
     /// </summary>
     [DataField("channelIndicatorSuffixes")]
     [ViewVariables(VVAccess.ReadWrite)]
-    public string[] ChannelSuffixes = new string[(byte)(2 << (sbyte)ApcChannelState.LogWidth)]{"auto_off", "manual_off", "auto_on", "manual_on"};
+    public string[] ChannelSuffixes = new string[2 << (sbyte) ApcChannelState.LogWidth]
+        { "auto_off", "manual_off", "auto_on", "manual_on" };
 
-#endregion Channels
+    #endregion Channels
 
-#endregion Indicators
+    #endregion Indicators
 
-#region Screen
+    #region Screen
 
     /// <summary>
     /// The prefix used to construct the sprite state suffix used for the screen overlay.
@@ -88,14 +89,18 @@ public sealed partial class ApcVisualsComponent : Component
     /// </summary>
     [DataField("screenStateSuffixes")]
     [ViewVariables(VVAccess.ReadWrite)]
-    public string[] ScreenSuffixes = new string[(byte)ApcChargeState.NumStates]{"lack", "charging", "full", "remote"};
+    public string[] ScreenSuffixes = new string[(byte) ApcChargeState.NumStates]
+        { "lack", "charging", "full", "remote" };
 
     /// <summary>
     /// The colors of the light emitted by the APC given a particular display state.
     /// </summary>
     [DataField("screenColors")]
     [ViewVariables(VVAccess.ReadWrite)]
-    public Color[] ScreenColors = new Color[(byte)ApcChargeState.NumStates]{Color.FromHex("#d1332e"), Color.FromHex("#dcdc28"), Color.FromHex("#82ff4c"), Color.FromHex("#ffac1c")};
+    public Color[] ScreenColors = new Color[(byte) ApcChargeState.NumStates]
+    {
+        Color.FromHex("#d1332e"), Color.FromHex("#dcdc28"), Color.FromHex("#82ff4c"), Color.FromHex("#ffac1c"),
+    };
 
     /// <summary>
     /// The sprite state of the unlit overlay used for the APC screen when the APC has been emagged.
@@ -111,5 +116,5 @@ public sealed partial class ApcVisualsComponent : Component
     [ViewVariables(VVAccess.ReadWrite)]
     public Color EmaggedScreenColor = Color.FromHex("#1f48d6");
 
-#endregion Screen
+    #endregion Screen
 }

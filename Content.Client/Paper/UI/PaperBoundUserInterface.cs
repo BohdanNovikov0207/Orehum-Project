@@ -84,11 +84,11 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Shared.Paper;
 using JetBrains.Annotations;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
 using Robust.Shared.Utility;
-using Content.Shared.Paper;
 using static Content.Shared.Paper.PaperComponent;
 
 namespace Content.Client.Paper.UI;
@@ -111,13 +111,9 @@ public sealed class PaperBoundUserInterface : BoundUserInterface
         _window.OnSaved += InputOnTextEntered;
 
         if (EntMan.TryGetComponent<PaperComponent>(Owner, out var paper))
-        {
             _window.MaxInputLength = paper.ContentSize;
-        }
         if (EntMan.TryGetComponent<PaperVisualsComponent>(Owner, out var visuals))
-        {
             _window.InitVisuals(Owner, visuals);
-        }
     }
 
     protected override void UpdateState(BoundUserInterfaceState state)

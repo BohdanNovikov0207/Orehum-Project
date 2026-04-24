@@ -6,8 +6,8 @@
 
 using Content.Shared.Electrocution;
 
-namespace Content.Client.Electrocution
+namespace Content.Client.Electrocution;
+
+public sealed class ElectrocutionSystem : SharedElectrocutionSystem
 {
-    public sealed class ElectrocutionSystem : SharedElectrocutionSystem
-    { }
 }

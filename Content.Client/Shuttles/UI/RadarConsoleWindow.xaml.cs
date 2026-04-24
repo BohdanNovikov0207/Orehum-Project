@@ -22,8 +22,5 @@ public sealed partial class RadarConsoleWindow : FancyWindow,
         RobustXamlLoader.Load(this);
     }
 
-    public void UpdateState(NavInterfaceState scc)
-    {
-        RadarScreen.UpdateState(scc);
-    }
+    public void UpdateState(NavInterfaceState scc) => RadarScreen.UpdateState(scc);
 }

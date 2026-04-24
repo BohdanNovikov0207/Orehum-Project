@@ -20,13 +20,13 @@ namespace Content.Client.CriminalRecords;
 
 public sealed class CriminalRecordsConsoleBoundUserInterface : BoundUserInterface
 {
+    private readonly AccessReaderSystem _accessReader;
+    [Dependency] private readonly IPlayerManager _playerManager = default!;
     [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly IPlayerManager _playerManager = default!;
-    private readonly AccessReaderSystem _accessReader;
+    private CrimeHistoryWindow? _historyWindow;
 
     private CriminalRecordsConsoleWindow? _window;
-    private CrimeHistoryWindow? _historyWindow;
 
     public CriminalRecordsConsoleBoundUserInterface(EntityUid owner, Enum uiKey) : base(owner, uiKey)
     {
@@ -39,7 +39,12 @@ public sealed class CriminalRecordsConsoleBoundUserInterface : BoundUserInterfac
 
         var comp = EntMan.GetComponent<CriminalRecordsConsoleComponent>(Owner);
 
-        _window = new(Owner, comp.MaxStringLength, _playerManager, _proto, _random, _accessReader);
+        _window = new CriminalRecordsConsoleWindow(Owner,
+            comp.MaxStringLength,
+            _playerManager,
+            _proto,
+            _random,
+            _accessReader);
         _window.OnKeySelected += key =>
             SendMessage(new SelectStationRecord(key));
         _window.OnFiltersChanged += (type, filterValue) =>
@@ -48,13 +53,13 @@ public sealed class CriminalRecordsConsoleBoundUserInterface : BoundUserInterfac
             SendMessage(new CriminalRecordChangeStatus(status, null));
         _window.OnDialogConfirmed += (status, reason) =>
             SendMessage(new CriminalRecordChangeStatus(status, reason));
-        _window.OnStatusFilterPressed += (statusFilter) =>
+        _window.OnStatusFilterPressed += statusFilter =>
             SendMessage(new CriminalRecordSetStatusFilter(statusFilter));
         _window.OnHistoryUpdated += UpdateHistory;
         _window.OnHistoryClosed += () => _historyWindow?.Close();
         _window.OnClose += Close;
 
-        _historyWindow = new(comp.MaxStringLength);
+        _historyWindow = new CrimeHistoryWindow(comp.MaxStringLength);
         _historyWindow.OnAddHistory += line => SendMessage(new CriminalRecordAddHistory(line));
         _historyWindow.OnDeleteHistory += index => SendMessage(new CriminalRecordDeleteHistory(index));
 

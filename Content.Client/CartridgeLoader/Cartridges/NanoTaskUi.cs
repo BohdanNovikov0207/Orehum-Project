@@ -1,24 +1,20 @@
-using System.Linq;
 using Content.Client.UserInterface.Fragments;
 using Content.Shared.CartridgeLoader;
 using Content.Shared.CartridgeLoader.Cartridges;
-using Robust.Client.GameObjects;
 using Robust.Client.UserInterface;
 
 namespace Content.Client.CartridgeLoader.Cartridges;
 
 /// <summary>
-///     UI fragment responsible for displaying NanoTask controls in a PDA and coordinating with the NanoTaskCartridgeSystem for state
+/// UI fragment responsible for displaying NanoTask controls in a PDA and coordinating with the NanoTaskCartridgeSystem for
+/// state
 /// </summary>
 public sealed partial class NanoTaskUi : UIFragment
 {
     private NanoTaskUiFragment? _fragment;
     private NanoTaskItemPopup? _popup;
 
-    public override Control GetUIFragmentRoot()
-    {
-        return _fragment!;
-    }
+    public override Control GetUIFragmentRoot() => _fragment!;
 
     public override void Setup(BoundUserInterface userInterface, EntityUid? fragmentOwner)
     {
@@ -44,16 +40,20 @@ public sealed partial class NanoTaskUi : UIFragment
             if (_fragment.Tasks.Find(task => task.Id == id) is not NanoTaskItemAndId task)
                 return;
 
-            userInterface.SendMessage(new CartridgeUiMessage(new NanoTaskUiMessageEvent(new NanoTaskUpdateTask(new(id, new(
-                description: task.Data.Description,
-                taskIsFor: task.Data.TaskIsFor,
-                isTaskDone: !task.Data.IsTaskDone,
-                priority: task.Data.Priority
-            ))))));
+            userInterface.SendMessage(new CartridgeUiMessage(new NanoTaskUiMessageEvent(new NanoTaskUpdateTask(
+                new NanoTaskItemAndId(id,
+                    new NanoTaskItem(
+                        task.Data.Description,
+                        task.Data.TaskIsFor,
+                        !task.Data.IsTaskDone,
+                        task.Data.Priority
+                    ))))));
         };
         _popup.TaskSaved += (id, data) =>
         {
-            userInterface.SendMessage(new CartridgeUiMessage(new NanoTaskUiMessageEvent(new NanoTaskUpdateTask(new(id, data)))));
+            userInterface.SendMessage(
+                new CartridgeUiMessage(
+                    new NanoTaskUiMessageEvent(new NanoTaskUpdateTask(new NanoTaskItemAndId(id, data)))));
             _popup.Close();
         };
         _popup.TaskDeleted += id =>

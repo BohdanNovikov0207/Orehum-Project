@@ -17,21 +17,18 @@ namespace Content.Client.Implants.UI;
 [GenerateTypedNameReferences]
 public sealed partial class ChameleonControllerMenu : FancyWindow
 {
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    private static readonly ProtoId<JobIconPrototype> UnknownIcon = "JobIconUnknown";
+    private static readonly LocId UnknownDepartment = "department-Unknown";
     [Dependency] private readonly IEntityManager _entityManager = default!;
-    private readonly SpriteSystem _sprite;
     private readonly JobSystem _job;
 
     // List of all the job protos that you can select!
-    private IEnumerable<ChameleonOutfitPrototype> _outfits;
+    private readonly IEnumerable<ChameleonOutfitPrototype> _outfits;
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    private readonly SpriteSystem _sprite;
 
     // Lock the UI until this time
     public DateTime? _lockedUntil;
-
-    private static readonly ProtoId<JobIconPrototype> UnknownIcon = "JobIconUnknown";
-    private static readonly LocId UnknownDepartment = "department-Unknown";
-
-    public event Action<ProtoId<ChameleonOutfitPrototype>>? OnJobSelected;
 
     public ChameleonControllerMenu()
     {
@@ -45,8 +42,10 @@ public sealed partial class ChameleonControllerMenu : FancyWindow
         UpdateGrid();
     }
 
+    public event Action<ProtoId<ChameleonOutfitPrototype>>? OnJobSelected;
+
     /// <summary>
-    ///     Fill the grid with the correct job icons and buttons.
+    /// Fill the grid with the correct job icons and buttons.
     /// </summary>
     /// <param name="disabled">Set to true to disable all the buttons.</param>
     public void UpdateGrid(bool disabled = false)
@@ -79,9 +78,7 @@ public sealed partial class ChameleonControllerMenu : FancyWindow
                 departments[departmentPrototype.Name].AddChild(outfitButton);
             }
             else
-            {
                 departments[UnknownDepartment].AddChild(outfitButton);
-            }
         }
 
         // Sort the departments by their weight.
@@ -109,14 +106,17 @@ public sealed partial class ChameleonControllerMenu : FancyWindow
         return departmentContainer;
     }
 
-    private BoxContainer CreateOutfitButton(bool disabled, string name, JobIconPrototype jobIconProto, ProtoId<ChameleonOutfitPrototype> outfitProto)
+    private BoxContainer CreateOutfitButton(bool disabled,
+        string name,
+        JobIconPrototype jobIconProto,
+        ProtoId<ChameleonOutfitPrototype> outfitProto)
     {
         var outfitButton = new BoxContainer();
 
         var button = new Button
         {
             HorizontalExpand = true,
-            StyleClasses = {StyleBase.ButtonSquare},
+            StyleClasses = { StyleBase.ButtonSquare },
             ToolTip = Loc.GetString(name),
             Text = Loc.GetString(name),
             Margin = new Thickness(0, 0, 15, 0),
@@ -139,10 +139,7 @@ public sealed partial class ChameleonControllerMenu : FancyWindow
         return outfitButton;
     }
 
-    private void JobButtonPressed(ProtoId<ChameleonOutfitPrototype> outfit)
-    {
-        OnJobSelected?.Invoke(outfit);
-    }
+    private void JobButtonPressed(ProtoId<ChameleonOutfitPrototype> outfit) => OnJobSelected?.Invoke(outfit);
 
     protected override void FrameUpdate(FrameEventArgs args)
     {

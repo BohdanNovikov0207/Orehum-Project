@@ -5,10 +5,10 @@ using Robust.Client.GameObjects;
 
 namespace Content.Client.Turrets;
 
-public sealed partial class DeployableTurretSystem : SharedDeployableTurretSystem
+public sealed class DeployableTurretSystem : SharedDeployableTurretSystem
 {
-    [Dependency] private readonly AppearanceSystem _appearance = default!;
     [Dependency] private readonly AnimationPlayerSystem _animation = default!;
+    [Dependency] private readonly AppearanceSystem _appearance = default!;
     [Dependency] private readonly SpriteSystem _sprite = default!;
 
     public override void Initialize()
@@ -25,23 +25,27 @@ public sealed partial class DeployableTurretSystem : SharedDeployableTurretSyste
         ent.Comp.DeploymentAnimation = new Animation
         {
             Length = TimeSpan.FromSeconds(ent.Comp.DeploymentLength),
-            AnimationTracks = {
-                new AnimationTrackSpriteFlick() {
+            AnimationTracks =
+            {
+                new AnimationTrackSpriteFlick
+                {
                     LayerKey = DeployableTurretVisuals.Turret,
-                    KeyFrames = {new AnimationTrackSpriteFlick.KeyFrame(ent.Comp.DeployingState, 0f)}
+                    KeyFrames = { new AnimationTrackSpriteFlick.KeyFrame(ent.Comp.DeployingState, 0f) },
                 },
-            }
+            },
         };
 
         ent.Comp.RetractionAnimation = new Animation
         {
             Length = TimeSpan.FromSeconds(ent.Comp.RetractionLength),
-            AnimationTracks = {
-                new AnimationTrackSpriteFlick() {
+            AnimationTracks =
+            {
+                new AnimationTrackSpriteFlick
+                {
                     LayerKey = DeployableTurretVisuals.Turret,
-                    KeyFrames = {new AnimationTrackSpriteFlick.KeyFrame(ent.Comp.RetractingState, 0f)}
+                    KeyFrames = { new AnimationTrackSpriteFlick.KeyFrame(ent.Comp.RetractingState, 0f) },
                 },
-            }
+            },
         };
     }
 
@@ -70,13 +74,19 @@ public sealed partial class DeployableTurretSystem : SharedDeployableTurretSyste
         if (!TryComp<AnimationPlayerComponent>(ent, out var animPlayer))
             return;
 
-        if (!_appearance.TryGetData<DeployableTurretState>(ent, DeployableTurretVisuals.Turret, out var state, args.Component))
+        if (!_appearance.TryGetData<DeployableTurretState>(ent,
+                DeployableTurretVisuals.Turret,
+                out var state,
+                args.Component))
             state = DeployableTurretState.Retracted;
 
         UpdateVisuals(ent, state, args.Sprite, animPlayer);
     }
 
-    private void UpdateVisuals(Entity<DeployableTurretComponent> ent, DeployableTurretState state, SpriteComponent sprite, AnimationPlayerComponent? animPlayer = null)
+    private void UpdateVisuals(Entity<DeployableTurretComponent> ent,
+        DeployableTurretState state,
+        SpriteComponent sprite,
+        AnimationPlayerComponent? animPlayer = null)
     {
         if (!Resolve(ent, ref animPlayer))
             return;
@@ -93,18 +103,26 @@ public sealed partial class DeployableTurretSystem : SharedDeployableTurretSyste
         ent.Comp.VisualState = state;
 
         // Toggle layer visibility
-        _sprite.LayerSetVisible((ent.Owner, sprite), DeployableTurretVisuals.Weapon, (targetState & DeployableTurretState.Deployed) > 0);
-        _sprite.LayerSetVisible((ent.Owner, sprite), PowerDeviceVisualLayers.Powered, HasAmmo(ent) && targetState == DeployableTurretState.Retracted);
+        _sprite.LayerSetVisible((ent.Owner, sprite),
+            DeployableTurretVisuals.Weapon,
+            (targetState & DeployableTurretState.Deployed) > 0);
+        _sprite.LayerSetVisible((ent.Owner, sprite),
+            PowerDeviceVisualLayers.Powered,
+            HasAmmo(ent) && targetState == DeployableTurretState.Retracted);
 
         // Change the visual state
         switch (targetState)
         {
             case DeployableTurretState.Deploying:
-                _animation.Play((ent, animPlayer), (Animation)ent.Comp.DeploymentAnimation, DeployableTurretComponent.AnimationKey);
+                _animation.Play((ent, animPlayer),
+                    (Animation) ent.Comp.DeploymentAnimation,
+                    DeployableTurretComponent.AnimationKey);
                 break;
 
             case DeployableTurretState.Retracting:
-                _animation.Play((ent, animPlayer), (Animation)ent.Comp.RetractionAnimation, DeployableTurretComponent.AnimationKey);
+                _animation.Play((ent, animPlayer),
+                    (Animation) ent.Comp.RetractionAnimation,
+                    DeployableTurretComponent.AnimationKey);
                 break;
 
             case DeployableTurretState.Deployed:

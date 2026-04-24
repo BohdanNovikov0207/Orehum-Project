@@ -11,7 +11,6 @@
 
 using System.Numerics;
 using Content.Client.UserInterface.Controls;
-using Content.Shared.Heretic;
 using Content.Shared.Heretic.Prototypes;
 using Robust.Client.GameObjects;
 using Robust.Client.UserInterface.Controls;
@@ -21,18 +20,14 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Client._Shitcode.Heretic.UI;
 
-public sealed partial class HereticRitualRuneRadialMenu : RadialMenu
+public sealed class HereticRitualRuneRadialMenu : RadialMenu
 {
     [Dependency] private readonly EntityManager _entityManager = default!;
     [Dependency] private readonly IEntitySystemManager _entitySystem = default!;
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-    [Dependency] private readonly ISharedPlayerManager _playerManager = default!;
-    private readonly SpriteSystem _spriteSystem;
     private readonly HereticSystem _heretic;
-
-    public event Action<ProtoId<HereticRitualPrototype>>? SendHereticRitualRuneMessageAction;
-
-    public EntityUid Entity { get; set; }
+    [Dependency] private readonly ISharedPlayerManager _playerManager = default!;
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    private readonly SpriteSystem _spriteSystem;
 
     public HereticRitualRuneRadialMenu()
     {
@@ -41,6 +36,10 @@ public sealed partial class HereticRitualRuneRadialMenu : RadialMenu
         _spriteSystem = _entitySystem.GetEntitySystem<SpriteSystem>();
         _heretic = _entitySystem.GetEntitySystem<HereticSystem>();
     }
+
+    public EntityUid Entity { get; set; }
+
+    public event Action<ProtoId<HereticRitualPrototype>>? SendHereticRitualRuneMessageAction;
 
     public void SetEntity(EntityUid uid)
     {
@@ -68,7 +67,7 @@ public sealed partial class HereticRitualRuneRadialMenu : RadialMenu
             {
                 SetSize = new Vector2(64, 64),
                 ToolTip = Loc.GetString(ritualPrototype.LocName),
-                ProtoId = ritualPrototype.ID
+                ProtoId = ritualPrototype.ID,
             };
 
             var texture = new TextureRect
@@ -76,7 +75,7 @@ public sealed partial class HereticRitualRuneRadialMenu : RadialMenu
                 VerticalAlignment = VAlignment.Center,
                 HorizontalAlignment = HAlignment.Center,
                 Texture = _spriteSystem.Frame0(ritualPrototype.Icon),
-                TextureScale = new Vector2(2f, 2f)
+                TextureScale = new Vector2(2f, 2f),
             };
 
             button.AddChild(texture);
@@ -91,7 +90,7 @@ public sealed partial class HereticRitualRuneRadialMenu : RadialMenu
         if (mainControl == null)
             return;
 
-        foreach(var child in mainControl.Children)
+        foreach (var child in mainControl.Children)
         {
             var castChild = child as HereticRitualMenuButton;
 

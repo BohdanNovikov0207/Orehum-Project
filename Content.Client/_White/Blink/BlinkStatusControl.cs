@@ -14,8 +14,8 @@ namespace Content.Client._White.Blink;
 
 public sealed class BlinkStatusControl : PollingItemStatusControl<BlinkStatusControl.Data>
 {
-    private readonly Entity<BlinkComponent> _parent;
     private readonly RichTextLabel _label;
+    private readonly Entity<BlinkComponent> _parent;
 
     public BlinkStatusControl(Entity<BlinkComponent> parent)
     {
@@ -26,16 +26,13 @@ public sealed class BlinkStatusControl : PollingItemStatusControl<BlinkStatusCon
         UpdateDraw();
     }
 
-    public record struct Data(bool IsActive);
-
-    protected override Data PollData()
-    {
-        return new Data(_parent.Comp.IsActive);
-    }
+    protected override Data PollData() => new(_parent.Comp.IsActive);
 
     protected override void Update(in Data data)
     {
         var message = data.IsActive ? "blink-component-control-active" : "blink-component-control-inactive";
         _label.SetMarkup(Loc.GetString(message));
     }
+
+    public record struct Data(bool IsActive);
 }

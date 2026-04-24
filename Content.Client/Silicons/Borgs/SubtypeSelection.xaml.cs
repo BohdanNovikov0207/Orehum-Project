@@ -16,8 +16,6 @@ namespace Content.Client.Silicons.Borgs;
 [GenerateTypedNameReferences]
 public partial class SubtypeSelection : Control
 {
-    public event Action? SubtypeSelected;
-
     [Dependency] private readonly IPrototypeManager _prototype = default!;
     public BorgSubtypePrototype? SelectedBorgSubtype;
 
@@ -26,6 +24,9 @@ public partial class SubtypeSelection : Control
         IoCManager.InjectDependencies(this);
         RobustXamlLoader.Load(this);
     }
+
+    public event Action? SubtypeSelected;
+
     public void FillContainer(BorgTypePrototype parentPrototype)
     {
         OptionsContainer.RemoveAllChildren();

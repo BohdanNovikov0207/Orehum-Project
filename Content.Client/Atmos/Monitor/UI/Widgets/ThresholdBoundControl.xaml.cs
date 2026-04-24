@@ -18,56 +18,14 @@ namespace Content.Client.Atmos.Monitor.UI.Widgets;
 [GenerateTypedNameReferences]
 public sealed partial class ThresholdBoundControl : BoxContainer
 {
+    private readonly float _uiValueScale;
+
     // raw values to use in thresholds, prefer these
     // over directly setting Modified(Value/LastValue)
     // when working with the FloatSpinBox
     private float _value;
-
-    // convenience thing for getting multiplied values
-    // and also setting value to a usable value
-    private float ScaledValue
-    {
-        get => _value * _uiValueScale;
-        set => _value = value / _uiValueScale;
-    }
-
-    private float _uiValueScale;
-
-    public event Action? OnValidBoundChanged;
     public Action<float>? OnBoundChanged;
     public Action<bool>? OnBoundEnabled;
-
-    public void SetValue(float value)
-    {
-        _value = value;
-        CSpinner.Value = ScaledValue;
-    }
-
-    public void SetEnabled(bool enabled)
-    {
-        CBoundEnabled.Pressed = enabled;
-
-        if (enabled)
-        {
-            CBoundLabel.RemoveStyleClass("Disabled");
-        }
-        else
-        {
-            CBoundLabel.SetOnlyStyleClass("Disabled");
-        }
-    }
-
-    public void SetWarningState(AtmosAlarmType alarm)
-    {
-        if(alarm == AtmosAlarmType.Normal)
-        {
-            CBoundLabel.FontColorOverride = null;
-        }
-        else
-        {
-            CBoundLabel.FontColorOverride = AirAlarmWindow.ColorForAlarm(alarm);
-        }
-    }
 
     public ThresholdBoundControl(string controlLabel, float value, float uiValueScale = 1)
     {
@@ -82,6 +40,40 @@ public sealed partial class ThresholdBoundControl : BoxContainer
 
         CSpinner.OnValueChanged += SpinnerValueChanged;
         CBoundEnabled.OnToggled += CheckboxToggled;
+    }
+
+    // convenience thing for getting multiplied values
+    // and also setting value to a usable value
+    private float ScaledValue
+    {
+        get => _value * _uiValueScale;
+        set => _value = value / _uiValueScale;
+    }
+
+    public event Action? OnValidBoundChanged;
+
+    public void SetValue(float value)
+    {
+        _value = value;
+        CSpinner.Value = ScaledValue;
+    }
+
+    public void SetEnabled(bool enabled)
+    {
+        CBoundEnabled.Pressed = enabled;
+
+        if (enabled)
+            CBoundLabel.RemoveStyleClass("Disabled");
+        else
+            CBoundLabel.SetOnlyStyleClass("Disabled");
+    }
+
+    public void SetWarningState(AtmosAlarmType alarm)
+    {
+        if (alarm == AtmosAlarmType.Normal)
+            CBoundLabel.FontColorOverride = null;
+        else
+            CBoundLabel.FontColorOverride = AirAlarmWindow.ColorForAlarm(alarm);
     }
 
     private void SpinnerValueChanged(FloatSpinBox.FloatSpinBoxEventArgs args)

@@ -23,30 +23,32 @@ public sealed partial class RadiationCollectorComponent : Component
     public const string AnimationKey = "radiationcollector_animation";
 
     /// <summary>
-    /// The current visual state of the radiation collector.
+    /// The animation used when turning on the radiation collector.
     /// </summary>
-    [ViewVariables]
-    public RadiationCollectorVisualState CurrentState = RadiationCollectorVisualState.Deactive;
+    [ViewVariables(VVAccess.ReadWrite)]
+    public Animation ActivateAnimation = default!;
 
     /// <summary>
-    /// The RSI state used for the main sprite layer (<see cref="RadiationCollectorVisualLayers.Main"/>) when the radiation collector is active.
+    /// Used to build the
+    /// <value cref="ActivateAnimation">activation animation</value>
+    /// when the component is initialized.
+    /// </summary>
+    [DataField("activatingState")]
+    public string ActivatingState = "ca_active";
+
+    /// <summary>
+    /// The RSI state used for the main sprite layer (<see cref="RadiationCollectorVisualLayers.Main" />) when the radiation
+    /// collector is active.
     /// </summary>
     [DataField("activeState")]
     [ViewVariables(VVAccess.ReadWrite)]
     public string ActiveState = "ca_on";
 
     /// <summary>
-    /// The RSI state used for the main sprite layer (<see cref="RadiationCollectorVisualLayers.Main"/>) when the radiation collector is inactive.
+    /// The current visual state of the radiation collector.
     /// </summary>
-    [DataField("inactiveState")]
-    [ViewVariables(VVAccess.ReadWrite)]
-    public string InactiveState = "ca_off";
-
-    /// <summary>
-    /// Used to build the <value cref="ActivateAnimation">activation animation</value> when the component is initialized.
-    /// </summary>
-    [DataField("activatingState")]
-    public string ActivatingState = "ca_active";
+    [ViewVariables]
+    public RadiationCollectorVisualState CurrentState = RadiationCollectorVisualState.Deactive;
 
     /// <summary>
     /// Used to build the <see cref="DeactiveAnimation">deactivation animation</see> when the component is initialized.
@@ -55,14 +57,16 @@ public sealed partial class RadiationCollectorComponent : Component
     public string DeactivatingState = "ca_deactive";
 
     /// <summary>
-    /// The animation used when turning on the radiation collector.
-    /// </summary>
-    [ViewVariables(VVAccess.ReadWrite)]
-    public Animation ActivateAnimation = default!;
-
-    /// <summary>
     /// The animation used when turning off the radiation collector.
     /// </summary>
     [ViewVariables(VVAccess.ReadWrite)]
     public Animation DeactiveAnimation = default!;
+
+    /// <summary>
+    /// The RSI state used for the main sprite layer (<see cref="RadiationCollectorVisualLayers.Main" />) when the radiation
+    /// collector is inactive.
+    /// </summary>
+    [DataField("inactiveState")]
+    [ViewVariables(VVAccess.ReadWrite)]
+    public string InactiveState = "ca_off";
 }

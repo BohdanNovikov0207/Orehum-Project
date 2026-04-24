@@ -9,8 +9,8 @@ namespace Content.Client.Guidebook;
 
 /// <summary>
 /// Client system for storing and retrieving values extracted from entity prototypes
-/// for display in the guidebook (<see cref="RichText.ProtodataTag"/>).
-/// Requests data from the server on <see cref="Initialize"/>.
+/// for display in the guidebook (<see cref="RichText.ProtodataTag" />).
+/// Requests data from the server on <see cref="Initialize" />.
 /// Can also be pushed new data when the server reloads prototypes.
 /// </summary>
 public sealed class GuidebookDataSystem : EntitySystem
@@ -36,7 +36,7 @@ public sealed class GuidebookDataSystem : EntitySystem
 
     /// <summary>
     /// Attempts to retrieve a value using the given identifiers.
-    /// See <see cref="GuidebookData.TryGetValue"/> for more information.
+    /// See <see cref="GuidebookData.TryGetValue" /> for more information.
     /// </summary>
     public bool TryGetValue(string prototype, string component, string field, out object? value)
     {
@@ -45,6 +45,7 @@ public sealed class GuidebookDataSystem : EntitySystem
             value = null;
             return false;
         }
+
         return _data.TryGetValue(prototype, component, field, out value);
     }
 }

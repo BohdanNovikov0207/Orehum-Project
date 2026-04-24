@@ -25,9 +25,9 @@ namespace Content.Client.CardboardBox;
 public sealed class CardboardBoxSystem : SharedCardboardBoxSystem
 {
     [Dependency] private readonly EntityLookupSystem _entityLookup = default!;
-    [Dependency] private readonly TransformSystem _transform = default!;
     [Dependency] private readonly ExamineSystemShared _examine = default!;
     [Dependency] private readonly SpriteSystem _sprite = default!;
+    [Dependency] private readonly TransformSystem _transform = default!;
 
     private EntityQuery<MobStateComponent> _mobStateQuery;
 
@@ -86,12 +86,12 @@ public sealed class CardboardBoxSystem : SharedCardboardBoxSystem
 
             var ent = Spawn(box.Effect, mapPos);
 
-            if (!xformQuery.TryGetComponent(ent, out var entTransform) || !TryComp<SpriteComponent>(ent, out var sprite))
+            if (!xformQuery.TryGetComponent(ent, out var entTransform) ||
+                !TryComp<SpriteComponent>(ent, out var sprite))
                 continue;
 
             _sprite.SetOffset((ent, sprite), new Vector2(0, 1));
             _transform.SetParent(ent, entTransform, mob);
         }
-
     }
 }

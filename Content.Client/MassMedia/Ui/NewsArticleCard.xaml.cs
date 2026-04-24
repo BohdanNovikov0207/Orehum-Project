@@ -14,9 +14,15 @@ public sealed partial class NewsArticleCard : Control
 {
     private string? _authorMarkup;
     private TimeSpan? _publicationTime;
+    public int ArtcileNumber;
 
     public Action? OnDeletePressed;
-    public int ArtcileNumber;
+
+    public NewsArticleCard()
+    {
+        RobustXamlLoader.Load(this);
+        DeleteButton.OnPressed += _ => OnDeletePressed?.Invoke();
+    }
 
     public string? Title
     {
@@ -42,11 +48,5 @@ public sealed partial class NewsArticleCard : Control
             _publicationTime = value;
             PublishTimeLabel.Text = value?.ToString(@"hh\:mm\:ss") ?? "";
         }
-    }
-
-    public NewsArticleCard()
-    {
-        RobustXamlLoader.Load(this);
-        DeleteButton.OnPressed += _ => OnDeletePressed?.Invoke();
     }
 }

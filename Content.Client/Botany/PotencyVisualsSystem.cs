@@ -8,15 +8,17 @@
 // SPDX-License-Identifier: MIT
 
 using System.Numerics;
-using Content.Shared.Botany;
 using Content.Client.Botany.Components;
+using Content.Shared.Botany;
 using Robust.Client.GameObjects;
 
 namespace Content.Client.Botany;
 
 public sealed class PotencyVisualsSystem : VisualizerSystem<PotencyVisualsComponent>
 {
-    protected override void OnAppearanceChange(EntityUid uid, PotencyVisualsComponent component, ref AppearanceChangeEvent args)
+    protected override void OnAppearanceChange(EntityUid uid,
+        PotencyVisualsComponent component,
+        ref AppearanceChangeEvent args)
     {
         if (args.Sprite == null)
             return;

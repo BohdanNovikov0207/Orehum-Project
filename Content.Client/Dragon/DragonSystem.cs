@@ -25,7 +25,8 @@ public sealed class DragonSystem : EntitySystem
         if (args.Current is not DragonRiftComponentState state)
             return;
 
-        if (component.State == state.State) return;
+        if (component.State == state.State)
+            return;
 
         component.State = state.State;
         TryComp<SpriteComponent>(uid, out var sprite);
@@ -40,25 +41,19 @@ public sealed class DragonSystem : EntitySystem
                 _sprite.LayerSetColor((uid, sprite), 0, Color.FromHex("#569fff"));
 
                 if (light != null)
-                {
                     _lights.SetColor(uid, Color.FromHex("#366db5"), light);
-                }
                 break;
             case DragonRiftState.AlmostFinished:
                 _sprite.LayerSetColor((uid, sprite), 0, Color.FromHex("#cf4cff"));
 
                 if (light != null)
-                {
                     _lights.SetColor(uid, Color.FromHex("#9e2fc1"), light);
-                }
                 break;
             case DragonRiftState.Finished:
                 _sprite.LayerSetColor((uid, sprite), 0, Color.FromHex("#edbc36"));
 
                 if (light != null)
-                {
                     _lights.SetColor(uid, Color.FromHex("#cbaf20"), light);
-                }
                 break;
         }
     }

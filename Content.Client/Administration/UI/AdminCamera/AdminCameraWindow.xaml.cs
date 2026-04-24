@@ -16,8 +16,6 @@ public sealed partial class AdminCameraWindow : DefaultWindow
         ContentsContainer.Margin = new Thickness(5, 0, 5, 0);
     }
 
-    public void SetState(AdminCameraEuiState state)
-    {
+    public void SetState(AdminCameraEuiState state) =>
         Title = Loc.GetString("admin-camera-window-title", ("name", state.Name));
-    }
 }

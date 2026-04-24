@@ -29,21 +29,25 @@ internal sealed class AtvRangeCommand : LocalizedCommands
             shell.WriteLine(Help);
             return;
         }
+
         if (!float.TryParse(args[0], out var xStart))
         {
             shell.WriteError(LocalizationManager.GetString($"cmd-{Command}-error-start"));
             return;
         }
+
         if (!float.TryParse(args[1], out var xEnd))
         {
             shell.WriteError(LocalizationManager.GetString($"cmd-{Command}-error-end"));
             return;
         }
+
         if (xStart == xEnd)
         {
             shell.WriteError(LocalizationManager.GetString($"cmd-{Command}-error-zero"));
             return;
         }
+
         var sys = _entitySystemManager.GetEntitySystem<AtmosDebugOverlaySystem>();
         sys.CfgBase = xStart;
         sys.CfgScale = xEnd - xStart;
@@ -66,14 +70,16 @@ internal sealed class AtvModeCommand : LocalizedCommands
             shell.WriteLine(Help);
             return;
         }
+
         if (!Enum.TryParse<AtmosDebugOverlayMode>(args[0], out var xMode))
         {
             shell.WriteError(LocalizationManager.GetString($"cmd-{Command}-error-invalid"));
             return;
         }
-        int xSpecificGas = 0;
+
+        var xSpecificGas = 0;
         float xBase = 0;
-        float xScale = Atmospherics.MolesCellStandard * 2;
+        var xScale = Atmospherics.MolesCellStandard * 2;
         if (xMode == AtmosDebugOverlayMode.GasMoles)
         {
             if (args.Length != 2)
@@ -81,6 +87,7 @@ internal sealed class AtvModeCommand : LocalizedCommands
                 shell.WriteError(LocalizationManager.GetString($"cmd-{Command}-error-target-gas"));
                 return;
             }
+
             if (!AtmosCommandUtils.TryParseGasID(args[1], out xSpecificGas))
             {
                 shell.WriteError(LocalizationManager.GetString($"cmd-{Command}-error-out-of-range"));
@@ -94,6 +101,7 @@ internal sealed class AtvModeCommand : LocalizedCommands
                 shell.WriteLine(LocalizationManager.GetString($"cmd-{Command}-error-info"));
                 return;
             }
+
             if (xMode == AtmosDebugOverlayMode.Temperature)
             {
                 // Red is 100C, Green is 20C, Blue is -60C
@@ -101,6 +109,7 @@ internal sealed class AtvModeCommand : LocalizedCommands
                 xScale = -160;
             }
         }
+
         var sys = _entitySystemManager.GetEntitySystem<AtmosDebugOverlaySystem>();
         sys.CfgMode = xMode;
         sys.CfgSpecificGas = xSpecificGas;
@@ -125,11 +134,13 @@ internal sealed class AtvCBMCommand : LocalizedCommands
             shell.WriteLine(Help);
             return;
         }
+
         if (!bool.TryParse(args[0], out var xFlag))
         {
             shell.WriteError(LocalizationManager.GetString($"cmd-{Command}-error"));
             return;
         }
+
         var sys = _entitySystemManager.GetEntitySystem<AtmosDebugOverlaySystem>();
         sys.CfgCBM = xFlag;
     }

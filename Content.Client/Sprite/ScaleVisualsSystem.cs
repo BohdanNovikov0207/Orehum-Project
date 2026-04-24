@@ -18,17 +18,18 @@ public sealed class ScaleVisualsSystem : SharedScaleVisualsSystem
     private void OnChangeData(Entity<ScaleVisualsComponent> ent, ref AppearanceChangeEvent args)
     {
         if (!args.AppearanceData.TryGetValue(ScaleVisuals.Scale, out var scale) ||
-            args.Sprite == null) return;
+            args.Sprite == null)
+            return;
 
         // save the original scale
         ent.Comp.OriginalScale ??= args.Sprite.Scale;
 
-        var vecScale = (Vector2)scale;
+        var vecScale = (Vector2) scale;
         _sprite.SetScale((ent.Owner, args.Sprite), vecScale);
     }
 
     // revert to the original scale
-    protected override void ResetScale(Entity<Shared.Sprite.ScaleVisualsComponent> ent)
+    protected override void ResetScale(Entity<ScaleVisualsComponent> ent)
     {
         base.ResetScale(ent);
 

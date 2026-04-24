@@ -36,12 +36,11 @@ namespace Content.Client.NetworkConfigurator.Systems;
 
 public sealed class NetworkConfiguratorSystem : SharedNetworkConfiguratorSystem
 {
-    [Dependency] private readonly IPlayerManager _playerManager = default!;
-    [Dependency] private readonly IOverlayManager _overlay = default!;
+    private static readonly EntProtoId Action = "ActionClearNetworkLinkOverlays";
     [Dependency] private readonly ActionsSystem _actions = default!;
     [Dependency] private readonly IInputManager _inputManager = default!;
-
-    private static readonly EntProtoId Action = "ActionClearNetworkLinkOverlays";
+    [Dependency] private readonly IOverlayManager _overlay = default!;
+    [Dependency] private readonly IPlayerManager _playerManager = default!;
 
     public override void Initialize()
     {
@@ -53,16 +52,14 @@ public sealed class NetworkConfiguratorSystem : SharedNetworkConfiguratorSystem
 
     private Control OnCollectItemStatus(Entity<NetworkConfiguratorComponent> entity)
     {
-        _inputManager.TryGetKeyBinding((ContentKeyFunctions.AltUseItemInHand), out var binding);
+        _inputManager.TryGetKeyBinding(ContentKeyFunctions.AltUseItemInHand, out var binding);
         return new StatusControl(entity, binding?.GetKeyString() ?? "");
     }
 
-    public bool ConfiguredListIsTracked(EntityUid uid, NetworkConfiguratorComponent? component = null)
-    {
-        return Resolve(uid, ref component)
-               && component.ActiveDeviceList != null
-               && HasComp<NetworkConfiguratorActiveLinkOverlayComponent>(component.ActiveDeviceList.Value);
-    }
+    public bool ConfiguredListIsTracked(EntityUid uid, NetworkConfiguratorComponent? component = null) =>
+        Resolve(uid, ref component)
+        && component.ActiveDeviceList != null
+        && HasComp<NetworkConfiguratorActiveLinkOverlayComponent>(component.ActiveDeviceList.Value);
 
     /// <summary>
     /// Toggles a device list's (tied to this network configurator) connection visualisation on and off.
@@ -104,9 +101,7 @@ public sealed class NetworkConfiguratorSystem : SharedNetworkConfiguratorSystem
     public void ClearAllOverlays()
     {
         if (!_overlay.TryGetOverlay(out NetworkConfiguratorLinkOverlay? overlay))
-        {
             return;
-        }
 
         var query = EntityQueryEnumerator<NetworkConfiguratorActiveLinkOverlayComponent>();
         while (query.MoveNext(out var uid, out _))
@@ -120,18 +115,19 @@ public sealed class NetworkConfiguratorSystem : SharedNetworkConfiguratorSystem
 
     private sealed class StatusControl : Control
     {
-        private readonly RichTextLabel _label;
         private readonly NetworkConfiguratorComponent _configurator;
         private readonly string _keyBindingName;
+        private readonly RichTextLabel _label;
 
-        private bool? _linkModeActive = null;
+        private bool? _linkModeActive;
 
         public StatusControl(NetworkConfiguratorComponent configurator, string keyBindingName)
         {
             _configurator = configurator;
             _keyBindingName = keyBindingName;
             _label = new RichTextLabel { StyleClasses = { StyleNano.StyleClassItemStatus } };
-            if (_configurator.ShowLabel) // Shitmed - Starlight Abductors: Allow hiding the label on multitools that dont need List mode.
+            if (_configurator
+                .ShowLabel) // Shitmed - Starlight Abductors: Allow hiding the label on multitools that dont need List mode.
                 AddChild(_label);
         }
 
@@ -144,10 +140,11 @@ public sealed class NetworkConfiguratorSystem : SharedNetworkConfiguratorSystem
 
             _linkModeActive = _configurator.LinkModeActive;
 
-            if (!_configurator.ShowLabel) // Shitmed - Starlight Abductors: Allow hiding the label on multitools that dont need List mode.
+            if (!_configurator
+                    .ShowLabel) // Shitmed - Starlight Abductors: Allow hiding the label on multitools that dont need List mode.
                 return;
 
-            var modeLocString = _linkModeActive??false
+            var modeLocString = _linkModeActive ?? false
                 ? "network-configurator-examine-mode-link"
                 : "network-configurator-examine-mode-list";
 
@@ -164,8 +161,5 @@ public sealed class ClearAllNetworkLinkOverlays : LocalizedEntityCommands
 
     public override string Command => "clearnetworklinkoverlays";
 
-    public override void Execute(IConsoleShell shell, string argStr, string[] args)
-    {
-        _network.ClearAllOverlays();
-    }
+    public override void Execute(IConsoleShell shell, string argStr, string[] args) => _network.ClearAllOverlays();
 }

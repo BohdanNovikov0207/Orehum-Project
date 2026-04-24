@@ -4,5 +4,4 @@ namespace Content.Client.Disposal.Tube;
 
 public sealed class DisposalTubeSystem : SharedDisposalTubeSystem
 {
-
 }

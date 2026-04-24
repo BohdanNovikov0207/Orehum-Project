@@ -23,128 +23,116 @@ using Robust.Client.UserInterface.CustomControls;
 using Robust.Client.UserInterface.XAML;
 using Robust.Shared.Prototypes;
 
-namespace Content.Client.UserInterface.Controls
+namespace Content.Client.UserInterface.Controls;
+
+[GenerateTypedNameReferences]
+[Virtual]
+public partial class FancyWindow : BaseWindow
 {
-    [GenerateTypedNameReferences]
-    [Virtual]
-    public partial class FancyWindow : BaseWindow
+    private const int DRAG_MARGIN_SIZE = 7;
+    public const string StyleClassWindowHelpButton = "windowHelpButton";
+    [Dependency] private readonly IEntitySystemManager _sysMan = default!;
+    private GuidebookSystem? _guidebookSystem;
+
+    private List<ProtoId<GuideEntryPrototype>>? _helpGuidebookIds;
+
+    public FancyWindow()
     {
-        [Dependency] private readonly IEntitySystemManager _sysMan = default!;
-        private GuidebookSystem? _guidebookSystem;
-        private const int DRAG_MARGIN_SIZE = 7;
-        public const string StyleClassWindowHelpButton = "windowHelpButton";
+        RobustXamlLoader.Load(this);
 
-        public FancyWindow()
+        CloseButton.OnPressed += _ => Close();
+        HelpButton.OnPressed += _ => Help();
+        XamlChildren = ContentsContainer.Children;
+    }
+
+    public string? Title
+    {
+        get => WindowTitle.Text;
+        set => WindowTitle.Text = value;
+    }
+
+    public List<ProtoId<GuideEntryPrototype>>? HelpGuidebookIds
+    {
+        get => _helpGuidebookIds;
+        set
         {
-            RobustXamlLoader.Load(this);
+            _helpGuidebookIds = value;
+            HelpButton.Disabled = _helpGuidebookIds == null;
+            HelpButton.Visible = !HelpButton.Disabled;
+        }
+    }
 
-            CloseButton.OnPressed += _ => Close();
-            HelpButton.OnPressed += _ => Help();
-            XamlChildren = ContentsContainer.Children;
+    public void Help()
+    {
+        if (HelpGuidebookIds is null)
+            return;
+        _guidebookSystem ??= _sysMan.GetEntitySystem<GuidebookSystem>();
+        _guidebookSystem.OpenHelp(HelpGuidebookIds);
+    }
+
+    protected override DragMode GetDragModeFor(Vector2 relativeMousePos)
+    {
+        var mode = DragMode.Move;
+
+        if (Resizable)
+        {
+            if (relativeMousePos.Y < DRAG_MARGIN_SIZE)
+                mode = DragMode.Top;
+            else if (relativeMousePos.Y > Size.Y - DRAG_MARGIN_SIZE)
+                mode = DragMode.Bottom;
+
+            if (relativeMousePos.X < DRAG_MARGIN_SIZE)
+                mode |= DragMode.Left;
+            else if (relativeMousePos.X > Size.X - DRAG_MARGIN_SIZE)
+                mode |= DragMode.Right;
         }
 
-        public string? Title
-        {
-            get => WindowTitle.Text;
-            set => WindowTitle.Text = value;
-        }
+        return mode;
+    }
+}
 
-        private List<ProtoId<GuideEntryPrototype>>? _helpGuidebookIds;
-        public List<ProtoId<GuideEntryPrototype>>? HelpGuidebookIds
-        {
-            get => _helpGuidebookIds;
-            set
-            {
-                _helpGuidebookIds = value;
-                HelpButton.Disabled = _helpGuidebookIds == null;
-                HelpButton.Visible = !HelpButton.Disabled;
-            }
-        }
-
-        public void Help()
-        {
-            if (HelpGuidebookIds is null)
-                return;
-            _guidebookSystem ??= _sysMan.GetEntitySystem<GuidebookSystem>();
-            _guidebookSystem.OpenHelp(HelpGuidebookIds);
-        }
-
-        protected override DragMode GetDragModeFor(Vector2 relativeMousePos)
-        {
-            var mode = DragMode.Move;
-
-            if (Resizable)
-            {
-                if (relativeMousePos.Y < DRAG_MARGIN_SIZE)
-                {
-                    mode = DragMode.Top;
-                }
-                else if (relativeMousePos.Y > Size.Y - DRAG_MARGIN_SIZE)
-                {
-                    mode = DragMode.Bottom;
-                }
-
-                if (relativeMousePos.X < DRAG_MARGIN_SIZE)
-                {
-                    mode |= DragMode.Left;
-                }
-                else if (relativeMousePos.X > Size.X - DRAG_MARGIN_SIZE)
-                {
-                    mode |= DragMode.Right;
-                }
-            }
-
-            return mode;
-        }
+/// <summary>
+/// Helper functions for working with <see cref="FancyWindow" />.
+/// </summary>
+public static class FancyWindowExt
+{
+    /// <summary>
+    /// Sets information for a window (title and guidebooks) based on an entity.
+    /// </summary>
+    /// <param name="window">The window to modify.</param>
+    /// <param name="entityManager">Entity manager used to retrieve the information.</param>
+    /// <param name="entity">The entity that this window represents.</param>
+    /// <seealso cref="SetTitleFromEntity" />
+    /// <seealso cref="SetGuidebookFromEntity" />
+    public static void SetInfoFromEntity(this FancyWindow window, IEntityManager entityManager, EntityUid entity)
+    {
+        window.SetTitleFromEntity(entityManager, entity);
+        window.SetGuidebookFromEntity(entityManager, entity);
     }
 
     /// <summary>
-    /// Helper functions for working with <see cref="FancyWindow"/>.
+    /// Set a window's title to the name of an entity.
     /// </summary>
-    public static class FancyWindowExt
-    {
-        /// <summary>
-        /// Sets information for a window (title and guidebooks) based on an entity.
-        /// </summary>
-        /// <param name="window">The window to modify.</param>
-        /// <param name="entityManager">Entity manager used to retrieve the information.</param>
-        /// <param name="entity">The entity that this window represents.</param>
-        /// <seealso cref="SetTitleFromEntity"/>
-        /// <seealso cref="SetGuidebookFromEntity"/>
-        public static void SetInfoFromEntity(this FancyWindow window, IEntityManager entityManager, EntityUid entity)
-        {
-            window.SetTitleFromEntity(entityManager, entity);
-            window.SetGuidebookFromEntity(entityManager, entity);
-        }
+    /// <param name="window">The window to modify.</param>
+    /// <param name="entityManager">Entity manager used to retrieve the information.</param>
+    /// <param name="entity">The entity that this window represents.</param>
+    /// <seealso cref="SetInfoFromEntity" />
+    public static void SetTitleFromEntity(
+        this FancyWindow window,
+        IEntityManager entityManager,
+        EntityUid entity) =>
+        window.Title = entityManager.GetComponent<MetaDataComponent>(entity).EntityName;
 
-        /// <summary>
-        /// Set a window's title to the name of an entity.
-        /// </summary>
-        /// <param name="window">The window to modify.</param>
-        /// <param name="entityManager">Entity manager used to retrieve the information.</param>
-        /// <param name="entity">The entity that this window represents.</param>
-        /// <seealso cref="SetInfoFromEntity"/>
-        public static void SetTitleFromEntity(
-            this FancyWindow window,
-            IEntityManager entityManager,
-            EntityUid entity)
-        {
-            window.Title = entityManager.GetComponent<MetaDataComponent>(entity).EntityName;
-        }
-
-        /// <summary>
-        /// Set a window's guidebook IDs to those of an entity.
-        /// </summary>
-        /// <param name="window">The window to modify.</param>
-        /// <param name="entityManager">Entity manager used to retrieve the information.</param>
-        /// <param name="entity">The entity that this window represents.</param>
-        /// <seealso cref="SetInfoFromEntity"/>
-        public static void SetGuidebookFromEntity(
-            this FancyWindow window,
-            IEntityManager entityManager,
-            EntityUid entity)
-        {
-            window.HelpGuidebookIds = entityManager.GetComponentOrNull<GuideHelpComponent>(entity)?.Guides;
-        }
-    }
+    /// <summary>
+    /// Set a window's guidebook IDs to those of an entity.
+    /// </summary>
+    /// <param name="window">The window to modify.</param>
+    /// <param name="entityManager">Entity manager used to retrieve the information.</param>
+    /// <param name="entity">The entity that this window represents.</param>
+    /// <seealso cref="SetInfoFromEntity" />
+    public static void SetGuidebookFromEntity(
+        this FancyWindow window,
+        IEntityManager entityManager,
+        EntityUid entity) =>
+        window.HelpGuidebookIds = entityManager.GetComponentOrNull<GuideHelpComponent>(entity)?.Guides;
 }

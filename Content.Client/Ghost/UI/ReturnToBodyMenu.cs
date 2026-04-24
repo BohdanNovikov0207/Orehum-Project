@@ -15,8 +15,8 @@ namespace Content.Client.Ghost.UI;
 
 public sealed class ReturnToBodyMenu : DefaultWindow
 {
-    public readonly Button DenyButton;
     public readonly Button AcceptButton;
+    public readonly Button DenyButton;
 
     public ReturnToBodyMenu()
     {
@@ -32,10 +32,10 @@ public sealed class ReturnToBodyMenu : DefaultWindow
                     Orientation = LayoutOrientation.Vertical,
                     Children =
                     {
-                        (new Label()
+                        new Label
                         {
-                            Text = Loc.GetString("ghost-return-to-body-text")
-                        }),
+                            Text = Loc.GetString("ghost-return-to-body-text"),
+                        },
                         new BoxContainer
                         {
                             Orientation = LayoutOrientation.Horizontal,
@@ -47,20 +47,20 @@ public sealed class ReturnToBodyMenu : DefaultWindow
                                     Text = Loc.GetString("accept-cloning-window-accept-button"),
                                 }),
 
-                                (new Control()
+                                new Control
                                 {
-                                    MinSize = new Vector2(20, 0)
-                                }),
+                                    MinSize = new Vector2(20, 0),
+                                },
 
                                 (DenyButton = new Button
                                 {
                                     Text = Loc.GetString("accept-cloning-window-deny-button"),
-                                })
-                            }
+                                }),
+                            },
                         },
-                    }
+                    },
                 },
-            }
+            },
         });
     }
 }

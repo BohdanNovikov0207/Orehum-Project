@@ -29,9 +29,7 @@ public sealed class AdminMessageEui : BaseEui
     public override void HandleState(EuiStateBase state)
     {
         if (state is not AdminMessageEuiState s)
-        {
             return;
-        }
 
         _popup.SetState(s);
     }
@@ -42,8 +40,5 @@ public sealed class AdminMessageEui : BaseEui
         LayoutContainer.SetAnchorPreset(_popup, LayoutContainer.LayoutPreset.Wide);
     }
 
-    public override void Closed()
-    {
-        _popup.Orphan();
-    }
+    public override void Closed() => _popup.Orphan();
 }

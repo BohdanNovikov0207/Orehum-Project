@@ -19,34 +19,32 @@ using System.Threading;
 using System.Threading.Tasks;
 using Content.Client.Parallax.Data;
 using Content.Shared.CCVar;
-using Robust.Shared.Prototypes;
 using Robust.Shared.Configuration;
+using Robust.Shared.Prototypes;
 
 namespace Content.Client.Parallax.Managers;
 
 public sealed class ParallaxManager : IParallaxManager
 {
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly IConfigurationManager _configurationManager = default!;
     [Dependency] private readonly IDependencyCollection _deps = null!;
 
-    private ISawmill _sawmill = Logger.GetSawmill("parallax");
-
-    public Vector2 ParallaxAnchor { get; set; }
-
-    private readonly Dictionary<string, ParallaxLayerPrepared[]> _parallaxesLQ = new();
+    private readonly Dictionary<string, CancellationTokenSource> _loadingParallaxes = new();
     private readonly Dictionary<string, ParallaxLayerPrepared[]> _parallaxesHQ = new();
 
-    private readonly Dictionary<string, CancellationTokenSource> _loadingParallaxes = new();
+    private readonly Dictionary<string, ParallaxLayerPrepared[]> _parallaxesLQ = new();
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+
+    private readonly ISawmill _sawmill = Logger.GetSawmill("parallax");
+
+    public Vector2 ParallaxAnchor { get; set; }
 
     public bool IsLoaded(string name) => _parallaxesLQ.ContainsKey(name);
 
     public ParallaxLayerPrepared[] GetParallaxLayers(string name)
     {
         if (_configurationManager.GetCVar(CCVars.ParallaxLowQuality))
-        {
             return !_parallaxesLQ.TryGetValue(name, out var lq) ? Array.Empty<ParallaxLayerPrepared>() : lq;
-        }
 
         return !_parallaxesHQ.TryGetValue(name, out var hq) ? Array.Empty<ParallaxLayerPrepared>() : hq;
     }
@@ -88,7 +86,8 @@ public sealed class ParallaxManager : IParallaxManager
 
     public async Task LoadParallaxByName(string name)
     {
-        if (_parallaxesLQ.ContainsKey(name) || _loadingParallaxes.ContainsKey(name)) return;
+        if (_parallaxesLQ.ContainsKey(name) || _loadingParallaxes.ContainsKey(name))
+            return;
 
         // Cancel any existing load and setup the new cancellation token
         var token = new CancellationTokenSource();
@@ -156,6 +155,7 @@ public sealed class ParallaxManager : IParallaxManager
         {
             tasks[i] = LoadParallaxLayer(layersIn[i], loadedLayers, cancel);
         }
+
         return await Task.WhenAll(tasks);
     }
 
@@ -164,10 +164,10 @@ public sealed class ParallaxManager : IParallaxManager
         List<ParallaxLayerPrepared> loadedLayers,
         CancellationToken cancel = default)
     {
-        var prepared = new ParallaxLayerPrepared()
+        var prepared = new ParallaxLayerPrepared
         {
             Texture = await config.Texture.GenerateTexture(cancel),
-            Config = config
+            Config = config,
         };
 
         loadedLayers.Add(prepared);

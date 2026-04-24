@@ -11,16 +11,16 @@ using Robust.Shared.Player;
 namespace Content.Client.Mining;
 
 /// <summary>
-/// This handles the lifetime of the <see cref="MiningOverlay"/> for a given entity.
+/// This handles the lifetime of the <see cref="MiningOverlay" /> for a given entity.
 /// </summary>
 public sealed class MiningOverlaySystem : EntitySystem
 {
-    [Dependency] private readonly IPlayerManager _player = default!;
     [Dependency] private readonly IOverlayManager _overlayMan = default!;
+    [Dependency] private readonly IPlayerManager _player = default!;
 
     private MiningOverlay _overlay = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         SubscribeLocalEvent<MiningScannerViewerComponent, ComponentInit>(OnInit);
@@ -28,32 +28,24 @@ public sealed class MiningOverlaySystem : EntitySystem
         SubscribeLocalEvent<MiningScannerViewerComponent, LocalPlayerAttachedEvent>(OnPlayerAttached);
         SubscribeLocalEvent<MiningScannerViewerComponent, LocalPlayerDetachedEvent>(OnPlayerDetached);
 
-        _overlay = new();
+        _overlay = new MiningOverlay();
     }
 
-    private void OnPlayerAttached(Entity<MiningScannerViewerComponent> ent, ref LocalPlayerAttachedEvent args)
-    {
+    private void OnPlayerAttached(Entity<MiningScannerViewerComponent> ent, ref LocalPlayerAttachedEvent args) =>
         _overlayMan.AddOverlay(_overlay);
-    }
 
-    private void OnPlayerDetached(Entity<MiningScannerViewerComponent> ent, ref LocalPlayerDetachedEvent args)
-    {
+    private void OnPlayerDetached(Entity<MiningScannerViewerComponent> ent, ref LocalPlayerDetachedEvent args) =>
         _overlayMan.RemoveOverlay(_overlay);
-    }
 
     private void OnInit(Entity<MiningScannerViewerComponent> ent, ref ComponentInit args)
     {
         if (_player.LocalEntity == ent)
-        {
             _overlayMan.AddOverlay(_overlay);
-        }
     }
 
     private void OnShutdown(Entity<MiningScannerViewerComponent> ent, ref ComponentShutdown args)
     {
         if (_player.LocalEntity == ent)
-        {
             _overlayMan.RemoveOverlay(_overlay);
-        }
     }
 }

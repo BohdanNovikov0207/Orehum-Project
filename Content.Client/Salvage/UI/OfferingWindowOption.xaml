@@ -16,16 +16,16 @@ SPDX-License-Identifier: MIT
         <controls:StripeBack>
             <Label Name="TitleStripe"
                    HorizontalAlignment="Center"
-                   Margin="0 5 0 5"/>
+                   Margin="0 5 0 5" />
         </controls:StripeBack>
-        <BoxContainer Orientation="Vertical" Name="ContentBox"/>
+        <BoxContainer Orientation="Vertical" Name="ContentBox" />
         <!-- Buffer so all claim buttons are in the same position -->
-        <Control VerticalExpand="True"/>
+        <Control VerticalExpand="True" />
         <Button Name="ClaimButton"
                 HorizontalExpand="True"
                 VerticalAlignment="Bottom"
                 ToggleMode="True"
                 Disabled="True"
-                Text="{Loc 'offering-window-claim'}"/>
+                Text="{Loc 'offering-window-claim'}" />
     </BoxContainer>
 </PanelContainer>

@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Numerics;
-using Content.Client._Orehum.Weapon.Tracer;
 using Content.Shared._Orehum.Weapon.Tracer.Components;
 using Robust.Client.Graphics;
 using Robust.Shared.Map;
@@ -13,8 +12,8 @@ namespace Content.Client._Orehum.Weapon.Tracer.Systems;
 
 public sealed class TracerSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly IOverlayManager _overlay = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     private TracerOverlay? _tracerOverlay;

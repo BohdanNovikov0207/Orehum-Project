@@ -68,23 +68,20 @@ public sealed partial class AnalysisConsoleMenu : FancyWindow
 {
     private static readonly TimeSpan ExtractInfoDisplayForDuration = TimeSpan.FromSeconds(3);
 
+    private readonly ArtifactAnalyzerSystem _artifactAnalyzer;
+    private readonly AudioSystem _audio;
+
     [Dependency] private readonly IEntityManager _ent = default!;
+    private readonly MetaDataSystem _meta = default!;
     [Dependency] private readonly IResourceCache _resCache = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
-
-    private readonly ArtifactAnalyzerSystem _artifactAnalyzer;
     private readonly XenoArtifactSystem _xenoArtifact;
-    private readonly AudioSystem _audio;
-    private readonly MetaDataSystem _meta = default!;
-
-    private Entity<AnalysisConsoleComponent> _owner;
     private Entity<XenoArtifactNodeComponent>? _currentNode;
-
-    private TimeSpan? _hideExtractInfoIn;
     private int _extractionSum;
 
-    public event Action? OnServerSelectionButtonPressed;
-    public event Action? OnExtractButtonPressed;
+    private TimeSpan? _hideExtractInfoIn;
+
+    private Entity<AnalysisConsoleComponent> _owner;
 
     public AnalysisConsoleMenu()
     {
@@ -113,9 +110,12 @@ public sealed partial class AnalysisConsoleMenu : FancyWindow
         ExtractButton.OnPressed += StartExtract;
     }
 
+    public event Action? OnServerSelectionButtonPressed;
+    public event Action? OnExtractButtonPressed;
+
     /// <summary>
     /// Set entity that corresponds analysis console, for which window is opened.
-    /// Closes window if <see cref="AnalysisConsoleComponent"/> is not present on entity.
+    /// Closes window if <see cref="AnalysisConsoleComponent" /> is not present on entity.
     /// </summary>
     public void SetOwner(EntityUid owner)
     {
@@ -205,9 +205,7 @@ public sealed partial class AnalysisConsoleMenu : FancyWindow
         if (_currentNode == null
             || arti == null
             || !_xenoArtifact.TryGetIndex((arti.Value, arti.Value), _currentNode.Value, out _))
-        {
             SetSelectedNode(null);
-        }
     }
 
     public void SetSelectedNode(Entity<XenoArtifactNodeComponent>? node)
@@ -238,7 +236,7 @@ public sealed partial class AnalysisConsoleMenu : FancyWindow
         {
             >= 0.75f => Color.Lime,
             >= 0.50f => Color.Yellow,
-            _ => Color.Red
+            _ => Color.Red,
         };
         DurabilityValueLabel.SetMarkup(Loc.GetString("analysis-console-info-durability-value",
             ("color", color),
@@ -253,9 +251,7 @@ public sealed partial class AnalysisConsoleMenu : FancyWindow
 
         var predecessorNodes = _xenoArtifact.GetPredecessorNodes(artifact.Value.Owner, node.Value);
         if (!hasInfo)
-        {
             TriggerValueLabel.SetMarkup(Loc.GetString("analysis-console-info-effect-value", ("state", false)));
-        }
         else
         {
             var triggerStr = new StringBuilder();
@@ -268,7 +264,9 @@ public sealed partial class AnalysisConsoleMenu : FancyWindow
                 triggerStr.Append("- ");
                 triggerStr.Append(Loc.GetString(predecessor.Comp.TriggerTip!));
             }
-            TriggerValueLabel.SetMarkup(Loc.GetString("analysis-console-info-triggered-value", ("triggers", triggerStr.ToString())));
+
+            TriggerValueLabel.SetMarkup(Loc.GetString("analysis-console-info-triggered-value",
+                ("triggers", triggerStr.ToString())));
         }
 
         ClassValueLabel.SetMarkup(Loc.GetString("analysis-console-info-class-value",

@@ -15,13 +15,12 @@ namespace Content.Client._Harmony.ReadyManifest.UI;
 [GenerateTypedNameReferences]
 public sealed partial class ReadyManifestJobListing : GridContainer
 {
-    [Dependency] private readonly IEntityManager _entityManager = default!;
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-
     public const string StyleClassReadyIndicatorNoReady = "ReadyIndicatorNoReady";
     public const string StyleClassReadyIndicatorLowReady = "ReadyIndicatorLowReady";
     public const string StyleClassReadyIndicatorMediumReady = "ReadyIndicatorMediumReady";
     public const string StyleClassReadyIndicatorHighReady = "ReadyIndicatorHighReady";
+    [Dependency] private readonly IEntityManager _entityManager = default!;
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
 
     public ReadyManifestJobListing(ProtoId<JobPrototype> jobId, ReadyManifestJobData? readyCount)
     {

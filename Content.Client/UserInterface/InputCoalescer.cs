@@ -12,7 +12,7 @@ public struct InputCoalescer<T>
     public T LastValue;
 
     /// <summary>
-    /// Replace the value in the <see cref="InputCoalescer{T}"/>. This sets <see cref="IsModified"/> to true.
+    /// Replace the value in the <see cref="InputCoalescer{T}" />. This sets <see cref="IsModified" /> to true.
     /// </summary>
     public void Set(T value)
     {
@@ -21,8 +21,8 @@ public struct InputCoalescer<T>
     }
 
     /// <summary>
-    /// Check if the <see cref="InputCoalescer{T}"/> has been modified.
-    /// If it was, return the value and clear <see cref="IsModified"/>.
+    /// Check if the <see cref="InputCoalescer{T}" /> has been modified.
+    /// If it was, return the value and clear <see cref="IsModified" />.
     /// </summary>
     /// <returns>True if the value was modified since the last check.</returns>
     public bool CheckIsModified([MaybeNullWhen(false)] out T value)

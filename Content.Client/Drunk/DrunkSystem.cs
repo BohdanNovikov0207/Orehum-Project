@@ -17,8 +17,8 @@ namespace Content.Client.Drunk;
 
 public sealed class DrunkSystem : SharedDrunkSystem
 {
-    [Dependency] private readonly IPlayerManager _player = default!;
     [Dependency] private readonly IOverlayManager _overlayMan = default!;
+    [Dependency] private readonly IPlayerManager _player = default!;
 
     private DrunkOverlay _overlay = default!;
 
@@ -32,13 +32,11 @@ public sealed class DrunkSystem : SharedDrunkSystem
         SubscribeLocalEvent<DrunkComponent, LocalPlayerAttachedEvent>(OnPlayerAttached);
         SubscribeLocalEvent<DrunkComponent, LocalPlayerDetachedEvent>(OnPlayerDetached);
 
-        _overlay = new();
+        _overlay = new DrunkOverlay();
     }
 
-    private void OnPlayerAttached(EntityUid uid, DrunkComponent component, LocalPlayerAttachedEvent args)
-    {
+    private void OnPlayerAttached(EntityUid uid, DrunkComponent component, LocalPlayerAttachedEvent args) =>
         _overlayMan.AddOverlay(_overlay);
-    }
 
     private void OnPlayerDetached(EntityUid uid, DrunkComponent component, LocalPlayerDetachedEvent args)
     {

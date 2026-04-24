@@ -45,5 +45,4 @@ public sealed class FeastOfOwlsEui : BaseEui
         SendMessage(new FeastOfOwlsMessage(false));
         _menu.Close();
     }
-
 }

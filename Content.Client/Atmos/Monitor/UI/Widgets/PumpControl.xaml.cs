@@ -24,19 +24,8 @@ namespace Content.Client.Atmos.Monitor.UI.Widgets;
 [GenerateTypedNameReferences]
 public sealed partial class PumpControl : BoxContainer
 {
-    private GasVentPumpData _data;
-    private string _address;
-
-    public event Action<string, IAtmosDeviceData>? PumpDataChanged;
-	public event Action<IAtmosDeviceData>? PumpDataCopied;
-
-    private CheckBox _enabled => CEnableDevice;
-    private CollapsibleHeading _addressLabel => CAddress;
-    private OptionButton _pumpDirection => CPumpDirection;
-    private OptionButton _pressureCheck => CPressureCheck;
-    private FloatSpinBox _externalBound => CExternalBound;
-    private FloatSpinBox _internalBound => CInternalBound;
-    private Button _copySettings => CCopySettings;
+    private readonly string _address;
+    private readonly GasVentPumpData _data;
 
     public PumpControl(GasVentPumpData data, string address)
     {
@@ -74,7 +63,8 @@ public sealed partial class PumpControl : BoxContainer
 
         foreach (var value in Enum.GetValues<VentPumpDirection>())
         {
-            _pumpDirection.AddItem(Loc.GetString($"air-alarm-ui-pump-direction-{value.ToString().ToLower()}"), (int) value);
+            _pumpDirection.AddItem(Loc.GetString($"air-alarm-ui-pump-direction-{value.ToString().ToLower()}"),
+                (int) value);
         }
 
         _pumpDirection.SelectId((int) _data.PumpDirection);
@@ -87,7 +77,8 @@ public sealed partial class PumpControl : BoxContainer
 
         foreach (var value in Enum.GetValues<VentPressureBound>())
         {
-            _pressureCheck.AddItem(Loc.GetString($"air-alarm-ui-pressure-bound-{value.ToString().ToLower()}"), (int) value);
+            _pressureCheck.AddItem(Loc.GetString($"air-alarm-ui-pressure-bound-{value.ToString().ToLower()}"),
+                (int) value);
         }
 
         _pressureCheck.SelectId((int) _data.PressureChecks);
@@ -103,6 +94,17 @@ public sealed partial class PumpControl : BoxContainer
             PumpDataCopied?.Invoke(_data);
         };
     }
+
+    private CheckBox _enabled => CEnableDevice;
+    private CollapsibleHeading _addressLabel => CAddress;
+    private OptionButton _pumpDirection => CPumpDirection;
+    private OptionButton _pressureCheck => CPressureCheck;
+    private FloatSpinBox _externalBound => CExternalBound;
+    private FloatSpinBox _internalBound => CInternalBound;
+    private Button _copySettings => CCopySettings;
+
+    public event Action<string, IAtmosDeviceData>? PumpDataChanged;
+    public event Action<IAtmosDeviceData>? PumpDataCopied;
 
     public void ChangeData(GasVentPumpData data)
     {

@@ -25,65 +25,39 @@ public class ListContainer : Control
     public const string StylePropertySeparation = "separation";
     public const string StyleClassListContainerButton = "list-container-button";
 
-    public int? SeparationOverride { get; set; }
+    private const int DefaultSeparation = 3;
+    private readonly Dictionary<ListData, ListContainerButton> _buttons = new();
 
-    public bool Group
-    {
-        get => _buttonGroup != null;
-        set => _buttonGroup = value ? new ButtonGroup() : null;
-    }
-    public bool Toggle { get; set; }
+    private readonly VScrollBar _vScrollBar;
+    private int _bottomIndex;
+    private ButtonGroup? _buttonGroup;
+
+    private List<ListData> _data = new();
+    private float _itemHeight;
+    private ListData? _selected;
+    private bool _suppressScrollValueChanged;
+    private int _topIndex;
+    private float _totalHeight;
+    private bool _updateChildren;
 
     /// <summary>
     /// Called when creating a button on the UI.
-    /// The provided <see cref="ListContainerButton"/> is the generated button that Controls should be parented to.
+    /// The provided <see cref="ListContainerButton" /> is the generated button that Controls should be parented to.
     /// </summary>
     public Action<ListData, ListContainerButton>? GenerateItem;
-
-    /// <inheritdoc cref="BaseButton.OnPressed"/>
-    public Action<BaseButton.ButtonEventArgs, ListData>? ItemPressed;
 
     /// <summary>
     /// Invoked when a KeyBind is pressed on a ListContainerButton.
     /// </summary>
     public Action<GUIBoundKeyEventArgs, ListData>? ItemKeyBindDown;
 
+    /// <inheritdoc cref="BaseButton.OnPressed" />
+    public Action<BaseButton.ButtonEventArgs, ListData>? ItemPressed;
+
     /// <summary>
     /// Invoked when the selected item does not exist in the new data when PopulateList is called.
     /// </summary>
     public Action? NoItemSelected;
-
-    public IReadOnlyList<ListData> Data => _data;
-
-    private const int DefaultSeparation = 3;
-
-    private readonly VScrollBar _vScrollBar;
-    private readonly Dictionary<ListData, ListContainerButton> _buttons = new();
-
-    private List<ListData> _data = new();
-    private ListData? _selected;
-    private float _itemHeight = 0;
-    private float _totalHeight = 0;
-    private int _topIndex = 0;
-    private int _bottomIndex = 0;
-    private bool _updateChildren = false;
-    private bool _suppressScrollValueChanged;
-    private ButtonGroup? _buttonGroup;
-
-    public int ScrollSpeedY { get; set; } = 50;
-
-    private int ActualSeparation
-    {
-        get
-        {
-            if (TryGetStyleProperty(StylePropertySeparation, out int separation))
-            {
-                return separation;
-            }
-
-            return SeparationOverride ?? DefaultSeparation;
-        }
-    }
 
     public ListContainer()
     {
@@ -95,15 +69,40 @@ public class ListContainer : Control
         _vScrollBar = new VScrollBar
         {
             HorizontalExpand = false,
-            HorizontalAlignment = HAlignment.Right
+            HorizontalAlignment = HAlignment.Right,
         };
         AddChild(_vScrollBar);
         _vScrollBar.OnValueChanged += ScrollValueChanged;
     }
 
+    public int? SeparationOverride { get; set; }
+
+    public bool Group
+    {
+        get => _buttonGroup != null;
+        set => _buttonGroup = value ? new ButtonGroup() : null;
+    }
+
+    public bool Toggle { get; set; }
+
+    public IReadOnlyList<ListData> Data => _data;
+
+    public int ScrollSpeedY { get; set; } = 50;
+
+    private int ActualSeparation
+    {
+        get
+        {
+            if (TryGetStyleProperty(StylePropertySeparation, out int separation))
+                return separation;
+
+            return SeparationOverride ?? DefaultSeparation;
+        }
+    }
+
     public virtual void PopulateList(IReadOnlyList<ListData> data)
     {
-        if ((_itemHeight == 0 || _data is {Count: 0}) && data.Count > 0)
+        if ((_itemHeight == 0 || _data is { Count: 0 }) && data.Count > 0)
         {
             ListContainerButton control = new(data[0], 0);
             GenerateItem?.Invoke(data[0], control);
@@ -120,6 +119,7 @@ public class ListContainer : Control
         {
             button.Dispose();
         }
+
         _buttons.Clear();
 
         _data = data.ToList();
@@ -150,14 +150,19 @@ public class ListContainer : Control
         _selected = data;
         button ??= new ListContainerButton(data, _data.IndexOf(data));
         OnItemPressed(new BaseButton.ButtonEventArgs(button,
-            new GUIBoundKeyEventArgs(EngineKeyFunctions.UIClick, BoundKeyState.Up,
-                new ScreenCoordinates(0, 0, WindowId.Main), true, Vector2.Zero, Vector2.Zero)));
+            new GUIBoundKeyEventArgs(EngineKeyFunctions.UIClick,
+                BoundKeyState.Up,
+                new ScreenCoordinates(0, 0, WindowId.Main),
+                true,
+                Vector2.Zero,
+                Vector2.Zero)));
     }
 
     /*
      * Need to implement selecting the first item in code.
      * Need to implement updating one entry without having to repopulate
      */
+
     #endregion
 
     private void OnItemPressed(BaseButton.ButtonEventArgs args)
@@ -168,25 +173,22 @@ public class ListContainer : Control
         ItemPressed?.Invoke(args, button.Data);
     }
 
-    private void OnItemKeyBindDown(ListContainerButton button, GUIBoundKeyEventArgs args)
-    {
+    private void OnItemKeyBindDown(ListContainerButton button, GUIBoundKeyEventArgs args) =>
         ItemKeyBindDown?.Invoke(args, button.Data);
-    }
 
     [Pure]
     private Vector2 GetScrollValue()
     {
         var v = _vScrollBar.Value;
         if (!_vScrollBar.Visible)
-        {
             v = 0;
-        }
         return new Vector2(0, v);
     }
 
     protected override Vector2 ArrangeOverride(Vector2 finalSize)
     {
         #region Scroll
+
         var cHeight = _totalHeight;
         var vBarSize = _vScrollBar.DesiredSize.X;
         var (finalWidth, finalHeight) = finalSize;
@@ -214,12 +216,12 @@ public class ListContainer : Control
         }
 
         if (_vScrollBar.Visible)
-        {
             _vScrollBar.Arrange(UIBox2.FromDimensions(Vector2.Zero, finalSize));
-        }
+
         #endregion
 
         #region Rebuild Children
+
         /*
          * Example:
          *
@@ -299,6 +301,7 @@ public class ListContainer : Control
                             button.Pressed = true;
                         AddChild(button);
                     }
+
                     button.SetPositionInParent(i - _topIndex);
                     button.Measure(finalSize);
                 }
@@ -312,11 +315,13 @@ public class ListContainer : Control
 
             _vScrollBar.SetPositionLast();
         }
+
         #endregion
 
         #region Layout Children
+
         // Use pixel position
-        var pixelWidth = (int)(finalWidth * UIScale);
+        var pixelWidth = (int) (finalWidth * UIScale);
         var pixelSeparation = (int) (ActualSeparation * UIScale);
 
         var pixelOffset = (int) -((scroll.Y - _topIndex * (_itemHeight + ActualSeparation)) * UIScale);
@@ -335,6 +340,7 @@ public class ListContainer : Control
 
             pixelOffset += pixelSize;
         }
+
         #endregion
 
         return finalSize;
@@ -367,9 +373,7 @@ public class ListContainer : Control
     private void ScrollValueChanged(Robust.Client.UserInterface.Controls.Range _)
     {
         if (_suppressScrollValueChanged)
-        {
             return;
-        }
 
         InvalidateArrange();
     }
@@ -408,7 +412,9 @@ public sealed class ListContainerButton : ContainerButton, IEntityControl
 }
 
 #region Data
+
 public abstract record ListData;
 
 public record EntityListData(EntityUid Uid) : ListData;
+
 #endregion

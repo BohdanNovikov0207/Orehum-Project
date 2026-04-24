@@ -31,6 +31,7 @@ public sealed class ToggleOutlineCommand : LocalizedCommands
         var old = _configurationManager.GetCVar(cvar);
 
         _configurationManager.SetCVar(cvar, !old);
-        shell.WriteLine(LocalizationManager.GetString($"cmd-{Command}-notify", ("state", _configurationManager.GetCVar(cvar))));
+        shell.WriteLine(LocalizationManager.GetString($"cmd-{Command}-notify",
+            ("state", _configurationManager.GetCVar(cvar))));
     }
 }

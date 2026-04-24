@@ -33,15 +33,9 @@ public sealed class SignalTimerBoundUserInterface : BoundUserInterface
         _window.OnCurrentDelayChanged += OnDelayChanged; // Mono
     }
 
-    public void StartTimer()
-    {
-        SendMessage(new SignalTimerStartMessage());
-    }
+    public void StartTimer() => SendMessage(new SignalTimerStartMessage());
 
-    private void OnTextChanged(string newText)
-    {
-        SendMessage(new SignalTimerTextChangedMessage(newText));
-    }
+    private void OnTextChanged(string newText) => SendMessage(new SignalTimerTextChangedMessage(newText));
 
     private void OnDelayChanged(TimeSpan newDelay) // Mono
     {

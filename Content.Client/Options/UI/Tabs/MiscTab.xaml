@@ -21,34 +21,38 @@ SPDX-License-Identifier: AGPL-3.0-or-later
         <ScrollContainer VerticalExpand="True" HorizontalExpand="True">
             <BoxContainer Orientation="Vertical" Margin="8 8 8 8" VerticalExpand="True">
                 <Label Text="{Loc 'ui-options-general-ui-style'}"
-                       StyleClasses="LabelKeyText"/>
+                       StyleClasses="LabelKeyText" />
                 <ui:OptionDropDown Name="DropDownHudTheme" Title="{Loc 'ui-options-hud-theme'}" />
                 <ui:OptionDropDown Name="DropDownHudLayout" Title="{Loc 'ui-options-hud-layout'}" />
                 <Label Text="{Loc 'ui-options-general-discord'}"
-                       StyleClasses="LabelKeyText"/>
+                       StyleClasses="LabelKeyText" />
                 <CheckBox Name="DiscordRich" Text="{Loc 'ui-options-discordrich'}" />
                 <Label Text="{Loc 'ui-options-general-speech'}"
-                       StyleClasses="LabelKeyText"/>
+                       StyleClasses="LabelKeyText" />
                 <CheckBox Name="ShowOocPatronColor" Text="{Loc 'ui-options-show-ooc-patron-color'}" />
                 <CheckBox Name="ShowLoocAboveHeadCheckBox" Text="{Loc 'ui-options-show-looc-on-head'}" />
                 <CheckBox Name="FancySpeechBubblesCheckBox" Text="{Loc 'ui-options-fancy-speech'}" />
                 <CheckBox Name="FancyNameBackgroundsCheckBox" Text="{Loc 'ui-options-fancy-name-background'}" />
                 <CheckBox Name="LogInChatCheckBox" Text="{Loc 'ui-options-log-in-chat'}" /> <!-- WD EDIT -->
-                <CheckBox Name="CoalesceIdenticalMessagesCheckBox" Text="{Loc 'ui-options-coalesce-identical-messages'}" /> <!-- WD EDIT -->
-                <CheckBox Name="DetailedExamineCheckBox" Text="{Loc 'ui-options-detailed-examine'}" /> <!-- Goobstation Change -->
+                <CheckBox Name="CoalesceIdenticalMessagesCheckBox"
+                          Text="{Loc 'ui-options-coalesce-identical-messages'}" /> <!-- WD EDIT -->
+                <CheckBox Name="DetailedExamineCheckBox" Text="{Loc 'ui-options-detailed-examine'}" />
+                <!-- Goobstation Change -->
                 <Label Text="{Loc 'ui-options-general-cursor'}"
-                       StyleClasses="LabelKeyText"/>
+                       StyleClasses="LabelKeyText" />
                 <CheckBox Name="ShowHeldItemCheckBox" Text="{Loc 'ui-options-show-held-item'}" />
                 <CheckBox Name="ShowCombatModeIndicatorsCheckBox" Text="{Loc 'ui-options-show-combat-mode-indicators'}" />
-                <CheckBox Name="ShowOfferModeIndicatorsCheckBox" Text="{Loc 'ui-options-show-offer-mode-indicators'}" /> <!-- CorvaxGoob-Offer -->
+                <CheckBox Name="ShowOfferModeIndicatorsCheckBox" Text="{Loc 'ui-options-show-offer-mode-indicators'}" />
+                <!-- CorvaxGoob-Offer -->
                 <Label Text="{Loc 'ui-options-general-storage'}"
-                       StyleClasses="LabelKeyText"/>
+                       StyleClasses="LabelKeyText" />
                 <CheckBox Name="OpaqueStorageWindowCheckBox" Text="{Loc 'ui-options-opaque-storage-window'}" />
                 <CheckBox Name="StaticStorageUI" Text="{Loc 'ui-options-static-storage-ui'}" />
                 <!-- Goobstation Edit Start -->
                 <Label Text="{Loc 'ui-options-preferences'}"
-                       StyleClasses="LabelKeyText"/>
-                <CheckBox Name="AutoFocusSearchOnBuildMenuCheckBox" Text="{Loc 'ui-options-auto-focus-search-on-build-menu'}" />
+                       StyleClasses="LabelKeyText" />
+                <CheckBox Name="AutoFocusSearchOnBuildMenuCheckBox"
+                          Text="{Loc 'ui-options-auto-focus-search-on-build-menu'}" />
                 <CheckBox Name="LockActionBarDragCheckBox" Text="{Loc 'ui-options-lock-action-bar-drag'}" />
                 <!-- Goobstation Edit End -->
                 <!-- <CheckBox Name="ToggleWalk" Text="{Loc 'ui-options-hotkey-toggle-walk'}" /> -->

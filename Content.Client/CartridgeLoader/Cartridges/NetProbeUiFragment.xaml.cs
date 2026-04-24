@@ -18,7 +18,7 @@ public sealed partial class NetProbeUiFragment : BoxContainer
     {
         BackgroundColor = Color.Transparent,
         BorderColor = Color.FromHex("#5a5a5a"),
-        BorderThickness = new Thickness(0, 0, 0, 1)
+        BorderThickness = new Thickness(0, 0, 0, 1),
     };
 
     public NetProbeUiFragment()

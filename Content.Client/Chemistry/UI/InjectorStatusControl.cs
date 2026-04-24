@@ -12,9 +12,9 @@
 
 using Content.Client.Message;
 using Content.Client.Stylesheets;
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Chemistry.Components;
 using Content.Shared.Chemistry.EntitySystems;
-using Content.Goobstation.Maths.FixedPoint;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
 using Robust.Shared.Timing;
@@ -23,14 +23,14 @@ namespace Content.Client.Chemistry.UI;
 
 public sealed class InjectorStatusControl : Control
 {
+    private readonly RichTextLabel _label;
     private readonly Entity<InjectorComponent> _parent;
     private readonly SharedSolutionContainerSystem _solutionContainers;
-    private readonly RichTextLabel _label;
+    private FixedPoint2 PrevMaxVolume;
+    private InjectorToggleMode PrevToggleState;
+    private FixedPoint2 PrevTransferAmount;
 
     private FixedPoint2 PrevVolume;
-    private FixedPoint2 PrevMaxVolume;
-    private FixedPoint2 PrevTransferAmount;
-    private InjectorToggleMode PrevToggleState;
 
     public InjectorStatusControl(Entity<InjectorComponent> parent, SharedSolutionContainerSystem solutionContainers)
     {
@@ -64,7 +64,7 @@ public sealed class InjectorStatusControl : Control
         {
             InjectorToggleMode.Draw => "injector-draw-text",
             InjectorToggleMode.Inject => "injector-inject-text",
-            _ => "injector-invalid-injector-toggle-mode"
+            _ => "injector-invalid-injector-toggle-mode",
         });
 
         _label.SetMarkup(Loc.GetString("injector-volume-label",

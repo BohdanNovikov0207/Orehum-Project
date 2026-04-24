@@ -42,9 +42,7 @@ public sealed class GrapplingGunSystem : SharedGrapplingGunSystem
         if (!TryComp<JointComponent>(handUid, out var jointComp) ||
             !jointComp.GetJoints.TryGetValue(GrapplingJoint, out var joint) ||
             joint is not DistanceJoint distance)
-        {
             return;
-        }
 
         if (distance.MaxLength <= distance.MinLength)
             return;
@@ -53,9 +51,7 @@ public sealed class GrapplingGunSystem : SharedGrapplingGunSystem
 
         if (!TryComp<CombatModeComponent>(local, out var combatMode) ||
             !combatMode.IsInCombatMode)
-        {
             reelKey = false;
-        }
 
         if (grappling.Reeling == reelKey)
             return;

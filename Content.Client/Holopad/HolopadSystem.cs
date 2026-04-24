@@ -5,14 +5,14 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Linq;
+using System.Numerics;
 using Content.Shared.Chat.TypingIndicator;
 using Content.Shared.Holopad;
 using Robust.Client.GameObjects;
 using Robust.Client.Graphics;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
-using System.Linq;
-using System.Numerics;
 using DrawDepth = Content.Shared.DrawDepth.DrawDepth;
 
 namespace Content.Client.Holopad;
@@ -20,8 +20,8 @@ namespace Content.Client.Holopad;
 public sealed class HolopadSystem : SharedHolopadSystem
 {
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SpriteSystem _sprite = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -32,10 +32,8 @@ public sealed class HolopadSystem : SharedHolopadSystem
         SubscribeAllEvent<TypingChangedEvent>(OnTypingChanged);
     }
 
-    private void OnComponentStartup(Entity<HolopadHologramComponent> entity, ref ComponentStartup ev)
-    {
+    private void OnComponentStartup(Entity<HolopadHologramComponent> entity, ref ComponentStartup ev) =>
         UpdateHologramSprite(entity, entity.Comp.LinkedEntity);
-    }
 
     private void OnShaderRender(Entity<HolopadHologramComponent> entity, ref BeforePostShaderRenderEvent ev)
     {
@@ -68,7 +66,9 @@ public sealed class HolopadSystem : SharedHolopadSystem
 
         // Remove all sprite layers
         for (var i = hologramSprite.AllLayers.Count() - 1; i >= 0; i--)
+        {
             _sprite.RemoveLayer((hologram, hologramSprite), i);
+        }
 
         if (TryComp<SpriteComponent>(target, out var targetSprite))
         {
@@ -84,9 +84,7 @@ public sealed class HolopadSystem : SharedHolopadSystem
 
             // Otherwise copy the target's current physical appearance
             else
-            {
                 _sprite.CopySprite((target.Value, targetSprite), (hologram, hologramSprite));
-            }
         }
 
         // There is no target, display a default sprite instead (if available)
@@ -98,7 +96,7 @@ public sealed class HolopadSystem : SharedHolopadSystem
             var layer = new PrototypeLayerData
             {
                 RsiPath = holopadhologram.RsiPath,
-                State = holopadhologram.RsiState
+                State = holopadhologram.RsiState,
             };
 
             _sprite.AddLayer((hologram, hologramSprite), layer, null);
@@ -107,7 +105,7 @@ public sealed class HolopadSystem : SharedHolopadSystem
         // Override specific values
         _sprite.SetColor((hologram, hologramSprite), Color.White);
         _sprite.SetOffset((hologram, hologramSprite), holopadhologram.Offset);
-        _sprite.SetDrawDepth((hologram, hologramSprite), (int)DrawDepth.Mobs);
+        _sprite.SetDrawDepth((hologram, hologramSprite), (int) DrawDepth.Mobs);
         hologramSprite.NoRotation = true;
         hologramSprite.DirectionOverride = Direction.South;
         hologramSprite.EnableDirectionOverride = true;
@@ -115,7 +113,8 @@ public sealed class HolopadSystem : SharedHolopadSystem
         // Remove shading from all layers (except displacement maps)
         for (var i = 0; i < hologramSprite.AllLayers.Count(); i++)
         {
-            if (_sprite.TryGetLayer((hologram, hologramSprite), i, out var layer, false) && layer.ShaderPrototype != "DisplacedDraw")
+            if (_sprite.TryGetLayer((hologram, hologramSprite), i, out var layer, false) &&
+                layer.ShaderPrototype != "DisplacedDraw")
                 hologramSprite.LayerSetShader(i, "unshaded");
         }
 
@@ -128,12 +127,14 @@ public sealed class HolopadSystem : SharedHolopadSystem
         float texHeight = sprite.AllLayers.Max(x => x.PixelSize.Y);
 
         var instance = _prototypeManager.Index<ShaderPrototype>(holopadHologram.ShaderName).InstanceUnique();
-        instance.SetParameter("color1", new Vector3(holopadHologram.Color1.R, holopadHologram.Color1.G, holopadHologram.Color1.B));
-        instance.SetParameter("color2", new Vector3(holopadHologram.Color2.R, holopadHologram.Color2.G, holopadHologram.Color2.B));
+        instance.SetParameter("color1",
+            new Vector3(holopadHologram.Color1.R, holopadHologram.Color1.G, holopadHologram.Color1.B));
+        instance.SetParameter("color2",
+            new Vector3(holopadHologram.Color2.R, holopadHologram.Color2.G, holopadHologram.Color2.B));
         instance.SetParameter("alpha", holopadHologram.Alpha);
         instance.SetParameter("intensity", holopadHologram.Intensity);
         instance.SetParameter("texHeight", texHeight);
-        instance.SetParameter("t", (float)_timing.CurTime.TotalSeconds * holopadHologram.ScrollRate);
+        instance.SetParameter("t", (float) _timing.CurTime.TotalSeconds * holopadHologram.ScrollRate);
 
         sprite.PostShader = instance;
         sprite.RaiseShaderEvent = true;

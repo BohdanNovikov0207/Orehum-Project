@@ -13,16 +13,13 @@ using Robust.Client.UserInterface.XAML;
 
 namespace Content.Client._Imp.ItemSlotsMenu;
 
-public sealed partial class ItemSlotsMenu: RadialMenu
+public sealed class ItemSlotsMenu : RadialMenu
 {
+    private const string MainString = "Main";
     [Dependency] private readonly EntityManager _entManager = default!;
-    [Dependency] private readonly IPlayerManager _playerManager = default!;
 
     private readonly ItemSlotsSystem _itemSlots;
-
-    private const string MainString = "Main";
-
-    public event Action<string>? ItemSlotEjectMessageAction;
+    [Dependency] private readonly IPlayerManager _playerManager = default!;
 
     public ItemSlotsMenu(EntityUid owner, ItemSlotsBoundUserInterface bui)
     {
@@ -56,7 +53,7 @@ public sealed partial class ItemSlotsMenu: RadialMenu
 
             itemName = metadata.EntityName;
 
-            var button = new ItemSlotButton()
+            var button = new ItemSlotButton
             {
                 SetSize = new Vector2(64f, 64f),
                 ToolTip = itemName,
@@ -68,7 +65,7 @@ public sealed partial class ItemSlotsMenu: RadialMenu
             if (sprite.Icon == null)
                 continue;
 
-            var tex = new TextureRect()
+            var tex = new TextureRect
             {
                 VerticalAlignment = VAlignment.Center,
                 HorizontalAlignment = HAlignment.Center,
@@ -89,12 +86,10 @@ public sealed partial class ItemSlotsMenu: RadialMenu
 
         ItemSlotEjectMessageAction += bui.SendItemSlotsEjectMessage;
     }
+
+    public event Action<string>? ItemSlotEjectMessageAction;
 }
 
 public sealed class ItemSlotButton : RadialMenuTextureButtonWithSector
 {
-    public ItemSlotButton()
-    {
-
-    }
 }

@@ -7,7 +7,6 @@ SPDX-License-Identifier: MIT
 <!-- basically all of this has been changed by goobstation to a new UI, See PR #4780-->
 <PanelContainer
     xmlns="https://spacestation14.io"
-    xmlns:gfx="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client"
     HorizontalExpand="True"
     Margin="0 1"
     StyleClasses="AngleRect">
@@ -25,7 +24,7 @@ SPDX-License-Identifier: MIT
                 <Label Name="Title"
                        Access="Public"
                        MaxHeight="28"
-                       StyleClasses="LabelKeyText"/>
+                       StyleClasses="LabelKeyText" />
             </BoxContainer>
         </Control>
 
@@ -42,19 +41,19 @@ SPDX-License-Identifier: MIT
                          Margin="4"
                          Stretch="KeepAspectCentered"
                          RectClipContent="True"
-                         VerticalAlignment="Center"/>
+                         VerticalAlignment="Center" />
 
-            <PanelContainer StyleClasses="LowDivider" Margin="4 0"/>
+            <PanelContainer StyleClasses="LowDivider" Margin="4 0" />
 
             <BoxContainer Orientation="Vertical"
                           HorizontalExpand="True"
                           VerticalExpand="True">
 
                 <RichTextLabel Name="ProductName"
-                       Access="Public"
-                       HorizontalExpand="True"
-                       VerticalExpand="True"
-                       StyleClasses="LabelSubText" />
+                               Access="Public"
+                               HorizontalExpand="True"
+                               VerticalExpand="True"
+                               StyleClasses="LabelSubText" />
 
                 <!-- CorvaxGoob-CargoFeatures-Start -->
                 <Label Name="DeliveryDestination"
@@ -74,7 +73,7 @@ SPDX-License-Identifier: MIT
             </BoxContainer>
         </BoxContainer>
 
-        <PanelContainer StyleClasses="LowDivider" Margin="-6 0"/>
+        <PanelContainer StyleClasses="LowDivider" Margin="-6 0" />
 
         <!-- Buttons -->
         <!-- Btn's position hardcoded (args.Button.Parent?.Parent?.Parent type) in CargoConsoleBUI 158 & 166 line -->
@@ -83,7 +82,7 @@ SPDX-License-Identifier: MIT
                     Access="Public"
                     Text="{Loc 'cargo-console-menu-order-row-button-approve'}"
                     StyleClasses="OpenRight"
-                    HorizontalExpand="True"/>
+                    HorizontalExpand="True" />
 
             <Button Name="Cancel"
                     Access="Public"

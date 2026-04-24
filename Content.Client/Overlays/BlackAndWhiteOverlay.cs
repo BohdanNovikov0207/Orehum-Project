@@ -4,15 +4,12 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Client.Overlays;
 
-public sealed partial class BlackAndWhiteOverlay : Overlay
+public sealed class BlackAndWhiteOverlay : Overlay
 {
     private static readonly ProtoId<ShaderPrototype> Shader = "GreyscaleFullscreen";
+    private readonly ShaderInstance _greyscaleShader;
 
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-
-    public override OverlaySpace Space => OverlaySpace.WorldSpace;
-    public override bool RequestScreenTexture => true;
-    private readonly ShaderInstance _greyscaleShader;
 
     public BlackAndWhiteOverlay()
     {
@@ -20,6 +17,9 @@ public sealed partial class BlackAndWhiteOverlay : Overlay
         _greyscaleShader = _prototypeManager.Index(Shader).InstanceUnique();
         ZIndex = 10; // draw this over the DamageOverlay, RainbowOverlay etc.
     }
+
+    public override OverlaySpace Space => OverlaySpace.WorldSpace;
+    public override bool RequestScreenTexture => true;
 
     protected override void Draw(in OverlayDrawArgs args)
     {

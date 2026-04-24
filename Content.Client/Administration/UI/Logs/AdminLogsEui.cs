@@ -8,6 +8,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using Content.Client.Administration.UI.CustomControls;
@@ -25,18 +26,17 @@ namespace Content.Client.Administration.UI.Logs;
 [UsedImplicitly]
 public sealed class AdminLogsEui : BaseEui
 {
-    [Dependency] private readonly IClyde _clyde = default!;
-    [Dependency] private readonly IUserInterfaceManager _uiManager = default!;
-    [Dependency] private readonly IFileDialogManager _dialogManager = default!;
-    [Dependency] private readonly ILogManager _log = default!;
-
     private const char CsvSeparator = ',';
     private const string CsvQuote = "\"";
     private const string CsvHeader = "Date,ID,PlayerID,Severity,Type,Message";
+    [Dependency] private readonly IClyde _clyde = default!;
+    [Dependency] private readonly IFileDialogManager _dialogManager = default!;
+    [Dependency] private readonly ILogManager _log = default!;
 
-    private ISawmill _sawmill;
+    private readonly ISawmill _sawmill;
+    [Dependency] private readonly IUserInterfaceManager _uiManager = default!;
 
-    private bool _currentlyExportingLogs = false;
+    private bool _currentlyExportingLogs;
 
     public AdminLogsEui()
     {
@@ -63,10 +63,7 @@ public sealed class AdminLogsEui : BaseEui
 
     private bool FirstState { get; set; } = true;
 
-    private void OnRequestClosed(WindowRequestClosedEventArgs args)
-    {
-        SendMessage(new CloseEuiMessage());
-    }
+    private void OnRequestClosed(WindowRequestClosedEventArgs args) => SendMessage(new CloseEuiMessage());
 
     private void OnCloseWindow()
     {
@@ -126,7 +123,7 @@ public sealed class AdminLogsEui : BaseEui
 
                 // Date
                 // I swear to god if someone adds ,s or "s to the other fields...
-                await writer.WriteAsync(log.Date.ToString("s", System.Globalization.CultureInfo.InvariantCulture));
+                await writer.WriteAsync(log.Date.ToString("s", CultureInfo.InvariantCulture));
                 await writer.WriteAsync(CsvSeparator);
                 // ID
                 await writer.WriteAsync(log.Id.ToString());
@@ -137,6 +134,7 @@ public sealed class AdminLogsEui : BaseEui
                 {
                     await writer.WriteAsync(players[i] + (i == players.Length - 1 ? "" : " "));
                 }
+
                 await writer.WriteAsync(CsvSeparator);
                 // Severity
                 await writer.WriteAsync(log.Impact.ToString());
@@ -167,9 +165,7 @@ public sealed class AdminLogsEui : BaseEui
     private void PopOut()
     {
         if (LogsWindow == null)
-        {
             return;
-        }
 
         var monitor = _clyde.EnumerateMonitors().First();
 
@@ -179,7 +175,7 @@ public sealed class AdminLogsEui : BaseEui
             Title = "Admin Logs",
             Monitor = monitor,
             Width = 1100,
-            Height = 400
+            Height = 400,
         });
 
         LogsControl.Orphan();
@@ -201,18 +197,14 @@ public sealed class AdminLogsEui : BaseEui
         var s = (AdminLogsEuiState) state;
 
         if (s.IsLoading)
-        {
             return;
-        }
 
         LogsControl.SetCurrentRound(s.RoundId);
         LogsControl.SetPlayers(s.Players);
         LogsControl.UpdateCount(round: s.RoundLogs);
 
         if (!FirstState)
-        {
             return;
-        }
 
         FirstState = false;
         LogsControl.SetRoundSpinBox(s.RoundId);
@@ -227,13 +219,9 @@ public sealed class AdminLogsEui : BaseEui
         {
             case NewLogs newLogs:
                 if (newLogs.Replace)
-                {
                     LogsControl.SetLogs(newLogs.Logs);
-                }
                 else
-                {
                     LogsControl.AddLogs(newLogs.Logs);
-                }
 
                 LogsControl.NextButton.Disabled = !newLogs.HasNext;
                 break;
@@ -261,9 +249,7 @@ public sealed class AdminLogsEui : BaseEui
         base.Closed();
 
         if (ClydeWindow != null)
-        {
             ClydeWindow.RequestClosed -= OnRequestClosed;
-        }
 
         LogsControl.Dispose();
         LogsWindow?.Dispose();

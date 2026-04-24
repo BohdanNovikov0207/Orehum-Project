@@ -21,14 +21,13 @@ public sealed class FlippableClothingVisualizerSystem : VisualizerSystem<Flippab
     {
         base.Initialize();
 
-        SubscribeLocalEvent<FlippableClothingVisualsComponent, GetEquipmentVisualsEvent>(OnGetVisuals, after: [typeof(ClothingSystem)]);
+        SubscribeLocalEvent<FlippableClothingVisualsComponent, GetEquipmentVisualsEvent>(OnGetVisuals,
+            after: [typeof(ClothingSystem)]);
         SubscribeLocalEvent<FlippableClothingVisualsComponent, FoldedEvent>(OnFolded);
     }
 
-    private void OnFolded(Entity<FlippableClothingVisualsComponent> ent, ref FoldedEvent args)
-    {
+    private void OnFolded(Entity<FlippableClothingVisualsComponent> ent, ref FoldedEvent args) =>
         _itemSys.VisualsChanged(ent);
-    }
 
     private void OnGetVisuals(Entity<FlippableClothingVisualsComponent> ent, ref GetEquipmentVisualsEvent args)
     {
@@ -38,7 +37,10 @@ public sealed class FlippableClothingVisualizerSystem : VisualizerSystem<Flippab
 
         if (clothing.MappedLayer == null ||
             !AppearanceSystem.TryGetData<bool>(ent, FoldableSystem.FoldedVisuals.State, out var folding) ||
-            !SpriteSystem.LayerMapTryGet((ent.Owner, sprite), folding ? ent.Comp.FoldingLayer : ent.Comp.UnfoldingLayer, out var idx, false))
+            !SpriteSystem.LayerMapTryGet((ent.Owner, sprite),
+                folding ? ent.Comp.FoldingLayer : ent.Comp.UnfoldingLayer,
+                out var idx,
+                false))
             return;
 
         // add each layer to the visuals

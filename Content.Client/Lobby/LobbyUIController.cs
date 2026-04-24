@@ -114,21 +114,20 @@ namespace Content.Client.Lobby;
 
 public sealed class LobbyUIController : UIController, IOnStateEntered<LobbyState>, IOnStateExited<LobbyState>
 {
-    [Dependency] private readonly IClientPreferencesManager _preferencesManager = default!;
+    [Dependency] private readonly ISharedSponsorsManager _clientSponsorsManager = default!; // sponsor
     [Dependency] private readonly IConfigurationManager _configurationManager = default!;
     [Dependency] private readonly IFileDialogManager _dialogManager = default!;
-    [Dependency] private readonly IPlayerManager _playerManager = default!;
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-    [Dependency] private readonly IResourceCache _resourceCache = default!;
-    [Dependency] private readonly IStateManager _stateManager = default!;
-    [Dependency] private readonly JobRequirementsManager _requirements = default!;
-    [Dependency] private readonly MarkingManager _markings = default!;
+    [UISystemDependency] private readonly GuidebookSystem _guide = default!;
     [UISystemDependency] private readonly HumanoidAppearanceSystem _humanoid = default!;
     [UISystemDependency] private readonly ClientInventorySystem _inventory = default!;
+    [Dependency] private readonly MarkingManager _markings = default!;
+    [Dependency] private readonly IPlayerManager _playerManager = default!;
+    [Dependency] private readonly IClientPreferencesManager _preferencesManager = default!;
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    [Dependency] private readonly JobRequirementsManager _requirements = default!;
+    [Dependency] private readonly IResourceCache _resourceCache = default!;
     [UISystemDependency] private readonly StationSpawningSystem _spawn = default!;
-    [UISystemDependency] private readonly GuidebookSystem _guide = default!;
-
-    [Dependency] private readonly ISharedSponsorsManager _clientSponsorsManager = default!; // sponsor
+    [Dependency] private readonly IStateManager _stateManager = default!;
 
     private CharacterSetupGui? _characterSetup;
     private HumanoidProfileEditor? _profileEditor;
@@ -146,6 +145,22 @@ public sealed class LobbyUIController : UIController, IOnStateEntered<LobbyState
 
     private int? EditedSlot => _profileEditor?.CharacterSlot;
 
+    public void OnStateEntered(LobbyState state)
+    {
+        PreviewPanel?.SetLoaded(_preferencesManager.ServerDataLoaded);
+        ReloadCharacterSetup();
+    }
+
+    public void OnStateExited(LobbyState state)
+    {
+        PreviewPanel?.SetLoaded(false);
+        _profileEditor?.Dispose();
+        _characterSetup?.Dispose();
+
+        _characterSetup = null;
+        _profileEditor = null;
+    }
+
     public override void Initialize()
     {
         base.Initialize();
@@ -153,10 +168,11 @@ public sealed class LobbyUIController : UIController, IOnStateEntered<LobbyState
         _preferencesManager.OnServerDataLoaded += PreferencesDataLoaded;
         _requirements.Updated += OnRequirementsUpdated;
 
-        _configurationManager.OnValueChanged(CCVars.FlavorText, args =>
-        {
-            _profileEditor?.RefreshFlavorText();
-        });
+        _configurationManager.OnValueChanged(CCVars.FlavorText,
+            args =>
+            {
+                _profileEditor?.RefreshFlavorText();
+            });
 
         _configurationManager.OnValueChanged(CCVars.GameRoleTimers, _ => RefreshProfileEditor());
 
@@ -166,9 +182,7 @@ public sealed class LobbyUIController : UIController, IOnStateEntered<LobbyState
     private LobbyCharacterPreviewPanel? GetLobbyPreview()
     {
         if (_stateManager.CurrentState is LobbyState lobby)
-        {
             return lobby.Lobby?.CharacterPreview;
-        }
 
         return null;
     }
@@ -187,32 +201,22 @@ public sealed class LobbyUIController : UIController, IOnStateEntered<LobbyState
         if (_profileEditor != null)
         {
             if (obj.WasModified<AntagPrototype>())
-            {
                 _profileEditor.RefreshAntags();
-            }
 
             if (obj.WasModified<JobPrototype>() ||
                 obj.WasModified<DepartmentPrototype>())
-            {
                 _profileEditor.RefreshJobs();
-            }
 
             if (obj.WasModified<LoadoutPrototype>() ||
                 obj.WasModified<LoadoutGroupPrototype>() ||
                 obj.WasModified<RoleLoadoutPrototype>())
-            {
                 _profileEditor.RefreshLoadouts();
-            }
 
             if (obj.WasModified<SpeciesPrototype>())
-            {
                 _profileEditor.RefreshSpecies();
-            }
 
             if (obj.WasModified<TraitPrototype>())
-            {
                 _profileEditor.RefreshTraits();
-            }
         }
     }
 
@@ -224,22 +228,6 @@ public sealed class LobbyUIController : UIController, IOnStateEntered<LobbyState
             return;
 
         ReloadCharacterSetup();
-    }
-
-    public void OnStateEntered(LobbyState state)
-    {
-        PreviewPanel?.SetLoaded(_preferencesManager.ServerDataLoaded);
-        ReloadCharacterSetup();
-    }
-
-    public void OnStateExited(LobbyState state)
-    {
-        PreviewPanel?.SetLoaded(false);
-        _profileEditor?.Dispose();
-        _characterSetup?.Dispose();
-
-        _characterSetup = null;
-        _profileEditor = null;
     }
 
     /// <summary>
@@ -310,9 +298,7 @@ public sealed class LobbyUIController : UIController, IOnStateEntered<LobbyState
         _profileEditor.Visible = false;
 
         if (_stateManager.CurrentState is LobbyState lobbyGui)
-        {
             lobbyGui.SwitchState(LobbyGui.LobbyGuiState.Default);
-        }
     }
 
     private void OpenSavePanel()
@@ -377,6 +363,7 @@ public sealed class LobbyUIController : UIController, IOnStateEntered<LobbyState
                     CloseProfileEditor();
                     return;
                 }
+
                 OpenSavePanel();
 
                 return;
@@ -400,9 +387,7 @@ public sealed class LobbyUIController : UIController, IOnStateEntered<LobbyState
 
             // Reload everything
             if (EditedSlot == args)
-            {
                 ReloadCharacterSetup();
-            }
             else
             {
                 // Only need to reload character pickers
@@ -411,9 +396,7 @@ public sealed class LobbyUIController : UIController, IOnStateEntered<LobbyState
         };
 
         if (_stateManager.CurrentState is LobbyState lobby)
-        {
             lobby.Lobby?.CharacterSetupState.AddChild(_characterSetup);
-        }
 
         return (_characterSetup, _profileEditor);
     }
@@ -430,7 +413,11 @@ public sealed class LobbyUIController : UIController, IOnStateEntered<LobbyState
 
         if (_prototypeManager.HasIndex<RoleLoadoutPrototype>(LoadoutSystem.GetJobPrototype(job.ID)))
         {
-            var loadout = profile.GetLoadoutOrDefault(LoadoutSystem.GetJobPrototype(job.ID), _playerManager.LocalSession, profile.Species, EntityManager, _prototypeManager);
+            var loadout = profile.GetLoadoutOrDefault(LoadoutSystem.GetJobPrototype(job.ID),
+                _playerManager.LocalSession,
+                profile.Species,
+                EntityManager,
+                _prototypeManager);
             GiveDummyLoadout(dummy, loadout);
         }
     }
@@ -488,10 +475,13 @@ public sealed class LobbyUIController : UIController, IOnStateEntered<LobbyState
                         {
                             var itemType = ((IEquipmentLoadout) loadoutGear).GetGear(slot.Name);
 
-                            if (_inventory.TryUnequip(dummy, slot.Name, out var unequippedItem, silent: true, force: true, reparent: false))
-                            {
+                            if (_inventory.TryUnequip(dummy,
+                                    slot.Name,
+                                    out var unequippedItem,
+                                    true,
+                                    true,
+                                    reparent: false))
                                 EntityManager.DeleteEntity(unequippedItem.Value);
-                            }
 
                             if (itemType != string.Empty)
                             {
@@ -503,10 +493,13 @@ public sealed class LobbyUIController : UIController, IOnStateEntered<LobbyState
                         {
                             var itemType = ((IEquipmentLoadout) loadoutProto).GetGear(slot.Name);
 
-                            if (_inventory.TryUnequip(dummy, slot.Name, out var unequippedItem, silent: true, force: true, reparent: false))
-                            {
+                            if (_inventory.TryUnequip(dummy,
+                                    slot.Name,
+                                    out var unequippedItem,
+                                    true,
+                                    true,
+                                    reparent: false))
                                 EntityManager.DeleteEntity(unequippedItem.Value);
-                            }
 
                             if (itemType != string.Empty)
                             {
@@ -526,10 +519,8 @@ public sealed class LobbyUIController : UIController, IOnStateEntered<LobbyState
         {
             var itemType = ((IEquipmentLoadout) gear).GetGear(slot.Name);
 
-            if (_inventory.TryUnequip(dummy, slot.Name, out var unequippedItem, silent: true, force: true, reparent: false))
-            {
+            if (_inventory.TryUnequip(dummy, slot.Name, out var unequippedItem, true, true, reparent: false))
                 EntityManager.DeleteEntity(unequippedItem.Value);
-            }
 
             if (itemType != string.Empty)
             {
@@ -551,7 +542,7 @@ public sealed class LobbyUIController : UIController, IOnStateEntered<LobbyState
         {
             job ??= GetPreferredJob(humanoid);
 
-            previewEntity = job.JobPreviewEntity ?? (EntProtoId?)job?.JobEntity;
+            previewEntity = job.JobPreviewEntity ?? (EntProtoId?) job?.JobEntity;
         }
 
         if (previewEntity != null)
@@ -560,15 +551,16 @@ public sealed class LobbyUIController : UIController, IOnStateEntered<LobbyState
             dummyEnt = EntityManager.SpawnEntity(previewEntity, MapCoordinates.Nullspace);
             return dummyEnt;
         }
-        else if (humanoid is not null)
+
+        if (humanoid is not null)
         {
-            var dummy = _prototypeManager.Index<SpeciesPrototype>(humanoid.Species).DollPrototype;
+            var dummy = _prototypeManager.Index(humanoid.Species).DollPrototype;
             dummyEnt = EntityManager.SpawnEntity(dummy, MapCoordinates.Nullspace);
         }
         else
-        {
-            dummyEnt = EntityManager.SpawnEntity(_prototypeManager.Index<SpeciesPrototype>(SharedHumanoidAppearanceSystem.DefaultSpecies).DollPrototype, MapCoordinates.Nullspace);
-        }
+            dummyEnt = EntityManager.SpawnEntity(
+                _prototypeManager.Index(SharedHumanoidAppearanceSystem.DefaultSpecies).DollPrototype,
+                MapCoordinates.Nullspace);
 
         _humanoid.LoadProfile(dummyEnt, humanoid);
 
@@ -580,7 +572,11 @@ public sealed class LobbyUIController : UIController, IOnStateEntered<LobbyState
 
             if (_prototypeManager.HasIndex<RoleLoadoutPrototype>(LoadoutSystem.GetJobPrototype(job.ID)))
             {
-                var loadout = humanoid.GetLoadoutOrDefault(LoadoutSystem.GetJobPrototype(job.ID), _playerManager.LocalSession, humanoid.Species, EntityManager, _prototypeManager);
+                var loadout = humanoid.GetLoadoutOrDefault(LoadoutSystem.GetJobPrototype(job.ID),
+                    _playerManager.LocalSession,
+                    humanoid.Species,
+                    EntityManager,
+                    _prototypeManager);
                 GiveDummyLoadout(dummyEnt, loadout);
             }
         }

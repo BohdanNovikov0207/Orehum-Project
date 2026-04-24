@@ -6,7 +6,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Client.Actions;
-using Content.Shared.Actions;
 using Content.Shared.Charges.Components;
 using Content.Shared.Charges.Systems;
 
@@ -16,8 +15,8 @@ public sealed class ChargesSystem : SharedChargesSystem
 {
     [Dependency] private readonly ActionsSystem _actions = default!;
 
-    private Dictionary<EntityUid, int> _lastCharges = new();
-    private Dictionary<EntityUid, int> _tempLastCharges = new();
+    private readonly Dictionary<EntityUid, int> _lastCharges = new();
+    private readonly Dictionary<EntityUid, int> _tempLastCharges = new();
 
     public override void Update(float frameTime)
     {
@@ -32,15 +31,13 @@ public sealed class ChargesSystem : SharedChargesSystem
 
         while (query.MoveNext(out var uid, out var recharge, out var charges))
         {
-            if (_actions.GetAction(uid, false) is not {} action)
+            if (_actions.GetAction(uid, false) is not { } action)
                 continue;
 
             var current = GetCurrentCharges((uid, charges, recharge));
 
             if (!_lastCharges.TryGetValue(uid, out var last) || current != last)
-            {
                 _actions.UpdateAction(action);
-            }
 
             _tempLastCharges[uid] = current;
         }

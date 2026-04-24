@@ -3,16 +3,16 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Goobstation.UIKit.UserActions.Controls;
 using Content.Client._Shitcode.UserActions.Tabs;
+using Content.Goobstation.UIKit.UserActions.Controls;
 using Robust.Client.UserInterface.Controllers;
 
 namespace Content.Client._Shitcode.UserActions;
 
 public sealed class UserActionUIController : UIController, IOnSystemChanged<UserActionUISystem>
 {
+    private readonly List<BaseTabControl> _tabs = new();
     private UserActionsPanel? _panel;
-    private List<BaseTabControl> _tabs = new();
 
     public void OnSystemLoaded(UserActionUISystem system)
     {
@@ -26,20 +26,11 @@ public sealed class UserActionUIController : UIController, IOnSystemChanged<User
         system.PlayerDetachedEvent -= OnDetached;
     }
 
-    private void OnAttached()
-    {
-        _panel?.UpdateTabs();
-    }
+    private void OnAttached() => _panel?.UpdateTabs();
 
-    private void OnDetached()
-    {
-        _panel?.UpdateTabs();
-    }
+    private void OnDetached() => _panel?.UpdateTabs();
 
-    public void RegisterPanel(UserActionsPanel panel)
-    {
-        _panel = panel;
-    }
+    public void RegisterPanel(UserActionsPanel panel) => _panel = panel;
 
     public void RegisterTab(BaseTabControl tab)
     {
@@ -59,8 +50,7 @@ public sealed class UserActionUIController : UIController, IOnSystemChanged<User
             configTab = tab as ConfigTabControl;
             if (configTab is null)
                 continue;
-            else
-                break;
+            break;
         }
 
         if (configTab is null)

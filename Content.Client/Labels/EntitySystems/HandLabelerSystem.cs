@@ -18,8 +18,6 @@ public sealed class HandLabelerSystem : SharedHandLabelerSystem
     {
         if (UserInterfaceSystem.TryGetOpenUi(ent.Owner, HandLabelerUiKey.Key, out var bui)
             && bui is HandLabelerBoundUserInterface cBui)
-        {
             cBui.Reload();
-        }
     }
 }

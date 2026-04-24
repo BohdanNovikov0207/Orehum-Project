@@ -83,12 +83,12 @@ using Content.Client.Paper.UI;
 using Content.Shared.CCVar;
 using Content.Shared.Movement.Components;
 using Content.Shared.Tips;
+using Robust.Client.Audio;
 using Robust.Client.GameObjects;
 using Robust.Client.ResourceManagement;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controllers;
 using Robust.Client.UserInterface.Controls;
-using Robust.Client.Audio;
 using Robust.Shared.Configuration;
 using Robust.Shared.Map;
 using Robust.Shared.Timing;
@@ -98,19 +98,18 @@ namespace Content.Client.Tips;
 
 public sealed class TippyUIController : UIController
 {
-    [Dependency] private readonly IConfigurationManager _cfg = default!;
-    [Dependency] private readonly IResourceCache _resCache = default!;
-    [UISystemDependency] private readonly AudioSystem _audio = default!;
-    [UISystemDependency] private readonly SpriteSystem _sprite = default!;
-
     public const float Padding = 50;
     public static Angle WaddleRotation = Angle.FromDegrees(10);
+    [UISystemDependency] private readonly AudioSystem _audio = default!;
+    [Dependency] private readonly IConfigurationManager _cfg = default!;
+    private readonly Queue<TippyEvent> _queuedMessages = new();
+    [Dependency] private readonly IResourceCache _resCache = default!;
+    [UISystemDependency] private readonly SpriteSystem _sprite = default!;
+    private TippyEvent? _currentMessage;
 
     private EntityUid _entity;
+    private int _previousStep;
     private float _secondsUntilNextState;
-    private int _previousStep = 0;
-    private TippyEvent? _currentMessage;
-    private readonly Queue<TippyEvent> _queuedMessages = new();
 
     public override void Initialize()
     {
@@ -119,10 +118,7 @@ public sealed class TippyUIController : UIController
         SubscribeNetworkEvent<TippyEvent>(OnTippyEvent);
     }
 
-    private void OnTippyEvent(TippyEvent msg, EntitySessionEventArgs args)
-    {
-        _queuedMessages.Enqueue(msg);
-    }
+    private void OnTippyEvent(TippyEvent msg, EntitySessionEventArgs args) => _queuedMessages.Enqueue(msg);
 
     public override void FrameUpdate(FrameEventArgs args)
     {
@@ -142,7 +138,8 @@ public sealed class TippyUIController : UIController
             NextState(tippy);
         else
         {
-            var pos = UpdatePosition(tippy, screen.Size, args); ;
+            var pos = UpdatePosition(tippy, screen.Size, args);
+            ;
             LayoutContainer.SetPosition(tippy, pos);
         }
     }
@@ -169,12 +166,11 @@ public sealed class TippyUIController : UIController
             || tippy.State == TippyState.Hidden
             || tippy.State == TippyState.Speaking
             || !EntityManager.TryGetComponent(_entity, out SpriteComponent? sprite))
-        {
-            return new Vector2(screenSize.X - offset * (tippy.DesiredSize.X + Padding), (screenSize.Y - tippy.DesiredSize.Y) / 2);
-        }
+            return new Vector2(screenSize.X - offset * (tippy.DesiredSize.X + Padding),
+                (screenSize.Y - tippy.DesiredSize.Y) / 2);
 
-        var numSteps = (int)Math.Ceiling(slideTime / waddle);
-        var curStep = (int)Math.Floor(numSteps * offset);
+        var numSteps = (int) Math.Ceiling(slideTime / waddle);
+        var curStep = (int) Math.Floor(numSteps * offset);
         var stepSize = (tippy.DesiredSize.X + Padding) / numSteps;
 
         if (curStep != _previousStep)
@@ -185,7 +181,8 @@ public sealed class TippyUIController : UIController
                     ? -WaddleRotation
                     : WaddleRotation);
 
-            if (EntityManager.TryGetComponent(_entity, out FootstepModifierComponent? step) && step.FootstepSoundCollection != null)
+            if (EntityManager.TryGetComponent(_entity, out FootstepModifierComponent? step) &&
+                step.FootstepSoundCollection != null)
             {
                 var audioParams = step.FootstepSoundCollection.Params
                     .AddVolume(-7f)
@@ -216,27 +213,25 @@ public sealed class TippyUIController : UIController
                     _entity = EntityManager.SpawnEntity(_cfg.GetCVar(CCVars.TippyEntity), MapCoordinates.Nullspace);
                     tippy.ModifyLayers = true;
                 }
+
                 if (!EntityManager.TryGetComponent(_entity, out sprite))
                     return;
                 if (!EntityManager.HasComponent<PaperVisualsComponent>(_entity))
                 {
                     var paper = EntityManager.AddComponent<PaperVisualsComponent>(_entity);
                     paper.BackgroundImagePath = "/Textures/Interface/Paper/paper_background_default.svg.96dpi.png";
-                    paper.BackgroundPatchMargin = new(16f, 16f, 16f, 16f);
-                    paper.BackgroundModulate = new(255, 255, 204);
-                    paper.FontAccentColor = new(0, 0, 0);
+                    paper.BackgroundPatchMargin = new Box2(16f, 16f, 16f, 16f);
+                    paper.BackgroundModulate = new Color(255, 255, 204);
+                    paper.FontAccentColor = new Color(0, 0, 0);
                 }
+
                 tippy.InitLabel(EntityManager.GetComponentOrNull<PaperVisualsComponent>(_entity), _resCache);
 
                 var scale = sprite.Scale;
                 if (tippy.ModifyLayers)
-                {
                     _sprite.SetScale((_entity, sprite), Vector2.One);
-                }
                 else
-                {
                     _sprite.SetScale((_entity, sprite), new Vector2(3, 3));
-                }
                 tippy.Entity.SetEntity(_entity);
                 tippy.Entity.Scale = scale;
 
@@ -251,6 +246,7 @@ public sealed class TippyUIController : UIController
                     _sprite.LayerSetVisible((_entity, sprite), "speaking", false);
                     _sprite.LayerSetVisible((_entity, sprite), "hiding", false);
                 }
+
                 _sprite.SetRotation((_entity, sprite), 0);
                 tippy.Label.SetMarkupPermissive(_currentMessage.Msg);
                 tippy.Label.Visible = false;
@@ -272,6 +268,7 @@ public sealed class TippyUIController : UIController
                     _sprite.LayerSetVisible((_entity, sprite), "speaking", true);
                     _sprite.LayerSetVisible((_entity, sprite), "hiding", false);
                 }
+
                 tippy.Label.Visible = true;
                 tippy.LabelPanel.Visible = true;
                 tippy.InvalidateArrange();
@@ -292,6 +289,7 @@ public sealed class TippyUIController : UIController
                     _sprite.LayerSetVisible((_entity, sprite), "speaking", false);
                     _sprite.LayerSetVisible((_entity, sprite), "hiding", true);
                 }
+
                 tippy.LabelPanel.Visible = false;
                 if (_currentMessage != null)
                     _secondsUntilNextState = _currentMessage.SlideTime;

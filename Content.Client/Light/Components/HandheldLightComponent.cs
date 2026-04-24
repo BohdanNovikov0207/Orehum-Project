@@ -33,20 +33,20 @@ public sealed class HandheldLightStatus : Control
 {
     private const float TimerCycle = 1;
 
-    private readonly HandheldLightComponent _parent;
-    private readonly PanelContainer[] _sections = new PanelContainer[HandheldLightComponent.StatusLevels - 1];
-
-    private float _timer;
-
     private static readonly StyleBoxFlat StyleBoxLit = new()
     {
-        BackgroundColor = Color.LimeGreen
+        BackgroundColor = Color.LimeGreen,
     };
 
     private static readonly StyleBoxFlat StyleBoxUnlit = new()
     {
-        BackgroundColor = Color.Black
+        BackgroundColor = Color.Black,
     };
+
+    private readonly HandheldLightComponent _parent;
+    private readonly PanelContainer[] _sections = new PanelContainer[HandheldLightComponent.StatusLevels - 1];
+
+    private float _timer;
 
     public HandheldLightStatus(HandheldLightComponent parent)
     {
@@ -56,14 +56,14 @@ public sealed class HandheldLightStatus : Control
         {
             Orientation = LayoutOrientation.Horizontal,
             SeparationOverride = 4,
-            HorizontalAlignment = HAlignment.Center
+            HorizontalAlignment = HAlignment.Center,
         };
 
         AddChild(wrapper);
 
         for (var i = 0; i < _sections.Length; i++)
         {
-            var panel = new PanelContainer {MinSize = new Vector2(20, 20)};
+            var panel = new PanelContainer { MinSize = new Vector2(20, 20) };
             wrapper.AddChild(panel);
             _sections[i] = panel;
         }
@@ -83,18 +83,14 @@ public sealed class HandheldLightStatus : Control
             if (i == 0)
             {
                 if (level == 0 || level == null)
-                {
                     _sections[0].PanelOverride = StyleBoxUnlit;
-                }
                 else if (level == 1)
                 {
                     // Flash the last light.
                     _sections[0].PanelOverride = _timer > TimerCycle / 2 ? StyleBoxLit : StyleBoxUnlit;
                 }
                 else
-                {
                     _sections[0].PanelOverride = StyleBoxLit;
-                }
 
                 continue;
             }

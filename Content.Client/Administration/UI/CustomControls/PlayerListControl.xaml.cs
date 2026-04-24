@@ -45,12 +45,12 @@ public sealed partial class PlayerListControl : BoxContainer
     private readonly AdminSystem _adminSystem;
 
     private readonly IEntityManager _entManager;
+    private readonly List<PlayerInfo> _sortedPlayerList = new();
     private readonly IUserInterfaceManager _uiManager;
 
-    private PlayerInfo? _selectedPlayer;
-
     private List<PlayerInfo> _playerList = new();
-    private List<PlayerInfo> _sortedPlayerList = new();
+
+    private PlayerInfo? _selectedPlayer;
 
     public Comparison<PlayerInfo>? Comparison;
     public Func<PlayerInfo, string, string>? OverrideText;
@@ -113,10 +113,7 @@ public sealed partial class PlayerListControl : BoxContainer
         args.Handle();
     }
 
-    public void StopFiltering()
-    {
-        FilterLineEdit.Text = string.Empty;
-    }
+    public void StopFiltering() => FilterLineEdit.Text = string.Empty;
 
     private void FilterList()
     {
@@ -154,9 +151,7 @@ public sealed partial class PlayerListControl : BoxContainer
         foreach (var player in _playerList)
         {
             if (pinnedPlayers.TryGetValue(player.SessionId, out var pinnedPlayer))
-            {
                 player.IsPinned = pinnedPlayer.IsPinned;
-            }
         }
 
         if (_selectedPlayer != null && !_playerList.Contains(_selectedPlayer))

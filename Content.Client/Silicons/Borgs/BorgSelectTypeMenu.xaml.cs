@@ -23,18 +23,15 @@ namespace Content.Client.Silicons.Borgs;
 /// <summary>
 /// Menu used by borgs to select their type.
 /// </summary>
-/// <seealso cref="BorgSelectTypeUserInterface"/>
-/// <seealso cref="BorgSwitchableTypeComponent"/>
+/// <seealso cref="BorgSelectTypeUserInterface" />
+/// <seealso cref="BorgSwitchableTypeComponent" />
 [GenerateTypedNameReferences]
 public sealed partial class BorgSelectTypeMenu : FancyWindow
 {
+    private static readonly List<ProtoId<GuideEntryPrototype>> GuidebookEntries = new() { "Cyborgs", "Robotics" };
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
 
     private BorgTypePrototype? _selectedBorgType;
-
-    public event Action<ProtoId<BorgTypePrototype>, ProtoId<BorgSubtypePrototype>>? ConfirmedBorgType;
-
-    private static readonly List<ProtoId<GuideEntryPrototype>> GuidebookEntries = new() { "Cyborgs", "Robotics" };
 
     public BorgSelectTypeMenu()
     {
@@ -47,7 +44,7 @@ public sealed partial class BorgSelectTypeMenu : FancyWindow
             var chassisList = new EntityPrototypeView
             {
                 Scale = new Vector2(2, 2),
-                MouseFilter = MouseFilterMode.Stop
+                MouseFilter = MouseFilterMode.Stop,
             };
             chassisList.SetPrototype(borgType.DummyPrototype);
             chassisList.OnMouseEntered += _ =>
@@ -66,6 +63,8 @@ public sealed partial class BorgSelectTypeMenu : FancyWindow
             ConfirmTypeButton.Disabled = false;
         // Goobstation-End: Customizable borgs sprites
     }
+
+    public event Action<ProtoId<BorgTypePrototype>, ProtoId<BorgSubtypePrototype>>? ConfirmedBorgType;
 
     private void UpdateInformation(BorgTypePrototype prototype)
     {
@@ -94,8 +93,5 @@ public sealed partial class BorgSelectTypeMenu : FancyWindow
         ConfirmedBorgType?.Invoke(_selectedBorgType, SubtypeSelection.SelectedBorgSubtype);
     }
 
-    private static string PrototypeName(BorgTypePrototype prototype)
-    {
-        return Loc.GetString($"borg-type-{prototype.ID}-name");
-    }
+    private static string PrototypeName(BorgTypePrototype prototype) => Loc.GetString($"borg-type-{prototype.ID}-name");
 }

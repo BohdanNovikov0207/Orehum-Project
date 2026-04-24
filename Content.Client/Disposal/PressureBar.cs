@@ -4,7 +4,6 @@
 // SPDX-License-Identifier: MIT
 
 using System.Numerics;
-using Content.Shared.Disposal;
 using Content.Shared.Disposal.Unit;
 using Robust.Client.Graphics;
 using Robust.Client.UserInterface.Controls;
@@ -17,7 +16,8 @@ public sealed class PressureBar : ProgressBar
     public bool UpdatePressure(TimeSpan fullTime)
     {
         var currentTime = IoCManager.Resolve<IGameTiming>().CurTime;
-        var pressure = (float) Math.Min(1.0f, 1.0f - (fullTime.TotalSeconds - currentTime.TotalSeconds) * SharedDisposalUnitSystem.PressurePerSecond);
+        var pressure = (float) Math.Min(1.0f,
+            1.0f - (fullTime.TotalSeconds - currentTime.TotalSeconds) * SharedDisposalUnitSystem.PressurePerSecond);
         UpdatePressureBar(pressure);
         return pressure >= 1.0f;
     }

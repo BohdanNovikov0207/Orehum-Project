@@ -21,20 +21,29 @@ public sealed partial class OfferingWindow : FancyWindow,
     IComputerWindow<EmergencyConsoleBoundUserInterfaceState>
 {
     [Dependency] private readonly IGameTiming _timing = default!;
+    private TimeSpan? _progression;
 
     public bool Claimed;
-    public TimeSpan NextOffer;
-    private TimeSpan? _progression;
 
     /// <summary>
     /// Time between NextOffers
     /// </summary>
     public TimeSpan Cooldown;
 
+    public TimeSpan NextOffer;
+
     /// <summary>
     /// Time between Progressions
     /// </summary>
     public TimeSpan ProgressionCooldown;
+
+    public OfferingWindow()
+    {
+        RobustXamlLoader.Load(this);
+        IoCManager.InjectDependencies(this);
+
+        ProgressionBar.ForegroundStyleBoxOverride = new StyleBoxFlat(Color.FromHex("#C74EBD"));
+    }
 
     /// <summary>
     /// Secondary timer used for tracking active progress.
@@ -50,33 +59,15 @@ public sealed partial class OfferingWindow : FancyWindow,
             _progression = value;
 
             if (value == null)
-            {
                 ProgressionBox.Visible = false;
-            }
             else
-            {
                 ProgressionBox.Visible = true;
-            }
         }
     }
 
-    public OfferingWindow()
-    {
-        RobustXamlLoader.Load(this);
-        IoCManager.InjectDependencies(this);
+    public void AddOption(OfferingWindowOption option) => Container.AddChild(option);
 
-        ProgressionBar.ForegroundStyleBoxOverride = new StyleBoxFlat(Color.FromHex("#C74EBD"));
-    }
-
-    public void AddOption(OfferingWindowOption option)
-    {
-        Container.AddChild(option);
-    }
-
-    public void ClearOptions()
-    {
-        Container.DisposeAllChildren();
-    }
+    public void ClearOptions() => Container.DisposeAllChildren();
 
     protected override void FrameUpdate(FrameEventArgs args)
     {

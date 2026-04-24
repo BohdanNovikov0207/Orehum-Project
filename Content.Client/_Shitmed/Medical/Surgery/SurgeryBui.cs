@@ -31,15 +31,20 @@ public sealed class SurgeryBui : BoundUserInterface
 {
     [Dependency] private readonly IEntityManager _entities = default!;
     [Dependency] private readonly IPlayerManager _player = default!;
+    private readonly List<EntProtoId> _previousSurgeries = new();
 
     private readonly SurgerySystem _system;
+    private bool _isBody;
+    private EntityUid? _part;
+    private (EntityUid Ent, EntProtoId Proto)? _surgery;
+
     [ViewVariables]
     private SurgeryWindow? _window;
-    private EntityUid? _part;
-    private bool _isBody;
-    private (EntityUid Ent, EntProtoId Proto)? _surgery;
-    private readonly List<EntProtoId> _previousSurgeries = new();
-    public SurgeryBui(EntityUid owner, Enum uiKey) : base(owner, uiKey) => _system = _entities.System<SurgerySystem>();
+
+    public SurgeryBui(EntityUid owner, Enum uiKey) : base(owner, uiKey)
+    {
+        _system = _entities.System<SurgerySystem>();
+    }
 
     protected override void ReceiveMessage(BoundUserInterfaceMessage message)
     {
@@ -124,13 +129,17 @@ public sealed class SurgeryBui : BoundUserInterface
 
         var options = new List<(NetEntity netEntity, EntityUid entity, string Name, BodyPartType? PartType)>();
         foreach (var choice in state.Choices.Keys)
+        {
             if (_entities.TryGetEntity(choice, out var ent))
             {
                 if (_entities.TryGetComponent(ent, out BodyPartComponent? part))
-                    options.Add((choice, ent.Value, _entities.GetComponent<MetaDataComponent>(ent.Value).EntityName, part.PartType));
+                    options.Add((choice, ent.Value, _entities.GetComponent<MetaDataComponent>(ent.Value).EntityName,
+                        part.PartType));
                 else if (_entities.TryGetComponent(ent, out BodyComponent? body))
-                    options.Add((choice, ent.Value, _entities.GetComponent<MetaDataComponent>(ent.Value).EntityName, null));
+                    options.Add((choice, ent.Value, _entities.GetComponent<MetaDataComponent>(ent.Value).EntityName,
+                        null));
             }
+        }
 
         options.Sort((a, b) =>
         {
@@ -147,7 +156,7 @@ public sealed class SurgeryBui : BoundUserInterface
                     BodyPartType.Foot => 7,
                     // BodyPartType.Tail => 8, No tails yet!
                     BodyPartType.Other => 9,
-                    _ => 10
+                    _ => 10,
                 };
             }
 
@@ -193,7 +202,8 @@ public sealed class SurgeryBui : BoundUserInterface
         var stepName = new FormattedMessage();
         stepName.AddText(_entities.GetComponent<MetaDataComponent>(step).EntityName);
         var stepButton = new SurgeryStepButton { Step = step };
-        stepButton.Button.OnPressed += _ => SendPredictedMessage(new SurgeryStepChosenBuiMsg(netPart, surgeryId, stepId, _isBody));
+        stepButton.Button.OnPressed += _ =>
+            SendPredictedMessage(new SurgeryStepChosenBuiMsg(netPart, surgeryId, stepId, _isBody));
 
         _window.Steps.AddChild(stepButton);
     }
@@ -229,8 +239,11 @@ public sealed class SurgeryBui : BoundUserInterface
             _window.Steps.AddChild(label);
             _window.Steps.AddChild(new HSeparator { Margin = new Thickness(0, 0, 0, 1) });
         }
+
         foreach (var stepId in surgery.Comp.Steps)
+        {
             AddStep(stepId, netPart, surgeryId);
+        }
 
         View(ViewType.Steps);
         RefreshUI();
@@ -250,9 +263,7 @@ public sealed class SurgeryBui : BoundUserInterface
         {
             if (_system.GetSingleton(surgeryId) is not { } surgery ||
                 !_entities.TryGetComponent(surgery, out SurgeryComponent? surgeryComp))
-            {
                 continue;
-            }
 
             var name = _entities.GetComponent<MetaDataComponent>(surgery).EntityName;
             surgeries.Add(((surgery, surgeryComp), surgeryId, name));
@@ -322,7 +333,12 @@ public sealed class SurgeryBui : BoundUserInterface
             {
                 stepButton.Button.Modulate = Color.White;
                 if (status == StepStatus.Next
-                    && !_system.CanPerformStepWithHeld(_player.LocalEntity.Value, Owner, _part.Value, stepButton.Step, false, out var popup))
+                    && !_system.CanPerformStepWithHeld(_player.LocalEntity.Value,
+                        Owner,
+                        _part.Value,
+                        stepButton.Step,
+                        false,
+                        out var popup))
                     stepButton.ToolTip = popup;
             }
 
@@ -361,13 +377,13 @@ public sealed class SurgeryBui : BoundUserInterface
     {
         Parts,
         Surgeries,
-        Steps
+        Steps,
     }
 
     private enum StepStatus
     {
         Next,
         Complete,
-        Incomplete
+        Incomplete,
     }
 }

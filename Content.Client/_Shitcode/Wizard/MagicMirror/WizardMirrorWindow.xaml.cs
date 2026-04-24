@@ -26,17 +26,22 @@ namespace Content.Client._Shitcode.Wizard.MagicMirror;
 [GenerateTypedNameReferences]
 public sealed partial class WizardMirrorWindow : DefaultWindow
 {
-    [Dependency] private readonly IEntityManager _entManager = default!;
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-    [Dependency] private readonly MarkingManager _markingManager = default!;
     private readonly LobbyUIController _controller;
+    [Dependency] private readonly IEntityManager _entManager = default!;
+    [Dependency] private readonly MarkingManager _markingManager = default!;
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+
+    private readonly ColorSelectorSliders _rgbSkinColorSelector;
+
+    private readonly List<SpeciesPrototype> _species = new();
+
+    private bool _isDirty;
+
+    private Direction _previewRotation = Direction.North;
 
     public HashSet<ProtoId<SpeciesPrototype>>? AllowedSpecies;
 
-    /// <summary>
-    /// If we're attempting to save.
-    /// </summary>
-    public event Action? Save;
+    public HumanoidCharacterProfile? LoadedProfile;
 
     /// <summary>
     /// Entity used for the profile editor preview
@@ -47,16 +52,6 @@ public sealed partial class WizardMirrorWindow : DefaultWindow
     /// The work in progress profile being edited.
     /// </summary>
     public HumanoidCharacterProfile? Profile;
-
-    public HumanoidCharacterProfile? LoadedProfile;
-
-    private readonly List<SpeciesPrototype> _species = new();
-
-    private Direction _previewRotation = Direction.North;
-
-    private readonly ColorSelectorSliders _rgbSkinColorSelector;
-
-    private bool _isDirty;
 
     public WizardMirrorWindow()
     {
@@ -300,10 +295,25 @@ public sealed partial class WizardMirrorWindow : DefaultWindow
         IsDirty = false;
     }
 
-    private void ClearMarking(string id)
+    public bool IsDirty
     {
-        Profile?.Appearance.Markings.RemoveAll(x => x.MarkingId == id);
+        get => _isDirty;
+        set
+        {
+            if (_isDirty == value)
+                return;
+
+            _isDirty = value;
+            UpdateSaveButton();
+        }
     }
+
+    /// <summary>
+    /// If we're attempting to save.
+    /// </summary>
+    public event Action? Save;
+
+    private void ClearMarking(string id) => Profile?.Appearance.Markings.RemoveAll(x => x.MarkingId == id);
 
     /// <summary>
     /// Refreshes the species selector.
@@ -317,11 +327,13 @@ public sealed partial class WizardMirrorWindow : DefaultWindow
         {
             _species.AddRange(_prototypeManager.EnumeratePrototypes<SpeciesPrototype>()
                 .Where(o => AllowedSpecies.Contains(o.ID)));
-            if (Profile != null && _prototypeManager.TryIndex(Profile.Species, out var prototype) && !_species.Contains(prototype))
+            if (Profile != null && _prototypeManager.TryIndex(Profile.Species, out var prototype) &&
+                !_species.Contains(prototype))
                 _species.Add(prototype);
         }
         else
             _species.AddRange(_prototypeManager.EnumeratePrototypes<SpeciesPrototype>().Where(o => o.RoundStart));
+
         var speciesIds = _species.Select(o => o.ID).ToList();
 
         for (var i = 0; i < _species.Count; i++)
@@ -330,18 +342,14 @@ public sealed partial class WizardMirrorWindow : DefaultWindow
             SpeciesButton.AddItem(name, i);
 
             if (Profile?.Species.Equals(_species[i].ID) == true)
-            {
                 SpeciesButton.SelectId(i);
-            }
         }
 
         // If our species isn't available then reset it to default.
         if (Profile != null)
         {
             if (!speciesIds.Contains(Profile.Species))
-            {
                 SetSpecies(SharedHumanoidAppearanceSystem.DefaultSpecies);
-            }
         }
     }
 
@@ -508,23 +516,7 @@ public sealed partial class WizardMirrorWindow : DefaultWindow
         _entManager.System<MetaDataSystem>().SetEntityName(PreviewDummy, newName);
     }
 
-    public bool IsDirty
-    {
-        get => _isDirty;
-        set
-        {
-            if (_isDirty == value)
-                return;
-
-            _isDirty = value;
-            UpdateSaveButton();
-        }
-    }
-
-    private void UpdateNameEdit()
-    {
-        NameEdit.Text = Profile?.Name ?? "";
-    }
+    private void UpdateNameEdit() => NameEdit.Text = Profile?.Name ?? "";
 
     private void UpdateSexControls()
     {
@@ -543,9 +535,7 @@ public sealed partial class WizardMirrorWindow : DefaultWindow
             }
         }
         else
-        {
             sexes.Add(Sex.Unsexed);
-        }
 
         // add button for each sex
         foreach (var sex in sexes)
@@ -577,9 +567,7 @@ public sealed partial class WizardMirrorWindow : DefaultWindow
     private void UpdateMarkings()
     {
         if (Profile == null)
-        {
             return;
-        }
 
         Markings.SetData(Profile.Appearance.Markings,
             Profile.Species,
@@ -592,9 +580,7 @@ public sealed partial class WizardMirrorWindow : DefaultWindow
     private void UpdateGenderControls()
     {
         if (Profile == null)
-        {
             return;
-        }
 
         PronounsButton.SelectId((int) Profile.Gender);
     }
@@ -602,22 +588,21 @@ public sealed partial class WizardMirrorWindow : DefaultWindow
     private void UpdateHairPickers()
     {
         if (Profile == null)
-        {
             return;
-        }
 
         var hairMarking = Profile.Appearance.HairStyleId switch
         {
             "HairBald" => new List<Marking>(),
-            _ => new() { new(Profile.Appearance.HairStyleId, new List<Color>() { Profile.Appearance.HairColor }) },
+            _ => new List<Marking>
+                { new(Profile.Appearance.HairStyleId, new List<Color> { Profile.Appearance.HairColor }) },
         };
 
         var facialHairMarking = Profile.Appearance.FacialHairStyleId switch
         {
             "FacialHairShaved" => new List<Marking>(),
-            _ => new()
+            _ => new List<Marking>
             {
-                new(Profile.Appearance.FacialHairStyleId, new List<Color>() { Profile.Appearance.FacialHairColor })
+                new(Profile.Appearance.FacialHairStyleId, new List<Color> { Profile.Appearance.FacialHairColor }),
             },
         };
 
@@ -634,9 +619,7 @@ public sealed partial class WizardMirrorWindow : DefaultWindow
     private void UpdateCMarkingsHair()
     {
         if (Profile == null)
-        {
             return;
-        }
 
         // hair color
         Color? hairColor = null;
@@ -648,7 +631,7 @@ public sealed partial class WizardMirrorWindow : DefaultWindow
             {
                 hairColor = _markingManager.MustMatchSkin(Profile.Species,
                     HumanoidVisualLayers.Hair,
-                    out var _,
+                    out _,
                     _prototypeManager)
                     ? Profile.Appearance.SkinColor
                     : Profile.Appearance.HairColor;
@@ -656,21 +639,15 @@ public sealed partial class WizardMirrorWindow : DefaultWindow
         }
 
         if (hairColor != null)
-        {
-            Markings.HairMarking = new(Profile.Appearance.HairStyleId, new List<Color>() { hairColor.Value });
-        }
+            Markings.HairMarking = new Marking(Profile.Appearance.HairStyleId, new List<Color> { hairColor.Value });
         else
-        {
             Markings.HairMarking = null;
-        }
     }
 
     private void UpdateCMarkingsFacialHair()
     {
         if (Profile == null)
-        {
             return;
-        }
 
         // facial hair color
         Color? facialHairColor = null;
@@ -681,7 +658,7 @@ public sealed partial class WizardMirrorWindow : DefaultWindow
             {
                 facialHairColor = _markingManager.MustMatchSkin(Profile.Species,
                     HumanoidVisualLayers.Hair,
-                    out var _,
+                    out _,
                     _prototypeManager)
                     ? Profile.Appearance.SkinColor
                     : Profile.Appearance.FacialHairColor;
@@ -690,35 +667,26 @@ public sealed partial class WizardMirrorWindow : DefaultWindow
 
         if (facialHairColor != null)
         {
-            Markings.FacialHairMarking = new(Profile.Appearance.FacialHairStyleId,
-                new List<Color>() { facialHairColor.Value });
+            Markings.FacialHairMarking = new Marking(Profile.Appearance.FacialHairStyleId,
+                new List<Color> { facialHairColor.Value });
         }
         else
-        {
             Markings.FacialHairMarking = null;
-        }
     }
 
     private void UpdateEyePickers()
     {
         if (Profile == null)
-        {
             return;
-        }
 
         Markings.CurrentEyeColor = Profile.Appearance.EyeColor;
         EyeColorPicker.SetData(Profile.Appearance.EyeColor);
     }
 
-    private void UpdateSaveButton()
-    {
-        SaveButton.Disabled = Profile is null || !IsDirty;
-    }
+    private void UpdateSaveButton() => SaveButton.Disabled = Profile is null || !IsDirty;
 
-    private void SetPreviewRotation(Direction direction)
-    {
+    private void SetPreviewRotation(Direction direction) =>
         SpriteView.OverrideDirection = (Direction) ((int) direction % 4 * 2);
-    }
 
     private void RandomizeEverything()
     {

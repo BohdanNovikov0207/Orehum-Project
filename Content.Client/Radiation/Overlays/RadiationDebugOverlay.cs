@@ -19,12 +19,10 @@ namespace Content.Client.Radiation.Overlays;
 public sealed class RadiationDebugOverlay : Overlay
 {
     [Dependency] private readonly IEntityManager _entityManager = default!;
-    private readonly SharedMapSystem _mapSystem;
-    private readonly RadiationSystem _radiation;
 
     private readonly Font _font;
-
-    public override OverlaySpace Space => OverlaySpace.WorldSpace | OverlaySpace.ScreenSpace;
+    private readonly SharedMapSystem _mapSystem;
+    private readonly RadiationSystem _radiation;
 
     public RadiationDebugOverlay()
     {
@@ -35,6 +33,8 @@ public sealed class RadiationDebugOverlay : Overlay
         var cache = IoCManager.Resolve<IResourceCache>();
         _font = new VectorFont(cache.GetResource<FontResource>("/Fonts/NotoSans/NotoSans-Regular.ttf"), 8);
     }
+
+    public override OverlaySpace Space => OverlaySpace.WorldSpace | OverlaySpace.ScreenSpace;
 
     protected override void Draw(in OverlayDrawArgs args)
     {
@@ -108,7 +108,7 @@ public sealed class RadiationDebugOverlay : Overlay
                 var localPos = _mapSystem.GridTileToLocal(gridUid, grid, tile).Position + offset;
                 var worldPos = _mapSystem.LocalToWorld(gridUid, grid, localPos);
                 var screenCenter = args.ViewportControl.WorldToScreen(worldPos);
-                handle.DrawString(_font, screenCenter, value.ToString("F2"), color: Color.White);
+                handle.DrawString(_font, screenCenter, value.ToString("F2"), Color.White);
             }
         }
     }

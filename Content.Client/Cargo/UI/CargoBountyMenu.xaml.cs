@@ -28,7 +28,9 @@ public sealed partial class CargoBountyMenu : FancyWindow
         MasterTabContainer.SetTabTitle(1, Loc.GetString("bounty-console-tab-history-label"));
     }
 
-    public void UpdateEntries(List<CargoBountyData> bounties, List<CargoBountyHistoryData> history, TimeSpan untilNextSkip)
+    public void UpdateEntries(List<CargoBountyData> bounties,
+        List<CargoBountyHistoryData> history,
+        TimeSpan untilNextSkip)
     {
         BountyEntriesContainer.Children.Clear();
         foreach (var b in bounties)
@@ -39,16 +41,15 @@ public sealed partial class CargoBountyMenu : FancyWindow
 
             BountyEntriesContainer.AddChild(entry);
         }
+
         BountyEntriesContainer.AddChild(new Control
         {
-            MinHeight = 10
+            MinHeight = 10,
         });
 
         BountyHistoryContainer.Children.Clear();
         if (history.Count == 0)
-        {
             NoHistoryLabel.Visible = true;
-        }
         else
         {
             NoHistoryLabel.Visible = false;

@@ -30,7 +30,8 @@ public sealed class CrayonSystem : SharedCrayonSystem
 
     private static void OnCrayonHandleState(EntityUid uid, CrayonComponent component, ref ComponentHandleState args)
     {
-        if (args.Current is not CrayonComponentState state) return;
+        if (args.Current is not CrayonComponentState state)
+            return;
 
         component.Color = state.Color;
         component.SelectedState = state.State;
@@ -43,8 +44,8 @@ public sealed class CrayonSystem : SharedCrayonSystem
 
     private sealed class StatusControl : Control
     {
-        private readonly CrayonComponent _parent;
         private readonly RichTextLabel _label;
+        private readonly CrayonComponent _parent;
 
         public StatusControl(CrayonComponent parent)
         {
@@ -60,16 +61,14 @@ public sealed class CrayonSystem : SharedCrayonSystem
             base.FrameUpdate(args);
 
             if (!_parent.UIUpdateNeeded)
-            {
                 return;
-            }
 
             _parent.UIUpdateNeeded = false;
             _label.SetMarkup(Robust.Shared.Localization.Loc.GetString("crayon-drawing-label",
-                ("color",_parent.Color),
-                ("state",_parent.SelectedState),
+                ("color", _parent.Color),
+                ("state", _parent.SelectedState),
                 ("charges", _parent.Charges),
-                ("capacity",_parent.Capacity),
+                ("capacity", _parent.Capacity),
                 ("infinite", _parent.Infinite))); // Impstation
         }
     }

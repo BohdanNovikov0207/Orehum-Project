@@ -20,14 +20,14 @@ namespace Content.Client.Chat.TypingIndicator;
 // Client-side typing system tracks user input in chat box
 public sealed class TypingIndicatorSystem : SharedTypingIndicatorSystem
 {
-    [Dependency] private readonly IGameTiming _time = default!;
-    [Dependency] private readonly IPlayerManager _playerManager = default!;
     [Dependency] private readonly IConfigurationManager _cfg = default!;
+    [Dependency] private readonly IPlayerManager _playerManager = default!;
+    [Dependency] private readonly IGameTiming _time = default!;
 
     private readonly TimeSpan _typingTimeout = TimeSpan.FromSeconds(2);
-    private TimeSpan _lastTextChange;
-    private bool _isClientTyping;
     private bool _isClientChatFocused;
+    private bool _isClientTyping;
+    private TimeSpan _lastTextChange;
 
     public override void Initialize()
     {

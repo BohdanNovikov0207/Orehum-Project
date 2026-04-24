@@ -16,7 +16,9 @@ public sealed class EmergencyLightSystem : VisualizerSystem<EmergencyLightCompon
 {
     [Dependency] private readonly SpriteSystem _sprite = default!;
 
-    protected override void OnAppearanceChange(EntityUid uid, EmergencyLightComponent comp, ref AppearanceChangeEvent args)
+    protected override void OnAppearanceChange(EntityUid uid,
+        EmergencyLightComponent comp,
+        ref AppearanceChangeEvent args)
     {
         if (args.Sprite == null)
             return;

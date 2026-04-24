@@ -44,43 +44,43 @@ public sealed class AirlockSystem : SharedAirlockSystem
             door.ClosedSpriteStates.Add((DoorVisualLayers.BaseUnlit, comp.ClosedSpriteState));
         }
 
-        ((Animation)door.OpeningAnimation).AnimationTracks.Add(new AnimationTrackSpriteFlick()
-        {
-            LayerKey = DoorVisualLayers.BaseUnlit,
-            KeyFrames = { new AnimationTrackSpriteFlick.KeyFrame(comp.OpeningSpriteState, 0f) },
-        }
+        ((Animation) door.OpeningAnimation).AnimationTracks.Add(new AnimationTrackSpriteFlick
+            {
+                LayerKey = DoorVisualLayers.BaseUnlit,
+                KeyFrames = { new AnimationTrackSpriteFlick.KeyFrame(comp.OpeningSpriteState, 0f) },
+            }
         );
 
-        ((Animation)door.ClosingAnimation).AnimationTracks.Add(new AnimationTrackSpriteFlick()
-        {
-            LayerKey = DoorVisualLayers.BaseUnlit,
-            KeyFrames = { new AnimationTrackSpriteFlick.KeyFrame(comp.ClosingSpriteState, 0f) },
-        }
+        ((Animation) door.ClosingAnimation).AnimationTracks.Add(new AnimationTrackSpriteFlick
+            {
+                LayerKey = DoorVisualLayers.BaseUnlit,
+                KeyFrames = { new AnimationTrackSpriteFlick.KeyFrame(comp.ClosingSpriteState, 0f) },
+            }
         );
 
-        door.DenyingAnimation = new Animation()
+        door.DenyingAnimation = new Animation
         {
             Length = TimeSpan.FromSeconds(comp.DenyAnimationTime),
             AnimationTracks =
             {
-                new AnimationTrackSpriteFlick()
+                new AnimationTrackSpriteFlick
                 {
                     LayerKey = DoorVisualLayers.BaseUnlit,
                     KeyFrames = { new AnimationTrackSpriteFlick.KeyFrame(comp.DenySpriteState, 0f) },
-                }
-            }
+                },
+            },
         };
 
         if (!comp.AnimatePanel)
             return;
 
-        ((Animation)door.OpeningAnimation).AnimationTracks.Add(new AnimationTrackSpriteFlick()
+        ((Animation) door.OpeningAnimation).AnimationTracks.Add(new AnimationTrackSpriteFlick
         {
             LayerKey = WiresVisualLayers.MaintenancePanel,
             KeyFrames = { new AnimationTrackSpriteFlick.KeyFrame(comp.OpeningPanelSpriteState, 0f) },
         });
 
-        ((Animation)door.ClosingAnimation).AnimationTracks.Add(new AnimationTrackSpriteFlick
+        ((Animation) door.ClosingAnimation).AnimationTracks.Add(new AnimationTrackSpriteFlick
         {
             LayerKey = WiresVisualLayers.MaintenancePanel,
             KeyFrames = { new AnimationTrackSpriteFlick.KeyFrame(comp.ClosingPanelSpriteState, 0f) },
@@ -102,17 +102,25 @@ public sealed class AirlockSystem : SharedAirlockSystem
         if (_appearanceSystem.TryGetData<bool>(uid, PowerDeviceVisuals.Powered, out var powered, args.Component)
             && powered)
         {
-            boltedVisible = _appearanceSystem.TryGetData<bool>(uid, DoorVisuals.BoltLights, out var lights, args.Component)
-                            && lights && (state == DoorState.Closed || state == DoorState.Welded);
+            boltedVisible =
+                _appearanceSystem.TryGetData<bool>(uid, DoorVisuals.BoltLights, out var lights, args.Component)
+                && lights && (state == DoorState.Closed || state == DoorState.Welded);
 
-            emergencyLightsVisible = _appearanceSystem.TryGetData<bool>(uid, DoorVisuals.EmergencyLights, out var eaLights, args.Component) && eaLights;
+            emergencyLightsVisible =
+                _appearanceSystem.TryGetData<bool>(uid,
+                    DoorVisuals.EmergencyLights,
+                    out var eaLights,
+                    args.Component) && eaLights;
             unlitVisible =
-                    (state == DoorState.Closing
-                ||  state == DoorState.Opening
-                ||  state == DoorState.Denying
-                || (state == DoorState.Open && comp.OpenUnlitVisible)
-                || (_appearanceSystem.TryGetData<bool>(uid, DoorVisuals.ClosedLights, out var closedLights, args.Component) && closedLights))
-                    && !boltedVisible && !emergencyLightsVisible;
+                (state == DoorState.Closing
+                 || state == DoorState.Opening
+                 || state == DoorState.Denying
+                 || state == DoorState.Open && comp.OpenUnlitVisible
+                 || _appearanceSystem.TryGetData<bool>(uid,
+                     DoorVisuals.ClosedLights,
+                     out var closedLights,
+                     args.Component) && closedLights)
+                && !boltedVisible && !emergencyLightsVisible;
         }
 
         _sprite.LayerSetVisible((uid, args.Sprite), DoorVisualLayers.BaseUnlit, unlitVisible);
@@ -122,10 +130,10 @@ public sealed class AirlockSystem : SharedAirlockSystem
             _sprite.LayerSetVisible(
                 (uid, args.Sprite),
                 DoorVisualLayers.BaseEmergencyAccess,
-                    emergencyLightsVisible
-                &&  state != DoorState.Open
-                &&  state != DoorState.Opening
-                &&  state != DoorState.Closing
+                emergencyLightsVisible
+                && state != DoorState.Open
+                && state != DoorState.Opening
+                && state != DoorState.Closing
                 && !boltedVisible
             );
         }

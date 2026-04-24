@@ -5,7 +5,8 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Client.TurretController;
 
-public sealed class TurretControllerWindowBoundUserInterface(EntityUid owner, Enum uiKey) : BoundUserInterface(owner, uiKey)
+public sealed class TurretControllerWindowBoundUserInterface(EntityUid owner, Enum uiKey)
+    : BoundUserInterface(owner, uiKey)
 {
     [ViewVariables]
     private TurretControllerWindow? _window;
@@ -32,13 +33,9 @@ public sealed class TurretControllerWindowBoundUserInterface(EntityUid owner, En
         _window?.UpdateState(castState);
     }
 
-    private void OnAccessLevelChanged(HashSet<ProtoId<AccessLevelPrototype>> accessLevels, bool enabled)
-    {
+    private void OnAccessLevelChanged(HashSet<ProtoId<AccessLevelPrototype>> accessLevels, bool enabled) =>
         SendPredictedMessage(new DeployableTurretExemptAccessLevelChangedMessage(accessLevels, enabled));
-    }
 
-    private void OnArmamentSettingChanged(TurretControllerWindow.TurretArmamentSetting setting)
-    {
-        SendPredictedMessage(new DeployableTurretArmamentSettingChangedMessage((int)setting));
-    }
+    private void OnArmamentSettingChanged(TurretControllerWindow.TurretArmamentSetting setting) =>
+        SendPredictedMessage(new DeployableTurretArmamentSettingChangedMessage((int) setting));
 }

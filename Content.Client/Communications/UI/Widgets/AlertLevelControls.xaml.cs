@@ -11,8 +11,6 @@ public sealed partial class AlertLevelControls : BoxContainer
     private bool _alertLevelSelectable;
     private string _currentAlertLevel = string.Empty;
 
-    public event Action<string>? OnAlertLevelChanged;
-
     public AlertLevelControls()
     {
         IoCManager.InjectDependencies(this);
@@ -28,19 +26,19 @@ public sealed partial class AlertLevelControls : BoxContainer
         {
             var metadata = AlertLevelSelector.GetItemMetadata(AlertLevelSelector.SelectedId);
             if (metadata is string cast)
-            {
                 OnAlertLevelChanged?.Invoke(cast);
-            }
         };
 
         AlertLevelSelector.Disabled = !_alertLevelSelectable;
     }
 
+    public event Action<string>? OnAlertLevelChanged;
+
     /// <summary>
     /// Updates the UI components to display the current alert level and the
     /// selectable alert levels
     /// </summary>
-   public void UpdateAlertLevels(List<string>? alerts,
+    public void UpdateAlertLevels(List<string>? alerts,
         string currentAlert,
         Color currentAlertColor,
         bool alertLevelSelectable)
@@ -61,9 +59,7 @@ public sealed partial class AlertLevelControls : BoxContainer
         {
             var metadata = AlertLevelSelector.GetItemMetadata(AlertLevelSelector.SelectedId);
             if (metadata is string cast)
-            {
                 previousSelection = cast;
-            }
         }
 
         // The server will only send alert levels which are selectable, but
@@ -83,20 +79,14 @@ public sealed partial class AlertLevelControls : BoxContainer
                 AlertLevelSelector.SetItemMetadata(AlertLevelSelector.ItemCount - 1, alert);
 
                 if (alert == previousSelection)
-                {
                     AlertLevelSelector.Select(AlertLevelSelector.ItemCount - 1);
-                }
             }
         }
 
         if (_loc.TryGetString($"comms-console-level-{currentAlert}-flavour-label", out var flavour))
-        {
             CurrentAlertLevelFlavorLabel.Text = flavour;
-        }
         else
-        {
             CurrentAlertLevelFlavorLabel.Text = string.Empty;
-        }
 
         EnableDisableConfirmLevelChangeButton();
     }
@@ -117,9 +107,7 @@ public sealed partial class AlertLevelControls : BoxContainer
         {
             var metadata = AlertLevelSelector.GetItemMetadata(selectedId);
             if (metadata is string selected)
-            {
                 ConfirmAlertLevelButton.Disabled |= selected == _currentAlertLevel;
-            }
         }
     }
 
@@ -129,9 +117,7 @@ public sealed partial class AlertLevelControls : BoxContainer
     private string GetLocalizedAlertName(string alertName)
     {
         if (_loc.TryGetString($"alert-level-{alertName}", out var locName))
-        {
             return locName;
-        }
         return alertName;
     }
 }

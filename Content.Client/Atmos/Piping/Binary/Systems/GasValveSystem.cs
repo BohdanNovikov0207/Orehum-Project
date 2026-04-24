@@ -4,5 +4,4 @@ namespace Content.Client.Atmos.Piping.Binary.Systems;
 
 public sealed class GasValveSystem : SharedGasValveSystem
 {
-
 }

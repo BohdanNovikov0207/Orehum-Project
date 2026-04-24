@@ -18,40 +18,39 @@ using Robust.Client.UserInterface.CustomControls;
 using Robust.Shared.Timing;
 using static Robust.Client.UserInterface.Controls.BoxContainer;
 
-namespace Content.Client.Strip
+namespace Content.Client.Strip;
+
+public sealed class StrippingMenu : DefaultWindow
 {
-    public sealed class StrippingMenu : DefaultWindow
+    public bool Dirty = true;
+    public LayoutContainer HandsContainer = new();
+    public LayoutContainer InventoryContainer = new();
+    public BoxContainer SnareContainer = new();
+
+    public StrippingMenu()
     {
-        public LayoutContainer InventoryContainer = new();
-        public LayoutContainer HandsContainer = new();
-        public BoxContainer SnareContainer = new();
-        public bool Dirty = true;
+        var box = new BoxContainer { Orientation = LayoutOrientation.Vertical, Margin = new Thickness(0, 8) };
+        Contents.AddChild(box);
+        box.AddChild(SnareContainer);
+        box.AddChild(HandsContainer);
+        box.AddChild(InventoryContainer);
+    }
 
-        public event Action? OnDirty;
+    public event Action? OnDirty;
 
-        public StrippingMenu()
-        {
-            var box = new BoxContainer() { Orientation = LayoutOrientation.Vertical, Margin = new Thickness(0, 8) };
-            Contents.AddChild(box);
-            box.AddChild(SnareContainer);
-            box.AddChild(HandsContainer);
-            box.AddChild(InventoryContainer);
-        }
+    public void ClearButtons()
+    {
+        InventoryContainer.DisposeAllChildren();
+        HandsContainer.DisposeAllChildren();
+        SnareContainer.DisposeAllChildren();
+    }
 
-        public void ClearButtons()
-        {
-            InventoryContainer.DisposeAllChildren();
-            HandsContainer.DisposeAllChildren();
-            SnareContainer.DisposeAllChildren();
-        }
+    protected override void FrameUpdate(FrameEventArgs args)
+    {
+        if (!Dirty)
+            return;
 
-        protected override void FrameUpdate(FrameEventArgs args)
-        {
-            if (!Dirty)
-                return;
-
-            Dirty = false;
-            OnDirty?.Invoke();
-        }
+        Dirty = false;
+        OnDirty?.Invoke();
     }
 }

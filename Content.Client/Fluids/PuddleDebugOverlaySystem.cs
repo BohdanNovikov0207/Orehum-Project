@@ -16,6 +16,7 @@ public sealed class PuddleDebugOverlaySystem : SharedPuddleDebugOverlaySystem
 
     public readonly Dictionary<EntityUid, PuddleOverlayDebugMessage> TileData = new();
     private PuddleOverlay? _overlay;
+
     public override void Initialize()
     {
         base.Initialize();
@@ -44,8 +45,5 @@ public sealed class PuddleDebugOverlaySystem : SharedPuddleDebugOverlaySystem
         _overlay = null;
     }
 
-    public PuddleDebugOverlayData[] GetData(EntityUid mapGridGridEntityId)
-    {
-        return TileData[mapGridGridEntityId].OverlayData;
-    }
+    public PuddleDebugOverlayData[] GetData(EntityUid mapGridGridEntityId) => TileData[mapGridGridEntityId].OverlayData;
 }

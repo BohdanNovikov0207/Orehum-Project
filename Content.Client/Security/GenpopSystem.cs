@@ -2,8 +2,7 @@ using Content.Shared.Security.Systems;
 
 namespace Content.Client.Security;
 
-/// <inheritdoc/>
+/// <inheritdoc />
 public sealed class GenpopSystem : SharedGenpopSystem
 {
-
 }

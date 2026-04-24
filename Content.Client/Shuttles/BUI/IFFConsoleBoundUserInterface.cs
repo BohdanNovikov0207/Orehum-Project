@@ -47,31 +47,25 @@ public sealed class IFFConsoleBoundUserInterface : BoundUserInterface
         _window?.UpdateState(bState);
     }
 
-    private void SendIFFMessage(bool obj)
-    {
-        SendMessage(new IFFShowIFFMessage()
+    private void SendIFFMessage(bool obj) =>
+        SendMessage(new IFFShowIFFMessage
         {
             Show = obj,
         });
-    }
 
-    private void SendVesselMessage(bool obj)
-    {
-        SendMessage(new IFFShowVesselMessage()
+    private void SendVesselMessage(bool obj) =>
+        SendMessage(new IFFShowVesselMessage
         {
             Show = obj,
         });
-    }
 
     // CorvaxGoob-IFF-Improves-Start
-    private void SendIFFRadarSettingsMessage(Color color, string? name)
-    {
-        SendMessage(new IFFApplyRadarSettingsMessage()
+    private void SendIFFRadarSettingsMessage(Color color, string? name) =>
+        SendMessage(new IFFApplyRadarSettingsMessage
         {
             Color = color,
-            Name = name
+            Name = name,
         });
-    }
     // CorvaxGoob-IFF-Improves-End
 
     protected override void Dispose(bool disposing)

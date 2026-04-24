@@ -29,9 +29,7 @@ public sealed class ItemMapperSystem : SharedItemMapperSystem
     private void OnStartup(EntityUid uid, ItemMapperComponent component, ComponentStartup args)
     {
         if (TryComp<SpriteComponent>(uid, out var sprite))
-        {
             component.RSIPath ??= sprite.BaseRSI!.Path;
-        }
     }
 
     private void OnAppearance(EntityUid uid, ItemMapperComponent component, ref AppearanceChangeEvent args)
@@ -39,9 +37,7 @@ public sealed class ItemMapperSystem : SharedItemMapperSystem
         if (TryComp<SpriteComponent>(uid, out var spriteComponent))
         {
             if (component.SpriteLayers.Count == 0)
-            {
                 InitLayers((uid, component, spriteComponent, args.Component));
-            }
 
             EnableLayers((uid, component, spriteComponent, args.Component));
         }
@@ -58,7 +54,9 @@ public sealed class ItemMapperSystem : SharedItemMapperSystem
         foreach (var sprite in component.SpriteLayers)
         {
             _sprite.LayerMapReserve((owner, spriteComponent), sprite);
-            _sprite.LayerSetSprite((owner, spriteComponent), sprite, new SpriteSpecifier.Rsi(component.RSIPath!.Value, sprite));
+            _sprite.LayerSetSprite((owner, spriteComponent),
+                sprite,
+                new SpriteSpecifier.Rsi(component.RSIPath!.Value, sprite));
             _sprite.LayerSetVisible((owner, spriteComponent), sprite, false);
         }
     }

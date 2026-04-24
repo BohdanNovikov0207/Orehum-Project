@@ -10,7 +10,7 @@ using Robust.Client.Player;
 
 namespace Content.Client._Orion.Posing;
 
-public sealed partial class PosingSystem : SharedPosingSystem
+public sealed class PosingSystem : SharedPosingSystem
 {
     [Dependency] private readonly IInputManager _input = default!;
     [Dependency] private readonly IPlayerManager _playerManager = default!;

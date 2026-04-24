@@ -30,9 +30,9 @@ namespace Content.Client.Silicons.StationAi;
 
 public sealed partial class StationAiSystem : SharedStationAiSystem
 {
+    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
     [Dependency] private readonly IOverlayManager _overlayMgr = default!;
     [Dependency] private readonly IPlayerManager _player = default!;
-    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
     [Dependency] private readonly SpriteSystem _sprite = default!;
 
     private StationAiOverlay? _overlay;
@@ -88,22 +88,20 @@ public sealed partial class StationAiSystem : SharedStationAiSystem
         _overlay = null;
     }
 
-    private void OnAiAttached(Entity<StationAiOverlayComponent> ent, ref LocalPlayerAttachedEvent args)
-    {
-        AddOverlay();
-    }
+    private void OnAiAttached(Entity<StationAiOverlayComponent> ent, ref LocalPlayerAttachedEvent args) => AddOverlay();
 
-    private void OnAiDetached(Entity<StationAiOverlayComponent> ent, ref LocalPlayerDetachedEvent args)
-    {
+    private void OnAiDetached(Entity<StationAiOverlayComponent> ent, ref LocalPlayerDetachedEvent args) =>
         RemoveOverlay();
-    }
 
     private void OnAppearanceChange(Entity<StationAiCoreComponent> entity, ref AppearanceChangeEvent args)
     {
         if (args.Sprite == null)
             return;
 
-        if (_appearance.TryGetData<PrototypeLayerData>(entity.Owner, StationAiVisualState.Key, out var layerData, args.Component))
+        if (_appearance.TryGetData<PrototypeLayerData>(entity.Owner,
+                StationAiVisualState.Key,
+                out var layerData,
+                args.Component))
             _sprite.LayerSetData((entity.Owner, args.Sprite), StationAiVisualState.Key, layerData);
 
         _sprite.LayerSetVisible((entity.Owner, args.Sprite), StationAiVisualState.Key, layerData != null);

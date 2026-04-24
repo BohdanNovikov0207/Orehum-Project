@@ -9,5 +9,4 @@ namespace Content.Client.Sound;
 
 public sealed class EmitSoundSystem : SharedEmitSoundSystem
 {
-
 }

@@ -48,7 +48,7 @@ public sealed partial class GunSystem
         component.Control = null;
 
         var ev = new AmmoCounterControlEvent();
-        RaiseLocalEvent(uid, ev, false);
+        RaiseLocalEvent(uid, ev);
 
         // Fallback to default if none specified
         ev.Control ??= new DefaultStatusControl();
@@ -62,12 +62,12 @@ public sealed partial class GunSystem
         if (component.Control == null)
             return;
 
-        var ev = new UpdateAmmoCounterEvent()
+        var ev = new UpdateAmmoCounterEvent
         {
-            Control = component.Control
+            Control = component.Control,
         };
 
-        RaiseLocalEvent(uid, ev, false);
+        RaiseLocalEvent(uid, ev);
     }
 
     protected override void UpdateAmmoCount(EntityUid uid, bool prediction = true)
@@ -76,9 +76,7 @@ public sealed partial class GunSystem
         // share as much code as possible
         if (prediction && !Timing.IsFirstTimePredicted ||
             !TryComp<AmmoCounterComponent>(uid, out var clientComp))
-        {
             return;
-        }
 
         UpdateAmmoCount(uid, clientComp);
     }
@@ -113,7 +111,7 @@ public sealed partial class GunSystem
             AddChild(_bulletRender = new BulletRender
             {
                 HorizontalAlignment = HAlignment.Right,
-                VerticalAlignment = VAlignment.Bottom
+                VerticalAlignment = VAlignment.Bottom,
             });
         }
 
@@ -128,14 +126,14 @@ public sealed partial class GunSystem
 
     public sealed class BoxesStatusControl : Control
     {
-        private readonly BatteryBulletRenderer _bullets;
         private readonly Label _ammoCount;
+        private readonly BatteryBulletRenderer _bullets;
 
         public BoxesStatusControl()
         {
             MinHeight = 15;
             HorizontalExpand = true;
-            VerticalAlignment = Control.VAlignment.Center;
+            VerticalAlignment = VAlignment.Center;
 
             AddChild(new BoxContainer
             {
@@ -145,15 +143,15 @@ public sealed partial class GunSystem
                     (_bullets = new BatteryBulletRenderer
                     {
                         Margin = new Thickness(0, 0, 5, 0),
-                        HorizontalExpand = true
+                        HorizontalExpand = true,
                     }),
                     (_ammoCount = new Label
                     {
                         StyleClasses = { StyleNano.StyleClassItemStatus },
                         HorizontalAlignment = HAlignment.Right,
-                        VerticalAlignment = VAlignment.Bottom
+                        VerticalAlignment = VAlignment.Bottom,
                     }),
-                }
+                },
             });
         }
 
@@ -170,16 +168,16 @@ public sealed partial class GunSystem
 
     private sealed class ChamberMagazineStatusControl : Control
     {
+        private readonly Label _ammoCount;
         private readonly BulletRender _bulletRender;
         private readonly TextureRect _chamberedBullet;
         private readonly Label _noMagazineLabel;
-        private readonly Label _ammoCount;
 
         public ChamberMagazineStatusControl()
         {
             MinHeight = 15;
             HorizontalExpand = true;
-            VerticalAlignment = Control.VAlignment.Center;
+            VerticalAlignment = VAlignment.Center;
 
             AddChild(new BoxContainer
             {
@@ -196,14 +194,14 @@ public sealed partial class GunSystem
                             (_bulletRender = new BulletRender
                             {
                                 HorizontalAlignment = HAlignment.Right,
-                                VerticalAlignment = VAlignment.Bottom
+                                VerticalAlignment = VAlignment.Bottom,
                             }),
                             (_noMagazineLabel = new Label
                             {
                                 Text = "No Magazine!",
-                                StyleClasses = {StyleNano.StyleClassItemStatus}
-                            })
-                        }
+                                StyleClasses = { StyleNano.StyleClassItemStatus },
+                            }),
+                        },
                     },
                     new BoxContainer
                     {
@@ -214,17 +212,18 @@ public sealed partial class GunSystem
                         {
                             (_ammoCount = new Label
                             {
-                                StyleClasses = {StyleNano.StyleClassItemStatus},
+                                StyleClasses = { StyleNano.StyleClassItemStatus },
                                 HorizontalAlignment = HAlignment.Right,
                             }),
                             (_chamberedBullet = new TextureRect
                             {
-                                Texture = StaticIoC.ResC.GetTexture("/Textures/Interface/ItemStatus/Bullets/chambered.png"),
+                                Texture = StaticIoC.ResC.GetTexture(
+                                    "/Textures/Interface/ItemStatus/Bullets/chambered.png"),
                                 HorizontalAlignment = HAlignment.Left,
                             }),
-                        }
-                    }
-                }
+                        },
+                    },
+                },
             });
         }
 
@@ -253,10 +252,7 @@ public sealed partial class GunSystem
             _ammoCount.Text = $"x{count:00}";
         }
 
-        public void PlayAlarmAnimation(Animation animation)
-        {
-            _noMagazineLabel.PlayAnimation(animation, "alarm");
-        }
+        public void PlayAlarmAnimation(Animation animation) => _noMagazineLabel.PlayAnimation(animation, "alarm");
     }
 
     private sealed class RevolverStatusControl : Control
@@ -267,14 +263,14 @@ public sealed partial class GunSystem
         {
             MinHeight = 15;
             HorizontalExpand = true;
-            VerticalAlignment = Control.VAlignment.Center;
-            AddChild((_bulletsList = new BoxContainer
+            VerticalAlignment = VAlignment.Center;
+            AddChild(_bulletsList = new BoxContainer
             {
                 Orientation = BoxContainer.LayoutOrientation.Horizontal,
                 HorizontalExpand = true,
                 VerticalAlignment = VAlignment.Center,
-                SeparationOverride = 0
-            }));
+                SeparationOverride = 0,
+            });
         }
 
         public void Update(int currentIndex, bool?[] bullets)
@@ -284,17 +280,11 @@ public sealed partial class GunSystem
 
             string texturePath;
             if (capacity <= 20)
-            {
                 texturePath = "/Textures/Interface/ItemStatus/Bullets/normal.png";
-            }
             else if (capacity <= 30)
-            {
                 texturePath = "/Textures/Interface/ItemStatus/Bullets/small.png";
-            }
             else
-            {
                 texturePath = "/Textures/Interface/ItemStatus/Bullets/tiny.png";
-            }
 
             var texture = StaticIoC.ResC.GetTexture(texturePath);
             var spentTexture = StaticIoC.ResC.GetTexture("/Textures/Interface/ItemStatus/Bullets/empty.png");
@@ -302,7 +292,11 @@ public sealed partial class GunSystem
             FillBulletRow(currentIndex, bullets, _bulletsList, texture, spentTexture);
         }
 
-        private void FillBulletRow(int currentIndex, bool?[] bullets, Control container, Texture texture, Texture emptyTexture)
+        private void FillBulletRow(int currentIndex,
+            bool?[] bullets,
+            Control container,
+            Texture texture,
+            Texture emptyTexture)
         {
             var capacity = bullets.Length;
             var colorA = Color.FromHex("#b68f0e");
@@ -319,7 +313,7 @@ public sealed partial class GunSystem
             {
                 var bulletFree = bullets[i];
                 // Add a outline
-                var box = new Control()
+                var box = new Control
                 {
                     MinSize = texture.Size * scale,
                 };
@@ -332,15 +326,14 @@ public sealed partial class GunSystem
                         ModulateSelfOverride = Color.LimeGreen,
                     });
                 }
+
                 Color color;
-                Texture bulletTexture = texture;
+                var bulletTexture = texture;
 
                 if (bulletFree.HasValue)
                 {
                     if (bulletFree.Value)
-                    {
                         color = altColor ? colorA : colorB;
-                    }
                     else
                     {
                         color = altColor ? colorSpentA : colorSpentB;
@@ -348,9 +341,7 @@ public sealed partial class GunSystem
                     }
                 }
                 else
-                {
                     color = altColor ? colorGoneA : colorGoneB;
-                }
 
                 box.AddChild(new TextureRect
                 {

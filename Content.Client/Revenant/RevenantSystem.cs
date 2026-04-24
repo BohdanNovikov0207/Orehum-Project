@@ -5,8 +5,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Client.Alerts;
-using Content.Shared.Alert;
 using Content.Shared.Alert.Components;
 using Content.Shared.Revenant;
 using Content.Shared.Revenant.Components;
@@ -32,14 +30,11 @@ public sealed class RevenantSystem : EntitySystem
         if (args.Sprite == null)
             return;
 
-        if (_appearance.TryGetData<bool>(uid, RevenantVisuals.Harvesting, out var harvesting, args.Component) && harvesting)
-        {
+        if (_appearance.TryGetData<bool>(uid, RevenantVisuals.Harvesting, out var harvesting, args.Component) &&
+            harvesting)
             _sprite.LayerSetRsiState((uid, args.Sprite), 0, component.HarvestingState);
-        }
         else if (_appearance.TryGetData<bool>(uid, RevenantVisuals.Stunned, out var stunned, args.Component) && stunned)
-        {
             _sprite.LayerSetRsiState((uid, args.Sprite), 0, component.StunnedState);
-        }
         else if (_appearance.TryGetData<bool>(uid, RevenantVisuals.Corporeal, out var corporeal, args.Component))
         {
             if (corporeal)

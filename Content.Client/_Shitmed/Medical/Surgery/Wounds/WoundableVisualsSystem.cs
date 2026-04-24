@@ -11,12 +11,12 @@
 
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared._Shitmed.Medical.Surgery.Traumas.Components;
 using Content.Shared._Shitmed.Medical.Surgery.Wounds;
 using Content.Shared._Shitmed.Medical.Surgery.Wounds.Systems;
 using Content.Shared.Body.Part;
 using Content.Shared.Body.Systems;
-using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Humanoid;
 using Robust.Client.GameObjects;
 using Robust.Shared.Random;
@@ -30,18 +30,25 @@ namespace Content.Client._Shitmed.Medical.Surgery.Wounds;
 public sealed class WoundableVisualsSystem : VisualizerSystem<WoundableVisualsComponent>
 {
     #region Dependencies
+
     [Dependency] private readonly SharedBodySystem _body = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
     [Dependency] private readonly WoundSystem _wound = default!;
     [Dependency] private readonly SpriteSystem _sprite = default!;
+
     #endregion
+
     #region Constants
+
     private const float AltBleedingSpriteChance = 0.15f;
     private const string BleedingSuffix = "Bleeding";
     private const string MinorSuffix = "Minor";
+
     #endregion
+
     #region Initialization
+
     public override void Initialize()
     {
         base.Initialize();
@@ -62,7 +69,10 @@ public sealed class WoundableVisualsSystem : VisualizerSystem<WoundableVisualsCo
     {
         if (ent.Comp.BleedingOverlay == null)
             return;
-        AddDamageLayerToSprite(ent.Owner, ent.Comp.BleedingOverlay, BuildStateKey(ent.Comp.OccupiedLayer, MinorSuffix), BuildLayerKey(ent.Comp.OccupiedLayer, BleedingSuffix));
+        AddDamageLayerToSprite(ent.Owner,
+            ent.Comp.BleedingOverlay,
+            BuildStateKey(ent.Comp.OccupiedLayer, MinorSuffix),
+            BuildLayerKey(ent.Comp.OccupiedLayer, BleedingSuffix));
     }
 
     private void InitDamage(Entity<WoundableVisualsComponent> ent)
@@ -70,13 +80,17 @@ public sealed class WoundableVisualsSystem : VisualizerSystem<WoundableVisualsCo
         if (ent.Comp.DamageOverlayGroups is null)
             return;
         foreach (var (group, sprite) in ent.Comp.DamageOverlayGroups)
+        {
             AddDamageLayerToSprite(ent.Owner,
                 sprite.Sprite,
                 BuildStateKey(ent.Comp.OccupiedLayer, group, "100"),
                 BuildLayerKey(ent.Comp.OccupiedLayer, group),
                 sprite.Color);
+        }
     }
+
     #endregion
+
     #region Event Handlers
 
     private void OnAfterAutoHandleState(Entity<WoundableVisualsComponent> ent, ref AfterAutoHandleStateEvent args)
@@ -96,6 +110,7 @@ public sealed class WoundableVisualsSystem : VisualizerSystem<WoundableVisualsCo
         if (ent.Comp.DamageOverlayGroups != null)
         {
             foreach (var (group, sprite) in ent.Comp.DamageOverlayGroups)
+            {
                 if (!_sprite.LayerMapTryGet(bodyUid, BuildLayerKey(ent.Comp.OccupiedLayer, group), out _, false))
                 {
                     AddDamageLayerToSprite(bodyUid,
@@ -104,7 +119,9 @@ public sealed class WoundableVisualsSystem : VisualizerSystem<WoundableVisualsCo
                         BuildLayerKey(ent.Comp.OccupiedLayer, group),
                         sprite.Color);
                 }
+            }
         }
+
         if (!_sprite.LayerMapTryGet(bodyUid, BuildLayerKey(ent.Comp.OccupiedLayer, BleedingSuffix), out _, false)
             && ent.Comp.BleedingOverlay != null)
         {
@@ -133,7 +150,8 @@ public sealed class WoundableVisualsSystem : VisualizerSystem<WoundableVisualsCo
         }
     }
 
-    private void OnWoundableIntegrityChanged(Entity<WoundableVisualsComponent> ent, ref WoundableIntegrityChangedEvent args)
+    private void OnWoundableIntegrityChanged(Entity<WoundableVisualsComponent> ent,
+        ref WoundableIntegrityChangedEvent args)
     {
         var bodyPart = Comp<BodyPartComponent>(ent);
         if (!bodyPart.Body.HasValue)
@@ -147,11 +165,14 @@ public sealed class WoundableVisualsSystem : VisualizerSystem<WoundableVisualsCo
         if (TryComp(bodyPart.Body, out SpriteComponent? bodySprite))
             UpdateWoundableVisuals(ent, (bodyPart.Body.Value, bodySprite));
     }
+
     #endregion
+
     #region Layer Management
+
     private void RemoveWoundableLayers(Entity<SpriteComponent?> ent, WoundableVisualsComponent visuals)
     {
-        if (visuals.DamageOverlayGroups == null || !Resolve(ent,ref ent.Comp))
+        if (visuals.DamageOverlayGroups == null || !Resolve(ent, ref ent.Comp))
             return;
 
         foreach (var (group, _) in visuals.DamageOverlayGroups)
@@ -178,7 +199,7 @@ public sealed class WoundableVisualsSystem : VisualizerSystem<WoundableVisualsCo
         string mapKey,
         string? color = null)
     {
-        if (!Resolve(ent, ref ent.Comp) ||_sprite.LayerMapTryGet(ent, mapKey, out _, false)) // prevent dupes
+        if (!Resolve(ent, ref ent.Comp) || _sprite.LayerMapTryGet(ent, mapKey, out _, false)) // prevent dupes
             return;
 
         var newLayer = _sprite.AddLayer(ent,
@@ -191,8 +212,11 @@ public sealed class WoundableVisualsSystem : VisualizerSystem<WoundableVisualsCo
             _sprite.LayerSetColor(ent, newLayer, Color.FromHex(color));
         _sprite.LayerSetVisible(ent, newLayer, false);
     }
+
     #endregion
+
     #region Visual Updates
+
     private void UpdateWoundableVisuals(Entity<WoundableVisualsComponent> visuals, Entity<SpriteComponent?> sprite)
     {
         UpdateDamageVisuals(visuals, sprite);
@@ -214,6 +238,7 @@ public sealed class WoundableVisualsSystem : VisualizerSystem<WoundableVisualsCo
                 severityPoint <= visuals.Comp.Thresholds.FirstOrDefault() ? 0 : GetThreshold(severityPoint, visuals));
         }
     }
+
     private void UpdateBleedingVisuals(Entity<WoundableVisualsComponent> ent, Entity<SpriteComponent?> sprite)
     {
         if (!TryComp<BodyPartComponent>(ent, out var bodyPart))
@@ -276,21 +301,29 @@ public sealed class WoundableVisualsSystem : VisualizerSystem<WoundableVisualsCo
         if (!_sprite.LayerMapTryGet(sprite, layerKey, out var bleedingLayer, false))
             return;
         var threshold = CalculateBleedingThreshold(totalBleeds, woundable.Comp);
-        UpdateBleedingLayerState(sprite, bleedingLayer, woundable.Comp.OccupiedLayer.ToString(), totalBleeds, threshold);
+        UpdateBleedingLayerState(sprite,
+            bleedingLayer,
+            woundable.Comp.OccupiedLayer.ToString(),
+            totalBleeds,
+            threshold);
     }
 
     #endregion
+
     #region Helper Methods
+
     private void SetLayerVisible(Entity<SpriteComponent?> sprite, int layer, bool visibility)
     {
         if (_sprite.TryGetLayer(sprite, layer, out var layerData, false) && layerData.Visible != visibility)
             _sprite.LayerSetVisible(sprite, layer, visibility);
     }
 
-    private bool TryGetWoundData(Entity<WoundableVisualsComponent?> entity, [NotNullWhen(true)] out WoundVisualizerGroupData? wounds)
+    private bool TryGetWoundData(Entity<WoundableVisualsComponent?> entity,
+        [NotNullWhen(true)] out WoundVisualizerGroupData? wounds)
     {
         wounds = null;
-        if (!Resolve(entity, ref entity.Comp) || !_appearance.TryGetData(entity.Owner, WoundableVisualizerKeys.Wounds, out wounds))
+        if (!Resolve(entity, ref entity.Comp) ||
+            !_appearance.TryGetData(entity.Owner, WoundableVisualizerKeys.Wounds, out wounds))
             return false;
         if (wounds.GroupList.Count != 0)
             return true;
@@ -316,6 +349,7 @@ public sealed class WoundableVisualsSystem : VisualizerSystem<WoundableVisualsCo
 
         return total;
     }
+
     private static BleedingSeverity CalculateBleedingThreshold(FixedPoint2 bleeding, WoundableVisualsComponent comp)
     {
         var nearestSeverity = BleedingSeverity.Minor;
@@ -330,6 +364,7 @@ public sealed class WoundableVisualsSystem : VisualizerSystem<WoundableVisualsCo
 
         return nearestSeverity;
     }
+
     private static FixedPoint2 GetThreshold(FixedPoint2 threshold, WoundableVisualsComponent comp)
     {
         var nearestSeverity = FixedPoint2.Zero;

@@ -46,9 +46,7 @@ public sealed class GasPressureRegulatorBoundUserInterface(EntityUid owner, Enum
 
         if (UserInputParser.TryFloat(newThreshold, out var parsedNewThreshold) && parsedNewThreshold >= 0 &&
             !float.IsInfinity(parsedNewThreshold))
-        {
             sentThreshold = parsedNewThreshold;
-        }
 
         // Autofill to zero if the user inputs an invalid value.
         _window?.SetThresholdPressureInput(sentThreshold);

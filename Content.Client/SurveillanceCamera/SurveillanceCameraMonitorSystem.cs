@@ -5,7 +5,9 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Robust.Client.Timing; // Goobstation
+using Robust.Client.Timing;
+
+// Goobstation
 
 namespace Content.Client.SurveillanceCamera;
 
@@ -40,8 +42,5 @@ public sealed class SurveillanceCameraMonitorSystem : EntitySystem
         comp.PreviousCurTime = _gameTiming.CurTime; // Goobstation
     }
 
-    public void RemoveTimer(EntityUid uid)
-    {
-        RemCompDeferred<ActiveSurveillanceCameraMonitorVisualsComponent>(uid);
-    }
+    public void RemoveTimer(EntityUid uid) => RemCompDeferred<ActiveSurveillanceCameraMonitorVisualsComponent>(uid);
 }

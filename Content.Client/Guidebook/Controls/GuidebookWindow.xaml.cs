@@ -116,9 +116,9 @@ public sealed partial class GuidebookWindow : FancyWindow, ILinkClickHandler
     [Dependency] private readonly DocumentParsingManager _parsingMan = default!;
     [Dependency] private readonly IResourceManager _resourceManager = default!;
 
-    private Dictionary<ProtoId<GuideEntryPrototype>, GuideEntry> _entries = new();
-
     private readonly ISawmill _sawmill;
+
+    private Dictionary<ProtoId<GuideEntryPrototype>, GuideEntry> _entries = new();
 
     public ProtoId<GuideEntryPrototype> LastEntry;
 

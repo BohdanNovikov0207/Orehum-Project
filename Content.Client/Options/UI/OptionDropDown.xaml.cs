@@ -53,9 +53,9 @@ using Robust.Client.UserInterface;
 namespace Content.Client.Options.UI;
 
 /// <summary>
-/// Standard UI control used for drop-downs in the options menu. Intended for use with <see cref="OptionsTabControlRow"/>.
+/// Standard UI control used for drop-downs in the options menu. Intended for use with <see cref="OptionsTabControlRow" />.
 /// </summary>
-/// <seealso cref="OptionsTabControlRow.AddOptionDropDown{T}"/>
+/// <seealso cref="OptionsTabControlRow.AddOptionDropDown{T}" />
 [GenerateTypedNameReferences]
 public sealed partial class OptionDropDown : Control
 {

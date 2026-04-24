@@ -15,12 +15,12 @@ namespace Content.Client.Replay.Spectator;
 // Partial class handles movement logic for observers.
 public sealed partial class ReplaySpectatorSystem
 {
-    public DirectionFlag Direction;
-
     /// <summary>
-    /// Fallback speed if the observer ghost has no <see cref="MovementSpeedModifierComponent"/>.
+    /// Fallback speed if the observer ghost has no <see cref="MovementSpeedModifierComponent" />.
     /// </summary>
     public const float DefaultSpeed = 12;
+
+    public DirectionFlag Direction;
 
     private void InitializeMovement()
     {
@@ -37,10 +37,7 @@ public sealed partial class ReplaySpectatorSystem
             .Register<ReplaySpectatorSystem>();
     }
 
-    private void ShutdownMovement()
-    {
-        CommandBinds.Unregister<ReplaySpectatorSystem>();
-    }
+    private void ShutdownMovement() => CommandBinds.Unregister<ReplaySpectatorSystem>();
 
     // Normal mover code works via physics. Replays don't do prediction/physics. You can fudge it by relying on the
     // fact that only local-player physics is currently predicted, but instead I've just added crude mover logic here.
@@ -110,8 +107,8 @@ public sealed partial class ReplaySpectatorSystem
 
     private sealed class MoverHandler : InputCmdHandler
     {
-        private readonly ReplaySpectatorSystem _sys;
         private readonly DirectionFlag _dir;
+        private readonly ReplaySpectatorSystem _sys;
 
         public MoverHandler(ReplaySpectatorSystem sys, DirectionFlag dir)
         {
@@ -119,7 +116,9 @@ public sealed partial class ReplaySpectatorSystem
             _dir = dir;
         }
 
-        public override bool HandleCmdMessage(IEntityManager entManager, ICommonSession? session, IFullInputCmdMessage message)
+        public override bool HandleCmdMessage(IEntityManager entManager,
+            ICommonSession? session,
+            IFullInputCmdMessage message)
         {
             if (message.State == BoundKeyState.Down)
                 _sys.Direction |= _dir;

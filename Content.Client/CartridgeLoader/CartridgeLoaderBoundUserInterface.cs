@@ -13,19 +13,18 @@ using Robust.Client.UserInterface;
 
 namespace Content.Client.CartridgeLoader;
 
-
 public abstract class CartridgeLoaderBoundUserInterface : BoundUserInterface
 {
-    [ViewVariables]
-    private EntityUid? _activeProgram;
+    private readonly IEntityManager _entManager;
 
     [ViewVariables]
     private UIFragment? _activeCartridgeUI;
 
     [ViewVariables]
-    private Control? _activeUiFragment;
+    private EntityUid? _activeProgram;
 
-    private IEntityManager _entManager;
+    [ViewVariables]
+    private Control? _activeUiFragment;
 
     protected CartridgeLoaderBoundUserInterface(EntityUid owner, Enum uiKey) : base(owner, uiKey)
     {
@@ -74,7 +73,8 @@ public abstract class CartridgeLoaderBoundUserInterface : BoundUserInterface
 
     protected void ActivateCartridge(EntityUid cartridgeUid)
     {
-        var message = new CartridgeLoaderUiMessage(_entManager.GetNetEntity(cartridgeUid), CartridgeUiMessageAction.Activate);
+        var message =
+            new CartridgeLoaderUiMessage(_entManager.GetNetEntity(cartridgeUid), CartridgeUiMessageAction.Activate);
         SendMessage(message);
     }
 
@@ -83,19 +83,22 @@ public abstract class CartridgeLoaderBoundUserInterface : BoundUserInterface
         if (!_activeProgram.HasValue)
             return;
 
-        var message = new CartridgeLoaderUiMessage(_entManager.GetNetEntity(_activeProgram.Value), CartridgeUiMessageAction.Deactivate);
+        var message = new CartridgeLoaderUiMessage(_entManager.GetNetEntity(_activeProgram.Value),
+            CartridgeUiMessageAction.Deactivate);
         SendMessage(message);
     }
 
     protected void InstallCartridge(EntityUid cartridgeUid)
     {
-        var message = new CartridgeLoaderUiMessage(_entManager.GetNetEntity(cartridgeUid), CartridgeUiMessageAction.Install);
+        var message =
+            new CartridgeLoaderUiMessage(_entManager.GetNetEntity(cartridgeUid), CartridgeUiMessageAction.Install);
         SendMessage(message);
     }
 
     protected void UninstallCartridge(EntityUid cartridgeUid)
     {
-        var message = new CartridgeLoaderUiMessage(_entManager.GetNetEntity(cartridgeUid), CartridgeUiMessageAction.Uninstall);
+        var message =
+            new CartridgeLoaderUiMessage(_entManager.GetNetEntity(cartridgeUid), CartridgeUiMessageAction.Uninstall);
         SendMessage(message);
     }
 
@@ -133,14 +136,13 @@ public abstract class CartridgeLoaderBoundUserInterface : BoundUserInterface
             _activeUiFragment?.Dispose();
     }
 
-    protected CartridgeComponent? RetrieveCartridgeComponent(EntityUid? cartridgeUid)
-    {
-        return EntMan.GetComponentOrNull<CartridgeComponent>(cartridgeUid);
-    }
+    protected CartridgeComponent? RetrieveCartridgeComponent(EntityUid? cartridgeUid) =>
+        EntMan.GetComponentOrNull<CartridgeComponent>(cartridgeUid);
 
     private void SendCartridgeUiReadyEvent(EntityUid cartridgeUid)
     {
-        var message = new CartridgeLoaderUiMessage(_entManager.GetNetEntity(cartridgeUid), CartridgeUiMessageAction.UIReady);
+        var message =
+            new CartridgeLoaderUiMessage(_entManager.GetNetEntity(cartridgeUid), CartridgeUiMessageAction.UIReady);
         SendMessage(message);
     }
 

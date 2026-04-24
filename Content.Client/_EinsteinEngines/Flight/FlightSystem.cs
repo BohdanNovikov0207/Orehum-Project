@@ -10,19 +10,21 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Robust.Client.GameObjects;
+using Content.Client._EinsteinEngines.Flight.Components;
 using Content.Shared._EinsteinEngines.Flight;
 using Content.Shared._EinsteinEngines.Flight.Events;
-using Content.Client._EinsteinEngines.Flight.Components;
+using Robust.Client.GameObjects;
 
 namespace Content.Client._EinsteinEngines.Flight;
+
 public sealed class FlightSystem : SharedFlightSystem
 {
     public override void Initialize()
     {
         base.Initialize();
 
-        SubscribeLocalEvent<ToggleFlightVisualsEvent>(OnToggleFlightVisuals); // We need this crap because standingsys only raises shit on server lmao
+        SubscribeLocalEvent<ToggleFlightVisualsEvent>(
+            OnToggleFlightVisuals); // We need this crap because standingsys only raises shit on server lmao
         SubscribeLocalEvent<FlightComponent, FlightEvent>(OnFlight);
     }
 
@@ -71,6 +73,7 @@ public sealed class FlightSystem : SharedFlightSystem
             };
             AddComp(uid, comp);
         }
+
         if (!isFlying)
             RemComp<FlightVisualsComponent>(uid);
     }
@@ -80,7 +83,7 @@ public sealed class FlightSystem : SharedFlightSystem
         if (!Resolve(uid, ref sprite))
             return null;
 
-        int index = 0;
+        var index = 0;
         foreach (var layer in sprite.AllLayers)
         {
             // This feels like absolute shitcode, isn't there a better way to check for it?
@@ -88,6 +91,7 @@ public sealed class FlightSystem : SharedFlightSystem
                 return index;
             index++;
         }
+
         return null;
     }
 }

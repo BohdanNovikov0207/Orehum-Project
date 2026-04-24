@@ -22,12 +22,7 @@ namespace Content.Client.CartridgeLoader.Cartridges;
 [GenerateTypedNameReferences]
 public sealed partial class NewsReaderUiFragment : BoxContainer
 {
-    public event Action? OnNextButtonPressed;
-    public event Action? OnPrevButtonPressed;
-
-    public event Action? OnNotificationSwithPressed;
-
-    private Type[] AllowedTags =
+    private readonly Type[] AllowedTags =
     [
         typeof(BoldItalicTag),
         typeof(BoldTag),
@@ -47,6 +42,11 @@ public sealed partial class NewsReaderUiFragment : BoxContainer
         NotificationSwitch.OnPressed += _ => OnNotificationSwithPressed?.Invoke();
     }
 
+    public event Action? OnNextButtonPressed;
+    public event Action? OnPrevButtonPressed;
+
+    public event Action? OnNotificationSwithPressed;
+
     public void UpdateState(NewsArticle article, int targetNum, int totalNum, bool notificationOn)
     {
         PageNum.Visible = true;
@@ -59,12 +59,14 @@ public sealed partial class NewsReaderUiFragment : BoxContainer
 
         PageNum.Text = $"{targetNum}/{totalNum}";
 
-        NotificationSwitch.Text = Loc.GetString(notificationOn ? "news-read-ui-notification-on" : "news-read-ui-notification-off");
+        NotificationSwitch.Text =
+            Loc.GetString(notificationOn ? "news-read-ui-notification-on" : "news-read-ui-notification-off");
 
         var shareTime = article.ShareTime.ToString(@"hh\:mm\:ss");
         ShareTime.SetMarkup(Loc.GetString("news-read-ui-time-prefix-text") + " " + shareTime);
 
-        var author = Loc.GetString("news-read-ui-author-prefix") + " " + (article.Author ?? Loc.GetString("news-read-ui-no-author"));
+        var author = Loc.GetString("news-read-ui-author-prefix") + " " +
+                     (article.Author ?? Loc.GetString("news-read-ui-no-author"));
         Author.SetMessage(FormattedMessage.FromMarkupPermissive(author), AllowedTags);
 
         Prev.Disabled = targetNum <= 1;
@@ -80,6 +82,7 @@ public sealed partial class NewsReaderUiFragment : BoxContainer
 
         PageName.Text = Loc.GetString("news-read-ui-not-found-text");
 
-        NotificationSwitch.Text = Loc.GetString(notificationOn ? "news-read-ui-notification-on" : "news-read-ui-notification-off");
+        NotificationSwitch.Text =
+            Loc.GetString(notificationOn ? "news-read-ui-notification-on" : "news-read-ui-notification-off");
     }
 }

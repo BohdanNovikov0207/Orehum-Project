@@ -38,12 +38,14 @@ namespace Content.Client.Instruments;
 
 public sealed partial class InstrumentSystem : SharedInstrumentSystem
 {
-    [Dependency] private readonly IClientNetManager _netManager = default!;
-    [Dependency] private readonly IMidiManager _midiManager = default!;
-    [Dependency] private readonly IGameTiming _gameTiming = default!;
     [Dependency] private readonly IConfigurationManager _cfg = default!;
+    [Dependency] private readonly IGameTiming _gameTiming = default!;
+    [Dependency] private readonly IMidiManager _midiManager = default!;
+    [Dependency] private readonly IClientNetManager _netManager = default!;
 
     public readonly TimeSpan OneSecAgo = TimeSpan.FromSeconds(-1);
+
+    private bool _isUpdateQueued;
     public int MaxMidiEventsPerBatch { get; private set; }
     public int MaxMidiEventsPerSecond { get; private set; }
 
@@ -67,13 +69,10 @@ public sealed partial class InstrumentSystem : SharedInstrumentSystem
         SubscribeLocalEvent<ActiveInstrumentComponent, AfterAutoHandleStateEvent>(OnActiveInstrumentAfterHandleState);
     }
 
-    private bool _isUpdateQueued = false;
-
-    private void OnActiveInstrumentAfterHandleState(Entity<ActiveInstrumentComponent> ent, ref AfterAutoHandleStateEvent args)
-    {
+    private void OnActiveInstrumentAfterHandleState(Entity<ActiveInstrumentComponent> ent,
+        ref AfterAutoHandleStateEvent args) =>
         // Called in the update loop so that the components update client side for resolving them in TryComps.
         _isUpdateQueued = true;
-    }
 
     public override void FrameUpdate(float frameTime)
     {
@@ -106,10 +105,8 @@ public sealed partial class InstrumentSystem : SharedInstrumentSystem
             EndRenderer(uid, true, component);
     }
 
-    private void OnShutdown(EntityUid uid, InstrumentComponent component, ComponentShutdown args)
-    {
+    private void OnShutdown(EntityUid uid, InstrumentComponent component, ComponentShutdown args) =>
         EndRenderer(uid, false, component);
-    }
 
     public void SetMaster(EntityUid uid, EntityUid? masterUid)
     {
@@ -146,16 +143,12 @@ public sealed partial class InstrumentSystem : SharedInstrumentSystem
             return;
 
         if (component is not InstrumentComponent instrument)
-        {
             return;
-        }
 
         if (instrument.IsRendererAlive)
         {
             if (fromStateChange)
-            {
                 UpdateRenderer(uid, instrument);
-            }
 
             return;
         }
@@ -176,9 +169,7 @@ public sealed partial class InstrumentSystem : SharedInstrumentSystem
         }
 
         if (!fromStateChange)
-        {
             RaiseNetworkEvent(new InstrumentStartMidiEvent(GetNetEntity(uid)));
-        }
     }
 
     public void UpdateRenderer(EntityUid uid, InstrumentComponent? instrument = null)
@@ -194,7 +185,7 @@ public sealed partial class InstrumentSystem : SharedInstrumentSystem
         instrument.Renderer.DisablePercussionChannel = !instrument.AllowPercussion;
         instrument.Renderer.DisableProgramChangeEvent = !instrument.AllowProgramChange;
 
-        for (int i = 0; i < RobustMidiEvent.MaxChannels; i++)
+        for (var i = 0; i < RobustMidiEvent.MaxChannels; i++)
         {
             if (instrument.FilteredChannels[i])
                 instrument.Renderer.SendMidiEvent(RobustMidiEvent.AllNotesOff((byte) i, 0));
@@ -216,7 +207,8 @@ public sealed partial class InstrumentSystem : SharedInstrumentSystem
         if (instrument.Renderer == null)
             return;
 
-        if (instrument.Master == null || !TryComp(instrument.Master, out InstrumentComponent? masterInstrument) || masterInstrument.Renderer == null)
+        if (instrument.Master == null || !TryComp(instrument.Master, out InstrumentComponent? masterInstrument) ||
+            masterInstrument.Renderer == null)
         {
             instrument.Renderer.Master = null;
             return;
@@ -260,9 +252,7 @@ public sealed partial class InstrumentSystem : SharedInstrumentSystem
         instrument.MidiEventBuffer.Clear();
 
         if (!fromStateChange && _netManager.IsConnected)
-        {
             RaiseNetworkEvent(new InstrumentStopMidiEvent(GetNetEntity(uid)));
-        }
     }
 
     public void SetPlayerTick(EntityUid uid, int playerTick, InstrumentComponent? instrument = null)
@@ -295,14 +285,11 @@ public sealed partial class InstrumentSystem : SharedInstrumentSystem
         instrument.MidiEventBuffer.Clear();
         instrument.Renderer.OnMidiEvent += instrument.MidiEventBuffer.Add;
         return true;
-
     }
 
     [Obsolete("Use overload that takes in byte[] instead.")]
-    public bool OpenMidi(EntityUid uid, ReadOnlySpan<byte> data, InstrumentComponent? instrument = null)
-    {
-        return OpenMidi(uid, data.ToArray(), instrument);
-    }
+    public bool OpenMidi(EntityUid uid, ReadOnlySpan<byte> data, InstrumentComponent? instrument = null) =>
+        OpenMidi(uid, data.ToArray(), instrument);
 
     public bool OpenMidi(EntityUid uid, byte[] data, InstrumentComponent? instrument = null)
     {
@@ -327,9 +314,7 @@ public sealed partial class InstrumentSystem : SharedInstrumentSystem
             return false;
 
         if (instrument.Renderer == null || !instrument.Renderer.CloseInput())
-        {
             return false;
-        }
 
         EndRenderer(uid, fromStateChange, instrument);
         return true;
@@ -341,23 +326,15 @@ public sealed partial class InstrumentSystem : SharedInstrumentSystem
             return false;
 
         if (instrument.Renderer == null || !instrument.Renderer.CloseMidi())
-        {
             return false;
-        }
 
         EndRenderer(uid, fromStateChange, instrument);
         return true;
     }
 
-    private void OnMaxMidiEventsPerSecondChanged(int obj)
-    {
-        MaxMidiEventsPerSecond = obj;
-    }
+    private void OnMaxMidiEventsPerSecondChanged(int obj) => MaxMidiEventsPerSecond = obj;
 
-    private void OnMaxMidiEventsPerBatchChanged(int obj)
-    {
-        MaxMidiEventsPerBatch = obj;
-    }
+    private void OnMaxMidiEventsPerBatchChanged(int obj) => MaxMidiEventsPerBatch = obj;
 
     private void OnMidiEventRx(InstrumentMidiEventEvent midiEv)
     {
@@ -388,9 +365,7 @@ public sealed partial class InstrumentSystem : SharedInstrumentSystem
         }
 
         if (instrument.SequenceStartTick <= 0)
-        {
             instrument.SequenceStartTick = midiEv.MidiEvent.Min(x => x.Tick) - 1;
-        }
 
         var sqrtLag = MathF.Sqrt((_netManager.ServerChannel?.Ping ?? 0) / 1000f);
         var delay = (uint) (renderer.SequencerTimeScale * (.2 + sqrtLag));
@@ -405,7 +380,7 @@ public sealed partial class InstrumentSystem : SharedInstrumentSystem
     {
         if (instrument.Renderer == null)
         {
-            Log.Warning($"Tried to send Midi events to an instrument without a renderer.");
+            Log.Warning("Tried to send Midi events to an instrument without a renderer.");
             return;
         }
 
@@ -431,24 +406,16 @@ public sealed partial class InstrumentSystem : SharedInstrumentSystem
         }
     }
 
-    private void OnMidiStart(InstrumentStartMidiEvent ev)
-    {
-        SetupRenderer(GetEntity(ev.Uid), true);
-    }
+    private void OnMidiStart(InstrumentStartMidiEvent ev) => SetupRenderer(GetEntity(ev.Uid), true);
 
-    private void OnMidiStop(InstrumentStopMidiEvent ev)
-    {
-        EndRenderer(GetEntity(ev.Uid), true);
-    }
+    private void OnMidiStop(InstrumentStopMidiEvent ev) => EndRenderer(GetEntity(ev.Uid), true);
 
     public override void Update(float frameTime)
     {
         base.Update(frameTime);
 
         if (!_gameTiming.IsFirstTimePredicted)
-        {
             return;
-        }
 
         var query = EntityQueryEnumerator<InstrumentComponent>();
         while (query.MoveNext(out var uid, out var instrument))

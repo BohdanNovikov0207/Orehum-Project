@@ -30,13 +30,30 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Client.UserInterface.Systems.Alerts;
 
-public sealed class AlertsUIController : UIController, IOnStateEntered<GameplayState>, IOnSystemChanged<ClientAlertsSystem>
+public sealed class AlertsUIController : UIController, IOnStateEntered<GameplayState>,
+    IOnSystemChanged<ClientAlertsSystem>
 {
+    [UISystemDependency] private readonly ClientAlertsSystem? _alertsSystem = default;
     [Dependency] private readonly IPlayerManager _player = default!;
 
-    [UISystemDependency] private readonly ClientAlertsSystem? _alertsSystem = default;
-
     private AlertsUI? UI => UIManager.GetActiveUIWidgetOrNull<AlertsUI>();
+
+
+    public void OnStateEntered(GameplayState state) =>
+        // initially populate the frame if system is available
+        SyncAlerts();
+
+    public void OnSystemLoaded(ClientAlertsSystem system)
+    {
+        system.SyncAlerts += SystemOnSyncAlerts;
+        system.ClearAlerts += SystemOnClearAlerts;
+    }
+
+    public void OnSystemUnloaded(ClientAlertsSystem system)
+    {
+        system.SyncAlerts -= SystemOnSyncAlerts;
+        system.ClearAlerts -= SystemOnClearAlerts;
+    }
 
     public override void Initialize()
     {
@@ -63,50 +80,21 @@ public sealed class AlertsUIController : UIController, IOnStateEntered<GameplayS
         SyncAlerts();
     }
 
-    private void OnAlertPressed(object? sender, ProtoId<AlertPrototype> e)
-    {
-        _alertsSystem?.AlertClicked(e);
-    }
+    private void OnAlertPressed(object? sender, ProtoId<AlertPrototype> e) => _alertsSystem?.AlertClicked(e);
 
-    private void SystemOnClearAlerts(object? sender, EventArgs e)
-    {
-        UI?.ClearAllControls();
-    }
+    private void SystemOnClearAlerts(object? sender, EventArgs e) => UI?.ClearAllControls();
 
     private void SystemOnSyncAlerts(object? sender, IReadOnlyDictionary<AlertKey, AlertState> e)
     {
         if (sender is ClientAlertsSystem system)
-        {
             UI?.SyncControls(system, system.AlertOrder, e);
-        }
-    }
-
-    public void OnSystemLoaded(ClientAlertsSystem system)
-    {
-        system.SyncAlerts += SystemOnSyncAlerts;
-        system.ClearAlerts += SystemOnClearAlerts;
-    }
-
-    public void OnSystemUnloaded(ClientAlertsSystem system)
-    {
-        system.SyncAlerts -= SystemOnSyncAlerts;
-        system.ClearAlerts -= SystemOnClearAlerts;
-    }
-
-
-    public void OnStateEntered(GameplayState state)
-    {
-        // initially populate the frame if system is available
-        SyncAlerts();
     }
 
     public void SyncAlerts()
     {
         var alerts = _alertsSystem?.ActiveAlerts;
         if (alerts != null)
-        {
             SystemOnSyncAlerts(_alertsSystem, alerts);
-        }
     }
 
     public void UpdateAlertSpriteEntity(EntityUid spriteViewEnt, AlertPrototype alert)

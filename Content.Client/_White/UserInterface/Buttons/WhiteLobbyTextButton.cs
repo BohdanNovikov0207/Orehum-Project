@@ -9,22 +9,21 @@ namespace Content.Client._White.UserInterface.Buttons;
 [Virtual]
 public class WhiteLobbyTextButton : TextureButton
 {
+    private readonly Font _font;
     [Dependency] private readonly IResourceCache _resourceCache = default!;
 
-    private readonly Font _font;
-
     private string? _buttonText;
-
-    public string ButtonText
-    {
-        set => _buttonText = value;
-    }
 
     public WhiteLobbyTextButton()
     {
         IoCManager.InjectDependencies(this);
 
         _font = new VectorFont(_resourceCache.GetResource<FontResource>("/Fonts/_White/Bedstead/Bedstead.otf"), 15);
+    }
+
+    public string ButtonText
+    {
+        set => _buttonText = value;
     }
 
     protected override void Draw(DrawingHandleScreen handle)
@@ -104,7 +103,7 @@ public class WhiteLobbyTextButton : TextureButton
 
     protected override Vector2 MeasureOverride(Vector2 availableSize)
     {
-        if(_buttonText == null)
+        if (_buttonText == null)
             return MeasureText(_font, " ");
 
         return MeasureText(_font, _buttonText);

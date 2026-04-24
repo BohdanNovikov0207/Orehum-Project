@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using Content.Corvax.Interfaces.Client;
+﻿using System.Linq;
 using Content.Corvax.Interfaces.Shared;
 using Content.Shared.Backmen.Sponsors;
 using Robust.Shared.Network;
@@ -11,31 +9,23 @@ public sealed class SponsorsManager : ISharedSponsorsManager
 {
     [Dependency] private readonly IClientNetManager _netMgr = default!;
 
-    public void Initialize()
-    {
-        _netMgr.RegisterNetMessage<MsgSponsorInfo>(OnUpdate);
-        //_netMgr.RegisterNetMessage<Shared.Backmen.MsgWhitelist>(RxWhitelist); //backmen: whitelist
-    }
+    public HashSet<string> Prototypes { get; } = new();
+    public HashSet<string> Loadouts { get; } = new();
+    public bool OpenAllRoles { get; private set; }
+    public int Tier { get; private set; }
+    public bool Whitelisted { get; private set; } = false;
+    public string? GhostTheme { get; private set; }
 
-    public List<string> GetClientPrototypes()
-    {
-        return Prototypes.ToList();
-    }
+    public void Initialize() => _netMgr.RegisterNetMessage<MsgSponsorInfo>(OnUpdate);
 
-    public List<string> GetClientLoadouts()
-    {
-        return Loadouts.ToList();
-    }
+    //_netMgr.RegisterNetMessage<Shared.Backmen.MsgWhitelist>(RxWhitelist); //backmen: whitelist
+    public List<string> GetClientPrototypes() => Prototypes.ToList();
 
-    public bool IsClientAllRoles()
-    {
-        return OpenAllRoles;
-    }
+    public List<string> GetClientLoadouts() => Loadouts.ToList();
 
-    public void Cleanup()
-    {
-        Reset();
-    }
+    public bool IsClientAllRoles() => OpenAllRoles;
+
+    public void Cleanup() => Reset();
 
     //private void RxWhitelist(Shared.Backmen.MsgWhitelist message)
     //{
@@ -54,9 +44,7 @@ public sealed class SponsorsManager : ISharedSponsorsManager
 #endif
 
         if (message.Info == null)
-        {
             return;
-        }
 
         foreach (var markings in message.Info.AllowedMarkings)
         {
@@ -81,11 +69,4 @@ public sealed class SponsorsManager : ISharedSponsorsManager
         Tier = 0;
         GhostTheme = null;
     }
-
-    public HashSet<string> Prototypes { get; } = new();
-    public HashSet<string> Loadouts { get; } = new();
-    public bool OpenAllRoles { get; private set; } = false;
-    public int Tier { get; private set; } = 0;
-    public bool Whitelisted { get; private set; } = false;
-    public string? GhostTheme { get; private set; } = null;
 }

@@ -12,7 +12,7 @@ SPDX-License-Identifier: MIT
     xmlns:roleBans="clr-namespace:Content.Client.Administration.UI.BanList.RoleBans"
     SetSize="1400 400">
     <TabContainer Name="TabContainer">
-        <bans:BanListControl Name="BanList" Access="Public"/>
-        <roleBans:RoleBanListControl Name="RoleBanList" Access="Public"/>
+        <bans:BanListControl Name="BanList" Access="Public" />
+        <roleBans:RoleBanListControl Name="RoleBanList" Access="Public" />
     </TabContainer>
 </controls:BanListWindow>

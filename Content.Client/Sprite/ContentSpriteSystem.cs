@@ -26,16 +26,15 @@ namespace Content.Client.Sprite;
 
 public sealed class ContentSpriteSystem : EntitySystem
 {
+    public static readonly ResPath Exports = new("/Exports");
     [Dependency] private readonly IClientAdminManager _adminManager = default!;
     [Dependency] private readonly IClyde _clyde = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
+
+    private readonly ContentSpriteControl _control = new();
     [Dependency] private readonly IResourceManager _resManager = default!;
-    [Dependency] private readonly IUserInterfaceManager _ui = default!;
     [Dependency] private readonly IRuntimeLog _runtimeLog = default!;
-
-    private ContentSpriteControl _control = new();
-
-    public static readonly ResPath Exports = new ResPath("/Exports");
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly IUserInterfaceManager _ui = default!;
 
     public override void Initialize()
     {
@@ -68,7 +67,7 @@ public sealed class ContentSpriteSystem : EntitySystem
         var tasks = new Task[4];
         var i = 0;
 
-        foreach (var dir in new Direction[]
+        foreach (var dir in new[]
                  {
                      Direction.South,
                      Direction.East,
@@ -76,7 +75,7 @@ public sealed class ContentSpriteSystem : EntitySystem
                      Direction.West,
                  })
         {
-            tasks[i++] = Export(entity, dir, includeId: includeId, cancelToken);
+            tasks[i++] = Export(entity, dir, includeId, cancelToken);
         }
 
         await Task.WhenAll(tasks);
@@ -85,7 +84,10 @@ public sealed class ContentSpriteSystem : EntitySystem
     /// <summary>
     /// Exports the sprite for a particular direction.
     /// </summary>
-    public async Task Export(EntityUid entity, Direction direction, bool includeId = true, CancellationToken cancelToken = default)
+    public async Task Export(EntityUid entity,
+        Direction direction,
+        bool includeId = true,
+        CancellationToken cancelToken = default)
     {
         if (!_timing.IsFirstTimePredicted)
             return;
@@ -108,7 +110,9 @@ public sealed class ContentSpriteSystem : EntitySystem
         if (size.Equals(Vector2i.Zero))
             return;
 
-        var texture = _clyde.CreateRenderTarget(new Vector2i(size.X, size.Y), new RenderTargetFormatParameters(RenderTargetColorFormat.Rgba8Srgb), name: "export");
+        var texture = _clyde.CreateRenderTarget(new Vector2i(size.X, size.Y),
+            new RenderTargetFormatParameters(RenderTargetColorFormat.Rgba8Srgb),
+            name: "export");
         var tcs = new TaskCompletionSource(cancelToken);
 
         _control.QueuedTextures.Enqueue((texture, direction, entity, includeId, tcs));
@@ -152,14 +156,14 @@ public sealed class ContentSpriteSystem : EntitySystem
         [Dependency] private readonly ILogManager _logMan = default!;
         [Dependency] private readonly IResourceManager _resManager = default!;
 
-        internal Queue<(
+        private readonly ISawmill _sawmill;
+
+        internal readonly Queue<(
             IRenderTexture Texture,
             Direction Direction,
             EntityUid Entity,
             bool IncludeId,
             TaskCompletionSource Tcs)> QueuedTextures = new();
-
-        private ISawmill _sawmill;
 
         public ContentSpriteControl()
         {
@@ -184,22 +188,23 @@ public sealed class ContentSpriteSystem : EntitySystem
                     var filename = metadata.EntityName;
                     var result = queued;
 
-                    handle.RenderInRenderTarget(queued.Texture, () =>
-                    {
-                        handle.DrawEntity(result.Entity, result.Texture.Size / 2, Vector2.One, Angle.Zero,
-                            overrideDirection: result.Direction);
-                    }, Color.Transparent);
+                    handle.RenderInRenderTarget(queued.Texture,
+                        () =>
+                        {
+                            handle.DrawEntity(result.Entity,
+                                result.Texture.Size / 2,
+                                Vector2.One,
+                                Angle.Zero,
+                                overrideDirection: result.Direction);
+                        },
+                        Color.Transparent);
 
                     ResPath fullFileName;
 
                     if (queued.IncludeId)
-                    {
                         fullFileName = Exports / $"{filename}-{queued.Direction}-{queued.Entity}.png";
-                    }
                     else
-                    {
                         fullFileName = Exports / $"{filename}-{queued.Direction}.png";
-                    }
 
                     queued.Texture.CopyPixelsToMemory<Rgba32>(image =>
                     {
@@ -210,7 +215,9 @@ public sealed class ContentSpriteSystem : EntitySystem
                         }
 
                         using var file =
-                            _resManager.UserData.Open(fullFileName, FileMode.CreateNew, FileAccess.Write,
+                            _resManager.UserData.Open(fullFileName,
+                                FileMode.CreateNew,
+                                FileAccess.Write,
                                 FileShare.None);
 
                         image.SaveAsPng(file);

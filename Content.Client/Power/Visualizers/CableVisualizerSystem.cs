@@ -20,7 +20,8 @@ public sealed class CableVisualizerSystem : EntitySystem
     {
         base.Initialize();
 
-        SubscribeLocalEvent<CableVisualizerComponent, AppearanceChangeEvent>(OnAppearanceChange, after: new[] { typeof(SubFloorHideSystem) });
+        SubscribeLocalEvent<CableVisualizerComponent, AppearanceChangeEvent>(OnAppearanceChange,
+            after: new[] { typeof(SubFloorHideSystem) });
     }
 
     private void OnAppearanceChange(EntityUid uid, CableVisualizerComponent component, ref AppearanceChangeEvent args)
@@ -35,11 +36,14 @@ public sealed class CableVisualizerSystem : EntitySystem
             return;
         }
 
-        if (!_appearanceSystem.TryGetData<WireVisDirFlags>(uid, WireVisVisuals.ConnectedMask, out var mask, args.Component))
+        if (!_appearanceSystem.TryGetData<WireVisDirFlags>(uid,
+                WireVisVisuals.ConnectedMask,
+                out var mask,
+                args.Component))
             mask = WireVisDirFlags.None;
 
-        _sprite.LayerSetRsiState((uid, args.Sprite), 0, $"{component.StatePrefix}{(int)mask}");
+        _sprite.LayerSetRsiState((uid, args.Sprite), 0, $"{component.StatePrefix}{(int) mask}");
         if (component.ExtraLayerPrefix != null)
-            _sprite.LayerSetRsiState((uid, args.Sprite), 1, $"{component.ExtraLayerPrefix}{(int)mask}");
+            _sprite.LayerSetRsiState((uid, args.Sprite), 1, $"{component.ExtraLayerPrefix}{(int) mask}");
     }
 }

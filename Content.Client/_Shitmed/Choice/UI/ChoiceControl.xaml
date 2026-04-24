@@ -16,9 +16,9 @@ SPDX-License-Identifier: AGPL-3.0-or-later
             <BoxContainer Orientation="Horizontal" Margin="0">
                 <TextureRect Name="Texture" Access="Public"
                              HorizontalExpand="False" VerticalExpand="False"
-                             Margin="1"/>
-                <Control MinWidth="5"/>
-                <RichTextLabel Name="NameLabel" Access="Public" VerticalAlignment="Center"/>
+                             Margin="1" />
+                <Control MinWidth="5" />
+                <RichTextLabel Name="NameLabel" Access="Public" VerticalAlignment="Center" />
             </BoxContainer>
         </Button>
     </BoxContainer>

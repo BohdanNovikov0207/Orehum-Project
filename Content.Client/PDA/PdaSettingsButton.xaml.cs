@@ -25,14 +25,21 @@ public sealed partial class PdaSettingsButton : ContainerButton
 
     private readonly StyleBoxFlat _styleBox = new()
     {
-        BackgroundColor = Color.FromHex("#25252a")
+        BackgroundColor = Color.FromHex("#25252a"),
     };
+
+    public PdaSettingsButton()
+    {
+        RobustXamlLoader.Load(this);
+        Panel.PanelOverride = _styleBox;
+    }
 
     public string? Text
     {
         get => OptionName.Text;
         set => OptionName.Text = value;
     }
+
     public string? Description
     {
         get => OptionDescription.Text;
@@ -56,12 +63,6 @@ public sealed partial class PdaSettingsButton : ContainerButton
         }
     }
 
-    public PdaSettingsButton()
-    {
-        RobustXamlLoader.Load(this);
-        Panel.PanelOverride = _styleBox;
-    }
-
     protected override void Draw(DrawingHandleScreen handle)
     {
         base.Draw(handle);
@@ -71,6 +72,5 @@ public sealed partial class PdaSettingsButton : ContainerButton
 
         if (TryGetStyleProperty<Color>(StylePropertyFgColor, out var fgColor))
             ForegroundColor = fgColor;
-
     }
 }

@@ -13,7 +13,7 @@ using Robust.Client.UserInterface;
 namespace Content.Client.Weapons.Melee.UI;
 
 /// <summary>
-/// Initializes a <see cref="MeleeSpeechWindow"/> and updates it when new server messages are received.
+/// Initializes a <see cref="MeleeSpeechWindow" /> and updates it when new server messages are received.
 /// </summary>
 public sealed class MeleeSpeechBoundUserInterface : BoundUserInterface
 {
@@ -32,10 +32,8 @@ public sealed class MeleeSpeechBoundUserInterface : BoundUserInterface
         _window.OnBattlecryEntered += OnBattlecryChanged;
     }
 
-    private void OnBattlecryChanged(string newBattlecry)
-    {
+    private void OnBattlecryChanged(string newBattlecry) =>
         SendMessage(new MeleeSpeechBattlecryChangedMessage(newBattlecry));
-    }
 
     /// <summary>
     /// Update the UI state based on server-sent info

@@ -6,6 +6,7 @@
 // New Frontiers - This file is licensed under AGPLv3
 // Copyright (c) 2024 New Frontiers Contributors
 // See AGPLv3.txt for details.
+
 using Content.Shared._NF.Shuttles.Events;
 using Robust.Client.UserInterface.Controls;
 
@@ -46,10 +47,7 @@ public sealed partial class NavScreen
         OnInertiaDampeningModeChanged?.Invoke(shuttle, InertiaDampeningMode.None);
     }
 
-    private void OnPortButtonPressed(string sourcePort)
-    {
-        OnNetworkPortButtonPressed?.Invoke(sourcePort);
-    }
+    private void OnPortButtonPressed(string sourcePort) => OnNetworkPortButtonPressed?.Invoke(sourcePort);
 
     private void SetDampenerMode(InertiaDampeningMode mode)
     {
@@ -80,8 +78,5 @@ public sealed partial class NavScreen
     }
 
     // Frontier - Maximum IFF Distance
-    private void OnRangeFilterChanged(int value)
-    {
-        NavRadar.MaximumIFFDistance = value;
-    }
+    private void OnRangeFilterChanged(int value) => NavRadar.MaximumIFFDistance = value;
 }

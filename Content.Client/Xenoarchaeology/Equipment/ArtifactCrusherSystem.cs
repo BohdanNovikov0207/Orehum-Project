@@ -7,8 +7,7 @@ using Content.Shared.Xenoarchaeology.Equipment;
 
 namespace Content.Client.Xenoarchaeology.Equipment;
 
-/// <inheritdoc/>
+/// <inheritdoc />
 public sealed class ArtifactCrusherSystem : SharedArtifactCrusherSystem
 {
-
 }

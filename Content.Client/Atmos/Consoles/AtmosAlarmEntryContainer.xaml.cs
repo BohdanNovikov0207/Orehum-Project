@@ -10,7 +10,9 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Linq;
 using Content.Client.Stylesheets;
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Atmos;
 using Content.Shared.Atmos.Components;
 using Content.Shared.Atmos.Monitor;
@@ -21,27 +23,25 @@ using Robust.Client.ResourceManagement;
 using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.XAML;
 using Robust.Shared.Map;
-using System.Linq;
-using Content.Goobstation.Maths.FixedPoint;
 
 namespace Content.Client.Atmos.Consoles;
 
 [GenerateTypedNameReferences]
 public sealed partial class AtmosAlarmEntryContainer : BoxContainer
 {
-    public NetEntity NetEntity;
-    public EntityCoordinates? Coordinates;
-
-    private readonly IEntityManager _entManager;
-    private readonly IResourceCache _cache;
-
-    private Dictionary<AtmosAlarmType, string> _alarmStrings = new Dictionary<AtmosAlarmType, string>()
+    private readonly Dictionary<AtmosAlarmType, string> _alarmStrings = new()
     {
         [AtmosAlarmType.Invalid] = "atmos-alerts-window-invalid-state",
         [AtmosAlarmType.Normal] = "atmos-alerts-window-normal-state",
         [AtmosAlarmType.Warning] = "atmos-alerts-window-warning-state",
         [AtmosAlarmType.Danger] = "atmos-alerts-window-danger-state",
     };
+
+    private readonly IResourceCache _cache;
+
+    private readonly IEntityManager _entManager;
+    public EntityCoordinates? Coordinates;
+    public NetEntity NetEntity;
 
     public AtmosAlarmEntryContainer(NetEntity uid, EntityCoordinates? coordinates)
     {
@@ -55,7 +55,8 @@ public sealed partial class AtmosAlarmEntryContainer : BoxContainer
 
         // Load fonts
         var headerFont = new VectorFont(_cache.GetResource<FontResource>("/Fonts/NotoSans/NotoSans-Bold.ttf"), 11);
-        var normalFont = new VectorFont(_cache.GetResource<FontResource>("/Fonts/NotoSansDisplay/NotoSansDisplay-Regular.ttf"), 11);
+        var normalFont =
+            new VectorFont(_cache.GetResource<FontResource>("/Fonts/NotoSansDisplay/NotoSansDisplay-Regular.ttf"), 11);
         var smallFont = new VectorFont(_cache.GetResource<FontResource>("/Fonts/NotoSans/NotoSans-Regular.ttf"), 10);
 
         // Set fonts
@@ -80,7 +81,8 @@ public sealed partial class AtmosAlarmEntryContainer : BoxContainer
         Coordinates = _entManager.GetCoordinates(entry.Coordinates);
 
         // Load fonts
-        var normalFont = new VectorFont(_cache.GetResource<FontResource>("/Fonts/NotoSansDisplay/NotoSansDisplay-Regular.ttf"), 11);
+        var normalFont =
+            new VectorFont(_cache.GetResource<FontResource>("/Fonts/NotoSansDisplay/NotoSansDisplay-Regular.ttf"), 11);
 
         // Update alarm state
         if (!_alarmStrings.TryGetValue(entry.AlarmState, out var alarmString))
@@ -90,7 +92,9 @@ public sealed partial class AtmosAlarmEntryContainer : BoxContainer
         AlarmStateLabel.FontColorOverride = GetAlarmStateColor(entry.AlarmState);
 
         // Update alarm name
-        AlarmNameLabel.Text = Loc.GetString("atmos-alerts-window-alarm-label", ("name", entry.EntityName), ("address", entry.Address));
+        AlarmNameLabel.Text = Loc.GetString("atmos-alerts-window-alarm-label",
+            ("name", entry.EntityName),
+            ("address", entry.Address));
 
         // Focus updates
         FocusContainer.Visible = isFocus;
@@ -102,24 +106,27 @@ public sealed partial class AtmosAlarmEntryContainer : BoxContainer
 
         if (isFocus && entry.Group == AtmosAlertsComputerGroup.AirAlarm)
         {
-            MainDataContainer.Visible = (entry.AlarmState != AtmosAlarmType.Invalid);
-            NoDataLabel.Visible = (entry.AlarmState == AtmosAlarmType.Invalid);
+            MainDataContainer.Visible = entry.AlarmState != AtmosAlarmType.Invalid;
+            NoDataLabel.Visible = entry.AlarmState == AtmosAlarmType.Invalid;
 
             if (focusData != null)
             {
                 // Update temperature
-                var tempK = (FixedPoint2)focusData.Value.TemperatureData.Item1;
-                var tempC = (FixedPoint2)TemperatureHelpers.KelvinToCelsius(tempK.Float());
+                var tempK = (FixedPoint2) focusData.Value.TemperatureData.Item1;
+                var tempC = (FixedPoint2) TemperatureHelpers.KelvinToCelsius(tempK.Float());
 
-                TemperatureLabel.Text = Loc.GetString("atmos-alerts-window-temperature-value", ("valueInC", tempC), ("valueInK", tempK));
+                TemperatureLabel.Text = Loc.GetString("atmos-alerts-window-temperature-value",
+                    ("valueInC", tempC),
+                    ("valueInK", tempK));
                 TemperatureLabel.FontColorOverride = GetAlarmStateColor(focusData.Value.TemperatureData.Item2);
 
                 // Update pressure
-                PressureLabel.Text = Loc.GetString("atmos-alerts-window-pressure-value", ("value", (FixedPoint2)focusData.Value.PressureData.Item1));
+                PressureLabel.Text = Loc.GetString("atmos-alerts-window-pressure-value",
+                    ("value", (FixedPoint2) focusData.Value.PressureData.Item1));
                 PressureLabel.FontColorOverride = GetAlarmStateColor(focusData.Value.PressureData.Item2);
 
                 // Update oxygenation
-                var oxygenPercent = (FixedPoint2)0f;
+                var oxygenPercent = (FixedPoint2) 0f;
                 var oxygenAlert = AtmosAlarmType.Invalid;
 
                 if (focusData.Value.GasData.TryGetValue(Gas.Oxygen, out var oxygenData))
@@ -128,7 +135,8 @@ public sealed partial class AtmosAlarmEntryContainer : BoxContainer
                     oxygenAlert = oxygenData.Item3;
                 }
 
-                OxygenationLabel.Text = Loc.GetString("atmos-alerts-window-oxygenation-value", ("value", oxygenPercent));
+                OxygenationLabel.Text =
+                    Loc.GetString("atmos-alerts-window-oxygenation-value", ("value", oxygenPercent));
                 OxygenationLabel.FontColorOverride = GetAlarmStateColor(oxygenAlert);
 
                 // Update other present gases
@@ -140,7 +148,7 @@ public sealed partial class AtmosAlarmEntryContainer : BoxContainer
                 if (keyValuePairs.Count == 0)
                 {
                     // No other gases
-                    var gasLabel = new Label()
+                    var gasLabel = new Label
                     {
                         Text = Loc.GetString("atmos-alerts-window-other-gases-value-nil"),
                         FontOverride = normalFont,
@@ -158,14 +166,18 @@ public sealed partial class AtmosAlarmEntryContainer : BoxContainer
                 else
                 {
                     // Add an entry for each gas
-                    foreach ((var gas, (var mol, var percent, var alert)) in keyValuePairs)
+                    foreach (var (gas, (mol, percent, alert)) in keyValuePairs)
                     {
                         FixedPoint2 gasPercent = percent * 100f;
-                        var gasAbbreviation = Atmospherics.GasAbbreviations.GetValueOrDefault(gas, Loc.GetString("gas-unknown-abbreviation"));
+                        var gasAbbreviation =
+                            Atmospherics.GasAbbreviations.GetValueOrDefault(gas,
+                                Loc.GetString("gas-unknown-abbreviation"));
 
-                        var gasLabel = new Label()
+                        var gasLabel = new Label
                         {
-                            Text = Loc.GetString("atmos-alerts-window-other-gases-value", ("shorthand", gasAbbreviation), ("value", gasPercent)),
+                            Text = Loc.GetString("atmos-alerts-window-other-gases-value",
+                                ("shorthand", gasAbbreviation),
+                                ("value", gasPercent)),
                             FontOverride = normalFont,
                             FontColorOverride = GetAlarmStateColor(alert),
                             HorizontalAlignment = HAlignment.Center,

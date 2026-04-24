@@ -13,10 +13,10 @@ namespace Content.Client._Shitmed.Medical.Surgery;
 [GenerateTypedNameReferences]
 public sealed partial class SurgeryStepButton : ChoiceControl
 {
-    public EntityUid Step { get; set; }
-
     public SurgeryStepButton()
     {
         RobustXamlLoader.Load(this);
     }
+
+    public EntityUid Step { get; set; }
 }

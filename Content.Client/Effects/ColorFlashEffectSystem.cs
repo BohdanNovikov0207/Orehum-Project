@@ -52,22 +52,22 @@ using Robust.Shared.Animations;
 using Robust.Shared.Collections;
 using Robust.Shared.Player;
 using Robust.Shared.Timing;
-using Robust.Shared.Utility;
 
 namespace Content.Client.Effects;
 
 public sealed class ColorFlashEffectSystem : SharedColorFlashEffectSystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly AnimationPlayerSystem _animation = default!;
-    [Dependency] private readonly IComponentFactory _factory = default!; // EE Plasmamen Change
-    [Dependency] private readonly SpriteSystem _sprite = default!;
     /// <summary>
     /// It's a little on the long side but given we use multiple colours denoting what happened it makes it easier to register.
     /// </summary>
     private const float AnimationLength = 0.30f;
+
     private const string AnimationKey = "color-flash-effect";
-    private ValueList<EntityUid> _toRemove = new();
+    [Dependency] private readonly AnimationPlayerSystem _animation = default!;
+    [Dependency] private readonly IComponentFactory _factory = default!; // EE Plasmamen Change
+    [Dependency] private readonly SpriteSystem _sprite = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    private ValueList<EntityUid> _toRemove;
 
     public override void Initialize()
     {
@@ -78,23 +78,28 @@ public sealed class ColorFlashEffectSystem : SharedColorFlashEffectSystem
     }
 
     // EE Plasmamen Change
-    public override void RaiseEffect(Color color, List<EntityUid> entities, Filter filter, float? animationLength = null)
+    public override void RaiseEffect(Color color,
+        List<EntityUid> entities,
+        Filter filter,
+        float? animationLength = null)
     {
         if (!_timing.IsFirstTimePredicted)
             return;
 
-        OnColorFlashEffect(new ColorFlashEffectEvent(color, GetNetEntityList(entities), animationLength)); // EE Plasmamen Change
+        OnColorFlashEffect(new ColorFlashEffectEvent(color,
+            GetNetEntityList(entities),
+            animationLength)); // EE Plasmamen Change
     }
 
-    private void OnEffectAnimationCompleted(EntityUid uid, ColorFlashEffectComponent component, AnimationCompletedEvent args)
+    private void OnEffectAnimationCompleted(EntityUid uid,
+        ColorFlashEffectComponent component,
+        AnimationCompletedEvent args)
     {
         if (args.Key != AnimationKey)
             return;
 
         if (TryComp<SpriteComponent>(uid, out var sprite))
-        {
             _sprite.SetColor((uid, sprite), component.Color);
-        }
     }
 
     public override void Update(float frameTime)
@@ -120,7 +125,10 @@ public sealed class ColorFlashEffectSystem : SharedColorFlashEffectSystem
     }
 
     // EE Plasmamen Change
-    private Animation? GetDamageAnimation(EntityUid uid, Color color, SpriteComponent? sprite = null, float? animationLength = null)
+    private Animation? GetDamageAnimation(EntityUid uid,
+        Color color,
+        SpriteComponent? sprite = null,
+        float? animationLength = null)
     {
         if (!Resolve(uid, ref sprite, false))
             return null;
@@ -139,10 +147,11 @@ public sealed class ColorFlashEffectSystem : SharedColorFlashEffectSystem
                     KeyFrames =
                     {
                         new AnimationTrackProperty.KeyFrame(color, 0f),
-                        new AnimationTrackProperty.KeyFrame(sprite.Color, animationLength ?? AnimationLength) // EE Plasmamen Change
-                    }
-                }
-            }
+                        new AnimationTrackProperty.KeyFrame(sprite.Color,
+                            animationLength ?? AnimationLength), // EE Plasmamen Change
+                    },
+                },
+            },
         };
     }
 
@@ -155,9 +164,7 @@ public sealed class ColorFlashEffectSystem : SharedColorFlashEffectSystem
             var ent = GetEntity(nent);
 
             if (Deleted(ent) || !TryComp(ent, out SpriteComponent? sprite))
-            {
                 continue;
-            }
 
             // EE Plasmamen Change Start
             if (!TryComp(ent, out AnimationPlayerComponent? player))
@@ -192,9 +199,7 @@ public sealed class ColorFlashEffectSystem : SharedColorFlashEffectSystem
             _animation.Stop(ent, AnimationKey);
 
             if (animation == null)
-            {
                 continue;
-            }
 
             var targetEv = new GetFlashEffectTargetEvent(ent);
             RaiseLocalEvent(ent, ref targetEv);

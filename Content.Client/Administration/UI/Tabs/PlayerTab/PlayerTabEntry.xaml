@@ -18,26 +18,26 @@ SPDX-License-Identifier: AGPL-3.0-or-later
         <Label Name="UsernameLabel"
                SizeFlagsStretchRatio="3"
                HorizontalExpand="True"
-               ClipText="True"/>
-        <customControls:VSeparator/>
+               ClipText="True" />
+        <customControls:VSeparator />
         <Label Name="CharacterLabel"
                SizeFlagsStretchRatio="3"
                HorizontalExpand="True"
-               ClipText="True"/>
-        <customControls:VSeparator/>
+               ClipText="True" />
+        <customControls:VSeparator />
         <Label Name="JobLabel"
                SizeFlagsStretchRatio="2"
                HorizontalExpand="True"
-               ClipText="True"/>
-        <customControls:VSeparator/>
+               ClipText="True" />
+        <customControls:VSeparator />
         <Label Name="RoleTypeLabel"
                SizeFlagsStretchRatio="2"
                HorizontalExpand="True"
-               ClipText="True"/>
-        <customControls:VSeparator/>
+               ClipText="True" />
+        <customControls:VSeparator />
         <Label Name="OverallPlaytimeLabel"
                SizeFlagsStretchRatio="1"
                HorizontalExpand="True"
-               ClipText="True"/>
+               ClipText="True" />
     </BoxContainer>
 </PanelContainer>

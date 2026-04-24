@@ -9,8 +9,12 @@ using Robust.Client.UserInterface.CustomControls;
 using Robust.Client.UserInterface.XAML;
 
 namespace Content.Client._Shitmed.Antags.Abductor;
+
 [GenerateTypedNameReferences]
 public sealed partial class AbductorConsoleWindow : DefaultWindow
 {
-    public AbductorConsoleWindow() => RobustXamlLoader.Load(this);
+    public AbductorConsoleWindow()
+    {
+        RobustXamlLoader.Load(this);
+    }
 }

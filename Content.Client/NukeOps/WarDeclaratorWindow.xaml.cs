@@ -26,8 +26,6 @@ public sealed partial class WarDeclaratorWindow : FancyWindow
     [Dependency] private readonly IGameTiming _gameTiming = default!;
     [Dependency] private readonly ILocalizationManager _localizationManager = default!;
 
-    public event Action<string>? OnActivated;
-
     private TimeSpan _endTime;
     private TimeSpan _shuttleDisabledTime;
     private WarConditionStatus _status;
@@ -37,15 +35,14 @@ public sealed partial class WarDeclaratorWindow : FancyWindow
         RobustXamlLoader.Load(this);
         IoCManager.InjectDependencies(this);
 
-        WarButton.OnPressed += (_) => OnActivated?.Invoke(Rope.Collapse(MessageEdit.TextRope));
+        WarButton.OnPressed += _ => OnActivated?.Invoke(Rope.Collapse(MessageEdit.TextRope));
 
         MessageEdit.Placeholder = new Rope.Leaf(_localizationManager.GetString("war-declarator-message-placeholder"));
     }
 
-    protected override void FrameUpdate(FrameEventArgs args)
-    {
-        UpdateTimer();
-    }
+    public event Action<string>? OnActivated;
+
+    protected override void FrameUpdate(FrameEventArgs args) => UpdateTimer();
 
     public void UpdateState(WarDeclaratorBoundUserInterfaceState state)
     {
@@ -59,7 +56,6 @@ public sealed partial class WarDeclaratorWindow : FancyWindow
         _status = state.Status.Value;
 
         UpdateStatus(state.Status.Value);
-
     }
 
     private void UpdateStatus(WarConditionStatus status)
@@ -108,12 +104,13 @@ public sealed partial class WarDeclaratorWindow : FancyWindow
 
     private void UpdateTimer()
     {
-        switch(_status)
+        switch (_status)
         {
             case WarConditionStatus.YesWar:
                 var timeLeft = _endTime.Subtract(_gameTiming.CurTime);
                 if (timeLeft > TimeSpan.Zero)
-                    InfoLabel.Text = Loc.GetString("war-declarator-boost-timer", ("time", timeLeft.ToString("mm\\:ss")));
+                    InfoLabel.Text = Loc.GetString("war-declarator-boost-timer",
+                        ("time", timeLeft.ToString("mm\\:ss")));
                 else
                     UpdateStatus(WarConditionStatus.NoWarTimeout);
                 break;

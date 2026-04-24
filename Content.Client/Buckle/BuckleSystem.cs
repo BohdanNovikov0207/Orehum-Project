@@ -53,10 +53,10 @@ namespace Content.Client.Buckle;
 
 internal sealed class BuckleSystem : SharedBuckleSystem
 {
-    [Dependency] private readonly RotationVisualizerSystem _rotationVisualizerSystem = default!;
     [Dependency] private readonly IEyeManager _eye = default!;
-    [Dependency] private readonly SharedTransformSystem _xformSystem = default!;
+    [Dependency] private readonly RotationVisualizerSystem _rotationVisualizerSystem = default!;
     [Dependency] private readonly SpriteSystem _sprite = default!;
+    [Dependency] private readonly SharedTransformSystem _xformSystem = default!;
 
     public override void Initialize()
     {
@@ -72,9 +72,7 @@ internal sealed class BuckleSystem : SharedBuckleSystem
     private void OnMobCollide(Entity<BuckleComponent> ent, ref AttemptMobCollideEvent args)
     {
         if (ent.Comp.Buckled)
-        {
             args.Cancelled = true;
-        }
     }
 
     private void OnStrapMoveEvent(EntityUid uid, StrapComponent component, ref MoveEvent args)
@@ -98,7 +96,8 @@ internal sealed class BuckleSystem : SharedBuckleSystem
         if (!TryComp<SpriteComponent>(uid, out var strapSprite))
             return;
 
-        var angle = _xformSystem.GetWorldRotation(uid) + _eye.CurrentEye.Rotation; // Get true screen position, or close enough
+        var angle = _xformSystem.GetWorldRotation(uid) +
+                    _eye.CurrentEye.Rotation; // Get true screen position, or close enough
 
         var isNorth = angle.GetCardinalDir() == Direction.North;
         foreach (var buckledEntity in component.BuckledEntities)
@@ -114,13 +113,9 @@ internal sealed class BuckleSystem : SharedBuckleSystem
                 return;
             buckle.OriginalDrawDepth ??= buckledSprite.DrawDepth;
             if (isNorth)
-            {
                 _sprite.SetDrawDepth((buckledEntity, buckledSprite), strapSprite.DrawDepth - 1);
-            }
             else
-            {
                 _sprite.SetDrawDepth((buckledEntity, buckledSprite), strapSprite.DrawDepth + 1);
-            }
             // Goobstation - end
         }
     }
@@ -144,8 +139,8 @@ internal sealed class BuckleSystem : SharedBuckleSystem
         ent.Comp.OriginalDrawDepth ??= buckledSprite.DrawDepth;
         _sprite.SetDrawDepth(
             (ent.Owner, buckledSprite),
-        strapSprite.DrawDepth + (isNorth ? -1 : 1)
-            );
+            strapSprite.DrawDepth + (isNorth ? -1 : 1)
+        );
         // Goobstation - end
     }
 

@@ -16,10 +16,8 @@ public sealed class CustomObjectiveSummaryUIController : UIController
         SubscribeNetworkEvent<CustomObjectiveSummaryOpenMessage>(OnCustomObjectiveSummaryOpen);
     }
 
-    private void OnCustomObjectiveSummaryOpen(CustomObjectiveSummaryOpenMessage msg, EntitySessionEventArgs args)
-    {
+    private void OnCustomObjectiveSummaryOpen(CustomObjectiveSummaryOpenMessage msg, EntitySessionEventArgs args) =>
         OpenWindow();
-    }
 
     public void OpenWindow()
     {

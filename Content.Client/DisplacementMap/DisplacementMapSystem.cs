@@ -15,10 +15,8 @@ public sealed class DisplacementMapSystem : EntitySystem
     [Dependency] private readonly ISerializationManager _serialization = default!;
     [Dependency] private readonly SpriteSystem _sprite = default!;
 
-    private static string? BuildDisplacementLayerKey(object key)
-    {
-        return key.ToString() is null ? null : $"{key}-displacement";
-    }
+    private static string? BuildDisplacementLayerKey(object key) =>
+        key.ToString() is null ? null : $"{key}-displacement";
 
     /// <summary>
     /// Attempting to apply a displacement map to a specific layer of SpriteComponent
@@ -49,7 +47,7 @@ public sealed class DisplacementMapSystem : EntitySystem
         //allows you not to write it every time in the YML
         foreach (var pair in data.SizeMaps)
         {
-            pair.Value.CopyToShaderParameters ??= new()
+            pair.Value.CopyToShaderParameters ??= new PrototypeCopyToShaderParameters
             {
                 LayerKey = "dummy",
                 ParameterTexture = "displacementMap",

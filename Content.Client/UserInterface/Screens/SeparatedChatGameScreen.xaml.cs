@@ -44,16 +44,14 @@ public sealed partial class SeparatedChatGameScreen : InGameScreen
         ViewportContainer.OnResized += ResizeActionContainer;
     }
 
+    public override ChatBox ChatBox => GetWidget<ChatBox>()!;
+
     private void ResizeActionContainer()
     {
         float indent = 20;
         Actions.ActionsContainer.MaxGridWidth = ViewportContainer.Size.X - indent;
     }
 
-    public override ChatBox ChatBox => GetWidget<ChatBox>()!;
-
-    public override void SetChatSize(Vector2 size)
-    {
+    public override void SetChatSize(Vector2 size) =>
         ScreenContainer.ResizeMode = SplitContainer.SplitResizeMode.RespectChildrenMinSize;
-    }
 }

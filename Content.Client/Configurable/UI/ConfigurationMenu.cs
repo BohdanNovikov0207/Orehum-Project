@@ -19,105 +19,101 @@ using System.Text.RegularExpressions;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.CustomControls;
-using static Content.Shared.Configurable.ConfigurationComponent;
 using static Robust.Client.UserInterface.Controls.BaseButton;
 using static Robust.Client.UserInterface.Controls.BoxContainer;
 
-namespace Content.Client.Configurable.UI
+namespace Content.Client.Configurable.UI;
+
+public sealed class ConfigurationMenu : DefaultWindow
 {
-    public sealed class ConfigurationMenu : DefaultWindow
+    public readonly BoxContainer Column;
+
+    public readonly List<(string name, LineEdit input)> Inputs;
+    public readonly BoxContainer Row;
+
+    public ConfigurationMenu()
     {
-        public readonly BoxContainer Column;
-        public readonly BoxContainer Row;
+        MinSize = SetSize = new Vector2(300, 250);
 
-        public readonly List<(string name, LineEdit input)> Inputs;
+        Inputs = new List<(string name, LineEdit input)>();
 
-        [ViewVariables]
-        public Regex? Validation { get; internal set; }
+        Title = Loc.GetString("configuration-menu-device-title");
 
-        public event Action<Dictionary<string, string>>? OnConfiguration;
-
-        public ConfigurationMenu()
+        var baseContainer = new BoxContainer
         {
-            MinSize = SetSize = new Vector2(300, 250);
+            Orientation = LayoutOrientation.Vertical,
+            VerticalExpand = true,
+            HorizontalExpand = true,
+        };
 
-            Inputs = new List<(string name, LineEdit input)>();
+        Column = new BoxContainer
+        {
+            Orientation = LayoutOrientation.Vertical,
+            Margin = new Thickness(8),
+            SeparationOverride = 16,
+        };
 
-            Title = Loc.GetString("configuration-menu-device-title");
+        Row = new BoxContainer
+        {
+            Orientation = LayoutOrientation.Horizontal,
+            SeparationOverride = 16,
+            HorizontalExpand = true,
+        };
 
-            var baseContainer = new BoxContainer
-            {
-                Orientation = LayoutOrientation.Vertical,
-                VerticalExpand = true,
-                HorizontalExpand = true
-            };
+        var confirmButton = new Button
+        {
+            Text = Loc.GetString("configuration-menu-confirm"),
+            HorizontalAlignment = HAlignment.Center,
+            VerticalAlignment = VAlignment.Center,
+        };
 
-            Column = new BoxContainer
-            {
-                Orientation = LayoutOrientation.Vertical,
-                Margin = new Thickness(8),
-                SeparationOverride = 16,
-            };
+        confirmButton.OnButtonUp += OnConfirm;
 
-            Row = new BoxContainer
-            {
-                Orientation = LayoutOrientation.Horizontal,
-                SeparationOverride = 16,
-                HorizontalExpand = true
-            };
+        var outerColumn = new ScrollContainer
+        {
+            VerticalExpand = true,
+            HorizontalExpand = true,
+            ModulateSelfOverride = Color.FromHex("#202025"),
+        };
 
-            var confirmButton = new Button
-            {
-                Text = Loc.GetString("configuration-menu-confirm"),
-                HorizontalAlignment = HAlignment.Center,
-                VerticalAlignment = VAlignment.Center
-            };
+        outerColumn.AddChild(Column);
+        baseContainer.AddChild(outerColumn);
+        baseContainer.AddChild(confirmButton);
+        Contents.AddChild(baseContainer);
+    }
 
-            confirmButton.OnButtonUp += OnConfirm;
+    [ViewVariables]
+    public Regex? Validation { get; internal set; }
 
-            var outerColumn = new ScrollContainer
-            {
-                VerticalExpand = true,
-                HorizontalExpand = true,
-                ModulateSelfOverride = Color.FromHex("#202025")
-            };
+    public event Action<Dictionary<string, string>>? OnConfiguration;
 
-            outerColumn.AddChild(Column);
-            baseContainer.AddChild(outerColumn);
-            baseContainer.AddChild(confirmButton);
-            Contents.AddChild(baseContainer);
+    private void OnConfirm(ButtonEventArgs args)
+    {
+        var config = GenerateDictionary(Inputs, "Text");
+        OnConfiguration?.Invoke(config);
+        Close();
+    }
+
+    public bool Validate(string value) => Validation?.IsMatch(value) != false;
+
+    private Dictionary<string, string> GenerateDictionary(IEnumerable<(string name, LineEdit input)> inputs,
+        string propertyName)
+    {
+        var dictionary = new Dictionary<string, string>();
+
+        foreach (var input in inputs)
+        {
+            dictionary.Add(input.name, input.input.Text);
         }
 
-        private void OnConfirm(ButtonEventArgs args)
+        return dictionary;
+    }
+
+    public static void CopyProperties<T>(T from, T to) where T : Control
+    {
+        foreach (var property in from.AllAttachedProperties)
         {
-            var config = GenerateDictionary(Inputs, "Text");
-            OnConfiguration?.Invoke(config);
-            Close();
-        }
-
-        public bool Validate(string value)
-        {
-            return Validation?.IsMatch(value) != false;
-        }
-
-        private Dictionary<string, string> GenerateDictionary(IEnumerable<(string name, LineEdit input)> inputs, string propertyName)
-        {
-            var dictionary = new Dictionary<string, string>();
-
-            foreach (var input in inputs)
-            {
-                dictionary.Add(input.name, input.input.Text);
-            }
-
-            return dictionary;
-        }
-
-        public static void CopyProperties<T>(T from, T to) where T : Control
-        {
-            foreach (var property in from.AllAttachedProperties)
-            {
-                to.SetValue(property.Key, property.Value);
-            }
+            to.SetValue(property.Key, property.Value);
         }
     }
 }

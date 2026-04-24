@@ -11,8 +11,8 @@ SPDX-License-Identifier: MIT
 <BoxContainer xmlns="https://spacestation14.io"
               xmlns:cc="clr-namespace:Content.Client.Administration.UI.CustomControls"
               Orientation="Vertical">
-    <BoxContainer Name ="MetadataContainer" Orientation="Horizontal">
-        <TextureRect Name="SeverityRect" Margin="2"/>
+    <BoxContainer Name="MetadataContainer" Orientation="Horizontal">
+        <TextureRect Name="SeverityRect" Margin="2" />
         <Label Name="TimeLabel" Margin="4 0" />
         <cc:HSeparator Margin="4 0" />
         <Label Name="ServerLabel" />

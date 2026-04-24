@@ -40,7 +40,7 @@ public sealed class PinpointerSystem : SharedPinpointerSystem
         var angle = component.DistanceToTarget switch
         {
             Distance.Close or Distance.Medium or Distance.Far => component.ArrowAngle + eye.Rotation,
-            _ => Angle.Zero
+            _ => Angle.Zero,
         };
 
         _sprite.LayerSetRotation((args.SpriteViewEnt, sprite), PinpointerLayers.Screen, angle);
@@ -70,6 +70,7 @@ public sealed class PinpointerSystem : SharedPinpointerSystem
                 sprite.LayerSetRotation(PinpointerLayers.Screen, Angle.Zero); // Goob edit
                 continue;
             }
+
             var eye = _eyeManager.CurrentEye;
             var angle = pinpointer.ArrowAngle + eye.Rotation;
 

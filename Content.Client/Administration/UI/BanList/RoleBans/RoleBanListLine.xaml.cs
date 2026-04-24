@@ -14,10 +14,6 @@ namespace Content.Client.Administration.UI.BanList.RoleBans;
 [GenerateTypedNameReferences]
 public sealed partial class RoleBanListLine : BoxContainer, IBanListLine<SharedServerRoleBan>
 {
-    public SharedServerRoleBan Ban { get; }
-
-    public event Action<RoleBanListLine>? IdsClicked;
-
     public RoleBanListLine(SharedServerRoleBan ban)
     {
         RobustXamlLoader.Load(this);
@@ -29,10 +25,11 @@ public sealed partial class RoleBanListLine : BoxContainer, IBanListLine<SharedS
         Role.Text = ban.Role;
     }
 
-    private void IdsPressed(ButtonEventArgs buttonEventArgs)
-    {
-        IdsClicked?.Invoke(this);
-    }
+    public SharedServerRoleBan Ban { get; }
+
+    public event Action<RoleBanListLine>? IdsClicked;
+
+    private void IdsPressed(ButtonEventArgs buttonEventArgs) => IdsClicked?.Invoke(this);
 
     protected override void Dispose(bool disposing)
     {

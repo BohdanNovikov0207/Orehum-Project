@@ -36,11 +36,11 @@ namespace Content.Client.CombatMode;
 
 public sealed class CombatModeSystem : SharedCombatModeSystem
 {
+    [Dependency] private readonly IConfigurationManager _cfg = default!;
+    [Dependency] private readonly IEyeManager _eye = default!;
+    [Dependency] private readonly IInputManager _inputManager = default!;
     [Dependency] private readonly IOverlayManager _overlayManager = default!;
     [Dependency] private readonly IPlayerManager _playerManager = default!;
-    [Dependency] private readonly IConfigurationManager _cfg = default!;
-    [Dependency] private readonly IInputManager _inputManager = default!;
-    [Dependency] private readonly IEyeManager _eye = default!;
 
     /// <summary>
     /// Raised whenever combat mode changes.
@@ -56,10 +56,8 @@ public sealed class CombatModeSystem : SharedCombatModeSystem
         Subs.CVar(_cfg, CCVars.CombatModeIndicatorsPointShow, OnShowCombatIndicatorsChanged, true);
     }
 
-    private void OnHandleState(EntityUid uid, CombatModeComponent component, ref AfterAutoHandleStateEvent args)
-    {
+    private void OnHandleState(EntityUid uid, CombatModeComponent component, ref AfterAutoHandleStateEvent args) =>
         UpdateHud(uid);
-    }
 
     public override void Shutdown()
     {
@@ -84,17 +82,12 @@ public sealed class CombatModeSystem : SharedCombatModeSystem
         UpdateHud(entity);
     }
 
-    protected override bool IsNpc(EntityUid uid)
-    {
-        return HasComp<HTNComponent>(uid);
-    }
+    protected override bool IsNpc(EntityUid uid) => HasComp<HTNComponent>(uid);
 
     private void UpdateHud(EntityUid entity)
     {
         if (entity != _playerManager.LocalEntity || !Timing.IsFirstTimePredicted)
-        {
             return;
-        }
 
         var inCombatMode = IsInCombatMode();
         LocalPlayerCombatModeUpdated?.Invoke(inCombatMode);
@@ -112,8 +105,6 @@ public sealed class CombatModeSystem : SharedCombatModeSystem
                 EntityManager.System<HandsSystem>()));
         }
         else
-        {
             _overlayManager.RemoveOverlay<CombatModeIndicatorsOverlay>();
-        }
     }
 }

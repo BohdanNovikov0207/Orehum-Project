@@ -4,8 +4,8 @@
 // SPDX-License-Identifier: MIT
 
 using Content.Client.UserInterface.Fragments;
-using Content.Shared.CartridgeLoader.Cartridges;
 using Content.Shared.CartridgeLoader;
+using Content.Shared.CartridgeLoader.Cartridges;
 using Robust.Client.UserInterface;
 
 namespace Content.Client.CartridgeLoader.Cartridges;
@@ -14,10 +14,7 @@ public sealed partial class NewsReaderUi : UIFragment
 {
     private NewsReaderUiFragment? _fragment;
 
-    public override Control GetUIFragmentRoot()
-    {
-        return _fragment!;
-    }
+    public override Control GetUIFragmentRoot() => _fragment!;
 
     public override void Setup(BoundUserInterface userInterface, EntityUid? fragmentOwner)
     {

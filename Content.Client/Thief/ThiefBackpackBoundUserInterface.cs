@@ -40,13 +40,7 @@ public sealed class ThiefBackpackBoundUserInterface : BoundUserInterface
         _window?.UpdateState(current);
     }
 
-    public void SendChangeSelected(int setNumber)
-    {
-        SendMessage(new ThiefBackpackChangeSetMessage(setNumber));
-    }
+    public void SendChangeSelected(int setNumber) => SendMessage(new ThiefBackpackChangeSetMessage(setNumber));
 
-    public void SendApprove()
-    {
-        SendMessage(new ThiefBackpackApproveMessage());
-    }
+    public void SendApprove() => SendMessage(new ThiefBackpackApproveMessage());
 }

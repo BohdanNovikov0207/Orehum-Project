@@ -24,27 +24,35 @@ public sealed class RadiationCollectorSystem : VisualizerSystem<RadiationCollect
         comp.ActivateAnimation = new Animation
         {
             Length = TimeSpan.FromSeconds(0.8f),
-            AnimationTracks = {
-                new AnimationTrackSpriteFlick() {
+            AnimationTracks =
+            {
+                new AnimationTrackSpriteFlick
+                {
                     LayerKey = RadiationCollectorVisualLayers.Main,
-                    KeyFrames = {new AnimationTrackSpriteFlick.KeyFrame(comp.ActivatingState, 0f)}
+                    KeyFrames = { new AnimationTrackSpriteFlick.KeyFrame(comp.ActivatingState, 0f) },
                 }, // TODO: Make this play a sound when activating a radiation collector.
-            }
+            },
         };
 
         comp.DeactiveAnimation = new Animation
         {
             Length = TimeSpan.FromSeconds(0.8f),
-            AnimationTracks = {
-                new AnimationTrackSpriteFlick() {
+            AnimationTracks =
+            {
+                new AnimationTrackSpriteFlick
+                {
                     LayerKey = RadiationCollectorVisualLayers.Main,
-                    KeyFrames = {new AnimationTrackSpriteFlick.KeyFrame(comp.DeactivatingState, 0f)}
+                    KeyFrames = { new AnimationTrackSpriteFlick.KeyFrame(comp.DeactivatingState, 0f) },
                 }, // TODO: Make this play a sound when deactivating a radiation collector.
-            }
+            },
         };
     }
 
-    private void UpdateVisuals(EntityUid uid, RadiationCollectorVisualState state, RadiationCollectorComponent comp, SpriteComponent sprite, AnimationPlayerComponent? animPlayer = null)
+    private void UpdateVisuals(EntityUid uid,
+        RadiationCollectorVisualState state,
+        RadiationCollectorComponent comp,
+        SpriteComponent sprite,
+        AnimationPlayerComponent? animPlayer = null)
     {
         if (state == comp.CurrentState)
             return;
@@ -55,7 +63,8 @@ public sealed class RadiationCollectorSystem : VisualizerSystem<RadiationCollect
 
         var targetState = state & RadiationCollectorVisualState.Active;
         var destinationState = comp.CurrentState & RadiationCollectorVisualState.Active;
-        if (targetState != destinationState) // If where we're going is not where we want to be then we must go there next.
+        if (targetState !=
+            destinationState) // If where we're going is not where we want to be then we must go there next.
             targetState |= RadiationCollectorVisualState.Deactivating; // Convert to transition state.
 
         comp.CurrentState = state;
@@ -63,10 +72,14 @@ public sealed class RadiationCollectorSystem : VisualizerSystem<RadiationCollect
         switch (targetState)
         {
             case RadiationCollectorVisualState.Activating:
-                AnimationSystem.Play((uid, animPlayer), comp.ActivateAnimation, RadiationCollectorComponent.AnimationKey);
+                AnimationSystem.Play((uid, animPlayer),
+                    comp.ActivateAnimation,
+                    RadiationCollectorComponent.AnimationKey);
                 break;
             case RadiationCollectorVisualState.Deactivating:
-                AnimationSystem.Play((uid, animPlayer), comp.DeactiveAnimation, RadiationCollectorComponent.AnimationKey);
+                AnimationSystem.Play((uid, animPlayer),
+                    comp.DeactiveAnimation,
+                    RadiationCollectorComponent.AnimationKey);
                 break;
 
             case RadiationCollectorVisualState.Active:
@@ -87,7 +100,9 @@ public sealed class RadiationCollectorSystem : VisualizerSystem<RadiationCollect
         if (!TryComp<AnimationPlayerComponent>(uid, out var animPlayer))
             return; // Why doesn't AnimationCompletedEvent propagate the AnimationPlayerComponent? No idea, but it's in engine so I'm not touching it.
 
-        if (!AppearanceSystem.TryGetData<RadiationCollectorVisualState>(uid, RadiationCollectorVisuals.VisualState, out var state))
+        if (!AppearanceSystem.TryGetData<RadiationCollectorVisualState>(uid,
+                RadiationCollectorVisuals.VisualState,
+                out var state))
             state = comp.CurrentState;
 
         // Convert to terminal state.
@@ -96,14 +111,19 @@ public sealed class RadiationCollectorSystem : VisualizerSystem<RadiationCollect
         UpdateVisuals(uid, targetState, comp, sprite, animPlayer);
     }
 
-    protected override void OnAppearanceChange(EntityUid uid, RadiationCollectorComponent comp, ref AppearanceChangeEvent args)
+    protected override void OnAppearanceChange(EntityUid uid,
+        RadiationCollectorComponent comp,
+        ref AppearanceChangeEvent args)
     {
         if (args.Sprite == null)
             return;
         if (!TryComp<AnimationPlayerComponent>(uid, out var animPlayer))
             return;
 
-        if (!AppearanceSystem.TryGetData<RadiationCollectorVisualState>(uid, RadiationCollectorVisuals.VisualState, out var state, args.Component))
+        if (!AppearanceSystem.TryGetData<RadiationCollectorVisualState>(uid,
+                RadiationCollectorVisuals.VisualState,
+                out var state,
+                args.Component))
             state = RadiationCollectorVisualState.Deactive;
 
         UpdateVisuals(uid, state, comp, args.Sprite, animPlayer);
@@ -112,5 +132,5 @@ public sealed class RadiationCollectorSystem : VisualizerSystem<RadiationCollect
 
 public enum RadiationCollectorVisualLayers : byte
 {
-    Main
+    Main,
 }

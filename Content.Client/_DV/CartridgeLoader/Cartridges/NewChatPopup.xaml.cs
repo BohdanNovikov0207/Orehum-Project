@@ -21,8 +21,6 @@ public sealed partial class NewChatPopup : DefaultWindow
     private const int MaxInputLength = 16;
     private const int MaxNumberLength = 4; // i hardcoded it to be 4 so suffer
 
-    public event Action<uint, string, string?>? OnChatCreated;
-
     public NewChatPopup()
     {
         RobustXamlLoader.Load(this);
@@ -65,6 +63,8 @@ public sealed partial class NewChatPopup : DefaultWindow
                 JobInput.Text = args.Text[..MaxInputLength];
         };
     }
+
+    public event Action<uint, string, string?>? OnChatCreated;
 
     private void ValidateInputs()
     {

@@ -32,25 +32,17 @@ public sealed class FloorOcclusionSystem : SharedFloorOcclusionSystem
         SubscribeLocalEvent<FloorOcclusionComponent, AfterAutoHandleStateEvent>(OnOcclusionAuto);
     }
 
-    private void OnOcclusionAuto(Entity<FloorOcclusionComponent> ent, ref AfterAutoHandleStateEvent args)
-    {
+    private void OnOcclusionAuto(Entity<FloorOcclusionComponent> ent, ref AfterAutoHandleStateEvent args) =>
         SetShader(ent.Owner, ent.Comp.Enabled);
-    }
 
-    private void OnOcclusionStartup(Entity<FloorOcclusionComponent> ent, ref ComponentStartup args)
-    {
+    private void OnOcclusionStartup(Entity<FloorOcclusionComponent> ent, ref ComponentStartup args) =>
         SetShader(ent.Owner, ent.Comp.Enabled);
-    }
 
-    private void OnOcclusionShutdown(Entity<FloorOcclusionComponent> ent, ref ComponentShutdown args)
-    {
+    private void OnOcclusionShutdown(Entity<FloorOcclusionComponent> ent, ref ComponentShutdown args) =>
         SetShader(ent.Owner, false);
-    }
 
-    protected override void SetEnabled(Entity<FloorOcclusionComponent> entity)
-    {
+    protected override void SetEnabled(Entity<FloorOcclusionComponent> entity) =>
         SetShader(entity.Owner, entity.Comp.Enabled);
-    }
 
     private void SetShader(Entity<SpriteComponent?> sprite, bool enabled)
     {
@@ -63,12 +55,8 @@ public sealed class FloorOcclusionSystem : SharedFloorOcclusionSystem
             return;
 
         if (enabled)
-        {
             sprite.Comp.PostShader = shader;
-        }
         else
-        {
             sprite.Comp.PostShader = null;
-        }
     }
 }

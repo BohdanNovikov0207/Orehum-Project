@@ -13,7 +13,9 @@ namespace Content.Client.Storage.Visualizers;
 
 public sealed class StorageFillVisualizerSystem : VisualizerSystem<StorageFillVisualizerComponent>
 {
-    protected override void OnAppearanceChange(EntityUid uid, StorageFillVisualizerComponent component, ref AppearanceChangeEvent args)
+    protected override void OnAppearanceChange(EntityUid uid,
+        StorageFillVisualizerComponent component,
+        ref AppearanceChangeEvent args)
     {
         if (args.Sprite == null)
             return;

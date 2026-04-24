@@ -17,6 +17,16 @@ namespace Content.Client.PDA;
 [GenerateTypedNameReferences]
 public partial class PdaWindow : BaseWindow
 {
+    public PdaWindow()
+    {
+        RobustXamlLoader.Load(this);
+
+        CloseButton.OnPressed += _ => Close();
+        XamlChildren = ContentsContainer.Children;
+
+        AccentH.Visible = false;
+        AccentV.Visible = false;
+    }
 
     public string? BorderColor
     {
@@ -47,19 +57,5 @@ public partial class PdaWindow : BaseWindow
         }
     }
 
-    public PdaWindow()
-    {
-        RobustXamlLoader.Load(this);
-
-        CloseButton.OnPressed += _ => Close();
-        XamlChildren = ContentsContainer.Children;
-
-        AccentH.Visible = false;
-        AccentV.Visible = false;
-    }
-
-    protected override DragMode GetDragModeFor(Vector2 relativeMousePos)
-    {
-        return DragMode.Move;
-    }
+    protected override DragMode GetDragModeFor(Vector2 relativeMousePos) => DragMode.Move;
 }

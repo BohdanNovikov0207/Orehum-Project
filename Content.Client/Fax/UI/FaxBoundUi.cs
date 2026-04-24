@@ -24,10 +24,10 @@ public sealed class FaxBoundUi : BoundUserInterface
 {
     [Dependency] private readonly IFileDialogManager _fileDialogManager = default!;
 
+    private bool _dialogIsOpen;
+
     [ViewVariables]
     private FaxWindow? _window;
-
-    private bool _dialogIsOpen = false;
 
     public FaxBoundUi(EntityUid owner, Enum uiKey) : base(owner, uiKey)
     {
@@ -56,9 +56,7 @@ public sealed class FaxBoundUi : BoundUserInterface
         _dialogIsOpen = false;
 
         if (_window == null || _window.Disposed || file == null)
-        {
             return;
-        }
 
         using var reader = new StreamReader(file);
 
@@ -66,16 +64,12 @@ public sealed class FaxBoundUi : BoundUserInterface
         string? label = null;
         var content = await reader.ReadToEndAsync();
 
-        if (firstLine is { })
+        if (firstLine is not null)
         {
             if (firstLine.StartsWith('#'))
-            {
                 label = firstLine[1..].Trim();
-            }
             else
-            {
                 content = firstLine + "\n" + content;
-            }
         }
 
         SendMessage(new FaxFileMessage(
@@ -84,25 +78,13 @@ public sealed class FaxBoundUi : BoundUserInterface
             _window.OfficePaper));
     }
 
-    private void OnSendButtonPressed()
-    {
-        SendMessage(new FaxSendMessage());
-    }
+    private void OnSendButtonPressed() => SendMessage(new FaxSendMessage());
 
-    private void OnCopyButtonPressed()
-    {
-        SendMessage(new FaxCopyMessage());
-    }
+    private void OnCopyButtonPressed() => SendMessage(new FaxCopyMessage());
 
-    private void OnRefreshButtonPressed()
-    {
-        SendMessage(new FaxRefreshMessage());
-    }
+    private void OnRefreshButtonPressed() => SendMessage(new FaxRefreshMessage());
 
-    private void OnPeerSelected(string address)
-    {
-        SendMessage(new FaxDestinationMessage(address));
-    }
+    private void OnPeerSelected(string address) => SendMessage(new FaxDestinationMessage(address));
 
     protected override void UpdateState(BoundUserInterfaceState state)
     {

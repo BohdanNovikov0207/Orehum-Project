@@ -7,15 +7,15 @@
 using Content.Client.Items.UI;
 using Content.Client.Message;
 using Content.Client.Stylesheets;
-using Robust.Client.UserInterface.Controls;
 using Content.Shared._Shitmed.ItemSwitch.Components;
+using Robust.Client.UserInterface.Controls;
 
 namespace Content.Client._Shitmed.ItemSwitch.UI;
 
 public sealed class ItemSwitchStatusControl : PollingItemStatusControl<ItemSwitchStatusControl.Data>
 {
-    private readonly Entity<ItemSwitchComponent> _parent;
     private readonly RichTextLabel _label;
+    private readonly Entity<ItemSwitchComponent> _parent;
 
     public ItemSwitchStatusControl(Entity<ItemSwitchComponent> parent)
     {
@@ -27,16 +27,11 @@ public sealed class ItemSwitchStatusControl : PollingItemStatusControl<ItemSwitc
         UpdateDraw();
     }
 
-    protected override Data PollData()
-    {
-        return new Data(_parent.Comp.State);
-    }
+    protected override Data PollData() => new(_parent.Comp.State);
 
-    protected override void Update(in Data data)
-    {
+    protected override void Update(in Data data) =>
         _label.SetMarkup(Loc.GetString("itemswitch-component-on-examine-detailed-message",
             ("state", data.State)));
-    }
 
     public record struct Data(string State);
 }

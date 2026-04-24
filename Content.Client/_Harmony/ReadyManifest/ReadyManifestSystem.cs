@@ -8,8 +8,5 @@ namespace Content.Client._Harmony.ReadyManifest;
 
 public sealed class ReadyManifestSystem : SharedReadyManifestSystem
 {
-    public void RequestReadyManifest()
-    {
-        RaiseNetworkEvent(new RequestReadyManifestMessage());
-    }
+    public void RequestReadyManifest() => RaiseNetworkEvent(new RequestReadyManifestMessage());
 }

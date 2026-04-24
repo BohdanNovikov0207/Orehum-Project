@@ -36,12 +36,8 @@ public sealed class ChangelogUIController : UIController
         EnsureWindow();
 
         if (_changeLogWindow.IsOpen)
-        {
             _changeLogWindow.Close();
-        }
         else
-        {
             OpenWindow();
-        }
     }
 }

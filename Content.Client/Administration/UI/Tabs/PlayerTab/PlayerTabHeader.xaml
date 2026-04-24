@@ -11,8 +11,8 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
 <Control xmlns="https://spacestation14.io"
-                 xmlns:cc="clr-namespace:Content.Client.Administration.UI.CustomControls">
-    <PanelContainer Name="BackgroundColorPanel" Access="Public"/>
+         xmlns:cc="clr-namespace:Content.Client.Administration.UI.CustomControls">
+    <PanelContainer Name="BackgroundColorPanel" Access="Public" />
     <BoxContainer Orientation="Horizontal"
                   HorizontalExpand="True"
                   SeparationOverride="4">
@@ -21,35 +21,35 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                HorizontalExpand="True"
                ClipText="True"
                Text="{Loc player-tab-username}"
-               MouseFilter="Pass"/>
-        <cc:VSeparator/>
+               MouseFilter="Pass" />
+        <cc:VSeparator />
         <Label Name="CharacterLabel"
                SizeFlagsStretchRatio="3"
                HorizontalExpand="True"
                ClipText="True"
                Text="{Loc player-tab-character}"
-               MouseFilter="Pass"/>
-        <cc:VSeparator/>
+               MouseFilter="Pass" />
+        <cc:VSeparator />
         <Label Name="JobLabel"
                SizeFlagsStretchRatio="2"
                HorizontalExpand="True"
                ClipText="True"
                Text="{Loc player-tab-job}"
-               MouseFilter="Pass"/>
-        <cc:VSeparator/>
+               MouseFilter="Pass" />
+        <cc:VSeparator />
         <Label Name="RoleTypeLabel"
                SizeFlagsStretchRatio="2"
                HorizontalExpand="True"
                ClipText="True"
                Text="{Loc player-tab-roletype}"
-               MouseFilter="Pass"/>
-        <cc:VSeparator/>
+               MouseFilter="Pass" />
+        <cc:VSeparator />
         <Label Name="PlaytimeLabel"
                SizeFlagsStretchRatio="1"
                HorizontalExpand="True"
                ClipText="True"
                Text="{Loc player-tab-playtime}"
                MouseFilter="Pass"
-               ToolTip="{Loc player-tab-entry-tooltip}"/>
+               ToolTip="{Loc player-tab-entry-tooltip}" />
     </BoxContainer>
 </Control>

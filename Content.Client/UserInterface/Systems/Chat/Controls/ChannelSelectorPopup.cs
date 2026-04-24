@@ -31,23 +31,21 @@ public sealed class ChannelSelectorPopup : Popup
         ChatSelectChannel.LOOC,
         ChatSelectChannel.OOC,
         ChatSelectChannel.Dead,
-        ChatSelectChannel.Admin
+        ChatSelectChannel.Admin,
         // NOTE: Console is not in there and it can never be permanently selected.
         // You can, however, still submit commands as console by prefixing with /.
     };
 
     private readonly BoxContainer _channelSelectorHBox;
-    private readonly Dictionary<ChatSelectChannel, ChannelSelectorItemButton> _selectorStates = new();
     private readonly ChatUIController _chatUIController;
-
-    public event Action<ChatSelectChannel>? Selected;
+    private readonly Dictionary<ChatSelectChannel, ChannelSelectorItemButton> _selectorStates = new();
 
     public ChannelSelectorPopup()
     {
         _channelSelectorHBox = new BoxContainer
         {
             Orientation = BoxContainer.LayoutOrientation.Horizontal,
-            SeparationOverride = 1
+            SeparationOverride = 1,
         };
 
         _chatUIController = UserInterfaceManager.GetUIController<ChatUIController>();
@@ -70,6 +68,8 @@ public sealed class ChannelSelectorPopup : Popup
             return null;
         }
     }
+
+    public event Action<ChatSelectChannel>? Selected;
 
     private bool IsPreferredAvailable()
     {
@@ -96,25 +96,17 @@ public sealed class ChannelSelectorPopup : Popup
             if ((channels & channel) == 0)
             {
                 if (selector.Parent == _channelSelectorHBox)
-                {
                     _channelSelectorHBox.RemoveChild(selector);
-                }
             }
             else if (selector.IsHidden)
-            {
                 _channelSelectorHBox.AddChild(selector);
-            }
         }
 
         var isPreferredAvailable = IsPreferredAvailable();
         if (!wasPreferredAvailable && isPreferredAvailable)
-        {
             Select(_chatUIController.GetPreferredChannel());
-        }
         else if (wasPreferredAvailable && !isPreferredAvailable)
-        {
             Select(ChatSelectChannel.OOC);
-        }
     }
 
     private void OnSelectorPressed(ButtonEventArgs args)
@@ -123,10 +115,7 @@ public sealed class ChannelSelectorPopup : Popup
         Select(button.Channel);
     }
 
-    private void Select(ChatSelectChannel channel)
-    {
-        Selected?.Invoke(channel);
-    }
+    private void Select(ChatSelectChannel channel) => Selected?.Invoke(channel);
 
     protected override void Dispose(bool disposing)
     {

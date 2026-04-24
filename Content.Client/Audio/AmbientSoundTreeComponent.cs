@@ -11,7 +11,7 @@ using Robust.Shared.Physics;
 namespace Content.Client.Audio;
 
 /// <summary>
-/// Samples nearby <see cref="AmbientSoundComponent"/> and plays audio.
+/// Samples nearby <see cref="AmbientSoundComponent" /> and plays audio.
 /// </summary>
 [RegisterComponent]
 public sealed partial class AmbientSoundTreeComponent : Component, IComponentTreeComponent<AmbientSoundComponent>

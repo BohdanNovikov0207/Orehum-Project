@@ -35,5 +35,5 @@ using Content.Shared.DeviceNetwork.Systems;
 
 namespace Content.Client.DeviceNetwork.Systems;
 
-/// <inheritdoc/>
+/// <inheritdoc />
 public sealed class DeviceNetworkJammerSystem : SharedDeviceNetworkJammerSystem;

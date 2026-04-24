@@ -87,22 +87,20 @@ public sealed class MappingOverlay : Overlay
 {
     private static readonly ProtoId<ShaderPrototype> UnshadedShader = "unshaded";
 
-    [Dependency] private readonly IEntityManager _entities = default!;
-    [Dependency] private readonly IPlayerManager _player = default!;
-    [Dependency] private readonly IPrototypeManager _prototypes = default!;
-
-    private readonly SpriteSystem _sprite;
-
     // 1 off in case something else uses these colors since we use them to compare
     private static readonly Color PickColor = new(1, 255, 0);
     private static readonly Color DeleteColor = new(255, 1, 0);
 
-    private readonly Dictionary<EntityUid, Color> _oldColors = new();
+    [Dependency] private readonly IEntityManager _entities = default!;
 
-    private readonly MappingState _state;
+    private readonly Dictionary<EntityUid, Color> _oldColors = new();
+    [Dependency] private readonly IPlayerManager _player = default!;
+    [Dependency] private readonly IPrototypeManager _prototypes = default!;
     private readonly ShaderInstance _shader;
 
-    public override OverlaySpace Space => OverlaySpace.WorldSpace;
+    private readonly SpriteSystem _sprite;
+
+    private readonly MappingState _state;
 
     public MappingOverlay(MappingState state)
     {
@@ -113,6 +111,8 @@ public sealed class MappingOverlay : Overlay
         _state = state;
         _shader = _prototypes.Index(UnshadedShader).Instance();
     }
+
+    public override OverlaySpace Space => OverlaySpace.WorldSpace;
 
     protected override void Draw(in OverlayDrawArgs args)
     {

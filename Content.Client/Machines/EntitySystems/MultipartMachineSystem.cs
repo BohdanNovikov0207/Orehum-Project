@@ -18,12 +18,12 @@ namespace Content.Client.Machines.EntitySystems;
 public sealed class MultipartMachineSystem : SharedMultipartMachineSystem
 {
     private readonly EntProtoId _ghostPrototype = "MultipartMachineGhost";
-    private readonly Color _partiallyTransparent = new Color(255, 255, 255, 180);
+    [Dependency] private readonly MetaDataSystem _metaData = default!;
+    private readonly Color _partiallyTransparent = new(255, 255, 255, 180);
+    [Dependency] private readonly IPrototypeManager _prototype = default!;
+    [Dependency] private readonly ISerializationManager _serialization = default!;
 
     [Dependency] private readonly SpriteSystem _sprite = default!;
-    [Dependency] private readonly IPrototypeManager _prototype = default!;
-    [Dependency] private readonly MetaDataSystem _metaData = default!;
-    [Dependency] private readonly ISerializationManager _serialization= default!;
 
     public override void Initialize()
     {
@@ -88,7 +88,9 @@ public sealed class MultipartMachineSystem : SharedMultipartMachineSystem
     {
         foreach (var part in ent.Comp.Parts.Values)
         {
-            part.Entity = part.NetEntity.HasValue ? EnsureEntity<MultipartMachinePartComponent>(part.NetEntity.Value, ent) : null;
+            part.Entity = part.NetEntity.HasValue
+                ? EnsureEntity<MultipartMachinePartComponent>(part.NetEntity.Value, ent)
+                : null;
         }
     }
 

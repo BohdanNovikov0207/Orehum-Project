@@ -12,35 +12,16 @@ namespace Content.Client.Communications.UI.Widgets;
 [GenerateTypedNameReferences]
 public sealed partial class MessagingControls : TabContainer
 {
-    [Dependency] private readonly ILocalizationManager _loc = default!;
     [Dependency] private readonly IConfigurationManager _cfg = default!;
     [Dependency] private readonly IEntityManager _entMan = default!;
+    [Dependency] private readonly ILocalizationManager _loc = default!;
 
     // Entity temporarily created to display a screen preview
     private EntityUid _broadcastDisplayEntity = EntityUid.Invalid;
 
-    public event Action<string>? OnRadioAnnounce;
-    public event Action<string>? OnScreenBroadcast;
-
     private bool _canRadioAnnounce;
-    public bool CanRadioAnnounce
-    {
-        set
-        {
-            _canRadioAnnounce = value;
-            SyncButtonState();
-        }
-    }
 
     private bool _canScreenBroadcast;
-    public bool CanScreenBroadcast
-    {
-        set
-        {
-            _canScreenBroadcast = value;
-            SyncButtonState();
-        }
-    }
 
     public MessagingControls()
     {
@@ -49,7 +30,7 @@ public sealed partial class MessagingControls : TabContainer
 
         RadioMessageInput.Placeholder = new Rope.Leaf(_loc.GetString("comms-console-menu-announcement-placeholder"));
 
-        RadioMessageInput.OnTextChanged += (_) => SyncButtonState();
+        RadioMessageInput.OnTextChanged += _ => SyncButtonState();
 
         AnnounceButton.OnPressed += _ =>
         {
@@ -60,9 +41,7 @@ public sealed partial class MessagingControls : TabContainer
         ScreenMessageInput.OnTextChanged += args =>
         {
             if (_broadcastDisplayEntity.IsValid())
-            {
                 appearanceSystem.SetData(_broadcastDisplayEntity, TextScreenVisuals.ScreenText, args.Text);
-            }
         };
 
         BroadcastButton.OnPressed += _ =>
@@ -73,21 +52,38 @@ public sealed partial class MessagingControls : TabContainer
         SyncButtonState();
     }
 
+    public bool CanRadioAnnounce
+    {
+        set
+        {
+            _canRadioAnnounce = value;
+            SyncButtonState();
+        }
+    }
+
+    public bool CanScreenBroadcast
+    {
+        set
+        {
+            _canScreenBroadcast = value;
+            SyncButtonState();
+        }
+    }
+
+    public event Action<string>? OnRadioAnnounce;
+    public event Action<string>? OnScreenBroadcast;
+
     public void SetBroadcastDisplayEntity(EntProtoId broadcastEntityId)
     {
         _broadcastDisplayEntity = _entMan.Spawn(broadcastEntityId);
         if (_broadcastDisplayEntity.IsValid())
-        {
             BroadcastEntityDisplay.SetEntity(_broadcastDisplayEntity);
-        }
     }
 
     protected override void ExitedTree()
     {
         if (_broadcastDisplayEntity.IsValid())
-        {
             _entMan.DeleteEntity(_broadcastDisplayEntity);
-        }
     }
 
     private void SyncButtonState()

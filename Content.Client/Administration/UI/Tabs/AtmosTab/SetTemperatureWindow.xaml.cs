@@ -83,43 +83,42 @@ using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.CustomControls;
 using Robust.Shared.Map.Components;
 
-namespace Content.Client.Administration.UI.Tabs.AtmosTab
+namespace Content.Client.Administration.UI.Tabs.AtmosTab;
+
+[GenerateTypedNameReferences]
+[UsedImplicitly]
+public sealed partial class SetTemperatureWindow : DefaultWindow
 {
-    [GenerateTypedNameReferences]
-    [UsedImplicitly]
-    public sealed partial class SetTemperatureWindow : DefaultWindow
+    private List<NetEntity>? _data;
+
+    protected override void EnteredTree()
     {
-        private List<NetEntity>? _data;
+        var entManager = IoCManager.Resolve<IEntityManager>();
+        var playerManager = IoCManager.Resolve<IPlayerManager>();
 
-        protected override void EnteredTree()
+        var gridQuery = entManager.AllEntityQueryEnumerator<MapGridComponent>();
+        _data ??= new List<NetEntity>();
+        _data.Clear();
+
+        while (gridQuery.MoveNext(out var uid, out _))
         {
-            var entManager = IoCManager.Resolve<IEntityManager>();
-            var playerManager = IoCManager.Resolve<IPlayerManager>();
-
-            var gridQuery = entManager.AllEntityQueryEnumerator<MapGridComponent>();
-            _data ??= new List<NetEntity>();
-            _data.Clear();
-
-            while (gridQuery.MoveNext(out var uid, out _))
-            {
-                var player = playerManager.LocalEntity;
-                var playerGrid = entManager.GetComponentOrNull<TransformComponent>(player)?.GridUid;
-                GridOptions.AddItem($"{uid} {(playerGrid == uid ? Loc.GetString($"admin-ui-atmos-grid-current") : "")}");
-                _data.Add(entManager.GetNetEntity(uid));
-            }
-
-            GridOptions.OnItemSelected += eventArgs => GridOptions.SelectId(eventArgs.Id);
-            SubmitButton.OnPressed += SubmitButtonOnOnPressed;
+            var player = playerManager.LocalEntity;
+            var playerGrid = entManager.GetComponentOrNull<TransformComponent>(player)?.GridUid;
+            GridOptions.AddItem($"{uid} {(playerGrid == uid ? Loc.GetString("admin-ui-atmos-grid-current") : "")}");
+            _data.Add(entManager.GetNetEntity(uid));
         }
 
-        private void SubmitButtonOnOnPressed(BaseButton.ButtonEventArgs obj)
-        {
-            if (_data == null)
-                return;
+        GridOptions.OnItemSelected += eventArgs => GridOptions.SelectId(eventArgs.Id);
+        SubmitButton.OnPressed += SubmitButtonOnOnPressed;
+    }
 
-            var selectedGrid = _data[GridOptions.SelectedId];
-            IoCManager.Resolve<IClientConsoleHost>()
-                .ExecuteCommand($"settemp {TileXSpin.Value} {TileYSpin.Value} {selectedGrid} {TemperatureSpin.Value}");
-        }
+    private void SubmitButtonOnOnPressed(BaseButton.ButtonEventArgs obj)
+    {
+        if (_data == null)
+            return;
+
+        var selectedGrid = _data[GridOptions.SelectedId];
+        IoCManager.Resolve<IClientConsoleHost>()
+            .ExecuteCommand($"settemp {TileXSpin.Value} {TileYSpin.Value} {selectedGrid} {TemperatureSpin.Value}");
     }
 }

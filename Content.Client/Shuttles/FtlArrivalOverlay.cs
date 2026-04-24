@@ -21,20 +21,18 @@ namespace Content.Client.Shuttles;
 public sealed class FtlArrivalOverlay : Overlay
 {
     private static readonly ProtoId<ShaderPrototype> UnshadedShader = "unshaded";
-
-    public override OverlaySpace Space => OverlaySpace.WorldSpaceBelowEntities;
-
-    private EntityLookupSystem _lookups;
-    private SharedMapSystem _maps;
-    private SharedTransformSystem _transforms;
-    private SpriteSystem _sprites;
     [Dependency] private readonly IEntityManager _entManager = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
+
+    private readonly EntityLookupSystem _lookups;
+    private readonly SharedMapSystem _maps;
     [Dependency] private readonly IPrototypeManager _protos = default!;
 
-    private readonly HashSet<Entity<FtlVisualizerComponent>> _visualizers = new();
+    private readonly ShaderInstance _shader;
+    private readonly SpriteSystem _sprites;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    private readonly SharedTransformSystem _transforms;
 
-    private ShaderInstance _shader;
+    private readonly HashSet<Entity<FtlVisualizerComponent>> _visualizers = new();
 
     public FtlArrivalOverlay()
     {
@@ -46,6 +44,8 @@ public sealed class FtlArrivalOverlay : Overlay
 
         _shader = _protos.Index(UnshadedShader).Instance();
     }
+
+    public override OverlaySpace Space => OverlaySpace.WorldSpaceBelowEntities;
 
     protected override bool BeforeDraw(in OverlayDrawArgs args)
     {
@@ -66,7 +66,7 @@ public sealed class FtlArrivalOverlay : Overlay
             if (!_entManager.TryGetComponent(grid, out MapGridComponent? mapGrid))
                 continue;
 
-            var texture = _sprites.GetFrame(comp.Sprite, TimeSpan.FromSeconds(comp.Elapsed), loop: false);
+            var texture = _sprites.GetFrame(comp.Sprite, TimeSpan.FromSeconds(comp.Elapsed), false);
             comp.Elapsed += (float) _timing.FrameTime.TotalSeconds;
 
             // Need to manually transform the viewport in terms of the visualizer entity as the grid isn't in position.

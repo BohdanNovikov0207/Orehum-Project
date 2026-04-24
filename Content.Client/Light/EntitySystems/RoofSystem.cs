@@ -8,8 +8,7 @@ using Content.Shared.Light.EntitySystems;
 
 namespace Content.Client.Light.EntitySystems;
 
-/// <inheritdoc/>
+/// <inheritdoc />
 public sealed class RoofSystem : SharedRoofSystem
 {
-
 }

@@ -12,9 +12,9 @@
 
 using Content.Client.Message;
 using Content.Client.Stylesheets;
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Chemistry.Components;
 using Content.Shared.Chemistry.EntitySystems;
-using Content.Goobstation.Maths.FixedPoint;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
 using Robust.Shared.Timing;
@@ -23,13 +23,13 @@ namespace Content.Client.Chemistry.UI;
 
 public sealed class HyposprayStatusControl : Control
 {
-    private readonly Entity<HyposprayComponent> _parent;
     private readonly RichTextLabel _label;
+    private readonly Entity<HyposprayComponent> _parent;
     private readonly SharedSolutionContainerSystem _solutionContainers;
-
-    private FixedPoint2 PrevVolume;
     private FixedPoint2 PrevMaxVolume;
     private bool PrevOnlyAffectsMobs;
+
+    private FixedPoint2 PrevVolume;
 
     public HyposprayStatusControl(Entity<HyposprayComponent> parent, SharedSolutionContainerSystem solutionContainers)
     {

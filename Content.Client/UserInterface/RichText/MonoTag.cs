@@ -17,22 +17,19 @@ namespace Content.Client.UserInterface.RichText;
 public sealed class MonoTag : IMarkupTag
 {
     public static readonly ProtoId<FontPrototype> MonoFont = "Monospace";
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
 
     [Dependency] private readonly IResourceCache _resourceCache = default!;
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
 
     public string Name => "mono";
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public void PushDrawContext(MarkupNode node, MarkupDrawingContext context)
     {
         var font = FontTag.CreateFont(context.Font, node, _resourceCache, _prototypeManager, MonoFont);
         context.Font.Push(font);
     }
 
-    /// <inheritdoc/>
-    public void PopDrawContext(MarkupNode node, MarkupDrawingContext context)
-    {
-        context.Font.Pop();
-    }
+    /// <inheritdoc />
+    public void PopDrawContext(MarkupNode node, MarkupDrawingContext context) => context.Font.Pop();
 }

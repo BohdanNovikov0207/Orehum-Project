@@ -14,12 +14,12 @@ namespace Content.Client.Administration.UI.BanList.Bans;
 [GenerateTypedNameReferences]
 public sealed partial class BanListControl : Control
 {
-    public event Action<BanListLine>? LineIdsClicked;
-
     public BanListControl()
     {
         RobustXamlLoader.Load(this);
     }
+
+    public event Action<BanListLine>? LineIdsClicked;
 
     public void SetBans(List<SharedServerBan> bans)
     {

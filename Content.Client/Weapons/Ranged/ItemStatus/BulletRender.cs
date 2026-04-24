@@ -86,7 +86,8 @@ public abstract class BaseBulletRenderer : Control
             // 3. MinCountPerRow is actually smaller than the count per row (avoid degenerate cases).
             // 4. There's enough bullets that at least one will end up on the next row.
             var nextRowCount = Capacity - bulletsDone - thisRowCount;
-            if (nextRowCount < _params.MinCountPerRow && row != Rows - 1 && _params.MinCountPerRow < countPerRow && nextRowCount > 0)
+            if (nextRowCount < _params.MinCountPerRow && row != Rows - 1 && _params.MinCountPerRow < countPerRow &&
+                nextRowCount > 0)
                 thisRowCount -= _params.MinCountPerRow - nextRowCount;
 
             // Account for row width to right-align.
@@ -115,15 +116,10 @@ public abstract class BaseBulletRenderer : Control
 
     protected abstract void DrawItem(DrawingHandleScreen handle, Vector2 renderPos, bool spent, bool altColor);
 
-    private int CountPerRow(float width)
-    {
-        return (int) ((width - _params.ItemWidth + _params.ItemSeparation) / _params.ItemSeparation);
-    }
+    private int CountPerRow(float width) =>
+        (int) ((width - _params.ItemWidth + _params.ItemSeparation) / _params.ItemSeparation);
 
-    private int RowWidth(int count)
-    {
-        return (count - 1) * _params.ItemSeparation + _params.ItemWidth;
-    }
+    private int RowWidth(int count) => (count - 1) * _params.ItemSeparation + _params.ItemWidth;
 
     protected struct LayoutParameters
     {
@@ -151,38 +147,52 @@ public abstract class BaseBulletRenderer : Control
 /// </remarks>
 public sealed class BulletRender : BaseBulletRenderer
 {
+    public enum BulletType
+    {
+        Normal,
+        Tiny,
+    }
+
     public const int MinCountPerRow = 7;
 
     public const int BulletHeight = 12;
     public const int VerticalSeparation = 2;
 
-    private static readonly LayoutParameters LayoutNormal = new LayoutParameters
+    private static readonly LayoutParameters LayoutNormal = new()
     {
         ItemHeight = BulletHeight,
         ItemSeparation = 3,
         ItemWidth = 5,
         VerticalSeparation = VerticalSeparation,
-        MinCountPerRow = MinCountPerRow
+        MinCountPerRow = MinCountPerRow,
     };
 
-    private static readonly LayoutParameters LayoutTiny = new LayoutParameters
+    private static readonly LayoutParameters LayoutTiny = new()
     {
         ItemHeight = BulletHeight,
         ItemSeparation = 2,
         ItemWidth = 2,
         VerticalSeparation = VerticalSeparation,
-        MinCountPerRow = MinCountPerRow
+        MinCountPerRow = MinCountPerRow,
     };
 
     private static readonly Color ColorA = Color.FromHex("#b68f0e");
     private static readonly Color ColorB = Color.FromHex("#d7df60");
     private static readonly Color ColorGoneA = Color.FromHex("#000000");
     private static readonly Color ColorGoneB = Color.FromHex("#222222");
-
-    private readonly Texture _bulletTiny;
     private readonly Texture _bulletNormal;
 
+    private readonly Texture _bulletTiny;
+
     private BulletType _type = BulletType.Normal;
+
+    public BulletRender()
+    {
+        var resC = IoCManager.Resolve<IResourceCache>();
+        _bulletTiny = resC.GetTexture("/Textures/Interface/ItemStatus/Bullets/tiny.png");
+        _bulletNormal = resC.GetTexture("/Textures/Interface/ItemStatus/Bullets/normal.png");
+        Parameters = LayoutNormal;
+    }
 
     public BulletType Type
     {
@@ -196,19 +206,11 @@ public sealed class BulletRender : BaseBulletRenderer
             {
                 BulletType.Normal => LayoutNormal,
                 BulletType.Tiny => LayoutTiny,
-                _ => throw new ArgumentOutOfRangeException()
+                _ => throw new ArgumentOutOfRangeException(),
             };
 
             _type = value;
         }
-    }
-
-    public BulletRender()
-    {
-        var resC = IoCManager.Resolve<IResourceCache>();
-        _bulletTiny = resC.GetTexture("/Textures/Interface/ItemStatus/Bullets/tiny.png");
-        _bulletNormal = resC.GetTexture("/Textures/Interface/ItemStatus/Bullets/normal.png");
-        Parameters = LayoutNormal;
     }
 
     protected override void DrawItem(DrawingHandleScreen handle, Vector2 renderPos, bool spent, bool altColor)
@@ -222,22 +224,15 @@ public sealed class BulletRender : BaseBulletRenderer
         var texture = _type == BulletType.Tiny ? _bulletTiny : _bulletNormal;
         handle.DrawTexture(texture, renderPos, color);
     }
-
-    public enum BulletType
-    {
-        Normal,
-        Tiny
-    }
 }
 
 public sealed class BatteryBulletRenderer : BaseBulletRenderer
 {
-    private static readonly Color ItemColor = Color.FromHex("#E00000");
-    private static readonly Color ItemColorGone = Color.Black;
-
     private const int SizeH = 10;
     private const int SizeV = 10;
     private const int Separation = 4;
+    private static readonly Color ItemColor = Color.FromHex("#E00000");
+    private static readonly Color ItemColorGone = Color.Black;
 
     public BatteryBulletRenderer()
     {
@@ -247,7 +242,7 @@ public sealed class BatteryBulletRenderer : BaseBulletRenderer
             ItemHeight = SizeV,
             ItemSeparation = SizeH + Separation,
             MinCountPerRow = 3,
-            VerticalSeparation = Separation
+            VerticalSeparation = Separation,
         };
     }
 

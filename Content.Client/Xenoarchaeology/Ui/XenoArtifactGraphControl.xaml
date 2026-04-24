@@ -3,4 +3,4 @@
     xmlns:controls="clr-namespace:Content.Client.Xenoarchaeology.Ui"
     HorizontalExpand="True"
     VerticalExpand="True"
-    MouseFilter="Stop"/>
+    MouseFilter="Stop" />

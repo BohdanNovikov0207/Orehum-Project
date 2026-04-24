@@ -11,6 +11,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Numerics;
 using Content.Shared.StatusIcon;
 using Content.Shared.StatusIcon.Components;
 using Robust.Client.GameObjects;
@@ -18,7 +19,6 @@ using Robust.Client.Graphics;
 using Robust.Shared.Enums;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
-using System.Numerics;
 
 namespace Content.Client.StatusIcon;
 
@@ -28,14 +28,12 @@ public sealed class StatusIconOverlay : Overlay
 
     [Dependency] private readonly IEntityManager _entity = default!;
     [Dependency] private readonly IPrototypeManager _prototype = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
 
     private readonly SpriteSystem _sprite;
-    private readonly TransformSystem _transform;
     private readonly StatusIconSystem _statusIcon;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    private readonly TransformSystem _transform;
     private readonly ShaderInstance _unshadedShader;
-
-    public override OverlaySpace Space => OverlaySpace.WorldSpaceBelowFOV;
 
     internal StatusIconOverlay()
     {
@@ -47,6 +45,8 @@ public sealed class StatusIconOverlay : Overlay
         _unshadedShader = _prototype.Index(UnshadedShader).Instance();
     }
 
+    public override OverlaySpace Space => OverlaySpace.WorldSpaceBelowFOV;
+
     protected override void Draw(in OverlayDrawArgs args)
     {
         var handle = args.WorldHandle;
@@ -57,7 +57,8 @@ public sealed class StatusIconOverlay : Overlay
         var scaleMatrix = Matrix3Helpers.CreateScale(new Vector2(1, 1));
         var rotationMatrix = Matrix3Helpers.CreateRotation(-eyeRot);
 
-        var query = _entity.AllEntityQueryEnumerator<StatusIconComponent, SpriteComponent, TransformComponent, MetaDataComponent>();
+        var query = _entity
+            .AllEntityQueryEnumerator<StatusIconComponent, SpriteComponent, TransformComponent, MetaDataComponent>();
         while (query.MoveNext(out var uid, out var comp, out var sprite, out var xform, out var meta))
         {
             if (xform.MapID != args.MapId || !sprite.Visible)
@@ -101,29 +102,33 @@ public sealed class StatusIconOverlay : Overlay
                 if (proto.LocationPreference == StatusIconLocationPreference.Left ||
                     proto.LocationPreference == StatusIconLocationPreference.None && countL <= countR)
                 {
-                    if (accOffsetL + texture.Height > _sprite.GetLocalBounds((uid, sprite)).Height * EyeManager.PixelsPerMeter)
+                    if (accOffsetL + texture.Height >
+                        _sprite.GetLocalBounds((uid, sprite)).Height * EyeManager.PixelsPerMeter)
                         break;
                     if (proto.Layer == StatusIconLayer.Base)
                     {
                         accOffsetL += texture.Height;
                         countL++;
                     }
-                    yOffset = (bounds.Height + sprite.Offset.Y) / 2f - (float)(accOffsetL - proto.Offset) / EyeManager.PixelsPerMeter;
-                    xOffset = -(bounds.Width + sprite.Offset.X) / 2f;
 
+                    yOffset = (bounds.Height + sprite.Offset.Y) / 2f -
+                              (float) (accOffsetL - proto.Offset) / EyeManager.PixelsPerMeter;
+                    xOffset = -(bounds.Width + sprite.Offset.X) / 2f;
                 }
                 else
                 {
-                    if (accOffsetR + texture.Height > _sprite.GetLocalBounds((uid, sprite)).Height * EyeManager.PixelsPerMeter)
+                    if (accOffsetR + texture.Height >
+                        _sprite.GetLocalBounds((uid, sprite)).Height * EyeManager.PixelsPerMeter)
                         break;
                     if (proto.Layer == StatusIconLayer.Base)
                     {
                         accOffsetR += texture.Height;
                         countR++;
                     }
-                    yOffset = (bounds.Height + sprite.Offset.Y) / 2f - (float)(accOffsetR - proto.Offset) / EyeManager.PixelsPerMeter;
-                    xOffset = (bounds.Width + sprite.Offset.X) / 2f - (float)texture.Width / EyeManager.PixelsPerMeter;
 
+                    yOffset = (bounds.Height + sprite.Offset.Y) / 2f -
+                              (float) (accOffsetR - proto.Offset) / EyeManager.PixelsPerMeter;
+                    xOffset = (bounds.Width + sprite.Offset.X) / 2f - (float) texture.Width / EyeManager.PixelsPerMeter;
                 }
 
                 if (proto.IsShaded)

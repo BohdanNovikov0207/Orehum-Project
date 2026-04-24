@@ -89,25 +89,10 @@ namespace Content.Client.Administration.UI.PlayerPanel;
 public sealed partial class PlayerPanel : FancyWindow
 {
     private readonly IClientAdminManager _adminManager;
-
-    public event Action<string>? OnUsernameCopy;
-    public event Action<NetUserId?>? OnOpenNotes;
-    public event Action<NetUserId?>? OnOpenBans;
-    public event Action<NetUserId?>? OnAhelp;
-    public event Action<string?>? OnKick;
-    public event Action<string?>? OnCamera;
-    public event Action<NetUserId?>? OnOpenBanPanel;
-    public event Action<NetUserId?, bool>? OnWhitelistToggle;
-    public event Action? OnFollow;
-    public event Action? OnFreezeAndMuteToggle;
-    public event Action? OnFreeze;
-    public event Action? OnLogs;
-    public event Action? OnDelete;
-    public event Action? OnRejuvenate;
+    private bool _isWhitelisted;
 
     public NetUserId? TargetPlayer;
     public string? TargetUsername;
-    private bool _isWhitelisted;
 
     public PlayerPanel(IClientAdminManager adminManager)
     {
@@ -134,6 +119,21 @@ public sealed partial class PlayerPanel : FancyWindow
         RejuvenateButton.OnPressed += _ => OnRejuvenate?.Invoke();
     }
 
+    public event Action<string>? OnUsernameCopy;
+    public event Action<NetUserId?>? OnOpenNotes;
+    public event Action<NetUserId?>? OnOpenBans;
+    public event Action<NetUserId?>? OnAhelp;
+    public event Action<string?>? OnKick;
+    public event Action<string?>? OnCamera;
+    public event Action<NetUserId?>? OnOpenBanPanel;
+    public event Action<NetUserId?, bool>? OnWhitelistToggle;
+    public event Action? OnFollow;
+    public event Action? OnFreezeAndMuteToggle;
+    public event Action? OnFreeze;
+    public event Action? OnLogs;
+    public event Action? OnDelete;
+    public event Action? OnRejuvenate;
+
     public void SetUsername(string player)
     {
         Title = Loc.GetString("player-panel-title", ("player", player));
@@ -150,7 +150,9 @@ public sealed partial class PlayerPanel : FancyWindow
         else
         {
             Whitelisted.Text = Loc.GetString("player-panel-whitelisted");
-            WhitelistToggle.Text = whitelisted.Value ? Loc.GetString("player-panel-true") : Loc.GetString("player-panel-false");
+            WhitelistToggle.Text = whitelisted.Value
+                ? Loc.GetString("player-panel-true")
+                : Loc.GetString("player-panel-false");
             WhitelistToggle.Visible = true;
             _isWhitelisted = whitelisted.Value;
         }
@@ -163,39 +165,33 @@ public sealed partial class PlayerPanel : FancyWindow
 
         Bans.Text = totalBans != null ? Loc.GetString("player-panel-bans", ("totalBans", totalBans)) : null;
 
-        RoleBans.Text = totalRoleBans != null ? Loc.GetString("player-panel-rolebans", ("totalRoleBans", totalRoleBans)) : null;
+        RoleBans.Text = totalRoleBans != null
+            ? Loc.GetString("player-panel-rolebans", ("totalRoleBans", totalRoleBans))
+            : null;
     }
 
-    public void SetNotes(int? totalNotes)
-    {
-        Notes.Text = totalNotes != null ? Loc.GetString("player-panel-notes", ("totalNotes", totalNotes)) : null;
-    }
+    public void SetNotes(int? totalNotes) => Notes.Text =
+        totalNotes != null ? Loc.GetString("player-panel-notes", ("totalNotes", totalNotes)) : null;
 
-    public void SetSharedConnections(int sharedConnections)
-    {
-        SharedConnections.Text = Loc.GetString("player-panel-shared-connections", ("sharedConnections", sharedConnections));
-    }
+    public void SetSharedConnections(int sharedConnections) => SharedConnections.Text =
+        Loc.GetString("player-panel-shared-connections", ("sharedConnections", sharedConnections));
 
-    public void SetPlaytime(TimeSpan playtime)
-    {
+    public void SetPlaytime(TimeSpan playtime) =>
         Playtime.Text = Loc.GetString("player-panel-playtime",
             ("days", playtime.Days),
             ("hours", playtime.Hours % 24),
             ("minutes", playtime.Minutes % (24 * 60)));
-    }
 
     public void SetFrozen(bool canFreeze, bool frozen)
     {
         FreezeAndMuteToggleButton.Disabled = !canFreeze;
         FreezeButton.Disabled = !canFreeze || frozen;
 
-        FreezeAndMuteToggleButton.Text = Loc.GetString(!frozen ? "player-panel-freeze-and-mute" : "player-panel-unfreeze");
+        FreezeAndMuteToggleButton.Text =
+            Loc.GetString(!frozen ? "player-panel-freeze-and-mute" : "player-panel-unfreeze");
     }
 
-    public void SetAhelp(bool canAhelp)
-    {
-        AhelpButton.Disabled = !canAhelp;
-    }
+    public void SetAhelp(bool canAhelp) => AhelpButton.Disabled = !canAhelp;
 
     public void SetButtons()
     {

@@ -40,27 +40,26 @@ namespace Content.Client._Lavaland.Audio;
 // TODO: Port this system to Shared and optimize it.
 public sealed class BossMusicSystem : SharedBossMusicSystem
 {
-    [Dependency] private readonly IPrototypeManager _proto = default!;
-    [Dependency] private readonly IConfigurationManager _configManager = default!;
-    [Dependency] private readonly ContentAudioSystem _audioContent = default!;
-    [Dependency] private readonly AudioSystem _audio = default!;
-    [Dependency] private readonly IPlayerManager _player = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
+    private const float MinVolume = -32f;
+    private const float DefaultDuration = 1f;
 
     private static float _volumeSlider;
-    private Entity<AudioComponent?>? _bossMusicStream;
-    private BossMusicPrototype? _musicProto;
+    [Dependency] private readonly AudioSystem _audio = default!;
+    [Dependency] private readonly ContentAudioSystem _audioContent = default!;
+    [Dependency] private readonly IConfigurationManager _configManager = default!;
 
-    // Need how much volume to change per tick and just remove it when it drops below "0"
-    private readonly Dictionary<EntityUid, float> _fadingOut = new();
+    private readonly List<EntityUid> _fadeToRemove = new();
 
     // Need volume change per tick + target volume.
     private readonly Dictionary<EntityUid, (float VolumeChange, float TargetVolume)> _fadingIn = new();
 
-    private readonly List<EntityUid> _fadeToRemove = new();
-
-    private const float MinVolume = -32f;
-    private const float DefaultDuration = 1f;
+    // Need how much volume to change per tick and just remove it when it drops below "0"
+    private readonly Dictionary<EntityUid, float> _fadingOut = new();
+    [Dependency] private readonly IPlayerManager _player = default!;
+    [Dependency] private readonly IPrototypeManager _proto = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    private Entity<AudioComponent?>? _bossMusicStream;
+    private BossMusicPrototype? _musicProto;
 
     public override void Initialize()
     {
@@ -138,10 +137,7 @@ public sealed class BossMusicSystem : SharedBossMusicSystem
         _bossMusicStream = null;
     }
 
-    private void OnMindRemoved(LocalPlayerDetachedEvent args)
-    {
-        EndAllMusic();
-    }
+    private void OnMindRemoved(LocalPlayerDetachedEvent args) => EndAllMusic();
 
     private void OnPlayerDeath(Entity<ActorComponent> ent, ref MobStateChangedEvent args)
     {
@@ -160,10 +156,7 @@ public sealed class BossMusicSystem : SharedBossMusicSystem
             EndAllMusic();
     }
 
-    private void OnRoundEnd(RoundEndMessageEvent args)
-    {
-        _bossMusicStream = _audio.Stop(_bossMusicStream);
-    }
+    private void OnRoundEnd(RoundEndMessageEvent args) => _bossMusicStream = _audio.Stop(_bossMusicStream);
 
     #region Fades
 
@@ -233,9 +226,7 @@ public sealed class BossMusicSystem : SharedBossMusicSystem
             _audio.SetVolume(stream, volume, component);
 
             if (component.Volume.Equals(target))
-            {
                 _fadeToRemove.Add(stream);
-            }
         }
 
         foreach (var stream in _fadeToRemove)

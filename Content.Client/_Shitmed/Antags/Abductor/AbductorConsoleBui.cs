@@ -6,10 +6,8 @@
 
 using Content.Shared._Shitmed.Antags.Abductor;
 using JetBrains.Annotations;
-using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.RichText;
 using Robust.Shared.Utility;
-using static Content.Shared.Pinpointer.SharedNavMapSystem;
 using static Robust.Client.UserInterface.Control;
 
 namespace Content.Client._Shitmed.Antags.Abductor;
@@ -20,22 +18,23 @@ public sealed class AbductorConsoleBui : BoundUserInterface
     [Dependency] private readonly IEntityManager _entities = default!;
 
     [ViewVariables]
-    private AbductorConsoleWindow? _window;
+    private bool _armorDisabled;
 
     [ViewVariables]
-    private bool _armorDisabled = false;
-
-    [ViewVariables]
-    private bool _armorLocked = false;
+    private bool _armorLocked;
 
     [ViewVariables]
     private AbductorArmorModeType _armorMode = AbductorArmorModeType.Stealth;
 
+    [ViewVariables]
+    private AbductorConsoleWindow? _window;
+
     public AbductorConsoleBui(EntityUid owner, Enum uiKey) : base(owner, uiKey)
     {
-
     }
+
     protected override void Open() => UpdateState(State);
+
     protected override void UpdateState(BoundUserInterfaceState? state)
     {
         if (state is AbductorConsoleBuiState s)
@@ -56,7 +55,8 @@ public sealed class AbductorConsoleBui : BoundUserInterface
 
     private void TryInitWindow()
     {
-        if (_window != null) return;
+        if (_window != null)
+            return;
         _window = new AbductorConsoleWindow();
         _window.OnClose += Close;
         _window.Title = "console";
@@ -71,7 +71,7 @@ public sealed class AbductorConsoleBui : BoundUserInterface
         {
             _window.StealthModeButton.Disabled = false;
             _window.CombatModeButton.Disabled = true;
-            SendMessage(new AbductorVestModeChangeBuiMsg()
+            SendMessage(new AbductorVestModeChangeBuiMsg
             {
                 Mode = AbductorArmorModeType.Combat,
             });
@@ -81,7 +81,7 @@ public sealed class AbductorConsoleBui : BoundUserInterface
         {
             _window.StealthModeButton.Disabled = true;
             _window.CombatModeButton.Disabled = false;
-            SendMessage(new AbductorVestModeChangeBuiMsg()
+            SendMessage(new AbductorVestModeChangeBuiMsg
             {
                 Mode = AbductorArmorModeType.Stealth,
             });
@@ -120,11 +120,15 @@ public sealed class AbductorConsoleBui : BoundUserInterface
         _window.TargetLabel.Children.Clear();
 
         var padMsg = new FormattedMessage();
-        padMsg.AddMarkupOrThrow(state.AlienPadFound ? Loc.GetString("abductor-ui-pad-found") : Loc.GetString("abductor-ui-pad-not-found"));
+        padMsg.AddMarkupOrThrow(state.AlienPadFound
+            ? Loc.GetString("abductor-ui-pad-found")
+            : Loc.GetString("abductor-ui-pad-not-found"));
         _window.PadLabel.SetMessage(padMsg);
 
         var msg = new FormattedMessage();
-        msg.AddMarkupOrThrow(state.Target == null ? Loc.GetString("abductor-ui-target-none") : Loc.GetString("abductor-ui-target-found", ("target", state.TargetName ?? "")));
+        msg.AddMarkupOrThrow(state.Target == null
+            ? Loc.GetString("abductor-ui-target-none")
+            : Loc.GetString("abductor-ui-target-found", ("target", state.TargetName ?? "")));
         _window.TeleportButton.Disabled = state.Target == null || !state.AlienPadFound;
         _window.TeleportButton.OnPressed += _ =>
         {
@@ -136,11 +140,15 @@ public sealed class AbductorConsoleBui : BoundUserInterface
         // experiment tab
 
         var experimentatorMsg = new FormattedMessage();
-        experimentatorMsg.AddMarkupOrThrow(state.AlienPadFound ? Loc.GetString("abductor-ui-experimentator-connected") : Loc.GetString("abductor-ui-experimentator-not-found"));
+        experimentatorMsg.AddMarkupOrThrow(state.AlienPadFound
+            ? Loc.GetString("abductor-ui-experimentator-connected")
+            : Loc.GetString("abductor-ui-experimentator-not-found"));
         _window.ExperimentatorLabel.SetMessage(experimentatorMsg);
 
         var victimMsg = new FormattedMessage();
-        victimMsg.AddMarkupOrThrow(state.VictimName == null ? Loc.GetString("abductor-ui-victim-none") : Loc.GetString("abductor-ui-victim-found", ("victim", state.VictimName ?? "")));
+        victimMsg.AddMarkupOrThrow(state.VictimName == null
+            ? Loc.GetString("abductor-ui-victim-none")
+            : Loc.GetString("abductor-ui-victim-found", ("victim", state.VictimName ?? "")));
         _window.VictimLabel.SetMessage(victimMsg);
 
         _window.CompleteExperimentButton.Disabled = state.VictimName == null;
@@ -171,6 +179,7 @@ public sealed class AbductorConsoleBui : BoundUserInterface
             _window.CombatModeButton.Disabled = false;
             _window.StealthModeButton.Disabled = true;
         }
+
         UpdateDisabledPanel(_armorDisabled);
     }
 
@@ -214,18 +223,18 @@ public sealed class AbductorConsoleBui : BoundUserInterface
         UpdateDisabledPanel(_armorDisabled);
     }
 
-    private enum ViewType
-    {
-        Teleport,
-        Experiment,
-        ArmorControl
-    }
-
     protected override void Dispose(bool disposing)
     {
         base.Dispose(disposing);
 
         if (disposing)
             _window?.Dispose();
+    }
+
+    private enum ViewType
+    {
+        Teleport,
+        Experiment,
+        ArmorControl,
     }
 }

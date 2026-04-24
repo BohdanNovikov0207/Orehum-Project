@@ -13,8 +13,8 @@ namespace Content.Client.Replay.UI.Loading;
 /// <summary>
 /// State used to display an error message if a replay failed to load.
 /// </summary>
-/// <seealso cref="ReplayLoadingFailedControl"/>
-/// <seealso cref="ContentReplayPlaybackManager"/>
+/// <seealso cref="ReplayLoadingFailedControl" />
+/// <seealso cref="ContentReplayPlaybackManager" />
 public sealed class ReplayLoadingFailed : State
 {
     [Dependency] private readonly IStylesheetManager _stylesheetManager = default!;
@@ -34,8 +34,5 @@ public sealed class ReplayLoadingFailed : State
         _userInterface.StateRoot.AddChild(_control);
     }
 
-    protected override void Shutdown()
-    {
-        _control?.Orphan();
-    }
+    protected override void Shutdown() => _control?.Orphan();
 }

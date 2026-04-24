@@ -4,35 +4,30 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared._EinsteinEngines.Abilities.Psionics;
 using Content.Client.Chat.Managers;
+using Content.Shared._EinsteinEngines.Abilities.Psionics;
 using Robust.Client.Player;
 
-namespace Content.Client.Chat
+namespace Content.Client.Chat;
+
+public sealed class PsionicChatUpdateSystem : EntitySystem
 {
-    public sealed class PsionicChatUpdateSystem : EntitySystem
+    [Dependency] private readonly IChatManager _chatManager = default!;
+    [Dependency] private readonly IPlayerManager _playerManager = default!;
+
+    public TelepathyComponent? Player => CompOrNull<TelepathyComponent>(_playerManager.LocalPlayer?.ControlledEntity);
+    public bool IsPsionic => Player != null;
+
+    public override void Initialize()
     {
-        [Dependency] private readonly IChatManager _chatManager = default!;
-        [Dependency] private readonly IPlayerManager _playerManager = default!;
-
-        public override void Initialize()
-        {
-            base.Initialize();
-            SubscribeLocalEvent<TelepathyComponent, ComponentInit>(OnInit);
-            SubscribeLocalEvent<TelepathyComponent, ComponentRemove>(OnRemove);
-        }
-
-        public TelepathyComponent? Player => CompOrNull<TelepathyComponent>(_playerManager.LocalPlayer?.ControlledEntity);
-        public bool IsPsionic => Player != null;
-
-        private void OnInit(EntityUid uid, TelepathyComponent component, ComponentInit args)
-        {
-            _chatManager.UpdatePermissions();
-        }
-
-        private void OnRemove(EntityUid uid, TelepathyComponent component, ComponentRemove args)
-        {
-            _chatManager.UpdatePermissions();
-        }
+        base.Initialize();
+        SubscribeLocalEvent<TelepathyComponent, ComponentInit>(OnInit);
+        SubscribeLocalEvent<TelepathyComponent, ComponentRemove>(OnRemove);
     }
+
+    private void OnInit(EntityUid uid, TelepathyComponent component, ComponentInit args) =>
+        _chatManager.UpdatePermissions();
+
+    private void OnRemove(EntityUid uid, TelepathyComponent component, ComponentRemove args) =>
+        _chatManager.UpdatePermissions();
 }

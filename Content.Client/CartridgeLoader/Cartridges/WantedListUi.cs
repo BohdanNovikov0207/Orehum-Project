@@ -17,15 +17,10 @@ public sealed partial class WantedListUi : UIFragment
 {
     private WantedListUiFragment? _fragment;
 
-    public override Control GetUIFragmentRoot()
-    {
-        return _fragment!;
-    }
+    public override Control GetUIFragmentRoot() => _fragment!;
 
-    public override void Setup(BoundUserInterface userInterface, EntityUid? fragmentOwner)
-    {
+    public override void Setup(BoundUserInterface userInterface, EntityUid? fragmentOwner) =>
         _fragment = new WantedListUiFragment();
-    }
 
     public override void UpdateState(BoundUserInterfaceState state)
     {

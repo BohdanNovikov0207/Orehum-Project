@@ -67,7 +67,7 @@ public sealed partial class ChangelogTab : Control
             {
                 Text = dayNice,
                 StyleClasses = { StyleBase.StyleClassLabelHeading },
-                Margin = new Thickness(4, 6, 0, 0)
+                Margin = new Thickness(4, 6, 0, 0),
             });
 
             var first = true;
@@ -77,9 +77,7 @@ public sealed partial class ChangelogTab : Control
                 var (author, read) = groupedEntry.Key;
 
                 if (!first)
-                {
                     ChangelogBody.AddChild(new Control { Margin = new Thickness(4) });
-                }
 
                 if (read && !hasRead)
                 {
@@ -90,7 +88,7 @@ public sealed partial class ChangelogTab : Control
 
                     var readDivider = new BoxContainer
                     {
-                        Orientation = LayoutOrientation.Vertical
+                        Orientation = LayoutOrientation.Vertical,
                     };
 
                     var hBox = new BoxContainer
@@ -105,7 +103,7 @@ public sealed partial class ChangelogTab : Control
                                 ModulateSelfOverride = Color.FromHex("#888"),
                                 TextureScale = new Vector2(0.5f, 0.5f),
                                 Margin = new Thickness(4, 3),
-                                VerticalAlignment = VAlignment.Bottom
+                                VerticalAlignment = VAlignment.Bottom,
                             },
                             new Label
                             {
@@ -119,9 +117,9 @@ public sealed partial class ChangelogTab : Control
                                 ModulateSelfOverride = Color.FromHex("#888"),
                                 TextureScale = new Vector2(0.5f, 0.5f),
                                 Margin = new Thickness(4, 3),
-                                VerticalAlignment = VAlignment.Bottom
-                            }
-                        }
+                                VerticalAlignment = VAlignment.Bottom,
+                            },
+                        },
                     };
 
                     readDivider.AddChild(hBox);
@@ -139,7 +137,8 @@ public sealed partial class ChangelogTab : Control
                     Margin = new Thickness(6, 0, 0, 0),
                 };
                 authorLabel.SetMessage(
-                    FormattedMessage.FromMarkupOrThrow(Loc.GetString("changelog-author-changed", ("author", FormattedMessage.EscapeText(author)))));
+                    FormattedMessage.FromMarkupOrThrow(Loc.GetString("changelog-author-changed",
+                        ("author", FormattedMessage.EscapeText(author)))));
                 ChangelogBody.AddChild(authorLabel);
 
                 foreach (var change in groupedEntry.SelectMany(c => c.Changes))
@@ -153,8 +152,8 @@ public sealed partial class ChangelogTab : Control
                         Children =
                         {
                             GetIcon(change.Type),
-                            text
-                        }
+                            text,
+                        },
                     });
                 }
             }
@@ -169,7 +168,7 @@ public sealed partial class ChangelogTab : Control
             ChangelogLineType.Remove => ("minus.svg.192dpi.png", "#D16E6E"),
             ChangelogLineType.Fix => ("bug.svg.192dpi.png", "#D1BA6E"),
             ChangelogLineType.Tweak => ("wrench.svg.192dpi.png", "#6E96D1"),
-            _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
+            _ => throw new ArgumentOutOfRangeException(nameof(type), type, null),
         };
 
         return new TextureRect
@@ -178,7 +177,7 @@ public sealed partial class ChangelogTab : Control
             VerticalAlignment = VAlignment.Top,
             TextureScale = new Vector2(0.5f, 0.5f),
             Margin = new Thickness(2, 4, 6, 2),
-            ModulateSelfOverride = Color.FromHex(color)
+            ModulateSelfOverride = Color.FromHex(color),
         };
     }
 }

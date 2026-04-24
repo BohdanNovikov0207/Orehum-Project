@@ -5,7 +5,6 @@
 
 using System.Numerics;
 using Content.Client.Stunnable;
-using Content.Goobstation.Shared.Emoting;
 using Content.Shared.Damage.Components;
 using Content.Shared.Damage.Systems;
 using Content.Shared.Mobs;
@@ -15,14 +14,13 @@ using Robust.Shared.Utility;
 
 namespace Content.Client.Damage.Systems;
 
-public sealed partial class StaminaSystem : SharedStaminaSystem
+public sealed class StaminaSystem : SharedStaminaSystem
 {
+    private const string StaminaAnimationKey = "stamina";
     [Dependency] private readonly AnimationPlayerSystem _animation = default!;
     [Dependency] private readonly MobStateSystem _mobState = default!;
     [Dependency] private readonly SpriteSystem _sprite = default!;
     [Dependency] private readonly StunSystem _stun = default!; // Clientside Stun System
-
-    private const string StaminaAnimationKey = "stamina";
 
     public override void Initialize()
     {
@@ -70,7 +68,8 @@ public sealed partial class StaminaSystem : SharedStaminaSystem
         // If the animation is running, the system should update it accordingly
         // If we're below the threshold to animate, don't try to animate
         // If we're in stamcrit don't override it
-        if (entity.Comp.AnimationThreshold > entity.Comp.StaminaDamage || _animation.HasRunningAnimation(entity, StaminaAnimationKey))
+        if (entity.Comp.AnimationThreshold > entity.Comp.StaminaDamage ||
+            _animation.HasRunningAnimation(entity, StaminaAnimationKey))
             return;
 
         // Don't animate if we're dead
@@ -84,7 +83,7 @@ public sealed partial class StaminaSystem : SharedStaminaSystem
 
     private void StopAnimation(Entity<StaminaComponent, SpriteComponent?> entity)
     {
-        if(!Resolve(entity, ref entity.Comp2))
+        if (!Resolve(entity, ref entity.Comp2))
             return;
 
         _animation.Stop(entity.Owner, StaminaAnimationKey);
@@ -114,12 +113,14 @@ public sealed partial class StaminaSystem : SharedStaminaSystem
 
     private void PlayAnimation(Entity<StaminaComponent, SpriteComponent> entity)
     {
-    	 DebugTools.Assert(entity.Comp1.CritThreshold > entity.Comp1.AnimationThreshold, $"Animation threshold on {ToPrettyString(entity)} was not less than the crit threshold. This will cause errors, animation has been cancelled.");
+        DebugTools.Assert(entity.Comp1.CritThreshold > entity.Comp1.AnimationThreshold,
+            $"Animation threshold on {ToPrettyString(entity)} was not less than the crit threshold. This will cause errors, animation has been cancelled.");
         // Goobstation start
         // Last-stand sanity check to prevent clients from dying from dividing by 0
         if (entity.Comp1.CritThreshold <= entity.Comp1.AnimationThreshold)
         {
-            Log.Warning($"Entity {ToPrettyString(entity)} has invalid StaminaComponent: it's {nameof(StaminaComponent.CritThreshold)} lower or equal to {nameof(StaminaComponent.AnimationThreshold)}. Canceling playing the animation.");
+            Log.Warning(
+                $"Entity {ToPrettyString(entity)} has invalid StaminaComponent: it's {nameof(StaminaComponent.CritThreshold)} lower or equal to {nameof(StaminaComponent.AnimationThreshold)}. Canceling playing the animation.");
             return;
         }
         // Goobstation end

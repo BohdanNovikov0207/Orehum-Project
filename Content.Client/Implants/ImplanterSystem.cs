@@ -18,8 +18,8 @@ namespace Content.Client.Implants;
 
 public sealed class ImplanterSystem : SharedImplanterSystem
 {
-    [Dependency] private readonly SharedUserInterfaceSystem _uiSystem = default!;
     [Dependency] private readonly IPrototypeManager _proto = default!;
+    [Dependency] private readonly SharedUserInterfaceSystem _uiSystem = default!;
 
     public override void Initialize()
     {

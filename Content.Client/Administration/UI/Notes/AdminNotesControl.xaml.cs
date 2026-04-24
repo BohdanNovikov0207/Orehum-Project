@@ -23,17 +23,13 @@ namespace Content.Client.Administration.UI.Notes;
 [GenerateTypedNameReferences]
 public sealed partial class AdminNotesControl : Control
 {
-    [Dependency] private readonly IEntitySystemManager _entitySystem = default!;
     [Dependency] private readonly IConfigurationManager _cfg = default!;
-
-    public event Action<int, NoteType, string, NoteSeverity?, bool, DateTime?>? NoteChanged;
-    public event Action<NoteType, string, NoteSeverity?, bool, DateTime?>? NewNoteEntered;
-    public event Action<int, NoteType>? NoteDeleted;
-
-    private AdminNotesLinePopup? _popup;
-    private readonly SpriteSystem _sprites;
+    [Dependency] private readonly IEntitySystemManager _entitySystem = default!;
     private readonly double _noteFreshDays;
     private readonly double _noteStaleDays;
+    private readonly SpriteSystem _sprites;
+
+    private AdminNotesLinePopup? _popup;
 
     public AdminNotesControl()
     {
@@ -56,10 +52,11 @@ public sealed partial class AdminNotesControl : Control
     private bool CanEdit { get; set; }
     private string PlayerName { get; set; } = "<Error>";
 
-    public void SetPlayerName(string playerName)
-    {
-        PlayerName = playerName;
-    }
+    public event Action<int, NoteType, string, NoteSeverity?, bool, DateTime?>? NoteChanged;
+    public event Action<NoteType, string, NoteSeverity?, bool, DateTime?>? NewNoteEntered;
+    public event Action<int, NoteType>? NoteDeleted;
+
+    public void SetPlayerName(string playerName) => PlayerName = playerName;
 
     private void OnNewNoteButtonPressed(BaseButton.ButtonEventArgs obj)
     {
@@ -68,7 +65,12 @@ public sealed partial class AdminNotesControl : Control
         noteEdit.OpenCentered();
     }
 
-    private void OnNoteSubmitted(int id, NoteType type, string message, NoteSeverity? severity, bool secret, DateTime? expiryTime)
+    private void OnNoteSubmitted(int id,
+        NoteType type,
+        string message,
+        NoteSeverity? severity,
+        bool secret,
+        DateTime? expiryTime)
     {
         if (id == 0)
         {
@@ -85,9 +87,7 @@ public sealed partial class AdminNotesControl : Control
         _popup.OnEditPressed += (noteId, noteType) =>
         {
             if (!Inputs.TryGetValue((noteId, noteType), out var input))
-            {
                 return;
-            }
 
             var noteEdit = new NoteEdit(input.Note, PlayerName, CanCreate, CanEdit);
             noteEdit.SubmitPressed += OnNoteSubmitted;
@@ -107,9 +107,7 @@ public sealed partial class AdminNotesControl : Control
     {
         if (_popup == null ||
             !Inputs.TryGetValue((_popup.NoteId, _popup.NoteType), out var input))
-        {
             return;
-        }
 
         UpdateNoteLineAlpha(input);
     }
@@ -138,17 +136,13 @@ public sealed partial class AdminNotesControl : Control
         var timeDiff = DateTime.UtcNow - input.Note.CreatedAt;
         float alpha;
         if (_noteFreshDays == 0 || timeDiff.TotalDays <= _noteFreshDays)
-        {
             alpha = 1f;
-        }
         else if (_noteStaleDays == 0 || timeDiff.TotalDays > _noteStaleDays)
-        {
             alpha = 0f;
-        }
         else
-        {
-            alpha = (float) (1 - Math.Clamp((timeDiff.TotalDays - _noteFreshDays) / (_noteStaleDays - _noteFreshDays), 0, 1));
-        }
+            alpha = (float) (1 - Math.Clamp((timeDiff.TotalDays - _noteFreshDays) / (_noteStaleDays - _noteFreshDays),
+                0,
+                1));
 
         input.Modulate = input.Modulate.WithAlpha(alpha);
     }
@@ -164,6 +158,7 @@ public sealed partial class AdminNotesControl : Control
                 Inputs.Clear();
                 break;
             }
+
             Notes.RemoveChild(input);
             Inputs.Remove(key);
         }
@@ -221,17 +216,13 @@ public sealed partial class AdminNotesControl : Control
         base.Dispose(disposing);
 
         if (!disposing)
-        {
             return;
-        }
 
         Inputs.Clear();
         NewNoteButton.OnPressed -= OnNewNoteButtonPressed;
 
         if (_popup != null)
-        {
             UserInterfaceManager.PopupRoot.RemoveChild(_popup);
-        }
 
         NoteDeleted = null;
     }

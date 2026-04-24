@@ -5,29 +5,30 @@ using Robust.Shared.Timing;
 namespace Content.Client.UserInterface;
 
 /// <summary>
-/// A local buffer for <see cref="BoundUserInterface"/>s to manually implement prediction.
+/// A local buffer for <see cref="BoundUserInterface" />s to manually implement prediction.
 /// </summary>
 /// <remarks>
-/// <para>
-/// In many current (and future) cases, it is not practically possible to implement prediction for UIs
-/// by implementing the logic in shared. At the same time, we want to implement prediction for the best user experience
-/// (and it is sometimes the easiest way to make even a middling user experience).
-/// </para>
-/// <para>
-/// You can queue predicted messages into this class with <see cref="SendMessage"/>,
-/// and then call <see cref="MessagesToReplay"/> later from <see cref="BoundUserInterface.UpdateState"/>
-/// to get all messages that are still "ahead" of the latest server state.
-/// These messages can then manually be "applied" to the latest state received from the server.
-/// </para>
-/// <para>
-/// Note that this system only works if the server is guaranteed to send some kind of update in response to UI messages,
-/// or at a regular schedule. If it does not, there is no opportunity to error correct the prediction.
-/// </para>
+///     <para>
+///     In many current (and future) cases, it is not practically possible to implement prediction for UIs
+///     by implementing the logic in shared. At the same time, we want to implement prediction for the best user experience
+///     (and it is sometimes the easiest way to make even a middling user experience).
+///     </para>
+///     <para>
+///     You can queue predicted messages into this class with <see cref="SendMessage" />,
+///     and then call <see cref="MessagesToReplay" /> later from <see cref="BoundUserInterface.UpdateState" />
+///     to get all messages that are still "ahead" of the latest server state.
+///     These messages can then manually be "applied" to the latest state received from the server.
+///     </para>
+///     <para>
+///     Note that this system only works if the server is guaranteed to send some kind of update in response to UI
+///     messages,
+///     or at a regular schedule. If it does not, there is no opportunity to error correct the prediction.
+///     </para>
 /// </remarks>
 public sealed class BuiPredictionState
 {
-    private readonly BoundUserInterface _parent;
     private readonly IClientGameTiming _gameTiming;
+    private readonly BoundUserInterface _parent;
 
     private readonly Queue<MessageData> _queuedMessages = new();
 
@@ -72,9 +73,6 @@ public sealed class BuiPredictionState
         public GameTick TickSent;
         public required BoundUserInterfaceMessage Message;
 
-        public override string ToString()
-        {
-            return $"{Message} @ {TickSent}";
-        }
+        public override string ToString() => $"{Message} @ {TickSent}";
     }
 }

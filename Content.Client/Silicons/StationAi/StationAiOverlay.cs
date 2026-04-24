@@ -23,8 +23,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Numerics;
-using Content.Shared.Silicons.StationAi;
+using Content.Client._Orehum.NavMapRender;
+using Content.Shared.Movement.Components;
 using Content.Shared.Pinpointer;
+using Content.Shared.Silicons.StationAi;
 using Robust.Client.Graphics;
 using Robust.Client.Player;
 using Robust.Shared.Enums;
@@ -32,47 +34,51 @@ using Robust.Shared.Map.Components;
 using Robust.Shared.Physics;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
-using Content.Shared.Movement.Components; // Shitmed - Starlight Abductors Change
-using Content.Client._Orehum.NavMapRender; // Orehum - NavMapRender
+// Shitmed - Starlight Abductors Change
+
+// Orehum - NavMapRender
 
 namespace Content.Client.Silicons.StationAi;
 
 public sealed class StationAiOverlay : Overlay
 {
+    private const float UpdateRate = 1f / 30f; // Carpmosia
     private static readonly ProtoId<ShaderPrototype> CameraStaticShader = "CameraStatic";
     private static readonly ProtoId<ShaderPrototype> StencilMaskShader = "StencilMask";
     private static readonly ProtoId<ShaderPrototype> StencilDrawShader = "StencilDrawUnshaded"; //Orehum-edit
 
+    private static readonly RenderTargetFormatParameters
+        _renderParams = new(RenderTargetColorFormat.Rgba8Srgb); // Carpmosia
+
     [Dependency] private readonly IClyde _clyde = default!;
+
+    // Orehum start
+    private readonly CyberspaceNavMapRenderer _cyberspaceRenderer;
     [Dependency] private readonly IEntityManager _entManager = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly IPlayerManager _player = default!;
     [Dependency] private readonly IPrototypeManager _proto = default!;
-
-    public override OverlaySpace Space => OverlaySpace.WorldSpaceEntities;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     private readonly HashSet<Vector2i> _visibleTiles = new();
     private readonly Dictionary<Vector2i, HashSet<string>> _visibleTileTags = []; // Orehum
 
-    private IRenderTexture? _staticTexture;
-    private IRenderTexture? _stencilTexture;
-
-    private static readonly RenderTargetFormatParameters _renderParams = new(RenderTargetColorFormat.Rgba8Srgb); // Carpmosia
-    private const float UpdateRate = 1f / 30f; // Carpmosia
-
     private float _accumulator;
-
-    // Orehum start
-    private readonly CyberspaceNavMapRenderer _cyberspaceRenderer;
     private EntityUid _lastGridUid = EntityUid.Invalid;
+
+    private IRenderTexture? _staticTexture;
+
+    private IRenderTexture? _stencilTexture;
     // Orehum end
 
     public StationAiOverlay()
     {
         IoCManager.InjectDependencies(this);
-        ZIndex = (int) Content.Shared.DrawDepth.DrawDepth.CyberspaceOverlays; // Orehum: above all normal DrawDepths (max=13), below CyberspaceObjects (100)
+        ZIndex = (int) Shared.DrawDepth.DrawDepth
+            .CyberspaceOverlays; // Orehum: above all normal DrawDepths (max=13), below CyberspaceObjects (100)
         _cyberspaceRenderer = new CyberspaceNavMapRenderer(_proto); // Orehum
     }
+
+    public override OverlaySpace Space => OverlaySpace.WorldSpaceEntities;
 
     protected override void Draw(in OverlayDrawArgs args)
     {
@@ -80,7 +86,9 @@ public sealed class StationAiOverlay : Overlay
         {
             _staticTexture?.Dispose();
             _stencilTexture?.Dispose();
-            _stencilTexture = _clyde.CreateRenderTarget(args.Viewport.Size, new RenderTargetFormatParameters(RenderTargetColorFormat.Rgba8Srgb), name: "station-ai-stencil");
+            _stencilTexture = _clyde.CreateRenderTarget(args.Viewport.Size,
+                new RenderTargetFormatParameters(RenderTargetColorFormat.Rgba8Srgb),
+                name: "station-ai-stencil");
             _staticTexture = _clyde.CreateRenderTarget(args.Viewport.Size,
                 new RenderTargetFormatParameters(RenderTargetColorFormat.Rgba8Srgb),
                 name: "station-ai-static");
@@ -106,7 +114,7 @@ public sealed class StationAiOverlay : Overlay
 
         // Orehum edit-start
         var gridUid = playerXform?.GridUid
-            ?? (stationAiOverlay is { AllowCrossGrid: true } ? _lastGridUid : EntityUid.Invalid);
+                      ?? (stationAiOverlay is { AllowCrossGrid: true } ? _lastGridUid : EntityUid.Invalid);
         if (gridUid != EntityUid.Invalid)
             _lastGridUid = gridUid;
         // Orehum edit-end
@@ -140,51 +148,60 @@ public sealed class StationAiOverlay : Overlay
             var xforms = _entManager.System<SharedTransformSystem>();
 
             // Orehum: rebuild cached navmap geometry on timer, grid change, or camera move
-            _cyberspaceRenderer.Update((float)_timing.FrameTime.TotalSeconds, gridUid, navMap, grid, xforms, worldBounds);
+            _cyberspaceRenderer.Update((float) _timing.FrameTime.TotalSeconds,
+                gridUid,
+                navMap,
+                grid,
+                xforms,
+                worldBounds);
 
             if (_accumulator <= 0f)
             {
                 _accumulator = MathF.Max(0f, _accumulator + UpdateRate);
                 _visibleTiles.Clear();
                 _visibleTileTags.Clear();
-                _entManager.System<StationAiVisionSystem>().GetView((gridUid, broadphase, grid), worldBounds, _visibleTiles);
+                _entManager.System<StationAiVisionSystem>()
+                    .GetView((gridUid, broadphase, grid), worldBounds, _visibleTiles);
             }
 
             var gridMatrix = xforms.GetWorldMatrix(gridUid);
-            var matty =  Matrix3x2.Multiply(gridMatrix, invMatrix);
+            var matty = Matrix3x2.Multiply(gridMatrix, invMatrix);
 
             // Draw visible tiles to stencil
-            worldHandle.RenderInRenderTarget(_stencilTexture!, () =>
-            {
-                worldHandle.SetTransform(matty);
-
-                foreach (var tile in _visibleTiles)
+            worldHandle.RenderInRenderTarget(_stencilTexture!,
+                () =>
                 {
-                    var aabb = lookups.GetLocalBounds(tile, grid.TileSize);
-                    worldHandle.DrawRect(aabb, Color.White);
-                }
-            },
-            Color.Transparent);
+                    worldHandle.SetTransform(matty);
+
+                    foreach (var tile in _visibleTiles)
+                    {
+                        var aabb = lookups.GetLocalBounds(tile, grid.TileSize);
+                        worldHandle.DrawRect(aabb, Color.White);
+                    }
+                },
+                Color.Transparent);
 
             // Once this is gucci optimise rendering.
             worldHandle.RenderInRenderTarget(_staticTexture!,
                 () => _cyberspaceRenderer.Draw(worldHandle, matty), // Orehum
-            Color.Black);
+                Color.Black);
         }
         // Not on a grid
         else
         {
-            worldHandle.RenderInRenderTarget(_stencilTexture!, () =>
-            {
-            },
-            Color.Transparent);
+            worldHandle.RenderInRenderTarget(_stencilTexture!,
+                () =>
+                {
+                },
+                Color.Transparent);
 
             worldHandle.RenderInRenderTarget(_staticTexture!,
-            () =>
-            {
-                worldHandle.SetTransform(Matrix3x2.Identity);
-                worldHandle.DrawRect(worldBounds, Color.Black);
-            }, Color.Black);
+                () =>
+                {
+                    worldHandle.SetTransform(Matrix3x2.Identity);
+                    worldHandle.DrawRect(worldBounds, Color.Black);
+                },
+                Color.Black);
         }
 
         // Use the lighting as a mask
@@ -197,6 +214,5 @@ public sealed class StationAiOverlay : Overlay
 
         worldHandle.SetTransform(Matrix3x2.Identity);
         worldHandle.UseShader(null);
-
     }
 }

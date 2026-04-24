@@ -22,10 +22,11 @@ public sealed partial class AdminFaxWindow : DefaultWindow
 {
     private const string StampsRsiPath = "/Textures/Objects/Misc/bureaucracy.rsi";
 
-    public Action<(NetEntity entity, string title, string stampedBy, string message, string stampSprite, Color stampColor, bool locked)>? OnMessageSend;
+    [Dependency] private readonly IResourceCache _resCache = default!;
     public Action<NetEntity>? OnFollowFax;
 
-    [Dependency] private readonly IResourceCache _resCache = default!;
+    public Action<(NetEntity entity, string title, string stampedBy, string message, string stampSprite, Color
+        stampColor, bool locked)>? OnMessageSend;
 
     public AdminFaxWindow()
     {
@@ -41,10 +42,11 @@ public sealed partial class AdminFaxWindow : DefaultWindow
 
         // Don't use this, but ColorSelectorSliders requires it:
         // what the fok
-        StampColorSelector.OnColorChanged += (color) => {};
+        StampColorSelector.OnColorChanged += color => { };
 
         var loc = IoCManager.Resolve<ILocalizationManager>();
-        MessageEdit.Placeholder = new Rope.Leaf(loc.GetString("admin-fax-message-placeholder")); // TextEdit work only with Nodes
+        MessageEdit.Placeholder =
+            new Rope.Leaf(loc.GetString("admin-fax-message-placeholder")); // TextEdit work only with Nodes
     }
 
     public void PopulateFaxes(List<AdminFaxEntry> faxes)

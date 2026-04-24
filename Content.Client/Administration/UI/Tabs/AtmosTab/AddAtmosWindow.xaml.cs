@@ -83,45 +83,43 @@ using Robust.Client.UserInterface.CustomControls;
 using Robust.Client.UserInterface.XAML;
 using Robust.Shared.Map.Components;
 
-namespace Content.Client.Administration.UI.Tabs.AtmosTab
+namespace Content.Client.Administration.UI.Tabs.AtmosTab;
+
+[GenerateTypedNameReferences]
+[UsedImplicitly]
+public sealed partial class AddAtmosWindow : DefaultWindow
 {
-    [GenerateTypedNameReferences]
-    [UsedImplicitly]
-    public sealed partial class AddAtmosWindow : DefaultWindow
+    private readonly List<Entity<MapGridComponent>> _data = new();
+    [Dependency] private readonly IEntityManager _entities = default!;
+    [Dependency] private readonly IPlayerManager _players = default!;
+
+    public AddAtmosWindow()
     {
-        [Dependency] private readonly IPlayerManager _players = default!;
-        [Dependency] private readonly IEntityManager _entities = default!;
+        RobustXamlLoader.Load(this);
+        IoCManager.InjectDependencies(this);
+    }
 
-        private readonly List<Entity<MapGridComponent>> _data = new();
+    protected override void EnteredTree()
+    {
+        _data.Clear();
 
-        public AddAtmosWindow()
+        var player = _players.LocalEntity;
+        var playerGrid = _entities.GetComponentOrNull<TransformComponent>(player)?.GridUid;
+        var query = IoCManager.Resolve<IEntityManager>().AllEntityQueryEnumerator<MapGridComponent>();
+
+        while (query.MoveNext(out var uid, out var grid))
         {
-            RobustXamlLoader.Load(this);
-            IoCManager.InjectDependencies(this);
+            _data.Add((uid, grid));
+            GridOptions.AddItem($"{uid} {(playerGrid == uid ? Loc.GetString("admin-ui-atmos-grid-current") : "")}");
         }
 
-        protected override void EnteredTree()
-        {
-            _data.Clear();
+        GridOptions.OnItemSelected += eventArgs => GridOptions.SelectId(eventArgs.Id);
+        SubmitButton.OnPressed += SubmitButtonOnOnPressed;
+    }
 
-            var player = _players.LocalEntity;
-            var playerGrid = _entities.GetComponentOrNull<TransformComponent>(player)?.GridUid;
-            var query = IoCManager.Resolve<IEntityManager>().AllEntityQueryEnumerator<MapGridComponent>();
-
-            while (query.MoveNext(out var uid, out var grid))
-            {
-                _data.Add((uid, grid));
-                GridOptions.AddItem($"{uid} {(playerGrid == uid ? Loc.GetString($"admin-ui-atmos-grid-current") : "")}");
-            }
-
-            GridOptions.OnItemSelected += eventArgs => GridOptions.SelectId(eventArgs.Id);
-            SubmitButton.OnPressed += SubmitButtonOnOnPressed;
-        }
-
-        private void SubmitButtonOnOnPressed(BaseButton.ButtonEventArgs obj)
-        {
-            var selectedGrid = _data[GridOptions.SelectedId].Owner;
-            IoCManager.Resolve<IClientConsoleHost>().ExecuteCommand($"addatmos {_entities.GetNetEntity(selectedGrid)}");
-        }
+    private void SubmitButtonOnOnPressed(BaseButton.ButtonEventArgs obj)
+    {
+        var selectedGrid = _data[GridOptions.SelectedId].Owner;
+        IoCManager.Resolve<IClientConsoleHost>().ExecuteCommand($"addatmos {_entities.GetNetEntity(selectedGrid)}");
     }
 }

@@ -20,8 +20,6 @@ public sealed class ChannelSelectorItemButton : Button
 {
     public readonly ChatSelectChannel Channel;
 
-    public bool IsHidden => Parent == null;
-
     public ChannelSelectorItemButton(ChatSelectChannel selector)
     {
         Channel = selector;
@@ -34,4 +32,6 @@ public sealed class ChannelSelectorItemButton : Button
         if (prefix != default)
             Text = Loc.GetString("hud-chatbox-select-name-prefixed", ("name", Text), ("prefix", prefix));
     }
+
+    public bool IsHidden => Parent == null;
 }

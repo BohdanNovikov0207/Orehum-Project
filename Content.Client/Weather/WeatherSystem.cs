@@ -52,9 +52,9 @@ namespace Content.Client.Weather;
 
 public sealed partial class WeatherSystem : SharedWeatherSystem // Goob edit - made partial
 {
-    [Dependency] private readonly IPlayerManager _playerManager = default!;
     [Dependency] private readonly AudioSystem _audio = default!;
     [Dependency] private readonly MapSystem _mapSystem = default!;
+    [Dependency] private readonly IPlayerManager _playerManager = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     public override void Initialize()
@@ -122,11 +122,11 @@ public sealed partial class WeatherSystem : SharedWeatherSystem // Goob edit - m
                             if (Math.Abs(x) == 1 && Math.Abs(y) == 1 ||
                                 x == 0 && y == 0 ||
                                 (new Vector2(x, y) + node.GridIndices - seed.GridIndices).Length() > 3)
-                            {
                                 continue;
-                            }
 
-                            frontier.Enqueue(_mapSystem.GetTileRef(gridId, grid, new Vector2i(x, y) + node.GridIndices));
+                            frontier.Enqueue(_mapSystem.GetTileRef(gridId,
+                                grid,
+                                new Vector2i(x, y) + node.GridIndices));
                         }
                     }
 
@@ -148,9 +148,7 @@ public sealed partial class WeatherSystem : SharedWeatherSystem // Goob edit - m
                 occlusion = _audio.GetOcclusion(entPos, delta, distance);
             }
             else
-            {
                 occlusion = 3f;
-            }
         }
 
         var alpha = GetPercent(weather, uid);
@@ -159,7 +157,11 @@ public sealed partial class WeatherSystem : SharedWeatherSystem // Goob edit - m
         comp.Occlusion = occlusion;
     }
 
-    protected override bool SetState(EntityUid uid, WeatherState state, WeatherComponent comp, WeatherData weather, WeatherPrototype weatherProto)
+    protected override bool SetState(EntityUid uid,
+        WeatherState state,
+        WeatherComponent comp,
+        WeatherData weather,
+        WeatherPrototype weatherProto)
     {
         if (!base.SetState(uid, state, comp, weather, weatherProto))
             return false;
@@ -204,7 +206,7 @@ public sealed partial class WeatherSystem : SharedWeatherSystem // Goob edit - m
                 continue;
 
             // New weather
-            StartWeather(uid, component, ProtoMan.Index<WeatherPrototype>(proto), weather.EndTime);
+            StartWeather(uid, component, ProtoMan.Index(proto), weather.EndTime);
         }
     }
 }

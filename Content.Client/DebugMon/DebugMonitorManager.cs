@@ -18,18 +18,16 @@ namespace Content.Client.DebugMon;
 /// </summary>
 internal sealed class DebugMonitorManager
 {
-    [Dependency] private readonly IConfigurationManager _cfg = default!;
     [Dependency] private readonly IClientAdminManager _admin = default!;
-    [Dependency] private readonly IUserInterfaceManager _userInterface = default!;
     [Dependency] private readonly IBaseClient _baseClient = default!;
+    [Dependency] private readonly IConfigurationManager _cfg = default!;
+    [Dependency] private readonly IUserInterfaceManager _userInterface = default!;
 
     public void FrameUpdate()
     {
         if (_baseClient.RunLevel == ClientRunLevel.InGame
             && !_admin.IsActive()
             && _cfg.GetCVar(CCVars.DebugCoordinatesAdminOnly))
-        {
             _userInterface.DebugMonitors.SetMonitor(DebugMonitor.Coords, false);
-        }
     }
 }

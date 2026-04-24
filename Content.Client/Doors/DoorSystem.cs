@@ -116,7 +116,8 @@ public sealed class DoorSystem : SharedDoorSystem
 
     private void UpdateAppearanceForDoorState(Entity<DoorComponent> entity, SpriteComponent sprite, DoorState state)
     {
-        _sprite.SetDrawDepth((entity.Owner, sprite), state is DoorState.Open ? entity.Comp.OpenDrawDepth : entity.Comp.ClosedDrawDepth);
+        _sprite.SetDrawDepth((entity.Owner, sprite),
+            state is DoorState.Open ? entity.Comp.OpenDrawDepth : entity.Comp.ClosedDrawDepth);
 
         switch (state)
         {
@@ -138,22 +139,22 @@ public sealed class DoorSystem : SharedDoorSystem
                 if (entity.Comp.OpeningAnimationTime == 0.0)
                     return;
 
-                _animationSystem.Play(entity, (Animation)entity.Comp.OpeningAnimation, DoorComponent.AnimationKey);
+                _animationSystem.Play(entity, (Animation) entity.Comp.OpeningAnimation, DoorComponent.AnimationKey);
 
                 return;
             case DoorState.Closing:
                 if (entity.Comp.ClosingAnimationTime == 0.0 || entity.Comp.CurrentlyCrushing.Count != 0)
                     return;
 
-                _animationSystem.Play(entity, (Animation)entity.Comp.ClosingAnimation, DoorComponent.AnimationKey);
+                _animationSystem.Play(entity, (Animation) entity.Comp.ClosingAnimation, DoorComponent.AnimationKey);
 
                 return;
             case DoorState.Denying:
-                _animationSystem.Play(entity, (Animation)entity.Comp.DenyingAnimation, DoorComponent.AnimationKey);
+                _animationSystem.Play(entity, (Animation) entity.Comp.DenyingAnimation, DoorComponent.AnimationKey);
 
                 return;
             case DoorState.Emagging:
-                _animationSystem.Play(entity, (Animation)entity.Comp.EmaggingAnimation, DoorComponent.AnimationKey);
+                _animationSystem.Play(entity, (Animation) entity.Comp.EmaggingAnimation, DoorComponent.AnimationKey);
 
                 return;
         }

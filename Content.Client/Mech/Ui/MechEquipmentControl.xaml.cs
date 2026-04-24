@@ -14,8 +14,6 @@ namespace Content.Client.Mech.Ui;
 [GenerateTypedNameReferences]
 public sealed partial class MechEquipmentControl : Control
 {
-    public event Action? OnRemoveButtonPressed;
-
     public MechEquipmentControl(EntityUid entity, string itemName, Control? fragment)
     {
         RobustXamlLoader.Load(this);
@@ -31,4 +29,6 @@ public sealed partial class MechEquipmentControl : Control
 
         RemoveButton.OnPressed += _ => OnRemoveButtonPressed?.Invoke();
     }
+
+    public event Action? OnRemoveButtonPressed;
 }

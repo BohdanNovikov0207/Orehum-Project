@@ -21,16 +21,16 @@ using Robust.Shared.Prototypes;
 namespace Content.Client.Guidebook.Controls;
 
 /// <summary>
-///     Control for embedding a research technology into a guidebook.
+/// Control for embedding a research technology into a guidebook.
 /// </summary>
-[UsedImplicitly, GenerateTypedNameReferences]
+[UsedImplicitly] [GenerateTypedNameReferences]
 public sealed partial class GuideTechnologyEmbed : BoxContainer, IDocumentTag, ISearchableControl
 {
-    [Dependency] private readonly IEntitySystemManager _systemManager = default!;
     [Dependency] private readonly IPrototypeManager _prototype = default!;
 
     private readonly ResearchSystem _research;
     private readonly SpriteSystem _sprite;
+    [Dependency] private readonly IEntitySystemManager _systemManager = default!;
 
     public GuideTechnologyEmbed()
     {
@@ -49,16 +49,6 @@ public sealed partial class GuideTechnologyEmbed : BoxContainer, IDocumentTag, I
     public GuideTechnologyEmbed(TechnologyPrototype technology) : this()
     {
         GenerateControl(technology);
-    }
-
-    public bool CheckMatchesSearch(string query)
-    {
-        return this.ChildrenContainText(query);
-    }
-
-    public void SetHiddenState(bool state, string query)
-    {
-        Visible = CheckMatchesSearch(query) ? state : !state;
     }
 
     public bool TryParseTag(Dictionary<string, string> args, [NotNullWhen(true)] out Control? control)
@@ -82,17 +72,23 @@ public sealed partial class GuideTechnologyEmbed : BoxContainer, IDocumentTag, I
         return true;
     }
 
+    public bool CheckMatchesSearch(string query) => this.ChildrenContainText(query);
+
+    public void SetHiddenState(bool state, string query) => Visible = CheckMatchesSearch(query) ? state : !state;
+
     private void GenerateControl(TechnologyPrototype technology)
     {
         var discipline = _prototype.Index(technology.Discipline);
 
         NameLabel.SetMarkup($"[bold]{Loc.GetString(technology.Name)}[/bold]");
-        DescriptionLabel.SetMessage(_research.GetTechnologyDescription(technology, includePrereqs: true, disciplinePrototype: discipline));
+        DescriptionLabel.SetMessage(_research.GetTechnologyDescription(technology,
+            includePrereqs: true,
+            disciplinePrototype: discipline));
         TechTexture.Texture = _sprite.Frame0(technology.Icon);
 
         DisciplineColorBackground.PanelOverride = new StyleBoxFlat
         {
-            BackgroundColor = discipline.Color
+            BackgroundColor = discipline.Color,
         };
     }
 }

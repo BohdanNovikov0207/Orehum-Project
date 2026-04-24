@@ -13,11 +13,11 @@ using Robust.Shared.Utility;
 namespace Content.Client.Toggleable;
 
 /// <summary>
-/// Implements the behavior of <see cref="ToggleableVisualsComponent"/> by reacting to
-/// <see cref="AppearanceChangeEvent"/>, for the sprite directly; <see cref="OnGetHeldVisuals"/> for the
-/// in-hand visuals; and <see cref="OnGetEquipmentVisuals"/> for the clothing visuals.
+/// Implements the behavior of <see cref="ToggleableVisualsComponent" /> by reacting to
+/// <see cref="AppearanceChangeEvent" />, for the sprite directly; <see cref="OnGetHeldVisuals" /> for the
+/// in-hand visuals; and <see cref="OnGetEquipmentVisuals" /> for the clothing visuals.
 /// </summary>
-/// <see cref="ToggleableVisualsComponent"/>
+/// <see cref="ToggleableVisualsComponent" />
 public sealed class ToggleableVisualsSystem : VisualizerSystem<ToggleableVisualsComponent>
 {
     [Dependency] private readonly SharedItemSystem _item = default!;
@@ -59,9 +59,7 @@ public sealed class ToggleableVisualsSystem : VisualizerSystem<ToggleableVisuals
                 $"{typeof(ItemTogglePointLightComponent)} requires point lights without net-sync");
             _pointLight.SetEnabled(uid, enabled, light);
             if (modulateColor && toggleLights.ToggleableVisualsColorModulatesLights)
-            {
                 _pointLight.SetColor(uid, color, light);
-            }
         }
 
         // update clothing & in-hand visuals.

@@ -17,14 +17,14 @@ namespace Content.Client.SprayPainter.UI;
 [GenerateTypedNameReferences]
 public sealed partial class SprayPainterDecals : Control
 {
-    public Action<ProtoId<DecalPrototype>>? OnDecalSelected;
-    public Action<Color?>? OnColorChanged;
-    public Action<int>? OnAngleChanged;
-    public Action<bool>? OnSnapChanged;
+    private List<SprayPainterDecalEntry> _decals = [];
+    private string _selectedDecal = string.Empty;
 
     private SpriteSystem? _sprite;
-    private string _selectedDecal = string.Empty;
-    private List<SprayPainterDecalEntry> _decals = [];
+    public Action<int>? OnAngleChanged;
+    public Action<Color?>? OnColorChanged;
+    public Action<ProtoId<DecalPrototype>>? OnDecalSelected;
+    public Action<bool>? OnSnapChanged;
 
     public SprayPainterDecals()
     {
@@ -46,10 +46,8 @@ public sealed partial class SprayPainterDecals : Control
         UpdateColorButtons(UseCustomColorCheckBox.Pressed);
     }
 
-    private void SnapToTileCheckBoxOnOnPressed(BaseButton.ButtonEventArgs _)
-    {
+    private void SnapToTileCheckBoxOnOnPressed(BaseButton.ButtonEventArgs _) =>
         OnSnapChanged?.Invoke(SnapToTileCheckBox.Pressed);
-    }
 
     /// <summary>
     /// Updates the decal list.
@@ -63,7 +61,7 @@ public sealed partial class SprayPainterDecals : Control
 
         foreach (var decal in decals)
         {
-            var button = new TextureButton()
+            var button = new TextureButton
             {
                 TextureNormal = sprite.Frame0(decal.Sprite),
                 Name = decal.Name,
@@ -73,15 +71,13 @@ public sealed partial class SprayPainterDecals : Control
             button.OnPressed += DecalButtonOnPressed;
 
             if (UseCustomColorCheckBox.Pressed)
-            {
                 button.Modulate = ColorSelector.Color;
-            }
 
             if (_selectedDecal == decal.Name)
             {
-                var panelContainer = new PanelContainer()
+                var panelContainer = new PanelContainer
                 {
-                    PanelOverride = new StyleBoxFlat()
+                    PanelOverride = new StyleBoxFlat
                     {
                         BackgroundColor = StyleNano.ButtonColorDefault,
                     },
@@ -93,9 +89,7 @@ public sealed partial class SprayPainterDecals : Control
                 DecalsGrid.AddChild(panelContainer);
             }
             else
-            {
                 DecalsGrid.AddChild(button);
-            }
         }
     }
 
@@ -111,7 +105,7 @@ public sealed partial class SprayPainterDecals : Control
 
     private void UpdateColorButtons(bool apply)
     {
-        Color modulateColor = apply ? ColorSelector.Color : Color.White;
+        var modulateColor = apply ? ColorSelector.Color : Color.White;
         foreach (var button in DecalsGrid.Children)
         {
             switch (button)
@@ -120,12 +114,14 @@ public sealed partial class SprayPainterDecals : Control
                     button.Modulate = modulateColor;
                     break;
                 case PanelContainer panelContainer:
+                {
+                    foreach (TextureButton textureButton in panelContainer.Children)
                     {
-                        foreach (TextureButton textureButton in panelContainer.Children)
-                            textureButton.Modulate = modulateColor;
-
-                        break;
+                        textureButton.Modulate = modulateColor;
                     }
+
+                    break;
+                }
             }
         }
     }
@@ -154,10 +150,7 @@ public sealed partial class SprayPainterDecals : Control
         PopulateDecals(_decals, _sprite);
     }
 
-    public void SetAngle(int degrees)
-    {
-        AngleSpinBox.OverrideValue(degrees);
-    }
+    public void SetAngle(int degrees) => AngleSpinBox.OverrideValue(degrees);
 
     public void SetColor(Color? color)
     {
@@ -167,8 +160,5 @@ public sealed partial class SprayPainterDecals : Control
         UpdateColorButtons(UseCustomColorCheckBox.Pressed);
     }
 
-    public void SetSnap(bool snap)
-    {
-        SnapToTileCheckBox.Pressed = snap;
-    }
+    public void SetSnap(bool snap) => SnapToTileCheckBox.Pressed = snap;
 }

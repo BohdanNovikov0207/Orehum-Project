@@ -20,17 +20,17 @@ namespace Content.Client.Materials.UI;
 [GenerateTypedNameReferences]
 public sealed partial class MaterialDisplay : PanelContainer
 {
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    private readonly bool _canEject;
+    private readonly EntityUid _ent;
     [Dependency] private readonly IEntityManager _entityManager = default!;
 
     private readonly MaterialStorageSystem _materialStorage;
 
     private readonly MaterialStorageUIController _materialUIController;
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    public readonly string Material;
 
     private int _volume;
-    private readonly EntityUid _ent;
-    public readonly string Material;
-    private readonly bool _canEject;
 
     public MaterialDisplay(EntityUid ent, string material, int volume, bool canEject)
     {
@@ -94,7 +94,7 @@ public sealed partial class MaterialDisplay : PanelContainer
                 Access = AccessLevel.Public,
                 Text = Loc.GetString($"{sheetsToEject}"),
                 MinWidth = 45,
-                StyleClasses = { styleClass }
+                StyleClasses = { styleClass },
             };
 
             button.OnPressed += _ =>
@@ -105,9 +105,9 @@ public sealed partial class MaterialDisplay : PanelContainer
             button.Disabled = maxEjectableSheets < sheetsToEject;
 
             if (_prototypeManager.TryIndex<MaterialPrototype>(Material, out var proto))
-            {
-                button.ToolTip = Loc.GetString("lathe-menu-tooltip-display", ("amount", sheetsToEject), ("material", Loc.GetString(proto.Name)));
-            }
+                button.ToolTip = Loc.GetString("lathe-menu-tooltip-display",
+                    ("amount", sheetsToEject),
+                    ("material", Loc.GetString(proto.Name)));
 
             Content.AddChild(button);
         }

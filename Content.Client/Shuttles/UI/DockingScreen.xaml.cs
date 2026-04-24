@@ -19,20 +19,18 @@ namespace Content.Client.Shuttles.UI;
 public sealed partial class DockingScreen : BoxContainer
 {
     [Dependency] private readonly IEntityManager _entManager = default!;
-    private readonly SharedShuttleSystem _shuttles;
-
-    /// <summary>
-    /// Stored by GridID then by docks
-    /// </summary>
-    public Dictionary<NetEntity, List<DockingPortState>> Docks = new();
 
     /// <summary>
     /// Store the dock buttons for the side buttons.
     /// </summary>
     private readonly Dictionary<NetEntity, Button> _ourDockButtons = new();
 
-    public event Action<NetEntity, NetEntity>? DockRequest;
-    public event Action<NetEntity>? UndockRequest;
+    private readonly SharedShuttleSystem _shuttles;
+
+    /// <summary>
+    /// Stored by GridID then by docks
+    /// </summary>
+    public Dictionary<NetEntity, List<DockingPortState>> Docks = new();
 
     public DockingScreen()
     {
@@ -51,12 +49,13 @@ public sealed partial class DockingScreen : BoxContainer
         };
     }
 
+    public event Action<NetEntity, NetEntity>? DockRequest;
+    public event Action<NetEntity>? UndockRequest;
+
     private void OnView(NetEntity obj)
     {
         if (_ourDockButtons.TryGetValue(obj, out var viewed))
-        {
             viewed.Pressed = true;
-        }
     }
 
     public void UpdateState(EntityUid? shuttle, DockingInterfaceState state)
@@ -98,7 +97,7 @@ public sealed partial class DockingScreen : BoxContainer
             dockText.Clear();
             dockText.Append(dock.Name);
 
-            var button = new Button()
+            var button = new Button
             {
                 Text = dockText.ToString(),
                 ToggleMode = true,
@@ -157,9 +156,7 @@ public sealed partial class DockingScreen : BoxContainer
                 string? iffLabel = null;
 
                 if (_entManager.EntityExists(dockGrid))
-                {
                     iffLabel = _shuttles.GetIFFLabel(dockGrid.Value);
-                }
 
                 iffLabel ??= Loc.GetString("shuttle-console-unknown");
                 dockContainer.SetName(iffLabel);
@@ -170,8 +167,5 @@ public sealed partial class DockingScreen : BoxContainer
         }
     }
 
-    private void OnDockPress(DockingPortState state)
-    {
-        DockingControl.SetViewedDock(state);
-    }
+    private void OnDockPress(DockingPortState state) => DockingControl.SetViewedDock(state);
 }

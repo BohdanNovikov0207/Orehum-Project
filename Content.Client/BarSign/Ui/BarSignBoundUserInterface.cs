@@ -27,7 +27,7 @@ public sealed class BarSignBoundUserInterface(EntityUid owner, Enum uiKey) : Bou
         var allSigns = Shared.BarSign.BarSignSystem.GetAllBarSigns(_prototype)
             .OrderBy(p => Loc.GetString(p.Name))
             .ToList();
-        _menu = new(sign, allSigns);
+        _menu = new BarSignMenu(sign, allSigns);
 
         _menu.OnSignSelected += id =>
         {

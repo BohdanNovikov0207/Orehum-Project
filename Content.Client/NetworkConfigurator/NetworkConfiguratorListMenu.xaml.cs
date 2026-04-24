@@ -19,8 +19,6 @@ namespace Content.Client.NetworkConfigurator;
 [GenerateTypedNameReferences]
 public sealed partial class NetworkConfiguratorListMenu : FancyWindow
 {
-    public event Action<string>? OnRemoveAddress;
-
     public NetworkConfiguratorListMenu()
     {
         RobustXamlLoader.Load(this);
@@ -29,6 +27,8 @@ public sealed partial class NetworkConfiguratorListMenu : FancyWindow
             OnRemoveAddress?.Invoke(args);
         };
     }
+
+    public event Action<string>? OnRemoveAddress;
 
     public void UpdateState(NetworkConfiguratorUserInterfaceState state)
     {

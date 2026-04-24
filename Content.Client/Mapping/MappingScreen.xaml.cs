@@ -95,22 +95,18 @@ public sealed partial class MappingScreen : InGameScreen
 {
     [Dependency] private readonly IPrototypeManager _prototype = default!;
 
-    public DecalPlacementSystem DecalSystem = default!;
-
-    private PaletteColorPicker? _picker;
-
-    private ProtoId<DecalPrototype>? _id;
+    private bool _decalAuto;
+    private bool _decalCleanable;
     private Color _decalColor = Color.White;
     private float _decalRotation;
     private bool _decalSnap;
     private int _decalZIndex;
-    private bool _decalCleanable;
 
-    private bool _decalAuto;
+    private ProtoId<DecalPrototype>? _id;
 
-    public override ChatBox ChatBox => GetWidget<ChatBox>()!;
+    private PaletteColorPicker? _picker;
 
-    public event Func<MappingSpawnButton, bool>? IsDecalVisible;
+    public DecalPlacementSystem DecalSystem = default!;
 
     public MappingScreen()
     {
@@ -131,7 +127,7 @@ public sealed partial class MappingScreen : InGameScreen
 
         var rotationSpinBox = new FloatSpinBox(90.0f, 0)
         {
-            HorizontalExpand = true
+            HorizontalExpand = true,
         };
         DecalSpinBoxContainer.AddChild(rotationSpinBox);
 
@@ -175,18 +171,18 @@ public sealed partial class MappingScreen : InGameScreen
         Flip.OnPressed += args => FlipSides();
     }
 
+    public override ChatBox ChatBox => GetWidget<ChatBox>()!;
+
+    public event Func<MappingSpawnButton, bool>? IsDecalVisible;
+
     public void FlipSides()
     {
         ScreenContainer.Flip();
 
         if (SpawnContainer.GetPositionInParent() == 0)
-        {
             Flip.Texture.TexturePath = "/Textures/Interface/VerbIcons/rotate_cw.svg.192dpi.png";
-        }
         else
-        {
             Flip.Texture.TexturePath = "/Textures/Interface/VerbIcons/rotate_ccw.svg.192dpi.png";
-        }
     }
 
     private void OnDecalColorPicked(Color color)
@@ -253,16 +249,12 @@ public sealed partial class MappingScreen : InGameScreen
         {
             if (control is not MappingSpawnButton button ||
                 button.Prototype?.Prototype is not DecalPrototype)
-            {
                 continue;
-            }
 
             foreach (var child in button.Children)
             {
                 if (child is not MappingSpawnButton { Prototype.Prototype: DecalPrototype } childButton)
-                {
                     continue;
-                }
 
                 childButton.Texture.Modulate = _decalColor;
                 childButton.Visible = IsDecalVisible?.Invoke(childButton) ?? true;
@@ -270,10 +262,8 @@ public sealed partial class MappingScreen : InGameScreen
         }
     }
 
-    public override void SetChatSize(Vector2 size)
-    {
+    public override void SetChatSize(Vector2 size) =>
         ScreenContainer.ResizeMode = SplitContainer.SplitResizeMode.RespectChildrenMinSize;
-    }
 
     public void UnPressActionsExcept(Control except)
     {

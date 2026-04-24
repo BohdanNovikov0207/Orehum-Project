@@ -34,8 +34,7 @@ public sealed class PowerMonitoringConsoleBoundUserInterface : BoundUserInterfac
         var castState = (PowerMonitoringConsoleBoundInterfaceState) state;
 
         EntMan.TryGetComponent<TransformComponent>(Owner, out var xform);
-        _menu?.ShowEntites
-            (castState.TotalSources,
+        _menu?.ShowEntites(castState.TotalSources,
             castState.TotalBatteryUsage,
             castState.TotalLoads,
             castState.AllEntries,
@@ -44,8 +43,6 @@ public sealed class PowerMonitoringConsoleBoundUserInterface : BoundUserInterfac
             xform?.Coordinates);
     }
 
-    public void SendPowerMonitoringConsoleMessage(NetEntity? netEntity, PowerMonitoringConsoleGroup group)
-    {
+    public void SendPowerMonitoringConsoleMessage(NetEntity? netEntity, PowerMonitoringConsoleGroup group) =>
         SendMessage(new PowerMonitoringConsoleMessage(netEntity, group));
-    }
 }

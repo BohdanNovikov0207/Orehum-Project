@@ -16,26 +16,19 @@ namespace Content.Client.UserInterface.Systems.EscapeMenu;
 [UsedImplicitly]
 public sealed class EscapeContextUIController : UIController
 {
-    [Dependency] private readonly IInputManager _inputManager = default!;
-
     [Dependency] private readonly CloseRecentWindowUIController _closeRecentWindowUIController = default!;
     [Dependency] private readonly EscapeUIController _escapeUIController = default!;
+    [Dependency] private readonly IInputManager _inputManager = default!;
 
-    public override void Initialize()
-    {
+    public override void Initialize() =>
         _inputManager.SetInputCommand(ContentKeyFunctions.EscapeContext,
             InputCmdHandler.FromDelegate(_ => CloseWindowOrOpenGameMenu()));
-    }
 
     private void CloseWindowOrOpenGameMenu()
     {
         if (_closeRecentWindowUIController.HasClosableWindow())
-        {
             _closeRecentWindowUIController.CloseMostRecentWindow();
-        }
         else
-        {
             _escapeUIController.ToggleWindow();
-        }
     }
 }

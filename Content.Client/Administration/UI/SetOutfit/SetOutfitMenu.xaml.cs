@@ -111,107 +111,96 @@ using Robust.Client.UserInterface.CustomControls;
 using Robust.Client.UserInterface.XAML;
 using Robust.Shared.Prototypes;
 
-namespace Content.Client.Administration.UI.SetOutfit
+namespace Content.Client.Administration.UI.SetOutfit;
+
+[GenerateTypedNameReferences]
+public sealed partial class SetOutfitMenu : DefaultWindow
 {
-    [GenerateTypedNameReferences]
-    public sealed partial class SetOutfitMenu : DefaultWindow
+    [Dependency] private readonly IClientConsoleHost _consoleHost = default!;
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    private StartingGearPrototype? _selectedOutfit;
+    public bool DoSpecial; // Goobstation
+
+    public SetOutfitMenu()
     {
-        [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-        [Dependency] private readonly IClientConsoleHost _consoleHost = default!;
+        MinSize = SetSize = new Vector2(250, 320);
+        IoCManager.InjectDependencies(this);
+        RobustXamlLoader.Load(this);
 
-        public NetEntity? TargetEntityId { get; set; }
-        private StartingGearPrototype? _selectedOutfit;
-        public bool DoSpecial; // Goobstation
+        Title = Loc.GetString("set-outfit-menu-title");
 
-        public SetOutfitMenu()
+        ConfirmButton.Text = Loc.GetString("set-outfit-menu-confirm-button");
+        ToggleSpecial.Text = Loc.GetString("set-outfit-menu-toggle-special"); // Goobstation
+        ConfirmButton.OnPressed += ConfirmButtonOnOnPressed;
+        ToggleSpecial.OnToggled += OnToggleSpecialPressed; // Goobstation
+        SearchBar.OnTextChanged += SearchBarOnOnTextChanged;
+        OutfitList.OnItemSelected += OutfitListOnOnItemSelected;
+        OutfitList.OnItemDeselected += OutfitListOnOnItemDeselected;
+        PopulateList();
+    }
+
+    public NetEntity? TargetEntityId { get; set; }
+
+    private void ConfirmButtonOnOnPressed(BaseButton.ButtonEventArgs obj)
+    {
+        if (TargetEntityId == null || _selectedOutfit == null)
+            return;
+        var command = $"setoutfit {TargetEntityId} {_selectedOutfit.ID} {DoSpecial}"; // Goobstation
+        _consoleHost.ExecuteCommand(command);
+        Close();
+    }
+
+    // Goobstation
+    private void OnToggleSpecialPressed(BaseButton.ButtonToggledEventArgs obj) => DoSpecial = obj.Pressed;
+
+    private void OutfitListOnOnItemSelected(ItemList.ItemListSelectedEventArgs obj)
+    {
+        _selectedOutfit = (StartingGearPrototype) obj.ItemList[obj.ItemIndex].Metadata!;
+        ConfirmButton.Disabled = false;
+    }
+
+    private void OutfitListOnOnItemDeselected(ItemList.ItemListDeselectedEventArgs obj)
+    {
+        _selectedOutfit = null;
+        ConfirmButton.Disabled = true;
+    }
+
+
+    private void SearchBarOnOnTextChanged(LineEdit.LineEditEventArgs obj) => PopulateByFilter(SearchBar.Text);
+
+    private IEnumerable<StartingGearPrototype> GetPrototypes()
+    {
+        // Filter out any StartingGearPrototypes that belong to loadouts
+        var loadouts = _prototypeManager.EnumeratePrototypes<LoadoutPrototype>();
+        var loadoutGears = loadouts.Select(l => l.StartingGear);
+        return _prototypeManager.EnumeratePrototypes<StartingGearPrototype>()
+            .Where(p => !loadoutGears.Contains(p.ID));
+    }
+
+    private void PopulateList()
+    {
+        foreach (var gear in GetPrototypes())
         {
-            MinSize = SetSize = new Vector2(250, 320);
-            IoCManager.InjectDependencies(this);
-            RobustXamlLoader.Load(this);
-
-            Title = Loc.GetString("set-outfit-menu-title");
-
-            ConfirmButton.Text = Loc.GetString("set-outfit-menu-confirm-button");
-            ToggleSpecial.Text = Loc.GetString("set-outfit-menu-toggle-special"); // Goobstation
-            ConfirmButton.OnPressed += ConfirmButtonOnOnPressed;
-            ToggleSpecial.OnToggled += OnToggleSpecialPressed; // Goobstation
-            SearchBar.OnTextChanged += SearchBarOnOnTextChanged;
-            OutfitList.OnItemSelected += OutfitListOnOnItemSelected;
-            OutfitList.OnItemDeselected += OutfitListOnOnItemDeselected;
-            PopulateList();
-        }
-
-        private void ConfirmButtonOnOnPressed(BaseButton.ButtonEventArgs obj)
-        {
-            if (TargetEntityId == null || _selectedOutfit == null)
-                return;
-            var command = $"setoutfit {TargetEntityId} {_selectedOutfit.ID} {DoSpecial}"; // Goobstation
-            _consoleHost.ExecuteCommand(command);
-            Close();
-        }
-
-        // Goobstation
-        private void OnToggleSpecialPressed(BaseButton.ButtonToggledEventArgs obj)
-        {
-            DoSpecial = obj.Pressed;
-        }
-
-        private void OutfitListOnOnItemSelected(ItemList.ItemListSelectedEventArgs obj)
-        {
-            _selectedOutfit = (StartingGearPrototype) obj.ItemList[obj.ItemIndex].Metadata!;
-            ConfirmButton.Disabled = false;
-        }
-
-        private void OutfitListOnOnItemDeselected(ItemList.ItemListDeselectedEventArgs obj)
-        {
-            _selectedOutfit = null;
-            ConfirmButton.Disabled = true;
-        }
-
-
-        private void SearchBarOnOnTextChanged(LineEdit.LineEditEventArgs obj)
-        {
-            PopulateByFilter(SearchBar.Text);
-        }
-
-        private IEnumerable<StartingGearPrototype> GetPrototypes()
-        {
-            // Filter out any StartingGearPrototypes that belong to loadouts
-            var loadouts = _prototypeManager.EnumeratePrototypes<LoadoutPrototype>();
-            var loadoutGears = loadouts.Select(l => l.StartingGear);
-            return _prototypeManager.EnumeratePrototypes<StartingGearPrototype>()
-                .Where(p => !loadoutGears.Contains(p.ID));
-        }
-
-        private void PopulateList()
-        {
-            foreach (var gear in GetPrototypes())
-            {
-                OutfitList.Add(GetItem(gear, OutfitList));
-            }
-        }
-
-        private void PopulateByFilter(string filter)
-        {
-            OutfitList.Clear();
-            foreach (var gear in GetPrototypes())
-            {
-                if (!string.IsNullOrEmpty(filter) &&
-                    gear.ID.ToLowerInvariant().Contains(filter.Trim().ToLowerInvariant()))
-                {
-                    OutfitList.Add(GetItem(gear, OutfitList));
-                }
-            }
-        }
-
-
-        private static ItemList.Item GetItem(StartingGearPrototype gear, ItemList itemList)
-        {
-            return new(itemList)
-            {
-                Metadata = gear,
-                Text = gear.ID
-            };
+            OutfitList.Add(GetItem(gear, OutfitList));
         }
     }
+
+    private void PopulateByFilter(string filter)
+    {
+        OutfitList.Clear();
+        foreach (var gear in GetPrototypes())
+        {
+            if (!string.IsNullOrEmpty(filter) &&
+                gear.ID.ToLowerInvariant().Contains(filter.Trim().ToLowerInvariant()))
+                OutfitList.Add(GetItem(gear, OutfitList));
+        }
+    }
+
+
+    private static ItemList.Item GetItem(StartingGearPrototype gear, ItemList itemList) =>
+        new(itemList)
+        {
+            Metadata = gear,
+            Text = gear.ID,
+        };
 }

@@ -78,16 +78,18 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Linq;
 using Content.Shared.Atmos.Rotting;
 using Content.Shared.Damage;
+using Content.Shared.Hands;
 using Content.Shared.Inventory.Events;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Overlays;
 using Content.Shared.StatusIcon;
 using Content.Shared.StatusIcon.Components;
 using Robust.Shared.Prototypes;
-using System.Linq;
-using Content.Shared.Hands; // Goobstation
+
+// Goobstation
 
 namespace Content.Client.Overlays;
 
@@ -128,10 +130,8 @@ public sealed class ShowHealthIconsSystem : EquipmentHudSystem<ShowHealthIconsCo
         DamageContainers.Clear();
     }
 
-    private void OnHandleState(Entity<ShowHealthIconsComponent> ent, ref AfterAutoHandleStateEvent args)
-    {
+    private void OnHandleState(Entity<ShowHealthIconsComponent> ent, ref AfterAutoHandleStateEvent args) =>
         RefreshOverlay();
-    }
 
     private void OnGetStatusIconsEvent(Entity<DamageableComponent> entity, ref GetStatusIconsEvent args)
     {
@@ -149,9 +149,7 @@ public sealed class ShowHealthIconsSystem : EquipmentHudSystem<ShowHealthIconsCo
 
         if (damageableComponent.DamageContainerID == null ||
             !DamageContainers.Contains(damageableComponent.DamageContainerID))
-        {
             return Array.Empty<HealthIconPrototype>();
-        }
 
         var result = new List<HealthIconPrototype>();
 
@@ -161,9 +159,11 @@ public sealed class ShowHealthIconsSystem : EquipmentHudSystem<ShowHealthIconsCo
             if (TryComp<MobStateComponent>(entity, out var state))
             {
                 // Since there is no MobState for a rotting mob, we have to deal with this case first.
-                if (HasComp<RottingComponent>(entity) && _prototypeMan.TryIndex(damageableComponent.RottingIcon, out var rottingIcon))
+                if (HasComp<RottingComponent>(entity) &&
+                    _prototypeMan.TryIndex(damageableComponent.RottingIcon, out var rottingIcon))
                     result.Add(rottingIcon);
-                else if (damageableComponent.HealthIcons.TryGetValue(state.CurrentState, out var value) && _prototypeMan.TryIndex(value, out var icon))
+                else if (damageableComponent.HealthIcons.TryGetValue(state.CurrentState, out var value) &&
+                         _prototypeMan.TryIndex(value, out var icon))
                     result.Add(icon);
             }
         }

@@ -28,7 +28,6 @@
 
 using Content.Shared.Alert;
 using Content.Shared.CCVar;
-using Content.Shared.Friction;
 using Content.Shared.Movement.Components;
 using Content.Shared.Movement.Events;
 using Content.Shared.Movement.Pulling.Components;
@@ -43,10 +42,10 @@ namespace Content.Client.PhysicsSystem.Controllers;
 
 public sealed class MoverController : SharedMoverController
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly IPlayerManager _playerManager = default!;
     [Dependency] private readonly AlertsSystem _alerts = default!;
     [Dependency] private readonly IConfigurationManager _cfg = default!;
+    [Dependency] private readonly IPlayerManager _playerManager = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -70,7 +69,8 @@ public sealed class MoverController : SharedMoverController
             args.IsPredicted = true;
     }
 
-    private void OnUpdateRelayTargetPredicted(Entity<MovementRelayTargetComponent> entity, ref UpdateIsPredictedEvent args)
+    private void OnUpdateRelayTargetPredicted(Entity<MovementRelayTargetComponent> entity,
+        ref UpdateIsPredictedEvent args)
     {
         if (entity.Comp.Source == _playerManager.LocalEntity)
             args.IsPredicted = true;
@@ -106,21 +106,17 @@ public sealed class MoverController : SharedMoverController
             SetMoveInput((entity.Comp.RelayEntity, inputMover), MoveButtons.None);
     }
 
-    private void OnPlayerAttached(Entity<InputMoverComponent> entity, ref LocalPlayerAttachedEvent args)
-    {
+    private void OnPlayerAttached(Entity<InputMoverComponent> entity, ref LocalPlayerAttachedEvent args) =>
         SetMoveInput(entity, MoveButtons.None);
-    }
 
-    private void OnPlayerDetached(Entity<InputMoverComponent> entity, ref LocalPlayerDetachedEvent args)
-    {
+    private void OnPlayerDetached(Entity<InputMoverComponent> entity, ref LocalPlayerDetachedEvent args) =>
         SetMoveInput(entity, MoveButtons.None);
-    }
 
     public override void UpdateBeforeSolve(bool prediction, float frameTime)
     {
         base.UpdateBeforeSolve(prediction, frameTime);
 
-        if (_playerManager.LocalEntity is not {Valid: true} player)
+        if (_playerManager.LocalEntity is not { Valid: true } player)
             return;
 
         if (RelayQuery.TryGetComponent(player, out var relayMover))
@@ -132,25 +128,21 @@ public sealed class MoverController : SharedMoverController
     private void HandleClientsideMovement(EntityUid player, float frameTime)
     {
         if (!MoverQuery.TryGetComponent(player, out var mover))
-        {
             return;
-        }
 
         // Server-side should just be handled on its own so we'll just do this shizznit
         HandleMobMovement((player, mover), frameTime);
     }
 
-    protected override bool CanSound()
-    {
-        return _timing is { IsFirstTimePredicted: true, InSimulation: true };
-    }
+    protected override bool CanSound() => _timing is { IsFirstTimePredicted: true, InSimulation: true };
 
     public override void SetSprinting(Entity<InputMoverComponent> entity, ushort subTick, bool walking)
     {
         // Logger.Info($"[{_gameTiming.CurTick}/{subTick}] Sprint: {enabled}");
         base.SetSprinting(entity, subTick, walking);
 
-        if (_cfg.GetCVar(CCVars.ToggleWalk) && (walking && !_cfg.GetCVar(CCVars.DefaultWalk) || !walking && _cfg.GetCVar(CCVars.DefaultWalk)))
+        if (_cfg.GetCVar(CCVars.ToggleWalk) && (walking && !_cfg.GetCVar(CCVars.DefaultWalk) ||
+                                                !walking && _cfg.GetCVar(CCVars.DefaultWalk)))
             _alerts.ShowAlert(entity, WalkingAlert, showCooldown: false, autoRemove: false);
         else
             _alerts.ClearAlert(entity, WalkingAlert);

@@ -18,7 +18,6 @@ namespace Content.Client._DV.CartridgeLoader.Cartridges;
 [GenerateTypedNameReferences]
 public sealed partial class NanoChatEntry : BoxContainer
 {
-    public event Action<uint>? OnPressed;
     private uint _number;
     private Action<EventArgs>? _pressHandler;
 
@@ -26,6 +25,8 @@ public sealed partial class NanoChatEntry : BoxContainer
     {
         RobustXamlLoader.Load(this);
     }
+
+    public event Action<uint>? OnPressed;
 
     public void SetRecipient(NanoChatRecipient recipient, uint number, bool isSelected)
     {

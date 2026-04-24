@@ -16,7 +16,7 @@ using Content.Shared.Strip.Components;
 namespace Content.Client.Strip;
 
 /// <summary>
-///     This is the client-side stripping system, which just triggers UI updates on events.
+/// This is the client-side stripping system, which just triggers UI updates on events.
 /// </summary>
 public sealed class StrippableSystem : SharedStrippableSystem
 {
@@ -32,10 +32,8 @@ public sealed class StrippableSystem : SharedStrippableSystem
         SubscribeLocalEvent<StrippableComponent, EnsnaredChangedEvent>(UpdateUi);
     }
 
-    private void OnCuffStateChange(EntityUid uid, StrippableComponent component, ref CuffedStateChangeEvent args)
-    {
+    private void OnCuffStateChange(EntityUid uid, StrippableComponent component, ref CuffedStateChangeEvent args) =>
         UpdateUi(uid, component);
-    }
 
     public void UpdateUi(EntityUid uid, StrippableComponent? component = null, EntityEventArgs? args = null)
     {

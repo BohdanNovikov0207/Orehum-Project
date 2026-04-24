@@ -17,8 +17,5 @@ public sealed class ToggleDecalCommand : LocalizedEntityCommands
 
     public override string Command => "toggledecals";
 
-    public override void Execute(IConsoleShell shell, string argStr, string[] args)
-    {
-        _decal.ToggleOverlay();
-    }
+    public override void Execute(IConsoleShell shell, string argStr, string[] args) => _decal.ToggleOverlay();
 }

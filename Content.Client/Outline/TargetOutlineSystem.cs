@@ -94,7 +94,7 @@ using Robust.Shared.Timing;
 namespace Content.Client.Outline;
 
 /// <summary>
-///     System used to indicate whether an entity is a valid target based on some criteria.
+/// System used to indicate whether an entity is a valid target based on some criteria.
 /// </summary>
 public sealed class TargetOutlineSystem : EntitySystem
 {
@@ -102,64 +102,64 @@ public sealed class TargetOutlineSystem : EntitySystem
     private static readonly ProtoId<ShaderPrototype> ShaderTargetInvalid = "SelectionOutline";
 
     [Dependency] private readonly IEyeManager _eyeManager = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
+
+    private readonly HashSet<SpriteComponent> _highlightedSprites = new();
     [Dependency] private readonly IInputManager _inputManager = default!;
+    [Dependency] private readonly SharedInteractionSystem _interactionSystem = default!;
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly IPlayerManager _playerManager = default!;
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-    [Dependency] private readonly SharedInteractionSystem _interactionSystem = default!;
-    [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SharedTransformSystem _transformSystem = default!;
+    [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
 
-    private bool _enabled = false;
+    private bool _enabled;
+    private ShaderInstance? _shaderTargetInvalid;
+
+    private ShaderInstance? _shaderTargetValid;
 
     /// <summary>
-    ///     Whitelist that the target must satisfy.
+    /// Blacklist that the target must satisfy.
     /// </summary>
-    public EntityWhitelist? Whitelist = null;
+    public EntityWhitelist? Blacklist;
 
     /// <summary>
-    ///     Blacklist that the target must satisfy.
-    /// </summary>
-    public EntityWhitelist? Blacklist = null;
-
-    /// <summary>
-    ///     Predicate the target must satisfy.
-    /// </summary>
-    public Func<EntityUid, bool>? Predicate = null;
-
-    /// <summary>
-    ///     Event to raise as targets to check whether they are valid.
-    /// </summary>
-    /// <remarks>
-    ///     This event will be uncanceled and re-used.
-    /// </remarks>
-    public CancellableEntityEventArgs? ValidationEvent = null;
-
-    /// <summary>
-    ///     Minimum range for a target to be valid.
-    /// </summary>
-    /// <remarks>
-    ///     If a target is further than this distance, they will still be highlighted in a different color.
-    /// </remarks>
-    public float Range = -1;
-
-    /// <summary>
-    ///     Whether to check if the player is unobstructed to the target;
+    /// Whether to check if the player is unobstructed to the target;
     /// </summary>
     public bool CheckObstruction = true;
 
     /// <summary>
-    ///     The size of the box around the mouse to use when looking for valid targets.
+    /// The size of the box around the mouse to use when looking for valid targets.
     /// </summary>
     public float LookupSize = 1;
 
+    /// <summary>
+    /// Predicate the target must satisfy.
+    /// </summary>
+    public Func<EntityUid, bool>? Predicate;
+
+    /// <summary>
+    /// Minimum range for a target to be valid.
+    /// </summary>
+    /// <remarks>
+    /// If a target is further than this distance, they will still be highlighted in a different color.
+    /// </remarks>
+    public float Range = -1;
+
+    /// <summary>
+    /// Event to raise as targets to check whether they are valid.
+    /// </summary>
+    /// <remarks>
+    /// This event will be uncanceled and re-used.
+    /// </remarks>
+    public CancellableEntityEventArgs? ValidationEvent;
+
+    /// <summary>
+    /// Whitelist that the target must satisfy.
+    /// </summary>
+    public EntityWhitelist? Whitelist;
+
     private Vector2 LookupVector => new(LookupSize, LookupSize);
-
-    private ShaderInstance? _shaderTargetValid;
-    private ShaderInstance? _shaderTargetInvalid;
-
-    private readonly HashSet<SpriteComponent> _highlightedSprites = new();
 
     public override void Initialize()
     {
@@ -171,14 +171,19 @@ public sealed class TargetOutlineSystem : EntitySystem
 
     public void Disable()
     {
-        if (_enabled == false)
+        if (!_enabled)
             return;
 
         _enabled = false;
         RemoveHighlights();
     }
 
-    public void Enable(float range, bool checkObstructions, Func<EntityUid, bool>? predicate, EntityWhitelist? whitelist, EntityWhitelist? blacklist, CancellableEntityEventArgs? validationEvent)
+    public void Enable(float range,
+        bool checkObstructions,
+        Func<EntityUid, bool>? predicate,
+        EntityWhitelist? whitelist,
+        EntityWhitelist? blacklist,
+        CancellableEntityEventArgs? validationEvent)
     {
         Range = range;
         CheckObstruction = checkObstructions;
@@ -212,7 +217,9 @@ public sealed class TargetOutlineSystem : EntitySystem
         // TODO: Duplicated in SpriteSystem and DragDropSystem. Should probably be cached somewhere for a frame?
         var mousePos = _eyeManager.PixelToMap(_inputManager.MouseScreenPosition).Position;
         var bounds = new Box2(mousePos - LookupVector, mousePos + LookupVector);
-        var pvsEntities = _lookup.GetEntitiesIntersecting(_eyeManager.CurrentEye.Position.MapId, bounds, LookupFlags.Approximate | LookupFlags.Static);
+        var pvsEntities = _lookup.GetEntitiesIntersecting(_eyeManager.CurrentEye.Position.MapId,
+            bounds,
+            LookupFlags.Approximate | LookupFlags.Static);
         var spriteQuery = GetEntityQuery<SpriteComponent>();
 
         foreach (var entity in pvsEntities)
@@ -231,14 +238,15 @@ public sealed class TargetOutlineSystem : EntitySystem
             if (valid && ValidationEvent != null)
             {
                 ValidationEvent.Uncancel();
-                RaiseLocalEvent(entity, (object) ValidationEvent, broadcast: false);
+                RaiseLocalEvent(entity, (object) ValidationEvent, false);
                 valid = !ValidationEvent.Cancelled;
             }
 
             if (!valid)
             {
                 // was this previously valid?
-                if (_highlightedSprites.Remove(sprite) && (sprite.PostShader == _shaderTargetValid || sprite.PostShader == _shaderTargetInvalid))
+                if (_highlightedSprites.Remove(sprite) && (sprite.PostShader == _shaderTargetValid ||
+                                                           sprite.PostShader == _shaderTargetInvalid))
                 {
                     sprite.PostShader = null;
                     sprite.RenderOrder = 0;

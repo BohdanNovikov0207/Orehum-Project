@@ -9,24 +9,29 @@ using Robust.Shared.Timing;
 
 namespace Content.Client._Mono.Radar;
 
-public sealed partial class RadarBlipsSystem : EntitySystem
+public sealed class RadarBlipsSystem : EntitySystem
 {
     private const double BlipStaleSeconds = 3.0;
-    private static readonly List<(Vector2, float, Color, RadarBlipShape)> EmptyBlipList = new();
-    private static readonly List<(NetEntity? Grid, Vector2 Position, float Scale, Color Color, RadarBlipShape Shape)> EmptyRawBlipList = new();
-    private static readonly List<(NetEntity? Grid, Vector2 Start, Vector2 End, float Thickness, Color Color)> EmptyHitscanList = new();
-    private TimeSpan _lastRequestTime = TimeSpan.Zero;
-    private static readonly TimeSpan RequestThrottle = TimeSpan.FromMilliseconds(250);
 
     // Maximum distance for blips to be considered visible
     private const float MaxBlipRenderDistance = 1000f;
+    private static readonly List<(Vector2, float, Color, RadarBlipShape)> EmptyBlipList = new();
+
+    private static readonly List<(NetEntity? Grid, Vector2 Position, float Scale, Color Color, RadarBlipShape Shape)>
+        EmptyRawBlipList = new();
+
+    private static readonly List<(NetEntity? Grid, Vector2 Start, Vector2 End, float Thickness, Color Color)>
+        EmptyHitscanList = new();
+
+    private static readonly TimeSpan RequestThrottle = TimeSpan.FromMilliseconds(250);
 
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SharedTransformSystem _xform = default!;
-
-    private TimeSpan _lastUpdatedTime;
     private List<(NetEntity? Grid, Vector2 Position, float Scale, Color Color, RadarBlipShape Shape)> _blips = new();
     private List<(NetEntity? Grid, Vector2 Start, Vector2 End, float Thickness, Color Color)> _hitscans = new();
+    private TimeSpan _lastRequestTime = TimeSpan.Zero;
+
+    private TimeSpan _lastUpdatedTime;
     private Vector2 _radarWorldPosition;
 
     public override void Initialize()
@@ -38,22 +43,14 @@ public sealed partial class RadarBlipsSystem : EntitySystem
     private void HandleReceiveBlips(GiveBlipsEvent ev, EntitySessionEventArgs args)
     {
         if (ev?.Blips == null)
-        {
             _blips = EmptyRawBlipList;
-        }
         else
-        {
             _blips = ev.Blips;
-        }
 
         if (ev?.HitscanLines == null)
-        {
             _hitscans = EmptyHitscanList;
-        }
         else
-        {
             _hitscans = ev.HitscanLines;
-        }
 
         _lastUpdatedTime = _timing.CurTime;
     }
@@ -72,9 +69,7 @@ public sealed partial class RadarBlipsSystem : EntitySystem
 
         // Cache the radar position for distance culling
         if (TryComp<TransformComponent>(console, out var xform))
-        {
             _radarWorldPosition = _xform.GetWorldPosition(console);
-        }
 
         var netConsole = GetNetEntity(console);
         var ev = new RequestBlipsEvent(netConsole);
@@ -104,7 +99,8 @@ public sealed partial class RadarBlipsSystem : EntitySystem
                 worldPosition = blip.Position;
 
                 // Distance culling for world position blips
-                if (Vector2.DistanceSquared(worldPosition, _radarWorldPosition) > MaxBlipRenderDistance * MaxBlipRenderDistance)
+                if (Vector2.DistanceSquared(worldPosition, _radarWorldPosition) >
+                    MaxBlipRenderDistance * MaxBlipRenderDistance)
                     continue;
 
                 result.Add((worldPosition, blip.Scale, blip.Color, blip.Shape));
@@ -123,7 +119,8 @@ public sealed partial class RadarBlipsSystem : EntitySystem
                 worldPosition = worldPos + rotatedLocalPos;
 
                 // Distance culling for grid position blips
-                if (Vector2.DistanceSquared(worldPosition, _radarWorldPosition) > MaxBlipRenderDistance * MaxBlipRenderDistance)
+                if (Vector2.DistanceSquared(worldPosition, _radarWorldPosition) >
+                    MaxBlipRenderDistance * MaxBlipRenderDistance)
                     continue;
 
                 result.Add((worldPosition, blip.Scale, blip.Color, blip.Shape));
@@ -145,17 +142,17 @@ public sealed partial class RadarBlipsSystem : EntitySystem
         if (_blips.Count == 0)
             return _blips;
 
-        var filteredBlips = new List<(NetEntity? Grid, Vector2 Position, float Scale, Color Color, RadarBlipShape Shape)>(_blips.Count);
+        var filteredBlips =
+            new List<(NetEntity? Grid, Vector2 Position, float Scale, Color Color, RadarBlipShape Shape)>(_blips.Count);
 
         foreach (var blip in _blips)
         {
             // For non-grid blips, do direct distance check
             if (blip.Grid == null)
             {
-                if (Vector2.DistanceSquared(blip.Position, _radarWorldPosition) <= MaxBlipRenderDistance * MaxBlipRenderDistance)
-                {
+                if (Vector2.DistanceSquared(blip.Position, _radarWorldPosition) <=
+                    MaxBlipRenderDistance * MaxBlipRenderDistance)
                     filteredBlips.Add(blip);
-                }
                 continue;
             }
 
@@ -167,10 +164,9 @@ public sealed partial class RadarBlipsSystem : EntitySystem
                 var rotatedLocalPos = gridRot.RotateVec(blip.Position);
                 var worldPosition = worldPos + rotatedLocalPos;
 
-                if (Vector2.DistanceSquared(worldPosition, _radarWorldPosition) <= MaxBlipRenderDistance * MaxBlipRenderDistance)
-                {
+                if (Vector2.DistanceSquared(worldPosition, _radarWorldPosition) <=
+                    MaxBlipRenderDistance * MaxBlipRenderDistance)
                     filteredBlips.Add(blip);
-                }
             }
         }
 
@@ -249,7 +245,8 @@ public sealed partial class RadarBlipsSystem : EntitySystem
         if (_hitscans.Count == 0)
             return _hitscans;
 
-        var filteredHitscans = new List<(NetEntity? Grid, Vector2 Start, Vector2 End, float Thickness, Color Color)>(_hitscans.Count);
+        var filteredHitscans =
+            new List<(NetEntity? Grid, Vector2 Start, Vector2 End, float Thickness, Color Color)>(_hitscans.Count);
 
         foreach (var hitscan in _hitscans)
         {
@@ -262,9 +259,7 @@ public sealed partial class RadarBlipsSystem : EntitySystem
 
                 if (startDist <= MaxBlipRenderDistance * MaxBlipRenderDistance ||
                     endDist <= MaxBlipRenderDistance * MaxBlipRenderDistance)
-                {
                     filteredHitscans.Add(hitscan);
-                }
                 continue;
             }
 
@@ -286,9 +281,7 @@ public sealed partial class RadarBlipsSystem : EntitySystem
 
                 if (startDist <= MaxBlipRenderDistance * MaxBlipRenderDistance ||
                     endDist <= MaxBlipRenderDistance * MaxBlipRenderDistance)
-                {
                     filteredHitscans.Add(hitscan);
-                }
             }
         }
 

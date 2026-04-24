@@ -21,49 +21,9 @@ namespace Content.Client.Paper.UI;
 public sealed partial class StampWidget : PanelContainer
 {
     private static readonly ProtoId<ShaderPrototype> PaperStamp = "PaperStamp";
+    private readonly ShaderInstance? _stampShader;
 
     private StyleBoxTexture? _borderTexture; // Goobstation stamp
-    private ShaderInstance? _stampShader;
-
-    public float Orientation
-    {
-        get => StampedByLabel.Orientation;
-        set => StampedByLabel.Orientation = value;
-    }
-
-    public StampDisplayInfo StampInfo {
-        set {
-            // Goobstation - start
-
-           // StampedByLabel.Text = Loc.GetString(value.StampedName);
-           // StampedByLabel.FontColorOverride = value.StampedColor;
-           // ModulateSelfOverride = value.StampedColor;
-
-           var icon = value.StampLargeIcon;
-           if (icon != null)
-           {
-               var resCache = IoCManager.Resolve<IResourceCache>();
-               var borderImage = resCache.GetResource<TextureResource>(
-                   "/Textures/_Goobstation/Interface/Paper/Stamps/" + icon + ".png");
-
-               _borderTexture = new StyleBoxTexture { Texture = borderImage };
-               PanelOverride = _borderTexture;
-
-               // make stamps 50% larger to better match the original stamp sizes
-               var width = (int)(borderImage.Texture.Width * 1.5);
-               var height = (int)(borderImage.Texture.Height * 1.5);
-               SetSize = new Vector2(width, height);
-           }
-
-           else
-           {
-               StampedByLabel.Text = Loc.GetString(value.StampedName);
-               StampedByLabel.FontColorOverride = value.StampedColor;
-               ModulateSelfOverride = value.StampedColor;
-           }
-           //Goobstation  - end
-        }
-    }
 
     public StampWidget()
     {
@@ -78,14 +38,56 @@ public sealed partial class StampWidget : PanelContainer
 
         var resCache = IoCManager.Resolve<IResourceCache>();
         var borderImage = resCache.GetResource<TextureResource>(
-                "/Textures/Interface/Paper/paper_stamp_border.svg.96dpi.png");
+            "/Textures/Interface/Paper/paper_stamp_border.svg.96dpi.png");
 
         _borderTexture = new StyleBoxTexture { Texture = borderImage }; //Goob
-        _borderTexture.SetPatchMargin(StyleBoxTexture.Margin.All, 7.0f);
+        _borderTexture.SetPatchMargin(StyleBox.Margin.All, 7.0f);
         PanelOverride = _borderTexture;
 
         //var prototypes = IoCManager.Resolve<IPrototypeManager>(); //Goob
         _stampShader = prototypes.Index(PaperStamp).InstanceUnique();
+    }
+
+    public float Orientation
+    {
+        get => StampedByLabel.Orientation;
+        set => StampedByLabel.Orientation = value;
+    }
+
+    public StampDisplayInfo StampInfo
+    {
+        set
+        {
+            // Goobstation - start
+
+            // StampedByLabel.Text = Loc.GetString(value.StampedName);
+            // StampedByLabel.FontColorOverride = value.StampedColor;
+            // ModulateSelfOverride = value.StampedColor;
+
+            var icon = value.StampLargeIcon;
+            if (icon != null)
+            {
+                var resCache = IoCManager.Resolve<IResourceCache>();
+                var borderImage = resCache.GetResource<TextureResource>(
+                    "/Textures/_Goobstation/Interface/Paper/Stamps/" + icon + ".png");
+
+                _borderTexture = new StyleBoxTexture { Texture = borderImage };
+                PanelOverride = _borderTexture;
+
+                // make stamps 50% larger to better match the original stamp sizes
+                var width = (int) (borderImage.Texture.Width * 1.5);
+                var height = (int) (borderImage.Texture.Height * 1.5);
+                SetSize = new Vector2(width, height);
+            }
+
+            else
+            {
+                StampedByLabel.Text = Loc.GetString(value.StampedName);
+                StampedByLabel.FontColorOverride = value.StampedColor;
+                ModulateSelfOverride = value.StampedColor;
+            }
+            //Goobstation  - end
+        }
     }
 
     protected override void Draw(DrawingHandleScreen handle)

@@ -39,7 +39,6 @@ using Robust.Shared.Network;
 using Robust.Shared.Timing;
 using Robust.Shared.Utility;
 using static Robust.Client.UserInterface.Controls.BaseButton;
-using static Robust.Client.UserInterface.Controls.LineEdit;
 using static Robust.Client.UserInterface.Controls.TabContainer;
 
 namespace Content.Client._RMC14.LinkAccount;
@@ -53,11 +52,15 @@ public sealed class LinkAccountUIController : UIController, IOnSystemChanged<Lin
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly IUriOpener _uriOpener = default!;
 
-    private LinkAccountWindow? _window;
-    private PatronPerksWindow? _patronPerksWindow;
-    private TimeSpan _disableUntil;
-
     private Guid _code;
+    private TimeSpan _disableUntil;
+    private PatronPerksWindow? _patronPerksWindow;
+
+    private LinkAccountWindow? _window;
+
+    public void OnSystemLoaded(LinkAccountSystem system) => system.LobbyMessageReceived += OnLobbyMessageReceived;
+
+    public void OnSystemUnloaded(LinkAccountSystem system) => system.LobbyMessageReceived -= OnLobbyMessageReceived;
 
     public override void Initialize()
     {
@@ -101,7 +104,8 @@ public sealed class LinkAccountUIController : UIController, IOnSystemChanged<Lin
             _window.OnClose += () => _window = null;
             _window.Label.SetMarkupPermissive($"{Loc.GetString("rmc-ui-link-discord-account-text")}");
             if (_linkAccount.Linked)
-                _window.Label.SetMarkupPermissive($"{Loc.GetString("rmc-ui-link-discord-account-already-linked")}\n\n{Loc.GetString("rmc-ui-link-discord-account-text")}");
+                _window.Label.SetMarkupPermissive(
+                    $"{Loc.GetString("rmc-ui-link-discord-account-already-linked")}\n\n{Loc.GetString("rmc-ui-link-discord-account-text")}");
 
             _window.CopyButton.OnPressed += _ =>
             {
@@ -195,7 +199,7 @@ public sealed class LinkAccountUIController : UIController, IOnSystemChanged<Lin
         if (text.Length > SharedRMCLobbyMessage.CharacterLimit)
         {
             text = text[..SharedRMCLobbyMessage.CharacterLimit];
-            _patronPerksWindow?.LobbyMessage.SetText(text, false);
+            _patronPerksWindow?.LobbyMessage.SetText(text);
         }
 
         _net.ClientSendMessage(new RMCChangeLobbyMessageMsg { Text = text });
@@ -210,7 +214,7 @@ public sealed class LinkAccountUIController : UIController, IOnSystemChanged<Lin
         if (text.Length > SharedRMCRoundEndShoutouts.CharacterLimit)
         {
             text = text[..SharedRMCRoundEndShoutouts.CharacterLimit];
-            _patronPerksWindow?.NTShoutout.SetText(text, false);
+            _patronPerksWindow?.NTShoutout.SetText(text);
         }
 
         _net.ClientSendMessage(new RMCChangeNTShoutoutMsg { Name = text });
@@ -251,16 +255,6 @@ public sealed class LinkAccountUIController : UIController, IOnSystemChanged<Lin
         _patronPerksWindow.NTShoutoutExample.SetMarkupPermissive(string.IsNullOrWhiteSpace(nt)
             ? " "
             : $"{Loc.GetString("rmc-ui-shoutout-example")} {Loc.GetString("rmc-ui-shoutout-nt", ("name", nt))}");
-    }
-
-    public void OnSystemLoaded(LinkAccountSystem system)
-    {
-        system.LobbyMessageReceived += OnLobbyMessageReceived;
-    }
-
-    public void OnSystemUnloaded(LinkAccountSystem system)
-    {
-        system.LobbyMessageReceived -= OnLobbyMessageReceived;
     }
 
     public override void FrameUpdate(FrameEventArgs args)

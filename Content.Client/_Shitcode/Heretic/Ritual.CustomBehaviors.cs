@@ -20,13 +20,25 @@ namespace Content.Client._Shitcode.Heretic;
 // regards.
 // - john
 
-public sealed partial class RitualAshAscendBehavior : RitualSacrificeBehavior { }
-public sealed partial class RitualBladeAscendBehavior : RitualSacrificeBehavior { }
-public sealed partial class RitualMuteGhoulifyBehavior : RitualSacrificeBehavior { }
+public sealed partial class RitualAshAscendBehavior : RitualSacrificeBehavior
+{
+}
 
-public sealed partial class RitualRustAscendBehavior : RitualSacrificeBehavior { }
+public sealed partial class RitualBladeAscendBehavior : RitualSacrificeBehavior
+{
+}
 
-public sealed partial class RitualCosmosAscendBehavior : RitualSacrificeBehavior { }
+public sealed partial class RitualMuteGhoulifyBehavior : RitualSacrificeBehavior
+{
+}
+
+public sealed partial class RitualRustAscendBehavior : RitualSacrificeBehavior
+{
+}
+
+public sealed partial class RitualCosmosAscendBehavior : RitualSacrificeBehavior
+{
+}
 
 [Virtual] public partial class RitualSacrificeBehavior : RitualCustomBehavior
 {

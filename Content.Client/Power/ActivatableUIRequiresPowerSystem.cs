@@ -18,14 +18,15 @@ public sealed class ActivatableUIRequiresPowerSystem : SharedActivatableUIRequir
 {
     [Dependency] private readonly SharedPopupSystem _popup = default!;
 
-    protected override void OnActivate(Entity<ActivatableUIRequiresPowerComponent> ent, ref ActivatableUIOpenAttemptEvent args)
+    protected override void OnActivate(Entity<ActivatableUIRequiresPowerComponent> ent,
+        ref ActivatableUIOpenAttemptEvent args)
     {
         if (args.Cancelled || this.IsPowered(ent.Owner, EntityManager))
-        {
             return;
-        }
 
-        _popup.PopupClient(Loc.GetString("base-computer-ui-component-not-powered", ("machine", ent.Owner)), args.User, args.User);
+        _popup.PopupClient(Loc.GetString("base-computer-ui-component-not-powered", ("machine", ent.Owner)),
+            args.User,
+            args.User);
         args.Cancel();
     }
 }

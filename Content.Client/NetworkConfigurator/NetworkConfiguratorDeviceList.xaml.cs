@@ -31,30 +31,30 @@ public sealed partial class NetworkConfiguratorDeviceList : ScrollContainer
 
     private BoxContainer BuildDeviceListRow((string address, string name) savedDevice, bool ui)
     {
-        var row = new BoxContainer()
+        var row = new BoxContainer
         {
             Orientation = BoxContainer.LayoutOrientation.Horizontal,
-            Margin = new Thickness(8)
+            Margin = new Thickness(8),
         };
 
-        var name = new Label()
+        var name = new Label
         {
             Text = savedDevice.name[..Math.Min(11, savedDevice.name.Length)],
-            SetWidth = 84
+            SetWidth = 84,
         };
 
-        var address = new Label()
+        var address = new Label
         {
             Text = savedDevice.address,
             HorizontalExpand = true,
-            Align = Label.AlignMode.Center
+            Align = Label.AlignMode.Center,
         };
 
-        var removeButton = new TextureButton()
+        var removeButton = new TextureButton
         {
             StyleClasses = { "CrossButtonRed" },
             VerticalAlignment = VAlignment.Center,
-            Scale = new Vector2(0.5f, 0.5f)
+            Scale = new Vector2(0.5f, 0.5f),
         };
 
         row.AddChild(name);

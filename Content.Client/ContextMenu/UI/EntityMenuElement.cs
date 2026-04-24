@@ -20,117 +20,115 @@ using Content.Shared.Administration;
 using Content.Shared.IdentityManagement;
 using Robust.Client.Player;
 
-namespace Content.Client.ContextMenu.UI
+namespace Content.Client.ContextMenu.UI;
+
+public sealed class EntityMenuElement : ContextMenuElement, IEntityControl
 {
-    public sealed partial class EntityMenuElement : ContextMenuElement, IEntityControl
+    [Dependency] private readonly IClientAdminManager _adminManager = default!;
+
+    private readonly AdminSystem _adminSystem;
+    [Dependency] private readonly IEntityManager _entityManager = default!;
+    [Dependency] private readonly IPlayerManager _playerManager = default!;
+
+    /// <summary>
+    /// The entity that can be accessed by interacting with this element.
+    /// </summary>
+    public EntityUid? Entity;
+
+    public EntityMenuElement(EntityUid? entity = null)
     {
-        [Dependency] private readonly IClientAdminManager _adminManager = default!;
-        [Dependency] private readonly IEntityManager _entityManager = default!;
-        [Dependency] private readonly IPlayerManager _playerManager = default!;
+        IoCManager.InjectDependencies(this);
 
-        private AdminSystem _adminSystem;
+        _adminSystem = _entityManager.System<AdminSystem>();
 
-        /// <summary>
-        ///     The entity that can be accessed by interacting with this element.
-        /// </summary>
-        public EntityUid? Entity;
+        Entity = entity;
+        if (Entity == null)
+            return;
 
-        /// <summary>
-        ///     How many entities are accessible through this element's sub-menus.
-        /// </summary>
-        public int Count { get; private set; }
+        Count = 1;
+        UpdateEntity();
+    }
 
-        public EntityMenuElement(EntityUid? entity = null)
+    /// <summary>
+    /// How many entities are accessible through this element's sub-menus.
+    /// </summary>
+    public int Count { get; private set; }
+
+    EntityUid? IEntityControl.UiEntity => Entity;
+
+    protected override void Dispose(bool disposing)
+    {
+        base.Dispose(disposing);
+        Entity = null;
+        Count = 0;
+    }
+
+    private string? SearchPlayerName(EntityUid entity)
+    {
+        var netEntity = _entityManager.GetNetEntity(entity);
+        return _adminSystem.PlayerList.FirstOrDefault(player => player.NetEntity == netEntity)?.Username;
+    }
+
+    /// <summary>
+    /// Update the entity count
+    /// </summary>
+    public void UpdateCount()
+    {
+        if (SubMenu == null)
+            return;
+
+        Count = 0;
+        foreach (var subElement in SubMenu.MenuBody.Children)
         {
-            IoCManager.InjectDependencies(this);
-
-            _adminSystem = _entityManager.System<AdminSystem>();
-
-            Entity = entity;
-            if (Entity == null)
-                return;
-
-            Count = 1;
-            UpdateEntity();
+            if (subElement is EntityMenuElement entityElement)
+                Count += entityElement.Count;
         }
 
-        protected override void Dispose(bool disposing)
+        IconLabel.Visible = Count > 1;
+        if (IconLabel.Visible)
+            IconLabel.Text = Count.ToString();
+    }
+
+    private string GetEntityDescriptionAdmin(EntityUid entity)
+    {
+        var representation = _entityManager.ToPrettyString(entity);
+
+        var name = representation.Name;
+        var prototype = representation.Prototype;
+        var playerName = representation.Session?.Name ?? SearchPlayerName(entity);
+        var deleted = representation.Deleted;
+
+        return
+            $"{name} ({_entityManager.GetNetEntity(entity).ToString()}{(prototype != null ? $", {prototype}" : "")}{(playerName != null ? $", {playerName}" : "")}){(deleted ? "D" : "")}";
+    }
+
+    private string GetEntityDescription(EntityUid entity)
+    {
+        if (_adminManager.HasFlag(AdminFlags.Admin | AdminFlags.Debug))
+            return GetEntityDescriptionAdmin(entity);
+
+        return Identity.Name(entity, _entityManager, _playerManager.LocalEntity!);
+    }
+
+    /// <summary>
+    /// Update the icon and text of this element based on the given entity or this element's own entity if none
+    /// is provided.
+    /// </summary>
+    public void UpdateEntity(EntityUid? entity = null)
+    {
+        entity ??= Entity;
+
+        // check whether entity is null, invalid, or has been deleted.
+        // _entityManager.Deleted() implicitly checks all of these.
+        if (_entityManager.Deleted(entity))
         {
-            base.Dispose(disposing);
-            Entity = null;
-            Count = 0;
+            Icon.SetEntity(null);
+            Text = string.Empty;
         }
-
-        private string? SearchPlayerName(EntityUid entity)
+        else
         {
-            var netEntity = _entityManager.GetNetEntity(entity);
-            return _adminSystem.PlayerList.FirstOrDefault(player => player.NetEntity == netEntity)?.Username;
+            Icon.SetEntity(entity);
+            Text = GetEntityDescription(entity.Value);
         }
-
-        /// <summary>
-        ///     Update the entity count
-        /// </summary>
-        public void UpdateCount()
-        {
-            if (SubMenu == null)
-                return;
-
-            Count = 0;
-            foreach (var subElement in SubMenu.MenuBody.Children)
-            {
-                if (subElement is EntityMenuElement entityElement)
-                    Count += entityElement.Count;
-            }
-
-            IconLabel.Visible = Count > 1;
-            if (IconLabel.Visible)
-                IconLabel.Text = Count.ToString();
-        }
-
-        private string GetEntityDescriptionAdmin(EntityUid entity)
-        {
-            var representation = _entityManager.ToPrettyString(entity);
-
-            var name = representation.Name;
-            var prototype = representation.Prototype;
-            var playerName = representation.Session?.Name ?? SearchPlayerName(entity);
-            var deleted = representation.Deleted;
-
-            return $"{name} ({_entityManager.GetNetEntity(entity).ToString()}{(prototype != null ? $", {prototype}" : "")}{(playerName != null ? $", {playerName}" : "")}){(deleted ? "D" : "")}";
-        }
-
-        private string GetEntityDescription(EntityUid entity)
-        {
-            if (_adminManager.HasFlag(AdminFlags.Admin | AdminFlags.Debug))
-            {
-                return GetEntityDescriptionAdmin(entity);
-            }
-
-            return Identity.Name(entity, _entityManager, _playerManager.LocalEntity!);
-        }
-
-        /// <summary>
-        ///     Update the icon and text of this element based on the given entity or this element's own entity if none
-        ///     is provided.
-        /// </summary>
-        public void UpdateEntity(EntityUid? entity = null)
-        {
-            entity ??= Entity;
-
-            // check whether entity is null, invalid, or has been deleted.
-            // _entityManager.Deleted() implicitly checks all of these.
-            if (_entityManager.Deleted(entity))
-            {
-                Icon.SetEntity(null);
-                Text = string.Empty;
-            }
-            else
-            {
-                Icon.SetEntity(entity);
-                Text = GetEntityDescription(entity.Value);
-            }
-        }
-
-        EntityUid? IEntityControl.UiEntity => Entity;
     }
 }

@@ -9,5 +9,4 @@ namespace Content.Client.Atmos.EntitySystems;
 
 public sealed class FirestarterSystem : SharedFirestarterSystem
 {
-
 }

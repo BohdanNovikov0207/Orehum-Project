@@ -14,7 +14,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
 <DefaultWindow Title="{Loc Make Ghost Role}"
-            xmlns="https://spacestation14.io">
+               xmlns="https://spacestation14.io">
 
     <BoxContainer Orientation="Vertical">
         <BoxContainer Orientation="Horizontal">

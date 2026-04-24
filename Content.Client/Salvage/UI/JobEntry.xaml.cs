@@ -26,6 +26,7 @@ public sealed partial class JobEntry : BoxContainer
                 ("amount", entry.Amount),
                 ("item", Loc.GetString(entry.Name))));
         }
+
         ManifestLabel.SetMarkup(Loc.GetString("job-board-ui-label-items", ("item", string.Join(", ", items))));
         RewardLabel.SetMarkup(Loc.GetString("bounty-console-reward-label", ("reward", job.Reward)));
         DescriptionLabel.SetMarkup(Loc.GetString(job.Description));

@@ -8,13 +8,12 @@
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.XAML;
 
-namespace Content.Client.Hands.UI
+namespace Content.Client.Hands.UI;
+
+public sealed class HandVirtualItemStatus : Control
 {
-    public sealed class HandVirtualItemStatus : Control
+    public HandVirtualItemStatus()
     {
-        public HandVirtualItemStatus()
-        {
-            RobustXamlLoader.Load(this);
-        }
+        RobustXamlLoader.Load(this);
     }
 }

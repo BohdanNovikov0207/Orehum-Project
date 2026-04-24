@@ -88,15 +88,13 @@ namespace Content.Client.Mapping;
 [GenerateTypedNameReferences]
 public sealed partial class MappingPrototypeList : Control
 {
-    private (int start, int end) _lastIndices;
-    private readonly List<MappingPrototype> _prototypes = new();
     private readonly List<Texture> _insertTextures = new();
+    private readonly List<MappingPrototype> _prototypes = new();
     private readonly List<MappingPrototype> _search = new();
+    private (int start, int end) _lastIndices;
+    public Action<IPrototype, List<Texture>>? GetPrototypeData;
 
     public MappingSpawnButton? Selected;
-    public Action<IPrototype, List<Texture>>? GetPrototypeData;
-    public event Action<MappingSpawnButton, IPrototype?>? SelectionChanged;
-    public event Action<MappingSpawnButton, ButtonToggledEventArgs>? CollapseToggled;
 
     public MappingPrototypeList()
     {
@@ -107,6 +105,9 @@ public sealed partial class MappingPrototypeList : Control
         ScrollContainer.OnScrolled += UpdateSearch;
         OnResized += UpdateSearch;
     }
+
+    public event Action<MappingSpawnButton, IPrototype?>? SelectionChanged;
+    public event Action<MappingSpawnButton, ButtonToggledEventArgs>? CollapseToggled;
 
     public void UpdateVisible(List<MappingPrototype> prototypes)
     {
@@ -143,9 +144,7 @@ public sealed partial class MappingPrototypeList : Control
             button.Texture.InvalidateMeasure();
         }
         else
-        {
             button.Texture.Visible = false;
-        }
 
         if (prototype != null && button.Prototype == Selected?.Prototype)
         {
@@ -185,7 +184,7 @@ public sealed partial class MappingPrototypeList : Control
     }
 
     /// <summary>
-    ///     Constructs a virtual list where not all buttons exist at one time, since there may be thousands of them.
+    /// Constructs a virtual list where not all buttons exist at one time, since there may be thousands of them.
     /// </summary>
     private void UpdateSearch()
     {

@@ -20,22 +20,27 @@ namespace Content.Client.UserInterface.Systems.Hands.Controls;
 public sealed class HandsContainer : ItemSlotUIContainer<HandButton>
 {
     private readonly GridContainer _grid;
-    public int ColumnLimit { get => _grid.Columns; set => _grid.Columns = value; }
-    public int MaxButtonCount { get; set; } = 0;
-
-    public int MaxButtonsPerRow { get; set;  }= 6;
-
-    /// <summary>
-    ///     Indexer. This is used to reference a HandsContainer from the
-    ///     controller.
-    /// </summary>
-    public string? Indexer { get; set; }
 
     public HandsContainer()
     {
         AddChild(_grid = new GridContainer());
         _grid.ExpandBackwards = true;
     }
+
+    public int ColumnLimit { get => _grid.Columns; set => _grid.Columns = value; }
+    public int MaxButtonCount { get; set; } = 0;
+
+    public int MaxButtonsPerRow { get; set; } = 6;
+
+    /// <summary>
+    /// Indexer. This is used to reference a HandsContainer from the
+    /// controller.
+    /// </summary>
+    public string? Indexer { get; set; }
+
+    public bool IsFull => MaxButtonCount != 0 && ButtonCount >= MaxButtonCount;
+
+    public int ButtonCount => _grid.ChildCount;
 
     public override HandButton? AddButton(HandButton newButton)
     {
@@ -47,9 +52,7 @@ public sealed class HandsContainer : ItemSlotUIContainer<HandButton>
             _grid.AddChild(newButton);
         }
         else
-        {
             _grid.AddChild(newButton);
-        }
 
         _grid.Columns = Math.Min(_grid.ChildCount, MaxButtonsPerRow);
         return base.AddButton(newButton);
@@ -98,8 +101,4 @@ public sealed class HandsContainer : ItemSlotUIContainer<HandButton>
                 yield return hand;
         }
     }
-
-    public bool IsFull => (MaxButtonCount != 0 && ButtonCount >= MaxButtonCount);
-
-    public int ButtonCount => _grid.ChildCount;
 }

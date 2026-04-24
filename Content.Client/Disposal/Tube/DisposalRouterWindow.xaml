@@ -8,9 +8,9 @@ SPDX-License-Identifier: MIT
 -->
 
 <DefaultWindow xmlns="https://spacestation14.io"
-            Title="{Loc 'disposal-router-window-title'}"
-            MinSize="500 110"
-            SetSize="500 110">
+               Title="{Loc 'disposal-router-window-title'}"
+               MinSize="500 110"
+               SetSize="500 110">
     <BoxContainer Orientation="Vertical">
         <Label Text="{Loc 'disposal-router-window-tags-label'}" />
         <Control MinSize="0 10" />

@@ -23,17 +23,19 @@ public sealed class AccessOverlay : Overlay
     private const int TextFontSize = 12;
 
     private readonly IEntityManager _entityManager;
-    private readonly SharedTransformSystem _transformSystem;
     private readonly Font _font;
+    private readonly SharedTransformSystem _transformSystem;
 
-    public override OverlaySpace Space => OverlaySpace.ScreenSpace;
-
-    public AccessOverlay(IEntityManager entityManager, IResourceCache resourceCache, SharedTransformSystem transformSystem)
+    public AccessOverlay(IEntityManager entityManager,
+        IResourceCache resourceCache,
+        SharedTransformSystem transformSystem)
     {
         _entityManager = entityManager;
         _transformSystem = transformSystem;
         _font = resourceCache.GetFont(TextFontPath, TextFontSize);
     }
+
+    public override OverlaySpace Space => OverlaySpace.ScreenSpace;
 
     protected override void Draw(in OverlayDrawArgs args)
     {
@@ -77,9 +79,7 @@ public sealed class AccessOverlay : Overlay
                 }
             }
             else
-            {
                 textBuffer.AppendLine("+Unrestricted");
-            }
 
             foreach (var key in accessReader.AccessKeys)
             {

@@ -40,49 +40,39 @@ public sealed partial class ShuttleConsoleBoundUserInterface : BoundUserInterfac
         NfOpen(); // Frontier
     }
 
-    private void OnUndockRequest(NetEntity entity)
-    {
-        SendMessage(new UndockRequestMessage()
+    private void OnUndockRequest(NetEntity entity) =>
+        SendMessage(new UndockRequestMessage
         {
             DockEntity = entity,
         });
-    }
 
-    private void OnDockRequest(NetEntity entity, NetEntity target)
-    {
-        SendMessage(new DockRequestMessage()
+    private void OnDockRequest(NetEntity entity, NetEntity target) =>
+        SendMessage(new DockRequestMessage
         {
             DockEntity = entity,
             TargetDockEntity = target,
         });
-    }
 
-    private void OnFTLBeaconRequest(NetEntity ent, Angle angle)
-    {
-        SendMessage(new ShuttleConsoleFTLBeaconMessage()
+    private void OnFTLBeaconRequest(NetEntity ent, Angle angle) =>
+        SendMessage(new ShuttleConsoleFTLBeaconMessage
         {
             Beacon = ent,
             Angle = angle,
         });
-    }
 
-    private void OnFTLRequest(MapCoordinates obj, Angle angle)
-    {
-        SendMessage(new ShuttleConsoleFTLPositionMessage()
+    private void OnFTLRequest(MapCoordinates obj, Angle angle) =>
+        SendMessage(new ShuttleConsoleFTLPositionMessage
         {
             Coordinates = obj,
             Angle = angle,
         });
-    }
 
     protected override void Dispose(bool disposing)
     {
         base.Dispose(disposing);
 
         if (disposing)
-        {
             _window?.Dispose();
-        }
     }
 
     protected override void UpdateState(BoundUserInterfaceState state)

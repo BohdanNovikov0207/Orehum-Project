@@ -9,7 +9,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 <Control xmlns="https://spacestation14.io"
          xmlns:cc="clr-namespace:Content.Client.Administration.UI.CustomControls">
-    <PanelContainer Name="BackgroundColorPanel" Access="Public"/>
+    <PanelContainer Name="BackgroundColorPanel" Access="Public" />
     <BoxContainer Orientation="Horizontal"
                   HorizontalExpand="True"
                   SeparationOverride="4">
@@ -18,19 +18,19 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                HorizontalExpand="True"
                ClipText="True"
                Text="{Loc object-tab-object-name}"
-               MouseFilter="Pass"/>
-        <cc:VSeparator/>
+               MouseFilter="Pass" />
+        <cc:VSeparator />
         <Label Name="EntityIDLabel"
                SizeFlagsStretchRatio="5"
                HorizontalExpand="True"
                ClipText="True"
                Text="{Loc object-tab-entity-id}"
-               MouseFilter="Pass"/>
+               MouseFilter="Pass" />
         <Label Name="EntityTeleportLabel"
                SizeFlagsStretchRatio="3"
-               HorizontalExpand="True"/>
+               HorizontalExpand="True" />
         <Label Name="EntityDeleteLabel"
                SizeFlagsStretchRatio="3"
-               HorizontalExpand="True"/>
+               HorizontalExpand="True" />
     </BoxContainer>
 </Control>

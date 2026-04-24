@@ -10,7 +10,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Bed.Sleep;
 using Content.Shared.Drowsiness;
 using Content.Shared.StatusEffectNew;
 using Robust.Client.Graphics;
@@ -23,24 +22,20 @@ namespace Content.Client.Drowsiness;
 
 public sealed class DrowsinessOverlay : Overlay
 {
-    private static readonly ProtoId<ShaderPrototype> Shader = "Drowsiness";
-
-    [Dependency] private readonly IEntityManager _entityManager = default!;
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-    [Dependency] private readonly IPlayerManager _playerManager = default!;
-    [Dependency] private readonly IEntitySystemManager _sysMan = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    private readonly StatusEffectsSystem _statusEffects = default!;
-
-    public override OverlaySpace Space => OverlaySpace.WorldSpace;
-    public override bool RequestScreenTexture => true;
-    private readonly ShaderInstance _drowsinessShader;
-
-    public float CurrentPower = 0.0f;
-
     private const float PowerDivisor = 250.0f;
     private const float Intensity = 0.2f; // for adjusting the visual scale
-    private float _visualScale = 0; // between 0 and 1
+    private static readonly ProtoId<ShaderPrototype> Shader = "Drowsiness";
+    private readonly ShaderInstance _drowsinessShader;
+
+    [Dependency] private readonly IEntityManager _entityManager = default!;
+    [Dependency] private readonly IPlayerManager _playerManager = default!;
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    private readonly StatusEffectsSystem _statusEffects = default!;
+    [Dependency] private readonly IEntitySystemManager _sysMan = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    private float _visualScale; // between 0 and 1
+
+    public float CurrentPower;
 
     public DrowsinessOverlay()
     {
@@ -51,6 +46,9 @@ public sealed class DrowsinessOverlay : Overlay
         _drowsinessShader = _prototypeManager.Index(Shader).InstanceUnique();
     }
 
+    public override OverlaySpace Space => OverlaySpace.WorldSpace;
+    public override bool RequestScreenTexture => true;
+
     protected override void FrameUpdate(FrameEventArgs args)
     {
         var playerEntity = _playerManager.LocalEntity;
@@ -58,11 +56,12 @@ public sealed class DrowsinessOverlay : Overlay
         if (playerEntity == null)
             return;
 
-        if (!_statusEffects.TryGetEffectsEndTimeWithComp<DrowsinessStatusEffectComponent>(playerEntity, out var endTime))
+        if (!_statusEffects.TryGetEffectsEndTimeWithComp<DrowsinessStatusEffectComponent>(playerEntity,
+                out var endTime))
             return;
 
         endTime ??= TimeSpan.MaxValue;
-        var timeLeft = (float)(endTime - _timing.CurTime).Value.TotalSeconds;
+        var timeLeft = (float) (endTime - _timing.CurTime).Value.TotalSeconds;
         CurrentPower += 8f * (0.5f * timeLeft - CurrentPower) * args.DeltaSeconds / (timeLeft + 1);
     }
 

@@ -11,19 +11,21 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Shared.Chat.TypingIndicator;
+using Content.Shared.Inventory;
 using Robust.Client.GameObjects;
 using Robust.Shared.Prototypes;
-using Content.Shared.Inventory;
 
 namespace Content.Client.Chat.TypingIndicator;
 
 public sealed class TypingIndicatorVisualizerSystem : VisualizerSystem<TypingIndicatorComponent>
 {
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly InventorySystem _inventory = default!;
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly SpriteSystem _sprite = default!;
 
-    protected override void OnAppearanceChange(EntityUid uid, TypingIndicatorComponent component, ref AppearanceChangeEvent args)
+    protected override void OnAppearanceChange(EntityUid uid,
+        TypingIndicatorComponent component,
+        ref AppearanceChangeEvent args)
     {
         if (args.Sprite == null)
             return;

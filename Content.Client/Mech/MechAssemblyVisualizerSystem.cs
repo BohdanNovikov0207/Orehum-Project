@@ -15,7 +15,8 @@ namespace Content.Client.Mech;
 /// </summary>
 public sealed class MechAssemblyVisualizerSystem : VisualizerSystem<MechAssemblyVisualsComponent>
 {
-    protected override void OnAppearanceChange(EntityUid uid, MechAssemblyVisualsComponent component,
+    protected override void OnAppearanceChange(EntityUid uid,
+        MechAssemblyVisualsComponent component,
         ref AppearanceChangeEvent args)
     {
         if (args.Sprite == null)

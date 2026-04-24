@@ -104,20 +104,16 @@ public sealed class ItemSystem : SharedItemSystem
         SubscribeLocalEvent<SpriteComponent, GotUnequippedEvent>(OnUnequipped);
     }
 
-    private void OnUnequipped(EntityUid uid, SpriteComponent component, GotUnequippedEvent args)
-    {
+    private void OnUnequipped(EntityUid uid, SpriteComponent component, GotUnequippedEvent args) =>
         _sprite.SetVisible((uid, component), true);
-    }
 
-    private void OnEquipped(EntityUid uid, SpriteComponent component, GotEquippedEvent args)
-    {
+    private void OnEquipped(EntityUid uid, SpriteComponent component, GotEquippedEvent args) =>
         _sprite.SetVisible((uid, component), false);
-    }
 
     #region InhandVisuals
 
     /// <summary>
-    ///     When an items visual state changes, notify and entities that are holding this item that their sprite may need updating.
+    /// When an items visual state changes, notify and entities that are holding this item that their sprite may need updating.
     /// </summary>
     public override void VisualsChanged(EntityUid uid)
     {
@@ -127,7 +123,7 @@ public sealed class ItemSystem : SharedItemSystem
     }
 
     /// <summary>
-    ///     An entity holding this item is requesting visual information for in-hand sprites.
+    /// An entity holding this item is requesting visual information for in-hand sprites.
     /// </summary>
     private void OnGetVisuals(EntityUid uid, ItemComponent item, GetInhandVisualsEvent args)
     {
@@ -156,12 +152,15 @@ public sealed class ItemSystem : SharedItemSystem
     }
 
     /// <summary>
-    ///     If no explicit in-hand visuals were specified, this attempts to populate with default values.
+    /// If no explicit in-hand visuals were specified, this attempts to populate with default values.
     /// </summary>
     /// <remarks>
-    ///     Useful for lazily adding in-hand sprites without modifying yaml. And backwards compatibility.
+    /// Useful for lazily adding in-hand sprites without modifying yaml. And backwards compatibility.
     /// </remarks>
-    private bool TryGetDefaultVisuals(EntityUid uid, ItemComponent item, string defaultKey, [NotNullWhen(true)] out List<PrototypeLayerData>? result)
+    private bool TryGetDefaultVisuals(EntityUid uid,
+        ItemComponent item,
+        string defaultKey,
+        [NotNullWhen(true)] out List<PrototypeLayerData>? result)
     {
         result = null;
 
@@ -175,20 +174,21 @@ public sealed class ItemSystem : SharedItemSystem
         if (rsi == null)
             return false;
 
-        var state = (item.HeldPrefix == null)
+        var state = item.HeldPrefix == null
             ? defaultKey
             : $"{item.HeldPrefix}-{defaultKey}";
 
-        if (!rsi.TryGetState(state, out var _))
+        if (!rsi.TryGetState(state, out _))
             return false;
 
         var layer = new PrototypeLayerData();
         layer.RsiPath = rsi.Path.ToString();
         layer.State = state;
-        layer.MapKeys = new() { state };
+        layer.MapKeys = new HashSet<string> { state };
 
-        result = new() { layer };
+        result = new List<PrototypeLayerData> { layer };
         return true;
     }
+
     #endregion
 }

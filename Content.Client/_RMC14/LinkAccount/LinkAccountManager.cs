@@ -33,9 +33,8 @@ namespace Content.Client._RMC14.LinkAccount;
 
 public sealed class LinkAccountManager : IPostInjectInit
 {
-    [Dependency] private readonly INetManager _net = default!;
-
     private readonly List<SharedRMCPatron> _allPatrons = [];
+    [Dependency] private readonly INetManager _net = default!;
 
     public SharedRMCPatronTier? Tier { get; private set; }
     public bool Linked { get; private set; }
@@ -43,13 +42,22 @@ public sealed class LinkAccountManager : IPostInjectInit
     public SharedRMCLobbyMessage? LobbyMessage { get; private set; }
     public SharedRMCRoundEndShoutouts? RoundEndShoutout { get; private set; }
 
+    void IPostInjectInit.PostInject()
+    {
+        _net.RegisterNetMessage<LinkAccountCodeMsg>(OnCode);
+        _net.RegisterNetMessage<LinkAccountRequestMsg>();
+        _net.RegisterNetMessage<LinkAccountStatusMsg>(OnStatus);
+        _net.RegisterNetMessage<RMCPatronListMsg>(OnPatronList);
+        _net.RegisterNetMessage<RMCClearGhostColorMsg>();
+        _net.RegisterNetMessage<RMCChangeGhostColorMsg>();
+        _net.RegisterNetMessage<RMCChangeLobbyMessageMsg>();
+        _net.RegisterNetMessage<RMCChangeNTShoutoutMsg>();
+    }
+
     public event Action<Guid>? CodeReceived;
     public event Action? Updated;
 
-    private void OnCode(LinkAccountCodeMsg message)
-    {
-        CodeReceived?.Invoke(message.Code);
-    }
+    private void OnCode(LinkAccountCodeMsg message) => CodeReceived?.Invoke(message.Code);
 
     private void OnStatus(LinkAccountStatusMsg ev)
     {
@@ -67,25 +75,8 @@ public sealed class LinkAccountManager : IPostInjectInit
         _allPatrons.AddRange(ev.Patrons);
     }
 
-    public IReadOnlyList<SharedRMCPatron> GetPatrons()
-    {
-        return _allPatrons;
-    }
+    public IReadOnlyList<SharedRMCPatron> GetPatrons() => _allPatrons;
 
-    public bool CanViewPatronPerks()
-    {
-        return Tier is { } tier && (tier.GhostColor || tier.LobbyMessage || tier.RoundEndShoutout);
-    }
-
-    void IPostInjectInit.PostInject()
-    {
-        _net.RegisterNetMessage<LinkAccountCodeMsg>(OnCode);
-        _net.RegisterNetMessage<LinkAccountRequestMsg>();
-        _net.RegisterNetMessage<LinkAccountStatusMsg>(OnStatus);
-        _net.RegisterNetMessage<RMCPatronListMsg>(OnPatronList);
-        _net.RegisterNetMessage<RMCClearGhostColorMsg>();
-        _net.RegisterNetMessage<RMCChangeGhostColorMsg>();
-        _net.RegisterNetMessage<RMCChangeLobbyMessageMsg>();
-        _net.RegisterNetMessage<RMCChangeNTShoutoutMsg>();
-    }
+    public bool CanViewPatronPerks() =>
+        Tier is { } tier && (tier.GhostColor || tier.LobbyMessage || tier.RoundEndShoutout);
 }

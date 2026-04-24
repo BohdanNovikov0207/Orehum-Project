@@ -3,12 +3,11 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared._White.Examine;
-using Robust.Client.UserInterface;
-using Robust.Client.UserInterface.Controls;
-using Content.Shared.Chat;
-using Robust.Shared.Utility;
 using Content.Client.UserInterface.Systems.Chat;
+using Content.Shared._White.Examine;
+using Content.Shared.Chat;
+using Robust.Client.UserInterface;
+
 namespace Content.Client._White.Examine;
 
 public sealed class ExaminableCharacterSystem : EntitySystem

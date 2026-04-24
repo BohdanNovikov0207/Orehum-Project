@@ -24,52 +24,55 @@ using Content.Shared.Administration;
 using Content.Shared.Administration.Events;
 using Robust.Shared.Network;
 
-namespace Content.Client.Administration.Systems
+namespace Content.Client.Administration.Systems;
+
+public sealed partial class AdminSystem : EntitySystem
 {
-    public sealed partial class AdminSystem : EntitySystem
+    private Dictionary<NetUserId, PlayerInfo>? _playerList;
+
+    public IReadOnlyList<PlayerInfo> PlayerList
     {
-        public event Action<List<PlayerInfo>>? PlayerListChanged;
-
-        private Dictionary<NetUserId, PlayerInfo>? _playerList;
-        public IReadOnlyList<PlayerInfo> PlayerList
+        get
         {
-            get
-            {
-                if (_playerList != null) return _playerList.Values.ToList();
+            if (_playerList != null)
+                return _playerList.Values.ToList();
 
-                return new List<PlayerInfo>();
-            }
+            return new List<PlayerInfo>();
         }
+    }
 
-        public override void Initialize()
-        {
-            base.Initialize();
+    public event Action<List<PlayerInfo>>? PlayerListChanged;
 
-            InitializeOverlay();
-            SubscribeNetworkEvent<FullPlayerListEvent>(OnPlayerListChanged);
-            SubscribeNetworkEvent<PlayerInfoChangedEvent>(OnPlayerInfoChanged);
-        }
+    public override void Initialize()
+    {
+        base.Initialize();
 
-        public override void Shutdown()
-        {
-            base.Shutdown();
-            ShutdownOverlay();
-        }
+        InitializeOverlay();
+        SubscribeNetworkEvent<FullPlayerListEvent>(OnPlayerListChanged);
+        SubscribeNetworkEvent<PlayerInfoChangedEvent>(OnPlayerInfoChanged);
+    }
 
-        private void OnPlayerInfoChanged(PlayerInfoChangedEvent ev)
-        {
-            if(ev.PlayerInfo == null) return;
+    public override void Shutdown()
+    {
+        base.Shutdown();
+        ShutdownOverlay();
+    }
 
-            if (_playerList == null) _playerList = new();
+    private void OnPlayerInfoChanged(PlayerInfoChangedEvent ev)
+    {
+        if (ev.PlayerInfo == null)
+            return;
 
-            _playerList[ev.PlayerInfo.SessionId] = ev.PlayerInfo;
-            PlayerListChanged?.Invoke(_playerList.Values.ToList());
-        }
+        if (_playerList == null)
+            _playerList = new Dictionary<NetUserId, PlayerInfo>();
 
-        private void OnPlayerListChanged(FullPlayerListEvent msg)
-        {
-            _playerList = msg.PlayersInfo.ToDictionary(x => x.SessionId, x => x);
-            PlayerListChanged?.Invoke(msg.PlayersInfo);
-        }
+        _playerList[ev.PlayerInfo.SessionId] = ev.PlayerInfo;
+        PlayerListChanged?.Invoke(_playerList.Values.ToList());
+    }
+
+    private void OnPlayerListChanged(FullPlayerListEvent msg)
+    {
+        _playerList = msg.PlayersInfo.ToDictionary(x => x.SessionId, x => x);
+        PlayerListChanged?.Invoke(msg.PlayersInfo);
     }
 }

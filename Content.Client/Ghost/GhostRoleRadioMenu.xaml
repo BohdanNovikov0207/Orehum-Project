@@ -10,6 +10,5 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     CloseButtonStyleClass="RadialMenuCloseButton"
     VerticalExpand="True"
     HorizontalExpand="True">
-    <ui:RadialContainer Name="Main">
-    </ui:RadialContainer>
+    <ui:RadialContainer Name="Main" />
 </ui:RadialMenu>

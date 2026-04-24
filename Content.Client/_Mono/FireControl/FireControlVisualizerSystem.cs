@@ -18,19 +18,8 @@ namespace Content.Client._Mono.FireControl;
 /// </summary>
 public sealed class FireControlVisualizerSystem : EntitySystem
 {
-    [Dependency] private readonly IOverlayManager _overlayManager = default!;
-
     private readonly Dictionary<EntityUid, VisualizationData> _activeVisualizations = new();
-
-    public sealed class VisualizationData
-    {
-        public Dictionary<float, bool> Directions { get; }
-
-        public VisualizationData(Dictionary<float, bool> directions)
-        {
-            Directions = directions;
-        }
-    }
+    [Dependency] private readonly IOverlayManager _overlayManager = default!;
 
     public override void Initialize()
     {
@@ -68,9 +57,16 @@ public sealed class FireControlVisualizerSystem : EntitySystem
     /// <summary>
     /// Gets the current active visualizations for the overlay to render
     /// </summary>
-    public IReadOnlyDictionary<EntityUid, VisualizationData> GetVisualizations()
+    public IReadOnlyDictionary<EntityUid, VisualizationData> GetVisualizations() => _activeVisualizations;
+
+    public sealed class VisualizationData
     {
-        return _activeVisualizations;
+        public VisualizationData(Dictionary<float, bool> directions)
+        {
+            Directions = directions;
+        }
+
+        public Dictionary<float, bool> Directions { get; }
     }
 
     /// <summary>
@@ -78,11 +74,9 @@ public sealed class FireControlVisualizerSystem : EntitySystem
     /// </summary>
     private sealed class FireControlOverlay : Overlay
     {
-        private readonly FireControlVisualizerSystem _system;
         private readonly IEntityManager _entityManager;
+        private readonly FireControlVisualizerSystem _system;
         private readonly SharedTransformSystem _transformSystem;
-
-        public override OverlaySpace Space => OverlaySpace.WorldSpace;
 
         public FireControlOverlay(FireControlVisualizerSystem system, IEntityManager entityManager)
         {
@@ -90,6 +84,8 @@ public sealed class FireControlVisualizerSystem : EntitySystem
             _entityManager = entityManager;
             _transformSystem = entityManager.System<SharedTransformSystem>();
         }
+
+        public override OverlaySpace Space => OverlaySpace.WorldSpace;
 
         protected override void Draw(in OverlayDrawArgs args)
         {
@@ -104,7 +100,7 @@ public sealed class FireControlVisualizerSystem : EntitySystem
                 var position = _transformSystem.GetWorldPosition(transform);
 
                 // Draw a small circle at the weapon position
-                handle.DrawCircle(position, 0.3f, Color.Yellow, true);
+                handle.DrawCircle(position, 0.3f, Color.Yellow);
 
                 // Draw rays for each direction
                 foreach (var (angle, canFire) in data.Directions)
@@ -113,7 +109,7 @@ public sealed class FireControlVisualizerSystem : EntitySystem
                     var radians = angle * Math.PI / 180;
 
                     // Calculate end point (25 units length)
-                    var direction = new Vector2((float)Math.Cos(radians), (float)Math.Sin(radians));
+                    var direction = new Vector2((float) Math.Cos(radians), (float) Math.Sin(radians));
                     var endPoint = position + direction * 25f;
 
                     // Choose color based on whether firing is possible

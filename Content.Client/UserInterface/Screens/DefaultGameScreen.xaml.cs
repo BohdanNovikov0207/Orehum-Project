@@ -48,15 +48,17 @@ public sealed partial class DefaultGameScreen : InGameScreen
         Inventory.OnResized += ResizeActionContainer;
     }
 
+    public override ChatBox ChatBox => Chat;
+
     private void ResizeActionContainer()
     {
-        float indent = Inventory.Size.Y + TopBar.Size.Y + 40;
+        var indent = Inventory.Size.Y + TopBar.Size.Y + 40;
         Actions.ActionsContainer.MaxGridHeight = MainViewport.Size.Y - indent;
     }
 
     private void ResizeAlertsContainer()
     {
-        float indent = Chat.Size.Y + Targeting.Size.Y + 120;
+        var indent = Chat.Size.Y + Targeting.Size.Y + 120;
         Alerts.AlertContainer.MaxGridHeight = Math.Max(MainViewport.Size.Y - indent, 1);
     }
 
@@ -72,8 +74,6 @@ public sealed partial class DefaultGameScreen : InGameScreen
         var marginBottom = Chat.GetValue<float>(MarginBottomProperty);
         SetMarginTop(Alerts, marginBottom);
     }
-
-    public override ChatBox ChatBox => Chat;
 
     //TODO: There's probably a better way to do this... but this is also the easiest way.
     public override void SetChatSize(Vector2 size)

@@ -122,11 +122,11 @@ public sealed partial class GraphicsTab : Control
         Control.AddOptionSlider(
             CCVars.ViewportWidth,
             ViewportWidthSlider,
-            (int)ViewportWidthSlider.Slider.MinValue,
-            (int)ViewportWidthSlider.Slider.MaxValue);
+            (int) ViewportWidthSlider.Slider.MinValue,
+            (int) ViewportWidthSlider.Slider.MaxValue);
 
         Control.AddOption(new OptionIntegerScaling(Control, _cfg, IntegerScalingCheckBox));
-        Control.AddOptionCheckBox(CCVars.ViewportScaleRender, ViewportLowResCheckBox, invert: true);
+        Control.AddOptionCheckBox(CCVars.ViewportScaleRender, ViewportLowResCheckBox, true);
         Control.AddOptionCheckBox(CCVars.ParallaxLowQuality, ParallaxLowQualityCheckBox);
         Control.AddOptionCheckBox(CCVars.HudFpsCounterVisible, FpsCounterCheckBox);
 
@@ -159,17 +159,18 @@ public sealed partial class GraphicsTab : Control
 
     private sealed class OptionLightingQuality : BaseOption
     {
-        private readonly IConfigurationManager _cfg;
-        private readonly OptionDropDown _dropDown;
-
         private const int QualityVeryLow = 0;
         private const int QualityLow = 1;
         private const int QualityMedium = 2;
         private const int QualityHigh = 3;
 
         private const int QualityDefault = QualityMedium;
+        private readonly IConfigurationManager _cfg;
+        private readonly OptionDropDown _dropDown;
 
-        public OptionLightingQuality(OptionsTabControlRow controller, IConfigurationManager cfg, OptionDropDown dropDown) : base(controller)
+        public OptionLightingQuality(OptionsTabControlRow controller,
+            IConfigurationManager cfg,
+            OptionDropDown dropDown) : base(controller)
         {
             _cfg = cfg;
             _dropDown = dropDown;
@@ -187,10 +188,7 @@ public sealed partial class GraphicsTab : Control
             ValueChanged();
         }
 
-        public override void LoadValue()
-        {
-            _dropDown.Button.SelectId(GetConfigLightingQuality());
-        }
+        public override void LoadValue() => _dropDown.Button.SelectId(GetConfigLightingQuality());
 
         public override void SaveValue()
         {
@@ -219,20 +217,11 @@ public sealed partial class GraphicsTab : Control
             }
         }
 
-        public override void ResetToDefault()
-        {
-            _dropDown.Button.SelectId(QualityDefault);
-        }
+        public override void ResetToDefault() => _dropDown.Button.SelectId(QualityDefault);
 
-        public override bool IsModified()
-        {
-            return _dropDown.Button.SelectedId != GetConfigLightingQuality();
-        }
+        public override bool IsModified() => _dropDown.Button.SelectedId != GetConfigLightingQuality();
 
-        public override bool IsModifiedFromDefault()
-        {
-            return _dropDown.Button.SelectedId != QualityDefault;
-        }
+        public override bool IsModifiedFromDefault() => _dropDown.Button.SelectedId != QualityDefault;
 
         private int GetConfigLightingQuality()
         {
@@ -241,7 +230,7 @@ public sealed partial class GraphicsTab : Control
             if (val <= 0.125)
                 return QualityVeryLow;
 
-            if ((val <= 0.5) && !soft)
+            if (val <= 0.5 && !soft)
                 return QualityLow;
 
             if (val <= 0.5)
@@ -255,12 +244,6 @@ public sealed partial class GraphicsTab : Control
     {
         private readonly CheckBox _checkBox;
 
-        protected override int Value
-        {
-            get => _checkBox.Pressed ? (int) WindowMode.Fullscreen : (int) WindowMode.Windowed;
-            set => _checkBox.Pressed = (value == (int) WindowMode.Fullscreen);
-        }
-
         public OptionFullscreen(
             OptionsTabControlRow controller,
             IConfigurationManager cfg,
@@ -273,17 +256,17 @@ public sealed partial class GraphicsTab : Control
                 ValueChanged();
             };
         }
+
+        protected override int Value
+        {
+            get => _checkBox.Pressed ? (int) WindowMode.Fullscreen : (int) WindowMode.Windowed;
+            set => _checkBox.Pressed = value == (int) WindowMode.Fullscreen;
+        }
     }
 
     private sealed class OptionIntegerScaling : BaseOptionCVar<int>
     {
         private readonly CheckBox _checkBox;
-
-        protected override int Value
-        {
-            get => _checkBox.Pressed ? CCVars.ViewportSnapToleranceMargin.DefaultValue : 0;
-            set => _checkBox.Pressed = (value != 0);
-        }
 
         public OptionIntegerScaling(
             OptionsTabControlRow controller,
@@ -296,6 +279,12 @@ public sealed partial class GraphicsTab : Control
             {
                 ValueChanged();
             };
+        }
+
+        protected override int Value
+        {
+            get => _checkBox.Pressed ? CCVars.ViewportSnapToleranceMargin.DefaultValue : 0;
+            set => _checkBox.Pressed = value != 0;
         }
     }
 }

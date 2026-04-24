@@ -18,8 +18,6 @@ public sealed class ConfigurationSystem : SharedConfigurationSystem
         if (_uiSystem.TryGetOpenUi<ConfigurationBoundUserInterface>(ent.Owner,
                 ConfigurationComponent.ConfigurationUiKey.Key,
                 out var bui))
-        {
             bui.Refresh(ent);
-        }
     }
 }

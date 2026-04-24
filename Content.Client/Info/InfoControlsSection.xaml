@@ -7,12 +7,12 @@ SPDX-License-Identifier: MIT
 
 <BoxContainer xmlns="https://spacestation14.io"
               Orientation="Vertical">
-    <Label Text="{Loc 'ui-info-header-controls'}" StyleClasses="LabelHeading"/>
+    <Label Text="{Loc 'ui-info-header-controls'}" StyleClasses="LabelHeading" />
     <BoxContainer Orientation="Horizontal"
                   SeparationOverride="5">
-        <Label Text="{Loc 'ui-info-text-controls'}"/>
+        <Label Text="{Loc 'ui-info-text-controls'}" />
         <Button Name="ControlsButton"
                 Text="{Loc 'ui-info-button-controls'}"
-                Access="Public"/>
+                Access="Public" />
     </BoxContainer>
 </BoxContainer>

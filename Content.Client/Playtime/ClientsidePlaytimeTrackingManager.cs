@@ -1,34 +1,33 @@
 using Content.Shared.CCVar;
 using Robust.Client.Player;
-using Robust.Shared.Network;
 using Robust.Shared.Configuration;
+using Robust.Shared.Network;
 using Robust.Shared.Timing;
 
 namespace Content.Client.Playtime;
 
 /// <summary>
-///     Keeps track of how long the player has played today.
+/// Keeps track of how long the player has played today.
 /// </summary>
 /// <remarks>
-/// <para>
+///     <para>
 ///     Playtime is treated as any time in which the player is attached to an entity.
 ///     This notably excludes scenarios like the lobby.
-/// </para>
+///     </para>
 /// </remarks>
 public sealed class ClientsidePlaytimeTrackingManager
 {
+    private const string InternalDateFormat = "yyyy-MM-dd";
     [Dependency] private readonly IClientNetManager _clientNetManager = default!;
     [Dependency] private readonly IConfigurationManager _configurationManager = default!;
+    [Dependency] private readonly IGameTiming _gameTiming = default!;
     [Dependency] private readonly ILogManager _logManager = default!;
     [Dependency] private readonly IPlayerManager _playerManager = default!;
-    [Dependency] private readonly IGameTiming _gameTiming = default!;
-
-    private ISawmill _sawmill = default!;
-
-    private const string InternalDateFormat = "yyyy-MM-dd";
 
     [ViewVariables]
     private TimeSpan? _mobAttachmentTime;
+
+    private ISawmill _sawmill = default!;
 
     /// <summary>
     /// The total amount of time played today, in minutes.
@@ -42,7 +41,7 @@ public sealed class ClientsidePlaytimeTrackingManager
             if (_mobAttachmentTime == null)
                 return cvarValue;
 
-            return cvarValue + (float)(_gameTiming.RealTime - _mobAttachmentTime.Value).TotalMinutes;
+            return cvarValue + (float) (_gameTiming.RealTime - _mobAttachmentTime.Value).TotalMinutes;
         }
     }
 
@@ -73,10 +72,7 @@ public sealed class ClientsidePlaytimeTrackingManager
         _configurationManager.SetCVar(CCVars.PlaytimeLastConnectDate, formattedDate);
     }
 
-    private void OnPlayerAttached(EntityUid entity)
-    {
-        _mobAttachmentTime = _gameTiming.RealTime;
-    }
+    private void OnPlayerAttached(EntityUid entity) => _mobAttachmentTime = _gameTiming.RealTime;
 
     private void OnPlayerDetached(EntityUid entity)
     {
@@ -103,6 +99,7 @@ public sealed class ClientsidePlaytimeTrackingManager
 
         _sawmill.Info($"Recorded {timeDiffMinutes} minutes of living playtime!");
 
-        _configurationManager.SaveToFile(); // We don't like that we have to save the entire config just to store playtime stats '^'
+        _configurationManager
+            .SaveToFile(); // We don't like that we have to save the entire config just to store playtime stats '^'
     }
 }

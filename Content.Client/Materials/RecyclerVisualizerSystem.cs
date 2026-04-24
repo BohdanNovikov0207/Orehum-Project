@@ -11,9 +11,12 @@ namespace Content.Client.Materials;
 
 public sealed class RecyclerVisualizerSystem : VisualizerSystem<RecyclerVisualsComponent>
 {
-    protected override void OnAppearanceChange(EntityUid uid, RecyclerVisualsComponent component, ref AppearanceChangeEvent args)
+    protected override void OnAppearanceChange(EntityUid uid,
+        RecyclerVisualsComponent component,
+        ref AppearanceChangeEvent args)
     {
-        if (args.Sprite == null || !SpriteSystem.LayerMapTryGet((uid, args.Sprite), RecyclerVisualLayers.Main, out var layer, false))
+        if (args.Sprite == null ||
+            !SpriteSystem.LayerMapTryGet((uid, args.Sprite), RecyclerVisualLayers.Main, out var layer, false))
             return;
 
         AppearanceSystem.TryGetData<ConveyorState>(uid, ConveyorVisuals.State, out var running);

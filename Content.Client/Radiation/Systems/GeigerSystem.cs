@@ -24,8 +24,6 @@ public sealed class GeigerSystem : SharedGeigerSystem
         Subs.ItemStatus<GeigerComponent>(ent => ent.Comp.ShowControl ? new GeigerItemControl(ent) : null);
     }
 
-    private void OnHandleState(EntityUid uid, GeigerComponent component, ref AfterAutoHandleStateEvent args)
-    {
+    private void OnHandleState(EntityUid uid, GeigerComponent component, ref AfterAutoHandleStateEvent args) =>
         component.UiUpdateNeeded = true;
-    }
 }

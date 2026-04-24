@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using Content.Client.Message;
 using Content.Client.UserInterface.Controls;
@@ -18,25 +17,22 @@ namespace Content.Client.Cargo.UI;
 [GenerateTypedNameReferences]
 public sealed partial class FundingAllocationMenu : FancyWindow
 {
+    private readonly HashSet<Control> _addedControls = new();
+    private readonly Dictionary<ProtoId<CargoAccountPrototype>, RichTextLabel> _balanceLabels = new();
+
+    private readonly EntityQuery<StationBankAccountComponent> _bankQuery;
     [Dependency] private readonly IConfigurationManager _cfg = default!;
     [Dependency] private readonly IEntityManager _entityManager = default!;
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-
-    private readonly EntityQuery<StationBankAccountComponent> _bankQuery;
-
-    public event Action<Dictionary<ProtoId<CargoAccountPrototype>, int>, double, double>? OnSavePressed;
-
-    private EntityUid? _station;
+    private readonly List<SpinBox> _spinBoxes = new();
     private bool _allowPrimaryAccountAllocation;
     private bool _allowPrimaryCutAdjustment;
+    private double _lockboxCut;
     private bool _lockboxCutEnabled;
 
     private double _primaryCut;
-    private double _lockboxCut;
 
-    private readonly HashSet<Control> _addedControls = new();
-    private readonly List<SpinBox> _spinBoxes = new();
-    private readonly Dictionary<ProtoId<CargoAccountPrototype>, RichTextLabel> _balanceLabels = new();
+    private EntityUid? _station;
 
     public FundingAllocationMenu()
     {
@@ -47,13 +43,13 @@ public sealed partial class FundingAllocationMenu : FancyWindow
 
         PrimaryCut.ValueChanged += args =>
         {
-            _primaryCut = (double)args.Value / 100.0;
+            _primaryCut = args.Value / 100.0;
             UpdateButtonDisabled();
         };
 
         LockboxCut.ValueChanged += args =>
         {
-            _lockboxCut = 1.0 - (double)args.Value / 100.0;
+            _lockboxCut = 1.0 - args.Value / 100.0;
             UpdateButtonDisabled();
         };
 
@@ -63,7 +59,7 @@ public sealed partial class FundingAllocationMenu : FancyWindow
                 return;
             var accounts = EditableAccounts(bank).OrderBy(p => p.Key).Select(p => p.Key).ToList();
             var dicts = new Dictionary<ProtoId<CargoAccountPrototype>, int>();
-            for (var i = 0; i< accounts.Count; i++)
+            for (var i = 0; i < accounts.Count; i++)
             {
                 dicts.Add(accounts[i], _spinBoxes[i].Value);
             }
@@ -72,21 +68,26 @@ public sealed partial class FundingAllocationMenu : FancyWindow
             SaveButton.Disabled = true;
         };
 
-        _cfg.OnValueChanged(CCVars.AllowPrimaryAccountAllocation, enabled => { _allowPrimaryAccountAllocation = enabled; }, true);
-        _cfg.OnValueChanged(CCVars.AllowPrimaryCutAdjustment, enabled => { _allowPrimaryCutAdjustment = enabled; }, true);
+        _cfg.OnValueChanged(CCVars.AllowPrimaryAccountAllocation,
+            enabled => { _allowPrimaryAccountAllocation = enabled; },
+            true);
+        _cfg.OnValueChanged(CCVars.AllowPrimaryCutAdjustment,
+            enabled => { _allowPrimaryCutAdjustment = enabled; },
+            true);
         _cfg.OnValueChanged(CCVars.LockboxCutEnabled, enabled => { _lockboxCutEnabled = enabled; }, true);
 
         BuildEntries();
     }
 
-    private IEnumerable<KeyValuePair<ProtoId<CargoAccountPrototype>, int>> EditableAccounts(StationBankAccountComponent bank)
+    public event Action<Dictionary<ProtoId<CargoAccountPrototype>, int>, double, double>? OnSavePressed;
+
+    private IEnumerable<KeyValuePair<ProtoId<CargoAccountPrototype>, int>> EditableAccounts(
+        StationBankAccountComponent bank)
     {
         foreach (var kvp in bank.Accounts)
         {
             if (_allowPrimaryAccountAllocation || kvp.Key != bank.PrimaryAccount)
-            {
                 yield return kvp;
-            }
         }
     }
 
@@ -96,9 +97,7 @@ public sealed partial class FundingAllocationMenu : FancyWindow
             return;
 
         if (_allowPrimaryCutAdjustment)
-        {
             HelpLabel.Text = Loc.GetString("cargo-funding-alloc-console-label-help-adjustible");
-        }
         else
         {
             HelpLabel.Text = Loc.GetString("cargo-funding-alloc-console-label-help-non-adjustible",
@@ -117,8 +116,8 @@ public sealed partial class FundingAllocationMenu : FancyWindow
         _primaryCut = bank.PrimaryCut;
         _lockboxCut = bank.LockboxCut;
 
-        LockboxCut.OverrideValue(100 - (int)(_lockboxCut * 100));
-        PrimaryCut.OverrideValue((int)(_primaryCut * 100));
+        LockboxCut.OverrideValue(100 - (int) (_lockboxCut * 100));
+        PrimaryCut.OverrideValue((int) (_primaryCut * 100));
 
         LockboxCut.IsValid = val => val is >= 0 and <= 100;
         PrimaryCut.IsValid = val => val is >= 0 and <= 100;
@@ -136,7 +135,7 @@ public sealed partial class FundingAllocationMenu : FancyWindow
             var accountNameLabel = new RichTextLabel
             {
                 Modulate = accountProto.Color,
-                Margin = new Thickness(0, 0, 10, 0)
+                Margin = new Thickness(0, 0, 10, 0),
             };
             accountNameLabel.SetMarkup($"[bold]{Loc.GetString(accountProto.Name)}[/bold]");
             EntriesContainer.AddChild(accountNameLabel);
@@ -196,6 +195,7 @@ public sealed partial class FundingAllocationMenu : FancyWindow
                 break;
             }
         }
+
         differs = differs || _primaryCut != bank.PrimaryCut || _lockboxCut != bank.LockboxCut;
 
         SaveButton.Disabled = !differs || incorrectSum;

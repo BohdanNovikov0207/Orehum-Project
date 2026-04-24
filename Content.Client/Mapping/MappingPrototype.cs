@@ -80,31 +80,31 @@ using Robust.Shared.Prototypes;
 namespace Content.Client.Mapping;
 
 /// <summary>
-///     Used to represent a button's data in the mapping editor.
+/// Used to represent a button's data in the mapping editor.
 /// </summary>
 public sealed class MappingPrototype
 {
     /// <summary>
-    ///     The prototype instance, if any.
-    ///     Can be one of <see cref="EntityPrototype"/>, <see cref="ContentTileDefinition"/> or <see cref="DecalPrototype"/>
-    ///     If null, this is a top-level button (such as Entities, Tiles or Decals)
-    /// </summary>
-    public readonly IPrototype? Prototype;
-
-    /// <summary>
-    ///     The text to display on the UI for this button.
+    /// The text to display on the UI for this button.
     /// </summary>
     public readonly string Name;
 
     /// <summary>
-    ///     Which other prototypes (buttons) this one is nested inside of.
+    /// The prototype instance, if any.
+    /// Can be one of <see cref="EntityPrototype" />, <see cref="ContentTileDefinition" /> or <see cref="DecalPrototype" />
+    /// If null, this is a top-level button (such as Entities, Tiles or Decals)
     /// </summary>
-    public List<MappingPrototype>? Parents;
+    public readonly IPrototype? Prototype;
 
     /// <summary>
-    ///     Which other prototypes (buttons) are nested inside this one.
+    /// Which other prototypes (buttons) are nested inside this one.
     /// </summary>
     public List<MappingPrototype>? Children;
+
+    /// <summary>
+    /// Which other prototypes (buttons) this one is nested inside of.
+    /// </summary>
+    public List<MappingPrototype>? Parents;
 
     public MappingPrototype(IPrototype? prototype, string name)
     {

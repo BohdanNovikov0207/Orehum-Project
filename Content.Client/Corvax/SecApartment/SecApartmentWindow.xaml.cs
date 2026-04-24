@@ -25,29 +25,29 @@ namespace Content.Client.Corvax.SecApartment;
 [GenerateTypedNameReferences]
 public sealed partial class SecApartmentWindow : BaseWindow
 {
-    [Dependency] private readonly IUserInterfaceManager _ui = default!;
-    [Dependency] private readonly IResourceCache _resCache = default!;
     [Dependency] private readonly IEntitySystemManager _entitySystem = default!;
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-    [Dependency] private readonly IGameTiming _gameTiming = default!;
     private readonly ClientGameTicker _gameTicker;
+    [Dependency] private readonly IGameTiming _gameTiming = default!;
+    private readonly Dictionary<string, CrewMemberInfo> _lastCrewData = new();
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    [Dependency] private readonly IResourceCache _resCache = default!;
     private readonly SpriteSystem _sprite;
+    private readonly Dictionary<string, SquadEntry> _squadEntries = new();
 
     private readonly SecApartmentStyles _styles;
+    private readonly Dictionary<NetEntity, TimerEntryControl> _timerControls = new();
+    [Dependency] private readonly IUserInterfaceManager _ui = default!;
     private string _station = Loc.GetString("sec-apartment-unknown");
-    private Dictionary<string, SquadEntry> _squadEntries = new();
-    private Dictionary<string, CrewMemberInfo> _lastCrewData = new();
-    private Dictionary<NetEntity, TimerEntryControl> _timerControls = new();
+    public Action<string, string>? OnAddMemberToSquad;
+    public Action<string, SquadIconNum>? OnChangeSquadIcon;
+    public Action<string, SquadStatus>? OnChangeSquadStatus;
 
     public Action<string>? OnCreateSquad;
-    public Action<string, string>? OnRenameSquad;
     public Action<string>? OnDeleteSquad;
-    public Action<string, string>? OnUpdateSquadDescription;
-    public Action<string, SquadStatus>? OnChangeSquadStatus;
-    public Action<string, string>? OnAddMemberToSquad;
     public Action<string, string>? OnRemoveMemberFromSquad;
-    public Action<string, SquadIconNum>? OnChangeSquadIcon;
     public Action<NetEntity>? OnRemoveTimer;
+    public Action<string, string>? OnRenameSquad;
+    public Action<string, string>? OnUpdateSquadDescription;
 
     public SecApartmentWindow()
     {
@@ -70,7 +70,8 @@ public sealed partial class SecApartmentWindow : BaseWindow
             if (!string.IsNullOrWhiteSpace(NewSquadName.Text))
             {
                 var squadName = FormattedMessage.RemoveMarkupOrThrow(NewSquadName.Text);
-                if (squadName.Length > 16) squadName = squadName[..16];
+                if (squadName.Length > 16)
+                    squadName = squadName[..16];
 
                 OnCreateSquad?.Invoke(squadName);
                 NewSquadName.Text = string.Empty;
@@ -86,7 +87,9 @@ public sealed partial class SecApartmentWindow : BaseWindow
         base.FrameUpdate(args);
 
         var stationTime = _gameTiming.CurTime.Subtract(_gameTicker.RoundStartTimeSpan);
-        StationLabel.Text = Loc.GetString("sec-apartment-ui-mark", ("time", stationTime.ToString("hh\\:mm\\:ss")), ("station", _station));
+        StationLabel.Text = Loc.GetString("sec-apartment-ui-mark",
+            ("time", stationTime.ToString("hh\\:mm\\:ss")),
+            ("station", _station));
     }
 
     private void SetupAllStyles()
@@ -173,10 +176,8 @@ public sealed partial class SecApartmentWindow : BaseWindow
         return new Stylesheet(combinedRules);
     }
 
-    private void OnSquadNameTextChanged(LineEdit.LineEditEventArgs args)
-    {
+    private void OnSquadNameTextChanged(LineEdit.LineEditEventArgs args) =>
         CreateSquadButton.Disabled = string.IsNullOrWhiteSpace(NewSquadName.Text);
-    }
 
     public void UpdateState(SecApartmentUpdateState state)
     {
@@ -194,10 +195,7 @@ public sealed partial class SecApartmentWindow : BaseWindow
         }
     }
 
-    public void UpdateTimerState(TimerUpdateState state)
-    {
-        UpdateTimersList(state.Timers);
-    }
+    public void UpdateTimerState(TimerUpdateState state) => UpdateTimersList(state.Timers);
 
     private void UpdateUnassignedList(List<CrewMemberInfo> unassigned, List<Squad> squads)
     {
@@ -233,7 +231,8 @@ public sealed partial class SecApartmentWindow : BaseWindow
             entry.OnRenamePressed += newName =>
             {
                 var cleanName = FormattedMessage.RemoveMarkupOrThrow(newName);
-                if (cleanName.Length > 16) cleanName = cleanName[..16];
+                if (cleanName.Length > 16)
+                    cleanName = cleanName[..16];
 
                 OnRenameSquad?.Invoke(squad.SquadId, cleanName);
             };
@@ -287,9 +286,7 @@ public sealed partial class SecApartmentWindow : BaseWindow
                 _timerControls[timer.TimerUid] = control;
             }
             else
-            {
                 control.UpdateTimer(timer);
-            }
         }
 
         var sortedChildren = TimersContainer.Children

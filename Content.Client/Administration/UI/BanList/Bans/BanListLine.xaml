@@ -19,30 +19,30 @@ SPDX-License-Identifier: MIT
                 Text="{Loc 'ban-list-view'}"
                 HorizontalExpand="True"
                 VerticalExpand="True"
-                MouseFilter="Pass"/>
+                MouseFilter="Pass" />
     </BoxContainer>
-    <cc:VSeparator/>
+    <cc:VSeparator />
     <Label Name="Reason"
            Access="Public"
            SizeFlagsStretchRatio="6"
            HorizontalExpand="True"
-           VerticalExpand="True"/>
-    <cc:VSeparator/>
+           VerticalExpand="True" />
+    <cc:VSeparator />
     <Label Name="BanTime"
            Access="Public"
            SizeFlagsStretchRatio="2"
            HorizontalExpand="True"
-           ClipText="True"/>
-    <cc:VSeparator/>
+           ClipText="True" />
+    <cc:VSeparator />
     <Label Name="Expires"
            Access="Public"
            SizeFlagsStretchRatio="4"
            HorizontalExpand="True"
-           ClipText="True"/>
-    <cc:VSeparator/>
+           ClipText="True" />
+    <cc:VSeparator />
     <Label Name="BanningAdmin"
            Access="Public"
            SizeFlagsStretchRatio="2"
            HorizontalExpand="True"
-           ClipText="True"/>
+           ClipText="True" />
 </BoxContainer>

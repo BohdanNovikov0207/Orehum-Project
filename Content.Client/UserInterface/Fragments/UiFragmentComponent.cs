@@ -12,7 +12,7 @@ namespace Content.Client.UserInterface.Fragments;
 /// <remarks>
 /// This is used primarily for PDA cartridges.
 /// </remarks>
-/// <seealso cref="UIFragment"/>
+/// <seealso cref="UIFragment" />
 [RegisterComponent]
 public sealed partial class UIFragmentComponent : Component
 {

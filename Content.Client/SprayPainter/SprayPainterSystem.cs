@@ -25,7 +25,8 @@ using Robust.Shared.Utility;
 namespace Content.Client.SprayPainter;
 
 /// <summary>
-/// Client-side spray painter functions. Caches information for spray painter windows and updates the UI to reflect component state.
+/// Client-side spray painter functions. Caches information for spray painter windows and updates the UI to reflect
+/// component state.
 /// </summary>
 public sealed class SprayPainterSystem : SharedSprayPainterSystem
 {
@@ -46,10 +47,7 @@ public sealed class SprayPainterSystem : SharedSprayPainterSystem
         CachePrototypes();
     }
 
-    private void OnStateUpdate(Entity<SprayPainterComponent> ent, ref AfterAutoHandleStateEvent args)
-    {
-        UpdateUi(ent);
-    }
+    private void OnStateUpdate(Entity<SprayPainterComponent> ent, ref AfterAutoHandleStateEvent args) => UpdateUi(ent);
 
     protected override void UpdateUi(Entity<SprayPainterComponent> ent)
     {
@@ -59,7 +57,8 @@ public sealed class SprayPainterSystem : SharedSprayPainterSystem
 
     private void OnPrototypesReloaded(PrototypesReloadedEventArgs args)
     {
-        if (!args.WasModified<PaintableGroupCategoryPrototype>() || !args.WasModified<PaintableGroupPrototype>() || !args.WasModified<DecalPrototype>())
+        if (!args.WasModified<PaintableGroupCategoryPrototype>() || !args.WasModified<PaintableGroupPrototype>() ||
+            !args.WasModified<DecalPrototype>())
             return;
 
         CachePrototypes();
@@ -99,9 +98,9 @@ public sealed class SprayPainterSystem : SharedSprayPainterSystem
 
     private sealed class StatusControl : Control
     {
-        private readonly RichTextLabel _label;
         private readonly Entity<SprayPainterComponent> _entity;
-        private DecalPaintMode? _lastPaintingDecals = null;
+        private readonly RichTextLabel _label;
+        private DecalPaintMode? _lastPaintingDecals;
 
         public StatusControl(Entity<SprayPainterComponent> ent)
         {
@@ -119,11 +118,11 @@ public sealed class SprayPainterSystem : SharedSprayPainterSystem
 
             _lastPaintingDecals = _entity.Comp.DecalMode;
 
-            string modeLocString = _entity.Comp.DecalMode switch
+            var modeLocString = _entity.Comp.DecalMode switch
             {
                 DecalPaintMode.Add => "spray-painter-item-status-add",
                 DecalPaintMode.Remove => "spray-painter-item-status-remove",
-                _ => "spray-painter-item-status-off"
+                _ => "spray-painter-item-status-off",
             };
 
             _label.SetMarkupPermissive(Robust.Shared.Localization.Loc.GetString("spray-painter-item-status-label",

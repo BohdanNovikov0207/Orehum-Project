@@ -21,12 +21,12 @@ namespace Content.Client.Silicons.Borgs;
 /// <summary>
 /// Client side logic for borg type switching. Sets up primarily client-side visual information.
 /// </summary>
-/// <seealso cref="SharedBorgSwitchableTypeSystem"/>
-/// <seealso cref="BorgSwitchableTypeComponent"/>
+/// <seealso cref="SharedBorgSwitchableTypeSystem" />
+/// <seealso cref="BorgSwitchableTypeComponent" />
 public sealed class BorgSwitchableTypeSystem : SharedBorgSwitchableTypeSystem
 {
-    [Dependency] private readonly BorgSystem _borgSystem = default!;
     [Dependency] private readonly AppearanceSystem _appearance = default!;
+    [Dependency] private readonly BorgSystem _borgSystem = default!;
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly IResourceCache _resourceCache = default!;
     [Dependency] private readonly SpriteSystem _sprite = default!;
@@ -39,15 +39,11 @@ public sealed class BorgSwitchableTypeSystem : SharedBorgSwitchableTypeSystem
         SubscribeLocalEvent<BorgSwitchableTypeComponent, ComponentStartup>(OnComponentStartup);
     }
 
-    private void OnComponentStartup(Entity<BorgSwitchableTypeComponent> ent, ref ComponentStartup args)
-    {
+    private void OnComponentStartup(Entity<BorgSwitchableTypeComponent> ent, ref ComponentStartup args) =>
         UpdateEntityAppearance(ent);
-    }
 
-    private void AfterStateHandler(Entity<BorgSwitchableTypeComponent> ent, ref AfterAutoHandleStateEvent args)
-    {
+    private void AfterStateHandler(Entity<BorgSwitchableTypeComponent> ent, ref AfterAutoHandleStateEvent args) =>
         UpdateEntityAppearance(ent);
-    }
 
     protected override void UpdateEntityAppearance(
         Entity<BorgSwitchableTypeComponent> entity,
@@ -67,6 +63,7 @@ public sealed class BorgSwitchableTypeSystem : SharedBorgSwitchableTypeSystem
                 _sprite.LayerSetRsi((entity, sprite), BorgVisualLayers.Light, resource.RSI);
                 _sprite.LayerSetRsi((entity, sprite), BorgVisualLayers.LightStatus, resource.RSI);
             }
+
             _sprite.LayerSetRsiState((entity, sprite), BorgVisualLayers.Body, prototype.SpriteBodyState);
             _sprite.LayerSetRsiState((entity, sprite), BorgVisualLayers.LightStatus, prototype.SpriteToggleLightState);
         }
@@ -100,9 +97,7 @@ public sealed class BorgSwitchableTypeSystem : SharedBorgSwitchableTypeSystem
             };
         }
         else
-        {
             RemComp<SpriteMovementComponent>(entity);
-        }
 
         base.UpdateEntityAppearance(entity, prototype, subtypePrototype);
     }

@@ -13,9 +13,6 @@ namespace Content.Client.Bed.Cryostorage;
 [GenerateTypedNameReferences]
 public sealed partial class CryostorageEntryControl : BoxContainer
 {
-    public event Action<string>? SlotRemoveButtonPressed;
-    public event Action<string>? HandRemoveButtonPressed;
-
     public NetEntity Entity;
     public bool LastOpenState;
 
@@ -25,6 +22,9 @@ public sealed partial class CryostorageEntryControl : BoxContainer
         Entity = data.PlayerEnt;
         Update(data);
     }
+
+    public event Action<string>? SlotRemoveButtonPressed;
+    public event Action<string>? HandRemoveButtonPressed;
 
     public void Update(CryostorageContainedPlayerData data)
     {
@@ -46,6 +46,7 @@ public sealed partial class CryostorageEntryControl : BoxContainer
             control.Button.OnPressed += _ => HandRemoveButtonPressed?.Invoke(name);
             ItemsContainer.AddChild(control);
         }
+
         Collapsible.BodyVisible = LastOpenState;
     }
 }

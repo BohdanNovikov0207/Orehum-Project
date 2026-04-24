@@ -20,7 +20,14 @@ namespace Content.Client.Administration.UI.Tabs.PlayerTab;
 [GenerateTypedNameReferences]
 public sealed partial class PlayerTabHeader : Control
 {
-    public event Action<Header>? OnHeaderClicked;
+    public enum Header
+    {
+        Username,
+        Character,
+        Job,
+        RoleType,
+        Playtime,
+    }
 
     public PlayerTabHeader()
     {
@@ -33,18 +40,18 @@ public sealed partial class PlayerTabHeader : Control
         PlaytimeLabel.OnKeyBindDown += PlaytimeClicked;
     }
 
-    public Label GetHeader(Header header)
-    {
-        return header switch
+    public event Action<Header>? OnHeaderClicked;
+
+    public Label GetHeader(Header header) =>
+        header switch
         {
             Header.Username => UsernameLabel,
             Header.Character => CharacterLabel,
             Header.Job => JobLabel,
             Header.RoleType => RoleTypeLabel,
             Header.Playtime => PlaytimeLabel,
-            _ => throw new ArgumentOutOfRangeException(nameof(header), header, null)
+            _ => throw new ArgumentOutOfRangeException(nameof(header), header, null),
         };
-    }
 
     public void ResetHeaderText()
     {
@@ -58,38 +65,21 @@ public sealed partial class PlayerTabHeader : Control
     private void HeaderClicked(GUIBoundKeyEventArgs args, Header header)
     {
         if (args.Function != EngineKeyFunctions.UIClick)
-        {
             return;
-        }
 
         OnHeaderClicked?.Invoke(header);
         args.Handle();
     }
 
-    private void UsernameClicked(GUIBoundKeyEventArgs args)
-    {
-        HeaderClicked(args, Header.Username);
-    }
+    private void UsernameClicked(GUIBoundKeyEventArgs args) => HeaderClicked(args, Header.Username);
 
-    private void CharacterClicked(GUIBoundKeyEventArgs args)
-    {
-        HeaderClicked(args, Header.Character);
-    }
+    private void CharacterClicked(GUIBoundKeyEventArgs args) => HeaderClicked(args, Header.Character);
 
-    private void JobClicked(GUIBoundKeyEventArgs args)
-    {
-        HeaderClicked(args, Header.Job);
-    }
+    private void JobClicked(GUIBoundKeyEventArgs args) => HeaderClicked(args, Header.Job);
 
-    private void RoleTypeClicked(GUIBoundKeyEventArgs args)
-    {
-        HeaderClicked(args, Header.RoleType);
-    }
+    private void RoleTypeClicked(GUIBoundKeyEventArgs args) => HeaderClicked(args, Header.RoleType);
 
-    private void PlaytimeClicked(GUIBoundKeyEventArgs args)
-    {
-        HeaderClicked(args, Header.Playtime);
-    }
+    private void PlaytimeClicked(GUIBoundKeyEventArgs args) => HeaderClicked(args, Header.Playtime);
 
     protected override void Dispose(bool disposing)
     {
@@ -103,14 +93,5 @@ public sealed partial class PlayerTabHeader : Control
             RoleTypeLabel.OnKeyBindDown -= RoleTypeClicked;
             PlaytimeLabel.OnKeyBindDown -= PlaytimeClicked;
         }
-    }
-
-    public enum Header
-    {
-        Username,
-        Character,
-        Job,
-        RoleType,
-        Playtime
     }
 }

@@ -18,9 +18,9 @@ namespace Content.Client.UserInterface.Systems.Inventory.Controls;
 
 public interface IItemslotUIContainer
 {
-    public bool TryRegisterButton(SlotControl control, string newSlotName);
+    bool TryRegisterButton(SlotControl control, string newSlotName);
 
-    public bool TryAddButton(SlotControl control);
+    bool TryAddButton(SlotControl control);
 }
 
 [Virtual]
@@ -28,36 +28,7 @@ public abstract class ItemSlotUIContainer<T> : GridContainer, IItemslotUIContain
 {
     protected readonly Dictionary<string, T> Buttons = new();
 
-    private int? _maxColumns;
-
-    public int? MaxColumns
-    {
-        get => _maxColumns;
-        set => _maxColumns = value;
-    }
-
-    public virtual bool TryAddButton(T newButton, out T button)
-    {
-        var tempButton = AddButton(newButton);
-        if (tempButton == null)
-        {
-            button = newButton;
-            return false;
-        }
-
-        button = newButton;
-        return true;
-    }
-
-    public void ClearButtons()
-    {
-        foreach (var button in Buttons.Values)
-        {
-            button.Dispose();
-        }
-
-        Buttons.Clear();
-    }
+    public int? MaxColumns { get; set; }
 
     public bool TryRegisterButton(SlotControl control, string newSlotName)
     {
@@ -84,20 +55,41 @@ public abstract class ItemSlotUIContainer<T> : GridContainer, IItemslotUIContain
         return AddButton(newButton) != null;
     }
 
+    public virtual bool TryAddButton(T newButton, out T button)
+    {
+        var tempButton = AddButton(newButton);
+        if (tempButton == null)
+        {
+            button = newButton;
+            return false;
+        }
+
+        button = newButton;
+        return true;
+    }
+
+    public void ClearButtons()
+    {
+        foreach (var button in Buttons.Values)
+        {
+            button.Dispose();
+        }
+
+        Buttons.Clear();
+    }
+
     public virtual T? AddButton(T newButton)
     {
         if (!Children.Contains(newButton) && newButton.Parent == null && newButton.SlotName != "")
             AddChild(newButton);
-        Columns = _maxColumns ?? ChildCount;
+        Columns = MaxColumns ?? ChildCount;
         return AddButtonToDict(newButton);
     }
 
     protected virtual T? AddButtonToDict(T newButton)
     {
         if (newButton.SlotName == "")
-        {
             Logger.Warning("Could not add button " + newButton.Name + "No slotname");
-        }
 
         return !Buttons.TryAdd(newButton.SlotName, newButton) ? null : newButton;
     }
@@ -126,10 +118,7 @@ public abstract class ItemSlotUIContainer<T> : GridContainer, IItemslotUIContain
         }
     }
 
-    protected virtual void RemoveButtonFromDict(T button)
-    {
-        Buttons.Remove(button.SlotName);
-    }
+    protected virtual void RemoveButtonFromDict(T button) => Buttons.Remove(button.SlotName);
 
     public virtual void RemoveButton(T button)
     {
@@ -138,13 +127,8 @@ public abstract class ItemSlotUIContainer<T> : GridContainer, IItemslotUIContain
         button.Dispose();
     }
 
-    public virtual T? GetButton(string slotName)
-    {
-        return !Buttons.TryGetValue(slotName, out var button) ? null : button;
-    }
+    public virtual T? GetButton(string slotName) => !Buttons.TryGetValue(slotName, out var button) ? null : button;
 
-    public virtual bool TryGetButton(string slotName, [NotNullWhen(true)] out T? button)
-    {
-        return (button = GetButton(slotName)) != null;
-    }
+    public virtual bool TryGetButton(string slotName, [NotNullWhen(true)] out T? button) =>
+        (button = GetButton(slotName)) != null;
 }

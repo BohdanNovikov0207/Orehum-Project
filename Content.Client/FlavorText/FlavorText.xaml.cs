@@ -11,26 +11,22 @@ using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.XAML;
 using Robust.Shared.Utility;
 
-namespace Content.Client.FlavorText
+namespace Content.Client.FlavorText;
+
+[GenerateTypedNameReferences]
+public sealed partial class FlavorText : Control
 {
-    [GenerateTypedNameReferences]
-    public sealed partial class FlavorText : Control
+    public Action<string>? OnFlavorTextChanged;
+
+    public FlavorText()
     {
-        public Action<string>? OnFlavorTextChanged;
+        RobustXamlLoader.Load(this);
+        IoCManager.InjectDependencies(this);
 
-        public FlavorText()
-        {
-            RobustXamlLoader.Load(this);
-            IoCManager.InjectDependencies(this);
-
-            var loc = IoCManager.Resolve<ILocalizationManager>();
-            CFlavorTextInput.Placeholder = new Rope.Leaf(loc.GetString("flavor-text-placeholder"));
-            CFlavorTextInput.OnTextChanged  += _ => FlavorTextChanged();
-        }
-
-        public void FlavorTextChanged()
-        {
-            OnFlavorTextChanged?.Invoke(Rope.Collapse(CFlavorTextInput.TextRope).Trim());
-        }
+        var loc = IoCManager.Resolve<ILocalizationManager>();
+        CFlavorTextInput.Placeholder = new Rope.Leaf(loc.GetString("flavor-text-placeholder"));
+        CFlavorTextInput.OnTextChanged += _ => FlavorTextChanged();
     }
+
+    public void FlavorTextChanged() => OnFlavorTextChanged?.Invoke(Rope.Collapse(CFlavorTextInput.TextRope).Trim());
 }

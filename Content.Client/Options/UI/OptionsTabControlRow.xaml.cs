@@ -67,42 +67,43 @@ namespace Content.Client.Options.UI;
 /// contains the "save" and "reset" buttons and controls the entire logic.
 /// </summary>
 /// <remarks>
-/// <para>
-/// Basic operation is simple: options tabs put this control at the bottom of the tab,
-/// they bind UI controls to it with calls such as <see cref="AddOptionCheckBox"/>,
-/// then they call <see cref="Initialize"/>. The rest is all handled by the control.
-/// </para>
-/// <para>
-/// Individual options are implementations of <see cref="BaseOption"/>. See the type for details.
-/// Common implementations for building on top of CVars are already exist,
-/// but tabs can define their own if they need to.
-/// </para>
-/// <para>
-/// Generally, options are added via helper methods such as <see cref="AddOptionCheckBox"/>,
-/// however it is totally possible to directly instantiate the backing types
-/// and add them via <see cref="AddOption{T}"/>.
-/// </para>
-/// <para>
-/// The options system is general purpose enough that <see cref="OptionsTabControlRow"/> does not, itself,
-/// know what a CVar is. It does automatically save CVars to config when save is pressed, but otherwise CVar interaction
-/// is handled by <see cref="BaseOption"/> implementations.
-/// </para>
-/// <para>
-/// Behaviorally, the row has 3 control buttons: save, reset changed, and reset to default.
-/// "Save" writes the configuration changes and saves the configuration.
-/// "Reset changed" discards changes made in the menu and re-loads the saved settings.
-/// "Reset to default" resets the settings on the menu to be the default, out-of-the-box values.
-/// Note that "Reset to default" does not save immediately, the user must still press save manually.
-/// </para>
-/// <para>
-/// The disabled state of the 3 buttons is updated dynamically based on the values of the options.
-/// </para>
+///     <para>
+///     Basic operation is simple: options tabs put this control at the bottom of the tab,
+///     they bind UI controls to it with calls such as <see cref="AddOptionCheckBox" />,
+///     then they call <see cref="Initialize" />. The rest is all handled by the control.
+///     </para>
+///     <para>
+///     Individual options are implementations of <see cref="BaseOption" />. See the type for details.
+///     Common implementations for building on top of CVars are already exist,
+///     but tabs can define their own if they need to.
+///     </para>
+///     <para>
+///     Generally, options are added via helper methods such as <see cref="AddOptionCheckBox" />,
+///     however it is totally possible to directly instantiate the backing types
+///     and add them via <see cref="AddOption{T}" />.
+///     </para>
+///     <para>
+///     The options system is general purpose enough that <see cref="OptionsTabControlRow" /> does not, itself,
+///     know what a CVar is. It does automatically save CVars to config when save is pressed, but otherwise CVar
+///     interaction
+///     is handled by <see cref="BaseOption" /> implementations.
+///     </para>
+///     <para>
+///     Behaviorally, the row has 3 control buttons: save, reset changed, and reset to default.
+///     "Save" writes the configuration changes and saves the configuration.
+///     "Reset changed" discards changes made in the menu and re-loads the saved settings.
+///     "Reset to default" resets the settings on the menu to be the default, out-of-the-box values.
+///     Note that "Reset to default" does not save immediately, the user must still press save manually.
+///     </para>
+///     <para>
+///     The disabled state of the 3 buttons is updated dynamically based on the values of the options.
+///     </para>
 /// </remarks>
 [GenerateTypedNameReferences]
 public sealed partial class OptionsTabControlRow : Control
 {
-    [Dependency] private readonly ILocalizationManager _loc = default!;
     [Dependency] private readonly IConfigurationManager _cfg = default!;
+    [Dependency] private readonly ILocalizationManager _loc = default!;
 
     private ValueList<BaseOption> _options;
 
@@ -125,7 +126,7 @@ public sealed partial class OptionsTabControlRow : Control
     /// The type of option being passed in. Necessary to allow the return type to match the parameter type
     /// for easy chaining.
     /// </typeparam>
-    /// <returns>The same <paramref name="option"/> as passed in, for easy chaining.</returns>
+    /// <returns>The same <paramref name="option" /> as passed in, for easy chaining.</returns>
     public T AddOption<T>(T option) where T : BaseOption
     {
         _options.Add(option);
@@ -141,11 +142,9 @@ public sealed partial class OptionsTabControlRow : Control
     /// If true, the checkbox is inverted relative to the CVar: if the CVar is true, the checkbox will be unchecked.
     /// </param>
     /// <returns>The option instance backing the added option.</returns>
-    /// <seealso cref="OptionCheckboxCVar"/>
-    public OptionCheckboxCVar AddOptionCheckBox(CVarDef<bool> cVar, CheckBox checkBox, bool invert = false)
-    {
-        return AddOption(new OptionCheckboxCVar(this, _cfg, cVar, checkBox, invert));
-    }
+    /// <seealso cref="OptionCheckboxCVar" />
+    public OptionCheckboxCVar AddOptionCheckBox(CVarDef<bool> cVar, CheckBox checkBox, bool invert = false) =>
+        AddOption(new OptionCheckboxCVar(this, _cfg, cVar, checkBox, invert));
 
     /// <summary>
     /// Add a slider option, displayed in percent, backed by a simple float CVar.
@@ -160,19 +159,17 @@ public sealed partial class OptionsTabControlRow : Control
     /// </param>
     /// <returns>The option instance backing the added option.</returns>
     /// <remarks>
-    /// <para>
-    /// Note that percentage values are represented as ratios in code, i.e. a value of 100% is "1".
-    /// </para>
+    ///     <para>
+    ///     Note that percentage values are represented as ratios in code, i.e. a value of 100% is "1".
+    ///     </para>
     /// </remarks>
     public OptionSliderFloatCVar AddOptionPercentSlider(
         CVarDef<float> cVar,
         OptionSlider slider,
         float min = 0,
         float max = 1,
-        float scale = 1)
-    {
-        return AddOption(new OptionSliderFloatCVar(this, _cfg, cVar, slider, min, max, scale, FormatPercent));
-    }
+        float scale = 1) =>
+        AddOption(new OptionSliderFloatCVar(this, _cfg, cVar, slider, min, max, scale, FormatPercent));
 
     /// <summary>
     /// Add a color slider option, backed by a simple string CVar.
@@ -182,10 +179,8 @@ public sealed partial class OptionsTabControlRow : Control
     /// <returns>The option instance backing the added option.</returns>
     public OptionColorSliderCVar AddOptionColorSlider(
         CVarDef<string> cVar,
-        OptionColorSlider slider)
-    {
-        return AddOption(new OptionColorSliderCVar(this, _cfg, cVar, slider));
-    }
+        OptionColorSlider slider) =>
+        AddOption(new OptionColorSliderCVar(this, _cfg, cVar, slider));
 
     /// <summary>
     /// Add a slider option, backed by a simple integer CVar.
@@ -204,10 +199,8 @@ public sealed partial class OptionsTabControlRow : Control
         OptionSlider slider,
         int min,
         int max,
-        Func<OptionSliderIntCVar, int, string>? format = null)
-    {
-        return AddOption(new OptionSliderIntCVar(this, _cfg, cVar, slider, min, max, format ?? FormatInt));
-    }
+        Func<OptionSliderIntCVar, int, string>? format = null) =>
+        AddOption(new OptionSliderIntCVar(this, _cfg, cVar, slider, min, max, format ?? FormatInt));
 
     /// <summary>
     /// Add a drop-down option, backed by a CVar.
@@ -223,10 +216,8 @@ public sealed partial class OptionsTabControlRow : Control
         CVarDef<T> cVar,
         OptionDropDown dropDown,
         IReadOnlyCollection<OptionDropDownCVar<T>.ValueOption> options)
-        where T : notnull
-    {
-        return AddOption(new OptionDropDownCVar<T>(this, _cfg, cVar, dropDown, options));
-    }
+        where T : notnull =>
+        AddOption(new OptionDropDownCVar<T>(this, _cfg, cVar, dropDown, options));
 
     /// <summary>
     /// Initializes the control row. This should be called after all options have been added.
@@ -245,22 +236,16 @@ public sealed partial class OptionsTabControlRow : Control
     /// Re-loads options in the settings from backing values.
     /// Should be called when the options window is opened to make sure all values are up-to-date.
     /// </summary>
-    public void ReloadValues()
-    {
-        Initialize();
-    }
+    public void ReloadValues() => Initialize();
 
     /// <summary>
-    /// Called by <see cref="BaseOption"/> to signal that an option's value changed through user interaction.
+    /// Called by <see cref="BaseOption" /> to signal that an option's value changed through user interaction.
     /// </summary>
     /// <remarks>
-    /// <see cref="BaseOption"/> implementations should not call this function directly,
-    /// instead they should call <see cref="BaseOption.ValueChanged"/>.
+    /// <see cref="BaseOption" /> implementations should not call this function directly,
+    /// instead they should call <see cref="BaseOption.ValueChanged" />.
     /// </remarks>
-    public void ValueChanged()
-    {
-        UpdateButtonState();
-    }
+    public void ValueChanged() => UpdateButtonState();
 
     private void UpdateButtonState()
     {
@@ -304,41 +289,33 @@ public sealed partial class OptionsTabControlRow : Control
         UpdateButtonState();
     }
 
-    private string FormatPercent(OptionSliderFloatCVar slider, float value)
-    {
-        return _loc.GetString("ui-options-value-percent", ("value", value));
-    }
+    private string FormatPercent(OptionSliderFloatCVar slider, float value) =>
+        _loc.GetString("ui-options-value-percent", ("value", value));
 
-    private static string FormatInt(OptionSliderIntCVar slider, int value)
-    {
-        return value.ToString();
-    }
+    private static string FormatInt(OptionSliderIntCVar slider, int value) => value.ToString();
 }
 
 /// <summary>
-/// Base class of a single "option" for <see cref="OptionsTabControlRow"/>.
+/// Base class of a single "option" for <see cref="OptionsTabControlRow" />.
 /// </summary>
 /// <remarks>
-/// <para>
-/// Implementations of this class handle loading values from backing storage or defaults,
-/// handling UI controls, and saving. The main <see cref="OptionsTabControlRow"/> does not know what a CVar is.
-/// </para>
-/// <para>
-/// <see cref="BaseOptionCVar{TValue}"/> is a derived class that makes it easier to work with options
-/// backed by a single CVar.
-/// </para>
+///     <para>
+///     Implementations of this class handle loading values from backing storage or defaults,
+///     handling UI controls, and saving. The main <see cref="OptionsTabControlRow" /> does not know what a CVar is.
+///     </para>
+///     <para>
+///     <see cref="BaseOptionCVar{TValue}" /> is a derived class that makes it easier to work with options
+///     backed by a single CVar.
+///     </para>
 /// </remarks>
 /// <param name="controller">The control row that owns this option.</param>
-/// <seealso cref="OptionsTabControlRow"/>
+/// <seealso cref="OptionsTabControlRow" />
 public abstract class BaseOption(OptionsTabControlRow controller)
 {
     /// <summary>
     /// Should be called by derived implementations to indicate that their value changed, due to user interaction.
     /// </summary>
-    protected virtual void ValueChanged()
-    {
-        controller.ValueChanged();
-    }
+    protected virtual void ValueChanged() => controller.ValueChanged();
 
     /// <summary>
     /// Loads the value represented by this option from its backing store, into the UI state.
@@ -369,37 +346,15 @@ public abstract class BaseOption(OptionsTabControlRow controller)
 }
 
 /// <summary>
-/// Derived class of <see cref="BaseOption"/> intended for making mappings to simple CVars easier.
+/// Derived class of <see cref="BaseOption" /> intended for making mappings to simple CVars easier.
 /// </summary>
 /// <typeparam name="TValue">The type of the CVar.</typeparam>
-/// <seealso cref="OptionsTabControlRow"/>
+/// <seealso cref="OptionsTabControlRow" />
 public abstract class BaseOptionCVar<TValue> : BaseOption
     where TValue : notnull
 {
-    /// <summary>
-    /// Raised immediately when the UI value of this option is changed by the user, even before saving.
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// This can be used to update parts of the options UI based on the state of a checkbox.
-    /// </para>
-    /// </remarks>
-    public event Action<TValue>? ImmediateValueChanged;
-
     private readonly IConfigurationManager _cfg;
     private readonly CVarDef<TValue> _cVar;
-
-    /// <summary>
-    /// Sets and gets the actual CVar value to/from the frontend UI state or control.
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// In the simplest case, this function should set a UI control's state to represent the CVar,
-    /// and inversely conver the UI control's state to the CVar value. For simple controls like a checkbox or slider,
-    /// this just means passing through their value property.
-    /// </para>
-    /// </remarks>
-    protected abstract TValue Value { get; set; }
 
     protected BaseOptionCVar(
         OptionsTabControlRow controller,
@@ -411,30 +366,37 @@ public abstract class BaseOptionCVar<TValue> : BaseOption
         _cVar = cVar;
     }
 
-    public override void LoadValue()
-    {
-        Value = _cfg.GetCVar(_cVar);
-    }
+    /// <summary>
+    /// Sets and gets the actual CVar value to/from the frontend UI state or control.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///     In the simplest case, this function should set a UI control's state to represent the CVar,
+    ///     and inversely conver the UI control's state to the CVar value. For simple controls like a checkbox or slider,
+    ///     this just means passing through their value property.
+    ///     </para>
+    /// </remarks>
+    protected abstract TValue Value { get; set; }
 
-    public override void SaveValue()
-    {
-        _cfg.SetCVar(_cVar, Value);
-    }
+    /// <summary>
+    /// Raised immediately when the UI value of this option is changed by the user, even before saving.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///     This can be used to update parts of the options UI based on the state of a checkbox.
+    ///     </para>
+    /// </remarks>
+    public event Action<TValue>? ImmediateValueChanged;
 
-    public override void ResetToDefault()
-    {
-        Value = _cVar.DefaultValue;
-    }
+    public override void LoadValue() => Value = _cfg.GetCVar(_cVar);
 
-    public override bool IsModified()
-    {
-        return !IsValueEqual(Value, _cfg.GetCVar(_cVar));
-    }
+    public override void SaveValue() => _cfg.SetCVar(_cVar, Value);
 
-    public override bool IsModifiedFromDefault()
-    {
-        return !IsValueEqual(Value, _cVar.DefaultValue);
-    }
+    public override void ResetToDefault() => Value = _cVar.DefaultValue;
+
+    public override bool IsModified() => !IsValueEqual(Value, _cfg.GetCVar(_cVar));
+
+    public override bool IsModifiedFromDefault() => !IsValueEqual(Value, _cVar.DefaultValue);
 
     protected virtual bool IsValueEqual(TValue a, TValue b)
     {
@@ -455,25 +417,19 @@ public abstract class BaseOptionCVar<TValue> : BaseOption
 }
 
 /// <summary>
-/// Implementation of a CVar option that simply corresponds with a <see cref="CheckBox"/>.
+/// Implementation of a CVar option that simply corresponds with a <see cref="CheckBox" />.
 /// </summary>
 /// <remarks>
-/// <para>
-/// Generally, you should just call <c>AddOption</c> methods on <see cref="OptionsTabControlRow"/>
-/// instead of instantiating this type directly.
-/// </para>
+///     <para>
+///     Generally, you should just call <c>AddOption</c> methods on <see cref="OptionsTabControlRow" />
+///     instead of instantiating this type directly.
+///     </para>
 /// </remarks>
-/// <seealso cref="OptionsTabControlRow"/>
+/// <seealso cref="OptionsTabControlRow" />
 public sealed class OptionCheckboxCVar : BaseOptionCVar<bool>
 {
     private readonly CheckBox _checkBox;
     private readonly bool _invert;
-
-    protected override bool Value
-    {
-        get => _checkBox.Pressed ^ _invert;
-        set => _checkBox.Pressed = value ^ _invert;
-    }
 
     /// <summary>
     /// Creates a new instance of this type.
@@ -486,10 +442,10 @@ public sealed class OptionCheckboxCVar : BaseOptionCVar<bool>
     /// If true, the checkbox is inverted relative to the CVar: if the CVar is true, the checkbox will be unchecked.
     /// </param>
     /// <remarks>
-    /// <para>
-    /// It is generally more convenient to call overloads on <see cref="OptionsTabControlRow"/>
-    /// such as <see cref="OptionsTabControlRow.AddOptionCheckBox"/> instead of instantiating this type directly.
-    /// </para>
+    ///     <para>
+    ///     It is generally more convenient to call overloads on <see cref="OptionsTabControlRow" />
+    ///     such as <see cref="OptionsTabControlRow.AddOptionCheckBox" /> instead of instantiating this type directly.
+    ///     </para>
     /// </remarks>
     public OptionCheckboxCVar(
         OptionsTabControlRow controller,
@@ -506,43 +462,32 @@ public sealed class OptionCheckboxCVar : BaseOptionCVar<bool>
             ValueChanged();
         };
     }
+
+    protected override bool Value
+    {
+        get => _checkBox.Pressed ^ _invert;
+        set => _checkBox.Pressed = value ^ _invert;
+    }
 }
 
 /// <summary>
-/// Implementation of a CVar option that simply corresponds with a floating-point <see cref="OptionSlider"/>.
+/// Implementation of a CVar option that simply corresponds with a floating-point <see cref="OptionSlider" />.
 /// </summary>
-/// <seealso cref="OptionsTabControlRow"/>
+/// <seealso cref="OptionsTabControlRow" />
 public sealed class OptionSliderFloatCVar : BaseOptionCVar<float>
 {
-    /// <summary>
-    /// Scale with which to multiply slider values when mapped to the backing CVar.
-    /// </summary>
-    /// <remarks>
-    /// For example, if a scale of 2 is set, a slider at 75% writes a value of 1.5 to the CVar.
-    /// </remarks>
-    public float Scale { get; }
-
-    private readonly OptionSlider _slider;
     private readonly Func<OptionSliderFloatCVar, float, string> _format;
 
-    protected override float Value
-    {
-        get => _slider.Slider.Value * Scale;
-        set
-        {
-            _slider.Slider.Value = value / Scale;
-            UpdateLabelValue();
-        }
-    }
+    private readonly OptionSlider _slider;
 
     /// <summary>
     /// Creates a new instance of this type.
     /// </summary>
     /// <remarks>
-    /// <para>
-    /// It is generally more convenient to call overloads on <see cref="OptionsTabControlRow"/>
-    /// such as <see cref="OptionsTabControlRow.AddOptionPercentSlider"/> instead of instantiating this type directly.
-    /// </para>
+    ///     <para>
+    ///     It is generally more convenient to call overloads on <see cref="OptionsTabControlRow" />
+    ///     such as <see cref="OptionsTabControlRow.AddOptionPercentSlider" /> instead of instantiating this type directly.
+    ///     </para>
     /// </remarks>
     /// <param name="controller">The control row that owns this option.</param>
     /// <param name="cfg">The configuration manager to get and set values from.</param>
@@ -551,7 +496,7 @@ public sealed class OptionSliderFloatCVar : BaseOptionCVar<float>
     /// <param name="minValue">The minimum value the slider should allow.</param>
     /// <param name="maxValue">The maximum value the slider should allow.</param>
     /// <param name="scale">
-    /// Scale with which to multiply slider values when mapped to the backing CVar. See <see cref="Scale"/>.
+    /// Scale with which to multiply slider values when mapped to the backing CVar. See <see cref="Scale" />.
     /// </param>
     /// <param name="format">Function that will be called to format the value display next to the slider.</param>
     public OptionSliderFloatCVar(
@@ -578,38 +523,43 @@ public sealed class OptionSliderFloatCVar : BaseOptionCVar<float>
         };
     }
 
-    private void UpdateLabelValue()
+    /// <summary>
+    /// Scale with which to multiply slider values when mapped to the backing CVar.
+    /// </summary>
+    /// <remarks>
+    /// For example, if a scale of 2 is set, a slider at 75% writes a value of 1.5 to the CVar.
+    /// </remarks>
+    public float Scale { get; }
+
+    protected override float Value
     {
-        _slider.ValueLabel.Text = _format(this, _slider.Slider.Value);
+        get => _slider.Slider.Value * Scale;
+        set
+        {
+            _slider.Slider.Value = value / Scale;
+            UpdateLabelValue();
+        }
     }
+
+    private void UpdateLabelValue() => _slider.ValueLabel.Text = _format(this, _slider.Slider.Value);
 }
 
 /// <summary>
-/// Implementation of a CVar option that simply corresponds with a string <see cref="OptionColorSlider"/>.
+/// Implementation of a CVar option that simply corresponds with a string <see cref="OptionColorSlider" />.
 /// </summary>
-/// <seealso cref="OptionsTabControlRow"/>
+/// <seealso cref="OptionsTabControlRow" />
 public sealed class OptionColorSliderCVar : BaseOptionCVar<string>
 {
     private readonly OptionColorSlider _slider;
-
-    protected override string Value
-    {
-        get => _slider.Slider.Color.ToHex();
-        set
-        {
-            _slider.Slider.Color = Color.FromHex(value);
-            UpdateLabelColor();
-        }
-    }
 
     /// <summary>
     /// Creates a new instance of this type.
     /// </summary>
     /// <remarks>
-    /// <para>
-    /// It is generally more convenient to call overloads on <see cref="OptionsTabControlRow"/>
-    /// such as <see cref="OptionsTabControlRow.AddOptionPercentSlider"/> instead of instantiating this type directly.
-    /// </para>
+    ///     <para>
+    ///     It is generally more convenient to call overloads on <see cref="OptionsTabControlRow" />
+    ///     such as <see cref="OptionsTabControlRow.AddOptionPercentSlider" /> instead of instantiating this type directly.
+    ///     </para>
     /// </remarks>
     /// <param name="controller">The control row that owns this option.</param>
     /// <param name="cfg">The configuration manager to get and set values from.</param>
@@ -630,39 +580,36 @@ public sealed class OptionColorSliderCVar : BaseOptionCVar<string>
         };
     }
 
-    private void UpdateLabelColor()
+    protected override string Value
     {
-        _slider.ExampleLabel.FontColorOverride = Color.FromHex(Value);
+        get => _slider.Slider.Color.ToHex();
+        set
+        {
+            _slider.Slider.Color = Color.FromHex(value);
+            UpdateLabelColor();
+        }
     }
+
+    private void UpdateLabelColor() => _slider.ExampleLabel.FontColorOverride = Color.FromHex(Value);
 }
 
 /// <summary>
-/// Implementation of a CVar option that simply corresponds with an integer <see cref="OptionSlider"/>.
+/// Implementation of a CVar option that simply corresponds with an integer <see cref="OptionSlider" />.
 /// </summary>
-/// <seealso cref="OptionsTabControlRow"/>
+/// <seealso cref="OptionsTabControlRow" />
 public sealed class OptionSliderIntCVar : BaseOptionCVar<int>
 {
-    private readonly OptionSlider _slider;
     private readonly Func<OptionSliderIntCVar, int, string> _format;
-
-    protected override int Value
-    {
-        get => (int) _slider.Slider.Value;
-        set
-        {
-            _slider.Slider.Value = value;
-            UpdateLabelValue();
-        }
-    }
+    private readonly OptionSlider _slider;
 
     /// <summary>
     /// Creates a new instance of this type.
     /// </summary>
     /// <remarks>
-    /// <para>
-    /// It is generally more convenient to call overloads on <see cref="OptionsTabControlRow"/>
-    /// such as <see cref="OptionsTabControlRow.AddOptionPercentSlider"/> instead of instantiating this type directly.
-    /// </para>
+    ///     <para>
+    ///     It is generally more convenient to call overloads on <see cref="OptionsTabControlRow" />
+    ///     such as <see cref="OptionsTabControlRow.AddOptionPercentSlider" /> instead of instantiating this type directly.
+    ///     </para>
     /// </remarks>
     /// <param name="controller">The control row that owns this option.</param>
     /// <param name="cfg">The configuration manager to get and set values from.</param>
@@ -694,35 +641,36 @@ public sealed class OptionSliderIntCVar : BaseOptionCVar<int>
         };
     }
 
-    private void UpdateLabelValue()
+    protected override int Value
     {
-        _slider.ValueLabel.Text = _format(this, (int) _slider.Slider.Value);
+        get => (int) _slider.Slider.Value;
+        set
+        {
+            _slider.Slider.Value = value;
+            UpdateLabelValue();
+        }
     }
+
+    private void UpdateLabelValue() => _slider.ValueLabel.Text = _format(this, (int) _slider.Slider.Value);
 }
 
 /// <summary>
 /// Implementation of a CVar option via a drop-down.
 /// </summary>
-/// <seealso cref="OptionsTabControlRow"/>
+/// <seealso cref="OptionsTabControlRow" />
 public sealed class OptionDropDownCVar<T> : BaseOptionCVar<T> where T : notnull
 {
     private readonly OptionDropDown _dropDown;
     private readonly ItemEntry[] _entries;
 
-    protected override T Value
-    {
-        get => (T) _dropDown.Button.SelectedMetadata!;
-        set => _dropDown.Button.SelectId(FindValueId(value));
-    }
-
     /// <summary>
     /// Creates a new instance of this type.
     /// </summary>
     /// <remarks>
-    /// <para>
-    /// It is generally more convenient to call overloads on <see cref="OptionsTabControlRow"/>
-    /// such as <see cref="OptionsTabControlRow.AddOptionDropDown{T}"/> instead of instantiating this type directly.
-    /// </para>
+    ///     <para>
+    ///     It is generally more convenient to call overloads on <see cref="OptionsTabControlRow" />
+    ///     such as <see cref="OptionsTabControlRow.AddOptionDropDown{T}" /> instead of instantiating this type directly.
+    ///     </para>
     /// </remarks>
     /// <param name="controller">The control row that owns this option.</param>
     /// <param name="cfg">The configuration manager to get and set values from.</param>
@@ -763,6 +711,12 @@ public sealed class OptionDropDownCVar<T> : BaseOptionCVar<T> where T : notnull
         };
     }
 
+    protected override T Value
+    {
+        get => (T) _dropDown.Button.SelectedMetadata!;
+        set => _dropDown.Button.SelectId(FindValueId(value));
+    }
+
     private int FindValueId(T value)
     {
         for (var i = 0; i < _entries.Length; i++)
@@ -780,8 +734,8 @@ public sealed class OptionDropDownCVar<T> : BaseOptionCVar<T> where T : notnull
     /// </summary>
     /// <param name="key">The value that this option has. This is what will be written to the CVar if selected.</param>
     /// <param name="label">The visual text shown to the user for the option.</param>
-    /// <seealso cref="OptionDropDownCVar{T}"/>
-    /// <seealso cref="OptionsTabControlRow.AddOptionDropDown{T}"/>
+    /// <seealso cref="OptionDropDownCVar{T}" />
+    /// <seealso cref="OptionsTabControlRow.AddOptionDropDown{T}" />
     public sealed class ValueOption(T key, string label)
     {
         /// <summary>

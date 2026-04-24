@@ -14,7 +14,7 @@ namespace Content.Client.Weapons.Ranged.Components;
 /// <summary>
 /// Visualizer for gun mag presence; can change states based on ammo count or toggle visibility entirely.
 /// </summary>
-[RegisterComponent, Access(typeof(GunSystem))]
+[RegisterComponent] [Access(typeof(GunSystem))]
 public sealed partial class MagazineVisualsComponent : Component
 {
     /// <summary>
@@ -28,16 +28,16 @@ public sealed partial class MagazineVisualsComponent : Component
     [DataField("steps")] public int MagSteps;
 
     /// <summary>
-    /// Should we hide when the count is 0
-    /// </summary>
-    [DataField("zeroVisible")] public bool ZeroVisible;
-
-    /// <summary>
     /// Goobstation.
     /// Whether should only set zero step when there is no ammo left.
     /// </summary>
     [DataField]
     public bool ZeroNoAmmo;
+
+    /// <summary>
+    /// Should we hide when the count is 0
+    /// </summary>
+    [DataField("zeroVisible")] public bool ZeroVisible;
 }
 
 public enum GunVisualLayers : byte

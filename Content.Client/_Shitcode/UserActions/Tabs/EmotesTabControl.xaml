@@ -11,8 +11,7 @@
             <BoxContainer Orientation="Vertical"
                           HorizontalExpand="True"
                           Margin="2">
-                <GridContainer Name="EmotesList" Columns="3" HorizontalExpand="True">
-                </GridContainer>
+                <GridContainer Name="EmotesList" Columns="3" HorizontalExpand="True" />
             </BoxContainer>
         </ScrollContainer>
     </PanelContainer>

@@ -41,10 +41,10 @@ namespace Content.Client.DoAfter;
 /// </summary>
 public sealed class DoAfterSystem : SharedDoAfterSystem
 {
+    [Dependency] private readonly MetaDataSystem _metadata = default!;
     [Dependency] private readonly IOverlayManager _overlay = default!;
     [Dependency] private readonly IPlayerManager _player = default!;
     [Dependency] private readonly IPrototypeManager _prototype = default!;
-    [Dependency] private readonly MetaDataSystem _metadata = default!;
 
     public override void Initialize()
     {
@@ -86,7 +86,7 @@ public sealed class DoAfterSystem : SharedDoAfterSystem
     /// <summary>
     /// Try to find an active do-after being executed by the local player.
     /// </summary>
-    /// <param name="entity">The entity the do after must be targeting (<see cref="DoAfterArgs.Target"/>)</param>
+    /// <param name="entity">The entity the do after must be targeting (<see cref="DoAfterArgs.Target" />)</param>
     /// <param name="doAfter">The found do-after.</param>
     /// <param name="event">The event to be raised on the found do-after when it completes.</param>
     /// <param name="progress">The progress of the found do-after, from 0 to 1.</param>

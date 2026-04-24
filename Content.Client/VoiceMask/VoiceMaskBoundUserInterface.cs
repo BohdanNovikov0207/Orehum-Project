@@ -15,11 +15,14 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Goobstation
-using Content.Goobstation.Shared.IntrinsicVoiceModulator.VoiceMask; // Goobstation
-using Content.Shared.StatusIcon; // Goobstation
+
+using Content.Goobstation.Shared.IntrinsicVoiceModulator.VoiceMask;
+using Content.Shared.StatusIcon;
 using Content.Shared.VoiceMask;
 using Robust.Client.UserInterface;
 using Robust.Shared.Prototypes;
+// Goobstation
+// Goobstation
 
 namespace Content.Client.VoiceMask;
 
@@ -52,24 +55,17 @@ public sealed class VoiceMaskBoundUserInterface : BoundUserInterface
         _window.OnJobIconChanged += OnJobIconChanged; // GabyStation -> Radio icons
     }
 
-    private void OnNameSelected(string name)
-    {
-        SendMessage(new VoiceMaskChangeNameMessage(name));
-    }
+    private void OnNameSelected(string name) => SendMessage(new VoiceMaskChangeNameMessage(name));
 
     // GabyStation Radio icons start
-    public void OnJobIconChanged(ProtoId<JobIconPrototype> newJobIconId)
-    {
+    public void OnJobIconChanged(ProtoId<JobIconPrototype> newJobIconId) =>
         SendMessage(new VoiceMaskChangeJobIconMessage(newJobIconId));
-    }
     // GabyStation Radio icons end
 
     protected override void UpdateState(BoundUserInterfaceState state)
     {
         if (state is not VoiceMaskBuiState cast || _window == null)
-        {
             return;
-        }
 
         _window.UpdateState(cast.Name, cast.Verb);
         _window.SetCurrentJobIcon(cast.JobIcon); // GabyStation -> Radio icons

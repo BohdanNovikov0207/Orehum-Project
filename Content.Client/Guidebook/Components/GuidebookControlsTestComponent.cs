@@ -14,5 +14,4 @@ namespace Content.Client.Guidebook.Components;
 [RegisterComponent]
 public sealed partial class GuidebookControlsTestComponent : Component
 {
-
 }

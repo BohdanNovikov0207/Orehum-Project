@@ -1,6 +1,5 @@
 using Content.Client._Shitcode.Heretic.UI;
 using Content.Shared._Goobstation.Heretic.Components;
-using Content.Shared.Heretic.Prototypes;
 using Content.Shared.Polymorph;
 using Robust.Client.Graphics;
 using Robust.Client.Input;
@@ -33,8 +32,6 @@ public sealed class HereticShapeshiftBoundUserInterface : BoundUserInterface
         _hereticRitualMenu.OpenCenteredAt(_inputManager.MouseScreenPosition.Position / vpSize);
     }
 
-    private void SendHereticRitualMessage(ProtoId<PolymorphPrototype> protoId)
-    {
+    private void SendHereticRitualMessage(ProtoId<PolymorphPrototype> protoId) =>
         SendMessage(new HereticShapeshiftMessage(protoId));
-    }
 }

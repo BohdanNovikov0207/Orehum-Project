@@ -43,20 +43,20 @@ public sealed class ProjectileSystem : SharedProjectileSystem
             if (TryComp<TimedDespawnComponent>(ent, out var despawn))
                 lifetime = despawn.Lifetime;
 
-            var anim = new Animation()
+            var anim = new Animation
             {
                 Length = TimeSpan.FromSeconds(lifetime),
                 AnimationTracks =
                 {
-                    new AnimationTrackSpriteFlick()
+                    new AnimationTrackSpriteFlick
                     {
                         LayerKey = EffectLayers.Unshaded,
                         KeyFrames =
                         {
                             new AnimationTrackSpriteFlick.KeyFrame(state.Name, 0f),
-                        }
-                    }
-                }
+                        },
+                    },
+                },
             };
 
             _player.Play(ent, anim, "impact-effect");

@@ -21,24 +21,57 @@ namespace Content.Client.UserInterface.Controls;
 
 public sealed class MenuButton : ContainerButton
 {
-    [Dependency] private readonly IInputManager _inputManager = default!;
     public const string StyleClassLabelTopButton = "topButtonLabel";
     public const string StyleClassRedTopButton = "topButtonLabel";
+
+    private const float VertPad = 8f;
 
     private static readonly Color ColorNormal = Color.FromHex("#7b7e9e");
     private static readonly Color ColorRedNormal = Color.FromHex("#FEFEFE");
     private static readonly Color ColorHovered = Color.FromHex("#9699bb");
     private static readonly Color ColorRedHovered = Color.FromHex("#FFFFFF");
     private static readonly Color ColorPressed = Color.FromHex("#789B8C");
-
-    private const float VertPad = 8f;
-    private Color NormalColor => HasStyleClass(StyleClassRedTopButton) ? ColorRedNormal : ColorNormal;
-    private Color HoveredColor => HasStyleClass(StyleClassRedTopButton) ? ColorRedHovered : ColorHovered;
-
-    private BoundKeyFunction _function;
-    private readonly BoxContainer _root;
     private readonly TextureRect? _buttonIcon;
     private readonly Label? _buttonLabel;
+    [Dependency] private readonly IInputManager _inputManager = default!;
+
+    private BoundKeyFunction _function;
+
+    public MenuButton()
+    {
+        IoCManager.InjectDependencies(this);
+        _buttonIcon = new TextureRect
+        {
+            TextureScale = new Vector2(0.5f, 0.5f),
+            HorizontalAlignment = HAlignment.Center,
+            VerticalAlignment = VAlignment.Center,
+            VerticalExpand = true,
+            Margin = new Thickness(0, VertPad),
+            ModulateSelfOverride = NormalColor,
+            Stretch = TextureRect.StretchMode.KeepCentered,
+        };
+        _buttonLabel = new Label
+        {
+            Text = "",
+            HorizontalAlignment = HAlignment.Center,
+            ModulateSelfOverride = NormalColor,
+            StyleClasses = { StyleClassLabelTopButton },
+        };
+        ButtonRoot = new BoxContainer
+        {
+            Orientation = BoxContainer.LayoutOrientation.Vertical,
+            Children =
+            {
+                _buttonIcon,
+                _buttonLabel,
+            },
+        };
+        AddChild(ButtonRoot);
+        ToggleMode = true;
+    }
+
+    private Color NormalColor => HasStyleClass(StyleClassRedTopButton) ? ColorRedNormal : ColorNormal;
+    private Color HoveredColor => HasStyleClass(StyleClassRedTopButton) ? ColorRedHovered : ColorHovered;
 
     public string AppendStyleClass { set => AddStyleClass(value); }
     public Texture? Icon { get => _buttonIcon!.Texture; set => _buttonIcon!.Texture = value; }
@@ -53,40 +86,7 @@ public sealed class MenuButton : ContainerButton
         }
     }
 
-    public BoxContainer ButtonRoot => _root;
-
-    public MenuButton()
-    {
-        IoCManager.InjectDependencies(this);
-        _buttonIcon = new TextureRect()
-        {
-            TextureScale = new Vector2(0.5f, 0.5f),
-            HorizontalAlignment = HAlignment.Center,
-            VerticalAlignment = VAlignment.Center,
-            VerticalExpand = true,
-            Margin = new Thickness(0, VertPad),
-            ModulateSelfOverride = NormalColor,
-            Stretch = TextureRect.StretchMode.KeepCentered
-        };
-        _buttonLabel = new Label
-        {
-            Text = "",
-            HorizontalAlignment = HAlignment.Center,
-            ModulateSelfOverride = NormalColor,
-            StyleClasses = {StyleClassLabelTopButton}
-        };
-        _root = new BoxContainer
-        {
-            Orientation = BoxContainer.LayoutOrientation.Vertical,
-            Children =
-            {
-                _buttonIcon,
-                _buttonLabel
-            }
-        };
-        AddChild(_root);
-        ToggleMode = true;
-    }
+    public BoxContainer ButtonRoot { get; }
 
     protected override void EnteredTree()
     {
@@ -103,15 +103,9 @@ public sealed class MenuButton : ContainerButton
     }
 
 
-    private void OnKeyBindingChanged(IKeyBinding obj)
-    {
-        _buttonLabel!.Text = BoundKeyHelper.ShortKeyName(_function);
-    }
+    private void OnKeyBindingChanged(IKeyBinding obj) => _buttonLabel!.Text = BoundKeyHelper.ShortKeyName(_function);
 
-    private void OnKeyBindingChanged()
-    {
-        _buttonLabel!.Text = BoundKeyHelper.ShortKeyName(_function);
-    }
+    private void OnKeyBindingChanged() => _buttonLabel!.Text = BoundKeyHelper.ShortKeyName(_function);
 
     protected override void StylePropertiesChanged()
     {
@@ -122,7 +116,8 @@ public sealed class MenuButton : ContainerButton
 
     private void UpdateChildColors()
     {
-        if (_buttonIcon == null || _buttonLabel == null) return;
+        if (_buttonIcon == null || _buttonLabel == null)
+            return;
         switch (DrawMode)
         {
             case DrawModeEnum.Normal:

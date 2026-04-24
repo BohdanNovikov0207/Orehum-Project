@@ -9,13 +9,13 @@ using Robust.Client.GameObjects;
 namespace Content.Client.Nutrition.EntitySystems;
 
 /// <summary>
-/// This handles visuals for <see cref="InfantComponent"/>
+/// This handles visuals for <see cref="InfantComponent" />
 /// </summary>
 public sealed class InfantSystem : EntitySystem
 {
     [Dependency] private readonly SpriteSystem _sprite = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         SubscribeLocalEvent<InfantComponent, ComponentStartup>(OnStartup);

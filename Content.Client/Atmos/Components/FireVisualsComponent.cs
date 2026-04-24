@@ -14,20 +14,23 @@ namespace Content.Client.Atmos.Components;
 [RegisterComponent]
 public sealed partial class FireVisualsComponent : Component
 {
-    [DataField("fireStackAlternateState")]
-    public int FireStackAlternateState = 3;
-
-    [DataField("normalState")]
-    public string? NormalState;
-
     [DataField("alternateState")]
     public string? AlternateState;
 
-    [DataField("sprite")]
-    public string? Sprite;
+    [DataField("fireStackAlternateState")]
+    public int FireStackAlternateState = 3;
+
+    [DataField("lightColor")]
+    public Color LightColor = Color.Orange;
 
     [DataField("lightEnergyPerStack")]
     public float LightEnergyPerStack = 0.5f;
+
+    /// <summary>
+    /// Client side point-light entity. We use this instead of directly adding a light to
+    /// the burning entity as entities don't support having multiple point-lights.
+    /// </summary>
+    public EntityUid? LightEntity;
 
     [DataField("lightRadiusPerStack")]
     public float LightRadiusPerStack = 0.3f;
@@ -38,12 +41,9 @@ public sealed partial class FireVisualsComponent : Component
     [DataField("maxLightRadius")]
     public float MaxLightRadius = 4f;
 
-    [DataField("lightColor")]
-    public Color LightColor = Color.Orange;
+    [DataField("normalState")]
+    public string? NormalState;
 
-    /// <summary>
-    ///     Client side point-light entity. We use this instead of directly adding a light to
-    ///     the burning entity as entities don't support having multiple point-lights.
-    /// </summary>
-    public EntityUid? LightEntity;
+    [DataField("sprite")]
+    public string? Sprite;
 }

@@ -86,8 +86,16 @@ namespace Content.Client.Tips;
 [GenerateTypedNameReferences]
 public sealed partial class TippyUI : UIWidget
 {
-    public TippyState State = TippyState.Hidden;
+    public enum TippyState : byte
+    {
+        Hidden,
+        Revealing,
+        Speaking,
+        Hiding,
+    }
+
     public bool ModifyLayers = true;
+    public TippyState State = TippyState.Hidden;
 
     public TippyUI()
     {
@@ -106,7 +114,9 @@ public sealed partial class TippyUI : UIWidget
 
         LabelPanel.ModulateSelfOverride = visuals.BackgroundModulate;
         var backgroundImage = resCache.GetResource<TextureResource>(visuals.BackgroundImagePath);
-        var backgroundImageMode = visuals.BackgroundImageTile ? StyleBoxTexture.StretchMode.Tile : StyleBoxTexture.StretchMode.Stretch;
+        var backgroundImageMode = visuals.BackgroundImageTile
+            ? StyleBoxTexture.StretchMode.Tile
+            : StyleBoxTexture.StretchMode.Stretch;
         var backgroundPatchMargin = visuals.BackgroundPatchMargin;
         LabelPanel.PanelOverride = new StyleBoxTexture
         {
@@ -116,15 +126,7 @@ public sealed partial class TippyUI : UIWidget
             PatchMarginLeft = backgroundPatchMargin.Left,
             PatchMarginBottom = backgroundPatchMargin.Bottom,
             PatchMarginRight = backgroundPatchMargin.Right,
-            PatchMarginTop = backgroundPatchMargin.Top
+            PatchMarginTop = backgroundPatchMargin.Top,
         };
-    }
-
-    public enum TippyState : byte
-    {
-        Hidden,
-        Revealing,
-        Speaking,
-        Hiding,
     }
 }

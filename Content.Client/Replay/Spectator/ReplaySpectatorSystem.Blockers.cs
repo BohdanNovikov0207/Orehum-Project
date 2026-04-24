@@ -61,23 +61,15 @@ public sealed partial class ReplaySpectatorSystem
         SubscribeLocalEvent<ReplaySpectatorComponent, PullAttemptEvent>(OnPullAttempt);
     }
 
-    private void OnInteractAttempt(Entity<ReplaySpectatorComponent> ent, ref InteractionAttemptEvent args)
-    {
+    private void OnInteractAttempt(Entity<ReplaySpectatorComponent> ent, ref InteractionAttemptEvent args) =>
         args.Cancelled = true;
-    }
 
-    private void OnAttempt(EntityUid uid, ReplaySpectatorComponent component, CancellableEntityEventArgs args)
-    {
+    private void OnAttempt(EntityUid uid, ReplaySpectatorComponent component, CancellableEntityEventArgs args) =>
         args.Cancel();
-    }
 
-    private void OnUpdateCanMove(EntityUid uid, ReplaySpectatorComponent component, CancellableEntityEventArgs args)
-    {
+    private void OnUpdateCanMove(EntityUid uid, ReplaySpectatorComponent component, CancellableEntityEventArgs args) =>
         args.Cancel();
-    }
 
-    private void OnPullAttempt(EntityUid uid, ReplaySpectatorComponent component, PullAttemptEvent args)
-    {
+    private void OnPullAttempt(EntityUid uid, ReplaySpectatorComponent component, PullAttemptEvent args) =>
         args.Cancelled = true;
-    }
 }

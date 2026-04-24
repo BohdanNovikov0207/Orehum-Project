@@ -9,8 +9,7 @@ SPDX-License-Identifier: MIT
                  HorizontalExpand="True"
                  VerticalExpand="True">
     <Control VerticalExpand="True">
-        <PanelContainer StyleClasses="PanelBackgroundBaseDark"></PanelContainer>
-        <BoxContainer Orientation="Vertical" Name="DeviceList" VerticalExpand="True" SeparationOverride="4">
-        </BoxContainer>
+        <PanelContainer StyleClasses="PanelBackgroundBaseDark" />
+        <BoxContainer Orientation="Vertical" Name="DeviceList" VerticalExpand="True" SeparationOverride="4" />
     </Control>
 </ScrollContainer>

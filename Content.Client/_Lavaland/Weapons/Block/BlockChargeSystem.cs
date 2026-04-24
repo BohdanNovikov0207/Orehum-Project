@@ -25,5 +25,4 @@ namespace Content.Client._Lavaland.Weapons.Block;
 
 public sealed class BlockChargeSystem : SharedBlockChargeSystem
 {
-
 }

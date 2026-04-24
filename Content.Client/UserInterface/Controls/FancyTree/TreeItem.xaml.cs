@@ -12,7 +12,7 @@ using Robust.Client.UserInterface.XAML;
 namespace Content.Client.UserInterface.Controls.FancyTree;
 
 /// <summary>
-///     Element of a <see cref="FancyTree"/>
+/// Element of a <see cref="FancyTree" />
 /// </summary>
 [GenerateTypedNameReferences]
 public sealed partial class TreeItem : PanelContainer
@@ -21,14 +21,10 @@ public sealed partial class TreeItem : PanelContainer
     public const string StyleIdentifierTreeButton = "tree-button";
     public const string StyleClassEvenRow = "even-row";
     public const string StyleClassOddRow = "odd-row";
+    public int Index;
 
     public object? Metadata;
-    public int Index;
     public FancyTree Tree = default!;
-    public event Action<TreeItem>? OnSelected;
-    public event Action<TreeItem>? OnDeselected;
-
-    public bool Expanded { get; private set; } = false;
 
     public TreeItem()
     {
@@ -37,6 +33,10 @@ public sealed partial class TreeItem : PanelContainer
         Body.OnChildAdded += OnItemAdded;
         Body.OnChildRemoved += OnItemRemoved;
     }
+
+    public bool Expanded { get; private set; }
+    public event Action<TreeItem>? OnSelected;
+    public event Action<TreeItem>? OnDeselected;
 
     private void OnItemRemoved(Control obj)
     {

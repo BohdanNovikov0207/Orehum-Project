@@ -1,15 +1,15 @@
-using Content.Shared._Imp.Drone;
 using Content.Shared._DV.CCVars;
+using Content.Shared._Imp.Drone;
 using Robust.Client.Graphics;
 using Robust.Shared.Configuration;
 using Robust.Shared.Player;
 
 namespace Content.Client._Imp.DroneVision;
 
-public sealed partial class DroneVisionSystem : EntitySystem
+public sealed class DroneVisionSystem : EntitySystem
 {
-    [Dependency] private readonly IOverlayManager _overlayMan = default!;
     [Dependency] private readonly IConfigurationManager _cfg = default!;
+    [Dependency] private readonly IOverlayManager _overlayMan = default!;
     [Dependency] private readonly ISharedPlayerManager _playerMan = default!;
 
     private DroneVisionOverlay _overlay = default!;
@@ -23,7 +23,7 @@ public sealed partial class DroneVisionSystem : EntitySystem
         SubscribeLocalEvent<DroneVisionComponent, LocalPlayerAttachedEvent>(OnPlayerAttached);
         SubscribeLocalEvent<DroneVisionComponent, LocalPlayerDetachedEvent>(OnPlayerDetached);
 
-        _overlay = new();
+        _overlay = new DroneVisionOverlay();
     }
 
     private void OnDroneVisionInit(EntityUid uid, DroneVisionComponent component, ComponentInit args)
@@ -44,10 +44,8 @@ public sealed partial class DroneVisionSystem : EntitySystem
             _overlayMan.AddOverlay(_overlay);
     }
 
-    private void OnPlayerDetached(EntityUid uid, DroneVisionComponent component, LocalPlayerDetachedEvent args)
-    {
+    private void OnPlayerDetached(EntityUid uid, DroneVisionComponent component, LocalPlayerDetachedEvent args) =>
         _overlayMan.RemoveOverlay(_overlay);
-    }
 
     private void OnNoVisionFiltersChanged(bool enabled)
     {

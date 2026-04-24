@@ -23,9 +23,8 @@ namespace Content.Client.Administration.UI.Notes;
 [GenerateTypedNameReferences]
 public sealed partial class AdminNotesLine : BoxContainer
 {
-    private readonly SpriteSystem _sprites;
-
     private const string AdminNotesTextureBase = "/Textures/Interface/AdminNotes/";
+
     private static readonly Dictionary<NoteSeverity, string> SeverityIcons = new()
     {
         { NoteSeverity.None, AdminNotesTextureBase + "none_button.png" },
@@ -33,11 +32,14 @@ public sealed partial class AdminNotesLine : BoxContainer
         { NoteSeverity.Medium, AdminNotesTextureBase + "medium_button.png" },
         { NoteSeverity.High, AdminNotesTextureBase + "high_button.png" },
     };
+
     private static readonly Dictionary<NoteType, string> NoteTypeIcons = new()
     {
         { NoteType.Message, AdminNotesTextureBase + "message.png" },
         { NoteType.Watchlist, AdminNotesTextureBase + "watchlist.png" },
     };
+
+    private readonly SpriteSystem _sprites;
 
     public AdminNotesLine(SpriteSystem sprites, SharedAdminNote note)
     {
@@ -57,7 +59,7 @@ public sealed partial class AdminNotesLine : BoxContainer
     public event Func<AdminNotesLine, bool>? OnClicked;
 
     /// <summary>
-    /// Attempts to refresh the current note line with new data. The note it draws data on is stored in <see cref="Note"/>
+    /// Attempts to refresh the current note line with new data. The note it draws data on is stored in <see cref="Note" />
     /// </summary>
     private void Refresh()
     {
@@ -73,9 +75,7 @@ public sealed partial class AdminNotesLine : BoxContainer
             Logger.WarningS("admin.notes", $"Could not find an icon for note ID {Note.Id}");
         }
         else
-        {
             SeverityRect.Texture = _sprites.Frame0(new SpriteSpecifier.Texture(new ResPath(iconPath)));
-        }
 
         TimeLabel.Text = Note.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss");
         ServerLabel.Text = Note.ServerName ?? "Unknown";
@@ -91,7 +91,9 @@ public sealed partial class AdminNotesLine : BoxContainer
 
         if (Note.UnbannedTime is not null)
         {
-            ExtraLabel.Text = Loc.GetString("admin-notes-unbanned", ("admin", Note.UnbannedByName ?? "[error]"), ("date", Note.UnbannedTime));
+            ExtraLabel.Text = Loc.GetString("admin-notes-unbanned",
+                ("admin", Note.UnbannedByName ?? "[error]"),
+                ("date", Note.UnbannedTime));
             ExtraLabel.Visible = true;
         }
         else if (Note.ExpiryTime is not null)
@@ -105,15 +107,16 @@ public sealed partial class AdminNotesLine : BoxContainer
                 ExpiresLabel.Modulate = Color.FromHex("#86DC3D");
             }
             else
-            {
                 ExpiresLabel.Text = Loc.GetString("admin-note-editor-expiry-label-expired");
-            }
+
             ExpiresLabel.Visible = true;
         }
 
         if (Note.LastEditedAt > Note.CreatedAt)
         {
-            EditedLabel.Text = Loc.GetString("admin-notes-edited", ("author", Note.EditedByName), ("date", Note.LastEditedAt.Value.ToLocalTime()));
+            EditedLabel.Text = Loc.GetString("admin-notes-edited",
+                ("author", Note.EditedByName),
+                ("date", Note.LastEditedAt.Value.ToLocalTime()));
             EditedLabel.Visible = true;
         }
 
@@ -142,22 +145,23 @@ public sealed partial class AdminNotesLine : BoxContainer
 
     private string FormatBanMessage()
     {
-        var banMessage = new StringBuilder($"{Loc.GetString("admin-notes-banned-from")} {Loc.GetString("admin-notes-the-server")} ");
+        var banMessage =
+            new StringBuilder($"{Loc.GetString("admin-notes-banned-from")} {Loc.GetString("admin-notes-the-server")} ");
         return FormatBanMessageCommon(banMessage);
     }
 
     private string FormatRoleBanMessage()
     {
-        var banMessage = new StringBuilder($"{Loc.GetString("admin-notes-banned-from")} {string.Join(", ", Note.BannedRoles ?? new []{"unknown"})} ");
+        var banMessage =
+            new StringBuilder(
+                $"{Loc.GetString("admin-notes-banned-from")} {string.Join(", ", Note.BannedRoles ?? new[] { "unknown" })} ");
         return FormatBanMessageCommon(banMessage);
     }
 
     private string FormatBanMessageCommon(StringBuilder sb)
     {
         if (Note.ExpiryTime is null)
-        {
             sb.Append(Loc.GetString("admin-notes-permanently"));
-        }
         else
         {
             sb.Append("for ");
@@ -181,14 +185,10 @@ public sealed partial class AdminNotesLine : BoxContainer
 
         if (args.Function != EngineKeyFunctions.UIRightClick &&
             args.Function != EngineKeyFunctions.UIClick)
-        {
             return;
-        }
 
         if (OnClicked?.Invoke(this) == true)
-        {
             args.Handle();
-        }
     }
 
     public void UpdateNote(SharedAdminNote note)
@@ -202,9 +202,7 @@ public sealed partial class AdminNotesLine : BoxContainer
         base.Dispose(disposing);
 
         if (!disposing)
-        {
             return;
-        }
 
         OnClicked = null;
     }

@@ -17,8 +17,8 @@ namespace Content.Client._Shitcode.Heretic.UI;
 
 public sealed class FeastOfOwlsMenu : DefaultWindow
 {
-    public readonly Button DenyButton;
     public readonly Button AcceptButton;
+    public readonly Button DenyButton;
 
     public FeastOfOwlsMenu()
     {
@@ -34,10 +34,10 @@ public sealed class FeastOfOwlsMenu : DefaultWindow
                     Orientation = LayoutOrientation.Vertical,
                     Children =
                     {
-                        (new Label()
+                        new Label
                         {
-                            Text = Loc.GetString("feast-of-owls-text")
-                        }),
+                            Text = Loc.GetString("feast-of-owls-text"),
+                        },
                         new BoxContainer
                         {
                             Orientation = LayoutOrientation.Horizontal,
@@ -49,20 +49,20 @@ public sealed class FeastOfOwlsMenu : DefaultWindow
                                     Text = Loc.GetString("feast-of-owls-accept-button"),
                                 }),
 
-                                (new Control()
+                                new Control
                                 {
-                                    MinSize = new Vector2(20, 0)
-                                }),
+                                    MinSize = new Vector2(20, 0),
+                                },
 
                                 (DenyButton = new Button
                                 {
                                     Text = Loc.GetString("feast-of-owls-deny-button"),
-                                })
-                            }
+                                }),
+                            },
                         },
-                    }
+                    },
                 },
-            }
+            },
         });
     }
 }

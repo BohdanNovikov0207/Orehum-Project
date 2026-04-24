@@ -2,5 +2,5 @@ using Content.Shared.Body.Systems;
 
 namespace Content.Client.Body.Systems;
 
-/// <inheritdoc/>
+/// <inheritdoc />
 public sealed class MetabolizerSystem : SharedMetabolizerSystem;

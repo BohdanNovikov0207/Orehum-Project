@@ -20,27 +20,18 @@ namespace Content.Client.Audio.Jukebox;
 [GenerateTypedNameReferences]
 public sealed partial class JukeboxMenu : FancyWindow
 {
-    [Dependency] private readonly IEntityManager _entManager = default!;
-    private AudioSystem _audioSystem;
     private readonly List<(string Name, ProtoId<JukeboxPrototype> Id)> _allSongs = new();
-    /// <summary>
-    /// Are we currently 'playing' or paused for the play / pause button.
-    /// </summary>
-    private bool _playState;
-
-    /// <summary>
-    /// True if playing, false if paused.
-    /// </summary>
-    public event Action<bool>? OnPlayPressed;
-    public event Action? OnLoopPressed;
-    public event Action? OnStopPressed;
-    public event Action<ProtoId<JukeboxPrototype>>? OnSongSelected;
-    public event Action<float>? SetTime;
-    public event Action<float>? SetVolume;
+    private readonly AudioSystem _audioSystem;
+    [Dependency] private readonly IEntityManager _entManager = default!;
 
     private EntityUid? _audio;
 
     private float _lockTimer;
+
+    /// <summary>
+    /// Are we currently 'playing' or paused for the play / pause button.
+    /// </summary>
+    private bool _playState;
 
     public JukeboxMenu()
     {
@@ -51,9 +42,7 @@ public sealed partial class JukeboxMenu : FancyWindow
         MusicList.OnItemSelected += args =>
         {
             if (MusicList[args.ItemIndex].Metadata is ProtoId<JukeboxPrototype> songId)
-            {
                 OnSongSelected?.Invoke(songId);
-            }
         };
 
         PlayButton.OnPressed += _ => OnPlayPressed?.Invoke(!_playState);
@@ -64,7 +53,7 @@ public sealed partial class JukeboxMenu : FancyWindow
         VolumeSlider.OnReleased += VolumeSliderKeyUp;
 
         VolumeSlider.MaxValue = 100f;
-        SetPlayPauseButton(_audioSystem.IsPlaying(_audio), force: true);
+        SetPlayPauseButton(_audioSystem.IsPlaying(_audio), true);
     }
 
     public JukeboxMenu(AudioSystem audioSystem)
@@ -72,10 +61,18 @@ public sealed partial class JukeboxMenu : FancyWindow
         _audioSystem = audioSystem;
     }
 
-    public void SetAudioStream(EntityUid? audio)
-    {
-        _audio = audio;
-    }
+    /// <summary>
+    /// True if playing, false if paused.
+    /// </summary>
+    public event Action<bool>? OnPlayPressed;
+
+    public event Action? OnLoopPressed;
+    public event Action? OnStopPressed;
+    public event Action<ProtoId<JukeboxPrototype>>? OnSongSelected;
+    public event Action<float>? SetTime;
+    public event Action<float>? SetVolume;
+
+    public void SetAudioStream(EntityUid? audio) => _audio = audio;
 
     private void PlaybackSliderKeyUp(Slider args)
     {
@@ -83,10 +80,8 @@ public sealed partial class JukeboxMenu : FancyWindow
         _lockTimer = 0.5f;
     }
 
-    public void SetLoopButton(bool loop)
-    {
-        LoopButton.Text = Loc.GetString(loop ? "jukebox-menu-buttonloop-on" : "jukebox-menu-buttonloop-off");
-    }
+    public void SetLoopButton(bool loop) => LoopButton.Text =
+        Loc.GetString(loop ? "jukebox-menu-buttonloop-on" : "jukebox-menu-buttonloop-off");
 
     private void VolumeSliderKeyUp(Slider args)
     {
@@ -104,6 +99,7 @@ public sealed partial class JukeboxMenu : FancyWindow
         {
             _allSongs.Add((proto.Name, proto.ID));
         }
+
         FilterSongs();
         MusicList.SortItemsByText();
     }
@@ -115,9 +111,7 @@ public sealed partial class JukeboxMenu : FancyWindow
         foreach (var song in _allSongs)
         {
             if (string.IsNullOrEmpty(filter) || song.Name.ToLowerInvariant().Contains(filter))
-            {
                 MusicList.AddItem(song.Name, metadata: song.Id);
-            }
         }
     }
 
@@ -132,9 +126,7 @@ public sealed partial class JukeboxMenu : FancyWindow
         foreach (var (name, id) in _allSongs)
         {
             if (string.IsNullOrEmpty(filter) || name.ToLowerInvariant().Contains(filter))
-            {
                 MusicList.AddItem(name, metadata: id);
-            }
         }
     }
 
@@ -161,10 +153,7 @@ public sealed partial class JukeboxMenu : FancyWindow
         PlaybackSlider.SetValueWithoutEvent(0);
     }
 
-    public void SetVolumeSlider(float volume)
-    {
-        VolumeSlider.Value = volume;
-    }
+    public void SetVolumeSlider(float volume) => VolumeSlider.Value = volume;
 
 
     protected override void FrameUpdate(FrameEventArgs args)
@@ -172,21 +161,16 @@ public sealed partial class JukeboxMenu : FancyWindow
         base.FrameUpdate(args);
 
         if (_lockTimer > 0f)
-        {
             _lockTimer -= args.DeltaSeconds;
-        }
 
         PlaybackSlider.Disabled = _lockTimer > 0f;
         VolumeSlider.Disabled = _lockTimer > 0f;
 
         if (_entManager.TryGetComponent(_audio, out AudioComponent? audio))
-        {
-            DurationLabel.Text = $@"{TimeSpan.FromSeconds(audio.PlaybackPosition):mm\:ss} / {_audioSystem.GetAudioLength(audio.FileName):mm\:ss}";
-        }
+            DurationLabel.Text =
+                $@"{TimeSpan.FromSeconds(audio.PlaybackPosition):mm\:ss} / {_audioSystem.GetAudioLength(audio.FileName):mm\:ss}";
         else
-        {
-            DurationLabel.Text = $"00:00 / 00:00";
-        }
+            DurationLabel.Text = "00:00 / 00:00";
 
         VolumeNumberLabel.Text = $"{VolumeSlider.Value.ToString("0.##")} %";
 
@@ -197,13 +181,9 @@ public sealed partial class JukeboxMenu : FancyWindow
             return;
 
         if (audio != null || _entManager.TryGetComponent(_audio, out audio))
-        {
             PlaybackSlider.SetValueWithoutEvent(audio.PlaybackPosition);
-        }
         else
-        {
             PlaybackSlider.SetValueWithoutEvent(0f);
-        }
 
         SetPlayPauseButton(_audioSystem.IsPlaying(_audio, audio));
     }
@@ -211,12 +191,8 @@ public sealed partial class JukeboxMenu : FancyWindow
     public void SetSelectedSongText(string? text)
     {
         if (!string.IsNullOrEmpty(text))
-        {
             SongName.Text = text;
-        }
         else
-        {
             SongName.Text = "---";
-        }
     }
 }

@@ -140,8 +140,6 @@ public static class MidiInstrumentExt
     /// <summary>
     /// Turns the given enum value into it's string representation to be used in localization.
     /// </summary>
-    public static string GetStringRep(this MidiInstrument instrument)
-    {
-        return CaseConversion.PascalToKebab(instrument.ToString());
-    }
+    public static string GetStringRep(this MidiInstrument instrument) =>
+        CaseConversion.PascalToKebab(instrument.ToString());
 }

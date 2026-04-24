@@ -9,36 +9,41 @@ using Robust.Shared.Timing;
 namespace Content.Client.UserInterface.Controls;
 
 /// <summary>
-/// A Button that requires a second click to actually invoke its OnPressed action. <br/>
-/// When clicked once it will change rendering modes to be prefixed by <see cref="ConfirmPrefix"/>
-/// and displays <see cref="ConfirmationText"/> on the button instead of <see cref="Text"/>.<br/>
-/// <br/>
-/// After the first click <see cref="CooldownTime"/> needs to elapse before it can be clicked again to confirm.<br/>
-/// When the button doesn't get clicked a second time before <see cref="ResetTime"/> passes it changes back to its normal state.<br/>
+/// A Button that requires a second click to actually invoke its OnPressed action. <br />
+/// When clicked once it will change rendering modes to be prefixed by <see cref="ConfirmPrefix" />
+/// and displays <see cref="ConfirmationText" /> on the button instead of <see cref="Text" />.<br />
+/// <br />
+/// After the first click <see cref="CooldownTime" /> needs to elapse before it can be clicked again to confirm.<br />
+/// When the button doesn't get clicked a second time before <see cref="ResetTime" /> passes it changes back to its normal
+/// state.<br />
 /// </summary>
 /// <remarks>
 /// Colors for the different states need to be set in the stylesheet
 /// </remarks>
 public sealed class ConfirmButton : Button
 {
-    [Dependency] private readonly IGameTiming _gameTiming = default!;
-
     public const string ConfirmPrefix = "confirm-";
+    [Dependency] private readonly IGameTiming _gameTiming = default!;
+    private string? _confirmationText;
+    private TimeSpan? _nextCooldown;
 
     private TimeSpan? _nextReset;
-    private TimeSpan? _nextCooldown;
-    private string? _confirmationText;
     private string? _text;
 
-    /// <summary>
-    /// Fired when the button was pressed and confirmed
-    /// </summary>
-    public new event Action<ButtonEventArgs>? OnPressed;
+    [ViewVariables]
+    public bool IsConfirming;
 
-    /// <inheritdoc cref="Button.Text"/>
+    public ConfirmButton()
+    {
+        IoCManager.InjectDependencies(this);
+
+        base.OnPressed += HandleOnPressed;
+    }
+
+    /// <inheritdoc cref="Button.Text" />
     /// <remarks>
     /// Hides the buttons text property to be able to sanely replace the button text with
-    /// <see cref="_confirmationText"/> when asking for confirmation
+    /// <see cref="_confirmationText" /> when asking for confirmation
     /// </remarks>
     public new string? Text
     {
@@ -72,15 +77,10 @@ public sealed class ConfirmButton : Button
     [ViewVariables(VVAccess.ReadWrite)]
     public TimeSpan CooldownTime { get; set; } = TimeSpan.FromSeconds(.5);
 
-    [ViewVariables]
-    public bool IsConfirming = false;
-
-    public ConfirmButton()
-    {
-        IoCManager.InjectDependencies(this);
-
-        base.OnPressed += HandleOnPressed;
-    }
+    /// <summary>
+    /// Fired when the button was pressed and confirmed
+    /// </summary>
+    public new event Action<ButtonEventArgs>? OnPressed;
 
     protected override void FrameUpdate(FrameEventArgs args)
     {
@@ -116,6 +116,7 @@ public sealed class ConfirmButton : Button
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+
             return;
         }
 
@@ -131,7 +132,7 @@ public sealed class ConfirmButton : Button
         switch (IsConfirming)
         {
             case false:
-                _nextCooldown  = _gameTiming.CurTime + CooldownTime;
+                _nextCooldown = _gameTiming.CurTime + CooldownTime;
                 _nextReset = _gameTiming.CurTime + ResetTime;
                 Disabled = true;
                 break;

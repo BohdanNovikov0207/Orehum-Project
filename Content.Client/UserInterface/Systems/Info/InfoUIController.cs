@@ -27,18 +27,26 @@ namespace Content.Client.UserInterface.Systems.Info;
 
 public sealed class InfoUIController : UIController, IOnStateExited<GameplayState>
 {
+    private static readonly ProtoId<GuideEntryPrototype> DefaultRuleset = "DefaultRuleset";
     [Dependency] private readonly IClientConsoleHost _consoleHost = default!;
     [Dependency] private readonly INetManager _netManager = default!;
     [Dependency] private readonly IPrototypeManager _prototype = default!;
-
-    private RulesPopup? _rulesPopup;
     private RulesAndInfoWindow? _infoWindow;
 
-    private static readonly ProtoId<GuideEntryPrototype> DefaultRuleset = "DefaultRuleset";
+    private RulesPopup? _rulesPopup;
 
     public ProtoId<GuideEntryPrototype> RulesEntryId = DefaultRuleset;
 
     protected override string SawmillName => "rules";
+
+    public void OnStateExited(GameplayState state)
+    {
+        if (_infoWindow == null)
+            return;
+
+        _infoWindow.Dispose();
+        _infoWindow = null;
+    }
 
     public override void Initialize()
     {
@@ -51,9 +59,9 @@ public sealed class InfoUIController : UIController, IOnStateExited<GameplayStat
             "",
             "",
             (_, _, _) =>
-        {
-            OnAcceptPressed();
-        });
+            {
+                OnAcceptPressed();
+            });
     }
 
     private void OnRulesInformationMessage(SendRulesInformationMessage message)
@@ -64,15 +72,6 @@ public sealed class InfoUIController : UIController, IOnStateExited<GameplayStat
             ShowRules(message.PopupTime);
     }
 
-    public void OnStateExited(GameplayState state)
-    {
-        if (_infoWindow == null)
-            return;
-
-        _infoWindow.Dispose();
-        _infoWindow = null;
-    }
-
     private void ShowRules(float time)
     {
         if (_rulesPopup != null)
@@ -80,7 +79,7 @@ public sealed class InfoUIController : UIController, IOnStateExited<GameplayStat
 
         _rulesPopup = new RulesPopup
         {
-            Timer = time
+            Timer = time,
         };
 
         _rulesPopup.OnQuitPressed += OnQuitPressed;
@@ -89,10 +88,7 @@ public sealed class InfoUIController : UIController, IOnStateExited<GameplayStat
         LayoutContainer.SetAnchorPreset(_rulesPopup, LayoutContainer.LayoutPreset.Wide);
     }
 
-    private void OnQuitPressed()
-    {
-        _consoleHost.ExecuteCommand("quit");
-    }
+    private void OnQuitPressed() => _consoleHost.ExecuteCommand("quit");
 
     private void OnAcceptPressed()
     {
@@ -107,7 +103,8 @@ public sealed class InfoUIController : UIController, IOnStateExited<GameplayStat
         if (!_prototype.TryIndex(RulesEntryId, out var guideEntryPrototype))
         {
             guideEntryPrototype = _prototype.Index(DefaultRuleset);
-            Log.Error($"Couldn't find the following prototype: {RulesEntryId}. Falling back to {DefaultRuleset}, please check that the server has the rules set up correctly");
+            Log.Error(
+                $"Couldn't find the following prototype: {RulesEntryId}. Falling back to {DefaultRuleset}, please check that the server has the rules set up correctly");
             return guideEntryPrototype;
         }
 

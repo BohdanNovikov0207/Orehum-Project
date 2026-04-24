@@ -17,25 +17,25 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
 <tabs:GraphicsTab xmlns="https://spacestation14.io"
-          xmlns:tabs="clr-namespace:Content.Client.Options.UI.Tabs"
-          xmlns:ui="clr-namespace:Content.Client.Options.UI">
+                  xmlns:tabs="clr-namespace:Content.Client.Options.UI.Tabs"
+                  xmlns:ui="clr-namespace:Content.Client.Options.UI">
     <BoxContainer Orientation="Vertical">
         <ScrollContainer VerticalExpand="True">
             <BoxContainer Orientation="Vertical" Margin="8 8 8 8">
                 <!-- Display -->
-                <Label Text="{Loc 'ui-options-display-label'}" StyleClasses="LabelKeyText"/>
+                <Label Text="{Loc 'ui-options-display-label'}" StyleClasses="LabelKeyText" />
                 <CheckBox Name="VSyncCheckBox" Text="{Loc 'ui-options-vsync'}" />
                 <CheckBox Name="FullscreenCheckBox" Text="{Loc 'ui-options-fullscreen'}" />
 
                 <!-- Quality -->
-                <Label Text="{Loc 'ui-options-quality-label'}" StyleClasses="LabelKeyText"/>
+                <Label Text="{Loc 'ui-options-quality-label'}" StyleClasses="LabelKeyText" />
                 <ui:OptionDropDown Name="DropDownLightingQuality" Title="{Loc 'ui-options-lighting-label'}" />
                 <CheckBox Name="ViewportLowResCheckBox" Text="{Loc 'ui-options-vp-low-res'}" />
                 <CheckBox Name="ParallaxLowQualityCheckBox" Text="{Loc 'ui-options-parallax-low-quality'}" />
                 <CheckBox Name="AmbientOcclusionCheckBox" Text="{Loc 'ui-options-ambient-occlusion'}" />
 
                 <!-- Interface -->
-                <Label Text="{Loc 'ui-options-interface-label'}" StyleClasses="LabelKeyText"/>
+                <Label Text="{Loc 'ui-options-interface-label'}" StyleClasses="LabelKeyText" />
                 <ui:OptionDropDown Name="DropDownUIScale" Title="{Loc 'ui-options-scale-label'}" />
                 <CheckBox Name="ViewportStretchCheckBox" Text="{Loc 'ui-options-vp-stretch'}" />
                 <ui:OptionSlider Name="ViewportScaleSlider" Title="{Loc ui-options-vp-scale}" />
@@ -49,7 +49,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                           ToolTip="{Loc 'ui-options-vp-vertical-fit-tooltip'}" />
 
                 <!-- Misc -->
-                <Label Text="{Loc 'ui-options-misc-label'}" StyleClasses="LabelKeyText"/>
+                <Label Text="{Loc 'ui-options-misc-label'}" StyleClasses="LabelKeyText" />
                 <CheckBox Name="FpsCounterCheckBox" Text="{Loc 'ui-options-fps-counter'}" />
             </BoxContainer>
         </ScrollContainer>

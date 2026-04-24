@@ -16,9 +16,9 @@ namespace Content.Client.Rotation;
 
 public sealed class RotationVisualizerSystem : SharedRotationVisualsSystem
 {
+    [Dependency] private readonly AnimationPlayerSystem _animation = default!;
 
     [Dependency] private readonly AppearanceSystem _appearance = default!;
-    [Dependency] private readonly AnimationPlayerSystem _animation = default!;
 
     public override void Initialize()
     {
@@ -47,22 +47,18 @@ public sealed class RotationVisualizerSystem : SharedRotationVisualsSystem
     }
 
     /// <summary>
-    ///     Rotates a sprite between two animated keyframes given a certain time.
+    /// Rotates a sprite between two animated keyframes given a certain time.
     /// </summary>
     public void AnimateSpriteRotation(EntityUid uid, SpriteComponent spriteComp, Angle rotation, float animationTime)
     {
         if (spriteComp.Rotation.Equals(rotation))
-        {
             return;
-        }
 
         var animationComp = EnsureComp<AnimationPlayerComponent>(uid);
         const string animationKey = "rotate";
         // Stop the current rotate animation and then start a new one
         if (_animation.HasRunningAnimation(animationComp, animationKey))
-        {
             _animation.Stop((uid, animationComp), animationKey);
-        }
 
         var animation = new Animation
         {
@@ -77,10 +73,10 @@ public sealed class RotationVisualizerSystem : SharedRotationVisualsSystem
                     KeyFrames =
                     {
                         new AnimationTrackProperty.KeyFrame(spriteComp.Rotation, 0),
-                        new AnimationTrackProperty.KeyFrame(rotation, animationTime)
-                    }
-                }
-            }
+                        new AnimationTrackProperty.KeyFrame(rotation, animationTime),
+                    },
+                },
+            },
         };
 
         _animation.Play((uid, animationComp), animation, animationKey);

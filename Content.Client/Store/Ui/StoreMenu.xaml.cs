@@ -49,18 +49,12 @@ public sealed partial class StoreMenu : DefaultWindow
     [Dependency] private readonly IEntityManager _entityManager = default!;
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
 
-    private StoreWithdrawWindow? _withdrawWindow;
+    private List<ListingData> _cachedListings = new();
 
-    public event EventHandler<string>? SearchTextUpdated;
-    public event Action<BaseButton.ButtonEventArgs, ListingData>? OnListingButtonPressed;
-    public event Action<BaseButton.ButtonEventArgs, string>? OnCategoryButtonPressed;
-    public event Action<BaseButton.ButtonEventArgs, string, int>? OnWithdrawAttempt;
-    public event Action<BaseButton.ButtonEventArgs>? OnRefundAttempt;
+    private StoreWithdrawWindow? _withdrawWindow;
 
     public Dictionary<ProtoId<CurrencyPrototype>, FixedPoint2> Balance = new();
     public string CurrentCategory = string.Empty;
-
-    private List<ListingData> _cachedListings = new();
 
     public StoreMenu()
     {
@@ -72,17 +66,25 @@ public sealed partial class StoreMenu : DefaultWindow
         SearchBar.OnTextChanged += _ => SearchTextUpdated?.Invoke(this, SearchBar.Text);
     }
 
+    public event EventHandler<string>? SearchTextUpdated;
+    public event Action<BaseButton.ButtonEventArgs, ListingData>? OnListingButtonPressed;
+    public event Action<BaseButton.ButtonEventArgs, string>? OnCategoryButtonPressed;
+    public event Action<BaseButton.ButtonEventArgs, string, int>? OnWithdrawAttempt;
+    public event Action<BaseButton.ButtonEventArgs>? OnRefundAttempt;
+
     public void UpdateBalance(Dictionary<ProtoId<CurrencyPrototype>, FixedPoint2> balance)
     {
         Balance = balance;
 
         var currency = balance.ToDictionary(type =>
-            (type.Key, type.Value), type => _prototypeManager.Index(type.Key));
+                (type.Key, type.Value),
+            type => _prototypeManager.Index(type.Key));
 
         var balanceStr = string.Empty;
         foreach (var ((_, amount), proto) in currency)
         {
-            balanceStr += Loc.GetString("store-ui-balance-display", ("amount", amount),
+            balanceStr += Loc.GetString("store-ui-balance-display",
+                ("amount", amount),
                 ("currency", Loc.GetString(proto.DisplayName, ("amount", 1)))) + "\n";
         }
 
@@ -110,7 +112,9 @@ public sealed partial class StoreMenu : DefaultWindow
 
     public void UpdateListing()
     {
-        var sorted = _cachedListings.OrderBy(l => l.Priority).ThenBy(l => l.Cost.Values.Sum()).ThenBy(l => l.Name == null ? string.Empty : Loc.GetString(l.Name)); // Goob edit
+        var sorted = _cachedListings.OrderBy(l => l.Priority)
+            .ThenBy(l => l.Cost.Values.Sum())
+            .ThenBy(l => l.Name == null ? string.Empty : Loc.GetString(l.Name)); // Goob edit
 
         // should probably chunk these out instead. to-do if this clogs the internet tubes.
         // maybe read clients prototypes instead?
@@ -121,10 +125,7 @@ public sealed partial class StoreMenu : DefaultWindow
         }
     }
 
-    public void SetFooterVisibility(bool visible)
-    {
-        TraitorFooter.Visible = visible;
-    }
+    public void SetFooterVisibility(bool visible) => TraitorFooter.Visible = visible;
 
     private void OnWithdrawButtonDown(BaseButton.ButtonEventArgs args)
     {
@@ -143,10 +144,7 @@ public sealed partial class StoreMenu : DefaultWindow
         _withdrawWindow.OnWithdrawAttempt += OnWithdrawAttempt;
     }
 
-    private void OnRefundButtonDown(BaseButton.ButtonEventArgs args)
-    {
-        OnRefundAttempt?.Invoke(args);
-    }
+    private void OnRefundButtonDown(BaseButton.ButtonEventArgs args) => OnRefundAttempt?.Invoke(args);
 
     private void AddListingGui(ListingData listing)
     {
@@ -170,7 +168,7 @@ public sealed partial class StoreMenu : DefaultWindow
         else if (listing.ProductAction != null)
         {
             var actionId = _entityManager.Spawn(listing.ProductAction);
-            if (_entityManager.System<ActionsSystem>().GetAction(actionId)?.Comp?.Icon is {} icon)
+            if (_entityManager.System<ActionsSystem>().GetAction(actionId)?.Comp?.Icon is { } icon)
                 texture = spriteSys.Frame0(icon);
         }
 
@@ -185,7 +183,8 @@ public sealed partial class StoreMenu : DefaultWindow
         StoreListingsContainer.AddChild(newListing);
     }
 
-    public bool HasListingPrice(Dictionary<ProtoId<CurrencyPrototype>, FixedPoint2> currency, Dictionary<ProtoId<CurrencyPrototype>, FixedPoint2> price)
+    public bool HasListingPrice(Dictionary<ProtoId<CurrencyPrototype>, FixedPoint2> currency,
+        Dictionary<ProtoId<CurrencyPrototype>, FixedPoint2> price)
     {
         foreach (var type in price)
         {
@@ -195,6 +194,7 @@ public sealed partial class StoreMenu : DefaultWindow
             if (currency[type.Key] < type.Value)
                 return false;
         }
+
         return true;
     }
 
@@ -221,10 +221,7 @@ public sealed partial class StoreMenu : DefaultWindow
         return text.TrimEnd();
     }
 
-    private void ClearListings()
-    {
-        StoreListingsContainer.Children.Clear();
-    }
+    private void ClearListings() => StoreListingsContainer.Children.Clear();
 
     public void PopulateStoreCategoryButtons(HashSet<ListingData> listings)
     {
@@ -262,7 +259,7 @@ public sealed partial class StoreMenu : DefaultWindow
                 Pressed = proto.ID == CurrentCategory,
                 Group = group,
                 ToggleMode = true,
-                StyleClasses = { "OpenBoth" }
+                StyleClasses = { "OpenBoth" },
             };
 
             if (proto.Evil) // Goobstation
@@ -279,10 +276,7 @@ public sealed partial class StoreMenu : DefaultWindow
         _withdrawWindow?.Close();
     }
 
-    public void UpdateRefund(bool allowRefund)
-    {
-        RefundButton.Visible = allowRefund;
-    }
+    public void UpdateRefund(bool allowRefund) => RefundButton.Visible = allowRefund;
 
     private sealed class StoreCategoryButton : Button
     {

@@ -13,14 +13,10 @@ namespace Content.Client.Power.EntitySystems;
 
 public sealed class PowerNetSystem : SharedPowerNetSystem
 {
-    public override bool IsPoweredCalculate(SharedApcPowerReceiverComponent comp)
-    {
-        return IsPoweredCalculate((ApcPowerReceiverComponent)comp);
-    }
+    public override bool IsPoweredCalculate(SharedApcPowerReceiverComponent comp) =>
+        IsPoweredCalculate((ApcPowerReceiverComponent) comp);
 
-    private bool IsPoweredCalculate(ApcPowerReceiverComponent comp)
-    {
-        return !comp.PowerDisabled
-               && !comp.NeedsPower;
-    }
+    private bool IsPoweredCalculate(ApcPowerReceiverComponent comp) =>
+        !comp.PowerDisabled
+        && !comp.NeedsPower;
 }

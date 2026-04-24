@@ -23,14 +23,14 @@ SPDX-License-Identifier: MIT
                 HorizontalAlignment="Right"
                 VerticalAlignment="Bottom"
                 StyleClasses="contextMenuIconLabel"
-                Visible="false"/>
+                Visible="false" />
         </SpriteView>
         <RichTextLabel
             Name="Label"
             MaxWidth="300"
             HorizontalExpand="True"
             VerticalAlignment="Center"
-            Margin ="4 0 4 0"/>
+            Margin="4 0 4 0" />
         <TextureRect
             Name="ExpansionIndicator"
             HorizontalAlignment="Right"
@@ -39,6 +39,6 @@ SPDX-License-Identifier: MIT
             TextureScale="0.5 0.5"
             SetWidth="{x:Static ui:ContextMenuElement.ElementHeight}"
             SetHeight="{x:Static ui:ContextMenuElement.ElementHeight}"
-            Visible ="false"/>
+            Visible="false" />
     </BoxContainer>
 </ContainerButton>

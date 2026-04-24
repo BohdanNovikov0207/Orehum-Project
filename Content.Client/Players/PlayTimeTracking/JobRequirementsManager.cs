@@ -83,6 +83,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Diagnostics.CodeAnalysis;
+using Content.Corvax.Interfaces.Shared;
 using Content.Shared.CCVar;
 using Content.Shared.Players;
 using Content.Shared.Players.JobWhitelist;
@@ -101,21 +102,30 @@ namespace Content.Client.Players.PlayTimeTracking;
 
 public sealed class JobRequirementsManager : ISharedPlaytimeManager
 {
-    [Dependency] private readonly IBaseClient _client = default!;
-    [Dependency] private readonly IClientNetManager _net = default!;
     [Dependency] private readonly IConfigurationManager _cfg = default!;
+    [Dependency] private readonly IBaseClient _client = default!;
     [Dependency] private readonly IEntityManager _entManager = default!;
+    private readonly List<string> _jobWhitelists = new();
+    [Dependency] private readonly IClientNetManager _net = default!;
     [Dependency] private readonly IPlayerManager _playerManager = default!;
     [Dependency] private readonly IPrototypeManager _prototypes = default!;
 
-    [Dependency] private readonly Content.Corvax.Interfaces.Shared.ISharedSponsorsManager _sponsorsManager = default!; // backmen: allRoles
+    private readonly List<string> _roleBans = new();
     //[Dependency] private readonly Content.Corvax.Interfaces.Client.IClientDiscordAuthManager _discordManager = default!; // backmen: discord
 
     private readonly Dictionary<string, TimeSpan> _roles = new();
-    private readonly List<string> _roleBans = new();
-    private readonly List<string> _jobWhitelists = new();
+
+    [Dependency] private readonly ISharedSponsorsManager _sponsorsManager = default!; // backmen: allRoles
 
     private ISawmill _sawmill = default!;
+
+    public IReadOnlyDictionary<string, TimeSpan> GetPlayTimes(ICommonSession session)
+    {
+        if (session != _playerManager.LocalSession)
+            return new Dictionary<string, TimeSpan>();
+
+        return _roles;
+    }
 
     public event Action? Updated;
 
@@ -176,7 +186,9 @@ public sealed class JobRequirementsManager : ISharedPlaytimeManager
         Updated?.Invoke();
     }
 
-    public bool IsAllowed(JobPrototype job, HumanoidCharacterProfile? profile, [NotNullWhen(false)] out FormattedMessage? reason)
+    public bool IsAllowed(JobPrototype job,
+        HumanoidCharacterProfile? profile,
+        [NotNullWhen(false)] out FormattedMessage? reason)
     {
         reason = null;
 
@@ -196,13 +208,17 @@ public sealed class JobRequirementsManager : ISharedPlaytimeManager
         return CheckRoleRequirements(job, profile, out reason);
     }
 
-    public bool CheckRoleRequirements(JobPrototype job, HumanoidCharacterProfile? profile, [NotNullWhen(false)] out FormattedMessage? reason)
+    public bool CheckRoleRequirements(JobPrototype job,
+        HumanoidCharacterProfile? profile,
+        [NotNullWhen(false)] out FormattedMessage? reason)
     {
         var reqs = _entManager.System<SharedRoleSystem>().GetJobRequirement(job);
         return CheckRoleRequirements(reqs, profile, out reason);
     }
 
-    public bool CheckRoleRequirements(HashSet<JobRequirement>? requirements, HumanoidCharacterProfile? profile, [NotNullWhen(false)] out FormattedMessage? reason)
+    public bool CheckRoleRequirements(HashSet<JobRequirement>? requirements,
+        HumanoidCharacterProfile? profile,
+        [NotNullWhen(false)] out FormattedMessage? reason)
     {
         reason = null;
 
@@ -237,10 +253,8 @@ public sealed class JobRequirementsManager : ISharedPlaytimeManager
         return true;
     }
 
-    public TimeSpan FetchOverallPlaytime()
-    {
-        return _roles.TryGetValue("Overall", out var overallPlaytime) ? overallPlaytime : TimeSpan.Zero;
-    }
+    public TimeSpan FetchOverallPlaytime() =>
+        _roles.TryGetValue("Overall", out var overallPlaytime) ? overallPlaytime : TimeSpan.Zero;
 
     public IEnumerable<KeyValuePair<string, TimeSpan>> FetchPlaytimeByRoles()
     {
@@ -249,19 +263,7 @@ public sealed class JobRequirementsManager : ISharedPlaytimeManager
         foreach (var job in jobsToMap)
         {
             if (_roles.TryGetValue(job.PlayTimeTracker, out var locJobName))
-            {
                 yield return new KeyValuePair<string, TimeSpan>(job.Name, locJobName);
-            }
         }
-    }
-
-    public IReadOnlyDictionary<string, TimeSpan> GetPlayTimes(ICommonSession session)
-    {
-        if (session != _playerManager.LocalSession)
-        {
-            return new Dictionary<string, TimeSpan>();
-        }
-
-        return _roles;
     }
 }

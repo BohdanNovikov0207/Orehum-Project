@@ -13,12 +13,11 @@ namespace Content.Client._Shitcode.Wizard.Systems;
 
 public sealed class ActionTargetMarkSystem : EntitySystem
 {
-    [Dependency] private readonly TransformSystem _transform = default!;
-
     private static readonly EntProtoId MarkProto = "ActionTargetMark";
+    [Dependency] private readonly TransformSystem _transform = default!;
+    public EntityUid? Mark;
 
     public EntityUid? Target;
-    public EntityUid? Mark;
 
     public override void Initialize()
     {

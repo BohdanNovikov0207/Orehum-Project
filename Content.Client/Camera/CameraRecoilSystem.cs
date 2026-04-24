@@ -34,15 +34,9 @@ public sealed class CameraRecoilSystem : SharedCameraRecoilSystem
         Subs.CVar(_configManager, CCVars.ScreenShakeIntensity, OnCvarChanged, true);
     }
 
-    private void OnCvarChanged(float value)
-    {
-        _intensity = value;
-    }
+    private void OnCvarChanged(float value) => _intensity = value;
 
-    private void OnCameraKick(CameraKickEvent ev)
-    {
-        KickCamera(GetEntity(ev.NetEntity), ev.Recoil);
-    }
+    private void OnCameraKick(CameraKickEvent ev) => KickCamera(GetEntity(ev.NetEntity), ev.Recoil);
 
     public override void KickCamera(EntityUid uid, Vector2 recoil, CameraRecoilComponent? component = null)
     {

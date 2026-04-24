@@ -17,8 +17,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using System.Linq;
-using System.Numerics;
 using Content.Client._White.UserInterface.Controls;
 using Content.Client.UserInterface.Controls;
 using Content.Shared.Ghost;
@@ -28,246 +26,246 @@ using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.CustomControls;
 using Robust.Client.UserInterface.XAML;
 
-namespace Content.Client.UserInterface.Systems.Ghost.Controls
+namespace Content.Client.UserInterface.Systems.Ghost.Controls;
+
+[GenerateTypedNameReferences]
+public sealed partial class GhostTargetWindow : DefaultWindow
 {
-    [GenerateTypedNameReferences]
-    public sealed partial class GhostTargetWindow : DefaultWindow
+    private readonly Dictionary<string, List<GhostWarp>> _aliveAntags = [];
+
+    private readonly Dictionary<string, List<GhostWarp>> _alivePlayers = [];
+    private readonly Dictionary<string, List<GhostWarp>> _deadPlayers = [];
+    private readonly Dictionary<string, List<GhostWarp>> _ghostPlayers = [];
+    private readonly Dictionary<string, List<GhostWarp>> _leftPlayers = [];
+    private readonly Dictionary<string, List<GhostWarp>> _other = [];
+    private readonly Dictionary<string, List<GhostWarp>> _places = [];
+
+    // WWDP EDIT START
+    private List<GhostWarp> _originalGhostWarps = [];
+    private string _searchText = string.Empty;
+
+    public GhostTargetWindow()
     {
-        private string _searchText = string.Empty;
+        RobustXamlLoader.Load(this);
+        SearchBar.OnTextChanged += OnSearchTextChanged;
 
-        // WWDP EDIT START
-        private List<GhostWarp> _originalGhostWarps = [];
-
-        private Dictionary<string, List<GhostWarp>> _alivePlayers = [];
-        private Dictionary<string, List<GhostWarp>> _deadPlayers = [];
-        private Dictionary<string, List<GhostWarp>> _ghostPlayers = [];
-        private Dictionary<string, List<GhostWarp>> _leftPlayers = [];
-
-        private Dictionary<string, List<GhostWarp>> _aliveAntags = [];
-        private Dictionary<string, List<GhostWarp>> _places = [];
-        private Dictionary<string, List<GhostWarp>> _other = [];
-
-        // WWDP EDIT END
-
-        public event Action<NetEntity>? WarpClicked;
-        public event Action? OnGhostnadoClicked;
-
-        public GhostTargetWindow()
-        {
-            RobustXamlLoader.Load(this);
-            SearchBar.OnTextChanged += OnSearchTextChanged;
-
-            GhostnadoButton.OnPressed += _ => OnGhostnadoClicked?.Invoke();
-        }
-
-        public void Populate()
-        {
-            // WWDP EDIT START
-            GhostTeleportContainer.DisposeAllChildren();
-            FilterWarps();
-            AddButtons();
-            // WWDP EDIT END
-        }
-
-        // WWDP EDIT START
-        private void FilterWarps()
-        {
-
-            _alivePlayers.Clear();
-            _deadPlayers.Clear();
-            _ghostPlayers.Clear();
-            _leftPlayers.Clear();
-            _aliveAntags.Clear();
-            _places.Clear();
-            _other.Clear();
-
-            foreach (var warp in _originalGhostWarps)
-            {
-                if(!string.IsNullOrEmpty(_searchText) && !warp.DisplayName.Contains(_searchText, StringComparison.OrdinalIgnoreCase))
-                    continue;
-
-                if(warp.Group == WarpGroup.Location)
-                {
-                    FilterLocalWarps(_places, warp, null);
-                    continue;
-                }
-
-                FilterLocalWarps(_alivePlayers, warp, WarpGroup.AliveDepartment);
-                FilterLocalWarps(_deadPlayers, warp, WarpGroup.DeadDepartment);
-                FilterLocalWarps(_leftPlayers, warp, WarpGroup.LeftDepartment);
-
-                FilterLocalWarps(_aliveAntags, warp, WarpGroup.AliveAntag);
-                FilterLocalWarps(_deadPlayers, warp, WarpGroup.DeadAntag);
-
-                FilterLocalWarps(_ghostPlayers, warp, WarpGroup.Ghost);
-                FilterLocalWarps(_other, warp, WarpGroup.AliveOther);
-            }
-        }
-
-        private void FilterLocalWarps(Dictionary<string, List<GhostWarp>> groups, GhostWarp warp, WarpGroup? group)
-        {
-            if (group != null && !warp.Group.HasFlag(group))
-               return;
-
-            if (!groups.TryGetValue(warp.SubGroup, out var list))
-            {
-                list = [];
-                groups.Add(warp.SubGroup, list);
-            }
-
-            list.Add(warp);
-        }
-
-        // WWDP EDIT END
-
-        public void UpdateWarps(List<GhostWarp> warps)
-        {
-            // WWDP EDIT START
-            _originalGhostWarps = warps;
-            Populate();
-            // WWDP EDIT END
-        }
-
-        private void AddButtons()
-        {
-            // WWDP EDIT START
-            AddButtons(_aliveAntags, "ghost-teleport-menu-antagonists-label");
-            AddButtons(_alivePlayers, "ghost-teleport-menu-alive-label"); // Alive
-            AddButtons(_ghostPlayers, "ghost-teleport-menu-ghosts-label"); // Ghost
-            AddButtons(_leftPlayers, "ghost-teleport-menu-left-label", true); // Left
-            AddButtons(_deadPlayers, "ghost-teleport-menu-dead-label", true); // Dead
-            AddButtons(_places, "ghost-teleport-menu-locations-label", true);
-            AddButtons(_other, "ghost-teleport-menu-other-label", true);
-            // WWDP EDIT END
-        }
-
-        private void OnSearchTextChanged(LineEdit.LineEditEventArgs args)
-        {
-            // WWDP EDIT START
-            _searchText = args.Text.ToLower();
-            Populate();
-            // WWDP EDIT END
-        }
-
-        // WWDP EDIT START
-
-        private void AddButtons(Dictionary<string, List<GhostWarp>> sortedWarps, string text, bool enableOtherCategory = false)
-        {
-            if(sortedWarps.Count == 0)
-                return;
-
-            var mainContainer = new BoxContainer()
-            {
-                Orientation = BoxContainer.LayoutOrientation.Vertical,
-                HorizontalExpand = true,
-                SeparationOverride = 5
-            };
-
-            var header = CreateSectionHeader(text);
-            mainContainer.AddChild(header);
-
-            var otherContainer = new FlexBox()
-            {
-                AlignContent = FlexBox.FlexAlignContent.SpaceBetween
-            };
-
-            foreach (var (subCategory, warps) in sortedWarps)
-            {
-                if(warps.Count == 0)
-                    continue;
-
-                var isOtherContainer = enableOtherCategory && (string.IsNullOrEmpty(subCategory) || warps.Count == 1);
-
-                var subBox = new FlexBox()
-                {
-                    AlignContent = FlexBox.FlexAlignContent.SpaceBetween
-                };
-
-                var departmentLabel = new Label
-                {
-                    Text = Loc.GetString(subCategory) + ": " + warps.Count,
-                    StyleClasses = { "LabelSecondaryColor" }
-                };
-
-                foreach (var warp in warps)
-                {
-                    var playerButton = new Button
-                    {
-                        Text = warp.DisplayName,
-                        TextAlign = Label.AlignMode.Right,
-                        HorizontalAlignment = HAlignment.Center,
-                        VerticalAlignment = VAlignment.Center,
-                        SizeFlagsStretchRatio = 1,
-                        ModulateSelfOverride = warp.Color,
-                        ToolTip = Loc.GetString(warp.Description),
-                        TooltipDelay = 0.1f,
-                        SetWidth = 180,
-                        ClipText = true,
-                    };
-
-                    playerButton.Label.ModulateSelfOverride = GetTextColor(warp.Color);
-                    playerButton.OnPressed += _ => WarpClicked?.Invoke(warp.Entity);
-
-                    if(!isOtherContainer)
-                        subBox.AddChild(playerButton);
-                    else
-                        otherContainer.AddChild(playerButton);
-                }
-
-                if(!isOtherContainer)
-                {
-                    mainContainer.AddChild(departmentLabel);
-                    mainContainer.AddChild(subBox);
-                }
-            }
-
-            if (enableOtherCategory && otherContainer.ChildCount > 0)
-            {
-                var otherLabel = new Label
-                {
-                    Text = Loc.GetString("ghost-teleport-menu-other-label") + ": " + otherContainer.ChildCount,
-                    StyleClasses = { "LabelSecondaryColor" }
-                };
-
-                mainContainer.AddChild(otherLabel);
-                mainContainer.AddChild(otherContainer);
-            }
-
-            GhostTeleportContainer.AddChild(mainContainer);
-        }
-
-        private Control CreateSectionHeader(string text, bool useStripeBack = true)
-        {
-            var label = new Label
-            {
-                Text = Loc.GetString(text),
-                StyleClasses = { "LabelBig" },
-                Align = Label.AlignMode.Center,
-            };
-
-            if (!useStripeBack)
-                return label;
-
-            var stripe = new StripeBack()
-            {
-                HorizontalExpand = true
-            };
-            stripe.AddChild(label);
-
-            return stripe;
-        }
-
-        public static Color GetTextColor(Color? background)
-        {
-            if (background is null)
-                return Color.White;
-
-            var luminance = (0.299 * background.Value.R +
-                0.587 * background.Value.G +
-                0.114 * background.Value.B);
-
-            return luminance > 0.5 ? Color.Black : Color.White;
-        }
-        //WWDP EDIT END
+        GhostnadoButton.OnPressed += _ => OnGhostnadoClicked?.Invoke();
     }
+
+    // WWDP EDIT END
+
+    public event Action<NetEntity>? WarpClicked;
+    public event Action? OnGhostnadoClicked;
+
+    public void Populate()
+    {
+        // WWDP EDIT START
+        GhostTeleportContainer.DisposeAllChildren();
+        FilterWarps();
+        AddButtons();
+        // WWDP EDIT END
+    }
+
+    // WWDP EDIT START
+    private void FilterWarps()
+    {
+        _alivePlayers.Clear();
+        _deadPlayers.Clear();
+        _ghostPlayers.Clear();
+        _leftPlayers.Clear();
+        _aliveAntags.Clear();
+        _places.Clear();
+        _other.Clear();
+
+        foreach (var warp in _originalGhostWarps)
+        {
+            if (!string.IsNullOrEmpty(_searchText) &&
+                !warp.DisplayName.Contains(_searchText, StringComparison.OrdinalIgnoreCase))
+                continue;
+
+            if (warp.Group == WarpGroup.Location)
+            {
+                FilterLocalWarps(_places, warp, null);
+                continue;
+            }
+
+            FilterLocalWarps(_alivePlayers, warp, WarpGroup.AliveDepartment);
+            FilterLocalWarps(_deadPlayers, warp, WarpGroup.DeadDepartment);
+            FilterLocalWarps(_leftPlayers, warp, WarpGroup.LeftDepartment);
+
+            FilterLocalWarps(_aliveAntags, warp, WarpGroup.AliveAntag);
+            FilterLocalWarps(_deadPlayers, warp, WarpGroup.DeadAntag);
+
+            FilterLocalWarps(_ghostPlayers, warp, WarpGroup.Ghost);
+            FilterLocalWarps(_other, warp, WarpGroup.AliveOther);
+        }
+    }
+
+    private void FilterLocalWarps(Dictionary<string, List<GhostWarp>> groups, GhostWarp warp, WarpGroup? group)
+    {
+        if (group != null && !warp.Group.HasFlag(group))
+            return;
+
+        if (!groups.TryGetValue(warp.SubGroup, out var list))
+        {
+            list = [];
+            groups.Add(warp.SubGroup, list);
+        }
+
+        list.Add(warp);
+    }
+
+    // WWDP EDIT END
+
+    public void UpdateWarps(List<GhostWarp> warps)
+    {
+        // WWDP EDIT START
+        _originalGhostWarps = warps;
+        Populate();
+        // WWDP EDIT END
+    }
+
+    private void AddButtons()
+    {
+        // WWDP EDIT START
+        AddButtons(_aliveAntags, "ghost-teleport-menu-antagonists-label");
+        AddButtons(_alivePlayers, "ghost-teleport-menu-alive-label"); // Alive
+        AddButtons(_ghostPlayers, "ghost-teleport-menu-ghosts-label"); // Ghost
+        AddButtons(_leftPlayers, "ghost-teleport-menu-left-label", true); // Left
+        AddButtons(_deadPlayers, "ghost-teleport-menu-dead-label", true); // Dead
+        AddButtons(_places, "ghost-teleport-menu-locations-label", true);
+        AddButtons(_other, "ghost-teleport-menu-other-label", true);
+        // WWDP EDIT END
+    }
+
+    private void OnSearchTextChanged(LineEdit.LineEditEventArgs args)
+    {
+        // WWDP EDIT START
+        _searchText = args.Text.ToLower();
+        Populate();
+        // WWDP EDIT END
+    }
+
+    // WWDP EDIT START
+
+    private void AddButtons(Dictionary<string, List<GhostWarp>> sortedWarps,
+        string text,
+        bool enableOtherCategory = false)
+    {
+        if (sortedWarps.Count == 0)
+            return;
+
+        var mainContainer = new BoxContainer
+        {
+            Orientation = BoxContainer.LayoutOrientation.Vertical,
+            HorizontalExpand = true,
+            SeparationOverride = 5,
+        };
+
+        var header = CreateSectionHeader(text);
+        mainContainer.AddChild(header);
+
+        var otherContainer = new FlexBox
+        {
+            AlignContent = FlexBox.FlexAlignContent.SpaceBetween,
+        };
+
+        foreach (var (subCategory, warps) in sortedWarps)
+        {
+            if (warps.Count == 0)
+                continue;
+
+            var isOtherContainer = enableOtherCategory && (string.IsNullOrEmpty(subCategory) || warps.Count == 1);
+
+            var subBox = new FlexBox
+            {
+                AlignContent = FlexBox.FlexAlignContent.SpaceBetween,
+            };
+
+            var departmentLabel = new Label
+            {
+                Text = Loc.GetString(subCategory) + ": " + warps.Count,
+                StyleClasses = { "LabelSecondaryColor" },
+            };
+
+            foreach (var warp in warps)
+            {
+                var playerButton = new Button
+                {
+                    Text = warp.DisplayName,
+                    TextAlign = Label.AlignMode.Right,
+                    HorizontalAlignment = HAlignment.Center,
+                    VerticalAlignment = VAlignment.Center,
+                    SizeFlagsStretchRatio = 1,
+                    ModulateSelfOverride = warp.Color,
+                    ToolTip = Loc.GetString(warp.Description),
+                    TooltipDelay = 0.1f,
+                    SetWidth = 180,
+                    ClipText = true,
+                };
+
+                playerButton.Label.ModulateSelfOverride = GetTextColor(warp.Color);
+                playerButton.OnPressed += _ => WarpClicked?.Invoke(warp.Entity);
+
+                if (!isOtherContainer)
+                    subBox.AddChild(playerButton);
+                else
+                    otherContainer.AddChild(playerButton);
+            }
+
+            if (!isOtherContainer)
+            {
+                mainContainer.AddChild(departmentLabel);
+                mainContainer.AddChild(subBox);
+            }
+        }
+
+        if (enableOtherCategory && otherContainer.ChildCount > 0)
+        {
+            var otherLabel = new Label
+            {
+                Text = Loc.GetString("ghost-teleport-menu-other-label") + ": " + otherContainer.ChildCount,
+                StyleClasses = { "LabelSecondaryColor" },
+            };
+
+            mainContainer.AddChild(otherLabel);
+            mainContainer.AddChild(otherContainer);
+        }
+
+        GhostTeleportContainer.AddChild(mainContainer);
+    }
+
+    private Control CreateSectionHeader(string text, bool useStripeBack = true)
+    {
+        var label = new Label
+        {
+            Text = Loc.GetString(text),
+            StyleClasses = { "LabelBig" },
+            Align = Label.AlignMode.Center,
+        };
+
+        if (!useStripeBack)
+            return label;
+
+        var stripe = new StripeBack
+        {
+            HorizontalExpand = true,
+        };
+        stripe.AddChild(label);
+
+        return stripe;
+    }
+
+    public static Color GetTextColor(Color? background)
+    {
+        if (background is null)
+            return Color.White;
+
+        var luminance = 0.299 * background.Value.R +
+                        0.587 * background.Value.G +
+                        0.114 * background.Value.B;
+
+        return luminance > 0.5 ? Color.Black : Color.White;
+    }
+    //WWDP EDIT END
 }

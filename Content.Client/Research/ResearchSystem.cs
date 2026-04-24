@@ -9,5 +9,4 @@ namespace Content.Client.Research;
 
 public sealed class ResearchSystem : SharedResearchSystem
 {
-
 }

@@ -3,5 +3,5 @@
                       xmlns:widgets="clr-namespace:Content.Client.UserInterface.Systems.Chat.Widgets"
                       Title="{Loc chat-window-title}"
                       MinSize="465 265">
-    <widgets:ChatBox Name="Chatbox"/>
+    <widgets:ChatBox Name="Chatbox" />
 </controls:FancyWindow>

@@ -19,44 +19,37 @@ using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.XAML;
 using Robust.Shared.Configuration;
 
-namespace Content.Client.Administration.UI.Tabs
+namespace Content.Client.Administration.UI.Tabs;
+
+[GenerateTypedNameReferences]
+public sealed partial class ServerTab : Control
 {
-    [GenerateTypedNameReferences]
-    public sealed partial class ServerTab : Control
+    [Dependency] private readonly IConfigurationManager _config = default!;
+    [Dependency] private readonly IClientConsoleHost _console = default!;
+
+    public ServerTab()
     {
-        [Dependency] private readonly IConfigurationManager _config = default!;
-        [Dependency] private readonly IClientConsoleHost _console = default!;
+        RobustXamlLoader.Load(this);
+        IoCManager.InjectDependencies(this);
 
-        public ServerTab()
+        _config.OnValueChanged(CCVars.OocEnabled, OocEnabledChanged, true);
+        _config.OnValueChanged(CCVars.LoocEnabled, LoocEnabledChanged, true);
+
+        ServerShutdownButton.OnPressed += _ => _console.ExecuteCommand("shutdown");
+    }
+
+    private void OocEnabledChanged(bool value) => SetOocButton.Pressed = value;
+
+    private void LoocEnabledChanged(bool value) => SetLoocButton.Pressed = value;
+
+    protected override void Dispose(bool disposing)
+    {
+        base.Dispose(disposing);
+
+        if (disposing)
         {
-            RobustXamlLoader.Load(this);
-            IoCManager.InjectDependencies(this);
-
-            _config.OnValueChanged(CCVars.OocEnabled, OocEnabledChanged, true);
-            _config.OnValueChanged(CCVars.LoocEnabled, LoocEnabledChanged, true);
-
-            ServerShutdownButton.OnPressed += _ => _console.ExecuteCommand("shutdown");
-        }
-
-        private void OocEnabledChanged(bool value)
-        {
-            SetOocButton.Pressed = value;
-        }
-
-        private void LoocEnabledChanged(bool value)
-        {
-            SetLoocButton.Pressed = value;
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
-
-            if (disposing)
-            {
-                _config.UnsubValueChanged(CCVars.OocEnabled, OocEnabledChanged);
-                _config.UnsubValueChanged(CCVars.LoocEnabled, LoocEnabledChanged);
-            }
+            _config.UnsubValueChanged(CCVars.OocEnabled, OocEnabledChanged);
+            _config.UnsubValueChanged(CCVars.LoocEnabled, LoocEnabledChanged);
         }
     }
 }

@@ -11,11 +11,12 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Shared.GameTicking;
-using Content.Shared.Hands; // Goobstation
+using Content.Shared.Hands;
 using Content.Shared.Inventory;
 using Content.Shared.Inventory.Events;
 using Robust.Client.Player;
 using Robust.Shared.Player;
+// Goobstation
 
 namespace Content.Client.Overlays;
 
@@ -29,6 +30,7 @@ public abstract class EquipmentHudSystem<T> : EntitySystem where T : IComponent
 
     [ViewVariables]
     protected bool IsActive;
+
     protected virtual SlotFlags TargetSlots => ~SlotFlags.POCKET;
     protected virtual bool WorksInHands => false; // Goobstation
 
@@ -71,20 +73,11 @@ public abstract class EquipmentHudSystem<T> : EntitySystem where T : IComponent
 
     protected virtual void DeactivateInternal() { }
 
-    private void OnStartup(Entity<T> ent, ref ComponentStartup args)
-    {
-        RefreshOverlay();
-    }
+    private void OnStartup(Entity<T> ent, ref ComponentStartup args) => RefreshOverlay();
 
-    private void OnRemove(Entity<T> ent, ref ComponentRemove args)
-    {
-        RefreshOverlay();
-    }
+    private void OnRemove(Entity<T> ent, ref ComponentRemove args) => RefreshOverlay();
 
-    private void OnPlayerAttached(LocalPlayerAttachedEvent args)
-    {
-        RefreshOverlay();
-    }
+    private void OnPlayerAttached(LocalPlayerAttachedEvent args) => RefreshOverlay();
 
     private void OnPlayerDetached(LocalPlayerDetachedEvent args)
     {
@@ -92,20 +85,11 @@ public abstract class EquipmentHudSystem<T> : EntitySystem where T : IComponent
             Deactivate();
     }
 
-    private void OnCompEquip(Entity<T> ent, ref GotEquippedEvent args)
-    {
-        RefreshOverlay();
-    }
+    private void OnCompEquip(Entity<T> ent, ref GotEquippedEvent args) => RefreshOverlay();
 
-    private void OnCompUnequip(Entity<T> ent, ref GotUnequippedEvent args)
-    {
-        RefreshOverlay();
-    }
+    private void OnCompUnequip(Entity<T> ent, ref GotUnequippedEvent args) => RefreshOverlay();
 
-    private void OnRoundRestart(RoundRestartCleanupEvent args)
-    {
-        Deactivate();
-    }
+    private void OnRoundRestart(RoundRestartCleanupEvent args) => Deactivate();
 
     // Goobstation
     protected virtual void OnRefreshEquipmentHud(Entity<T> ent, ref HeldRelayedEvent<RefreshEquipmentHudEvent<T>> args)
@@ -117,7 +101,8 @@ public abstract class EquipmentHudSystem<T> : EntitySystem where T : IComponent
         args.Args.Components.Add(ent.Comp);
     }
 
-    protected virtual void OnRefreshEquipmentHud(Entity<T> ent, ref InventoryRelayedEvent<RefreshEquipmentHudEvent<T>> args)
+    protected virtual void OnRefreshEquipmentHud(Entity<T> ent,
+        ref InventoryRelayedEvent<RefreshEquipmentHudEvent<T>> args)
     {
         // Goobstation edit
         args.Args.Active = true;

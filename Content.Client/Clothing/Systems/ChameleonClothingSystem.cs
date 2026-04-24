@@ -12,11 +12,9 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using System.Linq;
 using Content.Client.PDA;
 using Content.Shared.Clothing.Components;
 using Content.Shared.Clothing.EntitySystems;
-using Content.Shared.Inventory;
 using Robust.Client.GameObjects;
 using Robust.Shared.Prototypes;
 
@@ -40,19 +38,15 @@ public sealed class ChameleonClothingSystem : SharedChameleonClothingSystem
             PrepareAllVariants();
     }
 
-    private void HandleState(EntityUid uid, ChameleonClothingComponent component, ref AfterAutoHandleStateEvent args)
-    {
+    private void HandleState(EntityUid uid, ChameleonClothingComponent component, ref AfterAutoHandleStateEvent args) =>
         UpdateVisuals(uid, component);
-    }
 
     protected override void UpdateSprite(EntityUid uid, EntityPrototype proto)
     {
         base.UpdateSprite(uid, proto);
         if (TryComp(uid, out SpriteComponent? sprite)
             && proto.TryGetComponent(out SpriteComponent? otherSprite, Factory))
-        {
             sprite.CopyFrom(otherSprite);
-        }
 
         // Edgecase for PDAs to include visuals when UI is open
         if (TryComp(uid, out PdaBorderColorComponent? borderColor)

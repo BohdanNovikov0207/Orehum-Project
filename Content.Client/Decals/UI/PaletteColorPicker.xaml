@@ -10,10 +10,10 @@ SPDX-License-Identifier: MIT
                MinSize="250 500"
                SetSize="250 500">
     <BoxContainer Orientation="Vertical">
-        <ItemList Name="PaletteList" VerticalExpand="True" Access="Public"/>
+        <ItemList Name="PaletteList" VerticalExpand="True" Access="Public" />
         <BoxContainer Orientation="Horizontal">
-            <Label Text="Palette"/>
-            <OptionButton Name="Palettes"/>
+            <Label Text="Palette" />
+            <OptionButton Name="Palettes" />
         </BoxContainer>
     </BoxContainer>
 </DefaultWindow>

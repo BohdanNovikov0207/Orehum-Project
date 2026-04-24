@@ -34,227 +34,213 @@ using Robust.Shared.Configuration;
 using Robust.Shared.Prototypes;
 using static Content.Shared.Access.Components.IdCardConsoleComponent;
 
-namespace Content.Client.Access.UI
+namespace Content.Client.Access.UI;
+
+[GenerateTypedNameReferences]
+public sealed partial class IdCardConsoleWindow : DefaultWindow
 {
-    [GenerateTypedNameReferences]
-    public sealed partial class IdCardConsoleWindow : DefaultWindow
+    // The job that will be picked if the ID doesn't have a job on the station.
+    private static readonly ProtoId<JobPrototype> _defaultJob = "Passenger";
+
+    private readonly AccessLevelControl _accessButtons = new();
+    [Dependency] private readonly IConfigurationManager _cfgManager = default!;
+    private readonly List<string> _jobPrototypeIds = new();
+    [Dependency] private readonly ILogManager _logManager = default!;
+    private readonly ISawmill _logMill = default!;
+    private readonly int _maxIdJobLength;
+
+    // CCVar.
+    private readonly int _maxNameLength;
+
+    private readonly IdCardConsoleBoundUserInterface _owner;
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+
+    private string? _lastFullName;
+    private string? _lastJobProto;
+    private string? _lastJobTitle;
+
+    public IdCardConsoleWindow(IdCardConsoleBoundUserInterface owner,
+        IPrototypeManager prototypeManager,
+        List<ProtoId<AccessLevelPrototype>> accessLevels)
     {
-        [Dependency] private readonly IConfigurationManager _cfgManager = default!;
-        [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-        [Dependency] private readonly ILogManager _logManager = default!;
-        private readonly ISawmill _logMill = default!;
+        RobustXamlLoader.Load(this);
+        IoCManager.InjectDependencies(this);
+        _logMill = _logManager.GetSawmill(SharedIdCardConsoleSystem.Sawmill);
 
-        private readonly IdCardConsoleBoundUserInterface _owner;
+        _owner = owner;
 
-        // CCVar.
-        private int _maxNameLength;
-        private int _maxIdJobLength;
+        _maxNameLength = _cfgManager.GetCVar(CCVars.MaxNameLength);
+        _maxIdJobLength = _cfgManager.GetCVar(CCVars.MaxIdJobLength);
 
-        private AccessLevelControl _accessButtons = new();
-        private readonly List<string> _jobPrototypeIds = new();
-
-        private string? _lastFullName;
-        private string? _lastJobTitle;
-        private string? _lastJobProto;
-
-        // The job that will be picked if the ID doesn't have a job on the station.
-        private static ProtoId<JobPrototype> _defaultJob = "Passenger";
-
-        public IdCardConsoleWindow(IdCardConsoleBoundUserInterface owner, IPrototypeManager prototypeManager,
-            List<ProtoId<AccessLevelPrototype>> accessLevels)
+        FullNameLineEdit.OnTextEntered += _ => SubmitData();
+        FullNameLineEdit.IsValid = s => s.Length <= _maxNameLength;
+        FullNameLineEdit.OnTextChanged += _ =>
         {
-            RobustXamlLoader.Load(this);
-            IoCManager.InjectDependencies(this);
-            _logMill = _logManager.GetSawmill(SharedIdCardConsoleSystem.Sawmill);
+            FullNameSaveButton.Disabled = FullNameSaveButton.Text == _lastFullName;
+        };
+        FullNameSaveButton.OnPressed += _ => SubmitData();
 
-            _owner = owner;
+        JobTitleLineEdit.OnTextEntered += _ => SubmitData();
+        JobTitleLineEdit.IsValid = s => s.Length <= _maxIdJobLength;
+        JobTitleLineEdit.OnTextChanged += _ =>
+        {
+            JobTitleSaveButton.Disabled = JobTitleLineEdit.Text == _lastJobTitle;
+        };
+        JobTitleSaveButton.OnPressed += _ => SubmitData();
+        // Goobstation Start
+        SearchLineEdit.OnTextChanged += args =>
+        {
+            var query = args.Text.Trim();
+            var containerChild = AccessLevelControlContainer.GetChild(0);
+            containerChild.RemoveAllChildren();
 
-            _maxNameLength = _cfgManager.GetCVar(CCVars.MaxNameLength);
-            _maxIdJobLength = _cfgManager.GetCVar(CCVars.MaxIdJobLength);
-
-            FullNameLineEdit.OnTextEntered += _ => SubmitData();
-            FullNameLineEdit.IsValid = s => s.Length <= _maxNameLength;
-            FullNameLineEdit.OnTextChanged += _ =>
+            if (string.IsNullOrEmpty(query))
             {
-                FullNameSaveButton.Disabled = FullNameSaveButton.Text == _lastFullName;
-            };
-            FullNameSaveButton.OnPressed += _ => SubmitData();
-
-            JobTitleLineEdit.OnTextEntered += _ => SubmitData();
-            JobTitleLineEdit.IsValid = s => s.Length <= _maxIdJobLength;
-            JobTitleLineEdit.OnTextChanged += _ =>
-            {
-                JobTitleSaveButton.Disabled = JobTitleLineEdit.Text == _lastJobTitle;
-            };
-            JobTitleSaveButton.OnPressed += _ => SubmitData();
-            // Goobstation Start
-            SearchLineEdit.OnTextChanged += args =>
-            {
-                var query = args.Text.Trim();
-                var containerChild = AccessLevelControlContainer.GetChild(0);
-                containerChild.RemoveAllChildren();
-
-                if (string.IsNullOrEmpty(query))
+                foreach (var button in _accessButtons.ButtonsList.Values)
                 {
-                    foreach (var button in _accessButtons.ButtonsList.Values)
-                        containerChild.AddChild(button);
-                    return;
+                    containerChild.AddChild(button);
                 }
 
-                foreach (var (id, button) in _accessButtons.ButtonsList)
-                    if (id.Id.Contains(query, StringComparison.CurrentCultureIgnoreCase))
-                        containerChild.AddChild(button);
-            };
-            // Goobstation End
-
-            var jobs = _prototypeManager.EnumeratePrototypes<JobPrototype>().ToList();
-            jobs.Sort((x, y) => string.Compare(x.LocalizedName, y.LocalizedName, StringComparison.CurrentCulture));
-
-            foreach (var job in jobs)
-            {
-                if (!job.OverrideConsoleVisibility.GetValueOrDefault(job.SetPreference))
-                {
-                    continue;
-                }
-
-                _jobPrototypeIds.Add(job.ID);
-                JobPresetOptionButton.AddItem(Loc.GetString(job.Name), _jobPrototypeIds.Count - 1);
-            }
-
-            JobPresetOptionButton.OnItemSelected += SelectJobPreset;
-            _accessButtons.Populate(accessLevels, prototypeManager);
-            AccessLevelControlContainer.AddChild(_accessButtons);
-
-            foreach (var (id, button) in _accessButtons.ButtonsList)
-            {
-                button.OnPressed += _ => SubmitData();
-            }
-        }
-
-        private void ClearAllAccess()
-        {
-            foreach (var button in _accessButtons.ButtonsList.Values)
-            {
-                if (button.Pressed)
-                {
-                    button.Pressed = false;
-                }
-            }
-        }
-
-        private void SelectJobPreset(OptionButton.ItemSelectedEventArgs args)
-        {
-            if (!_prototypeManager.TryIndex(_jobPrototypeIds[args.Id], out JobPrototype? job))
-            {
                 return;
             }
 
-            JobTitleLineEdit.Text = Loc.GetString(job.Name);
-            args.Button.SelectId(args.Id);
+            foreach (var (id, button) in _accessButtons.ButtonsList)
+            {
+                if (id.Id.Contains(query, StringComparison.CurrentCultureIgnoreCase))
+                    containerChild.AddChild(button);
+            }
+        };
+        // Goobstation End
 
-            ClearAllAccess();
+        var jobs = _prototypeManager.EnumeratePrototypes<JobPrototype>().ToList();
+        jobs.Sort((x, y) => string.Compare(x.LocalizedName, y.LocalizedName, StringComparison.CurrentCulture));
 
-            // this is a sussy way to do this
-            foreach (var access in job.Access)
+        foreach (var job in jobs)
+        {
+            if (!job.OverrideConsoleVisibility.GetValueOrDefault(job.SetPreference))
+                continue;
+
+            _jobPrototypeIds.Add(job.ID);
+            JobPresetOptionButton.AddItem(Loc.GetString(job.Name), _jobPrototypeIds.Count - 1);
+        }
+
+        JobPresetOptionButton.OnItemSelected += SelectJobPreset;
+        _accessButtons.Populate(accessLevels, prototypeManager);
+        AccessLevelControlContainer.AddChild(_accessButtons);
+
+        foreach (var (id, button) in _accessButtons.ButtonsList)
+        {
+            button.OnPressed += _ => SubmitData();
+        }
+    }
+
+    private void ClearAllAccess()
+    {
+        foreach (var button in _accessButtons.ButtonsList.Values)
+        {
+            if (button.Pressed)
+                button.Pressed = false;
+        }
+    }
+
+    private void SelectJobPreset(OptionButton.ItemSelectedEventArgs args)
+    {
+        if (!_prototypeManager.TryIndex(_jobPrototypeIds[args.Id], out JobPrototype? job))
+            return;
+
+        JobTitleLineEdit.Text = Loc.GetString(job.Name);
+        args.Button.SelectId(args.Id);
+
+        ClearAllAccess();
+
+        // this is a sussy way to do this
+        foreach (var access in job.Access)
+        {
+            if (_accessButtons.ButtonsList.TryGetValue(access, out var button) && !button.Disabled)
+                button.Pressed = true;
+        }
+
+        foreach (var group in job.AccessGroups)
+        {
+            if (!_prototypeManager.TryIndex(group, out var groupPrototype))
+                continue;
+
+            foreach (var access in groupPrototype.Tags)
             {
                 if (_accessButtons.ButtonsList.TryGetValue(access, out var button) && !button.Disabled)
-                {
                     button.Pressed = true;
-                }
             }
-
-            foreach (var group in job.AccessGroups)
-            {
-                if (!_prototypeManager.TryIndex(group, out AccessGroupPrototype? groupPrototype))
-                {
-                    continue;
-                }
-
-                foreach (var access in groupPrototype.Tags)
-                {
-                    if (_accessButtons.ButtonsList.TryGetValue(access, out var button) && !button.Disabled)
-                    {
-                        button.Pressed = true;
-                    }
-                }
-            }
-
-            SubmitData();
         }
 
-        public void UpdateState(IdCardConsoleBoundUserInterfaceState state)
-        {
-            PrivilegedIdButton.Text = state.IsPrivilegedIdPresent
-                ? Loc.GetString("id-card-console-window-eject-button")
-                : Loc.GetString("id-card-console-window-insert-button");
+        SubmitData();
+    }
 
-            PrivilegedIdLabel.Text = state.PrivilegedIdName;
+    public void UpdateState(IdCardConsoleBoundUserInterfaceState state)
+    {
+        PrivilegedIdButton.Text = state.IsPrivilegedIdPresent
+            ? Loc.GetString("id-card-console-window-eject-button")
+            : Loc.GetString("id-card-console-window-insert-button");
 
-            TargetIdButton.Text = state.IsTargetIdPresent
-                ? Loc.GetString("id-card-console-window-eject-button")
-                : Loc.GetString("id-card-console-window-insert-button");
+        PrivilegedIdLabel.Text = state.PrivilegedIdName;
 
-            TargetIdLabel.Text = state.TargetIdName;
+        TargetIdButton.Text = state.IsTargetIdPresent
+            ? Loc.GetString("id-card-console-window-eject-button")
+            : Loc.GetString("id-card-console-window-insert-button");
 
-            var interfaceEnabled =
-                state.IsPrivilegedIdPresent && state.IsPrivilegedIdAuthorized && state.IsTargetIdPresent;
+        TargetIdLabel.Text = state.TargetIdName;
 
-            var fullNameDirty = _lastFullName != null && FullNameLineEdit.Text != state.TargetIdFullName;
-            var jobTitleDirty = _lastJobTitle != null && JobTitleLineEdit.Text != state.TargetIdJobTitle;
+        var interfaceEnabled =
+            state.IsPrivilegedIdPresent && state.IsPrivilegedIdAuthorized && state.IsTargetIdPresent;
 
-            FullNameLabel.Modulate = interfaceEnabled ? Color.White : Color.Gray;
-            FullNameLineEdit.Editable = interfaceEnabled;
-            if (!fullNameDirty)
-            {
-                FullNameLineEdit.Text = state.TargetIdFullName ?? string.Empty;
-            }
+        var fullNameDirty = _lastFullName != null && FullNameLineEdit.Text != state.TargetIdFullName;
+        var jobTitleDirty = _lastJobTitle != null && JobTitleLineEdit.Text != state.TargetIdJobTitle;
 
-            FullNameSaveButton.Disabled = !interfaceEnabled || !fullNameDirty;
+        FullNameLabel.Modulate = interfaceEnabled ? Color.White : Color.Gray;
+        FullNameLineEdit.Editable = interfaceEnabled;
+        if (!fullNameDirty)
+            FullNameLineEdit.Text = state.TargetIdFullName ?? string.Empty;
 
-            JobTitleLabel.Modulate = interfaceEnabled ? Color.White : Color.Gray;
-            JobTitleLineEdit.Editable = interfaceEnabled;
-            if (!jobTitleDirty)
-            {
-                JobTitleLineEdit.Text = state.TargetIdJobTitle ?? string.Empty;
-            }
+        FullNameSaveButton.Disabled = !interfaceEnabled || !fullNameDirty;
 
-            JobTitleSaveButton.Disabled = !interfaceEnabled || !jobTitleDirty;
+        JobTitleLabel.Modulate = interfaceEnabled ? Color.White : Color.Gray;
+        JobTitleLineEdit.Editable = interfaceEnabled;
+        if (!jobTitleDirty)
+            JobTitleLineEdit.Text = state.TargetIdJobTitle ?? string.Empty;
 
-            JobPresetOptionButton.Disabled = !interfaceEnabled;
+        JobTitleSaveButton.Disabled = !interfaceEnabled || !jobTitleDirty;
 
-            _accessButtons.UpdateState(state.TargetIdAccessList?.ToList() ??
-                                       new List<ProtoId<AccessLevelPrototype>>(),
-                                       state.AllowedModifyAccessList?.ToList() ??
-                                       new List<ProtoId<AccessLevelPrototype>>());
+        JobPresetOptionButton.Disabled = !interfaceEnabled;
 
-            var jobIndex = _jobPrototypeIds.IndexOf(state.TargetIdJobPrototype);
-            // If the job index is < 0 that means they don't have a job registered in the station records
-            // or the IdCardComponent's JobPrototype field.
-            // For example, a new ID from a box would have no job index.
-            if (jobIndex < 0)
-            {
-                jobIndex = _jobPrototypeIds.IndexOf(_defaultJob);
-            }
+        _accessButtons.UpdateState(state.TargetIdAccessList?.ToList() ??
+                                   new List<ProtoId<AccessLevelPrototype>>(),
+            state.AllowedModifyAccessList?.ToList() ??
+            new List<ProtoId<AccessLevelPrototype>>());
 
-            JobPresetOptionButton.SelectId(jobIndex);
+        var jobIndex = _jobPrototypeIds.IndexOf(state.TargetIdJobPrototype);
+        // If the job index is < 0 that means they don't have a job registered in the station records
+        // or the IdCardComponent's JobPrototype field.
+        // For example, a new ID from a box would have no job index.
+        if (jobIndex < 0)
+            jobIndex = _jobPrototypeIds.IndexOf(_defaultJob);
 
-            _lastFullName = state.TargetIdFullName;
-            _lastJobTitle = state.TargetIdJobTitle;
-            _lastJobProto = state.TargetIdJobPrototype;
-        }
+        JobPresetOptionButton.SelectId(jobIndex);
 
-        private void SubmitData()
-        {
-            // Don't send this if it isn't dirty.
-            var jobProtoDirty = _lastJobProto != null &&
-                                _jobPrototypeIds[JobPresetOptionButton.SelectedId] != _lastJobProto;
+        _lastFullName = state.TargetIdFullName;
+        _lastJobTitle = state.TargetIdJobTitle;
+        _lastJobProto = state.TargetIdJobPrototype;
+    }
 
-            _owner.SubmitData(
-                FullNameLineEdit.Text,
-                JobTitleLineEdit.Text,
-                // Iterate over the buttons dictionary, filter by `Pressed`, only get key from the key/value pair
-                _accessButtons.ButtonsList.Where(x => x.Value.Pressed).Select(x => x.Key).ToList(),
-                jobProtoDirty ? _jobPrototypeIds[JobPresetOptionButton.SelectedId] : string.Empty);
-        }
+    private void SubmitData()
+    {
+        // Don't send this if it isn't dirty.
+        var jobProtoDirty = _lastJobProto != null &&
+                            _jobPrototypeIds[JobPresetOptionButton.SelectedId] != _lastJobProto;
+
+        _owner.SubmitData(
+            FullNameLineEdit.Text,
+            JobTitleLineEdit.Text,
+            // Iterate over the buttons dictionary, filter by `Pressed`, only get key from the key/value pair
+            _accessButtons.ButtonsList.Where(x => x.Value.Pressed).Select(x => x.Key).ToList(),
+            jobProtoDirty ? _jobPrototypeIds[JobPresetOptionButton.SelectedId] : string.Empty);
     }
 }

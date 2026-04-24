@@ -14,10 +14,6 @@ namespace Content.Client.Administration.UI.BanList.Bans;
 [GenerateTypedNameReferences]
 public sealed partial class BanListLine : BoxContainer, IBanListLine<SharedServerBan>
 {
-    public SharedServerBan Ban { get; }
-
-    public event Action<BanListLine>? IdsClicked;
-
     public BanListLine(SharedServerBan ban)
     {
         RobustXamlLoader.Load(this);
@@ -28,10 +24,11 @@ public sealed partial class BanListLine : BoxContainer, IBanListLine<SharedServe
         BanListEui.SetData(this, ban);
     }
 
-    private void IdsPressed(ButtonEventArgs buttonEventArgs)
-    {
-        IdsClicked?.Invoke(this);
-    }
+    public SharedServerBan Ban { get; }
+
+    public event Action<BanListLine>? IdsClicked;
+
+    private void IdsPressed(ButtonEventArgs buttonEventArgs) => IdsClicked?.Invoke(this);
 
     protected override void Dispose(bool disposing)
     {

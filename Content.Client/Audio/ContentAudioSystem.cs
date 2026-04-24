@@ -22,14 +22,6 @@ namespace Content.Client.Audio;
 
 public sealed partial class ContentAudioSystem : SharedContentAudioSystem
 {
-    // Need how much volume to change per tick and just remove it when it drops below "0"
-    private readonly Dictionary<EntityUid, float> _fadingOut = new();
-
-    // Need volume change per tick + target volume.
-    private readonly Dictionary<EntityUid, (float VolumeChange, float TargetVolume)> _fadingIn = new();
-
-    private readonly List<EntityUid> _fadeToRemove = new();
-
     private const float MinVolume = -32f;
     private const float DefaultDuration = 2f;
 
@@ -48,6 +40,14 @@ public sealed partial class ContentAudioSystem : SharedContentAudioSystem
     public const float VoiceChatMultiplier = 5f;
     public const float BarksMultiplier = 3f; // Goob Station - Barks
     public const float AdminNotificationsMultiplier = 1f; // Goobstation - Admin Notifications
+
+    private readonly List<EntityUid> _fadeToRemove = new();
+
+    // Need volume change per tick + target volume.
+    private readonly Dictionary<EntityUid, (float VolumeChange, float TargetVolume)> _fadingIn = new();
+
+    // Need how much volume to change per tick and just remove it when it drops below "0"
+    private readonly Dictionary<EntityUid, float> _fadingOut = new();
 
     public override void Initialize()
     {
@@ -75,14 +75,10 @@ public sealed partial class ContentAudioSystem : SharedContentAudioSystem
         SilenceAudio();
 
         if (oldMusicGain != null)
-        {
             Audio.SetGain(lobbyMusic, oldMusicGain.Value, lobbyMusicComp);
-        }
 
         if (oldAudioGain != null)
-        {
             Audio.SetGain(restartAudio, oldAudioGain.Value, restartComp);
-        }
         PlayRestartSound(ev);
     }
 
@@ -175,9 +171,7 @@ public sealed partial class ContentAudioSystem : SharedContentAudioSystem
             _audio.SetVolume(stream, volume, component);
 
             if (component.Volume.Equals(target))
-            {
                 _fadeToRemove.Add(stream);
-            }
         }
 
         foreach (var stream in _fadeToRemove)

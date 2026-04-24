@@ -13,10 +13,10 @@ namespace Content.Client._White.ListViewSelector;
 public sealed class ListViewSelectorBUI(EntityUid owner, Enum uiKey) : BoundUserInterface(owner, uiKey)
 {
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-
-    private FancyWindow _window = new();
     private BoxContainer? _itemsContainer;
     private Dictionary<string, object> _metaData = new();
+
+    private FancyWindow _window = new();
 
     protected override void Open()
     {
@@ -51,18 +51,18 @@ public sealed class ListViewSelectorBUI(EntityUid owner, Enum uiKey) : BoundUser
             VerticalExpand = true,
             MinWidth = 350,
             MinHeight = 400,
-            Title = Loc.GetString("list-view-window-default-title")
+            Title = Loc.GetString("list-view-window-default-title"),
         };
 
         var scrollContainer = new ScrollContainer
         {
             HorizontalExpand = true,
-            VerticalExpand = true
+            VerticalExpand = true,
         };
 
         var itemsContainer = new BoxContainer
         {
-            Orientation = BoxContainer.LayoutOrientation.Vertical
+            Orientation = BoxContainer.LayoutOrientation.Vertical,
         };
 
         scrollContainer.AddChild(itemsContainer);

@@ -19,10 +19,7 @@ public sealed class PowerChargeBoundUserInterface : BoundUserInterface
     {
     }
 
-    public void SetPowerSwitch(bool on)
-    {
-        SendMessage(new SwitchChargingMachineMessage(on));
-    }
+    public void SetPowerSwitch(bool on) => SendMessage(new SwitchChargingMachineMessage(on));
 
     protected override void Open()
     {

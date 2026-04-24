@@ -9,5 +9,4 @@ namespace Content.Client.Damage;
 
 public sealed class DestructibleSystem : SharedDestructibleSystem
 {
-
 }

@@ -41,28 +41,26 @@ public sealed class StationAiBoundUserInterface(EntityUid owner, Enum uiKey) : B
         _menu.Track(Owner);
         var buttonModels = ConvertToButtons(ev.Actions);
         _menu.SetButtons(buttonModels);
-        
+
         _menu.Open();
     }
 
     private IEnumerable<RadialMenuActionOption> ConvertToButtons(IReadOnlyList<StationAiRadial> actions)
     {
         var models = new RadialMenuActionOption[actions.Count];
-        for (int i = 0; i < actions.Count; i++)
+        for (var i = 0; i < actions.Count; i++)
         {
             var action = actions[i];
             models[i] = new RadialMenuActionOption<BaseStationAiAction>(HandleRadialMenuClick, action.Event)
             {
                 Sprite = action.Sprite,
-                ToolTip = action.Tooltip
+                ToolTip = action.Tooltip,
             };
         }
 
         return models;
     }
 
-    private void HandleRadialMenuClick(BaseStationAiAction p)
-    {
+    private void HandleRadialMenuClick(BaseStationAiAction p) =>
         SendPredictedMessage(new StationAiRadialMessage { Event = p });
-    }
 }

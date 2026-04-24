@@ -32,18 +32,18 @@ namespace Content.Client.Administration.UI.SpawnExplosion;
 public sealed partial class SpawnExplosionWindow : DefaultWindow
 {
     [Dependency] private readonly IClientConsoleHost _conHost = default!;
-    [Dependency] private readonly IPlayerManager _playerManager = default!;
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly IEntityManager _entMan = default!;
-    private readonly SharedMapSystem _mapSystem;
-    private readonly SharedTransformSystem _transform = default!;
 
     private readonly SpawnExplosionEui _eui;
-    private List<MapId> _mapData = new();
-    private List<string> _explosionTypes = new();
+    private readonly List<string> _explosionTypes = new();
+    private readonly List<MapId> _mapData = new();
+    private readonly SharedMapSystem _mapSystem;
+    [Dependency] private readonly IPlayerManager _playerManager = default!;
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    private readonly SharedTransformSystem _transform = default!;
 
     /// <summary>
-    ///     Used to prevent unnecessary preview updates when setting fields (e.g., updating position)..
+    /// Used to prevent unnecessary preview updates when setting fields (e.g., updating position)..
     /// </summary>
     private bool _pausePreview;
 
@@ -57,15 +57,15 @@ public sealed partial class SpawnExplosionWindow : DefaultWindow
 
         ExplosionOption.OnItemSelected += ExplosionSelected;
         MapOptions.OnItemSelected += MapSelected;
-        Recentre.OnPressed += (_) => SetLocation();
+        Recentre.OnPressed += _ => SetLocation();
         Spawn.OnPressed += SubmitButtonOnOnPressed;
 
-        Preview.OnToggled += (_) => UpdatePreview();
-        MapX.OnValueChanged += (_) => UpdatePreview();
-        MapY.OnValueChanged += (_) => UpdatePreview();
-        Intensity.OnValueChanged += (_) => UpdatePreview();
-        Slope.OnValueChanged += (_) => UpdatePreview();
-        MaxIntensity.OnValueChanged += (_) => UpdatePreview();
+        Preview.OnToggled += _ => UpdatePreview();
+        MapX.OnValueChanged += _ => UpdatePreview();
+        MapY.OnValueChanged += _ => UpdatePreview();
+        Intensity.OnValueChanged += _ => UpdatePreview();
+        Slope.OnValueChanged += _ => UpdatePreview();
+        MaxIntensity.OnValueChanged += _ => UpdatePreview();
     }
 
     private void ExplosionSelected(ItemSelectedEventArgs args)
@@ -109,7 +109,7 @@ public sealed partial class SpawnExplosionWindow : DefaultWindow
     }
 
     /// <summary>
-    ///     Set the current grid & indices based on the attached entities current location.
+    /// Set the current grid & indices based on the attached entities current location.
     /// </summary>
     private void SetLocation()
     {
@@ -120,7 +120,7 @@ public sealed partial class SpawnExplosionWindow : DefaultWindow
 
         _pausePreview = true;
         MapOptions.Select(_mapData.IndexOf(transform.MapID));
-        (MapX.Value, MapY.Value) = _transform.GetMapCoordinates(_playerManager.LocalEntity!.Value, xform: transform).Position;
+        (MapX.Value, MapY.Value) = _transform.GetMapCoordinates(_playerManager.LocalEntity!.Value, transform).Position;
         _pausePreview = false;
 
         UpdatePreview();
@@ -152,7 +152,8 @@ public sealed partial class SpawnExplosionWindow : DefaultWindow
         // so assemble command arguments:
         var mapId = _mapData[MapOptions.SelectedId];
         var explosionType = _explosionTypes[ExplosionOption.SelectedId];
-        var cmd = $"explosion {Intensity.Value} {Slope.Value} {MaxIntensity.Value} {MapX.Value} {MapY.Value} {mapId} {explosionType}";
+        var cmd =
+            $"explosion {Intensity.Value} {Slope.Value} {MaxIntensity.Value} {MapX.Value} {MapY.Value} {mapId} {explosionType}";
 
         _conHost.ExecuteCommand(cmd);
     }

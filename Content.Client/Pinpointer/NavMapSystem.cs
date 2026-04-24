@@ -94,7 +94,9 @@ public sealed partial class NavMapSystem : SharedNavMapSystem
         var regionOwnersToRemove = prevRegionOwners.Except(validRegionOwners);
 
         foreach (var regionOwnerRemoved in regionOwnersToRemove)
+        {
             RemoveNavMapRegion(uid, component, regionOwnerRemoved);
+        }
 
         // Modify chunks
         foreach (var (origin, chunk) in modifiedChunks)

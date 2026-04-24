@@ -25,11 +25,9 @@ public sealed partial class PickSurgeryWindow : FancyWindow
     [Dependency] private readonly IPrototypeManager _proto = default!;
     private readonly SharedSurgerySystem _surgery;
 
-    public event Action<IAutodocStep>? OnAddStep;
-
     private BodyPartType? _part;
-    private BodyPartSymmetry? _symmetry;
     private EntProtoId<SurgeryComponent>? _surgeryId;
+    private BodyPartSymmetry? _symmetry;
 
     public PickSurgeryWindow()
     {
@@ -48,7 +46,7 @@ public sealed partial class PickSurgeryWindow : FancyWindow
 
         foreach (var symmetry in Enum.GetValues<BodyPartSymmetry>())
         {
-            var name = Loc.GetString("autodoc-body-symmetry-" + symmetry.ToString());
+            var name = Loc.GetString("autodoc-body-symmetry-" + symmetry);
             options.AddItem(name, symmetry);
         }
 
@@ -63,7 +61,7 @@ public sealed partial class PickSurgeryWindow : FancyWindow
 
         foreach (var part in Enum.GetValues<BodyPartType>())
         {
-            var name = Loc.GetString("autodoc-body-part-" + part.ToString());
+            var name = Loc.GetString("autodoc-body-part-" + part);
             Parts.AddItem(name, metadata: part);
         }
 
@@ -98,17 +96,19 @@ public sealed partial class PickSurgeryWindow : FancyWindow
 
         SubmitButton.OnPressed += _ =>
         {
-            var step = new SurgeryAutodocStep()
+            var step = new SurgeryAutodocStep
             {
                 Part = _part!.Value,
                 Symmetry = _symmetry,
-                Surgery = _surgeryId!.Value
+                Surgery = _surgeryId!.Value,
             };
             OnAddStep?.Invoke(step);
         };
 
         UpdateSurgeries();
     }
+
+    public event Action<IAutodocStep>? OnAddStep;
 
     // doesn't handle prototype reload so you have to reopen the window to see new surgeries
     private void UpdateSurgeries()
@@ -136,19 +136,18 @@ public sealed partial class PickSurgeryWindow : FancyWindow
             }
 
             var partOk = comp.Parts.Contains(part);
-            var symmetryOk = (comp.Symmetry == null || _symmetry == null) ? true : comp.Symmetry == _symmetry;
+            var symmetryOk = comp.Symmetry == null || _symmetry == null ? true : comp.Symmetry == _symmetry;
 
             var passesFilter = (partOk && symmetryOk) ^ comp.Inverse;
 
             if (passesFilter)
                 Surgeries.AddItem(name, metadata: protoId);
         }
+
         Surgeries.SortItemsByText();
     }
 
-    private void UpdateSubmit()
-    {
+    private void UpdateSubmit() =>
         // symmetry is optional, others are not
         SubmitButton.Disabled = _part == null || _surgeryId == null;
-    }
 }

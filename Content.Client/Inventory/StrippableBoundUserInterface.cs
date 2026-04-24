@@ -67,268 +67,273 @@ using Robust.Shared.Map;
 using static Content.Client.Inventory.ClientInventorySystem;
 using static Robust.Client.UserInterface.Control;
 
-namespace Content.Client.Inventory
+namespace Content.Client.Inventory;
+
+[UsedImplicitly]
+public sealed class StrippableBoundUserInterface : BoundUserInterface
 {
-    [UsedImplicitly]
-    public sealed class StrippableBoundUserInterface : BoundUserInterface
+    [ViewVariables]
+    private const int ButtonSeparation = 4;
+
+    [ViewVariables]
+    public const string HiddenPocketEntityId = "StrippingHiddenEntity";
+
+    private readonly SharedCuffableSystem _cuffable;
+
+    private readonly ExamineSystem _examine;
+    private readonly HandsSystem _hands;
+    private readonly InventorySystem _inv;
+    [Dependency] private readonly IPlayerManager _player = default!;
+    private readonly StrippableSystem _strippable;
+    [Dependency] private readonly IUserInterfaceManager _ui = default!;
+
+    [ViewVariables]
+    private readonly EntityUid _virtualHiddenEntity;
+
+    /// <summary>
+    /// The current amount of added hand buttons.
+    /// </summary>
+    [ViewVariables]
+    private int _handCount;
+
+    /// <summary>
+    /// The current shape of the inventory, needed to calculate the window size.
+    /// </summary>
+    [ViewVariables]
+    private Vector2i _inventoryDimensions;
+
+    [ViewVariables]
+    private StrippingMenu? _strippingMenu;
+
+    public StrippableBoundUserInterface(EntityUid owner, Enum uiKey) : base(owner, uiKey)
     {
-        [Dependency] private readonly IPlayerManager _player = default!;
-        [Dependency] private readonly IUserInterfaceManager _ui = default!;
+        _examine = EntMan.System<ExamineSystem>();
+        _hands = EntMan.System<HandsSystem>();
+        _inv = EntMan.System<InventorySystem>();
+        _cuffable = EntMan.System<SharedCuffableSystem>();
+        _strippable = EntMan.System<StrippableSystem>();
 
-        private readonly ExamineSystem _examine;
-        private readonly HandsSystem _hands;
-        private readonly InventorySystem _inv;
-        private readonly SharedCuffableSystem _cuffable;
-        private readonly StrippableSystem _strippable;
+        _virtualHiddenEntity = EntMan.SpawnEntity(HiddenPocketEntityId, MapCoordinates.Nullspace);
+    }
 
-        [ViewVariables]
-        private const int ButtonSeparation = 4;
+    protected override void Open()
+    {
+        base.Open();
 
-        [ViewVariables]
-        public const string HiddenPocketEntityId = "StrippingHiddenEntity";
+        _strippingMenu = this.CreateWindowCenteredLeft<StrippingMenu>();
+        _strippingMenu.OnDirty += UpdateMenu;
+        _strippingMenu.Title = Loc.GetString("strippable-bound-user-interface-stripping-menu-title",
+            ("ownerName", Identity.Name(Owner, EntMan)));
+    }
 
-        [ViewVariables]
-        private StrippingMenu? _strippingMenu;
+    protected override void Dispose(bool disposing)
+    {
+        if (!disposing)
+            return;
 
-        [ViewVariables]
-        private readonly EntityUid _virtualHiddenEntity;
+        if (_strippingMenu != null)
+            _strippingMenu.OnDirty -= UpdateMenu;
 
-        /// <summary>
-        /// The current amount of added hand buttons.
-        /// </summary>
-        [ViewVariables]
-        private int _handCount;
+        EntMan.DeleteEntity(_virtualHiddenEntity);
+        base.Dispose(disposing);
+    }
 
-        /// <summary>
-        /// The current shape of the inventory, needed to calculate the window size.
-        /// </summary>
-        [ViewVariables]
-        private Vector2i _inventoryDimensions;
+    public void DirtyMenu()
+    {
+        if (_strippingMenu != null)
+            _strippingMenu.Dirty = true;
+    }
 
-        public StrippableBoundUserInterface(EntityUid owner, Enum uiKey) : base(owner, uiKey)
+    public void UpdateMenu()
+    {
+        if (_strippingMenu == null)
+            return;
+
+        _strippingMenu.ClearButtons();
+        _handCount = 0;
+        _inventoryDimensions = Vector2i.Zero;
+
+        if (EntMan.TryGetComponent<InventoryComponent>(Owner, out var inv))
         {
-            _examine = EntMan.System<ExamineSystem>();
-            _hands = EntMan.System<HandsSystem>();
-            _inv = EntMan.System<InventorySystem>();
-            _cuffable = EntMan.System<SharedCuffableSystem>();
-            _strippable = EntMan.System<StrippableSystem>();
-
-            _virtualHiddenEntity = EntMan.SpawnEntity(HiddenPocketEntityId, MapCoordinates.Nullspace);
-        }
-
-        protected override void Open()
-        {
-            base.Open();
-
-            _strippingMenu = this.CreateWindowCenteredLeft<StrippingMenu>();
-            _strippingMenu.OnDirty += UpdateMenu;
-            _strippingMenu.Title = Loc.GetString("strippable-bound-user-interface-stripping-menu-title", ("ownerName", Identity.Name(Owner, EntMan)));
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (!disposing)
-                return;
-
-            if (_strippingMenu != null)
-                _strippingMenu.OnDirty -= UpdateMenu;
-
-            EntMan.DeleteEntity(_virtualHiddenEntity);
-            base.Dispose(disposing);
-        }
-
-        public void DirtyMenu()
-        {
-            if (_strippingMenu != null)
-                _strippingMenu.Dirty = true;
-        }
-
-        public void UpdateMenu()
-        {
-            if (_strippingMenu == null)
-                return;
-
-            _strippingMenu.ClearButtons();
-            _handCount = 0;
-            _inventoryDimensions = Vector2i.Zero;
-
-            if (EntMan.TryGetComponent<InventoryComponent>(Owner, out var inv))
+            foreach (var slot in inv.Slots)
             {
-                foreach (var slot in inv.Slots)
-                {
-                    AddInventoryButton(Owner, slot.Name, inv);
-                }
-            }
-
-            if (EntMan.TryGetComponent<HandsComponent>(Owner, out var handsComp) && handsComp.CanBeStripped)
-            {
-                // good ol hands shit code. there is a GuiHands comparer that does the same thing... but these are hands
-                // and not gui hands... which are different...
-                foreach (var (id, hand) in handsComp.Hands)
-                {
-                    if (hand.Location != HandLocation.Right)
-                        continue;
-
-                    AddHandButton((Owner, handsComp), id, hand);
-                }
-
-                foreach (var (id, hand) in handsComp.Hands)
-                {
-                    if (hand.Location != HandLocation.Middle)
-                        continue;
-
-                    AddHandButton((Owner, handsComp), id, hand);
-                }
-
-                foreach (var (id, hand) in handsComp.Hands)
-                {
-                    if (hand.Location != HandLocation.Left)
-                        continue;
-
-                    AddHandButton((Owner, handsComp), id, hand);
-                }
-            }
-
-            // snare-removal button. This is just the old button before the change to item slots. It is pretty out of place.
-            if (EntMan.TryGetComponent<EnsnareableComponent>(Owner, out var snare) && snare.IsEnsnared)
-            {
-                var button = new Button()
-                {
-                    Text = Loc.GetString("strippable-bound-user-interface-stripping-menu-ensnare-button"),
-                    StyleClasses = { StyleBase.ButtonOpenRight }
-                };
-
-                button.OnPressed += (_) => SendPredictedMessage(new StrippingEnsnareButtonPressed());
-
-                _strippingMenu.SnareContainer.AddChild(button);
-            }
-
-            // TODO fix layout container measuring (its broken atm).
-            // _strippingMenu.InvalidateMeasure();
-            // _strippingMenu.Contents.Measure(Vector2Helpers.Infinity);
-
-            // TODO allow windows to resize based on content's desired size
-
-            // for now: shit-code
-            // calculate the window size manually
-            // +20 horizontally and vertically from the ContentsContainer margin
-            // +16 vertically from the BoxContainer margin
-            // +27 vertically from the window header
-            var horizontalMenuSize = Math.Max(200, Math.Max(_handCount, _inventoryDimensions.X + 1) * (SlotControl.DefaultButtonSize + ButtonSeparation) + 20);
-            var verticalMenuSize = Math.Max(200, (_inventoryDimensions.Y + (_handCount > 0 ? 2 : 1)) * (SlotControl.DefaultButtonSize + ButtonSeparation) + 53);
-            if (snare?.IsEnsnared == true)
-                verticalMenuSize += 20;
-            _strippingMenu.SetSize = new Vector2(horizontalMenuSize, verticalMenuSize);
-        }
-
-        private void AddHandButton(Entity<HandsComponent> ent, string handId, Hand hand)
-        {
-            var button = new HandButton(handId, hand.Location);
-
-            button.Pressed += SlotPressed;
-
-            var heldEntity = _hands.GetHeldItem(ent.AsNullable(), handId);
-            if (EntMan.TryGetComponent<VirtualItemComponent>(heldEntity, out var virt))
-            {
-                button.Blocked = true;
-                if (EntMan.TryGetComponent<CuffableComponent>(Owner, out var cuff) && _cuffable.GetAllCuffs(cuff).Contains(virt.BlockingEntity))
-                    button.BlockedRect.MouseFilter = MouseFilterMode.Ignore;
-            }
-            //Goobstation: Cards are always hidden. NO CHEATING FOR U.
-            var isCard = EntMan.HasComponent<CardComponent>(heldEntity) ||
-                         EntMan.HasComponent<CardHandComponent>(heldEntity);
-            UpdateEntityIcon(button, isCard ? _virtualHiddenEntity : heldEntity);
-            
-            _strippingMenu!.HandsContainer.AddChild(button);
-            LayoutContainer.SetPosition(button, new Vector2i(_handCount, 0) * (SlotControl.DefaultButtonSize + ButtonSeparation));
-            _handCount++;
-        }
-
-        private void SlotPressed(GUIBoundKeyEventArgs ev, SlotControl slot)
-        {
-            // TODO: allow other interactions? Verbs? But they should then generate a pop-up and/or have a delay so the
-            // user that is being stripped can prevent the verbs from being exectuted.
-            // So for now: only stripping & examining
-            if (ev.Function == EngineKeyFunctions.Use)
-            {
-                SendPredictedMessage(new StrippingSlotButtonPressed(slot.SlotName, slot is HandButton));
-                return;
-            }
-
-            if (slot.Entity == null)
-                return;
-
-            if (ev.Function == ContentKeyFunctions.ExamineEntity)
-            {
-                _examine.DoExamine(slot.Entity.Value);
-                ev.Handle();
-            }
-            else if (ev.Function == EngineKeyFunctions.UseSecondary)
-            {
-                _ui.GetUIController<VerbMenuUIController>().OpenVerbMenu(slot.Entity.Value);
-                ev.Handle();
+                AddInventoryButton(Owner, slot.Name, inv);
             }
         }
 
-        private void AddInventoryButton(EntityUid invUid, string slotId, InventoryComponent inv)
+        if (EntMan.TryGetComponent<HandsComponent>(Owner, out var handsComp) && handsComp.CanBeStripped)
         {
-            if (!_inv.TryGetSlotContainer(invUid, slotId, out var container, out var slotDef, inv))
-                return;
-
-            var entity = container.ContainedEntity;
-
-            // If this is a full pocket, obscure the real entity
-            // this does not work for modified clients because they are still sent the real entity
-            if (entity != null && _strippable.IsStripHidden(slotDef, _player.LocalEntity))
-                entity = _virtualHiddenEntity;
-
-            // Goobstation: Playing Cards are always obscured in strip menu.
-            // I wanted to make the cards themselves appear hidden but this is simpler
-            var isCard = EntMan.HasComponent<CardComponent>(entity) ||
-                         EntMan.HasComponent<CardHandComponent>(entity);
-            if (entity != null && isCard)
+            // good ol hands shit code. there is a GuiHands comparer that does the same thing... but these are hands
+            // and not gui hands... which are different...
+            foreach (var (id, hand) in handsComp.Hands)
             {
-                entity = _virtualHiddenEntity;
+                if (hand.Location != HandLocation.Right)
+                    continue;
+
+                AddHandButton((Owner, handsComp), id, hand);
             }
 
-            if (EntMan.HasComponent<StripMenuInvisibleComponent>(entity)) // Goobstation
-                entity = null;
-
-            var button = new SlotButton(new SlotData(slotDef, container));
-            button.Pressed += SlotPressed;
-
-            _strippingMenu!.InventoryContainer.AddChild(button);
-
-            UpdateEntityIcon(button, entity);
-
-            LayoutContainer.SetPosition(button, slotDef.StrippingWindowPos * (SlotControl.DefaultButtonSize + ButtonSeparation));
-            if (slotDef.StrippingWindowPos.X > _inventoryDimensions.X)
-                _inventoryDimensions = new Vector2i(slotDef.StrippingWindowPos.X, _inventoryDimensions.Y);
-            if (slotDef.StrippingWindowPos.Y > _inventoryDimensions.Y)
-                _inventoryDimensions = new Vector2i(_inventoryDimensions.X, slotDef.StrippingWindowPos.Y);
-        }
-
-        private void UpdateEntityIcon(SlotControl button, EntityUid? entity)
-        {
-            // Hovering, highlighting & storage are features of general hands & inv GUIs. This UI just re-uses these because I'm lazy.
-            button.ClearHover();
-            button.StorageButton.Visible = false;
-
-            if (entity == null)
+            foreach (var (id, hand) in handsComp.Hands)
             {
-                button.SetEntity(null);
-                return;
+                if (hand.Location != HandLocation.Middle)
+                    continue;
+
+                AddHandButton((Owner, handsComp), id, hand);
             }
 
-            EntityUid? viewEnt;
-            if (EntMan.TryGetComponent<VirtualItemComponent>(entity, out var virt))
-                viewEnt = EntMan.HasComponent<SpriteComponent>(virt.BlockingEntity) ? virt.BlockingEntity : null;
-            else if (EntMan.HasComponent<SpriteComponent>(entity))
-                viewEnt = entity;
-            else
-                return;
+            foreach (var (id, hand) in handsComp.Hands)
+            {
+                if (hand.Location != HandLocation.Left)
+                    continue;
 
-            button.SetEntity(viewEnt);
+                AddHandButton((Owner, handsComp), id, hand);
+            }
         }
+
+        // snare-removal button. This is just the old button before the change to item slots. It is pretty out of place.
+        if (EntMan.TryGetComponent<EnsnareableComponent>(Owner, out var snare) && snare.IsEnsnared)
+        {
+            var button = new Button
+            {
+                Text = Loc.GetString("strippable-bound-user-interface-stripping-menu-ensnare-button"),
+                StyleClasses = { StyleBase.ButtonOpenRight },
+            };
+
+            button.OnPressed += _ => SendPredictedMessage(new StrippingEnsnareButtonPressed());
+
+            _strippingMenu.SnareContainer.AddChild(button);
+        }
+
+        // TODO fix layout container measuring (its broken atm).
+        // _strippingMenu.InvalidateMeasure();
+        // _strippingMenu.Contents.Measure(Vector2Helpers.Infinity);
+
+        // TODO allow windows to resize based on content's desired size
+
+        // for now: shit-code
+        // calculate the window size manually
+        // +20 horizontally and vertically from the ContentsContainer margin
+        // +16 vertically from the BoxContainer margin
+        // +27 vertically from the window header
+        var horizontalMenuSize = Math.Max(200,
+            Math.Max(_handCount, _inventoryDimensions.X + 1) * (SlotControl.DefaultButtonSize + ButtonSeparation) + 20);
+        var verticalMenuSize = Math.Max(200,
+            (_inventoryDimensions.Y + (_handCount > 0 ? 2 : 1)) * (SlotControl.DefaultButtonSize + ButtonSeparation) +
+            53);
+        if (snare?.IsEnsnared == true)
+            verticalMenuSize += 20;
+        _strippingMenu.SetSize = new Vector2(horizontalMenuSize, verticalMenuSize);
+    }
+
+    private void AddHandButton(Entity<HandsComponent> ent, string handId, Hand hand)
+    {
+        var button = new HandButton(handId, hand.Location);
+
+        button.Pressed += SlotPressed;
+
+        var heldEntity = _hands.GetHeldItem(ent.AsNullable(), handId);
+        if (EntMan.TryGetComponent<VirtualItemComponent>(heldEntity, out var virt))
+        {
+            button.Blocked = true;
+            if (EntMan.TryGetComponent<CuffableComponent>(Owner, out var cuff) &&
+                _cuffable.GetAllCuffs(cuff).Contains(virt.BlockingEntity))
+                button.BlockedRect.MouseFilter = MouseFilterMode.Ignore;
+        }
+
+        //Goobstation: Cards are always hidden. NO CHEATING FOR U.
+        var isCard = EntMan.HasComponent<CardComponent>(heldEntity) ||
+                     EntMan.HasComponent<CardHandComponent>(heldEntity);
+        UpdateEntityIcon(button, isCard ? _virtualHiddenEntity : heldEntity);
+
+        _strippingMenu!.HandsContainer.AddChild(button);
+        LayoutContainer.SetPosition(button,
+            new Vector2i(_handCount, 0) * (SlotControl.DefaultButtonSize + ButtonSeparation));
+        _handCount++;
+    }
+
+    private void SlotPressed(GUIBoundKeyEventArgs ev, SlotControl slot)
+    {
+        // TODO: allow other interactions? Verbs? But they should then generate a pop-up and/or have a delay so the
+        // user that is being stripped can prevent the verbs from being exectuted.
+        // So for now: only stripping & examining
+        if (ev.Function == EngineKeyFunctions.Use)
+        {
+            SendPredictedMessage(new StrippingSlotButtonPressed(slot.SlotName, slot is HandButton));
+            return;
+        }
+
+        if (slot.Entity == null)
+            return;
+
+        if (ev.Function == ContentKeyFunctions.ExamineEntity)
+        {
+            _examine.DoExamine(slot.Entity.Value);
+            ev.Handle();
+        }
+        else if (ev.Function == EngineKeyFunctions.UseSecondary)
+        {
+            _ui.GetUIController<VerbMenuUIController>().OpenVerbMenu(slot.Entity.Value);
+            ev.Handle();
+        }
+    }
+
+    private void AddInventoryButton(EntityUid invUid, string slotId, InventoryComponent inv)
+    {
+        if (!_inv.TryGetSlotContainer(invUid, slotId, out var container, out var slotDef, inv))
+            return;
+
+        var entity = container.ContainedEntity;
+
+        // If this is a full pocket, obscure the real entity
+        // this does not work for modified clients because they are still sent the real entity
+        if (entity != null && _strippable.IsStripHidden(slotDef, _player.LocalEntity))
+            entity = _virtualHiddenEntity;
+
+        // Goobstation: Playing Cards are always obscured in strip menu.
+        // I wanted to make the cards themselves appear hidden but this is simpler
+        var isCard = EntMan.HasComponent<CardComponent>(entity) ||
+                     EntMan.HasComponent<CardHandComponent>(entity);
+        if (entity != null && isCard)
+            entity = _virtualHiddenEntity;
+
+        if (EntMan.HasComponent<StripMenuInvisibleComponent>(entity)) // Goobstation
+            entity = null;
+
+        var button = new SlotButton(new SlotData(slotDef, container));
+        button.Pressed += SlotPressed;
+
+        _strippingMenu!.InventoryContainer.AddChild(button);
+
+        UpdateEntityIcon(button, entity);
+
+        LayoutContainer.SetPosition(button,
+            slotDef.StrippingWindowPos * (SlotControl.DefaultButtonSize + ButtonSeparation));
+        if (slotDef.StrippingWindowPos.X > _inventoryDimensions.X)
+            _inventoryDimensions = new Vector2i(slotDef.StrippingWindowPos.X, _inventoryDimensions.Y);
+        if (slotDef.StrippingWindowPos.Y > _inventoryDimensions.Y)
+            _inventoryDimensions = new Vector2i(_inventoryDimensions.X, slotDef.StrippingWindowPos.Y);
+    }
+
+    private void UpdateEntityIcon(SlotControl button, EntityUid? entity)
+    {
+        // Hovering, highlighting & storage are features of general hands & inv GUIs. This UI just re-uses these because I'm lazy.
+        button.ClearHover();
+        button.StorageButton.Visible = false;
+
+        if (entity == null)
+        {
+            button.SetEntity(null);
+            return;
+        }
+
+        EntityUid? viewEnt;
+        if (EntMan.TryGetComponent<VirtualItemComponent>(entity, out var virt))
+            viewEnt = EntMan.HasComponent<SpriteComponent>(virt.BlockingEntity) ? virt.BlockingEntity : null;
+        else if (EntMan.HasComponent<SpriteComponent>(entity))
+            viewEnt = entity;
+        else
+            return;
+
+        button.SetEntity(viewEnt);
     }
 }

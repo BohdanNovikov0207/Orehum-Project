@@ -11,7 +11,7 @@ using Robust.Shared.Reflection;
 namespace Content.Client.Options;
 
 /// <summary>
-/// Implements <see cref="OptionsVisualizerComponent"/>.
+/// Implements <see cref="OptionsVisualizerComponent" />.
 /// </summary>
 public sealed class OptionsVisualizerSystem : EntitySystem
 {

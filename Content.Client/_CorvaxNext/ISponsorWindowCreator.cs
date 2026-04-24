@@ -2,5 +2,5 @@
 
 public interface ISponsorWindowCreator
 {
-    public void OpenWindow();
+    void OpenWindow();
 }

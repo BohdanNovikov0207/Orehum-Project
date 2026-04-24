@@ -10,15 +10,15 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
 <ui:RadialMenu xmlns="https://spacestation14.io"
-                xmlns:ui="clr-namespace:Content.Client.UserInterface.Controls"
-                BackButtonStyleClass="RadialMenuBackButton"
-                CloseButtonStyleClass="RadialMenuCloseButton"
-                VerticalExpand="True"
-                HorizontalExpand="True"
-                MinSize="450 450">
+               xmlns:ui="clr-namespace:Content.Client.UserInterface.Controls"
+               BackButtonStyleClass="RadialMenuBackButton"
+               CloseButtonStyleClass="RadialMenuCloseButton"
+               VerticalExpand="True"
+               HorizontalExpand="True"
+               MinSize="450 450">
 
     <!-- Main -->
-    <ui:RadialContainer Name="Main" VerticalExpand="True" HorizontalExpand="True" InitialRadius="100" ReserveSpaceForHiddenChildren="False">
-    </ui:RadialContainer>
+    <ui:RadialContainer Name="Main" VerticalExpand="True" HorizontalExpand="True" InitialRadius="100"
+                        ReserveSpaceForHiddenChildren="False" />
 
 </ui:RadialMenu>

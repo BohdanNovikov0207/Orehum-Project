@@ -16,99 +16,95 @@ using Robust.Client.UserInterface.XAML;
 using Robust.Shared.Timing;
 using Robust.Shared.Utility;
 
-namespace Content.Client.Voting.UI
+namespace Content.Client.Voting.UI;
+
+[GenerateTypedNameReferences]
+public sealed partial class VotePopup : Control
 {
-    [GenerateTypedNameReferences]
-    public sealed partial class VotePopup : Control
+    [Dependency] private readonly IGameTiming _gameTiming = default!;
+    [Dependency] private readonly IEntityNetworkManager _net = default!;
+    private readonly NetEntity? _targetEntity;
+
+    private readonly VoteManager.ActiveVote _vote;
+    private readonly Button[] _voteButtons;
+    [Dependency] private readonly IVoteManager _voteManager = default!;
+
+    public VotePopup(VoteManager.ActiveVote vote)
     {
-        [Dependency] private readonly IGameTiming _gameTiming = default!;
-        [Dependency] private readonly IVoteManager _voteManager = default!;
-        [Dependency] private readonly IEntityNetworkManager _net = default!;
+        _vote = vote;
+        IoCManager.InjectDependencies(this);
+        RobustXamlLoader.Load(this);
 
-        private readonly VoteManager.ActiveVote _vote;
-        private readonly Button[] _voteButtons;
-        private readonly NetEntity? _targetEntity;
+        Stylesheet = IoCManager.Resolve<IStylesheetManager>().SheetSpace;
 
-        public VotePopup(VoteManager.ActiveVote vote)
+        if (_vote.TargetEntity != null && _vote.TargetEntity != 0)
         {
-            _vote = vote;
-            IoCManager.InjectDependencies(this);
-            RobustXamlLoader.Load(this);
-
-            Stylesheet = IoCManager.Resolve<IStylesheetManager>().SheetSpace;
-
-            if (_vote.TargetEntity != null && _vote.TargetEntity != 0)
-            {
-                _targetEntity = new NetEntity(_vote.TargetEntity.Value);
-                FollowVoteTarget.Visible = true;
-                FollowVoteTarget.OnPressed += _ => AttemptFollowVoteEntity();
-            }
-
-            Modulate = Color.White.WithAlpha(0.75f);
-            _voteButtons = new Button[vote.Entries.Length];
-            var group = new ButtonGroup();
-
-            for (var i = 0; i < _voteButtons.Length; i++)
-            {
-                var button = new Button
-                {
-                    ToggleMode = true,
-                    Group = group
-                };
-                _voteButtons[i] = button;
-                VoteOptionsContainer.AddChild(button);
-                var i1 = i;
-                button.OnPressed += _ => _voteManager.SendCastVote(vote.Id, i1);
-            }
+            _targetEntity = new NetEntity(_vote.TargetEntity.Value);
+            FollowVoteTarget.Visible = true;
+            FollowVoteTarget.OnPressed += _ => AttemptFollowVoteEntity();
         }
 
-        public void UpdateData()
-        {
-            VoteTitle.SetMessage(FormattedMessage.FromUnformatted(_vote.Title));
-            VoteCaller.Text = Loc.GetString("ui-vote-created", ("initiator", _vote.Initiator));
+        Modulate = Color.White.WithAlpha(0.75f);
+        _voteButtons = new Button[vote.Entries.Length];
+        var group = new ButtonGroup();
 
-            for (var i = 0; i < _voteButtons.Length; i++)
+        for (var i = 0; i < _voteButtons.Length; i++)
+        {
+            var button = new Button
             {
-                var entry = _vote.Entries[i];
-                if (_vote.DisplayVotes)
-                {
-                    _voteButtons[i].Text = Loc.GetString("ui-vote-button", ("text", entry.Text), ("votes", entry.Votes));
-                }
-                else
-                {
-                    _voteButtons[i].Text = Loc.GetString("ui-vote-button-no-votes", ("text", entry.Text));
-                }
-
-                if (_vote.OurVote == i)
-                    _voteButtons[i].Pressed = true;
-            }
+                ToggleMode = true,
+                Group = group,
+            };
+            _voteButtons[i] = button;
+            VoteOptionsContainer.AddChild(button);
+            var i1 = i;
+            button.OnPressed += _ => _voteManager.SendCastVote(vote.Id, i1);
         }
+    }
 
-        private void AttemptFollowVoteEntity()
+    public void UpdateData()
+    {
+        VoteTitle.SetMessage(FormattedMessage.FromUnformatted(_vote.Title));
+        VoteCaller.Text = Loc.GetString("ui-vote-created", ("initiator", _vote.Initiator));
+
+        for (var i = 0; i < _voteButtons.Length; i++)
         {
-            if (_targetEntity != null)
-            {
-                var msg = new GhostWarpToTargetRequestEvent(_targetEntity.Value);
-                _net.SendSystemNetworkMessage(msg);
-            }
-        }
+            var entry = _vote.Entries[i];
+            if (_vote.DisplayVotes)
+                _voteButtons[i].Text = Loc.GetString("ui-vote-button", ("text", entry.Text), ("votes", entry.Votes));
+            else
+                _voteButtons[i].Text = Loc.GetString("ui-vote-button-no-votes", ("text", entry.Text));
 
-        protected override void FrameUpdate(FrameEventArgs args)
+            if (_vote.OurVote == i)
+                _voteButtons[i].Pressed = true;
+        }
+    }
+
+    private void AttemptFollowVoteEntity()
+    {
+        if (_targetEntity != null)
         {
-            // Logger.Debug($"{_gameTiming.ServerTime}, {_vote.StartTime}, {_vote.EndTime}");
-
-            var curTime = _gameTiming.RealTime;
-            var timeLeft = _vote.EndTime - curTime;
-            if (timeLeft < TimeSpan.Zero)
-                timeLeft = TimeSpan.Zero;
-
-            // Round up a second.
-            timeLeft = TimeSpan.FromSeconds(Math.Ceiling(timeLeft.TotalSeconds));
-
-            TimeLeftBar.Value = Math.Min(1, (float) ((curTime.TotalSeconds - _vote.StartTime.TotalSeconds) /
-                                                     (_vote.EndTime.TotalSeconds - _vote.StartTime.TotalSeconds)));
-
-            TimeLeftText.Text = $"{timeLeft:m\\:ss}";
+            var msg = new GhostWarpToTargetRequestEvent(_targetEntity.Value);
+            _net.SendSystemNetworkMessage(msg);
         }
+    }
+
+    protected override void FrameUpdate(FrameEventArgs args)
+    {
+        // Logger.Debug($"{_gameTiming.ServerTime}, {_vote.StartTime}, {_vote.EndTime}");
+
+        var curTime = _gameTiming.RealTime;
+        var timeLeft = _vote.EndTime - curTime;
+        if (timeLeft < TimeSpan.Zero)
+            timeLeft = TimeSpan.Zero;
+
+        // Round up a second.
+        timeLeft = TimeSpan.FromSeconds(Math.Ceiling(timeLeft.TotalSeconds));
+
+        TimeLeftBar.Value = Math.Min(1,
+            (float) ((curTime.TotalSeconds - _vote.StartTime.TotalSeconds) /
+                     (_vote.EndTime.TotalSeconds - _vote.StartTime.TotalSeconds)));
+
+        TimeLeftText.Text = $"{timeLeft:m\\:ss}";
     }
 }

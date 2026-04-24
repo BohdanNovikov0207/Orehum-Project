@@ -1,8 +1,8 @@
 using System.Linq;
 using System.Numerics;
 using Content.Client.Stealth;
-using Content.Shared.Body.Components;
 using Content.Shared._Imp.Drone;
+using Content.Shared.Body.Components;
 using Content.Shared.Stealth.Components;
 using Robust.Client.GameObjects;
 using Robust.Client.Graphics;
@@ -14,18 +14,14 @@ namespace Content.Client._Imp.DroneVision;
 
 public sealed class DroneVisionOverlay : Overlay
 {
-    [Dependency] private readonly IEntityManager _entity = default!;
-    [Dependency] private readonly IPlayerManager _player = default!;
-
-    private readonly TransformSystem _transform;
-    private readonly StealthSystem _stealth;
     private readonly ContainerSystem _container;
-
-    public override bool RequestScreenTexture => true;
-
-    public override OverlaySpace Space => OverlaySpace.WorldSpace;
+    [Dependency] private readonly IEntityManager _entity = default!;
 
     private readonly List<DroneVisionRenderEntry> _entries = [];
+    [Dependency] private readonly IPlayerManager _player = default!;
+    private readonly StealthSystem _stealth;
+
+    private readonly TransformSystem _transform;
 
     public DroneVisionComponent? Comp;
 
@@ -39,6 +35,10 @@ public sealed class DroneVisionOverlay : Overlay
 
         ZIndex = -1;
     }
+
+    public override bool RequestScreenTexture => true;
+
+    public override OverlaySpace Space => OverlaySpace.WorldSpace;
 
     protected override void Draw(in OverlayDrawArgs args)
     {
@@ -116,11 +116,9 @@ public sealed class DroneVisionOverlay : Overlay
         sprite.Color = originalColor;
     }
 
-    private bool CanSee(EntityUid uid, SpriteComponent sprite)
-    {
-        return sprite.Visible && (!_entity.TryGetComponent(uid, out StealthComponent? stealth) ||
-                                  _stealth.GetVisibility(uid, stealth) > 0.5f);
-    }
+    private bool CanSee(EntityUid uid, SpriteComponent sprite) =>
+        sprite.Visible && (!_entity.TryGetComponent(uid, out StealthComponent? stealth) ||
+                           _stealth.GetVisibility(uid, stealth) > 0.5f);
 }
 
 public record struct DroneVisionRenderEntry(

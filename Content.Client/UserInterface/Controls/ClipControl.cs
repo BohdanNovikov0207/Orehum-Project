@@ -11,7 +11,7 @@ namespace Content.Client.UserInterface.Controls;
 
 /// <summary>
 /// Pretends to child controls that there's infinite space.
-/// This can be used to make something like a <see cref="RichTextLabel"/> clip instead of wrapping.
+/// This can be used to make something like a <see cref="RichTextLabel" /> clip instead of wrapping.
 /// </summary>
 public sealed class ClipControl : Control
 {

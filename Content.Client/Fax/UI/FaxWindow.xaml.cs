@@ -19,14 +19,7 @@ namespace Content.Client.Fax.UI;
 [GenerateTypedNameReferences]
 public sealed partial class FaxWindow : DefaultWindow
 {
-    public event Action? FileButtonPressed;
-    public event Action? PaperButtonPressed;
-    public event Action? CopyButtonPressed;
-    public event Action? SendButtonPressed;
-    public event Action? RefreshButtonPressed;
-    public event Action<string>? PeerSelected;
-
-    public bool OfficePaper = false;
+    public bool OfficePaper;
 
     public FaxWindow()
     {
@@ -42,6 +35,13 @@ public sealed partial class FaxWindow : DefaultWindow
         PeerSelector.OnItemSelected += args =>
             PeerSelected?.Invoke((string) args.Button.GetItemMetadata(args.Id)!);
     }
+
+    public event Action? FileButtonPressed;
+    public event Action? PaperButtonPressed;
+    public event Action? CopyButtonPressed;
+    public event Action? SendButtonPressed;
+    public event Action? RefreshButtonPressed;
+    public event Action<string>? PeerSelected;
 
     public void UpdateState(FaxUiState state)
     {
@@ -103,7 +103,7 @@ public sealed partial class FaxWindow : DefaultWindow
     {
         OfficePaper = !OfficePaper;
 
-        if(OfficePaper)
+        if (OfficePaper)
             PaperButton.Text = Loc.GetString("fax-machine-ui-paper-button-office");
         else
             PaperButton.Text = Loc.GetString("fax-machine-ui-paper-button-normal");

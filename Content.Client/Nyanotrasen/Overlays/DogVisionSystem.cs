@@ -7,18 +7,18 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Abilities;
 using Content.Shared._DV.CCVars;
+using Content.Shared.Abilities;
 using Robust.Client.Graphics;
 using Robust.Shared.Configuration;
 using Robust.Shared.Player;
 
 namespace Content.Client.Nyanotrasen.Overlays;
 
-public sealed partial class DogVisionSystem : EntitySystem
+public sealed class DogVisionSystem : EntitySystem
 {
-    [Dependency] private readonly IOverlayManager _overlayMan = default!;
     [Dependency] private readonly IConfigurationManager _cfg = default!;
+    [Dependency] private readonly IOverlayManager _overlayMan = default!;
     [Dependency] private readonly ISharedPlayerManager _playerMan = default!;
 
     private DogVisionOverlay _overlay = default!;
@@ -34,7 +34,7 @@ public sealed partial class DogVisionSystem : EntitySystem
 
         Subs.CVar(_cfg, DCCVars.NoVisionFilters, OnNoVisionFiltersChanged);
 
-        _overlay = new();
+        _overlay = new DogVisionOverlay();
     }
 
     private void OnDogVisionInit(EntityUid uid, DogVisionComponent component, ComponentInit args)
@@ -55,10 +55,8 @@ public sealed partial class DogVisionSystem : EntitySystem
             _overlayMan.AddOverlay(_overlay);
     }
 
-    private void OnPlayerDetached(EntityUid uid, DogVisionComponent component, LocalPlayerDetachedEvent args)
-    {
+    private void OnPlayerDetached(EntityUid uid, DogVisionComponent component, LocalPlayerDetachedEvent args) =>
         _overlayMan.RemoveOverlay(_overlay);
-    }
 
     private void OnNoVisionFiltersChanged(bool enabled)
     {

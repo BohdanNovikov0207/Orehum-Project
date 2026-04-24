@@ -20,10 +20,10 @@ public sealed partial class ParticleAcceleratorPartVisualsComponent : Component
     [ViewVariables(VVAccess.ReadWrite)]
     public Dictionary<ParticleAcceleratorVisualState, string> StatesSuffixes = new()
     {
-        {ParticleAcceleratorVisualState.Powered, "p"},
-        {ParticleAcceleratorVisualState.Level0, "p0"},
-        {ParticleAcceleratorVisualState.Level1, "p1"},
-        {ParticleAcceleratorVisualState.Level2, "p2"},
-        {ParticleAcceleratorVisualState.Level3, "p3"},
+        { ParticleAcceleratorVisualState.Powered, "p" },
+        { ParticleAcceleratorVisualState.Level0, "p0" },
+        { ParticleAcceleratorVisualState.Level1, "p1" },
+        { ParticleAcceleratorVisualState.Level2, "p2" },
+        { ParticleAcceleratorVisualState.Level3, "p3" },
     };
 }

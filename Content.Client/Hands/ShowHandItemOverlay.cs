@@ -32,137 +32,149 @@ using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
 using Direction = Robust.Shared.Maths.Direction;
 
-namespace Content.Client.Hands
+namespace Content.Client.Hands;
+
+public sealed class ShowHandItemOverlay : Overlay
 {
-    public sealed class ShowHandItemOverlay : Overlay
+    private static readonly ResPath
+        ComboAttackRsi = new("/Textures/_Goobstation/Interface/Misc/intents.rsi"); // Goobstation
+
+    [Dependency] private readonly IConfigurationManager _cfg = default!;
+    [Dependency] private readonly IClyde _clyde = default!;
+    [Dependency] private readonly IEntityManager _entMan = default!;
+    [Dependency] private readonly IInputManager _inputManager = default!;
+    [Dependency] private readonly IPlayerManager _player = default!; // Goobstation
+    [Dependency] private readonly IPrototypeManager _protoMan = default!; // Goobstation
+    private readonly IRenderTexture _renderBackbuffer;
+    [Dependency] private readonly IResourceCache _resourceCache = default!; // Goobstation
+
+    private readonly SpriteSystem _sprite; // Goobstation
+
+    private HandsSystem? _hands;
+    public EntityUid? EntityOverride;
+
+    public Texture? IconOverride;
+
+    public ShowHandItemOverlay()
     {
-        [Dependency] private readonly IConfigurationManager _cfg = default!;
-        [Dependency] private readonly IInputManager _inputManager = default!;
-        [Dependency] private readonly IClyde _clyde = default!;
-        [Dependency] private readonly IEntityManager _entMan = default!;
-        [Dependency] private readonly IPlayerManager _player = default!; // Goobstation
-        [Dependency] private readonly IPrototypeManager _protoMan = default!; // Goobstation
-        [Dependency] private readonly IResourceCache _resourceCache = default!; // Goobstation
+        IoCManager.InjectDependencies(this);
 
-        private readonly SpriteSystem _sprite; // Goobstation
+        _sprite = _entMan.System<SpriteSystem>(); // Goobstation
 
-        private static readonly ResPath ComboAttackRsi =
-            new ResPath("/Textures/_Goobstation/Interface/Misc/intents.rsi"); // Goobstation
-
-        private HandsSystem? _hands;
-        private readonly IRenderTexture _renderBackbuffer;
-
-        public override OverlaySpace Space => OverlaySpace.ScreenSpace;
-
-        public Texture? IconOverride;
-        public EntityUid? EntityOverride;
-
-        public ShowHandItemOverlay()
-        {
-            IoCManager.InjectDependencies(this);
-
-            _sprite = _entMan.System<SpriteSystem>(); // Goobstation
-
-            _renderBackbuffer = _clyde.CreateRenderTarget(
-                (64, 64),
-                new RenderTargetFormatParameters(RenderTargetColorFormat.Rgba8Srgb, true),
-                new TextureSampleParameters
-                {
-                    Filter = true
-                }, nameof(ShowHandItemOverlay));
-        }
-
-        protected override void DisposeBehavior()
-        {
-            base.DisposeBehavior();
-
-            _renderBackbuffer.Dispose();
-        }
-
-        protected override bool BeforeDraw(in OverlayDrawArgs args)
-        {
-            if (!_cfg.GetCVar(CCVars.HudHeldItemShow))
-                return false;
-
-            return base.BeforeDraw(in args);
-        }
-
-        protected override void Draw(in OverlayDrawArgs args)
-        {
-            var mousePos = _inputManager.MouseScreenPosition;
-
-            // Offscreen
-            if (mousePos.Window == WindowId.Invalid)
-                return;
-
-            var screen = args.ScreenHandle;
-            var offset = _cfg.GetCVar(CCVars.HudHeldItemOffset);
-            var offsetVec = new Vector2(offset, offset);
-
-            if (IconOverride != null)
+        _renderBackbuffer = _clyde.CreateRenderTarget(
+            (64, 64),
+            new RenderTargetFormatParameters(RenderTargetColorFormat.Rgba8Srgb, true),
+            new TextureSampleParameters
             {
-                screen.DrawTexture(IconOverride, mousePos.Position - IconOverride.Size / 2 + offsetVec, Color.White.WithAlpha(0.75f));
-                return;
-            }
+                Filter = true,
+            },
+            nameof(ShowHandItemOverlay));
+    }
 
-            _hands ??= _entMan.System<HandsSystem>();
-            var handEntity = _hands.GetActiveHandEntity();
+    public override OverlaySpace Space => OverlaySpace.ScreenSpace;
 
-            // Goob edit start
-            if (_player.LocalEntity != null)
+    protected override void DisposeBehavior()
+    {
+        base.DisposeBehavior();
+
+        _renderBackbuffer.Dispose();
+    }
+
+    protected override bool BeforeDraw(in OverlayDrawArgs args)
+    {
+        if (!_cfg.GetCVar(CCVars.HudHeldItemShow))
+            return false;
+
+        return base.BeforeDraw(in args);
+    }
+
+    protected override void Draw(in OverlayDrawArgs args)
+    {
+        var mousePos = _inputManager.MouseScreenPosition;
+
+        // Offscreen
+        if (mousePos.Window == WindowId.Invalid)
+            return;
+
+        var screen = args.ScreenHandle;
+        var offset = _cfg.GetCVar(CCVars.HudHeldItemOffset);
+        var offsetVec = new Vector2(offset, offset);
+
+        if (IconOverride != null)
+        {
+            screen.DrawTexture(IconOverride,
+                mousePos.Position - IconOverride.Size / 2 + offsetVec,
+                Color.White.WithAlpha(0.75f));
+            return;
+        }
+
+        _hands ??= _entMan.System<HandsSystem>();
+        var handEntity = _hands.GetActiveHandEntity();
+
+        // Goob edit start
+        if (_player.LocalEntity != null)
+        {
+            var comboEv = new GetPerformedAttackTypesEvent(null);
+            _entMan.EventBus.RaiseLocalEvent(_player.LocalEntity.Value, ref comboEv);
+            if (comboEv.AttackTypes is { Count: > 0 })
             {
-                var comboEv = new GetPerformedAttackTypesEvent(null);
-                _entMan.EventBus.RaiseLocalEvent(_player.LocalEntity.Value, ref comboEv);
-                if (comboEv.AttackTypes is { Count: > 0 })
+                var color = Color.White.WithAlpha(0.75f);
+                for (var i = 0; i < comboEv.AttackTypes.Count; i++)
                 {
-                    var color = Color.White.WithAlpha(0.75f);
-                    for (var i = 0; i < comboEv.AttackTypes.Count; i++)
-                    {
-                        var rsiActual = _resourceCache.GetResource<RSIResource>(ComboAttackRsi).RSI;
-                        if (!rsiActual.TryGetState(comboEv.AttackTypes[i].ToString().ToLower(), out var state))
-                            continue;
+                    var rsiActual = _resourceCache.GetResource<RSIResource>(ComboAttackRsi).RSI;
+                    if (!rsiActual.TryGetState(comboEv.AttackTypes[i].ToString().ToLower(), out var state))
+                        continue;
 
-                        var texture = state.Frame0;
+                    var texture = state.Frame0;
 
-                        var size = texture.Size;
+                    var size = texture.Size;
 
-                        var offsetVec2 = new Vector2(-offsetVec.X,
-                            (2f * i + 1f - comboEv.AttackTypes.Count) * texture.Size.Y / 1.8f);
+                    var offsetVec2 = new Vector2(-offsetVec.X,
+                        (2f * i + 1f - comboEv.AttackTypes.Count) * texture.Size.Y / 1.8f);
 
-                        screen.DrawTextureRect(texture,
-                            UIBox2.FromDimensions(mousePos.Position - size / 2 + offsetVec2, size),
-                            color);
-                    }
+                    screen.DrawTextureRect(texture,
+                        UIBox2.FromDimensions(mousePos.Position - size / 2 + offsetVec2, size),
+                        color);
                 }
             }
-
-            if (handEntity == null)
-                return;
-
-            if (_entMan.TryGetComponent(handEntity.Value, out AmmoSelectorComponent? ammoSelector) &&
-                ammoSelector.CurrentlySelected is { } selected)
-            {
-                var selectedProto = _protoMan.Index(selected);
-                var texture = _sprite.Frame0(selectedProto.Icon);
-                screen.DrawTexture(texture,
-                    mousePos.Position - texture.Size / 2 + offsetVec,
-                    Color.White.WithAlpha(0.75f));
-                return;
-            }
-
-            if (!_entMan.TryGetComponent(handEntity.Value, out SpriteComponent? sprite))
-                return;
-            // Goob edit end
-
-            var halfSize = _renderBackbuffer.Size / 2;
-            var uiScale = (args.ViewportControl as Control)?.UIScale ?? 1f;
-
-            screen.RenderInRenderTarget(_renderBackbuffer, () =>
-            {
-                screen.DrawEntity(handEntity.Value, halfSize, new Vector2(1f, 1f) * uiScale, Angle.Zero, Angle.Zero, Direction.South, sprite);
-            }, Color.Transparent);
-
-            screen.DrawTexture(_renderBackbuffer.Texture, mousePos.Position - halfSize + offsetVec, Color.White.WithAlpha(0.75f));
         }
+
+        if (handEntity == null)
+            return;
+
+        if (_entMan.TryGetComponent(handEntity.Value, out AmmoSelectorComponent? ammoSelector) &&
+            ammoSelector.CurrentlySelected is { } selected)
+        {
+            var selectedProto = _protoMan.Index(selected);
+            var texture = _sprite.Frame0(selectedProto.Icon);
+            screen.DrawTexture(texture,
+                mousePos.Position - texture.Size / 2 + offsetVec,
+                Color.White.WithAlpha(0.75f));
+            return;
+        }
+
+        if (!_entMan.TryGetComponent(handEntity.Value, out SpriteComponent? sprite))
+            return;
+        // Goob edit end
+
+        var halfSize = _renderBackbuffer.Size / 2;
+        var uiScale = (args.ViewportControl as Control)?.UIScale ?? 1f;
+
+        screen.RenderInRenderTarget(_renderBackbuffer,
+            () =>
+            {
+                screen.DrawEntity(handEntity.Value,
+                    halfSize,
+                    new Vector2(1f, 1f) * uiScale,
+                    Angle.Zero,
+                    Angle.Zero,
+                    Direction.South,
+                    sprite);
+            },
+            Color.Transparent);
+
+        screen.DrawTexture(_renderBackbuffer.Texture,
+            mousePos.Position - halfSize + offsetVec,
+            Color.White.WithAlpha(0.75f));
     }
 }

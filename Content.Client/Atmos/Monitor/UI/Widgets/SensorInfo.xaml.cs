@@ -25,18 +25,16 @@ namespace Content.Client.Atmos.Monitor.UI.Widgets;
 [GenerateTypedNameReferences]
 public sealed partial class SensorInfo : BoxContainer
 {
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    private readonly string _address;
     [Dependency] private readonly IEntityManager _entMan = default!;
+    private readonly Dictionary<Gas, RichTextLabel> _gasLabels = new();
+    private readonly Dictionary<Gas, ThresholdControl> _gasThresholds = new();
+
+    private readonly ThresholdControl _pressureThreshold;
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    private readonly ThresholdControl _temperatureThreshold;
 
     public Action<string, AtmosMonitorThresholdType, AtmosAlarmThreshold, Gas?>? OnThresholdUpdate;
-    public event Action<AtmosSensorData>? SensorDataCopied;
-    private string _address;
-
-    private ThresholdControl _pressureThreshold;
-    private ThresholdControl _temperatureThreshold;
-    private Dictionary<Gas, ThresholdControl> _gasThresholds = new();
-    private Dictionary<Gas, RichTextLabel> _gasLabels = new();
-    private Button _copySettings => CCopySettings;
 
     public SensorInfo(AtmosSensorData data, string address)
     {
@@ -47,18 +45,20 @@ public sealed partial class SensorInfo : BoxContainer
 
         _address = address;
 
-        SensorAddress.Title = Loc.GetString("air-alarm-ui-window-listing-title", ("address", _address), ("state", data.AlarmState));
+        SensorAddress.Title = Loc.GetString("air-alarm-ui-window-listing-title",
+            ("address", _address),
+            ("state", data.AlarmState));
 
         AlarmStateLabel.SetMarkup(Loc.GetString("air-alarm-ui-window-alarm-state-indicator",
-                    ("color", AirAlarmWindow.ColorForAlarm(data.AlarmState)),
-                    ("state", data.AlarmState)));
+            ("color", AirAlarmWindow.ColorForAlarm(data.AlarmState)),
+            ("state", data.AlarmState)));
         PressureLabel.SetMarkup(Loc.GetString("air-alarm-ui-window-pressure-indicator",
-                    ("color", AirAlarmWindow.ColorForThreshold(data.Pressure, data.PressureThreshold)),
-                    ("pressure", $"{data.Pressure:0.##}")));
+            ("color", AirAlarmWindow.ColorForThreshold(data.Pressure, data.PressureThreshold)),
+            ("pressure", $"{data.Pressure:0.##}")));
         TemperatureLabel.SetMarkup(Loc.GetString("air-alarm-ui-window-temperature-indicator",
-                ("color", AirAlarmWindow.ColorForThreshold(data.Temperature, data.TemperatureThreshold)),
-                ("tempC", $"{TemperatureHelpers.KelvinToCelsius(data.Temperature):0.#}"),
-                ("temperature", $"{data.Temperature:0.##}")));
+            ("color", AirAlarmWindow.ColorForThreshold(data.Temperature, data.TemperatureThreshold)),
+            ("tempC", $"{TemperatureHelpers.KelvinToCelsius(data.Temperature):0.#}"),
+            ("temperature", $"{data.Temperature:0.##}")));
 
         foreach (var (gas, amount) in data.Gases)
         {
@@ -73,12 +73,16 @@ public sealed partial class SensorInfo : BoxContainer
                 ("gas", Loc.GetString(gasName)),
                 ("color", AirAlarmWindow.ColorForThreshold(fractionGas, data.GasThresholds[gas])),
                 ("amount", $"{amount:0.####}"),
-                ("percentage", $"{(100 * fractionGas):0.##}")));
+                ("percentage", $"{100 * fractionGas:0.##}")));
             GasContainer.AddChild(label);
             _gasLabels.Add(gas, label);
 
             var threshold = data.GasThresholds[gas];
-            var gasThresholdControl = new ThresholdControl(Loc.GetString($"air-alarm-ui-thresholds-gas-title"), threshold, AtmosMonitorThresholdType.Gas, gas, 100);
+            var gasThresholdControl = new ThresholdControl(Loc.GetString("air-alarm-ui-thresholds-gas-title"),
+                threshold,
+                AtmosMonitorThresholdType.Gas,
+                gas,
+                100);
             gasThresholdControl.Margin = new Thickness(20, 2, 2, 2);
             gasThresholdControl.ThresholdDataChanged += (type, alarmThreshold, arg3) =>
             {
@@ -89,7 +93,9 @@ public sealed partial class SensorInfo : BoxContainer
             GasContainer.AddChild(gasThresholdControl);
         }
 
-        _pressureThreshold = new ThresholdControl(Loc.GetString("air-alarm-ui-thresholds-pressure-title"), data.PressureThreshold, AtmosMonitorThresholdType.Pressure);
+        _pressureThreshold = new ThresholdControl(Loc.GetString("air-alarm-ui-thresholds-pressure-title"),
+            data.PressureThreshold,
+            AtmosMonitorThresholdType.Pressure);
         PressureThresholdContainer.AddChild(_pressureThreshold);
         _temperatureThreshold = new ThresholdControl(Loc.GetString("air-alarm-ui-thresholds-temperature-title"),
             data.TemperatureThreshold,
@@ -112,31 +118,34 @@ public sealed partial class SensorInfo : BoxContainer
         };
     }
 
+    private Button _copySettings => CCopySettings;
+    public event Action<AtmosSensorData>? SensorDataCopied;
+
     public void ChangeData(AtmosSensorData data)
     {
         IoCManager.InjectDependencies(this);
         var atmosphereSystem = _entMan.System<SharedAtmosphereSystem>();
 
-        SensorAddress.Title = Loc.GetString("air-alarm-ui-window-listing-title", ("address", _address), ("state", data.AlarmState));
+        SensorAddress.Title = Loc.GetString("air-alarm-ui-window-listing-title",
+            ("address", _address),
+            ("state", data.AlarmState));
 
         AlarmStateLabel.SetMarkup(Loc.GetString("air-alarm-ui-window-alarm-state-indicator",
-                    ("color", AirAlarmWindow.ColorForAlarm(data.AlarmState)),
-                    ("state", data.AlarmState)));
+            ("color", AirAlarmWindow.ColorForAlarm(data.AlarmState)),
+            ("state", data.AlarmState)));
 
         PressureLabel.SetMarkup(Loc.GetString("air-alarm-ui-window-pressure-indicator",
-                    ("color", AirAlarmWindow.ColorForThreshold(data.Pressure, data.PressureThreshold)),
-                    ("pressure", $"{data.Pressure:0.##}")));
+            ("color", AirAlarmWindow.ColorForThreshold(data.Pressure, data.PressureThreshold)),
+            ("pressure", $"{data.Pressure:0.##}")));
         TemperatureLabel.SetMarkup(Loc.GetString("air-alarm-ui-window-temperature-indicator",
-                ("color", AirAlarmWindow.ColorForThreshold(data.Temperature, data.TemperatureThreshold)),
-                ("tempC", $"{TemperatureHelpers.KelvinToCelsius(data.Temperature):0.#}"),
-                ("temperature", $"{data.Temperature:0.##}")));
+            ("color", AirAlarmWindow.ColorForThreshold(data.Temperature, data.TemperatureThreshold)),
+            ("tempC", $"{TemperatureHelpers.KelvinToCelsius(data.Temperature):0.#}"),
+            ("temperature", $"{data.Temperature:0.##}")));
 
         foreach (var (gas, amount) in data.Gases)
         {
             if (!_gasLabels.TryGetValue(gas, out var label))
-            {
                 continue;
-            }
 
             var fractionGas = amount / data.TotalMoles;
 
@@ -147,7 +156,7 @@ public sealed partial class SensorInfo : BoxContainer
                 ("gas", Loc.GetString(gasName)),
                 ("color", AirAlarmWindow.ColorForThreshold(fractionGas, data.GasThresholds[gas])),
                 ("amount", $"{amount:0.####}"),
-                ("percentage", $"{(100 * fractionGas):0.##}")));
+                ("percentage", $"{100 * fractionGas:0.##}")));
         }
 
         _pressureThreshold.UpdateThresholdData(data.PressureThreshold, data.Pressure);
@@ -155,12 +164,9 @@ public sealed partial class SensorInfo : BoxContainer
         foreach (var (gas, control) in _gasThresholds)
         {
             if (!data.GasThresholds.TryGetValue(gas, out var threshold))
-            {
                 continue;
-            }
 
             control.UpdateThresholdData(threshold, data.Gases[gas] / data.TotalMoles);
         }
     }
-
- }
+}

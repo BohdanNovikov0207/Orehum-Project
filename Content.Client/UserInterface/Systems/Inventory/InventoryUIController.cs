@@ -31,7 +31,6 @@ using Content.Client.UserInterface.Systems.Inventory.Controls;
 using Content.Client.UserInterface.Systems.Inventory.Widgets;
 using Content.Client.UserInterface.Systems.Inventory.Windows;
 using Content.Shared.Containers.ItemSlots;
-using Content.Shared.Hands.Components;
 using Content.Shared.Input;
 using Content.Shared.Inventory.VirtualItem;
 using Content.Shared.Storage;
@@ -50,39 +49,22 @@ namespace Content.Client.UserInterface.Systems.Inventory;
 public sealed class InventoryUIController : UIController, IOnStateEntered<GameplayState>, IOnStateExited<GameplayState>,
     IOnSystemChanged<ClientInventorySystem>, IOnSystemChanged<HandsSystem>
 {
+    [UISystemDependency] private readonly ContainerSystem _container = default!;
     [Dependency] private readonly IEntityManager _entities = default!;
+    [UISystemDependency] private readonly HandsSystem _handsSystem = default!;
 
     [UISystemDependency] private readonly ClientInventorySystem _inventorySystem = default!;
-    [UISystemDependency] private readonly HandsSystem _handsSystem = default!;
-    [UISystemDependency] private readonly ContainerSystem _container = default!;
-    [UISystemDependency] private readonly SpriteSystem _sprite = default!;
-
-    private EntityUid? _playerUid;
-    private InventorySlotsComponent? _playerInventory;
     private readonly Dictionary<string, ItemSlotButtonContainer> _slotGroups = new();
-
-    private StrippingWindow? _strippingWindow;
-    private ItemSlotButtonContainer? _inventoryHotbar;
+    [UISystemDependency] private readonly SpriteSystem _sprite = default!;
     private SlotButton? _inventoryButton;
+    private ItemSlotButtonContainer? _inventoryHotbar;
 
     private SlotControl? _lastHovered;
+    private InventorySlotsComponent? _playerInventory;
 
-    public override void Initialize()
-    {
-        base.Initialize();
+    private EntityUid? _playerUid;
 
-        var gameplayStateLoad = UIManager.GetUIController<GameplayStateLoadController>();
-        gameplayStateLoad.OnScreenLoad += OnScreenLoad;
-    }
-
-    private void OnScreenLoad()
-    {
-        if (UIManager.ActiveScreen == null)
-            return;
-
-        if (UIManager.GetActiveUIWidgetOrNull<InventoryGui>() is { } inventoryGui)
-            RegisterInventoryButton(inventoryGui.InventoryButton);
-    }
+    private StrippingWindow? _strippingWindow;
 
     public void OnStateEntered(GameplayState state)
     {
@@ -105,11 +87,63 @@ public sealed class InventoryUIController : UIController, IOnStateEntered<Gamepl
         }
 
         if (_inventoryHotbar != null)
-        {
             _inventoryHotbar.Visible = false;
-        }
 
         CommandBinds.Unregister<ClientInventorySystem>();
+    }
+
+    // Neuron Activation
+    public void OnSystemLoaded(ClientInventorySystem system)
+    {
+        _inventorySystem.OnSlotAdded += AddSlot;
+        _inventorySystem.OnSlotRemoved += RemoveSlot;
+        _inventorySystem.OnLinkInventorySlots += LoadSlots;
+        _inventorySystem.OnUnlinkInventory += UnloadSlots;
+        _inventorySystem.OnSpriteUpdate += SpriteUpdated;
+    }
+
+    // Neuron Deactivation
+    public void OnSystemUnloaded(ClientInventorySystem system)
+    {
+        _inventorySystem.OnSlotAdded -= AddSlot;
+        _inventorySystem.OnSlotRemoved -= RemoveSlot;
+        _inventorySystem.OnLinkInventorySlots -= LoadSlots;
+        _inventorySystem.OnUnlinkInventory -= UnloadSlots;
+        _inventorySystem.OnSpriteUpdate -= SpriteUpdated;
+    }
+
+    // Monkey Sees Action
+    // Neuron Activation
+    // Monkey copies code
+    public void OnSystemLoaded(HandsSystem system)
+    {
+        _handsSystem.OnPlayerItemAdded += OnItemAdded;
+        _handsSystem.OnPlayerItemRemoved += OnItemRemoved;
+        _handsSystem.OnPlayerSetActiveHand += SetActiveHand;
+    }
+
+    public void OnSystemUnloaded(HandsSystem system)
+    {
+        _handsSystem.OnPlayerItemAdded -= OnItemAdded;
+        _handsSystem.OnPlayerItemRemoved -= OnItemRemoved;
+        _handsSystem.OnPlayerSetActiveHand -= SetActiveHand;
+    }
+
+    public override void Initialize()
+    {
+        base.Initialize();
+
+        var gameplayStateLoad = UIManager.GetUIController<GameplayStateLoadController>();
+        gameplayStateLoad.OnScreenLoad += OnScreenLoad;
+    }
+
+    private void OnScreenLoad()
+    {
+        if (UIManager.ActiveScreen == null)
+            return;
+
+        if (UIManager.GetActiveUIWidgetOrNull<InventoryGui>() is { } inventoryGui)
+            RegisterInventoryButton(inventoryGui.InventoryButton);
     }
 
     private SlotButton CreateSlotButton(SlotData data)
@@ -122,17 +156,13 @@ public sealed class InventoryUIController : UIController, IOnStateEntered<Gamepl
         return button;
     }
 
-    public void RegisterInventoryBarContainer(ItemSlotButtonContainer inventoryHotbar)
-    {
+    public void RegisterInventoryBarContainer(ItemSlotButtonContainer inventoryHotbar) =>
         _inventoryHotbar = inventoryHotbar;
-    }
 
     public void RegisterInventoryButton(SlotButton? button)
     {
         if (_inventoryButton != null)
-        {
             _inventoryButton.Pressed -= InventoryButtonPressed;
-        }
 
         if (button != null)
         {
@@ -210,7 +240,7 @@ public sealed class InventoryUIController : UIController, IOnStateEntered<Gamepl
             {
                 _inventoryHotbar.AddChild(new Control
                 {
-                    MinSize = new Vector2(64, 64)
+                    MinSize = new Vector2(64, 64),
                 });
             }
         }
@@ -269,27 +299,6 @@ public sealed class InventoryUIController : UIController, IOnStateEntered<Gamepl
         UpdateInventoryHotbar(_playerInventory);
         var shouldBeVisible = !_inventoryHotbar.Visible;
         _inventoryHotbar.Visible = shouldBeVisible;
-
-    }
-
-    // Neuron Activation
-    public void OnSystemLoaded(ClientInventorySystem system)
-    {
-        _inventorySystem.OnSlotAdded += AddSlot;
-        _inventorySystem.OnSlotRemoved += RemoveSlot;
-        _inventorySystem.OnLinkInventorySlots += LoadSlots;
-        _inventorySystem.OnUnlinkInventory += UnloadSlots;
-        _inventorySystem.OnSpriteUpdate += SpriteUpdated;
-    }
-
-    // Neuron Deactivation
-    public void OnSystemUnloaded(ClientInventorySystem system)
-    {
-        _inventorySystem.OnSlotAdded -= AddSlot;
-        _inventorySystem.OnSlotRemoved -= RemoveSlot;
-        _inventorySystem.OnLinkInventorySlots -= LoadSlots;
-        _inventorySystem.OnUnlinkInventory -= UnloadSlots;
-        _inventorySystem.OnSpriteUpdate -= SpriteUpdated;
     }
 
     private void ItemPressed(GUIBoundKeyEventArgs args, SlotControl control)
@@ -304,38 +313,24 @@ public sealed class InventoryUIController : UIController, IOnStateEntered<Gamepl
         }
 
         if (_playerInventory == null || _playerUid == null)
-        {
             return;
-        }
 
         if (args.Function == ContentKeyFunctions.ExamineEntity)
-        {
             _inventorySystem.UIInventoryExamine(slot, _playerUid.Value);
-        }
         else if (args.Function == EngineKeyFunctions.UseSecondary)
-        {
             _inventorySystem.UIInventoryOpenContextMenu(slot, _playerUid.Value);
-        }
         else if (args.Function == ContentKeyFunctions.ActivateItemInWorld)
-        {
             _inventorySystem.UIInventoryActivateItem(slot, _playerUid.Value);
-        }
         else if (args.Function == ContentKeyFunctions.AltActivateItemInWorld)
-        {
             _inventorySystem.UIInventoryAltActivateItem(slot, _playerUid.Value);
-        }
         else
-        {
             return;
-        }
 
         args.Handle();
     }
 
-    private void StoragePressed(GUIBoundKeyEventArgs args, SlotControl control)
-    {
+    private void StoragePressed(GUIBoundKeyEventArgs args, SlotControl control) =>
         _inventorySystem.UIInventoryStorageActivate(control.SlotName);
-    }
 
     private void SlotButtonHovered(GUIMouseHoverEventArgs args, SlotControl control)
     {
@@ -364,9 +359,8 @@ public sealed class InventoryUIController : UIController, IOnStateEntered<Gamepl
                    _container.CanInsert(held.Value, container);
 
         if (!fits && _entities.TryGetComponent<StorageComponent>(container.ContainedEntity, out var storage))
-        {
-            fits = _entities.System<StorageSystem>().CanInsert(container.ContainedEntity.Value, held.Value, out _, storage);
-        }
+            fits = _entities.System<StorageSystem>()
+                .CanInsert(container.ContainedEntity.Value, held.Value, out _, storage);
         else if (!fits && _entities.TryGetComponent<ItemSlotsComponent>(container.ContainedEntity, out var itemSlots))
         {
             var itemSlotsSys = _entities.System<ItemSlotsSystem>();
@@ -405,10 +399,7 @@ public sealed class InventoryUIController : UIController, IOnStateEntered<Gamepl
         slotGroup.RemoveButton(data.SlotName);
     }
 
-    public void ReloadSlots()
-    {
-        _inventorySystem.ReloadInventory();
-    }
+    public void ReloadSlots() => _inventorySystem.ReloadInventory();
 
     private void LoadSlots(EntityUid clientUid, InventorySlotsComponent clientInv)
     {
@@ -475,27 +466,7 @@ public sealed class InventoryUIController : UIController, IOnStateEntered<Gamepl
         return false;
     }
 
-    public void RemoveSlotGroup(string slotGroupName)
-    {
-        _slotGroups.Remove(slotGroupName);
-    }
-
-    // Monkey Sees Action
-    // Neuron Activation
-    // Monkey copies code
-    public void OnSystemLoaded(HandsSystem system)
-    {
-        _handsSystem.OnPlayerItemAdded += OnItemAdded;
-        _handsSystem.OnPlayerItemRemoved += OnItemRemoved;
-        _handsSystem.OnPlayerSetActiveHand += SetActiveHand;
-    }
-
-    public void OnSystemUnloaded(HandsSystem system)
-    {
-        _handsSystem.OnPlayerItemAdded -= OnItemAdded;
-        _handsSystem.OnPlayerItemRemoved -= OnItemRemoved;
-        _handsSystem.OnPlayerSetActiveHand -= SetActiveHand;
-    }
+    public void RemoveSlotGroup(string slotGroupName) => _slotGroups.Remove(slotGroupName);
 
 
     private void OnItemAdded(string name, EntityUid entity)

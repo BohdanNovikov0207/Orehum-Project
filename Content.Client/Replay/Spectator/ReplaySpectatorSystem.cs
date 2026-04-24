@@ -28,21 +28,22 @@ namespace Content.Client.Replay.Spectator;
 /// </remarks>
 public sealed partial class ReplaySpectatorSystem : EntitySystem
 {
-    [Dependency] private readonly IPlayerManager _player = default!;
-    [Dependency] private readonly IConsoleHost _conHost = default!;
-    [Dependency] private readonly IStateManager _stateMan = default!;
-    [Dependency] private readonly TransformSystem _transform = default!;
-    [Dependency] private readonly SharedMoverController _mover = default!;
-    [Dependency] private readonly SharedContentEyeSystem _eye = default!;
-    [Dependency] private readonly IReplayPlaybackManager _replayPlayback = default!;
-
-    private SpectatorData? _spectatorData;
     public const string SpectateCmd = "replay_spectate";
 
     /// <summary>
     /// User Id that corresponds to the local user in a single-player game.
     /// </summary>
     public static readonly NetUserId DefaultUser = default;
+
+    [Dependency] private readonly IConsoleHost _conHost = default!;
+    [Dependency] private readonly SharedContentEyeSystem _eye = default!;
+    [Dependency] private readonly SharedMoverController _mover = default!;
+    [Dependency] private readonly IPlayerManager _player = default!;
+    [Dependency] private readonly IReplayPlaybackManager _replayPlayback = default!;
+    [Dependency] private readonly IStateManager _stateMan = default!;
+    [Dependency] private readonly TransformSystem _transform = default!;
+
+    private SpectatorData? _spectatorData;
 
     public override void Initialize()
     {

@@ -18,10 +18,12 @@ public sealed class OptionsUIController : UIController
 {
     [Dependency] private readonly IConsoleHost _con = default!;
 
-    public override void Initialize()
-    {
-        _con.RegisterCommand("options", Loc.GetString("cmd-options-desc"), Loc.GetString("cmd-options-help"), OptionsCommand);
-    }
+    private OptionsMenu _optionsWindow = default!;
+
+    public override void Initialize() => _con.RegisterCommand("options",
+        Loc.GetString("cmd-options-desc"),
+        Loc.GetString("cmd-options-help"),
+        OptionsCommand);
 
     private void OptionsCommand(IConsoleShell shell, string argStr, string[] args)
     {
@@ -30,6 +32,7 @@ public sealed class OptionsUIController : UIController
             ToggleWindow();
             return;
         }
+
         OpenWindow();
 
         if (!int.TryParse(args[0], out var tab))
@@ -40,8 +43,6 @@ public sealed class OptionsUIController : UIController
 
         _optionsWindow.Tabs.CurrentTab = tab;
     }
-
-    private OptionsMenu _optionsWindow = default!;
 
     private void EnsureWindow()
     {
@@ -66,12 +67,8 @@ public sealed class OptionsUIController : UIController
         EnsureWindow();
 
         if (_optionsWindow.IsOpen)
-        {
             _optionsWindow.Close();
-        }
         else
-        {
             OpenWindow();
-        }
     }
 }

@@ -28,12 +28,6 @@ namespace Content.Client.UserInterface.Systems.Ghost.Widgets;
 [GenerateTypedNameReferences]
 public sealed partial class GhostGui : UIWidget
 {
-    public GhostTargetWindow TargetWindow { get; }
-
-    public event Action? RequestWarpsPressed;
-    public event Action? ReturnToBodyPressed;
-    public event Action? GhostRolesPressed;
-    public event Action? ThunderdomePressed; // Goobstation - Thunderdome
     private int _prevNumberRoles;
 
     public GhostGui()
@@ -50,6 +44,13 @@ public sealed partial class GhostGui : UIWidget
         GhostRolesButton.OnPressed += _ => GhostRolesButton.StyleClasses.Remove(StyleBase.ButtonCaution);
         ThunderdomeButton.OnPressed += _ => ThunderdomePressed?.Invoke(); // Goobstation - Thunderdome
     }
+
+    public GhostTargetWindow TargetWindow { get; }
+
+    public event Action? RequestWarpsPressed;
+    public event Action? ReturnToBodyPressed;
+    public event Action? GhostRolesPressed;
+    public event Action? ThunderdomePressed; // Goobstation - Thunderdome
 
     public void Hide()
     {
@@ -70,29 +71,23 @@ public sealed partial class GhostGui : UIWidget
             GhostRolesButton.Text = Loc.GetString("ghost-gui-ghost-roles-button", ("count", roles));
 
             if (roles > _prevNumberRoles)
-            {
                 GhostRolesButton.StyleClasses.Add(StyleBase.ButtonCaution);
-            }
 
-            _prevNumberRoles = (int)roles;
+            _prevNumberRoles = (int) roles;
         }
 
         TargetWindow.Populate();
     }
 
     // Goobstation - Thunderdome
-    public void UpdateThunderdome(int playerCount)
-    {
+    public void UpdateThunderdome(int playerCount) =>
         ThunderdomeButton.Text = Loc.GetString("thunderdome-ghost-button", ("count", playerCount));
-    }
 
     protected override void Dispose(bool disposing)
     {
         base.Dispose(disposing);
 
         if (disposing)
-        {
             TargetWindow.Dispose();
-        }
     }
 }

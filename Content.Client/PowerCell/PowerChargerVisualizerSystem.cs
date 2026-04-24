@@ -18,7 +18,9 @@ public sealed class PowerChargerVisualizerSystem : VisualizerSystem<PowerCharger
 {
     [Dependency] private readonly SpriteSystem _sprite = default!;
 
-    protected override void OnAppearanceChange(EntityUid uid, PowerChargerVisualsComponent comp, ref AppearanceChangeEvent args)
+    protected override void OnAppearanceChange(EntityUid uid,
+        PowerChargerVisualsComponent comp,
+        ref AppearanceChangeEvent args)
     {
         if (args.Sprite == null)
             return;
@@ -30,9 +32,7 @@ public sealed class PowerChargerVisualizerSystem : VisualizerSystem<PowerCharger
             _sprite.LayerSetRsiState((uid, args.Sprite), PowerChargerVisualLayers.Base, comp.OccupiedState);
         }
         else
-        {
             _sprite.LayerSetRsiState((uid, args.Sprite), PowerChargerVisualLayers.Base, comp.EmptyState);
-        }
 
         // Update lighting
         if (AppearanceSystem.TryGetData<CellChargerStatus>(uid, CellVisual.Light, out var status, args.Component)

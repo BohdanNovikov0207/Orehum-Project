@@ -17,13 +17,13 @@ namespace Content.Client.Bed.Cryostorage;
 [GenerateTypedNameReferences]
 public sealed partial class CryostorageMenu : FancyWindow
 {
-    public event Action<NetEntity, string>? SlotRemoveButtonPressed;
-    public event Action<NetEntity, string>? HandRemoveButtonPressed;
-
     public CryostorageMenu()
     {
         RobustXamlLoader.Load(this);
     }
+
+    public event Action<NetEntity, string>? SlotRemoveButtonPressed;
+    public event Action<NetEntity, string>? HandRemoveButtonPressed;
 
     public void UpdateState(CryostorageBuiState state)
     {

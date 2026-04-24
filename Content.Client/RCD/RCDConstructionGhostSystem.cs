@@ -7,7 +7,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Client.Hands.Systems;
-using Content.Shared.Hands.Components;
 using Content.Shared.Input;
 using Content.Shared.Interaction;
 using Content.Shared.RCD;
@@ -19,7 +18,6 @@ using Robust.Shared.Input;
 using Robust.Shared.Input.Binding;
 using Robust.Shared.Prototypes;
 
-
 namespace Content.Client.RCD;
 
 /// <summary>
@@ -28,14 +26,14 @@ namespace Content.Client.RCD;
 public sealed class RCDConstructionGhostSystem : EntitySystem
 {
     private const string PlacementMode = nameof(AlignRCDConstruction);
+    [Dependency] private readonly HandsSystem _hands = default!;
+    [Dependency] private readonly IPlacementManager _placementManager = default!;
 
     [Dependency] private readonly IPlayerManager _playerManager = default!;
-    [Dependency] private readonly IPlacementManager _placementManager = default!;
     [Dependency] private readonly IPrototypeManager _protoManager = default!;
-    [Dependency] private readonly HandsSystem _hands = default!;
 
-    private Direction _placementDirection = default;
-    private bool _useMirrorPrototype = false;
+    private Direction _placementDirection;
+    private bool _useMirrorPrototype;
     public event EventHandler? FlipConstructionPrototype;
 
     public override void Initialize()
@@ -95,7 +93,7 @@ public sealed class RCDConstructionGhostSystem : EntitySystem
         var placerIsRCD = HasComp<RCDComponent>(placerEntity);
 
         // Exit if erasing or the current placer is not an RCD (build mode is active)
-        if (_placementManager.Eraser || (placerEntity != null && !placerIsRCD))
+        if (_placementManager.Eraser || placerEntity != null && !placerIsRCD)
             return;
 
         // Determine if player is carrying an RCD in their active hand
@@ -112,22 +110,23 @@ public sealed class RCDConstructionGhostSystem : EntitySystem
 
             return;
         }
+
         var prototype = _protoManager.Index(rcd.ProtoId);
 
         // Update the direction the RCD prototype based on the placer direction
         if (_placementDirection != _placementManager.Direction)
         {
             _placementDirection = _placementManager.Direction;
-            RaiseNetworkEvent(new RCDConstructionGhostRotationEvent(GetNetEntity(heldEntity.Value), _placementDirection));
+            RaiseNetworkEvent(
+                new RCDConstructionGhostRotationEvent(GetNetEntity(heldEntity.Value), _placementDirection));
         }
+
         // If the placer has not changed build it.
-        var useProto = (_useMirrorPrototype && !string.IsNullOrEmpty(prototype.MirrorPrototype)) ? prototype.MirrorPrototype : prototype.Prototype;
+        var useProto = _useMirrorPrototype && !string.IsNullOrEmpty(prototype.MirrorPrototype)
+            ? prototype.MirrorPrototype
+            : prototype.Prototype;
         if (heldEntity != placerEntity || useProto != placerProto)
-        {
             CreatePlacer(heldEntity.Value, rcd, useProto, prototype.Mode);
-        }
-
-
     }
 
     private void CreatePlacer(EntityUid uid, RCDComponent component, string? prototype, RcdMode mode)
@@ -139,7 +138,7 @@ public sealed class RCDConstructionGhostSystem : EntitySystem
             PlacementOption = PlacementMode,
             EntityType = prototype,
             Range = (int) Math.Ceiling(SharedInteractionSystem.InteractionRange),
-            IsTile = (mode == RcdMode.ConstructTile),
+            IsTile = mode == RcdMode.ConstructTile,
             UseEditorContext = false,
         };
 

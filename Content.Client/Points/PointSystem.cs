@@ -13,12 +13,12 @@ using Robust.Client.UserInterface.Controls;
 
 namespace Content.Client.Points;
 
-/// <inheritdoc/>
+/// <inheritdoc />
 public sealed class PointSystem : SharedPointSystem
 {
     [Dependency] private readonly CharacterInfoSystem _characterInfo = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
@@ -27,10 +27,8 @@ public sealed class PointSystem : SharedPointSystem
         SubscribeLocalEvent<CharacterInfoSystem.GetCharacterInfoControlsEvent>(OnGetCharacterInfoControls);
     }
 
-    private void OnHandleState(EntityUid uid, PointManagerComponent component, ref AfterAutoHandleStateEvent args)
-    {
+    private void OnHandleState(EntityUid uid, PointManagerComponent component, ref AfterAutoHandleStateEvent args) =>
         _characterInfo.RequestCharacterInfo();
-    }
 
     private void OnGetCharacterInfoControls(ref CharacterInfoSystem.GetCharacterInfoControlsEvent ev)
     {
@@ -39,12 +37,12 @@ public sealed class PointSystem : SharedPointSystem
             var box = new BoxContainer
             {
                 Margin = new Thickness(5),
-                Orientation = BoxContainer.LayoutOrientation.Vertical
+                Orientation = BoxContainer.LayoutOrientation.Vertical,
             };
 
             var title = new RichTextLabel
             {
-                HorizontalAlignment = Control.HAlignment.Center
+                HorizontalAlignment = Control.HAlignment.Center,
             };
             title.SetMarkup(Loc.GetString("point-scoreboard-header"));
 

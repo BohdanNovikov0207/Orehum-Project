@@ -23,18 +23,9 @@ namespace Content.Client.Lobby.UI.Loadouts;
 [GenerateTypedNameReferences]
 public sealed partial class LoadoutContainer : BoxContainer
 {
+    private readonly EntityUid? _entity;
     [Dependency] private readonly IEntityManager _entManager = default!;
     [Dependency] private readonly IPrototypeManager _protoManager = default!;
-
-    private readonly EntityUid? _entity;
-
-    public Button Select => SelectButton;
-
-    public string? Text
-    {
-        get => SelectButton.Text;
-        set => SelectButton.Text = value;
-    }
 
     public LoadoutContainer(ProtoId<LoadoutPrototype> proto, bool disabled, FormattedMessage? reason)
     {
@@ -61,10 +52,26 @@ public sealed partial class LoadoutContainer : BoxContainer
             Sprite.SetEntity(_entity);
 
             var spriteTooltip = new Tooltip();
-            spriteTooltip.SetMessage(FormattedMessage.FromUnformatted(_entManager.GetComponent<MetaDataComponent>(_entity.Value).EntityDescription));
+            spriteTooltip.SetMessage(
+                FormattedMessage.FromUnformatted(_entManager.GetComponent<MetaDataComponent>(_entity.Value)
+                    .EntityDescription));
 
             TooltipSupplier = _ => spriteTooltip;
         }
+    }
+
+    public Button Select => SelectButton;
+
+    public string? Text
+    {
+        get => SelectButton.Text;
+        set => SelectButton.Text = value;
+    }
+
+    public bool Pressed
+    {
+        get => SelectButton.Pressed;
+        set => SelectButton.Pressed = value;
     }
 
     protected override void Dispose(bool disposing)
@@ -74,11 +81,5 @@ public sealed partial class LoadoutContainer : BoxContainer
             return;
 
         _entManager.DeleteEntity(_entity);
-    }
-
-    public bool Pressed
-    {
-        get => SelectButton.Pressed;
-        set => SelectButton.Pressed = value;
     }
 }

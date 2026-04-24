@@ -14,22 +14,18 @@ namespace Content.Client.Power.Generation.Teg;
 /// Handles client-side logic for the thermo-electric generator (TEG).
 /// </summary>
 /// <remarks>
-/// <para>
-/// TEG circulators show which direction the in- and outlet port is by popping up two floating arrows when examined.
-/// </para>
+///     <para>
+///     TEG circulators show which direction the in- and outlet port is by popping up two floating arrows when examined.
+///     </para>
 /// </remarks>
-/// <seealso cref="TegCirculatorComponent"/>
+/// <seealso cref="TegCirculatorComponent" />
 public sealed class TegSystem : EntitySystem
 {
     private static readonly EntProtoId ArrowPrototype = "TegCirculatorArrow";
 
-    public override void Initialize()
-    {
+    public override void Initialize() =>
         SubscribeLocalEvent<TegCirculatorComponent, ClientExaminedEvent>(CirculatorExamined);
-    }
 
-    private void CirculatorExamined(EntityUid uid, TegCirculatorComponent component, ClientExaminedEvent args)
-    {
+    private void CirculatorExamined(EntityUid uid, TegCirculatorComponent component, ClientExaminedEvent args) =>
         Spawn(ArrowPrototype, new EntityCoordinates(uid, 0, 0));
-    }
 }

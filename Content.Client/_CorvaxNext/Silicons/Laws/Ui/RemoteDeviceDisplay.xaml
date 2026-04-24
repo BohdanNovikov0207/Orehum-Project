@@ -6,12 +6,12 @@
                       HorizontalExpand="True"
                       VerticalExpand="True"
                       Margin="5 5 5 5">
-            <customControls:HSeparator Margin="0 5 0 5"/>
-            <RichTextLabel Name="DeviceName"/>
+            <customControls:HSeparator Margin="0 5 0 5" />
+            <RichTextLabel Name="DeviceName" />
             <BoxContainer Name="RemoteControlButtons" Orientation="Horizontal" HorizontalExpand="True" Margin="0 5 0 0">
-                <Button Name="MoveButton" StyleClasses="chatSelectorOptionButton" Text="{Loc ai-remote-ui-menu-moveto}"/>
-                <Control Margin="2 0 0 0"/>
-                <Button Name="TakeControlButton" StyleClasses="chatSelectorOptionButton" Text="{Loc ai-remote-control}"/>
+                <Button Name="MoveButton" StyleClasses="chatSelectorOptionButton" Text="{Loc ai-remote-ui-menu-moveto}" />
+                <Control Margin="2 0 0 0" />
+                <Button Name="TakeControlButton" StyleClasses="chatSelectorOptionButton" Text="{Loc ai-remote-control}" />
             </BoxContainer>
         </BoxContainer>
     </PanelContainer>

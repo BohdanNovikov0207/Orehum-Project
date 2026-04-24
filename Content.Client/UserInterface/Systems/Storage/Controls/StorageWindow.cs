@@ -36,55 +36,52 @@ namespace Content.Client.UserInterface.Systems.Storage.Controls;
 
 public sealed class StorageWindow : BaseWindow
 {
-    [Dependency] private readonly IEntityManager _entity = default!;
-    private readonly StorageUIController _storageController;
+    private readonly GridContainer _backgroundGrid;
+    private readonly string _backTexturePath = "Storage/back";
+    private readonly string _blockedOpaqueTexturePath = "Storage/tile_blocked_opaque";
+    private readonly string _blockedTexturePath = "Storage/tile_blocked";
+    private readonly List<Control> _controlGrid = new();
+    private readonly string _emptyOpaqueTexturePath = "Storage/tile_empty_opaque";
 
-    public EntityUid? StorageEntity;
+    private readonly string _emptyTexturePath = "Storage/tile_empty";
+    [Dependency] private readonly IEntityManager _entity = default!;
+    private readonly string _exitTexturePath = "Storage/exit";
 
     private readonly GridContainer _pieceGrid;
-    private readonly GridContainer _backgroundGrid;
-    private readonly GridContainer _sidebar;
-
-    private Control _titleContainer;
-    private Label _titleLabel;
 
     // Needs to be nullable in case a piece is in default spot.
     private readonly Dictionary<EntityUid, (ItemStorageLocation? Loc, ItemGridPiece Control)> _pieces = new();
-    private readonly List<Control> _controlGrid = new();
+    private readonly GridContainer _sidebar;
+    private readonly string _sidebarBottomTexturePath = "Storage/sidebar_bottom";
+    private readonly string _sidebarFatTexturePath = "Storage/sidebar_fat";
+    private readonly string _sidebarMiddleTexturePath = "Storage/sidebar_mid";
+    private readonly string _sidebarTopTexturePath = "Storage/sidebar_top";
+    private readonly StorageUIController _storageController;
 
-    private ValueList<EntityUid> _contained = new();
-    private ValueList<EntityUid> _toRemove = new();
-
-    // Manually store this because you can't have a 0x0 GridContainer but we still need to add child controls for 1x1 containers.
-    private Vector2i _pieceGridSize;
+    private readonly Control _titleContainer;
+    private readonly Label _titleLabel;
 
     private TextureButton? _backButton;
+    private Texture? _backTexture;
+    private Texture? _blockedOpaqueTexture;
+    private Texture? _blockedTexture;
+
+    private ValueList<EntityUid> _contained;
+    private Texture? _emptyOpaqueTexture;
+    private Texture? _emptyTexture;
+    private Texture? _exitTexture;
 
     private bool _isDirty;
 
-    public event Action<GUIBoundKeyEventArgs, ItemGridPiece>? OnPiecePressed;
-    public event Action<GUIBoundKeyEventArgs, ItemGridPiece>? OnPieceUnpressed;
-
-    private readonly string _emptyTexturePath = "Storage/tile_empty";
-    private Texture? _emptyTexture;
-    private readonly string _blockedTexturePath = "Storage/tile_blocked";
-    private Texture? _blockedTexture;
-    private readonly string _emptyOpaqueTexturePath = "Storage/tile_empty_opaque";
-    private Texture? _emptyOpaqueTexture;
-    private readonly string _blockedOpaqueTexturePath = "Storage/tile_blocked_opaque";
-    private Texture? _blockedOpaqueTexture;
-    private readonly string _exitTexturePath = "Storage/exit";
-    private Texture? _exitTexture;
-    private readonly string _backTexturePath = "Storage/back";
-    private Texture? _backTexture;
-    private readonly string _sidebarTopTexturePath = "Storage/sidebar_top";
-    private Texture? _sidebarTopTexture;
-    private readonly string _sidebarMiddleTexturePath = "Storage/sidebar_mid";
-    private Texture? _sidebarMiddleTexture;
-    private readonly string _sidebarBottomTexturePath = "Storage/sidebar_bottom";
+    // Manually store this because you can't have a 0x0 GridContainer but we still need to add child controls for 1x1 containers.
+    private Vector2i _pieceGridSize;
     private Texture? _sidebarBottomTexture;
-    private readonly string _sidebarFatTexturePath = "Storage/sidebar_fat";
     private Texture? _sidebarFatTexture;
+    private Texture? _sidebarMiddleTexture;
+    private Texture? _sidebarTopTexture;
+    private ValueList<EntityUid> _toRemove;
+
+    public EntityUid? StorageEntity;
 
     public StorageWindow()
     {
@@ -102,24 +99,24 @@ public sealed class StorageWindow : BaseWindow
             Name = "SideBar",
             HSeparationOverride = 0,
             VSeparationOverride = 0,
-            Columns = 1
+            Columns = 1,
         };
 
         _pieceGrid = new GridContainer
         {
             Name = "PieceGrid",
             HSeparationOverride = 0,
-            VSeparationOverride = 0
+            VSeparationOverride = 0,
         };
 
         _backgroundGrid = new GridContainer
         {
             Name = "BackgroundGrid",
             HSeparationOverride = 0,
-            VSeparationOverride = 0
+            VSeparationOverride = 0,
         };
 
-        _titleLabel = new Label()
+        _titleLabel = new Label
         {
             HorizontalExpand = true,
             Name = "StorageLabel",
@@ -128,19 +125,19 @@ public sealed class StorageWindow : BaseWindow
             StyleClasses =
             {
                 "FancyWindowTitle",
-            }
+            },
         };
 
-        _titleContainer = new PanelContainer()
+        _titleContainer = new PanelContainer
         {
             StyleClasses =
             {
-                "WindowHeadingBackground"
+                "WindowHeadingBackground",
             },
             Children =
             {
-                _titleLabel
-            }
+                _titleLabel,
+            },
         };
 
         var container = new BoxContainer
@@ -160,16 +157,19 @@ public sealed class StorageWindow : BaseWindow
                             Children =
                             {
                                 _backgroundGrid,
-                                _pieceGrid
-                            }
-                        }
-                    }
-                }
-            }
+                                _pieceGrid,
+                            },
+                        },
+                    },
+                },
+            },
         };
 
         AddChild(container);
     }
+
+    public event Action<GUIBoundKeyEventArgs, ItemGridPiece>? OnPiecePressed;
+    public event Action<GUIBoundKeyEventArgs, ItemGridPiece>? OnPieceUnpressed;
 
     protected override void OnThemeUpdated()
     {
@@ -200,9 +200,7 @@ public sealed class StorageWindow : BaseWindow
             _titleContainer.Visible = true;
         }
         else
-        {
             _titleContainer.Visible = false;
-        }
 
         BuildGridRepresentation();
     }
@@ -222,9 +220,7 @@ public sealed class StorageWindow : BaseWindow
                 .TryGetOpenUi<StorageBoundUserInterface>(container.Owner,
                     StorageComponent.StorageUiKey.Key,
                     out var parentBui))
-        {
             parentBui.CloseWindow(Position);
-        }
     }
 
     private void BuildGridRepresentation()
@@ -237,6 +233,7 @@ public sealed class StorageWindow : BaseWindow
         BuildBackground();
 
         #region Sidebar
+
         _sidebar.Children.Clear();
         var rows = boundingGrid.Height + 1;
         _sidebar.Rows = rows;
@@ -277,10 +274,10 @@ public sealed class StorageWindow : BaseWindow
                     TextureScale = new Vector2(2, 2),
                     Children =
                     {
-                        exitButton
-                    }
-                }
-            }
+                        exitButton,
+                    },
+                },
+            },
         };
 
         _sidebar.AddChild(exitContainer);
@@ -307,9 +304,7 @@ public sealed class StorageWindow : BaseWindow
                         .TryGetOpenUi<StorageBoundUserInterface>(container.Owner,
                             StorageComponent.StorageUiKey.Key,
                             out var parentBui))
-                    {
                         parentBui.Show(Position);
-                    }
                 }
             };
 
@@ -325,9 +320,9 @@ public sealed class StorageWindow : BaseWindow
                         Children =
                         {
                             _backButton,
-                        }
-                    }
-                }
+                        },
+                    },
+                },
             };
 
             _sidebar.AddChild(backContainer);
@@ -339,7 +334,7 @@ public sealed class StorageWindow : BaseWindow
         {
             _sidebar.AddChild(new TextureRect
             {
-                Texture = i != (fillerRows - 1) ? _sidebarMiddleTexture : _sidebarBottomTexture,
+                Texture = i != fillerRows - 1 ? _sidebarMiddleTexture : _sidebarBottomTexture,
                 TextureScale = new Vector2(2, 2),
             });
         }
@@ -377,7 +372,7 @@ public sealed class StorageWindow : BaseWindow
                 _backgroundGrid.AddChild(new TextureRect
                 {
                     Texture = texture,
-                    TextureScale = new Vector2(2, 2)
+                    TextureScale = new Vector2(2, 2),
                 });
             }
         }
@@ -393,15 +388,10 @@ public sealed class StorageWindow : BaseWindow
         _controlGrid[controlIndex].AddChild(draggingGhost);
     }
 
-    private int GetGridIndex(ItemGridPiece piece)
-    {
-        return piece.Location.Position.X + piece.Location.Position.Y * _pieceGrid.Columns;
-    }
+    private int GetGridIndex(ItemGridPiece piece) =>
+        piece.Location.Position.X + piece.Location.Position.Y * _pieceGrid.Columns;
 
-    public void FlagDirty()
-    {
-        _isDirty = true;
-    }
+    public void FlagDirty() => _isDirty = true;
 
     public void RemoveGrid(ItemGridPiece control)
     {
@@ -428,7 +418,7 @@ public sealed class StorageWindow : BaseWindow
         var height = boundingGrid.Height + 1;
 
         // Build the grid representation
-         if (_pieceGrid.Rows != _pieceGridSize.Y || _pieceGrid.Columns != _pieceGridSize.X)
+        if (_pieceGrid.Rows != _pieceGridSize.Y || _pieceGrid.Columns != _pieceGridSize.X)
         {
             _pieceGrid.Rows = height;
             _pieceGrid.Columns = width;
@@ -440,7 +430,7 @@ public sealed class StorageWindow : BaseWindow
                 {
                     var control = new Control
                     {
-                        MinSize = size
+                        MinSize = size,
                     };
 
                     _controlGrid.Add(control);
@@ -449,7 +439,7 @@ public sealed class StorageWindow : BaseWindow
             }
         }
 
-        _pieceGridSize = new(width, height);
+        _pieceGridSize = new Vector2i(width, height);
         _toRemove.Clear();
 
         // Remove entities no longer relevant / Update existing ones
@@ -509,15 +499,13 @@ public sealed class StorageWindow : BaseWindow
         }
     }
 
-    private ItemGridPieceMarks? IsMarked(EntityUid uid)
-    {
-        return _contained.IndexOf(uid) switch
+    private ItemGridPieceMarks? IsMarked(EntityUid uid) =>
+        _contained.IndexOf(uid) switch
         {
             0 => ItemGridPieceMarks.First,
             1 => ItemGridPieceMarks.Second,
             _ => null,
         };
-    }
 
     protected override void FrameUpdate(FrameEventArgs args)
     {
@@ -540,20 +528,15 @@ public sealed class StorageWindow : BaseWindow
             {
                 // If parent container nests us then show back button
                 if (containerSystem.TryGetContainingContainer(StorageEntity.Value, out var container) &&
-                    _entity.TryGetComponent(container.Owner, out StorageComponent? storageComp) && storageComp.Container.Contains(StorageEntity.Value))
-                {
+                    _entity.TryGetComponent(container.Owner, out StorageComponent? storageComp) &&
+                    storageComp.Container.Contains(StorageEntity.Value))
                     _backButton.Visible = true;
-                }
                 else
-                {
                     _backButton.Visible = false;
-                }
             }
             // Hide the button.
             else
-            {
                 _backButton.Visible = false;
-            }
         }
 
         var itemSystem = _entity.System<ItemSystem>();
@@ -580,16 +563,18 @@ public sealed class StorageWindow : BaseWindow
             currentLocation = dragging.Location;
         }
         else if (handsSystem.GetActiveHandEntity() is { } handEntity &&
-                 storageSystem.CanInsert(StorageEntity.Value, handEntity, out _, storageComp: storageComponent, ignoreLocation: true))
+                 storageSystem.CanInsert(StorageEntity.Value,
+                     handEntity,
+                     out _,
+                     storageComponent,
+                     ignoreLocation: true))
         {
             currentEnt = handEntity;
             currentLocation = new ItemStorageLocation(_storageController.DraggingRotation, Vector2i.Zero);
             usingInHand = true;
         }
         else
-        {
             return;
-        }
 
         if (!_entity.TryGetComponent<ItemComponent>(currentEnt, out var itemComp))
             return;
@@ -610,7 +595,8 @@ public sealed class StorageWindow : BaseWindow
 
         foreach (var locations in storageComponent.SavedLocations)
         {
-            if (!_entity.TryGetComponent<MetaDataComponent>(currentEnt, out var meta) || meta.EntityName != locations.Key)
+            if (!_entity.TryGetComponent<MetaDataComponent>(currentEnt, out var meta) ||
+                meta.EntityName != locations.Key)
                 continue;
 
             float spot = 0;
@@ -649,9 +635,7 @@ public sealed class StorageWindow : BaseWindow
             for (var x = itemBounding.Left; x <= itemBounding.Right; x++)
             {
                 if (TryGetBackgroundCell(x, y, out var cell) && itemShape.Contains(x, y))
-                {
                     cell.ModulateSelfOverride = validLocation ? validColor : Color.FromHex("#B40046");
-                }
             }
         }
     }
@@ -662,9 +646,7 @@ public sealed class StorageWindow : BaseWindow
             return DragMode.None;
 
         if (_sidebar.SizeBox.Contains(relativeMousePos - _sidebar.Position))
-        {
             return DragMode.Move;
-        }
 
         return DragMode.None;
     }
@@ -699,9 +681,7 @@ public sealed class StorageWindow : BaseWindow
             x >= _backgroundGrid.Columns ||
             y < 0 ||
             y >= _backgroundGrid.Rows)
-        {
             return false;
-        }
 
         cell = _backgroundGrid.GetChild(y * _backgroundGrid.Columns + x);
         return true;

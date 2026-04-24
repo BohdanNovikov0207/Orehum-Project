@@ -6,8 +6,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Shared._Goobstation.Wizard.MagicMirror;
+using Content.Shared.Humanoid.Prototypes;
 using JetBrains.Annotations;
 using Robust.Client.UserInterface;
+using Robust.Shared.Prototypes;
 
 namespace Content.Client._Shitcode.Wizard.MagicMirror;
 
@@ -24,7 +26,7 @@ public sealed class WizardMirrorBoundUserInterface(EntityUid owner, Enum uiKey) 
         _window = this.CreateWindow<WizardMirrorWindow>();
 
         if (EntMan.TryGetComponent(Owner, out WizardMirrorComponent? mirror))
-            _window.AllowedSpecies = new(mirror.AllowedSpecies);
+            _window.AllowedSpecies = new HashSet<ProtoId<SpeciesPrototype>>(mirror.AllowedSpecies);
 
         _window.Save += OnSave;
     }

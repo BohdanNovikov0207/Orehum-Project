@@ -16,8 +16,8 @@ namespace Content.Client._Shitcode.Wizard.Systems;
 
 public sealed class SpellsSystem : SharedSpellsSystem
 {
-    [Dependency] private readonly IPlayerManager _player = default!;
     [Dependency] private readonly ActionTargetMarkSystem _mark = default!;
+    [Dependency] private readonly IPlayerManager _player = default!;
     [Dependency] private readonly RaysSystem _rays = default!;
 
     public event Action? StopTargeting;
@@ -50,7 +50,7 @@ public sealed class SpellsSystem : SharedSpellsSystem
             Color.Fuchsia,
             10,
             15,
-            minMaxRadius: new Vector2(3f, 6f),
+            new Vector2(3f, 6f),
             proto: "EffectRayCharge",
             server: false);
 

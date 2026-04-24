@@ -19,8 +19,8 @@ namespace Content.Client.Cargo.Systems;
 
 public sealed partial class CargoSystem
 {
-    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
-    [Dependency] private readonly SpriteSystem _sprite = default!;
+    private const string TelepadBeamKey = "cargo-telepad-beam";
+    private const string TelepadIdleKey = "cargo-telepad-idle";
 
     private static readonly Animation CargoTelepadBeamAnimation = new()
     {
@@ -32,10 +32,10 @@ public sealed partial class CargoSystem
                 LayerKey = CargoTelepadLayers.Beam,
                 KeyFrames =
                 {
-                    new AnimationTrackSpriteFlick.KeyFrame(new RSI.StateId("beam"), 0f)
-                }
-            }
-        }
+                    new AnimationTrackSpriteFlick.KeyFrame(new RSI.StateId("beam"), 0f),
+                },
+            },
+        },
     };
 
     private static readonly Animation CargoTelepadIdleAnimation = new()
@@ -48,14 +48,14 @@ public sealed partial class CargoSystem
                 LayerKey = CargoTelepadLayers.Beam,
                 KeyFrames =
                 {
-                    new AnimationTrackSpriteFlick.KeyFrame(new RSI.StateId("idle"), 0f)
-                }
-            }
-        }
+                    new AnimationTrackSpriteFlick.KeyFrame(new RSI.StateId("idle"), 0f),
+                },
+            },
+        },
     };
 
-    private const string TelepadBeamKey = "cargo-telepad-beam";
-    private const string TelepadIdleKey = "cargo-telepad-idle";
+    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly SpriteSystem _sprite = default!;
 
     private void InitializeCargoTelepad()
     {
@@ -63,15 +63,11 @@ public sealed partial class CargoSystem
         SubscribeLocalEvent<CargoTelepadComponent, AnimationCompletedEvent>(OnCargoAnimComplete);
     }
 
-    private void OnCargoAppChange(EntityUid uid, CargoTelepadComponent component, ref AppearanceChangeEvent args)
-    {
+    private void OnCargoAppChange(EntityUid uid, CargoTelepadComponent component, ref AppearanceChangeEvent args) =>
         OnChangeData(uid, args.Sprite);
-    }
 
-    private void OnCargoAnimComplete(EntityUid uid, CargoTelepadComponent component, AnimationCompletedEvent args)
-    {
+    private void OnCargoAnimComplete(EntityUid uid, CargoTelepadComponent component, AnimationCompletedEvent args) =>
         OnChangeData(uid);
-    }
 
     private void OnChangeData(EntityUid uid, SpriteComponent? sprite = null)
     {

@@ -88,8 +88,5 @@ public sealed partial class MappingDoNotMeasure : Control
         RobustXamlLoader.Load(this);
     }
 
-    protected override Vector2 MeasureOverride(Vector2 availableSize)
-    {
-        return Vector2.Zero;
-    }
+    protected override Vector2 MeasureOverride(Vector2 availableSize) => Vector2.Zero;
 }

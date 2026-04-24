@@ -23,117 +23,106 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Shared.ActionBlocker;
-using Content.Shared.Instruments;
 using Content.Shared.Instruments.UI;
 using Content.Shared.Interaction;
 using Robust.Client.Audio.Midi;
-using Robust.Client.Player;
 using Robust.Client.UserInterface;
 
-namespace Content.Client.Instruments.UI
+namespace Content.Client.Instruments.UI;
+
+public sealed class InstrumentBoundUserInterface : BoundUserInterface
 {
-    public sealed class InstrumentBoundUserInterface : BoundUserInterface
+    public readonly ActionBlockerSystem ActionBlocker;
+    [Dependency] public readonly IFileDialogManager FileDialogManager = default!;
+
+    public readonly InstrumentSystem Instruments;
+    public readonly SharedInteractionSystem Interactions;
+    [Dependency] public readonly ILocalizationManager Loc = default!;
+    [Dependency] public readonly IMidiManager MidiManager = default!;
+    [ViewVariables] private BandMenu? _bandMenu;
+    [ViewVariables] private ChannelsMenu? _channelsMenu;
+
+    [ViewVariables] private InstrumentMenu? _instrumentMenu;
+
+    public InstrumentBoundUserInterface(EntityUid owner, Enum uiKey) : base(owner, uiKey)
     {
-        public IEntityManager Entities => EntMan;
-        [Dependency] public readonly IMidiManager MidiManager = default!;
-        [Dependency] public readonly IFileDialogManager FileDialogManager = default!;
-        [Dependency] public readonly ILocalizationManager Loc = default!;
+        IoCManager.InjectDependencies(this);
 
-        public readonly InstrumentSystem Instruments;
-        public readonly ActionBlockerSystem ActionBlocker;
-        public readonly SharedInteractionSystem Interactions;
+        Instruments = Entities.System<InstrumentSystem>();
+        ActionBlocker = Entities.System<ActionBlockerSystem>();
+        Interactions = Entities.System<SharedInteractionSystem>();
+    }
 
-        [ViewVariables] private InstrumentMenu? _instrumentMenu;
-        [ViewVariables] private BandMenu? _bandMenu;
-        [ViewVariables] private ChannelsMenu? _channelsMenu;
+    public IEntityManager Entities => EntMan;
 
-        public InstrumentBoundUserInterface(EntityUid owner, Enum uiKey) : base(owner, uiKey)
-        {
-            IoCManager.InjectDependencies(this);
+    protected override void ReceiveMessage(BoundUserInterfaceMessage message)
+    {
+        if (message is InstrumentBandResponseBuiMessage bandRx)
+            _bandMenu?.Populate(bandRx.Nearby, EntMan);
+    }
 
-            Instruments = Entities.System<InstrumentSystem>();
-            ActionBlocker = Entities.System<ActionBlockerSystem>();
-            Interactions = Entities.System<SharedInteractionSystem>();
-        }
+    protected override void Open()
+    {
+        base.Open();
 
-        protected override void ReceiveMessage(BoundUserInterfaceMessage message)
-        {
-            if (message is InstrumentBandResponseBuiMessage bandRx)
-                _bandMenu?.Populate(bandRx.Nearby, EntMan);
-        }
+        _instrumentMenu = this.CreateWindow<InstrumentMenu>();
+        _instrumentMenu.Title = EntMan.GetComponent<MetaDataComponent>(Owner).EntityName;
 
-        protected override void Open()
-        {
-            base.Open();
+        _instrumentMenu.OnOpenBand += OpenBandMenu;
+        _instrumentMenu.OnOpenChannels += OpenChannelsMenu;
+        _instrumentMenu.OnCloseChannels += CloseChannelsMenu;
+        _instrumentMenu.OnCloseBands += CloseBandMenu;
 
-            _instrumentMenu = this.CreateWindow<InstrumentMenu>();
-            _instrumentMenu.Title = EntMan.GetComponent<MetaDataComponent>(Owner).EntityName;
+        _instrumentMenu.SetMIDI(MidiManager.IsAvailable);
 
-            _instrumentMenu.OnOpenBand += OpenBandMenu;
-            _instrumentMenu.OnOpenChannels += OpenChannelsMenu;
-            _instrumentMenu.OnCloseChannels += CloseChannelsMenu;
-            _instrumentMenu.OnCloseBands += CloseBandMenu;
+        if (EntMan.TryGetComponent(Owner, out InstrumentComponent? instrument))
+            _instrumentMenu.SetInstrument((Owner, instrument));
+    }
 
-            _instrumentMenu.SetMIDI(MidiManager.IsAvailable);
+    protected override void Dispose(bool disposing)
+    {
+        base.Dispose(disposing);
+        if (!disposing)
+            return;
 
-            if (EntMan.TryGetComponent(Owner, out InstrumentComponent? instrument))
-            {
-                _instrumentMenu.SetInstrument((Owner, instrument));
-            }
-        }
+        if (EntMan.TryGetComponent(Owner, out InstrumentComponent? instrument))
+            _instrumentMenu?.RemoveInstrument(instrument);
 
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
-            if (!disposing)
-                return;
+        _bandMenu?.Dispose();
+        _channelsMenu?.Dispose();
+    }
 
-            if (EntMan.TryGetComponent(Owner, out InstrumentComponent? instrument))
-            {
-                _instrumentMenu?.RemoveInstrument(instrument);
-            }
+    public void RefreshBands() => SendMessage(new InstrumentBandRequestBuiMessage());
 
-            _bandMenu?.Dispose();
-            _channelsMenu?.Dispose();
-        }
+    public void OpenBandMenu()
+    {
+        _bandMenu ??= new BandMenu(this);
 
-        public void RefreshBands()
-        {
-            SendMessage(new InstrumentBandRequestBuiMessage());
-        }
+        if (EntMan.TryGetComponent(Owner, out InstrumentComponent? instrument))
+            _bandMenu.Master = instrument.Master;
 
-        public void OpenBandMenu()
-        {
-            _bandMenu ??= new BandMenu(this);
+        // Refresh cache...
+        RefreshBands();
 
-            if (EntMan.TryGetComponent(Owner, out InstrumentComponent? instrument))
-            {
-                _bandMenu.Master = instrument.Master;
-            }
+        _bandMenu.OpenCenteredLeft();
+    }
 
-            // Refresh cache...
-            RefreshBands();
+    public void CloseBandMenu()
+    {
+        if (_bandMenu?.IsOpen ?? false)
+            _bandMenu.Close();
+    }
 
-            _bandMenu.OpenCenteredLeft();
-        }
+    public void OpenChannelsMenu()
+    {
+        _channelsMenu ??= new ChannelsMenu(this);
+        _channelsMenu.Populate();
+        _channelsMenu.OpenCenteredRight();
+    }
 
-        public void CloseBandMenu()
-        {
-            if(_bandMenu?.IsOpen ?? false)
-                _bandMenu.Close();
-        }
-
-        public void OpenChannelsMenu()
-        {
-            _channelsMenu ??= new ChannelsMenu(this);
-            _channelsMenu.Populate();
-            _channelsMenu.OpenCenteredRight();
-        }
-
-        public void CloseChannelsMenu()
-        {
-            if(_channelsMenu?.IsOpen ?? false)
-                _channelsMenu.Close();
-        }
+    public void CloseChannelsMenu()
+    {
+        if (_channelsMenu?.IsOpen ?? false)
+            _channelsMenu.Close();
     }
 }

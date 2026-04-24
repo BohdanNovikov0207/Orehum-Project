@@ -17,7 +17,7 @@ public sealed class AutodocBoundUserInterface : BoundUserInterface
     [Dependency] private readonly IPlayerManager _player = default!;
 
     [ViewVariables]
-    private AutodocWindow? _window;
+    private readonly AutodocWindow? _window;
 
     public AutodocBoundUserInterface(EntityUid owner, Enum uiKey) : base(owner, uiKey)
     {
@@ -30,7 +30,7 @@ public sealed class AutodocBoundUserInterface : BoundUserInterface
         _window.OnAddStep += (program, step, index) => SendMessage(new AutodocAddStepMessage(program, step, index));
         _window.OnRemoveStep += (program, stepIndex) => SendMessage(new AutodocRemoveStepMessage(program, stepIndex));
 
-        _window.OnImportProgram += (program) => SendMessage(new AutodocImportProgramMessage(program));
+        _window.OnImportProgram += program => SendMessage(new AutodocImportProgramMessage(program));
 
         _window.OnStart += program => SendMessage(new AutodocStartMessage(program));
         _window.OnStop += () => SendMessage(new AutodocStopMessage());

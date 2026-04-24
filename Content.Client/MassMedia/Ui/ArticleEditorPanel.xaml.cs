@@ -26,12 +26,7 @@ namespace Content.Client.MassMedia.Ui;
 [GenerateTypedNameReferences]
 public sealed partial class ArticleEditorPanel : Control
 {
-    public event Action? PublishButtonPressed;
-    public event Action<string, string>? ArticleDraftUpdated;
-
-    private bool _preview;
-
-    private Type[] AllowedTags =
+    private readonly Type[] AllowedTags =
     [
         typeof(BoldItalicTag),
         typeof(BoldTag),
@@ -41,6 +36,8 @@ public sealed partial class ArticleEditorPanel : Control
         typeof(ItalicTag),
         typeof(MonoTag),
     ];
+
+    private bool _preview;
 
     public ArticleEditorPanel()
     {
@@ -53,7 +50,7 @@ public sealed partial class ArticleEditorPanel : Control
         // Customize scrollbar width and margin. This is not possible in xaml
         var scrollbar = ContentField.GetChild(1);
         scrollbar.SetWidth = 6f;
-        scrollbar.Margin = new Thickness(9, 0, 2 , 0);
+        scrollbar.Margin = new Thickness(9, 0, 2, 0);
 
         RichTextInfoLabel.TooltipSupplier = sender =>
         {
@@ -72,9 +69,14 @@ public sealed partial class ArticleEditorPanel : Control
         ButtonPublish.OnPressed += OnPublish;
         ButtonSaveDraft.OnPressed += OnDraftSaved;
 
-        TitleField.OnTextChanged += args => OnTextChanged(args.Text.Length, args.Control, SharedNewsSystem.MaxTitleLength);
-        ContentField.OnTextChanged += args => OnTextChanged(Rope.CalcTotalLength(args.TextRope), args.Control, SharedNewsSystem.MaxContentLength);
+        TitleField.OnTextChanged +=
+            args => OnTextChanged(args.Text.Length, args.Control, SharedNewsSystem.MaxTitleLength);
+        ContentField.OnTextChanged += args =>
+            OnTextChanged(Rope.CalcTotalLength(args.TextRope), args.Control, SharedNewsSystem.MaxContentLength);
     }
+
+    public event Action? PublishButtonPressed;
+    public event Action<string, string>? ArticleDraftUpdated;
 
     private void OnTextChanged(long length, Control control, long maxLength)
     {

@@ -33,9 +33,7 @@ public sealed class CryoPodSystem : SharedCryoPodSystem
     private void OnCryoPodInsertion(EntityUid uid, InsideCryoPodComponent component, ComponentStartup args)
     {
         if (!TryComp<SpriteComponent>(uid, out var spriteComponent))
-        {
             return;
-        }
 
         component.PreviousOffset = spriteComponent.Offset;
         _sprite.SetOffset((uid, spriteComponent), new Vector2(0, 1));
@@ -44,9 +42,7 @@ public sealed class CryoPodSystem : SharedCryoPodSystem
     private void OnCryoPodRemoval(EntityUid uid, InsideCryoPodComponent component, ComponentRemove args)
     {
         if (!TryComp<SpriteComponent>(uid, out var spriteComponent))
-        {
             return;
-        }
 
         _sprite.SetOffset((uid, spriteComponent), component.PreviousOffset);
     }
@@ -54,15 +50,11 @@ public sealed class CryoPodSystem : SharedCryoPodSystem
     private void OnAppearanceChange(EntityUid uid, CryoPodComponent component, ref AppearanceChangeEvent args)
     {
         if (args.Sprite == null)
-        {
             return;
-        }
 
         if (!_appearance.TryGetData<bool>(uid, CryoPodVisuals.ContainsEntity, out var isOpen, args.Component)
             || !_appearance.TryGetData<bool>(uid, CryoPodVisuals.IsOn, out var isOn, args.Component))
-        {
             return;
-        }
 
         if (isOpen)
         {

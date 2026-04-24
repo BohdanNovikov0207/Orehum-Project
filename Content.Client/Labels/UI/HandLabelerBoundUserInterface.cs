@@ -20,54 +20,51 @@ using Content.Shared.Labels;
 using Content.Shared.Labels.Components;
 using Robust.Client.UserInterface;
 
-namespace Content.Client.Labels.UI
+namespace Content.Client.Labels.UI;
+
+/// <summary>
+/// Initializes a <see cref="HandLabelerWindow" /> and updates it when new server messages are received.
+/// </summary>
+public sealed class HandLabelerBoundUserInterface : BoundUserInterface
 {
-    /// <summary>
-    /// Initializes a <see cref="HandLabelerWindow"/> and updates it when new server messages are received.
-    /// </summary>
-    public sealed class HandLabelerBoundUserInterface : BoundUserInterface
+    [Dependency] private readonly IEntityManager _entManager = default!;
+
+    [ViewVariables]
+    private HandLabelerWindow? _window;
+
+    public HandLabelerBoundUserInterface(EntityUid owner, Enum uiKey) : base(owner, uiKey)
     {
-        [Dependency] private readonly IEntityManager _entManager = default!;
+        IoCManager.InjectDependencies(this);
+    }
 
-        [ViewVariables]
-        private HandLabelerWindow? _window;
+    protected override void Open()
+    {
+        base.Open();
 
-        public HandLabelerBoundUserInterface(EntityUid owner, Enum uiKey) : base(owner, uiKey)
-        {
-            IoCManager.InjectDependencies(this);
-        }
+        _window = this.CreateWindow<HandLabelerWindow>();
 
-        protected override void Open()
-        {
-            base.Open();
+        if (_entManager.TryGetComponent(Owner, out HandLabelerComponent? labeler))
+            _window.SetMaxLabelLength(labeler!.MaxLabelChars);
 
-            _window = this.CreateWindow<HandLabelerWindow>();
+        _window.OnLabelChanged += OnLabelChanged;
+        Reload();
+    }
 
-            if (_entManager.TryGetComponent(Owner, out HandLabelerComponent? labeler))
-            {
-                _window.SetMaxLabelLength(labeler!.MaxLabelChars);
-            }
+    private void OnLabelChanged(string newLabel)
+    {
+        // Focus moment
+        if (_entManager.TryGetComponent(Owner, out HandLabelerComponent? labeler) &&
+            labeler.AssignedLabel.Equals(newLabel))
+            return;
 
-            _window.OnLabelChanged += OnLabelChanged;
-            Reload();
-        }
+        SendPredictedMessage(new HandLabelerLabelChangedMessage(newLabel));
+    }
 
-        private void OnLabelChanged(string newLabel)
-        {
-            // Focus moment
-            if (_entManager.TryGetComponent(Owner, out HandLabelerComponent? labeler) &&
-                labeler.AssignedLabel.Equals(newLabel))
-                return;
+    public void Reload()
+    {
+        if (_window == null || !_entManager.TryGetComponent(Owner, out HandLabelerComponent? component))
+            return;
 
-            SendPredictedMessage(new HandLabelerLabelChangedMessage(newLabel));
-        }
-
-        public void Reload()
-        {
-            if (_window == null || !_entManager.TryGetComponent(Owner, out HandLabelerComponent? component))
-                return;
-
-            _window.SetCurrentLabel(component.AssignedLabel);
-        }
+        _window.SetCurrentLabel(component.AssignedLabel);
     }
 }

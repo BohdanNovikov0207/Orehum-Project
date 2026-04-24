@@ -60,9 +60,9 @@ public sealed partial class PointingSystem : SharedPointingSystem
         Verb verb = new()
         {
             Text = Loc.GetString("pointing-verb-get-data-text"),
-            Icon = new SpriteSpecifier.Texture(new("/Textures/Interface/VerbIcons/point.svg.192dpi.png")),
+            Icon = new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/VerbIcons/point.svg.192dpi.png")),
             ClientExclusive = true,
-            Act = () => RaiseNetworkEvent(new PointingAttemptEvent(GetNetEntity(args.Target)))
+            Act = () => RaiseNetworkEvent(new PointingAttemptEvent(GetNetEntity(args.Target))),
         };
 
         args.Verbs.Add(verb);
@@ -71,7 +71,7 @@ public sealed partial class PointingSystem : SharedPointingSystem
     private void OnArrowStartup(EntityUid uid, PointingArrowComponent component, ComponentStartup args)
     {
         if (TryComp<SpriteComponent>(uid, out var sprite))
-            _sprite.SetDrawDepth((uid, sprite), (int)DrawDepth.Overlays);
+            _sprite.SetDrawDepth((uid, sprite), (int) DrawDepth.Overlays);
 
         BeginPointAnimation(uid, component.StartPosition, component.Offset, component.AnimationKey);
     }
@@ -80,7 +80,7 @@ public sealed partial class PointingSystem : SharedPointingSystem
     {
         if (TryComp<SpriteComponent>(uid, out var sprite))
         {
-            _sprite.SetDrawDepth((uid, sprite), (int)DrawDepth.Overlays);
+            _sprite.SetDrawDepth((uid, sprite), (int) DrawDepth.Overlays);
             sprite.NoRotation = false;
         }
     }

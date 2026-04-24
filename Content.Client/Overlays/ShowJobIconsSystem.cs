@@ -89,10 +89,9 @@ namespace Content.Client.Overlays;
 
 public sealed class ShowJobIconsSystem : EquipmentHudSystem<ShowJobIconsComponent>
 {
-    [Dependency] private readonly IPrototypeManager _prototype = default!;
-    [Dependency] private readonly AccessReaderSystem _accessReader = default!;
-
     private static readonly ProtoId<JobIconPrototype> JobIconForNoId = "JobIconNoId";
+    [Dependency] private readonly AccessReaderSystem _accessReader = default!;
+    [Dependency] private readonly IPrototypeManager _prototype = default!;
 
     public override void Initialize()
     {

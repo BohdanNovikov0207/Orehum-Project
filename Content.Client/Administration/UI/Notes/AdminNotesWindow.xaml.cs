@@ -20,8 +20,5 @@ public sealed partial class AdminNotesWindow : FancyWindow
         RobustXamlLoader.Load(this);
     }
 
-    public void SetTitlePlayer(string playerName)
-    {
-        Title = Loc.GetString("admin-notes-title", ("player", playerName));
-    }
+    public void SetTitlePlayer(string playerName) => Title = Loc.GetString("admin-notes-title", ("player", playerName));
 }

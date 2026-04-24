@@ -26,10 +26,7 @@ public sealed class AdminLogLabel : RichTextLabel
 
     public HSeparator Separator { get; }
 
-    private void VisibilityChanged(Control control)
-    {
-        Separator.Visible = Visible;
-    }
+    private void VisibilityChanged(Control control) => Separator.Visible = Visible;
 
     protected override void Dispose(bool disposing)
     {

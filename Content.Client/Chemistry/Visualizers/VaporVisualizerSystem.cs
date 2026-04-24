@@ -26,44 +26,43 @@ public sealed class VaporVisualizerSystem : VisualizerSystem<VaporVisualsCompone
     /// </summary>
     private void OnComponentInit(EntityUid uid, VaporVisualsComponent comp, ComponentInit args)
     {
-        comp.VaporFlick = new Animation()
+        comp.VaporFlick = new Animation
         {
             Length = TimeSpan.FromSeconds(comp.AnimationTime),
             AnimationTracks =
             {
-                new AnimationTrackSpriteFlick()
+                new AnimationTrackSpriteFlick
                 {
                     LayerKey = VaporVisualLayers.Base,
                     KeyFrames =
                     {
-                        new AnimationTrackSpriteFlick.KeyFrame(comp.AnimationState, 0f)
-                    }
-                }
-            }
+                        new AnimationTrackSpriteFlick.KeyFrame(comp.AnimationState, 0f),
+                    },
+                },
+            },
         };
 
         if (AppearanceSystem.TryGetData<bool>(uid, VaporVisuals.State, out var state) &&
             state &&
             TryComp<AnimationPlayerComponent>(uid, out var animPlayer) &&
             !AnimationSystem.HasRunningAnimation(uid, animPlayer, VaporVisualsComponent.AnimationKey))
-        {
             AnimationSystem.Play((uid, animPlayer), comp.VaporFlick, VaporVisualsComponent.AnimationKey);
-        }
     }
 
     /// <summary>
     /// Ensures that the vapor entity plays its 'being sprayed' animation if necessary.
     /// </summary>
-    protected override void OnAppearanceChange(EntityUid uid, VaporVisualsComponent comp, ref AppearanceChangeEvent args)
+    protected override void OnAppearanceChange(EntityUid uid,
+        VaporVisualsComponent comp,
+        ref AppearanceChangeEvent args)
     {
-        if (AppearanceSystem.TryGetData<Color>(uid, VaporVisuals.Color, out var color, args.Component) && args.Sprite != null)
-        {
+        if (AppearanceSystem.TryGetData<Color>(uid, VaporVisuals.Color, out var color, args.Component) &&
+            args.Sprite != null)
             SpriteSystem.SetColor((uid, args.Sprite), color);
-        }
     }
 }
 
 public enum VaporVisualLayers : byte
 {
-    Base
+    Base,
 }

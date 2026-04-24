@@ -28,10 +28,7 @@ public sealed class SpaceVillainArcadeBoundUserInterface : BoundUserInterface
         SendAction(PlayerAction.RequestData);
     }
 
-    public void SendAction(PlayerAction action)
-    {
-        SendMessage(new SpaceVillainArcadePlayerActionMessage(action));
-    }
+    public void SendAction(PlayerAction action) => SendMessage(new SpaceVillainArcadePlayerActionMessage(action));
 
     protected override void Open()
     {

@@ -26,7 +26,7 @@ public sealed class ItemSlotsBoundUserInterface : BoundUserInterface
     {
         base.Open();
 
-        _menu = new(Owner, this);
+        _menu = new ItemSlotsMenu(Owner, this);
         _menu.OnClose += Close;
 
         // Open the menu, centered on the mouse
@@ -34,15 +34,13 @@ public sealed class ItemSlotsBoundUserInterface : BoundUserInterface
         _menu.OpenCenteredAt(_inputManager.MouseScreenPosition.Position / vpSize);
     }
 
-    public void SendItemSlotsEjectMessage(string e)
-    {
-        SendMessage(new ItemSlotButtonPressedEvent(e));
-    }
+    public void SendItemSlotsEjectMessage(string e) => SendMessage(new ItemSlotButtonPressedEvent(e));
 
     protected override void Dispose(bool disposing)
     {
         base.Dispose(disposing);
-        if (!disposing) return;
+        if (!disposing)
+            return;
 
         _menu?.Parent?.RemoveChild(_menu);
     }

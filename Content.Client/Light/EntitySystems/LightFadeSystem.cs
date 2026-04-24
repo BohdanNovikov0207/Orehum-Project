@@ -16,9 +16,8 @@ namespace Content.Client.Light.EntitySystems;
 
 public sealed class LightFadeSystem : EntitySystem
 {
-    [Dependency] private readonly AnimationPlayerSystem _player = default!;
-
     private const string FadeTrack = "light-fade";
+    [Dependency] private readonly AnimationPlayerSystem _player = default!;
 
     public override void Initialize()
     {
@@ -31,12 +30,12 @@ public sealed class LightFadeSystem : EntitySystem
         if (!TryComp<PointLightComponent>(uid, out var light))
             return;
 
-        var animation = new Animation()
+        var animation = new Animation
         {
             Length = TimeSpan.FromSeconds(component.Duration),
             AnimationTracks =
             {
-                new AnimationTrackComponentProperty()
+                new AnimationTrackComponentProperty
                 {
                     Property = nameof(PointLightComponent.Energy),
                     ComponentType = typeof(PointLightComponent),
@@ -44,11 +43,12 @@ public sealed class LightFadeSystem : EntitySystem
                     KeyFrames =
                     {
                         new AnimationTrackProperty.KeyFrame(0f, 0f), // EE - Plasmamen Change
-                        new AnimationTrackProperty.KeyFrame(light.Energy, component.RampUpDuration), // sEE - Plasmamen Change
-                        new AnimationTrackProperty.KeyFrame(0f, component.Duration)
-                    }
-                }
-            }
+                        new AnimationTrackProperty.KeyFrame(light.Energy,
+                            component.RampUpDuration), // sEE - Plasmamen Change
+                        new AnimationTrackProperty.KeyFrame(0f, component.Duration),
+                    },
+                },
+            },
         };
 
         _player.Play(uid, animation, FadeTrack);

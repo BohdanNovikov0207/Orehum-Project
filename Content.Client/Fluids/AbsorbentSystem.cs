@@ -10,7 +10,7 @@ using Content.Shared.Fluids;
 
 namespace Content.Client.Fluids;
 
-/// <inheritdoc/>
+/// <inheritdoc />
 public sealed class AbsorbentSystem : SharedAbsorbentSystem
 {
     public override void Initialize()

@@ -40,9 +40,7 @@ public sealed class CrewMonitoringBoundUserInterface : BoundUserInterface
             gridUid = xform.GridUid;
 
             if (EntMan.TryGetComponent<MetaDataComponent>(gridUid, out var metaData))
-            {
                 stationName = metaData.EntityName;
-            }
         }
 
         _menu = this.CreateWindow<CrewMonitoringWindow>();

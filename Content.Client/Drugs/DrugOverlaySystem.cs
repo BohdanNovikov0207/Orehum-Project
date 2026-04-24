@@ -17,12 +17,12 @@ using Robust.Shared.Random;
 namespace Content.Client.Drugs;
 
 /// <summary>
-///     System to handle drug related overlays.
+/// System to handle drug related overlays.
 /// </summary>
 public sealed class DrugOverlaySystem : EntitySystem
 {
-    [Dependency] private readonly IPlayerManager _player = default!;
     [Dependency] private readonly IOverlayManager _overlayMan = default!;
+    [Dependency] private readonly IPlayerManager _player = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
 
     private RainbowOverlay _overlay = default!;
@@ -34,10 +34,12 @@ public sealed class DrugOverlaySystem : EntitySystem
         SubscribeLocalEvent<SeeingRainbowsStatusEffectComponent, StatusEffectAppliedEvent>(OnApplied);
         SubscribeLocalEvent<SeeingRainbowsStatusEffectComponent, StatusEffectRemovedEvent>(OnRemoved);
 
-        SubscribeLocalEvent<SeeingRainbowsStatusEffectComponent, StatusEffectRelayedEvent<LocalPlayerAttachedEvent>>(OnPlayerAttached);
-        SubscribeLocalEvent<SeeingRainbowsStatusEffectComponent, StatusEffectRelayedEvent<LocalPlayerDetachedEvent>>(OnPlayerDetached);
+        SubscribeLocalEvent<SeeingRainbowsStatusEffectComponent, StatusEffectRelayedEvent<LocalPlayerAttachedEvent>>(
+            OnPlayerAttached);
+        SubscribeLocalEvent<SeeingRainbowsStatusEffectComponent, StatusEffectRelayedEvent<LocalPlayerDetachedEvent>>(
+            OnPlayerDetached);
 
-        _overlay = new();
+        _overlay = new RainbowOverlay();
     }
 
     private void OnRemoved(Entity<SeeingRainbowsStatusEffectComponent> ent, ref StatusEffectRemovedEvent args)
@@ -59,12 +61,11 @@ public sealed class DrugOverlaySystem : EntitySystem
         _overlayMan.AddOverlay(_overlay);
     }
 
-    private void OnPlayerAttached(Entity<SeeingRainbowsStatusEffectComponent> ent, ref StatusEffectRelayedEvent<LocalPlayerAttachedEvent> args)
-    {
-        _overlayMan.AddOverlay(_overlay);
-    }
+    private void OnPlayerAttached(Entity<SeeingRainbowsStatusEffectComponent> ent,
+        ref StatusEffectRelayedEvent<LocalPlayerAttachedEvent> args) => _overlayMan.AddOverlay(_overlay);
 
-    private void OnPlayerDetached(Entity<SeeingRainbowsStatusEffectComponent> ent, ref StatusEffectRelayedEvent<LocalPlayerDetachedEvent> args)
+    private void OnPlayerDetached(Entity<SeeingRainbowsStatusEffectComponent> ent,
+        ref StatusEffectRelayedEvent<LocalPlayerDetachedEvent> args)
     {
         _overlay.Intoxication = 0;
         _overlay.TimeTicker = 0;

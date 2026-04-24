@@ -15,10 +15,10 @@ namespace Content.Client.Animations;
 [RegisterComponent]
 public sealed partial class TrackUserComponent : Component
 {
-    public EntityUid? User;
-
     /// <summary>
     /// Offset in the direction of the entity's rotation.
     /// </summary>
     public Vector2 Offset = Vector2.Zero;
+
+    public EntityUid? User;
 }

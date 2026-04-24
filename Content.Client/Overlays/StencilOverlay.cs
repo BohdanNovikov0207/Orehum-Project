@@ -30,22 +30,24 @@ public sealed partial class StencilOverlay : Overlay
 
     [Dependency] private readonly IClyde _clyde = default!;
     [Dependency] private readonly IEntityManager _entManager = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly IMapManager _mapManager = default!;
-    [Dependency] private readonly IPrototypeManager _protoManager = default!;
-    private readonly ParallaxSystem _parallax;
-    private readonly SharedTransformSystem _transform;
     private readonly SharedMapSystem _map;
-    private readonly SpriteSystem _sprite;
-    private readonly WeatherSystem _weather;
+    [Dependency] private readonly IMapManager _mapManager = default!;
+    private readonly ParallaxSystem _parallax;
+    [Dependency] private readonly IPrototypeManager _protoManager = default!;
 
-    public override OverlaySpace Space => OverlaySpace.WorldSpaceBelowFOV;
+    private readonly ShaderInstance _shader;
+    private readonly SpriteSystem _sprite;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    private readonly SharedTransformSystem _transform;
+    private readonly WeatherSystem _weather;
 
     private IRenderTexture? _blep;
 
-    private readonly ShaderInstance _shader;
-
-    public StencilOverlay(ParallaxSystem parallax, SharedTransformSystem transform, SharedMapSystem map, SpriteSystem sprite, WeatherSystem weather)
+    public StencilOverlay(ParallaxSystem parallax,
+        SharedTransformSystem transform,
+        SharedMapSystem map,
+        SpriteSystem sprite,
+        WeatherSystem weather)
     {
         ZIndex = ParallaxSystem.ParallaxZIndex + 1;
         _parallax = parallax;
@@ -57,6 +59,8 @@ public sealed partial class StencilOverlay : Overlay
         _shader = _protoManager.Index(CircleShader).InstanceUnique();
     }
 
+    public override OverlaySpace Space => OverlaySpace.WorldSpaceBelowFOV;
+
     protected override void Draw(in OverlayDrawArgs args)
     {
         var mapUid = _map.GetMapOrInvalid(args.MapId);
@@ -65,14 +69,16 @@ public sealed partial class StencilOverlay : Overlay
         if (_blep?.Texture.Size != args.Viewport.Size)
         {
             _blep?.Dispose();
-            _blep = _clyde.CreateRenderTarget(args.Viewport.Size, new RenderTargetFormatParameters(RenderTargetColorFormat.Rgba8Srgb), name: "weather-stencil");
+            _blep = _clyde.CreateRenderTarget(args.Viewport.Size,
+                new RenderTargetFormatParameters(RenderTargetColorFormat.Rgba8Srgb),
+                name: "weather-stencil");
         }
 
         if (_entManager.TryGetComponent<WeatherComponent>(mapUid, out var comp))
         {
             foreach (var (proto, weather) in comp.Weather)
             {
-                if (!_protoManager.TryIndex<WeatherPrototype>(proto, out var weatherProto))
+                if (!_protoManager.TryIndex(proto, out var weatherProto))
                     continue;
 
                 var alpha = _weather.GetPercent(weather, mapUid);
@@ -81,9 +87,7 @@ public sealed partial class StencilOverlay : Overlay
         }
 
         if (_entManager.TryGetComponent<RestrictedRangeComponent>(mapUid, out var restrictedRangeComponent))
-        {
             DrawRestrictedRange(args, restrictedRangeComponent, invMatrix);
-        }
 
         args.WorldHandle.UseShader(null);
         args.WorldHandle.SetTransform(Matrix3x2.Identity);

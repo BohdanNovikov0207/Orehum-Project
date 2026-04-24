@@ -10,15 +10,15 @@ namespace Content.Client._EinsteinEngines.Power.Systems;
 
 // Goobstation - Energycrit
 /// <summary>
-///     Client-side prediction for BatteryDrinkerSystem.
+/// Client-side prediction for BatteryDrinkerSystem.
 /// </summary>
 /// <remarks>
-///     For some reason, the battery drinking system has a feature letting you drink from anything
-///     with a BatteryComponent, this means that all the logic for figuring out what you can drink
-///     or not has to be entirely serverside. The feature isn't even used anywhere. It was briefly
-///     going to be used in energycrit, but I very quickly realized that it was incredibly broken
-///     and shouldn't have existed in the first place. Because of this, the logic has to be copied
-///     and shoved into the client too!
+/// For some reason, the battery drinking system has a feature letting you drink from anything
+/// with a BatteryComponent, this means that all the logic for figuring out what you can drink
+/// or not has to be entirely serverside. The feature isn't even used anywhere. It was briefly
+/// going to be used in energycrit, but I very quickly realized that it was incredibly broken
+/// and shouldn't have existed in the first place. Because of this, the logic has to be copied
+/// and shoved into the client too!
 /// </remarks>
 public sealed class BatteryDrinkerSystem : SharedBatteryDrinkerSystem
 {
@@ -48,7 +48,7 @@ public sealed class BatteryDrinkerSystem : SharedBatteryDrinkerSystem
         {
             Text = Loc.GetString("battery-drinker-verb-drink"),
             Icon = new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/VerbIcons/smite.svg.192dpi.png")),
-            Priority = -5
+            Priority = -5,
         };
 
         args.Verbs.Add(verb);

@@ -11,5 +11,4 @@ namespace Content.Client.Salvage;
 [RegisterComponent]
 public sealed partial class SalvageExpeditionComponent : SharedSalvageExpeditionComponent
 {
-
 }

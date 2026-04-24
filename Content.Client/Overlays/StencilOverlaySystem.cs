@@ -13,11 +13,11 @@ namespace Content.Client.Overlays;
 
 public sealed class StencilOverlaySystem : EntitySystem
 {
+    [Dependency] private readonly SharedMapSystem _map = default!;
     [Dependency] private readonly IOverlayManager _overlay = default!;
     [Dependency] private readonly ParallaxSystem _parallax = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly SharedMapSystem _map = default!;
     [Dependency] private readonly SpriteSystem _sprite = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly WeatherSystem _weather = default!;
 
     public override void Initialize()

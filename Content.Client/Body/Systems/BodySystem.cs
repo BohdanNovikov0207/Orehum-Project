@@ -8,13 +8,14 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Body.Systems;
-// Shitmed Change Start
 using Content.Shared._Shitmed.Body.Part;
+using Content.Shared.Body.Systems;
 using Content.Shared.Humanoid;
 using Content.Shared.Humanoid.Markings;
 using Robust.Client.GameObjects;
 using Robust.Shared.Utility;
+// Shitmed Change Start
+
 // Shitmed Change End
 
 namespace Content.Client.Body.Systems;
@@ -68,18 +69,19 @@ public sealed class BodySystem : SharedBodySystem
             sprite.Color = component.Color.Value;
 
         foreach (var (visualLayer, markingList) in component.Markings)
-            foreach (var marking in markingList)
-            {
-                if (!_markingManager.TryGetMarking(marking, out var markingPrototype))
-                    continue;
+        foreach (var marking in markingList)
+        {
+            if (!_markingManager.TryGetMarking(marking, out var markingPrototype))
+                continue;
 
-                ApplyMarkingToPart(markingPrototype, marking.MarkingColors, marking.Visible, sprite);
-            }
+            ApplyMarkingToPart(markingPrototype, marking.MarkingColors, marking.Visible, sprite);
+        }
     }
 
-    protected override void RemoveBodyMarkings(EntityUid target, BodyPartAppearanceComponent partAppearance, HumanoidAppearanceComponent bodyAppearance)
+    protected override void RemoveBodyMarkings(EntityUid target,
+        BodyPartAppearanceComponent partAppearance,
+        HumanoidAppearanceComponent bodyAppearance)
     {
-        return;
     }
     // Shitmed Change End
 }

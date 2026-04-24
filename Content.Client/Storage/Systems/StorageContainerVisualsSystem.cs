@@ -10,12 +10,14 @@ using Robust.Client.GameObjects;
 
 namespace Content.Client.Storage.Systems;
 
-/// <inheritdoc cref="StorageContainerVisualsComponent"/>
+/// <inheritdoc cref="StorageContainerVisualsComponent" />
 public sealed class StorageContainerVisualsSystem : VisualizerSystem<StorageContainerVisualsComponent>
 {
     [Dependency] private readonly SpriteSystem _sprite = default!;
 
-    protected override void OnAppearanceChange(EntityUid uid, StorageContainerVisualsComponent component, ref AppearanceChangeEvent args)
+    protected override void OnAppearanceChange(EntityUid uid,
+        StorageContainerVisualsComponent component,
+        ref AppearanceChangeEvent args)
     {
         if (args.Sprite == null)
             return;
@@ -26,7 +28,7 @@ public sealed class StorageContainerVisualsSystem : VisualizerSystem<StorageCont
         if (!AppearanceSystem.TryGetData<int>(uid, StorageVisuals.Capacity, out var capacity, args.Component))
             return;
 
-        var fraction = used / (float)capacity;
+        var fraction = used / (float) capacity;
 
         if (!_sprite.LayerMapTryGet((uid, args.Sprite), component.FillLayer, out var fillLayer, false))
             return;
@@ -44,8 +46,6 @@ public sealed class StorageContainerVisualsSystem : VisualizerSystem<StorageCont
             _sprite.LayerSetRsiState((uid, args.Sprite), fillLayer, stateName);
         }
         else
-        {
             _sprite.LayerSetVisible((uid, args.Sprite), fillLayer, false);
-        }
     }
 }

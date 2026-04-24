@@ -17,13 +17,8 @@ public sealed class GasVolumePumpSystem : SharedGasVolumePumpSystem
     protected override void UpdateUi(Entity<GasVolumePumpComponent> entity)
     {
         if (_ui.TryGetOpenUi(entity.Owner, GasVolumePumpUiKey.Key, out var bui))
-        {
             bui.Update();
-        }
     }
 
-    private void OnPumpState(Entity<GasVolumePumpComponent> ent, ref AfterAutoHandleStateEvent args)
-    {
-        UpdateUi(ent);
-    }
+    private void OnPumpState(Entity<GasVolumePumpComponent> ent, ref AfterAutoHandleStateEvent args) => UpdateUi(ent);
 }

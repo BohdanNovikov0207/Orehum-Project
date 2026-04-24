@@ -14,11 +14,9 @@ public sealed class RadioDeviceSystem : EntitySystem
 {
     [Dependency] private readonly UserInterfaceSystem _ui = default!;
 
-    /// <inheritdoc/>
-    public override void Initialize()
-    {
+    /// <inheritdoc />
+    public override void Initialize() =>
         SubscribeLocalEvent<IntercomComponent, AfterAutoHandleStateEvent>(OnAfterHandleState);
-    }
 
     private void OnAfterHandleState(Entity<IntercomComponent> ent, ref AfterAutoHandleStateEvent args)
     {

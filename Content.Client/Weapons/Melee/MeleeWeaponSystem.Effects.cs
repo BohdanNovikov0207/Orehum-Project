@@ -105,7 +105,14 @@ public sealed partial class MeleeWeaponSystem
     /// <summary>
     /// Does all of the melee effects for a player that are predicted, i.e. character lunge and weapon animation.
     /// </summary>
-    public override void DoLunge(EntityUid user, EntityUid weapon, Angle angle, Vector2 localPos, string? animation, Angle spriteRotation, bool flippedAnimation, bool predicted = true)
+    public override void DoLunge(EntityUid user,
+        EntityUid weapon,
+        Angle angle,
+        Vector2 localPos,
+        string? animation,
+        Angle spriteRotation,
+        bool flippedAnimation,
+        bool predicted = true)
     {
         if (!Timing.IsFirstTimePredicted)
             return;
@@ -126,9 +133,7 @@ public sealed partial class MeleeWeaponSystem
 
         if (!TryComp<SpriteComponent>(animationUid, out var sprite)
             || !TryComp<WeaponArcVisualsComponent>(animationUid, out var arcComponent))
-        {
             return;
-        }
 
         if (arcComponent.Animation != WeaponArcAnimation.None
             && TryComp(weapon, out MeleeWeaponComponent? meleeWeaponComponent))
@@ -140,6 +145,7 @@ public sealed partial class MeleeWeaponSystem
             if (meleeWeaponComponent.SwingLeft)
                 angle *= -1;
         }
+
         _sprite.SetRotation((animationUid, sprite), localPos.ToWorldAngle());
         var distance = Math.Clamp(localPos.Length() / 2f, 0.2f, 1f);
 
@@ -165,7 +171,9 @@ public sealed partial class MeleeWeaponSystem
                     spriteRotation = Angle.FromDegrees(360) - spriteRotation;
 
                 // Goobstation - Shove Rework End
-                _animation.Play(animationUid, GetThrustAnimation((animationUid, sprite), distance, spriteRotation), ThrustAnimationKey);
+                _animation.Play(animationUid,
+                    GetThrustAnimation((animationUid, sprite), distance, spriteRotation),
+                    ThrustAnimationKey);
                 if (arcComponent.Fadeout)
                     _animation.Play(animationUid, GetFadeAnimation(sprite, 0.05f, 0.15f), FadeAnimationKey);
                 break;
@@ -192,12 +200,12 @@ public sealed partial class MeleeWeaponSystem
         startRotation += spriteRotation;
         endRotation += spriteRotation;
 
-        return new Animation()
+        return new Animation
         {
             Length = TimeSpan.FromSeconds(length),
             AnimationTracks =
             {
-                new AnimationTrackComponentProperty()
+                new AnimationTrackComponentProperty
                 {
                     ComponentType = typeof(SpriteComponent),
                     Property = nameof(SpriteComponent.Rotation),
@@ -205,10 +213,10 @@ public sealed partial class MeleeWeaponSystem
                     {
                         new AnimationTrackProperty.KeyFrame(startRotation, 0f),
                         new AnimationTrackProperty.KeyFrame(startRotation, slashStart),
-                        new AnimationTrackProperty.KeyFrame(endRotation, slashEnd)
-                    }
+                        new AnimationTrackProperty.KeyFrame(endRotation, slashEnd),
+                    },
                 },
-                new AnimationTrackComponentProperty()
+                new AnimationTrackComponentProperty
                 {
                     ComponentType = typeof(SpriteComponent),
                     Property = nameof(SpriteComponent.Offset),
@@ -216,10 +224,10 @@ public sealed partial class MeleeWeaponSystem
                     {
                         new AnimationTrackProperty.KeyFrame(startRotationOffset, 0f),
                         new AnimationTrackProperty.KeyFrame(startRotationOffset, slashStart),
-                        new AnimationTrackProperty.KeyFrame(endRotationOffset, slashEnd)
-                    }
+                        new AnimationTrackProperty.KeyFrame(endRotationOffset, slashEnd),
+                    },
                 },
-            }
+            },
         };
     }
 
@@ -231,12 +239,12 @@ public sealed partial class MeleeWeaponSystem
         var endOffset = sprite.Comp.Rotation.RotateVec(new Vector2(0f, -distance));
         _sprite.SetRotation(sprite.AsNullable(), sprite.Comp.Rotation + spriteRotation);
 
-        return new Animation()
+        return new Animation
         {
             Length = TimeSpan.FromSeconds(length),
             AnimationTracks =
             {
-                new AnimationTrackComponentProperty()
+                new AnimationTrackComponentProperty
                 {
                     ComponentType = typeof(SpriteComponent),
                     Property = nameof(SpriteComponent.Offset),
@@ -245,32 +253,30 @@ public sealed partial class MeleeWeaponSystem
                         new AnimationTrackProperty.KeyFrame(startOffset, 0f),
                         new AnimationTrackProperty.KeyFrame(endOffset, thrustEnd),
                         new AnimationTrackProperty.KeyFrame(endOffset, length),
-                    }
+                    },
                 },
-            }
+            },
         };
     }
 
-    private Animation GetFadeAnimation(SpriteComponent sprite, float start, float end)
-    {
-        return new Animation
+    private Animation GetFadeAnimation(SpriteComponent sprite, float start, float end) =>
+        new()
         {
             Length = TimeSpan.FromSeconds(end),
             AnimationTracks =
             {
-                new AnimationTrackComponentProperty()
+                new AnimationTrackComponentProperty
                 {
                     ComponentType = typeof(SpriteComponent),
                     Property = nameof(SpriteComponent.Color),
                     KeyFrames =
                     {
                         new AnimationTrackProperty.KeyFrame(sprite.Color, start),
-                        new AnimationTrackProperty.KeyFrame(sprite.Color.WithAlpha(0f), end)
-                    }
-                }
-            }
+                        new AnimationTrackProperty.KeyFrame(sprite.Color.WithAlpha(0f), end),
+                    },
+                },
+            },
         };
-    }
 
     /// <summary>
     /// Get the sprite offset animation to use for mob lunges.
@@ -284,7 +290,7 @@ public sealed partial class MeleeWeaponSystem
             Length = TimeSpan.FromSeconds(length),
             AnimationTracks =
             {
-                new AnimationTrackComponentProperty()
+                new AnimationTrackComponentProperty
                 {
                     ComponentType = typeof(SpriteComponent),
                     Property = nameof(SpriteComponent.Offset),
@@ -292,10 +298,10 @@ public sealed partial class MeleeWeaponSystem
                     KeyFrames =
                     {
                         new AnimationTrackProperty.KeyFrame(direction.Normalized() * 0.15f, 0f),
-                        new AnimationTrackProperty.KeyFrame(Vector2.Zero, length)
-                    }
-                }
-            }
+                        new AnimationTrackProperty.KeyFrame(Vector2.Zero, length),
+                    },
+                },
+            },
         };
     }
 
@@ -310,7 +316,7 @@ public sealed partial class MeleeWeaponSystem
             if (arcComponent.User == null || TerminatingOrDeleted(arcComponent.User)) // Goobstation
                 continue;
 
-            Vector2 targetPos = TransformSystem.GetWorldPosition(arcComponent.User.Value);
+            var targetPos = TransformSystem.GetWorldPosition(arcComponent.User.Value);
 
             if (arcComponent.Offset != Vector2.Zero)
             {

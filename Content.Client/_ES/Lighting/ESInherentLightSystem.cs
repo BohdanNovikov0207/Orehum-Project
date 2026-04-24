@@ -6,13 +6,13 @@ using Robust.Shared.Player;
 namespace Content.Client._ES.Lighting;
 
 /// <summary>
-///     Handles enabling and disabling mob inherent pointlights when locally attaching to a new mob.
+/// Handles enabling and disabling mob inherent pointlights when locally attaching to a new mob.
 /// </summary>
 public sealed class ESInherentLightSystem : EntitySystem
 {
     [Dependency] private readonly PointLightSystem _light = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         SubscribeLocalEvent<LocalPlayerAttachedEvent>(OnPlayerAttach);
@@ -28,13 +28,9 @@ public sealed class ESInherentLightSystem : EntitySystem
 
         entity.Comp.Enabled = value;
         if (value)
-        {
             CreateAndAttachPointLight(entity!);
-        }
         else
-        {
             CleanupPointLight(entity!);
-        }
     }
 
     #endregion

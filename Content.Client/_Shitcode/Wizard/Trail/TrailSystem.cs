@@ -25,15 +25,15 @@ namespace Content.Client._Shitcode.Wizard.Trail;
 
 public sealed class TrailSystem : EntitySystem
 {
-    [Dependency] private readonly IOverlayManager _overlay = default!;
     [Dependency] private readonly IEyeManager _eye = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly IOverlayManager _overlay = default!;
     [Dependency] private readonly IPrototypeManager _protoMan = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly TransformSystem _transform = default!;
-
-    private EntityQuery<TransformComponent> _xformQuery;
     private EntityQuery<FrozenComponent> _frozenQuery;
     private EntityQuery<PhysicsComponent> _physicsQuery;
+
+    private EntityQuery<TransformComponent> _xformQuery;
 
     public override void Initialize()
     {

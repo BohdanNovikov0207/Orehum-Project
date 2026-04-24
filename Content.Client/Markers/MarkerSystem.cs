@@ -40,17 +40,12 @@ public sealed class MarkerSystem : EntitySystem
         SubscribeLocalEvent<MarkerComponent, ComponentStartup>(OnStartup);
     }
 
-    private void OnStartup(EntityUid uid, MarkerComponent marker, ComponentStartup args)
-    {
-        UpdateVisibility(uid);
-    }
+    private void OnStartup(EntityUid uid, MarkerComponent marker, ComponentStartup args) => UpdateVisibility(uid);
 
     private void UpdateVisibility(EntityUid uid)
     {
         if (TryComp(uid, out SpriteComponent? sprite))
-        {
             _sprite.SetVisible((uid, sprite), MarkersVisible);
-        }
     }
 
     private void UpdateMarkers()

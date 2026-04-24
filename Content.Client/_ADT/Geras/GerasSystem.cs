@@ -5,8 +5,6 @@
 using Content.Client._ADT.Geras.Component;
 using Content.Shared._ADT.Geras;
 using Robust.Client.GameObjects;
-using Content.Shared.Item;
-using static Robust.Client.GameObjects.SpriteComponent;
 
 namespace Content.Client._ADT.Geras;
 

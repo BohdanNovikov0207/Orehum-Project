@@ -14,19 +14,20 @@ namespace Content.Client.Mech.Ui.Equipment;
 [GenerateTypedNameReferences]
 public sealed partial class MechSoundboardUiFragment : BoxContainer
 {
-    public event Action<int>? OnPlayAction;
-
     public MechSoundboardUiFragment()
     {
         RobustXamlLoader.Load(this);
         IoCManager.InjectDependencies(this);
     }
 
+    public event Action<int>? OnPlayAction;
+
     public void UpdateContents(MechSoundboardUiState state)
     {
         foreach (var sound in state.Sounds)
         {
-            Sounds.AddItem(Loc.GetString($"mech-soundboard-{sound}")).OnSelected += item => {
+            Sounds.AddItem(Loc.GetString($"mech-soundboard-{sound}")).OnSelected += item =>
+            {
                 OnPlayAction?.Invoke(Sounds.IndexOf(item));
             };
         }

@@ -21,14 +21,6 @@ public sealed partial class OfferingWindowOption : PanelContainer
 {
     private bool _claimed;
 
-    public string? Title
-    {
-        get => TitleStripe.Text;
-        set => TitleStripe.Text = value;
-    }
-
-    public event Action<BaseButton.ButtonEventArgs>? ClaimPressed;
-
     public OfferingWindowOption()
     {
         RobustXamlLoader.Load(this);
@@ -43,9 +35,10 @@ public sealed partial class OfferingWindowOption : PanelContainer
         };
     }
 
-    public void AddContent(Control control)
+    public string? Title
     {
-        ContentBox.AddChild(control);
+        get => TitleStripe.Text;
+        set => TitleStripe.Text = value;
     }
 
     public bool Disabled
@@ -76,4 +69,8 @@ public sealed partial class OfferingWindowOption : PanelContainer
             }
         }
     }
+
+    public event Action<BaseButton.ButtonEventArgs>? ClaimPressed;
+
+    public void AddContent(Control control) => ContentBox.AddChild(control);
 }

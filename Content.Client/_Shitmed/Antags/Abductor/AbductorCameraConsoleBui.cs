@@ -4,8 +4,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared._Shitmed.Antags.Abductor;
 using Content.Client._Shitmed.Choice.UI;
+using Content.Shared._Shitmed.Antags.Abductor;
 using JetBrains.Annotations;
 using static Content.Shared.Pinpointer.SharedNavMapSystem;
 
@@ -14,13 +14,17 @@ namespace Content.Client._Shitmed.Antags.Abductor;
 [UsedImplicitly]
 public sealed class AbductorCameraConsoleBui : BoundUserInterface
 {
+    private int? _station;
+
     [ViewVariables]
     private AbductorCameraConsoleWindow? _window;
-    private int? _station;
+
     public AbductorCameraConsoleBui(EntityUid owner, Enum uiKey) : base(owner, uiKey)
     {
     }
+
     protected override void Open() => UpdateState(State);
+
     protected override void UpdateState(BoundUserInterfaceState? state)
     {
         if (state is AbductorCameraConsoleBuiState s)
@@ -41,7 +45,8 @@ public sealed class AbductorCameraConsoleBui : BoundUserInterface
 
     private void TryInitWindow()
     {
-        if (_window != null) return;
+        if (_window != null)
+            return;
         _window = new AbductorCameraConsoleWindow();
         _window.OnClose += Close;
         _window.Title = "Intercepted cameras.";
@@ -68,7 +73,7 @@ public sealed class AbductorCameraConsoleBui : BoundUserInterface
             beaconButton.Button.Modulate = beacon.Color;
             beaconButton.Button.OnPressed += _ =>
             {
-                SendMessage(new AbductorBeaconChosenBuiMsg()
+                SendMessage(new AbductorBeaconChosenBuiMsg
                 {
                     Beacon = beacon,
                 });
@@ -76,6 +81,7 @@ public sealed class AbductorCameraConsoleBui : BoundUserInterface
             };
             _window.Beacons.AddChild(beaconButton);
         }
+
         View(ViewType.Beacons);
     }
 
@@ -96,7 +102,8 @@ public sealed class AbductorCameraConsoleBui : BoundUserInterface
 
             _window.Stations.AddChild(stationButton);
 
-            if (station.Key == _station) OnStationPressed(station.Key, station.Value.Beacons);
+            if (station.Key == _station)
+                OnStationPressed(station.Key, station.Value.Beacons);
         }
     }
 
@@ -114,16 +121,10 @@ public sealed class AbductorCameraConsoleBui : BoundUserInterface
         _window.BeaconsButton.Disabled = type != ViewType.Beacons;
 
         _window.Title = State is not AbductorCameraConsoleBuiState state
-            || _station == null
-            || !state.Stations.TryGetValue(_station.Value, out var station)
+                        || _station == null
+                        || !state.Stations.TryGetValue(_station.Value, out var station)
             ? "Stations"
             : $"Station - {station.Name}";
-    }
-
-    private enum ViewType
-    {
-        Stations,
-        Beacons,
     }
 
     protected override void Dispose(bool disposing)
@@ -132,5 +133,11 @@ public sealed class AbductorCameraConsoleBui : BoundUserInterface
 
         if (disposing)
             _window?.Dispose();
+    }
+
+    private enum ViewType
+    {
+        Stations,
+        Beacons,
     }
 }

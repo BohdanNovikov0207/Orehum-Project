@@ -18,8 +18,8 @@ public sealed partial class MapTextComponent : SharedMapTextComponent
     public VectorFont? CachedFont;
 
     /// <summary>
-    /// The text currently being displayed. This is either <see cref="SharedMapTextComponent.Text"/> or the
-    /// localized text <see cref="SharedMapTextComponent.LocText"/> or
+    /// The text currently being displayed. This is either <see cref="SharedMapTextComponent.Text" /> or the
+    /// localized text <see cref="SharedMapTextComponent.LocText" /> or
     /// </summary>
     public string CachedText = string.Empty;
 }

@@ -10,9 +10,9 @@ namespace Content.Client._Shitcode.Heretic;
 
 public sealed class StarGazerSystem : SharedStarGazerSystem
 {
-    [Dependency] private readonly IPlayerManager _player = default!;
     [Dependency] private readonly IEyeManager _eye = default!;
     [Dependency] private readonly IInputManager _input = default!;
+    [Dependency] private readonly IPlayerManager _player = default!;
 
     public override void FrameUpdate(float frameTime)
     {

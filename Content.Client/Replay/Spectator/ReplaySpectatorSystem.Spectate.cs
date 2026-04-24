@@ -29,7 +29,7 @@ public sealed partial class ReplaySpectatorSystem
             Priority = 100,
             Act = () => SpectateEntity(ev.Target),
             Text = Loc.GetString("replay-verb-spectate"),
-            Icon = new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/VerbIcons/vv.svg.192dpi.png"))
+            Icon = new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/VerbIcons/vv.svg.192dpi.png")),
         });
     }
 
@@ -128,6 +128,7 @@ public sealed partial class ReplaySpectatorSystem
             return CompletionResult.Empty;
 
         return CompletionResult.FromHintOptions(CompletionHelper.NetEntities(args[0],
-            EntityManager), Loc.GetString("cmd-replay-spectate-hint"));
+                EntityManager),
+            Loc.GetString("cmd-replay-spectate-hint"));
     }
 }

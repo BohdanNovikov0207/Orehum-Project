@@ -40,15 +40,11 @@ public sealed class ShopVendorSystem : SharedShopVendorSystem
     }
 
     // copied from vending machines because its not reusable in other systems :)
-    private void OnAnimationCompleted(Entity<ShopVendorComponent> ent, ref AnimationCompletedEvent args)
-    {
+    private void OnAnimationCompleted(Entity<ShopVendorComponent> ent, ref AnimationCompletedEvent args) =>
         UpdateAppearance((ent, ent.Comp));
-    }
 
-    private void OnAppearanceChange(Entity<ShopVendorComponent> ent, ref AppearanceChangeEvent args)
-    {
+    private void OnAppearanceChange(Entity<ShopVendorComponent> ent, ref AppearanceChangeEvent args) =>
         UpdateAppearance((ent, ent.Comp, args.Sprite));
-    }
 
     private void UpdateAppearance(Entity<ShopVendorComponent, SpriteComponent?> ent)
     {
@@ -71,11 +67,19 @@ public sealed class ShopVendorSystem : SharedShopVendorSystem
                 if (ent.Comp1.LoopDenyAnimation)
                     SetLayerState(VendingMachineVisualLayers.BaseUnshaded, ent.Comp1.DenyState, sprite);
                 else
-                    PlayAnimation(ent, VendingMachineVisualLayers.BaseUnshaded, ent.Comp1.DenyState, ent.Comp1.DenyDelay, sprite);
+                    PlayAnimation(ent,
+                        VendingMachineVisualLayers.BaseUnshaded,
+                        ent.Comp1.DenyState,
+                        ent.Comp1.DenyDelay,
+                        sprite);
                 break;
 
             case VendingMachineVisualState.Eject:
-                PlayAnimation(ent, VendingMachineVisualLayers.BaseUnshaded, ent.Comp1.EjectState, ent.Comp1.EjectDelay, sprite);
+                PlayAnimation(ent,
+                    VendingMachineVisualLayers.BaseUnshaded,
+                    ent.Comp1.EjectState,
+                    ent.Comp1.EjectDelay,
+                    sprite);
                 break;
 
             case VendingMachineVisualState.Broken:
@@ -99,7 +103,11 @@ public sealed class ShopVendorSystem : SharedShopVendorSystem
         sprite.LayerSetState(layer, state);
     }
 
-    private void PlayAnimation(EntityUid uid, VendingMachineVisualLayers layer, string? state, TimeSpan time, SpriteComponent sprite)
+    private void PlayAnimation(EntityUid uid,
+        VendingMachineVisualLayers layer,
+        string? state,
+        TimeSpan time,
+        SpriteComponent sprite)
     {
         if (state == null || _animationPlayer.HasRunningAnimation(uid, state))
             return;
@@ -109,9 +117,8 @@ public sealed class ShopVendorSystem : SharedShopVendorSystem
         _animationPlayer.Play(uid, animation, state);
     }
 
-    private static Animation GetAnimation(VendingMachineVisualLayers layer, string state, TimeSpan time)
-    {
-        return new Animation
+    private static Animation GetAnimation(VendingMachineVisualLayers layer, string state, TimeSpan time) =>
+        new()
         {
             Length = time,
             AnimationTracks =
@@ -121,12 +128,11 @@ public sealed class ShopVendorSystem : SharedShopVendorSystem
                     LayerKey = layer,
                     KeyFrames =
                     {
-                        new AnimationTrackSpriteFlick.KeyFrame(state, 0f)
-                    }
-                }
-            }
+                        new AnimationTrackSpriteFlick.KeyFrame(state, 0f),
+                    },
+                },
+            },
         };
-    }
 
     private static void HideLayers(SpriteComponent sprite)
     {

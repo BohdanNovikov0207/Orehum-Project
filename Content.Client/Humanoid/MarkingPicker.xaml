@@ -33,8 +33,10 @@ SPDX-License-Identifier: MIT
                 <ItemList Name="CMarkingsUsed" VerticalExpand="True" MinSize="300 250" />
 
                 <BoxContainer Orientation="Horizontal">
-                    <Button Name="CMarkingRankUp" Text="{Loc 'markings-rank-up'}" StyleClasses="OpenBoth" HorizontalExpand="True" />
-                    <Button Name="CMarkingRankDown" Text="{Loc 'markings-rank-down'}" StyleClasses="OpenBoth" HorizontalExpand="True" />
+                    <Button Name="CMarkingRankUp" Text="{Loc 'markings-rank-up'}" StyleClasses="OpenBoth"
+                            HorizontalExpand="True" />
+                    <Button Name="CMarkingRankDown" Text="{Loc 'markings-rank-down'}" StyleClasses="OpenBoth"
+                            HorizontalExpand="True" />
                 </BoxContainer>
                 <Button Name="CMarkingRemove" Text="{Loc 'markings-remove'}" StyleClasses="OpenRight" />
             </BoxContainer>

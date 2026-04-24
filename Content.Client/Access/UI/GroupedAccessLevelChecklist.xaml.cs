@@ -3,6 +3,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Linq;
+using System.Numerics;
 using Content.Client.Stylesheets;
 using Content.Client.UserInterface.Controls;
 using Content.Shared.Access;
@@ -12,8 +14,6 @@ using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.XAML;
 using Robust.Shared.Prototypes;
-using System.Linq;
-using System.Numerics;
 
 namespace Content.Client.Access.UI;
 
@@ -22,28 +22,25 @@ public sealed partial class GroupedAccessLevelChecklist : BoxContainer
 {
     private static readonly ProtoId<AccessGroupPrototype> GeneralAccessGroup = "General";
 
-    [Dependency] private readonly IPrototypeManager _protoManager = default!;
-
-    private bool _isMonotone;
-    private string? _labelStyleClass;
-
-    // Access data
-    private HashSet<ProtoId<AccessGroupPrototype>> _accessGroups = new();
-    private HashSet<ProtoId<AccessLevelPrototype>> _accessLevels = new();
-    private HashSet<ProtoId<AccessLevelPrototype>> _activeAccessLevels = new();
-
     // Button groups
     private readonly ButtonGroup _accessGroupsButtons = new();
-
-    // Temp values
-    private int _accessGroupTabIndex = 0;
-    private bool _canInteract = false;
-    private List<AccessLevelPrototype> _accessLevelsForTab = new();
     private readonly List<AccessLevelEntry> _accessLevelEntries = new();
     private readonly Dictionary<AccessGroupPrototype, List<AccessLevelPrototype>> _groupedAccessLevels = new();
 
-    // Events
-    public event Action<HashSet<ProtoId<AccessLevelPrototype>>, bool>? OnAccessLevelsChangedEvent;
+    [Dependency] private readonly IPrototypeManager _protoManager = default!;
+
+    // Access data
+    private HashSet<ProtoId<AccessGroupPrototype>> _accessGroups = new();
+
+    // Temp values
+    private int _accessGroupTabIndex;
+    private HashSet<ProtoId<AccessLevelPrototype>> _accessLevels = new();
+    private List<AccessLevelPrototype> _accessLevelsForTab = new();
+    private HashSet<ProtoId<AccessLevelPrototype>> _activeAccessLevels = new();
+    private bool _canInteract;
+
+    private bool _isMonotone;
+    private string? _labelStyleClass;
 
     /// <summary>
     /// Creates a UI control for changing access levels.
@@ -55,6 +52,9 @@ public sealed partial class GroupedAccessLevelChecklist : BoxContainer
         IoCManager.InjectDependencies(this);
     }
 
+    // Events
+    public event Action<HashSet<ProtoId<AccessLevelPrototype>>, bool>? OnAccessLevelsChangedEvent;
+
     private void ArrangeAccessControls()
     {
         // Create a list of known access groups with which to populate the UI
@@ -65,13 +65,13 @@ public sealed partial class GroupedAccessLevelChecklist : BoxContainer
             if (!_protoManager.TryIndex(accessGroup, out var accessGroupProto))
                 continue;
 
-            _groupedAccessLevels.Add(accessGroupProto, new());
+            _groupedAccessLevels.Add(accessGroupProto, new List<AccessLevelPrototype>());
         }
 
         // Ensure that the 'general' access group is added to handle
         // misc. access levels that aren't associated with any group
         if (_protoManager.TryIndex(GeneralAccessGroup, out var generalAccessProto))
-            _groupedAccessLevels.TryAdd(generalAccessProto, new());
+            _groupedAccessLevels.TryAdd(generalAccessProto, new List<AccessLevelPrototype>());
 
         // Assign known access levels with their associated groups
         foreach (var accessLevel in _accessLevels)
@@ -125,7 +125,7 @@ public sealed partial class GroupedAccessLevelChecklist : BoxContainer
             {
                 if (AccessGroupList.ChildCount == 0)
                     accessGroupButton.AddStyleClass(StyleBase.ButtonOpenLeft);
-                else if (_groupedAccessLevels.Count > 1 && AccessGroupList.ChildCount == (_groupedAccessLevels.Count - 1))
+                else if (_groupedAccessLevels.Count > 1 && AccessGroupList.ChildCount == _groupedAccessLevels.Count - 1)
                     accessGroupButton.AddStyleClass(StyleBase.ButtonOpenRight);
                 else
                     accessGroupButton.AddStyleClass(StyleBase.ButtonOpenBoth);
@@ -232,7 +232,7 @@ public sealed partial class GroupedAccessLevelChecklist : BoxContainer
                 accessLevelEntry.CheckBox.Label.SetOnlyStyleClass(_labelStyleClass);
 
             // Set the checkbox linkage lines
-            var isEndOfList = _accessLevelsForTab.IndexOf(accessLevel) == (_accessLevelsForTab.Count - 1);
+            var isEndOfList = _accessLevelsForTab.IndexOf(accessLevel) == _accessLevelsForTab.Count - 1;
 
             var lines = new List<(Vector2, Vector2)>
             {
@@ -386,9 +386,9 @@ public sealed partial class GroupedAccessLevelChecklist : BoxContainer
 
     private sealed class AccessLevelEntry : BoxContainer
     {
-        public ProtoId<AccessLevelPrototype> AccessLevel;
         public readonly CheckBox CheckBox;
         public readonly LineRenderer CheckBoxLink;
+        public ProtoId<AccessLevelPrototype> AccessLevel;
 
         public AccessLevelEntry(bool monotone)
         {
@@ -411,10 +411,7 @@ public sealed partial class GroupedAccessLevelChecklist : BoxContainer
             AddChild(CheckBox);
         }
 
-        public void UpdateCheckBoxLink(List<(Vector2, Vector2)> lines)
-        {
-            CheckBoxLink.Lines = lines;
-        }
+        public void UpdateCheckBoxLink(List<(Vector2, Vector2)> lines) => CheckBoxLink.Lines = lines;
     }
 
     private sealed class LineRenderer : Control

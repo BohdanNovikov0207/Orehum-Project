@@ -19,14 +19,14 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     <LineEdit Name="FilterLineEdit"
               MinSize="100 0"
               HorizontalExpand="True"
-              PlaceHolder="{Loc player-list-filter}"/>
+              PlaceHolder="{Loc player-list-filter}" />
     <PanelContainer Name="BackgroundPanel"
                     VerticalExpand="True"
                     HorizontalExpand="True">
         <controls:ListContainer Name="PlayerListContainer"
-                  Access="Public"
-                  Toggle="True"
-                  Group="True"
-                  MinSize="100 0"/>
+                                Access="Public"
+                                Toggle="True"
+                                Group="True"
+                                MinSize="100 0" />
     </PanelContainer>
 </BoxContainer>

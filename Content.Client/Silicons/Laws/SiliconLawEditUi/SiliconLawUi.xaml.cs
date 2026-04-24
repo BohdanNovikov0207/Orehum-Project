@@ -128,15 +128,11 @@ public sealed partial class SiliconLawUi : FancyWindow
     public void MoveLawDown(SiliconLaw law)
     {
         if (_laws.Count == 0)
-        {
             return;
-        }
 
         var index = _laws.IndexOf(law);
         if (index == -1)
-        {
             return;
-        }
 
         _laws[index].Order += FixedPoint2.New(1);
         SetLaws(_laws);
@@ -145,22 +141,15 @@ public sealed partial class SiliconLawUi : FancyWindow
     public void MoveLawUp(SiliconLaw law)
     {
         if (_laws.Count == 0)
-        {
             return;
-        }
 
         var index = _laws.IndexOf(law);
         if (index == -1)
-        {
             return;
-        }
 
         _laws[index].Order += FixedPoint2.New(-1);
         SetLaws(_laws);
     }
 
-    public List<SiliconLaw> GetLaws()
-    {
-        return _laws;
-    }
+    public List<SiliconLaw> GetLaws() => _laws;
 }

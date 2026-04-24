@@ -10,19 +10,19 @@
 //
 // SPDX-License-Identifier: MIT
 
-using Robust.Client.Graphics;
-using Robust.Client.Player;
 using Content.Shared.Eye.Blinding.Components;
 using Content.Shared.GameTicking;
+using Robust.Client.Graphics;
+using Robust.Client.Player;
 using Robust.Shared.Player;
 
 namespace Content.Client.Eye.Blinding;
 
 public sealed class BlindingSystem : EntitySystem
 {
-    [Dependency] private readonly IPlayerManager _player = default!;
+    [Dependency] private readonly ILightManager _lightManager = default!;
     [Dependency] private readonly IOverlayManager _overlayMan = default!;
-    [Dependency] ILightManager _lightManager = default!;
+    [Dependency] private readonly IPlayerManager _player = default!;
 
 
     private BlindOverlay _overlay = default!;
@@ -39,13 +39,11 @@ public sealed class BlindingSystem : EntitySystem
 
         SubscribeNetworkEvent<RoundRestartCleanupEvent>(RoundRestartCleanup);
 
-        _overlay = new();
+        _overlay = new BlindOverlay();
     }
 
-    private void OnPlayerAttached(EntityUid uid, BlindableComponent component, LocalPlayerAttachedEvent args)
-    {
+    private void OnPlayerAttached(EntityUid uid, BlindableComponent component, LocalPlayerAttachedEvent args) =>
         _overlayMan.AddOverlay(_overlay);
-    }
 
     private void OnPlayerDetached(EntityUid uid, BlindableComponent component, LocalPlayerDetachedEvent args)
     {
@@ -62,13 +60,8 @@ public sealed class BlindingSystem : EntitySystem
     private void OnBlindShutdown(EntityUid uid, BlindableComponent component, ComponentShutdown args)
     {
         if (_player.LocalEntity == uid)
-        {
             _overlayMan.RemoveOverlay(_overlay);
-        }
     }
 
-    private void RoundRestartCleanup(RoundRestartCleanupEvent ev)
-    {
-        _lightManager.Enabled = true;
-    }
+    private void RoundRestartCleanup(RoundRestartCleanupEvent ev) => _lightManager.Enabled = true;
 }

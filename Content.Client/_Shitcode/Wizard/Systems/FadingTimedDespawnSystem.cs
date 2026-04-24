@@ -67,8 +67,5 @@ public sealed class FadingTimedDespawnSystem : SharedFadingTimedDespawnSystem
         _animationSystem.Play(uid, animation, FadingTimedDespawnComponent.AnimationKey);
     }
 
-    protected override bool CanDelete(EntityUid uid)
-    {
-        return IsClientSide(uid);
-    }
+    protected override bool CanDelete(EntityUid uid) => IsClientSide(uid);
 }

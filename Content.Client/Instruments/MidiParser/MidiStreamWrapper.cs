@@ -8,13 +8,13 @@ public sealed class MidiStreamWrapper
     private readonly MemoryStream _stream;
     private byte[] _buffer;
 
-    public long StreamPosition => _stream.Position;
-
     public MidiStreamWrapper(byte[] data)
     {
-        _stream = new MemoryStream(data, writable: false);
+        _stream = new MemoryStream(data, false);
         _buffer = new byte[4];
     }
+
+    public long StreamPosition => _stream.Position;
 
     /// <summary>
     /// Skips X number of bytes in the stream.
@@ -43,9 +43,7 @@ public sealed class MidiStreamWrapper
     public byte[] ReadBytes(int count)
     {
         if (_buffer.Length < count)
-        {
             Array.Resize(ref _buffer, count);
-        }
 
         var read = _stream.Read(_buffer, 0, count);
         if (read != count)
@@ -61,9 +59,9 @@ public sealed class MidiStreamWrapper
     {
         var bytes = ReadBytes(4);
         return (uint) ((bytes[0] << 24) |
-                      (bytes[1] << 16) |
-                      (bytes[2] << 8) |
-                      (bytes[3]));
+                       (bytes[1] << 16) |
+                       (bytes[2] << 8) |
+                       bytes[3]);
     }
 
     /// <summary>

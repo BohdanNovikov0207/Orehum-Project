@@ -14,39 +14,37 @@ using Robust.Shared.Map.Components;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
 using Robust.Shared.Utility;
-using Content.Goobstation.Maths.Vectors;
 
 namespace Content.Client._DV.CosmicCult.Visuals;
 
 public sealed class MonumentPlacementPreviewOverlay : Overlay
 {
     private readonly IEntityManager _ent;
-    private readonly IPlayerManager _player;
-    private readonly SpriteSystem _sprite;
-    private readonly MonumentPlacementPreviewSystem _preview;
-    private readonly IGameTiming _timing;
-    public override OverlaySpace Space => OverlaySpace.WorldSpaceEntities;
-    private readonly ShaderInstance _saturationShader;
-    private readonly ShaderInstance _unshadedShader;
-    private readonly ShaderInstance _starsShader;
-    public bool LockPlacement = false;
-    private EntityCoordinates _lastPos = new();
-
-    //for a slight fade in / out
-    //ss14's formatting settings can take my needlessly public variables away from my cold, dead hands
-    public float FadeInProgress = 0;
-    public float FadeInTime = 0.25f;
-    public bool FadingIn = true;
-
-    public float FadeOutProgress = 0;
-    public float FadeOutTime = 0.25f;
-    public bool FadingOut = false;
-
-    public float Alpha = 0;
 
     private readonly SpriteSpecifier _mainTex;
     private readonly SpriteSpecifier _outlineTex;
+    private readonly IPlayerManager _player;
+    private readonly MonumentPlacementPreviewSystem _preview;
+    private readonly ShaderInstance _saturationShader;
+    private readonly SpriteSystem _sprite;
+    private readonly ShaderInstance _starsShader;
     private readonly SpriteSpecifier _starTex;
+    private readonly IGameTiming _timing;
+    private readonly ShaderInstance _unshadedShader;
+    private EntityCoordinates _lastPos = new();
+
+    public float Alpha;
+
+    //for a slight fade in / out
+    //ss14's formatting settings can take my needlessly public variables away from my cold, dead hands
+    public float FadeInProgress;
+    public float FadeInTime = 0.25f;
+
+    public float FadeOutProgress;
+    public float FadeOutTime = 0.25f;
+    public bool FadingIn = true;
+    public bool FadingOut;
+    public bool LockPlacement = false;
 
     //todo arbitrary sprite drawing overlay at some point
     //I don't want to have to make a new overlay for every "draw a sprite at x" thing
@@ -84,13 +82,16 @@ public sealed class MonumentPlacementPreviewOverlay : Overlay
 
         _unshadedShader = protoMan.Index<ShaderPrototype>("unshaded").Instance(); //doesn't need a unique instance
 
-        ZIndex = (int) Shared.DrawDepth.DrawDepth.Mobs; //make the overlay render at the same depth as the actual sprite. might want to make it 1 lower if things get wierd with it.
+        ZIndex = (int) Shared.DrawDepth.DrawDepth
+            .Mobs; //make the overlay render at the same depth as the actual sprite. might want to make it 1 lower if things get wierd with it.
 
         //will fuck up if the wrong tier is passed in but it's not my problem if that happens
         _mainTex = new SpriteSpecifier.Rsi(mainRsiPath, mainRsiState);
         _outlineTex = new SpriteSpecifier.Rsi(mainRsiPath, outlineRsiState);
         _starTex = new SpriteSpecifier.Rsi(mainRsiPath, starRsiState);
     }
+
+    public override OverlaySpace Space => OverlaySpace.WorldSpaceEntities;
 
     //this might get wierd if the player managed to leave the grid they put the monument on? theoretically not a concern because it can't be placed too close to space.
     //shouldn't crash due to the comp checks, though.
@@ -114,6 +115,7 @@ public sealed class MonumentPlacementPreviewOverlay : Overlay
                 FadingIn = false;
                 FadeInProgress = FadeInTime;
             }
+
             Alpha = FadeInProgress / FadeInTime;
         }
 
@@ -125,6 +127,7 @@ public sealed class MonumentPlacementPreviewOverlay : Overlay
                 FadingOut = false;
                 FadeOutProgress = FadeOutTime;
             }
+
             Alpha = 1 - FadeOutProgress / FadeOutTime;
         }
 
@@ -136,7 +139,9 @@ public sealed class MonumentPlacementPreviewOverlay : Overlay
         if (!LockPlacement)
         {
             //set the colour based on if the target tile is valid or not
-            color = _preview.VerifyPlacement(transformComp, out var snappedCoords) ? Color.White.WithAlpha(outlineAlphaModulate * Alpha) : Color.Gray.WithAlpha(outlineAlphaModulate * 0.5f * Alpha);
+            color = _preview.VerifyPlacement(transformComp, out var snappedCoords)
+                ? Color.White.WithAlpha(outlineAlphaModulate * Alpha)
+                : Color.Gray.WithAlpha(outlineAlphaModulate * 0.5f * Alpha);
             _lastPos = snappedCoords; //update the position
         }
         else
@@ -149,7 +154,10 @@ public sealed class MonumentPlacementPreviewOverlay : Overlay
 
         //for the desaturated monument "shadow"
         worldHandle.UseShader(_saturationShader);
-        worldHandle.DrawTexture(_sprite.Frame0(_mainTex), _lastPos.Position - new Vector2(1.5f, 0.5f), Color.White.WithAlpha(Alpha)); //needs the offset to render in the proper position. does not inherit the extra modulate
+        worldHandle.DrawTexture(_sprite.Frame0(_mainTex),
+            _lastPos.Position - new Vector2(1.5f, 0.5f),
+            Color.White.WithAlpha(
+                Alpha)); //needs the offset to render in the proper position. does not inherit the extra modulate
 
         //for the outline to pop
         worldHandle.UseShader(_unshadedShader);

@@ -14,7 +14,7 @@ using DrawDepth = Content.Shared.DrawDepth.DrawDepth;
 
 namespace Content.Client._DV.Abilities;
 
-public sealed partial class HideUnderTableAbilitySystem : SharedCrawlUnderObjectsSystem
+public sealed class HideUnderTableAbilitySystem : SharedCrawlUnderObjectsSystem
 {
     [Dependency] private readonly AppearanceSystem _appearance = default!;
 

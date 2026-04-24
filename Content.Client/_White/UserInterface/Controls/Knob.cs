@@ -12,12 +12,16 @@ public sealed class Knob : Range
 {
     private readonly IGameTiming _gameTiming;
 
-    public event Action<Knob>? OnGrabbed;
-    public event Action<Knob>? OnReleased;
+    private TimeSpan? _lastMouseWheelTime;
 
-    private bool _grabbed;
+    public Knob()
+    {
+        _gameTiming = IoCManager.Resolve<IGameTiming>();
+        MouseFilter = MouseFilterMode.Stop;
+        MinSize = new Vector2(64, 64);
+    }
 
-    public bool Grabbed => _grabbed;
+    public bool Grabbed { get; private set; }
 
     public float AngleMultiplier { get; set; } = 1f;
 
@@ -27,12 +31,8 @@ public sealed class Knob : Range
 
     public bool Disabled { get; set; }
 
-    public Knob()
-    {
-        _gameTiming = IoCManager.Resolve<IGameTiming>();
-        MouseFilter = MouseFilterMode.Stop;
-        MinSize = new Vector2(64, 64);
-    }
+    public event Action<Knob>? OnGrabbed;
+    public event Action<Knob>? OnReleased;
 
     protected override void Draw(DrawingHandleScreen handle)
     {
@@ -49,37 +49,42 @@ public sealed class Knob : Range
             var angle = i / (float) segments * MathHelper.Pi + MathHelper.PiOver2;
             var pos = new Vector2(MathF.Sin(angle), MathF.Cos(angle));
 
-            handle.DrawLine(center, center + pos*radius, Color.White);
+            handle.DrawLine(center, center + pos * radius, Color.White);
         }
 
-        handle.DrawCircle(center, radius*0.8f, Color.FromHex("#424245"));
+        handle.DrawCircle(center, radius * 0.8f, Color.FromHex("#424245"));
 
-        handle.DrawCircle(center, radius*0.6f, Color.FromHex("#757585"));
+        handle.DrawCircle(center, radius * 0.6f, Color.FromHex("#757585"));
 
-        var newMatrix = Matrix3x2.Identity * Matrix3x2.CreateRotation((float) Angle.Theta) * Matrix3x2.CreateTranslation(center);
+        var newMatrix = Matrix3x2.Identity * Matrix3x2.CreateRotation((float) Angle.Theta) *
+                        Matrix3x2.CreateTranslation(center);
 
         var len = 2;
 
-        handle.DrawPrimitives(DrawPrimitiveTopology.TriangleFan, new List<Vector2>()
-        {
-            Vector2.Transform(new Vector2(-radius*0.75f, -len*4), newMatrix),
-            Vector2.Transform(new Vector2(7, -len*4), newMatrix),
-            Vector2.Transform(new Vector2(9, -len), newMatrix),
-            Vector2.Transform(new Vector2(9, len), newMatrix),
-            Vector2.Transform(new Vector2(7, len*4), newMatrix),
-            Vector2.Transform(new Vector2(-radius*0.75f, len*4), newMatrix),
-            Vector2.Transform(new Vector2(-radius*0.8f, 0), newMatrix),
-        }, Color.FromHex("#858585"));
+        handle.DrawPrimitives(DrawPrimitiveTopology.TriangleFan,
+            new List<Vector2>
+            {
+                Vector2.Transform(new Vector2(-radius * 0.75f, -len * 4), newMatrix),
+                Vector2.Transform(new Vector2(7, -len * 4), newMatrix),
+                Vector2.Transform(new Vector2(9, -len), newMatrix),
+                Vector2.Transform(new Vector2(9, len), newMatrix),
+                Vector2.Transform(new Vector2(7, len * 4), newMatrix),
+                Vector2.Transform(new Vector2(-radius * 0.75f, len * 4), newMatrix),
+                Vector2.Transform(new Vector2(-radius * 0.8f, 0), newMatrix),
+            },
+            Color.FromHex("#858585"));
 
-        handle.DrawPrimitives(DrawPrimitiveTopology.TriangleFan, new List<Vector2>()
-        {
-            Vector2.Transform(new Vector2(-radius*0.85f, -len), newMatrix),
-            Vector2.Transform(new Vector2(5, -len), newMatrix),
-            Vector2.Transform(new Vector2(6, 0), newMatrix),
-            Vector2.Transform(new Vector2(5, len), newMatrix),
-            Vector2.Transform(new Vector2(-radius*0.85f, len), newMatrix),
-            Vector2.Transform(new Vector2(-radius*0.9f, 0), newMatrix),
-        }, Color.White);
+        handle.DrawPrimitives(DrawPrimitiveTopology.TriangleFan,
+            new List<Vector2>
+            {
+                Vector2.Transform(new Vector2(-radius * 0.85f, -len), newMatrix),
+                Vector2.Transform(new Vector2(5, -len), newMatrix),
+                Vector2.Transform(new Vector2(6, 0), newMatrix),
+                Vector2.Transform(new Vector2(5, len), newMatrix),
+                Vector2.Transform(new Vector2(-radius * 0.85f, len), newMatrix),
+                Vector2.Transform(new Vector2(-radius * 0.9f, 0), newMatrix),
+            },
+            Color.White);
     }
 
     protected override void KeyBindDown(GUIBoundKeyEventArgs args)
@@ -89,7 +94,7 @@ public sealed class Knob : Range
         if (args.Function != EngineKeyFunctions.UIClick || Disabled)
             return;
 
-        _grabbed = true;
+        Grabbed = true;
         OnGrabbed?.Invoke(this);
     }
 
@@ -97,10 +102,10 @@ public sealed class Knob : Range
     {
         base.KeyBindUp(args);
 
-        if (args.Function != EngineKeyFunctions.UIClick || !_grabbed)
+        if (args.Function != EngineKeyFunctions.UIClick || !Grabbed)
             return;
 
-        _grabbed = false;
+        Grabbed = false;
         OnReleased?.Invoke(this);
     }
 
@@ -111,14 +116,12 @@ public sealed class Knob : Range
         if (Disabled)
             return;
 
-        if (!_grabbed)
+        if (!Grabbed)
             return;
 
         var ratio = (args.Relative.X - args.Relative.Y) * 0.01f;
         SetAsRatio(GetAsRatio() + ratio);
     }
-
-    private TimeSpan? _lastMouseWheelTime;
 
     protected override void MouseWheel(GUIMouseWheelEventArgs args)
     {
@@ -142,7 +145,8 @@ public sealed class Knob : Range
     {
         base.FrameUpdate(args);
 
-        if(!_lastMouseWheelTime.HasValue || _lastMouseWheelTime.Value + TimeSpan.FromMilliseconds(100) > _gameTiming.CurTime)
+        if (!_lastMouseWheelTime.HasValue ||
+            _lastMouseWheelTime.Value + TimeSpan.FromMilliseconds(100) > _gameTiming.CurTime)
             return;
 
         OnReleased?.Invoke(this);

@@ -22,13 +22,12 @@ namespace Content.Client.Parallax;
 
 public sealed class ParallaxSystem : SharedParallaxSystem
 {
-    [Dependency] private readonly IOverlayManager _overlay = default!;
-    [Dependency] private readonly IParallaxManager _parallax = default!;
-    [Dependency] private readonly SharedMapSystem _map = default!;
+    public const int ParallaxZIndex = 0;
 
     private static readonly ProtoId<ParallaxPrototype> Fallback = "Default";
-
-    public const int ParallaxZIndex = 0;
+    [Dependency] private readonly SharedMapSystem _map = default!;
+    [Dependency] private readonly IOverlayManager _overlay = default!;
+    [Dependency] private readonly IParallaxManager _parallax = default!;
 
     public override void Initialize()
     {
@@ -62,25 +61,16 @@ public sealed class ParallaxSystem : SharedParallaxSystem
     private void OnAfterAutoHandleState(EntityUid uid, ParallaxComponent component, ref AfterAutoHandleStateEvent args)
     {
         if (!_parallax.IsLoaded(component.Parallax))
-        {
             _parallax.LoadParallaxByName(component.Parallax);
-        }
     }
 
-    public ParallaxLayerPrepared[] GetParallaxLayers(MapId mapId)
-    {
-        return _parallax.GetParallaxLayers(GetParallax(_map.GetMapOrInvalid(mapId)));
-    }
+    public ParallaxLayerPrepared[] GetParallaxLayers(MapId mapId) =>
+        _parallax.GetParallaxLayers(GetParallax(_map.GetMapOrInvalid(mapId)));
 
-    public string GetParallax(MapId mapId)
-    {
-        return GetParallax(_map.GetMapOrInvalid(mapId));
-    }
+    public string GetParallax(MapId mapId) => GetParallax(_map.GetMapOrInvalid(mapId));
 
-    public string GetParallax(EntityUid mapUid)
-    {
-        return TryComp<ParallaxComponent>(mapUid, out var parallax) ? parallax.Parallax : Fallback;
-    }
+    public string GetParallax(EntityUid mapUid) =>
+        TryComp<ParallaxComponent>(mapUid, out var parallax) ? parallax.Parallax : Fallback;
 
     /// <summary>
     /// Draws a texture as parallax in the specified world handle.

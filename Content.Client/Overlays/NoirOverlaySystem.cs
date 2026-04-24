@@ -4,7 +4,7 @@ using Robust.Client.Graphics;
 
 namespace Content.Client.Overlays;
 
-public sealed partial class NoirOverlaySystem : EquipmentHudSystem<NoirOverlayComponent>
+public sealed class NoirOverlaySystem : EquipmentHudSystem<NoirOverlayComponent>
 {
     [Dependency] private readonly IOverlayManager _overlayMan = default!;
 
@@ -14,7 +14,7 @@ public sealed partial class NoirOverlaySystem : EquipmentHudSystem<NoirOverlayCo
     {
         base.Initialize();
 
-        _overlay = new();
+        _overlay = new NoirOverlay();
     }
 
     protected override void UpdateInternal(RefreshEquipmentHudEvent<NoirOverlayComponent> component)

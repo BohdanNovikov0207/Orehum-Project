@@ -10,8 +10,5 @@ namespace Content.Client._Shitmed.Antags.Abductor;
 
 public sealed class AbductorSystem : SharedAbductorSystem
 {
-    public override void Initialize()
-    {
-        base.Initialize();
-    }
+    public override void Initialize() => base.Initialize();
 }

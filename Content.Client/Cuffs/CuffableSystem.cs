@@ -58,14 +58,16 @@ public sealed class CuffableSystem : SharedCuffableSystem
             return;
         _sprite.LayerSetColor((uid, sprite), HumanoidVisualLayers.Handcuffs, cuffState.Color!.Value);
 
-        if (!Equals(component.CurrentRSI, cuffState.RSI) && cuffState.RSI != null) // we don't want to keep loading the same RSI
+        if (!Equals(component.CurrentRSI, cuffState.RSI) &&
+            cuffState.RSI != null) // we don't want to keep loading the same RSI
         {
             component.CurrentRSI = cuffState.RSI;
-            _sprite.LayerSetRsi((uid, sprite), _sprite.LayerMapGet((uid, sprite), HumanoidVisualLayers.Handcuffs), new ResPath(component.CurrentRSI), cuffState.IconState);
+            _sprite.LayerSetRsi((uid, sprite),
+                _sprite.LayerMapGet((uid, sprite), HumanoidVisualLayers.Handcuffs),
+                new ResPath(component.CurrentRSI),
+                cuffState.IconState);
         }
         else
-        {
             _sprite.LayerSetRsiState((uid, sprite), HumanoidVisualLayers.Handcuffs, cuffState.IconState);
-        }
     }
 }

@@ -5,9 +5,9 @@
 
 using Content.Shared.Mail;
 
-namespace Content.Client.Mail
+namespace Content.Client.Mail;
+
+[RegisterComponent]
+public sealed partial class MailComponent : SharedMailComponent
 {
-    [RegisterComponent]
-    public sealed partial class MailComponent : SharedMailComponent
-    {}
 }

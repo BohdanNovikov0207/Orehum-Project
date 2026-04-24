@@ -11,27 +11,29 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using System.Numerics;
 using Content.Client.Stylesheets;
 using Content.Shared.Power;
 using Robust.Client.Graphics;
 using Robust.Client.UserInterface.Controls;
 using Robust.Shared.Utility;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Numerics;
 
 namespace Content.Client.Power;
 
 public sealed partial class PowerMonitoringWindow
 {
-    private SpriteSpecifier.Texture _sourceIcon = new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/PowerMonitoring/source_arrow.png"));
-    private SpriteSpecifier.Texture _loadIconPath = new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/PowerMonitoring/load_arrow.png"));
+    private readonly SpriteSpecifier.Texture _loadIconPath =
+        new(new ResPath("/Textures/Interface/PowerMonitoring/load_arrow.png"));
 
-    private bool _autoScrollActive = false;
-    private bool _autoScrollAwaitsUpdate = false;
+    private readonly SpriteSpecifier.Texture _sourceIcon =
+        new(new ResPath("/Textures/Interface/PowerMonitoring/source_arrow.png"));
 
-    private void UpdateWindowConsoleEntry
-        (BoxContainer masterContainer,
+    private bool _autoScrollActive;
+    private bool _autoScrollAwaitsUpdate;
+
+    private void UpdateWindowConsoleEntry(BoxContainer masterContainer,
         int index,
         PowerMonitoringConsoleEntry entry,
         PowerMonitoringConsoleEntry[] focusSources,
@@ -73,9 +75,7 @@ public sealed partial class PowerMonitoringWindow
         }
 
         else
-        {
             windowEntry = masterContainer.GetChild(index) as PowerMonitoringWindowEntry;
-        }
 
         // If we exit here, something was added to the container that shouldn't have been added
         if (windowEntry == null)
@@ -88,7 +88,9 @@ public sealed partial class PowerMonitoringWindow
         UpdateWindowEntryButton(entry.NetEntity, windowEntry.Button, entry);
     }
 
-    public void UpdateWindowEntryButton(NetEntity netEntity, PowerMonitoringButton button, PowerMonitoringConsoleEntry entry)
+    public void UpdateWindowEntryButton(NetEntity netEntity,
+        PowerMonitoringButton button,
+        PowerMonitoringConsoleEntry entry)
     {
         if (!netEntity.IsValid())
             return;
@@ -105,7 +107,9 @@ public sealed partial class PowerMonitoringWindow
 
         // Update sprite
         if (entry.MetaData.Value.SpritePath != string.Empty && entry.MetaData.Value.SpriteState != string.Empty)
-            button.TextureRect.Texture = _spriteSystem.Frame0(new SpriteSpecifier.Rsi(new ResPath(entry.MetaData.Value.SpritePath), entry.MetaData.Value.SpriteState));
+            button.TextureRect.Texture =
+                _spriteSystem.Frame0(new SpriteSpecifier.Rsi(new ResPath(entry.MetaData.Value.SpritePath),
+                    entry.MetaData.Value.SpriteState));
 
         // Update name
         var name = Loc.GetString(entry.MetaData.Value.EntityName);
@@ -116,7 +120,8 @@ public sealed partial class PowerMonitoringWindow
 
         // Update power value
         // Don't use SI prefixes, just give the number in W, so that it is readily apparent which consumer is using a lot of power.
-        button.PowerValue.Text = Loc.GetString("power-monitoring-window-button-value", ("value", Math.Round(entry.PowerValue).ToString("N0")));
+        button.PowerValue.Text = Loc.GetString("power-monitoring-window-button-value",
+            ("value", Math.Round(entry.PowerValue).ToString("N0")));
 
         // Update battery level if applicable
         if (entry.BatteryLevel != null)
@@ -139,7 +144,10 @@ public sealed partial class PowerMonitoringWindow
         }
     }
 
-    private void UpdateEntrySourcesOrLoads(BoxContainer masterContainer, BoxContainer currentContainer, PowerMonitoringConsoleEntry[]? entries, SpriteSpecifier.Texture icon)
+    private void UpdateEntrySourcesOrLoads(BoxContainer masterContainer,
+        BoxContainer currentContainer,
+        PowerMonitoringConsoleEntry[]? entries,
+        SpriteSpecifier.Texture icon)
     {
         if (currentContainer == null)
             return;
@@ -290,7 +298,7 @@ public sealed partial class PowerMonitoringWindow
         if (scroll == null)
             return;
 
-        if (!TryGetNextScrollPosition(out float? nextScrollPosition))
+        if (!TryGetNextScrollPosition(out var nextScrollPosition))
             return;
 
         scroll.VScrollTarget = nextScrollPosition.Value;
@@ -343,27 +351,29 @@ public sealed partial class PowerMonitoringWindow
         switch (group)
         {
             case PowerMonitoringConsoleGroup.Generator:
-                MasterTabContainer.CurrentTab = 0; break;
+                MasterTabContainer.CurrentTab = 0;
+                break;
             case PowerMonitoringConsoleGroup.SMES:
-                MasterTabContainer.CurrentTab = 1; break;
+                MasterTabContainer.CurrentTab = 1;
+                break;
             case PowerMonitoringConsoleGroup.Substation:
-                MasterTabContainer.CurrentTab = 2; break;
+                MasterTabContainer.CurrentTab = 2;
+                break;
             case PowerMonitoringConsoleGroup.APC:
-                MasterTabContainer.CurrentTab = 3; break;
+                MasterTabContainer.CurrentTab = 3;
+                break;
         }
     }
 
-    private PowerMonitoringConsoleGroup GetCurrentPowerMonitoringConsoleGroup()
-    {
-        return (PowerMonitoringConsoleGroup) MasterTabContainer.CurrentTab;
-    }
+    private PowerMonitoringConsoleGroup GetCurrentPowerMonitoringConsoleGroup() =>
+        (PowerMonitoringConsoleGroup) MasterTabContainer.CurrentTab;
 }
 
 public sealed class PowerMonitoringWindowEntry : PowerMonitoringWindowBaseEntry
 {
+    public BoxContainer LoadsContainer;
     public BoxContainer MainContainer;
     public BoxContainer SourcesContainer;
-    public BoxContainer LoadsContainer;
 
     public PowerMonitoringWindowEntry(PowerMonitoringConsoleEntry entry) : base(entry)
     {
@@ -378,7 +388,7 @@ public sealed class PowerMonitoringWindowEntry : PowerMonitoringWindowBaseEntry
         AddChild(Button);
 
         // Grid container to hold sub containers
-        MainContainer = new BoxContainer()
+        MainContainer = new BoxContainer
         {
             Orientation = LayoutOrientation.Vertical,
             HorizontalExpand = true,
@@ -389,7 +399,7 @@ public sealed class PowerMonitoringWindowEntry : PowerMonitoringWindowBaseEntry
         AddChild(MainContainer);
 
         // Grid container to hold the list of sources when selected
-        SourcesContainer = new BoxContainer()
+        SourcesContainer = new BoxContainer
         {
             Orientation = LayoutOrientation.Vertical,
             HorizontalExpand = true,
@@ -398,7 +408,7 @@ public sealed class PowerMonitoringWindowEntry : PowerMonitoringWindowBaseEntry
         MainContainer.AddChild(SourcesContainer);
 
         // Grid container to hold the list of loads when selected
-        LoadsContainer = new BoxContainer()
+        LoadsContainer = new BoxContainer
         {
             Orientation = LayoutOrientation.Vertical,
             HorizontalExpand = true,
@@ -418,7 +428,7 @@ public sealed class PowerMonitoringWindowSubEntry : PowerMonitoringWindowBaseEnt
         HorizontalExpand = true;
 
         // Source/load icon
-        Icon = new TextureRect()
+        Icon = new TextureRect
         {
             VerticalAlignment = VAlignment.Center,
             Margin = new Thickness(0, 0, 2, 0),
@@ -434,9 +444,9 @@ public sealed class PowerMonitoringWindowSubEntry : PowerMonitoringWindowBaseEnt
 
 public abstract class PowerMonitoringWindowBaseEntry : BoxContainer
 {
-    public NetEntity NetEntity;
-    public PowerMonitoringConsoleEntry Entry;
     public PowerMonitoringButton Button;
+    public PowerMonitoringConsoleEntry Entry;
+    public NetEntity NetEntity;
 
     public PowerMonitoringWindowBaseEntry(PowerMonitoringConsoleEntry entry)
     {
@@ -449,15 +459,15 @@ public abstract class PowerMonitoringWindowBaseEntry : BoxContainer
 
 public sealed class PowerMonitoringButton : Button
 {
-    public BoxContainer MainContainer;
-    public TextureRect TextureRect;
-    public Label NameLocalized;
+    public PanelContainer BackgroundPanel;
 
     public ProgressBar BatteryLevel;
-    public PanelContainer BackgroundPanel;
     public Label BatteryPercentage;
+    public BoxContainer MainContainer;
+    public Label NameLocalized;
 
     public Label PowerValue;
+    public TextureRect TextureRect;
 
     public PowerMonitoringButton()
     {
@@ -465,7 +475,7 @@ public sealed class PowerMonitoringButton : Button
         VerticalExpand = true;
         Margin = new Thickness(0f, 1f, 0f, 1f);
 
-        MainContainer = new BoxContainer()
+        MainContainer = new BoxContainer
         {
             Orientation = BoxContainer.LayoutOrientation.Horizontal,
             HorizontalExpand = true,
@@ -474,7 +484,7 @@ public sealed class PowerMonitoringButton : Button
 
         AddChild(MainContainer);
 
-        TextureRect = new TextureRect()
+        TextureRect = new TextureRect
         {
             HorizontalAlignment = HAlignment.Center,
             VerticalAlignment = VAlignment.Center,
@@ -484,7 +494,7 @@ public sealed class PowerMonitoringButton : Button
 
         MainContainer.AddChild(TextureRect);
 
-        NameLocalized = new Label()
+        NameLocalized = new Label
         {
             HorizontalExpand = true,
             ClipText = true,
@@ -492,7 +502,7 @@ public sealed class PowerMonitoringButton : Button
 
         MainContainer.AddChild(NameLocalized);
 
-        BatteryLevel = new ProgressBar()
+        BatteryLevel = new ProgressBar
         {
             SetWidth = 47f,
             SetHeight = 20f,
@@ -509,19 +519,19 @@ public sealed class PowerMonitoringButton : Button
             // Draw a half-transparent box over the battery level to make the text more readable.
             PanelOverride = new StyleBoxFlat
             {
-                BackgroundColor = new Color(0, 0, 0, 0.9f)
+                BackgroundColor = new Color(0, 0, 0, 0.9f),
             },
             HorizontalAlignment = HAlignment.Center,
             VerticalAlignment = VAlignment.Center,
             HorizontalExpand = true,
             VerticalExpand = true,
             // Box is undersized perfectly compared to the progress bar, so a little bit of the unaffected progress bar is visible.
-            SetSize = new Vector2(43f, 16f)
+            SetSize = new Vector2(43f, 16f),
         };
 
         BatteryLevel.AddChild(BackgroundPanel);
 
-        BatteryPercentage = new Label()
+        BatteryPercentage = new Label
         {
             VerticalAlignment = VAlignment.Center,
             HorizontalAlignment = HAlignment.Center,
@@ -535,7 +545,7 @@ public sealed class PowerMonitoringButton : Button
 
         BackgroundPanel.AddChild(BatteryPercentage);
 
-        PowerValue = new Label()
+        PowerValue = new Label
         {
             HorizontalAlignment = HAlignment.Right,
             Align = Label.AlignMode.Right,

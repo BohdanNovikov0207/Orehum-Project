@@ -14,17 +14,21 @@ namespace Content.Client.Power.Battery;
 /// <summary>
 /// Interface control for batteries.
 /// </summary>
-/// <seealso cref="BatteryBoundUserInterface"/>
+/// <seealso cref="BatteryBoundUserInterface" />
 [GenerateTypedNameReferences]
 public sealed partial class BatteryMenu : FancyWindow
 {
     // Cutoff for the ETA time to switch from "~" to ">" and cap out.
     private const float MaxEtaValueMinutes = 60;
+
     // Cutoff where ETA times likely don't make sense and it's better to just say "N/A".
     private const float NotApplicableEtaHighCutoffMinutes = 1000;
+
     private const float NotApplicableEtaLowCutoffMinutes = 0.01f;
+
     // Fudge factor to ignore small charge/discharge values, that are likely caused by floating point rounding errors.
     private const float PrecisionRoundFactor = 100_000;
+    private const float PowerPulseFactor = 4;
 
     // Colors used for the storage cell bar graphic.
     private static readonly Color[] StorageColors =
@@ -47,42 +51,34 @@ public sealed partial class BatteryMenu : FancyWindow
     // Parameters for the sine wave pulsing animations for active power lines in the UI.
     private static readonly Color ActivePowerLineHighColor = Color.FromHex("#CCC");
     private static readonly Color ActivePowerLineLowColor = Color.FromHex("#888");
-    private const float PowerPulseFactor = 4;
-
-    // Dependencies
-    [Dependency] private readonly IEntityManager _entityManager = null!;
-    [Dependency] private readonly ILocalizationManager _loc = null!;
 
     // Active and inactive style boxes for power lines.
     // We modify _activePowerLineStyleBox's properties programmatically to implement the pulsing animation.
     private readonly StyleBoxFlat _activePowerLineStyleBox = new();
+
+    // Dependencies
+    [Dependency] private readonly IEntityManager _entityManager = null!;
     private readonly StyleBoxFlat _inactivePowerLineStyleBox = new() { BackgroundColor = Color.FromHex("#555") };
+    [Dependency] private readonly ILocalizationManager _loc = null!;
+    private bool _blinkPulse;
+
+    // State for the storage cell bar graphic and its blinking effect.
+    private float _blinkPulseValue;
 
     // Style boxes for the storage cell bar graphic.
     // We modify the properties of these to change the bars' colors.
     private StyleBoxFlat[] _chargeMeterBoxes;
 
-    // State for the powerline pulsing animation.
-    private float _powerPulseValue;
-
-    // State for the storage cell bar graphic and its blinking effect.
-    private float _blinkPulseValue;
-    private bool _blinkPulse;
-    private int _storageLevel;
-    private bool _hasStorageDelta;
-
     // The entity that this UI is for.
     private EntityUid _entity;
+    private bool _hasStorageDelta;
+
+    // State for the powerline pulsing animation.
+    private float _powerPulseValue;
+    private int _storageLevel;
 
     // Used to avoid sending input events when updating slider values.
     private bool _suppressSliderEvents;
-
-    // Events for the BUI to subscribe to.
-    public event Action<bool>? OnInBreaker;
-    public event Action<bool>? OnOutBreaker;
-
-    public event Action<float>? OnChargeRate;
-    public event Action<float>? OnDischargeRate;
 
     public BatteryMenu()
     {
@@ -105,6 +101,13 @@ public sealed partial class BatteryMenu : FancyWindow
                 OnDischargeRate?.Invoke(DischargeRateSlider.Value);
         };
     }
+
+    // Events for the BUI to subscribe to.
+    public event Action<bool>? OnInBreaker;
+    public event Action<bool>? OnOutBreaker;
+
+    public event Action<float>? OnChargeRate;
+    public event Action<float>? OnDischargeRate;
 
     public void SetEntity(EntityUid entity)
     {
@@ -193,9 +196,7 @@ public sealed partial class BatteryMenu : FancyWindow
         if (!double.IsFinite(etaTimeMinutes)
             || Math.Abs(etaTimeMinutes) > NotApplicableEtaHighCutoffMinutes
             || Math.Abs(etaTimeMinutes) < NotApplicableEtaLowCutoffMinutes)
-        {
             EtaValue.Text = _loc.GetString("battery-menu-eta-value-na");
-        }
         else
         {
             EtaValue.Text = _loc.GetString(
@@ -223,15 +224,10 @@ public sealed partial class BatteryMenu : FancyWindow
         return Color.FromHsv(hsv);
     }
 
-    private void SetPowerLineState(PanelContainer control, bool value)
-    {
+    private void SetPowerLineState(PanelContainer control, bool value) =>
         control.PanelOverride = value ? _activePowerLineStyleBox : _inactivePowerLineStyleBox;
-    }
 
-    private string FormatPower(float value)
-    {
-        return _loc.GetString("battery-menu-power-value", ("value", value));
-    }
+    private string FormatPower(float value) => _loc.GetString("battery-menu-power-value", ("value", value));
 
     protected override void FrameUpdate(FrameEventArgs args)
     {
@@ -256,9 +252,7 @@ public sealed partial class BatteryMenu : FancyWindow
                 box.BackgroundColor = StorageColors[i];
             }
             else
-            {
                 box.BackgroundColor = DimStorageColors[i];
-            }
         }
 
         _blinkPulseValue += args.DeltaSeconds;

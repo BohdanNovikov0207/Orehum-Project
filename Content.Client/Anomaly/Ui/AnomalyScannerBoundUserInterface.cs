@@ -19,7 +19,6 @@ public sealed class AnomalyScannerBoundUserInterface : BoundUserInterface
 
     public AnomalyScannerBoundUserInterface(EntityUid owner, Enum uiKey) : base(owner, uiKey)
     {
-
     }
 
     protected override void Open()

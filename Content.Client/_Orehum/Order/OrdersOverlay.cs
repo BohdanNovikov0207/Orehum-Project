@@ -16,16 +16,14 @@ public sealed class OrdersOverlay : Overlay
     [Dependency] private readonly IEntityManager _entity = default!;
     [Dependency] private readonly IPlayerManager _players = default!;
     [Dependency] private readonly IPrototypeManager _prototype = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-
-    private readonly SpriteSystem _sprite;
-    private readonly TransformSystem _transform;
 
     private readonly ShaderInstance _shader;
 
-    private EntityQuery<TransformComponent> _xformQuery;
+    private readonly SpriteSystem _sprite;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    private readonly TransformSystem _transform;
 
-    public override OverlaySpace Space => OverlaySpace.WorldSpaceBelowFOV;
+    private readonly EntityQuery<TransformComponent> _xformQuery;
 
     public OrdersOverlay()
     {
@@ -39,6 +37,8 @@ public sealed class OrdersOverlay : Overlay
         _xformQuery = _entity.GetEntityQuery<TransformComponent>();
     }
 
+    public override OverlaySpace Space => OverlaySpace.WorldSpaceBelowFOV;
+
     protected override void Draw(in OverlayDrawArgs args)
     {
         if (!_entity.HasComponent<OrderListenComponent>(_players.LocalEntity))
@@ -49,7 +49,7 @@ public sealed class OrdersOverlay : Overlay
         var eyeRot = args.Viewport.Eye?.Rotation ?? default;
 
         var scaleMatrix = Matrix3x2.CreateScale(new Vector2(1, 1));
-        var rotationMatrix = Matrix3x2.CreateRotation((float)-eyeRot);
+        var rotationMatrix = Matrix3x2.CreateRotation((float) -eyeRot);
 
         handle.UseShader(_shader);
 
@@ -70,6 +70,7 @@ public sealed class OrdersOverlay : Overlay
         {
             DrawIcon((uid, sprite, xform), in args, focus.Icon, scaleMatrix, rotationMatrix);
         }
+
         handle.UseShader(null);
     }
 
@@ -99,7 +100,8 @@ public sealed class OrdersOverlay : Overlay
 
         var texture = _sprite.GetFrame(icon, _timing.CurTime);
 
-        var yOffset = (bounds.Height + sprite.Offset.Y) / 2f - (float) texture.Height / EyeManager.PixelsPerMeter * bounds.Height;
+        var yOffset = (bounds.Height + sprite.Offset.Y) / 2f -
+                      (float) texture.Height / EyeManager.PixelsPerMeter * bounds.Height;
         var xOffset = (bounds.Width + sprite.Offset.X) / 2f - (float) texture.Width / EyeManager.PixelsPerMeter - 0.25f;
 
         var position = new Vector2(xOffset, yOffset);

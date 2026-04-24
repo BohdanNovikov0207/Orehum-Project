@@ -37,6 +37,6 @@ SPDX-License-Identifier: AGPL-3.0-or-later
         </BoxContainer>
         <Button Name="SubmitButton" Text="{Loc admin-ui-blueprint-load}" />
         <Button Name="TeleportButton" Text="{Loc admin-ui-blueprint-teleport}" />
-        <Button Name="ResetButton" Text="{Loc admin-ui-blueprint-reset}"></Button>
+        <Button Name="ResetButton" Text="{Loc admin-ui-blueprint-reset}" />
     </BoxContainer>
 </DefaultWindow>

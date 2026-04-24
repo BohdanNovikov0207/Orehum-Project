@@ -76,7 +76,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Numerics;
-using Content.Client.Physics.Controllers;
 using Content.Client.PhysicsSystem.Controllers;
 using Content.Shared.Movement.Components;
 using Content.Shared.NPC;
@@ -89,6 +88,8 @@ namespace Content.Client.NPC;
 public sealed class NPCSteeringSystem : SharedNPCSteeringSystem
 {
     [Dependency] private readonly IOverlayManager _overlay = default!;
+
+    private bool _debugEnabled;
 
     public bool DebugEnabled
     {
@@ -103,17 +104,17 @@ public sealed class NPCSteeringSystem : SharedNPCSteeringSystem
             if (_debugEnabled)
             {
                 _overlay.AddOverlay(new NPCSteeringOverlay(EntityManager));
-                RaiseNetworkEvent(new RequestNPCSteeringDebugEvent()
+                RaiseNetworkEvent(new RequestNPCSteeringDebugEvent
                 {
-                    Enabled = true
+                    Enabled = true,
                 });
             }
             else
             {
                 _overlay.RemoveOverlay<NPCSteeringOverlay>();
-                RaiseNetworkEvent(new RequestNPCSteeringDebugEvent()
+                RaiseNetworkEvent(new RequestNPCSteeringDebugEvent
                 {
-                    Enabled = false
+                    Enabled = false,
                 });
 
                 var query = AllEntityQuery<NPCSteeringComponent>();
@@ -124,8 +125,6 @@ public sealed class NPCSteeringSystem : SharedNPCSteeringSystem
             }
         }
     }
-
-    private bool _debugEnabled;
 
     public override void Initialize()
     {
@@ -156,8 +155,6 @@ public sealed class NPCSteeringSystem : SharedNPCSteeringSystem
 
 public sealed class NPCSteeringOverlay : Overlay
 {
-    public override OverlaySpace Space => OverlaySpace.WorldSpace;
-
     private readonly IEntityManager _entManager;
     private readonly SharedTransformSystem _transformSystem;
 
@@ -167,14 +164,15 @@ public sealed class NPCSteeringOverlay : Overlay
         _transformSystem = _entManager.System<SharedTransformSystem>();
     }
 
+    public override OverlaySpace Space => OverlaySpace.WorldSpace;
+
     protected override void Draw(in OverlayDrawArgs args)
     {
-        foreach (var (comp, mover, xform) in _entManager.EntityQuery<NPCSteeringComponent, InputMoverComponent, TransformComponent>(true))
+        foreach (var (comp, mover, xform) in _entManager
+                     .EntityQuery<NPCSteeringComponent, InputMoverComponent, TransformComponent>(true))
         {
             if (xform.MapID != args.MapId)
-            {
                 continue;
-            }
 
             var (worldPos, worldRot) = _transformSystem.GetWorldPositionRotation(xform);
 
@@ -194,8 +192,12 @@ public sealed class NPCSteeringOverlay : Overlay
                 var danger = comp.DangerMap[i];
                 var interest = comp.InterestMap[i];
                 var angle = Angle.FromDegrees(i * (360 / SharedNPCSteeringSystem.InterestDirections));
-                args.WorldHandle.DrawLine(worldPos, worldPos + (rotationOffset + angle).RotateVec(new Vector2(interest, 0f)), Color.LimeGreen);
-                args.WorldHandle.DrawLine(worldPos, worldPos + (rotationOffset + angle).RotateVec(new Vector2(danger, 0f)), Color.Red);
+                args.WorldHandle.DrawLine(worldPos,
+                    worldPos + (rotationOffset + angle).RotateVec(new Vector2(interest, 0f)),
+                    Color.LimeGreen);
+                args.WorldHandle.DrawLine(worldPos,
+                    worldPos + (rotationOffset + angle).RotateVec(new Vector2(danger, 0f)),
+                    Color.Red);
             }
 
             args.WorldHandle.DrawLine(worldPos, worldPos + rotationOffset.RotateVec(comp.Direction), Color.Cyan);

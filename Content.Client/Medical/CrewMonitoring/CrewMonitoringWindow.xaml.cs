@@ -117,12 +117,12 @@ public sealed partial class CrewMonitoringWindow : FancyWindow
 {
     [Dependency] private readonly IEntityManager _entManager = default!;
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-    private readonly SharedTransformSystem _transformSystem;
     private readonly SpriteSystem _spriteSystem;
+    private readonly SharedTransformSystem _transformSystem;
+    private Texture? _blipTexture;
 
     private NetEntity? _trackedEntity;
     private bool _tryToScrollToListFocus;
-    private Texture? _blipTexture;
 
     public CrewMonitoringWindow()
     {
@@ -137,7 +137,9 @@ public sealed partial class CrewMonitoringWindow : FancyWindow
 
     public void Set(string stationName, EntityUid? mapUid)
     {
-        _blipTexture = _spriteSystem.Frame0(new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/NavMap/beveled_circle.png")));
+        _blipTexture =
+            _spriteSystem.Frame0(
+                new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/NavMap/beveled_circle.png")));
 
         if (_entManager.TryGetComponent<TransformComponent>(mapUid, out var xform))
             NavMap.MapUid = xform.GridUid;
@@ -187,6 +189,7 @@ public sealed partial class CrewMonitoringWindow : FancyWindow
 
             uniqueSensorsMap[sensor.OwnerUid] = sensor;
         }
+
         var uniqueSensors = uniqueSensorsMap.Values.ToList();
 
         // Order sensor data
@@ -203,11 +206,13 @@ public sealed partial class CrewMonitoringWindow : FancyWindow
                 continue;
 
             foreach (var sensor in departmentSensors)
+            {
                 assignedSensors.Add(sensor);
+            }
 
             if (SensorsTable.ChildCount > 0)
             {
-                var spacer = new Control()
+                var spacer = new Control
                 {
                     SetHeight = 20,
                 };
@@ -215,7 +220,7 @@ public sealed partial class CrewMonitoringWindow : FancyWindow
                 SensorsTable.AddChild(spacer);
             }
 
-            var deparmentLabel = new RichTextLabel()
+            var deparmentLabel = new RichTextLabel
             {
                 Margin = new Thickness(10, 0),
                 HorizontalExpand = true,
@@ -234,14 +239,14 @@ public sealed partial class CrewMonitoringWindow : FancyWindow
 
         if (remainingSensors.Any())
         {
-            var spacer = new Control()
+            var spacer = new Control
             {
                 SetHeight = 20,
             };
 
             SensorsTable.AddChild(spacer);
 
-            var deparmentLabel = new RichTextLabel()
+            var deparmentLabel = new RichTextLabel
             {
                 Margin = new Thickness(10, 0),
                 HorizontalExpand = true,
@@ -257,9 +262,8 @@ public sealed partial class CrewMonitoringWindow : FancyWindow
 
         // Show monitor on nav map
         if (monitorCoords != null && _blipTexture != null)
-        {
-            NavMap.TrackedEntities[_entManager.GetNetEntity(monitor)] = new NavMapBlip(monitorCoords.Value, _blipTexture, Color.Cyan, true, false);
-        }
+            NavMap.TrackedEntities[_entManager.GetNetEntity(monitor)] =
+                new NavMapBlip(monitorCoords.Value, _blipTexture, Color.Cyan, true, false);
     }
 
     private void PopulateDepartmentList(IEnumerable<SuitSensorStatus> departmentSensors)
@@ -277,11 +281,11 @@ public sealed partial class CrewMonitoringWindow : FancyWindow
             // Add a button that will hold a username and other details
             NavMap.LocalizedNames.TryAdd(sensor.SuitSensorUid, sensor.Name + ", " + sensor.Job);
 
-            var sensorButton = new CrewMonitoringButton()
+            var sensorButton = new CrewMonitoringButton
             {
                 SuitSensorUid = sensor.SuitSensorUid,
                 Coordinates = coordinates,
-                Disabled = (coordinates == null),
+                Disabled = coordinates == null,
                 HorizontalExpand = true,
             };
 
@@ -291,7 +295,7 @@ public sealed partial class CrewMonitoringWindow : FancyWindow
             SensorsTable.AddChild(sensorButton);
 
             // Primary container to hold the button UI elements
-            var mainContainer = new BoxContainer()
+            var mainContainer = new BoxContainer
             {
                 Orientation = LayoutOrientation.Horizontal,
                 HorizontalExpand = true,
@@ -300,7 +304,7 @@ public sealed partial class CrewMonitoringWindow : FancyWindow
             sensorButton.AddChild(mainContainer);
 
             // User status container
-            var statusContainer = new BoxContainer()
+            var statusContainer = new BoxContainer
             {
                 SizeFlagsStretchRatio = 1.25f,
                 Orientation = LayoutOrientation.Horizontal,
@@ -310,7 +314,7 @@ public sealed partial class CrewMonitoringWindow : FancyWindow
             mainContainer.AddChild(statusContainer);
 
             // Suit coords indicator
-            var suitCoordsIndicator = new TextureRect()
+            var suitCoordsIndicator = new TextureRect
             {
                 Texture = _blipTexture,
                 TextureScale = new Vector2(0.25f, 0.25f),
@@ -325,19 +329,19 @@ public sealed partial class CrewMonitoringWindow : FancyWindow
             var specifier = new SpriteSpecifier.Rsi(new ResPath("Interface/Alerts/human_crew_monitoring.rsi"), "alive");
 
             if (!sensor.IsAlive)
-            {
                 specifier = new SpriteSpecifier.Rsi(new ResPath("Interface/Alerts/human_crew_monitoring.rsi"), "dead");
-            }
 
             else if (sensor.DamagePercentage != null)
             {
                 var index = MathF.Round(4f * sensor.DamagePercentage.Value);
 
                 if (index >= 5)
-                    specifier = new SpriteSpecifier.Rsi(new ResPath("Interface/Alerts/human_crew_monitoring.rsi"), "critical");
+                    specifier = new SpriteSpecifier.Rsi(new ResPath("Interface/Alerts/human_crew_monitoring.rsi"),
+                        "critical");
 
                 else
-                    specifier = new SpriteSpecifier.Rsi(new ResPath("Interface/Alerts/human_crew_monitoring.rsi"), "health" + index);
+                    specifier = new SpriteSpecifier.Rsi(new ResPath("Interface/Alerts/human_crew_monitoring.rsi"),
+                        "health" + index);
             }
 
             // Status icon
@@ -354,7 +358,7 @@ public sealed partial class CrewMonitoringWindow : FancyWindow
             statusContainer.AddChild(statusIcon);
 
             // User name
-            var nameLabel = new Label()
+            var nameLabel = new Label
             {
                 Text = sensor.Name,
                 HorizontalExpand = true,
@@ -364,7 +368,7 @@ public sealed partial class CrewMonitoringWindow : FancyWindow
             statusContainer.AddChild(nameLabel);
 
             // User job container
-            var jobContainer = new BoxContainer()
+            var jobContainer = new BoxContainer
             {
                 Orientation = LayoutOrientation.Horizontal,
                 HorizontalExpand = true,
@@ -375,7 +379,7 @@ public sealed partial class CrewMonitoringWindow : FancyWindow
             // Job icon
             if (_prototypeManager.TryIndex<JobIconPrototype>(sensor.JobIcon, out var proto))
             {
-                var jobIcon = new TextureRect()
+                var jobIcon = new TextureRect
                 {
                     TextureScale = new Vector2(2f, 2f),
                     VerticalAlignment = VAlignment.Center,
@@ -387,7 +391,7 @@ public sealed partial class CrewMonitoringWindow : FancyWindow
             }
 
             // Job name
-            var jobLabel = new Label()
+            var jobLabel = new Label
             {
                 Text = sensor.Job,
                 HorizontalExpand = true,
@@ -400,11 +404,12 @@ public sealed partial class CrewMonitoringWindow : FancyWindow
             if (coordinates != null && NavMap.Visible && _blipTexture != null)
             {
                 NavMap.TrackedEntities.TryAdd(sensor.SuitSensorUid,
-                    new NavMapBlip
-                    (CoordinatesToLocal(coordinates.Value),
-                    _blipTexture,
-                    (_trackedEntity == null || sensor.SuitSensorUid == _trackedEntity) ? Color.LimeGreen : Color.LimeGreen * Color.DimGray,
-                    sensor.SuitSensorUid == _trackedEntity));
+                    new NavMapBlip(CoordinatesToLocal(coordinates.Value),
+                        _blipTexture,
+                        _trackedEntity == null || sensor.SuitSensorUid == _trackedEntity
+                            ? Color.LimeGreen
+                            : Color.LimeGreen * Color.DimGray,
+                        sensor.SuitSensorUid == _trackedEntity));
 
                 NavMap.Focus = _trackedEntity;
 
@@ -414,9 +419,7 @@ public sealed partial class CrewMonitoringWindow : FancyWindow
                     var prevTrackedEntity = _trackedEntity;
 
                     if (_trackedEntity == sensor.SuitSensorUid)
-                    {
                         _trackedEntity = null;
-                    }
 
                     else
                     {
@@ -466,10 +469,11 @@ public sealed partial class CrewMonitoringWindow : FancyWindow
 
             if (NavMap.TrackedEntities.TryGetValue(castSensor.SuitSensorUid, out var data))
             {
-                data = new NavMapBlip
-                    (CoordinatesToLocal(data.Coordinates),
+                data = new NavMapBlip(CoordinatesToLocal(data.Coordinates),
                     data.Texture,
-                    (currTrackedEntity == null || castSensor.SuitSensorUid == currTrackedEntity) ? Color.LimeGreen : Color.LimeGreen * Color.DimGray,
+                    currTrackedEntity == null || castSensor.SuitSensorUid == currTrackedEntity
+                        ? Color.LimeGreen
+                        : Color.LimeGreen * Color.DimGray,
                     castSensor.SuitSensorUid == currTrackedEntity);
 
                 NavMap.TrackedEntities[castSensor.SuitSensorUid] = data;
@@ -482,15 +486,12 @@ public sealed partial class CrewMonitoringWindow : FancyWindow
         if (!_tryToScrollToListFocus)
             return;
 
-        if (TryGetNextScrollPosition(out float? nextScrollPosition))
+        if (TryGetNextScrollPosition(out var nextScrollPosition))
         {
             SensorScroller.VScrollTarget = nextScrollPosition.Value;
 
             if (MathHelper.CloseToPercent(SensorScroller.VScroll, SensorScroller.VScrollTarget))
-            {
                 _tryToScrollToListFocus = false;
-                return;
-            }
         }
     }
 
@@ -524,13 +525,9 @@ public sealed partial class CrewMonitoringWindow : FancyWindow
     private EntityCoordinates CoordinatesToLocal(EntityCoordinates refCoords)
     {
         if (NavMap.MapUid != null)
-        {
-            return _transformSystem.WithEntityId(refCoords, (EntityUid)NavMap.MapUid);
-        }
-        else
-        {
-            return refCoords;
-        }
+            return _transformSystem.WithEntityId(refCoords, (EntityUid) NavMap.MapUid);
+
+        return refCoords;
     }
 
     private void ClearOutDatedData()
@@ -544,7 +541,7 @@ public sealed partial class CrewMonitoringWindow : FancyWindow
 
 public sealed class CrewMonitoringButton : Button
 {
+    public EntityCoordinates? Coordinates;
     public int IndexInTable;
     public NetEntity SuitSensorUid;
-    public EntityCoordinates? Coordinates;
 }

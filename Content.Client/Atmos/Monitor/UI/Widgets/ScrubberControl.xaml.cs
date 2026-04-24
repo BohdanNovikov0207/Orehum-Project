@@ -32,30 +32,15 @@ namespace Content.Client.Atmos.Monitor.UI.Widgets;
 [GenerateTypedNameReferences]
 public sealed partial class ScrubberControl : BoxContainer
 {
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    private readonly string _address;
+
+    private readonly GasVentScrubberData _data;
     [Dependency] private readonly IEntityManager _entMan = default!;
-
-    private GasVentScrubberData _data;
-    private string _address;
-
-    public event Action<string, IAtmosDeviceData>? ScrubberDataChanged;
-	public event Action<IAtmosDeviceData>? ScrubberDataCopied;
-
-    private CheckBox _enabled => CEnableDevice;
-    private CollapsibleHeading _addressLabel => CAddress;
-    private OptionButton _pumpDirection => CPumpDirection;
-    private FloatSpinBox _volumeRate => CVolumeRate;
-    private CheckBox _wideNet => CWideNet;
-    private Button _copySettings => CCopySettings;
-    private Button _selectAll => CSelectAll;
-    private Button _deselectAll => CDeselectAll;
-
-    private GridContainer _gases => CGasContainer;
-    private Dictionary<Gas, Button> _gasControls = new();
+    private readonly Dictionary<Gas, Button> _gasControls = new();
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
 
     public ScrubberControl(GasVentScrubberData data, string address)
     {
-
         IoCManager.InjectDependencies(this);
         var atmosphereSystem = _entMan.System<SharedAtmosphereSystem>();
 
@@ -92,7 +77,8 @@ public sealed partial class ScrubberControl : BoxContainer
 
         foreach (var value in Enum.GetValues<ScrubberPumpDirection>())
         {
-            _pumpDirection.AddItem(Loc.GetString($"air-alarm-ui-pump-direction-{value.ToString().ToLower()}"), (int) value);
+            _pumpDirection.AddItem(Loc.GetString($"air-alarm-ui-pump-direction-{value.ToString().ToLower()}"),
+                (int) value);
         }
 
         _pumpDirection.SelectId((int) _data.PumpDirection);
@@ -133,7 +119,7 @@ public sealed partial class ScrubberControl : BoxContainer
                 Text = Loc.GetString(gasName),
                 ToggleMode = true,
                 HorizontalExpand = true,
-                Pressed = _data.FilterGases.Contains(value)
+                Pressed = _data.FilterGases.Contains(value),
             };
             gasButton.OnToggled += args =>
             {
@@ -147,8 +133,21 @@ public sealed partial class ScrubberControl : BoxContainer
             _gasControls.Add(value, gasButton);
             _gases.AddChild(gasButton);
         }
-
     }
+
+    private CheckBox _enabled => CEnableDevice;
+    private CollapsibleHeading _addressLabel => CAddress;
+    private OptionButton _pumpDirection => CPumpDirection;
+    private FloatSpinBox _volumeRate => CVolumeRate;
+    private CheckBox _wideNet => CWideNet;
+    private Button _copySettings => CCopySettings;
+    private Button _selectAll => CSelectAll;
+    private Button _deselectAll => CDeselectAll;
+
+    private GridContainer _gases => CGasContainer;
+
+    public event Action<string, IAtmosDeviceData>? ScrubberDataChanged;
+    public event Action<IAtmosDeviceData>? ScrubberDataCopied;
 
     public void ChangeData(GasVentScrubberData data)
     {

@@ -7,10 +7,10 @@ SPDX-License-Identifier: MIT
 -->
 
 <controls:FancyWindow xmlns="https://spacestation14.io"
-                xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls"
-                Title="{Loc 'anomaly-generator-ui-title'}"
+                      xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls"
+                      Title="{Loc 'anomaly-generator-ui-title'}"
 
-                Resizable="False">
+                      Resizable="False">
     <BoxContainer Margin="0 0"
                   Orientation="Vertical"
                   HorizontalExpand="True"
@@ -52,18 +52,18 @@ SPDX-License-Identifier: MIT
                       VerticalAlignment="Center"
                       Margin="0 10">
             <Button Name="GenerateButton"
-                    Text="{Loc 'anomaly-generator-generate'}"></Button>
+                    Text="{Loc 'anomaly-generator-generate'}" />
         </BoxContainer>
 
-         <!-- Footer -->
+        <!-- Footer -->
         <BoxContainer Orientation="Vertical">
             <PanelContainer StyleClasses="LowDivider" />
             <BoxContainer Orientation="Horizontal" Margin="10 2 5 0" VerticalAlignment="Bottom">
                 <Label Text="{Loc 'anomaly-generator-flavor-left'}" StyleClasses="WindowFooterText" />
                 <Label Text="{Loc 'anomaly-generator-flavor-right'}" StyleClasses="WindowFooterText"
-                        HorizontalAlignment="Right" HorizontalExpand="True"  Margin="0 0 5 0" />
+                       HorizontalAlignment="Right" HorizontalExpand="True" Margin="0 0 5 0" />
                 <TextureRect StyleClasses="NTLogoDark" Stretch="KeepAspectCentered"
-                        VerticalAlignment="Center" HorizontalAlignment="Right" SetSize="19 19"/>
+                             VerticalAlignment="Center" HorizontalAlignment="Right" SetSize="19 19" />
             </BoxContainer>
         </BoxContainer>
     </BoxContainer>

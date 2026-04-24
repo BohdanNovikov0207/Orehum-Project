@@ -69,15 +69,9 @@ public sealed class BanListEui : BaseEui
         RoleBanControl.SetRoleBans(s.RoleBans);
     }
 
-    public override void Opened()
-    {
-        BanWindow.OpenCentered();
-    }
+    public override void Opened() => BanWindow.OpenCentered();
 
-    private static string FormatDate(DateTimeOffset date)
-    {
-        return date.ToString("MM/dd/yyyy h:mm tt");
-    }
+    private static string FormatDate(DateTimeOffset date) => date.ToString("MM/dd/yyyy h:mm tt");
 
     public static void SetData<T>(IBanListLine<T> line, SharedServerBan ban) where T : SharedServerBan
     {

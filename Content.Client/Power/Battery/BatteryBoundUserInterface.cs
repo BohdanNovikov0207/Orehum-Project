@@ -7,25 +7,34 @@ using Robust.Client.UserInterface;
 namespace Content.Client.Power.Battery;
 
 /// <summary>
-/// BUI for <see cref="BatteryUiKey.Key"/>.
+/// BUI for <see cref="BatteryUiKey.Key" />.
 /// </summary>
-/// <seealso cref="BoundUserInterfaceState"/>
-/// <seealso cref="BatteryMenu"/>
+/// <seealso cref="BoundUserInterfaceState" />
+/// <seealso cref="BatteryMenu" />
 [UsedImplicitly]
 public sealed class BatteryBoundUserInterface : BoundUserInterface, IBuiPreTickUpdate
 {
     [Dependency] private readonly IClientGameTiming _gameTiming = null!;
+    private InputCoalescer<float> _chargeRateCoalescer;
+    private InputCoalescer<float> _dischargeRateCoalescer;
 
     [ViewVariables]
     private BatteryMenu? _menu;
 
     private BuiPredictionState? _pred;
-    private InputCoalescer<float> _chargeRateCoalescer;
-    private InputCoalescer<float> _dischargeRateCoalescer;
 
     public BatteryBoundUserInterface(EntityUid owner, Enum uiKey) : base(owner, uiKey)
     {
         IoCManager.InjectDependencies(this);
+    }
+
+    void IBuiPreTickUpdate.PreTickUpdate()
+    {
+        if (_chargeRateCoalescer.CheckIsModified(out var chargeRateValue))
+            _pred!.SendMessage(new BatterySetChargeRateMessage(chargeRateValue));
+
+        if (_dischargeRateCoalescer.CheckIsModified(out var dischargeRateValue))
+            _pred!.SendMessage(new BatterySetDischargeRateMessage(dischargeRateValue));
     }
 
     protected override void Open()
@@ -42,15 +51,6 @@ public sealed class BatteryBoundUserInterface : BoundUserInterface, IBuiPreTickU
 
         _menu.OnChargeRate += val => _chargeRateCoalescer.Set(val);
         _menu.OnDischargeRate += val => _dischargeRateCoalescer.Set(val);
-    }
-
-    void IBuiPreTickUpdate.PreTickUpdate()
-    {
-        if (_chargeRateCoalescer.CheckIsModified(out var chargeRateValue))
-            _pred!.SendMessage(new BatterySetChargeRateMessage(chargeRateValue));
-
-        if (_dischargeRateCoalescer.CheckIsModified(out var dischargeRateValue))
-            _pred!.SendMessage(new BatterySetDischargeRateMessage(dischargeRateValue));
     }
 
     protected override void UpdateState(BoundUserInterfaceState state)

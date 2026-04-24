@@ -15,28 +15,29 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     <BoxContainer Orientation="Horizontal" HorizontalExpand="True" VerticalExpand="True" Margin="10">
         <BoxContainer SizeFlagsStretchRatio="2" Orientation="Vertical" HorizontalExpand="True" VerticalExpand="True">
             <BoxContainer Orientation="Vertical">
-                <EntityPrototypeView Name="MachineSprite" Scale="4 4" HorizontalAlignment="Center" VerticalExpand="True" MinSize="128 128"/>
-                <RichTextLabel Name="MachineNameLabel" HorizontalAlignment="Center" StyleClasses="LabelKeyText"/>
+                <EntityPrototypeView Name="MachineSprite" Scale="4 4" HorizontalAlignment="Center"
+                                     VerticalExpand="True" MinSize="128 128" />
+                <RichTextLabel Name="MachineNameLabel" HorizontalAlignment="Center" StyleClasses="LabelKeyText" />
             </BoxContainer>
-            <Control MinHeight="10"/>
-            <Button Name="PackButton" Text="{Loc 'flatpacker-ui-pack-button'}" MaxWidth="150" Margin="0 0 0 10"/>
+            <Control MinHeight="10" />
+            <Button Name="PackButton" Text="{Loc 'flatpacker-ui-pack-button'}" MaxWidth="150" Margin="0 0 0 10" />
             <BoxContainer Orientation="Vertical" VerticalExpand="True" RectClipContent="True">
-                <Label Name="CostHeaderLabel" Text="{Loc 'flatpacker-ui-cost-label'}" HorizontalAlignment="Left"/>
+                <Label Name="CostHeaderLabel" Text="{Loc 'flatpacker-ui-cost-label'}" HorizontalAlignment="Left" />
                 <PanelContainer VerticalExpand="True"
                                 HorizontalExpand="True">
                     <PanelContainer.PanelOverride>
                         <gfx:StyleBoxFlat BackgroundColor="#1B1B1E" />
                     </PanelContainer.PanelOverride>
                     <BoxContainer Orientation="Vertical" VerticalAlignment="Center">
-                        <RichTextLabel Name="CostLabel" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        <RichTextLabel Name="InsertLabel" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <RichTextLabel Name="CostLabel" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        <RichTextLabel Name="InsertLabel" HorizontalAlignment="Center" VerticalAlignment="Center" />
                     </BoxContainer>
                 </PanelContainer>
             </BoxContainer>
         </BoxContainer>
-        <Control MinWidth="10"/>
+        <Control MinWidth="10" />
         <BoxContainer SizeFlagsStretchRatio="3" Orientation="Vertical" HorizontalExpand="True" VerticalExpand="True">
-            <Label Text="{Loc 'flatpacker-ui-materials-label'}" HorizontalAlignment="Center" Margin="0 0 0 5"/>
+            <Label Text="{Loc 'flatpacker-ui-materials-label'}" HorizontalAlignment="Center" Margin="0 0 0 5" />
             <PanelContainer
                 VerticalExpand="True"
                 HorizontalExpand="True"
@@ -44,7 +45,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                 <PanelContainer.PanelOverride>
                     <gfx:StyleBoxFlat BackgroundColor="#1B1B1E" />
                 </PanelContainer.PanelOverride>
-                <ui:MaterialStorageControl Name="MaterialStorageControl"/>
+                <ui:MaterialStorageControl Name="MaterialStorageControl" />
             </PanelContainer>
         </BoxContainer>
     </BoxContainer>

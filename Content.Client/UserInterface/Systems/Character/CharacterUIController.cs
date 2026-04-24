@@ -24,14 +24,16 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+// DeltaV
 using System.Linq;
-using Content.Client._DV.CustomObjectiveSummary; // DeltaV
+using Content.Client._DV.CustomObjectiveSummary;
 using Content.Client.CharacterInfo;
 using Content.Client.Gameplay;
 using Content.Client.Stylesheets;
 using Content.Client.UserInterface.Controls;
 using Content.Client.UserInterface.Systems.Character.Controls;
 using Content.Client.UserInterface.Systems.Character.Windows;
+using Content.Client.UserInterface.Systems.MenuBar.Widgets;
 using Content.Client.UserInterface.Systems.Objectives.Controls;
 using Content.Shared.Input;
 using Content.Shared.Mind;
@@ -52,25 +54,18 @@ using static Robust.Client.UserInterface.Controls.BaseButton;
 namespace Content.Client.UserInterface.Systems.Character;
 
 [UsedImplicitly]
-public sealed class CharacterUIController : UIController, IOnStateEntered<GameplayState>, IOnStateExited<GameplayState>, IOnSystemChanged<CharacterInfoSystem>
+public sealed class CharacterUIController : UIController, IOnStateEntered<GameplayState>, IOnStateExited<GameplayState>,
+    IOnSystemChanged<CharacterInfoSystem>
 {
+    [UISystemDependency] private readonly CharacterInfoSystem _characterInfo = default!;
     [Dependency] private readonly IEntityManager _ent = default!;
+    [Dependency] private readonly CustomObjectiveSummaryUIController _objective = default!; // DeltaV
     [Dependency] private readonly IPlayerManager _player = default!;
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-    [Dependency] private readonly CustomObjectiveSummaryUIController _objective = default!; // DeltaV
-
-    [UISystemDependency] private readonly CharacterInfoSystem _characterInfo = default!;
     [UISystemDependency] private readonly SpriteSystem _sprite = default!;
 
-    public override void Initialize()
-    {
-        base.Initialize();
-
-        SubscribeNetworkEvent<MindRoleTypeChangedEvent>(OnRoleTypeChanged);
-    }
-
     private CharacterWindow? _window;
-    private MenuButton? CharacterButton => UIManager.GetActiveUIWidgetOrNull<MenuBar.Widgets.GameTopMenuBar>()?.CharacterButton;
+    private MenuButton? CharacterButton => UIManager.GetActiveUIWidgetOrNull<GameTopMenuBar>()?.CharacterButton;
 
     public void OnStateEntered(GameplayState state)
     {
@@ -111,12 +106,17 @@ public sealed class CharacterUIController : UIController, IOnStateEntered<Gamepl
         _player.LocalPlayerDetached -= CharacterDetached;
     }
 
+    public override void Initialize()
+    {
+        base.Initialize();
+
+        SubscribeNetworkEvent<MindRoleTypeChangedEvent>(OnRoleTypeChanged);
+    }
+
     public void UnloadButton()
     {
         if (CharacterButton == null)
-        {
             return;
-        }
 
         CharacterButton.OnPressed -= CharacterButtonPressed;
     }
@@ -124,9 +124,7 @@ public sealed class CharacterUIController : UIController, IOnStateEntered<Gamepl
     public void LoadButton()
     {
         if (CharacterButton == null)
-        {
             return;
-        }
 
         CharacterButton.OnPressed += CharacterButtonPressed;
     }
@@ -134,9 +132,7 @@ public sealed class CharacterUIController : UIController, IOnStateEntered<Gamepl
     private void DeactivateButton()
     {
         if (CharacterButton == null)
-        {
             return;
-        }
 
         CharacterButton.Pressed = false;
     }
@@ -144,9 +140,7 @@ public sealed class CharacterUIController : UIController, IOnStateEntered<Gamepl
     private void ActivateButton()
     {
         if (CharacterButton == null)
-        {
             return;
-        }
 
         CharacterButton.Pressed = true;
     }
@@ -154,9 +148,7 @@ public sealed class CharacterUIController : UIController, IOnStateEntered<Gamepl
     private void CharacterUpdated(CharacterData data)
     {
         if (_window == null)
-        {
             return;
-        }
 
         var (entity, job, objectives, briefing, entityName) = data;
 
@@ -174,7 +166,7 @@ public sealed class CharacterUIController : UIController, IOnStateEntered<Gamepl
             var objectiveControl = new CharacterObjectiveControl
             {
                 Orientation = BoxContainer.LayoutOrientation.Vertical,
-                Modulate = Color.Gray
+                Modulate = Color.Gray,
             };
 
 
@@ -183,7 +175,7 @@ public sealed class CharacterUIController : UIController, IOnStateEntered<Gamepl
 
             var objectiveLabel = new RichTextLabel
             {
-                StyleClasses = { StyleNano.StyleClassTooltipActionTitle }
+                StyleClasses = { StyleNano.StyleClassTooltipActionTitle },
             };
             objectiveLabel.SetMessage(objectiveText);
 
@@ -207,13 +199,14 @@ public sealed class CharacterUIController : UIController, IOnStateEntered<Gamepl
 
             _window.Objectives.AddChild(objectiveControl);
         }
+
         // Begin DeltaV Additions - Custom objective summary
         if (objectives.Count > 0)
         {
             var button = new Button
             {
                 Text = Loc.GetString("custom-objective-button-text"),
-                Margin = new Thickness(0, 10, 0, 10)
+                Margin = new Thickness(0, 10, 0, 10),
             };
             button.OnPressed += _ => _objective.OpenWindow();
 
@@ -240,10 +233,7 @@ public sealed class CharacterUIController : UIController, IOnStateEntered<Gamepl
         _window.RolePlaceholder.Visible = briefing == null && !controls.Any() && !objectives.Any();
     }
 
-    private void OnRoleTypeChanged(MindRoleTypeChangedEvent ev, EntitySessionEventArgs _)
-    {
-        UpdateRoleType();
-    }
+    private void OnRoleTypeChanged(MindRoleTypeChangedEvent ev, EntitySessionEventArgs _) => UpdateRoleType();
 
     private void UpdateRoleType()
     {
@@ -258,26 +248,18 @@ public sealed class CharacterUIController : UIController, IOnStateEntered<Gamepl
             return;
 
         if (!_prototypeManager.TryIndex(mind.RoleType, out var proto))
-            Log.Error($"Player '{_player.LocalSession}' has invalid Role Type '{mind.RoleType}'. Displaying default instead");
+            Log.Error(
+                $"Player '{_player.LocalSession}' has invalid Role Type '{mind.RoleType}'. Displaying default instead");
 
         _window.RoleType.Text = Loc.GetString(proto?.Name ?? "role-type-crew-aligned-name");
         _window.RoleType.FontColorOverride = proto?.Color ?? Color.White;
     }
 
-    private void CharacterDetached(EntityUid uid)
-    {
-        CloseWindow();
-    }
+    private void CharacterDetached(EntityUid uid) => CloseWindow();
 
-    private void CharacterButtonPressed(ButtonEventArgs args)
-    {
-        ToggleWindow();
-    }
+    private void CharacterButtonPressed(ButtonEventArgs args) => ToggleWindow();
 
-    private void CloseWindow()
-    {
-        _window?.Close();
-    }
+    private void CloseWindow() => _window?.Close();
 
     private void ToggleWindow()
     {
@@ -287,9 +269,7 @@ public sealed class CharacterUIController : UIController, IOnStateEntered<Gamepl
         CharacterButton?.SetClickPressed(!_window.IsOpen);
 
         if (_window.IsOpen)
-        {
             CloseWindow();
-        }
         else
         {
             _characterInfo.RequestCharacterInfo();

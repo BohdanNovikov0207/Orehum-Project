@@ -6,17 +6,15 @@ using Robust.Client.Graphics;
 namespace Content.Client.Alerts;
 
 /// <summary>
-/// This handles <see cref="GenericCounterAlertComponent"/>
+/// This handles <see cref="GenericCounterAlertComponent" />
 /// </summary>
 public sealed class GenericCounterAlertSystem : EntitySystem
 {
     [Dependency] private readonly SpriteSystem _sprite = default!;
 
-    /// <inheritdoc/>
-    public override void Initialize()
-    {
+    /// <inheritdoc />
+    public override void Initialize() =>
         SubscribeLocalEvent<GenericCounterAlertComponent, UpdateAlertSpriteEvent>(OnUpdateAlertSprite);
-    }
 
     private void OnUpdateAlertSprite(Entity<GenericCounterAlertComponent> ent, ref UpdateAlertSpriteEvent args)
     {
@@ -55,7 +53,8 @@ public sealed class GenericCounterAlertSystem : EntitySystem
         }
 
         // ReSharper disable once PossibleLossOfFraction
-        var baseOffset = (ent.Comp.AlertSize.X - digitCount * ent.Comp.GlyphWidth) / 2 * (1f / EyeManager.PixelsPerMeter);
+        var baseOffset = (ent.Comp.AlertSize.X - digitCount * ent.Comp.GlyphWidth) / 2 *
+                         (1f / EyeManager.PixelsPerMeter);
 
         for (var i = 0; i < ent.Comp.DigitKeys.Count; i++)
         {

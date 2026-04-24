@@ -10,5 +10,4 @@ namespace Content.Client.Damage;
 
 public sealed class GodmodeSystem : SharedGodmodeSystem
 {
-
 }

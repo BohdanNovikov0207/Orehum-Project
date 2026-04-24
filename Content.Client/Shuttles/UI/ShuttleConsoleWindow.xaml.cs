@@ -26,15 +26,16 @@ namespace Content.Client.Shuttles.UI;
 public sealed partial class ShuttleConsoleWindow : FancyWindow,
     IComputerWindow<ShuttleBoundUserInterfaceState>
 {
+    public enum ShuttleConsoleMode : byte
+    {
+        Nav,
+        Map,
+        Dock,
+    }
+
     [Dependency] private readonly IEntityManager _entManager = default!;
 
     private ShuttleConsoleMode _mode = ShuttleConsoleMode.Nav;
-
-    public event Action<MapCoordinates, Angle>? RequestFTL;
-    public event Action<NetEntity, Angle>? RequestBeaconFTL;
-
-    public event Action<NetEntity, NetEntity>? DockRequest;
-    public event Action<NetEntity>? UndockRequest;
 
     public ShuttleConsoleWindow()
     {
@@ -79,12 +80,16 @@ public sealed partial class ShuttleConsoleWindow : FancyWindow,
         NfInitialize(); // Frontier
     }
 
+    public event Action<MapCoordinates, Angle>? RequestFTL;
+    public event Action<NetEntity, Angle>? RequestBeaconFTL;
+
+    public event Action<NetEntity, NetEntity>? DockRequest;
+    public event Action<NetEntity>? UndockRequest;
+
     private void ClearModes(ShuttleConsoleMode mode)
     {
         if (mode != ShuttleConsoleMode.Nav)
-        {
             NavContainer.Visible = false;
-        }
 
         if (mode != ShuttleConsoleMode.Map)
         {
@@ -93,25 +98,14 @@ public sealed partial class ShuttleConsoleWindow : FancyWindow,
         }
 
         if (mode != ShuttleConsoleMode.Dock)
-        {
             DockContainer.Visible = false;
-        }
     }
 
-    private void NavPressed(BaseButton.ButtonEventArgs obj)
-    {
-        SwitchMode(ShuttleConsoleMode.Nav);
-    }
+    private void NavPressed(BaseButton.ButtonEventArgs obj) => SwitchMode(ShuttleConsoleMode.Nav);
 
-    private void MapPressed(BaseButton.ButtonEventArgs obj)
-    {
-        SwitchMode(ShuttleConsoleMode.Map);
-    }
+    private void MapPressed(BaseButton.ButtonEventArgs obj) => SwitchMode(ShuttleConsoleMode.Map);
 
-    private void DockPressed(BaseButton.ButtonEventArgs obj)
-    {
-        SwitchMode(ShuttleConsoleMode.Dock);
-    }
+    private void DockPressed(BaseButton.ButtonEventArgs obj) => SwitchMode(ShuttleConsoleMode.Dock);
 
     private void SetupMode(ShuttleConsoleMode mode)
     {
@@ -140,13 +134,6 @@ public sealed partial class ShuttleConsoleWindow : FancyWindow,
         _mode = mode;
         ClearModes(mode);
         SetupMode(_mode);
-    }
-
-    public enum ShuttleConsoleMode : byte
-    {
-        Nav,
-        Map,
-        Dock,
     }
 
     public void UpdateState(EntityUid owner, ShuttleBoundUserInterfaceState cState)

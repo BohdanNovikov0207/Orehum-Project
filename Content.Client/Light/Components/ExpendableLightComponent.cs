@@ -25,16 +25,28 @@ namespace Content.Client.Light.Components;
 public sealed partial class ExpendableLightComponent : SharedExpendableLightComponent
 {
     /// <summary>
-    /// The icon state used by expendable lights when the they have been completely expended.
+    /// The sprite layer shader used after the expendable light has burnt out.
     /// </summary>
-    [DataField("iconStateSpent")]
-    public string? IconStateSpent;
+    [DataField("glowColorLit")]
+    public Color? GlowColorLit = null;
 
     /// <summary>
     /// The icon state used by expendable lights while they are lit.
     /// </summary>
     [DataField("iconStateLit")]
     public string? IconStateLit;
+
+    /// <summary>
+    /// The icon state used by expendable lights when the they have been completely expended.
+    /// </summary>
+    [DataField("iconStateSpent")]
+    public string? IconStateSpent;
+
+    /// <summary>
+    /// The sound that plays when the expendable light is lit.
+    /// </summary>
+    [Access(typeof(ExpendableLightSystem))]
+    public EntityUid? PlayingStream;
 
     /// <summary>
     /// The sprite layer shader used while the expendable light is lit.
@@ -47,18 +59,6 @@ public sealed partial class ExpendableLightComponent : SharedExpendableLightComp
     /// </summary>
     [DataField("spriteShaderSpent")]
     public string? SpriteShaderSpent = null;
-
-    /// <summary>
-    /// The sprite layer shader used after the expendable light has burnt out.
-    /// </summary>
-    [DataField("glowColorLit")]
-    public Color? GlowColorLit = null;
-
-    /// <summary>
-    /// The sound that plays when the expendable light is lit.
-    /// </summary>
-    [Access(typeof(ExpendableLightSystem))]
-    public EntityUid? PlayingStream;
 }
 
 public enum ExpendableLightVisualLayers : byte

@@ -12,24 +12,24 @@ SPDX-License-Identifier: MIT
     xmlns="https://spacestation14.io"
     xmlns:controls="clr-namespace:Content.Client.UserInterface.Systems.Actions.Controls">
     <BoxContainer Orientation="Horizontal">
-        <Control HorizontalExpand="True" SizeFlagsStretchRatio="1"/>
+        <Control HorizontalExpand="True" SizeFlagsStretchRatio="1" />
         <TextureButton TexturePath="left_arrow.svg.192dpi"
                        SizeFlagsStretchRatio="1"
                        Scale="0.5 0.5"
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center"
                        Name="LeftArrow"
-                       Access="Public"/>
-        <Control HorizontalExpand="True" SizeFlagsStretchRatio="2"/>
+                       Access="Public" />
+        <Control HorizontalExpand="True" SizeFlagsStretchRatio="2" />
         <Label Text="1" SizeFlagsStretchRatio="1" Name="Label" Access="Public" />
-        <Control HorizontalExpand="True" SizeFlagsStretchRatio="2"/>
+        <Control HorizontalExpand="True" SizeFlagsStretchRatio="2" />
         <TextureButton TexturePath="right_arrow.svg.192dpi"
                        SizeFlagsStretchRatio="1"
                        Scale="0.5 0.5"
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center"
                        Name="RightArrow"
-                       Access="Public"/>
-        <Control HorizontalExpand="True" SizeFlagsStretchRatio="1"/>
+                       Access="Public" />
+        <Control HorizontalExpand="True" SizeFlagsStretchRatio="1" />
     </BoxContainer>
 </controls:ActionPageButtons>

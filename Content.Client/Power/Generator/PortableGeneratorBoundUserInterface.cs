@@ -30,13 +30,9 @@ public sealed class PortableGeneratorBoundUserInterface : BoundUserInterface
         _window.OnState += args =>
         {
             if (args)
-            {
                 Start();
-            }
             else
-            {
                 Stop();
-            }
         };
 
         _window.OnPower += SetTargetPower;
@@ -52,28 +48,13 @@ public sealed class PortableGeneratorBoundUserInterface : BoundUserInterface
         _window?.Update(msg);
     }
 
-    public void SetTargetPower(int target)
-    {
-        SendMessage(new PortableGeneratorSetTargetPowerMessage(target));
-    }
+    public void SetTargetPower(int target) => SendMessage(new PortableGeneratorSetTargetPowerMessage(target));
 
-    public void Start()
-    {
-        SendMessage(new PortableGeneratorStartMessage());
-    }
+    public void Start() => SendMessage(new PortableGeneratorStartMessage());
 
-    public void Stop()
-    {
-        SendMessage(new PortableGeneratorStopMessage());
-    }
+    public void Stop() => SendMessage(new PortableGeneratorStopMessage());
 
-    public void SwitchOutput()
-    {
-        SendMessage(new PortableGeneratorSwitchOutputMessage());
-    }
+    public void SwitchOutput() => SendMessage(new PortableGeneratorSwitchOutputMessage());
 
-    public void EjectFuel()
-    {
-        SendMessage(new PortableGeneratorEjectFuelMessage());
-    }
+    public void EjectFuel() => SendMessage(new PortableGeneratorEjectFuelMessage());
 }

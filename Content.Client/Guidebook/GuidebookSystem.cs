@@ -31,7 +31,6 @@ using Content.Shared.Tag;
 using Content.Shared.Verbs;
 using Robust.Client.GameObjects;
 using Robust.Client.Player;
-using Robust.Shared.Audio.Systems;
 using Robust.Shared.Map;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
@@ -40,16 +39,19 @@ using Robust.Shared.Utility;
 namespace Content.Client.Guidebook;
 
 /// <summary>
-///     This system handles the help-verb and interactions with various client-side entities that are embedded into guidebooks.
+/// This system handles the help-verb and interactions with various client-side entities that are embedded into guidebooks.
 /// </summary>
 public sealed class GuidebookSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
+    public const string GuideEmbedTag = "GuideEmbeded";
     [Dependency] private readonly IPlayerManager _playerManager = default!;
-    [Dependency] private readonly VerbSystem _verbSystem = default!;
-    [Dependency] private readonly RgbLightControllerSystem _rgbLightControllerSystem = default!;
     [Dependency] private readonly SharedPointLightSystem _pointLightSystem = default!;
+    [Dependency] private readonly RgbLightControllerSystem _rgbLightControllerSystem = default!;
     [Dependency] private readonly TagSystem _tags = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly VerbSystem _verbSystem = default!;
+
+    private EntityUid _defaultUser;
 
     public event Action<List<ProtoId<GuideEntryPrototype>>,
         List<ProtoId<GuideEntryPrototype>>?,
@@ -57,18 +59,15 @@ public sealed class GuidebookSystem : EntitySystem
         bool,
         ProtoId<GuideEntryPrototype>?>? OnGuidebookOpen;
 
-    public const string GuideEmbedTag = "GuideEmbeded";
-
-    private EntityUid _defaultUser;
-
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         SubscribeLocalEvent<GuideHelpComponent, GetVerbsEvent<ExamineVerb>>(OnGetVerbs);
         SubscribeLocalEvent<GuideHelpComponent, ActivateInWorldEvent>(OnInteract);
 
         SubscribeLocalEvent<GuidebookControlsTestComponent, InteractHandEvent>(OnGuidebookControlsTestInteractHand);
-        SubscribeLocalEvent<GuidebookControlsTestComponent, ActivateInWorldEvent>(OnGuidebookControlsTestActivateInWorld);
+        SubscribeLocalEvent<GuidebookControlsTestComponent, ActivateInWorldEvent>(
+            OnGuidebookControlsTestActivateInWorld);
         SubscribeLocalEvent<GuidebookControlsTestComponent, GetVerbsEvent<AlternativeVerb>>(
             OnGuidebookControlsTestGetAlternateVerbs);
     }
@@ -95,20 +94,22 @@ public sealed class GuidebookSystem : EntitySystem
         if (component.Guides.Count == 0 || _tags.HasTag(uid, GuideEmbedTag))
             return;
 
-        args.Verbs.Add(new()
+        args.Verbs.Add(new ExamineVerb
         {
             Text = Loc.GetString("guide-help-verb"),
-            Icon = new SpriteSpecifier.Texture(new ("/Textures/Interface/VerbIcons/information.svg.192dpi.png")),
-            Act = () => OnGuidebookOpen?.Invoke(component.Guides, null, null, component.IncludeChildren, component.Guides[0]),
+            Icon = new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/VerbIcons/information.svg.192dpi.png")),
+            Act = () => OnGuidebookOpen?.Invoke(component.Guides,
+                null,
+                null,
+                component.IncludeChildren,
+                component.Guides[0]),
             ClientExclusive = true,
-            CloseMenu = true
+            CloseMenu = true,
         });
     }
 
-    public void OpenHelp(List<ProtoId<GuideEntryPrototype>> guides)
-    {
+    public void OpenHelp(List<ProtoId<GuideEntryPrototype>> guides) =>
         OnGuidebookOpen?.Invoke(guides, null, null, true, guides[0]);
-    }
 
     private void OnInteract(EntityUid uid, GuideHelpComponent component, ActivateInWorldEvent args)
     {
@@ -122,9 +123,11 @@ public sealed class GuidebookSystem : EntitySystem
         args.Handled = true;
     }
 
-    private void OnGuidebookControlsTestGetAlternateVerbs(EntityUid uid, GuidebookControlsTestComponent component, GetVerbsEvent<AlternativeVerb> args)
+    private void OnGuidebookControlsTestGetAlternateVerbs(EntityUid uid,
+        GuidebookControlsTestComponent component,
+        GetVerbsEvent<AlternativeVerb> args)
     {
-        args.Verbs.Add(new AlternativeVerb()
+        args.Verbs.Add(new AlternativeVerb
         {
             Act = () =>
             {
@@ -135,7 +138,7 @@ public sealed class GuidebookSystem : EntitySystem
             Priority = -9999,
         });
 
-        args.Verbs.Add(new AlternativeVerb()
+        args.Verbs.Add(new AlternativeVerb
         {
             Act = () =>
             {
@@ -158,12 +161,13 @@ public sealed class GuidebookSystem : EntitySystem
         });
     }
 
-    private void OnGuidebookControlsTestActivateInWorld(EntityUid uid, GuidebookControlsTestComponent component, ActivateInWorldEvent args)
-    {
-        Transform(uid).LocalRotation += Angle.FromDegrees(90);
-    }
+    private void OnGuidebookControlsTestActivateInWorld(EntityUid uid,
+        GuidebookControlsTestComponent component,
+        ActivateInWorldEvent args) => Transform(uid).LocalRotation += Angle.FromDegrees(90);
 
-    private void OnGuidebookControlsTestInteractHand(EntityUid uid, GuidebookControlsTestComponent component, InteractHandEvent args)
+    private void OnGuidebookControlsTestInteractHand(EntityUid uid,
+        GuidebookControlsTestComponent component,
+        InteractHandEvent args)
     {
         if (!TryComp<SpeechComponent>(uid, out var speech) || speech.SpeechSounds is null)
             return;
@@ -182,7 +186,7 @@ public sealed class GuidebookSystem : EntitySystem
     public void FakeClientAltActivateInWorld(EntityUid activated)
     {
         // Get list of alt-interact verbs
-        var verbs = _verbSystem.GetLocalVerbs(activated, GetGuidebookUser(), typeof(AlternativeVerb), force: true);
+        var verbs = _verbSystem.GetLocalVerbs(activated, GetGuidebookUser(), typeof(AlternativeVerb), true);
 
         if (!verbs.Any())
             return;

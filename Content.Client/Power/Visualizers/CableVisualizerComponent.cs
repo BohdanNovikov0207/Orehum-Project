@@ -10,8 +10,8 @@ namespace Content.Client.Power.Visualizers;
 public sealed partial class CableVisualizerComponent : Component
 {
     [DataField]
-    public string? StatePrefix;
+    public string? ExtraLayerPrefix;
 
     [DataField]
-    public string? ExtraLayerPrefix;
+    public string? StatePrefix;
 }

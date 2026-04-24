@@ -13,14 +13,14 @@ using Robust.Shared.Animations;
 namespace Content.Client.Chasm;
 
 /// <summary>
-///     Handles the falling animation for entities that fall into a chasm.
+/// Handles the falling animation for entities that fall into a chasm.
 /// </summary>
 public sealed class ChasmFallingVisualsSystem : EntitySystem
 {
     [Dependency] private readonly AnimationPlayerSystem _anim = default!;
-    [Dependency] private readonly SpriteSystem _sprite = default!;
 
     private readonly string _chasmFallAnimationKey = "chasm_fall";
+    [Dependency] private readonly SpriteSystem _sprite = default!;
 
     public override void Initialize()
     {
@@ -34,9 +34,7 @@ public sealed class ChasmFallingVisualsSystem : EntitySystem
     {
         if (!TryComp<SpriteComponent>(uid, out var sprite) ||
             TerminatingOrDeleted(uid))
-        {
             return;
-        }
 
         component.OriginalScale = sprite.Scale;
 
@@ -67,12 +65,12 @@ public sealed class ChasmFallingVisualsSystem : EntitySystem
     {
         var length = component.AnimationTime;
 
-        return new Animation()
+        return new Animation
         {
             Length = length,
             AnimationTracks =
             {
-                new AnimationTrackComponentProperty()
+                new AnimationTrackComponentProperty
                 {
                     ComponentType = typeof(SpriteComponent),
                     Property = nameof(SpriteComponent.Scale),
@@ -81,9 +79,9 @@ public sealed class ChasmFallingVisualsSystem : EntitySystem
                         new AnimationTrackProperty.KeyFrame(component.OriginalScale, 0.0f),
                         new AnimationTrackProperty.KeyFrame(component.AnimationScale, length.Seconds),
                     },
-                    InterpolationMode = AnimationInterpolationMode.Cubic
-                }
-            }
+                    InterpolationMode = AnimationInterpolationMode.Cubic,
+                },
+            },
         };
     }
 }

@@ -30,8 +30,10 @@ public sealed class PowerCellSystem : SharedPowerCellSystem
         SubscribeLocalEvent<PowerCellVisualsComponent, AppearanceChangeEvent>(OnPowerCellVisualsChange);
     }
 
-    /// <inheritdoc/>
-    public override bool HasActivatableCharge(EntityUid uid, PowerCellDrawComponent? battery = null, PowerCellSlotComponent? cell = null,
+    /// <inheritdoc />
+    public override bool HasActivatableCharge(EntityUid uid,
+        PowerCellDrawComponent? battery = null,
+        PowerCellSlotComponent? cell = null,
         EntityUid? user = null)
     {
         if (!Resolve(uid, ref battery, ref cell, false))
@@ -40,7 +42,7 @@ public sealed class PowerCellSystem : SharedPowerCellSystem
         return battery.CanUse;
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override bool HasDrawCharge(
         EntityUid uid,
         PowerCellDrawComponent? battery = null,
@@ -53,7 +55,9 @@ public sealed class PowerCellSystem : SharedPowerCellSystem
         return battery.CanDraw;
     }
 
-    private void OnPowerCellVisualsChange(EntityUid uid, PowerCellVisualsComponent component, ref AppearanceChangeEvent args)
+    private void OnPowerCellVisualsChange(EntityUid uid,
+        PowerCellVisualsComponent component,
+        ref AppearanceChangeEvent args)
     {
         if (args.Sprite == null)
             return;

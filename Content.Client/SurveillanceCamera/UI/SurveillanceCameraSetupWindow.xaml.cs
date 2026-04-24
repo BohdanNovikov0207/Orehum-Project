@@ -69,15 +69,11 @@ public sealed partial class SurveillanceCameraSetupWindow : DefaultWindow
         {
             if (!_prototypeManager.TryIndex(network, out DeviceFrequencyPrototype? frequency)
                 || frequency.Name == null)
-            {
                 continue;
-            }
 
             NetworkSelector.AddItem(Loc.GetString(frequency.Name), networkId);
             if (frequency.Frequency == currentNetwork)
-            {
                 NetworkSelector.SelectId(networkId);
-            }
 
             id++;
         }

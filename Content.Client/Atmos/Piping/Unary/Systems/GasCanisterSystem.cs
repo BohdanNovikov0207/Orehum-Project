@@ -22,16 +22,14 @@ public sealed class GasCanisterSystem : SharedGasCanisterSystem
     private void OnGasState(Entity<GasCanisterComponent> ent, ref AfterAutoHandleStateEvent args)
     {
         if (UI.TryGetOpenUi<GasCanisterBoundUserInterface>(ent.Owner, GasCanisterUiKey.Key, out var bui))
-        {
             bui.Update<GasCanisterBoundUserInterfaceState>();
-        }
     }
 
-    protected override void DirtyUI(EntityUid uid, GasCanisterComponent? component = null, NodeContainerComponent? nodes = null)
+    protected override void DirtyUI(EntityUid uid,
+        GasCanisterComponent? component = null,
+        NodeContainerComponent? nodes = null)
     {
         if (UI.TryGetOpenUi<GasCanisterBoundUserInterface>(uid, GasCanisterUiKey.Key, out var bui))
-        {
             bui.Update<GasCanisterBoundUserInterfaceState>();
-        }
     }
 }

@@ -7,8 +7,7 @@ using Content.Shared.RatKing;
 
 namespace Content.Client.RatKing;
 
-/// <inheritdoc/>
+/// <inheritdoc />
 public sealed class RatKingSystem : SharedRatKingSystem
 {
-
 }

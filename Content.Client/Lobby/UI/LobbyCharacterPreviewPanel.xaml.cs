@@ -55,8 +55,6 @@ public sealed partial class LobbyCharacterPreviewPanel : Control
 {
     [Dependency] private readonly IEntityManager _entManager = default!;
 
-    public Button CharacterSetupButton => CharacterSetup;
-
     private EntityUid? _previewDummy;
 
     public LobbyCharacterPreviewPanel()
@@ -65,23 +63,20 @@ public sealed partial class LobbyCharacterPreviewPanel : Control
         IoCManager.InjectDependencies(this);
     }
 
+    public Button CharacterSetupButton => CharacterSetup;
+
     public void SetLoaded(bool value)
     {
         Loaded.Visible = value;
         Unloaded.Visible = !value;
     }
 
-    public void SetSummaryText(string value)
-    {
-        Summary.Text = value;
-    }
+    public void SetSummaryText(string value) => Summary.Text = value;
 
     public void SetSprite(EntityUid uid)
     {
         if (_previewDummy != null)
-        {
             _entManager.DeleteEntity(_previewDummy);
-        }
 
         _previewDummy = uid;
 

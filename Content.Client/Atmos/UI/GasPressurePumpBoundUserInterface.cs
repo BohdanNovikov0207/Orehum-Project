@@ -14,7 +14,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Atmos;
 using Content.Shared.Atmos.Components;
 using Content.Shared.Atmos.Piping.Binary.Components;
 using Content.Shared.IdentityManagement;
@@ -24,7 +23,7 @@ using Robust.Client.UserInterface;
 namespace Content.Client.Atmos.UI;
 
 /// <summary>
-/// Initializes a <see cref="GasPressurePumpWindow"/> and updates it when new server messages are received.
+/// Initializes a <see cref="GasPressurePumpWindow" /> and updates it when new server messages are received.
 /// </summary>
 [UsedImplicitly]
 public sealed class GasPressurePumpBoundUserInterface(EntityUid owner, Enum uiKey) : BoundUserInterface(owner, uiKey)
@@ -66,8 +65,6 @@ public sealed class GasPressurePumpBoundUserInterface(EntityUid owner, Enum uiKe
         SendPredictedMessage(new GasPressurePumpToggleStatusMessage(_window.PumpStatus));
     }
 
-    private void OnPumpOutputPressurePressed(float value)
-    {
+    private void OnPumpOutputPressurePressed(float value) =>
         SendPredictedMessage(new GasPressurePumpChangeOutputPressureMessage(value));
-    }
 }

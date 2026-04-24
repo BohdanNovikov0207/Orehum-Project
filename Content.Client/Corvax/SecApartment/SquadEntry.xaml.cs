@@ -21,23 +21,21 @@ namespace Content.Client.Corvax.SecApartment;
 [GenerateTypedNameReferences]
 public sealed partial class SquadEntry : PanelContainer
 {
+    private readonly Dictionary<string, PanelContainer> _memberPanels = new();
     private readonly IPrototypeManager _prototypeManager;
     private readonly SpriteSystem _sprite;
 
-    public Squad Squad { get; }
+    private readonly SecApartmentStyles _styles;
+    private bool _isEditingDescription;
+
+    private bool _isEditingName;
+    public Action? OnDeletePressed;
+    public Action<SquadIconNum>? OnIconChanged;
+    public Action<string>? OnRemoveMemberPressed;
 
     public Action<string>? OnRenamePressed;
-    public Action? OnDeletePressed;
-    public Action<string>? OnUpdateDescriptionPressed;
     public Action<SquadStatus>? OnStatusChanged;
-    public Action<string>? OnRemoveMemberPressed;
-    public Action<SquadIconNum>? OnIconChanged;
-
-    private readonly SecApartmentStyles _styles;
-
-    private bool _isEditingName = false;
-    private bool _isEditingDescription = false;
-    private Dictionary<string, PanelContainer> _memberPanels = new();
+    public Action<string>? OnUpdateDescriptionPressed;
 
     public SquadEntry(Squad squad, SecApartmentStyles styles, IPrototypeManager protoMan, SpriteSystem sprite)
     {
@@ -53,6 +51,8 @@ public sealed partial class SquadEntry : PanelContainer
         UpdateUI();
     }
 
+    public Squad Squad { get; }
+
     private void SetupUI()
     {
         RenameButton.OnPressed += _ => ToggleNameEdit();
@@ -64,13 +64,13 @@ public sealed partial class SquadEntry : PanelContainer
 
         foreach (SquadStatus status in Enum.GetValues(typeof(SquadStatus)))
         {
-            StatusDropdown.AddItem(GetStatusText(status), (int)status);
+            StatusDropdown.AddItem(GetStatusText(status), (int) status);
         }
 
         StatusDropdown.OnItemSelected += args =>
         {
             StatusDropdown.SelectId(args.Id);
-            var status = (SquadStatus)args.Id;
+            var status = (SquadStatus) args.Id;
             OnStatusChanged?.Invoke(status);
         };
 
@@ -89,7 +89,7 @@ public sealed partial class SquadEntry : PanelContainer
             ContentMarginBottomOverride = 8,
             ContentMarginLeftOverride = 10,
             ContentMarginRightOverride = 10,
-            ContentMarginTopOverride = 8
+            ContentMarginTopOverride = 8,
         };
 
         RenameButton.AddStyleClass(SecApartmentStyles.StyleClassButtonRed);
@@ -117,14 +117,15 @@ public sealed partial class SquadEntry : PanelContainer
         SquadNameLabel.Text = Squad.Name.ToUpperInvariant();
         SquadNameEdit.Text = Squad.Name;
         SquadDescriptionLabel.Text = string.IsNullOrWhiteSpace(Squad.Description)
-            ? Loc.GetString("sec-apartment-squad-no-desc") : Squad.Description;
+            ? Loc.GetString("sec-apartment-squad-no-desc")
+            : Squad.Description;
         SquadDescriptionEdit.Text = Squad.Description;
 
         SquadLocationLabel.Text = Loc.GetString("sec-apartment-unknown");
         SquadLocationLabel.FontColorOverride = SecApartmentStyles.TabInactiveColor;
 
-        IconDropdown.SelectId((int)Squad.IconId);
-        StatusDropdown.SelectId((int)Squad.Status);
+        IconDropdown.SelectId((int) Squad.IconId);
+        StatusDropdown.SelectId((int) Squad.Status);
 
         MembersCountLabel.Text = Loc.GetString("sec-apartment-squad-members", ("count", Squad.Members.Count));
 
@@ -136,13 +137,13 @@ public sealed partial class SquadEntry : PanelContainer
         IconDropdown.Clear();
         foreach (SquadIconNum icon in Enum.GetValues(typeof(SquadIconNum)))
         {
-            IconDropdown.AddItem(GetIconText(icon), (int)icon);
+            IconDropdown.AddItem(GetIconText(icon), (int) icon);
         }
 
         IconDropdown.OnItemSelected += args =>
         {
             IconDropdown.SelectId(args.Id);
-            var icon = (SquadIconNum)args.Id;
+            var icon = (SquadIconNum) args.Id;
             OnIconChanged?.Invoke(icon);
         };
     }
@@ -172,7 +173,7 @@ public sealed partial class SquadEntry : PanelContainer
                 Text = Loc.GetString("sec-apartment-squad-no-members"),
                 FontColorOverride = SecApartmentStyles.TabInactiveColor,
                 HorizontalAlignment = HAlignment.Center,
-                Margin = new Thickness(0, 5)
+                Margin = new Thickness(0, 5),
             };
             MembersContainer.AddChild(emptyLabel);
             return;
@@ -212,8 +213,8 @@ public sealed partial class SquadEntry : PanelContainer
                 ContentMarginBottomOverride = 4,
                 ContentMarginLeftOverride = 8,
                 ContentMarginRightOverride = 8,
-                ContentMarginTopOverride = 4
-            }
+                ContentMarginTopOverride = 4,
+            },
         };
 
         var container = new BoxContainer
@@ -221,19 +222,19 @@ public sealed partial class SquadEntry : PanelContainer
             Orientation = BoxContainer.LayoutOrientation.Horizontal,
             HorizontalExpand = true,
             VerticalAlignment = VAlignment.Center,
-            SeparationOverride = 8
+            SeparationOverride = 8,
         };
 
         var infoContainer = new BoxContainer
         {
             Orientation = BoxContainer.LayoutOrientation.Vertical,
-            HorizontalExpand = true
+            HorizontalExpand = true,
         };
 
         var nameContainer = new BoxContainer
         {
             Orientation = BoxContainer.LayoutOrientation.Horizontal,
-            HorizontalExpand = true
+            HorizontalExpand = true,
         };
 
         var nameLabel = new Label
@@ -242,7 +243,7 @@ public sealed partial class SquadEntry : PanelContainer
             FontColorOverride = member.SensorStatus?.IsAlive == false
                 ? Color.FromHex("#888888")
                 : SecApartmentStyles.TextColor,
-            FontOverride = _styles.GetBoldFont(12)
+            FontOverride = _styles.GetBoldFont(),
         };
 
         nameContainer.AddChild(nameLabel);
@@ -252,23 +253,23 @@ public sealed partial class SquadEntry : PanelContainer
         if (member.SensorStatus != null)
         {
             if (!member.SensorStatus.IsAlive)
-            {
                 specifier = new SpriteSpecifier.Rsi(new ResPath("Interface/Alerts/human_crew_monitoring.rsi"), "dead");
-            }
             else if (member.SensorStatus.DamagePercentage != null)
             {
                 var index = MathF.Round(4f * member.SensorStatus.DamagePercentage.Value);
 
                 if (index >= 5)
-                    specifier = new SpriteSpecifier.Rsi(new ResPath("Interface/Alerts/human_crew_monitoring.rsi"), "critical");
+                    specifier = new SpriteSpecifier.Rsi(new ResPath("Interface/Alerts/human_crew_monitoring.rsi"),
+                        "critical");
                 else
-                    specifier = new SpriteSpecifier.Rsi(new ResPath("Interface/Alerts/human_crew_monitoring.rsi"), "health" + index);
+                    specifier = new SpriteSpecifier.Rsi(new ResPath("Interface/Alerts/human_crew_monitoring.rsi"),
+                        "health" + index);
             }
-        }/*
+        } /*
         else
         {
             specifier = new SpriteSpecifier.Rsi(new ResPath("Interface/Misc/health_icons.rsi"), "Critical");
-        }*///всётаки оставлю чуть больше шансов антагам :D
+        }*/ //всётаки оставлю чуть больше шансов антагам :D
 
         var statusIcon = new AnimatedTextureRect
         {
@@ -287,7 +288,7 @@ public sealed partial class SquadEntry : PanelContainer
         var jobContainer = new BoxContainer
         {
             Orientation = BoxContainer.LayoutOrientation.Horizontal,
-            HorizontalExpand = true
+            HorizontalExpand = true,
         };
 
         var jobLabel = new Label
@@ -295,7 +296,7 @@ public sealed partial class SquadEntry : PanelContainer
             Text = member.JobTitle,
             FontColorOverride = SecApartmentStyles.SubTextColor,
             FontOverride = _styles.GetRegularFont(10),
-            Margin = new Thickness(0, 0, 5, 0)
+            Margin = new Thickness(0, 0, 5, 0),
         };
 
         jobContainer.AddChild(jobLabel);
@@ -308,14 +309,14 @@ public sealed partial class SquadEntry : PanelContainer
 
         if (iconSpecifier != null)
         {
-            var icon = new TextureRect()
+            var icon = new TextureRect
             {
                 TextureScale = new Vector2(2, 2),
                 VerticalAlignment = VAlignment.Center,
                 HorizontalAlignment = HAlignment.Left,
                 Texture = _sprite.Frame0(iconSpecifier),
                 Margin = new Thickness(0, 0, 4, 0),
-                Stretch = TextureRect.StretchMode.KeepCentered
+                Stretch = TextureRect.StretchMode.KeepCentered,
             };
 
             jobContainer.AddChild(icon);
@@ -327,7 +328,7 @@ public sealed partial class SquadEntry : PanelContainer
         {
             Text = Loc.GetString("sec-apartment-squad-remove-name"),
             ToolTip = Loc.GetString("sec-apartment-squad-remove-tooltip"),
-            MinWidth = 30
+            MinWidth = 30,
         };
         removeButton.AddStyleClass(SecApartmentStyles.StyleClassButtonRed);
 
@@ -417,21 +418,25 @@ public sealed partial class SquadEntry : PanelContainer
                             {
                                 var index = MathF.Round(4f * status.DamagePercentage.Value);
                                 if (index >= 5)
+                                {
                                     specifier = new SpriteSpecifier.Rsi(
                                         new ResPath("Interface/Alerts/human_crew_monitoring.rsi"),
                                         "critical"
                                     );
+                                }
                                 else
+                                {
                                     specifier = new SpriteSpecifier.Rsi(
                                         new ResPath("Interface/Alerts/human_crew_monitoring.rsi"),
                                         "health" + index
                                     );
+                                }
                             }
-                        }/*
+                        } /*
                         else
                         {
                             specifier = new SpriteSpecifier.Rsi(new ResPath("Interface/Misc/health_icons.rsi"), "Critical");
-                        }*///всётаки оставлю больше шансов антагам :D
+                        }*/ //всётаки оставлю больше шансов антагам :D
 
                         statusIcon.SetFromSpriteSpecifier(specifier);
                     }
@@ -483,9 +488,7 @@ public sealed partial class SquadEntry : PanelContainer
     {
         var newName = SquadNameEdit.Text.Trim();
         if (!string.IsNullOrWhiteSpace(newName) && newName != Squad.Name)
-        {
             OnRenamePressed?.Invoke(newName);
-        }
         _isEditingName = false;
         UpdateEditMode();
     }
@@ -498,19 +501,16 @@ public sealed partial class SquadEntry : PanelContainer
         UpdateEditMode();
     }
 
-    private string GetStatusText(SquadStatus status)
-    {
-        return status switch
+    private string GetStatusText(SquadStatus status) =>
+        status switch
         {
             SquadStatus.Active => Loc.GetString("sec-apartment-active"),
             SquadStatus.OnBreak => Loc.GetString("sec-apartment-on-break"),
-            _ => Loc.GetString("sec-apartment-unknown")
+            _ => Loc.GetString("sec-apartment-unknown"),
         };
-    }
 
-    private string GetIconText(SquadIconNum icon)
-    {
-        return icon switch
+    private string GetIconText(SquadIconNum icon) =>
+        icon switch
         {
             SquadIconNum.Alpha => Loc.GetString("sec-apartment-icon-alpha"),
             SquadIconNum.Beta => Loc.GetString("sec-apartment-icon-beta"),
@@ -536,7 +536,6 @@ public sealed partial class SquadEntry : PanelContainer
             SquadIconNum.Hi => Loc.GetString("sec-apartment-icon-hi"),
             SquadIconNum.Psi => Loc.GetString("sec-apartment-icon-psi"),
             SquadIconNum.Omega => Loc.GetString("sec-apartment-icon-omega"),
-            _ => Loc.GetString("sec-apartment-unknown")
+            _ => Loc.GetString("sec-apartment-unknown"),
         };
-    }
 }

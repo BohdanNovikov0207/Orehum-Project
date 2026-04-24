@@ -7,9 +7,9 @@
 // Copyright (c) 2024 New Frontiers Contributors
 // See AGPLv3.txt for details.
 
+using System.Numerics;
 using Content.Shared._NF.Shuttles.Events;
 using Content.Shared.Shuttles.BUIStates;
-using System.Numerics;
 using Content.Shared.Shuttles.Components;
 using Robust.Client.Graphics;
 using Robust.Shared.Collections;
@@ -30,7 +30,8 @@ public sealed partial class ShuttleNavControl
     private void NfUpdateState(NavInterfaceState state)
     {
         if (!EntManager.GetCoordinates(state.Coordinates).HasValue ||
-            !EntManager.TryGetComponent(EntManager.GetCoordinates(state.Coordinates).GetValueOrDefault().EntityId, out TransformComponent? transform))
+            !EntManager.TryGetComponent(EntManager.GetCoordinates(state.Coordinates).GetValueOrDefault().EntityId,
+                out TransformComponent? transform))
             return;
 
         DampeningMode = state.DampeningMode;
@@ -46,9 +47,7 @@ public sealed partial class ShuttleNavControl
         if (shouldDrawIff && MaximumIFFDistance >= 0.0f)
         {
             if (distance.Length() > MaximumIFFDistance)
-            {
                 shouldDrawIff = false;
-            }
         }
 
         return shouldDrawIff;
@@ -59,16 +58,14 @@ public sealed partial class ShuttleNavControl
         Vector2 uiPosition,
         int uiXCentre,
         int uiYCentre,
-        Color color)
-    {
+        Color color) =>
         blipDataList.Add(new BlipData
         {
             IsOutsideRadarCircle = isOutsideRadarCircle,
             UiPosition = uiPosition,
             VectorToPosition = uiPosition - new Vector2(uiXCentre, uiYCentre),
-            Color = color
+            Color = color,
         });
-    }
 
     /**
     * Frontier - Adds blip style triangles that are on ships or pointing towards ships on the edges of the radar.
@@ -84,7 +81,7 @@ public sealed partial class ShuttleNavControl
             {
                 new Vector2(0, 0),
                 new Vector2(RadarBlipSize, 0),
-                new Vector2(RadarBlipSize * 0.5f, RadarBlipSize)
+                new Vector2(RadarBlipSize * 0.5f, RadarBlipSize),
             };
 
             if (blipData.IsOutsideRadarCircle)
@@ -112,7 +109,7 @@ public sealed partial class ShuttleNavControl
 
             // Calculate the vectors from the center to each vertex
             var vectorsFromCenter = new Vector2[3];
-            for (int i = 0; i < 3; i++)
+            for (var i = 0; i < 3; i++)
             {
                 vectorsFromCenter[i] = (triangleShapeVectorPoints[i] - triangleCenterVector) * UIScale;
             }
@@ -121,13 +118,11 @@ public sealed partial class ShuttleNavControl
             var newVerts = new Vector2[3];
             for (var i = 0; i < 3; i++)
             {
-                newVerts[i] = (blipData.UiPosition * UIScale) + vectorsFromCenter[i];
+                newVerts[i] = blipData.UiPosition * UIScale + vectorsFromCenter[i];
             }
 
             if (!blipValueList.TryGetValue(blipData.Color, out var valueList))
-            {
                 valueList = new ValueList<Vector2>();
-            }
 
             valueList.Add(newVerts[0]);
             valueList.Add(newVerts[1]);

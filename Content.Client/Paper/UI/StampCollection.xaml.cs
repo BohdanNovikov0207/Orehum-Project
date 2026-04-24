@@ -14,7 +14,7 @@ namespace Content.Client.Paper.UI;
 [GenerateTypedNameReferences]
 public sealed partial class StampCollection : Container
 {
-    private List<StampWidget> _stamps = new();
+    private readonly List<StampWidget> _stamps = new();
 
     /// Seed for random number generator to place stamps deterministically
     public int PlacementSeed;
@@ -58,10 +58,13 @@ public sealed partial class StampCollection : Container
         // orientation of the stamp into account.
         for (var i = 0; i < _stamps.Count; i++)
         {
-            var stampOrientation = MathHelper.DegreesToRadians((random.NextFloat() - 0.5f) * 10.0f) ;
+            var stampOrientation = MathHelper.DegreesToRadians((random.NextFloat() - 0.5f) * 10.0f);
             _stamps[i].Orientation = stampOrientation;
 
-            var theta = theta0 + dtheta * 0.5f + dtheta * i + (i > 4 ? MathF.Log(1 + i / 4) * dtheta : 0); // There is probably a better way to lay these out, to minimize overlaps
+            var theta = theta0 + dtheta * 0.5f + dtheta * i +
+                        (i > 4
+                            ? MathF.Log(1 + i / 4) * dtheta
+                            : 0); // There is probably a better way to lay these out, to minimize overlaps
             var childCenterOnCircle = thisCenter;
             if (i > 0)
             {
@@ -76,7 +79,7 @@ public sealed partial class StampCollection : Container
             var controlBox = new UIBox2(PixelSizeBox.TopLeft, PixelSizeBox.TopLeft + finalSize * UIScale);
             var clampedCenter = Clamp(Shrink(controlBox, childHePage), childCenterOnCircle);
             var finalPosition = clampedCenter - childHePage;
-            var finalPositionAsInt = new Vector2i((int)finalPosition.X, (int)finalPosition.Y);
+            var finalPositionAsInt = new Vector2i((int) finalPosition.X, (int) finalPosition.Y);
             _stamps[i].ArrangePixel(new UIBox2i(finalPositionAsInt, finalPositionAsInt + _stamps[i].DesiredPixelSize));
         }
 
@@ -87,16 +90,10 @@ public sealed partial class StampCollection : Container
     /// Shrink a UIBox2 by a half extents, moving both the top-left and
     /// bottom-right closer together.
     /// </summary>
-    private UIBox2 Shrink(UIBox2 box, Vector2 shrinkHe)
-    {
-        return new UIBox2(box.TopLeft + shrinkHe, box.BottomRight - shrinkHe);
-    }
+    private UIBox2 Shrink(UIBox2 box, Vector2 shrinkHe) => new(box.TopLeft + shrinkHe, box.BottomRight - shrinkHe);
 
     /// <summary>
     /// Returns the input vector clamped to be within the UIBox
     /// </summary>
-    private Vector2 Clamp(UIBox2 box, Vector2 point)
-    {
-        return Vector2.Min(box.BottomRight, Vector2.Max(box.TopLeft, point));
-    }
+    private Vector2 Clamp(UIBox2 box, Vector2 point) => Vector2.Min(box.BottomRight, Vector2.Max(box.TopLeft, point));
 }

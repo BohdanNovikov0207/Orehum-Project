@@ -20,19 +20,19 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                 PatchMarginBottom="4"
                 PatchMarginTop="6"
                 TextureScale="2 2"
-                Mode="Tile"/>
+                Mode="Tile" />
         </PanelContainer.PanelOverride>
     </PanelContainer>
     <PanelContainer Name="HighlightPanel">
         <PanelContainer.PanelOverride>
-            <graphics:StyleBoxTexture PatchMarginBottom="4" PatchMarginTop="6" TextureScale="2 2">
-            </graphics:StyleBoxTexture>
+            <graphics:StyleBoxTexture PatchMarginBottom="4" PatchMarginTop="6" TextureScale="2 2" />
         </PanelContainer.PanelOverride>
     </PanelContainer>
     <BoxContainer Name="Contents" Orientation="Vertical" Margin="0 6 0 4" RectClipContent="True">
         <BoxContainer Name="StatusContents" Orientation="Vertical" VerticalExpand="True" VerticalAlignment="Bottom" />
         <Control>
-            <Label Name="NoItemLabel" ClipText="True" StyleClasses="ItemStatusNotHeld" Align="Left" Text="{Loc 'item-status-not-held'}" />
+            <Label Name="NoItemLabel" ClipText="True" StyleClasses="ItemStatusNotHeld" Align="Left"
+                   Text="{Loc 'item-status-not-held'}" />
             <Label Name="ItemNameLabel" ClipText="True" StyleClasses="ItemStatus" Align="Left" Visible="False" />
         </Control>
     </BoxContainer>

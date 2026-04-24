@@ -24,16 +24,16 @@ public sealed partial class PdaProgramItem : ContainerButton
         BackgroundColor = Color.FromHex("#25252a"),
     };
 
-    public Color BackgroundColor
-    {
-        get => _styleBox.BackgroundColor;
-        set => _styleBox.BackgroundColor = value;
-    }
-
     public PdaProgramItem()
     {
         RobustXamlLoader.Load(this);
         Panel.PanelOverride = _styleBox;
+    }
+
+    public Color BackgroundColor
+    {
+        get => _styleBox.BackgroundColor;
+        set => _styleBox.BackgroundColor = value;
     }
 
     protected override void Draw(DrawingHandleScreen handle)
@@ -42,6 +42,5 @@ public sealed partial class PdaProgramItem : ContainerButton
 
         if (TryGetStyleProperty<Color>(StylePropertyBgColor, out var bgColor))
             BackgroundColor = bgColor;
-
     }
 }

@@ -14,14 +14,13 @@ using Content.Shared._Goobstation.Heretic.Components;
 using Content.Shared.Tag;
 using Robust.Client.GameObjects;
 using Robust.Shared.Graphics.RSI;
-using Robust.Shared.Utility;
 
 namespace Content.Client._Shitcode.Heretic;
 
 public sealed class RustRuneSystem : EntitySystem
 {
-    [Dependency] private readonly TagSystem _tag = default!;
     [Dependency] private readonly SpriteSystem _spriteSystem = default!;
+    [Dependency] private readonly TagSystem _tag = default!;
 
     public override void Initialize()
     {

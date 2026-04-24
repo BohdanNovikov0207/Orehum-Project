@@ -20,17 +20,20 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     MinHeight="545">
     <ScrollContainer>
         <BoxContainer Orientation="Vertical">
-            <Label Name="RoleType" VerticalAlignment="Top" Margin="0 6 0 10" HorizontalAlignment="Center" StyleClasses="LabelHeading" Access="Public"/>
+            <Label Name="RoleType" VerticalAlignment="Top" Margin="0 6 0 10" HorizontalAlignment="Center"
+                   StyleClasses="LabelHeading" Access="Public" />
             <BoxContainer Orientation="Horizontal">
-                <SpriteView OverrideDirection="South" Scale="2 2" Name="SpriteView" Access="Public" SetSize="64 64"/>
+                <SpriteView OverrideDirection="South" Scale="2 2" Name="SpriteView" Access="Public" SetSize="64 64" />
                 <BoxContainer Orientation="Vertical" VerticalAlignment="Top">
-                    <Label Name="NameLabel" Access="Public"/>
-                    <Label Name="SubText" VerticalAlignment="Top" StyleClasses="LabelSubText" Access="Public"/>
+                    <Label Name="NameLabel" Access="Public" />
+                    <Label Name="SubText" VerticalAlignment="Top" StyleClasses="LabelSubText" Access="Public" />
                 </BoxContainer>
             </BoxContainer>
-            <Label Name="ObjectivesLabel" Access="Public" Text="{Loc 'character-info-objectives-label'}" HorizontalAlignment="Center"/>
-            <BoxContainer Orientation="Vertical" Name="Objectives" Access="Public"/>
-            <cc:Placeholder Name="RolePlaceholder" Access="Public" PlaceholderText="{Loc 'character-info-roles-antagonist-text'}"/>
+            <Label Name="ObjectivesLabel" Access="Public" Text="{Loc 'character-info-objectives-label'}"
+                   HorizontalAlignment="Center" />
+            <BoxContainer Orientation="Vertical" Name="Objectives" Access="Public" />
+            <cc:Placeholder Name="RolePlaceholder" Access="Public"
+                            PlaceholderText="{Loc 'character-info-roles-antagonist-text'}" />
         </BoxContainer>
     </ScrollContainer>
 </windows:CharacterWindow>

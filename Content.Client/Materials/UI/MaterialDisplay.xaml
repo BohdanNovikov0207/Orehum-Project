@@ -21,7 +21,7 @@ SPDX-License-Identifier: MIT
                    Access="Public"
                    HorizontalExpand="True"
                    ClipText="True"
-                   Margin="4 4 4 4"/>
+                   Margin="4 4 4 4" />
         </BoxContainer>
         <BoxContainer Name="Content"
                       Orientation="Horizontal"

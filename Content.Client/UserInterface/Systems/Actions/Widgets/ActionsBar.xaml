@@ -19,8 +19,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     xmlns:controls="clr-namespace:Content.Client.UserInterface.Systems.Actions.Controls"
     VerticalExpand="False"
     Orientation="Horizontal"
-    HorizontalExpand="False"
->
+    HorizontalExpand="False">
     <BoxContainer Orientation="Vertical">
         <controls:ActionButtonContainer
             HorizontalAlignment="Center"
@@ -28,6 +27,6 @@ SPDX-License-Identifier: AGPL-3.0-or-later
             MaxSize="64 9999"
             Name="ActionsContainer"
             Access="Public"
-            Rows="1"/>
+            Rows="1" />
     </BoxContainer>
 </widgets:ActionsBar>

@@ -3,15 +3,15 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Linq;
 using Content.Shared.Atmos;
 using Content.Shared.Pinpointer;
-using System.Linq;
 
 namespace Content.Client.Pinpointer;
 
 public sealed partial class NavMapSystem
 {
-    private (AtmosDirection, Vector2i, AtmosDirection)[] _regionPropagationTable =
+    private readonly (AtmosDirection, Vector2i, AtmosDirection)[] _regionPropagationTable =
     {
         (AtmosDirection.East, new Vector2i(1, 0), AtmosDirection.West),
         (AtmosDirection.West, new Vector2i(-1, 0), AtmosDirection.East),
@@ -25,7 +25,9 @@ public sealed partial class NavMapSystem
         var query = AllEntityQuery<NavMapComponent>();
 
         while (query.MoveNext(out var ent, out var entNavMapRegions))
+        {
             FloodFillNextEnqueuedRegion(ent, entNavMapRegions);
+        }
     }
 
     private void FloodFillNextEnqueuedRegion(EntityUid uid, NavMapComponent component)
@@ -52,7 +54,7 @@ public sealed partial class NavMapSystem
         // Create and assign the new region overlay
         var regionOverlay = new NavMapRegionOverlay(regionProperties.UiKey, gridCoords)
         {
-            Color = regionProperties.Color
+            Color = regionProperties.Color,
         };
 
         component.RegionOverlays[regionOwner] = regionOverlay;
@@ -78,17 +80,19 @@ public sealed partial class NavMapSystem
         foreach (var chunk in floodedChunks)
         {
             if (!component.ChunkToRegionOwnerTable.TryGetValue(chunk, out var owners))
-                owners = new();
+                owners = new HashSet<NetEntity>();
 
             owners.Add(regionOwner);
             component.ChunkToRegionOwnerTable[chunk] = owners;
         }
     }
 
-    private (HashSet<Vector2i>, HashSet<Vector2i>) FloodFillRegion(EntityUid uid, NavMapComponent component, NavMapRegionProperties regionProperties)
+    private (HashSet<Vector2i>, HashSet<Vector2i>) FloodFillRegion(EntityUid uid,
+        NavMapComponent component,
+        NavMapRegionProperties regionProperties)
     {
         if (!regionProperties.Seeds.Any())
-            return (new(), new());
+            return (new HashSet<Vector2i>(), new HashSet<Vector2i>());
 
         var visitedChunks = new HashSet<Vector2i>();
         var visitedTiles = new HashSet<Vector2i>();
@@ -102,7 +106,7 @@ public sealed partial class NavMapSystem
             {
                 // If the max region area is hit, exit
                 if (visitedTiles.Count > regionProperties.MaxArea)
-                    return (new(), new());
+                    return (new HashSet<Vector2i>(), new HashSet<Vector2i>());
 
                 // Pop the top tile from the stack 
                 var current = tilesToVisit.Pop();
@@ -177,9 +181,9 @@ public sealed partial class NavMapSystem
         if ((FloorMask & flag) == 0)
             return false;
 
-        var directionMask = 1 << (int)direction;
-        var wallMask = (int)direction << (int)NavMapChunkType.Wall;
-        var airlockMask = (int)direction << (int)NavMapChunkType.Airlock;
+        var directionMask = 1 << (int) direction;
+        var wallMask = (int) direction << (int) NavMapChunkType.Wall;
+        var airlockMask = (int) direction << (int) NavMapChunkType.Airlock;
 
         if ((wallMask & flag) > 0)
             return false;
@@ -193,7 +197,7 @@ public sealed partial class NavMapSystem
     private List<(Vector2i, Vector2i)> GetMergedRegionTiles(HashSet<Vector2i> tiles)
     {
         if (!tiles.Any())
-            return new();
+            return new List<(Vector2i, Vector2i)>();
 
         var x = tiles.Select(t => t.X);
         var minX = x.Min();
@@ -242,26 +246,28 @@ public sealed partial class NavMapSystem
             maxArea = 0;
 
             // Initialize the first row of dp
-            for (int j = 0; j < cols; j++)
+            for (var j = 0; j < cols; j++)
             {
                 dp[0, j] = matrix[0, j];
             }
 
             // Calculate dp values for remaining rows
-            for (int i = 1; i < rows; i++)
+            for (var i = 1; i < rows; i++)
             {
-                for (int j = 0; j < cols; j++)
+                for (var j = 0; j < cols; j++)
+                {
                     dp[i, j] = matrix[i, j] == 1 ? dp[i - 1, j] + 1 : 0;
+                }
             }
 
             // Find the largest rectangular area seeded for each position in the matrix
-            for (int i = 0; i < rows; i++)
+            for (var i = 0; i < rows; i++)
             {
-                for (int j = 0; j < cols; j++)
+                for (var j = 0; j < cols; j++)
                 {
-                    int minWidth = dp[i, j];
+                    var minWidth = dp[i, j];
 
-                    for (int k = j; k >= 0; k--)
+                    for (var k = j; k >= 0; k--)
                     {
                         if (dp[i, k] <= 0)
                             break;
@@ -282,10 +288,12 @@ public sealed partial class NavMapSystem
             output.Add((coords.Item1 + offset, coords.Item2 + offset));
 
             // Removed the tiles covered by the rectangle from matrix
-            for (int i = coords.Item1.X; i <= coords.Item2.X; i++)
+            for (var i = coords.Item1.X; i <= coords.Item2.X; i++)
             {
-                for (int j = coords.Item1.Y; j <= coords.Item2.Y; j++)
+                for (var j = coords.Item1.Y; j <= coords.Item2.Y; j++)
+                {
                     matrix[i, j] = 0;
+                }
             }
         }
 
@@ -294,9 +302,9 @@ public sealed partial class NavMapSystem
 
     private bool IsArrayEmpty(int[,] matrix)
     {
-        for (int i = 0; i < matrix.GetLength(0); i++)
+        for (var i = 0; i < matrix.GetLength(0); i++)
         {
-            for (int j = 0; j < matrix.GetLength(1); j++)
+            for (var j = 0; j < matrix.GetLength(1); j++)
             {
                 if (matrix[i, j] == 1)
                     return false;

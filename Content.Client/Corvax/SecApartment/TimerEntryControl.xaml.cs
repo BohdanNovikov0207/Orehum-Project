@@ -14,10 +14,8 @@ namespace Content.Client.Corvax.SecApartment;
 [GenerateTypedNameReferences]
 public sealed partial class TimerEntryControl : PanelContainer
 {
-    private TimerEntry _timerEntry;
     private readonly SecApartmentStyles _styles;
-
-    public TimeSpan RemainingTime => _timerEntry.RemainingTime;
+    private TimerEntry _timerEntry;
 
     public Action? OnRemovePressed;
 
@@ -34,6 +32,8 @@ public sealed partial class TimerEntryControl : PanelContainer
         UpdateDisplay();
     }
 
+    public TimeSpan RemainingTime => _timerEntry.RemainingTime;
+
     private void SetupStyles()
     {
         PanelOverride = new StyleBoxFlat
@@ -44,13 +44,13 @@ public sealed partial class TimerEntryControl : PanelContainer
             ContentMarginBottomOverride = 6,
             ContentMarginLeftOverride = 8,
             ContentMarginRightOverride = 8,
-            ContentMarginTopOverride = 6
+            ContentMarginTopOverride = 6,
         };
 
         RemoveButton.AddStyleClass(SecApartmentStyles.StyleClassButtonRed);
 
-        TimerLabel.FontOverride = _styles.GetBoldFont(12);
-        TimeLabel.FontOverride = _styles.GetBoldFont(12);
+        TimerLabel.FontOverride = _styles.GetBoldFont();
+        TimeLabel.FontOverride = _styles.GetBoldFont();
         TotalTimeLabel.FontOverride = _styles.GetRegularFont(10);
     }
 
@@ -94,12 +94,8 @@ public sealed partial class TimerEntryControl : PanelContainer
     private string FormatTimeSpan(TimeSpan timeSpan)
     {
         if (timeSpan.TotalHours >= 1)
-        {
-            return $"{(int)timeSpan.TotalHours:00}:{timeSpan.Minutes:00}:{timeSpan.Seconds:00}";
-        }
-        else
-        {
-            return $"{timeSpan.Minutes:00}:{timeSpan.Seconds:00}";
-        }
+            return $"{(int) timeSpan.TotalHours:00}:{timeSpan.Minutes:00}:{timeSpan.Seconds:00}";
+
+        return $"{timeSpan.Minutes:00}:{timeSpan.Seconds:00}";
     }
 }

@@ -50,7 +50,7 @@ internal sealed partial class ToolshedVisualizeWindow : DefaultWindow
             ItemList.AddChild(new BoxContainer
             {
                 Orientation = BoxContainer.LayoutOrientation.Horizontal,
-                Children = { nameLabel, tpButton, vvButton }
+                Children = { nameLabel, tpButton, vvButton },
             });
         }
     }

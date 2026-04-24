@@ -30,15 +30,10 @@ public sealed partial class ContentAudioSystem
 {
     [Dependency] private readonly IBaseClient _client = default!;
     [Dependency] private readonly ClientGameTicker _gameTicker = default!;
-    [Dependency] private readonly IResourceCache _resourceCache = default!;
 
     private readonly AudioParams _lobbySoundtrackParams = new(-5f, 1, 0, 0, 0, false, 0f);
+    [Dependency] private readonly IResourceCache _resourceCache = default!;
     private readonly AudioParams _roundEndSoundEffectParams = new(-5f, 1, 0, 0, 0, false, 0f);
-
-    /// <summary>
-    /// EntityUid of lobby restart sound component.
-    /// </summary>
-    private EntityUid? _lobbyRoundRestartAudioStream;
 
     /// <summary>
     /// Shuffled list of soundtrack file-names.
@@ -46,11 +41,16 @@ public sealed partial class ContentAudioSystem
     private string[]? _lobbyPlaylist;
 
     /// <summary>
+    /// EntityUid of lobby restart sound component.
+    /// </summary>
+    private EntityUid? _lobbyRoundRestartAudioStream;
+
+    private Action<LobbySoundtrackChangedEvent>? _lobbySoundtrackChanged;
+
+    /// <summary>
     /// Short info about lobby soundtrack currently playing. Is null if soundtrack is not playing.
     /// </summary>
     private LobbySoundtrackInfo? _lobbySoundtrackInfo;
-
-    private Action<LobbySoundtrackChangedEvent>? _lobbySoundtrackChanged;
 
     /// <summary>
     /// Event for subscription on lobby soundtrack changes.
@@ -62,9 +62,7 @@ public sealed partial class ContentAudioSystem
             if (value != null)
             {
                 if (_lobbySoundtrackInfo != null)
-                {
                     value(new LobbySoundtrackChangedEvent(_lobbySoundtrackInfo.Filename));
-                }
 
                 _lobbySoundtrackChanged += value;
             }
@@ -88,10 +86,7 @@ public sealed partial class ContentAudioSystem
         SubscribeNetworkEvent<LobbyPlaylistChangedEvent>(OnLobbySongChanged);
     }
 
-    private void OnLobbySongStopped(LobbyMusicStopEvent ev)
-    {
-        EndLobbyMusic();
-    }
+    private void OnLobbySongStopped(LobbyMusicStopEvent ev) => EndLobbyMusic();
 
     private void StateManagerOnStateChanged(StateChangedEventArgs args)
     {
@@ -106,10 +101,7 @@ public sealed partial class ContentAudioSystem
         }
     }
 
-    private void OnLeave(object? sender, PlayerEventArgs args)
-    {
-        EndLobbyMusic();
-    }
+    private void OnLeave(object? sender, PlayerEventArgs args) => EndLobbyMusic();
 
     private void LobbyMusicVolumeCVarChanged(float volume)
     {
@@ -117,7 +109,8 @@ public sealed partial class ContentAudioSystem
         {
             _audio.SetVolume(
                 _lobbySoundtrackInfo.MusicStreamEntityUid,
-                _lobbySoundtrackParams.Volume + SharedAudioSystem.GainToVolume(_configManager.GetCVar(CCVars.LobbyMusicVolume))
+                _lobbySoundtrackParams.Volume +
+                SharedAudioSystem.GainToVolume(_configManager.GetCVar(CCVars.LobbyMusicVolume))
             );
         }
     }
@@ -125,13 +118,9 @@ public sealed partial class ContentAudioSystem
     private void LobbyMusicCVarChanged(bool musicEnabled)
     {
         if (musicEnabled && _state.CurrentState is LobbyState)
-        {
             StartLobbyMusic();
-        }
         else
-        {
             EndLobbyMusic();
-        }
     }
 
     private void OnLobbySongChanged(LobbyPlaylistChangedEvent playlistChangedEvent)
@@ -142,9 +131,7 @@ public sealed partial class ContentAudioSystem
             && _lobbyPlaylist != null
             && _lobbyPlaylist.SequenceEqual(playlist)
            )
-        {
             return;
-        }
 
         EndLobbyMusic();
         StartLobbyMusic(playlistChangedEvent.Playlist);
@@ -156,9 +143,7 @@ public sealed partial class ContentAudioSystem
     private void StartLobbyMusic()
     {
         if (_lobbyPlaylist == null || _lobbyPlaylist.Length == 0)
-        {
             return;
-        }
 
         StartLobbyMusic(_lobbyPlaylist);
     }
@@ -174,9 +159,7 @@ public sealed partial class ContentAudioSystem
 
         _lobbyPlaylist = playlist;
         if (_lobbyPlaylist.Length == 0)
-        {
             return;
-        }
 
         PlaySoundtrack(playlist[0]);
     }
@@ -184,15 +167,15 @@ public sealed partial class ContentAudioSystem
     private void PlaySoundtrack(string soundtrackFilename)
     {
         if (!_resourceCache.TryGetResource(new ResPath(soundtrackFilename), out AudioResource? audio))
-        {
             return;
-        }
 
         var playResult = _audio.PlayGlobal(
             soundtrackFilename,
             Filter.Local(),
             false,
-            _lobbySoundtrackParams.WithVolume(_lobbySoundtrackParams.Volume + SharedAudioSystem.GainToVolume(_configManager.GetCVar(CCVars.LobbyMusicVolume)))
+            _lobbySoundtrackParams.WithVolume(_lobbySoundtrackParams.Volume +
+                                              SharedAudioSystem.GainToVolume(
+                                                  _configManager.GetCVar(CCVars.LobbyMusicVolume)))
         );
         if (playResult == null)
         {
@@ -212,9 +195,7 @@ public sealed partial class ContentAudioSystem
     private void EndLobbyMusic()
     {
         if (_lobbySoundtrackInfo == null)
-        {
             return;
-        }
 
         _audio.Stop(_lobbySoundtrackInfo.MusicStreamEntityUid);
         _lobbySoundtrackInfo = null;
@@ -229,16 +210,17 @@ public sealed partial class ContentAudioSystem
 
         var file = _gameTicker.RestartSound;
         if (ResolvedSoundSpecifier.IsNullOrEmpty(file))
-        {
             return;
-        }
 
         _lobbyRoundRestartAudioStream = _audio.PlayGlobal(
-            file,
-            Filter.Local(),
-            false,
-            _roundEndSoundEffectParams.WithVolume(_roundEndSoundEffectParams.Volume + SharedAudioSystem.GainToVolume(_configManager.GetCVar(CCVars.LobbyMusicVolume)))
-        )?.Entity;
+                file,
+                Filter.Local(),
+                false,
+                _roundEndSoundEffectParams.WithVolume(_roundEndSoundEffectParams.Volume +
+                                                      SharedAudioSystem.GainToVolume(
+                                                          _configManager.GetCVar(CCVars.LobbyMusicVolume)))
+            )
+            ?.Entity;
     }
 
     private void ShutdownLobbyMusic()
@@ -256,7 +238,7 @@ public sealed partial class ContentAudioSystem
             _lobbySoundtrackInfo != null
             && _timing.CurTime >= _lobbySoundtrackInfo.NextTrackOn
             && _lobbyPlaylist?.Length > 0
-            )
+        )
         {
             var nextSoundtrackFilename = GetNextSoundtrackFromPlaylist(_lobbySoundtrackInfo.Filename, _lobbyPlaylist);
             PlaySoundtrack(nextSoundtrackFilename);
@@ -268,25 +250,31 @@ public sealed partial class ContentAudioSystem
         var indexOfCurrent = Array.IndexOf(playlist, currentSoundtrackFilename);
         var nextTrackIndex = indexOfCurrent + 1;
         if (nextTrackIndex > playlist.Length - 1)
-        {
             nextTrackIndex = 0;
-        }
 
         return playlist[nextTrackIndex];
     }
 
     /// <summary> Container for lobby soundtrack information. </summary>
     /// <param name="Filename">Soundtrack filename.</param>
-    /// <param name="NextTrackOn">Time (based on <see cref="IGameTiming.CurTime"/>) when this track is going to finish playing and next track have to be started.</param>
+    /// <param name="NextTrackOn">
+    /// Time (based on <see cref="IGameTiming.CurTime" />) when this track is going to finish playing
+    /// and next track have to be started.
+    /// </param>
     /// <param name="MusicStreamEntityUid">
-    /// EntityUid of launched soundtrack (from <see cref="SharedAudioSystem.PlayGlobal(string,Robust.Shared.Player.Filter,bool,System.Nullable{Robust.Shared.Audio.AudioParams})"/>).
+    /// EntityUid of launched soundtrack (from
+    /// <see
+    ///     cref="SharedAudioSystem.PlayGlobal(string,Robust.Shared.Player.Filter,bool,System.Nullable{Robust.Shared.Audio.AudioParams})" />
+    /// ).
     /// </param>
     private sealed record LobbySoundtrackInfo(string Filename, TimeSpan NextTrackOn, EntityUid MusicStreamEntityUid);
 }
 
 /// <summary>
-/// Event of changing lobby soundtrack (or stopping lobby music - will pass null for <paramref name="SoundtrackFilename"/> in that case).
-/// Is used by <see cref="ContentAudioSystem.LobbySoundtrackChanged"/> and <see cref="LobbyState.UpdateLobbySoundtrackInfo"/>.
+/// Event of changing lobby soundtrack (or stopping lobby music - will pass null for <paramref name="SoundtrackFilename" />
+/// in that case).
+/// Is used by <see cref="ContentAudioSystem.LobbySoundtrackChanged" /> and
+/// <see cref="LobbyState.UpdateLobbySoundtrackInfo" />.
 /// </summary>
 /// <param name="SoundtrackFilename">Filename of newly set soundtrack, or null if soundtrack playback is stopped.</param>
 public sealed record LobbySoundtrackChangedEvent(string? SoundtrackFilename = null);

@@ -2,8 +2,7 @@ using Content.Shared.TurretController;
 
 namespace Content.Client.TurretController;
 
-/// <inheritdoc/>
+/// <inheritdoc />
 public sealed class DeployableTurretControllerSystem : SharedDeployableTurretControllerSystem
 {
-
 }

@@ -26,7 +26,6 @@ using Robust.Shared.Input;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Physics.Components;
-using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
 using Robust.Shared.Utility;
 
@@ -35,54 +34,45 @@ namespace Content.Client.Shuttles.UI;
 [GenerateTypedNameReferences]
 public sealed partial class ShuttleMapControl : BaseShuttleControl
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly IInputManager _inputs = default!;
+    /// <summary>
+    /// Set every draw to determine the beacons that are clickable for mouse events
+    /// </summary>
+    private readonly List<IMapObject> _beacons = new();
+
+    private readonly Dictionary<Color, List<Vector2>> _edges = new();
     [Dependency] private readonly IEntityManager _entManager = default!; // Frontier
-    private readonly SharedMapSystem _mapSystem;
-    private readonly ShuttleSystem _shuttles;
-    private readonly SharedTransformSystem _xformSystem;
-
-    protected override bool Draggable => true;
-
-    public bool ShowBeacons = true;
-    public MapId ViewingMap = MapId.Nullspace;
-
-    private EntityUid? _shuttleEntity;
 
     private readonly Font _font;
+    [Dependency] private readonly IInputManager _inputs = default!;
+
+    // Per frame data to avoid re-allocating
+    private readonly List<IMapObject> _mapObjects = new();
+    private readonly SharedMapSystem _mapSystem;
 
     private readonly EntityQuery<PhysicsComponent> _physicsQuery;
+    private readonly ShuttleSystem _shuttles;
+    private readonly Dictionary<Color, List<(Vector2, string)>> _strings = new();
+    [Dependency] private readonly IGameTiming _timing = default!;
+    private readonly Dictionary<Color, List<Vector2>> _verts = new();
+    private readonly List<ShuttleExclusionObject> _viewportExclusions = new();
+    private readonly SharedTransformSystem _xformSystem;
+
+    private Angle _ftlAngle;
+
+    private EntityUid? _shuttleEntity;
 
     /// <summary>
     /// Toggles FTL mode on. This shows a pre-vis for FTLing a grid.
     /// </summary>
     public bool FtlMode;
 
-    private Angle _ftlAngle;
-
     /// <summary>
     /// Are we currently in FTL.
     /// </summary>
     public bool InFtl;
 
-    /// <summary>
-    /// Raised when a request to FTL to a particular spot is raised.
-    /// </summary>
-    public event Action<MapCoordinates, Angle>? RequestFTL;
-
-    public event Action<NetEntity, Angle>? RequestBeaconFTL;
-
-    /// <summary>
-    /// Set every draw to determine the beacons that are clickable for mouse events
-    /// </summary>
-    private List<IMapObject> _beacons = new();
-
-    // Per frame data to avoid re-allocating
-    private readonly List<IMapObject> _mapObjects = new();
-    private readonly Dictionary<Color, List<Vector2>> _verts = new();
-    private readonly Dictionary<Color, List<Vector2>> _edges = new();
-    private readonly Dictionary<Color, List<(Vector2, string)>> _strings = new();
-    private readonly List<ShuttleExclusionObject> _viewportExclusions = new();
+    public bool ShowBeacons = true;
+    public MapId ViewingMap = MapId.Nullspace;
 
     public ShuttleMapControl() : base(256f, 1024f, 1024f) // Frontier edit
     {
@@ -97,6 +87,15 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
         _font = new VectorFont(cache.GetResource<FontResource>("/EngineFonts/NotoSans/NotoSans-Regular.ttf"), 10);
     }
 
+    protected override bool Draggable => true;
+
+    /// <summary>
+    /// Raised when a request to FTL to a particular spot is raised.
+    /// </summary>
+    public event Action<MapCoordinates, Angle>? RequestFTL;
+
+    public event Action<NetEntity, Angle>? RequestBeaconFTL;
+
     public void SetMap(MapId mapId, Vector2 offset, bool recentering = false)
     {
         ViewingMap = mapId;
@@ -104,10 +103,7 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
         Recentering = recentering;
     }
 
-    public void SetShuttle(EntityUid? entity)
-    {
-        _shuttleEntity = entity;
-    }
+    public void SetShuttle(EntityUid? entity) => _shuttleEntity = entity;
 
     protected override void MouseMove(GUIMouseMoveEventArgs args)
     {
@@ -131,10 +127,13 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
 
                 var mapTransform = Matrix3Helpers.CreateInverseTransform(Offset, Angle.Zero);
 
-                if (beaconsOnly && TryGetBeacon(_beacons, mapTransform, args.RelativePixelPosition, PixelRect, out var foundBeacon, out _))
-                {
+                if (beaconsOnly && TryGetBeacon(_beacons,
+                        mapTransform,
+                        args.RelativePixelPosition,
+                        PixelRect,
+                        out var foundBeacon,
+                        out _))
                     RequestBeaconFTL?.Invoke(foundBeacon.Entity, _ftlAngle);
-                }
                 else
                 {
                     // We'll send the "adjusted" position and server will adjust it back when relevant.
@@ -152,7 +151,9 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
         // Scroll handles FTL rotation if you're in FTL mode.
         if (FtlMode)
         {
-            _ftlAngle -= Angle.FromDegrees(15f) * args.Delta.Y; // Mono Edit: Subtract instead of add to preserve clockwise rotation when scrolling up. (positive angles are actually counter-clockwise)
+            _ftlAngle -=
+                Angle.FromDegrees(15f) *
+                args.Delta.Y; // Mono Edit: Subtract instead of add to preserve clockwise rotation when scrolling up. (positive angles are actually counter-clockwise)
             _ftlAngle = _ftlAngle.Reduced();
             return;
         }
@@ -162,7 +163,8 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
 
     private void DrawParallax(DrawingHandleScreen handle)
     {
-        if (!EntManager.TryGetComponent(_shuttleEntity, out TransformComponent? shuttleXform) || shuttleXform.MapUid == null)
+        if (!EntManager.TryGetComponent(_shuttleEntity, out TransformComponent? shuttleXform) ||
+            shuttleXform.MapUid == null)
             return;
 
         // TODO: Figure out how the fuck to make this common between the 3 slightly different parallax methods and move to parallaxsystem.
@@ -227,7 +229,9 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
         foreach (var mapObj in mapObjects)
         {
             // If it's a grid-map skip it.
-            if (mapObj is GridMapObject gridObj && (EntManager.HasComponent<MapComponent>(gridObj.Entity) || !_entManager.EntityExists(gridObj.Entity))) // Frontier: add EntityExists
+            if (mapObj is GridMapObject gridObj && (EntManager.HasComponent<MapComponent>(gridObj.Entity) ||
+                                                    !_entManager.EntityExists(gridObj
+                                                        .Entity))) // Frontier: add EntityExists
                 continue;
 
             var mapCoords = _shuttles.GetMapCoordinates(mapObj);
@@ -288,7 +292,7 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
 
                 var range = _shuttles.GetFTLRange(gridUid);
                 range *= MinimapScale;
-                handle.DrawCircle(gridUiPos, range, Color.Gold, filled: false);
+                handle.DrawCircle(gridUiPos, range, Color.Gold, false);
             }
         }
 
@@ -307,14 +311,12 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
 
             if (mapCoords.MapId != ViewingMap ||
                 !enlargedBounds.Contains(mapCoords.Position))
-            {
                 continue;
-            }
 
             var adjustedPos = Vector2.Transform(mapCoords.Position, matty);
-            var localPos = ScalePosition(adjustedPos with { Y = -adjustedPos.Y});
+            var localPos = ScalePosition(adjustedPos with { Y = -adjustedPos.Y });
             handle.DrawCircle(localPos, exclusion.Range * MinimapScale, exclusionColor.WithAlpha(0.05f));
-            handle.DrawCircle(localPos, exclusion.Range * MinimapScale, exclusionColor, filled: false);
+            handle.DrawCircle(localPos, exclusion.Range * MinimapScale, exclusionColor, false);
 
             _viewportExclusions.Add(exclusion);
         }
@@ -337,7 +339,7 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
                 var localPos = Vector2.Transform(coords.Position, matty);
                 localPos = localPos with { Y = -localPos.Y };
                 var beaconUiPos = ScalePosition(localPos);
-                var mapObject = GetMapObject(localPos, Angle.Zero, scale: 0.75f, scalePosition: true);
+                var mapObject = GetMapObject(localPos, Angle.Zero, 0.75f, true);
 
                 var existingVerts = _verts.GetOrNew(beaconColor);
                 var existingEdges = _edges.GetOrNew(beaconColor);
@@ -352,7 +354,8 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
 
         foreach (var mapObj in viewportObjects)
         {
-            if (mapObj is not GridMapObject gridObj || !EntManager.TryGetComponent(gridObj.Entity, out MapGridComponent? mapGrid))
+            if (mapObj is not GridMapObject gridObj ||
+                !EntManager.TryGetComponent(gridObj.Entity, out MapGridComponent? mapGrid))
                 continue;
 
             Entity<MapGridComponent> grid = (gridObj.Entity, mapGrid);
@@ -362,11 +365,9 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
             if (grid.Owner != _shuttleEntity &&
                 EntManager.TryGetComponent(grid, out iffComp) &&
                 (iffComp.Flags & IFFFlags.Hide) != 0x0)
-            {
                 continue;
-            }
 
-            var gridColor = _shuttles.GetIFFColor(grid, self: _shuttleEntity == grid.Owner, component: iffComp);
+            var gridColor = _shuttles.GetIFFColor(grid, _shuttleEntity == grid.Owner, iffComp);
 
             var existingVerts = _verts.GetOrNew(gridColor);
             var existingEdges = _edges.GetOrNew(gridColor);
@@ -387,7 +388,7 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
                 continue;
 
             // Force drawing it at this point.
-            var iffText = _shuttles.GetIFFLabel(grid, self: true, component: iffComp);
+            var iffText = _shuttles.GetIFFLabel(grid, true, iffComp);
 
             if (string.IsNullOrEmpty(iffText))
                 continue;
@@ -415,7 +416,10 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
             foreach (var (gridUiPos, iffText) in sendStrings)
             {
                 var textWidth = handle.GetDimensions(_font, iffText, 1f);
-                handle.DrawString(_font, gridUiPos + textWidth with { X = -textWidth.X / 2f, Y = textWidth.Y * UIScale }, iffText, adjustedColor);
+                handle.DrawString(_font,
+                    gridUiPos + textWidth with { X = -textWidth.X / 2f, Y = textWidth.Y * UIScale },
+                    iffText,
+                    adjustedColor);
             }
         }
 
@@ -436,10 +440,13 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
                     ShuttleBeaconObject foundBeacon = default;
 
                     // Check for beacons around mouse and snap to that.
-                    if (beaconsOnly && TryGetBeacon(viewportObjects, matty, mouseLocalPos, controlLocalBounds, out foundBeacon, out var foundLocalPos))
-                    {
+                    if (beaconsOnly && TryGetBeacon(viewportObjects,
+                            matty,
+                            mouseLocalPos,
+                            controlLocalBounds,
+                            out foundBeacon,
+                            out var foundLocalPos))
                         mouseLocalPos = foundLocalPos;
-                    }
 
                     var grid = EntManager.GetComponent<MapGridComponent>(_shuttleEntity.Value);
 
@@ -450,7 +457,10 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
                     var mouseMapPos = InverseMapPosition(mouseLocalPos);
 
                     var ftlFree = (!beaconsOnly || foundBeacon != default) &&
-                                  _shuttles.FTLFree(_shuttleEntity.Value, new EntityCoordinates(viewedMapUid, mouseMapPos), _ftlAngle, _viewportExclusions);
+                                  _shuttles.FTLFree(_shuttleEntity.Value,
+                                      new EntityCoordinates(viewedMapUid, mouseMapPos),
+                                      _ftlAngle,
+                                      _viewportExclusions);
 
                     var color = ftlFree ? Color.LimeGreen : Color.Magenta;
 
@@ -462,21 +472,27 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
                     var ourFTLBuffer = _shuttles.GetFTLBufferRange(_shuttleEntity.Value, grid);
                     ourFTLBuffer *= MinimapScale;
                     handle.DrawCircle(mouseLocalPos, ourFTLBuffer, Color.Magenta.WithAlpha(0.01f));
-                    handle.DrawCircle(mouseLocalPos, ourFTLBuffer, Color.Magenta, filled: false);
+                    handle.DrawCircle(mouseLocalPos, ourFTLBuffer, Color.Magenta, false);
 
                     // Draw line from our shuttle to target
                     // Might need to clip the line if it's too far? But my brain wasn't working so F.
                     handle.DrawDottedLine(gridUiPos, mouseLocalPos, color, (float) realTime.TotalSeconds * 30f);
 
                     // Draw shuttle pre-vis
-                    var mouseVerts = GetMapObject(mouseLocalPos, -_ftlAngle, scale: MinimapScale); // Mono Edit: UI controls and the map are in different coordinate orientations, so the angle has to be negated. (shuttle Y is UI control -Y)
+                    var mouseVerts =
+                        GetMapObject(mouseLocalPos,
+                            -_ftlAngle,
+                            MinimapScale); // Mono Edit: UI controls and the map are in different coordinate orientations, so the angle has to be negated. (shuttle Y is UI control -Y)
 
                     handle.DrawPrimitives(DrawPrimitiveTopology.TriangleFan, mouseVerts.Span, color.WithAlpha(0.05f));
                     handle.DrawPrimitives(DrawPrimitiveTopology.LineLoop, mouseVerts.Span, color);
 
                     // Draw a notch indicating direction.
                     var ftlLength = GetMapObjectRadius() + 16f;
-                    var ftlEnd = mouseLocalPos + (-_ftlAngle).RotateVec(new Vector2(0f, -ftlLength)); // Mono Edit: UI controls and the map are in different coordinate orientations, so the angle has to be negated. (shuttle Y is UI control -Y)
+                    var ftlEnd =
+                        mouseLocalPos +
+                        (-_ftlAngle).RotateVec(new Vector2(0f,
+                            -ftlLength)); // Mono Edit: UI controls and the map are in different coordinate orientations, so the angle has to be negated. (shuttle Y is UI control -Y)
 
                     handle.DrawLine(mouseLocalPos, ftlEnd, color);
                 }
@@ -488,9 +504,7 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
 
         if (mousePos.Window != WindowId.Invalid &&
             controlLocalBounds.Contains(mouseLocalPos.Floored()))
-        {
             mapOffset = mouseLocalPos;
-        }
 
         mapOffset = InverseMapPosition(mapOffset);
         var coordsText = $"{mapOffset.X:0.0}, {mapOffset.Y:0.0}";
@@ -527,7 +541,10 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
     /// <summary>
     /// Returns the beacons that intersect the viewport.
     /// </summary>
-    private IEnumerable<(string Beacon, MapCoordinates Coordinates, IMapObject MapObject)> GetBeacons(List<IMapObject> mapObjs, Matrix3x2 mapTransform, UIBox2i area)
+    private IEnumerable<(string Beacon, MapCoordinates Coordinates, IMapObject MapObject)> GetBeacons(
+        List<IMapObject> mapObjs,
+        Matrix3x2 mapTransform,
+        UIBox2i area)
     {
         foreach (var mapO in mapObjs)
         {
@@ -536,7 +553,7 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
 
             var beaconCoords = _xformSystem.ToMapCoordinates(EntManager.GetCoordinates(beacon.Coordinates));
             var position = Vector2.Transform(beaconCoords.Position, mapTransform);
-            var localPos = ScalePosition(position with {Y = -position.Y});
+            var localPos = ScalePosition(position with { Y = -position.Y });
 
             // If beacon not on screen then ignore it.
             if (!area.Contains(localPos.Floored()))
@@ -572,11 +589,16 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
         return mapObj;
     }
 
-    private bool TryGetBeacon(IEnumerable<IMapObject> mapObjects, Matrix3x2 mapTransform, Vector2 mousePos, UIBox2i area, out ShuttleBeaconObject foundBeacon, out Vector2 foundLocalPos)
+    private bool TryGetBeacon(IEnumerable<IMapObject> mapObjects,
+        Matrix3x2 mapTransform,
+        Vector2 mousePos,
+        UIBox2i area,
+        out ShuttleBeaconObject foundBeacon,
+        out Vector2 foundLocalPos)
     {
         // In pixels
         const float BeaconSnapRange = 32f;
-        float nearestValue = float.MaxValue;
+        var nearestValue = float.MaxValue;
         foundLocalPos = Vector2.Zero;
         foundBeacon = default;
 
@@ -595,7 +617,7 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
                 continue;
 
             var position = Vector2.Transform(beaconCoords.Position, mapTransform);
-            var localPos = ScalePosition(position with {Y = -position.Y});
+            var localPos = ScalePosition(position with { Y = -position.Y });
 
             // If beacon not on screen then ignore it.
             if (!area.Contains(localPos.Floored()))
@@ -605,9 +627,7 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
 
             if (distance > BeaconSnapRange * UIScale ||
                 distance > nearestValue)
-            {
                 continue;
-            }
 
             foundLocalPos = localPos;
             nearestValue = distance;
@@ -625,8 +645,6 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
         _mapObjects.Clear();
 
         if (mapObjects.TryGetValue(ViewingMap, out var obbies))
-        {
             _mapObjects.AddRange(obbies);
-        }
     }
 }

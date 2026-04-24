@@ -22,28 +22,6 @@ namespace Content.Client.Replay.Spectator;
 // a consistent view/camera can be maintained when jumping around in time.
 public sealed partial class ReplaySpectatorSystem
 {
-    /// <summary>
-    /// Simple struct containing position & rotation data for maintaining a persistent view when jumping around in time.
-    /// </summary>
-    public struct SpectatorData
-    {
-        // TODO REPLAYS handle ghost-following.
-
-        /// <summary>
-        /// The current entity being spectated.
-        /// </summary>
-        public EntityUid Entity;
-
-        /// <summary>
-        /// The player that was originally controlling <see cref="Entity"/>
-        /// </summary>
-        public NetUserId Controller;
-
-        public (EntityCoordinates Coords, Angle Rot)? Local;
-        public (EntityCoordinates Coords, Angle Rot)? World;
-        public (EntityUid? Ent, Angle Rot)? Eye;
-    }
-
     public SpectatorData GetSpectatorData()
     {
         var data = new SpectatorData();
@@ -57,7 +35,7 @@ public sealed partial class ReplaySpectatorSystem
 
         data.Local = (xform.Coordinates, xform.LocalRotation);
         var (pos, rot) = _transform.GetWorldPositionRotation(player);
-        data.World = (new(xform.MapUid.Value, pos), rot);
+        data.World = (new EntityCoordinates(xform.MapUid.Value, pos), rot);
 
         if (TryComp(player, out InputMoverComponent? mover))
             data.Eye = (mover.RelativeEntity, mover.TargetRelativeRotation);
@@ -67,10 +45,7 @@ public sealed partial class ReplaySpectatorSystem
         return data;
     }
 
-    private void OnBeforeSetTick()
-    {
-        _spectatorData = GetSpectatorData();
-    }
+    private void OnBeforeSetTick() => _spectatorData = GetSpectatorData();
 
     private void OnAfterSetTick()
     {
@@ -89,7 +64,7 @@ public sealed partial class ReplaySpectatorSystem
         if (_player.LocalUser != DefaultUser)
             return; // Already spectating some session.
 
-        if (_player.LocalEntity is not {} uid)
+        if (_player.LocalEntity is not { } uid)
             return;
 
         var netEnt = GetNetEntity(uid);
@@ -187,7 +162,7 @@ public sealed partial class ReplaySpectatorSystem
                 continue;
 
             if (!station && stationFound)
-               continue;
+                continue;
 
             maxUid = (uid, grid);
             maxSize = size;
@@ -239,5 +214,27 @@ public sealed partial class ReplaySpectatorSystem
             QueueDel(uid);
         else
             RemCompDeferred(uid, component);
+    }
+
+    /// <summary>
+    /// Simple struct containing position & rotation data for maintaining a persistent view when jumping around in time.
+    /// </summary>
+    public struct SpectatorData
+    {
+        // TODO REPLAYS handle ghost-following.
+
+        /// <summary>
+        /// The current entity being spectated.
+        /// </summary>
+        public EntityUid Entity;
+
+        /// <summary>
+        /// The player that was originally controlling <see cref="Entity" />
+        /// </summary>
+        public NetUserId Controller;
+
+        public (EntityCoordinates Coords, Angle Rot)? Local;
+        public (EntityCoordinates Coords, Angle Rot)? World;
+        public (EntityUid? Ent, Angle Rot)? Eye;
     }
 }

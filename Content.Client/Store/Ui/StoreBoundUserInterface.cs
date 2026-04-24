@@ -18,10 +18,10 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Store;
-using JetBrains.Annotations;
 using System.Linq;
+using Content.Shared.Store;
 using Content.Shared.Store.Components;
+using JetBrains.Annotations;
 using Robust.Client.UserInterface;
 using Robust.Shared.Prototypes;
 
@@ -32,16 +32,16 @@ namespace Content.Client.Store.Ui;
 [UsedImplicitly]
 public sealed class StoreBoundUserInterface : BoundUserInterface
 {
-    private IPrototypeManager _prototypeManager = default!;
+    private readonly IPrototypeManager _prototypeManager = default!;
+
+    [ViewVariables]
+    private HashSet<ListingData> _listings = new();
 
     [ViewVariables]
     private StoreMenu? _menu;
 
     [ViewVariables]
     private string _search = string.Empty;
-
-    [ViewVariables]
-    private HashSet<ListingData> _listings = new();
 
     public StoreBoundUserInterface(EntityUid owner, Enum uiKey) : base(owner, uiKey)
     {
@@ -77,11 +77,12 @@ public sealed class StoreBoundUserInterface : BoundUserInterface
             UpdateListingsWithSearchFilter();
         };
 
-        _menu.OnRefundAttempt += (_) =>
+        _menu.OnRefundAttempt += _ =>
         {
             SendMessage(new StoreRequestRefundMessage());
         };
     }
+
     protected override void UpdateState(BoundUserInterfaceState state)
     {
         base.UpdateState(state);
@@ -108,9 +109,17 @@ public sealed class StoreBoundUserInterface : BoundUserInterface
         var filteredListings = new HashSet<ListingData>(_listings);
         if (!string.IsNullOrEmpty(_search))
         {
-            filteredListings.RemoveWhere(listingData => !ListingLocalisationHelpers.GetLocalisedNameOrEntityName(listingData, _prototypeManager).Trim().ToLowerInvariant().Contains(_search) &&
-                                                        !ListingLocalisationHelpers.GetLocalisedDescriptionOrEntityDescription(listingData, _prototypeManager).Trim().ToLowerInvariant().Contains(_search));
+            filteredListings.RemoveWhere(listingData =>
+                !ListingLocalisationHelpers.GetLocalisedNameOrEntityName(listingData, _prototypeManager)
+                    .Trim()
+                    .ToLowerInvariant()
+                    .Contains(_search) &&
+                !ListingLocalisationHelpers.GetLocalisedDescriptionOrEntityDescription(listingData, _prototypeManager)
+                    .Trim()
+                    .ToLowerInvariant()
+                    .Contains(_search));
         }
+
         _menu.PopulateStoreCategoryButtons(filteredListings);
         _menu.UpdateListing(filteredListings.ToList());
     }

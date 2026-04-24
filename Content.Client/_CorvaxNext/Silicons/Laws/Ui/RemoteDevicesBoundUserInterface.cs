@@ -12,8 +12,8 @@ namespace Content.Client._CorvaxNext.Silicons.Laws.Ui;
 
 public sealed class RemoteDevicesBoundUserInterface : BoundUserInterface
 {
+    private readonly EntityUid _owner;
     private RemoteDevicesMenu? _menu;
-    private EntityUid _owner;
 
     public RemoteDevicesBoundUserInterface(EntityUid owner, Enum uiKey) : base(owner, uiKey)
     {
@@ -38,8 +38,5 @@ public sealed class RemoteDevicesBoundUserInterface : BoundUserInterface
         _menu?.Update(_owner, msg);
     }
 
-    public void SendAction(RemoteDeviceActionEvent action)
-    {
-        SendMessage(new RemoteDeviceActionMessage(action));
-    }
+    public void SendAction(RemoteDeviceActionEvent action) => SendMessage(new RemoteDeviceActionMessage(action));
 }

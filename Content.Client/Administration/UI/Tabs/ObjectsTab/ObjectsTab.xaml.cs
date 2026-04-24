@@ -120,17 +120,16 @@ namespace Content.Client.Administration.UI.Tabs.ObjectsTab;
 public sealed partial class ObjectsTab : Control
 {
     [Dependency] private readonly IClientAdminManager _admin = default!;
-    [Dependency] private readonly IEntityManager _entityManager = default!;
-    [Dependency] private readonly IClientConsoleHost _console = default!;
 
     private readonly Color _altColor = Color.FromHex("#292B38");
+    [Dependency] private readonly IClientConsoleHost _console = default!;
     private readonly Color _defaultColor = Color.FromHex("#2F2F3B");
+    [Dependency] private readonly IEntityManager _entityManager = default!;
+
+    private readonly List<ObjectsTabSelection> _selections = [];
 
     private bool _ascending;
     private ObjectsTabHeader.Header _headerClicked = ObjectsTabHeader.Header.ObjectName;
-
-    private readonly List<ObjectsTabSelection> _selections = [];
-    public event Action<GUIBoundKeyEventArgs, ListData>? OnEntryKeyBindDown;
 
     public ObjectsTab()
     {
@@ -157,24 +156,17 @@ public sealed partial class ObjectsTab : Control
         RefreshListButton.OnPressed += _ => RefreshObjectList();
 
         var defaultSelection = ObjectsTabSelection.Grids;
-        ObjectTypeOptions.SelectId((int)defaultSelection);
+        ObjectTypeOptions.SelectId((int) defaultSelection);
         RefreshObjectList(defaultSelection);
     }
 
-    private void TeleportTo(NetEntity nent)
-    {
-        _console.ExecuteCommand($"tpto {nent}");
-    }
+    public event Action<GUIBoundKeyEventArgs, ListData>? OnEntryKeyBindDown;
 
-    private void Delete(NetEntity nent)
-    {
-        _console.ExecuteCommand($"delete {nent}");
-    }
+    private void TeleportTo(NetEntity nent) => _console.ExecuteCommand($"tpto {nent}");
 
-    public void RefreshObjectList()
-    {
-        RefreshObjectList(_selections[ObjectTypeOptions.SelectedId]);
-    }
+    private void Delete(NetEntity nent) => _console.ExecuteCommand($"delete {nent}");
+
+    public void RefreshObjectList() => RefreshObjectList(_selections[ObjectTypeOptions.SelectedId]);
 
     private void RefreshObjectList(ObjectsTabSelection selection)
     {
@@ -234,7 +226,10 @@ public sealed partial class ObjectsTab : Control
         if (data is not ObjectsListData { Info: var info, BackgroundColor: var backgroundColor })
             return;
 
-        var entry = new ObjectsTabEntry(_admin, info.Name, info.Entity, new StyleBoxFlat { BackgroundColor = backgroundColor });
+        var entry = new ObjectsTabEntry(_admin,
+            info.Name,
+            info.Entity,
+            new StyleBoxFlat { BackgroundColor = backgroundColor });
         entry.OnTeleport += TeleportTo;
         entry.OnDelete += Delete;
         button.ToolTip = $"{info.Name}, {info.Entity}";
@@ -254,22 +249,18 @@ public sealed partial class ObjectsTab : Control
         return filteringString.Contains(filter, StringComparison.CurrentCultureIgnoreCase);
     }
 
-    private object GetComparableValue((string Name, NetEntity Entity) entity, ObjectsTabHeader.Header header)
-    {
-        return header switch
+    private object GetComparableValue((string Name, NetEntity Entity) entity, ObjectsTabHeader.Header header) =>
+        header switch
         {
             ObjectsTabHeader.Header.ObjectName => entity.Name,
             ObjectsTabHeader.Header.EntityID => entity.Entity.ToString(),
             _ => entity.Name,
         };
-    }
 
     private void HeaderClicked(ObjectsTabHeader.Header header)
     {
         if (_headerClicked == header)
-        {
             _ascending = !_ascending;
-        }
         else
         {
             _headerClicked = header;
@@ -280,16 +271,14 @@ public sealed partial class ObjectsTab : Control
         RefreshObjectList();
     }
 
-    private string GetLocalizedEnumValue(ObjectsTabSelection selection)
-    {
-        return selection switch
+    private string GetLocalizedEnumValue(ObjectsTabSelection selection) =>
+        selection switch
         {
             ObjectsTabSelection.Grids => Loc.GetString("object-tab-object-type-grids"),
             ObjectsTabSelection.Maps => Loc.GetString("object-tab-object-type-maps"),
             ObjectsTabSelection.Stations => Loc.GetString("object-tab-object-type-stations"),
             _ => throw new ArgumentOutOfRangeException(nameof(selection), selection, null),
         };
-    }
 
     private enum ObjectsTabSelection
     {

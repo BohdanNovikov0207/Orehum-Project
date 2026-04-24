@@ -40,9 +40,7 @@ public sealed class CharacterInfoSystem : EntitySystem
     {
         var entity = _players.LocalEntity;
         if (entity == null)
-        {
             return;
-        }
 
         RaiseNetworkEvent(new RequestCharacterInfoEvent(GetNetEntity(entity.Value)));
     }

@@ -16,9 +16,20 @@ namespace Content.Client.Info.PlaytimeStats;
 [GenerateTypedNameReferences]
 public sealed partial class PlaytimeStatsHeader : Control
 {
-    public event Action<Header, SortDirection>? OnHeaderClicked;
-    private SortDirection _roleDirection = SortDirection.Ascending;
+    public enum Header : byte
+    {
+        Role,
+        Playtime,
+    }
+
+    public enum SortDirection : byte
+    {
+        Ascending,
+        Descending,
+    }
+
     private SortDirection _playtimeDirection = SortDirection.Descending;
+    private SortDirection _roleDirection = SortDirection.Ascending;
 
     public PlaytimeStatsHeader()
     {
@@ -30,31 +41,24 @@ public sealed partial class PlaytimeStatsHeader : Control
         UpdateLabels();
     }
 
-    public enum Header : byte
-    {
-        Role,
-        Playtime
-    }
-    public enum SortDirection : byte
-    {
-        Ascending,
-        Descending
-    }
+    public event Action<Header, SortDirection>? OnHeaderClicked;
 
     private void HeaderClicked(GUIBoundKeyEventArgs args, Header header)
     {
         if (args.Function != EngineKeyFunctions.UIClick)
-        {
             return;
-        }
 
         switch (header)
         {
             case Header.Role:
-                _roleDirection = _roleDirection == SortDirection.Ascending ? SortDirection.Descending : SortDirection.Ascending;
+                _roleDirection = _roleDirection == SortDirection.Ascending
+                    ? SortDirection.Descending
+                    : SortDirection.Ascending;
                 break;
             case Header.Playtime:
-                _playtimeDirection = _playtimeDirection == SortDirection.Ascending ? SortDirection.Descending : SortDirection.Ascending;
+                _playtimeDirection = _playtimeDirection == SortDirection.Ascending
+                    ? SortDirection.Descending
+                    : SortDirection.Ascending;
                 break;
         }
 
@@ -62,6 +66,7 @@ public sealed partial class PlaytimeStatsHeader : Control
         OnHeaderClicked?.Invoke(header, header == Header.Role ? _roleDirection : _playtimeDirection);
         args.Handle();
     }
+
     private void UpdateLabels()
     {
         RoleLabel.Text = Loc.GetString("ui-playtime-header-role-type") +
@@ -70,15 +75,9 @@ public sealed partial class PlaytimeStatsHeader : Control
                              (_playtimeDirection == SortDirection.Ascending ? " ↓" : " ↑");
     }
 
-    private void RoleClicked(GUIBoundKeyEventArgs args)
-    {
-        HeaderClicked(args, Header.Role);
-    }
+    private void RoleClicked(GUIBoundKeyEventArgs args) => HeaderClicked(args, Header.Role);
 
-    private void PlaytimeClicked(GUIBoundKeyEventArgs args)
-    {
-        HeaderClicked(args, Header.Playtime);
-    }
+    private void PlaytimeClicked(GUIBoundKeyEventArgs args) => HeaderClicked(args, Header.Playtime);
 
     protected override void Dispose(bool disposing)
     {

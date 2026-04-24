@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using Content.Client.UserInterface.Controls;
 using Content.Shared._Shitcode.Heretic.Components;
@@ -7,10 +6,6 @@ using Robust.Client.GameObjects;
 using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.XAML;
 using Robust.Shared.Prototypes;
-using Robust.Shared.Serialization.Markdown.Mapping;
-using Robust.Shared.Serialization.Markdown.Sequence;
-using Robust.Shared.Serialization.Markdown.Value;
-using Robust.Shared.Utility;
 
 namespace Content.Client._Shitcode.Heretic.UI;
 
@@ -21,16 +16,16 @@ public sealed class HereticShapeshiftRadialMenu : RadialMenu
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     private readonly SpriteSystem _spriteSystem;
 
-    public event Action<ProtoId<PolymorphPrototype>>? SendHereticShapeshiftMessageAction;
-
-    public EntityUid Entity { get; set; }
-
     public HereticShapeshiftRadialMenu()
     {
         IoCManager.InjectDependencies(this);
         RobustXamlLoader.Load(this);
         _spriteSystem = _entitySystem.GetEntitySystem<SpriteSystem>();
     }
+
+    public EntityUid Entity { get; set; }
+
+    public event Action<ProtoId<PolymorphPrototype>>? SendHereticShapeshiftMessageAction;
 
     public void SetEntity(EntityUid uid)
     {
@@ -63,7 +58,7 @@ public sealed class HereticShapeshiftRadialMenu : RadialMenu
             {
                 SetSize = new Vector2(64, 64),
                 ToolTip = ent.Name,
-                ProtoId = polymorph
+                ProtoId = polymorph,
             };
 
             var texture = new TextureRect
@@ -71,7 +66,7 @@ public sealed class HereticShapeshiftRadialMenu : RadialMenu
                 VerticalAlignment = VAlignment.Center,
                 HorizontalAlignment = HAlignment.Center,
                 Texture = _spriteSystem.Frame0(ent),
-                TextureScale = new Vector2(2f, 2f)
+                TextureScale = new Vector2(2f, 2f),
             };
 
             button.AddChild(texture);

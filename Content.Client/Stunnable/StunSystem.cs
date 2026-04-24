@@ -20,9 +20,9 @@ public sealed class StunSystem : SharedStunSystem
 {
     [Dependency] private readonly SharedCombatModeSystem _combat = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly SpriteSystem _spriteSystem = default!;
 
     private readonly int[] _sign = [-1, 1];
+    [Dependency] private readonly SpriteSystem _spriteSystem = default!;
 
     public override void Initialize()
     {
@@ -32,13 +32,15 @@ public sealed class StunSystem : SharedStunSystem
         SubscribeLocalEvent<StunVisualsComponent, AppearanceChangeEvent>(OnAppearanceChanged);
 
         CommandBinds.Builder
-            .BindAfter(EngineKeyFunctions.UseSecondary, new PointerInputCmdHandler(OnUseSecondary, true, true), typeof(SharedInteractionSystem))
+            .BindAfter(EngineKeyFunctions.UseSecondary,
+                new PointerInputCmdHandler(OnUseSecondary, true, true),
+                typeof(SharedInteractionSystem))
             .Register<StunSystem>();
     }
 
     private bool OnUseSecondary(in PointerInputCmdHandler.PointerInputCmdArgs args)
     {
-        if (args.Session?.AttachedEntity is not {Valid: true} uid)
+        if (args.Session?.AttachedEntity is not { Valid: true } uid)
             return false;
 
         if (args.EntityUid != uid || !HasComp<KnockedDownComponent>(uid) || !_combat.IsInCombatMode(uid))
@@ -49,7 +51,7 @@ public sealed class StunSystem : SharedStunSystem
     }
 
     /// <summary>
-    ///     Add stun visual layers
+    /// Add stun visual layers
     /// </summary>
     private void OnComponentInit(Entity<StunVisualsComponent> entity, ref ComponentInit args)
     {
@@ -155,21 +157,19 @@ public sealed class StunSystem : SharedStunSystem
 
             // For the first half of the jitter, we vertically displace the sprite upwards to simulate breathing in
             if (i <= jitters / 2)
-            {
                 keyFrames.Add(new AnimationTrackProperty.KeyFrame(startOffset + breaths * i + offset, frames));
-            }
             // For the next quarter we displace the sprite down, to about 12.5% breathing offset below our starting position
             // Simulates breathing out
             else if (i < jitters * 3 / 4)
             {
                 keyFrames.Add(
-                    new AnimationTrackProperty.KeyFrame(startOffset + breaths * ( jitters - i * 1.5f ) + offset, frames));
+                    new AnimationTrackProperty.KeyFrame(startOffset + breaths * (jitters - i * 1.5f) + offset, frames));
             }
             // Return to our starting position for breathing, jitter reaches its final position
             else
             {
                 keyFrames.Add(
-                    new AnimationTrackProperty.KeyFrame(startOffset + breaths * ( i - jitters ) + offset, frames));
+                    new AnimationTrackProperty.KeyFrame(startOffset + breaths * (i - jitters) + offset, frames));
             }
         }
 
@@ -186,7 +186,7 @@ public sealed class StunSystem : SharedStunSystem
                     InterpolationMode = AnimationInterpolationMode.Cubic,
                     KeyFrames = keyFrames,
                 },
-            }
+            },
         };
     }
 }

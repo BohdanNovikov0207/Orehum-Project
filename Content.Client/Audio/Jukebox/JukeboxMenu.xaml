@@ -8,17 +8,17 @@ SPDX-License-Identifier: MIT
 <ui:FancyWindow xmlns="https://spacestation14.io" xmlns:ui="clr-namespace:Content.Client.UserInterface.Controls"
                 SetSize="400 500" Title="{Loc 'jukebox-menu-title'}">
     <BoxContainer Margin="4 0" Orientation="Vertical">
-        <LineEdit Name="SearchBar" PlaceHolder="{Loc 'jukebox-search-placeholder'}" HorizontalExpand="True"  Margin ="4 4"/>
+        <LineEdit Name="SearchBar" PlaceHolder="{Loc 'jukebox-search-placeholder'}" HorizontalExpand="True"
+                  Margin="4 4" />
         <ItemList Name="MusicList" SelectMode="Button" Margin="3 3 3 3"
-        HorizontalExpand="True" VerticalExpand="True" SizeFlagsStretchRatio="8"/>
+                  HorizontalExpand="True" VerticalExpand="True" SizeFlagsStretchRatio="8" />
         <BoxContainer Orientation="Vertical">
             <Label Name="SongSelected" Text="{Loc 'jukebox-menu-selectedsong'}" />
             <BoxContainer
                 Orientation="Horizontal"
                 HorizontalExpand="True"
                 VerticalExpand="False"
-                SizeFlagsStretchRatio="1"
-            >
+                SizeFlagsStretchRatio="1">
                 <Label Name="SongName" Text="---" />
                 <Label Name="DurationLabel" Text="00:00 / 00:00" HorizontalAlignment="Right" HorizontalExpand="True" />
             </BoxContainer>
@@ -28,8 +28,7 @@ SPDX-License-Identifier: MIT
                 Orientation="Horizontal"
                 HorizontalExpand="True"
                 VerticalExpand="False"
-                SizeFlagsStretchRatio="1"
-            >
+                SizeFlagsStretchRatio="1">
                 <Label Name="VolumeLabel" Text="{Loc 'jukebox-menu-volume'} " />
                 <Slider Name="VolumeSlider" HorizontalExpand="True" />
             </BoxContainer>
@@ -40,8 +39,7 @@ SPDX-License-Identifier: MIT
                 Orientation="Horizontal"
                 HorizontalExpand="True"
                 VerticalExpand="False"
-                SizeFlagsStretchRatio="1"
-            >
+                SizeFlagsStretchRatio="1">
                 <Button Name="PlayButton" Text="{Loc 'jukebox-menu-buttonplay'}" />
                 <Button Name="StopButton" Text="{Loc 'jukebox-menu-buttonstop'}" />
                 <Button Name="LoopButton" Text="{Loc 'jukebox-menu-buttonloop-off'}" />

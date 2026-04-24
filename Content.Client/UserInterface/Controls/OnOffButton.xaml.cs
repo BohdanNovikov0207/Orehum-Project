@@ -11,6 +11,18 @@ namespace Content.Client.UserInterface.Controls;
 [GenerateTypedNameReferences]
 public sealed partial class OnOffButton : Control
 {
+    public OnOffButton()
+    {
+        RobustXamlLoader.Load(this);
+
+        var group = new ButtonGroup(false);
+        OffButton.Group = group;
+        OnButton.Group = group;
+
+        OffButton.OnPressed += _ => StateChanged?.Invoke(false);
+        OnButton.OnPressed += _ => StateChanged?.Invoke(true);
+    }
+
     /// <summary>
     /// Whether the control is currently in the "on" state.
     /// </summary>
@@ -30,19 +42,7 @@ public sealed partial class OnOffButton : Control
     /// Raised when the user changes the state of the control.
     /// </summary>
     /// <remarks>
-    /// This does not get raised if state is changed with <see cref="set_IsOn"/>.
+    /// This does not get raised if state is changed with <see cref="set_IsOn" />.
     /// </remarks>
     public event Action<bool>? StateChanged;
-
-    public OnOffButton()
-    {
-        RobustXamlLoader.Load(this);
-
-        var group = new ButtonGroup(isNoneSetAllowed: false);
-        OffButton.Group = group;
-        OnButton.Group = group;
-
-        OffButton.OnPressed += _ => StateChanged?.Invoke(false);
-        OnButton.OnPressed += _ => StateChanged?.Invoke(true);
-    }
 }

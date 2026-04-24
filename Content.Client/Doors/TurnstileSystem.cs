@@ -9,15 +9,14 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Client.Doors;
 
-/// <inheritdoc/>
+/// <inheritdoc />
 public sealed class TurnstileSystem : SharedTurnstileSystem
 {
-    [Dependency] private readonly AnimationPlayerSystem _animationPlayer = default!;
-    [Dependency] private readonly SpriteSystem _sprite = default!;
+    private const string AnimationKey = "Turnstile";
 
     private static readonly EntProtoId ExamineArrow = "TurnstileArrow";
-
-    private const string AnimationKey = "Turnstile";
+    [Dependency] private readonly AnimationPlayerSystem _animationPlayer = default!;
+    [Dependency] private readonly SpriteSystem _sprite = default!;
 
     public override void Initialize()
     {
@@ -34,17 +33,18 @@ public sealed class TurnstileSystem : SharedTurnstileSystem
 
         if (!TryComp<SpriteComponent>(ent, out var sprite))
             return;
-        _sprite.LayerSetRsiState((ent.Owner, sprite), TurnstileVisualLayers.Base, new RSI.StateId(ent.Comp.DefaultState));
+        _sprite.LayerSetRsiState((ent.Owner, sprite),
+            TurnstileVisualLayers.Base,
+            new RSI.StateId(ent.Comp.DefaultState));
     }
 
-    private void OnExamined(Entity<TurnstileComponent> ent, ref ExaminedEvent args)
-    {
+    private void OnExamined(Entity<TurnstileComponent> ent, ref ExaminedEvent args) =>
         Spawn(ExamineArrow, new EntityCoordinates(ent, 0, 0));
-    }
 
     protected override void PlayAnimation(EntityUid uid, string stateId)
     {
-        if (!TryComp<AnimationPlayerComponent>(uid, out var animation) || !TryComp<SpriteComponent>(uid, out var sprite))
+        if (!TryComp<AnimationPlayerComponent>(uid, out var animation) ||
+            !TryComp<SpriteComponent>(uid, out var sprite))
             return;
         var ent = (uid, animation);
 

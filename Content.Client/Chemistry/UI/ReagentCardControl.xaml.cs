@@ -15,9 +15,8 @@ namespace Content.Client.Chemistry.UI;
 [GenerateTypedNameReferences]
 public sealed partial class ReagentCardControl : Control
 {
-    public ItemStorageLocation StorageLocation { get; }
-    public Action<ItemStorageLocation>? OnPressed;
     public Action<ItemStorageLocation>? OnEjectButtonPressed;
+    public Action<ItemStorageLocation>? OnPressed;
 
     public ReagentCardControl(ReagentInventoryItem item)
     {
@@ -26,7 +25,8 @@ public sealed partial class ReagentCardControl : Control
         StorageLocation = item.StorageLocation;
         ColorPanel.PanelOverride = new StyleBoxFlat { BackgroundColor = item.ReagentColor };
         ReagentNameLabel.Text = item.ReagentLabel;
-        FillLabel.Text = Loc.GetString("reagent-dispenser-window-quantity-label-text", ("quantity", item.Quantity));;
+        FillLabel.Text = Loc.GetString("reagent-dispenser-window-quantity-label-text", ("quantity", item.Quantity));
+        ;
         EjectButtonIcon.Text = Loc.GetString("reagent-dispenser-window-eject-container-button");
 
         if (item.Quantity == 0.0)
@@ -35,4 +35,6 @@ public sealed partial class ReagentCardControl : Control
         MainButton.OnPressed += args => OnPressed?.Invoke(StorageLocation);
         EjectButton.OnPressed += args => OnEjectButtonPressed?.Invoke(StorageLocation);
     }
+
+    public ItemStorageLocation StorageLocation { get; }
 }

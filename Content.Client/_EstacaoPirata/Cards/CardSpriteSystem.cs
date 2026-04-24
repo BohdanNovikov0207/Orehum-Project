@@ -16,10 +16,9 @@ namespace Content.Client._EstacaoPirata.Cards;
 /// </summary>
 public sealed class CardSpriteSystem : EntitySystem
 {
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
-
     }
 
     public bool TryAdjustLayerQuantity(Entity<SpriteComponent, CardStackComponent> uid, int? cardLimit = null)
@@ -38,6 +37,7 @@ public sealed class CardSpriteSystem : EntitySystem
 
             layerCount += cardSprite.AllLayers.Count();
         }
+
         layerCount = int.Max(1, layerCount); // Frontier: you need one layer.
         //inserts Missing Layers
         if (sprite.AllLayers.Count() < layerCount)
@@ -60,7 +60,9 @@ public sealed class CardSpriteSystem : EntitySystem
         return true;
     }
 
-    public bool TryHandleLayerConfiguration(Entity<SpriteComponent, CardStackComponent> uid, int cardCount, Func<Entity<SpriteComponent>, int, int, bool> layerFunc)
+    public bool TryHandleLayerConfiguration(Entity<SpriteComponent, CardStackComponent> uid,
+        int cardCount,
+        Func<Entity<SpriteComponent>, int, int, bool> layerFunc)
     {
         var sprite = uid.Comp1;
         var stack = uid.Comp2;

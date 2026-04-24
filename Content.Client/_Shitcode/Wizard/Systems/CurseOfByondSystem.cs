@@ -9,12 +9,13 @@ using Content.Shared._Goobstation.Wizard.Components;
 using Robust.Shared;
 using Robust.Shared.Configuration;
 using Robust.Shared.Player;
+
 namespace Content.Client._Goobstation.Wizard.Systems;
 
 public sealed class CurseOfByondSystem : EntitySystem
 {
-    [Dependency] private readonly ISharedPlayerManager _player = default!;
     [Dependency] private readonly IConfigurationManager _cfg = default!;
+    [Dependency] private readonly ISharedPlayerManager _player = default!;
     public bool InitPredict;
 
     public override void Initialize()
@@ -39,13 +40,9 @@ public sealed class CurseOfByondSystem : EntitySystem
             _cfg.SetCVar(CVars.NetPredict, InitPredict);
     }
 
-    private void OnDetached(EntityUid uid, CurseOfByondComponent component, LocalPlayerDetachedEvent args)
-    {
+    private void OnDetached(EntityUid uid, CurseOfByondComponent component, LocalPlayerDetachedEvent args) =>
         _cfg.SetCVar(CVars.NetPredict, InitPredict);
-    }
 
-    private void OnAttached(EntityUid uid, CurseOfByondComponent component, LocalPlayerAttachedEvent args)
-    {
+    private void OnAttached(EntityUid uid, CurseOfByondComponent component, LocalPlayerAttachedEvent args) =>
         _cfg.SetCVar(CVars.NetPredict, false);
-    }
 }

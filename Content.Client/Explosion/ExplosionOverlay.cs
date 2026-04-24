@@ -96,16 +96,14 @@ namespace Content.Client.Explosion;
 public sealed class ExplosionOverlay : Overlay
 {
     private static readonly ProtoId<ShaderPrototype> UnshadedShader = "unshaded";
-
-    [Dependency] private readonly IRobustRandom _robustRandom = default!;
+    private readonly SharedAppearanceSystem _appearance;
     [Dependency] private readonly IEntityManager _entMan = default!;
     [Dependency] private readonly IPrototypeManager _proto = default!;
+
+    [Dependency] private readonly IRobustRandom _robustRandom = default!;
+
+    private readonly ShaderInstance _shader;
     private readonly SharedTransformSystem _transformSystem;
-    private SharedAppearanceSystem _appearance;
-
-    public override OverlaySpace Space => OverlaySpace.WorldSpaceBelowFOV;
-
-    private ShaderInstance _shader;
 
     public ExplosionOverlay(SharedAppearanceSystem appearanceSystem)
     {
@@ -114,6 +112,8 @@ public sealed class ExplosionOverlay : Overlay
         _transformSystem = _entMan.System<SharedTransformSystem>();
         _appearance = appearanceSystem;
     }
+
+    public override OverlaySpace Space => OverlaySpace.WorldSpaceBelowFOV;
 
     protected override void Draw(in OverlayDrawArgs args)
     {
@@ -154,7 +154,8 @@ public sealed class ExplosionOverlay : Overlay
                 continue;
 
             var xform = xforms.GetComponent(gridId);
-            var (_, _, worldMatrix, invWorldMatrix) = _transformSystem.GetWorldPositionRotationMatrixWithInv(xform, xforms);
+            var (_, _, worldMatrix, invWorldMatrix) =
+                _transformSystem.GetWorldPositionRotationMatrixWithInv(xform, xforms);
 
             gridBounds = invWorldMatrix.TransformBox(worldBounds).Enlarged(grid.TileSize * 2);
             drawHandle.SetTransform(worldMatrix);
@@ -186,7 +187,8 @@ public sealed class ExplosionOverlay : Overlay
             if (!tileSets.TryGetValue(j, out var tiles))
                 continue;
 
-            var frameIndex = (int) Math.Min(visuals.Intensity[j] / textures.IntensityPerState, textures.FireFrames.Count - 1);
+            var frameIndex = (int) Math.Min(visuals.Intensity[j] / textures.IntensityPerState,
+                textures.FireFrames.Count - 1);
             var frames = textures.FireFrames[frameIndex];
 
             foreach (var tile in tiles)
@@ -197,7 +199,9 @@ public sealed class ExplosionOverlay : Overlay
                     continue;
 
                 var texture = _robustRandom.Pick(frames);
-                drawHandle.DrawTextureRect(texture, Box2.CenteredAround(centre, new Vector2(tileSize, tileSize)), textures.FireColor);
+                drawHandle.DrawTextureRect(texture,
+                    Box2.CenteredAround(centre, new Vector2(tileSize, tileSize)),
+                    textures.FireColor);
             }
         }
     }

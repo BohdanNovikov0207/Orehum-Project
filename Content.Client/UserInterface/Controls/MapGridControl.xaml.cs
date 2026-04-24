@@ -23,69 +23,49 @@ namespace Content.Client.UserInterface.Controls;
 [Virtual]
 public partial class MapGridControl : LayoutContainer
 {
-    [Dependency] protected readonly IEntityManager EntManager = default!;
-    [Dependency] protected readonly IGameTiming Timing = default!;
-
-    protected static readonly Color BackingColor = new Color(0.08f, 0.08f, 0.08f);
-
-    private Font _largerFont;
-
-    /* Dragging */
-    protected virtual bool Draggable { get; } = false;
-
-    /// <summary>
-    /// Control offset from whatever is being tracked.
-    /// </summary>
-    public Vector2 Offset;
-
-    /// <summary>
-    /// If the control is being recentered what is the target offset to reach.
-    /// </summary>
-    public Vector2 TargetOffset;
-
-    private bool _draggin;
-    protected Vector2 StartDragPosition;
-    protected bool Recentering;
-
     protected const float ScrollSensitivity = 8f;
-
-    protected float RecenterMinimum = 0.05f;
 
     /// <summary>
     /// UI pixel radius.
     /// </summary>
     public const int UIDisplayRadius = 320;
+
     protected const int MinimapMargin = 4;
 
-    protected float WorldMinRange;
-    protected float WorldMaxRange;
-    public float WorldRange;
-    public Vector2 WorldRangeVector => new Vector2(WorldRange, WorldRange);
+    protected static readonly Color BackingColor = new(0.08f, 0.08f, 0.08f);
+
+    private readonly Font _largerFont;
+    [Dependency] protected readonly IEntityManager EntManager = default!;
+    [Dependency] protected readonly IGameTiming Timing = default!;
+
+    private bool _draggin;
 
     /// <summary>
     /// We'll lerp between the radarrange and actual range
     /// </summary>
     protected float ActualRadarRange;
 
-    protected float CornerRadarRange => MathF.Sqrt(ActualRadarRange * ActualRadarRange + ActualRadarRange * ActualRadarRange) * 1.1f;
+    /// <summary>
+    /// Control offset from whatever is being tracked.
+    /// </summary>
+    public Vector2 Offset;
+
+    protected bool Recentering;
+
+    protected float RecenterMinimum = 0.05f;
+    protected Vector2 StartDragPosition;
 
     /// <summary>
-    /// Controls the maximum distance that will display.
+    /// If the control is being recentered what is the target offset to reach.
     /// </summary>
-    public float MaxRadarRange { get; private set; } = 256f * 10f;
+    public Vector2 TargetOffset;
 
-    public Vector2 MaxRadarRangeVector => new Vector2(MaxRadarRange, MaxRadarRange);
+    protected float WorldMaxRange;
 
-    protected Vector2 MidPointVector => new Vector2(MidPoint, MidPoint);
+    protected float WorldMinRange;
+    public float WorldRange;
 
-    protected int MidPoint => SizeFull / 2;
-    protected int SizeFull => (int) ((UIDisplayRadius + MinimapMargin) * 2 * UIScale);
-    protected int ScaledMinimapRadius => (int) (UIDisplayRadius * UIScale);
-    protected float MinimapScale => WorldRange != 0 ? ScaledMinimapRadius / WorldRange : 0f;
-
-    public event Action<float>? WorldRangeChanged;
-
-    public MapGridControl() : this(32f, 32f, 32f) {}
+    public MapGridControl() : this(32f, 32f, 32f) { }
 
     public MapGridControl(float minRange, float maxRange, float range)
     {
@@ -104,10 +84,30 @@ public partial class MapGridControl : LayoutContainer
         _largerFont = new VectorFont(cache.GetResource<FontResource>("/EngineFonts/NotoSans/NotoSans-Regular.ttf"), 16);
     }
 
-    public void ForceRecenter()
-    {
-        Recentering = true;
-    }
+    /* Dragging */
+    protected virtual bool Draggable { get; } = false;
+    public Vector2 WorldRangeVector => new(WorldRange, WorldRange);
+
+    protected float CornerRadarRange =>
+        MathF.Sqrt(ActualRadarRange * ActualRadarRange + ActualRadarRange * ActualRadarRange) * 1.1f;
+
+    /// <summary>
+    /// Controls the maximum distance that will display.
+    /// </summary>
+    public float MaxRadarRange { get; } = 256f * 10f;
+
+    public Vector2 MaxRadarRangeVector => new(MaxRadarRange, MaxRadarRange);
+
+    protected Vector2 MidPointVector => new(MidPoint, MidPoint);
+
+    protected int MidPoint => SizeFull / 2;
+    protected int SizeFull => (int) ((UIDisplayRadius + MinimapMargin) * 2 * UIScale);
+    protected int ScaledMinimapRadius => (int) (UIDisplayRadius * UIScale);
+    protected float MinimapScale => WorldRange != 0 ? ScaledMinimapRadius / WorldRange : 0f;
+
+    public event Action<float>? WorldRangeChanged;
+
+    public void ForceRecenter() => Recentering = true;
 
     protected override void KeyBindDown(GUIBoundKeyEventArgs args)
     {
@@ -149,23 +149,16 @@ public partial class MapGridControl : LayoutContainer
         AddRadarRange(-args.Delta.Y * 1f / ScrollSensitivity * ActualRadarRange);
     }
 
-    public void AddRadarRange(float value)
-    {
+    public void AddRadarRange(float value) =>
         ActualRadarRange = Math.Clamp(ActualRadarRange + value, WorldMinRange, WorldMaxRange);
-    }
 
     /// <summary>
     /// Converts map coordinates to the local control.
     /// </summary>
-    protected Vector2 ScalePosition(Vector2 value)
-    {
-        return ScalePosition(value, MinimapScale, MidPointVector);
-    }
+    protected Vector2 ScalePosition(Vector2 value) => ScalePosition(value, MinimapScale, MidPointVector);
 
-    protected static Vector2 ScalePosition(Vector2 value, float minimapScale, Vector2 midpointVector)
-    {
-        return value * minimapScale + midpointVector;
-    }
+    protected static Vector2 ScalePosition(Vector2 value, float minimapScale, Vector2 midpointVector) =>
+        value * minimapScale + midpointVector;
 
     /// <summary>
     /// Converts local coordinates on the control to map coordinates.
@@ -242,7 +235,9 @@ public partial class MapGridControl : LayoutContainer
             var diff = ActualRadarRange - WorldRange;
             const float lerpRate = 10f;
 
-            WorldRange += (float) Math.Clamp(diff, -lerpRate * MathF.Abs(diff) * Timing.FrameTime.TotalSeconds, lerpRate * MathF.Abs(diff) * Timing.FrameTime.TotalSeconds);
+            WorldRange += (float) Math.Clamp(diff,
+                -lerpRate * MathF.Abs(diff) * Timing.FrameTime.TotalSeconds,
+                lerpRate * MathF.Abs(diff) * Timing.FrameTime.TotalSeconds);
             WorldRangeChanged?.Invoke(WorldRange);
         }
     }

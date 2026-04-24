@@ -9,5 +9,4 @@ namespace Content.Client.Parallax;
 
 public sealed class BiomeSystem : SharedBiomeSystem
 {
-
 }

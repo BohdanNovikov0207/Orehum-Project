@@ -17,12 +17,12 @@ public sealed partial class StampLabel : Label
 {
     private static readonly ProtoId<ShaderPrototype> PaperStamp = "PaperStamp";
 
+    /// Shader used to draw the stamps
+    private readonly ShaderInstance? _stampShader;
+
     /// A scale that's applied to the text to ensure it
     /// fits in the allowed space.
     private Vector2 _textScaling = Vector2.One;
-
-    /// Shader used to draw the stamps
-    private ShaderInstance? _stampShader;
 
     /// Allows an additional orientation to be applied to
     /// this control.
@@ -49,7 +49,7 @@ public sealed partial class StampLabel : Label
     protected override void Draw(DrawingHandleScreen handle)
     {
         var offset = new Vector2(PixelPosition.X * MathF.Cos(Orientation) - PixelPosition.Y * MathF.Sin(Orientation),
-                PixelPosition.Y * MathF.Cos(Orientation) + PixelPosition.X * MathF.Sin(Orientation));
+            PixelPosition.Y * MathF.Cos(Orientation) + PixelPosition.X * MathF.Sin(Orientation));
 
         _stampShader?.SetParameter("objCoord", GlobalPosition * UIScale * new Vector2(1, -1));
         handle.UseShader(_stampShader);

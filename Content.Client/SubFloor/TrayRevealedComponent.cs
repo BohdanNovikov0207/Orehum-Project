@@ -12,5 +12,4 @@ namespace Content.Client.SubFloor;
 [RegisterComponent]
 public sealed partial class TrayRevealedComponent : Component
 {
-
 }

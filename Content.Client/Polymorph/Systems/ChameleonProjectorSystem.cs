@@ -63,8 +63,6 @@ public sealed class ChameleonProjectorSystem : SharedChameleonProjectorSystem
             _sprite.SetVisible((ent.Owner, sprite), ent.Comp.WasVisible);
     }
 
-    private void OnGetFlashEffectTargetEvent(Entity<ChameleonDisguisedComponent> ent, ref GetFlashEffectTargetEvent args)
-    {
-        args.Target = ent.Comp.Disguise;
-    }
+    private void OnGetFlashEffectTargetEvent(Entity<ChameleonDisguisedComponent> ent,
+        ref GetFlashEffectTargetEvent args) => args.Target = ent.Comp.Disguise;
 }

@@ -17,19 +17,24 @@ namespace Content.Client.PDA;
 [GenerateTypedNameReferences]
 public sealed partial class PdaNavigationButton : ContainerButton
 {
-
-    private bool _isCurrent;
-    private bool _isActive = true;
-
-    private Thickness _borderThickness = new(0, 0, 0, 2);
-    private Thickness _currentTabBorderThickness = new(2, 0, 2, 0);
-
     private readonly StyleBoxFlat _styleBox = new()
     {
         BackgroundColor = Color.FromHex("#202023"),
         BorderColor = Color.FromHex("#5a5a5a"),
-        BorderThickness = new Thickness(0, 0, 0, 2)
+        BorderThickness = new Thickness(0, 0, 0, 2),
     };
+
+    private Thickness _borderThickness = new(0, 0, 0, 2);
+    private Thickness _currentTabBorderThickness = new(2, 0, 2, 0);
+    private bool _isActive = true;
+
+    private bool _isCurrent;
+
+    public PdaNavigationButton()
+    {
+        RobustXamlLoader.Load(this);
+        Background.PanelOverride = _styleBox;
+    }
 
     public string InactiveBgColor { get; set; } = "#202023";
     public string ActiveBgColor { get; set; } = "#25252a";
@@ -106,11 +111,5 @@ public sealed partial class PdaNavigationButton : ContainerButton
             Icon.Modulate = Color.FromHex(value ? ActiveFgColor : InactiveFgColor);
             Label.FontColorOverride = Color.FromHex(value ? ActiveFgColor : InactiveFgColor);
         }
-    }
-
-    public PdaNavigationButton()
-    {
-        RobustXamlLoader.Load(this);
-        Background.PanelOverride = _styleBox;
     }
 }

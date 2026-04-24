@@ -20,10 +20,10 @@ namespace Content.Client.Info.PlaytimeStats;
 [GenerateTypedNameReferences]
 public sealed partial class PlaytimeStatsWindow : FancyWindow
 {
-    [Dependency] private readonly JobRequirementsManager _jobRequirementsManager = default!;
-    private ISawmill _sawmill = Logger.GetSawmill("PlaytimeStatsWindow");
     private readonly Color _altColor = Color.FromHex("#292B38");
     private readonly Color _defaultColor = Color.FromHex("#2F2F3B");
+    [Dependency] private readonly JobRequirementsManager _jobRequirementsManager = default!;
+    private readonly ISawmill _sawmill = Logger.GetSawmill("PlaytimeStatsWindow");
     private bool _useAltColor;
 
     public PlaytimeStatsWindow()
@@ -67,7 +67,7 @@ public sealed partial class PlaytimeStatsWindow : FancyWindow
         if (header != null)
             RolesPlaytimeList.AddChild(header);
 
-        var sortedEntries = (direction == PlaytimeStatsHeader.SortDirection.Ascending)
+        var sortedEntries = direction == PlaytimeStatsHeader.SortDirection.Ascending
             ? entries.OrderBy(entry => entry.RoleText).ToList()
             : entries.OrderByDescending(entry => entry.RoleText).ToList();
 
@@ -93,7 +93,7 @@ public sealed partial class PlaytimeStatsWindow : FancyWindow
         if (header != null)
             RolesPlaytimeList.AddChild(header);
 
-        var sortedEntries = (direction == PlaytimeStatsHeader.SortDirection.Ascending)
+        var sortedEntries = direction == PlaytimeStatsHeader.SortDirection.Ascending
             ? entries.OrderBy(entry => entry.Playtime).ToList()
             : entries.OrderByDescending(entry => entry.Playtime).ToList();
 
@@ -132,14 +132,13 @@ public sealed partial class PlaytimeStatsWindow : FancyWindow
     {
         if (TimeSpan.TryParse(playtimeString, out var playtime))
         {
-            var entry = new PlaytimeStatsEntry(role, playtime,
+            var entry = new PlaytimeStatsEntry(role,
+                playtime,
                 new StyleBoxFlat(_useAltColor ? _altColor : _defaultColor));
             RolesPlaytimeList.AddChild(entry);
             _useAltColor ^= true;
         }
         else
-        {
             _sawmill.Error($"The provided playtime string '{playtimeString}' is not in the correct format.");
-        }
     }
 }

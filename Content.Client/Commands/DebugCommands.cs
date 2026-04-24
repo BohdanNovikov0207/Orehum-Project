@@ -31,10 +31,8 @@ internal sealed class ShowMarkersCommand : LocalizedEntityCommands
 
     public override string Command => "showmarkers";
 
-    public override void Execute(IConsoleShell shell, string argStr, string[] args)
-    {
+    public override void Execute(IConsoleShell shell, string argStr, string[] args) =>
         _markerSystem.MarkersVisible ^= true;
-    }
 }
 
 internal sealed class ShowSubFloor : LocalizedEntityCommands
@@ -43,10 +41,7 @@ internal sealed class ShowSubFloor : LocalizedEntityCommands
 
     public override string Command => "showsubfloor";
 
-    public override void Execute(IConsoleShell shell, string argStr, string[] args)
-    {
-        _subfloorSystem.ShowAll ^= true;
-    }
+    public override void Execute(IConsoleShell shell, string argStr, string[] args) => _subfloorSystem.ShowAll ^= true;
 }
 
 internal sealed class NotifyCommand : LocalizedEntityCommands
@@ -55,8 +50,6 @@ internal sealed class NotifyCommand : LocalizedEntityCommands
 
     public override string Command => "notify";
 
-    public override void Execute(IConsoleShell shell, string argStr, string[] args)
-    {
+    public override void Execute(IConsoleShell shell, string argStr, string[] args) =>
         _popupSystem.PopupCursor(args[0]);
-    }
 }

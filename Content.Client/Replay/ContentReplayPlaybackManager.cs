@@ -10,6 +10,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.IO.Compression;
 using Content.Client.Administration.Managers;
 using Content.Client.Launcher;
 using Content.Client.MainMenu;
@@ -47,19 +48,21 @@ namespace Content.Client.Replay;
 
 public sealed class ContentReplayPlaybackManager
 {
-    [Dependency] private readonly IStateManager _stateMan = default!;
-    [Dependency] private readonly IClientGameTiming _timing = default!;
-    [Dependency] private readonly IReplayLoadManager _loadMan = default!;
+    [Dependency] private readonly IClientAdminManager _adminMan = default!;
+    [Dependency] private readonly IConfigurationManager _cfg = default!;
+    [Dependency] private readonly IBaseClient _client = default!;
+    [Dependency] private readonly IClientConGroupController _conGrp = default!;
     [Dependency] private readonly IGameController _controller = default!;
     [Dependency] private readonly IClientEntityManager _entMan = default!;
-    [Dependency] private readonly IUserInterfaceManager _uiMan = default!;
+    [Dependency] private readonly IReplayLoadManager _loadMan = default!;
     [Dependency] private readonly IReplayPlaybackManager _playback = default!;
-    [Dependency] private readonly IClientConGroupController _conGrp = default!;
-    [Dependency] private readonly IClientAdminManager _adminMan = default!;
     [Dependency] private readonly IPlayerManager _player = default!;
-    [Dependency] private readonly IBaseClient _client = default!;
-    [Dependency] private readonly IConfigurationManager _cfg = default!;
     [Dependency] private readonly IResourceManager _resMan = default!;
+    [Dependency] private readonly IStateManager _stateMan = default!;
+    [Dependency] private readonly IClientGameTiming _timing = default!;
+    [Dependency] private readonly IUserInterfaceManager _uiMan = default!;
+
+    private bool _initialized;
 
     /// <summary>
     /// UI state to return to when stopping a replay or loading fails.
@@ -68,12 +71,10 @@ public sealed class ContentReplayPlaybackManager
 
     public bool IsScreenshotMode = false;
 
-    private bool _initialized;
-
     /// <summary>
     /// Most recently loaded file, for re-attempting the load with error tolerance.
     /// Required because the zip reader auto-disposes and I'm too lazy to change it so that
-    /// <see cref="ReplayFileReaderZip"/> can re-open it.
+    /// <see cref="ReplayFileReaderZip" /> can re-open it.
     /// </summary>
     public (ResPath? Zip, ResPath Folder)? LastLoad;
 
@@ -119,7 +120,7 @@ public sealed class ContentReplayPlaybackManager
 
                 IReplayFileReader reader = last.Zip == null
                     ? new ReplayFileReaderResources(_resMan, last.Folder)
-                    : new ReplayFileReaderZip(new(_resMan.UserData.OpenRead(last.Zip.Value)), last.Folder);
+                    : new ReplayFileReaderZip(new ZipArchive(_resMan.UserData.OpenRead(last.Zip.Value)), last.Folder);
 
                 _loadMan.LoadAndStartReplay(reader);
             };
@@ -184,7 +185,7 @@ public sealed class ContentReplayPlaybackManager
                     _entMan.System<ReplaySpectatorSystem>().SetSpectatorPosition(default);
                 return true;
             case ChatMessage chat:
-                _uiMan.GetUIController<ChatUIController>().ProcessChatMessage(chat, speechBubble: !skipEffects);
+                _uiMan.GetUIController<ChatUIController>().ProcessChatMessage(chat, !skipEffects);
                 return true;
         }
 
@@ -215,10 +216,8 @@ public sealed class ContentReplayPlaybackManager
         return false;
     }
 
-    private void OnReplayPlaybackStarted(MappingDataNode metadata, List<object> objects)
-    {
+    private void OnReplayPlaybackStarted(MappingDataNode metadata, List<object> objects) =>
         _conGrp.Implementation = new ReplayConGroup();
-    }
 
     private void OnReplayPlaybackStopped()
     {

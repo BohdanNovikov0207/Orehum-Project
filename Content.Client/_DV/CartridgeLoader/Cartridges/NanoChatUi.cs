@@ -9,8 +9,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Client.UserInterface.Fragments;
-using Content.Shared.CartridgeLoader;
 using Content.Shared._DV.CartridgeLoader.Cartridges;
+using Content.Shared.CartridgeLoader;
 using Robust.Client.UserInterface;
 
 namespace Content.Client._DV.CartridgeLoader.Cartridges;
@@ -19,10 +19,7 @@ public sealed partial class NanoChatUi : UIFragment
 {
     private NanoChatUiFragment? _fragment;
 
-    public override Control GetUIFragmentRoot()
-    {
-        return _fragment!;
-    }
+    public override Control GetUIFragmentRoot() => _fragment!;
 
     public override void Setup(BoundUserInterface userInterface, EntityUid? fragmentOwner)
     {

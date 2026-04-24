@@ -51,6 +51,7 @@ namespace Content.Client.StationRecords;
 public sealed partial class GeneralRecord : Control
 {
     public Action<uint>? OnDeletePressed;
+
     public GeneralRecord(GeneralStationRecord record, bool canDelete, uint? id)
     {
         RobustXamlLoader.Load(this);
@@ -66,7 +67,7 @@ public sealed partial class GeneralRecord : Control
         Dna.Text = Loc.GetString("general-station-record-console-record-dna",
             ("dna", record.DNA ?? Loc.GetString("generic-not-available-shorthand")));
 
-        if (canDelete && id != null )
+        if (canDelete && id != null)
         {
             DeleteButton.Visible = true;
             DeleteButton.OnPressed += _ => OnDeletePressed?.Invoke(id.Value);

@@ -7,13 +7,12 @@ using Robust.Client.Graphics;
 
 namespace Content.Client._ES.Blinking;
 
-/// <inheritdoc/>
+/// <inheritdoc />
 public sealed class ESBlinkingSystem : ESSharedBlinkingSystem
 {
+    private const string AnimationKey = "anim-blink";
     [Dependency] private readonly AnimationPlayerSystem _animationPlayer = default!;
     [Dependency] private readonly SpriteSystem _sprite = default!;
-
-    private const string AnimationKey = "anim-blink";
 
     public override void Initialize()
     {
@@ -55,8 +54,8 @@ public sealed class ESBlinkingSystem : ESSharedBlinkingSystem
                     {
                         new AnimationTrackSpriteFlick.KeyFrame(new RSI.StateId("no_eyes"), 0f),
                         new AnimationTrackSpriteFlick.KeyFrame(layer.State, 0.10f),
-                    }
-                }
+                    },
+                },
             },
         };
 

@@ -7,11 +7,11 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Linq;
 using Content.Shared.Damage.Prototypes;
 using Content.Shared.Overlays;
 using Robust.Shared.Console;
 using Robust.Shared.Prototypes;
-using System.Linq;
 
 namespace Content.Client.Commands;
 

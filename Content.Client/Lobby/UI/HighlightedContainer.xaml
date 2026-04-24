@@ -13,6 +13,6 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                                ContentMarginTopOverride="10"
                                ContentMarginBottomOverride="10"
                                ContentMarginLeftOverride="10"
-                               ContentMarginRightOverride="10"/>
+                               ContentMarginRightOverride="10" />
     </PanelContainer.PanelOverride>
 </PanelContainer>

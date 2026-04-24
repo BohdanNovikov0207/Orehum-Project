@@ -41,9 +41,7 @@ public sealed partial class PanicBunkerTab : Control
         if (string.IsNullOrWhiteSpace(text) ||
             text == _minAccountAge ||
             !int.TryParse(text, out var minutes))
-        {
             return;
-        }
 
         _console.ExecuteCommand($"panicbunker_min_account_age {minutes}");
     }
@@ -53,9 +51,7 @@ public sealed partial class PanicBunkerTab : Control
         if (string.IsNullOrWhiteSpace(text) ||
             text == _minOverallMinutes ||
             !int.TryParse(text, out var minutes))
-        {
             return;
-        }
 
         _console.ExecuteCommand($"panicbunker_min_overall_minutes {minutes}");
     }

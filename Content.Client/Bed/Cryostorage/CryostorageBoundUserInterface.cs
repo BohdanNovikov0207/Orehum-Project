@@ -28,12 +28,15 @@ public sealed class CryostorageBoundUserInterface : BoundUserInterface
 
         _menu.SlotRemoveButtonPressed += (ent, slot) =>
         {
-            SendMessage(new CryostorageRemoveItemBuiMessage(ent, slot, CryostorageRemoveItemBuiMessage.RemovalType.Inventory));
+            SendMessage(new CryostorageRemoveItemBuiMessage(ent,
+                slot,
+                CryostorageRemoveItemBuiMessage.RemovalType.Inventory));
         };
 
         _menu.HandRemoveButtonPressed += (ent, hand) =>
         {
-            SendMessage(new CryostorageRemoveItemBuiMessage(ent, hand, CryostorageRemoveItemBuiMessage.RemovalType.Hand));
+            SendMessage(
+                new CryostorageRemoveItemBuiMessage(ent, hand, CryostorageRemoveItemBuiMessage.RemovalType.Hand));
         };
     }
 

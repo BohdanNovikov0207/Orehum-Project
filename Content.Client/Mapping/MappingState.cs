@@ -112,42 +112,45 @@ namespace Content.Client.Mapping;
 
 public sealed class MappingState : GameplayStateBase
 {
+    // TODO this doesn't handle pressing down multiple state hotkeys at the moment
+    public enum CursorState
+    {
+        None,
+        Pick,
+        Delete,
+    }
+
     [Dependency] private readonly IClientAdminManager _admin = default!;
+    private readonly List<MappingPrototype> _allPrototypes = new();
+    private readonly Dictionary<IPrototype, MappingPrototype> _allPrototypesDict = new();
     [Dependency] private readonly IEntityManager _entityManager = default!;
     [Dependency] private readonly IEntityNetworkManager _entityNetwork = default!;
+    private readonly Dictionary<Type, Dictionary<string, MappingPrototype>> _idDict = new();
     [Dependency] private readonly IInputManager _input = default!;
+    private readonly GameplayStateLoadController _loadController;
     [Dependency] private readonly ILogManager _log = default!;
     [Dependency] private readonly IMapManager _mapMan = default!;
     [Dependency] private readonly MappingManager _mapping = default!;
     [Dependency] private readonly IOverlayManager _overlays = default!;
     [Dependency] private readonly IPlacementManager _placement = default!;
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    private readonly List<MappingPrototype> _prototypes = new();
     [Dependency] private readonly IResourceCache _resources = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-
-    private EntityMenuUIController _entityMenuController = default!;
-
-    private DecalPlacementSystem _decal = default!;
-    private SpriteSystem _sprite = default!;
-    private TransformSystem _transform = default!;
-    private VerbSystem _verbs = default!;
 
     private readonly ISawmill _sawmill;
-    private readonly GameplayStateLoadController _loadController;
-    private bool _setup;
-    private readonly List<MappingPrototype> _allPrototypes = new();
-    private readonly Dictionary<IPrototype, MappingPrototype> _allPrototypesDict = new();
-    private readonly Dictionary<Type, Dictionary<string, MappingPrototype>> _idDict = new();
-    private readonly List<MappingPrototype> _prototypes = new();
+    [Dependency] private readonly IGameTiming _timing = default!;
+
+    private DecalPlacementSystem _decal = default!;
+
+    private EntityMenuUIController _entityMenuController = default!;
     private (TimeSpan At, MappingSpawnButton Button)? _lastClicked;
     private Control? _scrollTo;
-    private bool _updatePlacement;
+    private bool _setup;
+    private SpriteSystem _sprite = default!;
+    private TransformSystem _transform = default!;
     private bool _updateEraseDecal;
-
-    private MappingScreen Screen => (MappingScreen) UserInterfaceManager.ActiveScreen!;
-    private MainViewport Viewport => UserInterfaceManager.ActiveScreen!.GetWidget<MainViewport>()!;
-
-    public CursorState State { get; set; }
+    private bool _updatePlacement;
+    private VerbSystem _verbs = default!;
 
     public MappingState()
     {
@@ -156,6 +159,11 @@ public sealed class MappingState : GameplayStateBase
         _sawmill = _log.GetSawmill("mapping");
         _loadController = UserInterfaceManager.GetUIController<GameplayStateLoadController>();
     }
+
+    private MappingScreen Screen => (MappingScreen) UserInterfaceManager.ActiveScreen!;
+    private MainViewport Viewport => UserInterfaceManager.ActiveScreen!.GetWidget<MainViewport>()!;
+
+    public CursorState State { get; set; }
 
     protected override void Startup()
     {
@@ -191,14 +199,20 @@ public sealed class MappingState : GameplayStateBase
         _placement.PlacementChanged += OnPlacementChanged;
 
         CommandBinds.Builder
-            .Bind(ContentKeyFunctions.MappingUnselect, new PointerInputCmdHandler(HandleMappingUnselect, outsidePrediction: true))
+            .Bind(ContentKeyFunctions.MappingUnselect,
+                new PointerInputCmdHandler(HandleMappingUnselect, outsidePrediction: true))
             .Bind(ContentKeyFunctions.SaveMap, new PointerInputCmdHandler(HandleSaveMap, outsidePrediction: true))
-            .Bind(ContentKeyFunctions.MappingEnablePick, new PointerStateInputCmdHandler(HandleEnablePick, HandleDisablePick, outsidePrediction: true))
-            .Bind(ContentKeyFunctions.MappingEnableDelete, new PointerStateInputCmdHandler(HandleEnableDelete, HandleDisableDelete, outsidePrediction: true))
+            .Bind(ContentKeyFunctions.MappingEnablePick,
+                new PointerStateInputCmdHandler(HandleEnablePick, HandleDisablePick, true))
+            .Bind(ContentKeyFunctions.MappingEnableDelete,
+                new PointerStateInputCmdHandler(HandleEnableDelete, HandleDisableDelete, true))
             .Bind(ContentKeyFunctions.MappingPick, new PointerInputCmdHandler(HandlePick, outsidePrediction: true))
-            .Bind(ContentKeyFunctions.MappingRemoveDecal, new PointerInputCmdHandler(HandleEditorCancelPlace, outsidePrediction: true))
-            .Bind(ContentKeyFunctions.MappingCancelEraseDecal, new PointerInputCmdHandler(HandleCancelEraseDecal, outsidePrediction: true))
-            .Bind(ContentKeyFunctions.MappingOpenContextMenu, new PointerInputCmdHandler(HandleOpenContextMenu, outsidePrediction: true))
+            .Bind(ContentKeyFunctions.MappingRemoveDecal,
+                new PointerInputCmdHandler(HandleEditorCancelPlace, outsidePrediction: true))
+            .Bind(ContentKeyFunctions.MappingCancelEraseDecal,
+                new PointerInputCmdHandler(HandleCancelEraseDecal, outsidePrediction: true))
+            .Bind(ContentKeyFunctions.MappingOpenContextMenu,
+                new PointerInputCmdHandler(HandleOpenContextMenu, outsidePrediction: true))
             .Register<MappingState>();
 
         _overlays.AddOverlay(new MappingOverlay(this));
@@ -213,9 +227,7 @@ public sealed class MappingState : GameplayStateBase
         if (!obj.WasModified<EntityPrototype>() &&
             !obj.WasModified<ContentTileDefinition>() &&
             !obj.WasModified<DecalPrototype>())
-        {
             return;
-        }
 
         ReloadPrototypes();
     }
@@ -287,7 +299,8 @@ public sealed class MappingState : GameplayStateBase
 
     private void ReloadPrototypes()
     {
-        var entities = new MappingPrototype(null, Loc.GetString("mapping-entities")) { Children = new List<MappingPrototype>() };
+        var entities = new MappingPrototype(null, Loc.GetString("mapping-entities"))
+            { Children = new List<MappingPrototype>() };
         _prototypes.Add(entities);
 
         var mappings = new Dictionary<string, MappingPrototype>();
@@ -299,7 +312,8 @@ public sealed class MappingState : GameplayStateBase
         Sort(mappings, entities);
         mappings.Clear();
 
-        var tiles = new MappingPrototype(null, Loc.GetString("mapping-tiles")) { Children = new List<MappingPrototype>() };
+        var tiles = new MappingPrototype(null, Loc.GetString("mapping-tiles"))
+            { Children = new List<MappingPrototype>() };
         _prototypes.Add(tiles);
 
         foreach (var tile in _prototypeManager.EnumeratePrototypes<ContentTileDefinition>())
@@ -310,7 +324,8 @@ public sealed class MappingState : GameplayStateBase
         Sort(mappings, tiles);
         mappings.Clear();
 
-        var decals = new MappingPrototype(null, Loc.GetString("mapping-decals")) { Children = new List<MappingPrototype>() };
+        var decals = new MappingPrototype(null, Loc.GetString("mapping-decals"))
+            { Children = new List<MappingPrototype>() };
         _prototypes.Add(decals);
 
         foreach (var decal in _prototypeManager.EnumeratePrototypes<DecalPrototype>())
@@ -346,7 +361,8 @@ public sealed class MappingState : GameplayStateBase
         topLevel.Children.Sort(Compare);
     }
 
-    private MappingPrototype? Register<T>(T? prototype, string id, MappingPrototype topLevel) where T : class, IPrototype, IInheritingPrototype
+    private MappingPrototype? Register<T>(T? prototype, string id, MappingPrototype topLevel)
+        where T : class, IPrototype, IInheritingPrototype
     {
         {
             if (prototype == null &&
@@ -368,25 +384,36 @@ public sealed class MappingState : GameplayStateBase
 
             var ids = _idDict.GetOrNew(typeof(T));
             if (ids.TryGetValue(id, out var mapping))
-            {
                 return mapping;
-            }
-            else
+
+            var name = node.TryGet("name", out ValueDataNode? nameNode)
+                ? nameNode.Value
+                : id;
+
+            if (node.TryGet("suffix", out ValueDataNode? suffix))
+                name = $"{name} [{suffix.Value}]";
+
+            mapping = new MappingPrototype(prototype, name);
+            _allPrototypes.Add(mapping);
+            ids.Add(id, mapping);
+
+            if (node.TryGet("parent", out ValueDataNode? parentValue))
             {
-                var name = node.TryGet("name", out ValueDataNode? nameNode)
-                    ? nameNode.Value
-                    : id;
+                var parent = Register<T>(null, parentValue.Value, topLevel);
 
-                if (node.TryGet("suffix", out ValueDataNode? suffix))
-                    name = $"{name} [{suffix.Value}]";
-
-                mapping = new MappingPrototype(prototype, name);
-                _allPrototypes.Add(mapping);
-                ids.Add(id, mapping);
-
-                if (node.TryGet("parent", out ValueDataNode? parentValue))
+                if (parent != null)
                 {
-                    var parent = Register<T>(null, parentValue.Value, topLevel);
+                    mapping.Parents ??= new List<MappingPrototype>();
+                    mapping.Parents.Add(parent);
+                    parent.Children ??= new List<MappingPrototype>();
+                    parent.Children.Add(mapping);
+                }
+            }
+            else if (node.TryGet("parent", out SequenceDataNode? parentSequence))
+            {
+                foreach (var parentNode in parentSequence.Cast<ValueDataNode>())
+                {
+                    var parent = Register<T>(null, parentNode.Value, topLevel);
 
                     if (parent != null)
                     {
@@ -396,52 +423,33 @@ public sealed class MappingState : GameplayStateBase
                         parent.Children.Add(mapping);
                     }
                 }
-                else if (node.TryGet("parent", out SequenceDataNode? parentSequence))
-                {
-                    foreach (var parentNode in parentSequence.Cast<ValueDataNode>())
-                    {
-                        var parent = Register<T>(null, parentNode.Value, topLevel);
-
-                        if (parent != null)
-                        {
-                            mapping.Parents ??= new List<MappingPrototype>();
-                            mapping.Parents.Add(parent);
-                            parent.Children ??= new List<MappingPrototype>();
-                            parent.Children.Add(mapping);
-                        }
-                    }
-                }
-                else
-                {
-                    topLevel.Children ??= new List<MappingPrototype>();
-                    topLevel.Children.Add(mapping);
-                    mapping.Parents ??= new List<MappingPrototype>();
-                    mapping.Parents.Add(topLevel);
-                }
-
-                return mapping;
             }
+            else
+            {
+                topLevel.Children ??= new List<MappingPrototype>();
+                topLevel.Children.Add(mapping);
+                mapping.Parents ??= new List<MappingPrototype>();
+                mapping.Parents.Add(topLevel);
+            }
+
+            return mapping;
         }
         else
         {
             var ids = _idDict.GetOrNew(typeof(T));
             if (ids.TryGetValue(id, out var mapping))
-            {
                 return mapping;
-            }
-            else
-            {
-                var entity = prototype as EntityPrototype;
-                var name = entity?.Name ?? prototype.ID;
 
-                if (!string.IsNullOrWhiteSpace(entity?.EditorSuffix))
-                    name = $"{name} [{entity.EditorSuffix}]";
+            var entity = prototype as EntityPrototype;
+            var name = entity?.Name ?? prototype.ID;
 
-                mapping = new MappingPrototype(prototype, name);
-                _allPrototypes.Add(mapping);
-                _allPrototypesDict.Add(prototype, mapping);
-                ids.Add(prototype.ID, mapping);
-            }
+            if (!string.IsNullOrWhiteSpace(entity?.EditorSuffix))
+                name = $"{name} [{entity.EditorSuffix}]";
+
+            mapping = new MappingPrototype(prototype, name);
+            _allPrototypes.Add(mapping);
+            _allPrototypesDict.Add(prototype, mapping);
+            ids.Add(prototype.ID, mapping);
 
             if (prototype.Parents == null)
             {
@@ -469,10 +477,7 @@ public sealed class MappingState : GameplayStateBase
         }
     }
 
-    private void OnPlacementChanged(object? sender, EventArgs e)
-    {
-        _updatePlacement = true;
-    }
+    private void OnPlacementChanged(object? sender, EventArgs e) => _updatePlacement = true;
 
     protected override void OnKeyBindStateChanged(ViewportBoundKeyEventArgs args)
     {
@@ -616,9 +621,7 @@ public sealed class MappingState : GameplayStateBase
 
         if (Screen.Prototypes.Selected is { } oldButton &&
             oldButton != button)
-        {
             Deselect();
-        }
 
         Screen.EntityContainer.Visible = false;
         Screen.DecalContainer.Visible = false;
@@ -633,7 +636,7 @@ public sealed class MappingState : GameplayStateBase
                 {
                     PlacementOption = placementId > 0 ? EntitySpawnWindow.InitOpts[placementId] : entity.PlacementMode,
                     EntityType = entity.ID,
-                    IsTile = false
+                    IsTile = false,
                 };
 
                 Screen.EntityContainer.Visible = true;
@@ -654,7 +657,7 @@ public sealed class MappingState : GameplayStateBase
                 {
                     PlacementOption = "AlignTileAny",
                     TileType = tile.TileId,
-                    IsTile = true
+                    IsTile = true,
                 };
 
                 _decal.SetActive(false);
@@ -685,21 +688,14 @@ public sealed class MappingState : GameplayStateBase
             }
 
             if (selected.Prototype?.Prototype is EntityPrototype)
-            {
                 _placement.Clear();
-            }
 
             if (selected.Prototype?.Prototype is ContentTileDefinition)
-            {
                 _placement.Clear();
-            }
         }
     }
 
-    private void OnCollapseToggled(MappingSpawnButton button, ButtonToggledEventArgs args)
-    {
-        ToggleCollapse(button);
-    }
+    private void OnCollapseToggled(MappingSpawnButton button, ButtonToggledEventArgs args) => ToggleCollapse(button);
 
     private void OnPickPressed(ButtonEventArgs args)
     {
@@ -717,10 +713,7 @@ public sealed class MappingState : GameplayStateBase
             DisableDelete();
     }
 
-    private void OnEntityReplacePressed(ButtonToggledEventArgs args)
-    {
-        _placement.Replacement = args.Pressed;
-    }
+    private void OnEntityReplacePressed(ButtonToggledEventArgs args) => _placement.Replacement = args.Pressed;
 
     private void OnEntityPlacementSelected(ItemSelectedEventArgs args)
     {
@@ -868,7 +861,8 @@ public sealed class MappingState : GameplayStateBase
 
             if (_mapMan.TryFindGridAt(mapPos, out var gridUid, out var grid) &&
                 _entityManager.System<SharedMapSystem>().TryGetTileRef(gridUid, grid, coords, out var tileRef) &&
-                _allPrototypesDict.TryGetValue(_entityManager.System<TurfSystem>().GetContentTileDefinition(tileRef), out button))
+                _allPrototypesDict.TryGetValue(_entityManager.System<TurfSystem>().GetContentTileDefinition(tileRef),
+                    out button))
             {
                 OnSelected(button);
                 return true;
@@ -915,10 +909,7 @@ public sealed class MappingState : GameplayStateBase
         return true;
     }
 
-    private async void SaveMap()
-    {
-        await _mapping.SaveMap();
-    }
+    private async void SaveMap() => await _mapping.SaveMap();
 
     private void ToggleCollapse(MappingSpawnButton button)
     {
@@ -964,9 +955,7 @@ public sealed class MappingState : GameplayStateBase
     {
         if (UserInterfaceManager.CurrentlyHovered is not IViewportControl viewport ||
             _input.MouseScreenPosition is not { IsValid: true } position)
-        {
             return null;
-        }
 
         var mapPos = viewport.PixelToMap(position.Position);
         return GetClickedEntity(mapPos);
@@ -998,14 +987,5 @@ public sealed class MappingState : GameplayStateBase
             scroll.SetScrollValue(scroll.GetScrollValue() + new Vector2(0, y));
             _scrollTo = null;
         }
-    }
-
-
-    // TODO this doesn't handle pressing down multiple state hotkeys at the moment
-    public enum CursorState
-    {
-        None,
-        Pick,
-        Delete
     }
 }

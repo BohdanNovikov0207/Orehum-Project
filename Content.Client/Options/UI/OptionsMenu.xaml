@@ -16,9 +16,9 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
 <DefaultWindow xmlns="https://spacestation14.io"
-            xmlns:tabs="clr-namespace:Content.Client.Options.UI.Tabs"
-            Title="{Loc 'ui-options-title'}"
-            MinSize="800 450">
+               xmlns:tabs="clr-namespace:Content.Client.Options.UI.Tabs"
+               Title="{Loc 'ui-options-title'}"
+               MinSize="800 450">
     <TabContainer Name="Tabs" Access="Public">
         <tabs:MiscTab Name="MiscTab" />
         <tabs:GraphicsTab Name="GraphicsTab" />

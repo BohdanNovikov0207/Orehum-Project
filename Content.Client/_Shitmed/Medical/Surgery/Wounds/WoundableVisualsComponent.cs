@@ -9,29 +9,17 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared._Shitmed.Medical.Surgery.Wounds;
-using Content.Shared.Damage.Prototypes;
 using Content.Goobstation.Maths.FixedPoint;
+using Content.Shared._Shitmed.Medical.Surgery.Wounds;
 using Content.Shared.Humanoid;
-using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype.Dictionary;
-using Robust.Shared.Serialization.TypeSerializers.Implementations.Generic;
 
 namespace Content.Client._Shitmed.Medical.Surgery.Wounds;
 
-[RegisterComponent, AutoGenerateComponentState(raiseAfterAutoHandleState: true)]
+[RegisterComponent] [AutoGenerateComponentState(true)]
 public sealed partial class WoundableVisualsComponent : Component
 {
-    [DataField(required: true)]
-    public HumanoidVisualLayers OccupiedLayer;
-
-    [DataField]
-    public Dictionary<string, WoundVisualizerSprite>? DamageOverlayGroups = new();
-
     [DataField]
     public string? BleedingOverlay;
-
-    [DataField(required: true)]
-    public List<FixedPoint2> Thresholds = [];
 
     [DataField]
     public Dictionary<BleedingSeverity, FixedPoint2> BleedingThresholds = new()
@@ -39,15 +27,24 @@ public sealed partial class WoundableVisualsComponent : Component
         { BleedingSeverity.Minor, 2.6 },
         { BleedingSeverity.Severe, 7 },
     };
+
+    [DataField]
+    public Dictionary<string, WoundVisualizerSprite>? DamageOverlayGroups = new();
+
+    [DataField(required: true)]
+    public HumanoidVisualLayers OccupiedLayer;
+
+    [DataField(required: true)]
+    public List<FixedPoint2> Thresholds = [];
 }
 
 // :fort:
 [DataDefinition]
 public sealed partial class WoundVisualizerSprite
 {
-    [DataField(required: true)]
-    public string Sprite = default!;
-
     [DataField]
     public string? Color;
+
+    [DataField(required: true)]
+    public string Sprite = default!;
 }

@@ -14,19 +14,17 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Client.VoiceMask;
 
-
 public sealed partial class VoiceMaskNameChangeWindow
 {
+    private const int JobIconColumnCount = 10;
+    private readonly ButtonGroup? _jobIconButtonGroup = new();
+    private readonly Dictionary<ProtoId<JobIconPrototype>, Button> _jobIconButtons = new();
     [Dependency] private readonly IPrototypeManager _protoManager = default!;
-
-    public Action<ProtoId<JobIconPrototype>>? OnJobIconChanged;
+    private ProtoId<JobIconPrototype>? _currentJobIconId = new();
 
     private List<ProtoId<JobIconPrototype>> _jobIcons = new();
-    private ProtoId<JobIconPrototype>? _currentJobIconId = new();
-    private Dictionary<ProtoId<JobIconPrototype>, Button> _jobIconButtons = new();
-    private ButtonGroup? _jobIconButtonGroup = new();
 
-    private const int JobIconColumnCount = 10;
+    public Action<ProtoId<JobIconPrototype>>? OnJobIconChanged;
 
 
     public void ReloadJobIcons()
@@ -63,7 +61,7 @@ public sealed partial class VoiceMaskNameChangeWindow
                 MaxSize = new Vector2(42, 28),
                 Group = _jobIconButtonGroup,
                 Pressed = jobIcon.ID == _currentJobIconId,
-                ToolTip = jobIcon.LocalizedJobName
+                ToolTip = jobIcon.LocalizedJobName,
             };
 
             var jobIconTexture = new TextureRect

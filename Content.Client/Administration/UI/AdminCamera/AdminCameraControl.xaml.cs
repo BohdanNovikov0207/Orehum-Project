@@ -13,23 +13,19 @@ namespace Content.Client.Administration.UI.AdminCamera;
 [GenerateTypedNameReferences]
 public sealed partial class AdminCameraControl : Control
 {
-    [Dependency] private readonly IEntityManager _entManager = default!;
-    [Dependency] private readonly IClientGameTiming _timing = default!;
-
-    public event Action? OnFollow;
-    public event Action? OnPopoutControl;
-
-    private readonly EyeLerpingSystem _eyeLerpingSystem;
-    private readonly FixedEye _defaultEye = new();
-    private AdminCameraEuiState? _nextState;
-
     private const float MinimumZoom = 0.1f;
     private const float MaximumZoom = 2.0f;
+    private readonly FixedEye _defaultEye = new();
+    [Dependency] private readonly IEntityManager _entManager = default!;
+
+    private readonly EyeLerpingSystem _eyeLerpingSystem;
+    [Dependency] private readonly IClientGameTiming _timing = default!;
+    private AdminCameraEuiState? _nextState;
 
     public EntityUid? CurrentCamera;
-    public float Zoom = 1.0f;
 
     public bool IsPoppedOut;
+    public float Zoom = 1.0f;
 
     public AdminCameraControl()
     {
@@ -45,10 +41,13 @@ public sealed partial class AdminCameraControl : Control
         CameraView.OnResized += OnResized;
     }
 
+    public event Action? OnFollow;
+    public event Action? OnPopoutControl;
+
     private new void OnResized()
     {
-        var width = Math.Max(CameraView.PixelWidth, (int)Math.Floor(CameraView.MinWidth));
-        var height = Math.Max(CameraView.PixelHeight, (int)Math.Floor(CameraView.MinHeight));
+        var width = Math.Max(CameraView.PixelWidth, (int) Math.Floor(CameraView.MinWidth));
+        var height = Math.Max(CameraView.PixelHeight, (int) Math.Floor(CameraView.MinHeight));
 
         CameraView.ViewportSize = new Vector2i(width, height);
     }
@@ -65,10 +64,7 @@ public sealed partial class AdminCameraControl : Control
         args.Handle();
     }
 
-    public void SetState(AdminCameraEuiState state)
-    {
-        _nextState = state;
-    }
+    public void SetState(AdminCameraEuiState state) => _nextState = state;
 
     // I know that this is awful, but I copied this from the solution editor anyways.
     // This is needed because EUIs update before the gamestate is applied, which means it will fail to get the uid from the net entity.
@@ -77,7 +73,8 @@ public sealed partial class AdminCameraControl : Control
     // - We want the UI opened by the user session, not by their currently attached entity. Otherwise it would close in cases where admins move from one entity to another, for example when ghosting.
     protected override void FrameUpdate(FrameEventArgs args)
     {
-        if (_nextState == null || _timing.LastRealTick < _nextState.Tick) // make sure the last gamestate has been applied
+        if (_nextState == null ||
+            _timing.LastRealTick < _nextState.Tick) // make sure the last gamestate has been applied
             return;
 
         if (!_entManager.TryGetEntity(_nextState.Camera, out var cameraUid))

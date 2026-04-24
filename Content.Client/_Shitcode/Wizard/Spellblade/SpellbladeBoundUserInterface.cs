@@ -39,8 +39,6 @@ public sealed class SpellbladeBoundUserInterface : BoundUserInterface
         _menu.OpenCenteredAt(_inputManager.MouseScreenPosition.Position / vpSize);
     }
 
-    public void SendSpellbladeSystemMessage(ProtoId<SpellbladeEnchantmentPrototype> protoId)
-    {
+    public void SendSpellbladeSystemMessage(ProtoId<SpellbladeEnchantmentPrototype> protoId) =>
         SendPredictedMessage(new SpellbladeEnchantMessage(protoId));
-    }
 }

@@ -10,17 +10,18 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Client.Gameplay;
-using Content.Client._Shitmed.UserInterface.Systems.Targeting.Widgets;
-using Content.Shared._Shitmed.Targeting;
 using Content.Client._Shitmed.Targeting;
+using Content.Client._Shitmed.UserInterface.Systems.Targeting.Widgets;
+using Content.Client.Gameplay;
+using Content.Shared._Shitmed.Targeting;
 using Content.Shared._Shitmed.Targeting.Events;
-using Robust.Client.UserInterface.Controllers;
 using Robust.Client.Player;
+using Robust.Client.UserInterface.Controllers;
 
 namespace Content.Client._Shitmed.UserInterface.Systems.Targeting;
 
-public sealed class TargetingUIController : UIController, IOnStateEntered<GameplayState>, IOnSystemChanged<TargetingSystem>
+public sealed class TargetingUIController : UIController, IOnStateEntered<GameplayState>,
+    IOnSystemChanged<TargetingSystem>
 {
     [Dependency] private readonly IEntityManager _entManager = default!;
     [Dependency] private readonly IEntityNetworkManager _net = default!;
@@ -28,6 +29,17 @@ public sealed class TargetingUIController : UIController, IOnStateEntered<Gamepl
 
     private TargetingComponent? _targetingComponent;
     private TargetingControl? TargetingControl => UIManager.GetActiveUIWidgetOrNull<TargetingControl>();
+
+    public void OnStateEntered(GameplayState state)
+    {
+        if (TargetingControl == null)
+            return;
+
+        TargetingControl.SetTargetDollVisible(_targetingComponent != null);
+
+        if (_targetingComponent != null)
+            TargetingControl.SetBodyPartsVisible(_targetingComponent.Target);
+    }
 
     public void OnSystemLoaded(TargetingSystem system)
     {
@@ -43,17 +55,6 @@ public sealed class TargetingUIController : UIController, IOnStateEntered<Gamepl
         system.TargetChange -= CycleTarget;
     }
 
-    public void OnStateEntered(GameplayState state)
-    {
-        if (TargetingControl == null)
-            return;
-
-        TargetingControl.SetTargetDollVisible(_targetingComponent != null);
-
-        if (_targetingComponent != null)
-            TargetingControl.SetBodyPartsVisible(_targetingComponent.Target);
-    }
-
     public void AddTargetingControl(TargetingComponent component)
     {
         _targetingComponent = component;
@@ -65,7 +66,6 @@ public sealed class TargetingUIController : UIController, IOnStateEntered<Gamepl
             if (_targetingComponent != null)
                 TargetingControl.SetBodyPartsVisible(_targetingComponent.Target);
         }
-
     }
 
     public void RemoveTargetingControl()

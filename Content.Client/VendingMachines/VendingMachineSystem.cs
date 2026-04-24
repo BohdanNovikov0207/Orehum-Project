@@ -56,29 +56,25 @@ public sealed class VendingMachineSystem : SharedVendingMachineSystem
 
         foreach (var entry in state.Inventory)
         {
-            component.Inventory.Add(entry.Key, new(entry.Value));
+            component.Inventory.Add(entry.Key, new VendingMachineInventoryEntry(entry.Value));
         }
 
         foreach (var entry in state.EmaggedInventory)
         {
-            component.EmaggedInventory.Add(entry.Key, new(entry.Value));
+            component.EmaggedInventory.Add(entry.Key, new VendingMachineInventoryEntry(entry.Value));
         }
 
         foreach (var entry in state.ContrabandInventory)
         {
-            component.ContrabandInventory.Add(entry.Key, new(entry.Value));
+            component.ContrabandInventory.Add(entry.Key, new VendingMachineInventoryEntry(entry.Value));
         }
 
         if (UISystem.TryGetOpenUi<VendingMachineBoundUserInterface>(uid, VendingMachineUiKey.Key, out var bui))
         {
             if (fullUiUpdate)
-            {
                 bui.Refresh();
-            }
             else
-            {
                 bui.UpdateAmounts();
-            }
         }
     }
 
@@ -90,9 +86,7 @@ public sealed class VendingMachineSystem : SharedVendingMachineSystem
         if (UISystem.TryGetOpenUi<VendingMachineBoundUserInterface>(entity.Owner,
                 VendingMachineUiKey.Key,
                 out var bui))
-        {
             bui.UpdateAmounts();
-        }
     }
 
     private void OnAnimationCompleted(EntityUid uid, VendingMachineComponent component, AnimationCompletedEvent args)
@@ -101,10 +95,11 @@ public sealed class VendingMachineSystem : SharedVendingMachineSystem
             return;
 
         if (!TryComp<AppearanceComponent>(uid, out var appearance) ||
-            !_appearanceSystem.TryGetData<VendingMachineVisualState>(uid, VendingMachineVisuals.VisualState, out var visualState, appearance))
-        {
+            !_appearanceSystem.TryGetData<VendingMachineVisualState>(uid,
+                VendingMachineVisuals.VisualState,
+                out var visualState,
+                appearance))
             visualState = VendingMachineVisualState.Normal;
-        }
 
         UpdateAppearance(uid, visualState, component, sprite);
     }
@@ -116,14 +111,15 @@ public sealed class VendingMachineSystem : SharedVendingMachineSystem
 
         if (!args.AppearanceData.TryGetValue(VendingMachineVisuals.VisualState, out var visualStateObject) ||
             visualStateObject is not VendingMachineVisualState visualState)
-        {
             visualState = VendingMachineVisualState.Normal;
-        }
 
         UpdateAppearance(uid, visualState, component, args.Sprite);
     }
 
-    private void UpdateAppearance(EntityUid uid, VendingMachineVisualState visualState, VendingMachineComponent component, SpriteComponent sprite)
+    private void UpdateAppearance(EntityUid uid,
+        VendingMachineVisualState visualState,
+        VendingMachineComponent component,
+        SpriteComponent sprite)
     {
         SetLayerState(VendingMachineVisualLayers.Base, component.OffState, (uid, sprite));
 
@@ -138,13 +134,21 @@ public sealed class VendingMachineSystem : SharedVendingMachineSystem
                 if (component.LoopDenyAnimation)
                     SetLayerState(VendingMachineVisualLayers.BaseUnshaded, component.DenyState, (uid, sprite));
                 else
-                    PlayAnimation(uid, VendingMachineVisualLayers.BaseUnshaded, component.DenyState, (float)component.DenyDelay.TotalSeconds, sprite);
+                    PlayAnimation(uid,
+                        VendingMachineVisualLayers.BaseUnshaded,
+                        component.DenyState,
+                        (float) component.DenyDelay.TotalSeconds,
+                        sprite);
 
                 SetLayerState(VendingMachineVisualLayers.Screen, component.ScreenState, (uid, sprite));
                 break;
 
             case VendingMachineVisualState.Eject:
-                PlayAnimation(uid, VendingMachineVisualLayers.BaseUnshaded, component.EjectState, (float)component.EjectDelay.TotalSeconds, sprite);
+                PlayAnimation(uid,
+                    VendingMachineVisualLayers.BaseUnshaded,
+                    component.EjectState,
+                    (float) component.EjectDelay.TotalSeconds,
+                    sprite);
                 SetLayerState(VendingMachineVisualLayers.Screen, component.ScreenState, (uid, sprite));
                 break;
 
@@ -169,7 +173,11 @@ public sealed class VendingMachineSystem : SharedVendingMachineSystem
         _sprite.LayerSetRsiState(sprite.AsNullable(), layer, state);
     }
 
-    private void PlayAnimation(EntityUid uid, VendingMachineVisualLayers layer, string? state, float animationTime, SpriteComponent sprite)
+    private void PlayAnimation(EntityUid uid,
+        VendingMachineVisualLayers layer,
+        string? state,
+        float animationTime,
+        SpriteComponent sprite)
     {
         if (string.IsNullOrEmpty(state))
             return;
@@ -182,24 +190,22 @@ public sealed class VendingMachineSystem : SharedVendingMachineSystem
         }
     }
 
-    private static Animation GetAnimation(VendingMachineVisualLayers layer, string state, float animationTime)
-    {
-        return new Animation
+    private static Animation GetAnimation(VendingMachineVisualLayers layer, string state, float animationTime) =>
+        new()
         {
             Length = TimeSpan.FromSeconds(animationTime),
             AnimationTracks =
+            {
+                new AnimationTrackSpriteFlick
                 {
-                    new AnimationTrackSpriteFlick
+                    LayerKey = layer,
+                    KeyFrames =
                     {
-                        LayerKey = layer,
-                        KeyFrames =
-                        {
-                            new AnimationTrackSpriteFlick.KeyFrame(state, 0f)
-                        }
-                    }
-                }
+                        new AnimationTrackSpriteFlick.KeyFrame(state, 0f),
+                    },
+                },
+            },
         };
-    }
 
     private void HideLayers(Entity<SpriteComponent> sprite)
     {

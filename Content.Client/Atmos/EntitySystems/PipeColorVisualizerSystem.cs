@@ -5,14 +5,16 @@
 // SPDX-License-Identifier: MIT
 
 using Content.Client.Atmos.Components;
-using Robust.Client.GameObjects;
 using Content.Shared.Atmos.Piping;
+using Robust.Client.GameObjects;
 
 namespace Content.Client.Atmos.EntitySystems;
 
 public sealed class PipeColorVisualizerSystem : VisualizerSystem<PipeColorVisualsComponent>
 {
-    protected override void OnAppearanceChange(EntityUid uid, PipeColorVisualsComponent component, ref AppearanceChangeEvent args)
+    protected override void OnAppearanceChange(EntityUid uid,
+        PipeColorVisualsComponent component,
+        ref AppearanceChangeEvent args)
     {
         if (TryComp<SpriteComponent>(uid, out var sprite)
             && AppearanceSystem.TryGetData<Color>(uid, PipeColorVisuals.Color, out var color, args.Component))

@@ -22,7 +22,10 @@ public sealed partial class MiniTechnologyCardControl : Control
     /// The technology that this control represents
     public readonly TechnologyPrototype Technology;
 
-    public MiniTechnologyCardControl(TechnologyPrototype technology, IPrototypeManager prototypeManager, SpriteSystem spriteSys, FormattedMessage description)
+    public MiniTechnologyCardControl(TechnologyPrototype technology,
+        IPrototypeManager prototypeManager,
+        SpriteSystem spriteSys,
+        FormattedMessage description)
     {
         RobustXamlLoader.Load(this);
 

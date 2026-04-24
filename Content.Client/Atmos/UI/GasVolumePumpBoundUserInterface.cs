@@ -17,65 +17,63 @@ using Content.Shared.Localizations;
 using JetBrains.Annotations;
 using Robust.Client.UserInterface;
 
-namespace Content.Client.Atmos.UI
+namespace Content.Client.Atmos.UI;
+
+/// <summary>
+/// Initializes a <see cref="GasVolumePumpWindow" /> and updates it when new server messages are received.
+/// </summary>
+[UsedImplicitly]
+public sealed class GasVolumePumpBoundUserInterface : BoundUserInterface
 {
-    /// <summary>
-    /// Initializes a <see cref="GasVolumePumpWindow"/> and updates it when new server messages are received.
-    /// </summary>
-    [UsedImplicitly]
-    public sealed class GasVolumePumpBoundUserInterface : BoundUserInterface
+    [ViewVariables]
+    private float _maxTransferRate;
+
+    [ViewVariables]
+    private GasVolumePumpWindow? _window;
+
+    public GasVolumePumpBoundUserInterface(EntityUid owner, Enum uiKey) : base(owner, uiKey)
     {
-        [ViewVariables]
-        private float _maxTransferRate;
+    }
 
-        [ViewVariables]
-        private GasVolumePumpWindow? _window;
+    protected override void Open()
+    {
+        base.Open();
 
-        public GasVolumePumpBoundUserInterface(EntityUid owner, Enum uiKey) : base(owner, uiKey)
-        {
-        }
+        _window = this.CreateWindow<GasVolumePumpWindow>();
 
-        protected override void Open()
-        {
-            base.Open();
+        if (EntMan.TryGetComponent(Owner, out GasVolumePumpComponent? pump))
+            _maxTransferRate = pump.MaxTransferRate;
 
-            _window = this.CreateWindow<GasVolumePumpWindow>();
+        _window.ToggleStatusButtonPressed += OnToggleStatusButtonPressed;
+        _window.PumpTransferRateChanged += OnPumpTransferRatePressed;
+        Update();
+    }
 
-            if (EntMan.TryGetComponent(Owner, out GasVolumePumpComponent? pump))
-            {
-                _maxTransferRate = pump.MaxTransferRate;
-            }
+    private void OnToggleStatusButtonPressed()
+    {
+        if (_window is null)
+            return;
 
-            _window.ToggleStatusButtonPressed += OnToggleStatusButtonPressed;
-            _window.PumpTransferRateChanged += OnPumpTransferRatePressed;
-            Update();
-        }
+        SendPredictedMessage(new GasVolumePumpToggleStatusMessage(_window.PumpStatus));
+    }
 
-        private void OnToggleStatusButtonPressed()
-        {
-            if (_window is null) return;
+    private void OnPumpTransferRatePressed(string value)
+    {
+        var rate = UserInputParser.TryFloat(value, out var parsed) ? parsed : 0f;
+        rate = Math.Clamp(rate, 0f, _maxTransferRate);
 
-            SendPredictedMessage(new GasVolumePumpToggleStatusMessage(_window.PumpStatus));
-        }
+        SendPredictedMessage(new GasVolumePumpChangeTransferRateMessage(rate));
+    }
 
-        private void OnPumpTransferRatePressed(string value)
-        {
-            var rate = UserInputParser.TryFloat(value, out var parsed) ? parsed : 0f;
-            rate = Math.Clamp(rate, 0f, _maxTransferRate);
+    public override void Update()
+    {
+        base.Update();
 
-            SendPredictedMessage(new GasVolumePumpChangeTransferRateMessage(rate));
-        }
+        if (_window is null || !EntMan.TryGetComponent(Owner, out GasVolumePumpComponent? pump))
+            return;
 
-        public override void Update()
-        {
-            base.Update();
-
-            if (_window is null || !EntMan.TryGetComponent(Owner, out GasVolumePumpComponent? pump))
-                return;
-
-            _window.Title = Identity.Name(Owner, EntMan);
-            _window.SetPumpStatus(pump.Enabled);
-            _window.SetTransferRate(pump.TransferRate);
-        }
+        _window.Title = Identity.Name(Owner, EntMan);
+        _window.SetPumpStatus(pump.Enabled);
+        _window.SetTransferRate(pump.TransferRate);
     }
 }

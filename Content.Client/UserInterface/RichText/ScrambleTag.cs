@@ -17,9 +17,8 @@ namespace Content.Client.UserInterface.RichText;
 [UsedImplicitly]
 public sealed class ScrambleTag : IMarkupTag
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-
     private const int MaxScrambleLength = 32;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public string Name => "scramble";
 

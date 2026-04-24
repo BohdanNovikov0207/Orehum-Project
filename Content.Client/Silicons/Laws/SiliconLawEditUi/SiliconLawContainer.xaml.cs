@@ -91,10 +91,6 @@ public sealed partial class SiliconLawContainer : BoxContainer
 
     private SiliconLaw? _law;
 
-    public event Action<SiliconLaw>? MoveLawUp;
-    public event Action<SiliconLaw>? MoveLawDown;
-    public event Action<SiliconLaw>? DeleteAction;
-
 
     public SiliconLawContainer()
     {
@@ -105,13 +101,9 @@ public sealed partial class SiliconLawContainer : BoxContainer
         Corrupted.OnPressed += _ =>
         {
             if (Corrupted.Pressed)
-            {
                 _law!.LawIdentifierOverride = CorruptedString;
-            }
             else
-            {
                 _law!.LawIdentifierOverride = null;
-            }
         };
 
         LawContent.OnTextChanged += _ => _law!.LawString = Rope.Collapse(LawContent.TextRope).Trim();
@@ -119,18 +111,18 @@ public sealed partial class SiliconLawContainer : BoxContainer
         Delete.OnPressed += _ => DeleteAction?.Invoke(_law!);
     }
 
+    public event Action<SiliconLaw>? MoveLawUp;
+    public event Action<SiliconLaw>? MoveLawDown;
+    public event Action<SiliconLaw>? DeleteAction;
+
     public void SetLaw(SiliconLaw law)
     {
         _law = law;
         LawContent.TextRope = new Rope.Leaf(Loc.GetString(law.LawString));
         PositionText.Text = law.Order.ToString();
         if (!string.IsNullOrEmpty(law.LawIdentifierOverride))
-        {
             Corrupted.Pressed = true;
-        }
         else
-        {
             Corrupted.Pressed = false;
-        }
     }
 }

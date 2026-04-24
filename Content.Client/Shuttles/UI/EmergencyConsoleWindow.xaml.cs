@@ -46,21 +46,6 @@ public sealed partial class EmergencyConsoleWindow : FancyWindow,
         };
     }
 
-    private void OnRepealAllPressed(ComputerBoundUserInterfaceBase cb, BaseButton.ButtonEventArgs obj)
-    {
-        cb.SendMessage(new EmergencyShuttleRepealAllMessage());
-    }
-
-    private void OnRepealPressed(ComputerBoundUserInterfaceBase cb, BaseButton.ButtonEventArgs obj)
-    {
-        cb.SendMessage(new EmergencyShuttleRepealMessage());
-    }
-
-    private void OnAuthorizePressed(ComputerBoundUserInterfaceBase cb, BaseButton.ButtonEventArgs obj)
-    {
-        cb.SendMessage(new EmergencyShuttleAuthorizeMessage());
-    }
-
     public void UpdateState(EmergencyConsoleBoundUserInterfaceState scc)
     {
         // TODO: Loc and cvar for this.
@@ -80,13 +65,20 @@ public sealed partial class EmergencyConsoleWindow : FancyWindow,
         }
     }
 
+    private void OnRepealAllPressed(ComputerBoundUserInterfaceBase cb, BaseButton.ButtonEventArgs obj) =>
+        cb.SendMessage(new EmergencyShuttleRepealAllMessage());
+
+    private void OnRepealPressed(ComputerBoundUserInterfaceBase cb, BaseButton.ButtonEventArgs obj) =>
+        cb.SendMessage(new EmergencyShuttleRepealMessage());
+
+    private void OnAuthorizePressed(ComputerBoundUserInterfaceBase cb, BaseButton.ButtonEventArgs obj) =>
+        cb.SendMessage(new EmergencyShuttleAuthorizeMessage());
+
     protected override void Draw(DrawingHandleScreen handle)
     {
         base.Draw(handle);
         if (_earlyLaunchTime == null)
-        {
             Countdown.Text = "00:10";
-        }
         else
         {
             var remaining = _earlyLaunchTime.Value - _timing.CurTime;

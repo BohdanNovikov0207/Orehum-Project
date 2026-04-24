@@ -13,6 +13,18 @@ namespace Content.Client.Storage.Visualizers;
 public sealed partial class EntityStorageVisualsComponent : Component
 {
     /// <summary>
+    /// The drawdepth the object has when it's closed
+    /// </summary>
+    [DataField] [ViewVariables(VVAccess.ReadWrite)]
+    public int? ClosedDrawDepth;
+
+    /// <summary>
+    /// The drawdepth the object has when it's open
+    /// </summary>
+    [DataField] [ViewVariables(VVAccess.ReadWrite)]
+    public int? OpenDrawDepth;
+
+    /// <summary>
     /// The RSI state used for the base layer of the storage entity sprite while the storage is closed.
     /// </summary>
     [DataField("stateBaseClosed")]
@@ -27,13 +39,6 @@ public sealed partial class EntityStorageVisualsComponent : Component
     public string? StateBaseOpen;
 
     /// <summary>
-    /// The RSI state used for the door/lid while the storage is open.
-    /// </summary>
-    [DataField("stateDoorOpen")]
-    [ViewVariables(VVAccess.ReadWrite)]
-    public string? StateDoorOpen;
-
-    /// <summary>
     /// The RSI state used for the door/lid while the storage is closed.
     /// </summary>
     [DataField("stateDoorClosed")]
@@ -41,14 +46,9 @@ public sealed partial class EntityStorageVisualsComponent : Component
     public string? StateDoorClosed;
 
     /// <summary>
-    /// The drawdepth the object has when it's open
+    /// The RSI state used for the door/lid while the storage is open.
     /// </summary>
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
-    public int? OpenDrawDepth;
-
-    /// <summary>
-    /// The drawdepth the object has when it's closed
-    /// </summary>
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
-    public int? ClosedDrawDepth;
+    [DataField("stateDoorOpen")]
+    [ViewVariables(VVAccess.ReadWrite)]
+    public string? StateDoorOpen;
 }

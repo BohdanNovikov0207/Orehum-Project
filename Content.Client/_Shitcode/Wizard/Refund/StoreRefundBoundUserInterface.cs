@@ -43,13 +43,8 @@ public sealed class StoreRefundBoundUserInterface : BoundUserInterface
         _menu?.Populate();
     }
 
-    public void SendStoreRefundAllSystemMessage()
-    {
-        SendMessage(new StoreRefundAllListingsMessage());
-    }
+    public void SendStoreRefundAllSystemMessage() => SendMessage(new StoreRefundAllListingsMessage());
 
-    public void SendStoreRefundSystemMessage(NetEntity listingUid)
-    {
+    public void SendStoreRefundSystemMessage(NetEntity listingUid) =>
         SendMessage(new StoreRefundListingMessage(listingUid));
-    }
 }

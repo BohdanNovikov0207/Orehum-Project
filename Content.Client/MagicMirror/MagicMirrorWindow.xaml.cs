@@ -17,16 +17,18 @@ namespace Content.Client.MagicMirror;
 [GenerateTypedNameReferences]
 public sealed partial class MagicMirrorWindow : DefaultWindow
 {
-    // MMMMMMM
-    public Action<(int slot, string id)>? OnHairSelected;
-    public Action<(int slot, Marking marking)>? OnHairColorChanged;
-    public Action<int>? OnHairSlotRemoved;
-    public Action? OnHairSlotAdded;
+    public Action<(int slot, Marking marking)>? OnFacialHairColorChanged;
 
     public Action<(int slot, string id)>? OnFacialHairSelected;
-    public Action<(int slot, Marking marking)>? OnFacialHairColorChanged;
-    public Action<int>? OnFacialHairSlotRemoved;
     public Action? OnFacialHairSlotAdded;
+    public Action<int>? OnFacialHairSlotRemoved;
+
+    public Action<(int slot, Marking marking)>? OnHairColorChanged;
+
+    // MMMMMMM
+    public Action<(int slot, string id)>? OnHairSelected;
+    public Action? OnHairSlotAdded;
+    public Action<int>? OnHairSlotRemoved;
 
     public MagicMirrorWindow()
     {
@@ -49,8 +51,6 @@ public sealed partial class MagicMirrorWindow : DefaultWindow
         FacialHairPicker.UpdateData(state.FacialHair, state.Species, state.FacialHairSlotTotal);
 
         if (!HairPicker.Visible && !FacialHairPicker.Visible)
-        {
             AddChild(new Label { Text = Loc.GetString("magic-mirror-component-activate-user-has-no-hair") });
-        }
     }
 }

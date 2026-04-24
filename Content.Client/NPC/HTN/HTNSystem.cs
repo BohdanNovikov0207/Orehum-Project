@@ -12,6 +12,8 @@ namespace Content.Client.NPC.HTN;
 
 public sealed class HTNSystem : EntitySystem
 {
+    private bool _enableOverlay;
+
     /*
      * Mainly handles clientside debugging for HTN NPCs.
      */
@@ -26,7 +28,7 @@ public sealed class HTNSystem : EntitySystem
             if (_enableOverlay)
             {
                 overlayManager.AddOverlay(new HTNOverlay(EntityManager, IoCManager.Resolve<IResourceCache>()));
-                RaiseNetworkEvent(new RequestHTNMessage()
+                RaiseNetworkEvent(new RequestHTNMessage
                 {
                     Enabled = true,
                 });
@@ -34,15 +36,13 @@ public sealed class HTNSystem : EntitySystem
             else
             {
                 overlayManager.RemoveOverlay<HTNOverlay>();
-                RaiseNetworkEvent(new RequestHTNMessage()
+                RaiseNetworkEvent(new RequestHTNMessage
                 {
                     Enabled = false,
                 });
             }
         }
     }
-
-    private bool _enableOverlay;
 
     public override void Initialize()
     {

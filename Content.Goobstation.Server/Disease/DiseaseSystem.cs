@@ -189,7 +189,7 @@ public sealed partial class DiseaseSystem : SharedDiseaseSystem
         disease = null;
 
         if (force)
-            EnsureComp(ent, out ent.Comp);
+            EnsureComp<DiseaseCarrierComponent>(ent, out ent.Comp);
 
         if (!Resolve(ent, ref ent.Comp, false))
             return false;

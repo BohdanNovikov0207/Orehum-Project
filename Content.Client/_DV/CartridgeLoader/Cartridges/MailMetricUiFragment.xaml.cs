@@ -17,7 +17,6 @@ namespace Content.Client._DV.CartridgeLoader.Cartridges;
 [GenerateTypedNameReferences]
 public sealed partial class MailMetricUiFragment : BoxContainer
 {
-
     private OpenedMailPercentGrade? _successGrade;
 
     public MailMetricUiFragment()
@@ -76,38 +75,32 @@ public sealed partial class MailMetricUiFragment : BoxContainer
 
         var previousGradeClass = GetClassForGrade(previousGrade);
         if (previousGradeClass != string.Empty)
-        {
             SuccessRatePercent.StyleClasses.Remove(previousGradeClass);
-        }
 
         SuccessRatePercent.StyleClasses.Add(GetClassForGrade(_successGrade));
     }
 
-    private static OpenedMailPercentGrade GetSuccessRateGrade(double successRate)
-    {
-        return successRate switch
+    private static OpenedMailPercentGrade GetSuccessRateGrade(double successRate) =>
+        successRate switch
         {
             > 75 => OpenedMailPercentGrade.Good,
             > 50 => OpenedMailPercentGrade.Average,
             _ => OpenedMailPercentGrade.Bad,
         };
-    }
 
-    private string GetClassForGrade(OpenedMailPercentGrade? grade)
-    {
-        return grade switch
+    private string GetClassForGrade(OpenedMailPercentGrade? grade) =>
+        grade switch
         {
             OpenedMailPercentGrade.Good => "Good",
             OpenedMailPercentGrade.Average => "Caution",
             OpenedMailPercentGrade.Bad => "Danger",
             _ => string.Empty,
         };
-    }
 }
 
-enum OpenedMailPercentGrade
+internal enum OpenedMailPercentGrade
 {
     Good,
     Average,
-    Bad
+    Bad,
 }

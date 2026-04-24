@@ -49,9 +49,7 @@ public sealed class DoorElectronicsBoundUserInterface : BoundUserInterface
         foreach (var accessLevel in _prototypeManager.EnumeratePrototypes<AccessLevelPrototype>())
         {
             if (accessLevel.Name != null)
-            {
                 accessLevels.Add(accessLevel.ID);
-            }
         }
 
         accessLevels.Sort();
@@ -67,8 +65,6 @@ public sealed class DoorElectronicsBoundUserInterface : BoundUserInterface
         _window?.UpdateState(castState);
     }
 
-    public void UpdateConfiguration(List<ProtoId<AccessLevelPrototype>> newAccessList)
-    {
+    public void UpdateConfiguration(List<ProtoId<AccessLevelPrototype>> newAccessList) =>
         SendMessage(new DoorElectronicsUpdateConfigurationMessage(newAccessList));
-    }
 }

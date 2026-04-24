@@ -28,33 +28,28 @@ namespace Content.Client.NetworkConfigurator;
 [GenerateTypedNameReferences]
 public sealed partial class NetworkConfiguratorLinkMenu : FancyWindow
 {
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-
     private const string PanelBgColor = "#202023";
 
     private readonly LinksRender _links;
-
-    private readonly List<SourcePortPrototype> _sources = new();
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
 
     private readonly List<SinkPortPrototype> _sinks = new();
 
-    private (ButtonPosition position, string id, int index)? _selectedButton;
+    private readonly List<SourcePortPrototype> _sources = new();
 
     private List<(string left, string right)>? _defaults;
 
-    public event Action? OnClearLinks;
-    public event Action<string, string>? OnToggleLink;
-    public event Action<List<(string left, string right)>>? OnLinkDefaults;
+    private (ButtonPosition position, string id, int index)? _selectedButton;
 
     public NetworkConfiguratorLinkMenu()
     {
         RobustXamlLoader.Load(this);
         IoCManager.InjectDependencies(this);
 
-        var footerStyleBox = new StyleBoxFlat()
+        var footerStyleBox = new StyleBoxFlat
         {
             BorderThickness = new Thickness(0, 2, 0, 0),
-            BorderColor = Color.FromHex("#5A5A5A")
+            BorderColor = Color.FromHex("#5A5A5A"),
         };
 
         FooterPanel.PanelOverride = footerStyleBox;
@@ -71,6 +66,10 @@ public sealed partial class NetworkConfiguratorLinkMenu : FancyWindow
         ButtonLinkDefault.OnPressed += _ => LinkDefaults();
         ButtonClear.OnPressed += _ => OnClearLinks?.Invoke();
     }
+
+    public event Action? OnClearLinks;
+    public event Action<string, string>? OnToggleLink;
+    public event Action<List<(string left, string right)>>? OnLinkDefaults;
 
     public void UpdateState(DeviceLinkUserInterfaceState linkState)
     {
@@ -159,7 +158,9 @@ public sealed partial class NetworkConfiguratorLinkMenu : FancyWindow
 
         args.Button.Pressed = false;
 
-        var container = _selectedButton.Value.position == ButtonPosition.Left ? ButtonContainerLeft : ButtonContainerRight;
+        var container = _selectedButton.Value.position == ButtonPosition.Left
+            ? ButtonContainerLeft
+            : ButtonContainerRight;
         if (container.GetChild(_selectedButton.Value.index) is Button button)
             button.Pressed = false;
 
@@ -169,20 +170,20 @@ public sealed partial class NetworkConfiguratorLinkMenu : FancyWindow
     private enum ButtonPosition
     {
         Left,
-        Right
+        Right,
     }
 
     /// <summary>
-    ///  Draws lines between linked ports using bezier curve calculated with polynomial coefficients
-    ///  See: https://youtu.be/jvPPXbo87ds?t=351
+    /// Draws lines between linked ports using bezier curve calculated with polynomial coefficients
+    /// See: https://youtu.be/jvPPXbo87ds?t=351
     /// </summary>
     private sealed class LinksRender : Control
     {
-        public readonly List<(ProtoId<SourcePortPrototype>, ProtoId<SinkPortPrototype>)> Links = new();
-        public readonly Dictionary<string, Button> SourceButtons = new();
-        public readonly Dictionary<string, Button> SinkButtons = new();
         private readonly BoxContainer _leftButtonContainer;
         private readonly BoxContainer _rightButtonContainer;
+        public readonly List<(ProtoId<SourcePortPrototype>, ProtoId<SinkPortPrototype>)> Links = new();
+        public readonly Dictionary<string, Button> SinkButtons = new();
+        public readonly Dictionary<string, Button> SourceButtons = new();
 
         public LinksRender(BoxContainer leftButtonContainer, BoxContainer rightButtonContainer)
         {
@@ -194,7 +195,8 @@ public sealed partial class NetworkConfiguratorLinkMenu : FancyWindow
         {
             foreach (var (left, right) in Links)
             {
-                if (!SourceButtons.TryGetValue(left, out var leftChild) || !SinkButtons.TryGetValue(right, out var rightChild))
+                if (!SourceButtons.TryGetValue(left, out var leftChild) ||
+                    !SinkButtons.TryGetValue(right, out var rightChild))
                     continue;
 
                 var leftOffset = _leftButtonContainer.PixelPosition.Y;

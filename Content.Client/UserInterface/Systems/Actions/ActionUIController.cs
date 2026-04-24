@@ -110,6 +110,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+// Goobstation
+// Goobstation
 using System.Linq;
 using System.Numerics;
 using Content.Client._Shitcode.Wizard.Systems;
@@ -124,12 +126,12 @@ using Content.Client.UserInterface.Systems.Actions.Controls;
 using Content.Client.UserInterface.Systems.Actions.Widgets;
 using Content.Client.UserInterface.Systems.Actions.Windows;
 using Content.Client.UserInterface.Systems.Gameplay;
+using Content.Client.UserInterface.Systems.MenuBar.Widgets;
+using Content.Goobstation.Common.CCVar;
 using Content.Shared._Goobstation.Wizard.Components;
 using Content.Shared._Goobstation.Wizard.SpellCards;
-using Content.Shared.Actions;
-using Content.Shared.Damage;
 using Content.Shared.Actions.Components;
-using Content.Shared.Charges.Systems;
+using Content.Shared.Damage;
 using Content.Shared.Heretic;
 using Content.Shared.Input;
 using Content.Shared.Mobs.Components;
@@ -140,13 +142,12 @@ using Robust.Client.Player;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controllers;
 using Robust.Client.UserInterface.Controls;
+using Robust.Shared.Configuration;
 using Robust.Shared.Graphics.RSI;
 using Robust.Shared.Input;
 using Robust.Shared.Input.Binding;
 using Robust.Shared.Timing;
 using Robust.Shared.Utility;
-using Robust.Shared.Configuration; // Goobstation
-using Content.Goobstation.Common.CCVar; // Goobstation
 using static Content.Client.Actions.ActionsSystem;
 using static Content.Client.UserInterface.Systems.Actions.Windows.ActionsWindow;
 using static Robust.Client.UserInterface.Control;
@@ -161,40 +162,29 @@ namespace Content.Client.UserInterface.Systems.Actions;
 
 public sealed class ActionUIController : UIController, IOnStateChanged<GameplayState>, IOnSystemChanged<ActionsSystem>
 {
-    [Dependency] private readonly IOverlayManager _overlays = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly IPlayerManager _playerManager = default!;
-    [Dependency] private readonly IInputManager _input = default!;
-    [Dependency] private readonly IEyeManager _eye = default!; // Goobstation
-    [Dependency] private readonly IConfigurationManager _cfg = default!; // Goobstation
-
     [UISystemDependency] private readonly ActionsSystem? _actionsSystem = default;
-    [UISystemDependency] private readonly InteractionOutlineSystem? _interactionOutline = default;
-    [UISystemDependency] private readonly TargetOutlineSystem? _targetOutline = default;
-    [UISystemDependency] private readonly SpriteSystem _spriteSystem = default!;
-    [UISystemDependency] private readonly TransformSystem _transform = default!; // Goobstation
-    [UISystemDependency] private readonly SpellsSystem? _spells = default!; // Goobstation
-    [UISystemDependency] private readonly ActionTargetMarkSystem? _mark = default!; // Goobstation
-    [UISystemDependency] private readonly EntityLookupSystem _lookup = default!; // Goobstation
-
-    private ActionButtonContainer? _container;
-    private List<EntityUid?> _actions = new(); // Goob edit
-    private readonly DragDropHelper<ActionButton> _menuDragHelper;
+    [Dependency] private readonly IConfigurationManager _cfg = default!; // Goobstation
     private readonly TextureRect _dragShadow;
-    private ActionsWindow? _window;
+    [Dependency] private readonly IEyeManager _eye = default!; // Goobstation
+    [Dependency] private readonly IInputManager _input = default!;
+    [UISystemDependency] private readonly InteractionOutlineSystem? _interactionOutline = default;
+    [UISystemDependency] private readonly EntityLookupSystem _lookup = default!; // Goobstation
+    [UISystemDependency] private readonly ActionTargetMarkSystem? _mark = default!; // Goobstation
+    private readonly DragDropHelper<ActionButton> _menuDragHelper;
+    [Dependency] private readonly IOverlayManager _overlays = default!;
+    [Dependency] private readonly IPlayerManager _playerManager = default!;
 
     private readonly Dictionary<EntityUid, List<EntityUid?>> _savedActions = new(); // Goobstation
+    [UISystemDependency] private readonly SpellsSystem? _spells = default!; // Goobstation
+    [UISystemDependency] private readonly SpriteSystem _spriteSystem = default!;
+    [UISystemDependency] private readonly TargetOutlineSystem? _targetOutline = default;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [UISystemDependency] private readonly TransformSystem _transform = default!; // Goobstation
+    private List<EntityUid?> _actions = new(); // Goob edit
+
+    private ActionButtonContainer? _container;
     private ISawmill _sawmill = default!; // Goobstation
-
-    private ActionsBar? ActionsBar => UIManager.GetActiveUIWidgetOrNull<ActionsBar>();
-    private MenuButton? ActionButton => UIManager.GetActiveUIWidgetOrNull<MenuBar.Widgets.GameTopMenuBar>()?.ActionButton;
-
-    public bool IsDragging => _menuDragHelper.IsDragging;
-
-    /// <summary>
-    /// Action slot we are currently selecting a target for.
-    /// </summary>
-    public EntityUid? SelectingTargetFor { get; private set; }
+    private ActionsWindow? _window;
 
     public ActionUIController()
     {
@@ -205,30 +195,19 @@ public sealed class ActionUIController : UIController, IOnStateChanged<GameplayS
             Stretch = StretchMode.Scale,
             Visible = false,
             SetSize = new Vector2(64, 64),
-            MouseFilter = MouseFilterMode.Ignore
+            MouseFilter = MouseFilterMode.Ignore,
         };
     }
 
-    public override void Initialize()
-    {
-        base.Initialize();
+    private ActionsBar? ActionsBar => UIManager.GetActiveUIWidgetOrNull<ActionsBar>();
+    private MenuButton? ActionButton => UIManager.GetActiveUIWidgetOrNull<GameTopMenuBar>()?.ActionButton;
 
-        var gameplayStateLoad = UIManager.GetUIController<GameplayStateLoadController>();
-        gameplayStateLoad.OnScreenLoad += OnScreenLoad;
-        gameplayStateLoad.OnScreenUnload += OnScreenUnload;
+    public bool IsDragging => _menuDragHelper.IsDragging;
 
-        _sawmill = Logger.GetSawmill("action_ui_controller"); // Goobstation
-    }
-
-    private void OnScreenLoad()
-    {
-       LoadGui();
-    }
-
-    private void OnScreenUnload()
-    {
-        UnloadGui();
-    }
+    /// <summary>
+    /// Action slot we are currently selecting a target for.
+    /// </summary>
+    public EntityUid? SelectingTargetFor { get; private set; }
 
     public void OnStateEntered(GameplayState state)
     {
@@ -258,25 +237,82 @@ public sealed class ActionUIController : UIController, IOnStateChanged<GameplayS
         {
             var boundId = i; // This is needed, because the lambda captures it.
             var boundKey = hotbarKeys[i];
-            builder = builder.Bind(boundKey, new PointerInputCmdHandler((in PointerInputCmdArgs args) =>
-            {
-                if (args.State != BoundKeyState.Down)
-                    return false;
+            builder = builder.Bind(boundKey,
+                new PointerInputCmdHandler((in PointerInputCmdArgs args) =>
+                    {
+                        if (args.State != BoundKeyState.Down)
+                            return false;
 
-                TriggerAction(boundId);
-                return true;
-            }, false, true));
+                        TriggerAction(boundId);
+                        return true;
+                    },
+                    false,
+                    true));
         }
 
         builder
             .Bind(ContentKeyFunctions.OpenActionsMenu,
                 InputCmdHandler.FromDelegate(_ => ToggleWindow()))
-            .BindBefore(EngineKeyFunctions.Use, new PointerInputCmdHandler(TargetingOnUse, outsidePrediction: true),
-                    typeof(ConstructionSystem), typeof(DragDropSystem))
-                .BindBefore(ContentKeyFunctions.AltActivateItemInWorld, new PointerInputCmdHandler(AltTargeting, outsidePrediction: true)) // Goobstation
-                .BindBefore(EngineKeyFunctions.UIRightClick, new PointerInputCmdHandler(TargetingCancel, outsidePrediction: true))
+            .BindBefore(EngineKeyFunctions.Use,
+                new PointerInputCmdHandler(TargetingOnUse, outsidePrediction: true),
+                typeof(ConstructionSystem),
+                typeof(DragDropSystem))
+            .BindBefore(ContentKeyFunctions.AltActivateItemInWorld,
+                new PointerInputCmdHandler(AltTargeting, outsidePrediction: true)) // Goobstation
+            .BindBefore(EngineKeyFunctions.UIRightClick,
+                new PointerInputCmdHandler(TargetingCancel, outsidePrediction: true))
             .Register<ActionUIController>();
     }
+
+    public void OnStateExited(GameplayState state)
+    {
+        if (_actionsSystem != null)
+        {
+            _actionsSystem.OnActionAdded -= OnActionAdded;
+            _actionsSystem.OnActionRemoved -= OnActionRemoved;
+            _actionsSystem.ActionsUpdated -= OnActionsUpdated;
+            // Gooobstation start
+            _actionsSystem.ActionsSaved -= OnActionsSaved;
+            _actionsSystem.ActionsLoaded -= OnActionsLoaded;
+            // Goobstation end
+        }
+
+        if (_spells != null) // Goobstation
+            _spells.StopTargeting -= StopTargeting;
+
+        CommandBinds.Unregister<ActionUIController>();
+    }
+
+    public void OnSystemLoaded(ActionsSystem system)
+    {
+        system.LinkActions += OnComponentLinked;
+        system.UnlinkActions += OnComponentUnlinked;
+        system.ClearAssignments += ClearActions;
+        system.AssignSlot += AssignSlots;
+    }
+
+    public void OnSystemUnloaded(ActionsSystem system)
+    {
+        system.LinkActions -= OnComponentLinked;
+        system.UnlinkActions -= OnComponentUnlinked;
+        system.ClearAssignments -= ClearActions;
+        system.AssignSlot -= AssignSlots;
+    }
+
+    public override void Initialize()
+    {
+        base.Initialize();
+
+        var gameplayStateLoad = UIManager.GetUIController<GameplayStateLoadController>();
+        gameplayStateLoad.OnScreenLoad += OnScreenLoad;
+        gameplayStateLoad.OnScreenUnload += OnScreenUnload;
+
+        _sawmill = Logger.GetSawmill("action_ui_controller"); // Goobstation
+    }
+
+    private void OnScreenLoad() => LoadGui();
+
+    private void OnScreenUnload() => UnloadGui();
 
     private bool TargetingCancel(in PointerInputCmdArgs args)
     {
@@ -292,7 +328,7 @@ public sealed class ActionUIController : UIController, IOnStateChanged<GameplayS
     }
 
     /// <summary>
-    ///     If the user clicked somewhere, and they are currently targeting an action, try and perform it.
+    /// If the user clicked somewhere, and they are currently targeting an action, try and perform it.
     /// </summary>
     private bool TargetingOnUse(in PointerInputCmdArgs args)
     {
@@ -305,11 +341,9 @@ public sealed class ActionUIController : UIController, IOnStateChanged<GameplayS
         if (!EntityManager.TryGetComponent<ActionsComponent>(user, out var comp))
             return false;
 
-        if (_actionsSystem.GetAction(actionId) is not {} action ||
+        if (_actionsSystem.GetAction(actionId) is not { } action ||
             !EntityManager.TryGetComponent<TargetActionComponent>(action, out var target))
-        {
             return false;
-        }
 
         // Is the action currently valid?
         if (!_actionsSystem.ValidAction(action))
@@ -353,37 +387,13 @@ public sealed class ActionUIController : UIController, IOnStateChanged<GameplayS
         SearchAndDisplay();
     }
 
-    private void OnWindowClosed()
-    {
-        ActionButton?.SetClickPressed(false);
-    }
-
-    public void OnStateExited(GameplayState state)
-    {
-        if (_actionsSystem != null)
-        {
-            _actionsSystem.OnActionAdded -= OnActionAdded;
-            _actionsSystem.OnActionRemoved -= OnActionRemoved;
-            _actionsSystem.ActionsUpdated -= OnActionsUpdated;
-            // Gooobstation start
-            _actionsSystem.ActionsSaved -= OnActionsSaved;
-            _actionsSystem.ActionsLoaded -= OnActionsLoaded;
-            // Goobstation end
-        }
-
-        if (_spells != null) // Goobstation
-            _spells.StopTargeting -= StopTargeting;
-
-        CommandBinds.Unregister<ActionUIController>();
-    }
+    private void OnWindowClosed() => ActionButton?.SetClickPressed(false);
 
     private void TriggerAction(int index)
     {
         if (!_actions.TryGetValue(index, out var actionId) ||
-            _actionsSystem?.GetAction(actionId) is not {} action)
-        {
+            _actionsSystem?.GetAction(actionId) is not { } action)
             return;
-        }
 
         // TODO: probably should have a clientside event raised for flexibility
         if (EntityManager.TryGetComponent<TargetActionComponent>(action, out var target))
@@ -450,7 +460,7 @@ public sealed class ActionUIController : UIController, IOnStateChanged<GameplayS
         if (_actions.Count == 0)
             return;
 
-        _savedActions[entity] = new(_actions);
+        _savedActions[entity] = new List<EntityUid?>(_actions);
         _sawmill.Debug($"Saved actions for entity {entity}");
     }
 
@@ -518,10 +528,9 @@ public sealed class ActionUIController : UIController, IOnStateChanged<GameplayS
         foreach (var savedAction in savedActions)
         {
             if (_actions.FirstOrDefault(x => IdsEqual(x, savedAction)) is { } action)
-            {
                 newActions.Add(action);
-            }
         }
+
         var addedActions = _actions.Except(newActions);
         _actions = newActions.Concat(addedActions).ToList();
         OnActionsUpdated();
@@ -532,7 +541,7 @@ public sealed class ActionUIController : UIController, IOnStateChanged<GameplayS
 
     private void OnActionAdded(EntityUid actionId)
     {
-        if (_actionsSystem?.GetAction(actionId) is not {} action)
+        if (_actionsSystem?.GetAction(actionId) is not { } action)
             return;
 
         // TODO: event
@@ -565,10 +574,7 @@ public sealed class ActionUIController : UIController, IOnStateChanged<GameplayS
             _container?.SetActionData(_actionsSystem, _actions.ToArray());
     }
 
-    private void ActionButtonPressed(ButtonEventArgs args)
-    {
-        ToggleWindow();
-    }
+    private void ActionButtonPressed(ButtonEventArgs args) => ToggleWindow();
 
     private void ToggleWindow()
     {
@@ -590,9 +596,7 @@ public sealed class ActionUIController : UIController, IOnStateChanged<GameplayS
             return;
 
         if (_window.FilterButton.SelectedKeys.Count == 0)
-        {
             _window.FilterLabel.Visible = false;
-        }
         else
         {
             _window.FilterLabel.Visible = true;
@@ -611,7 +615,7 @@ public sealed class ActionUIController : UIController, IOnStateChanged<GameplayS
             Filters.Innate => comp.Container == null || comp.Container == _playerManager.LocalEntity,
             Filters.Instant => EntityManager.HasComponent<InstantActionComponent>(uid),
             Filters.Targeted => EntityManager.HasComponent<TargetActionComponent>(uid),
-            _ => throw new ArgumentOutOfRangeException(nameof(filter), filter, null)
+            _ => throw new ArgumentOutOfRangeException(nameof(filter), filter, null),
         };
     }
 
@@ -638,7 +642,7 @@ public sealed class ActionUIController : UIController, IOnStateChanged<GameplayS
                 existing.Add(button);
         }
 
-        int i = 0;
+        var i = 0;
         foreach (var action in actions)
         {
             if (i < existing.Count)
@@ -647,7 +651,7 @@ public sealed class ActionUIController : UIController, IOnStateChanged<GameplayS
                 continue;
             }
 
-            var button = new ActionButton(EntityManager, _spriteSystem, this) {Locked = true};
+            var button = new ActionButton(EntityManager, _spriteSystem, this) { Locked = true };
             button.ActionPressed += OnWindowActionPressed;
             button.ActionUnpressed += OnWindowActionUnPressed;
             button.ActionFocusExited += OnWindowActionFocusExisted;
@@ -727,17 +731,13 @@ public sealed class ActionUIController : UIController, IOnStateChanged<GameplayS
             }
         }
         else if (button.TryReplaceWith(actionId.Value, _actionsSystem) &&
-            _container != null &&
-            _container.TryGetButtonIndex(button, out position))
+                 _container != null &&
+                 _container.TryGetButtonIndex(button, out position))
         {
             if (position >= _actions.Count)
-            {
                 _actions.Add(actionId);
-            }
             else
-            {
                 _actions[position] = actionId;
-            }
         }
 
         if (updateSlots)
@@ -746,7 +746,7 @@ public sealed class ActionUIController : UIController, IOnStateChanged<GameplayS
 
     private void DragAction()
     {
-        if (_menuDragHelper.Dragged is not {Action: {} action} dragged)
+        if (_menuDragHelper.Dragged is not { Action: { } action } dragged)
         {
             _menuDragHelper.EndDrag();
             return;
@@ -780,10 +780,7 @@ public sealed class ActionUIController : UIController, IOnStateChanged<GameplayS
         QueueWindowUpdate();
     }
 
-    private void OnSearchChanged(LineEditEventArgs args)
-    {
-        QueueWindowUpdate();
-    }
+    private void OnSearchChanged(LineEditEventArgs args) => QueueWindowUpdate();
 
     private void OnFilterSelected(ItemPressedEventArgs args)
     {
@@ -807,10 +804,7 @@ public sealed class ActionUIController : UIController, IOnStateChanged<GameplayS
         HandleActionUnpressed(args, dragged);
     }
 
-    private void OnWindowActionFocusExisted(ActionButton button)
-    {
-        _menuDragHelper.EndDrag();
-    }
+    private void OnWindowActionFocusExisted(ActionButton button) => _menuDragHelper.EndDrag();
 
     private void OnActionPressed(GUIBoundKeyEventArgs args, ActionButton button)
     {
@@ -835,7 +829,6 @@ public sealed class ActionUIController : UIController, IOnStateChanged<GameplayS
             // Goobstation - only allow drag if lock setting is off or actions menu is open
             if (!_cfg.GetCVar(GoobCVars.LockActionBarDrag) || _window is { IsOpen: true })
                 _menuDragHelper.MouseDown(button);
-            return;
         }
 
         // good job
@@ -864,7 +857,7 @@ public sealed class ActionUIController : UIController, IOnStateChanged<GameplayS
 
         _menuDragHelper.EndDrag();
 
-        if (button.Action is not {} action)
+        if (button.Action is not { } action)
             return;
 
         // TODO: make this an event
@@ -887,21 +880,15 @@ public sealed class ActionUIController : UIController, IOnStateChanged<GameplayS
         // TODO ACTIONS
         // The dragging icon shuld be based on the entity's icon style. I.e. if the action has a large icon texture,
         // and a small item/provider sprite, then the dragged icon should be the big texture, not the provider.
-        if (_menuDragHelper.Dragged?.Action is {} action)
+        if (_menuDragHelper.Dragged?.Action is { } action)
         {
             if (EntityManager.TryGetComponent(action.Comp.EntityIcon, out SpriteComponent? sprite)
-                && sprite.Icon?.GetFrame(RsiDirection.South, 0) is {} frame)
-            {
+                && sprite.Icon?.GetFrame(RsiDirection.South, 0) is { } frame)
                 _dragShadow.Texture = frame;
-            }
-            else if (action.Comp.Icon is {} icon)
-            {
+            else if (action.Comp.Icon is { } icon)
                 _dragShadow.Texture = _spriteSystem.Frame0(icon);
-            }
             else
-            {
                 _dragShadow.Texture = null;
-            }
         }
 
         LayoutContainer.SetPosition(_dragShadow, UIManager.MousePositionScaled.Position - new Vector2(32, 32));
@@ -926,9 +913,7 @@ public sealed class ActionUIController : UIController, IOnStateChanged<GameplayS
         _actionsSystem?.UnlinkAllActions();
 
         if (ActionsBar == null)
-        {
             return;
-        }
 
         if (_window != null)
         {
@@ -956,9 +941,7 @@ public sealed class ActionUIController : UIController, IOnStateChanged<GameplayS
         _window.FilterButton.OnItemSelected += OnFilterSelected;
 
         if (ActionsBar == null)
-        {
             return;
-        }
 
         RegisterActionContainer(ActionsBar.ActionsContainer);
 
@@ -978,10 +961,7 @@ public sealed class ActionUIController : UIController, IOnStateChanged<GameplayS
         _container.ActionUnpressed += OnActionUnpressed;
     }
 
-    private void ClearActions()
-    {
-        _container?.ClearActionData();
-    }
+    private void ClearActions() => _container?.ClearActionData();
 
     private void AssignSlots(List<SlotAssignment> assignments)
     {
@@ -997,31 +977,12 @@ public sealed class ActionUIController : UIController, IOnStateChanged<GameplayS
         _container?.SetActionData(_actionsSystem, _actions.ToArray());
     }
 
-    public void RemoveActionContainer()
-    {
-        _container = null;
-    }
-
-    public void OnSystemLoaded(ActionsSystem system)
-    {
-        system.LinkActions += OnComponentLinked;
-        system.UnlinkActions += OnComponentUnlinked;
-        system.ClearAssignments += ClearActions;
-        system.AssignSlot += AssignSlots;
-    }
-
-    public void OnSystemUnloaded(ActionsSystem system)
-    {
-        system.LinkActions -= OnComponentLinked;
-        system.UnlinkActions -= OnComponentUnlinked;
-        system.ClearAssignments -= ClearActions;
-        system.AssignSlot -= AssignSlots;
-    }
+    public void RemoveActionContainer() => _container = null;
 
     public override void FrameUpdate(FrameEventArgs args)
     {
         _menuDragHelper.Update(args.DeltaSeconds);
-        if (_window is {UpdateNeeded: true})
+        if (_window is { UpdateNeeded: true })
             SearchAndDisplay();
 
         // Goobstation start
@@ -1143,9 +1104,7 @@ public sealed class ActionUIController : UIController, IOnStateChanged<GameplayS
         if (target.TargetingIndicator && _overlays.TryGetOverlay<ShowHandItemOverlay>(out var handOverlay))
         {
             if (action.ItemIconStyle == ItemActionIconStyle.BigItem && action.Container != null)
-            {
                 handOverlay.EntityOverride = provider;
-            }
             else if (action.Toggled && action.IconOn != null)
                 handOverlay.IconOverride = _spriteSystem.Frame0(action.IconOn);
             else if (action.Icon != null)

@@ -37,8 +37,5 @@ public sealed class VoteUIController : UIController
         }
     }
 
-    private void OnScreenUnload()
-    {
-        _votes.ClearPopupContainer();
-    }
+    private void OnScreenUnload() => _votes.ClearPopupContainer();
 }

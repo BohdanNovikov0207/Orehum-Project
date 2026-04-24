@@ -28,9 +28,7 @@ public sealed partial class GasPressureRegulatorWindow : FancyWindow
         SetToCurrentPressureButton.OnPressed += _ =>
         {
             if (InletPressureLabel.Text != null)
-            {
                 ThresholdInput.Text = InletPressureLabel.Text;
-            }
 
             SetThresholdButton.Disabled = false;
         };
@@ -65,29 +63,22 @@ public sealed partial class GasPressureRegulatorWindow : FancyWindow
     /// Sets the current threshold pressure label. This is not setting the threshold input box.
     /// </summary>
     /// <param name="threshold"> Threshold to set.</param>
-    public void SetThresholdPressureLabel(float threshold)
-    {
+    public void SetThresholdPressureLabel(float threshold) =>
         TargetPressureLabel.Text = threshold.ToString(CultureInfo.CurrentCulture);
-    }
 
     /// <summary>
     /// Sets the threshold pressure input field with the given value.
     /// When the client opens the UI the field will be autofilled with the current threshold pressure.
     /// </summary>
     /// <param name="input">The threshold pressure value to autofill into the input field.</param>
-    public void SetThresholdPressureInput(float input)
-    {
+    public void SetThresholdPressureInput(float input) =>
         ThresholdInput.Text = input.ToString(CultureInfo.CurrentCulture);
-    }
 
     /// <summary>
     /// Sets the entity to be visible in the UI.
     /// </summary>
     /// <param name="entity"></param>
-    public void SetEntity(EntityUid entity)
-    {
-        EntityView.SetEntity(entity);
-    }
+    public void SetEntity(EntityUid entity) => EntityView.SetEntity(entity);
 
     /// <summary>
     /// Updates the UI for the labels.
@@ -118,12 +109,10 @@ public sealed partial class GasPressureRegulatorWindow : FancyWindow
         var maxValue = FlowRateBar.MaxValue;
 
         // Increment the progress bar value based on elapsed time
-        FlowRateBar.Value += (_flowRate / barFillPerSecond) * args.DeltaSeconds;
+        FlowRateBar.Value += _flowRate / barFillPerSecond * args.DeltaSeconds;
 
         // Reset the progress bar when it is fully filled
         if (FlowRateBar.Value >= maxValue)
-        {
             FlowRateBar.Value = 0f;
-        }
     }
 }

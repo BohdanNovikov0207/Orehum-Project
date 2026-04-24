@@ -13,6 +13,5 @@ SPDX-License-Identifier: MIT
                   Orientation="Vertical"
                   Margin="2 2 0 0"
                   SeparationOverride="10"
-                  Access="Public">
-    </BoxContainer>
+                  Access="Public" />
 </ScrollContainer>

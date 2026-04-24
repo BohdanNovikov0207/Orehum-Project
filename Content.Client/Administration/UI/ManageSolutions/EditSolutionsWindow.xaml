@@ -15,8 +15,8 @@ SPDX-License-Identifier: MIT
     xmlns="https://spacestation14.io">
     <BoxContainer Orientation="Vertical">
         <BoxContainer Orientation="Horizontal" HorizontalExpand="True" Margin="0 4">
-            <Label Text ="{Loc 'admin-solutions-window-solution-label'}" Margin="0 0 10 0"/>
-            <OptionButton Name="SolutionOption" HorizontalExpand="True"/>
+            <Label Text="{Loc 'admin-solutions-window-solution-label'}" Margin="0 0 10 0" />
+            <OptionButton Name="SolutionOption" HorizontalExpand="True" />
         </BoxContainer>
 
         <BoxContainer Orientation="Horizontal" HorizontalExpand="True" Margin="0 4">
@@ -25,31 +25,32 @@ SPDX-License-Identifier: MIT
                     ToolTip="{Loc 'admin-solutions-window-vv-button-tooltip'}"
                     Disabled="True"
                     HorizontalExpand="True"
-                    StyleClasses="OpenRight"/>
+                    StyleClasses="OpenRight" />
             <Button Name="SolutionButton"
                     Text="{Loc 'admin-solutions-window-solution-button'}"
                     ToolTip="{Loc 'admin-solutions-window-solution-button-tooltip'}"
                     Disabled="True"
                     HorizontalExpand="True"
-                    StyleClasses="OpenLeft"/>
+                    StyleClasses="OpenLeft" />
         </BoxContainer>
 
         <!-- The total volume / capacity of the solution -->
-        <BoxContainer Name="VolumeBox" Orientation="Vertical" HorizontalExpand="True" Margin="0 4"/>
+        <BoxContainer Name="VolumeBox" Orientation="Vertical" HorizontalExpand="True" Margin="0 4" />
 
         <!-- The temperature / heat capacity / thermal energy of the solution -->
         <Collapsible>
             <CollapsibleHeading Name="ThermalHeading" Title="{Loc 'admin-solutions-window-thermals'}" />
             <CollapsibleBody>
-                <BoxContainer Name="ThermalBox" Orientation="Vertical" HorizontalExpand="True" Margin="0 4"/>
+                <BoxContainer Name="ThermalBox" Orientation="Vertical" HorizontalExpand="True" Margin="0 4" />
             </CollapsibleBody>
         </Collapsible>
 
         <!-- The reagents in the solution -->
         <ScrollContainer HorizontalExpand="True" VerticalExpand="True" Margin="0 4">
-            <BoxContainer Name="ReagentList" Orientation="Vertical"/>
+            <BoxContainer Name="ReagentList" Orientation="Vertical" />
         </ScrollContainer>
 
-        <Button Name="AddButton" Text="{Loc 'admin-solutions-window-add-new-button'}" HorizontalExpand="True"  Margin="0 4"/>
+        <Button Name="AddButton" Text="{Loc 'admin-solutions-window-add-new-button'}" HorizontalExpand="True"
+                Margin="0 4" />
     </BoxContainer>
 </DefaultWindow>

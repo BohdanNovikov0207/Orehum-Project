@@ -3,8 +3,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-using Content.Shared.Storage;
 using Content.Shared.Lock;
+using Content.Shared.Storage;
 using Robust.Client.GameObjects;
 
 namespace Content.Client.Lock.Visualizers;
@@ -26,20 +26,18 @@ public sealed class LockVisualizerSystem : VisualizerSystem<LockVisualsComponent
         var unlockedStateExist = args.Sprite.BaseRSI?.TryGetState(comp.StateUnlocked, out _);
 
         if (AppearanceSystem.TryGetData<bool>(uid, StorageVisuals.Open, out var open, args.Component))
-        {
             _sprite.LayerSetVisible((uid, args.Sprite), LockVisualLayers.Lock, !open);
-        }
-        else if (!(bool)unlockedStateExist!)
+        else if (!(bool) unlockedStateExist!)
             _sprite.LayerSetVisible((uid, args.Sprite), LockVisualLayers.Lock, locked);
 
-        if (!open && (bool)unlockedStateExist!)
-        {
-            _sprite.LayerSetRsiState((uid, args.Sprite), LockVisualLayers.Lock, locked ? comp.StateLocked : comp.StateUnlocked);
-        }
+        if (!open && (bool) unlockedStateExist!)
+            _sprite.LayerSetRsiState((uid, args.Sprite),
+                LockVisualLayers.Lock,
+                locked ? comp.StateLocked : comp.StateUnlocked);
     }
 }
 
 public enum LockVisualLayers : byte
 {
-    Lock
+    Lock,
 }

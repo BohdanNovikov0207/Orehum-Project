@@ -4,8 +4,8 @@ namespace Content.Client._White.UserInterface.Buttons;
 
 public sealed class WhiteUICommandButton : WhiteCommandButton
 {
-    public Type? WindowType { get; set; }
     private DefaultWindow? _window;
+    public Type? WindowType { get; set; }
 
     protected override void Execute(ButtonEventArgs obj)
     {

@@ -6,6 +6,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.IO;
 using Content.Client.UserInterface.Controls;
 using Content.Shared._Shitmed.Autodoc;
 using Content.Shared._Shitmed.Autodoc.Components;
@@ -15,33 +16,26 @@ using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.XAML;
 using Robust.Shared.Serialization.Manager;
 using Robust.Shared.Timing;
-using System.IO;
 
 namespace Content.Client._Shitmed.Autodoc;
 
 [GenerateTypedNameReferences]
 public sealed partial class AutodocProgramWindow : FancyWindow
 {
-    [Dependency] private readonly IEntityManager _entMan = default!;
+    private readonly SharedAutodocSystem _autodoc = default!;
     [Dependency] private readonly IFileDialogManager _dialogManager = default!;
+    [Dependency] private readonly IEntityManager _entMan = default!;
     [Dependency] private readonly ILogManager _logMan = default!;
+
+    private readonly EntityUid _owner;
+    private readonly AutodocProgram _program;
+    private readonly ISawmill _sawmill;
     [Dependency] private readonly ISerializationManager _serMan = default!;
-    private SharedAutodocSystem _autodoc = default!;
-
-    public event Action? OnToggleSafety;
-    public event Action? OnRemoveProgram;
-    public event Action<IAutodocStep, int>? OnAddStep;
-    public event Action<int>? OnRemoveStep;
-    public event Action? OnStart;
-
-    private EntityUid _owner;
-    private AutodocProgram _program;
-    private int _steps;
+    private AddStepWindow? _addStep;
     private bool _safety = true;
-    private ISawmill _sawmill;
 
     private int? _selected;
-    private AddStepWindow? _addStep;
+    private int _steps;
 
     public AutodocProgramWindow(EntityUid owner, AutodocProgram program)
     {
@@ -72,7 +66,7 @@ public sealed partial class AutodocProgramWindow : FancyWindow
 
         AddStepButton.OnPressed += _ =>
         {
-            if (_addStep is {} window)
+            if (_addStep is { } window)
             {
                 window.MoveToFront();
                 return;
@@ -96,7 +90,7 @@ public sealed partial class AutodocProgramWindow : FancyWindow
 
         RemoveStepButton.OnPressed += _ =>
         {
-            if (_selected is not {} index)
+            if (_selected is not { } index)
                 return;
 
             _selected = null;
@@ -134,9 +128,15 @@ public sealed partial class AutodocProgramWindow : FancyWindow
         UpdateSafety();
     }
 
+    public event Action? OnToggleSafety;
+    public event Action? OnRemoveProgram;
+    public event Action<IAutodocStep, int>? OnAddStep;
+    public event Action<int>? OnRemoveStep;
+    public event Action? OnStart;
+
     private async void ExportProgram()
     {
-        if (await _dialogManager.SaveFile(new FileDialogFilters(new FileDialogFilters.Group("yml"))) is not {} file)
+        if (await _dialogManager.SaveFile(new FileDialogFilters(new FileDialogFilters.Group("yml"))) is not { } file)
             return;
 
         try
@@ -180,7 +180,7 @@ public sealed partial class AutodocProgramWindow : FancyWindow
 
         Steps.Clear();
 
-        for (int i = 0; i < count; i++)
+        for (var i = 0; i < count; i++)
         {
             Steps.AddItem(_program.Steps[i].Title);
         }

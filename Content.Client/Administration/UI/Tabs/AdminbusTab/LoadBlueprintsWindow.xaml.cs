@@ -18,112 +18,105 @@ using Robust.Client.UserInterface.CustomControls;
 using Robust.Client.UserInterface.XAML;
 using Robust.Shared.Map;
 
-namespace Content.Client.Administration.UI.Tabs.AdminbusTab
+namespace Content.Client.Administration.UI.Tabs.AdminbusTab;
+
+[GenerateTypedNameReferences]
+[UsedImplicitly]
+public sealed partial class LoadBlueprintsWindow : DefaultWindow
 {
-    [GenerateTypedNameReferences]
-    [UsedImplicitly]
-    public sealed partial class LoadBlueprintsWindow : DefaultWindow
+    [Dependency] private readonly IEntityManager _entityManager = default!;
+    [Dependency] private readonly IPlayerManager _playerManager = default!;
+
+    public LoadBlueprintsWindow()
     {
-        [Dependency] private readonly IEntityManager _entityManager = default!;
-        [Dependency] private readonly IPlayerManager _playerManager = default!;
+        RobustXamlLoader.Load(this);
+    }
 
-        public LoadBlueprintsWindow()
+    protected override void EnteredTree()
+    {
+        var mapSystem = _entityManager.System<SharedMapSystem>();
+
+        foreach (var mapId in mapSystem.GetAllMapIds())
         {
-            RobustXamlLoader.Load(this);
+            MapOptions.AddItem(mapId.ToString(), (int) mapId);
         }
 
-        protected override void EnteredTree()
-        {
-            var mapSystem = _entityManager.System<SharedMapSystem>();
+        Reset();
 
-            foreach (var mapId in mapSystem.GetAllMapIds())
+        MapOptions.OnItemSelected += OnOptionSelect;
+        RotationSpin.ValueChanged += OnRotate;
+        SubmitButton.OnPressed += OnSubmitButtonPressed;
+        TeleportButton.OnPressed += OnTeleportButtonPressed;
+        ResetButton.OnPressed += OnResetButtonPressed;
+    }
+
+    private void Reset()
+    {
+        var xformSystem = _entityManager.System<SharedTransformSystem>();
+        var player = _playerManager.LocalEntity;
+
+        var currentMap = MapId.Nullspace;
+        var position = Vector2.Zero;
+        var rotation = Angle.Zero;
+
+        if (_entityManager.TryGetComponent<TransformComponent>(player, out var xform))
+        {
+            currentMap = xform.MapID;
+            position = xformSystem.GetWorldPosition(xform);
+
+            if (_entityManager.TryGetComponent<TransformComponent>(xform.GridUid, out var gridXform))
+                rotation = xformSystem.GetWorldRotation(gridXform);
+            else
             {
-                MapOptions.AddItem(mapId.ToString(), (int) mapId);
+                // MapId moment
+                rotation = xformSystem.GetWorldRotation(xform) - xform.LocalRotation;
             }
-
-            Reset();
-
-            MapOptions.OnItemSelected += OnOptionSelect;
-            RotationSpin.ValueChanged += OnRotate;
-            SubmitButton.OnPressed += OnSubmitButtonPressed;
-            TeleportButton.OnPressed += OnTeleportButtonPressed;
-            ResetButton.OnPressed += OnResetButtonPressed;
         }
 
-        private void Reset()
-        {
-            var xformSystem = _entityManager.System<SharedTransformSystem>();
-            var player = _playerManager.LocalEntity;
+        if (currentMap != MapId.Nullspace)
+            MapOptions.Select((int) currentMap);
 
-            var currentMap = MapId.Nullspace;
-            var position = Vector2.Zero;
-            var rotation = Angle.Zero;
+        XCoordinate.Value = (int) position.X;
+        YCoordinate.Value = (int) position.Y;
 
-            if (_entityManager.TryGetComponent<TransformComponent>(player, out var xform))
-            {
-                currentMap = xform.MapID;
-                position = xformSystem.GetWorldPosition(xform);
+        RotationSpin.OverrideValue(Wraparound((int) rotation.Degrees));
+    }
 
-                if (_entityManager.TryGetComponent<TransformComponent>(xform.GridUid, out var gridXform))
-                {
-                    rotation = xformSystem.GetWorldRotation(gridXform);
-                }
-                else
-                {
-                    // MapId moment
-                    rotation = xformSystem.GetWorldRotation(xform) - xform.LocalRotation;
-                }
-            }
+    private void OnResetButtonPressed(BaseButton.ButtonEventArgs obj) => Reset();
 
-            if (currentMap != MapId.Nullspace)
-                MapOptions.Select((int) currentMap);
+    private void OnRotate(ValueChangedEventArgs e)
+    {
+        var newValue = Wraparound(e.Value);
 
-            XCoordinate.Value = (int) position.X;
-            YCoordinate.Value = (int) position.Y;
+        if (e.Value == newValue)
+            return;
 
-            RotationSpin.OverrideValue(Wraparound((int) rotation.Degrees));
-        }
+        RotationSpin.OverrideValue(newValue);
+    }
 
-        private void OnResetButtonPressed(BaseButton.ButtonEventArgs obj)
-        {
-            Reset();
-        }
+    private int Wraparound(int value)
+    {
+        var newValue = value % 360;
+        if (newValue < 0)
+            newValue += 360;
 
-        private void OnRotate(ValueChangedEventArgs e)
-        {
-            var newValue = Wraparound(e.Value);
+        return newValue;
+    }
 
-            if (e.Value == newValue) return;
+    private void OnOptionSelect(OptionButton.ItemSelectedEventArgs obj) => MapOptions.SelectId(obj.Id);
 
-            RotationSpin.OverrideValue(newValue);
-        }
-
-        private int Wraparound(int value)
-        {
-            var newValue = (value % 360);
-            if (newValue < 0)
-                newValue += 360;
-
-            return newValue;
-        }
-
-        private void OnOptionSelect(OptionButton.ItemSelectedEventArgs obj)
-        {
-            MapOptions.SelectId(obj.Id);
-        }
-
-        private void OnTeleportButtonPressed(BaseButton.ButtonEventArgs obj)
-        {
-            IoCManager.Resolve<IClientConsoleHost>().ExecuteCommand(
+    private void OnTeleportButtonPressed(BaseButton.ButtonEventArgs obj) =>
+        IoCManager.Resolve<IClientConsoleHost>()
+            .ExecuteCommand(
                 $"tp {XCoordinate.Value} {YCoordinate.Value} {new MapId(MapOptions.SelectedId)}");
-        }
 
-        private void OnSubmitButtonPressed(BaseButton.ButtonEventArgs obj)
-        {
-            if (MapPath.Text.Length == 0) return;
+    private void OnSubmitButtonPressed(BaseButton.ButtonEventArgs obj)
+    {
+        if (MapPath.Text.Length == 0)
+            return;
 
-            IoCManager.Resolve<IClientConsoleHost>().ExecuteCommand(
+        IoCManager.Resolve<IClientConsoleHost>()
+            .ExecuteCommand(
                 $"loadbp {new MapId(MapOptions.SelectedId)} \"{MapPath.Text}\" {XCoordinate.Value} {YCoordinate.Value} {RotationSpin.Value}");
-        }
     }
 }

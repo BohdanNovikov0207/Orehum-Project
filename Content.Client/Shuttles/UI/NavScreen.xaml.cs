@@ -17,7 +17,9 @@ using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.XAML;
 using Robust.Shared.Map;
 using Robust.Shared.Physics.Components;
-using Robust.Shared.Prototypes; // Frontier
+using Robust.Shared.Prototypes;
+
+// Frontier
 
 namespace Content.Client.Shuttles.UI;
 
@@ -26,7 +28,7 @@ public sealed partial class NavScreen : BoxContainer
 {
     [Dependency] private readonly IEntityManager _entManager = default!;
     [Dependency] private readonly IPrototypeManager _protoMan = default!; // Frontier
-    private SharedTransformSystem _xformSystem;
+    private readonly SharedTransformSystem _xformSystem;
 
     private EntityUid? _consoleEntity; // Entity of controlling console
     private EntityUid? _shuttleEntity;
@@ -65,10 +67,7 @@ public sealed partial class NavScreen : BoxContainer
                 metadata.EntityName.Contains(text, StringComparison.OrdinalIgnoreCase);
     }
 
-    public void SetShuttle(EntityUid? shuttle)
-    {
-        _shuttleEntity = shuttle;
-    }
+    public void SetShuttle(EntityUid? shuttle) => _shuttleEntity = shuttle;
 
     public void SetConsole(EntityUid? console)
     {
@@ -148,9 +147,7 @@ public sealed partial class NavScreen : BoxContainer
 
         if (!_entManager.TryGetComponent(_shuttleEntity, out TransformComponent? gridXform) ||
             !_entManager.TryGetComponent(_shuttleEntity, out PhysicsComponent? gridBody))
-        {
             return;
-        }
 
         var (_, worldRot, worldMatrix) = _xformSystem.GetWorldPositionRotationMatrix(gridXform);
         var worldPos = Vector2.Transform(gridBody.LocalCenter, worldMatrix);

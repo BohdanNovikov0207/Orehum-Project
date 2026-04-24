@@ -13,12 +13,8 @@ namespace Content.Client.Parallax.Data;
 /// Prototype data for a parallax.
 /// </summary>
 [Prototype]
-public sealed partial class ParallaxPrototype : IPrototype
+public sealed class ParallaxPrototype : IPrototype
 {
-    /// <inheritdoc/>
-    [IdDataField]
-    public string ID { get; private set; } = default!;
-
     /// <summary>
     /// Parallax layers.
     /// </summary>
@@ -36,4 +32,8 @@ public sealed partial class ParallaxPrototype : IPrototype
     /// </summary>
     [DataField("layersLQUseHQ")]
     public bool LayersLQUseHQ { get; private set; } = true;
+
+    /// <inheritdoc />
+    [IdDataField]
+    public string ID { get; } = default!;
 }

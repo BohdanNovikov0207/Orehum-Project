@@ -11,7 +11,6 @@ SPDX-License-Identifier: MIT
     xmlns:graphics="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client"
     xmlns:xNamespace="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:style="clr-namespace:Content.Client.Stylesheets"
-    xmlns:customControls="clr-namespace:Content.Client.Administration.UI.CustomControls"
     Orientation="Vertical"
     HorizontalExpand="True"
     Margin="0 0 0 5">
@@ -20,9 +19,9 @@ SPDX-License-Identifier: MIT
             <graphics:StyleBoxFlat BackgroundColor="{xNamespace:Static style:StyleNano.ButtonColorDisabled}" />
         </PanelContainer.PanelOverride>
         <Collapsible Name="Collapsible">
-            <CollapsibleHeading Name="Heading" MinHeight="35"/>
+            <CollapsibleHeading Name="Heading" MinHeight="35" />
             <CollapsibleBody Name="Body">
-                <BoxContainer Name="ItemsContainer" Orientation="Vertical" HorizontalExpand="True"/>
+                <BoxContainer Name="ItemsContainer" Orientation="Vertical" HorizontalExpand="True" />
             </CollapsibleBody>
         </Collapsible>
     </PanelContainer>

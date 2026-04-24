@@ -13,9 +13,6 @@ namespace Content.Client.Research.UI;
 [GenerateTypedNameReferences]
 public sealed partial class DiskConsoleMenu : FancyWindow
 {
-    public event Action? OnServerButtonPressed;
-    public event Action? OnPrintButtonPressed;
-
     public DiskConsoleMenu()
     {
         RobustXamlLoader.Load(this);
@@ -23,6 +20,9 @@ public sealed partial class DiskConsoleMenu : FancyWindow
         ServerButton.OnPressed += _ => OnServerButtonPressed?.Invoke();
         PrintButton.OnPressed += _ => OnPrintButtonPressed?.Invoke();
     }
+
+    public event Action? OnServerButtonPressed;
+    public event Action? OnPrintButtonPressed;
 
     public void Update(DiskConsoleBoundUserInterfaceState state)
     {

@@ -23,8 +23,8 @@ public sealed class HSeparator : Control
             PanelOverride = new StyleBoxFlat
             {
                 BackgroundColor = color,
-                ContentMarginBottomOverride = 2, ContentMarginLeftOverride = 2
-            }
+                ContentMarginBottomOverride = 2, ContentMarginLeftOverride = 2,
+            },
         });
     }
 

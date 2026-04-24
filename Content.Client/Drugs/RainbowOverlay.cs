@@ -22,30 +22,24 @@ namespace Content.Client.Drugs;
 
 public sealed class RainbowOverlay : Overlay
 {
+    private const float VisualThreshold = 10.0f;
+    private const float PowerDivisor = 250.0f;
     private static readonly ProtoId<ShaderPrototype> Shader = "Rainbow";
 
     [Dependency] private readonly IConfigurationManager _config = default!;
     [Dependency] private readonly IEntityManager _entityManager = default!;
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly IPlayerManager _playerManager = default!;
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    private readonly ShaderInstance _rainbowShader;
+    private readonly StatusEffectsSystem _statusEffects = default!;
     [Dependency] private readonly IEntitySystemManager _sysMan = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
-    private readonly StatusEffectsSystem _statusEffects = default!;
+    private float _timeScale;
+    private float _warpScale;
 
-    public override OverlaySpace Space => OverlaySpace.WorldSpace;
-    public override bool RequestScreenTexture => true;
-    private readonly ShaderInstance _rainbowShader;
-
-    public float Intoxication = 0.0f;
-    public float TimeTicker = 0.0f;
+    public float Intoxication;
     public float Phase = 0.0f;
-
-    private const float VisualThreshold = 10.0f;
-    private const float PowerDivisor = 250.0f;
-    private float _timeScale = 0.0f;
-    private float _warpScale = 0.0f;
-
-    private float EffectScale => Math.Clamp((Intoxication - VisualThreshold) / PowerDivisor, 0.0f, 1.0f);
+    public float TimeTicker;
 
     public RainbowOverlay()
     {
@@ -54,8 +48,13 @@ public sealed class RainbowOverlay : Overlay
         _statusEffects = _sysMan.GetEntitySystem<StatusEffectsSystem>();
 
         _rainbowShader = _prototypeManager.Index(Shader).InstanceUnique();
-        _config.OnValueChanged(CCVars.ReducedMotion, OnReducedMotionChanged, invokeImmediately: true);
+        _config.OnValueChanged(CCVars.ReducedMotion, OnReducedMotionChanged, true);
     }
+
+    public override OverlaySpace Space => OverlaySpace.WorldSpace;
+    public override bool RequestScreenTexture => true;
+
+    private float EffectScale => Math.Clamp((Intoxication - VisualThreshold) / PowerDivisor, 0.0f, 1.0f);
 
     private void OnReducedMotionChanged(bool reducedMotion)
     {
@@ -70,21 +69,18 @@ public sealed class RainbowOverlay : Overlay
         if (playerEntity == null)
             return;
 
-        if (!_statusEffects.TryGetEffectsEndTimeWithComp<SeeingRainbowsStatusEffectComponent>(playerEntity, out var endTime))
+        if (!_statusEffects.TryGetEffectsEndTimeWithComp<SeeingRainbowsStatusEffectComponent>(playerEntity,
+                out var endTime))
             return;
 
         endTime ??= TimeSpan.MaxValue;
-        var timeLeft = (float)(endTime - _timing.CurTime).Value.TotalSeconds;
+        var timeLeft = (float) (endTime - _timing.CurTime).Value.TotalSeconds;
 
         TimeTicker += args.DeltaSeconds;
         if (timeLeft - TimeTicker > timeLeft / 16f)
-        {
             Intoxication += (timeLeft - Intoxication) * args.DeltaSeconds / 16f;
-        }
         else
-        {
             Intoxication -= Intoxication / (timeLeft - TimeTicker) * args.DeltaSeconds;
-        }
     }
 
     protected override bool BeforeDraw(in OverlayDrawArgs args)

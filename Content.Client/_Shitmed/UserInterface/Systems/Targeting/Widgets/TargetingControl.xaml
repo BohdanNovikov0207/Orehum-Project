@@ -36,7 +36,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                             Stretch="KeepAspectCentered"
                             SetSize="12 24"
                             VerticalAlignment="Center"
-                            HorizontalAlignment="Center"/>
+                            HorizontalAlignment="Center" />
                     </TextureButton>
                     <TextureButton
                         Name="RightHandButton"
@@ -48,7 +48,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                             Stretch="KeepAspectCentered"
                             SetSize="12 12"
                             VerticalAlignment="Center"
-                            HorizontalAlignment="Center"/>
+                            HorizontalAlignment="Center" />
                     </TextureButton>
                 </PanelContainer>
                 <PanelContainer
@@ -67,7 +67,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                             Stretch="KeepAspectCentered"
                             SetSize="27 21"
                             VerticalAlignment="Center"
-                            HorizontalAlignment="Center"/>
+                            HorizontalAlignment="Center" />
                         <!--<PanelContainer
                             SetSize="15 15"
                             Margin="0 9 0 0"
@@ -106,7 +106,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                             Stretch="KeepAspectCentered"
                             SetSize="27 30"
                             VerticalAlignment="Center"
-                            HorizontalAlignment="Center"/>
+                            HorizontalAlignment="Center" />
                     </TextureButton>
                     <PanelContainer
                         MinSize="45 42"
@@ -123,7 +123,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                                 Stretch="KeepAspectCentered"
                                 SetSize="27 12"
                                 VerticalAlignment="Center"
-                                HorizontalAlignment="Center"/>
+                                HorizontalAlignment="Center" />
                         </TextureButton>
                         <PanelContainer
                             MinSize="24 36"
@@ -140,19 +140,19 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                                     Stretch="KeepAspectCentered"
                                     SetSize="12 27"
                                     VerticalAlignment="Center"
-                                    HorizontalAlignment="Center"/>
+                                    HorizontalAlignment="Center" />
                             </TextureButton>
                             <TextureButton
                                 Name="LeftFootButton"
                                 MinSize="24 12"
                                 VerticalAlignment="Bottom"
                                 StyleClasses="TargetDollButtonLeftFoot">
-                                    <TextureRect
-                                        TexturePath="/Textures/_Shitmed/Interface/Targeting/Doll/leftfoot.png"
-                                        Stretch="KeepAspectCentered"
-                                        SetSize="18 9"
-                                        VerticalAlignment="Center"
-                                        HorizontalAlignment="Center"/>
+                                <TextureRect
+                                    TexturePath="/Textures/_Shitmed/Interface/Targeting/Doll/leftfoot.png"
+                                    Stretch="KeepAspectCentered"
+                                    SetSize="18 9"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Center" />
                             </TextureButton>
                         </PanelContainer>
                         <PanelContainer
@@ -170,7 +170,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                                     Stretch="KeepAspectCentered"
                                     SetSize="12 27"
                                     VerticalAlignment="Center"
-                                    HorizontalAlignment="Center"/>
+                                    HorizontalAlignment="Center" />
                             </TextureButton>
                             <TextureButton
                                 Name="RightFootButton"
@@ -183,7 +183,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                                     Stretch="KeepAspectCentered"
                                     SetSize="18 9"
                                     VerticalAlignment="Center"
-                                    HorizontalAlignment="Center"/>
+                                    HorizontalAlignment="Center" />
                             </TextureButton>
                         </PanelContainer>
                     </PanelContainer>
@@ -202,7 +202,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                             Stretch="KeepAspectCentered"
                             SetSize="12 24"
                             VerticalAlignment="Center"
-                            HorizontalAlignment="Center"/>
+                            HorizontalAlignment="Center" />
                     </TextureButton>
                     <TextureButton
                         Name="LeftHandButton"
@@ -214,7 +214,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                             Stretch="KeepAspectCentered"
                             SetSize="12 12"
                             VerticalAlignment="Center"
-                            HorizontalAlignment="Center"/>
+                            HorizontalAlignment="Center" />
                     </TextureButton>
                 </PanelContainer>
             </PanelContainer>

@@ -17,10 +17,10 @@ public class LoadingScreen<TResult> : State
 {
     [Dependency] private readonly IResourceCache _resourceCache = default!;
     [Dependency] private readonly IUserInterfaceManager _userInterfaceManager = default!;
-
-    public event Action<TResult?, Exception?>? OnJobFinished;
     private LoadingScreenControl _screen = default!;
     public Job<TResult>? Job;
+
+    public event Action<TResult?, Exception?>? OnJobFinished;
 
     public override void FrameUpdate(FrameEventArgs e)
     {
@@ -38,14 +38,11 @@ public class LoadingScreen<TResult> : State
 
     protected override void Startup()
     {
-        _screen = new(_resourceCache);
+        _screen = new LoadingScreenControl(_resourceCache);
         _userInterfaceManager.StateRoot.AddChild(_screen);
     }
 
-    protected override void Shutdown()
-    {
-        _screen.Dispose();
-    }
+    protected override void Shutdown() => _screen.Dispose();
 
     public void UpdateProgress(float value, float maxValue, string header, string subtext = "")
     {

@@ -15,7 +15,12 @@ public sealed class SearchListContainer : ListContainer
     private List<ListData> _unfilteredData = new();
 
     /// <summary>
-    /// The <see cref="LineEdit"/> that is used to filter the list data.
+    /// Runs over the ListData to determine if it should pass the filter.
+    /// </summary>
+    public Func<string, ListData, bool>? DataFilterCondition = null;
+
+    /// <summary>
+    /// The <see cref="LineEdit" /> that is used to filter the list data.
     /// </summary>
     public LineEdit? SearchBar
     {
@@ -34,21 +39,13 @@ public sealed class SearchListContainer : ListContainer
         }
     }
 
-    /// <summary>
-    /// Runs over the ListData to determine if it should pass the filter.
-    /// </summary>
-    public Func<string, ListData, bool>? DataFilterCondition = null;
-
     public override void PopulateList(IReadOnlyList<ListData> data)
     {
         _unfilteredData = data.ToList();
         FilterList();
     }
 
-    private void FilterList(LineEdit.LineEditEventArgs obj)
-    {
-        FilterList();
-    }
+    private void FilterList(LineEdit.LineEditEventArgs obj) => FilterList();
 
     private void FilterList()
     {

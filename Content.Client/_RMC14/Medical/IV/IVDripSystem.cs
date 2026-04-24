@@ -7,14 +7,16 @@ using Content.Shared._RMC14.Medical.IV;
 using Content.Shared.Rounding;
 using Robust.Client.GameObjects;
 using Robust.Client.Graphics;
-using Robust.Shared.Containers; // Required for SharedContainerSystem
+using Robust.Shared.Containers;
+
+// Required for SharedContainerSystem
 
 namespace Content.Client._RMC14.Medical.IV;
 
 public sealed class IVDripSystem : SharedIVDripSystem
 {
-    [Dependency] private readonly IOverlayManager _overlay = default!;
     [Dependency] private readonly SharedContainerSystem _container = default!; // Add this dependency
+    [Dependency] private readonly IOverlayManager _overlay = default!;
 
     public override void Initialize()
     {
@@ -36,12 +38,10 @@ public sealed class IVDripSystem : SharedIVDripSystem
             return;
 
         // check if slot has an item
-        bool hasBag = false;
+        var hasBag = false;
         if (_container.TryGetContainer(iv, iv.Comp.Slot, out var container) &&
             container.ContainedEntities.Count > 0)
-        {
             hasBag = true;
-        }
 
         // determine state
         string baseState;

@@ -39,14 +39,16 @@ public sealed partial class InstrumentSystem
                     resolvedTracks.Add(midiTrack);
                     break;
                 default:
-                    resolvedTracks.Add(null); // Used so the channel still displays as MIDI Channel X and doesn't just take the next valid one in the UI
+                    resolvedTracks
+                        .Add(null); // Used so the channel still displays as MIDI Channel X and doesn't just take the next valid one in the UI
                     break;
             }
 
             Log.Debug($"Channel name: {resolvedTracks.Last()}");
         }
 
-        RaiseNetworkEvent(new InstrumentSetChannelsEvent(GetNetEntity(uid), resolvedTracks.Take(RobustMidiEvent.MaxChannels).ToArray()));
+        RaiseNetworkEvent(new InstrumentSetChannelsEvent(GetNetEntity(uid),
+            resolvedTracks.Take(RobustMidiEvent.MaxChannels).ToArray()));
         Log.Debug($"Resolved {resolvedTracks.Count} channels.");
 
         return true;

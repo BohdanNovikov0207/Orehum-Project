@@ -28,10 +28,10 @@ namespace Content.Client.Administration.UI.Notes;
 [GenerateTypedNameReferences]
 public sealed partial class NoteEdit : FancyWindow
 {
-    [Dependency] private readonly IGameTiming _gameTiming = default!;
     [Dependency] private readonly IClientConsoleHost _console = default!;
+    [Dependency] private readonly IGameTiming _gameTiming = default!;
 
-    public event Action<int, NoteType, string, NoteSeverity?, bool, DateTime?>? SubmitPressed;
+    private NoteSeverity? _noteSeverity;
 
     public NoteEdit(SharedAdminNote? note, string playerName, bool canCreate, bool canEdit)
     {
@@ -52,10 +52,14 @@ public sealed partial class NoteEdit : FancyWindow
 
 
         SeverityOption.AddItem(Loc.GetString("admin-note-editor-severity-select"), -1);
-        SeverityOption.AddItem(Loc.GetString("admin-note-editor-severity-none"), (int) Shared.Database.NoteSeverity.None);
-        SeverityOption.AddItem(Loc.GetString("admin-note-editor-severity-low"), (int) Shared.Database.NoteSeverity.Minor);
-        SeverityOption.AddItem(Loc.GetString("admin-note-editor-severity-medium"), (int) Shared.Database.NoteSeverity.Medium);
-        SeverityOption.AddItem(Loc.GetString("admin-note-editor-severity-high"), (int) Shared.Database.NoteSeverity.High);
+        SeverityOption.AddItem(Loc.GetString("admin-note-editor-severity-none"),
+            (int) Shared.Database.NoteSeverity.None);
+        SeverityOption.AddItem(Loc.GetString("admin-note-editor-severity-low"),
+            (int) Shared.Database.NoteSeverity.Minor);
+        SeverityOption.AddItem(Loc.GetString("admin-note-editor-severity-medium"),
+            (int) Shared.Database.NoteSeverity.Medium);
+        SeverityOption.AddItem(Loc.GetString("admin-note-editor-severity-high"),
+            (int) Shared.Database.NoteSeverity.High);
         SeverityOption.OnItemSelected += OnSeverityChanged;
 
         PermanentCheckBox.OnPressed += OnPermanentPressed;
@@ -72,19 +76,22 @@ public sealed partial class NoteEdit : FancyWindow
 
         if (note is not null)
         {
-            Title = Loc.GetString("admin-note-editor-title-existing", ("id", note.Id), ("player", PlayerName), ("author", note.CreatedByName));
+            Title = Loc.GetString("admin-note-editor-title-existing",
+                ("id", note.Id),
+                ("player", PlayerName),
+                ("author", note.CreatedByName));
             NoteId = note.Id;
 
             NoteType = note.NoteType;
             TypeOption.AddItem(Loc.GetString("admin-note-editor-type-server-ban"), (int) NoteType.ServerBan);
             TypeOption.AddItem(Loc.GetString("admin-note-editor-type-role-ban"), (int) NoteType.RoleBan);
-            TypeOption.SelectId((int)NoteType);
+            TypeOption.SelectId((int) NoteType);
             TypeOption.Disabled = true;
 
             NoteTextEdit.InsertAtCursor(note.Message);
 
             NoteSeverity = note.NoteSeverity ?? Shared.Database.NoteSeverity.Minor;
-            SeverityOption.SelectId((int)NoteSeverity);
+            SeverityOption.SelectId((int) NoteSeverity);
             SeverityOption.Disabled = note.NoteType is not (NoteType.Note or NoteType.ServerBan or NoteType.RoleBan);
 
             IsSecret = note.Secret;
@@ -102,21 +109,6 @@ public sealed partial class NoteEdit : FancyWindow
         UpdateSubmitButton();
     }
 
-    private void OnSubmitButtonMouseEntered(GUIMouseHoverEventArgs args)
-    {
-        if (!SubmitButton.Disabled)
-            return;
-
-        SeverityOption.ModulateSelfOverride = Color.Red;
-    }
-
-    private void OnSubmitButtonMouseExited(GUIMouseHoverEventArgs args)
-    {
-        SeverityOption.ModulateSelfOverride = null;
-    }
-
-    private NoteSeverity? _noteSeverity = null;
-
     private string PlayerName { get; }
     private int NoteId { get; }
     private bool IsSecret { get; set; }
@@ -131,11 +123,24 @@ public sealed partial class NoteEdit : FancyWindow
             UpdateSubmitButton();
         }
     }
+
     private DateTime? ExpiryTime { get; set; }
     private TimeSpan? DeleteResetOn { get; set; }
-    private bool IsCreating { get; set; }
-    private bool CanCreate { get; set; }
-    private bool CanEdit { get; set; }
+    private bool IsCreating { get; }
+    private bool CanCreate { get; }
+    private bool CanEdit { get; }
+
+    public event Action<int, NoteType, string, NoteSeverity?, bool, DateTime?>? SubmitPressed;
+
+    private void OnSubmitButtonMouseEntered(GUIMouseHoverEventArgs args)
+    {
+        if (!SubmitButton.Disabled)
+            return;
+
+        SeverityOption.ModulateSelfOverride = Color.Red;
+    }
+
+    private void OnSubmitButtonMouseExited(GUIMouseHoverEventArgs args) => SeverityOption.ModulateSelfOverride = null;
 
     private void OnTypeChanged(OptionButton.ItemSelectedEventArgs args)
     {
@@ -161,7 +166,8 @@ public sealed partial class NoteEdit : FancyWindow
                 PermanentCheckBox.Pressed = false;
                 UpdatePermanentCheckboxFields();
                 break;
-            case (int) NoteType.Watchlist: // Watchlist: these are always secret and only shown to admins when the player logs on
+            case (int) NoteType.Watchlist
+                : // Watchlist: these are always secret and only shown to admins when the player logs on
                 NoteType = NoteType.Watchlist;
                 SecretCheckBox.Disabled = true;
                 SecretCheckBox.Pressed = true;
@@ -178,10 +184,7 @@ public sealed partial class NoteEdit : FancyWindow
         TypeOption.SelectId(args.Id);
     }
 
-    private void OnPermanentPressed(BaseButton.ButtonEventArgs _)
-    {
-        UpdatePermanentCheckboxFields();
-    }
+    private void OnPermanentPressed(BaseButton.ButtonEventArgs _) => UpdatePermanentCheckboxFields();
 
     private void UpdatePermanentCheckboxFields()
     {
@@ -191,10 +194,7 @@ public sealed partial class NoteEdit : FancyWindow
         ExpiryLineEdit.Text = !PermanentCheckBox.Pressed ? DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") : string.Empty;
     }
 
-    private void OnSecretPressed(BaseButton.ButtonEventArgs _)
-    {
-        IsSecret = SecretCheckBox.Pressed;
-    }
+    private void OnSecretPressed(BaseButton.ButtonEventArgs _) => IsSecret = SecretCheckBox.Pressed;
 
     private void OnSeverityChanged(OptionButton.ItemSelectedEventArgs args)
     {
@@ -217,12 +217,15 @@ public sealed partial class NoteEdit : FancyWindow
 
         ResetSubmitButton();
 
-        SubmitPressed?.Invoke(NoteId, NoteType, Rope.Collapse(NoteTextEdit.TextRope), NoteSeverity, IsSecret, ExpiryTime);
+        SubmitPressed?.Invoke(NoteId,
+            NoteType,
+            Rope.Collapse(NoteTextEdit.TextRope),
+            NoteSeverity,
+            IsSecret,
+            ExpiryTime);
 
         if (Parent is null)
-        {
             _console.ExecuteCommand($"adminnotes \"{PlayerName}\"");
-        }
         Close();
     }
 
@@ -238,7 +241,7 @@ public sealed partial class NoteEdit : FancyWindow
     }
 
     /// <summary>
-    ///     Updates whether or not the submit button is disabled.
+    /// Updates whether or not the submit button is disabled.
     /// </summary>
     private void UpdateSubmitButton()
     {
@@ -254,7 +257,7 @@ public sealed partial class NoteEdit : FancyWindow
             return;
         }
 
-        SubmitButton.Disabled = (NoteType != NoteType.Watchlist && NoteType != NoteType.Message) && NoteSeverity == null;
+        SubmitButton.Disabled = NoteType != NoteType.Watchlist && NoteType != NoteType.Message && NoteSeverity == null;
     }
 
     private void ResetSubmitButton()
@@ -278,7 +281,8 @@ public sealed partial class NoteEdit : FancyWindow
             return true;
         }
 
-        if (string.IsNullOrWhiteSpace(ExpiryLineEdit.Text) || !DateTime.TryParse(ExpiryLineEdit.Text, out var result) || DateTime.UtcNow > result)
+        if (string.IsNullOrWhiteSpace(ExpiryLineEdit.Text) || !DateTime.TryParse(ExpiryLineEdit.Text, out var result) ||
+            DateTime.UtcNow > result)
         {
             ExpiryLineEdit.ModulateSelfOverride = Color.Red;
             return false;
@@ -294,9 +298,7 @@ public sealed partial class NoteEdit : FancyWindow
         base.Dispose(disposing);
 
         if (!disposing)
-        {
             return;
-        }
 
         PermanentCheckBox.OnPressed -= OnPermanentPressed;
         SecretCheckBox.OnPressed -= OnSecretPressed;

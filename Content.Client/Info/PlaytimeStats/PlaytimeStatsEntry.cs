@@ -17,23 +17,20 @@ namespace Content.Client.Info.PlaytimeStats;
 [GenerateTypedNameReferences]
 public sealed partial class PlaytimeStatsEntry : ContainerButton
 {
-    public TimeSpan Playtime { get; private set; }  // new TimeSpan property
-
     public PlaytimeStatsEntry(string role, TimeSpan playtime, StyleBox styleBox)
     {
         RobustXamlLoader.Load(this);
 
         RoleLabel.Text = role;
-        Playtime = playtime;  // store the TimeSpan value directly
-        PlaytimeLabel.Text = ContentLocalizationManager.FormatPlaytime(playtime);  // convert to string for display
+        Playtime = playtime; // store the TimeSpan value directly
+        PlaytimeLabel.Text = ContentLocalizationManager.FormatPlaytime(playtime); // convert to string for display
         BackgroundColorPanel.PanelOverride = styleBox;
     }
 
-    public void UpdateShading(StyleBoxFlat styleBox)
-    {
-        BackgroundColorPanel.PanelOverride = styleBox;
-    }
+    public TimeSpan Playtime { get; private set; } // new TimeSpan property
     public string? PlaytimeText => PlaytimeLabel.Text;
 
     public string? RoleText => RoleLabel.Text;
+
+    public void UpdateShading(StyleBoxFlat styleBox) => BackgroundColorPanel.PanelOverride = styleBox;
 }

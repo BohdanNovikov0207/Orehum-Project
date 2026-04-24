@@ -17,9 +17,10 @@ namespace Content.Client._EstacaoPirata.Cards.Card;
 /// </summary>
 public sealed class CardSystem : EntitySystem
 {
-    [Dependency] private readonly SpriteSystem _spriteSystem = default!;
     [Dependency] private readonly CardSpriteSystem _cardSpriteSystem = default!;
-    /// <inheritdoc/>
+    [Dependency] private readonly SpriteSystem _spriteSystem = default!;
+
+    /// <inheritdoc />
     public override void Initialize()
     {
         SubscribeLocalEvent<CardComponent, ComponentStartup>(OnComponentStartupEvent);

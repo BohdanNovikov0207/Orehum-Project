@@ -36,19 +36,16 @@ public class ActionButtonContainer : GridContainer
     [Dependency] private readonly IEntityManager _entity = default!;
     [Dependency] private readonly IInputManager _input = default!;
 
-    public event Action<GUIBoundKeyEventArgs, ActionButton>? ActionPressed;
-    public event Action<GUIBoundKeyEventArgs, ActionButton>? ActionUnpressed;
-    public event Action<ActionButton>? ActionFocusExited;
-
     public ActionButtonContainer()
     {
         IoCManager.InjectDependencies(this);
     }
 
-    public ActionButton this[int index]
-    {
-        get => (ActionButton) GetChild(index);
-    }
+    public ActionButton this[int index] => (ActionButton) GetChild(index);
+
+    public event Action<GUIBoundKeyEventArgs, ActionButton>? ActionPressed;
+    public event Action<GUIBoundKeyEventArgs, ActionButton>? ActionUnpressed;
+    public event Action<ActionButton>? ActionFocusExited;
 
     public void SetActionData(ActionsSystem system, params EntityUid?[] actionTypes)
     {
@@ -58,9 +55,7 @@ public class ActionButtonContainer : GridContainer
         for (var i = 0; i < uniqueCount; i++)
         {
             if (i >= ChildCount)
-            {
                 AddChild(MakeButton(i));
-            }
 
             if (!actionTypes.TryGetValue(i, out var action))
                 action = null;
@@ -81,9 +76,7 @@ public class ActionButtonContainer : GridContainer
 
             button.KeyBind = boundKey;
             if (_input.TryGetKeyBinding(boundKey, out var binding))
-            {
                 button.Label.Text = binding.GetKeyString();
-            }
 
             return button;
         }

@@ -12,17 +12,17 @@ namespace Content.Client.Administration.UI.AdminCamera;
 /// Use the "Open Camera" admin verb or the "camera" command to open.
 /// </summary>
 [UsedImplicitly]
-public sealed partial class AdminCameraEui : BaseEui
+public sealed class AdminCameraEui : BaseEui
 {
-    private readonly AdminCameraWindow _window;
     private readonly AdminCameraControl _control;
-
-    // If not null the camera is in "popped out" mode and is in an external window.
-    private OSWindow? _OSWindow;
+    private readonly AdminCameraWindow _window;
 
     // The last location the window was located at in game.
     // Is used for getting knowing where to "pop in" external windows.
     private Vector2 _lastLocation;
+
+    // If not null the camera is in "popped out" mode and is in an external window.
+    private OSWindow? _OSWindow;
 
     public AdminCameraEui()
     {

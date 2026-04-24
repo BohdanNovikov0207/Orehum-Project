@@ -23,7 +23,6 @@ using Content.Client.UserInterface.Systems.Inventory;
 using Content.Client.UserInterface.Systems.Inventory.Controls;
 using Content.Client.UserInterface.Systems.Inventory.Widgets;
 using Content.Client.UserInterface.Systems.Storage;
-using Content.Client.UserInterface.Systems.Storage.Controls;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controllers;
 
@@ -31,8 +30,8 @@ namespace Content.Client.UserInterface.Systems.Hotbar;
 
 public sealed class HotbarUIController : UIController
 {
-    private InventoryUIController? _inventory;
     private HandsUIController? _hands;
+    private InventoryUIController? _inventory;
     private StorageUIController? _storage;
 
     public override void Initialize()
@@ -43,10 +42,7 @@ public sealed class HotbarUIController : UIController
         gameplayStateLoad.OnScreenLoad += OnScreenLoad;
     }
 
-    private void OnScreenLoad()
-    {
-        ReloadHotbar();
-    }
+    private void OnScreenLoad() => ReloadHotbar();
 
     public void Setup(HandsContainer handsContainer)
     {
@@ -59,9 +55,7 @@ public sealed class HotbarUIController : UIController
     public void ReloadHotbar()
     {
         if (UIManager.ActiveScreen == null)
-        {
             return;
-        }
 
         if (UIManager.ActiveScreen.GetWidget<HotbarGui>() is { } hotbar)
         {
@@ -78,9 +72,7 @@ public sealed class HotbarUIController : UIController
         //todo move this over to its own hellhole
         var inventory = UIManager.ActiveScreen.GetWidget<InventoryGui>();
         if (inventory == null)
-        {
             return;
-        }
 
         foreach (var container in GetAllItemSlotContainers(inventory))
         {
@@ -98,9 +90,7 @@ public sealed class HotbarUIController : UIController
         foreach (var child in gui.Children)
         {
             if (child is ItemSlotButtonContainer container)
-            {
                 result.Add(container);
-            }
 
             result.AddRange(GetAllItemSlotContainers(child));
         }

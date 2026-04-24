@@ -30,15 +30,13 @@ public sealed partial class PlayerListEntry : BoxContainer
         PlayerEntryPinButton.OnPressed += HandlePinButtonPressed(info);
     }
 
-    private Action<BaseButton.ButtonEventArgs> HandlePinButtonPressed(PlayerInfo info)
-    {
-        return args =>
+    private Action<BaseButton.ButtonEventArgs> HandlePinButtonPressed(PlayerInfo info) =>
+        args =>
         {
             info.IsPinned = !info.IsPinned;
             UpdatePinButtonTexture(info.IsPinned);
             OnPinStatusChanged?.Invoke(info);
         };
-    }
 
     private void Update(PlayerInfo info, Func<PlayerInfo, string, string>? overrideText)
     {

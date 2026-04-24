@@ -12,10 +12,6 @@ namespace Content.Client.CartridgeLoader.Cartridges;
 [GenerateTypedNameReferences]
 public sealed partial class NotekeeperUiFragment : BoxContainer
 {
-
-    public event Action<string>? OnNoteAdded;
-    public event Action<string>? OnNoteRemoved;
-
     public NotekeeperUiFragment()
     {
         RobustXamlLoader.Load(this);
@@ -33,13 +29,16 @@ public sealed partial class NotekeeperUiFragment : BoxContainer
         UpdateState(new List<string>());
     }
 
+    public event Action<string>? OnNoteAdded;
+    public event Action<string>? OnNoteRemoved;
+
     public void UpdateState(List<string> notes)
     {
         MessageContainer.RemoveAllChildren();
 
         foreach (var note in notes)
         {
-           AddNote(note);
+            AddNote(note);
         }
     }
 

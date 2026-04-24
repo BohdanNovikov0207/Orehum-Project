@@ -29,32 +29,32 @@ public sealed class AtmosMonitoringConsoleSystem : SharedAtmosMonitoringConsoleS
         switch (args.Current)
         {
             case AtmosMonitoringConsoleDeltaState delta:
+            {
+                modifiedChunks = delta.ModifiedChunks;
+                atmosDevices = delta.AtmosDevices;
+
+                foreach (var index in component.AtmosPipeChunks.Keys)
                 {
-                    modifiedChunks = delta.ModifiedChunks;
-                    atmosDevices = delta.AtmosDevices;
-
-                    foreach (var index in component.AtmosPipeChunks.Keys)
-                    {
-                        if (!delta.AllChunks!.Contains(index))
-                            component.AtmosPipeChunks.Remove(index);
-                    }
-
-                    break;
+                    if (!delta.AllChunks!.Contains(index))
+                        component.AtmosPipeChunks.Remove(index);
                 }
+
+                break;
+            }
 
             case AtmosMonitoringConsoleState state:
+            {
+                modifiedChunks = state.Chunks;
+                atmosDevices = state.AtmosDevices;
+
+                foreach (var index in component.AtmosPipeChunks.Keys)
                 {
-                    modifiedChunks = state.Chunks;
-                    atmosDevices = state.AtmosDevices;
-
-                    foreach (var index in component.AtmosPipeChunks.Keys)
-                    {
-                        if (!state.Chunks.ContainsKey(index))
-                            component.AtmosPipeChunks.Remove(index);
-                    }
-
-                    break;
+                    if (!state.Chunks.ContainsKey(index))
+                        component.AtmosPipeChunks.Remove(index);
                 }
+
+                break;
+            }
             default:
                 return;
         }

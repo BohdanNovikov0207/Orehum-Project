@@ -20,13 +20,12 @@ namespace Content.Client.UserInterface.Systems.Chat.Controls;
 
 public sealed class ChannelFilterButton : ChatPopupButton<ChannelFilterPopup>
 {
+    private const int FilterDropdownOffset = 120;
     private static readonly Color ColorNormal = Color.FromHex("#7b7e9e");
     private static readonly Color ColorHovered = Color.FromHex("#9699bb");
     private static readonly Color ColorPressed = Color.FromHex("#789B8C");
-    private readonly TextureRect? _textureRect;
     private readonly ChatUIController _chatUIController;
-
-    private const int FilterDropdownOffset = 120;
+    private readonly TextureRect? _textureRect;
 
     public ChannelFilterButton()
     {
@@ -35,12 +34,12 @@ public sealed class ChannelFilterButton : ChatPopupButton<ChannelFilterPopup>
             .GetTexture("/Textures/Interface/Nano/filter.svg.96dpi.png");
 
         AddChild(
-            (_textureRect = new TextureRect
+            _textureRect = new TextureRect
             {
                 Texture = filterTexture,
                 HorizontalAlignment = HAlignment.Center,
-                VerticalAlignment = VAlignment.Center
-            })
+                VerticalAlignment = VAlignment.Center,
+            }
         );
 
         _chatUIController.FilterableChannelsChanged += Popup.SetChannels;
@@ -59,7 +58,8 @@ public sealed class ChannelFilterButton : ChatPopupButton<ChannelFilterPopup>
 
     private void UpdateChildColors()
     {
-        if (_textureRect == null) return;
+        if (_textureRect == null)
+            return;
         switch (DrawMode)
         {
             case DrawModeEnum.Normal:

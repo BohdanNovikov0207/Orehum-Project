@@ -27,7 +27,7 @@ public sealed class ContentLoadReplayJob : LoadReplayJob
 
     protected override async Task Yield(float value, float maxValue, LoadingState state, bool force)
     {
-        var header = Loc.GetString("replay-loading", ("cur", (int)state + 1), ("total", 5));
+        var header = Loc.GetString("replay-loading", ("cur", (int) state + 1), ("total", 5));
         var subText = Loc.GetString(state switch
         {
             LoadingState.ReadingFiles => "replay-loading-reading",

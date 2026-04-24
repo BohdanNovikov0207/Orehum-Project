@@ -31,16 +31,14 @@ public sealed class PopupOverlay : Overlay
     private static readonly ProtoId<ShaderPrototype> UnshadedShader = "unshaded";
 
     private readonly IConfigurationManager _configManager;
-    private readonly IEntityManager _entManager;
-    private readonly IPlayerManager _playerMgr;
-    private readonly IUserInterfaceManager _uiManager;
-    private readonly PopupSystem _popup;
     private readonly PopupUIController _controller;
+    private readonly IEntityManager _entManager;
     private readonly ExamineSystemShared _examine;
-    private readonly SharedTransformSystem _transform;
+    private readonly IPlayerManager _playerMgr;
+    private readonly PopupSystem _popup;
     private readonly ShaderInstance _shader;
-
-    public override OverlaySpace Space => OverlaySpace.ScreenSpace;
+    private readonly SharedTransformSystem _transform;
+    private readonly IUserInterfaceManager _uiManager;
 
     public PopupOverlay(
         IConfigurationManager configManager,
@@ -64,6 +62,8 @@ public sealed class PopupOverlay : Overlay
 
         _shader = protoManager.Index(UnshadedShader).Instance();
     }
+
+    public override OverlaySpace Space => OverlaySpace.ScreenSpace;
 
     protected override void Draw(in OverlayDrawArgs args)
     {
@@ -107,8 +107,11 @@ public sealed class PopupOverlay : Overlay
             var distance = (mapPos.Position - ourPos).Length();
 
             // Should handle fade here too wyci.
-            if (!args.WorldBounds.Contains(mapPos.Position) || !_examine.InRangeUnOccluded(viewPos, mapPos, distance,
-                    e => e == popup.InitialPos.EntityId || e == ourEntity, entMan: _entManager))
+            if (!args.WorldBounds.Contains(mapPos.Position) || !_examine.InRangeUnOccluded(viewPos,
+                    mapPos,
+                    distance,
+                    e => e == popup.InitialPos.EntityId || e == ourEntity,
+                    entMan: _entManager))
                 continue;
 
             var pos = Vector2.Transform(mapPos.Position, matrix);

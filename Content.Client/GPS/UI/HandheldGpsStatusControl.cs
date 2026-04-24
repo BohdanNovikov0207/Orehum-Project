@@ -9,9 +9,9 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.GPS.Components;
 using Content.Client.Message;
 using Content.Client.Stylesheets;
+using Content.Shared.GPS.Components;
 using Robust.Client.GameObjects;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
@@ -21,11 +21,11 @@ namespace Content.Client.GPS.UI;
 
 public sealed class HandheldGpsStatusControl : Control
 {
-    private readonly Entity<HandheldGPSComponent> _parent;
-    private readonly RichTextLabel _label;
-    private float _updateDif;
     private readonly IEntityManager _entMan;
+    private readonly RichTextLabel _label;
+    private readonly Entity<HandheldGPSComponent> _parent;
     private readonly SharedTransformSystem _transform;
+    private float _updateDif;
 
     public HandheldGpsStatusControl(Entity<HandheldGPSComponent> parent)
     {
@@ -62,11 +62,12 @@ public sealed class HandheldGpsStatusControl : Control
         var posText = "Error";
         if (_entMan.TryGetComponent(_parent, out TransformComponent? transComp))
         {
-            var pos = _transform.GetMapCoordinates(_parent.Owner, xform: transComp);
-            var x = (int)pos.X;
-            var y = (int)pos.Y;
+            var pos = _transform.GetMapCoordinates(_parent.Owner, transComp);
+            var x = (int) pos.X;
+            var y = (int) pos.Y;
             posText = $"({x}, {y})";
         }
+
         _label.SetMarkup(Loc.GetString("handheld-gps-coordinates-title", ("coordinates", posText)));
     }
 }

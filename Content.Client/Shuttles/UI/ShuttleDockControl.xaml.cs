@@ -25,27 +25,7 @@ namespace Content.Client.Shuttles.UI;
 [GenerateTypedNameReferences]
 public sealed partial class ShuttleDockControl : BaseShuttleControl
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly IMapManager _mapManager = default!;
-    private readonly DockingSystem _dockSystem;
-    private readonly SharedShuttleSystem _shuttles;
-    private readonly SharedTransformSystem _xformSystem;
-
-    public NetEntity? HighlightedDock;
-
-    public NetEntity? ViewedDock => _viewedState?.Entity;
-    private DockingPortState? _viewedState;
-
-    public EntityUid? GridEntity;
-
-    private EntityCoordinates? _coordinates;
-    private Angle? _angle;
-
-    public DockingInterfaceState? DockState = null;
-
-    private List<Entity<MapGridComponent>> _grids = new();
-
-    private readonly HashSet<DockingPortState> _drawnDocks = new();
+    private static readonly TimeSpan DockChangeCooldown = TimeSpan.FromSeconds(0.5);
     private readonly Dictionary<DockingPortState, Button> _dockButtons = new();
 
     /// <summary>
@@ -53,16 +33,31 @@ public sealed partial class ShuttleDockControl : BaseShuttleControl
     /// </summary>
     private readonly Dictionary<DockingPortState, Control> _dockContainers = new();
 
-    private static readonly TimeSpan DockChangeCooldown = TimeSpan.FromSeconds(0.5);
+    private readonly DockingSystem _dockSystem;
+
+    private readonly HashSet<DockingPortState> _drawnDocks = new();
+    [Dependency] private readonly IMapManager _mapManager = default!;
+    private readonly SharedShuttleSystem _shuttles;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    private readonly SharedTransformSystem _xformSystem;
+    private Angle? _angle;
+
+    private EntityCoordinates? _coordinates;
+
+    private List<Entity<MapGridComponent>> _grids = new();
 
     /// <summary>
     /// Rate-limiting for docking changes
     /// </summary>
     private TimeSpan _nextDockChange;
 
-    public event Action<NetEntity>? OnViewDock;
-    public event Action<NetEntity, NetEntity>? DockRequest;
-    public event Action<NetEntity>? UndockRequest;
+    private DockingPortState? _viewedState;
+
+    public DockingInterfaceState? DockState = null;
+
+    public EntityUid? GridEntity;
+
+    public NetEntity? HighlightedDock;
 
     public ShuttleDockControl() : base(2f, 32f, 8f)
     {
@@ -72,6 +67,12 @@ public sealed partial class ShuttleDockControl : BaseShuttleControl
         _xformSystem = EntManager.System<SharedTransformSystem>();
         MinSize = new Vector2(SizeFull, SizeFull);
     }
+
+    public NetEntity? ViewedDock => _viewedState?.Entity;
+
+    public event Action<NetEntity>? OnViewDock;
+    public event Action<NetEntity, NetEntity>? DockRequest;
+    public event Action<NetEntity>? UndockRequest;
 
     public void SetViewedDock(DockingPortState? dockState)
     {
@@ -119,10 +120,11 @@ public sealed partial class ShuttleDockControl : BaseShuttleControl
         var selectedDockToOurGrid = Matrix3Helpers.CreateTransform(_coordinates.Value.Position, Angle.Zero);
         var selectedDockToWorld = Matrix3x2.Multiply(selectedDockToOurGrid, ourGridToWorld);
 
-        Box2 viewBoundsWorld = Matrix3Helpers.TransformBox(selectedDockToWorld, new Box2(-WorldRangeVector, WorldRangeVector));
+        var viewBoundsWorld = selectedDockToWorld.TransformBox(new Box2(-WorldRangeVector, WorldRangeVector));
 
         Matrix3x2.Invert(selectedDockToWorld, out var worldToSelectedDock);
-        var selectedDockToView = Matrix3x2.CreateScale(new Vector2(MinimapScale, -MinimapScale)) * Matrix3x2.CreateTranslation(MidPointVector);
+        var selectedDockToView = Matrix3x2.CreateScale(new Vector2(MinimapScale, -MinimapScale)) *
+                                 Matrix3x2.CreateTranslation(MidPointVector);
 
         // Draw nearby grids
         var controlBounds = PixelSizeBox;
@@ -133,9 +135,7 @@ public sealed partial class ShuttleDockControl : BaseShuttleControl
         Vector2? viewedDockPos = _viewedState != null ? MidPointVector : null;
 
         if (viewedDockPos != null)
-        {
-            viewedDockPos = viewedDockPos.Value + _angle.Value.RotateVec(new Vector2(0f,-0.6f) * MinimapScale);
-        }
+            viewedDockPos = viewedDockPos.Value + _angle.Value.RotateVec(new Vector2(0f, -0.6f) * MinimapScale);
 
         var canDockChange = _timing.CurTime > _nextDockChange;
         var lineOffset = (float) _timing.RealTime.TotalSeconds * 30f;
@@ -149,7 +149,7 @@ public sealed partial class ShuttleDockControl : BaseShuttleControl
 
             var curGridToWorld = _xformSystem.GetWorldMatrix(grid.Owner);
             var curGridToView = curGridToWorld * worldToSelectedDock * selectedDockToView;
-            var color = _shuttles.GetIFFColor(grid.Owner, grid.Owner == GridEntity, component: iffComp);
+            var color = _shuttles.GetIFFColor(grid.Owner, grid.Owner == GridEntity, iffComp);
 
             DrawGrid(handle, curGridToView, grid, color);
 
@@ -168,18 +168,22 @@ public sealed partial class ShuttleDockControl : BaseShuttleControl
                 var dockRenderBoundsLocal = new Box2(-0.5f, -0.7f, 0.5f, 0.5f);
                 var currentDockToCurGrid = Matrix3Helpers.CreateTransform(dock.Coordinates.Position, dock.Angle);
                 var currentDockToWorld = Matrix3x2.Multiply(currentDockToCurGrid, curGridToWorld);
-                var dockRenderBoundsWorld = Matrix3Helpers.TransformBox(currentDockToWorld, dockRenderBoundsLocal);
+                var dockRenderBoundsWorld = currentDockToWorld.TransformBox(dockRenderBoundsLocal);
                 if (!viewBoundsWorld.Intersects(dockRenderBoundsWorld))
                     continue;
 
                 var collisionBL = Vector2.Transform(dock.Coordinates.Position +
-                                                  Vector2.Transform(new Vector2(-0.2f, -0.7f), otherDockRotation), curGridToView);
+                                                    Vector2.Transform(new Vector2(-0.2f, -0.7f), otherDockRotation),
+                    curGridToView);
                 var collisionBR = Vector2.Transform(dock.Coordinates.Position +
-                                                  Vector2.Transform(new Vector2(0.2f, -0.7f), otherDockRotation), curGridToView);
+                                                    Vector2.Transform(new Vector2(0.2f, -0.7f), otherDockRotation),
+                    curGridToView);
                 var collisionTR = Vector2.Transform(dock.Coordinates.Position +
-                                                  Vector2.Transform(new Vector2(0.2f, -0.5f), otherDockRotation), curGridToView);
+                                                    Vector2.Transform(new Vector2(0.2f, -0.5f), otherDockRotation),
+                    curGridToView);
                 var collisionTL = Vector2.Transform(dock.Coordinates.Position +
-                                                  Vector2.Transform(new Vector2(-0.2f, -0.5f), otherDockRotation), curGridToView);
+                                                    Vector2.Transform(new Vector2(-0.2f, -0.5f), otherDockRotation),
+                    curGridToView);
 
                 var verts = new[]
                 {
@@ -214,19 +218,15 @@ public sealed partial class ShuttleDockControl : BaseShuttleControl
                     dockTR,
                     dockTL,
                     dockTL,
-                    dockBL
+                    dockBL,
                 };
 
                 Color otherDockColor;
 
                 if (HighlightedDock == dock.Entity)
-                {
                     otherDockColor = Color.ToSrgb(Color.Magenta);
-                }
                 else
-                {
                     otherDockColor = Color.ToSrgb(Color.Purple);
-                }
 
                 /*
                  * Can draw in these conditions:
@@ -241,9 +241,7 @@ public sealed partial class ShuttleDockControl : BaseShuttleControl
 
                 // Rate limit
                 if (dockButton != null && dock.GridDockedWith != null)
-                {
                     dockButton.Disabled = !canDockChange;
-                }
 
                 // If the dock is in range then also do highlighting
                 if (viewedDockPos != null && dock.Coordinates.NetEntity != gridNent)
@@ -275,7 +273,7 @@ public sealed partial class ShuttleDockControl : BaseShuttleControl
                                 dockButton.Disabled = !canDock || !canDockChange;
 
                             var lineColor = inAlignment ? Color.Lime : Color.Red;
-                            handle.DrawDottedLine(viewedDockPos.Value, collisionCenter, lineColor, offset: lineOffset);
+                            handle.DrawDottedLine(viewedDockPos.Value, collisionCenter, lineColor, lineOffset);
                         }
 
                         canDraw = true;
@@ -299,7 +297,8 @@ public sealed partial class ShuttleDockControl : BaseShuttleControl
                     // Because it's being layed out top-down we have to arrange for first frame.
                     container.Arrange(PixelRect);
                     var dockPositionInView = Vector2.Transform(dock.Coordinates.Position, curGridToView);
-                    var containerPos = dockPositionInView / UIScale - container.DesiredSize / 2 - new Vector2(0f, 0.75f) * MinimapScale;
+                    var containerPos = dockPositionInView / UIScale - container.DesiredSize / 2 -
+                                       new Vector2(0f, 0.75f) * MinimapScale;
                     SetPosition(container, containerPos);
                 }
 
@@ -323,11 +322,11 @@ public sealed partial class ShuttleDockControl : BaseShuttleControl
         var connectionColor = Color.Pink;
 
         handle.DrawRect(ourDockConnection, connectionColor.WithAlpha(0.2f));
-        handle.DrawRect(ourDockConnection, connectionColor, filled: false);
+        handle.DrawRect(ourDockConnection, connectionColor, false);
 
         // Draw the dock itself
         handle.DrawRect(ourDock, dockColor.WithAlpha(0.2f));
-        handle.DrawRect(ourDock, dockColor, filled: false);
+        handle.DrawRect(ourDock, dockColor, false);
     }
 
     private void HideDocks()
@@ -371,17 +370,15 @@ public sealed partial class ShuttleDockControl : BaseShuttleControl
             foreach (var dock in docks)
             {
                 if (dock.Entity == viewedEnt)
-                {
                     _viewedState = dock;
-                }
 
-                var container = new BoxContainer()
+                var container = new BoxContainer
                 {
                     Orientation = BoxContainer.LayoutOrientation.Vertical,
                     Margin = new Thickness(3),
                 };
 
-                var panel = new PanelContainer()
+                var panel = new PanelContainer
                 {
                     HorizontalAlignment = HAlignment.Center,
                     VerticalAlignment = VAlignment.Center,
@@ -389,14 +386,14 @@ public sealed partial class ShuttleDockControl : BaseShuttleControl
                     Children =
                     {
                         container,
-                    }
+                    },
                 };
 
                 Button button;
 
                 if (otherShuttle == gridNent)
                 {
-                    button = new Button()
+                    button = new Button
                     {
                         Text = Loc.GetString("shuttle-console-view"),
                     };
@@ -410,7 +407,7 @@ public sealed partial class ShuttleDockControl : BaseShuttleControl
                 {
                     if (dock.Connected)
                     {
-                        button = new Button()
+                        button = new Button
                         {
                             Text = Loc.GetString("shuttle-console-undock"),
                         };
@@ -423,7 +420,7 @@ public sealed partial class ShuttleDockControl : BaseShuttleControl
                     }
                     else
                     {
-                        button = new Button()
+                        button = new Button
                         {
                             Text = Loc.GetString("shuttle-console-dock"),
                             Disabled = true,
@@ -442,7 +439,7 @@ public sealed partial class ShuttleDockControl : BaseShuttleControl
                     _dockButtons.Add(dock, button);
                 }
 
-                container.AddChild(new Label()
+                container.AddChild(new Label
                 {
                     Text = dock.Name,
                     HorizontalAlignment = HAlignment.Center,

@@ -21,7 +21,6 @@ using Robust.Client.Graphics;
 using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.CustomControls;
 using Robust.Client.UserInterface.XAML;
-using Robust.Client.Utility;
 using Robust.Shared.Prototypes;
 using static Robust.Client.UserInterface.Controls.BaseButton;
 
@@ -30,26 +29,25 @@ namespace Content.Client.Decals.UI;
 [GenerateTypedNameReferences]
 public sealed partial class DecalPlacerWindow : DefaultWindow
 {
-    [Dependency] private readonly IPrototypeManager _prototype = default!;
-    [Dependency] private readonly IEntityManager _e = default!;
-
     private readonly DecalPlacementSystem _decalPlacementSystem;
+    [Dependency] private readonly IEntityManager _e = default!;
+    [Dependency] private readonly IPrototypeManager _prototype = default!;
     private readonly SpriteSystem _sprite;
 
-    public FloatSpinBox RotationSpinBox;
-
-    private PaletteColorPicker? _picker;
+    private bool _auto;
+    private bool _cleanable;
+    private Color _color = Color.White;
 
     private SortedDictionary<string, Texture>? _decals;
-    private string? _selected;
-    private Color _color = Color.White;
-    private bool _useColor;
-    private bool _snap;
+
+    private PaletteColorPicker? _picker;
     private float _rotation;
-    private bool _cleanable;
+    private string? _selected;
+    private bool _snap;
+    private bool _useColor;
     private int _zIndex;
 
-    private bool _auto;
+    public FloatSpinBox RotationSpinBox;
 
     public DecalPlacerWindow()
     {
@@ -63,7 +61,7 @@ public sealed partial class DecalPlacerWindow : DefaultWindow
         // and thus have a proper step size
         RotationSpinBox = new FloatSpinBox(90.0f, 0)
         {
-            HorizontalExpand = true
+            HorizontalExpand = true,
         };
         SpinBoxContainer.AddChild(RotationSpinBox);
 
@@ -86,13 +84,9 @@ public sealed partial class DecalPlacerWindow : DefaultWindow
             else
             {
                 if (_picker.IsOpen)
-                {
                     _picker.Close();
-                }
                 else
-                {
                     _picker.Open();
-                }
             }
         };
 
@@ -164,7 +158,7 @@ public sealed partial class DecalPlacerWindow : DefaultWindow
                 TextureNormal = tex,
                 Name = decal,
                 ToolTip = decal,
-                Modulate = _useColor ? _color : Color.White
+                Modulate = _useColor ? _color : Color.White,
             };
             button.OnPressed += ButtonOnPressed;
             if (_selected == decal)
@@ -173,12 +167,12 @@ public sealed partial class DecalPlacerWindow : DefaultWindow
                 {
                     PanelOverride = new StyleBoxFlat
                     {
-                        BackgroundColor = StyleNano.ButtonColorDefault
+                        BackgroundColor = StyleNano.ButtonColorDefault,
                     },
                     Children =
                     {
-                        button
-                    }
+                        button,
+                    },
                 };
                 Grid.AddChild(panelContainer);
             }
@@ -211,6 +205,7 @@ public sealed partial class DecalPlacerWindow : DefaultWindow
             _useColor = decal.DefaultCustomColor;
             _snap = decal.DefaultSnap;
         }
+
         UpdateDecalPlacementInfo();
         RefreshList();
     }

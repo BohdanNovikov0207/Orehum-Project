@@ -39,10 +39,8 @@ public sealed class NetworkConfiguratorBoundUserInterface : BoundUserInterface
         _netConfig = EntMan.System<NetworkConfiguratorSystem>();
     }
 
-    public void OnRemoveButtonPressed(string address)
-    {
+    public void OnRemoveButtonPressed(string address) =>
         SendMessage(new NetworkConfiguratorRemoveDeviceMessage(address));
-    }
 
     protected override void Open()
     {
@@ -86,10 +84,8 @@ public sealed class NetworkConfiguratorBoundUserInterface : BoundUserInterface
         }
     }
 
-    private void OnShowPressed(BaseButton.ButtonEventArgs args)
-    {
+    private void OnShowPressed(BaseButton.ButtonEventArgs args) =>
         _netConfig.ToggleVisualization(Owner, args.Button.Pressed);
-    }
 
     protected override void UpdateState(BoundUserInterfaceState state)
     {
@@ -109,13 +105,8 @@ public sealed class NetworkConfiguratorBoundUserInterface : BoundUserInterface
         }
     }
 
-    private void OnClearButtonPressed()
-    {
-        SendMessage(new NetworkConfiguratorClearDevicesMessage());
-    }
+    private void OnClearButtonPressed() => SendMessage(new NetworkConfiguratorClearDevicesMessage());
 
-    private void OnConfigButtonPressed(NetworkConfiguratorButtonKey buttonKey)
-    {
+    private void OnConfigButtonPressed(NetworkConfiguratorButtonKey buttonKey) =>
         SendMessage(new NetworkConfiguratorButtonPressedMessage(buttonKey));
-    }
 }

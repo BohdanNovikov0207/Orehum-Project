@@ -16,13 +16,13 @@ namespace Content.Client.Stack;
 
 public sealed class StackStatusControl : Control
 {
-    private readonly StackComponent _parent;
     private readonly RichTextLabel _label;
+    private readonly StackComponent _parent;
 
     public StackStatusControl(StackComponent parent)
     {
         _parent = parent;
-        _label = new RichTextLabel {StyleClasses = {StyleNano.StyleClassItemStatus}};
+        _label = new RichTextLabel { StyleClasses = { StyleNano.StyleClassItemStatus } };
         _label.SetMarkup(Loc.GetString("comp-stack-status", ("count", _parent.Count)));
         AddChild(_label);
     }
@@ -32,9 +32,7 @@ public sealed class StackStatusControl : Control
         base.FrameUpdate(args);
 
         if (!_parent.UiUpdateNeeded)
-        {
             return;
-        }
 
         _parent.UiUpdateNeeded = false;
 

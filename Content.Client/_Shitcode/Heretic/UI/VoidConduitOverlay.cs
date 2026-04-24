@@ -10,16 +10,14 @@ namespace Content.Client._Shitcode.Heretic.UI;
 
 public sealed class VoidConduitOverlay : Overlay
 {
-    public override OverlaySpace Space => OverlaySpace.WorldSpaceEntities;
-
     [Dependency] private readonly IEntityManager _entMan = default!;
     [Dependency] private readonly IPrototypeManager _prototype = default!;
+    private readonly SpriteSystem _sprite;
     [Dependency] private readonly IGameTiming _timing = default!;
 
-    private readonly TransformSystem _xform;
-    private readonly SpriteSystem _sprite;
-
     private readonly ShaderInstance _unshadedShader;
+
+    private readonly TransformSystem _xform;
 
     public VoidConduitOverlay()
     {
@@ -31,6 +29,8 @@ public sealed class VoidConduitOverlay : Overlay
 
         _unshadedShader = _prototype.Index<ShaderPrototype>("unshaded").Instance();
     }
+
+    public override OverlaySpace Space => OverlaySpace.WorldSpaceEntities;
 
     protected override void Draw(in OverlayDrawArgs args)
     {

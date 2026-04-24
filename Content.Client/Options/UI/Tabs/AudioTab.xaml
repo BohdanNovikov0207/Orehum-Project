@@ -22,7 +22,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     <BoxContainer Orientation="Vertical">
         <BoxContainer Orientation="Vertical" Margin="8 8 8 8" VerticalExpand="True">
             <Label Text="{Loc 'ui-options-volume-label'}"
-                   StyleClasses="LabelKeyText"/>
+                   StyleClasses="LabelKeyText" />
             <BoxContainer Orientation="Vertical" Margin="0 3 0 0">
                 <ui:OptionSlider Name="SliderVolumeMaster" Title="{Loc 'ui-options-master-volume'}"
                                  Margin="0 0 0 8" />
@@ -32,10 +32,12 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                 <ui:OptionSlider Name="SliderVolumeLobby" Title="{Loc 'ui-options-lobby-volume'}" />
                 <ui:OptionSlider Name="SliderVolumeInterface" Title="{Loc 'ui-options-interface-volume'}" />
                 <ui:OptionSlider Name="SliderVolumeVoiceChat" Title="{Loc 'ui-options-voice-chat-volume'}" />
-                <ui:OptionSlider Name="SliderVolumeBarks" Title="{Loc 'ui-options-barks-volume'}" /><!-- Goob Station - Barks -->
+                <ui:OptionSlider Name="SliderVolumeBarks" Title="{Loc 'ui-options-barks-volume'}" />
+                <!-- Goob Station - Barks -->
                 <ui:OptionSlider Name="SliderMaxAmbienceSounds" Title="{Loc 'ui-options-ambience-max-sounds'}"
                                  Margin="0 0 0 8" />
-                <ui:OptionSlider Name="SliderHighlightVolume" Title="{Loc 'ui-options-highlight-volume'}" /> <!-- Goobstation - Highlight chat Ping/Audio! -->
+                <ui:OptionSlider Name="SliderHighlightVolume" Title="{Loc 'ui-options-highlight-volume'}" />
+                <!-- Goobstation - Highlight chat Ping/Audio! -->
 
                 <CheckBox Name="HearSelfCheckBox" Text="{Loc 'ui-options-hear-self'}" />
                 <CheckBox Name="LobbyMusicCheckBox" Text="{Loc 'ui-options-lobby-music'}" />

@@ -14,7 +14,7 @@ using Robust.Client.UserInterface;
 
 namespace Content.Client._Shitcode.Heretic.UI;
 
-public sealed partial class LivingHeartMenuBoundUserInterface : BoundUserInterface
+public sealed class LivingHeartMenuBoundUserInterface : BoundUserInterface
 {
     [Dependency] private readonly IClyde _displayManager = default!;
     [Dependency] private readonly IInputManager _inputManager = default!;
@@ -36,8 +36,6 @@ public sealed partial class LivingHeartMenuBoundUserInterface : BoundUserInterfa
         _menu.OpenCenteredAt(_inputManager.MouseScreenPosition.Position / _displayManager.ScreenSize);
     }
 
-    private void SendMessage(NetEntity netent)
-    {
-        base.SendMessage(new EventHereticLivingHeartActivate() { Target = netent });
-    }
+    private void SendMessage(NetEntity netent) =>
+        base.SendMessage(new EventHereticLivingHeartActivate { Target = netent });
 }

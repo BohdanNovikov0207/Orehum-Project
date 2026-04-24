@@ -28,112 +28,109 @@ using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.CustomControls;
 using Robust.Client.UserInterface.XAML;
 
-namespace Content.Client._Shitcode.Wizard.Refund
+namespace Content.Client._Shitcode.Wizard.Refund;
+
+[GenerateTypedNameReferences]
+public sealed partial class StoreRefundWindow : DefaultWindow
 {
-    [GenerateTypedNameReferences]
-    public sealed partial class StoreRefundWindow : DefaultWindow
+    private List<RefundListingData> _listings = new();
+    private bool _refundDiabled;
+    private string _searchText = string.Empty;
+
+    public StoreRefundWindow()
     {
-        private List<RefundListingData> _listings = new();
-        private bool _refundDiabled;
-        private string _searchText = string.Empty;
+        RobustXamlLoader.Load(this);
+        SearchBar.OnTextChanged += OnSearchTextChanged;
 
-        public event Action<NetEntity>? ListingClicked;
+        RefundAllButton.OnPressed += _ => RefundAllClicked?.Invoke();
+    }
 
-        public event Action? RefundAllClicked;
+    public event Action<NetEntity>? ListingClicked;
 
-        public StoreRefundWindow()
+    public event Action? RefundAllClicked;
+
+    public void UpdateListings(IEnumerable<RefundListingData> listings, bool refundDisabled)
+    {
+        _refundDiabled = refundDisabled;
+        // Server COULD send these sorted but how about we just use the client to do it instead
+        _listings = listings
+            .OrderBy(w => w.DisplayName,
+                Comparer<string>.Create((x, y) => string.Compare(x, y, StringComparison.Ordinal)))
+            .ToList();
+    }
+
+    public void Populate()
+    {
+        ButtonContainer.DisposeAllChildren();
+        AddButtons();
+    }
+
+    private void AddButtons()
+    {
+        if (_refundDiabled)
         {
-            RobustXamlLoader.Load(this);
-            SearchBar.OnTextChanged += OnSearchTextChanged;
-
-            RefundAllButton.OnPressed += _ => RefundAllClicked?.Invoke();
+            RefundAllButton.Disabled = true;
+            NoRefundLabel.Visible = true;
+            SearchBar.Visible = false;
+            NoRefundLabel.Text = Loc.GetString("store-refund-window-refund-disabled");
+            return;
         }
 
-        public void UpdateListings(IEnumerable<RefundListingData> listings, bool refundDisabled)
+        if (_listings.Count == 0)
         {
-            _refundDiabled = refundDisabled;
-            // Server COULD send these sorted but how about we just use the client to do it instead
-            _listings = listings
-                .OrderBy(w => w.DisplayName,
-                    Comparer<string>.Create((x, y) => string.Compare(x, y, StringComparison.Ordinal)))
-                .ToList();
+            RefundAllButton.Disabled = true;
+            NoRefundLabel.Visible = true;
+            SearchBar.Visible = false;
+            NoRefundLabel.Text = Loc.GetString("store-refund-window-nothing-to-refund");
+            return;
         }
 
-        public void Populate()
-        {
-            ButtonContainer.DisposeAllChildren();
-            AddButtons();
-        }
+        RefundAllButton.Disabled = false;
+        NoRefundLabel.Visible = false;
+        SearchBar.Visible = true;
 
-        private void AddButtons()
+        foreach (var listing in _listings)
         {
-            if (_refundDiabled)
+            var name = listing.DisplayName;
+            var listingUid = listing.Entity;
+
+            var currentButtonRef = new Button
             {
-                RefundAllButton.Disabled = true;
-                NoRefundLabel.Visible = true;
-                SearchBar.Visible = false;
-                NoRefundLabel.Text = Loc.GetString("store-refund-window-refund-disabled");
-                return;
-            }
+                Text = name,
+                TextAlign = Label.AlignMode.Right,
+                HorizontalAlignment = HAlignment.Center,
+                VerticalAlignment = VAlignment.Center,
+                SizeFlagsStretchRatio = 1,
+                MinSize = new Vector2(340, 20),
+                ClipText = true,
+            };
 
-            if (_listings.Count == 0)
-            {
-                RefundAllButton.Disabled = true;
-                NoRefundLabel.Visible = true;
-                SearchBar.Visible = false;
-                NoRefundLabel.Text = Loc.GetString("store-refund-window-nothing-to-refund");
-                return;
-            }
+            currentButtonRef.OnPressed += _ => ListingClicked?.Invoke(listingUid);
+            currentButtonRef.Visible = ButtonIsVisible(currentButtonRef);
 
-            RefundAllButton.Disabled = false;
-            NoRefundLabel.Visible = false;
-            SearchBar.Visible = true;
-
-            foreach (var listing in _listings)
-            {
-                var name = listing.DisplayName;
-                var listingUid = listing.Entity;
-
-                var currentButtonRef = new Button
-                {
-                    Text = name,
-                    TextAlign = Label.AlignMode.Right,
-                    HorizontalAlignment = HAlignment.Center,
-                    VerticalAlignment = VAlignment.Center,
-                    SizeFlagsStretchRatio = 1,
-                    MinSize = new Vector2(340, 20),
-                    ClipText = true,
-                };
-
-                currentButtonRef.OnPressed += _ => ListingClicked?.Invoke(listingUid);
-                currentButtonRef.Visible = ButtonIsVisible(currentButtonRef);
-
-                ButtonContainer.AddChild(currentButtonRef);
-            }
+            ButtonContainer.AddChild(currentButtonRef);
         }
+    }
 
-        private bool ButtonIsVisible(Button button)
+    private bool ButtonIsVisible(Button button) =>
+        string.IsNullOrEmpty(_searchText) || button.Text == null ||
+        button.Text.Contains(_searchText, StringComparison.OrdinalIgnoreCase);
+
+    private void UpdateVisibleButtons()
+    {
+        foreach (var child in ButtonContainer.Children)
         {
-            return string.IsNullOrEmpty(_searchText) || button.Text == null ||
-                   button.Text.Contains(_searchText, StringComparison.OrdinalIgnoreCase);
+            if (child is Button button)
+                button.Visible = ButtonIsVisible(button);
         }
+    }
 
-        private void UpdateVisibleButtons()
-        {
-            foreach (var child in ButtonContainer.Children)
-            {
-                if (child is Button button)
-                    button.Visible = ButtonIsVisible(button);
-            }
-        }
+    private void OnSearchTextChanged(LineEdit.LineEditEventArgs args)
+    {
+        _searchText = args.Text;
 
-        private void OnSearchTextChanged(LineEdit.LineEditEventArgs args)
-        {
-            _searchText = args.Text;
-
-            UpdateVisibleButtons();
-            // Reset scroll bar so they can see the relevant results.
-            Scroll.SetScrollValue(Vector2.Zero);
-        }
+        UpdateVisibleButtons();
+        // Reset scroll bar so they can see the relevant results.
+        Scroll.SetScrollValue(Vector2.Zero);
     }
 }

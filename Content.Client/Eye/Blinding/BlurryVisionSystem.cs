@@ -17,8 +17,8 @@ namespace Content.Client.Eye.Blinding;
 
 public sealed class BlurryVisionSystem : EntitySystem
 {
-    [Dependency] private readonly IPlayerManager _player = default!;
     [Dependency] private readonly IOverlayManager _overlayMan = default!;
+    [Dependency] private readonly IPlayerManager _player = default!;
     private BlurryVisionOverlay _overlay = default!;
 
     public override void Initialize()
@@ -31,18 +31,14 @@ public sealed class BlurryVisionSystem : EntitySystem
         SubscribeLocalEvent<BlurryVisionComponent, LocalPlayerAttachedEvent>(OnPlayerAttached);
         SubscribeLocalEvent<BlurryVisionComponent, LocalPlayerDetachedEvent>(OnPlayerDetached);
 
-        _overlay = new();
+        _overlay = new BlurryVisionOverlay();
     }
 
-    private void OnPlayerAttached(EntityUid uid, BlurryVisionComponent component, LocalPlayerAttachedEvent args)
-    {
+    private void OnPlayerAttached(EntityUid uid, BlurryVisionComponent component, LocalPlayerAttachedEvent args) =>
         _overlayMan.AddOverlay(_overlay);
-    }
 
-    private void OnPlayerDetached(EntityUid uid, BlurryVisionComponent component, LocalPlayerDetachedEvent args)
-    {
+    private void OnPlayerDetached(EntityUid uid, BlurryVisionComponent component, LocalPlayerDetachedEvent args) =>
         _overlayMan.RemoveOverlay(_overlay);
-    }
 
     private void OnBlurryInit(EntityUid uid, BlurryVisionComponent component, ComponentInit args)
     {
@@ -53,8 +49,6 @@ public sealed class BlurryVisionSystem : EntitySystem
     private void OnBlurryShutdown(EntityUid uid, BlurryVisionComponent component, ComponentShutdown args)
     {
         if (_player.LocalEntity == uid)
-        {
             _overlayMan.RemoveOverlay(_overlay);
-        }
     }
 }

@@ -12,7 +12,16 @@ namespace Content.Client.Corvax.SecApartment.Stylesheets;
 
 public sealed class SecApartmentStyles
 {
+    public const string StyleClassButtonRed = "ButtonRed";
+    public const string StyleClassConsoleLineEdit = "ConsoleLineEdit";
+    public const string StyleClassConsoleHeading = "ConsoleHeading";
+    public const string StyleClassOptionButton = "SecApartmentOptionButton";
     private readonly IResourceCache _resCache;
+
+    public SecApartmentStyles(IResourceCache resCache)
+    {
+        _resCache = resCache;
+    }
 
     public static Color TabActiveColor => Color.FromHex("#ff4444");
     public static Color TabInactiveColor => Color.FromHex("#ff8888");
@@ -22,24 +31,16 @@ public sealed class SecApartmentStyles
     public static Color SubTextColor => Color.FromHex("#ff8888");
     public static Color PlaceholderColor => Color.FromHex("#ff6666");
 
-    public const string StyleClassButtonRed = "ButtonRed";
-    public const string StyleClassConsoleLineEdit = "ConsoleLineEdit";
-    public const string StyleClassConsoleHeading = "ConsoleHeading";
-    public const string StyleClassOptionButton = "SecApartmentOptionButton";
-
-    public SecApartmentStyles(IResourceCache resCache)
-    {
-        _resCache = resCache;
-    }
-
-    private StyleBoxFlat CreateStyleBox(Color backgroundColor, Color borderColor,
-        Thickness borderThickness, Thickness? contentMargin = null)
+    private StyleBoxFlat CreateStyleBox(Color backgroundColor,
+        Color borderColor,
+        Thickness borderThickness,
+        Thickness? contentMargin = null)
     {
         var style = new StyleBoxFlat
         {
             BackgroundColor = backgroundColor,
             BorderColor = borderColor,
-            BorderThickness = borderThickness
+            BorderThickness = borderThickness,
         };
 
         if (contentMargin.HasValue)
@@ -89,36 +90,41 @@ public sealed class SecApartmentStyles
     );
 
     public Font GetBoldFont(int size = 12) => _resCache.GetFont(new[]
-    {
-        "/Fonts/NotoSans/NotoSans-Bold.ttf",
-        "/Fonts/NotoSans/NotoSansSymbols-Regular.ttf",
-        "/Fonts/NotoSans/NotoSansSymbols2-Regular.ttf"
-    }, size);
+        {
+            "/Fonts/NotoSans/NotoSans-Bold.ttf",
+            "/Fonts/NotoSans/NotoSansSymbols-Regular.ttf",
+            "/Fonts/NotoSans/NotoSansSymbols2-Regular.ttf",
+        },
+        size);
 
     public Font GetRegularFont(int size = 12) => _resCache.GetFont(new[]
-    {
-        "/Fonts/NotoSans/NotoSans-Regular.ttf",
-        "/Fonts/NotoSans/NotoSansSymbols-Regular.ttf",
-        "/Fonts/NotoSans/NotoSansSymbols2-Regular.ttf"
-    }, size);
+        {
+            "/Fonts/NotoSans/NotoSans-Regular.ttf",
+            "/Fonts/NotoSans/NotoSansSymbols-Regular.ttf",
+            "/Fonts/NotoSans/NotoSansSymbols2-Regular.ttf",
+        },
+        size);
 
-    public static StyleRule CreateButtonRedRule(StyleBox buttonRedStyle, Font font, Color fontColor, Color disabledColor)
-    {
-        return new StyleRule(
+    public static StyleRule CreateButtonRedRule(StyleBox buttonRedStyle,
+        Font font,
+        Color fontColor,
+        Color disabledColor) =>
+        new(
             new SelectorElement(typeof(Button), new[] { StyleClassButtonRed }, null, null),
             new[]
             {
                 new StyleProperty("stylebox", buttonRedStyle),
                 new StyleProperty("font-color", fontColor),
                 new StyleProperty("font", font),
-                new StyleProperty("font-color-disabled", disabledColor)
+                new StyleProperty("font-color-disabled", disabledColor),
             }
         );
-    }
 
-    public static StyleRule CreateLineEditRule(StyleBox lineEditStyle, Font font, Color textColor, Color placeholderColor)
-    {
-        return new StyleRule(
+    public static StyleRule CreateLineEditRule(StyleBox lineEditStyle,
+        Font font,
+        Color textColor,
+        Color placeholderColor) =>
+        new(
             new SelectorElement(typeof(LineEdit), new[] { StyleClassConsoleLineEdit }, null, null),
             new[]
             {
@@ -127,10 +133,9 @@ public sealed class SecApartmentStyles
                 new StyleProperty("font", font),
                 new StyleProperty("placeholder-color", placeholderColor),
                 new StyleProperty("cursor-color", TabActiveColor),
-                new StyleProperty("selection-color", TabActiveColor.WithAlpha(0.3f))
+                new StyleProperty("selection-color", TabActiveColor.WithAlpha(0.3f)),
             }
         );
-    }
 
     public StyleBox GetOptionButtonStyle() => CreateStyleBox(
         Color.FromHex("#330000"),
@@ -139,38 +144,43 @@ public sealed class SecApartmentStyles
         new Thickness(6, 3, 6, 3)
     );
 
-    public static StyleRule CreateOptionButtonRule(StyleBox optionStyle, Font font, Color fontColor, Color disabledColor)
-    {
-        return new StyleRule(
+    public static StyleRule CreateOptionButtonRule(StyleBox optionStyle,
+        Font font,
+        Color fontColor,
+        Color disabledColor) =>
+        new(
             new SelectorElement(typeof(OptionButton), new[] { StyleClassOptionButton }, null, null),
             new[]
             {
                 new StyleProperty(ContainerButton.StylePropertyStyleBox, optionStyle),
                 new StyleProperty("font", font),
                 new StyleProperty("font-color", fontColor),
-                new StyleProperty("font-color-disabled", disabledColor)
+                new StyleProperty("font-color-disabled", disabledColor),
             }
         );
-    }
-    public static StyleRule CreateOptionButtonBackgroundRule()
-    {
-        return new StyleRule(
+
+    public static StyleRule CreateOptionButtonBackgroundRule() =>
+        new(
             new SelectorElement(typeof(PanelContainer), new[] { OptionButton.StyleClassOptionsBackground }, null, null),
             new[]
             {
-                new StyleProperty(PanelContainer.StylePropertyPanel, new StyleBoxFlat
-                {
-                    BackgroundColor = Color.FromHex("#330000"),
-                    BorderColor = TabActiveColor,
-                    BorderThickness = new Thickness(1)
-                })
+                new StyleProperty(PanelContainer.StylePropertyPanel,
+                    new StyleBoxFlat
+                    {
+                        BackgroundColor = Color.FromHex("#330000"),
+                        BorderColor = TabActiveColor,
+                        BorderThickness = new Thickness(1),
+                    }),
             }
         );
-    }
-    public static StyleRule CreateTabContainerRule(StyleBox tabActiveStyle, StyleBox tabInactiveStyle,
-        StyleBox panelStyle, Font font, Color activeColor, Color inactiveColor)
-    {
-        return new StyleRule(
+
+    public static StyleRule CreateTabContainerRule(StyleBox tabActiveStyle,
+        StyleBox tabInactiveStyle,
+        StyleBox panelStyle,
+        Font font,
+        Color activeColor,
+        Color inactiveColor) =>
+        new(
             new SelectorElement(typeof(TabContainer), null, null, null),
             new[]
             {
@@ -179,8 +189,7 @@ public sealed class SecApartmentStyles
                 new StyleProperty("panel-stylebox", panelStyle),
                 new StyleProperty("tab-font-color", activeColor),
                 new StyleProperty("tab-font-color-inactive", inactiveColor),
-                new StyleProperty("font", font)
+                new StyleProperty("font", font),
             }
         );
-    }
 }

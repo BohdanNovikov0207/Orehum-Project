@@ -31,13 +31,13 @@ namespace Content.Client.Storage.Systems;
 
 public sealed class StorageSystem : SharedStorageSystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly IPlayerManager _player = default!;
     [Dependency] private readonly EntityPickupAnimationSystem _entityPickupAnimation = default!;
 
-    private Dictionary<EntityUid, ItemStorageLocation> _oldStoredItems = new();
+    private readonly Dictionary<EntityUid, ItemStorageLocation> _oldStoredItems = new();
+    [Dependency] private readonly IPlayerManager _player = default!;
 
-    private List<(StorageBoundUserInterface Bui, bool Value)> _queuedBuis = new();
+    private readonly List<(StorageBoundUserInterface Bui, bool Value)> _queuedBuis = new();
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -78,54 +78,54 @@ public sealed class StorageSystem : SharedStorageSystem
 
         foreach (var loc in state.SavedLocations)
         {
-            component.SavedLocations[loc.Key] = new(loc.Value);
+            component.SavedLocations[loc.Key] = new List<ItemStorageLocation>(loc.Value);
         }
 
         UpdateOccupied((uid, component));
 
         var uiDirty = !component.StoredItems.SequenceEqual(_oldStoredItems);
 
-        if (uiDirty && UI.TryGetOpenUi<StorageBoundUserInterface>(uid, StorageComponent.StorageUiKey.Key, out var storageBui))
+        if (uiDirty && UI.TryGetOpenUi<StorageBoundUserInterface>(uid,
+                StorageComponent.StorageUiKey.Key,
+                out var storageBui))
         {
             storageBui.Refresh();
             // Make sure nesting still updated.
             var player = _player.LocalEntity;
 
-            if (NestedStorage && player != null && ContainerSystem.TryGetContainingContainer((uid, null, null), out var container) &&
-                UI.TryGetOpenUi<StorageBoundUserInterface>(container.Owner, StorageComponent.StorageUiKey.Key, out var containerBui))
-            {
+            if (NestedStorage && player != null &&
+                ContainerSystem.TryGetContainingContainer((uid, null, null), out var container) &&
+                UI.TryGetOpenUi<StorageBoundUserInterface>(container.Owner,
+                    StorageComponent.StorageUiKey.Key,
+                    out var containerBui))
                 _queuedBuis.Add((containerBui, false));
-            }
         }
     }
 
     public override void UpdateUI(Entity<StorageComponent?> entity)
     {
         if (UI.TryGetOpenUi<StorageBoundUserInterface>(entity.Owner, StorageComponent.StorageUiKey.Key, out var sBui))
-        {
             sBui.Refresh();
-        }
     }
 
     protected override void HideStorageWindow(EntityUid uid, EntityUid actor)
     {
         if (UI.TryGetOpenUi<StorageBoundUserInterface>(uid, StorageComponent.StorageUiKey.Key, out var storageBui))
-        {
             _queuedBuis.Add((storageBui, false));
-        }
     }
 
     protected override void ShowStorageWindow(EntityUid uid, EntityUid actor)
     {
         if (UI.TryGetOpenUi<StorageBoundUserInterface>(uid, StorageComponent.StorageUiKey.Key, out var storageBui))
-        {
             _queuedBuis.Add((storageBui, true));
-        }
     }
 
     /// <inheritdoc />
-    public override void PlayPickupAnimation(EntityUid uid, EntityCoordinates initialCoordinates, EntityCoordinates finalCoordinates,
-        Angle initialRotation, EntityUid? user = null)
+    public override void PlayPickupAnimation(EntityUid uid,
+        EntityCoordinates initialCoordinates,
+        EntityCoordinates finalCoordinates,
+        Angle initialRotation,
+        EntityUid? user = null)
     {
         if (!_timing.IsFirstTimePredicted)
             return;
@@ -133,21 +133,22 @@ public sealed class StorageSystem : SharedStorageSystem
         PickupAnimation(uid, initialCoordinates, finalCoordinates, initialRotation);
     }
 
-    private void HandlePickupAnimation(PickupAnimationEvent msg)
-    {
-        PickupAnimation(GetEntity(msg.ItemUid), GetCoordinates(msg.InitialPosition), GetCoordinates(msg.FinalPosition), msg.InitialAngle);
-    }
+    private void HandlePickupAnimation(PickupAnimationEvent msg) => PickupAnimation(GetEntity(msg.ItemUid),
+        GetCoordinates(msg.InitialPosition),
+        GetCoordinates(msg.FinalPosition),
+        msg.InitialAngle);
 
-    public void PickupAnimation(EntityUid item, EntityCoordinates initialCoords, EntityCoordinates finalCoords, Angle initialAngle)
+    public void PickupAnimation(EntityUid item,
+        EntityCoordinates initialCoords,
+        EntityCoordinates finalCoords,
+        Angle initialAngle)
     {
         if (!_timing.IsFirstTimePredicted)
             return;
 
         if (TransformSystem.InRange(finalCoords, initialCoords, 0.1f) ||
             !Exists(initialCoords.EntityId) || !Exists(finalCoords.EntityId))
-        {
             return;
-        }
 
         var finalMapPos = TransformSystem.ToMapCoordinates(finalCoords).Position;
         var finalPos = Vector2.Transform(finalMapPos, TransformSystem.GetInvWorldMatrix(initialCoords.EntityId));
@@ -156,7 +157,7 @@ public sealed class StorageSystem : SharedStorageSystem
     }
 
     /// <summary>
-    /// Animate the newly stored entities in <paramref name="msg"/> flying towards this storage's position
+    /// Animate the newly stored entities in <paramref name="msg" /> flying towards this storage's position
     /// </summary>
     /// <param name="msg"></param>
     public void HandleAnimatingInsertingEntities(AnimateInsertingEntitiesEvent msg)
@@ -169,9 +170,10 @@ public sealed class StorageSystem : SharedStorageSystem
 
             var initialPosition = msg.EntityPositions[i];
             if (Exists(entity) && transformComp != null)
-            {
-                _entityPickupAnimation.AnimateEntityPickup(entity, GetCoordinates(initialPosition), transformComp.LocalPosition, msg.EntityAngles[i]);
-            }
+                _entityPickupAnimation.AnimateEntityPickup(entity,
+                    GetCoordinates(initialPosition),
+                    transformComp.LocalPosition,
+                    msg.EntityAngles[i]);
         }
     }
 
@@ -180,22 +182,16 @@ public sealed class StorageSystem : SharedStorageSystem
         base.Update(frameTime);
 
         if (!_timing.IsFirstTimePredicted)
-        {
             return;
-        }
 
         // This update loop exists just to synchronize with UISystem and avoid 1-tick delays.
         // If deferred opens / closes ever get removed you can dump this.
         foreach (var (bui, open) in _queuedBuis)
         {
             if (open)
-            {
                 bui.Show();
-            }
             else
-            {
                 bui.Hide();
-            }
         }
 
         _queuedBuis.Clear();

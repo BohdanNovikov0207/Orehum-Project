@@ -12,7 +12,7 @@ public sealed class GenpopLockerBoundUserInterface(EntityUid owner, Enum uiKey) 
     {
         base.Open();
 
-        _menu = new(Owner, EntMan);
+        _menu = new GenpopLockerMenu(Owner, EntMan);
 
         _menu.OnConfigurationComplete += (name, time, crime) =>
         {
@@ -33,4 +33,3 @@ public sealed class GenpopLockerBoundUserInterface(EntityUid owner, Enum uiKey) 
         _menu = null;
     }
 }
-

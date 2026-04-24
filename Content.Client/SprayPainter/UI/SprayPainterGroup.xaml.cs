@@ -12,8 +12,6 @@ namespace Content.Client.SprayPainter.UI;
 [GenerateTypedNameReferences]
 public sealed partial class SprayPainterGroup : BoxContainer
 {
-    public event Action<SpriteListData>? OnButtonPressed;
-
     public SprayPainterGroup()
     {
         RobustXamlLoader.Load(this);
@@ -21,10 +19,9 @@ public sealed partial class SprayPainterGroup : BoxContainer
         StyleList.GenerateItem = GenerateItems;
     }
 
-    public void PopulateList(List<SpriteListData> spriteList)
-    {
-        StyleList.PopulateList(spriteList);
-    }
+    public event Action<SpriteListData>? OnButtonPressed;
+
+    public void PopulateList(List<SpriteListData> spriteList) => StyleList.PopulateList(spriteList);
 
     public void SelectItemByStyle(string key)
     {
@@ -46,12 +43,13 @@ public sealed partial class SprayPainterGroup : BoxContainer
         if (data is not SpriteListData spriteListData)
             return;
 
-        var box = new BoxContainer() { Orientation = LayoutOrientation.Horizontal };
+        var box = new BoxContainer { Orientation = LayoutOrientation.Horizontal };
         var protoView = new EntityPrototypeView();
         protoView.SetPrototype(spriteListData.Prototype);
-        var label = new Label()
+        var label = new Label
         {
-            Text = Loc.GetString($"spray-painter-style-{spriteListData.Group.ToLower()}-{spriteListData.Style.ToLower()}")
+            Text = Loc.GetString(
+                $"spray-painter-style-{spriteListData.Group.ToLower()}-{spriteListData.Style.ToLower()}"),
         };
 
         box.AddChild(protoView);

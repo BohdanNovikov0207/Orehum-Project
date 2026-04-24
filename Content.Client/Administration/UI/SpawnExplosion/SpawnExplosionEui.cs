@@ -46,10 +46,7 @@ public sealed class SpawnExplosionEui : BaseEui
         ClearOverlay();
     }
 
-    public void SendClosedMessage()
-    {
-        SendMessage(new CloseEuiMessage());
-    }
+    public void SendClosedMessage() => SendMessage(new CloseEuiMessage());
 
     public void ClearOverlay()
     {
@@ -58,14 +55,22 @@ public sealed class SpawnExplosionEui : BaseEui
         _debugOverlay = null;
     }
 
-    public void RequestPreviewData(MapCoordinates epicenter, string typeId, float totalIntensity, float intensitySlope, float maxIntensity)
+    public void RequestPreviewData(MapCoordinates epicenter,
+        string typeId,
+        float totalIntensity,
+        float intensitySlope,
+        float maxIntensity)
     {
-        var msg = new SpawnExplosionEuiMsg.PreviewRequest(epicenter, typeId, totalIntensity, intensitySlope, maxIntensity);
+        var msg = new SpawnExplosionEuiMsg.PreviewRequest(epicenter,
+            typeId,
+            totalIntensity,
+            intensitySlope,
+            maxIntensity);
         SendMessage(msg);
     }
 
     /// <summary>
-    ///     Receive explosion preview data and add a client-side explosion preview overlay
+    /// Receive explosion preview data and add a client-side explosion preview overlay
     /// </summary>
     /// <param name="msg"></param>
     public override void HandleMessage(EuiMessageBase msg)
@@ -75,7 +80,7 @@ public sealed class SpawnExplosionEui : BaseEui
 
         if (_debugOverlay == null)
         {
-            _debugOverlay = new();
+            _debugOverlay = new ExplosionDebugOverlay();
             _overlayManager.AddOverlay(_debugOverlay);
         }
 

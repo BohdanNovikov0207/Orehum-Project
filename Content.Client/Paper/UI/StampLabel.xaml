@@ -6,4 +6,4 @@ SPDX-License-Identifier: MIT
 -->
 
 <paper:StampLabel xmlns="https://spacestation14.io"
-    xmlns:paper="clr-namespace:Content.Client.Paper.UI" />
+                  xmlns:paper="clr-namespace:Content.Client.Paper.UI" />

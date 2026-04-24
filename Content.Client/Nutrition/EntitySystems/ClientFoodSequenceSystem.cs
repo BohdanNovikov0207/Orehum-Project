@@ -78,8 +78,9 @@
 using Content.Shared.Nutrition.Components;
 using Content.Shared.Nutrition.EntitySystems;
 using Robust.Client.GameObjects;
-using Robust.Shared.Prototypes; // Goobstation - anythingburgers
+using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
+// Goobstation - anythingburgers
 
 namespace Content.Client.Nutrition.EntitySystems;
 
@@ -88,10 +89,8 @@ public sealed class ClientFoodSequenceSystem : SharedFoodSequenceSystem
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly SpriteSystem _sprite = default!;
 
-    public override void Initialize()
-    {
+    public override void Initialize() =>
         SubscribeLocalEvent<FoodSequenceStartPointComponent, AfterAutoHandleStateEvent>(OnHandleState);
-    }
 
     private void OnHandleState(Entity<FoodSequenceStartPointComponent> start, ref AfterAutoHandleStateEvent args)
     {
@@ -111,15 +110,18 @@ public sealed class ClientFoodSequenceSystem : SharedFoodSequenceSystem
         {
             _sprite.RemoveLayer((start.Owner, sprite), key);
         }
+
         start.Comp.RevealedLayers.Clear();
 
         //Add new layers
         // <Trauma> change it to regular for loop so it can modify layer sprite which is a struct
-        for (int counter = 0; counter < start.Comp.FoodLayers.Count;)
+        for (var counter = 0; counter < start.Comp.FoodLayers.Count;)
         {
             var state = start.Comp.FoodLayers[counter];
             // </Trauma>
-            if (state.Sprite is null && _prototypeManager.TryIndex<EntityPrototype>(state.Proto, out var prototype)) // Goobstation - anythingburgers HOLY FUCK THIS IS SO BAD!!! BUT IT WORKS!!
+            if (state.Sprite is null &&
+                _prototypeManager.TryIndex<EntityPrototype>(state.Proto,
+                    out var prototype)) // Goobstation - anythingburgers HOLY FUCK THIS IS SO BAD!!! BUT IT WORKS!!
             {
                 if (prototype.TryGetComponent<SpriteComponent>(out var spriteComp))
                 {
@@ -129,7 +131,8 @@ public sealed class ClientFoodSequenceSystem : SharedFoodSequenceSystem
                     var layercount = 0;
                     foreach (var layer in spriteComp.AllLayers)
                     {
-                        if (!layer.RsiState.IsValid || !layer.Visible || layer.ActualRsi == null || layer.RsiState == null || layer.RsiState.Name == null)
+                        if (!layer.RsiState.IsValid || !layer.Visible || layer.ActualRsi == null ||
+                            layer.RsiState == null || layer.RsiState.Name == null)
                             continue;
 
                         state.Sprite = new SpriteSpecifier.Rsi(layer.ActualRsi.Path, layer.RsiState.Name);
@@ -149,11 +152,11 @@ public sealed class ClientFoodSequenceSystem : SharedFoodSequenceSystem
                         sprite.LayerSetColor(indexProto, layer.Color);
 
                         var layerPosProto = start.Comp.StartPosition;
-                        layerPosProto += (start.Comp.Offset * counter) + state.LocalOffset;
+                        layerPosProto += start.Comp.Offset * counter + state.LocalOffset;
                         sprite.LayerSetOffset(indexProto, layerPosProto);
-
                     }
                 }
+
                 counter++;
                 continue;
             }
@@ -177,7 +180,7 @@ public sealed class ClientFoodSequenceSystem : SharedFoodSequenceSystem
 
             //Offset the layer
             var layerPos = start.Comp.StartPosition;
-            layerPos += (start.Comp.Offset * counter) + state.LocalOffset;
+            layerPos += start.Comp.Offset * counter + state.LocalOffset;
             _sprite.LayerSetOffset((start.Owner, sprite), index, layerPos);
 
             counter++;

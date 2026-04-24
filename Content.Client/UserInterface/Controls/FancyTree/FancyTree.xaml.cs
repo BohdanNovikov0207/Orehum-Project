@@ -23,13 +23,11 @@ using Robust.Shared.Utility;
 namespace Content.Client.UserInterface.Controls.FancyTree;
 
 /// <summary>
-///     Functionally similar to <see cref="Tree"/>, but with collapsible sections,
+/// Functionally similar to <see cref="Tree" />, but with collapsible sections,
 /// </summary>
 [GenerateTypedNameReferences]
 public sealed partial class FancyTree : Control
 {
-    [Dependency] private readonly IResourceCache _resCache = default!;
-
     public const string StylePropertyLineWidth = "LineWidth";
     public const string StylePropertyLineColor = "LineColor";
     public const string StylePropertyIconColor = "IconColor";
@@ -37,63 +35,49 @@ public sealed partial class FancyTree : Control
     public const string StylePropertyIconCollapsed = "IconCollapsed";
     public const string StylePropertyIconNoChildren = "IconNoChildren";
 
-    public readonly List<TreeItem> Items = new();
-
-    public event Action<TreeItem?>? OnSelectedItemChanged;
-
-    public int? SelectedIndex { get; private set; }
-
-    private bool _rowStyleUpdateQueued = true;
-
-    /// <summary>
-    ///     Whether or not to draw the lines connecting parents & children.
-    /// </summary>
-    public bool DrawLines = true;
-
-    /// <summary>
-    ///     Colour of the lines connecting parents & their child entries.
-    /// </summary>
-    public Color LineColor = Color.White;
-
-    /// <summary>
-    ///     Color used to modulate the icon textures.
-    /// </summary>
-    public Color IconColor = Color.White;
-
-    /// <summary>
-    ///     Width of the lines connecting parents & their child entries.
-    /// </summary>
-    public int LineWidth = 2;
-
     // If people ever want to customize this, this should be a style parameter/
     public const int Indentation = 16;
 
     public const string DefaultIconExpanded = "/Textures/Interface/Nano/inverted_triangle.svg.png";
     public const string DefaultIconCollapsed = "/Textures/Interface/Nano/triangle_right.png";
     public const string DefaultIconNoChildren = "/Textures/Interface/Nano/triangle_right_hollow.svg.png";
+    [Dependency] private readonly IResourceCache _resCache = default!;
+
+    public readonly List<TreeItem> Items = new();
+    private bool _hideEmptyIcon;
+
+    private bool _rowStyleUpdateQueued = true;
+
+    /// <summary>
+    /// If true, a collapsed item will automatically expand when first selected. If false, it has to be manually expanded by
+    /// clicking on it a second time.
+    /// </summary>
+    public bool AutoExpand = true;
+
+    /// <summary>
+    /// Whether or not to draw the lines connecting parents & children.
+    /// </summary>
+    public bool DrawLines = true;
+
+    public Texture? IconCollapsed;
+
+    /// <summary>
+    /// Color used to modulate the icon textures.
+    /// </summary>
+    public Color IconColor = Color.White;
 
     public Texture? IconExpanded;
-    public Texture? IconCollapsed;
     public Texture? IconNoChildren;
 
     /// <summary>
-    ///     If true, tree entries will hide their icon if the texture is set to null. If the icon is hidden then the
-    ///     text of that entry will no longer be aligned with sibling entries that do have an icon.
+    /// Colour of the lines connecting parents & their child entries.
     /// </summary>
-    public bool HideEmptyIcon
-    {
-        get => _hideEmptyIcon;
-        set => SetHideEmptyIcon(value);
-    }
-    private bool _hideEmptyIcon;
-
-    public TreeItem? SelectedItem => SelectedIndex == null ? null : Items[SelectedIndex.Value];
+    public Color LineColor = Color.White;
 
     /// <summary>
-    ///     If true, a collapsed item will automatically expand when first selected. If false, it has to be manually expanded by
-    ///     clicking on it a second time.
+    /// Width of the lines connecting parents & their child entries.
     /// </summary>
-    public bool AutoExpand = true;
+    public int LineWidth = 2;
 
     public FancyTree()
     {
@@ -101,6 +85,22 @@ public sealed partial class FancyTree : Control
         IoCManager.InjectDependencies(this);
         LoadIcons();
     }
+
+    public int? SelectedIndex { get; private set; }
+
+    /// <summary>
+    /// If true, tree entries will hide their icon if the texture is set to null. If the icon is hidden then the
+    /// text of that entry will no longer be aligned with sibling entries that do have an icon.
+    /// </summary>
+    public bool HideEmptyIcon
+    {
+        get => _hideEmptyIcon;
+        set => SetHideEmptyIcon(value);
+    }
+
+    public TreeItem? SelectedItem => SelectedIndex == null ? null : Items[SelectedIndex.Value];
+
+    public event Action<TreeItem?>? OnSelectedItemChanged;
 
     private void LoadIcons()
     {
@@ -131,7 +131,7 @@ public sealed partial class FancyTree : Control
             DebugTools.Assert(Items[parent.Index] == parent);
         }
 
-        var item = new TreeItem()
+        var item = new TreeItem
         {
             Tree = this,
             Index = Items.Count,
@@ -139,7 +139,7 @@ public sealed partial class FancyTree : Control
 
         Items.Add(item);
         item.Icon.SetSize = new Vector2(Indentation, Indentation);
-        item.Button.OnPressed += (_) => OnPressed(item);
+        item.Button.OnPressed += _ => OnPressed(item);
 
         if (parent == null)
             Body.AddChild(item);
@@ -188,7 +188,7 @@ public sealed partial class FancyTree : Control
     }
 
     /// <summary>
-    ///     Recursively expands or collapse all entries, optionally up to some depth.
+    /// Recursively expands or collapse all entries, optionally up to some depth.
     /// </summary>
     /// <param name="value">Whether to expand or collapse the entries</param>
     /// <param name="depth">The recursion depth. If negative, implies no limit. Zero will expand only the top-level entries.</param>
@@ -225,6 +225,7 @@ public sealed partial class FancyTree : Control
                 break;
             }
         }
+
         return index != null;
     }
 
@@ -251,10 +252,7 @@ public sealed partial class FancyTree : Control
         SelectedIndex = null;
     }
 
-    public void QueueRowStyleUpdate()
-    {
-        _rowStyleUpdateQueued = true;
-    }
+    public void QueueRowStyleUpdate() => _rowStyleUpdateQueued = true;
 
     protected override void FrameUpdate(FrameEventArgs args)
     {
@@ -263,7 +261,7 @@ public sealed partial class FancyTree : Control
 
         _rowStyleUpdateQueued = false;
 
-        int index = 0;
+        var index = 0;
 
         foreach (var item in Body.Children)
         {
@@ -321,7 +319,7 @@ public sealed partial class FancyTree : Control
     protected override void StylePropertiesChanged()
     {
         LoadIcons();
-        LineColor = TryGetStyleProperty(StylePropertyLineColor, out Color color) ? color: Color.White;
+        LineColor = TryGetStyleProperty(StylePropertyLineColor, out Color color) ? color : Color.White;
         LineWidth = TryGetStyleProperty(StylePropertyLineWidth, out int width) ? width : 2;
         base.StylePropertiesChanged();
     }

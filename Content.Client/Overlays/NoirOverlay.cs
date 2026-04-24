@@ -4,15 +4,12 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Client.Overlays;
 
-public sealed partial class NoirOverlay : Overlay
+public sealed class NoirOverlay : Overlay
 {
     private static readonly ProtoId<ShaderPrototype> Shader = "Noir";
+    private readonly ShaderInstance _noirShader;
 
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-
-    public override OverlaySpace Space => OverlaySpace.WorldSpace;
-    public override bool RequestScreenTexture => true;
-    private readonly ShaderInstance _noirShader;
 
     public NoirOverlay()
     {
@@ -20,6 +17,9 @@ public sealed partial class NoirOverlay : Overlay
         _noirShader = _prototypeManager.Index(Shader).InstanceUnique();
         ZIndex = 9; // draw this over the DamageOverlay, RainbowOverlay etc, but before the black and white shader
     }
+
+    public override OverlaySpace Space => OverlaySpace.WorldSpace;
+    public override bool RequestScreenTexture => true;
 
     protected override void Draw(in OverlayDrawArgs args)
     {

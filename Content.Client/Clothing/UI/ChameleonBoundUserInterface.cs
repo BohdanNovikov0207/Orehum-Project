@@ -15,7 +15,6 @@
 using Content.Client.Clothing.Systems;
 using Content.Shared.Clothing.Components;
 using Content.Shared.Tag;
-using Content.Shared.Prototypes;
 using JetBrains.Annotations;
 using Robust.Client.UserInterface;
 using Robust.Shared.Prototypes;
@@ -25,8 +24,8 @@ namespace Content.Client.Clothing.UI;
 [UsedImplicitly]
 public sealed class ChameleonBoundUserInterface : BoundUserInterface
 {
-    [Dependency] private readonly IPrototypeManager _proto = default!;
     private readonly ChameleonClothingSystem _chameleon;
+    [Dependency] private readonly IPrototypeManager _proto = default!;
     private readonly TagSystem _tag;
 
     [ViewVariables]
@@ -58,23 +57,21 @@ public sealed class ChameleonBoundUserInterface : BoundUserInterface
             var newTargets = new List<EntProtoId>();
             foreach (var target in targets)
             {
-                if (string.IsNullOrEmpty(target) || !_proto.TryIndex(target, out EntityPrototype? proto))
+                if (string.IsNullOrEmpty(target) || !_proto.TryIndex(target, out var proto))
                     continue;
 
-                if (!proto.TryGetComponent(out TagComponent? tag, EntMan.ComponentFactory) || !_tag.HasTag(tag, st.RequiredTag))
+                if (!proto.TryGetComponent(out TagComponent? tag, EntMan.ComponentFactory) ||
+                    !_tag.HasTag(tag, st.RequiredTag))
                     continue;
 
                 newTargets.Add(target);
             }
+
             _menu?.UpdateState(newTargets, st.SelectedId);
-        } else
-        {
-            _menu?.UpdateState(targets, st.SelectedId);
         }
+        else
+            _menu?.UpdateState(targets, st.SelectedId);
     }
 
-    private void OnIdSelected(string selectedId)
-    {
-        SendMessage(new ChameleonPrototypeSelectedMessage(selectedId));
-    }
+    private void OnIdSelected(string selectedId) => SendMessage(new ChameleonPrototypeSelectedMessage(selectedId));
 }

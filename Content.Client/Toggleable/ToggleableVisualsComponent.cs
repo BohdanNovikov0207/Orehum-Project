@@ -6,15 +6,15 @@ namespace Content.Client.Toggleable;
 /// Component that handles toggling the visuals of an entity, including layers on an entity's sprite,
 /// the in-hand visuals, and the clothing/equipment visuals.
 /// </summary>
-/// <see cref="ToggleableVisualsSystem"/>
+/// <see cref="ToggleableVisualsSystem" />
 [RegisterComponent]
 public sealed partial class ToggleableVisualsComponent : Component
 {
     /// <summary>
-    /// Sprite layer that will have its visibility toggled when this item is toggled.
+    /// Layers to add to the sprite of the player that is wearing this entity (while the component is toggled on).
     /// </summary>
-    [DataField(required: true)]
-    public string? SpriteLayer;
+    [DataField]
+    public Dictionary<string, List<PrototypeLayerData>> ClothingVisuals = new();
 
     /// <summary>
     /// Layers to add to the sprite of the player that is holding this entity (while the component is toggled on).
@@ -23,8 +23,8 @@ public sealed partial class ToggleableVisualsComponent : Component
     public Dictionary<HandLocation, List<PrototypeLayerData>> InhandVisuals = new();
 
     /// <summary>
-    /// Layers to add to the sprite of the player that is wearing this entity (while the component is toggled on).
+    /// Sprite layer that will have its visibility toggled when this item is toggled.
     /// </summary>
-    [DataField]
-    public Dictionary<string, List<PrototypeLayerData>> ClothingVisuals = new();
+    [DataField(required: true)]
+    public string? SpriteLayer;
 }

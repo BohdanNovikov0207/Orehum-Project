@@ -31,15 +31,15 @@ namespace Content.Client.Store.Ui;
 [GenerateTypedNameReferences]
 public sealed partial class StoreListingControl : Control
 {
-    [Dependency] private readonly IPrototypeManager _prototype = default!;
-    [Dependency] private readonly IEntityManager _entity = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    private readonly ClientGameTicker _ticker;
-
     private readonly ListingData _data;
+    [Dependency] private readonly IEntityManager _entity = default!;
 
     private readonly bool _hasBalance;
     private readonly string _price;
+    [Dependency] private readonly IPrototypeManager _prototype = default!;
+    private readonly ClientGameTicker _ticker;
+    [Dependency] private readonly IGameTiming _timing = default!;
+
     public StoreListingControl(ListingData data, string price, bool hasBalance, Texture? texture = null)
     {
         IoCManager.InjectDependencies(this);
@@ -52,7 +52,8 @@ public sealed partial class StoreListingControl : Control
         _price = price;
 
         StoreItemName.Text = ListingLocalisationHelpers.GetLocalisedNameOrEntityName(_data, _prototype);
-        StoreItemDescription.SetMessage(ListingLocalisationHelpers.GetLocalisedDescriptionOrEntityDescription(_data, _prototype));
+        StoreItemDescription.SetMessage(
+            ListingLocalisationHelpers.GetLocalisedDescriptionOrEntityDescription(_data, _prototype));
 
         UpdateBuyButtonText();
         StoreItemBuyButton.Disabled = !CanBuy();
@@ -78,12 +79,10 @@ public sealed partial class StoreListingControl : Control
         if (_data.RestockTime > stationTime)
         {
             var timeLeftToBuy = stationTime - _data.RestockTime;
-            StoreItemBuyButton.Text =  timeLeftToBuy.Duration().ToString(@"mm\:ss");
+            StoreItemBuyButton.Text = timeLeftToBuy.Duration().ToString(@"mm\:ss");
         }
         else
-        {
             StoreItemBuyButton.Text = _price;
-        }
     }
 
     private void UpdateName()
@@ -92,9 +91,7 @@ public sealed partial class StoreListingControl : Control
 
         var stationTime = _timing.CurTime.Subtract(_ticker.RoundStartTimeSpan);
         if (_data.RestockTime > stationTime)
-        {
             name += Loc.GetString("store-ui-button-out-of-stock");
-        }
 
         StoreItemName.Text = name;
     }

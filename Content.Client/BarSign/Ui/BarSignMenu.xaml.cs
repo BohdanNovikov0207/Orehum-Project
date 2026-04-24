@@ -13,11 +13,8 @@ namespace Content.Client.BarSign.Ui;
 [GenerateTypedNameReferences]
 public sealed partial class BarSignMenu : FancyWindow
 {
-    private string? _currentId;
-
     private readonly List<BarSignPrototype> _cachedPrototypes = new();
-
-    public event Action<string>? OnSignSelected;
+    private string? _currentId;
 
     public BarSignMenu(BarSignPrototype? currentSign, List<BarSignPrototype> signs)
     {
@@ -43,6 +40,8 @@ public sealed partial class BarSignMenu : FancyWindow
             SignOptions.TrySelectId(idx);
         }
     }
+
+    public event Action<string>? OnSignSelected;
 
     public void UpdateState(BarSignPrototype newSign)
     {

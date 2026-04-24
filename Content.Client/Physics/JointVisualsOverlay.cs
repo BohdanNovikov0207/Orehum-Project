@@ -20,14 +20,14 @@ namespace Content.Client.Physics;
 /// </summary>
 public sealed class JointVisualsOverlay : Overlay
 {
-    public override OverlaySpace Space => OverlaySpace.WorldSpaceBelowFOV;
-
-    private IEntityManager _entManager;
+    private readonly IEntityManager _entManager;
 
     public JointVisualsOverlay(IEntityManager entManager)
     {
         _entManager = entManager;
     }
+
+    public override OverlaySpace Space => OverlaySpace.WorldSpaceBelowFOV;
 
     protected override void Draw(in OverlayDrawArgs args)
     {
@@ -67,7 +67,7 @@ public sealed class JointVisualsOverlay : Overlay
 
             var posA = xformSystem.ToMapCoordinates(coordsA).Position;
             var posB = xformSystem.ToMapCoordinates(coordsB).Position;
-            var diff = (posB - posA);
+            var diff = posB - posA;
             var length = diff.Length();
 
             var midPoint = diff / 2f + posA;

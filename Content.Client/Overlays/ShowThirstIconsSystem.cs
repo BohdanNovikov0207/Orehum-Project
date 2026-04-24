@@ -11,8 +11,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Nutrition.EntitySystems;
 using Content.Shared.Nutrition.Components;
+using Content.Shared.Nutrition.EntitySystems;
 using Content.Shared.Overlays;
 using Content.Shared.StatusIcon.Components;
 
