@@ -27,17 +27,6 @@ namespace Content.Benchmarks;
 [MemoryDiagnoser]
 public class DeviceNetworkingBenchmark
 {
-    private TestPair _pair = default!;
-    private DeviceNetworkTestSystem _deviceNetTestSystem = default!;
-    private DeviceNetworkSystem _deviceNetworkSystem = default!;
-    private EntityUid _sourceEntity;
-    private EntityUid _sourceWirelessEntity;
-    private readonly List<EntityUid> _targetEntities = new();
-    private readonly List<EntityUid> _targetWirelessEntities = new();
-
-
-    private NetworkPayload _payload = default!;
-
     [TestPrototypes]
     private const string Prototypes = @"
 - type: entity
@@ -59,6 +48,17 @@ public class DeviceNetworkingBenchmark
     - type: WirelessNetworkConnection
       range: 100
         ";
+
+    private readonly List<EntityUid> _targetEntities = new();
+    private readonly List<EntityUid> _targetWirelessEntities = new();
+    private DeviceNetworkTestSystem _deviceNetTestSystem = default!;
+    private DeviceNetworkSystem _deviceNetworkSystem = default!;
+    private TestPair _pair = default!;
+
+
+    private NetworkPayload _payload = default!;
+    private EntityUid _sourceEntity;
+    private EntityUid _sourceWirelessEntity;
 
     //public static IEnumerable<int> EntityCountSource { get; set; }
 
@@ -84,7 +84,7 @@ public class DeviceNetworkingBenchmark
             {
                 ["Test"] = testValue,
                 ["testnumber"] = 1,
-                ["testbool"] = true
+                ["testbool"] = true,
             };
 
             _sourceEntity = entityManager.SpawnEntity("DummyNetworkDevicePrivate", MapCoordinates.Nullspace);
@@ -93,7 +93,8 @@ public class DeviceNetworkingBenchmark
             for (var i = 0; i < EntityCount; i++)
             {
                 _targetEntities.Add(entityManager.SpawnEntity("DummyNetworkDevicePrivate", MapCoordinates.Nullspace));
-                _targetWirelessEntities.Add(entityManager.SpawnEntity("DummyWirelessNetworkDevice", MapCoordinates.Nullspace));
+                _targetWirelessEntities.Add(entityManager.SpawnEntity("DummyWirelessNetworkDevice",
+                    MapCoordinates.Nullspace));
             }
         });
     }

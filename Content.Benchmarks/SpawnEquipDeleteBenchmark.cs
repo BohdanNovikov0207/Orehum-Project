@@ -25,17 +25,17 @@ namespace Content.Benchmarks;
 /// This benchmarks spawns several humans, gives them captain equipment and then deletes them.
 /// This measures performance for spawning, deletion, containers, and inventory code.
 /// </summary>
-[Virtual, MemoryDiagnoser]
+[Virtual] [MemoryDiagnoser]
 public class SpawnEquipDeleteBenchmark
 {
     private static readonly EntProtoId Mob = "MobHuman";
     private static readonly ProtoId<StartingGearPrototype> CaptainStartingGear = "CaptainGear";
+    private EntityCoordinates _coords;
+    private EntityUid _entity;
+    private StartingGearPrototype _gear = default!;
 
     private TestPair _pair = default!;
     private StationSpawningSystem _spawnSys = default!;
-    private StartingGearPrototype _gear = default!;
-    private EntityUid _entity;
-    private EntityCoordinates _coords;
 
     [Params(1, 4, 16, 64)]
     public int N;
@@ -62,8 +62,7 @@ public class SpawnEquipDeleteBenchmark
     }
 
     [Benchmark]
-    public async Task SpawnDeletePlayer()
-    {
+    public async Task SpawnDeletePlayer() =>
         await _pair.Server.WaitPost(() =>
         {
             var server = _pair.Server;
@@ -74,5 +73,4 @@ public class SpawnEquipDeleteBenchmark
                 server.EntMan.DeleteEntity(_entity);
             }
         });
-    }
 }

@@ -35,13 +35,13 @@ namespace Content.Benchmarks;
 public class ComponentQueryBenchmark
 {
     public const string Map = "Maps/saltern.yml";
-
-    private TestPair _pair = default!;
+    private EntityQuery<ClothingComponent> _clothingQuery;
     private IEntityManager _entMan = default!;
     private EntityQuery<ItemComponent> _itemQuery;
-    private EntityQuery<ClothingComponent> _clothingQuery;
-    private EntityQuery<MapComponent> _mapQuery;
     private EntityUid[] _items = default!;
+    private EntityQuery<MapComponent> _mapQuery;
+
+    private TestPair _pair = default!;
 
     [GlobalSetup]
     public void Setup()
@@ -58,12 +58,14 @@ public class ComponentQueryBenchmark
 
         _pair.Server.ResolveDependency<IRobustRandom>().SetSeed(42);
         _pair.Server.WaitPost(() =>
-        {
-            var map = new ResPath(Map);
-            var opts = DeserializationOptions.Default with {InitializeMaps = true};
-            if (!_entMan.System<MapLoaderSystem>().TryLoadMap(map, out _, out _, opts))
-                throw new Exception("Map load failed");
-        }).GetAwaiter().GetResult();
+            {
+                var map = new ResPath(Map);
+                var opts = DeserializationOptions.Default with { InitializeMaps = true };
+                if (!_entMan.System<MapLoaderSystem>().TryLoadMap(map, out _, out _, opts))
+                    throw new Exception("Map load failed");
+            })
+            .GetAwaiter()
+            .GetResult();
 
         _items = new EntityUid[_entMan.Count<ItemComponent>()];
         var i = 0;
@@ -81,6 +83,19 @@ public class ComponentQueryBenchmark
         PoolManager.Shutdown();
     }
 
+    [Benchmark(Baseline = true)]
+    [BenchmarkCategory("Events")]
+    public int StructEvents()
+    {
+        var ev = new QueryBenchEvent();
+        foreach (var uid in _items)
+        {
+            _entMan.EventBus.RaiseLocalEvent(uid, ref ev);
+        }
+
+        return ev.HashCode;
+    }
+
     #region TryComp
 
     /// <summary>
@@ -96,11 +111,12 @@ public class ComponentQueryBenchmark
             if (_clothingQuery.TryGetComponent(uid, out var clothing))
                 hashCode = HashCode.Combine(hashCode, clothing.GetHashCode());
         }
+
         return hashCode;
     }
 
     /// <summary>
-    /// Variant of <see cref="TryComp"/> that is meant to always fail to get a component.
+    /// Variant of <see cref="TryComp" /> that is meant to always fail to get a component.
     /// </summary>
     [Benchmark]
     [BenchmarkCategory("TryComp")]
@@ -112,11 +128,12 @@ public class ComponentQueryBenchmark
             if (_mapQuery.TryGetComponent(uid, out var map))
                 hashCode = HashCode.Combine(hashCode, map.GetHashCode());
         }
+
         return hashCode;
     }
 
     /// <summary>
-    /// Variant of <see cref="TryComp"/> that is meant to always succeed getting a component.
+    /// Variant of <see cref="TryComp" /> that is meant to always succeed getting a component.
     /// </summary>
     [Benchmark]
     [BenchmarkCategory("TryComp")]
@@ -128,11 +145,12 @@ public class ComponentQueryBenchmark
             if (_itemQuery.TryGetComponent(uid, out var item))
                 hashCode = HashCode.Combine(hashCode, item.GetHashCode());
         }
+
         return hashCode;
     }
 
     /// <summary>
-    /// Variant of <see cref="TryComp"/> that uses `Resolve()` to try get the component.
+    /// Variant of <see cref="TryComp" /> that uses `Resolve()` to try get the component.
     /// </summary>
     [Benchmark]
     [BenchmarkCategory("TryComp")]
@@ -143,6 +161,7 @@ public class ComponentQueryBenchmark
         {
             DoResolve(uid, ref hashCode);
         }
+
         return hashCode;
     }
 
@@ -242,19 +261,6 @@ public class ComponentQueryBenchmark
     }
 
     #endregion
-
-    [Benchmark(Baseline = true)]
-    [BenchmarkCategory("Events")]
-    public int StructEvents()
-    {
-        var ev = new QueryBenchEvent();
-        foreach (var uid in _items)
-        {
-            _entMan.EventBus.RaiseLocalEvent(uid, ref ev);
-        }
-
-        return ev.HashCode;
-    }
 }
 
 [ByRefEvent]
@@ -271,8 +277,6 @@ public sealed class QueryBenchSystem : EntitySystem
         SubscribeLocalEvent<ClothingComponent, QueryBenchEvent>(OnEvent);
     }
 
-    private void OnEvent(EntityUid uid, ClothingComponent component, ref QueryBenchEvent args)
-    {
+    private void OnEvent(EntityUid uid, ClothingComponent component, ref QueryBenchEvent args) =>
         args.HashCode = HashCode.Combine(args.HashCode, component.GetHashCode());
-    }
 }

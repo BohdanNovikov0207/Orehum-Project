@@ -49,9 +49,23 @@ namespace Content.Benchmarks;
 [Virtual]
 public class MapLoadBenchmark
 {
-    private TestPair _pair = default!;
+    public static readonly string[] MapsSource =
+    {
+        "Empty", "Satlern", "Box", "Bagel", "Dev", "CentComm", "Atlas", "Core", "TestTeg", "Packed", "Origin", "Omega",
+        "Cluster", "Reach", "Meta", "Marathon", "Europa", "MeteorArena", "Fland", "Oasis", "FlandHighPop",
+        "OasisHighPop", "OriginHighPop", "Barratry", "Kettle", "Lambda", "Leonid", "Delta", "Amber", "Chloris", "Cog",
+        "Serpentcrest", "Gate",
+    }; //Goobstation, readds maps
+
+    private MapId _mapId;
     private MapLoaderSystem _mapLoader = default!;
     private SharedMapSystem _mapSys = default!;
+    private TestPair _pair = default!;
+
+    [ParamsSource(nameof(MapsSource))]
+    public string Map;
+
+    public Dictionary<string, string> Paths;
 
     [GlobalSetup]
     public void Setup()
@@ -76,14 +90,6 @@ public class MapLoadBenchmark
         await _pair.DisposeAsync();
         PoolManager.Shutdown();
     }
-
-    public static readonly string[] MapsSource = { "Empty", "Satlern", "Box", "Bagel", "Dev", "CentComm", "Atlas", "Core", "TestTeg", "Packed", "Origin", "Omega", "Cluster", "Reach", "Meta", "Marathon", "Europa", "MeteorArena", "Fland", "Oasis", "FlandHighPop", "OasisHighPop", "OriginHighPop", "Barratry", "Kettle", "Lambda", "Leonid", "Delta", "Amber", "Chloris", "Cog", "Serpentcrest", "Gate"}; //Goobstation, readds maps
-
-    [ParamsSource(nameof(MapsSource))]
-    public string Map;
-
-    public Dictionary<string, string> Paths;
-    private MapId _mapId;
 
     [Benchmark]
     public async Task LoadMap()

@@ -35,17 +35,17 @@ namespace Content.Benchmarks;
 public class PvsBenchmark
 {
     public const string Map = "Maps/box.yml";
+    public int _cycleOffset;
+    private IEntityManager _entMan = default!;
+    private EntityCoordinates[] _locations = default!;
+
+    private TestPair _pair = default!;
+    private ICommonSession[] _players = default!;
+    private EntityCoordinates[] _spawns = default!;
+    private SharedTransformSystem _sys = default!;
 
     [Params(1, 8, 80)]
     public int PlayerCount { get; set; }
-
-    private TestPair _pair = default!;
-    private IEntityManager _entMan = default!;
-    private ICommonSession[] _players = default!;
-    private EntityCoordinates[] _spawns = default!;
-    public int _cycleOffset = 0;
-    private SharedTransformSystem _sys = default!;
-    private EntityCoordinates[] _locations = default!;
 
     [GlobalSetup]
     public void Setup()
@@ -72,7 +72,7 @@ public class PvsBenchmark
         await _pair.Server.WaitPost(() =>
         {
             var path = new ResPath(Map);
-            var opts = DeserializationOptions.Default with {InitializeMaps = true};
+            var opts = DeserializationOptions.Default with { InitializeMaps = true };
             if (!_entMan.System<MapLoaderSystem>().TryLoadMap(path, out _, out _, opts))
                 throw new Exception("Map load failed");
         });
@@ -93,7 +93,7 @@ public class PvsBenchmark
             for (var i = 0; i < PlayerCount; i++)
             {
                 var pos = _spawns[i % _spawns.Length];
-                var uid =_entMan.SpawnEntity("MobHuman", pos);
+                var uid = _entMan.SpawnEntity("MobHuman", pos);
                 _pair.Server.ConsoleHost.ExecuteCommand($"setoutfit {_entMan.GetNetEntity(uid)} CaptainGear");
                 mind.ControlMob(_players[i].UserId, uid);
             }
@@ -137,12 +137,13 @@ public class PvsBenchmark
         }
 
         _pair.Server.WaitPost(() =>
-        {
-            for (var i = 0; i < PlayerCount; i++)
             {
-                _sys.SetCoordinates(ents[i], locations[i]);
-            }
-        }).Wait();
+                for (var i = 0; i < PlayerCount; i++)
+                {
+                    _sys.SetCoordinates(ents[i], locations[i]);
+                }
+            })
+            .Wait();
 
         _pair.Server.PvsTick(_players);
     }
@@ -156,14 +157,11 @@ public class PvsBenchmark
     /// - Sending PVS leave messages
     /// </summary>
     [Benchmark]
-    public void StaticTick()
-    {
-        _pair.Server.PvsTick(_players);
-    }
+    public void StaticTick() => _pair.Server.PvsTick(_players);
 
     /// <summary>
     /// Basic benchmark for PVS in a situation where players are teleporting all over the place. This isn't very
-    /// realistic, but unlike <see cref="StaticTick"/> this will actually also measure the speed of processing dirty
+    /// realistic, but unlike <see cref="StaticTick" /> this will actually also measure the speed of processing dirty
     /// chunks and sending PVS leave messages.
     /// </summary>
     [Benchmark]
@@ -171,12 +169,14 @@ public class PvsBenchmark
     {
         _cycleOffset = (_cycleOffset + 1) % _players.Length;
         _pair.Server.WaitPost(() =>
-        {
-            for (var i = 0; i < PlayerCount; i++)
             {
-                _sys.SetCoordinates(_players[i].AttachedEntity!.Value, _locations[(i + _cycleOffset) % _players.Length]);
-            }
-        }).Wait();
+                for (var i = 0; i < PlayerCount; i++)
+                {
+                    _sys.SetCoordinates(_players[i].AttachedEntity!.Value,
+                        _locations[(i + _cycleOffset) % _players.Length]);
+                }
+            })
+            .Wait();
         _pair.Server.PvsTick(_players);
     }
 }

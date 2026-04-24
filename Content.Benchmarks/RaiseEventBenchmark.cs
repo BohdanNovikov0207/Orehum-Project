@@ -26,11 +26,11 @@ public class RaiseEventBenchmark
         _sys = entMan.System<BenchSystem>();
 
         _pair.Server.WaitPost(() =>
-        {
-            var uid = entMan.Spawn();
-            _sys.Ent = new(uid, entMan.GetComponent<TransformComponent>(uid));
-            _sys.Ent2 = new(_sys.Ent.Owner, _sys.Ent.Comp);
-        })
+            {
+                var uid = entMan.Spawn();
+                _sys.Ent = new Entity<TransformComponent>(uid, entMan.GetComponent<TransformComponent>(uid));
+                _sys.Ent2 = new Entity<IComponent>(_sys.Ent.Owner, _sys.Ent.Comp);
+            })
             .GetAwaiter()
             .GetResult();
     }
@@ -43,35 +43,23 @@ public class RaiseEventBenchmark
     }
 
     [Benchmark(Baseline = true)]
-    public int RaiseEvent()
-    {
-        return _sys.RaiseEvent();
-    }
+    public int RaiseEvent() => _sys.RaiseEvent();
 
     [Benchmark]
-    public int RaiseCompEvent()
-    {
-        return _sys.RaiseCompEvent();
-    }
+    public int RaiseCompEvent() => _sys.RaiseCompEvent();
 
     [Benchmark]
-    public int RaiseICompEvent()
-    {
-        return _sys.RaiseICompEvent();
-    }
+    public int RaiseICompEvent() => _sys.RaiseICompEvent();
 
     [Benchmark]
-    public int RaiseCSharpEvent()
-    {
-        return _sys.CSharpEvent();
-    }
+    public int RaiseCSharpEvent() => _sys.CSharpEvent();
 
     public sealed class BenchSystem : EntitySystem
     {
+        public delegate void EntityEventHandler(EntityUid uid, TransformComponent comp, ref BenchEv ev);
+
         public Entity<TransformComponent> Ent;
         public Entity<IComponent> Ent2;
-
-        public delegate void EntityEventHandler(EntityUid uid, TransformComponent comp, ref BenchEv ev);
 
         public event EntityEventHandler? OnCSharpEvent;
 
@@ -112,10 +100,7 @@ public class RaiseEventBenchmark
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private void OnEvent(EntityUid uid, TransformComponent component, ref BenchEv args)
-        {
-            args.N += uid.Id;
-        }
+        private void OnEvent(EntityUid uid, TransformComponent component, ref BenchEv args) => args.N += uid.Id;
 
         [ByRefEvent]
         public struct BenchEv
