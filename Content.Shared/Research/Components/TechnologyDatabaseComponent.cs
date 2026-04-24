@@ -15,19 +15,20 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototy
 
 namespace Content.Shared.Research.Components;
 
-[RegisterComponent, NetworkedComponent, Access(typeof(SharedResearchSystem), typeof(SharedLatheSystem)), AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(SharedResearchSystem), typeof(SharedLatheSystem))]
+[AutoGenerateComponentState]
 public sealed partial class TechnologyDatabaseComponent : Component
 {
+    [AutoNetworkedField]
+    [DataField("currentTechnologyCards")]
+    public List<string> CurrentTechnologyCards = new();
+
     /// <summary>
     /// A main discipline that locks out other discipline technology past a certain tier.
     /// </summary>
     [AutoNetworkedField]
     [DataField("mainDiscipline", customTypeSerializer: typeof(PrototypeIdSerializer<TechDisciplinePrototype>))]
     public string? MainDiscipline;
-
-    [AutoNetworkedField]
-    [DataField("currentTechnologyCards")]
-    public List<string> CurrentTechnologyCards = new();
 
     /// <summary>
     /// Which research disciplines are able to be unlocked
@@ -37,13 +38,6 @@ public sealed partial class TechnologyDatabaseComponent : Component
     public List<ProtoId<TechDisciplinePrototype>> SupportedDisciplines = new();
 
     /// <summary>
-    /// The ids of all the technologies which have been unlocked.
-    /// </summary>
-    [AutoNetworkedField]
-    [DataField]
-    public List<ProtoId<TechnologyPrototype>> UnlockedTechnologies = new();
-
-    /// <summary>
     /// The ids of all the lathe recipes which have been unlocked.
     /// This is maintained alongside the TechnologyIds
     /// </summary>
@@ -51,6 +45,13 @@ public sealed partial class TechnologyDatabaseComponent : Component
     [AutoNetworkedField]
     [DataField]
     public List<ProtoId<LatheRecipePrototype>> UnlockedRecipes = new();
+
+    /// <summary>
+    /// The ids of all the technologies which have been unlocked.
+    /// </summary>
+    [AutoNetworkedField]
+    [DataField]
+    public List<ProtoId<TechnologyPrototype>> UnlockedTechnologies = new();
 }
 
 /// <summary>
@@ -68,9 +69,9 @@ public readonly record struct TechnologyDatabaseModifiedEvent // Goobstation - L
 
     public TechnologyDatabaseModifiedEvent(List<ProtoId<LatheRecipePrototype>>? unlockedRecipes = null)
     {
-        UnlockedRecipes = unlockedRecipes ?? new();
+        UnlockedRecipes = unlockedRecipes ?? new List<ProtoId<LatheRecipePrototype>>();
     }
-};
+}
 
 /// <summary>
 /// Event raised on a database after being synchronized

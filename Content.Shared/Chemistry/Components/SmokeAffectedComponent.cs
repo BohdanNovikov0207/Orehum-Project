@@ -13,7 +13,7 @@ namespace Content.Shared.Chemistry.Components;
 /// This is used for entities which are currently being affected by smoke.
 /// Manages the gradual metabolism every second.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentPause]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentPause]
 public sealed partial class SmokeAffectedComponent : Component
 {
     /// <summary>

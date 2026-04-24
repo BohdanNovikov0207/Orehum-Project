@@ -78,10 +78,8 @@
 
 using Content.Shared.Alert;
 using Content.Shared.Atmos.Components;
-using Content.Shared.Clothing.EntitySystems;
 using Content.Shared.Gravity;
 using Content.Shared.Inventory;
-using Content.Shared.Item;
 using Content.Shared.Item.ItemToggle;
 using Content.Shared.Item.ItemToggle.Components;
 using Robust.Shared.Containers;
@@ -91,10 +89,10 @@ namespace Content.Shared.Clothing;
 public sealed class SharedMagbootsSystem : EntitySystem
 {
     [Dependency] private readonly AlertsSystem _alerts = default!;
-    [Dependency] private readonly InventorySystem _inventory = default!;
-    [Dependency] private readonly ItemToggleSystem _toggle = default!;
     [Dependency] private readonly SharedContainerSystem _container = default!;
     [Dependency] private readonly SharedGravitySystem _gravity = default!;
+    [Dependency] private readonly InventorySystem _inventory = default!;
+    [Dependency] private readonly ItemToggleSystem _toggle = default!;
 
     public override void Initialize()
     {
@@ -114,20 +112,14 @@ public sealed class SharedMagbootsSystem : EntitySystem
         if (_container.TryGetContainingContainer((uid, null, null), out var container) &&
             _inventory.TryGetSlotEntity(container.Owner, comp.Slot, out var worn)
             && uid == worn)
-        {
             UpdateMagbootEffects(container.Owner, ent, args.Activated);
-        }
     }
 
-    private void OnGotUnequipped(Entity<MagbootsComponent> ent, ref ClothingGotUnequippedEvent args)
-    {
+    private void OnGotUnequipped(Entity<MagbootsComponent> ent, ref ClothingGotUnequippedEvent args) =>
         UpdateMagbootEffects(args.Wearer, ent, false);
-    }
 
-    private void OnGotEquipped(Entity<MagbootsComponent> ent, ref ClothingGotEquippedEvent args)
-    {
+    private void OnGotEquipped(Entity<MagbootsComponent> ent, ref ClothingGotEquippedEvent args) =>
         UpdateMagbootEffects(args.Wearer, ent, _toggle.IsActivated(ent.Owner));
-    }
 
     public void UpdateMagbootEffects(EntityUid user, Entity<MagbootsComponent> ent, bool state)
     {
@@ -154,8 +146,6 @@ public sealed class SharedMagbootsSystem : EntitySystem
         args.Handled = true;
     }
 
-    private void OnIsWeightless(Entity<MagbootsComponent> ent, ref InventoryRelayedEvent<IsWeightlessEvent> args)
-    {
+    private void OnIsWeightless(Entity<MagbootsComponent> ent, ref InventoryRelayedEvent<IsWeightlessEvent> args) =>
         OnIsWeightless(ent, ref args.Args);
-    }
 }

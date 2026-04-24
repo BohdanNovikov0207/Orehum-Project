@@ -4,7 +4,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared._NF.Mining.Components; // Frontier
+using Content.Shared._NF.Mining.Components;
 using Content.Shared.Inventory;
 using Content.Shared.Item.ItemToggle.Components;
 using Content.Shared.Mining.Components;
@@ -12,18 +12,19 @@ using Robust.Shared.Audio.Systems;
 using Robust.Shared.Containers;
 using Robust.Shared.Network;
 using Robust.Shared.Timing;
+// Frontier
 
 namespace Content.Shared.Mining;
 
 public sealed partial class MiningScannerSystem : EntitySystem // Frontier: partial
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly INetManager _net = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedContainerSystem _container = default!;
     [Dependency] private readonly InventorySystem _inventory = default!;
+    [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         SubscribeLocalEvent<MiningScannerComponent, EntGotInsertedIntoContainerMessage>(OnInserted);
@@ -32,15 +33,11 @@ public sealed partial class MiningScannerSystem : EntitySystem // Frontier: part
         NFInitialize(); // Frontier
     }
 
-    private void OnInserted(Entity<MiningScannerComponent> ent, ref EntGotInsertedIntoContainerMessage args)
-    {
+    private void OnInserted(Entity<MiningScannerComponent> ent, ref EntGotInsertedIntoContainerMessage args) =>
         UpdateViewerComponent(args.Container.Owner);
-    }
 
-    private void OnRemoved(Entity<MiningScannerComponent> ent, ref EntGotRemovedFromContainerMessage args)
-    {
+    private void OnRemoved(Entity<MiningScannerComponent> ent, ref EntGotRemovedFromContainerMessage args) =>
         UpdateViewerComponent(args.Container.Owner);
-    }
 
     private void OnToggled(Entity<MiningScannerComponent> ent, ref ItemToggledEvent args)
     {
@@ -95,9 +92,7 @@ public sealed partial class MiningScannerSystem : EntitySystem // Frontier: part
             {
                 // Frontier: innate mining scanner
                 if (TryComp<InnateMiningScannerViewerComponent>(uid, out var innateViewer))
-                {
                     SetupInnateMiningViewerComponent((uid, innateViewer));
-                }
                 else
                 {
                     // End Frontier: innate mining scanner

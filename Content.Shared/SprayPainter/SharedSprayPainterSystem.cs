@@ -75,6 +75,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Linq;
 using Content.Shared.Administration.Logs;
 using Content.Shared.Charges.Components;
 using Content.Shared.Charges.Systems;
@@ -90,7 +91,6 @@ using Robust.Shared.Audio.Systems;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
 using Robust.Shared.Utility;
-using System.Linq;
 
 namespace Content.Shared.SprayPainter;
 
@@ -100,14 +100,14 @@ namespace Content.Shared.SprayPainter;
 /// </summary>
 public abstract class SharedSprayPainterSystem : EntitySystem
 {
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] protected readonly IPrototypeManager Proto = default!;
     [Dependency] protected readonly ISharedAdminLogManager AdminLogger = default!;
     [Dependency] protected readonly SharedAppearanceSystem Appearance = default!;
     [Dependency] protected readonly SharedAudioSystem Audio = default!;
     [Dependency] protected readonly SharedChargesSystem Charges = default!;
     [Dependency] protected readonly SharedDoAfterSystem DoAfter = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] protected readonly IPrototypeManager Proto = default!;
 
     public override void Initialize()
     {
@@ -135,12 +135,13 @@ public abstract class SharedSprayPainterSystem : EntitySystem
 
     private void OnMapInit(Entity<SprayPainterComponent> ent, ref MapInitEvent args)
     {
-        bool stylesByGroupPopulated = false;
+        var stylesByGroupPopulated = false;
         foreach (var groupProto in Proto.EnumeratePrototypes<PaintableGroupPrototype>())
         {
             ent.Comp.StylesByGroup[groupProto.ID] = groupProto.DefaultStyle;
             stylesByGroupPopulated = true;
         }
+
         if (stylesByGroupPopulated)
             Dirty(ent);
 
@@ -176,17 +177,18 @@ public abstract class SharedSprayPainterSystem : EntitySystem
 
         Appearance.SetData(target, PaintableVisuals.Prototype, args.Prototype);
         Audio.PlayPredicted(ent.Comp.SpraySound, ent, args.Args.User);
-        Charges.TryUseCharges(new Entity<LimitedChargesComponent?>(ent, EnsureComp<LimitedChargesComponent>(ent)), args.Cost);
+        Charges.TryUseCharges(new Entity<LimitedChargesComponent?>(ent, EnsureComp<LimitedChargesComponent>(ent)),
+            args.Cost);
 
         var paintedComponent = EnsureComp<PaintedComponent>(target);
         paintedComponent.DryTime = _timing.CurTime + ent.Comp.FreshPaintDuration;
         Dirty(target, paintedComponent);
 
         var ev = new EntityPaintedEvent(
-            User: args.User,
-            Tool: ent,
-            Prototype: args.Prototype,
-            Group: args.Group);
+            args.User,
+            ent,
+            args.Prototype,
+            args.Group);
         RaiseLocalEvent(target, ref ev);
 
         AdminLogger.Add(LogType.Action,
@@ -208,7 +210,7 @@ public abstract class SharedSprayPainterSystem : EntitySystem
             Text = Loc.GetString("spray-painter-verb-toggle-decals"),
             Icon = new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/VerbIcons/settings.svg.192dpi.png")),
             Act = () => TogglePaintDecals(ent, user),
-            Impact = LogImpact.Low
+            Impact = LogImpact.Low,
         };
         args.Verbs.Add(verb);
     }
@@ -238,10 +240,14 @@ public abstract class SharedSprayPainterSystem : EntitySystem
                 pitch = 0.8f;
                 break;
         }
+
         Dirty(ent);
 
         // Make the machine beep.
-        Audio.PlayPredicted(ent.Comp.SoundSwitchDecalMode, ent, user, ent.Comp.SoundSwitchDecalMode.Params.WithPitchScale(pitch));
+        Audio.PlayPredicted(ent.Comp.SoundSwitchDecalMode,
+            ent,
+            user,
+            ent.Comp.SoundSwitchDecalMode.Params.WithPitchScale(pitch));
     }
 
     /// <summary>
@@ -284,8 +290,8 @@ public abstract class SharedSprayPainterSystem : EntitySystem
             targetGroup.Time,
             new SprayPainterDoAfterEvent(proto, group, targetGroup.Cost),
             args.Used,
-            target: ent,
-            used: args.Used)
+            ent,
+            args.Used)
         {
             BreakOnMove = true,
             BreakOnDamage = true,
@@ -333,10 +339,8 @@ public abstract class SharedSprayPainterSystem : EntitySystem
     /// <summary>
     /// Changes the color to paint pipes in.
     /// </summary>
-    private void OnSetPipeColor(Entity<SprayPainterComponent> ent, ref SprayPainterSetPipeColorMessage args)
-    {
+    private void OnSetPipeColor(Entity<SprayPainterComponent> ent, ref SprayPainterSetPipeColorMessage args) =>
         SetPipeColor(ent, args.Key);
-    }
 
     /// <summary>
     /// Tracks the tab the spray painter was on.

@@ -3,12 +3,12 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Shared._Shitcode.Heretic.Components;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class StarTouchedStatusEffectComponent : Component
 {
     [DataField]
-    public TimeSpan SleepTime = TimeSpan.FromSeconds(8);
+    public EntProtoId CosmicCloud = "EffectCosmicCloud";
 
     [DataField]
-    public EntProtoId CosmicCloud = "EffectCosmicCloud";
+    public TimeSpan SleepTime = TimeSpan.FromSeconds(8);
 }

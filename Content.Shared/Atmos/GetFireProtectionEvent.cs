@@ -16,7 +16,10 @@ namespace Content.Shared.Atmos;
 [ByRefEvent]
 public sealed class GetFireProtectionEvent : EntityEventArgs, IInventoryRelayEvent
 {
-    public SlotFlags TargetSlots { get; } = ~SlotFlags.POCKET;
+    /// <summary>
+    /// Goobstation - The entity the event was originally raised on.
+    /// </summary>
+    public readonly EntityUid Target;
 
     /// <summary>
     /// What to multiply the fire damage by.
@@ -24,16 +27,13 @@ public sealed class GetFireProtectionEvent : EntityEventArgs, IInventoryRelayEve
     /// </summary>
     public float Multiplier;
 
-    /// <summary>
-    /// Goobstation - The entity the event was originally raised on.
-    /// </summary>
-    public readonly EntityUid Target;
-
     public GetFireProtectionEvent(EntityUid target) // Goobstation
     {
         Multiplier = 1f;
         Target = target; // Goobstation
     }
+
+    public SlotFlags TargetSlots { get; } = ~SlotFlags.POCKET;
 
     /// <summary>
     /// Reduce fire damage taken by a percentage.

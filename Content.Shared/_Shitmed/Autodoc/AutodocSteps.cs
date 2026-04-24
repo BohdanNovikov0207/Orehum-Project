@@ -15,11 +15,11 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared._Shitmed.Autodoc;
 
-[Serializable, NetSerializable, DataRecord]
-public sealed partial class AutodocProgram
+[Serializable] [NetSerializable] [DataRecord]
+public sealed class AutodocProgram
 {
-    public List<IAutodocStep> Steps = new();
     public bool SkipFailed;
+    public List<IAutodocStep> Steps = new();
     public string Title = string.Empty;
 }
 
@@ -35,7 +35,8 @@ public partial interface IAutodocStep
     string Title { get; }
 
     /// <summary>
-    /// Run the step, returning true if it is instantly complete and ready to go to the next step, or false if it needs to wait for something else.
+    /// Run the step, returning true if it is instantly complete and ready to go to the next step, or false if it needs to wait
+    /// for something else.
     /// Should throw AutodocError for player-facing errors.
     /// </summary>
     bool Run(Entity<AutodocComponent, HandsComponent> ent, SharedAutodocSystem autodoc);
@@ -43,16 +44,13 @@ public partial interface IAutodocStep
     /// <summary>
     /// Check that this step is valid, returning false if it isn't.
     /// </summary>
-    bool Validate(Entity<AutodocComponent> ent, SharedAutodocSystem autodoc)
-    {
-        return true;
-    }
+    bool Validate(Entity<AutodocComponent> ent, SharedAutodocSystem autodoc) => true;
 }
 
 /// <summary>
 /// Perform a surgery including any prerequesites like opening an incision.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class SurgeryAutodocStep : IAutodocStep
 {
     /// <summary>
@@ -62,22 +60,24 @@ public sealed partial class SurgeryAutodocStep : IAutodocStep
     public BodyPartType Part;
 
     /// <summary>
-    /// The symmetry required. If this is null then symmetry is not checked (operate on an arbitrary leg for example).
-    /// </summary>
-    [DataField]
-    public BodyPartSymmetry? Symmetry;
-
-    /// <summary>
     /// The ID of the surgery to perform.
     /// </summary>
     [DataField(required: true)]
     public EntProtoId<SurgeryComponent> Surgery;
 
-    public string Title {
-        get {
+    /// <summary>
+    /// The symmetry required. If this is null then symmetry is not checked (operate on an arbitrary leg for example).
+    /// </summary>
+    [DataField]
+    public BodyPartSymmetry? Symmetry;
+
+    public string Title
+    {
+        get
+        {
             var protoMan = IoCManager.Resolve<IPrototypeManager>();
             var proto = protoMan.Index(Surgery);
-            var part = Loc.GetString("autodoc-body-part-" + Part.ToString());
+            var part = Loc.GetString("autodoc-body-part-" + Part);
             return Loc.GetString("autodoc-program-step-surgery", ("part", part), ("name", proto.Name));
         }
     }
@@ -85,7 +85,7 @@ public sealed partial class SurgeryAutodocStep : IAutodocStep
     bool IAutodocStep.Run(Entity<AutodocComponent, HandsComponent> ent, SharedAutodocSystem autodoc)
     {
         var patient = autodoc.GetPatientOrThrow((ent.Owner, ent.Comp1));
-        if (autodoc.FindPart(patient, Part, Symmetry) is not {} part)
+        if (autodoc.FindPart(patient, Part, Symmetry) is not { } part)
             throw new AutodocError("body-part");
 
         if (!autodoc.StartSurgeryOrThrow((ent.Owner, ent.Comp1), patient, part, Surgery))
@@ -94,16 +94,13 @@ public sealed partial class SurgeryAutodocStep : IAutodocStep
         return false; // wait for the surgery to be completed before going onto the next program step
     }
 
-    bool IAutodocStep.Validate(Entity<AutodocComponent> ent, SharedAutodocSystem autodoc)
-    {
-        return autodoc.IsSurgery(Surgery);
-    }
+    bool IAutodocStep.Validate(Entity<AutodocComponent> ent, SharedAutodocSystem autodoc) => autodoc.IsSurgery(Surgery);
 }
 
 /// <summary>
 /// Grab a specific item from storage, failing if it isn't found.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class GrabItemAutodocStep : IAutodocStep
 {
     /// <summary>
@@ -114,15 +111,13 @@ public sealed partial class GrabItemAutodocStep : IAutodocStep
 
     public string Title => Loc.GetString("autodoc-program-step-grab-item", ("name", Name));
 
-    bool IAutodocStep.Validate(Entity<AutodocComponent> ent, SharedAutodocSystem autodoc)
-    {
+    bool IAutodocStep.Validate(Entity<AutodocComponent> ent, SharedAutodocSystem autodoc) =>
         // client will never send a blank string for name
-        return !string.IsNullOrEmpty(Name) && Name.Length <= 100;
-    }
+        !string.IsNullOrEmpty(Name) && Name.Length <= 100;
 
     bool IAutodocStep.Run(Entity<AutodocComponent, HandsComponent> ent, SharedAutodocSystem autodoc)
     {
-        if (autodoc.FindItem(ent, Name) is not {} item)
+        if (autodoc.FindItem(ent, Name) is not { } item)
             throw new AutodocError("item-unavailable");
         autodoc.GrabItemOrThrow(ent, item);
         return true;
@@ -132,14 +127,15 @@ public sealed partial class GrabItemAutodocStep : IAutodocStep
 /// <summary>
 /// Grab the first item that matches a whitelist, failing if none are found.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public abstract partial class GrabAnyItemAutodocStep : IAutodocStep
 {
+    private EntityWhitelist? _whitelist;
+
     /// <summary>
     /// A whitelist that must be matched.
     /// </summary>
     public virtual EntityWhitelist Whitelist { get; }
-    private EntityWhitelist? _whitelist;
 
     /// <summary>
     /// Name that represents the whitelist.
@@ -150,30 +146,30 @@ public abstract partial class GrabAnyItemAutodocStep : IAutodocStep
 
     bool IAutodocStep.Run(Entity<AutodocComponent, HandsComponent> ent, SharedAutodocSystem autodoc)
     {
-        if (autodoc.FindItem(ent, _whitelist ??= Whitelist) is not {} item)
+        if (autodoc.FindItem(ent, _whitelist ??= Whitelist) is not { } item)
             throw new AutodocError("item-unavailable");
         autodoc.GrabItemOrThrow(ent, item);
         return true;
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class GrabAnyOrganAutodocStep : GrabAnyItemAutodocStep
 {
-    public override EntityWhitelist Whitelist => new EntityWhitelist()
+    public override EntityWhitelist Whitelist => new()
     {
-        Components = ["Organ"]
+        Components = ["Organ"],
     };
 
     public override LocId Name => "autodoc-item-organ";
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class GrabAnyBodyPartAutodocStep : GrabAnyItemAutodocStep
 {
-    public override EntityWhitelist Whitelist => new EntityWhitelist()
+    public override EntityWhitelist Whitelist => new()
     {
-        Components = ["BodyPart"]
+        Components = ["BodyPart"],
     };
 
     public override LocId Name => "autodoc-item-part";
@@ -182,7 +178,7 @@ public sealed partial class GrabAnyBodyPartAutodocStep : GrabAnyItemAutodocStep
 /// <summary>
 /// Store the held item in storage, failing if it can't be picked up.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class StoreItemAutodocStep : IAutodocStep
 {
     string IAutodocStep.Title => Loc.GetString("autodoc-program-step-store-item");
@@ -197,7 +193,7 @@ public sealed partial class StoreItemAutodocStep : IAutodocStep
 /// <summary>
 /// Gives the held item a label, failing if there is no held item.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class SetLabelAutodocStep : IAutodocStep
 {
     [DataField(required: true)]
@@ -205,11 +201,9 @@ public sealed partial class SetLabelAutodocStep : IAutodocStep
 
     string IAutodocStep.Title => Loc.GetString("autodoc-program-step-set-label", ("label", Label));
 
-    bool IAutodocStep.Validate(Entity<AutodocComponent> ent, SharedAutodocSystem autodoc)
-    {
+    bool IAutodocStep.Validate(Entity<AutodocComponent> ent, SharedAutodocSystem autodoc) =>
         // client will never send a blank string for label
-        return !string.IsNullOrEmpty(Label) && Label.Length <= 20;
-    }
+        !string.IsNullOrEmpty(Label) && Label.Length <= 20;
 
     bool IAutodocStep.Run(Entity<AutodocComponent, HandsComponent> ent, SharedAutodocSystem autodoc)
     {
@@ -222,7 +216,7 @@ public sealed partial class SetLabelAutodocStep : IAutodocStep
 /// <summary>
 /// Waits a number of seconds before going onto the next step.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class WaitAutodocStep : IAutodocStep
 {
     [DataField(required: true)]
@@ -230,10 +224,7 @@ public sealed partial class WaitAutodocStep : IAutodocStep
 
     string IAutodocStep.Title => Loc.GetString("autodoc-program-step-wait", ("length", Length));
 
-    bool IAutodocStep.Validate(Entity<AutodocComponent> ent, SharedAutodocSystem autodoc)
-    {
-        return Length > 0 && Length < 30;
-    }
+    bool IAutodocStep.Validate(Entity<AutodocComponent> ent, SharedAutodocSystem autodoc) => Length > 0 && Length < 30;
 
     bool IAutodocStep.Run(Entity<AutodocComponent, HandsComponent> ent, SharedAutodocSystem autodoc)
     {

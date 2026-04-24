@@ -18,10 +18,16 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Shared.Clothing;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 [Access(typeof(SharedMagbootsSystem))]
 public sealed partial class MagbootsComponent : Component
 {
+    /// <summary>
+    /// Goobstation - EquippedPrefix for enabled state
+    /// </summary>
+    [DataField]
+    public string? EnabledPrefix = "on";
+
     [DataField]
     public ProtoId<AlertPrototype> MagbootsAlert = "Magboots";
 
@@ -36,10 +42,4 @@ public sealed partial class MagbootsComponent : Component
     /// </summary>
     [DataField]
     public string Slot = "shoes";
-
-    /// <summary>
-    /// Goobstation - EquippedPrefix for enabled state
-    /// </summary>
-    [DataField]
-    public string? EnabledPrefix = "on";
 }

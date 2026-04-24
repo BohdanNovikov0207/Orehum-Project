@@ -7,7 +7,7 @@ public sealed class SpawnTableOnDespawnSystem : EntitySystem
 {
     [Dependency] private readonly EntityTableSystem _table = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();

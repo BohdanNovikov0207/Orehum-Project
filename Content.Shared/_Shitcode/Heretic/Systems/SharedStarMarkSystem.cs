@@ -1,26 +1,25 @@
 using System.Linq;
 using Content.Goobstation.Common.Religion;
 using Content.Shared._Shitcode.Heretic.Components;
-using Content.Shared.StatusEffectNew;
-using Robust.Shared.Physics.Events;
-using Robust.Shared.Prototypes;
 using Content.Shared.Coordinates.Helpers;
 using Content.Shared.Damage.Components;
 using Content.Shared.Damage.Systems;
-using Content.Shared.Explosion.Components;
 using Content.Shared.Heretic;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Movement.Components;
 using Content.Shared.Movement.Pulling.Components;
 using Content.Shared.Movement.Pulling.Events;
 using Content.Shared.Popups;
+using Content.Shared.StatusEffectNew;
 using Content.Shared.Trigger.Components;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Map;
 using Robust.Shared.Network;
 using Robust.Shared.Physics;
 using Robust.Shared.Physics.Components;
+using Robust.Shared.Physics.Events;
 using Robust.Shared.Physics.Systems;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Spawners;
 using Robust.Shared.Timing;
 
@@ -28,24 +27,23 @@ namespace Content.Shared._Shitcode.Heretic.Systems;
 
 public abstract class SharedStarMarkSystem : EntitySystem
 {
-    [Dependency] private readonly INetManager _net = default!;
-    [Dependency] private readonly IMapManager _mapMan = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly StatusEffectsSystem _status = default!;
-    [Dependency] private readonly SharedStaminaSystem _stam = default!;
-    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
-    [Dependency] private readonly SharedBroadphaseSystem _broadphase = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly SharedHereticSystem _heretic = default!;
+    private const float CosmosPassiveStaminaHealInterval = 1f;
 
     public static readonly EntProtoId StarMarkStatusEffect = "StatusEffectStarMark";
     public static readonly EntProtoId CosmicField = "WallFieldCosmic";
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly SharedBroadphaseSystem _broadphase = default!;
+    [Dependency] private readonly SharedHereticSystem _heretic = default!;
 
-    private const float CosmosPassiveStaminaHealInterval = 1f;
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
+    [Dependency] private readonly IMapManager _mapMan = default!;
+    [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly SharedStaminaSystem _stam = default!;
+    [Dependency] private readonly StatusEffectsSystem _status = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
     private float _accumulator;
 
     public override void Initialize()
@@ -123,7 +121,9 @@ public abstract class SharedStarMarkSystem : EntitySystem
 
         var cosmicFieldQuery = GetEntityQuery<CosmicFieldComponent>();
 
-        var query2 = EntityQueryEnumerator<CosmosPassiveComponent, SpeedModifiedByContactComponent, StaminaComponent, PhysicsComponent>();
+        var query2 =
+            EntityQueryEnumerator<CosmosPassiveComponent, SpeedModifiedByContactComponent, StaminaComponent,
+                PhysicsComponent>();
         while (query2.MoveNext(out var uid, out var passive, out _, out var stam, out var phys))
         {
             if (!_physics.GetContactingEntities(uid, phys).Any(cosmicFieldQuery.HasComp))

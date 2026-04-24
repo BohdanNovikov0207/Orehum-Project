@@ -12,57 +12,56 @@
 
 using Robust.Shared.Serialization;
 
-namespace Content.Shared.Solar
+namespace Content.Shared.Solar;
+
+[Serializable] [NetSerializable]
+public sealed class SolarControlConsoleBoundInterfaceState : BoundUserInterfaceState
 {
-    [Serializable, NetSerializable]
-    public sealed class SolarControlConsoleBoundInterfaceState : BoundUserInterfaceState
+    /// <summary>
+    /// The target velocity of the panels in radians/minute.
+    /// </summary>
+    public Angle AngularVelocity;
+
+    /// <summary>
+    /// The total amount of power the panels are supplying.
+    /// </summary>
+    public float OutputPower;
+
+    /// <summary>
+    /// The target rotation of the panels in radians.
+    /// </summary>
+    public Angle Rotation;
+
+    /// <summary>
+    /// The current sun angle.
+    /// </summary>
+    public Angle TowardsSun;
+
+    public SolarControlConsoleBoundInterfaceState(Angle r, Angle vm, float p, Angle tw)
     {
-        /// <summary>
-        /// The target rotation of the panels in radians.
-        /// </summary>
-        public Angle Rotation;
-
-        /// <summary>
-        /// The target velocity of the panels in radians/minute.
-        /// </summary>
-        public Angle AngularVelocity;
-
-        /// <summary>
-        /// The total amount of power the panels are supplying.
-        /// </summary>
-        public float OutputPower;
-
-        /// <summary>
-        /// The current sun angle.
-        /// </summary>
-        public Angle TowardsSun;
-
-        public SolarControlConsoleBoundInterfaceState(Angle r, Angle vm, float p, Angle tw)
-        {
-            Rotation = r;
-            AngularVelocity = vm;
-            OutputPower = p;
-            TowardsSun = tw;
-        }
+        Rotation = r;
+        AngularVelocity = vm;
+        OutputPower = p;
+        TowardsSun = tw;
     }
+}
 
-    [Serializable, NetSerializable]
-    public sealed class SolarControlConsoleAdjustMessage : BoundUserInterfaceMessage
-    {
-        /// <summary>
-        /// New target rotation of the panels in radians.
-        /// </summary>
-        public Angle Rotation;
+[Serializable] [NetSerializable]
+public sealed class SolarControlConsoleAdjustMessage : BoundUserInterfaceMessage
+{
+    /// <summary>
+    /// New target velocity of the panels in radians/second.
+    /// </summary>
+    public Angle AngularVelocity;
 
-        /// <summary>
-        /// New target velocity of the panels in radians/second.
-        /// </summary>
-        public Angle AngularVelocity;
-    }
+    /// <summary>
+    /// New target rotation of the panels in radians.
+    /// </summary>
+    public Angle Rotation;
+}
 
-    [Serializable, NetSerializable]
-    public enum SolarControlConsoleUiKey
-    {
-        Key
-    }
+[Serializable] [NetSerializable]
+public enum SolarControlConsoleUiKey
+{
+    Key,
 }

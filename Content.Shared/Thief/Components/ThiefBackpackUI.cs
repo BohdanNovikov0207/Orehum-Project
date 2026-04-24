@@ -10,7 +10,7 @@ using Robust.Shared.Utility;
 
 namespace Content.Shared.Thief;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class ThiefBackpackBoundUserInterfaceState : BoundUserInterfaceState
 {
     public readonly Dictionary<int, ThiefBackpackSetInfo> Sets;
@@ -23,7 +23,7 @@ public sealed class ThiefBackpackBoundUserInterfaceState : BoundUserInterfaceSta
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class ThiefBackpackChangeSetMessage : BoundUserInterfaceMessage
 {
     public readonly int SetNumber;
@@ -34,19 +34,18 @@ public sealed class ThiefBackpackChangeSetMessage : BoundUserInterfaceMessage
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class ThiefBackpackApproveMessage : BoundUserInterfaceMessage
 {
-    public ThiefBackpackApproveMessage() { }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum ThiefBackpackUIKey : byte
 {
-    Key
-};
+    Key,
+}
 
-[Serializable, NetSerializable, DataDefinition]
+[Serializable] [NetSerializable] [DataDefinition]
 public partial struct ThiefBackpackSetInfo
 {
     [DataField]

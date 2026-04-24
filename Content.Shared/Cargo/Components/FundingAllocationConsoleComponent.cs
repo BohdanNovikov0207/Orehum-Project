@@ -9,7 +9,7 @@ namespace Content.Shared.Cargo.Components;
 /// <summary>
 /// A console that manipulates the distribution of revenue on the station.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 [Access(typeof(SharedCargoSystem))]
 public sealed partial class FundingAllocationConsoleComponent : Component
 {
@@ -20,14 +20,16 @@ public sealed partial class FundingAllocationConsoleComponent : Component
     public SoundSpecifier SetDistributionSound = new SoundCollectionSpecifier("CargoPing");
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class SetFundingAllocationBuiMessage : BoundUserInterfaceMessage
 {
+    public double LockboxCut;
     public Dictionary<ProtoId<CargoAccountPrototype>, int> Percents;
     public double PrimaryCut;
-    public double LockboxCut;
 
-    public SetFundingAllocationBuiMessage(Dictionary<ProtoId<CargoAccountPrototype>, int> percents, double primaryCut, double lockboxCut)
+    public SetFundingAllocationBuiMessage(Dictionary<ProtoId<CargoAccountPrototype>, int> percents,
+        double primaryCut,
+        double lockboxCut)
     {
         Percents = percents;
         PrimaryCut = primaryCut;
@@ -35,7 +37,7 @@ public sealed class SetFundingAllocationBuiMessage : BoundUserInterfaceMessage
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class FundingAllocationConsoleBuiState : BoundUserInterfaceState
 {
     public NetEntity Station;
@@ -46,8 +48,8 @@ public sealed class FundingAllocationConsoleBuiState : BoundUserInterfaceState
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum FundingAllocationConsoleUiKey : byte
 {
-    Key
+    Key,
 }

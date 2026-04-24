@@ -21,7 +21,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Robust.Shared.Prototypes;
-using Robust.Shared.Utility;
 
 namespace Content.Shared._Lavaland.Procedural.Prototypes;
 
@@ -29,19 +28,19 @@ namespace Content.Shared._Lavaland.Procedural.Prototypes;
 /// Contains information about Lavaland ruin configuration.
 /// </summary>
 [Prototype]
-public sealed partial class LavalandDungeonRuinPrototype : IPrototype
+public sealed class LavalandDungeonRuinPrototype : IPrototype
 {
-    [IdDataField] public string ID { get; } = default!;
-
     [DataField(required: true)]
-    public Vector2i Boundary { get; }
-
-    [DataField(required: true)]
-    public EntProtoId SpawnedMarker;
+    public int Priority = int.MinValue;
 
     [DataField]
     public int SpawnAttempts = 8;
 
     [DataField(required: true)]
-    public int Priority = int.MinValue;
+    public EntProtoId SpawnedMarker;
+
+    [DataField(required: true)]
+    public Vector2i Boundary { get; }
+
+    [IdDataField] public string ID { get; } = default!;
 }

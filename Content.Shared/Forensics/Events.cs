@@ -80,15 +80,15 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Forensics;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class ForensicScannerDoAfterEvent : SimpleDoAfterEvent
 {
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class ForensicPadDoAfterEvent : DoAfterEvent
 {
-    [DataField("sample", required: true)] public  string Sample = default!;
+    [DataField("sample", required: true)] public string Sample = default!;
 
     private ForensicPadDoAfterEvent()
     {
@@ -102,7 +102,7 @@ public sealed partial class ForensicPadDoAfterEvent : DoAfterEvent
     public override DoAfterEvent Clone() => this;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class CleanForensicsDoAfterEvent : SimpleDoAfterEvent
 {
 }
@@ -114,6 +114,11 @@ public sealed partial class CleanForensicsDoAfterEvent : SimpleDoAfterEvent
 public record struct TransferDnaEvent()
 {
     /// <summary>
+    /// Can the DNA be cleaned off?
+    /// </summary>
+    public bool CanDnaBeCleaned = true;
+
+    /// <summary>
     /// The entity donating the DNA.
     /// </summary>
     public EntityUid Donor;
@@ -122,28 +127,23 @@ public record struct TransferDnaEvent()
     /// The entity receiving the DNA.
     /// </summary>
     public EntityUid Recipient;
-
-    /// <summary>
-    /// Can the DNA be cleaned off?
-    /// </summary>
-    public bool CanDnaBeCleaned = true;
 }
 
 /// <summary>
 /// Raised on an entity when its DNA has been changed.
 /// </summary>
 [ByRefEvent]
-public record struct GenerateDnaEvent()
+public record struct GenerateDnaEvent
 {
-    /// <summary>
-    /// The entity getting new DNA.
-    /// </summary>
-    public EntityUid Owner;
-
     /// <summary>
     /// The generated DNA.
     /// </summary>
     public required string DNA;
+
+    /// <summary>
+    /// The entity getting new DNA.
+    /// </summary>
+    public EntityUid Owner;
 }
 
 /// <summary>
@@ -151,10 +151,10 @@ public record struct GenerateDnaEvent()
 /// </summary>
 public sealed class TryAccessFingerprintEvent : CancellableEntityEventArgs, IInventoryRelayEvent
 {
-    SlotFlags IInventoryRelayEvent.TargetSlots => SlotFlags.WITHOUT_POCKET;
-
     /// <summary>
-    ///     Entity that blocked access.
+    /// Entity that blocked access.
     /// </summary>
     public EntityUid? Blocker;
+
+    SlotFlags IInventoryRelayEvent.TargetSlots => SlotFlags.WITHOUT_POCKET;
 }

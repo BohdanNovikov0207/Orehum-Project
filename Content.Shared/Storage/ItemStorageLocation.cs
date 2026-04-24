@@ -11,7 +11,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Storage;
 
-[DataDefinition, Serializable, NetSerializable]
+[DataDefinition] [Serializable] [NetSerializable]
 public partial record struct ItemStorageLocation
 {
     /// <summary>
@@ -19,15 +19,6 @@ public partial record struct ItemStorageLocation
     /// </summary>
     [DataField("_rotation")]
     public Direction Direction;
-
-    /// <summary>
-    /// The rotation of the piece in storage.
-    /// </summary>
-    public Angle Rotation
-    {
-        get => Direction.ToAngle();
-        set => Direction = value.GetCardinalDir();
-    }
 
     /// <summary>
     /// Where the item is located in storage.
@@ -41,9 +32,16 @@ public partial record struct ItemStorageLocation
         Position = position;
     }
 
-    public bool Equals(ItemStorageLocation? other)
+    /// <summary>
+    /// The rotation of the piece in storage.
+    /// </summary>
+    public Angle Rotation
     {
-        return Rotation == other?.Rotation &&
-               Position == other.Value.Position;
+        get => Direction.ToAngle();
+        set => Direction = value.GetCardinalDir();
     }
-};
+
+    public bool Equals(ItemStorageLocation? other) =>
+        Rotation == other?.Rotation &&
+        Position == other.Value.Position;
+}

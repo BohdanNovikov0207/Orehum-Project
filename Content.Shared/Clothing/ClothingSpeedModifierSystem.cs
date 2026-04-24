@@ -109,15 +109,14 @@ public sealed class ClothingSpeedModifierSystem : EntitySystem
 
         SubscribeLocalEvent<ClothingSpeedModifierComponent, ComponentGetState>(OnGetState);
         SubscribeLocalEvent<ClothingSpeedModifierComponent, ComponentHandleState>(OnHandleState);
-        SubscribeLocalEvent<ClothingSpeedModifierComponent, InventoryRelayedEvent<RefreshMovementSpeedModifiersEvent>>(OnRefreshMoveSpeed);
+        SubscribeLocalEvent<ClothingSpeedModifierComponent, InventoryRelayedEvent<RefreshMovementSpeedModifiersEvent>>(
+            OnRefreshMoveSpeed);
         SubscribeLocalEvent<ClothingSpeedModifierComponent, GetVerbsEvent<ExamineVerb>>(OnClothingVerbExamine);
         SubscribeLocalEvent<ClothingSpeedModifierComponent, ItemToggledEvent>(OnToggled);
     }
 
-    private void OnGetState(EntityUid uid, ClothingSpeedModifierComponent component, ref ComponentGetState args)
-    {
+    private void OnGetState(EntityUid uid, ClothingSpeedModifierComponent component, ref ComponentGetState args) =>
         args.State = new ClothingSpeedModifierComponentState(component.WalkModifier, component.SprintModifier);
-    }
 
     private void OnHandleState(EntityUid uid, ClothingSpeedModifierComponent component, ref ComponentHandleState args)
     {
@@ -133,19 +132,21 @@ public sealed class ClothingSpeedModifierSystem : EntitySystem
         // Avoid raising the event for the container if nothing changed.
         // We'll still set the values in case they're slightly different but within tolerance.
         if (diff && _container.TryGetContainingContainer((uid, null, null), out var container))
-        {
             _movementSpeed.RefreshMovementSpeedModifiers(container.Owner);
-        }
     }
 
-    private void OnRefreshMoveSpeed(EntityUid uid, ClothingSpeedModifierComponent component, InventoryRelayedEvent<RefreshMovementSpeedModifiersEvent> args)
+    private void OnRefreshMoveSpeed(EntityUid uid,
+        ClothingSpeedModifierComponent component,
+        InventoryRelayedEvent<RefreshMovementSpeedModifiersEvent> args)
     {
         // goob edit - speed modifier immunity (1 liner)
         if (_toggle.IsActivated(uid) && !HasComp<SpeedModifierImmunityComponent>(uid))
             args.Args.ModifySpeed(component.WalkModifier, component.SprintModifier);
     }
 
-    private void OnClothingVerbExamine(EntityUid uid, ClothingSpeedModifierComponent component, GetVerbsEvent<ExamineVerb> args)
+    private void OnClothingVerbExamine(EntityUid uid,
+        ClothingSpeedModifierComponent component,
+        GetVerbsEvent<ExamineVerb> args)
     {
         // goob edit - speed modifier immunity (1 liner)
         if (!args.CanInteract || !args.CanAccess || HasComp<SpeedModifierImmunityComponent>(uid))
@@ -162,35 +163,38 @@ public sealed class ClothingSpeedModifierSystem : EntitySystem
         if (MathHelper.CloseTo(walkModifierPercentage, sprintModifierPercentage, 0.5f))
         {
             if (walkModifierPercentage < 0.0f)
-                msg.AddMarkupOrThrow(Loc.GetString("clothing-speed-increase-equal-examine", ("walkSpeed", (int) MathF.Abs(walkModifierPercentage)), ("runSpeed", (int) MathF.Abs(sprintModifierPercentage))));
+                msg.AddMarkupOrThrow(Loc.GetString("clothing-speed-increase-equal-examine",
+                    ("walkSpeed", (int) MathF.Abs(walkModifierPercentage)),
+                    ("runSpeed", (int) MathF.Abs(sprintModifierPercentage))));
             else
-                msg.AddMarkupOrThrow(Loc.GetString("clothing-speed-decrease-equal-examine", ("walkSpeed", (int) walkModifierPercentage), ("runSpeed", (int) sprintModifierPercentage)));
+                msg.AddMarkupOrThrow(Loc.GetString("clothing-speed-decrease-equal-examine",
+                    ("walkSpeed", (int) walkModifierPercentage),
+                    ("runSpeed", (int) sprintModifierPercentage)));
         }
         else
         {
             if (sprintModifierPercentage < 0.0f)
-            {
-                msg.AddMarkupOrThrow(Loc.GetString("clothing-speed-increase-run-examine", ("runSpeed", (int) MathF.Abs(sprintModifierPercentage))));
-            }
+                msg.AddMarkupOrThrow(Loc.GetString("clothing-speed-increase-run-examine",
+                    ("runSpeed", (int) MathF.Abs(sprintModifierPercentage))));
             else if (sprintModifierPercentage > 0.0f)
-            {
-                msg.AddMarkupOrThrow(Loc.GetString("clothing-speed-decrease-run-examine", ("runSpeed", (int) sprintModifierPercentage)));
-            }
+                msg.AddMarkupOrThrow(Loc.GetString("clothing-speed-decrease-run-examine",
+                    ("runSpeed", (int) sprintModifierPercentage)));
             if (walkModifierPercentage != 0.0f && sprintModifierPercentage != 0.0f)
-            {
                 msg.PushNewline();
-            }
             if (walkModifierPercentage < 0.0f)
-            {
-                msg.AddMarkupOrThrow(Loc.GetString("clothing-speed-increase-walk-examine", ("walkSpeed", (int) MathF.Abs(walkModifierPercentage))));
-            }
+                msg.AddMarkupOrThrow(Loc.GetString("clothing-speed-increase-walk-examine",
+                    ("walkSpeed", (int) MathF.Abs(walkModifierPercentage))));
             else if (walkModifierPercentage > 0.0f)
-            {
-                msg.AddMarkupOrThrow(Loc.GetString("clothing-speed-decrease-walk-examine", ("walkSpeed", (int) walkModifierPercentage)));
-            }
+                msg.AddMarkupOrThrow(Loc.GetString("clothing-speed-decrease-walk-examine",
+                    ("walkSpeed", (int) walkModifierPercentage)));
         }
 
-        _examine.AddDetailedExamineVerb(args, component, msg, Loc.GetString("clothing-speed-examinable-verb-text"), "/Textures/Interface/VerbIcons/outfit.svg.192dpi.png", Loc.GetString("clothing-speed-examinable-verb-message"));
+        _examine.AddDetailedExamineVerb(args,
+            component,
+            msg,
+            Loc.GetString("clothing-speed-examinable-verb-text"),
+            "/Textures/Interface/VerbIcons/outfit.svg.192dpi.png",
+            Loc.GetString("clothing-speed-examinable-verb-message"));
     }
 
     private void OnToggled(Entity<ClothingSpeedModifierComponent> ent, ref ItemToggledEvent args)

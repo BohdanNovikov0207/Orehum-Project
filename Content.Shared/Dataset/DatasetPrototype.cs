@@ -13,15 +13,14 @@
 
 using Robust.Shared.Prototypes;
 
-namespace Content.Shared.Dataset
-{
-    [Prototype]
-    public sealed partial class DatasetPrototype : IPrototype
-    {
-        [ViewVariables]
-        [IdDataField]
-        public string ID { get; private set; } = default!;
+namespace Content.Shared.Dataset;
 
-        [DataField("values")] public IReadOnlyList<string> Values { get; private set; } = new List<string>();
-    }
+[Prototype]
+public sealed class DatasetPrototype : IPrototype
+{
+    [DataField("values")] public IReadOnlyList<string> Values { get; private set; } = new List<string>();
+
+    [ViewVariables]
+    [IdDataField]
+    public string ID { get; } = default!;
 }

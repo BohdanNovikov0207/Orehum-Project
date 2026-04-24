@@ -2,22 +2,22 @@ using Content.Shared.Actions;
 using Content.Shared.Damage;
 using Content.Shared.Movement.Systems;
 using Robust.Shared.Audio;
-using Robust.Shared.Audio.Components;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.GameStates;
-using Robust.Shared.Utility;
 using Robust.Shared.Timing;
+using Robust.Shared.Utility;
+
 namespace Content.Shared._Orehum.Orders;
 
 public abstract class SharedOrdersSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly EntityLookupSystem _entityLookup = default!;
-    [Dependency] private readonly MovementSpeedModifierSystem _movementSpeed = default!;
     [Dependency] private readonly SharedActionsSystem _actions = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly EntityLookupSystem _entityLookup = default!;
+    [Dependency] private readonly MovementSpeedModifierSystem _movementSpeed = default!;
 
     private readonly HashSet<Entity<OrderListenComponent>> _receivers = new();
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -55,8 +55,8 @@ public abstract class SharedOrdersSystem : EntitySystem
             if (damage.TryGetValue(damageTypes.Current, out var amount))
                 damage[damageTypes.Current] = amount * multiplier;
         }
-
     }
+
     private void OnRefreshMovement(EntityUid uid, MoveOrderComponent comp, RefreshMovementSpeedModifiersEvent args)
     {
         var speed = (1 + comp.MoveSpeedModifier).Float();
@@ -69,10 +69,8 @@ public abstract class SharedOrdersSystem : EntitySystem
         Dirty(uid, comp);
     }
 
-    private void OnMoveShutdown(Entity<MoveOrderComponent> uid, ref ComponentShutdown ev)
-    {
+    private void OnMoveShutdown(Entity<MoveOrderComponent> uid, ref ComponentShutdown ev) =>
         _movementSpeed.RefreshMovementSpeedModifiers(uid);
-    }
 
     protected virtual void OnAction(EntityUid uid, OrdersComponent orders, FocusActionEvent args)
     {
@@ -118,19 +116,13 @@ public abstract class SharedOrdersSystem : EntitySystem
         return true;
     }
 
-    private bool CanHandleAction(EntityUid uid, OrdersComponent orders)
-    {
-        return HasComp<TransformComponent>(uid);
-    }
+    private bool CanHandleAction(EntityUid uid, OrdersComponent orders) => HasComp<TransformComponent>(uid);
 
-    private void DoHandleAction(EntityUid uid, Orders order, OrdersComponent orders)
-    {
+    private void DoHandleAction(EntityUid uid, Orders order, OrdersComponent orders) =>
         HandleAction(uid, order, orders);
-    }
 
     private void HandleAction(EntityUid uid, Orders order, OrdersComponent orderComp)
     {
-
         if (!TryComp<TransformComponent>(uid, out var xform))
         {
             DebugTools.Assert("Order issued by an entity without TransformComponent");
@@ -198,16 +190,14 @@ public abstract class SharedOrdersSystem : EntitySystem
         RemoveExpired<HoldOrderComponent>();
     }
 
-    private void RemoveExpired<T>() where T: IComponent, IOrderComponent
+    private void RemoveExpired<T>() where T : IComponent, IOrderComponent
     {
         var query = EntityQueryEnumerator<T>();
 
         while (query.MoveNext(out var uid, out var comp))
         {
             if (_timing.CurTime > comp.Duration)
-            {
                 RemCompDeferred<T>(uid);
-            }
         }
     }
 }

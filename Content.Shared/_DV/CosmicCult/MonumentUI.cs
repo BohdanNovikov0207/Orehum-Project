@@ -5,21 +5,25 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared._DV.CosmicCult;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum MonumentKey : byte
 {
     Key,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class MonumentBuiState : BoundUserInterfaceState
 {
     public int CurrentProgress;
-    public int TargetProgress;
     public ProtoId<GlyphPrototype> SelectedGlyph;
+    public int TargetProgress;
     public HashSet<ProtoId<GlyphPrototype>> UnlockedGlyphs;
 
-    public MonumentBuiState(int currentProgress, int targetProgress, int progressOffset, ProtoId<GlyphPrototype> selectedGlyph, HashSet<ProtoId<GlyphPrototype>> unlockedGlyphs)
+    public MonumentBuiState(int currentProgress,
+        int targetProgress,
+        int progressOffset,
+        ProtoId<GlyphPrototype> selectedGlyph,
+        HashSet<ProtoId<GlyphPrototype>> unlockedGlyphs)
     {
         CurrentProgress = currentProgress - progressOffset;
         TargetProgress = targetProgress - progressOffset;

@@ -20,104 +20,104 @@ using Robust.Shared.Timing;
 using Robust.Shared.Utility;
 using static Content.Shared.Decals.DecalGridComponent;
 
-namespace Content.Shared.Decals
+namespace Content.Shared.Decals;
+
+[RegisterComponent]
+[Access(typeof(SharedDecalSystem))]
+[NetworkedComponent]
+public sealed partial class DecalGridComponent : Component
 {
-    [RegisterComponent]
-    [Access(typeof(SharedDecalSystem))]
-    [NetworkedComponent]
-    public sealed partial class DecalGridComponent : Component
+    /// <summary>
+    /// Dictionary mapping decals to their corresponding grid chunks.
+    /// </summary>
+    public readonly Dictionary<uint, Vector2i> DecalIndex = new();
+
+    [Access(Other = AccessPermissions.ReadExecute)]
+    [DataField(serverOnly: true)]
+    public DecalGridChunkCollection ChunkCollection = new(new Dictionary<Vector2i, DecalChunk>());
+
+    /// <summary>
+    /// Tick at which PVS was last toggled. Ensures that all players receive a full update when toggling PVS.
+    /// </summary>
+    public GameTick ForceTick { get; set; }
+
+    [DataDefinition]
+    [Serializable] [NetSerializable]
+    public sealed partial class DecalChunk
     {
-        [Access(Other = AccessPermissions.ReadExecute)]
-        [DataField(serverOnly: true)]
-        public DecalGridChunkCollection ChunkCollection = new(new ());
+        [IncludeDataField(customTypeSerializer: typeof(DictionarySerializer<uint, Decal>))]
+        public Dictionary<uint, Decal> Decals;
 
-        /// <summary>
-        ///     Dictionary mapping decals to their corresponding grid chunks.
-        /// </summary>
-        public readonly Dictionary<uint, Vector2i> DecalIndex = new();
+        [NonSerialized]
+        public GameTick LastModified;
 
-        /// <summary>
-        ///     Tick at which PVS was last toggled. Ensures that all players receive a full update when toggling PVS.
-        /// </summary>
-        public GameTick ForceTick { get; set; }
-
-        [DataDefinition]
-        [Serializable, NetSerializable]
-        public sealed partial class DecalChunk
+        public DecalChunk()
         {
-            [IncludeDataField(customTypeSerializer:typeof(DictionarySerializer<uint, Decal>))]
-            public Dictionary<uint, Decal> Decals;
-
-            [NonSerialized]
-            public GameTick LastModified;
-
-            public DecalChunk()
-            {
-                Decals = new();
-            }
-
-            public DecalChunk(Dictionary<uint, Decal> decals)
-            {
-                Decals = decals;
-            }
-
-            public DecalChunk(DecalChunk chunk)
-            {
-                // decals are readonly, so this should be fine.
-                Decals = chunk.Decals.ShallowClone();
-                LastModified = chunk.LastModified;
-            }
+            Decals = new Dictionary<uint, Decal>();
         }
 
-        [DataRecord, Serializable, NetSerializable]
-        public partial record DecalGridChunkCollection(Dictionary<Vector2i, DecalChunk> ChunkCollection)
+        public DecalChunk(Dictionary<uint, Decal> decals)
         {
-            public uint NextDecalId;
+            Decals = decals;
+        }
+
+        public DecalChunk(DecalChunk chunk)
+        {
+            // decals are readonly, so this should be fine.
+            Decals = chunk.Decals.ShallowClone();
+            LastModified = chunk.LastModified;
         }
     }
 
-    [Serializable, NetSerializable]
-    public sealed class DecalGridState(Dictionary<Vector2i, DecalChunk> chunks) : ComponentState
+    [DataRecord] [Serializable] [NetSerializable]
+    public record DecalGridChunkCollection(Dictionary<Vector2i, DecalChunk> ChunkCollection)
     {
-        public Dictionary<Vector2i, DecalChunk> Chunks = chunks;
+        public uint NextDecalId;
+    }
+}
+
+[Serializable] [NetSerializable]
+public sealed class DecalGridState(Dictionary<Vector2i, DecalChunk> chunks) : ComponentState
+{
+    public Dictionary<Vector2i, DecalChunk> Chunks = chunks;
+}
+
+[Serializable] [NetSerializable]
+public sealed class DecalGridDeltaState(Dictionary<Vector2i, DecalChunk> modifiedChunks, HashSet<Vector2i> allChunks)
+    : ComponentState, IComponentDeltaState<DecalGridState>
+{
+    public HashSet<Vector2i> AllChunks = allChunks;
+    public Dictionary<Vector2i, DecalChunk> ModifiedChunks = modifiedChunks;
+
+    public void ApplyToFullState(DecalGridState state)
+    {
+        foreach (var key in state.Chunks.Keys)
+        {
+            if (!AllChunks!.Contains(key))
+                state.Chunks.Remove(key);
+        }
+
+        foreach (var (chunk, data) in ModifiedChunks)
+        {
+            state.Chunks[chunk] = new DecalChunk(data);
+        }
     }
 
-    [Serializable, NetSerializable]
-    public sealed class DecalGridDeltaState(Dictionary<Vector2i, DecalChunk> modifiedChunks, HashSet<Vector2i> allChunks)
-        : ComponentState, IComponentDeltaState<DecalGridState>
+    public DecalGridState CreateNewFullState(DecalGridState state)
     {
-        public Dictionary<Vector2i, DecalChunk> ModifiedChunks = modifiedChunks;
-        public HashSet<Vector2i> AllChunks = allChunks;
+        var chunks = new Dictionary<Vector2i, DecalChunk>(state.Chunks.Count);
 
-        public void ApplyToFullState(DecalGridState state)
+        foreach (var (chunk, data) in ModifiedChunks)
         {
-            foreach (var key in state.Chunks.Keys)
-            {
-                if (!AllChunks!.Contains(key))
-                    state.Chunks.Remove(key);
-            }
-
-            foreach (var (chunk, data) in ModifiedChunks)
-            {
-                state.Chunks[chunk] = new(data);
-            }
+            chunks[chunk] = new DecalChunk(data);
         }
 
-        public DecalGridState CreateNewFullState(DecalGridState state)
+        foreach (var (chunk, data) in state.Chunks)
         {
-            var chunks = new Dictionary<Vector2i, DecalChunk>(state.Chunks.Count);
-
-            foreach (var (chunk, data) in ModifiedChunks)
-            {
-                chunks[chunk] = new(data);
-            }
-
-            foreach (var (chunk, data) in state.Chunks)
-            {
-                if (AllChunks!.Contains(chunk))
-                    chunks.TryAdd(chunk, new(data));
-            }
-            return new DecalGridState(chunks);
+            if (AllChunks!.Contains(chunk))
+                chunks.TryAdd(chunk, new DecalChunk(data));
         }
+
+        return new DecalGridState(chunks);
     }
 }

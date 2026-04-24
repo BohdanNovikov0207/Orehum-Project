@@ -14,13 +14,13 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Medical.CrewMonitoring;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum CrewMonitoringUIKey
 {
-    Key
+    Key,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class CrewMonitoringState : BoundUserInterfaceState
 {
     public List<SuitSensorStatus> Sensors;

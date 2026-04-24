@@ -26,21 +26,19 @@ using Robust.Shared.Timing;
 namespace Content.Shared.Storage.EntitySystems;
 
 /// <summary>
-/// <see cref="MagnetPickupComponent"/>
+///     <see cref="MagnetPickupComponent" />
 /// </summary>
 public sealed class MagnetPickupSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly InventorySystem _inventory = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly SharedStorageSystem _storage = default!;
-    [Dependency] private readonly ItemToggleSystem _itemToggle = default!;
-    [Dependency] private readonly SharedItemSystem _item = default!; // White Dream
-    [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
-
-
     private static readonly TimeSpan ScanDelay = TimeSpan.FromSeconds(1);
+    [Dependency] private readonly InventorySystem _inventory = default!;
+    [Dependency] private readonly SharedItemSystem _item = default!; // White Dream
+    [Dependency] private readonly ItemToggleSystem _itemToggle = default!;
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
+    [Dependency] private readonly SharedStorageSystem _storage = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
+    [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
 
     private EntityQuery<PhysicsComponent> _physicsQuery;
 
@@ -52,6 +50,7 @@ public sealed class MagnetPickupSystem : EntitySystem
         SubscribeLocalEvent<MagnetPickupComponent, ExaminedEvent>(OnExamined); // WD EDIT
         SubscribeLocalEvent<MagnetPickupComponent, MapInitEvent>(OnMagnetMapInit);
     }
+
     //WD EDIT start
     private void OnExamined(Entity<MagnetPickupComponent> entity, ref ExaminedEvent args)
     {
@@ -61,21 +60,19 @@ public sealed class MagnetPickupSystem : EntitySystem
         args.PushMarkup(onMsg);
     }
 
-    private void OnItemToggled(Entity<MagnetPickupComponent> entity, ref ItemToggledEvent args)
-    {
+    private void OnItemToggled(Entity<MagnetPickupComponent> entity, ref ItemToggledEvent args) =>
         _item.SetHeldPrefix(entity.Owner, args.Activated ? "on" : "off");
-    }
+
     //WD EDIT end
-    private void OnMagnetMapInit(EntityUid uid, MagnetPickupComponent component, MapInitEvent args)
-    {
+    private void OnMagnetMapInit(EntityUid uid, MagnetPickupComponent component, MapInitEvent args) =>
         component.NextScan = _timing.CurTime;
-    }
 
 
     public override void Update(float frameTime)
     {
         base.Update(frameTime);
-        var query = EntityQueryEnumerator<MagnetPickupComponent, StorageComponent, TransformComponent, MetaDataComponent>();
+        var query =
+            EntityQueryEnumerator<MagnetPickupComponent, StorageComponent, TransformComponent, MetaDataComponent>();
         var currentTime = _timing.CurTime;
 
         while (query.MoveNext(out var uid, out var comp, out var storage, out var xform, out var meta))
@@ -88,12 +85,12 @@ public sealed class MagnetPickupSystem : EntitySystem
                 continue;
             // WD EDIT END
 
-             if (comp.NextScan > currentTime)
+            if (comp.NextScan > currentTime)
                 continue;
 
             comp.NextScan += ScanDelay;
 
-                        // WD EDIT START. Added ForcePickup.
+            // WD EDIT START. Added ForcePickup.
             if (!comp.ForcePickup && !_inventory.TryGetContainingSlot((uid, xform, meta), out _))
                 continue;
 
@@ -106,7 +103,8 @@ public sealed class MagnetPickupSystem : EntitySystem
             var finalCoords = xform.Coordinates;
             var moverCoords = _transform.GetMoverCoordinates(uid, xform);
 
-            foreach (var near in _lookup.GetEntitiesInRange(uid, comp.Range, LookupFlags.Dynamic | LookupFlags.Sundries))
+            foreach (var near in
+                     _lookup.GetEntitiesInRange(uid, comp.Range, LookupFlags.Dynamic | LookupFlags.Sundries))
             {
                 if (_whitelistSystem.IsWhitelistFail(storage.Whitelist, near))
                     continue;
@@ -122,14 +120,14 @@ public sealed class MagnetPickupSystem : EntitySystem
                 // the problem is that stack pickups delete the original entity, which is fine, but due to
                 // game state handling we can't show a lerp animation for it.
                 var nearXform = Transform(near);
-                var nearMap = _transform.GetMapCoordinates(near, xform: nearXform);
+                var nearMap = _transform.GetMapCoordinates(near, nearXform);
                 var nearCoords = _transform.ToCoordinates(moverCoords.EntityId, nearMap);
 
                 if (!_storage.Insert(uid, near, out var stacked, storageComp: storage, playSound: !playedSound))
                     continue;
 
                 // Play pickup animation for either the stack entity or the original entity.
-                                _storage.PlayPickupAnimation(stacked ?? near, nearCoords, finalCoords, nearXform.LocalRotation);
+                _storage.PlayPickupAnimation(stacked ?? near, nearCoords, finalCoords, nearXform.LocalRotation);
 
                 playedSound = true;
             }

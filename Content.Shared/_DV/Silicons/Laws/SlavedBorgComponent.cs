@@ -13,19 +13,19 @@ namespace Content.Shared._DV.Silicons.Laws;
 /// Adds a law no matter the default lawset.
 /// Switching borg chassis type keeps this law.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(SharedSlavedBorgSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(SharedSlavedBorgSystem))]
 public sealed partial class SlavedBorgComponent : Component
 {
+    /// <summary>
+    /// Prevents adding the same law twice.
+    /// </summary>
+    [DataField]
+    public bool Added;
+
     /// <summary>
     /// The law to add after loading the default laws or switching chassis.
     /// This is assumed to be law 0 so gets inserted to the top of the laws.
     /// </summary>
     [DataField(required: true)]
     public ProtoId<SiliconLawPrototype> Law;
-
-    /// <summary>
-    /// Prevents adding the same law twice.
-    /// </summary>
-    [DataField]
-    public bool Added;
 }

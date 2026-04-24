@@ -7,7 +7,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Cargo.BUI;
 
-[NetSerializable, Serializable]
+[NetSerializable] [Serializable]
 public sealed class CargoPalletConsoleInterfaceState : BoundUserInterfaceState
 {
     /// <summary>

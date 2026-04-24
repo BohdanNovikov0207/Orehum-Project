@@ -20,7 +20,7 @@ public sealed class XAEKnockSystem : BaseXAESystem<XAEKnockComponent>
         var ev = new KnockSpellEvent
         {
             Performer = ent.Owner,
-            Range = ent.Comp.KnockRange
+            Range = ent.Comp.KnockRange,
         };
         RaiseLocalEvent(ev);
     }

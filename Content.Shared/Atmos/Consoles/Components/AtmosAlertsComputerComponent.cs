@@ -12,10 +12,16 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Atmos.Components;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 [Access(typeof(SharedAtmosAlertsComputerSystem))]
 public sealed partial class AtmosAlertsComputerComponent : Component
 {
+    /// <summary>
+    /// A list of all the atmos devices that will be used to populate the nav map
+    /// </summary>
+    [ViewVariables] [AutoNetworkedField]
+    public HashSet<AtmosAlertsDeviceNavMapData> AtmosDevices = new();
+
     /// <summary>
     /// The current entity of interest (selected via the console UI)
     /// </summary>
@@ -23,19 +29,13 @@ public sealed partial class AtmosAlertsComputerComponent : Component
     public NetEntity? FocusDevice;
 
     /// <summary>
-    /// A list of all the atmos devices that will be used to populate the nav map
-    /// </summary>
-    [ViewVariables, AutoNetworkedField]
-    public HashSet<AtmosAlertsDeviceNavMapData> AtmosDevices = new();
-
-    /// <summary>
     /// A list of all the air alarms that have had their alerts silenced on this particular console
     /// </summary>
-    [ViewVariables, AutoNetworkedField]
+    [ViewVariables] [AutoNetworkedField]
     public HashSet<NetEntity> SilencedDevices = new();
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public struct AtmosAlertsDeviceNavMapData
 {
     /// <summary>
@@ -56,7 +56,9 @@ public struct AtmosAlertsDeviceNavMapData
     /// <summary>
     /// Populate the atmos monitoring console nav map with a single entity
     /// </summary>
-    public AtmosAlertsDeviceNavMapData(NetEntity netEntity, NetCoordinates netCoordinates, AtmosAlertsComputerGroup group)
+    public AtmosAlertsDeviceNavMapData(NetEntity netEntity,
+        NetCoordinates netCoordinates,
+        AtmosAlertsComputerGroup group)
     {
         NetEntity = netEntity;
         NetCoordinates = netCoordinates;
@@ -64,7 +66,7 @@ public struct AtmosAlertsDeviceNavMapData
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public struct AtmosAlertsFocusDeviceData
 {
     /// <summary>
@@ -83,15 +85,14 @@ public struct AtmosAlertsFocusDeviceData
     public (float, AtmosAlarmType) PressureData;
 
     /// <summary>
-    /// Moles, percentage, and related alert state, for all detected gases 
+    /// Moles, percentage, and related alert state, for all detected gases
     /// </summary>
     public Dictionary<Gas, (float, float, AtmosAlarmType)> GasData;
 
     /// <summary>
     /// Populates the atmos monitoring console focus entry with atmospheric data
     /// </summary>
-    public AtmosAlertsFocusDeviceData
-        (NetEntity netEntity,
+    public AtmosAlertsFocusDeviceData(NetEntity netEntity,
         (float, AtmosAlarmType) temperatureData,
         (float, AtmosAlarmType) pressureData,
         Dictionary<Gas, (float, float, AtmosAlarmType)> gasData)
@@ -103,7 +104,7 @@ public struct AtmosAlertsFocusDeviceData
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class AtmosAlertsComputerBoundInterfaceState : BoundUserInterfaceState
 {
     /// <summary>
@@ -124,7 +125,9 @@ public sealed class AtmosAlertsComputerBoundInterfaceState : BoundUserInterfaceS
     /// <summary>
     /// Sends data from the server to the client to populate the atmos monitoring console UI
     /// </summary>
-    public AtmosAlertsComputerBoundInterfaceState(AtmosAlertsComputerEntry[] airAlarms, AtmosAlertsComputerEntry[] fireAlarms, AtmosAlertsFocusDeviceData? focusData)
+    public AtmosAlertsComputerBoundInterfaceState(AtmosAlertsComputerEntry[] airAlarms,
+        AtmosAlertsComputerEntry[] fireAlarms,
+        AtmosAlertsFocusDeviceData? focusData)
     {
         AirAlarms = airAlarms;
         FireAlarms = fireAlarms;
@@ -132,7 +135,7 @@ public sealed class AtmosAlertsComputerBoundInterfaceState : BoundUserInterfaceS
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public struct AtmosAlertsComputerEntry
 {
     /// <summary>
@@ -168,8 +171,7 @@ public struct AtmosAlertsComputerEntry
     /// <summary>
     /// Used to populate the atmos monitoring console UI with data from a single air alarm
     /// </summary>
-    public AtmosAlertsComputerEntry
-        (NetEntity entity,
+    public AtmosAlertsComputerEntry(NetEntity entity,
         NetCoordinates coordinates,
         AtmosAlertsComputerGroup group,
         AtmosAlarmType alarmState,
@@ -185,7 +187,7 @@ public struct AtmosAlertsComputerEntry
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class AtmosAlertsComputerFocusChangeMessage : BoundUserInterfaceMessage
 {
     public NetEntity? FocusDevice;
@@ -199,14 +201,15 @@ public sealed class AtmosAlertsComputerFocusChangeMessage : BoundUserInterfaceMe
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class AtmosAlertsComputerDeviceSilencedMessage : BoundUserInterfaceMessage
 {
     public NetEntity AtmosDevice;
     public bool SilenceDevice = true;
 
     /// <summary>
-    /// Used to inform the server that the client has silenced alerts from the specified device to this atmos monitoring console 
+    /// Used to inform the server that the client has silenced alerts from the specified device to this atmos monitoring
+    /// console
     /// </summary>
     public AtmosAlertsComputerDeviceSilencedMessage(NetEntity atmosDevice, bool silenceDevice = true)
     {
@@ -225,7 +228,7 @@ public enum AtmosAlertsComputerGroup
     FireAlarm,
 }
 
-[NetSerializable, Serializable]
+[NetSerializable] [Serializable]
 public enum AtmosAlertsComputerVisuals
 {
     ComputerLayerScreen,
@@ -234,8 +237,8 @@ public enum AtmosAlertsComputerVisuals
 /// <summary>
 /// UI key associated with the atmos monitoring console
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum AtmosAlertsComputerUiKey
 {
-    Key
+    Key,
 }

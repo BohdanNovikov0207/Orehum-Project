@@ -39,8 +39,6 @@ public abstract class SharedPneumaticCannonSystem : EntitySystem
         // so this won't mispredict
         if (!Container.TryGetContainer(uid, PneumaticCannonComponent.TankSlotId, out var container) ||
             container is not ContainerSlot slot || slot.ContainedEntity is null)
-        {
             args.Cancelled = true;
-        }
     }
 }

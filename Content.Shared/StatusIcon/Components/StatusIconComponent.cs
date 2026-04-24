@@ -16,7 +16,7 @@ namespace Content.Shared.StatusIcon.Components;
 /// This is used for noting if an entity is able to
 /// have StatusIcons displayed on them and inherent icons. (debug purposes)
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState, Access(typeof(SharedStatusIconSystem))]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState] [Access(typeof(SharedStatusIconSystem))]
 public sealed partial class StatusIconComponent : Component
 {
     /// <summary>
@@ -24,7 +24,7 @@ public sealed partial class StatusIconComponent : Component
     /// If null, the sprite bounds will be used.
     /// </summary>
     [AutoNetworkedField]
-    [DataField("bounds"), ViewVariables(VVAccess.ReadWrite)]
+    [DataField("bounds")] [ViewVariables(VVAccess.ReadWrite)]
     public Box2? Bounds;
 }
 

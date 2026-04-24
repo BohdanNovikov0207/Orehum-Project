@@ -55,22 +55,24 @@ using Robust.Shared.Serialization.TypeSerializers.Interfaces;
 namespace Content.Shared.Containers;
 
 /// <summary>
-///     Component for spawning entity prototypes into containers on map init.
+/// Component for spawning entity prototypes into containers on map init.
 /// </summary>
 /// <remarks>
-///     Unlike <see cref="StorageFillComponent"/> this is deterministic and supports arbitrary containers. While this
-///     could maybe be merged with that component, it would require significant changes to <see
-///     cref="EntitySpawnCollection.GetSpawns"/>, which is also used by several other systems.
+/// Unlike <see cref="StorageFillComponent" /> this is deterministic and supports arbitrary containers. While this
+/// could maybe be merged with that component, it would require significant changes to
+/// <see
+///     cref="EntitySpawnCollection.GetSpawns" />
+/// , which is also used by several other systems.
 /// </remarks>
 [RegisterComponent]
 public sealed partial class ContainerFillComponent : Component
 {
-    [DataField("containers", customTypeSerializer:typeof(ContainerFillSerializer))]
+    [DataField("containers", customTypeSerializer: typeof(ContainerFillSerializer))]
     public Dictionary<string, List<string>> Containers = new();
 
     /// <summary>
-    ///     If true, entities spawned via the construction system will not have entities spawned into containers managed
-    ///     by the construction system.
+    /// If true, entities spawned via the construction system will not have entities spawned into containers managed
+    /// by the construction system.
     /// </summary>
     [DataField("ignoreConstructionSpawn")]
     public bool IgnoreConstructionSpawn = true;
@@ -93,7 +95,7 @@ public sealed class ContainerFillSerializer : ITypeValidator<Dictionary<string, 
 
         foreach (var (key, val) in node.Children)
         {
-            var listVal = (val is SequenceDataNode seq)
+            var listVal = val is SequenceDataNode seq
                 ? ListSerializer.Validate(serializationManager, seq, dependencies, context)
                 : new ErrorNode(val, "ContainerFillComponent prototypes must be a sequence/list");
 

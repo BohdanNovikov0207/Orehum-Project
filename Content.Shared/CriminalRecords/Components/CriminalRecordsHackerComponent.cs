@@ -15,9 +15,15 @@ namespace Content.Shared.CriminalRecords.Components;
 /// Lets the user hack a criminal records console, once.
 /// Everyone is set to wanted with a randomly picked reason.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(SharedCriminalRecordsHackerSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(SharedCriminalRecordsHackerSystem))]
 public sealed partial class CriminalRecordsHackerComponent : Component
 {
+    /// <summary>
+    /// Announcement made after the console is hacked.
+    /// </summary>
+    [DataField]
+    public LocId Announcement = "ninja-criminal-records-hack-announcement";
+
     /// <summary>
     /// How long the doafter is for hacking it.
     /// </summary>
@@ -28,10 +34,4 @@ public sealed partial class CriminalRecordsHackerComponent : Component
     /// </summary>
     [DataField]
     public ProtoId<LocalizedDatasetPrototype> Reasons = "CriminalRecordsWantedReasonPlaceholders";
-
-    /// <summary>
-    /// Announcement made after the console is hacked.
-    /// </summary>
-    [DataField]
-    public LocId Announcement = "ninja-criminal-records-hack-announcement";
 }

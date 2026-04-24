@@ -3,16 +3,15 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Goobstation.Common.Mind;
 using Content.Shared._EinsteinEngines.Silicon.Components;
 using Content.Shared.Alert;
 using Content.Shared.Bed.Sleep;
-using Robust.Shared.Serialization;
-using Content.Shared.Movement.Systems;
 using Content.Shared.Containers.ItemSlots;
-using Content.Goobstation.Common.Mind;
+using Content.Shared.Movement.Systems;
+using Robust.Shared.Serialization;
 
 namespace Content.Shared._EinsteinEngines.Silicon.Systems;
-
 
 public sealed class SharedSiliconChargeSystem : EntitySystem
 {
@@ -68,10 +67,9 @@ public sealed class SharedSiliconChargeSystem : EntitySystem
         _alertsSystem.ShowAlert(uid, component.BatteryAlert, component.ChargeState);
     }
 
-    private void OnSiliconChargeStateUpdate(EntityUid uid, SiliconComponent component, SiliconChargeStateUpdateEvent ev)
-    {
+    private void
+        OnSiliconChargeStateUpdate(EntityUid uid, SiliconComponent component, SiliconChargeStateUpdateEvent ev) =>
         _alertsSystem.ShowAlert(uid, component.BatteryAlert, ev.ChargePercent);
-    }
 
     private void OnRefreshMovespeed(EntityUid uid, SiliconComponent component, RefreshMovementSpeedModifiersEvent args)
     {
@@ -81,8 +79,10 @@ public sealed class SharedSiliconChargeSystem : EntitySystem
         var closest = 0;
 
         foreach (var state in component.SpeedModifierThresholds)
+        {
             if (component.ChargeState >= state.Key && state.Key > closest)
                 closest = state.Key;
+        }
 
         var speedMod = component.SpeedModifierThresholds[closest];
 
@@ -90,20 +90,15 @@ public sealed class SharedSiliconChargeSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Silicon entities can now also be Living player entities. We may want to prevent them from sleeping if they can't sleep.
+    /// Silicon entities can now also be Living player entities. We may want to prevent them from sleeping if they can't sleep.
     /// </summary>
-    private void OnTryingToSleep(EntityUid uid, SiliconComponent component, ref TryingToSleepEvent args)
-    {
+    private void OnTryingToSleep(EntityUid uid, SiliconComponent component, ref TryingToSleepEvent args) =>
         args.Cancelled = !component.DoSiliconsDreamOfElectricSheep;
-    }
 
     // goob edit - antag target blockers
-    private void OnGetAntagBlocker(Entity<SiliconComponent> ent, ref GetAntagSelectionBlockerEvent args)
-    {
+    private void OnGetAntagBlocker(Entity<SiliconComponent> ent, ref GetAntagSelectionBlockerEvent args) =>
         args.Blocked = true;
-    }
 }
-
 
 public enum SiliconType
 {
@@ -113,15 +108,15 @@ public enum SiliconType
 }
 
 /// <summary>
-///     Event raised when a Silicon's charge state needs to be updated.
+/// Event raised when a Silicon's charge state needs to be updated.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class SiliconChargeStateUpdateEvent : EntityEventArgs
 {
-    public short ChargePercent { get; }
-
     public SiliconChargeStateUpdateEvent(short chargePercent)
     {
         ChargePercent = chargePercent;
     }
+
+    public short ChargePercent { get; }
 }

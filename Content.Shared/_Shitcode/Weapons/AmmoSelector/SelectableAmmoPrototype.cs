@@ -16,40 +16,40 @@ using Robust.Shared.Utility;
 namespace Content.Shared._Goobstation.Weapons.AmmoSelector;
 
 [Prototype("selectableAmmo")]
-public sealed partial class SelectableAmmoPrototype : IPrototype
+public sealed class SelectableAmmoPrototype : IPrototype
 {
-    [IdDataField]
-    public string ID { get; private set; } = default!;
-
-    [DataField(required: true)]
-    public SpriteSpecifier Icon = default!;
+    [DataField]
+    public Color? Color;
 
     [DataField(required: true)]
     public string Desc = default!;
 
-    [DataField(required: true)]
-    public string ProtoId = default!; // this has to be a string because of how hitscan projectiles work
-
-    [DataField]
-    public Color? Color;
-
     [DataField]
     public float FireCost = 100f;
-
-    [DataField]
-    public SoundSpecifier? SoundGunshot;
 
     [DataField]
     public float FireRate = 8f;
 
     [DataField(customTypeSerializer: typeof(FlagSerializer<SelectableAmmoWeaponFlags>))]
     public int Flags = (int) SelectableAmmoFlags.ChangeWeaponFireCost;
+
+    [DataField(required: true)]
+    public SpriteSpecifier Icon = default!;
+
+    [DataField(required: true)]
+    public string ProtoId = default!; // this has to be a string because of how hitscan projectiles work
+
+    [DataField]
+    public SoundSpecifier? SoundGunshot;
+
+    [IdDataField]
+    public string ID { get; } = default!;
 }
 
 public sealed class SelectableAmmoWeaponFlags;
 
-[Serializable, NetSerializable]
-[Flags, FlagsFor(typeof(SelectableAmmoWeaponFlags))]
+[Serializable] [NetSerializable]
+[Flags] [FlagsFor(typeof(SelectableAmmoWeaponFlags))]
 public enum SelectableAmmoFlags
 {
     None = 0,

@@ -30,6 +30,9 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Shared._Lavaland.Weapons.Marker;
+using Content.Shared._Shitmed.Damage;
+using Content.Shared._Shitmed.Targeting;
 using Content.Shared.Damage;
 using Content.Shared.Projectiles;
 using Content.Shared.Weapons.Melee.Events;
@@ -38,18 +41,19 @@ using Robust.Shared.Audio.Systems;
 using Robust.Shared.Network;
 using Robust.Shared.Physics.Events;
 using Robust.Shared.Timing;
-using Content.Shared._Lavaland.Weapons.Marker; // Lavaland Change
-using Content.Shared._Shitmed.Targeting; // Shitmed Change
-using Content.Shared._Shitmed.Damage; // Shitmed Change
+// Lavaland Change
+// Shitmed Change
+
+// Shitmed Change
 
 namespace Content.Shared.Weapons.Marker;
 
 public abstract class SharedDamageMarkerSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly INetManager _netManager = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly DamageableSystem _damageable = default!;
+    [Dependency] private readonly INetManager _netManager = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
 
     public override void Initialize()
@@ -69,7 +73,13 @@ public abstract class SharedDamageMarkerSystem : EntitySystem
         _audio.PlayPredicted(component.Sound, uid, args.User);
 
         if (TryComp<LeechOnMarkerComponent>(args.Used, out var leech))
-            _damageable.TryChangeDamage(args.User, leech.Leech, true, false, origin: args.Used, targetPart: TargetBodyPart.All, splitDamage: SplitDamageBehavior.SplitEnsureAll); // Shitmed Change
+            _damageable.TryChangeDamage(args.User,
+                leech.Leech,
+                true,
+                false,
+                origin: args.Used,
+                targetPart: TargetBodyPart.All,
+                splitDamage: SplitDamageBehavior.SplitEnsureAll); // Shitmed Change
 
         // Lavaland Change start
         RaiseLocalEvent(uid, new ApplyMarkerBonusEvent(args.Used, args.User)); // For effects on the target
@@ -100,9 +110,7 @@ public abstract class SharedDamageMarkerSystem : EntitySystem
             _whitelistSystem.IsWhitelistFail(component.Whitelist, args.OtherEntity) ||
             !TryComp<ProjectileComponent>(uid, out var projectile) ||
             projectile.Weapon == null)
-        {
             return;
-        }
 
         // Markers are exclusive, deal with it.
         var marker = EnsureComp<DamageMarkerComponent>(args.OtherEntity);
@@ -118,13 +126,9 @@ public abstract class SharedDamageMarkerSystem : EntitySystem
         if (_netManager.IsServer)
         {
             if (component.Amount <= 0)
-            {
                 QueueDel(uid);
-            }
             else
-            {
                 Dirty(uid, component);
-            }
         }
     }
 }

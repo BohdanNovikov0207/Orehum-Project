@@ -19,8 +19,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Robust.Shared.Prototypes;
-
 namespace Content.Shared._Lavaland.Megafauna.Events;
 
 /// <summary>

@@ -14,15 +14,9 @@ namespace Content.Shared.Atmos.Components;
 /// <summary>
 /// Lets its owner entity ignite flammables around it and also heal some damage.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(SharedFirestarterSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(SharedFirestarterSystem))]
 public sealed partial class FirestarterComponent : Component
 {
-    /// <summary>
-    /// Radius of objects that will be ignited if flammable.
-    /// </summary>
-    [DataField]
-    public float IgnitionRadius = 4f;
-
     /// <summary>
     /// The action entity.
     /// </summary>
@@ -37,4 +31,10 @@ public sealed partial class FirestarterComponent : Component
     /// </summary>
     [DataField]
     public SoundSpecifier IgniteSound = new SoundPathSpecifier("/Audio/Magic/rumble.ogg");
+
+    /// <summary>
+    /// Radius of objects that will be ignited if flammable.
+    /// </summary>
+    [DataField]
+    public float IgnitionRadius = 4f;
 }

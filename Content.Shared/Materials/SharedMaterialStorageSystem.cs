@@ -57,34 +57,34 @@ using System.Linq;
 using Content.Shared._Goobstation.Silo;
 using Content.Shared.Interaction;
 using Content.Shared.Interaction.Components;
+using Content.Shared.Research.Components;
 using Content.Shared.Stacks;
 using Content.Shared.Whitelist;
 using JetBrains.Annotations;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
 using Robust.Shared.Utility;
-using Content.Shared.Research.Components;
 
 namespace Content.Shared.Materials;
 
 /// <summary>
 /// This handles storing materials and modifying their amounts
-/// <see cref="MaterialStorageComponent"/>
+/// <see cref="MaterialStorageComponent" />
 /// </summary>
 public abstract class SharedMaterialStorageSystem : EntitySystem
 {
-    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly IPrototypeManager _prototype = default!;
-    [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
-    [Dependency] private readonly SharedSiloSystem _silo = default!; // Goobstation
-
     /// <summary>
     /// Default volume for a sheet if the material's entity prototype has no material composition.
     /// </summary>
     private const int DefaultSheetVolume = 100;
 
-    /// <inheritdoc/>
+    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly IPrototypeManager _prototype = default!;
+    [Dependency] private readonly SharedSiloSystem _silo = default!; // Goobstation
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
+
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
@@ -108,10 +108,8 @@ public abstract class SharedMaterialStorageSystem : EntitySystem
         }
     }
 
-    private void OnMapInit(EntityUid uid, MaterialStorageComponent component, MapInitEvent args)
-    {
+    private void OnMapInit(EntityUid uid, MaterialStorageComponent component, MapInitEvent args) =>
         _appearance.SetData(uid, MaterialStorageVisuals.Inserting, false);
-    }
 
     /// <summary>
     /// Gets the volume of a specified material contained in this storage.
@@ -121,10 +119,9 @@ public abstract class SharedMaterialStorageSystem : EntitySystem
     /// <param name="component"></param>
     /// <returns>The volume of the material</returns>
     [PublicAPI]
-    public int GetMaterialAmount(EntityUid uid, MaterialPrototype material, MaterialStorageComponent? component = null)
-    {
-        return GetMaterialAmount(uid, material.ID, component);
-    }
+    public int GetMaterialAmount(EntityUid uid,
+        MaterialPrototype material,
+        MaterialStorageComponent? component = null) => GetMaterialAmount(uid, material.ID, component);
 
     /// <summary>
     /// Gets the volume of a specified material contained in this storage.
@@ -168,7 +165,8 @@ public abstract class SharedMaterialStorageSystem : EntitySystem
     {
         if (!Resolve(uid, ref component))
             return false;
-        return component.StorageLimit == null || GetTotalMaterialAmount(uid, component) + volume <= component.StorageLimit;
+        return component.StorageLimit == null ||
+               GetTotalMaterialAmount(uid, component) + volume <= component.StorageLimit;
     }
 
     /// <summary>
@@ -179,7 +177,10 @@ public abstract class SharedMaterialStorageSystem : EntitySystem
     /// <param name="volume"></param>
     /// <param name="component"></param>
     /// <returns>If the amount can be changed</returns>
-    public bool CanChangeMaterialAmount(EntityUid uid, string materialId, int volume, MaterialStorageComponent? component = null)
+    public bool CanChangeMaterialAmount(EntityUid uid,
+        string materialId,
+        int volume,
+        MaterialStorageComponent? component = null)
     {
         if (!Resolve(uid, ref component))
             return false;
@@ -188,8 +189,10 @@ public abstract class SharedMaterialStorageSystem : EntitySystem
             return false;
 
         if (!component.IgnoreMaterialWhiteList) // Goobstation Change - Shitcode.
+        {
             if (component.MaterialWhiteList == null ? false : !component.MaterialWhiteList.Contains(materialId))
                 return false;
+        }
 
         if (component.ConnectToSilo && _silo.TryGetMaterialAmount(uid, materialId, out var siloAmount)) // Goobstation
             return siloAmount + volume >= 0;
@@ -204,7 +207,7 @@ public abstract class SharedMaterialStorageSystem : EntitySystem
     /// <param name="entity"></param>
     /// <param name="materials"></param>
     /// <returns>If the amount can be changed</returns>
-    public bool CanChangeMaterialAmount(Entity<MaterialStorageComponent?> entity, Dictionary<string,int> materials)
+    public bool CanChangeMaterialAmount(Entity<MaterialStorageComponent?> entity, Dictionary<string, int> materials)
     {
         if (!Resolve(entity, ref entity.Comp))
             return false;
@@ -228,7 +231,11 @@ public abstract class SharedMaterialStorageSystem : EntitySystem
     /// <param name="component"></param>
     /// <param name="dirty"></param>
     /// <returns>If it was successful</returns>
-    public bool TryChangeMaterialAmount(EntityUid uid, string materialId, int volume, MaterialStorageComponent? component = null, bool dirty = true)
+    public bool TryChangeMaterialAmount(EntityUid uid,
+        string materialId,
+        int volume,
+        MaterialStorageComponent? component = null,
+        bool dirty = true)
     {
         if (!Resolve(uid, ref component))
             return false;
@@ -277,7 +284,7 @@ public abstract class SharedMaterialStorageSystem : EntitySystem
     /// <param name="entity"></param>
     /// <param name="materials"></param>
     /// <returns>If the amount can be changed</returns>
-    public bool TryChangeMaterialAmount(Entity<MaterialStorageComponent?> entity, Dictionary<string,int> materials)
+    public bool TryChangeMaterialAmount(Entity<MaterialStorageComponent?> entity, Dictionary<string, int> materials)
     {
         if (!Resolve(entity, ref entity.Comp))
             return false;
@@ -304,7 +311,7 @@ public abstract class SharedMaterialStorageSystem : EntitySystem
     /// <param name="uid">The entity to change the material storage on.</param>
     /// <param name="materialId">The ID of the material to change.</param>
     /// <param name="volume">The stored material volume to set the storage to.</param>
-    /// <param name="component">The storage component on <paramref name="uid"/>. Resolved automatically if not given.</param>
+    /// <param name="component">The storage component on <paramref name="uid" />. Resolved automatically if not given.</param>
     /// <returns>True if it was successful (enough space etc).</returns>
     public bool TrySetMaterialAmount(
         EntityUid uid,
@@ -399,6 +406,7 @@ public abstract class SharedMaterialStorageSystem : EntitySystem
             _prototype.TryIndex<MaterialPrototype>(composition.MaterialComposition.Keys.First(), out var lastMat);
             insertingComp.MaterialColor = lastMat?.Color;
         }
+
         _appearance.SetData(receiver, MaterialStorageVisuals.Inserting, true);
         Dirty(receiver, insertingComp);
 
@@ -430,10 +438,8 @@ public abstract class SharedMaterialStorageSystem : EntitySystem
         args.Handled = TryInsertMaterialEntity(args.User, args.Used, uid, component);
     }
 
-    private void OnDatabaseModified(Entity<MaterialStorageComponent> ent, ref TechnologyDatabaseModifiedEvent args)
-    {
+    private void OnDatabaseModified(Entity<MaterialStorageComponent> ent, ref TechnologyDatabaseModifiedEvent args) =>
         UpdateMaterialWhitelist(ent);
-    }
 
     public int GetSheetVolume(MaterialPrototype material)
     {

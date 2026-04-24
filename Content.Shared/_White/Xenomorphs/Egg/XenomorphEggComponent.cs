@@ -7,20 +7,29 @@ namespace Content.Shared._White.Xenomorphs.Egg;
 [RegisterComponent]
 public sealed partial class XenomorphEggComponent : Component
 {
+    [ViewVariables]
+    public TimeSpan BurstAt = TimeSpan.Zero;
+
     [DataField]
-    public EntProtoId? FaceHuggerPrototype = "MobXenomorphFaceHugger";
+    public TimeSpan BurstingDelay = TimeSpan.FromSeconds(1.5f);
 
     [DataField]
     public float BurstRange = 1f;
 
-    [DataField]
-    public SoundSpecifier? CleaningSound = new SoundPathSpecifier("/Audio/Animals/Blob/blobattack.ogg");
+    [ViewVariables]
+    public TimeSpan CheckInRangeAt = TimeSpan.Zero;
 
     [DataField]
     public TimeSpan CheckInRangeDelay = TimeSpan.FromSeconds(1);
 
     [DataField]
-    public TimeSpan BurstingDelay = TimeSpan.FromSeconds(1.5f);
+    public SoundSpecifier? CleaningSound = new SoundPathSpecifier("/Audio/Animals/Blob/blobattack.ogg");
+
+    [DataField]
+    public EntProtoId? FaceHuggerPrototype = "MobXenomorphFaceHugger";
+
+    [ViewVariables]
+    public TimeSpan GrownAt = TimeSpan.Zero;
 
     [DataField]
     public TimeSpan MaxGrowthTime = TimeSpan.FromSeconds(150);
@@ -30,15 +39,6 @@ public sealed partial class XenomorphEggComponent : Component
 
     [DataField]
     public XenomorphEggStatus Status = XenomorphEggStatus.Growning;
-
-    [ViewVariables]
-    public TimeSpan BurstAt = TimeSpan.Zero;
-
-    [ViewVariables]
-    public TimeSpan CheckInRangeAt = TimeSpan.Zero;
-
-    [ViewVariables]
-    public TimeSpan GrownAt = TimeSpan.Zero;
 }
 
 public enum XenomorphEggStatus : byte
@@ -49,7 +49,7 @@ public enum XenomorphEggStatus : byte
     Growning,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum XenomorphEggVisualsStatus : byte
 {
     Burst,
@@ -58,8 +58,8 @@ public enum XenomorphEggVisualsStatus : byte
     Growning,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum XenomorphEggKey
 {
-    Key
+    Key,
 }

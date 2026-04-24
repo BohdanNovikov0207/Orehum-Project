@@ -4,8 +4,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Robust.Shared.Serialization;
-using Robust.Shared.GameObjects;
 using Content.Goobstation.Maths.FixedPoint;
 
 namespace Content.Shared._Shitmed.EntityEffects.Effects;
@@ -16,12 +14,14 @@ namespace Content.Shared._Shitmed.EntityEffects.Effects;
 /// <param name="Max">The maximum temperature to scale the effect.</param>
 /// <param name="Scale">The scale to use for the efficiency.</param>
 /// </summary>
-[DataRecord, Serializable]
+[DataRecord] [Serializable]
 public record struct TemperatureScaling(FixedPoint2 Min, FixedPoint2 Max, FixedPoint2 Scale)
 {
+    public static implicit operator (FixedPoint2, FixedPoint2, FixedPoint2)(TemperatureScaling p) =>
+        (p.Min, p.Max, p.Scale);
 
-    public static implicit operator (FixedPoint2, FixedPoint2, FixedPoint2)(TemperatureScaling p) => (p.Min, p.Max, p.Scale);
-    public static implicit operator TemperatureScaling((FixedPoint2, FixedPoint2, FixedPoint2) p) => new(p.Item1, p.Item2, p.Item3);
+    public static implicit operator TemperatureScaling((FixedPoint2, FixedPoint2, FixedPoint2) p) =>
+        new(p.Item1, p.Item2, p.Item3);
 
     // <summary>
     // Calculates the efficiency multiplier based on the given temperature.
@@ -37,7 +37,9 @@ public record struct TemperatureScaling(FixedPoint2 Min, FixedPoint2 Max, FixedP
             (Min, Max) = (Max, Min);
 
         if (Min == Max)
-            return FixedPoint2.New(1); // If the min is equal to the max, return one or full efficiency since the range is meaningless.
+            return
+                FixedPoint2.New(
+                    1); // If the min is equal to the max, return one or full efficiency since the range is meaningless.
 
         // Clamp the temperature within a given range.
         temperature = FixedPoint2.Clamp(temperature, Min, Max);
@@ -55,7 +57,7 @@ public record struct TemperatureScaling(FixedPoint2 Min, FixedPoint2 Max, FixedP
         // If not inverted, efficiency decreases with temperature (1 - scaled distance)
         // Then apply the scale factor to the result
         return invert
-            ? FixedPoint2.New(1) + (scaledDistance * scale)
+            ? FixedPoint2.New(1) + scaledDistance * scale
             : (FixedPoint2.New(1) - scaledDistance) * scale;
     }
 }

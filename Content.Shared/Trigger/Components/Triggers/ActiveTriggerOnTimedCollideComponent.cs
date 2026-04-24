@@ -2,5 +2,5 @@
 
 namespace Content.Shared.Trigger.Components.Triggers;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class ActiveTriggerOnTimedCollideComponent : Component;

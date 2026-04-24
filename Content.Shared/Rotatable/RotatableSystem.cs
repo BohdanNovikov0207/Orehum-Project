@@ -13,7 +13,7 @@ using Robust.Shared.Utility;
 namespace Content.Shared.Rotatable;
 
 /// <summary>
-/// Handles verbs for the <see cref="RotatableComponent"/> and <see cref="FlippableComponent"/> components.
+/// Handles verbs for the <see cref="RotatableComponent" /> and <see cref="FlippableComponent" /> components.
 /// </summary>
 public sealed class RotatableSystem : EntitySystem
 {
@@ -29,7 +29,8 @@ public sealed class RotatableSystem : EntitySystem
 
         CommandBinds.Builder
             .Bind(ContentKeyFunctions.RotateObjectClockwise, new PointerInputCmdHandler(HandleRotateObjectClockwise))
-            .Bind(ContentKeyFunctions.RotateObjectCounterclockwise, new PointerInputCmdHandler(HandleRotateObjectCounterclockwise))
+            .Bind(ContentKeyFunctions.RotateObjectCounterclockwise,
+                new PointerInputCmdHandler(HandleRotateObjectCounterclockwise))
             .Bind(ContentKeyFunctions.FlipObject, new PointerInputCmdHandler(HandleFlipObject))
             .Register<RotatableSystem>();
     }
@@ -50,9 +51,9 @@ public sealed class RotatableSystem : EntitySystem
             Act = () => Flip(uid, component),
             Text = Loc.GetString("flippable-verb-get-data-text"),
             Category = VerbCategory.Rotate,
-            Icon = new SpriteSpecifier.Texture(new("/Textures/Interface/VerbIcons/flip.svg.192dpi.png")),
+            Icon = new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/VerbIcons/flip.svg.192dpi.png")),
             Priority = -3, // show flip last
-            DoContactInteraction = true
+            DoContactInteraction = true,
         };
         args.Verbs.Add(verb);
     }
@@ -76,7 +77,7 @@ public sealed class RotatableSystem : EntitySystem
             DoContactInteraction = true,
             Act = () => ResetRotation(uid),
             Category = VerbCategory.Rotate,
-            Icon = new SpriteSpecifier.Texture(new("/Textures/Interface/VerbIcons/refresh.svg.192dpi.png")),
+            Icon = new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/VerbIcons/refresh.svg.192dpi.png")),
             Text = Loc.GetString("rotate-reset-verb-get-data-text"),
             Priority = -2, // show CCW, then CW, then reset
             CloseMenu = false,
@@ -88,7 +89,7 @@ public sealed class RotatableSystem : EntitySystem
         {
             Act = () => Rotate(uid, -component.Increment),
             Category = VerbCategory.Rotate,
-            Icon = new SpriteSpecifier.Texture(new("/Textures/Interface/VerbIcons/rotate_cw.svg.192dpi.png")),
+            Icon = new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/VerbIcons/rotate_cw.svg.192dpi.png")),
             Text = Loc.GetString("rotate-verb-get-data-text"),
             Priority = -1,
             CloseMenu = false, // allow for easy double rotations.
@@ -100,7 +101,7 @@ public sealed class RotatableSystem : EntitySystem
         {
             Act = () => Rotate(uid, component.Increment),
             Category = VerbCategory.Rotate,
-            Icon = new SpriteSpecifier.Texture(new("/Textures/Interface/VerbIcons/rotate_ccw.svg.192dpi.png")),
+            Icon = new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/VerbIcons/rotate_ccw.svg.192dpi.png")),
             Text = Loc.GetString("rotate-counter-verb-get-data-text"),
             Priority = 0,
             CloseMenu = false, // allow for easy double rotations.
@@ -121,7 +122,9 @@ public sealed class RotatableSystem : EntitySystem
         PredictedDel(uid);
     }
 
-    private bool HandleRotateObjectClockwise(ICommonSession? playerSession, EntityCoordinates coordinates, EntityUid entity)
+    private bool HandleRotateObjectClockwise(ICommonSession? playerSession,
+        EntityCoordinates coordinates,
+        EntityUid entity)
     {
         if (playerSession?.AttachedEntity is not { Valid: true } player || !Exists(player))
             return false;
@@ -146,7 +149,9 @@ public sealed class RotatableSystem : EntitySystem
         return false;
     }
 
-    private bool HandleRotateObjectCounterclockwise(ICommonSession? playerSession, EntityCoordinates coordinates, EntityUid entity)
+    private bool HandleRotateObjectCounterclockwise(ICommonSession? playerSession,
+        EntityCoordinates coordinates,
+        EntityUid entity)
     {
         if (playerSession?.AttachedEntity is not { Valid: true } player || !Exists(player))
             return false;

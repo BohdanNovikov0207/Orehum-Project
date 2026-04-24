@@ -9,10 +9,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-namespace Content.Shared.Humanoid
+namespace Content.Shared.Humanoid;
+
+public interface ICharacterAppearance
 {
-    public interface ICharacterAppearance
-    {
-        bool MemberwiseEquals(ICharacterAppearance other);
-    }
+    bool MemberwiseEquals(ICharacterAppearance other);
 }

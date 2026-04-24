@@ -8,6 +8,12 @@ namespace Content.Shared._White.Jump;
 public sealed partial class JumpComponent : Component
 {
     [DataField]
+    public EntProtoId JumpAction = "ActionJumpXenomorph";
+
+    [ViewVariables]
+    public EntityUid? JumpActionEntity;
+
+    [DataField]
     public SoundSpecifier? JumpSound;
 
     [DataField]
@@ -15,12 +21,6 @@ public sealed partial class JumpComponent : Component
 
     [DataField]
     public TimeSpan StunTime = TimeSpan.FromSeconds(4);
-
-    [DataField]
-    public EntProtoId JumpAction = "ActionJumpXenomorph";
-
-    [ViewVariables]
-    public EntityUid? JumpActionEntity;
 }
 
 public sealed partial class JumpActionEvent : WorldTargetActionEvent;

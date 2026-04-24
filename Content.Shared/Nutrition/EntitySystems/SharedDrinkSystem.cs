@@ -5,13 +5,13 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Administration.Logs;
 using Content.Shared.Chemistry.EntitySystems;
 using Content.Shared.Database;
+using Content.Shared.Forensics;
 using Content.Shared.IdentityManagement;
 using Content.Shared.Interaction;
-using Content.Goobstation.Maths.FixedPoint;
-using Content.Shared.Forensics;
 using Content.Shared.Interaction.Events;
 using Content.Shared.Inventory;
 using Content.Shared.Nutrition.Components;
@@ -23,21 +23,22 @@ using Robust.Shared.Audio.Systems;
 namespace Content.Shared.Nutrition.EntitySystems;
 
 [Obsolete("Migration to Content.Shared.Nutrition.EntitySystems.IngestionSystem is required")]
-public abstract partial class SharedDrinkSystem : EntitySystem
+public abstract class SharedDrinkSystem : EntitySystem
 {
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly FlavorProfileSystem _flavorProfile = default!;
     [Dependency] private readonly IngestionSystem _ingestion = default!;
+    [Dependency] private readonly OpenableSystem _openable = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly SharedSolutionContainerSystem _solutionContainer = default!;
-    [Dependency] private readonly OpenableSystem _openable = default!;
 
     public override void Initialize()
     {
         base.Initialize();
 
-        SubscribeLocalEvent<DrinkComponent, UseInHandEvent>(OnUseDrinkInHand, after: new[] { typeof(OpenableSystem), typeof(InventorySystem) });
+        SubscribeLocalEvent<DrinkComponent, UseInHandEvent>(OnUseDrinkInHand,
+            after: new[] { typeof(OpenableSystem), typeof(InventorySystem) });
         SubscribeLocalEvent<DrinkComponent, AfterInteractEvent>(OnUseDrink);
 
         SubscribeLocalEvent<DrinkComponent, AttemptShakeEvent>(OnAttemptShake);
@@ -130,7 +131,10 @@ public abstract partial class SharedDrinkSystem : EntitySystem
 
         args.Handled = true;
 
-        _audio.PlayPredicted(entity.Comp.UseSound, args.Target, args.User, AudioParams.Default.WithVolume(-2f).WithVariation(0.25f));
+        _audio.PlayPredicted(entity.Comp.UseSound,
+            args.Target,
+            args.User,
+            AudioParams.Default.WithVolume(-2f).WithVariation(0.25f));
 
         var flavors = _flavorProfile.GetLocalizedFlavorsMessage(entity.Owner, args.Target, args.Split);
 
@@ -139,12 +143,23 @@ public abstract partial class SharedDrinkSystem : EntitySystem
             var targetName = Identity.Entity(args.Target, EntityManager);
             var userName = Identity.Entity(args.User, EntityManager);
 
-            _popup.PopupEntity(Loc.GetString("edible-force-feed-success", ("user", userName), ("verb", _ingestion.GetProtoVerb(IngestionSystem.Drink)), ("flavors", flavors)), entity, entity);
+            _popup.PopupEntity(Loc.GetString("edible-force-feed-success",
+                    ("user", userName),
+                    ("verb", _ingestion.GetProtoVerb(IngestionSystem.Drink)),
+                    ("flavors", flavors)),
+                entity,
+                entity);
 
-            _popup.PopupClient(Loc.GetString("edible-force-feed-success-user", ("target", targetName), ("verb", _ingestion.GetProtoVerb(IngestionSystem.Drink))), args.User, args.User);
+            _popup.PopupClient(Loc.GetString("edible-force-feed-success-user",
+                    ("target", targetName),
+                    ("verb", _ingestion.GetProtoVerb(IngestionSystem.Drink))),
+                args.User,
+                args.User);
 
             // log successful forced drinking
-            _adminLogger.Add(LogType.ForceFeed, LogImpact.Medium, $"{ToPrettyString(entity.Owner):user} forced {ToPrettyString(args.User):target} to drink {ToPrettyString(entity.Owner):drink}");
+            _adminLogger.Add(LogType.ForceFeed,
+                LogImpact.Medium,
+                $"{ToPrettyString(entity.Owner):user} forced {ToPrettyString(args.User):target} to drink {ToPrettyString(entity.Owner):drink}");
         }
         else
         {
@@ -154,7 +169,9 @@ public abstract partial class SharedDrinkSystem : EntitySystem
                 args.User);
 
             // log successful voluntary drinking
-            _adminLogger.Add(LogType.Ingestion, LogImpact.Low, $"{ToPrettyString(args.User):target} drank {ToPrettyString(entity.Owner):drink}");
+            _adminLogger.Add(LogType.Ingestion,
+                LogImpact.Low,
+                $"{ToPrettyString(args.User):target} drank {ToPrettyString(entity.Owner):drink}");
         }
 
         if (_ingestion.GetUsesRemaining(entity, entity.Comp.Solution, args.Split.Volume) <= 0)
@@ -188,11 +205,9 @@ public abstract partial class SharedDrinkSystem : EntitySystem
         args.Time += TimeSpan.FromSeconds(drink.Comp.Delay);
     }
 
-    private void OnIsDigestible(Entity<DrinkComponent> ent, ref IsDigestibleEvent args)
-    {
+    private void OnIsDigestible(Entity<DrinkComponent> ent, ref IsDigestibleEvent args) =>
         // Anyone can drink from puddles on the floor!
         args.UniversalDigestion();
-    }
 
     private void OnGetEdibleType(Entity<DrinkComponent> ent, ref GetEdibleTypeEvent args)
     {

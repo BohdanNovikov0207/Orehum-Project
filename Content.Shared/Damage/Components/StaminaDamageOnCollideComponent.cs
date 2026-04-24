@@ -17,7 +17,7 @@ namespace Content.Shared.Damage.Components;
 [RegisterComponent]
 public sealed partial class StaminaDamageOnCollideComponent : Component
 {
-    [ViewVariables(VVAccess.ReadWrite), DataField("damage")]
+    [ViewVariables(VVAccess.ReadWrite)] [DataField("damage")]
     public float Damage = 55f;
 
     // goob edit

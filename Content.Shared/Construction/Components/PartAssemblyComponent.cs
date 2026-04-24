@@ -17,22 +17,22 @@ namespace Content.Shared.Construction.Components;
 public sealed partial class PartAssemblyComponent : Component
 {
     /// <summary>
-    /// A dictionary of a set of parts to a list of tags for each assembly.
+    /// The container where the parts are stored
     /// </summary>
-    [DataField("parts", required: true)]
-    public Dictionary<string, List<string>> Parts = new();
+    [DataField("containerId")]
+    public string ContainerId = "part-container";
 
     /// <summary>
-    /// The entry in <see cref="Parts"/> that is currently being worked on.
+    /// The entry in <see cref="Parts" /> that is currently being worked on.
     /// </summary>
     [DataField("currentAssembly")]
     public string? CurrentAssembly;
 
     /// <summary>
-    /// The container where the parts are stored
+    /// A dictionary of a set of parts to a list of tags for each assembly.
     /// </summary>
-    [DataField("containerId")]
-    public string ContainerId = "part-container";
+    [DataField("parts", required: true)]
+    public Dictionary<string, List<string>> Parts = new();
 
     /// <summary>
     /// The container that stores all of the parts when
@@ -47,5 +47,4 @@ public sealed partial class PartAssemblyComponent : Component
 /// </summary>
 public sealed class PartAssemblyPartInsertedEvent
 {
-
 }

@@ -9,19 +9,19 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Chemistry.Components;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class ReagentTankComponent : Component
 {
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    [DataField] [ViewVariables(VVAccess.ReadWrite)]
     public FixedPoint2 TransferAmount { get; set; } = FixedPoint2.New(10);
 
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    [DataField] [ViewVariables(VVAccess.ReadWrite)]
     public ReagentTankType TankType { get; set; } = ReagentTankType.Unspecified;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum ReagentTankType : byte
 {
     Unspecified,
-    Fuel
+    Fuel,
 }

@@ -18,45 +18,42 @@
 //
 // SPDX-License-Identifier: MIT
 
-using Content.Shared.Maps;
 using JetBrains.Annotations;
 using Robust.Shared.Map;
 
-namespace Content.Shared.Construction.Conditions
+namespace Content.Shared.Construction.Conditions;
+
+[UsedImplicitly]
+[DataDefinition]
+public sealed partial class EmptyOrWindowValidInTile : IConstructionCondition
 {
-    [UsedImplicitly]
-    [DataDefinition]
-    public sealed partial class EmptyOrWindowValidInTile : IConstructionCondition
+    [DataField("tileNotBlocked")]
+    private TileNotBlocked _tileNotBlocked = new();
+
+    public bool Condition(EntityUid user, EntityCoordinates location, Direction direction)
     {
-        [DataField("tileNotBlocked")]
-        private TileNotBlocked _tileNotBlocked = new();
+        var entManager = IoCManager.Resolve<IEntityManager>();
+        var lookupSys = entManager.System<EntityLookupSystem>();
 
-        public bool Condition(EntityUid user, EntityCoordinates location, Direction direction)
+        var result = false;
+
+
+        foreach (var entity in
+                 lookupSys.GetEntitiesIntersecting(location, LookupFlags.Approximate | LookupFlags.Static))
         {
-            var entManager = IoCManager.Resolve<IEntityManager>();
-            var lookupSys = entManager.System<EntityLookupSystem>();
-
-            var result = false;
-
-
-            foreach (var entity in lookupSys.GetEntitiesIntersecting(location, LookupFlags.Approximate | LookupFlags.Static))
-            {
-                if (entManager.HasComponent<SharedCanBuildWindowOnTopComponent>(entity))
-                    result = true;
-            }
-
-            if (!result)
-                result = _tileNotBlocked.Condition(user, location, direction);
-
-            return result;
+            if (entManager.HasComponent<SharedCanBuildWindowOnTopComponent>(entity))
+                result = true;
         }
 
-        public ConstructionGuideEntry GenerateGuideEntry()
-        {
-            return new ConstructionGuideEntry
-            {
-                Localization = "construction-guide-condition-empty-or-window-valid-in-tile"
-            };
-        }
+        if (!result)
+            result = _tileNotBlocked.Condition(user, location, direction);
+
+        return result;
     }
+
+    public ConstructionGuideEntry GenerateGuideEntry() =>
+        new()
+        {
+            Localization = "construction-guide-condition-empty-or-window-valid-in-tile",
+        };
 }

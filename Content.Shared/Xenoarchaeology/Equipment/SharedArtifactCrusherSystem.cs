@@ -5,26 +5,26 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Shared.Emag.Systems;
 using Content.Shared.Examine;
 using Content.Shared.Storage.Components;
+using Content.Shared.Xenoarchaeology.Equipment.Components;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Containers;
-using Content.Shared.Emag.Systems;
-using Content.Shared.Xenoarchaeology.Equipment.Components;
 
 namespace Content.Shared.Xenoarchaeology.Equipment;
 
 /// <summary>
-/// This handles logic relating to <see cref="ArtifactCrusherComponent"/>
+/// This handles logic relating to <see cref="ArtifactCrusherComponent" />
 /// </summary>
 public abstract class SharedArtifactCrusherSystem : EntitySystem
 {
+    [Dependency] private readonly EmagSystem _emag = default!;
     [Dependency] protected readonly SharedAppearanceSystem Appearance = default!;
     [Dependency] protected readonly SharedAudioSystem AudioSystem = default!;
     [Dependency] protected readonly SharedContainerSystem ContainerSystem = default!;
-    [Dependency] private readonly EmagSystem _emag = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
@@ -36,10 +36,8 @@ public abstract class SharedArtifactCrusherSystem : EntitySystem
         SubscribeLocalEvent<ArtifactCrusherComponent, GotEmaggedEvent>(OnEmagged);
     }
 
-    private void OnInit(Entity<ArtifactCrusherComponent> ent, ref ComponentInit args)
-    {
-        ent.Comp.OutputContainer = ContainerSystem.EnsureContainer<Container>(ent, ent.Comp.OutputContainerName);
-    }
+    private void OnInit(Entity<ArtifactCrusherComponent> ent, ref ComponentInit args) => ent.Comp.OutputContainer =
+        ContainerSystem.EnsureContainer<Container>(ent, ent.Comp.OutputContainerName);
 
     private void OnStorageAfterOpen(Entity<ArtifactCrusherComponent> ent, ref StorageAfterOpenEvent args)
     {
@@ -68,10 +66,10 @@ public abstract class SharedArtifactCrusherSystem : EntitySystem
             args.Cancelled = true;
     }
 
-    private void OnExamine(Entity<ArtifactCrusherComponent> ent, ref ExaminedEvent args)
-    {
-        args.PushMarkup(ent.Comp.AutoLock ? Loc.GetString("artifact-crusher-examine-autolocks") : Loc.GetString("artifact-crusher-examine-no-autolocks"));
-    }
+    private void OnExamine(Entity<ArtifactCrusherComponent> ent, ref ExaminedEvent args) => args.PushMarkup(
+        ent.Comp.AutoLock
+            ? Loc.GetString("artifact-crusher-examine-autolocks")
+            : Loc.GetString("artifact-crusher-examine-no-autolocks"));
 
     public void StopCrushing(Entity<ArtifactCrusherComponent> ent, bool early = true)
     {

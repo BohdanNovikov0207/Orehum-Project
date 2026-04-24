@@ -19,10 +19,10 @@ namespace Content.Shared.Magic.Events;
 public sealed partial class WorldSpawnSpellEvent : WorldTargetActionEvent
 {
     /// <summary>
-    /// The list of prototypes this spell will spawn
+    /// Lifetime to set for the entities to self delete
     /// </summary>
     [DataField]
-    public List<EntitySpawnEntry> Prototypes = new();
+    public float? Lifetime;
 
     // TODO: This offset is liable for deprecation.
     // TODO: Target tile via code instead?
@@ -34,8 +34,8 @@ public sealed partial class WorldSpawnSpellEvent : WorldTargetActionEvent
     public Vector2 Offset;
 
     /// <summary>
-    /// Lifetime to set for the entities to self delete
+    /// The list of prototypes this spell will spawn
     /// </summary>
     [DataField]
-    public float? Lifetime;
+    public List<EntitySpawnEntry> Prototypes = new();
 }

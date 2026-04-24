@@ -10,26 +10,24 @@ using Robust.Shared.Prototypes;
 namespace Content.Shared.Procedural;
 
 [Prototype]
-public sealed partial class SalvageDifficultyPrototype : IPrototype
+public sealed class SalvageDifficultyPrototype : IPrototype
 {
-    [IdDataField] public string ID { get; private set; } = string.Empty;
-
     /// <summary>
     /// Color to be used in UI.
     /// </summary>
-    [ViewVariables(VVAccess.ReadWrite), DataField("color")]
+    [ViewVariables(VVAccess.ReadWrite)] [DataField("color")]
     public Color Color = Color.White;
 
     /// <summary>
     /// How much loot this difficulty is allowed to spawn.
     /// </summary>
-    [DataField("lootBudget", required : true)]
+    [DataField("lootBudget", required: true)]
     public float LootBudget;
 
     /// <summary>
     /// How many mobs this difficulty is allowed to spawn.
     /// </summary>
-    [DataField("mobBudget", required : true)]
+    [DataField("mobBudget", required: true)]
     public float MobBudget;
 
     /// <summary>
@@ -40,4 +38,6 @@ public sealed partial class SalvageDifficultyPrototype : IPrototype
 
     [DataField("recommendedPlayers", required: true)]
     public int RecommendedPlayers;
+
+    [IdDataField] public string ID { get; } = string.Empty;
 }

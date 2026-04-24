@@ -10,7 +10,7 @@ namespace Content.Shared._EinsteinEngines.Silicon.BlindHealing;
 
 public abstract partial class SharedBlindHealingSystem : EntitySystem
 {
-    [Serializable, NetSerializable]
+    [Serializable] [NetSerializable]
     protected sealed partial class HealingDoAfterEvent : SimpleDoAfterEvent
     {
     }

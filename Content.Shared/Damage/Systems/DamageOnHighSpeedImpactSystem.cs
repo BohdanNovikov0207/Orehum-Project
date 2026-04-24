@@ -41,9 +41,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-using Content.Shared.Stunnable;
 using Content.Shared.Damage.Components;
 using Content.Shared.Effects;
+using Content.Shared.Stunnable;
 using Robust.Shared.Audio;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Physics.Events;
@@ -55,11 +55,11 @@ namespace Content.Shared.Damage.Systems;
 
 public sealed class DamageOnHighSpeedImpactSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _gameTiming = default!;
-    [Dependency] private readonly IRobustRandom _robustRandom = default!;
-    [Dependency] private readonly DamageableSystem _damageable = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedColorFlashEffectSystem _color = default!;
+    [Dependency] private readonly DamageableSystem _damageable = default!;
+    [Dependency] private readonly IGameTiming _gameTiming = default!;
+    [Dependency] private readonly IRobustRandom _robustRandom = default!;
     [Dependency] private readonly SharedStunSystem _stun = default!;
 
     public override void Initialize()
@@ -97,10 +97,15 @@ public sealed class DamageOnHighSpeedImpactSystem : EntitySystem
 
         if (_gameTiming.IsFirstTimePredicted)
             _audio.PlayPvs(component.SoundHit, uid, AudioParams.Default.WithVariation(0.125f).WithVolume(-0.125f));
-        _color.RaiseEffect(Color.Red, new List<EntityUid>() { uid }, Filter.Pvs(uid, entityManager: EntityManager));
+        _color.RaiseEffect(Color.Red, new List<EntityUid> { uid }, Filter.Pvs(uid, entityManager: EntityManager));
     }
 
-    public void ChangeCollide(EntityUid uid, float minimumSpeed, float stunSeconds, float damageCooldown, float speedDamage, DamageOnHighSpeedImpactComponent? collide = null)
+    public void ChangeCollide(EntityUid uid,
+        float minimumSpeed,
+        float stunSeconds,
+        float damageCooldown,
+        float speedDamage,
+        DamageOnHighSpeedImpactComponent? collide = null)
     {
         if (!Resolve(uid, ref collide, false))
             return;

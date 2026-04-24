@@ -6,5 +6,5 @@ namespace Content.Shared.Trigger.Components;
 /// Component used for tracking active timers triggers.
 /// Used internally for performance reasons.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class ActiveTimerTriggerComponent : Component;

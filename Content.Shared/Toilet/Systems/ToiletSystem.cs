@@ -1,11 +1,11 @@
 using Content.Shared.Buckle.Components;
 using Content.Shared.Interaction;
-using Content.Shared.Verbs;
 using Content.Shared.Plunger.Components;
+using Content.Shared.Toilet.Components;
+using Content.Shared.Verbs;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Random;
 using Robust.Shared.Utility;
-using Content.Shared.Toilet.Components;
 
 namespace Content.Shared.Toilet.Systems;
 
@@ -15,9 +15,9 @@ namespace Content.Shared.Toilet.Systems;
 /// </summary>
 public sealed class ToiletSystem : EntitySystem
 {
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
 
     public override void Initialize()
     {
@@ -66,6 +66,7 @@ public sealed class ToiletSystem : EntitySystem
             toggleVerb.Icon =
                 new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/VerbIcons/open.svg.192dpi.png"));
         }
+
         args.Verbs.Add(toggleVerb);
     }
 
@@ -78,12 +79,10 @@ public sealed class ToiletSystem : EntitySystem
         ToggleToiletSeat(ent.AsNullable(), args.User);
     }
 
-    private void UpdateAppearance(Entity<ToiletComponent> ent)
-    {
+    private void UpdateAppearance(Entity<ToiletComponent> ent) =>
         _appearance.SetData(ent,
             ToiletVisuals.SeatVisualState,
             ent.Comp.ToggleSeat ? SeatVisualState.SeatUp : SeatVisualState.SeatDown);
-    }
 
 
     /// <summary>
@@ -109,8 +108,6 @@ public sealed class ToiletSystem : EntitySystem
     /// someone's back. (That is, no one is seated on it.)
     /// </summary>
     /// <seealso cref="ToggleToiletSeat" />
-    public bool CanToggle(EntityUid uid)
-    {
-        return TryComp<StrapComponent>(uid, out var strap) && strap.BuckledEntities.Count == 0;
-    }
+    public bool CanToggle(EntityUid uid) =>
+        TryComp<StrapComponent>(uid, out var strap) && strap.BuckledEntities.Count == 0;
 }

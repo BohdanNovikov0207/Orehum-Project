@@ -30,20 +30,11 @@ public readonly struct StationRecordKey : IEquatable<StationRecordKey>
         OriginStation = originStation;
     }
 
-    public bool Equals(StationRecordKey other)
-    {
-        return Id == other.Id && OriginStation.Id == other.OriginStation.Id;
-    }
+    public bool Equals(StationRecordKey other) => Id == other.Id && OriginStation.Id == other.OriginStation.Id;
 
-    public override bool Equals(object? obj)
-    {
-        return obj is StationRecordKey other && Equals(other);
-    }
+    public override bool Equals(object? obj) => obj is StationRecordKey other && Equals(other);
 
-    public override int GetHashCode()
-    {
-        return HashCode.Combine(Id, OriginStation);
-    }
+    public override int GetHashCode() => HashCode.Combine(Id, OriginStation);
 
     public bool IsValid() => OriginStation.IsValid();
 }

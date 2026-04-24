@@ -3,9 +3,8 @@
 namespace Content.Shared.EntityEffects.Effects.PlantMetabolism;
 
 /// <summary>
-///     Handles removal of seeds on a plant.
+/// Handles removal of seeds on a plant.
 /// </summary>
-
 public sealed partial class PlantDestroySeeds : EventEntityEffect<PlantDestroySeeds>
 {
     protected override string? ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys) =>

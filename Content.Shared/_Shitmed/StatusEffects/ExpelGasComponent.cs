@@ -5,11 +5,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Shared.Atmos;
-using Robust.Shared.GameStates;
+
 namespace Content.Shared._Shitmed.StatusEffects;
 
 /// <summary>
-///     Randomly spawns gas of a given type.
+/// Randomly spawns gas of a given type.
 /// </summary>
 [RegisterComponent]
 public sealed partial class ExpelGasComponent : Component

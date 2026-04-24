@@ -20,18 +20,17 @@ namespace Content.Shared._Shitcode.Heretic.Systems;
 
 public abstract class SharedStarGazerSystem : EntitySystem
 {
-    [Dependency] protected readonly IGameTiming Timing = default!;
-    [Dependency] protected readonly SharedTransformSystem Xform = default!;
+    protected const string JointId = "stargaze";
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
+    [Dependency] private readonly SharedHereticSystem _heretic = default!;
+    [Dependency] private readonly SharedHereticAbilitySystem _hereticAbility = default!;
+    [Dependency] private readonly MovementSpeedModifierSystem _movement = default!;
 
     [Dependency] private readonly INetManager _net = default!;
-    [Dependency] private readonly SharedHereticAbilitySystem _hereticAbility = default!;
-    [Dependency] private readonly SharedHereticSystem _heretic = default!;
-    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
-    [Dependency] private readonly MovementSpeedModifierSystem _movement = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedStarMarkSystem _starMark = default!;
-
-    protected const string JointId = "stargaze";
+    [Dependency] protected readonly IGameTiming Timing = default!;
+    [Dependency] protected readonly SharedTransformSystem Xform = default!;
 
     public override void Initialize()
     {
@@ -57,10 +56,7 @@ public abstract class SharedStarGazerSystem : EntitySystem
         }
     }
 
-    private void OnStarGazeAttackAttempt(Entity<StarGazeComponent> ent, ref AttackAttemptEvent args)
-    {
-        args.Cancel();
-    }
+    private void OnStarGazeAttackAttempt(Entity<StarGazeComponent> ent, ref AttackAttemptEvent args) => args.Cancel();
 
     private void OnGetPosition(LaserBeamEndpointPositionEvent ev)
     {
@@ -98,10 +94,8 @@ public abstract class SharedStarGazerSystem : EntitySystem
             PredictedQueueDel(ent.Comp.BeamSoundEnt);
     }
 
-    protected virtual void OnStarGazeStartup(Entity<StarGazeComponent> ent, ref ComponentStartup args)
-    {
+    protected virtual void OnStarGazeStartup(Entity<StarGazeComponent> ent, ref ComponentStartup args) =>
         _movement.RefreshMovementSpeedModifiers(ent);
-    }
 
     private void OnRefreshMovespeed(Entity<StarGazeComponent> ent, ref RefreshMovementSpeedModifiersEvent args)
     {

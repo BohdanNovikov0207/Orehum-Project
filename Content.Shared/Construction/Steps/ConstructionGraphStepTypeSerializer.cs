@@ -21,75 +21,61 @@ using Robust.Shared.Serialization.Markdown.Mapping;
 using Robust.Shared.Serialization.Markdown.Validation;
 using Robust.Shared.Serialization.TypeSerializers.Interfaces;
 
-namespace Content.Shared.Construction.Steps
+namespace Content.Shared.Construction.Steps;
+
+[TypeSerializer]
+public sealed class ConstructionGraphStepTypeSerializer : ITypeReader<ConstructionGraphStep, MappingDataNode>
 {
-    [TypeSerializer]
-    public sealed class ConstructionGraphStepTypeSerializer : ITypeReader<ConstructionGraphStep, MappingDataNode>
+    public ConstructionGraphStep Read(ISerializationManager serializationManager,
+        MappingDataNode node,
+        IDependencyCollection dependencies,
+        SerializationHookContext hookCtx,
+        ISerializationContext? context = null,
+        ISerializationManager.InstantiationDelegate<ConstructionGraphStep>? instanceProvider = null)
     {
-        private Type? GetType(MappingDataNode node)
-        {
-            if (node.Has("material"))
-            {
-                return typeof(MaterialConstructionGraphStep);
-            }
+        var type = GetType(node) ??
+                   throw new ArgumentException(
+                       "Tried to convert invalid YAML node mapping to ConstructionGraphStep!");
 
-            if (node.Has("tool"))
-            {
-                return typeof(ToolConstructionGraphStep);
-            }
+        return (ConstructionGraphStep) serializationManager.Read(type, node, hookCtx, context)!;
+    }
 
-            if (node.Has("component"))
-            {
-                return typeof(ComponentConstructionGraphStep);
-            }
+    public ValidationNode Validate(ISerializationManager serializationManager,
+        MappingDataNode node,
+        IDependencyCollection dependencies,
+        ISerializationContext? context = null)
+    {
+        var type = GetType(node);
 
-            if (node.Has("tag"))
-            {
-                return typeof(TagConstructionGraphStep);
-            }
+        if (type == null)
+            return new ErrorNode(node, "No construction graph step type found.");
 
-            if (node.Has("allTags") || node.Has("anyTags"))
-            {
-                return typeof(MultipleTagsConstructionGraphStep);
-            }
+        return serializationManager.ValidateNode(type, node, context);
+    }
 
-            if (node.Has("minTemperature") || node.Has("maxTemperature"))
-            {
-                return typeof(TemperatureConstructionGraphStep);
-            }
+    private Type? GetType(MappingDataNode node)
+    {
+        if (node.Has("material"))
+            return typeof(MaterialConstructionGraphStep);
 
-            if (node.Has("assemblyId") || node.Has("guideString"))
-            {
-                return typeof(PartAssemblyConstructionGraphStep);
-            }
+        if (node.Has("tool"))
+            return typeof(ToolConstructionGraphStep);
 
-            return null;
-        }
+        if (node.Has("component"))
+            return typeof(ComponentConstructionGraphStep);
 
-        public ConstructionGraphStep Read(ISerializationManager serializationManager,
-            MappingDataNode node,
-            IDependencyCollection dependencies,
-            SerializationHookContext hookCtx,
-            ISerializationContext? context = null,
-            ISerializationManager.InstantiationDelegate<ConstructionGraphStep>? instanceProvider = null)
-        {
-            var type = GetType(node) ??
-                       throw new ArgumentException(
-                           "Tried to convert invalid YAML node mapping to ConstructionGraphStep!");
+        if (node.Has("tag"))
+            return typeof(TagConstructionGraphStep);
 
-            return (ConstructionGraphStep)serializationManager.Read(type, node, hookCtx, context)!;
-        }
+        if (node.Has("allTags") || node.Has("anyTags"))
+            return typeof(MultipleTagsConstructionGraphStep);
 
-        public ValidationNode Validate(ISerializationManager serializationManager, MappingDataNode node,
-            IDependencyCollection dependencies,
-            ISerializationContext? context = null)
-        {
-            var type = GetType(node);
+        if (node.Has("minTemperature") || node.Has("maxTemperature"))
+            return typeof(TemperatureConstructionGraphStep);
 
-            if (type == null)
-                return new ErrorNode(node, "No construction graph step type found.");
+        if (node.Has("assemblyId") || node.Has("guideString"))
+            return typeof(PartAssemblyConstructionGraphStep);
 
-            return serializationManager.ValidateNode(type, node, context);
-        }
+        return null;
     }
 }

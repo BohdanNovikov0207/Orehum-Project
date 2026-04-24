@@ -21,10 +21,9 @@ namespace Content.Shared.Timing;
 
 public sealed class UseDelaySystem : EntitySystem
 {
+    public const string DefaultId = "default";
     [Dependency] private readonly IGameTiming _gameTiming = default!;
     [Dependency] private readonly MetaDataSystem _metadata = default!;
-
-    public const string DefaultId = "default";
 
     public override void Initialize()
     {
@@ -50,20 +49,16 @@ public sealed class UseDelaySystem : EntitySystem
         }
     }
 
-    private void OnDelayGetState(Entity<UseDelayComponent> ent, ref ComponentGetState args)
-    {
-        args.State = new UseDelayComponentState()
+    private void OnDelayGetState(Entity<UseDelayComponent> ent, ref ComponentGetState args) =>
+        args.State = new UseDelayComponentState
         {
-            Delays = ent.Comp.Delays
+            Delays = ent.Comp.Delays,
         };
-    }
 
-    private void OnMapInit(Entity<UseDelayComponent> ent, ref MapInitEvent args)
-    {
+    private void OnMapInit(Entity<UseDelayComponent> ent, ref MapInitEvent args) =>
         // Set default delay length from the prototype
         // This makes it easier for simple use cases that only need a single delay
-        SetLength((ent, ent.Comp), ent.Comp.Delay, DefaultId);
-    }
+        SetLength((ent, ent.Comp), ent.Comp.Delay);
 
     private void OnUnpaused(Entity<UseDelayComponent> ent, ref EntityUnpausedEvent args)
     {
@@ -92,9 +87,7 @@ public sealed class UseDelaySystem : EntitySystem
             entry.Length = length;
         }
         else
-        {
             comp.Delays.Add(id, new UseDelayInfo(length));
-        }
 
         Dirty(ent);
         return true;
@@ -127,13 +120,15 @@ public sealed class UseDelaySystem : EntitySystem
     }
 
     /// <summary>
-    /// Tries to get info about the delay with the specified ID. See <see cref="UseDelayInfo"/>.
+    /// Tries to get info about the delay with the specified ID. See <see cref="UseDelayInfo" />.
     /// </summary>
     /// <param name="ent"></param>
     /// <param name="info"></param>
     /// <param name="id"></param>
     /// <returns></returns>
-    public bool TryGetDelayInfo(Entity<UseDelayComponent?> ent, [NotNullWhen(true)] out UseDelayInfo? info, string id = DefaultId)
+    public bool TryGetDelayInfo(Entity<UseDelayComponent?> ent,
+        [NotNullWhen(true)] out UseDelayInfo? info,
+        string id = DefaultId)
     {
         if (!Resolve(ent.Owner, ref ent.Comp, false))
         {
@@ -157,15 +152,18 @@ public sealed class UseDelaySystem : EntitySystem
             if (entry.Value.EndTime > last.EndTime)
                 last = entry.Value;
         }
+
         return last;
     }
 
     /// <summary>
     /// Resets the delay with the specified ID for this entity if possible.
     /// </summary>
-    /// <param name="checkDelayed">Check if the entity has an ongoing delay with the specified ID.
+    /// <param name="checkDelayed">
+    /// Check if the entity has an ongoing delay with the specified ID.
     /// If it does, return false and don't reset it.
-    /// Otherwise reset it and return true.</param>
+    /// Otherwise reset it and return true.
+    /// </param>
     public bool TryResetDelay(Entity<UseDelayComponent> ent, bool checkDelayed = false, string id = DefaultId)
     {
         if (checkDelayed && IsDelayed((ent.Owner, ent.Comp), id))
@@ -181,7 +179,10 @@ public sealed class UseDelaySystem : EntitySystem
         return true;
     }
 
-    public bool TryResetDelay(EntityUid uid, bool checkDelayed = false, UseDelayComponent? component = null, string id = DefaultId)
+    public bool TryResetDelay(EntityUid uid,
+        bool checkDelayed = false,
+        UseDelayComponent? component = null,
+        string id = DefaultId)
     {
         if (!Resolve(uid, ref component, false))
             return false;
@@ -200,6 +201,7 @@ public sealed class UseDelaySystem : EntitySystem
             entry.StartTime = curTime;
             entry.EndTime = curTime - _metadata.GetPauseTime(ent) + entry.Length;
         }
+
         Dirty(ent);
     }
 }

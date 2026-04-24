@@ -11,7 +11,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.NukeOps;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum WarDeclaratorUiKey
 {
     Key,
@@ -24,32 +24,33 @@ public enum WarConditionStatus : byte
     NoWarUnknown,
     NoWarTimeout,
     NoWarSmallCrew,
-    NoWarShuttleDeparted
+    NoWarShuttleDeparted,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class WarDeclaratorBoundUserInterfaceState : BoundUserInterfaceState
 {
-    public WarConditionStatus? Status;
-    public TimeSpan ShuttleDisabledTime;
     public TimeSpan EndTime;
+    public TimeSpan ShuttleDisabledTime;
+    public WarConditionStatus? Status;
 
-    public WarDeclaratorBoundUserInterfaceState(WarConditionStatus? status, TimeSpan endTime, TimeSpan shuttleDisabledTime)
+    public WarDeclaratorBoundUserInterfaceState(WarConditionStatus? status,
+        TimeSpan endTime,
+        TimeSpan shuttleDisabledTime)
     {
         Status = status;
         EndTime = endTime;
         ShuttleDisabledTime = shuttleDisabledTime;
     }
-
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class WarDeclaratorActivateMessage : BoundUserInterfaceMessage
 {
-    public string Message { get; }
-
     public WarDeclaratorActivateMessage(string msg)
     {
         Message = msg;
     }
+
+    public string Message { get; }
 }

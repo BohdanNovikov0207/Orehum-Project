@@ -13,8 +13,8 @@ namespace Content.Shared._Goobstation.Wizard.ScryingOrb;
 
 public abstract class SharedScryingOrbSystem : EntitySystem
 {
-    [Dependency] private readonly InventorySystem _inventory = default!;
     [Dependency] private readonly SharedHandsSystem _hands = default!;
+    [Dependency] private readonly InventorySystem _inventory = default!;
 
     public bool IsScryingOrbEquipped(EntityUid uid)
     {

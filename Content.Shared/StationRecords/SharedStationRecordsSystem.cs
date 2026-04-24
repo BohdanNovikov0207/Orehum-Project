@@ -7,24 +7,13 @@ namespace Content.Shared.StationRecords;
 
 public abstract class SharedStationRecordsSystem : EntitySystem
 {
-    public StationRecordKey? Convert((NetEntity, uint)? input)
-    {
-        return input == null ? null : Convert(input.Value);
-    }
+    public StationRecordKey? Convert((NetEntity, uint)? input) => input == null ? null : Convert(input.Value);
 
-    public (NetEntity, uint)? Convert(StationRecordKey? input)
-    {
-        return input == null ? null : Convert(input.Value);
-    }
+    public (NetEntity, uint)? Convert(StationRecordKey? input) => input == null ? null : Convert(input.Value);
 
-    public StationRecordKey Convert((NetEntity, uint) input)
-    {
-        return new StationRecordKey(input.Item2, GetEntity(input.Item1));
-    }
-    public (NetEntity, uint) Convert(StationRecordKey input)
-    {
-        return (GetNetEntity(input.OriginStation), input.Id);
-    }
+    public StationRecordKey Convert((NetEntity, uint) input) => new(input.Item2, GetEntity(input.Item1));
+
+    public (NetEntity, uint) Convert(StationRecordKey input) => (GetNetEntity(input.OriginStation), input.Id);
 
     public List<(NetEntity, uint)> Convert(ICollection<StationRecordKey> input)
     {
@@ -33,6 +22,7 @@ public abstract class SharedStationRecordsSystem : EntitySystem
         {
             result.Add(Convert(entry));
         }
+
         return result;
     }
 
@@ -43,6 +33,7 @@ public abstract class SharedStationRecordsSystem : EntitySystem
         {
             result.Add(Convert(entry));
         }
+
         return result;
     }
 }

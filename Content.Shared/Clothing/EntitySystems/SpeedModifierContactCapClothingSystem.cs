@@ -15,11 +15,11 @@ public sealed class SpeedModifierContactCapClothingSystem : EntitySystem
     {
         base.Initialize();
 
-        SubscribeLocalEvent<SpeedModifierContactCapClothingComponent, InventoryRelayedEvent<GetSpeedModifierContactCapEvent>>(OnGetMaxSlow);
+        SubscribeLocalEvent<SpeedModifierContactCapClothingComponent,
+            InventoryRelayedEvent<GetSpeedModifierContactCapEvent>>(OnGetMaxSlow);
     }
 
-    private void OnGetMaxSlow(Entity<SpeedModifierContactCapClothingComponent> ent, ref InventoryRelayedEvent<GetSpeedModifierContactCapEvent> args)
-    {
+    private void OnGetMaxSlow(Entity<SpeedModifierContactCapClothingComponent> ent,
+        ref InventoryRelayedEvent<GetSpeedModifierContactCapEvent> args) =>
         args.Args.SetIfMax(ent.Comp.MaxContactSprintSlowdown, ent.Comp.MaxContactWalkSlowdown);
-    }
 }

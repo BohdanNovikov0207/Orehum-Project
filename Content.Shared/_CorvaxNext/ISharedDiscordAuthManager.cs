@@ -2,8 +2,7 @@
 
 public interface ISharedDiscordAuthManager
 {
-    public void Initialize();
-
-    public bool IsOpt { get; }
-    public bool IsEnabled { get; }
+    bool IsOpt { get; }
+    bool IsEnabled { get; }
+    void Initialize();
 }

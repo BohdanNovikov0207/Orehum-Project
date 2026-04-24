@@ -1,4 +1,3 @@
-using Content.Shared.Access.Components;
 using Content.Shared.Access.Systems;
 using Content.Shared.Damage;
 using Content.Shared.Database;
@@ -16,16 +15,16 @@ using Robust.Shared.Utility;
 
 namespace Content.Shared.Turrets;
 
-public abstract partial class SharedDeployableTurretSystem : EntitySystem
+public abstract class SharedDeployableTurretSystem : EntitySystem
 {
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly UseDelaySystem _useDelay = default!;
     [Dependency] private readonly AccessReaderSystem _accessReader = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly DamageableSystem _damageable = default!;
     [Dependency] private readonly SharedPhysicsSystem _physics = default!;
-    [Dependency] private readonly SharedWiresSystem _wires = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly UseDelaySystem _useDelay = default!;
+    [Dependency] private readonly SharedWiresSystem _wires = default!;
 
     public override void Initialize()
     {
@@ -49,11 +48,14 @@ public abstract partial class SharedDeployableTurretSystem : EntitySystem
         var verb = new Verb
         {
             Priority = 1,
-            Text = ent.Comp.Enabled ? Loc.GetString("deployable-turret-component-deactivate") : Loc.GetString("deployable-turret-component-activate"),
-            Icon = new SpriteSpecifier.Texture(new("/Textures/Interface/VerbIcons/Spare/poweronoff.svg.192dpi.png")),
+            Text = ent.Comp.Enabled
+                ? Loc.GetString("deployable-turret-component-deactivate")
+                : Loc.GetString("deployable-turret-component-activate"),
+            Icon = new SpriteSpecifier.Texture(
+                new ResPath("/Textures/Interface/VerbIcons/Spare/poweronoff.svg.192dpi.png")),
             Disabled = !HasAmmo(ent),
             Impact = LogImpact.Low,
-            Act = () => { TryToggleState(ent, user); }
+            Act = () => { TryToggleState(ent, user); },
         };
 
         args.Verbs.Add(verb);
@@ -85,10 +87,8 @@ public abstract partial class SharedDeployableTurretSystem : EntitySystem
         args.Cancelled = true;
     }
 
-    public bool TryToggleState(Entity<DeployableTurretComponent> ent, EntityUid? user = null)
-    {
-        return TrySetState(ent, !ent.Comp.Enabled, user);
-    }
+    public bool TryToggleState(Entity<DeployableTurretComponent> ent, EntityUid? user = null) =>
+        TrySetState(ent, !ent.Comp.Enabled, user);
 
     public bool TrySetState(Entity<DeployableTurretComponent> ent, bool enabled, EntityUid? user = null)
     {
@@ -128,7 +128,8 @@ public abstract partial class SharedDeployableTurretSystem : EntitySystem
         // Determine how much time is remaining in the current animation and the one next in queue
         // We track this so that when a turret is toggled on/off, we can wait for all queued animations
         // to end before the turret's HTN is reactivated
-        var animTimeRemaining = MathF.Max((float)(ent.Comp.AnimationCompletionTime - _timing.CurTime).TotalSeconds, 0f);
+        var animTimeRemaining =
+            MathF.Max((float) (ent.Comp.AnimationCompletionTime - _timing.CurTime).TotalSeconds, 0f);
         var animTimeNext = enabled ? ent.Comp.DeploymentLength : ent.Comp.RetractionLength;
 
         ent.Comp.AnimationCompletionTime = _timing.CurTime + TimeSpan.FromSeconds(animTimeNext + animTimeRemaining);
@@ -144,9 +145,7 @@ public abstract partial class SharedDeployableTurretSystem : EntitySystem
         if (ent.Comp.DeployedFixture != null &&
             TryComp(ent, out FixturesComponent? fixtures) &&
             fixtures.Fixtures.TryGetValue(ent.Comp.DeployedFixture, out var fixture))
-        {
             _physics.SetHard(ent, fixture, enabled);
-        }
 
         // Play pop up message
         var msg = enabled ? "deployable-turret-component-activating" : "deployable-turret-component-deactivating";

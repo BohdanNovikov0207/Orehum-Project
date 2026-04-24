@@ -15,11 +15,11 @@ namespace Content.Shared.Random;
 /// Linter-friendly version of weightedRandom for Ore prototypes.
 /// </summary>
 [Prototype]
-public sealed partial class WeightedRandomOrePrototype : IWeightedRandomPrototype
+public sealed class WeightedRandomOrePrototype : IWeightedRandomPrototype
 {
     [IdDataField]
-    public string ID { get; private set; } = default!;
+    public string ID { get; } = default!;
 
     [DataField("weights", customTypeSerializer: typeof(PrototypeIdDictionarySerializer<float, OrePrototype>))]
-    public Dictionary<string, float> Weights { get; private set; } = new();
+    public Dictionary<string, float> Weights { get; } = new();
 }

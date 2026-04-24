@@ -72,34 +72,9 @@ using Robust.Shared.GameStates;
 
 namespace Content.Shared.Prying.Components;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState] // Shitmed Change
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState] // Shitmed Change
 public sealed partial class PryingComponent : Component
 {
-    /// <summary>
-    /// Whether the entity can pry open powered doors
-    /// </summary>
-    [DataField, AutoNetworkedField] // Shitmed Change
-    public bool PryPowered;
-
-    /// <summary>
-    /// Whether the tool can bypass certain restrictions when prying.
-    /// For example door bolts.
-    /// </summary>
-    [DataField]
-    public bool Force;
-    /// <summary>
-    /// Modifier on the prying time.
-    /// Lower values result in more time.
-    /// </summary>
-    [DataField, AutoNetworkedField] // Shitmed Change
-    public float SpeedModifier = 1.0f;
-
-    /// <summary>
-    /// What sound to play when prying is finished.
-    /// </summary>
-    [DataField]
-    public SoundSpecifier UseSound = new SoundPathSpecifier("/Audio/Items/crowbar.ogg");
-
     /// <summary>
     /// Whether the entity can currently pry things.
     /// </summary>
@@ -107,11 +82,37 @@ public sealed partial class PryingComponent : Component
     public bool Enabled = true;
 
     /// <summary>
+    /// Whether the tool can bypass certain restrictions when prying.
+    /// For example door bolts.
+    /// </summary>
+    [DataField]
+    public bool Force;
+
+    /// <summary>
     /// Goobstation
     /// Whether the tool is able to instantly pry unpowered unbolted doors and firelocks
     /// </summary>
     [DataField]
     public bool InstaPry = true;
+
+    /// <summary>
+    /// Whether the entity can pry open powered doors
+    /// </summary>
+    [DataField] [AutoNetworkedField] // Shitmed Change
+    public bool PryPowered;
+
+    /// <summary>
+    /// Modifier on the prying time.
+    /// Lower values result in more time.
+    /// </summary>
+    [DataField] [AutoNetworkedField] // Shitmed Change
+    public float SpeedModifier = 1.0f;
+
+    /// <summary>
+    /// What sound to play when prying is finished.
+    /// </summary>
+    [DataField]
+    public SoundSpecifier UseSound = new SoundPathSpecifier("/Audio/Items/crowbar.ogg");
 }
 
 /// <summary>
@@ -121,13 +122,6 @@ public sealed partial class PryingComponent : Component
 [ByRefEvent]
 public record struct BeforePryEvent(EntityUid User, bool PryPowered, bool Force, bool StrongPry)
 {
-    public readonly EntityUid User = User;
-
-    /// <summary>
-    /// Whether prying should be allowed even if whatever is being pried is powered.
-    /// </summary>
-    public readonly bool PryPowered = PryPowered;
-
     /// <summary>
     /// Whether prying should be allowed to go through under most circumstances. (E.g. airlock is bolted).
     /// Systems may still wish to ignore this occasionally.
@@ -135,13 +129,21 @@ public record struct BeforePryEvent(EntityUid User, bool PryPowered, bool Force,
     public readonly bool Force = Force;
 
     /// <summary>
-    /// Whether anything other than bare hands were used. This should only be false if prying is being performed without a prying comp.
+    /// Whether prying should be allowed even if whatever is being pried is powered.
+    /// </summary>
+    public readonly bool PryPowered = PryPowered;
+
+    /// <summary>
+    /// Whether anything other than bare hands were used. This should only be false if prying is being performed without a
+    /// prying comp.
     /// </summary>
     public readonly bool StrongPry = StrongPry;
 
-    public string? Message;
+    public readonly EntityUid User = User;
 
     public bool Cancelled;
+
+    public string? Message;
 }
 
 /// <summary>
@@ -160,10 +162,10 @@ public readonly record struct PriedEvent(EntityUid User)
 [ByRefEvent]
 public record struct GetPryTimeModifierEvent
 {
-    public readonly EntityUid User;
     public readonly bool InstaPry; // Goobstation
-    public float PryTimeModifier = 1.0f;
+    public readonly EntityUid User;
     public float BaseTime = 5.0f;
+    public float PryTimeModifier = 1.0f;
 
     public GetPryTimeModifierEvent(EntityUid user, bool instaPry) // Goob edit
     {

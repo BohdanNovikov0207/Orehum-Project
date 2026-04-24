@@ -21,14 +21,14 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Shared.Mind;
 using Robust.Shared.Network;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
-using Content.Shared.Mind;
 
 namespace Content.Shared.Administration;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed record PlayerInfo(
     string Username,
     string CharacterName,
@@ -52,13 +52,7 @@ public sealed record PlayerInfo(
     public string PlaytimeString => _playtimeString ??=
         OverallPlaytime?.ToString("%d':'hh':'mm") ?? Loc.GetString("generic-unknown-title");
 
-    public bool Equals(PlayerInfo? other)
-    {
-        return other?.SessionId == SessionId;
-    }
+    public bool Equals(PlayerInfo? other) => other?.SessionId == SessionId;
 
-    public override int GetHashCode()
-    {
-        return SessionId.GetHashCode();
-    }
+    public override int GetHashCode() => SessionId.GetHashCode();
 }

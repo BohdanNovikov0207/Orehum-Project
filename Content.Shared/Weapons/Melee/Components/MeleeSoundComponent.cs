@@ -19,6 +19,11 @@ namespace Content.Shared.Weapons.Melee.Components;
 public sealed partial class MeleeSoundComponent : Component
 {
     /// <summary>
+    /// Sound that plays if no damage is done.
+    /// </summary>
+    [DataField("noDamageSound")] public SoundSpecifier? NoDamageSound;
+
+    /// <summary>
     /// Specified sounds to apply when the entity takes damage with the specified group.
     /// Will fallback to defaults if none specified.
     /// </summary>
@@ -33,9 +38,4 @@ public sealed partial class MeleeSoundComponent : Component
     [DataField("soundTypes",
         customTypeSerializer: typeof(PrototypeIdDictionarySerializer<SoundSpecifier, DamageTypePrototype>))]
     public Dictionary<string, SoundSpecifier>? SoundTypes;
-
-    /// <summary>
-    /// Sound that plays if no damage is done.
-    /// </summary>
-    [DataField("noDamageSound")] public SoundSpecifier? NoDamageSound;
 }

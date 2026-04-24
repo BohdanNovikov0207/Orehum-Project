@@ -16,13 +16,13 @@ public sealed partial class CCVars
         CVarDef.Create("ooc.enabled_admin", true, CVar.NOTIFY);
 
     /// <summary>
-    ///     If true, whenever OOC is disabled the Discord OOC relay will also be disabled.
+    /// If true, whenever OOC is disabled the Discord OOC relay will also be disabled.
     /// </summary>
     public static readonly CVarDef<bool> DisablingOOCDisablesRelay =
         CVarDef.Create("ooc.disabling_ooc_disables_relay", true, CVar.SERVERONLY);
 
     /// <summary>
-    ///     Whether or not OOC chat should be enabled during a round.
+    /// Whether or not OOC chat should be enabled during a round.
     /// </summary>
     public static readonly CVarDef<bool> OocEnableDuringRound =
         CVarDef.Create("ooc.enable_during_round", false, CVar.NOTIFY | CVar.REPLICATED | CVar.SERVER);

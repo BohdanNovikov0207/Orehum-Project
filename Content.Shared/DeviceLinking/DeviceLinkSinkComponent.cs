@@ -40,7 +40,6 @@
 
 using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
-using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype.Set;
 using Robust.Shared.Timing;
 
 namespace Content.Shared.DeviceLinking;
@@ -51,10 +50,29 @@ namespace Content.Shared.DeviceLinking;
 public sealed partial class DeviceLinkSinkComponent : Component
 {
     /// <summary>
-    /// The ports this sink has
+    /// Counter used to throttle device invocations to avoid infinite loops.
+    /// </summary>
+    /// <remarks>
+    /// This is stored relative to <see cref="InvokeCounterTick" />. For reading the real value,
+    /// <see cref="SharedDeviceLinkSystem.GetEffectiveInvokeCounter" /> should be used.
+    /// </remarks>
+    [DataField]
+    [Access(typeof(SharedDeviceLinkSystem), Other = AccessPermissions.None)]
+    public int InvokeCounter;
+
+    /// <summary>
+    /// The tick <see cref="InvokeCounter" /> was set at. Used to calculate the real value for the current tick.
+    /// </summary>
+    [Access(typeof(SharedDeviceLinkSystem), Other = AccessPermissions.None)]
+    public GameTick InvokeCounterTick;
+
+    /// <summary>
+    /// How high the invoke counter is allowed to get before the links to the sink are removed and the
+    /// DeviceLinkOverloadedEvent gets raised
+    /// If the invoke limit is smaller than 1 the sink can't overload
     /// </summary>
     [DataField]
-    public HashSet<ProtoId<SinkPortPrototype>> Ports = new();
+    public int InvokeLimit = 10;
 
     /// <summary>
     /// Used for removing a sink from all linked sources when this component gets removed.
@@ -64,26 +82,8 @@ public sealed partial class DeviceLinkSinkComponent : Component
     public HashSet<EntityUid> LinkedSources = new();
 
     /// <summary>
-    /// The tick <see cref="InvokeCounter"/> was set at. Used to calculate the real value for the current tick.
-    /// </summary>
-    [Access(typeof(SharedDeviceLinkSystem), Other = AccessPermissions.None)]
-    public GameTick InvokeCounterTick;
-
-    /// <summary>
-    /// Counter used to throttle device invocations to avoid infinite loops.
-    /// </summary>
-    /// <remarks>
-    /// This is stored relative to <see cref="InvokeCounterTick"/>. For reading the real value,
-    /// <see cref="SharedDeviceLinkSystem.GetEffectiveInvokeCounter"/> should be used.
-    /// </remarks>
-    [DataField]
-    [Access(typeof(SharedDeviceLinkSystem), Other = AccessPermissions.None)]
-    public int InvokeCounter;
-
-    /// <summary>
-    /// How high the invoke counter is allowed to get before the links to the sink are removed and the DeviceLinkOverloadedEvent gets raised
-    /// If the invoke limit is smaller than 1 the sink can't overload
+    /// The ports this sink has
     /// </summary>
     [DataField]
-    public int InvokeLimit = 10;
+    public HashSet<ProtoId<SinkPortPrototype>> Ports = new();
 }

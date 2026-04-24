@@ -30,7 +30,7 @@ public enum StandardVoteType : byte
     /// <summary>
     /// Vote to kick a player.
     /// </summary>
-    Votekick
+    Votekick,
 }
 
 /// <summary>
@@ -40,5 +40,5 @@ public enum VotekickReasonType : byte
 {
     Raiding,
     Cheating,
-    Spam
+    Spam,
 }

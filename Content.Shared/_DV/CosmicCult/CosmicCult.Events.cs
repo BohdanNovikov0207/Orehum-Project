@@ -2,20 +2,20 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared._DV.CosmicCult;
 
-[Serializable, NetSerializable]
-public sealed partial class CosmicSiphonIndicatorEvent(NetEntity target) : EntityEventArgs
+[Serializable] [NetSerializable]
+public sealed class CosmicSiphonIndicatorEvent(NetEntity target) : EntityEventArgs
 {
     public NetEntity Target = target;
 
-    public CosmicSiphonIndicatorEvent() : this(new())
+    public CosmicSiphonIndicatorEvent() : this(new NetEntity())
     {
     }
 }
 
-public sealed partial class CosmicCultLeadChangedEvent() : EntityEventArgs
+public sealed class CosmicCultLeadChangedEvent : EntityEventArgs
 {
 }
 
-public sealed partial class CosmicCultAddedCultistEvent(): EntityEventArgs
+public sealed class CosmicCultAddedCultistEvent : EntityEventArgs
 {
 }

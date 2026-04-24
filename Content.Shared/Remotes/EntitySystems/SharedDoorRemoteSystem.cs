@@ -5,8 +5,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-using Content.Shared.Popups;
 using Content.Shared.Interaction.Events;
+using Content.Shared.Popups;
 using Content.Shared.Remotes.Components;
 
 namespace Content.Shared.Remotes.EntitySystems;
@@ -15,10 +15,7 @@ public abstract class SharedDoorRemoteSystem : EntitySystem
 {
     [Dependency] protected readonly SharedPopupSystem Popup = default!;
 
-    public override void Initialize()
-    {
-        SubscribeLocalEvent<DoorRemoteComponent, UseInHandEvent>(OnInHandActivation);
-    }
+    public override void Initialize() => SubscribeLocalEvent<DoorRemoteComponent, UseInHandEvent>(OnInHandActivation);
 
     private void OnInHandActivation(Entity<DoorRemoteComponent> entity, ref UseInHandEvent args)
     {
@@ -45,6 +42,7 @@ public abstract class SharedDoorRemoteSystem : EntitySystem
                 throw new InvalidOperationException(
                     $"{nameof(DoorRemoteComponent)} had invalid mode {entity.Comp.Mode}");
         }
+
         Dirty(entity);
         Popup.PopupClient(Loc.GetString(switchMessageId), entity, args.User);
     }

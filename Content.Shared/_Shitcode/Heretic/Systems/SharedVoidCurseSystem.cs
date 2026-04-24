@@ -21,8 +21,8 @@ namespace Content.Shared._Goobstation.Heretic.Systems;
 
 public abstract class SharedVoidCurseSystem : EntitySystem
 {
-    [Dependency] private readonly MovementSpeedModifierSystem _modifier = default!;
     [Dependency] private readonly SharedHereticSystem _heretic = default!;
+    [Dependency] private readonly MovementSpeedModifierSystem _modifier = default!;
 
     public override void Initialize()
     {
@@ -59,14 +59,11 @@ public abstract class SharedVoidCurseSystem : EntitySystem
         args.ModifySpeed(modifier, modifier, true);
     }
 
-    protected void RefreshLifetime(VoidCurseComponent comp)
-    {
+    protected void RefreshLifetime(VoidCurseComponent comp) =>
         comp.Lifetime = comp.MaxLifetime + comp.LifetimeIncreasePerLevel * comp.Stacks;
-    }
 
     public bool DoCurse(EntityUid uid, float stacks = 1, float max = 0)
     {
-
         if (!HasComp<MobStateComponent>(uid))
             return false; // ignore non mobs because holy shit
 

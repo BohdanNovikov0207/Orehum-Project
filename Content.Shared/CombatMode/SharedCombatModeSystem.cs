@@ -31,17 +31,16 @@ using Content.Shared.Mind;
 using Content.Shared.MouseRotator;
 using Content.Shared.Movement.Components;
 using Content.Shared.Popups;
-using Robust.Shared.Network;
 using Robust.Shared.Timing;
 
 namespace Content.Shared.CombatMode;
 
 public abstract class SharedCombatModeSystem : EntitySystem
 {
+    [Dependency] private readonly SharedActionsSystem _actionsSystem = default!;
+    [Dependency] private readonly SharedMindSystem _mind = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] protected readonly IGameTiming Timing = default!;
-    [Dependency] private   readonly SharedActionsSystem _actionsSystem = default!;
-    [Dependency] private   readonly SharedPopupSystem _popup = default!;
-    [Dependency] private   readonly SharedMindSystem  _mind = default!;
 
     public override void Initialize()
     {
@@ -72,7 +71,6 @@ public abstract class SharedCombatModeSystem : EntitySystem
 
         args.Handled = true;
         SetInCombatMode(uid, !component.IsInCombatMode, component);
-
     }
 
     public void SetCanDisarm(EntityUid entity, bool canDisarm, CombatModeComponent? component = null)
@@ -83,10 +81,8 @@ public abstract class SharedCombatModeSystem : EntitySystem
         component.CanDisarm = canDisarm;
     }
 
-    public bool IsInCombatMode(EntityUid? entity, CombatModeComponent? component = null)
-    {
-        return entity != null && Resolve(entity.Value, ref component, false) && component.IsInCombatMode;
-    }
+    public bool IsInCombatMode(EntityUid? entity, CombatModeComponent? component = null) =>
+        entity != null && Resolve(entity.Value, ref component, false) && component.IsInCombatMode;
 
     public virtual void SetInCombatMode(EntityUid entity, bool value, CombatModeComponent? component = null)
     {
@@ -134,5 +130,4 @@ public abstract class SharedCombatModeSystem : EntitySystem
 
 public sealed partial class ToggleCombatActionEvent : InstantActionEvent
 {
-
 }

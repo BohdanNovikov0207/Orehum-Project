@@ -1,7 +1,7 @@
-using Content.Shared.Mobs.Components;
-using Content.Shared.Storage.Components;
 using Content.Shared.Examine;
+using Content.Shared.Mobs.Components;
 using Content.Shared.Morgue.Components;
+using Content.Shared.Storage.Components;
 using Robust.Shared.Player;
 
 namespace Content.Shared.Morgue;
@@ -34,26 +34,25 @@ public abstract class SharedMorgueSystem : EntitySystem
             MorgueContents.HasSoul => "morgue-entity-storage-component-on-examine-details-body-has-soul",
             MorgueContents.HasContents => "morgue-entity-storage-component-on-examine-details-has-contents",
             MorgueContents.HasMob => "morgue-entity-storage-component-on-examine-details-body-has-no-soul",
-            _ => "morgue-entity-storage-component-on-examine-details-empty"
+            _ => "morgue-entity-storage-component-on-examine-details-empty",
         };
 
         args.PushMarkup(Loc.GetString(text));
     }
 
-    private void OnClosed(Entity<MorgueComponent> ent, ref StorageAfterCloseEvent args)
-    {
+    private void OnClosed(Entity<MorgueComponent> ent, ref StorageAfterCloseEvent args) =>
         CheckContents(ent.Owner, ent.Comp);
-    }
 
-    private void OnOpened(Entity<MorgueComponent> ent, ref StorageAfterOpenEvent args)
-    {
+    private void OnOpened(Entity<MorgueComponent> ent, ref StorageAfterOpenEvent args) =>
         CheckContents(ent.Owner, ent.Comp);
-    }
 
     /// <summary>
     /// Updates data in case something died/got deleted in the morgue.
     /// </summary>
-    public void CheckContents(EntityUid uid, MorgueComponent? morgue = null, EntityStorageComponent? storage = null, AppearanceComponent? app = null)
+    public void CheckContents(EntityUid uid,
+        MorgueComponent? morgue = null,
+        EntityStorageComponent? storage = null,
+        AppearanceComponent? app = null)
     {
         if (!Resolve(uid, ref morgue, ref storage, ref app))
             return;
@@ -78,6 +77,9 @@ public abstract class SharedMorgueSystem : EntitySystem
             }
         }
 
-        _appearance.SetData(uid, MorgueVisuals.Contents, hasMob ? MorgueContents.HasMob : MorgueContents.HasContents, app);
+        _appearance.SetData(uid,
+            MorgueVisuals.Contents,
+            hasMob ? MorgueContents.HasMob : MorgueContents.HasContents,
+            app);
     }
 }

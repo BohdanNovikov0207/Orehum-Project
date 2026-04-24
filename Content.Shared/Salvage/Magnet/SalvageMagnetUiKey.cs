@@ -7,5 +7,5 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Salvage.Magnet;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum SalvageMagnetUiKey : byte { Key }

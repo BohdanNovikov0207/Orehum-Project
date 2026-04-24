@@ -85,11 +85,11 @@ public sealed partial class EntSelector : EntityTableSelector
 {
     public const string IdDataFieldTag = "id";
 
-    [DataField(IdDataFieldTag, required: true)]
-    public EntProtoId Id;
-
     [DataField]
     public NumberSelector Amount = new ConstantNumberSelector(1);
+
+    [DataField(IdDataFieldTag, required: true)]
+    public EntProtoId Id;
 
     protected override IEnumerable<EntProtoId> GetSpawnsImplementation(System.Random rand,
         IEntityManager entMan,

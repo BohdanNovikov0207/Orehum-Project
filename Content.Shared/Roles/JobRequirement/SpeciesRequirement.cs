@@ -88,7 +88,7 @@ namespace Content.Shared.Roles;
 /// Requires the character to be or not be on the list of specified species
 /// </summary>
 [UsedImplicitly]
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class SpeciesRequirement : JobRequirement
 {
     [DataField(required: true)]

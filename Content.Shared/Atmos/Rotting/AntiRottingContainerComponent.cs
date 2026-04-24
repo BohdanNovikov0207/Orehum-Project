@@ -13,5 +13,4 @@ namespace Content.Shared.Atmos.Rotting;
 [RegisterComponent]
 public sealed partial class AntiRottingContainerComponent : Component
 {
-
 }

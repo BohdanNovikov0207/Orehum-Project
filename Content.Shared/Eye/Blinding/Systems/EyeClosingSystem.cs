@@ -15,12 +15,12 @@ namespace Content.Shared.Eye.Blinding.Systems;
 
 public sealed class EyeClosingSystem : EntitySystem
 {
-    [Dependency] private readonly INetManager _net = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly BlindableSystem _blindableSystem = default!;
     [Dependency] private readonly SharedActionsSystem _actionsSystem = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly BlindableSystem _blindableSystem = default!;
+    [Dependency] private readonly INetManager _net = default!;
     [Dependency] private readonly ISharedPlayerManager _playerManager = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -55,10 +55,8 @@ public sealed class EyeClosingSystem : EntitySystem
         SetEyelids((eyelids.Owner, eyelids.Comp), !eyelids.Comp.EyesClosed);
     }
 
-    private void OnHandleState(Entity<EyeClosingComponent> eyelids, ref AfterAutoHandleStateEvent args)
-    {
+    private void OnHandleState(Entity<EyeClosingComponent> eyelids, ref AfterAutoHandleStateEvent args) =>
         DoAudioFeedback((eyelids.Owner, eyelids.Comp), eyelids.Comp.EyesClosed);
-    }
 
     private void OnTrySee(Entity<EyeClosingComponent> eyelids, ref CanSeeAttemptEvent args)
     {
@@ -71,10 +69,8 @@ public sealed class EyeClosingSystem : EntitySystem
     /// </summary>
     /// <param name="eyelids">The entity that contains an EyeClosingComponent</param>
     /// <returns>Exactly what this function says on the tin. True if eyes are closed, false if they're open.</returns>
-    public bool AreEyesClosed(Entity<EyeClosingComponent?> eyelids)
-    {
-        return Resolve(eyelids, ref eyelids.Comp, false) && eyelids.Comp.EyesClosed;
-    }
+    public bool AreEyesClosed(Entity<EyeClosingComponent?> eyelids) =>
+        Resolve(eyelids, ref eyelids.Comp, false) && eyelids.Comp.EyesClosed;
 
     /// <summary>
     /// Sets whether or not the entity's eyelids are closed.

@@ -8,12 +8,6 @@ namespace Content.Shared.EntityTable.ValueSelector;
 public sealed partial class BinomialNumberSelector : NumberSelector
 {
     /// <summary>
-    /// How many times to try including an entry. i.e. the Max.
-    /// </summary>
-    [DataField]
-    public int Trials = 1;
-
-    /// <summary>
     /// The odds a single trial succeeds
     /// </summary>
     /// <remarks>
@@ -22,16 +16,23 @@ public sealed partial class BinomialNumberSelector : NumberSelector
     [DataField]
     public float Chance = .5f;
 
+    /// <summary>
+    /// How many times to try including an entry. i.e. the Max.
+    /// </summary>
+    [DataField]
+    public int Trials = 1;
+
     public override int Get(System.Random rand)
     {
         var random = IoCManager.Resolve<IRobustRandom>();
-        int count = 0;
+        var count = 0;
 
-        for (int i = 0; i < Trials; i++)
+        for (var i = 0; i < Trials; i++)
         {
             if (random.Prob(Chance))
                 count++;
         }
+
         return count;
         // get binomialed motherfucker
     }

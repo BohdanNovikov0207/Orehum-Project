@@ -9,7 +9,7 @@ using Robust.Shared.GameStates;
 
 namespace Content.Shared._Goobstation.Weapons.SmartGun;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class SmartGunComponent : Component
 {
     [DataField]

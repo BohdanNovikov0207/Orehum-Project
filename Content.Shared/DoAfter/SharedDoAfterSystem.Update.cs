@@ -78,14 +78,13 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Shared._Shitmed.Antags.Abductor;
 using Content.Shared.Gravity;
 using Content.Shared.Hands.Components;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Interaction;
-
-// Shitmed Change
-using Content.Shared._Shitmed.Antags.Abductor;
 using Content.Shared.Silicons.StationAi;
+// Shitmed Change
 
 namespace Content.Shared.DoAfter;
 
@@ -93,8 +92,8 @@ public abstract partial class SharedDoAfterSystem : EntitySystem
 {
     [Dependency] private readonly IDynamicTypeFactory _factory = default!;
     [Dependency] private readonly SharedGravitySystem _gravity = default!;
-    [Dependency] private readonly SharedInteractionSystem _interaction = default!;
     [Dependency] private readonly SharedHandsSystem _hands = default!;
+    [Dependency] private readonly SharedInteractionSystem _interaction = default!;
 
     private DoAfter[] _doAfters = Array.Empty<DoAfter>();
 
@@ -139,6 +138,7 @@ public abstract partial class SharedDoAfterSystem : EntitySystem
                     comp.DoAfters.Remove(doAfter.Index);
                     dirty = true;
                 }
+
                 continue;
             }
 
@@ -149,6 +149,7 @@ public abstract partial class SharedDoAfterSystem : EntitySystem
                     comp.DoAfters.Remove(doAfter.Index);
                     dirty = true;
                 }
+
                 continue;
             }
 
@@ -236,7 +237,7 @@ public abstract partial class SharedDoAfterSystem : EntitySystem
         if (args.Used is { } used && !xformQuery.HasComponent(used))
             return true;
 
-        if (args.EventTarget is {Valid: true} eventTarget && !xformQuery.HasComponent(eventTarget))
+        if (args.EventTarget is { Valid: true } eventTarget && !xformQuery.HasComponent(eventTarget))
             return true;
 
         if (!xformQuery.TryGetComponent(args.User, out var userXform))
@@ -301,16 +302,19 @@ public abstract partial class SharedDoAfterSystem : EntitySystem
 
             // If an item was in the user's hand to begin with,
             // check if the user is no longer holding the item.
-            if (args.BreakOnDropItem && doAfter.InitialItem != null && !_hands.IsHolding((args.User, hands), doAfter.InitialItem))
-                    return true;
+            if (args.BreakOnDropItem && doAfter.InitialItem != null &&
+                !_hands.IsHolding((args.User, hands), doAfter.InitialItem))
+                return true;
 
             // If the user changes which hand is active at all, interrupt the do-after
             if (args.BreakOnHandChange && hands.ActiveHandId != doAfter.InitialHand)
                 return true;
         }
 
-        var hasNoSpecificComponents = !HasComp<StationAiOverlayComponent>(args.User) && !HasComp<AbductorScientistComponent>(args.User); // Shitmed Change
-        if (args.RequireCanInteract && !_actionBlocker.CanInteract(args.User, args.Target) && hasNoSpecificComponents) // Shitmed Change
+        var hasNoSpecificComponents = !HasComp<StationAiOverlayComponent>(args.User) &&
+                                      !HasComp<AbductorScientistComponent>(args.User); // Shitmed Change
+        if (args.RequireCanInteract && !_actionBlocker.CanInteract(args.User, args.Target) &&
+            hasNoSpecificComponents) // Shitmed Change
             return true;
 
 

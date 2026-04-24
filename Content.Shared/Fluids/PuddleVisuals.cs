@@ -8,12 +8,11 @@
 
 using Robust.Shared.Serialization;
 
-namespace Content.Shared.Fluids
+namespace Content.Shared.Fluids;
+
+[Serializable] [NetSerializable]
+public enum PuddleVisuals : byte
 {
-    [Serializable, NetSerializable]
-    public enum PuddleVisuals : byte
-    {
-        CurrentVolume,
-        SolutionColor,
-    }
+    CurrentVolume,
+    SolutionColor,
 }

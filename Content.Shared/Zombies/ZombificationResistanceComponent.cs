@@ -7,21 +7,21 @@ namespace Content.Shared.Zombies;
 /// An armor-esque component for clothing that grants "resistance" (lowers the chance) against getting infected.
 /// It works on a coefficient system, so 0.3 is better than 0.9, 1 is no resistance, and 0 is full resistance.
 /// </summary>
-[NetworkedComponent, RegisterComponent]
+[NetworkedComponent] [RegisterComponent]
 public sealed partial class ZombificationResistanceComponent : Component
 {
-    /// <summary>
-    ///  The multiplier that will by applied to the zombification chance.
-    /// </summary>
-    [DataField]
-    public float ZombificationResistanceCoefficient = 1;
-
     /// <summary>
     /// Examine string for the zombification resistance.
     /// Passed <c>value</c> from 0 to 100.
     /// </summary>
     [DataField]
     public LocId Examine = "zombification-resistance-coefficient-value";
+
+    /// <summary>
+    /// The multiplier that will by applied to the zombification chance.
+    /// </summary>
+    [DataField]
+    public float ZombificationResistanceCoefficient = 1;
 }
 
 /// <summary>
@@ -29,11 +29,6 @@ public sealed partial class ZombificationResistanceComponent : Component
 /// </summary>
 public sealed class ZombificationResistanceQueryEvent : EntityEventArgs, IInventoryRelayEvent
 {
-    /// <summary>
-    /// All slots to relay to
-    /// </summary>
-    public SlotFlags TargetSlots { get; }
-
     /// <summary>
     /// The Total of all Coefficients.
     /// </summary>
@@ -43,4 +38,9 @@ public sealed class ZombificationResistanceQueryEvent : EntityEventArgs, IInvent
     {
         TargetSlots = slots;
     }
+
+    /// <summary>
+    /// All slots to relay to
+    /// </summary>
+    public SlotFlags TargetSlots { get; }
 }

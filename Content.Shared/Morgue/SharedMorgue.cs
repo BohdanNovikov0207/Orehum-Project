@@ -15,13 +15,13 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Morgue;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum MorgueVisuals : byte
 {
-    Contents
+    Contents,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum MorgueContents : byte
 {
     Empty,
@@ -30,7 +30,7 @@ public enum MorgueContents : byte
     HasContents,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum CrematoriumVisuals : byte
 {
     Burning,

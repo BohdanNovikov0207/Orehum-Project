@@ -12,7 +12,7 @@ namespace Content.Shared.HotPotato;
 /// <summary>
 /// Added to an activated hot potato. Controls hot potato transfer on server / effect spawning on client.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 [Access(typeof(SharedHotPotatoSystem))]
 public sealed partial class ActiveHotPotatoComponent : Component
 {

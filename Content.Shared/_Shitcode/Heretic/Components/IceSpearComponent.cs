@@ -3,15 +3,15 @@ using Robust.Shared.GameStates;
 
 namespace Content.Shared._Shitcode.Heretic.Components;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class IceSpearComponent : Component
 {
     [DataField]
     public EntityUid? ActionId;
 
     [DataField]
-    public SoundSpecifier ShatterSound = new SoundCollectionSpecifier("GlassBreak");
+    public TimeSpan ShatterCooldown = TimeSpan.FromSeconds(45);
 
     [DataField]
-    public TimeSpan ShatterCooldown = TimeSpan.FromSeconds(45);
+    public SoundSpecifier ShatterSound = new SoundCollectionSpecifier("GlassBreak");
 }

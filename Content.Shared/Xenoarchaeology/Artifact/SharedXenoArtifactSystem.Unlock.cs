@@ -54,8 +54,8 @@ public abstract partial class SharedXenoArtifactSystem
 
         if (!HasUnlockedPredecessor((artifact.Value, artiComp), ent)
             // unlocked final nodes should not listen for unlocking
-            || (!ent.Comp.Locked && GetSuccessorNodes((artifact.Value, artiComp), (ent.Owner, ent.Comp)).Count == 0)
-            )
+            || !ent.Comp.Locked && GetSuccessorNodes((artifact.Value, artiComp), (ent.Owner, ent.Comp)).Count == 0
+           )
             return false;
 
         return true;
@@ -168,7 +168,6 @@ public abstract partial class SharedXenoArtifactSystem
         var unlockingFinishedEvent = new ArtifactUnlockingFinishedEvent(node);
         RaiseLocalEvent(ent.Owner, ref unlockingFinishedEvent);
     }
-
 }
 
 /// <summary>

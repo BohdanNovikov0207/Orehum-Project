@@ -34,21 +34,6 @@ namespace Content.Shared._Goobstation.Wizard.BindSoul;
 
 public abstract class SharedBindSoulSystem : EntitySystem
 {
-    [Dependency] protected readonly SharedTransformSystem TransformSystem = default!;
-    [Dependency] protected readonly SharedMindSystem Mind = default!;
-    [Dependency] protected readonly SharedStunSystem Stun = default!;
-    [Dependency] protected readonly MetaDataSystem Meta = default!;
-    [Dependency] protected readonly SharedContainerSystem Container = default!;
-    [Dependency] protected readonly NpcFactionSystem Faction = default!;
-    [Dependency] protected readonly GrammarSystem Grammar = default!;
-    [Dependency] private   readonly TagSystem _tag = default!;
-    [Dependency] private   readonly SharedActionsSystem _actions = default!;
-    [Dependency] private   readonly SharedBodySystem _body = default!;
-    [Dependency] private   readonly SharedPhysicsSystem _physics = default!;
-    [Dependency] private   readonly SharedGravitySystem _gravity = default!;
-    [Dependency] private   readonly IPrototypeManager _proto = default!;
-    [Dependency] private   readonly INetManager _net = default!;
-
     public static readonly ProtoId<TagPrototype> IgnoreBindSoulTag = "IgnoreBindSoul"; // Goobstation
 
     private static readonly ProtoId<TagPrototype> ActionTag = "BindSoulAction";
@@ -58,6 +43,20 @@ public abstract class SharedBindSoulSystem : EntitySystem
     protected static readonly EntProtoId LichPrototype = "MobSkeletonPerson";
 
     protected static readonly ProtoId<StartingGearPrototype> LichGear = "LichGear";
+    [Dependency] private readonly SharedActionsSystem _actions = default!;
+    [Dependency] private readonly SharedBodySystem _body = default!;
+    [Dependency] private readonly SharedGravitySystem _gravity = default!;
+    [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
+    [Dependency] private readonly IPrototypeManager _proto = default!;
+    [Dependency] private readonly TagSystem _tag = default!;
+    [Dependency] protected readonly SharedContainerSystem Container = default!;
+    [Dependency] protected readonly NpcFactionSystem Faction = default!;
+    [Dependency] protected readonly GrammarSystem Grammar = default!;
+    [Dependency] protected readonly MetaDataSystem Meta = default!;
+    [Dependency] protected readonly SharedMindSystem Mind = default!;
+    [Dependency] protected readonly SharedStunSystem Stun = default!;
+    [Dependency] protected readonly SharedTransformSystem TransformSystem = default!;
 
     public override void Initialize()
     {
@@ -89,7 +88,8 @@ public abstract class SharedBindSoulSystem : EntitySystem
 
     private void OnMindGetRemoved(Entity<SoulBoundComponent> ent, ref MindGotRemovedEvent args)
     {
-        if (_net.IsClient || _tag.HasTag(args.Container, IgnoreBindSoulTag) || HasComp<GhostComponent>(args.Container) ||
+        if (_net.IsClient || _tag.HasTag(args.Container, IgnoreBindSoulTag) ||
+            HasComp<GhostComponent>(args.Container) ||
             Terminating(args.Container))
             return;
 
@@ -118,9 +118,9 @@ public abstract class SharedBindSoulSystem : EntitySystem
                 return;
         }
         else if ((itemXform.GridUid == null &&
-                 (!TryComp(item.Value, out PhysicsComponent? body) ||
-                  _gravity.IsWeightless(item.Value, body, itemXform)) ||
-                 itemXform.GridUid != xform.GridUid) && // If it is in space or on another grid
+                  (!TryComp(item.Value, out PhysicsComponent? body) ||
+                   _gravity.IsWeightless(item.Value, body, itemXform)) ||
+                  itemXform.GridUid != xform.GridUid) && // If it is in space or on another grid
                  !RespawnItem(item.Value, itemXform, xform))
             return;
 
@@ -138,10 +138,7 @@ public abstract class SharedBindSoulSystem : EntitySystem
         Dirty(particle, homing);
     }
 
-    private bool Deleting(EntityUid uid)
-    {
-        return TerminatingOrDeleted(uid) || EntityManager.IsQueuedForDeletion(uid);
-    }
+    private bool Deleting(EntityUid uid) => TerminatingOrDeleted(uid) || EntityManager.IsQueuedForDeletion(uid);
 
     private bool ItemExistsAndOnSamePlane([NotNullWhen(true)] EntityUid? item,
         EntityUid? mapUid,
@@ -171,10 +168,8 @@ public abstract class SharedBindSoulSystem : EntitySystem
         }
     }
 
-    private void OnExamined(Entity<PhylacteryComponent> ent, ref ExaminedEvent args)
-    {
+    private void OnExamined(Entity<PhylacteryComponent> ent, ref ExaminedEvent args) =>
         args.PushMarkup(Loc.GetString("ensouled-item-desc"));
-    }
 
     private void OnInit(Entity<PhylacteryComponent> ent, ref ComponentInit args)
     {
@@ -192,10 +187,8 @@ public abstract class SharedBindSoulSystem : EntitySystem
     {
     }
 
-    protected virtual bool RespawnItem(EntityUid item, TransformComponent itemXform, TransformComponent userXform)
-    {
-        return false;
-    }
+    protected virtual bool RespawnItem(EntityUid item, TransformComponent itemXform, TransformComponent userXform) =>
+        false;
 
     protected virtual void MakeDestructible(EntityUid uid)
     {

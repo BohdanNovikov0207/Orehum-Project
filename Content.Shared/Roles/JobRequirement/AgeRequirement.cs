@@ -87,7 +87,7 @@ namespace Content.Shared.Roles;
 /// Requires the character to be older or younger than a certain age (inclusive)
 /// </summary>
 [UsedImplicitly]
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class AgeRequirement : JobRequirement
 {
     [DataField(required: true)]

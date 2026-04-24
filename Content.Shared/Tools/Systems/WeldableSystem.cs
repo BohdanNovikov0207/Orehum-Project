@@ -31,9 +31,9 @@ namespace Content.Shared.Tools.Systems;
 public sealed class WeldableSystem : EntitySystem
 {
     [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
-    [Dependency] private readonly SharedToolSystem _toolSystem = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
     [Dependency] private readonly SharedPhysicsSystem _physics = default!;
+    [Dependency] private readonly SharedToolSystem _toolSystem = default!;
     private EntityQuery<WeldableComponent> _query;
 
     public override void Initialize()
@@ -47,10 +47,8 @@ public sealed class WeldableSystem : EntitySystem
         _query = GetEntityQuery<WeldableComponent>();
     }
 
-    public bool IsWelded(EntityUid uid, WeldableComponent? component = null)
-    {
-        return _query.Resolve(uid, ref component, false) && component.IsWelded;
-    }
+    public bool IsWelded(EntityUid uid, WeldableComponent? component = null) =>
+        _query.Resolve(uid, ref component, false) && component.IsWelded;
 
     private void OnExamine(EntityUid uid, WeldableComponent component, ExaminedEvent args)
     {
@@ -88,11 +86,19 @@ public sealed class WeldableSystem : EntitySystem
         if (!CanWeld(uid, tool, user, component))
             return false;
 
-        if (!_toolSystem.UseTool(tool, user, uid, component.Time.Seconds, component.WeldingQuality, new WeldFinishedEvent(), component.Fuel))
+        if (!_toolSystem.UseTool(tool,
+                user,
+                uid,
+                component.Time.Seconds,
+                component.WeldingQuality,
+                new WeldFinishedEvent(),
+                component.Fuel))
             return false;
 
         // Log attempt
-        _adminLogger.Add(LogType.Action, LogImpact.Low, $"{ToPrettyString(user):user} is {(component.IsWelded ? "un" : "")}welding {ToPrettyString(uid):target} at {Transform(uid).Coordinates:targetlocation}");
+        _adminLogger.Add(LogType.Action,
+            LogImpact.Low,
+            $"{ToPrettyString(user):user} is {(component.IsWelded ? "un" : "")}welding {ToPrettyString(uid):target} at {Transform(uid).Coordinates:targetlocation}");
 
         return true;
     }
@@ -109,7 +115,9 @@ public sealed class WeldableSystem : EntitySystem
         SetWeldedState(uid, !component.IsWelded, component);
 
         // Log success
-        _adminLogger.Add(LogType.Action, LogImpact.Low, $"{ToPrettyString(args.User):user} {(!component.IsWelded ? "un" : "")}welded {ToPrettyString(uid):target}");
+        _adminLogger.Add(LogType.Action,
+            LogImpact.Low,
+            $"{ToPrettyString(args.User):user} {(!component.IsWelded ? "un" : "")}welded {ToPrettyString(uid):target}");
     }
 
     private void OnWeldChanged(EntityUid uid, LayerChangeOnWeldComponent component, ref WeldableChangedEvent args)

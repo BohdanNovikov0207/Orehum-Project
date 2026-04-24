@@ -17,45 +17,30 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Inventory;
-using Robust.Shared.GameStates;
-using Robust.Shared.Serialization;
-using Robust.Shared.Utility;
-
-// Shitmed Change
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared._Shitmed.Medical.Surgery.Traumas;
-using Content.Shared._Shitmed.Medical.Surgery.Traumas.Components;
 using Content.Shared._Shitmed.Medical.Surgery.Traumas.Systems;
 using Content.Shared.Body.Part;
 using Content.Shared.Damage;
-using Content.Goobstation.Maths.FixedPoint;
+using Content.Shared.Inventory;
+using Robust.Shared.GameStates;
+using Robust.Shared.Utility;
+// Shitmed Change
 
 namespace Content.Shared.Armor;
 
 /// <summary>
 /// Used for clothing that reduces damage when worn.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState, Access(typeof(SharedArmorSystem), typeof(TraumaSystem))] // Shitmed Change
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
+[Access(typeof(SharedArmorSystem), typeof(TraumaSystem))] // Shitmed Change
 public sealed partial class ArmorComponent : Component
 {
     /// <summary>
-    /// The damage reduction
+    /// Shitmed Change: thankfully all the armor in the game is symmetrical.
     /// </summary>
-    [DataField(required: true), AutoNetworkedField]
-    public DamageModifierSet Modifiers = default!;
-
-    /// <summary>
-    /// Shitmed Change: A multiplier applied to the calculated point value
-    /// to determine the monetary value of the armor
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public float PriceMultiplier = 1;
-
-    /// <summary>
-    /// If true, you can examine the armor to see the protection. If false, the verb won't appear.
-    /// </summary>
-    [DataField]
-    public bool ShowArmorOnExamine = true;
+    [DataField("coverage")] [Access(Other = AccessPermissions.ReadExecute)] // Goob edit
+    public List<BodyPartType> ArmorCoverage = new();
 
     /// <summary>
     /// Shitmed Change: If true, the coverage won't show.
@@ -70,15 +55,28 @@ public sealed partial class ArmorComponent : Component
     public bool ArmourModifiersHidden = false;
 
     /// <summary>
-    /// Shitmed Change: thankfully all the armor in the game is symmetrical.
+    /// The damage reduction
     /// </summary>
-    [DataField("coverage"), Access(Other = AccessPermissions.ReadExecute)] // Goob edit
-    public List<BodyPartType> ArmorCoverage = new();
+    [DataField(required: true)] [AutoNetworkedField]
+    public DamageModifierSet Modifiers = default!;
+
+    /// <summary>
+    /// Shitmed Change: A multiplier applied to the calculated point value
+    /// to determine the monetary value of the armor
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public float PriceMultiplier = 1;
+
+    /// <summary>
+    /// If true, you can examine the armor to see the protection. If false, the verb won't appear.
+    /// </summary>
+    [DataField]
+    public bool ShowArmorOnExamine = true;
 
     /// <summary>
     /// Shitmed Change: The amount of dismemberment chance deduction.
     /// </summary>
-    [DataField, Access(Other = AccessPermissions.ReadExecute)] // Goob edit
+    [DataField] [Access(Other = AccessPermissions.ReadExecute)] // Goob edit
     public Dictionary<TraumaType, FixedPoint2> TraumaDeductions = new()
     {
         { TraumaType.Dismemberment, 0 },
@@ -101,18 +99,18 @@ public record struct ArmorExamineEvent(FormattedMessage Msg);
 /// </summary>
 public sealed class CoefficientQueryEvent : EntityEventArgs, IInventoryRelayEvent
 {
-    /// <summary>
-    /// All slots to relay to
-    /// </summary>
-    public SlotFlags TargetSlots { get; set; }
-
-    /// <summary>
-    /// The Total of all Coefficients.
-    /// </summary>
-    public DamageModifierSet DamageModifiers { get; set; } = new DamageModifierSet();
-
     public CoefficientQueryEvent(SlotFlags slots)
     {
         TargetSlots = slots;
     }
+
+    /// <summary>
+    /// The Total of all Coefficients.
+    /// </summary>
+    public DamageModifierSet DamageModifiers { get; set; } = new();
+
+    /// <summary>
+    /// All slots to relay to
+    /// </summary>
+    public SlotFlags TargetSlots { get; set; }
 }

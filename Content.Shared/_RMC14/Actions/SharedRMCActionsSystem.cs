@@ -23,7 +23,8 @@ public abstract class SharedRMCActionsSystem : EntitySystem
 
         SubscribeLocalEvent<ActionCooldownComponent, RMCActionUseEvent>(OnCooldownUse);
 
-        SubscribeLocalEvent<ActionInRangeUnobstructedComponent, RMCActionUseAttemptEvent>(OnInRangeUnobstructedUseAttempt);
+        SubscribeLocalEvent<ActionInRangeUnobstructedComponent, RMCActionUseAttemptEvent>(
+            OnInRangeUnobstructedUseAttempt);
 
         SubscribeLocalEvent<ActionComponent, ActionReducedUseDelayEvent>(OnReducedUseDelayEvent);
     }
@@ -58,7 +59,8 @@ public abstract class SharedRMCActionsSystem : EntitySystem
                 continue;
 
             // Same ID or primary ID found in subset of other action's ids
-            if ((shared.Id != null && shared.Id == action.Comp.Id) || (action.Comp.Id != null && shared.Ids.Contains(action.Comp.Id.Value)))
+            if (shared.Id != null && shared.Id == action.Comp.Id ||
+                action.Comp.Id != null && shared.Ids.Contains(action.Comp.Id.Value))
                 _actions.SetIfBiggerCooldown(actionId, action.Comp.Cooldown);
         }
     }
@@ -66,23 +68,21 @@ public abstract class SharedRMCActionsSystem : EntitySystem
     /// <summary>
     /// Enable all events that have a shared cooldown with the provided action
     /// </summary>
-    public void EnableSharedCooldownEvents(Entity<ActionSharedCooldownComponent?> action, EntityUid performer)
-    {
+    public void EnableSharedCooldownEvents(Entity<ActionSharedCooldownComponent?> action, EntityUid performer) =>
         SetStatusOfSharedCooldownEvents(action, performer, true);
-    }
 
     /// <summary>
     /// Disable all events that have a shared cooldown with the provided action
     /// </summary>
-    public void DisableSharedCooldownEvents(Entity<ActionSharedCooldownComponent?> action, EntityUid performer)
-    {
+    public void DisableSharedCooldownEvents(Entity<ActionSharedCooldownComponent?> action, EntityUid performer) =>
         SetStatusOfSharedCooldownEvents(action, performer, false);
-    }
 
     /// <summary>
     /// Sets the enabled status of all events that have a shared cooldown with the provided action
     /// </summary>
-    private void SetStatusOfSharedCooldownEvents(Entity<ActionSharedCooldownComponent?> action, EntityUid performer, bool newStatus)
+    private void SetStatusOfSharedCooldownEvents(Entity<ActionSharedCooldownComponent?> action,
+        EntityUid performer,
+        bool newStatus)
     {
         if (!Resolve(action, ref action.Comp, false))
             return;
@@ -97,10 +97,8 @@ public abstract class SharedRMCActionsSystem : EntitySystem
 
             // Same ID or primary ID found in subset of other action's ids
             if (!(shared.Id != null && shared.Id == action.Comp.Id || action.Comp.Id != null &&
-                  (shared.Ids.Contains(action.Comp.Id.Value) || shared.ActiveIds.Contains(action.Comp.Id.Value))))
-            {
+                    (shared.Ids.Contains(action.Comp.Id.Value) || shared.ActiveIds.Contains(action.Comp.Id.Value))))
                 continue;
-            }
 
             _actions.SetEnabled((actionId, comp), newStatus);
         }
@@ -155,12 +153,11 @@ public abstract class SharedRMCActionsSystem : EntitySystem
         Dirty(ent.Owner, shared);
     }
 
-    private void OnCooldownUse(Entity<ActionCooldownComponent> ent, ref RMCActionUseEvent args)
-    {
+    private void OnCooldownUse(Entity<ActionCooldownComponent> ent, ref RMCActionUseEvent args) =>
         _actions.SetIfBiggerCooldown(ent.Owner, ent.Comp.Cooldown);
-    }
 
-    private void OnInRangeUnobstructedUseAttempt(Entity<ActionInRangeUnobstructedComponent> ent, ref RMCActionUseAttemptEvent args)
+    private void OnInRangeUnobstructedUseAttempt(Entity<ActionInRangeUnobstructedComponent> ent,
+        ref RMCActionUseAttemptEvent args)
     {
         if (args.Cancelled)
             return;
@@ -241,10 +238,11 @@ public abstract class SharedRMCActionsSystem : EntitySystem
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class RMCMissedTargetActionEvent : EntityEventArgs
 {
     public readonly NetEntity Action;
+
     public RMCMissedTargetActionEvent(NetEntity actionId)
     {
         Action = actionId;

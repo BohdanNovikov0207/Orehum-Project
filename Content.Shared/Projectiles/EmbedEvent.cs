@@ -12,10 +12,10 @@ namespace Content.Shared.Projectiles;
 [ByRefEvent]
 public readonly record struct EmbedEvent(EntityUid? Shooter, EntityUid Embedded)
 {
-    public readonly EntityUid? Shooter = Shooter;
-
     /// <summary>
     /// Entity that is embedded in.
     /// </summary>
     public readonly EntityUid Embedded = Embedded;
+
+    public readonly EntityUid? Shooter = Shooter;
 }

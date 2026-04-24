@@ -23,13 +23,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Shared.Gravity;
-using Content.Shared.Inventory; // Goobstation
+using Content.Shared.Inventory;
 using Content.Shared.StepTrigger.Components;
 using Content.Shared.Whitelist;
 using Robust.Shared.Map.Components;
-using Robust.Shared.Physics;
 using Robust.Shared.Physics.Components;
 using Robust.Shared.Physics.Events;
+// Goobstation
 
 namespace Content.Shared.StepTrigger.Systems;
 
@@ -69,21 +69,20 @@ public sealed class StepTriggerSystem : EntitySystem
         while (enumerator.MoveNext(out var uid, out var active, out var trigger, out var transform))
         {
             if (!Update(uid, trigger, transform, query))
-            {
                 continue;
-            }
 
             RemCompDeferred(uid, active);
         }
     }
 
-    private bool Update(EntityUid uid, StepTriggerComponent component, TransformComponent transform, EntityQuery<PhysicsComponent> query)
+    private bool Update(EntityUid uid,
+        StepTriggerComponent component,
+        TransformComponent transform,
+        EntityQuery<PhysicsComponent> query)
     {
         if (!component.Active ||
             component.Colliding.Count == 0)
-        {
             return true;
-        }
 
         if (component.Blacklist != null && TryComp<MapGridComponent>(transform.GridUid, out var grid))
         {
@@ -96,9 +95,7 @@ public sealed class StepTriggerSystem : EntitySystem
                     continue;
 
                 if (_whitelistSystem.IsBlacklistPass(component.Blacklist, ent.Value))
-                {
                     return false;
-                }
             }
         }
 
@@ -110,7 +107,11 @@ public sealed class StepTriggerSystem : EntitySystem
         return false;
     }
 
-    private void UpdateColliding(EntityUid uid, StepTriggerComponent component, TransformComponent ownerXform, EntityUid otherUid, EntityQuery<PhysicsComponent> query)
+    private void UpdateColliding(EntityUid uid,
+        StepTriggerComponent component,
+        TransformComponent ownerXform,
+        EntityUid otherUid,
+        EntityQuery<PhysicsComponent> query)
     {
         if (!query.TryGetComponent(otherUid, out var otherPhysics))
             return;
@@ -123,9 +124,7 @@ public sealed class StepTriggerSystem : EntitySystem
         if (!ourAabb.Intersects(otherAabb))
         {
             if (component.CurrentlySteppedOn.Remove(otherUid))
-            {
                 Dirty(uid, component);
-            }
             return;
         }
 
@@ -137,9 +136,7 @@ public sealed class StepTriggerSystem : EntitySystem
             || component.CurrentlySteppedOn.Contains(otherUid)
             || ratio < component.IntersectRatio
             || !CanTrigger(uid, otherUid, component))
-        {
             return;
-        }
 
         if (component.StepOn)
         {
@@ -221,21 +218,15 @@ public sealed class StepTriggerSystem : EntitySystem
         }
 
         if (component.Colliding.Count == 0)
-        {
             RemCompDeferred<StepTriggerActiveComponent>(uid);
-        }
     }
 
     private void TriggerHandleState(EntityUid uid, StepTriggerComponent component, ref AfterAutoHandleStateEvent args)
     {
         if (component.Colliding.Count > 0)
-        {
             EnsureComp<StepTriggerActiveComponent>(uid);
-        }
         else
-        {
             RemCompDeferred<StepTriggerActiveComponent>(uid);
-        }
     }
 
     public void SetIntersectRatio(EntityUid uid, float ratio, StepTriggerComponent? component = null)
@@ -287,7 +278,10 @@ public sealed class StepTriggerSystem : EntitySystem
         Dirty(uid, component);
     }
 
-    private void OnTerminating(EntityUid uid, StepTriggerCleanupComponent component, ref EntityTerminatingEvent args) // Goobstation - Fix
+    private void
+        OnTerminating(EntityUid uid,
+            StepTriggerCleanupComponent component,
+            ref EntityTerminatingEvent args) // Goobstation - Fix
     {
         if (!TryComp<StepTriggerComponent>(component.StepTrigger, out var step))
             return;
@@ -295,7 +289,6 @@ public sealed class StepTriggerSystem : EntitySystem
         if (step.Colliding.Remove(uid) || step.CurrentlySteppedOn.Remove(uid))
             Dirty(component.StepTrigger, step);
     }
-
 }
 
 [ByRefEvent]
@@ -305,8 +298,9 @@ public struct StepTriggerAttemptEvent : IInventoryRelayEvent // Goobstation
     public EntityUid Source;
     public EntityUid Tripper;
     public bool Continue;
+
     /// <summary>
-    ///     Set by systems which wish to cancel the step trigger event, regardless of event ordering.
+    /// Set by systems which wish to cancel the step trigger event, regardless of event ordering.
     /// </summary>
     public bool Cancelled;
 }

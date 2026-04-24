@@ -65,10 +65,8 @@ public abstract class SharedWizardMirrorSystem : EntitySystem
             args.Cancel();
     }
 
-    private void OnBeforeUIOpen(Entity<WizardMirrorComponent> ent, ref BeforeActivatableUIOpenEvent args)
-    {
+    private void OnBeforeUIOpen(Entity<WizardMirrorComponent> ent, ref BeforeActivatableUIOpenEvent args) =>
         UpdateInterface(ent, args.User, ent);
-    }
 
     protected void UpdateInterface(EntityUid mirrorUid, EntityUid targetUid, WizardMirrorComponent component)
     {
@@ -115,19 +113,19 @@ public abstract class SharedWizardMirrorSystem : EntitySystem
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum WizardMirrorUiKey : byte
 {
-    Key
+    Key,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class WizardMirrorUiState(HumanoidCharacterProfile profile) : BoundUserInterfaceState
 {
     public HumanoidCharacterProfile Profile = profile;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class WizardMirrorMessage(HumanoidCharacterProfile profile) : BoundUserInterfaceMessage
 {
     public HumanoidCharacterProfile Profile = profile;

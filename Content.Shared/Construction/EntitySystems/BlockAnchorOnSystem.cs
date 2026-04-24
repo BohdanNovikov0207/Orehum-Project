@@ -11,17 +11,17 @@ using Robust.Shared.Map.Components;
 namespace Content.Shared.Construction.EntitySystems;
 
 /// <summary>
-/// Prevents anchoring an item in the same tile as an item matching the <see cref="EntityWhitelist"/>.
-/// <seealso cref="BlockAnchorOnComponent"/>
+/// Prevents anchoring an item in the same tile as an item matching the <see cref="EntityWhitelist" />.
+/// <seealso cref="BlockAnchorOnComponent" />
 /// </summary>
 public sealed class BlockAnchorOnSystem : EntitySystem
 {
-    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
     [Dependency] private readonly SharedMapSystem _map = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
     [Dependency] private readonly SharedTransformSystem _xform = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
@@ -31,7 +31,7 @@ public sealed class BlockAnchorOnSystem : EntitySystem
     }
 
     /// <summary>
-    /// Handles the <see cref="AnchorStateChangedEvent"/>.
+    /// Handles the <see cref="AnchorStateChangedEvent" />.
     /// </summary>
     private void OnAnchorStateChanged(Entity<BlockAnchorOnComponent> ent, ref AnchorStateChangedEvent args)
     {
@@ -46,7 +46,7 @@ public sealed class BlockAnchorOnSystem : EntitySystem
     }
 
     /// <summary>
-    /// Handles the <see cref="AnchorAttemptEvent"/>.
+    /// Handles the <see cref="AnchorAttemptEvent" />.
     /// </summary>
     private void OnAnchorAttempt(Entity<BlockAnchorOnComponent> ent, ref AnchorAttemptEvent args)
     {

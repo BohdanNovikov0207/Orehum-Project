@@ -14,14 +14,21 @@ namespace Content.Shared.CriminalRecords;
 /// Criminal record for a crewmember.
 /// Can be viewed and edited in a criminal records console by security.
 /// </summary>
-[Serializable, NetSerializable, DataRecord]
-public sealed partial record CriminalRecord
+[Serializable] [NetSerializable] [DataRecord]
+public sealed record CriminalRecord
 {
     /// <summary>
-    /// Status of the person (None, Wanted, Detained).
+    /// Criminal history of the person.
+    /// This should have charges and time served added after someone is detained.
     /// </summary>
     [DataField]
-    public SecurityStatus Status = SecurityStatus.None;
+    public List<CrimeHistory> History = new();
+
+    /// <summary>
+    /// The name of the person who changed the status.
+    /// </summary>
+    [DataField]
+    public string? InitiatorName;
 
     /// <summary>
     /// When Status is Wanted, the reason for it.
@@ -31,21 +38,14 @@ public sealed partial record CriminalRecord
     public string? Reason;
 
     /// <summary>
-    /// The name of the person who changed the status.
+    /// Status of the person (None, Wanted, Detained).
     /// </summary>
     [DataField]
-    public string? InitiatorName;
-
-    /// <summary>
-    /// Criminal history of the person.
-    /// This should have charges and time served added after someone is detained.
-    /// </summary>
-    [DataField]
-    public List<CrimeHistory> History = new();
+    public SecurityStatus Status = SecurityStatus.None;
 }
 
 /// <summary>
 /// A line of criminal activity and the time it was added at.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public record struct CrimeHistory(TimeSpan AddTime, string Crime, string? InitiatorName);

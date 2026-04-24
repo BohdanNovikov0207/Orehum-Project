@@ -15,62 +15,60 @@ using Lidgren.Network;
 using Robust.Shared.Network;
 using Robust.Shared.Serialization;
 
-namespace Content.Shared.Administration
+namespace Content.Shared.Administration;
+
+public sealed class MsgUpdateAdminStatus : NetMessage
 {
-    public sealed class MsgUpdateAdminStatus : NetMessage
+    public AdminData? Admin;
+    public string[] AvailableCommands = Array.Empty<string>();
+    public override MsgGroups MsgGroup => MsgGroups.Command;
+
+    public override NetDeliveryMethod DeliveryMethod => NetDeliveryMethod.ReliableOrdered;
+
+    public override void ReadFromBuffer(NetIncomingMessage buffer, IRobustSerializer serializer)
     {
-        public override MsgGroups MsgGroup => MsgGroups.Command;
+        var count = buffer.ReadVariableInt32();
 
-        public AdminData? Admin;
-        public string[] AvailableCommands = Array.Empty<string>();
+        AvailableCommands = new string[count];
 
-        public override void ReadFromBuffer(NetIncomingMessage buffer, IRobustSerializer serializer)
+        for (var i = 0; i < count; i++)
         {
-            var count = buffer.ReadVariableInt32();
-
-            AvailableCommands = new string[count];
-
-            for (var i = 0; i < count; i++)
-            {
-                AvailableCommands[i] = buffer.ReadString();
-            }
-
-            if (buffer.ReadBoolean())
-            {
-                var active = buffer.ReadBoolean();
-                buffer.ReadPadBits();
-                var flags = (AdminFlags) buffer.ReadUInt32();
-                var title = buffer.ReadString();
-
-                Admin = new AdminData
-                {
-                    Active = active,
-                    Title = title,
-                    Flags = flags,
-                };
-            }
-
+            AvailableCommands[i] = buffer.ReadString();
         }
 
-        public override void WriteToBuffer(NetOutgoingMessage buffer, IRobustSerializer serializer)
+        if (buffer.ReadBoolean())
         {
-            buffer.WriteVariableInt32(AvailableCommands.Length);
+            var active = buffer.ReadBoolean();
+            buffer.ReadPadBits();
+            var flags = (AdminFlags) buffer.ReadUInt32();
+            var title = buffer.ReadString();
 
-            foreach (var cmd in AvailableCommands)
+            Admin = new AdminData
             {
-                buffer.Write(cmd);
-            }
+                Active = active,
+                Title = title,
+                Flags = flags,
+            };
+        }
+    }
 
-            buffer.Write(Admin != null);
+    public override void WriteToBuffer(NetOutgoingMessage buffer, IRobustSerializer serializer)
+    {
+        buffer.WriteVariableInt32(AvailableCommands.Length);
 
-            if (Admin == null) return;
-
-            buffer.Write(Admin.Active);
-            buffer.WritePadBits();
-            buffer.Write((uint) Admin.Flags);
-            buffer.Write(Admin.Title);
+        foreach (var cmd in AvailableCommands)
+        {
+            buffer.Write(cmd);
         }
 
-        public override NetDeliveryMethod DeliveryMethod => NetDeliveryMethod.ReliableOrdered;
+        buffer.Write(Admin != null);
+
+        if (Admin == null)
+            return;
+
+        buffer.Write(Admin.Active);
+        buffer.WritePadBits();
+        buffer.Write((uint) Admin.Flags);
+        buffer.Write(Admin.Title);
     }
 }

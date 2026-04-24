@@ -13,22 +13,14 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototy
 namespace Content.Shared.Weapons.Ranged.Components;
 
 /// <summary>
-///     Simply provides a certain capacity of entities that cannot be reloaded through normal means and have
-///     no special behavior like cycling, magazine
+/// Simply provides a certain capacity of entities that cannot be reloaded through normal means and have
+/// no special behavior like cycling, magazine
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class BasicEntityAmmoProviderComponent : AmmoProviderComponent
 {
-    [ViewVariables(VVAccess.ReadWrite)]
-    [DataField("proto", customTypeSerializer:typeof(PrototypeIdSerializer<EntityPrototype>))]
-    public string? Proto; // Goob edit
-
-    // Goobstation
-    [DataField]
-    public ProtoId<WeightedRandomEntityPrototype>? Prototypes;
-
     /// <summary>
-    ///     Max capacity.
+    /// Max capacity.
     /// </summary>
     [ViewVariables(VVAccess.ReadWrite)]
     [DataField("capacity")]
@@ -36,10 +28,18 @@ public sealed partial class BasicEntityAmmoProviderComponent : AmmoProviderCompo
     public int? Capacity = null;
 
     /// <summary>
-    ///     Actual ammo left. Initialized to capacity unless they are non-null and differ.
+    /// Actual ammo left. Initialized to capacity unless they are non-null and differ.
     /// </summary>
     [ViewVariables(VVAccess.ReadWrite)]
     [DataField("count")]
     [AutoNetworkedField]
     public int? Count = null;
+
+    [ViewVariables(VVAccess.ReadWrite)]
+    [DataField("proto", customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
+    public string? Proto; // Goob edit
+
+    // Goobstation
+    [DataField]
+    public ProtoId<WeightedRandomEntityPrototype>? Prototypes;
 }

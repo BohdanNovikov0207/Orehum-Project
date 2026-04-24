@@ -7,7 +7,7 @@ using Robust.Shared.Configuration;
 namespace Content.Shared._CorvaxGoob.CCCVars;
 
 /// <summary>
-///     Corvax modules console variables
+/// Corvax modules console variables
 /// </summary>
 [CVarDefs]
 // ReSharper disable once InconsistentNaming

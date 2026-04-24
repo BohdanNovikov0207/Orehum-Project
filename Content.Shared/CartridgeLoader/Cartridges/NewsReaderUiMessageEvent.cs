@@ -7,7 +7,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.CartridgeLoader.Cartridges;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class NewsReaderUiMessageEvent : CartridgeMessageEvent
 {
     public readonly NewsReaderUiAction Action;
@@ -18,10 +18,10 @@ public sealed class NewsReaderUiMessageEvent : CartridgeMessageEvent
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum NewsReaderUiAction
 {
     Next,
     Prev,
-    NotificationSwitch
+    NotificationSwitch,
 }

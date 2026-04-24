@@ -5,11 +5,11 @@
 //
 // SPDX-License-Identifier: MIT
 
-using Content.Shared.Physics;
-using Robust.Shared.Physics;
 using System.Linq;
 using Content.Shared.Movement.Systems;
+using Content.Shared.Physics;
 using Content.Shared.Revenant.Components;
+using Robust.Shared.Physics;
 using Robust.Shared.Physics.Systems;
 
 namespace Content.Shared.Revenant.EntitySystems;
@@ -34,10 +34,8 @@ public abstract class SharedCorporealSystem : EntitySystem
         SubscribeLocalEvent<CorporealComponent, RefreshMovementSpeedModifiersEvent>(OnRefresh);
     }
 
-    private void OnRefresh(EntityUid uid, CorporealComponent component, RefreshMovementSpeedModifiersEvent args)
-    {
+    private void OnRefresh(EntityUid uid, CorporealComponent component, RefreshMovementSpeedModifiersEvent args) =>
         args.ModifySpeed(component.MovementSpeedDebuff, component.MovementSpeedDebuff);
-    }
 
     public virtual void OnStartup(EntityUid uid, CorporealComponent component, ComponentStartup args)
     {
@@ -47,9 +45,18 @@ public abstract class SharedCorporealSystem : EntitySystem
         {
             var fixture = fixtures.Fixtures.First();
 
-            _physics.SetCollisionMask(uid, fixture.Key, fixture.Value, (int) CollisionGroup.MobMask, fixtures); // Goobstation - mob layer is set to regular mobs to prevent walking under doors.
-            _physics.SetCollisionLayer(uid, fixture.Key, fixture.Value, (int) CollisionGroup.MobLayer, fixtures); // Goobstation - mob layer is set to regular mobs to prevent walking under doors.
+            _physics.SetCollisionMask(uid,
+                fixture.Key,
+                fixture.Value,
+                (int) CollisionGroup.MobMask,
+                fixtures); // Goobstation - mob layer is set to regular mobs to prevent walking under doors.
+            _physics.SetCollisionLayer(uid,
+                fixture.Key,
+                fixture.Value,
+                (int) CollisionGroup.MobLayer,
+                fixtures); // Goobstation - mob layer is set to regular mobs to prevent walking under doors.
         }
+
         _movement.RefreshMovementSpeedModifiers(uid);
     }
 
@@ -62,8 +69,13 @@ public abstract class SharedCorporealSystem : EntitySystem
             var fixture = fixtures.Fixtures.First();
 
             _physics.SetCollisionMask(uid, fixture.Key, fixture.Value, 0, fixtures); // Goobstation - Set mask to 0
-            _physics.SetCollisionLayer(uid, fixture.Key, fixture.Value, (int) CollisionGroup.GhostImpassable, fixtures); // Goobstation - Set layer to CollisionGroup.GhostImpassable
+            _physics.SetCollisionLayer(uid,
+                fixture.Key,
+                fixture.Value,
+                (int) CollisionGroup.GhostImpassable,
+                fixtures); // Goobstation - Set layer to CollisionGroup.GhostImpassable
         }
+
         component.MovementSpeedDebuff = 1; //just so we can avoid annoying code elsewhere
         _movement.RefreshMovementSpeedModifiers(uid);
     }

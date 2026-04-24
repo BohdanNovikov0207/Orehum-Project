@@ -17,6 +17,11 @@ namespace Content.Shared.Weapons.Ranged.Components;
 
 public abstract partial class BatteryAmmoProviderComponent : AmmoProviderComponent
 {
+    [ViewVariables(VVAccess.ReadWrite)]
+    public int Capacity;
+
+    [DataField] public bool Examinable = true; // goob edit
+
     /// <summary>
     /// How much battery it costs to fire once.
     /// </summary>
@@ -27,9 +32,4 @@ public abstract partial class BatteryAmmoProviderComponent : AmmoProviderCompone
 
     [ViewVariables(VVAccess.ReadWrite)]
     public int Shots;
-
-    [ViewVariables(VVAccess.ReadWrite)]
-    public int Capacity;
-
-    [DataField] public bool Examinable = true; // goob edit
 }

@@ -7,20 +7,19 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Shared._Shitmed.Surgery;
 using Content.Shared.Atmos;
 using Content.Shared.Camera;
+using Content.Shared.Cuffs;
 using Content.Shared.Hands.Components;
+using Content.Shared.Heretic;
+using Content.Shared.Inventory.Events;
 using Content.Shared.Movement.Systems;
+using Content.Shared.Overlays;
 using Content.Shared.Projectiles;
 using Content.Shared.Weapons.Ranged.Events;
 using Content.Shared.Wieldable;
-
 // Goobstation using
-using Content.Shared._Shitmed.Surgery;
-using Content.Shared.Cuffs;
-using Content.Shared.Heretic;
-using Content.Shared.Inventory.Events;
-using Content.Shared.Overlays;
 
 namespace Content.Shared.Hands.EntitySystems;
 
@@ -44,14 +43,14 @@ public abstract partial class SharedHandsSystem
         SubscribeLocalEvent<HandsComponent, UnwieldAttemptEvent>(RefRelayEvent);
         SubscribeLocalEvent<HandsComponent, TargetHandcuffedEvent>(RefRelayEvent);
 
-        SubscribeLocalEvent<HandsComponent, RefreshEquipmentHudEvent<ShowHealthBarsComponent>>(RefRelayEvent); // goob edit - heretics
-        SubscribeLocalEvent<HandsComponent, RefreshEquipmentHudEvent<ShowHealthIconsComponent>>(RefRelayEvent); // goob edit - heretics
+        SubscribeLocalEvent<HandsComponent, RefreshEquipmentHudEvent<ShowHealthBarsComponent>>(
+            RefRelayEvent); // goob edit - heretics
+        SubscribeLocalEvent<HandsComponent, RefreshEquipmentHudEvent<ShowHealthIconsComponent>>(
+            RefRelayEvent); // goob edit - heretics
     }
 
-    private void RelayEvent<T>(Entity<HandsComponent> entity, ref T args) where T : EntityEventArgs
-    {
+    private void RelayEvent<T>(Entity<HandsComponent> entity, ref T args) where T : EntityEventArgs =>
         CoreRelayEvent(entity, ref args);
-    }
 
     private void RefRelayEvent<T>(Entity<HandsComponent> entity, ref T args)
     {

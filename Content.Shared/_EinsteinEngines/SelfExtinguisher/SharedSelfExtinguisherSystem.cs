@@ -12,15 +12,15 @@ using Robust.Shared.Utility;
 
 namespace Content.Shared._EinsteinEngines.SelfExtinguisher;
 
-public abstract partial class SharedSelfExtinguisherSystem : EntitySystem
+public abstract class SharedSelfExtinguisherSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly SharedActionsSystem _actions = default!;
     [Dependency] private readonly ActionContainerSystem _actionContainer = default!;
+    [Dependency] private readonly SharedActionsSystem _actions = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly SharedChargesSystem _charges = default!;
     [Dependency] private readonly InventorySystem _inventory = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly SharedChargesSystem _charges = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -28,7 +28,8 @@ public abstract partial class SharedSelfExtinguisherSystem : EntitySystem
 
         SubscribeLocalEvent<SelfExtinguisherComponent, MapInitEvent>(OnMapInit);
 
-        SubscribeLocalEvent<SelfExtinguisherComponent, InventoryRelayedEvent<GetVerbsEvent<EquipmentVerb>>>(GetRelayedVerbs);
+        SubscribeLocalEvent<SelfExtinguisherComponent, InventoryRelayedEvent<GetVerbsEvent<EquipmentVerb>>>(
+            GetRelayedVerbs);
         SubscribeLocalEvent<SelfExtinguisherComponent, GetItemActionsEvent>(OnGetActions);
         SubscribeLocalEvent<SelfExtinguisherComponent, GetVerbsEvent<EquipmentVerb>>(OnGetVerbs);
 
@@ -58,7 +59,9 @@ public abstract partial class SharedSelfExtinguisherSystem : EntitySystem
         _actions.SetEnabled(component.ActionEntity, _charges.HasCharges((uid, chargeComp), 1));
     }
 
-    private void GetRelayedVerbs(EntityUid uid, SelfExtinguisherComponent component, InventoryRelayedEvent<GetVerbsEvent<EquipmentVerb>> args) =>
+    private void GetRelayedVerbs(EntityUid uid,
+        SelfExtinguisherComponent component,
+        InventoryRelayedEvent<GetVerbsEvent<EquipmentVerb>> args) =>
         OnGetVerbs(uid, component, args.Args);
 
     private void OnGetVerbs(EntityUid uid, SelfExtinguisherComponent component, GetVerbsEvent<EquipmentVerb> args)
@@ -67,15 +70,16 @@ public abstract partial class SharedSelfExtinguisherSystem : EntitySystem
         if (!args.CanAccess || !args.CanInteract || !args.CanComplexInteract)
             return;
 
-        if (!_inventory.TryGetContainingSlot(uid, out var _))
+        if (!_inventory.TryGetContainingSlot(uid, out _))
             return;
 
-        var verb = new EquipmentVerb()
+        var verb = new EquipmentVerb
         {
-            Icon = new SpriteSpecifier.Texture(new("/Textures/_EinsteinEngines/Interface/VerbIcons/extinguisher.svg.192dpi.png")),
+            Icon = new SpriteSpecifier.Texture(
+                new ResPath("/Textures/_EinsteinEngines/Interface/VerbIcons/extinguisher.svg.192dpi.png")),
             Text = Loc.GetString("self-extinguisher-verb"),
             EventTarget = uid,
-            ExecutionEventArgs = new SelfExtinguishEvent() { Performer = args.User }
+            ExecutionEventArgs = new SelfExtinguishEvent { Performer = args.User },
         };
 
         args.Verbs.Add(verb);
@@ -159,4 +163,6 @@ public abstract partial class SharedSelfExtinguisherSystem : EntitySystem
 // <summary>
 //   Raised on an attempt to self-extinguish.
 // </summary>
-public sealed partial class SelfExtinguishEvent : InstantActionEvent { }
+public sealed partial class SelfExtinguishEvent : InstantActionEvent
+{
+}

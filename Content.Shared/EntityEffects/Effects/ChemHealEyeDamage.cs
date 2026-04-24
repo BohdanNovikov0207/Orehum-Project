@@ -3,7 +3,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.EntityEffects;
 using Content.Shared.Eye.Blinding.Systems;
 using Robust.Shared.Prototypes;
 
@@ -21,14 +20,19 @@ public sealed partial class ChemHealEyeDamage : EntityEffect
     public int Amount = -1;
 
     protected override string? ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys)
-        => Loc.GetString("reagent-effect-guidebook-cure-eye-damage", ("chance", Probability), ("deltasign", MathF.Sign(Amount)));
+        => Loc.GetString("reagent-effect-guidebook-cure-eye-damage",
+            ("chance", Probability),
+            ("deltasign", MathF.Sign(Amount)));
 
     public override void Effect(EntityEffectBaseArgs args)
     {
         if (args is EntityEffectReagentArgs reagentArgs)
+        {
             if (reagentArgs.Scale != 1f) // huh?
                 return;
+        }
 
-        args.EntityManager.EntitySysManager.GetEntitySystem<BlindableSystem>().AdjustEyeDamage(args.TargetEntity, Amount);
+        args.EntityManager.EntitySysManager.GetEntitySystem<BlindableSystem>()
+            .AdjustEyeDamage(args.TargetEntity, Amount);
     }
 }

@@ -10,10 +10,7 @@ namespace Content.Shared.Silicons.Borgs;
 
 public abstract partial class SharedBorgSystem
 {
-    public void InitializeRelay()
-    {
-        SubscribeLocalEvent<BorgChassisComponent, DamageModifyEvent>(RelayToModule);
-    }
+    public void InitializeRelay() => SubscribeLocalEvent<BorgChassisComponent, DamageModifyEvent>(RelayToModule);
 
     protected void RelayToModule<T>(EntityUid uid, BorgChassisComponent component, T args) where T : class
     {

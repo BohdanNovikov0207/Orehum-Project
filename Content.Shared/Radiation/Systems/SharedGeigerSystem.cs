@@ -25,7 +25,8 @@ public abstract class SharedGeigerSystem : EntitySystem
         var rads = currentRads.ToString("N1");
         var color = LevelToColor(component.DangerLevel);
         var msg = Loc.GetString("geiger-component-examine",
-            ("rads", rads), ("color", color));
+            ("rads", rads),
+            ("color", color));
         args.PushMarkup(msg);
     }
 

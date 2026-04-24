@@ -82,34 +82,32 @@ using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
 
 namespace Content.Shared.Ensnaring.Components;
+
 /// <summary>
-/// Use this on an entity that you would like to be ensnared by anything that has the <see cref="EnsnaringComponent"/>
+/// Use this on an entity that you would like to be ensnared by anything that has the <see cref="EnsnaringComponent" />
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState(true)]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState(true)]
 public sealed partial class EnsnareableComponent : Component
 {
     /// <summary>
-    /// How much should this slow down the entities walk?
+    /// The container where the <see cref="EnsnaringComponent" /> entity will be stored
     /// </summary>
-    [DataField, AutoNetworkedField]
-    public float WalkSpeed = 1.0f;
+    public Container Container = default!;
 
-    /// <summary>
-    /// How much should this slow down the entities sprint?
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public float SprintSpeed = 1.0f;
+    [DataField]
+    public ProtoId<AlertPrototype> EnsnaredAlert = "Ensnared";
 
     /// <summary>
     /// Is this entity currently ensnared?
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public bool IsEnsnared;
 
     /// <summary>
-    /// The container where the <see cref="EnsnaringComponent"/> entity will be stored
+    /// How much should this slow down the entities sprint?
     /// </summary>
-    public Container Container = default!;
+    [DataField] [AutoNetworkedField]
+    public float SprintSpeed = 1.0f;
 
     [DataField]
     public string? Sprite;
@@ -117,8 +115,11 @@ public sealed partial class EnsnareableComponent : Component
     [DataField]
     public string? State;
 
-    [DataField]
-    public ProtoId<AlertPrototype> EnsnaredAlert = "Ensnared";
+    /// <summary>
+    /// How much should this slow down the entities walk?
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public float WalkSpeed = 1.0f;
 }
 
 public sealed partial class RemoveEnsnareAlertEvent : BaseAlertEvent;

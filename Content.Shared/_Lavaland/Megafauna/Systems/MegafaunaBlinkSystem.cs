@@ -14,9 +14,9 @@ namespace Content.Shared._Lavaland.Megafauna.Systems;
 public sealed class MegafaunaBlinkSystem : EntitySystem
 {
     [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedTransformSystem _xform = default!;
     [Dependency] private readonly IMapManager _mapMan = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly SharedTransformSystem _xform = default!;
 
     private EntityQuery<MegafaunaBlinkComponent> _blinkQuery;
 

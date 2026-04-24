@@ -8,24 +8,9 @@ namespace Content.Shared._Mono.FireControl;
 /// <summary>
 /// Event sent from server to client to visualize firing directions for a weapon
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class FireControlVisualizationEvent : EntityEventArgs
 {
-    /// <summary>
-    /// Entity to visualize
-    /// </summary>
-    public NetEntity Entity { get; }
-
-    /// <summary>
-    /// Dictionary mapping direction angles (in degrees) to whether firing is possible
-    /// </summary>
-    public Dictionary<float, bool>? Directions { get; }
-
-    /// <summary>
-    /// Whether to enable (true) or disable (false) visualization
-    /// </summary>
-    public bool Enabled { get; }
-
     /// <summary>
     /// Constructor for enabling/updating visualization with data
     /// </summary>
@@ -45,4 +30,19 @@ public sealed class FireControlVisualizationEvent : EntityEventArgs
         Directions = null;
         Enabled = false;
     }
+
+    /// <summary>
+    /// Entity to visualize
+    /// </summary>
+    public NetEntity Entity { get; }
+
+    /// <summary>
+    /// Dictionary mapping direction angles (in degrees) to whether firing is possible
+    /// </summary>
+    public Dictionary<float, bool>? Directions { get; }
+
+    /// <summary>
+    /// Whether to enable (true) or disable (false) visualization
+    /// </summary>
+    public bool Enabled { get; }
 }

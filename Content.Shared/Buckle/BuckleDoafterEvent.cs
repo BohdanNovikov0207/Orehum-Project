@@ -79,8 +79,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Buckle;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class BuckleDoAfterEvent : SimpleDoAfterEvent
 {
-
 }

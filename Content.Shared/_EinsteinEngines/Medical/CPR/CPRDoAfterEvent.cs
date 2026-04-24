@@ -8,5 +8,5 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Medical.CPR;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class CPRDoAfterEvent : SimpleDoAfterEvent;

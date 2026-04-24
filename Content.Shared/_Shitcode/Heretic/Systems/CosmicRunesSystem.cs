@@ -1,7 +1,6 @@
 using System.Linq;
 using Content.Goobstation.Common.BlockTeleport;
 using Content.Goobstation.Common.Grab;
-using Content.Goobstation.Common.MartialArts;
 using Content.Goobstation.Common.Religion;
 using Content.Goobstation.Shared.Bible;
 using Content.Shared._Goobstation.Wizard.FadingTimedDespawn;
@@ -21,17 +20,17 @@ namespace Content.Shared._Shitcode.Heretic.Systems;
 
 public sealed class CosmicRunesSystem : EntitySystem
 {
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly SharedHereticAbilitySystem _heretic = default!;
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly PullingSystem _pulling = default!;
+    [Dependency] private readonly SharedStarMarkSystem _starMark = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     [Dependency] private readonly UseDelaySystem _useDelay = default!;
-    [Dependency] private readonly PullingSystem _pulling = default!;
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedStarMarkSystem _starMark = default!;
-    [Dependency] private readonly SharedHereticAbilitySystem _heretic = default!;
 
     public override void Initialize()
     {

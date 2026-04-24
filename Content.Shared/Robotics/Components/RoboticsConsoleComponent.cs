@@ -18,8 +18,8 @@ namespace Content.Shared.Robotics.Components;
 /// <summary>
 /// Robotics console for managing borgs.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(SharedRoboticsConsoleSystem))]
-[AutoGenerateComponentState, AutoGenerateComponentPause]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(SharedRoboticsConsoleSystem))]
+[AutoGenerateComponentState] [AutoGenerateComponentPause]
 public sealed partial class RoboticsConsoleComponent : Component
 {
     /// <summary>
@@ -29,16 +29,10 @@ public sealed partial class RoboticsConsoleComponent : Component
     public Dictionary<string, CyborgControlData> Cyborgs = new();
 
     /// <summary>
-    /// After not responding for this length of time borgs are removed from the console.
+    /// Cooldown on destroying borgs to prevent complete abuse.
     /// </summary>
     [DataField]
-    public TimeSpan Timeout = TimeSpan.FromSeconds(10);
-
-    /// <summary>
-    /// Radio channel to send messages on.
-    /// </summary>
-    [DataField]
-    public ProtoId<RadioChannelPrototype> RadioChannel = "Science";
+    public TimeSpan DestroyCooldown = TimeSpan.FromSeconds(30);
 
     /// <summary>
     /// Radio message sent when destroying a borg.
@@ -47,15 +41,21 @@ public sealed partial class RoboticsConsoleComponent : Component
     public LocId DestroyMessage = "robotics-console-cyborg-destroying";
 
     /// <summary>
-    /// Cooldown on destroying borgs to prevent complete abuse.
-    /// </summary>
-    [DataField]
-    public TimeSpan DestroyCooldown = TimeSpan.FromSeconds(30);
-
-    /// <summary>
     /// When a borg can next be destroyed.
     /// </summary>
     [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))]
-    [AutoNetworkedField, AutoPausedField]
+    [AutoNetworkedField] [AutoPausedField]
     public TimeSpan NextDestroy = TimeSpan.Zero;
+
+    /// <summary>
+    /// Radio channel to send messages on.
+    /// </summary>
+    [DataField]
+    public ProtoId<RadioChannelPrototype> RadioChannel = "Science";
+
+    /// <summary>
+    /// After not responding for this length of time borgs are removed from the console.
+    /// </summary>
+    [DataField]
+    public TimeSpan Timeout = TimeSpan.FromSeconds(10);
 }

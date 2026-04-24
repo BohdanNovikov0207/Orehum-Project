@@ -16,20 +16,11 @@ using Robust.Shared.Utility;
 
 namespace Content.Shared._Goobstation.Heretic.Components;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState(true)]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState(true)]
 public sealed partial class RustRuneComponent : Component
 {
-    /// <summary>
-    /// If there is no rusted wall sprite - add rust overlay.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public bool RustOverlay;
-
-    [DataField]
-    public ProtoId<TagPrototype> DiagonalTag = "Diagonal";
-
-    [DataField, AutoNetworkedField]
-    public Vector2 RuneOffset = Vector2.Zero;
+    [DataField] [AutoNetworkedField]
+    public bool AnimationEnded;
 
     [DataField]
     public Vector2 DiagonalOffset = new(0.25f, -0.25f);
@@ -39,8 +30,20 @@ public sealed partial class RustRuneComponent : Component
         new SpriteSpecifier.Rsi(new ResPath("_Goobstation/Heretic/Effects/effects.rsi"), "rust_diagonal");
 
     [DataField]
+    public ProtoId<TagPrototype> DiagonalTag = "Diagonal";
+
+    [DataField]
+    public int LastFrame = 5;
+
+    [DataField]
     public SpriteSpecifier OverlaySprite =
         new SpriteSpecifier.Rsi(new ResPath("_Goobstation/Heretic/Effects/effects.rsi"), "rust_default");
+
+    [DataField] [AutoNetworkedField]
+    public int RuneIndex;
+
+    [DataField] [AutoNetworkedField]
+    public Vector2 RuneOffset = Vector2.Zero;
 
     [DataField]
     public List<SpriteSpecifier> RuneSprites = new()
@@ -59,14 +62,11 @@ public sealed partial class RustRuneComponent : Component
         new SpriteSpecifier.Rsi(new ResPath("_Goobstation/Heretic/Effects/effects.rsi"), "small_rune_12"),
     };
 
-    [DataField, AutoNetworkedField]
-    public int RuneIndex;
-
-    [DataField, AutoNetworkedField]
-    public bool AnimationEnded;
-
-    [DataField]
-    public int LastFrame = 5;
+    /// <summary>
+    /// If there is no rusted wall sprite - add rust overlay.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public bool RustOverlay;
 }
 
 public enum RustRuneKey : byte

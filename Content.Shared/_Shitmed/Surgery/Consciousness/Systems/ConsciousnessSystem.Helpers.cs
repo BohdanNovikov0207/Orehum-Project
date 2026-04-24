@@ -1,15 +1,14 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared._Shitmed.Medical.Surgery.Consciousness.Components;
 using Content.Shared._Shitmed.Medical.Surgery.Pain.Components;
-using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Mobs.Components;
 
 namespace Content.Shared._Shitmed.Medical.Surgery.Consciousness.Systems;
 
 public partial class ConsciousnessSystem
 {
-
     #region PublicApi
 
     /// <summary>
@@ -49,13 +48,16 @@ public partial class ConsciousnessSystem
     /// <param name="target">Target entity</param>
     /// <param name="consciousness">ConsciousnessComponent</param>
     /// <param name="mobState">MobStateComponent</param>
-    public bool CheckConscious(EntityUid target, ConsciousnessComponent? consciousness = null, MobStateComponent? mobState = null)
+    public bool CheckConscious(EntityUid target,
+        ConsciousnessComponent? consciousness = null,
+        MobStateComponent? mobState = null)
     {
         if (!Resolve(target, ref consciousness, ref mobState, false))
             return false;
 
         var shouldBeConscious =
-            consciousness.Consciousness > consciousness.Threshold || consciousness is { ForceUnconscious: false, ForceConscious: true };
+            consciousness.Consciousness > consciousness.Threshold || consciousness is
+                { ForceUnconscious: false, ForceConscious: true };
 
         if (shouldBeConscious != consciousness.IsConscious)
         {
@@ -74,7 +76,7 @@ public partial class ConsciousnessSystem
     /// </summary>
     /// <param name="target">Target to pass out.</param>
     /// <param name="time">Time.</param>
-    /// <param name="consciousness"><see cref="ConsciousnessComponent"/> of an entity.</param>
+    /// <param name="consciousness"><see cref="ConsciousnessComponent" /> of an entity.</param>
     public void ForcePassOut(EntityUid target, TimeSpan time, ConsciousnessComponent? consciousness = null)
     {
         if (!Resolve(target, ref consciousness))
@@ -87,12 +89,13 @@ public partial class ConsciousnessSystem
     }
 
     /// <summary>
-    /// Forces the entity to stay alive even if on 0 Consciousness, unless induced injuries that cause direct death, like getting your brain blown out
+    /// Forces the entity to stay alive even if on 0 Consciousness, unless induced injuries that cause direct death, like
+    /// getting your brain blown out
     /// Overrides ForcePassout and all other factors, the only requirement is entity being able to live
     /// </summary>
     /// <param name="target">Target to pass out.</param>
     /// <param name="time">Time.</param>
-    /// <param name="consciousness"><see cref="ConsciousnessComponent"/> of an entity.</param>
+    /// <param name="consciousness"><see cref="ConsciousnessComponent" /> of an entity.</param>
     public void ForceConscious(EntityUid target, TimeSpan time, ConsciousnessComponent? consciousness = null)
     {
         if (!Resolve(target, ref consciousness))
@@ -129,8 +132,10 @@ public partial class ConsciousnessSystem
             return;
 
         if (consciousness.Multipliers.Count > 0)
+        {
             consciousness.Multiplier = consciousness.Multipliers.Aggregate(FixedPoint2.Zero,
                 (current, multiplier) => current + multiplier.Value.Change) / consciousness.Multipliers.Count;
+        }
         else
             consciousness.Multiplier = 1.0; // Just in case i guess?
 
@@ -152,7 +157,9 @@ public partial class ConsciousnessSystem
         Dirty(target, consciousness);
     }
 
-    private void UpdateMobState(EntityUid target, ConsciousnessComponent? consciousness = null, MobStateComponent? mobState = null)
+    private void UpdateMobState(EntityUid target,
+        ConsciousnessComponent? consciousness = null,
+        MobStateComponent? mobState = null)
     {
         if (TerminatingOrDeleted(target) || !Resolve(target, ref consciousness, ref mobState) || _net.IsClient)
             return;
@@ -254,7 +261,8 @@ public partial class ConsciousnessSystem
 
     /// <summary>
     /// Add a unique consciousness modifier. This value gets added to the raw consciousness value.
-    /// The owner and type combo must be unique, if you are adding multiple values from a single owner and type, combine them into one modifier
+    /// The owner and type combo must be unique, if you are adding multiple values from a single owner and type, combine them
+    /// into one modifier
     /// </summary>
     /// <param name="target">Target entity</param>
     /// <param name="modifierOwner">Owner of a modifier</param>
@@ -275,7 +283,8 @@ public partial class ConsciousnessSystem
         if (!Resolve(target, ref consciousness))
             return false;
 
-        if (!consciousness.Modifiers.TryAdd((modifierOwner, identifier), new ConsciousnessModifier(modifier, _timing.CurTime + time, type)))
+        if (!consciousness.Modifiers.TryAdd((modifierOwner, identifier),
+                new ConsciousnessModifier(modifier, _timing.CurTime + time, type)))
             return false;
 
         UpdateConsciousnessModifiers(target, consciousness);
@@ -356,7 +365,7 @@ public partial class ConsciousnessSystem
         if (!Resolve(target, ref consciousness))
             return false;
 
-        var newModifier = new ConsciousnessModifier(Change: modifierChange, Time: _timing.CurTime + time, Type: type);
+        var newModifier = new ConsciousnessModifier(modifierChange, _timing.CurTime + time, type);
         consciousness.Modifiers[(modifierOwner, identifier)] = newModifier;
 
         UpdateConsciousnessModifiers(target, consciousness);
@@ -387,7 +396,10 @@ public partial class ConsciousnessSystem
             return false;
 
         var newModifier =
-            oldModifier with {Change = oldModifier.Change + modifierChange, Time = _timing.CurTime + time ?? oldModifier.Time};
+            oldModifier with
+            {
+                Change = oldModifier.Change + modifierChange, Time = _timing.CurTime + time ?? oldModifier.Time,
+            };
 
         consciousness.Modifiers[(modifierOwner, identifier)] = newModifier;
 
@@ -399,7 +411,8 @@ public partial class ConsciousnessSystem
 
     /// <summary>
     /// Add a unique consciousness multiplier. This value gets added onto the multiplier used to calculate consciousness.
-    /// The owner and type combo must be unique, if you are adding multiple values from a single owner and type, combine them into one multiplier
+    /// The owner and type combo must be unique, if you are adding multiple values from a single owner and type, combine them
+    /// into one multiplier
     /// </summary>
     /// <param name="target">Target entity</param>
     /// <param name="multiplierOwner">Owner of a multiplier</param>
@@ -420,7 +433,8 @@ public partial class ConsciousnessSystem
         if (!Resolve(target, ref consciousness))
             return false;
 
-        if (!consciousness.Multipliers.TryAdd((multiplierOwner, identifier), new ConsciousnessMultiplier(multiplier, _timing.CurTime + time ?? time, type)))
+        if (!consciousness.Multipliers.TryAdd((multiplierOwner, identifier),
+                new ConsciousnessMultiplier(multiplier, _timing.CurTime + time ?? time, type)))
             return false;
 
         UpdateConsciousnessMultipliers(target, consciousness);

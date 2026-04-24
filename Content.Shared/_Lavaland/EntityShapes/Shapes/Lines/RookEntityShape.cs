@@ -10,8 +10,6 @@ namespace Content.Shared._Lavaland.EntityShapes.Shapes;
 /// </summary>
 public sealed partial class RookEntityShape : EntityShape
 {
-    protected override List<Vector2> GetShapeImplementation(System.Random rand, IPrototypeManager proto)
-    {
-        return ShapeHelpers.MakeCross(Offset, Size, StepSize).ToList();
-    }
+    protected override List<Vector2> GetShapeImplementation(System.Random rand, IPrototypeManager proto) =>
+        ShapeHelpers.MakeCross(Offset, Size, StepSize).ToList();
 }

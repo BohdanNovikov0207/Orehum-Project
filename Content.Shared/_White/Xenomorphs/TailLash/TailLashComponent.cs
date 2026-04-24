@@ -7,27 +7,28 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Shared._White.Xenomorphs.TailLash;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class TailLashComponent : Component
 {
-    [DataField, AutoNetworkedField]
-    public EntProtoId TailAnimationId = "WeaponArcThrust";
-
-    [DataField, AutoNetworkedField]
-    public FixedPoint2 TailRange = 2;
-
-    [DataField, AutoNetworkedField]
-    public SoundSpecifier HitSound = new SoundPathSpecifier("/Audio/Effects/thudswoosh.ogg", AudioParams.Default.WithVolume(-3));
-
-    [DataField]
-    public DamageSpecifier TailDamage = new();
+    [DataField] [AutoNetworkedField]
+    public SoundSpecifier HitSound =
+        new SoundPathSpecifier("/Audio/Effects/thudswoosh.ogg", AudioParams.Default.WithVolume(-3));
 
     [DataField]
     public Dictionary<ProtoId<ReagentPrototype>, FixedPoint2>? Inject;
 
+    [DataField] [AutoNetworkedField]
+    public EntProtoId TailAnimationId = "WeaponArcThrust";
+
     [DataField]
-    public EntProtoId? TailLashActionId = "ActionTailLash";
+    public DamageSpecifier TailDamage = new();
 
     [ViewVariables]
     public EntityUid? TailLashAction;
+
+    [DataField]
+    public EntProtoId? TailLashActionId = "ActionTailLash";
+
+    [DataField] [AutoNetworkedField]
+    public FixedPoint2 TailRange = 2;
 }

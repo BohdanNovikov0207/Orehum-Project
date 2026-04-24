@@ -86,7 +86,6 @@ using Content.Shared.Administration.Logs;
 using Content.Shared.Audio;
 using Content.Shared.Body.Components;
 using Content.Shared.Database;
-using Content.Shared.Emag.Components;
 using Content.Shared.Emag.Systems;
 using Content.Shared.Examine;
 using Content.Shared.Lock;
@@ -102,23 +101,22 @@ using Robust.Shared.Timing;
 namespace Content.Shared.Materials;
 
 /// <summary>
-/// Handles interactions and logic related to <see cref="MaterialReclaimerComponent"/>,
-/// <see cref="CollideMaterialReclaimerComponent"/>, and <see cref="ActiveMaterialReclaimerComponent"/>.
+/// Handles interactions and logic related to <see cref="MaterialReclaimerComponent" />,
+/// <see cref="CollideMaterialReclaimerComponent" />, and <see cref="ActiveMaterialReclaimerComponent" />.
 /// </summary>
 public abstract class SharedMaterialReclaimerSystem : EntitySystem
 {
+    public const string ActiveReclaimerContainerId = "active-material-reclaimer-container";
     [Dependency] private readonly ISharedAdminLogManager _adminLog = default!;
-    [Dependency] protected readonly IGameTiming Timing = default!;
-    [Dependency] protected readonly SharedAmbientSoundSystem AmbientSound = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] protected readonly SharedContainerSystem Container = default!;
-    [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
     [Dependency] private readonly EmagSystem _emag = default!;
     [Dependency] private readonly LockSystem _lockSystem = default!; // Goobstation - Recycle Update
+    [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
+    [Dependency] protected readonly SharedAmbientSoundSystem AmbientSound = default!;
+    [Dependency] protected readonly SharedContainerSystem Container = default!;
+    [Dependency] protected readonly IGameTiming Timing = default!;
 
-    public const string ActiveReclaimerContainerId = "active-material-reclaimer-container";
-
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         SubscribeLocalEvent<MaterialReclaimerComponent, ComponentShutdown>(OnShutdown);
@@ -129,20 +127,14 @@ public abstract class SharedMaterialReclaimerSystem : EntitySystem
         SubscribeLocalEvent<ActiveMaterialReclaimerComponent, ComponentStartup>(OnActiveStartup);
     }
 
-    private void OnMapInit(EntityUid uid, MaterialReclaimerComponent component, MapInitEvent args)
-    {
+    private void OnMapInit(EntityUid uid, MaterialReclaimerComponent component, MapInitEvent args) =>
         component.NextSound = Timing.CurTime;
-    }
 
-    private void OnShutdown(EntityUid uid, MaterialReclaimerComponent component, ComponentShutdown args)
-    {
+    private void OnShutdown(EntityUid uid, MaterialReclaimerComponent component, ComponentShutdown args) =>
         _audio.Stop(component.Stream);
-    }
 
-    private void OnExamined(EntityUid uid, MaterialReclaimerComponent component, ExaminedEvent args)
-    {
+    private void OnExamined(EntityUid uid, MaterialReclaimerComponent component, ExaminedEvent args) =>
         args.PushMarkup(Loc.GetString("recycler-count-items", ("items", component.ItemsProcessed)));
-    }
 
     private void OnEmagged(EntityUid uid, MaterialReclaimerComponent component, ref GotEmaggedEvent args)
     {
@@ -164,15 +156,16 @@ public abstract class SharedMaterialReclaimerSystem : EntitySystem
         TryStartProcessItem(uid, args.OtherEntity, reclaimer);
     }
 
-    private void OnActiveStartup(EntityUid uid, ActiveMaterialReclaimerComponent component, ComponentStartup args)
-    {
+    private void OnActiveStartup(EntityUid uid, ActiveMaterialReclaimerComponent component, ComponentStartup args) =>
         component.ReclaimingContainer = Container.EnsureContainer<Container>(uid, ActiveReclaimerContainerId);
-    }
 
     /// <summary>
-    /// Tries to start processing an item via a <see cref="MaterialReclaimerComponent"/>.
+    /// Tries to start processing an item via a <see cref="MaterialReclaimerComponent" />.
     /// </summary>
-    public bool TryStartProcessItem(EntityUid uid, EntityUid item, MaterialReclaimerComponent? component = null, EntityUid? user = null)
+    public bool TryStartProcessItem(EntityUid uid,
+        EntityUid item,
+        MaterialReclaimerComponent? component = null,
+        EntityUid? user = null)
     {
         if (!Resolve(uid, ref component))
             return false;
@@ -231,10 +224,12 @@ public abstract class SharedMaterialReclaimerSystem : EntitySystem
     /// </summary>
     /// <remarks>
     /// This doesn't reclaim the entity itself, but rather ends the formal
-    /// process started with <see cref="ActiveMaterialReclaimerComponent"/>.
-    /// The actual reclaiming happens in <see cref="Reclaim"/>
+    /// process started with <see cref="ActiveMaterialReclaimerComponent" />.
+    /// The actual reclaiming happens in <see cref="Reclaim" />
     /// </remarks>
-    public virtual bool TryFinishProcessItem(EntityUid uid, MaterialReclaimerComponent? component = null, ActiveMaterialReclaimerComponent? active = null)
+    public virtual bool TryFinishProcessItem(EntityUid uid,
+        MaterialReclaimerComponent? component = null,
+        ActiveMaterialReclaimerComponent? active = null)
     {
         if (!Resolve(uid, ref component, ref active, false))
             return false;
@@ -257,9 +252,7 @@ public abstract class SharedMaterialReclaimerSystem : EntitySystem
 
         component.ItemsProcessed++;
         if (component.CutOffSound)
-        {
             _audio.Stop(component.Stream);
-        }
 
         Dirty(uid, component);
     }
@@ -286,27 +279,22 @@ public abstract class SharedMaterialReclaimerSystem : EntitySystem
     /// Whether or not the specified reclaimer can currently
     /// begin reclaiming another entity.
     /// </summary>
-    public bool CanStart(EntityUid uid, MaterialReclaimerComponent component)
-    {
+    public bool CanStart(EntityUid uid, MaterialReclaimerComponent component) =>
         /* Goobstation - Recycle Update - Commented to prevent recycling one item several times
           if (HasComp<ActiveMaterialReclaimerComponent>(uid))
             return false;*/
-
-        return component.Powered && component.Enabled && !component.Broken;
-    }
+        component.Powered && component.Enabled && !component.Broken;
 
     /// <summary>
     /// Whether or not the reclaimer satisfies the conditions
     /// allowing it to gib/reclaim a living creature.
     /// </summary>
-    public bool CanGib(EntityUid uid, EntityUid victim, MaterialReclaimerComponent component)
-    {
-        return component.Powered &&
-               component.Enabled &&
-               !component.Broken &&
-               HasComp<BodyComponent>(victim) &&
-               _emag.CheckFlag(uid, EmagType.Interaction);
-    }
+    public bool CanGib(EntityUid uid, EntityUid victim, MaterialReclaimerComponent component) =>
+        component.Powered &&
+        component.Enabled &&
+        !component.Broken &&
+        HasComp<BodyComponent>(victim) &&
+        _emag.CheckFlag(uid, EmagType.Interaction);
 
     /// <summary>
     /// Gets the duration of processing a specified entity.
@@ -333,7 +321,7 @@ public abstract class SharedMaterialReclaimerSystem : EntitySystem
         return duration;
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Update(float frameTime)
     {
         base.Update(frameTime);

@@ -86,16 +86,10 @@ namespace Content.Shared.Sticky.Components;
 /// Items that can be stuck to other structures or entities.
 /// For example, paper stickers or C4 charges.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(StickySystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(StickySystem))]
 [AutoGenerateComponentState]
 public sealed partial class StickyComponent : Component
 {
-    /// <summary>
-    /// What target entities are valid to be surface for sticky entity.
-    /// </summary>
-    [DataField]
-    public EntityWhitelist? Whitelist;
-
     /// <summary>
     /// What target entities can't be used as surface for sticky entity.
     /// </summary>
@@ -103,24 +97,36 @@ public sealed partial class StickyComponent : Component
     public EntityWhitelist? Blacklist;
 
     /// <summary>
-    /// How much time it takes to stick the entity to a target.
-    /// If zero, it will immediately be stuck.
-    /// </summary>
-    [DataField]
-    public TimeSpan StickDelay = TimeSpan.Zero;
-
-    /// <summary>
     /// Whether users can unstick the entity after it has been stuck.
     /// </summary>
     [DataField]
     public bool CanUnstick = true;
 
+    // Goobstation start
     /// <summary>
-    /// How much time it takes to unstick the entity.
-    /// If zero, it will immediately be unstuck.
+    /// Should the stick do-after break on move if the user is the target
     /// </summary>
     [DataField]
-    public TimeSpan UnstickDelay = TimeSpan.Zero;
+    public bool SelfStickBreakOnMove = true;
+
+    [DataField]
+    public float SelfStickTimeMultiplier = 1f;
+
+    /// <summary>
+    /// Should the unstick do-after break on move if the user is the target
+    /// </summary>
+    [DataField]
+    public bool SelfUnstickBreakOnMove = true;
+
+    [DataField]
+    public float SelfUnstickTimeMultiplier = 1f;
+
+    /// <summary>
+    /// How much time it takes to stick the entity to a target.
+    /// If zero, it will immediately be stuck.
+    /// </summary>
+    [DataField]
+    public TimeSpan StickDelay = TimeSpan.Zero;
 
     /// <summary>
     /// Popup message shown when player starts sticking the entity to another entity.
@@ -135,6 +141,20 @@ public sealed partial class StickyComponent : Component
     public LocId? StickPopupSuccess;
 
     /// <summary>
+    /// Entity that is used as a surface for the sticky entity.
+    /// Null if entity isn't stuck to anything.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public EntityUid? StuckTo;
+
+    /// <summary>
+    /// How much time it takes to unstick the entity.
+    /// If zero, it will immediately be unstuck.
+    /// </summary>
+    [DataField]
+    public TimeSpan UnstickDelay = TimeSpan.Zero;
+
+    /// <summary>
     /// Popup message shown when a player starts unsticking the entity from another entity.
     /// </summary>
     [DataField]
@@ -147,11 +167,11 @@ public sealed partial class StickyComponent : Component
     public LocId? UnstickPopupSuccess;
 
     /// <summary>
-    /// Entity that is used as a surface for the sticky entity.
-    /// Null if entity isn't stuck to anything.
+    /// Icon to use for the unstick verb.
     /// </summary>
-    [DataField, AutoNetworkedField]
-    public EntityUid? StuckTo;
+    [DataField]
+    public SpriteSpecifier VerbIcon =
+        new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/VerbIcons/eject.svg.192dpi.png"));
 
     /// <summary>
     /// Text to use for the unstick verb.
@@ -160,28 +180,9 @@ public sealed partial class StickyComponent : Component
     public LocId VerbText = "comp-sticky-unstick-verb-text";
 
     /// <summary>
-    /// Icon to use for the unstick verb.
+    /// What target entities are valid to be surface for sticky entity.
     /// </summary>
     [DataField]
-    public SpriteSpecifier VerbIcon = new SpriteSpecifier.Texture(new("/Textures/Interface/VerbIcons/eject.svg.192dpi.png"));
-
-    // Goobstation start
-    /// <summary>
-    /// Should the stick do-after break on move if the user is the target
-    /// </summary>
-    [DataField]
-    public bool SelfStickBreakOnMove = true;
-
-    /// <summary>
-    /// Should the unstick do-after break on move if the user is the target
-    /// </summary>
-    [DataField]
-    public bool SelfUnstickBreakOnMove = true;
-
-    [DataField]
-    public float SelfStickTimeMultiplier = 1f;
-
-    [DataField]
-    public float SelfUnstickTimeMultiplier = 1f;
+    public EntityWhitelist? Whitelist;
     // Goobstation end
 }

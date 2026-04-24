@@ -9,26 +9,26 @@ using Robust.Shared.Serialization;
 namespace Content.Shared.Storage.Components;
 
 /// <summary>
-///     Change sprite depending on a storage fill percent.
+/// Change sprite depending on a storage fill percent.
 /// </summary>
 [RegisterComponent]
 public sealed partial class StorageFillVisualizerComponent : Component
 {
-    [DataField("maxFillLevels", required: true)]
-    public int MaxFillLevels;
-
     [DataField("fillBaseName", required: true)]
     public string FillBaseName = default!;
+
+    [DataField("maxFillLevels", required: true)]
+    public int MaxFillLevels;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum StorageFillVisuals : byte
 {
-    FillLevel
+    FillLevel,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum StorageFillLayers : byte
 {
-    Fill
+    Fill,
 }

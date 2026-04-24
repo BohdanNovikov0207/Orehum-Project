@@ -12,23 +12,23 @@ using Robust.Shared.GameStates;
 
 namespace Content.Shared._Goobstation.Heretic.Components;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class VoidCurseComponent : Component
 {
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public float Lifetime = 5f; // 8s on 1 stack, 20s on max stack
-
-    [DataField]
-    public float MaxLifetime = 5f;
 
     [DataField]
     public float LifetimeIncreasePerLevel = 3f;
 
-    [DataField, AutoNetworkedField]
-    public float Stacks = 0f;
+    [DataField]
+    public float MaxLifetime = 5f;
 
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public float MaxStacks = 5f;
+
+    [DataField] [AutoNetworkedField]
+    public float Stacks = 0f;
 
     public float Timer = 1f;
 }

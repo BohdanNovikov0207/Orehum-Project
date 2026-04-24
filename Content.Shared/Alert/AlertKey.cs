@@ -20,7 +20,7 @@ namespace Content.Shared.Alert;
 /// I.e., entirely defined by the category, if a category was specified, otherwise
 /// falls back to the id.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public struct AlertKey
 {
     public ProtoId<AlertPrototype>? AlertType { get; private set; } = default!;
@@ -39,30 +39,25 @@ public struct AlertKey
     {
         // compare only on alert category if we have one
         if (AlertCategory.HasValue)
-        {
             return other.AlertCategory == AlertCategory;
-        }
 
         return AlertType == other.AlertType && AlertCategory == other.AlertCategory;
     }
 
-    public override bool Equals(object? obj)
-    {
-        return obj is AlertKey other && Equals(other);
-    }
+    public override bool Equals(object? obj) => obj is AlertKey other && Equals(other);
 
     public override int GetHashCode()
     {
         // use only alert category if we have one
-        if (AlertCategory.HasValue) return AlertCategory.GetHashCode();
+        if (AlertCategory.HasValue)
+            return AlertCategory.GetHashCode();
         return AlertType.GetHashCode();
     }
 
     /// <param name="category">alert category, must not be null</param>
-    /// <returns>An alert key for the provided alert category. This must only be used for
-    /// queries and never storage, as it is lacking an alert type.</returns>
-    public static AlertKey ForCategory(ProtoId<AlertCategoryPrototype> category)
-    {
-        return new(null, category);
-    }
+    /// <returns>
+    /// An alert key for the provided alert category. This must only be used for
+    /// queries and never storage, as it is lacking an alert type.
+    /// </returns>
+    public static AlertKey ForCategory(ProtoId<AlertCategoryPrototype> category) => new(null, category);
 }

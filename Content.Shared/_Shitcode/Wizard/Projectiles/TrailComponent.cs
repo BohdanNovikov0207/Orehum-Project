@@ -17,16 +17,57 @@ namespace Content.Shared._Goobstation.Wizard.Projectiles;
 
 // Make more fields auto networked if you need to.
 // Changing Lifetime and Frequency may lead to unexpected results, especially if frequency is greater than lifetime
-[RegisterComponent,NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class TrailComponent : Component
 {
+    [ViewVariables(VVAccess.ReadOnly)]
+    public float Accumulator;
+
+    [DataField]
+    public List<LerpPropertyData> AdditionalLerpData = new();
+
+    [DataField] [AutoNetworkedField]
+    public Color Color = Color.White;
+
+    [ViewVariables(VVAccess.ReadOnly)]
+    public int CurIndex;
+
     /// <summary>
-    /// How many particles to spawn each cycle. If it is less than one, no particles will spawn.
-    /// Values above one wouldn't work with line trails currently.
-    /// Changing this during runtime may break things.
+    ///     <inheritdoc cref="StartAngle" />
     /// </summary>
-    [DataField, AutoNetworkedField]
-    public int ParticleAmount = 1;
+    [DataField] [AutoNetworkedField]
+    public Angle EndAngle;
+
+    /// <summary>
+    /// The less this value is, the more frequent the particles will be. This is basically time of each cycle.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public float Frequency = 0.2f;
+
+    [ViewVariables(VVAccess.ReadOnly)]
+    public MapCoordinates LastCoords = MapCoordinates.Nullspace;
+
+    [ViewVariables(VVAccess.ReadOnly)]
+    public float LerpAccumulator;
+
+    /// <summary>
+    /// Delay before a particle starts lerping.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public TimeSpan LerpDelay = TimeSpan.Zero;
+
+    /// <summary>
+    /// Less value for smoother lerps and more lag. You can get away with much less value, really.
+    /// Affects <see cref="AlphaLerpAmount" />, <see cref="ScaleLerpAmount" /> and <see cref="Velocity" />
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public float LerpTime = 0.05f;
+
+    /// <summary>
+    /// Lifetime of one particle.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public float Lifetime = 1f;
 
     /// <summary>
     /// Limits the total amount of particles that the trail can spawn, if above zero
@@ -34,138 +75,32 @@ public sealed partial class TrailComponent : Component
     [DataField]
     public int MaxParticleAmount;
 
-    /// <summary>
-    /// If not null, determines spawn position of the particles.
-    /// If <see cref="SpawnEntityPosition"/> is not null, it will spawn at coordinates relative to that entity.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public Vector2? SpawnPosition;
-
-    /// <summary>
-    /// If not null, particles will spawn at this entity coordinates.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public EntityUid? SpawnEntityPosition;
-
-    /// <summary>
-    /// Particles are spawned in a radius around the origin.
-    /// </summary>
-    [DataField, Animatable]
-    public float Radius { get; set; }
-
-    /// <summary>
-    /// If this is not null, trail particles will render this entity instead of sprite/lines
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public EntityUid? RenderedEntity;
-
     [DataField]
     public bool NoRenderIfRenderedEntityDeleted = true;
 
     /// <summary>
-    /// Whether to use <see cref="RenderedEntity"/> rotation (if it is not null), trail entity rotation,
+    /// How many particles to spawn each cycle. If it is less than one, no particles will spawn.
+    /// Values above one wouldn't work with line trails currently.
+    /// Changing this during runtime may break things.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public int ParticleAmount = 1;
+
+    [ViewVariables(VVAccess.ReadOnly)]
+    public int ParticleCount;
+
+    /// <summary>
+    /// If this is not null, trail particles will render this entity instead of sprite/lines
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public EntityUid? RenderedEntity;
+
+    /// <summary>
+    /// Whether to use <see cref="RenderedEntity" /> rotation (if it is not null), trail entity rotation,
     /// or particle rotation.
     /// </summary>
     [DataField]
     public RenderedEntityRotationStrategy RenderedEntityRotationStrategy;
-
-    /// <summary>
-    /// Whether the trail should slowly fade out even when the entity was deleted.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public bool SpawnRemainingTrail = true;
-
-    /// <summary>
-    /// Used for spread, if <see cref="ParticleAmount"/> is greater than one.
-    /// Zero angle faces towards projectile direction.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public Angle StartAngle;
-
-    /// <summary>
-    /// <inheritdoc cref="StartAngle"/>
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public Angle EndAngle;
-
-    /// <summary>
-    /// The less this value is, the more frequent the particles will be. This is basically time of each cycle.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public float Frequency = 0.2f;
-
-    /// <summary>
-    /// Lifetime of one particle.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public float Lifetime = 1f;
-
-    /// <summary>
-    /// Delay before a particle starts lerping.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public TimeSpan LerpDelay = TimeSpan.Zero;
-
-    /// <summary>
-    /// Velocity of a particle, aimed towards somewhere between <see cref="StartAngle"/> and <see cref="EndAngle"/>.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public float Velocity;
-
-    /// <summary>
-    /// Less value for smoother lerps and more lag. You can get away with much less value, really.
-    /// Affects <see cref="AlphaLerpAmount"/>, <see cref="ScaleLerpAmount"/> and <see cref="Velocity"/>
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public float LerpTime = 0.05f;
-
-    /// <summary>
-    /// Color alpga lerps to <see cref="AlphaLerpTarget"/> by this amount every <see cref="LerpTime"/> seconds.
-    /// </summary>
-    [DataField, Animatable]
-    public float AlphaLerpAmount { get; set; } = 0.3f;
-
-    /// <summary>
-    /// Scale lerps to <see cref="ScaleLerpTarget"/> by this amount every <see cref="LerpTime"/> seconds.
-    /// </summary>
-    [DataField, Animatable]
-    public float ScaleLerpAmount { get; set; }
-
-    /// <summary>
-    /// Velocity lerps to <see cref="VelocityLerpTarget"/> by this amount every <see cref="LerpTime"/> seconds.
-    /// </summary>
-    [DataField, Animatable]
-    public float VelocityLerpAmount { get; set; }
-
-    /// <summary>
-    /// Particle position lerps to the origin entity position by this amount every <see cref="LerpTime"/> seconds.
-    /// </summary>
-    [DataField, Animatable]
-    public float PositionLerpAmount { get; set; }
-
-    /// <summary>
-    /// Color alpha lerps to this value every <see cref="LerpTime"/> seconds.
-    /// </summary>
-    [DataField, Animatable]
-    public float AlphaLerpTarget { get; set; }
-
-    /// <summary>
-    /// Scale lerps to this value every <see cref="LerpTime"/> seconds.
-    /// </summary>
-    [DataField, Animatable]
-    public float ScaleLerpTarget { get; set; }
-
-    /// <summary>
-    /// Velocity lerps to this value every <see cref="LerpTime"/> seconds.
-    /// </summary>
-    [DataField, Animatable]
-    public float VelocityLerpTarget { get; set; }
-
-    /// <summary>
-    /// If sprite is null, it will draw lines instead.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public SpriteSpecifier? Sprite;
 
     [DataField]
     public float Scale = 1f;
@@ -176,28 +111,93 @@ public sealed partial class TrailComponent : Component
     [DataField]
     public Dictionary<string, IGetShaderData> ShaderData = new();
 
-    [DataField, AutoNetworkedField]
-    public Color Color = Color.White;
+    /// <summary>
+    /// If not null, particles will spawn at this entity coordinates.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public EntityUid? SpawnEntityPosition;
 
-    [DataField]
-    public List<LerpPropertyData> AdditionalLerpData = new();
+    /// <summary>
+    /// If not null, determines spawn position of the particles.
+    /// If <see cref="SpawnEntityPosition" /> is not null, it will spawn at coordinates relative to that entity.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public Vector2? SpawnPosition;
 
-    [ViewVariables(VVAccess.ReadOnly)]
-    public float Accumulator;
+    /// <summary>
+    /// Whether the trail should slowly fade out even when the entity was deleted.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public bool SpawnRemainingTrail = true;
 
-    [ViewVariables(VVAccess.ReadOnly)]
-    public float LerpAccumulator;
+    /// <summary>
+    /// If sprite is null, it will draw lines instead.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public SpriteSpecifier? Sprite;
 
-    [ViewVariables(VVAccess.ReadOnly)]
-    public int CurIndex;
-
-    [ViewVariables(VVAccess.ReadOnly)]
-    public int ParticleCount;
-
-    [ViewVariables(VVAccess.ReadOnly)]
-    public MapCoordinates LastCoords = MapCoordinates.Nullspace;
+    /// <summary>
+    /// Used for spread, if <see cref="ParticleAmount" /> is greater than one.
+    /// Zero angle faces towards projectile direction.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public Angle StartAngle;
 
     public List<TrailData> TrailData = new();
+
+    /// <summary>
+    /// Velocity of a particle, aimed towards somewhere between <see cref="StartAngle" /> and <see cref="EndAngle" />.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public float Velocity;
+
+    /// <summary>
+    /// Particles are spawned in a radius around the origin.
+    /// </summary>
+    [DataField] [Animatable]
+    public float Radius { get; set; }
+
+    /// <summary>
+    /// Color alpga lerps to <see cref="AlphaLerpTarget" /> by this amount every <see cref="LerpTime" /> seconds.
+    /// </summary>
+    [DataField] [Animatable]
+    public float AlphaLerpAmount { get; set; } = 0.3f;
+
+    /// <summary>
+    /// Scale lerps to <see cref="ScaleLerpTarget" /> by this amount every <see cref="LerpTime" /> seconds.
+    /// </summary>
+    [DataField] [Animatable]
+    public float ScaleLerpAmount { get; set; }
+
+    /// <summary>
+    /// Velocity lerps to <see cref="VelocityLerpTarget" /> by this amount every <see cref="LerpTime" /> seconds.
+    /// </summary>
+    [DataField] [Animatable]
+    public float VelocityLerpAmount { get; set; }
+
+    /// <summary>
+    /// Particle position lerps to the origin entity position by this amount every <see cref="LerpTime" /> seconds.
+    /// </summary>
+    [DataField] [Animatable]
+    public float PositionLerpAmount { get; set; }
+
+    /// <summary>
+    /// Color alpha lerps to this value every <see cref="LerpTime" /> seconds.
+    /// </summary>
+    [DataField] [Animatable]
+    public float AlphaLerpTarget { get; set; }
+
+    /// <summary>
+    /// Scale lerps to this value every <see cref="LerpTime" /> seconds.
+    /// </summary>
+    [DataField] [Animatable]
+    public float ScaleLerpTarget { get; set; }
+
+    /// <summary>
+    /// Velocity lerps to this value every <see cref="LerpTime" /> seconds.
+    /// </summary>
+    [DataField] [Animatable]
+    public float VelocityLerpTarget { get; set; }
 }
 
 public sealed class TrailData(
@@ -210,44 +210,43 @@ public sealed class TrailData(
     float scale,
     TimeSpan spawnTime)
 {
-    public Vector2 Position = position;
-
-    public float Velocity = velocity;
-
-    public MapId MapId = mapId;
-
-    public Vector2 Direction = direction;
-
     public Angle Angle = angle;
 
     public Color Color = color;
 
+    public Vector2 Direction = direction;
+
+    public MapId MapId = mapId;
+    public Vector2 Position = position;
+
     public float Scale = scale;
 
     public TimeSpan SpawnTime = spawnTime;
+
+    public float Velocity = velocity;
 }
 
 [DataDefinition]
 public sealed partial class LerpPropertyData
 {
     [DataField(required: true)]
-    public string Property;
-
-    [DataField(required: true)]
     public float LerpAmount;
 
     [DataField(required: true)]
-    public float Value;
+    public float LerpTarget;
 
     [DataField(required: true)]
-    public float LerpTarget;
+    public string Property;
+
+    [DataField(required: true)]
+    public float Value;
 }
 
 public enum RenderedEntityRotationStrategy : byte
 {
     RenderedEntity = 0,
     Trail,
-    Particle
+    Particle,
 }
 
 [ImplicitDataDefinitionForInheritors]

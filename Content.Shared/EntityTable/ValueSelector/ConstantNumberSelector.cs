@@ -73,8 +73,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Robust.Shared.Prototypes;
-
 namespace Content.Shared.EntityTable.ValueSelector;
 
 /// <summary>
@@ -90,8 +88,5 @@ public sealed partial class ConstantNumberSelector : NumberSelector
         Value = value;
     }
 
-    public override int Get(System.Random rand)
-    {
-        return Value;
-    }
+    public override int Get(System.Random rand) => Value;
 }

@@ -9,7 +9,7 @@ using Robust.Shared.Utility;
 
 namespace Content.Shared.Shuttles.Components;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class FtlVisualizerComponent : Component
 {
     /// <summary>
@@ -18,12 +18,12 @@ public sealed partial class FtlVisualizerComponent : Component
     [ViewVariables(VVAccess.ReadWrite)]
     public float Elapsed;
 
-    [DataField(required: true)]
-    public SpriteSpecifier.Rsi Sprite;
-
     /// <summary>
     /// Target grid to pull FTL visualization from.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public EntityUid Grid;
+
+    [DataField(required: true)]
+    public SpriteSpecifier.Rsi Sprite;
 }

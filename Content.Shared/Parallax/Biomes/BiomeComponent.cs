@@ -16,18 +16,14 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototy
 
 namespace Content.Shared.Parallax.Biomes;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState(true), Access(typeof(SharedBiomeSystem))]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState(true)] [Access(typeof(SharedBiomeSystem))]
 public sealed partial class BiomeComponent : Component
 {
     /// <summary>
     /// Do we load / deload.
     /// </summary>
-    [DataField, ViewVariables(VVAccess.ReadWrite), Access(Other = AccessPermissions.ReadWriteExecute)]
+    [DataField] [ViewVariables(VVAccess.ReadWrite)] [Access(Other = AccessPermissions.ReadWriteExecute)]
     public bool Enabled = true;
-
-    [ViewVariables(VVAccess.ReadWrite), DataField("seed")]
-    [AutoNetworkedField]
-    public int Seed = -1;
 
     /// <summary>
     /// The underlying entity, decal, and tile layers for the biome.
@@ -37,20 +33,10 @@ public sealed partial class BiomeComponent : Component
     public List<IBiomeLayer> Layers = new();
 
     /// <summary>
-    /// Templates to use for <see cref="Layers"/>.
-    /// If this is set on mapinit, it will fill out layers automatically.
-    /// If not set, use <c>BiomeSystem</c> to do it.
-    /// Prototype reloading will also use this.
+    /// Currently active chunks
     /// </summary>
-    [DataField]
-    public ProtoId<BiomeTemplatePrototype>? Template;
-
-    /// <summary>
-    /// If we've already generated a tile and couldn't deload it then we won't ever reload it in future.
-    /// Stored by [Chunkorigin, Tiles]
-    /// </summary>
-    [DataField("modifiedTiles")]
-    public Dictionary<Vector2i, HashSet<Vector2i>> ModifiedTiles = new();
+    [DataField("loadedChunks")]
+    public HashSet<Vector2i> LoadedChunks = new();
 
     /// <summary>
     /// Decals that have been loaded as a part of this biome.
@@ -62,10 +48,24 @@ public sealed partial class BiomeComponent : Component
     public Dictionary<Vector2i, Dictionary<EntityUid, Vector2i>> LoadedEntities = new();
 
     /// <summary>
-    /// Currently active chunks
+    /// If we've already generated a tile and couldn't deload it then we won't ever reload it in future.
+    /// Stored by [Chunkorigin, Tiles]
     /// </summary>
-    [DataField("loadedChunks")]
-    public HashSet<Vector2i> LoadedChunks = new();
+    [DataField("modifiedTiles")]
+    public Dictionary<Vector2i, HashSet<Vector2i>> ModifiedTiles = new();
+
+    [ViewVariables(VVAccess.ReadWrite)] [DataField("seed")]
+    [AutoNetworkedField]
+    public int Seed = -1;
+
+    /// <summary>
+    /// Templates to use for <see cref="Layers" />.
+    /// If this is set on mapinit, it will fill out layers automatically.
+    /// If not set, use <c>BiomeSystem</c> to do it.
+    /// Prototype reloading will also use this.
+    /// </summary>
+    [DataField]
+    public ProtoId<BiomeTemplatePrototype>? Template;
 
     #region Markers
 
@@ -78,7 +78,8 @@ public sealed partial class BiomeComponent : Component
     /// <summary>
     /// Track what markers we've loaded already to avoid double-loading.
     /// </summary>
-    [DataField("loadedMarkers", customTypeSerializer:typeof(PrototypeIdDictionarySerializer<HashSet<Vector2i>, BiomeMarkerLayerPrototype>))]
+    [DataField("loadedMarkers",
+        customTypeSerializer: typeof(PrototypeIdDictionarySerializer<HashSet<Vector2i>, BiomeMarkerLayerPrototype>))]
     public Dictionary<string, HashSet<Vector2i>> LoadedMarkers = new();
 
     [DataField]

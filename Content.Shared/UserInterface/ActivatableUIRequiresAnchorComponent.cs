@@ -10,7 +10,7 @@ namespace Content.Shared.UserInterface;
 /// <summary>
 /// Specifies the entity as requiring anchoring to keep the ActivatableUI open.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class ActivatableUIRequiresAnchorComponent : Component
 {
     [DataField]

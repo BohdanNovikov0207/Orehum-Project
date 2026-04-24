@@ -24,8 +24,6 @@ public abstract class SharedSpiderSystem : EntitySystem
         SubscribeLocalEvent<SpiderComponent, MapInitEvent>(OnInit);
     }
 
-    private void OnInit(EntityUid uid, SpiderComponent component, MapInitEvent args)
-    {
+    private void OnInit(EntityUid uid, SpiderComponent component, MapInitEvent args) =>
         _action.AddAction(uid, ref component.Action, component.WebAction, uid);
-    }
 }

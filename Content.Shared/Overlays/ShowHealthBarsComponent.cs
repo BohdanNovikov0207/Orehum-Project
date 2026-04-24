@@ -88,23 +88,23 @@ namespace Content.Shared.Overlays;
 /// <summary>
 /// This component allows you to see health bars above damageable mobs.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 [AutoGenerateComponentState(true)]
 public sealed partial class ShowHealthBarsComponent : Component
 {
-    // Goobstation
-    [DataField]
-    public bool WorksInHands;
-
     /// <summary>
     /// Displays health bars of the damage containers.
     /// </summary>
-    [DataField, AutoNetworkedField] // Shitmed Change
+    [DataField] [AutoNetworkedField] // Shitmed Change
     public List<ProtoId<DamageContainerPrototype>> DamageContainers = new()
     {
-        "Biological"
+        "Biological",
     };
 
     [DataField]
     public ProtoId<HealthIconPrototype>? HealthStatusIcon = "HealthIconFine";
+
+    // Goobstation
+    [DataField]
+    public bool WorksInHands;
 }

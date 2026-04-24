@@ -10,31 +10,28 @@ using Robust.Shared.Utility;
 
 namespace Content.Shared.Gateway;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum GatewayVisuals : byte
 {
-    Active
+    Active,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum GatewayVisualLayers : byte
 {
-    Portal
+    Portal,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum GatewayUiKey : byte
 {
-    Key
+    Key,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class GatewayBoundUserInterfaceState : BoundUserInterfaceState
 {
-    /// <summary>
-    /// List of enabled destinations and information about them.
-    /// </summary>
-    public readonly List<GatewayDestinationData> Destinations;
+    public readonly TimeSpan Cooldown;
 
     /// <summary>
     /// Which destination it is currently linked to, if any.
@@ -42,11 +39,14 @@ public sealed class GatewayBoundUserInterfaceState : BoundUserInterfaceState
     public readonly NetEntity? Current;
 
     /// <summary>
+    /// List of enabled destinations and information about them.
+    /// </summary>
+    public readonly List<GatewayDestinationData> Destinations;
+
+    /// <summary>
     /// Next time the portal is ready to be used.
     /// </summary>
     public readonly TimeSpan NextReady;
-
-    public readonly TimeSpan Cooldown;
 
     /// <summary>
     /// Next time the destination generator unlocks another destination.
@@ -59,7 +59,11 @@ public sealed class GatewayBoundUserInterfaceState : BoundUserInterfaceState
     public readonly TimeSpan UnlockTime;
 
     public GatewayBoundUserInterfaceState(List<GatewayDestinationData> destinations,
-        NetEntity? current, TimeSpan nextReady, TimeSpan cooldown, TimeSpan nextUnlock, TimeSpan unlockTime)
+        NetEntity? current,
+        TimeSpan nextReady,
+        TimeSpan cooldown,
+        TimeSpan nextUnlock,
+        TimeSpan unlockTime)
     {
         Destinations = destinations;
         Current = current;
@@ -70,10 +74,15 @@ public sealed class GatewayBoundUserInterfaceState : BoundUserInterfaceState
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public record struct GatewayDestinationData
 {
     public NetEntity Entity;
+
+    /// <summary>
+    /// Is the map the gateway on locked or unlocked.
+    /// </summary>
+    public bool Locked;
 
     public FormattedMessage Name;
 
@@ -81,14 +90,9 @@ public record struct GatewayDestinationData
     /// Is the portal currently open.
     /// </summary>
     public bool Portal;
-
-    /// <summary>
-    /// Is the map the gateway on locked or unlocked.
-    /// </summary>
-    public bool Locked;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class GatewayOpenPortalMessage : BoundUserInterfaceMessage
 {
     public NetEntity Destination;

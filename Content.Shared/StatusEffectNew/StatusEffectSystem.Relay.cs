@@ -25,15 +25,11 @@ public sealed partial class StatusEffectsSystem
         SubscribeLocalEvent<StatusEffectContainerComponent, StunEndAttemptEvent>(RefRelayStatusEffectEvent);
     }
 
-    private void RefRelayStatusEffectEvent<T>(EntityUid uid, StatusEffectContainerComponent component, ref T args) where T : struct
-    {
-        RelayEvent((uid, component), ref args);
-    }
+    private void RefRelayStatusEffectEvent<T>(EntityUid uid, StatusEffectContainerComponent component, ref T args)
+        where T : struct => RelayEvent((uid, component), ref args);
 
-    private void RelayStatusEffectEvent<T>(EntityUid uid, StatusEffectContainerComponent component, T args) where T : class
-    {
-        RelayEvent((uid, component), args);
-    }
+    private void RelayStatusEffectEvent<T>(EntityUid uid, StatusEffectContainerComponent component, T args)
+        where T : class => RelayEvent((uid, component), args);
 
     public void RelayEvent<T>(Entity<StatusEffectContainerComponent> statusEffect, ref T args) where T : struct
     {
@@ -43,6 +39,7 @@ public sealed partial class StatusEffectsSystem
         {
             RaiseLocalEvent(activeEffect, ref ev);
         }
+
         // and now we copy it back
         args = ev.Args;
     }

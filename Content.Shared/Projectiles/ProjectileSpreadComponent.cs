@@ -82,9 +82,15 @@ namespace Content.Shared.Projectiles;
 /// <summary>
 /// Spawns a spread of the projectiles when fired
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(SharedGunSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(SharedGunSystem))]
 public sealed partial class ProjectileSpreadComponent : Component
 {
+    /// <summary>
+    /// How many prototypes are spawned when shot.
+    /// </summary>
+    [DataField]
+    public int Count = 1;
+
     /// <summary>
     /// The entity prototype that will be fired by the rest of the spread.
     /// Will generally be the same entity prototype as the first projectile being fired.
@@ -98,10 +104,4 @@ public sealed partial class ProjectileSpreadComponent : Component
     /// </summary>
     [DataField]
     public Angle Spread = Angle.FromDegrees(5);
-
-    /// <summary>
-    /// How many prototypes are spawned when shot.
-    /// </summary>
-    [DataField]
-    public int Count = 1;
 }

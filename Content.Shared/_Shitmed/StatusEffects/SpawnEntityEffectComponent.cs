@@ -4,12 +4,10 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Robust.Shared.GameStates;
-
 namespace Content.Shared._Shitmed.StatusEffects;
 
 /// <summary>
-///     For use as a status effect. Spawns a given entity prototype.
+/// For use as a status effect. Spawns a given entity prototype.
 /// </summary>
 public abstract partial class SpawnEntityEffectComponent : Component
 {

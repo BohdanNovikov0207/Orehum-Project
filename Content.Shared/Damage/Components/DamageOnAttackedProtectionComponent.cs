@@ -78,18 +78,17 @@ using Robust.Shared.GameStates;
 
 namespace Content.Shared.Damage.Components;
 
-
 /// <summary>
 /// This component is added to entities to protect them from being damaged
-/// when attacking objects with the <see cref="DamageOnAttackedComponent"/>
+/// when attacking objects with the <see cref="DamageOnAttackedComponent" />
 /// If the entity has sufficient protection, the entity will take no damage.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class DamageOnAttackedProtectionComponent : Component, IClothingSlots
 {
     /// <summary>
     /// How much and what kind of damage to protect the user from
-    /// when interacting with something with <see cref="DamageOnInteractComponent"/>
+    /// when interacting with something with <see cref="DamageOnInteractComponent" />
     /// </summary>
     [DataField(required: true)]
     public DamageModifierSet DamageProtection = default!;

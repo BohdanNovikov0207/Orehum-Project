@@ -12,5 +12,4 @@ namespace Content.Shared.Damage.Components;
 [RegisterComponent]
 public sealed partial class ActiveStaminaComponent : Component
 {
-
 }

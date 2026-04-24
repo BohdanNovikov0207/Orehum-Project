@@ -31,11 +31,37 @@ namespace Content.Shared.Research.Prototypes;
 /// This is a prototype for a technology that can be unlocked.
 /// </summary>
 [Prototype]
-public sealed partial class TechnologyPrototype : IPrototype
+public sealed class TechnologyPrototype : IPrototype
 {
-    /// <inheritdoc/>
-    [IdDataField]
-    public string ID { get; private set; } = default!;
+    /// <summary>
+    /// How much research is needed to unlock.
+    /// </summary>
+    [DataField]
+    public int Cost = 10000;
+
+    /// <summary>
+    /// What research discipline this technology belongs to.
+    /// </summary>
+    [DataField(required: true)]
+    public ProtoId<TechDisciplinePrototype> Discipline;
+
+    /// <summary>
+    /// A list of non-standard effects that are done when this technology is unlocked.
+    /// </summary>
+    [DataField]
+    public IReadOnlyList<GenericUnlock> GenericUnlocks = new List<GenericUnlock>();
+
+    /// <summary>
+    /// Hidden tech is not ever available at the research console.
+    /// </summary>
+    [DataField]
+    public bool Hidden;
+
+    /// <summary>
+    /// An icon used to visually represent the technology in UI.
+    /// </summary>
+    [DataField(required: true)]
+    public SpriteSpecifier Icon = default!;
 
     /// <summary>
     /// The name of the technology.
@@ -45,16 +71,16 @@ public sealed partial class TechnologyPrototype : IPrototype
     public LocId Name = string.Empty;
 
     /// <summary>
-    /// An icon used to visually represent the technology in UI.
+    /// A list of <see cref="LatheRecipePrototype" />s that are unlocked by this technology
     /// </summary>
-    [DataField(required: true)]
-    public SpriteSpecifier Icon = default!;
+    [DataField]
+    public List<ProtoId<LatheRecipePrototype>> RecipeUnlocks = new();
 
     /// <summary>
-    /// What research discipline this technology belongs to.
+    /// A list of <see cref="TechnologyPrototype" />s that need to be unlocked in order to unlock this technology.
     /// </summary>
-    [DataField(required: true)]
-    public ProtoId<TechDisciplinePrototype> Discipline;
+    [DataField]
+    public List<ProtoId<TechnologyPrototype>> TechnologyPrerequisites = new();
 
     /// <summary>
     /// What tier research is this?
@@ -65,41 +91,15 @@ public sealed partial class TechnologyPrototype : IPrototype
     public int Tier;
 
     /// <summary>
-    /// Hidden tech is not ever available at the research console.
-    /// </summary>
-    [DataField]
-    public bool Hidden;
-
-    /// <summary>
-    /// How much research is needed to unlock.
-    /// </summary>
-    [DataField]
-    public int Cost = 10000;
-
-    /// <summary>
-    /// A list of <see cref="TechnologyPrototype"/>s that need to be unlocked in order to unlock this technology.
-    /// </summary>
-    [DataField]
-    public List<ProtoId<TechnologyPrototype>> TechnologyPrerequisites = new();
-
-    /// <summary>
-    /// A list of <see cref="LatheRecipePrototype"/>s that are unlocked by this technology
-    /// </summary>
-    [DataField]
-    public List<ProtoId<LatheRecipePrototype>> RecipeUnlocks = new();
-
-    /// <summary>
-    /// A list of non-standard effects that are done when this technology is unlocked.
-    /// </summary>
-    [DataField]
-    public IReadOnlyList<GenericUnlock> GenericUnlocks = new List<GenericUnlock>();
-
-    /// <summary>
     /// Goobstation R&D console rework field
     /// Position of this tech in console menu
     /// </summary>
     [DataField(required: true)]
     public Vector2i Position { get; private set; }
+
+    /// <inheritdoc />
+    [IdDataField]
+    public string ID { get; } = default!;
 }
 
 [DataDefinition]

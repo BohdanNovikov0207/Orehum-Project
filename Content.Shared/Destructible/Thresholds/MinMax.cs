@@ -9,7 +9,7 @@ using Robust.Shared.Random;
 
 namespace Content.Shared.Destructible.Thresholds;
 
-[DataDefinition, Serializable]
+[DataDefinition] [Serializable]
 public partial struct MinMax
 {
     [DataField]
@@ -24,13 +24,7 @@ public partial struct MinMax
         Max = max;
     }
 
-    public readonly int Next(IRobustRandom random)
-    {
-        return random.Next(Min, Max + 1);
-    }
+    public readonly int Next(IRobustRandom random) => random.Next(Min, Max + 1);
 
-    public readonly int Next(System.Random random)
-    {
-        return random.Next(Min, Max + 1);
-    }
+    public readonly int Next(System.Random random) => random.Next(Min, Max + 1);
 }

@@ -22,10 +22,8 @@ public sealed partial class ParcelWrappingSystem
         SubscribeLocalEvent<WrappedParcelComponent, GotReclaimedEvent>(OnDestroyed);
     }
 
-    private void OnComponentInit(Entity<WrappedParcelComponent> entity, ref ComponentInit args)
-    {
+    private void OnComponentInit(Entity<WrappedParcelComponent> entity, ref ComponentInit args) =>
         entity.Comp.Contents = _container.EnsureContainer<ContainerSlot>(entity, entity.Comp.ContainerId);
-    }
 
     private void OnUseInHand(Entity<WrappedParcelComponent> entity, ref UseInHandEvent args)
     {
@@ -66,7 +64,7 @@ public sealed partial class ParcelWrappingSystem
     private void OnDestroyed<T>(Entity<WrappedParcelComponent> parcel, ref T args)
     {
         // Unwrap the package and if something was in it, show a popup describing "wow something came out!"
-        if (UnwrapInternal(user: null, parcel) is { } contents)
+        if (UnwrapInternal(null, parcel) is { } contents)
         {
             _popup.PopupPredicted(Loc.GetString("parcel-wrap-popup-parcel-destroyed", ("contents", contents)),
                 contents,
@@ -75,9 +73,8 @@ public sealed partial class ParcelWrappingSystem
         }
     }
 
-    private bool TryStartUnwrapDoAfter(EntityUid user, Entity<WrappedParcelComponent> parcel)
-    {
-        return _doAfter.TryStartDoAfter(new DoAfterArgs(EntityManager,
+    private bool TryStartUnwrapDoAfter(EntityUid user, Entity<WrappedParcelComponent> parcel) =>
+        _doAfter.TryStartDoAfter(new DoAfterArgs(EntityManager,
             user,
             parcel.Comp.UnwrapDelay,
             new UnwrapWrappedParcelDoAfterEvent(),
@@ -86,10 +83,9 @@ public sealed partial class ParcelWrappingSystem
         {
             NeedHand = true,
         });
-    }
 
     /// <summary>
-    /// Despawns <paramref name="parcel"/>, leaving the contained entity where the parcel was.
+    /// Despawns <paramref name="parcel" />, leaving the contained entity where the parcel was.
     /// </summary>
     /// <param name="user">The entity doing the unwrapping.</param>
     /// <param name="parcel">The entity being unwrapped.</param>

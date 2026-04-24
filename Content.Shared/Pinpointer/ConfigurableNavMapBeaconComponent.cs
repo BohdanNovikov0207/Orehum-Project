@@ -9,18 +9,18 @@ using Robust.Shared.Serialization;
 namespace Content.Shared.Pinpointer;
 
 /// <summary>
-/// This is used for a <see cref="NavMapBeaconComponent"/> that can be configured with a UI.
+/// This is used for a <see cref="NavMapBeaconComponent" /> that can be configured with a UI.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 [Access(typeof(SharedNavMapSystem))]
 public sealed partial class ConfigurableNavMapBeaconComponent : Component;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class NavMapBeaconConfigureBuiMessage : BoundUserInterfaceMessage
 {
-    public string? Text;
-    public bool Enabled;
     public Color Color;
+    public bool Enabled;
+    public string? Text;
 
     public NavMapBeaconConfigureBuiMessage(string? text, bool enabled, Color color)
     {
@@ -30,13 +30,13 @@ public sealed class NavMapBeaconConfigureBuiMessage : BoundUserInterfaceMessage
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum NavMapBeaconUiKey : byte
 {
     Key,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum NavMapBeaconVisuals : byte
 {
     Enabled,

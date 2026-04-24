@@ -6,15 +6,15 @@ namespace Content.Shared._Lavaland.EntityShapes.Components;
 /// <summary>
 /// Spawns an entity shape periodically or with a delay. Can be modified to expand, shrink, or move with time.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class ExpandingShapeSpawnerComponent : Component
 {
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public Vector2? CounterOffset;
 
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public float? CounterSize;
 
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public float? CounterStepSize;
 }

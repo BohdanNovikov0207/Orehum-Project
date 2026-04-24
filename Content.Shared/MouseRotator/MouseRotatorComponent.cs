@@ -14,44 +14,44 @@ namespace Content.Shared.MouseRotator;
 /// <summary>
 /// This component allows overriding an entities local rotation based on the client's mouse movement
 /// </summary>
-/// <see cref="SharedMouseRotatorSystem"/>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+/// <see cref="SharedMouseRotatorSystem" />
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class MouseRotatorComponent : Component
 {
     /// <summary>
-    ///     How much the desired angle needs to change before a predictive event is sent
+    /// How much the desired angle needs to change before a predictive event is sent
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public Angle AngleTolerance = Angle.FromDegrees(5.0); // Goobstation edit - 20 => 5
 
     /// <summary>
-    ///     The angle that will be lerped to
+    /// The angle that will be lerped to
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public Angle? GoalRotation;
 
     /// <summary>
-    ///     Max degrees the entity can rotate per second
+    /// Max degrees the entity can rotate per second
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public double RotationSpeed = float.MaxValue;
 
     /// <summary>
-    ///     This one is important. If this is true, <see cref="AngleTolerance"/> does not apply. In this mode, the client will only send
-    ///     events when an entity should snap to a different cardinal direction, rather than for every angle change.
-    ///
-    ///     This is useful for cases like humans, where what really matters is the visual sprite direction, as opposed to something
-    ///     like turrets or ship guns, which have finer range of movement.
+    /// This one is important. If this is true, <see cref="AngleTolerance" /> does not apply. In this mode, the client will
+    /// only send
+    /// events when an entity should snap to a different cardinal direction, rather than for every angle change.
+    /// This is useful for cases like humans, where what really matters is the visual sprite direction, as opposed to something
+    /// like turrets or ship guns, which have finer range of movement.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public bool Simple4DirMode = false; // Goobstation edit - false by default
 }
 
 /// <summary>
-///     Raised on an entity with <see cref="MouseRotatorComponent"/> as a predictive event on the client
-///     when mouse rotation changes
+/// Raised on an entity with <see cref="MouseRotatorComponent" /> as a predictive event on the client
+/// when mouse rotation changes
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class RequestMouseRotatorRotationEvent : EntityEventArgs
 {
     public Angle Rotation;

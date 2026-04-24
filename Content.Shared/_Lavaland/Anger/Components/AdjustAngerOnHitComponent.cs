@@ -2,7 +2,7 @@
 
 namespace Content.Shared._Lavaland.Anger.Components;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class AdjustAngerOnHitComponent : Component
 {
     [DataField]

@@ -12,13 +12,13 @@ namespace Content.Shared._Lavaland.EntityShapes;
 public sealed class EntityShapeSystem : EntitySystem
 {
     [Dependency] private readonly AngerSystem _anger = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly IPrototypeManager _protoMan = default!;
-    [Dependency] private readonly INetManager _net = default!;
     [Dependency] private readonly IMapManager _mapMan = default!;
+    [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly IPrototypeManager _protoMan = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    private EntityQuery<ShapeSpawnerCounterComponent> _counterQuery;
 
     private EntityQuery<ShapeSpawnerComponent> _spawnerQuery;
-    private EntityQuery<ShapeSpawnerCounterComponent> _counterQuery;
 
     public override void Initialize()
     {
@@ -58,7 +58,11 @@ public sealed class EntityShapeSystem : EntitySystem
         }
     }
 
-    public void SpawnEntityShape(EntityShape shape, EntityUid target, EntProtoId spawnId, out List<EntityUid> spawned, bool alignTile = false)
+    public void SpawnEntityShape(EntityShape shape,
+        EntityUid target,
+        EntProtoId spawnId,
+        out List<EntityUid> spawned,
+        bool alignTile = false)
     {
         var coords = alignTile
             ? Transform(target).Coordinates.AlignWithClosestGridTile(1.5f, EntityManager, _mapMan)
@@ -71,7 +75,10 @@ public sealed class EntityShapeSystem : EntitySystem
     /// Use this only if you need to get all spawned entities by this shape,
     /// otherwise it's better to spawn an entity with ShapeSpawnerComponent.
     /// </remarks>
-    public void SpawnEntityShape(EntityShape shape, EntityCoordinates coords, EntProtoId spawnId, out List<EntityUid> spawned)
+    public void SpawnEntityShape(EntityShape shape,
+        EntityCoordinates coords,
+        EntProtoId spawnId,
+        out List<EntityUid> spawned)
     {
         spawned = new List<EntityUid>();
 
@@ -81,7 +88,7 @@ public sealed class EntityShapeSystem : EntitySystem
             return;
 
         var result = shape.GetShape(GetRandom(), _protoMan);
-        for (int i = 0; i < result.Count; i++)
+        for (var i = 0; i < result.Count; i++)
         {
             result[i] += coords.Position;
         }
@@ -98,7 +105,9 @@ public sealed class EntityShapeSystem : EntitySystem
         => SpawnEntityShape(ent.Comp.Shape, ent.Owner, ent.Comp.Spawn, out _, ent.Comp.AlignCoords);
 
     private void OnCounterInit(Entity<ShapeSpawnerCounterComponent> ent, ref MapInitEvent args)
-        => ent.Comp.NextSpawn = _timing.CurTime + ent.Comp.SpawnPeriod; // First shape is spawned by an event right above this one, so delay it
+        => ent.Comp.NextSpawn =
+            _timing.CurTime +
+            ent.Comp.SpawnPeriod; // First shape is spawned by an event right above this one, so delay it
 
     private void OnActionSpawned(Entity<AngerShapeSpawnerComponent> ent, ref SpawnedByActionEvent args)
     {
@@ -124,7 +133,8 @@ public sealed class EntityShapeSystem : EntitySystem
         }
     }
 
-    private void OnExpandingShapeTrigger(Entity<ExpandingShapeSpawnerComponent> ent, ref SpawnCounterEntityShapeEvent args)
+    private void OnExpandingShapeTrigger(Entity<ExpandingShapeSpawnerComponent> ent,
+        ref SpawnCounterEntityShapeEvent args)
     {
         var (uid, comp) = ent;
 
@@ -143,8 +153,5 @@ public sealed class EntityShapeSystem : EntitySystem
         SpawnEntityShape(spawner.Shape, uid, spawner.Spawn, out _, spawner.AlignCoords);
     }
 
-    private System.Random GetRandom()
-    {
-        return new System.Random((int) _timing.CurTick.Value);
-    }
+    private System.Random GetRandom() => new((int) _timing.CurTick.Value);
 }

@@ -4,15 +4,14 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Chemistry.Reagent;
-using Content.Shared.Body.Systems;
-using Content.Shared.EntityEffects;
 using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Body.Components;
-using Robust.Shared.Prototypes;
-using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype;
+using Content.Shared.Body.Systems;
 using Content.Shared.Chemistry.Components;
 using Content.Shared.Chemistry.EntitySystems;
+using Content.Shared.Chemistry.Reagent;
+using Robust.Shared.Prototypes;
+using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype;
 
 namespace Content.Shared.EntityEffects.Effects;
 
@@ -20,11 +19,11 @@ public sealed partial class AddReagentToBlood : EntityEffect // TODO Goobstation
 {
     private readonly SharedSolutionContainerSystem _solutionContainers;
 
-    [DataField(customTypeSerializer: typeof(PrototypeIdSerializer<ReagentPrototype>))]
-    public string? Reagent = null;
-
     [DataField]
     public FixedPoint2 Amount = default!;
+
+    [DataField(customTypeSerializer: typeof(PrototypeIdSerializer<ReagentPrototype>))]
+    public string? Reagent = null;
 
     public override void Effect(EntityEffectBaseArgs args)
     {
@@ -33,13 +32,13 @@ public sealed partial class AddReagentToBlood : EntityEffect // TODO Goobstation
             var sys = args.EntityManager.System<SharedBloodstreamSystem>();
             if (args is EntityEffectReagentArgs reagentArgs)
             {
-                if (Reagent is null) return;
+                if (Reagent is null)
+                    return;
                 var amt = Amount;
                 var solution = new Solution();
                 solution.AddReagent(Reagent, amt);
                 sys.TryAddToChemicals((args.TargetEntity, blood), solution);
             }
-            return;
         }
     }
 

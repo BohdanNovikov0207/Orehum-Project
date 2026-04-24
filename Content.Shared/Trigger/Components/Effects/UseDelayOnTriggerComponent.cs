@@ -9,18 +9,18 @@ namespace Content.Shared.Trigger.Components.Effects;
 /// <remarks>
 /// TODO: Support specific UseDelay IDs for each trigger key.
 /// </remarks>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class UseDelayOnTriggerComponent : BaseXOnTriggerComponent
 {
     /// <summary>
-    /// The UseDelay Id to delay.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public string UseDelayId = UseDelaySystem.DefaultId;
-
-    /// <summary>
     /// If true ongoing delays won't be reset.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public bool CheckDelayed;
+
+    /// <summary>
+    /// The UseDelay Id to delay.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public string UseDelayId = UseDelaySystem.DefaultId;
 }

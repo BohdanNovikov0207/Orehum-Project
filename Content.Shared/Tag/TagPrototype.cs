@@ -23,8 +23,8 @@ namespace Content.Shared.Tag;
 /// gets saved in TagComponent.
 /// </summary>
 [Prototype("Tag")]
-public sealed partial class TagPrototype : IPrototype
+public sealed class TagPrototype : IPrototype
 {
-    [IdDataField, ViewVariables]
-    public string ID { get; private set; } = string.Empty;
+    [IdDataField] [ViewVariables]
+    public string ID { get; } = string.Empty;
 }

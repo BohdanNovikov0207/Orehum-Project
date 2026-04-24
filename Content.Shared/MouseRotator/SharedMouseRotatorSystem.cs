@@ -12,7 +12,7 @@ namespace Content.Shared.MouseRotator;
 /// <summary>
 /// This handles rotating an entity based on mouse location
 /// </summary>
-/// <see cref="MouseRotatorComponent"/>
+/// <see cref="MouseRotatorComponent" />
 public abstract class SharedMouseRotatorSystem : EntitySystem
 {
     [Dependency] private readonly RotateToFaceSystem _rotate = default!;

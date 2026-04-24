@@ -9,12 +9,12 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Shared._Lavaland.Movement;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class HierophantBeatComponent : Component
 {
     [DataField]
-    public float MovementSpeedBuff = 1.25f;
+    public ProtoId<AlertPrototype> HierophantBeatAlertId = "HierophantBeat";
 
     [DataField]
-    public ProtoId<AlertPrototype> HierophantBeatAlertId = "HierophantBeat";
+    public float MovementSpeedBuff = 1.25f;
 }

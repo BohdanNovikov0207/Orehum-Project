@@ -10,27 +10,14 @@ namespace Content.Shared.Doors.Components;
 /// <summary>
 /// This is used for a condition door that allows entry only through a single side.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState, AutoGenerateComponentPause]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState] [AutoGenerateComponentPause]
 [Access(typeof(SharedTurnstileSystem))]
 public sealed partial class TurnstileComponent : Component
 {
     /// <summary>
-    /// A whitelist of the things this turnstile can choose to block or let through.
-    /// Things not in this whitelist will be ignored by default.
-    /// </summary>
-    [DataField]
-    public EntityWhitelist? ProcessWhitelist;
-
-    /// <summary>
-    /// The next time at which the resist message can show.
-    /// </summary>
-    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer)), AutoNetworkedField, AutoPausedField]
-    public TimeSpan NextResistTime;
-
-    /// <summary>
     /// Maintained hashset of entities currently passing through the turnstile.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public HashSet<EntityUid> CollideExceptions = new();
 
     /// <summary>
@@ -40,10 +27,16 @@ public sealed partial class TurnstileComponent : Component
     public string DefaultState = "turnstile";
 
     /// <summary>
-    /// animation state of the turnstile spinning.
+    /// Sound to play when the turnstile denies entry
     /// </summary>
     [DataField]
-    public string SpinState = "operate";
+    public SoundSpecifier? DenySound = new SoundPathSpecifier("/Audio/Machines/airlock_deny.ogg")
+    {
+        Params = new AudioParams
+        {
+            Volume = -7,
+        },
+    };
 
     /// <summary>
     /// animation state of the turnstile denying entry.
@@ -52,26 +45,34 @@ public sealed partial class TurnstileComponent : Component
     public string DenyState = "deny";
 
     /// <summary>
+    /// The next time at which the resist message can show.
+    /// </summary>
+    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))] [AutoNetworkedField] [AutoPausedField]
+    public TimeSpan NextResistTime;
+
+    /// <summary>
+    /// A whitelist of the things this turnstile can choose to block or let through.
+    /// Things not in this whitelist will be ignored by default.
+    /// </summary>
+    [DataField]
+    public EntityWhitelist? ProcessWhitelist;
+
+    /// <summary>
+    /// animation state of the turnstile spinning.
+    /// </summary>
+    [DataField]
+    public string SpinState = "operate";
+
+    /// <summary>
     /// Sound to play when the turnstile admits a mob through.
     /// </summary>
     [DataField]
-    public SoundSpecifier? TurnSound = new SoundPathSpecifier("/Audio/Items/ratchet.ogg", AudioParams.Default.WithVolume(-6));
-
-    /// <summary>
-    /// Sound to play when the turnstile denies entry
-    /// </summary>
-    [DataField]
-    public SoundSpecifier? DenySound = new SoundPathSpecifier("/Audio/Machines/airlock_deny.ogg")
-    {
-        Params = new()
-        {
-            Volume = -7,
-        },
-    };
+    public SoundSpecifier? TurnSound =
+        new SoundPathSpecifier("/Audio/Items/ratchet.ogg", AudioParams.Default.WithVolume(-6));
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum TurnstileVisualLayers : byte
 {
-    Base
+    Base,
 }

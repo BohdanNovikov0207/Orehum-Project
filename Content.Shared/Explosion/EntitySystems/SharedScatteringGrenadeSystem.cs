@@ -13,9 +13,9 @@ namespace Content.Shared.Explosion.EntitySystems;
 
 public abstract class SharedScatteringGrenadeSystem : EntitySystem
 {
-    [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
     [Dependency] private readonly SharedContainerSystem _container = default!;
+    [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
 
     public override void Initialize()
     {
@@ -26,10 +26,8 @@ public abstract class SharedScatteringGrenadeSystem : EntitySystem
         SubscribeLocalEvent<ScatteringGrenadeComponent, InteractUsingEvent>(OnScatteringInteractUsing);
     }
 
-    private void OnScatteringInit(Entity<ScatteringGrenadeComponent> entity, ref ComponentInit args)
-    {
+    private void OnScatteringInit(Entity<ScatteringGrenadeComponent> entity, ref ComponentInit args) =>
         entity.Comp.Container = _container.EnsureContainer<Container>(entity.Owner, "cluster-payload");
-    }
 
     /// <summary>
     /// Setting the unspawned count based on capacity, so we know how many new entities to spawn
@@ -43,7 +41,6 @@ public abstract class SharedScatteringGrenadeSystem : EntitySystem
         entity.Comp.UnspawnedCount = Math.Max(0, entity.Comp.Capacity - entity.Comp.Container.ContainedEntities.Count);
         UpdateAppearance(entity);
         Dirty(entity, entity.Comp);
-
     }
 
     /// <summary>

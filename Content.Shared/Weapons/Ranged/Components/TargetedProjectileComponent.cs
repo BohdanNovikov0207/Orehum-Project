@@ -9,10 +9,10 @@ using Robust.Shared.GameStates;
 
 namespace Content.Shared.Weapons.Ranged.Components;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 [Access(typeof(SharedGunSystem))]
 public sealed partial class TargetedProjectileComponent : Component
 {
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public EntityUid? Target; // Goob edit - if null it hits everything
 }

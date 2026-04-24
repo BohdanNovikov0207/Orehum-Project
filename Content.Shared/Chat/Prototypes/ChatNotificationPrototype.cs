@@ -7,11 +7,13 @@ namespace Content.Shared.Chat.Prototypes;
 /// A predefined notification used to warn a player of specific events.
 /// </summary>
 [Prototype("chatNotification")]
-public sealed partial class ChatNotificationPrototype : IPrototype
+public sealed class ChatNotificationPrototype : IPrototype
 {
-    [ViewVariables]
-    [IdDataField]
-    public string ID { get; private set; } = default!;
+    /// <summary>
+    /// Font color for the notification.
+    /// </summary>
+    [DataField]
+    public Color Color = Color.White;
 
     /// <summary>
     /// The notification that the player receives.
@@ -22,18 +24,6 @@ public sealed partial class ChatNotificationPrototype : IPrototype
     /// </remarks>
     [DataField(required: true)]
     public LocId Message = string.Empty;
-
-    /// <summary>
-    /// Font color for the notification.
-    /// </summary>
-    [DataField]
-    public Color Color = Color.White;
-
-    /// <summary>
-    /// Sound played upon receiving the notification.
-    /// </summary>
-    [DataField]
-    public SoundSpecifier? Sound;
 
     /// <summary>
     /// The period during which duplicate chat notifications are blocked after a player receives one.
@@ -49,6 +39,16 @@ public sealed partial class ChatNotificationPrototype : IPrototype
     /// </summary>
     [DataField]
     public bool NotifyBySource = false;
+
+    /// <summary>
+    /// Sound played upon receiving the notification.
+    /// </summary>
+    [DataField]
+    public SoundSpecifier? Sound;
+
+    [ViewVariables]
+    [IdDataField]
+    public string ID { get; } = default!;
 }
 
 /// <summary>
@@ -58,7 +58,10 @@ public sealed partial class ChatNotificationPrototype : IPrototype
 /// <param name="Source">The entity that the triggered the notification.</param>
 /// <param name="User">The entity that ultimately responsible for triggering the notification.</param>
 [ByRefEvent]
-public record ChatNotificationEvent(ProtoId<ChatNotificationPrototype> ChatNotification, EntityUid Source, EntityUid? User = null)
+public record ChatNotificationEvent(
+    ProtoId<ChatNotificationPrototype> ChatNotification,
+    EntityUid Source,
+    EntityUid? User = null)
 {
     /// <summary>
     /// Set this variable if you want to change the name of the notification source

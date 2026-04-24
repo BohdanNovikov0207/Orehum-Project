@@ -6,6 +6,7 @@
 using System.Linq;
 using System.Numerics;
 using Robust.Shared.Random;
+
 // ReSharper disable PossibleLossOfFraction
 
 namespace Content.Shared._Lavaland.EntityShapes;
@@ -29,17 +30,15 @@ public static class ShapeHelpers
             yield break;
 
         var curStep = new Vector2(center.X, center.Y);
-        for (int i = 0; i < range; i++)
+        for (var i = 0; i < range; i++)
         {
             curStep += step;
             yield return curStep;
         }
     }
 
-    public static IEnumerable<Vector2> MakeBox(Vector2 center, int range, bool hollow, float stepSize = 1)
-    {
-        return hollow ? MakeBoxHollow(center, range, stepSize) : MakeBoxFilled(center, range, stepSize);
-    }
+    public static IEnumerable<Vector2> MakeBox(Vector2 center, int range, bool hollow, float stepSize = 1) =>
+        hollow ? MakeBoxHollow(center, range, stepSize) : MakeBoxFilled(center, range, stepSize);
 
 
     public static IEnumerable<Vector2> MakeBoxFilled(Vector2 center, int range, float stepSize = 1)
@@ -88,16 +87,19 @@ public static class ShapeHelpers
         {
             yield return bottomLeft + Vector2.UnitY * i;
         }
+
         // Top side
         for (var i = 0f; i < side; i += stepSize)
         {
             yield return topLeft + Vector2.UnitX * i;
         }
+
         // Right side
         for (var i = 0f; i < side; i += stepSize)
         {
             yield return topRight + -Vector2.UnitY * i;
         }
+
         // Bottom side
         for (var i = 0f; i < side; i += stepSize)
         {
@@ -169,7 +171,7 @@ public static class ShapeHelpers
         float stepSize = 1)
     {
         var refs = MakeBoxFilled(center, range, stepSize).ToList();
-        for (int i = 0; i < removeAmount; i++)
+        for (var i = 0; i < removeAmount; i++)
         {
             if (refs.Count == 0)
                 return refs;

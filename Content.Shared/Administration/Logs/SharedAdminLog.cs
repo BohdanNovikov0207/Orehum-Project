@@ -11,7 +11,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Administration.Logs;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public readonly record struct SharedAdminLog(
     int Id,
     LogType Type,

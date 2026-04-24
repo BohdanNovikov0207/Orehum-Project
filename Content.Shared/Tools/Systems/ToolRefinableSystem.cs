@@ -47,7 +47,7 @@ public sealed class ToolRefinablSystem : EntitySystem
             component.RefineTime,
             component.QualityNeeded,
             new WelderRefineDoAfterEvent(),
-            fuel: component.RefineFuel);
+            component.RefineFuel);
     }
 
     private void OnDoAfter(EntityUid uid, ToolRefinableComponent component, WelderRefineDoAfterEvent args)

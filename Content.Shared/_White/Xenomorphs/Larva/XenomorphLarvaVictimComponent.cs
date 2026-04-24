@@ -4,10 +4,10 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Shared._White.Xenomorphs.Larva;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 [AutoGenerateComponentState(true)]
 public sealed partial class XenomorphLarvaVictimComponent : Component
 {
-    [AutoNetworkedField, ViewVariables]
+    [AutoNetworkedField] [ViewVariables]
     public ProtoId<InfectionIconPrototype>? InfectedIcon;
 }

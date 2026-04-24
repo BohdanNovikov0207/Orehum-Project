@@ -14,9 +14,9 @@ namespace Content.Shared.Fluids;
 
 public sealed class SpraySafetySystem : EntitySystem
 {
-    [Dependency] private readonly ItemToggleSystem _toggle = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly ItemToggleSystem _toggle = default!;
 
     public override void Initialize()
     {
@@ -34,10 +34,8 @@ public sealed class SpraySafetySystem : EntitySystem
             args.Cancel(Loc.GetString(comp.Popup));
     }
 
-    private void OnTransferred(Entity<SpraySafetyComponent> ent, ref SolutionTransferredEvent args)
-    {
+    private void OnTransferred(Entity<SpraySafetyComponent> ent, ref SolutionTransferredEvent args) =>
         _audio.PlayPredicted(ent.Comp.RefillSound, ent, args.User);
-    }
 
     private void OnSprayAttempt(Entity<SpraySafetyComponent> ent, ref SprayAttemptEvent args)
     {

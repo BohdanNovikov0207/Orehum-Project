@@ -1,9 +1,9 @@
-using Content.Shared.Verbs;
 using Content.Shared.Trigger.Components.Triggers;
+using Content.Shared.Verbs;
 
 namespace Content.Shared.Trigger.Systems;
 
-public sealed partial class TriggerOnVerbSystem : EntitySystem
+public sealed class TriggerOnVerbSystem : EntitySystem
 {
     [Dependency] private readonly TriggerSystem _trigger = default!;
 
@@ -25,7 +25,7 @@ public sealed partial class TriggerOnVerbSystem : EntitySystem
         {
             Text = Loc.GetString(ent.Comp.Text),
             Act = () => _trigger.Trigger(ent.Owner, user, ent.Comp.KeyOut),
-            Priority = 2 // should be above any timer settings
+            Priority = 2, // should be above any timer settings
         });
     }
 }

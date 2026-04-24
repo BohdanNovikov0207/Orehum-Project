@@ -18,14 +18,15 @@ namespace Content.Shared.Weapons.Ranged.Components;
 /// This is used for relaying ammo events
 /// to an entity in the user's clothing slot.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(SharedGunSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(SharedGunSystem))]
 public sealed partial class ClothingSlotAmmoProviderComponent : AmmoProviderComponent
 {
     /// <summary>
-    /// The slot that the ammo provider should be located in.
+    /// Assmos - Extinguisher Nozzle
+    /// If the hands are considered a valid ammo provider slot.
     /// </summary>
-    [DataField("targetSlot", required: true)]
-    public SlotFlags TargetSlot;
+    [DataField("checkHands")]
+    public bool CheckHands = false;
 
     /// <summary>
     /// A whitelist for determining whether or not an ammo provider is valid.
@@ -34,9 +35,8 @@ public sealed partial class ClothingSlotAmmoProviderComponent : AmmoProviderComp
     public EntityWhitelist? ProviderWhitelist;
 
     /// <summary>
-    /// Assmos - Extinguisher Nozzle
-    /// If the hands are considered a valid ammo provider slot.
+    /// The slot that the ammo provider should be located in.
     /// </summary>
-    [DataField("checkHands")]
-    public bool CheckHands = false;
+    [DataField("targetSlot", required: true)]
+    public SlotFlags TargetSlot;
 }

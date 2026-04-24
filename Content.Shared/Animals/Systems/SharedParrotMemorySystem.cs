@@ -9,9 +9,9 @@ namespace Content.Shared.Animals.Systems;
 
 public abstract class SharedParrotMemorySystem : EntitySystem
 {
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly ISharedAdminManager _admin = default!;
     [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
 
     public override void Initialize()
     {
@@ -29,11 +29,11 @@ public abstract class SharedParrotMemorySystem : EntitySystem
             return;
 
         // simple verb that just clears the memory list
-        var clearMemoryVerb = new Verb()
+        var clearMemoryVerb = new Verb
         {
             Text = Loc.GetString("parrot-verb-clear-memory"),
             Category = VerbCategory.Admin,
-            Icon = new SpriteSpecifier.Texture(new("/Textures/Interface/AdminActions/clear-parrot.png")),
+            Icon = new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/AdminActions/clear-parrot.png")),
             Act = () =>
             {
                 _popup.PopupClient(Loc.GetString("parrot-popup-memory-cleared"), entity.Owner, user);

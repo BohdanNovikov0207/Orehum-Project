@@ -15,6 +15,9 @@ namespace Content.Shared.Random.Rules;
 /// </summary>
 public sealed partial class NearbyAccessRule : RulesRule
 {
+    [DataField(required: true)]
+    public List<ProtoId<AccessLevelPrototype>> Access = new();
+
     // This exists because of door electronics contained inside doors.
     /// <summary>
     /// Does the access entity need to be anchored.
@@ -28,9 +31,6 @@ public sealed partial class NearbyAccessRule : RulesRule
     [DataField]
     public int Count = 1;
 
-    [DataField(required: true)]
-    public List<ProtoId<AccessLevelPrototype>> Access = new();
-
     [DataField]
     public float Range = 10f;
 
@@ -40,9 +40,7 @@ public sealed partial class NearbyAccessRule : RulesRule
 
         if (!xformQuery.TryGetComponent(uid, out var xform) ||
             xform.MapUid == null)
-        {
             return false;
-        }
 
         var transform = entManager.System<SharedTransformSystem>();
         var lookup = entManager.System<EntityLookupSystem>();
@@ -61,9 +59,7 @@ public sealed partial class NearbyAccessRule : RulesRule
                 Anchored &&
                 (!xformQuery.TryGetComponent(comp, out var compXform) ||
                  !compXform.Anchored))
-            {
                 continue;
-            }
 
             count++;
 

@@ -8,7 +8,7 @@ namespace Content.Shared._Lavaland.Megafauna.Selectors;
 
 /// <summary>
 /// Performs an action and if required, tries to get target positions
-/// from <see cref="MegafaunaAiTargetingComponent"/>.
+/// from <see cref="MegafaunaAiTargetingComponent" />.
 /// </summary>
 public sealed partial class PerformActionSelector : MegafaunaSelector
 {
@@ -31,7 +31,8 @@ public sealed partial class PerformActionSelector : MegafaunaSelector
 
         if (!actionSys.TryPerformAction(args.Entity, ev))
         {
-            DebugTools.Assert($"{entMan.ToPrettyString(args.Entity)}'s AI failed to perform action {entMan.ToPrettyString(action.Value.Owner)} with ID {ActionId}!");
+            DebugTools.Assert(
+                $"{entMan.ToPrettyString(args.Entity)}'s AI failed to perform action {entMan.ToPrettyString(action.Value.Owner)} with ID {ActionId}!");
             return FailDelay;
         }
 

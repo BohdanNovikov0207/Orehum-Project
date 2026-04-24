@@ -12,13 +12,17 @@ using Robust.Shared.Prototypes;
 namespace Content.Shared.Spreader;
 
 /// <summary>
-/// Adds this node group to <see cref="Content.Server.Spreader.SpreaderSystem"/> for tick updates.
+/// Adds this node group to <see cref="Content.Server.Spreader.SpreaderSystem" /> for tick updates.
 /// </summary>
 [Prototype]
-public sealed partial class EdgeSpreaderPrototype : IPrototype
+public sealed class EdgeSpreaderPrototype : IPrototype
 {
-    [IdDataField] public string ID { get; private set; } = string.Empty;
-    [DataField(required:true)] public int UpdatesPerSecond;
+    /// <summary>
+    /// Goobstation
+    /// If true, blocked tiles (such as walls) will be ignored
+    /// </summary>
+    [DataField]
+    public bool IgnoreBlockedTiles;
 
     /// <summary>
     /// If true, this spreader can't spread onto spaced tiles like lattice.
@@ -26,10 +30,6 @@ public sealed partial class EdgeSpreaderPrototype : IPrototype
     [DataField]
     public bool PreventSpreadOnSpaced = true;
 
-    /// <summary>
-    /// Goobstation
-    /// If true, blocked tiles (such as walls) will be ignored
-    /// </summary>
-    [DataField]
-    public bool IgnoreBlockedTiles;
+    [DataField(required: true)] public int UpdatesPerSecond;
+    [IdDataField] public string ID { get; } = string.Empty;
 }

@@ -18,18 +18,18 @@ using Robust.Shared.Timing;
 namespace Content.Shared.Chat.TypingIndicator;
 
 /// <summary>
-///     Supports typing indicators on entities.
+/// Supports typing indicators on entities.
 /// </summary>
 public abstract class SharedTypingIndicatorSystem : EntitySystem
 {
+    /// <summary>
+    /// Default ID of <see cref="TypingIndicatorPrototype" />
+    /// </summary>
+    public static readonly ProtoId<TypingIndicatorPrototype> InitialIndicatorId = "default";
+
     [Dependency] private readonly ActionBlockerSystem _actionBlocker = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
-
-    /// <summary>
-    ///     Default ID of <see cref="TypingIndicatorPrototype"/>
-    /// </summary>
-    public static readonly ProtoId<TypingIndicatorPrototype> InitialIndicatorId = "default";
 
     public override void Initialize()
     {
@@ -39,7 +39,8 @@ public abstract class SharedTypingIndicatorSystem : EntitySystem
 
         SubscribeLocalEvent<TypingIndicatorClothingComponent, ClothingGotEquippedEvent>(OnGotEquipped);
         SubscribeLocalEvent<TypingIndicatorClothingComponent, ClothingGotUnequippedEvent>(OnGotUnequipped);
-        SubscribeLocalEvent<TypingIndicatorClothingComponent, InventoryRelayedEvent<BeforeShowTypingIndicatorEvent>>(BeforeShow);
+        SubscribeLocalEvent<TypingIndicatorClothingComponent, InventoryRelayedEvent<BeforeShowTypingIndicatorEvent>>(
+            BeforeShow);
 
         SubscribeAllEvent<TypingChangedEvent>(OnTypingChanged);
     }
@@ -52,26 +53,20 @@ public abstract class SharedTypingIndicatorSystem : EntitySystem
         EnsureComp<AppearanceComponent>(ev.Entity);
     }
 
-    private void OnPlayerDetached(EntityUid uid, TypingIndicatorComponent component, PlayerDetachedEvent args)
-    {
+    private void OnPlayerDetached(EntityUid uid, TypingIndicatorComponent component, PlayerDetachedEvent args) =>
         // player left entity body - hide typing indicator
         SetTypingIndicatorState(uid, TypingIndicatorState.None);
-    }
 
-    private void OnGotEquipped(Entity<TypingIndicatorClothingComponent> entity, ref ClothingGotEquippedEvent args)
-    {
+    private void OnGotEquipped(Entity<TypingIndicatorClothingComponent> entity, ref ClothingGotEquippedEvent args) =>
         entity.Comp.GotEquippedTime = _timing.CurTime;
-    }
 
-    private void OnGotUnequipped(Entity<TypingIndicatorClothingComponent> entity, ref ClothingGotUnequippedEvent args)
-    {
+    private void
+        OnGotUnequipped(Entity<TypingIndicatorClothingComponent> entity, ref ClothingGotUnequippedEvent args) =>
         entity.Comp.GotEquippedTime = null;
-    }
 
-    private void BeforeShow(Entity<TypingIndicatorClothingComponent> entity, ref InventoryRelayedEvent<BeforeShowTypingIndicatorEvent> args)
-    {
+    private void BeforeShow(Entity<TypingIndicatorClothingComponent> entity,
+        ref InventoryRelayedEvent<BeforeShowTypingIndicatorEvent> args) =>
         args.Args.TryUpdateTimeAndIndicator(entity.Comp.TypingIndicatorPrototype, entity.Comp.GotEquippedTime);
-    }
 
     private void OnTypingChanged(TypingChangedEvent ev, EntitySessionEventArgs args)
     {
@@ -93,7 +88,9 @@ public abstract class SharedTypingIndicatorSystem : EntitySystem
         SetTypingIndicatorState(uid.Value, ev.State);
     }
 
-    private void SetTypingIndicatorState(EntityUid uid, TypingIndicatorState state, AppearanceComponent? appearance = null)
+    private void SetTypingIndicatorState(EntityUid uid,
+        TypingIndicatorState state,
+        AppearanceComponent? appearance = null)
     {
         if (!Resolve(uid, ref appearance, false))
             return;

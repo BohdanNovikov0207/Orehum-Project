@@ -46,8 +46,11 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Roles;
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.GameTicking.Prototypes;
+using Content.Shared.Mobs;
+using Content.Shared.Roles;
+using Robust.Shared.Audio;
 using Robust.Shared.Network;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Replays;
@@ -55,243 +58,247 @@ using Robust.Shared.Serialization;
 using Robust.Shared.Serialization.Markdown.Mapping;
 using Robust.Shared.Serialization.Markdown.Value;
 using Robust.Shared.Timing;
-using Robust.Shared.Audio;
-using Content.Goobstation.Maths.FixedPoint; // Goob Station - Round End Screen
-using Content.Shared.Mobs; // Goob Station - Round End Screen
+// Goob Station - Round End Screen
 
-namespace Content.Shared.GameTicking
+// Goob Station - Round End Screen
+
+namespace Content.Shared.GameTicking;
+
+public abstract class SharedGameTicker : EntitySystem
 {
-    public abstract class SharedGameTicker : EntitySystem
+    public const string FallbackOverflowJobName = "job-name-passenger";
+
+    // See ideally these would be pulled from the job definition or something.
+    // But this is easier, and at least it isn't hardcoded.
+    //TODO: Move these, they really belong in StationJobsSystem or a cvar.
+    public static readonly ProtoId<JobPrototype> FallbackOverflowJob = "Passenger";
+    [Dependency] private readonly IGameTiming _gameTiming = default!;
+    [Dependency] private readonly IReplayRecordingManager _replay = default!;
+
+    // TODO network.
+    // Probably most useful for replays, round end info, and probably things like lobby menus.
+    [ViewVariables]
+    public int RoundId { get; protected set; }
+
+    [ViewVariables] public TimeSpan RoundStartTimeSpan { get; protected set; }
+
+    public override void Initialize()
     {
-        [Dependency] private readonly IReplayRecordingManager _replay = default!;
-        [Dependency] private readonly IGameTiming _gameTiming = default!;
-
-        // See ideally these would be pulled from the job definition or something.
-        // But this is easier, and at least it isn't hardcoded.
-        //TODO: Move these, they really belong in StationJobsSystem or a cvar.
-        public static readonly ProtoId<JobPrototype> FallbackOverflowJob = "Passenger";
-
-        public const string FallbackOverflowJobName = "job-name-passenger";
-
-        // TODO network.
-        // Probably most useful for replays, round end info, and probably things like lobby menus.
-        [ViewVariables]
-        public int RoundId { get; protected set; }
-        [ViewVariables] public TimeSpan RoundStartTimeSpan { get; protected set; }
-
-        public override void Initialize()
-        {
-            base.Initialize();
-            _replay.RecordingStarted += OnRecordingStart;
-        }
-
-        public override void Shutdown()
-        {
-            _replay.RecordingStarted -= OnRecordingStart;
-        }
-
-        private void OnRecordingStart(MappingDataNode metadata, List<object> events)
-        {
-            if (RoundId != 0)
-            {
-                metadata["roundId"] = new ValueDataNode(RoundId.ToString());
-            }
-        }
-
-        public TimeSpan RoundDuration()
-        {
-            return _gameTiming.CurTime.Subtract(RoundStartTimeSpan);
-        }
+        base.Initialize();
+        _replay.RecordingStarted += OnRecordingStart;
     }
 
-    [Serializable, NetSerializable]
-    public sealed class TickerJoinLobbyEvent : EntityEventArgs
+    public override void Shutdown() => _replay.RecordingStarted -= OnRecordingStart;
+
+    private void OnRecordingStart(MappingDataNode metadata, List<object> events)
     {
+        if (RoundId != 0)
+            metadata["roundId"] = new ValueDataNode(RoundId.ToString());
     }
 
-    [Serializable, NetSerializable]
-    public sealed class TickerJoinGameEvent : EntityEventArgs
+    public TimeSpan RoundDuration() => _gameTiming.CurTime.Subtract(RoundStartTimeSpan);
+}
+
+[Serializable] [NetSerializable]
+public sealed class TickerJoinLobbyEvent : EntityEventArgs
+{
+}
+
+[Serializable] [NetSerializable]
+public sealed class TickerJoinGameEvent : EntityEventArgs
+{
+}
+
+[Serializable] [NetSerializable]
+public sealed class TickerLateJoinStatusEvent : EntityEventArgs
+{
+    public TickerLateJoinStatusEvent(bool disallowed)
     {
+        Disallowed = disallowed;
     }
 
-    [Serializable, NetSerializable]
-    public sealed class TickerLateJoinStatusEvent : EntityEventArgs
-    {
-        // TODO: Make this a replicated CVar, honestly.
-        public bool Disallowed { get; }
+    // TODO: Make this a replicated CVar, honestly.
+    public bool Disallowed { get; }
+}
 
-        public TickerLateJoinStatusEvent(bool disallowed)
-        {
-            Disallowed = disallowed;
-        }
+[Serializable] [NetSerializable]
+public sealed class TickerInGameInfoEvent : EntityEventArgs
+{
+    public TickerInGameInfoEvent(string textBlob)
+    {
+        InGameTextBlob = textBlob;
     }
 
-    [Serializable, NetSerializable]
-    public sealed class TickerInGameInfoEvent : EntityEventArgs
-    {
-        public string InGameTextBlob { get; }
+    public string InGameTextBlob { get; }
+}
 
-        public TickerInGameInfoEvent(string textBlob)
-        {
-            InGameTextBlob = textBlob;
-        }
-    }
-    [Serializable, NetSerializable]
-    public sealed class TickerConnectionStatusEvent : EntityEventArgs
+[Serializable] [NetSerializable]
+public sealed class TickerConnectionStatusEvent : EntityEventArgs
+{
+    public TickerConnectionStatusEvent(TimeSpan roundStartTimeSpan)
     {
-        public TimeSpan RoundStartTimeSpan { get; }
-        public TickerConnectionStatusEvent(TimeSpan roundStartTimeSpan)
-        {
-            RoundStartTimeSpan = roundStartTimeSpan;
-        }
+        RoundStartTimeSpan = roundStartTimeSpan;
     }
 
-    [Serializable, NetSerializable]
-    public sealed class TickerLobbyStatusEvent : EntityEventArgs
-    {
-        public bool IsRoundStarted { get; }
-        public ProtoId<LobbyBackgroundPrototype>? LobbyBackground { get; } // Goobstation - Lobby Background Credits
-        public bool YouAreReady { get; }
-        // UTC.
-        public TimeSpan StartTime { get; }
-        public TimeSpan RoundStartTimeSpan { get; }
-        public bool Paused { get; }
+    public TimeSpan RoundStartTimeSpan { get; }
+}
 
-        // Goobstation - Lobby Background Credits
-        public TickerLobbyStatusEvent(bool isRoundStarted, ProtoId<LobbyBackgroundPrototype>? lobbyBackground, bool youAreReady, TimeSpan startTime, TimeSpan preloadTime, TimeSpan roundStartTimeSpan, bool paused)
-        {
-            IsRoundStarted = isRoundStarted;
-            LobbyBackground = lobbyBackground;
-            YouAreReady = youAreReady;
-            StartTime = startTime;
-            RoundStartTimeSpan = roundStartTimeSpan;
-            Paused = paused;
-        }
+[Serializable] [NetSerializable]
+public sealed class TickerLobbyStatusEvent : EntityEventArgs
+{
+    // Goobstation - Lobby Background Credits
+    public TickerLobbyStatusEvent(bool isRoundStarted,
+        ProtoId<LobbyBackgroundPrototype>? lobbyBackground,
+        bool youAreReady,
+        TimeSpan startTime,
+        TimeSpan preloadTime,
+        TimeSpan roundStartTimeSpan,
+        bool paused)
+    {
+        IsRoundStarted = isRoundStarted;
+        LobbyBackground = lobbyBackground;
+        YouAreReady = youAreReady;
+        StartTime = startTime;
+        RoundStartTimeSpan = roundStartTimeSpan;
+        Paused = paused;
     }
 
-    [Serializable, NetSerializable]
-    public sealed class TickerLobbyInfoEvent : EntityEventArgs
-    {
-        public string TextBlob { get; }
+    public bool IsRoundStarted { get; }
+    public ProtoId<LobbyBackgroundPrototype>? LobbyBackground { get; } // Goobstation - Lobby Background Credits
 
-        public TickerLobbyInfoEvent(string textBlob)
-        {
-            TextBlob = textBlob;
-        }
+    public bool YouAreReady { get; }
+
+    // UTC.
+    public TimeSpan StartTime { get; }
+    public TimeSpan RoundStartTimeSpan { get; }
+    public bool Paused { get; }
+}
+
+[Serializable] [NetSerializable]
+public sealed class TickerLobbyInfoEvent : EntityEventArgs
+{
+    public TickerLobbyInfoEvent(string textBlob)
+    {
+        TextBlob = textBlob;
     }
 
-    [Serializable, NetSerializable]
-    public sealed class TickerLobbyCountdownEvent : EntityEventArgs
+    public string TextBlob { get; }
+}
+
+[Serializable] [NetSerializable]
+public sealed class TickerLobbyCountdownEvent : EntityEventArgs
+{
+    public TickerLobbyCountdownEvent(TimeSpan startTime, bool paused)
     {
-        /// <summary>
-        /// The game time that the game will start at.
-        /// </summary>
-        public TimeSpan StartTime { get; }
-
-        /// <summary>
-        /// Whether or not the countdown is paused
-        /// </summary>
-        public bool Paused { get; }
-
-        public TickerLobbyCountdownEvent(TimeSpan startTime, bool paused)
-        {
-            StartTime = startTime;
-            Paused = paused;
-        }
+        StartTime = startTime;
+        Paused = paused;
     }
 
-    [Serializable, NetSerializable]
-    public sealed class TickerJobsAvailableEvent(
-        Dictionary<NetEntity, string> stationNames,
-        Dictionary<NetEntity, Dictionary<ProtoId<JobPrototype>, int?>> jobsAvailableByStation)
-        : EntityEventArgs
-    {
-        /// <summary>
-        /// The Status of the Player in the lobby (ready, observer, ...)
-        /// </summary>
-        public Dictionary<NetEntity, Dictionary<ProtoId<JobPrototype>, int?>> JobsAvailableByStation { get; } = jobsAvailableByStation;
+    /// <summary>
+    /// The game time that the game will start at.
+    /// </summary>
+    public TimeSpan StartTime { get; }
 
-        public Dictionary<NetEntity, string> StationNames { get; } = stationNames;
+    /// <summary>
+    /// Whether or not the countdown is paused
+    /// </summary>
+    public bool Paused { get; }
+}
+
+[Serializable] [NetSerializable]
+public sealed class TickerJobsAvailableEvent(
+    Dictionary<NetEntity, string> stationNames,
+    Dictionary<NetEntity, Dictionary<ProtoId<JobPrototype>, int?>> jobsAvailableByStation)
+    : EntityEventArgs
+{
+    /// <summary>
+    /// The Status of the Player in the lobby (ready, observer, ...)
+    /// </summary>
+    public Dictionary<NetEntity, Dictionary<ProtoId<JobPrototype>, int?>> JobsAvailableByStation { get; } =
+        jobsAvailableByStation;
+
+    public Dictionary<NetEntity, string> StationNames { get; } = stationNames;
+}
+
+[Serializable] [NetSerializable] [DataDefinition]
+public sealed partial class RoundEndMessageEvent : EntityEventArgs
+{
+    /// <summary>
+    /// Sound gets networked due to how entity lifecycle works between client / server and to avoid clipping.
+    /// </summary>
+    public ResolvedSoundSpecifier? RestartSound;
+
+    public RoundEndMessageEvent(
+        string gamemodeTitle,
+        string roundEndText,
+        TimeSpan roundDuration,
+        int roundId,
+        int playerCount,
+        RoundEndPlayerInfo[] allPlayersEndInfo,
+        ResolvedSoundSpecifier? restartSound)
+    {
+        GamemodeTitle = gamemodeTitle;
+        RoundEndText = roundEndText;
+        RoundDuration = roundDuration;
+        RoundId = roundId;
+        PlayerCount = playerCount;
+        AllPlayersEndInfo = allPlayersEndInfo;
+        RestartSound = restartSound;
     }
 
-    [Serializable, NetSerializable, DataDefinition]
-    public sealed partial class RoundEndMessageEvent : EntityEventArgs
+    public string GamemodeTitle { get; }
+    public string RoundEndText { get; }
+    public TimeSpan RoundDuration { get; }
+    public int RoundId { get; }
+    public int PlayerCount { get; }
+    public RoundEndPlayerInfo[] AllPlayersEndInfo { get; }
+
+    [Serializable] [NetSerializable] [DataDefinition]
+    public partial struct RoundEndPlayerInfo
     {
-        [Serializable, NetSerializable, DataDefinition]
-        public partial struct RoundEndPlayerInfo
-        {
-            [DataField]
-            public string PlayerOOCName;
+        [DataField]
+        public string PlayerOOCName;
 
-            [DataField]
-            public string? PlayerICName;
+        [DataField]
+        public string? PlayerICName;
 
-            [DataField, NonSerialized]
-            public NetUserId? PlayerGuid;
+        [DataField] [NonSerialized]
+        public NetUserId? PlayerGuid;
 
-            public string Role;
+        public string Role;
 
-            [DataField] // Trauma - make it not NonSerialized
-            public string[] JobPrototypes;
+        [DataField] // Trauma - make it not NonSerialized
+        public string[] JobPrototypes;
 
-            [DataField] // Trauma - make it not NonSerialized (wtf?)
-            public string[] AntagPrototypes;
+        [DataField] // Trauma - make it not NonSerialized (wtf?)
+        public string[] AntagPrototypes;
 
-            public NetEntity? PlayerNetEntity;
+        public NetEntity? PlayerNetEntity;
 
-            [DataField]
-            public bool Antag;
+        [DataField]
+        public bool Antag;
 
-            [DataField]
-            public bool Observer;
+        [DataField]
+        public bool Observer;
 
-            public bool Connected;
+        public bool Connected;
 
-            #region Goob Station
-            public string? LastWords;
+        #region Goob Station
 
-            public MobState EntMobState;
+        public string? LastWords;
 
-            public Dictionary<string, FixedPoint2> DamagePerGroup;
-            #endregion
-        }
+        public MobState EntMobState;
 
-        public string GamemodeTitle { get; }
-        public string RoundEndText { get; }
-        public TimeSpan RoundDuration { get; }
-        public int RoundId { get; }
-        public int PlayerCount { get; }
-        public RoundEndPlayerInfo[] AllPlayersEndInfo { get; }
+        public Dictionary<string, FixedPoint2> DamagePerGroup;
 
-        /// <summary>
-        /// Sound gets networked due to how entity lifecycle works between client / server and to avoid clipping.
-        /// </summary>
-        public ResolvedSoundSpecifier? RestartSound;
-
-        public RoundEndMessageEvent(
-            string gamemodeTitle,
-            string roundEndText,
-            TimeSpan roundDuration,
-            int roundId,
-            int playerCount,
-            RoundEndPlayerInfo[] allPlayersEndInfo,
-            ResolvedSoundSpecifier? restartSound)
-        {
-            GamemodeTitle = gamemodeTitle;
-            RoundEndText = roundEndText;
-            RoundDuration = roundDuration;
-            RoundId = roundId;
-            PlayerCount = playerCount;
-            AllPlayersEndInfo = allPlayersEndInfo;
-            RestartSound = restartSound;
-        }
+        #endregion
     }
+}
 
-    [Serializable, NetSerializable]
-    public enum PlayerGameStatus : sbyte
-    {
-        NotReadyToPlay = 0,
-        ReadyToPlay,
-        JoinedGame,
-    }
+[Serializable] [NetSerializable]
+public enum PlayerGameStatus : sbyte
+{
+    NotReadyToPlay = 0,
+    ReadyToPlay,
+    JoinedGame,
 }

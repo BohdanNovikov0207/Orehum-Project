@@ -13,8 +13,8 @@ namespace Content.Shared._Goobstation.Wizard.UserInterface;
 
 public sealed class ActivatableUiUserWhitelistSystem : EntitySystem
 {
-    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
     [Dependency] private readonly SharedMindSystem _mind = default!;
+    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
 
 
     public override void Initialize()

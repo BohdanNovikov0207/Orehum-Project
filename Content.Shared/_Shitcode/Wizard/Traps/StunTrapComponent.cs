@@ -11,8 +11,8 @@ namespace Content.Shared._Goobstation.Wizard.Traps;
 public sealed partial class StunTrapComponent : Component
 {
     [DataField]
-    public TimeSpan StunTime = TimeSpan.FromSeconds(10);
+    public int Damage = 30;
 
     [DataField]
-    public int Damage = 30;
+    public TimeSpan StunTime = TimeSpan.FromSeconds(10);
 }

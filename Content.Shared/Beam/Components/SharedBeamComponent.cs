@@ -10,29 +10,18 @@ using Robust.Shared.Audio;
 using Robust.Shared.Serialization;
 
 namespace Content.Shared.Beam.Components;
+
 /// <summary>
 /// Use this as a generic beam. Not for something like a laser gun, more for something continuous like lightning.
 /// </summary>
 public abstract partial class SharedBeamComponent : Component
 {
     /// <summary>
-    /// A unique list of targets that this beam collided with.
-    /// Useful for code like Arcing in the Lightning Component.
+    /// Goobstation
+    /// Beams of the same family have unique index. Used to make sure lightning hits an entity no more than once.
     /// </summary>
-    [DataField("hitTargets")]
-    public HashSet<EntityUid> HitTargets = new();
-
-    /// <summary>
-    /// The virtual entity representing a beam.
-    /// </summary>
-    [DataField("virtualBeamController")]
-    public EntityUid? VirtualBeamController;
-
-    /// <summary>
-    /// The first beam created, useful for keeping track of chains.
-    /// </summary>
-    [DataField("originBeam")]
-    public EntityUid OriginBeam;
+    [ViewVariables(VVAccess.ReadOnly)]
+    public uint BeamIndex;
 
     /// <summary>
     /// The entity that fired the beam originally
@@ -47,6 +36,19 @@ public abstract partial class SharedBeamComponent : Component
     public HashSet<EntityUid> CreatedBeams = new();
 
     /// <summary>
+    /// A unique list of targets that this beam collided with.
+    /// Useful for code like Arcing in the Lightning Component.
+    /// </summary>
+    [DataField("hitTargets")]
+    public HashSet<EntityUid> HitTargets = new();
+
+    /// <summary>
+    /// The first beam created, useful for keeping track of chains.
+    /// </summary>
+    [DataField("originBeam")]
+    public EntityUid OriginBeam;
+
+    /// <summary>
     /// Sound played upon creation
     /// </summary>
     [ViewVariables(VVAccess.ReadWrite)]
@@ -54,21 +56,21 @@ public abstract partial class SharedBeamComponent : Component
     public SoundSpecifier? Sound;
 
     /// <summary>
-    /// Goobstation
-    /// Beams of the same family have unique index. Used to make sure lightning hits an entity no more than once.
+    /// The virtual entity representing a beam.
     /// </summary>
-    [ViewVariables(VVAccess.ReadOnly)]
-    public uint BeamIndex;
+    [DataField("virtualBeamController")]
+    public EntityUid? VirtualBeamController;
 }
 
 /// <summary>
-/// Called where a <see cref="BeamControllerEntity"/> is first created. Stores the originator beam euid and the controller euid.
-/// Raised on the <see cref="BeamControllerEntity"/> and broadcast.
+/// Called where a <see cref="BeamControllerEntity" /> is first created. Stores the originator beam euid and the controller
+/// euid.
+/// Raised on the <see cref="BeamControllerEntity" /> and broadcast.
 /// </summary>
 public sealed class BeamControllerCreatedEvent : EntityEventArgs
 {
-    public EntityUid OriginBeam;
     public EntityUid BeamControllerEntity;
+    public EntityUid OriginBeam;
 
     public BeamControllerCreatedEvent(EntityUid originBeam, EntityUid beamControllerEntity)
     {
@@ -82,8 +84,8 @@ public sealed class BeamControllerCreatedEvent : EntityEventArgs
 /// </summary>
 public sealed class CreateBeamSuccessEvent : EntityEventArgs
 {
-    public readonly EntityUid User;
     public readonly EntityUid Target;
+    public readonly EntityUid User;
 
     public CreateBeamSuccessEvent(EntityUid user, EntityUid target)
     {
@@ -106,19 +108,23 @@ public sealed class BeamFiredEvent : EntityEventArgs
 }
 
 /// <summary>
-/// Raised on the new entity created after the <see cref="SharedBeamSystem"/> creates one.
+/// Raised on the new entity created after the <see cref="SharedBeamSystem" /> creates one.
 /// Used to get sprite data over to the client.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class BeamVisualizerEvent : EntityEventArgs
 {
     public readonly NetEntity Beam;
-    public readonly float DistanceLength;
-    public readonly Angle UserAngle;
     public readonly string? BodyState;
+    public readonly float DistanceLength;
     public readonly string Shader = "unshaded";
+    public readonly Angle UserAngle;
 
-    public BeamVisualizerEvent(NetEntity beam, float distanceLength, Angle userAngle, string? bodyState = null, string shader = "unshaded")
+    public BeamVisualizerEvent(NetEntity beam,
+        float distanceLength,
+        Angle userAngle,
+        string? bodyState = null,
+        string shader = "unshaded")
     {
         Beam = beam;
         DistanceLength = distanceLength;

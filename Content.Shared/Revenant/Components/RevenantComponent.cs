@@ -18,8 +18,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Numerics;
-using Content.Shared.Alert;
 using Content.Goobstation.Maths.FixedPoint;
+using Content.Shared.Alert;
 using Content.Shared.Store;
 using Content.Shared.Whitelist;
 using Robust.Shared.GameStates;
@@ -28,55 +28,63 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototy
 
 namespace Content.Shared.Revenant.Components;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 [AutoGenerateComponentState]
 public sealed partial class RevenantComponent : Component
 {
+    [ViewVariables]
+    public float Accumulator = 0;
+
+    [DataField] public EntityUid? Action;
+
+    /// <summary>
+    /// The coefficient of damage taken to actual health lost.
+    /// </summary>
+    [ViewVariables(VVAccess.ReadWrite)] [DataField("damageToEssenceCoefficient")]
+    public float DamageToEssenceCoefficient = 0.75f;
+
     /// <summary>
     /// The total amount of Essence the revenant has. Functions
     /// as health and is regenerated.
     /// </summary>
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    [DataField] [ViewVariables(VVAccess.ReadWrite)]
     [AutoNetworkedField]
     public FixedPoint2 Essence = 75;
 
-    [DataField("stolenEssenceCurrencyPrototype", customTypeSerializer: typeof(PrototypeIdSerializer<CurrencyPrototype>))]
-    public string StolenEssenceCurrencyPrototype = "StolenEssence";
+    [DataField]
+    public ProtoId<AlertPrototype> EssenceAlert = "Essence";
 
     /// <summary>
-    /// Prototype to spawn when the entity dies.
+    /// The amount of essence passively generated per second.
     /// </summary>
-    [DataField("spawnOnDeathPrototype", customTypeSerializer:typeof(PrototypeIdSerializer<EntityPrototype>))]
-    public string SpawnOnDeathPrototype = "Ectoplasm";
+    [ViewVariables(VVAccess.ReadWrite)] [DataField("essencePerSecond")]
+    public FixedPoint2 EssencePerSecond = 1f;
 
     /// <summary>
     /// The entity's current max amount of essence. Can be increased
     /// through harvesting player souls.
     /// </summary>
-    [ViewVariables(VVAccess.ReadWrite), DataField("maxEssence")]
+    [ViewVariables(VVAccess.ReadWrite)] [DataField("maxEssence")]
     public FixedPoint2 EssenceRegenCap = 100;
 
     /// <summary>
-    /// The coefficient of damage taken to actual health lost.
+    /// Prototype to spawn when the entity dies.
     /// </summary>
-    [ViewVariables(VVAccess.ReadWrite), DataField("damageToEssenceCoefficient")]
-    public float DamageToEssenceCoefficient = 0.75f;
+    [DataField("spawnOnDeathPrototype", customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
+    public string SpawnOnDeathPrototype = "Ectoplasm";
 
-    /// <summary>
-    /// The amount of essence passively generated per second.
-    /// </summary>
-    [ViewVariables(VVAccess.ReadWrite), DataField("essencePerSecond")]
-    public FixedPoint2 EssencePerSecond = 1f;
-
-    [ViewVariables]
-    public float Accumulator = 0;
+    [DataField("stolenEssenceCurrencyPrototype",
+        customTypeSerializer: typeof(PrototypeIdSerializer<CurrencyPrototype>))]
+    public string StolenEssenceCurrencyPrototype = "StolenEssence";
 
     // Here's the gist of the harvest ability:
     // Step 1: The revenant clicks on an entity to "search" for it's soul, which creates a doafter.
     // Step 2: After the doafter is completed, the soul is "found" and can be harvested.
     // Step 3: Clicking the entity again begins to harvest the soul, which causes the revenant to become vulnerable
     // Step 4: The second doafter for the harvest completes, killing the target and granting the revenant essence.
+
     #region Harvest Ability
+
     /// <summary>
     /// The duration of the soul search
     /// </summary>
@@ -94,17 +102,20 @@ public sealed partial class RevenantComponent : Component
     /// <summary>
     /// The amount that is given to the revenant each time it's max essence is upgraded.
     /// </summary>
-    [ViewVariables(VVAccess.ReadWrite), DataField("maxEssenceUpgradeAmount")]
+    [ViewVariables(VVAccess.ReadWrite)] [DataField("maxEssenceUpgradeAmount")]
     public float MaxEssenceUpgradeAmount = 10;
+
     #endregion
 
     //In the nearby radius, causes various objects to be thrown, messed with, and containers opened
     //Generally just causes a mess
+
     #region Defile Ability
+
     /// <summary>
     /// The amount of essence that is needed to use the ability.
     /// </summary>
-    [ViewVariables(VVAccess.ReadWrite), DataField("defileCost")]
+    [ViewVariables(VVAccess.ReadWrite)] [DataField("defileCost")]
     public FixedPoint2 DefileCost = 30;
 
     /// <summary>
@@ -118,28 +129,30 @@ public sealed partial class RevenantComponent : Component
     /// <summary>
     /// The radius around the user that this ability affects
     /// </summary>
-    [ViewVariables(VVAccess.ReadWrite), DataField("defileRadius")]
+    [ViewVariables(VVAccess.ReadWrite)] [DataField("defileRadius")]
     public float DefileRadius = 3.5f;
 
     /// <summary>
     /// The amount of tiles that are uprooted by the ability
     /// </summary>
-    [ViewVariables(VVAccess.ReadWrite), DataField("defileTilePryAmount")]
+    [ViewVariables(VVAccess.ReadWrite)] [DataField("defileTilePryAmount")]
     public int DefileTilePryAmount = 15;
 
     /// <summary>
     /// The chance that an individual entity will have any of the effects
     /// happen to it.
     /// </summary>
-    [ViewVariables(VVAccess.ReadWrite), DataField("defileEffectChance")]
+    [ViewVariables(VVAccess.ReadWrite)] [DataField("defileEffectChance")]
     public float DefileEffectChance = 0.5f;
+
     #endregion
 
     #region Overload Lights Ability
+
     /// <summary>
     /// The amount of essence that is needed to use the ability.
     /// </summary>
-    [ViewVariables(VVAccess.ReadWrite), DataField("overloadCost")]
+    [ViewVariables(VVAccess.ReadWrite)] [DataField("overloadCost")]
     public FixedPoint2 OverloadCost = 40;
 
     /// <summary>
@@ -153,21 +166,23 @@ public sealed partial class RevenantComponent : Component
     /// <summary>
     /// The radius around the user that this ability affects
     /// </summary>
-    [ViewVariables(VVAccess.ReadWrite), DataField("overloadRadius")]
+    [ViewVariables(VVAccess.ReadWrite)] [DataField("overloadRadius")]
     public float OverloadRadius = 5f;
 
     /// <summary>
     /// How close to the light the entity has to be in order to be zapped.
     /// </summary>
-    [ViewVariables(VVAccess.ReadWrite), DataField("overloadZapRadius")]
+    [ViewVariables(VVAccess.ReadWrite)] [DataField("overloadZapRadius")]
     public float OverloadZapRadius = 2f;
+
     #endregion
 
     #region Blight Ability
+
     /// <summary>
     /// The amount of essence that is needed to use the ability.
     /// </summary>
-    [ViewVariables(VVAccess.ReadWrite), DataField("blightCost")]
+    [ViewVariables(VVAccess.ReadWrite)] [DataField("blightCost")]
     public float BlightCost = 50;
 
     /// <summary>
@@ -181,15 +196,17 @@ public sealed partial class RevenantComponent : Component
     /// <summary>
     /// The radius around the user that this ability affects
     /// </summary>
-    [ViewVariables(VVAccess.ReadWrite), DataField("blightRadius")]
+    [ViewVariables(VVAccess.ReadWrite)] [DataField("blightRadius")]
     public float BlightRadius = 3.5f;
+
     #endregion
 
     #region Malfunction Ability
+
     /// <summary>
     /// The amount of essence that is needed to use the ability.
     /// </summary>
-    [ViewVariables(VVAccess.ReadWrite), DataField("malfunctionCost")]
+    [ViewVariables(VVAccess.ReadWrite)] [DataField("malfunctionCost")]
     public FixedPoint2 MalfunctionCost = 60;
 
     /// <summary>
@@ -203,7 +220,7 @@ public sealed partial class RevenantComponent : Component
     /// <summary>
     /// The radius around the user that this ability affects
     /// </summary>
-    [ViewVariables(VVAccess.ReadWrite), DataField("malfunctionRadius")]
+    [ViewVariables(VVAccess.ReadWrite)] [DataField("malfunctionRadius")]
     public float MalfunctionRadius = 3.5f;
 
     /// <summary>
@@ -218,21 +235,22 @@ public sealed partial class RevenantComponent : Component
     /// </summary>
     [DataField]
     public EntityWhitelist? MalfunctionBlacklist;
-    #endregion
 
-    [DataField]
-    public ProtoId<AlertPrototype> EssenceAlert = "Essence";
+    #endregion
 
     #region Visualizer
+
     [DataField("state")]
     public string State = "idle";
+
     [DataField("corporealState")]
     public string CorporealState = "active";
+
     [DataField("stunnedState")]
     public string StunnedState = "stunned";
+
     [DataField("harvestingState")]
     public string HarvestingState = "harvesting";
-    #endregion
 
-    [DataField] public EntityUid? Action;
+    #endregion
 }

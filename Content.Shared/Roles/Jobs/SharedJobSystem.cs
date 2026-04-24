@@ -29,15 +29,14 @@ using Robust.Shared.Utility;
 namespace Content.Shared.Roles.Jobs;
 
 /// <summary>
-///     Handles the job data on mind entities.
+/// Handles the job data on mind entities.
 /// </summary>
 public abstract partial class SharedJobSystem : EntitySystem
 {
+    private readonly Dictionary<string, string> _inverseTrackerLookup = new();
     [Dependency] private readonly SharedPlayerSystem _playerSystem = default!;
     [Dependency] private readonly IPrototypeManager _prototypes = default!;
     [Dependency] private readonly SharedRoleSystem _roles = default!;
-
-    private readonly Dictionary<string, string> _inverseTrackerLookup = new();
 
     public override void Initialize()
     {
@@ -64,7 +63,7 @@ public abstract partial class SharedJobSystem : EntitySystem
     }
 
     /// <summary>
-    /// Gets the corresponding Job Prototype to a <see cref="PlayTimeTrackerPrototype"/>
+    /// Gets the corresponding Job Prototype to a <see cref="PlayTimeTrackerPrototype" />
     /// </summary>
     /// <param name="trackerProto"></param>
     /// <returns></returns>
@@ -97,7 +96,7 @@ public abstract partial class SharedJobSystem : EntitySystem
     }
 
     /// <summary>
-    /// Like <see cref="TryGetDepartment"/> but ignores any non-primary departments.
+    /// Like <see cref="TryGetDepartment" /> but ignores any non-primary departments.
     /// For example, with CE it will return Engineering but with captain it will
     /// not return anything, since Command is not a primary department.
     /// </summary>
@@ -163,7 +162,6 @@ public abstract partial class SharedJobSystem : EntitySystem
 
     public bool MindHasJobWithId(EntityUid? mindId, string prototypeId)
     {
-
         MindRoleComponent? comp = null;
         if (mindId is null)
             return false;
@@ -175,7 +173,7 @@ public abstract partial class SharedJobSystem : EntitySystem
 
         comp = role.Value.Comp1;
 
-        return (comp.JobPrototype == prototypeId);
+        return comp.JobPrototype == prototypeId;
     }
 
     public bool MindTryGetJob(
@@ -185,7 +183,7 @@ public abstract partial class SharedJobSystem : EntitySystem
         prototype = null;
         MindTryGetJobId(mindId, out var protoId);
 
-        return (_prototypes.TryIndex<JobPrototype>(protoId, out prototype) || prototype is not null);
+        return _prototypes.TryIndex(protoId, out prototype) || prototype is not null;
     }
 
     public bool MindTryGetJobId(
@@ -200,12 +198,12 @@ public abstract partial class SharedJobSystem : EntitySystem
         if (_roles.MindHasRole<JobRoleComponent>(mindId.Value, out var role))
             job = role.Value.Comp1.JobPrototype;
 
-        return (job is not null);
+        return job is not null;
     }
 
     /// <summary>
-    ///     Tries to get the job name for this mind.
-    ///     Returns unknown if not found.
+    /// Tries to get the job name for this mind.
+    /// Returns unknown if not found.
     /// </summary>
     public bool MindTryGetJobName([NotNullWhen(true)] EntityUid? mindId, out string name)
     {
@@ -220,8 +218,8 @@ public abstract partial class SharedJobSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Tries to get the job name for this mind.
-    ///     Returns unknown if not found.
+    /// Tries to get the job name for this mind.
+    /// Returns unknown if not found.
     /// </summary>
     public string MindTryGetJobName([NotNullWhen(true)] EntityUid? mindId)
     {

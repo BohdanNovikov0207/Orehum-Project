@@ -10,7 +10,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Exchanger;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class ExchangerDoAfterEvent : SimpleDoAfterEvent
 {
 }

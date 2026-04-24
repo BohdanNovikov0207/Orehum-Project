@@ -30,17 +30,15 @@ namespace Content.Shared._Lavaland.Procedural.Prototypes;
 /// Contains information about Lavaland ruin configuration.
 /// </summary>
 [Prototype]
-public sealed partial class LavalandGridRuinPrototype : IPrototype
+public sealed class LavalandGridRuinPrototype : IPrototype
 {
-    [IdDataField] public string ID { get; } = default!;
+    /// <summary>
+    /// List of components to grant to entities that enter the ruin.
+    /// </summary>
+    [DataField]
+    public ComponentRegistry ComponentsToGrant = new();
 
     [DataField] public LocId Name = "lavaland-ruin-unknown";
-
-    [DataField(required: true)]
-    public ResPath Path { get; }
-
-    [DataField]
-    public int SpawnAttempts = 8;
 
     [DataField]
     public bool PatchToPlanet = true;
@@ -48,9 +46,11 @@ public sealed partial class LavalandGridRuinPrototype : IPrototype
     [DataField(required: true)]
     public int Priority = int.MinValue;
 
-    /// <summary>
-    /// List of components to grant to entities that enter the ruin.
-    /// </summary>
     [DataField]
-    public ComponentRegistry ComponentsToGrant = new();
+    public int SpawnAttempts = 8;
+
+    [DataField(required: true)]
+    public ResPath Path { get; }
+
+    [IdDataField] public string ID { get; } = default!;
 }

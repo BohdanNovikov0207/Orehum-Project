@@ -10,19 +10,19 @@ using Robust.Shared.Timing;
 namespace Content.Shared.Doors.Systems;
 
 /// <summary>
-/// This handles logic and interactions related to <see cref="TurnstileComponent"/>
+/// This handles logic and interactions related to <see cref="TurnstileComponent" />
 /// </summary>
-public abstract partial class SharedTurnstileSystem : EntitySystem
+public abstract class SharedTurnstileSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly AccessReaderSystem _accessReader = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly EntityWhitelistSystem _entityWhitelist = default!;
-    [Dependency] private readonly PullingSystem _pulling = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly PullingSystem _pulling = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         SubscribeLocalEvent<TurnstileComponent, PreventCollideEvent>(OnPreventCollide);
@@ -73,7 +73,9 @@ public abstract partial class SharedTurnstileSystem : EntitySystem
         {
             if (_timing.CurTime >= ent.Comp.NextResistTime)
             {
-                _popup.PopupClient(Loc.GetString("turnstile-component-popup-resist", ("turnstile", ent.Owner)), ent, args.OtherEntity);
+                _popup.PopupClient(Loc.GetString("turnstile-component-popup-resist", ("turnstile", ent.Owner)),
+                    ent,
+                    args.OtherEntity);
                 ent.Comp.NextResistTime = _timing.CurTime + TimeSpan.FromSeconds(0.1);
                 Dirty(ent);
             }
@@ -95,6 +97,7 @@ public abstract partial class SharedTurnstileSystem : EntitySystem
 
             return;
         }
+
         // if they passed through:
         PlayAnimation(ent, ent.Comp.SpinState);
         _audio.PlayPredicted(ent.Comp.TurnSound, ent, args.OtherEntity);
@@ -130,6 +133,5 @@ public abstract partial class SharedTurnstileSystem : EntitySystem
 
     protected virtual void PlayAnimation(EntityUid uid, string stateId)
     {
-
     }
 }

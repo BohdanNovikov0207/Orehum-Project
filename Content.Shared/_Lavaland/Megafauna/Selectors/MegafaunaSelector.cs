@@ -22,26 +22,10 @@ namespace Content.Shared._Lavaland.Megafauna.Selectors;
 public abstract partial class MegafaunaSelector
 {
     /// <summary>
-    /// A weight used to pick between actions.
-    /// </summary>
-    [DataField]
-    public float Weight = 1;
-
-    [DataField]
-    public int Priority;
-
-    /// <summary>
     /// A list of conditions that must evaluate to 'true' for the selector to apply.
     /// </summary>
     [DataField]
     public List<MegafaunaCondition> Conditions = new();
-
-    /// <summary>
-    /// If true, all the conditions must be successful in order for the selector to process.
-    /// Otherwise, only one of them must be.
-    /// </summary>
-    [DataField]
-    public bool RequireAllConditions = true;
 
     /// <summary>
     /// Used for calculating the delay for actions.
@@ -54,6 +38,22 @@ public abstract partial class MegafaunaSelector
     /// </summary>
     [DataField]
     public float FailDelay;
+
+    [DataField]
+    public int Priority;
+
+    /// <summary>
+    /// If true, all the conditions must be successful in order for the selector to process.
+    /// Otherwise, only one of them must be.
+    /// </summary>
+    [DataField]
+    public bool RequireAllConditions = true;
+
+    /// <summary>
+    /// A weight used to pick between actions.
+    /// </summary>
+    [DataField]
+    public float Weight = 1;
 
     public bool CheckConditions(MegafaunaCalculationBaseArgs args)
     {

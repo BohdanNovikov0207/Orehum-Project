@@ -13,7 +13,7 @@ namespace Content.Shared.Atmos.Components;
 /// Entities with this component appear on the
 /// nav maps of atmos monitoring consoles
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class AtmosMonitoringConsoleDeviceComponent : Component
 {
     /// <summary>

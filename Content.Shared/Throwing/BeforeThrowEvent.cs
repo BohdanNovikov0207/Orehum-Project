@@ -13,7 +13,7 @@ namespace Content.Shared.Throwing;
 [ByRefEvent]
 public struct BeforeThrowEvent
 {
-    public BeforeThrowEvent(EntityUid itemUid, Vector2 direction, float throwSpeed,  EntityUid playerUid)
+    public BeforeThrowEvent(EntityUid itemUid, Vector2 direction, float throwSpeed, EntityUid playerUid)
     {
         ItemUid = itemUid;
         Direction = direction;
@@ -23,7 +23,7 @@ public struct BeforeThrowEvent
 
     public EntityUid ItemUid { get; set; }
     public Vector2 Direction { get; }
-    public float ThrowSpeed { get; set;}
+    public float ThrowSpeed { get; set; }
     public EntityUid PlayerUid { get; }
 
     /// <summary>

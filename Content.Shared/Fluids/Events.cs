@@ -7,24 +7,24 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.DoAfter;
 using Content.Goobstation.Maths.FixedPoint;
+using Content.Shared.DoAfter;
 using Robust.Shared.Audio;
 using Robust.Shared.Serialization;
 
 namespace Content.Shared.Fluids;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class AbsorbantDoAfterEvent : DoAfterEvent
 {
-    [DataField("solution", required: true)]
-    public string TargetSolution = default!;
-
     [DataField("message", required: true)]
     public string Message = default!;
 
     [DataField("sound", required: true)]
     public SoundSpecifier Sound = default!;
+
+    [DataField("solution", required: true)]
+    public string TargetSolution = default!;
 
     [DataField("transferAmount", required: true)]
     public FixedPoint2 TransferAmount;
@@ -33,7 +33,10 @@ public sealed partial class AbsorbantDoAfterEvent : DoAfterEvent
     {
     }
 
-    public AbsorbantDoAfterEvent(string targetSolution, string message, SoundSpecifier sound, FixedPoint2 transferAmount)
+    public AbsorbantDoAfterEvent(string targetSolution,
+        string message,
+        SoundSpecifier sound,
+        FixedPoint2 transferAmount)
     {
         TargetSolution = targetSolution;
         Message = message;
@@ -50,8 +53,5 @@ public sealed partial class AbsorbantDoAfterEvent : DoAfterEvent
 [ByRefEvent]
 public record struct SprayAttemptEvent(EntityUid User, bool Cancelled = false)
 {
-    public void Cancel()
-    {
-        Cancelled = true;
-    }
+    public void Cancel() => Cancelled = true;
 }

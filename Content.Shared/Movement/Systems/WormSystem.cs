@@ -30,10 +30,7 @@ public sealed class WormSystem : EntitySystem
         _stun.SetAutoStand((ent, knocked));
     }
 
-    private void OnRejuvenate(Entity<WormComponent> ent, ref RejuvenateEvent args)
-    {
-        RemComp<WormComponent>(ent);
-    }
+    private void OnRejuvenate(Entity<WormComponent> ent, ref RejuvenateEvent args) => RemComp<WormComponent>(ent);
 
     private void OnStandAttempt(Entity<WormComponent> ent, ref StandUpAttemptEvent args)
     {

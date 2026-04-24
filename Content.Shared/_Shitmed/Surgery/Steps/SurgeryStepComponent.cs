@@ -10,44 +10,41 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Shared._Shitmed.Medical.Surgery.Steps;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 [EntityCategory("SurgerySteps")]
 public sealed partial class SurgeryStepComponent : Component
 {
-
-    [DataField]
-    public ComponentRegistry? Tool;
-
     [DataField]
     public ComponentRegistry? Add;
+
+    /// <summary>
+    /// These components will be added to the body part's organs' OnAdd field.
+    /// Each key is the SlotId of the organ to look for.
+    /// Used to make organs add components to whatever body it's residing in.
+    /// </summary>
+    [DataField]
+    public Dictionary<string, ComponentRegistry>? AddOrganOnAdd;
 
     [DataField]
     public ComponentRegistry? BodyAdd;
 
     [DataField]
-    public ComponentRegistry? Remove;
-
-    [DataField]
     public ComponentRegistry? BodyRemove;
 
-    /// <summary>
-    ///   These components will be added to the body part's organs' OnAdd field.
-    ///   Each key is the SlotId of the organ to look for.
-    ///
-    ///   Used to make organs add components to whatever body it's residing in.
-    /// </summary>
     [DataField]
-    public Dictionary<string, ComponentRegistry>? AddOrganOnAdd;
+    public float Duration = 2f;
+
+    [DataField]
+    public ComponentRegistry? Remove;
 
     /// <summary>
-    ///   These components will be removed from the body part's organs' OnAdd field.
-    ///   Each key is the SlotId of the organ to look for.
-    ///
-    ///   Used to stop organs from adding components to whatever body it's residing in.
+    /// These components will be removed from the body part's organs' OnAdd field.
+    /// Each key is the SlotId of the organ to look for.
+    /// Used to stop organs from adding components to whatever body it's residing in.
     /// </summary>
     [DataField]
     public Dictionary<string, ComponentRegistry>? RemoveOrganOnAdd;
 
     [DataField]
-    public float Duration = 2f;
+    public ComponentRegistry? Tool;
 }

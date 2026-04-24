@@ -25,13 +25,9 @@ public abstract class SharedStutteringSystem : EntitySystem
     {
     }
 
-    public virtual void DoRemoveStutterTime(EntityUid uid, double timeRemoved)
-    {
+    public virtual void DoRemoveStutterTime(EntityUid uid, double timeRemoved) =>
         _statusEffectsSystem.TryRemoveTime(uid, StutterKey, TimeSpan.FromSeconds(timeRemoved));
-    }
 
-    public void DoRemoveStutter(EntityUid uid, double timeRemoved)
-    {
-       _statusEffectsSystem.TryRemoveStatusEffect(uid, StutterKey);
-    }
+    public void DoRemoveStutter(EntityUid uid, double timeRemoved) =>
+        _statusEffectsSystem.TryRemoveStatusEffect(uid, StutterKey);
 }

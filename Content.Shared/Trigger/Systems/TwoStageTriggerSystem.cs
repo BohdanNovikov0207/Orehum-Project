@@ -1,5 +1,5 @@
-using Robust.Shared.Timing;
 using Content.Shared.Trigger.Components;
+using Robust.Shared.Timing;
 
 namespace Content.Shared.Trigger.Systems;
 

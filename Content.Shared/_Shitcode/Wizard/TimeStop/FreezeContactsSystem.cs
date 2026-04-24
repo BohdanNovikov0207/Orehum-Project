@@ -32,15 +32,14 @@ namespace Content.Shared._Goobstation.Wizard.TimeStop;
 
 public sealed class FreezeContactsSystem : EntitySystem
 {
-    [Dependency] private readonly INetManager _net = default!;
-    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
-    [Dependency] private readonly SharedActionsSystem _actions = default!;
-    [Dependency] private readonly ActionBlockerSystem _blocker = default!;
-    [Dependency] private readonly TagSystem _tag = default!;
+    private const string ProjectileFixture = "projectile";
 
     private static readonly ProtoId<TagPrototype> FrozenIgnoreMindActionTag = "FrozenIgnoreMindAction";
-
-    private const string ProjectileFixture = "projectile";
+    [Dependency] private readonly SharedActionsSystem _actions = default!;
+    [Dependency] private readonly ActionBlockerSystem _blocker = default!;
+    [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
+    [Dependency] private readonly TagSystem _tag = default!;
 
     public override void Initialize()
     {
@@ -116,20 +115,13 @@ public sealed class FreezeContactsSystem : EntitySystem
         RemComp<CollisionWakeComponent>(uid);
     }
 
-    private void MoveUpdate(EntityUid uid, FrozenComponent component, EntityEventArgs args)
-    {
+    private void MoveUpdate(EntityUid uid, FrozenComponent component, EntityEventArgs args) =>
         _blocker.UpdateCanMove(uid);
-    }
 
-    private void OnInteractAttempt(Entity<FrozenComponent> ent, ref InteractionAttemptEvent args)
-    {
+    private void OnInteractAttempt(Entity<FrozenComponent> ent, ref InteractionAttemptEvent args) =>
         args.Cancelled = true;
-    }
 
-    private void OnAttempt(EntityUid uid, FrozenComponent component, CancellableEntityEventArgs args)
-    {
-        args.Cancel();
-    }
+    private void OnAttempt(EntityUid uid, FrozenComponent component, CancellableEntityEventArgs args) => args.Cancel();
 
     private void OnPullAttempt(EntityUid uid, FrozenComponent component, PullAttemptEvent args)
     {
@@ -252,8 +244,5 @@ public sealed class FreezeContactsSystem : EntitySystem
         }
     }
 
-    private bool ShouldCollideWith(Fixture fix, string id)
-    {
-        return fix.Hard || id == ProjectileFixture;
-    }
+    private bool ShouldCollideWith(Fixture fix, string id) => fix.Hard || id == ProjectileFixture;
 }

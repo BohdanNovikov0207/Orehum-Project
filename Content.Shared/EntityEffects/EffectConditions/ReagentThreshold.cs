@@ -3,26 +3,25 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Chemistry.Reagent;
 using Content.Goobstation.Maths.FixedPoint;
+using Content.Shared.Chemistry.Reagent;
 using Robust.Shared.Prototypes;
 
 namespace Content.Shared.EntityEffects.EffectConditions;
 
 /// <summary>
-///     Used for implementing reagent effects that require a certain amount of reagent before it should be applied.
-///     For instance, overdoses.
-///
-///     This can also trigger on -other- reagents, not just the one metabolizing. By default, it uses the
-///     one being metabolized.
+/// Used for implementing reagent effects that require a certain amount of reagent before it should be applied.
+/// For instance, overdoses.
+/// This can also trigger on -other- reagents, not just the one metabolizing. By default, it uses the
+/// one being metabolized.
 /// </summary>
 public sealed partial class ReagentThreshold : EntityEffectCondition
 {
     [DataField]
-    public FixedPoint2 Min = FixedPoint2.Zero;
+    public FixedPoint2 Max = FixedPoint2.MaxValue;
 
     [DataField]
-    public FixedPoint2 Max = FixedPoint2.MaxValue;
+    public FixedPoint2 Min = FixedPoint2.Zero;
 
     // TODO use ReagentId
     [DataField]
@@ -54,8 +53,9 @@ public sealed partial class ReagentThreshold : EntityEffectCondition
             prototype.TryIndex(Reagent, out reagentProto);
 
         return Loc.GetString("reagent-effect-condition-guidebook-reagent-threshold",
-            ("reagent", reagentProto?.LocalizedName ?? Loc.GetString("reagent-effect-condition-guidebook-this-reagent")),
-            ("max", Max == FixedPoint2.MaxValue ? (float) int.MaxValue : Max.Float()),
+            ("reagent",
+                reagentProto?.LocalizedName ?? Loc.GetString("reagent-effect-condition-guidebook-this-reagent")),
+            ("max", Max == FixedPoint2.MaxValue ? int.MaxValue : Max.Float()),
             ("min", Min.Float()));
     }
 }

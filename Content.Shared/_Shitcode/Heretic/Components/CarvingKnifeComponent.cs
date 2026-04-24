@@ -16,7 +16,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared._Goobstation.Heretic.Components;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class CarvingKnifeComponent : Component
 {
     [DataField]
@@ -29,31 +29,31 @@ public sealed partial class CarvingKnifeComponent : Component
     public int MaxRuneAmount = 3;
 
     [DataField]
-    public TimeSpan RuneDrawTime = TimeSpan.FromSeconds(3f);
-
-    [DataField]
-    public SoundSpecifier Sound = new SoundPathSpecifier("/Audio/_Goobstation/Heretic/sheath.ogg");
-
-    [DataField]
     public EntProtoId RunebreakAction = "ActionRunebreak";
 
     [DataField]
     public EntityUid? RunebreakActionEntity;
+
+    [DataField]
+    public TimeSpan RuneDrawTime = TimeSpan.FromSeconds(3f);
+
+    [DataField]
+    public SoundSpecifier Sound = new SoundPathSpecifier("/Audio/_Goobstation/Heretic/sheath.ogg");
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class RuneCarvingSelectedMessage(ProtoId<RuneCarvingPrototype> protoId) : BoundUserInterfaceMessage
 {
     public ProtoId<RuneCarvingPrototype> ProtoId { get; } = protoId;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum CarvingKnifeUiKey : byte
 {
-    Key
+    Key,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class CarveRuneDoAfterEvent(ProtoId<RuneCarvingPrototype> carving) : DoAfterEvent
 {
     public ProtoId<RuneCarvingPrototype> Carving = carving;

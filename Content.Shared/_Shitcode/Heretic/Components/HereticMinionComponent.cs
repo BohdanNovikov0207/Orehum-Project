@@ -4,15 +4,15 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Shared._Shitcode.Heretic.Components;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class HereticMinionComponent : Component
 {
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public EntityUid? BoundHeretic;
 
-    [DataField, ViewVariables(VVAccess.ReadOnly)]
+    [DataField] [ViewVariables(VVAccess.ReadOnly)]
     public ProtoId<FactionIconPrototype> MasterIcon { get; set; } = "GhoulHereticMaster";
 
-    [DataField, ViewVariables(VVAccess.ReadOnly)]
+    [DataField] [ViewVariables(VVAccess.ReadOnly)]
     public ProtoId<FactionIconPrototype> GhoulIcon { get; set; } = "GhoulFaction";
 }

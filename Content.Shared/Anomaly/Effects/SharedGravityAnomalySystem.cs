@@ -13,9 +13,9 @@
 using System.Linq;
 using Content.Shared.Anomaly.Components;
 using Content.Shared.Anomaly.Effects.Components;
+using Content.Shared.Physics;
 using Content.Shared.Throwing;
 using Robust.Shared.Map;
-using Content.Shared.Physics;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Physics.Components;
 
@@ -24,11 +24,11 @@ namespace Content.Shared.Anomaly.Effects;
 public abstract class SharedGravityAnomalySystem : EntitySystem
 {
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
+    [Dependency] private readonly SharedMapSystem _mapSystem = default!;
     [Dependency] private readonly ThrowingSystem _throwing = default!;
     [Dependency] private readonly SharedTransformSystem _xform = default!;
-    [Dependency] private readonly SharedMapSystem _mapSystem = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         SubscribeLocalEvent<GravityAnomalyComponent, AnomalyPulseEvent>(OnAnomalyPulse);

@@ -8,23 +8,25 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Goobstation.Common.MartialArts;
+using Content.Shared.Tag;
 using Content.Shared.Whitelist;
 using Robust.Shared.Audio;
 using Robust.Shared.GameStates;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
 
 namespace Content.Shared._Goobstation.Heretic.Components;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class RiposteeComponent : Component
 {
-    public override bool SessionSpecific => true;
-
     [DataField]
     public Dictionary<string, RiposteData> Data = new();
+
+    public override bool SessionSpecific => true;
 }
 
-[Serializable, NetSerializable, DataDefinition]
+[Serializable] [NetSerializable] [DataDefinition]
 public sealed partial class RiposteData(
     float cooldown,
     bool requiresWeapon,
@@ -39,10 +41,49 @@ public sealed partial class RiposteData(
     LocId? riposteAvailableMessage,
     BaseRiposteCheckEvent? canRiposteEvent)
 {
+    [DataField]
+    public bool CanRiposte = canRiposte;
+
+    [DataField] [NonSerialized]
+    public BaseRiposteCheckEvent? CanRiposteEvent = canRiposteEvent;
+
+    [DataField]
+    public bool CanRiposteWhileProne = canRiposteWhileProne;
+
+    [DataField]
+    public float Cooldown = cooldown;
+
+    [DataField]
+    public TimeSpan KnockdownTime = knockdownTime;
+
+    [DataField]
+    public bool RequiresWeapon = requiresWeapon;
+
+    [DataField]
+    public LocId? RiposteAvailableMessage = riposteAvailableMessage;
+
+    [DataField]
+    public float RiposteChance = riposteChance;
+
+    [DataField]
+    public SoundSpecifier? RiposteSound = riposteSound;
+
+    [DataField]
+    public LocId? RiposteUsedMessage = riposteUsedMessage;
+
+    [DataField]
+    public TimeSpan StunTime = stunTime;
+
+    [ViewVariables(VVAccess.ReadWrite)]
+    public float Timer = cooldown;
+
+    [DataField]
+    public EntityWhitelist? WeaponWhitelist = whitelist;
+
     // Default values for blade heretic
     public RiposteData() : this(20f,
         true,
-        new() { Tags = new() { "HereticBlade", }, },
+        new EntityWhitelist { Tags = new List<ProtoId<TagPrototype>> { "HereticBlade" } },
         true,
         new SoundPathSpecifier("/Audio/_Goobstation/Heretic/parry.ogg"),
         TimeSpan.FromSeconds(1),
@@ -54,43 +95,4 @@ public sealed partial class RiposteData(
         null)
     {
     }
-
-    [DataField]
-    public float Cooldown = cooldown;
-
-    [DataField]
-    public bool RequiresWeapon = requiresWeapon;
-
-    [DataField]
-    public EntityWhitelist? WeaponWhitelist = whitelist;
-
-    [ViewVariables(VVAccess.ReadWrite)]
-    public float Timer = cooldown;
-
-    [DataField]
-    public bool CanRiposte = canRiposte;
-
-    [DataField]
-    public SoundSpecifier? RiposteSound = riposteSound;
-
-    [DataField]
-    public TimeSpan StunTime = stunTime;
-
-    [DataField]
-    public TimeSpan KnockdownTime = knockdownTime;
-
-    [DataField]
-    public bool CanRiposteWhileProne = canRiposteWhileProne;
-
-    [DataField]
-    public float RiposteChance = riposteChance;
-
-    [DataField]
-    public LocId? RiposteUsedMessage = riposteUsedMessage;
-
-    [DataField]
-    public LocId? RiposteAvailableMessage = riposteAvailableMessage;
-
-    [DataField, NonSerialized]
-    public BaseRiposteCheckEvent? CanRiposteEvent = canRiposteEvent;
 }

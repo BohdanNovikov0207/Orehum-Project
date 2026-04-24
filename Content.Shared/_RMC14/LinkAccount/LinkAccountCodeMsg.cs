@@ -41,13 +41,8 @@ public sealed class LinkAccountCodeMsg : NetMessage
 
     public override MsgGroups MsgGroup => MsgGroups.Core;
 
-    public override void ReadFromBuffer(NetIncomingMessage buffer, IRobustSerializer serializer)
-    {
+    public override void ReadFromBuffer(NetIncomingMessage buffer, IRobustSerializer serializer) =>
         Code = buffer.ReadGuid();
-    }
 
-    public override void WriteToBuffer(NetOutgoingMessage buffer, IRobustSerializer serializer)
-    {
-        buffer.Write(Code);
-    }
+    public override void WriteToBuffer(NetOutgoingMessage buffer, IRobustSerializer serializer) => buffer.Write(Code);
 }

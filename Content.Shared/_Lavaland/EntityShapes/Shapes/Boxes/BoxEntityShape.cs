@@ -9,8 +9,6 @@ public sealed partial class BoxEntityShape : EntityShape
     [DataField]
     public bool Hollow;
 
-    protected override List<Vector2> GetShapeImplementation(System.Random rand, IPrototypeManager proto)
-    {
-        return ShapeHelpers.MakeBox(Offset, Size, Hollow, StepSize).ToList();
-    }
+    protected override List<Vector2> GetShapeImplementation(System.Random rand, IPrototypeManager proto) =>
+        ShapeHelpers.MakeBox(Offset, Size, Hollow, StepSize).ToList();
 }

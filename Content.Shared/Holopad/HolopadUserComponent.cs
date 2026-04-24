@@ -15,7 +15,7 @@ namespace Content.Shared.Holopad;
 /// <remarks>
 /// This component is added and removed automatically from entities
 /// </remarks>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 [Access(typeof(SharedHolopadSystem))]
 public sealed partial class HolopadUserComponent : Component
 {
@@ -29,18 +29,18 @@ public sealed partial class HolopadUserComponent : Component
 /// <summary>
 /// A networked event raised when the visual state of a hologram is being updated
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class HolopadUserTypingChangedEvent : EntityEventArgs
 {
-    /// <summary>
-    /// The hologram being updated
-    /// </summary>
-    public readonly NetEntity User;
-
     /// <summary>
     /// The typing indicator state
     /// </summary>
     public readonly TypingIndicatorState State;
+
+    /// <summary>
+    /// The hologram being updated
+    /// </summary>
+    public readonly NetEntity User;
 
     public HolopadUserTypingChangedEvent(NetEntity user, TypingIndicatorState state)
     {

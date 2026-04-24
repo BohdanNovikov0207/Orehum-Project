@@ -39,9 +39,7 @@ public abstract class SharedDragDropSystem : EntitySystem
         // Client also does this check but ya know we gotta validate it.
         if (!_interaction.InRangeUnobstructed(user.Value, dragged, popup: true)
             || !_interaction.InRangeUnobstructed(user.Value, target, popup: true))
-        {
             return;
-        }
 
         var dragArgs = new DragDropDraggedEvent(user.Value, target);
 

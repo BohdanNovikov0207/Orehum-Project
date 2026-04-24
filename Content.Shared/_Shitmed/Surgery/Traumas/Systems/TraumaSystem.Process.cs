@@ -5,12 +5,15 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using Content.Goobstation.Common.SecondSkin;
 using Content.Goobstation.Maths.FixedPoint;
-using Content.Shared._Shitmed.Medical.Surgery.Wounds;
-using Content.Shared._Shitmed.Medical.Surgery.Wounds.Components;
 using Content.Shared._Shitmed.Medical.Surgery.Pain;
 using Content.Shared._Shitmed.Medical.Surgery.Pain.Components;
 using Content.Shared._Shitmed.Medical.Surgery.Traumas.Components;
+using Content.Shared._Shitmed.Medical.Surgery.Wounds;
+using Content.Shared._Shitmed.Medical.Surgery.Wounds.Components;
 using Content.Shared.Armor;
 using Content.Shared.Body.Components;
 using Content.Shared.Body.Part;
@@ -20,16 +23,15 @@ using Robust.Shared.Containers;
 using Robust.Shared.GameStates;
 using Robust.Shared.Random;
 using Robust.Shared.Utility;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using Content.Goobstation.Common.SecondSkin;
 
 namespace Content.Shared._Shitmed.Medical.Surgery.Traumas.Systems;
 
 public partial class TraumaSystem
 {
     private const string TraumaContainerId = "Traumas";
-    public static readonly TraumaType[] TraumasBlockingHealing = { TraumaType.BoneDamage, TraumaType.OrganDamage, TraumaType.Dismemberment };
+
+    public static readonly TraumaType[] TraumasBlockingHealing =
+        { TraumaType.BoneDamage, TraumaType.OrganDamage, TraumaType.Dismemberment };
 
     private void InitProcess()
     {
@@ -42,10 +44,8 @@ public partial class TraumaSystem
 
     private void OnTraumaInflicterInit(
         Entity<TraumaInflicterComponent> woundEnt,
-        ref ComponentInit args)
-    {
+        ref ComponentInit args) =>
         woundEnt.Comp.TraumaContainer = _container.EnsureContainer<Container>(woundEnt, TraumaContainerId);
-    }
 
     private void OnComponentGet(EntityUid uid, TraumaComponent comp, ref ComponentGetState args)
     {
@@ -117,6 +117,148 @@ public partial class TraumaSystem
         }
     }
 
+    #region Private API
+
+    private void ApplyTraumas(Entity<WoundableComponent> target,
+        Entity<TraumaInflicterComponent> inflicter,
+        List<TraumaType> traumas,
+        FixedPoint2 severity)
+    {
+        var bodyPart = Comp<BodyPartComponent>(target);
+        if (!bodyPart.Body.HasValue)
+            return;
+
+        if (!_consciousness.TryGetNerveSystem(bodyPart.Body.Value, out var nerveSys))
+            return;
+
+        foreach (var trauma in traumas)
+        {
+            EntityUid? targetChosen = null;
+            switch (trauma)
+            {
+                case TraumaType.BoneDamage:
+                    targetChosen = target.Comp.Bone.ContainedEntities.FirstOrNull();
+                    break;
+
+                case TraumaType.OrganDamage:
+                    var organs = _body.GetPartOrgans(target).ToList();
+                    _random.Shuffle(organs);
+
+                    var chosenOrgan = organs.FirstOrNull();
+                    if (chosenOrgan != null)
+                        targetChosen = chosenOrgan.Value.Id;
+
+                    break;
+                case TraumaType.Dismemberment:
+                    targetChosen = target.Comp.ParentWoundable;
+                    break;
+
+                case TraumaType.NerveDamage:
+                    targetChosen = target;
+                    break;
+            }
+
+            if (targetChosen == null)
+                continue;
+
+            var beforeTraumaInduced = new BeforeTraumaInducedEvent(severity, targetChosen.Value, trauma);
+            RaiseLocalEvent(target, ref beforeTraumaInduced);
+
+            if (beforeTraumaInduced.Cancelled)
+                continue;
+
+            switch (trauma)
+            {
+                case TraumaType.BoneDamage:
+                    if (ApplyBoneTrauma(targetChosen.Value, target, inflicter, severity))
+                    {
+                        _pain.TryAddPainModifier(
+                            nerveSys.Value.Owner,
+                            target.Owner,
+                            "BoneDamage",
+                            severity / 1.4f,
+                            PainDamageTypes.TraumaticPain,
+                            nerveSys.Value.Comp);
+                    }
+
+                    break;
+
+                case TraumaType.OrganDamage:
+                    var traumaEnt = AddTrauma(targetChosen.Value, target, inflicter, TraumaType.OrganDamage, severity);
+
+                    if (traumaEnt != EntityUid.Invalid
+                        && !TryChangeOrganDamageModifier(targetChosen.Value, severity, traumaEnt, "WoundableDamage"))
+                        TryCreateOrganDamageModifier(targetChosen.Value, severity, traumaEnt, "WoundableDamage");
+
+                    break;
+
+                case TraumaType.NerveDamage:
+                    var time = TimeSpan.FromSeconds((float) severity * 2.4);
+
+                    // Fooling people into thinking they have no pain.
+                    // 10 (raw pain) * 1.4 (multiplier) = 14 (actual pain)
+                    // 1 - 0.28 = 0.72 (the fraction of pain the person feels)
+                    // 14 * 0.72 = 10.08 (the pain the player can actually see) ... Barely noticeable :3
+                    _pain.TryAddPainMultiplier(nerveSys.Value,
+                        "NerveDamage",
+                        1.4f,
+                        time: time);
+
+                    _pain.TryAddPainFeelsModifier(nerveSys.Value,
+                        "NerveDamage",
+                        target,
+                        -0.28f,
+                        time: time);
+                    foreach (var child in _wound.GetAllWoundableChildren(target))
+                    {
+                        // Funner! Very unlucky of you if your torso gets hit. Rest in pieces
+                        _pain.TryAddPainFeelsModifier(nerveSys.Value,
+                            "NerveDamage",
+                            child,
+                            -0.7f,
+                            time: time);
+                    }
+
+                    break;
+
+                case TraumaType.Dismemberment:
+                    Logger.Debug("Attempting to trigger dismemberment");
+                    if (!_wound.IsWoundableRoot(target)
+                        && _wound.TryInduceWound(targetChosen.Value,
+                            "Blunt",
+                            0f,
+                            out var woundInduced)) // We need this to add the trauma into.
+                    {
+                        AddTrauma(
+                            targetChosen.Value,
+                            (targetChosen.Value, Comp<WoundableComponent>(targetChosen.Value)),
+                            (woundInduced.Value.Owner, EnsureComp<TraumaInflicterComponent>(woundInduced.Value.Owner)),
+                            TraumaType.Dismemberment,
+                            severity,
+                            (bodyPart.PartType, bodyPart.Symmetry));
+
+                        _wound.AmputateWoundable(targetChosen.Value, target, target);
+                        Logger.Debug("Amputating woundable.");
+                    }
+
+                    break;
+            }
+
+            //Log.Debug($"A new trauma (Raw Severity: {severity}) was created on target: {ToPrettyString(target)}. Type: {trauma}.");
+        }
+
+        // TODO: veins, would have been very lovely to integrate this into vascular system
+        //if (RandomVeinsTraumaChance(woundable))
+        //{
+        //    traumaApplied = ApplyDamageToVeins(woundable.Veins!.ContainedEntities[0], severity * _veinsDamageMultipliers[woundable.WoundableSeverity]);
+        //    _sawmill.Info(traumaApplied
+        //        ? $"A new trauma (Raw Severity: {severity}) was created on target: {target} of type Vein damage"
+        //        : $"Tried to create a trauma on target: {target}, but no trauma was applied. Type: Vein damage.");
+        //}
+    }
+
+    #endregion
+
     #region Public API
 
     public IEnumerable<Entity<TraumaComponent>> GetAllWoundTraumas(
@@ -157,8 +299,8 @@ public partial class TraumaSystem
                 // TODO: Fill this with other blocking traumas.
                 if (trauma.Comp.TraumaType == TraumaType.BoneDamage
                     && (woundableComp.Bone.ContainedEntities.FirstOrNull() is not { } bone
-                    || !TryComp(bone, out BoneComponent? boneComp)
-                    || boneComp.BoneSeverity != BoneSeverity.Broken))
+                        || !TryComp(bone, out BoneComponent? boneComp)
+                        || boneComp.BoneSeverity != BoneSeverity.Broken))
                     continue;
             }
 
@@ -240,10 +382,9 @@ public partial class TraumaSystem
     public bool HasBodyTrauma(
         EntityUid body,
         TraumaType? traumaType = null,
-        BodyComponent? bodyComp = null)
-    {
-        return Resolve(body, ref bodyComp, false) && _body.GetBodyChildren(body, bodyComp).Any(bodyPart => HasWoundableTrauma(bodyPart.Id, traumaType));
-    }
+        BodyComponent? bodyComp = null) =>
+        Resolve(body, ref bodyComp, false) && _body.GetBodyChildren(body, bodyComp)
+            .Any(bodyPart => HasWoundableTrauma(bodyPart.Id, traumaType));
 
     public bool TryGetBodyTraumas(
         EntityUid body,
@@ -298,7 +439,10 @@ public partial class TraumaSystem
         return traumaList;
     }
 
-    public FixedPoint2 GetArmourChanceDeduction(EntityUid body, Entity<TraumaInflicterComponent> inflicter, TraumaType traumaType, BodyPartType coverage)
+    public FixedPoint2 GetArmourChanceDeduction(EntityUid body,
+        Entity<TraumaInflicterComponent> inflicter,
+        TraumaType traumaType,
+        BodyPartType coverage)
     {
         var deduction = FixedPoint2.Zero;
 
@@ -315,9 +459,7 @@ public partial class TraumaSystem
                 continue;
 
             if (armour.ArmorCoverage.Contains(coverage))
-            {
                 deduction += armour.TraumaDeductions[traumaType];
-            }
         }
 
         return deduction;
@@ -359,14 +501,14 @@ public partial class TraumaSystem
             switch (traumaType)
             {
                 case TraumaType.BoneDamage:
-                    {
-                        var bone = woundableComp.Bone.ContainedEntities.FirstOrNull();
-                        if (bone == null || !TryComp<BoneComponent>(bone, out var boneComp))
-                            break;
-
-                        traumasToInduce.Add(TraumaType.BoneDamage);
+                {
+                    var bone = woundableComp.Bone.ContainedEntities.FirstOrNull();
+                    if (bone == null || !TryComp<BoneComponent>(bone, out var boneComp))
                         break;
-                    }
+
+                    traumasToInduce.Add(TraumaType.BoneDamage);
+                    break;
+                }
             }
         }
 
@@ -377,7 +519,8 @@ public partial class TraumaSystem
 
     #region Trauma Chance Randoming
 
-    public bool RandomBoneTraumaChance(Entity<WoundableComponent> target, Entity<TraumaInflicterComponent> woundInflicter)
+    public bool RandomBoneTraumaChance(Entity<WoundableComponent> target,
+        Entity<TraumaInflicterComponent> woundInflicter)
     {
         var bodyPart = Comp<BodyPartComponent>(target);
         if (!bodyPart.Body.HasValue)
@@ -408,8 +551,8 @@ public partial class TraumaSystem
         // The more damage, the bigger is the chance.
         var chance = FixedPoint2.Clamp(
             target.Comp.IntegrityCap / (target.Comp.WoundableIntegrity + boneComp.BoneIntegrity)
-             * _boneTraumaChanceMultipliers[target.Comp.WoundableSeverity]
-             - deduction + woundInflicter.Comp.TraumasChances[TraumaType.BoneDamage],
+            * _boneTraumaChanceMultipliers[target.Comp.WoundableSeverity]
+            - deduction + woundInflicter.Comp.TraumasChances[TraumaType.BoneDamage],
             0,
             1);
 
@@ -541,14 +684,13 @@ public partial class TraumaSystem
                 case BoneSeverity.Broken:
                     multiplier *= 1.2f; // increases by 20%
                     break;
-                default:
-                    break;
             }
         }
 
         var chance =
             FixedPoint2.Clamp(
-                (1f - (MathF.Pow(target.Comp.WoundableIntegrity.Float(), 1.3f) / target.Comp.IntegrityCap - 1f) * bonePenalty) * multiplier
+                (1f - (MathF.Pow(target.Comp.WoundableIntegrity.Float(), 1.3f) / target.Comp.IntegrityCap - 1f) *
+                    bonePenalty) * multiplier
                 - deduction + woundInflicter.Comp.TraumasChances[TraumaType.Dismemberment],
                 0,
                 1);
@@ -615,7 +757,8 @@ public partial class TraumaSystem
     public void RemoveTrauma(
         Entity<TraumaComponent> trauma)
     {
-        if (!_container.TryGetContainingContainer((trauma.Owner, Transform(trauma.Owner), MetaData(trauma.Owner)), out var traumaContainer))
+        if (!_container.TryGetContainingContainer((trauma.Owner, Transform(trauma.Owner), MetaData(trauma.Owner)),
+                out var traumaContainer))
             return;
 
         if (!TryComp<TraumaInflicterComponent>(traumaContainer.Owner, out var traumaInflicter))
@@ -628,16 +771,22 @@ public partial class TraumaSystem
         Entity<TraumaComponent> trauma,
         Entity<TraumaInflicterComponent> inflicterWound)
     {
-        _container.Remove(trauma.Owner, inflicterWound.Comp.TraumaContainer, reparent: false, force: true);
+        _container.Remove(trauma.Owner, inflicterWound.Comp.TraumaContainer, false, true);
 
         if (trauma.Comp.TraumaTarget != null)
         {
-            var ev = new TraumaBeingRemovedEvent(trauma, trauma.Comp.TraumaTarget.Value, trauma.Comp.TraumaSeverity, trauma.Comp.TraumaType);
+            var ev = new TraumaBeingRemovedEvent(trauma,
+                trauma.Comp.TraumaTarget.Value,
+                trauma.Comp.TraumaSeverity,
+                trauma.Comp.TraumaType);
             RaiseLocalEvent(inflicterWound, ref ev);
 
             if (trauma.Comp.HoldingWoundable != null)
             {
-                var ev1 = new TraumaBeingRemovedEvent(trauma, trauma.Comp.TraumaTarget.Value, trauma.Comp.TraumaSeverity, trauma.Comp.TraumaType);
+                var ev1 = new TraumaBeingRemovedEvent(trauma,
+                    trauma.Comp.TraumaTarget.Value,
+                    trauma.Comp.TraumaSeverity,
+                    trauma.Comp.TraumaType);
                 RaiseLocalEvent(trauma.Comp.HoldingWoundable.Value, ref ev1);
             }
         }
@@ -645,146 +794,6 @@ public partial class TraumaSystem
         if (_net.IsServer)
             QueueDel(trauma);
     }
-
-    #endregion
-
-    #region Private API
-
-    private void ApplyTraumas(Entity<WoundableComponent> target, Entity<TraumaInflicterComponent> inflicter, List<TraumaType> traumas, FixedPoint2 severity)
-    {
-        var bodyPart = Comp<BodyPartComponent>(target);
-        if (!bodyPart.Body.HasValue)
-            return;
-
-        if (!_consciousness.TryGetNerveSystem(bodyPart.Body.Value, out var nerveSys))
-            return;
-
-        foreach (var trauma in traumas)
-        {
-            EntityUid? targetChosen = null;
-            switch (trauma)
-            {
-                case TraumaType.BoneDamage:
-                    targetChosen = target.Comp.Bone.ContainedEntities.FirstOrNull();
-                    break;
-
-                case TraumaType.OrganDamage:
-                    var organs = _body.GetPartOrgans(target).ToList();
-                    _random.Shuffle(organs);
-
-                    var chosenOrgan = organs.FirstOrNull();
-                    if (chosenOrgan != null)
-                    {
-                        targetChosen = chosenOrgan.Value.Id;
-                    }
-
-                    break;
-                case TraumaType.Dismemberment:
-                    targetChosen = target.Comp.ParentWoundable;
-                    break;
-
-                case TraumaType.NerveDamage:
-                    targetChosen = target;
-                    break;
-            }
-
-            if (targetChosen == null)
-                continue;
-
-            var beforeTraumaInduced = new BeforeTraumaInducedEvent(severity, targetChosen.Value, trauma);
-            RaiseLocalEvent(target, ref beforeTraumaInduced);
-
-            if (beforeTraumaInduced.Cancelled)
-                continue;
-
-            switch (trauma)
-            {
-                case TraumaType.BoneDamage:
-                    if (ApplyBoneTrauma(targetChosen.Value, target, inflicter, severity))
-                    {
-                        _pain.TryAddPainModifier(
-                            nerveSys.Value.Owner,
-                                target.Owner,
-                                "BoneDamage",
-                                severity / 1.4f,
-                                PainDamageTypes.TraumaticPain,
-                                nerveSys.Value.Comp);
-                    }
-
-                    break;
-
-                case TraumaType.OrganDamage:
-                    var traumaEnt = AddTrauma(targetChosen.Value, target, inflicter, TraumaType.OrganDamage, severity);
-
-                    if (traumaEnt != EntityUid.Invalid
-                        && !TryChangeOrganDamageModifier(targetChosen.Value, severity, traumaEnt, "WoundableDamage"))
-                    {
-                        TryCreateOrganDamageModifier(targetChosen.Value, severity, traumaEnt, "WoundableDamage");
-                    }
-
-                    break;
-
-                case TraumaType.NerveDamage:
-                    var time = TimeSpan.FromSeconds((float) severity * 2.4);
-
-                    // Fooling people into thinking they have no pain.
-                    // 10 (raw pain) * 1.4 (multiplier) = 14 (actual pain)
-                    // 1 - 0.28 = 0.72 (the fraction of pain the person feels)
-                    // 14 * 0.72 = 10.08 (the pain the player can actually see) ... Barely noticeable :3
-                    _pain.TryAddPainMultiplier(nerveSys.Value,
-                        "NerveDamage",
-                        1.4f,
-                        time: time);
-
-                    _pain.TryAddPainFeelsModifier(nerveSys.Value,
-                        "NerveDamage",
-                        target,
-                        -0.28f,
-                        time: time);
-                    foreach (var child in _wound.GetAllWoundableChildren(target))
-                    {
-                        // Funner! Very unlucky of you if your torso gets hit. Rest in pieces
-                        _pain.TryAddPainFeelsModifier(nerveSys.Value,
-                            "NerveDamage",
-                            child,
-                            -0.7f,
-                            time: time);
-                    }
-
-                    break;
-
-                case TraumaType.Dismemberment:
-                    Logger.Debug("Attempting to trigger dismemberment");
-                    if (!_wound.IsWoundableRoot(target)
-                        && _wound.TryInduceWound(targetChosen.Value, "Blunt", 0f, out var woundInduced)) // We need this to add the trauma into.
-                    {
-                        AddTrauma(
-                            targetChosen.Value,
-                            (targetChosen.Value, Comp<WoundableComponent>(targetChosen.Value)),
-                            (woundInduced.Value.Owner, EnsureComp<TraumaInflicterComponent>(woundInduced.Value.Owner)),
-                            TraumaType.Dismemberment,
-                            severity,
-                            (bodyPart.PartType, bodyPart.Symmetry));
-
-                        _wound.AmputateWoundable(targetChosen.Value, target, target);
-                        Logger.Debug($"Amputating woundable.");
-                    }
-                    break;
-            }
-
-            //Log.Debug($"A new trauma (Raw Severity: {severity}) was created on target: {ToPrettyString(target)}. Type: {trauma}.");
-        }
-
-        // TODO: veins, would have been very lovely to integrate this into vascular system
-        //if (RandomVeinsTraumaChance(woundable))
-        //{
-        //    traumaApplied = ApplyDamageToVeins(woundable.Veins!.ContainedEntities[0], severity * _veinsDamageMultipliers[woundable.WoundableSeverity]);
-        //    _sawmill.Info(traumaApplied
-        //        ? $"A new trauma (Raw Severity: {severity}) was created on target: {target} of type Vein damage"
-        //        : $"Tried to create a trauma on target: {target}, but no trauma was applied. Type: Vein damage.");
-        //}
-    }
-
 
     #endregion
 }

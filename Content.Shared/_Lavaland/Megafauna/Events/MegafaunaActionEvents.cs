@@ -5,17 +5,17 @@ namespace Content.Shared._Lavaland.Megafauna.Events;
 
 public sealed partial class SpawnEntityActionEvent : WorldTargetActionEvent
 {
-    [DataField(required: true)]
-    public EntProtoId Spawn;
-
     /// <summary>
     /// If true, will attach spawned entity to the target.
     /// </summary>
     [DataField]
     public bool AttachToTarget;
 
+    [DataField(required: true)]
+    public EntProtoId Spawn;
+
     /// <summary>
-    /// If this is true and <see cref="AttachToTarget"/> is false,
+    /// If this is true and <see cref="AttachToTarget" /> is false,
     /// will spawn the entity right at user's position.
     /// </summary>
     [DataField]
@@ -23,7 +23,7 @@ public sealed partial class SpawnEntityActionEvent : WorldTargetActionEvent
 }
 
 /// <summary>
-/// Raised on a spawned entity by <see cref="SpawnEntityActionEvent"/>.
+/// Raised on a spawned entity by <see cref="SpawnEntityActionEvent" />.
 /// </summary>
 [ByRefEvent]
 public readonly record struct SpawnedByActionEvent(EntityUid User, EntityUid? Target);

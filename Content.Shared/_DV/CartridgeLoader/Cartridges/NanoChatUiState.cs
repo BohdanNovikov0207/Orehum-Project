@@ -14,17 +14,17 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared._DV.CartridgeLoader.Cartridges;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class NanoChatUiState : BoundUserInterfaceState
 {
-    public readonly Dictionary<uint, NanoChatRecipient> Recipients = new();
-    public readonly Dictionary<uint, List<NanoChatMessage>> Messages = new();
     public readonly List<NanoChatRecipient>? Contacts;
     public readonly uint? CurrentChat;
-    public readonly uint OwnNumber;
-    public readonly int MaxRecipients;
-    public readonly bool NotificationsMuted;
     public readonly bool ListNumber;
+    public readonly int MaxRecipients;
+    public readonly Dictionary<uint, List<NanoChatMessage>> Messages = new();
+    public readonly bool NotificationsMuted;
+    public readonly uint OwnNumber;
+    public readonly Dictionary<uint, NanoChatRecipient> Recipients = new();
 
     public NanoChatUiState(
         Dictionary<uint, NanoChatRecipient> recipients,

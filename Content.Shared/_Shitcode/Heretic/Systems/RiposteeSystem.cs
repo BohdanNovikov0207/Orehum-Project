@@ -30,26 +30,26 @@ namespace Content.Shared._Goobstation.Heretic.Systems;
 
 public sealed class RiposteeSystem : EntitySystem
 {
-    [Dependency] private readonly SharedMeleeWeaponSystem _melee = default!;
-    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
-    [Dependency] private readonly SharedHandsSystem _hands = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly SharedCombatModeSystem _combatMode = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly ActionBlockerSystem _blocker = default!;
-    [Dependency] private readonly SharedStunSystem _stun = default!;
+    [Dependency] private readonly SharedCombatModeSystem _combatMode = default!;
+    [Dependency] private readonly SharedHandsSystem _hands = default!;
+    [Dependency] private readonly SharedMeleeWeaponSystem _melee = default!;
     [Dependency] private readonly MobStateSystem _mobState = default!;
-    [Dependency] private readonly StandingStateSystem _standing = default!;
     [Dependency] private readonly INetManager _net = default!;
     [Dependency] private readonly ISharedPlayerManager _player = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly StandingStateSystem _standing = default!;
+    [Dependency] private readonly SharedStunSystem _stun = default!;
+    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
 
     public override void Initialize()
     {
         base.Initialize();
 
         SubscribeLocalEvent<RiposteeComponent, BeforeHarmfulActionEvent>(OnHarmAttempt,
-            before: new[] { typeof(SharedHereticAbilitySystem) });
+            new[] { typeof(SharedHereticAbilitySystem) });
 
         SubscribeNetworkEvent<RiposteUsedEvent>(OnRiposteUsed);
     }
@@ -212,7 +212,7 @@ public sealed class RiposteeSystem : EntitySystem
                 _stun.TryUpdateStunDuration(target, data.StunTime);
 
             if (data.KnockdownTime > TimeSpan.Zero)
-                _stun.TryKnockdown(target, data.KnockdownTime, true);
+                _stun.TryKnockdown(target, data.KnockdownTime);
         }
 
         if (!inCombat)
@@ -233,15 +233,14 @@ public sealed class RiposteeSystem : EntitySystem
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class RiposteUsedEvent(NetEntity user, NetEntity target, NetEntity weapon, RiposteData data)
     : EntityEventArgs
 {
-    public NetEntity User = user;
+    public RiposteData Data = data;
 
     public NetEntity Target = target;
+    public NetEntity User = user;
 
     public NetEntity Weapon = weapon;
-
-    public RiposteData Data = data;
 }

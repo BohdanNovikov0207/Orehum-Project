@@ -3,13 +3,13 @@ using Robust.Shared.Utility;
 
 namespace Content.Shared._White.RadialSelector;
 
-[NetSerializable, Serializable]
+[NetSerializable] [Serializable]
 public enum RadialSelectorUiKey : byte
 {
     Key,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class RadialSelectorState(List<RadialSelectorEntry> entries, bool openCentered = false)
     : BoundUserInterfaceState
 {
@@ -19,7 +19,7 @@ public sealed class RadialSelectorState(List<RadialSelectorEntry> entries, bool 
     public bool OpenCentered { get; } = openCentered;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class TrackedRadialSelectorState(List<RadialSelectorEntry> entries, NetEntity? trackedEntity = null)
     : BoundUserInterfaceState
 {
@@ -29,15 +29,18 @@ public sealed class TrackedRadialSelectorState(List<RadialSelectorEntry> entries
     public NetEntity? TrackedEntity { get; } = trackedEntity;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class RadialSelectorSelectedMessage(string selectedItem) : BoundUserInterfaceMessage
 {
     public string SelectedItem { get; private set; } = selectedItem;
 }
 
-[DataDefinition, Serializable, NetSerializable]
+[DataDefinition] [Serializable] [NetSerializable]
 public sealed partial class RadialSelectorEntry
 {
+    [DataField]
+    public bool CloseUiOnSelect = true;
+
     [DataField]
     public string? Prototype { get; set; }
 
@@ -46,12 +49,9 @@ public sealed partial class RadialSelectorEntry
 
     [DataField]
     public RadialSelectorCategory? Category { get; set; }
-
-    [DataField]
-    public bool CloseUiOnSelect = true;
 }
 
-[DataDefinition, Serializable, NetSerializable]
+[DataDefinition] [Serializable] [NetSerializable]
 public sealed partial class RadialSelectorCategory
 {
     [DataField(required: true)]

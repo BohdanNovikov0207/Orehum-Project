@@ -13,10 +13,17 @@ namespace Content.Shared.Silicons.Borgs.Components;
 /// This is used for modules that can be inserted into borgs
 /// to give them unique abilities and attributes.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(SharedBorgSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(SharedBorgSystem))]
 [AutoGenerateComponentState]
 public sealed partial class BorgModuleComponent : Component
 {
+    /// <summary>
+    /// If true, this is a "default" module that cannot be removed from a borg.
+    /// </summary>
+    [DataField]
+    [AutoNetworkedField]
+    public bool DefaultModule;
+
     /// <summary>
     /// The entity this module is installed into
     /// </summary>
@@ -24,13 +31,6 @@ public sealed partial class BorgModuleComponent : Component
     public EntityUid? InstalledEntity;
 
     public bool Installed => InstalledEntity != null;
-
-    /// <summary>
-    /// If true, this is a "default" module that cannot be removed from a borg.
-    /// </summary>
-    [DataField]
-    [AutoNetworkedField]
-    public bool DefaultModule;
 }
 
 /// <summary>

@@ -25,7 +25,10 @@ public sealed partial class ToggleSleepingAction : InteractionAction
         return WakeUp;
     }
 
-    public override bool CanPerform(InteractionArgs args, InteractionVerbPrototype proto, bool isBefore, VerbDependencies deps)
+    public override bool CanPerform(InteractionArgs args,
+        InteractionVerbPrototype proto,
+        bool isBefore,
+        VerbDependencies deps)
     {
         if (isBefore)
             args.Blackboard["sleeping"] = deps.EntMan.HasComponent<SleepingComponent>(args.Target);
@@ -41,7 +44,7 @@ public sealed partial class ToggleSleepingAction : InteractionAction
 
         if (isSleeping && WakeUp)
             return deps.EntMan.System<SleepingSystem>().TryWaking(args.Target, user: args.User);
-        else if (Sleep)
+        if (Sleep)
             return deps.EntMan.System<SleepingSystem>().TrySleeping(args.Target);
 
         return false;

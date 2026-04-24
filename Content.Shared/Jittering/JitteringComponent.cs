@@ -18,9 +18,16 @@ using Robust.Shared.GameStates;
 namespace Content.Shared.Jittering;
 
 [Access(typeof(SharedJitteringSystem))]
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class JitteringComponent : Component
 {
+    /// <summary>
+    /// The offset that an entity had before jittering started,
+    /// so that we can reset it properly.
+    /// </summary>
+    [ViewVariables(VVAccess.ReadWrite)]
+    public Vector2 StartOffset = Vector2.Zero;
+
     [AutoNetworkedField]
     [ViewVariables(VVAccess.ReadWrite)]
     public float Amplitude { get; set; } = 10f; // Goob edit
@@ -31,11 +38,4 @@ public sealed partial class JitteringComponent : Component
 
     [ViewVariables(VVAccess.ReadWrite)]
     public Vector2 LastJitter { get; set; }
-
-    /// <summary>
-    ///     The offset that an entity had before jittering started,
-    ///     so that we can reset it properly.
-    /// </summary>
-    [ViewVariables(VVAccess.ReadWrite)]
-    public Vector2 StartOffset = Vector2.Zero;
 }

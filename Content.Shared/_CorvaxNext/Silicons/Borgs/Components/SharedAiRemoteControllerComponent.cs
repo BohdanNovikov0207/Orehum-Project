@@ -13,18 +13,19 @@ namespace Content.Shared._CorvaxNext.Silicons.Borgs.Components;
 public sealed partial class AiRemoteControllerComponent : Component
 {
     [DataField] public EntityUid? AiHolder;
-    [DataField] public EntityUid? LinkedMind;
-
-    [DataField] public string[]? PreviouslyTransmitterChannels;
-    [DataField] public string[]? PreviouslyActiveRadioChannels;
 
     [DataField] public EntProtoId BackToAiAction = "ActionBackToAi";
     [DataField] public EntityUid? BackToAiActionEntity;
+    [DataField] public EntityUid? LinkedMind;
+    [DataField] public string[]? PreviouslyActiveRadioChannels;
 
-    [Serializable, NetSerializable]
+    [DataField] public string[]? PreviouslyTransmitterChannels;
+
+    [Serializable] [NetSerializable]
     public sealed class RemoteDeviceActionMessage : BoundUserInterfaceMessage
     {
         public readonly RemoteDeviceActionEvent? RemoteAction;
+
         public RemoteDeviceActionMessage(RemoteDeviceActionEvent remoteDeviceAction)
         {
             RemoteAction = remoteDeviceAction;
@@ -32,14 +33,15 @@ public sealed partial class AiRemoteControllerComponent : Component
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class RemoteDeviceActionEvent : EntityEventArgs
 {
     public enum RemoteDeviceActionType
     {
         MoveToDevice,
-        TakeControl
+        TakeControl,
     }
+
     public RemoteDeviceActionType ActionType;
     public NetEntity Target;
 
@@ -50,14 +52,14 @@ public sealed class RemoteDeviceActionEvent : EntityEventArgs
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public record struct RemoteDevicesData()
 {
     public string DisplayName = string.Empty;
     public NetEntity NetEntityUid = NetEntity.Invalid;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class RemoteDevicesBuiState : BoundUserInterfaceState
 {
     public List<RemoteDevicesData> DeviceList;

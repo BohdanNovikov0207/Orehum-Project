@@ -10,11 +10,14 @@ namespace Content.Shared.Decals;
 
 public sealed partial class PlaceDecalActionEvent : WorldTargetActionEvent
 {
-    [DataField("decalId", customTypeSerializer:typeof(PrototypeIdSerializer<DecalPrototype>), required:true)]
-    public string DecalId = string.Empty;
+    [DataField("cleanable")]
+    public bool Cleanable;
 
     [DataField("color")]
     public Color Color;
+
+    [DataField("decalId", customTypeSerializer: typeof(PrototypeIdSerializer<DecalPrototype>), required: true)]
+    public string DecalId = string.Empty;
 
     [DataField("rotation")]
     public double Rotation;
@@ -24,7 +27,4 @@ public sealed partial class PlaceDecalActionEvent : WorldTargetActionEvent
 
     [DataField("zIndex")]
     public int ZIndex;
-
-    [DataField("cleanable")]
-    public bool Cleanable;
 }

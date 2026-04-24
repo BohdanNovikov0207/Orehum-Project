@@ -15,11 +15,6 @@ namespace Content.Shared.Singularity.EntitySystems;
 /// </summary>
 public abstract class SharedSingularityGeneratorSystem : EntitySystem
 {
-    #region Dependencies
-    [Dependency] protected readonly SharedPopupSystem PopupSystem = default!;
-    [Dependency] private readonly EmagSystem _emag = default!;
-    #endregion Dependencies
-
     public override void Initialize()
     {
         base.Initialize();
@@ -41,4 +36,11 @@ public abstract class SharedSingularityGeneratorSystem : EntitySystem
         component.FailsafeDisabled = true;
         args.Handled = true;
     }
+
+    #region Dependencies
+
+    [Dependency] protected readonly SharedPopupSystem PopupSystem = default!;
+    [Dependency] private readonly EmagSystem _emag = default!;
+
+    #endregion Dependencies
 }

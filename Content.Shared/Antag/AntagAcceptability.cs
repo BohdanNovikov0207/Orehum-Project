@@ -23,10 +23,12 @@ public enum AntagAcceptability
     /// Dont choose anyone who already has an antag role
     /// </summary>
     None,
+
     /// <summary>
     /// Dont choose anyone who has an exclusive antag role
     /// </summary>
     NotExclusive,
+
     /// <summary>
     /// Choose anyone
     /// </summary>

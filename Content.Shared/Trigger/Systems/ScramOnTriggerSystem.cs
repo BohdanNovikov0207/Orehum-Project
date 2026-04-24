@@ -3,29 +3,29 @@ using Content.Shared.Movement.Pulling.Components;
 using Content.Shared.Movement.Pulling.Systems;
 using Content.Shared.Physics;
 using Content.Shared.Trigger.Components.Effects;
+using Robust.Shared.Audio.Systems;
+using Robust.Shared.Collections;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Network;
 using Robust.Shared.Physics;
 using Robust.Shared.Physics.Components;
-using Robust.Shared.Audio.Systems;
-using Robust.Shared.Collections;
 using Robust.Shared.Random;
 
 namespace Content.Shared.Trigger.Systems;
 
 public sealed class ScramOnTriggerSystem : EntitySystem
 {
-    [Dependency] private readonly PullingSystem _pulling = default!;
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly SharedMapSystem _map = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
+    [Dependency] private readonly SharedMapSystem _map = default!;
     [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly PullingSystem _pulling = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    private readonly HashSet<Entity<MapGridComponent>> _targetGrids = new();
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     private EntityQuery<PhysicsComponent> _physicsQuery;
-    private HashSet<Entity<MapGridComponent>> _targetGrids = new();
 
     public override void Initialize()
     {
@@ -52,7 +52,8 @@ public sealed class ScramOnTriggerSystem : EntitySystem
             _pulling.TryStopPull(ent, pull);
 
         // Check if the user is pulling anything, and drop it if so.
-        if (TryComp<PullerComponent>(target, out var puller) && TryComp<PullableComponent>(puller.Pulling, out var pullable))
+        if (TryComp<PullerComponent>(target, out var puller) &&
+            TryComp<PullableComponent>(puller.Pulling, out var pullable))
             _pulling.TryStopPull(puller.Pulling.Value, pullable);
 
         _audio.PlayPredicted(ent.Comp.TeleportSound, ent, args.User);
@@ -103,7 +104,7 @@ public sealed class ScramOnTriggerSystem : EntitySystem
         {
             var valid = false;
 
-            var range = (float)Math.Sqrt(radius);
+            var range = (float) Math.Sqrt(radius);
             var box = Box2.CenteredAround(userCoords.Position, new Vector2(range, range));
             var tilesInRange = _map.GetTilesEnumerator(targetGrid.Value.Owner, targetGrid.Value.Comp, box, false);
             var tileList = new ValueList<Vector2i>();
@@ -117,7 +118,8 @@ public sealed class ScramOnTriggerSystem : EntitySystem
             {
                 var tile = tileList.RemoveSwap(_random.Next(tileList.Count));
                 valid = true;
-                foreach (var entity in _map.GetAnchoredEntities(targetGrid.Value.Owner, targetGrid.Value.Comp,
+                foreach (var entity in _map.GetAnchoredEntities(targetGrid.Value.Owner,
+                             targetGrid.Value.Comp,
                              tile))
                 {
                     if (!_physicsQuery.TryGetComponent(entity, out var body))
@@ -125,7 +127,7 @@ public sealed class ScramOnTriggerSystem : EntitySystem
 
                     if (body.BodyType != BodyType.Static ||
                         !body.Hard ||
-                        (body.CollisionLayer & (int)CollisionGroup.MobMask) == 0)
+                        (body.CollisionLayer & (int) CollisionGroup.MobMask) == 0)
                         continue;
 
                     valid = false;
@@ -140,7 +142,8 @@ public sealed class ScramOnTriggerSystem : EntitySystem
                 }
             }
 
-            if (valid || _targetGrids.Count == 0) // if we don't do the check here then PickAndTake will blow up on an empty set.
+            if (valid || _targetGrids.Count ==
+                0) // if we don't do the check here then PickAndTake will blow up on an empty set.
                 break;
 
             targetGrid = _random.GetRandom().PickAndTake(_targetGrids);

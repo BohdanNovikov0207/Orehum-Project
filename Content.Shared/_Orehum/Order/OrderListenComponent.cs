@@ -3,9 +3,9 @@ using Robust.Shared.Utility;
 
 namespace Content.Shared._Orehum;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class OrderListenComponent : Component
 {
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public SpriteSpecifier? Icon;
 }

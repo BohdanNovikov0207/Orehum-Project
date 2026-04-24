@@ -43,7 +43,9 @@ public abstract class SharedMagicMirrorSystem : EntitySystem
         UISystem.TryOpenUi(mirror.Owner, MagicMirrorUiKey.Key, args.User);
     }
 
-    private void OnMirrorRangeCheck(EntityUid uid, MagicMirrorComponent component, ref BoundUserInterfaceCheckRangeEvent args)
+    private void OnMirrorRangeCheck(EntityUid uid,
+        MagicMirrorComponent component,
+        ref BoundUserInterfaceCheckRangeEvent args)
     {
         if (args.Result == BoundUserInterfaceRangeResult.Fail)
             return;
@@ -67,10 +69,8 @@ public abstract class SharedMagicMirrorSystem : EntitySystem
             args.Cancel();
     }
 
-    private void OnBeforeUIOpen(Entity<MagicMirrorComponent> ent, ref BeforeActivatableUIOpenEvent args)
-    {
+    private void OnBeforeUIOpen(Entity<MagicMirrorComponent> ent, ref BeforeActivatableUIOpenEvent args) =>
         UpdateInterface(ent, args.User, ent);
-    }
 
     protected void UpdateInterface(EntityUid mirrorUid, EntityUid targetUid, MagicMirrorComponent component)
     {
@@ -81,11 +81,11 @@ public abstract class SharedMagicMirrorSystem : EntitySystem
 
         var hair = humanoid.MarkingSet.TryGetCategory(MarkingCategories.Hair, out var hairMarkings)
             ? new List<Marking>(hairMarkings)
-            : new();
+            : new List<Marking>();
 
         var facialHair = humanoid.MarkingSet.TryGetCategory(MarkingCategories.FacialHair, out var facialHairMarkings)
             ? new List<Marking>(facialHairMarkings)
-            : new();
+            : new List<Marking>();
 
         var state = new MagicMirrorUiState(
             humanoid.Species,
@@ -101,20 +101,20 @@ public abstract class SharedMagicMirrorSystem : EntitySystem
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum MagicMirrorUiKey : byte
 {
-    Key
+    Key,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum MagicMirrorCategory : byte
 {
     Hair,
-    FacialHair
+    FacialHair,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class MagicMirrorSelectMessage : BoundUserInterfaceMessage
 {
     public MagicMirrorSelectMessage(MagicMirrorCategory category, string marking, int slot)
@@ -129,7 +129,7 @@ public sealed class MagicMirrorSelectMessage : BoundUserInterfaceMessage
     public int Slot { get; }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class MagicMirrorChangeColorMessage : BoundUserInterfaceMessage
 {
     public MagicMirrorChangeColorMessage(MagicMirrorCategory category, List<Color> colors, int slot)
@@ -144,7 +144,7 @@ public sealed class MagicMirrorChangeColorMessage : BoundUserInterfaceMessage
     public int Slot { get; }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class MagicMirrorRemoveSlotMessage : BoundUserInterfaceMessage
 {
     public MagicMirrorRemoveSlotMessage(MagicMirrorCategory category, int slot)
@@ -157,7 +157,7 @@ public sealed class MagicMirrorRemoveSlotMessage : BoundUserInterfaceMessage
     public int Slot { get; }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class MagicMirrorSelectSlotMessage : BoundUserInterfaceMessage
 {
     public MagicMirrorSelectSlotMessage(MagicMirrorCategory category, int slot)
@@ -170,7 +170,7 @@ public sealed class MagicMirrorSelectSlotMessage : BoundUserInterfaceMessage
     public int Slot { get; }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class MagicMirrorAddSlotMessage : BoundUserInterfaceMessage
 {
     public MagicMirrorAddSlotMessage(MagicMirrorCategory category)
@@ -181,10 +181,24 @@ public sealed class MagicMirrorAddSlotMessage : BoundUserInterfaceMessage
     public MagicMirrorCategory Category { get; }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class MagicMirrorUiState : BoundUserInterfaceState
 {
-    public MagicMirrorUiState(string species, List<Marking> hair, int hairSlotTotal, List<Marking> facialHair, int facialHairSlotTotal)
+    public List<Marking> FacialHair;
+    public int FacialHairSlotTotal;
+
+    public List<Marking> Hair;
+    public int HairSlotTotal;
+
+    public string Species;
+
+    public NetEntity Target;
+
+    public MagicMirrorUiState(string species,
+        List<Marking> hair,
+        int hairSlotTotal,
+        List<Marking> facialHair,
+        int facialHairSlotTotal)
     {
         Species = species;
         Hair = hair;
@@ -192,48 +206,38 @@ public sealed class MagicMirrorUiState : BoundUserInterfaceState
         FacialHair = facialHair;
         FacialHairSlotTotal = facialHairSlotTotal;
     }
-
-    public NetEntity Target;
-
-    public string Species;
-
-    public List<Marking> Hair;
-    public int HairSlotTotal;
-
-    public List<Marking> FacialHair;
-    public int FacialHairSlotTotal;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class MagicMirrorRemoveSlotDoAfterEvent : DoAfterEvent
 {
-    public override DoAfterEvent Clone() => this;
     public MagicMirrorCategory Category;
     public int Slot;
+    public override DoAfterEvent Clone() => this;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class MagicMirrorAddSlotDoAfterEvent : DoAfterEvent
 {
-    public override DoAfterEvent Clone() => this;
     public MagicMirrorCategory Category;
+    public override DoAfterEvent Clone() => this;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class MagicMirrorSelectDoAfterEvent : DoAfterEvent
 {
     public MagicMirrorCategory Category;
-    public int Slot;
     public string Marking = string.Empty;
+    public int Slot;
 
     public override DoAfterEvent Clone() => this;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class MagicMirrorChangeColorDoAfterEvent : DoAfterEvent
 {
-    public override DoAfterEvent Clone() => this;
     public MagicMirrorCategory Category;
+    public List<Color> Colors = new();
     public int Slot;
-    public List<Color> Colors = new List<Color>();
+    public override DoAfterEvent Clone() => this;
 }

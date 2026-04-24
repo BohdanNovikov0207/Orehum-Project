@@ -78,27 +78,28 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Silicons.Laws;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class SiliconLawsEuiState : EuiStateBase
 {
-    public List<SiliconLaw> Laws { get; }
-    public NetEntity Target { get; }
     public SiliconLawsEuiState(List<SiliconLaw> laws, NetEntity target)
     {
         Laws = laws;
         Target = target;
     }
-}
 
-[Serializable, NetSerializable]
-public sealed class SiliconLawsSaveMessage : EuiMessageBase
-{
     public List<SiliconLaw> Laws { get; }
     public NetEntity Target { get; }
+}
 
+[Serializable] [NetSerializable]
+public sealed class SiliconLawsSaveMessage : EuiMessageBase
+{
     public SiliconLawsSaveMessage(List<SiliconLaw> laws, NetEntity target)
     {
         Laws = laws;
         Target = target;
     }
+
+    public List<SiliconLaw> Laws { get; }
+    public NetEntity Target { get; }
 }

@@ -32,19 +32,19 @@ namespace Content.Shared._Goobstation.Wizard.Traps;
 
 public abstract class SharedWizardTrapsSystem : EntitySystem
 {
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly DamageableSystem _damageable = default!;
+    [Dependency] private readonly SharedElectrocutionSystem _electrocution = default!;
+    [Dependency] private readonly SharedMindSystem _mind = default!;
+    [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly ISharedPlayerManager _player = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly SparksSystem _spark = default!;
+    [Dependency] private readonly StatusEffectsSystem _status = default!;
+    [Dependency] private readonly SharedStunSystem _stun = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
+    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
     [Dependency] protected readonly SharedAppearanceSystem Appearance = default!;
-    [Dependency] private   readonly SharedTransformSystem _transform = default!;
-    [Dependency] private   readonly SharedPopupSystem _popup = default!;
-    [Dependency] private   readonly SharedMindSystem _mind = default!;
-    [Dependency] private   readonly SparksSystem _spark = default!;
-    [Dependency] private   readonly SharedElectrocutionSystem _electrocution = default!;
-    [Dependency] private   readonly SharedStunSystem _stun = default!;
-    [Dependency] private   readonly StatusEffectsSystem _status = default!;
-    [Dependency] private   readonly DamageableSystem _damageable = default!;
-    [Dependency] private   readonly SharedAudioSystem _audio = default!;
-    [Dependency] private   readonly EntityWhitelistSystem _whitelist = default!;
-    [Dependency] private   readonly INetManager _net = default!;
-    [Dependency] private   readonly ISharedPlayerManager _player = default!;
 
     public override void Initialize()
     {
@@ -88,10 +88,8 @@ public abstract class SharedWizardTrapsSystem : EntitySystem
             status);
     }
 
-    private void OnChillTriggered(Entity<ChillTrapComponent> ent, ref TrapTriggeredEvent args)
-    {
+    private void OnChillTriggered(Entity<ChillTrapComponent> ent, ref TrapTriggeredEvent args) =>
         EnsureComp<IceCubeComponent>(args.Victim);
-    }
 
     private void OnStunTriggered(Entity<StunTrapComponent> ent, ref TrapTriggeredEvent args)
     {
@@ -220,7 +218,8 @@ public abstract class SharedWizardTrapsSystem : EntitySystem
 
         if (!comp.CanReveal)
             args.Cancel();
-        else if (HasComp<TemporaryBlindnessComponent>(args.Examiner) || HasComp<PermanentBlindnessComponent>(args.Examiner))
+        else if (HasComp<TemporaryBlindnessComponent>(args.Examiner) ||
+                 HasComp<PermanentBlindnessComponent>(args.Examiner))
             args.Cancel();
         else if (!_transform.InRange(uid, args.Examiner, comp.ExamineRange))
             args.Cancel();

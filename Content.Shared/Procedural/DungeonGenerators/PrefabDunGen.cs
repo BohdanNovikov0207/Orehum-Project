@@ -10,6 +10,9 @@ namespace Content.Shared.Procedural.DungeonGenerators;
 /// <remarks>
 public sealed partial class PrefabDunGen : IDunGenLayer
 {
+    [DataField]
+    public ProtoId<ContentTileDefinition>? FallbackTile;
+
     /// <summary>
     /// Room pack presets we can use for this prefab.
     /// </summary>
@@ -18,7 +21,4 @@ public sealed partial class PrefabDunGen : IDunGenLayer
 
     [DataField]
     public EntityWhitelist? RoomWhitelist;
-
-    [DataField]
-    public ProtoId<ContentTileDefinition>? FallbackTile;
 }

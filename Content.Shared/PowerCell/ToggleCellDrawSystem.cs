@@ -52,8 +52,8 @@ namespace Content.Shared.PowerCell;
 /// </summary>
 public sealed class ToggleCellDrawSystem : EntitySystem
 {
-    [Dependency] private readonly ItemToggleSystem _toggle = default!;
     [Dependency] private readonly SharedPowerCellSystem _cell = default!;
+    [Dependency] private readonly ItemToggleSystem _toggle = default!;
 
     public override void Initialize()
     {
@@ -65,10 +65,8 @@ public sealed class ToggleCellDrawSystem : EntitySystem
         SubscribeLocalEvent<ToggleCellDrawComponent, PowerCellSlotEmptyEvent>(OnEmpty);
     }
 
-    private void OnMapInit(Entity<ToggleCellDrawComponent> ent, ref MapInitEvent args)
-    {
+    private void OnMapInit(Entity<ToggleCellDrawComponent> ent, ref MapInitEvent args) =>
         _cell.SetDrawEnabled(ent.Owner, _toggle.IsActivated(ent.Owner));
-    }
 
     private void OnActivateAttempt(Entity<ToggleCellDrawComponent> ent, ref ItemToggleActivateAttemptEvent args)
     {
@@ -84,8 +82,6 @@ public sealed class ToggleCellDrawSystem : EntitySystem
         _cell.SetDrawEnabled((uid, draw), args.Activated);
     }
 
-    private void OnEmpty(Entity<ToggleCellDrawComponent> ent, ref PowerCellSlotEmptyEvent args)
-    {
+    private void OnEmpty(Entity<ToggleCellDrawComponent> ent, ref PowerCellSlotEmptyEvent args) =>
         _toggle.TryDeactivate(ent.Owner);
-    }
 }

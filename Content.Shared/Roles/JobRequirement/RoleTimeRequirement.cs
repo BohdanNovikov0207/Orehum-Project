@@ -87,7 +87,7 @@ using Robust.Shared.Utility;
 namespace Content.Shared.Roles;
 
 [UsedImplicitly]
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class RoleTimeRequirement : JobRequirement
 {
     /// <summary>
@@ -96,7 +96,7 @@ public sealed partial class RoleTimeRequirement : JobRequirement
     [DataField(required: true)]
     public ProtoId<PlayTimeTrackerPrototype> Role;
 
-    /// <inheritdoc cref="DepartmentTimeRequirement.Time"/>
+    /// <inheritdoc cref="DepartmentTimeRequirement.Time" />
     [DataField(required: true)]
     public TimeSpan Time;
 

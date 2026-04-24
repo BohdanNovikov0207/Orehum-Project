@@ -23,8 +23,8 @@ namespace Content.Shared.Storage.EntitySystems;
 
 /// <summary>
 /// <c>ItemMapperSystem</c> is a system that on each initialization, insertion, removal of an entity from
-/// given <see cref="ItemMapperComponent"/> (with appropriate storage attached) will check each stored item to see
-/// if its tags/component, and overall quantity match <see cref="ItemMapperComponent.MapLayers"/>.
+/// given <see cref="ItemMapperComponent" /> (with appropriate storage attached) will check each stored item to see
+/// if its tags/component, and overall quantity match <see cref="ItemMapperComponent.MapLayers" />.
 /// </summary>
 [UsedImplicitly]
 public abstract class SharedItemMapperSystem : EntitySystem
@@ -93,15 +93,16 @@ public abstract class SharedItemMapperSystem : EntitySystem
     }
 
     /// <summary>
-    /// Method that iterates over storage of the entity in <paramref name="uid"/> and sets <paramref name="showLayers"/>
-    /// according to <paramref name="itemMapper"/> definition. It will have O(n*m) time behavior
-    /// (n - number of entities in container, and m - number of definitions in <paramref name="showLayers"/>).
+    /// Method that iterates over storage of the entity in <paramref name="uid" /> and sets <paramref name="showLayers" />
+    /// according to <paramref name="itemMapper" /> definition. It will have O(n*m) time behavior
+    /// (n - number of entities in container, and m - number of definitions in <paramref name="showLayers" />).
     /// </summary>
     /// <param name="uid">EntityUid used to search the storage</param>
-    /// <param name="itemMapper">component that contains definition used to map
-    /// <see cref="EntityWhitelist">Whitelist</see> in <see cref="ItemMapperComponent.MapLayers"/> to string.
+    /// <param name="itemMapper">
+    /// component that contains definition used to map
+    /// <see cref="EntityWhitelist">Whitelist</see> in <see cref="ItemMapperComponent.MapLayers" /> to string.
     /// </param>
-    /// <param name="showLayers">list of <paramref name="itemMapper"/> layers that should be visible</param>
+    /// <param name="showLayers">list of <paramref name="itemMapper" /> layers that should be visible</param>
     /// <returns>false if <c>msg.Container.Owner</c> is not a storage, true otherwise.</returns>
     private bool TryGetLayers(EntityUid uid, ItemMapperComponent itemMapper, out List<string> showLayers)
     {
@@ -116,9 +117,7 @@ public abstract class SharedItemMapperSystem : EntitySystem
             var count = containedLayers.Count(ent => _whitelistSystem.IsWhitelistPassOrNull(mapLayerData.Whitelist,
                 ent));
             if (count >= mapLayerData.MinCount && count <= mapLayerData.MaxCount)
-            {
                 list.Add(mapLayerData.Layer);
-            }
         }
 
         showLayers = list;

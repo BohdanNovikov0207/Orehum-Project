@@ -56,12 +56,13 @@ namespace Content.Shared.Power.EntitySystems;
 
 public abstract class SharedPowerReceiverSystem : EntitySystem
 {
-    [Dependency] private readonly INetManager _netMan = default!;
     [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedPowerNetSystem _net = default!;
+    [Dependency] private readonly INetManager _netMan = default!;
 
-    public abstract bool ResolveApc(EntityUid entity, [NotNullWhen(true)] ref SharedApcPowerReceiverComponent? component);
+    public abstract bool ResolveApc(EntityUid entity,
+        [NotNullWhen(true)] ref SharedApcPowerReceiverComponent? component);
 
     /// <summary>
     /// Goobstation - Lets shared code set power load.
@@ -92,7 +93,10 @@ public abstract class SharedPowerReceiverSystem : EntitySystem
     /// Turn this machine on or off.
     /// Returns true if we turned it on, false if we turned it off.
     /// </summary>
-    public bool TogglePower(EntityUid uid, bool playSwitchSound = true, SharedApcPowerReceiverComponent? receiver = null, EntityUid? user = null)
+    public bool TogglePower(EntityUid uid,
+        bool playSwitchSound = true,
+        SharedApcPowerReceiverComponent? receiver = null,
+        EntityUid? user = null)
     {
         if (!ResolveApc(uid, ref receiver))
             return true;
@@ -105,9 +109,7 @@ public abstract class SharedPowerReceiverSystem : EntitySystem
             // Server won't raise it here as it can raise the load event later with NeedsPower?
             // This is mostly here for clientside predictions.
             if (receiver.Powered != powered)
-            {
                 RaisePower((uid, receiver));
-            }
 
             SetPowerDisabled(uid, false, receiver);
             return true;
@@ -116,11 +118,15 @@ public abstract class SharedPowerReceiverSystem : EntitySystem
         SetPowerDisabled(uid, !receiver.PowerDisabled, receiver);
 
         if (user != null)
-            _adminLogger.Add(LogType.Action, LogImpact.Low, $"{ToPrettyString(user.Value):player} hit power button on {ToPrettyString(uid)}, it's now {(!receiver.PowerDisabled ? "on" : "off")}");
+            _adminLogger.Add(LogType.Action,
+                LogImpact.Low,
+                $"{ToPrettyString(user.Value):player} hit power button on {ToPrettyString(uid)}, it's now {(!receiver.PowerDisabled ? "on" : "off")}");
 
         if (playSwitchSound)
         {
-            _audio.PlayPredicted(new SoundPathSpecifier("/Audio/Machines/machine_switch.ogg"), uid, user: user,
+            _audio.PlayPredicted(new SoundPathSpecifier("/Audio/Machines/machine_switch.ogg"),
+                uid,
+                user,
                 AudioParams.Default.WithVolume(-2f));
         }
 
@@ -145,8 +151,8 @@ public abstract class SharedPowerReceiverSystem : EntitySystem
         // NOOP on server because client has 0 idea of load so we can't raise it properly in shared.
     }
 
-	/// <summary>
-	/// Checks if entity is APC-powered device, and if it have power.
+    /// <summary>
+    /// Checks if entity is APC-powered device, and if it have power.
     /// </summary>
     public bool IsPowered(Entity<SharedApcPowerReceiverComponent?> entity)
     {
@@ -156,11 +162,9 @@ public abstract class SharedPowerReceiverSystem : EntitySystem
         return entity.Comp.Powered;
     }
 
-    protected string GetExamineText(bool powered)
-    {
-        return Loc.GetString("power-receiver-component-on-examine-main",
-                                ("stateText", Loc.GetString(powered
-                                    ? "power-receiver-component-on-examine-powered"
-                                    : "power-receiver-component-on-examine-unpowered")));
-    }
+    protected string GetExamineText(bool powered) =>
+        Loc.GetString("power-receiver-component-on-examine-main",
+            ("stateText", Loc.GetString(powered
+                ? "power-receiver-component-on-examine-powered"
+                : "power-receiver-component-on-examine-unpowered")));
 }

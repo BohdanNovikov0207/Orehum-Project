@@ -16,22 +16,35 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Access.Components;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 [Access(typeof(SharedAccessOverriderSystem))]
 public sealed partial class AccessOverriderComponent : Component
 {
+    [Serializable] [NetSerializable]
+    public enum AccessOverriderUiKey : byte
+    {
+        Key,
+    }
+
     public static string PrivilegedIdCardSlotId = "AccessOverrider-privilegedId";
 
-    [DataField]
-    public ItemSlot PrivilegedIdSlot = new();
+    [DataField] [AutoNetworkedField]
+    public List<ProtoId<AccessLevelPrototype>> AccessLevels = new();
 
     [ViewVariables(VVAccess.ReadWrite)]
     [DataField]
     public SoundSpecifier? DenialSound;
 
+    [ViewVariables(VVAccess.ReadWrite)]
+    [DataField]
+    public float DoAfter;
+
+    [DataField]
+    public ItemSlot PrivilegedIdSlot = new();
+
     public EntityUid TargetAccessReaderId = new();
 
-    [Serializable, NetSerializable]
+    [Serializable] [NetSerializable]
     public sealed class WriteToTargetAccessReaderIdMessage : BoundUserInterfaceMessage
     {
         public readonly List<ProtoId<AccessLevelPrototype>> AccessList;
@@ -42,24 +55,17 @@ public sealed partial class AccessOverriderComponent : Component
         }
     }
 
-    [DataField, AutoNetworkedField]
-    public List<ProtoId<AccessLevelPrototype>> AccessLevels = new();
-
-    [ViewVariables(VVAccess.ReadWrite)]
-    [DataField]
-    public float DoAfter;
-
-    [Serializable, NetSerializable]
+    [Serializable] [NetSerializable]
     public sealed class AccessOverriderBoundUserInterfaceState : BoundUserInterfaceState
     {
+        public readonly ProtoId<AccessLevelPrototype>[]? AllowedModifyAccessList;
+        public readonly bool IsPrivilegedIdAuthorized;
+        public readonly bool IsPrivilegedIdPresent;
+        public readonly ProtoId<AccessLevelPrototype>[]? MissingPrivilegesList;
+        public readonly string PrivilegedIdName;
+        public readonly ProtoId<AccessLevelPrototype>[]? TargetAccessReaderIdAccessList;
         public readonly string TargetLabel;
         public readonly Color TargetLabelColor;
-        public readonly string PrivilegedIdName;
-        public readonly bool IsPrivilegedIdPresent;
-        public readonly bool IsPrivilegedIdAuthorized;
-        public readonly ProtoId<AccessLevelPrototype>[]? TargetAccessReaderIdAccessList;
-        public readonly ProtoId<AccessLevelPrototype>[]? AllowedModifyAccessList;
-        public readonly ProtoId<AccessLevelPrototype>[]? MissingPrivilegesList;
 
         public AccessOverriderBoundUserInterfaceState(bool isPrivilegedIdPresent,
             bool isPrivilegedIdAuthorized,
@@ -79,11 +85,5 @@ public sealed partial class AccessOverriderComponent : Component
             TargetLabel = targetLabel;
             TargetLabelColor = targetLabelColor;
         }
-    }
-
-    [Serializable, NetSerializable]
-    public enum AccessOverriderUiKey : byte
-    {
-        Key,
     }
 }

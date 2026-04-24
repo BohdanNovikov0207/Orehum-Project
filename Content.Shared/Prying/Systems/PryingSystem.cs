@@ -97,10 +97,10 @@ namespace Content.Shared.Prying.Systems;
 public sealed class PryingSystem : EntitySystem
 {
     [Dependency] private readonly ISharedAdminLogManager _adminLog = default!;
-    [Dependency] private readonly SharedDoAfterSystem _doAfterSystem = default!;
     [Dependency] private readonly SharedAudioSystem _audioSystem = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly UseDelaySystem _delay = default!; // Goobstation
+    [Dependency] private readonly SharedDoAfterSystem _doAfterSystem = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
 
     public override void Initialize()
     {
@@ -128,7 +128,7 @@ public sealed class PryingSystem : EntitySystem
         if (!TryComp<PryingComponent>(args.User, out _))
             return;
 
-        args.Verbs.Add(new AlternativeVerb()
+        args.Verbs.Add(new AlternativeVerb
         {
             Text = Loc.GetString("door-pry"),
             Impact = LogImpact.Low,
@@ -178,7 +178,8 @@ public sealed class PryingSystem : EntitySystem
             return false;
 
         // We don't care about displaying a message if no tool was used.
-        if (!TryComp<PryUnpoweredComponent>(target, out var unpoweredComp) || !CanPry(target, user, out _, unpoweredComp: unpoweredComp))
+        if (!TryComp<PryUnpoweredComponent>(target, out var unpoweredComp) ||
+            !CanPry(target, user, out _, unpoweredComp: unpoweredComp))
             // If we have reached this point we want the event that caused this
             // to be marked as handled.
             return true;
@@ -188,14 +189,16 @@ public sealed class PryingSystem : EntitySystem
         return StartPry(target, user, user, modifier, out id); // Goob edit
     }
 
-    private bool CanPry(EntityUid target, EntityUid user, out string? message, PryingComponent? comp = null, PryUnpoweredComponent? unpoweredComp = null)
+    private bool CanPry(EntityUid target,
+        EntityUid user,
+        out string? message,
+        PryingComponent? comp = null,
+        PryUnpoweredComponent? unpoweredComp = null)
     {
         BeforePryEvent canev;
 
         if (comp != null || Resolve(user, ref comp, false))
-        {
             canev = new BeforePryEvent(user, comp.PryPowered, comp.Force, true);
-        }
         else
         {
             if (!Resolve(target, ref unpoweredComp))
@@ -214,7 +217,11 @@ public sealed class PryingSystem : EntitySystem
         return !canev.Cancelled;
     }
 
-    private bool StartPry(EntityUid target, EntityUid user, EntityUid? tool, float toolModifier, [NotNullWhen(true)] out DoAfterId? id)
+    private bool StartPry(EntityUid target,
+        EntityUid user,
+        EntityUid? tool,
+        float toolModifier,
+        [NotNullWhen(true)] out DoAfterId? id)
     {
         var instaPry = TryComp(tool, out PryingComponent? prying) && prying.InstaPry; // Goobstation
 
@@ -227,7 +234,13 @@ public sealed class PryingSystem : EntitySystem
         RaiseLocalEvent(user, ref modEv);
         // End DeltaV additions
 
-        var doAfterArgs = new DoAfterArgs(EntityManager, user, TimeSpan.FromSeconds(modEv.BaseTime * modEv.PryTimeModifier / toolModifier), new DoorPryDoAfterEvent(), target, target, tool)
+        var doAfterArgs = new DoAfterArgs(EntityManager,
+            user,
+            TimeSpan.FromSeconds(modEv.BaseTime * modEv.PryTimeModifier / toolModifier),
+            new DoorPryDoAfterEvent(),
+            target,
+            target,
+            tool)
         {
             BreakOnDamage = true,
             BreakOnMove = true,
@@ -235,13 +248,11 @@ public sealed class PryingSystem : EntitySystem
         };
 
         if (tool != user && tool != null)
-        {
-            _adminLog.Add(LogType.Action, LogImpact.Low, $"{ToPrettyString(user)} is using {ToPrettyString(tool.Value)} to pry {ToPrettyString(target)}");
-        }
+            _adminLog.Add(LogType.Action,
+                LogImpact.Low,
+                $"{ToPrettyString(user)} is using {ToPrettyString(tool.Value)} to pry {ToPrettyString(target)}");
         else
-        {
             _adminLog.Add(LogType.Action, LogImpact.Low, $"{ToPrettyString(user)} is prying {ToPrettyString(target)}");
-        }
         return _doAfterSystem.TryStartDoAfter(doAfterArgs, out id);
     }
 
@@ -262,9 +273,7 @@ public sealed class PryingSystem : EntitySystem
         }
 
         if (args.Used != null && comp != null)
-        {
             _audioSystem.PlayPredicted(comp.UseSound, args.Used.Value, args.User);
-        }
 
         var ev = new PriedEvent(args.User);
         RaiseLocalEvent(uid, ref ev);
@@ -274,5 +283,5 @@ public sealed class PryingSystem : EntitySystem
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class DoorPryDoAfterEvent : SimpleDoAfterEvent;

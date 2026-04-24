@@ -24,5 +24,5 @@ public partial interface IBiomeLayer
     /// <summary>
     /// Is the thresold inverted so we need to be lower than it.
     /// </summary>
-    public bool Invert { get; }
+    bool Invert { get; }
 }

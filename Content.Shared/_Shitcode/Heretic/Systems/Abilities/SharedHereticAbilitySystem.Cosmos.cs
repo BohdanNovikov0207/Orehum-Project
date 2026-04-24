@@ -23,10 +23,7 @@ public abstract partial class SharedHereticAbilitySystem
         SubscribeLocalEvent<StarBlastComponent, EntityTerminatingEvent>(OnEntityTerminating);
     }
 
-    private void OnAscension(HereticAscensionCosmosEvent args)
-    {
-        _eye.SetDrawFov(args.Heretic, args.Negative);
-    }
+    private void OnAscension(HereticAscensionCosmosEvent args) => _eye.SetDrawFov(args.Heretic, args.Negative);
 
     private void OnExpansion(EventHereticCosmicExpansion args)
     {
@@ -38,14 +35,14 @@ public abstract partial class SharedHereticAbilitySystem
         var coords = Transform(ent).Coordinates;
 
         Heretic.TryGetHereticComponent(ent, out var heretic, out _);
-        var strength = heretic is {CurrentPath: "Cosmos"} ? heretic.PathStage : 10;
+        var strength = heretic is { CurrentPath: "Cosmos" } ? heretic.PathStage : 10;
 
         _starMark.ApplyStarMarkInRange(coords, ent, args.Range);
         _starMark.SpawnCosmicFields(coords, 2, strength);
 
         PredictedSpawnAtPosition(args.Effect, coords);
 
-        if (heretic is null or {Ascended: true, CurrentPath: "Cosmos"})
+        if (heretic is null or { Ascended: true, CurrentPath: "Cosmos" })
         {
             _starMark.SpawnCosmicFieldLine(coords, DirectionFlag.North, -4, 4, 3, strength);
             _starMark.SpawnCosmicFieldLine(coords, DirectionFlag.East, -4, 4, 3, strength);
@@ -63,7 +60,7 @@ public abstract partial class SharedHereticAbilitySystem
         var ent = args.Performer;
 
         Heretic.TryGetHereticComponent(ent, out var heretic, out _);
-        var strength = heretic is {CurrentPath: "Cosmos"} ? heretic.PathStage : 10;
+        var strength = heretic is { CurrentPath: "Cosmos" } ? heretic.PathStage : 10;
 
         if (Exists(starBlast.Projectile))
         {
@@ -126,7 +123,7 @@ public abstract partial class SharedHereticAbilitySystem
         _starMark.ApplyStarMarkInRange(coords, args.Shooter, ent.Comp.StarMarkRadius);
 
         if (TryComp(args.Target, out StatusEffectsComponent? targetStatus))
-            _stun.KnockdownOrStun(args.Target, ent.Comp.KnockdownTime, true);
+            _stun.KnockdownOrStun(args.Target, ent.Comp.KnockdownTime);
     }
 
     private void PullVictims(EntityUid user, EntityCoordinates coords, int strength)
@@ -136,6 +133,7 @@ public abstract partial class SharedHereticAbilitySystem
             if (_starMark.TryApplyStarMark(mob.AsNullable()))
                 _throw.TryThrow(mob, coords);
         }
+
         _starMark.SpawnCosmicFields(coords, 1, strength);
     }
 

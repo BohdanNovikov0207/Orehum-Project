@@ -44,42 +44,42 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Goobstation.Maths.FixedPoint; // Shitmed Change
+using Content.Goobstation.Maths.FixedPoint;
 using Robust.Shared.Prototypes;
+// Shitmed Change
 
-namespace Content.Shared.Damage.Prototypes
+namespace Content.Shared.Damage.Prototypes;
+
+/// <summary>
+/// A single damage type. These types are grouped together in <see cref="DamageGroupPrototype" />s.
+/// </summary>
+[Prototype]
+public sealed class DamageTypePrototype : IPrototype
 {
+    [DataField(required: true)]
+    private LocId Name { get; set; }
+
+    [ViewVariables(VVAccess.ReadOnly)]
+    public string LocalizedName => Loc.GetString(Name);
+
     /// <summary>
-    ///     A single damage type. These types are grouped together in <see cref="DamageGroupPrototype"/>s.
+    /// The price for each 1% damage reduction in armors
     /// </summary>
-    [Prototype]
-    public sealed partial class DamageTypePrototype : IPrototype
-    {
-        [IdDataField]
-        public string ID { get; private set; } = default!;
+    [DataField("armorCoefficientPrice")]
+    public double ArmorPriceCoefficient { get; set; }
 
-        [DataField(required: true)]
-        private LocId Name { get; set; }
+    /// <summary>
+    /// The price for each flat damage reduction in armors
+    /// </summary>
+    [DataField("armorFlatPrice")]
+    public double ArmorPriceFlat { get; set; }
 
-        [ViewVariables(VVAccess.ReadOnly)]
-        public string LocalizedName => Loc.GetString(Name);
+    /// <summary>
+    /// Shitmed Change: Wounds with the said damage type will be having this multiplier
+    /// </summary>
+    [DataField] [ViewVariables(VVAccess.ReadOnly)]
+    public FixedPoint2 WoundHealingMultiplier { get; set; } = 1;
 
-        /// <summary>
-        /// The price for each 1% damage reduction in armors
-        /// </summary>
-        [DataField("armorCoefficientPrice")]
-        public double ArmorPriceCoefficient { get; set; }
-
-        /// <summary>
-        /// The price for each flat damage reduction in armors
-        /// </summary>
-        [DataField("armorFlatPrice")]
-        public double ArmorPriceFlat { get; set; }
-
-        /// <summary>
-        /// Shitmed Change: Wounds with the said damage type will be having this multiplier
-        /// </summary>
-        [DataField, ViewVariables(VVAccess.ReadOnly)]
-        public FixedPoint2 WoundHealingMultiplier { get; set; } = 1;
-    }
+    [IdDataField]
+    public string ID { get; } = default!;
 }

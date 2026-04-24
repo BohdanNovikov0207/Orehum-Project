@@ -6,7 +6,8 @@ public abstract class SharedMetabolizerSystem : EntitySystem
 {
     /// <summary>
     /// Updates the metabolic rate multiplier for a given entity,
-    /// raising both <see cref="GetMetabolicMultiplierEvent"/> to determine what the multiplier is and <see cref="ApplyMetabolicMultiplierEvent"/> to update relevant components.
+    /// raising both <see cref="GetMetabolicMultiplierEvent" /> to determine what the multiplier is and
+    /// <see cref="ApplyMetabolicMultiplierEvent" /> to update relevant components.
     /// </summary>
     /// <param name="uid"></param>
     public void UpdateMetabolicMultiplier(EntityUid uid)

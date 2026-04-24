@@ -14,9 +14,9 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Chemistry.Components;
 using Content.Shared.DoAfter;
-using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Inventory;
 using Content.Shared.Nutrition.Components;
 using Content.Shared.Nutrition.Prototypes;
@@ -33,18 +33,17 @@ namespace Content.Shared.Nutrition;
 public record struct IngestibleEvent(bool Cancelled = false);
 
 /// <summary>
-/// Raised on an entity with the <see cref="EdibleComponent"/> to check if anything is stopping
+/// Raised on an entity with the <see cref="EdibleComponent" /> to check if anything is stopping
 /// another entity from consuming the delicious reagents stored inside.
 /// </summary>
 /// <param name="User">The entity trying to feed us to an entity.</param>
 [ByRefEvent]
 public record struct EdibleEvent(EntityUid User)
 {
+    public bool Cancelled;
     public Entity<SolutionComponent>? Solution = null;
 
     public TimeSpan Time = TimeSpan.Zero;
-
-    public bool Cancelled;
 }
 
 /// <summary>
@@ -58,26 +57,27 @@ public record struct EdibleEvent(EntityUid User)
 public record struct AttemptIngestEvent(EntityUid User, EntityUid Ingested, bool Ingest, bool Handled = false);
 
 /// <summary>
-///     Raised on an entity that is consuming another entity to see if there is anything attached to the entity
-///     that is preventing it from doing the consumption.
+/// Raised on an entity that is consuming another entity to see if there is anything attached to the entity
+/// that is preventing it from doing the consumption.
 /// </summary>
 [ByRefEvent]
 public record struct IngestionAttemptEvent(SlotFlags TargetSlots, bool Cancelled = false) : IInventoryRelayEvent
 {
     /// <summary>
-    ///     The equipment that is blocking consumption. Should only be non-null if the event was canceled.
+    /// The equipment that is blocking consumption. Should only be non-null if the event was canceled.
     /// </summary>
     public EntityUid? Blocker = null;
 }
 
 /// <summary>
-///     Raised on an entity that is trying to be digested, aka turned from an entity into reagents.
-///     Returns its digestive properties or how difficult it is to convert to reagents.
+/// Raised on an entity that is trying to be digested, aka turned from an entity into reagents.
+/// Returns its digestive properties or how difficult it is to convert to reagents.
 /// </summary>
-/// <remarks>This method is currently needed for backwards compatibility with food and drink component.
-///          It also might be needed in the event items like trash and plushies have their edible component removed.
-///          There's no way to know whether this event will be made obsolete or not after Food and Drink Components
-///          are removed until after a proper body and digestion rework. Oh well!
+/// <remarks>
+/// This method is currently needed for backwards compatibility with food and drink component.
+/// It also might be needed in the event items like trash and plushies have their edible component removed.
+/// There's no way to know whether this event will be made obsolete or not after Food and Drink Components
+/// are removed until after a proper body and digestion rework. Oh well!
 /// </remarks>
 [ByRefEvent]
 public record struct IsDigestibleEvent()
@@ -107,7 +107,7 @@ public record struct IsDigestibleEvent()
 /// <summary>
 /// Do After Event for trying to put food solution into stomach entity.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class EatingDoAfterEvent : SimpleDoAfterEvent;
 
 /// <summary>
@@ -121,11 +121,11 @@ public sealed partial class EatingDoAfterEvent : SimpleDoAfterEvent;
 [ByRefEvent]
 public record struct BeforeIngestedEvent(FixedPoint2 Min, FixedPoint2 Max, Solution? Solution)
 {
-    // How much we would like to transfer, gets clamped by Min and Max.
-    public FixedPoint2 Transfer;
-
     // Whether this event, and therefore eat attempt, should be cancelled.
     public bool Cancelled;
+
+    // How much we would like to transfer, gets clamped by Min and Max.
+    public FixedPoint2 Transfer;
 
     public bool TryNewMinimum(FixedPoint2 newMin)
     {
@@ -159,15 +159,15 @@ public record struct IngestingEvent(EntityUid Food, Solution Split, bool ForceFe
 [ByRefEvent]
 public record struct IngestedEvent(EntityUid User, EntityUid Target, Solution Split, bool ForceFed)
 {
-    // Should we refill the solution now that we've eaten it?
-    // This bool basically only exists because of stackable system.
-    public bool Refresh;
-
     // Should we destroy the ingested entity?
     public bool Destroy;
 
     // Has this eaten event been handled? Used to prevent duplicate flavor popups and sound effects.
     public bool Handled;
+
+    // Should we refill the solution now that we've eaten it?
+    // This bool basically only exists because of stackable system.
+    public bool Refresh;
 
     // Should we try eating again?
     public bool Repeat;
@@ -191,9 +191,8 @@ public readonly record struct FullyEatenEvent(EntityUid User)
 [ByRefEvent]
 public record struct GetUtensilsEvent()
 {
-    public UtensilType Types = UtensilType.None;
-
     public UtensilType RequiredTypes = UtensilType.None;
+    public UtensilType Types = UtensilType.None;
 
     // Forces you to add to both lists if a utensil is required.
     public void AddRequiredTypes(UtensilType type)
@@ -211,10 +210,7 @@ public record struct GetEdibleTypeEvent
 {
     public ProtoId<EdiblePrototype>? Type { get; private set; }
 
-    public void SetPrototype([ForbidLiteral] ProtoId<EdiblePrototype> proto)
-    {
-        Type = proto;
-    }
+    public void SetPrototype([ForbidLiteral] ProtoId<EdiblePrototype> proto) => Type = proto;
 }
 
 /// <summary>

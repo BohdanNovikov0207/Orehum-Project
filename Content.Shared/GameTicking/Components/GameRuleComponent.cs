@@ -25,7 +25,7 @@ namespace Content.Shared.GameTicking.Components;
 /// Component attached to all gamerule entities.
 /// Used to both track the entity as well as store basic data
 /// </summary>
-[RegisterComponent, EntityCategory("GameRules")]
+[RegisterComponent] [EntityCategory("GameRules")]
 public sealed partial class GameRuleComponent : Component
 {
     /// <summary>
@@ -35,17 +35,23 @@ public sealed partial class GameRuleComponent : Component
     public TimeSpan ActivatedAt;
 
     /// <summary>
-    /// The minimum amount of players needed for this game rule.
-    /// </summary>
-    [DataField]
-    public int MinPlayers;
-
-    /// <summary>
     /// If true, this rule not having enough players will cancel the preset selection.
     /// If false, it will simply not run silently.
     /// </summary>
     [DataField]
     public bool CancelPresetOnTooFewPlayers = true;
+
+    // Goobstation
+    /// <summary>
+    /// Used by SecretPlus to weight this event in addition to StationEventComponent's weight.
+    /// In GameRuleComponent to be usable for roundstart events.
+    /// See SecretPlus documentation for more information.
+    /// If the event is fired, chaos will be adjusted by this value.
+    /// Should not be null if this is fireable by SecretPlus, unless we have AntagSelectionComponent. There's an integration
+    /// test for this, though.
+    /// </summary>
+    [DataField]
+    public float? ChaosScore = null;
 
     /// <summary>
     /// A delay for when the rule the is started and when the starting logic actually runs.
@@ -53,16 +59,11 @@ public sealed partial class GameRuleComponent : Component
     [DataField]
     public MinMax? Delay;
 
-    // Goobstation
     /// <summary>
-    ///   Used by SecretPlus to weight this event in addition to StationEventComponent's weight.
-    ///   In GameRuleComponent to be usable for roundstart events.
-    ///   See SecretPlus documentation for more information.
-    ///   If the event is fired, chaos will be adjusted by this value.
-    ///   Should not be null if this is fireable by SecretPlus, unless we have AntagSelectionComponent. There's an integration test for this, though.
+    /// The minimum amount of players needed for this game rule.
     /// </summary>
     [DataField]
-    public float? ChaosScore = null;
+    public int MinPlayers;
 }
 
 /// <summary>

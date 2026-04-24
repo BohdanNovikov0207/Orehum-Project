@@ -8,6 +8,9 @@ namespace Content.Shared._Mono.Ships;
 [RegisterComponent]
 public sealed partial class FTLDriveGeneratorComponent : Component
 {
+    [DataField]
+    public FTLDriveData Data;
+
     [ViewVariables]
     public bool Powered;
 
@@ -16,7 +19,4 @@ public sealed partial class FTLDriveGeneratorComponent : Component
     /// </summary>
     [DataField]
     public int Priority;
-
-    [DataField]
-    public FTLDriveData Data;
 }

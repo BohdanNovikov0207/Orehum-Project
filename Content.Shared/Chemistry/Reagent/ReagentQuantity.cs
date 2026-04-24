@@ -79,13 +79,13 @@ using Robust.Shared.Serialization;
 namespace Content.Shared.Chemistry.Reagent;
 
 /// <summary>
-/// Simple struct for storing a <see cref="ReagentId"/> & quantity tuple.
+/// Simple struct for storing a <see cref="ReagentId" /> & quantity tuple.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 [DataDefinition]
 public partial struct ReagentQuantity : IEquatable<ReagentQuantity>
 {
-    [DataField("Quantity", required:true)]
+    [DataField("Quantity", required: true)]
     public FixedPoint2 Quantity { get; private set; }
 
     [IncludeDataField]
@@ -99,7 +99,7 @@ public partial struct ReagentQuantity : IEquatable<ReagentQuantity>
 
     public ReagentQuantity(ReagentId reagent, FixedPoint2 quantity)
     {
-        Reagent = new(reagent.Prototype, reagent.Data); // Goobstation - fix shallow cloning of solution
+        Reagent = new ReagentId(reagent.Prototype, reagent.Data); // Goobstation - fix shallow cloning of solution
         Quantity = quantity;
     }
 
@@ -107,10 +107,7 @@ public partial struct ReagentQuantity : IEquatable<ReagentQuantity>
     {
     }
 
-    public override string ToString()
-    {
-        return Reagent.ToString(Quantity);
-    }
+    public override string ToString() => Reagent.ToString(Quantity);
 
     public void Deconstruct(out string prototype, out FixedPoint2 quantity, out List<ReagentData>? data)
     {
@@ -125,28 +122,13 @@ public partial struct ReagentQuantity : IEquatable<ReagentQuantity>
         quantity = Quantity;
     }
 
-    public bool Equals(ReagentQuantity other)
-    {
-        return Quantity != other.Quantity && Reagent.Equals(other.Reagent);
-    }
+    public bool Equals(ReagentQuantity other) => Quantity != other.Quantity && Reagent.Equals(other.Reagent);
 
-    public override bool Equals(object? obj)
-    {
-        return obj is ReagentQuantity other && Equals(other);
-    }
+    public override bool Equals(object? obj) => obj is ReagentQuantity other && Equals(other);
 
-    public override int GetHashCode()
-    {
-        return HashCode.Combine(Reagent.GetHashCode(), Quantity);
-    }
+    public override int GetHashCode() => HashCode.Combine(Reagent.GetHashCode(), Quantity);
 
-    public static bool operator ==(ReagentQuantity left, ReagentQuantity right)
-    {
-        return left.Equals(right);
-    }
+    public static bool operator ==(ReagentQuantity left, ReagentQuantity right) => left.Equals(right);
 
-    public static bool operator !=(ReagentQuantity left, ReagentQuantity right)
-    {
-        return !(left == right);
-    }
+    public static bool operator !=(ReagentQuantity left, ReagentQuantity right) => !(left == right);
 }

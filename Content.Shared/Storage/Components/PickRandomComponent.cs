@@ -15,25 +15,25 @@ namespace Content.Shared.Storage.Components;
 /// Adds a verb to pick a random item from a container.
 /// Only picks items that match the whitelist.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 [Access(typeof(PickRandomSystem))]
 public sealed partial class PickRandomComponent : Component
 {
     /// <summary>
-    /// Whitelist for potential picked items.
+    /// Locale id for the empty storage message.
     /// </summary>
-    [DataField, AutoNetworkedField]
-    public EntityWhitelist? Whitelist;
+    [DataField] [AutoNetworkedField]
+    public LocId EmptyText = "comp-pick-random-empty";
 
     /// <summary>
     /// Locale id for the pick verb text.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public LocId VerbText = "comp-pick-random-verb-text";
 
     /// <summary>
-    /// Locale id for the empty storage message.
+    /// Whitelist for potential picked items.
     /// </summary>
-    [DataField, AutoNetworkedField]
-    public LocId EmptyText = "comp-pick-random-empty";
+    [DataField] [AutoNetworkedField]
+    public EntityWhitelist? Whitelist;
 }

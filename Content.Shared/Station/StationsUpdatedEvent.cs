@@ -8,7 +8,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Station;
 
-[NetSerializable, Serializable]
+[NetSerializable] [Serializable]
 public sealed class StationsUpdatedEvent : EntityEventArgs
 {
     public readonly List<(string Name, NetEntity Entity)> Stations;

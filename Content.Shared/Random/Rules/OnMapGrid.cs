@@ -15,9 +15,7 @@ public sealed partial class OnMapGridRule : RulesRule
         if (!entManager.TryGetComponent(uid, out TransformComponent? xform) ||
             xform.GridUid != xform.MapUid ||
             xform.MapUid == null)
-        {
             return Inverted;
-        }
 
         return !Inverted;
     }

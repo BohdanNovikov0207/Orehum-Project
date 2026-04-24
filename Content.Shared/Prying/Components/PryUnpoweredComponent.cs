@@ -10,10 +10,10 @@ using Robust.Shared.GameStates;
 
 namespace Content.Shared.Prying.Components;
 
-///<summary>
+/// <summary>
 /// Applied to entities that can be pried open without tools while unpowered
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class PryUnpoweredComponent : Component
 {
     [DataField]

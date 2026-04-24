@@ -27,9 +27,7 @@ public abstract class SharedFloorOcclusionSystem : EntitySystem
 
         if (!TryComp<FloorOcclusionComponent>(other, out var occlusion) ||
             occlusion.Colliding.Contains(entity.Owner))
-        {
             return;
-        }
 
         occlusion.Colliding.Add(entity.Owner);
         Dirty(other, occlusion);
@@ -52,6 +50,5 @@ public abstract class SharedFloorOcclusionSystem : EntitySystem
 
     protected virtual void SetEnabled(Entity<FloorOcclusionComponent> entity)
     {
-
     }
 }

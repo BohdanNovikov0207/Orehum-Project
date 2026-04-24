@@ -12,26 +12,31 @@
 //
 // SPDX-License-Identifier: MIT
 
+using Content.Goobstation.Common.CCVar;
 using Content.Shared.Speech.EntitySystems;
 using Content.Shared.StatusEffect;
 using Content.Shared.Traits.Assorted;
-using Content.Goobstation.Common.CCVar; // Goob
-using Robust.Shared.Timing; // Goob
-using Robust.Shared.Configuration; // Goob
+using Robust.Shared.Configuration;
 using Robust.Shared.Prototypes;
+using Robust.Shared.Timing;
+// Goob
+// Goob
+// Goob
 
 namespace Content.Shared.Drunk;
 
 public abstract class SharedDrunkSystem : EntitySystem
 {
     public static readonly ProtoId<StatusEffectPrototype> DrunkKey = "Drunk";
+    [Dependency] private readonly IConfigurationManager _cfg = default!; // Goob - used to get the CVar setting. 
+    [Dependency] private readonly SharedSlurredSystem _slurredSystem = default!;
 
     [Dependency] private readonly StatusEffectsSystem _statusEffectsSystem = default!;
-    [Dependency] private readonly SharedSlurredSystem _slurredSystem = default!;
     [Dependency] private readonly IGameTiming _timing = default!; // Goob - needed to calculate remaining status time. 
-    [Dependency] private readonly IConfigurationManager _cfg = default!; // Goob - used to get the CVar setting. 
 
-    public void TryApplyDrunkenness(EntityUid uid, float boozePower, bool applySlur = true,
+    public void TryApplyDrunkenness(EntityUid uid,
+        float boozePower,
+        bool applySlur = true,
         StatusEffectsComponent? status = null)
     {
         if (!Resolve(uid, ref status, false))
@@ -41,18 +46,18 @@ public abstract class SharedDrunkSystem : EntitySystem
             boozePower *= trait.BoozeStrengthMultiplier;
 
         if (applySlur)
-        {
             _slurredSystem.DoSlur(uid, TimeSpan.FromSeconds(boozePower), status);
-        }
 
         if (!_statusEffectsSystem.HasStatusEffect(uid, DrunkKey, status))
-        {
-            _statusEffectsSystem.TryAddStatusEffect<DrunkComponent>(uid, DrunkKey, TimeSpan.FromSeconds(boozePower), true, status);
-        }
+            _statusEffectsSystem.TryAddStatusEffect<DrunkComponent>(uid,
+                DrunkKey,
+                TimeSpan.FromSeconds(boozePower),
+                true,
+                status);
         // Goob modification starts here
         else if (_statusEffectsSystem.TryGetTime(uid, DrunkKey, out var time))
         {
-            float maxDrunkTime = _cfg.GetCVar(GoobCVars.MaxDrunkTime);
+            var maxDrunkTime = _cfg.GetCVar(GoobCVars.MaxDrunkTime);
             var timeLeft = (float) (time.Value.Item2 - _timing.CurTime).TotalSeconds;
 
             if (timeLeft + boozePower > maxDrunkTime)
@@ -67,13 +72,8 @@ public abstract class SharedDrunkSystem : EntitySystem
         // }
     }
 
-    public void TryRemoveDrunkenness(EntityUid uid)
-    {
-        _statusEffectsSystem.TryRemoveStatusEffect(uid, DrunkKey);
-    }
-    public void TryRemoveDrunkenessTime(EntityUid uid, double timeRemoved)
-    {
-        _statusEffectsSystem.TryRemoveTime(uid, DrunkKey, TimeSpan.FromSeconds(timeRemoved));
-    }
+    public void TryRemoveDrunkenness(EntityUid uid) => _statusEffectsSystem.TryRemoveStatusEffect(uid, DrunkKey);
 
+    public void TryRemoveDrunkenessTime(EntityUid uid, double timeRemoved) =>
+        _statusEffectsSystem.TryRemoveTime(uid, DrunkKey, TimeSpan.FromSeconds(timeRemoved));
 }

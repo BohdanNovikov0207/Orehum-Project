@@ -8,7 +8,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.CartridgeLoader.Cartridges;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class NetProbeUiState : BoundUserInterfaceState
 {
     /// <summary>
@@ -22,12 +22,12 @@ public sealed class NetProbeUiState : BoundUserInterfaceState
     }
 }
 
-[Serializable, NetSerializable, DataRecord]
-public sealed partial class ProbedNetworkDevice
+[Serializable] [NetSerializable] [DataRecord]
+public sealed class ProbedNetworkDevice
 {
-    public readonly string Name;
     public readonly string Address;
     public readonly string Frequency;
+    public readonly string Name;
     public readonly string NetId;
 
     public ProbedNetworkDevice(string name, string address, string frequency, string netId)

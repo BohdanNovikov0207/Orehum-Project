@@ -27,5 +27,5 @@ namespace Content.Shared._Lavaland.Shuttles.Components;
 /// Marker component for the mining shuttle grid.
 /// Used for lavaland's FTL whitelist.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class MiningShuttleComponent : Component;

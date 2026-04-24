@@ -30,141 +30,146 @@
 using Robust.Shared.Serialization;
 using DrawDepthTag = Robust.Shared.GameObjects.DrawDepth;
 
-namespace Content.Shared.DrawDepth
+namespace Content.Shared.DrawDepth;
+
+[ConstantsFor(typeof(DrawDepthTag))]
+public enum DrawDepth
 {
-    [ConstantsFor(typeof(DrawDepthTag))]
-    public enum DrawDepth
-    {
-        /// <summary>
-        ///     This is for sub-floors, the floors you see after prying off a tile.
-        /// </summary>
-        LowFloors = DrawDepthTag.Default - 20,
+    /// <summary>
+    /// This is for sub-floors, the floors you see after prying off a tile.
+    /// </summary>
+    LowFloors = DrawDepthTag.Default - 20,
 
-        // various entity types that require different
-        // draw depths, as to avoid hiding
-        #region SubfloorEntities
-        ThickPipe = DrawDepthTag.Default - 19,
-        ThickWire = DrawDepthTag.Default - 18,
-        ThinPipeAlt2 = DrawDepthTag.Default - 17,
-        ThinPipeAlt1 = DrawDepthTag.Default - 16,
-        ThinPipe = DrawDepthTag.Default - 15,
-        ThinWire = DrawDepthTag.Default - 14,
-        #endregion
+    // various entity types that require different
+    // draw depths, as to avoid hiding
 
-        /// <summary>
-        ///     Things that are beneath regular floors.
-        /// </summary>
-        BelowFloor = DrawDepthTag.Default - 13,
+    #region SubfloorEntities
 
-        /// <summary>
-        ///     Used for entities like carpets.
-        /// </summary>
-        FloorTiles = DrawDepthTag.Default - 12,
+    ThickPipe = DrawDepthTag.Default - 19,
+    ThickWire = DrawDepthTag.Default - 18,
+    ThinPipeAlt2 = DrawDepthTag.Default - 17,
+    ThinPipeAlt1 = DrawDepthTag.Default - 16,
+    ThinPipe = DrawDepthTag.Default - 15,
+    ThinWire = DrawDepthTag.Default - 14,
 
-        /// <summary>
-        ///     Things that are actually right on the floor, like ice crust or atmos devices. This does not mean objects like
-        ///     tables, even though they are technically "on the floor".
-        /// </summary>
-        FloorObjects = DrawDepthTag.Default - 11,
+    #endregion
 
-        /// <summary>
-        //     Discrete drawdepth to avoid z-fighting with other FloorObjects but also above floor entities.
-        /// </summary>
-        Puddles = DrawDepthTag.Default - 10,
+    /// <summary>
+    /// Things that are beneath regular floors.
+    /// </summary>
+    BelowFloor = DrawDepthTag.Default - 13,
 
-        // There's a gap for subfloor entities to retain relative draw depth when revealed by a t-ray scanner.
-        /// <summary>
-        //     Objects that are on the floor, but should render above puddles. This includes kudzu, holopads, telepads and levers.
-        /// </summary>
-        HighFloorObjects = DrawDepthTag.Default - 5,
+    /// <summary>
+    /// Used for entities like carpets.
+    /// </summary>
+    FloorTiles = DrawDepthTag.Default - 12,
 
-        FloorEffects = DrawDepthTag.Default - 5, // Goobstation
+    /// <summary>
+    /// Things that are actually right on the floor, like ice crust or atmos devices. This does not mean objects like
+    /// tables, even though they are technically "on the floor".
+    /// </summary>
+    FloorObjects = DrawDepthTag.Default - 11,
 
-        BlobTiles = DrawDepthTag.Default - 4, // Goobstation - Blob
+    /// <summary>
+    //     Discrete drawdepth to avoid z-fighting with other FloorObjects but also above floor entities.
+    /// </summary>
+    Puddles = DrawDepthTag.Default - 10,
 
-        DeadMobs = DrawDepthTag.Default - 4,
+    // There's a gap for subfloor entities to retain relative draw depth when revealed by a t-ray scanner.
+    /// <summary>
+    //     Objects that are on the floor, but should render above puddles. This includes kudzu, holopads, telepads and levers.
+    /// </summary>
+    HighFloorObjects = DrawDepthTag.Default - 5,
 
-        /// <summary>
-        ///     Allows small mobs like mice and drones to render under tables and chairs but above puddles and vents
-        /// </summary>
-        SmallMobs = DrawDepthTag.Default - 3,
+    FloorEffects = DrawDepthTag.Default - 5, // Goobstation
 
-        Walls = DrawDepthTag.Default - 2,
+    BlobTiles = DrawDepthTag.Default - 4, // Goobstation - Blob
 
-        /// <summary>
-        ///     Used for windows (grilles use walls) and misc signage. Useful if you want to have an APC in the middle
-        ///     of some wall-art or something.
-        /// </summary>
-        WallTops = DrawDepthTag.Default - 1,
+    DeadMobs = DrawDepthTag.Default - 4,
 
-        /// <summary>
-        ///     Furniture, crates, tables. etc. If an entity should be drawn on top of a table, it needs a draw depth
-        ///     that is higher than this.
-        /// </summary>
-        Objects = DrawDepthTag.Default,
+    /// <summary>
+    /// Allows small mobs like mice and drones to render under tables and chairs but above puddles and vents
+    /// </summary>
+    SmallMobs = DrawDepthTag.Default - 3,
 
-        /// <summary>
-        ///     In-between an furniture and an item. Useful for entities that need to appear on top of tables, but are
-        ///     not items. E.g., power cell chargers. Also useful for pizza boxes, which appear above crates, but not
-        ///     above the pizza itself.
-        /// </summary>
-        SmallObjects = DrawDepthTag.Default + 1,
+    Walls = DrawDepthTag.Default - 2,
 
-        /// <summary>
-        ///     Posters, APCs, air alarms, etc. This also includes most lights & lamps.
-        /// </summary>
-        WallMountedItems = DrawDepthTag.Default + 2,
+    /// <summary>
+    /// Used for windows (grilles use walls) and misc signage. Useful if you want to have an APC in the middle
+    /// of some wall-art or something.
+    /// </summary>
+    WallTops = DrawDepthTag.Default - 1,
 
-        /// <summary>
-        ///     To use for objects that would usually fall under SmallObjects, but appear taller than 1 tile. For example: Reagent Grinder
-        /// </summary>
-        LargeObjects = DrawDepthTag.Default + 3,
+    /// <summary>
+    /// Furniture, crates, tables. etc. If an entity should be drawn on top of a table, it needs a draw depth
+    /// that is higher than this.
+    /// </summary>
+    Objects = DrawDepthTag.Default,
 
-        /// <summary>
-        ///     Generic items. Things that should be above crates & tables, but underneath mobs.
-        /// </summary>
-        Items = DrawDepthTag.Default + 4,
-        /// <summary>
-        /// Stuff that should be drawn below mobs, but on top of items. Like muzzle flash.
-        /// </summary>
-        BelowMobs = DrawDepthTag.Default + 5,
+    /// <summary>
+    /// In-between an furniture and an item. Useful for entities that need to appear on top of tables, but are
+    /// not items. E.g., power cell chargers. Also useful for pizza boxes, which appear above crates, but not
+    /// above the pizza itself.
+    /// </summary>
+    SmallObjects = DrawDepthTag.Default + 1,
 
-        Mobs = DrawDepthTag.Default + 6,
+    /// <summary>
+    /// Posters, APCs, air alarms, etc. This also includes most lights & lamps.
+    /// </summary>
+    WallMountedItems = DrawDepthTag.Default + 2,
 
-        OverMobs = DrawDepthTag.Default + 7,
+    /// <summary>
+    /// To use for objects that would usually fall under SmallObjects, but appear taller than 1 tile. For example: Reagent
+    /// Grinder
+    /// </summary>
+    LargeObjects = DrawDepthTag.Default + 3,
 
-        Doors = DrawDepthTag.Default + 8,
+    /// <summary>
+    /// Generic items. Things that should be above crates & tables, but underneath mobs.
+    /// </summary>
+    Items = DrawDepthTag.Default + 4,
 
-        /// <summary>
-        /// Blast doors and shutters which go over the usual doors.
-        /// </summary>
-        BlastDoors = DrawDepthTag.Default + 9,
+    /// <summary>
+    /// Stuff that should be drawn below mobs, but on top of items. Like muzzle flash.
+    /// </summary>
+    BelowMobs = DrawDepthTag.Default + 5,
 
-        /// <summary>
-        /// Stuff that needs to draw over most things, but not effects, like Kudzu.
-        /// </summary>
-        Overdoors = DrawDepthTag.Default + 10,
+    Mobs = DrawDepthTag.Default + 6,
 
-        /// <summary>
-        ///     Explosions, fire, melee swings. Whatever.
-        /// </summary>
-        Effects = DrawDepthTag.Default + 11,
+    OverMobs = DrawDepthTag.Default + 7,
 
-        Ghosts = DrawDepthTag.Default + 12,
+    Doors = DrawDepthTag.Default + 8,
 
-        /// <summary>
-        ///    Use this selectively if it absolutely needs to be drawn above (almost) everything else. Examples include
-        ///    the pointing arrow, the drag & drop ghost-entity, and some debug tools.
-        /// </summary>
-        Overlays = DrawDepthTag.Default + 13,
+    /// <summary>
+    /// Blast doors and shutters which go over the usual doors.
+    /// </summary>
+    BlastDoors = DrawDepthTag.Default + 9,
 
-        // Orehum - start
-        CyberspaceOverlays = DrawDepthTag.Default + 14,
-        /// <summary>
-        ///     Objects that exist in cyberspace and should render above the StationAI dark overlay (ZIndex 14).
-        ///     Assign this to any entity that must be visible to the AI regardless of camera coverage.
-        /// </summary>
-        CyberspaceObjects = DrawDepthTag.Default + 100,
-        // Orehum - end
-    }
+    /// <summary>
+    /// Stuff that needs to draw over most things, but not effects, like Kudzu.
+    /// </summary>
+    Overdoors = DrawDepthTag.Default + 10,
+
+    /// <summary>
+    /// Explosions, fire, melee swings. Whatever.
+    /// </summary>
+    Effects = DrawDepthTag.Default + 11,
+
+    Ghosts = DrawDepthTag.Default + 12,
+
+    /// <summary>
+    /// Use this selectively if it absolutely needs to be drawn above (almost) everything else. Examples include
+    /// the pointing arrow, the drag & drop ghost-entity, and some debug tools.
+    /// </summary>
+    Overlays = DrawDepthTag.Default + 13,
+
+    // Orehum - start
+    CyberspaceOverlays = DrawDepthTag.Default + 14,
+
+    /// <summary>
+    /// Objects that exist in cyberspace and should render above the StationAI dark overlay (ZIndex 14).
+    /// Assign this to any entity that must be visible to the AI regardless of camera coverage.
+    /// </summary>
+    CyberspaceObjects = DrawDepthTag.Default + 100,
+    // Orehum - end
 }

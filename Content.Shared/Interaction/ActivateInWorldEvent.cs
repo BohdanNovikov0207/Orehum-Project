@@ -10,30 +10,15 @@ using JetBrains.Annotations;
 namespace Content.Shared.Interaction;
 
 /// <summary>
-///     Raised when an entity is activated in the world.
+/// Raised when an entity is activated in the world.
 /// </summary>
 [PublicAPI]
 public sealed class ActivateInWorldEvent : HandledEntityEventArgs, ITargetedInteractEventArgs
 {
     /// <summary>
-    ///     Entity that activated the target world entity.
-    /// </summary>
-    public EntityUid User { get; }
-
-    /// <summary>
-    ///     Entity that was activated in the world.
-    /// </summary>
-    public EntityUid Target { get; }
-
-    /// <summary>
-    ///     Whether or not <see cref="User"/> can perform complex interactions or only basic ones.
+    /// Whether or not <see cref="User" /> can perform complex interactions or only basic ones.
     /// </summary>
     public bool Complex;
-
-    /// <summary>
-    ///     Set to true when the activation is logged by a specific logger.
-    /// </summary>
-    public bool WasLogged { get; set; }
 
     public ActivateInWorldEvent(EntityUid user, EntityUid target, bool complex)
     {
@@ -41,6 +26,21 @@ public sealed class ActivateInWorldEvent : HandledEntityEventArgs, ITargetedInte
         Target = target;
         Complex = complex;
     }
+
+    /// <summary>
+    /// Set to true when the activation is logged by a specific logger.
+    /// </summary>
+    public bool WasLogged { get; set; }
+
+    /// <summary>
+    /// Entity that activated the target world entity.
+    /// </summary>
+    public EntityUid User { get; }
+
+    /// <summary>
+    /// Entity that was activated in the world.
+    /// </summary>
+    public EntityUid Target { get; }
 }
 
 /// <summary>
@@ -50,17 +50,7 @@ public sealed class ActivateInWorldEvent : HandledEntityEventArgs, ITargetedInte
 public sealed class UserActivateInWorldEvent : HandledEntityEventArgs, ITargetedInteractEventArgs
 {
     /// <summary>
-    ///     Entity that activated the target world entity.
-    /// </summary>
-    public EntityUid User { get; }
-
-    /// <summary>
-    ///     Entity that was activated in the world.
-    /// </summary>
-    public EntityUid Target { get; }
-
-    /// <summary>
-    ///     Whether or not <see cref="User"/> can perform complex interactions or only basic ones.
+    /// Whether or not <see cref="User" /> can perform complex interactions or only basic ones.
     /// </summary>
     public bool Complex;
 
@@ -70,4 +60,14 @@ public sealed class UserActivateInWorldEvent : HandledEntityEventArgs, ITargeted
         Target = target;
         Complex = complex;
     }
+
+    /// <summary>
+    /// Entity that activated the target world entity.
+    /// </summary>
+    public EntityUid User { get; }
+
+    /// <summary>
+    /// Entity that was activated in the world.
+    /// </summary>
+    public EntityUid Target { get; }
 }

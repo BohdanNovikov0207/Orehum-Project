@@ -18,10 +18,10 @@ public sealed partial class ShipGunClassComponent : Component
 /// <summary>
 /// Classes of ship guns
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum ShipGunClass
 {
     Light,
     Medium,
-    Heavy
+    Heavy,
 }

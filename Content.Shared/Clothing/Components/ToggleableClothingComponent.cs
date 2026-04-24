@@ -28,42 +28,56 @@ namespace Content.Shared.Clothing.Components;
 // GOOBSTATION - MODSUITS FULLY CHANGE THIS SYSTEM
 
 /// <summary>
-///     This component gives an item an action that will equip or un-equip some clothing e.g. hardsuits and hardsuit helmets.
+/// This component gives an item an action that will equip or un-equip some clothing e.g. hardsuits and hardsuit helmets.
 /// </summary>
 [Access(typeof(ToggleableClothingSystem))]
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class ToggleableClothingComponent : Component
 {
     public const string DefaultClothingContainerId = "toggleable-clothing";
 
     /// <summary>
-    ///     Action used to toggle the clothing on or off.
+    /// Action used to toggle the clothing on or off.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public EntProtoId Action = "ActionToggleSuitPiece";
 
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public EntityUid? ActionEntity;
+
+    /// <summary>
+    /// If true it will block unequip of this entity until all attached clothing are removed
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public bool BlockUnequipWhenAttached = false;
 
     // Goobstation - ClothingPrototype and Slot Fields saved for compatibility with old prototype
     /// <summary>
-    ///     Default clothing entity prototype to spawn into the clothing container.
+    /// Default clothing entity prototype to spawn into the clothing container.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public EntProtoId? ClothingPrototype;
 
     /// <summary>
-    ///     The inventory slot that the clothing is equipped to.
+    /// Dictionary of inventory slots and entity prototypes to spawn into the clothing container.
     /// </summary>
-    [ViewVariables(VVAccess.ReadWrite)]
-    [DataField, AutoNetworkedField]
-    public string Slot = string.Empty;
+    [DataField] [AutoNetworkedField]
+    public Dictionary<string, EntProtoId> ClothingPrototypes = new();
 
     /// <summary>
-    ///     Dictionary of inventory slots and entity prototypes to spawn into the clothing container.
+    /// Dictionary of clothing uids and slots
     /// </summary>
-    [DataField, AutoNetworkedField]
-    public Dictionary<string, EntProtoId> ClothingPrototypes = new();
+    [DataField] [AutoNetworkedField]
+    public Dictionary<EntityUid, string> ClothingUids = new();
+
+    [ViewVariables]
+    public Container Container = default!;
+
+    /// <summary>
+    /// The container that the clothing is stored in when not equipped.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public string ContainerId = DefaultClothingContainerId;
 
     /// <summary>
     /// slot -> prefix
@@ -72,58 +86,45 @@ public sealed partial class ToggleableClothingComponent : Component
     public Dictionary<string, string?> EquippedPrefixes = new();
 
     /// <summary>
-    ///     Dictionary of clothing uids and slots
+    /// If true all attached will replace already equipped clothing on equip attempt
     /// </summary>
-    [DataField, AutoNetworkedField]
-    public Dictionary<EntityUid, string> ClothingUids = new();
+    [DataField] [AutoNetworkedField]
+    public bool ReplaceCurrentClothing = false;
 
     /// <summary>
-    ///     The inventory slot flags required for this component to function.
+    /// The inventory slot flags required for this component to function.
     /// </summary>
-    [DataField("requiredSlot"), AutoNetworkedField]
+    [DataField("requiredSlot")] [AutoNetworkedField]
     public SlotFlags RequiredFlags = SlotFlags.OUTERCLOTHING;
 
     /// <summary>
-    ///     The container that the clothing is stored in when not equipped.
+    /// The inventory slot that the clothing is equipped to.
     /// </summary>
-    [DataField, AutoNetworkedField]
-    public string ContainerId = DefaultClothingContainerId;
-
-    [ViewVariables]
-    public Container Container = default!;
+    [ViewVariables(VVAccess.ReadWrite)]
+    [DataField] [AutoNetworkedField]
+    public string Slot = string.Empty;
 
     /// <summary>
-    ///     Time it takes for this clothing to be toggled via the stripping menu verbs. Null prevents the verb from even showing up.
+    /// Time it takes for this clothing to be toggled via the stripping menu verbs. Null prevents the verb from even showing
+    /// up.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public TimeSpan? StripDelay = TimeSpan.FromSeconds(3);
 
     /// <summary>
-    ///     Text shown in the toggle-clothing verb. Defaults to using the name of the <see cref="ActionEntity"/> action.
+    /// Text shown in the toggle-clothing verb. Defaults to using the name of the <see cref="ActionEntity" /> action.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public string? VerbText;
-
-    /// <summary>
-    ///     If true it will block unequip of this entity until all attached clothing are removed
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public bool BlockUnequipWhenAttached = false;
-
-    /// <summary>
-    ///     If true all attached will replace already equipped clothing on equip attempt
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public bool ReplaceCurrentClothing = false;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum ToggleClothingUiKey : byte
 {
-    Key
+    Key,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class ToggleableClothingUiMessage : BoundUserInterfaceMessage
 {
     public NetEntity AttachedClothingUid;

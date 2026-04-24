@@ -1,6 +1,5 @@
 using Content.Shared.EntityTable;
 using Content.Shared.Maps;
-using Content.Shared.Storage;
 using Robust.Shared.Prototypes;
 
 namespace Content.Shared.Procedural.PostGeneration;
@@ -10,6 +9,9 @@ namespace Content.Shared.Procedural.PostGeneration;
 /// </summary>
 public sealed partial class DungeonEntranceDunGen : IDunGenLayer
 {
+    [DataField(required: true)]
+    public ProtoId<EntityTablePrototype> Contents;
+
     /// <summary>
     /// How many rooms we place doors on.
     /// </summary>
@@ -18,7 +20,4 @@ public sealed partial class DungeonEntranceDunGen : IDunGenLayer
 
     [DataField(required: true)]
     public ProtoId<ContentTileDefinition> Tile;
-
-    [DataField(required: true)]
-    public ProtoId<EntityTablePrototype> Contents;
 }

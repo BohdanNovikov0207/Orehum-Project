@@ -8,21 +8,21 @@ using Robust.Shared.Serialization;
 namespace Content.Shared.Atmos.Visuals;
 
 /// <summary>
-///     Used for the visualizer
+/// Used for the visualizer
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum SpaceHeaterVisualLayers : byte
 {
-    Main
+    Main,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum SpaceHeaterVisuals : byte
 {
     State,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum SpaceHeaterState : byte
 {
     Off,

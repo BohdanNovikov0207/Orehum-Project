@@ -10,7 +10,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Administration.Notes;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class AdminMessageEuiState(TimeSpan time, AdminMessageEuiState.Message[] messages) : EuiStateBase
 {
     public TimeSpan Time { get; } = time;
@@ -19,15 +19,15 @@ public sealed class AdminMessageEuiState(TimeSpan time, AdminMessageEuiState.Mes
     [Serializable]
     public sealed class Message(string text, string adminName, DateTime addedOn)
     {
-        public string Text = text;
-        public string AdminName = adminName;
         public DateTime AddedOn = addedOn;
+        public string AdminName = adminName;
+        public string Text = text;
     }
 }
 
 public static class AdminMessageEuiMsg
 {
-    [Serializable, NetSerializable]
+    [Serializable] [NetSerializable]
     public sealed class Dismiss(bool permanent) : EuiMessageBase
     {
         public bool Permanent { get; } = permanent;

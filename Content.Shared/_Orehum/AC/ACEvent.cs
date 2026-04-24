@@ -2,10 +2,9 @@
 
 namespace Content.Shared._Orehum.AC;
 
-
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class ACEvent(string version, string modifications) : EntityEventArgs
 {
-    public string Version = version;
     public string Modifications = modifications;
+    public string Version = version;
 }

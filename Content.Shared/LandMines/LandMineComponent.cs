@@ -10,14 +10,14 @@ namespace Content.Shared.LandMines;
 public sealed partial class LandMineComponent : Component
 {
     /// <summary>
-    /// The text that popups when the landmine is stepped on.
-    /// </summary>
-    [DataField]
-    public LocId? TriggerText = "land-mine-triggered";
-
-    /// <summary>
     /// Trigger sound effect when stepping onto landmine
     /// </summary>
     [DataField]
     public SoundSpecifier? Sound;
+
+    /// <summary>
+    /// The text that popups when the landmine is stepped on.
+    /// </summary>
+    [DataField]
+    public LocId? TriggerText = "land-mine-triggered";
 }

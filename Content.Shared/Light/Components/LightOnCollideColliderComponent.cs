@@ -25,9 +25,9 @@ using Robust.Shared.GameStates;
 namespace Content.Shared.Light.Components;
 
 /// <summary>
-/// Can activate <see cref="LightOnCollideComponent"/> when collided with.
+/// Can activate <see cref="LightOnCollideComponent" /> when collided with.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class LightOnCollideColliderComponent : Component
 {
     [DataField]

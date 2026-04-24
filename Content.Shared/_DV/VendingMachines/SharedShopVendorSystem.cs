@@ -19,8 +19,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Access.Systems;
 using Content.Shared._DV.Salvage.Systems;
+using Content.Shared.Access.Systems;
 using Content.Shared.Destructible;
 using Content.Shared.Popups;
 using Content.Shared.Power;
@@ -36,14 +36,14 @@ namespace Content.Shared._DV.VendingMachines;
 public abstract class SharedShopVendorSystem : EntitySystem
 {
     [Dependency] private readonly AccessReaderSystem _access = default!;
-    [Dependency] private readonly MiningPointsSystem _points = default!;
-    [Dependency] protected readonly IGameTiming Timing = default!;
-    [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedPointLightSystem _light = default!;
+    [Dependency] private readonly MiningPointsSystem _points = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly SharedPowerReceiverSystem _power = default!;
+    [Dependency] private readonly IPrototypeManager _proto = default!;
+    [Dependency] protected readonly IGameTiming Timing = default!;
 
     public override void Initialize()
     {
@@ -55,10 +55,11 @@ public abstract class SharedShopVendorSystem : EntitySystem
         SubscribeLocalEvent<ShopVendorComponent, PowerChangedEvent>(OnPowerChanged);
         SubscribeLocalEvent<ShopVendorComponent, BreakageEventArgs>(OnBreak);
         SubscribeLocalEvent<ShopVendorComponent, ActivatableUIOpenAttemptEvent>(OnOpenAttempt);
-        Subs.BuiEvents<ShopVendorComponent>(VendingMachineUiKey.Key, subs =>
-        {
-            subs.Event<ShopVendorPurchaseMessage>(OnPurchase);
-        });
+        Subs.BuiEvents<ShopVendorComponent>(VendingMachineUiKey.Key,
+            subs =>
+            {
+                subs.Event<ShopVendorPurchaseMessage>(OnPurchase);
+            });
     }
 
     #region Public API
@@ -72,25 +73,7 @@ public abstract class SharedShopVendorSystem : EntitySystem
 
     #endregion
 
-    #region Balance adapters
-
-    private void OnPointsBalance(Entity<PointsVendorComponent> ent, ref ShopVendorBalanceEvent args)
-    {
-        args.Balance = _points.GetPointComp(args.User)?.Comp?.Points ?? 0; // Goobstation - borg Miningpoints
-    }
-
-    private void OnPointsPurchase(Entity<PointsVendorComponent> ent, ref ShopVendorPurchaseEvent args)
-    {
-        if (_points.GetPointComp(args.User) is {} idCard && _points.RemovePoints(idCard, args.Cost)) // Goobstation - borg Miningpoints
-            args.Paid = true;
-    }
-
-    #endregion
-
-    private void OnPowerChanged(Entity<ShopVendorComponent> ent, ref PowerChangedEvent args)
-    {
-        UpdateVisuals(ent);
-    }
+    private void OnPowerChanged(Entity<ShopVendorComponent> ent, ref PowerChangedEvent args) => UpdateVisuals(ent);
 
     private void OnBreak(Entity<ShopVendorComponent> ent, ref BreakageEventArgs args)
     {
@@ -169,13 +152,9 @@ public abstract class SharedShopVendorSystem : EntitySystem
             lit = false;
         }
         else if (ent.Comp.Ejecting != null)
-        {
             state = VendingMachineVisualState.Eject;
-        }
         else if (ent.Comp.Denying)
-        {
             state = VendingMachineVisualState.Deny;
-        }
         else if (!_power.IsPowered(ent.Owner))
         {
             state = VendingMachineVisualState.Off;
@@ -185,6 +164,20 @@ public abstract class SharedShopVendorSystem : EntitySystem
         _light.SetEnabled(ent, lit);
         _appearance.SetData(ent, VendingMachineVisuals.VisualState, state);
     }
+
+    #region Balance adapters
+
+    private void OnPointsBalance(Entity<PointsVendorComponent> ent, ref ShopVendorBalanceEvent args) =>
+        args.Balance = _points.GetPointComp(args.User)?.Comp?.Points ?? 0; // Goobstation - borg Miningpoints
+
+    private void OnPointsPurchase(Entity<PointsVendorComponent> ent, ref ShopVendorPurchaseEvent args)
+    {
+        if (_points.GetPointComp(args.User) is { } idCard &&
+            _points.RemovePoints(idCard, args.Cost)) // Goobstation - borg Miningpoints
+            args.Paid = true;
+    }
+
+    #endregion
 }
 
 /// <summary>

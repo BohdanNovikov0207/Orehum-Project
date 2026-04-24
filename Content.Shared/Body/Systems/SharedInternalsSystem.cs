@@ -20,9 +20,9 @@ namespace Content.Shared.Body.Systems;
 public abstract class SharedInternalsSystem : EntitySystem
 {
     [Dependency] private readonly AlertsSystem _alerts = default!;
-    [Dependency] private readonly InventorySystem _inventory = default!;
     [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
     [Dependency] private readonly SharedGasTankSystem _gasTank = default!;
+    [Dependency] private readonly InventorySystem _inventory = default!;
     [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
 
     public override void Initialize()
@@ -51,18 +51,18 @@ public abstract class SharedInternalsSystem : EntitySystem
 
         InteractionVerb verb = new()
         {
-            Icon = new SpriteSpecifier.Texture(new("/Textures/Interface/VerbIcons/dot.svg.192dpi.png")),
+            Icon = new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/VerbIcons/dot.svg.192dpi.png")),
         };
 
         if (AreInternalsWorking(ent))
         {
-            verb.Act = () => ToggleInternals(ent, user, force: false, ent, ToggleMode.Off);
+            verb.Act = () => ToggleInternals(ent, user, false, ent, ToggleMode.Off);
             verb.Message = Loc.GetString("action-description-internals-toggle-off");
             verb.Text = Loc.GetString("action-name-internals-toggle-off");
         }
         else
         {
-            verb.Act = () => ToggleInternals(ent, user, force: false, ent, ToggleMode.On);
+            verb.Act = () => ToggleInternals(ent, user, false, ent, ToggleMode.On);
             verb.Message = Loc.GetString("action-description-internals-toggle-on");
             verb.Text = Loc.GetString("action-name-internals-toggle-on");
         }
@@ -77,13 +77,15 @@ public abstract class SharedInternalsSystem : EntitySystem
         InternalsComponent? internals = null,
         ToggleMode mode = ToggleMode.Toggle)
     {
-        if (!Resolve(target, ref internals, logMissing: false))
+        if (!Resolve(target, ref internals, false))
             return false;
 
         // Check if a mask is present.
         if (internals.BreathTools.Count == 0)
         {
-            var message = user == target ? Loc.GetString("internals-self-no-breath-tool") : Loc.GetString("internals-other-no-breath-tool", ("ent", Identity.Name(target, EntityManager, user)));
+            var message = user == target
+                ? Loc.GetString("internals-self-no-breath-tool")
+                : Loc.GetString("internals-other-no-breath-tool", ("ent", Identity.Name(target, EntityManager, user)));
             _popupSystem.PopupClient(message, target, user);
             return false;
         }
@@ -94,16 +96,16 @@ public abstract class SharedInternalsSystem : EntitySystem
         // If they're not on then check if we have a mask to use
         if (tank == null)
         {
-            var message = user == target ? Loc.GetString("internals-self-no-tank") : Loc.GetString("internals-other-no-tank", ("ent", Identity.Name(target, EntityManager, user)));
+            var message = user == target
+                ? Loc.GetString("internals-self-no-tank")
+                : Loc.GetString("internals-other-no-tank", ("ent", Identity.Name(target, EntityManager, user)));
             _popupSystem.PopupClient(message, target, user);
             return false;
         }
 
         // Start the toggle do-after if it's on someone else.
         if (!force && user != target)
-        {
             return StartToggleInternalsDoAfter(user, (target, internals), mode);
-        }
 
         // Toggle off.
         if (TryComp(internals.GasTankEntity, out GasTankComponent? gas))
@@ -120,7 +122,7 @@ public abstract class SharedInternalsSystem : EntitySystem
         if (mode == ToggleMode.Off)
             return false;
 
-        return _gasTank.ConnectToInternals(tank.Value, user: user);
+        return _gasTank.ConnectToInternals(tank.Value, user);
     }
 
     private bool StartToggleInternalsDoAfter(EntityUid user, Entity<InternalsComponent> targetEnt, ToggleMode mode)
@@ -130,7 +132,7 @@ public abstract class SharedInternalsSystem : EntitySystem
         var delay = !isUser ? targetEnt.Comp.Delay : TimeSpan.Zero;
 
         return _doAfter.TryStartDoAfter(
-            new DoAfterArgs(EntityManager, user, delay, new InternalsDoAfterEvent(mode), targetEnt, target: targetEnt)
+            new DoAfterArgs(EntityManager, user, delay, new InternalsDoAfterEvent(mode), targetEnt, targetEnt)
             {
                 BreakOnDamage = true,
                 BreakOnMove = true,
@@ -143,7 +145,7 @@ public abstract class SharedInternalsSystem : EntitySystem
         if (args.Cancelled || args.Handled)
             return;
 
-        ToggleInternals(ent, args.User, force: true, ent, args.ToggleMode);
+        ToggleInternals(ent, args.User, true, ent, args.ToggleMode);
 
         args.Handled = true;
     }
@@ -153,18 +155,14 @@ public abstract class SharedInternalsSystem : EntitySystem
         if (args.Handled)
             return;
 
-        args.Handled |= ToggleInternals(ent, ent, false, internals: ent.Comp);
+        args.Handled |= ToggleInternals(ent, ent, false, ent.Comp);
     }
 
-    private void OnInternalsStartup(Entity<InternalsComponent> ent, ref ComponentStartup args)
-    {
+    private void OnInternalsStartup(Entity<InternalsComponent> ent, ref ComponentStartup args) =>
         _alerts.ShowAlert(ent, ent.Comp.InternalsAlert, GetSeverity(ent));
-    }
 
-    private void OnInternalsShutdown(Entity<InternalsComponent> ent, ref ComponentShutdown args)
-    {
+    private void OnInternalsShutdown(Entity<InternalsComponent> ent, ref ComponentShutdown args) =>
         _alerts.ClearAlert(ent, ent.Comp.InternalsAlert);
-    }
 
     public void ConnectBreathTool(Entity<InternalsComponent> ent, EntityUid toolEntity)
     {
@@ -195,9 +193,7 @@ public abstract class SharedInternalsSystem : EntitySystem
         }
 
         if (ent.Comp.BreathTools.Count == 0)
-        {
-            DisconnectTank(ent, forced: forced);
-        }
+            DisconnectTank(ent, forced);
 
         _alerts.ShowAlert(ent, ent.Comp.InternalsAlert, GetSeverity(ent));
     }
@@ -226,18 +222,14 @@ public abstract class SharedInternalsSystem : EntitySystem
         return true;
     }
 
-    public bool AreInternalsWorking(EntityUid uid, InternalsComponent? component = null)
-    {
-        return Resolve(uid, ref component, logMissing: false)
-               && AreInternalsWorking(component);
-    }
+    public bool AreInternalsWorking(EntityUid uid, InternalsComponent? component = null) =>
+        Resolve(uid, ref component, false)
+        && AreInternalsWorking(component);
 
-    public bool AreInternalsWorking(InternalsComponent component)
-    {
-        return TryComp(component.BreathTools.FirstOrNull(), out BreathToolComponent? breathTool)
-               && breathTool.IsFunctional
-               && HasComp<GasTankComponent>(component.GasTankEntity);
-    }
+    public bool AreInternalsWorking(InternalsComponent component) =>
+        TryComp(component.BreathTools.FirstOrNull(), out BreathToolComponent? breathTool)
+        && breathTool.IsFunctional
+        && HasComp<GasTankComponent>(component.GasTankEntity);
 
     protected short GetSeverity(InternalsComponent component)
     {
@@ -247,9 +239,7 @@ public abstract class SharedInternalsSystem : EntitySystem
         // If pressure in the tank is below low pressure threshold, flash warning on internals UI
         if (TryComp<GasTankComponent>(component.GasTankEntity, out var gasTank)
             && gasTank.IsLowPressure)
-        {
             return 0;
-        }
 
         return 1;
     }
@@ -270,16 +260,12 @@ public abstract class SharedInternalsSystem : EntitySystem
         if (_inventory.TryGetSlotEntity(user, "back", out var backEntity, user.Comp2, user.Comp3) &&
             TryComp<GasTankComponent>(backEntity, out var backGasTank) &&
             _gasTank.CanConnectToInternals((backEntity.Value, backGasTank)))
-        {
             return (backEntity.Value, backGasTank);
-        }
 
         if (_inventory.TryGetSlotEntity(user, "suitstorage", out var entity, user.Comp2, user.Comp3) &&
             TryComp<GasTankComponent>(entity, out var gasTank) &&
             _gasTank.CanConnectToInternals((entity.Value, gasTank)))
-        {
             return (entity.Value, gasTank);
-        }
 
         foreach (var item in _inventory.GetHandOrInventoryEntities((user.Owner, user.Comp1, user.Comp2)))
         {

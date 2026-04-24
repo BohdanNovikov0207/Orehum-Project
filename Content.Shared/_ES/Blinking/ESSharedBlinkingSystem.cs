@@ -8,11 +8,11 @@ namespace Content.Shared._ES.Blinking;
 
 public abstract class ESSharedBlinkingSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] protected readonly SharedAppearanceSystem Appearance = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         SubscribeLocalEvent<ESBlinkerComponent, MapInitEvent>(OnMapInit);
@@ -20,20 +20,13 @@ public abstract class ESSharedBlinkingSystem : EntitySystem
         SubscribeLocalEvent<ESBlinkerComponent, SleepStateChangedEvent>(OnSleepStateChanged);
     }
 
-    private void OnMapInit(Entity<ESBlinkerComponent> ent, ref MapInitEvent args)
-    {
-        ResetBlink(ent);
-    }
+    private void OnMapInit(Entity<ESBlinkerComponent> ent, ref MapInitEvent args) => ResetBlink(ent);
 
-    private void OnMobStateChanged(Entity<ESBlinkerComponent> ent, ref MobStateChangedEvent args)
-    {
+    private void OnMobStateChanged(Entity<ESBlinkerComponent> ent, ref MobStateChangedEvent args) =>
         SetEnabled(ent.AsNullable(), args.NewMobState != MobState.Dead);
-    }
 
-    private void OnSleepStateChanged(Entity<ESBlinkerComponent> ent, ref SleepStateChangedEvent args)
-    {
+    private void OnSleepStateChanged(Entity<ESBlinkerComponent> ent, ref SleepStateChangedEvent args) =>
         Appearance.SetData(ent.Owner, ESBlinkVisuals.EyesClosed, args.FellAsleep);
-    }
 
     private void ResetBlink(Entity<ESBlinkerComponent> ent)
     {
@@ -56,10 +49,7 @@ public abstract class ESSharedBlinkingSystem : EntitySystem
             ResetBlink((ent, ent.Comp));
     }
 
-    public virtual void Blink(Entity<ESBlinkerComponent> ent)
-    {
-        ResetBlink(ent);
-    }
+    public virtual void Blink(Entity<ESBlinkerComponent> ent) => ResetBlink(ent);
 
     public override void Update(float frameTime)
     {

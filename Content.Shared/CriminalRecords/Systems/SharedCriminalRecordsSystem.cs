@@ -58,7 +58,7 @@ public abstract class SharedCriminalRecordsSystem : EntitySystem
             SecurityStatus.Search => "SecurityIconSearch",
             SecurityStatus.Dangerous => "SecurityIconDangerous",
             SecurityStatus.Demote => "SecurityIconDemoted", // Goobstation
-            _ => record.StatusIcon
+            _ => record.StatusIcon,
         };
 
         if (previousIcon != record.StatusIcon)
@@ -66,15 +66,20 @@ public abstract class SharedCriminalRecordsSystem : EntitySystem
     }
 }
 
-[Serializable, NetSerializable]
-public struct WantedRecord(GeneralStationRecord targetInfo, SecurityStatus status, string? reason, string? initiator, List<CrimeHistory> history)
+[Serializable] [NetSerializable]
+public struct WantedRecord(
+    GeneralStationRecord targetInfo,
+    SecurityStatus status,
+    string? reason,
+    string? initiator,
+    List<CrimeHistory> history)
 {
     public GeneralStationRecord TargetInfo = targetInfo;
     public SecurityStatus Status = status;
     public string? Reason = reason;
     public string? Initiator = initiator;
     public List<CrimeHistory> History = history;
-};
+}
 
 [ByRefEvent]
 public record struct CriminalRecordChangedEvent(CriminalRecord Record);

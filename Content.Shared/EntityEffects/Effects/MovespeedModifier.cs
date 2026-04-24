@@ -17,6 +17,13 @@ namespace Content.Shared.EntityEffects.Effects;
 public sealed partial class MovespeedModifier : EntityEffect
 {
     /// <summary>
+    /// How long the modifier applies (in seconds).
+    /// Is scaled by reagent amount if used with an EntityEffectReagentArgs.
+    /// </summary>
+    [DataField]
+    public float StatusLifetime = 2f;
+
+    /// <summary>
     /// How much the entities' walk speed is multiplied by.
     /// </summary>
     [DataField]
@@ -28,23 +35,15 @@ public sealed partial class MovespeedModifier : EntityEffect
     [DataField]
     public float SprintSpeedModifier { get; set; } = 1;
 
-    /// <summary>
-    /// How long the modifier applies (in seconds).
-    /// Is scaled by reagent amount if used with an EntityEffectReagentArgs.
-    /// </summary>
-    [DataField]
-    public float StatusLifetime = 2f;
-
-    protected override string? ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys)
-    {
-        return Loc.GetString("reagent-effect-guidebook-movespeed-modifier",
+    protected override string? ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys) =>
+        Loc.GetString("reagent-effect-guidebook-movespeed-modifier",
             ("chance", Probability),
             ("walkspeed", WalkSpeedModifier),
             ("time", StatusLifetime));
-    }
 
     /// <summary>
-    /// Remove reagent at set rate, changes the movespeed modifiers and adds a MovespeedModifierMetabolismComponent if not already there.
+    /// Remove reagent at set rate, changes the movespeed modifiers and adds a MovespeedModifierMetabolismComponent if not
+    /// already there.
     /// </summary>
     public override void Effect(EntityEffectBaseArgs args)
     {
@@ -61,16 +60,18 @@ public sealed partial class MovespeedModifier : EntityEffect
         var statusLifetime = StatusLifetime;
 
         if (args is EntityEffectReagentArgs reagentArgs)
-        {
             statusLifetime *= reagentArgs.Scale.Float();
-        }
 
         IncreaseTimer(status, statusLifetime, args.EntityManager, args.TargetEntity);
 
         if (modified)
             args.EntityManager.System<MovementSpeedModifierSystem>().RefreshMovementSpeedModifiers(args.TargetEntity);
     }
-    private void IncreaseTimer(MovespeedModifierMetabolismComponent status, float time, IEntityManager entityManager, EntityUid uid)
+
+    private void IncreaseTimer(MovespeedModifierMetabolismComponent status,
+        float time,
+        IEntityManager entityManager,
+        EntityUid uid)
     {
         var gameTiming = IoCManager.Resolve<IGameTiming>();
 

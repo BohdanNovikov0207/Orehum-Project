@@ -26,61 +26,17 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototy
 namespace Content.Shared.Doors.Components;
 
 /// <summary>
-/// Companion component to DoorComponent that handles airlock-specific behavior -- wires, requiring power to operate, bolts, and allowing automatic closing.
+/// Companion component to DoorComponent that handles airlock-specific behavior -- wires, requiring power to operate,
+/// bolts, and allowing automatic closing.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 [Access(typeof(SharedAirlockSystem), Friend = AccessPermissions.ReadWriteExecute, Other = AccessPermissions.Read)]
 public sealed partial class AirlockComponent : Component
 {
-    [DataField, AutoNetworkedField]
-    public bool Powered;
-
-    // Need to network airlock safety state to avoid mis-predicts when a door auto-closes as the client walks through the door.
-    [ViewVariables(VVAccess.ReadWrite)]
-    [DataField, AutoNetworkedField]
-    public bool Safety = true;
-
-    [ViewVariables(VVAccess.ReadWrite)]
-    [DataField, AutoNetworkedField]
-    public bool EmergencyAccess = false;
-	
-    /// <summary>
-    /// Sound to play when the airlock emergency access is turned on.
-    /// </summary>
-    [DataField]
-    public SoundSpecifier EmergencyOnSound = new SoundPathSpecifier("/Audio/Machines/airlock_emergencyon.ogg");
-
-    /// <summary>
-    /// Sound to play when the airlock emergency access is turned off.
-    /// </summary>
-    [DataField]
-    public SoundSpecifier EmergencyOffSound = new SoundPathSpecifier("/Audio/Machines/airlock_emergencyoff.ogg");
-
-    /// <summary>
-    /// Pry modifier for a powered airlock.
-    /// Most anything that can pry powered has a pry speed bonus,
-    /// so this default is closer to 6 effectively on e.g. jaws (9 seconds when applied to other default.)
-    /// </summary>
-    [DataField]
-    public float PoweredPryModifier = 9f;
-
-    /// <summary>
-    /// Whether the maintenance panel should be visible even if the airlock is opened.
-    /// </summary>
-    [DataField]
-    public bool OpenPanelVisible = false;
-
-    /// <summary>
-    /// Whether the airlock should stay open if the airlock was clicked.
-    /// If the airlock was bumped into it will still auto close.
-    /// </summary>
-    [DataField]
-    public bool KeepOpenIfClicked = false;
-
     /// <summary>
     /// Whether the airlock should auto close. This value is reset every time the airlock closes.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public bool AutoClose = true;
 
     /// <summary>
@@ -101,6 +57,51 @@ public sealed partial class AirlockComponent : Component
     /// </summary>
     [DataField(customTypeSerializer: typeof(PrototypeIdSerializer<SinkPortPrototype>))]
     public string AutoClosePort = "AutoClose";
+
+    [ViewVariables(VVAccess.ReadWrite)]
+    [DataField] [AutoNetworkedField]
+    public bool EmergencyAccess = false;
+
+    /// <summary>
+    /// Sound to play when the airlock emergency access is turned off.
+    /// </summary>
+    [DataField]
+    public SoundSpecifier EmergencyOffSound = new SoundPathSpecifier("/Audio/Machines/airlock_emergencyoff.ogg");
+
+    /// <summary>
+    /// Sound to play when the airlock emergency access is turned on.
+    /// </summary>
+    [DataField]
+    public SoundSpecifier EmergencyOnSound = new SoundPathSpecifier("/Audio/Machines/airlock_emergencyon.ogg");
+
+    /// <summary>
+    /// Whether the airlock should stay open if the airlock was clicked.
+    /// If the airlock was bumped into it will still auto close.
+    /// </summary>
+    [DataField]
+    public bool KeepOpenIfClicked = false;
+
+    /// <summary>
+    /// Whether the maintenance panel should be visible even if the airlock is opened.
+    /// </summary>
+    [DataField]
+    public bool OpenPanelVisible = false;
+
+    [DataField] [AutoNetworkedField]
+    public bool Powered;
+
+    /// <summary>
+    /// Pry modifier for a powered airlock.
+    /// Most anything that can pry powered has a pry speed bonus,
+    /// so this default is closer to 6 effectively on e.g. jaws (9 seconds when applied to other default.)
+    /// </summary>
+    [DataField]
+    public float PoweredPryModifier = 9f;
+
+    // Need to network airlock safety state to avoid mis-predicts when a door auto-closes as the client walks through the door.
+    [ViewVariables(VVAccess.ReadWrite)]
+    [DataField] [AutoNetworkedField]
+    public bool Safety = true;
 
     #region Graphics
 

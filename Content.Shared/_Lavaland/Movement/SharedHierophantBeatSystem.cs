@@ -1,7 +1,6 @@
 ﻿using Content.Shared._vg.TileMovement;
 using Content.Shared.Alert;
 using Content.Shared.Movement.Systems;
-using Robust.Shared.Prototypes;
 
 namespace Content.Shared._Lavaland.Movement;
 
@@ -30,6 +29,8 @@ public sealed class HierophantBeatSystem : EntitySystem
         _alertsSystem.ClearAlert(uid, component.HierophantBeatAlertId);
     }
 
-    private void OnRefreshSpeed(EntityUid uid, HierophantBeatComponent component, ref RefreshMovementSpeedModifiersEvent args)
+    private void OnRefreshSpeed(EntityUid uid,
+        HierophantBeatComponent component,
+        ref RefreshMovementSpeedModifiersEvent args)
         => args.ModifySpeed(component.MovementSpeedBuff, component.MovementSpeedBuff);
 }

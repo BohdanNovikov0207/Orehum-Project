@@ -1,7 +1,7 @@
 namespace Content.Shared._EinsteinEngines.SelfExtinguisher;
 
 /// <summary>
-///     Used to refill the charges of self-extinguishers.
+/// Used to refill the charges of self-extinguishers.
 /// </summary>
 [RegisterComponent]
 public sealed partial class SelfExtinguisherRefillComponent : Component

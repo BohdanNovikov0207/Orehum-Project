@@ -66,20 +66,70 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototy
 
 namespace Content.Shared.Singularity.Components;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class ContainmentFieldGeneratorComponent : Component
 {
-        private int _powerBuffer;
+    private int _powerBuffer;
 
     /// <summary>
-    /// Store power with a cap. Decrease over time if not being powered from source.
+    /// Used to check if it's received power recently.
     /// </summary>
-    [DataField("powerBuffer")]
-    public int PowerBuffer
-    {
-        get => _powerBuffer;
-        set => _powerBuffer = Math.Clamp(value, 0, 25); //have this decrease over time if not hit by a bolt
-    }
+    [DataField("accumulator")]
+    public float Accumulator;
+
+    /// <summary>
+    /// The masks the raycast should not go through
+    /// </summary>
+    [DataField("collisionMask")]
+    public int CollisionMask = (int) (CollisionGroup.MobMask | CollisionGroup.Impassable | CollisionGroup.MachineMask |
+                                      CollisionGroup.Opaque);
+
+    /// <summary>
+    /// A collection of connections that the generator has based on direction.
+    /// Stores a list of fields connected between generators in this direction.
+    /// </summary>
+    [ViewVariables]
+    public Dictionary<Direction, (Entity<ContainmentFieldGeneratorComponent>, List<EntityUid>)> Connections = new();
+
+    /// <summary>
+    /// What fields should this spawn?
+    /// </summary>
+    [ViewVariables(VVAccess.ReadWrite)]
+    [DataField("createdField", customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
+    public string CreatedField = "ContainmentField";
+
+    /// <summary>
+    /// Is the generator toggled on?
+    /// </summary>
+    [DataField]
+    public bool Enabled;
+
+    /// <summary>
+    /// What collision should power this generator?
+    /// It really shouldn't be anything but an emitter bolt but it's here for fun.
+    /// </summary>
+    [ViewVariables(VVAccess.ReadWrite)]
+    [DataField("idTag", customTypeSerializer: typeof(PrototypeIdSerializer<TagPrototype>))]
+    public string IDTag = "EmitterBolt";
+
+    /// <summary>
+    /// Is this generator connected to fields?
+    /// </summary>
+    [ViewVariables(VVAccess.ReadWrite)]
+    public bool IsConnected;
+
+    /// <summary>
+    /// How many tiles should this field check before giving up?
+    /// </summary>
+    [DataField("maxLength")]
+    public float MaxLength = 8F;
+
+    /// <summary>
+    /// How much power should this field generator lose if not powered?
+    /// </summary>
+    [ViewVariables(VVAccess.ReadWrite)]
+    [DataField("powerLoss")]
+    public int PowerLoss = 2;
 
     /// <summary>
     /// The minimum the field generator needs to start generating a connection
@@ -96,17 +146,11 @@ public sealed partial class ContainmentFieldGeneratorComponent : Component
     public int PowerReceived = 3;
 
     /// <summary>
-    /// How much power should this field generator lose if not powered?
+    /// Which fixture ID should test collision with from the entity that powers the generator?
+    /// Prevents the generator from being powered by fly-by fixtures.
     /// </summary>
-    [ViewVariables(VVAccess.ReadWrite)]
-    [DataField("powerLoss")]
-    public int PowerLoss = 2;
-
-    /// <summary>
-    /// Used to check if it's received power recently.
-    /// </summary>
-    [DataField("accumulator")]
-    public float Accumulator;
+    [DataField]
+    public string SourceFixtureId = "projectile";
 
     /// <summary>
     /// How many seconds should the generators wait before losing power?
@@ -115,60 +159,17 @@ public sealed partial class ContainmentFieldGeneratorComponent : Component
     public float Threshold = 20f;
 
     /// <summary>
-    /// How many tiles should this field check before giving up?
+    /// Store power with a cap. Decrease over time if not being powered from source.
     /// </summary>
-    [DataField("maxLength")]
-    public float MaxLength = 8F;
-
-    /// <summary>
-    /// What collision should power this generator?
-    /// It really shouldn't be anything but an emitter bolt but it's here for fun.
-    /// </summary>
-    [ViewVariables(VVAccess.ReadWrite)]
-    [DataField("idTag", customTypeSerializer: typeof(PrototypeIdSerializer<TagPrototype>))]
-    public string IDTag = "EmitterBolt";
-
-    /// <summary>
-    /// Which fixture ID should test collision with from the entity that powers the generator?
-    /// Prevents the generator from being powered by fly-by fixtures.
-    /// </summary>
-    [DataField]
-    public string SourceFixtureId = "projectile";
-
-    /// <summary>
-    /// Is the generator toggled on?
-    /// </summary>
-    [DataField]
-    public bool Enabled;
-
-    /// <summary>
-    /// Is this generator connected to fields?
-    /// </summary>
-    [ViewVariables(VVAccess.ReadWrite)]
-    public bool IsConnected;
-
-    /// <summary>
-    /// The masks the raycast should not go through
-    /// </summary>
-    [DataField("collisionMask")]
-    public int CollisionMask = (int) (CollisionGroup.MobMask | CollisionGroup.Impassable | CollisionGroup.MachineMask | CollisionGroup.Opaque);
-
-    /// <summary>
-    /// A collection of connections that the generator has based on direction.
-    /// Stores a list of fields connected between generators in this direction.
-    /// </summary>
-    [ViewVariables]
-    public Dictionary<Direction, (Entity<ContainmentFieldGeneratorComponent>, List<EntityUid>)> Connections = new();
-
-    /// <summary>
-    /// What fields should this spawn?
-    /// </summary>
-    [ViewVariables(VVAccess.ReadWrite)]
-    [DataField("createdField", customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
-    public string CreatedField = "ContainmentField";
+    [DataField("powerBuffer")]
+    public int PowerBuffer
+    {
+        get => _powerBuffer;
+        set => _powerBuffer = Math.Clamp(value, 0, 25); //have this decrease over time if not hit by a bolt
+    }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum ContainmentFieldGeneratorVisuals : byte
 {
     PowerLight,
@@ -176,7 +177,7 @@ public enum ContainmentFieldGeneratorVisuals : byte
     OnLight,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum PowerLevelVisuals : byte
 {
     NoPower,
@@ -185,7 +186,7 @@ public enum PowerLevelVisuals : byte
     HighPower,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum FieldLevelVisuals : byte
 {
     NoLevel,

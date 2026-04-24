@@ -16,7 +16,7 @@ public abstract class SharedArtifactAnalyzerSystem : EntitySystem
 {
     [Dependency] private readonly SharedPowerReceiverSystem _powerReceiver = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
@@ -90,7 +90,8 @@ public abstract class SharedArtifactAnalyzerSystem : EntitySystem
         Dirty(ent);
     }
 
-    public bool TryGetAnalyzer(Entity<AnalysisConsoleComponent> ent, [NotNullWhen(true)] out Entity<ArtifactAnalyzerComponent>? analyzer)
+    public bool TryGetAnalyzer(Entity<AnalysisConsoleComponent> ent,
+        [NotNullWhen(true)] out Entity<ArtifactAnalyzerComponent>? analyzer)
     {
         analyzer = null;
 
@@ -109,7 +110,8 @@ public abstract class SharedArtifactAnalyzerSystem : EntitySystem
         return true;
     }
 
-    public bool TryGetArtifactFromConsole(Entity<AnalysisConsoleComponent> ent, [NotNullWhen(true)] out Entity<XenoArtifactComponent>? artifact)
+    public bool TryGetArtifactFromConsole(Entity<AnalysisConsoleComponent> ent,
+        [NotNullWhen(true)] out Entity<XenoArtifactComponent>? artifact)
     {
         artifact = null;
 
@@ -123,7 +125,8 @@ public abstract class SharedArtifactAnalyzerSystem : EntitySystem
         return true;
     }
 
-    public bool TryGetAnalysisConsole(Entity<ArtifactAnalyzerComponent> ent, [NotNullWhen(true)] out Entity<AnalysisConsoleComponent>? analysisConsole)
+    public bool TryGetAnalysisConsole(Entity<ArtifactAnalyzerComponent> ent,
+        [NotNullWhen(true)] out Entity<AnalysisConsoleComponent>? analysisConsole)
     {
         analysisConsole = null;
 

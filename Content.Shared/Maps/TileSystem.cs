@@ -26,27 +26,24 @@ using Robust.Shared.Utility;
 namespace Content.Shared.Maps;
 
 /// <summary>
-///     Handles server-side tile manipulation like prying/deconstructing tiles.
+/// Handles server-side tile manipulation like prying/deconstructing tiles.
 /// </summary>
 public sealed class TileSystem : EntitySystem
 {
+    [Dependency] private readonly SharedDecalSystem _decal = default!;
     [Dependency] private readonly IMapManager _mapManager = default!;
+    [Dependency] private readonly SharedMapSystem _maps = default!;
     [Dependency] private readonly IRobustRandom _robustRandom = default!;
     [Dependency] private readonly ITileDefinitionManager _tileDefinitionManager = default!;
-    [Dependency] private readonly SharedDecalSystem _decal = default!;
-    [Dependency] private readonly SharedMapSystem _maps = default!;
     [Dependency] private readonly TurfSystem _turf = default!;
 
     /// <summary>
-    ///     Returns a weighted pick of a tile variant.
+    /// Returns a weighted pick of a tile variant.
     /// </summary>
-    public byte PickVariant(ContentTileDefinition tile)
-    {
-        return PickVariant(tile, _robustRandom.GetRandom());
-    }
+    public byte PickVariant(ContentTileDefinition tile) => PickVariant(tile, _robustRandom.GetRandom());
 
     /// <summary>
-    ///     Returns a weighted pick of a tile variant.
+    /// Returns a weighted pick of a tile variant.
     /// </summary>
     public byte PickVariant(ContentTileDefinition tile, int seed)
     {
@@ -55,7 +52,7 @@ public sealed class TileSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Returns a weighted pick of a tile variant.
+    /// Returns a weighted pick of a tile variant.
     /// </summary>
     public byte PickVariant(ContentTileDefinition tile, System.Random random)
     {
@@ -78,15 +75,13 @@ public sealed class TileSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Returns a tile with a weighted random variant.
+    /// Returns a tile with a weighted random variant.
     /// </summary>
-    public Tile GetVariantTile(ContentTileDefinition tile, System.Random random)
-    {
-        return new Tile(tile.TileId, variant: PickVariant(tile, random));
-    }
+    public Tile GetVariantTile(ContentTileDefinition tile, System.Random random) =>
+        new(tile.TileId, variant: PickVariant(tile, random));
 
     /// <summary>
-    ///     Returns a tile with a weighted random variant.
+    /// Returns a tile with a weighted random variant.
     /// </summary>
     public Tile GetVariantTile(ContentTileDefinition tile, int seed)
     {
@@ -101,10 +96,7 @@ public sealed class TileSystem : EntitySystem
         return PryTile(tileRef);
     }
 
-	public bool PryTile(TileRef tileRef)
-    {
-        return PryTile(tileRef, false);
-    }
+    public bool PryTile(TileRef tileRef) => PryTile(tileRef, false);
 
     public bool PryTile(TileRef tileRef, bool pryPlating)
     {
@@ -128,7 +120,10 @@ public sealed class TileSystem : EntitySystem
         return ReplaceTile(tileref, replacementTile, tileref.GridUid, grid);
     }
 
-    public bool ReplaceTile(TileRef tileref, ContentTileDefinition replacementTile, EntityUid grid, MapGridComponent? component = null)
+    public bool ReplaceTile(TileRef tileref,
+        ContentTileDefinition replacementTile,
+        EntityUid grid,
+        MapGridComponent? component = null)
     {
         DebugTools.Assert(tileref.GridUid == grid);
 
@@ -173,7 +168,8 @@ public sealed class TileSystem : EntitySystem
         Transform(tileItem).LocalRotation = _robustRandom.NextDouble() * Math.Tau;
 
         // Destroy any decals on the tile
-        var decals = _decal.GetDecalsInRange(gridUid, coordinates.SnapToGrid(EntityManager, _mapManager).Position, 0.5f);
+        var decals =
+            _decal.GetDecalsInRange(gridUid, coordinates.SnapToGrid(EntityManager, _mapManager).Position, 0.5f);
         foreach (var (id, _) in decals)
         {
             _decal.RemoveDecal(tileRef.GridUid, id);

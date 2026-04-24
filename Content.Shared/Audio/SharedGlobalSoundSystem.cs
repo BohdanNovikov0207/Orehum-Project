@@ -12,6 +12,7 @@
 using Content.Shared.CCVar;
 using Robust.Shared.Audio;
 using Robust.Shared.Serialization;
+
 namespace Content.Shared.Audio;
 
 /// <summary>
@@ -22,11 +23,12 @@ public abstract class SharedGlobalSoundSystem : EntitySystem
 }
 
 [Virtual]
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public class GlobalSoundEvent : EntityEventArgs
 {
-    public ResolvedSoundSpecifier Specifier;
     public AudioParams? AudioParams;
+    public ResolvedSoundSpecifier Specifier;
+
     public GlobalSoundEvent(ResolvedSoundSpecifier specifier, AudioParams? audioParams = null)
     {
         Specifier = specifier;
@@ -35,21 +37,27 @@ public class GlobalSoundEvent : EntityEventArgs
 }
 
 /// <summary>
-/// Intended for admin music. Can be disabled by the <seealso cref="CCVars.AdminSoundsEnabled"/> cvar.
+/// Intended for admin music. Can be disabled by the <seealso cref="CCVars.AdminSoundsEnabled" /> cvar.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class AdminSoundEvent : GlobalSoundEvent
 {
-    public AdminSoundEvent(ResolvedSoundSpecifier specifier, AudioParams? audioParams = null) : base(specifier, audioParams){}
+    public AdminSoundEvent(ResolvedSoundSpecifier specifier, AudioParams? audioParams = null) : base(specifier,
+        audioParams)
+    {
+    }
 }
 
 /// <summary>
 /// Intended for misc sound effects. Can't be disabled by cvar.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class GameGlobalSoundEvent : GlobalSoundEvent
 {
-    public GameGlobalSoundEvent(ResolvedSoundSpecifier specifier, AudioParams? audioParams = null) : base(specifier, audioParams){}
+    public GameGlobalSoundEvent(ResolvedSoundSpecifier specifier, AudioParams? audioParams = null) : base(specifier,
+        audioParams)
+    {
+    }
 }
 
 public enum StationEventMusicType : byte
@@ -61,24 +69,28 @@ public enum StationEventMusicType : byte
 }
 
 /// <summary>
-/// Intended for music triggered by events on a specific station. Can be disabled by the <seealso cref="CCVars.EventMusicEnabled"/> cvar.
+/// Intended for music triggered by events on a specific station. Can be disabled by the
+/// <seealso cref="CCVars.EventMusicEnabled" /> cvar.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class StationEventMusicEvent : GlobalSoundEvent
 {
     public StationEventMusicType Type;
 
-    public StationEventMusicEvent(ResolvedSoundSpecifier specifier, StationEventMusicType type, AudioParams? audioParams = null) : base(
-        specifier, audioParams)
+    public StationEventMusicEvent(ResolvedSoundSpecifier specifier,
+        StationEventMusicType type,
+        AudioParams? audioParams = null) : base(
+        specifier,
+        audioParams)
     {
         Type = type;
     }
 }
 
 /// <summary>
-/// Attempts to stop a playing <seealso cref="StationEventMusicEvent"/> stream.
+/// Attempts to stop a playing <seealso cref="StationEventMusicEvent" /> stream.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class StopStationEventMusic : EntityEventArgs
 {
     public StationEventMusicType Type;

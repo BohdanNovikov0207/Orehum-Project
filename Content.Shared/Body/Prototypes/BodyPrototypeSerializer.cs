@@ -28,66 +28,18 @@ namespace Content.Shared.Body.Prototypes;
 [TypeSerializer]
 public sealed class BodyPrototypeSerializer : ITypeReader<BodyPrototype, MappingDataNode>
 {
-    private (ValidationNode Node, List<string> Connections) ValidateSlot(MappingDataNode slot, IDependencyCollection dependencies)
-    {
-        var nodes = new List<ValidationNode>();
-        var prototypes = dependencies.Resolve<IPrototypeManager>();
-        var factory = dependencies.Resolve<IComponentFactory>();
-
-        var connections = new List<string>();
-        if (slot.TryGet("connections", out SequenceDataNode? connectionsNode))
-        {
-            foreach (var node in connectionsNode)
-            {
-                if (node is not ValueDataNode connection)
-                {
-                    nodes.Add(new ErrorNode(node, $"Connection is not a value data node"));
-                    continue;
-                }
-
-                connections.Add(connection.Value);
-            }
-        }
-
-        if (slot.TryGet("organs", out MappingDataNode? organsNode))
-        {
-            foreach (var (key, value) in organsNode)
-            {
-                if (value is not ValueDataNode organ)
-                {
-                    nodes.Add(new ErrorNode(value, $"Value is not a value data node"));
-                    continue;
-                }
-
-                if (!prototypes.TryIndex(organ.Value, out EntityPrototype? organPrototype))
-                {
-                    nodes.Add(new ErrorNode(value, $"No organ entity prototype found with id {organ.Value}"));
-                    continue;
-                }
-
-                if (!organPrototype.HasComponent<OrganComponent>(factory))
-                {
-                    nodes.Add(new ErrorNode(value, $"Organ {organ.Value} does not have a body component"));
-                }
-            }
-        }
-
-        var validation = new ValidatedSequenceNode(nodes);
-        return (validation, connections);
-    }
-
-    public ValidationNode Validate(ISerializationManager serializationManager, MappingDataNode node,
-        IDependencyCollection dependencies, ISerializationContext? context = null)
+    public ValidationNode Validate(ISerializationManager serializationManager,
+        MappingDataNode node,
+        IDependencyCollection dependencies,
+        ISerializationContext? context = null)
     {
         var nodes = new List<ValidationNode>();
 
         if (!node.TryGet("root", out ValueDataNode? root))
-            nodes.Add(new ErrorNode(node, $"No root value data node found"));
+            nodes.Add(new ErrorNode(node, "No root value data node found"));
 
         if (!node.TryGet("slots", out MappingDataNode? slots))
-        {
-            nodes.Add(new ErrorNode(node, $"No slots mapping data node found"));
-        }
+            nodes.Add(new ErrorNode(node, "No slots mapping data node found"));
         else if (root != null)
         {
             if (!slots.TryGet(root.Value, out MappingDataNode? _))
@@ -100,7 +52,7 @@ public sealed class BodyPrototypeSerializer : ITypeReader<BodyPrototype, Mapping
             {
                 if (value is not MappingDataNode slot)
                 {
-                    nodes.Add(new ErrorNode(value, $"Slot is not a mapping data node"));
+                    nodes.Add(new ErrorNode(value, "Slot is not a mapping data node"));
                     continue;
                 }
 
@@ -118,16 +70,19 @@ public sealed class BodyPrototypeSerializer : ITypeReader<BodyPrototype, Mapping
         return new ValidatedSequenceNode(nodes);
     }
 
-    public BodyPrototype Read(ISerializationManager serializationManager, MappingDataNode node,
+    public BodyPrototype Read(ISerializationManager serializationManager,
+        MappingDataNode node,
         IDependencyCollection dependencies,
-        SerializationHookContext hookCtx, ISerializationContext? context = null,
+        SerializationHookContext hookCtx,
+        ISerializationContext? context = null,
         ISerializationManager.InstantiationDelegate<BodyPrototype>? instanceProvider = null)
     {
         var id = node.Get<ValueDataNode>("id").Value;
         var name = node.Get<ValueDataNode>("name").Value;
         var root = node.Get<ValueDataNode>("root").Value;
         var slotNodes = node.Get<MappingDataNode>("slots");
-        var allConnections = new Dictionary<string, (string? Part, HashSet<string>? Connections, Dictionary<string, string>? Organs)>();
+        var allConnections =
+            new Dictionary<string, (string? Part, HashSet<string>? Connections, Dictionary<string, string>? Organs)>();
 
         foreach (var (slotId, valueNode) in slotNodes)
         {
@@ -135,9 +90,7 @@ public sealed class BodyPrototypeSerializer : ITypeReader<BodyPrototype, Mapping
 
             string? part = null;
             if (slot.TryGet<ValueDataNode>("part", out var value))
-            {
                 part = value.Value;
-            }
 
             HashSet<string>? connections = null;
             if (slot.TryGet("connections", out SequenceDataNode? slotConnectionsNode))
@@ -182,10 +135,59 @@ public sealed class BodyPrototypeSerializer : ITypeReader<BodyPrototype, Mapping
 
         foreach (var (slotId, (part, connections, organs)) in allConnections)
         {
-            var slot = new BodyPrototypeSlot(part, connections ?? new HashSet<string>(), organs ?? new Dictionary<string, string>());
+            var slot = new BodyPrototypeSlot(part,
+                connections ?? new HashSet<string>(),
+                organs ?? new Dictionary<string, string>());
             slots.Add(slotId, slot);
         }
 
         return new BodyPrototype(id, name, root, slots);
+    }
+
+    private (ValidationNode Node, List<string> Connections) ValidateSlot(MappingDataNode slot,
+        IDependencyCollection dependencies)
+    {
+        var nodes = new List<ValidationNode>();
+        var prototypes = dependencies.Resolve<IPrototypeManager>();
+        var factory = dependencies.Resolve<IComponentFactory>();
+
+        var connections = new List<string>();
+        if (slot.TryGet("connections", out SequenceDataNode? connectionsNode))
+        {
+            foreach (var node in connectionsNode)
+            {
+                if (node is not ValueDataNode connection)
+                {
+                    nodes.Add(new ErrorNode(node, "Connection is not a value data node"));
+                    continue;
+                }
+
+                connections.Add(connection.Value);
+            }
+        }
+
+        if (slot.TryGet("organs", out MappingDataNode? organsNode))
+        {
+            foreach (var (key, value) in organsNode)
+            {
+                if (value is not ValueDataNode organ)
+                {
+                    nodes.Add(new ErrorNode(value, "Value is not a value data node"));
+                    continue;
+                }
+
+                if (!prototypes.TryIndex(organ.Value, out EntityPrototype? organPrototype))
+                {
+                    nodes.Add(new ErrorNode(value, $"No organ entity prototype found with id {organ.Value}"));
+                    continue;
+                }
+
+                if (!organPrototype.HasComponent<OrganComponent>(factory))
+                    nodes.Add(new ErrorNode(value, $"Organ {organ.Value} does not have a body component"));
+            }
+        }
+
+        var validation = new ValidatedSequenceNode(nodes);
+        return (validation, connections);
     }
 }

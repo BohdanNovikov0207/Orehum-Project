@@ -30,5 +30,7 @@ public abstract class SharedCommsHackerSystem : EntitySystem
 /// <summary>
 /// DoAfter event for comms console terror ability.
 /// </summary>
-[Serializable, NetSerializable]
-public sealed partial class TerrorDoAfterEvent : SimpleDoAfterEvent { }
+[Serializable] [NetSerializable]
+public sealed partial class TerrorDoAfterEvent : SimpleDoAfterEvent
+{
+}

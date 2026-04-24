@@ -16,7 +16,7 @@ public abstract partial class SharedMapAtmosphereComponent : Component
     [ViewVariables] public SharedGasTileOverlaySystem.GasOverlayData OverlayData;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class MapAtmosphereComponentState : ComponentState
 {
     public SharedGasTileOverlaySystem.GasOverlayData Overlay;

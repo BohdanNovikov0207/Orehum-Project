@@ -39,9 +39,15 @@ namespace Content.Shared.Clothing.Components;
 /// <summary>
 /// Allows an entity stored in this clothing item to pass inputs to the entity wearing it.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class PilotedClothingComponent : Component
 {
+    /// <summary>
+    /// Reference to the entity contained in the clothing and acting as pilot.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public EntityUid? Pilot;
+
     /// <summary>
     /// Whitelist for entities that are allowed to act as pilots when inside this entity.
     /// </summary>
@@ -54,17 +60,10 @@ public sealed partial class PilotedClothingComponent : Component
     [DataField]
     public bool RelayMovement = true;
 
-
-    /// <summary>
-    /// Reference to the entity contained in the clothing and acting as pilot.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public EntityUid? Pilot;
-
     /// <summary>
     /// Reference to the entity wearing this clothing who will be controlled by the pilot.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public EntityUid? Wearer;
 
     public bool IsActive => Pilot != null && Wearer != null;

@@ -11,12 +11,15 @@ public sealed partial class CreateGas : EventEntityEffect<CreateGas>
     public Gas Gas = default!;
 
     /// <summary>
-    ///     For each unit consumed, how many moles of gas should be created?
+    /// For each unit consumed, how many moles of gas should be created?
     /// </summary>
     [DataField]
     public float Multiplier = 3f;
 
     public override bool ShouldLog => true;
+
+    public override LogImpact LogImpact => LogImpact.High;
+
     protected override string? ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys)
     {
         var atmos = entSys.GetEntitySystem<SharedAtmosphereSystem>();
@@ -27,6 +30,4 @@ public sealed partial class CreateGas : EventEntityEffect<CreateGas>
             ("moles", Multiplier),
             ("gas", gasProto.Name));
     }
-
-    public override LogImpact LogImpact => LogImpact.High;
 }

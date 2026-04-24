@@ -16,8 +16,5 @@ public sealed partial class MegafaunaRangeNumberSelector : MegafaunaNumberSelect
         Range = range;
     }
 
-    public override float Get(MegafaunaCalculationBaseArgs args)
-    {
-        return args.Random.NextFloat(Range.X, Range.Y);
-    }
+    public override float Get(MegafaunaCalculationBaseArgs args) => args.Random.NextFloat(Range.X, Range.Y);
 }

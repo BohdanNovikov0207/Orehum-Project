@@ -13,36 +13,41 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Atmos.Components;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class GasAnalyzerComponent : Component
 {
+    [Serializable] [NetSerializable]
+    public enum GasAnalyzerUiKey
+    {
+        Key,
+    }
+
+    [DataField("enabled")] [ViewVariables(VVAccess.ReadWrite)]
+    public bool Enabled;
+
     [ViewVariables]
     public EntityUid? Target;
 
     [ViewVariables]
     public EntityUid User;
 
-    [DataField("enabled"), ViewVariables(VVAccess.ReadWrite)]
-    public bool Enabled;
-
-    [Serializable, NetSerializable]
-    public enum GasAnalyzerUiKey
-    {
-        Key,
-    }
-
     /// <summary>
     /// Atmospheric data is gathered in the system and sent to the user
     /// </summary>
-    [Serializable, NetSerializable]
+    [Serializable] [NetSerializable]
     public sealed class GasAnalyzerUserMessage : BoundUserInterfaceMessage
     {
+        public bool DeviceFlipped;
         public string DeviceName;
         public NetEntity DeviceUid;
-        public bool DeviceFlipped;
         public string? Error;
         public GasMixEntry[] NodeGasMixes;
-        public GasAnalyzerUserMessage(GasMixEntry[] nodeGasMixes, string deviceName, NetEntity deviceUid, bool deviceFlipped, string? error = null)
+
+        public GasAnalyzerUserMessage(GasMixEntry[] nodeGasMixes,
+            string deviceName,
+            NetEntity deviceUid,
+            bool deviceFlipped,
+            string? error = null)
         {
             NodeGasMixes = nodeGasMixes;
             DeviceName = deviceName;
@@ -55,13 +60,14 @@ public sealed partial class GasAnalyzerComponent : Component
     /// <summary>
     /// Contains information on a gas mix entry, turns into a tab in the UI
     /// </summary>
-    [Serializable, NetSerializable]
+    [Serializable] [NetSerializable]
     public struct GasMixEntry
     {
         /// <summary>
         /// Name of the tab in the UI
         /// </summary>
         public readonly string Name;
+
         public readonly float Volume;
         public readonly float Pressure;
         public readonly float Temperature;
@@ -80,7 +86,7 @@ public sealed partial class GasAnalyzerComponent : Component
     /// <summary>
     /// Individual gas entry data for populating the UI
     /// </summary>
-    [Serializable, NetSerializable]
+    [Serializable] [NetSerializable]
     public struct GasEntry
     {
         public readonly string Name;
@@ -94,18 +100,16 @@ public sealed partial class GasAnalyzerComponent : Component
             Color = color;
         }
 
-        public override string ToString()
-        {
+        public override string ToString() =>
             // e.g. "Plasma: 2000 mol"
-            return Loc.GetString(
+            Loc.GetString(
                 "gas-entry-info",
-                 ("gasName", Name),
-                 ("gasAmount", Amount));
-        }
+                ("gasName", Name),
+                ("gasAmount", Amount));
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum GasAnalyzerVisuals : byte
 {
     Enabled,

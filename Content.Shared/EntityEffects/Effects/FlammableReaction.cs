@@ -14,8 +14,8 @@ public sealed partial class FlammableReaction : EventEntityEffect<FlammableReact
 
     public override bool ShouldLog => true;
 
+    public override LogImpact LogImpact => LogImpact.Medium;
+
     protected override string? ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys)
         => Loc.GetString("reagent-effect-guidebook-flammable-reaction", ("chance", Probability));
-
-    public override LogImpact LogImpact => LogImpact.Medium;
 }

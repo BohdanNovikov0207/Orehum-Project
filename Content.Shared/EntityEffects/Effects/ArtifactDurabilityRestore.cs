@@ -1,16 +1,16 @@
-using Content.Shared.Xenoarchaeology.Artifact.Components;
 using Content.Shared.Xenoarchaeology.Artifact;
+using Content.Shared.Xenoarchaeology.Artifact.Components;
 using Robust.Shared.Prototypes;
 
 namespace Content.Shared.EntityEffects.Effects;
 
 /// <summary>
-///     Restores durability in active artefact nodes.
+/// Restores durability in active artefact nodes.
 /// </summary>
 public sealed partial class ArtifactDurabilityRestore : EntityEffect
 {
     /// <summary>
-    ///     Amount of durability that will be restored per effect interaction.
+    /// Amount of durability that will be restored per effect interaction.
     /// </summary>
     [DataField]
     public int RestoredDurability = 1;
@@ -29,8 +29,6 @@ public sealed partial class ArtifactDurabilityRestore : EntityEffect
         }
     }
 
-    protected override string ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys)
-    {
-        return Loc.GetString("reagent-effect-guidebook-artifact-durability-restore", ("restored", RestoredDurability));
-    }
+    protected override string ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys) =>
+        Loc.GetString("reagent-effect-guidebook-artifact-durability-restore", ("restored", RestoredDurability));
 }

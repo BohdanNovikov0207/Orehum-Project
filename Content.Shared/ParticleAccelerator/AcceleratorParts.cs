@@ -2,7 +2,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.ParticleAccelerator;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum AcceleratorParts : byte
 {
     EndCap,
@@ -10,7 +10,5 @@ public enum AcceleratorParts : byte
     PowerBox,
     PortEmitter,
     ForeEmitter,
-    StarboardEmitter
-};
-
-
+    StarboardEmitter,
+}

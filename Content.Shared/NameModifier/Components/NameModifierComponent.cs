@@ -13,13 +13,13 @@ namespace Content.Shared.NameModifier.Components;
 /// that survives being renamed by multiple systems.
 /// </summary>
 [RegisterComponent]
-[NetworkedComponent, AutoGenerateComponentState]
+[NetworkedComponent] [AutoGenerateComponentState]
 [Access(typeof(NameModifierSystem))]
 public sealed partial class NameModifierComponent : Component
 {
     /// <summary>
     /// The entity's name without any modifiers applied.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public string BaseName = string.Empty;
 }

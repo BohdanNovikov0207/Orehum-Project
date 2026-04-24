@@ -19,22 +19,13 @@ namespace Content.Shared.Salvage.Expeditions.Modifiers;
 /// Which one is selected depends on the mission difficulty, different weightedRandoms are picked from.
 /// </summary>
 [Prototype("salvageAirMod")]
-public sealed partial class SalvageAirMod : IPrototype, IBiomeSpecificMod
+public sealed class SalvageAirMod : IPrototype, IBiomeSpecificMod
 {
-    [IdDataField]
-    public string ID { get; private set; } = default!;
-
-    /// <inheritdoc/>
-    [DataField("desc")]
-    public LocId Description { get; private set; } = string.Empty;
-
-    /// <inheritdoc/>
-    [DataField("cost")]
-    public float Cost { get; private set; } = 0f;
-
-    /// <inheritdoc/>
-    [DataField]
-    public List<ProtoId<SalvageBiomeModPrototype>>? Biomes { get; private set; } = null;
+    /// <summary>
+    /// Number of moles of each gas in the mixture.
+    /// </summary>
+    [DataField("gases")]
+    public float[] Gases = new float[Atmospherics.AdjustedNumberOfGases];
 
     /// <summary>
     /// Set to true if this planet will have no atmosphere.
@@ -42,9 +33,18 @@ public sealed partial class SalvageAirMod : IPrototype, IBiomeSpecificMod
     [DataField("space")]
     public bool Space;
 
-    /// <summary>
-    /// Number of moles of each gas in the mixture.
-    /// </summary>
-    [DataField("gases")]
-    public float[] Gases = new float[Atmospherics.AdjustedNumberOfGases];
+    /// <inheritdoc />
+    [DataField("desc")]
+    public LocId Description { get; } = string.Empty;
+
+    /// <inheritdoc />
+    [DataField("cost")]
+    public float Cost { get; } = 0f;
+
+    /// <inheritdoc />
+    [DataField]
+    public List<ProtoId<SalvageBiomeModPrototype>>? Biomes { get; } = null;
+
+    [IdDataField]
+    public string ID { get; } = default!;
 }

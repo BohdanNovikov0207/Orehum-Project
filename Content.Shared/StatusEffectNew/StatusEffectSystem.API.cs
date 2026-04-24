@@ -7,12 +7,15 @@ namespace Content.Shared.StatusEffectNew;
 public sealed partial class StatusEffectsSystem
 {
     /// <summary>
-    /// Increments duration of status effect by <see cref="duration"/>.
+    /// Increments duration of status effect by <see cref="duration" />.
     /// Tries to add status effect if it is not yet present on entity.
     /// </summary>
     /// <param name="target">The target entity to which the effect should be added.</param>
     /// <param name="effectProto">ProtoId of the status effect entity. Make sure it has StatusEffectComponent on it.</param>
-    /// <param name="duration">Duration of status effect. Leave null and the effect will be permanent until it is removed using <c>TryRemoveStatusEffect</c>.</param>
+    /// <param name="duration">
+    /// Duration of status effect. Leave null and the effect will be permanent until it is removed using
+    /// <c>TryRemoveStatusEffect</c>.
+    /// </param>
     /// <param name="statusEffect">The EntityUid of the status effect we have just created or null if it doesn't exist.</param>
     /// <returns>True if effect exists and its duration is set properly, false in case effect cannot be applied.</returns>
     public bool TryAddStatusEffectDuration(
@@ -38,19 +41,20 @@ public sealed partial class StatusEffectsSystem
     }
 
 
-    ///<inheritdoc cref="TryAddStatusEffectDuration(EntityUid,EntProtoId,out EntityUid?,TimeSpan)"/>
-    public bool TryAddStatusEffectDuration(EntityUid target, EntProtoId effectProto, TimeSpan duration)
-    {
-        return TryAddStatusEffectDuration(target, effectProto, out _, duration);
-    }
+    /// <inheritdoc cref="TryAddStatusEffectDuration(EntityUid,EntProtoId,out EntityUid?,TimeSpan)" />
+    public bool TryAddStatusEffectDuration(EntityUid target, EntProtoId effectProto, TimeSpan duration) =>
+        TryAddStatusEffectDuration(target, effectProto, out _, duration);
 
     /// <summary>
-    /// Sets duration of status effect by <see cref="duration"/>.
+    /// Sets duration of status effect by <see cref="duration" />.
     /// Tries to add status effect if it is not yet present on entity.
     /// </summary>
     /// <param name="target">The target entity to which the effect should be added.</param>
     /// <param name="effectProto">ProtoId of the status effect entity. Make sure it has StatusEffectComponent on it.</param>
-    /// <param name="duration">Duration of status effect. Leave null and the effect will be permanent until it is removed using <c>TryRemoveStatusEffect</c>.</param>
+    /// <param name="duration">
+    /// Duration of status effect. Leave null and the effect will be permanent until it is removed using
+    /// <c>TryRemoveStatusEffect</c>.
+    /// </param>
     /// <param name="statusEffect">The EntityUid of the status effect we have just created or null if it doesn't exist.</param>
     /// <returns>True if effect exists and its duration is set properly, false in case effect cannot be applied.</returns>
     public bool TrySetStatusEffectDuration(
@@ -74,19 +78,20 @@ public sealed partial class StatusEffectsSystem
         return true;
     }
 
-    /// <inheritdoc cref="TrySetStatusEffectDuration(EntityUid,EntProtoId,out EntityUid?,TimeSpan?)"/>
-    public bool TrySetStatusEffectDuration(EntityUid target, EntProtoId effectProto, TimeSpan? duration = null)
-    {
-        return TrySetStatusEffectDuration(target, effectProto, out _, duration);
-    }
+    /// <inheritdoc cref="TrySetStatusEffectDuration(EntityUid,EntProtoId,out EntityUid?,TimeSpan?)" />
+    public bool TrySetStatusEffectDuration(EntityUid target, EntProtoId effectProto, TimeSpan? duration = null) =>
+        TrySetStatusEffectDuration(target, effectProto, out _, duration);
 
     /// <summary>
-    /// Updates duration of effect to larger value between provided <see cref="duration"/> and current effect duration.
+    /// Updates duration of effect to larger value between provided <see cref="duration" /> and current effect duration.
     /// Tries to add status effect if it is not yet present on entity.
     /// </summary>
     /// <param name="target">The target entity to which the effect should be added.</param>
     /// <param name="effectProto">ProtoId of the status effect entity. Make sure it has StatusEffectComponent on it.</param>
-    /// <param name="duration">Duration of status effect. Leave null and the effect will be permanent until it is removed using <c>TryRemoveStatusEffect</c>.</param>
+    /// <param name="duration">
+    /// Duration of status effect. Leave null and the effect will be permanent until it is removed using
+    /// <c>TryRemoveStatusEffect</c>.
+    /// </param>
     /// <param name="statusEffect">The EntityUid of the status effect we have just created or null if it doesn't exist.</param>
     /// <returns>True if effect exists and its duration is set properly, false in case effect cannot be applied.</returns>
     public bool TryUpdateStatusEffectDuration(
@@ -110,11 +115,9 @@ public sealed partial class StatusEffectsSystem
         return true;
     }
 
-    /// <inheritdoc cref="TryUpdateStatusEffectDuration(EntityUid,EntProtoId,out EntityUid?,TimeSpan?)"/>
-    public bool TryUpdateStatusEffectDuration(EntityUid target, EntProtoId effectProto, TimeSpan? duration = null)
-    {
-        return TryUpdateStatusEffectDuration(target, effectProto, out _, duration);
-    }
+    /// <inheritdoc cref="TryUpdateStatusEffectDuration(EntityUid,EntProtoId,out EntityUid?,TimeSpan?)" />
+    public bool TryUpdateStatusEffectDuration(EntityUid target, EntProtoId effectProto, TimeSpan? duration = null) =>
+        TryUpdateStatusEffectDuration(target, effectProto, out _, duration);
 
     /// <summary>
     /// Attempting to remove a status effect from an entity.
@@ -222,10 +225,13 @@ public sealed partial class StatusEffectsSystem
     /// component exists.
     /// </summary>
     /// <param name="uid">The target entity on which the effect is applied.</param>
-    /// <param name="time">Returns the EntityUid of the status effect with the most time left, and the end effect time
-    /// of that status effect.</param>
+    /// <param name="time">
+    /// Returns the EntityUid of the status effect with the most time left, and the end effect time
+    /// of that status effect.
+    /// </param>
     /// <returns> True if a status effect entity with the given component exists</returns>
-    public bool TryGetMaxTime<T>(EntityUid uid, out (EntityUid EffectEnt, TimeSpan? EndEffectTime) time) where T : IComponent
+    public bool TryGetMaxTime<T>(EntityUid uid, out (EntityUid EffectEnt, TimeSpan? EndEffectTime) time)
+        where T : IComponent
     {
         time = default;
         if (!TryEffectsWithComp<T>(uid, out var status))
@@ -244,6 +250,7 @@ public sealed partial class StatusEffectsSystem
             if (effect.Comp2.EndEffectTime > time.EndEffectTime)
                 time = (effect.Owner, effect.Comp2.EndEffectTime);
         }
+
         return true;
     }
 
@@ -271,6 +278,7 @@ public sealed partial class StatusEffectsSystem
                 return true;
             }
         }
+
         return false;
     }
 
@@ -295,6 +303,7 @@ public sealed partial class StatusEffectsSystem
                 return true;
             }
         }
+
         return false;
     }
 
@@ -318,7 +327,8 @@ public sealed partial class StatusEffectsSystem
     /// <summary>
     /// Returns all status effects that have the specified component.
     /// </summary>
-    public bool TryEffectsWithComp<T>(EntityUid? target, [NotNullWhen(true)] out HashSet<Entity<T, StatusEffectComponent>>? effects) where T : IComponent
+    public bool TryEffectsWithComp<T>(EntityUid? target,
+        [NotNullWhen(true)] out HashSet<Entity<T, StatusEffectComponent>>? effects) where T : IComponent
     {
         effects = null;
         if (!_containerQuery.TryComp(target, out var container))
@@ -340,10 +350,14 @@ public sealed partial class StatusEffectsSystem
     }
 
     /// <summary>
-    /// Helper function for calculating how long it takes for all effects with a particular component to disappear. Useful for overlays.
+    /// Helper function for calculating how long it takes for all effects with a particular component to disappear. Useful for
+    /// overlays.
     /// </summary>
     /// <param name="target">An entity from which status effects are checked.</param>
-    /// <param name="endTime">The farthest end time of effects with this component is returned. Can be null if one of the effects is infinite.</param>
+    /// <param name="endTime">
+    /// The farthest end time of effects with this component is returned. Can be null if one of the
+    /// effects is infinite.
+    /// </param>
     /// <returns>True if effects with the specified component were found, or False if there are no such effects.</returns>
     public bool TryGetEffectsEndTimeWithComp<T>(EntityUid? target, out TimeSpan? endTime) where T : IComponent
     {

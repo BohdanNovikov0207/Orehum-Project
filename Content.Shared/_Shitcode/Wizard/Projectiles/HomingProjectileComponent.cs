@@ -9,25 +9,25 @@ using Robust.Shared.GameStates;
 
 namespace Content.Shared._Goobstation.Wizard.Projectiles;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class HomingProjectileComponent : Component
 {
-    [ViewVariables(VVAccess.ReadOnly), AutoNetworkedField]
-    public EntityUid? Target;
+    [ViewVariables(VVAccess.ReadOnly)]
+    public float HomingAccumulator;
 
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public float? HomingSpeed = 720f;
-
-    [DataField]
-    public Angle Tolerance = Angle.FromDegrees(1);
 
     /// <summary>
     /// The less this value is, the smoother homing will be, but also more laggy.
-    /// Changing this also changes homing speed, so you need to tweak <see cref="HomingSpeed"/> datafield.
+    /// Changing this also changes homing speed, so you need to tweak <see cref="HomingSpeed" /> datafield.
     /// </summary>
     [DataField]
     public float HomingTime = 0.1f;
 
-    [ViewVariables(VVAccess.ReadOnly)]
-    public float HomingAccumulator;
+    [ViewVariables(VVAccess.ReadOnly)] [AutoNetworkedField]
+    public EntityUid? Target;
+
+    [DataField]
+    public Angle Tolerance = Angle.FromDegrees(1);
 }

@@ -16,6 +16,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Goobstation.Common.Effects;
 using Content.Shared.Administration.Logs;
 using Content.Shared.Charges.Components;
 using Content.Shared.Charges.Systems;
@@ -25,10 +26,11 @@ using Content.Shared.IdentityManagement;
 using Content.Shared.Interaction;
 using Content.Shared.Popups;
 using Content.Shared.Tag;
+using Content.Shared.Whitelist;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Serialization;
-using Content.Shared.Whitelist;
-using Content.Goobstation.Common.Effects; // Shitmed - Starlight Abductors
+
+// Shitmed - Starlight Abductors
 
 namespace Content.Shared.Emag.Systems;
 
@@ -41,12 +43,14 @@ namespace Content.Shared.Emag.Systems;
 public sealed class EmagSystem : EntitySystem
 {
     [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
-    [Dependency] private readonly SharedChargesSystem _sharedCharges = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly TagSystem _tag = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!; // DeltaV - Add a whitelist/blacklist to the Emag
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly SharedChargesSystem _sharedCharges = default!;
     [Dependency] private readonly SparksSystem _sparks = default!; // goob edit - sparks everywhere
+    [Dependency] private readonly TagSystem _tag = default!;
+
+    [Dependency]
+    private readonly EntityWhitelistSystem _whitelist = default!; // DeltaV - Add a whitelist/blacklist to the Emag
 
     public override void Initialize()
     {
@@ -56,7 +60,8 @@ public sealed class EmagSystem : EntitySystem
         SubscribeLocalEvent<EmaggedComponent, OnAccessOverriderAccessUpdatedEvent>(OnAccessOverriderAccessUpdated);
     }
 
-    private void OnAccessOverriderAccessUpdated(Entity<EmaggedComponent> entity, ref OnAccessOverriderAccessUpdatedEvent args)
+    private void OnAccessOverriderAccessUpdated(Entity<EmaggedComponent> entity,
+        ref OnAccessOverriderAccessUpdatedEvent args)
     {
         if (!CompareFlag(entity.Comp.EmagType, EmagType.Access))
             return;
@@ -64,6 +69,7 @@ public sealed class EmagSystem : EntitySystem
         entity.Comp.EmagType &= ~EmagType.Access;
         Dirty(entity);
     }
+
     private void OnAfterInteract(EntityUid uid, EmagComponent comp, AfterInteractEvent args)
     {
         if (!args.CanReach || args.Target is not { } target)
@@ -73,9 +79,13 @@ public sealed class EmagSystem : EntitySystem
     }
 
     /// <summary>
-    /// Does the emag effect on a specified entity with a specified EmagType. The optional field customEmagType can be used to override the emag type defined in the component.
+    /// Does the emag effect on a specified entity with a specified EmagType. The optional field customEmagType can be used to
+    /// override the emag type defined in the component.
     /// </summary>
-    public bool TryEmagEffect(Entity<EmagComponent?> ent, EntityUid user, EntityUid target, EmagType? customEmagType = null)
+    public bool TryEmagEffect(Entity<EmagComponent?> ent,
+        EntityUid user,
+        EntityUid target,
+        EmagType? customEmagType = null)
     {
         if (!Resolve(ent, ref ent.Comp, false))
             return false;
@@ -105,12 +115,17 @@ public sealed class EmagSystem : EntitySystem
         if (!emaggedEvent.Handled)
             return false;
 
-        _popup.PopupPredicted(Loc.GetString(ent.Comp.SuccessText, ("target", Identity.Entity(target, EntityManager))), user, user, PopupType.Medium); // Goobstation - Success text de-hardcoded
+        _popup.PopupPredicted(Loc.GetString(ent.Comp.SuccessText, ("target", Identity.Entity(target, EntityManager))),
+            user,
+            user,
+            PopupType.Medium); // Goobstation - Success text de-hardcoded
 
         _audio.PlayPredicted(ent.Comp.EmagSound, ent, ent);
         _sparks.DoSparks(Transform(target).Coordinates); // goob edit - sparks everywhere
 
-        _adminLogger.Add(LogType.Emag, LogImpact.High, $"{ToPrettyString(user):player} emagged {ToPrettyString(target):target} with flag(s): {typeToUse}");
+        _adminLogger.Add(LogType.Emag,
+            LogImpact.High,
+            $"{ToPrettyString(user):player} emagged {ToPrettyString(target):target} with flag(s): {typeToUse}");
 
         if (emaggedEvent.Handled)
             _sharedCharges.TryUseCharge(chargesEnt);
@@ -131,7 +146,10 @@ public sealed class EmagSystem : EntitySystem
     /// </summary>
     /// <param name="target">The target entity to check for the flag.</param>
     /// <param name="flag">The EmagType flag to check for.</param>
-    /// <returns>True if entity has EmaggedComponent and the provided flag. False if the entity lacks EmaggedComponent or provided flag.</returns>
+    /// <returns>
+    /// True if entity has EmaggedComponent and the provided flag. False if the entity lacks EmaggedComponent or
+    /// provided flag.
+    /// </returns>
     public bool CheckFlag(EntityUid target, EmagType flag)
     {
         if (!TryComp<EmaggedComponent>(target, out var comp))
@@ -158,24 +176,31 @@ public sealed class EmagSystem : EntitySystem
     }
 }
 
-
 [Flags]
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum EmagType
 {
     None = 0,
     All = ~None,
     Interaction = 1 << 1,
-    Access = 1 << 2
+    Access = 1 << 2,
 }
+
 /// <summary>
-/// Shows a popup to emag user (client side only!) and adds <see cref="EmaggedComponent"/> to the entity when handled
+/// Shows a popup to emag user (client side only!) and adds <see cref="EmaggedComponent" /> to the entity when handled
 /// </summary>
 /// <param name="UserUid">Emag user</param>
 /// <param name="Type">The emag type to use</param>
 /// <param name="Handled">Did the emagging succeed? Causes a user-only popup to show on client side</param>
-/// <param name="Repeatable">Can the entity be emagged more than once? Prevents adding of <see cref="EmaggedComponent"/></param>
+/// <param name="Repeatable">
+/// Can the entity be emagged more than once? Prevents adding of <see cref="EmaggedComponent" />
+/// </param>
 /// <param name="EmagUid">Uid of emag entity, Goobstation</param>
 /// <remarks>Needs to be handled in shared/client, not just the server, to actually show the emagging popup</remarks>
 [ByRefEvent]
-public record struct GotEmaggedEvent(EntityUid UserUid, EmagType Type, bool Handled = false, bool Repeatable = false, EntityUid? EmagUid = null); // Goob edit
+public record struct GotEmaggedEvent(
+    EntityUid UserUid,
+    EmagType Type,
+    bool Handled = false,
+    bool Repeatable = false,
+    EntityUid? EmagUid = null); // Goob edit

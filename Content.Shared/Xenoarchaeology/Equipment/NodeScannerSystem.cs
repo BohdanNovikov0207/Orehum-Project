@@ -10,12 +10,12 @@ namespace Content.Shared.Xenoarchaeology.Equipment;
 /// <summary> Controls behaviour of artifact node scanner device. </summary>
 public sealed class NodeScannerSystem : EntitySystem
 {
-    [Dependency] private readonly UseDelaySystem _useDelay = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly SharedUserInterfaceSystem _ui = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
+    [Dependency] private readonly SharedUserInterfaceSystem _ui = default!;
+    [Dependency] private readonly UseDelaySystem _useDelay = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         SubscribeLocalEvent<NodeScannerComponent, BeforeRangedInteractEvent>(OnBeforeRangedInteract);
@@ -25,7 +25,8 @@ public sealed class NodeScannerSystem : EntitySystem
     /// <inheritdoc />
     public override void Update(float frameTime)
     {
-        var scannerQuery = EntityQueryEnumerator<NodeScannerConnectedComponent, NodeScannerComponent, TransformComponent>();
+        var scannerQuery =
+            EntityQueryEnumerator<NodeScannerConnectedComponent, NodeScannerComponent, TransformComponent>();
         while (scannerQuery.MoveNext(out var uid, out var connected, out var scanner, out var transform))
         {
             if (connected.NextUpdate > _timing.CurTime)
@@ -48,9 +49,10 @@ public sealed class NodeScannerSystem : EntitySystem
         if (args.Handled || !args.CanReach || args.Target is not { } target || !HasComp<XenoArtifactComponent>(target))
             return;
 
-        Entity<XenoArtifactUnlockingComponent?> unlockingEnt = TryComp<XenoArtifactUnlockingComponent>(target, out var unlockingComponent)
-            ? (target, unlockingComponent)
-            : (target, null);
+        Entity<XenoArtifactUnlockingComponent?> unlockingEnt =
+            TryComp<XenoArtifactUnlockingComponent>(target, out var unlockingComponent)
+                ? (target, unlockingComponent)
+                : (target, null);
 
         Attach((uid, component), unlockingEnt, args.User);
 
@@ -68,7 +70,7 @@ public sealed class NodeScannerSystem : EntitySystem
         var verb = new UtilityVerb
         {
             Act = () => Attach((uid, component), (args.Target, unlockingComponent), args.User),
-            Text = Loc.GetString("node-scan-tooltip")
+            Text = Loc.GetString("node-scan-tooltip"),
         };
 
         args.Verbs.Add(verb);
@@ -95,6 +97,6 @@ public sealed class NodeScannerSystem : EntitySystem
             Dirty(device, connected);
         }
 
-        _ui.TryOpenUi((device, null), NodeScannerUiKey.Key, actor, predicted: true);
+        _ui.TryOpenUi((device, null), NodeScannerUiKey.Key, actor, true);
     }
 }

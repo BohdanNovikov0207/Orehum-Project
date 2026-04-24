@@ -7,11 +7,11 @@ namespace Content.Shared.Module;
 
 public record struct RequiredAssembly(string AssemblyName, bool IsServer = true, bool IsClient = false)
 {
-    public static RequiredAssembly Server(string assembly) => new(assembly, IsServer: true, IsClient: false);
+    public static RequiredAssembly Server(string assembly) => new(assembly, true, false);
 
-    public static RequiredAssembly Client(string assembly) => new(assembly, IsServer: false, IsClient: true);
+    public static RequiredAssembly Client(string assembly) => new(assembly, false, true);
 
-    public static RequiredAssembly Shared(string assembly) => new(assembly, IsServer: true, IsClient: true);
+    public static RequiredAssembly Shared(string assembly) => new(assembly, true, true);
 }
 
 public abstract class ModulePack

@@ -4,8 +4,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared._Shitmed.Medical.Surgery.Wounds;
 using Content.Goobstation.Maths.FixedPoint;
+using Content.Shared._Shitmed.Medical.Surgery.Wounds;
 
 namespace Content.Shared._Shitmed.Medical.Surgery.Traumas.Systems;
 

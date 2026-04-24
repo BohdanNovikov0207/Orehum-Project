@@ -14,7 +14,6 @@
 
 using Content.Shared.Chemistry.Components;
 using Content.Shared.DoAfter;
-using Content.Shared.Nutrition.Components;
 using Content.Shared.Nutrition.Prototypes;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
@@ -22,16 +21,16 @@ using Robust.Shared.Serialization;
 namespace Content.Shared.Nutrition;
 
 /// <summary>
-///     Do after even for food and drink.
+/// Do after even for food and drink.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class ConsumeDoAfterEvent : DoAfterEvent
 {
-    [DataField("solution", required: true)]
-    public string Solution = default!;
-
     [DataField("flavorMessage", required: true)]
     public string FlavorMessage = default!;
+
+    [DataField("solution", required: true)]
+    public string Solution = default!;
 
     private ConsumeDoAfterEvent()
     {
@@ -47,16 +46,16 @@ public sealed partial class ConsumeDoAfterEvent : DoAfterEvent
 }
 
 /// <summary>
-///     Do after event for vape.
+/// Do after event for vape.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class VapeDoAfterEvent : DoAfterEvent
 {
+    [DataField("forced", required: true)]
+    public bool Forced;
+
     [DataField("solution", required: true)]
     public Solution Solution = default!;
-
-    [DataField("forced", required: true)]
-    public bool Forced = default!;
 
     private VapeDoAfterEvent()
     {
@@ -75,17 +74,21 @@ public sealed partial class VapeDoAfterEvent : DoAfterEvent
 /// Raised before food is sliced
 /// </summary>
 [ByRefEvent]
-public record struct SliceFoodEvent();
+public record struct SliceFoodEvent;
 
 /// <summary>
 /// is called after a successful attempt at slicing food.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class SliceFoodDoAfterEvent : SimpleDoAfterEvent
 {
 }
 
 /// <summary>
-///    Raised on FoodSequence start element entity when new ingredient is added to FoodSequence
+/// Raised on FoodSequence start element entity when new ingredient is added to FoodSequence
 /// </summary>
-public record struct FoodSequenceIngredientAddedEvent(EntityUid Start, EntityUid Element, ProtoId<FoodSequenceElementPrototype> Proto, EntityUid? User = null);
+public record struct FoodSequenceIngredientAddedEvent(
+    EntityUid Start,
+    EntityUid Element,
+    ProtoId<FoodSequenceElementPrototype> Proto,
+    EntityUid? User = null);

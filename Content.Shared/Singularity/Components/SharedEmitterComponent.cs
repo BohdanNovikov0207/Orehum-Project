@@ -24,36 +24,26 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Singularity.Components;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class EmitterComponent : Component
 {
-    public CancellationTokenSource? TimerCancel;
-
-    // whether the power switch is in "on"
-    [ViewVariables] public bool IsOn;
-    // Whether the power switch is on AND the machine has enough power (so is actively firing)
-    [ViewVariables] public bool IsPowered;
-
-    /// <summary>
-    /// counts the number of consecutive shots fired.
-    /// </summary>
-    [ViewVariables]
-    public int FireShotCounter;
-
     /// <summary>
     /// The entity that is spawned when the emitter fires.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public EntProtoId BoltType = "EmitterBolt";
 
-    [DataField]
-    public List<EntProtoId> SelectableTypes = new();
-
     /// <summary>
-    /// The current amount of power being used.
+    /// The current maximum delay between bursts.
     /// </summary>
     [DataField]
-    public int PowerUseActive = 600;
+    public TimeSpan FireBurstDelayMax = TimeSpan.FromSeconds(10);
+
+    /// <summary>
+    /// The current minimum delay between bursts.
+    /// </summary>
+    [DataField]
+    public TimeSpan FireBurstDelayMin = TimeSpan.FromSeconds(4);
 
     /// <summary>
     /// The amount of shots that are fired in a single "burst"
@@ -68,34 +58,16 @@ public sealed partial class EmitterComponent : Component
     public TimeSpan FireInterval = TimeSpan.FromSeconds(2);
 
     /// <summary>
-    /// The current minimum delay between bursts.
+    /// counts the number of consecutive shots fired.
     /// </summary>
-    [DataField]
-    public TimeSpan FireBurstDelayMin = TimeSpan.FromSeconds(4);
+    [ViewVariables]
+    public int FireShotCounter;
 
-    /// <summary>
-    /// The current maximum delay between bursts.
-    /// </summary>
-    [DataField]
-    public TimeSpan FireBurstDelayMax = TimeSpan.FromSeconds(10);
+    // whether the power switch is in "on"
+    [ViewVariables] public bool IsOn;
 
-    /// <summary>
-    /// The visual state that is set when the emitter is turned on
-    /// </summary>
-    [DataField]
-    public string? OnState = "beam";
-
-    /// <summary>
-    /// The visual state that is set when the emitter doesn't have enough power.
-    /// </summary>
-    [DataField]
-    public string? UnderpoweredState = "underpowered";
-
-    /// <summary>
-    /// Signal port that turns on the emitter.
-    /// </summary>
-    [DataField]
-    public ProtoId<SinkPortPrototype> OnPort = "On";
+    // Whether the power switch is on AND the machine has enough power (so is actively firing)
+    [ViewVariables] public bool IsPowered;
 
     /// <summary>
     /// Signal port that turns off the emitter.
@@ -104,34 +76,63 @@ public sealed partial class EmitterComponent : Component
     public ProtoId<SinkPortPrototype> OffPort = "Off";
 
     /// <summary>
-    /// Signal port that toggles the emitter on or off.
+    /// Signal port that turns on the emitter.
     /// </summary>
     [DataField]
-    public ProtoId<SinkPortPrototype> TogglePort = "Toggle";
+    public ProtoId<SinkPortPrototype> OnPort = "On";
+
+    /// <summary>
+    /// The visual state that is set when the emitter is turned on
+    /// </summary>
+    [DataField]
+    public string? OnState = "beam";
+
+    /// <summary>
+    /// The current amount of power being used.
+    /// </summary>
+    [DataField]
+    public int PowerUseActive = 600;
+
+    [DataField]
+    public List<EntProtoId> SelectableTypes = new();
 
     /// <summary>
     /// Map of signal ports to entity prototype IDs of the entity that will be fired.
     /// </summary>
     [DataField]
     public Dictionary<ProtoId<SinkPortPrototype>, EntProtoId> SetTypePorts = new();
+
+    public CancellationTokenSource? TimerCancel;
+
+    /// <summary>
+    /// Signal port that toggles the emitter on or off.
+    /// </summary>
+    [DataField]
+    public ProtoId<SinkPortPrototype> TogglePort = "Toggle";
+
+    /// <summary>
+    /// The visual state that is set when the emitter doesn't have enough power.
+    /// </summary>
+    [DataField]
+    public string? UnderpoweredState = "underpowered";
 }
 
-[NetSerializable, Serializable]
+[NetSerializable] [Serializable]
 public enum EmitterVisuals : byte
 {
-    VisualState
+    VisualState,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum EmitterVisualLayers : byte
 {
-    Lights
+    Lights,
 }
 
-[NetSerializable, Serializable]
+[NetSerializable] [Serializable]
 public enum EmitterVisualState
 {
     On,
     Underpowered,
-    Off
+    Off,
 }

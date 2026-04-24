@@ -7,16 +7,15 @@
 
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using Content.Shared.Body.Components;
-using Content.Shared._Shitmed.Medical.Surgery.Traumas.Components;
-using Content.Shared._Shitmed.Medical.Surgery.Wounds.Components;
-using Content.Shared.Damage;
-using Content.Shared.Damage.Prototypes;
 using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared._Shitmed.Medical.Surgery.Pain.Components;
 using Content.Shared._Shitmed.Medical.Surgery.Pain.Systems;
+using Content.Shared._Shitmed.Medical.Surgery.Traumas.Components;
+using Content.Shared._Shitmed.Medical.Surgery.Wounds.Components;
+using Content.Shared.Body.Components;
 using Content.Shared.Body.Part;
-
+using Content.Shared.Damage;
+using Content.Shared.Damage.Prototypes;
 
 namespace Content.Shared._Shitmed.Medical.Surgery.Wounds.Systems;
 
@@ -91,7 +90,10 @@ public partial class WoundSystem
     /// <param name="healed">The total amount of bleeding that was healed</param>
     /// <param name="component">Optional body component if already resolved</param>
     /// <returns>True if any bleeding was healed, false otherwise</returns>
-    public bool TryHealMostSevereBleedingWoundables(EntityUid body, float healAmount, out FixedPoint2 healed, BodyComponent? component = null)
+    public bool TryHealMostSevereBleedingWoundables(EntityUid body,
+        float healAmount,
+        out FixedPoint2 healed,
+        BodyComponent? component = null)
     {
         healed = FixedPoint2.Zero;
         if (!Resolve(body, ref component) || healAmount <= 0)
@@ -106,8 +108,8 @@ public partial class WoundSystem
         var bleedingWoundables = new List<(EntityUid Woundable, FixedPoint2 BleedAmount)>();
         foreach (var (bodyPart, _) in _body.GetBodyChildren(body))
         {
-            FixedPoint2 totalBleedAmount = FixedPoint2.Zero;
-            bool hasBleedingWounds = false;
+            var totalBleedAmount = FixedPoint2.Zero;
+            var hasBleedingWounds = false;
             foreach (var wound in GetWoundableWounds(bodyPart))
             {
                 if (!TryComp<BleedInflicterComponent>(wound, out var bleeds) || !bleeds.IsBleeding)
@@ -127,8 +129,8 @@ public partial class WoundSystem
             .Select(x => x.Woundable)
             .ToList();
 
-        float remainingHealAmount = healAmount * sortedWoundables.Count();
-        bool anyHealed = false;
+        var remainingHealAmount = healAmount * sortedWoundables.Count();
+        var anyHealed = false;
 
         // Apply healing to each woundable in order
         foreach (var woundable in sortedWoundables)
@@ -137,7 +139,7 @@ public partial class WoundSystem
                 break;
 
             FixedPoint2 modifiedBleed;
-            bool didHeal = TryHealBleedingWounds(woundable, -remainingHealAmount, out modifiedBleed);
+            var didHeal = TryHealBleedingWounds(woundable, -remainingHealAmount, out modifiedBleed);
             if (didHeal)
             {
                 anyHealed = true;
@@ -152,7 +154,10 @@ public partial class WoundSystem
         return anyHealed;
     }
 
-    public bool TryHealBleedingWounds(EntityUid woundable, float bleedStopAbility, out FixedPoint2 modifiedBleed, WoundableComponent? component = null)
+    public bool TryHealBleedingWounds(EntityUid woundable,
+        float bleedStopAbility,
+        out FixedPoint2 modifiedBleed,
+        WoundableComponent? component = null)
     {
         modifiedBleed = FixedPoint2.Zero; // Goobstation
         if (!Resolve(woundable, ref component))
@@ -179,6 +184,7 @@ public partial class WoundSystem
 
             Dirty(wound, bleeds);
         }
+
         return modifiedBleed <= -bleedStopAbility; // Goobstation
     }
 
@@ -207,9 +213,7 @@ public partial class WoundSystem
 
         // Update pain state after healing wounds if any wounds were healed
         if (woundsToHeal.Count > 0)
-        {
             UpdatePainAfterHealing(woundable);
-        }
     }
 
     public bool TryHealWoundsOnWoundable(EntityUid woundable,
@@ -311,10 +315,7 @@ public partial class WoundSystem
         foreach (var (key, value) in damage.DamageDict)
         {
             if (TryHealWoundsOnWoundable(woundable, -value, key, out var tempHealed, component, ignoreMultipliers))
-            {
                 healed.Add(key, tempHealed);
-                continue;
-            }
         }
 
         return healed.Any();
@@ -351,8 +352,10 @@ public partial class WoundSystem
         bool healable = false)
     {
         if (healable)
+        {
             return GetWoundableWounds(woundable)
                 .Any(wound => wound.Comp.DamageType == damageType);
+        }
 
         return GetWoundableWounds(woundable).Any(wound => wound.Comp.DamageType == damageType);
     }
@@ -363,8 +366,10 @@ public partial class WoundSystem
         bool healable = false)
     {
         if (healable)
+        {
             return GetWoundableWounds(woundable)
                 .Any(wound => wound.Comp.DamageGroup == damageGroup);
+        }
 
         return GetWoundableWounds(woundable).Any(wound => wound.Comp.DamageGroup == damageGroup);
     }
@@ -383,17 +388,22 @@ public partial class WoundSystem
             return FixedPoint2.Zero;
 
         var woundHealingMultiplier =
-            _prototype.Index<DamageTypePrototype>(Comp<WoundComponent>(wound).DamageType).WoundHealingMultiplier;
+            _prototype.Index(Comp<WoundComponent>(wound).DamageType).WoundHealingMultiplier;
 
         if (component.HealingMultipliers.Count == 0)
             return severity * woundHealingMultiplier;
 
         var toMultiply =
-            component.HealingMultipliers.Sum(multiplier => (float) multiplier.Value.Change) / component.HealingMultipliers.Count;
+            component.HealingMultipliers.Sum(multiplier => (float) multiplier.Value.Change) /
+            component.HealingMultipliers.Count;
         return severity * toMultiply * woundHealingMultiplier;
     }
 
-    public bool TryAddHealingRateMultiplier(EntityUid owner, EntityUid woundable, string identifier, FixedPoint2 change, WoundableComponent? component = null)
+    public bool TryAddHealingRateMultiplier(EntityUid owner,
+        EntityUid woundable,
+        string identifier,
+        FixedPoint2 change,
+        WoundableComponent? component = null)
     {
         if (!Resolve(woundable, ref component) || !_net.IsServer)
             return false;
@@ -401,9 +411,11 @@ public partial class WoundSystem
         return component.HealingMultipliers.TryAdd(owner, new WoundableHealingMultiplier(change, identifier));
     }
 
-    public bool TryRemoveHealingRateMultiplier(EntityUid owner, EntityUid woundable, WoundableComponent? component = null)
+    public bool TryRemoveHealingRateMultiplier(EntityUid owner,
+        EntityUid woundable,
+        WoundableComponent? component = null)
     {
-        if (!Resolve(woundable, ref component)  || !_net.IsServer)
+        if (!Resolve(woundable, ref component) || !_net.IsServer)
             return false;
 
         return component.HealingMultipliers.Remove(owner);
@@ -425,7 +437,8 @@ public partial class WoundSystem
         if (ev.Cancelled)
             return false;
 
-        var ev1 = new WoundHealAttemptEvent((holdingWoundable, Comp<WoundableComponent>(holdingWoundable)), ignoreBlockers);
+        var ev1 = new WoundHealAttemptEvent((holdingWoundable, Comp<WoundableComponent>(holdingWoundable)),
+            ignoreBlockers);
         RaiseLocalEvent(wound, ref ev1);
 
         return !ev1.Cancelled;
@@ -455,13 +468,15 @@ public partial class WoundSystem
     /// <param name="target"></param>
     /// <param name="woundables"></param>
     /// <returns></returns>
-    public bool TryGetAllOwnerWoundedParts(EntityUid target, [NotNullWhen(true)] out List<Entity<WoundableComponent>> woundables)
+    public bool TryGetAllOwnerWoundedParts(EntityUid target,
+        [NotNullWhen(true)] out List<Entity<WoundableComponent>> woundables)
     {
         woundables = [];
 
         foreach (var bodyPart in _body.GetBodyChildren(target))
         {
-            if (!TryComp<WoundableComponent>(bodyPart.Id, out var woundableComp) || !woundableComp.Wounds.ContainedEntities.Any())
+            if (!TryComp<WoundableComponent>(bodyPart.Id, out var woundableComp) ||
+                !woundableComp.Wounds.ContainedEntities.Any())
                 continue;
 
             woundables.Add((bodyPart.Id, woundableComp));
@@ -484,7 +499,7 @@ public partial class WoundSystem
         if (!TryGetAllOwnerWoundedParts(target, out var woundables) || !TryGetAllOwnerWounds(target, out var wounds))
             return false;
 
-        DamageSpecifier healingPerPart = new DamageSpecifier(healing);
+        var healingPerPart = new DamageSpecifier(healing);
         healingPerPart.DamageDict.Clear();
 
         var woundCountByType = wounds
@@ -504,7 +519,11 @@ public partial class WoundSystem
 
         foreach (var woundable in woundables)
         {
-            if (!TryHealWoundsOnWoundable(woundable.Owner, healingPerPart, out var healed, woundable.Comp, ignoreBlockers))
+            if (!TryHealWoundsOnWoundable(woundable.Owner,
+                    healingPerPart,
+                    out var healed,
+                    woundable.Comp,
+                    ignoreBlockers))
                 continue;
 
             healedWounds++;

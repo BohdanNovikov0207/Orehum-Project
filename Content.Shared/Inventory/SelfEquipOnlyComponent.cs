@@ -80,7 +80,7 @@ namespace Content.Shared.Inventory;
 /// <summary>
 /// This is used for an item that can only be equipped/unequipped by the user.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(SelfEquipOnlySystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(SelfEquipOnlySystem))]
 public sealed partial class SelfEquipOnlyComponent : Component
 {
     /// <summary>

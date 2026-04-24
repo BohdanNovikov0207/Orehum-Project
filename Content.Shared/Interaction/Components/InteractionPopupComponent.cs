@@ -16,7 +16,7 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Shared.Interaction.Components;
 
-[RegisterComponent, Access(typeof(InteractionPopupSystem))]
+[RegisterComponent] [Access(typeof(InteractionPopupSystem))]
 public sealed partial class InteractionPopupComponent : Component
 {
     /// <summary>
@@ -27,11 +27,17 @@ public sealed partial class InteractionPopupComponent : Component
     public TimeSpan InteractDelay = TimeSpan.FromSeconds(1.0);
 
     /// <summary>
-    /// String will be used to fetch the localized message to be played if the interaction succeeds.
-    /// Nullable in case none is specified on the yaml prototype.
+    /// Sound effect to be played when the interaction fails.
+    /// Nullable in case no path is specified on the yaml prototype.
     /// </summary>
-    [DataField("interactSuccessString")]
-    public string? InteractSuccessString;
+    [DataField("interactFailureSound")]
+    public SoundSpecifier? InteractFailureSound;
+
+    /// <summary>
+    /// a prototype that will spawn upon failure interaction (as planned only for special effects)
+    /// </summary>
+    [DataField] [ViewVariables(VVAccess.ReadWrite)]
+    public EntProtoId? InteractFailureSpawn;
 
     /// <summary>
     /// String will be used to fetch the localized message to be played if the interaction fails.
@@ -48,23 +54,38 @@ public sealed partial class InteractionPopupComponent : Component
     public SoundSpecifier? InteractSuccessSound;
 
     /// <summary>
-    /// Sound effect to be played when the interaction fails.
-    /// Nullable in case no path is specified on the yaml prototype.
-    /// </summary>
-    [DataField("interactFailureSound")]
-    public SoundSpecifier? InteractFailureSound;
-
-    /// <summary>
     /// a prototype that will spawn upon successful interaction (as planned only for special effects)
     /// </summary>
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    [DataField] [ViewVariables(VVAccess.ReadWrite)]
     public EntProtoId? InteractSuccessSpawn;
 
     /// <summary>
-    /// a prototype that will spawn upon failure interaction (as planned only for special effects)
+    /// String will be used to fetch the localized message to be played if the interaction succeeds.
+    /// Nullable in case none is specified on the yaml prototype.
     /// </summary>
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
-    public EntProtoId? InteractFailureSpawn;
+    [DataField("interactSuccessString")]
+    public string? InteractSuccessString;
+
+    [ViewVariables(VVAccess.ReadWrite)]
+    public TimeSpan LastInteractTime;
+
+    /// <summary>
+    /// If set, shows a message to all surrounding players but NOT the current player.
+    /// </summary>
+    [DataField("messagePerceivedByOthers")]
+    public string? MessagePerceivedByOthers;
+
+    /// <summary>
+    /// If set to true, activate interactions will also trigger the component.
+    /// </summary>
+    [DataField]
+    public bool OnActivate;
+
+    /// <summary>
+    /// Will the sound effect be perceived by entities not involved in the interaction?
+    /// </summary>
+    [DataField("soundPerceivedByOthers")]
+    public bool SoundPerceivedByOthers = true;
 
     /// <summary>
     /// Chance that an interaction attempt will succeed.
@@ -74,25 +95,4 @@ public sealed partial class InteractionPopupComponent : Component
     /// </summary>
     [DataField("successChance")]
     public float SuccessChance = 1.0f; // Always succeed, unless specified otherwise on the yaml prototype.
-
-    /// <summary>
-    /// If set, shows a message to all surrounding players but NOT the current player.
-    /// </summary>
-    [DataField("messagePerceivedByOthers")]
-    public string? MessagePerceivedByOthers;
-
-    /// <summary>
-    /// Will the sound effect be perceived by entities not involved in the interaction?
-    /// </summary>
-    [DataField("soundPerceivedByOthers")]
-    public bool SoundPerceivedByOthers = true;
-
-    [ViewVariables(VVAccess.ReadWrite)]
-    public TimeSpan LastInteractTime;
-
-    /// <summary>
-    /// If set to true, activate interactions will also trigger the component.
-    /// </summary>
-    [DataField]
-    public bool OnActivate;
 }

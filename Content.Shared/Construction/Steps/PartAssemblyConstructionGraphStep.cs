@@ -13,7 +13,7 @@ namespace Content.Shared.Construction.Steps;
 public sealed partial class PartAssemblyConstructionGraphStep : ConstructionGraphStep
 {
     /// <summary>
-    /// A valid ID on <see cref="PartAssemblyComponent"/>'s dictionary of strings to part lists.
+    /// A valid ID on <see cref="PartAssemblyComponent" />'s dictionary of strings to part lists.
     /// </summary>
     [DataField]
     public string AssemblyId = string.Empty;
@@ -24,21 +24,14 @@ public sealed partial class PartAssemblyConstructionGraphStep : ConstructionGrap
     [DataField]
     public LocId GuideString = "construction-guide-condition-part-assembly";
 
-    public bool Condition(EntityUid uid, IEntityManager entityManager)
-    {
-        return entityManager.System<PartAssemblySystem>().IsAssemblyFinished(uid, AssemblyId);
-    }
+    public bool Condition(EntityUid uid, IEntityManager entityManager) =>
+        entityManager.System<PartAssemblySystem>().IsAssemblyFinished(uid, AssemblyId);
 
-    public override void DoExamine(ExaminedEvent args)
-    {
-        args.PushMarkup(Loc.GetString(GuideString));
-    }
+    public override void DoExamine(ExaminedEvent args) => args.PushMarkup(Loc.GetString(GuideString));
 
-    public override ConstructionGuideEntry GenerateGuideEntry()
-    {
-        return new ConstructionGuideEntry
+    public override ConstructionGuideEntry GenerateGuideEntry() =>
+        new()
         {
             Localization = GuideString,
         };
-    }
 }

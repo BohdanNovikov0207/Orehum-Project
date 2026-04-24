@@ -8,11 +8,11 @@ namespace Content.Shared.Xenoarchaeology.Artifact.XAT;
 /// </summary>
 public sealed class XATCompNearbySystem : BaseQueryUpdateXATSystem<XATCompNearbyComponent>
 {
-    [Dependency] private readonly EntityLookupSystem _entityLookup = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
-
     /// <summary> Pre-allocated and re-used collection.</summary>
     private readonly HashSet<Entity<IComponent>> _entities = new();
+
+    [Dependency] private readonly EntityLookupSystem _entityLookup = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     /// <inheritdoc />
     protected override void UpdateXAT(

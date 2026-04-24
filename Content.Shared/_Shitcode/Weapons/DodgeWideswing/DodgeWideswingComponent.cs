@@ -5,9 +5,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Robust.Shared.GameStates;
-using Robust.Shared.Localization;
-
 namespace Content.Shared._Goobstation.Weapons.DodgeWideswing;
 
 /// <summary>
@@ -18,6 +15,9 @@ public sealed partial class DodgeWideswingComponent : Component
 {
     [DataField]
     public float Chance = 1f;
+
+    [DataField]
+    public LocId? PopupId = "wideswing-dodge-generic";
 
     /// <summary>
     /// How much stamina damage to apply per damage from source.
@@ -30,7 +30,4 @@ public sealed partial class DodgeWideswingComponent : Component
     /// </summary>
     [DataField]
     public bool WhenKnockedDown = false;
-
-    [DataField]
-    public LocId? PopupId = "wideswing-dodge-generic";
 }

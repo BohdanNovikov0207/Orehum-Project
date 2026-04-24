@@ -26,9 +26,9 @@ public struct ExtinguishEvent : IInventoryRelayEvent
 /// A flammable entity has been extinguished.
 /// </summary>
 /// <remarks>
-/// This can occur on both <c>Flammable</c> entities as well as <see cref="SmokableComponent"/>.
+/// This can occur on both <c>Flammable</c> entities as well as <see cref="SmokableComponent" />.
 /// </remarks>
-/// <seealso cref="ExtinguishEvent"/>
+/// <seealso cref="ExtinguishEvent" />
 [ByRefEvent]
 public struct ExtinguishedEvent;
 
@@ -36,7 +36,7 @@ public struct ExtinguishedEvent;
 /// A flammable entity has been ignited.
 /// </summary>
 /// <remarks>
-/// This can occur on both <c>Flammable</c> entities as well as <see cref="SmokableComponent"/>.
+/// This can occur on both <c>Flammable</c> entities as well as <see cref="SmokableComponent" />.
 /// </remarks>
 [ByRefEvent]
 public struct IgnitedEvent;

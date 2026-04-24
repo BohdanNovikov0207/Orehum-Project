@@ -12,8 +12,8 @@ namespace Content.Shared._Lavaland.Megafauna.Systems;
 /// </summary>
 public sealed class MegafaunaActionsSystem : EntitySystem
 {
-    [Dependency] private readonly SharedTransformSystem _xform = default!;
     [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly SharedTransformSystem _xform = default!;
 
     public override void Initialize()
     {
@@ -32,7 +32,8 @@ public sealed class MegafaunaActionsSystem : EntitySystem
 
         EntityUid spawned;
         if (args.Entity != null && args.AttachToTarget)
-            spawned = EntityManager.CreateEntityUninitialized(args.Spawn, new EntityCoordinates(args.Entity.Value, Vector2.Zero));
+            spawned = EntityManager.CreateEntityUninitialized(args.Spawn,
+                new EntityCoordinates(args.Entity.Value, Vector2.Zero));
         else if (args.SpawnAtUser)
             spawned = EntityManager.CreateEntityUninitialized(args.Spawn, Transform(args.Performer).Coordinates);
         else
@@ -43,7 +44,8 @@ public sealed class MegafaunaActionsSystem : EntitySystem
 
         // We run MapInitEvent only after SpawnedByActionEvent so all values are already set properly.
         EntityManager.InitializeEntity(spawned);
-        EntityManager.RunMapInit(spawned, MetaData(spawned)); // InitializeEntity doesn't trigger MapInit event by itself....
+        EntityManager.RunMapInit(spawned,
+            MetaData(spawned)); // InitializeEntity doesn't trigger MapInit event by itself....
 
         if (args.Entity != null && args.AttachToTarget)
             _xform.SetParent(spawned, args.Entity.Value); // It doesn't work without that for whatever reason??

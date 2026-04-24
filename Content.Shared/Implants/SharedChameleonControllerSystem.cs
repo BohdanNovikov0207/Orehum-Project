@@ -1,8 +1,6 @@
-﻿using Robust.Shared.Prototypes;
+﻿namespace Content.Shared.Implants;
 
-namespace Content.Shared.Implants;
-
-public abstract partial class SharedChameleonControllerSystem : EntitySystem
+public abstract class SharedChameleonControllerSystem : EntitySystem
 {
     [Dependency] private readonly SharedUserInterfaceSystem _uiSystem = default!;
 

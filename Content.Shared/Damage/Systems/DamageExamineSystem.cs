@@ -9,15 +9,17 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Linq;
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Damage.Components;
 using Content.Shared.Damage.Events;
 using Content.Shared.Damage.Prototypes;
 using Content.Shared.Examine;
-using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Verbs;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
-using System.Linq; // Goobstation Change
+
+// Goobstation Change
 
 namespace Content.Shared.Damage.Systems;
 
@@ -42,7 +44,9 @@ public sealed class DamageExamineSystem : EntitySystem
         RaiseLocalEvent(uid, ref ev);
         if (!ev.Message.IsEmpty)
         {
-            _examine.AddDetailedExamineVerb(args, component, ev.Message,
+            _examine.AddDetailedExamineVerb(args,
+                component,
+                ev.Message,
                 Loc.GetString("damage-examinable-verb-text"),
                 "/Textures/Interface/VerbIcons/smite.svg.192dpi.png",
                 Loc.GetString("damage-examinable-verb-message")
@@ -54,9 +58,7 @@ public sealed class DamageExamineSystem : EntitySystem
     {
         var markup = GetDamageExamine(damageSpecifier, type);
         if (!message.IsEmpty)
-        {
             message.PushNewline();
-        }
         message.AddMessage(markup);
     }
 
@@ -68,9 +70,7 @@ public sealed class DamageExamineSystem : EntitySystem
         var msg = new FormattedMessage();
 
         if (string.IsNullOrEmpty(type))
-        {
             msg.AddMarkupOrThrow(Loc.GetString("damage-examine"));
-        }
         else
         {
             if (damageSpecifier.GetTotal() == FixedPoint2.Zero && !damageSpecifier.AnyPositive())
@@ -87,7 +87,9 @@ public sealed class DamageExamineSystem : EntitySystem
             if (damage.Value != FixedPoint2.Zero)
             {
                 msg.PushNewline();
-                msg.AddMarkupOrThrow(Loc.GetString("damage-value", ("type", _prototype.Index<DamageTypePrototype>(damage.Key).LocalizedName), ("amount", damage.Value)));
+                msg.AddMarkupOrThrow(Loc.GetString("damage-value",
+                    ("type", _prototype.Index<DamageTypePrototype>(damage.Key).LocalizedName),
+                    ("amount", damage.Value)));
             }
         }
 
@@ -96,7 +98,8 @@ public sealed class DamageExamineSystem : EntitySystem
         if (meaningfulDamage > 0)
         {
             msg.PushNewline();
-            msg.AddMarkupOrThrow(Loc.GetString("damage-hits-to-kill", ("count", (100f / (float) meaningfulDamage).ToString("F1"))));
+            msg.AddMarkupOrThrow(Loc.GetString("damage-hits-to-kill",
+                ("count", (100f / (float) meaningfulDamage).ToString("F1"))));
         }
 
         return msg;
@@ -114,6 +117,7 @@ public sealed class DamageExamineSystem : EntitySystem
 
             total += value;
         }
+
         return total;
     }
 }

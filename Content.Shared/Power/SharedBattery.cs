@@ -5,7 +5,7 @@ namespace Content.Shared.Power;
 /// <summary>
 /// UI key for large battery (SMES/substation) UIs.
 /// </summary>
-[NetSerializable, Serializable]
+[NetSerializable] [Serializable]
 public enum BatteryUiKey : byte
 {
     Key,
@@ -14,8 +14,8 @@ public enum BatteryUiKey : byte
 /// <summary>
 /// UI state for large battery (SMES/substation) UIs.
 /// </summary>
-/// <seealso cref="BatteryUiKey"/>
-[Serializable, NetSerializable]
+/// <seealso cref="BatteryUiKey" />
+[Serializable] [NetSerializable]
 public sealed class BatteryBuiState : BoundUserInterfaceState
 {
     // These are mostly just regular Pow3r parameters.
@@ -23,31 +23,31 @@ public sealed class BatteryBuiState : BoundUserInterfaceState
     // I/O
     public bool CanCharge;
     public bool CanDischarge;
-    public bool SupplyingNetworkHasPower;
-    public bool LoadingNetworkHasPower;
-    public float CurrentReceiving;
-    public float CurrentSupply;
-
-    // Charge
-    public float MaxChargeRate;
-    public float MinMaxChargeRate;
-    public float MaxMaxChargeRate;
-    public float Efficiency;
-
-    // Discharge
-    public float MaxSupply;
-    public float MinMaxSupply;
-    public float MaxMaxSupply;
+    public float Capacity;
 
     // Storage
     public float Charge;
-    public float Capacity;
+    public float CurrentReceiving;
+    public float CurrentSupply;
+    public float Efficiency;
+    public bool LoadingNetworkHasPower;
+
+    // Charge
+    public float MaxChargeRate;
+    public float MaxMaxChargeRate;
+    public float MaxMaxSupply;
+
+    // Discharge
+    public float MaxSupply;
+    public float MinMaxChargeRate;
+    public float MinMaxSupply;
+    public bool SupplyingNetworkHasPower;
 }
 
 /// <summary>
 /// Sent client to server to change the input breaker state on a large battery.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class BatterySetInputBreakerMessage(bool on) : BoundUserInterfaceMessage
 {
     public bool On = on;
@@ -56,7 +56,7 @@ public sealed class BatterySetInputBreakerMessage(bool on) : BoundUserInterfaceM
 /// <summary>
 /// Sent client to server to change the output breaker state on a large battery.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class BatterySetOutputBreakerMessage(bool on) : BoundUserInterfaceMessage
 {
     public bool On = on;
@@ -65,7 +65,7 @@ public sealed class BatterySetOutputBreakerMessage(bool on) : BoundUserInterface
 /// <summary>
 /// Sent client to server to change the charge rate on a large battery.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class BatterySetChargeRateMessage(float rate) : BoundUserInterfaceMessage
 {
     public float Rate = rate;
@@ -74,9 +74,8 @@ public sealed class BatterySetChargeRateMessage(float rate) : BoundUserInterface
 /// <summary>
 /// Sent client to server to change the discharge rate on a large battery.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class BatterySetDischargeRateMessage(float rate) : BoundUserInterfaceMessage
 {
     public float Rate = rate;
 }
-

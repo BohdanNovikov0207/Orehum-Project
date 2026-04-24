@@ -1,16 +1,13 @@
 namespace Content.Shared.Xenoarchaeology.Artifact.XAE;
 
 /// <summary>
-/// Base class for 
+/// Base class for
 /// </summary>
 /// <typeparam name="T"></typeparam>
 public abstract class BaseXAESystem<T> : EntitySystem where T : Component
 {
-    /// <inheritdoc/>
-    public override void Initialize()
-    {
-        SubscribeLocalEvent<T, XenoArtifactNodeActivatedEvent>(OnActivated);
-    }
+    /// <inheritdoc />
+    public override void Initialize() => SubscribeLocalEvent<T, XenoArtifactNodeActivatedEvent>(OnActivated);
 
     /// <summary>
     /// Handler for node activation.

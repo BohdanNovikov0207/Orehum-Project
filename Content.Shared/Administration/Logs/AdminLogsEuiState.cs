@@ -15,7 +15,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Administration.Logs;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class AdminLogsEuiState : EuiStateBase
 {
     public AdminLogsEuiState(int roundId, Dictionary<Guid, string> players, int roundLogs)
@@ -36,7 +36,7 @@ public sealed class AdminLogsEuiState : EuiStateBase
 
 public static class AdminLogsEuiMsg
 {
-    [Serializable, NetSerializable]
+    [Serializable] [NetSerializable]
     public sealed class SetLogFilter : EuiMessageBase
     {
         public SetLogFilter(string? search = null, bool invertTypes = false, HashSet<LogType>? types = null)
@@ -51,7 +51,7 @@ public static class AdminLogsEuiMsg
         public HashSet<LogType>? Types { get; set; }
     }
 
-    [Serializable, NetSerializable]
+    [Serializable] [NetSerializable]
     public sealed class NewLogs : EuiMessageBase
     {
         public NewLogs(List<SharedAdminLog> logs, bool replace, bool hasNext)
@@ -66,7 +66,7 @@ public static class AdminLogsEuiMsg
         public bool HasNext { get; set; }
     }
 
-    [Serializable, NetSerializable]
+    [Serializable] [NetSerializable]
     public sealed class LogsRequest : EuiMessageBase
     {
         public LogsRequest(
@@ -108,7 +108,7 @@ public static class AdminLogsEuiMsg
         public DateOrder DateOrder { get; set; }
     }
 
-    [Serializable, NetSerializable]
+    [Serializable] [NetSerializable]
     public sealed class NextLogsRequest : EuiMessageBase
     {
     }

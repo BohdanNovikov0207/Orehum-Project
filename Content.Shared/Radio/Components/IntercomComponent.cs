@@ -12,27 +12,27 @@ namespace Content.Shared.Radio.Components;
 /// <summary>
 /// Handles intercom ui and is authoritative on the channels an intercom can access.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState(true)]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState(true)]
 public sealed partial class IntercomComponent : Component
 {
+    [DataField] [AutoNetworkedField]
+    public ProtoId<RadioChannelPrototype>? CurrentChannel;
+
+    [DataField] [AutoNetworkedField]
+    public bool MicrophoneEnabled;
+
     /// <summary>
     /// Does this intercom require power to function
     /// </summary>
     [DataField]
     public bool RequiresPower = true;
 
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public bool SpeakerEnabled;
-
-    [DataField, AutoNetworkedField]
-    public bool MicrophoneEnabled;
-
-    [DataField, AutoNetworkedField]
-    public ProtoId<RadioChannelPrototype>? CurrentChannel;
 
     /// <summary>
     /// The list of radio channel prototypes this intercom can choose between.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public List<ProtoId<RadioChannelPrototype>> SupportedChannels = new();
 }

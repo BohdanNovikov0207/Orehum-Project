@@ -26,25 +26,26 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared._Lavaland.Shuttles;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum DockingConsoleUiKey : byte
 {
-    Key
+    Key,
 }
 
-[Serializable, NetSerializable]
-public sealed class DockingConsoleState(FTLState ftlState, StartEndTime ftlTime, List<DockingDestination> destinations) : BoundUserInterfaceState
+[Serializable] [NetSerializable]
+public sealed class DockingConsoleState(FTLState ftlState, StartEndTime ftlTime, List<DockingDestination> destinations)
+    : BoundUserInterfaceState
 {
+    public List<DockingDestination> Destinations = destinations;
     public FTLState FTLState = ftlState;
     public StartEndTime FTLTime = ftlTime;
-    public List<DockingDestination> Destinations = destinations;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class DockingConsoleFTLMessage(int index) : BoundUserInterfaceMessage
 {
     public int Index = index;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class DockingConsoleShuttleCheckMessage : BoundUserInterfaceMessage;

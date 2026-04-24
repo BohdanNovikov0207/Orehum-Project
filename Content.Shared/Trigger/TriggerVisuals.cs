@@ -15,7 +15,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Trigger;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum ProximityTriggerVisuals : byte
 {
     Off,
@@ -23,19 +23,19 @@ public enum ProximityTriggerVisuals : byte
     Active,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum ProximityTriggerVisualState : byte
 {
     State,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum TriggerVisuals : byte
 {
     VisualState,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum TriggerVisualState : byte
 {
     Primed,

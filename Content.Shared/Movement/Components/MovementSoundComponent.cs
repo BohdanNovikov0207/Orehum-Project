@@ -11,15 +11,15 @@ namespace Content.Shared.Movement.Components;
 /// <summary>
 /// Plays a sound whenever InputMover is running.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class MovementSoundComponent : Component
 {
     /// <summary>
     /// Sound to play when InputMover has inputs.
     /// </summary>
-    [DataField(required: true), AutoNetworkedField]
+    [DataField(required: true)] [AutoNetworkedField]
     public SoundSpecifier? Sound;
 
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public EntityUid? SoundEntity;
 }

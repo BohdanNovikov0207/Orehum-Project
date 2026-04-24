@@ -15,18 +15,18 @@ namespace Content.Shared.Mindshield.FakeMindShield;
 
 public sealed class SharedFakeMindShieldSystem : EntitySystem
 {
+    // This tag should be placed on the fake mindshield action so there is a way to easily identify it.
+    private static readonly ProtoId<TagPrototype> FakeMindShieldImplantTag = "FakeMindShieldImplant";
     [Dependency] private readonly SharedActionsSystem _actions = default!;
     [Dependency] private readonly TagSystem _tag = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
-
-    // This tag should be placed on the fake mindshield action so there is a way to easily identify it.
-    private static readonly ProtoId<TagPrototype> FakeMindShieldImplantTag = "FakeMindShieldImplant";
 
     public override void Initialize()
     {
         base.Initialize();
         SubscribeLocalEvent<FakeMindShieldComponent, FakeMindShieldToggleEvent>(OnToggleMindshield);
-        SubscribeLocalEvent<FakeMindShieldComponent, ChameleonControllerOutfitSelectedEvent>(OnChameleonControllerOutfitSelected);
+        SubscribeLocalEvent<FakeMindShieldComponent, ChameleonControllerOutfitSelectedEvent>(
+            OnChameleonControllerOutfitSelected);
     }
 
     private void OnToggleMindshield(EntityUid uid, FakeMindShieldComponent comp, FakeMindShieldToggleEvent toggleEvent)
@@ -35,7 +35,9 @@ public sealed class SharedFakeMindShieldSystem : EntitySystem
         Dirty(uid, comp);
     }
 
-    private void OnChameleonControllerOutfitSelected(EntityUid uid, FakeMindShieldComponent component, ChameleonControllerOutfitSelectedEvent args)
+    private void OnChameleonControllerOutfitSelected(EntityUid uid,
+        FakeMindShieldComponent component,
+        ChameleonControllerOutfitSelectedEvent args)
     {
         if (component.IsEnabled == args.ChameleonOutfit.HasMindShield)
             return;

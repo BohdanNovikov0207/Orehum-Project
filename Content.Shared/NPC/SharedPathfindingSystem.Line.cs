@@ -24,6 +24,8 @@ namespace Content.Shared.NPC;
 
 public abstract partial class SharedPathfindingSystem
 {
+    public delegate bool Vector2iCallback(Vector2i index);
+
     public static void GridCast(Vector2i start, Vector2i end, Vector2iCallback callback)
     {
         // https://gist.github.com/Pyr3z/46884d67641094d6cf353358566db566
@@ -34,10 +36,10 @@ public abstract partial class SharedPathfindingSystem
         if (!callback(start))
             return;
 
-        xinc  = (end.X < start.X) ? -1 : 1;
-        yinc  = (end.Y < start.Y) ? -1 : 1;
-        dx    = xinc * (end.X - start.X);
-        dy    = yinc * (end.Y - start.Y);
+        xinc = end.X < start.X ? -1 : 1;
+        yinc = end.Y < start.Y ? -1 : 1;
+        dx = xinc * (end.X - start.X);
+        dy = yinc * (end.Y - start.Y);
         var ax = start.X;
         var ay = start.Y;
 
@@ -53,7 +55,7 @@ public abstract partial class SharedPathfindingSystem
             // raycasts, for example, then perfect diagonals will check half as many
             // cells.
 
-            while (dx --> 0)
+            while (dx-- > 0)
             {
                 ax += xinc;
                 ay += yinc;
@@ -68,22 +70,22 @@ public abstract partial class SharedPathfindingSystem
 
         side = -1 * ((dx == 0 ? yinc : xinc) - 1);
 
-        i     = dx + dy;
+        i = dx + dy;
         error = dx - dy;
 
         dx *= 2;
         dy *= 2;
 
-        while (i --> 0)
+        while (i-- > 0)
         {
             if (error > 0 || error == side)
             {
-                ax    += xinc;
+                ax += xinc;
                 error -= dy;
             }
             else
             {
-                ay    += yinc;
+                ay += yinc;
                 error += dx;
             }
 
@@ -91,6 +93,4 @@ public abstract partial class SharedPathfindingSystem
                 return;
         }
     }
-
-    public delegate bool Vector2iCallback(Vector2i index);
 }

@@ -14,8 +14,11 @@ namespace Content.Shared._Goobstation.Wizard.Spellblade;
 [Prototype("spellbladeEnchantment")]
 public sealed partial class SpellbladeEnchantmentPrototype : IPrototype
 {
-    [IdDataField]
-    public string ID { get; private set; }
+    [DataField(required: true)]
+    public string Desc;
+
+    [DataField(required: true)]
+    public object? Event;
 
     [DataField(required: true)]
     public SpriteSpecifier Icon;
@@ -23,9 +26,6 @@ public sealed partial class SpellbladeEnchantmentPrototype : IPrototype
     [DataField(required: true)]
     public LocId Name;
 
-    [DataField(required: true)]
-    public string Desc;
-
-    [DataField(required: true)]
-    public object? Event;
+    [IdDataField]
+    public string ID { get; private set; }
 }

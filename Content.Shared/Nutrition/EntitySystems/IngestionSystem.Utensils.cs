@@ -1,5 +1,4 @@
-﻿using Content.Shared.Containers.ItemSlots;
-using Content.Shared.Hands.Components;
+﻿using Content.Shared.Hands.Components;
 using Content.Shared.Interaction;
 using Content.Shared.Nutrition.Components;
 using Content.Shared.Random.Helpers;
@@ -19,7 +18,8 @@ public sealed partial class IngestionSystem
 
     public void InitializeUtensils()
     {
-        SubscribeLocalEvent<UtensilComponent, AfterInteractEvent>(OnAfterInteract, after: new[] { typeof(ToolOpenableSystem) });
+        SubscribeLocalEvent<UtensilComponent, AfterInteractEvent>(OnAfterInteract,
+            after: new[] { typeof(ToolOpenableSystem) });
 
         SubscribeLocalEvent<EdibleComponent, GetUtensilsEvent>(OnGetEdibleUtensils);
 
@@ -45,7 +45,12 @@ public sealed partial class IngestionSystem
         //Prevents food usage with a wrong utensil
         if ((ev.Types & utensil.Comp.Types) == 0)
         {
-            _popup.PopupClient(Loc.GetString("ingestion-try-use-wrong-utensil", ("verb", GetEdibleVerb(target)),("food", target), ("utensil", utensil.Owner)), user, user);
+            _popup.PopupClient(Loc.GetString("ingestion-try-use-wrong-utensil",
+                    ("verb", GetEdibleVerb(target)),
+                    ("food", target),
+                    ("utensil", utensil.Owner)),
+                user,
+                user);
             return true;
         }
 
@@ -66,7 +71,8 @@ public sealed partial class IngestionSystem
             return;
 
         // TODO: Once we have predicted randomness delete this for something sane...
-        var seed = SharedRandomExtensions.HashCodeCombine(new() {(int)_timing.CurTick.Value, GetNetEntity(entity).Id, GetNetEntity(userUid).Id });
+        var seed = SharedRandomExtensions.HashCodeCombine(new List<int>
+            { (int) _timing.CurTick.Value, GetNetEntity(entity).Id, GetNetEntity(userUid).Id });
         var rand = new System.Random(seed);
 
         if (!rand.Prob(entity.Comp.BreakChance))
@@ -92,7 +98,10 @@ public sealed partial class IngestionSystem
         return TryGetUtensils(entity, ev.Types, ev.RequiredTypes, out utensils);
     }
 
-    public bool TryGetUtensils(Entity<HandsComponent?> entity, UtensilType types, UtensilType requiredTypes, out List<EntityUid> utensils)
+    public bool TryGetUtensils(Entity<HandsComponent?> entity,
+        UtensilType types,
+        UtensilType requiredTypes,
+        out List<EntityUid> utensils)
     {
         utensils = new List<EntityUid>();
 
@@ -103,7 +112,9 @@ public sealed partial class IngestionSystem
             return true;
 
         // If you don't have hands you can eat anything I guess.
-        if (!Resolve(entity, ref entity.Comp, false)) // You aren't allowed to eat with your hands in this hellish dystopia.
+        if (!Resolve(entity,
+                ref entity.Comp,
+                false)) // You aren't allowed to eat with your hands in this hellish dystopia.
             return true;
 
         var usedTypes = UtensilType.None;
@@ -127,9 +138,10 @@ public sealed partial class IngestionSystem
         if (!required || (usedTypes & requiredTypes) == requiredTypes)
             return true;
 
-        _popup.PopupClient(Loc.GetString("ingestion-you-need-to-hold-utensil", ("utensil", requiredTypes ^ usedTypes)), entity, entity);
+        _popup.PopupClient(Loc.GetString("ingestion-you-need-to-hold-utensil", ("utensil", requiredTypes ^ usedTypes)),
+            entity,
+            entity);
         return false;
-
     }
 
     /// <summary>
@@ -139,10 +151,7 @@ public sealed partial class IngestionSystem
     /// <param name="entity">The entity doing the action who has the utensils.</param>
     /// <param name="types">The types of utensils we need.</param>
     /// <returns>Returns true if we have the utensils we need.</returns>
-    public bool HasRequiredUtensils(EntityUid entity, UtensilType types)
-    {
-        return TryGetUtensils(entity, types, types, out _);
-    }
+    public bool HasRequiredUtensils(EntityUid entity, UtensilType types) => TryGetUtensils(entity, types, types, out _);
 
     private void OnGetEdibleUtensils(Entity<EdibleComponent> entity, ref GetUtensilsEvent args)
     {

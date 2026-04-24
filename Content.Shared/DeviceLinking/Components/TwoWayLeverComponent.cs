@@ -11,21 +11,21 @@ namespace Content.Shared.DeviceLinking.Components;
 /// <summary>
 /// Simple ternary state for device linking.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class TwoWayLeverComponent : Component
 {
-    [DataField, AutoNetworkedField]
-    public TwoWayLeverState State;
-
-    [DataField, AutoNetworkedField]
-    public bool NextSignalLeft;
-
     [DataField]
     public ProtoId<SourcePortPrototype> LeftPort = "Left";
 
     [DataField]
-    public ProtoId<SourcePortPrototype> RightPort = "Right";
+    public ProtoId<SourcePortPrototype> MiddlePort = "Middle";
+
+    [DataField] [AutoNetworkedField]
+    public bool NextSignalLeft;
 
     [DataField]
-    public ProtoId<SourcePortPrototype> MiddlePort = "Middle";
+    public ProtoId<SourcePortPrototype> RightPort = "Right";
+
+    [DataField] [AutoNetworkedField]
+    public TwoWayLeverState State;
 }

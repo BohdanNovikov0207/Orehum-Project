@@ -8,6 +8,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Numerics;
 using Content.Shared.RCD.Systems;
 using Robust.Shared.Audio;
 using Robust.Shared.GameStates;
@@ -21,14 +22,22 @@ namespace Content.Shared.RCD.Components;
 /// Optionally uses LimitedChargesComponent.
 /// Charges can be refilled with RCD ammo
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 [Access(typeof(RCDSystem))]
 public sealed partial class RCDComponent : Component
 {
+    private Direction _constructionDirection = Direction.South;
+
+    /// <summary>
+    /// Indicates if a mirrored version of the construction prototype should be used (if available)
+    /// </summary>
+    [AutoNetworkedField] [ViewVariables(VVAccess.ReadOnly)]
+    public bool UseMirrorPrototype = false;
+
     /// <summary>
     /// List of RCD prototypes that the device comes loaded with
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public HashSet<ProtoId<RCDPrototype>> AvailablePrototypes { get; set; } = new();
 
     /// <summary>
@@ -40,36 +49,28 @@ public sealed partial class RCDComponent : Component
     /// <summary>
     /// The ProtoId of the currently selected RCD prototype
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public ProtoId<RCDPrototype> ProtoId { get; set; } = "Invalid";
-
-    /// <summary>
-    /// Indicates if a mirrored version of the construction prototype should be used (if available)
-    /// </summary>
-    [AutoNetworkedField, ViewVariables(VVAccess.ReadOnly)]
-    public bool UseMirrorPrototype = false;
 
     /// <summary>
     /// Indicates whether this is an RCD or an RPD
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public bool IsRpd { get; set; } = false;
 
     /// <summary>
     /// The direction constructed entities will face upon spawning
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public Direction ConstructionDirection
     {
         get => _constructionDirection;
         set
         {
             _constructionDirection = value;
-            ConstructionTransform = new Transform(new(), _constructionDirection.ToAngle());
+            ConstructionTransform = new Transform(new Vector2(), _constructionDirection.ToAngle());
         }
     }
-
-    private Direction _constructionDirection = Direction.South;
 
     /// <summary>
     /// Returns a rotated transform based on the specified ConstructionDirection

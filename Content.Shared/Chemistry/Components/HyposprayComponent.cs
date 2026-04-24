@@ -8,44 +8,18 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Goobstation.Maths.FixedPoint;
-using Robust.Shared.GameStates;
 using Robust.Shared.Audio;
+using Robust.Shared.GameStates;
 
 namespace Content.Shared.Chemistry.Components;
 
 /// <summary>
-///     Component that allows an entity instantly transfer liquids by interacting with objects that have solutions.
+/// Component that allows an entity instantly transfer liquids by interacting with objects that have solutions.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 [AutoGenerateComponentState]
 public sealed partial class HyposprayComponent : Component
 {
-    /// <summary>
-    ///     Solution that will be used by hypospray for injections.
-    /// </summary>
-    [DataField]
-    public string SolutionName = "hypospray";
-
-    /// <summary>
-    ///     Amount of the units that will be transfered.
-    /// </summary>
-    [AutoNetworkedField]
-    [DataField]
-    public FixedPoint2 TransferAmount = FixedPoint2.New(5);
-
-    /// <summary>
-    ///     Sound that will be played when injecting.
-    /// </summary>
-    [DataField]
-    public SoundSpecifier InjectSound = new SoundPathSpecifier("/Audio/Items/hypospray.ogg");
-
-    /// <summary>
-    /// Decides whether you can inject everything or just mobs.
-    /// </summary>
-    [AutoNetworkedField]
-    [DataField(required: true)]
-    public bool OnlyAffectsMobs = false;
-
     /// <summary>
     /// If this can draw from containers in mob-only mode.
     /// </summary>
@@ -59,4 +33,30 @@ public sealed partial class HyposprayComponent : Component
     /// </summary>
     [DataField]
     public bool InjectOnly = false;
+
+    /// <summary>
+    /// Sound that will be played when injecting.
+    /// </summary>
+    [DataField]
+    public SoundSpecifier InjectSound = new SoundPathSpecifier("/Audio/Items/hypospray.ogg");
+
+    /// <summary>
+    /// Decides whether you can inject everything or just mobs.
+    /// </summary>
+    [AutoNetworkedField]
+    [DataField(required: true)]
+    public bool OnlyAffectsMobs = false;
+
+    /// <summary>
+    /// Solution that will be used by hypospray for injections.
+    /// </summary>
+    [DataField]
+    public string SolutionName = "hypospray";
+
+    /// <summary>
+    /// Amount of the units that will be transfered.
+    /// </summary>
+    [AutoNetworkedField]
+    [DataField]
+    public FixedPoint2 TransferAmount = FixedPoint2.New(5);
 }

@@ -8,23 +8,23 @@ namespace Content.Shared.ParcelWrap.Components;
 
 /// <summary>
 /// This component marks its owner as being a parcel created by wrapping another item up. It can be unwrapped,
-/// destroying this entity and releasing <see cref="Contents"/>.
+/// destroying this entity and releasing <see cref="Contents" />.
 /// </summary>
-/// <seealso cref="ParcelWrapComponent"/>
-[RegisterComponent, NetworkedComponent, Access(typeof(ParcelWrappingSystem))]
+/// <seealso cref="ParcelWrapComponent" />
+[RegisterComponent] [NetworkedComponent] [Access(typeof(ParcelWrappingSystem))]
 public sealed partial class WrappedParcelComponent : Component
 {
+    /// <summary>
+    /// The ID of <see cref="Contents" />.
+    /// </summary>
+    [DataField] [ViewVariables(VVAccess.ReadOnly)]
+    public string ContainerId = "contents";
+
     /// <summary>
     /// The contents of this parcel.
     /// </summary>
     [ViewVariables(VVAccess.ReadOnly)]
     public ContainerSlot Contents = default!;
-
-    /// <summary>
-    /// Specifies the entity to spawn when this parcel is unwrapped.
-    /// </summary>
-    [DataField]
-    public EntProtoId? UnwrapTrash;
 
     /// <summary>
     /// How long it takes to unwrap this parcel.
@@ -39,8 +39,8 @@ public sealed partial class WrappedParcelComponent : Component
     public SoundSpecifier? UnwrapSound;
 
     /// <summary>
-    /// The ID of <see cref="Contents"/>.
+    /// Specifies the entity to spawn when this parcel is unwrapped.
     /// </summary>
-    [DataField, ViewVariables(VVAccess.ReadOnly)]
-    public string ContainerId = "contents";
+    [DataField]
+    public EntProtoId? UnwrapTrash;
 }

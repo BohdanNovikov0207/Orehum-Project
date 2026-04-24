@@ -10,8 +10,8 @@ namespace Content.Shared.Procedural.PostGeneration;
 public sealed partial class EntranceFlankDunGen : IDunGenLayer
 {
     [DataField(required: true)]
-    public ProtoId<ContentTileDefinition> Tile;
+    public ProtoId<EntityTablePrototype> Contents = new();
 
     [DataField(required: true)]
-    public ProtoId<EntityTablePrototype> Contents = new();
+    public ProtoId<ContentTileDefinition> Tile;
 }

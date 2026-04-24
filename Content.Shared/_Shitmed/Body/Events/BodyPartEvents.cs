@@ -13,6 +13,7 @@
 using Content.Shared.Body.Part;
 
 namespace Content.Shared._Shitmed.Body.Events;
+
 [ByRefEvent]
 public readonly record struct BodyPartEnableChangedEvent(bool Enabled);
 

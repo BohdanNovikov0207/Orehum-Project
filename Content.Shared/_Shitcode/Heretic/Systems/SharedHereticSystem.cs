@@ -9,9 +9,9 @@ namespace Content.Shared._Shitcode.Heretic.Systems;
 public abstract class SharedHereticSystem : EntitySystem
 {
     [Dependency] private readonly SharedMindSystem _mind = default!;
+    private EntityQuery<GhoulComponent> _ghoulQuery;
 
     private EntityQuery<HereticComponent> _hereticQuery;
-    private EntityQuery<GhoulComponent> _ghoulQuery;
 
     public override void Initialize()
     {
@@ -30,10 +30,7 @@ public abstract class SharedHereticSystem : EntitySystem
             ev.Blocked = true;
     }
 
-    private void OnCheck(ref HereticCheckEvent ev)
-    {
-        ev.Result = TryGetHereticComponent(ev.Uid, out _, out _);
-    }
+    private void OnCheck(ref HereticCheckEvent ev) => ev.Result = TryGetHereticComponent(ev.Uid, out _, out _);
 
     public bool TryGetHereticComponent(
         EntityUid uid,
@@ -44,8 +41,6 @@ public abstract class SharedHereticSystem : EntitySystem
         return _mind.TryGetMind(uid, out mind, out _) && _hereticQuery.TryComp(mind, out heretic);
     }
 
-    public bool IsHereticOrGhoul(EntityUid uid)
-    {
-        return _ghoulQuery.HasComp(uid) || TryGetHereticComponent(uid, out _, out _);
-    }
+    public bool IsHereticOrGhoul(EntityUid uid) =>
+        _ghoulQuery.HasComp(uid) || TryGetHereticComponent(uid, out _, out _);
 }

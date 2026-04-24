@@ -8,7 +8,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Administration.BanList;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class BanListEuiState : EuiStateBase
 {
     public BanListEuiState(string banListPlayerName, List<SharedServerBan> bans, List<SharedServerRoleBan> roleBans)

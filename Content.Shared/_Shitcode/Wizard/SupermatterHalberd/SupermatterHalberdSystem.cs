@@ -14,7 +14,6 @@ using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Whitelist;
 using Robust.Shared.Audio.Systems;
-using Robust.Shared.Map;
 using Robust.Shared.Serialization;
 
 namespace Content.Shared._Goobstation.Wizard.SupermatterHalberd;
@@ -22,10 +21,10 @@ namespace Content.Shared._Goobstation.Wizard.SupermatterHalberd;
 public sealed class SupermatterHalberdSystem : EntitySystem
 {
     [Dependency] private readonly ISharedAdminLogManager _admin = default!;
-    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
     [Dependency] private readonly RaysSystem _rays = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
 
     public override void Initialize()
@@ -104,7 +103,7 @@ public sealed class SupermatterHalberdSystem : EntitySystem
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class SmHalberdExecuteDoAfterEvent(NetEntity? rayEffect) : DoAfterEvent
 {
     public NetEntity? RayEffect = rayEffect;

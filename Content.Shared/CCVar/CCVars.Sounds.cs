@@ -17,11 +17,10 @@ public sealed partial class CCVars
         CVarDef.Create("ambience.event_music_enabled", true, CVar.ARCHIVE | CVar.CLIENTONLY);
 
     /// <summary>
-    ///     Round end sound (APC Destroyed)
+    /// Round end sound (APC Destroyed)
     /// </summary>
     public static readonly CVarDef<bool> RestartSoundsEnabled =
         CVarDef.Create("ambience.restart_sounds_enabled", true, CVar.ARCHIVE | CVar.CLIENTONLY);
-
 
 
     public static readonly CVarDef<bool> AdminSoundsEnabled =

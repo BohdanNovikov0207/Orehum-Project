@@ -27,83 +27,91 @@ using Robust.Shared.Network;
 using Robust.Shared.Serialization;
 using Robust.Shared.Utility;
 
-namespace Content.Shared.Chat
+namespace Content.Shared.Chat;
+
+[Serializable] [NetSerializable]
+public sealed class ChatMessage
 {
-    [Serializable, NetSerializable]
-    public sealed class ChatMessage
-    {
-        public ChatChannel Channel;
+    public string? AudioPath;
+    public float AudioVolume;
+    public bool CanCoalesce; // Goobstation Edit
+    public ChatChannel Channel;
 
-        /// <summary>
-        /// This is the text spoken by the entity, after accents and such were applied.
-        /// This should have <see cref="FormattedMessage.EscapeText"/> applied before using it in any rich text box.
-        /// </summary>
-        public string Message;
-
-        /// <summary>
-        /// This is the <see cref="Message"/> but with special characters escaped and wrapped in some rich text
-        /// formatting tags.
-        /// </summary>
-        public string WrappedMessage;
-
-        public NetEntity SenderEntity;
-
-        /// <summary>
-        ///     Identifier sent when <see cref="SenderEntity"/> is <see cref="NetEntity.Invalid"/>
-        ///     if this was sent by a player to assign a key to the sender of this message.
-        ///     This is unique per sender.
-        /// </summary>
-        public int? SenderKey;
-
-        public bool HideChat;
-        public Color? MessageColorOverride;
-        public string? AudioPath;
-        public float AudioVolume;
-        public bool CanCoalesce; // Goobstation Edit
-
-        [NonSerialized]
-        public bool Read;
-
-        // Goobstation Edit - Coalescing Chat
-        public ChatMessage(ChatChannel channel, string message, string wrappedMessage, NetEntity source, int? senderKey, bool hideChat = false, Color? colorOverride = null, string? audioPath = null, float audioVolume = 0, bool canCoalesce = true)
-        {
-            Channel = channel;
-            Message = message;
-            WrappedMessage = wrappedMessage;
-            SenderEntity = source;
-            SenderKey = senderKey;
-            HideChat = hideChat;
-            MessageColorOverride = colorOverride;
-            AudioPath = audioPath;
-            AudioVolume = audioVolume;
-            CanCoalesce = canCoalesce; // Goobstation Edit
-        }
-    }
+    public bool HideChat;
 
     /// <summary>
-    ///     Sent from server to client to notify the client about a new chat message.
+    /// This is the text spoken by the entity, after accents and such were applied.
+    /// This should have <see cref="FormattedMessage.EscapeText" /> applied before using it in any rich text box.
     /// </summary>
-    [UsedImplicitly]
-    public sealed class MsgChatMessage : NetMessage
+    public string Message;
+
+    public Color? MessageColorOverride;
+
+    [NonSerialized]
+    public bool Read;
+
+    public NetEntity SenderEntity;
+
+    /// <summary>
+    /// Identifier sent when <see cref="SenderEntity" /> is <see cref="NetEntity.Invalid" />
+    /// if this was sent by a player to assign a key to the sender of this message.
+    /// This is unique per sender.
+    /// </summary>
+    public int? SenderKey;
+
+    /// <summary>
+    /// This is the <see cref="Message" /> but with special characters escaped and wrapped in some rich text
+    /// formatting tags.
+    /// </summary>
+    public string WrappedMessage;
+
+    // Goobstation Edit - Coalescing Chat
+    public ChatMessage(ChatChannel channel,
+        string message,
+        string wrappedMessage,
+        NetEntity source,
+        int? senderKey,
+        bool hideChat = false,
+        Color? colorOverride = null,
+        string? audioPath = null,
+        float audioVolume = 0,
+        bool canCoalesce = true)
     {
-        public override MsgGroups MsgGroup => MsgGroups.Command;
+        Channel = channel;
+        Message = message;
+        WrappedMessage = wrappedMessage;
+        SenderEntity = source;
+        SenderKey = senderKey;
+        HideChat = hideChat;
+        MessageColorOverride = colorOverride;
+        AudioPath = audioPath;
+        AudioVolume = audioVolume;
+        CanCoalesce = canCoalesce; // Goobstation Edit
+    }
+}
 
-        public ChatMessage Message = default!;
+/// <summary>
+/// Sent from server to client to notify the client about a new chat message.
+/// </summary>
+[UsedImplicitly]
+public sealed class MsgChatMessage : NetMessage
+{
+    public ChatMessage Message = default!;
+    public override MsgGroups MsgGroup => MsgGroups.Command;
 
-        public override void ReadFromBuffer(NetIncomingMessage buffer, IRobustSerializer serializer)
-        {
-            var length = buffer.ReadVariableInt32();
-            using var stream = new MemoryStream(length);
-            buffer.ReadAlignedMemory(stream, length);
-            serializer.DeserializeDirect(stream, out Message);
-        }
+    public override void ReadFromBuffer(NetIncomingMessage buffer, IRobustSerializer serializer)
+    {
+        var length = buffer.ReadVariableInt32();
+        using var stream = new MemoryStream(length);
+        buffer.ReadAlignedMemory(stream, length);
+        serializer.DeserializeDirect(stream, out Message);
+    }
 
-        public override void WriteToBuffer(NetOutgoingMessage buffer, IRobustSerializer serializer)
-        {
-            var stream = new MemoryStream();
-            serializer.SerializeDirect(stream, Message);
-            buffer.WriteVariableInt32((int) stream.Length);
-            buffer.Write(stream.AsSpan());
-        }
+    public override void WriteToBuffer(NetOutgoingMessage buffer, IRobustSerializer serializer)
+    {
+        var stream = new MemoryStream();
+        serializer.SerializeDirect(stream, Message);
+        buffer.WriteVariableInt32((int) stream.Length);
+        buffer.Write(stream.AsSpan());
     }
 }

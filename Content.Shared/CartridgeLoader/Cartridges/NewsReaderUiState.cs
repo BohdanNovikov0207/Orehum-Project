@@ -4,18 +4,18 @@
 //
 // SPDX-License-Identifier: MIT
 
-using Robust.Shared.Serialization;
 using Content.Shared.MassMedia.Systems;
+using Robust.Shared.Serialization;
 
 namespace Content.Shared.CartridgeLoader.Cartridges;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class NewsReaderBoundUserInterfaceState : BoundUserInterfaceState
 {
     public NewsArticle Article;
+    public bool NotificationOn;
     public int TargetNum;
     public int TotalNum;
-    public bool NotificationOn;
 
     public NewsReaderBoundUserInterfaceState(NewsArticle article, int targetNum, int totalNum, bool notificationOn)
     {
@@ -26,7 +26,7 @@ public sealed class NewsReaderBoundUserInterfaceState : BoundUserInterfaceState
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class NewsReaderEmptyBoundUserInterfaceState : BoundUserInterfaceState
 {
     public bool NotificationOn;

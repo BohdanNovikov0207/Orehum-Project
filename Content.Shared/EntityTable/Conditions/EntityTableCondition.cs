@@ -5,9 +5,9 @@ using Robust.Shared.Prototypes;
 namespace Content.Shared.EntityTable.Conditions;
 
 /// <summary>
-/// Used for implementing conditional logic for <see cref="EntityTableSelector"/>.
+/// Used for implementing conditional logic for <see cref="EntityTableSelector" />.
 /// </summary>
-[ImplicitDataDefinitionForInheritors, UsedImplicitly(ImplicitUseTargetFlags.WithInheritors)]
+[ImplicitDataDefinitionForInheritors] [UsedImplicitly(ImplicitUseTargetFlags.WithInheritors)]
 public abstract partial class EntityTableCondition
 {
     /// <summary>
@@ -16,7 +16,10 @@ public abstract partial class EntityTableCondition
     [DataField]
     public bool Invert;
 
-    public bool Evaluate(EntityTableSelector root, IEntityManager entMan, IPrototypeManager proto, EntityTableContext ctx)
+    public bool Evaluate(EntityTableSelector root,
+        IEntityManager entMan,
+        IPrototypeManager proto,
+        EntityTableContext ctx)
     {
         var res = EvaluateImplementation(root, entMan, proto, ctx);
 
@@ -24,5 +27,8 @@ public abstract partial class EntityTableCondition
         return res ^ Invert;
     }
 
-    protected abstract bool EvaluateImplementation(EntityTableSelector root, IEntityManager entMan, IPrototypeManager proto, EntityTableContext ctx);
+    protected abstract bool EvaluateImplementation(EntityTableSelector root,
+        IEntityManager entMan,
+        IPrototypeManager proto,
+        EntityTableContext ctx);
 }

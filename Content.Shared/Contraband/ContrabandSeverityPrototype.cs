@@ -13,15 +13,11 @@ using Robust.Shared.Prototypes;
 namespace Content.Shared.Contraband;
 
 /// <summary>
-/// This is a prototype for defining the degree of severity for a particular <see cref="ContrabandComponent"/>
+/// This is a prototype for defining the degree of severity for a particular <see cref="ContrabandComponent" />
 /// </summary>
 [Prototype]
-public sealed partial class ContrabandSeverityPrototype : IPrototype
+public sealed class ContrabandSeverityPrototype : IPrototype
 {
-    /// <inheritdoc/>
-    [IdDataField]
-    public string ID { get; private set; } = default!;
-
     /// <summary>
     /// Text shown for this severity level when the contraband is examined.
     /// </summary>
@@ -33,4 +29,8 @@ public sealed partial class ContrabandSeverityPrototype : IPrototype
     /// </summary>
     [DataField]
     public bool ShowDepartmentsAndJobs;
+
+    /// <inheritdoc />
+    [IdDataField]
+    public string ID { get; } = default!;
 }

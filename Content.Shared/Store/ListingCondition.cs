@@ -27,4 +27,8 @@ public abstract partial class ListingCondition
 /// <param name="Buyer">Either the account owner, user, or an inanimate object (e.g., surplus bundle)</param>
 /// <param name="Listing">The listing itself</param>
 /// <param name="EntityManager">An entitymanager for sane coding</param>
-public readonly record struct ListingConditionArgs(EntityUid Buyer, EntityUid? StoreEntity, ListingData Listing, IEntityManager EntityManager);
+public readonly record struct ListingConditionArgs(
+    EntityUid Buyer,
+    EntityUid? StoreEntity,
+    ListingData Listing,
+    IEntityManager EntityManager);

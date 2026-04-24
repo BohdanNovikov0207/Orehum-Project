@@ -92,156 +92,157 @@
 using Content.Shared.Movement.Systems;
 using Robust.Shared.GameStates;
 
-namespace Content.Shared.Movement.Components
+namespace Content.Shared.Movement.Components;
+
+/// <summary>
+/// Applies basic movement speed and movement modifiers for an entity.
+/// If this is not present on the entity then they will use defaults for movement.
+/// </summary>
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
+[Access(typeof(MovementSpeedModifierSystem))]
+public sealed partial class MovementSpeedModifierComponent : Component
 {
+    #region defaults
+
+    // weightless
+    public const float DefaultWeightlessFriction = 1f;
+    public const float DefaultWeightlessModifier = 0.7f;
+    public const float DefaultWeightlessAcceleration = 1f;
+
+    // friction
+    public const float DefaultAcceleration = 20f;
+    public const float DefaultFriction = 2.5f;
+    public const float DefaultFrictionNoInput = 2.5f;
+    public const float DefaultMinimumFrictionSpeed = 0.005f;
+
+    // movement
+    public const float DefaultBaseWalkSpeed = 2.5f;
+    public const float DefaultBaseSprintSpeed = 4.5f;
+
+    #endregion
+
+    #region base values
+
     /// <summary>
-    /// Applies basic movement speed and movement modifiers for an entity.
-    /// If this is not present on the entity then they will use defaults for movement.
+    /// These base values should be defined in yaml and rarely if ever modified directly.
     /// </summary>
-    [RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
-    [Access(typeof(MovementSpeedModifierSystem))]
-    public sealed partial class MovementSpeedModifierComponent : Component
-    {
-        #region defaults
+    [DataField] [AutoNetworkedField]
+    public float BaseWalkSpeed = DefaultBaseWalkSpeed;
 
-        // weightless
-        public const float DefaultWeightlessFriction = 1f;
-        public const float DefaultWeightlessModifier = 0.7f;
-        public const float DefaultWeightlessAcceleration = 1f;
+    [DataField] [AutoNetworkedField]
+    public float BaseSprintSpeed = DefaultBaseSprintSpeed;
 
-        // friction
-        public const float DefaultAcceleration = 20f;
-        public const float DefaultFriction = 2.5f;
-        public const float DefaultFrictionNoInput = 2.5f;
-        public const float DefaultMinimumFrictionSpeed = 0.005f;
+    /// <summary>
+    /// The acceleration applied to mobs when moving. If this is ever less than Friction the mob will be slower.
+    /// </summary>
+    [AutoNetworkedField] [DataField]
+    public float BaseAcceleration = DefaultAcceleration;
 
-        // movement
-        public const float DefaultBaseWalkSpeed = 2.5f;
-        public const float DefaultBaseSprintSpeed = 4.5f;
+    /// <summary>
+    /// The body's base friction modifier that is applied in *all* circumstances.
+    /// </summary>
+    [AutoNetworkedField] [DataField]
+    public float BaseFriction = DefaultFriction;
 
-        #endregion
+    /// <summary>
+    /// Minimum speed a mob has to be moving before applying movement friction.
+    /// </summary>
+    [DataField]
+    public float MinimumFrictionSpeed = DefaultMinimumFrictionSpeed;
 
-        #region base values
+    #endregion
 
-        /// <summary>
-        /// These base values should be defined in yaml and rarely if ever modified directly.
-        /// </summary>
-        [DataField, AutoNetworkedField]
-        public float BaseWalkSpeed = DefaultBaseWalkSpeed;
+    #region calculated values
 
-        [DataField, AutoNetworkedField]
-        public float BaseSprintSpeed = DefaultBaseSprintSpeed;
+    [ViewVariables]
+    public float CurrentWalkSpeed => WalkSpeedModifier * BaseWalkSpeed;
 
-        /// <summary>
-        /// The acceleration applied to mobs when moving. If this is ever less than Friction the mob will be slower.
-        /// </summary>
-        [AutoNetworkedField, DataField]
-        public float BaseAcceleration = DefaultAcceleration;
+    [ViewVariables]
+    public float CurrentSprintSpeed => SprintSpeedModifier * BaseSprintSpeed;
 
-        /// <summary>
-        /// The body's base friction modifier that is applied in *all* circumstances.
-        /// </summary>
-        [AutoNetworkedField, DataField]
-        public float BaseFriction = DefaultFriction;
+    /// <summary>
+    /// The acceleration applied to mobs when moving. If this is ever less than Friction the mob will be slower.
+    /// </summary>
+    [AutoNetworkedField] [DataField]
+    public float Acceleration;
 
-        /// <summary>
-        /// Minimum speed a mob has to be moving before applying movement friction.
-        /// </summary>
-        [DataField]
-        public float MinimumFrictionSpeed = DefaultMinimumFrictionSpeed;
+    /// <summary>
+    /// Modifier to the negative velocity applied for friction.
+    /// </summary>
+    [AutoNetworkedField] [DataField]
+    public float Friction;
 
-        #endregion
+    /// <summary>
+    /// The negative velocity applied for friction.
+    /// </summary>
+    [AutoNetworkedField] [DataField]
+    public float FrictionNoInput;
 
-        #region calculated values
+    #endregion
 
-        [ViewVariables]
-        public float CurrentWalkSpeed => WalkSpeedModifier * BaseWalkSpeed;
-        [ViewVariables]
-        public float CurrentSprintSpeed => SprintSpeedModifier * BaseSprintSpeed;
+    #region movement modifiers
 
-        /// <summary>
-        /// The acceleration applied to mobs when moving. If this is ever less than Friction the mob will be slower.
-        /// </summary>
-        [AutoNetworkedField, DataField]
-        public float Acceleration;
+    [AutoNetworkedField] [ViewVariables]
+    public float WalkSpeedModifier = 1.0f;
 
-        /// <summary>
-        /// Modifier to the negative velocity applied for friction.
-        /// </summary>
-        [AutoNetworkedField, DataField]
-        public float Friction;
+    [AutoNetworkedField] [ViewVariables]
+    public float SprintSpeedModifier = 1.0f;
 
-        /// <summary>
-        /// The negative velocity applied for friction.
-        /// </summary>
-        [AutoNetworkedField, DataField]
-        public float FrictionNoInput;
+    #endregion
 
-        #endregion
+    #region Weightless
 
-        #region movement modifiers
+    /// <summary>
+    /// These base values should be defined in yaml and rarely if ever modified directly.
+    /// </summary>
+    [AutoNetworkedField] [DataField]
+    public float BaseWeightlessFriction = DefaultWeightlessFriction;
 
-        [AutoNetworkedField, ViewVariables]
-        public float WalkSpeedModifier = 1.0f;
+    [AutoNetworkedField] [DataField]
+    public float BaseWeightlessModifier = DefaultWeightlessModifier;
 
-        [AutoNetworkedField, ViewVariables]
-        public float SprintSpeedModifier = 1.0f;
+    [AutoNetworkedField] [DataField]
+    public float BaseWeightlessAcceleration = DefaultWeightlessAcceleration;
 
-        #endregion
+    /*
+     * Final values
+     */
 
-        #region Weightless
+    [ViewVariables]
+    public float WeightlessWalkSpeed => WeightlessModifier * BaseWalkSpeed;
 
-        /// <summary>
-        /// These base values should be defined in yaml and rarely if ever modified directly.
-        /// </summary>
-        [AutoNetworkedField, DataField]
-        public float BaseWeightlessFriction = DefaultWeightlessFriction;
+    [ViewVariables]
+    public float WeightlessSprintSpeed => WeightlessModifier * BaseSprintSpeed;
 
-        [AutoNetworkedField, DataField]
-        public float BaseWeightlessModifier = DefaultWeightlessModifier;
+    /// <summary>
+    /// The acceleration applied to mobs when moving and weightless.
+    /// </summary>
+    [AutoNetworkedField] [DataField]
+    public float WeightlessAcceleration;
 
-        [AutoNetworkedField, DataField]
-        public float BaseWeightlessAcceleration = DefaultWeightlessAcceleration;
+    /// <summary>
+    /// The movement speed modifier applied to a mob's total input velocity when weightless.
+    /// </summary>
+    [AutoNetworkedField] [DataField]
+    public float WeightlessModifier;
 
-        /*
-         * Final values
-         */
+    /// <summary>
+    /// The negative velocity applied for friction when weightless and providing inputs.
+    /// </summary>
+    [AutoNetworkedField] [DataField]
+    public float WeightlessFriction;
 
-        [ViewVariables]
-        public float WeightlessWalkSpeed => WeightlessModifier * BaseWalkSpeed;
-        [ViewVariables]
-        public float WeightlessSprintSpeed => WeightlessModifier * BaseSprintSpeed;
+    /// <summary>
+    /// The negative velocity applied for friction when weightless and not providing inputs.
+    /// </summary>
+    [AutoNetworkedField] [DataField]
+    public float WeightlessFrictionNoInput;
 
-        /// <summary>
-        /// The acceleration applied to mobs when moving and weightless.
-        /// </summary>
-        [AutoNetworkedField, DataField]
-        public float WeightlessAcceleration;
+    /// <summary>
+    /// The negative velocity applied for friction when weightless and not standing on a grid or mapgrid
+    /// </summary>
+    [AutoNetworkedField] [DataField]
+    public float? OffGridFriction;
 
-        /// <summary>
-        /// The movement speed modifier applied to a mob's total input velocity when weightless.
-        /// </summary>
-        [AutoNetworkedField, DataField]
-        public float WeightlessModifier;
-
-        /// <summary>
-        /// The negative velocity applied for friction when weightless and providing inputs.
-        /// </summary>
-        [AutoNetworkedField, DataField]
-        public float WeightlessFriction;
-
-        /// <summary>
-        /// The negative velocity applied for friction when weightless and not providing inputs.
-        /// </summary>
-        [AutoNetworkedField, DataField]
-        public float WeightlessFrictionNoInput;
-
-        /// <summary>
-        /// The negative velocity applied for friction when weightless and not standing on a grid or mapgrid
-        /// </summary>
-        [AutoNetworkedField, DataField]
-        public float? OffGridFriction;
-
-        #endregion
-    }
+    #endregion
 }

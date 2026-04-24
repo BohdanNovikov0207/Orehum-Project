@@ -20,8 +20,8 @@ namespace Content.Shared._Lavaland.Anger.Systems;
 public sealed class AngerSystem : EntitySystem
 {
     [Dependency] private readonly SharedActionsSystem _actions = default!;
-    [Dependency] private readonly MobThresholdSystem _threshold = default!;
     [Dependency] private readonly MobPhasesSystem _phases = default!;
+    [Dependency] private readonly MobThresholdSystem _threshold = default!;
 
     private EntityQuery<AngerPlayerScalingComponent> _scalingQuery;
 
@@ -72,6 +72,7 @@ public sealed class AngerSystem : EntitySystem
                 for (var i = 1; i < playerCount; i++)
                     angerMultiplier *= scaling.AngerScalingFactor.Value;
             }
+
             if (scaling.HealthScalingFactor != null)
             {
                 for (var i = 1; i < playerCount; i++)

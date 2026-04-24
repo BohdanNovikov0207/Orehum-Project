@@ -108,23 +108,12 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Chemistry.EntitySystems;
-using Content.Shared.Nutrition.Components;
-using System.Linq;
 using Content.Shared.Administration.Logs;
-using Content.Shared.Chemistry.EntitySystems;
-using Content.Shared.Body.Components;
-using Content.Shared.Body.Organ;
 using Content.Shared.Body.Systems;
-using Content.Shared.Chemistry;
 using Content.Shared.Chemistry.EntitySystems;
-using Content.Shared.Containers.ItemSlots;
+using Content.Shared.Clothing.EntitySystems;
 using Content.Shared.Database;
 using Content.Shared.Forensics;
-using Content.Shared.Destructible;
-using Content.Shared.DoAfter;
-using Content.Goobstation.Maths.FixedPoint;
-using Content.Shared.Hands.Components;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.IdentityManagement;
 using Content.Shared.Interaction;
@@ -133,21 +122,15 @@ using Content.Shared.Inventory;
 using Content.Shared.Mobs.Systems;
 using Content.Shared.Nutrition.Components;
 using Content.Shared.Popups;
-using Content.Shared.Nutrition;
-using Content.Shared.Nutrition.EntitySystems;
-using Content.Shared.Nutrition.Components;
-using Content.Shared.Popups;
 using Content.Shared.Stacks;
-using Content.Shared.Storage;
 using Content.Shared.Tag;
 using Content.Shared.Verbs;
 using Content.Shared.Whitelist;
 using Robust.Shared.Audio;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Prototypes;
-using Robust.Shared.Utility;
-using Content.Shared.Clothing.EntitySystems;
-using Content.Shared.Heretic; // Goobstation
+
+// Goobstation
 
 namespace Content.Shared.Nutrition.EntitySystems;
 
@@ -157,23 +140,22 @@ namespace Content.Shared.Nutrition.EntitySystems;
 [Obsolete("Migration to Content.Shared.Nutrition.EntitySystems.IngestionSystem is required")]
 public sealed class FoodSystem : EntitySystem
 {
-    [Dependency] private readonly FlavorProfileSystem _flavorProfile = default!;
-    [Dependency] private readonly IngestionSystem _ingestion = default!;
-    [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
-    [Dependency] private readonly MobStateSystem _mobState = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedHandsSystem _hands = default!;
-    [Dependency] private readonly SharedSolutionContainerSystem _solutionContainer = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly SharedStackSystem _stack = default!;
-    [Dependency] private readonly StomachSystem _stomach = default!;
-    [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
-    [Dependency] private readonly TagSystem _tag = default!; // Goob
+    public const float MaxFeedDistance = 1.0f;
 
     private static readonly ProtoId<TagPrototype> UnedibleTag = "Unedible"; // Goobstaion
-
-    public const float MaxFeedDistance = 1.0f;
+    [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly FlavorProfileSystem _flavorProfile = default!;
+    [Dependency] private readonly SharedHandsSystem _hands = default!;
+    [Dependency] private readonly IngestionSystem _ingestion = default!;
+    [Dependency] private readonly MobStateSystem _mobState = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly SharedSolutionContainerSystem _solutionContainer = default!;
+    [Dependency] private readonly SharedStackSystem _stack = default!;
+    [Dependency] private readonly StomachSystem _stomach = default!;
+    [Dependency] private readonly TagSystem _tag = default!; // Goob
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
+    [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
 
     public override void Initialize()
     {
@@ -181,10 +163,10 @@ public sealed class FoodSystem : EntitySystem
 
         SubscribeLocalEvent<FoodComponent, UseInHandEvent>(OnUseFoodInHand,
             after: new[]
-        {
-            typeof(OpenableSystem), typeof(InventorySystem),
-            typeof(ClothingSystem) // Goob - moths eating things in their hands when quick equipping
-        });
+            {
+                typeof(OpenableSystem), typeof(InventorySystem),
+                typeof(ClothingSystem), // Goob - moths eating things in their hands when quick equipping
+            });
 
         SubscribeLocalEvent<FoodComponent, AfterInteractEvent>(OnFeedFood);
 
@@ -256,7 +238,10 @@ public sealed class FoodSystem : EntitySystem
 
         args.Handled = true;
 
-        _audio.PlayPredicted(entity.Comp.UseSound, args.Target, args.User, AudioParams.Default.WithVolume(-1f).WithVariation(0.20f));
+        _audio.PlayPredicted(entity.Comp.UseSound,
+            args.Target,
+            args.User,
+            AudioParams.Default.WithVolume(-1f).WithVariation(0.20f));
 
         var flavors = _flavorProfile.GetLocalizedFlavorsMessage(entity.Owner, args.Target, args.Split);
 
@@ -264,19 +249,34 @@ public sealed class FoodSystem : EntitySystem
         {
             var targetName = Identity.Entity(args.Target, EntityManager);
             var userName = Identity.Entity(args.User, EntityManager);
-            _popup.PopupEntity(Loc.GetString("edible-force-feed-success", ("user", userName), ("verb", _ingestion.GetProtoVerb(IngestionSystem.Food)), ("flavors", flavors)), entity, entity);
+            _popup.PopupEntity(Loc.GetString("edible-force-feed-success",
+                    ("user", userName),
+                    ("verb", _ingestion.GetProtoVerb(IngestionSystem.Food)),
+                    ("flavors", flavors)),
+                entity,
+                entity);
 
-            _popup.PopupClient(Loc.GetString("edible-force-feed-success-user", ("target", targetName), ("verb", _ingestion.GetProtoVerb(IngestionSystem.Food))), args.User, args.User);
+            _popup.PopupClient(Loc.GetString("edible-force-feed-success-user",
+                    ("target", targetName),
+                    ("verb", _ingestion.GetProtoVerb(IngestionSystem.Food))),
+                args.User,
+                args.User);
 
             // log successful forced feeding
-            _adminLogger.Add(LogType.ForceFeed, LogImpact.Medium, $"{ToPrettyString(entity):user} forced {ToPrettyString(args.User):target} to eat {ToPrettyString(entity):food}");
+            _adminLogger.Add(LogType.ForceFeed,
+                LogImpact.Medium,
+                $"{ToPrettyString(entity):user} forced {ToPrettyString(args.User):target} to eat {ToPrettyString(entity):food}");
         }
         else
         {
-            _popup.PopupClient(Loc.GetString(entity.Comp.EatMessage, ("food", entity.Owner), ("flavors", flavors)), args.User, args.User);
+            _popup.PopupClient(Loc.GetString(entity.Comp.EatMessage, ("food", entity.Owner), ("flavors", flavors)),
+                args.User,
+                args.User);
 
             // log successful voluntary eating
-            _adminLogger.Add(LogType.Ingestion, LogImpact.Low, $"{ToPrettyString(args.User):target} ate {ToPrettyString(entity):food}");
+            _adminLogger.Add(LogType.Ingestion,
+                LogImpact.Low,
+                $"{ToPrettyString(args.User):target} ate {ToPrettyString(entity):food}");
         }
 
         // BREAK OUR UTENSILS

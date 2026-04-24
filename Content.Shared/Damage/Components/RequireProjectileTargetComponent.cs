@@ -11,14 +11,14 @@ namespace Content.Shared.Damage.Components;
 /// <summary>
 /// Prevent the object from getting hit by projetiles unless you target the object.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 [Access(typeof(RequireProjectileTargetSystem))]
 public sealed partial class RequireProjectileTargetComponent : Component
 {
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public bool Active = true;
 
     // Goobstation - Crawl fix
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public bool IgnoreThrow = false;
 }

@@ -1,17 +1,15 @@
+using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Mobs.Systems;
-using Content.Shared.Traits.Assorted;
-using Content.Shared.Damage.Events;
-using Content.Shared.Weapons.Melee.Events;
-using Content.Shared.Damage.Components;
 using Robust.Shared.Random;
 
 namespace Content.Shared.Traits.Assorted.Systems;
 
-public sealed partial class TraitStatModifierSystem : EntitySystem
+public sealed class TraitStatModifierSystem : EntitySystem
 {
-    [Dependency] private readonly MobThresholdSystem _threshold = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly MobThresholdSystem _threshold = default!;
+
     public override void Initialize()
     {
         base.Initialize();
@@ -24,9 +22,9 @@ public sealed partial class TraitStatModifierSystem : EntitySystem
         if (!TryComp<MobThresholdsComponent>(uid, out var threshold))
             return;
 
-        var deadThreshold = _threshold.GetThresholdForState(uid, Mobs.MobState.Dead, threshold);
+        var deadThreshold = _threshold.GetThresholdForState(uid, MobState.Dead, threshold);
         if (deadThreshold != 0)
-            _threshold.SetMobStateThreshold(uid, deadThreshold + component.DeadThresholdModifier, Mobs.MobState.Dead);
+            _threshold.SetMobStateThreshold(uid, deadThreshold + component.DeadThresholdModifier, MobState.Dead);
     }
 
     private void OnCritStartup(EntityUid uid, CritModifierComponent component, ComponentStartup args)
@@ -34,9 +32,8 @@ public sealed partial class TraitStatModifierSystem : EntitySystem
         if (!TryComp<MobThresholdsComponent>(uid, out var threshold))
             return;
 
-        var critThreshold = _threshold.GetThresholdForState(uid, Mobs.MobState.Critical, threshold);
+        var critThreshold = _threshold.GetThresholdForState(uid, MobState.Critical, threshold);
         if (critThreshold != 0)
-            _threshold.SetMobStateThreshold(uid, critThreshold + component.CritThresholdModifier, Mobs.MobState.Critical);
+            _threshold.SetMobStateThreshold(uid, critThreshold + component.CritThresholdModifier, MobState.Critical);
     }
-
 }

@@ -109,37 +109,23 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
 namespace Content.Shared.Buckle.Components;
 
 /// <summary>
-/// This component allows an entity to be buckled to an entity with a <see cref="StrapComponent"/>.
+/// This component allows an entity to be buckled to an entity with a <see cref="StrapComponent" />.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState, AutoGenerateComponentPause]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState] [AutoGenerateComponentPause]
 [Access(typeof(SharedBuckleSystem))]
 public sealed partial class BuckleComponent : Component
 {
     /// <summary>
-    /// The range from which this entity can buckle to a <see cref="StrapComponent"/>.
-    /// Separated from normal interaction range to fix the "someone buckled to a strap
-    /// across a table two tiles away" problem.
+    /// The strap that this component is buckled to.
     /// </summary>
-    [DataField]
-    public float Range = SharedInteractionSystem.InteractionRange;
+    [DataField] [AutoNetworkedField]
+    public EntityUid? BuckledTo;
 
     /// <summary>
-    /// True if the entity is buckled, false otherwise.
+    /// The time that this entity buckled at.
     /// </summary>
-    [MemberNotNullWhen(true, nameof(BuckledTo))]
-    public bool Buckled => BuckledTo != null;
-
-    /// <summary>
-    /// Whether or not collisions should be possible with the entity we are strapped to
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public bool DontCollide;
-
-    /// <summary>
-    /// Whether or not we should be allowed to pull the entity we are strapped to
-    /// </summary>
-    [DataField]
-    public bool PullStrap;
+    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))] [AutoPausedField] [AutoNetworkedField]
+    public TimeSpan? BuckleTime;
 
     /// <summary>
     /// The amount of time that must pass for this entity to
@@ -149,28 +135,42 @@ public sealed partial class BuckleComponent : Component
     public TimeSpan Delay = TimeSpan.FromSeconds(0.25f);
 
     /// <summary>
-    /// The time that this entity buckled at.
+    /// Whether or not collisions should be possible with the entity we are strapped to
     /// </summary>
-    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer)), AutoPausedField, AutoNetworkedField]
-    public TimeSpan? BuckleTime;
-
-    /// <summary>
-    /// The strap that this component is buckled to.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public EntityUid? BuckledTo;
-
-    /// <summary>
-    /// The amount of space that this entity occupies in a
-    /// <see cref="StrapComponent"/>.
-    /// </summary>
-    [DataField]
-    public int Size = 100;
+    [DataField] [AutoNetworkedField]
+    public bool DontCollide;
 
     /// <summary>
     /// Used for client rendering
     /// </summary>
     [ViewVariables] public int? OriginalDrawDepth;
+
+    /// <summary>
+    /// Whether or not we should be allowed to pull the entity we are strapped to
+    /// </summary>
+    [DataField]
+    public bool PullStrap;
+
+    /// <summary>
+    /// The range from which this entity can buckle to a <see cref="StrapComponent" />.
+    /// Separated from normal interaction range to fix the "someone buckled to a strap
+    /// across a table two tiles away" problem.
+    /// </summary>
+    [DataField]
+    public float Range = SharedInteractionSystem.InteractionRange;
+
+    /// <summary>
+    /// The amount of space that this entity occupies in a
+    /// <see cref="StrapComponent" />.
+    /// </summary>
+    [DataField]
+    public int Size = 100;
+
+    /// <summary>
+    /// True if the entity is buckled, false otherwise.
+    /// </summary>
+    [MemberNotNullWhen(true, nameof(BuckledTo))]
+    public bool Buckled => BuckledTo != null;
 }
 
 public sealed partial class UnbuckleAlertEvent : BaseAlertEvent;
@@ -252,12 +252,12 @@ public readonly record struct UnstrappedEvent(Entity<StrapComponent> Strap, Enti
 public readonly record struct UnbuckledEvent(Entity<StrapComponent> Strap, Entity<BuckleComponent> Buckle);
 
 // WD EDIT START
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class UnbuckleDoAfterEvent : SimpleDoAfterEvent;
 // WD EDIT END
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum BuckleVisuals
 {
-    Buckled
+    Buckled,
 }

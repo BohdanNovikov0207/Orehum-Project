@@ -9,7 +9,6 @@ namespace Content.Shared.Security;
 
 /// <summary>
 /// Status used in Criminal Records.
-///
 /// None - the default value
 /// Suspected - the person is suspected of doing something illegal
 /// Wanted - the person is being wanted by security
@@ -32,5 +31,5 @@ public enum SecurityStatus : byte
     Search,
     Perma,
     Dangerous,
-    Demote // Goobstation - Demotion
+    Demote, // Goobstation - Demotion
 }

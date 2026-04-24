@@ -31,23 +31,22 @@ namespace Content.Shared.Shuttles.Systems;
 
 public abstract partial class SharedShuttleSystem : EntitySystem
 {
-    [Dependency] private readonly IMapManager _mapManager = default!;
+    public const float FTLRange = 256f;
+    public const float FTLBufferRange = 8f;
+    public const float TileDensityMultiplier = 0.5f;
     [Dependency] private readonly ItemSlotsSystem _itemSlots = default!;
+    [Dependency] private readonly IMapManager _mapManager = default!;
+    [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
     [Dependency] protected readonly FixtureSystem Fixtures = default!;
     [Dependency] protected readonly SharedMapSystem Maps = default!;
     [Dependency] protected readonly SharedPhysicsSystem Physics = default!;
     [Dependency] protected readonly SharedTransformSystem XformSystem = default!;
-    [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
-
-    public const float FTLRange = 256f;
-    public const float FTLBufferRange = 8f;
-    public const float TileDensityMultiplier = 0.5f;
 
     private EntityQuery<MapGridComponent> _gridQuery;
-    private EntityQuery<PhysicsComponent> _physicsQuery;
-    private EntityQuery<TransformComponent> _xformQuery;
 
     private List<Entity<MapGridComponent>> _grids = new();
+    private EntityQuery<PhysicsComponent> _physicsQuery;
+    private EntityQuery<TransformComponent> _xformQuery;
 
     public override void Initialize()
     {
@@ -86,34 +85,29 @@ public abstract partial class SharedShuttleSystem : EntitySystem
         if (destination.RequireCoordinateDisk)
         {
             if (!TryComp<ItemSlotsComponent>(consoleUid, out var slot))
-            {
                 return false;
-            }
 
-            if (!_itemSlots.TryGetSlot(consoleUid, SharedShuttleConsoleComponent.DiskSlotName, out var itemSlot, component: slot) || !itemSlot.HasItem)
-            {
+            if (!_itemSlots.TryGetSlot(consoleUid,
+                    SharedShuttleConsoleComponent.DiskSlotName,
+                    out var itemSlot,
+                    slot) || !itemSlot.HasItem)
                 return false;
-            }
 
             if (itemSlot.Item is { Valid: true } disk)
             {
                 ShuttleDestinationCoordinatesComponent? diskCoordinates = null;
                 if (!Resolve(disk, ref diskCoordinates))
-                {
                     return false;
-                }
 
                 var diskCoords = diskCoordinates.Destination;
 
-                if (diskCoords == null || !TryComp<FTLDestinationComponent>(diskCoords.Value, out var diskDestination) || diskDestination != destination)
-                {
+                if (diskCoords == null ||
+                    !TryComp<FTLDestinationComponent>(diskCoords.Value, out var diskDestination) ||
+                    diskDestination != destination)
                     return false;
-                }
             }
             else
-            {
                 return false;
-            }
         }
 
         if (HasComp<FTLMapComponent>(mapUid))
@@ -125,7 +119,8 @@ public abstract partial class SharedShuttleSystem : EntitySystem
     /// <summary>
     /// Gets the list of map objects relevant for the specified map.
     /// </summary>
-    public IEnumerable<(ShuttleExclusionObject Exclusion, MapCoordinates Coordinates)> GetExclusions(MapId mapId, List<ShuttleExclusionObject> exclusions)
+    public IEnumerable<(ShuttleExclusionObject Exclusion, MapCoordinates Coordinates)> GetExclusions(MapId mapId,
+        List<ShuttleExclusionObject> exclusions)
     {
         foreach (var exc in exclusions)
         {
@@ -141,7 +136,8 @@ public abstract partial class SharedShuttleSystem : EntitySystem
     /// <summary>
     /// Gets the list of map objects relevant for the specified map.
     /// </summary>
-    public IEnumerable<(ShuttleBeaconObject Beacon, MapCoordinates Coordinates)> GetBeacons(MapId mapId, List<ShuttleBeaconObject> beacons)
+    public IEnumerable<(ShuttleBeaconObject Beacon, MapCoordinates Coordinates)> GetBeacons(MapId mapId,
+        List<ShuttleBeaconObject> beacons)
     {
         foreach (var beacon in beacons)
         {
@@ -160,23 +156,17 @@ public abstract partial class SharedShuttleSystem : EntitySystem
             return true;
 
         if (physics.BodyType != BodyType.Static && physics.Mass < 10f)
-        {
             return false;
-        }
 
         if (!Resolve(gridUid, ref iffComp, false))
-        {
             return true;
-        }
 
         // Hide it entirely.
         return (iffComp.Flags & IFFFlags.Hide) == 0x0;
     }
 
-    public bool IsBeaconMap(EntityUid mapUid)
-    {
-        return TryComp(mapUid, out FTLDestinationComponent? ftlDest) && ftlDest.BeaconsOnly;
-    }
+    public bool IsBeaconMap(EntityUid mapUid) =>
+        TryComp(mapUid, out FTLDestinationComponent? ftlDest) && ftlDest.BeaconsOnly;
 
     /// <summary>
     /// Returns true if a beacon can be FTLd to.
@@ -191,10 +181,8 @@ public abstract partial class SharedShuttleSystem : EntitySystem
     /// <summary>
     /// Frontier edit
     /// </summary>
-    public float GetFTLRange(EntityUid shuttleUid, FTLDriveComponent? ftl = null)
-    {
-        return !Resolve(shuttleUid, ref ftl) ? 0f : ftl.Data.Range;
-    }
+    public float GetFTLRange(EntityUid shuttleUid, FTLDriveComponent? ftl = null) =>
+        !Resolve(shuttleUid, ref ftl) ? 0f : ftl.Data.Range;
 
     public float GetFTLBufferRange(EntityUid shuttleUid, MapGridComponent? grid = null)
     {
@@ -210,14 +198,16 @@ public abstract partial class SharedShuttleSystem : EntitySystem
     /// <summary>
     /// Returns true if the spot is free to be FTLd to (not close to any objects and in range).
     /// </summary>
-    public bool FTLFree(EntityUid shuttleUid, EntityCoordinates coordinates, Angle angle, List<ShuttleExclusionObject>? exclusionZones, FTLDriveComponent? ftl = null) // Frontier edit - FTL drive
+    public bool FTLFree(EntityUid shuttleUid,
+        EntityCoordinates coordinates,
+        Angle angle,
+        List<ShuttleExclusionObject>? exclusionZones,
+        FTLDriveComponent? ftl = null) // Frontier edit - FTL drive
     {
         if (!_physicsQuery.TryGetComponent(shuttleUid, out var shuttlePhysics) ||
             !_xformQuery.TryGetComponent(shuttleUid, out var shuttleXform)
             || !Resolve(shuttleUid, ref ftl, false))
-        {
             return false;
-        }
 
         // Just checks if any grids inside of a buffer range at the target position.
         _grids.Clear();
@@ -237,9 +227,7 @@ public abstract partial class SharedShuttleSystem : EntitySystem
 
         // Check range even if it's cross-map.
         if ((targetPosition - ourPos).Length() > GetFTLRange(shuttleUid, ftl)) // Frontier edit - FTL range
-        {
             return false;
-        }
 
         // Check exclusion zones.
         // This needs to be passed in manually due to PVS.
@@ -260,8 +248,11 @@ public abstract partial class SharedShuttleSystem : EntitySystem
         var ourFTLBuffer = GetFTLBufferRange(shuttleUid);
         var circle = new PhysShapeCircle(ourFTLBuffer + FTLBufferRange, targetPosition);
 
-        _mapManager.FindGridsIntersecting(mapCoordinates.MapId, circle, Robust.Shared.Physics.Transform.Empty,
-            ref _grids, includeMap: false);
+        _mapManager.FindGridsIntersecting(mapCoordinates.MapId,
+            circle,
+            Robust.Shared.Physics.Transform.Empty,
+            ref _grids,
+            includeMap: false);
 
         // If any grids in range that aren't us then can't FTL.
         foreach (var grid in _grids)

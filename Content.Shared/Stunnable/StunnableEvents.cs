@@ -8,22 +8,21 @@ namespace Content.Shared.Stunnable;
 /// <summary>
 /// This contains all the events raised by the SharedStunSystem
 /// </summary>
-
 /// <summary>
-///     Raised directed on an entity when it is stunned.
+/// Raised directed on an entity when it is stunned.
 /// </summary>
 [ByRefEvent]
 public record struct StunnedEvent;
 
 /// <summary>
-///     Raised on a stunned entity when something wants to remove the stunned component.
+/// Raised on a stunned entity when something wants to remove the stunned component.
 /// </summary>
 [ByRefEvent]
 public record struct StunEndAttemptEvent(bool Cancelled);
 
 /// <summary>
-///     Raised directed on an entity before it is knocked down to see if it should be cancelled, and to determine
-///     knocked down arguments.
+/// Raised directed on an entity before it is knocked down to see if it should be cancelled, and to determine
+/// knocked down arguments.
 /// </summary>
 [ByRefEvent]
 public record struct KnockDownAttemptEvent(bool AutoStand, bool Drop, TimeSpan? Time)
@@ -32,23 +31,23 @@ public record struct KnockDownAttemptEvent(bool AutoStand, bool Drop, TimeSpan? 
 }
 
 /// <summary>
-///     Raised directed on an entity when it is knocked down.
+/// Raised directed on an entity when it is knocked down.
 /// </summary>
 [ByRefEvent]
 public record struct KnockedDownEvent;
 
 /// <summary>
-///     Raised on an entity that needs to refresh its knockdown modifiers
+/// Raised on an entity that needs to refresh its knockdown modifiers
 /// </summary>
 [ByRefEvent]
 public record struct KnockedDownRefreshEvent()
 {
-    public float SpeedModifier = 1f;
     public float FrictionModifier = 1f;
+    public float SpeedModifier = 1f;
 }
 
 /// <summary>
-///     Raised directed on an entity when it tries to stand up
+/// Raised directed on an entity when it tries to stand up
 /// </summary>
 /// <param name="Autostand">If the attempt was cancelled, passes a recommended value to change autostand to.</param>
 [ByRefEvent]
@@ -76,7 +75,7 @@ public record struct GetStandUpTimeEvent(TimeSpan DoAfterTime);
 public record struct TryForceStandEvent(float Stamina);
 
 /// <summary>
-///     Raised when you click on the Knocked Down Alert
+/// Raised when you click on the Knocked Down Alert
 /// </summary>
 public sealed partial class KnockedDownAlertEvent : BaseAlertEvent;
 
@@ -84,12 +83,11 @@ public sealed partial class KnockedDownAlertEvent : BaseAlertEvent;
 /// The DoAfterEvent for trying to stand the slow and boring way.
 /// </summary>
 [ByRefEvent]
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class TryStandDoAfterEvent : SimpleDoAfterEvent;
 
 /// <summary>
 /// An event sent by the client to the server to ask it very nicely to perform a forced stand-up.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class ForceStandUpEvent : EntityEventArgs;
-

@@ -1,8 +1,8 @@
 ﻿using Content.Shared.Interaction;
 using Content.Shared.Interaction.Events;
 using Content.Shared.Item.ItemToggle.Components;
-using Content.Shared.Trigger.Components.Triggers;
 using Content.Shared.Trigger.Components.Effects;
+using Content.Shared.Trigger.Components.Triggers;
 
 namespace Content.Shared.Trigger.Systems;
 
@@ -51,9 +51,15 @@ public sealed partial class TriggerSystem
 
         var handled = false;
         if (itemToggle.Activated && ent.Comp.CanDeactivate)
-            handled = _itemToggle.TryDeactivate((target.Value, itemToggle), args.User, ent.Comp.Predicted, ent.Comp.ShowPopup);
+            handled = _itemToggle.TryDeactivate((target.Value, itemToggle),
+                args.User,
+                ent.Comp.Predicted,
+                ent.Comp.ShowPopup);
         else if (ent.Comp.CanActivate)
-            handled = _itemToggle.TryActivate((target.Value, itemToggle), args.User, ent.Comp.Predicted, ent.Comp.ShowPopup);
+            handled = _itemToggle.TryActivate((target.Value, itemToggle),
+                args.User,
+                ent.Comp.Predicted,
+                ent.Comp.ShowPopup);
 
         args.Handled |= handled;
     }

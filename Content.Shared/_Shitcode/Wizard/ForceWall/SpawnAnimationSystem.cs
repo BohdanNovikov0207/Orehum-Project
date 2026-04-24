@@ -21,10 +21,8 @@ public sealed class SpawnAnimationSystem : EntitySystem
         SubscribeLocalEvent<SpawnAnimationComponent, ComponentInit>(OnInit);
     }
 
-    private void OnInit(Entity<SpawnAnimationComponent> ent, ref ComponentInit args)
-    {
+    private void OnInit(Entity<SpawnAnimationComponent> ent, ref ComponentInit args) =>
         _appearance.SetData(ent, SpawnAnimationVisuals.Spawned, ent.Comp.Spawned);
-    }
 
     public override void Update(float frameTime)
     {

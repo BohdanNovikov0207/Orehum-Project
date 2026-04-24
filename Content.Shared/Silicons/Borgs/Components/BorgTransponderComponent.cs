@@ -15,20 +15,27 @@ namespace Content.Shared.Silicons.Borgs.Components;
 /// Periodically broadcasts borg data to robotics consoles.
 /// When not emagged, handles disabling and destroying commands as expected.
 /// </summary>
-[RegisterComponent, Access(typeof(SharedBorgSystem))]
+[RegisterComponent] [Access(typeof(SharedBorgSystem))]
 public sealed partial class BorgTransponderComponent : Component
 {
     /// <summary>
-    /// Sprite of the chassis to send.
+    /// How long to wait between each broadcast.
     /// </summary>
-    [DataField(required: true)]
-    public SpriteSpecifier? Sprite;
+    [DataField]
+    public TimeSpan BroadcastDelay = TimeSpan.FromSeconds(5);
 
     /// <summary>
-    /// Name of the chassis to send.
+    /// Popup shown to everyone when a borg is being destroyed.
+    /// Gets passed a string "name".
     /// </summary>
-    [DataField(required: true)]
-    public string Name = string.Empty;
+    [DataField]
+    public LocId DestroyingPopup = "borg-transponder-destroying-popup";
+
+    /// <summary>
+    /// How long to wait to disable the borg after RD has ordered it.
+    /// </summary>
+    [DataField]
+    public TimeSpan DisableDelay = TimeSpan.FromSeconds(5);
 
     /// <summary>
     /// Popup shown to everyone after a borg is disabled.
@@ -44,17 +51,22 @@ public sealed partial class BorgTransponderComponent : Component
     public LocId DisablingPopup = "borg-transponder-disabling-popup";
 
     /// <summary>
-    /// Popup shown to everyone when a borg is being destroyed.
-    /// Gets passed a string "name".
+    /// Pretend that the borg has no brain inserted.
     /// </summary>
     [DataField]
-    public LocId DestroyingPopup = "borg-transponder-destroying-popup";
+    public bool FakeDisabled;
 
     /// <summary>
-    /// How long to wait between each broadcast.
+    /// Pretend that the borg cannot be disabled due to being on delay.
     /// </summary>
     [DataField]
-    public TimeSpan BroadcastDelay = TimeSpan.FromSeconds(5);
+    public bool FakeDisabling;
+
+    /// <summary>
+    /// Name of the chassis to send.
+    /// </summary>
+    [DataField(required: true)]
+    public string Name = string.Empty;
 
     /// <summary>
     /// When to next broadcast data.
@@ -69,20 +81,8 @@ public sealed partial class BorgTransponderComponent : Component
     public TimeSpan? NextDisable;
 
     /// <summary>
-    /// How long to wait to disable the borg after RD has ordered it.
+    /// Sprite of the chassis to send.
     /// </summary>
-    [DataField]
-    public TimeSpan DisableDelay = TimeSpan.FromSeconds(5);
-
-    /// <summary>
-    /// Pretend that the borg cannot be disabled due to being on delay.
-    /// </summary>
-    [DataField]
-    public bool FakeDisabling;
-
-    /// <summary>
-    /// Pretend that the borg has no brain inserted.
-    /// </summary>
-    [DataField]
-    public bool FakeDisabled;
+    [DataField(required: true)]
+    public SpriteSpecifier? Sprite;
 }

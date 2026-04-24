@@ -4,7 +4,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Chemistry.Reagent;
 using Content.Shared.Nutrition.Components;
 using Content.Shared.Nutrition.EntitySystems;
 using Robust.Shared.Prototypes;
@@ -33,5 +32,7 @@ public sealed partial class SatiateThirst : EntityEffect
     }
 
     protected override string? ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys)
-        => Loc.GetString("reagent-effect-guidebook-satiate-thirst", ("chance", Probability), ("relative",  HydrationFactor / DefaultHydrationFactor));
+        => Loc.GetString("reagent-effect-guidebook-satiate-thirst",
+            ("chance", Probability),
+            ("relative", HydrationFactor / DefaultHydrationFactor));
 }

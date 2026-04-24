@@ -98,16 +98,12 @@ using Content.Shared._Goobstation.Wizard;
 using Content.Shared._Goobstation.Wizard.BindSoul;
 using Content.Shared._Goobstation.Wizard.Chuuni;
 using Content.Shared._Goobstation.Wizard.FadingTimedDespawn;
-using Content.Shared._Shitmed.Damage;
-using Content.Shared._Shitmed.Targeting;
-using Content.Shared.Actions;
 using Content.Shared.Body.Components;
 using Content.Shared.Body.Systems;
 using Content.Shared.Coordinates.Helpers;
 using Content.Shared.Damage;
 using Content.Shared.Doors.Components;
 using Content.Shared.Doors.Systems;
-using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Ghost;
 using Content.Shared.Gibbing.Events;
 using Content.Shared.Hands.Components;
@@ -152,30 +148,30 @@ namespace Content.Shared.Magic;
 /// </summary>
 public abstract class SharedMagicSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!; // Goobstation
-    [Dependency] private readonly ISerializationManager _seriMan = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly SharedBodySystem _body = default!;
+    [Dependency] private readonly DamageableSystem _damageable = default!; // Goobstation
+    [Dependency] private readonly SharedDoorSystem _door = default!;
+    [Dependency] private readonly NpcFactionSystem _faction = default!; // Goobstation
+    [Dependency] private readonly SharedGunSystem _gunSystem = default!;
+    [Dependency] private readonly SharedHandsSystem _hands = default!;
+    [Dependency] private readonly SharedInteractionSystem _interaction = default!;
+    [Dependency] private readonly InventorySystem _inventory = default!;
+    [Dependency] private readonly LockSystem _lock = default!;
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly IMapManager _mapManager = default!;
     [Dependency] private readonly SharedMapSystem _mapSystem = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly SharedGunSystem _gunSystem = default!;
-    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly INetManager _net = default!;
-    [Dependency] private readonly SharedBodySystem _body = default!;
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly SharedDoorSystem _door = default!;
-    [Dependency] private readonly InventorySystem _inventory = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly SharedInteractionSystem _interaction = default!;
-    [Dependency] private readonly LockSystem _lock = default!;
-    [Dependency] private readonly SharedHandsSystem _hands = default!;
-    [Dependency] private readonly TagSystem _tag = default!;
-    [Dependency] private readonly MobStateSystem _mobState = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedMindSystem _mind = default!;
+    [Dependency] private readonly MobStateSystem _mobState = default!;
+    [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly ISerializationManager _seriMan = default!;
     [Dependency] private readonly SharedStunSystem _stun = default!;
-    [Dependency] private readonly DamageableSystem _damageable = default!; // Goobstation
-    [Dependency] private readonly NpcFactionSystem _faction = default!; // Goobstation
+    [Dependency] private readonly TagSystem _tag = default!;
+    [Dependency] private readonly IGameTiming _timing = default!; // Goobstation
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly TurfSystem _turf = default!;
 
     public override void Initialize()
@@ -334,7 +330,9 @@ public abstract class SharedMagicSystem : EntitySystem
             return;
 
         args.Cancelled = true;
-        _popup.PopupClient(Loc.GetString("spell-requirements-failed-speech"), args.Performer, args.Performer); // Goob edit
+        _popup.PopupClient(Loc.GetString("spell-requirements-failed-speech"),
+            args.Performer,
+            args.Performer); // Goob edit
 
         // TODO: Pre-cast do after, either here or in SharedActionsSystem
     }
@@ -355,7 +353,9 @@ public abstract class SharedMagicSystem : EntitySystem
     }
 
     #region Spells
+
     #region Instant Spawn Spells
+
     /// <summary>
     /// Handles the instant action (i.e. on the caster) attempting to spawn an entity.
     /// </summary>
@@ -374,16 +374,17 @@ public abstract class SharedMagicSystem : EntitySystem
         args.Handled = true;
     }
 
-        /// <summary>
-    ///     Gets spawn positions listed on <see cref="InstantSpawnSpellEvent"/>
+    /// <summary>
+    /// Gets spawn positions listed on <see cref="InstantSpawnSpellEvent" />
     /// </summary>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
-    public List<EntityCoordinates> GetInstantSpawnPositions(TransformComponent casterXform, MagicInstantSpawnData data) // Goob edit - made public
+    public List<EntityCoordinates>
+        GetInstantSpawnPositions(TransformComponent casterXform, MagicInstantSpawnData data) // Goob edit - made public
     {
         switch (data)
         {
             case TargetCasterPos:
-                return new List<EntityCoordinates>(1) {casterXform.Coordinates};
+                return new List<EntityCoordinates>(1) { casterXform.Coordinates };
             case TargetInFrontSingle:
             {
                 var directionPos = casterXform.Coordinates.Offset(casterXform.LocalRotation.ToWorldVec().Normalized());
@@ -394,7 +395,8 @@ public abstract class SharedMagicSystem : EntitySystem
                     return new List<EntityCoordinates>();
 
                 var tileIndex = tileReference.Value.GridIndices;
-                return new List<EntityCoordinates>(1) { _mapSystem.GridTileToLocal(casterXform.GridUid.Value, mapGrid, tileIndex) };
+                return new List<EntityCoordinates>(1)
+                    { _mapSystem.GridTileToLocal(casterXform.GridUid.Value, mapGrid, tileIndex) };
             }
             case TargetInFront:
             {
@@ -418,7 +420,8 @@ public abstract class SharedMagicSystem : EntitySystem
                     case Direction.South:
                     {
                         coordsPlus = _mapSystem.GridTileToLocal(casterXform.GridUid.Value, mapGrid, tileIndex + (1, 0));
-                        coordsMinus = _mapSystem.GridTileToLocal(casterXform.GridUid.Value, mapGrid, tileIndex + (-1, 0));
+                        coordsMinus =
+                            _mapSystem.GridTileToLocal(casterXform.GridUid.Value, mapGrid, tileIndex + (-1, 0));
                         return new List<EntityCoordinates>(3)
                         {
                             coords,
@@ -430,7 +433,8 @@ public abstract class SharedMagicSystem : EntitySystem
                     case Direction.West:
                     {
                         coordsPlus = _mapSystem.GridTileToLocal(casterXform.GridUid.Value, mapGrid, tileIndex + (0, 1));
-                        coordsMinus = _mapSystem.GridTileToLocal(casterXform.GridUid.Value, mapGrid, tileIndex + (0, -1));
+                        coordsMinus =
+                            _mapSystem.GridTileToLocal(casterXform.GridUid.Value, mapGrid, tileIndex + (0, -1));
                         return new List<EntityCoordinates>(3)
                         {
                             coords,
@@ -446,9 +450,13 @@ public abstract class SharedMagicSystem : EntitySystem
                 throw new ArgumentOutOfRangeException();
         }
     }
+
     // End Instant Spawn Spells
+
     #endregion
+
     #region World Spawn Spells
+
     /// <summary>
     /// Spawns entities from a list within range of click.
     /// </summary>
@@ -479,7 +487,11 @@ public abstract class SharedMagicSystem : EntitySystem
     /// <param name="entityCoords"> Map Coordinates where the entities will spawn</param>
     /// <param name="lifetime"> Check to see if the entities should self delete</param>
     /// <param name="offsetVector2"> A Vector2 offset that the entities will spawn in</param>
-    private void WorldSpawnSpellHelper(List<EntitySpawnEntry> entityEntries, EntityCoordinates entityCoords, EntityUid performer, float? lifetime, Vector2 offsetVector2)
+    private void WorldSpawnSpellHelper(List<EntitySpawnEntry> entityEntries,
+        EntityCoordinates entityCoords,
+        EntityUid performer,
+        float? lifetime,
+        Vector2 offsetVector2)
     {
         var getProtos = EntitySpawnCollection.GetSpawns(entityEntries, _random);
 
@@ -490,9 +502,13 @@ public abstract class SharedMagicSystem : EntitySystem
             offsetCoords = offsetCoords.Offset(offsetVector2);
         }
     }
+
     // End World Spawn Spells
+
     #endregion
+
     #region Projectile Spells
+
     public void OnProjectileSpell(ProjectileSpellEvent ev) // Goob edit - made public
     {
         if (ev.Handled || !PassesSpellPrerequisites(ev.Action, ev.Performer)) // Goob edit
@@ -511,7 +527,7 @@ public abstract class SharedMagicSystem : EntitySystem
 
         var spawnCoords = _mapManager.TryFindGridAt(fromMap, out var gridUid, out _)
             ? _transform.WithEntityId(fromCoords, gridUid)
-            : new(_mapSystem.GetMap(fromMap.MapId), fromMap.Position);
+            : new EntityCoordinates(_mapSystem.GetMap(fromMap.MapId), fromMap.Position);
         var userVelocity = _physics.GetMapLinearVelocity(spawnCoords); // Goob edit
 
         var ent = Spawn(ev.Prototype, fromMap);
@@ -522,9 +538,13 @@ public abstract class SharedMagicSystem : EntitySystem
         if (ev.Entity != null) // Goobstation
             _gunSystem.SetTarget(ent, ev.Entity.Value, out _);
     }
+
     // End Projectile Spells
+
     #endregion
+
     #region Change Component Spells
+
     // staves.yml ActionRGB light
     private void OnChangeComponentsSpell(ChangeComponentsSpellEvent ev)
     {
@@ -542,9 +562,13 @@ public abstract class SharedMagicSystem : EntitySystem
         RemoveComponents(ev.Target, ev.ToRemove);
         AddComponents(ev.Target, ev.ToAdd);
     }
+
     // End Change Component Spells
+
     #endregion
+
     #region Teleport Spells
+
     // TODO: Rename to teleport clicked spell?
     /// <summary>
     /// Teleports the user to the clicked location
@@ -564,17 +588,26 @@ public abstract class SharedMagicSystem : EntitySystem
 
         var transform = Transform(args.Performer);
 
-        if (transform.MapID != args.Target.GetMapId(EntityManager) || !_interaction.InRangeUnobstructed(args.Performer, args.Target, range: 1000F, collisionMask: CollisionGroup.Opaque, popup: true))
+        if (transform.MapID != args.Target.GetMapId(EntityManager) ||
+            !_interaction.InRangeUnobstructed(args.Performer, args.Target, 1000F, CollisionGroup.Opaque, popup: true))
             return;
 
         _transform.SetCoordinates(args.Performer, args.Target);
         _transform.AttachToGridOrMap(args.Performer, transform);
         args.Handled = true;
     }
+
     // End Teleport Spells
+
     #endregion
+
     #region Spell Helpers
-    private void SpawnSpellHelper(string? proto, EntityCoordinates position, EntityUid performer, float? lifetime = null, bool preventCollide = false)
+
+    private void SpawnSpellHelper(string? proto,
+        EntityCoordinates position,
+        EntityUid performer,
+        float? lifetime = null,
+        bool preventCollide = false)
     {
         if (!_net.IsServer)
             return;
@@ -601,10 +634,10 @@ public abstract class SharedMagicSystem : EntitySystem
             if (HasComp(target, data.Component.GetType()))
                 continue;
 
-            var component = (Component)Factory.GetComponent(name);
-            var temp = (object)component;
+            var component = (Component) Factory.GetComponent(name);
+            var temp = (object) component;
             _seriMan.CopyTo(data.Component, ref temp);
-            AddComp(target, (Component)temp!);
+            AddComp(target, (Component) temp!);
         }
     }
 
@@ -616,9 +649,13 @@ public abstract class SharedMagicSystem : EntitySystem
                 RemComp(target, registration.Type);
         }
     }
+
     // End Spell Helpers
+
     #endregion
+
     #region Smite Spells
+
     private void OnSmiteSpell(SmiteSpellEvent ev)
     {
         if (ev.Handled || !PassesSpellPrerequisites(ev.Action, ev.Performer))
@@ -632,7 +669,8 @@ public abstract class SharedMagicSystem : EntitySystem
 
         ev.Handled = true;
 
-        var direction = _transform.GetMapCoordinates(ev.Target, Transform(ev.Target)).Position - _transform.GetMapCoordinates(ev.Performer, Transform(ev.Performer)).Position;
+        var direction = _transform.GetMapCoordinates(ev.Target, Transform(ev.Target)).Position -
+                        _transform.GetMapCoordinates(ev.Performer, Transform(ev.Performer)).Position;
         var impulseVector = direction * 10000;
 
         _physics.ApplyLinearImpulse(ev.Target, impulseVector);
@@ -643,9 +681,13 @@ public abstract class SharedMagicSystem : EntitySystem
         if (_timing.IsFirstTimePredicted) // Goobstation
             _body.GibBody(ev.Target, true, body, splatModifier: 10f, contents: GibContentsOption.Skip); // Goob edit
     }
+
     // End Smite Spells
+
     #endregion
+
     #region Knock Spells
+
     /// <summary>
     /// Opens all doors and locks within range
     /// </summary>
@@ -660,7 +702,9 @@ public abstract class SharedMagicSystem : EntitySystem
         var transform = Transform(args.Performer);
 
         // Look for doors and lockers, and don't open/unlock them if they're already opened/unlocked.
-        foreach (var target in _lookup.GetEntitiesInRange(_transform.GetMapCoordinates(args.Performer, transform), args.Range, flags: LookupFlags.Dynamic | LookupFlags.Static | LookupFlags.Approximate)) // Goob edit
+        foreach (var target in _lookup.GetEntitiesInRange(_transform.GetMapCoordinates(args.Performer, transform),
+                     args.Range,
+                     LookupFlags.Dynamic | LookupFlags.Static | LookupFlags.Approximate)) // Goob edit
         {
             // Goob edit
             // if (!_interaction.InRangeUnobstructed(args.Performer, target, range: 0, collisionMask: CollisionGroup.Opaque))
@@ -676,13 +720,18 @@ public abstract class SharedMagicSystem : EntitySystem
                 _lock.Unlock(target, args.Performer, lockComp);
         }
     }
+
     // End Knock Spells
+
     #endregion
+
     #region Charge Spells
+
     // TODO: Future support to charge other items
     private void OnChargeSpell(ChargeSpellEvent ev)
     {
-        if (ev.Handled || !PassesSpellPrerequisites(ev.Action, ev.Performer) || !TryComp<HandsComponent>(ev.Performer, out var handsComp))
+        if (ev.Handled || !PassesSpellPrerequisites(ev.Action, ev.Performer) ||
+            !TryComp<HandsComponent>(ev.Performer, out var handsComp))
             return;
 
         EntityUid? wand = null;
@@ -696,18 +745,23 @@ public abstract class SharedMagicSystem : EntitySystem
 
         ev.Handled = true;
 
-        if (wand == null || !TryComp<BasicEntityAmmoProviderComponent>(wand, out var basicAmmoComp) || basicAmmoComp.Count == null)
+        if (wand == null || !TryComp<BasicEntityAmmoProviderComponent>(wand, out var basicAmmoComp) ||
+            basicAmmoComp.Count == null)
             return;
 
         _gunSystem.UpdateBasicEntityAmmoCount(wand.Value, basicAmmoComp.Count.Value + ev.Charge, basicAmmoComp);
     }
+
     // End Charge Spells
+
     #endregion
+
     #region Global Spells
 
     private void OnRandomGlobalSpawnSpell(RandomGlobalSpawnSpellEvent ev)
     {
-        if (!_net.IsServer || ev.Handled || !PassesSpellPrerequisites(ev.Action, ev.Performer) || ev.Spawns is not { } spawns)
+        if (!_net.IsServer || ev.Handled || !PassesSpellPrerequisites(ev.Action, ev.Performer) ||
+            ev.Spawns is not { } spawns)
             return;
 
         ev.Handled = true;
@@ -733,6 +787,7 @@ public abstract class SharedMagicSystem : EntitySystem
     }
 
     #endregion
+
     #region Mindswap Spells
 
     private void OnMindSwapSpell(MindSwapSpellEvent ev)
@@ -795,9 +850,7 @@ public abstract class SharedMagicSystem : EntitySystem
         _mind.TransferTo(perMind, ev.Target);
 
         if (tarHasMind)
-        {
             _mind.TransferTo(tarMind, ev.Performer);
-        }
 
         _stun.TryUpdateParalyzeDuration(ev.Target, ev.TargetStunDuration);
         _stun.TryUpdateParalyzeDuration(ev.Performer, ev.PerformerStunDuration);
@@ -827,8 +880,8 @@ public abstract class SharedMagicSystem : EntitySystem
         _tag.RemoveTag(ev.Performer, SharedBindSoulSystem.IgnoreBindSoulTag); // Goobstation
         _tag.RemoveTag(ev.Target, SharedBindSoulSystem.IgnoreBindSoulTag); // Goobstation
 
-        _stun.KnockdownOrStun(ev.Target, ev.TargetStunDuration, true); // Goob edit
-        _stun.KnockdownOrStun(ev.Performer, ev.PerformerStunDuration, true); // Goob edit
+        _stun.KnockdownOrStun(ev.Target, ev.TargetStunDuration); // Goob edit
+        _stun.KnockdownOrStun(ev.Performer, ev.PerformerStunDuration); // Goob edit
 
         // Goobstation start
         return;
@@ -941,7 +994,8 @@ public abstract class SharedMagicSystem : EntitySystem
     }
 
     #endregion
-    // End Spells
-    #endregion
 
+    // End Spells
+
+    #endregion
 }

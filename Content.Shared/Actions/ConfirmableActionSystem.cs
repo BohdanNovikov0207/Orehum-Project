@@ -21,9 +21,9 @@ namespace Content.Shared.Actions;
 /// </summary>
 public sealed class ConfirmableActionSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SharedActionsSystem _actions = default!; // Goobstation
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -41,7 +41,7 @@ public sealed class ConfirmableActionSystem : EntitySystem
         var query = EntityQueryEnumerator<ConfirmableActionComponent>();
         while (query.MoveNext(out var uid, out var comp))
         {
-            if (comp.NextUnprime is not {} time)
+            if (comp.NextUnprime is not { } time)
                 continue;
 
             if (now >= time)
@@ -58,7 +58,7 @@ public sealed class ConfirmableActionSystem : EntitySystem
             return;
 
         // if not primed, prime it and cancel the action
-        if (ent.Comp.NextConfirm is not {} confirm)
+        if (ent.Comp.NextConfirm is not { } confirm)
         {
             Prime(ent, args.User);
             args.Cancelled = true;

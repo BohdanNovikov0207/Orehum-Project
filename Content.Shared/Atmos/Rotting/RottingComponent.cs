@@ -6,6 +6,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Damage;
 using Robust.Shared.GameStates;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
@@ -16,10 +17,23 @@ namespace Content.Shared.Atmos.Rotting;
 /// Tracking component for stuff that has started to rot.
 /// Only the current stage is networked to the client.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentPause]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentPause]
 [Access(typeof(SharedRottingSystem))]
 public sealed partial class RottingComponent : Component
 {
+    /// <summary>
+    /// The damage dealt by rotting.
+    /// </summary>
+    [DataField]
+    public DamageSpecifier Damage = new()
+    {
+        DamageDict = new Dictionary<string, FixedPoint2>
+        {
+            { "Blunt", 0.06 },
+            { "Cellular", 0.06 },
+        },
+    };
+
     /// <summary>
     /// Whether or not the rotting should deal damage
     /// </summary>
@@ -44,17 +58,4 @@ public sealed partial class RottingComponent : Component
     /// </summary>
     [DataField]
     public TimeSpan TotalRotTime = TimeSpan.Zero;
-
-    /// <summary>
-    /// The damage dealt by rotting.
-    /// </summary>
-    [DataField]
-    public DamageSpecifier Damage = new()
-    {
-        DamageDict = new()
-        {
-            { "Blunt", 0.06 },
-            { "Cellular", 0.06 }
-        }
-    };
 }

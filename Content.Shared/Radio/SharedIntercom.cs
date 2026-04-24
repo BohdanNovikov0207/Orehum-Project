@@ -8,13 +8,13 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Radio;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum IntercomUiKey
 {
     Key,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class ToggleIntercomMicMessage : BoundUserInterfaceMessage
 {
     public bool Enabled;
@@ -25,7 +25,7 @@ public sealed class ToggleIntercomMicMessage : BoundUserInterfaceMessage
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class ToggleIntercomSpeakerMessage : BoundUserInterfaceMessage
 {
     public bool Enabled;
@@ -36,7 +36,7 @@ public sealed class ToggleIntercomSpeakerMessage : BoundUserInterfaceMessage
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class SelectIntercomChannelMessage : BoundUserInterfaceMessage
 {
     public string Channel;

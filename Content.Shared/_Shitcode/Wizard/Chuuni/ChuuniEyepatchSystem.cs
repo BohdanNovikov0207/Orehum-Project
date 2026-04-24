@@ -5,10 +5,10 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Clothing.EntitySystems;
 using Content.Shared.Damage;
 using Content.Shared.Examine;
-using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Inventory;
 using Content.Shared.Magic.Components;
 using Content.Shared.Verbs;
@@ -20,10 +20,10 @@ namespace Content.Shared._Goobstation.Wizard.Chuuni;
 
 public sealed class ChuuniEyepatchSystem : EntitySystem
 {
-    [Dependency] private readonly INetManager _net = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
     [Dependency] private readonly ClothingSystem _clothing = default!;
+    [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
 
     public override void Initialize()
     {
@@ -57,10 +57,8 @@ public sealed class ChuuniEyepatchSystem : EntitySystem
     }
 
     private void OnGetPostfix(Entity<ChuuniEyepatchComponent> ent,
-        ref InventoryRelayedEvent<GetMessageColorOverrideEvent> args)
-    {
+        ref InventoryRelayedEvent<GetMessageColorOverrideEvent> args) =>
         args.Args.Color = ent.Comp.Color;
-    }
 
     private void OnGetInvocation(Entity<ChuuniEyepatchComponent> ent,
         ref InventoryRelayedEvent<GetSpellInvocationEvent> args)
@@ -120,7 +118,7 @@ public sealed class ChuuniEyepatchSystem : EntitySystem
                 Dirty(ent);
             },
             Text = Loc.GetString("flippable-verb-get-data-text"),
-            Icon = new SpriteSpecifier.Texture(new("/Textures/Interface/VerbIcons/flip.svg.192dpi.png")),
+            Icon = new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/VerbIcons/flip.svg.192dpi.png")),
             Priority = 1,
         };
 
@@ -131,20 +129,18 @@ public sealed class ChuuniEyepatchSystem : EntitySystem
 public sealed class GetSpellInvocationEvent(MagicSchool school, EntityUid performer)
     : EntityEventArgs, IInventoryRelayEvent
 {
-    public SlotFlags TargetSlots => SlotFlags.EYES;
-
-    public MagicSchool School = school;
+    public LocId? Invocation;
 
     public EntityUid Performer = performer;
 
-    public DamageSpecifier ToHeal = new();
+    public MagicSchool School = school;
 
-    public LocId? Invocation;
+    public DamageSpecifier ToHeal = new();
+    public SlotFlags TargetSlots => SlotFlags.EYES;
 }
 
 public sealed class GetMessageColorOverrideEvent : EntityEventArgs, IInventoryRelayEvent
 {
+    public Color? Color;
     public SlotFlags TargetSlots => SlotFlags.EYES;
-
-    public Color? Color = null;
 }

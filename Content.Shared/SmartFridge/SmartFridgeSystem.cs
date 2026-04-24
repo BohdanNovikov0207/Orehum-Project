@@ -1,4 +1,3 @@
-using Content.Shared.Access.Components;
 using Content.Shared.Access.Systems;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.IdentityManagement;
@@ -8,7 +7,6 @@ using Content.Shared.Storage.Components;
 using Content.Shared.Whitelist;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Containers;
-using Robust.Shared.GameObjects;
 using Robust.Shared.Timing;
 
 namespace Content.Shared.SmartFridge;
@@ -16,12 +14,12 @@ namespace Content.Shared.SmartFridge;
 public sealed class SmartFridgeSystem : EntitySystem
 {
     [Dependency] private readonly AccessReaderSystem _accessReader = default!;
-    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedContainerSystem _container = default!;
     [Dependency] private readonly SharedHandsSystem _hands = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
 
     public override void Initialize()
     {
@@ -40,7 +38,10 @@ public sealed class SmartFridgeSystem : EntitySystem
             });
     }
 
-    private bool DoInsert(Entity<SmartFridgeComponent> ent, EntityUid user, IEnumerable<EntityUid> usedItems, bool playSound)
+    private bool DoInsert(Entity<SmartFridgeComponent> ent,
+        EntityUid user,
+        IEnumerable<EntityUid> usedItems,
+        bool playSound)
     {
         if (!_container.TryGetContainer(ent, ent.Comp.Container, out var container))
             return false;
@@ -48,7 +49,7 @@ public sealed class SmartFridgeSystem : EntitySystem
         if (!Allowed(ent, user))
             return true;
 
-        bool anyInserted = false;
+        var anyInserted = false;
         foreach (var used in usedItems)
         {
             if (!_whitelist.CheckBoth(used, ent.Comp.Blacklist, ent.Comp.Whitelist))
@@ -60,7 +61,7 @@ public sealed class SmartFridgeSystem : EntitySystem
             if (!ent.Comp.Entries.Contains(key))
                 ent.Comp.Entries.Add(key);
 
-            ent.Comp.ContainedEntries.TryAdd(key, new());
+            ent.Comp.ContainedEntries.TryAdd(key, new HashSet<NetEntity>());
             var entries = ent.Comp.ContainedEntries[key];
             if (!entries.Contains(GetNetEntity(used)))
                 entries.Add(GetNetEntity(used));
@@ -69,9 +70,7 @@ public sealed class SmartFridgeSystem : EntitySystem
         }
 
         if (anyInserted && playSound)
-        {
             _audio.PlayPredicted(ent.Comp.InsertSound, ent, user);
-        }
 
         return anyInserted;
     }
@@ -89,9 +88,7 @@ public sealed class SmartFridgeSystem : EntitySystem
         var key = new SmartFridgeEntry(Identity.Name(args.Entity, EntityManager));
 
         if (ent.Comp.ContainedEntries.TryGetValue(key, out var contained))
-        {
             contained.Remove(GetNetEntity(args.Entity));
-        }
 
         Dirty(ent);
     }
@@ -139,9 +136,7 @@ public sealed class SmartFridgeSystem : EntitySystem
     private void OnGetDumpableVerb(Entity<SmartFridgeComponent> ent, ref GetDumpableVerbEvent args)
     {
         if (_accessReader.IsAllowed(args.User, ent))
-        {
             args.Verb = Loc.GetString("dump-smartfridge-verb-name", ("unit", ent));
-        }
     }
 
     private void OnDump(Entity<SmartFridgeComponent> ent, ref DumpEvent args)

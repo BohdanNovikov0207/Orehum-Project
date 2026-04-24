@@ -12,5 +12,5 @@ namespace Content.Shared.Morgue.Components;
 /// Makes an entity storage only accept entities that are laying down.
 /// This is true for mobs that are crit, dead or crawling.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class EntityStorageLayingDownOverrideComponent : Component;

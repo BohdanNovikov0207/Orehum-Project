@@ -7,19 +7,13 @@ namespace Content.Shared.Throwing;
 /// <summary>
 /// Allows this entity to be caught in your hands when someone else throws it at you.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class CatchableComponent : Component
 {
     /// <summary>
-    /// If true this item can only be caught while in combat mode.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public bool RequireCombatMode;
-
-    /// <summary>
     /// The chance of successfully catching.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public float CatchChance = 1.0f;
 
     /// <summary>
@@ -28,7 +22,7 @@ public sealed partial class CatchableComponent : Component
     /// <summary>
     /// Example usecase: Only someone who knows martial arts can catch grenades.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public EntityWhitelist? CatcherWhitelist;
 
     /// <summary>
@@ -36,4 +30,10 @@ public sealed partial class CatchableComponent : Component
     /// </summary>
     [DataField]
     public SoundSpecifier? CatchSuccessSound;
+
+    /// <summary>
+    /// If true this item can only be caught while in combat mode.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public bool RequireCombatMode;
 }

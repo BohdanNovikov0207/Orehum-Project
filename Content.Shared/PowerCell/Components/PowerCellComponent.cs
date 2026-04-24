@@ -18,8 +18,8 @@ using Robust.Shared.Serialization;
 namespace Content.Shared.PowerCell;
 
 /// <summary>
-///     This component enables power-cell related interactions (e.g., entity white-lists, cell sizes, examine, rigging).
-///     The actual power functionality is provided by the server-side BatteryComponent.
+/// This component enables power-cell related interactions (e.g., entity white-lists, cell sizes, examine, rigging).
+/// The actual power functionality is provided by the server-side BatteryComponent.
 /// </summary>
 [NetworkedComponent]
 [RegisterComponent]
@@ -31,13 +31,14 @@ public sealed partial class PowerCellComponent : Component
     // Goob edit end
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum PowerCellVisuals : byte
 {
-    ChargeLevel
+    ChargeLevel,
 }
-[Serializable, NetSerializable]
+
+[Serializable] [NetSerializable]
 public enum PowerCellSlotVisuals : byte
 {
-    Enabled
+    Enabled,
 }

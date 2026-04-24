@@ -24,24 +24,23 @@ namespace Content.Shared.Inventory.VirtualItem;
 
 /// <summary>
 /// In charge of managing virtual items.
-/// Virtual items are used to block a <see cref="SlotButton"/>
-/// or a <see cref="HandButton"/> with a non-existent item that
+/// Virtual items are used to block a <see cref="SlotButton" />
+/// or a <see cref="HandButton" /> with a non-existent item that
 /// is a visual copy of another for whatever use
 /// </summary>
 /// <remarks>
-/// The slot visuals are managed by <see cref="HandsUiController"/>
-/// and <see cref="InventoryUiController"/>, see the <see cref="VirtualItemComponent"/>
+/// The slot visuals are managed by <see cref="HandsUiController" />
+/// and <see cref="InventoryUiController" />, see the <see cref="VirtualItemComponent" />
 /// references there for more information
 /// </remarks>
 public abstract class SharedVirtualItemSystem : EntitySystem
 {
-    [Dependency] private readonly SharedContainerSystem _containerSystem = default!;
-    [Dependency] private readonly SharedItemSystem _itemSystem = default!;
-    [Dependency] private readonly InventorySystem _inventorySystem = default!;
-    [Dependency] private readonly SharedHandsSystem _handsSystem = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-
     private static readonly EntProtoId VirtualItem = "VirtualItem";
+    [Dependency] private readonly SharedContainerSystem _containerSystem = default!;
+    [Dependency] private readonly SharedHandsSystem _handsSystem = default!;
+    [Dependency] private readonly InventorySystem _inventorySystem = default!;
+    [Dependency] private readonly SharedItemSystem _itemSystem = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
 
     public override void Initialize()
     {
@@ -51,7 +50,8 @@ public abstract class SharedVirtualItemSystem : EntitySystem
         SubscribeLocalEvent<VirtualItemComponent, BeingUnequippedAttemptEvent>(OnBeingUnequippedAttempt);
 
         SubscribeLocalEvent<VirtualItemComponent, BeforeRangedInteractEvent>(OnBeforeRangedInteract);
-        SubscribeLocalEvent<VirtualItemComponent, GettingInteractedWithAttemptEvent>(OnGettingInteractedWithAttemptEvent);
+        SubscribeLocalEvent<VirtualItemComponent, GettingInteractedWithAttemptEvent>(
+            OnGettingInteractedWithAttemptEvent);
 
         SubscribeLocalEvent<VirtualItemComponent, GetUsedEntityEvent>(OnGetUsedEntity);
     }
@@ -65,29 +65,22 @@ public abstract class SharedVirtualItemSystem : EntitySystem
             _itemSystem.VisualsChanged(ent);
     }
 
-    private void OnBeingEquippedAttempt(Entity<VirtualItemComponent> ent, ref BeingEquippedAttemptEvent args)
-    {
+    private void OnBeingEquippedAttempt(Entity<VirtualItemComponent> ent, ref BeingEquippedAttemptEvent args) =>
         // No interactions with a virtual item, please.
         args.Cancel();
-    }
 
-    private void OnBeingUnequippedAttempt(Entity<VirtualItemComponent> ent, ref BeingUnequippedAttemptEvent args)
-    {
+    private void OnBeingUnequippedAttempt(Entity<VirtualItemComponent> ent, ref BeingUnequippedAttemptEvent args) =>
         // No interactions with a virtual item, please.
         args.Cancel();
-    }
 
-    private void OnBeforeRangedInteract(Entity<VirtualItemComponent> ent, ref BeforeRangedInteractEvent args)
-    {
+    private void OnBeforeRangedInteract(Entity<VirtualItemComponent> ent, ref BeforeRangedInteractEvent args) =>
         // No interactions with a virtual item, please.
         args.Handled = true;
-    }
 
-    private void OnGettingInteractedWithAttemptEvent(Entity<VirtualItemComponent> ent, ref GettingInteractedWithAttemptEvent args)
-    {
+    private void OnGettingInteractedWithAttemptEvent(Entity<VirtualItemComponent> ent,
+        ref GettingInteractedWithAttemptEvent args) =>
         // No interactions with a virtual item, please.
         args.Cancelled = true;
-    }
 
     private void OnGetUsedEntity(Entity<VirtualItemComponent> ent, ref GetUsedEntityEvent args)
     {
@@ -106,6 +99,46 @@ public abstract class SharedVirtualItemSystem : EntitySystem
         }
     }
 
+    /// <summary>
+    /// Spawns a virtual item and setups the component without any special handling
+    /// </summary>
+    /// <param name="blockingEnt">The entity we will make a virtual entity copy of</param>
+    /// <param name="user">The entity that we want to insert the virtual entity</param>
+    /// <param name="virtualItem">The virtual item, if spawned</param>
+    public bool TrySpawnVirtualItem(EntityUid blockingEnt,
+        EntityUid user,
+        [NotNullWhen(true)] out EntityUid? virtualItem)
+    {
+        var pos = Transform(user).Coordinates;
+        virtualItem = PredictedSpawnAttachedTo(VirtualItem, pos);
+        var virtualItemComp = EnsureComp<VirtualItemComponent>(virtualItem.Value);
+        virtualItemComp.BlockingEntity = blockingEnt;
+        Dirty(virtualItem.Value, virtualItemComp);
+        return true;
+    }
+
+    /// <summary>
+    /// Queues a deletion for a virtual item and notifies the blocking entity and user.
+    /// </summary>
+    public void DeleteVirtualItem(Entity<VirtualItemComponent> item, EntityUid user, bool queueDel = true) // Goob edit
+    {
+        var userEv = new VirtualItemDeletedEvent(item.Comp.BlockingEntity, user, item.Owner); // Goobstation
+        RaiseLocalEvent(user, userEv);
+
+        var targEv = new VirtualItemDeletedEvent(item.Comp.BlockingEntity, user, item.Owner); // Goobstation
+        RaiseLocalEvent(item.Comp.BlockingEntity, targEv);
+
+        if (TerminatingOrDeleted(item))
+            return;
+
+        // Goob edit start
+        if (queueDel)
+            PredictedQueueDel(item.Owner);
+        else
+            PredictedDel(item.Owner);
+        // Goob edit end
+    }
+
     #region Hands
 
     /// <summary>
@@ -114,13 +147,16 @@ public abstract class SharedVirtualItemSystem : EntitySystem
     /// <param name="blockingEnt">The entity we will make a virtual entity copy of</param>
     /// <param name="user">The entity that we want to insert the virtual entity</param>
     /// <param name="dropOthers">Whether or not to try and drop other items to make space</param>
-    public bool TrySpawnVirtualItemInHand(EntityUid blockingEnt, EntityUid user, bool dropOthers = false)
-    {
-        return TrySpawnVirtualItemInHand(blockingEnt, user, out _, dropOthers);
-    }
+    public bool TrySpawnVirtualItemInHand(EntityUid blockingEnt, EntityUid user, bool dropOthers = false) =>
+        TrySpawnVirtualItemInHand(blockingEnt, user, out _, dropOthers);
 
-    /// <inheritdoc cref="TrySpawnVirtualItemInHand(Robust.Shared.GameObjects.EntityUid,Robust.Shared.GameObjects.EntityUid,bool)"/>
-    public bool TrySpawnVirtualItemInHand(EntityUid blockingEnt, EntityUid user, [NotNullWhen(true)] out EntityUid? virtualItem, bool dropOthers = false, string? empty = null)
+    /// <inheritdoc
+    ///     cref="TrySpawnVirtualItemInHand(Robust.Shared.GameObjects.EntityUid,Robust.Shared.GameObjects.EntityUid,bool)" />
+    public bool TrySpawnVirtualItemInHand(EntityUid blockingEnt,
+        EntityUid user,
+        [NotNullWhen(true)] out EntityUid? virtualItem,
+        bool dropOthers = false,
+        string? empty = null)
     {
         virtualItem = null;
         if (empty == null && !_handsSystem.TryGetEmptyHand(user, out empty))
@@ -166,11 +202,10 @@ public abstract class SharedVirtualItemSystem : EntitySystem
         foreach (var held in _handsSystem.EnumerateHeld(user))
         {
             if (TryComp(held, out VirtualItemComponent? virt) && virt.BlockingEntity == matching)
-            {
                 DeleteVirtualItem((held, virt), user, queueDel); // Goob edit
-            }
         }
     }
+
     #endregion
 
     #region Inventory
@@ -182,13 +217,17 @@ public abstract class SharedVirtualItemSystem : EntitySystem
     /// <param name="user">The entity that we want to insert the virtual entity</param>
     /// <param name="slot">The slot to which we will insert the virtual entity (could be the "shoes" slot, for example)</param>
     /// <param name="force">Whether or not to force an equip</param>
-    public bool TrySpawnVirtualItemInInventory(EntityUid blockingEnt, EntityUid user, string slot, bool force = false)
-    {
-        return TrySpawnVirtualItemInInventory(blockingEnt, user, slot, force, out _);
-    }
+    public bool
+        TrySpawnVirtualItemInInventory(EntityUid blockingEnt, EntityUid user, string slot, bool force = false) =>
+        TrySpawnVirtualItemInInventory(blockingEnt, user, slot, force, out _);
 
-    /// <inheritdoc cref="TrySpawnVirtualItemInInventory(Robust.Shared.GameObjects.EntityUid,Robust.Shared.GameObjects.EntityUid,string,bool)"/>
-    public bool TrySpawnVirtualItemInInventory(EntityUid blockingEnt, EntityUid user, string slot, bool force, [NotNullWhen(true)] out EntityUid? virtualItem)
+    /// <inheritdoc
+    ///     cref="TrySpawnVirtualItemInInventory(Robust.Shared.GameObjects.EntityUid,Robust.Shared.GameObjects.EntityUid,string,bool)" />
+    public bool TrySpawnVirtualItemInInventory(EntityUid blockingEnt,
+        EntityUid user,
+        string slot,
+        bool force,
+        [NotNullWhen(true)] out EntityUid? virtualItem)
     {
         if (!TrySpawnVirtualItem(blockingEnt, user, out virtualItem))
             return false;
@@ -230,43 +269,6 @@ public abstract class SharedVirtualItemSystem : EntitySystem
                 DeleteVirtualItem((slotEnt.Value, virt), user);
         }
     }
+
     #endregion
-
-    /// <summary>
-    /// Spawns a virtual item and setups the component without any special handling
-    /// </summary>
-    /// <param name="blockingEnt">The entity we will make a virtual entity copy of</param>
-    /// <param name="user">The entity that we want to insert the virtual entity</param>
-    /// <param name="virtualItem">The virtual item, if spawned</param>
-    public bool TrySpawnVirtualItem(EntityUid blockingEnt, EntityUid user, [NotNullWhen(true)] out EntityUid? virtualItem)
-    {
-        var pos = Transform(user).Coordinates;
-        virtualItem = PredictedSpawnAttachedTo(VirtualItem, pos);
-        var virtualItemComp = EnsureComp<VirtualItemComponent>(virtualItem.Value);
-        virtualItemComp.BlockingEntity = blockingEnt;
-        Dirty(virtualItem.Value, virtualItemComp);
-        return true;
-    }
-
-    /// <summary>
-    /// Queues a deletion for a virtual item and notifies the blocking entity and user.
-    /// </summary>
-    public void DeleteVirtualItem(Entity<VirtualItemComponent> item, EntityUid user, bool queueDel = true) // Goob edit
-    {
-        var userEv = new VirtualItemDeletedEvent(item.Comp.BlockingEntity, user, item.Owner); // Goobstation
-        RaiseLocalEvent(user, userEv);
-
-        var targEv = new VirtualItemDeletedEvent(item.Comp.BlockingEntity, user, item.Owner); // Goobstation
-        RaiseLocalEvent(item.Comp.BlockingEntity, targEv);
-
-        if (TerminatingOrDeleted(item))
-            return;
-
-        // Goob edit start
-        if (queueDel)
-            PredictedQueueDel(item.Owner);
-        else
-            PredictedDel(item.Owner);
-        // Goob edit end
-    }
 }

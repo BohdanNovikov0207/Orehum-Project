@@ -9,14 +9,14 @@ using Robust.Shared.Audio.Systems;
 namespace Content.Shared.Temperature.Systems;
 
 /// <summary>
-/// Handles <see cref="EntityHeaterComponent"/> events.
+/// Handles <see cref="EntityHeaterComponent" /> events.
 /// </summary>
-public abstract partial class SharedEntityHeaterSystem : EntitySystem
+public abstract class SharedEntityHeaterSystem : EntitySystem
 {
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly SharedPowerReceiverSystem _receiver = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
 
     private readonly int _settingCount = Enum.GetValues<EntityHeaterSetting>().Length;
 
@@ -42,17 +42,17 @@ public abstract partial class SharedEntityHeaterSystem : EntitySystem
         if (!args.CanAccess || !args.CanInteract)
             return;
 
-        var nextSettingIndex = ((int)ent.Comp.Setting + 1) % _settingCount;
-        var nextSetting = (EntityHeaterSetting)nextSettingIndex;
+        var nextSettingIndex = ((int) ent.Comp.Setting + 1) % _settingCount;
+        var nextSetting = (EntityHeaterSetting) nextSettingIndex;
 
         var user = args.User;
-        args.Verbs.Add(new AlternativeVerb()
+        args.Verbs.Add(new AlternativeVerb
         {
             Text = Loc.GetString("entity-heater-switch-setting", ("setting", nextSetting)),
             Act = () =>
             {
                 ChangeSetting(ent, nextSetting, user);
-            }
+            },
         });
     }
 
@@ -64,7 +64,9 @@ public abstract partial class SharedEntityHeaterSystem : EntitySystem
         _appearance.SetData(ent, EntityHeaterVisuals.Setting, setting);
     }
 
-    protected virtual void ChangeSetting(Entity<EntityHeaterComponent> ent, EntityHeaterSetting setting, EntityUid? user = null)
+    protected virtual void ChangeSetting(Entity<EntityHeaterComponent> ent,
+        EntityHeaterSetting setting,
+        EntityUid? user = null)
     {
         // Still allow changing the setting without power
         ent.Comp.Setting = setting;
@@ -77,8 +79,7 @@ public abstract partial class SharedEntityHeaterSystem : EntitySystem
             _appearance.SetData(ent, EntityHeaterVisuals.Setting, setting);
     }
 
-    protected float SettingPower(EntityHeaterSetting setting, float max)
-    {
+    protected float SettingPower(EntityHeaterSetting setting, float max) =>
         // Power use while off needs to be non-zero so powernet doesn't consider the device powered
         // by an unpowered network while in the off state. Otherwise, when we increase the load,
         // the clientside APC receiver will think the device is powered until it gets the next
@@ -86,12 +87,11 @@ public abstract partial class SharedEntityHeaterSystem : EntitySystem
         // I spent several hours trying to figure out a better way to do this using PowerDisabled
         // or something, but nothing worked as well as this.
         // Just think of the load as a little LED, or bad wiring, or something.
-        return setting switch
+        setting switch
         {
             EntityHeaterSetting.Low => max / 3f,
             EntityHeaterSetting.Medium => max * 2f / 3f,
             EntityHeaterSetting.High => max,
             _ => 0.01f,
         };
-    }
 }

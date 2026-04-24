@@ -11,15 +11,23 @@ namespace Content.Shared.Sound.Components;
 /// <summary>
 /// Repeatedly plays a sound with a randomized delay.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
-[AutoGenerateComponentState, AutoGenerateComponentPause]
+[RegisterComponent] [NetworkedComponent]
+[AutoGenerateComponentState] [AutoGenerateComponentPause]
 public sealed partial class SpamEmitSoundComponent : BaseEmitSoundComponent
 {
     /// <summary>
-    /// The time at which the next sound will play.
+    /// Whether the timer is currently running and sounds are being played.
+    /// Do not set this directly, use <see cref="EmitSoundSystem.SetEnabled" />
     /// </summary>
-    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer)), AutoPausedField, AutoNetworkedField]
-    public TimeSpan NextSound;
+    [DataField] [AutoNetworkedField]
+    [Access(typeof(SharedEmitSoundSystem))]
+    public bool Enabled = true;
+
+    /// <summary>
+    /// The maximum time in seconds between playing the sound.
+    /// </summary>
+    [DataField]
+    public TimeSpan MaxInterval = TimeSpan.FromSeconds(2);
 
     /// <summary>
     /// The minimum time in seconds between playing the sound.
@@ -28,10 +36,10 @@ public sealed partial class SpamEmitSoundComponent : BaseEmitSoundComponent
     public TimeSpan MinInterval = TimeSpan.FromSeconds(2);
 
     /// <summary>
-    /// The maximum time in seconds between playing the sound.
+    /// The time at which the next sound will play.
     /// </summary>
-    [DataField]
-    public TimeSpan MaxInterval = TimeSpan.FromSeconds(2);
+    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))] [AutoPausedField] [AutoNetworkedField]
+    public TimeSpan NextSound;
 
     // Always Pvs.
     /// <summary>
@@ -39,12 +47,4 @@ public sealed partial class SpamEmitSoundComponent : BaseEmitSoundComponent
     /// </summary>
     [DataField]
     public LocId? PopUp;
-
-    /// <summary>
-    /// Whether the timer is currently running and sounds are being played.
-    /// Do not set this directly, use <see cref="EmitSoundSystem.SetEnabled"/>
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    [Access(typeof(SharedEmitSoundSystem))]
-    public bool Enabled = true;
 }

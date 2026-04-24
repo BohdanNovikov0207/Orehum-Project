@@ -9,7 +9,7 @@ namespace Content.Shared.Random.Rules;
 
 /// <summary>
 /// Checks for entities matching the whitelist in range.
-/// This is more expensive than <see cref="NearbyComponentsRule"/> so prefer that!
+/// This is more expensive than <see cref="NearbyComponentsRule" /> so prefer that!
 /// </summary>
 public sealed partial class NearbyEntitiesRule : RulesRule
 {
@@ -19,19 +19,17 @@ public sealed partial class NearbyEntitiesRule : RulesRule
     [DataField]
     public int Count = 1;
 
-    [DataField(required: true)]
-    public EntityWhitelist Whitelist = new();
-
     [DataField]
     public float Range = 10f;
+
+    [DataField(required: true)]
+    public EntityWhitelist Whitelist = new();
 
     public override bool Check(EntityManager entManager, EntityUid uid)
     {
         if (!entManager.TryGetComponent(uid, out TransformComponent? xform) ||
             xform.MapUid == null)
-        {
             return false;
-        }
 
         var transform = entManager.System<SharedTransformSystem>();
         var lookup = entManager.System<EntityLookupSystem>();

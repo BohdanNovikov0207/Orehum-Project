@@ -2,8 +2,8 @@ using Content.Shared.DetailExaminable;
 using Content.Shared.Forensics.Systems;
 using Content.Shared.Humanoid;
 using Content.Shared.IdentityManagement;
-using Content.Shared.Preferences;
 using Content.Shared.Popups;
+using Content.Shared.Preferences;
 using Content.Shared.Trigger.Components.Effects;
 using Robust.Shared.Network;
 
@@ -11,12 +11,12 @@ namespace Content.Shared.Trigger.Systems;
 
 public sealed class DnaScrambleOnTriggerSystem : EntitySystem
 {
-    [Dependency] private readonly MetaDataSystem _metaData = default!;
+    [Dependency] private readonly SharedForensicsSystem _forensics = default!;
     [Dependency] private readonly SharedHumanoidAppearanceSystem _humanoidAppearance = default!;
     [Dependency] private readonly SharedIdentitySystem _identity = default!;
-    [Dependency] private readonly SharedForensicsSystem _forensics = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly MetaDataSystem _metaData = default!;
     [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
 
     public override void Initialize()
     {
@@ -47,7 +47,9 @@ public sealed class DnaScrambleOnTriggerSystem : EntitySystem
 
         var newProfile = HumanoidCharacterProfile.RandomWithSpecies(humanoid.Species);
         _humanoidAppearance.LoadProfile(target.Value, newProfile, humanoid);
-        _metaData.SetEntityName(target.Value, newProfile.Name, raiseEvents: false); // raising events would update ID card, station record, etc.
+        _metaData.SetEntityName(target.Value,
+            newProfile.Name,
+            raiseEvents: false); // raising events would update ID card, station record, etc.
 
         // If the entity has the respective components, then scramble the dna and fingerprint strings.
         _forensics.RandomizeDNA(target.Value);

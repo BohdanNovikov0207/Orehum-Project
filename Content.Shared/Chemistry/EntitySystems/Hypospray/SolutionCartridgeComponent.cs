@@ -13,9 +13,9 @@ namespace Content.Shared.Chemistry.EntitySystems.Hypospray;
 [RegisterComponent]
 public sealed partial class SolutionCartridgeComponent : Component
 {
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
-    public string TargetSolution = "default";
-
     [DataField(required: true)]
     public Solution Solution;
+
+    [DataField] [ViewVariables(VVAccess.ReadWrite)]
+    public string TargetSolution = "default";
 }

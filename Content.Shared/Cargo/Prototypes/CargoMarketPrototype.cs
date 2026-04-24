@@ -6,9 +6,9 @@ namespace Content.Shared.Cargo.Prototypes;
 /// Defines a "market" that a cargo computer can access and make orders from.
 /// </summary>
 [Prototype]
-public sealed partial class CargoMarketPrototype : IPrototype
+public sealed class CargoMarketPrototype : IPrototype
 {
-    /// <inheritdoc/>
+    /// <inheritdoc />
     [IdDataField]
-    public string ID { get; private set; } = default!;
+    public string ID { get; } = default!;
 }

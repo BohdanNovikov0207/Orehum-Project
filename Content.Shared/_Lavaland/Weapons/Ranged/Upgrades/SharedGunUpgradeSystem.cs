@@ -25,19 +25,19 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared._Lavaland.Weapons.Ranged.Upgrades.Components;
-using Content.Shared._Lavaland.Weapons.Ranged.Events;
-using Content.Shared.Containers.ItemSlots;
-using Content.Shared.Damage;
-using Content.Shared.Examine;
-using Content.Shared.Weapons.Ranged.Events;
-using Content.Shared.Weapons.Ranged.Systems;
 using System.Linq;
 using Content.Goobstation.Common.Weapons;
 using Content.Shared._Goobstation.Weapons.Ranged;
+using Content.Shared._Lavaland.Weapons.Ranged.Events;
+using Content.Shared._Lavaland.Weapons.Ranged.Upgrades.Components;
 using Content.Shared.Actions;
+using Content.Shared.Containers.ItemSlots;
+using Content.Shared.Damage;
+using Content.Shared.Examine;
 using Content.Shared.Weapons.Melee.Events;
 using Content.Shared.Weapons.Ranged.Components;
+using Content.Shared.Weapons.Ranged.Events;
+using Content.Shared.Weapons.Ranged.Systems;
 using Robust.Shared.Containers;
 using Robust.Shared.Timing;
 
@@ -45,13 +45,13 @@ namespace Content.Shared._Lavaland.Weapons.Ranged.Upgrades;
 
 public abstract partial class SharedGunUpgradeSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly SharedActionsSystem _actions = default!;
     [Dependency] private readonly ActionContainerSystem _actionContainer = default!;
-    [Dependency] private readonly SharedGunSystem _gun = default!;
+    [Dependency] private readonly SharedActionsSystem _actions = default!;
     [Dependency] private readonly DamageableSystem _damage = default!;
+    [Dependency] private readonly SharedGunSystem _gun = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         SubscribeLocalEvent<UpgradeableWeaponComponent, EntInsertedIntoContainerMessage>(OnUpgradeInserted);
@@ -114,19 +114,22 @@ public abstract partial class SharedGunUpgradeSystem : EntitySystem
             foreach (var upgrade in GetCurrentUpgrades(ent))
             {
                 if (upgrade.Comp.InsertedTextType != null)
-                    args.PushMarkup(Loc.GetString(upgrade.Comp.InsertedTextType.Value, ("name", Loc.GetString(upgrade.Comp.Name))));
+                    args.PushMarkup(Loc.GetString(upgrade.Comp.InsertedTextType.Value,
+                        ("name", Loc.GetString(upgrade.Comp.Name))));
                 if (upgrade.Comp.CapacityCost != null)
                     usedCapacity += upgrade.Comp.CapacityCost.Value;
             }
 
             if (ent.Comp.MaxUpgradeCapacity != null)
-                args.PushMarkup(Loc.GetString("upgradeable-gun-total-remaining-capacity", ("value", ent.Comp.MaxUpgradeCapacity.Value - usedCapacity)));
+                args.PushMarkup(Loc.GetString("upgradeable-gun-total-remaining-capacity",
+                    ("value", ent.Comp.MaxUpgradeCapacity.Value - usedCapacity)));
         }
     }
 
     private void OnUpgradeExamine(Entity<GunUpgradeComponent> ent, ref ExaminedEvent args)
     {
-        if (ent.Comp.ExamineTextType != null) // TODO add a list of all weapon types that this gun upgrade can be inserted to
+        if (ent.Comp.ExamineTextType !=
+            null) // TODO add a list of all weapon types that this gun upgrade can be inserted to
             args.PushMarkup(Loc.GetString(ent.Comp.ExamineTextType.Value, ("name", Loc.GetString(ent.Comp.Name))));
 
         if (ent.Comp.CapacityCost != null)
@@ -140,7 +143,8 @@ public abstract partial class SharedGunUpgradeSystem : EntitySystem
             _gun.RefreshModifiers((ent.Owner, gun));
     }
 
-    private void OnItemSlotInsertAttemptEvent(Entity<UpgradeableWeaponComponent> ent, ref ItemSlotInsertAttemptEvent args)
+    private void OnItemSlotInsertAttemptEvent(Entity<UpgradeableWeaponComponent> ent,
+        ref ItemSlotInsertAttemptEvent args)
     {
         if (!TryComp<GunUpgradeComponent>(args.Item, out var upgradeComp)
             || !TryComp<ItemSlotsComponent>(ent, out var itemSlots))
@@ -166,7 +170,8 @@ public abstract partial class SharedGunUpgradeSystem : EntitySystem
         }
     }
 
-    public HashSet<Entity<GunUpgradeComponent>> GetCurrentUpgrades(Entity<UpgradeableWeaponComponent> ent, ItemSlotsComponent? itemSlots = null)
+    public HashSet<Entity<GunUpgradeComponent>> GetCurrentUpgrades(Entity<UpgradeableWeaponComponent> ent,
+        ItemSlotsComponent? itemSlots = null)
     {
         if (!Resolve(ent, ref itemSlots))
             return [];

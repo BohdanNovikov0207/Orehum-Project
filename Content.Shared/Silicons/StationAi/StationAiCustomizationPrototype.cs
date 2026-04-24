@@ -8,10 +8,13 @@ namespace Content.Shared.Silicons.StationAi;
 /// Holds data for customizing the appearance of station AIs.
 /// </summary>
 [Prototype]
-public sealed partial class StationAiCustomizationPrototype : IPrototype, IInheritingPrototype
+public sealed class StationAiCustomizationPrototype : IPrototype, IInheritingPrototype
 {
-    [IdDataField]
-    public string ID { get; private set; } = string.Empty;
+    /// <summary>
+    /// Stores the data which is used to modify the appearance of the station AI.
+    /// </summary>
+    [DataField(required: true)]
+    public Dictionary<string, PrototypeLayerData> LayerData = new();
 
     /// <summary>
     /// The (unlocalized) name of the customization.
@@ -20,22 +23,16 @@ public sealed partial class StationAiCustomizationPrototype : IPrototype, IInher
     public LocId Name;
 
     /// <summary>
-    /// Stores the data which is used to modify the appearance of the station AI.
+    /// Specifies a background to use for previewing the customization (for menus, etc)
     /// </summary>
-    [DataField(required: true)]
-    public Dictionary<string, PrototypeLayerData> LayerData = new();
+    [DataField]
+    public SpriteSpecifier? PreviewBackground;
 
     /// <summary>
     /// Key used to index the prototype layer data and extract a preview of the customization (for menus, etc)
     /// </summary>
     [DataField]
     public string PreviewKey = string.Empty;
-
-    /// <summary>
-    /// Specifies a background to use for previewing the customization (for menus, etc)
-    /// </summary>
-    [DataField]
-    public SpriteSpecifier? PreviewBackground;
 
     /// <summary>
     /// The prototype we inherit from.
@@ -51,4 +48,7 @@ public sealed partial class StationAiCustomizationPrototype : IPrototype, IInher
     [NeverPushInheritance]
     [AbstractDataField]
     public bool Abstract { get; private set; }
+
+    [IdDataField]
+    public string ID { get; } = string.Empty;
 }

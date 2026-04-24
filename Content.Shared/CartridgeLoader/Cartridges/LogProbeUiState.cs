@@ -10,12 +10,13 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared._DV.CartridgeLoader.Cartridges; // DeltaV
+using Content.Shared._DV.CartridgeLoader.Cartridges;
 using Robust.Shared.Serialization;
+// DeltaV
 
 namespace Content.Shared.CartridgeLoader.Cartridges;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class LogProbeUiState : BoundUserInterfaceState
 {
     /// <summary>
@@ -28,24 +29,26 @@ public sealed class LogProbeUiState : BoundUserInterfaceState
     /// </summary>
     public List<PulledAccessLog> PulledLogs;
 
-    /// <summary>
-    /// DeltaV: The NanoChat data if a card was scanned, null otherwise
-    /// </summary>
-    public NanoChatData? NanoChatData { get; }
-
-    public LogProbeUiState(string entityName, List<PulledAccessLog> pulledLogs, NanoChatData? nanoChatData = null) // DeltaV - NanoChat support
+    public LogProbeUiState(string entityName,
+        List<PulledAccessLog> pulledLogs,
+        NanoChatData? nanoChatData = null) // DeltaV - NanoChat support
     {
         EntityName = entityName;
         PulledLogs = pulledLogs;
         NanoChatData = nanoChatData; // DeltaV
     }
+
+    /// <summary>
+    /// DeltaV: The NanoChat data if a card was scanned, null otherwise
+    /// </summary>
+    public NanoChatData? NanoChatData { get; }
 }
 
-[Serializable, NetSerializable, DataRecord]
-public sealed partial class PulledAccessLog
+[Serializable] [NetSerializable] [DataRecord]
+public sealed class PulledAccessLog
 {
-    public readonly TimeSpan Time;
     public readonly string Accessor;
+    public readonly TimeSpan Time;
 
     public PulledAccessLog(TimeSpan time, string accessor)
     {

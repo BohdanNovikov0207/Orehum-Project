@@ -34,15 +34,14 @@ namespace Content.Shared.Implants;
 
 public abstract class SharedSubdermalImplantSystem : EntitySystem
 {
-    [Dependency] private readonly SharedActionsSystem _actionsSystem = default!;
-    [Dependency] private readonly SharedContainerSystem _container = default!;
-    [Dependency] private readonly TagSystem _tag = default!;
-    [Dependency] private readonly SharedTransformSystem _transformSystem = default!;
-
     public const string BaseStorageId = "storagebase";
 
     private static readonly ProtoId<TagPrototype> MicroBombTag = "MicroBomb";
     private static readonly ProtoId<TagPrototype> MacroBombTag = "MacroBomb";
+    [Dependency] private readonly SharedActionsSystem _actionsSystem = default!;
+    [Dependency] private readonly SharedContainerSystem _container = default!;
+    [Dependency] private readonly TagSystem _tag = default!;
+    [Dependency] private readonly SharedTransformSystem _transformSystem = default!;
 
     public override void Initialize()
     {
@@ -61,13 +60,16 @@ public abstract class SharedSubdermalImplantSystem : EntitySystem
             return;
 
         if (!string.IsNullOrWhiteSpace(component.ImplantAction))
-        {
-            _actionsSystem.AddAction(component.ImplantedEntity.Value, ref component.Action, component.ImplantAction, uid);
-        }
+            _actionsSystem.AddAction(component.ImplantedEntity.Value,
+                ref component.Action,
+                component.ImplantAction,
+                uid);
 
         // replace micro bomb with macro bomb
         // TODO: this shouldn't be hardcoded here
-        if (_container.TryGetContainer(component.ImplantedEntity.Value, ImplanterComponent.ImplantSlotId, out var implantContainer) && _tag.HasTag(uid, MacroBombTag))
+        if (_container.TryGetContainer(component.ImplantedEntity.Value,
+                ImplanterComponent.ImplantSlotId,
+                out var implantContainer) && _tag.HasTag(uid, MacroBombTag))
         {
             foreach (var implant in implantContainer.ContainedEntities)
             {
@@ -83,7 +85,9 @@ public abstract class SharedSubdermalImplantSystem : EntitySystem
         RaiseLocalEvent(uid, ref ev);
     }
 
-    private void OnRemoveAttempt(EntityUid uid, SubdermalImplantComponent component, ContainerGettingRemovedAttemptEvent args)
+    private void OnRemoveAttempt(EntityUid uid,
+        SubdermalImplantComponent component,
+        ContainerGettingRemovedAttemptEvent args)
     {
         if (component.Permanent && component.ImplantedEntity != null)
             args.Cancel();
@@ -115,7 +119,7 @@ public abstract class SharedSubdermalImplantSystem : EntitySystem
 
     /// <summary>
     /// Add a list of implants to a person.
-    /// Logs any implant ids that don't have <see cref="SubdermalImplantComponent"/>.
+    /// Logs any implant ids that don't have <see cref="SubdermalImplantComponent" />.
     /// </summary>
     public void AddImplants(EntityUid uid, IEnumerable<EntProtoId> implants)
     {
@@ -127,20 +131,19 @@ public abstract class SharedSubdermalImplantSystem : EntitySystem
 
     /// <summary>
     /// Adds a single implant to a person, and returns the implant.
-    /// Logs any implant ids that don't have <see cref="SubdermalImplantComponent"/>.
+    /// Logs any implant ids that don't have <see cref="SubdermalImplantComponent" />.
     /// </summary>
     /// <returns>
     /// The implant, if it was successfully created. Otherwise, null.
-    /// </returns>>
-    public EntityUid? AddImplant(EntityUid uid, String implantId)
+    /// </returns>
+    /// >
+    public EntityUid? AddImplant(EntityUid uid, string implantId)
     {
         var coords = Transform(uid).Coordinates;
         var ent = Spawn(implantId, coords);
 
         if (TryComp<SubdermalImplantComponent>(ent, out var implant))
-        {
             ForceImplant(uid, ent, implant);
-        }
         else
         {
             Log.Warning($"Found invalid starting implant '{implantId}' on {uid} {ToPrettyString(uid):implanted}");

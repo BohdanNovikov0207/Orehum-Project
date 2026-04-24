@@ -16,30 +16,30 @@ using Robust.Shared.Serialization;
 namespace Content.Shared.Explosion.Components;
 
 /// <summary>
-///     Component that is used to send explosion overlay/visual data to an abstract explosion entity.
+/// Component that is used to send explosion overlay/visual data to an abstract explosion entity.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class ExplosionVisualsComponent : Component
 {
     public MapCoordinates Epicenter;
-    public Dictionary<int, List<Vector2i>>? SpaceTiles;
-    public Dictionary<EntityUid, Dictionary<int, List<Vector2i>>> Tiles = new();
-    public List<float> Intensity = new();
     public string ExplosionType = string.Empty;
+    public List<float> Intensity = new();
     public Matrix3x2 SpaceMatrix;
+    public Dictionary<int, List<Vector2i>>? SpaceTiles;
     public ushort SpaceTileSize;
+    public Dictionary<EntityUid, Dictionary<int, List<Vector2i>>> Tiles = new();
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class ExplosionVisualsState : ComponentState
 {
     public MapCoordinates Epicenter;
-    public Dictionary<int, List<Vector2i>>? SpaceTiles;
-    public Dictionary<NetEntity, Dictionary<int, List<Vector2i>>> Tiles;
-    public List<float> Intensity;
     public string ExplosionType = string.Empty;
+    public List<float> Intensity;
     public Matrix3x2 SpaceMatrix;
+    public Dictionary<int, List<Vector2i>>? SpaceTiles;
     public ushort SpaceTileSize;
+    public Dictionary<NetEntity, Dictionary<int, List<Vector2i>>> Tiles;
 
     public ExplosionVisualsState(
         MapCoordinates epicenter,
@@ -60,7 +60,7 @@ public sealed class ExplosionVisualsState : ComponentState
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum ExplosionAppearanceData
 {
     Progress, // iteration index tracker for explosions that are still expanding outwards,

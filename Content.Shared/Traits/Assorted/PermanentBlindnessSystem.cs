@@ -30,7 +30,7 @@ public sealed class PermanentBlindnessSystem : EntitySystem
     [Dependency] private readonly BlindableSystem _blinding = default!;
     [Dependency] private readonly INetManager _net = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         SubscribeLocalEvent<PermanentBlindnessComponent, MapInitEvent>(OnMapInit);
@@ -41,13 +41,11 @@ public sealed class PermanentBlindnessSystem : EntitySystem
     private void OnExamined(Entity<PermanentBlindnessComponent> blindness, ref ExaminedEvent args)
     {
         if (args.IsInDetailsRange && blindness.Comp.Blindness == 0)
-        {
-            args.PushMarkup(Loc.GetString("permanent-blindness-trait-examined", ("target", Identity.Entity(blindness, EntityManager))));
-        }
+            args.PushMarkup(Loc.GetString("permanent-blindness-trait-examined",
+                ("target", Identity.Entity(blindness, EntityManager))));
         else if (args.IsInDetailsRange && !_net.IsClient && blindness.Comp.Blindness == 4) /// Goobstation
-        {
-            args.PushMarkup(Loc.GetString("poor-vision-trait-examined", ("target", Identity.Entity(blindness, EntityManager))));
-        }  
+            args.PushMarkup(Loc.GetString("poor-vision-trait-examined",
+                ("target", Identity.Entity(blindness, EntityManager))));
     }
 
     private void OnShutdown(Entity<PermanentBlindnessComponent> blindness, ref ComponentShutdown args)
@@ -56,14 +54,12 @@ public sealed class PermanentBlindnessSystem : EntitySystem
             return;
 
         if (blindable.MinDamage != 0)
-        {
             _blinding.SetMinDamage((blindness.Owner, blindable), 0);
-        }
     }
 
     private void OnMapInit(Entity<PermanentBlindnessComponent> blindness, ref MapInitEvent args)
     {
-        if(!TryComp<BlindableComponent>(blindness.Owner, out var blindable))
+        if (!TryComp<BlindableComponent>(blindness.Owner, out var blindable))
             return;
 
         if (blindness.Comp.Blindness != 0)

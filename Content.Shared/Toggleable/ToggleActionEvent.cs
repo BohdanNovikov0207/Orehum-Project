@@ -20,9 +20,9 @@ namespace Content.Shared.Toggleable;
 public sealed partial class ToggleActionEvent : InstantActionEvent;
 
 /// <summary>
-///     Generic enum keys for toggle-visualizer appearance data & sprite layers.
+/// Generic enum keys for toggle-visualizer appearance data & sprite layers.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum ToggleableVisuals : byte
 {
     Enabled,
@@ -31,16 +31,16 @@ public enum ToggleableVisuals : byte
 }
 
 /// <summary>
-///     Generic sprite layer keys.
+/// Generic sprite layer keys.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum LightLayers : byte
 {
     Light,
 
     /// <summary>
-    ///     Used as a key for generic unshaded layers. Not necessarily related to an entity with an actual light source.
-    ///     Use this instead of creating a unique single-purpose "unshaded" enum for every visualizer.
+    /// Used as a key for generic unshaded layers. Not necessarily related to an entity with an actual light source.
+    /// Use this instead of creating a unique single-purpose "unshaded" enum for every visualizer.
     /// </summary>
     Unshaded,
 }

@@ -6,7 +6,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Shared.Atmos;
-using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Damage;
 using Content.Shared.Physics;
 using Robust.Shared.GameStates;
@@ -17,60 +16,20 @@ using Robust.Shared.Utility;
 
 namespace Content.Shared._Goobstation.Wizard.Traps;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class IceCubeComponent : Component
 {
-    [ViewVariables(VVAccess.ReadOnly)]
-    public BodyType? OldBodyType = null;
-
     [DataField]
-    public BodyType FrozenBodyType = BodyType.Dynamic;
-
-    [DataField]
-    public float VelocityMultiplier = 0.2f;
-
-    [DataField]
-    public float TileFriction = 0.01f;
-
-    [DataField]
-    public float Restitution = 0.8f;
-
-    [DataField]
-    public float FrozenTemperature = Atmospherics.T0C - 200f;
-
-    [DataField]
-    public float UnfreezeTemperatureThreshold = Atmospherics.T0C;
-
-    [DataField]
-    public float UnfrozenTemperature = Atmospherics.T0C - 100f;
-
-    [DataField]
-    public float TemperaturePerHeatDamageIncrease = 5f;
-
-    [DataField]
-    public float SustainedDamageMeltProbabilityMultiplier = 4f;
-
-    [DataField]
-    public float StaminaDamageMeltProbabilityMultiplier = 5f;
-
-    [DataField]
-    public float DamageMeltProbabilityThreshold = 60f;
-
-    [DataField]
-    public float SustainedDamage;
-
-    [DataField(customTypeSerializer: typeof(FlagSerializer<CollisionMask>))]
-    public int CollisionMask = (int) CollisionGroup.FullTileMask;
+    public TimeSpan BreakFreeDelay = TimeSpan.FromSeconds(10);
 
     [DataField(customTypeSerializer: typeof(FlagSerializer<CollisionLayer>))]
     public int CollisionLayer = (int) CollisionGroup.WallLayer;
 
-    [DataField]
-    public TimeSpan BreakFreeDelay = TimeSpan.FromSeconds(10);
+    [DataField(customTypeSerializer: typeof(FlagSerializer<CollisionMask>))]
+    public int CollisionMask = (int) CollisionGroup.FullTileMask;
 
     [DataField]
-    public SpriteSpecifier Sprite =
-        new SpriteSpecifier.Rsi(new ResPath("_Goobstation/Wizard/Effects/effects.rsi"), "ice_cube");
+    public float DamageMeltProbabilityThreshold = 60f;
 
     [DataField]
     public DamageModifierSet DamageReduction = new()
@@ -82,6 +41,46 @@ public sealed partial class IceCubeComponent : Component
             { "Piercing", 0.35f },
         },
     };
+
+    [DataField]
+    public BodyType FrozenBodyType = BodyType.Dynamic;
+
+    [DataField]
+    public float FrozenTemperature = Atmospherics.T0C - 200f;
+
+    [ViewVariables(VVAccess.ReadOnly)]
+    public BodyType? OldBodyType = null;
+
+    [DataField]
+    public float Restitution = 0.8f;
+
+    [DataField]
+    public SpriteSpecifier Sprite =
+        new SpriteSpecifier.Rsi(new ResPath("_Goobstation/Wizard/Effects/effects.rsi"), "ice_cube");
+
+    [DataField]
+    public float StaminaDamageMeltProbabilityMultiplier = 5f;
+
+    [DataField]
+    public float SustainedDamage;
+
+    [DataField]
+    public float SustainedDamageMeltProbabilityMultiplier = 4f;
+
+    [DataField]
+    public float TemperaturePerHeatDamageIncrease = 5f;
+
+    [DataField]
+    public float TileFriction = 0.01f;
+
+    [DataField]
+    public float UnfreezeTemperatureThreshold = Atmospherics.T0C;
+
+    [DataField]
+    public float UnfrozenTemperature = Atmospherics.T0C - 100f;
+
+    [DataField]
+    public float VelocityMultiplier = 0.2f;
 }
 
 public enum IceCubeKey : byte

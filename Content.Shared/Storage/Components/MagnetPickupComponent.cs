@@ -15,20 +15,20 @@ namespace Content.Shared.Storage.Components;
 /// Applies an ongoing pickup area around the attached entity.
 /// </summary>
 [NetworkedComponent]
-[RegisterComponent, AutoGenerateComponentPause, AutoGenerateComponentState]
+[RegisterComponent] [AutoGenerateComponentPause] [AutoGenerateComponentState]
 public sealed partial class MagnetPickupComponent : Component
 {
-    [ViewVariables(VVAccess.ReadWrite), DataField("nextScan")]
-    [AutoPausedField]
-    public TimeSpan NextScan = TimeSpan.Zero;
-
     /// <summary>
     /// If true, ignores SlotFlags and can magnet pickup on hands/ground.
     /// </summary>
-    [ViewVariables(VVAccess.ReadWrite), DataField]
+    [ViewVariables(VVAccess.ReadWrite)] [DataField]
     [AutoNetworkedField]
     public bool ForcePickup = true;
 
-    [ViewVariables(VVAccess.ReadWrite), DataField("range")]
+    [ViewVariables(VVAccess.ReadWrite)] [DataField("nextScan")]
+    [AutoPausedField]
+    public TimeSpan NextScan = TimeSpan.Zero;
+
+    [ViewVariables(VVAccess.ReadWrite)] [DataField("range")]
     public float Range = 1f;
 }

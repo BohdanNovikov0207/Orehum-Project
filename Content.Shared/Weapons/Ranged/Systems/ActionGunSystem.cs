@@ -34,7 +34,7 @@ public sealed class ActionGunSystem : EntitySystem
 
     private void OnShutdown(Entity<ActionGunComponent> ent, ref ComponentShutdown args)
     {
-        if (ent.Comp.Gun is {} gun)
+        if (ent.Comp.Gun is { } gun)
             QueueDel(gun);
     }
 

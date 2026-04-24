@@ -13,9 +13,12 @@ using Robust.Shared.GameStates;
 namespace Content.Shared.Magic.Components;
 
 // TODO: Rename to MagicActionComponent or MagicRequirementsComponent
-[RegisterComponent, NetworkedComponent, Access(typeof(SharedMagicSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(SharedMagicSystem))]
 public sealed partial class MagicComponent : Component
 {
+    // Goobstation
+    [DataField]
+    public bool BlockedBySpectral = true;
     // TODO: Split into different components?
     // This could be the MagicRequirementsComp - which just is requirements for the spell
     // Magic comp could be on the actual entities itself
@@ -33,15 +36,15 @@ public sealed partial class MagicComponent : Component
 
     // TODO: List requirements in action desc
     /// <summary>
-    ///     Does this spell require Wizard Robes & Hat?
+    /// Does this spell require Wizard Robes & Hat?
     /// </summary>
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    [DataField] [ViewVariables(VVAccess.ReadWrite)]
     public bool RequiresClothes;
 
     /// <summary>
-    ///     Does this spell require the user to speak?
+    /// Does this spell require the user to speak?
     /// </summary>
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    [DataField] [ViewVariables(VVAccess.ReadWrite)]
     public bool RequiresSpeech;
 
     // TODO: FreeHand - should check if toggleable action
@@ -50,10 +53,6 @@ public sealed partial class MagicComponent : Component
     // Goobstation
     [DataField]
     public MagicSchool School = MagicSchool.Unset;
-
-    // Goobstation
-    [DataField]
-    public bool BlockedBySpectral = true;
 }
 
 public enum MagicSchool : byte // Goobstation

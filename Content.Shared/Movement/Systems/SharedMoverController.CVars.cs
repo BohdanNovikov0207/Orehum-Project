@@ -26,19 +26,19 @@ public abstract partial class SharedMoverController
 
     private void OnMindAdded(Entity<InputMoverComponent> ent, ref MindAddedMessage args)
     {
-        if (!_player.TryGetSessionById(args.Mind.Comp.UserId, out var session)) return;
+        if (!_player.TryGetSessionById(args.Mind.Comp.UserId, out var session))
+            return;
 
-        if (session.Channel is not { } channel) return;
+        if (session.Channel is not { } channel)
+            return;
 
         ent.Comp.DefaultSprinting = _netConfig.GetClientCVar(channel, CCVars.DefaultWalk);
         RaiseLocalEvent(ent, new SprintingInputEvent(ent)); // WD EDIT
     }
 
-    private void OnMindRemoved(Entity<InputMoverComponent> ent, ref MindRemovedMessage args)
-    {
+    private void OnMindRemoved(Entity<InputMoverComponent> ent, ref MindRemovedMessage args) =>
         // If it's an ai-controlled mob, we probably want them sprinting by default.
         ent.Comp.DefaultSprinting = true;
-    }
 
     private void OnUpdateCVars(UpdateInputCVarsMessage msg, EntitySessionEventArgs args)
     {

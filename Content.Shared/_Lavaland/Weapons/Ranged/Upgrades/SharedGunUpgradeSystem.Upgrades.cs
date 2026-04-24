@@ -18,7 +18,8 @@ public abstract partial class SharedGunUpgradeSystem
         SubscribeLocalEvent<GunUpgradeComponentsComponent, EntGotRemovedFromContainerMessage>(OnCompsUpgradeEject);
 
         SubscribeLocalEvent<GunUpgradeFireRateComponent, GunRefreshModifiersEvent>(OnFireRateRefresh);
-        SubscribeLocalEvent<GunUpgradeFireRateComponent, RechargeBasicEntityAmmoGetCooldownModifiersEvent>(OnFireRateRefreshRecharge);
+        SubscribeLocalEvent<GunUpgradeFireRateComponent, RechargeBasicEntityAmmoGetCooldownModifiersEvent>(
+            OnFireRateRefreshRecharge);
 
         SubscribeLocalEvent<GunUpgradeSpeedComponent, GunRefreshModifiersEvent>(OnSpeedRefresh);
 
@@ -42,27 +43,25 @@ public abstract partial class SharedGunUpgradeSystem
         args.BurstCooldown /= ent.Comp.Coefficient;
     }
 
-    private void OnFireRateRefreshRecharge(Entity<GunUpgradeFireRateComponent> ent, ref RechargeBasicEntityAmmoGetCooldownModifiersEvent args)
-    {
-        args.Multiplier /= ent.Comp.Coefficient;
-    }
+    private void OnFireRateRefreshRecharge(Entity<GunUpgradeFireRateComponent> ent,
+        ref RechargeBasicEntityAmmoGetCooldownModifiersEvent args) => args.Multiplier /= ent.Comp.Coefficient;
 
-    private void OnCompsUpgradeInsert(Entity<GunUpgradeComponentsComponent> ent, ref EntGotInsertedIntoContainerMessage args)
+    private void OnCompsUpgradeInsert(Entity<GunUpgradeComponentsComponent> ent,
+        ref EntGotInsertedIntoContainerMessage args)
     {
         if (!_timing.ApplyingState && HasComp<UpgradeableWeaponComponent>(args.Container.Owner))
             EntityManager.AddComponents(args.Container.Owner, ent.Comp.Components);
     }
 
-    private void OnCompsUpgradeEject(Entity<GunUpgradeComponentsComponent> ent, ref EntGotRemovedFromContainerMessage args)
+    private void OnCompsUpgradeEject(Entity<GunUpgradeComponentsComponent> ent,
+        ref EntGotRemovedFromContainerMessage args)
     {
         if (!_timing.ApplyingState && HasComp<UpgradeableWeaponComponent>(args.Container.Owner))
             EntityManager.RemoveComponents(args.Container.Owner, ent.Comp.Components);
     }
 
-    private void OnSpeedRefresh(Entity<GunUpgradeSpeedComponent> ent, ref GunRefreshModifiersEvent args)
-    {
+    private void OnSpeedRefresh(Entity<GunUpgradeSpeedComponent> ent, ref GunRefreshModifiersEvent args) =>
         args.ProjectileSpeed *= ent.Comp.Coefficient;
-    }
 
     private void OnDamageGunShotComps(Entity<GunUpgradeProjectileComponentsComponent> ent, ref GunShotEvent args)
     {

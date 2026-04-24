@@ -10,26 +10,25 @@
 using System.Collections.Immutable;
 using Robust.Shared.Prototypes;
 
-namespace Content.Shared.EntityList
+namespace Content.Shared.EntityList;
+
+[Prototype]
+public sealed class EntityListPrototype : IPrototype
 {
-    [Prototype]
-    public sealed partial class EntityListPrototype : IPrototype
+    [DataField]
+    public ImmutableList<EntProtoId> Entities { get; } = ImmutableList<EntProtoId>.Empty;
+
+    [ViewVariables]
+    [IdDataField]
+    public string ID { get; } = default!;
+
+    public IEnumerable<EntityPrototype> GetEntities(IPrototypeManager? prototypeManager = null)
     {
-        [ViewVariables]
-        [IdDataField]
-        public string ID { get; private set; } = default!;
+        prototypeManager ??= IoCManager.Resolve<IPrototypeManager>();
 
-        [DataField]
-        public ImmutableList<EntProtoId> Entities { get; private set; } = ImmutableList<EntProtoId>.Empty;
-
-        public IEnumerable<EntityPrototype> GetEntities(IPrototypeManager? prototypeManager = null)
+        foreach (var entityId in Entities)
         {
-            prototypeManager ??= IoCManager.Resolve<IPrototypeManager>();
-
-            foreach (var entityId in Entities)
-            {
-                yield return prototypeManager.Index<EntityPrototype>(entityId);
-            }
+            yield return prototypeManager.Index<EntityPrototype>(entityId);
         }
     }
 }

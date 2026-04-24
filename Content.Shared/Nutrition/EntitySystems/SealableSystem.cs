@@ -12,9 +12,10 @@ using Content.Shared.Nutrition.Components;
 
 namespace Content.Shared.Nutrition.EntitySystems;
 
-public sealed partial class SealableSystem : EntitySystem
+public sealed class SealableSystem : EntitySystem
 {
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+
     public override void Initialize()
     {
         base.Initialize();

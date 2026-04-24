@@ -8,7 +8,7 @@ namespace Content.Shared.StatusEffectNew.Components;
 /// Is applied automatically upon adding any status effect.
 /// Can be used for tracking currently applied status effects.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 [Access(typeof(StatusEffectsSystem))]
 public sealed partial class StatusEffectContainerComponent : Component
 {

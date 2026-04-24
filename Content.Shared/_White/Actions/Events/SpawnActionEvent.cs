@@ -1,3 +1,4 @@
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Actions;
 using Content.Shared.DoAfter;
 using Robust.Shared.Audio;
@@ -6,7 +7,8 @@ using Robust.Shared.Physics.Dynamics;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
-using Content.Goobstation.Maths.FixedPoint; // Goobstation
+
+// Goobstation
 
 
 namespace Content.Shared._White.Actions.Events;
@@ -17,6 +19,18 @@ namespace Content.Shared._White.Actions.Events;
 public sealed partial class SpawnTileEntityActionEvent : InstantActionEvent
 {
     /// <summary>
+    /// The sound that will be played when the action is performed
+    /// </summary>
+    [DataField]
+    public SoundSpecifier? Audio;
+
+    [DataField(customTypeSerializer: typeof(FlagSerializer<CollisionLayer>))]
+    public int BlockedCollisionLayer;
+
+    [DataField(customTypeSerializer: typeof(FlagSerializer<CollisionMask>))]
+    public int BlockedCollisionMask;
+
+    /// <summary>
     /// The prototype of the entity to be created
     /// </summary>
     [DataField]
@@ -27,18 +41,6 @@ public sealed partial class SpawnTileEntityActionEvent : InstantActionEvent
     /// </summary>
     [DataField]
     public string? TileId;
-
-    /// <summary>
-    /// The sound that will be played when the action is performed
-    /// </summary>
-    [DataField]
-    public SoundSpecifier? Audio;
-
-    [DataField(customTypeSerializer: typeof(FlagSerializer<CollisionMask>))]
-    public int BlockedCollisionMask;
-
-    [DataField(customTypeSerializer: typeof(FlagSerializer<CollisionLayer>))]
-    public int BlockedCollisionLayer;
 }
 
 /// <summary>
@@ -47,47 +49,47 @@ public sealed partial class SpawnTileEntityActionEvent : InstantActionEvent
 public sealed partial class PlaceTileEntityEvent : WorldTargetActionEvent
 {
     /// <summary>
+    /// The sound that will be played when the action is performed
+    /// </summary>
+    [DataField]
+    public SoundSpecifier? Audio;
+
+    [DataField(customTypeSerializer: typeof(FlagSerializer<CollisionLayer>))]
+    public int BlockedCollisionLayer;
+
+    [DataField(customTypeSerializer: typeof(FlagSerializer<CollisionMask>))]
+    public int BlockedCollisionMask;
+
+    /// <summary>
     /// The prototype of the entity to be created
     /// </summary>
     [DataField]
     public EntProtoId? Entity;
 
     /// <summary>
-    /// The identifier of the tile to be placed
-    /// </summary>
-    [DataField]
-    public string? TileId;
-
-    /// <summary>
-    /// The sound that will be played when the action is performed
-    /// </summary>
-    [DataField]
-    public SoundSpecifier? Audio;
-
-    [DataField(customTypeSerializer: typeof(FlagSerializer<CollisionMask>))]
-    public int BlockedCollisionMask;
-
-    [DataField(customTypeSerializer: typeof(FlagSerializer<CollisionLayer>))]
-    public int BlockedCollisionLayer;
-
-    /// <summary>
     /// The duration of the action in seconds
     /// </summary>
     [DataField]
     public float Length;
+
+    /// <summary>
+    /// The identifier of the tile to be placed
+    /// </summary>
+    [DataField]
+    public string? TileId;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class PlaceTileEntityDoAfterEvent : DoAfterEvent
 {
-    public NetCoordinates Target;
-    public EntProtoId? Entity;
-    public string? TileId;
-    public SoundSpecifier? Audio;
-    public int BlockedCollisionMask;
-    public int BlockedCollisionLayer;
-    public FixedPoint2 PlasmaCost; // Goobstation
     public NetEntity Action; // Goobstation
+    public SoundSpecifier? Audio;
+    public int BlockedCollisionLayer;
+    public int BlockedCollisionMask;
+    public EntProtoId? Entity;
+    public FixedPoint2 PlasmaCost; // Goobstation
+    public NetCoordinates Target;
+    public string? TileId;
 
     public override DoAfterEvent Clone() => this;
 }

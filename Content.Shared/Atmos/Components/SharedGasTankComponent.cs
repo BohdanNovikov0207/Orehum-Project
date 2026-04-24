@@ -17,22 +17,22 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Atmos.Components;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum SharedGasTankUiKey : byte
 {
-    Key
+    Key,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class GasTankToggleInternalsMessage : BoundUserInterfaceMessage;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class GasTankSetPressureMessage : BoundUserInterfaceMessage
 {
     public float Pressure;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class GasTankBoundUserInterfaceState : BoundUserInterfaceState
 {
     public float TankPressure;

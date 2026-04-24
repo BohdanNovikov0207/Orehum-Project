@@ -16,24 +16,25 @@ namespace Content.Shared.Revenant.Components;
 /// This is used for tracking lights that are overloaded
 /// and are about to zap a player.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class RevenantOverloadedLightsComponent : Component
 {
+    [ViewVariables(VVAccess.ReadWrite)]
+    public float Accumulator = 0;
+
+    public bool OriginalEnabled = false;
+
+    public float? OriginalEnergy;
+
     [ViewVariables]
     public EntityUid? Target;
 
-    [ViewVariables(VVAccess.ReadWrite)]
-    public float Accumulator = 0;
+    [DataField("zapBeamEntityId", customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
+    public string ZapBeamEntityId = "LightningRevenant";
 
     [ViewVariables(VVAccess.ReadWrite)]
     public float ZapDelay = 2f;
 
     [ViewVariables(VVAccess.ReadWrite)]
     public float ZapRange = 7f;
-
-    [DataField("zapBeamEntityId",customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
-    public string ZapBeamEntityId = "LightningRevenant";
-
-    public float? OriginalEnergy;
-    public bool OriginalEnabled = false;
 }

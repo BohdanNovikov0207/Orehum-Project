@@ -12,70 +12,69 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-namespace Content.Shared.Chat
+namespace Content.Shared.Chat;
+
+/// <summary>
+/// Chat channels that the player can select in the chat box.
+/// </summary>
+/// <remarks>
+/// Maps to <see cref="ChatChannel" />, giving better names.
+/// </remarks>
+[Flags]
+public enum ChatSelectChannel : uint // Goobstation - Starlight collective mind port
 {
+    None = 0,
+
     /// <summary>
-    ///     Chat channels that the player can select in the chat box.
+    /// Chat heard by players within earshot
     /// </summary>
-    /// <remarks>
-    ///     Maps to <see cref="ChatChannel"/>, giving better names.
-    /// </remarks>
-    [Flags]
-    public enum ChatSelectChannel : uint // Goobstation - Starlight collective mind port
-    {
-        None = 0,
+    Local = ChatChannel.Local,
 
-        /// <summary>
-        ///     Chat heard by players within earshot
-        /// </summary>
-        Local = ChatChannel.Local,
+    /// <summary>
+    /// Chat heard by players right next to each other
+    /// </summary>
+    Whisper = ChatChannel.Whisper,
 
-        /// <summary>
-        ///     Chat heard by players right next to each other
-        /// </summary>
-        Whisper = ChatChannel.Whisper,
+    /// <summary>
+    /// Radio messages
+    /// </summary>
+    Radio = ChatChannel.Radio,
 
-        /// <summary>
-        ///     Radio messages
-        /// </summary>
-        Radio = ChatChannel.Radio,
+    /// <summary>
+    /// Local out-of-character channel
+    /// </summary>
+    LOOC = ChatChannel.LOOC,
 
-        /// <summary>
-        ///     Local out-of-character channel
-        /// </summary>
-        LOOC = ChatChannel.LOOC,
+    /// <summary>
+    /// Out-of-character channel
+    /// </summary>
+    OOC = ChatChannel.OOC,
 
-        /// <summary>
-        ///     Out-of-character channel
-        /// </summary>
-        OOC = ChatChannel.OOC,
+    /// <summary>
+    /// Emotes
+    /// </summary>
+    Emotes = ChatChannel.Emotes,
 
-        /// <summary>
-        ///     Emotes
-        /// </summary>
-        Emotes = ChatChannel.Emotes,
+    // Goobstation - Starlight collective mind port
+    /// <summary>
+    /// CollectiveMind
+    /// </summary>
+    CollectiveMind = ChatChannel.CollectiveMind,
 
-        // Goobstation - Starlight collective mind port
-        /// <summary>
-        ///     CollectiveMind
-        /// </summary>
-        CollectiveMind = ChatChannel.CollectiveMind,
+    /// <summary>
+    /// Deadchat
+    /// </summary>
+    Dead = ChatChannel.Dead,
 
-        /// <summary>
-        ///     Deadchat
-        /// </summary>
-        Dead = ChatChannel.Dead,
+    /// <summary>
+    /// Admin chat
+    /// </summary>
+    Admin = ChatChannel.AdminChat,
 
-        /// <summary>
-        ///     Admin chat
-        /// </summary>
-        Admin = ChatChannel.AdminChat,
+    /// <summary>
+    /// Nyano - Summary:. Telepathic channel for all psionic entities.
+    /// </summary>
+    Telepathic = ChatChannel.Telepathic,
 
-        /// <summary>
-        ///     Nyano - Summary:. Telepathic channel for all psionic entities.
-        /// </summary>
-        Telepathic = ChatChannel.Telepathic,
-
-        Console = ChatChannel.Unspecified
-    }
+    Console = ChatChannel.Unspecified,
 }

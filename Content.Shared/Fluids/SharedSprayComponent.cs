@@ -13,11 +13,10 @@
 
 using Robust.Shared.Serialization;
 
-namespace Content.Shared.Fluids
+namespace Content.Shared.Fluids;
+
+[Serializable] [NetSerializable]
+public enum SprayVisuals : byte
 {
-    [Serializable, NetSerializable]
-    public enum SprayVisuals : byte
-    {
-        Safety
-    }
+    Safety,
 }

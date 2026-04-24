@@ -30,7 +30,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared._RMC14.LinkAccount;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed record SharedRMCPatronFull(
     SharedRMCPatronTier? Tier,
     bool Linked,

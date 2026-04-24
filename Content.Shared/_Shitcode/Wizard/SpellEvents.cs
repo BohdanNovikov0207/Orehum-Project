@@ -8,13 +8,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Numerics;
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Actions;
 using Content.Shared.Atmos;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Prototypes;
 using Content.Shared.Destructible.Thresholds;
 using Content.Shared.Explosion;
-using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Item;
 using Content.Shared.NPC.Prototypes;
 using Content.Shared.Physics;
@@ -43,17 +43,17 @@ public sealed partial class BananaTouchEvent : EntityTargetActionEvent
     [DataField]
     public Dictionary<string, EntProtoId> Gear = new()
     {
-        {"mask", "ClothingMaskClown"},
-        {"jumpsuit", "ClothingUniformJumpsuitClown"},
-        {"shoes", "ClothingShoesClown"},
-        {"id", "ClownPDA"},
+        { "mask", "ClothingMaskClown" },
+        { "jumpsuit", "ClothingUniformJumpsuitClown" },
+        { "shoes", "ClothingShoesClown" },
+        { "id", "ClownPDA" },
     };
 
     [DataField]
-    public TimeSpan ParalyzeDuration = TimeSpan.FromSeconds(5);
+    public TimeSpan JitterStutterDuration = TimeSpan.FromSeconds(30);
 
     [DataField]
-    public TimeSpan JitterStutterDuration = TimeSpan.FromSeconds(30);
+    public TimeSpan ParalyzeDuration = TimeSpan.FromSeconds(5);
 }
 
 public sealed partial class MimeMalaiseEvent : EntityTargetActionEvent
@@ -61,53 +61,53 @@ public sealed partial class MimeMalaiseEvent : EntityTargetActionEvent
     [DataField]
     public Dictionary<string, EntProtoId> Gear = new()
     {
-        {"mask", "ClothingMaskMime"},
-        {"jumpsuit", "ClothingUniformJumpsuitMime"},
-        {"belt", "ClothingBeltSuspendersRed"},
-        {"id", "MimePDA"},
+        { "mask", "ClothingMaskMime" },
+        { "jumpsuit", "ClothingUniformJumpsuitMime" },
+        { "belt", "ClothingBeltSuspendersRed" },
+        { "id", "MimePDA" },
     };
 
     [DataField]
-    public TimeSpan WizardMuteDuration = TimeSpan.FromSeconds(15);
+    public TimeSpan ParalyzeDuration = TimeSpan.FromSeconds(5);
 
     [DataField]
-    public TimeSpan ParalyzeDuration = TimeSpan.FromSeconds(5);
+    public TimeSpan WizardMuteDuration = TimeSpan.FromSeconds(15);
 }
 
 public sealed partial class MagicMissileEvent : InstantActionEvent
 {
     [DataField]
+    public float ProjectileSpeed = 6f;
+
+    [DataField]
     public EntProtoId Proto = "ProjectileMagicMissile";
 
     [DataField]
     public float Range = 7f;
-
-    [DataField]
-    public float ProjectileSpeed = 6f;
 }
 
 public sealed partial class DisableTechEvent : InstantActionEvent
 {
     [DataField]
-    public float Range = 10f;
+    public float DisableDuration = 60f;
+
+    [DataField]
+    public EntProtoId Effect = "EmpFlashEffect";
 
     [DataField]
     public float EnergyConsumption = 50000f;
 
     [DataField]
-    public float DisableDuration = 60f;
-
-    [DataField]
-    public EntProtoId Effect = "EmpFlashEffect";
+    public float Range = 10f;
 }
 
 public sealed partial class SmokeSpellEvent : InstantActionEvent
 {
     [DataField]
-    public EntProtoId Proto = "Smoke";
+    public float Duration = 10;
 
     [DataField]
-    public float Duration = 10;
+    public EntProtoId Proto = "Smoke";
 
     [DataField]
     public int SpreadAmount = 30;
@@ -116,19 +116,19 @@ public sealed partial class SmokeSpellEvent : InstantActionEvent
 public sealed partial class RepulseEvent : InstantActionEvent
 {
     [DataField]
-    public float Force = 180f;
+    public EntProtoId EffectProto = "EffectRepulse";
 
     [DataField]
-    public float MinRange = 0.00001f;
+    public float Force = 180f;
 
     [DataField]
     public float MaxRange = 5f;
 
     [DataField]
-    public TimeSpan StunTime = TimeSpan.FromSeconds(4);
+    public float MinRange = 0.00001f;
 
     [DataField]
-    public EntProtoId EffectProto = "EffectRepulse";
+    public TimeSpan StunTime = TimeSpan.FromSeconds(4);
 }
 
 public sealed partial class StopTimeEvent : InstantActionEvent
@@ -139,29 +139,29 @@ public sealed partial class StopTimeEvent : InstantActionEvent
 
 public sealed partial class CorpseExplosionEvent : EntityTargetActionEvent
 {
-    [DataField]
-    public float TotalIntensity = 200f;
+    [DataField(required: true)]
+    public DamageSpecifier Damage;
 
     [DataField]
-    public float Slope = 1.5f;
-
-    [DataField]
-    public float MaxIntenity = 100f;
+    public ProtoId<ExplosionPrototype> ExplosionId = "Corpse";
 
     [DataField]
     public float KnockdownRange = 4f;
 
     [DataField]
-    public TimeSpan SiliconStunTime = TimeSpan.FromSeconds(6f);
-
-    [DataField]
     public TimeSpan KnockdownTime = TimeSpan.FromSeconds(4f);
 
     [DataField]
-    public ProtoId<ExplosionPrototype> ExplosionId = "Corpse";
+    public float MaxIntenity = 100f;
 
-    [DataField(required: true)]
-    public DamageSpecifier Damage;
+    [DataField]
+    public TimeSpan SiliconStunTime = TimeSpan.FromSeconds(6f);
+
+    [DataField]
+    public float Slope = 1.5f;
+
+    [DataField]
+    public float TotalIntensity = 200f;
 }
 
 public sealed partial class BlindSpellEvent : EntityTargetActionEvent
@@ -185,32 +185,32 @@ public sealed partial class BindSoulEvent : InstantActionEvent
     public EntProtoId Entity = "MobSkeletonPerson";
 
     [DataField]
-    public SoundSpecifier? Sound;
-
-    [DataField]
     public Dictionary<string, EntProtoId> Gear = new()
     {
-        {"head", "ClothingHeadHatBlackwizardReal"},
-        {"outerClothing", "ClothingOuterWizardBlackReal"},
+        { "head", "ClothingHeadHatBlackwizardReal" },
+        { "outerClothing", "ClothingOuterWizardBlackReal" },
     };
 
     [DataField]
     public ProtoId<ItemSizePrototype> PhylacterySize = "Ginormous";
+
+    [DataField]
+    public SoundSpecifier? Sound;
 }
 
 public sealed partial class PolymorphSpellEvent : InstantActionEvent
 {
     [DataField]
-    public ProtoId<PolymorphPrototype>? ProtoId;
+    public bool LoadActions;
 
     [DataField]
     public bool MakeWizard = true;
 
     [DataField]
-    public SoundSpecifier? Sound;
+    public ProtoId<PolymorphPrototype>? ProtoId;
 
     [DataField]
-    public bool LoadActions;
+    public SoundSpecifier? Sound;
 }
 
 public sealed partial class MutateSpellEvent : InstantActionEvent
@@ -222,16 +222,19 @@ public sealed partial class MutateSpellEvent : InstantActionEvent
 public sealed partial class TeslaBlastEvent : InstantActionEvent
 {
     [DataField]
-    public TimeSpan Delay = TimeSpan.FromSeconds(10);
-
-    [DataField]
-    public float Range = 7f;
+    public int ArcDepth = 5;
 
     [DataField]
     public int BoltCount = 1;
 
     [DataField]
-    public int ArcDepth = 5;
+    public TimeSpan Delay = TimeSpan.FromSeconds(10);
+
+    [DataField]
+    public EntProtoId EffectPrototype = "EffectElectricity";
+
+    [DataField]
+    public EntProtoId LightningPrototype = "SuperchargedLightning";
 
     [DataField]
     public Vector2 MinMaxDamage = new(15f, 60f);
@@ -240,10 +243,7 @@ public sealed partial class TeslaBlastEvent : InstantActionEvent
     public Vector2 MinMaxStunTime = new(2f, 8f);
 
     [DataField]
-    public EntProtoId LightningPrototype = "SuperchargedLightning";
-
-    [DataField]
-    public EntProtoId EffectPrototype = "EffectElectricity";
+    public float Range = 7f;
 
     [DataField]
     public SoundSpecifier? Sound;
@@ -261,34 +261,34 @@ public sealed partial class LightningBoltEvent : EntityTargetActionEvent
 public sealed partial class HomingToolboxEvent : WorldTargetActionEvent
 {
     [DataField]
-    public EntProtoId Proto = "ProjectileToolboxHoming";
+    public float ProjectileSpeed = 20f;
 
     [DataField]
-    public float ProjectileSpeed = 20f;
+    public EntProtoId Proto = "ProjectileToolboxHoming";
 }
 
 public sealed partial class SpellCardsEvent : WorldTargetActionEvent
 {
     [DataField]
-    public EntProtoId RedProto = "ProjectileSpellCardRed";
+    public float MaxAngularVelocity = MathF.PI / 3f;
 
     [DataField]
-    public EntProtoId PurpleProto = "ProjectileSpellCardPurple";
-
-    [DataField]
-    public float ProjectileSpeed = 20f;
+    public Vector2 MinMaxLinearDamping = new(3f, 7f);
 
     [DataField]
     public int ProjectilesAmount = 7;
 
     [DataField]
+    public float ProjectileSpeed = 20f;
+
+    [DataField]
+    public EntProtoId PurpleProto = "ProjectileSpellCardPurple";
+
+    [DataField]
+    public EntProtoId RedProto = "ProjectileSpellCardRed";
+
+    [DataField]
     public Angle Spread = Angle.FromDegrees(30);
-
-    [DataField]
-    public float MaxAngularVelocity = MathF.PI / 3f;
-
-    [DataField]
-    public Vector2 MinMaxLinearDamping = new(3f, 7f);
 }
 
 public sealed partial class ArcaneBarrageEvent : InstantActionEvent
@@ -305,11 +305,11 @@ public sealed partial class LesserSummonGunsEvent : InstantActionEvent
 
 public sealed partial class BarnyardCurseEvent : EntityTargetActionEvent
 {
-    [DataField(required: true)]
-    public Dictionary<EntProtoId, SoundSpecifier?> Masks = new();
-
     [DataField]
     public ProtoId<TagPrototype> CursedMaskTag = "CursedAnimalMask";
+
+    [DataField(required: true)]
+    public Dictionary<EntProtoId, SoundSpecifier?> Masks = new();
 }
 
 public sealed partial class ScreamForMeEvent : EntityTargetActionEvent
@@ -331,6 +331,12 @@ public sealed partial class WizardTeleportEvent : InstantActionEvent
 public sealed partial class TrapsSpellEvent : InstantActionEvent
 {
     [DataField]
+    public int Amount = 5;
+
+    [DataField]
+    public float Range = 3f;
+
+    [DataField]
     public List<EntProtoId> Traps = new()
     {
         "TrapShock",
@@ -339,16 +345,19 @@ public sealed partial class TrapsSpellEvent : InstantActionEvent
         "TrapChill",
         "TrapBlind",
     };
-
-    [DataField]
-    public float Range = 3f;
-
-    [DataField]
-    public int Amount = 5;
 }
 
 public sealed partial class SummonMobsEvent : InstantActionEvent
 {
+    [DataField]
+    public int Amount = 9;
+
+    [DataField(customTypeSerializer: typeof(FlagSerializer<CollisionMask>))]
+    public int CollisionMask = (int) CollisionGroup.MobMask;
+
+    [DataField]
+    public bool FactionIgnoreSummoner;
+
     [DataField]
     public List<EntProtoId> Mobs = new();
 
@@ -356,34 +365,25 @@ public sealed partial class SummonMobsEvent : InstantActionEvent
     public float Range = 1f;
 
     [DataField]
-    public int Amount = 9;
-
-    [DataField]
     public Angle SpawnAngle = Angle.FromDegrees(160);
-
-    [DataField(customTypeSerializer: typeof(FlagSerializer<CollisionMask>))]
-    public int CollisionMask = (int) CollisionGroup.MobMask;
-
-    [DataField]
-    public bool FactionIgnoreSummoner;
 }
 
 public sealed partial class SummonSimiansEvent : InstantActionEvent
 {
-    [DataField(required: true)]
-    public ProtoId<WeightedRandomEntityPrototype> Mobs;
+    [DataField]
+    public int Amount = 4;
 
     [DataField(required: true)]
-    public ProtoId<WeightedRandomEntityPrototype> Weapons;
+    public ProtoId<WeightedRandomEntityPrototype> Mobs;
 
     [DataField]
     public float Range = 1f;
 
     [DataField]
-    public int Amount = 4;
-
-    [DataField]
     public Angle SpawnAngle = Angle.FromDegrees(40);
+
+    [DataField(required: true)]
+    public ProtoId<WeightedRandomEntityPrototype> Weapons;
 }
 
 public sealed partial class ExsanguinatingStrikeEvent : InstantActionEvent
@@ -395,7 +395,7 @@ public sealed partial class ChuuniInvocationsEvent : InstantActionEvent
     [DataField]
     public Dictionary<string, EntProtoId> Gear = new()
     {
-        {"eyes", "ClothingEyesEyepatchMedical"},
+        { "eyes", "ClothingEyesEyepatchMedical" },
     };
 
     [DataField]
@@ -405,13 +405,13 @@ public sealed partial class ChuuniInvocationsEvent : InstantActionEvent
 public sealed partial class SwapSpellEvent : EntityTargetActionEvent
 {
     [DataField]
-    public SoundSpecifier? Sound;
+    public EntProtoId Effect = "SwapSpellEffect";
 
     [DataField]
     public float Range = 15f;
 
     [DataField]
-    public EntProtoId Effect = "SwapSpellEffect";
+    public SoundSpecifier? Sound;
 
     [DataField]
     public bool ThroughWalls = true;
@@ -420,13 +420,13 @@ public sealed partial class SwapSpellEvent : EntityTargetActionEvent
 public sealed partial class SoulTapEvent : InstantActionEvent
 {
     [DataField]
-    public FixedPoint2 MaxHealthReduction = 20;
+    public ProtoId<TagPrototype> DeadTag = "SoulTapped";
 
     [DataField]
     public ProtoId<DamageTypePrototype> KillDamage = "Cellular";
 
     [DataField]
-    public ProtoId<TagPrototype> DeadTag = "SoulTapped";
+    public FixedPoint2 MaxHealthReduction = 20;
 }
 
 public sealed partial class ThrownLightningEvent : InstantActionEvent
@@ -441,16 +441,7 @@ public sealed partial class ThrownLightningEvent : InstantActionEvent
 public sealed partial class ChargeMagicEvent : InstantActionEvent
 {
     [DataField]
-    public ProtoId<TagPrototype> WandTag = "WizardWand";
-
-    [DataField]
-    public float WandChargeRate = 1000f;
-
-    [DataField]
     public float MinWandDegradeCharge = 1000f;
-
-    [DataField]
-    public float WandDegradePercentagePerCharge = 0.5f;
 
     [DataField]
     public List<ProtoId<TagPrototype>> RechargeTags = new()
@@ -458,6 +449,15 @@ public sealed partial class ChargeMagicEvent : InstantActionEvent
         "WizardWand",
         "WizardStaff",
     };
+
+    [DataField]
+    public float WandChargeRate = 1000f;
+
+    [DataField]
+    public float WandDegradePercentagePerCharge = 0.5f;
+
+    [DataField]
+    public ProtoId<TagPrototype> WandTag = "WizardWand";
 }
 
 public sealed partial class BlinkSpellEvent : InstantActionEvent
@@ -492,10 +492,10 @@ public sealed partial class SummonSimiansMaxedOutEvent : EntityEventArgs
     public EntProtoId Action = "ActionGorillaForm";
 
     [DataField]
-    public ProtoId<TagPrototype> MaxLevelTag = "SummonSimiansMaxLevelAction";
+    public ProtoId<TagPrototype> GorillaFormTag = "GorillaFormAction";
 
     [DataField]
-    public ProtoId<TagPrototype> GorillaFormTag = "GorillaFormAction";
+    public ProtoId<TagPrototype> MaxLevelTag = "SummonSimiansMaxLevelAction";
 
     [DataField]
     public Color MessageColor = Color.FromHex("#EDC349");
@@ -512,22 +512,22 @@ public sealed partial class SummonGhostsEvent : EntityEventArgs
 public sealed partial class DimensionShiftEvent : EntityEventArgs
 {
     [DataField]
-    public SoundSpecifier? Sound = new SoundPathSpecifier("/Audio/_Goobstation/Wizard/ghost.ogg");
-
-    [DataField]
-    public float OxygenMoles = 10f;
+    public float CarbonDioxideMoles = 10f;
 
     [DataField]
     public float NitrogenMoles = 10f;
 
     [DataField]
-    public float CarbonDioxideMoles = 10f;
-
-    [DataField]
-    public float Temperature = Atmospherics.T0C - 5f;
+    public float OxygenMoles = 10f;
 
     [DataField]
     public string? Parallax = "Wizard";
+
+    [DataField]
+    public SoundSpecifier? Sound = new SoundPathSpecifier("/Audio/_Goobstation/Wizard/ghost.ogg");
+
+    [DataField]
+    public float Temperature = Atmospherics.T0C - 5f;
 }
 
 [DataDefinition]
@@ -540,15 +540,18 @@ public sealed partial class GrantFactionsEvent : EntityEventArgs
 [DataDefinition]
 public sealed partial class RandomizeSpellsEvent : EntityEventArgs
 {
-    [DataField]
-    public float TotalBalance = 10;
-
     [DataField(required: true)]
     public Dictionary<ProtoId<WeightedRandomEntityPrototype>, int?> SpellsDict;
+
+    [DataField]
+    public float TotalBalance = 10;
 }
 
 public sealed partial class RathenEvent : InstantActionEvent
 {
+    [DataField]
+    public float LimbTearChance = 0.3f;
+
     [DataField]
     public float MaxRange = 5f;
 
@@ -560,7 +563,4 @@ public sealed partial class RathenEvent : InstantActionEvent
     {
         DamageDict = { { "Blunt", 10 } },
     };
-
-    [DataField]
-    public float LimbTearChance = 0.3f;
 }

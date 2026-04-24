@@ -8,33 +8,34 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared._DV.Storage.EntitySystems;
 using Content.Goobstation.Maths.FixedPoint;
+using Content.Shared._DV.Storage.EntitySystems;
 using Robust.Shared.Containers;
 using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
+
 namespace Content.Shared._DV.Storage.Components;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 [Access(typeof(SharedMouthStorageSystem))]
 public sealed partial class MouthStorageComponent : Component
 {
     public const string MouthContainerId = "mouth";
 
-    [DataField, AutoNetworkedField]
-    public EntProtoId? OpenStorageAction;
-
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public EntityUid? Action;
-
-    [DataField]
-    public EntProtoId MouthProto = "ActionOpenMouthStorage";
 
     [ViewVariables]
     public Container Mouth = default!;
 
     [DataField]
     public EntityUid? MouthId;
+
+    [DataField]
+    public EntProtoId MouthProto = "ActionOpenMouthStorage";
+
+    [DataField] [AutoNetworkedField]
+    public EntProtoId? OpenStorageAction;
 
     // Mimimum inflicted damage on hit to spit out items
     [DataField]

@@ -33,9 +33,9 @@ namespace Content.Shared._Lavaland.Aggression;
 
 public sealed class AggressorsSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly MobStateSystem _mobState = default!;
     [Dependency] private readonly SharedBossMusicSystem _bossMusic = default!;
+    [Dependency] private readonly MobStateSystem _mobState = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SharedTransformSystem _xform = default!;
 
     private EntityQuery<TransformComponent> _xformQuery;
@@ -87,12 +87,31 @@ public sealed class AggressorsSystem : EntitySystem
                     || xform.MapID != aggroXform.MapID)
                     toRemove.Add(aggressor);
             }
+
             foreach (var remove in toRemove)
             {
                 RemoveAggressor((uid, aggressive), remove);
             }
         }
     }
+
+    #region Aggressor API
+
+    public void CleanAggressions(Entity<AggressorComponent?> aggressor)
+    {
+        if (!Resolve(aggressor, ref aggressor.Comp))
+            return;
+
+        foreach (var aggressive in aggressor.Comp.Aggressives.ToArray())
+        {
+            if (TryComp<AggressiveComponent>(aggressive, out var aggressors))
+                RemoveAggressor((aggressive, aggressors), aggressor);
+        }
+
+        RemComp(aggressor, aggressor.Comp);
+    }
+
+    #endregion
 
     #region Event Handling
 
@@ -187,24 +206,6 @@ public sealed class AggressorsSystem : EntitySystem
         }
 
         ent.Comp.Aggressors.Clear();
-    }
-
-    #endregion
-
-    #region Aggressor API
-
-    public void CleanAggressions(Entity<AggressorComponent?> aggressor)
-    {
-        if (!Resolve(aggressor, ref aggressor.Comp))
-            return;
-
-        foreach (var aggressive in aggressor.Comp.Aggressives.ToArray())
-        {
-            if (TryComp<AggressiveComponent>(aggressive, out var aggressors))
-                RemoveAggressor((aggressive, aggressors), aggressor);
-        }
-
-        RemComp(aggressor, aggressor.Comp);
     }
 
     #endregion

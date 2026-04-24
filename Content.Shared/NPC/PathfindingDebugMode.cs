@@ -44,7 +44,6 @@ public enum PathfindingDebugMode : ushort
     /// Gets a path from the current attached entity to the mouse cursor.
     /// </summary>
     // Path = 1 << 6,
-
     Routes = 1 << 6,
 
     RouteCosts = 1 << 7,

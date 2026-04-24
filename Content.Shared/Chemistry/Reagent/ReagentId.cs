@@ -73,10 +73,10 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Linq;
 using Content.Goobstation.Maths.FixedPoint;
 using Robust.Shared.Serialization;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype;
-using System.Linq;
 
 namespace Content.Shared.Chemistry.Reagent;
 
@@ -84,7 +84,7 @@ namespace Content.Shared.Chemistry.Reagent;
 /// Struct used to uniquely identify a reagent. This is usually just a ReagentPrototype id string, however some reagents
 /// contain additional data (e.g., blood could store DNA data).
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 [DataDefinition]
 public partial struct ReagentId : IEquatable<ReagentId>
 {
@@ -102,7 +102,7 @@ public partial struct ReagentId : IEquatable<ReagentId>
     {
         Prototype = prototype;
         // Goobstation start - fix shallow cloning of solution
-        Data = new();
+        Data = new List<ReagentData>();
         if (data != null)
         {
             foreach (var reagentData in data)
@@ -116,13 +116,10 @@ public partial struct ReagentId : IEquatable<ReagentId>
     public ReagentId()
     {
         Prototype = default!;
-        Data = new();
+        Data = new List<ReagentData>();
     }
 
-    public List<ReagentData> EnsureReagentData()
-    {
-        return (Data != null) ? Data : new List<ReagentData>();
-    }
+    public List<ReagentData> EnsureReagentData() => Data != null ? Data : new List<ReagentData>();
 
     public bool Equals(ReagentId other)
     {
@@ -152,33 +149,15 @@ public partial struct ReagentId : IEquatable<ReagentId>
         return Data.Equals(otherData);
     }
 
-    public override bool Equals(object? obj)
-    {
-        return obj is ReagentId other && Equals(other);
-    }
+    public override bool Equals(object? obj) => obj is ReagentId other && Equals(other);
 
-    public override int GetHashCode()
-    {
-        return HashCode.Combine(Prototype, Data);
-    }
+    public override int GetHashCode() => HashCode.Combine(Prototype, Data);
 
-    public string ToString(FixedPoint2 quantity)
-    {
-        return $"{Prototype}:{quantity}";
-    }
+    public string ToString(FixedPoint2 quantity) => $"{Prototype}:{quantity}";
 
-    public override string ToString()
-    {
-        return $"{Prototype}";
-    }
+    public override string ToString() => $"{Prototype}";
 
-    public static bool operator ==(ReagentId left, ReagentId right)
-    {
-        return left.Equals(right);
-    }
+    public static bool operator ==(ReagentId left, ReagentId right) => left.Equals(right);
 
-    public static bool operator !=(ReagentId left, ReagentId right)
-    {
-        return !(left == right);
-    }
+    public static bool operator !=(ReagentId left, ReagentId right) => !(left == right);
 }

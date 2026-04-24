@@ -11,7 +11,7 @@ namespace Content.Shared.Atmos.Piping.Portable.Components;
 [NetSerializable]
 public enum SpaceHeaterUiKey
 {
-    Key
+    Key,
 }
 
 [Serializable]
@@ -24,50 +24,48 @@ public sealed class SpaceHeaterToggleMessage : BoundUserInterfaceMessage
 [NetSerializable]
 public sealed class SpaceHeaterChangeTemperatureMessage : BoundUserInterfaceMessage
 {
-    public float Temperature { get; }
-
     public SpaceHeaterChangeTemperatureMessage(float temperature)
     {
         Temperature = temperature;
     }
+
+    public float Temperature { get; }
 }
 
 [Serializable]
 [NetSerializable]
 public sealed class SpaceHeaterChangePowerLevelMessage : BoundUserInterfaceMessage
 {
-    public SpaceHeaterPowerLevel PowerLevel { get; }
-
     public SpaceHeaterChangePowerLevelMessage(SpaceHeaterPowerLevel powerLevel)
     {
         PowerLevel = powerLevel;
     }
+
+    public SpaceHeaterPowerLevel PowerLevel { get; }
 }
 
 [Serializable]
 [NetSerializable]
 public sealed class SpaceHeaterChangeModeMessage : BoundUserInterfaceMessage
 {
-    public SpaceHeaterMode Mode { get; }
-
     public SpaceHeaterChangeModeMessage(SpaceHeaterMode mode)
     {
         Mode = mode;
     }
+
+    public SpaceHeaterMode Mode { get; }
 }
 
 [Serializable]
 [NetSerializable]
 public sealed class SpaceHeaterBoundUserInterfaceState : BoundUserInterfaceState
 {
-    public float MinTemperature { get; }
-    public float MaxTemperature { get; }
-    public float TargetTemperature { get; }
-    public bool Enabled { get; }
-    public SpaceHeaterMode Mode { get; }
-    public SpaceHeaterPowerLevel PowerLevel { get; }
-
-    public SpaceHeaterBoundUserInterfaceState(float minTemperature, float maxTemperature, float temperature, bool enabled, SpaceHeaterMode mode, SpaceHeaterPowerLevel powerLevel)
+    public SpaceHeaterBoundUserInterfaceState(float minTemperature,
+        float maxTemperature,
+        float temperature,
+        bool enabled,
+        SpaceHeaterMode mode,
+        SpaceHeaterPowerLevel powerLevel)
     {
         MinTemperature = minTemperature;
         MaxTemperature = maxTemperature;
@@ -76,20 +74,27 @@ public sealed class SpaceHeaterBoundUserInterfaceState : BoundUserInterfaceState
         Mode = mode;
         PowerLevel = powerLevel;
     }
+
+    public float MinTemperature { get; }
+    public float MaxTemperature { get; }
+    public float TargetTemperature { get; }
+    public bool Enabled { get; }
+    public SpaceHeaterMode Mode { get; }
+    public SpaceHeaterPowerLevel PowerLevel { get; }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum SpaceHeaterMode : byte
 {
     Auto,
     Heat,
-    Cool
+    Cool,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum SpaceHeaterPowerLevel : byte
 {
     Low,
     Medium,
-    High
+    High,
 }

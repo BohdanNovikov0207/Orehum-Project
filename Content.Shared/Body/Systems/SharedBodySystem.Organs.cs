@@ -83,18 +83,15 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Diagnostics.CodeAnalysis;
+using Content.Shared._Shitmed.Body.Organ;
+using Content.Shared._Shitmed.BodyEffects;
 using Content.Shared.Body.Components;
 using Content.Shared.Body.Events;
 using Content.Shared.Body.Organ;
 using Content.Shared.Body.Part;
-using Robust.Shared.Containers;
-
-// Shitmed Change
-
-using Content.Shared.Damage;
-using Content.Shared._Shitmed.BodyEffects;
-using Content.Shared._Shitmed.Body.Organ;
 using Content.Shared.Heretic;
+using Robust.Shared.Containers;
+// Shitmed Change
 
 namespace Content.Shared.Body.Systems;
 
@@ -127,7 +124,7 @@ public partial class SharedBodySystem
 
         if (organEnt.Comp.Body is not null)
         {
-        // Shitmed Change Start
+            // Shitmed Change Start
             var addedInBodyEv = new OrganAddedToBodyEvent(bodyUid, parentPartUid);
             RaiseLocalEvent(organEnt, ref addedInBodyEv);
             var organEnabledEv = new OrganEnableChangedEvent(true);
@@ -163,7 +160,7 @@ public partial class SharedBodySystem
     /// </summary>
     private OrganSlot? CreateOrganSlot(Entity<BodyPartComponent?> parentEnt, string slotId)
     {
-        if (!Resolve(parentEnt, ref parentEnt.Comp, logMissing: false))
+        if (!Resolve(parentEnt, ref parentEnt.Comp, false))
             return null;
 
         Containers.EnsureContainer<ContainerSlot>(parentEnt, GetOrganContainerId(slotId));
@@ -187,10 +184,8 @@ public partial class SharedBodySystem
     {
         slot = null;
 
-        if (parent is null || !Resolve(parent.Value, ref part, logMissing: false))
-        {
+        if (parent is null || !Resolve(parent.Value, ref part, false))
             return false;
-        }
 
         Containers.EnsureContainer<ContainerSlot>(parent.Value, GetOrganContainerId(slotId));
         slot = new OrganSlot(slotId);
@@ -211,10 +206,8 @@ public partial class SharedBodySystem
     public bool CanInsertOrgan(
         EntityUid partId,
         string slotId,
-        BodyPartComponent? part = null)
-    {
-        return Resolve(partId, ref part) && part.Organs.ContainsKey(slotId);
-    }
+        BodyPartComponent? part = null) =>
+        Resolve(partId, ref part) && part.Organs.ContainsKey(slotId);
 
     /// <summary>
     /// Returns whether the specified organ slot exists on the partId.
@@ -222,10 +215,8 @@ public partial class SharedBodySystem
     public bool CanInsertOrgan(
         EntityUid partId,
         OrganSlot slot,
-        BodyPartComponent? part = null)
-    {
-        return CanInsertOrgan(partId, slot.Id, part);
-    }
+        BodyPartComponent? part = null) =>
+        CanInsertOrgan(partId, slot.Id, part);
 
     public bool InsertOrgan(
         EntityUid partId,
@@ -234,17 +225,15 @@ public partial class SharedBodySystem
         BodyPartComponent? part = null,
         OrganComponent? organ = null)
     {
-        if (!Resolve(organId, ref organ, logMissing: false)
-            || !Resolve(partId, ref part, logMissing: false)
+        if (!Resolve(organId, ref organ, false)
+            || !Resolve(partId, ref part, false)
             || !CanInsertOrgan(partId, slotId, part))
-        {
             return false;
-        }
 
         var containerId = GetOrganContainerId(slotId);
 
         return Containers.TryGetContainer(partId, containerId, out var container)
-            && Containers.Insert(organId, container);
+               && Containers.Insert(organId, container);
     }
 
     /// <summary>
@@ -258,7 +247,7 @@ public partial class SharedBodySystem
         var parent = container.Owner;
 
         return HasComp<BodyPartComponent>(parent)
-            && Containers.Remove(organId, container);
+               && Containers.Remove(organId, container);
     }
 
     /// <summary>
@@ -270,11 +259,9 @@ public partial class SharedBodySystem
         BodyPartComponent? part = null,
         OrganComponent? organ = null)
     {
-        if (!Resolve(partId, ref part, logMissing: false)
-            || !Resolve(organId, ref organ, logMissing: false))
-        {
+        if (!Resolve(partId, ref part, false)
+            || !Resolve(organId, ref organ, false))
             return false;
-        }
 
         foreach (var slotId in part.Organs.Keys)
         {
@@ -286,7 +273,7 @@ public partial class SharedBodySystem
     }
 
     /// <summary>
-    /// Returns a list of Entity<<see cref="T"/>, <see cref="OrganComponent"/>>
+    /// Returns a list of Entity<<see cref="T" />, <see cref="OrganComponent" />>
     /// for each organ of the body
     /// </summary>
     /// <typeparam name="T">The component that we want to return</typeparam>
@@ -303,7 +290,7 @@ public partial class SharedBodySystem
         RaiseLocalEvent(entity, ref ev);
         var result = ev.Organ;
         if (result != null)
-            return new List<Entity<T, OrganComponent>> {result.Value};
+            return new List<Entity<T, OrganComponent>> { result.Value };
         // Goobstation end
 
         var query = GetEntityQuery<T>();
@@ -318,8 +305,8 @@ public partial class SharedBodySystem
     }
 
     /// <summary>
-    ///     Tries to get a list of ValueTuples of <see cref="T"/> and OrganComponent on each organs
-    ///     in the given body.
+    /// Tries to get a list of ValueTuples of <see cref="T" /> and OrganComponent on each organs
+    /// in the given body.
     /// </summary>
     /// <param name="uid">The body entity id to check on.</param>
     /// <param name="comps">The list of components.</param>

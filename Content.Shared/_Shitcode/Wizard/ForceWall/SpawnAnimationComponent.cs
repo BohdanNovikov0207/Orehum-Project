@@ -19,7 +19,7 @@ public sealed partial class SpawnAnimationComponent : Component
     public bool Spawned;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum SpawnAnimationVisuals : byte
 {
     Spawned,

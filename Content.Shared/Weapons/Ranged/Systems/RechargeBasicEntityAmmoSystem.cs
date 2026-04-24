@@ -18,7 +18,6 @@
 using Content.Shared._Goobstation.Weapons.Ranged;
 using Content.Shared.Examine;
 using Content.Shared.Weapons.Ranged.Components;
-using Content.Shared.Weapons.Ranged.Events;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Network;
 using Robust.Shared.Timing;
@@ -27,11 +26,11 @@ namespace Content.Shared.Weapons.Ranged.Systems;
 
 public sealed class RechargeBasicEntityAmmoSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly INetManager _netManager = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedGunSystem _gun = default!;
     [Dependency] private readonly MetaDataSystem _metadata = default!;
+    [Dependency] private readonly INetManager _netManager = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -70,11 +69,12 @@ public sealed class RechargeBasicEntityAmmoSystem : EntitySystem
             }
 
             // Goobstation
-            float multiplier = 1f;
+            var multiplier = 1f;
             var ev = new RechargeBasicEntityAmmoGetCooldownModifiersEvent(multiplier);
             RaiseLocalEvent(uid, ref ev);
 
-            recharge.NextCharge = recharge.NextCharge.Value + TimeSpan.FromSeconds(recharge.RechargeCooldown * ev.Multiplier); // Goobstation
+            recharge.NextCharge = recharge.NextCharge.Value +
+                                  TimeSpan.FromSeconds(recharge.RechargeCooldown * ev.Multiplier); // Goobstation
             Dirty(uid, recharge);
         }
     }
@@ -99,7 +99,8 @@ public sealed class RechargeBasicEntityAmmoSystem : EntitySystem
         }
 
         var timeLeft = component.NextCharge + _metadata.GetPauseTime(uid) - _timing.CurTime;
-        args.PushMarkup(Loc.GetString("recharge-basic-entity-ammo-can-recharge", ("seconds", Math.Round(timeLeft.Value.TotalSeconds, 1))));
+        args.PushMarkup(Loc.GetString("recharge-basic-entity-ammo-can-recharge",
+            ("seconds", Math.Round(timeLeft.Value.TotalSeconds, 1))));
     }
 
     public void Reset(EntityUid uid, RechargeBasicEntityAmmoComponent? recharge = null)
@@ -110,11 +111,12 @@ public sealed class RechargeBasicEntityAmmoSystem : EntitySystem
         if (recharge.NextCharge == null || recharge.NextCharge < _timing.CurTime)
         {
             // Goobstation
-            float multiplier = 1f;
+            var multiplier = 1f;
             var ev = new RechargeBasicEntityAmmoGetCooldownModifiersEvent(multiplier);
             RaiseLocalEvent(uid, ref ev);
 
-            recharge.NextCharge = _timing.CurTime + TimeSpan.FromSeconds(recharge.RechargeCooldown * ev.Multiplier); // Goobstation
+            recharge.NextCharge =
+                _timing.CurTime + TimeSpan.FromSeconds(recharge.RechargeCooldown * ev.Multiplier); // Goobstation
             Dirty(uid, recharge);
         }
     }

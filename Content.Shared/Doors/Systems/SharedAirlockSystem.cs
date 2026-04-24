@@ -20,22 +20,22 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Shared.Doors.Components;
-using Robust.Shared.Audio.Systems;
 using Content.Shared.Popups;
 using Content.Shared.Prying.Components;
 using Content.Shared.Wires;
+using Robust.Shared.Audio.Systems;
 using Robust.Shared.Timing;
 
 namespace Content.Shared.Doors.Systems;
 
 public abstract class SharedAirlockSystem : EntitySystem
 {
-    [Dependency] private   readonly IGameTiming _timing = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly SharedWiresSystem _wiresSystem = default!;
     [Dependency] protected readonly SharedAppearanceSystem Appearance = default!;
     [Dependency] protected readonly SharedAudioSystem Audio = default!;
     [Dependency] protected readonly SharedDoorSystem DoorSystem = default!;
     [Dependency] protected readonly SharedPopupSystem Popup = default!;
-    [Dependency] private   readonly SharedWiresSystem _wiresSystem = default!;
 
     public override void Initialize()
     {
@@ -65,9 +65,7 @@ public abstract class SharedAirlockSystem : EntitySystem
         if (TryComp(uid, out DoorComponent? door)
             && !args.Partial
             && !CanChangeState(uid, airlock))
-        {
             args.Cancel();
-        }
     }
 
     private void OnStateChanged(EntityUid uid, AirlockComponent component, DoorStateChangedEvent args)
@@ -78,9 +76,9 @@ public abstract class SharedAirlockSystem : EntitySystem
 
         // Only show the maintenance panel if the airlock is closed
         if (TryComp<WiresPanelComponent>(uid, out var wiresPanel))
-        {
-            _wiresSystem.ChangePanelVisibility(uid, wiresPanel, component.OpenPanelVisible || args.State != DoorState.Open);
-        }
+            _wiresSystem.ChangePanelVisibility(uid,
+                wiresPanel,
+                component.OpenPanelVisible || args.State != DoorState.Open);
         // If the door is closed, we should look if the bolt was locked while closing
         UpdateAutoClose(uid, component);
 
@@ -160,14 +158,15 @@ public abstract class SharedAirlockSystem : EntitySystem
         args.Cancelled = true;
     }
 
-    public void UpdateEmergencyLightStatus(EntityUid uid, AirlockComponent component)
-    {
+    public void UpdateEmergencyLightStatus(EntityUid uid, AirlockComponent component) =>
         Appearance.SetData(uid, DoorVisuals.EmergencyLights, component.EmergencyAccess);
-    }
 
-    public void SetEmergencyAccess(Entity<AirlockComponent> ent, bool value, EntityUid? user = null, bool predicted = false)
+    public void SetEmergencyAccess(Entity<AirlockComponent> ent,
+        bool value,
+        EntityUid? user = null,
+        bool predicted = false)
     {
-        if(!ent.Comp.Powered)
+        if (!ent.Comp.Powered)
             return;
 
         if (ent.Comp.EmergencyAccess == value)
@@ -179,7 +178,7 @@ public abstract class SharedAirlockSystem : EntitySystem
 
         var sound = ent.Comp.EmergencyAccess ? ent.Comp.EmergencyOnSound : ent.Comp.EmergencyOffSound;
         if (predicted)
-            Audio.PlayPredicted(sound, ent, user: user);
+            Audio.PlayPredicted(sound, ent, user);
         else
             Audio.PlayPvs(sound, ent);
     }
@@ -192,13 +191,8 @@ public abstract class SharedAirlockSystem : EntitySystem
         component.AutoCloseDelayModifier = value;
     }
 
-    public void SetSafety(AirlockComponent component, bool value)
-    {
-        component.Safety = value;
-    }
+    public void SetSafety(AirlockComponent component, bool value) => component.Safety = value;
 
-    public bool CanChangeState(EntityUid uid, AirlockComponent component)
-    {
-        return component.Powered && !DoorSystem.IsBolted(uid);
-    }
+    public bool CanChangeState(EntityUid uid, AirlockComponent component) =>
+        component.Powered && !DoorSystem.IsBolted(uid);
 }

@@ -1,6 +1,5 @@
-using Content.Shared.Trigger;
-using Content.Shared.Trigger.Components.Effects;
 using Content.Shared.RepulseAttract;
+using Content.Shared.Trigger.Components.Effects;
 
 namespace Content.Shared.Trigger.Systems;
 
@@ -27,7 +26,12 @@ public sealed class RepulseAttractOnTriggerSystem : EntitySystem
             return;
 
         var position = _transform.GetMapCoordinates(target.Value);
-        _repulse.TryRepulseAttract(position, args.User, ent.Comp.Speed, ent.Comp.Range, ent.Comp.Whitelist, ent.Comp.CollisionMask);
+        _repulse.TryRepulseAttract(position,
+            args.User,
+            ent.Comp.Speed,
+            ent.Comp.Range,
+            ent.Comp.Whitelist,
+            ent.Comp.CollisionMask);
 
         args.Handled = true;
     }

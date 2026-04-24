@@ -15,22 +15,18 @@ namespace Content.Shared.Random.Rules;
 /// </summary>
 public sealed partial class GridInRangeRule : RulesRule
 {
+    private List<Entity<MapGridComponent>> _grids = [];
+
     [DataField]
     public float Range = 10f;
-
-    private List<Entity<MapGridComponent>> _grids = [];
 
     public override bool Check(EntityManager entManager, EntityUid uid)
     {
         if (!entManager.TryGetComponent(uid, out TransformComponent? xform))
-        {
             return false;
-        }
 
         if (xform.GridUid != null)
-        {
             return !Inverted;
-        }
 
         var transform = entManager.System<SharedTransformSystem>();
         var mapManager = IoCManager.Resolve<IMapManager>();

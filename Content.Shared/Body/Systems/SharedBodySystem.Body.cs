@@ -33,49 +33,51 @@
 
 using System.Linq;
 using System.Numerics;
-using Content.Shared.Body.Components;
-using Content.Shared.Body.Organ;
-using Content.Shared.Body.Part;
-using Content.Shared.Body.Prototypes;
-using Content.Shared.DragDrop;
-using Content.Shared.Gibbing.Components;
-using Content.Shared.Gibbing.Events;
-using Content.Shared.Gibbing.Systems;
-using Content.Shared.Inventory;
-using Robust.Shared.Audio;
-using Robust.Shared.Audio.Systems;
-using Robust.Shared.Containers;
-using Robust.Shared.Map;
-using Robust.Shared.Utility;
-
-// Shitmed Change
-using Content.Shared._Shitmed.Body.Events;
 using Content.Shared._Shitmed.Body.Part;
 using Content.Shared._Shitmed.CCVar;
 using Content.Shared._Shitmed.Humanoid.Events;
 using Content.Shared._Shitmed.Medical.Surgery;
+using Content.Shared._Shitmed.Medical.Surgery.Traumas.Components;
+using Content.Shared._Shitmed.Medical.Surgery.Traumas.Systems;
 using Content.Shared._Shitmed.Medical.Surgery.Wounds.Components;
 using Content.Shared._Shitmed.Medical.Surgery.Wounds.Systems;
-using Content.Shared._Shitmed.Medical.Surgery.Traumas.Systems;
-using Content.Shared._Shitmed.Medical.Surgery.Traumas.Components;
-using Content.Shared.Silicons.Borgs.Components;
+using Content.Shared.Body.Components;
+using Content.Shared.Body.Organ;
+using Content.Shared.Body.Part;
+using Content.Shared.Body.Prototypes;
 using Content.Shared.Containers.ItemSlots;
-using Content.Shared.Mobs.Systems;
+using Content.Shared.DragDrop;
+using Content.Shared.Gibbing.Components;
+using Content.Shared.Gibbing.Events;
+using Content.Shared.Gibbing.Systems;
 using Content.Shared.Humanoid;
+using Content.Shared.Inventory;
 using Content.Shared.Inventory.Events;
-using Content.Shared.Pulling.Events;
-using Content.Shared.Standing;
-using Robust.Shared.Network;
-using Content.Shared.Rejuvenate;
+using Content.Shared.Mobs.Systems;
 using Content.Shared.Popups;
+using Content.Shared.Pulling.Events;
+using Content.Shared.Rejuvenate;
+using Content.Shared.Silicons.Borgs.Components;
+using Content.Shared.Standing;
+using Robust.Shared.Audio;
+using Robust.Shared.Audio.Systems;
 using Robust.Shared.Configuration;
-using Robust.Shared.Timing;
-using Content.Goobstation.Maths.FixedPoint;
+using Robust.Shared.Containers;
+using Robust.Shared.Map;
+using Robust.Shared.Utility;
+// Shitmed Change
 
 namespace Content.Shared.Body.Systems;
 
 public partial class SharedBodySystem
 {
+    // Shitmed Change End
+
+    private const float GibletLaunchImpulse = 8;
+    private const float GibletLaunchImpulseVariance = 3;
+    [Dependency] private readonly SharedAudioSystem _audioSystem = default!;
+
+    [Dependency] private readonly IConfigurationManager _cfg = default!;
     /*
      * tl;dr of how bobby works
      * - BodyComponent uses a BodyPrototype as a template.
@@ -84,19 +86,13 @@ public partial class SharedBodySystem
      */
 
     [Dependency] private readonly GibbingSystem _gibbingSystem = default!;
-    [Dependency] private readonly SharedAudioSystem _audioSystem = default!;
 
     // Shitmed Change Start
     [Dependency] private readonly MobStateSystem _mobState = default!;
-    [Dependency] private readonly ItemSlotsSystem _slots = default!;
-    [Dependency] private readonly WoundSystem _woundSystem = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly ItemSlotsSystem _slots = default!;
     [Dependency] private readonly TraumaSystem _trauma = default!;
-    [Dependency] private readonly IConfigurationManager _cfg = default!;
-    // Shitmed Change End
-
-    private const float GibletLaunchImpulse = 8;
-    private const float GibletLaunchImpulseVariance = 3;
+    [Dependency] private readonly WoundSystem _woundSystem = default!;
     private float _medicalHealingTickrate = 2f;
 
     private void InitializeBody()
@@ -149,9 +145,7 @@ public partial class SharedBodySystem
         }
 
         if (TryComp(insertedUid, out OrganComponent? organ))
-        {
             AddOrgan((insertedUid, organ), ent, ent);
-        }
     }
 
     private void OnBodyRemoved(Entity<BodyComponent> ent, ref EntRemovedFromContainerMessage args)
@@ -176,11 +170,9 @@ public partial class SharedBodySystem
             RemoveOrgan((removedUid, organ), ent);
     }
 
-    private void OnBodyInit(Entity<BodyComponent> ent, ref ComponentInit args)
-    {
+    private void OnBodyInit(Entity<BodyComponent> ent, ref ComponentInit args) =>
         // Setup the initial container.
         ent.Comp.RootContainer = Containers.EnsureContainer<ContainerSlot>(ent, BodyRootContainerId);
-    }
 
     private void OnBodyMapInit(Entity<BodyComponent> ent, ref MapInitEvent args)
     {
@@ -211,15 +203,15 @@ public partial class SharedBodySystem
         MapInitParts(bodyEntity, rootPartUid, rootPart, prototype); // Shitmed Change
     }
 
-    private void OnBodyCanDrag(Entity<BodyComponent> ent, ref CanDragEvent args)
-    {
-        args.Handled = true;
-    }
+    private void OnBodyCanDrag(Entity<BodyComponent> ent, ref CanDragEvent args) => args.Handled = true;
 
     /// <summary>
     /// Sets up all of the relevant body parts for a particular body entity and root part.
     /// </summary>
-    private void MapInitParts(EntityUid body, EntityUid rootPartId, BodyPartComponent rootPart, BodyPrototype prototype) // Shitmed Change
+    private void MapInitParts(EntityUid body,
+        EntityUid rootPartId,
+        BodyPartComponent rootPart,
+        BodyPrototype prototype) // Shitmed Change
     {
         // Start at the root part and traverse the body graph, setting up parts as we go.
         // Basic BFS pathfind.
@@ -256,7 +248,12 @@ public partial class SharedBodySystem
                 cameFromEntities[connection] = childPart;
 
                 var childPartComponent = Comp<BodyPartComponent>(childPart);
-                TryCreatePartSlot(parentEntity, connection, childPartComponent.PartType, childPartComponent.Symmetry, out var partSlot, parentPartComponent);
+                TryCreatePartSlot(parentEntity,
+                    connection,
+                    childPartComponent.PartType,
+                    childPartComponent.Symmetry,
+                    out var partSlot,
+                    parentPartComponent);
                 // Shitmed Change Start
                 childPartComponent.Body = body;
                 childPartComponent.ParentSlot = partSlot;
@@ -288,9 +285,7 @@ public partial class SharedBodySystem
             SpawnInContainerOrDrop(organProto, ent, GetOrganContainerId(organSlotId));
 
             if (slot is null)
-            {
                 Log.Error($"Could not create organ for slot {organSlotId} in {ToPrettyString(ent)}");
-            }
         }
     }
 
@@ -302,12 +297,10 @@ public partial class SharedBodySystem
         BodyComponent? body = null,
         BodyPartComponent? rootPart = null)
     {
-        if (!Resolve(id, ref body, logMissing: false)
+        if (!Resolve(id, ref body, false)
             || body.RootContainer.ContainedEntity is null
             || !Resolve(body.RootContainer.ContainedEntity.Value, ref rootPart))
-        {
             yield break;
-        }
 
         yield return body.RootContainer;
 
@@ -326,14 +319,12 @@ public partial class SharedBodySystem
         BodyPartComponent? rootPart = null)
     {
         if (id is null
-            || !Resolve(id.Value, ref body, logMissing: false)
+            || !Resolve(id.Value, ref body, false)
             || body is null // Shitmed Change
             || body.RootContainer == null // Shitmed Change
             || body.RootContainer.ContainedEntity is null
             || !Resolve(body.RootContainer.ContainedEntity.Value, ref rootPart))
-        {
             yield break;
-        }
 
         foreach (var child in GetBodyPartChildren(body.RootContainer.ContainedEntity.Value, rootPart))
         {
@@ -348,14 +339,12 @@ public partial class SharedBodySystem
         BodyPartComponent? rootPart = null)
     {
         if (id is null
-            || !Resolve(id.Value, ref body, logMissing: false)
+            || !Resolve(id.Value, ref body, false)
             || body is null // Shitmed Change
             || body.RootContainer == null // Shitmed Change
             || body.RootContainer.ContainedEntity is null
             || !Resolve(body.RootContainer.ContainedEntity.Value, ref rootPart))
-        {
             yield break;
-        }
 
         foreach (var child in GetBodyPartChildren(body.RootContainer.ContainedEntity.Value, rootPart))
         {
@@ -369,7 +358,7 @@ public partial class SharedBodySystem
         EntityUid? bodyId,
         BodyComponent? body = null)
     {
-        if (bodyId is null || !Resolve(bodyId.Value, ref body, logMissing: false))
+        if (bodyId is null || !Resolve(bodyId.Value, ref body, false))
             yield break;
 
         foreach (var part in GetBodyChildren(bodyId, body))
@@ -391,11 +380,9 @@ public partial class SharedBodySystem
         EntityUid bodyId,
         BodyComponent? body = null)
     {
-        if (!Resolve(bodyId, ref body, logMissing: false)
+        if (!Resolve(bodyId, ref body, false)
             || body.RootContainer.ContainedEntity is null)
-        {
             yield break;
-        }
 
         foreach (var slot in GetAllBodyPartSlots(body.RootContainer.ContainedEntity.Value))
         {
@@ -420,10 +407,11 @@ public partial class SharedBodySystem
     {
         var gibs = new HashSet<EntityUid>();
 
-        if (!Resolve(bodyId, ref body, logMissing: false))
+        if (!Resolve(bodyId, ref body, false))
             return gibs;
 
-        if (TryGetRootPart(bodyId, out var root) && TryComp(root.Value.Owner, out GibbableComponent? gibbable)) // ShitMed - TryGet
+        if (TryGetRootPart(bodyId, out var root) &&
+            TryComp(root.Value.Owner, out GibbableComponent? gibbable)) // ShitMed - TryGet
             gibSoundOverride ??= gibbable.GibSound;
 
 
@@ -431,21 +419,36 @@ public partial class SharedBodySystem
         gibs.EnsureCapacity(parts.Length);
         foreach (var part in parts)
         {
-
-            _gibbingSystem.TryGibEntityWithRef(bodyId, part.Id, gib, contents, ref gibs, playAudio: false,
-                launchGibs: true, launchDirection: splatDirection, launchImpulse: GibletLaunchImpulse * splatModifier,
-                launchImpulseVariance: GibletLaunchImpulseVariance, launchCone: splatCone,
-                allowedContainers: allowedContainers, excludedContainers: excludedContainers);
+            _gibbingSystem.TryGibEntityWithRef(bodyId,
+                part.Id,
+                gib,
+                contents,
+                ref gibs,
+                playAudio: false,
+                launchGibs: true,
+                launchDirection: splatDirection,
+                launchImpulse: GibletLaunchImpulse * splatModifier,
+                launchImpulseVariance: GibletLaunchImpulseVariance,
+                launchCone: splatCone,
+                allowedContainers: allowedContainers,
+                excludedContainers: excludedContainers);
 
             if (!gibOrgans)
                 continue;
 
             foreach (var organ in GetPartOrgans(part.Id, part.Component))
             {
-                _gibbingSystem.TryGibEntityWithRef(bodyId, organ.Id, GibType.Drop, GibContentsOption.Skip,
-                    ref gibs, playAudio: false, launchImpulse: GibletLaunchImpulse * splatModifier,
-                    launchImpulseVariance: GibletLaunchImpulseVariance, launchCone: splatCone,
-                    allowedContainers: allowedContainers, excludedContainers: excludedContainers);
+                _gibbingSystem.TryGibEntityWithRef(bodyId,
+                    organ.Id,
+                    GibType.Drop,
+                    GibContentsOption.Skip,
+                    ref gibs,
+                    playAudio: false,
+                    launchImpulse: GibletLaunchImpulse * splatModifier,
+                    launchImpulseVariance: GibletLaunchImpulseVariance,
+                    launchCone: splatCone,
+                    allowedContainers: allowedContainers,
+                    excludedContainers: excludedContainers);
             }
         }
 
@@ -458,6 +461,7 @@ public partial class SharedBodySystem
                 gibs.Add(item);
             }
         }
+
         _audioSystem.PlayPredicted(gibSoundOverride, bodyTransform.Coordinates, null);
         return gibs;
     }
@@ -475,13 +479,21 @@ public partial class SharedBodySystem
     {
         var gibs = new HashSet<EntityUid>();
 
-        if (!Resolve(partId, ref part, logMissing: false)
+        if (!Resolve(partId, ref part, false)
             || part.Body is not null)
             return gibs;
 
-        _gibbingSystem.TryGibEntityWithRef(partId, partId, GibType.Gib, GibContentsOption.Drop, ref gibs,
-                playAudio: true, launchGibs: true, launchDirection: splatDirection, launchImpulse: GibletLaunchImpulse * splatModifier,
-                launchImpulseVariance: GibletLaunchImpulseVariance, launchCone: splatCone);
+        _gibbingSystem.TryGibEntityWithRef(partId,
+            partId,
+            GibType.Gib,
+            GibContentsOption.Drop,
+            ref gibs,
+            playAudio: true,
+            launchGibs: true,
+            launchDirection: splatDirection,
+            launchImpulse: GibletLaunchImpulse * splatModifier,
+            launchImpulseVariance: GibletLaunchImpulseVariance,
+            launchCone: splatCone);
 
         if (HasComp<InventoryComponent>(partId))
         {
@@ -491,6 +503,7 @@ public partial class SharedBodySystem
                 gibs.Add(item);
             }
         }
+
         _audioSystem.PlayPredicted(gibSoundOverride, Transform(partId).Coordinates, null);
         return gibs;
     }
@@ -498,7 +511,7 @@ public partial class SharedBodySystem
     public virtual bool BurnPart(EntityUid partId,
         BodyPartComponent? part = null)
     {
-        if (!Resolve(partId, ref part, logMissing: false))
+        if (!Resolve(partId, ref part, false))
             return false;
 
         if (part.Body is { } bodyEnt)
@@ -522,7 +535,9 @@ public partial class SharedBodySystem
             return;
 
         foreach (var part in GetBodyChildren(uid, component))
+        {
             EnsureComp<BodyPartAppearanceComponent>(part.Id);
+        }
 
         humanoid.ProfileLoaded = true;
         Dirty(uid, humanoid);
@@ -553,16 +568,17 @@ public partial class SharedBodySystem
                 && !GetBodyChildrenOfType(args.EquipTarget, bodyPart.Value).Any())
             {
                 _popup.PopupClient(Loc.GetString("equip-part-missing-error",
-                    ("target", args.EquipTarget), ("part", bodyPartString)), args.Equipee, args.Equipee);
+                        ("target", args.EquipTarget),
+                        ("part", bodyPartString)),
+                    args.Equipee,
+                    args.Equipee);
                 args.Cancel();
             }
         }
     }
 
-    private void OnRejuvenate(EntityUid ent, BodyComponent body, ref RejuvenateEvent args)
-    {
+    private void OnRejuvenate(EntityUid ent, BodyComponent body, ref RejuvenateEvent args) =>
         RestoreBody((ent, body)); // Goobstation
-    }
 
     // Goob edit start
     public void RestoreBody(Entity<BodyComponent?> entity)
@@ -584,7 +600,9 @@ public partial class SharedBodySystem
         var rootSlot = prototype.Root;
         foreach (var organ in prototype.Slots[rootSlot].Organs)
         {
-            if (!Containers.TryGetContainer(rootPart.Value.Owner, GetOrganContainerId(organ.Key), out var organContainer))
+            if (!Containers.TryGetContainer(rootPart.Value.Owner,
+                    GetOrganContainerId(organ.Key),
+                    out var organContainer))
                 continue;
 
             var organEnt = organContainer.ContainedEntities.FirstOrNull();
@@ -596,9 +614,7 @@ public partial class SharedBodySystem
                 }
             }
             else
-            {
                 SpawnInContainerOrDrop(organ.Value, rootPart.Value.Owner, GetOrganContainerId(organ.Key));
-            }
         }
 
         Dirty(rootPart.Value.Owner, rootPart.Value.Comp);
@@ -635,20 +651,22 @@ public partial class SharedBodySystem
 
                         foreach (var organ in connectionSlot.Organs)
                         {
-                            if (Containers.TryGetContainer(containedEnt, GetOrganContainerId(organ.Key), out var organContainer))
+                            if (Containers.TryGetContainer(containedEnt,
+                                    GetOrganContainerId(organ.Key),
+                                    out var organContainer))
                             {
                                 var organEnt = organContainer.ContainedEntities.FirstOrNull();
                                 if (organEnt != null)
                                 {
                                     foreach (var modifier in Comp<OrganComponent>(organEnt.Value).IntegrityModifiers)
                                     {
-                                        _trauma.TryRemoveOrganDamageModifier(organEnt.Value, modifier.Key.Item2, modifier.Key.Item1);
+                                        _trauma.TryRemoveOrganDamageModifier(organEnt.Value,
+                                            modifier.Key.Item2,
+                                            modifier.Key.Item1);
                                     }
                                 }
                                 else
-                                {
                                     SpawnInContainerOrDrop(organ.Value, containedEnt, GetOrganContainerId(organ.Key));
-                                }
                             }
                             else
                             {
@@ -656,9 +674,7 @@ public partial class SharedBodySystem
                                 SpawnInContainerOrDrop(organ.Value, containedEnt, GetOrganContainerId(organ.Key));
 
                                 if (slot is null)
-                                {
                                     Log.Error($"Could not create organ for slot {organ.Key} in {ToPrettyString(ent)}");
-                                }
                             }
                         }
                     }
@@ -669,7 +685,9 @@ public partial class SharedBodySystem
 
                         var childPartComponent = Comp<BodyPartComponent>(childPart);
 
-                        var partSlot = new BodyPartSlot(connection, childPartComponent.PartType, childPartComponent.Symmetry);
+                        var partSlot = new BodyPartSlot(connection,
+                            childPartComponent.PartType,
+                            childPartComponent.Symmetry);
                         childPartComponent.ParentSlot = partSlot;
                         parentPartComponent.Children.TryAdd(connection, partSlot);
 
@@ -688,7 +706,11 @@ public partial class SharedBodySystem
 
                     var childPartComponent = Comp<BodyPartComponent>(childPart);
 
-                    var partSlot = CreatePartSlot(parentEntity, connection, childPartComponent.PartType, childPartComponent.Symmetry, parentPartComponent);
+                    var partSlot = CreatePartSlot(parentEntity,
+                        connection,
+                        childPartComponent.PartType,
+                        childPartComponent.Symmetry,
+                        parentPartComponent);
                     childPartComponent.ParentSlot = partSlot;
 
                     Dirty(parentEntity, parentPartComponent);
@@ -713,8 +735,12 @@ public partial class SharedBodySystem
 
 
         if (_trauma.TryGetBodyTraumas(ent, out var traumas, bodyComp: body))
+        {
             foreach (var trauma in traumas)
+            {
                 _trauma.RemoveTrauma(trauma);
+            }
+        }
 
         foreach (var bodyPart in GetBodyChildren(ent, body))
         {
@@ -741,14 +767,12 @@ public partial class SharedBodySystem
         where T : IComponent
     {
         if (id is null
-            || !Resolve(id.Value, ref body, logMissing: false)
+            || !Resolve(id.Value, ref body, false)
             || body is null
             || body.RootContainer == null
             || body.RootContainer.ContainedEntity is null
             || !Resolve(body.RootContainer.ContainedEntity.Value, ref rootPart))
-        {
             yield break;
-        }
 
         foreach (var child in GetBodyPartChildrenWithComponent<T>(body.RootContainer.ContainedEntity.Value, rootPart))
         {
@@ -764,7 +788,7 @@ public partial class SharedBodySystem
         BodyPartComponent? part = null)
         where T : IComponent
     {
-        if (!Resolve(partId, ref part, logMissing: false))
+        if (!Resolve(partId, ref part, false))
             yield break;
 
         var query = GetEntityQuery<T>();

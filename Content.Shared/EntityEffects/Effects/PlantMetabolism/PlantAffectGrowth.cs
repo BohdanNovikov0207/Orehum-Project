@@ -4,4 +4,3 @@ public sealed partial class PlantAffectGrowth : PlantAdjustAttribute<PlantAffect
 {
     public override string GuidebookAttributeName { get; set; } = "plant-attribute-growth";
 }
-

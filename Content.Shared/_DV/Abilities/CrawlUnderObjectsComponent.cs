@@ -15,42 +15,44 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared._DV.Abilities;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class CrawlUnderObjectsComponent : Component
 {
     [DataField]
-    public EntityUid? ToggleHideAction;
-
-    [DataField]
     public EntProtoId? ActionProto;
+
+    /// <summary>
+    /// List of fixtures that had their collision mask changed.
+    /// Required for re-adding the collision mask.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public List<(string key, int originalMask)> ChangedFixtures = new();
 
     [DataField]
     public bool Enabled = false;
-
-    /// <summary>
-    ///     List of fixtures that had their collision mask changed.
-    ///     Required for re-adding the collision mask.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public List<(string key, int originalMask)> ChangedFixtures = new();
 
     [DataField]
     public int? OriginalDrawDepth;
 
     [DataField]
     public float SneakSpeedModifier = 0.7f;
+
+    [DataField]
+    public EntityUid? ToggleHideAction;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum SneakMode : byte
 {
-    Enabled
+    Enabled,
 }
 
-public sealed partial class ToggleCrawlingStateEvent : InstantActionEvent { }
+public sealed partial class ToggleCrawlingStateEvent : InstantActionEvent
+{
+}
 
-[Serializable, NetSerializable]
-public sealed partial class CrawlingUpdatedEvent(bool enabled = false) : EventArgs
+[Serializable] [NetSerializable]
+public sealed class CrawlingUpdatedEvent(bool enabled = false) : EventArgs
 {
     public readonly bool Enabled = enabled;
 }

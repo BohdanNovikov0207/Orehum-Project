@@ -16,36 +16,35 @@
 
 using Robust.Shared.Prototypes;
 
-namespace Content.Shared.Access
+namespace Content.Shared.Access;
+
+/// <summary>
+/// Defines a single access level that can be stored on ID cards and checked for.
+/// </summary>
+[Prototype]
+public sealed class AccessLevelPrototype : IPrototype
 {
     /// <summary>
-    ///     Defines a single access level that can be stored on ID cards and checked for.
+    /// Denotes whether this access level is intended to be assignable to a crew ID card.
     /// </summary>
-    [Prototype]
-    public sealed partial class AccessLevelPrototype : IPrototype
+    [DataField]
+    public bool CanAddToIdCard = true;
+
+    /// <summary>
+    /// The player-visible name of the access level, in the ID card console and such.
+    /// </summary>
+    [DataField]
+    public string? Name { get; set; }
+
+    [ViewVariables]
+    [IdDataField]
+    public string ID { get; } = default!;
+
+    public string GetAccessLevelName()
     {
-        [ViewVariables]
-        [IdDataField]
-        public string ID { get; private set; } = default!;
+        if (Name is { } name)
+            return Loc.GetString(name);
 
-        /// <summary>
-        ///     The player-visible name of the access level, in the ID card console and such.
-        /// </summary>
-        [DataField]
-        public string? Name { get; set; }
-
-        /// <summary>
-        ///     Denotes whether this access level is intended to be assignable to a crew ID card.
-        /// </summary>
-        [DataField]
-        public bool CanAddToIdCard = true;
-
-        public string GetAccessLevelName()
-        {
-            if (Name is { } name)
-                return Loc.GetString(name);
-
-            return ID;
-        }
+        return ID;
     }
 }

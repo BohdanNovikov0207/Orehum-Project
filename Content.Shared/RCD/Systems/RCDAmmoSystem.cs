@@ -20,8 +20,8 @@ namespace Content.Shared.RCD.Systems;
 
 public sealed class RCDAmmoSystem : EntitySystem
 {
-    [Dependency] private readonly SharedChargesSystem _sharedCharges = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly SharedChargesSystem _sharedCharges = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()

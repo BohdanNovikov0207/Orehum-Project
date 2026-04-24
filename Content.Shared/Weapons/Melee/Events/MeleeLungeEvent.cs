@@ -18,30 +18,30 @@ namespace Content.Shared.Weapons.Melee.Events;
 /// <summary>
 /// Data for melee lunges from attacks.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class MeleeLungeEvent : EntityEventArgs
 {
-    public NetEntity Entity;
-
-    /// <summary>
-    /// The weapon used.
-    /// </summary>
-    public NetEntity Weapon;
-
     /// <summary>
     /// Width of the attack angle.
     /// </summary>
     public Angle Angle;
 
     /// <summary>
-    /// The relative local position to the <see cref="Entity"/>
-    /// </summary>
-    public Vector2 LocalPos;
-
-    /// <summary>
     /// Entity to spawn for the animation
     /// </summary>
     public string? Animation;
+
+    public NetEntity Entity;
+
+    /// <summary>
+    /// Goob - Shove Rework / The rotation of the sprite for the animation
+    /// </summary>
+    public bool FlipAnimation;
+
+    /// <summary>
+    /// The relative local position to the <see cref="Entity" />
+    /// </summary>
+    public Vector2 LocalPos;
 
     /// <summary>
     /// Goob - Shove Rework / The rotation of the sprite for the animation
@@ -49,12 +49,18 @@ public sealed class MeleeLungeEvent : EntityEventArgs
     public Angle SpriteRotation;
 
     /// <summary>
-    /// Goob - Shove Rework / The rotation of the sprite for the animation
+    /// The weapon used.
     /// </summary>
-    public bool FlipAnimation;
+    public NetEntity Weapon;
 
 
-    public MeleeLungeEvent(NetEntity entity, NetEntity weapon, Angle angle, Vector2 localPos, string? animation, Angle spriteRotation, bool flipAnimation)
+    public MeleeLungeEvent(NetEntity entity,
+        NetEntity weapon,
+        Angle angle,
+        Vector2 localPos,
+        string? animation,
+        Angle spriteRotation,
+        bool flipAnimation)
     {
         Entity = entity;
         Weapon = weapon;

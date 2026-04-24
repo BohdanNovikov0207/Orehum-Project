@@ -10,12 +10,12 @@ using Robust.Shared.GameStates;
 
 namespace Content.Shared._Goobstation.Wizard.HighFrequencyBlade;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class LightAttackDamageMultiplierComponent : Component
 {
     [DataField]
-    public float Multiplier = 2f;
+    public SoundSpecifier? ExtraSound;
 
     [DataField]
-    public SoundSpecifier? ExtraSound;
+    public float Multiplier = 2f;
 }

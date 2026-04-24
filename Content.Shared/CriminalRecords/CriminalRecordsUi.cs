@@ -11,42 +11,42 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.CriminalRecords;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum CriminalRecordsConsoleKey : byte
 {
-    Key
+    Key,
 }
 
 /// <summary>
-///     Criminal records console state. There are a few states:
-///     - SelectedKey null, Record null, RecordListing null
-///         - The station record database could not be accessed.
-///     - SelectedKey null, Record null, RecordListing non-null
-///         - Records are populated in the database, or at least the station has
-///           the correct component.
-///     - SelectedKey non-null, Record null, RecordListing non-null
-///         - The selected key does not have a record tied to it.
-///     - SelectedKey non-null, Record non-null, RecordListing non-null
-///         - The selected key has a record tied to it, and the record has been sent.
-///
-///     - there is added new filters and so added new states
-///         -SelectedKey null, Record null, RecordListing null, filters non-null
-///            the station may have data, but they all did not pass through the filters
-///
-///     Other states are erroneous.
+/// Criminal records console state. There are a few states:
+/// - SelectedKey null, Record null, RecordListing null
+/// - The station record database could not be accessed.
+/// - SelectedKey null, Record null, RecordListing non-null
+/// - Records are populated in the database, or at least the station has
+/// the correct component.
+/// - SelectedKey non-null, Record null, RecordListing non-null
+/// - The selected key does not have a record tied to it.
+/// - SelectedKey non-null, Record non-null, RecordListing non-null
+/// - The selected key has a record tied to it, and the record has been sent.
+/// - there is added new filters and so added new states
+/// -SelectedKey null, Record null, RecordListing null, filters non-null
+/// the station may have data, but they all did not pass through the filters
+/// Other states are erroneous.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class CriminalRecordsConsoleState : BoundUserInterfaceState
 {
+    public readonly StationRecordsFilter? Filter;
+    public readonly Dictionary<uint, string>? RecordListing;
+    public CriminalRecord? CriminalRecord = null;
+    public SecurityStatus FilterStatus = SecurityStatus.None;
+
     /// <summary>
     /// Currently selected crewmember record key.
     /// </summary>
     public uint? SelectedKey = null;
-    public CriminalRecord? CriminalRecord = null;
+
     public GeneralStationRecord? StationRecord = null;
-    public SecurityStatus FilterStatus = SecurityStatus.None;
-    public readonly Dictionary<uint, string>? RecordListing;
-    public readonly StationRecordsFilter? Filter;
 
     public CriminalRecordsConsoleState(Dictionary<uint, string>? recordListing, StationRecordsFilter? newFilter)
     {
@@ -61,17 +61,18 @@ public sealed class CriminalRecordsConsoleState : BoundUserInterfaceState
     {
     }
 
-    public bool IsEmpty() => SelectedKey == null && StationRecord == null && CriminalRecord == null && RecordListing == null;
+    public bool IsEmpty() =>
+        SelectedKey == null && StationRecord == null && CriminalRecord == null && RecordListing == null;
 }
 
 /// <summary>
-/// Used to change status, respecting the wanted/reason nullability rules in <see cref="CriminalRecord"/>.
+/// Used to change status, respecting the wanted/reason nullability rules in <see cref="CriminalRecord" />.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class CriminalRecordChangeStatus : BoundUserInterfaceMessage
 {
-    public readonly SecurityStatus Status;
     public readonly string? Reason;
+    public readonly SecurityStatus Status;
 
     public CriminalRecordChangeStatus(SecurityStatus status, string? reason)
     {
@@ -83,7 +84,7 @@ public sealed class CriminalRecordChangeStatus : BoundUserInterfaceMessage
 /// <summary>
 /// Used to add a single line to the record's crime history.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class CriminalRecordAddHistory : BoundUserInterfaceMessage
 {
     public readonly string Line;
@@ -97,7 +98,7 @@ public sealed class CriminalRecordAddHistory : BoundUserInterfaceMessage
 /// <summary>
 /// Used to delete a single line from the crime history, by index.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class CriminalRecordDeleteHistory : BoundUserInterfaceMessage
 {
     public readonly uint Index;
@@ -110,14 +111,12 @@ public sealed class CriminalRecordDeleteHistory : BoundUserInterfaceMessage
 
 /// <summary>
 /// Used to set what status to filter by index.
-///
 /// </summary>
-///
-[Serializable, NetSerializable]
-
+[Serializable] [NetSerializable]
 public sealed class CriminalRecordSetStatusFilter : BoundUserInterfaceMessage
 {
     public readonly SecurityStatus FilterStatus;
+
     public CriminalRecordSetStatusFilter(SecurityStatus newFilterStatus)
     {
         FilterStatus = newFilterStatus;

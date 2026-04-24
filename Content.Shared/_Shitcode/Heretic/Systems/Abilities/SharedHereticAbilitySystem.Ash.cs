@@ -5,10 +5,7 @@ namespace Content.Shared._Shitcode.Heretic.Systems.Abilities;
 
 public abstract partial class SharedHereticAbilitySystem
 {
-    protected virtual void SubscribeAsh()
-    {
-        SubscribeLocalEvent<EventHereticVolcanoBlast>(OnVolcanoBlast);
-    }
+    protected virtual void SubscribeAsh() => SubscribeLocalEvent<EventHereticVolcanoBlast>(OnVolcanoBlast);
 
     private void OnVolcanoBlast(EventHereticVolcanoBlast args)
     {

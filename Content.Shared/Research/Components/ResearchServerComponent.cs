@@ -31,30 +31,9 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
 
 namespace Content.Shared.Research.Components;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class ResearchServerComponent : Component
 {
-    /// <summary>
-    /// The name of the server
-    /// </summary>
-    [AutoNetworkedField]
-    [DataField("serverName"), ViewVariables(VVAccess.ReadWrite)]
-    public string ServerName = "RDSERVER";
-
-    /// <summary>
-    /// The amount of points on the server.
-    /// </summary>
-    [AutoNetworkedField]
-    [DataField("points"), ViewVariables(VVAccess.ReadWrite)]
-    public int Points;
-
-    /// <summary>
-    /// A unique numeric id representing the server
-    /// </summary>
-    [AutoNetworkedField]
-    [ViewVariables(VVAccess.ReadOnly)]
-    public int Id;
-
     /// <summary>
     /// Entities connected to the server
     /// </summary>
@@ -64,11 +43,32 @@ public sealed partial class ResearchServerComponent : Component
     [ViewVariables(VVAccess.ReadOnly)]
     public List<EntityUid> Clients = new();
 
+    /// <summary>
+    /// A unique numeric id representing the server
+    /// </summary>
+    [AutoNetworkedField]
+    [ViewVariables(VVAccess.ReadOnly)]
+    public int Id;
+
     [DataField("nextUpdateTime", customTypeSerializer: typeof(TimeOffsetSerializer))]
     public TimeSpan NextUpdateTime = TimeSpan.Zero;
 
-    [DataField("researchConsoleUpdateTime"), ViewVariables(VVAccess.ReadWrite)]
+    /// <summary>
+    /// The amount of points on the server.
+    /// </summary>
+    [AutoNetworkedField]
+    [DataField("points")] [ViewVariables(VVAccess.ReadWrite)]
+    public int Points;
+
+    [DataField("researchConsoleUpdateTime")] [ViewVariables(VVAccess.ReadWrite)]
     public TimeSpan ResearchConsoleUpdateTime = TimeSpan.FromSeconds(1);
+
+    /// <summary>
+    /// The name of the server
+    /// </summary>
+    [AutoNetworkedField]
+    [DataField("serverName")] [ViewVariables(VVAccess.ReadWrite)]
+    public string ServerName = "RDSERVER";
 }
 
 /// <summary>

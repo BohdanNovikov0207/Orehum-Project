@@ -3,8 +3,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.EntityEffects;
-using Content.Shared.Electrocution;
 using Content.Shared.Electrocution;
 using Robust.Shared.Prototypes;
 
@@ -12,33 +10,43 @@ namespace Content.Shared.EntityEffects.Effects;
 
 public sealed partial class Electrocute : EntityEffect
 {
+    [DataField] public int ElectrocuteDamageScale = 5;
     [DataField] public int ElectrocuteTime = 2;
 
-    [DataField] public int ElectrocuteDamageScale = 5;
-
     /// <remarks>
-    ///     true - refresh electrocute time,  false - accumulate electrocute time
+    /// true - refresh electrocute time,  false - accumulate electrocute time
     /// </remarks>
     [DataField] public bool Refresh = true;
 
+    public override bool ShouldLog => true;
+
     protected override string? ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys)
         => Loc.GetString("reagent-effect-guidebook-electrocute", ("chance", Probability), ("time", ElectrocuteTime));
-
-    public override bool ShouldLog => true;
 
     public override void Effect(EntityEffectBaseArgs args)
     {
         if (args is EntityEffectReagentArgs reagentArgs)
         {
-            reagentArgs.EntityManager.System<SharedElectrocutionSystem>().TryDoElectrocution(reagentArgs.TargetEntity, null,
-                Math.Max((reagentArgs.Quantity * ElectrocuteDamageScale).Int(), 1), TimeSpan.FromSeconds(ElectrocuteTime), Refresh, ignoreInsulation: true);
+            reagentArgs.EntityManager.System<SharedElectrocutionSystem>()
+                .TryDoElectrocution(reagentArgs.TargetEntity,
+                    null,
+                    Math.Max((reagentArgs.Quantity * ElectrocuteDamageScale).Int(), 1),
+                    TimeSpan.FromSeconds(ElectrocuteTime),
+                    Refresh,
+                    ignoreInsulation: true);
 
             if (reagentArgs.Reagent != null)
                 reagentArgs.Source?.RemoveReagent(reagentArgs.Reagent.ID, reagentArgs.Quantity);
-        } else
+        }
+        else
         {
-            args.EntityManager.System<SharedElectrocutionSystem>().TryDoElectrocution(args.TargetEntity, null,
-                Math.Max(ElectrocuteDamageScale, 1), TimeSpan.FromSeconds(ElectrocuteTime), Refresh, ignoreInsulation: true);
+            args.EntityManager.System<SharedElectrocutionSystem>()
+                .TryDoElectrocution(args.TargetEntity,
+                    null,
+                    Math.Max(ElectrocuteDamageScale, 1),
+                    TimeSpan.FromSeconds(ElectrocuteTime),
+                    Refresh,
+                    ignoreInsulation: true);
         }
     }
 }

@@ -12,14 +12,14 @@ using Robust.Shared.Containers;
 namespace Content.Shared.Construction;
 
 /// <summary>
-/// This handles <see cref="PartAssemblyComponent"/>
+/// This handles <see cref="PartAssemblyComponent" />
 /// </summary>
 public sealed class PartAssemblySystem : EntitySystem
 {
     [Dependency] private readonly SharedContainerSystem _container = default!;
     [Dependency] private readonly TagSystem _tag = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         SubscribeLocalEvent<PartAssemblyComponent, ComponentInit>(OnInit);
@@ -27,10 +27,8 @@ public sealed class PartAssemblySystem : EntitySystem
         SubscribeLocalEvent<PartAssemblyComponent, EntRemovedFromContainerMessage>(OnEntRemoved);
     }
 
-    private void OnInit(EntityUid uid, PartAssemblyComponent component, ComponentInit args)
-    {
+    private void OnInit(EntityUid uid, PartAssemblyComponent component, ComponentInit args) =>
         component.PartsContainer = _container.EnsureContainer<Container>(uid, component.ContainerId);
-    }
 
     private void OnInteractUsing(EntityUid uid, PartAssemblyComponent component, InteractUsingEvent args)
     {

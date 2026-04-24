@@ -4,7 +4,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Chemistry.Reagent;
 using Content.Shared.Nutrition.Components;
 using Content.Shared.Nutrition.EntitySystems;
 using Robust.Shared.Prototypes;
@@ -18,7 +17,8 @@ public sealed partial class WashCreamPieReaction : EntityEffect
 
     public override void Effect(EntityEffectBaseArgs args)
     {
-        if (!args.EntityManager.TryGetComponent(args.TargetEntity, out CreamPiedComponent? creamPied)) return;
+        if (!args.EntityManager.TryGetComponent(args.TargetEntity, out CreamPiedComponent? creamPied))
+            return;
 
         args.EntityManager.System<SharedCreamPieSystem>().SetCreamPied(args.TargetEntity, creamPied, false);
     }

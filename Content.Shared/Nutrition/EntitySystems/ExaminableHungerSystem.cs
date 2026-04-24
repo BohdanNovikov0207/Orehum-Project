@@ -10,7 +10,7 @@ using Content.Shared.Nutrition.Components;
 
 namespace Content.Shared.Nutrition.EntitySystems;
 
-/// <inheritdoc cref="ExaminableHungerComponent"/>
+/// <inheritdoc cref="ExaminableHungerComponent" />
 public sealed class ExaminableHungerSystem : EntitySystem
 {
     [Dependency] private readonly HungerSystem _hunger = default!;
@@ -26,8 +26,8 @@ public sealed class ExaminableHungerSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Defines the text provided on examine.
-    ///     Changes depending on the amount of hunger the target has.
+    /// Defines the text provided on examine.
+    /// Changes depending on the amount of hunger the target has.
     /// </summary>
     private void OnExamine(Entity<ExaminableHungerComponent> entity, ref ExaminedEvent args)
     {

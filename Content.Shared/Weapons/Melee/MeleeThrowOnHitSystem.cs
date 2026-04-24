@@ -14,26 +14,27 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Numerics;
 using Content.Shared.Stunnable;
 using Content.Shared.Throwing;
 using Content.Shared.Timing;
 using Content.Shared.Weapons.Melee.Components;
 using Content.Shared.Weapons.Melee.Events;
 using Robust.Shared.Physics.Components;
-using System.Numerics;
 
 namespace Content.Shared.Weapons.Melee;
 
 /// <summary>
-/// This handles <see cref="MeleeThrowOnHitComponent"/>
+/// This handles <see cref="MeleeThrowOnHitComponent" />
 /// </summary>
 public sealed class MeleeThrowOnHitSystem : EntitySystem
 {
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly UseDelaySystem _delay = default!;
     [Dependency] private readonly SharedStunSystem _stun = default!;
     [Dependency] private readonly ThrowingSystem _throwing = default!;
-    /// <inheritdoc/>
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
+
+    /// <inheritdoc />
     public override void Initialize()
     {
         SubscribeLocalEvent<MeleeThrowOnHitComponent, MeleeHitEvent>(OnMeleeHit);
@@ -102,7 +103,10 @@ public sealed class MeleeThrowOnHitSystem : EntitySystem
         ThrowOnHitHelper(weapon, args.Component.Thrower, args.Target, weaponPhysics.LinearVelocity);
     }
 
-    private void ThrowOnHitHelper(Entity<MeleeThrowOnHitComponent> ent, EntityUid? user, EntityUid target, Vector2 direction)
+    private void ThrowOnHitHelper(Entity<MeleeThrowOnHitComponent> ent,
+        EntityUid? user,
+        EntityUid target,
+        Vector2 direction)
     {
         var attemptEvent = new AttemptMeleeThrowOnHitEvent(target, user);
         RaiseLocalEvent(ent.Owner, ref attemptEvent);
@@ -119,6 +123,10 @@ public sealed class MeleeThrowOnHitSystem : EntitySystem
         if (direction == Vector2.Zero)
             return;
 
-        _throwing.TryThrow(target, direction.Normalized() * ent.Comp.Distance, ent.Comp.Speed, user, unanchor: ent.Comp.UnanchorOnHit);
+        _throwing.TryThrow(target,
+            direction.Normalized() * ent.Comp.Distance,
+            ent.Comp.Speed,
+            user,
+            unanchor: ent.Comp.UnanchorOnHit);
     }
 }

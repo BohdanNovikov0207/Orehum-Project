@@ -5,7 +5,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Shared.Anomaly.Effects;
-using Content.Shared.Body.Prototypes;
 using Content.Shared.Humanoid.Prototypes;
 using Robust.Shared.Audio;
 using Robust.Shared.GameStates;
@@ -17,9 +16,23 @@ namespace Content.Shared.Anomaly.Components;
 /// <summary>
 /// An anomaly within the body of a living being. Controls the ability to return to the standard state.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState(true), Access(typeof(SharedInnerBodyAnomalySystem))]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState(true)]
+[Access(typeof(SharedInnerBodyAnomalySystem))]
 public sealed partial class InnerBodyAnomalyComponent : Component
 {
+    /// <summary>
+    /// A message sent in chat to a player who has cleared an anomaly
+    /// </summary>
+    [DataField]
+    public LocId? EndMessage = "inner-anomaly-end-message";
+
+    /// <summary>
+    /// The fallback sprite to be added on the original entity. Allows you to visually identify the feature and type of anomaly
+    /// to other players
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public SpriteSpecifier? FallbackSprite = null;
+
     [DataField]
     public bool Injected;
 
@@ -30,10 +43,22 @@ public sealed partial class InnerBodyAnomalyComponent : Component
     public EntProtoId? InjectionProto;
 
     /// <summary>
-    /// Duration of stun from the effect of the anomaly
+    /// Used to display messages to the player about their level of disease progression
     /// </summary>
     [DataField]
-    public float StunDuration = 4f;
+    public float LastSeverityInformed = 0f;
+
+    /// <summary>
+    /// The key of the entity layer into which the sprite will be inserted
+    /// </summary>
+    [DataField]
+    public string LayerMap = "inner_anomaly_layer";
+
+    /// <summary>
+    /// Ability to use unique sprites for different body types
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public Dictionary<ProtoId<SpeciesPrototype>, SpriteSpecifier> SpeciesSprites = new();
 
     /// <summary>
     /// A message sent in chat to a player who has become infected by an anomaly
@@ -42,40 +67,16 @@ public sealed partial class InnerBodyAnomalyComponent : Component
     public LocId? StartMessage = null;
 
     /// <summary>
-    /// A message sent in chat to a player who has cleared an anomaly
-    /// </summary>
-    [DataField]
-    public LocId? EndMessage = "inner-anomaly-end-message";
-
-    /// <summary>
     /// Sound, playing on becoming anomaly
     /// </summary>
     [DataField]
     public SoundSpecifier? StartSound = new SoundPathSpecifier("/Audio/Effects/inneranomaly.ogg");
 
     /// <summary>
-    /// Used to display messages to the player about their level of disease progression
+    /// Duration of stun from the effect of the anomaly
     /// </summary>
     [DataField]
-    public float LastSeverityInformed = 0f;
-
-    /// <summary>
-    /// The fallback sprite to be added on the original entity. Allows you to visually identify the feature and type of anomaly to other players
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public SpriteSpecifier? FallbackSprite = null;
-
-    /// <summary>
-    /// Ability to use unique sprites for different body types
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public Dictionary<ProtoId<SpeciesPrototype>, SpriteSpecifier> SpeciesSprites = new();
-
-    /// <summary>
-    /// The key of the entity layer into which the sprite will be inserted
-    /// </summary>
-    [DataField]
-    public string LayerMap = "inner_anomaly_layer";
+    public float StunDuration = 4f;
 }
 
 /// <summary>

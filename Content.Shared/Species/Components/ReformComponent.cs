@@ -4,22 +4,28 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Robust.Shared.Prototypes;
 using Robust.Shared.GameStates;
+using Robust.Shared.Prototypes;
 
 namespace Content.Shared.Species.Components;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class ReformComponent : Component
 {
+    [DataField] [AutoNetworkedField]
+    public EntityUid? ActionEntity;
+
     /// <summary>
     /// The action to use.
     /// </summary>
     [DataField(required: true)]
     public EntProtoId ActionPrototype = default!;
 
-    [DataField, AutoNetworkedField]
-    public EntityUid? ActionEntity;
+    /// <summary>
+    /// The text that appears when attempting to reform
+    /// </summary>
+    [DataField(required: true)]
+    public string PopupText;
 
     /// <summary>
     /// How long it will take to reform
@@ -28,22 +34,16 @@ public sealed partial class ReformComponent : Component
     public float ReformTime = 0;
 
     /// <summary>
-    /// Whether or not the entity should start with a cooldown
-    /// </summary>
-    [DataField]
-    public bool StartDelayed = true;
-
-    /// <summary>
     /// Whether or not the entity should be stunned when reforming at all
     /// </summary>
     [DataField]
     public bool ShouldStun = true;
 
     /// <summary>
-    /// The text that appears when attempting to reform
+    /// Whether or not the entity should start with a cooldown
     /// </summary>
-    [DataField(required: true)]
-    public string PopupText;
+    [DataField]
+    public bool StartDelayed = true;
 
     /// <summary>
     /// The mob that our entity will reform into

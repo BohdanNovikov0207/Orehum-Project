@@ -16,13 +16,13 @@ namespace Content.Shared.GridPreloader.Prototypes;
 /// because loading grids in the middle of a round causes the server to lag.
 /// </summary>
 [Prototype]
-public sealed partial class PreloadedGridPrototype : IPrototype
+public sealed class PreloadedGridPrototype : IPrototype
 {
-    [IdDataField] public string ID { get; private set; } = string.Empty;
+    [DataField]
+    public int Copies = 1;
 
     [DataField(required: true)]
     public ResPath Path;
 
-    [DataField]
-    public int Copies = 1;
+    [IdDataField] public string ID { get; } = string.Empty;
 }

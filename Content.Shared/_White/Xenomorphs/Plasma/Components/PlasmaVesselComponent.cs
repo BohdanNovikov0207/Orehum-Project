@@ -9,17 +9,23 @@ namespace Content.Shared._White.Xenomorphs.Plasma.Components;
 /// <summary>
 /// This is used for the plasma vessel component in the xenomorph entities.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class PlasmaVesselComponent : Component
 {
+    [DataField]
+    public FixedPoint2 MaxPlasma = 250;
+
+    [ViewVariables]
+    public TimeSpan NextPointsAt;
+
     /// <summary>
     /// The total amount of plasma the xenomorph has.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public FixedPoint2 Plasma = 100;
 
     [DataField]
-    public FixedPoint2 MaxPlasma = 250;
+    public ProtoId<AlertPrototype> PlasmaAlert = "Plasma";
 
     /// <summary>
     /// The amount of plasma passively generated per second.
@@ -32,15 +38,9 @@ public sealed partial class PlasmaVesselComponent : Component
     /// </summary>
     [DataField]
     public FixedPoint2 PlasmaPerSecondOnWeed = 5f;
-
-    [DataField]
-    public ProtoId<AlertPrototype> PlasmaAlert = "Plasma";
-
-    [ViewVariables]
-    public TimeSpan NextPointsAt;
 }
 
-[NetSerializable, Serializable]
+[NetSerializable] [Serializable]
 public enum PlasmaVisualLayers : byte
 {
     Digit1,

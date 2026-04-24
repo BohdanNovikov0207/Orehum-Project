@@ -7,10 +7,10 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Diagnostics.CodeAnalysis;
 using Content.Shared.Containers.ItemSlots;
 using Content.Shared.Nutrition.EntitySystems;
 using Robust.Shared.Containers;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Content.Shared.Cabinet;
 
@@ -19,11 +19,11 @@ namespace Content.Shared.Cabinet;
 /// </summary>
 public sealed class ItemCabinetSystem : EntitySystem
 {
-    [Dependency] private readonly ItemSlotsSystem _slots = default!;
-    [Dependency] private readonly OpenableSystem _openable = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly OpenableSystem _openable = default!;
+    [Dependency] private readonly ItemSlotsSystem _slots = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
@@ -36,21 +36,14 @@ public sealed class ItemCabinetSystem : EntitySystem
         SubscribeLocalEvent<ItemCabinetComponent, OpenableClosedEvent>(OnClosed);
     }
 
-    private void OnStartup(Entity<ItemCabinetComponent> ent, ref ComponentStartup args)
-    {
-        UpdateAppearance(ent);
-    }
+    private void OnStartup(Entity<ItemCabinetComponent> ent, ref ComponentStartup args) => UpdateAppearance(ent);
 
-    private void OnMapInit(Entity<ItemCabinetComponent> ent, ref MapInitEvent args)
-    {
+    private void OnMapInit(Entity<ItemCabinetComponent> ent, ref MapInitEvent args) =>
         // update at mapinit to avoid copy pasting locked: true and locked: false for each closed/open prototype
         SetSlotLock(ent, !_openable.IsOpen(ent));
-    }
 
-    private void UpdateAppearance(Entity<ItemCabinetComponent> ent)
-    {
+    private void UpdateAppearance(Entity<ItemCabinetComponent> ent) =>
         _appearance.SetData(ent, ItemCabinetVisuals.ContainsItem, HasItem(ent));
-    }
 
     private void OnContainerModified(EntityUid uid, ItemCabinetComponent component, ContainerModifiedMessage args)
     {
@@ -58,15 +51,9 @@ public sealed class ItemCabinetSystem : EntitySystem
             UpdateAppearance((uid, component));
     }
 
-    private void OnOpened(Entity<ItemCabinetComponent> ent, ref OpenableOpenedEvent args)
-    {
-        SetSlotLock(ent, false);
-    }
+    private void OnOpened(Entity<ItemCabinetComponent> ent, ref OpenableOpenedEvent args) => SetSlotLock(ent, false);
 
-    private void OnClosed(Entity<ItemCabinetComponent> ent, ref OpenableClosedEvent args)
-    {
-        SetSlotLock(ent, true);
-    }
+    private void OnClosed(Entity<ItemCabinetComponent> ent, ref OpenableClosedEvent args) => SetSlotLock(ent, true);
 
     /// <summary>
     /// Tries to get the cabinet's item slot.
@@ -83,10 +70,7 @@ public sealed class ItemCabinetSystem : EntitySystem
     /// <summary>
     /// Returns true if the cabinet contains an item.
     /// </summary>
-    public bool HasItem(Entity<ItemCabinetComponent> ent)
-    {
-        return TryGetSlot(ent, out var slot) && slot.HasItem;
-    }
+    public bool HasItem(Entity<ItemCabinetComponent> ent) => TryGetSlot(ent, out var slot) && slot.HasItem;
 
     /// <summary>
     /// Lock or unlock the underlying item slot.

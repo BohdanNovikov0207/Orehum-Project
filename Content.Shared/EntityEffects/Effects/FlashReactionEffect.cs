@@ -7,38 +7,38 @@ namespace Content.Shared.EntityEffects.Effects;
 public sealed partial class FlashReactionEffect : EventEntityEffect<FlashReactionEffect>
 {
     /// <summary>
-    ///     Flash range per unit of reagent.
-    /// </summary>
-    [DataField]
-    public float RangePerUnit = 0.2f;
-
-    /// <summary>
-    ///     Maximum flash range.
-    /// </summary>
-    [DataField]
-    public float MaxRange = 10f;
-
-    /// <summary>
-    ///     How much to entities are slowed down.
-    /// </summary>
-    [DataField]
-    public float SlowTo = 0.5f;
-
-    /// <summary>
-    ///     The time entities will be flashed.
-    ///     The default is chosen to be better than the hand flash so it is worth using it for grenades etc.
+    /// The time entities will be flashed.
+    /// The default is chosen to be better than the hand flash so it is worth using it for grenades etc.
     /// </summary>
     [DataField]
     public TimeSpan Duration = TimeSpan.FromSeconds(4);
 
     /// <summary>
-    ///     The prototype ID used for the visual effect.
+    /// The prototype ID used for the visual effect.
     /// </summary>
     [DataField]
     public EntProtoId? FlashEffectPrototype = "ReactionFlash";
 
     /// <summary>
-    ///     The sound the flash creates.
+    /// Maximum flash range.
+    /// </summary>
+    [DataField]
+    public float MaxRange = 10f;
+
+    /// <summary>
+    /// Flash range per unit of reagent.
+    /// </summary>
+    [DataField]
+    public float RangePerUnit = 0.2f;
+
+    /// <summary>
+    /// How much to entities are slowed down.
+    /// </summary>
+    [DataField]
+    public float SlowTo = 0.5f;
+
+    /// <summary>
+    /// The sound the flash creates.
     /// </summary>
     [DataField]
     public SoundSpecifier? Sound = new SoundPathSpecifier("/Audio/Weapons/flash.ogg");

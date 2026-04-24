@@ -11,7 +11,7 @@ namespace Content.Shared.Atmos.Visuals;
 /// <summary>
 /// Used for the visualizer
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum PortableScrubberVisuals : byte
 {
     IsFull,

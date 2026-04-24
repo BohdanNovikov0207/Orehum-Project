@@ -45,28 +45,28 @@ using Robust.Shared.Utility;
 
 namespace Content.Shared.Tools.Components;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 [Access(typeof(SharedToolSystem))]
 public sealed partial class ToolComponent : Component
 {
-    [DataField]
-    public PrototypeFlags<ToolQualityPrototype> Qualities  = [];
-
-    /// <summary>
-    ///     For tool interactions that have a delay before action this will modify the rate, time to wait is divided by this value
-    /// </summary>
-    [DataField]
-    public float SpeedModifier  = 1;
-
-    [DataField]
-    public SoundSpecifier? UseSound;
-
     // Goobstation
     /// <summary>
-    ///     Whether to check doafter validity every tick even if we don't satisfy the usual conditions.
+    /// Whether to check doafter validity every tick even if we don't satisfy the usual conditions.
     /// </summary>
     [DataField]
     public bool AlwaysCheckDoAfter = false;
+
+    [DataField]
+    public PrototypeFlags<ToolQualityPrototype> Qualities = [];
+
+    /// <summary>
+    /// For tool interactions that have a delay before action this will modify the rate, time to wait is divided by this value
+    /// </summary>
+    [DataField]
+    public float SpeedModifier = 1;
+
+    [DataField]
+    public SoundSpecifier? UseSound;
 }
 
 /// <summary>
@@ -75,8 +75,8 @@ public sealed partial class ToolComponent : Component
 /// </summary>
 public sealed class ToolUseAttemptEvent(EntityUid user, float fuel) : CancellableEntityEventArgs
 {
-    public EntityUid User { get; } = user;
     public float Fuel = fuel;
+    public EntityUid User { get; } = user;
 }
 
 /// <summary>

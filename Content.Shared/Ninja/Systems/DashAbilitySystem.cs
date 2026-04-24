@@ -17,13 +17,13 @@
 using Content.Goobstation.Common.BlockTeleport;
 using Content.Shared.Actions;
 using Content.Shared.Charges.Systems;
+using Content.Shared.Examine;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Interaction;
 using Content.Shared.Movement.Pulling.Components;
 using Content.Shared.Movement.Pulling.Systems;
 using Content.Shared.Ninja.Components;
 using Content.Shared.Popups;
-using Content.Shared.Examine;
 using Robust.Shared.Timing;
 
 namespace Content.Shared.Ninja.Systems;
@@ -34,12 +34,12 @@ namespace Content.Shared.Ninja.Systems;
 public sealed class DashAbilitySystem : EntitySystem
 {
     [Dependency] private readonly ActionContainerSystem _actionContainer = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly SharedChargesSystem _sharedCharges = default!;
-    [Dependency] private readonly SharedHandsSystem _hands = default!;
     [Dependency] private readonly ExamineSystemShared _examine = default!;
+    [Dependency] private readonly SharedHandsSystem _hands = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly PullingSystem _pullingSystem = default!;
+    [Dependency] private readonly SharedChargesSystem _sharedCharges = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     public override void Initialize()
@@ -77,7 +77,7 @@ public sealed class DashAbilitySystem : EntitySystem
         if (!CheckDash(uid, user))
             return;
 
-        if (!_hands.IsHolding(user, uid, out var _))
+        if (!_hands.IsHolding(user, uid, out _))
         {
             _popup.PopupClient(Loc.GetString("dash-ability-not-held", ("item", uid)), user, user);
             return;
@@ -103,7 +103,8 @@ public sealed class DashAbilitySystem : EntitySystem
             _pullingSystem.TryStopPull(user, pull);
 
         // Check if the user is pulling anything, and drop it if so
-        if (TryComp<PullerComponent>(user, out var puller) && TryComp<PullableComponent>(puller.Pulling, out var pullable))
+        if (TryComp<PullerComponent>(user, out var puller) &&
+            TryComp<PullableComponent>(puller.Pulling, out var pullable))
             _pullingSystem.TryStopPull(puller.Pulling.Value, pullable);
 
         var xform = Transform(user);

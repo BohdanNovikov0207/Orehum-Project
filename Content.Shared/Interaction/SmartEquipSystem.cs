@@ -29,23 +29,23 @@ namespace Content.Shared.Interaction;
 /// </summary>
 public sealed class SmartEquipSystem : EntitySystem
 {
-    [Dependency] private readonly SharedHandsSystem _hands = default!;
-    [Dependency] private readonly SharedStorageSystem _storage = default!;
-    [Dependency] private readonly InventorySystem _inventory = default!;
-    [Dependency] private readonly ItemSlotsSystem _slots = default!;
-    [Dependency] private readonly SharedContainerSystem _container = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly ActionBlockerSystem _actionBlocker = default!;
+    [Dependency] private readonly SharedContainerSystem _container = default!;
+    [Dependency] private readonly SharedHandsSystem _hands = default!;
+    [Dependency] private readonly InventorySystem _inventory = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly ItemSlotsSystem _slots = default!;
+    [Dependency] private readonly SharedStorageSystem _storage = default!;
     [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
 
-    /// <inheritdoc/>
-    public override void Initialize()
-    {
+    /// <inheritdoc />
+    public override void Initialize() =>
         CommandBinds.Builder
-            .Bind(ContentKeyFunctions.SmartEquipBackpack, InputCmdHandler.FromDelegate(HandleSmartEquipBackpack, handle: false, outsidePrediction: false))
-            .Bind(ContentKeyFunctions.SmartEquipBelt, InputCmdHandler.FromDelegate(HandleSmartEquipBelt, handle: false, outsidePrediction: false))
+            .Bind(ContentKeyFunctions.SmartEquipBackpack,
+                InputCmdHandler.FromDelegate(HandleSmartEquipBackpack, handle: false, outsidePrediction: false))
+            .Bind(ContentKeyFunctions.SmartEquipBelt,
+                InputCmdHandler.FromDelegate(HandleSmartEquipBelt, handle: false, outsidePrediction: false))
             .Register<SmartEquipSystem>();
-    }
 
     public override void Shutdown()
     {
@@ -54,15 +54,9 @@ public sealed class SmartEquipSystem : EntitySystem
         CommandBinds.Unregister<SmartEquipSystem>();
     }
 
-    private void HandleSmartEquipBackpack(ICommonSession? session)
-    {
-        HandleSmartEquip(session, "back");
-    }
+    private void HandleSmartEquipBackpack(ICommonSession? session) => HandleSmartEquip(session, "back");
 
-    private void HandleSmartEquipBelt(ICommonSession? session)
-    {
-        HandleSmartEquip(session, "belt");
-    }
+    private void HandleSmartEquipBelt(ICommonSession? session) => HandleSmartEquip(session, "belt");
 
     private void HandleSmartEquip(ICommonSession? session, string equipmentSlot)
     {
@@ -84,7 +78,9 @@ public sealed class SmartEquipSystem : EntitySystem
 
         if (!TryComp<InventoryComponent>(uid, out var inventory) || !_inventory.HasSlot(uid, equipmentSlot, inventory))
         {
-            _popup.PopupClient(Loc.GetString("smart-equip-missing-equipment-slot", ("slotName", equipmentSlot)), uid, uid);
+            _popup.PopupClient(Loc.GetString("smart-equip-missing-equipment-slot", ("slotName", equipmentSlot)),
+                uid,
+                uid);
             return;
         }
 
@@ -131,7 +127,7 @@ public sealed class SmartEquipSystem : EntitySystem
             }
 
             _hands.TryDrop((uid, hands), hands.ActiveHandId!);
-            _inventory.TryEquip(uid, handItem.Value, equipmentSlot, predicted: true, checkDoafter:true);
+            _inventory.TryEquip(uid, handItem.Value, equipmentSlot, predicted: true, checkDoafter: true);
             return;
         }
 
@@ -191,7 +187,7 @@ public sealed class SmartEquipSystem : EntitySystem
                     return;
                 }
 
-                _slots.TryEjectToHands(slotItem, toEjectFrom, uid, excludeUserAudio: true);
+                _slots.TryEjectToHands(slotItem, toEjectFrom, uid, true);
                 return;
             }
 
@@ -202,18 +198,18 @@ public sealed class SmartEquipSystem : EntitySystem
                 if (!slot.HasItem
                     && _whitelistSystem.IsWhitelistPassOrNull(slot.Whitelist, handItem.Value)
                     && slot.Priority > (toInsertTo?.Priority ?? int.MinValue))
-                {
                     toInsertTo = slot;
-                }
             }
 
             if (toInsertTo == null)
             {
-                _popup.PopupClient(Loc.GetString("smart-equip-no-valid-item-slot-insert", ("item", handItem.Value)), uid, uid);
+                _popup.PopupClient(Loc.GetString("smart-equip-no-valid-item-slot-insert", ("item", handItem.Value)),
+                    uid,
+                    uid);
                 return;
             }
 
-            _slots.TryInsertFromHand(slotItem, toInsertTo, uid, hands, excludeUserAudio: true);
+            _slots.TryInsertFromHand(slotItem, toInsertTo, uid, hands, true);
             return;
         }
 

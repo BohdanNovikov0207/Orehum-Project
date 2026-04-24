@@ -10,7 +10,8 @@ using Robust.Shared.GameStates;
 namespace Content.Shared.Audio;
 
 /// <summary>
-/// Toggles <see cref="AmbientSoundComponent"/> and <see cref="SpamEmitSoundComponent"/> off when this entity's MobState isn't Alive.
+/// Toggles <see cref="AmbientSoundComponent" /> and <see cref="SpamEmitSoundComponent" /> off when this entity's MobState
+/// isn't Alive.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class SoundWhileAliveComponent : Component;

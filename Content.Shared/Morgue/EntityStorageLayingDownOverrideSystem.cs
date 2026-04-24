@@ -5,7 +5,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-using Content.Shared.Body.Components;
 using Content.Shared.Morgue.Components;
 using Content.Shared.Standing;
 using Content.Shared.Storage.Components;
@@ -23,7 +22,9 @@ public sealed class EntityStorageLayingDownOverrideSystem : EntitySystem
         SubscribeLocalEvent<EntityStorageLayingDownOverrideComponent, StorageBeforeCloseEvent>(OnBeforeClose);
     }
 
-    private void OnBeforeClose(EntityUid uid, EntityStorageLayingDownOverrideComponent component, ref StorageBeforeCloseEvent args)
+    private void OnBeforeClose(EntityUid uid,
+        EntityStorageLayingDownOverrideComponent component,
+        ref StorageBeforeCloseEvent args)
     {
         foreach (var ent in args.Contents)
         {

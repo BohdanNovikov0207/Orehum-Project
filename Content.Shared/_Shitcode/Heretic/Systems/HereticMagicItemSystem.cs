@@ -30,9 +30,12 @@ public sealed class HereticMagicItemSystem : EntitySystem
 
     private void OnCheckMagicItem(Entity<HereticMagicItemComponent> ent, ref CheckMagicItemEvent args)
         => args.Handled = true;
+
     private void OnCheckMagicItem(Entity<HereticMagicItemComponent> ent, ref HeldRelayedEvent<CheckMagicItemEvent> args)
         => args.Args.Handled = true;
-    private void OnCheckMagicItem(Entity<HereticMagicItemComponent> ent, ref InventoryRelayedEvent<CheckMagicItemEvent> args)
+
+    private void OnCheckMagicItem(Entity<HereticMagicItemComponent> ent,
+        ref InventoryRelayedEvent<CheckMagicItemEvent> args)
         => args.Args.Handled = true;
 
     private void OnMagicItemExamine(Entity<HereticMagicItemComponent> ent, ref ExaminedEvent args)

@@ -5,7 +5,6 @@
 using Content.Shared._EinsteinEngines.Language.Components;
 using Content.Shared._EinsteinEngines.Language.Systems;
 using Content.Shared._EinsteinEngines.Revolutionary.Components;
-using Content.Shared.Charges.Components;
 using Content.Shared.Charges.Systems;
 using Content.Shared.Chat;
 using Content.Shared.Dataset;
@@ -14,7 +13,6 @@ using Content.Shared.Flash;
 using Content.Shared.Humanoid;
 using Content.Shared.Interaction;
 using Content.Shared.Interaction.Events;
-using Content.Shared.Mind;
 using Content.Shared.Mind.Components;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Random.Helpers;
@@ -29,13 +27,13 @@ public sealed class RevolutionaryConverterSystem : EntitySystem
     private static readonly ProtoId<LocalizedDatasetPrototype> RevConvertSpeechProto = "RevolutionaryConverterSpeech";
 
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
-    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
-    [Dependency] private readonly SharedChatSystem _chat = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-    [Dependency] private readonly SharedLanguageSystem _language = default!;
     [Dependency] private readonly SharedChargesSystem _chargesSystem = default!;
+    [Dependency] private readonly SharedChatSystem _chat = default!;
+    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
     [Dependency] private readonly SharedFlashSystem _flash = default!;
+    [Dependency] private readonly SharedLanguageSystem _language = default!;
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
 
     private LocalizedDatasetPrototype? _speechLocalization;
 
@@ -60,17 +58,18 @@ public sealed class RevolutionaryConverterSystem : EntitySystem
 
     private bool SpeakPropaganda(Entity<RevolutionaryConverterComponent> conversionToolEntity, EntityUid user)
     {
-        if(_speechLocalization == null
+        if (_speechLocalization == null
             || _speechLocalization.Values.Count == 0
             || conversionToolEntity.Comp.Silent)
             return false;
 
         var message = _random.Pick(_speechLocalization);
-        _chat.TrySendInGameICMessage(user, Loc.GetString(message), InGameICChatType.Speak, hideChat: false, hideLog: false);
+        _chat.TrySendInGameICMessage(user, Loc.GetString(message), InGameICChatType.Speak, false, false);
         return true;
     }
 
-    public void OnConvertDoAfter(Entity<RevolutionaryConverterComponent> entity, ref RevolutionaryConverterDoAfterEvent args)
+    public void OnConvertDoAfter(Entity<RevolutionaryConverterComponent> entity,
+        ref RevolutionaryConverterDoAfterEvent args)
     {
         if (args.Target == null
             || args.Cancelled
@@ -101,7 +100,11 @@ public sealed class RevolutionaryConverterSystem : EntitySystem
 
         // TraumaStation
         if (entity.Comp.ApplyFlashEffect)
-            _flash.Flash(args.Target.Value, args.User, entity.Owner, entity.Comp.FlashDuration, entity.Comp.SlowToOnFlashed);
+            _flash.Flash(args.Target.Value,
+                args.User,
+                entity.Owner,
+                entity.Comp.FlashDuration,
+                entity.Comp.SlowToOnFlashed);
 
 
         if (args.Target is not { Valid: true } target
@@ -120,7 +123,8 @@ public sealed class RevolutionaryConverterSystem : EntitySystem
 
         if (SpeakPropaganda(converter, user)
             // Note: this check is skipped if the speaker speaks lines and somehow doesn't have a languageSpeaker component.
-            && EntityManager.TryGetComponent<LanguageSpeakerComponent>(user, out var speakerComponent)) // returns true if the chosen conversion method uses a spoken line of text
+            && EntityManager.TryGetComponent<LanguageSpeakerComponent>(user,
+                out var speakerComponent)) // returns true if the chosen conversion method uses a spoken line of text
         {
             //check if spoken language can be understood by target
             if (!_language.CanUnderstand(target, speakerComponent.CurrentLanguage))
@@ -134,9 +138,9 @@ public sealed class RevolutionaryConverterSystem : EntitySystem
                 converter.Comp.ConversionDuration,
                 new RevolutionaryConverterDoAfterEvent(),
                 converter.Owner,
-                target: target,
-                used: converter.Owner,
-                showTo: user)
+                target,
+                converter.Owner,
+                user)
             {
                 Hidden = !converter.Comp.VisibleDoAfter,
                 BreakOnMove = false,

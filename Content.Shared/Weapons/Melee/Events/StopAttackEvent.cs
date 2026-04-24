@@ -8,7 +8,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Weapons.Melee.Events;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class StopAttackEvent : EntityEventArgs
 {
     public readonly NetEntity Weapon;

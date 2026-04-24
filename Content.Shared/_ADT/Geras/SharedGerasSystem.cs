@@ -9,11 +9,12 @@ using Robust.Shared.Serialization;
 namespace Content.Shared._ADT.Geras;
 
 /// <summary>
-/// Geras is the god of old age, and A geras is the small morph of a slime. This system allows the slimes to have the morphing action.
+/// Geras is the god of old age, and A geras is the small morph of a slime. This system allows the slimes to have the
+/// morphing action.
 /// </summary>
 public abstract class SharedGerasSystem : EntitySystem;
 
 public sealed partial class MorphIntoGeras : InstantActionEvent;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class MorphIntoGerasDoAfterEvent : SimpleDoAfterEvent;

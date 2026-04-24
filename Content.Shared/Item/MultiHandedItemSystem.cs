@@ -17,13 +17,13 @@ namespace Content.Shared.Item;
 
 public sealed class MultiHandedItemSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly SharedContainerSystem _container = default!; // Goobstation
     [Dependency] private readonly SharedHandsSystem _hands = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SharedVirtualItemSystem _virtualItem = default!;
-    [Dependency] private readonly SharedContainerSystem _container = default!; // Goobstation
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         SubscribeLocalEvent<MultiHandedItemComponent, GettingPickedUpAttemptEvent>(OnAttemptPickup);
@@ -44,10 +44,8 @@ public sealed class MultiHandedItemSystem : EntitySystem
         }
     }
 
-    private void OnUnequipped(Entity<MultiHandedItemComponent> ent, ref GotUnequippedHandEvent args)
-    {
+    private void OnUnequipped(Entity<MultiHandedItemComponent> ent, ref GotUnequippedHandEvent args) =>
         _virtualItem.DeleteInHandsMatching(args.User, ent.Owner);
-    }
 
     private void OnAttemptPickup(Entity<MultiHandedItemComponent> ent, ref GettingPickedUpAttemptEvent args)
     {
@@ -56,7 +54,9 @@ public sealed class MultiHandedItemSystem : EntitySystem
 
         args.Cancel();
         _popup.PopupPredictedCursor(Loc.GetString("multi-handed-item-pick-up-fail",
-            ("number", ent.Comp.HandsNeeded - 1), ("item", ent.Owner)), args.User);
+                ("number", ent.Comp.HandsNeeded - 1),
+                ("item", ent.Owner)),
+            args.User);
     }
 
     private void OnVirtualItemDeleted(Entity<MultiHandedItemComponent> ent, ref VirtualItemDeletedEvent args)
@@ -76,7 +76,9 @@ public sealed class MultiHandedItemSystem : EntitySystem
             return;
 
         // dropOthers: true in TrySpawnVirtualItemInHand didn't work properly so here we have this linq monstrosity
-        var hands = _hands.EnumerateHands(container.Owner).Where(hand => _hands.GetHeldItem(container.Owner, hand) != ent).ToList();
+        var hands = _hands.EnumerateHands(container.Owner)
+            .Where(hand => _hands.GetHeldItem(container.Owner, hand) != ent)
+            .ToList();
         var iterations = ent.Comp.HandsNeeded - 1 - hands.Count(hand => _hands.HandIsEmpty(container.Owner, hand));
         var droppable = hands.Where(hand => _hands.CanDropHeld(container.Owner, hand, false)).ToList();
 
@@ -87,10 +89,14 @@ public sealed class MultiHandedItemSystem : EntitySystem
         }
 
         for (var i = 0; i < iterations; i++)
+        {
             _hands.TryDrop(container.Owner, droppable[i]);
+        }
 
         for (var i = 1; i < ent.Comp.HandsNeeded; i++)
+        {
             _virtualItem.TrySpawnVirtualItemInHand(ent, container.Owner);
+        }
     }
 
     private void OnComponentShutdown(Entity<MultiHandedItemComponent> ent, ref ComponentShutdown args)

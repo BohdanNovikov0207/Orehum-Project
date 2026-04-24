@@ -10,11 +10,10 @@ namespace Content.Shared.Shuttles.Systems;
 
 public abstract class SharedDockingSystem : EntitySystem
 {
-    [Dependency] protected readonly SharedTransformSystem XformSystem = default!;
-
     public const float DockingHiglightRange = 4f;
     public const float DockRange = 1f + 0.2f;
     public static readonly double AlignmentTolerance = Angle.FromDegrees(15).Theta;
+    [Dependency] protected readonly SharedTransformSystem XformSystem = default!;
 
     public bool CanShuttleDock(EntityUid? shuttle)
     {
@@ -32,8 +31,10 @@ public abstract class SharedDockingSystem : EntitySystem
         return !HasComp<PreventPilotComponent>(shuttle.Value);
     }
 
-    public bool CanDock(MapCoordinates mapPosA, Angle worldRotA,
-                        MapCoordinates mapPosB, Angle worldRotB)
+    public bool CanDock(MapCoordinates mapPosA,
+        Angle worldRotA,
+        MapCoordinates mapPosB,
+        Angle worldRotB)
     {
         // Uh oh
         if (mapPosA.MapId != mapPosB.MapId)
@@ -42,10 +43,8 @@ public abstract class SharedDockingSystem : EntitySystem
         return InRange(mapPosA, mapPosB) && InAlignment(mapPosA, worldRotA, mapPosB, worldRotB);
     }
 
-    public bool InRange(MapCoordinates mapPosA, MapCoordinates mapPosB)
-    {
-        return (mapPosA.Position - mapPosB.Position).Length() <= DockRange;
-    }
+    public bool InRange(MapCoordinates mapPosA, MapCoordinates mapPosB) =>
+        (mapPosA.Position - mapPosB.Position).Length() <= DockRange;
 
     public bool InAlignment(MapCoordinates mapPosA, Angle worldRotA, MapCoordinates mapPosB, Angle worldRotB)
     {
@@ -65,8 +64,10 @@ public abstract class SharedDockingSystem : EntitySystem
         return true;
     }
 
-    public bool CanDock(NetCoordinates coordinatesOne, Angle angleOne,
-                        NetCoordinates coordinatesTwo, Angle angleTwo)
+    public bool CanDock(NetCoordinates coordinatesOne,
+        Angle angleOne,
+        NetCoordinates coordinatesTwo,
+        Angle angleTwo)
     {
         // TODO: Dump the dock fixtures
         var coordsA = GetCoordinates(coordinatesOne);

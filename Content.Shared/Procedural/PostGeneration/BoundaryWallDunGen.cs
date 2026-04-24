@@ -15,16 +15,16 @@ namespace Content.Shared.Procedural.PostGeneration;
 public sealed partial class BoundaryWallDunGen : IDunGenLayer
 {
     [DataField]
+    public EntProtoId? CornerWall;
+
+    [DataField]
     public BoundaryWallFlags Flags = BoundaryWallFlags.Corridors | BoundaryWallFlags.Rooms;
 
     [DataField(required: true)]
-    public EntProtoId Wall;
-
-    [DataField]
-    public EntProtoId? CornerWall;
+    public ProtoId<ContentTileDefinition> Tile;
 
     [DataField(required: true)]
-    public ProtoId<ContentTileDefinition> Tile;
+    public EntProtoId Wall;
 }
 
 [Flags]

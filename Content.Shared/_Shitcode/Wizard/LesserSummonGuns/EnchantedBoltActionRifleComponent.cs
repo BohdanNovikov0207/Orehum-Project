@@ -11,17 +11,17 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Shared._Goobstation.Wizard.LesserSummonGuns;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class EnchantedBoltActionRifleComponent : Component
 {
-    [ViewVariables(VVAccess.ReadOnly), AutoNetworkedField]
+    [ViewVariables(VVAccess.ReadOnly)] [AutoNetworkedField]
     public EntityUid? Caster;
-
-    [DataField, AutoNetworkedField]
-    public int Shots = 30;
 
     [DataField]
     public EntProtoId Proto = "WeaponBoltActionEnchanted";
+
+    [DataField] [AutoNetworkedField]
+    public int Shots = 30;
 
     [DataField]
     public Vector2 ThrowingSpeed = new(2f, 4f);

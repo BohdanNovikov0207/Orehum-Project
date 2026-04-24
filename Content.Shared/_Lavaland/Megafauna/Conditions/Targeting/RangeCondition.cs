@@ -15,10 +15,10 @@ namespace Content.Shared._Lavaland.Megafauna.Conditions;
 public sealed partial class RangeCondition : MegafaunaEntityCondition
 {
     [DataField]
-    public float? MinRange;
+    public float? MaxRange;
 
     [DataField]
-    public float? MaxRange;
+    public float? MinRange;
 
     public override bool EvaluateImplementation(MegafaunaCalculationBaseArgs args, EntityUid target)
     {

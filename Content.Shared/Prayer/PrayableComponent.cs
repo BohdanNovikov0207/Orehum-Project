@@ -5,16 +5,18 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Robust.Shared.Audio;
 using Robust.Shared.GameStates;
 using Robust.Shared.Utility;
-using Robust.Shared.Audio; // Goobstation - Prayer Sound
+
+// Goobstation - Prayer Sound
 
 namespace Content.Shared.Prayer;
 
 /// <summary>
 /// Allows an entity to be prayed on in the context menu
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class PrayableComponent : Component
 {
     /// <summary>
@@ -25,18 +27,25 @@ public sealed partial class PrayableComponent : Component
     public bool BibleUserOnly;
 
     /// <summary>
-    /// Message given to user to notify them a message was sent
-    /// </summary>
-    [DataField("sentMessage")]
-    [ViewVariables(VVAccess.ReadWrite)]
-    public string SentMessage = "prayer-popup-notify-pray-sent";
-
-    /// <summary>
     /// Prefix used in the notification to admins
     /// </summary>
     [DataField("notificationPrefix")]
     [ViewVariables(VVAccess.ReadWrite)]
     public string NotificationPrefix = "prayer-chat-notify-pray";
+
+    // Goobstation - Prayer sound
+    /// <summary>
+    /// Optional sound played with the admin notification.
+    /// </summary>
+    [DataField]
+    public SoundSpecifier? NotificationSound = new SoundPathSpecifier("/Audio/Effects/holy.ogg");
+
+    /// <summary>
+    /// Message given to user to notify them a message was sent
+    /// </summary>
+    [DataField("sentMessage")]
+    [ViewVariables(VVAccess.ReadWrite)]
+    public string SentMessage = "prayer-popup-notify-pray-sent";
 
     /// <summary>
     /// Used in window title and context menu
@@ -50,12 +59,5 @@ public sealed partial class PrayableComponent : Component
     /// </summary>
     [DataField("verbImage")]
     [ViewVariables(VVAccess.ReadOnly)]
-    public SpriteSpecifier? VerbImage = new SpriteSpecifier.Texture(new ("/Textures/Interface/pray.svg.png"));
-
-    // Goobstation - Prayer sound
-    /// <summary>
-    /// Optional sound played with the admin notification.
-    /// </summary>
-    [DataField]
-    public SoundSpecifier? NotificationSound = new SoundPathSpecifier("/Audio/Effects/holy.ogg");
+    public SpriteSpecifier? VerbImage = new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/pray.svg.png"));
 }

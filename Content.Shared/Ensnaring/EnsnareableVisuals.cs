@@ -7,8 +7,8 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Ensnaring;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum EnsnareableVisuals : byte
 {
-    IsEnsnared
+    IsEnsnared,
 }

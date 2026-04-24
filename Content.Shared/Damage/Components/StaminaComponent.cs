@@ -24,8 +24,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Goobstation.Maths.FixedPoint;
 using System.Numerics;
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Alert;
 using Robust.Shared.Audio;
 using Robust.Shared.GameStates;
@@ -37,39 +37,9 @@ namespace Content.Shared.Damage.Components;
 /// <summary>
 /// Add to an entity to paralyze it whenever it reaches critical amounts of Stamina DamageType.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState(true), AutoGenerateComponentPause]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState(true)] [AutoGenerateComponentPause]
 public sealed partial class StaminaComponent : Component
 {
-    /// <summary>
-    /// Have we reached peak stamina damage and been paralyzed?
-    /// </summary>
-    [ViewVariables(VVAccess.ReadWrite), DataField, AutoNetworkedField]
-    public bool Critical;
-
-    /// <summary>
-    /// How much stamina reduces per second.
-    /// </summary>
-    [ViewVariables(VVAccess.ReadWrite), DataField, AutoNetworkedField]
-    public float Decay = 5f; // goob edit
-
-    /// <summary>
-    /// How much time after receiving damage until stamina starts decreasing.
-    /// </summary>
-    [ViewVariables(VVAccess.ReadWrite), DataField, AutoNetworkedField]
-    public float Cooldown = 5f; // goob edit
-
-    /// <summary>
-    /// How much stamina damage this entity has taken.
-    /// </summary>
-    [ViewVariables(VVAccess.ReadWrite), DataField, AutoNetworkedField]
-    public float StaminaDamage;
-
-    /// <summary>
-    /// How much stamina damage is required to enter stam crit.
-    /// </summary>
-    [ViewVariables(VVAccess.ReadWrite), DataField, AutoNetworkedField]
-    public float CritThreshold = 100f;
-
     /// <summary>
     /// Goob Edit: A dictionary of active stamina drains, with the key being the source of the drain,
     /// DrainRate how much it changes per tick, and ModifiesSpeed if it should slow down the user.
@@ -77,65 +47,103 @@ public sealed partial class StaminaComponent : Component
     /// <remarks>
     /// TODO: Refactor into a struct or another component at some point idk.
     /// </remarks>
-    [DataField, AutoNetworkedField]
-    public Dictionary<string, (float DrainRate, bool ModifiesSpeed, NetEntity? Source, bool ApplyResistances)> ActiveDrains = new();
+    [DataField] [AutoNetworkedField]
+    public Dictionary<string, (float DrainRate, bool ModifiesSpeed, NetEntity? Source, bool ApplyResistances)>
+        ActiveDrains = new();
 
     /// <summary>
-    /// How long will this mob be stunned for?
+    /// This float determines how fast stamina will regenerate after exiting the stamina crit.
     /// </summary>
-    [ViewVariables(VVAccess.ReadWrite), DataField]
-    public TimeSpan StunTime = TimeSpan.FromSeconds(6);
+    [DataField] [AutoNetworkedField]
+    public float AfterCritDecayMultiplier = 5f;
+
+    /// <summary>
+    /// This flag indicates whether the value of <see cref="StaminaDamage" /> decreases after the entity exits stamina crit.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public bool AfterCritical;
+
+    /// <summary>
+    /// How much time after receiving damage until stamina starts decreasing.
+    /// </summary>
+    [ViewVariables(VVAccess.ReadWrite)] [DataField] [AutoNetworkedField]
+    public float Cooldown = 5f; // goob edit
+
+    /// <summary>
+    /// Have we reached peak stamina damage and been paralyzed?
+    /// </summary>
+    [ViewVariables(VVAccess.ReadWrite)] [DataField] [AutoNetworkedField]
+    public bool Critical;
+
+    /// <summary>
+    /// How much stamina damage is required to enter stam crit.
+    /// </summary>
+    [ViewVariables(VVAccess.ReadWrite)] [DataField] [AutoNetworkedField]
+    public float CritThreshold = 100f;
+
+    /// <summary>
+    /// How much stamina reduces per second.
+    /// </summary>
+    [ViewVariables(VVAccess.ReadWrite)] [DataField] [AutoNetworkedField]
+    public float Decay = 5f; // goob edit
+
+    /// <summary>
+    /// This is how much stamina damage a mob takes when it forces itself to stand up before modifiers
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public float ForceStandStamina = 10f;
+
+    /// <summary>
+    /// What sound should play when we successfully stand up
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public SoundSpecifier ForceStandSuccessSound = new SoundPathSpecifier("/Audio/Effects/thudswoosh.ogg");
 
     /// <summary>
     /// To avoid continuously updating our data we track the last time we updated so we can extrapolate our current stamina.
     /// </summary>
-    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer)), AutoNetworkedField]
+    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))] [AutoNetworkedField]
     [AutoPausedField]
     public TimeSpan NextUpdate = TimeSpan.Zero;
 
     [DataField]
     public ProtoId<AlertPrototype> StaminaAlert = "Stamina";
 
+    /// <summary>
+    /// How much stamina damage this entity has taken.
+    /// </summary>
+    [ViewVariables(VVAccess.ReadWrite)] [DataField] [AutoNetworkedField]
+    public float StaminaDamage;
+
     // Goobstation
     [DataField]
     public float StaminaOnShove = 7.5f;
 
     /// <summary>
-    /// This flag indicates whether the value of <see cref="StaminaDamage"/> decreases after the entity exits stamina crit.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public bool AfterCritical;
-
-    /// <summary>
-    /// This float determines how fast stamina will regenerate after exiting the stamina crit.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public float AfterCritDecayMultiplier = 5f;
-
-    /// <summary>
-    /// This is how much stamina damage a mob takes when it forces itself to stand up before modifiers
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public float ForceStandStamina = 10f;
-
-    /// <summary>
-    /// What sound should play when we successfully stand up
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public SoundSpecifier ForceStandSuccessSound = new SoundPathSpecifier("/Audio/Effects/thudswoosh.ogg");
-
-    /// <summary>
     /// Thresholds that determine an entity's slowdown as a function of stamina damage.
     /// </summary>
     [DataField] // Goob edit. No slowdown. todo goobstation refactor sprint shit so it isnt as dependent on stamina its kinda annoying to wrangle both at the same time.
-    public Dictionary<FixedPoint2, float> StunModifierThresholds = new() { {0, 1f } }; // Goob edit, 0.7 -> 1, 0.5 -> 1
+    public Dictionary<FixedPoint2, float> StunModifierThresholds = new() { { 0, 1f } }; // Goob edit, 0.7 -> 1, 0.5 -> 1
+
+    /// <summary>
+    /// How long will this mob be stunned for?
+    /// </summary>
+    [ViewVariables(VVAccess.ReadWrite)] [DataField]
+    public TimeSpan StunTime = TimeSpan.FromSeconds(6);
+
+    /// <summary>
+    /// Goobstation - Used for the sprinting event to get rather we sprinting or not from Goob Mod folder
+    /// </summary>
+    [DataField]
+    public bool IsSprinting { get; set; }
 
 
     #region Animation Data
 
     /// <summary>
     /// Threshold at which low stamina animations begin playing. This should be set to a value that means something.
-    /// At 50, it is aligned so when you hit 60 stun the entity will be breathing once per second (well above hyperventilation).
+    /// At 50, it is aligned so when you hit 60 stun the entity will be breathing once per second (well above
+    /// hyperventilation).
     /// </summary>
     [DataField]
     public float AnimationThreshold = 50;
@@ -165,13 +173,15 @@ public sealed partial class StaminaComponent : Component
     public float JitterAmplitudeMod = 0.04f;
 
     /// <summary>
-    /// Min multipliers for JitterAmplitude in the X and Y directions, animation randomly chooses between these min and max multipliers
+    /// Min multipliers for JitterAmplitude in the X and Y directions, animation randomly chooses between these min and max
+    /// multipliers
     /// </summary>
     [DataField]
     public Vector2 JitterMin = Vector2.Create(0.5f, 0.125f);
 
     /// <summary>
-    /// Max multipliers for JitterAmplitude in the X and Y directions, animation randomly chooses between these min and max multipliers
+    /// Max multipliers for JitterAmplitude in the X and Y directions, animation randomly chooses between these min and max
+    /// multipliers
     /// </summary>
     [DataField]
     public Vector2 JitterMax = Vector2.Create(1f, 0.25f);
@@ -201,17 +211,11 @@ public sealed partial class StaminaComponent : Component
     public Vector2 LastJitter;
 
     /// <summary>
-    ///     The offset that an entity had before jittering started,
-    ///     so that we can reset it properly.
+    /// The offset that an entity had before jittering started,
+    /// so that we can reset it properly.
     /// </summary>
     [DataField]
     public Vector2 StartOffset = Vector2.Zero;
 
     #endregion
-
-    /// <summary>
-    /// Goobstation - Used for the sprinting event to get rather we sprinting or not from Goob Mod folder
-    /// </summary>
-    [DataField]
-    public bool IsSprinting { get; set; }
 }

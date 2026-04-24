@@ -6,8 +6,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-using Content.Shared.DoAfter;
 using System.Numerics;
+using Content.Shared.DoAfter;
 using Robust.Shared.GameStates;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
 
@@ -16,23 +16,26 @@ namespace Content.Shared.Climbing.Components;
 /// <summary>
 /// Indicates that this entity is able to be placed on top of surfaces like tables.
 /// Does not by itself allow the entity to carry out the action of climbing, unless
-/// <see cref="CanClimb"/> is true. Use <see cref="CanForceClimb"/> to control whether
+/// <see cref="CanClimb" /> is true. Use <see cref="CanForceClimb" /> to control whether
 /// the entity can force other entities onto surfaces.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState, AutoGenerateComponentPause]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState] [AutoGenerateComponentPause]
 public sealed partial class ClimbingComponent : Component
 {
     /// <summary>
     /// Whether the owner is able to climb onto things by their own action.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public bool CanClimb = true;
 
     /// <summary>
-    /// Whether the owner is climbing on a climbable entity.
+    /// Direction to move when transition.
     /// </summary>
-    [AutoNetworkedField, DataField]
-    public bool IsClimbing;
+    [AutoNetworkedField] [DataField]
+    public Vector2 Direction;
+
+    [AutoNetworkedField] [DataField]
+    public Dictionary<string, int> DisabledFixtureMasks = new();
 
     /// <summary>
     /// The Climbing DoAfter.
@@ -41,24 +44,21 @@ public sealed partial class ClimbingComponent : Component
     public DoAfterId? DoAfter;
 
     /// <summary>
-    /// Whether the owner is being moved onto the climbed entity.
+    /// Whether the owner is climbing on a climbable entity.
     /// </summary>
-    [AutoNetworkedField, DataField(customTypeSerializer: typeof(TimeOffsetSerializer))]
-    [AutoPausedField]
-    public TimeSpan? NextTransition;
+    [AutoNetworkedField] [DataField]
+    public bool IsClimbing;
 
     /// <summary>
-    /// Direction to move when transition.
+    /// Whether the owner is being moved onto the climbed entity.
     /// </summary>
-    [AutoNetworkedField, DataField]
-    public Vector2 Direction;
+    [AutoNetworkedField] [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))]
+    [AutoPausedField]
+    public TimeSpan? NextTransition;
 
     /// <summary>
     /// How fast the entity is moved when climbing.
     /// </summary>
     [DataField]
     public float TransitionRate = 5f;
-
-    [AutoNetworkedField, DataField]
-    public Dictionary<string, int> DisabledFixtureMasks = new();
 }

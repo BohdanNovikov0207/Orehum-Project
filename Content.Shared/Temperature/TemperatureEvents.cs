@@ -79,16 +79,17 @@ namespace Content.Shared.Temperature;
 
 public sealed class ModifyChangedTemperatureEvent : EntityEventArgs, IInventoryRelayEvent
 {
-    public SlotFlags TargetSlots { get; } = ~SlotFlags.POCKET;
+    public readonly EntityUid Target; // Goobstation
 
     public float TemperatureDelta;
-    public readonly EntityUid Target; // Goobstation
 
     public ModifyChangedTemperatureEvent(float temperature, EntityUid target) // Goobstation
     {
         TemperatureDelta = temperature;
         Target = target; // Goobstation
     }
+
+    public SlotFlags TargetSlots { get; } = ~SlotFlags.POCKET;
 }
 
 public sealed class OnTemperatureChangeEvent : EntityEventArgs

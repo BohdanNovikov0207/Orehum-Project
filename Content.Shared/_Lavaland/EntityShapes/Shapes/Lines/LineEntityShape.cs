@@ -13,8 +13,6 @@ public sealed partial class LineEntityShape : EntityShape
     [DataField]
     public Vector2 Direction = Vector2.UnitX;
 
-    protected override List<Vector2> GetShapeImplementation(System.Random rand, IPrototypeManager proto)
-    {
-        return ShapeHelpers.MakeLine(Offset, Size, Direction).ToList();
-    }
+    protected override List<Vector2> GetShapeImplementation(System.Random rand, IPrototypeManager proto) =>
+        ShapeHelpers.MakeLine(Offset, Size, Direction).ToList();
 }

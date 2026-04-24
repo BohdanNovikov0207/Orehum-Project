@@ -35,15 +35,12 @@ public sealed partial class ParticleAcceleratorEmitterComponent : Component
     [ViewVariables(VVAccess.ReadWrite)]
     public ParticleAcceleratorEmitterType Type = ParticleAcceleratorEmitterType.Fore;
 
-    public override string ToString()
-    {
-        return base.ToString() + $" EmitterType:{Type}";
-    }
+    public override string ToString() => base.ToString() + $" EmitterType:{Type}";
 }
 
 public enum ParticleAcceleratorEmitterType
 {
     Port,
     Fore,
-    Starboard
+    Starboard,
 }

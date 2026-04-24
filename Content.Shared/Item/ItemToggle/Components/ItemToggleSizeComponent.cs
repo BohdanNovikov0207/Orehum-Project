@@ -16,30 +16,30 @@ namespace Content.Shared.Item.ItemToggle.Components;
 /// <remarks>
 /// You can change the size when activated or not. By default the sizes are copied from the item.
 /// </remarks>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class ItemToggleSizeComponent : Component
 {
     /// <summary>
-    ///     Item's size when activated
+    /// Item's shape when activated
     /// </summary>
-    [DataField, AutoNetworkedField]
-    public ProtoId<ItemSizePrototype>? ActivatedSize = null;
-
-    /// <summary>
-    ///     Item's shape when activated
-    /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public List<Box2i>? ActivatedShape = null;
 
     /// <summary>
-    ///     Item's size when deactivated. If none is mentioned, it uses the item's default size instead.
+    /// Item's size when activated
     /// </summary>
-    [DataField, AutoNetworkedField]
-    public ProtoId<ItemSizePrototype>? DeactivatedSize = null;
+    [DataField] [AutoNetworkedField]
+    public ProtoId<ItemSizePrototype>? ActivatedSize = null;
 
     /// <summary>
-    ///     Item's shape when deactivated. If none is mentioned, it uses the item's default shape instead.
+    /// Item's shape when deactivated. If none is mentioned, it uses the item's default shape instead.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public List<Box2i>? DeactivatedShape = null;
+
+    /// <summary>
+    /// Item's size when deactivated. If none is mentioned, it uses the item's default size instead.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public ProtoId<ItemSizePrototype>? DeactivatedSize = null;
 }

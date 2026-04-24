@@ -6,15 +6,14 @@
 //
 // SPDX-License-Identifier: MIT
 
-namespace Content.Shared.Speech
-{
-    public sealed class SpeakAttemptEvent : CancellableEntityEventArgs
-    {
-        public SpeakAttemptEvent(EntityUid uid)
-        {
-            Uid = uid;
-        }
+namespace Content.Shared.Speech;
 
-        public EntityUid Uid { get; }
+public sealed class SpeakAttemptEvent : CancellableEntityEventArgs
+{
+    public SpeakAttemptEvent(EntityUid uid)
+    {
+        Uid = uid;
     }
+
+    public EntityUid Uid { get; }
 }

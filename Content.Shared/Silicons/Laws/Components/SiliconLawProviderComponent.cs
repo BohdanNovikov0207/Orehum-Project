@@ -10,13 +10,13 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Robust.Shared.Prototypes;
 using Robust.Shared.Audio;
+using Robust.Shared.Prototypes;
 
 namespace Content.Shared.Silicons.Laws.Components;
 
 /// <summary>
-/// This is used for an entity which grants laws to a <see cref="SiliconLawBoundComponent"/>
+/// This is used for an entity which grants laws to a <see cref="SiliconLawBoundComponent" />
 /// </summary>
 [RegisterComponent] // Goobstation - Make this component not locked to SharedSiliconLawSystem
 public sealed partial class SiliconLawProviderComponent : Component
@@ -31,7 +31,7 @@ public sealed partial class SiliconLawProviderComponent : Component
     /// Lawset created from the prototype id.
     /// Cached when getting laws and modified during an ion storm event and when emagged.
     /// </summary>
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    [DataField] [ViewVariables(VVAccess.ReadWrite)]
     public SiliconLawset? Lawset;
 
     /// <summary>
@@ -46,5 +46,4 @@ public sealed partial class SiliconLawProviderComponent : Component
     /// </summary>
     [DataField]
     public bool Subverted = false;
-
 }

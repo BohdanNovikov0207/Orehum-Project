@@ -13,11 +13,10 @@ namespace Content.Shared.Movement.Events;
 [ByRefEvent]
 public record struct GetSpeedModifierContactCapEvent() : IInventoryRelayEvent
 {
-    SlotFlags IInventoryRelayEvent.TargetSlots => ~SlotFlags.POCKET;
-
     public float MaxSprintSlowdown = 0f;
 
     public float MaxWalkSlowdown = 0f;
+    SlotFlags IInventoryRelayEvent.TargetSlots => ~SlotFlags.POCKET;
 
     public void SetIfMax(float valueSprint, float valueWalk)
     {

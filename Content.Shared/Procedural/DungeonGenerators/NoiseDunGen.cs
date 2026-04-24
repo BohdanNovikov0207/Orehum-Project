@@ -14,6 +14,11 @@ namespace Content.Shared.Procedural.DungeonGenerators;
 /// </summary>
 public sealed partial class NoiseDunGen : IDunGenLayer
 {
+    /// <summary>
+    /// Standard deviation of tilecap.
+    /// </summary>
+    [DataField]
+    public float CapStd = 8f;
     /*
      * Floodfills out from 0 until it finds a valid tile.
      * From here it then floodfills until it can no longer fill in an area and generates a dungeon from that.
@@ -28,25 +33,22 @@ public sealed partial class NoiseDunGen : IDunGenLayer
     [DataField]
     public int Iterations = int.MaxValue;
 
+    [DataField(required: true)]
+    public List<NoiseDunGenLayer> Layers = new();
+
     /// <summary>
     /// Cap on how many tiles to include.
     /// </summary>
     [DataField]
     public int TileCap = 128;
-
-    /// <summary>
-    /// Standard deviation of tilecap.
-    /// </summary>
-    [DataField]
-    public float CapStd = 8f;
-
-    [DataField(required: true)]
-    public List<NoiseDunGenLayer> Layers = new();
 }
 
 [DataRecord]
-public partial record struct NoiseDunGenLayer
+public record struct NoiseDunGenLayer
 {
+    [DataField(required: true)]
+    public FastNoiseLite Noise;
+
     /// <summary>
     /// If the noise value is above this then it gets output.
     /// </summary>
@@ -55,7 +57,4 @@ public partial record struct NoiseDunGenLayer
 
     [DataField(required: true)]
     public string Tile;
-
-    [DataField(required: true)]
-    public FastNoiseLite Noise;
 }

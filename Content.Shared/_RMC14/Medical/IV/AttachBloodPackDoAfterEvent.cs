@@ -7,5 +7,5 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared._RMC14.Medical.IV;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class AttachBloodPackDoAfterEvent : SimpleDoAfterEvent;

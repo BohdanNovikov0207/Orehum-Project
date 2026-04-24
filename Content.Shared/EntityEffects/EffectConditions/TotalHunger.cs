@@ -4,7 +4,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.EntityEffects;
 using Content.Shared.Nutrition.Components;
 using Content.Shared.Nutrition.EntitySystems;
 using Robust.Shared.Prototypes;
@@ -30,10 +29,8 @@ public sealed partial class Hunger : EntityEffectCondition
         return false;
     }
 
-    public override string GuidebookExplanation(IPrototypeManager prototype)
-    {
-        return Loc.GetString("reagent-effect-condition-guidebook-total-hunger",
-            ("max", float.IsPositiveInfinity(Max) ? (float) int.MaxValue : Max),
+    public override string GuidebookExplanation(IPrototypeManager prototype) =>
+        Loc.GetString("reagent-effect-condition-guidebook-total-hunger",
+            ("max", float.IsPositiveInfinity(Max) ? int.MaxValue : Max),
             ("min", Min));
-    }
 }

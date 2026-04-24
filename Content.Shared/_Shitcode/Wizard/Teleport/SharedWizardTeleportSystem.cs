@@ -30,8 +30,6 @@ public abstract class SharedWizardTeleportSystem : EntitySystem
             args.Cancel();
     }
 
-    private void OnExamined(Entity<TeleportScrollComponent> ent, ref ExaminedEvent args)
-    {
+    private void OnExamined(Entity<TeleportScrollComponent> ent, ref ExaminedEvent args) =>
         args.PushMarkup(Loc.GetString("teleport-scroll-uses-left", ("uses", ent.Comp.UsesLeft)));
-    }
 }

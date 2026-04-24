@@ -14,23 +14,21 @@ using Content.Shared.Mobs.Components;
 namespace Content.Shared.Mobs.Systems;
 
 /// <summary>
-///     Adds and removes defined actions when a mob's <see cref="MobState"/> changes.
+/// Adds and removes defined actions when a mob's <see cref="MobState" /> changes.
 /// </summary>
 public sealed class MobStateActionsSystem : EntitySystem
 {
     [Dependency] private readonly SharedActionsSystem _actions = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         SubscribeLocalEvent<MobStateActionsComponent, MobStateChangedEvent>(OnMobStateChanged);
         SubscribeLocalEvent<MobStateComponent, ComponentInit>(OnMobStateComponentInit);
     }
 
-    private void OnMobStateChanged(EntityUid uid, MobStateActionsComponent component, MobStateChangedEvent args)
-    {
+    private void OnMobStateChanged(EntityUid uid, MobStateActionsComponent component, MobStateChangedEvent args) =>
         ComposeActions(uid, component, args.NewMobState);
-    }
 
     private void OnMobStateComponentInit(EntityUid uid, MobStateComponent component, ComponentInit args)
     {
@@ -52,6 +50,7 @@ public sealed class MobStateActionsSystem : EntitySystem
         {
             Del(act);
         }
+
         component.GrantedActions.Clear();
 
         if (!component.Actions.TryGetValue(newMobState, out var toGrant))

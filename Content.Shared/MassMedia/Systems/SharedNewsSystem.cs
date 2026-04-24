@@ -16,7 +16,7 @@ public abstract class SharedNewsSystem : EntitySystem
     public const int MaxContentLength = 2048;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public struct NewsArticle
 {
     [ViewVariables(VVAccess.ReadWrite)]

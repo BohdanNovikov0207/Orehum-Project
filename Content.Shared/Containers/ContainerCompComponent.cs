@@ -47,12 +47,12 @@ namespace Content.Shared.Containers;
 /// <summary>
 /// Applies container changes whenever an entity is inserted into the specified container on this entity.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class ContainerCompComponent : Component
 {
     [DataField(required: true)]
-    public EntProtoId Proto;
+    public string Container = string.Empty;
 
     [DataField(required: true)]
-    public string Container = string.Empty;
+    public EntProtoId Proto;
 }

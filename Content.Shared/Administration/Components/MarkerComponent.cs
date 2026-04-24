@@ -10,10 +10,10 @@ namespace Content.Shared.Administration.Components;
 [RegisterComponent]
 public sealed partial class MarkerOneComponent : Component;
 
-/// <inheritdoc cref="MarkerOneComponent"/>
+/// <inheritdoc cref="MarkerOneComponent" />
 [RegisterComponent]
 public sealed partial class MarkerTwoComponent : Component;
 
-/// <inheritdoc cref="MarkerOneComponent"/>
+/// <inheritdoc cref="MarkerOneComponent" />
 [RegisterComponent]
 public sealed partial class MarkerThreeComponent : Component;

@@ -12,29 +12,31 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Humanoid;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum HumanoidMarkingModifierKey
 {
-    Key
+    Key,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class HumanoidMarkingModifierMarkingSetMessage : BoundUserInterfaceMessage
 {
-    public MarkingSet MarkingSet { get; }
-    public bool ResendState { get; }
-
     public HumanoidMarkingModifierMarkingSetMessage(MarkingSet set, bool resendState)
     {
         MarkingSet = set;
         ResendState = resendState;
     }
+
+    public MarkingSet MarkingSet { get; }
+    public bool ResendState { get; }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class HumanoidMarkingModifierBaseLayersSetMessage : BoundUserInterfaceMessage
 {
-    public HumanoidMarkingModifierBaseLayersSetMessage(HumanoidVisualLayers layer, CustomBaseLayerInfo? info, bool resendState)
+    public HumanoidMarkingModifierBaseLayersSetMessage(HumanoidVisualLayers layer,
+        CustomBaseLayerInfo? info,
+        bool resendState)
     {
         Layer = layer;
         Info = info;
@@ -46,7 +48,7 @@ public sealed class HumanoidMarkingModifierBaseLayersSetMessage : BoundUserInter
     public bool ResendState { get; }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class HumanoidMarkingModifierState : BoundUserInterfaceState
 {
     // TODO just use the component state, remove the BUI state altogether.

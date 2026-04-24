@@ -6,6 +6,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Shared.Body.Systems;
 using Content.Shared.Damage.Components;
 using Content.Shared.Damage.Events;
 using Content.Shared.Destructible;
@@ -13,20 +14,19 @@ using Content.Shared.Nutrition;
 using Content.Shared.Prototypes;
 using Content.Shared.Rejuvenate;
 using Content.Shared.Slippery;
-using Content.Shared.Body.Systems; // Shitmed Change
 using Content.Shared.StatusEffect;
 using Content.Shared.StatusEffectNew;
 using Content.Shared.StatusEffectNew.Components;
 using Robust.Shared.Prototypes;
+// Shitmed Change
 
 namespace Content.Shared.Damage.Systems;
 
 public abstract class SharedGodmodeSystem : EntitySystem
 {
-    [Dependency] private readonly IPrototypeManager _protoMan = default!;
-    [Dependency] private readonly DamageableSystem _damageable = default!;
-
     [Dependency] private readonly SharedBodySystem _bodySystem = default!; // Shitmed Change
+    [Dependency] private readonly DamageableSystem _damageable = default!;
+    [Dependency] private readonly IPrototypeManager _protoMan = default!;
 
     public override void Initialize()
     {
@@ -41,15 +41,10 @@ public abstract class SharedGodmodeSystem : EntitySystem
         SubscribeLocalEvent<GodmodeComponent, DestructionAttemptEvent>(OnDestruction);
     }
 
-    private void OnSlipAttempt(EntityUid uid, GodmodeComponent component, SlipAttemptEvent args)
-    {
-        args.NoSlip = true;
-    }
+    private void OnSlipAttempt(EntityUid uid, GodmodeComponent component, SlipAttemptEvent args) => args.NoSlip = true;
 
-    private void OnBeforeDamageChanged(EntityUid uid, GodmodeComponent component, ref BeforeDamageChangedEvent args)
-    {
+    private void OnBeforeDamageChanged(EntityUid uid, GodmodeComponent component, ref BeforeDamageChangedEvent args) =>
         args.Cancelled = true;
-    }
 
     private void OnBeforeStatusEffect(EntityUid uid, GodmodeComponent component, ref BeforeStatusEffectAddedEvent args)
     {
@@ -57,35 +52,23 @@ public abstract class SharedGodmodeSystem : EntitySystem
             args.Cancelled = true;
     }
 
-    private void OnBeforeOldStatusEffect(Entity<GodmodeComponent> ent, ref BeforeOldStatusEffectAddedEvent args)
-    {
+    private void OnBeforeOldStatusEffect(Entity<GodmodeComponent> ent, ref BeforeOldStatusEffectAddedEvent args) =>
         // Old status effect system doesn't distinguish between good and bad status effects
         args.Cancelled = true;
-    }
 
-    private void OnBeforeStaminaDamage(EntityUid uid, GodmodeComponent component, ref BeforeStaminaDamageEvent args)
-    {
+    private void OnBeforeStaminaDamage(EntityUid uid, GodmodeComponent component, ref BeforeStaminaDamageEvent args) =>
         args.Cancelled = true;
-    }
 
-    private void OnDestruction(Entity<GodmodeComponent> ent, ref DestructionAttemptEvent args)
-    {
-        args.Cancel();
-    }
+    private void OnDestruction(Entity<GodmodeComponent> ent, ref DestructionAttemptEvent args) => args.Cancel();
 
-    private void BeforeEdible(Entity<GodmodeComponent> ent, ref IngestibleEvent args)
-    {
-        args.Cancelled = true;
-    }
+    private void BeforeEdible(Entity<GodmodeComponent> ent, ref IngestibleEvent args) => args.Cancelled = true;
 
     public virtual void EnableGodmode(EntityUid uid, GodmodeComponent? godmode = null)
     {
         godmode ??= EnsureComp<GodmodeComponent>(uid);
 
         if (TryComp<DamageableComponent>(uid, out var damageable))
-        {
             godmode.OldDamage = new DamageSpecifier(damageable.Damage);
-        }
 
         // Rejuv to cover other stuff
         RaiseLocalEvent(uid, new RejuvenateEvent());
@@ -97,18 +80,18 @@ public abstract class SharedGodmodeSystem : EntitySystem
             return;
 
         if (TryComp<DamageableComponent>(uid, out var damageable) && godmode.OldDamage != null)
-        {
             _damageable.SetDamage(uid, damageable, godmode.OldDamage);
-        }
 
         RemComp<GodmodeComponent>(uid);
 
         foreach (var (id, _) in _bodySystem.GetBodyChildren(uid)) // Shitmed Change
+        {
             DisableGodmode(id);
+        }
     }
 
     /// <summary>
-    ///     Toggles godmode for a given entity.
+    /// Toggles godmode for a given entity.
     /// </summary>
     /// <param name="uid">The entity to toggle godmode for.</param>
     /// <returns>true if enabled, false if disabled.</returns>

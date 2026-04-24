@@ -3,14 +3,15 @@
 //
 // SPDX-License-Identifier: MIT
 
-using Content.Shared._Goobstation.Heretic.Components; // Goobstation
-using Content.Shared.Species.Components;
+using Content.Shared._Goobstation.Heretic.Components;
 using Content.Shared.Actions;
 using Content.Shared.Body.Systems;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Popups;
+using Content.Shared.Species.Components;
 using Robust.Shared.Prototypes;
+// Goobstation
 
 
 namespace Content.Shared.Species;
@@ -19,8 +20,8 @@ public sealed partial class GibActionSystem : EntitySystem
 {
     [Dependency] private readonly SharedActionsSystem _actionsSystem = default!;
     [Dependency] private readonly SharedBodySystem _bodySystem = default!;
-    [Dependency] private readonly IPrototypeManager _protoManager = default!;
     [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
+    [Dependency] private readonly IPrototypeManager _protoManager = default!;
 
     public override void Initialize()
     {
@@ -42,7 +43,7 @@ public sealed partial class GibActionSystem : EntitySystem
 
         foreach (var allowedState in comp.AllowedStates)
         {
-            if(allowedState == mobState.CurrentState)
+            if (allowedState == mobState.CurrentState)
             {
                 // The mob should never have more than 1 state so I don't see this being an issue
                 _actionsSystem.AddAction(uid, ref comp.ActionEntity, comp.ActionPrototype);
@@ -57,7 +58,8 @@ public sealed partial class GibActionSystem : EntitySystem
     private void OnGibAction(EntityUid uid, GibActionComponent comp, GibActionEvent args)
     {
         // Goobstation start
-        if (HasComp<MansusGraspBlockTriggerComponent>(args.Action.Owner) && HasComp<MansusGraspAffectedComponent>(args.Performer))
+        if (HasComp<MansusGraspBlockTriggerComponent>(args.Action.Owner) &&
+            HasComp<MansusGraspAffectedComponent>(args.Performer))
         {
             _popupSystem.PopupClient(Loc.GetString("mansus-grasp-trigger-fail"), args.Performer, args.Performer);
             return;
@@ -70,6 +72,7 @@ public sealed partial class GibActionSystem : EntitySystem
     }
 
 
-
-    public sealed partial class GibActionEvent : InstantActionEvent { }
+    public sealed partial class GibActionEvent : InstantActionEvent
+    {
+    }
 }

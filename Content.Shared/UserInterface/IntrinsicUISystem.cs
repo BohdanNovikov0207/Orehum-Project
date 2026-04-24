@@ -69,11 +69,12 @@ public sealed class IntrinsicUISystem : EntitySystem
 // Competing with ActivatableUI for horrible event names.
 public sealed class IntrinsicUIOpenAttemptEvent : CancellableEntityEventArgs
 {
-    public EntityUid User { get; }
-    public Enum? Key { get; }
     public IntrinsicUIOpenAttemptEvent(EntityUid who, Enum? key)
     {
         User = who;
         Key = key;
     }
+
+    public EntityUid User { get; }
+    public Enum? Key { get; }
 }

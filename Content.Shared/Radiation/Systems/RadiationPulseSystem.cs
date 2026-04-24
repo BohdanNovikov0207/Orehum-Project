@@ -26,9 +26,7 @@ public sealed class RadiationPulseSystem : EntitySystem
 
         // try to get despawn time or keep default duration time
         if (TryComp<TimedDespawnComponent>(uid, out var despawn))
-        {
             component.VisualDuration = despawn.Lifetime;
-        }
         /*
         goobstation - Long depricated wizden system, changes to RadiationSystem and RadiationSourceComponent
         have changed how radiation range is calculated.

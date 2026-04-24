@@ -10,28 +10,13 @@ namespace Content.Shared._DV.Weapons.Ranged.Components;
 
 /// <summary>
 /// Alters the accuracy of attached entity's held or wielded guns via
-/// <see cref="Shared.Weapons.Ranged.Events.GunRefreshModifiersEvent"/>.
+/// <see cref="Shared.Weapons.Ranged.Events.GunRefreshModifiersEvent" />.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class PlayerAccuracyModifierComponent : Component
 {
-    /// <summary>
-    /// Multiplies the Min/Max angles of a gun by this amount.
-    /// </summary>
     [DataField]
-    public float SpreadMultiplier = 15f;
-
-    /// <summary>
-    /// Modifies the Min angle of a gun by this amount.
-    /// </summary>
-    [DataField]
-    public float MinSpreadModifier = 10f;
-
-    /// <summary>
-    /// Modifies the Max angle of a gun by this amount.
-    /// </summary>
-    [DataField]
-    public float MaxSpreadModifier = 20f;
+    public EntityWhitelist? Blacklist;
 
     /// <summary>
     /// Maximum angle, in degrees, an entity can shoot between.
@@ -41,9 +26,24 @@ public sealed partial class PlayerAccuracyModifierComponent : Component
     [DataField]
     public float MaxSpreadAngle = 180f;
 
+    /// <summary>
+    /// Modifies the Max angle of a gun by this amount.
+    /// </summary>
     [DataField]
-    public EntityWhitelist? Whitelist;
+    public float MaxSpreadModifier = 20f;
+
+    /// <summary>
+    /// Modifies the Min angle of a gun by this amount.
+    /// </summary>
+    [DataField]
+    public float MinSpreadModifier = 10f;
+
+    /// <summary>
+    /// Multiplies the Min/Max angles of a gun by this amount.
+    /// </summary>
+    [DataField]
+    public float SpreadMultiplier = 15f;
 
     [DataField]
-    public EntityWhitelist? Blacklist;
+    public EntityWhitelist? Whitelist;
 }

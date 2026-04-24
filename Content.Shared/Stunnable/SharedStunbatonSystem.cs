@@ -24,17 +24,13 @@ public abstract class SharedStunbatonSystem : EntitySystem
 
     protected virtual void TryTurnOn(Entity<StunbatonComponent> entity, ref ItemToggleActivateAttemptEvent args)
     {
-        if (args.User != null && !_actionBlocker.CanComplexInteract(args.User.Value)) {
+        if (args.User != null && !_actionBlocker.CanComplexInteract(args.User.Value))
             args.Cancelled = true;
-            return;
-        }
     }
 
     protected virtual void TryTurnOff(Entity<StunbatonComponent> entity, ref ItemToggleDeactivateAttemptEvent args)
     {
-        if (args.User != null && !_actionBlocker.CanComplexInteract(args.User.Value)) {
+        if (args.User != null && !_actionBlocker.CanComplexInteract(args.User.Value))
             args.Cancelled = true;
-            return;
-        }
     }
 }

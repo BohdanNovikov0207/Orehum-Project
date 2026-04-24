@@ -12,13 +12,9 @@ namespace Content.Shared.CCVar.CVarAccess;
 /// Manages what admin flags can change the cvar value. With optional mins and maxes.
 /// </summary>
 [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-[Reflect(discoverable: true)]
+[Reflect(true)]
 public sealed class CVarControl : Attribute
 {
-    public AdminFlags AdminFlags { get; }
-    public object? Min { get; }
-    public object? Max { get; }
-
     public CVarControl(AdminFlags adminFlags, object? min = null, object? max = null, string? helpText = null)
     {
         AdminFlags = adminFlags;
@@ -30,14 +26,14 @@ public sealed class CVarControl : Attribute
         if (min != null && max != null)
         {
             if (min.GetType() != max.GetType())
-            {
                 throw new ArgumentException("Min and max must be of the same type.");
-            }
         }
 
         if (min == null && max != null || min != null && max == null)
-        {
             throw new ArgumentException("Min and max must both be null or both be set.");
-        }
     }
+
+    public AdminFlags AdminFlags { get; }
+    public object? Min { get; }
+    public object? Max { get; }
 }

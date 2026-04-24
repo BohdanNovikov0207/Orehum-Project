@@ -38,10 +38,8 @@ public sealed class PainNumbnessSystem : EntitySystem
         _mobThresholdSystem.VerifyThresholds(uid);
     }
 
-    private void OnChangeForceSay(Entity<PainNumbnessComponent> ent, ref BeforeForceSayEvent args)
-    {
+    private void OnChangeForceSay(Entity<PainNumbnessComponent> ent, ref BeforeForceSayEvent args) =>
         args.Prefix = ent.Comp.ForceSayNumbDataset;
-    }
 
     private void OnAlertSeverityCheck(Entity<PainNumbnessComponent> ent, ref BeforeAlertSeverityCheckEvent args)
     {

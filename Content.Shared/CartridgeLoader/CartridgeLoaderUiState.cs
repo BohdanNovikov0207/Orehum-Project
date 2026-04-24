@@ -10,7 +10,7 @@ using Robust.Shared.Serialization;
 namespace Content.Shared.CartridgeLoader;
 
 [Virtual]
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public class CartridgeLoaderUiState : BoundUserInterfaceState
 {
     public NetEntity? ActiveUI;

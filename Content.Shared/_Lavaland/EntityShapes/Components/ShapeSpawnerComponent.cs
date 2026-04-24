@@ -7,15 +7,9 @@ namespace Content.Shared._Lavaland.EntityShapes.Components;
 /// <summary>
 /// Spawns an entity shape on MapInit.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class ShapeSpawnerComponent : Component
 {
-    [DataField(required: true)]
-    public EntityShape Shape;
-
-    [DataField(required: true)]
-    public EntProtoId Spawn;
-
     /// <summary>
     /// If true, aligns center coordinates of a spawner to the nearest tile.
     /// Used for tile patterns to be more stable when the origin
@@ -23,4 +17,10 @@ public sealed partial class ShapeSpawnerComponent : Component
     /// </summary>
     [DataField]
     public bool AlignCoords;
+
+    [DataField(required: true)]
+    public EntityShape Shape;
+
+    [DataField(required: true)]
+    public EntProtoId Spawn;
 }

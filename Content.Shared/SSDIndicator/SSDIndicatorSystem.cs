@@ -4,7 +4,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-using Content.Shared.Bed.Sleep;
 using Content.Shared.CCVar;
 using Content.Shared.StatusEffectNew;
 using Robust.Shared.Configuration;
@@ -15,15 +14,15 @@ using Robust.Shared.Timing;
 namespace Content.Shared.SSDIndicator;
 
 /// <summary>
-///     Handle changing player SSD indicator status
+/// Handle changing player SSD indicator status
 /// </summary>
 public sealed class SSDIndicatorSystem : EntitySystem
 {
     public static readonly EntProtoId StatusEffectSSDSleeping = "StatusEffectSSDSleeping";
 
     [Dependency] private readonly IConfigurationManager _cfg = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly StatusEffectsSystem _statusEffects = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     private bool _icSsdSleep;
     private float _icSsdSleepTime;
@@ -58,9 +57,7 @@ public sealed class SSDIndicatorSystem : EntitySystem
 
         // Sets the time when the entity should fall asleep
         if (_icSsdSleep)
-        {
             component.FallAsleepTime = _timing.CurTime + TimeSpan.FromSeconds(_icSsdSleepTime);
-        }
 
         Dirty(uid, component);
     }

@@ -21,10 +21,8 @@ public abstract partial class SharedHereticAbilitySystem
         SubscribeLocalEvent<FleshSurgeryComponent, AfterInteractEvent>(OnAfterInteract);
     }
 
-    private void OnPoisonImmune(Entity<FleshPassiveComponent> ent, ref ImmuneToPoisonDamageEvent args)
-    {
+    private void OnPoisonImmune(Entity<FleshPassiveComponent> ent, ref ImmuneToPoisonDamageEvent args) =>
         args.Immune = true;
-    }
 
     private void OnAfterInteract(Entity<FleshSurgeryComponent> ent, ref AfterInteractEvent args)
     {
@@ -38,7 +36,7 @@ public abstract partial class SharedHereticAbilitySystem
             args.User,
             args.Target,
             ent,
-            showTo: EntityUid.Invalid)
+            EntityUid.Invalid)
         {
             Hidden = true, // Hidden because it also has health analyzer do-after
             BreakOnDamage = true,
@@ -52,15 +50,12 @@ public abstract partial class SharedHereticAbilitySystem
             args.Handled = true;
     }
 
-    private void OnIgnore(Entity<FleshSurgeryComponent> ent, ref HeldRelayedEvent<SurgeryIgnorePreviousStepsEvent> args)
-    {
+    private void
+        OnIgnore(Entity<FleshSurgeryComponent> ent, ref HeldRelayedEvent<SurgeryIgnorePreviousStepsEvent> args) =>
         args.Args.Handled = true;
-    }
 
-    private void OnPain(Entity<FleshSurgeryComponent> ent, ref HeldRelayedEvent<SurgeryPainEvent> args)
-    {
+    private void OnPain(Entity<FleshSurgeryComponent> ent, ref HeldRelayedEvent<SurgeryPainEvent> args) =>
         args.Args.Cancel();
-    }
 
     private void OnFleshSurgery(EventHereticFleshSurgery args)
     {

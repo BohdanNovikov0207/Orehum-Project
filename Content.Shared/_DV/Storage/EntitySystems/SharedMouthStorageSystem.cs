@@ -8,10 +8,10 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Shared._DV.Storage.Components;
 using Content.Shared.Actions;
 using Content.Shared.CombatMode;
 using Content.Shared.Damage;
-using Content.Shared._DV.Storage.Components;
 using Content.Shared.Examine;
 using Content.Shared.IdentityManagement;
 using Content.Shared.Standing;
@@ -24,9 +24,9 @@ namespace Content.Shared._DV.Storage.EntitySystems;
 
 public abstract class SharedMouthStorageSystem : EntitySystem
 {
-    [Dependency] private readonly DumpableSystem _dumpableSystem = default!;
-    [Dependency] private readonly SharedContainerSystem _containerSystem = default!;
     [Dependency] private readonly SharedActionsSystem _actionsSystem = default!;
+    [Dependency] private readonly SharedContainerSystem _containerSystem = default!;
+    [Dependency] private readonly DumpableSystem _dumpableSystem = default!;
 
     public override void Initialize()
     {

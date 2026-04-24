@@ -77,32 +77,31 @@
 
 using System.Linq;
 using Content.Shared.Administration.Logs;
-using Content.Shared.UserInterface;
 using Content.Shared.Database;
 using Content.Shared.Examine;
 using Content.Shared.Interaction;
 using Content.Shared.Popups;
 using Content.Shared.Tag;
-using Robust.Shared.Player;
+using Content.Shared.UserInterface;
 using Robust.Shared.Audio.Systems;
-using static Content.Shared.Paper.PaperComponent;
+using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
+using static Content.Shared.Paper.PaperComponent;
 
 namespace Content.Shared.Paper;
 
 public sealed class PaperSystem : EntitySystem
 {
+    private static readonly ProtoId<TagPrototype> WriteIgnoreStampsTag = "WriteIgnoreStamps";
+    private static readonly ProtoId<TagPrototype> WriteTag = "Write";
     [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedInteractionSystem _interaction = default!;
+    [Dependency] private readonly MetaDataSystem _metaSystem = default!;
     [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
     [Dependency] private readonly TagSystem _tagSystem = default!;
     [Dependency] private readonly SharedUserInterfaceSystem _uiSystem = default!;
-    [Dependency] private readonly MetaDataSystem _metaSystem = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-
-    private static readonly ProtoId<TagPrototype> WriteIgnoreStampsTag = "WriteIgnoreStamps";
-    private static readonly ProtoId<TagPrototype> WriteTag = "Write";
 
     public override void Initialize()
     {
@@ -121,9 +120,7 @@ public sealed class PaperSystem : EntitySystem
     private void OnMapInit(Entity<PaperComponent> entity, ref MapInitEvent args)
     {
         if (!string.IsNullOrEmpty(entity.Comp.Content))
-        {
             SetContent(entity, Loc.GetString(entity.Comp.Content));
-        }
     }
 
     private void OnInit(Entity<PaperComponent> entity, ref ComponentInit args)
@@ -216,23 +213,28 @@ public sealed class PaperSystem : EntitySystem
                 _uiSystem.OpenUi(entity.Owner, PaperUiKey.Key, args.User);
                 UpdateUserInterface(entity);
             }
+
             args.Handled = true;
             return;
         }
 
         // If a stamp, attempt to stamp paper
-        if (TryComp<StampComponent>(args.Used, out var stampComp) && TryStamp(entity, GetStampInfo(stampComp), stampComp.StampState))
+        if (TryComp<StampComponent>(args.Used, out var stampComp) &&
+            TryStamp(entity, GetStampInfo(stampComp), stampComp.StampState))
         {
             // successfully stamped, play popup
             var stampPaperOtherMessage = Loc.GetString("paper-component-action-stamp-paper-other",
-                    ("user", args.User),
-                    ("target", args.Target),
-                    ("stamp", args.Used));
+                ("user", args.User),
+                ("target", args.Target),
+                ("stamp", args.Used));
 
-            _popupSystem.PopupEntity(stampPaperOtherMessage, args.User, Filter.PvsExcept(args.User, entityManager: EntityManager), true);
+            _popupSystem.PopupEntity(stampPaperOtherMessage,
+                args.User,
+                Filter.PvsExcept(args.User, entityManager: EntityManager),
+                true);
             var stampPaperSelfMessage = Loc.GetString("paper-component-action-stamp-paper-self",
-                    ("target", args.Target),
-                    ("stamp", args.Used));
+                ("target", args.Target),
+                ("stamp", args.Used));
             _popupSystem.PopupClient(stampPaperSelfMessage, args.User, args.User);
 
             _audio.PlayPredicted(stampComp.Sound, entity, args.User);
@@ -241,15 +243,13 @@ public sealed class PaperSystem : EntitySystem
         }
     }
 
-    private static StampDisplayInfo GetStampInfo(StampComponent stamp)
-    {
-        return new StampDisplayInfo
+    private static StampDisplayInfo GetStampInfo(StampComponent stamp) =>
+        new()
         {
             StampedName = stamp.StampedName,
             StampedColor = stamp.StampedColor, // Goob stamp
-            StampLargeIcon = stamp.StampLargeIcon // goob Stamp
+            StampLargeIcon = stamp.StampLargeIcon, // goob Stamp
         };
-    }
 
     private void OnInputTextMessage(Entity<PaperComponent> entity, ref PaperInputTextMessage args)
     {
@@ -281,13 +281,11 @@ public sealed class PaperSystem : EntitySystem
         UpdateUserInterface(entity);
     }
 
-    private void OnPaperWrite(Entity<ActivateOnPaperOpenedComponent> entity, ref PaperWriteEvent args)
-    {
+    private void OnPaperWrite(Entity<ActivateOnPaperOpenedComponent> entity, ref PaperWriteEvent args) =>
         _interaction.UseInHandInteraction(args.User, entity);
-    }
 
     /// <summary>
-    ///     Accepts the name and state to be stamped onto the paper, returns true if successful.
+    /// Accepts the name and state to be stamped onto the paper, returns true if successful.
     /// </summary>
     public bool TryStamp(Entity<PaperComponent> entity, StampDisplayInfo stampInfo, string spriteStampState)
     {
@@ -303,11 +301,12 @@ public sealed class PaperSystem : EntitySystem
                 _appearance.SetData(entity, PaperVisuals.Stamp, entity.Comp.StampState, appearance);
             }
         }
+
         return true;
     }
 
     /// <summary>
-    ///     Copy any stamp information from one piece of paper to another.
+    /// Copy any stamp information from one piece of paper to another.
     /// </summary>
     public void CopyStamps(Entity<PaperComponent?> source, Entity<PaperComponent?> target)
     {
@@ -348,10 +347,9 @@ public sealed class PaperSystem : EntitySystem
         _appearance.SetData(entity, PaperVisuals.Status, status, appearance);
     }
 
-    public void UpdateUserInterface(Entity<PaperComponent> entity)
-    {
-        _uiSystem.SetUiState(entity.Owner, PaperUiKey.Key, new PaperBoundUserInterfaceState(entity.Comp.Content, entity.Comp.StampedBy, entity.Comp.Mode));
-    }
+    public void UpdateUserInterface(Entity<PaperComponent> entity) => _uiSystem.SetUiState(entity.Owner,
+        PaperUiKey.Key,
+        new PaperBoundUserInterfaceState(entity.Comp.Content, entity.Comp.StampedBy, entity.Comp.Mode));
 }
 
 /// <summary>

@@ -42,7 +42,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using System.Linq;
 using Content.Goobstation.Common.Weapons.NoWieldNeeded;
 using Content.Shared.Examine;
 using Content.Shared.Hands;
@@ -54,6 +53,7 @@ using Content.Shared.Inventory;
 using Content.Shared.Inventory.Events;
 using Content.Shared.Inventory.VirtualItem;
 using Content.Shared.Item;
+using Content.Shared.Item.ItemToggle;
 using Content.Shared.Movement.Components;
 using Content.Shared.Movement.Systems;
 using Content.Shared.Popups;
@@ -69,29 +69,30 @@ using Content.Shared.Wieldable.Components;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Collections;
 using Robust.Shared.Timing;
-using Content.Shared.Item.ItemToggle;
 
 namespace Content.Shared.Wieldable;
 
 public abstract class SharedWieldableSystem : EntitySystem
 {
-    [Dependency] private readonly MovementSpeedModifierSystem _movementSpeedModifier = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly UseDelaySystem _delay = default!;
     [Dependency] private readonly SharedGunSystem _gun = default!;
     [Dependency] private readonly SharedHandsSystem _hands = default!;
     [Dependency] private readonly SharedItemSystem _item = default!;
+    [Dependency] private readonly MovementSpeedModifierSystem _movementSpeedModifier = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SharedVirtualItemSystem _virtualItem = default!;
-    [Dependency] private readonly UseDelaySystem _delay = default!;
 
     public override void Initialize()
     {
         base.Initialize();
 
         SubscribeLocalEvent<WieldableComponent, UseInHandEvent>(OnUseInHand,
-            before: [typeof(SharedGunSystem), typeof(BatteryWeaponFireModesSystem), typeof(ItemToggleSystem)]); // Goob - before item toogle for hardlight bow
+        [
+            typeof(SharedGunSystem), typeof(BatteryWeaponFireModesSystem), typeof(ItemToggleSystem),
+        ]); // Goob - before item toogle for hardlight bow
         SubscribeLocalEvent<WieldableComponent, ItemUnwieldedEvent>(OnItemUnwielded);
         SubscribeLocalEvent<WieldableComponent, GotUnequippedHandEvent>(OnItemLeaveHand);
         SubscribeLocalEvent<WieldableComponent, VirtualItemDeletedEvent>(OnVirtualItemDeleted);
@@ -113,7 +114,8 @@ public abstract class SharedWieldableSystem : EntitySystem
         SubscribeLocalEvent<GunWieldBonusComponent, ExaminedEvent>(OnExamine);
         SubscribeLocalEvent<SpeedModifiedOnWieldComponent, ItemWieldedEvent>(OnSpeedModifierWielded);
         SubscribeLocalEvent<SpeedModifiedOnWieldComponent, ItemUnwieldedEvent>(OnSpeedModifierUnwielded);
-        SubscribeLocalEvent<SpeedModifiedOnWieldComponent, HeldRelayedEvent<RefreshMovementSpeedModifiersEvent>>(OnRefreshSpeedWielded);
+        SubscribeLocalEvent<SpeedModifiedOnWieldComponent, HeldRelayedEvent<RefreshMovementSpeedModifiersEvent>>(
+            OnRefreshSpeedWielded);
 
         SubscribeLocalEvent<IncreaseDamageOnWieldComponent, GetMeleeDamageEvent>(OnGetMeleeDamage);
 
@@ -136,7 +138,7 @@ public abstract class SharedWieldableSystem : EntitySystem
         if (TryComp<WieldableComponent>(uid, out var wieldable) &&
             !wieldable.Wielded &&
             !HasComp<NoWieldNeededComponent>(args.User) // Goobstation - Yowies
-            )
+           )
         {
             args.Cancel();
 
@@ -152,15 +154,11 @@ public abstract class SharedWieldableSystem : EntitySystem
         }
     }
 
-    private void OnGunUnwielded(EntityUid uid, GunWieldBonusComponent component, ItemUnwieldedEvent args)
-    {
+    private void OnGunUnwielded(EntityUid uid, GunWieldBonusComponent component, ItemUnwieldedEvent args) =>
         _gun.RefreshModifiers(uid, args.User);
-    }
 
-    private void OnGunWielded(EntityUid uid, GunWieldBonusComponent component, ref ItemWieldedEvent args)
-    {
+    private void OnGunWielded(EntityUid uid, GunWieldBonusComponent component, ref ItemWieldedEvent args) =>
         _gun.RefreshModifiers(uid);
-    }
 
     private void OnDeselectWieldable(EntityUid uid, WieldableComponent component, HandDeselectedEvent args)
     {
@@ -173,8 +171,8 @@ public abstract class SharedWieldableSystem : EntitySystem
     private void OnGunRefreshModifiers(Entity<GunWieldBonusComponent> bonus, ref GunRefreshModifiersEvent args)
     {
         if (TryComp(bonus, out WieldableComponent? wield) &&
-            (wield.Wielded)
-            )
+            wield.Wielded
+           )
         {
             args.MinAngle += bonus.Comp.MinAngle;
             args.MaxAngle += bonus.Comp.MaxAngle;
@@ -183,22 +181,20 @@ public abstract class SharedWieldableSystem : EntitySystem
         }
     }
 
-    private void OnSpeedModifierWielded(EntityUid uid, SpeedModifiedOnWieldComponent component, ItemWieldedEvent args)
-    {
+    private void
+        OnSpeedModifierWielded(EntityUid uid, SpeedModifiedOnWieldComponent component, ItemWieldedEvent args) =>
         _movementSpeedModifier.RefreshMovementSpeedModifiers(args.User);
-    }
 
-    private void OnSpeedModifierUnwielded(EntityUid uid, SpeedModifiedOnWieldComponent component, ItemUnwieldedEvent args)
-    {
-        _movementSpeedModifier.RefreshMovementSpeedModifiers(args.User);
-    }
+    private void OnSpeedModifierUnwielded(EntityUid uid,
+        SpeedModifiedOnWieldComponent component,
+        ItemUnwieldedEvent args) => _movementSpeedModifier.RefreshMovementSpeedModifiers(args.User);
 
-    private void OnRefreshSpeedWielded(EntityUid uid, SpeedModifiedOnWieldComponent component, ref HeldRelayedEvent<RefreshMovementSpeedModifiersEvent> args)
+    private void OnRefreshSpeedWielded(EntityUid uid,
+        SpeedModifiedOnWieldComponent component,
+        ref HeldRelayedEvent<RefreshMovementSpeedModifiersEvent> args)
     {
         if (TryComp<WieldableComponent>(uid, out var wield) && wield.Wielded)
-        {
             args.Args.ModifySpeed(component.WalkModifier, component.SprintModifier);
-        }
     }
 
     private void OnExamineRequires(Entity<GunRequiresWieldComponent> entity, ref ExaminedEvent args)
@@ -230,10 +226,12 @@ public abstract class SharedWieldableSystem : EntitySystem
         // TODO VERBS ICON
         InteractionVerb verb = new()
         {
-            Text = component.Wielded ? Loc.GetString("wieldable-verb-text-unwield") : Loc.GetString("wieldable-verb-text-wield"),
+            Text = component.Wielded
+                ? Loc.GetString("wieldable-verb-text-unwield")
+                : Loc.GetString("wieldable-verb-text-wield"),
             Act = component.Wielded
                 ? () => TryUnwield(uid, component, args.User)
-                : () => TryWield(uid, component, args.User)
+                : () => TryWield(uid, component, args.User),
         };
 
         args.Verbs.Add(verb);
@@ -258,23 +256,27 @@ public abstract class SharedWieldableSystem : EntitySystem
         if (HasComp<UseDelayComponent>(uid) && !component.UseDelayOnWield)
             args.ApplyDelay = false;
     }
+
     private void OnBlockerEquipped(Entity<WieldingBlockerComponent> ent, ref GotEquippedEvent args)
     {
         if (ent.Comp.BlockEquipped)
-            UnwieldAll(args.Equipee, force: true);
+            UnwieldAll(args.Equipee, true);
     }
 
     private void OnBlockerEquippedHand(Entity<WieldingBlockerComponent> ent, ref GotEquippedHandEvent args)
     {
         if (ent.Comp.BlockInHand)
-            UnwieldAll(args.User, force: true);
+            UnwieldAll(args.User, true);
     }
 
-    private void OnBlockerAttempt(Entity<WieldingBlockerComponent> ent, ref InventoryRelayedEvent<WieldAttemptEvent> args)
+    private void OnBlockerAttempt(Entity<WieldingBlockerComponent> ent,
+        ref InventoryRelayedEvent<WieldAttemptEvent> args)
     {
         if (ent.Comp.BlockEquipped)
         {
-            args.Args.Message = Loc.GetString("wieldable-component-blocked-wield", ("blocker", ent.Owner), ("item", args.Args.Wielded));
+            args.Args.Message = Loc.GetString("wieldable-component-blocked-wield",
+                ("blocker", ent.Owner),
+                ("item", args.Args.Wielded));
             args.Args.Cancelled = true;
         }
     }
@@ -283,17 +285,21 @@ public abstract class SharedWieldableSystem : EntitySystem
     {
         if (ent.Comp.BlockInHand)
         {
-            args.Args.Message = Loc.GetString("wieldable-component-blocked-wield", ("blocker", ent.Owner), ("item", args.Args.Wielded));
+            args.Args.Message = Loc.GetString("wieldable-component-blocked-wield",
+                ("blocker", ent.Owner),
+                ("item", args.Args.Wielded));
             args.Args.Cancelled = true;
         }
     }
 
-    private void OnBlockerAttempt(Entity<WieldingBlockerComponent> ent, ref WieldAttemptEvent args)
-    {
+    private void OnBlockerAttempt(Entity<WieldingBlockerComponent> ent, ref WieldAttemptEvent args) =>
         args.Cancelled = true;
-    }
 
-    public bool CanWield(EntityUid uid, WieldableComponent component, EntityUid user, bool quiet = false, bool checkHolding = true) // Goob edit
+    public bool CanWield(EntityUid uid,
+        WieldableComponent component,
+        EntityUid user,
+        bool quiet = false,
+        bool checkHolding = true) // Goob edit
     {
         // Do they have enough hands free?
         if (!TryComp<HandsComponent>(user, out var hands))
@@ -316,9 +322,11 @@ public abstract class SharedWieldableSystem : EntitySystem
             if (!quiet)
             {
                 var message = Loc.GetString("wieldable-component-not-enough-free-hands",
-                    ("number", component.FreeHandsRequired), ("item", uid));
+                    ("number", component.FreeHandsRequired),
+                    ("item", uid));
                 _popup.PopupClient(message, user, user);
             }
+
             return false;
         }
 
@@ -327,10 +335,13 @@ public abstract class SharedWieldableSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Attempts to wield an item, starting a UseDelay after.
+    /// Attempts to wield an item, starting a UseDelay after.
     /// </summary>
     /// <returns>True if the attempt wasn't blocked.</returns>
-    public bool TryWield(EntityUid used, WieldableComponent component, EntityUid user, bool showMessage = true) // Goob edit
+    public bool TryWield(EntityUid used,
+        WieldableComponent component,
+        EntityUid user,
+        bool showMessage = true) // Goob edit
     {
         if (!CanWield(used, component, user))
             return false;
@@ -381,7 +392,9 @@ public abstract class SharedWieldableSystem : EntitySystem
         }
 
         var selfMessage = Loc.GetString("wieldable-component-successful-wield", ("item", used));
-        var othersMessage = Loc.GetString("wieldable-component-successful-wield-other", ("user", Identity.Entity(user, EntityManager)), ("item", used));
+        var othersMessage = Loc.GetString("wieldable-component-successful-wield-other",
+            ("user", Identity.Entity(user, EntityManager)),
+            ("item", used));
         if (showMessage) // Goob edit
             _popup.PopupPredicted(selfMessage, othersMessage, user, user);
 
@@ -394,7 +407,7 @@ public abstract class SharedWieldableSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Attempts to unwield an item, with no use delay.
+    /// Attempts to unwield an item, with no use delay.
     /// </summary>
     /// <returns>True if the attempt wasn't blocked.</returns>
     public bool TryUnwield(EntityUid used, WieldableComponent component, EntityUid user, bool force = false)
@@ -458,7 +471,9 @@ public abstract class SharedWieldableSystem : EntitySystem
                 _audio.PlayPredicted(component.UnwieldSound, uid, user);
 
             var selfMessage = Loc.GetString("wieldable-component-failed-wield", ("item", uid));
-            var othersMessage = Loc.GetString("wieldable-component-failed-wield-other", ("user", Identity.Entity(args.User, EntityManager)), ("item", uid));
+            var othersMessage = Loc.GetString("wieldable-component-failed-wield-other",
+                ("user", Identity.Entity(args.User, EntityManager)),
+                ("item", uid));
             _popup.PopupPredicted(selfMessage, othersMessage, user, user);
         }
     }
@@ -466,13 +481,13 @@ public abstract class SharedWieldableSystem : EntitySystem
     private void OnItemLeaveHand(EntityUid uid, WieldableComponent component, GotUnequippedHandEvent args)
     {
         if (uid == args.Unequipped)
-            TryUnwield(uid, component, args.User, force: true);
+            TryUnwield(uid, component, args.User, true);
     }
 
     private void OnVirtualItemDeleted(EntityUid uid, WieldableComponent component, VirtualItemDeletedEvent args)
     {
         if (args.BlockingEntity == uid)
-            TryUnwield(uid, component, args.User, force: true);
+            TryUnwield(uid, component, args.User, true);
     }
 
     private void OnGetMeleeDamage(EntityUid uid, IncreaseDamageOnWieldComponent component, ref GetMeleeDamageEvent args)

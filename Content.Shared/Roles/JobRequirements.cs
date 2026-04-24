@@ -118,7 +118,7 @@ public static class JobRequirements
 /// Abstract class for playtime and other requirements for role gates.
 /// </summary>
 [ImplicitDataDefinitionForInheritors]
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public abstract partial class JobRequirement
 {
     [DataField]

@@ -9,10 +9,10 @@ namespace Content.Shared._Shitcode.Heretic.Systems;
 public sealed class VelocityModifierContactsSystem : EntitySystem
 {
     [Dependency] private readonly SharedPhysicsSystem _physics = default!;
-    [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
+    private readonly HashSet<EntityUid> _toRemove = new();
 
     private readonly HashSet<EntityUid> _toUpdate = new();
-    private readonly HashSet<EntityUid> _toRemove = new();
+    [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
 
     public override void Initialize()
     {
@@ -132,11 +132,10 @@ public sealed class VelocityModifierContactsSystem : EntitySystem
             modified.OriginalVelocity = physics.LinearVelocity;
             Dirty(uid, modified);
         }
+
         _toUpdate.Add(uid);
     }
 
-    private bool CheckWhitelist(EntityUid uid, VelocityModifierContactsComponent slowContactsComponent)
-    {
-        return _whitelistSystem.CheckBoth(uid, slowContactsComponent.Blacklist, slowContactsComponent.Whitelist);
-    }
+    private bool CheckWhitelist(EntityUid uid, VelocityModifierContactsComponent slowContactsComponent) =>
+        _whitelistSystem.CheckBoth(uid, slowContactsComponent.Blacklist, slowContactsComponent.Whitelist);
 }

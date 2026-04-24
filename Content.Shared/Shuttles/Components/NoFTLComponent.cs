@@ -11,8 +11,7 @@ namespace Content.Shared.Shuttles.Components;
 /// <summary>
 /// Prevents the attached entity from taking FTL.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class NoFTLComponent : Component
 {
-
 }

@@ -6,7 +6,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.SecApartment;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum SquadIconNum : byte
 {
     Alpha,
@@ -32,12 +32,12 @@ public enum SquadIconNum : byte
     Fi,
     Hi,
     Psi,
-    Omega
+    Omega,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum SquadStatus : byte
 {
     Active,
-    OnBreak
+    OnBreak,
 }

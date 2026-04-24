@@ -27,36 +27,36 @@ using Robust.Shared.GameStates;
 
 namespace Content.Shared._Lavaland.Damage.Components;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class DamageSquareComponent : Component
 {
-    [DataField(required: true), AutoNetworkedField]
+    [DataField(required: true)] [AutoNetworkedField]
     public DamageSpecifier Damage;
 
-    [DataField, AutoNetworkedField]
-    public EntityWhitelist? DamageWhitelist;
-
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public EntityWhitelist? DamageBlacklist;
-
-    [DataField, AutoNetworkedField]
-    public SoundPathSpecifier? Sound;
 
     /// <summary>
     /// After how many seconds we should deal the damage to all entities above.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public float DamageDelay = 0.2f;
 
     /// <summary>
     /// Time when this square is going to deal damage. Used for prediction to work.
     /// </summary>
-    [ViewVariables, AutoNetworkedField]
+    [ViewVariables] [AutoNetworkedField]
     public TimeSpan DamageTime = TimeSpan.MaxValue;
+
+    [DataField] [AutoNetworkedField]
+    public EntityWhitelist? DamageWhitelist;
 
     /// <summary>
     /// For how many seconds we add immunity to the entity we hit.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public float ImmunityTime = 0.5f;
+
+    [DataField] [AutoNetworkedField]
+    public SoundPathSpecifier? Sound;
 }

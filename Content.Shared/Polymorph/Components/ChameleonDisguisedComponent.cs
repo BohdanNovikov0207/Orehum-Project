@@ -13,14 +13,14 @@ namespace Content.Shared.Polymorph.Components;
 /// Added to a player when they use a chameleon projector.
 /// Handles making them invisible and revealing when damaged enough or switching hands.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(SharedChameleonProjectorSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(SharedChameleonProjectorSystem))]
 [AutoGenerateComponentState]
 public sealed partial class ChameleonDisguisedComponent : Component
 {
     /// <summary>
     /// The disguise entity parented to the player.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public EntityUid Disguise;
 
     /// <summary>

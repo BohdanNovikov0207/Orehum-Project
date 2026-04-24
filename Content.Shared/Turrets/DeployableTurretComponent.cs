@@ -9,27 +9,21 @@ namespace Content.Shared.Turrets;
 /// <summary>
 /// Attached to turrets that can be toggled between an inactive and active state
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState(fieldDeltas: true), AutoGenerateComponentPause]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState(fieldDeltas: true)] [AutoGenerateComponentPause]
 [Access(typeof(SharedDeployableTurretSystem))]
 public sealed partial class DeployableTurretComponent : Component
 {
     /// <summary>
-    /// Whether the turret is toggled 'on' or 'off'
+    /// The current state of the turret. Used to inform the device network.
     /// </summary>
-    [DataField, AutoNetworkedField]
-    public bool Enabled = false;
-
-    /// <summary>
-    /// The current state of the turret. Used to inform the device network. 
-    /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public DeployableTurretState CurrentState = DeployableTurretState.Retracted;
 
     /// <summary>
-    /// The visual state of the turret. Used on the client-side. 
+    /// When deployed, the following damage modifier set will be applied to the turret.
     /// </summary>
     [DataField]
-    public DeployableTurretState VisualState = DeployableTurretState.Retracted;
+    public ProtoId<DamageModifierSetPrototype>? DeployedDamageModifierSetId;
 
     /// <summary>
     /// The physics fixture that will have its collisions disabled when the turret is retracted.
@@ -38,16 +32,22 @@ public sealed partial class DeployableTurretComponent : Component
     public string? DeployedFixture = "turret";
 
     /// <summary>
+    /// Whether the turret is toggled 'on' or 'off'
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public bool Enabled = false;
+
+    /// <summary>
     /// When retracted, the following damage modifier set will be applied to the turret.
     /// </summary>
     [DataField]
     public ProtoId<DamageModifierSetPrototype>? RetractedDamageModifierSetId;
 
     /// <summary>
-    /// When deployed, the following damage modifier set will be applied to the turret.
+    /// The visual state of the turret. Used on the client-side.
     /// </summary>
     [DataField]
-    public ProtoId<DamageModifierSetPrototype>? DeployedDamageModifierSetId;
+    public DeployableTurretState VisualState = DeployableTurretState.Retracted;
 
     #region: Sound data
 
@@ -88,7 +88,7 @@ public sealed partial class DeployableTurretComponent : Component
     /// <summary>
     /// The time that the current animation should complete (in seconds)
     /// </summary>
-    [DataField, AutoPausedField]
+    [DataField] [AutoPausedField]
     public TimeSpan AnimationCompletionTime = TimeSpan.Zero;
 
     /// <summary>
@@ -140,7 +140,7 @@ public sealed partial class DeployableTurretComponent : Component
     #endregion
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum DeployableTurretVisuals : byte
 {
     Turret,
@@ -148,14 +148,14 @@ public enum DeployableTurretVisuals : byte
     Broken,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum DeployableTurretState : byte
 {
     Retracted = 0,
-    Deployed = (1 << 0),
-    Retracting = (1 << 1),
+    Deployed = 1 << 0,
+    Retracting = 1 << 1,
     Deploying = (1 << 1) | Deployed,
     Firing = (1 << 2) | Deployed,
-    Disabled = (1 << 3),
-    Broken = (1 << 4),
+    Disabled = 1 << 3,
+    Broken = 1 << 4,
 }

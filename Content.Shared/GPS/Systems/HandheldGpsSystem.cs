@@ -1,5 +1,5 @@
-using Content.Shared.GPS.Components;
 using Content.Shared.Examine;
+using Content.Shared.GPS.Components;
 using Robust.Shared.Map;
 
 namespace Content.Shared.GPS.Systems;
@@ -8,7 +8,7 @@ public sealed class HandheldGpsSystem : EntitySystem
 {
     [Dependency] private readonly SharedTransformSystem _transform = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();

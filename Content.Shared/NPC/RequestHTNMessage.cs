@@ -8,7 +8,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.NPC;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class RequestHTNMessage : EntityEventArgs
 {
     public bool Enabled;

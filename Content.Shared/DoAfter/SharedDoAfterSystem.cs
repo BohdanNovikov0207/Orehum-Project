@@ -106,8 +106,8 @@
 
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
-using Content.Goobstation.Common.DoAfter; // Goobstation
-using Content.Shared._Shitmed.DoAfter; // Shitmed
+using Content.Goobstation.Common.DoAfter;
+using Content.Shared._Shitmed.DoAfter;
 using Content.Shared.ActionBlocker;
 using Content.Shared.Damage;
 using Content.Shared.Hands.Components;
@@ -117,22 +117,23 @@ using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
 using Robust.Shared.Timing;
 using Robust.Shared.Utility;
+// Goobstation
+// Shitmed
 
 namespace Content.Shared.DoAfter;
 
 public abstract partial class SharedDoAfterSystem : EntitySystem
 {
-    [Dependency] protected readonly IGameTiming GameTiming = default!;
-    [Dependency] private readonly ActionBlockerSystem _actionBlocker = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly TagSystem _tag = default!;
-
     /// <summary>
-    ///     We'll use an excess time so stuff like finishing effects can show.
+    /// We'll use an excess time so stuff like finishing effects can show.
     /// </summary>
     private static readonly TimeSpan ExcessTime = TimeSpan.FromSeconds(0.5f);
 
     private static readonly ProtoId<TagPrototype> InstantDoAftersTag = "InstantDoAfters";
+    [Dependency] private readonly ActionBlockerSystem _actionBlocker = default!;
+    [Dependency] private readonly TagSystem _tag = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
+    [Dependency] protected readonly IGameTiming GameTiming = default!;
 
     public override void Initialize()
     {
@@ -189,9 +190,9 @@ public abstract partial class SharedDoAfterSystem : EntitySystem
         ev.DoAfter = doAfter;
 
         if (Exists(doAfter.Args.EventTarget))
-            RaiseLocalEvent(doAfter.Args.EventTarget.Value, (object)ev, doAfter.Args.Broadcast);
+            RaiseLocalEvent(doAfter.Args.EventTarget.Value, (object) ev, doAfter.Args.Broadcast);
         else if (doAfter.Args.Broadcast)
-            RaiseLocalEvent((object)ev);
+            RaiseLocalEvent((object) ev);
 
         // <Goobstation>
         if (component.RaiseEndedEvent
@@ -206,10 +207,8 @@ public abstract partial class SharedDoAfterSystem : EntitySystem
             tcs.SetResult(doAfter.Cancelled ? DoAfterStatus.Cancelled : DoAfterStatus.Finished);
     }
 
-    private void OnDoAfterGetState(EntityUid uid, DoAfterComponent comp, ref ComponentGetState args)
-    {
+    private void OnDoAfterGetState(EntityUid uid, DoAfterComponent comp, ref ComponentGetState args) =>
         args.State = new DoAfterComponentState(EntityManager, comp);
-    }
 
     private void OnDoAfterHandleState(EntityUid uid, DoAfterComponent comp, ref ComponentHandleState args)
     {
@@ -235,7 +234,9 @@ public abstract partial class SharedDoAfterSystem : EntitySystem
             doAfterArgs.Used = EnsureEntity<DoAfterComponent>(doAfterArgs.NetUsed, uid);
             doAfterArgs.User = EnsureEntity<DoAfterComponent>(doAfterArgs.NetUser, uid);
             doAfterArgs.EventTarget = EnsureEntity<DoAfterComponent>(doAfterArgs.NetEventTarget, uid);
-            doAfterArgs.ShowTo = EnsureEntity<DoAfterComponent>(doAfterArgs.NetShowTo, uid); // Goobstation - Show doAfter popup to another entity
+            doAfterArgs.ShowTo =
+                EnsureEntity<DoAfterComponent>(doAfterArgs.NetShowTo,
+                    uid); // Goobstation - Show doAfter popup to another entity
         }
 
         comp.NextId = state.NextId;
@@ -248,9 +249,10 @@ public abstract partial class SharedDoAfterSystem : EntitySystem
     }
 
     #region Creation
+
     /// <summary>
-    ///     Tasks that are delayed until the specified time has passed
-    ///     These can be potentially cancelled by the user moving or when other things happen.
+    /// Tasks that are delayed until the specified time has passed
+    /// These can be potentially cancelled by the user moving or when other things happen.
     /// </summary>
     // TODO remove this, as well as AwaitedDoAfterEvent and DoAfterComponent.AwaitedDoAfters
     [Obsolete("Use the synchronous version instead.")]
@@ -274,8 +276,8 @@ public abstract partial class SharedDoAfterSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Attempts to start a new DoAfter. Note that even if this function returns true, an interaction may have
-    ///     occured, as starting a duplicate DoAfter may cancel currently running DoAfters.
+    /// Attempts to start a new DoAfter. Note that even if this function returns true, an interaction may have
+    /// occured, as starting a duplicate DoAfter may cancel currently running DoAfters.
     /// </summary>
     /// <param name="args">The DoAfter arguments</param>
     /// <param name="component">The user's DoAfter component</param>
@@ -284,8 +286,8 @@ public abstract partial class SharedDoAfterSystem : EntitySystem
         => TryStartDoAfter(args, out _, component);
 
     /// <summary>
-    ///     Attempts to start a new DoAfter. Note that even if this function returns false, an interaction may have
-    ///     occured, as starting a duplicate DoAfter may cancel currently running DoAfters.
+    /// Attempts to start a new DoAfter. Note that even if this function returns false, an interaction may have
+    /// occured, as starting a duplicate DoAfter may cancel currently running DoAfters.
     /// </summary>
     /// <param name="args">The DoAfter arguments</param>
     /// <param name="id">The Id of the newly started DoAfter</param>
@@ -293,9 +295,12 @@ public abstract partial class SharedDoAfterSystem : EntitySystem
     /// <returns></returns>
     public bool TryStartDoAfter(DoAfterArgs args, [NotNullWhen(true)] out DoAfterId? id, DoAfterComponent? comp = null)
     {
-        DebugTools.Assert(args.Broadcast || Exists(args.EventTarget) || args.Event.GetType() == typeof(AwaitedDoAfterEvent));
+        DebugTools.Assert(args.Broadcast || Exists(args.EventTarget) ||
+                          args.Event.GetType() == typeof(AwaitedDoAfterEvent));
         DebugTools.Assert(args.Event.GetType().HasCustomAttribute<NetSerializableAttribute>()
-            || args.Event.GetType().Namespace is {} ns && ns.StartsWith("Content.IntegrationTests"), // classes defined in tests cannot be marked as serializable.
+                          || args.Event.GetType().Namespace is { } ns &&
+                          ns.StartsWith(
+                              "Content.IntegrationTests"), // classes defined in tests cannot be marked as serializable.
             $"Do after event is not serializable. Event: {args.Event.GetType()}");
 
         if (!Resolve(args.User, ref comp))
@@ -378,7 +383,7 @@ public abstract partial class SharedDoAfterSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Cancel any applicable duplicate DoAfters and return whether or not the new DoAfter should be created.
+    /// Cancel any applicable duplicate DoAfters and return whether or not the new DoAfter should be created.
     /// </summary>
     private bool ProcessDuplicates(DoAfterArgs args, DoAfterComponent component)
     {
@@ -411,25 +416,19 @@ public abstract partial class SharedDoAfterSystem : EntitySystem
         return IsDuplicate(args, otherArgs, otherArgs.DuplicateCondition);
     }
 
-    private bool IsDuplicate(DoAfterArgs args, DoAfterArgs otherArgs, DuplicateConditions conditions )
+    private bool IsDuplicate(DoAfterArgs args, DoAfterArgs otherArgs, DuplicateConditions conditions)
     {
         if ((conditions & DuplicateConditions.SameTarget) != 0
             && args.Target != otherArgs.Target)
-        {
             return false;
-        }
 
         if ((conditions & DuplicateConditions.SameTool) != 0
             && args.Used != otherArgs.Used)
-        {
             return false;
-        }
 
         if ((conditions & DuplicateConditions.SameEvent) != 0
             && !args.Event.IsDuplicate(otherArgs.Event))
-        {
             return false;
-        }
 
         return true;
     }
@@ -437,8 +436,9 @@ public abstract partial class SharedDoAfterSystem : EntitySystem
     #endregion
 
     #region Cancellation
+
     /// <summary>
-    ///     Cancels an active DoAfter.
+    /// Cancels an active DoAfter.
     /// </summary>
     public void Cancel(DoAfterId? id, DoAfterComponent? comp = null)
     {
@@ -447,7 +447,7 @@ public abstract partial class SharedDoAfterSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Cancels an active DoAfter.
+    /// Cancels an active DoAfter.
     /// </summary>
     public void Cancel(EntityUid entity, ushort id, DoAfterComponent? comp = null)
     {
@@ -473,22 +473,23 @@ public abstract partial class SharedDoAfterSystem : EntitySystem
         doAfter.CancelledTime = GameTiming.CurTime;
         RaiseDoAfterEvents(doAfter, component);
     }
+
     #endregion
 
     #region Query
+
     /// <summary>
-    ///     Returns the current status of a DoAfter
+    /// Returns the current status of a DoAfter
     /// </summary>
     public DoAfterStatus GetStatus(DoAfterId? id, DoAfterComponent? comp = null)
     {
         if (id != null)
             return GetStatus(id.Value.Uid, id.Value.Index, comp);
-        else
-            return DoAfterStatus.Invalid;
+        return DoAfterStatus.Invalid;
     }
 
     /// <summary>
-    ///     Returns the current status of a DoAfter
+    /// Returns the current status of a DoAfter
     /// </summary>
     public DoAfterStatus GetStatus(EntityUid entity, ushort id, DoAfterComponent? comp = null)
     {
@@ -518,21 +519,15 @@ public abstract partial class SharedDoAfterSystem : EntitySystem
         return GetStatus(id.Value.Uid, id.Value.Index, comp) == DoAfterStatus.Running;
     }
 
-    public bool IsRunning(EntityUid entity, ushort id, DoAfterComponent? comp = null)
-    {
-        return GetStatus(entity, id, comp) == DoAfterStatus.Running;
-    }
+    public bool IsRunning(EntityUid entity, ushort id, DoAfterComponent? comp = null) =>
+        GetStatus(entity, id, comp) == DoAfterStatus.Running;
 
     // Goobstation start
-    public bool TryGetDoAfter(DoAfterComponent comp, ushort id, [NotNullWhen(true)] out DoAfter? doAfter)
-    {
-        return comp.DoAfters.TryGetValue(id, out doAfter);
-    }
+    public bool TryGetDoAfter(DoAfterComponent comp, ushort id, [NotNullWhen(true)] out DoAfter? doAfter) =>
+        comp.DoAfters.TryGetValue(id, out doAfter);
 
-    public DoAfterArgs GetArgs(DoAfter doAfter)
-    {
-        return doAfter.Args;
-    }
+    public DoAfterArgs GetArgs(DoAfter doAfter) => doAfter.Args;
     // Goobstation end
+
     #endregion
 }

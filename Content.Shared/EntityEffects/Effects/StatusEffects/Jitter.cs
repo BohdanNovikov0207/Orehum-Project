@@ -4,16 +4,15 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Chemistry.Reagent;
 using Content.Shared.Jittering;
 using Robust.Shared.Prototypes;
 
 namespace Content.Shared.EntityEffects.Effects.StatusEffects;
 
 /// <summary>
-///     Adds the jitter status effect to a mob.
-///     This doesn't use generic status effects because it needs to
-///     take in some parameters that JitterSystem needs.
+/// Adds the jitter status effect to a mob.
+/// This doesn't use generic status effects because it needs to
+/// take in some parameters that JitterSystem needs.
 /// </summary>
 public sealed partial class Jitter : EntityEffect
 {
@@ -23,14 +22,14 @@ public sealed partial class Jitter : EntityEffect
     [DataField]
     public float Frequency = 4.0f;
 
-    [DataField]
-    public float Time = 2.0f;
-
     /// <remarks>
-    ///     true - refresh jitter time,  false - accumulate jitter time
+    /// true - refresh jitter time,  false - accumulate jitter time
     /// </remarks>
     [DataField]
     public bool Refresh = true;
+
+    [DataField]
+    public float Time = 2.0f;
 
     public override void Effect(EntityEffectBaseArgs args)
     {

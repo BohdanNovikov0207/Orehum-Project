@@ -12,10 +12,10 @@ namespace Content.Shared._Shitcode.Heretic.Systems;
 
 public sealed class CosmosComboSystem : EntitySystem
 {
-    [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
 
     [Dependency] private readonly DamageableSystem _damageable = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly INetManager _net = default!;
 
     public override void Initialize()
     {

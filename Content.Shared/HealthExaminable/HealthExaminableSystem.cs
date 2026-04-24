@@ -16,13 +16,14 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Goobstation.Common.Examine; // Goobstation Change
+using Content.Goobstation.Common.Examine;
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Damage;
 using Content.Shared.Examine;
-using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.IdentityManagement;
 using Content.Shared.Verbs;
 using Robust.Shared.Utility;
+// Goobstation Change
 
 namespace Content.Shared.HealthExaminable;
 
@@ -30,13 +31,9 @@ public sealed class HealthExaminableSystem : EntitySystem
 {
     [Dependency] private readonly ExamineSystemShared _examineSystem = default!;
 
-    public override void Initialize()
-    {
-        base.Initialize();
+    public override void Initialize() => base.Initialize();
 
-        //SubscribeLocalEvent<HealthExaminableComponent, GetVerbsEvent<ExamineVerb>>(OnGetExamineVerbs);
-    }
-
+    //SubscribeLocalEvent<HealthExaminableComponent, GetVerbsEvent<ExamineVerb>>(OnGetExamineVerbs);
     private void OnGetExamineVerbs(EntityUid uid, HealthExaminableComponent component, GetVerbsEvent<ExamineVerb> args)
     {
         if (!TryComp<DamageableComponent>(uid, out var damage))
@@ -44,7 +41,7 @@ public sealed class HealthExaminableSystem : EntitySystem
 
         var detailsRange = _examineSystem.IsInDetailsRange(args.User, uid);
 
-        var verb = new ExamineVerb()
+        var verb = new ExamineVerb
         {
             Act = () =>
             {
@@ -57,7 +54,7 @@ public sealed class HealthExaminableSystem : EntitySystem
             Category = VerbCategory.Examine,
             Disabled = !detailsRange,
             Message = detailsRange ? null : Loc.GetString("health-examinable-verb-disabled"),
-            Icon = new SpriteSpecifier.Texture(new ("/Textures/Interface/VerbIcons/rejuvenate.svg.192dpi.png"))
+            Icon = new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/VerbIcons/rejuvenate.svg.192dpi.png")),
         };
 
         args.Verbs.Add(verb);
@@ -76,13 +73,14 @@ public sealed class HealthExaminableSystem : EntitySystem
             if (dmg == FixedPoint2.Zero)
                 continue;
 
-            FixedPoint2 closest = FixedPoint2.Zero;
+            var closest = FixedPoint2.Zero;
 
-            string chosenLocStr = string.Empty;
+            var chosenLocStr = string.Empty;
             foreach (var threshold in component.Thresholds)
             {
                 var str = $"health-examinable-{component.LocPrefix}-{type}-{threshold}";
-                var tempLocStr = Loc.GetString($"health-examinable-{component.LocPrefix}-{type}-{threshold}", ("target", Identity.Entity(uid, EntityManager)));
+                var tempLocStr = Loc.GetString($"health-examinable-{component.LocPrefix}-{type}-{threshold}",
+                    ("target", Identity.Entity(uid, EntityManager)));
 
                 // i.e., this string doesn't exist, because theres nothing for that threshold
                 if (tempLocStr == str)
@@ -99,20 +97,14 @@ public sealed class HealthExaminableSystem : EntitySystem
                 continue;
 
             if (!first)
-            {
                 msg.PushNewline();
-            }
             else
-            {
                 first = false;
-            }
             msg.AddMarkupOrThrow(chosenLocStr);
         }
 
         if (msg.IsEmpty)
-        {
             msg.AddMarkupOrThrow(Loc.GetString($"health-examinable-{component.LocPrefix}-none"));
-        }
 
         // Anything else want to add on to this?
         RaiseLocalEvent(uid, new HealthBeingExaminedEvent(msg), true);
@@ -122,9 +114,9 @@ public sealed class HealthExaminableSystem : EntitySystem
 }
 
 /// <summary>
-///     A class raised on an entity whose health is being examined
-///     in order to add special text that is not handled by the
-///     damage thresholds.
+/// A class raised on an entity whose health is being examined
+/// in order to add special text that is not handled by the
+/// damage thresholds.
 /// </summary>
 public sealed class HealthBeingExaminedEvent
 {

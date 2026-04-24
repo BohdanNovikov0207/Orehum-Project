@@ -11,62 +11,60 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Fax;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class AdminFaxEuiState : EuiStateBase
 {
-    public List<AdminFaxEntry> Entries { get; }
-
     public AdminFaxEuiState(List<AdminFaxEntry> entries)
     {
         Entries = entries;
     }
+
+    public List<AdminFaxEntry> Entries { get; }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class AdminFaxEntry
 {
-    public NetEntity Uid { get; }
-    public string Name { get; }
-    public string Address { get; }
-
     public AdminFaxEntry(NetEntity uid, string name, string address)
     {
         Uid = uid;
         Name = name;
         Address = address;
     }
+
+    public NetEntity Uid { get; }
+    public string Name { get; }
+    public string Address { get; }
 }
 
 public static class AdminFaxEuiMsg
 {
-    [Serializable, NetSerializable]
+    [Serializable] [NetSerializable]
     public sealed class Close : EuiMessageBase
     {
     }
 
-    [Serializable, NetSerializable]
+    [Serializable] [NetSerializable]
     public sealed class Follow : EuiMessageBase
     {
-        public NetEntity TargetFax { get; }
-
         public Follow(NetEntity targetFax)
         {
             TargetFax = targetFax;
         }
+
+        public NetEntity TargetFax { get; }
     }
 
-    [Serializable, NetSerializable]
+    [Serializable] [NetSerializable]
     public sealed class Send : EuiMessageBase
     {
-        public NetEntity Target { get; }
-        public string Title { get; }
-        public string From { get; }
-        public string Content { get; }
-        public string StampState { get; }
-        public Color StampColor { get; }
-        public bool Locked { get; }
-
-        public Send(NetEntity target, string title, string from, string content, string stamp, Color stampColor, bool locked)
+        public Send(NetEntity target,
+            string title,
+            string from,
+            string content,
+            string stamp,
+            Color stampColor,
+            bool locked)
         {
             Target = target;
             Title = title;
@@ -76,5 +74,13 @@ public static class AdminFaxEuiMsg
             StampColor = stampColor;
             Locked = locked;
         }
+
+        public NetEntity Target { get; }
+        public string Title { get; }
+        public string From { get; }
+        public string Content { get; }
+        public string StampState { get; }
+        public Color StampColor { get; }
+        public bool Locked { get; }
     }
 }

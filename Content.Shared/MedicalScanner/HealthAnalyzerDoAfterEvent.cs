@@ -8,7 +8,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.MedicalScanner;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class HealthAnalyzerDoAfterEvent : SimpleDoAfterEvent
 {
 }

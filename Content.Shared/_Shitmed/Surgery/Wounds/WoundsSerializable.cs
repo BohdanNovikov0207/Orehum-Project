@@ -4,20 +4,20 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared._Shitmed.Medical.Surgery.Wounds.Components;
 using Content.Goobstation.Maths.FixedPoint;
+using Content.Shared._Shitmed.Medical.Surgery.Wounds.Components;
 using Robust.Shared.Serialization;
 
 namespace Content.Shared._Shitmed.Medical.Surgery.Wounds;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum WoundType
 {
     External,
     Internal,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum WoundSeverity
 {
     Healed,
@@ -28,14 +28,14 @@ public enum WoundSeverity
     Loss,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum BleedingSeverity
 {
     Minor,
     Severe,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum WoundableSeverity : byte
 {
     Healthy,
@@ -47,7 +47,7 @@ public enum WoundableSeverity : byte
     Severed,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum WoundVisibility
 {
     Always,
@@ -55,13 +55,13 @@ public enum WoundVisibility
     AdvancedScanner,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum WoundableVisualizerKeys
 {
     Wounds,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class WoundVisualizerGroupData : ICloneable
 {
     public List<NetEntity> GroupList;
@@ -71,19 +71,26 @@ public sealed class WoundVisualizerGroupData : ICloneable
         GroupList = groupList;
     }
 
-    public object Clone()
-    {
-        return new WoundVisualizerGroupData(new List<NetEntity>(GroupList));
-    }
+    public object Clone() => new WoundVisualizerGroupData(new List<NetEntity>(GroupList));
 }
-[ByRefEvent]
-public record struct WoundAddedEvent(WoundComponent Component, WoundableComponent Woundable, WoundableComponent RootWoundable);
 
 [ByRefEvent]
-public record struct WoundAddedOnBodyEvent(Entity<WoundComponent> Wound, WoundableComponent Woundable, WoundableComponent RootWoundable);
+public record struct WoundAddedEvent(
+    WoundComponent Component,
+    WoundableComponent Woundable,
+    WoundableComponent RootWoundable);
 
 [ByRefEvent]
-public record struct WoundRemovedEvent(WoundComponent Component, WoundableComponent OldWoundable, WoundableComponent OldRootWoundable);
+public record struct WoundAddedOnBodyEvent(
+    Entity<WoundComponent> Wound,
+    WoundableComponent Woundable,
+    WoundableComponent RootWoundable);
+
+[ByRefEvent]
+public record struct WoundRemovedEvent(
+    WoundComponent Component,
+    WoundableComponent OldWoundable,
+    WoundableComponent OldRootWoundable);
 
 [ByRefEvent]
 public record struct WoundableAttachedEvent(EntityUid ParentWoundableEntity, WoundableComponent Component);
@@ -92,10 +99,17 @@ public record struct WoundableAttachedEvent(EntityUid ParentWoundableEntity, Wou
 public record struct WoundableDetachedEvent(EntityUid ParentWoundableEntity, WoundableComponent Component);
 
 [ByRefEvent]
-public record struct WoundSeverityPointChangedEvent(WoundComponent Component, FixedPoint2 OldSeverity, FixedPoint2 NewSeverity, FixedPoint2? Overflow = null);
+public record struct WoundSeverityPointChangedEvent(
+    WoundComponent Component,
+    FixedPoint2 OldSeverity,
+    FixedPoint2 NewSeverity,
+    FixedPoint2? Overflow = null);
 
 [ByRefEvent]
-public record struct WoundSeverityPointChangedOnBodyEvent(Entity<WoundComponent> Wound, FixedPoint2 OldSeverity, FixedPoint2 NewSeverity);
+public record struct WoundSeverityPointChangedOnBodyEvent(
+    Entity<WoundComponent> Wound,
+    FixedPoint2 OldSeverity,
+    FixedPoint2 NewSeverity);
 
 [ByRefEvent]
 public record struct WoundSeverityChangedEvent(WoundSeverity OldSeverity, WoundSeverity NewSeverity);
@@ -104,19 +118,25 @@ public record struct WoundSeverityChangedEvent(WoundSeverity OldSeverity, WoundS
 public record struct WoundableIntegrityChangedEvent(FixedPoint2 OldIntegrity, FixedPoint2 NewIntegrity);
 
 [ByRefEvent]
-public record struct WoundableIntegrityChangedOnBodyEvent(Entity<WoundableComponent> Woundable, FixedPoint2 OldIntegrity, FixedPoint2 NewIntegrity);
+public record struct WoundableIntegrityChangedOnBodyEvent(
+    Entity<WoundableComponent> Woundable,
+    FixedPoint2 OldIntegrity,
+    FixedPoint2 NewIntegrity);
 
 [ByRefEvent]
 public record struct WoundableSeverityChangedEvent(WoundableSeverity OldSeverity, WoundableSeverity NewSeverity);
 
 [ByRefEvent]
-public record struct WoundHealAttemptEvent(Entity<WoundableComponent> Woundable, bool IgnoreBlockers = false, bool Cancelled = false);
+public record struct WoundHealAttemptEvent(
+    Entity<WoundableComponent> Woundable,
+    bool IgnoreBlockers = false,
+    bool Cancelled = false);
 
 [ByRefEvent]
 public record struct WoundHealAttemptOnWoundableEvent(Entity<WoundComponent> Wound, bool Cancelled = false);
 
-[Serializable, DataRecord]
+[Serializable] [DataRecord]
 public record struct WoundableSeverityMultiplier(FixedPoint2 Change, string Identifier = "Unspecified");
 
-[Serializable, DataRecord]
+[Serializable] [DataRecord]
 public record struct WoundableHealingMultiplier(FixedPoint2 Change, string Identifier = "Unspecified");

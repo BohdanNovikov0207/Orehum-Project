@@ -4,7 +4,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-using Content.Shared.Movement.Events;
 using Content.Shared.Movement.Systems;
 using Content.Shared.Standing;
 using Content.Shared.Throwing;
@@ -39,8 +38,8 @@ public sealed class SlidingSystem : EntitySystem
     }
 
     /// <summary>
-    ///     When the component is first added, calculate the friction modifier we need.
-    ///     Don't do this more than once to avoid mispredicts.
+    /// When the component is first added, calculate the friction modifier we need.
+    /// Don't do this more than once to avoid mispredicts.
     /// </summary>
     private void OnComponentInit(Entity<SlidingComponent> entity, ref ComponentInit args)
     {
@@ -49,7 +48,7 @@ public sealed class SlidingSystem : EntitySystem
     }
 
     /// <summary>
-    ///     When the component is removed, refresh friction modifiers and set ours to 1 to avoid causing issues.
+    /// When the component is removed, refresh friction modifiers and set ours to 1 to avoid causing issues.
     /// </summary>
     private void OnComponentShutdown(Entity<SlidingComponent> entity, ref ComponentShutdown args)
     {
@@ -58,15 +57,13 @@ public sealed class SlidingSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Remove the component when the entity stands up again.
+    /// Remove the component when the entity stands up again.
     /// </summary>
-    private void OnStand(EntityUid uid, SlidingComponent component, ref StoodEvent args)
-    {
+    private void OnStand(EntityUid uid, SlidingComponent component, ref StoodEvent args) =>
         RemComp<SlidingComponent>(uid);
-    }
 
     /// <summary>
-    ///     Updates friction when we collide with a slippery entity
+    /// Updates friction when we collide with a slippery entity
     /// </summary>
     private void OnStartCollide(Entity<SlidingComponent> entity, ref StartCollideEvent args)
     {
@@ -78,7 +75,7 @@ public sealed class SlidingSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Update friction when we stop colliding with a slippery entity
+    /// Update friction when we stop colliding with a slippery entity
     /// </summary>
     private void OnEndCollide(Entity<SlidingComponent> entity, ref EndCollideEvent args)
     {
@@ -95,7 +92,7 @@ public sealed class SlidingSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Gets contacting slippery entities and averages their friction modifiers.
+    /// Gets contacting slippery entities and averages their friction modifiers.
     /// </summary>
     private bool CalculateSlidingModifier(Entity<SlidingComponent, PhysicsComponent?> entity, EntityUid? ignore = null)
     {
@@ -134,13 +131,7 @@ public sealed class SlidingSystem : EntitySystem
         args.ModifyAcceleration(entity.Comp.FrictionModifier);
     }
 
-    private void OnThrowerImpulse(Entity<SlidingComponent> entity, ref ThrowerImpulseEvent args)
-    {
-        args.Push = true;
-    }
+    private void OnThrowerImpulse(Entity<SlidingComponent> entity, ref ThrowerImpulseEvent args) => args.Push = true;
 
-    private void ShooterImpulseEvent(Entity<SlidingComponent> entity, ref ShooterImpulseEvent args)
-    {
-        args.Push = true;
-    }
+    private void ShooterImpulseEvent(Entity<SlidingComponent> entity, ref ShooterImpulseEvent args) => args.Push = true;
 }

@@ -13,9 +13,10 @@ using Robust.Shared.GameStates;
 namespace Content.Shared.StepTrigger.Components;
 
 /// <summary>
-/// This is used for cancelling preventable step trigger events if the user is wearing clothing in a valid slot or if the user itself has the component.
+/// This is used for cancelling preventable step trigger events if the user is wearing clothing in a valid slot or if the
+/// user itself has the component.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 [Access(typeof(StepTriggerImmuneSystem))]
 public sealed partial class ProtectedFromStepTriggersComponent : Component, IClothingSlots
 {

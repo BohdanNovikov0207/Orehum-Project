@@ -12,6 +12,25 @@ namespace Content.Shared._White.StoreDiscount;
 [DataDefinition]
 public sealed partial class SalesSpecifier
 {
+    public SalesSpecifier()
+    {
+    }
+
+    public SalesSpecifier(bool enabled,
+        float minMultiplier,
+        float maxMultiplier,
+        int minItems,
+        int maxItems,
+        string salesCategory)
+    {
+        Enabled = enabled;
+        MinMultiplier = minMultiplier;
+        MaxMultiplier = maxMultiplier;
+        MinItems = minItems;
+        MaxItems = maxItems;
+        SalesCategory = salesCategory;
+    }
+
     [DataField]
     public bool Enabled { get; private set; }
 
@@ -29,19 +48,4 @@ public sealed partial class SalesSpecifier
 
     [DataField]
     public string SalesCategory { get; private set; } = string.Empty;
-
-    public SalesSpecifier()
-    {
-    }
-
-    public SalesSpecifier(bool enabled, float minMultiplier, float maxMultiplier, int minItems, int maxItems,
-        string salesCategory)
-    {
-        Enabled = enabled;
-        MinMultiplier = minMultiplier;
-        MaxMultiplier = maxMultiplier;
-        MinItems = minItems;
-        MaxItems = maxItems;
-        SalesCategory = salesCategory;
-    }
 }

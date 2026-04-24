@@ -7,13 +7,14 @@ namespace Content.Shared.Xenoarchaeology.Artifact.XAE;
 
 public sealed class XAERandomTeleportInvokerSystem : BaseXAESystem<XAERandomTeleportInvokerComponent>
 {
-    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly SharedTransformSystem _xform = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly SharedTransformSystem _xform = default!;
 
     /// <inheritdoc />
-    protected override void OnActivated(Entity<XAERandomTeleportInvokerComponent> ent, ref XenoArtifactNodeActivatedEvent args)
+    protected override void OnActivated(Entity<XAERandomTeleportInvokerComponent> ent,
+        ref XenoArtifactNodeActivatedEvent args)
     {
         if (!_timing.IsFirstTimePredicted)
             return;

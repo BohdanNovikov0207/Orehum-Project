@@ -23,9 +23,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Shared.Storage;
+using Content.Shared.Tools.Systems;
 using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
-using Content.Shared.Tools.Systems;
 
 namespace Content.Shared.Tools.Components;
 
@@ -33,9 +33,21 @@ namespace Content.Shared.Tools.Components;
 /// Used for something that can be refined by welder.
 /// For example, glass shard can be refined to glass sheet.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(ToolRefinablSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(ToolRefinablSystem))]
 public sealed partial class ToolRefinableComponent : Component
 {
+    /// <summary>
+    /// The tool type needed in order to refine this item.
+    /// </summary>
+    [DataField]
+    public ProtoId<ToolQualityPrototype> QualityNeeded = "Welding";
+
+    /// <summary>
+    /// The amount of fuel it takes to refine a given item.
+    /// </summary>
+    [DataField]
+    public float RefineFuel = 3f;
+
     /// <summary>
     /// The items created when the item is refined.
     /// </summary>
@@ -47,16 +59,4 @@ public sealed partial class ToolRefinableComponent : Component
     /// </summary>
     [DataField]
     public float RefineTime = 2f;
-
-    /// <summary>
-    /// The amount of fuel it takes to refine a given item.
-    /// </summary>
-    [DataField]
-    public float RefineFuel = 3f;
-
-    /// <summary>
-    /// The tool type needed in order to refine this item.
-    /// </summary>
-    [DataField]
-    public ProtoId<ToolQualityPrototype> QualityNeeded = "Welding";
 }

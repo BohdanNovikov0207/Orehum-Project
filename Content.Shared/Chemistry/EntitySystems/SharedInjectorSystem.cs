@@ -9,11 +9,11 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Administration.Logs;
 using Content.Shared.Chemistry.Components;
 using Content.Shared.CombatMode;
 using Content.Shared.DoAfter;
-using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Interaction.Events;
 using Content.Shared.Mobs.Systems;
 using Content.Shared.Popups;
@@ -24,16 +24,17 @@ namespace Content.Shared.Chemistry.EntitySystems;
 public abstract class SharedInjectorSystem : EntitySystem
 {
     /// <summary>
-    ///     Default transfer amounts for the set-transfer verb.
+    /// Default transfer amounts for the set-transfer verb.
     /// </summary>
     public static readonly FixedPoint2[] TransferAmounts = { 1, 5, 10, 15 };
 
-    [Dependency] protected readonly SharedPopupSystem Popup = default!;
-    [Dependency] protected readonly SharedSolutionContainerSystem SolutionContainers = default!;
-    [Dependency] protected readonly MobStateSystem MobState = default!;
+    [Dependency] protected readonly ISharedAdminLogManager AdminLogger = default!;
     [Dependency] protected readonly SharedCombatModeSystem Combat = default!;
     [Dependency] protected readonly SharedDoAfterSystem DoAfter = default!;
-    [Dependency] protected readonly ISharedAdminLogManager AdminLogger = default!;
+    [Dependency] protected readonly MobStateSystem MobState = default!;
+
+    [Dependency] protected readonly SharedPopupSystem Popup = default!;
+    [Dependency] protected readonly SharedSolutionContainerSystem SolutionContainers = default!;
 
     public override void Initialize()
     {
@@ -63,11 +64,13 @@ public abstract class SharedInjectorSystem : EntitySystem
             Act = () =>
             {
                 component.TransferAmount = toggleAmount;
-                Popup.PopupClient(Loc.GetString("comp-solution-transfer-set-amount", ("amount", toggleAmount)), user, user);
+                Popup.PopupClient(Loc.GetString("comp-solution-transfer-set-amount", ("amount", toggleAmount)),
+                    user,
+                    user);
                 Dirty(entity);
             },
 
-            Priority = priority
+            Priority = priority,
         };
         args.Verbs.Add(toggleVerb);
 
@@ -86,12 +89,14 @@ public abstract class SharedInjectorSystem : EntitySystem
                 Act = () =>
                 {
                     component.TransferAmount = amount;
-                    Popup.PopupClient(Loc.GetString("comp-solution-transfer-set-amount", ("amount", amount)), user, user);
+                    Popup.PopupClient(Loc.GetString("comp-solution-transfer-set-amount", ("amount", amount)),
+                        user,
+                        user);
                     Dirty(entity);
                 },
 
                 // we want to sort by size, not alphabetically by the verb text.
-                Priority = priority
+                Priority = priority,
             };
 
             priority -= 1;
@@ -100,11 +105,9 @@ public abstract class SharedInjectorSystem : EntitySystem
         }
     }
 
-    private void OnInjectorStartup(Entity<InjectorComponent> entity, ref ComponentStartup args)
-    {
+    private void OnInjectorStartup(Entity<InjectorComponent> entity, ref ComponentStartup args) =>
         // ???? why ?????
         Dirty(entity);
-    }
 
     private void OnInjectorUse(Entity<InjectorComponent> entity, ref UseInHandEvent args)
     {
@@ -123,7 +126,10 @@ public abstract class SharedInjectorSystem : EntitySystem
         if (injector.Comp.InjectOnly)
             return;
 
-        if (!SolutionContainers.TryGetSolution(injector.Owner, injector.Comp.SolutionName, out var solEnt, out var solution))
+        if (!SolutionContainers.TryGetSolution(injector.Owner,
+                injector.Comp.SolutionName,
+                out var solEnt,
+                out var solution))
             return;
 
         string msg;
@@ -137,9 +143,8 @@ public abstract class SharedInjectorSystem : EntitySystem
                     msg = "injector-component-drawing-text";
                 }
                 else
-                {
                     msg = "injector-component-cannot-toggle-draw-message";
-                }
+
                 break;
             case InjectorToggleMode.Draw:
                 if (solution.Volume > 0) // If solution has anything in it, allow toggling to inject
@@ -148,9 +153,8 @@ public abstract class SharedInjectorSystem : EntitySystem
                     msg = "injector-component-injecting-text";
                 }
                 else
-                {
                     msg = "injector-component-cannot-toggle-inject-message";
-                }
+
                 break;
             default:
                 throw new ArgumentOutOfRangeException();

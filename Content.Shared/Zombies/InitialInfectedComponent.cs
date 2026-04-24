@@ -80,7 +80,7 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Shared.Zombies;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class InitialInfectedComponent : Component
 {
     [DataField]

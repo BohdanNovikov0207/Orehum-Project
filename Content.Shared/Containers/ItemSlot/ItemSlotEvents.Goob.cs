@@ -1,5 +1,6 @@
-using Content.Shared.DoAfter; // Goobstation
+using Content.Shared.DoAfter;
 using Robust.Shared.Serialization;
+// Goobstation
 
 namespace Content.Shared.Containers.ItemSlots;
 
@@ -7,23 +8,23 @@ namespace Content.Shared.Containers.ItemSlots;
 /// Goobstation
 /// A do-after event for inserting-removing from slots with a delay.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class ItemSlotInteractionDoAfterEvent : DoAfterEvent
 {
     /// <summary>
-    ///     The name of the slot/container from which to insert or eject an item.
+    /// The name of the slot/container from which to insert or eject an item.
     /// </summary>
     public string SlotId;
 
     /// <summary>
-    ///     Whether to attempt to insert an item into the slot, if there is not already one inside.
-    /// </summary>
-    public bool TryInsert;
-
-    /// <summary>
-    ///     Whether to attempt to eject the item from the slot, if it has one.
+    /// Whether to attempt to eject the item from the slot, if it has one.
     /// </summary>
     public bool TryEject;
+
+    /// <summary>
+    /// Whether to attempt to insert an item into the slot, if there is not already one inside.
+    /// </summary>
+    public bool TryInsert;
 
     public ItemSlotInteractionDoAfterEvent(string slotId, bool tryEject = true, bool tryInsert = true)
     {
@@ -32,8 +33,5 @@ public sealed partial class ItemSlotInteractionDoAfterEvent : DoAfterEvent
         TryInsert = tryInsert;
     }
 
-    public override DoAfterEvent Clone()
-    {
-        return this;
-    }
+    public override DoAfterEvent Clone() => this;
 }

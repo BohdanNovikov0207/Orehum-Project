@@ -40,19 +40,19 @@ public abstract partial class SharedInstrumentComponent : Component
     [ViewVariables]
     public bool Playing { get; set; }
 
-    [DataField("program"), ViewVariables(VVAccess.ReadWrite)]
+    [DataField("program")] [ViewVariables(VVAccess.ReadWrite)]
     public byte InstrumentProgram { get; set; }
 
-    [DataField("bank"), ViewVariables(VVAccess.ReadWrite)]
+    [DataField("bank")] [ViewVariables(VVAccess.ReadWrite)]
     public byte InstrumentBank { get; set; }
 
-    [DataField("allowPercussion"), ViewVariables(VVAccess.ReadWrite)]
+    [DataField("allowPercussion")] [ViewVariables(VVAccess.ReadWrite)]
     public bool AllowPercussion { get; set; }
 
-    [DataField("allowProgramChange"), ViewVariables(VVAccess.ReadWrite)]
+    [DataField("allowProgramChange")] [ViewVariables(VVAccess.ReadWrite)]
     public bool AllowProgramChange { get; set; }
 
-    [DataField("respectMidiLimits"), ViewVariables(VVAccess.ReadWrite)]
+    [DataField("respectMidiLimits")] [ViewVariables(VVAccess.ReadWrite)]
     public bool RespectMidiLimits { get; set; } = true;
 
     [ViewVariables(VVAccess.ReadWrite)]
@@ -65,7 +65,7 @@ public abstract partial class SharedInstrumentComponent : Component
 /// <summary>
 /// Component that indicates that musical instrument was activated (ui opened).
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 [AutoGenerateComponentState(true)]
 public sealed partial class ActiveInstrumentComponent : Component
 {
@@ -74,106 +74,104 @@ public sealed partial class ActiveInstrumentComponent : Component
     public MidiTrack?[] Tracks = [];
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class InstrumentComponentState : ComponentState
 {
-    public bool Playing;
-
-    public byte InstrumentProgram;
-
-    public byte InstrumentBank;
-
     public bool AllowPercussion;
 
     public bool AllowProgramChange;
 
-    public bool RespectMidiLimits;
+    public BitArray FilteredChannels = default!;
+
+    public byte InstrumentBank;
+
+    public byte InstrumentProgram;
 
     public NetEntity? Master;
+    public bool Playing;
 
-    public BitArray FilteredChannels = default!;
+    public bool RespectMidiLimits;
 }
 
-
 /// <summary>
-///     This message is sent to the client to completely stop midi input and midi playback.
+/// This message is sent to the client to completely stop midi input and midi playback.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class InstrumentStopMidiEvent : EntityEventArgs
 {
-    public NetEntity Uid { get; }
-
     public InstrumentStopMidiEvent(NetEntity uid)
     {
         Uid = uid;
     }
+
+    public NetEntity Uid { get; }
 }
 
 /// <summary>
-///     Send from the client to the server to set a master instrument.
+/// Send from the client to the server to set a master instrument.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class InstrumentSetMasterEvent : EntityEventArgs
 {
-    public NetEntity Uid { get; }
-    public NetEntity? Master { get; }
-
     public InstrumentSetMasterEvent(NetEntity uid, NetEntity? master)
     {
         Uid = uid;
         Master = master;
     }
+
+    public NetEntity Uid { get; }
+    public NetEntity? Master { get; }
 }
 
 /// <summary>
-///     Send from the client to the server to set a master instrument channel.
+/// Send from the client to the server to set a master instrument channel.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class InstrumentSetFilteredChannelEvent : EntityEventArgs
 {
-    public NetEntity Uid { get; }
-    public int Channel { get; }
-    public bool Value { get; }
-
     public InstrumentSetFilteredChannelEvent(NetEntity uid, int channel, bool value)
     {
         Uid = uid;
         Channel = channel;
         Value = value;
     }
+
+    public NetEntity Uid { get; }
+    public int Channel { get; }
+    public bool Value { get; }
 }
 
 /// <summary>
-///     This message is sent to the client to start the synth.
+/// This message is sent to the client to start the synth.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class InstrumentStartMidiEvent : EntityEventArgs
 {
-    public NetEntity Uid { get; }
-
     public InstrumentStartMidiEvent(NetEntity uid)
     {
         Uid = uid;
     }
+
+    public NetEntity Uid { get; }
 }
 
 /// <summary>
-///     This message carries a MidiEvent to be played on clients.
+/// This message carries a MidiEvent to be played on clients.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class InstrumentMidiEventEvent : EntityEventArgs
 {
-    public NetEntity Uid { get; }
-    public RobustMidiEvent[] MidiEvent { get; }
-
     public InstrumentMidiEventEvent(NetEntity uid, RobustMidiEvent[] midiEvent)
     {
         Uid = uid;
         MidiEvent = midiEvent;
     }
+
+    public NetEntity Uid { get; }
+    public RobustMidiEvent[] MidiEvent { get; }
 }
 
-[NetSerializable, Serializable]
+[NetSerializable] [Serializable]
 public enum InstrumentUiKey
 {
     Key,
@@ -182,29 +180,27 @@ public enum InstrumentUiKey
 /// <summary>
 /// Sets the MIDI channels on an instrument.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class InstrumentSetChannelsEvent : EntityEventArgs
 {
-    public NetEntity Uid { get; }
-    public MidiTrack?[] Tracks { get; set; }
-
     public InstrumentSetChannelsEvent(NetEntity uid, MidiTrack?[] tracks)
     {
         Uid = uid;
         Tracks = tracks;
     }
+
+    public NetEntity Uid { get; }
+    public MidiTrack?[] Tracks { get; set; }
 }
 
 /// <summary>
 /// Represents a single midi track with the track name, instrument name and bank instrument name extracted.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class MidiTrack
 {
-    /// <summary>
-    /// The first specified Track Name
-    /// </summary>
-    public string? TrackName;
+    private const string Postfix = "…";
+
     /// <summary>
     /// The first specified instrument name
     /// </summary>
@@ -215,10 +211,13 @@ public sealed class MidiTrack
     /// </summary>
     public string? ProgramName;
 
-    public override string ToString()
-    {
-        return $"Track Name: {TrackName}; Instrument Name: {InstrumentName}; Program Name: {ProgramName}";
-    }
+    /// <summary>
+    /// The first specified Track Name
+    /// </summary>
+    public string? TrackName;
+
+    public override string ToString() =>
+        $"Track Name: {TrackName}; Instrument Name: {InstrumentName}; Program Name: {ProgramName}";
 
     /// <summary>
     /// Truncates the fields based on the limit inputted into this method.
@@ -247,7 +246,6 @@ public sealed class MidiTrack
             ProgramName = Sanitize(ProgramName);
     }
 
-    private const string Postfix = "…";
     // TODO: Make a general method to use in RT? idk if we have that.
     private string Truncate(string input, int limit)
     {
@@ -263,7 +261,7 @@ public sealed class MidiTrack
     {
         var sanitized = new StringBuilder(input.Length);
 
-        foreach (char c in input)
+        foreach (var c in input)
         {
             if (!char.IsControl(c) && c <= 127) // no control characters, only ASCII
                 sanitized.Append(c);

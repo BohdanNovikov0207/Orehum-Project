@@ -101,10 +101,8 @@ public sealed class DamageOnHoldingSystem : EntitySystem
         }
     }
 
-    private void OnMapInit(EntityUid uid, DamageOnHoldingComponent component, MapInitEvent args)
-    {
+    private void OnMapInit(EntityUid uid, DamageOnHoldingComponent component, MapInitEvent args) =>
         component.NextDamage = _timing.CurTime;
-    }
 
     public override void Update(float frameTime)
     {
@@ -114,9 +112,7 @@ public sealed class DamageOnHoldingSystem : EntitySystem
             if (!component.Enabled || component.NextDamage > _timing.CurTime)
                 continue;
             if (_container.TryGetContainingContainer((uid, null, null), out var container))
-            {
                 _damageableSystem.TryChangeDamage(container.Owner, component.Damage, origin: uid);
-            }
             component.NextDamage = _timing.CurTime + TimeSpan.FromSeconds(component.Interval);
         }
     }

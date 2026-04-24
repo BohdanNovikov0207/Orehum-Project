@@ -103,7 +103,9 @@ public abstract partial class SharedToolSystem
         args.Handled = true;
     }
 
-    private bool UseToolOnTile(Entity<ToolTileCompatibleComponent?, ToolComponent?> ent, EntityUid user, EntityCoordinates clickLocation)
+    private bool UseToolOnTile(Entity<ToolTileCompatibleComponent?, ToolComponent?> ent,
+        EntityUid user,
+        EntityCoordinates clickLocation)
     {
         if (!Resolve(ent, ref ent.Comp1, ref ent.Comp2, false))
             return false;
@@ -114,7 +116,9 @@ public abstract partial class SharedToolSystem
         var comp = ent.Comp1!;
         var tool = ent.Comp2!;
 
-        if (!_mapManager.TryFindGridAt(_transformSystem.ToMapCoordinates(clickLocation), out var gridUid, out var mapGrid))
+        if (!_mapManager.TryFindGridAt(_transformSystem.ToMapCoordinates(clickLocation),
+                out var gridUid,
+                out var mapGrid))
             return false;
 
         var tileRef = _maps.GetTileRef(gridUid, mapGrid, clickLocation);
@@ -134,7 +138,14 @@ public abstract partial class SharedToolSystem
             return false;
 
         var args = new TileToolDoAfterEvent(GetNetEntity(gridUid), tileRef.GridIndices);
-        UseTool(ent, user, ent, comp.Delay * tileDef.DeconstructTimeMultiplier, tool.Qualities, args, out _, toolComponent: tool); // Goob edit
+        UseTool(ent,
+            user,
+            ent,
+            comp.Delay * tileDef.DeconstructTimeMultiplier,
+            tool.Qualities,
+            args,
+            out _,
+            toolComponent: tool); // Goob edit
         return true;
     }
 
@@ -146,6 +157,7 @@ public abstract partial class SharedToolSystem
             // don't do this on the client or else the tile entity spawn mispredicts and looks horrible
             return _net.IsClient || _tiles.DeconstructTile(tileRef);
         }
+
         return false;
     }
 }

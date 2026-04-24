@@ -8,15 +8,14 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Charges;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum ChargesVisuals : byte
 {
-    Charges
+    Charges,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum ChargesVisualLayers : byte
 {
-    ChargesLeft
+    ChargesLeft,
 }
-

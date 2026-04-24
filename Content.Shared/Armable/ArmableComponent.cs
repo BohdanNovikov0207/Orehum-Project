@@ -5,20 +5,14 @@ namespace Content.Shared.Armable;
 /// <summary>
 /// Makes an item armable, needs ItemToggleComponent to work.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 [Access(typeof(ArmableSystem))]
 public sealed partial class ArmableComponent : Component
 {
     /// <summary>
-    /// Does it show its status on examination?
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public bool ShowStatusOnExamination = true;
-
-    /// <summary>
     /// Does it change appearance when activated?
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public bool ChangeAppearance = true;
 
     /// <summary>
@@ -31,5 +25,11 @@ public sealed partial class ArmableComponent : Component
     /// Text to show on examination when the entity is not armed
     /// </summary>
     [DataField]
-    public LocId? ExamineTextNotArmed ="armable-examine-not-armed";
+    public LocId? ExamineTextNotArmed = "armable-examine-not-armed";
+
+    /// <summary>
+    /// Does it show its status on examination?
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public bool ShowStatusOnExamination = true;
 }

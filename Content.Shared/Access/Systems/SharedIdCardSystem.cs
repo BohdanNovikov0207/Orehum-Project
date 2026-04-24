@@ -100,18 +100,18 @@ namespace Content.Shared.Access.Systems;
 
 public abstract class SharedIdCardSystem : EntitySystem
 {
-    [Dependency] private readonly IConfigurationManager _cfgManager = default!;
-    [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SharedAccessSystem _access = default!;
+    [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
+    [Dependency] private readonly IConfigurationManager _cfgManager = default!;
     [Dependency] private readonly SharedHandsSystem _hands = default!;
     [Dependency] private readonly InventorySystem _inventorySystem = default!;
     [Dependency] private readonly MetaDataSystem _metaSystem = default!;
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    private int _maxIdJobLength;
 
     // CCVar.
     private int _maxNameLength;
-    private int _maxIdJobLength;
 
     public override void Initialize()
     {
@@ -138,40 +138,31 @@ public abstract class SharedIdCardSystem : EntitySystem
             TryChangeFullName(idCard, ev.NewName, idCard);
     }
 
-    private void OnMapInit(EntityUid uid, IdCardComponent id, MapInitEvent args)
-    {
-        UpdateEntityName(uid, id);
-    }
+    private void OnMapInit(EntityUid uid, IdCardComponent id, MapInitEvent args) => UpdateEntityName(uid, id);
 
     private void OnTryGetIdentityShortInfo(TryGetIdentityShortInfoEvent ev)
     {
         if (ev.Handled)
-        {
             return;
-        }
 
         string? title = null;
         if (TryFindIdCard(ev.ForActor, out var idCard) && !(ev.RequestForAccessLogging && idCard.Comp.BypassLogging))
-        {
             title = ExtractFullTitle(idCard);
-        }
 
         ev.Title = title;
         ev.Handled = true;
     }
 
     /// <summary>
-    ///     Attempt to find an ID card on an entity. This will look in the entity itself, in the entity's hands, and
-    ///     in the entity's inventory.
+    /// Attempt to find an ID card on an entity. This will look in the entity itself, in the entity's hands, and
+    /// in the entity's inventory.
     /// </summary>
     public bool TryFindIdCard(EntityUid uid, out Entity<IdCardComponent> idCard)
     {
         // check held item?
         if (_hands.GetActiveItem(uid) is { } heldItem &&
             TryGetIdCard(heldItem, out idCard))
-        {
             return true;
-        }
 
         // check entity itself
         if (TryGetIdCard(uid, out idCard))
@@ -185,8 +176,8 @@ public abstract class SharedIdCardSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Attempt to get an id card component from an entity, either by getting it directly from the entity, or by
-    ///     getting the contained id from a <see cref="PdaComponent"/>.
+    /// Attempt to get an id card component from an entity, either by getting it directly from the entity, or by
+    /// getting the contained id from a <see cref="PdaComponent" />.
     /// </summary>
     public bool TryGetIdCard(EntityUid uid, out Entity<IdCardComponent> idCard)
     {
@@ -197,7 +188,7 @@ public abstract class SharedIdCardSystem : EntitySystem
         }
 
         if (TryComp(uid, out PdaComponent? pda)
-        && TryComp(pda.ContainedId, out idCardComp))
+            && TryComp(pda.ContainedId, out idCardComp))
         {
             idCard = (pda.ContainedId.Value, idCardComp);
             return true;
@@ -228,9 +219,7 @@ public abstract class SharedIdCardSystem : EntitySystem
                 jobTitle = jobTitle[.._maxIdJobLength];
         }
         else
-        {
             jobTitle = null;
-        }
 
         if (id.LocalizedJobTitle == jobTitle)
             return true;
@@ -240,30 +229,32 @@ public abstract class SharedIdCardSystem : EntitySystem
 
         if (player != null)
         {
-            _adminLogger.Add(LogType.Identity, LogImpact.Low,
+            _adminLogger.Add(LogType.Identity,
+                LogImpact.Low,
                 $"{ToPrettyString(player.Value):player} has changed the job title of {ToPrettyString(uid):entity} to {jobTitle} ");
         }
+
         return true;
     }
 
-    public bool TryChangeJobIcon(EntityUid uid, JobIconPrototype jobIcon, IdCardComponent? id = null, EntityUid? player = null)
+    public bool TryChangeJobIcon(EntityUid uid,
+        JobIconPrototype jobIcon,
+        IdCardComponent? id = null,
+        EntityUid? player = null)
     {
         if (!Resolve(uid, ref id))
-        {
             return false;
-        }
 
         if (id.JobIcon == jobIcon.ID)
-        {
             return true;
-        }
 
         id.JobIcon = jobIcon.ID;
         Dirty(uid, id);
 
         if (player != null)
         {
-            _adminLogger.Add(LogType.Identity, LogImpact.Low,
+            _adminLogger.Add(LogType.Identity,
+                LogImpact.Low,
                 $"{ToPrettyString(player.Value):player} has changed the job icon of {ToPrettyString(uid):entity} to {jobIcon} ");
         }
 
@@ -287,7 +278,9 @@ public abstract class SharedIdCardSystem : EntitySystem
         return true;
     }
 
-    public bool TryChangeJobDepartment(EntityUid uid, List<ProtoId<DepartmentPrototype>> departments, IdCardComponent? id = null)
+    public bool TryChangeJobDepartment(EntityUid uid,
+        List<ProtoId<DepartmentPrototype>> departments,
+        IdCardComponent? id = null)
     {
         if (!Resolve(uid, ref id))
             return false;
@@ -322,9 +315,7 @@ public abstract class SharedIdCardSystem : EntitySystem
                 fullName = fullName[.._maxNameLength];
         }
         else
-        {
             fullName = null;
-        }
 
         if (id.FullName == fullName)
             return true;
@@ -334,9 +325,11 @@ public abstract class SharedIdCardSystem : EntitySystem
 
         if (player != null)
         {
-            _adminLogger.Add(LogType.Identity, LogImpact.Low,
+            _adminLogger.Add(LogType.Identity,
+                LogImpact.Low,
                 $"{ToPrettyString(player.Value):player} has changed the name of {ToPrettyString(uid):entity} to {fullName} ");
         }
+
         return true;
     }
 
@@ -344,7 +337,7 @@ public abstract class SharedIdCardSystem : EntitySystem
     /// Changes the name of the id's owner.
     /// </summary>
     /// <remarks>
-    /// If either <see cref="FullName"/> or <see cref="JobTitle"/> is empty, it's replaced by placeholders.
+    /// If either <see cref="FullName" /> or <see cref="JobTitle" /> is empty, it's replaced by placeholders.
     /// If both are empty, the original entity's name is restored.
     /// </remarks>
     private void UpdateEntityName(EntityUid uid, IdCardComponent? id = null)
@@ -363,11 +356,9 @@ public abstract class SharedIdCardSystem : EntitySystem
         _metaSystem.SetEntityName(uid, val);
     }
 
-    private static string ExtractFullTitle(IdCardComponent idCardComponent)
-    {
-        return $"{idCardComponent.FullName} ({CultureInfo.CurrentCulture.TextInfo.ToTitleCase(idCardComponent.LocalizedJobTitle ?? string.Empty)})"
+    private static string ExtractFullTitle(IdCardComponent idCardComponent) =>
+        $"{idCardComponent.FullName} ({CultureInfo.CurrentCulture.TextInfo.ToTitleCase(idCardComponent.LocalizedJobTitle ?? string.Empty)})"
             .Trim();
-    }
 
     public void SetExpireTime(Entity<ExpireIdCardComponent?> ent, TimeSpan time)
     {
@@ -386,7 +377,7 @@ public abstract class SharedIdCardSystem : EntitySystem
     }
 
     /// <summary>
-    /// Marks an <see cref="ExpireIdCardComponent"/> as expired, setting the accesses.
+    /// Marks an <see cref="ExpireIdCardComponent" /> as expired, setting the accesses.
     /// </summary>
     public virtual void ExpireId(Entity<ExpireIdCardComponent> ent)
     {

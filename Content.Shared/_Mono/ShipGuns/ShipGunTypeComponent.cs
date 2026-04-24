@@ -18,11 +18,11 @@ public sealed partial class ShipGunTypeComponent : Component
 /// <summary>
 /// Types of ship guns
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum ShipGunType
 {
     Ballistic,
     Energy,
     Missile,
-    Mining //Lua Addition
+    Mining, //Lua Addition
 }

@@ -13,22 +13,22 @@ namespace Content.Shared._EinsteinEngines.Language;
 public abstract partial class ObfuscationMethod
 {
     /// <summary>
-    ///     The fallback obfuscation method, replaces the message with the string "&lt;?&gt;".
+    /// The fallback obfuscation method, replaces the message with the string "&lt;?&gt;".
     /// </summary>
     public static readonly ObfuscationMethod Default = new ReplacementObfuscation
     {
-        Replacement = new List<string> { "<?>" }
+        Replacement = new List<string> { "<?>" },
     };
 
     /// <summary>
-    ///     Obfuscates the provided message and writes the result into the provided StringBuilder.
-    ///     Implementations should use the context's pseudo-random number generator and provide stable obfuscations.
+    /// Obfuscates the provided message and writes the result into the provided StringBuilder.
+    /// Implementations should use the context's pseudo-random number generator and provide stable obfuscations.
     /// </summary>
     internal abstract void Obfuscate(StringBuilder builder, string message, SharedLanguageSystem context);
 
     /// <summary>
-    ///     Obfuscates the provided message. This method should only be used for debugging purposes.
-    ///     For all other purposes, use <see cref="SharedLanguageSystem.ObfuscateSpeech"/> instead.
+    /// Obfuscates the provided message. This method should only be used for debugging purposes.
+    /// For all other purposes, use <see cref="SharedLanguageSystem.ObfuscateSpeech" /> instead.
     /// </summary>
     public string Obfuscate(string message)
     {
@@ -39,13 +39,13 @@ public abstract partial class ObfuscationMethod
 }
 
 /// <summary>
-///     The most primitive method of obfuscation - replaces the entire message with one random replacement phrase.
-///     Similar to ReplacementAccent. Base for all replacement-based obfuscation methods.
+/// The most primitive method of obfuscation - replaces the entire message with one random replacement phrase.
+/// Similar to ReplacementAccent. Base for all replacement-based obfuscation methods.
 /// </summary>
 public partial class ReplacementObfuscation : ObfuscationMethod
 {
     /// <summary>
-    ///     A list of replacement phrases used in the obfuscation process.
+    /// A list of replacement phrases used in the obfuscation process.
     /// </summary>
     [DataField(required: true)]
     public List<string> Replacement = [];
@@ -58,20 +58,21 @@ public partial class ReplacementObfuscation : ObfuscationMethod
 }
 
 /// <summary>
-///     Obfuscates the provided message by replacing each word with a random number of syllables in the range (min, max),
-///     preserving the original punctuation to a resonable extent.
+/// Obfuscates the provided message by replacing each word with a random number of syllables in the range (min, max),
+/// preserving the original punctuation to a resonable extent.
 /// </summary>
 /// <remarks>
-///     The words are obfuscated in a stable manner, such that every particular word will be obfuscated the same way throughout one round.
-///     This means that particular words can be memorized within a round, but not across rounds.
+/// The words are obfuscated in a stable manner, such that every particular word will be obfuscated the same way throughout
+/// one round.
+/// This means that particular words can be memorized within a round, but not across rounds.
 /// </remarks>
 public sealed partial class SyllableObfuscation : ReplacementObfuscation
 {
     [DataField]
-    public int MinSyllables = 1;
+    public int MaxSyllables = 4;
 
     [DataField]
-    public int MaxSyllables = 4;
+    public int MinSyllables = 1;
 
     internal override void Obfuscate(StringBuilder builder, string message, SharedLanguageSystem context)
     {
@@ -114,40 +115,39 @@ public sealed partial class SyllableObfuscation : ReplacementObfuscation
         }
     }
 
-    private static bool IsPunctuation(char ch)
-    {
-        return ch is '.' or '!' or '?' or ',' or ':';
-    }
+    private static bool IsPunctuation(char ch) => ch is '.' or '!' or '?' or ',' or ':';
 }
 
 /// <summary>
-///     Obfuscates each sentence in the message by concatenating a number of obfuscation phrases.
-///     The number of phrases in the obfuscated message is proportional to the length of the original message.
+/// Obfuscates each sentence in the message by concatenating a number of obfuscation phrases.
+/// The number of phrases in the obfuscated message is proportional to the length of the original message.
 /// </summary>
 public sealed partial class PhraseObfuscation : ReplacementObfuscation
 {
     [DataField]
-    public int MinPhrases = 1;
-
-    [DataField]
     public int MaxPhrases = 4;
 
-    /// <summary>
-    ///     A string used to separate individual phrases within one sentence. Default is a space.
-    /// </summary>
     [DataField]
-    public string Separator = " ";
+    public int MinPhrases = 1;
 
     /// <summary>
-    ///     A power to which the number of characters in the original message is raised to determine the number of phrases in the result.
-    ///     Default is 1/3, i.e. the cubic root of the original number.
+    /// A power to which the number of characters in the original message is raised to determine the number of phrases in the
+    /// result.
+    /// Default is 1/3, i.e. the cubic root of the original number.
     /// </summary>
     /// <remarks>
-    ///     Using the default proportion, you will need at least 27 characters for 2 phrases, at least 64 for 3, at least 125 for 4, etc.
-    ///     Increasing the proportion to 1/4 will result in the numbers changing to 81, 256, 625, etc.
+    /// Using the default proportion, you will need at least 27 characters for 2 phrases, at least 64 for 3, at least 125 for
+    /// 4, etc.
+    /// Increasing the proportion to 1/4 will result in the numbers changing to 81, 256, 625, etc.
     /// </remarks>
     [DataField]
     public float Proportion = 1f / 3;
+
+    /// <summary>
+    /// A string used to separate individual phrases within one sentence. Default is a space.
+    /// </summary>
+    [DataField]
+    public string Separator = " ";
 
     internal override void Obfuscate(StringBuilder builder, string message, SharedLanguageSystem context)
     {
@@ -176,6 +176,7 @@ public sealed partial class PhraseObfuscation : ReplacementObfuscation
                     builder.Append(Separator);
                 }
             }
+
             sentenceBeginIndex = i + 1;
 
             if (IsPunctuation(ch))
@@ -183,8 +184,6 @@ public sealed partial class PhraseObfuscation : ReplacementObfuscation
         }
     }
 
-    private static bool IsPunctuation(char ch)
-    {
-        return ch is '.' or '!' or '?'; // Doesn't include mid-sentence punctuation like the comma
-    }
+    private static bool IsPunctuation(char ch) =>
+        ch is '.' or '!' or '?'; // Doesn't include mid-sentence punctuation like the comma
 }

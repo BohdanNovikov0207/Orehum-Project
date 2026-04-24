@@ -24,29 +24,35 @@ using Robust.Shared.Utility;
 namespace Content.Shared.Weapons.Ranged;
 
 [Prototype]
-public sealed partial class HitscanPrototype : IPrototype, IShootable
+public sealed class HitscanPrototype : IPrototype, IShootable
 {
-    [ViewVariables]
-    [IdDataField]
-    public string ID { get; private set; } = default!;
-
-    [ViewVariables(VVAccess.ReadWrite), DataField("staminaDamage")]
-    public float StaminaDamage;
-
-    [ViewVariables(VVAccess.ReadWrite), DataField("damage")]
-    public DamageSpecifier? Damage;
-
-    [ViewVariables(VVAccess.ReadOnly), DataField("muzzleFlash")]
-    public SpriteSpecifier? MuzzleFlash;
-
-    [ViewVariables(VVAccess.ReadOnly), DataField("travelFlash")]
-    public SpriteSpecifier? TravelFlash;
-
-    [ViewVariables(VVAccess.ReadOnly), DataField("impactFlash")]
-    public SpriteSpecifier? ImpactFlash;
-
     [DataField("collisionMask")]
     public int CollisionMask = (int) CollisionGroup.Opaque;
+
+    [ViewVariables(VVAccess.ReadWrite)] [DataField("damage")]
+    public DamageSpecifier? Damage;
+
+    // Goobstation
+    [DataField]
+    public float FireStacks;
+
+    /// <summary>
+    /// Force the hitscan sound to play rather than potentially playing the entity's sound.
+    /// </summary>
+    [ViewVariables(VVAccess.ReadWrite)] [DataField("forceSound")]
+    public bool ForceSound;
+
+    [ViewVariables(VVAccess.ReadOnly)] [DataField("impactFlash")]
+    public SpriteSpecifier? ImpactFlash;
+
+    /// <summary>
+    /// Try not to set this too high.
+    /// </summary>
+    [DataField("maxLength")]
+    public float MaxLength = 20f;
+
+    [ViewVariables(VVAccess.ReadOnly)] [DataField("muzzleFlash")]
+    public SpriteSpecifier? MuzzleFlash;
 
     /// <summary>
     /// What we count as for reflection.
@@ -59,19 +65,13 @@ public sealed partial class HitscanPrototype : IPrototype, IShootable
     [DataField("sound")]
     public SoundSpecifier? Sound;
 
-    /// <summary>
-    /// Force the hitscan sound to play rather than potentially playing the entity's sound.
-    /// </summary>
-    [ViewVariables(VVAccess.ReadWrite), DataField("forceSound")]
-    public bool ForceSound;
+    [ViewVariables(VVAccess.ReadWrite)] [DataField("staminaDamage")]
+    public float StaminaDamage;
 
-    /// <summary>
-    /// Try not to set this too high.
-    /// </summary>
-    [DataField("maxLength")]
-    public float MaxLength = 20f;
+    [ViewVariables(VVAccess.ReadOnly)] [DataField("travelFlash")]
+    public SpriteSpecifier? TravelFlash;
 
-    // Goobstation
-    [DataField]
-    public float FireStacks;
+    [ViewVariables]
+    [IdDataField]
+    public string ID { get; } = default!;
 }

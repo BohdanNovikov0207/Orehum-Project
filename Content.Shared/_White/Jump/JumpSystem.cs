@@ -3,21 +3,19 @@ using Content.Shared.Stunnable;
 using Content.Shared.Throwing;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Containers;
-using Robust.Shared.Physics.Components;
-using Robust.Shared.Physics.Systems;
 using Robust.Shared.Serialization;
 
 namespace Content.Shared._White.Jump;
 
 public sealed class JumpSystem : EntitySystem
 {
-    [Dependency] private readonly ThrownItemSystem _throwingItem = default!;
-    [Dependency] private readonly ThrowingSystem _throwing = default!;
     [Dependency] private readonly SharedActionsSystem _actions = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedContainerSystem _container = default!;
     [Dependency] private readonly SharedStunSystem _stun = default!;
+    [Dependency] private readonly ThrowingSystem _throwing = default!;
+    [Dependency] private readonly ThrownItemSystem _throwingItem = default!;
 
     public override void Initialize()
     {
@@ -64,19 +62,19 @@ public sealed class JumpSystem : EntitySystem
             return;
         }
 
-        _stun.TryKnockdown(args.Target, component.StunTime, true);
+        _stun.TryKnockdown(args.Target, component.StunTime);
 
         args.Handled = true;
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum JumpVisuals : byte
 {
-    Jumping
+    Jumping,
 }
 
 public enum JumpLayers : byte
 {
-    Jumping
+    Jumping,
 }

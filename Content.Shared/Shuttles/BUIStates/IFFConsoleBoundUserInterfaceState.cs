@@ -8,17 +8,17 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Shuttles.BUIStates;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class IFFConsoleBoundUserInterfaceState : BoundUserInterfaceState
 {
     public IFFFlags AllowedFlags;
+    public Color Color; // CorvaxGoob-IIF-Improves
     public IFFFlags Flags;
 
     public string? Name; // CorvaxGoob-IIF-Improves
-    public Color Color; // CorvaxGoob-IIF-Improves
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum IFFConsoleUiKey : byte
 {
     Key,

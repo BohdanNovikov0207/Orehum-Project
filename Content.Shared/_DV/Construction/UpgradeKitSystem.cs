@@ -18,11 +18,11 @@ namespace Content.Shared._DV.Construction;
 /// </summary>
 public sealed class UpgradeKitSystem : EntitySystem
 {
-    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
-    [Dependency] private readonly INetManager _net = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
+    [Dependency] private readonly INetManager _net = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
     [Dependency] private readonly SharedWiresSystem _wires = default!;
 
     public override void Initialize()
@@ -35,7 +35,7 @@ public sealed class UpgradeKitSystem : EntitySystem
 
     private void OnAfterInteract(Entity<UpgradeKitComponent> ent, ref AfterInteractEvent args)
     {
-        if (args.Handled || !args.CanReach || args.Target is not {} target)
+        if (args.Handled || !args.CanReach || args.Target is not { } target)
             return;
 
         args.Handled = true;
@@ -62,7 +62,7 @@ public sealed class UpgradeKitSystem : EntitySystem
         if (args.Cancelled)
             return;
 
-        if (args.Handled || args.Args.Target is not {} target)
+        if (args.Handled || args.Args.Target is not { } target)
             return;
 
         args.Handled = true;

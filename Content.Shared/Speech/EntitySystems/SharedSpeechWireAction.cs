@@ -7,7 +7,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Speech;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum SpeechWireActionKey : byte
 {
     StatusKey,

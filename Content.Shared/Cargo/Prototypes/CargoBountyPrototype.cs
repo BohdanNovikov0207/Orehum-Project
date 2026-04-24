@@ -20,18 +20,8 @@ namespace Content.Shared.Cargo.Prototypes;
 /// to receive a monetary reward.
 /// </summary>
 [Prototype]
-public sealed partial class CargoBountyPrototype : IPrototype
+public sealed class CargoBountyPrototype : IPrototype
 {
-    /// <inheritdoc/>
-    [IdDataField]
-    public string ID { get; private set; } = default!;
-
-    /// <summary>
-    /// The monetary reward for completing the bounty
-    /// </summary>
-    [DataField(required: true)]
-    public int Reward;
-
     /// <summary>
     /// A description for flava purposes.
     /// </summary>
@@ -45,25 +35,35 @@ public sealed partial class CargoBountyPrototype : IPrototype
     public List<CargoBountyItemEntry> Entries = new();
 
     /// <summary>
-    /// A prefix appended to the beginning of a bounty's ID.
-    /// </summary>
-    [DataField]
-    public string IdPrefix = "NT";
-
-    /// <summary>
     /// A group used for categorizing this bounty.
     /// </summary>
     [DataField]
     public ProtoId<CargoBountyGroupPrototype> Group = "StationBounty";
 
     /// <summary>
+    /// A prefix appended to the beginning of a bounty's ID.
+    /// </summary>
+    [DataField]
+    public string IdPrefix = "NT";
+
+    /// <summary>
+    /// The monetary reward for completing the bounty
+    /// </summary>
+    [DataField(required: true)]
+    public int Reward;
+
+    /// <summary>
     /// Optional sprite representing this bounty.
     /// </summary>
     [DataField]
     public SpriteSpecifier? Sprite;
+
+    /// <inheritdoc />
+    [IdDataField]
+    public string ID { get; } = default!;
 }
 
-[DataDefinition, Serializable, NetSerializable]
+[DataDefinition] [Serializable] [NetSerializable]
 public readonly partial record struct CargoBountyItemEntry()
 {
     /// <summary>

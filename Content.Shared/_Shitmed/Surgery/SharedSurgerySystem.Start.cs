@@ -10,9 +10,9 @@ public abstract partial class SharedSurgerySystem
 {
     [Dependency] private readonly IConfigurationManager _config = default!;
 
-    private EntityQuery<SurgeryTargetComponent> _targetQuery;
-
     private bool _noSelfOperate;
+
+    private EntityQuery<SurgeryTargetComponent> _targetQuery;
 
     private void InitializeStart()
     {
@@ -49,13 +49,13 @@ public abstract partial class SharedSurgerySystem
 
         var user = args.User;
 
-        var verb = new UtilityVerb()
+        var verb = new UtilityVerb
         {
             Act = () => AttemptStartSurgery(ent, user, target),
-            Icon = new SpriteSpecifier.Texture(new("/Textures/_Shitmed/Interface/Examine/scalpel.png")),
+            Icon = new SpriteSpecifier.Texture(new ResPath("/Textures/_Shitmed/Interface/Examine/scalpel.png")),
             Text = Loc.GetString("surgery-verb-text"),
             Message = Loc.GetString("surgery-verb-message"),
-            DoContactInteraction = true
+            DoContactInteraction = true,
         };
 
         args.Verbs.Add(verb);

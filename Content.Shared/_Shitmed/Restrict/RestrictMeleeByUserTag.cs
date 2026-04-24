@@ -10,15 +10,16 @@ using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
 
 namespace Content.Shared._Shitmed.Restrict;
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class RestrictMeleeByUserTagComponent : Component
 {
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public List<ProtoId<TagPrototype>> Contains = [];
 
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public List<ProtoId<TagPrototype>> DoesntContain = [];
 
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public List<string> Messages = [];
 }

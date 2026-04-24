@@ -29,10 +29,8 @@ public abstract partial class SharedXenoArtifactSystem
     }
 
     /// <summary> Relays artifact events for artifact nodes. </summary>
-    protected void XATRelayLocalEvent<T>() where T : notnull
-    {
+    protected void XATRelayLocalEvent<T>() where T : notnull =>
         SubscribeLocalEvent<XenoArtifactComponent, T>(RelayEventToNodes);
-    }
 
     private void OnExamined(Entity<XenoArtifactComponent> ent, ref ExaminedEvent args)
     {
@@ -54,9 +52,12 @@ public abstract partial class SharedXenoArtifactSystem
     }
 
     /// <summary>
-    /// Attempts to shift artifact into unlocking state, in which it is going to listen to interactions, that could trigger nodes.
+    /// Attempts to shift artifact into unlocking state, in which it is going to listen to interactions, that could trigger
+    /// nodes.
     /// </summary>
-    public void TriggerXenoArtifact(Entity<XenoArtifactComponent> ent, Entity<XenoArtifactNodeComponent>? node, bool force = false)
+    public void TriggerXenoArtifact(Entity<XenoArtifactComponent> ent,
+        Entity<XenoArtifactNodeComponent>? node,
+        bool force = false)
     {
         // limits spontaneous chain activations, also prevents spamming every triggering tool to activate nodes
         // without real knowledge about triggers
@@ -80,8 +81,8 @@ public abstract partial class SharedXenoArtifactSystem
             var predecessorNodeIndices = GetPredecessorNodes((ent, ent), index);
             var successorNodeIndices = GetSuccessorNodes((ent, ent), index);
             if (unlockingComp.TriggeredNodeIndexes.Count == 0
-                || unlockingComp.TriggeredNodeIndexes.All(
-                    x => predecessorNodeIndices.Contains(x) || successorNodeIndices.Contains(x)
+                || unlockingComp.TriggeredNodeIndexes.All(x =>
+                    predecessorNodeIndices.Contains(x) || successorNodeIndices.Contains(x)
                 )
                )
                 // we add time on each new trigger, if it is not going to fail us
@@ -89,9 +90,7 @@ public abstract partial class SharedXenoArtifactSystem
         }
 
         if (node != null && unlockingComp.TriggeredNodeIndexes.Add(GetIndex(ent, node.Value)))
-        {
             Dirty(ent, unlockingComp);
-        }
     }
 
     public void SetArtifexiumApplied(Entity<XenoArtifactUnlockingComponent> ent, bool val)

@@ -11,14 +11,17 @@ using Robust.Shared.Utility;
 namespace Content.Shared.Points;
 
 /// <summary>
-/// This handles modifying point counts for <see cref="PointManagerComponent"/>
+/// This handles modifying point counts for <see cref="PointManagerComponent" />
 /// </summary>
 public abstract class SharedPointSystem : EntitySystem
 {
     /// <summary>
     /// Adds the specified point value to a player.
     /// </summary>
-    public void AdjustPointValue(NetUserId userId, FixedPoint2 value, EntityUid uid, PointManagerComponent? component = null)
+    public void AdjustPointValue(NetUserId userId,
+        FixedPoint2 value,
+        EntityUid uid,
+        PointManagerComponent? component = null)
     {
         if (!Resolve(uid, ref component))
             return;
@@ -32,7 +35,10 @@ public abstract class SharedPointSystem : EntitySystem
     /// <summary>
     /// Sets the amount of points for a player
     /// </summary>
-    public void SetPointValue(NetUserId userId, FixedPoint2 value, EntityUid uid, PointManagerComponent? component = null)
+    public void SetPointValue(NetUserId userId,
+        FixedPoint2 value,
+        EntityUid uid,
+        PointManagerComponent? component = null)
     {
         if (!Resolve(uid, ref component))
             return;
@@ -77,10 +83,7 @@ public abstract class SharedPointSystem : EntitySystem
     /// <summary>
     /// Returns a formatted message containing a ranking of all the currently online players and their scores.
     /// </summary>
-    public virtual FormattedMessage GetScoreboard(EntityUid uid, PointManagerComponent? component = null)
-    {
-        return new FormattedMessage();
-    }
+    public virtual FormattedMessage GetScoreboard(EntityUid uid, PointManagerComponent? component = null) => new();
 }
 
 /// <summary>

@@ -32,13 +32,13 @@ namespace Content.Shared.Clumsy;
 
 public sealed class ClumsySystem : EntitySystem
 {
-    [Dependency] private readonly SharedStunSystem _stun = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly DamageableSystem _damageable = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly IConfigurationManager _cfg = default!;
+    [Dependency] private readonly DamageableSystem _damageable = default!;
     [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly SharedStunSystem _stun = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -49,8 +49,32 @@ public sealed class ClumsySystem : EntitySystem
         SubscribeLocalEvent<ClumsyComponent, SelfBeforeClimbEvent>(OnBeforeClimbEvent);
     }
 
+    #region Helper functions
+
+    /// <summary>
+    /// "Hits" an entites head against the given table.
+    /// </summary>
+    // Oh this fucntion is public le- NO!! This is only public for the one admin command if you use this anywhere else I will cry.
+    public void HitHeadClumsy(Entity<ClumsyComponent> target, EntityUid table)
+    {
+        var stunTime = target.Comp.ClumsyDefaultStunTime;
+
+        if (TryComp<BonkableComponent>(table, out var bonkComp))
+        {
+            stunTime = bonkComp.BonkTime;
+            if (bonkComp.BonkDamage != null)
+                _damageable.TryChangeDamage(target, bonkComp.BonkDamage, true);
+        }
+
+        _stun.TryUpdateParalyzeDuration(target, stunTime);
+    }
+
+    #endregion
+
     // If you add more clumsy interactions add them in this section!
+
     #region Clumsy interaction events
+
     private void BeforeHyposprayEvent(Entity<ClumsyComponent> ent, ref SelfBeforeHyposprayInjectsEvent args)
     {
         // Clumsy people sometimes inject themselves! Apparently syringes are clumsy proof...
@@ -60,7 +84,8 @@ public sealed class ClumsySystem : EntitySystem
             return;
 
         // TODO: Replace with RandomPredicted once the engine PR is merged
-        var seed = SharedRandomExtensions.HashCodeCombine(new() { (int)_timing.CurTick.Value, GetNetEntity(ent).Id });
+        var seed = SharedRandomExtensions.HashCodeCombine(new List<int>
+            { (int) _timing.CurTick.Value, GetNetEntity(ent).Id });
         var rand = new System.Random(seed);
         if (!rand.Prob(ent.Comp.ClumsyDefaultCheck))
             return;
@@ -79,14 +104,14 @@ public sealed class ClumsySystem : EntitySystem
             return;
 
         // TODO: Replace with RandomPredicted once the engine PR is merged
-        var seed = SharedRandomExtensions.HashCodeCombine(new() { (int)_timing.CurTick.Value, GetNetEntity(ent).Id });
+        var seed = SharedRandomExtensions.HashCodeCombine(new List<int>
+            { (int) _timing.CurTick.Value, GetNetEntity(ent).Id });
         var rand = new System.Random(seed);
         if (!rand.Prob(ent.Comp.ClumsyDefaultCheck))
             return;
 
         args.DefibTarget = args.EntityUsingDefib;
         _audio.PlayPvs(ent.Comp.ClumsySound, ent);
-
     }
 
     private void OnCatchAttempt(Entity<ClumsyComponent> ent, ref CatchAttemptEvent args)
@@ -98,7 +123,8 @@ public sealed class ClumsySystem : EntitySystem
             return;
 
         // TODO: Replace with RandomPredicted once the engine PR is merged
-        var seed = SharedRandomExtensions.HashCodeCombine(new() { (int)_timing.CurTick.Value, GetNetEntity(args.Item).Id });
+        var seed = SharedRandomExtensions.HashCodeCombine(new List<int>
+            { (int) _timing.CurTick.Value, GetNetEntity(args.Item).Id });
         var rand = new System.Random(seed);
         if (!rand.Prob(ent.Comp.ClumsyDefaultCheck))
             return;
@@ -113,8 +139,12 @@ public sealed class ClumsySystem : EntitySystem
         if (_net.IsClient)
             return;
 
-        var selfMessage = Loc.GetString(ent.Comp.CatchingFailedMessageSelf, ("item", ent.Owner), ("catcher", Identity.Entity(ent.Owner, EntityManager)));
-        var othersMessage = Loc.GetString(ent.Comp.CatchingFailedMessageOthers, ("item", ent.Owner), ("catcher", Identity.Entity(ent.Owner, EntityManager)));
+        var selfMessage = Loc.GetString(ent.Comp.CatchingFailedMessageSelf,
+            ("item", ent.Owner),
+            ("catcher", Identity.Entity(ent.Owner, EntityManager)));
+        var othersMessage = Loc.GetString(ent.Comp.CatchingFailedMessageOthers,
+            ("item", ent.Owner),
+            ("catcher", Identity.Entity(ent.Owner, EntityManager)));
         _popup.PopupEntity(selfMessage, ent.Owner, ent.Owner);
         _popup.PopupEntity(othersMessage, ent.Owner, Filter.PvsExcept(ent.Owner), true);
         _audio.PlayPvs(ent.Comp.ClumsySound, ent);
@@ -132,7 +162,8 @@ public sealed class ClumsySystem : EntitySystem
             return;
 
         // TODO: Replace with RandomPredicted once the engine PR is merged
-        var seed = SharedRandomExtensions.HashCodeCombine(new() { (int)_timing.CurTick.Value, GetNetEntity(args.Gun).Id });
+        var seed = SharedRandomExtensions.HashCodeCombine(new List<int>
+            { (int) _timing.CurTick.Value, GetNetEntity(args.Gun).Id });
         var rand = new System.Random(seed);
         if (!rand.Prob(ent.Comp.ClumsyDefaultCheck))
             return;
@@ -157,7 +188,8 @@ public sealed class ClumsySystem : EntitySystem
             return;
 
         // TODO: Replace with RandomPredicted once the engine PR is merged
-        var seed = SharedRandomExtensions.HashCodeCombine(new() { (int)_timing.CurTick.Value, GetNetEntity(ent).Id });
+        var seed = SharedRandomExtensions.HashCodeCombine(new List<int>
+            { (int) _timing.CurTick.Value, GetNetEntity(ent).Id });
         var rand = new System.Random(seed);
         if (!_cfg.GetCVar(CCVars.GameTableBonk) && !rand.Prob(ent.Comp.ClumsyDefaultCheck))
             return;
@@ -176,7 +208,9 @@ public sealed class ClumsySystem : EntitySystem
             // You are slamming yourself onto the table.
             _popup.PopupPredicted(
                 Loc.GetString(ent.Comp.VaulingFailedMessageSelf, ("bonkable", args.BeingClimbedOn)),
-                Loc.GetString(ent.Comp.VaulingFailedMessageOthers, ("victim", gettingPutOnTableName), ("bonkable", args.BeingClimbedOn)),
+                Loc.GetString(ent.Comp.VaulingFailedMessageOthers,
+                    ("victim", gettingPutOnTableName),
+                    ("bonkable", args.BeingClimbedOn)),
                 ent,
                 ent);
         }
@@ -195,25 +229,6 @@ public sealed class ClumsySystem : EntitySystem
 
         args.Cancel();
     }
-    #endregion
 
-    #region Helper functions
-    /// <summary>
-    ///     "Hits" an entites head against the given table.
-    /// </summary>
-    // Oh this fucntion is public le- NO!! This is only public for the one admin command if you use this anywhere else I will cry.
-    public void HitHeadClumsy(Entity<ClumsyComponent> target, EntityUid table)
-    {
-        var stunTime = target.Comp.ClumsyDefaultStunTime;
-
-        if (TryComp<BonkableComponent>(table, out var bonkComp))
-        {
-            stunTime = bonkComp.BonkTime;
-            if (bonkComp.BonkDamage != null)
-                _damageable.TryChangeDamage(target, bonkComp.BonkDamage, true);
-        }
-
-        _stun.TryUpdateParalyzeDuration(target, stunTime);
-    }
     #endregion
 }

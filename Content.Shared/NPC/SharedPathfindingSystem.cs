@@ -33,19 +33,18 @@ public abstract partial class SharedPathfindingSystem : EntitySystem
     public const byte SubStep = 4;
 
     public const byte ChunkSize = 8;
-    public static readonly Vector2 ChunkSizeVec = new(ChunkSize, ChunkSize);
 
     /// <summary>
     /// We won't do points on edges so we'll offset them slightly.
     /// </summary>
     protected const float StepOffset = 1f / SubStep / 2f;
 
+    public static readonly Vector2 ChunkSizeVec = new(ChunkSize, ChunkSize);
+
     private static readonly Vector2 StepOffsetVec = new(StepOffset, StepOffset);
 
-    public Vector2 GetCoordinate(Vector2i chunk, Vector2i index)
-    {
-        return new Vector2(index.X, index.Y) / SubStep+ (chunk) * ChunkSizeVec + StepOffsetVec;
-    }
+    public Vector2 GetCoordinate(Vector2i chunk, Vector2i index) =>
+        new Vector2(index.X, index.Y) / SubStep + chunk * ChunkSizeVec + StepOffsetVec;
 
     public static float ManhattanDistance(Vector2i start, Vector2i end)
     {

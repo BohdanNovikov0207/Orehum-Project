@@ -8,7 +8,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Burial;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class GraveDiggingDoAfterEvent : SimpleDoAfterEvent
 {
 }

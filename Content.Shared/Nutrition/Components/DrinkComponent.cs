@@ -51,32 +51,29 @@
 //
 // SPDX-License-Identifier: MIT
 
-using Content.Shared.Nutrition.EntitySystems;
 using Content.Goobstation.Maths.FixedPoint;
+using Content.Shared.Nutrition.EntitySystems;
 using Robust.Shared.Audio;
 using Robust.Shared.GameStates;
 
 namespace Content.Shared.Nutrition.Components;
 
 [Obsolete("Migration to Content.Shared.Nutrition.Components.EdibleComponent is required")]
-[NetworkedComponent, AutoGenerateComponentState]
-[RegisterComponent, Access(typeof(SharedDrinkSystem))]
+[NetworkedComponent] [AutoGenerateComponentState]
+[RegisterComponent] [Access(typeof(SharedDrinkSystem))]
 public sealed partial class DrinkComponent : Component
 {
-    [DataField]
-    public string Solution = "drink";
-
-    [DataField, AutoNetworkedField]
-    public SoundSpecifier UseSound = new SoundPathSpecifier("/Audio/Items/drink.ogg");
-
-    [DataField, AutoNetworkedField]
-    public FixedPoint2 TransferAmount = FixedPoint2.New(5);
-
     /// <summary>
     /// How long it takes to drink this yourself.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public float Delay = 1;
+
+    /// <summary>
+    /// This is how many seconds it takes to force feed someone this drink.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public float ForceFeedDelay = 3;
 
     /// <summary>
     /// If true, trying to drink when empty will not handle the event.
@@ -86,9 +83,12 @@ public sealed partial class DrinkComponent : Component
     [DataField]
     public bool IgnoreEmpty;
 
-    /// <summary>
-    ///     This is how many seconds it takes to force feed someone this drink.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public float ForceFeedDelay = 3;
+    [DataField]
+    public string Solution = "drink";
+
+    [DataField] [AutoNetworkedField]
+    public FixedPoint2 TransferAmount = FixedPoint2.New(5);
+
+    [DataField] [AutoNetworkedField]
+    public SoundSpecifier UseSound = new SoundPathSpecifier("/Audio/Items/drink.ogg");
 }

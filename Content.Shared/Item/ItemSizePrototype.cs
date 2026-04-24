@@ -12,17 +12,13 @@ namespace Content.Shared.Item;
 /// This is a prototype for a category of an item's size.
 /// </summary>
 [Prototype]
-public sealed partial class ItemSizePrototype : IPrototype, IComparable<ItemSizePrototype>
+public sealed class ItemSizePrototype : IPrototype, IComparable<ItemSizePrototype>
 {
-    /// <inheritdoc/>
-    [IdDataField]
-    public string ID { get; private set; } = default!;
-
     /// <summary>
-    /// The amount of space in a bag an item of this size takes.
+    /// The default inventory shape associated with this item size.
     /// </summary>
-    [DataField]
-    public int Weight = 1;
+    [DataField(required: true)]
+    public IReadOnlyList<Box2i> DefaultShape = new List<Box2i>();
 
     /// <summary>
     /// A player-facing name used to describe this size.
@@ -31,10 +27,10 @@ public sealed partial class ItemSizePrototype : IPrototype, IComparable<ItemSize
     public LocId Name;
 
     /// <summary>
-    /// The default inventory shape associated with this item size.
+    /// The amount of space in a bag an item of this size takes.
     /// </summary>
-    [DataField(required: true)]
-    public IReadOnlyList<Box2i> DefaultShape = new List<Box2i>();
+    [DataField]
+    public int Weight = 1;
 
     public int CompareTo(ItemSizePrototype? other)
     {
@@ -43,23 +39,15 @@ public sealed partial class ItemSizePrototype : IPrototype, IComparable<ItemSize
         return Weight.CompareTo(otherItemSize.Weight);
     }
 
-    public static bool operator <(ItemSizePrototype a, ItemSizePrototype b)
-    {
-        return a.Weight < b.Weight;
-    }
+    /// <inheritdoc />
+    [IdDataField]
+    public string ID { get; } = default!;
 
-    public static bool operator >(ItemSizePrototype a, ItemSizePrototype b)
-    {
-        return a.Weight > b.Weight;
-    }
+    public static bool operator <(ItemSizePrototype a, ItemSizePrototype b) => a.Weight < b.Weight;
 
-    public static bool operator <=(ItemSizePrototype a, ItemSizePrototype b)
-    {
-        return a.Weight <= b.Weight;
-    }
+    public static bool operator >(ItemSizePrototype a, ItemSizePrototype b) => a.Weight > b.Weight;
 
-    public static bool operator >=(ItemSizePrototype a, ItemSizePrototype b)
-    {
-        return a.Weight >= b.Weight;
-    }
+    public static bool operator <=(ItemSizePrototype a, ItemSizePrototype b) => a.Weight <= b.Weight;
+
+    public static bool operator >=(ItemSizePrototype a, ItemSizePrototype b) => a.Weight >= b.Weight;
 }

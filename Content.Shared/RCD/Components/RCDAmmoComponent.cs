@@ -8,13 +8,12 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.RCD.Systems;
 using Robust.Shared.GameStates;
 
 namespace Content.Shared.RCD.Components;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 [Access(typeof(RCDAmmoSystem))]
 public sealed partial class RCDAmmoComponent : Component
 {
@@ -22,6 +21,6 @@ public sealed partial class RCDAmmoComponent : Component
     /// How many charges are contained in this ammo cartridge.
     /// Can be partially transferred into an RCD, until it is empty then it gets deleted.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public int Charges = 30;
 }

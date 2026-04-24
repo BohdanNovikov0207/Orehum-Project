@@ -12,7 +12,7 @@ using Content.Shared.NPC.Systems;
 namespace Content.Shared.Clothing.EntitySystems;
 
 /// <summary>
-/// Handles <see cref="FactionClothingComponent"/> faction adding and removal.
+/// Handles <see cref="FactionClothingComponent" /> faction adding and removal.
 /// </summary>
 public sealed class FactionClothingSystem : EntitySystem
 {

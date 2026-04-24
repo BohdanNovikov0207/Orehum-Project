@@ -7,11 +7,9 @@ using Content.Shared._NF.Interaction.Components;
 using Content.Shared.Hands.Components;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Interaction;
-using Content.Shared.Interaction.Events;
 using Content.Shared.Item;
 using Content.Shared.Whitelist;
 using Robust.Shared.Containers;
-using Robust.Shared.Map;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
 
@@ -20,21 +18,22 @@ namespace Content.Shared._NF.Interaction.Systems;
 /// <summary>
 /// Handles interactions with items that swap with HandPlaceholder items.
 /// </summary>
-public sealed partial class HandPlaceholderSystem : EntitySystem
+public sealed class HandPlaceholderSystem : EntitySystem
 {
     [Dependency] private readonly SharedContainerSystem _container = default!;
     [Dependency] private readonly SharedHandsSystem _hands = default!;
     [Dependency] private readonly SharedInteractionSystem _interaction = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
     [Dependency] private readonly MetaDataSystem _metadata = default!;
     [Dependency] private readonly IPrototypeManager _proto = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
+    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
 
     public readonly EntProtoId<HandPlaceholderComponent> Placeholder = "HandPlaceholder";
 
     public override void Initialize()
     {
-        SubscribeLocalEvent<HandPlaceholderRemoveableComponent, EntGotRemovedFromContainerMessage>(OnEntityRemovedFromContainer);
+        SubscribeLocalEvent<HandPlaceholderRemoveableComponent, EntGotRemovedFromContainerMessage>(
+            OnEntityRemovedFromContainer);
 
         SubscribeLocalEvent<HandPlaceholderComponent, BeforeRangedInteractEvent>(BeforeRangedInteract);
         SubscribeLocalEvent<HandPlaceholderComponent, ContainerGettingRemovedAttemptEvent>(OnRemoveAttempt);
@@ -59,7 +58,8 @@ public sealed partial class HandPlaceholderSystem : EntitySystem
         SetPlaceholder(item, placeholder);
 
         var succeeded = _container.Insert(placeholder, container, force: true);
-        DebugTools.Assert(succeeded, $"Failed to insert placeholder {ToPrettyString(placeholder)} into {ToPrettyString(comp.Source)}");
+        DebugTools.Assert(succeeded,
+            $"Failed to insert placeholder {ToPrettyString(placeholder)} into {ToPrettyString(comp.Source)}");
     }
 
     /// <summary>
@@ -104,14 +104,13 @@ public sealed partial class HandPlaceholderSystem : EntitySystem
 
         SetEnabled(placeholder, false);
         var succeeded = _container.Insert(placeholder, container, force: true);
-        DebugTools.Assert(succeeded, $"Failed to insert placeholder {ToPrettyString(placeholder)} of {ToPrettyString(ent)} into container of {ToPrettyString(owner)}");
+        DebugTools.Assert(succeeded,
+            $"Failed to insert placeholder {ToPrettyString(placeholder)} of {ToPrettyString(ent)} into container of {ToPrettyString(owner)}");
         SetEnabled(placeholder, true); // prevent dropping it now that it's in hand
     }
 
-    private void OnEntityRemovedFromContainer(Entity<HandPlaceholderRemoveableComponent> ent, ref EntGotRemovedFromContainerMessage args)
-    {
-        SwapPlaceholder(ent, args.Container);
-    }
+    private void OnEntityRemovedFromContainer(Entity<HandPlaceholderRemoveableComponent> ent,
+        ref EntGotRemovedFromContainerMessage args) => SwapPlaceholder(ent, args.Container);
 
     private void BeforeRangedInteract(Entity<HandPlaceholderComponent> ent, ref BeforeRangedInteractEvent args)
     {
@@ -150,14 +149,16 @@ public sealed partial class HandPlaceholderSystem : EntitySystem
         {
             var container = _container.GetContainer(source, ent.Comp.ContainerId);
             var succeeded = _container.Insert(ent.Owner, container, force: true);
-            DebugTools.Assert(succeeded, $"Failed to insert {ToPrettyString(ent)} into {container.ID} of {ToPrettyString(source)}");
+            DebugTools.Assert(succeeded,
+                $"Failed to insert {ToPrettyString(ent)} into {container.ID} of {ToPrettyString(source)}");
         }
         else
-        {
             Log.Error($"Placeholder {ToPrettyString(ent)} had no source set");
-        }
 
         _hands.DoPickup(user, hand, target, hands); // Force pickup - empty hands are not okay
-        _interaction.DoContactInteraction(user, target, null, true); // allow for forensics and other systems to work (why does hands system not do this???)
+        _interaction.DoContactInteraction(user,
+            target,
+            null,
+            true); // allow for forensics and other systems to work (why does hands system not do this???)
     }
 }

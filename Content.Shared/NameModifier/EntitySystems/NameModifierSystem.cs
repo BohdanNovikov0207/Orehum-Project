@@ -10,7 +10,7 @@ using Content.Shared.NameModifier.Components;
 
 namespace Content.Shared.NameModifier.EntitySystems;
 
-/// <inheritdoc cref="NameModifierComponent"/>
+/// <inheritdoc cref="NameModifierComponent" />
 public sealed class NameModifierSystem : EntitySystem
 {
     [Dependency] private readonly MetaDataSystem _metaData = default!;
@@ -40,20 +40,20 @@ public sealed class NameModifierSystem : EntitySystem
 
     /// <summary>
     /// Returns the base name of the entity, without any modifiers applied.
-    /// If the entity doesn't have a <see cref="NameModifierComponent"/>,
+    /// If the entity doesn't have a <see cref="NameModifierComponent" />,
     /// this returns the entity's metadata name.
     /// </summary>
     public string GetBaseName(Entity<NameModifierComponent?> entity)
     {
-        if (Resolve(entity, ref entity.Comp, logMissing: false))
+        if (Resolve(entity, ref entity.Comp, false))
             return entity.Comp.BaseName;
         return Name(entity);
     }
 
     /// <summary>
-    /// Raises a <see cref="RefreshNameModifiersEvent"/> to gather modifiers and
+    /// Raises a <see cref="RefreshNameModifiersEvent" /> to gather modifiers and
     /// updates the entity's name to its base name with modifiers applied.
-    /// This will add a <see cref="NameModifierComponent"/> if any modifiers are added.
+    /// This will add a <see cref="NameModifierComponent" /> if any modifiers are added.
     /// </summary>
     /// <remarks>
     /// Call this to update the entity's name when adding or removing a modifier.
@@ -62,7 +62,7 @@ public sealed class NameModifierSystem : EntitySystem
     {
         var meta = MetaData(entity);
         var baseName = meta.EntityName;
-        if (Resolve(entity, ref entity.Comp, logMissing: false))
+        if (Resolve(entity, ref entity.Comp, false))
             baseName = entity.Comp.BaseName;
 
         // Raise an event to get any modifiers
@@ -78,7 +78,7 @@ public sealed class NameModifierSystem : EntitySystem
                 return;
 
             // Restore the base name
-            _metaData.SetEntityName(entity, entity.Comp.BaseName, meta, raiseEvents: false);
+            _metaData.SetEntityName(entity, entity.Comp.BaseName, meta, false);
             // The component isn't doing anything anymore, so remove it
             RemComp<NameModifierComponent>(entity);
             return;
@@ -93,17 +93,19 @@ public sealed class NameModifierSystem : EntitySystem
             SetBaseName((entity, comp), meta.EntityName);
 
         // Set the entity's name with modifiers applied
-        _metaData.SetEntityName(entity, modifiedName, meta, raiseEvents: false);
+        _metaData.SetEntityName(entity, modifiedName, meta, false);
     }
 }
 
 /// <summary>
-/// Raised on an entity when <see cref="NameModifierSystem.RefreshNameModifiers"/> is called.
+/// Raised on an entity when <see cref="NameModifierSystem.RefreshNameModifiers" /> is called.
 /// Subscribe to this event and use its methods to add modifiers to the entity's name.
 /// </summary>
 [ByRefEvent]
 public sealed class RefreshNameModifiersEvent : IInventoryRelayEvent
 {
+    private readonly List<(LocId LocId, int Priority, (string, object)[] ExtraArgs)> _modifiers = [];
+
     /// <summary>
     /// The entity's name without any modifiers applied.
     /// If you want to base a modifier on the entity's name, use
@@ -111,30 +113,26 @@ public sealed class RefreshNameModifiersEvent : IInventoryRelayEvent
     /// </summary>
     public readonly string BaseName;
 
-    private readonly List<(LocId LocId, int Priority, (string, object)[] ExtraArgs)> _modifiers = [];
-
-    /// <inheritdoc/>
-    public SlotFlags TargetSlots => ~SlotFlags.POCKET;
-
-    /// <summary>
-    /// How many modifiers have been added to this event.
-    /// </summary>
-    public int ModifierCount => _modifiers.Count;
-
     public RefreshNameModifiersEvent(string baseName)
     {
         BaseName = baseName;
     }
 
     /// <summary>
-    /// Adds a modifier to the entity's name.
-    /// The original name will be passed to Fluent as <c>$baseName</c> along with any <paramref name="extraArgs"/>.
-    /// Modifiers with a higher <paramref name="priority"/> will be applied later.
+    /// How many modifiers have been added to this event.
     /// </summary>
-    public void AddModifier(LocId locId, int priority = 0, params (string, object)[] extraArgs)
-    {
+    public int ModifierCount => _modifiers.Count;
+
+    /// <inheritdoc />
+    public SlotFlags TargetSlots => ~SlotFlags.POCKET;
+
+    /// <summary>
+    /// Adds a modifier to the entity's name.
+    /// The original name will be passed to Fluent as <c>$baseName</c> along with any <paramref name="extraArgs" />.
+    /// Modifiers with a higher <paramref name="priority" /> will be applied later.
+    /// </summary>
+    public void AddModifier(LocId locId, int priority = 0, params (string, object)[] extraArgs) =>
         _modifiers.Add((locId, priority, extraArgs));
-    }
 
     /// <summary>
     /// Returns the final name with all modifiers applied.

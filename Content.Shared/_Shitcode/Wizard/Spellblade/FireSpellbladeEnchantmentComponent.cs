@@ -14,6 +14,9 @@ namespace Content.Shared._Goobstation.Wizard.Spellblade;
 public sealed partial class FireSpellbladeEnchantmentComponent : Component
 {
     [DataField]
+    public EntProtoId Effect = "FireFlashEffect";
+
+    [DataField]
     public float FireStacks = 10f;
 
     [DataField]
@@ -21,7 +24,4 @@ public sealed partial class FireSpellbladeEnchantmentComponent : Component
 
     [DataField]
     public SoundSpecifier? Sound = new SoundPathSpecifier("/Audio/Magic/fireball.ogg");
-
-    [DataField]
-    public EntProtoId Effect = "FireFlashEffect";
 }

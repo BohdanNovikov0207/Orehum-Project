@@ -38,18 +38,14 @@ public ref struct LogStringHandler
         if (format == null)
         {
             if (argument == null)
-            {
                 return;
-            }
 
             format = argument[0] == '@' ? argument[1..] : argument;
         }
 
         if (Values.TryAdd(format, value) ||
             Values[format] == (object?) value)
-        {
             return;
-        }
 
         var originalFormat = format;
         var i = 2;
@@ -62,10 +58,7 @@ public ref struct LogStringHandler
         }
     }
 
-    public void AppendLiteral(string value)
-    {
-        _handler.AppendLiteral(value);
-    }
+    public void AppendLiteral(string value) => _handler.AppendLiteral(value);
 
     public void AppendFormatted<T>(T value, [CallerArgumentExpression("value")] string? argument = null)
     {
@@ -85,16 +78,16 @@ public ref struct LogStringHandler
         _handler.AppendFormatted(value, alignment);
     }
 
-    public void AppendFormatted<T>(T value, int alignment, string? format, [CallerArgumentExpression("value")] string? argument = null)
+    public void AppendFormatted<T>(T value,
+        int alignment,
+        string? format,
+        [CallerArgumentExpression("value")] string? argument = null)
     {
         AddFormat(format, value, argument);
         _handler.AppendFormatted(value, alignment, format);
     }
 
-    public void AppendFormatted(ReadOnlySpan<char> value)
-    {
-        _handler.AppendFormatted(value);
-    }
+    public void AppendFormatted(ReadOnlySpan<char> value) => _handler.AppendFormatted(value);
 
     // ReSharper disable once MethodOverloadWithOptionalParameter
     public void AppendFormatted(ReadOnlySpan<char> value, int alignment = 0, string? format = null)
@@ -103,10 +96,7 @@ public ref struct LogStringHandler
         _handler.AppendFormatted(value, alignment, format);
     }
 
-    public void AppendFormatted(string? value)
-    {
-        _handler.AppendFormatted(value);
-    }
+    public void AppendFormatted(string? value) => _handler.AppendFormatted(value);
 
     // ReSharper disable once MethodOverloadWithOptionalParameter
     public void AppendFormatted(string? value, int alignment = 0, string? format = null)

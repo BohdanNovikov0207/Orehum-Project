@@ -88,18 +88,34 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
 namespace Content.Shared.Movement.Pulling.Components;
 
 /// <summary>
-/// Specifies an entity as being able to pull another entity with <see cref="PullableComponent"/>
+/// Specifies an entity as being able to pull another entity with <see cref="PullableComponent" />
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState(true)]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState(true)]
 public sealed partial class PullerComponent : Component
 {
+    /// <summary>
+    /// Does this entity need hands to be able to pull something?
+    /// </summary>
+    [DataField]
+    public bool NeedsHands = true;
+
     // My raiding guild
     /// <summary>
     /// Next time the puller can throw what is being pulled.
     /// Used to avoid spamming it for infinite spin + velocity.
     /// </summary>
-    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer)), AutoNetworkedField, Access(Other = AccessPermissions.ReadWriteExecute)]
+    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))] [AutoNetworkedField]
+    [Access(Other = AccessPermissions.ReadWriteExecute)]
     public TimeSpan NextThrow;
+
+    /// <summary>
+    /// Entity currently being pulled if applicable.
+    /// </summary>
+    [AutoNetworkedField] [DataField]
+    public EntityUid? Pulling;
+
+    [DataField]
+    public ProtoId<AlertPrototype> PullingAlert = "Pulling";
 
     [DataField]
     public TimeSpan ThrowCooldown = TimeSpan.FromSeconds(1);
@@ -108,22 +124,6 @@ public sealed partial class PullerComponent : Component
     public float WalkSpeedModifier => Pulling == default ? 1.0f : 0.95f;
 
     public float SprintSpeedModifier => Pulling == default ? 1.0f : 0.95f;
-
-    /// <summary>
-    /// Entity currently being pulled if applicable.
-    /// </summary>
-    [AutoNetworkedField, DataField]
-    public EntityUid? Pulling;
-
-    /// <summary>
-    ///     Does this entity need hands to be able to pull something?
-    /// </summary>
-    [DataField]
-    public bool NeedsHands = true;
-
-    [DataField]
-    public ProtoId<AlertPrototype> PullingAlert = "Pulling";
-
 }
 
 public sealed partial class StopPullingAlertEvent : BaseAlertEvent;

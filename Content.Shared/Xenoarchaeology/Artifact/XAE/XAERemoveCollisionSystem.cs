@@ -12,7 +12,8 @@ public sealed class XAERemoveCollisionSystem : BaseXAESystem<XAERemoveCollisionC
     [Dependency] private readonly SharedPhysicsSystem _physics = default!;
 
     /// <inheritdoc />
-    protected override void OnActivated(Entity<XAERemoveCollisionComponent> ent, ref XenoArtifactNodeActivatedEvent args)
+    protected override void OnActivated(Entity<XAERemoveCollisionComponent> ent,
+        ref XenoArtifactNodeActivatedEvent args)
     {
         if (!TryComp<FixturesComponent>(ent.Owner, out var fixtures))
             return;

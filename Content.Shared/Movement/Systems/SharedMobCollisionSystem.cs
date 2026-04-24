@@ -14,39 +14,39 @@ namespace Content.Shared.Movement.Systems;
 
 public abstract class SharedMobCollisionSystem : EntitySystem
 {
-    [Dependency] protected readonly IConfigurationManager CfgManager = default!;
-    [Dependency] private   readonly IRobustRandom _random = default!;
-    [Dependency] private   readonly MovementSpeedModifierSystem _moveMod = default!;
-    [Dependency] protected readonly SharedPhysicsSystem Physics = default!;
-    [Dependency] private   readonly SharedTransformSystem _xformSystem = default!;
-
-    protected EntityQuery<MobCollisionComponent> MobQuery;
-    protected EntityQuery<PhysicsComponent> PhysicsQuery;
-
-    /// <summary>
-    /// <see cref="CCVars.MovementPushingCap"/>
-    /// </summary>
-    private float _pushingCap;
-
-    /// <summary>
-    /// <see cref="CCVars.MovementPushingVelocityProduct"/>
-    /// </summary>
-    private float _pushingDotProduct;
-
-    /// <summary>
-    /// <see cref="CCVars.MovementMinimumPush"/>
-    /// </summary>
-    private float _minimumPushSquared = 0.01f;
-
-    private float _penCap;
-
     /// <summary>
     /// Time after we stop colliding with another mob before adjusting the movespeedmodifier.
     /// This is required so if we stop colliding for a frame we don't fully reset and get jerky movement.
     /// </summary>
     public const float BufferTime = 0.2f;
 
+    [Dependency] private readonly MovementSpeedModifierSystem _moveMod = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly SharedTransformSystem _xformSystem = default!;
+    [Dependency] protected readonly IConfigurationManager CfgManager = default!;
+    [Dependency] protected readonly SharedPhysicsSystem Physics = default!;
+
     private float _massDiffCap;
+
+    /// <summary>
+    ///     <see cref="CCVars.MovementMinimumPush" />
+    /// </summary>
+    private float _minimumPushSquared = 0.01f;
+
+    private float _penCap;
+
+    /// <summary>
+    ///     <see cref="CCVars.MovementPushingCap" />
+    /// </summary>
+    private float _pushingCap;
+
+    /// <summary>
+    ///     <see cref="CCVars.MovementPushingVelocityProduct" />
+    /// </summary>
+    private float _pushingDotProduct;
+
+    protected EntityQuery<MobCollisionComponent> MobQuery;
+    protected EntityQuery<PhysicsComponent> PhysicsQuery;
 
     public override void Initialize()
     {
@@ -57,11 +57,13 @@ public abstract class SharedMobCollisionSystem : EntitySystem
         Subs.CVar(CfgManager, CCVars.MovementMinimumPush, val => _minimumPushSquared = val * val, true);
         Subs.CVar(CfgManager, CCVars.MovementPenetrationCap, val => _penCap = val, true);
         Subs.CVar(CfgManager, CCVars.MovementPushingCap, _ => UpdatePushCap());
-        Subs.CVar(CfgManager, CCVars.MovementPushingVelocityProduct,
+        Subs.CVar(CfgManager,
+            CCVars.MovementPushingVelocityProduct,
             value =>
             {
                 _pushingDotProduct = value;
-            }, true);
+            },
+            true);
         Subs.CVar(CfgManager, CCVars.MovementPushMassCap, val => _massDiffCap = val, true);
 
         MobQuery = GetEntityQuery<MobCollisionComponent>();
@@ -72,10 +74,8 @@ public abstract class SharedMobCollisionSystem : EntitySystem
         UpdatesBefore.Add(typeof(SharedPhysicsSystem));
     }
 
-    private void UpdatePushCap()
-    {
-        _pushingCap = (1f / CfgManager.GetCVar(CVars.NetTickrate)) * CfgManager.GetCVar(CCVars.MovementPushingCap);
-    }
+    private void UpdatePushCap() => _pushingCap =
+        1f / CfgManager.GetCVar(CVars.NetTickrate) * CfgManager.GetCVar(CCVars.MovementPushingCap);
 
     public override void Update(float frameTime)
     {
@@ -93,9 +93,7 @@ public abstract class SharedMobCollisionSystem : EntitySystem
             var direction = comp.Direction;
 
             if (comp.BufferAccumulator <= 0f)
-            {
                 SetColliding((uid, comp), false, 1f);
-            }
             // Apply the mob collision; if it's too low ignore it (e.g. if mob friction would overcome it).
             // This is so we don't spam velocity changes every tick. It's not that expensive for physics but
             // avoids the networking side.
@@ -104,9 +102,7 @@ public abstract class SharedMobCollisionSystem : EntitySystem
                 DebugTools.Assert(direction.LengthSquared() >= _minimumPushSquared);
 
                 if (direction.Length() > _pushingCap)
-                {
                     direction = direction.Normalized() * _pushingCap;
-                }
 
                 Physics.ApplyLinearImpulse(uid, direction * physics.Mass, body: physics);
                 comp.Direction = Vector2.Zero;
@@ -131,9 +127,7 @@ public abstract class SharedMobCollisionSystem : EntitySystem
             DirtyField(entity.Owner, entity.Comp, nameof(MobCollisionComponent.BufferAccumulator));
         }
         else
-        {
             DebugTools.Assert(speedMod.Equals(1f));
-        }
 
         if (entity.Comp.Colliding != value)
         {
@@ -179,9 +173,7 @@ public abstract class SharedMobCollisionSystem : EntitySystem
             speedMod = 1f;
         }
         else if (float.IsNaN(direction.X) || float.IsNaN(direction.Y))
-        {
             direction = Vector2.Zero;
-        }
 
         speedMod = Math.Clamp(speedMod, 0f, 1f);
 
@@ -245,9 +237,7 @@ public abstract class SharedMobCollisionSystem : EntitySystem
 
             // If we're moving opposite directions for example then ignore (based on cvar).
             if (velocityProduct < _pushingDotProduct)
-            {
                 continue;
-            }
 
             var targetEv = new AttemptMobTargetCollideEvent();
             RaiseLocalEvent(other, ref targetEv);
@@ -260,9 +250,7 @@ public abstract class SharedMobCollisionSystem : EntitySystem
             var diff = ourTransform.Position - otherTransform.Position;
 
             if (diff == Vector2.Zero)
-            {
                 diff = _random.NextVector2(0.01f);
-            }
 
             // 0.7 for 0.35 + 0.35 for mob bounds (see TODO above).
             // Clamp so we don't get a heap of penetration depth and suddenly lurch other mobs.
@@ -287,7 +275,8 @@ public abstract class SharedMobCollisionSystem : EntitySystem
                 speedReduction /= _penCap / penDepth;
                 var speedModifier = Math.Clamp(
                     1f - speedReduction * modifier,
-                    entity.Comp1.MinimumSpeedModifier, 1f);
+                    entity.Comp1.MinimumSpeedModifier,
+                    1f);
 
                 speedMod = MathF.Min(speedModifier, 1f);
             }
@@ -298,9 +287,7 @@ public abstract class SharedMobCollisionSystem : EntitySystem
         }
 
         if (direction == Vector2.Zero)
-        {
             return contactCount > 0;
-        }
 
         direction *= frameTime;
         RaiseCollisionEvent(entity.Owner, direction, speedMod);
@@ -312,7 +299,7 @@ public abstract class SharedMobCollisionSystem : EntitySystem
     /// <summary>
     /// Raised from client -> server indicating mob push direction OR server -> server for NPC mob pushes.
     /// </summary>
-    [Serializable, NetSerializable]
+    [Serializable] [NetSerializable]
     protected sealed class MobCollisionMessage : EntityEventArgs
     {
         public Vector2 Direction;

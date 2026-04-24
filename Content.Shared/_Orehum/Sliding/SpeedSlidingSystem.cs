@@ -2,20 +2,20 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Numerics;
 using Content.Shared.Standing;
 using Content.Shared.Stunnable;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Physics.Components;
 using Robust.Shared.Physics.Systems;
-using System.Numerics;
 
 namespace Content.Shared._Orehum.Sliding;
 
 public sealed class SpeedSlidingSystem : EntitySystem
 {
-    [Dependency] private readonly SharedStunSystem _stun = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedPhysicsSystem _physics = default!;
+    [Dependency] private readonly SharedStunSystem _stun = default!;
 
     public override void Initialize()
     {
@@ -35,7 +35,7 @@ public sealed class SpeedSlidingSystem : EntitySystem
         if (velocity.Length() < ent.Comp.MinSlideSpeed)
             return;
 
-        _stun.TryKnockdown(ent.Owner, TimeSpan.FromSeconds(1.2f), false, false, true);
+        _stun.TryKnockdown(ent.Owner, TimeSpan.FromSeconds(1.2f), false, false);
 
         var direction = velocity.Normalized();
         var impulseMagnitude = ent.Comp.SlideSpeed * ent.Comp.SlideDistance * physics.Mass;

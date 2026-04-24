@@ -7,11 +7,11 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.StationRecords;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class StationRecordsFilter
 {
     public StationRecordFilterType Type = StationRecordFilterType.Name;
-    public string Value  = "";
+    public string Value = "";
 
     public StationRecordsFilter(StationRecordFilterType filterType, string newValue = "")
     {
@@ -23,11 +23,11 @@ public sealed class StationRecordsFilter
 /// <summary>
 /// Message for updating the filter on any kind of records console.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class SetStationRecordFilter : BoundUserInterfaceMessage
 {
-    public readonly string Value;
     public readonly StationRecordFilterType Type;
+    public readonly string Value;
 
     public SetStationRecordFilter(StationRecordFilterType filterType,
         string filterValue)
@@ -40,7 +40,7 @@ public sealed class SetStationRecordFilter : BoundUserInterfaceMessage
 /// <summary>
 /// Different strings that results can be filtered by.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum StationRecordFilterType : byte
 {
     Name,

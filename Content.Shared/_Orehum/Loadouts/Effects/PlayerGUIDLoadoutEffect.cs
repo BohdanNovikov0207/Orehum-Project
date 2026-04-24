@@ -1,9 +1,9 @@
-using Content.Shared.Preferences.Loadouts.Effects;
-using Content.Shared.Preferences.Loadouts;
+using System.Diagnostics.CodeAnalysis;
 using Content.Shared.Preferences;
+using Content.Shared.Preferences.Loadouts;
+using Content.Shared.Preferences.Loadouts.Effects;
 using Robust.Shared.Player;
 using Robust.Shared.Utility;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Content.Shared._Orehum.Loadouts;
 
@@ -12,12 +12,16 @@ namespace Content.Shared._Orehum.Loadouts;
 /// </summary>
 public sealed partial class PlayerGUIDLoadoutEffect : LoadoutEffect
 {
+    private Guid? _guid;
+
     [DataField(required: true)]
     public string Guid;
 
-    private Guid? _guid;
-
-    public override bool Validate(HumanoidCharacterProfile profile, RoleLoadout loadout, ICommonSession? session, IDependencyCollection collection, [NotNullWhen(false)] out FormattedMessage? reason)
+    public override bool Validate(HumanoidCharacterProfile profile,
+        RoleLoadout loadout,
+        ICommonSession? session,
+        IDependencyCollection collection,
+        [NotNullWhen(false)] out FormattedMessage? reason)
     {
         if (session == null)
         {
@@ -32,6 +36,7 @@ public sealed partial class PlayerGUIDLoadoutEffect : LoadoutEffect
             reason = null;
             return true;
         }
+
         reason = FormattedMessage.FromUnformatted(Loc.GetString("loadout-group-player-restriction"));
         return false;
     }

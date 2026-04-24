@@ -10,7 +10,7 @@ namespace Content.Shared.Power.Generation.Teg;
 /// <summary>
 /// Appearance keys for the TEG &amp; its circulators.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum TegVisuals
 {
     PowerOutput,
@@ -21,21 +21,21 @@ public enum TegVisuals
 /// <summary>
 /// Visual sprite layers for the TEG &amp; its circulators.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum TegVisualLayers
 {
     PowerOutput,
     CirculatorBase,
-    CirculatorLight
+    CirculatorLight,
 }
 
 /// <summary>
 /// Visual speed levels for the TEG circulators.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum TegCirculatorSpeed
 {
     SpeedStill,
     SpeedSlow,
-    SpeedFast
+    SpeedFast,
 }

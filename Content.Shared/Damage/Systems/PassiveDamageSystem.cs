@@ -11,10 +11,12 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Shared._Shitmed.Targeting;
 using Content.Shared.Damage.Components;
 using Content.Shared.Mobs.Components;
 using Robust.Shared.Timing;
-using Content.Shared._Shitmed.Targeting; // Shitmed Change
+
+// Shitmed Change
 namespace Content.Shared.Damage;
 
 public sealed class PassiveDamageSystem : EntitySystem
@@ -29,10 +31,8 @@ public sealed class PassiveDamageSystem : EntitySystem
         SubscribeLocalEvent<PassiveDamageComponent, MapInitEvent>(OnPendingMapInit);
     }
 
-    private void OnPendingMapInit(EntityUid uid, PassiveDamageComponent component, MapInitEvent args)
-    {
+    private void OnPendingMapInit(EntityUid uid, PassiveDamageComponent component, MapInitEvent args) =>
         component.NextDamage = _timing.CurTime + TimeSpan.FromSeconds(1f);
-    }
 
     // Every tick, attempt to damage entities
     public override void Update(float frameTime)
@@ -63,8 +63,16 @@ public sealed class PassiveDamageSystem : EntitySystem
 
             // Damage them
             foreach (var allowedState in comp.AllowedStates)
+            {
                 if (allowedState == mobState.CurrentState)
-                    _damageable.TryChangeDamage(uid, comp.Damage, true, false, damage, targetPart: TargetBodyPart.All, splitDamage: comp.SplitBehavior); // Shitmed Change
+                    _damageable.TryChangeDamage(uid,
+                        comp.Damage,
+                        true,
+                        false,
+                        damage,
+                        targetPart: TargetBodyPart.All,
+                        splitDamage: comp.SplitBehavior); // Shitmed Change
+            }
         }
     }
 }

@@ -31,22 +31,33 @@ using Robust.Shared.Prototypes;
 namespace Content.Shared.Inventory;
 
 [Prototype]
-public sealed partial class InventoryTemplatePrototype : IPrototype
+public sealed class InventoryTemplatePrototype : IPrototype
 {
-    [IdDataField] public string ID { get; private set; } = string.Empty;
-
     [DataField("slots")] public SlotDefinition[] Slots { get; private set; } = Array.Empty<SlotDefinition>();
+    [IdDataField] public string ID { get; } = string.Empty;
 }
 
 [DataDefinition]
 public sealed partial class SlotDefinition
 {
+    /// <summary>
+    /// Entity blacklist for CanEquip checks.
+    /// </summary>
+    [DataField("blacklist")] public EntityWhitelist? Blacklist = null;
+
+    /// <summary>
+    /// Entity whitelist for CanEquip checks.
+    /// </summary>
+    [DataField("whitelist")] public EntityWhitelist? Whitelist = null;
+
     [DataField("name", required: true)] public string Name { get; private set; } = string.Empty;
     [DataField("slotTexture")] public string TextureName { get; private set; } = "pocket";
+
     /// <summary>
     /// The texture displayed in a slot when it has an item inside of it.
     /// </summary>
     [DataField] public string FullTextureName { get; private set; } = "SlotBackground";
+
     [DataField("slotFlags")] public SlotFlags SlotFlags { get; private set; } = SlotFlags.PREVENTEQUIP;
     [DataField("showInWindow")] public bool ShowInWindow { get; private set; } = true;
     [DataField("slotGroup")] public string SlotGroup { get; private set; } = "Default";
@@ -66,23 +77,13 @@ public sealed partial class SlotDefinition
     public string DisplayName { get; private set; } = string.Empty;
 
     /// <summary>
-    ///     Whether or not this slot will have its item hidden in the strip menu, and block interactions.
-    ///     <seealso cref="SharedStrippableSystem.IsStripHidden"/>
+    /// Whether or not this slot will have its item hidden in the strip menu, and block interactions.
+    /// <seealso cref="SharedStrippableSystem.IsStripHidden" />
     /// </summary>
     [DataField("stripHidden")] public bool StripHidden { get; private set; }
 
     /// <summary>
-    ///     Offset for the clothing sprites.
+    /// Offset for the clothing sprites.
     /// </summary>
     [DataField("offset")] public Vector2 Offset { get; private set; } = Vector2.Zero;
-
-    /// <summary>
-    ///     Entity whitelist for CanEquip checks.
-    /// </summary>
-    [DataField("whitelist")] public EntityWhitelist? Whitelist = null;
-
-    /// <summary>
-    ///     Entity blacklist for CanEquip checks.
-    /// </summary>
-    [DataField("blacklist")] public EntityWhitelist? Blacklist = null;
 }

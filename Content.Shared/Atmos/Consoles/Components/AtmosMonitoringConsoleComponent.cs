@@ -18,10 +18,15 @@ namespace Content.Shared.Atmos.Components;
 /// Entities capable of opening the atmos monitoring console UI
 /// require this component to function correctly
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 [Access(typeof(SharedAtmosMonitoringConsoleSystem))]
 public sealed partial class AtmosMonitoringConsoleComponent : Component
 {
+    /// <summary>
+    /// A list of all the atmos devices that will be used to populate the nav map
+    /// </summary>
+    [ViewVariables]
+    public Dictionary<NetEntity, AtmosDeviceNavMapData> AtmosDevices = new();
     /*
      * Don't need DataFields as this can be reconstructed
      */
@@ -33,32 +38,26 @@ public sealed partial class AtmosMonitoringConsoleComponent : Component
     public Dictionary<Vector2i, AtmosPipeChunk> AtmosPipeChunks = new();
 
     /// <summary>
-    /// A list of all the atmos devices that will be used to populate the nav map
-    /// </summary>
-    [ViewVariables]
-    public Dictionary<NetEntity, AtmosDeviceNavMapData> AtmosDevices = new();
-
-    /// <summary>
-    /// Color of the floor tiles on the nav map screen
-    /// </summary>
-    [DataField, ViewVariables]
-    public Color NavMapTileColor;
-
-    /// <summary>
-    /// Color of the wall lines on the nav map screen
-    /// </summary>
-    [DataField, ViewVariables]
-    public Color NavMapWallColor;
-
-    /// <summary>
     /// The next time this component is dirtied, it will force the full state
     /// to be sent to the client, instead of just the delta state
     /// </summary>
     [ViewVariables]
     public bool ForceFullUpdate = false;
+
+    /// <summary>
+    /// Color of the floor tiles on the nav map screen
+    /// </summary>
+    [DataField] [ViewVariables]
+    public Color NavMapTileColor;
+
+    /// <summary>
+    /// Color of the wall lines on the nav map screen
+    /// </summary>
+    [DataField] [ViewVariables]
+    public Color NavMapWallColor;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public struct AtmosPipeChunk(Vector2i origin)
 {
     /// <summary>
@@ -81,7 +80,7 @@ public struct AtmosPipeChunk(Vector2i origin)
     public GameTick LastUpdate;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public struct AtmosDeviceNavMapData
 {
     /// <summary>
@@ -140,7 +139,7 @@ public struct AtmosDeviceNavMapData
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class AtmosMonitoringConsoleBoundInterfaceState : BoundUserInterfaceState
 {
     /// <summary>
@@ -157,7 +156,7 @@ public sealed class AtmosMonitoringConsoleBoundInterfaceState : BoundUserInterfa
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public struct AtmosMonitoringConsoleEntry
 {
     /// <summary>
@@ -218,8 +217,7 @@ public struct AtmosMonitoringConsoleEntry
     /// <summary>
     /// Used to populate the atmos monitoring console UI with data from a single air alarm
     /// </summary>
-    public AtmosMonitoringConsoleEntry
-        (NetEntity entity,
+    public AtmosMonitoringConsoleEntry(NetEntity entity,
         NetCoordinates coordinates,
         int netId,
         string entityName,
@@ -240,7 +238,7 @@ public struct AtmosMonitoringConsoleEntry
 /// <param name="NetId">The associated network ID.</param>
 /// <param name="PipeLayer">The associated pipe layer.</param>
 /// <param name="Color">The color of the pipe.</param>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public record AtmosMonitoringConsoleSubnet(int NetId, AtmosPipeLayer PipeLayer, Color Color);
 
 public enum AtmosPipeChunkDataFacing : byte
@@ -255,8 +253,8 @@ public enum AtmosPipeChunkDataFacing : byte
 /// <summary>
 /// UI key associated with the atmos monitoring console
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum AtmosMonitoringConsoleUiKey
 {
-    Key
+    Key,
 }

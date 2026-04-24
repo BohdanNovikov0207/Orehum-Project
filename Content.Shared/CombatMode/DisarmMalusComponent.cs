@@ -5,7 +5,7 @@ namespace Content.Shared.CombatMode;
 /// <summary>
 /// Applies a malus to disarm attempts against this item.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class DisarmMalusComponent : Component
 {
     /// <summary>

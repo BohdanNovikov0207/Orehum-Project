@@ -81,9 +81,28 @@ using Robust.Shared.Random;
 
 namespace Content.Shared.EntityTable.EntitySelectors;
 
-[ImplicitDataDefinitionForInheritors, UsedImplicitly(ImplicitUseTargetFlags.WithInheritors)]
+[ImplicitDataDefinitionForInheritors] [UsedImplicitly(ImplicitUseTargetFlags.WithInheritors)]
 public abstract partial class EntityTableSelector
 {
+    /// <summary>
+    /// A list of conditions that must evaluate to 'true' for the selector to apply.
+    /// </summary>
+    [DataField]
+    public List<EntityTableCondition> Conditions = new();
+
+    /// <summary>
+    /// A simple chance that the selector will run.
+    /// </summary>
+    [DataField]
+    public double Prob = 1;
+
+    /// <summary>
+    /// If true, all the conditions must be successful in order for the selector to process.
+    /// Otherwise, only one of them must be.
+    /// </summary>
+    [DataField]
+    public bool RequireAll = true;
+
     /// <summary>
     /// The number of times this selector is run
     /// </summary>
@@ -95,25 +114,6 @@ public abstract partial class EntityTableSelector
     /// </summary>
     [DataField]
     public float Weight = 1;
-
-    /// <summary>
-    /// A simple chance that the selector will run.
-    /// </summary>
-    [DataField]
-    public double Prob = 1;
-
-    /// <summary>
-    /// A list of conditions that must evaluate to 'true' for the selector to apply.
-    /// </summary>
-    [DataField]
-    public List<EntityTableCondition> Conditions = new();
-
-    /// <summary>
-    /// If true, all the conditions must be successful in order for the selector to process.
-    /// Otherwise, only one of them must be.
-    /// </summary>
-    [DataField]
-    public bool RequireAll = true;
 
     public IEnumerable<EntProtoId> GetSpawns(System.Random rand,
         IEntityManager entMan,

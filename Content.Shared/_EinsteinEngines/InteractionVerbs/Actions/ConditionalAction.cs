@@ -5,44 +5,43 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Shared.InteractionVerbs;
-using Robust.Shared.Serialization;
 
 namespace Content.Server.InteractionVerbs.Actions;
 
 /// <summary>
-///     An action that performs one of the two (or just one) actions based on a condition.
+/// An action that performs one of the two (or just one) actions based on a condition.
 /// </summary>
 [Serializable]
 public sealed partial class ConditionalAction : InteractionAction
 {
+    /// <summary>
+    /// If true, the CanPerform check will be performed before the do-after, interrupting the verb early.
+    /// </summary>
+    [DataField]
+    public bool BeforeDelay = false;
+
     [DataField(required: true)]
     public InteractionRequirement Condition;
 
-    [DataField("true")]
-    public InteractionAction? TrueBranch;
-
-    [DataField("false")]
-    public InteractionAction? FalseBranch;
-
     /// <summary>
-    ///     If true, CanPerform and Perform will fail when the condition results in a <c>null</c> branch.
-    ///     Otherwise, null branch is equivalent to a no-op action.
-    /// </summary>
-    [DataField("failWhenNull")]
-    public bool FailWhenNoBranch = false;
-
-    /// <summary>
-    ///     If true, the IsValid check will be delegated to the respective branch.
-    ///     If the respective branch is <c>null</c>, the decision will be made based on <see cref="FailWhenNoBranch"/>
+    /// If true, the IsValid check will be delegated to the respective branch.
+    /// If the respective branch is <c>null</c>, the decision will be made based on <see cref="FailWhenNoBranch" />
     /// </summary>
     [DataField("delegateValid")]
     public bool DelegateValidation = false;
 
     /// <summary>
-    ///     If true, the CanPerform check will be performed before the do-after, interrupting the verb early.
+    /// If true, CanPerform and Perform will fail when the condition results in a <c>null</c> branch.
+    /// Otherwise, null branch is equivalent to a no-op action.
     /// </summary>
-    [DataField]
-    public bool BeforeDelay = false;
+    [DataField("failWhenNull")]
+    public bool FailWhenNoBranch = false;
+
+    [DataField("false")]
+    public InteractionAction? FalseBranch;
+
+    [DataField("true")]
+    public InteractionAction? TrueBranch;
 
     public override bool IsAllowed(InteractionArgs args, InteractionVerbPrototype proto, VerbDependencies deps)
     {
@@ -53,7 +52,10 @@ public sealed partial class ConditionalAction : InteractionAction
         return branch?.IsAllowed(args, proto, deps) ?? !FailWhenNoBranch;
     }
 
-    public override bool CanPerform(InteractionArgs args, InteractionVerbPrototype proto, bool beforeDelay, VerbDependencies deps)
+    public override bool CanPerform(InteractionArgs args,
+        InteractionVerbPrototype proto,
+        bool beforeDelay,
+        VerbDependencies deps)
     {
         if (beforeDelay && !BeforeDelay)
             return true;

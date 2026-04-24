@@ -10,9 +10,9 @@ namespace Content.Shared.Forensics.Components;
 /// <summary>
 /// This component is for mobs that leave fingerprints.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class FingerprintComponent : Component
 {
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public string? Fingerprint;
 }

@@ -11,7 +11,7 @@ namespace Content.Shared.Access.Components;
 
 /// <summary>
 /// Toggles an access provider with <c>ItemToggle</c>.
-/// Requires <see cref="AccessComponent"/>.
+/// Requires <see cref="AccessComponent" />.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(AccessToggleSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(AccessToggleSystem))]
 public sealed partial class AccessToggleComponent : Component;

@@ -10,6 +10,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Shared.Antag;
 using Content.Shared.IdentityManagement;
 using Content.Shared.Mindshield.Components;
 using Content.Shared.Popups;
@@ -17,7 +18,6 @@ using Content.Shared.Revolutionary.Components;
 using Content.Shared.Stunnable;
 using Robust.Shared.GameStates;
 using Robust.Shared.Player;
-using Content.Shared.Antag;
 
 namespace Content.Shared.Revolutionary;
 
@@ -34,14 +34,17 @@ public abstract class SharedRevolutionarySystem : EntitySystem
         SubscribeLocalEvent<RevolutionaryComponent, ComponentGetStateAttemptEvent>(OnRevCompGetStateAttempt);
         SubscribeLocalEvent<HeadRevolutionaryComponent, ComponentGetStateAttemptEvent>(OnRevCompGetStateAttempt);
 
-        SubscribeLocalEvent<RevolutionaryComponent, ComponentStartup>(OnRevolutionaryComponentStartup); // Goob Station - Revolutionary Language
-        SubscribeLocalEvent<HeadRevolutionaryComponent, ComponentStartup>(OnRevolutionaryComponentStartup); // Goob Station - Revolutionary Language
+        SubscribeLocalEvent<RevolutionaryComponent, ComponentStartup>(
+            OnRevolutionaryComponentStartup); // Goob Station - Revolutionary Language
+        SubscribeLocalEvent<HeadRevolutionaryComponent, ComponentStartup>(
+            OnRevolutionaryComponentStartup); // Goob Station - Revolutionary Language
 
         SubscribeLocalEvent<ShowAntagIconsComponent, ComponentStartup>(OnRevolutionaryComponentStartup);
     }
 
     /// <summary>
-    /// When the mindshield is implanted in the rev it will popup saying they were deconverted. In Head Revs it will remove the mindshield component.
+    /// When the mindshield is implanted in the rev it will popup saying they were deconverted. In Head Revs it will remove the
+    /// mindshield component.
     /// </summary>
     private void MindShieldImplanted(EntityUid uid, MindShieldComponent comp, MapInitEvent init)
     {
@@ -65,18 +68,16 @@ public abstract class SharedRevolutionarySystem : EntitySystem
     /// <summary>
     /// Determines if a HeadRev component should be sent to the client.
     /// </summary>
-    private void OnRevCompGetStateAttempt(EntityUid uid, HeadRevolutionaryComponent comp, ref ComponentGetStateAttemptEvent args)
-    {
-        args.Cancelled = !CanGetState(args.Player);
-    }
+    private void OnRevCompGetStateAttempt(EntityUid uid,
+        HeadRevolutionaryComponent comp,
+        ref ComponentGetStateAttemptEvent args) => args.Cancelled = !CanGetState(args.Player);
 
     /// <summary>
     /// Determines if a Rev component should be sent to the client.
     /// </summary>
-    private void OnRevCompGetStateAttempt(EntityUid uid, RevolutionaryComponent comp, ref ComponentGetStateAttemptEvent args)
-    {
-        args.Cancelled = !CanGetState(args.Player);
-    }
+    private void OnRevCompGetStateAttempt(EntityUid uid,
+        RevolutionaryComponent comp,
+        ref ComponentGetStateAttemptEvent args) => args.Cancelled = !CanGetState(args.Player);
 
     /// <summary>
     /// The criteria that determine whether a Rev/HeadRev component should be sent to a client.
@@ -86,7 +87,7 @@ public abstract class SharedRevolutionarySystem : EntitySystem
     private bool CanGetState(ICommonSession? player)
     {
         //Apparently this can be null in replays so I am just returning true.
-        if (player?.AttachedEntity is not {} uid)
+        if (player?.AttachedEntity is not { } uid)
             return true;
 
         if (HasComp<RevolutionaryComponent>(uid) || HasComp<HeadRevolutionaryComponent>(uid))
@@ -94,14 +95,17 @@ public abstract class SharedRevolutionarySystem : EntitySystem
 
         return HasComp<ShowAntagIconsComponent>(uid);
     }
+
     /// <summary>
     /// Dirties all the Rev components so they are sent to clients.
-    ///
     /// We need to do this because if a rev component was not earlier sent to a client and for example the client
     /// becomes a rev then we need to send all the components to it. To my knowledge there is no way to do this on a
     /// per client basis so we are just dirtying all the components.
     /// </summary>
-    public virtual void OnRevolutionaryComponentStartup<T>(EntityUid someUid, T someComp, ComponentStartup ev) // Goob Station - Revolutionary Language (made public virtual)
+    public virtual void
+        OnRevolutionaryComponentStartup<T>(EntityUid someUid,
+            T someComp,
+            ComponentStartup ev) // Goob Station - Revolutionary Language (made public virtual)
     {
         var revComps = AllEntityQuery<RevolutionaryComponent>();
         while (revComps.MoveNext(out var uid, out var comp))
@@ -120,8 +124,6 @@ public abstract class SharedRevolutionarySystem : EntitySystem
     /// <summary>
     /// Change headrevs ability to convert people
     /// </summary>
-    public void ToggleConvertAbility(Entity<HeadRevolutionaryComponent> headRev, bool toggle = true)
-    {
+    public void ToggleConvertAbility(Entity<HeadRevolutionaryComponent> headRev, bool toggle = true) =>
         headRev.Comp.ConvertAbilityEnabled = toggle;
-    }
 }

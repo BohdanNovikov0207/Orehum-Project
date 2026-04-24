@@ -39,12 +39,12 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="JetBrains.Annotations" PrivateAssets="All" />
+    <PackageReference Include="JetBrains.Annotations" PrivateAssets="All"/>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Content.Goobstation.Common\Content.Goobstation.Common.csproj" />
-    <ProjectReference Include="..\Content.Goobstation.Maths\Content.Goobstation.Maths.csproj" />
-    <ProjectReference Include="..\Content.Shared.Database\Content.Shared.Database.csproj" />
+    <ProjectReference Include="..\Content.Goobstation.Common\Content.Goobstation.Common.csproj"/>
+    <ProjectReference Include="..\Content.Goobstation.Maths\Content.Goobstation.Maths.csproj"/>
+    <ProjectReference Include="..\Content.Shared.Database\Content.Shared.Database.csproj"/>
     <ProjectReference Include="..\RobustToolbox\Lidgren.Network\Lidgren.Network.csproj">
       <Private>false</Private>
     </ProjectReference>
@@ -56,8 +56,8 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Goobstation\Changeling\Changeling.Actions.cs" />
+    <None Include="Goobstation\Changeling\Changeling.Actions.cs"/>
   </ItemGroup>
-  <Import Project="..\RobustToolbox\MSBuild\Robust.Properties.targets" />
-  <Import Project="..\RobustToolbox\MSBuild\Robust.CompNetworkGenerator.targets" />
+  <Import Project="..\RobustToolbox\MSBuild\Robust.Properties.targets"/>
+  <Import Project="..\RobustToolbox\MSBuild\Robust.CompNetworkGenerator.targets"/>
 </Project>

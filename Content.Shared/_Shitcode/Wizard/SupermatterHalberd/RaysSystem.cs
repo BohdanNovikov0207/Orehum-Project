@@ -15,8 +15,8 @@ namespace Content.Shared._Goobstation.Wizard.SupermatterHalberd;
 public sealed class RaysSystem : EntitySystem
 {
     [Dependency] private readonly INetManager _net = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly SharedPointLightSystem _pointLight = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     public EntityUid? DoRays(MapCoordinates coords,

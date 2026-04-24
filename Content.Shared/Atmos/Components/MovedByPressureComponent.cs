@@ -21,6 +21,12 @@ public sealed partial class MovedByPressureComponent : Component
     [DataField]
     public float Accumulator;
 
+    /// <summary>
+    /// Used to remember which fixtures we have to remove the table mask from and give it back accordingly
+    /// </summary>
+    [DataField]
+    public HashSet<string> TableLayerRemoved = new();
+
     [DataField]
     public bool Enabled { get; set; } = true;
 
@@ -32,10 +38,4 @@ public sealed partial class MovedByPressureComponent : Component
 
     [ViewVariables(VVAccess.ReadWrite)]
     public int LastHighPressureMovementAirCycle { get; set; } = 0;
-
-    /// <summary>
-    /// Used to remember which fixtures we have to remove the table mask from and give it back accordingly
-    /// </summary>
-    [DataField]
-    public HashSet<string> TableLayerRemoved = new();
 }

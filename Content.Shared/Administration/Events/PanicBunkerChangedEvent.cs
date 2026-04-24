@@ -8,19 +8,19 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Administration.Events;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class PanicBunkerStatus
 {
-    public bool Enabled;
-    public bool DisableWithAdmins;
-    public bool EnableWithoutAdmins;
     public bool CountDeadminnedAdmins;
-    public bool ShowReason;
+    public bool DisableWithAdmins;
+    public bool Enabled;
+    public bool EnableWithoutAdmins;
     public int MinAccountAgeMinutes;
     public int MinOverallMinutes;
+    public bool ShowReason;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class PanicBunkerChangedEvent : EntityEventArgs
 {
     public PanicBunkerStatus Status;

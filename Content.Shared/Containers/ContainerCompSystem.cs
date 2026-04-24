@@ -50,8 +50,8 @@ namespace Content.Shared.Containers;
 /// </summary>
 public sealed class ContainerCompSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly IPrototypeManager _proto = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -66,9 +66,7 @@ public sealed class ContainerCompSystem : EntitySystem
             return;
 
         if (_proto.TryIndex(ent.Comp.Proto, out var entProto))
-        {
             EntityManager.RemoveComponents(args.Entity, entProto.Components);
-        }
     }
 
     private void OnConInsert(Entity<ContainerCompComponent> ent, ref EntInsertedIntoContainerMessage args)
@@ -77,8 +75,6 @@ public sealed class ContainerCompSystem : EntitySystem
             return;
 
         if (_proto.TryIndex(ent.Comp.Proto, out var entProto))
-        {
             EntityManager.AddComponents(args.Entity, entProto.Components);
-        }
     }
 }

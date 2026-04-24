@@ -13,41 +13,39 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Atmos.Components;
 using Content.Shared.Atmos.Prototypes;
 using Content.Shared.Body.Components;
 using Content.Shared.Body.Systems;
 using Robust.Shared.Prototypes;
 
-namespace Content.Shared.Atmos.EntitySystems
+namespace Content.Shared.Atmos.EntitySystems;
+
+public abstract partial class SharedAtmosphereSystem : EntitySystem
 {
-    public abstract partial class SharedAtmosphereSystem : EntitySystem
+    [Dependency] private readonly SharedInternalsSystem _internals = default!;
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+
+    protected readonly GasPrototype[] GasPrototypes = new GasPrototype[Atmospherics.TotalNumberOfGases];
+
+    private EntityQuery<InternalsComponent> _internalsQuery;
+
+    public IEnumerable<GasPrototype> Gases => GasPrototypes;
+
+    public override void Initialize()
     {
-        [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-        [Dependency] private readonly SharedInternalsSystem _internals = default!;
+        base.Initialize();
 
-        private EntityQuery<InternalsComponent> _internalsQuery;
+        _internalsQuery = GetEntityQuery<InternalsComponent>();
 
-        protected readonly GasPrototype[] GasPrototypes = new GasPrototype[Atmospherics.TotalNumberOfGases];
+        InitializeBreathTool();
 
-        public override void Initialize()
+        for (var i = 0; i < Atmospherics.TotalNumberOfGases; i++)
         {
-            base.Initialize();
-
-            _internalsQuery = GetEntityQuery<InternalsComponent>();
-
-            InitializeBreathTool();
-
-            for (var i = 0; i < Atmospherics.TotalNumberOfGases; i++)
-            {
-                GasPrototypes[i] = _prototypeManager.Index<GasPrototype>(i.ToString());
-            }
+            GasPrototypes[i] = _prototypeManager.Index<GasPrototype>(i.ToString());
         }
-
-        public GasPrototype GetGas(int gasId) => GasPrototypes[gasId];
-
-        public GasPrototype GetGas(Gas gasId) => GasPrototypes[(int) gasId];
-
-        public IEnumerable<GasPrototype> Gases => GasPrototypes;
     }
+
+    public GasPrototype GetGas(int gasId) => GasPrototypes[gasId];
+
+    public GasPrototype GetGas(Gas gasId) => GasPrototypes[(int) gasId];
 }

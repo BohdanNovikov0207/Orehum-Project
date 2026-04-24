@@ -3,16 +3,16 @@
 //
 // SPDX-License-Identifier: MIT
 
-using Robust.Shared.Prototypes;
 using Robust.Shared.GameStates;
+using Robust.Shared.Prototypes;
 
 namespace Content.Shared.Species.Components;
+
 /// <summary>
 /// This will replace one entity with another entity when it is removed from a body part.
-/// Obviously hyper-specific. If you somehow find another use for this, good on you. 
+/// Obviously hyper-specific. If you somehow find another use for this, good on you.
 /// </summary>
-
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class NymphComponent : Component
 {
     /// <summary>

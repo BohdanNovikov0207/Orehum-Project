@@ -24,7 +24,7 @@ public sealed partial class AreaReactionEffect : EventEntityEffect<AreaReactionE
     /// <summary>
     /// The entity prototype that will be spawned as the effect.
     /// </summary>
-    [DataField("prototypeId", required: true, customTypeSerializer:typeof(PrototypeIdSerializer<EntityPrototype>))]
+    [DataField("prototypeId", required: true, customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
     public string PrototypeId = default!;
 
     /// <summary>
@@ -34,10 +34,10 @@ public sealed partial class AreaReactionEffect : EventEntityEffect<AreaReactionE
 
     public override bool ShouldLog => true;
 
-    protected override string ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys)
-            => Loc.GetString("reagent-effect-guidebook-area-reaction",
-                    ("duration", Duration)
-                );
-
     public override LogImpact LogImpact => LogImpact.High;
+
+    protected override string ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys)
+        => Loc.GetString("reagent-effect-guidebook-area-reaction",
+            ("duration", Duration)
+        );
 }

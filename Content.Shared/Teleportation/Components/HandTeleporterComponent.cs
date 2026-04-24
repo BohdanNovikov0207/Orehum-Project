@@ -19,53 +19,53 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototy
 namespace Content.Shared.Teleportation.Components;
 
 /// <summary>
-///     Creates portals. If two are created, both are linked together--otherwise the first teleports randomly.
-///     Using it with both portals active deactivates both.
+/// Creates portals. If two are created, both are linked together--otherwise the first teleports randomly.
+/// Using it with both portals active deactivates both.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class HandTeleporterComponent : Component
 {
-    [ViewVariables, DataField("firstPortal")]
-    public EntityUid? FirstPortal = null;
-
-    [ViewVariables, DataField("secondPortal")]
-    public EntityUid? SecondPortal = null;
-
     /// <summary>
-    ///     Should the portals be able to be placed across grids?
+    /// Should the portals be able to be placed across grids?
     /// </summary>
     [DataField]
     public bool AllowPortalsOnDifferentGrids;
 
     /// <summary>
-    ///     Should the portals work across maps?
+    /// Should the portals work across maps?
     /// </summary>
     [DataField]
     public bool AllowPortalsOnDifferentMaps;
 
+    [DataField("clearPortalsSound")]
+    public SoundSpecifier ClearPortalsSound = new SoundPathSpecifier("/Audio/Machines/button.ogg");
+
+    [ViewVariables] [DataField("firstPortal")]
+    public EntityUid? FirstPortal = null;
+
     [DataField("firstPortalPrototype", customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
     public string FirstPortalPrototype = "PortalRed";
-
-    [DataField("secondPortalPrototype", customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
-    public string SecondPortalPrototype = "PortalBlue";
 
     [DataField("newPortalSound")] public SoundSpecifier NewPortalSound =
         new SoundPathSpecifier("/Audio/Machines/high_tech_confirm.ogg")
         {
-            Params = AudioParams.Default.WithVolume(-2f)
+            Params = AudioParams.Default.WithVolume(-2f),
         };
 
-    [DataField("clearPortalsSound")]
-    public SoundSpecifier ClearPortalsSound = new SoundPathSpecifier("/Audio/Machines/button.ogg");
-
     /// <summary>
-    ///     Delay for creating the portals in seconds.
+    /// Delay for creating the portals in seconds.
     /// </summary>
     [DataField("portalCreationDelay")]
     public float PortalCreationDelay = 1.0f;
+
+    [ViewVariables] [DataField("secondPortal")]
+    public EntityUid? SecondPortal = null;
+
+    [DataField("secondPortalPrototype", customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
+    public string SecondPortalPrototype = "PortalBlue";
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class TeleporterDoAfterEvent : SimpleDoAfterEvent
 {
 }

@@ -5,9 +5,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Linq;
-using Content.Shared.Examine;
-using Content.Shared.Toggleable; // Ignore, touching for REUSE Headers.
 using Content.Shared._EinsteinEngines.Language.Components.Translators;
+using Content.Shared.Examine;
+using Content.Shared.Toggleable;
+// Ignore, touching for REUSE Headers.
 
 namespace Content.Shared._EinsteinEngines.Language.Systems;
 
@@ -34,13 +35,17 @@ public abstract class SharedTranslatorSystem : EntitySystem
         var requiredLanguageNames = component.RequiredLanguages
             .Select(it => Loc.GetString($"language-{it}-name"));
 
-        args.PushMarkup(Loc.GetString("translator-examined-langs-understood", ("languages", string.Join(", ", understoodLanguageNames))));
-        args.PushMarkup(Loc.GetString("translator-examined-langs-spoken", ("languages", string.Join(", ", spokenLanguageNames))));
+        args.PushMarkup(Loc.GetString("translator-examined-langs-understood",
+            ("languages", string.Join(", ", understoodLanguageNames))));
+        args.PushMarkup(Loc.GetString("translator-examined-langs-spoken",
+            ("languages", string.Join(", ", spokenLanguageNames))));
 
-        args.PushMarkup(Loc.GetString(component.RequiresAllLanguages ? "translator-examined-requires-all" : "translator-examined-requires-any",
+        args.PushMarkup(Loc.GetString(
+            component.RequiresAllLanguages ? "translator-examined-requires-all" : "translator-examined-requires-any",
             ("languages", string.Join(", ", requiredLanguageNames))));
 
-        args.PushMarkup(Loc.GetString(component.Enabled ? "translator-examined-enabled" : "translator-examined-disabled"));
+        args.PushMarkup(
+            Loc.GetString(component.Enabled ? "translator-examined-enabled" : "translator-examined-disabled"));
     }
 
     protected void OnAppearanceChange(EntityUid translator, HandheldTranslatorComponent? comp = null)

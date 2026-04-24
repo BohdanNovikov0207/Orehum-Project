@@ -57,8 +57,6 @@ public sealed class ItemSlotRequiresPowerSystem : EntitySystem
     private void OnInsertAttempt(Entity<ItemSlotRequiresPowerComponent> ent, ref ItemSlotInsertAttemptEvent args)
     {
         if (!_receiver.IsPowered(ent.Owner))
-        {
             args.Cancelled = true;
-        }
     }
 }

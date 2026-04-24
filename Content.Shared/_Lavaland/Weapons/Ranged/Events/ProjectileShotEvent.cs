@@ -28,4 +28,3 @@ public sealed class ProjectileShotEvent : EntityEventArgs
 {
     public EntityUid FiredProjectile = default!;
 }
-

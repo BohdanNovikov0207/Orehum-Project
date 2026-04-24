@@ -13,7 +13,7 @@ namespace Content.Shared.Fluids.Components;
 /// Uses <c>ItemToggle</c> to control safety for a spray item.
 /// You can't spray or refill it while safety is on.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(SpraySafetySystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(SpraySafetySystem))]
 public sealed partial class SpraySafetyComponent : Component
 {
     /// <summary>

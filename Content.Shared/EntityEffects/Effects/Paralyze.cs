@@ -13,7 +13,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.EntityEffects;
 using Content.Shared.Stunnable;
 using Robust.Shared.Prototypes;
 
@@ -24,7 +23,7 @@ public sealed partial class Paralyze : EntityEffect
     [DataField] public double ParalyzeTime = 2;
 
     /// <remarks>
-    ///     true - refresh paralyze time,  false - accumulate paralyze time
+    /// true - refresh paralyze time,  false - accumulate paralyze time
     /// </remarks>
     [DataField] public bool Refresh = true;
 
@@ -40,13 +39,10 @@ public sealed partial class Paralyze : EntityEffect
         var paralyzeTime = ParalyzeTime;
 
         if (args is EntityEffectReagentArgs reagentArgs)
-        {
-            paralyzeTime *= (double)reagentArgs.Scale;
-        }
+            paralyzeTime *= (double) reagentArgs.Scale;
         var stunSystem = args.EntityManager.System<SharedStunSystem>();
         _ = Refresh
             ? stunSystem.TryUpdateParalyzeDuration(args.TargetEntity, TimeSpan.FromSeconds(paralyzeTime))
             : stunSystem.TryAddParalyzeDuration(args.TargetEntity, TimeSpan.FromSeconds(paralyzeTime));
     }
 }
-

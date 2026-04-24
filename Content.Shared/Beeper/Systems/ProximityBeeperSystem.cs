@@ -20,14 +20,16 @@ public sealed class ProximityBeeperSystem : EntitySystem
 {
     [Dependency] private readonly BeeperSystem _beeper = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         SubscribeLocalEvent<ProximityBeeperComponent, NewProximityTargetEvent>(OnNewProximityTarget);
         SubscribeLocalEvent<ProximityBeeperComponent, ProximityTargetUpdatedEvent>(OnProximityTargetUpdate);
     }
 
-    private void OnProximityTargetUpdate(EntityUid owner, ProximityBeeperComponent proxBeeper, ref ProximityTargetUpdatedEvent args)
+    private void OnProximityTargetUpdate(EntityUid owner,
+        ProximityBeeperComponent proxBeeper,
+        ref ProximityTargetUpdatedEvent args)
     {
         if (!TryComp<BeeperComponent>(owner, out var beeper))
             return;
@@ -35,8 +37,7 @@ public sealed class ProximityBeeperSystem : EntitySystem
         _beeper.SetIntervalScaling(owner, args.Distance / args.Detector.Comp.Range, beeper);
     }
 
-    private void OnNewProximityTarget(EntityUid owner, ProximityBeeperComponent proxBeeper, ref NewProximityTargetEvent args)
-    {
-        _beeper.SetMute(owner, args.Target == null);
-    }
+    private void OnNewProximityTarget(EntityUid owner,
+        ProximityBeeperComponent proxBeeper,
+        ref NewProximityTargetEvent args) => _beeper.SetMute(owner, args.Target == null);
 }

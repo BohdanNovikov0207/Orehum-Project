@@ -9,7 +9,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Goobstation.Common.Heretic;
 using Content.Shared.Dataset;
 using Content.Shared.Heretic.Prototypes;
 using Content.Shared.Objectives.Components;
@@ -23,10 +22,19 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Heretic;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class HereticComponent : Component
 {
-    public override bool SessionSpecific => true;
+    [DataField]
+    public List<EntProtoId<ObjectiveComponent>> AllObjectives = new()
+    {
+        "HereticKnowledgeObjective",
+        "HereticSacrificeObjective",
+        "HereticSacrificeHeadObjective",
+    };
+
+    [DataField] [AutoNetworkedField]
+    public bool Ascended;
 
     [DataField]
     public List<ProtoId<HereticKnowledgePrototype>> BaseKnowledge = new()
@@ -41,70 +49,22 @@ public sealed partial class HereticComponent : Component
         "FeastOfOwls",
     };
 
-    [DataField, AutoNetworkedField]
-    public List<ProtoId<HereticRitualPrototype>> KnownRituals = new();
+    [DataField] [AutoNetworkedField]
+    public bool CanAscend = true;
 
     [DataField]
     public ProtoId<HereticRitualPrototype>? ChosenRitual;
 
-    /// <summary>
-    ///     Contains the list of targets that are eligible for sacrifice.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public List<SacrificeTargetData> SacrificeTargets = new();
-
-    /// <summary>
-    ///     How much targets can a heretic have?
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public int MaxTargets = 6;
-
     // hardcoded paths because i hate it
     // "Ash", "Lock", "Flesh", "Void", "Blade", "Rust"
     /// <summary>
-    ///     Indicates a path the heretic is on.
+    /// Indicates a path the heretic is on.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public string? CurrentPath;
-
-    /// <summary>
-    ///     Indicates a stage of a path the heretic is on. 0 is no path, 10 is ascension
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public int PathStage;
-
-    [DataField, AutoNetworkedField]
-    public bool Ascended;
-
-    [DataField, AutoNetworkedField]
-    public bool CanAscend = true;
-
-    [DataField]
-    public ProtoId<DatasetPrototype> KnowledgeDataset = "EligibleTags";
-
-    /// <summary>
-    ///     Required tags for ritual of knowledge
-    /// </summary>
-    [DataField(serverOnly: true), NonSerialized]
-    public HashSet<ProtoId<TagPrototype>> KnowledgeRequiredTags = new();
-
-    /// <summary>
-    ///     Used to prevent double casting mansus grasp.
-    /// </summary>
-    [ViewVariables(VVAccess.ReadOnly)]
-    public EntityUid MansusGraspAction = EntityUid.Invalid;
-
-    [DataField]
-    public Dictionary<ProtoId<HereticRitualPrototype>, List<EntityUid>> LimitedTransmutations = new();
-
-    [DataField]
-    public SoundSpecifier? InfluenceGainSound = new SoundCollectionSpecifier("bloodCrawl");
 
     [DataField]
     public LocId InfluenceGainBaseMessage = "influence-base-message";
-
-    [DataField]
-    public int InfluenceGainTextFontSize = 22;
 
     [DataField]
     public List<LocId> InfluenceGainMessages = new()
@@ -129,40 +89,79 @@ public sealed partial class HereticComponent : Component
     };
 
     [DataField]
-    public List<EntProtoId<ObjectiveComponent>> AllObjectives = new()
-    {
-        "HereticKnowledgeObjective",
-        "HereticSacrificeObjective",
-        "HereticSacrificeHeadObjective",
-    };
+    public SoundSpecifier? InfluenceGainSound = new SoundCollectionSpecifier("bloodCrawl");
+
+    [DataField]
+    public int InfluenceGainTextFontSize = 22;
+
+    [DataField]
+    public ProtoId<DatasetPrototype> KnowledgeDataset = "EligibleTags";
 
     /// <summary>
     /// Events raised when on new body when mind gets transferred to it
     /// </summary>
-    [DataField, NonSerialized]
+    [DataField] [NonSerialized]
     public List<HereticKnowledgeEvent> KnowledgeEvents = new();
+
+    /// <summary>
+    /// Required tags for ritual of knowledge
+    /// </summary>
+    [DataField(serverOnly: true)] [NonSerialized]
+    public HashSet<ProtoId<TagPrototype>> KnowledgeRequiredTags = new();
+
+    [DataField] [AutoNetworkedField]
+    public List<ProtoId<HereticRitualPrototype>> KnownRituals = new();
+
+    [DataField]
+    public Dictionary<ProtoId<HereticRitualPrototype>, List<EntityUid>> LimitedTransmutations = new();
+
+    /// <summary>
+    /// Used to prevent double casting mansus grasp.
+    /// </summary>
+    [ViewVariables(VVAccess.ReadOnly)]
+    public EntityUid MansusGraspAction = EntityUid.Invalid;
+
+    /// <summary>
+    /// How much targets can a heretic have?
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public int MaxTargets = 6;
 
     /// <summary>
     /// Minions summoned by this heretic
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public HashSet<EntityUid> Minions = new();
+
+    /// <summary>
+    /// Indicates a stage of a path the heretic is on. 0 is no path, 10 is ascension
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public int PathStage;
+
+    /// <summary>
+    /// Contains the list of targets that are eligible for sacrifice.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public List<SacrificeTargetData> SacrificeTargets = new();
+
+    public override bool SessionSpecific => true;
 }
 
-[DataDefinition, Serializable, NetSerializable]
+[DataDefinition] [Serializable] [NetSerializable]
 public sealed partial class SacrificeTargetData
 {
     [DataField]
     public NetEntity Entity;
 
     [DataField]
-    public HumanoidCharacterProfile Profile;
+    public ProtoId<JobPrototype> Job;
 
     [DataField]
-    public ProtoId<JobPrototype> Job;
+    public HumanoidCharacterProfile Profile;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum InfusedBladeVisuals
 {
     Infused,

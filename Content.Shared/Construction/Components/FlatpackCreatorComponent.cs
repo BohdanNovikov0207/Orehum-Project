@@ -16,36 +16,22 @@ namespace Content.Shared.Construction.Components;
 /// <summary>
 /// This is used for a machine that creates flatpacks at the cost of materials
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 [Access(typeof(SharedFlatpackSystem))]
-[AutoGenerateComponentState, AutoGenerateComponentPause]
+[AutoGenerateComponentState] [AutoGenerateComponentPause]
 public sealed partial class FlatpackCreatorComponent : Component
 {
     /// <summary>
-    /// Whether or not packing is occuring
+    /// A default cost applied to all flatpacks outside of the cost of constructing the machine.
+    /// This one is applied to computers specifically.
     /// </summary>
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
-    [AutoNetworkedField]
-    public bool Packing;
-
-    /// <summary>
-    /// The time at which packing ends
-    /// </summary>
-    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer)), ViewVariables(VVAccess.ReadWrite)]
-    [AutoNetworkedField]
-    [AutoPausedField]
-    public TimeSpan PackEndTime;
-
-    /// <summary>
-    /// How long packing lasts.
-    /// </summary>
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
-    public TimeSpan PackDuration = TimeSpan.FromSeconds(3);
+    [DataField]
+    public Dictionary<ProtoId<MaterialPrototype>, int> BaseComputerCost = new();
 
     /// <summary>
     /// The prototype used when spawning a flatpack.
     /// </summary>
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    [DataField] [ViewVariables(VVAccess.ReadWrite)]
     public EntProtoId BaseFlatpackPrototype = "BaseFlatpack";
 
     /// <summary>
@@ -56,30 +42,43 @@ public sealed partial class FlatpackCreatorComponent : Component
     public Dictionary<ProtoId<MaterialPrototype>, int> BaseMachineCost = new();
 
     /// <summary>
-    /// A default cost applied to all flatpacks outside of the cost of constructing the machine.
-    /// This one is applied to computers specifically.
+    /// How long packing lasts.
     /// </summary>
-    [DataField]
-    public Dictionary<ProtoId<MaterialPrototype>, int> BaseComputerCost = new();
+    [DataField] [ViewVariables(VVAccess.ReadWrite)]
+    public TimeSpan PackDuration = TimeSpan.FromSeconds(3);
 
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    /// <summary>
+    /// The time at which packing ends
+    /// </summary>
+    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))] [ViewVariables(VVAccess.ReadWrite)]
+    [AutoNetworkedField]
+    [AutoPausedField]
+    public TimeSpan PackEndTime;
+
+    /// <summary>
+    /// Whether or not packing is occuring
+    /// </summary>
+    [DataField] [ViewVariables(VVAccess.ReadWrite)]
+    [AutoNetworkedField]
+    public bool Packing;
+
+    [DataField] [ViewVariables(VVAccess.ReadWrite)]
     public string SlotId = "board_slot";
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum FlatpackCreatorUIKey : byte
 {
-    Key
+    Key,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum FlatpackCreatorVisuals : byte
 {
-    Packing
+    Packing,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class FlatpackCreatorStartPackBuiMessage : BoundUserInterfaceMessage
 {
-
 }

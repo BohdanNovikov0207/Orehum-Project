@@ -16,31 +16,31 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.DoAfter;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 [Access(typeof(SharedDoAfterSystem))]
 public sealed partial class DoAfterComponent : Component
 {
-    [DataField("nextId")]
-    public ushort NextId;
+    // Used by obsolete async do afters
+    public readonly Dictionary<ushort, TaskCompletionSource<DoAfterStatus>> AwaitedDoAfters = new();
 
     [DataField("doAfters")]
     public Dictionary<ushort, DoAfter> DoAfters = new();
+
+    [DataField("nextId")]
+    public ushort NextId;
 
     /// <summary>
     /// Goobstation - Whether to raise <c>DoAfterEndedEvent</c> on the user after it ends.
     /// </summary>
     [DataField]
     public bool RaiseEndedEvent;
-
-    // Used by obsolete async do afters
-    public readonly Dictionary<ushort, TaskCompletionSource<DoAfterStatus>> AwaitedDoAfters = new();
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class DoAfterComponentState : ComponentState
 {
-    public readonly ushort NextId;
     public readonly Dictionary<ushort, DoAfter> DoAfters;
+    public readonly ushort NextId;
 
     public DoAfterComponentState(IEntityManager entManager, DoAfterComponent component)
     {
@@ -63,7 +63,7 @@ public sealed class DoAfterComponentState : ComponentState
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum DoAfterStatus : byte
 {
     Invalid,

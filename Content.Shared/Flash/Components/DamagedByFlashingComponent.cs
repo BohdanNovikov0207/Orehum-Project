@@ -6,7 +6,7 @@ namespace Content.Shared.Flash.Components;
 /// <summary>
 /// This entity will take damage from flashes.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 [Access(typeof(DamagedByFlashingSystem))]
 public sealed partial class DamagedByFlashingComponent : Component
 {

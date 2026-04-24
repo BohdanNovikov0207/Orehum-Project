@@ -44,11 +44,11 @@ public sealed partial class AllEntityShape : EntityShape
 public partial record struct GroupEntityShapeOptions
 {
     [DataField]
-    public Vector2? Offset;
-
-    [DataField]
     public int? GroupSize;
 
     [DataField]
     public int? GroupStepSize;
+
+    [DataField]
+    public Vector2? Offset;
 }

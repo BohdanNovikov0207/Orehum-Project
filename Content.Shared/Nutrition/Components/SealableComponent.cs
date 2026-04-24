@@ -13,16 +13,10 @@ namespace Content.Shared.Nutrition.Components;
 /// Only affects the Examine text.
 /// Once the seal has been broken, it cannot be resealed.
 /// </summary>
-[NetworkedComponent, AutoGenerateComponentState]
-[RegisterComponent, Access(typeof(SealableSystem))]
+[NetworkedComponent] [AutoGenerateComponentState]
+[RegisterComponent] [Access(typeof(SealableSystem))]
 public sealed partial class SealableComponent : Component
 {
-    /// <summary>
-    /// Whether the item's seal is intact (i.e. it has never been opened)
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public bool Sealed = true;
-
     /// <summary>
     /// Text shown when examining and the item's seal has not been broken.
     /// </summary>
@@ -34,4 +28,10 @@ public sealed partial class SealableComponent : Component
     /// </summary>
     [DataField]
     public LocId ExamineTextUnsealed = "sealable-component-on-examine-is-unsealed";
+
+    /// <summary>
+    /// Whether the item's seal is intact (i.e. it has never been opened)
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public bool Sealed = true;
 }

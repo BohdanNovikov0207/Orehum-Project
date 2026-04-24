@@ -6,7 +6,7 @@ namespace Content.Shared.Stacks;
 /// Denotes an item as having thresholded stack visuals.
 /// StackComponent.LayerFunction should be set to Threshold to use this in practice.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class StackLayerThresholdComponent : Component
 {
     /// <summary>

@@ -23,30 +23,16 @@ using Robust.Shared.GameStates;
 
 namespace Content.Shared.Gravity;
 
-[NetworkedComponent()]
+[NetworkedComponent]
 [Virtual]
 public partial class SharedGravityGeneratorComponent : Component
 {
     /// <summary>
-    /// A map of the sprites used by the gravity generator given its status.
+    /// The sprite used by the core of the gravity generator when the gravity generator is active.
     /// </summary>
-    [DataField("spriteMap")]
-    [Access(typeof(SharedGravitySystem))]
-    public Dictionary<PowerChargeStatus, string> SpriteMap = new();
-
-    /// <summary>
-    /// The sprite used by the core of the gravity generator when the gravity generator is starting up.
-    /// </summary>
-    [DataField("coreStartupState")]
+    [DataField("coreActivatedState")]
     [ViewVariables(VVAccess.ReadWrite)]
-    public string CoreStartupState = "startup";
-
-    /// <summary>
-    /// The sprite used by the core of the gravity generator when the gravity generator is idle.
-    /// </summary>
-    [DataField("coreIdleState")]
-    [ViewVariables(VVAccess.ReadWrite)]
-    public string CoreIdleState = "idle";
+    public string CoreActivatedState = "activated";
 
     /// <summary>
     /// The sprite used by the core of the gravity generator when the gravity generator is activating.
@@ -56,9 +42,23 @@ public partial class SharedGravityGeneratorComponent : Component
     public string CoreActivatingState = "activating";
 
     /// <summary>
-    /// The sprite used by the core of the gravity generator when the gravity generator is active.
+    /// The sprite used by the core of the gravity generator when the gravity generator is idle.
     /// </summary>
-    [DataField("coreActivatedState")]
+    [DataField("coreIdleState")]
     [ViewVariables(VVAccess.ReadWrite)]
-    public string CoreActivatedState = "activated";
+    public string CoreIdleState = "idle";
+
+    /// <summary>
+    /// The sprite used by the core of the gravity generator when the gravity generator is starting up.
+    /// </summary>
+    [DataField("coreStartupState")]
+    [ViewVariables(VVAccess.ReadWrite)]
+    public string CoreStartupState = "startup";
+
+    /// <summary>
+    /// A map of the sprites used by the gravity generator given its status.
+    /// </summary>
+    [DataField("spriteMap")]
+    [Access(typeof(SharedGravitySystem))]
+    public Dictionary<PowerChargeStatus, string> SpriteMap = new();
 }

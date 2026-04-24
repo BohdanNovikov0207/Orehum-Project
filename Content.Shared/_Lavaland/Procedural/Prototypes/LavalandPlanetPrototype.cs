@@ -6,18 +6,18 @@ namespace Content.Shared._Lavaland.Procedural.Prototypes;
 /// A simple wrapper that contains information about the planet, its static grid layout and a random ruin pool.
 /// </summary>
 [Prototype]
-public sealed partial class LavalandMapPrototype : IPrototype
+public sealed class LavalandMapPrototype : IPrototype
 {
-    /// <inheritdoc/>
-    [IdDataField]
-    public string ID { get; } = default!;
+    [DataField]
+    public ProtoId<LavalandLayoutPrototype>? Layout;
 
     [DataField(required: true)]
     public ProtoId<LavalandPlanetPrototype> Planet = "Lavaland";
 
     [DataField]
-    public ProtoId<LavalandLayoutPrototype>? Layout;
-
-    [DataField]
     public ProtoId<LavalandRuinPoolPrototype>? Ruins;
+
+    /// <inheritdoc />
+    [IdDataField]
+    public string ID { get; } = default!;
 }

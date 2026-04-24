@@ -1,5 +1,4 @@
 using Content.Shared.Atmos.Components;
-using Content.Shared.Body.Components;
 using Content.Shared.Clothing;
 
 namespace Content.Shared.Atmos.EntitySystems;
@@ -12,10 +11,8 @@ public abstract partial class SharedAtmosphereSystem
         SubscribeLocalEvent<BreathToolComponent, ItemMaskToggledEvent>(OnMaskToggled);
     }
 
-    private void OnBreathToolShutdown(Entity<BreathToolComponent> entity, ref ComponentShutdown args)
-    {
+    private void OnBreathToolShutdown(Entity<BreathToolComponent> entity, ref ComponentShutdown args) =>
         DisconnectInternals(entity);
-    }
 
     public void DisconnectInternals(Entity<BreathToolComponent> entity, bool forced = false)
     {
@@ -27,9 +24,7 @@ public abstract partial class SharedAtmosphereSystem
         entity.Comp.ConnectedInternalsEntity = null;
 
         if (_internalsQuery.TryComp(old, out var internalsComponent))
-        {
-            _internals.DisconnectBreathTool((old.Value, internalsComponent), entity.Owner, forced: forced);
-        }
+            _internals.DisconnectBreathTool((old.Value, internalsComponent), entity.Owner, forced);
 
         Dirty(entity);
     }
@@ -37,15 +32,11 @@ public abstract partial class SharedAtmosphereSystem
     private void OnMaskToggled(Entity<BreathToolComponent> ent, ref ItemMaskToggledEvent args)
     {
         if (args.Mask.Comp.IsToggled)
-        {
-            DisconnectInternals(ent, forced: true);
-        }
+            DisconnectInternals(ent, true);
         else
         {
             if (_internalsQuery.TryComp(args.Wearer, out var internals))
-            {
                 _internals.ConnectBreathTool((args.Wearer.Value, internals), ent);
-            }
         }
     }
 }

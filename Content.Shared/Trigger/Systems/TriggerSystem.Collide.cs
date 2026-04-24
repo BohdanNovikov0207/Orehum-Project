@@ -1,5 +1,5 @@
-﻿using Content.Shared.Trigger.Components.Triggers;
-using Content.Shared.StepTrigger.Systems;
+﻿using Content.Shared.StepTrigger.Systems;
+using Content.Shared.Trigger.Components.Triggers;
 using Robust.Shared.Physics.Events;
 
 namespace Content.Shared.Trigger.Systems;
@@ -31,14 +31,13 @@ public sealed partial class TriggerSystem
                 if (ent.Comp.MaxTriggers <= 0)
                     RemCompDeferred<TriggerOnCollideComponent>(ent);
             }
+
             Trigger(ent.Owner, args.OtherEntity, ent.Comp.KeyOut);
         }
     }
 
-    private void OnStepTriggered(Entity<TriggerOnStepTriggerComponent> ent, ref StepTriggeredOffEvent args)
-    {
+    private void OnStepTriggered(Entity<TriggerOnStepTriggerComponent> ent, ref StepTriggeredOffEvent args) =>
         Trigger(ent, args.Tripper, ent.Comp.KeyOut);
-    }
 
     private void OnTimedCollide(Entity<TriggerOnTimedCollideComponent> ent, ref StartCollideEvent args)
     {
@@ -61,10 +60,8 @@ public sealed partial class TriggerSystem
             RemComp<ActiveTriggerOnTimedCollideComponent>(ent);
     }
 
-    private void OnTimedShutdown(Entity<TriggerOnTimedCollideComponent> ent, ref ComponentShutdown args)
-    {
+    private void OnTimedShutdown(Entity<TriggerOnTimedCollideComponent> ent, ref ComponentShutdown args) =>
         RemComp<ActiveTriggerOnTimedCollideComponent>(ent);
-    }
 
     private void UpdateTimedCollide()
     {

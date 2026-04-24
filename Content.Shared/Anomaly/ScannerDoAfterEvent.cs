@@ -10,7 +10,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Anomaly;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class ScannerDoAfterEvent : SimpleDoAfterEvent
 {
 }

@@ -9,7 +9,6 @@ using System.Numerics;
 using Content.Shared._Goobstation.Wizard.Projectiles;
 using Content.Shared._Goobstation.Wizard.TimeStop;
 using Content.Shared.Friction;
-using Content.Shared.Movement.Events;
 using Robust.Shared.Network;
 using Robust.Shared.Physics;
 using Robust.Shared.Physics.Components;
@@ -19,17 +18,17 @@ namespace Content.Shared._Goobstation.Wizard.SpellCards;
 
 public sealed class SpellCardSystem : EntitySystem
 {
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly INetManager _net = default!;
     [Dependency] private readonly SharedPhysicsSystem _physics = default!;
     [Dependency] private readonly TileFrictionController _tileFriction = default!;
-    [Dependency] private readonly INetManager _net = default!;
-
-    private EntityQuery<TransformComponent> _xformQuery;
-    private EntityQuery<HomingProjectileComponent> _homingQuery;
-    private EntityQuery<TrailComponent> _trailQuery;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
     private EntityQuery<AppearanceComponent> _appearanceQuery;
     private EntityQuery<FrozenComponent> _frozenQuery;
+    private EntityQuery<HomingProjectileComponent> _homingQuery;
+    private EntityQuery<TrailComponent> _trailQuery;
+
+    private EntityQuery<TransformComponent> _xformQuery;
 
     public override void Initialize()
     {

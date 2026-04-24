@@ -52,9 +52,9 @@ public abstract class SharedLightCycleSystem : EntitySystem
             var lightLevel = CalculateLightLevel(cycle.Comp, time);
             var colorLevel = CalculateColorLevel(cycle.Comp, time);
             return new Color(
-                (byte)Math.Min(255, color.RByte * colorLevel.R * lightLevel),
-                (byte)Math.Min(255, color.GByte * colorLevel.G * lightLevel),
-                (byte)Math.Min(255, color.BByte * colorLevel.B * lightLevel)
+                (byte) Math.Min(255, color.RByte * colorLevel.R * lightLevel),
+                (byte) Math.Min(255, color.GByte * colorLevel.G * lightLevel),
+                (byte) Math.Min(255, color.BByte * colorLevel.B * lightLevel)
             );
         }
 
@@ -73,11 +73,14 @@ public abstract class SharedLightCycleSystem : EntitySystem
     }
 
     /// <summary>
-    /// It is important to note that each color must have a different exponent, to modify how early or late one color should stand out in relation to another.
+    /// It is important to note that each color must have a different exponent, to modify how early or late one color should
+    /// stand out in relation to another.
     /// This "simulates" what the atmosphere does and is what generates the effect of dawn and dusk.
-    /// The blue component must be a cosine function with half period, so that its minimum is at dawn and dusk, generating the "warm" color corresponding to these periods.
+    /// The blue component must be a cosine function with half period, so that its minimum is at dawn and dusk, generating the
+    /// "warm" color corresponding to these periods.
     /// As you can see in the values, the maximums of the function serve more to define the curve behavior,
-    /// they must be "clipped" so as not to distort the original color of the lighting. In practice, the maximum values, in fact, are the clip thresholds.
+    /// they must be "clipped" so as not to distort the original color of the lighting. In practice, the maximum values, in
+    /// fact, are the clip thresholds.
     /// </summary>
     public static Color CalculateColorLevel(LightCycleComponent comp, float time)
     {
@@ -111,12 +114,27 @@ public abstract class SharedLightCycleSystem : EntitySystem
     /// <summary>
     /// Generates a sinusoidal curve as a function of x (time). The other parameters serve to adjust the behavior of the curve.
     /// </summary>
-    /// <param name="x"> It corresponds to the independent variable of the function, which in the context of this algorithm is the current time. </param>
-    /// <param name="waveLength"> It's the wavelength of the function, it can be said to be the total duration of the light cycle. </param>
+    /// <param name="x">
+    /// It corresponds to the independent variable of the function, which in the context of this algorithm is
+    /// the current time.
+    /// </param>
+    /// <param name="waveLength">
+    /// It's the wavelength of the function, it can be said to be the total duration of the light
+    /// cycle.
+    /// </param>
     /// <param name="crest"> It's the maximum point of the function, where it will have its greatest value. </param>
-    /// <param name="shift"> It's the vertical displacement of the function, in practice it corresponds to the minimum value of the function. </param>
-    /// <param name="exponent"> It is the exponent of the sine, serves to "flatten" the function close to its minimum points and make it "steeper" close to its maximum. </param>
-    /// <param name="phase"> It changes the phase of the wave, like a "horizontal shift". It is important to transform the sinusoidal function into cosine, when necessary. </param>
+    /// <param name="shift">
+    /// It's the vertical displacement of the function, in practice it corresponds to the minimum value of
+    /// the function.
+    /// </param>
+    /// <param name="exponent">
+    /// It is the exponent of the sine, serves to "flatten" the function close to its minimum points
+    /// and make it "steeper" close to its maximum.
+    /// </param>
+    /// <param name="phase">
+    /// It changes the phase of the wave, like a "horizontal shift". It is important to transform the
+    /// sinusoidal function into cosine, when necessary.
+    /// </param>
     /// <returns> The result of the function. </returns>
     public static float CalculateCurve(float x,
         float waveLength,
@@ -125,13 +143,13 @@ public abstract class SharedLightCycleSystem : EntitySystem
         float exponent,
         float phase = 0)
     {
-        var sen = MathF.Pow(MathF.Sin((MathF.PI * (phase + x)) / waveLength), exponent);
+        var sen = MathF.Pow(MathF.Sin(MathF.PI * (phase + x) / waveLength), exponent);
         return (crest - shift) * sen + shift;
     }
 }
 
 /// <summary>
-/// Raised when the offset on <see cref="LightCycleComponent"/> changes.
+/// Raised when the offset on <see cref="LightCycleComponent" /> changes.
 /// </summary>
 [ByRefEvent]
 public record struct LightCycleOffsetEvent(TimeSpan Offset)

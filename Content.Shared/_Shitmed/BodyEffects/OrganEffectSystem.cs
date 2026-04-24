@@ -6,22 +6,24 @@
 
 // We keep this clone of the other system since I don't know yet if I'll need organ specific functions in the future.
 // will delete or refactor as time goes on.
+
+using System.Linq;
 using Content.Shared._Shitmed.Body.Organ;
 using Content.Shared.Body.Organ;
+using Robust.Shared.Network;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization.Manager;
 using Robust.Shared.Timing;
-using System.Linq;
-using Robust.Shared.Network;
-
 
 namespace Content.Shared._Shitmed.BodyEffects;
-public sealed partial class OrganEffectSystem : EntitySystem
+
+public sealed class OrganEffectSystem : EntitySystem
 {
     [Dependency] private readonly IComponentFactory _compFactory = default!;
-    [Dependency] private readonly ISerializationManager _serManager = default!;
     [Dependency] private readonly IGameTiming _gameTiming = default!;
     [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly ISerializationManager _serManager = default!;
+
     public override void Initialize()
     {
         base.Initialize();
@@ -78,7 +80,7 @@ public sealed partial class OrganEffectSystem : EntitySystem
         OrganEffectComponent? effectComp = null,
         bool? removeExisting = true)
     {
-        if (!Resolve(part, ref effectComp, logMissing: false))
+        if (!Resolve(part, ref effectComp, false))
             return;
 
         EntityManager.AddComponents(body, reg, removeExisting ?? true);
@@ -93,7 +95,7 @@ public sealed partial class OrganEffectSystem : EntitySystem
         ComponentRegistry reg,
         OrganEffectComponent? effectComp = null)
     {
-        if (!Resolve(part, ref effectComp, logMissing: false))
+        if (!Resolve(part, ref effectComp, false))
             return;
 
         EntityManager.RemoveComponents(body, reg);

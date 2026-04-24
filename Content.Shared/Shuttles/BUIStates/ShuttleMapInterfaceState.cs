@@ -14,7 +14,7 @@ namespace Content.Shared.Shuttles.BUIStates;
 /// <summary>
 /// Handles BUI data for Map screen.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class ShuttleMapInterfaceState
 {
     /// <summary>
@@ -22,14 +22,14 @@ public sealed class ShuttleMapInterfaceState
     /// </summary>
     public readonly FTLState FTLState;
 
+    public List<ShuttleBeaconObject> Destinations;
+
+    public List<ShuttleExclusionObject> Exclusions;
+
     /// <summary>
     /// When the current FTL state starts and ends.
     /// </summary>
     public StartEndTime FTLTime;
-
-    public List<ShuttleBeaconObject> Destinations;
-
-    public List<ShuttleExclusionObject> Exclusions;
 
     public ShuttleMapInterfaceState(
         FTLState ftlState,

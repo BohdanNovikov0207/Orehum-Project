@@ -31,7 +31,6 @@ using Content.Shared.Camera;
 using Content.Shared.CCVar;
 using Content.Shared.Construction.Components;
 using Content.Shared.Database;
-using Content.Shared.Friction;
 using Content.Shared.Gravity;
 using Content.Shared.Projectiles;
 using Robust.Shared.Configuration;
@@ -52,18 +51,18 @@ public sealed class ThrowingSystem : EntitySystem
     public const float FlyTimePercentage = 0.8f;
 
     private const float TileFrictionMod = 1.5f;
-
-    private float _frictionModifier;
-    private float _airDamping;
+    [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
+    [Dependency] private readonly IConfigurationManager _configManager = default!;
 
     [Dependency] private readonly IGameTiming _gameTiming = default!;
     [Dependency] private readonly SharedGravitySystem _gravity = default!;
     [Dependency] private readonly SharedPhysicsSystem _physics = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly ThrownItemSystem _thrownSystem = default!;
     [Dependency] private readonly SharedCameraRecoilSystem _recoil = default!;
-    [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
-    [Dependency] private readonly IConfigurationManager _configManager = default!;
+    [Dependency] private readonly ThrownItemSystem _thrownSystem = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
+    private float _airDamping;
+
+    private float _frictionModifier;
 
     public override void Initialize()
     {
@@ -94,20 +93,41 @@ public sealed class ThrowingSystem : EntitySystem
         if (mapPos.MapId != thrownPos.MapId)
             return;
 
-        TryThrow(uid, mapPos.Position - thrownPos.Position, baseThrowSpeed, user, pushbackRatio, friction, compensateFriction: compensateFriction, recoil: recoil, animated: animated, playSound: playSound, doSpin: doSpin, unanchor: unanchor, throwInAir: throwInAir); // WWDP throwInAir
+        TryThrow(uid,
+            mapPos.Position - thrownPos.Position,
+            baseThrowSpeed,
+            user,
+            pushbackRatio,
+            friction,
+            compensateFriction,
+            recoil,
+            animated,
+            playSound,
+            doSpin,
+            unanchor,
+            throwInAir); // WWDP throwInAir
     }
 
     /// <summary>
-    ///     Tries to throw the entity if it has a physics component, otherwise does nothing.
+    /// Tries to throw the entity if it has a physics component, otherwise does nothing.
     /// </summary>
     /// <param name="uid">The entity being thrown.</param>
     /// <param name="direction">A vector pointing from the entity to its destination.</param>
     /// <param name="baseThrowSpeed">Throw velocity. Gets modified if compensateFriction is true.</param>
-    /// <param name="pushbackRatio">The ratio of impulse applied to the thrower - defaults to 10 because otherwise it's not enough to properly recover from getting spaced</param>
-    /// <param name="friction">friction value used for the distance calculation. If set to null this defaults to the standard tile values</param>
-    /// <param name="compensateFriction">True will adjust the throw so the item stops at the target coordinates. False means it will land at the target and keep sliding.</param>
+    /// <param name="pushbackRatio">
+    /// The ratio of impulse applied to the thrower - defaults to 10 because otherwise it's not
+    /// enough to properly recover from getting spaced
+    /// </param>
+    /// <param name="friction">
+    /// friction value used for the distance calculation. If set to null this defaults to the standard
+    /// tile values
+    /// </param>
+    /// <param name="compensateFriction">
+    /// True will adjust the throw so the item stops at the target coordinates. False means it
+    /// will land at the target and keep sliding.
+    /// </param>
     /// <param name="doSpin">Whether spin will be applied to the thrown entity.</param>
-    /// <param name="unanchor">If true and the thrown entity has <see cref="AnchorableComponent"/>, unanchor the thrown entity</param>
+    /// <param name="unanchor">If true and the thrown entity has <see cref="AnchorableComponent" />, unanchor the thrown entity</param>
     /// <param name="throwInAir">WWDP - Whether the thrown entity status will be set to InAir during flight.</param>
     public void TryThrow(EntityUid uid,
         Vector2 direction,
@@ -138,21 +158,35 @@ public sealed class ThrowingSystem : EntitySystem
             baseThrowSpeed,
             user,
             pushbackRatio,
-            friction, compensateFriction: compensateFriction, recoil: recoil, animated: animated, playSound: playSound, doSpin: doSpin, throwInAir: throwInAir);
-
+            friction,
+            compensateFriction,
+            recoil,
+            animated,
+            playSound,
+            doSpin,
+            throwInAir: throwInAir);
     }
 
     /// <summary>
-    ///     Tries to throw the entity if it has a physics component, otherwise does nothing.
+    /// Tries to throw the entity if it has a physics component, otherwise does nothing.
     /// </summary>
     /// <param name="uid">The entity being thrown.</param>
     /// <param name="direction">A vector pointing from the entity to its destination.</param>
     /// <param name="baseThrowSpeed">Throw velocity. Gets modified if compensateFriction is true.</param>
-    /// <param name="pushbackRatio">The ratio of impulse applied to the thrower - defaults to 10 because otherwise it's not enough to properly recover from getting spaced</param>
-    /// <param name="friction">friction value used for the distance calculation. If set to null this defaults to the standard tile values</param>
-    /// <param name="compensateFriction">True will adjust the throw so the item stops at the target coordinates. False means it will land at the target and keep sliding.</param>
+    /// <param name="pushbackRatio">
+    /// The ratio of impulse applied to the thrower - defaults to 10 because otherwise it's not
+    /// enough to properly recover from getting spaced
+    /// </param>
+    /// <param name="friction">
+    /// friction value used for the distance calculation. If set to null this defaults to the standard
+    /// tile values
+    /// </param>
+    /// <param name="compensateFriction">
+    /// True will adjust the throw so the item stops at the target coordinates. False means it
+    /// will land at the target and keep sliding.
+    /// </param>
     /// <param name="doSpin">Whether spin will be applied to the thrown entity.</param>
-    /// <param name="unanchor">If true and the thrown entity has <see cref="AnchorableComponent"/>, unanchor the thrown entity</param>
+    /// <param name="unanchor">If true and the thrown entity has <see cref="AnchorableComponent" />, unanchor the thrown entity</param>
     public void TryThrow(EntityUid uid,
         Vector2 direction,
         PhysicsComponent physics,
@@ -170,7 +204,8 @@ public sealed class ThrowingSystem : EntitySystem
         bool unanchor = false,
         bool throwInAir = true) // WWDP throwInAir
     {
-        if (baseThrowSpeed <= 0 || direction == Vector2Helpers.Infinity || direction == Vector2Helpers.NaN || direction == Vector2.Zero || friction < 0)
+        if (baseThrowSpeed <= 0 || direction == Vector2Helpers.Infinity || direction == Vector2Helpers.NaN ||
+            direction == Vector2.Zero || friction < 0)
             return;
 
         if (unanchor && HasComp<AnchorableComponent>(uid))
@@ -187,7 +222,6 @@ public sealed class ThrowingSystem : EntitySystem
         {
             Thrower = user,
             Animate = animated,
-
         };
 
         // if not given, get the default friction value for distance calculation
@@ -212,9 +246,7 @@ public sealed class ThrowingSystem : EntitySystem
         if (doSpin)
         {
             if (physics.InvI > 0f && (!TryComp(uid, out throwingAngle) || throwingAngle.AngularVelocity))
-            {
                 _physics.ApplyAngularImpulse(uid, ThrowAngularImpulse / physics.InvI, body: physics);
-            }
             else
             {
                 Resolve(uid, ref throwingAngle, false);
@@ -228,7 +260,9 @@ public sealed class ThrowingSystem : EntitySystem
         var throwEvent = new ThrownEvent(user, uid);
         RaiseLocalEvent(uid, ref throwEvent, true);
         if (user != null)
-            _adminLogger.Add(LogType.Throw, LogImpact.Low, $"{ToPrettyString(user.Value):user} threw {ToPrettyString(uid):entity}");
+            _adminLogger.Add(LogType.Throw,
+                LogImpact.Low,
+                $"{ToPrettyString(user.Value):user} threw {ToPrettyString(uid):entity}");
 
         // if compensateFriction==true compensate for the distance the item will slide over the floor after landing by reducing the throw speed accordingly.
         // else let the item land on the cursor and from where it slides a little further.
@@ -240,13 +274,9 @@ public sealed class ThrowingSystem : EntitySystem
         _physics.ApplyLinearImpulse(uid, impulseVector, body: physics);
 
         if (comp.LandTime == null || comp.LandTime <= TimeSpan.Zero || !throwInAir) // WWDP
-        {
             _thrownSystem.LandComponent(uid, comp, physics, playSound);
-        }
         else
-        {
             _physics.SetBodyStatus(uid, physics, BodyStatus.InAir);
-        }
 
         if (user == null)
             return;
@@ -270,6 +300,8 @@ public sealed class ThrowingSystem : EntitySystem
         const float massLimit = 5f;
 
         if (pushEv.Push || _gravity.IsWeightless(user.Value))
-            _physics.ApplyLinearImpulse(user.Value, -impulseVector / physics.Mass * pushbackRatio * MathF.Min(massLimit, physics.Mass), body: userPhysics);
+            _physics.ApplyLinearImpulse(user.Value,
+                -impulseVector / physics.Mass * pushbackRatio * MathF.Min(massLimit, physics.Mass),
+                body: userPhysics);
     }
 }

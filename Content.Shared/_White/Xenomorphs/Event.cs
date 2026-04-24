@@ -7,19 +7,21 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared._White.Xenomorphs;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class XenomorphEvolutionDoAfterEvent : DoAfterEvent
 {
-    [DataField]
-    public EntProtoId Choice;
-
     [DataField]
     public ProtoId<XenomorphCastePrototype> Caste;
 
     [DataField]
     public bool CheckNeedCasteDeath;
 
-    public XenomorphEvolutionDoAfterEvent(EntProtoId choice, ProtoId<XenomorphCastePrototype> caste, bool checkNeedCasteDeath = true)
+    [DataField]
+    public EntProtoId Choice;
+
+    public XenomorphEvolutionDoAfterEvent(EntProtoId choice,
+        ProtoId<XenomorphCastePrototype> caste,
+        bool checkNeedCasteDeath = true)
     {
         Choice = choice;
         Caste = caste;
@@ -29,7 +31,7 @@ public sealed partial class XenomorphEvolutionDoAfterEvent : DoAfterEvent
     public override DoAfterEvent Clone() => this;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class LarvaBurstDoAfterEvent : SimpleDoAfterEvent;
 
 public sealed partial class TransferPlasmaActionEvent : EntityTargetActionEvent
@@ -49,14 +51,19 @@ public sealed partial class TailLashActionEvent : WorldTargetActionEvent;
 
 public sealed partial class AcidActionEvent : EntityTargetActionEvent;
 
-public sealed class AfterXenomorphEvolutionEvent(EntityUid evolvedInto, EntityUid mindUid, ProtoId<XenomorphCastePrototype> caste) : EntityEventArgs
+public sealed class AfterXenomorphEvolutionEvent(
+    EntityUid evolvedInto,
+    EntityUid mindUid,
+    ProtoId<XenomorphCastePrototype> caste) : EntityEventArgs
 {
+    public ProtoId<XenomorphCastePrototype> Caste = caste;
     public EntityUid EvolvedInto = evolvedInto;
     public EntityUid MindUid = mindUid;
-    public ProtoId<XenomorphCastePrototype> Caste = caste;
 }
 
-public sealed class BeforeXenomorphEvolutionEvent(ProtoId<XenomorphCastePrototype> caste, bool checkNeedCasteDeath = true) : CancellableEntityEventArgs
+public sealed class BeforeXenomorphEvolutionEvent(
+    ProtoId<XenomorphCastePrototype> caste,
+    bool checkNeedCasteDeath = true) : CancellableEntityEventArgs
 {
     public ProtoId<XenomorphCastePrototype> Caste = caste;
     public bool CheckNeedCasteDeath = checkNeedCasteDeath;

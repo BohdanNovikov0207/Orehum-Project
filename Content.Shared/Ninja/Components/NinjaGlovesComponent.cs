@@ -23,29 +23,35 @@ namespace Content.Shared.Ninja.Components;
 /// <remarks>
 /// Requires <c>ItemToggleComponent</c>.
 /// </remarks>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 [Access(typeof(SharedNinjaGlovesSystem))]
 public sealed partial class NinjaGlovesComponent : Component
 {
-    /// <summary>
-    /// Entity of the ninja using these gloves, usually means enabled
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public EntityUid? User;
-
     /// <summary>
     /// Abilities to give to the user when enabled.
     /// </summary>
     [DataField(required: true)]
     public List<NinjaGloveAbility> Abilities = new();
+
+    /// <summary>
+    /// Entity of the ninja using these gloves, usually means enabled
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public EntityUid? User;
 }
 
 /// <summary>
 /// An ability that adds components to the user when the gloves are enabled.
 /// </summary>
 [DataRecord]
-public partial record struct NinjaGloveAbility()
+public record struct NinjaGloveAbility()
 {
+    /// <summary>
+    /// Components to add and remove.
+    /// </summary>
+    [DataField(required: true)]
+    public ComponentRegistry Components = new();
+
     /// <summary>
     /// If not null, checks if an objective with this prototype has been completed.
     /// If it has, the ability components are skipped to prevent doing the objective twice.
@@ -53,10 +59,4 @@ public partial record struct NinjaGloveAbility()
     /// </summary>
     [DataField]
     public EntProtoId<ObjectiveComponent>? Objective;
-
-    /// <summary>
-    /// Components to add and remove.
-    /// </summary>
-    [DataField(required: true)]
-    public ComponentRegistry Components = new();
 }

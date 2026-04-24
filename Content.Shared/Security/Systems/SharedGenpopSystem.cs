@@ -16,20 +16,20 @@ namespace Content.Shared.Security.Systems;
 
 public abstract class SharedGenpopSystem : EntitySystem
 {
-    [Dependency] private readonly IConfigurationManager _cfgManager = default!;
-    [Dependency] protected readonly IGameTiming Timing = default!;
     [Dependency] private readonly AccessReaderSystem _accessReader = default!;
+    [Dependency] private readonly IConfigurationManager _cfgManager = default!;
     [Dependency] private readonly SharedEntityStorageSystem _entityStorage = default!;
-    [Dependency] protected readonly SharedIdCardSystem IdCard = default!;
     [Dependency] private readonly LockSystem _lock = default!;
-    [Dependency] protected readonly MetaDataSystem MetaDataSystem = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly SharedUserInterfaceSystem _userInterface = default!;
+    [Dependency] protected readonly SharedIdCardSystem IdCard = default!;
+    [Dependency] protected readonly MetaDataSystem MetaDataSystem = default!;
+    [Dependency] protected readonly IGameTiming Timing = default!;
 
     // CCvar.
     private int _maxIdJobLength;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         SubscribeLocalEvent<GenpopLockerComponent, GenpopLockerIdConfiguredMessage>(OnIdConfigured);
@@ -48,9 +48,7 @@ public abstract class SharedGenpopSystem : EntitySystem
         if (string.IsNullOrWhiteSpace(args.Name) || args.Name.Length > _maxIdJobLength ||
             args.Sentence < 0 ||
             string.IsNullOrWhiteSpace(args.Crime) || args.Crime.Length > GenpopLockerComponent.MaxCrimeLength)
-        {
             return;
-        }
 
         if (!_accessReader.IsAllowed(args.Actor, ent))
             return;
@@ -72,9 +70,7 @@ public abstract class SharedGenpopSystem : EntitySystem
 
         // We cancel no matter what. Our second option is just opening the closet.
         if (ent.Comp.LinkedId == null)
-        {
             args.Cancelled = true;
-        }
 
         if (args.User is not { } user)
             return;
@@ -182,7 +178,8 @@ public abstract class SharedGenpopSystem : EntitySystem
                 IdCard.SetExpireTime((ent.Comp.LinkedId.Value, expire), Timing.CurTime + genpopId.SentenceDuration);
             },
             Priority = 11,
-            Text = Loc.GetString("genpop-locker-action-reset-sentence", ("percent", Math.Clamp(servedTime, 0, 1) * 100)),
+            Text = Loc.GetString("genpop-locker-action-reset-sentence",
+                ("percent", Math.Clamp(servedTime, 0, 1) * 100)),
             Impact = LogImpact.Medium,
             DoContactInteraction = true,
             Disabled = !hasAccess,
@@ -242,6 +239,5 @@ public abstract class SharedGenpopSystem : EntitySystem
 
     protected virtual void CreateId(Entity<GenpopLockerComponent> ent, string name, float sentence, string crime)
     {
-
     }
 }

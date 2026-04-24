@@ -1,19 +1,17 @@
-using Content.Shared.NameModifier.EntitySystems;
 using Content.Shared.Mind.Components;
+using Content.Shared.NameModifier.EntitySystems;
 
 namespace Content.Shared.Mind;
 
 /// <summary>
-///     Relays events raised on a mobs body to its mind and mind role entities.
-///     Useful for events that should be raised both on the body and the mind.
+/// Relays events raised on a mobs body to its mind and mind role entities.
+/// Useful for events that should be raised both on the body and the mind.
 /// </summary>
 public abstract partial class SharedMindSystem : EntitySystem
 {
-    public void InitializeRelay()
-    {
+    public void InitializeRelay() =>
         // for name modifiers that depend on certain mind roles
         SubscribeLocalEvent<MindContainerComponent, RefreshNameModifiersEvent>(RelayRefToMind);
-    }
 
     protected void RelayToMind<T>(EntityUid uid, MindContainerComponent component, T args) where T : class
     {
@@ -24,7 +22,9 @@ public abstract partial class SharedMindSystem : EntitySystem
             RaiseLocalEvent(mindId, ref ev);
 
             foreach (var role in mindComp.MindRoles)
+            {
                 RaiseLocalEvent(role, ref ev);
+            }
         }
     }
 
@@ -37,7 +37,9 @@ public abstract partial class SharedMindSystem : EntitySystem
             RaiseLocalEvent(mindId, ref ev);
 
             foreach (var role in mindComp.MindRoles)
+            {
                 RaiseLocalEvent(role, ref ev);
+            }
         }
 
         args = ev.Args;

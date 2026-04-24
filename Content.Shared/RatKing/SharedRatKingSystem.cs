@@ -14,7 +14,7 @@
 
 using Content.Shared.Abilities;
 using Content.Shared.Actions;
-﻿using Content.Shared.Actions.Components;
+using Content.Shared.Actions.Components;
 using Content.Shared.DoAfter;
 using Content.Shared.Random;
 using Content.Shared.Random.Helpers;
@@ -30,15 +30,15 @@ namespace Content.Shared.RatKing;
 
 public abstract class SharedRatKingSystem : EntitySystem
 {
+    [Dependency] private readonly SharedActionsSystem _action = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
     [Dependency] private readonly IGameTiming _gameTiming = default!; // Used for rummage cooldown
     [Dependency] private readonly INetManager _net = default!;
     [Dependency] protected readonly IPrototypeManager PrototypeManager = default!;
     [Dependency] protected readonly IRobustRandom Random = default!;
-    [Dependency] private readonly SharedActionsSystem _action = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         SubscribeLocalEvent<RatKingComponent, ComponentStartup>(OnStartup);
@@ -145,19 +145,25 @@ public abstract class SharedRatKingSystem : EntitySystem
             Priority = 0,
             Act = () =>
             {
-                _doAfter.TryStartDoAfter(new DoAfterArgs(EntityManager, args.User, component.RummageDuration,
-                    new RatKingRummageDoAfterEvent(), uid, uid)
+                _doAfter.TryStartDoAfter(new DoAfterArgs(EntityManager,
+                    args.User,
+                    component.RummageDuration,
+                    new RatKingRummageDoAfterEvent(),
+                    uid,
+                    uid)
                 {
                     BlockDuplicate = true,
                     BreakOnDamage = true,
                     BreakOnMove = true,
-                    DistanceThreshold = 2f
+                    DistanceThreshold = 2f,
                 });
-            }
+            },
         });
     }
 
-    private void OnDoAfterComplete(EntityUid uid, RatKingRummageableComponent component, RatKingRummageDoAfterEvent args)
+    private void OnDoAfterComplete(EntityUid uid,
+        RatKingRummageableComponent component,
+        RatKingRummageDoAfterEvent args)
     {
         // DeltaV - Rummaging an object updates the looting cooldown rather than a "previously looted" check.
         // Note that the "Looted" boolean can still be checked (by mappers/admins)
@@ -189,17 +195,14 @@ public abstract class SharedRatKingSystem : EntitySystem
 
     public virtual void UpdateServantNpc(EntityUid uid, RatKingOrderType orderType)
     {
-
     }
 
     public virtual void DoCommandCallout(EntityUid uid, RatKingComponent component)
     {
-
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class RatKingRummageDoAfterEvent : SimpleDoAfterEvent
 {
-
 }

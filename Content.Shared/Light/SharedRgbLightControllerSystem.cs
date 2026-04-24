@@ -23,10 +23,8 @@ public abstract class SharedRgbLightControllerSystem : EntitySystem
         SubscribeLocalEvent<RgbLightControllerComponent, ComponentGetState>(OnGetState);
     }
 
-    private void OnGetState(EntityUid uid, RgbLightControllerComponent component, ref ComponentGetState args)
-    {
+    private void OnGetState(EntityUid uid, RgbLightControllerComponent component, ref ComponentGetState args) =>
         args.State = new RgbLightControllerState(component.CycleRate, component.Layers);
-    }
 
     public void SetLayers(EntityUid uid, List<int>? layers, RgbLightControllerComponent? rgb = null)
     {

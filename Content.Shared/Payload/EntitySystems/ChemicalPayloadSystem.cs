@@ -12,8 +12,8 @@ namespace Content.Shared.Payload.EntitySystems;
 
 public sealed class ChemicalPayloadSystem : EntitySystem
 {
-    [Dependency] private readonly ItemSlotsSystem _itemSlotsSystem = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly ItemSlotsSystem _itemSlotsSystem = default!;
 
     public override void Initialize()
     {
@@ -25,12 +25,13 @@ public sealed class ChemicalPayloadSystem : EntitySystem
         SubscribeLocalEvent<ChemicalPayloadComponent, EntRemovedFromContainerMessage>(OnContainerModified);
     }
 
-    private void OnContainerModified(EntityUid uid, ChemicalPayloadComponent component, ContainerModifiedMessage args)
-    {
+    private void
+        OnContainerModified(EntityUid uid, ChemicalPayloadComponent component, ContainerModifiedMessage args) =>
         UpdateAppearance(uid, component);
-    }
 
-    private void UpdateAppearance(EntityUid uid, ChemicalPayloadComponent? component = null, AppearanceComponent? appearance = null)
+    private void UpdateAppearance(EntityUid uid,
+        ChemicalPayloadComponent? component = null,
+        AppearanceComponent? appearance = null)
     {
         if (!Resolve(uid, ref component, ref appearance, false))
             return;

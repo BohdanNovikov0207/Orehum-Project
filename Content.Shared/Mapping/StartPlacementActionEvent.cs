@@ -4,7 +4,7 @@
 // SPDX-License-Identifier: MIT
 
 using Content.Shared.Actions;
-﻿using Content.Shared.Maps;
+using Content.Shared.Maps;
 using Robust.Shared.Prototypes;
 
 namespace Content.Shared.Mapping;
@@ -15,11 +15,11 @@ public sealed partial class StartPlacementActionEvent : InstantActionEvent
     public EntProtoId? EntityType;
 
     [DataField]
-    public ProtoId<ContentTileDefinition>? TileId;
+    public bool Eraser;
 
     [DataField]
     public string? PlacementOption;
 
     [DataField]
-    public bool Eraser;
+    public ProtoId<ContentTileDefinition>? TileId;
 }

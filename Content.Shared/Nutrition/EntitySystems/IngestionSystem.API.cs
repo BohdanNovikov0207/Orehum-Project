@@ -17,13 +17,16 @@ namespace Content.Shared.Nutrition.EntitySystems;
 /// </summary>
 public sealed partial class IngestionSystem
 {
+    public const float
+        MaxFeedDistance =
+            1.0f; // We should really have generic interaction ranges like short, medium, long and use those instead...
+
+    // BodySystem has no way of telling us where the mouth is so we're making some assumptions.
+    public const SlotFlags DefaultFlags = SlotFlags.HEAD | SlotFlags.MASK;
+
     // List of prototypes that other components or systems might want.
     public static readonly ProtoId<EdiblePrototype> Food = "Food";
     public static readonly ProtoId<EdiblePrototype> Drink = "Drink";
-
-    public const float MaxFeedDistance = 1.0f; // We should really have generic interaction ranges like short, medium, long and use those instead...
-    // BodySystem has no way of telling us where the mouth is so we're making some assumptions.
-    public const SlotFlags DefaultFlags = SlotFlags.HEAD | SlotFlags.MASK;
 
     #region Ingestion
 
@@ -33,20 +36,15 @@ public sealed partial class IngestionSystem
     /// <param name="user">The entity who is eating.</param>
     /// <param name="ingested">The entity that is trying to be ingested.</param>
     /// <returns>Returns true if we are now ingesting the item.</returns>
-    public bool TryIngest(EntityUid user, EntityUid ingested)
-    {
-        return TryIngest(user, user, ingested);
-    }
+    public bool TryIngest(EntityUid user, EntityUid ingested) => TryIngest(user, user, ingested);
 
-    /// <inheritdoc cref="TryIngest(EntityUid,EntityUid)"/>
+    /// <inheritdoc cref="TryIngest(EntityUid,EntityUid)" />
     /// <summary>Overload of TryIngest for if an entity is trying to make another entity ingest an entity</summary>
     /// <param name="user">The entity who is trying to make this happen.</param>
     /// <param name="target">The entity who is being made to ingest something.</param>
     /// <param name="ingested">The entity that is trying to be ingested.</param>
-    public bool TryIngest(EntityUid user, EntityUid target, EntityUid ingested)
-    {
-        return AttemptIngest(user, target, ingested, true);
-    }
+    public bool TryIngest(EntityUid user, EntityUid target, EntityUid ingested) =>
+        AttemptIngest(user, target, ingested, true);
 
     /// <summary>
     /// Checks if we can ingest a given entity without actually ingesting it.
@@ -54,23 +52,17 @@ public sealed partial class IngestionSystem
     /// <param name="user">The entity doing the ingesting.</param>
     /// <param name="ingested">The ingested entity.</param>
     /// <returns>Returns true if it's possible for the entity to ingest this item.</returns>
-    public bool CanIngest(EntityUid user, EntityUid ingested)
-    {
-        return AttemptIngest(user, user, ingested, false);
-    }
+    public bool CanIngest(EntityUid user, EntityUid ingested) => AttemptIngest(user, user, ingested, false);
 
     /// <summary>
-    ///     Check whether we have an open pie-hole that's in range.
+    /// Check whether we have an open pie-hole that's in range.
     /// </summary>
     /// <param name="user">The one performing the action</param>
     /// <param name="target">The target whose mouth is checked</param>
     /// <returns></returns>
-    public bool HasMouthAvailable(EntityUid user, EntityUid target)
-    {
-        return HasMouthAvailable(user, target, DefaultFlags);
-    }
+    public bool HasMouthAvailable(EntityUid user, EntityUid target) => HasMouthAvailable(user, target, DefaultFlags);
 
-    /// <inheritdoc cref="HasMouthAvailable(EntityUid, EntityUid)"/>
+    /// <inheritdoc cref="HasMouthAvailable(EntityUid, EntityUid)" />
     /// Overflow which takes custom flags for a mouth being blocked, in case the entity has a mouth not on the face.
     public bool HasMouthAvailable(EntityUid user, EntityUid target, SlotFlags flags)
     {
@@ -93,27 +85,22 @@ public sealed partial class IngestionSystem
         return false;
     }
 
-    /// <inheritdoc cref="CanConsume(EntityUid,EntityUid)"/>
+    /// <inheritdoc cref="CanConsume(EntityUid,EntityUid)" />
     /// <param name="user">The entity that is consuming</param>
     /// <param name="ingested">The entity that is being consumed</param>
-    public bool CanConsume(EntityUid user, EntityUid ingested)
-    {
-        return CanConsume(user, user, ingested, out _, out _);
-    }
+    public bool CanConsume(EntityUid user, EntityUid ingested) => CanConsume(user, user, ingested, out _, out _);
 
     /// <summary>
-    ///     Checks if we can feed an edible solution from an entity to a target.
+    /// Checks if we can feed an edible solution from an entity to a target.
     /// </summary>
     /// <param name="user">The one doing the feeding</param>
     /// <param name="target">The one being fed.</param>
     /// <param name="ingested">The food item being eaten.</param>
     /// <returns>Returns true if the user can feed the target with the ingested entity</returns>
-    public bool CanConsume(EntityUid user, EntityUid target, EntityUid ingested)
-    {
-        return CanConsume(user, target, ingested, out _, out _);
-    }
+    public bool CanConsume(EntityUid user, EntityUid target, EntityUid ingested) =>
+        CanConsume(user, target, ingested, out _, out _);
 
-    /// <inheritdoc cref="CanConsume(EntityUid,EntityUid,EntityUid)"/>
+    /// <inheritdoc cref="CanConsume(EntityUid,EntityUid,EntityUid)" />
     /// <param name="user">The one doing the feeding</param>
     /// <param name="target">The one being fed.</param>
     /// <param name="ingested">The food item being eaten.</param>
@@ -170,10 +157,7 @@ public sealed partial class IngestionSystem
         return solution.Volume;
     }
 
-    public bool IsEmpty(Entity<EdibleComponent> entity)
-    {
-        return EdibleVolume(entity) == FixedPoint2.Zero;
-    }
+    public bool IsEmpty(Entity<EdibleComponent> entity) => EdibleVolume(entity) == FixedPoint2.Zero;
 
     /// <summary>
     /// Gets the total metabolizable nutrition from an entity, checks first if we can metabolize it.
@@ -216,9 +200,7 @@ public sealed partial class IngestionSystem
                 {
                     // ignores any effect conditions, just cares about how much it can hydrate
                     if (effect is SatiateHunger hunger)
-                    {
                         total += hunger.NutritionFactor * quantity.Quantity.Float();
-                    }
                 }
             }
         }
@@ -267,9 +249,7 @@ public sealed partial class IngestionSystem
                 {
                     // ignores any effect conditions, just cares about how much it can hydrate
                     if (effect is SatiateThirst thirst)
-                    {
                         total += thirst.HydrationFactor * quantity.Quantity.Float();
-                    }
                 }
             }
         }
@@ -312,7 +292,8 @@ public sealed partial class IngestionSystem
     }
 
     /// <summary>
-    /// Estimate the number of bites this food has left, based on how much food solution there is and how much of it to eat per bite.
+    /// Estimate the number of bites this food has left, based on how much food solution there is and how much of it to eat per
+    /// bite.
     /// </summary>
     public int GetUsesRemaining(EntityUid uid, string solutionName, FixedPoint2 splitVol)
     {
@@ -334,7 +315,10 @@ public sealed partial class IngestionSystem
     /// <param name="type">Edible prototype.</param>
     /// <param name="verb">Verb we're returning.</param>
     /// <returns>Returns true if we generated a verb.</returns>
-    public bool TryGetIngestionVerb(EntityUid user, EntityUid ingested, [ForbidLiteral] ProtoId<EdiblePrototype> type, [NotNullWhen(true)] out AlternativeVerb? verb)
+    public bool TryGetIngestionVerb(EntityUid user,
+        EntityUid ingested,
+        [ForbidLiteral] ProtoId<EdiblePrototype> type,
+        [NotNullWhen(true)] out AlternativeVerb? verb)
     {
         verb = null;
 
@@ -344,7 +328,7 @@ public sealed partial class IngestionSystem
 
         var proto = _proto.Index(type);
 
-        verb = new()
+        verb = new AlternativeVerb
         {
             Act = () =>
             {
@@ -352,7 +336,7 @@ public sealed partial class IngestionSystem
             },
             Icon = proto.VerbIcon,
             Text = Loc.GetString(proto.VerbName),
-            Priority = 2
+            Priority = 2,
         };
 
         return true;
@@ -395,10 +379,7 @@ public sealed partial class IngestionSystem
         return GetProtoNoun(prototype);
     }
 
-    public string GetProtoNoun(EdiblePrototype proto)
-    {
-        return Loc.GetString(proto.Noun);
-    }
+    public string GetProtoNoun(EdiblePrototype proto) => Loc.GetString(proto.Noun);
 
     public string GetEdibleVerb(Entity<EdibleComponent?> entity)
     {
@@ -421,10 +402,7 @@ public sealed partial class IngestionSystem
         return GetProtoVerb(prototype);
     }
 
-    public string GetProtoVerb(EdiblePrototype proto)
-    {
-        return Loc.GetString(proto.Verb);
-    }
+    public string GetProtoVerb(EdiblePrototype proto) => Loc.GetString(proto.Verb);
 
     #endregion
 }

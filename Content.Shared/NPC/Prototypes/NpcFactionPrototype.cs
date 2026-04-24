@@ -13,17 +13,17 @@ namespace Content.Shared.NPC.Prototypes;
 /// Contains data about this faction's relations with other factions.
 /// </summary>
 [Prototype]
-public sealed partial class NpcFactionPrototype : IPrototype
+public sealed class NpcFactionPrototype : IPrototype
 {
-    [ViewVariables]
-    [IdDataField]
-    public string ID { get; private set; } = default!;
-
     [DataField]
     public List<ProtoId<NpcFactionPrototype>> Friendly = new();
 
     [DataField]
     public List<ProtoId<NpcFactionPrototype>> Hostile = new();
+
+    [ViewVariables]
+    [IdDataField]
+    public string ID { get; } = default!;
 }
 
 /// <summary>

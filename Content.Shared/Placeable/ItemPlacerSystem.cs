@@ -17,12 +17,13 @@ namespace Content.Shared.Placeable;
 
 /// <summary>
 /// Tracks placed entities
-/// Subscribe to <see cref="ItemPlacedEvent"/> or <see cref="ItemRemovedEvent"/> to do things when items or placed or removed.
+/// Subscribe to <see cref="ItemPlacedEvent" /> or <see cref="ItemRemovedEvent" /> to do things when items or placed or
+/// removed.
 /// </summary>
 public sealed class ItemPlacerSystem : EntitySystem
 {
-    [Dependency] private readonly CollisionWakeSystem _wake = default!;
     [Dependency] private readonly PlaceableSurfaceSystem _placeableSurface = default!;
+    [Dependency] private readonly CollisionWakeSystem _wake = default!;
     [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
 
     public override void Initialize()
@@ -50,7 +51,7 @@ public sealed class ItemPlacerSystem : EntitySystem
             RaiseLocalEvent(uid, ref ev);
         }
 
-        if (comp.MaxEntities > 0 && count >= (comp.MaxEntities - 1))
+        if (comp.MaxEntities > 0 && count >= comp.MaxEntities - 1)
         {
             // Don't let any more items be placed if it's reached its limit.
             _placeableSurface.SetPlaceable(uid, false);
@@ -72,13 +73,13 @@ public sealed class ItemPlacerSystem : EntitySystem
 }
 
 /// <summary>
-/// Raised on the <see cref="ItemPlacer"/> when an item is placed and it is under the item limit.
+/// Raised on the <see cref="ItemPlacer" /> when an item is placed and it is under the item limit.
 /// </summary>
 [ByRefEvent]
 public readonly record struct ItemPlacedEvent(EntityUid OtherEntity);
 
 /// <summary>
-/// Raised on the <see cref="ItemPlacer"/> when an item is removed from it.
+/// Raised on the <see cref="ItemPlacer" /> when an item is removed from it.
 /// </summary>
 [ByRefEvent]
 public readonly record struct ItemRemovedEvent(EntityUid OtherEntity);

@@ -13,7 +13,7 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Shared.UserInterface;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class IntrinsicUIComponent : Component
 {
     /// <summary>

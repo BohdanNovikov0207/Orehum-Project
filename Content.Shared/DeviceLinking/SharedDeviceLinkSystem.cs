@@ -57,15 +57,14 @@ namespace Content.Shared.DeviceLinking;
 
 public abstract class SharedDeviceLinkSystem : EntitySystem
 {
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-    [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
-    [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly IGameTiming _gameTiming = default!;
-
     public const string InvokedPort = "link_port";
+    [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
+    [Dependency] private readonly IGameTiming _gameTiming = default!;
+    [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         SubscribeLocalEvent<DeviceLinkSourceComponent, ComponentStartup>(OnSourceStartup);
@@ -82,7 +81,7 @@ public abstract class SharedDeviceLinkSystem : EntitySystem
     {
         List<EntityUid> invalidSinks = new();
         List<(string, string)> invalidLinks = new();
-        foreach (var (sink, links)  in source.Comp.LinkedPorts)
+        foreach (var (sink, links) in source.Comp.LinkedPorts)
         {
             if (!TryComp(sink, out DeviceLinkSinkComponent? sinkComponent))
             {
@@ -100,7 +99,8 @@ public abstract class SharedDeviceLinkSystem : EntitySystem
 
             foreach (var link in invalidLinks)
             {
-                Log.Warning($"Device source {ToPrettyString(source)} contains invalid links to entity {ToPrettyString(sink)}: {link.Item1}->{link.Item2}");
+                Log.Warning(
+                    $"Device source {ToPrettyString(source)} contains invalid links to entity {ToPrettyString(sink)}: {link.Item1}->{link.Item2}");
                 links.Remove(link);
             }
 
@@ -120,6 +120,7 @@ public abstract class SharedDeviceLinkSystem : EntitySystem
             Log.Warning($"Device source {ToPrettyString(source)} contains invalid sink: {ToPrettyString(sink)}");
         }
     }
+
     #endregion
 
     /// <summary>
@@ -147,11 +148,39 @@ public abstract class SharedDeviceLinkSystem : EntitySystem
             if (TryComp(sourceUid, out DeviceLinkSourceComponent? source))
                 RemoveSinkFromSourceInternal(sourceUid, sink, source, sink);
             else
-                Log.Error($"Device sink {ToPrettyString(sink)} source list contains invalid entity: {ToPrettyString(sourceUid)}");
+                Log.Error(
+                    $"Device sink {ToPrettyString(sink)} source list contains invalid entity: {ToPrettyString(sourceUid)}");
         }
     }
 
+    /// <summary>
+    /// Gets how many times a <see cref="DeviceLinkSinkComponent" /> has been invoked recently.
+    /// </summary>
+    /// <remarks>
+    /// The return value of this function goes up by one every time a sink is invoked, and goes down by one every tick.
+    /// </remarks>
+    public int GetEffectiveInvokeCounter(DeviceLinkSinkComponent sink)
+    {
+        // Shouldn't be possible but just to be safe.
+        var curTick = _gameTiming.CurTick;
+        if (curTick < sink.InvokeCounterTick)
+            return 0;
+
+        var tickDelta = curTick.Value - sink.InvokeCounterTick.Value;
+        if (tickDelta >= sink.InvokeCounter)
+            return 0;
+
+        return Math.Max(0, sink.InvokeCounter - (int) tickDelta);
+    }
+
+    protected void SetInvokeCounter(DeviceLinkSinkComponent sink, int value)
+    {
+        sink.InvokeCounterTick = _gameTiming.CurTick;
+        sink.InvokeCounter = value;
+    }
+
     #region Ports
+
     /// <summary>
     /// Convenience function to add several ports to an entity
     /// </summary>
@@ -188,16 +217,15 @@ public abstract class SharedDeviceLinkSystem : EntitySystem
         }
     }
 
-    public ProtoId<SourcePortPrototype>[] GetSourcePortIds(Entity<DeviceLinkSourceComponent> source)
-    {
-        return source.Comp.Ports.ToArray();
-    }
+    public ProtoId<SourcePortPrototype>[] GetSourcePortIds(Entity<DeviceLinkSourceComponent> source) =>
+        source.Comp.Ports.ToArray();
 
     /// <summary>
     /// Retrieves the available ports from a source
     /// </summary>
     /// <returns>A list of source port prototypes</returns>
-    public List<SourcePortPrototype> GetSourcePorts(EntityUid sourceUid, DeviceLinkSourceComponent? sourceComponent = null)
+    public List<SourcePortPrototype> GetSourcePorts(EntityUid sourceUid,
+        DeviceLinkSourceComponent? sourceComponent = null)
     {
         if (!Resolve(sourceUid, ref sourceComponent))
             return new List<SourcePortPrototype>();
@@ -211,10 +239,8 @@ public abstract class SharedDeviceLinkSystem : EntitySystem
         return sourcePorts;
     }
 
-    public ProtoId<SinkPortPrototype>[] GetSinkPortIds(Entity<DeviceLinkSinkComponent> source)
-    {
-        return source.Comp.Ports.ToArray();
-    }
+    public ProtoId<SinkPortPrototype>[] GetSinkPortIds(Entity<DeviceLinkSinkComponent> source) =>
+        source.Comp.Ports.ToArray();
 
     /// <summary>
     /// Retrieves the available ports from a sink
@@ -270,16 +296,21 @@ public abstract class SharedDeviceLinkSystem : EntitySystem
         if (comp.Ports.Count == 0)
             RemCompDeferred<DeviceLinkSinkComponent>(uid);
     }
+
     #endregion
 
     #region Links
+
     /// <summary>
     /// Returns the links of a source
     /// </summary>
     /// <returns>A list of sink and source port ids that are linked together</returns>
-    public HashSet<(ProtoId<SourcePortPrototype> source, ProtoId<SinkPortPrototype> sink)> GetLinks(EntityUid sourceUid, EntityUid sinkUid, DeviceLinkSourceComponent? sourceComponent = null)
+    public HashSet<(ProtoId<SourcePortPrototype> source, ProtoId<SinkPortPrototype> sink)> GetLinks(EntityUid sourceUid,
+        EntityUid sinkUid,
+        DeviceLinkSourceComponent? sourceComponent = null)
     {
-        if (!Resolve(sourceUid, ref sourceComponent) || !sourceComponent.LinkedPorts.TryGetValue(sinkUid, out var links))
+        if (!Resolve(sourceUid, ref sourceComponent) ||
+            !sourceComponent.LinkedPorts.TryGetValue(sinkUid, out var links))
             return new HashSet<(ProtoId<SourcePortPrototype>, ProtoId<SinkPortPrototype>)>();
 
         return links;
@@ -326,16 +357,21 @@ public abstract class SharedDeviceLinkSystem : EntitySystem
             return;
 
         if (userId != null)
-            _adminLogger.Add(LogType.DeviceLinking, LogImpact.Low, $"{ToPrettyString(userId.Value):actor} is linking defaults between {ToPrettyString(sourceUid):source} and {ToPrettyString(sinkUid):sink}");
+            _adminLogger.Add(LogType.DeviceLinking,
+                LogImpact.Low,
+                $"{ToPrettyString(userId.Value):actor} is linking defaults between {ToPrettyString(sourceUid):source} and {ToPrettyString(sinkUid):sink}");
         else
-            _adminLogger.Add(LogType.DeviceLinking, LogImpact.Low, $"linking defaults between {ToPrettyString(sourceUid):source} and {ToPrettyString(sinkUid):sink}");
+            _adminLogger.Add(LogType.DeviceLinking,
+                LogImpact.Low,
+                $"linking defaults between {ToPrettyString(sourceUid):source} and {ToPrettyString(sinkUid):sink}");
 
         var sourcePorts = GetSourcePorts(sourceUid, sourceComponent);
         var defaults = GetDefaults(sourcePorts);
         SaveLinks(userId, sourceUid, sinkUid, defaults, sourceComponent, sinkComponent);
 
         if (userId != null)
-            _popupSystem.PopupCursor(Loc.GetString("signal-linking-verb-success", ("machine", sourceUid)), userId.Value);
+            _popupSystem.PopupCursor(Loc.GetString("signal-linking-verb-success", ("machine", sourceUid)),
+                userId.Value);
     }
 
 
@@ -407,12 +443,15 @@ public abstract class SharedDeviceLinkSystem : EntitySystem
     /// <summary>
     /// Einstein Engines: Removes every link from the given sink
     /// </summary>
-    public void RemoveAllFromSource(EntityUid sourceUid, DeviceLinkSourceComponent? sourceComponent = null, Predicate<EntityUid>? filter = null)
+    public void RemoveAllFromSource(EntityUid sourceUid,
+        DeviceLinkSourceComponent? sourceComponent = null,
+        Predicate<EntityUid>? filter = null)
     {
         if (!Resolve(sourceUid, ref sourceComponent))
             return;
 
-        foreach (var sinkUid in sourceComponent.LinkedPorts.Where(sinkUid => filter == null || filter.Invoke(sinkUid.Key)))
+        foreach (var sinkUid in sourceComponent.LinkedPorts.Where(sinkUid =>
+                     filter == null || filter.Invoke(sinkUid.Key)))
         {
             RemoveSinkFromSource(sourceUid, sinkUid.Key, sourceComponent);
         }
@@ -441,12 +480,14 @@ public abstract class SharedDeviceLinkSystem : EntitySystem
 
         if (sourceComponent == null)
         {
-            Log.Error($"Attempted to remove link between {ToPrettyString(sourceUid)} and {ToPrettyString(sinkUid)}, but the source component was missing.");
+            Log.Error(
+                $"Attempted to remove link between {ToPrettyString(sourceUid)} and {ToPrettyString(sinkUid)}, but the source component was missing.");
             sinkComponent!.LinkedSources.Remove(sourceUid);
         }
         else
         {
-            Log.Error($"Attempted to remove link between {ToPrettyString(sourceUid)} and {ToPrettyString(sinkUid)}, but the sink component was missing.");
+            Log.Error(
+                $"Attempted to remove link between {ToPrettyString(sourceUid)} and {ToPrettyString(sinkUid)}, but the sink component was missing.");
             sourceComponent.LinkedPorts.Remove(sinkUid);
         }
     }
@@ -498,9 +539,13 @@ public abstract class SharedDeviceLinkSystem : EntitySystem
         if (linkedPorts.Contains((source, sink)))
         {
             if (userId != null)
-                _adminLogger.Add(LogType.DeviceLinking, LogImpact.Low, $"{ToPrettyString(userId.Value):actor} unlinked {ToPrettyString(sourceUid):source} {source} and {ToPrettyString(sinkUid):sink} {sink}");
+                _adminLogger.Add(LogType.DeviceLinking,
+                    LogImpact.Low,
+                    $"{ToPrettyString(userId.Value):actor} unlinked {ToPrettyString(sourceUid):source} {source} and {ToPrettyString(sinkUid):sink} {sink}");
             else
-                _adminLogger.Add(LogType.DeviceLinking, LogImpact.Low, $"unlinked {ToPrettyString(sourceUid):source} {source} and {ToPrettyString(sinkUid):sink} {sink}");
+                _adminLogger.Add(LogType.DeviceLinking,
+                    LogImpact.Low,
+                    $"unlinked {ToPrettyString(sourceUid):source} {source} and {ToPrettyString(sinkUid):sink} {sink}");
 
             RaiseLocalEvent(sourceUid, new PortDisconnectedEvent(source, sinkUid)); // EE edit: added Uid field
             RaiseLocalEvent(sinkUid, new PortDisconnectedEvent(sink, sourceUid)); // EE edit: added Uid field
@@ -564,60 +609,79 @@ public abstract class SharedDeviceLinkSystem : EntitySystem
         RaiseLocalEvent(sourceUid, linkAttemptEvent, true);
         if (linkAttemptEvent.Cancelled && userId.HasValue)
         {
-            _popupSystem.PopupCursor(Loc.GetString("signal-linker-component-connection-refused", ("machine", source)), userId.Value);
+            _popupSystem.PopupCursor(Loc.GetString("signal-linker-component-connection-refused", ("machine", source)),
+                userId.Value);
             return false;
         }
 
         RaiseLocalEvent(sinkUid, linkAttemptEvent, true);
         if (linkAttemptEvent.Cancelled && userId.HasValue)
         {
-            _popupSystem.PopupCursor(Loc.GetString("signal-linker-component-connection-refused", ("machine", sink)), userId.Value); // Goobstation - sink instead of source
+            _popupSystem.PopupCursor(Loc.GetString("signal-linker-component-connection-refused", ("machine", sink)),
+                userId.Value); // Goobstation - sink instead of source
             return false;
         }
 
         return !linkAttemptEvent.Cancelled;
     }
 
-    private bool InRange(EntityUid sourceUid, EntityUid sinkUid, float range)
-    {
+    private bool InRange(EntityUid sourceUid, EntityUid sinkUid, float range) =>
         // TODO: This should be using an existing method and also coordinates inrange instead.
-        return _transform.GetMapCoordinates(sourceUid).InRange(_transform.GetMapCoordinates(sinkUid), range);
-    }
+        _transform.GetMapCoordinates(sourceUid).InRange(_transform.GetMapCoordinates(sinkUid), range);
 
     private void SendNewLinkEvent(EntityUid? user, EntityUid sourceUid, string source, EntityUid sinkUid, string sink)
     {
         if (user != null)
-            _adminLogger.Add(LogType.DeviceLinking, LogImpact.Low, $"{ToPrettyString(user.Value):actor} linked {ToPrettyString(sourceUid):source} {source} and {ToPrettyString(sinkUid):sink} {sink}");
+            _adminLogger.Add(LogType.DeviceLinking,
+                LogImpact.Low,
+                $"{ToPrettyString(user.Value):actor} linked {ToPrettyString(sourceUid):source} {source} and {ToPrettyString(sinkUid):sink} {sink}");
         else
-            _adminLogger.Add(LogType.DeviceLinking, LogImpact.Low, $"linked {ToPrettyString(sourceUid):source} {source} and {ToPrettyString(sinkUid):sink} {sink}");
+            _adminLogger.Add(LogType.DeviceLinking,
+                LogImpact.Low,
+                $"linked {ToPrettyString(sourceUid):source} {source} and {ToPrettyString(sinkUid):sink} {sink}");
 
         var newLinkEvent = new NewLinkEvent(user, sourceUid, source, sinkUid, sink);
         RaiseLocalEvent(sourceUid, newLinkEvent);
         RaiseLocalEvent(sinkUid, newLinkEvent);
     }
 
-    private void CreateLinkPopup(EntityUid? userId, EntityUid sourceUid, string source, EntityUid sinkUid, string sink, bool removed)
+    private void CreateLinkPopup(EntityUid? userId,
+        EntityUid sourceUid,
+        string source,
+        EntityUid sinkUid,
+        string sink,
+        bool removed)
     {
         if (!userId.HasValue)
             return;
 
         var locString = removed ? "signal-linker-component-unlinked-port" : "signal-linker-component-linked-port";
 
-        _popupSystem.PopupCursor(Loc.GetString(locString, ("machine1", sourceUid), ("port1", PortName<SourcePortPrototype>(source)),
-                ("machine2", sinkUid), ("port2", PortName<SinkPortPrototype>(sink))), userId.Value, PopupType.Medium);
+        _popupSystem.PopupCursor(Loc.GetString(locString,
+                ("machine1", sourceUid),
+                ("port1", PortName<SourcePortPrototype>(source)),
+                ("machine2", sinkUid),
+                ("port2", PortName<SinkPortPrototype>(sink))),
+            userId.Value,
+            PopupType.Medium);
     }
+
     #endregion
 
     #region Sending & Receiving
+
     /// <summary>
     /// Sends a network payload directed at the sink entity.
-    /// Just raises a <see cref="SignalReceivedEvent"/> without data if the source or the sink doesn't have a <see cref="DeviceNetworkComponent"/>
+    /// Just raises a <see cref="SignalReceivedEvent" /> without data if the source or the sink doesn't have a
+    /// <see cref="DeviceNetworkComponent" />
     /// </summary>
     /// <param name="uid">The source uid that invokes the port</param>
     /// <param name="port">The port to invoke</param>
     /// <param name="data">Optional data to send along</param>
     /// <param name="sourceComponent"></param>
-    public virtual void InvokePort(EntityUid uid, string port, NetworkPayload? data = null,
+    public virtual void InvokePort(EntityUid uid,
+        string port,
+        NetworkPayload? data = null,
         DeviceLinkSourceComponent? sourceComponent = null)
     {
         // NOOP on client for the moment.
@@ -634,37 +698,12 @@ public abstract class SharedDeviceLinkSystem : EntitySystem
 
         var data = new NetworkPayload
         {
-            [DeviceNetworkConstants.LogicState] = signal ? SignalState.High : SignalState.Low
+            [DeviceNetworkConstants.LogicState] = signal ? SignalState.High : SignalState.Low,
         };
         InvokePort(uid, port, data, comp);
 
         comp.LastSignals[port] = signal;
     }
+
     #endregion
-
-    /// <summary>
-    /// Gets how many times a <see cref="DeviceLinkSinkComponent"/> has been invoked recently.
-    /// </summary>
-    /// <remarks>
-    /// The return value of this function goes up by one every time a sink is invoked, and goes down by one every tick.
-    /// </remarks>
-    public int GetEffectiveInvokeCounter(DeviceLinkSinkComponent sink)
-    {
-        // Shouldn't be possible but just to be safe.
-        var curTick = _gameTiming.CurTick;
-        if (curTick < sink.InvokeCounterTick)
-            return 0;
-
-        var tickDelta = curTick.Value - sink.InvokeCounterTick.Value;
-        if (tickDelta >= sink.InvokeCounter)
-            return 0;
-
-        return Math.Max(0, sink.InvokeCounter - (int)tickDelta);
-    }
-
-    protected void SetInvokeCounter(DeviceLinkSinkComponent sink, int value)
-    {
-        sink.InvokeCounterTick = _gameTiming.CurTick;
-        sink.InvokeCounter = value;
-    }
 }

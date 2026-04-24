@@ -3,25 +3,24 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Shared.Mining;
 using Robust.Shared.Audio;
 using Robust.Shared.GameStates;
-using Content.Shared.Mining;
 
 namespace Content.Shared._NF.Mining.Components;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState, Access(typeof(MiningScannerSystem))]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState] [Access(typeof(MiningScannerSystem))]
 public sealed partial class InnateMiningScannerViewerComponent : Component
 {
-    [DataField, ViewVariables(VVAccess.ReadOnly), AutoNetworkedField]
-    public float ViewRange;
-
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public float AnimationDuration = 1.5f;
 
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public TimeSpan PingDelay = TimeSpan.FromSeconds(5);
 
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public SoundSpecifier? PingSound = null;
 
+    [DataField] [ViewVariables(VVAccess.ReadOnly)] [AutoNetworkedField]
+    public float ViewRange;
 }

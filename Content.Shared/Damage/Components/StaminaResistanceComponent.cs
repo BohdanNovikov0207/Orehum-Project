@@ -1,5 +1,3 @@
-using Content.Shared.Damage.Systems;
-using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype.Dictionary;
 using Robust.Shared.GameStates;
 
 namespace Content.Shared.Damage.Components;
@@ -13,21 +11,14 @@ namespace Content.Shared.Damage.Components;
 /// This is desirable over just using damage modifier sets, given that equipment like bomb-suits need to
 /// significantly reduce the damage, but shouldn't be silly overpowered in regular combat.
 /// </remarks>
-[NetworkedComponent, RegisterComponent, AutoGenerateComponentState]
+[NetworkedComponent] [RegisterComponent] [AutoGenerateComponentState]
 public sealed partial class StaminaResistanceComponent : Component
 {
     /// <summary>
     /// The stamina resistance coefficient, This fraction is multiplied into the total resistance.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public float DamageCoefficient = 1;
-
-    /// <summary>
-    /// When true, resistances will be applied to the entity wearing this item.
-    /// When false, only this entity will get the resistance.
-    /// </summary>
-    [DataField]
-    public bool Worn = true;
 
     /// <summary>
     /// Examine string for stamina resistance.
@@ -35,4 +26,11 @@ public sealed partial class StaminaResistanceComponent : Component
     /// </summary>
     [DataField]
     public LocId Examine = "stamina-resistance-coefficient-value";
+
+    /// <summary>
+    /// When true, resistances will be applied to the entity wearing this item.
+    /// When false, only this entity will get the resistance.
+    /// </summary>
+    [DataField]
+    public bool Worn = true;
 }

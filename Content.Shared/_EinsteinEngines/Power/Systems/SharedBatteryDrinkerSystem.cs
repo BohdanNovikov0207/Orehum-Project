@@ -12,7 +12,7 @@ public abstract class SharedBatteryDrinkerSystem : EntitySystem
     [Dependency] private readonly ItemSlotsSystem _itemSlots = default!;
 
     /// <summary>
-    ///     Find an item that a battery drinker can drink from without using BatterySystem
+    /// Find an item that a battery drinker can drink from without using BatterySystem
     /// </summary>
     public bool SearchForSource(EntityUid ent, [NotNullWhen(true)] out EntityUid? source)
     {
@@ -37,14 +37,15 @@ public abstract class SharedBatteryDrinkerSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Find a battery that can be charged without using BatterySystem
+    /// Find a battery that can be charged without using BatterySystem
     /// </summary>
     public bool SearchForDrinker(EntityUid ent, [NotNullWhen(true)] out EntityUid? drinker)
     {
         drinker = null;
 
         // Do we have a cell slot
-        if (SearchForCellSlot(ent, out var slot)) {
+        if (SearchForCellSlot(ent, out var slot))
+        {
             // Do we have a battery to charge?
             if (slot.HasItem && HasComp<BatteryDrinkerSourceComponent>(slot.Item))
             {
@@ -62,7 +63,7 @@ public abstract class SharedBatteryDrinkerSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Find a battery cell slot that we can be drink from without ChargerSystem
+    /// Find a battery cell slot that we can be drink from without ChargerSystem
     /// </summary>
     private bool SearchForCellSlot(EntityUid ent, [NotNullWhen(true)] out ItemSlot? slot)
     {

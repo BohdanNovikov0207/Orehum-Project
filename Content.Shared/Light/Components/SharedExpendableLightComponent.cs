@@ -17,21 +17,26 @@ namespace Content.Shared.Light.Components;
 [NetworkedComponent]
 public abstract partial class SharedExpendableLightComponent : Component
 {
-
     [ViewVariables(VVAccess.ReadOnly)]
     public ExpendableLightState CurrentState;
 
     [DataField]
-    public string TurnOnBehaviourID = string.Empty;
+    public SoundSpecifier? DieSound;
 
     [DataField]
     public string FadeOutBehaviourID = string.Empty;
 
     [DataField]
+    public TimeSpan FadeOutDuration = TimeSpan.FromSeconds(60 * 5f);
+
+    [DataField]
     public TimeSpan GlowDuration = TimeSpan.FromSeconds(60 * 15f);
 
     [DataField]
-    public TimeSpan FadeOutDuration = TimeSpan.FromSeconds(60 * 5f);
+    public SoundSpecifier? LitSound;
+
+    [DataField]
+    public SoundSpecifier? LoopedSound;
 
     [DataField]
     public ProtoId<StackPrototype>? RefuelMaterialID;
@@ -43,27 +48,21 @@ public abstract partial class SharedExpendableLightComponent : Component
     public TimeSpan RefuelMaximumDuration = TimeSpan.FromSeconds(60 * 15f * 2);
 
     [DataField]
-    public SoundSpecifier? LitSound;
-
-    [DataField]
-    public SoundSpecifier? LoopedSound;
-
-    [DataField]
-    public SoundSpecifier? DieSound;
+    public string TurnOnBehaviourID = string.Empty;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum ExpendableLightVisuals
 {
     State,
-    Behavior
+    Behavior,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum ExpendableLightState
 {
     BrandNew,
     Lit,
     Fading,
-    Dead
+    Dead,
 }

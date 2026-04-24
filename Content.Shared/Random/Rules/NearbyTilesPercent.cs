@@ -23,19 +23,17 @@ public sealed partial class NearbyTilesPercentRule : RulesRule
     [DataField(required: true)]
     public float Percent;
 
-    [DataField(required: true)]
-    public List<ProtoId<ContentTileDefinition>> Tiles = new();
-
     [DataField]
     public float Range = 10f;
+
+    [DataField(required: true)]
+    public List<ProtoId<ContentTileDefinition>> Tiles = new();
 
     public override bool Check(EntityManager entManager, EntityUid uid)
     {
         if (!entManager.TryGetComponent(uid, out TransformComponent? xform) ||
             !entManager.TryGetComponent<MapGridComponent>(xform.GridUid, out var grid))
-        {
             return false;
-        }
 
         var transform = entManager.System<SharedTransformSystem>();
         var mapSys = entManager.System<SharedMapSystem>();
@@ -45,8 +43,10 @@ public sealed partial class NearbyTilesPercentRule : RulesRule
         var tileCount = 0;
         var matchingTileCount = 0;
 
-        foreach (var tile in mapSys.GetTilesIntersecting(xform.GridUid.Value, grid, new Circle(transform.GetWorldPosition(xform),
-                     Range)))
+        foreach (var tile in mapSys.GetTilesIntersecting(xform.GridUid.Value,
+                     grid,
+                     new Circle(transform.GetWorldPosition(xform),
+                         Range)))
         {
             // Only consider collidable anchored (for reasons some subfloor stuff has physics but non-collidable)
             if (IgnoreAnchored)
@@ -58,9 +58,7 @@ public sealed partial class NearbyTilesPercentRule : RulesRule
                 {
                     if (!physicsQuery.TryGetComponent(ancUid, out var physics) ||
                         !physics.CanCollide)
-                    {
                         continue;
-                    }
 
                     found = true;
                     break;

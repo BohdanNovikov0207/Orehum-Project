@@ -15,36 +15,38 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
 namespace Content.Shared.Chemistry.Components;
 
 /// <summary>
-/// This is used for an entity that uses <see cref="ReactionMixerComponent"/> to mix any container with a solution after a period of time.
+/// This is used for an entity that uses <see cref="ReactionMixerComponent" /> to mix any container with a solution after a
+/// period of time.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 [Access(typeof(SharedSolutionContainerMixerSystem))]
 public sealed partial class SolutionContainerMixerComponent : Component
 {
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    [DataField] [ViewVariables(VVAccess.ReadWrite)]
     public string ContainerId = "mixer";
-
-    [DataField, AutoNetworkedField]
-    public bool Mixing;
 
     /// <summary>
     /// How long it takes for mixing to occurs.
     /// </summary>
-    [DataField, ViewVariables(VVAccess.ReadWrite), AutoNetworkedField]
+    [DataField] [ViewVariables(VVAccess.ReadWrite)] [AutoNetworkedField]
     public TimeSpan MixDuration;
 
-    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer)), ViewVariables(VVAccess.ReadWrite), AutoNetworkedField]
-    public TimeSpan MixTimeEnd;
+    [DataField] [AutoNetworkedField]
+    public bool Mixing;
 
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public SoundSpecifier? MixingSound;
 
     [ViewVariables]
     public Entity<AudioComponent>? MixingSoundEntity;
+
+    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))] [ViewVariables(VVAccess.ReadWrite)]
+    [AutoNetworkedField]
+    public TimeSpan MixTimeEnd;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum SolutionContainerMixerVisuals : byte
 {
-    Mixing
+    Mixing,
 }

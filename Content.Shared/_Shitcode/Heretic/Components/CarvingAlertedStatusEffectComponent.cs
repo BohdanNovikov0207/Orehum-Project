@@ -4,13 +4,13 @@ using Robust.Shared.Map;
 
 namespace Content.Shared._Shitcode.Heretic.Components;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class CarvingAlertedStatusEffectComponent : Component
 {
+    public const string Id = "alertcarving";
+
     [DataField]
     public Dictionary<NetCoordinates, EntityUid> Locations = new();
-
-    public const string Id = "alertcarving";
 
     [DataField]
     public SoundSpecifier? TeleportSound = new SoundCollectionSpecifier("Curse");

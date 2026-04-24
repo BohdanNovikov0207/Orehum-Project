@@ -8,10 +8,7 @@ public sealed class ActionRelaySystem : EntitySystem
 {
     [Dependency] private readonly SharedActionsSystem _actions = default!;
 
-    public override void Initialize()
-    {
-        SubscribeLocalEvent<ActionsComponent, PlasmaAmountChangeEvent>(RelayEvent);
-    }
+    public override void Initialize() => SubscribeLocalEvent<ActionsComponent, PlasmaAmountChangeEvent>(RelayEvent);
 
     public void RelayEvent<T>(EntityUid uid, ActionsComponent component, T args) where T : EntityEventArgs
     {

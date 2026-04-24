@@ -18,10 +18,10 @@ namespace Content.Shared.VentCrawler.Tube.Components;
 public sealed partial class VentCrawlerTubeComponent : Component
 {
     [DataField]
-    public string ContainerId { get; set; } = "VentCrawlerTube";
+    public bool Connected = true;
 
     [DataField]
-    public bool Connected = true;
+    public string ContainerId { get; set; } = "VentCrawlerTube";
 
     [ViewVariables]
     public Container Contents { get; set; } = null!;

@@ -72,10 +72,8 @@ public abstract class SharedAdminFrozenSystem : EntitySystem
         SubscribeLocalEvent<AdminFrozenComponent, SpeakAttemptEvent>(OnSpeakAttempt);
     }
 
-    private void OnInteractAttempt(Entity<AdminFrozenComponent> ent, ref InteractionAttemptEvent args)
-    {
+    private void OnInteractAttempt(Entity<AdminFrozenComponent> ent, ref InteractionAttemptEvent args) =>
         args.Cancelled = true;
-    }
 
     private void OnSpeakAttempt(EntityUid uid, AdminFrozenComponent component, SpeakAttemptEvent args)
     {
@@ -85,22 +83,16 @@ public abstract class SharedAdminFrozenSystem : EntitySystem
         args.Cancel();
     }
 
-    private void OnAttempt(EntityUid uid, AdminFrozenComponent component, CancellableEntityEventArgs args)
-    {
+    private void OnAttempt(EntityUid uid, AdminFrozenComponent component, CancellableEntityEventArgs args) =>
         args.Cancel();
-    }
 
-    private void OnPullAttempt(EntityUid uid, AdminFrozenComponent component, PullAttemptEvent args)
-    {
+    private void OnPullAttempt(EntityUid uid, AdminFrozenComponent component, PullAttemptEvent args) =>
         args.Cancelled = true;
-    }
 
     private void OnStartup(EntityUid uid, AdminFrozenComponent component, ComponentStartup args)
     {
         if (TryComp<PullableComponent>(uid, out var pullable))
-        {
             _pulling.TryStopPull(uid, pullable, ignoreGrab: true); // Goobstation edit
-        }
 
         UpdateCanMove(uid, component, args);
     }
@@ -113,10 +105,8 @@ public abstract class SharedAdminFrozenSystem : EntitySystem
         args.Cancel();
     }
 
-    private void UpdateCanMove(EntityUid uid, AdminFrozenComponent component, EntityEventArgs args)
-    {
+    private void UpdateCanMove(EntityUid uid, AdminFrozenComponent component, EntityEventArgs args) =>
         _blocker.UpdateCanMove(uid);
-    }
 
     private void OnEmoteAttempt(EntityUid uid, AdminFrozenComponent component, EmoteAttemptEvent args)
     {

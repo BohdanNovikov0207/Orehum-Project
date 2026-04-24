@@ -10,7 +10,7 @@ namespace Content.Shared._Lavaland.Megafauna.Conditions;
 
 /// <summary>
 /// Condition that returns true if the boss is currently at specific phase.
-/// Returns false if doesn't have <see cref="MobPhasesComponent"/> or phase doesn't equal to any of RequiredPhases.
+/// Returns false if doesn't have <see cref="MobPhasesComponent" /> or phase doesn't equal to any of RequiredPhases.
 /// </summary>
 public sealed partial class PhaseMegafaunaCondition : MegafaunaCondition
 {

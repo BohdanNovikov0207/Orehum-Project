@@ -23,14 +23,15 @@ public record struct CanDragEvent
 [ByRefEvent]
 public record struct CanDropDraggedEvent(EntityUid User, EntityUid Target)
 {
-    public readonly EntityUid User = User;
     public readonly EntityUid Target = Target;
-    public bool Handled = false;
+    public readonly EntityUid User = User;
 
     /// <summary>
     /// Can we drop the entity onto the target? If the event is not handled then there is no supported interactions.
     /// </summary>
     public bool CanDrop = false;
+
+    public bool Handled = false;
 }
 
 /// <summary>
@@ -39,14 +40,15 @@ public record struct CanDropDraggedEvent(EntityUid User, EntityUid Target)
 [ByRefEvent]
 public record struct CanDropTargetEvent(EntityUid User, EntityUid Dragged)
 {
-    public readonly EntityUid User = User;
     public readonly EntityUid Dragged = Dragged;
-    public bool Handled = false;
+    public readonly EntityUid User = User;
 
     /// <summary>
-    /// <see cref="CanDropDraggedEvent"/>
+    ///     <see cref="CanDropDraggedEvent" />
     /// </summary>
     public bool CanDrop = false;
+
+    public bool Handled = false;
 }
 
 /// <summary>
@@ -55,8 +57,8 @@ public record struct CanDropTargetEvent(EntityUid User, EntityUid Dragged)
 [ByRefEvent]
 public record struct DragDropDraggedEvent(EntityUid User, EntityUid Target)
 {
-    public readonly EntityUid User = User;
     public readonly EntityUid Target = Target;
+    public readonly EntityUid User = User;
     public bool Handled = false;
 }
 
@@ -66,7 +68,7 @@ public record struct DragDropDraggedEvent(EntityUid User, EntityUid Target)
 [ByRefEvent]
 public record struct DragDropTargetEvent(EntityUid User, EntityUid Dragged)
 {
-    public readonly EntityUid User = User;
     public readonly EntityUid Dragged = Dragged;
+    public readonly EntityUid User = User;
     public bool Handled = false;
 }

@@ -75,7 +75,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using System.Numerics;
 using Content.Shared.Nutrition.EntitySystems;
 using Content.Shared.Nutrition.Prototypes;
 using Content.Shared.Tag;
@@ -86,7 +85,7 @@ namespace Content.Shared.Nutrition.Components;
 /// <summary>
 /// Indicates that this entity can be inserted into FoodSequence, which will transfer all reagents to the target.
 /// </summary>
-[RegisterComponent, Access(typeof(SharedFoodSequenceSystem))]
+[RegisterComponent] [Access(typeof(SharedFoodSequenceSystem))]
 public sealed partial class FoodSequenceElementComponent : Component
 {
     /// <summary>

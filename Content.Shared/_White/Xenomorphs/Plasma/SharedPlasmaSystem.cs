@@ -49,5 +49,5 @@ public abstract class SharedPlasmaSystem : EntitySystem
     /// </summary>
     public bool HasPlasma(EntityUid uid, FixedPoint2 amount)
         => TryComp<PlasmaVesselComponent>(uid, out var comp)
-            && comp.Plasma >= amount;
+           && comp.Plasma >= amount;
 }

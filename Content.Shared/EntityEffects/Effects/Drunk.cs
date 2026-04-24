@@ -22,13 +22,13 @@ namespace Content.Shared.EntityEffects.Effects;
 public sealed partial class Drunk : EntityEffect
 {
     /// <summary>
-    ///     BoozePower is how long each metabolism cycle will make the drunk effect last for.
+    /// BoozePower is how long each metabolism cycle will make the drunk effect last for.
     /// </summary>
     [DataField]
     public float BoozePower = 3f;
 
     /// <summary>
-    ///     Whether speech should be slurred.
+    /// Whether speech should be slurred.
     /// </summary>
     [DataField]
     public bool SlurSpeech = true;
@@ -40,9 +40,8 @@ public sealed partial class Drunk : EntityEffect
     {
         var boozePower = BoozePower;
 
-        if (args is EntityEffectReagentArgs reagentArgs) {
+        if (args is EntityEffectReagentArgs reagentArgs)
             boozePower *= reagentArgs.Scale.Float();
-        }
 
         var drunkSys = args.EntityManager.EntitySysManager.GetEntitySystem<SharedDrunkSystem>();
         drunkSys.TryApplyDrunkenness(args.TargetEntity, boozePower, SlurSpeech);

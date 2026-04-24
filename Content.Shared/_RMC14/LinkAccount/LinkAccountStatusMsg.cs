@@ -35,9 +35,8 @@ namespace Content.Shared._RMC14.LinkAccount;
 
 public sealed class LinkAccountStatusMsg : NetMessage
 {
-    public override MsgGroups MsgGroup => MsgGroups.Core;
-
     public SharedRMCPatronFull? Patron;
+    public override MsgGroups MsgGroup => MsgGroups.Core;
 
     public override void ReadFromBuffer(NetIncomingMessage buffer, IRobustSerializer serializer)
     {

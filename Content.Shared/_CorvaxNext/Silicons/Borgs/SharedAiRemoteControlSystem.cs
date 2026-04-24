@@ -16,14 +16,11 @@ namespace Content.Shared._CorvaxNext.Silicons.Borgs;
 
 public abstract class SharedAiRemoteControlSystem : EntitySystem
 {
+    [Dependency] private readonly SharedMindSystem _mind = default!;
     [Dependency] private readonly SharedStationAiSystem _stationAiSystem = default!;
     [Dependency] private readonly SharedTransformSystem _xformSystem = default!;
-    [Dependency] private readonly SharedMindSystem _mind = default!;
 
-    public override void Initialize()
-    {
-        base.Initialize();
-    }
+    public override void Initialize() => base.Initialize();
 
     public void ReturnMindIntoAi(EntityUid entity)
     {
@@ -61,8 +58,8 @@ public sealed partial class ToggleRemoteDevicesScreenEvent : InstantActionEvent
 {
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum RemoteDeviceUiKey : byte
 {
-    Key
+    Key,
 }

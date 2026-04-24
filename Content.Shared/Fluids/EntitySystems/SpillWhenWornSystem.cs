@@ -45,11 +45,11 @@ using Content.Shared.Fluids.Components;
 
 namespace Content.Shared.Fluids.EntitySystems;
 
-/// <inheritdoc cref="SpillWhenWornComponent"/>
+/// <inheritdoc cref="SpillWhenWornComponent" />
 public sealed class SpillWhenWornSystem : EntitySystem
 {
-    [Dependency] private readonly SharedSolutionContainerSystem _solutionContainer = default!;
     [Dependency] private readonly SharedPuddleSystem _puddle = default!;
+    [Dependency] private readonly SharedSolutionContainerSystem _solutionContainer = default!;
 
     public override void Initialize()
     {

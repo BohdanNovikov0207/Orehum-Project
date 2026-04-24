@@ -73,8 +73,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Content.Shared.CCVar;
-using Content.Shared.Humanoid.Prototypes;
-using Content.Shared.Random;
 using Robust.Shared.Collections;
 using Robust.Shared.Configuration;
 using Robust.Shared.Player;
@@ -87,15 +85,9 @@ namespace Content.Shared.Preferences.Loadouts;
 /// <summary>
 /// Contains all of the selected data for a role's loadout.
 /// </summary>
-[Serializable, NetSerializable, DataDefinition]
+[Serializable] [NetSerializable] [DataDefinition]
 public sealed partial class RoleLoadout : IEquatable<RoleLoadout>
 {
-    [DataField]
-    public ProtoId<RoleLoadoutPrototype> Role;
-
-    [DataField]
-    public Dictionary<ProtoId<LoadoutGroupPrototype>, List<Loadout>> SelectedLoadouts = new();
-
     /// <summary>
     /// Loadout specific name.
     /// </summary>
@@ -107,9 +99,39 @@ public sealed partial class RoleLoadout : IEquatable<RoleLoadout>
 
     public int? Points;
 
+    [DataField]
+    public ProtoId<RoleLoadoutPrototype> Role;
+
+    [DataField]
+    public Dictionary<ProtoId<LoadoutGroupPrototype>, List<Loadout>> SelectedLoadouts = new();
+
     public RoleLoadout(ProtoId<RoleLoadoutPrototype> role)
     {
         Role = role;
+    }
+
+    public bool Equals(RoleLoadout? other)
+    {
+        if (ReferenceEquals(null, other))
+            return false;
+        if (ReferenceEquals(this, other))
+            return true;
+
+        if (!Role.Equals(other.Role) ||
+            SelectedLoadouts.Count != other.SelectedLoadouts.Count ||
+            Points != other.Points ||
+            EntityName != other.EntityName)
+            return false;
+
+        // Tried using SequenceEqual but it stinky so.
+        foreach (var (key, value) in SelectedLoadouts)
+        {
+            if (!other.SelectedLoadouts.TryGetValue(key, out var otherValue) ||
+                !otherValue.SequenceEqual(value))
+                return false;
+        }
+
+        return true;
     }
 
     public RoleLoadout Clone()
@@ -144,9 +166,7 @@ public sealed partial class RoleLoadout : IEquatable<RoleLoadout>
 
         // Remove name not allowed.
         if (!roleProto.CanCustomizeName)
-        {
             EntityName = null;
-        }
 
         // Validate name length
         // TODO: Probably allow regex to be supplied?
@@ -156,14 +176,10 @@ public sealed partial class RoleLoadout : IEquatable<RoleLoadout>
             var maxNameLength = configManager.GetCVar(CCVars.MaxNameLength);
 
             if (name.Length > maxNameLength)
-            {
                 EntityName = name[..maxNameLength];
-            }
 
             if (name.Length == 0)
-            {
                 EntityName = null;
-            }
         }
 
         // In some instances we might not have picked up a new group for existing data.
@@ -239,7 +255,7 @@ public sealed partial class RoleLoadout : IEquatable<RoleLoadout>
                     if (!protoManager.TryIndex(protoId, out var loadoutProto))
                         continue;
 
-                    var defaultLoadout = new Loadout()
+                    var defaultLoadout = new Loadout
                     {
                         Prototype = loadoutProto.ID,
                     };
@@ -276,7 +292,10 @@ public sealed partial class RoleLoadout : IEquatable<RoleLoadout>
     /// <summary>
     /// Resets the selected loadouts to default if no data is present.
     /// </summary>
-    public void SetDefault(HumanoidCharacterProfile? profile, ICommonSession? session, IPrototypeManager protoManager, bool force = false)
+    public void SetDefault(HumanoidCharacterProfile? profile,
+        ICommonSession? session,
+        IPrototypeManager protoManager,
+        bool force = false)
     {
         if (profile == null)
             return;
@@ -312,7 +331,7 @@ public sealed partial class RoleLoadout : IEquatable<RoleLoadout>
                     if (!protoManager.TryIndex(protoId, out var loadoutProto))
                         continue;
 
-                    var defaultLoadout = new Loadout()
+                    var defaultLoadout = new Loadout
                     {
                         Prototype = loadoutProto.ID,
                     };
@@ -331,7 +350,11 @@ public sealed partial class RoleLoadout : IEquatable<RoleLoadout>
     /// <summary>
     /// Returns whether a loadout is valid or not.
     /// </summary>
-    public bool IsValid(HumanoidCharacterProfile profile, ICommonSession? session, ProtoId<LoadoutPrototype> loadout, IDependencyCollection collection, [NotNullWhen(false)] out FormattedMessage? reason)
+    public bool IsValid(HumanoidCharacterProfile profile,
+        ICommonSession? session,
+        ProtoId<LoadoutPrototype> loadout,
+        IDependencyCollection collection,
+        [NotNullWhen(false)] out FormattedMessage? reason)
     {
         reason = null;
 
@@ -363,7 +386,9 @@ public sealed partial class RoleLoadout : IEquatable<RoleLoadout>
     /// <summary>
     /// Applies the specified loadout to this group.
     /// </summary>
-    public bool AddLoadout(ProtoId<LoadoutGroupPrototype> selectedGroup, ProtoId<LoadoutPrototype> selectedLoadout, IPrototypeManager protoManager)
+    public bool AddLoadout(ProtoId<LoadoutGroupPrototype> selectedGroup,
+        ProtoId<LoadoutPrototype> selectedLoadout,
+        IPrototypeManager protoManager)
     {
         var groupLoadouts = SelectedLoadouts[selectedGroup];
 
@@ -391,7 +416,7 @@ public sealed partial class RoleLoadout : IEquatable<RoleLoadout>
             return false;
         }
 
-        groupLoadouts.Add(new Loadout()
+        groupLoadouts.Add(new Loadout
         {
             Prototype = selectedLoadout,
         });
@@ -402,7 +427,9 @@ public sealed partial class RoleLoadout : IEquatable<RoleLoadout>
     /// <summary>
     /// Removed the specified loadout from this group.
     /// </summary>
-    public bool RemoveLoadout(ProtoId<LoadoutGroupPrototype> selectedGroup, ProtoId<LoadoutPrototype> selectedLoadout, IPrototypeManager protoManager)
+    public bool RemoveLoadout(ProtoId<LoadoutGroupPrototype> selectedGroup,
+        ProtoId<LoadoutPrototype> selectedLoadout,
+        IPrototypeManager protoManager)
     {
         // Although this may bring us below minimum we'll let EnsureValid handle it.
 
@@ -422,39 +449,7 @@ public sealed partial class RoleLoadout : IEquatable<RoleLoadout>
         return false;
     }
 
-    public bool Equals(RoleLoadout? other)
-    {
-        if (ReferenceEquals(null, other)) return false;
-        if (ReferenceEquals(this, other)) return true;
+    public override bool Equals(object? obj) => ReferenceEquals(this, obj) || obj is RoleLoadout other && Equals(other);
 
-        if (!Role.Equals(other.Role) ||
-            SelectedLoadouts.Count != other.SelectedLoadouts.Count ||
-            Points != other.Points ||
-            EntityName != other.EntityName)
-        {
-            return false;
-        }
-
-        // Tried using SequenceEqual but it stinky so.
-        foreach (var (key, value) in SelectedLoadouts)
-        {
-            if (!other.SelectedLoadouts.TryGetValue(key, out var otherValue) ||
-                !otherValue.SequenceEqual(value))
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    public override bool Equals(object? obj)
-    {
-        return ReferenceEquals(this, obj) || obj is RoleLoadout other && Equals(other);
-    }
-
-    public override int GetHashCode()
-    {
-        return HashCode.Combine(Role, SelectedLoadouts, Points);
-    }
+    public override int GetHashCode() => HashCode.Combine(Role, SelectedLoadouts, Points);
 }

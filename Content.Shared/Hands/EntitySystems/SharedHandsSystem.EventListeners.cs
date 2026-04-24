@@ -8,10 +8,7 @@ namespace Content.Shared.Hands.EntitySystems;
 /// </summary>
 public abstract partial class SharedHandsSystem
 {
-    private void InitializeEventListeners()
-    {
-        SubscribeLocalEvent<HandsComponent, GetStandUpTimeEvent>(OnStandupArgs);
-    }
+    private void InitializeEventListeners() => SubscribeLocalEvent<HandsComponent, GetStandUpTimeEvent>(OnStandupArgs);
 
     /// <summary>
     /// Reduces the time it takes to stand up based on the number of hands we have available.
@@ -26,6 +23,6 @@ public abstract partial class SharedHandsSystem
         if (hands == 0)
             return;
 
-        time.DoAfterTime *= (float)ent.Comp.Count / (hands + ent.Comp.Count);
+        time.DoAfterTime *= (float) ent.Comp.Count / (hands + ent.Comp.Count);
     }
 }

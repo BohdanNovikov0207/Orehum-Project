@@ -8,15 +8,15 @@ namespace Content.Shared._Lavaland.Megafauna.NumberSelectors;
 /// </summary>
 public sealed partial class AngerNumberSelector : MegafaunaNumberSelector
 {
-    [DataField]
-    public Vector2 Range = new(1f, 1f);
-
     /// <summary>
     /// If true, will inverse the calculation so the value will
     /// become smaller with bigger aggression.
     /// </summary>
     [DataField]
     public bool Inverse;
+
+    [DataField]
+    public Vector2 Range = new(1f, 1f);
 
     public override float Get(MegafaunaCalculationBaseArgs args)
     {

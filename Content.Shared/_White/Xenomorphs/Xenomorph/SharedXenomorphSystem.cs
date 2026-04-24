@@ -6,11 +6,11 @@ namespace Content.Shared._White.Xenomorphs.Xenomorph;
 
 public abstract class SharedXenomorphSystem : EntitySystem
 {
-    [Dependency] private readonly TagSystem _tag = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-
     [ValidatePrototypeId<TagPrototype>]
     private const string XenomorphItemTag = "XenomorphItem";
+
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly TagSystem _tag = default!;
 
     public override void Initialize()
     {

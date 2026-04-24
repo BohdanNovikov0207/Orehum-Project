@@ -15,22 +15,12 @@ namespace Content.Shared._DV.Holosign;
 /// If there is already a sign on the clicked tile it reclaims it for a charge instead of stacking it.
 /// Currently there is no spawning prediction so signs are spawned once in a container and moved out to allow prediction.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState(fieldDeltas: true), Access(typeof(ChargeHolosignSystem))]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState(fieldDeltas: true)]
+[Access(typeof(ChargeHolosignSystem))]
 public sealed partial class ChargeHolosignProjectorComponent : Component
 {
-    /// <summary>
-    /// The entity to spawn.
-    /// </summary>
-    [DataField(required: true)]
-    public EntProtoId SignProto;
-
-    /// <summary>
-    /// Component on <see cref="SignProto"/> to check for duplicates.
-    /// </summary>
-    [DataField(required: true)]
-    public string SignComponentName;
-
-    public Type SignComponent = default!;
+    [ViewVariables]
+    public Container Container = default!;
 
     /// <summary>
     /// Container to store sign entities in before they are "spawned" on use.
@@ -38,12 +28,23 @@ public sealed partial class ChargeHolosignProjectorComponent : Component
     [DataField]
     public string ContainerId = "signs";
 
+    public Type SignComponent = default!;
+
+    /// <summary>
+    /// Component on <see cref="SignProto" /> to check for duplicates.
+    /// </summary>
+    [DataField(required: true)]
+    public string SignComponentName;
+
+    /// <summary>
+    /// The entity to spawn.
+    /// </summary>
+    [DataField(required: true)]
+    public EntProtoId SignProto;
+
     /// <summary>
     /// Holosigns we "own".
     /// </summary>
-    [ViewVariables, AutoNetworkedField]
+    [ViewVariables] [AutoNetworkedField]
     public List<EntityUid> Signs = new();
-
-    [ViewVariables]
-    public Container Container = default!;
 }

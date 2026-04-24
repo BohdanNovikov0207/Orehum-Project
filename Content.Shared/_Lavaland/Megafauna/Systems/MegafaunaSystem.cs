@@ -10,10 +10,10 @@ namespace Content.Shared._Lavaland.Megafauna.Systems;
 
 public sealed partial class MegafaunaSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly MobStateSystem _mobState = default!;
     [Dependency] private readonly INetManager _net = default!;
     [Dependency] private readonly IPrototypeManager _protoMan = default!;
-    [Dependency] private readonly MobStateSystem _mobState = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SharedTransformSystem _xform = default!;
 
     private EntityQuery<AggressiveComponent> _aggressiveQuery;
@@ -64,8 +64,5 @@ public sealed partial class MegafaunaSystem : EntitySystem
     }
 
     // TODO replace this with shared random
-    private System.Random GetRandom()
-    {
-        return new System.Random((int) (_timing.CurTick.Value * 6.7f));
-    }
+    private System.Random GetRandom() => new((int) (_timing.CurTick.Value * 6.7f));
 }

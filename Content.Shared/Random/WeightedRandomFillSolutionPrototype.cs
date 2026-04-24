@@ -11,16 +11,16 @@ using Robust.Shared.Prototypes;
 namespace Content.Shared.Random;
 
 /// <summary>
-///     Random weighting dataset for solutions, able to specify reagents quantity.
+/// Random weighting dataset for solutions, able to specify reagents quantity.
 /// </summary>
 [Prototype]
-public sealed partial class WeightedRandomFillSolutionPrototype : IPrototype
+public sealed class WeightedRandomFillSolutionPrototype : IPrototype
 {
-    [IdDataField] public string ID { get; private set; } = default!;
-
     /// <summary>
-    ///     List of RandomFills that can be picked from.
+    /// List of RandomFills that can be picked from.
     /// </summary>
     [DataField("fills", required: true)]
     public List<RandomFillSolution> Fills = new();
+
+    [IdDataField] public string ID { get; } = default!;
 }

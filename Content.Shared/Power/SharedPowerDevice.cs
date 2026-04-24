@@ -16,13 +16,12 @@
 
 using Robust.Shared.Serialization;
 
-namespace Content.Shared.Power
+namespace Content.Shared.Power;
+
+[Serializable] [NetSerializable]
+public enum PowerDeviceVisuals : byte
 {
-    [Serializable, NetSerializable]
-    public enum PowerDeviceVisuals : byte
-    {
-        VisualState,
-        Powered,
-        BatteryPowered
-    }
+    VisualState,
+    Powered,
+    BatteryPowered,
 }

@@ -4,8 +4,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-using Robust.Shared.Audio;
 using Content.Shared.Chat.Prototypes;
+using Robust.Shared.Audio;
 using Robust.Shared.GameStates;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype;
 
@@ -21,14 +21,17 @@ public sealed partial class CluwneComponent : Component
     [ViewVariables(VVAccess.ReadWrite)]
     public TimeSpan DamageGiggleCooldown = TimeSpan.FromSeconds(2);
 
-    [ViewVariables(VVAccess.ReadWrite)]
-    public float KnockChance = 0.05f;
+    [DataField("emoteId", customTypeSerializer: typeof(PrototypeIdSerializer<EmoteSoundsPrototype>))]
+    public string? EmoteSoundsId = "Cluwne";
 
     [ViewVariables(VVAccess.ReadWrite)]
     public float GiggleRandomChance = 0.1f;
 
-    [DataField("emoteId", customTypeSerializer: typeof(PrototypeIdSerializer<EmoteSoundsPrototype>))]
-    public string? EmoteSoundsId = "Cluwne";
+    [ViewVariables(VVAccess.ReadWrite)]
+    public float KnockChance = 0.05f;
+
+    [DataField("knocksound")]
+    public SoundSpecifier KnockSound = new SoundPathSpecifier("/Audio/Items/airhorn.ogg");
 
     /// <summary>
     /// Amount of time cluwne is paralyzed for when falling over.
@@ -41,7 +44,4 @@ public sealed partial class CluwneComponent : Component
     /// </summary>
     [DataField("spawnsound")]
     public SoundSpecifier SpawnSound = new SoundPathSpecifier("/Audio/Items/bikehorn.ogg");
-
-    [DataField("knocksound")]
-    public SoundSpecifier KnockSound = new SoundPathSpecifier("/Audio/Items/airhorn.ogg");
 }

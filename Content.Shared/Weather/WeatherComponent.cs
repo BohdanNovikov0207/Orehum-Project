@@ -41,14 +41,17 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
 
 namespace Content.Shared.Weather;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class WeatherComponent : Component
 {
+    public static readonly TimeSpan StartupTime = TimeSpan.FromSeconds(15);
+    public static readonly TimeSpan ShutdownTime = TimeSpan.FromSeconds(15);
+
     /// <summary>
-    /// Currently running weathers
+    /// DeltaV: When to next update weather effects (damage).
     /// </summary>
-    [DataField]
-    public Dictionary<ProtoId<WeatherPrototype>, WeatherData> Weather = new();
+    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))]
+    public TimeSpan NextUpdate = TimeSpan.Zero;
 
     /// <summary>
     /// DeltaV: How long to wait between updating weather effects.
@@ -57,21 +60,20 @@ public sealed partial class WeatherComponent : Component
     public TimeSpan UpdateDelay = TimeSpan.FromSeconds(1);
 
     /// <summary>
-    /// DeltaV: When to next update weather effects (damage).
+    /// Currently running weathers
     /// </summary>
-    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))]
-    public TimeSpan NextUpdate = TimeSpan.Zero;
-
-    public static readonly TimeSpan StartupTime = TimeSpan.FromSeconds(15);
-    public static readonly TimeSpan ShutdownTime = TimeSpan.FromSeconds(15);
+    [DataField]
+    public Dictionary<ProtoId<WeatherPrototype>, WeatherData> Weather = new();
 }
 
-[DataDefinition, Serializable, NetSerializable]
+[DataDefinition] [Serializable] [NetSerializable]
 public sealed partial class WeatherData
 {
-    // Client audio stream.
-    [NonSerialized]
-    public EntityUid? Stream;
+    /// <summary>
+    /// When the applied weather will end.
+    /// </summary>
+    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))] //TODO: Remove Custom serializer
+    public TimeSpan? EndTime;
 
     /// <summary>
     /// When the weather started if relevant.
@@ -79,17 +81,15 @@ public sealed partial class WeatherData
     [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))] //TODO: Remove Custom serializer
     public TimeSpan StartTime = TimeSpan.Zero;
 
-    /// <summary>
-    /// When the applied weather will end.
-    /// </summary>
-    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))] //TODO: Remove Custom serializer
-    public TimeSpan? EndTime;
+    [DataField]
+    public WeatherState State = WeatherState.Invalid;
+
+    // Client audio stream.
+    [NonSerialized]
+    public EntityUid? Stream;
 
     [ViewVariables]
     public TimeSpan Duration => EndTime == null ? TimeSpan.MaxValue : EndTime.Value - StartTime;
-
-    [DataField]
-    public WeatherState State = WeatherState.Invalid;
 }
 
 public enum WeatherState : byte

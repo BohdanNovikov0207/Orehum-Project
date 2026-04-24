@@ -13,11 +13,8 @@ public abstract class SharedClockSystem : EntitySystem
 {
     [Dependency] private readonly SharedGameTicker _ticker = default!;
 
-    /// <inheritdoc/>
-    public override void Initialize()
-    {
-        SubscribeLocalEvent<ClockComponent, ExaminedEvent>(OnExamined);
-    }
+    /// <inheritdoc />
+    public override void Initialize() => SubscribeLocalEvent<ClockComponent, ExaminedEvent>(OnExamined);
 
     private void OnExamined(Entity<ClockComponent> ent, ref ExaminedEvent args)
     {
@@ -41,10 +38,9 @@ public abstract class SharedClockSystem : EntitySystem
         }
     }
 
-    private TimeSpan GetGlobalTime()
-    {
-        return (EntityQuery<GlobalTimeManagerComponent>().FirstOrDefault()?.TimeOffset ?? TimeSpan.Zero) + _ticker.RoundDuration();
-    }
+    private TimeSpan GetGlobalTime() =>
+        (EntityQuery<GlobalTimeManagerComponent>().FirstOrDefault()?.TimeOffset ?? TimeSpan.Zero) +
+        _ticker.RoundDuration();
 
     public TimeSpan GetClockTime(Entity<ClockComponent> ent)
     {

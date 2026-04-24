@@ -15,25 +15,19 @@ namespace Content.Shared.Power.Generator;
 /// This is used for generators that run off some kind of fuel.
 /// </summary>
 /// <remarks>
-/// <para>
-/// Generators must be anchored to be able to run.
-/// </para>
+///     <para>
+///     Generators must be anchored to be able to run.
+///     </para>
 /// </remarks>
-/// <seealso cref="SharedGeneratorSystem"/>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState, Access(typeof(SharedGeneratorSystem))]
+/// <seealso cref="SharedGeneratorSystem" />
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState] [Access(typeof(SharedGeneratorSystem))]
 public sealed partial class FuelGeneratorComponent : Component
 {
     /// <summary>
-    /// Is the generator currently running?
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public bool On;
-
-    /// <summary>
-    /// The generator's target power.
+    /// A constant used to calculate fuel efficiency in relation to target power output and optimal power output
     /// </summary>
     [DataField]
-    public float TargetPower = 15_000.0f;
+    public float FuelEfficiencyConstant = 1.3f;
 
     /// <summary>
     /// The maximum target power.
@@ -52,10 +46,10 @@ public sealed partial class FuelGeneratorComponent : Component
     public float MinTargetPower = 1_000;
 
     /// <summary>
-    /// The "optimal" power at which the generator is considered to be at 100% efficiency.
+    /// Is the generator currently running?
     /// </summary>
-    [DataField]
-    public float OptimalPower = 15_000.0f;
+    [DataField] [AutoNetworkedField]
+    public bool On;
 
     /// <summary>
     /// The rate at which one unit of fuel should be consumed.
@@ -64,8 +58,14 @@ public sealed partial class FuelGeneratorComponent : Component
     public float OptimalBurnRate = 1 / 60.0f; // Once every 60 seconds.
 
     /// <summary>
-    /// A constant used to calculate fuel efficiency in relation to target power output and optimal power output
+    /// The "optimal" power at which the generator is considered to be at 100% efficiency.
     /// </summary>
     [DataField]
-    public float FuelEfficiencyConstant = 1.3f;
+    public float OptimalPower = 15_000.0f;
+
+    /// <summary>
+    /// The generator's target power.
+    /// </summary>
+    [DataField]
+    public float TargetPower = 15_000.0f;
 }

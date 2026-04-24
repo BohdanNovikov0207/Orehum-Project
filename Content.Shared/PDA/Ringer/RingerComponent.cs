@@ -3,27 +3,15 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
 
 namespace Content.Shared.PDA.Ringer;
 
-[RegisterComponent, NetworkedComponent, Access(typeof(SharedRingerSystem))]
-[AutoGenerateComponentState(true, fieldDeltas: true), AutoGenerateComponentPause]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(SharedRingerSystem))]
+[AutoGenerateComponentState(true, true)] [AutoGenerateComponentPause]
 public sealed partial class RingerComponent : Component
 {
     /// <summary>
-    /// The ringtone, represented as an array of notes.
+    /// Whether the ringer is currently playing its ringtone.
     /// </summary>
-    [DataField, AutoNetworkedField]
-    public Note[] Ringtone = new Note[SharedRingerSystem.RingtoneLength];
-
-    /// <summary>
-    /// The last time this ringer's ringtone was set.
-    /// </summary>
-    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer)), AutoPausedField, AutoNetworkedField]
-    public TimeSpan NextRingtoneSetTime;
-
-    /// <summary>
-    /// The time when the next note should play.
-    /// </summary>
-    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer)), AutoPausedField, AutoNetworkedField]
-    public TimeSpan? NextNoteTime;
+    [DataField] [AutoNetworkedField]
+    public bool Active;
 
     /// <summary>
     /// The cooldown before the ringtone can be changed again.
@@ -32,26 +20,38 @@ public sealed partial class RingerComponent : Component
     public TimeSpan Cooldown = TimeSpan.FromMilliseconds(250);
 
     /// <summary>
+    /// The time when the next note should play.
+    /// </summary>
+    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))] [AutoPausedField] [AutoNetworkedField]
+    public TimeSpan? NextNoteTime;
+
+    /// <summary>
+    /// The last time this ringer's ringtone was set.
+    /// </summary>
+    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))] [AutoPausedField] [AutoNetworkedField]
+    public TimeSpan NextRingtoneSetTime;
+
+    /// <summary>
     /// Keeps track of how many notes have elapsed if the ringer component is playing.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public int NoteCount;
 
     /// <summary>
     /// How far the sound projects in metres.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public float Range = 3f;
+
+    /// <summary>
+    /// The ringtone, represented as an array of notes.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public Note[] Ringtone = new Note[SharedRingerSystem.RingtoneLength];
 
     /// <summary>
     /// The ringtone volume.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public float Volume = -4f;
-
-    /// <summary>
-    /// Whether the ringer is currently playing its ringtone.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public bool Active;
 }

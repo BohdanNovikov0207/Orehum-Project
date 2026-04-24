@@ -16,7 +16,6 @@
 
 using Content.Shared.Chemistry.EntitySystems;
 using Content.Shared.Mobs.Systems;
-using Content.Shared.Nutrition;
 using Content.Shared.Nutrition.Components;
 using Content.Shared.Nutrition.EntitySystems;
 using Robust.Shared.Containers;
@@ -25,15 +24,15 @@ using Robust.Shared.Timing;
 namespace Content.Shared.Animals;
 
 /// <summary>
-///     Gives ability to produce fiber reagents;
-///     produces endlessly if the owner has no HungerComponent.
+/// Gives ability to produce fiber reagents;
+/// produces endlessly if the owner has no HungerComponent.
 /// </summary>
 public sealed class WoolySystem : EntitySystem
 {
     [Dependency] private readonly HungerSystem _hunger = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly MobStateSystem _mobState = default!;
     [Dependency] private readonly SharedSolutionContainerSystem _solutionContainer = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -43,10 +42,8 @@ public sealed class WoolySystem : EntitySystem
         SubscribeLocalEvent<WoolyComponent, EntRemovedFromContainerMessage>(OnEntRemoved);
     }
 
-    private void OnMapInit(EntityUid uid, WoolyComponent component, MapInitEvent args)
-    {
+    private void OnMapInit(EntityUid uid, WoolyComponent component, MapInitEvent args) =>
         component.NextGrowth = _timing.CurTime + component.GrowthDelay;
-    }
 
     private void OnEntRemoved(Entity<WoolyComponent> entity, ref EntRemovedFromContainerMessage args)
     {

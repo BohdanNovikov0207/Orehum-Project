@@ -9,17 +9,22 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Cargo.BUI;
 
-[NetSerializable, Serializable]
+[NetSerializable] [Serializable]
 public sealed class CargoConsoleInterfaceState : BoundUserInterfaceState
 {
-    public string Name;
-    public int Count;
     public int Capacity;
-    public NetEntity Station;
+    public int Count;
+    public string Name;
     public List<CargoOrderData> Orders;
     public List<ProtoId<CargoProductPrototype>> Products;
+    public NetEntity Station;
 
-    public CargoConsoleInterfaceState(string name, int count, int capacity, NetEntity station, List<CargoOrderData> orders, List<ProtoId<CargoProductPrototype>> products)
+    public CargoConsoleInterfaceState(string name,
+        int count,
+        int capacity,
+        NetEntity station,
+        List<CargoOrderData> orders,
+        List<ProtoId<CargoProductPrototype>> products)
     {
         Name = name;
         Count = count;

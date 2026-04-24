@@ -5,20 +5,21 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Movement.Systems;
+using Content.Shared.Clothing.Components;
 using Content.Shared.Damage.Systems;
 using Content.Shared.Inventory;
-using Content.Shared.Clothing.Components;
+using Content.Shared.Movement.Systems;
 
 namespace Content.Shared.Clothing.EntitySystems;
 
 /// <summary>
-/// Changes the friction and acceleration of the wearer and also the damage on impact variables of thew wearer when hitting a static object.
+/// Changes the friction and acceleration of the wearer and also the damage on impact variables of thew wearer when hitting
+/// a static object.
 /// </summary>
 public sealed class SkatesSystem : EntitySystem
 {
-    [Dependency] private readonly MovementSpeedModifierSystem _move = default!;
     [Dependency] private readonly DamageOnHighSpeedImpactSystem _impact = default!;
+    [Dependency] private readonly MovementSpeedModifierSystem _move = default!;
 
     public override void Initialize()
     {
@@ -26,7 +27,8 @@ public sealed class SkatesSystem : EntitySystem
 
         SubscribeLocalEvent<SkatesComponent, ClothingGotEquippedEvent>(OnGotEquipped);
         SubscribeLocalEvent<SkatesComponent, ClothingGotUnequippedEvent>(OnGotUnequipped);
-        SubscribeLocalEvent<SkatesComponent, InventoryRelayedEvent<RefreshFrictionModifiersEvent>>(OnRefreshFrictionModifiers);
+        SubscribeLocalEvent<SkatesComponent, InventoryRelayedEvent<RefreshFrictionModifiersEvent>>(
+            OnRefreshFrictionModifiers);
     }
 
     /// <summary>
@@ -35,7 +37,11 @@ public sealed class SkatesSystem : EntitySystem
     private void OnGotUnequipped(Entity<SkatesComponent> entity, ref ClothingGotUnequippedEvent args)
     {
         _move.RefreshFrictionModifiers(args.Wearer);
-        _impact.ChangeCollide(args.Wearer, entity.Comp.DefaultMinimumSpeed, entity.Comp.DefaultStunSeconds, entity.Comp.DefaultDamageCooldown, entity.Comp.DefaultSpeedDamage);
+        _impact.ChangeCollide(args.Wearer,
+            entity.Comp.DefaultMinimumSpeed,
+            entity.Comp.DefaultStunSeconds,
+            entity.Comp.DefaultDamageCooldown,
+            entity.Comp.DefaultSpeedDamage);
     }
 
     /// <summary>
@@ -44,7 +50,11 @@ public sealed class SkatesSystem : EntitySystem
     private void OnGotEquipped(Entity<SkatesComponent> entity, ref ClothingGotEquippedEvent args)
     {
         _move.RefreshFrictionModifiers(args.Wearer);
-        _impact.ChangeCollide(args.Wearer, entity.Comp.MinimumSpeed, entity.Comp.StunSeconds, entity.Comp.DamageCooldown, entity.Comp.SpeedDamage);
+        _impact.ChangeCollide(args.Wearer,
+            entity.Comp.MinimumSpeed,
+            entity.Comp.StunSeconds,
+            entity.Comp.DamageCooldown,
+            entity.Comp.SpeedDamage);
     }
 
     private void OnRefreshFrictionModifiers(Entity<SkatesComponent> ent,

@@ -4,12 +4,12 @@ using Robust.Shared.Prototypes;
 namespace Content.Shared.EntityEffects.EffectConditions;
 
 /// <summary>
-///     Condition for if the entity is or isn't wearing internals.
+/// Condition for if the entity is or isn't wearing internals.
 /// </summary>
 public sealed partial class Internals : EntityEffectCondition
 {
     /// <summary>
-    ///     To pass, the entity's internals must have this same state.
+    /// To pass, the entity's internals must have this same state.
     /// </summary>
     [DataField]
     public bool UsingInternals = true;
@@ -23,8 +23,6 @@ public sealed partial class Internals : EntityEffectCondition
         return UsingInternals == internalsState;
     }
 
-    public override string GuidebookExplanation(IPrototypeManager prototype)
-    {
-        return Loc.GetString("reagent-effect-condition-guidebook-internals", ("usingInternals", UsingInternals));
-    }
+    public override string GuidebookExplanation(IPrototypeManager prototype) =>
+        Loc.GetString("reagent-effect-condition-guidebook-internals", ("usingInternals", UsingInternals));
 }

@@ -14,11 +14,11 @@ namespace Content.Shared.Mousetrap;
 
 /// <summary>
 /// Component inteded to be used for mouse traps.
-/// Will stop step triggers from happening unless armed via <see cref="Item.ItemToggle.Components.ItemToggleComponent"/>
-/// and will scale damage taken from <see cref="Trigger.Components.Effects.DamageOnTriggerComponent"/>
+/// Will stop step triggers from happening unless armed via <see cref="Item.ItemToggle.Components.ItemToggleComponent" />
+/// and will scale damage taken from <see cref="Trigger.Components.Effects.DamageOnTriggerComponent" />
 /// depending on mass.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class MousetrapComponent : Component
 {
     /// <summary>
@@ -26,6 +26,6 @@ public sealed partial class MousetrapComponent : Component
     /// inflection point in the damage scaling
     /// equation will occur.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public int MassBalance = 10;
 }

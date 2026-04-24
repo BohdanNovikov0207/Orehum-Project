@@ -16,9 +16,9 @@ public sealed partial class HumanoidProfileExport
     [DataField]
     public string ForkId;
 
-    [DataField]
-    public int Version = 1;
-
     [DataField(required: true)]
     public HumanoidCharacterProfile Profile = default!;
+
+    [DataField]
+    public int Version = 1;
 }

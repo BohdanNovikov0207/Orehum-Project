@@ -13,14 +13,14 @@ using Robust.Shared.GameStates;
 
 namespace Content.Shared.Smoking.Components;
 
-[RegisterComponent, NetworkedComponent, Access(typeof(SharedMatchstickSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(SharedMatchstickSystem))]
 [AutoGenerateComponentState]
 public sealed partial class MatchstickComponent : Component
 {
     /// <summary>
     /// Current state to matchstick. Can be <code>Unlit</code>, <code>Lit</code> or <code>Burnt</code>.
     /// </summary>
-    [DataField("state"), AutoNetworkedField]
+    [DataField("state")] [AutoNetworkedField]
     public SmokableState CurrentState = SmokableState.Unlit;
 
     /// <summary>

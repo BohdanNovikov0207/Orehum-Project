@@ -3,15 +3,16 @@
 // SPDX-License-Identifier: MIT
 
 using System.Linq;
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Chat.Prototypes;
 using Content.Shared.Chemistry.EntitySystems;
 using Content.Shared.Damage;
 using Content.Shared.DoAfter;
 using Content.Shared.DragDrop;
 using Content.Shared.Examine;
-using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Hands;
 using Content.Shared.Interaction;
+using Content.Shared.Mobs.Components;
 using Content.Shared.Popups;
 using Content.Shared.Verbs;
 using Robust.Shared.Containers;
@@ -19,7 +20,6 @@ using Robust.Shared.Network;
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
-using Content.Shared.Mobs.Components;
 
 namespace Content.Shared._RMC14.Medical.IV;
 
@@ -29,13 +29,13 @@ public abstract class SharedIVDripSystem : EntitySystem
     [Dependency] private readonly DamageableSystem _damageable = default!;
     [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
     [Dependency] private readonly INetManager _net = default!;
+
+    private readonly HashSet<EntityUid> _packsToUpdate = [];
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly IPrototypeManager _prototype = default!;
     [Dependency] private readonly SharedSolutionContainerSystem _solutionContainer = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
-
-    private readonly HashSet<EntityUid> _packsToUpdate = [];
 
     private EntityQuery<BloodPackComponent> _bloodPackQuery;
 
@@ -63,25 +63,16 @@ public abstract class SharedIVDripSystem : EntitySystem
         SubscribeLocalEvent<BloodPackComponent, ExaminedEvent>(OnBloodPackExamine);
     }
 
-    private void OnIVDripEntInserted(Entity<IVDripComponent> iv, ref EntInsertedIntoContainerMessage args)
-    {
+    private void OnIVDripEntInserted(Entity<IVDripComponent> iv, ref EntInsertedIntoContainerMessage args) =>
         UpdateIVVisuals(iv);
-    }
 
-    private void OnIVDripEntRemoved(Entity<IVDripComponent> iv, ref EntRemovedFromContainerMessage args)
-    {
+    private void OnIVDripEntRemoved(Entity<IVDripComponent> iv, ref EntRemovedFromContainerMessage args) =>
         UpdateIVVisuals(iv);
-    }
 
-    private void OnIVDripAfterHandleState(Entity<IVDripComponent> iv, ref AfterAutoHandleStateEvent args)
-    {
+    private void OnIVDripAfterHandleState(Entity<IVDripComponent> iv, ref AfterAutoHandleStateEvent args) =>
         UpdateIVAppearance(iv);
-    }
 
-    private void OnIVDripCanDrag(Entity<IVDripComponent> iv, ref CanDragEvent args)
-    {
-        args.Handled = true;
-    }
+    private void OnIVDripCanDrag(Entity<IVDripComponent> iv, ref CanDragEvent args) => args.Handled = true;
 
     private void OnIVDripCanDropDragged(Entity<IVDripComponent> iv, ref CanDropDraggedEvent args)
     {
@@ -91,7 +82,7 @@ public abstract class SharedIVDripSystem : EntitySystem
         args.CanDrop = true;
     }
 
-    private void OnIVDripDragDropDragged(Entity<IVDripComponent> iv, ref    DragDropDraggedEvent args)
+    private void OnIVDripDragDropDragged(Entity<IVDripComponent> iv, ref DragDropDraggedEvent args)
     {
         if (args.Handled)
             return;
@@ -102,10 +93,8 @@ public abstract class SharedIVDripSystem : EntitySystem
             DetachIV(iv, args.User, false, true);
     }
 
-    private void OnIVInteractHand(Entity<IVDripComponent> iv, ref InteractHandEvent args)
-    {
+    private void OnIVInteractHand(Entity<IVDripComponent> iv, ref InteractHandEvent args) =>
         DetachIV(iv, args.User, false, true);
-    }
 
     private void OnIVVerbs(Entity<IVDripComponent> iv, ref GetVerbsEvent<InteractionVerb> args)
     {
@@ -149,20 +138,13 @@ public abstract class SharedIVDripSystem : EntitySystem
         }
     }
 
-    private void OnBloodPackMapInit(Entity<BloodPackComponent> pack, ref MapInitEvent args)
-    {
-        _packsToUpdate.Add(pack);
-    }
+    private void OnBloodPackMapInit(Entity<BloodPackComponent> pack, ref MapInitEvent args) => _packsToUpdate.Add(pack);
 
-    private void OnBloodPackAfterState(Entity<BloodPackComponent> pack, ref AfterAutoHandleStateEvent args)
-    {
+    private void OnBloodPackAfterState(Entity<BloodPackComponent> pack, ref AfterAutoHandleStateEvent args) =>
         UpdatePackVisuals(pack);
-    }
 
-    private void OnBloodPackSolutionChanged(Entity<BloodPackComponent> pack, ref SolutionContainerChangedEvent args)
-    {
+    private void OnBloodPackSolutionChanged(Entity<BloodPackComponent> pack, ref SolutionContainerChangedEvent args) =>
         UpdatePackVisuals(pack);
-    }
 
     private void OnBloodPackAfterInteract(Entity<BloodPackComponent> pack, ref AfterInteractEvent args)
     {
@@ -205,7 +187,7 @@ public abstract class SharedIVDripSystem : EntitySystem
             BreakOnDamage = true,
             BreakOnHandChange = true,
             BlockDuplicate = true,
-            DuplicateCondition = DuplicateConditions.SameEvent
+            DuplicateCondition = DuplicateConditions.SameEvent,
         };
         _doAfter.TryStartDoAfter(doAfter);
     }
@@ -218,10 +200,8 @@ public abstract class SharedIVDripSystem : EntitySystem
         AttachPack(pack, args.User, target);
     }
 
-    private void OnBloodPackUnequippedHand(Entity<BloodPackComponent> pack, ref GotUnequippedHandEvent args)
-    {
+    private void OnBloodPackUnequippedHand(Entity<BloodPackComponent> pack, ref GotUnequippedHandEvent args) =>
         DetachPack((pack, pack), args.User, true, true);
-    }
 
     private void OnBloodPackVerbs(Entity<BloodPackComponent> pack, ref GetVerbsEvent<InteractionVerb> args)
     {
@@ -430,9 +410,7 @@ public abstract class SharedIVDripSystem : EntitySystem
             _popup.PopupEntity(message, attached, others, true);
         }
         else
-        {
             _popup.PopupEntity(message, attached);
-        }
     }
 
     private void AttachFeedback(EntityUid iv, EntityUid user, EntityUid to, bool injecting)

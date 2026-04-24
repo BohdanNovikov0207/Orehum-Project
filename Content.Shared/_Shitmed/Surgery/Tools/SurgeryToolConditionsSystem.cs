@@ -16,7 +16,7 @@ using Content.Shared.Weapons.Ranged.Events;
 namespace Content.Shared._Shitmed.Medical.Surgery.Tools;
 
 /// <summary>
-///  Prevents using esword or welder when off, laser when no charges.
+/// Prevents using esword or welder when off, laser when no charges.
 /// </summary>
 public sealed class SurgeryToolConditionsSystem : EntitySystem
 {

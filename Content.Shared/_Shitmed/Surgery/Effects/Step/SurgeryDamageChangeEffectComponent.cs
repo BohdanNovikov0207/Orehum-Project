@@ -11,18 +11,18 @@ using Robust.Shared.GameStates;
 
 namespace Content.Shared._Shitmed.Medical.Surgery.Effects.Step;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class SurgeryDamageChangeEffectComponent : Component
 {
     [DataField]
-    public DamageSpecifier Damage = default!;
+    public bool AffectAll;
 
     [DataField]
-    public float SleepModifier = 0.5f;
+    public DamageSpecifier Damage = default!;
 
     [DataField]
     public bool IsConsumable;
 
     [DataField]
-    public bool AffectAll;
+    public float SleepModifier = 0.5f;
 }

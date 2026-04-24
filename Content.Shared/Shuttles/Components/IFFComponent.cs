@@ -13,7 +13,7 @@ namespace Content.Shared.Shuttles.Components;
 /// <summary>
 /// Handles what a grid should look like on radar.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 [Access(typeof(SharedShuttleSystem))]
 public sealed partial class IFFComponent : Component
 {
@@ -24,14 +24,14 @@ public sealed partial class IFFComponent : Component
     /// </summary>
     public static readonly Color IFFColor = Color.Gold;
 
-    [ViewVariables(VVAccess.ReadWrite), DataField, AutoNetworkedField]
-    public IFFFlags Flags = IFFFlags.None;
-
     /// <summary>
     /// Color for this to show up on IFF.
     /// </summary>
-    [ViewVariables(VVAccess.ReadWrite), DataField, AutoNetworkedField]
+    [ViewVariables(VVAccess.ReadWrite)] [DataField] [AutoNetworkedField]
     public Color Color = IFFColor;
+
+    [ViewVariables(VVAccess.ReadWrite)] [DataField] [AutoNetworkedField]
+    public IFFFlags Flags = IFFFlags.None;
 }
 
 [Flags]

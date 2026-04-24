@@ -3,7 +3,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Heretic.Messages;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class FeastOfOwlsMessage(bool accepted) : EuiMessageBase
 {
     public readonly bool Accepted = accepted;

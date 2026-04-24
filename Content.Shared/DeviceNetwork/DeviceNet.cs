@@ -7,39 +7,40 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Robust.Shared.Random;
 using Content.Shared.DeviceNetwork.Components;
+using Robust.Shared.Random;
 
 namespace Content.Shared.DeviceNetwork;
 
 /// <summary>
-///     Data class for storing and retrieving information about devices connected to a device network.
+/// Data class for storing and retrieving information about devices connected to a device network.
 /// </summary>
 /// <remarks>
-///     This basically just makes <see cref="DeviceNetworkComponent"/> accessible via their addresses and frequencies on
-///     some network.
+/// This basically just makes <see cref="DeviceNetworkComponent" /> accessible via their addresses and frequencies on
+/// some network.
 /// </remarks>
 public sealed class DeviceNet
 {
+    private readonly IRobustRandom _random;
+
     /// <summary>
-    ///     Devices, mapped by their "Address", which is just an int that gets converted to Hex for displaying to users.
-    ///     This dictionary contains all devices connected to this network, though they may not be listening to any
-    ///     specific frequency.
+    /// Devices, mapped by their "Address", which is just an int that gets converted to Hex for displaying to users.
+    /// This dictionary contains all devices connected to this network, though they may not be listening to any
+    /// specific frequency.
     /// </summary>
     public readonly Dictionary<string, DeviceNetworkComponent> Devices = new();
 
     /// <summary>
-    ///     Devices listening on a given frequency.
+    /// Devices listening on a given frequency.
     /// </summary>
     public readonly Dictionary<uint, HashSet<DeviceNetworkComponent>> ListeningDevices = new();
 
+    public readonly int NetId;
+
     /// <summary>
-    ///     Devices listening to all packets on a given frequency, regardless of the intended recipient.
+    /// Devices listening to all packets on a given frequency, regardless of the intended recipient.
     /// </summary>
     public readonly Dictionary<uint, HashSet<DeviceNetworkComponent>> ReceiveAllDevices = new();
-
-    private readonly IRobustRandom _random;
-    public readonly int NetId;
 
     public DeviceNet(int netId, IRobustRandom random)
     {
@@ -48,7 +49,7 @@ public sealed class DeviceNet
     }
 
     /// <summary>
-    ///     Add a device to the network.
+    /// Add a device to the network.
     /// </summary>
     public bool Add(DeviceNetworkComponent device)
     {
@@ -71,7 +72,7 @@ public sealed class DeviceNet
             return true;
 
         if (!ListeningDevices.TryGetValue(freq, out var devices))
-            ListeningDevices[freq] = devices = new();
+            ListeningDevices[freq] = devices = new HashSet<DeviceNetworkComponent>();
 
         devices.Add(device);
 
@@ -79,14 +80,14 @@ public sealed class DeviceNet
             return true;
 
         if (!ReceiveAllDevices.TryGetValue(freq, out var receiveAlldevices))
-            ReceiveAllDevices[freq] = receiveAlldevices = new();
+            ReceiveAllDevices[freq] = receiveAlldevices = new HashSet<DeviceNetworkComponent>();
 
         receiveAlldevices.Add(device);
         return true;
     }
 
     /// <summary>
-    ///     Remove a device from the network.
+    /// Remove a device from the network.
     /// </summary>
     public bool Remove(DeviceNetworkComponent device)
     {
@@ -114,8 +115,8 @@ public sealed class DeviceNet
     }
 
     /// <summary>
-    ///     Give an existing device a new randomly generated address. Useful if the device's address prefix was updated
-    ///     and they want a new address to reflect that, or something like that.
+    /// Give an existing device a new randomly generated address. Useful if the device's address prefix was updated
+    /// and they want a new address to reflect that, or something like that.
     /// </summary>
     public bool RandomizeAddress(string oldAddress, string? prefix = null)
     {
@@ -129,7 +130,7 @@ public sealed class DeviceNet
     }
 
     /// <summary>
-    ///     Update the address of an existing device.
+    /// Update the address of an existing device.
     /// </summary>
     public bool UpdateAddress(string oldAddress, string newAddress)
     {
@@ -146,7 +147,7 @@ public sealed class DeviceNet
     }
 
     /// <summary>
-    ///     Make an existing network device listen to a new frequency.
+    /// Make an existing network device listen to a new frequency.
     /// </summary>
     public bool UpdateReceiveFrequency(string address, uint? newFrequency)
     {
@@ -179,7 +180,7 @@ public sealed class DeviceNet
             return true;
 
         if (!ListeningDevices.TryGetValue(newFrequency.Value, out var devices))
-            ListeningDevices[newFrequency.Value] = devices = new();
+            ListeningDevices[newFrequency.Value] = devices = new HashSet<DeviceNetworkComponent>();
 
         devices.Add(device);
 
@@ -187,14 +188,14 @@ public sealed class DeviceNet
             return true;
 
         if (!ReceiveAllDevices.TryGetValue(newFrequency.Value, out var receiveAlldevices))
-            ReceiveAllDevices[newFrequency.Value] = receiveAlldevices = new();
+            ReceiveAllDevices[newFrequency.Value] = receiveAlldevices = new HashSet<DeviceNetworkComponent>();
 
         receiveAlldevices.Add(device);
         return true;
     }
 
     /// <summary>
-    ///     Make an existing network device listen to a new frequency.
+    /// Make an existing network device listen to a new frequency.
     /// </summary>
     public bool UpdateReceiveAll(string address, bool receiveAll)
     {
@@ -215,7 +216,7 @@ public sealed class DeviceNet
         if (receiveAll)
         {
             if (!ReceiveAllDevices.TryGetValue(freq, out devices))
-                ReceiveAllDevices[freq] = devices = new();
+                ReceiveAllDevices[freq] = devices = new HashSet<DeviceNetworkComponent>();
             devices.Add(device);
         }
         else if (ReceiveAllDevices.TryGetValue(freq, out devices))
@@ -229,7 +230,7 @@ public sealed class DeviceNet
     }
 
     /// <summary>
-    ///     Generates a valid address by randomly generating one and checking if it already exists on the network.
+    /// Generates a valid address by randomly generating one and checking if it already exists on the network.
     /// </summary>
     private string GenerateValidAddress(string? prefix)
     {
@@ -239,8 +240,7 @@ public sealed class DeviceNet
         {
             var num = _random.Next();
             address = $"{prefix}{num >> 16:X4}-{num & 0xFFFF:X4}";
-        }
-        while (Devices.ContainsKey(address));
+        } while (Devices.ContainsKey(address));
 
         return address;
     }

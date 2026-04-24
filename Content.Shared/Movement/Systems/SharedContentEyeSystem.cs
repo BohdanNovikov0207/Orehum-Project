@@ -29,17 +29,16 @@ namespace Content.Shared.Movement.Systems;
 /// </summary>
 public abstract class SharedContentEyeSystem : EntitySystem
 {
-    [Dependency] private readonly ISharedAdminManager _admin = default!;
-    [Dependency] private readonly SharedScryingOrbSystem _scrying = default!;
-
     // Admin flags required to ignore normal eye restrictions.
     public const AdminFlags EyeFlag = AdminFlags.Debug;
 
     public const float ZoomMod = 1.5f;
     public static readonly Vector2 DefaultZoom = Vector2.One;
-    public static readonly Vector2 MinZoom = DefaultZoom * (float)Math.Pow(ZoomMod, -3);
+    public static readonly Vector2 MinZoom = DefaultZoom * (float) Math.Pow(ZoomMod, -3);
+    [Dependency] private readonly ISharedAdminManager _admin = default!;
 
     [Dependency] private readonly SharedEyeSystem _eye = default!;
+    [Dependency] private readonly SharedScryingOrbSystem _scrying = default!;
 
     public override void Initialize()
     {
@@ -50,9 +49,9 @@ public abstract class SharedContentEyeSystem : EntitySystem
         SubscribeAllEvent<RequestEyeEvent>(OnRequestEye);
 
         CommandBinds.Builder
-            .Bind(ContentKeyFunctions.ZoomIn, InputCmdHandler.FromDelegate(ZoomIn, handle:false))
-            .Bind(ContentKeyFunctions.ZoomOut, InputCmdHandler.FromDelegate(ZoomOut, handle:false))
-            .Bind(ContentKeyFunctions.ResetZoom, InputCmdHandler.FromDelegate(ResetZoom, handle:false))
+            .Bind(ContentKeyFunctions.ZoomIn, InputCmdHandler.FromDelegate(ZoomIn, handle: false))
+            .Bind(ContentKeyFunctions.ZoomOut, InputCmdHandler.FromDelegate(ZoomOut, handle: false))
+            .Bind(ContentKeyFunctions.ResetZoom, InputCmdHandler.FromDelegate(ResetZoom, handle: false))
             .Register<SharedContentEyeSystem>();
 
         Log.Level = LogLevel.Info;
@@ -83,10 +82,8 @@ public abstract class SharedContentEyeSystem : EntitySystem
             SetZoom(session.AttachedEntity.Value, eye.TargetZoom / ZoomMod, eye: eye);
     }
 
-    private Vector2 Clamp(Vector2 zoom, ContentEyeComponent component)
-    {
-        return Vector2.Clamp(zoom, MinZoom, component.MaxZoom);
-    }
+    private Vector2 Clamp(Vector2 zoom, ContentEyeComponent component) =>
+        Vector2.Clamp(zoom, MinZoom, component.MaxZoom);
 
     /// <summary>
     /// Sets the target zoom, optionally ignoring normal zoom limits.
@@ -105,12 +102,12 @@ public abstract class SharedContentEyeSystem : EntitySystem
         var ignoreLimit = msg.IgnoreLimit && _admin.HasAdminFlag(args.SenderSession, EyeFlag);
 
         if (TryComp<ContentEyeComponent>(args.SenderSession.AttachedEntity, out var content))
-            SetZoom(args.SenderSession.AttachedEntity.Value, msg.TargetZoom, ignoreLimit, eye: content);
+            SetZoom(args.SenderSession.AttachedEntity.Value, msg.TargetZoom, ignoreLimit, content);
     }
 
     private void OnPvsScale(RequestPvsScaleEvent ev, EntitySessionEventArgs args)
     {
-        if (args.SenderSession.AttachedEntity is {} uid && _admin.HasAdminFlag(args.SenderSession, EyeFlag))
+        if (args.SenderSession.AttachedEntity is { } uid && _admin.HasAdminFlag(args.SenderSession, EyeFlag))
             _eye.SetPvsScale(uid, ev.Scale);
     }
 
@@ -119,7 +116,8 @@ public abstract class SharedContentEyeSystem : EntitySystem
         if (args.SenderSession.AttachedEntity is not { } player)
             return;
 
-        if (!HasComp<GhostComponent>(player) && !_admin.IsAdmin(player) && !_scrying.IsScryingOrbEquipped(player)) // Goob edit
+        if (!HasComp<GhostComponent>(player) && !_admin.IsAdmin(player) &&
+            !_scrying.IsScryingOrbEquipped(player)) // Goob edit
             return;
 
         if (TryComp<EyeComponent>(player, out var eyeComp))
@@ -200,17 +198,17 @@ public abstract class SharedContentEyeSystem : EntitySystem
     /// <summary>
     /// Sendable from client to server to request a target zoom.
     /// </summary>
-    [Serializable, NetSerializable]
+    [Serializable] [NetSerializable]
     public sealed class RequestTargetZoomEvent : EntityEventArgs
     {
-        public Vector2 TargetZoom;
         public bool IgnoreLimit;
+        public Vector2 TargetZoom;
     }
 
     /// <summary>
     /// Client->Server request for new PVS scale.
     /// </summary>
-    [Serializable, NetSerializable]
+    [Serializable] [NetSerializable]
     public sealed class RequestPvsScaleEvent(float scale) : EntityEventArgs
     {
         public float Scale = scale;
@@ -219,7 +217,7 @@ public abstract class SharedContentEyeSystem : EntitySystem
     /// <summary>
     /// Sendable from client to server to request changing fov.
     /// </summary>
-    [Serializable, NetSerializable]
+    [Serializable] [NetSerializable]
     public sealed class RequestEyeEvent : EntityEventArgs
     {
         public readonly bool DrawFov;

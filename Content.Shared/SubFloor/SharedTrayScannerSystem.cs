@@ -21,11 +21,10 @@ namespace Content.Shared.SubFloor;
 
 public abstract class SharedTrayScannerSystem : EntitySystem
 {
-    [Dependency] private readonly INetManager _netMan = default!;
+    public const float SubfloorRevealAlpha = 0.8f;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
     [Dependency] private readonly SharedEyeSystem _eye = default!;
-
-    public const float SubfloorRevealAlpha = 0.8f;
+    [Dependency] private readonly INetManager _netMan = default!;
 
     public override void Initialize()
     {
@@ -43,10 +42,8 @@ public abstract class SharedTrayScannerSystem : EntitySystem
         SubscribeLocalEvent<TrayScannerUserComponent, GetVisMaskEvent>(OnUserGetVis);
     }
 
-    private void OnUserGetVis(Entity<TrayScannerUserComponent> ent, ref GetVisMaskEvent args)
-    {
-        args.VisibilityMask |= (int)VisibilityFlags.Subfloor;
-    }
+    private void OnUserGetVis(Entity<TrayScannerUserComponent> ent, ref GetVisMaskEvent args) =>
+        args.VisibilityMask |= (int) VisibilityFlags.Subfloor;
 
     private void OnEquip(EntityUid user)
     {
@@ -79,25 +76,16 @@ public abstract class SharedTrayScannerSystem : EntitySystem
         _eye.RefreshVisibilityMask(user);
     }
 
-    private void OnTrayHandUnequipped(Entity<TrayScannerComponent> ent, ref GotUnequippedHandEvent args)
-    {
+    private void OnTrayHandUnequipped(Entity<TrayScannerComponent> ent, ref GotUnequippedHandEvent args) =>
         OnUnequip(args.User);
-    }
 
-    private void OnTrayHandEquipped(Entity<TrayScannerComponent> ent, ref GotEquippedHandEvent args)
-    {
+    private void OnTrayHandEquipped(Entity<TrayScannerComponent> ent, ref GotEquippedHandEvent args) =>
         OnEquip(args.User);
-    }
 
-    private void OnTrayUnequipped(Entity<TrayScannerComponent> ent, ref GotUnequippedEvent args)
-    {
+    private void OnTrayUnequipped(Entity<TrayScannerComponent> ent, ref GotUnequippedEvent args) =>
         OnUnequip(args.Equipee);
-    }
 
-    private void OnTrayEquipped(Entity<TrayScannerComponent> ent, ref GotEquippedEvent args)
-    {
-        OnEquip(args.Equipee);
-    }
+    private void OnTrayEquipped(Entity<TrayScannerComponent> ent, ref GotEquippedEvent args) => OnEquip(args.Equipee);
 
     private void OnTrayScannerActivate(EntityUid uid, TrayScannerComponent scanner, ActivateInWorldEvent args)
     {
@@ -120,15 +108,14 @@ public abstract class SharedTrayScannerSystem : EntitySystem
         // managing the revealed subfloor entities
 
         if (TryComp<AppearanceComponent>(uid, out var appearance))
-        {
-            _appearance.SetData(uid, TrayScannerVisual.Visual, scanner.Enabled ? TrayScannerVisual.On : TrayScannerVisual.Off, appearance);
-        }
+            _appearance.SetData(uid,
+                TrayScannerVisual.Visual,
+                scanner.Enabled ? TrayScannerVisual.On : TrayScannerVisual.Off,
+                appearance);
     }
 
-    private void OnTrayScannerGetState(EntityUid uid, TrayScannerComponent scanner, ref ComponentGetState args)
-    {
+    private void OnTrayScannerGetState(EntityUid uid, TrayScannerComponent scanner, ref ComponentGetState args) =>
         args.State = new TrayScannerState(scanner.Enabled, scanner.Range);
-    }
 
     private void OnTrayScannerHandleState(EntityUid uid, TrayScannerComponent scanner, ref ComponentHandleState args)
     {
@@ -140,10 +127,10 @@ public abstract class SharedTrayScannerSystem : EntitySystem
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum TrayScannerVisual : sbyte
 {
     Visual,
     On,
-    Off
+    Off,
 }

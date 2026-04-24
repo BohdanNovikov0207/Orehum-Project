@@ -11,23 +11,30 @@ using Robust.Shared.Serialization;
 namespace Content.Shared.Cargo.Events;
 
 /// <summary>
-///     Add order to database.
+/// Add order to database.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class CargoConsoleAddOrderMessage : BoundUserInterfaceMessage
 {
-    // CorvaxGoob-CargoFeatures-Start
-    public string? Requester;
-    public string? DeliveryDestination;
-    public string? Note;
-    public bool SecuredDelivery;
+    public int Amount;
     // CorvaxGoob-CargoFeatures-End
 
     public string CargoProductId;
-    public int Amount;
+    public string? DeliveryDestination;
+
+    public string? Note;
+
+    // CorvaxGoob-CargoFeatures-Start
+    public string? Requester;
+    public bool SecuredDelivery;
 
     // CorvaxGoob-CargoFeatures 
-    public CargoConsoleAddOrderMessage(string? requester, string? deliveryDestination, string? note, string cargoProductId, int amount, bool securedDelivery = false)
+    public CargoConsoleAddOrderMessage(string? requester,
+        string? deliveryDestination,
+        string? note,
+        string cargoProductId,
+        int amount,
+        bool securedDelivery = false)
     {
         // CorvaxGoob-CargoFeatures-Start
         Requester = requester;

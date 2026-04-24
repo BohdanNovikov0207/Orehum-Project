@@ -9,13 +9,12 @@ using Robust.Shared.Utility;
 
 namespace Content.Shared.Labels.EntitySystems;
 
-public sealed partial class LabelSystem : EntitySystem
+public sealed class LabelSystem : EntitySystem
 {
-    [Dependency] private readonly NameModifierSystem _nameModifier = default!;
-    [Dependency] private readonly ItemSlotsSystem _itemSlots = default!;
-    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
-
     public const string ContainerName = "paper_label";
+    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly ItemSlotsSystem _itemSlots = default!;
+    [Dependency] private readonly NameModifierSystem _nameModifier = default!;
 
     public override void Initialize()
     {
@@ -86,14 +85,12 @@ public sealed partial class LabelSystem : EntitySystem
         UpdateAppearance(ent);
     }
 
-    private void OnComponentRemove(Entity<PaperLabelComponent> ent, ref ComponentRemove args)
-    {
+    private void OnComponentRemove(Entity<PaperLabelComponent> ent, ref ComponentRemove args) =>
         _itemSlots.RemoveItemSlot(ent, ent.Comp.LabelSlot);
-    }
 
     private void OnExamined(Entity<PaperLabelComponent> ent, ref ExaminedEvent args)
     {
-        if (ent.Comp.LabelSlot.Item is not {Valid: true} item)
+        if (ent.Comp.LabelSlot.Item is not { Valid: true } item)
             return;
 
         using (args.PushGroup(nameof(PaperLabelComponent)))
@@ -146,7 +143,8 @@ public sealed partial class LabelSystem : EntitySystem
     /// <summary>
     /// Retrieves a label with the specified component from the default label slot.
     /// </summary>
-    public bool TryGetLabel<T>(Entity<PaperLabelComponent?> ent, [NotNullWhen(true)] out Entity<T>? label) where T : Component
+    public bool TryGetLabel<T>(Entity<PaperLabelComponent?> ent, [NotNullWhen(true)] out Entity<T>? label)
+        where T : Component
     {
         label = null;
         if (!Resolve(ent, ref ent.Comp, false))

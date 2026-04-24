@@ -12,17 +12,16 @@ using Content.Shared.Interaction;
 using Content.Shared.Popups;
 using Content.Shared.Silicons.Borgs.Components;
 using Robust.Shared.Containers;
-using Robust.Shared.Network;
 using Robust.Shared.Utility;
 
 namespace Content.Shared._NF.Silicons.Borgs;
 
 public sealed class DroppableBorgModuleSystem : EntitySystem
 {
-    [Dependency] private readonly HandPlaceholderSystem _placeholder = default!;
     [Dependency] private readonly SharedContainerSystem _container = default!;
     [Dependency] private readonly SharedHandsSystem _hands = default!;
     [Dependency] private readonly SharedInteractionSystem _interaction = default!;
+    [Dependency] private readonly HandPlaceholderSystem _placeholder = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
 
     public override void Initialize()
@@ -45,7 +44,8 @@ public sealed class DroppableBorgModuleSystem : EntitySystem
             // only the server runs mapinit, this wont make clientside entities
             var successful = TrySpawnInContainer(slot.Id, ent, ent.Comp.ContainerId, out var item);
             // this would only fail if the current entity is being terminated, which is impossible for mapinit
-            DebugTools.Assert(successful, $"Somehow failed to insert {ToPrettyString(item)} into {ToPrettyString(ent)}");
+            DebugTools.Assert(successful,
+                $"Somehow failed to insert {ToPrettyString(item)} into {ToPrettyString(ent)}");
             _placeholder.SpawnPlaceholder(placeholders, item!.Value, slot.Id, slot.Whitelist);
         }
 
@@ -66,7 +66,9 @@ public sealed class DroppableBorgModuleSystem : EntitySystem
                 continue;
 
             if (args.User is { } user)
-                _popup.PopupEntity(Loc.GetString("borg-module-duplicate"), args.Chassis, user); // event is only raised by server so not using PopupClient
+                _popup.PopupEntity(Loc.GetString("borg-module-duplicate"),
+                    args.Chassis,
+                    user); // event is only raised by server so not using PopupClient
             args.Cancelled = true;
             return;
         }
@@ -80,7 +82,7 @@ public sealed class DroppableBorgModuleSystem : EntitySystem
 
         var container = _container.GetContainer(ent, ent.Comp.ContainerId);
         var items = container.ContainedEntities;
-        for (int i = 0; i < ent.Comp.Items.Count; i++)
+        for (var i = 0; i < ent.Comp.Items.Count; i++)
         {
             var item = items[0]; // the contained items will gradually go to 0
             var handId = HandId(ent, i);
@@ -89,13 +91,17 @@ public sealed class DroppableBorgModuleSystem : EntitySystem
             var held = _hands.GetHeldItem((chassis, hands), handId);
             if (held != item)
             {
-                Log.Error($"Failed to pick up {ToPrettyString(item)} into hand {handId} of {ToPrettyString(chassis)}, it holds {ToPrettyString(held)}");
+                Log.Error(
+                    $"Failed to pick up {ToPrettyString(item)} into hand {handId} of {ToPrettyString(chassis)}, it holds {ToPrettyString(held)}");
                 // If we didn't pick up our expected item, delete the hand.  No free hands!
                 _hands.RemoveHand((chassis, hands), handId);
             }
             else
             {
-                _interaction.DoContactInteraction(chassis, item, null, true); // for potential forensics or other systems (why does hands system not do this)
+                _interaction.DoContactInteraction(chassis,
+                    item,
+                    null,
+                    true); // for potential forensics or other systems (why does hands system not do this)
                 _placeholder.SetEnabled(item, true);
             }
         }
@@ -109,21 +115,23 @@ public sealed class DroppableBorgModuleSystem : EntitySystem
 
         if (TerminatingOrDeleted(ent))
         {
-            for (int i = 0; i < ent.Comp.Items.Count; i++)
+            for (var i = 0; i < ent.Comp.Items.Count; i++)
             {
                 var handId = HandId(ent, i);
                 var held = _hands.GetHeldItem((chassis, hands), handId);
                 if (held is { } item)
                     QueueDel(item);
                 else if (!TerminatingOrDeleted(chassis)) // don't care if its empty if the server is shutting down
-                    Log.Error($"Borg {ToPrettyString(chassis)} terminated with empty hand {i} in {ToPrettyString(ent)}");
+                    Log.Error(
+                        $"Borg {ToPrettyString(chassis)} terminated with empty hand {i} in {ToPrettyString(ent)}");
                 _hands.RemoveHand((chassis, hands), handId);
             }
+
             return;
         }
 
         var container = _container.GetContainer(ent, ent.Comp.ContainerId);
-        for (int i = 0; i < ent.Comp.Items.Count; i++)
+        for (var i = 0; i < ent.Comp.Items.Count; i++)
         {
             var handId = HandId(ent, i);
             _hands.TryGetHand((chassis, hands), handId, out var hand);
@@ -134,9 +142,7 @@ public sealed class DroppableBorgModuleSystem : EntitySystem
                 _container.Insert(item, container, force: true);
             }
             else
-            {
                 Log.Error($"Borg {ToPrettyString(chassis)} had an empty hand in the slot for {ent.Comp.Items[i].Id}");
-            }
 
             _hands.RemoveHand((chassis, hands), handId);
         }
@@ -145,10 +151,7 @@ public sealed class DroppableBorgModuleSystem : EntitySystem
     /// <summary>
     /// Format the hand ID for a given module and item number.
     /// </summary>
-    private static string HandId(EntityUid uid, int i)
-    {
-        return $"nf-{uid}-item-{i}";
-    }
+    private static string HandId(EntityUid uid, int i) => $"nf-{uid}-item-{i}";
 }
 
 /// <summary>
@@ -156,4 +159,7 @@ public sealed class DroppableBorgModuleSystem : EntitySystem
 /// This should exist upstream but doesn't.
 /// </summary>
 [ByRefEvent]
-public record struct BorgCanInsertModuleEvent(Entity<BorgChassisComponent> Chassis, EntityUid? User, bool Cancelled = false);
+public record struct BorgCanInsertModuleEvent(
+    Entity<BorgChassisComponent> Chassis,
+    EntityUid? User,
+    bool Cancelled = false);

@@ -15,8 +15,8 @@ namespace Content.Shared.Singularity.EntitySystems;
 
 public abstract class SharedEmitterSystem : EntitySystem
 {
-    [Dependency] private readonly IPrototypeManager _prototype = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly IPrototypeManager _prototype = default!;
 
     public override void Initialize()
     {

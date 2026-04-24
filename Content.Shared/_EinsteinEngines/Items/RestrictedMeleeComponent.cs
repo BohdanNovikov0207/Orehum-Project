@@ -13,24 +13,25 @@ using Robust.Shared.Audio;
 // </summary>
 
 namespace Content.Shared._EinsteinEngines.Items;
+
 [RegisterComponent]
 public sealed partial class RestrictedMeleeComponent : Component
 {
     [DataField]
-    public EntityWhitelist? Whitelist;
-
-    [DataField]
-    public TimeSpan KnockdownDuration = TimeSpan.FromSeconds(2);
-
-    [DataField]
-    public string FailText { get; set; } = "restricted-melee-component-attack-fail-too-large";
-
-    [DataField]
     public bool DoKnockdown = true;
+
+    [DataField]
+    public SoundSpecifier FallSound = new SoundPathSpecifier("/Audio/Effects/slip.ogg");
 
     [DataField]
     public bool ForceDrop = true;
 
     [DataField]
-    public SoundSpecifier FallSound = new SoundPathSpecifier("/Audio/Effects/slip.ogg");
+    public TimeSpan KnockdownDuration = TimeSpan.FromSeconds(2);
+
+    [DataField]
+    public EntityWhitelist? Whitelist;
+
+    [DataField]
+    public string FailText { get; set; } = "restricted-melee-component-attack-fail-too-large";
 }

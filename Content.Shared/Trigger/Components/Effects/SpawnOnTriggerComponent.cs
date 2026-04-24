@@ -7,25 +7,25 @@ namespace Content.Shared.Trigger.Components.Effects;
 /// Spawns a protoype when triggered.
 /// If TargetUser is true it will be spawned at their location.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class SpawnOnTriggerComponent : BaseXOnTriggerComponent
 {
     /// <summary>
+    /// Whether or not to use predicted spawning.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public bool Predicted;
+
+    /// <summary>
     /// The prototype to spawn.
     /// </summary>
-    [DataField(required: true), AutoNetworkedField]
+    [DataField(required: true)] [AutoNetworkedField]
     public EntProtoId Proto = string.Empty;
 
     /// <summary>
     /// Use MapCoordinates for spawning?
     /// Set to true if you don't want the new entity parented to the spawner.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public bool UseMapCoords;
-
-    /// <summary>
-    /// Whether or not to use predicted spawning.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public bool Predicted;
 }

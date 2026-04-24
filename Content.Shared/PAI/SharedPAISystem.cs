@@ -19,9 +19,9 @@ namespace Content.Shared.PAI;
 /// In their current implementation, they create a ghost role anyone can access,
 /// and that a player can also "wipe" (reset/kick out player).
 /// Theoretically speaking pAIs are supposed to use a dedicated "offer and select" system,
-///  with the player holding the pAI being able to choose one of the ghosts in the round.
+/// with the player holding the pAI being able to choose one of the ghosts in the round.
 /// This seems too complicated for an initial implementation, though,
-///  and there's not always enough players and ghost roles to justify it.
+/// and there's not always enough players and ghost roles to justify it.
 /// </summary>
 public abstract class SharedPAISystem : EntitySystem
 {
@@ -35,16 +35,13 @@ public abstract class SharedPAISystem : EntitySystem
         SubscribeLocalEvent<PAIComponent, ComponentShutdown>(OnShutdown);
     }
 
-    private void OnMapInit(Entity<PAIComponent> ent, ref MapInitEvent args)
-    {
+    private void OnMapInit(Entity<PAIComponent> ent, ref MapInitEvent args) =>
         _actions.AddAction(ent, ent.Comp.ShopActionId);
-    }
 
-    private void OnShutdown(Entity<PAIComponent> ent, ref ComponentShutdown args)
-    {
+    private void OnShutdown(Entity<PAIComponent> ent, ref ComponentShutdown args) =>
         _actions.RemoveAction(ent.Owner, ent.Comp.ShopAction);
-    }
 }
+
 public sealed partial class PAIShopActionEvent : InstantActionEvent
 {
 }

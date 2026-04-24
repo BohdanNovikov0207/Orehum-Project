@@ -27,6 +27,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Shared._Lavaland.Chasm;
 using Content.Shared.ActionBlocker;
 using Content.Shared.Movement.Events;
 using Content.Shared.StepTrigger.Systems;
@@ -37,14 +38,14 @@ using Robust.Shared.Timing;
 namespace Content.Shared.Chasm;
 
 /// <summary>
-///     Handles making entities fall into chasms when stepped on.
+/// Handles making entities fall into chasms when stepped on.
 /// </summary>
 public sealed class ChasmSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly ActionBlockerSystem _blocker = default!;
     [Dependency] private readonly INetManager _net = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -70,7 +71,7 @@ public sealed class ChasmSystem : EntitySystem
                 continue;
 
             // Lavaland Change start: Jaunter
-            var ev = new _Lavaland.Chasm.BeforeChasmFallingEvent(uid);
+            var ev = new BeforeChasmFallingEvent(uid);
             RaiseLocalEvent(uid, ref ev);
             if (ev.Cancelled)
             {
@@ -104,13 +105,9 @@ public sealed class ChasmSystem : EntitySystem
             _audio.PlayPredicted(component.FallingSound, chasm, tripper);
     }
 
-    private void OnStepTriggerAttempt(EntityUid uid, ChasmComponent component, ref StepTriggerAttemptEvent args)
-    {
+    private void OnStepTriggerAttempt(EntityUid uid, ChasmComponent component, ref StepTriggerAttemptEvent args) =>
         args.Continue = true;
-    }
 
-    private void OnUpdateCanMove(EntityUid uid, ChasmFallingComponent component, UpdateCanMoveEvent args)
-    {
+    private void OnUpdateCanMove(EntityUid uid, ChasmFallingComponent component, UpdateCanMoveEvent args) =>
         args.Cancel();
-    }
 }

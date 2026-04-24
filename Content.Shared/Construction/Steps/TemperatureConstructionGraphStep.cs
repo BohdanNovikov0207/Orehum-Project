@@ -7,31 +7,33 @@
 
 using Content.Shared.Examine;
 
-namespace Content.Shared.Construction.Steps
+namespace Content.Shared.Construction.Steps;
+
+[DataDefinition]
+public sealed partial class TemperatureConstructionGraphStep : ConstructionGraphStep
 {
-    [DataDefinition]
-    public sealed partial class TemperatureConstructionGraphStep : ConstructionGraphStep
+    [DataField("maxTemperature")]
+    public float? MaxTemperature;
+
+    [DataField("minTemperature")]
+    public float? MinTemperature;
+
+    public override void DoExamine(ExaminedEvent examinedEvent)
     {
-        [DataField("minTemperature")]
-        public float? MinTemperature;
-        [DataField("maxTemperature")]
-        public float? MaxTemperature;
+        var guideTemperature = MinTemperature.HasValue ? MinTemperature.Value :
+            MaxTemperature.HasValue ? MaxTemperature.Value : 0;
+        examinedEvent.PushMarkup(Loc.GetString("construction-temperature-default", ("temperature", guideTemperature)));
+    }
 
-        public override void DoExamine(ExaminedEvent examinedEvent)
+    public override ConstructionGuideEntry GenerateGuideEntry()
+    {
+        var guideTemperature = MinTemperature.HasValue ? MinTemperature.Value :
+            MaxTemperature.HasValue ? MaxTemperature.Value : 0;
+
+        return new ConstructionGuideEntry
         {
-            float guideTemperature = MinTemperature.HasValue ? MinTemperature.Value : (MaxTemperature.HasValue ? MaxTemperature.Value : 0);
-            examinedEvent.PushMarkup(Loc.GetString("construction-temperature-default", ("temperature", guideTemperature)));
-        }
-
-        public override ConstructionGuideEntry GenerateGuideEntry()
-        {
-            float guideTemperature = MinTemperature.HasValue ? MinTemperature.Value : (MaxTemperature.HasValue ? MaxTemperature.Value : 0);
-
-            return new ConstructionGuideEntry()
-            {
-                Localization = "construction-presenter-temperature-step",
-                Arguments = new (string, object)[] { ("temperature", guideTemperature) }
-            };
-        }
+            Localization = "construction-presenter-temperature-step",
+            Arguments = new (string, object)[] { ("temperature", guideTemperature) },
+        };
     }
 }

@@ -10,6 +10,6 @@ public abstract partial class BaseTriggerConditionComponent : Component
     /// <summary>
     /// The keys that are checked for the condition.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public HashSet<string> Keys = new() { TriggerSystem.DefaultTriggerKey };
 }

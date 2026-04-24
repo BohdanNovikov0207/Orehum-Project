@@ -81,11 +81,11 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Chemistry.Reagent;
 
-[ImplicitDataDefinitionForInheritors, Serializable, NetSerializable]
+[ImplicitDataDefinitionForInheritors] [Serializable] [NetSerializable]
 public sealed partial class DnaData : ReagentData
 {
     [DataField]
-    public string DNA = String.Empty;
+    public string DNA = string.Empty;
 
     [DataField] // Goobstation
     public TimeSpan Freshness = TimeSpan.Zero; // Goobstation
@@ -97,24 +97,16 @@ public sealed partial class DnaData : ReagentData
         Freshness = other.Freshness;
     }
 
-    public override DnaData Clone()
-    {
-        return new DnaData(this);
-    }
+    public override DnaData Clone() => new(this);
     // Goobstation End
 
     public override bool Equals(ReagentData? other)
     {
         if (other == null)
-        {
             return false;
-        }
 
         return ((DnaData) other).DNA == DNA;
     }
 
-    public override int GetHashCode()
-    {
-        return DNA.GetHashCode();
-    }
+    public override int GetHashCode() => DNA.GetHashCode();
 }

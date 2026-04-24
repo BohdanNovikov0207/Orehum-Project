@@ -20,13 +20,13 @@ namespace Content.Shared._Goobstation.Silo;
 public abstract class SharedSiloSystem : EntitySystem
 {
     [Dependency] private readonly IConfigurationManager _cfg = default!;
-    [Dependency] protected readonly SharedDeviceLinkSystem DeviceLink = default!;
     [Dependency] protected readonly SharedMaterialStorageSystem _materialStorage = default!;
+    [Dependency] protected readonly SharedDeviceLinkSystem DeviceLink = default!;
 
     private bool _siloEnabled;
+    protected ProtoId<SinkPortPrototype> SinkPort = "MaterialSiloUtilizer";
 
     protected ProtoId<SourcePortPrototype> SourcePort = "MaterialSilo";
-    protected ProtoId<SinkPortPrototype> SinkPort = "MaterialSiloUtilizer";
 
     public override void Initialize()
     {

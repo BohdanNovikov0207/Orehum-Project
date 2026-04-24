@@ -16,14 +16,14 @@ namespace Content.Shared.Follower.Components;
 
 // TODO properly network this and followercomp.
 /// <summary>
-///     Attached to entities that are currently being followed by a ghost.
+/// Attached to entities that are currently being followed by a ghost.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 [Access(typeof(FollowerSystem))]
 public sealed partial class FollowedComponent : Component
 {
-    public override bool SessionSpecific => true;
-
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public HashSet<EntityUid> Following = new();
+
+    public override bool SessionSpecific => true;
 }

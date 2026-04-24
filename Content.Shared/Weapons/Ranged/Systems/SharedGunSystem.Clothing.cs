@@ -102,14 +102,18 @@ public partial class SharedGunSystem
         RaiseLocalEvent(entity.Value, args);
     }
 
-    private void OnClothingAmmoCount(EntityUid uid, ClothingSlotAmmoProviderComponent component, ref GetAmmoCountEvent args)
+    private void OnClothingAmmoCount(EntityUid uid,
+        ClothingSlotAmmoProviderComponent component,
+        ref GetAmmoCountEvent args)
     {
         if (!TryGetClothingSlotEntity(uid, component, out var entity))
             return;
         RaiseLocalEvent(entity.Value, ref args);
     }
 
-    private bool TryGetClothingSlotEntity(EntityUid uid, ClothingSlotAmmoProviderComponent component, [NotNullWhen(true)] out EntityUid? slotEntity)
+    private bool TryGetClothingSlotEntity(EntityUid uid,
+        ClothingSlotAmmoProviderComponent component,
+        [NotNullWhen(true)] out EntityUid? slotEntity)
     {
         slotEntity = null;
 

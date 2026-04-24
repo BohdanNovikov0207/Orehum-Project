@@ -8,8 +8,8 @@ namespace Content.Shared._White.Xenomorphs.XenomorphShoveTracker;
 
 public sealed class XenomorphShoveTrackerSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SharedStunSystem _stun = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
 
     public override void Initialize()
@@ -24,7 +24,8 @@ public sealed class XenomorphShoveTrackerSystem : EntitySystem
         var target = args.Target;
 
         // Only process if the source is a xenomorph with shove tracker
-        if (!HasComp<XenomorphComponent>(source) || !TryComp<XenomorphShoveTrackerComponent>(source, out var xenoComponent))
+        if (!HasComp<XenomorphComponent>(source) ||
+            !TryComp<XenomorphShoveTrackerComponent>(source, out var xenoComponent))
             return;
 
         var currentTime = _timing.CurTime;
@@ -43,8 +44,8 @@ public sealed class XenomorphShoveTrackerSystem : EntitySystem
         if (xenoComponent.ShoveCount[target] >= xenoComponent.ShoveThreshold)
         {
             // Apply knockdown and stun
-            bool wasStunned = _stun.TryUpdateStunDuration(target, xenoComponent.KnockdownDuration);
-            bool wasKnockedDown = _stun.TryKnockdown(target, xenoComponent.KnockdownDuration, true);
+            var wasStunned = _stun.TryUpdateStunDuration(target, xenoComponent.KnockdownDuration);
+            var wasKnockedDown = _stun.TryKnockdown(target, xenoComponent.KnockdownDuration);
 
             // Reset the count for this target
             xenoComponent.ShoveCount.Remove(target);
@@ -64,9 +65,7 @@ public sealed class XenomorphShoveTrackerSystem : EntitySystem
         foreach (var (target, lastTime) in component.LastShoveTime)
         {
             if (currentTime - lastTime > component.ShoveResetTime)
-            {
                 toRemove.Add(target);
-            }
         }
 
         foreach (var target in toRemove)

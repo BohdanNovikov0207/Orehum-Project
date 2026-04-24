@@ -10,33 +10,31 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared._Goobstation.Wizard.Teleport;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class TeleportScrollComponent : Component
 {
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public int UsesLeft = 4;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class WizardTeleportLocationSelectedMessage(NetEntity location, string locationName, NetEntity? action)
     : BoundUserInterfaceMessage
 {
+    public NetEntity? Action = action;
     public NetEntity Location = location;
 
     public string LocationName = locationName;
-
-    public NetEntity? Action = action;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class WizardTeleportState(List<WizardWarp> warps, NetEntity? action) : BoundUserInterfaceState
 {
-    public List<WizardWarp> Warps = warps;
-
     public NetEntity? Action = action;
+    public List<WizardWarp> Warps = warps;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public struct WizardWarp(NetEntity entity, string displayName)
 {
     public NetEntity Entity = entity;
@@ -44,8 +42,8 @@ public struct WizardWarp(NetEntity entity, string displayName)
     public string DisplayName = displayName;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum WizardTeleportUiKey : byte
 {
-    Key
+    Key,
 }

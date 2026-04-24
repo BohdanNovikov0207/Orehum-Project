@@ -27,9 +27,9 @@ namespace Content.Shared.Construction.Conditions;
 [DataDefinition]
 public sealed partial class TileNotBlocked : IConstructionCondition
 {
-    [DataField("filterMobs")] private bool _filterMobs = false;
-    [DataField("failIfSpace")] private bool _failIfSpace = true;
     [DataField("failIfNotSturdy")] private bool _failIfNotSturdy = true;
+    [DataField("failIfSpace")] private bool _failIfSpace = true;
+    [DataField("filterMobs")] private bool _filterMobs;
 
     public bool Condition(EntityUid user, EntityCoordinates location, Direction direction)
     {
@@ -37,28 +37,21 @@ public sealed partial class TileNotBlocked : IConstructionCondition
             return false;
 
         if (!turfSystem.TryGetTileRef(location, out var tileRef))
-        {
             return false;
-        }
 
         if (turfSystem.IsSpace(tileRef.Value) && _failIfSpace)
-        {
             return false;
-        }
 
         if (!turfSystem.GetContentTileDefinition(tileRef.Value).Sturdy && _failIfNotSturdy)
-        {
             return false;
-        }
 
-        return !turfSystem.IsTileBlocked(tileRef.Value, _filterMobs ? CollisionGroup.MobMask : CollisionGroup.Impassable);
+        return !turfSystem.IsTileBlocked(tileRef.Value,
+            _filterMobs ? CollisionGroup.MobMask : CollisionGroup.Impassable);
     }
 
-    public ConstructionGuideEntry GenerateGuideEntry()
-    {
-        return new ConstructionGuideEntry
+    public ConstructionGuideEntry GenerateGuideEntry() =>
+        new()
         {
             Localization = "construction-step-condition-tile-not-blocked",
         };
-    }
 }

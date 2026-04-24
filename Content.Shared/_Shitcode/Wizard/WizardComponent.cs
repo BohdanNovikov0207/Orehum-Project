@@ -11,7 +11,7 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Shared._Goobstation.Wizard;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class WizardComponent : Component
 {
     [DataField]

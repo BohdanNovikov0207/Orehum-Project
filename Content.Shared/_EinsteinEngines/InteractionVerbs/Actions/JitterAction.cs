@@ -13,18 +13,18 @@ namespace Content.Server.InteractionVerbs.Actions;
 public sealed partial class JitterAction : InteractionAction
 {
     [DataField]
-    public TimeSpan Time = TimeSpan.FromSeconds(1);
-
-    [DataField]
     public float Amplitude = 10f, Frequency = 4f;
 
     [DataField]
     public bool Refresh = false;
 
-    public override bool CanPerform(InteractionArgs args, InteractionVerbPrototype proto, bool beforeDelay, VerbDependencies deps)
-    {
-        return true;
-    }
+    [DataField]
+    public TimeSpan Time = TimeSpan.FromSeconds(1);
+
+    public override bool CanPerform(InteractionArgs args,
+        InteractionVerbPrototype proto,
+        bool beforeDelay,
+        VerbDependencies deps) => true;
 
     public override bool Perform(InteractionArgs args, InteractionVerbPrototype proto, VerbDependencies deps)
     {

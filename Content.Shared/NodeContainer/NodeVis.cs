@@ -8,47 +8,46 @@
 
 using Robust.Shared.Serialization;
 
-namespace Content.Shared.NodeContainer
+namespace Content.Shared.NodeContainer;
+
+public static class NodeVis
 {
-    public static class NodeVis
+    [Serializable] [NetSerializable]
+    public sealed class MsgEnable : EntityEventArgs
     {
-        [Serializable, NetSerializable]
-        public sealed class MsgEnable : EntityEventArgs
+        public MsgEnable(bool enabled)
         {
-            public MsgEnable(bool enabled)
-            {
-                Enabled = enabled;
-            }
-
-            public bool Enabled { get; }
+            Enabled = enabled;
         }
 
-        [Serializable, NetSerializable]
-        public sealed class MsgData : EntityEventArgs
-        {
-            public List<GroupData> Groups = new();
-            public List<int> GroupDeletions = new();
-            public Dictionary<int, string?> GroupDataUpdates = new();
-        }
+        public bool Enabled { get; }
+    }
 
-        [Serializable, NetSerializable]
-        public sealed class GroupData
-        {
-            public int NetId;
-            public string GroupId = "";
-            public Color Color;
-            public NodeDatum[] Nodes = Array.Empty<NodeDatum>();
-            public string? DebugData;
-        }
+    [Serializable] [NetSerializable]
+    public sealed class MsgData : EntityEventArgs
+    {
+        public Dictionary<int, string?> GroupDataUpdates = new();
+        public List<int> GroupDeletions = new();
+        public List<GroupData> Groups = new();
+    }
 
-        [Serializable, NetSerializable]
-        public sealed class NodeDatum
-        {
-            public NetEntity Entity;
-            public int NetId;
-            public int[] Reachable = Array.Empty<int>();
-            public string Name = "";
-            public string Type = "";
-        }
+    [Serializable] [NetSerializable]
+    public sealed class GroupData
+    {
+        public Color Color;
+        public string? DebugData;
+        public string GroupId = "";
+        public int NetId;
+        public NodeDatum[] Nodes = Array.Empty<NodeDatum>();
+    }
+
+    [Serializable] [NetSerializable]
+    public sealed class NodeDatum
+    {
+        public NetEntity Entity;
+        public string Name = "";
+        public int NetId;
+        public int[] Reachable = Array.Empty<int>();
+        public string Type = "";
     }
 }

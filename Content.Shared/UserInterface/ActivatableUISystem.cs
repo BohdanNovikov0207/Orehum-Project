@@ -61,9 +61,9 @@ public sealed partial class ActivatableUISystem : EntitySystem
 {
     [Dependency] private readonly ISharedAdminManager _adminManager = default!;
     [Dependency] private readonly ActionBlockerSystem _blockerSystem = default!;
-    [Dependency] private readonly SharedUserInterfaceSystem _uiSystem = default!;
-    [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
     [Dependency] private readonly SharedHandsSystem _hands = default!;
+    [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
+    [Dependency] private readonly SharedUserInterfaceSystem _uiSystem = default!;
     [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
 
     public override void Initialize()
@@ -90,10 +90,7 @@ public sealed partial class ActivatableUISystem : EntitySystem
     private void OnStartup(Entity<ActivatableUIComponent> ent, ref ComponentStartup args)
     {
         if (ent.Comp.Key == null)
-        {
             Log.Error($"Missing UI Key for entity: {ToPrettyString(ent)}");
-            return;
-        }
 
         // TODO BUI
         // set interaction range to zero to avoid constant range checks.
@@ -139,7 +136,8 @@ public sealed partial class ActivatableUISystem : EntitySystem
         });
     }
 
-    private void GetAltVerb(EntityUid uid, ActivatableUIComponent component, GetVerbsEvent<AlternativeVerb> args) // Goobstation
+    private void
+        GetAltVerb(EntityUid uid, ActivatableUIComponent component, GetVerbsEvent<AlternativeVerb> args) // Goobstation
     {
         if (!component.AltVerb || !ShouldAddVerb(uid, component, args))
             return;
@@ -195,7 +193,9 @@ public sealed partial class ActivatableUISystem : EntitySystem
 
     private void OnActivate(EntityUid uid, ActivatableUIComponent component, ActivateInWorldEvent args)
     {
-        if (args.Handled || !args.Complex && TryComp<GhostComponent>(args.User, out var ghost) && !ghost.CanGhostOpenUI) // CorvaxGoob-GhostUIViewing
+        if (args.Handled ||
+            !args.Complex && TryComp<GhostComponent>(args.User, out var ghost) &&
+            !ghost.CanGhostOpenUI) // CorvaxGoob-GhostUIViewing
             return;
 
         if (component.VerbOnly)
@@ -280,13 +280,15 @@ public sealed partial class ActivatableUISystem : EntitySystem
             if (_uiSystem.IsUiOpen(uiEntity, aui.Key))
                 return true;
 
-            Log.Error($"Activatable UI has user without being opened? Entity: {ToPrettyString(uiEntity)}. User: {aui.CurrentSingleUser}, Key: {aui.Key}");
+            Log.Error(
+                $"Activatable UI has user without being opened? Entity: {ToPrettyString(uiEntity)}. User: {aui.CurrentSingleUser}, Key: {aui.Key}");
         }
 
         // CorvaxGoob-GhostUIViewing-Start
         TryComp<GhostComponent>(user, out var ghostComp);
 
-        if (aui.RequiresComplex && ghostComp is null) // Гостам не думаю что требуется комплексное взаимодействие для открытие консолей. ведь так?
+        if (aui.RequiresComplex &&
+            ghostComp is null) // Гостам не думаю что требуется комплексное взаимодействие для открытие консолей. ведь так?
         {
             if (!_blockerSystem.CanComplexInteract(user))
                 return false;

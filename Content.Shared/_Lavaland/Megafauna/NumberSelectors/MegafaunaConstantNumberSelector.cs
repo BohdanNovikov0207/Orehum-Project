@@ -10,8 +10,5 @@ public sealed partial class MegafaunaConstantNumberSelector : MegafaunaNumberSel
         Value = value;
     }
 
-    public override float Get(MegafaunaCalculationBaseArgs args)
-    {
-        return Value;
-    }
+    public override float Get(MegafaunaCalculationBaseArgs args) => Value;
 }

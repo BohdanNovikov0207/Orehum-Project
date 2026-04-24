@@ -7,13 +7,13 @@ namespace Content.Shared.EntityEffects.Effects;
 public sealed partial class CreateEntityReactionEffect : EventEntityEffect<CreateEntityReactionEffect>
 {
     /// <summary>
-    ///     What entity to create.
+    /// What entity to create.
     /// </summary>
     [DataField(required: true, customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
     public string Entity = default!;
 
     /// <summary>
-    ///     How many entities to create per unit reaction.
+    /// How many entities to create per unit reaction.
     /// </summary>
     [DataField]
     public uint Number = 1;

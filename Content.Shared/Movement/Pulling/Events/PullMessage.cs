@@ -8,8 +8,8 @@ namespace Content.Shared.Movement.Pulling.Events;
 
 public abstract class PullMessage : EntityEventArgs
 {
-    public readonly EntityUid PullerUid;
     public readonly EntityUid PulledUid;
+    public readonly EntityUid PullerUid;
 
     protected PullMessage(EntityUid pullerUid, EntityUid pulledUid)
     {

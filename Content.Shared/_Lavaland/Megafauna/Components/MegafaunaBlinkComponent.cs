@@ -13,11 +13,11 @@ namespace Content.Shared._Lavaland.Megafauna.Components;
 /// Signifies that this entity is being blink-teleported to some spot.
 /// TODO: cool shader for this fella
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 [AutoGenerateComponentState]
 public sealed partial class MegafaunaBlinkComponent : Component
 {
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public TimeSpan Delay = TimeSpan.FromSeconds(0.9f);
 
     [DataField]

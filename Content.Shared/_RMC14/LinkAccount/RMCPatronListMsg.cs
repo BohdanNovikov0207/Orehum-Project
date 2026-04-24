@@ -34,9 +34,8 @@ namespace Content.Shared._RMC14.LinkAccount;
 
 public sealed class RMCPatronListMsg : NetMessage
 {
-    public override MsgGroups MsgGroup => MsgGroups.Core;
-
     public List<SharedRMCPatron> Patrons = default!;
+    public override MsgGroups MsgGroup => MsgGroups.Core;
 
     public override void ReadFromBuffer(NetIncomingMessage buffer, IRobustSerializer serializer)
     {

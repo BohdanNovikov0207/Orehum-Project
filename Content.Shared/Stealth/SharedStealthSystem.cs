@@ -23,8 +23,9 @@
 using Content.Shared.Examine;
 using Content.Shared.Mobs;
 using Content.Shared.Stealth.Components;
-using Robust.Shared.Physics.Components; // Goobstation
+using Robust.Shared.Physics.Components;
 using Robust.Shared.Timing;
+// Goobstation
 
 namespace Content.Shared.Stealth;
 
@@ -59,8 +60,7 @@ public abstract class SharedStealthSystem : EntitySystem
             if (source == uid)
                 return;
             source = Transform(source).ParentUid;
-        }
-        while (source.IsValid());
+        } while (source.IsValid());
 
         args.Cancel();
     }
@@ -81,7 +81,10 @@ public abstract class SharedStealthSystem : EntitySystem
     }
 
 
-    private void OnMobStateChanged(EntityUid uid, StealthComponent component, MobStateChangedEvent args)// Goobstation - Stealth change
+    private void
+        OnMobStateChanged(EntityUid uid,
+            StealthComponent component,
+            MobStateChangedEvent args) // Goobstation - Stealth change
     {
         if (args.NewMobState == MobState.Dead || args.NewMobState == MobState.Critical)
         {
@@ -91,10 +94,9 @@ public abstract class SharedStealthSystem : EntitySystem
                 component.Enabled = component.EnabledOnCrit;
         }
         else
-        {
             component.Enabled = true;
-        }
-        SetEnabled(uid, component.Enabled, component);// to update the sprite;
+
+        SetEnabled(uid, component.Enabled, component); // to update the sprite;
         Dirty(uid, component);
     }
 
@@ -141,11 +143,14 @@ public abstract class SharedStealthSystem : EntitySystem
     }
 
     // Goobstation - Proper invisibility
-    private void OnGetVisibilityModifiers(EntityUid uid, StealthOnMoveComponent component, GetVisibilityModifiersEvent args)
+    private void OnGetVisibilityModifiers(EntityUid uid,
+        StealthOnMoveComponent component,
+        GetVisibilityModifiersEvent args)
     {
         var limit = args.Stealth.MinVisibility;
         if (TryComp<PhysicsComponent>(uid, out var phys))
-            limit += Math.Min(component.MaxInvisibilityPenalty, phys.LinearVelocity.Length() * component.InvisibilityPenalty);
+            limit += Math.Min(component.MaxInvisibilityPenalty,
+                phys.LinearVelocity.Length() * component.InvisibilityPenalty);
 
         // Goobstation - Wait before accumulating stealth
         var noMoveTime = (float) component.NoMoveTime.TotalSeconds;
@@ -169,7 +174,9 @@ public abstract class SharedStealthSystem : EntitySystem
             component.LastUpdated = _timing.CurTime;
         }
 
-        component.LastVisibility = Math.Clamp(component.LastVisibility + delta, component.MinVisibility, component.MaxVisibility);
+        component.LastVisibility = Math.Clamp(component.LastVisibility + delta,
+            component.MinVisibility,
+            component.MaxVisibility);
         Dirty(uid, component);
     }
 
@@ -190,12 +197,14 @@ public abstract class SharedStealthSystem : EntitySystem
     }
 
     /// <summary>
-    /// Gets the current visibility from the <see cref="StealthComponent"/>
+    /// Gets the current visibility from the <see cref="StealthComponent" />
     /// Use this instead of getting LastVisibility from the component directly.
     /// </summary>
-    /// <returns>Returns a calculation that accounts for any stealth change that happened since last update, otherwise
+    /// <returns>
+    /// Returns a calculation that accounts for any stealth change that happened since last update, otherwise
     /// returns based on if it can resolve the component. Note that the returned value may be larger than the components
-    /// maximum stealth value if it is currently disabled.</returns>
+    /// maximum stealth value if it is currently disabled.
+    /// </returns>
     public float GetVisibility(EntityUid uid, StealthComponent? component = null)
     {
         if (!Resolve(uid, ref component) || !component.Enabled)
@@ -207,31 +216,9 @@ public abstract class SharedStealthSystem : EntitySystem
         var deltaTime = _timing.CurTime - component.LastUpdated.Value;
 
         var ev = new GetVisibilityModifiersEvent(uid, component, (float) deltaTime.TotalSeconds, 0f);
-        RaiseLocalEvent(uid, ev, false);
+        RaiseLocalEvent(uid, ev);
 
         return Math.Clamp(component.LastVisibility + ev.FlatModifier, component.MinVisibility, component.MaxVisibility);
-    }
-
-    /// <summary>
-    ///     Used to run through any stealth effecting components on the entity.
-    /// </summary>
-    private sealed class GetVisibilityModifiersEvent : EntityEventArgs
-    {
-        public readonly StealthComponent Stealth;
-        public readonly float SecondsSinceUpdate;
-
-        /// <summary>
-        ///     Calculate this and add to it. Do not divide, multiply, or overwrite.
-        ///     The sum will be added to the stealth component's visibility.
-        /// </summary>
-        public float FlatModifier;
-
-        public GetVisibilityModifiersEvent(EntityUid uid, StealthComponent stealth, float secondsSinceUpdate, float flatModifier)
-        {
-            Stealth = stealth;
-            SecondsSinceUpdate = secondsSinceUpdate;
-            FlatModifier = flatModifier;
-        }
     }
 
     // Goobstation start
@@ -254,6 +241,31 @@ public abstract class SharedStealthSystem : EntitySystem
         ent.Comp.RevealOnDamage = state;
 
         Dirty(ent);
+    }
+
+    /// <summary>
+    /// Used to run through any stealth effecting components on the entity.
+    /// </summary>
+    private sealed class GetVisibilityModifiersEvent : EntityEventArgs
+    {
+        public readonly float SecondsSinceUpdate;
+        public readonly StealthComponent Stealth;
+
+        /// <summary>
+        /// Calculate this and add to it. Do not divide, multiply, or overwrite.
+        /// The sum will be added to the stealth component's visibility.
+        /// </summary>
+        public float FlatModifier;
+
+        public GetVisibilityModifiersEvent(EntityUid uid,
+            StealthComponent stealth,
+            float secondsSinceUpdate,
+            float flatModifier)
+        {
+            Stealth = stealth;
+            SecondsSinceUpdate = secondsSinceUpdate;
+            FlatModifier = flatModifier;
+        }
     }
     // Goobstation end
 }

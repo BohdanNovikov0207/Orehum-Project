@@ -13,7 +13,7 @@ public sealed class XATDeathSystem : BaseXATSystem<XATDeathComponent>
 
     private EntityQuery<XenoArtifactComponent> _xenoArtifactQuery;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();

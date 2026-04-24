@@ -8,7 +8,7 @@ using Robust.Shared.GameStates;
 
 namespace Content.Shared.Chemistry.Components;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState(true)]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState(true)]
 public sealed partial class PillComponent : Component
 {
     /// <summary>

@@ -23,12 +23,12 @@ namespace Content.Shared._Goobstation.Weapons.AmmoSelector;
 
 public sealed class SelectableAmmoSystem : EntitySystem
 {
-    [Dependency] private readonly IPrototypeManager _protoManager = default!;
+    [Dependency] private readonly ActivatableUiUserWhitelistSystem _activatableUiWhitelist = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly SharedGunSystem _gun = default!;
-    [Dependency] private readonly ActivatableUiUserWhitelistSystem _activatableUiWhitelist = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly IPrototypeManager _protoManager = default!;
 
     public override void Initialize()
     {
@@ -149,7 +149,7 @@ public sealed class SelectableAmmoSystem : EntitySystem
                 return true;
             var oldFireCost = projectileBattery.FireCost;
             projectileBattery.FireCost = proto.FireCost;
-            var fireCostDiff =  proto.FireCost / oldFireCost;
+            var fireCostDiff = proto.FireCost / oldFireCost;
             projectileBattery.Shots = (int) Math.Round(projectileBattery.Shots / fireCostDiff);
             projectileBattery.Capacity = (int) Math.Round(projectileBattery.Capacity / fireCostDiff);
             Dirty(uid, projectileBattery);
@@ -172,18 +172,12 @@ public sealed class SelectableAmmoSystem : EntitySystem
         return false;
     }
 
-    private bool ShouldSetFireCost(SelectableAmmoPrototype proto)
-    {
-        return (proto.Flags & (int) SelectableAmmoFlags.ChangeWeaponFireCost) != 0;
-    }
+    private bool ShouldSetFireCost(SelectableAmmoPrototype proto) =>
+        (proto.Flags & (int) SelectableAmmoFlags.ChangeWeaponFireCost) != 0;
 
-    private bool ShouldSetSound(SelectableAmmoPrototype proto)
-    {
-        return (proto.Flags & (int) SelectableAmmoFlags.ChangeWeaponFireSound) != 0;
-    }
+    private bool ShouldSetSound(SelectableAmmoPrototype proto) =>
+        (proto.Flags & (int) SelectableAmmoFlags.ChangeWeaponFireSound) != 0;
 
-    private bool ShouldSetFireRate(SelectableAmmoPrototype proto)
-    {
-        return (proto.Flags & (int) SelectableAmmoFlags.ChangeWeaponFireRate) != 0;
-    }
+    private bool ShouldSetFireRate(SelectableAmmoPrototype proto) =>
+        (proto.Flags & (int) SelectableAmmoFlags.ChangeWeaponFireRate) != 0;
 }

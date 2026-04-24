@@ -32,6 +32,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Shared.Clothing.Components;
+using Content.Shared.Inventory;
 using Content.Shared.Inventory.Events;
 using Content.Shared.Movement.Components;
 using Content.Shared.Movement.Systems;
@@ -42,10 +43,10 @@ using Robust.Shared.Timing;
 
 namespace Content.Shared.Clothing.EntitySystems;
 
-public sealed partial class PilotedClothingSystem : EntitySystem
+public sealed class PilotedClothingSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SharedMoverController _moverController = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
 
     public override void Initialize()
@@ -92,7 +93,7 @@ public sealed partial class PilotedClothingSystem : EntitySystem
             return;
 
         // Make sure the clothing item was equipped to the right slot, and not just held in a hand.
-        var isCorrectSlot = (clothing.Slots & args.SlotFlags) != Inventory.SlotFlags.NONE;
+        var isCorrectSlot = (clothing.Slots & args.SlotFlags) != SlotFlags.NONE;
         if (!isCorrectSlot)
             return;
 

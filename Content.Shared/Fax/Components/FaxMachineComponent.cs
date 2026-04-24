@@ -89,9 +89,87 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototy
 
 namespace Content.Shared.Fax.Components;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class FaxMachineComponent : Component
 {
+    /// <summary>
+    /// Sprite to use when inserting an object.
+    /// </summary>
+    [ViewVariables(VVAccess.ReadWrite)]
+    [DataField] [AutoNetworkedField]
+    public string InsertingState = "inserting";
+
+    /// <summary>
+    /// Remaining time of inserting animation
+    /// </summary>
+    [DataField]
+    public float InsertingTimeRemaining;
+
+    /// <summary>
+    /// How long the inserting animation will play
+    /// </summary>
+    [ViewVariables]
+    public float InsertionTime = 1.88f; // 0.02 off for correct animation
+
+    /// <summary>
+    /// Contains the item to be sent, assumes it's paper...
+    /// </summary>
+    [DataField(required: true)]
+    public ItemSlot PaperSlot = new();
+
+    /// <summary>
+    /// How long the printing animation will play
+    /// </summary>
+    [ViewVariables]
+    public float PrintingTime = 2.3f;
+
+    /// <summary>
+    /// Remaining time of printing animation
+    /// </summary>
+    [DataField]
+    public float PrintingTimeRemaining;
+
+    /// <summary>
+    /// The prototype ID to use for faxed or copied entities if we can't get one from
+    /// the paper entity for whatever reason of the Office type.
+    /// </summary>
+    [DataField]
+    public EntProtoId PrintOfficePaperId = "PaperOffice";
+
+    /// <summary>
+    /// The prototype ID to use for faxed or copied entities if we can't get one from
+    /// the paper entity for whatever reason.
+    /// </summary>
+    [DataField]
+    public EntProtoId PrintPaperId = "Paper";
+    // CorvaxGoob-StationGoal-End
+
+    /// <summary>
+    /// Sound to play when fax printing new message
+    /// </summary>
+    [DataField]
+    public SoundSpecifier PrintSound = new SoundPathSpecifier("/Audio/Machines/printer.ogg");
+
+    /// <summary>
+    /// Sound to play when fax successfully send message
+    /// </summary>
+    [DataField]
+    public SoundSpecifier SendSound = new SoundPathSpecifier("/Audio/Machines/high_tech_confirm.ogg");
+
+    /// <summary>
+    /// Message sending timeout
+    /// </summary>
+    [ViewVariables]
+    [DataField]
+    public float SendTimeout = 5f;
+
+    /// <summary>
+    /// Message sending timeout
+    /// </summary>
+    [ViewVariables]
+    [DataField]
+    public float SendTimeoutRemaining;
+
     /// <summary>
     /// Name with which the fax will be visible to others on the network
     /// </summary>
@@ -100,24 +178,11 @@ public sealed partial class FaxMachineComponent : Component
     public string FaxName { get; set; } = "Unknown";
 
     /// <summary>
-    /// Sprite to use when inserting an object.
-    /// </summary>
-    [ViewVariables(VVAccess.ReadWrite)]
-    [DataField, AutoNetworkedField]
-    public string InsertingState = "inserting";
-
-    /// <summary>
     /// Device address of fax in network to which data will be send
     /// </summary>
     [ViewVariables(VVAccess.ReadWrite)]
     [DataField("destinationAddress")]
     public string? DestinationFaxAddress { get; set; }
-
-    /// <summary>
-    /// Contains the item to be sent, assumes it's paper...
-    /// </summary>
-    [DataField(required: true)]
-    public ItemSlot PaperSlot = new();
 
     /// <summary>
     /// Is fax machine should respond to pings in network
@@ -153,19 +218,6 @@ public sealed partial class FaxMachineComponent : Component
     /// </summary>
     [DataField]
     public bool ReceiveAllStationGoals { get; set; }
-    // CorvaxGoob-StationGoal-End
-
-    /// <summary>
-    /// Sound to play when fax printing new message
-    /// </summary>
-    [DataField]
-    public SoundSpecifier PrintSound = new SoundPathSpecifier("/Audio/Machines/printer.ogg");
-
-    /// <summary>
-    /// Sound to play when fax successfully send message
-    /// </summary>
-    [DataField]
-    public SoundSpecifier SendSound = new SoundPathSpecifier("/Audio/Machines/high_tech_confirm.ogg");
 
     /// <summary>
     /// Known faxes in network by address with fax names
@@ -179,63 +231,32 @@ public sealed partial class FaxMachineComponent : Component
     [ViewVariables]
     [DataField]
     public Queue<FaxPrintout> PrintingQueue { get; private set; } = new();
-
-    /// <summary>
-    /// Message sending timeout
-    /// </summary>
-    [ViewVariables]
-    [DataField]
-    public float SendTimeoutRemaining;
-
-    /// <summary>
-    /// Message sending timeout
-    /// </summary>
-    [ViewVariables]
-    [DataField]
-    public float SendTimeout = 5f;
-
-    /// <summary>
-    /// Remaining time of inserting animation
-    /// </summary>
-    [DataField]
-    public float InsertingTimeRemaining;
-
-    /// <summary>
-    /// How long the inserting animation will play
-    /// </summary>
-    [ViewVariables]
-    public float InsertionTime = 1.88f; // 0.02 off for correct animation
-
-    /// <summary>
-    /// Remaining time of printing animation
-    /// </summary>
-    [DataField]
-    public float PrintingTimeRemaining;
-
-    /// <summary>
-    /// How long the printing animation will play
-    /// </summary>
-    [ViewVariables]
-    public float PrintingTime = 2.3f;
-
-    /// <summary>
-    ///     The prototype ID to use for faxed or copied entities if we can't get one from
-    ///     the paper entity for whatever reason.
-    /// </summary>
-    [DataField]
-    public EntProtoId PrintPaperId = "Paper";
-
-    /// <summary>
-    ///     The prototype ID to use for faxed or copied entities if we can't get one from
-    ///     the paper entity for whatever reason of the Office type.
-    /// </summary>
-    [DataField]
-    public EntProtoId PrintOfficePaperId = "PaperOffice";
 }
 
 [DataDefinition]
 public sealed partial class FaxPrintout
 {
+    private FaxPrintout()
+    {
+    }
+
+    public FaxPrintout(string content,
+        string name,
+        string? label = null,
+        string? prototypeId = null,
+        string? stampState = null,
+        List<StampDisplayInfo>? stampedBy = null,
+        bool locked = false)
+    {
+        Content = content;
+        Name = name;
+        Label = label;
+        PrototypeId = prototypeId ?? "";
+        StampState = stampState;
+        StampedBy = stampedBy ?? new List<StampDisplayInfo>();
+        Locked = locked;
+    }
+
     [DataField(required: true)]
     public string Name { get; private set; } = default!;
 
@@ -256,19 +277,4 @@ public sealed partial class FaxPrintout
 
     [DataField]
     public bool Locked { get; private set; }
-
-    private FaxPrintout()
-    {
-    }
-
-    public FaxPrintout(string content, string name, string? label = null, string? prototypeId = null, string? stampState = null, List<StampDisplayInfo>? stampedBy = null, bool locked = false)
-    {
-        Content = content;
-        Name = name;
-        Label = label;
-        PrototypeId = prototypeId ?? "";
-        StampState = stampState;
-        StampedBy = stampedBy ?? new List<StampDisplayInfo>();
-        Locked = locked;
-    }
 }

@@ -19,8 +19,7 @@ public sealed class StoreAfterFailedInteractSystem : EntitySystem
         SubscribeLocalEvent<StoreAfterFailedInteractComponent, StorageInsertFailedEvent>(OnStorageInsertFailed);
     }
 
-    private void OnStorageInsertFailed(Entity<StoreAfterFailedInteractComponent> ent, ref StorageInsertFailedEvent args)
-    {
+    private void
+        OnStorageInsertFailed(Entity<StoreAfterFailedInteractComponent> ent, ref StorageInsertFailedEvent args) =>
         _storage.PlayerInsertHeldEntity(args.Storage, args.Player);
-    }
 }

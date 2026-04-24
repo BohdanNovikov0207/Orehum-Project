@@ -10,12 +10,11 @@ public abstract partial class SharedOfferItemSystem
 {
     [Dependency] private readonly ActionBlockerSystem _actionBlocker = default!;
 
-    private void InitializeInteractions()
-    {
+    private void InitializeInteractions() =>
         CommandBinds.Builder
-            .Bind(ContentKeyFunctions.OfferItem, InputCmdHandler.FromDelegate(SetInOfferMode, handle: false, outsidePrediction: false))
+            .Bind(ContentKeyFunctions.OfferItem,
+                InputCmdHandler.FromDelegate(SetInOfferMode, handle: false, outsidePrediction: false))
             .Register<SharedOfferItemSystem>();
-    }
 
     public override void Shutdown()
     {

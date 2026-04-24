@@ -27,7 +27,8 @@ public sealed class ExitContainerOnMoveSystem : EntitySystem
         if (!TryComp<ContainerManagerComponent>(ent, out var containerManager))
             return;
 
-        if (!_container.TryGetContainer(ent, comp.ContainerId, out var container, containerManager) || !container.Contains(args.Entity))
+        if (!_container.TryGetContainer(ent, comp.ContainerId, out var container, containerManager) ||
+            !container.Contains(args.Entity))
             return;
 
         _climb.ForciblySetClimbing(args.Entity, ent);

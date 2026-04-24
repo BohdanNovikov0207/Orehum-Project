@@ -10,7 +10,7 @@ namespace Content.Shared.Xenoarchaeology.Artifact.XAT;
 /// <remarks> Not actually a trigger but nice and easy to use. </remarks>
 public sealed class XATExaminableTextSystem : BaseXATSystem<XATExaminableTextComponent>
 {
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
@@ -18,7 +18,9 @@ public sealed class XATExaminableTextSystem : BaseXATSystem<XATExaminableTextCom
         XATSubscribeDirectEvent<ExaminedEvent>(OnExamined);
     }
 
-    private void OnExamined(Entity<XenoArtifactComponent> artifact, Entity<XATExaminableTextComponent, XenoArtifactNodeComponent> node, ref ExaminedEvent args)
+    private void OnExamined(Entity<XenoArtifactComponent> artifact,
+        Entity<XATExaminableTextComponent, XenoArtifactNodeComponent> node,
+        ref ExaminedEvent args)
     {
         if (!args.IsInDetailsRange)
             return;

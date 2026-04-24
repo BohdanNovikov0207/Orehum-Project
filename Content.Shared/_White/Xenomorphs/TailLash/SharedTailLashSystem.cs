@@ -18,17 +18,16 @@ namespace Content.Shared._White.Xenomorphs.TailLash;
 
 public sealed class SharedTailLashSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-
     [Dependency] private readonly ActionBlockerSystem _actionBlocker = default!;
-    [Dependency] private readonly DamageableSystem _damageable = default!;
     [Dependency] private readonly SharedActionsSystem _actions = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
+    [Dependency] private readonly DamageableSystem _damageable = default!;
     [Dependency] private readonly SharedInteractionSystem _interaction = default!;
-    [Dependency] private readonly SharedSolutionContainerSystem _solutionContainer = default!;
     [Dependency] private readonly SharedMeleeWeaponSystem _meleeWeapon = default!;
+    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
+    [Dependency] private readonly SharedSolutionContainerSystem _solutionContainer = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     public override void Initialize()
     {
@@ -63,14 +62,21 @@ public sealed class SharedTailLashSystem : EntitySystem
         var targetCoords = _transform.ToMapCoordinates(args.Target);
 
         var range = component.TailRange.Float();
-        var box = new Box2(userCoords.Position.X - 0.10f, userCoords.Position.Y, userCoords.Position.X + 0.10f, userCoords.Position.Y + range);
+        var box = new Box2(userCoords.Position.X - 0.10f,
+            userCoords.Position.Y,
+            userCoords.Position.X + 0.10f,
+            userCoords.Position.Y + range);
 
         var matrix = Vector2.Transform(targetCoords.Position, _transform.GetInvWorldMatrix(transform));
         var rotation = _transform.GetWorldRotation(uid).RotateVec(-matrix).ToWorldAngle();
         var boxRotated = new Box2Rotated(box, rotation, userCoords.Position);
 
-        var leftRay = new CollisionRay(boxRotated.BottomLeft, (boxRotated.TopLeft - boxRotated.BottomLeft).Normalized(), SharedMeleeWeaponSystem.AttackMask);
-        var rightRay = new CollisionRay(boxRotated.BottomRight, (boxRotated.TopRight - boxRotated.BottomRight).Normalized(), SharedMeleeWeaponSystem.AttackMask);
+        var leftRay = new CollisionRay(boxRotated.BottomLeft,
+            (boxRotated.TopLeft - boxRotated.BottomLeft).Normalized(),
+            SharedMeleeWeaponSystem.AttackMask);
+        var rightRay = new CollisionRay(boxRotated.BottomRight,
+            (boxRotated.TopRight - boxRotated.BottomRight).Normalized(),
+            SharedMeleeWeaponSystem.AttackMask);
 
         bool Ignored(EntityUid predicate)
         {
@@ -81,12 +87,13 @@ public sealed class SharedTailLashSystem : EntitySystem
         }
 
         var intersect = _physics.IntersectRayWithPredicate(transform.MapID, leftRay, range, Ignored, false);
-        intersect = intersect.Concat(_physics.IntersectRayWithPredicate(transform.MapID, rightRay, range, Ignored, false));
+        intersect = intersect.Concat(
+            _physics.IntersectRayWithPredicate(transform.MapID, rightRay, range, Ignored, false));
         var results = intersect.Select(r => r.HitEntity).ToHashSet();
 
         _interaction.DoContactInteraction(uid, uid, null, true);
 
-        var hitEntities = results.Where(result => _interaction.InRangeUnobstructed(uid, result, range: range)).ToList();
+        var hitEntities = results.Where(result => _interaction.InRangeUnobstructed(uid, result, range)).ToList();
         var hitEvent = new MeleeHitEvent(hitEntities, uid, uid, component.TailDamage, null, args.Target);
         RaiseLocalEvent(uid, hitEvent);
 
@@ -97,14 +104,19 @@ public sealed class SharedTailLashSystem : EntitySystem
             var attackedEv = new AttackedEvent(uid, hit, args.Target);
             RaiseLocalEvent(hit, attackedEv);
 
-            var modifiedDamage = DamageSpecifier.ApplyModifierSets(component.TailDamage + hitEvent.BonusDamage + attackedEv.BonusDamage, hitEvent.ModifiersList);
-            _damageable.TryChangeDamage(hit, modifiedDamage, origin:uid);
+            var modifiedDamage = DamageSpecifier.ApplyModifierSets(
+                component.TailDamage + hitEvent.BonusDamage + attackedEv.BonusDamage,
+                hitEvent.ModifiersList);
+            _damageable.TryChangeDamage(hit, modifiedDamage, origin: uid);
 
-            if (component.Inject == null || !_solutionContainer.TryGetInjectableSolution(hit, out var solutionEnt, out _))
+            if (component.Inject == null ||
+                !_solutionContainer.TryGetInjectableSolution(hit, out var solutionEnt, out _))
                 continue;
 
             foreach (var (reagent, amount) in component.Inject)
+            {
                 _solutionContainer.TryAddReagent(solutionEnt.Value, reagent, amount);
+            }
         }
 
         var localPos = transform.LocalRotation.RotateVec(matrix);

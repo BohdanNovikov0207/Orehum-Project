@@ -14,12 +14,10 @@ using System.Linq;
 using Content.Shared._White.Blink;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Events;
-using Content.Shared.Damage.Systems;
 using Content.Shared.Electrocution;
 using Content.Shared.Examine;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.StatusEffect;
-using Content.Shared.StatusEffectNew;
 using Content.Shared.Timing;
 using Content.Shared.UserInterface;
 using Content.Shared.Weapons.Melee;
@@ -30,10 +28,10 @@ namespace Content.Shared._Goobstation.Wizard.Spellblade;
 
 public abstract class SharedSpellbladeSystem : EntitySystem
 {
-    [Dependency] protected readonly UseDelaySystem UseDelay = default!;
+    [Dependency] private readonly SharedHandsSystem _hands = default!;
+    [Dependency] private readonly IPrototypeManager _protoManager = default!;
     [Dependency] protected readonly SharedAudioSystem Audio = default!;
-    [Dependency] private   readonly IPrototypeManager _protoManager = default!;
-    [Dependency] private   readonly SharedHandsSystem _hands = default!;
+    [Dependency] protected readonly UseDelaySystem UseDelay = default!;
 
     public override void Initialize()
     {
@@ -56,15 +54,13 @@ public abstract class SharedSpellbladeSystem : EntitySystem
         SubscribeLocalEvent<ShieldedComponent, DamageModifyEvent>(OnDamageModify);
     }
 
-    private void OnDamageModify(Entity<ShieldedComponent> ent, ref DamageModifyEvent args)
-    {
+    private void OnDamageModify(Entity<ShieldedComponent> ent, ref DamageModifyEvent args) =>
         args.Damage = DamageSpecifier.ApplyModifierSet(args.Damage,
             DamageSpecifier.PenetrateArmor(ent.Comp.Resistances, args.Damage.ArmorPenetration));
-    }
 
     private void OnBeforeStatusEffect(Entity<ShieldedComponent> ent, ref BeforeOldStatusEffectAddedEvent args)
     {
-        if (!ent.Comp.AntiStun || args.EffectKey is not ("Stun"))
+        if (!ent.Comp.AntiStun || args.EffectKey is not "Stun")
             return;
 
         args.Cancelled = true;
@@ -181,8 +177,6 @@ public abstract class SharedSpellbladeSystem : EntitySystem
             RaiseLocalEvent(uid, proto.Event);
     }
 
-    public bool IsHoldingItemWithComponent<T>(EntityUid user) where T : Component
-    {
-        return _hands.EnumerateHeld(user).Any(HasComp<T>);
-    }
+    public bool IsHoldingItemWithComponent<T>(EntityUid user) where T : Component =>
+        _hands.EnumerateHeld(user).Any(HasComp<T>);
 }

@@ -10,6 +10,26 @@ namespace Content.Shared.Cargo.Components;
 public sealed partial class CargoSlipComponent : Component
 {
     /// <summary>
+    /// How many of the product to order
+    /// </summary>
+    [DataField]
+    public ProtoId<CargoAccountPrototype> Account;
+
+    // CorvaxGoob-CargoFeatures-Start
+    [DataField]
+    public string? DeliveryDestination;
+
+    [DataField]
+    public string? Note;
+    // CorvaxGoob-CargoFeatures-End
+
+    /// <summary>
+    /// How many of the product to order
+    /// </summary>
+    [DataField]
+    public int OrderQuantity;
+
+    /// <summary>
     /// The requested product
     /// </summary>
     [DataField]
@@ -21,26 +41,6 @@ public sealed partial class CargoSlipComponent : Component
     [DataField]
     public string Requester;
 
-    // CorvaxGoob-CargoFeatures-Start
-    [DataField]
-    public string? DeliveryDestination;
-
-    [DataField]
-    public string? Note;
-
     [DataField]
     public bool SecuredDelivery;
-    // CorvaxGoob-CargoFeatures-End
-
-    /// <summary>
-    /// How many of the product to order
-    /// </summary>
-    [DataField]
-    public int OrderQuantity;
-
-    /// <summary>
-    /// How many of the product to order
-    /// </summary>
-    [DataField]
-    public ProtoId<CargoAccountPrototype> Account;
 }

@@ -20,21 +20,24 @@ namespace Content.Shared.Weapons.Ranged.Events;
 /// </summary>
 public sealed class TakeAmmoEvent : EntityEventArgs
 {
-    public readonly EntityUid? User;
     public readonly int Shots;
+    public readonly EntityUid? User;
     public List<(EntityUid? Entity, IShootable Shootable)> Ammo;
-
-    /// <summary>
-    /// If no ammo returned what is the reason for it?
-    /// </summary>
-    public string? Reason;
 
     /// <summary>
     /// Coordinates to spawn the ammo at.
     /// </summary>
     public EntityCoordinates Coordinates;
 
-    public TakeAmmoEvent(int shots, List<(EntityUid? Entity, IShootable Shootable)> ammo, EntityCoordinates coordinates, EntityUid? user)
+    /// <summary>
+    /// If no ammo returned what is the reason for it?
+    /// </summary>
+    public string? Reason;
+
+    public TakeAmmoEvent(int shots,
+        List<(EntityUid? Entity, IShootable Shootable)> ammo,
+        EntityCoordinates coordinates,
+        EntityUid? user)
     {
         Shots = shots;
         Ammo = ammo;

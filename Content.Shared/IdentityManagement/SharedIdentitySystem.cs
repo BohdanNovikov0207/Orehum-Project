@@ -18,8 +18,8 @@ namespace Content.Shared.IdentityManagement;
 
 public abstract class SharedIdentitySystem : EntitySystem
 {
+    private static readonly string SlotName = "identity";
     [Dependency] private readonly SharedContainerSystem _container = default!;
-    private static string SlotName = "identity";
 
     public override void Initialize()
     {
@@ -27,7 +27,8 @@ public abstract class SharedIdentitySystem : EntitySystem
 
         SubscribeLocalEvent<IdentityComponent, ComponentInit>(OnComponentInit);
         SubscribeLocalEvent<IdentityBlockerComponent, SeeIdentityAttemptEvent>(OnSeeIdentity);
-        SubscribeLocalEvent<IdentityBlockerComponent, InventoryRelayedEvent<SeeIdentityAttemptEvent>>((e, c, ev) => OnSeeIdentity(e, c, ev.Args));
+        SubscribeLocalEvent<IdentityBlockerComponent, InventoryRelayedEvent<SeeIdentityAttemptEvent>>((e, c, ev) =>
+            OnSeeIdentity(e, c, ev.Args));
         SubscribeLocalEvent<IdentityBlockerComponent, ItemMaskToggledEvent>(OnMaskToggled);
     }
 
@@ -36,28 +37,25 @@ public abstract class SharedIdentitySystem : EntitySystem
         if (component.Enabled)
         {
             args.TotalCoverage |= component.Coverage;
-            if(args.TotalCoverage == IdentityBlockerCoverage.FULL)
+            if (args.TotalCoverage == IdentityBlockerCoverage.FULL)
                 args.Cancel();
         }
     }
 
-    protected virtual void OnComponentInit(EntityUid uid, IdentityComponent component, ComponentInit args)
-    {
+    protected virtual void OnComponentInit(EntityUid uid, IdentityComponent component, ComponentInit args) =>
         component.IdentityEntitySlot = _container.EnsureContainer<ContainerSlot>(uid, SlotName);
-    }
 
-    private void OnMaskToggled(Entity<IdentityBlockerComponent> ent, ref ItemMaskToggledEvent args)
-    {
+    private void OnMaskToggled(Entity<IdentityBlockerComponent> ent, ref ItemMaskToggledEvent args) =>
         ent.Comp.Enabled = !args.Mask.Comp.IsToggled;
-    }
 
     /// <summary>
     /// Queues an identity update to the start of the next tick.
     /// </summary>
     public virtual void QueueIdentityUpdate(EntityUid uid) { }
 }
+
 /// <summary>
-///     Gets called whenever an entity changes their identity.
+/// Gets called whenever an entity changes their identity.
 /// </summary>
 [ByRefEvent]
 public record struct IdentityChangedEvent(EntityUid CharacterEntity, EntityUid IdentityEntity);

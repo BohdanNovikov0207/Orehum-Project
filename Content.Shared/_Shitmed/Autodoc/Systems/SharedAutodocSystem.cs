@@ -6,6 +6,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Linq;
 using Content.Shared._Shitmed.Autodoc.Components;
 using Content.Shared._Shitmed.Medical.Surgery;
 using Content.Shared._Shitmed.Medical.Surgery.Steps;
@@ -25,22 +26,21 @@ using Content.Shared.Storage.EntitySystems;
 using Content.Shared.Whitelist;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
-using System.Linq;
 
 namespace Content.Shared._Shitmed.Autodoc.Systems;
 
 public abstract class SharedAutodocSystem : EntitySystem
 {
-    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
-    [Dependency] protected readonly IGameTiming Timing = default!;
     [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
-    [Dependency] private readonly MobStateSystem _mobState = default!;
     [Dependency] private readonly SharedBodySystem _body = default!;
     [Dependency] private readonly SharedHandsSystem _hands = default!;
     [Dependency] private readonly LabelSystem _label = default!;
+    [Dependency] private readonly MobStateSystem _mobState = default!;
+    [Dependency] private readonly SleepingSystem _sleeping = default!;
     [Dependency] private readonly SharedStorageSystem _storage = default!;
     [Dependency] private readonly SharedSurgerySystem _surgery = default!;
-    [Dependency] private readonly SleepingSystem _sleeping = default!;
+    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
+    [Dependency] protected readonly IGameTiming Timing = default!;
 
     public override void Initialize()
     {
@@ -48,17 +48,18 @@ public abstract class SharedAutodocSystem : EntitySystem
 
         SubscribeLocalEvent<AutodocComponent, NewLinkEvent>(OnNewLink);
         SubscribeLocalEvent<AutodocComponent, PortDisconnectedEvent>(OnPortDisconnected);
-        Subs.BuiEvents<AutodocComponent>(AutodocUiKey.Key, s =>
-        {
-            s.Event<AutodocCreateProgramMessage>(OnCreateProgram);
-            s.Event<AutodocToggleProgramSafetyMessage>(OnToggleProgramSafety);
-            s.Event<AutodocRemoveProgramMessage>(OnRemoveProgram);
-            s.Event<AutodocAddStepMessage>(OnAddStep);
-            s.Event<AutodocRemoveStepMessage>(OnRemoveStep);
-            s.Event<AutodocStartMessage>(OnStart);
-            s.Event<AutodocStopMessage>(OnStop);
-            s.Event<AutodocImportProgramMessage>(OnImportProgram);
-        });
+        Subs.BuiEvents<AutodocComponent>(AutodocUiKey.Key,
+            s =>
+            {
+                s.Event<AutodocCreateProgramMessage>(OnCreateProgram);
+                s.Event<AutodocToggleProgramSafetyMessage>(OnToggleProgramSafety);
+                s.Event<AutodocRemoveProgramMessage>(OnRemoveProgram);
+                s.Event<AutodocAddStepMessage>(OnAddStep);
+                s.Event<AutodocRemoveStepMessage>(OnRemoveStep);
+                s.Event<AutodocStartMessage>(OnStart);
+                s.Event<AutodocStopMessage>(OnStop);
+                s.Event<AutodocImportProgramMessage>(OnImportProgram);
+            });
 
         SubscribeLocalEvent<ActiveAutodocComponent, SurgeryStepEvent>(OnSurgeryStep);
         SubscribeLocalEvent<ActiveAutodocComponent, SurgeryStepFailedEvent>(OnSurgeryStepFailed);
@@ -83,66 +84,6 @@ public abstract class SharedAutodocSystem : EntitySystem
         ent.Comp.OperatingTable = null;
         Dirty(ent);
     }
-
-    #region UI Handling
-
-    private void OnCreateProgram(Entity<AutodocComponent> ent, ref AutodocCreateProgramMessage args)
-    {
-        CreateProgram(ent, args.Title);
-    }
-
-    private void OnToggleProgramSafety(Entity<AutodocComponent> ent, ref AutodocToggleProgramSafetyMessage args)
-    {
-        if (IsActive(ent))
-            return;
-
-        if (args.Program >= ent.Comp.Programs.Count)
-            return;
-
-        var program = ent.Comp.Programs[args.Program];
-        program.SkipFailed ^= true;
-        Dirty(ent);
-
-        _adminLogger.Add(LogType.InteractActivate, LogImpact.Low, $"{ToPrettyString(args.Actor):user} toggled safety of autodoc program {program.Title}");
-    }
-
-    private void OnRemoveProgram(Entity<AutodocComponent> ent, ref AutodocRemoveProgramMessage args)
-    {
-        RemoveProgram(ent, args.Program);
-    }
-
-    private void OnAddStep(Entity<AutodocComponent> ent, ref AutodocAddStepMessage args)
-    {
-        if (!args.Step.Validate(ent, this))
-        {
-            Log.Warning($"User {ToPrettyString(args.Actor)} tried to add an invalid autodoc step!");
-            return;
-        }
-
-        AddStep(ent, args.Program, args.Step, args.Index, args.Actor);
-    }
-
-    private void OnRemoveStep(Entity<AutodocComponent> ent, ref AutodocRemoveStepMessage args)
-    {
-        RemoveStep(ent, args.Program, args.Step);
-    }
-
-    private void OnStart(Entity<AutodocComponent> ent, ref AutodocStartMessage args)
-    {
-        StartProgram(ent, args.Program, args.Actor);
-    }
-
-    private void OnStop(Entity<AutodocComponent> ent, ref AutodocStopMessage args)
-    {
-        RemComp<ActiveAutodocComponent>(ent);
-    }
-
-    private void OnImportProgram(Entity<AutodocComponent> ent, ref AutodocImportProgramMessage args)
-    {
-        ImportProgram(ent, args.Program, args.Actor);
-    }
-
-    #endregion
 
     private void OnSurgeryStep(Entity<ActiveAutodocComponent> ent, ref SurgeryStepEvent args)
     {
@@ -188,22 +129,80 @@ public abstract class SharedAutodocSystem : EntitySystem
             return;
 
         // wake the patient when program completes or errors out
-        if (GetPatient((ent.Owner, comp)) is {} patient)
+        if (GetPatient((ent.Owner, comp)) is { } patient)
             WakePatient(patient);
     }
 
-    protected virtual void WakePatient(EntityUid patient)
+    protected virtual void WakePatient(EntityUid patient) => _sleeping.TryWaking(patient);
+
+    public virtual void Say(EntityUid uid, string msg)
     {
-        _sleeping.TryWaking(patient);
     }
+
+    public void SetSafety(Entity<AutodocComponent> ent, bool enabled)
+    {
+        if (enabled == ent.Comp.RequireSleeping)
+            return;
+
+        ent.Comp.RequireSleeping = enabled;
+        Dirty(ent);
+    }
+
+    #region UI Handling
+
+    private void OnCreateProgram(Entity<AutodocComponent> ent, ref AutodocCreateProgramMessage args) =>
+        CreateProgram(ent, args.Title);
+
+    private void OnToggleProgramSafety(Entity<AutodocComponent> ent, ref AutodocToggleProgramSafetyMessage args)
+    {
+        if (IsActive(ent))
+            return;
+
+        if (args.Program >= ent.Comp.Programs.Count)
+            return;
+
+        var program = ent.Comp.Programs[args.Program];
+        program.SkipFailed ^= true;
+        Dirty(ent);
+
+        _adminLogger.Add(LogType.InteractActivate,
+            LogImpact.Low,
+            $"{ToPrettyString(args.Actor):user} toggled safety of autodoc program {program.Title}");
+    }
+
+    private void OnRemoveProgram(Entity<AutodocComponent> ent, ref AutodocRemoveProgramMessage args) =>
+        RemoveProgram(ent, args.Program);
+
+    private void OnAddStep(Entity<AutodocComponent> ent, ref AutodocAddStepMessage args)
+    {
+        if (!args.Step.Validate(ent, this))
+        {
+            Log.Warning($"User {ToPrettyString(args.Actor)} tried to add an invalid autodoc step!");
+            return;
+        }
+
+        AddStep(ent, args.Program, args.Step, args.Index, args.Actor);
+    }
+
+    private void OnRemoveStep(Entity<AutodocComponent> ent, ref AutodocRemoveStepMessage args) =>
+        RemoveStep(ent, args.Program, args.Step);
+
+    private void OnStart(Entity<AutodocComponent> ent, ref AutodocStartMessage args) =>
+        StartProgram(ent, args.Program, args.Actor);
+
+    private void OnStop(Entity<AutodocComponent> ent, ref AutodocStopMessage args) =>
+        RemComp<ActiveAutodocComponent>(ent);
+
+    private void OnImportProgram(Entity<AutodocComponent> ent, ref AutodocImportProgramMessage args) =>
+        ImportProgram(ent, args.Program, args.Actor);
+
+    #endregion
 
     #region Step API
 
-    public bool IsSurgery(EntProtoId id)
-    {
+    public bool IsSurgery(EntProtoId id) =>
         // this is O(n) so with a fuck ton of surgeries it could slow down the server
-        return _surgery.AllSurgeries.Contains(id);
-    }
+        _surgery.AllSurgeries.Contains(id);
 
     public EntityUid? FindItem(EntityUid uid, string name)
     {
@@ -229,10 +228,8 @@ public abstract class SharedAutodocSystem : EntitySystem
         return null;
     }
 
-    public bool GrabItem(Entity<AutodocComponent, HandsComponent> ent, EntityUid item)
-    {
-        return _hands.TryPickup(ent, item, ent.Comp1.ItemSlot, animate: false, handsComp: ent.Comp2);
-    }
+    public bool GrabItem(Entity<AutodocComponent, HandsComponent> ent, EntityUid item) =>
+        _hands.TryPickup(ent, item, ent.Comp1.ItemSlot, animate: false, handsComp: ent.Comp2);
 
     public void GrabItemOrThrow(Entity<AutodocComponent, HandsComponent> ent, EntityUid item)
     {
@@ -249,16 +246,13 @@ public abstract class SharedAutodocSystem : EntitySystem
 
     public EntityUid GetHeldOrThrow(Entity<AutodocComponent, HandsComponent> ent)
     {
-        if (_hands.GetHeldItem((ent.Owner, ent.Comp2), ent.Comp1.ItemSlot) is not {} item)
+        if (_hands.GetHeldItem((ent.Owner, ent.Comp2), ent.Comp1.ItemSlot) is not { } item)
             throw new AutodocError("item-unavailable");
 
         return item;
     }
 
-    public void LabelItem(EntityUid item, string label)
-    {
-        _label.Label(item, label);
-    }
+    public void LabelItem(EntityUid item, string label) => _label.Label(item, label);
 
     public void DelayUpdate(EntityUid uid, TimeSpan delay)
     {
@@ -284,7 +278,7 @@ public abstract class SharedAutodocSystem : EntitySystem
 
     public EntityUid GetPatientOrThrow(Entity<AutodocComponent> ent)
     {
-        if (GetPatient(ent) is not {} patient)
+        if (GetPatient(ent) is not { } patient)
             throw new AutodocError("missing-patient");
 
         return patient;
@@ -309,14 +303,14 @@ public abstract class SharedAutodocSystem : EntitySystem
         if (ent.Comp.RequireSleeping && IsAwake(patient))
             throw new AutodocError("patient-unsedated");
 
-        if (_surgery.GetSingleton(surgery) is not {} singleton)
+        if (_surgery.GetSingleton(surgery) is not { } singleton)
             throw new AutodocError("reality-breaking");
 
-        if (_surgery.GetNextStep(patient, part, singleton, ent) is not {} pair)
+        if (_surgery.GetNextStep(patient, part, singleton, ent) is not { } pair)
             return false;
 
         var nextSurgery = pair.Item1;
-        if (MetaData(nextSurgery).EntityPrototype?.ID is not {} surgeryId) // should never happen
+        if (MetaData(nextSurgery).EntityPrototype?.ID is not { } surgeryId) // should never happen
             throw new AutodocError("reality-breaking");
 
         var index = pair.Item2;
@@ -341,10 +335,7 @@ public abstract class SharedAutodocSystem : EntitySystem
         return true;
     }
 
-    public bool IsAwake(EntityUid uid)
-    {
-        return _mobState.IsAlive(uid) && !HasComp<SleepingComponent>(uid);
-    }
+    public bool IsAwake(EntityUid uid) => _mobState.IsAlive(uid) && !HasComp<SleepingComponent>(uid);
 
     /// <summary>
     /// Creates a new program and populates it using another AutodocProgram.
@@ -357,15 +348,17 @@ public abstract class SharedAutodocSystem : EntitySystem
         if (!idx.HasValue)
             return false;
 
-        for (int key = 0; key < program.Steps.Count; ++key)
+        for (var key = 0; key < program.Steps.Count; ++key)
         {
             if (!program.Steps[key].Validate(ent, this))
             {
                 Log.Warning($"User {ToPrettyString(user)} tried to add an invalid autodoc step!");
                 return false;
             }
+
             AddStep(ent, idx.Value, program.Steps[key], key, user);
         }
+
         return true;
     }
 
@@ -382,9 +375,9 @@ public abstract class SharedAutodocSystem : EntitySystem
         if (string.IsNullOrEmpty(title) || title.Length > ent.Comp.MaxProgramTitleLength)
             return null;
 
-        ent.Comp.Programs.Add(new AutodocProgram()
+        ent.Comp.Programs.Add(new AutodocProgram
         {
-            Title = title
+            Title = title,
         });
         Dirty(ent);
         return index;
@@ -418,7 +411,9 @@ public abstract class SharedAutodocSystem : EntitySystem
         program.Steps.Insert(index, step);
         Dirty(ent);
 
-        _adminLogger.Add(LogType.InteractActivate, LogImpact.Low, $"{ToPrettyString(user):user} added step '{step.Title}' to autodoc program '{program.Title}'");
+        _adminLogger.Add(LogType.InteractActivate,
+            LogImpact.Low,
+            $"{ToPrettyString(user):user} added step '{step.Title}' to autodoc program '{program.Title}'");
         return true;
     }
 
@@ -439,21 +434,16 @@ public abstract class SharedAutodocSystem : EntitySystem
         return true;
     }
 
-    public bool IsActive(EntityUid uid)
-    {
-        return HasComp<ActiveAutodocComponent>(uid);
-    }
+    public bool IsActive(EntityUid uid) => HasComp<ActiveAutodocComponent>(uid);
 
-    public AutodocProgram CurrentProgram(Entity<AutodocComponent, ActiveAutodocComponent> ent)
-    {
+    public AutodocProgram CurrentProgram(Entity<AutodocComponent, ActiveAutodocComponent> ent) =>
         // not checking if it exists since Programs isnt allowed to be changed while operating
-        return ent.Comp1.Programs[ent.Comp2.CurrentProgram];
-    }
+        ent.Comp1.Programs[ent.Comp2.CurrentProgram];
 
     public bool StartProgram(Entity<AutodocComponent> ent, int index, EntityUid user)
     {
         // no error since UI checks this too
-        if (IsActive(ent) || index >= ent.Comp.Programs.Count || GetPatient(ent) is not {} patient)
+        if (IsActive(ent) || index >= ent.Comp.Programs.Count || GetPatient(ent) is not { } patient)
             return false;
 
         var active = EnsureComp<ActiveAutodocComponent>(ent);
@@ -461,7 +451,9 @@ public abstract class SharedAutodocSystem : EntitySystem
         active.NextUpdate = Timing.CurTime + ent.Comp.UpdateDelay;
         Dirty(ent.Owner, active);
 
-        _adminLogger.Add(LogType.InteractActivate, LogImpact.High, $"{ToPrettyString(user):user} started autodoc program '{ent.Comp.Programs[index].Title}' on {ToPrettyString(patient):patient}");
+        _adminLogger.Add(LogType.InteractActivate,
+            LogImpact.High,
+            $"{ToPrettyString(user):user} started autodoc program '{ent.Comp.Programs[index].Title}' on {ToPrettyString(patient):patient}");
         return true;
     }
 
@@ -478,7 +470,7 @@ public abstract class SharedAutodocSystem : EntitySystem
         {
             // stay on this AutodocSurgeryStep until every step of the surgery (and its dependencies) is complete
             // if this was the last step, StartSurgery will fail and the next autodoc step will run
-            if (ent.Comp2.CurrentSurgery is {} args)
+            if (ent.Comp2.CurrentSurgery is { } args)
             {
                 var (body, part, surgery) = args;
                 if (StartSurgeryOrThrow((ent.Owner, ent.Comp1), body, part, surgery))
@@ -496,6 +488,7 @@ public abstract class SharedAutodocSystem : EntitySystem
                 Say(ent, Loc.GetString("autodoc-program-completed"));
                 return true;
             }
+
             var step = program.Steps[index];
             if (step.Run((ent.Owner, ent.Comp1, Comp<HandsComponent>(ent)), this))
                 ent.Comp2.ProgramStep++;
@@ -523,19 +516,6 @@ public abstract class SharedAutodocSystem : EntitySystem
     }
 
     #endregion
-
-    public virtual void Say(EntityUid uid, string msg)
-    {
-    }
-
-    public void SetSafety(Entity<AutodocComponent> ent, bool enabled)
-    {
-        if (enabled == ent.Comp.RequireSleeping)
-            return;
-
-        ent.Comp.RequireSleeping = enabled;
-        Dirty(ent);
-    }
 }
 
 /// <summary>

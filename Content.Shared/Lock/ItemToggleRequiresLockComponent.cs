@@ -5,7 +5,7 @@ namespace Content.Shared.Lock;
 /// <summary>
 /// This is used for toggleable items that require the entity to have a lock in a certain state.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(LockSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(LockSystem))]
 public sealed partial class ItemToggleRequiresLockComponent : Component
 {
     /// <summary>

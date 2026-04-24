@@ -14,15 +14,14 @@ namespace Content.Shared._Shitcode.Heretic.Systems;
 
 public abstract class SharedFireBlastSystem : EntitySystem
 {
-    [Dependency] protected readonly SharedTransformSystem Xform = default!;
-    [Dependency] protected readonly StatusEffectsSystem Status = default!;
-    [Dependency] protected readonly DamageableSystem Dmg = default!;
-    [Dependency] protected readonly SharedBodySystem Body = default!;
-
-    [Dependency] private readonly IGameTiming _timing = default!;
+    public static readonly EntProtoId FireBlastStatusEffect = "StatusEffectFireBlasted";
     [Dependency] private readonly SharedStaminaSystem _stam = default!;
 
-    public static readonly EntProtoId FireBlastStatusEffect = "StatusEffectFireBlasted";
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] protected readonly SharedBodySystem Body = default!;
+    [Dependency] protected readonly DamageableSystem Dmg = default!;
+    [Dependency] protected readonly StatusEffectsSystem Status = default!;
+    [Dependency] protected readonly SharedTransformSystem Xform = default!;
 
     public override void Initialize()
     {

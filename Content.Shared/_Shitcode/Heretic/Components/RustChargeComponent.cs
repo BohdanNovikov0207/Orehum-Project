@@ -6,7 +6,7 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Shared._Shitcode.Heretic.Components;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class RustChargeComponent : Component
 {
     [DataField]
@@ -14,18 +14,18 @@ public sealed partial class RustChargeComponent : Component
     {
         DamageDict =
         {
-            {"Blunt", 50f},
+            { "Blunt", 50f },
         },
     };
 
     [DataField]
-    public ProtoId<TagPrototype> IgnoreTag = "IgnoreImmovableRod";
+    public List<EntityUid> DamagedEntities = new();
 
     [DataField]
     public SoundSpecifier HitSound = new SoundCollectionSpecifier("MetalSlam");
 
     [DataField]
-    public List<EntityUid> DamagedEntities = new();
+    public ProtoId<TagPrototype> IgnoreTag = "IgnoreImmovableRod";
 
     [DataField]
     public TimeSpan KnockdownTime = TimeSpan.FromSeconds(2);

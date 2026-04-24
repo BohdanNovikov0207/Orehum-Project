@@ -15,15 +15,9 @@ namespace Content.Shared._DV.Construction;
 /// <summary>
 /// Component for an upgrade kit that upgrades allowed machines then deletes itself.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(UpgradeKitSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(UpgradeKitSystem))]
 public sealed partial class UpgradeKitComponent : Component
 {
-    /// <summary>
-    /// A whitelist that entities must match to be upgraded.
-    /// </summary>
-    [DataField(required: true)]
-    public EntityWhitelist Whitelist = new();
-
     /// <summary>
     /// A blacklist that entities cannot match to be upgraded.
     /// </summary>
@@ -43,14 +37,20 @@ public sealed partial class UpgradeKitComponent : Component
     [DataField]
     public TimeSpan Delay = TimeSpan.FromSeconds(4);
 
+    public EntityUid? SoundStream;
+
     /// <summary>
     /// Sound played when upgrading an entity.
     /// </summary>
     [DataField]
     public SoundSpecifier? UpgradeSound = new SoundPathSpecifier("/Audio/Items/rped.ogg");
 
-    public EntityUid? SoundStream;
+    /// <summary>
+    /// A whitelist that entities must match to be upgraded.
+    /// </summary>
+    [DataField(required: true)]
+    public EntityWhitelist Whitelist = new();
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class UpgradeKitDoAfterEvent : SimpleDoAfterEvent;

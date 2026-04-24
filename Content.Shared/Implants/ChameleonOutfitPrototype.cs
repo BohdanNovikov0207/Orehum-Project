@@ -10,11 +10,19 @@ namespace Content.Shared.Implants;
 /// that make sense for the best outcome.
 /// </summary>
 [Prototype]
-public sealed partial class ChameleonOutfitPrototype : IPrototype
+public sealed class ChameleonOutfitPrototype : IPrototype
 {
-    /// <inheritdoc/>
-    [ViewVariables, IdDataField]
-    public string ID { get; private set; } = string.Empty;
+    [DataField]
+    public List<ProtoId<DepartmentPrototype>>? Departments;
+
+    [DataField]
+    public bool HasMindShield;
+
+    /// <summary>
+    /// Icon for the outfit - used for stuff like the UI or agent ID.
+    /// </summary>
+    [DataField]
+    public ProtoId<JobIconPrototype>? Icon;
 
     /// <summary>
     /// Job this outfit is based off of. Will use various things (job icon, job name, loadout etc...) for the outfit.
@@ -24,17 +32,17 @@ public sealed partial class ChameleonOutfitPrototype : IPrototype
     public ProtoId<JobPrototype>? Job;
 
     /// <summary>
+    /// This name is only used in the chameleon controller UI.
+    /// </summary>
+    [DataField]
+    public LocId? LoadoutName;
+
+    /// <summary>
     /// Name of the outfit. This will be used for varous things like the chameleon controller UI and the agent IDs job
     /// name.
     /// </summary>
     [DataField]
     public LocId? Name;
-
-    /// <summary>
-    /// This name is only used in the chameleon controller UI.
-    /// </summary>
-    [DataField]
-    public LocId? LoadoutName;
 
     /// <summary>
     /// Generic staring gear. Sometimes outfits don't have jobs but do have starting gear (E.g. Cluwne).
@@ -43,22 +51,14 @@ public sealed partial class ChameleonOutfitPrototype : IPrototype
     public ProtoId<StartingGearPrototype>? StartingGear;
 
     /// <summary>
-    /// Icon for the outfit - used for stuff like the UI or agent ID.
-    /// </summary>
-    [DataField]
-    public ProtoId<JobIconPrototype>? Icon;
-
-    [DataField]
-    public List<ProtoId<DepartmentPrototype>>? Departments;
-
-    [DataField]
-    public bool HasMindShield;
-
-    /// <summary>
     /// Custom equipment for this specific chameleon outfit. If your making a new outfit that's just for the controller
     /// use this! It can be mixed with the rest of the fields though, it just takes highest priority right under
     /// user specified loadouts.
     /// </summary>
     [DataField]
     public Dictionary<string, EntProtoId> Equipment { get; set; } = new();
+
+    /// <inheritdoc />
+    [ViewVariables] [IdDataField]
+    public string ID { get; } = string.Empty;
 }

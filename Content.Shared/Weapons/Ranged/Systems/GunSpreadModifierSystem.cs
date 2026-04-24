@@ -4,8 +4,7 @@ using Content.Shared.Weapons.Ranged.Events;
 
 namespace Content.Shared.Weapons.Ranged.Systems;
 
-
-public sealed class GunSpreadModifierSystem: EntitySystem
+public sealed class GunSpreadModifierSystem : EntitySystem
 {
     public override void Initialize()
     {
@@ -14,10 +13,8 @@ public sealed class GunSpreadModifierSystem: EntitySystem
         SubscribeLocalEvent<GunSpreadModifierComponent, ExaminedEvent>(OnExamine);
     }
 
-    private void OnGunGetAmmoSpread(EntityUid uid, GunSpreadModifierComponent comp, ref GunGetAmmoSpreadEvent args)
-    {
+    private void OnGunGetAmmoSpread(EntityUid uid, GunSpreadModifierComponent comp, ref GunGetAmmoSpreadEvent args) =>
         args.Spread *= comp.Spread;
-    }
 
     private void OnExamine(EntityUid uid, GunSpreadModifierComponent comp, ExaminedEvent args)
     {

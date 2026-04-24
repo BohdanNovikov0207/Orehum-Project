@@ -18,19 +18,20 @@ public sealed class FrictionContactsSystem : EntitySystem
     [Dependency] private readonly SharedGravitySystem _gravity = default!;
     [Dependency] private readonly SharedPhysicsSystem _physics = default!;
     [Dependency] private readonly MovementSpeedModifierSystem _speedModifierSystem = default!;
+    private readonly HashSet<EntityUid> _toRemove = new();
 
     // Comment copied from "original" SlowContactsSystem.cs (now SpeedModifierContactsSystem.cs)
     // TODO full-game-save
     // Either these need to be processed before a map is saved, or slowed/slowing entities need to update on init.
     private readonly HashSet<EntityUid> _toUpdate = new();
-    private readonly HashSet<EntityUid> _toRemove = new();
 
     public override void Initialize()
     {
         base.Initialize();
         SubscribeLocalEvent<FrictionContactsComponent, StartCollideEvent>(OnEntityEnter);
         SubscribeLocalEvent<FrictionContactsComponent, EndCollideEvent>(OnEntityExit);
-        SubscribeLocalEvent<FrictionModifiedByContactComponent, RefreshFrictionModifiersEvent>(OnRefreshFrictionModifiers);
+        SubscribeLocalEvent<FrictionModifiedByContactComponent, RefreshFrictionModifiersEvent>(
+            OnRefreshFrictionModifiers);
         SubscribeLocalEvent<FrictionContactsComponent, ComponentShutdown>(OnShutdown);
 
         UpdatesAfter.Add(typeof(SharedPhysicsSystem));
@@ -55,12 +56,14 @@ public sealed class FrictionContactsSystem : EntitySystem
         _toUpdate.Clear();
     }
 
-    public void ChangeFrictionModifiers(EntityUid uid, float friction, FrictionContactsComponent? component = null)
-    {
+    public void ChangeFrictionModifiers(EntityUid uid, float friction, FrictionContactsComponent? component = null) =>
         ChangeFrictionModifiers(uid, friction, null, null, component);
-    }
 
-    public void ChangeFrictionModifiers(EntityUid uid, float mobFriction, float? mobFrictionNoInput, float? acceleration, FrictionContactsComponent? component = null)
+    public void ChangeFrictionModifiers(EntityUid uid,
+        float mobFriction,
+        float? mobFrictionNoInput,
+        float? acceleration,
+        FrictionContactsComponent? component = null)
     {
         if (!Resolve(uid, ref component))
             return;
@@ -82,7 +85,8 @@ public sealed class FrictionContactsSystem : EntitySystem
         _toUpdate.UnionWith(_physics.GetContactingEntities(uid, phys));
     }
 
-    private void OnRefreshFrictionModifiers(Entity<FrictionModifiedByContactComponent> entity, ref RefreshFrictionModifiersEvent args)
+    private void OnRefreshFrictionModifiers(Entity<FrictionModifiedByContactComponent> entity,
+        ref RefreshFrictionModifiersEvent args)
     {
         if (!TryComp<PhysicsComponent>(entity, out var physicsComponent))
             return;
@@ -91,7 +95,8 @@ public sealed class FrictionContactsSystem : EntitySystem
         var frictionNoInput = 0.0f;
         var acceleration = 0.0f;
 
-        var isAirborne = physicsComponent.BodyStatus == BodyStatus.InAir || _gravity.IsWeightless(entity, physicsComponent);
+        var isAirborne = physicsComponent.BodyStatus == BodyStatus.InAir ||
+                         _gravity.IsWeightless(entity, physicsComponent);
 
         var remove = true;
         var entries = 0;
@@ -138,10 +143,8 @@ public sealed class FrictionContactsSystem : EntitySystem
         _toUpdate.Add(otherUid);
     }
 
-    private void OnEntityEnter(EntityUid uid, FrictionContactsComponent component, ref StartCollideEvent args)
-    {
+    private void OnEntityEnter(EntityUid uid, FrictionContactsComponent component, ref StartCollideEvent args) =>
         AddModifiedEntity(args.OtherEntity);
-    }
 
     public void AddModifiedEntity(EntityUid uid)
     {

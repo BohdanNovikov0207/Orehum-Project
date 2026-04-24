@@ -40,7 +40,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Actions;
 using Content.Shared.Actions.Components;
 using Content.Shared.Clothing.EntitySystems;
 using Content.Shared.Item.ItemToggle.Components;
@@ -52,23 +51,23 @@ namespace Content.Shared.Clothing.Components;
 
 /// <summary>
 /// Clothing that can be enabled and disabled with an action.
-/// Requires <see cref="ItemToggleComponent"/>.
+/// Requires <see cref="ItemToggleComponent" />.
 /// </summary>
 /// <remarks>
-/// Not to be confused with <see cref="ToggleableClothingComponent"/> for hardsuit helmets and such.
+/// Not to be confused with <see cref="ToggleableClothingComponent" /> for hardsuit helmets and such.
 /// </remarks>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 [Access(typeof(ToggleClothingSystem))]
 public sealed partial class ToggleClothingComponent : Component
 {
     /// <summary>
     /// The action to add when equipped, even if not worn.
-    /// This must raise <see cref="ToggleActionEvent"/> to then get handled.
+    /// This must raise <see cref="ToggleActionEvent" /> to then get handled.
     /// </summary>
     [DataField(required: true)]
     public EntProtoId<InstantActionComponent> Action;
 
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public EntityUid? ActionEntity;
 
     /// <summary>

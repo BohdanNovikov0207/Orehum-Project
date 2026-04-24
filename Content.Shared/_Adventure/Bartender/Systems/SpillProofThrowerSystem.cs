@@ -2,8 +2,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Inventory;
 using Content.Shared._Adventure.Bartender.Components;
+using Content.Shared.Inventory;
 
 namespace Content.Shared._Adventure.Bartender.Systems;
 
@@ -26,10 +26,8 @@ public sealed class SpillProofThrowerSystem : EntitySystem
         return nonSpillThrowEvent.NonSpillThrow;
     }
 
-    private void OnSpillProofThrowAttempt(Entity<SpillProofThrowerComponent> ent, ref SpillProofThrowEvent args)
-    {
+    private void OnSpillProofThrowAttempt(Entity<SpillProofThrowerComponent> ent, ref SpillProofThrowEvent args) =>
         args.NonSpillThrow = true;
-    }
 }
 
 [ByRefEvent]

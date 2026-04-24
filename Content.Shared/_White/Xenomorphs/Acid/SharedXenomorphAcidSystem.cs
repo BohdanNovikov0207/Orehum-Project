@@ -11,10 +11,10 @@ namespace Content.Shared._White.Xenomorphs.Acid;
 
 public abstract class SharedXenomorphAcidSystem : EntitySystem
 {
-    [Dependency] protected readonly IGameTiming Timing = default!;
     [Dependency] private readonly INetManager _net = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly PlasmaCostActionSystem _plasmaCost = default!; // Goobstation
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] protected readonly IGameTiming Timing = default!;
 
     public override void Initialize()
     {
@@ -36,19 +36,25 @@ public abstract class SharedXenomorphAcidSystem : EntitySystem
         // Check plasma cost before proceeding
         if (plasmaCostValue > FixedPoint2.Zero && !_plasmaCost.HasEnoughPlasma(uid, plasmaCostValue))
         {
-            _popup.PopupEntity(Loc.GetString("xenomorphs-acid-not-enough-plasma"), uid, uid, type: PopupType.SmallCaution);
+            _popup.PopupEntity(Loc.GetString("xenomorphs-acid-not-enough-plasma"), uid, uid, PopupType.SmallCaution);
             return;
         }
 
         if (!HasComp<StructureComponent>(args.Target)) // TODO: This should check whether the target is a structure.
         {
-            _popup.PopupEntity(Loc.GetString("xenomorphs-acid-not-corrodible", ("target", args.Target)), uid, uid, type: PopupType.SmallCaution);
+            _popup.PopupEntity(Loc.GetString("xenomorphs-acid-not-corrodible", ("target", args.Target)),
+                uid,
+                uid,
+                PopupType.SmallCaution);
             return;
         }
 
         if (HasComp<AcidCorrodingComponent>(args.Target))
         {
-            _popup.PopupEntity(Loc.GetString("xenomorphs-acid-already-corroding", ("target", args.Target)), uid, uid, type: PopupType.SmallCaution);
+            _popup.PopupEntity(Loc.GetString("xenomorphs-acid-already-corroding", ("target", args.Target)),
+                uid,
+                uid,
+                PopupType.SmallCaution);
             return;
         }
 
@@ -57,7 +63,7 @@ public abstract class SharedXenomorphAcidSystem : EntitySystem
             _plasmaCost.DeductPlasma(uid, plasmaCostValue);
 
         args.Handled = true;
-        _popup.PopupEntity(Loc.GetString("xenomorphs-acid-apply", ("target", args.Target)), uid, uid, type: PopupType.Small);
+        _popup.PopupEntity(Loc.GetString("xenomorphs-acid-apply", ("target", args.Target)), uid, uid, PopupType.Small);
         // Goobstation end
 
         if (_net.IsClient)
@@ -68,7 +74,7 @@ public abstract class SharedXenomorphAcidSystem : EntitySystem
         {
             Acid = acid,
             AcidExpiresAt = Timing.CurTime + component.AcidLifeTime,
-            DamagePerSecond = component.DamagePerSecond
+            DamagePerSecond = component.DamagePerSecond,
         };
         AddComp(args.Target, acidCorroding);
     }

@@ -7,13 +7,13 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Research;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum DiskConsoleUiKey : byte
 {
-    Key
+    Key,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class DiskConsoleBoundUserInterfaceState : BoundUserInterfaceState
 {
     public bool CanPrint;
@@ -28,8 +28,7 @@ public sealed class DiskConsoleBoundUserInterfaceState : BoundUserInterfaceState
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class DiskConsolePrintDiskMessage : BoundUserInterfaceMessage
 {
-
 }

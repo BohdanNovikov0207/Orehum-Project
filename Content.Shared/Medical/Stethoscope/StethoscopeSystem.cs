@@ -1,7 +1,7 @@
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Actions;
 using Content.Shared.Damage;
 using Content.Shared.DoAfter;
-using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Inventory;
 using Content.Shared.Medical.Stethoscope.Components;
 using Content.Shared.Mobs.Components;
@@ -14,13 +14,12 @@ namespace Content.Shared.Medical.Stethoscope;
 
 public sealed class StethoscopeSystem : EntitySystem
 {
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
-    [Dependency] private readonly MobStateSystem _mobState = default!;
-    [Dependency] private readonly SharedContainerSystem _container = default!;
-
     // The damage type to "listen" for with the stethoscope.
     private const string DamageToListenFor = "Asphyxiation";
+    [Dependency] private readonly SharedContainerSystem _container = default!;
+    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
+    [Dependency] private readonly MobStateSystem _mobState = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
 
     public override void Initialize()
     {
@@ -32,17 +31,14 @@ public sealed class StethoscopeSystem : EntitySystem
         SubscribeLocalEvent<StethoscopeComponent, StethoscopeDoAfterEvent>(OnDoAfter);
     }
 
-    private void OnGetActions(Entity<StethoscopeComponent> ent, ref GetItemActionsEvent args)
-    {
+    private void OnGetActions(Entity<StethoscopeComponent> ent, ref GetItemActionsEvent args) =>
         args.AddAction(ref ent.Comp.ActionEntity, ent.Comp.Action);
-    }
 
-    private void OnStethoscopeAction(Entity<StethoscopeComponent> ent, ref StethoscopeActionEvent args)
-    {
+    private void OnStethoscopeAction(Entity<StethoscopeComponent> ent, ref StethoscopeActionEvent args) =>
         StartListening(ent, args.Target);
-    }
 
-    private void AddStethoscopeVerb(Entity<StethoscopeComponent> ent, ref InventoryRelayedEvent<GetVerbsEvent<InnateVerb>> args)
+    private void AddStethoscopeVerb(Entity<StethoscopeComponent> ent,
+        ref InventoryRelayedEvent<GetVerbsEvent<InnateVerb>> args)
     {
         if (!args.Args.CanInteract || !args.Args.CanAccess)
             return;
@@ -67,7 +63,13 @@ public sealed class StethoscopeSystem : EntitySystem
         if (!_container.TryGetContainingContainer((ent, null, null), out var container))
             return;
 
-        _doAfter.TryStartDoAfter(new DoAfterArgs(EntityManager, container.Owner, ent.Comp.Delay, new StethoscopeDoAfterEvent(), ent, target: target, used: ent)
+        _doAfter.TryStartDoAfter(new DoAfterArgs(EntityManager,
+            container.Owner,
+            ent.Comp.Delay,
+            new StethoscopeDoAfterEvent(),
+            ent,
+            target,
+            ent)
         {
             DuplicateCondition = DuplicateConditions.SameEvent,
             BreakOnMove = true,
@@ -95,9 +97,9 @@ public sealed class StethoscopeSystem : EntitySystem
     {
         // TODO: Add check for respirator component when it gets moved to shared.
         // If the mob is dead or cannot asphyxiation damage, the popup shows nothing.
-        if (!TryComp<MobStateComponent>(target, out var mobState)                        ||
+        if (!TryComp<MobStateComponent>(target, out var mobState) ||
             !TryComp<DamageableComponent>(target, out var damageComp) ||
-            _mobState.IsDead(target, mobState)                                           ||
+            _mobState.IsDead(target, mobState) ||
             !damageComp.Damage.DamageDict.TryGetValue(DamageToListenFor, out var asphyxDmg))
         {
             _popup.PopupPredicted(Loc.GetString("stethoscope-nothing"), target, user);
@@ -109,13 +111,15 @@ public sealed class StethoscopeSystem : EntitySystem
 
         // Don't show the change if this is the first time listening.
         if (stethoscope.Comp.LastMeasuredDamage == null)
-        {
             _popup.PopupPredicted(absString, target, user);
-        }
         else
         {
             var deltaString = GetDeltaDamageString(stethoscope.Comp.LastMeasuredDamage.Value, asphyxDmg);
-            _popup.PopupPredicted(Loc.GetString("stethoscope-combined-status", ("absolute", absString), ("delta", deltaString)), target, user);
+            _popup.PopupPredicted(Loc.GetString("stethoscope-combined-status",
+                    ("absolute", absString),
+                    ("delta", deltaString)),
+                target,
+                user);
         }
 
         stethoscope.Comp.LastMeasuredDamage = asphyxDmg;
@@ -129,7 +133,7 @@ public sealed class StethoscopeSystem : EntitySystem
             < 30 => "stethoscope-raggedy",
             < 60 => "stethoscope-hyper",
             < 80 => "stethoscope-irregular",
-            _    => "stethoscope-fucked",
+            _ => "stethoscope-fucked",
         };
         return Loc.GetString(msg);
     }
@@ -142,7 +146,6 @@ public sealed class StethoscopeSystem : EntitySystem
             return Loc.GetString("stethoscope-delta-worsening");
         return Loc.GetString("stethoscope-delta-steady");
     }
-
 }
 
 public sealed partial class StethoscopeActionEvent : EntityTargetActionEvent;

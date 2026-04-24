@@ -14,10 +14,6 @@ namespace Content.Shared.Construction.NodeEntities;
 [DataDefinition]
 public sealed partial class StaticNodeEntity : IGraphNodeEntity
 {
-    [DataField("id", customTypeSerializer:typeof(PrototypeIdSerializer<EntityPrototype>))]
-    [ViewVariables(VVAccess.ReadWrite)]
-    public string? Id { get; private set; }
-
     public StaticNodeEntity()
     {
     }
@@ -27,8 +23,9 @@ public sealed partial class StaticNodeEntity : IGraphNodeEntity
         Id = id;
     }
 
-    public string? GetId(EntityUid? uid, EntityUid? userUid, GraphNodeEntityArgs args)
-    {
-        return Id;
-    }
+    [DataField("id", customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
+    [ViewVariables(VVAccess.ReadWrite)]
+    public string? Id { get; private set; }
+
+    public string? GetId(EntityUid? uid, EntityUid? userUid, GraphNodeEntityArgs args) => Id;
 }

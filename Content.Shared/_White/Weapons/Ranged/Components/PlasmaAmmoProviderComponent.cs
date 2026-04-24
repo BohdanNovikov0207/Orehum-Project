@@ -7,9 +7,9 @@ namespace Content.Shared._White.Weapons.Ranged.Components;
 [RegisterComponent]
 public sealed partial class PlasmaAmmoProviderComponent : AmmoProviderComponent
 {
-    [DataField(required: true)]
-    public EntProtoId Proto;
-
     [DataField]
     public FixedPoint2 FireCost = 55f;
+
+    [DataField(required: true)]
+    public EntProtoId Proto;
 }

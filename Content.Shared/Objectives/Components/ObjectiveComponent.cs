@@ -9,15 +9,15 @@
 
 using Content.Shared.Mind;
 using Content.Shared.Objectives.Systems;
-using Robust.Shared.Utility;
 using Robust.Shared.Prototypes;
+using Robust.Shared.Utility;
 
 namespace Content.Shared.Objectives.Components;
 
 /// <summary>
 /// Required component for an objective entity prototype.
 /// </summary>
-[RegisterComponent, Access(typeof(SharedObjectivesSystem))]
+[RegisterComponent] [Access(typeof(SharedObjectivesSystem))]
 [EntityCategory("Objectives")]
 public sealed partial class ObjectiveComponent : Component
 {
@@ -28,24 +28,8 @@ public sealed partial class ObjectiveComponent : Component
     public float Difficulty;
 
     /// <summary>
-    /// Organisation that issued this objective, used for grouping and as a header above common objectives.
-    /// </summary>
-    [DataField("issuer", required: true)]
-    private LocId Issuer { get; set; }
-
-    [ViewVariables(VVAccess.ReadOnly)]
-    public string LocIssuer => Loc.GetString(Issuer);
-
-    /// <summary>
-    /// Unique objectives can only have 1 per prototype id.
-    /// Set this to false if you want multiple objectives of the same prototype.
-    /// </summary>
-    [DataField]
-    public bool Unique = true;
-
-    /// <summary>
     /// Icon of this objective to display in the character menu.
-    /// Can be specified by an <see cref="ObjectiveGetInfoEvent"/> handler but is usually done in the prototype.
+    /// Can be specified by an <see cref="ObjectiveGetInfoEvent" /> handler but is usually done in the prototype.
     /// </summary>
     [DataField]
     public SpriteSpecifier? Icon;
@@ -64,6 +48,22 @@ public sealed partial class ObjectiveComponent : Component
     [DataField]
     public bool ServerCurrencyRewardPartial;
 
+    /// <summary>
+    /// Unique objectives can only have 1 per prototype id.
+    /// Set this to false if you want multiple objectives of the same prototype.
+    /// </summary>
+    [DataField]
+    public bool Unique = true;
+
+    /// <summary>
+    /// Organisation that issued this objective, used for grouping and as a header above common objectives.
+    /// </summary>
+    [DataField("issuer", required: true)]
+    private LocId Issuer { get; set; }
+
+    [ViewVariables(VVAccess.ReadOnly)]
+    public string LocIssuer => Loc.GetString(Issuer);
+
     //Goobstation - end
 }
 
@@ -77,22 +77,26 @@ public record struct RequirementCheckEvent(EntityUid MindId, MindComponent Mind,
 
 /// <summary>
 /// Event raised on an objective after its requirements have been checked.
-/// If <see cref="Cancelled"/> is set to true, the objective is deleted.
+/// If <see cref="Cancelled" /> is set to true, the objective is deleted.
 /// Use this if the objective cannot be used, like a kill objective with no people alive.
 /// </summary>
 [ByRefEvent]
 public record struct ObjectiveAssignedEvent(EntityUid MindId, MindComponent Mind, bool Cancelled = false);
 
 /// <summary>
-/// Event raised on an objective after everything has handled <see cref="ObjectiveAssignedEvent"/>.
+/// Event raised on an objective after everything has handled <see cref="ObjectiveAssignedEvent" />.
 /// Use this to set the objective's title description or icon.
 /// </summary>
 [ByRefEvent]
-public record struct ObjectiveAfterAssignEvent(EntityUid MindId, MindComponent Mind, ObjectiveComponent Objective, MetaDataComponent Meta);
+public record struct ObjectiveAfterAssignEvent(
+    EntityUid MindId,
+    MindComponent Mind,
+    ObjectiveComponent Objective,
+    MetaDataComponent Meta);
 
 /// <summary>
 /// Event raised on an objective to update the Progress field.
-/// To use this yourself call <see cref="SharedObjectivesSystem.GetInfo"/> with the mind.
+/// To use this yourself call <see cref="SharedObjectivesSystem.GetInfo" /> with the mind.
 /// </summary>
 [ByRefEvent]
 public record struct ObjectiveGetProgressEvent(EntityUid MindId, MindComponent Mind, float? Progress = null);

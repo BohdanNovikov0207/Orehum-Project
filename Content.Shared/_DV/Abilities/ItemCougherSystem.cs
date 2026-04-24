@@ -17,12 +17,12 @@ namespace Content.Shared._DV.Abilities;
 
 public sealed class ItemCougherSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly INetManager _net = default!;
-    [Dependency] private readonly InventorySystem _inventory = default!;
     [Dependency] private readonly SharedActionsSystem _actions = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly InventorySystem _inventory = default!;
+    [Dependency] private readonly INetManager _net = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     private EntityQuery<ItemCougherComponent> _query;
 
@@ -95,7 +95,7 @@ public sealed class ItemCougherSystem : EntitySystem
     public void SetActionEnabled(Entity<ItemCougherComponent?> ent, bool enabled)
     {
         if (!_query.Resolve(ent, ref ent.Comp)
-        || ent.Comp.ActionEntity is not {} action)
+            || ent.Comp.ActionEntity is not { } action)
             return;
 
         _actions.SetEnabled(action, enabled);

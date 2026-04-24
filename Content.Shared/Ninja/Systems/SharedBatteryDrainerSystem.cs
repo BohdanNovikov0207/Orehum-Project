@@ -4,8 +4,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Ninja.Components;
 using Content.Shared.DoAfter;
+using Content.Shared.Ninja.Components;
 using Robust.Shared.Serialization;
 
 namespace Content.Shared.Ninja.Systems;
@@ -26,7 +26,8 @@ public abstract class SharedBatteryDrainerSystem : EntitySystem
     /// <summary>
     /// Cancel any drain doafters if the battery is removed or, on the server, gets filled.
     /// </summary>
-    protected virtual void OnDoAfterAttempt(Entity<BatteryDrainerComponent> ent, ref DoAfterAttemptEvent<DrainDoAfterEvent> args)
+    protected virtual void OnDoAfterAttempt(Entity<BatteryDrainerComponent> ent,
+        ref DoAfterAttemptEvent<DrainDoAfterEvent> args)
     {
         if (ent.Comp.BatteryUid == null)
             args.Cancel();
@@ -38,7 +39,7 @@ public abstract class SharedBatteryDrainerSystem : EntitySystem
     /// </summary>
     private void OnDoAfter(Entity<BatteryDrainerComponent> ent, ref DrainDoAfterEvent args)
     {
-        if (args.Cancelled || args.Handled || args.Target is not {} target)
+        if (args.Cancelled || args.Handled || args.Target is not { } target)
             return;
 
         // repeat if there is still power to drain
@@ -47,12 +48,10 @@ public abstract class SharedBatteryDrainerSystem : EntitySystem
 
     /// <summary>
     /// Attempt to drain as much power as possible into the powercell.
-    /// Client always predicts this as succeeding since power is serverside and it can only fail once, when the powercell is filled or the target is emptied.
+    /// Client always predicts this as succeeding since power is serverside and it can only fail once, when the powercell is
+    /// filled or the target is emptied.
     /// </summary>
-    protected virtual bool TryDrainPower(Entity<BatteryDrainerComponent> ent, EntityUid target)
-    {
-        return true;
-    }
+    protected virtual bool TryDrainPower(Entity<BatteryDrainerComponent> ent, EntityUid target) => true;
 
     /// <summary>
     /// Sets the battery field on the drainer.
@@ -68,7 +67,7 @@ public abstract class SharedBatteryDrainerSystem : EntitySystem
 }
 
 /// <summary>
-/// DoAfter event for <see cref="BatteryDrainerComponent"/>.
+/// DoAfter event for <see cref="BatteryDrainerComponent" />.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class DrainDoAfterEvent : SimpleDoAfterEvent;

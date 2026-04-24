@@ -12,21 +12,20 @@
 using Content.Shared.Nutrition.EntitySystems;
 using Robust.Shared.Audio;
 
-namespace Content.Shared.Nutrition.Components
+namespace Content.Shared.Nutrition.Components;
+
+[Access(typeof(SharedCreamPieSystem))]
+[RegisterComponent]
+public sealed partial class CreamPieComponent : Component
 {
-    [Access(typeof(SharedCreamPieSystem))]
-    [RegisterComponent]
-    public sealed partial class CreamPieComponent : Component
-    {
-        [DataField("paralyzeTime")]
-        public float ParalyzeTime { get; private set; } = 1f;
+    public const string PayloadSlotName = "payloadSlot";
 
-        [DataField("sound")]
-        public SoundSpecifier Sound { get; private set; } = new SoundCollectionSpecifier("desecration");
+    [DataField("paralyzeTime")]
+    public float ParalyzeTime { get; private set; } = 1f;
 
-        [ViewVariables]
-        public bool Splatted { get; set; } = false;
+    [DataField("sound")]
+    public SoundSpecifier Sound { get; private set; } = new SoundCollectionSpecifier("desecration");
 
-        public const string PayloadSlotName = "payloadSlot";
-    }
+    [ViewVariables]
+    public bool Splatted { get; set; } = false;
 }

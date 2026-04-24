@@ -1,5 +1,4 @@
 using Content.Shared.Alert;
-using Content.Shared.Bed.Sleep;
 using Content.Shared.Buckle.Components;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Components;
@@ -7,13 +6,11 @@ using Content.Shared.Database;
 using Content.Shared.DoAfter;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Input;
-using Content.Shared.Interaction;
 using Content.Shared.Movement.Events;
 using Content.Shared.Movement.Systems;
 using Content.Shared.Popups;
 using Content.Shared.Rejuvenate;
 using Content.Shared.Standing;
-using Content.Shared.StatusEffectNew.Components;
 using Robust.Shared.Audio;
 using Robust.Shared.Input.Binding;
 using Robust.Shared.Physics;
@@ -28,15 +25,14 @@ namespace Content.Shared.Stunnable;
 /// </summary>
 public abstract partial class SharedStunSystem
 {
-    private EntityQuery<CrawlerComponent> _crawlerQuery;
+    public static readonly ProtoId<AlertPrototype> KnockdownAlert = "Knockdown";
 
     [Dependency] private readonly EntityLookupSystem _entityLookup = default!;
     [Dependency] private readonly SharedHandsSystem _hands = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly SharedPhysicsSystem _physics = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly StandingStateSystem _standingState = default!;
-
-    public static readonly ProtoId<AlertPrototype> KnockdownAlert = "Knockdown";
+    private EntityQuery<CrawlerComponent> _crawlerQuery;
 
     private void InitializeKnockdown()
     {
@@ -72,7 +68,8 @@ public abstract partial class SharedStunSystem
         SubscribeLocalEvent<KnockedDownComponent, KnockedDownAlertEvent>(OnKnockedDownAlert);
 
         CommandBinds.Builder
-            .Bind(ContentKeyFunctions.ToggleKnockdown, InputCmdHandler.FromDelegate(HandleToggleKnockdown, handle: false))
+            .Bind(ContentKeyFunctions.ToggleKnockdown,
+                InputCmdHandler.FromDelegate(HandleToggleKnockdown, handle: false))
             .Register<SharedStunSystem>();
     }
 
@@ -100,6 +97,27 @@ public abstract partial class SharedStunSystem
             RemComp<KnockedDownComponent>(entity);
     }
 
+    #region DoAfter
+
+    private void OnStandDoAfter(Entity<KnockedDownComponent> entity, ref TryStandDoAfterEvent args)
+    {
+        entity.Comp.DoAfterId = null;
+
+        if (args.Cancelled || StandingBlocked(entity))
+        {
+            DirtyField(entity, entity.Comp, nameof(KnockedDownComponent.DoAfterId));
+            return;
+        }
+
+        RemComp<KnockedDownComponent>(entity);
+
+        _adminLogger.Add(LogType.Stamina,
+            LogImpact.Medium,
+            $"{ToPrettyString(entity):user} has stood up from knockdown.");
+    }
+
+    #endregion
+
     #region Startup and Shutdown
 
     private void OnKnockInit(Entity<KnockedDownComponent> entity, ref ComponentInit args)
@@ -124,7 +142,7 @@ public abstract partial class SharedStunSystem
     #region API
 
     /// <summary>
-    /// Sets the autostand property of a <see cref="KnockedDownComponent"/> on an entity to true or false and dirties it.
+    /// Sets the autostand property of a <see cref="KnockedDownComponent" /> on an entity to true or false and dirties it.
     /// Defaults to false.
     /// </summary>
     /// <param name="entity">Entity we want to edit the data field of.</param>
@@ -139,7 +157,7 @@ public abstract partial class SharedStunSystem
     }
 
     /// <summary>
-    /// Cancels the DoAfter of an entity with the <see cref="KnockedDownComponent"/> who is trying to stand.
+    /// Cancels the DoAfter of an entity with the <see cref="KnockedDownComponent" /> who is trying to stand.
     /// </summary>
     /// <param name="entity">Entity who we are canceling the DoAfter for.</param>
     public void CancelKnockdownDoAfter(Entity<KnockedDownComponent?> entity)
@@ -170,7 +188,7 @@ public abstract partial class SharedStunSystem
     }
 
     /// <summary>
-    /// Sets the next update datafield of an entity's <see cref="KnockedDownComponent"/> to a specific time.
+    /// Sets the next update datafield of an entity's <see cref="KnockedDownComponent" /> to a specific time.
     /// </summary>
     /// <param name="entity">Entity whose timer we're updating</param>
     /// <param name="time">The exact time we're setting the next update to.</param>
@@ -271,7 +289,9 @@ public abstract partial class SharedStunSystem
             // In case you're wondering, the KnockdownOverCheck, returns if we're able to move, so if next update is null.
             // An entity that can't crawl will stand up the next time they can move, which should prevent moving while knocked down.
             RemComp<KnockedDownComponent>(entity);
-            _adminLogger.Add(LogType.Stamina, LogImpact.Medium, $"{ToPrettyString(entity):user} has stood up from knockdown.");
+            _adminLogger.Add(LogType.Stamina,
+                LogImpact.Medium,
+                $"{ToPrettyString(entity):user} has stood up from knockdown.");
             return true;
         }
 
@@ -281,13 +301,14 @@ public abstract partial class SharedStunSystem
         var ev = new GetStandUpTimeEvent(crawler.StandTime);
         RaiseLocalEvent(entity, ref ev);
 
-        var doAfterArgs = new DoAfterArgs(EntityManager, entity, ev.DoAfterTime, new TryStandDoAfterEvent(), entity, entity)
-        {
-            MultiplyDelay = false, // Goob
-            CancelDuplicate = true,
-            RequireCanInteract = false,
-            BreakOnHandChange = true
-        };
+        var doAfterArgs =
+            new DoAfterArgs(EntityManager, entity, ev.DoAfterTime, new TryStandDoAfterEvent(), entity, entity)
+            {
+                MultiplyDelay = false, // Goob
+                CancelDuplicate = true,
+                RequireCanInteract = false,
+                BreakOnHandChange = true,
+            };
 
         // If we try standing don't try standing again
         if (!DoAfter.TryStartDoAfter(doAfterArgs, out var doAfterId))
@@ -307,7 +328,7 @@ public abstract partial class SharedStunSystem
     }
 
     /// <summary>
-    /// A variant of <see cref="CanStand"/> used when we're actually trying to stand.
+    /// A variant of <see cref="CanStand" /> used when we're actually trying to stand.
     /// Main difference is this one affects autostand datafields and also displays popups.
     /// </summary>
     /// <param name="entity">Entity we're checking</param>
@@ -324,9 +345,7 @@ public abstract partial class SharedStunSystem
             SetAutoStand((entity.Owner, entity.Comp), ev.Autostand);
 
         if (ev.Message != null)
-        {
             _popup.PopupClient(ev.Message.Value.Item1, entity, entity, ev.Message.Value.Item2);
-        }
 
         return !ev.Cancelled;
     }
@@ -358,12 +377,11 @@ public abstract partial class SharedStunSystem
         _popup.PopupClient(Loc.GetString("knockdown-component-stand-no-room"), entity, entity, PopupType.SmallCaution);
         SetAutoStand(entity.Owner);
         return true;
-
     }
 
     private void OnForceStandup(ForceStandUpEvent msg, EntitySessionEventArgs args)
     {
-        if (args.SenderSession.AttachedEntity is not {} user)
+        if (args.SenderSession.AttachedEntity is not { } user)
             return;
 
         ForceStandUp(user);
@@ -391,7 +409,9 @@ public abstract partial class SharedStunSystem
         // Remove Component
         RemComp<KnockedDownComponent>(entity);
 
-        _adminLogger.Add(LogType.Stamina, LogImpact.Medium, $"{ToPrettyString(entity):user} has force stood up from knockdown.");
+        _adminLogger.Add(LogType.Stamina,
+            LogImpact.Medium,
+            $"{ToPrettyString(entity):user} has force stood up from knockdown.");
     }
 
     private void OnKnockedDownAlert(Entity<KnockedDownComponent> entity, ref KnockedDownAlertEvent args)
@@ -417,26 +437,33 @@ public abstract partial class SharedStunSystem
 
         if (!Stamina.TryTakeStamina(entity, ev.Stamina, entity.Comp, visual: true))
         {
-            _popup.PopupClient(Loc.GetString("knockdown-component-pushup-failure"), entity, entity, PopupType.MediumCaution);
+            _popup.PopupClient(Loc.GetString("knockdown-component-pushup-failure"),
+                entity,
+                entity,
+                PopupType.MediumCaution);
             return false;
         }
 
         _popup.PopupClient(Loc.GetString("knockdown-component-pushup-success"), entity, entity);
-        _audio.PlayPredicted(entity.Comp.ForceStandSuccessSound, entity.Owner, entity.Owner, AudioParams.Default.WithVariation(0.025f).WithVolume(5f));
+        _audio.PlayPredicted(entity.Comp.ForceStandSuccessSound,
+            entity.Owner,
+            entity.Owner,
+            AudioParams.Default.WithVariation(0.025f).WithVolume(5f));
 
         return true;
     }
 
     /// <summary>
-    ///     Checks if standing would cause us to collide with something and potentially get stuck.
-    ///     Returns true if we will collide with something, and false if we will not.
+    /// Checks if standing would cause us to collide with something and potentially get stuck.
+    /// Returns true if we will collide with something, and false if we will not.
     /// </summary>
     private bool IntersectingStandingColliders(Entity<TransformComponent?> entity)
     {
         if (!Resolve(entity, ref entity.Comp))
             return false;
 
-        var intersecting = _physics.GetEntitiesIntersectingBody(entity, StandingStateSystem.StandingCollisionLayer, false);
+        var intersecting =
+            _physics.GetEntitiesIntersectingBody(entity, StandingStateSystem.StandingCollisionLayer, false);
 
         if (intersecting.Count == 0)
             return false;
@@ -458,7 +485,8 @@ public abstract partial class SharedStunSystem
 
             foreach (var fixture in fixtures.Fixtures.Values)
             {
-                if (!fixture.Hard || (fixture.CollisionMask & StandingStateSystem.StandingCollisionLayer) != StandingStateSystem.StandingCollisionLayer)
+                if (!fixture.Hard || (fixture.CollisionMask & StandingStateSystem.StandingCollisionLayer) !=
+                    StandingStateSystem.StandingCollisionLayer)
                     continue;
 
                 for (var i = 0; i < fixture.Shape.ChildCount; i++)
@@ -529,7 +557,6 @@ public abstract partial class SharedStunSystem
 
     // EE verbs end
 
-
     #endregion
 
     #region Action Blockers
@@ -548,25 +575,6 @@ public abstract partial class SharedStunSystem
 
     #endregion
 
-    #region DoAfter
-
-    private void OnStandDoAfter(Entity<KnockedDownComponent> entity, ref TryStandDoAfterEvent args)
-    {
-        entity.Comp.DoAfterId = null;
-
-        if (args.Cancelled || StandingBlocked(entity))
-        {
-            DirtyField(entity, entity.Comp, nameof(KnockedDownComponent.DoAfterId));
-            return;
-        }
-
-        RemComp<KnockedDownComponent>(entity);
-
-        _adminLogger.Add(LogType.Stamina, LogImpact.Medium, $"{ToPrettyString(entity):user} has stood up from knockdown.");
-    }
-
-    #endregion
-
     #region Movement and Friction
 
     private void RefreshKnockedMovement(Entity<KnockedDownComponent> ent)
@@ -581,15 +589,12 @@ public abstract partial class SharedStunSystem
         _movementSpeedModifier.RefreshFrictionModifiers(ent);
     }
 
-    private void OnRefreshKnockedSpeed(Entity<KnockedDownComponent> entity, ref RefreshMovementSpeedModifiersEvent args)
-    {
+    private void
+        OnRefreshKnockedSpeed(Entity<KnockedDownComponent> entity, ref RefreshMovementSpeedModifiersEvent args) =>
         args.ModifySpeed(entity.Comp.SpeedModifier);
-    }
 
-    private void OnKnockedTileFriction(Entity<KnockedDownComponent> entity, ref TileFrictionEvent args)
-    {
+    private void OnKnockedTileFriction(Entity<KnockedDownComponent> entity, ref TileFrictionEvent args) =>
         args.Modifier *= entity.Comp.FrictionModifier;
-    }
 
     private void OnRefreshFriction(Entity<KnockedDownComponent> entity, ref RefreshFrictionModifiersEvent args)
     {

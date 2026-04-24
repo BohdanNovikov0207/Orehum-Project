@@ -8,7 +8,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Administration.Events;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class AdminInfoEvent(NetUserId userid) : EntityEventArgs
 {
     public NetUserId user = userid;

@@ -33,7 +33,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Body.Components;
 using Content.Shared.Buckle;
 using Content.Shared.Buckle.Components;
 using Content.Shared.Construction.EntitySystems;
@@ -50,10 +49,16 @@ namespace Content.Shared.Foldable;
 // TODO: This system could arguably be refactored into a general state system, as it is being utilized for a lot of different objects with various needs.
 public sealed class FoldableSystem : EntitySystem
 {
+    [Serializable] [NetSerializable]
+    public enum FoldedVisuals : byte
+    {
+        State,
+    }
+
+    [Dependency] private readonly AnchorableSystem _anchorable = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
     [Dependency] private readonly SharedBuckleSystem _buckle = default!;
     [Dependency] private readonly SharedContainerSystem _container = default!;
-    [Dependency] private readonly AnchorableSystem _anchorable = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
 
     public override void Initialize()
@@ -71,15 +76,11 @@ public sealed class FoldableSystem : EntitySystem
         SubscribeLocalEvent<FoldableComponent, StrapAttemptEvent>(OnStrapAttempt);
     }
 
-    private void OnHandleState(EntityUid uid, FoldableComponent component, ref AfterAutoHandleStateEvent args)
-    {
+    private void OnHandleState(EntityUid uid, FoldableComponent component, ref AfterAutoHandleStateEvent args) =>
         SetFolded(uid, component, component.IsFolded);
-    }
 
-    private void OnFoldableInit(EntityUid uid, FoldableComponent component, ComponentInit args)
-    {
+    private void OnFoldableInit(EntityUid uid, FoldableComponent component, ComponentInit args) =>
         SetFolded(uid, component, component.IsFolded);
-    }
 
     private void OnFoldableOpenAttempt(EntityUid uid, FoldableComponent component, ref StorageOpenAttemptEvent args)
     {
@@ -112,7 +113,7 @@ public sealed class FoldableSystem : EntitySystem
     }
 
     /// <summary>
-    /// Set the folded state of the given <see cref="FoldableComponent"/>
+    /// Set the folded state of the given <see cref="FoldableComponent" />
     /// </summary>
     public void SetFolded(EntityUid uid, FoldableComponent component, bool folded)
     {
@@ -141,6 +142,7 @@ public sealed class FoldableSystem : EntitySystem
             else
                 _popup.PopupPredicted(Loc.GetString("foldable-fold-fail", ("object", uid)), uid, folder.Value);
         }
+
         return result;
     }
 
@@ -188,7 +190,7 @@ public sealed class FoldableSystem : EntitySystem
         {
             Act = () => TryToggleFold(uid, component, args.User),
             Text = component.IsFolded ? Loc.GetString(component.UnfoldVerbText) : Loc.GetString(component.FoldVerbText),
-            Icon = new SpriteSpecifier.Texture(new ("/Textures/Interface/VerbIcons/fold.svg.192dpi.png")),
+            Icon = new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/VerbIcons/fold.svg.192dpi.png")),
 
             // If the object is unfolded and they click it, they want to fold it, if it's folded, they want to pick it up
             Priority = component.IsFolded ? 0 : 2,
@@ -198,12 +200,6 @@ public sealed class FoldableSystem : EntitySystem
     }
 
     #endregion
-
-    [Serializable, NetSerializable]
-    public enum FoldedVisuals : byte
-    {
-        State
-    }
 }
 
 /// <summary>

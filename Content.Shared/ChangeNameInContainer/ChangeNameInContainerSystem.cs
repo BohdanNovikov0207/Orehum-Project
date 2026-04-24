@@ -5,13 +5,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Shared.Chat;
-using Robust.Shared.Containers;
-using Content.Shared.Whitelist;
 using Content.Shared.Speech;
+using Content.Shared.Whitelist;
+using Robust.Shared.Containers;
 
 namespace Content.Shared.ChangeNameInContainer;
 
-public sealed partial class ChangeNameInContainerSystem : EntitySystem
+public sealed class ChangeNameInContainerSystem : EntitySystem
 {
     [Dependency] private readonly SharedContainerSystem _container = default!;
     [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
@@ -32,5 +32,4 @@ public sealed partial class ChangeNameInContainerSystem : EntitySystem
         if (TryComp<SpeechComponent>(container.Owner, out var speechComp))
             args.SpeechVerb = speechComp.SpeechVerb;
     }
-
 }

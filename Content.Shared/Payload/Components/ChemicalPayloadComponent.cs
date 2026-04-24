@@ -11,7 +11,7 @@ using Robust.Shared.Serialization;
 namespace Content.Shared.Payload.Components;
 
 /// <summary>
-///     Chemical payload that mixes the solutions of two drain-able solution containers when triggered.
+/// Chemical payload that mixes the solutions of two drain-able solution containers when triggered.
 /// </summary>
 [RegisterComponent]
 public sealed partial class ChemicalPayloadComponent : Component
@@ -29,14 +29,14 @@ public sealed partial class ChemicalPayloadComponent : Component
     public List<string> KeysIn = new() { TriggerSystem.DefaultTriggerKey };
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum ChemicalPayloadVisuals : byte
 {
-    Slots
+    Slots,
 }
 
 [Flags]
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum ChemicalPayloadFilledSlots : byte
 {
     None = 0,

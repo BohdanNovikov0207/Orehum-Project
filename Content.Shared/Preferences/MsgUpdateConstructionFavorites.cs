@@ -11,9 +11,8 @@ namespace Content.Shared.Preferences;
 /// </summary>
 public sealed class MsgUpdateConstructionFavorites : NetMessage
 {
-    public override MsgGroups MsgGroup => MsgGroups.Command;
-
     public List<ProtoId<ConstructionPrototype>> Favorites = [];
+    public override MsgGroups MsgGroup => MsgGroups.Command;
 
     public override void ReadFromBuffer(NetIncomingMessage buffer, IRobustSerializer serializer)
     {

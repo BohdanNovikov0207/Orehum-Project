@@ -6,7 +6,7 @@ namespace Content.Shared.Speech.Components;
 /// <summary>
 /// This component is used to relay speech events to other systems.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class ActiveListenerComponent : Component
 {
     /// <summary>

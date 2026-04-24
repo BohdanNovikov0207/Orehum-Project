@@ -15,10 +15,8 @@ namespace Content.Shared._Goobstation.Wizard.Chemistry;
 [UsedImplicitly]
 public sealed partial class DropItemsEntityEffect : EntityEffect
 {
-    protected override string? ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys)
-    {
-        return Loc.GetString("reagent-effect-guidebook-drop-items", ("chance", Probability));
-    }
+    protected override string? ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys) =>
+        Loc.GetString("reagent-effect-guidebook-drop-items", ("chance", Probability));
 
     public override void Effect(EntityEffectBaseArgs args)
     {

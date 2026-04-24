@@ -33,17 +33,18 @@ public sealed partial class TriggerSystem
             args.Cancelled |= !ent.Comp.Enabled;
     }
 
-    private void OnToggleGetAltVerbs(Entity<ToggleTriggerConditionComponent> ent, ref GetVerbsEvent<AlternativeVerb> args)
+    private void OnToggleGetAltVerbs(Entity<ToggleTriggerConditionComponent> ent,
+        ref GetVerbsEvent<AlternativeVerb> args)
     {
         if (!args.CanInteract || !args.CanAccess || args.Hands == null)
             return;
 
         var user = args.User;
 
-        args.Verbs.Add(new AlternativeVerb()
+        args.Verbs.Add(new AlternativeVerb
         {
             Text = Loc.GetString(ent.Comp.ToggleVerb),
-            Act = () => Toggle(ent, user)
+            Act = () => Toggle(ent, user),
         });
     }
 

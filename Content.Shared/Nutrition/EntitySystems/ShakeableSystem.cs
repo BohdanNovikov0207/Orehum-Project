@@ -14,12 +14,12 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Nutrition.EntitySystems;
 
-public sealed partial class ShakeableSystem : EntitySystem
+public sealed class ShakeableSystem : EntitySystem
 {
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
     [Dependency] private readonly SharedHandsSystem _hands = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
 
     public override void Initialize()
     {
@@ -37,10 +37,10 @@ public sealed partial class ShakeableSystem : EntitySystem
         if (!CanShake((uid, component), args.User))
             return;
 
-        var shakeVerb = new Verb()
+        var shakeVerb = new Verb
         {
             Text = Loc.GetString(component.ShakeVerbText),
-            Act = () => TryStartShake((args.Target, component), args.User)
+            Act = () => TryStartShake((args.Target, component), args.User),
         };
         args.Verbs.Add(shakeVerb);
     }
@@ -70,9 +70,9 @@ public sealed partial class ShakeableSystem : EntitySystem
             user,
             entity.Comp.ShakeDuration,
             new ShakeDoAfterEvent(),
-            eventTarget: entity,
-            target: user,
-            used: entity)
+            entity,
+            user,
+            entity)
         {
             NeedHand = true,
             BreakOnDamage = true,
@@ -89,8 +89,12 @@ public sealed partial class ShakeableSystem : EntitySystem
         var userName = Identity.Entity(user, EntityManager);
         var shakeableName = Identity.Entity(entity, EntityManager);
 
-        var selfMessage = Loc.GetString(entity.Comp.ShakePopupMessageSelf, ("user", userName), ("shakeable", shakeableName));
-        var othersMessage = Loc.GetString(entity.Comp.ShakePopupMessageOthers, ("user", userName), ("shakeable", shakeableName));
+        var selfMessage = Loc.GetString(entity.Comp.ShakePopupMessageSelf,
+            ("user", userName),
+            ("shakeable", shakeableName));
+        var othersMessage = Loc.GetString(entity.Comp.ShakePopupMessageOthers,
+            ("user", userName),
+            ("shakeable", shakeableName));
         _popup.PopupPredicted(selfMessage, othersMessage, user, user);
 
         _audio.PlayPredicted(entity.Comp.ShakeSound, entity, user);
@@ -149,12 +153,12 @@ public record struct ShakeEvent(EntityUid? Shaker);
 /// entity will not be shaken.
 /// </summary>
 [ByRefEvent]
-public record struct AttemptShakeEvent()
+public record struct AttemptShakeEvent
 {
     public bool Cancelled;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class ShakeDoAfterEvent : SimpleDoAfterEvent
 {
 }

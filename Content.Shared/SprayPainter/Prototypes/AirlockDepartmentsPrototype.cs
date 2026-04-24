@@ -15,15 +15,15 @@ namespace Content.Shared.SprayPainter.Prototypes;
 /// Maps airlock style names to department ids.
 /// </summary>
 [Prototype]
-public sealed partial class AirlockDepartmentsPrototype : IPrototype
+public sealed class AirlockDepartmentsPrototype : IPrototype
 {
-    [IdDataField]
-    public string ID { get; private set; } = default!;
-
     /// <summary>
     /// Dictionary of style names to department ids.
     /// If a style does not have a department (e.g. external) it is set to null.
     /// </summary>
     [DataField(required: true)]
     public Dictionary<string, ProtoId<DepartmentPrototype>> Departments = new();
+
+    [IdDataField]
+    public string ID { get; } = default!;
 }

@@ -14,7 +14,7 @@ namespace Content.Shared.Anomaly.Components;
 /// <summary>
 /// Tracks anomalies going supercritical
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 [Access(typeof(SharedAnomalySystem))]
 [AutoGenerateComponentPause]
 public sealed partial class AnomalySupercriticalComponent : Component
@@ -22,7 +22,7 @@ public sealed partial class AnomalySupercriticalComponent : Component
     /// <summary>
     /// The time when the supercritical animation ends and it does whatever effect.
     /// </summary>
-    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer)), AutoNetworkedField]
+    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))] [AutoNetworkedField]
     [ViewVariables(VVAccess.ReadWrite)]
     [AutoPausedField]
     public TimeSpan EndTime;

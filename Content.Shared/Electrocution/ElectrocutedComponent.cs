@@ -6,10 +6,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-namespace Content.Shared.Electrocution
+namespace Content.Shared.Electrocution;
+
+[RegisterComponent]
+public sealed partial class ElectrocutedComponent : Component
 {
-    [RegisterComponent]
-    public sealed partial class ElectrocutedComponent : Component
-    {
-    }
 }

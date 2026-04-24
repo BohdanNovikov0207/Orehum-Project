@@ -60,14 +60,10 @@ public abstract partial class SharedStationAiSystem
     private void OnTryGetIdentityShortInfo(TryGetIdentityShortInfoEvent args)
     {
         if (args.Handled)
-        {
             return;
-        }
 
         if (!HasComp<StationAiHeldComponent>(args.ForActor))
-        {
             return;
-        }
         args.Title = $"{Name(args.ForActor)} ({Loc.GetString(JobNameLocId)})";
         args.Handled = true;
     }
@@ -77,7 +73,7 @@ public abstract partial class SharedStationAiSystem
         if (!TryGetCore(ent.Owner, out var core) || core.Comp?.RemoteEntity == null)
             return;
 
-        _xforms.DropNextTo(core.Comp.RemoteEntity.Value, core.Owner) ;
+        _xforms.DropNextTo(core.Comp.RemoteEntity.Value, core.Owner);
     }
 
     /// <summary>
@@ -150,8 +146,8 @@ public abstract partial class SharedStationAiSystem
             return;
 
         if (TryComp(ev.Actor, out StationAiHeldComponent? aiComp) &&
-           (!TryComp(ev.Target, out StationAiWhitelistComponent? whitelistComponent) ||
-            !ValidateAi((ev.Actor, aiComp))))
+            (!TryComp(ev.Target, out StationAiWhitelistComponent? whitelistComponent) ||
+             !ValidateAi((ev.Actor, aiComp))))
         {
             // Don't allow the AI to interact with anything that isn't powered.
             if (!PowerReceiver.IsPowered(ev.Target))
@@ -163,9 +159,7 @@ public abstract partial class SharedStationAiSystem
 
             // Don't allow the AI to interact with anything that it isn't allowed to (ex. AI wire is cut)
             if (whitelistComponent is { Enabled: false })
-            {
                 ShowDeviceNotRespondingPopup(ev.Actor);
-            }
             ev.Cancel();
         }
     }
@@ -178,9 +172,7 @@ public abstract partial class SharedStationAiSystem
                          && ent.Owner != args.Target
                          && args.Target != null;
         if (whitelistComponent is { Enabled: false })
-        {
             ShowDeviceNotRespondingPopup(ent.Owner);
-        }
     }
 
     private void OnTargetVerbs(Entity<StationAiWhitelistComponent> ent, ref GetVerbsEvent<AlternativeVerb> args)
@@ -191,9 +183,7 @@ public abstract partial class SharedStationAiSystem
         if (!args.CanComplexInteract
             || !HasComp<StationAiHeldComponent>(args.User)
             || !args.CanInteract)
-        {
             return;
-        }
 
         var user = args.User;
 
@@ -207,29 +197,23 @@ public abstract partial class SharedStationAiSystem
             Act = () =>
             {
                 if (isOpen)
-                {
                     _uiSystem.CloseUi(ent.Owner, AiUi.Key, user);
-                }
                 else
-                {
                     _uiSystem.OpenUi(ent.Owner, AiUi.Key, user);
-                }
-            }
+            },
         };
         args.Verbs.Add(verb);
     }
 
-    private void ShowDeviceNotRespondingPopup(EntityUid toEntity)
-    {
+    private void ShowDeviceNotRespondingPopup(EntityUid toEntity) =>
         _popup.PopupClient(Loc.GetString("ai-device-not-responding"), toEntity, PopupType.MediumCaution);
-    }
 }
 
 /// <summary>
 /// Raised from client to server as a BUI message wrapping the event to perform.
 /// Also handles AI action validation.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class StationAiRadialMessage : BoundUserInterfaceMessage
 {
     public BaseStationAiAction Event = default!;
@@ -241,21 +225,20 @@ public sealed class StationAiRadialMessage : BoundUserInterfaceMessage
 /// </summary>
 public sealed class StationAiRadial : BaseStationAiAction
 {
+    public BaseStationAiAction Event = default!;
     public SpriteSpecifier? Sprite;
 
     public string? Tooltip;
-
-    public BaseStationAiAction Event = default!;
 }
 
 /// <summary>
 /// Abstract parent for radial actions events.
 /// When a client requests a radial action this will get sent.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public abstract class BaseStationAiAction
 {
-    [field:NonSerialized]
+    [field: NonSerialized]
     public EntityUid User { get; set; }
 }
 
@@ -269,7 +252,7 @@ public record struct GetStationAiRadialEvent()
     public List<StationAiRadial> Actions = new();
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum AiUi : byte
 {
     Key,

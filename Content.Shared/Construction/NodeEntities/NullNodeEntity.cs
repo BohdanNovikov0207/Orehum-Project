@@ -12,8 +12,5 @@ namespace Content.Shared.Construction.NodeEntities;
 [DataDefinition]
 public sealed partial class NullNodeEntity : IGraphNodeEntity
 {
-    public string? GetId(EntityUid? uid, EntityUid? userUid, GraphNodeEntityArgs args)
-    {
-        return null;
-    }
+    public string? GetId(EntityUid? uid, EntityUid? userUid, GraphNodeEntityArgs args) => null;
 }

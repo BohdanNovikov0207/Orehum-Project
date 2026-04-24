@@ -10,12 +10,12 @@ namespace Content.Shared.Weapons.Misc;
 /// <summary>
 /// Added to entities tethered by a tethergun.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class TetheredComponent : Component
 {
-    [DataField("tetherer"), AutoNetworkedField]
-    public EntityUid Tetherer;
-
-    [ViewVariables(VVAccess.ReadWrite), DataField("originalAngularDamping"), AutoNetworkedField]
+    [ViewVariables(VVAccess.ReadWrite)] [DataField("originalAngularDamping")] [AutoNetworkedField]
     public float OriginalAngularDamping;
+
+    [DataField("tetherer")] [AutoNetworkedField]
+    public EntityUid Tetherer;
 }

@@ -55,19 +55,19 @@ namespace Content.Shared.Item.ItemToggle.Components;
 /// If you need extended functionality (e.g. requiring power) then add a new component and use events:
 /// ItemToggleActivateAttemptEvent, ItemToggleDeactivateAttemptEvent, ItemToggledEvent.
 /// </remarks>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class ItemToggleComponent : Component
 {
     /// <summary>
-    ///     The item's toggle state.
+    /// The item's toggle state.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public bool Activated = false;
 
     /// <summary>
     /// Can the entity be activated in the world.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public bool OnActivate = true;
 
     /// <summary>
@@ -78,62 +78,63 @@ public sealed partial class ItemToggleComponent : Component
     public bool OnUse = true;
 
     /// <summary>
-    /// Goobstation
-    /// Don't toggle on wielding/unwielding if false
+    /// The popup to show to someone activating this item.
     /// </summary>
-    [DataField]
-    public bool WieldToggle = true;
+    [DataField] [AutoNetworkedField]
+    public LocId? PopupActivate;
 
     /// <summary>
-    ///     The localized text to display in the verb to activate.
+    /// The popup to show to someone deactivating this item.
     /// </summary>
-    [DataField]
-    public string VerbToggleOn = "item-toggle-activate";
+    [DataField] [AutoNetworkedField]
+    public LocId? PopupDeactivate;
 
     /// <summary>
-    ///     The localized text to display in the verb to de-activate.
+    /// Whether the item's toggle can be predicted by the client.
+    /// </summary>
+    /// ///
+    /// <remarks>
+    /// If server-side systems affect the item's toggle, like charge/fuel systems, then the item is not predictable.
+    /// </remarks>
+    [DataField] [AutoNetworkedField]
+    public bool Predictable = true;
+
+    /// <summary>
+    /// The noise this item makes when it is toggled on.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public SoundSpecifier? SoundActivate;
+
+    /// <summary>
+    /// The noise this item makes when it is toggled off.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public SoundSpecifier? SoundDeactivate;
+
+    /// <summary>
+    /// The noise this item makes when it is toggled on.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public SoundSpecifier? SoundFailToActivate;
+
+    /// <summary>
+    /// The localized text to display in the verb to de-activate.
     /// </summary>
     [DataField]
     public string VerbToggleOff = "item-toggle-deactivate";
 
     /// <summary>
-    ///     Whether the item's toggle can be predicted by the client.
+    /// The localized text to display in the verb to activate.
     /// </summary>
-    /// /// <remarks>
-    /// If server-side systems affect the item's toggle, like charge/fuel systems, then the item is not predictable.
-    /// </remarks>
-    [DataField, AutoNetworkedField]
-    public bool Predictable = true;
+    [DataField]
+    public string VerbToggleOn = "item-toggle-activate";
 
     /// <summary>
-    ///     The noise this item makes when it is toggled on.
+    /// Goobstation
+    /// Don't toggle on wielding/unwielding if false
     /// </summary>
-    [DataField, AutoNetworkedField]
-    public SoundSpecifier? SoundActivate;
-
-    /// <summary>
-    ///     The noise this item makes when it is toggled off.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public SoundSpecifier? SoundDeactivate;
-
-    /// <summary>
-    ///     The popup to show to someone activating this item.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public LocId? PopupActivate;
-
-    /// <summary>
-    ///     The popup to show to someone deactivating this item.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public LocId? PopupDeactivate;
-
-    /// <summary>
-    ///     The noise this item makes when it is toggled on.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public SoundSpecifier? SoundFailToActivate;
+    [DataField]
+    public bool WieldToggle = true;
 }
 
 /// <summary>
@@ -142,18 +143,19 @@ public sealed partial class ItemToggleComponent : Component
 [ByRefEvent]
 public record struct ItemToggleActivateAttemptEvent(EntityUid? User)
 {
-    /// <summary>
-    /// Should we silently fail.
-    /// </summary>
-    public bool Silent = false;
+    public readonly EntityUid? User = User;
 
     public bool Cancelled = false;
-    public readonly EntityUid? User = User;
 
     /// <summary>
     /// Pop-up that gets shown to users explaining why the attempt was cancelled.
     /// </summary>
     public string? Popup;
+
+    /// <summary>
+    /// Should we silently fail.
+    /// </summary>
+    public bool Silent = false;
 }
 
 /// <summary>
@@ -162,18 +164,19 @@ public record struct ItemToggleActivateAttemptEvent(EntityUid? User)
 [ByRefEvent]
 public record struct ItemToggleDeactivateAttemptEvent(EntityUid? User)
 {
-    /// <summary>
-    /// Should we silently fail.
-    /// </summary>
-    public bool Silent = false;
+    public readonly EntityUid? User = User;
 
     public bool Cancelled = false;
-    public readonly EntityUid? User = User;
 
     /// <summary>
     /// Pop-up that gets shown to users explaining why the attempt was cancelled.
     /// </summary>
     public string? Popup;
+
+    /// <summary>
+    /// Should we silently fail.
+    /// </summary>
+    public bool Silent = false;
 }
 
 /// <summary>
@@ -182,7 +185,7 @@ public record struct ItemToggleDeactivateAttemptEvent(EntityUid? User)
 [ByRefEvent]
 public readonly record struct ItemToggledEvent(bool Predicted, bool Activated, EntityUid? User)
 {
-    public readonly bool Predicted = Predicted;
     public readonly bool Activated = Activated;
+    public readonly bool Predicted = Predicted;
     public readonly EntityUid? User = User;
 }

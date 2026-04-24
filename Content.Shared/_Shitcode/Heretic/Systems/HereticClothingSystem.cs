@@ -33,9 +33,7 @@ public sealed class HereticClothingSystem : EntitySystem
         args.Reason = Loc.GetString("heretic-clothing-component-fail");
     }
 
-    private bool IsTargetValid(EntityUid target)
-    {
-        return _heretic.IsHereticOrGhoul(target) || HasComp<WizardComponent>(target) ||
-               HasComp<ApprenticeComponent>(target);
-    }
+    private bool IsTargetValid(EntityUid target) =>
+        _heretic.IsHereticOrGhoul(target) || HasComp<WizardComponent>(target) ||
+        HasComp<ApprenticeComponent>(target);
 }

@@ -21,8 +21,6 @@ public abstract class SharedPowerNetSystem : EntitySystem
         SubscribeLocalEvent<AppearanceComponent, PowerChangedEvent>(OnPowerAppearance);
     }
 
-    private void OnPowerAppearance(Entity<AppearanceComponent> ent, ref PowerChangedEvent args)
-    {
+    private void OnPowerAppearance(Entity<AppearanceComponent> ent, ref PowerChangedEvent args) =>
         _appearance.SetData(ent, PowerDeviceVisuals.Powered, args.Powered, ent.Comp);
-    }
 }

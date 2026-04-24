@@ -11,15 +11,15 @@ namespace Content.Shared.Shuttles.BUIStates;
 /// <summary>
 /// State of each individual docking port for interface purposes
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class DockingPortState
 {
-    public string Name = string.Empty;
+    public Angle Angle;
 
     public NetCoordinates Coordinates;
-    public Angle Angle;
     public NetEntity Entity;
-    public bool Connected => GridDockedWith != null;
 
     public NetEntity? GridDockedWith;
+    public string Name = string.Empty;
+    public bool Connected => GridDockedWith != null;
 }

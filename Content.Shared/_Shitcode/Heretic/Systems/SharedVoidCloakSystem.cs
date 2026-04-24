@@ -13,7 +13,6 @@ using Content.Shared.Clothing.Components;
 using Content.Shared.Clothing.EntitySystems;
 using Content.Shared.Heretic;
 using Content.Shared.Inventory;
-using Content.Shared.Inventory.Events;
 using Content.Shared.Temperature;
 using Robust.Shared.Network;
 
@@ -21,8 +20,8 @@ namespace Content.Shared._Goobstation.Heretic.Systems;
 
 public abstract class SharedVoidCloakSystem : EntitySystem
 {
-    [Dependency] private readonly ClothingSystem _clothing = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly ClothingSystem _clothing = default!;
     [Dependency] private readonly INetManager _net = default!;
 
     public override void Initialize()
@@ -33,10 +32,12 @@ public abstract class SharedVoidCloakSystem : EntitySystem
         SubscribeLocalEvent<VoidCloakHoodComponent, EntityTerminatingEvent>(OnTerminating);
 
         SubscribeLocalEvent<VoidCloakComponent, InventoryRelayedEvent<CheckMagicItemEvent>>(OnCheckMagicItem);
-        SubscribeLocalEvent<VoidCloakComponent, InventoryRelayedEvent<ModifyChangedTemperatureEvent>>(OnTemperatureModify);
+        SubscribeLocalEvent<VoidCloakComponent, InventoryRelayedEvent<ModifyChangedTemperatureEvent>>(
+            OnTemperatureModify);
     }
 
-    private void OnTemperatureModify(Entity<VoidCloakComponent> ent, ref InventoryRelayedEvent<ModifyChangedTemperatureEvent> args)
+    private void OnTemperatureModify(Entity<VoidCloakComponent> ent,
+        ref InventoryRelayedEvent<ModifyChangedTemperatureEvent> args)
     {
         if (ent.Comp.Transparent || args.Args.TemperatureDelta > 0f)
             return;

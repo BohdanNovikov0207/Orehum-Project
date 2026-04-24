@@ -17,10 +17,11 @@ namespace Content.Shared.PowerCell.Components;
 public sealed partial class PowerCellSlotComponent : Component
 {
     /// <summary>
-    /// The actual item-slot that contains the cell. Allows all the interaction logic to be handled by <see cref="ItemSlotsSystem"/>.
+    /// The actual item-slot that contains the cell. Allows all the interaction logic to be handled by
+    /// <see cref="ItemSlotsSystem" />.
     /// </summary>
     /// <remarks>
-    /// Given that <see cref="PowerCellSystem"/> needs to verify that a given cell has the correct cell-size before
+    /// Given that <see cref="PowerCellSystem" /> needs to verify that a given cell has the correct cell-size before
     /// inserting anyways, there is no need to specify a separate entity whitelist. In this slot's yaml definition.
     /// </remarks>
     [DataField("cellSlotId", required: true)]
@@ -32,11 +33,11 @@ public sealed partial class PowerCellSlotComponent : Component
     /// </summary>
     [DataField("fitsInCharger")]
     public bool FitsInCharger = true;
-
 }
 
 /// <summary>
-///     Raised directed at an entity with a power cell slot when the power cell inside has its charge updated or is ejected/inserted.
+/// Raised directed at an entity with a power cell slot when the power cell inside has its charge updated or is
+/// ejected/inserted.
 /// </summary>
 public sealed class PowerCellChangedEvent : EntityEventArgs
 {

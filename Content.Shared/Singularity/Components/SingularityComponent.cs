@@ -10,10 +10,9 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Robust.Shared.GameStates;
-
 using Content.Shared.Singularity.EntitySystems;
 using Robust.Shared.Audio;
+using Robust.Shared.GameStates;
 
 namespace Content.Shared.Singularity.Components;
 
@@ -21,28 +20,9 @@ namespace Content.Shared.Singularity.Components;
 /// A component that makes the associated entity accumulate energy when an associated event horizon consumes things.
 /// Energy management is server-side.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class SingularityComponent : Component
 {
-    /// <summary>
-    /// The current level of the singularity.
-    /// Used as a scaling factor for things like visual size, event horizon radius, gravity well radius, radiation output, etc.
-    /// If you want to set this use <see cref="SharedSingularitySystem.SetLevel"/>().
-    /// </summary>
-    [Access(friends: typeof(SharedSingularitySystem), Other = AccessPermissions.Read, Self = AccessPermissions.Read)]
-    [DataField("level")]
-    public byte Level = 1;
-
-    /// <summary>
-    /// The amount of radiation this singularity emits per its level.
-    /// Has to be on shared in case someone attaches a RadiationPulseComponent to the singularity.
-    /// If you want to set this use <see cref="SharedSingularitySystem.SetRadsPerLevel"/>().
-    /// </summary>
-    [Access(friends: typeof(SharedSingularitySystem), Other = AccessPermissions.Read, Self = AccessPermissions.Read)]
-    [DataField("radsPerLevel")]
-    [ViewVariables(VVAccess.ReadWrite)]
-    public float RadsPerLevel = 2f;
-
     /// <summary>
     /// The amount of energy this singularity contains.
     /// </summary>
@@ -55,6 +35,25 @@ public sealed partial class SingularityComponent : Component
     [DataField("energyLoss")]
     [ViewVariables(VVAccess.ReadWrite)]
     public float EnergyDrain;
+
+    /// <summary>
+    /// The current level of the singularity.
+    /// Used as a scaling factor for things like visual size, event horizon radius, gravity well radius, radiation output, etc.
+    /// If you want to set this use <see cref="SharedSingularitySystem.SetLevel" />().
+    /// </summary>
+    [Access(friends: typeof(SharedSingularitySystem), Other = AccessPermissions.Read, Self = AccessPermissions.Read)]
+    [DataField("level")]
+    public byte Level = 1;
+
+    /// <summary>
+    /// The amount of radiation this singularity emits per its level.
+    /// Has to be on shared in case someone attaches a RadiationPulseComponent to the singularity.
+    /// If you want to set this use <see cref="SharedSingularitySystem.SetRadsPerLevel" />().
+    /// </summary>
+    [Access(friends: typeof(SharedSingularitySystem), Other = AccessPermissions.Read, Self = AccessPermissions.Read)]
+    [DataField("radsPerLevel")]
+    [ViewVariables(VVAccess.ReadWrite)]
+    public float RadsPerLevel = 2f;
 
     #region Audio
 
@@ -69,20 +68,20 @@ public sealed partial class SingularityComponent : Component
     );
 
     /// <summary>
-    /// The audio stream that plays the sound specified by <see cref="AmbientSound"/> on loop.
+    /// The audio stream that plays the sound specified by <see cref="AmbientSound" /> on loop.
     /// </summary>
     [ViewVariables(VVAccess.ReadWrite)]
     public EntityUid? AmbientSoundStream = null;
 
     /// <summary>
-    ///     The sound that the singularity produces when it forms.
+    /// The sound that the singularity produces when it forms.
     /// </summary>
     [DataField("formationSound")]
     [ViewVariables(VVAccess.ReadOnly)]
     public SoundSpecifier? FormationSound = null;
 
     /// <summary>
-    ///     The sound that the singularity produces when it dissipates.
+    /// The sound that the singularity produces when it dissipates.
     /// </summary>
     [DataField("dissipationSound")]
     [ViewVariables(VVAccess.ReadWrite)]

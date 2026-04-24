@@ -12,26 +12,26 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared._Goobstation.Heretic.Components;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class HereticRitualMessage(ProtoId<HereticRitualPrototype> protoId) : BoundUserInterfaceMessage
 {
     public ProtoId<HereticRitualPrototype> ProtoId = protoId;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum HereticRitualRuneUiKey : byte
 {
-    Key
+    Key,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class HereticShapeshiftMessage(ProtoId<PolymorphPrototype> protoId) : BoundUserInterfaceMessage
 {
     public ProtoId<PolymorphPrototype> ProtoId = protoId;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum HereticShapeshiftUiKey : byte
 {
-    Key
+    Key,
 }

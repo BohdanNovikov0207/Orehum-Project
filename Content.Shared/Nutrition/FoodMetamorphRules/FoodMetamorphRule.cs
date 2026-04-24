@@ -14,42 +14,48 @@ namespace Content.Shared.Nutrition.FoodMetamorphRules;
 /// abstract rules that are used to verify the correct foodSequence for recipe
 /// </summary>
 [ImplicitDataDefinitionForInheritors]
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public abstract partial class FoodMetamorphRule
 {
-    public abstract bool Check(IPrototypeManager protoMan, EntityManager entMan, EntityUid food, List<FoodSequenceVisualLayer> ingredients);
+    public abstract bool Check(IPrototypeManager protoMan,
+        EntityManager entMan,
+        EntityUid food,
+        List<FoodSequenceVisualLayer> ingredients);
 }
 
 /// <summary>
 /// The requirement that the sequence be within the specified size limit
 /// </summary>
 [UsedImplicitly]
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class SequenceLength : FoodMetamorphRule
 {
     [DataField(required: true)]
     public MinMax Range;
 
-    public override bool Check(IPrototypeManager protoMan, EntityManager entMan, EntityUid food, List<FoodSequenceVisualLayer> ingredients)
-    {
-        return ingredients.Count <= Range.Max && ingredients.Count >= Range.Min;
-    }
+    public override bool Check(IPrototypeManager protoMan,
+        EntityManager entMan,
+        EntityUid food,
+        List<FoodSequenceVisualLayer> ingredients) => ingredients.Count <= Range.Max && ingredients.Count >= Range.Min;
 }
 
 /// <summary>
 /// A requirement that the last element of the sequence have one or all of the required tags
 /// </summary>
 [UsedImplicitly]
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class LastElementHasTags : FoodMetamorphRule
 {
-    [DataField(required: true)]
-    public List<ProtoId<TagPrototype>> Tags = new ();
-
     [DataField]
     public bool NeedAll = true;
 
-    public override bool Check(IPrototypeManager protoMan, EntityManager entMan, EntityUid food, List<FoodSequenceVisualLayer> ingredients)
+    [DataField(required: true)]
+    public List<ProtoId<TagPrototype>> Tags = new();
+
+    public override bool Check(IPrototypeManager protoMan,
+        EntityManager entMan,
+        EntityUid food,
+        List<FoodSequenceVisualLayer> ingredients)
     {
         var lastIngredient = ingredients[ingredients.Count - 1];
 
@@ -61,14 +67,10 @@ public sealed partial class LastElementHasTags : FoodMetamorphRule
             var containsTag = protoIndexed.Tags.Contains(tag);
 
             if (NeedAll && !containsTag)
-            {
                 return false;
-            }
 
             if (!NeedAll && containsTag)
-            {
                 return true;
-            }
         }
 
         return NeedAll;
@@ -79,19 +81,22 @@ public sealed partial class LastElementHasTags : FoodMetamorphRule
 /// A requirement that the specified sequence element have one or all of the required tags
 /// </summary>
 [UsedImplicitly]
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class ElementHasTags : FoodMetamorphRule
 {
     [DataField(required: true)]
-    public int ElementNumber = 0;
-
-    [DataField(required: true)]
-    public List<ProtoId<TagPrototype>> Tags = new ();
+    public int ElementNumber;
 
     [DataField]
     public bool NeedAll = true;
 
-    public override bool Check(IPrototypeManager protoMan, EntityManager entMan, EntityUid food, List<FoodSequenceVisualLayer> ingredients)
+    [DataField(required: true)]
+    public List<ProtoId<TagPrototype>> Tags = new();
+
+    public override bool Check(IPrototypeManager protoMan,
+        EntityManager entMan,
+        EntityUid food,
+        List<FoodSequenceVisualLayer> ingredients)
     {
         if (ingredients.Count < ElementNumber + 1)
             return false;
@@ -104,14 +109,10 @@ public sealed partial class ElementHasTags : FoodMetamorphRule
             var containsTag = protoIndexed.Tags.Contains(tag);
 
             if (NeedAll && !containsTag)
-            {
                 return false;
-            }
 
             if (!NeedAll && containsTag)
-            {
                 return true;
-            }
         }
 
         return NeedAll;
@@ -122,19 +123,22 @@ public sealed partial class ElementHasTags : FoodMetamorphRule
 /// requirement that the food contains certain reagents (e.g. sauces)
 /// </summary>
 [UsedImplicitly]
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class FoodHasReagent : FoodMetamorphRule
 {
     [DataField(required: true)]
-    public ProtoId<ReagentPrototype> Reagent = new();
+    public MinMax Count;
 
     [DataField(required: true)]
-    public MinMax Count;
+    public ProtoId<ReagentPrototype> Reagent;
 
     [DataField]
     public string Solution = "food";
 
-    public override bool Check(IPrototypeManager protoMan, EntityManager entMan, EntityUid food, List<FoodSequenceVisualLayer> ingredients)
+    public override bool Check(IPrototypeManager protoMan,
+        EntityManager entMan,
+        EntityUid food,
+        List<FoodSequenceVisualLayer> ingredients)
     {
         if (!entMan.TryGetComponent<SolutionContainerManagerComponent>(food, out var solMan))
             return false;
@@ -163,19 +167,22 @@ public sealed partial class FoodHasReagent : FoodMetamorphRule
 /// A requirement that there be X ingredients in the sequence that have one or all of the specified tags.
 /// </summary>
 [UsedImplicitly]
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class IngredientsWithTags : FoodMetamorphRule
 {
-    [DataField(required: true)]
-    public List<ProtoId<TagPrototype>> Tags = new ();
-
     [DataField(required: true)]
     public MinMax Count = new();
 
     [DataField]
     public bool NeedAll = true;
 
-    public override bool Check(IPrototypeManager protoMan, EntityManager entMan, EntityUid food, List<FoodSequenceVisualLayer> ingredients)
+    [DataField(required: true)]
+    public List<ProtoId<TagPrototype>> Tags = new();
+
+    public override bool Check(IPrototypeManager protoMan,
+        EntityManager entMan,
+        EntityUid food,
+        List<FoodSequenceVisualLayer> ingredients)
     {
         var count = 0;
         foreach (var ingredient in ingredients)

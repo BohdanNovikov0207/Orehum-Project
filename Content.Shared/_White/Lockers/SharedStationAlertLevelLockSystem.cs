@@ -1,8 +1,8 @@
+using System.Linq;
 using Content.Shared.Emag.Systems;
 using Content.Shared.Examine;
 using Content.Shared.Lock;
 using Content.Shared.Popups;
-using System.Linq;
 
 namespace Content.Shared._White.Lockers;
 
@@ -49,7 +49,8 @@ public abstract class SharedStationAlertLevelLockSystem : EntitySystem
         if (!ent.Comp.Enabled || ent.Comp.LockedAlertLevels.Count == 0)
             return;
 
-        var levels = string.Join(", ", ent.Comp.LockedAlertLevels.Select( s => Loc.GetString($"alert-level-{s}").ToLower()));
+        var levels = string.Join(", ",
+            ent.Comp.LockedAlertLevels.Select(s => Loc.GetString($"alert-level-{s}").ToLower()));
 
         args.PushMarkup(Loc.GetString("station-alert-level-lock-examined", ("levels", levels)));
     }

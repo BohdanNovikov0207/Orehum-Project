@@ -23,17 +23,17 @@ using Content.Shared._Shitmed.Medical.Surgery.Consciousness.Systems;
 using Content.Shared._Shitmed.Medical.Surgery.Pain.Systems;
 using Content.Shared._Shitmed.Medical.Surgery.Steps;
 using Content.Shared._Shitmed.Medical.Surgery.Steps.Parts;
-using Content.Shared._Shitmed.Medical.Surgery.Wounds.Systems;
-using Content.Shared._Shitmed.Medical.Surgery.Wounds.Components;
 using Content.Shared._Shitmed.Medical.Surgery.Traumas.Systems;
+using Content.Shared._Shitmed.Medical.Surgery.Wounds.Components;
+using Content.Shared._Shitmed.Medical.Surgery.Wounds.Systems;
 using Content.Shared._Shitmed.Surgery;
-using Content.Shared.Buckle.Components;
 using Content.Shared.Body.Components;
+using Content.Shared.Body.Organ;
 using Content.Shared.Body.Part;
 using Content.Shared.Body.Systems;
+using Content.Shared.Buckle.Components;
 using Content.Shared.Containers.ItemSlots;
 using Content.Shared.DoAfter;
-using Content.Shared.Mobs.Systems;
 using Content.Shared.GameTicking;
 using Content.Shared.Hands;
 using Content.Shared.Hands.EntitySystems;
@@ -41,6 +41,7 @@ using Content.Shared.Humanoid;
 using Content.Shared.Humanoid.Markings;
 using Content.Shared.Interaction;
 using Content.Shared.Inventory;
+using Content.Shared.Mobs.Systems;
 using Content.Shared.Popups;
 using Content.Shared.Prototypes;
 using Content.Shared.Stacks;
@@ -51,37 +52,28 @@ using Robust.Shared.Map;
 using Robust.Shared.Network;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
-using Content.Shared.Body.Organ;
 
 namespace Content.Shared._Shitmed.Medical.Surgery;
 
 public abstract partial class SharedSurgerySystem : EntitySystem
 {
+    private readonly List<EntProtoId> _allSurgeries = new();
     [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly SharedBodySystem _body = default!;
     [Dependency] private readonly IComponentFactory _compFactory = default!;
+    [Dependency] private readonly ConsciousnessSystem _consciousness = default!;
     [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
     [Dependency] private readonly SharedHandsSystem _hands = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly SharedBodySystem _body = default!;
-    [Dependency] private readonly INetManager _net = default!;
     [Dependency] private readonly InventorySystem _inventory = default!;
     [Dependency] private readonly ItemSlotsSystem _itemSlotsSystem = default!;
     [Dependency] private readonly MobStateSystem _mobState = default!;
+    [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly PainSystem _pain = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly IPrototypeManager _prototypes = default!;
     [Dependency] private readonly RotateToFaceSystem _rotateToFace = default!;
-    [Dependency] private readonly StandingStateSystem _standing = default!;
     [Dependency] private readonly SharedStackSystem _stack = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly WoundSystem _wounds = default!;
-    [Dependency] private readonly TraumaSystem _trauma = default!;
-    [Dependency] private readonly ConsciousnessSystem _consciousness = default!;
-    [Dependency] private readonly PainSystem _pain = default!;
-    [Dependency] private readonly SharedUserInterfaceSystem _ui = default!;
-    [Dependency] protected readonly StatusEffectsSystem Status = default!;
-
-    private EntityQuery<BodyComponent> _bodyQuery;
-    private EntityQuery<StackComponent> _stackQuery;
+    [Dependency] private readonly StandingStateSystem _standing = default!;
 
     /// <summary>
     /// Cache of all surgery prototypes' singleton entities.
@@ -89,7 +81,15 @@ public abstract partial class SharedSurgerySystem : EntitySystem
     /// </summary>
     private readonly Dictionary<EntProtoId, EntityUid> _surgeries = new();
 
-    private readonly List<EntProtoId> _allSurgeries = new();
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
+    [Dependency] private readonly TraumaSystem _trauma = default!;
+    [Dependency] private readonly SharedUserInterfaceSystem _ui = default!;
+    [Dependency] private readonly WoundSystem _wounds = default!;
+    [Dependency] protected readonly StatusEffectsSystem Status = default!;
+
+    private EntityQuery<BodyComponent> _bodyQuery;
+    private EntityQuery<StackComponent> _stackQuery;
 
     /// <summary>
     /// Every surgery entity prototype id.
@@ -140,15 +140,10 @@ public abstract partial class SharedSurgerySystem : EntitySystem
             args.Args.Handled = true;
     }
 
-    private void OnSanitization(Entity<SanitizedComponent> ent, ref SurgerySanitizationEvent args)
-    {
+    private void OnSanitization(Entity<SanitizedComponent> ent, ref SurgerySanitizationEvent args) =>
         args.Handled = true;
-    }
 
-    private void OnRoundRestartCleanup(RoundRestartCleanupEvent ev)
-    {
-        _surgeries.Clear();
-    }
+    private void OnRoundRestartCleanup(RoundRestartCleanupEvent ev) => _surgeries.Clear();
 
     private void OnMapInit(Entity<SurgeryTargetComponent> ent, ref MapInitEvent args)
     {
@@ -164,7 +159,14 @@ public abstract partial class SharedSurgerySystem : EntitySystem
             return;
 
         if (args.Event.Target is not { } target
-            || !IsSurgeryValid(ent, target, args.Event.Surgery, args.Event.Step, args.Event.User, out var surgery, out var part, out var _)
+            || !IsSurgeryValid(ent,
+                target,
+                args.Event.Surgery,
+                args.Event.Step,
+                args.Event.User,
+                out var surgery,
+                out var part,
+                out _)
             || IsStepComplete(ent, part, args.Event.Step, surgery))
             args.Cancel();
     }
@@ -184,7 +186,14 @@ public abstract partial class SharedSurgerySystem : EntitySystem
         var tool = _hands.GetActiveItemOrSelf(args.User);
         if (args.Handled
             || args.Target is not { } target
-            || !IsSurgeryValid(ent, target, args.Surgery, args.Step, args.User, out var surgery, out var part, out var step)
+            || !IsSurgeryValid(ent,
+                target,
+                args.Surgery,
+                args.Step,
+                args.User,
+                out var surgery,
+                out var part,
+                out var step)
             || !PreviousStepsComplete(ent, part, surgery, args.Step, args.User)
             || !CanPerformStep(args.User, ent, part, step, tool, false))
         {
@@ -217,9 +226,7 @@ public abstract partial class SharedSurgerySystem : EntitySystem
             !HasComp<SkinRetractedComponent>(args.Part) ||
             !HasComp<BodyPartReattachedComponent>(args.Part) ||
             !HasComp<InternalBleedersClampedComponent>(args.Part))
-        {
             args.Cancelled = true;
-        }
     }
 
     private void OnWoundedValid(Entity<SurgeryWoundedConditionComponent> ent, ref SurgeryValidEvent args)
@@ -229,11 +236,12 @@ public abstract partial class SharedSurgerySystem : EntitySystem
                 args.Part,
                 partWoundable,
                 ent.Comp.DamageGroup,
-                healable: true) <= 0)
+                true) <= 0)
             args.Cancelled = true;
     }
 
-    private void OnBodyComponentConditionValid(Entity<SurgeryBodyComponentConditionComponent> ent, ref SurgeryValidEvent args)
+    private void OnBodyComponentConditionValid(Entity<SurgeryBodyComponentConditionComponent> ent,
+        ref SurgeryValidEvent args)
     {
         var present = true;
         foreach (var reg in ent.Comp.Components.Values)
@@ -247,7 +255,8 @@ public abstract partial class SharedSurgerySystem : EntitySystem
             args.Cancelled = true;
     }
 
-    private void OnPartComponentConditionValid(Entity<SurgeryPartComponentConditionComponent> ent, ref SurgeryValidEvent args)
+    private void OnPartComponentConditionValid(Entity<SurgeryPartComponentConditionComponent> ent,
+        ref SurgeryValidEvent args)
     {
         var present = true;
         foreach (var reg in ent.Comp.Components.Values)
@@ -270,7 +279,8 @@ public abstract partial class SharedSurgerySystem : EntitySystem
             return;
         }
 
-        var organSlotIdToOrgan = _body.GetPartOrgans(args.Part, part).ToDictionary(o => o.Component.SlotId, o => o.Component);
+        var organSlotIdToOrgan =
+            _body.GetPartOrgans(args.Part, part).ToDictionary(o => o.Component.SlotId, o => o.Component);
 
         var allOnAddFound = true;
         var zeroOnAddFound = true;
@@ -332,12 +342,12 @@ public abstract partial class SharedSurgerySystem : EntitySystem
             {
                 if (ent.Comp.Inverse
                     && (!ent.Comp.Reattaching
-                    || ent.Comp.Reattaching
-                    && !organs.Any(organ => HasComp<OrganReattachedComponent>(organ.Id))))
+                        || ent.Comp.Reattaching
+                        && !organs.Any(organ => HasComp<OrganReattachedComponent>(organ.Id))))
                     args.Cancelled = true;
                 // Start of DeltaV Additions - Checks if any organ has the removable component set to true, hiding it from the surgery UI
                 if (!organs.Any(organ => !TryComp<OrganComponent>(organ.Id, out var organComp)
-                    || organComp.Removable))
+                                         || organComp.Removable))
                     args.Cancelled = true;
                 // End of DeltaV Additions
             }
@@ -352,12 +362,12 @@ public abstract partial class SharedSurgerySystem : EntitySystem
             args.Cancelled |= ent.Comp.Accepted.Contains(bodyId) == ent.Comp.Inverse;
     }
 
-    private void OnOrganSlotConditionValid(Entity<SurgeryOrganSlotConditionComponent> ent, ref SurgeryValidEvent args)
-    {
+    private void
+        OnOrganSlotConditionValid(Entity<SurgeryOrganSlotConditionComponent> ent, ref SurgeryValidEvent args) =>
         args.Cancelled |= _body.CanInsertOrgan(args.Part, ent.Comp.OrganSlot) ^ !ent.Comp.Inverse;
-    }
 
-    private void OnPartRemovedConditionValid(Entity<SurgeryPartRemovedConditionComponent> ent, ref SurgeryValidEvent args)
+    private void OnPartRemovedConditionValid(Entity<SurgeryPartRemovedConditionComponent> ent,
+        ref SurgeryValidEvent args)
     {
         if (!_body.CanAttachToSlot(args.Part, ent.Comp.Connection))
         {
@@ -366,21 +376,23 @@ public abstract partial class SharedSurgerySystem : EntitySystem
         }
 
         var results = _body.GetBodyChildrenOfType(args.Body, ent.Comp.Part, symmetry: ent.Comp.Symmetry).ToList();
-        if (results is not { } || !results.Any())
+        if (results is null || !results.Any())
             return;
 
         if (!results.Any(part => HasComp<BodyPartReattachedComponent>(part.Id)))
             args.Cancelled = true;
     }
 
-    private void OnPartPresentConditionValid(Entity<SurgeryPartPresentConditionComponent> ent, ref SurgeryValidEvent args)
+    private void OnPartPresentConditionValid(Entity<SurgeryPartPresentConditionComponent> ent,
+        ref SurgeryValidEvent args)
     {
         if (args.Part == EntityUid.Invalid
             || !HasComp<BodyPartComponent>(args.Part))
             args.Cancelled = true;
     }
 
-    private void OnTraumaPresentConditionValid(Entity<SurgeryTraumaPresentConditionComponent> ent, ref SurgeryValidEvent args)
+    private void OnTraumaPresentConditionValid(Entity<SurgeryTraumaPresentConditionComponent> ent,
+        ref SurgeryValidEvent args)
     {
         if (args.Cancelled)
             return;
@@ -391,7 +403,8 @@ public abstract partial class SharedSurgerySystem : EntitySystem
             args.Cancelled = true;
     }
 
-    private void OnBleedsPresentConditionValid(Entity<SurgeryBleedsPresentConditionComponent> ent, ref SurgeryValidEvent args)
+    private void OnBleedsPresentConditionValid(Entity<SurgeryBleedsPresentConditionComponent> ent,
+        ref SurgeryValidEvent args)
     {
         if (!TryComp<WoundableComponent>(args.Part, out var woundable))
         {
@@ -409,15 +422,21 @@ public abstract partial class SharedSurgerySystem : EntitySystem
         var markingCategory = MarkingCategoriesConversion.FromHumanoidVisualLayers(ent.Comp.MarkingCategory);
 
         var hasMarking = TryComp(args.Body, out HumanoidAppearanceComponent? bodyAppearance)
-            && bodyAppearance.MarkingSet.Markings.TryGetValue(markingCategory, out var markingList)
-            && markingList.Any(marking => marking.MarkingId.Contains(ent.Comp.MatchString));
+                         && bodyAppearance.MarkingSet.Markings.TryGetValue(markingCategory, out var markingList)
+                         && markingList.Any(marking => marking.MarkingId.Contains(ent.Comp.MatchString));
 
-        if ((!ent.Comp.Inverse && hasMarking) || (ent.Comp.Inverse && !hasMarking))
+        if (!ent.Comp.Inverse && hasMarking || ent.Comp.Inverse && !hasMarking)
             args.Cancelled = true;
     }
 
-    protected bool IsSurgeryValid(EntityUid body, EntityUid targetPart, EntProtoId surgery, EntProtoId stepId,
-        EntityUid user, out Entity<SurgeryComponent> surgeryEnt, out EntityUid part, out EntityUid step)
+    protected bool IsSurgeryValid(EntityUid body,
+        EntityUid targetPart,
+        EntProtoId surgery,
+        EntProtoId stepId,
+        EntityUid user,
+        out Entity<SurgeryComponent> surgeryEnt,
+        out EntityUid part,
+        out EntityUid step)
     {
         surgeryEnt = default;
         part = default;
@@ -512,11 +531,14 @@ public abstract partial class SharedSurgerySystem : EntitySystem
         {
             Del(uid);
         }
+
         _surgeries.Clear();
 
         _allSurgeries.Clear();
         foreach (var entity in _prototypes.EnumeratePrototypes<EntityPrototype>())
+        {
             if (entity.HasComponent<SurgeryComponent>())
                 _allSurgeries.Add(new EntProtoId(entity.ID));
+        }
     }
 }

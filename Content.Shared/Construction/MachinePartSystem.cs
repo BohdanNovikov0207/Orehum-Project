@@ -13,122 +13,124 @@ using Content.Shared.Lathe;
 using Content.Shared.Materials;
 using Robust.Shared.Prototypes;
 
-namespace Content.Shared.Construction
+namespace Content.Shared.Construction;
+
+/// <summary>
+/// Deals with machine parts and machine boards.
+/// </summary>
+public sealed class MachinePartSystem : EntitySystem
 {
-    /// <summary>
-    /// Deals with machine parts and machine boards.
-    /// </summary>
-    public sealed class MachinePartSystem : EntitySystem
+    [Dependency] private readonly SharedConstructionSystem _construction = default!;
+    [Dependency] private readonly SharedLatheSystem _lathe = default!;
+    [Dependency] private readonly IPrototypeManager _prototype = default!;
+
+    public override void Initialize()
     {
-        [Dependency] private readonly IPrototypeManager _prototype = default!;
-        [Dependency] private readonly SharedLatheSystem _lathe = default!;
-        [Dependency] private readonly SharedConstructionSystem _construction = default!;
+        base.Initialize();
+        SubscribeLocalEvent<MachineBoardComponent, ExaminedEvent>(OnMachineBoardExamined);
+    }
 
-        public override void Initialize()
+    private void OnMachineBoardExamined(EntityUid uid, MachineBoardComponent component, ExaminedEvent args)
+    {
+        if (!args.IsInDetailsRange)
+            return;
+
+        using (args.PushGroup(nameof(MachineBoardComponent)))
         {
-            base.Initialize();
-            SubscribeLocalEvent<MachineBoardComponent, ExaminedEvent>(OnMachineBoardExamined);
-        }
-
-        private void OnMachineBoardExamined(EntityUid uid, MachineBoardComponent component, ExaminedEvent args)
-        {
-            if (!args.IsInDetailsRange)
-                return;
-
-            using (args.PushGroup(nameof(MachineBoardComponent)))
+            args.PushMarkup(Loc.GetString("machine-board-component-on-examine-label"));
+            foreach (var (material, amount) in component.StackRequirements)
             {
-                args.PushMarkup(Loc.GetString("machine-board-component-on-examine-label"));
-                foreach (var (material, amount) in component.StackRequirements)
-                {
-                    var stack = _prototype.Index(material);
-                    var name = _prototype.Index(stack.Spawn).Name;
+                var stack = _prototype.Index(material);
+                var name = _prototype.Index(stack.Spawn).Name;
 
-                    args.PushMarkup(Loc.GetString("machine-board-component-required-element-entry-text",
-                        ("amount", amount),
-                        ("requiredElement", Loc.GetString(name))));
+                args.PushMarkup(Loc.GetString("machine-board-component-required-element-entry-text",
+                    ("amount", amount),
+                    ("requiredElement", Loc.GetString(name))));
+            }
+
+            foreach (var (_, info) in component.ComponentRequirements)
+            {
+                var examineName = _construction.GetExamineName(info);
+                args.PushMarkup(Loc.GetString("machine-board-component-required-element-entry-text",
+                    ("amount", info.Amount),
+                    ("requiredElement", examineName)));
+            }
+
+            foreach (var (_, info) in component.TagRequirements)
+            {
+                var examineName = _construction.GetExamineName(info);
+                args.PushMarkup(Loc.GetString("machine-board-component-required-element-entry-text",
+                    ("amount", info.Amount),
+                    ("requiredElement", examineName)));
+            }
+        }
+    }
+
+    public Dictionary<string, int> GetMachineBoardMaterialCost(Entity<MachineBoardComponent> entity,
+        int coefficient = 1)
+    {
+        var (_, comp) = entity;
+
+        var materials = new Dictionary<string, int>();
+
+        foreach (var (stackId, amount) in comp.StackRequirements)
+        {
+            var stackProto = _prototype.Index(stackId);
+            var defaultProto = _prototype.Index(stackProto.Spawn);
+
+            if (defaultProto.TryGetComponent<PhysicalCompositionComponent>(out var physComp,
+                    EntityManager.ComponentFactory))
+            {
+                foreach (var (mat, matAmount) in physComp.MaterialComposition)
+                {
+                    materials.TryAdd(mat, 0);
+                    materials[mat] += matAmount * amount * coefficient;
                 }
+            }
+            else if (_lathe.TryGetRecipesFromEntity(stackProto.Spawn, out var recipes))
+            {
+                var partRecipe = recipes[0];
+                if (recipes.Count > 1)
+                    partRecipe = recipes.MinBy(p => p.Materials.Values.Sum());
 
-                foreach (var (_, info) in component.ComponentRequirements)
+                foreach (var (mat, matAmount) in partRecipe!.Materials)
                 {
-                    var examineName = _construction.GetExamineName(info);
-                    args.PushMarkup(Loc.GetString("machine-board-component-required-element-entry-text",
-                        ("amount", info.Amount),
-                        ("requiredElement", examineName)));
-                }
-
-                foreach (var (_, info) in component.TagRequirements)
-                {
-                    var examineName = _construction.GetExamineName(info);
-                    args.PushMarkup(Loc.GetString("machine-board-component-required-element-entry-text",
-                        ("amount", info.Amount),
-                        ("requiredElement", examineName)));
+                    materials.TryAdd(mat, 0);
+                    materials[mat] += matAmount * amount * coefficient;
                 }
             }
         }
 
-        public Dictionary<string, int> GetMachineBoardMaterialCost(Entity<MachineBoardComponent> entity, int coefficient = 1)
+        var genericPartInfo = comp.ComponentRequirements.Values.Concat(comp.ComponentRequirements.Values);
+        foreach (var info in genericPartInfo)
         {
-            var (_, comp) = entity;
+            var amount = info.Amount;
+            var defaultProtoId = info.DefaultPrototype;
 
-            var materials = new Dictionary<string, int>();
-
-            foreach (var (stackId, amount) in comp.StackRequirements)
+            if (_lathe.TryGetRecipesFromEntity(defaultProtoId, out var recipes))
             {
-                var stackProto = _prototype.Index(stackId);
-                var defaultProto = _prototype.Index(stackProto.Spawn);
+                var partRecipe = recipes[0];
+                if (recipes.Count > 1)
+                    partRecipe = recipes.MinBy(p => p.Materials.Values.Sum());
 
-                if (defaultProto.TryGetComponent<PhysicalCompositionComponent>(out var physComp, EntityManager.ComponentFactory))
+                foreach (var (mat, matAmount) in partRecipe!.Materials)
                 {
-                    foreach (var (mat, matAmount) in physComp.MaterialComposition)
-                    {
-                        materials.TryAdd(mat, 0);
-                        materials[mat] += matAmount * amount * coefficient;
-                    }
-                }
-                else if (_lathe.TryGetRecipesFromEntity(stackProto.Spawn, out var recipes))
-                {
-                    var partRecipe = recipes[0];
-                    if (recipes.Count > 1)
-                        partRecipe = recipes.MinBy(p => p.Materials.Values.Sum());
-
-                    foreach (var (mat, matAmount) in partRecipe!.Materials)
-                    {
-                        materials.TryAdd(mat, 0);
-                        materials[mat] += matAmount * amount * coefficient;
-                    }
+                    materials.TryAdd(mat, 0);
+                    materials[mat] += matAmount * amount * coefficient;
                 }
             }
-
-            var genericPartInfo = comp.ComponentRequirements.Values.Concat(comp.ComponentRequirements.Values);
-            foreach (var info in genericPartInfo)
+            else if (_prototype.TryIndex(defaultProtoId, out var defaultProto) &&
+                     defaultProto.TryGetComponent<PhysicalCompositionComponent>(out var physComp,
+                         EntityManager.ComponentFactory))
             {
-                var amount = info.Amount;
-                var defaultProtoId = info.DefaultPrototype;
-
-                if (_lathe.TryGetRecipesFromEntity(defaultProtoId, out var recipes))
+                foreach (var (mat, matAmount) in physComp.MaterialComposition)
                 {
-                    var partRecipe = recipes[0];
-                    if (recipes.Count > 1)
-                        partRecipe = recipes.MinBy(p => p.Materials.Values.Sum());
-
-                    foreach (var (mat, matAmount) in partRecipe!.Materials)
-                    {
-                        materials.TryAdd(mat, 0);
-                        materials[mat] += matAmount * amount * coefficient;
-                    }
-                }
-                else if (_prototype.TryIndex(defaultProtoId, out var defaultProto) &&
-                         defaultProto.TryGetComponent<PhysicalCompositionComponent>(out var physComp, EntityManager.ComponentFactory))
-                {
-                    foreach (var (mat, matAmount) in physComp.MaterialComposition)
-                    {
-                        materials.TryAdd(mat, 0);
-                        materials[mat] += matAmount * amount * coefficient;
-                    }
+                    materials.TryAdd(mat, 0);
+                    materials[mat] += matAmount * amount * coefficient;
                 }
             }
-
-            return materials;
         }
+
+        return materials;
     }
 }

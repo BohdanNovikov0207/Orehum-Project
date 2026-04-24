@@ -17,5 +17,4 @@ public abstract partial class SharedPowerChargeComponent : Component
     /// </summary>
     [DataField]
     public LocId WindowTitle { get; set; } = string.Empty;
-
 }

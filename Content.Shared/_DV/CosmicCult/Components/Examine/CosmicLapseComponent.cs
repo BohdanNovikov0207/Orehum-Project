@@ -5,5 +5,5 @@ namespace Content.Shared._DV.CosmicCult.Components.Examine;
 /// <summary>
 /// Marker component for targets under the effect of Abberant Lapse.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class CosmicLapseComponent : Component;

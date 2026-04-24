@@ -12,8 +12,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Alert;
 using Content.Goobstation.Maths.FixedPoint;
+using Content.Shared.Alert;
 using Content.Shared.Mobs.Systems;
 using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
@@ -21,30 +21,18 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Mobs.Components;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 [Access(typeof(MobThresholdSystem))]
 public sealed partial class MobThresholdsComponent : Component
 {
-    [DataField("thresholds", required: true)]
-    public SortedDictionary<FixedPoint2, MobState> Thresholds = new();
-
-    [DataField("triggersAlerts")]
-    public bool TriggersAlerts = true;
+    /// <summary>
+    /// Whether or not this entity can be revived out of a dead state.
+    /// </summary>
+    [DataField("allowRevives")]
+    public bool AllowRevives;
 
     [DataField("currentThresholdState")]
     public MobState CurrentThresholdState;
-
-    /// <summary>
-    /// The health alert that should be displayed for player controlled entities.
-    /// Used for alternate health alerts (silicons, for example)
-    /// </summary>
-    [DataField("stateAlertDict")]
-    public Dictionary<MobState, ProtoId<AlertPrototype>> StateAlertDict = new()
-    {
-        {MobState.Alive, "HumanHealth"},
-        {MobState.Critical, "HumanCrit"},
-        {MobState.Dead, "HumanDead"},
-    };
 
     [DataField]
     public ProtoId<AlertCategoryPrototype> HealthAlertCategory = "Health";
@@ -56,32 +44,43 @@ public sealed partial class MobThresholdsComponent : Component
     public bool ShowOverlays = true;
 
     /// <summary>
-    /// Whether or not this entity can be revived out of a dead state.
+    /// The health alert that should be displayed for player controlled entities.
+    /// Used for alternate health alerts (silicons, for example)
     /// </summary>
-    [DataField("allowRevives")]
-    public bool AllowRevives;
+    [DataField("stateAlertDict")]
+    public Dictionary<MobState, ProtoId<AlertPrototype>> StateAlertDict = new()
+    {
+        { MobState.Alive, "HumanHealth" },
+        { MobState.Critical, "HumanCrit" },
+        { MobState.Dead, "HumanDead" },
+    };
+
+    [DataField("thresholds", required: true)]
+    public SortedDictionary<FixedPoint2, MobState> Thresholds = new();
+
+    [DataField("triggersAlerts")]
+    public bool TriggersAlerts = true;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class MobThresholdsComponentState : ComponentState
 {
-    public Dictionary<FixedPoint2, MobState> UnsortedThresholds;
-
-    public bool TriggersAlerts;
+    public bool AllowRevives;
 
     public MobState CurrentThresholdState;
 
-    public Dictionary<MobState, ProtoId<AlertPrototype>> StateAlertDict;
-
     public bool ShowOverlays;
 
-    public bool AllowRevives;
+    public Dictionary<MobState, ProtoId<AlertPrototype>> StateAlertDict;
+
+    public bool TriggersAlerts;
+    public Dictionary<FixedPoint2, MobState> UnsortedThresholds;
 
     public MobThresholdsComponentState(Dictionary<FixedPoint2, MobState> unsortedThresholds,
         bool triggersAlerts,
         MobState currentThresholdState,
         Dictionary<MobState,
-        ProtoId<AlertPrototype>> stateAlertDict,
+            ProtoId<AlertPrototype>> stateAlertDict,
         bool showOverlays,
         bool allowRevives)
     {

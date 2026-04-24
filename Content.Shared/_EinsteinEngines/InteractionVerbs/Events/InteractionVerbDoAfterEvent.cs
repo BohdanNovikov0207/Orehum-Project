@@ -10,14 +10,15 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.InteractionVerbs.Events;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class InteractionVerbDoAfterEvent : SimpleDoAfterEvent
 {
+    [NonSerialized]
+    public InteractionArgs?
+        VerbArgs; // Only ever used on the server, it should be fine™. If it ever isn't, move the entire code to server and forget it.
+
     [DataField]
     public ProtoId<InteractionVerbPrototype>? VerbPrototype;
-
-    [NonSerialized]
-    public InteractionArgs? VerbArgs; // Only ever used on the server, it should be fine™. If it ever isn't, move the entire code to server and forget it.
 
     public InteractionVerbDoAfterEvent(ProtoId<InteractionVerbPrototype>? verbPrototype, InteractionArgs? verbArgs)
     {

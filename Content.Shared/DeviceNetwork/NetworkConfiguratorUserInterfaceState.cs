@@ -18,7 +18,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.DeviceNetwork;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class NetworkConfiguratorUserInterfaceState : BoundUserInterfaceState
 {
     public readonly HashSet<(string address, string name)> DeviceList;
@@ -29,7 +29,7 @@ public sealed class NetworkConfiguratorUserInterfaceState : BoundUserInterfaceSt
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class DeviceListUserInterfaceState : BoundUserInterfaceState
 {
     public readonly HashSet<(string address, string name)> DeviceList;
@@ -40,15 +40,15 @@ public sealed class DeviceListUserInterfaceState : BoundUserInterfaceState
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class DeviceLinkUserInterfaceState : BoundUserInterfaceState
 {
-    public readonly ProtoId<SourcePortPrototype>[] Sources;
-    public readonly ProtoId<SinkPortPrototype>[] Sinks;
-    public readonly HashSet<(ProtoId<SourcePortPrototype> source, ProtoId<SinkPortPrototype> sink)> Links;
     public readonly List<(string source, string sink)>? Defaults;
-    public readonly string SourceAddress;
+    public readonly HashSet<(ProtoId<SourcePortPrototype> source, ProtoId<SinkPortPrototype> sink)> Links;
     public readonly string SinkAddress;
+    public readonly ProtoId<SinkPortPrototype>[] Sinks;
+    public readonly string SourceAddress;
+    public readonly ProtoId<SourcePortPrototype>[] Sources;
 
     public DeviceLinkUserInterfaceState(
         ProtoId<SourcePortPrototype>[] sources,

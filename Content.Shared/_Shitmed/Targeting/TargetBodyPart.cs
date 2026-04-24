@@ -11,7 +11,6 @@
 
 namespace Content.Shared._Shitmed.Targeting;
 
-
 /// <summary>
 /// Represents and enum of possible target parts.
 /// </summary>

@@ -36,10 +36,7 @@ public record struct WieldAttemptEvent(EntityUid User, EntityUid Wielded, bool C
     public string? Message;
 
     SlotFlags IInventoryRelayEvent.TargetSlots => SlotFlags.WITHOUT_POCKET;
-    public void Cancel()
-    {
-        Cancelled = true;
-    }
+    public void Cancel() => Cancelled = true;
 }
 
 /// <summary>
@@ -50,7 +47,8 @@ public record struct WieldAttemptEvent(EntityUid User, EntityUid Wielded, bool C
 /// This event is not raised if the user is forced to unwield the item.
 /// </remarks>
 [ByRefEvent]
-public record struct UnwieldAttemptEvent(EntityUid User, EntityUid Wielded, bool Cancelled = false) : IInventoryRelayEvent
+public record struct UnwieldAttemptEvent(EntityUid User, EntityUid Wielded, bool Cancelled = false)
+    : IInventoryRelayEvent
 {
     /// <summary>
     /// Popup message for the user to tell them why they cannot unwield if Cancelled
@@ -58,8 +56,5 @@ public record struct UnwieldAttemptEvent(EntityUid User, EntityUid Wielded, bool
     public string? Message;
 
     SlotFlags IInventoryRelayEvent.TargetSlots => SlotFlags.WITHOUT_POCKET;
-    public void Cancel()
-    {
-        Cancelled = true;
-    }
+    public void Cancel() => Cancelled = true;
 }

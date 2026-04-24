@@ -9,15 +9,15 @@ namespace Content.Shared.Chemistry.EntitySystems.Hypospray;
 /// Raised on a hypospray when it successfully injects.
 /// </summary>
 [ByRefEvent]
-public record struct AfterHyposprayInjectsEvent()
+public record struct AfterHyposprayInjectsEvent
 {
-    /// <summary>
-    /// Entity that used the hypospray.
-    /// </summary>
-    public EntityUid User;
-
     /// <summary>
     /// Entity that was injected.
     /// </summary>
     public EntityUid Target;
+
+    /// <summary>
+    /// Entity that used the hypospray.
+    /// </summary>
+    public EntityUid User;
 }

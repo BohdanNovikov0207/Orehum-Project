@@ -8,14 +8,14 @@ namespace Content.Shared._White.Xenomorphs.Infection;
 public abstract partial class SharedXenomorphInfectionComponent : Component
 {
     /// <summary>
-    /// A set of prototype IDs for status icons representing different growth stages of the infection.
-    /// </summary>
-    [DataField]
-    public Dictionary<int, ProtoId<InfectionIconPrototype>> InfectedIcons = new();
-
-    /// <summary>
     /// Current stage of infection development.
     /// </summary>
     [ViewVariables(VVAccess.ReadWrite)]
     public int GrowthStage;
+
+    /// <summary>
+    /// A set of prototype IDs for status icons representing different growth stages of the infection.
+    /// </summary>
+    [DataField]
+    public Dictionary<int, ProtoId<InfectionIconPrototype>> InfectedIcons = new();
 }

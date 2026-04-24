@@ -4,23 +4,23 @@ using Robust.Shared.Utility;
 namespace Content.Shared._DV.CosmicCult.Prototypes;
 
 [Prototype]
-public sealed partial class GlyphPrototype : IPrototype
+public sealed class GlyphPrototype : IPrototype
 {
-    [IdDataField]
-    public string ID { get; private set; } = default!;
-
     [DataField(required: true)]
-    public LocId Name;
-
-    [DataField]
-    public LocId Tooltip;
+    public EntProtoId Entity;
 
     [DataField(required: true)]
     public SpriteSpecifier Icon = SpriteSpecifier.Invalid;
 
     [DataField(required: true)]
-    public EntProtoId Entity;
+    public LocId Name;
 
     [DataField(required: true)]
     public int Tier;
+
+    [DataField]
+    public LocId Tooltip;
+
+    [IdDataField]
+    public string ID { get; } = default!;
 }

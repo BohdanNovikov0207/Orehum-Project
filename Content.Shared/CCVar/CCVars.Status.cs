@@ -14,5 +14,4 @@ public sealed partial class CCVars
 
     public static readonly CVarDef<string> StatusMoMMIPassword =
         CVarDef.Create("status.mommipassword", "", CVar.SERVERONLY | CVar.CONFIDENTIAL);
-
 }

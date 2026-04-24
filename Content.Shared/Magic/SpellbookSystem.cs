@@ -78,7 +78,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Shared.Actions;
-﻿using Content.Shared.Actions.Components;
+using Content.Shared.Actions.Components;
 using Content.Shared.Charges.Systems;
 using Content.Shared.DoAfter;
 using Content.Shared.Interaction.Events;
@@ -90,16 +90,16 @@ namespace Content.Shared.Magic;
 
 public sealed class SpellbookSystem : EntitySystem
 {
-    [Dependency] private readonly SharedChargesSystem _sharedCharges = default!;
-    [Dependency] private readonly SharedMindSystem _mind = default!;
-    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
-    [Dependency] private readonly SharedActionsSystem _actions = default!;
     [Dependency] private readonly ActionContainerSystem _actionContainer = default!;
+    [Dependency] private readonly SharedActionsSystem _actions = default!;
+    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
+    [Dependency] private readonly SharedMindSystem _mind = default!;
     [Dependency] private readonly INetManager _netManager = default!;
+    [Dependency] private readonly SharedChargesSystem _sharedCharges = default!;
 
     public override void Initialize()
     {
-        SubscribeLocalEvent<SpellbookComponent, MapInitEvent>(OnInit, before: [typeof(SharedMagicSystem)]);
+        SubscribeLocalEvent<SpellbookComponent, MapInitEvent>(OnInit, [typeof(SharedMagicSystem)]);
         SubscribeLocalEvent<SpellbookComponent, UseInHandEvent>(OnUse);
         SubscribeLocalEvent<SpellbookComponent, SpellbookDoAfterEvent>(OnDoAfter);
     }
@@ -129,7 +129,8 @@ public sealed class SpellbookSystem : EntitySystem
         args.Handled = true;
     }
 
-    private void OnDoAfter<T>(Entity<SpellbookComponent> ent, ref T args) where T : DoAfterEvent // Sometimes i despise this language
+    private void OnDoAfter<T>(Entity<SpellbookComponent> ent, ref T args)
+        where T : DoAfterEvent // Sometimes i despise this language
     {
         if (args.Handled || args.Cancelled)
             return;
@@ -147,7 +148,10 @@ public sealed class SpellbookSystem : EntitySystem
             var mindActionContainerComp = EnsureComp<ActionsContainerComponent>(mindId);
 
             if (_netManager.IsServer)
-                _actionContainer.TransferAllActionsWithNewAttached(ent, mindId, args.Args.User, newContainer: mindActionContainerComp);
+                _actionContainer.TransferAllActionsWithNewAttached(ent,
+                    mindId,
+                    args.Args.User,
+                    newContainer: mindActionContainerComp);
         }
         else
         {
@@ -165,13 +169,14 @@ public sealed class SpellbookSystem : EntitySystem
 
     private void AttemptLearn(Entity<SpellbookComponent> ent, UseInHandEvent args)
     {
-        var doAfterEventArgs = new DoAfterArgs(EntityManager, args.User, ent.Comp.LearnTime, new SpellbookDoAfterEvent(), ent, target: ent)
-        {
-            BreakOnMove = true,
-            BreakOnDamage = true,
-            NeedHand = true, //What, are you going to read with your eyes only??
-            MultiplyDelay = false, // Goobstation
-        };
+        var doAfterEventArgs =
+            new DoAfterArgs(EntityManager, args.User, ent.Comp.LearnTime, new SpellbookDoAfterEvent(), ent, ent)
+            {
+                BreakOnMove = true,
+                BreakOnDamage = true,
+                NeedHand = true, //What, are you going to read with your eyes only??
+                MultiplyDelay = false, // Goobstation
+            };
 
         _doAfter.TryStartDoAfter(doAfterEventArgs);
     }

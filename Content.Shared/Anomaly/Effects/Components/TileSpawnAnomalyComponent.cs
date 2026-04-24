@@ -9,7 +9,7 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Shared.Anomaly.Effects.Components;
 
-[RegisterComponent, NetworkedComponent, Access(typeof(SharedTileAnomalySystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(SharedTileAnomalySystem))]
 public sealed partial class TileSpawnAnomalyComponent : Component
 {
     /// <summary>
@@ -20,7 +20,7 @@ public sealed partial class TileSpawnAnomalyComponent : Component
 }
 
 [DataRecord]
-public partial record struct TileSpawnSettingsEntry()
+public record struct TileSpawnSettingsEntry()
 {
     /// <summary>
     /// The tile that is spawned by the anomaly's effect

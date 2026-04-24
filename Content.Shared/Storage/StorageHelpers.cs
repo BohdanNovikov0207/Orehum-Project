@@ -38,6 +38,7 @@ public static class StorageHelper
             if (right < box.Right)
                 right = box.Right;
         }
+
         return new Box2i(left, bottom, right, top);
     }
 

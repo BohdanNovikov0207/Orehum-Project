@@ -10,8 +10,8 @@ namespace Content.Shared.Procedural.PostGeneration;
 public sealed partial class InternalWindowDunGen : IDunGenLayer
 {
     [DataField(required: true)]
-    public ProtoId<ContentTileDefinition> Tile;
+    public ProtoId<EntityTablePrototype> Contents;
 
     [DataField(required: true)]
-    public ProtoId<EntityTablePrototype> Contents;
+    public ProtoId<ContentTileDefinition> Tile;
 }

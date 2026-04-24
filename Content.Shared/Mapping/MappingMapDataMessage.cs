@@ -83,11 +83,10 @@ namespace Content.Shared.Mapping;
 
 public sealed class MappingMapDataMessage : NetMessage
 {
-    public override MsgGroups MsgGroup => MsgGroups.Command;
-    public override NetDeliveryMethod DeliveryMethod => NetDeliveryMethod.ReliableUnordered;
-
     public ZStdCompressionContext Context = default!;
     public string Yml = default!;
+    public override MsgGroups MsgGroup => MsgGroups.Command;
+    public override NetDeliveryMethod DeliveryMethod => NetDeliveryMethod.ReliableUnordered;
 
     public override void ReadFromBuffer(NetIncomingMessage buffer, IRobustSerializer serializer)
     {

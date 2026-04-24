@@ -9,12 +9,12 @@ namespace Content.Shared.Trigger.Components.Triggers;
 /// <remarks>
 /// TODO: Support multiple verbs and trigger keys.
 /// </remarks>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class TriggerOnVerbComponent : BaseTriggerOnXComponent
 {
     /// <summary>
     /// The text to display in the verb.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public LocId Text = "trigger-on-verb-default";
 }

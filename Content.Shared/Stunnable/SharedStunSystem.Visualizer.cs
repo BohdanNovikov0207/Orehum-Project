@@ -6,6 +6,12 @@ namespace Content.Shared.Stunnable;
 
 public abstract partial class SharedStunSystem
 {
+    [Serializable] [NetSerializable] [Flags]
+    public enum StunVisuals
+    {
+        SeeingStars,
+    }
+
     public void InitializeAppearance()
     {
         SubscribeLocalEvent<StunVisualsComponent, MobStateChangedEvent>(OnStunMobStateChanged);
@@ -20,15 +26,11 @@ public abstract partial class SharedStunSystem
         return Blocker.CanConsciouslyPerformAction(entity);
     }
 
-    private void OnStunMobStateChanged(Entity<StunVisualsComponent> entity, ref MobStateChangedEvent args)
-    {
+    private void OnStunMobStateChanged(Entity<StunVisualsComponent> entity, ref MobStateChangedEvent args) =>
         Appearance.SetData(entity, StunVisuals.SeeingStars, GetStarsData(entity));
-    }
 
-    private void OnSleepStateChanged(Entity<StunVisualsComponent> entity, ref SleepStateChangedEvent args)
-    {
+    private void OnSleepStateChanged(Entity<StunVisualsComponent> entity, ref SleepStateChangedEvent args) =>
         Appearance.SetData(entity, StunVisuals.SeeingStars, GetStarsData(entity));
-    }
 
     public void TrySeeingStars(Entity<AppearanceComponent?> entity)
     {
@@ -45,11 +47,5 @@ public abstract partial class SharedStunSystem
 
         Appearance.SetData(entity, StunVisuals.SeeingStars, true);
         Dirty(entity);
-    }
-
-    [Serializable, NetSerializable, Flags]
-    public enum StunVisuals
-    {
-        SeeingStars,
     }
 }

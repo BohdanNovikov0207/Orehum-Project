@@ -8,16 +8,16 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Disposal;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum MailingUnitUiKey : byte
 {
-    Key
+    Key,
 }
 
 /// <summary>
-///     Message data sent from client to server when a disposal unit ui button is pressed.
+/// Message data sent from client to server when a disposal unit ui button is pressed.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class TargetSelectedMessage : BoundUserInterfaceMessage
 {
     public readonly string? Target;

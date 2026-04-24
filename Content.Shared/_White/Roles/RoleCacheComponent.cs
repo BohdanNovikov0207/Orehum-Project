@@ -1,13 +1,12 @@
 using Content.Shared.Roles;
 using Robust.Shared.Prototypes;
 
-
 namespace Content.Shared._White.Roles;
 
 [RegisterComponent]
 public sealed partial class RoleCacheComponent : Component
 {
-    [ViewVariables(VVAccess.ReadOnly), Access(typeof(RolesCacheSystem))]
+    [ViewVariables(VVAccess.ReadOnly)] [Access(typeof(RolesCacheSystem))]
     public int AntagWeight;
 
     [ViewVariables(VVAccess.ReadOnly)]

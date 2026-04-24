@@ -21,9 +21,9 @@
 
 using Content.Shared._DV.Salvage.Components;
 using Content.Shared.DragDrop;
-using Content.Shared.Storage;
 using Content.Shared.Interaction;
 using Content.Shared.Materials;
+using Content.Shared.Storage;
 using Robust.Shared.Timing;
 
 namespace Content.Shared._Lavaland.OreBag;
@@ -32,6 +32,7 @@ public sealed class OreBagSystem : EntitySystem
 {
     [Dependency] private readonly SharedMaterialStorageSystem _materialStorage = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
+
     public override void Initialize()
     {
         SubscribeLocalEvent<OreBagComponent, AfterInteractEvent>(OnAfterInteract);
@@ -44,9 +45,9 @@ public sealed class OreBagSystem : EntitySystem
     private void OnAfterInteract(EntityUid uid, OreBagComponent component, AfterInteractEvent args)
     {
         if (!args.CanReach
-          || args.Target == null
-          || !HasComp<MiningPointsLatheComponent>(args.Target)
-          || !_timing.IsFirstTimePredicted)
+            || args.Target == null
+            || !HasComp<MiningPointsLatheComponent>(args.Target)
+            || !_timing.IsFirstTimePredicted)
             return;
 
         if (!TryComp<StorageComponent>(uid, out var storage))
@@ -55,11 +56,15 @@ public sealed class OreBagSystem : EntitySystem
         var validEntities = new List<EntityUid>();
 
         foreach (var entity in storage.Container.ContainedEntities)
+        {
             if (HasComp<MaterialComponent>(entity))
                 validEntities.Add(entity);
+        }
 
         foreach (var entity in validEntities)
+        {
             _materialStorage.TryInsertMaterialEntity(args.User, entity, args.Target.Value);
+        }
     }
 
     private void OnDrag(Entity<OreBagComponent> ent, ref DragDropDraggedEvent args)
@@ -70,11 +75,15 @@ public sealed class OreBagSystem : EntitySystem
         var validEntities = new List<EntityUid>();
 
         foreach (var entity in storage.Container.ContainedEntities)
+        {
             if (HasComp<MaterialComponent>(entity))
                 validEntities.Add(entity);
+        }
 
         foreach (var entity in validEntities)
+        {
             _materialStorage.TryInsertMaterialEntity(args.User, entity, args.Target);
+        }
 
         args.Handled = true;
     }
@@ -86,8 +95,5 @@ public sealed class OreBagSystem : EntitySystem
         args.Handled = true;
     }
 
-    private void OnCanDragBox(Entity<OreBagComponent> ent, ref CanDragEvent args)
-    {
-        args.Handled = true;
-    }
+    private void OnCanDragBox(Entity<OreBagComponent> ent, ref CanDragEvent args) => args.Handled = true;
 }

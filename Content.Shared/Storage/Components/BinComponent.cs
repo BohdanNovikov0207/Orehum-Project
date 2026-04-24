@@ -17,21 +17,27 @@ namespace Content.Shared.Storage.Components;
 /// This is used for things like paper bins, in which
 /// you can only take off of the top of the bin.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 [Access(typeof(BinSystem))]
 public sealed partial class BinComponent : Component
 {
-    /// <summary>
-    /// The containers that contain the items held in the bin
-    /// </summary>
-    [ViewVariables]
-    public Container ItemContainer = default!;
-
     /// <summary>
     /// ID of the container used to hold the items in the bin.
     /// </summary>
     [DataField]
     public string ContainerId = "bin-container";
+
+    /// <summary>
+    /// The items that start in the bin. Sorted in order.
+    /// </summary>
+    [DataField]
+    public List<EntProtoId> InitialContents = new();
+
+    /// <summary>
+    /// The containers that contain the items held in the bin
+    /// </summary>
+    [ViewVariables]
+    public Container ItemContainer = default!;
 
     /// <summary>
     /// A list representing the order in which
@@ -42,25 +48,19 @@ public sealed partial class BinComponent : Component
     /// i can handle entities being deleted and removed
     /// out of order by other systems
     /// </remarks>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public List<EntityUid> Items = new();
-
-    /// <summary>
-    /// The items that start in the bin. Sorted in order.
-    /// </summary>
-    [DataField]
-    public List<EntProtoId> InitialContents = new();
-
-    /// <summary>
-    /// A whitelist governing what items can be inserted into the bin.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public EntityWhitelist? Whitelist;
 
     /// <summary>
     /// The maximum amount of items
     /// that can be stored in the bin.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public int MaxItems = 20;
+
+    /// <summary>
+    /// A whitelist governing what items can be inserted into the bin.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public EntityWhitelist? Whitelist;
 }

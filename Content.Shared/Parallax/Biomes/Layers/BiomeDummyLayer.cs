@@ -13,7 +13,7 @@ namespace Content.Shared.Parallax.Biomes.Layers;
 /// Dummy layer that specifies a marker to be replaced by external code.
 /// For example if they wish to add their own layers at specific points across different templates.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class BiomeDummyLayer : IBiomeLayer
 {
     [DataField("id", required: true)] public string ID = string.Empty;

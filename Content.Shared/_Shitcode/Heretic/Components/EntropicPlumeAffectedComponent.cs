@@ -11,16 +11,16 @@ using Robust.Shared.Utility;
 
 namespace Content.Shared._Goobstation.Heretic.Components;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState, AutoGenerateComponentPause]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState] [AutoGenerateComponentPause]
 public sealed partial class EntropicPlumeAffectedComponent : Component
 {
-    [DataField, AutoNetworkedField]
-    public EntityUid ExcludedEntity;
-
     [DataField]
     public float Duration = 10f;
 
-    [DataField, AutoNetworkedField, AutoPausedField]
+    [DataField] [AutoNetworkedField]
+    public EntityUid ExcludedEntity;
+
+    [DataField] [AutoNetworkedField] [AutoPausedField]
     public TimeSpan NextAttack = TimeSpan.Zero;
 
     [DataField]

@@ -39,7 +39,6 @@ using Content.Shared.DoAfter;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Interaction;
 using Content.Shared.Inventory;
-using Content.Shared.Mobs.Components;
 using Content.Shared.Tag;
 using Content.Shared.Throwing;
 using Content.Shared.Weapons.Ranged.Components;
@@ -60,22 +59,23 @@ public abstract partial class SharedProjectileSystem : EntitySystem
 {
     public const string ProjectileFixture = "projectile";
 
-    [Dependency] private readonly INetManager _net = default!;
+    private static readonly ProtoId<TagPrototype> GunCanAimShooterTag = "GunCanAimShooter";
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
     [Dependency] private readonly SharedHandsSystem _hands = default!;
-    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly TagSystem _tag = default!;
 
-    private static readonly ProtoId<TagPrototype> GunCanAimShooterTag = "GunCanAimShooter";
+    [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
+    [Dependency] private readonly TagSystem _tag = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     public override void Initialize()
     {
         base.Initialize();
 
         SubscribeLocalEvent<ProjectileComponent, PreventCollideEvent>(PreventCollision);
-        SubscribeLocalEvent<EmbeddableProjectileComponent, PreventCollideEvent>(EmbeddablePreventCollision); // Goobstation - Crawl Fix
+        SubscribeLocalEvent<EmbeddableProjectileComponent, PreventCollideEvent>(
+            EmbeddablePreventCollision); // Goobstation - Crawl Fix
         SubscribeLocalEvent<EmbeddableProjectileComponent, ProjectileHitEvent>(OnEmbedProjectileHit);
         SubscribeLocalEvent<EmbeddableProjectileComponent, ThrowDoHitEvent>(OnEmbedThrowDoHit);
         SubscribeLocalEvent<EmbeddableProjectileComponent, ActivateInWorldEvent>(OnEmbedActivate);
@@ -101,8 +101,8 @@ public abstract partial class SharedProjectileSystem : EntitySystem
             args.User,
             embeddable.Comp.RemovalTime.Value,
             new RemoveEmbeddedProjectileEvent(),
-            eventTarget: embeddable,
-            target: embeddable));
+            embeddable,
+            embeddable));
     }
 
     private void OnEmbedRemove(Entity<EmbeddableProjectileComponent> embeddable, ref RemoveEmbeddedProjectileEvent args)
@@ -116,10 +116,9 @@ public abstract partial class SharedProjectileSystem : EntitySystem
         _hands.TryPickupAnyHand(args.User, embeddable);
     }
 
-    private void OnEmbeddableCompShutdown(Entity<EmbeddableProjectileComponent> embeddable, ref ComponentShutdown arg)
-    {
+    private void
+        OnEmbeddableCompShutdown(Entity<EmbeddableProjectileComponent> embeddable, ref ComponentShutdown arg) =>
         EmbedDetach(embeddable, embeddable.Comp);
-    }
 
     private void OnEmbedThrowDoHit(Entity<EmbeddableProjectileComponent> embeddable, ref ThrowDoHitEvent args)
     {
@@ -134,7 +133,8 @@ public abstract partial class SharedProjectileSystem : EntitySystem
         EmbedAttach(embeddable, args.Target, args.Shooter, embeddable.Comp);
 
         // Raise a specific event for projectiles.
-        if (TryComp(embeddable, out ProjectileComponent? projectile) && projectile.Weapon.HasValue) // Goobstation edit: un-heisenfailing tests
+        if (TryComp(embeddable, out ProjectileComponent? projectile) &&
+            projectile.Weapon.HasValue) // Goobstation edit: un-heisenfailing tests
         {
             // Goobstation edit: Shooter is nullable, so why are we using nullforgiving operator for shooter?
             var ev = new ProjectileEmbedEvent(projectile.Shooter, projectile.Weapon.Value, args.Target);
@@ -216,17 +216,18 @@ public abstract partial class SharedProjectileSystem : EntitySystem
         if (user != null)
         {
             // Land it just coz uhhh yeah
-            var landEv = new LandEvent(user, true);  // note from goobstation: if this line is removed, syringe gun will break, LOOK AT THIS IF YOU ARE SEEING THIS IN A MERGE CONFLICT
+            var landEv =
+                new LandEvent(user,
+                    true); // note from goobstation: if this line is removed, syringe gun will break, LOOK AT THIS IF YOU ARE SEEING THIS IN A MERGE CONFLICT
             RaiseLocalEvent(uid, ref landEv);
         }
 
         _physics.WakeBody(uid, body: physics);
     }
 
-    private void OnEmbeddableTermination(Entity<EmbeddedContainerComponent> container, ref EntityTerminatingEvent args)
-    {
+    private void
+        OnEmbeddableTermination(Entity<EmbeddedContainerComponent> container, ref EntityTerminatingEvent args) =>
         DetachAllEmbedded(container);
-    }
 
     public void DetachAllEmbedded(Entity<EmbeddedContainerComponent> container)
     {
@@ -242,7 +243,8 @@ public abstract partial class SharedProjectileSystem : EntitySystem
     private void PreventCollision(EntityUid uid, ProjectileComponent component, ref PreventCollideEvent args)
     {
         // Goobstation - Crawling fix
-        if (TryComp<RequireProjectileTargetComponent>(args.OtherEntity, out var requireTarget) && requireTarget.IgnoreThrow && requireTarget.Active)
+        if (TryComp<RequireProjectileTargetComponent>(args.OtherEntity, out var requireTarget) &&
+            requireTarget.IgnoreThrow && requireTarget.Active)
             return;
 
         if (component.IgnoredEntities.Contains(args.OtherEntity))
@@ -258,15 +260,16 @@ public abstract partial class SharedProjectileSystem : EntitySystem
         // /Goobstation
 
         if (component.IgnoreShooter && (args.OtherEntity == component.Shooter || args.OtherEntity == component.Weapon))
-        {
             args.Cancelled = true;
-        }
     }
 
     // Goobstation - Crawling fix
-    private void EmbeddablePreventCollision(EntityUid uid, EmbeddableProjectileComponent component, ref PreventCollideEvent args)
+    private void EmbeddablePreventCollision(EntityUid uid,
+        EmbeddableProjectileComponent component,
+        ref PreventCollideEvent args)
     {
-        if (TryComp<RequireProjectileTargetComponent>(args.OtherEntity, out var requireTarget) && requireTarget.IgnoreThrow && requireTarget.Active)
+        if (TryComp<RequireProjectileTargetComponent>(args.OtherEntity, out var requireTarget) &&
+            requireTarget.IgnoreThrow && requireTarget.Active)
             args.Cancelled = true;
     }
 
@@ -279,18 +282,18 @@ public abstract partial class SharedProjectileSystem : EntitySystem
         Dirty(id, component);
     }
 
-    [Serializable, NetSerializable]
+    [Serializable] [NetSerializable]
     private sealed partial class RemoveEmbeddedProjectileEvent : DoAfterEvent
     {
         public override DoAfterEvent Clone() => this;
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class ImpactEffectEvent : EntityEventArgs
 {
-    public string Prototype;
     public NetCoordinates Coordinates;
+    public string Prototype;
 
     public ImpactEffectEvent(string prototype, NetCoordinates coordinates)
     {
@@ -303,7 +306,8 @@ public sealed class ImpactEffectEvent : EntityEventArgs
 /// Raised when an entity is just about to be hit with a projectile but can reflect it
 /// </summary>
 [ByRefEvent]
-public record struct ProjectileReflectAttemptEvent(EntityUid ProjUid, ProjectileComponent Component, bool Cancelled) : IInventoryRelayEvent
+public record struct ProjectileReflectAttemptEvent(EntityUid ProjUid, ProjectileComponent Component, bool Cancelled)
+    : IInventoryRelayEvent
 {
     SlotFlags IInventoryRelayEvent.TargetSlots => SlotFlags.WITHOUT_POCKET;
 }

@@ -24,12 +24,13 @@ namespace Content.Shared.Cargo;
 
 public abstract class SharedCargoSystem : EntitySystem
 {
-    [Dependency] protected readonly IGameTiming Timing = default!;
+    [Dependency] protected readonly AccessReaderSystem AccessReader = default!;
+    [Dependency] protected readonly SharedIdCardSystem IdCard = default!;
 
     // CorvaxGoob-CargoFeatures-Start
     [Dependency] protected readonly IPrototypeManager Proto = default!;
-    [Dependency] protected readonly AccessReaderSystem AccessReader = default!;
-    [Dependency] protected readonly SharedIdCardSystem IdCard = default!;
+
+    [Dependency] protected readonly IGameTiming Timing = default!;
     // CorvaxGoob-CargoFeatures-End
 
     public override void Initialize()
@@ -48,7 +49,8 @@ public abstract class SharedCargoSystem : EntitySystem
     /// <summary>
     /// For a given station, retrieves the balance in a specific account.
     /// </summary>
-    public int GetBalanceFromAccount(Entity<StationBankAccountComponent?> station, ProtoId<CargoAccountPrototype> account)
+    public int GetBalanceFromAccount(Entity<StationBankAccountComponent?> station,
+        ProtoId<CargoAccountPrototype> account)
     {
         if (!Resolve(station, ref station.Comp))
             return 0;
@@ -59,13 +61,14 @@ public abstract class SharedCargoSystem : EntitySystem
     /// <summary>
     /// For a station, creates a distribution between one the bank's account and the other accounts.
     /// The primary account receives the majority percentage listed on the bank account, with the remaining
-    /// funds distributed to all accounts based on <see cref="StationBankAccountComponent.RevenueDistribution"/>
+    /// funds distributed to all accounts based on <see cref="StationBankAccountComponent.RevenueDistribution" />
     /// </summary>
-    public Dictionary<ProtoId<CargoAccountPrototype>, double> CreateAccountDistribution(Entity<StationBankAccountComponent> stationBank)
+    public Dictionary<ProtoId<CargoAccountPrototype>, double> CreateAccountDistribution(
+        Entity<StationBankAccountComponent> stationBank)
     {
         var distribution = new Dictionary<ProtoId<CargoAccountPrototype>, double>
         {
-            { stationBank.Comp.PrimaryAccount, stationBank.Comp.PrimaryCut }
+            { stationBank.Comp.PrimaryAccount, stationBank.Comp.PrimaryCut },
         };
         var remaining = 1.0 - stationBank.Comp.PrimaryCut;
 
@@ -74,6 +77,7 @@ public abstract class SharedCargoSystem : EntitySystem
             var existing = distribution.GetOrNew(account);
             distribution[account] = existing + remaining * percentage;
         }
+
         return distribution;
     }
 
@@ -98,8 +102,8 @@ public abstract class SharedCargoSystem : EntitySystem
         if (productProto.HasComponent<StorageFillComponent>())
         {
             if (productProto.TryGetComponent<AccessReaderComponent>(out var reader)
-            && access is not null
-            && !AccessReader.AreAccessTagsAllowed(access, reader))
+                && access is not null
+                && !AccessReader.AreAccessTagsAllowed(access, reader))
                 return false;
         }
         else if (!productProto.HasComponent<ItemComponent>())
@@ -113,14 +117,18 @@ public abstract class SharedCargoSystem : EntitySystem
     /// </summary>
     public string GenerateRequesterName(Entity<CargoOrderConsoleComponent> entity, EntityUid requester)
     {
-        string name = string.Empty;
+        var name = string.Empty;
 
         if (AccessReader.FindAccessItemsInventory(requester, out var items))
+        {
             foreach (var item in items)
             {
                 if (IdCard.TryGetIdCard(item, out var idCard))
-                    name = Loc.GetString("cargo-console-menu-order-requester-format", ("name", idCard.Comp.FullName ?? ""), ("job", idCard.Comp.JobTitle ?? idCard.Comp.LocalizedJobTitle ?? ""));
+                    name = Loc.GetString("cargo-console-menu-order-requester-format",
+                        ("name", idCard.Comp.FullName ?? ""),
+                        ("job", idCard.Comp.JobTitle ?? idCard.Comp.LocalizedJobTitle ?? ""));
             }
+        }
         else
             name = Identity.Name(requester, EntityManager);
 
@@ -129,31 +137,31 @@ public abstract class SharedCargoSystem : EntitySystem
     // CorvaxGoob-CargoFeatures-End
 }
 
-[NetSerializable, Serializable]
+[NetSerializable] [Serializable]
 public enum CargoConsoleUiKey : byte
 {
     Orders,
     Bounty,
     Shuttle,
-    Telepad
+    Telepad,
 }
 
-[NetSerializable, Serializable]
+[NetSerializable] [Serializable]
 public enum CargoPalletConsoleUiKey : byte
 {
-    Sale
+    Sale,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum CargoTelepadState : byte
 {
     Unpowered,
     Idle,
     Teleporting,
-};
+}
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum CargoTelepadVisuals : byte
 {
     State,
-};
+}

@@ -15,19 +15,19 @@ namespace Content.Shared.Clothing.Components;
 /// When equipped, adds the wearer to a faction.
 /// When removed, removes the wearer from a faction.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(FactionClothingSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(FactionClothingSystem))]
 public sealed partial class FactionClothingComponent : Component
 {
-    /// <summary>
-    /// Faction to add and remove.
-    /// </summary>
-    [DataField(required: true)]
-    public ProtoId<NpcFactionPrototype> Faction = string.Empty;
-
     /// <summary>
     /// If true, the wearer was already part of the faction.
     /// This prevents wrongly removing them after removing the item.
     /// </summary>
     [DataField]
     public bool AlreadyMember;
+
+    /// <summary>
+    /// Faction to add and remove.
+    /// </summary>
+    [DataField(required: true)]
+    public ProtoId<NpcFactionPrototype> Faction = string.Empty;
 }

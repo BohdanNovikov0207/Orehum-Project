@@ -8,8 +8,6 @@ namespace Content.Shared._Lavaland.EntityShapes.Shapes;
 /// </summary>
 public sealed partial class SingleEntityShape : EntityShape
 {
-    protected override List<Vector2> GetShapeImplementation(System.Random rand, IPrototypeManager proto)
-    {
-        return new List<Vector2> { Offset };
-    }
+    protected override List<Vector2> GetShapeImplementation(System.Random rand, IPrototypeManager proto) =>
+        new() { Offset };
 }

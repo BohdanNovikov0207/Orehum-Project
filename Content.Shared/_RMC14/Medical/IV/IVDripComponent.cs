@@ -3,81 +3,81 @@
 //
 // SPDX-License-Identifier: MIT
 
+using System.Numerics;
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Chat.Prototypes;
 using Content.Shared.Damage;
-using Content.Goobstation.Maths.FixedPoint;
 using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
-using System.Numerics;
 
 namespace Content.Shared._RMC14.Medical.IV;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState(true), AutoGenerateComponentPause]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState(true)] [AutoGenerateComponentPause]
 public sealed partial class IVDripComponent : Component
 {
-    [DataField, AutoNetworkedField]
-    public EntityUid? AttachedTo;
-
-    [DataField, AutoNetworkedField]
-    public string Slot = "pack";
-
-    [DataField, AutoNetworkedField]
-    public FixedPoint2 TransferAmount = FixedPoint2.New(5);
-
-    [DataField, AutoNetworkedField]
-    public TimeSpan TransferDelay = TimeSpan.FromSeconds(3);
-
-    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer)), AutoNetworkedField, AutoPausedField]
-    public TimeSpan TransferAt;
-
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public string AttachedState = "hooked";
 
-    [DataField, AutoNetworkedField]
-    public string UnattachedState = "unhooked";
+    [DataField] [AutoNetworkedField]
+    public EntityUid? AttachedTo;
 
-    [DataField, AutoNetworkedField]
-    public string NoBagState = "empty";
-
-    /// <summary>
-    ///     Percentages are from 0 to 100
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public List<(int Percentage, string State)> ReagentStates = new();
-
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public Color FillColor;
 
     /// <summary>
-    ///     From 0 to 100
+    /// From 0 to 100
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public int FillPercentage;
 
-    [DataField, AutoNetworkedField]
-    public int Range = 2;
-
-    [DataField]
-    public DamageSpecifier? RipDamage;
-
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public bool Injecting = true;
-
-    [DataField, AutoNetworkedField]
-    public ProtoId<EmotePrototype> RipEmote = "Scream";
 
     /// <summary>
     /// Offset from the center of the entity where the IV line should start
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public Vector2 LineOriginOffset = Vector2.Zero;
+
+    [DataField] [AutoNetworkedField]
+    public string NoBagState = "empty";
+
+    [DataField] [AutoNetworkedField]
+    public int Range = 2;
+
+    /// <summary>
+    /// Percentages are from 0 to 100
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public List<(int Percentage, string State)> ReagentStates = new();
+
+    [DataField]
+    public DamageSpecifier? RipDamage;
+
+    [DataField] [AutoNetworkedField]
+    public ProtoId<EmotePrototype> RipEmote = "Scream";
+
+    [DataField] [AutoNetworkedField]
+    public string Slot = "pack";
+
+    [DataField] [AutoNetworkedField]
+    public FixedPoint2 TransferAmount = FixedPoint2.New(5);
+
+    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))] [AutoNetworkedField] [AutoPausedField]
+    public TimeSpan TransferAt;
+
+    [DataField] [AutoNetworkedField]
+    public TimeSpan TransferDelay = TimeSpan.FromSeconds(3);
+
+    [DataField] [AutoNetworkedField]
+    public string UnattachedState = "unhooked";
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum IVDripVisualLayers
 {
     Base,
-    Reagent
+    Reagent,
 }

@@ -86,10 +86,10 @@ using Robust.Shared.Utility;
 namespace Content.Shared.Roles;
 
 [UsedImplicitly]
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class OverallPlaytimeRequirement : JobRequirement
 {
-    /// <inheritdoc cref="DepartmentTimeRequirement.Time"/>
+    /// <inheritdoc cref="DepartmentTimeRequirement.Time" />
     [DataField(required: true)]
     public TimeSpan Time;
 

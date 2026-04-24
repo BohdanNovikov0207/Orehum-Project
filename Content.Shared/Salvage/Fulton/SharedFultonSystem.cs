@@ -95,23 +95,23 @@ using Robust.Shared.Timing;
 namespace Content.Shared.Salvage.Fulton;
 
 /// <summary>
-/// Provides extraction devices that teleports the attached entity after <see cref="FultonDuration"/> elapses to the linked beacon.
+/// Provides extraction devices that teleports the attached entity after <see cref="FultonDuration" /> elapses to the
+/// linked beacon.
 /// </summary>
 public abstract partial class SharedFultonSystem : EntitySystem
 {
-    [Dependency] protected readonly IGameTiming Timing = default!;
-    [Dependency] private   readonly MetaDataSystem _metadata = default!;
-    [Dependency] protected readonly SharedAudioSystem Audio = default!;
-    [Dependency] private   readonly SharedDoAfterSystem _doAfter = default!;
-    [Dependency] private   readonly FoldableSystem _foldable = default!;
-    [Dependency] protected readonly SharedContainerSystem Container = default!;
-    [Dependency] private   readonly SharedPopupSystem _popup = default!;
-    [Dependency] private   readonly SharedStackSystem _stack = default!;
-    [Dependency] protected readonly SharedTransformSystem TransformSystem = default!;
-    [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
-
     public static readonly EntProtoId EffectProto = "FultonEffect";
     protected static readonly Vector2 EffectOffset = Vector2.Zero;
+    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
+    [Dependency] private readonly FoldableSystem _foldable = default!;
+    [Dependency] private readonly MetaDataSystem _metadata = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly SharedStackSystem _stack = default!;
+    [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
+    [Dependency] protected readonly SharedAudioSystem Audio = default!;
+    [Dependency] protected readonly SharedContainerSystem Container = default!;
+    [Dependency] protected readonly IGameTiming Timing = default!;
+    [Dependency] protected readonly SharedTransformSystem TransformSystem = default!;
 
     public override void Initialize()
     {
@@ -128,10 +128,9 @@ public abstract partial class SharedFultonSystem : EntitySystem
         SubscribeLocalEvent<FultonComponent, StackSplitEvent>(OnFultonSplit);
     }
 
-    private void OnFultonContainerInserted(EntityUid uid, FultonedComponent component, EntGotInsertedIntoContainerMessage args)
-    {
-        RemCompDeferred<FultonedComponent>(uid);
-    }
+    private void OnFultonContainerInserted(EntityUid uid,
+        FultonedComponent component,
+        EntGotInsertedIntoContainerMessage args) => RemCompDeferred<FultonedComponent>(uid);
 
     private void OnFultonedExamine(EntityUid uid, FultonedComponent component, ExaminedEvent args)
     {
@@ -146,13 +145,13 @@ public abstract partial class SharedFultonSystem : EntitySystem
         if (!args.CanAccess || !args.CanInteract)
             return;
 
-        args.Verbs.Add(new InteractionVerb()
+        args.Verbs.Add(new InteractionVerb
         {
             Text = Loc.GetString("fulton-remove"),
             Act = () =>
             {
                 Unfulton(uid);
-            }
+            },
         });
     }
 
@@ -170,9 +169,7 @@ public abstract partial class SharedFultonSystem : EntitySystem
             return;
 
         if (!_stack.Use(args.Used.Value, 1))
-        {
             return;
-        }
 
         var fultoned = AddComp<FultonedComponent>(args.Target.Value);
         fultoned.Beacon = fulton.Beacon;
@@ -228,7 +225,13 @@ public abstract partial class SharedFultonSystem : EntitySystem
 
         var ev = new FultonedDoAfterEvent();
         _doAfter.TryStartDoAfter(
-            new DoAfterArgs(EntityManager, args.User, component.ApplyFultonDuration, ev, args.Target, args.Target, args.Used)
+            new DoAfterArgs(EntityManager,
+                args.User,
+                component.ApplyFultonDuration,
+                ev,
+                args.Target,
+                args.Target,
+                args.Used)
             {
                 MovementThreshold = 0.5f,
                 BreakOnMove = true,
@@ -246,7 +249,6 @@ public abstract partial class SharedFultonSystem : EntitySystem
 
     protected virtual void UpdateAppearance(EntityUid uid, FultonedComponent fultoned)
     {
-        return;
     }
 
     protected bool CanApplyFulton(EntityUid targetUid, FultonComponent component)
@@ -274,7 +276,7 @@ public abstract partial class SharedFultonSystem : EntitySystem
         return true;
     }
 
-    [Serializable, NetSerializable]
+    [Serializable] [NetSerializable]
     private sealed partial class FultonedDoAfterEvent : SimpleDoAfterEvent
     {
     }
@@ -283,10 +285,10 @@ public abstract partial class SharedFultonSystem : EntitySystem
     /// <summary>
     /// Tells clients to play the fulton animation.
     /// </summary>
-    [Serializable, NetSerializable]
+    [Serializable] [NetSerializable]
     protected sealed class FultonAnimationMessage : EntityEventArgs
     {
-        public NetEntity Entity;
         public NetCoordinates Coordinates;
+        public NetEntity Entity;
     }
 }

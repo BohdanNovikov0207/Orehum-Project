@@ -17,9 +17,9 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Shared.Gravity;
 using Content.Shared.Movement.Components;
 using Content.Shared.Movement.Events;
-using Content.Shared.Gravity;
 using Content.Shared.Slippery;
 using Content.Shared.Whitelist;
 using Robust.Shared.Physics.Components;
@@ -30,22 +30,23 @@ namespace Content.Shared.Movement.Systems;
 
 public sealed class SpeedModifierContactsSystem : EntitySystem
 {
-    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
     [Dependency] private readonly SharedGravitySystem _gravity = default!;
+    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
     [Dependency] private readonly MovementSpeedModifierSystem _speedModifierSystem = default!;
-    [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
+    private readonly HashSet<EntityUid> _toRemove = new();
 
     // TODO full-game-save
     // Either these need to be processed before a map is saved, or slowed/slowing entities need to update on init.
     private readonly HashSet<EntityUid> _toUpdate = new();
-    private readonly HashSet<EntityUid> _toRemove = new();
+    [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
 
     public override void Initialize()
     {
         base.Initialize();
         SubscribeLocalEvent<SpeedModifierContactsComponent, StartCollideEvent>(OnEntityEnter);
         SubscribeLocalEvent<SpeedModifierContactsComponent, EndCollideEvent>(OnEntityExit);
-        SubscribeLocalEvent<SpeedModifiedByContactComponent, RefreshMovementSpeedModifiersEvent>(OnRefreshMovementSpeedModifiers);
+        SubscribeLocalEvent<SpeedModifiedByContactComponent, RefreshMovementSpeedModifiersEvent>(
+            OnRefreshMovementSpeedModifiers);
         SubscribeLocalEvent<SpeedModifierContactsComponent, ComponentShutdown>(OnShutdown);
 
         UpdatesAfter.Add(typeof(SharedPhysicsSystem));
@@ -70,12 +71,13 @@ public sealed class SpeedModifierContactsSystem : EntitySystem
         _toUpdate.Clear();
     }
 
-    public void ChangeSpeedModifiers(EntityUid uid, float speed, SpeedModifierContactsComponent? component = null)
-    {
+    public void ChangeSpeedModifiers(EntityUid uid, float speed, SpeedModifierContactsComponent? component = null) =>
         ChangeSpeedModifiers(uid, speed, speed, component);
-    }
 
-    public void ChangeSpeedModifiers(EntityUid uid, float walkSpeed, float sprintSpeed, SpeedModifierContactsComponent? component = null)
+    public void ChangeSpeedModifiers(EntityUid uid,
+        float walkSpeed,
+        float sprintSpeed,
+        SpeedModifierContactsComponent? component = null)
     {
         if (!Resolve(uid, ref component))
             return;
@@ -95,7 +97,9 @@ public sealed class SpeedModifierContactsSystem : EntitySystem
         _toUpdate.UnionWith(_physics.GetContactingEntities(uid, phys));
     }
 
-    private void OnRefreshMovementSpeedModifiers(EntityUid uid, SpeedModifiedByContactComponent component, RefreshMovementSpeedModifiersEvent args)
+    private void OnRefreshMovementSpeedModifiers(EntityUid uid,
+        SpeedModifiedByContactComponent component,
+        RefreshMovementSpeedModifiersEvent args)
     {
         if (!TryComp<PhysicsComponent>(uid, out var physicsComponent))
             return;
@@ -104,13 +108,14 @@ public sealed class SpeedModifierContactsSystem : EntitySystem
         var sprintSpeed = 0.0f;
 
         // Cache the result of the airborne check, as it's expensive and independent of contacting entities, hence need only be done once.
-        var isAirborne = physicsComponent.BodyStatus == BodyStatus.InAir || _gravity.IsWeightless(uid, physicsComponent);
+        var isAirborne = physicsComponent.BodyStatus == BodyStatus.InAir ||
+                         _gravity.IsWeightless(uid, physicsComponent);
 
-        bool remove = true;
+        var remove = true;
         var entries = 0;
         foreach (var ent in _physics.GetContactingEntities(uid, physicsComponent))
         {
-            bool speedModified = false;
+            var speedModified = false;
 
             if (TryComp<SpeedModifierContactsComponent>(ent, out var slowContactsComponent))
             {
@@ -131,7 +136,7 @@ public sealed class SpeedModifierContactsSystem : EntitySystem
             }
 
             // SpeedModifierContactsComponent takes priority over SlowedOverSlipperyComponent, effectively overriding the slippery slow.
-            if (HasComp<SlipperyComponent>(ent) && speedModified == false)
+            if (HasComp<SlipperyComponent>(ent) && !speedModified)
             {
                 var evSlippery = new GetSlowedOverSlipperyModifierEvent();
                 RaiseLocalEvent(uid, ref evSlippery);

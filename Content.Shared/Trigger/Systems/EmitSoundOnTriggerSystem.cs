@@ -6,8 +6,8 @@ namespace Content.Shared.Trigger.Systems;
 
 public sealed class EmitSoundOnTriggerSystem : EntitySystem
 {
-    [Dependency] private readonly INetManager _netMan = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly INetManager _netMan = default!;
 
     public override void Initialize()
     {

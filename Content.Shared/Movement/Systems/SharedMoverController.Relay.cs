@@ -8,7 +8,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.ActionBlocker;
 using Content.Shared.Movement.Components;
 
 namespace Content.Shared.Movement.Systems;
@@ -23,19 +22,15 @@ public abstract partial class SharedMoverController
         SubscribeLocalEvent<RelayInputMoverComponent, AfterAutoHandleStateEvent>(OnAfterRelayState);
     }
 
-    private void OnAfterRelayTargetState(Entity<MovementRelayTargetComponent> entity, ref AfterAutoHandleStateEvent args)
-    {
-        PhysicsSystem.UpdateIsPredicted(entity.Owner);
-    }
+    private void OnAfterRelayTargetState(Entity<MovementRelayTargetComponent> entity,
+        ref AfterAutoHandleStateEvent args) => PhysicsSystem.UpdateIsPredicted(entity.Owner);
 
-    private void OnAfterRelayState(Entity<RelayInputMoverComponent> entity, ref AfterAutoHandleStateEvent args)
-    {
+    private void OnAfterRelayState(Entity<RelayInputMoverComponent> entity, ref AfterAutoHandleStateEvent args) =>
         PhysicsSystem.UpdateIsPredicted(entity.Owner);
-    }
 
     /// <summary>
-    ///     Sets the relay entity and marks the component as dirty. This only exists because people have previously
-    ///     forgotten to Dirty(), so fuck you, you have to use this method now.
+    /// Sets the relay entity and marks the component as dirty. This only exists because people have previously
+    /// forgotten to Dirty(), so fuck you, you have to use this method now.
     /// </summary>
     public void SetRelay(EntityUid uid, EntityUid relayEntity)
     {
@@ -84,7 +79,8 @@ public abstract partial class SharedMoverController
         if (Timing.ApplyingState)
             return;
 
-        if (TryComp(entity.Comp.RelayEntity, out MovementRelayTargetComponent? target) && target.LifeStage <= ComponentLifeStage.Running)
+        if (TryComp(entity.Comp.RelayEntity, out MovementRelayTargetComponent? target) &&
+            target.LifeStage <= ComponentLifeStage.Running)
             RemComp(entity.Comp.RelayEntity, target);
 
         _blocker.UpdateCanMove(entity.Owner);
@@ -98,7 +94,8 @@ public abstract partial class SharedMoverController
         if (Timing.ApplyingState)
             return;
 
-        if (TryComp(entity.Comp.Source, out RelayInputMoverComponent? relay) && relay.LifeStage <= ComponentLifeStage.Running)
+        if (TryComp(entity.Comp.Source, out RelayInputMoverComponent? relay) &&
+            relay.LifeStage <= ComponentLifeStage.Running)
             RemComp(entity.Comp.Source, relay);
     }
 }

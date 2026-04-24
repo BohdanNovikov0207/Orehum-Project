@@ -8,22 +8,34 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Chemistry.Components;
-using Content.Shared.Kitchen.Components;
-using Content.Shared.Chemistry.Components.SolutionManager;
-using Content.Goobstation.Maths.FixedPoint;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
+using Content.Goobstation.Maths.FixedPoint;
+using Content.Shared.Chemistry.Components;
+using Content.Shared.Chemistry.Components.SolutionManager;
+using Content.Shared.Kitchen.Components;
 
 namespace Content.Shared.Chemistry.EntitySystems;
 
 public abstract partial class SharedSolutionContainerSystem
 {
+    /// <returns>A value between 0 and 100 inclusive.</returns>
+    public float PercentFull(EntityUid uid)
+    {
+        if (!TryGetDrainableSolution(uid, out _, out var solution))
+            return 0;
+
+        return PercentFull(solution);
+    }
+
     #region Solution Accessors
 
-    public bool TryGetRefillableSolution(Entity<RefillableSolutionComponent?, SolutionContainerManagerComponent?> entity, [NotNullWhen(true)] out Entity<SolutionComponent>? soln, [NotNullWhen(true)] out Solution? solution)
+    public bool TryGetRefillableSolution(
+        Entity<RefillableSolutionComponent?, SolutionContainerManagerComponent?> entity,
+        [NotNullWhen(true)] out Entity<SolutionComponent>? soln,
+        [NotNullWhen(true)] out Solution? solution)
     {
-        if (!Resolve(entity, ref entity.Comp1, logMissing: false))
+        if (!Resolve(entity, ref entity.Comp1, false))
         {
             (soln, solution) = (default!, null);
             return false;
@@ -32,9 +44,11 @@ public abstract partial class SharedSolutionContainerSystem
         return TryGetSolution((entity.Owner, entity.Comp2), entity.Comp1.Solution, out soln, out solution);
     }
 
-    public bool TryGetDrainableSolution(Entity<DrainableSolutionComponent?, SolutionContainerManagerComponent?> entity, [NotNullWhen(true)] out Entity<SolutionComponent>? soln, [NotNullWhen(true)] out Solution? solution)
+    public bool TryGetDrainableSolution(Entity<DrainableSolutionComponent?, SolutionContainerManagerComponent?> entity,
+        [NotNullWhen(true)] out Entity<SolutionComponent>? soln,
+        [NotNullWhen(true)] out Solution? solution)
     {
-        if (!Resolve(entity, ref entity.Comp1, logMissing: false))
+        if (!Resolve(entity, ref entity.Comp1, false))
         {
             (soln, solution) = (default!, null);
             return false;
@@ -43,9 +57,11 @@ public abstract partial class SharedSolutionContainerSystem
         return TryGetSolution((entity.Owner, entity.Comp2), entity.Comp1.Solution, out soln, out solution);
     }
 
-    public bool TryGetExtractableSolution(Entity<ExtractableComponent?, SolutionContainerManagerComponent?> entity, [NotNullWhen(true)] out Entity<SolutionComponent>? soln, [NotNullWhen(true)] out Solution? solution)
+    public bool TryGetExtractableSolution(Entity<ExtractableComponent?, SolutionContainerManagerComponent?> entity,
+        [NotNullWhen(true)] out Entity<SolutionComponent>? soln,
+        [NotNullWhen(true)] out Solution? solution)
     {
-        if (!Resolve(entity, ref entity.Comp1, logMissing: false))
+        if (!Resolve(entity, ref entity.Comp1, false))
         {
             (soln, solution) = (default!, null);
             return false;
@@ -54,9 +70,11 @@ public abstract partial class SharedSolutionContainerSystem
         return TryGetSolution((entity.Owner, entity.Comp2), entity.Comp1.GrindableSolution, out soln, out solution);
     }
 
-    public bool TryGetDumpableSolution(Entity<DumpableSolutionComponent?, SolutionContainerManagerComponent?> entity, [NotNullWhen(true)] out Entity<SolutionComponent>? soln, [NotNullWhen(true)] out Solution? solution)
+    public bool TryGetDumpableSolution(Entity<DumpableSolutionComponent?, SolutionContainerManagerComponent?> entity,
+        [NotNullWhen(true)] out Entity<SolutionComponent>? soln,
+        [NotNullWhen(true)] out Solution? solution)
     {
-        if (!Resolve(entity, ref entity.Comp1, logMissing: false))
+        if (!Resolve(entity, ref entity.Comp1, false))
         {
             (soln, solution) = (default!, null);
             return false;
@@ -65,9 +83,11 @@ public abstract partial class SharedSolutionContainerSystem
         return TryGetSolution((entity.Owner, entity.Comp2), entity.Comp1.Solution, out soln, out solution);
     }
 
-    public bool TryGetDrawableSolution(Entity<DrawableSolutionComponent?, SolutionContainerManagerComponent?> entity, [NotNullWhen(true)] out Entity<SolutionComponent>? soln, [NotNullWhen(true)] out Solution? solution)
+    public bool TryGetDrawableSolution(Entity<DrawableSolutionComponent?, SolutionContainerManagerComponent?> entity,
+        [NotNullWhen(true)] out Entity<SolutionComponent>? soln,
+        [NotNullWhen(true)] out Solution? solution)
     {
-        if (!Resolve(entity, ref entity.Comp1, logMissing: false))
+        if (!Resolve(entity, ref entity.Comp1, false))
         {
             (soln, solution) = (default!, null);
             return false;
@@ -76,9 +96,12 @@ public abstract partial class SharedSolutionContainerSystem
         return TryGetSolution((entity.Owner, entity.Comp2), entity.Comp1.Solution, out soln, out solution);
     }
 
-    public bool TryGetInjectableSolution(Entity<InjectableSolutionComponent?, SolutionContainerManagerComponent?> entity, [NotNullWhen(true)] out Entity<SolutionComponent>? soln, [NotNullWhen(true)] out Solution? solution)
+    public bool TryGetInjectableSolution(
+        Entity<InjectableSolutionComponent?, SolutionContainerManagerComponent?> entity,
+        [NotNullWhen(true)] out Entity<SolutionComponent>? soln,
+        [NotNullWhen(true)] out Solution? solution)
     {
-        if (!Resolve(entity, ref entity.Comp1, logMissing: false))
+        if (!Resolve(entity, ref entity.Comp1, false))
         {
             (soln, solution) = (default!, null);
             return false;
@@ -87,9 +110,11 @@ public abstract partial class SharedSolutionContainerSystem
         return TryGetSolution((entity.Owner, entity.Comp2), entity.Comp1.Solution, out soln, out solution);
     }
 
-    public bool TryGetFitsInDispenser(Entity<FitsInDispenserComponent?, SolutionContainerManagerComponent?> entity, [NotNullWhen(true)] out Entity<SolutionComponent>? soln, [NotNullWhen(true)] out Solution? solution)
+    public bool TryGetFitsInDispenser(Entity<FitsInDispenserComponent?, SolutionContainerManagerComponent?> entity,
+        [NotNullWhen(true)] out Entity<SolutionComponent>? soln,
+        [NotNullWhen(true)] out Solution? solution)
     {
-        if (!Resolve(entity, ref entity.Comp1, logMissing: false))
+        if (!Resolve(entity, ref entity.Comp1, false))
         {
             (soln, solution) = (default!, null);
             return false;
@@ -98,9 +123,11 @@ public abstract partial class SharedSolutionContainerSystem
         return TryGetSolution((entity.Owner, entity.Comp2), entity.Comp1.Solution, out soln, out solution);
     }
 
-    public bool TryGetMixableSolution(Entity<MixableSolutionComponent?, SolutionContainerManagerComponent?> entity, [NotNullWhen(true)] out Entity<SolutionComponent>? soln, [NotNullWhen(true)] out Solution? solution)
+    public bool TryGetMixableSolution(Entity<MixableSolutionComponent?, SolutionContainerManagerComponent?> entity,
+        [NotNullWhen(true)] out Entity<SolutionComponent>? soln,
+        [NotNullWhen(true)] out Solution? solution)
     {
-        if (!Resolve(entity, ref entity.Comp1, logMissing: false))
+        if (!Resolve(entity, ref entity.Comp1, false))
         {
             (soln, solution) = (default!, null);
             return false;
@@ -115,7 +142,7 @@ public abstract partial class SharedSolutionContainerSystem
 
     public void Refill(Entity<RefillableSolutionComponent?> entity, Entity<SolutionComponent> soln, Solution refill)
     {
-        if (!Resolve(entity, ref entity.Comp, logMissing: false))
+        if (!Resolve(entity, ref entity.Comp, false))
             return;
 
         AddSolution(soln, refill);
@@ -123,38 +150,33 @@ public abstract partial class SharedSolutionContainerSystem
 
     public void Inject(Entity<InjectableSolutionComponent?> entity, Entity<SolutionComponent> soln, Solution inject)
     {
-        if (!Resolve(entity, ref entity.Comp, logMissing: false))
+        if (!Resolve(entity, ref entity.Comp, false))
             return;
 
         AddSolution(soln, inject);
     }
 
-    public Solution Drain(Entity<DrainableSolutionComponent?> entity, Entity<SolutionComponent> soln, FixedPoint2 quantity)
+    public Solution Drain(Entity<DrainableSolutionComponent?> entity,
+        Entity<SolutionComponent> soln,
+        FixedPoint2 quantity)
     {
-        if (!Resolve(entity, ref entity.Comp, logMissing: false))
-            return new();
+        if (!Resolve(entity, ref entity.Comp, false))
+            return new Solution();
 
         return SplitSolution(soln, quantity);
     }
 
-    public Solution Draw(Entity<DrawableSolutionComponent?> entity, Entity<SolutionComponent> soln, FixedPoint2 quantity)
+    public Solution Draw(Entity<DrawableSolutionComponent?> entity,
+        Entity<SolutionComponent> soln,
+        FixedPoint2 quantity)
     {
-        if (!Resolve(entity, ref entity.Comp, logMissing: false))
-            return new();
+        if (!Resolve(entity, ref entity.Comp, false))
+            return new Solution();
 
         return SplitSolution(soln, quantity);
     }
 
     #endregion Solution Modifiers
-
-    /// <returns>A value between 0 and 100 inclusive.</returns>
-    public float PercentFull(EntityUid uid)
-    {
-        if (!TryGetDrainableSolution(uid, out _, out var solution))
-            return 0;
-
-        return PercentFull(solution);
-    }
 
     #region Static Methods
 
@@ -169,13 +191,9 @@ public abstract partial class SharedSolutionContainerSystem
         foreach (var (id, quantity) in solution.Contents)
         {
             if (first)
-            {
                 first = false;
-            }
             else
-            {
                 sb.Append(", ");
-            }
 
             sb.AppendFormat("{0}: {1}u", id, quantity);
         }

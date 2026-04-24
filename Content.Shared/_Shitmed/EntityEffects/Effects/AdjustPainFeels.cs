@@ -1,8 +1,7 @@
 using System.Text.Json.Serialization;
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared._Shitmed.Medical.Surgery.Consciousness.Systems;
 using Content.Shared._Shitmed.Medical.Surgery.Pain.Systems;
-using Content.Shared.EntityEffects;
-using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Body.Systems;
 using JetBrains.Annotations;
 using Robust.Shared.Prototypes;
@@ -29,9 +28,7 @@ public sealed partial class AdjustPainFeels : EntityEffect
         var scale = FixedPoint2.New(1);
 
         if (args is EntityEffectReagentArgs reagentArgs)
-        {
             scale = reagentArgs.Quantity * reagentArgs.Scale;
-        }
 
         if (!args.EntityManager.System<ConsciousnessSystem>().TryGetNerveSystem(args.TargetEntity, out var nerveSys))
             return;

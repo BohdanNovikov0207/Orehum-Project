@@ -7,7 +7,6 @@
 using Content.Shared.InteractionVerbs;
 using Content.Shared.StatusEffect;
 using Robust.Shared.Prototypes;
-using Robust.Shared.Serialization;
 
 namespace Content.Server.InteractionVerbs.Actions;
 
@@ -18,19 +17,22 @@ public sealed partial class ModifyStatusEffectAction : InteractionAction
     public ProtoId<StatusEffectPrototype> Effect;
 
     /// <summary>
-    ///     If true, the action will ensure that the system already has the status effect when removing time,
-    ///     or will ensure the entity gets the status effect when adding it.
+    /// If true, the action will ensure that the system already has the status effect when removing time,
+    /// or will ensure the entity gets the status effect when adding it.
     /// </summary>
     [DataField]
     public bool EnsureEffect = true;
 
     /// <summary>
-    ///     Amount of time added by this action. Can be negative, but then <see cref="EnsureEffect"/> should be false.
+    /// Amount of time added by this action. Can be negative, but then <see cref="EnsureEffect" /> should be false.
     /// </summary>
     [DataField]
     public TimeSpan TimeAdded = TimeSpan.FromSeconds(1);
 
-    public override bool CanPerform(InteractionArgs args, InteractionVerbPrototype proto, bool isBefore, VerbDependencies deps)
+    public override bool CanPerform(InteractionArgs args,
+        InteractionVerbPrototype proto,
+        bool isBefore,
+        VerbDependencies deps)
     {
         var statusEffects = deps.EntMan.System<StatusEffectsSystem>();
         if (!statusEffects.CanApplyEffect(args.Target, Effect))
@@ -45,7 +47,7 @@ public sealed partial class ModifyStatusEffectAction : InteractionAction
 
         if (statusEffects.HasStatusEffect(args.Target, Effect))
             return statusEffects.TryAddTime(args.Target, Effect, TimeAdded);
-        else if (EnsureEffect)
+        if (EnsureEffect)
             return statusEffects.TryAddStatusEffect(args.Target, Effect, TimeAdded, true);
 
         return false;

@@ -24,17 +24,17 @@ using Robust.Shared.GameStates;
 
 namespace Content.Shared._Lavaland.Body;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 [AutoGenerateComponentState]
 public sealed partial class CursedHeartComponent : Component
 {
-    [AutoNetworkedField]
-    public EntityUid? PumpActionEntity;
-
     public TimeSpan LastPump = TimeSpan.Zero;
 
     [DataField]
     public float MaxDelay = 5f;
+
+    [AutoNetworkedField]
+    public EntityUid? PumpActionEntity;
 }
 
 public sealed partial class PumpHeartActionEvent : InstantActionEvent;

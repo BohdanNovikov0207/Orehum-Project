@@ -10,24 +10,18 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Audio.Jukebox;
 
-[NetworkedComponent, RegisterComponent, AutoGenerateComponentState(true)]
+[NetworkedComponent] [RegisterComponent] [AutoGenerateComponentState(true)]
 [Access(typeof(SharedJukeboxSystem))]
 public sealed partial class JukeboxComponent : Component
 {
-    [DataField, AutoNetworkedField]
-    public ProtoId<JukeboxPrototype>? SelectedSongId;
-
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public EntityUid? AudioStream;
 
-    [DataField, AutoNetworkedField]
-    public bool Loop { get; set; } = false;
+    public float MaxSlider = 100f;
+    public float MaxVolume = 0f;
+    public float MinSlider = 0f;
 
-    /// <summary>
-    /// RSI state for the jukebox being on.
-    /// </summary>
-    [DataField]
-    public string? OnState;
+    public float MinVolume = -30f;
 
     /// <summary>
     /// RSI state for the jukebox being on.
@@ -36,60 +30,67 @@ public sealed partial class JukeboxComponent : Component
     public string? OffState;
 
     /// <summary>
+    /// RSI state for the jukebox being on.
+    /// </summary>
+    [DataField]
+    public string? OnState;
+
+    [ViewVariables]
+    public float SelectAccumulator;
+
+    [DataField] [AutoNetworkedField]
+    public ProtoId<JukeboxPrototype>? SelectedSongId;
+
+    [ViewVariables]
+    public bool Selecting;
+
+    /// <summary>
     /// RSI state for the jukebox track being selected.
     /// </summary>
     [DataField]
     public string? SelectState;
 
-    [ViewVariables]
-    public bool Selecting;
-
-    [ViewVariables]
-    public float SelectAccumulator;
-
-    [ViewVariables, AutoNetworkedField]
+    [ViewVariables] [AutoNetworkedField]
     public float Volume = 50f;
 
-    public float MinVolume = -30f;
-    public float MaxVolume = 0f;
-    public float MinSlider = 0f;
-    public float MaxSlider = 100f;
+    [DataField] [AutoNetworkedField]
+    public bool Loop { get; set; } = false;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class JukeboxPlayingMessage : BoundUserInterfaceMessage;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class JukeboxPauseMessage : BoundUserInterfaceMessage;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class JukeboxStopMessage : BoundUserInterfaceMessage;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class JukeboxSelectedMessage(ProtoId<JukeboxPrototype> songId) : BoundUserInterfaceMessage
 {
     public ProtoId<JukeboxPrototype> SongId { get; } = songId;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class JukeboxSetTimeMessage(float songTime) : BoundUserInterfaceMessage
 {
     public float SongTime { get; } = songTime;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class JukeboxSetVolumeMessage(float volume) : BoundUserInterfaceMessage
 {
     public float Volume { get; } = volume;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum JukeboxVisuals : byte
 {
-    VisualState
+    VisualState,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum JukeboxVisualState : byte
 {
     On,
@@ -97,10 +98,10 @@ public enum JukeboxVisualState : byte
     Select,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class JukeboxToggleLoopMessage : BoundUserInterfaceMessage;
 
 public enum JukeboxVisualLayers : byte
 {
-    Base
+    Base,
 }

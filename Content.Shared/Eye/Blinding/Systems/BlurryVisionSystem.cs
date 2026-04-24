@@ -8,8 +8,8 @@
 // SPDX-License-Identifier: MIT
 
 using Content.Shared.Eye.Blinding.Components;
-using Content.Shared.Inventory.Events;
 using Content.Shared.Inventory;
+using Content.Shared.Inventory.Events;
 
 namespace Content.Shared.Eye.Blinding.Systems;
 
@@ -51,15 +51,11 @@ public sealed class BlurryVisionSystem : EntitySystem
         Dirty(ent, blurry);
     }
 
-    private void OnGlassesEquipped(Entity<VisionCorrectionComponent> glasses, ref GotEquippedEvent args)
-    {
+    private void OnGlassesEquipped(Entity<VisionCorrectionComponent> glasses, ref GotEquippedEvent args) =>
         UpdateBlurMagnitude(args.Equipee);
-    }
 
-    private void OnGlassesUnequipped(Entity<VisionCorrectionComponent> glasses, ref GotUnequippedEvent args)
-    {
+    private void OnGlassesUnequipped(Entity<VisionCorrectionComponent> glasses, ref GotUnequippedEvent args) =>
         UpdateBlurMagnitude(args.Equipee);
-    }
 }
 
 public sealed class GetBlurEvent : EntityEventArgs, IInventoryRelayEvent

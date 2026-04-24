@@ -18,8 +18,8 @@ namespace Content.Shared.Containers;
 
 public sealed partial class DragInsertContainerSystem : EntitySystem
 {
-    [Dependency] private readonly ISharedAdminLogManager _adminLog = default!;
     [Dependency] private readonly ActionBlockerSystem _actionBlocker = default!;
+    [Dependency] private readonly ISharedAdminLogManager _adminLog = default!;
     [Dependency] private readonly ClimbSystem _climb = default!;
     [Dependency] private readonly SharedContainerSystem _container = default!;
     [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
@@ -28,7 +28,8 @@ public sealed partial class DragInsertContainerSystem : EntitySystem
     {
         base.Initialize();
 
-        SubscribeLocalEvent<DragInsertContainerComponent, DragDropTargetEvent>(OnDragDropOn, before: new []{ typeof(ClimbSystem)});
+        SubscribeLocalEvent<DragInsertContainerComponent, DragDropTargetEvent>(OnDragDropOn,
+            new[] { typeof(ClimbSystem) });
         SubscribeLocalEvent<DragInsertContainerComponent, DragInsertContainerDoAfterEvent>(OnDragFinished);
         SubscribeLocalEvent<DragInsertContainerComponent, CanDropTargetEvent>(OnCanDragDropOn);
         SubscribeLocalEvent<DragInsertContainerComponent, GetVerbsEvent<AlternativeVerb>>(OnGetAlternativeVerb);
@@ -52,7 +53,13 @@ public sealed partial class DragInsertContainerSystem : EntitySystem
         }
 
         //delayed insertion
-        var doAfterArgs = new DoAfterArgs(EntityManager, args.User, comp.EntryDelay, new DragInsertContainerDoAfterEvent(), ent, args.Dragged, ent)
+        var doAfterArgs = new DoAfterArgs(EntityManager,
+            args.User,
+            comp.EntryDelay,
+            new DragInsertContainerDoAfterEvent(),
+            ent,
+            args.Dragged,
+            ent)
         {
             BreakOnDamage = true,
             BreakOnMove = true,
@@ -117,7 +124,9 @@ public sealed partial class DragInsertContainerSystem : EntitySystem
                 {
                     Act = () =>
                     {
-                        _adminLog.Add(LogType.Action, LogImpact.Low, $"{ToPrettyString(user):player} emptied container {ToPrettyString(ent)}");
+                        _adminLog.Add(LogType.Action,
+                            LogImpact.Low,
+                            $"{ToPrettyString(user):player} emptied container {ToPrettyString(ent)}");
                         var ents = _container.EmptyContainer(container);
                         foreach (var contained in ents)
                         {
@@ -126,7 +135,7 @@ public sealed partial class DragInsertContainerSystem : EntitySystem
                     },
                     Category = VerbCategory.Eject,
                     Text = Loc.GetString("container-verb-text-empty"),
-                    Priority = 1 // Promote to top to make ejecting the ALT-click action
+                    Priority = 1, // Promote to top to make ejecting the ALT-click action
                 };
                 args.Verbs.Add(verb);
             }
@@ -140,7 +149,7 @@ public sealed partial class DragInsertContainerSystem : EntitySystem
             {
                 Act = () => Insert(user, user, ent, container),
                 Text = Loc.GetString("container-verb-text-enter"),
-                Priority = 2
+                Priority = 2,
             };
             args.Verbs.Add(verb);
         }
@@ -151,11 +160,13 @@ public sealed partial class DragInsertContainerSystem : EntitySystem
         if (!_container.Insert(target, container))
             return false;
 
-        _adminLog.Add(LogType.Action, LogImpact.Medium, $"{ToPrettyString(user):player} inserted {ToPrettyString(target):player} into container {ToPrettyString(containerEntity)}");
+        _adminLog.Add(LogType.Action,
+            LogImpact.Medium,
+            $"{ToPrettyString(user):player} inserted {ToPrettyString(target):player} into container {ToPrettyString(containerEntity)}");
         return true;
     }
 
-    [Serializable, NetSerializable]
+    [Serializable] [NetSerializable]
     public sealed partial class DragInsertContainerDoAfterEvent : SimpleDoAfterEvent
     {
     }

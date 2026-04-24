@@ -32,19 +32,32 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Robust.Shared.Serialization;
 using Robust.Shared.GameStates;
+using Robust.Shared.Serialization;
 
 namespace Content.Shared.Radio.Components;
 
 /// <summary>
-/// When activated (<see cref="ActiveRadioJammerComponent"/>) prevents from sending messages in range
+/// When activated (<see cref="ActiveRadioJammerComponent" />) prevents from sending messages in range
 /// Suit sensors will also stop working.
 /// </summary>
-[NetworkedComponent, RegisterComponent]
+[NetworkedComponent] [RegisterComponent]
 [AutoGenerateComponentState]
 public sealed partial class RadioJammerComponent : Component
 {
+    /// <summary>
+    /// Index of the currently selected setting.
+    /// </summary>
+    [DataField]
+    [AutoNetworkedField]
+    public int SelectedPowerLevel = 1;
+
+    /// <summary>
+    /// List of all the settings for the radio jammer.
+    /// </summary>
+    [DataField(required: true)] [ViewVariables(VVAccess.ReadOnly)]
+    public RadioJamSetting[] Settings;
+
     [DataDefinition]
     public partial struct RadioJamSetting
     {
@@ -73,38 +86,25 @@ public sealed partial class RadioJammerComponent : Component
         [DataField(required: true)]
         public LocId Name = string.Empty;
     }
-
-    /// <summary>
-    /// List of all the settings for the radio jammer.
-    /// </summary>
-    [DataField(required: true), ViewVariables(VVAccess.ReadOnly)]
-    public RadioJamSetting[] Settings;
-
-    /// <summary>
-    /// Index of the currently selected setting.
-    /// </summary>
-    [DataField]
-    [AutoNetworkedField]
-    public int SelectedPowerLevel = 1;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum RadioJammerChargeLevel : byte
 {
     Low,
     Medium,
-    High
+    High,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum RadioJammerLayers : byte
 {
-    LED
+    LED,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum RadioJammerVisuals : byte
 {
     ChargeLevel,
-    LEDOn
+    LEDOn,
 }

@@ -25,11 +25,11 @@ namespace Content.Shared.Nutrition.EntitySystems;
 /// <summary>
 /// Provides API for openable food and drinks, handles opening on use and preventing transfer when closed.
 /// </summary>
-public sealed partial class OpenableSystem : EntitySystem
+public sealed class OpenableSystem : EntitySystem
 {
-    [Dependency] private readonly LockSystem _lock = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly LockSystem _lock = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
 
     public override void Initialize()
@@ -62,10 +62,7 @@ public sealed partial class OpenableSystem : EntitySystem
     }
 #endif
 
-    private void OnInit(Entity<OpenableComponent> ent, ref ComponentInit args)
-    {
-        UpdateAppearance(ent, ent.Comp);
-    }
+    private void OnInit(Entity<OpenableComponent> ent, ref ComponentInit args) => UpdateAppearance(ent, ent.Comp);
 
     private void OnUse(Entity<OpenableComponent> ent, ref UseInHandEvent args)
     {
@@ -92,11 +89,9 @@ public sealed partial class OpenableSystem : EntitySystem
         args.PushMarkup(text);
     }
 
-    private void HandleIfClosed(EntityUid uid, OpenableComponent comp, HandledEntityEventArgs args)
-    {
+    private void HandleIfClosed(EntityUid uid, OpenableComponent comp, HandledEntityEventArgs args) =>
         // prevent spilling/pouring/whatever drinks when closed
         args.Handled = !comp.Opened;
-    }
 
     private void OnGetVerbs(EntityUid uid, OpenableComponent comp, GetVerbsEvent<AlternativeVerb> args)
     {
@@ -109,24 +104,25 @@ public sealed partial class OpenableSystem : EntitySystem
             if (!comp.Closeable)
                 return;
 
-            verb = new()
+            verb = new AlternativeVerb
             {
                 Text = Loc.GetString(comp.CloseVerbText),
-                Icon = new SpriteSpecifier.Texture(new("/Textures/Interface/VerbIcons/close.svg.192dpi.png")),
+                Icon = new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/VerbIcons/close.svg.192dpi.png")),
                 Act = () => TryClose(args.Target, comp, args.User),
-                Priority = 3
+                Priority = 3,
             };
         }
         else
         {
-            verb = new()
+            verb = new AlternativeVerb
             {
                 Text = Loc.GetString(comp.OpenVerbText),
-                Icon = new SpriteSpecifier.Texture(new("/Textures/Interface/VerbIcons/open.svg.192dpi.png")),
+                Icon = new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/VerbIcons/open.svg.192dpi.png")),
                 Act = () => TryOpen(args.Target, comp, args.User),
-                Priority = 3
+                Priority = 3,
             };
         }
+
         args.Verbs.Add(verb);
     }
 

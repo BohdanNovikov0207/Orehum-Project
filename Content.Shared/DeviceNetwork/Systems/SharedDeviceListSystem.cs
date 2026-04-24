@@ -21,9 +21,7 @@ public abstract class SharedDeviceListSystem : EntitySystem
     public IEnumerable<EntityUid> GetAllDevices(EntityUid uid, DeviceListComponent? component = null)
     {
         if (!Resolve(uid, ref component))
-        {
             return new EntityUid[] { };
-        }
         return component.Devices;
     }
 }
@@ -44,5 +42,5 @@ public enum DeviceListUpdateResult : byte
 {
     NoComponent,
     TooManyDevices,
-    UpdateOk
+    UpdateOk,
 }

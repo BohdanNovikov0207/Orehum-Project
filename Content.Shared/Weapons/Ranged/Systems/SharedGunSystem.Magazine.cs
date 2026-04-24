@@ -42,10 +42,8 @@ public abstract partial class SharedGunSystem
         SubscribeLocalEvent<MagazineAmmoProviderComponent, ExaminedEvent>(OnMagazineExamine);
     }
 
-    private void OnMagazineMapInit(Entity<MagazineAmmoProviderComponent> ent, ref MapInitEvent args)
-    {
+    private void OnMagazineMapInit(Entity<MagazineAmmoProviderComponent> ent, ref MapInitEvent args) =>
         MagazineSlotChanged(ent);
-    }
 
     private void OnMagazineExamine(EntityUid uid, MagazineAmmoProviderComponent component, ExaminedEvent args)
     {
@@ -70,7 +68,9 @@ public abstract partial class SharedGunSystem
         UpdateMagazineAppearance(uid, component, magEnt.Value);
     }
 
-    private void OnMagazineVerb(EntityUid uid, MagazineAmmoProviderComponent component, GetVerbsEvent<AlternativeVerb> args)
+    private void OnMagazineVerb(EntityUid uid,
+        MagazineAmmoProviderComponent component,
+        GetVerbsEvent<AlternativeVerb> args)
     {
         if (!args.CanInteract || !args.CanAccess)
             return;
@@ -84,7 +84,9 @@ public abstract partial class SharedGunSystem
         }
     }
 
-    protected virtual void OnMagazineSlotChange(EntityUid uid, MagazineAmmoProviderComponent component, ContainerModifiedMessage args)
+    protected virtual void OnMagazineSlotChange(EntityUid uid,
+        MagazineAmmoProviderComponent component,
+        ContainerModifiedMessage args)
     {
         if (MagazineSlot != args.Container.ID)
             return;
@@ -102,9 +104,7 @@ public abstract partial class SharedGunSystem
         Appearance.SetData(ent, AmmoVisuals.MagLoaded, magEnt != null, appearance);
 
         if (magEnt != null)
-        {
             UpdateMagazineAppearance(ent, ent, magEnt.Value);
-        }
     }
 
     protected (int, int) GetMagazineCountCapacity(EntityUid uid, MagazineAmmoProviderComponent component)
@@ -116,7 +116,7 @@ public abstract partial class SharedGunSystem
         if (magEnt != null)
         {
             var ev = new GetAmmoCountEvent();
-            RaiseLocalEvent(magEnt.Value, ref ev, false);
+            RaiseLocalEvent(magEnt.Value, ref ev);
             count += ev.Count;
             capacity += ev.Capacity;
         }
@@ -128,9 +128,7 @@ public abstract partial class SharedGunSystem
     {
         if (!Containers.TryGetContainer(uid, MagazineSlot, out var container) ||
             container is not ContainerSlot slot)
-        {
             return null;
-        }
 
         return slot.ContainedEntity;
     }
@@ -165,7 +163,12 @@ public abstract partial class SharedGunSystem
         FinaliseMagazineTakeAmmo(uid, component, ammoEv.Count, ammoEv.Capacity, args.User, appearance);
     }
 
-    private void FinaliseMagazineTakeAmmo(EntityUid uid, MagazineAmmoProviderComponent component, int count, int capacity, EntityUid? user, AppearanceComponent? appearance)
+    private void FinaliseMagazineTakeAmmo(EntityUid uid,
+        MagazineAmmoProviderComponent component,
+        int count,
+        int capacity,
+        EntityUid? user,
+        AppearanceComponent? appearance)
     {
         // If no ammo then check for autoeject
         var ejectMag = component.AutoEject && count == 0;
@@ -196,7 +199,11 @@ public abstract partial class SharedGunSystem
         UpdateMagazineAppearance(uid, appearance, true, count, capacity);
     }
 
-    private void UpdateMagazineAppearance(EntityUid uid, AppearanceComponent? appearance, bool magLoaded, int count, int capacity)
+    private void UpdateMagazineAppearance(EntityUid uid,
+        AppearanceComponent? appearance,
+        bool magLoaded,
+        int count,
+        int capacity)
     {
         if (appearance == null)
             return;

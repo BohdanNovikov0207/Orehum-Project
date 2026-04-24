@@ -15,22 +15,21 @@ namespace Content.Shared.Procedural.DungeonGenerators;
 /// </summary>
 public sealed partial class ReplaceTileDunGen : IDunGenLayer
 {
+    [DataField(required: true)]
+    public List<ReplaceTileLayer> Layers = new();
+
     /// <summary>
     /// Chance for a non-variant tile to be used, in case they're too noisy.
     /// </summary>
     [DataField]
     public float VariantWeight = 0.1f;
-
-    [DataField(required: true)]
-    public List<ReplaceTileLayer> Layers = new();
 }
 
 [DataRecord]
-public partial record struct ReplaceTileLayer
+public record struct ReplaceTileLayer
 {
-    public ProtoId<ContentTileDefinition> Tile;
+    public FastNoiseLite Noise;
 
     public float Threshold;
-
-    public FastNoiseLite Noise;
+    public ProtoId<ContentTileDefinition> Tile;
 }

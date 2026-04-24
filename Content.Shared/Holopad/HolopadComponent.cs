@@ -14,23 +14,29 @@ namespace Content.Shared.Holopad;
 /// Holds data pertaining to holopads
 /// </summary>
 /// <remarks>
-/// Holopads also require a <see cref="TelephoneComponent"/> to function
+/// Holopads also require a <see cref="TelephoneComponent" /> to function
 /// </remarks>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 [Access(typeof(SharedHolopadSystem))]
 public sealed partial class HolopadComponent : Component
 {
+    /// <summary>
+    /// The entity that has locked out the controls of this device
+    /// </summary>
+    [ViewVariables] [AutoNetworkedField]
+    public EntityUid? ControlLockoutOwner = null;
+
+    /// <summary>
+    /// The game tick the control lockout was initiated
+    /// </summary>
+    [ViewVariables] [AutoNetworkedField]
+    public TimeSpan ControlLockoutStartTime;
+
     /// <summary>
     /// The entity being projected by the holopad
     /// </summary>
     [ViewVariables]
     public Entity<HolopadHologramComponent>? Hologram;
-
-    /// <summary>
-    /// The entity using the holopad
-    /// </summary>
-    [ViewVariables]
-    public Entity<HolopadUserComponent>? User;
 
     /// <summary>
     /// Proto ID for the user's hologram
@@ -39,16 +45,10 @@ public sealed partial class HolopadComponent : Component
     public EntProtoId? HologramProtoId;
 
     /// <summary>
-    /// The entity that has locked out the controls of this device
+    /// The entity using the holopad
     /// </summary>
-    [ViewVariables, AutoNetworkedField]
-    public EntityUid? ControlLockoutOwner = null;
-
-    /// <summary>
-    /// The game tick the control lockout was initiated
-    /// </summary>
-    [ViewVariables, AutoNetworkedField]
-    public TimeSpan ControlLockoutStartTime;
+    [ViewVariables]
+    public Entity<HolopadUserComponent>? User;
 
     /// <summary>
     /// The duration that the control lockout will last in seconds
@@ -66,9 +66,9 @@ public sealed partial class HolopadComponent : Component
 #region: Event messages
 
 /// <summary>
-///     Data from by the server to the client for the holopad UI
+/// Data from by the server to the client for the holopad UI
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class HolopadBoundInterfaceState : BoundUserInterfaceState
 {
     public readonly Dictionary<NetEntity, string> Holopads;
@@ -80,9 +80,9 @@ public sealed class HolopadBoundInterfaceState : BoundUserInterfaceState
 }
 
 /// <summary>
-///     Triggers the server to send updated power monitoring console data to the client for the single player session
+/// Triggers the server to send updated power monitoring console data to the client for the single player session
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class HolopadStartNewCallMessage : BoundUserInterfaceMessage
 {
     public readonly NetEntity Receiver;
@@ -94,45 +94,55 @@ public sealed class HolopadStartNewCallMessage : BoundUserInterfaceMessage
 }
 
 /// <summary>
-///     Triggers the server to send updated power monitoring console data to the client for the single player session
+/// Triggers the server to send updated power monitoring console data to the client for the single player session
 /// </summary>
-[Serializable, NetSerializable]
-public sealed class HolopadAnswerCallMessage : BoundUserInterfaceMessage { }
+[Serializable] [NetSerializable]
+public sealed class HolopadAnswerCallMessage : BoundUserInterfaceMessage
+{
+}
 
 /// <summary>
-///     Triggers the server to send updated power monitoring console data to the client for the single player session
+/// Triggers the server to send updated power monitoring console data to the client for the single player session
 /// </summary>
-[Serializable, NetSerializable]
-public sealed class HolopadEndCallMessage : BoundUserInterfaceMessage { }
+[Serializable] [NetSerializable]
+public sealed class HolopadEndCallMessage : BoundUserInterfaceMessage
+{
+}
 
 /// <summary>
-///     Triggers the server to send updated power monitoring console data to the client for the single player session
+/// Triggers the server to send updated power monitoring console data to the client for the single player session
 /// </summary>
-[Serializable, NetSerializable]
-public sealed class HolopadStartBroadcastMessage : BoundUserInterfaceMessage { }
+[Serializable] [NetSerializable]
+public sealed class HolopadStartBroadcastMessage : BoundUserInterfaceMessage
+{
+}
 
 /// <summary>
-///     Triggers the server to send updated power monitoring console data to the client for the single player session
+/// Triggers the server to send updated power monitoring console data to the client for the single player session
 /// </summary>
-[Serializable, NetSerializable]
-public sealed class HolopadActivateProjectorMessage : BoundUserInterfaceMessage { }
+[Serializable] [NetSerializable]
+public sealed class HolopadActivateProjectorMessage : BoundUserInterfaceMessage
+{
+}
 
 /// <summary>
-///     Triggers the server to send updated power monitoring console data to the client for the single player session
+/// Triggers the server to send updated power monitoring console data to the client for the single player session
 /// </summary>
-[Serializable, NetSerializable]
-public sealed class HolopadStationAiRequestMessage : BoundUserInterfaceMessage { }
+[Serializable] [NetSerializable]
+public sealed class HolopadStationAiRequestMessage : BoundUserInterfaceMessage
+{
+}
 
 #endregion
 
 /// <summary>
 /// Key to the Holopad UI
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum HolopadUiKey : byte
 {
     InteractionWindow,
     InteractionWindowForAi,
     AiActionWindow,
-    AiRequestWindow
+    AiRequestWindow,
 }

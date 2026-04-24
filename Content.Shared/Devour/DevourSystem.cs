@@ -3,7 +3,7 @@ using Content.Shared.Actions;
 using Content.Shared.Body.Events;
 using Content.Shared.Body.Systems;
 using Content.Shared.Chemistry.Components;
-using Content.Shared.Chemistry.EntitySystems; // Goobstation
+using Content.Shared.Chemistry.EntitySystems;
 using Content.Shared.Devour.Components;
 using Content.Shared.DoAfter;
 using Content.Shared.Mobs;
@@ -13,12 +13,12 @@ using Content.Shared.Whitelist;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Containers;
 using Robust.Shared.Serialization;
+// Goobstation
 
 namespace Content.Shared.Devour;
 
 public sealed class DevourSystem : EntitySystem
 {
-    [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
     [Dependency] private readonly SharedActionsSystem _actionsSystem = default!;
     [Dependency] private readonly SharedAudioSystem _audioSystem = default!;
     [Dependency] private readonly SharedBloodstreamSystem _bloodstreamSystem = default!;
@@ -26,6 +26,7 @@ public sealed class DevourSystem : EntitySystem
     [Dependency] private readonly SharedDoAfterSystem _doAfterSystem = default!;
     [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
     [Dependency] private readonly SharedSolutionContainerSystem _solution = default!; // Goobstation
+    [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
 
     public override void Initialize()
     {
@@ -39,22 +40,16 @@ public sealed class DevourSystem : EntitySystem
         SubscribeLocalEvent<DevourerComponent, BeingGibbedEvent>(OnGibContents);
     }
 
-    private void OnStartup(Entity<DevourerComponent> ent, ref ComponentStartup args)
-    {
+    private void OnStartup(Entity<DevourerComponent> ent, ref ComponentStartup args) =>
         //Devourer doesn't actually chew, since he sends targets right into his stomach.
         //I did it mom, I added ERP content into upstream. Legally!
         ent.Comp.Stomach = _containerSystem.EnsureContainer<Container>(ent.Owner, DevourerComponent.StomachContainerId);
-    }
 
-    private void OnInit(Entity<DevourerComponent> ent, ref MapInitEvent args)
-    {
+    private void OnInit(Entity<DevourerComponent> ent, ref MapInitEvent args) =>
         _actionsSystem.AddAction(ent.Owner, ref ent.Comp.DevourActionEntity, ent.Comp.DevourAction);
-    }
 
-    private void OnShutdown(Entity<DevourerComponent> ent, ref ComponentShutdown args)
-    {
+    private void OnShutdown(Entity<DevourerComponent> ent, ref ComponentShutdown args) =>
         _actionsSystem.RemoveAction(ent.Owner, ent.Comp.DevourActionEntity);
-    }
 
     /// <summary>
     /// The devour action
@@ -75,7 +70,13 @@ public sealed class DevourSystem : EntitySystem
                 case MobState.Critical:
                 case MobState.Dead:
 
-                    _doAfterSystem.TryStartDoAfter(new DoAfterArgs(EntityManager, ent.Owner, ent.Comp.DevourTime, new DevourDoAfterEvent(), ent.Owner, target: target, used: ent.Owner)
+                    _doAfterSystem.TryStartDoAfter(new DoAfterArgs(EntityManager,
+                        ent.Owner,
+                        ent.Comp.DevourTime,
+                        new DevourDoAfterEvent(),
+                        ent.Owner,
+                        target,
+                        ent.Owner)
                     {
                         BreakOnMove = true,
                     });
@@ -83,7 +84,9 @@ public sealed class DevourSystem : EntitySystem
                 case MobState.Invalid:
                 case MobState.Alive:
                 default:
-                    _popupSystem.PopupClient(Loc.GetString("devour-action-popup-message-fail-target-alive"), ent.Owner, ent.Owner);
+                    _popupSystem.PopupClient(Loc.GetString("devour-action-popup-message-fail-target-alive"),
+                        ent.Owner,
+                        ent.Owner);
                     break;
             }
 
@@ -93,9 +96,18 @@ public sealed class DevourSystem : EntitySystem
         _popupSystem.PopupClient(Loc.GetString("devour-action-popup-message-structure"), ent.Owner, ent.Owner);
 
         if (ent.Comp.SoundStructureDevour != null)
-            _audioSystem.PlayPredicted(ent.Comp.SoundStructureDevour, ent.Owner, ent.Owner, ent.Comp.SoundStructureDevour.Params);
+            _audioSystem.PlayPredicted(ent.Comp.SoundStructureDevour,
+                ent.Owner,
+                ent.Owner,
+                ent.Comp.SoundStructureDevour.Params);
 
-        _doAfterSystem.TryStartDoAfter(new DoAfterArgs(EntityManager, ent.Owner, ent.Comp.StructureDevourTime, new DevourDoAfterEvent(), ent.Owner, target: target, used: ent.Owner)
+        _doAfterSystem.TryStartDoAfter(new DoAfterArgs(EntityManager,
+            ent.Owner,
+            ent.Comp.StructureDevourTime,
+            new DevourDoAfterEvent(),
+            ent.Owner,
+            target,
+            ent.Owner)
         {
             BreakOnMove = true,
         });
@@ -109,35 +121,33 @@ public sealed class DevourSystem : EntitySystem
         var ichorInjection = new Solution(ent.Comp.Chemical, ent.Comp.HealRate);
 
         // Grant ichor if the devoured thing meets the dragon's food preference
-        if (args.Args.Target != null && _whitelistSystem.IsWhitelistPassOrNull(ent.Comp.FoodPreferenceWhitelist, (EntityUid)args.Args.Target))
-        {
+        if (args.Args.Target != null &&
+            _whitelistSystem.IsWhitelistPassOrNull(ent.Comp.FoodPreferenceWhitelist, (EntityUid) args.Args.Target))
             _bloodstreamSystem.TryAddToChemicals(ent.Owner, ichorInjection);
-        }
         // <Goobstation> voring walls is good for iron intake
-        if (args.Args.Target is {} target && _solution.TryGetSolution(target, "food", out _, out var food))
+        if (args.Args.Target is { } target && _solution.TryGetSolution(target, "food", out _, out var food))
             _bloodstreamSystem.TryAddToChemicals(ent.Owner, food);
         // </Goobstation>
 
         // If the devoured thing meets the stomach whitelist criteria, add it to the stomach
-        if (args.Args.Target != null && _whitelistSystem.IsWhitelistPass(ent.Comp.StomachStorageWhitelist, (EntityUid)args.Args.Target))
+        if (args.Args.Target != null &&
+            _whitelistSystem.IsWhitelistPass(ent.Comp.StomachStorageWhitelist, (EntityUid) args.Args.Target))
         {
             _containerSystem.Insert(args.Args.Target.Value, ent.Comp.Stomach);
 
             // Goobstation start
 
-            if (HasComp<MobStateComponent>(args.Args.Target.Value)) // can be cases where objects are also whitelisted, which wont need this
+            if (HasComp<MobStateComponent>(args.Args.Target
+                    .Value)) // can be cases where objects are also whitelisted, which wont need this
                 EnsureComp<PreventSelfRevivalComponent>(args.Args.Target.Value);
 
             // Goobstation end
-
         }
         //TODO: Figure out a better way of removing structures via devour that still entails standing still and waiting for a DoAfter. Somehow.
         //If it's not alive, it must be a structure.
         // Delete if the thing isn't in the stomach storage whitelist (or the stomach whitelist is null/empty)
         else if (args.Args.Target != null)
-        {
             PredictedQueueDel(args.Args.Target.Value);
-        }
 
         _audioSystem.PlayPredicted(ent.Comp.SoundDevour, ent.Owner, ent.Owner);
     }
@@ -150,7 +160,9 @@ public sealed class DevourSystem : EntitySystem
         // Goobstation start
 
         foreach (var entity in ent.Comp.Stomach.ContainedEntities)
+        {
             RemComp<PreventSelfRevivalComponent>(entity);
+        }
 
         // Goobstation end
 
@@ -162,6 +174,5 @@ public sealed class DevourSystem : EntitySystem
 
 public sealed partial class DevourActionEvent : EntityTargetActionEvent;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class DevourDoAfterEvent : SimpleDoAfterEvent;
-

@@ -10,7 +10,7 @@ namespace Content.Shared.Xenoarchaeology.Artifact.XAT;
 /// </summary>
 public sealed class XATExamineSystem : BaseXATSystem<XATExamineComponent>
 {
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
@@ -18,7 +18,9 @@ public sealed class XATExamineSystem : BaseXATSystem<XATExamineComponent>
         XATSubscribeDirectEvent<ExaminedEvent>(OnExamine);
     }
 
-    private void OnExamine(Entity<XenoArtifactComponent> artifact, Entity<XATExamineComponent, XenoArtifactNodeComponent> node, ref ExaminedEvent args)
+    private void OnExamine(Entity<XenoArtifactComponent> artifact,
+        Entity<XATExamineComponent, XenoArtifactNodeComponent> node,
+        ref ExaminedEvent args)
     {
         if (!args.IsInDetailsRange)
             return;

@@ -17,9 +17,9 @@ namespace Content.Shared.Movement.Components;
 /// <summary>
 /// Changes footstep sound
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class FootstepModifierComponent : Component
 {
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public SoundSpecifier? FootstepSoundCollection;
 }

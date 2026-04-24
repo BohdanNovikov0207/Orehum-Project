@@ -12,11 +12,11 @@ namespace Content.Shared._Shitmed.Switchable;
 public sealed partial class SwitchableActionEvent : InstantActionEvent;
 
 /// <summary>
-///     Generic enum keys for toggle-visualizer appearance data & sprite layers.
+/// Generic enum keys for toggle-visualizer appearance data & sprite layers.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum SwitchableVisuals : byte
 {
     Switched,
-    Layer
+    Layer,
 }

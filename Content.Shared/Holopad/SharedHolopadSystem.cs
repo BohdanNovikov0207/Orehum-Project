@@ -16,7 +16,8 @@ public abstract class SharedHolopadSystem : EntitySystem
         if (entity.Comp.ControlLockoutStartTime == TimeSpan.Zero)
             return false;
 
-        if (entity.Comp.ControlLockoutStartTime + TimeSpan.FromSeconds(entity.Comp.ControlLockoutDuration) < _timing.CurTime)
+        if (entity.Comp.ControlLockoutStartTime + TimeSpan.FromSeconds(entity.Comp.ControlLockoutDuration) <
+            _timing.CurTime)
             return false;
 
         if (entity.Comp.ControlLockoutOwner == null || entity.Comp.ControlLockoutOwner == user)
@@ -25,24 +26,23 @@ public abstract class SharedHolopadSystem : EntitySystem
         return true;
     }
 
-    public TimeSpan GetHolopadControlLockedPeriod(Entity<HolopadComponent> entity)
-    {
-        return entity.Comp.ControlLockoutStartTime + TimeSpan.FromSeconds(entity.Comp.ControlLockoutDuration) - _timing.CurTime;
-    }
+    public TimeSpan GetHolopadControlLockedPeriod(Entity<HolopadComponent> entity) =>
+        entity.Comp.ControlLockoutStartTime + TimeSpan.FromSeconds(entity.Comp.ControlLockoutDuration) -
+        _timing.CurTime;
 
     public bool IsHolopadBroadcastOnCoolDown(Entity<HolopadComponent> entity)
     {
         if (entity.Comp.ControlLockoutStartTime == TimeSpan.Zero)
             return false;
 
-        if (entity.Comp.ControlLockoutStartTime + TimeSpan.FromSeconds(entity.Comp.ControlLockoutCoolDown) < _timing.CurTime)
+        if (entity.Comp.ControlLockoutStartTime + TimeSpan.FromSeconds(entity.Comp.ControlLockoutCoolDown) <
+            _timing.CurTime)
             return false;
 
         return true;
     }
 
-    public TimeSpan GetHolopadBroadcastCoolDown(Entity<HolopadComponent> entity)
-    {
-        return entity.Comp.ControlLockoutStartTime + TimeSpan.FromSeconds(entity.Comp.ControlLockoutCoolDown) - _timing.CurTime;
-    }
+    public TimeSpan GetHolopadBroadcastCoolDown(Entity<HolopadComponent> entity) =>
+        entity.Comp.ControlLockoutStartTime + TimeSpan.FromSeconds(entity.Comp.ControlLockoutCoolDown) -
+        _timing.CurTime;
 }

@@ -84,21 +84,20 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Content.Shared.Inventory.Events;
+using Content.Shared.Random;
 using Content.Shared.Storage;
 using Robust.Shared.Containers;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
-
 // Shitmed Change
-using Content.Shared.Random;
 
 namespace Content.Shared.Inventory;
 
 public partial class InventorySystem : EntitySystem
 {
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-    [Dependency] private readonly IViewVariablesManager _vvm = default!;
     [Dependency] private readonly RandomHelperSystem _randomHelper = default!; // Shitmed Change
+    [Dependency] private readonly IViewVariablesManager _vvm = default!;
 
     private void InitializeSlots()
     {
@@ -111,11 +110,9 @@ public partial class InventorySystem : EntitySystem
         SubscribeLocalEvent<InventoryComponent, AfterAutoHandleStateEvent>(AfterAutoState);
     }
 
-    private void ShutdownSlots()
-    {
+    private void ShutdownSlots() =>
         _vvm.GetTypeHandler<InventoryComponent>()
             .RemoveHandler(HandleViewVariablesSlots, ListViewVariablesSlots);
-    }
 
     /// <summary>
     /// Tries to find an entity in the specified slot with the specified component.
@@ -130,7 +127,7 @@ public partial class InventorySystem : EntitySystem
                 if (!TryComp<T>(item, out var required))
                     continue;
 
-                if ((((IClothingSlots)required).Slots & slot.SlotFlags) == 0x0)
+                if ((required.Slots & slot.SlotFlags) == 0x0)
                     continue;
 
                 target = (item, required);
@@ -142,15 +139,11 @@ public partial class InventorySystem : EntitySystem
         return false;
     }
 
-    protected virtual void OnInit(Entity<InventoryComponent> ent, ref ComponentInit args)
-    {
+    protected virtual void OnInit(Entity<InventoryComponent> ent, ref ComponentInit args) =>
         UpdateInventoryTemplate(ent);
-    }
 
-    private void AfterAutoState(Entity<InventoryComponent> ent, ref AfterAutoHandleStateEvent args)
-    {
+    private void AfterAutoState(Entity<InventoryComponent> ent, ref AfterAutoHandleStateEvent args) =>
         UpdateInventoryTemplate(ent);
-    }
 
     protected virtual void UpdateInventoryTemplate(Entity<InventoryComponent> ent)
     {
@@ -189,21 +182,24 @@ public partial class InventorySystem : EntitySystem
         if (args.SenderSession.AttachedEntity is not { Valid: true } uid)
             return;
 
-        if (TryGetSlotEntity(uid, ev.Slot, out var entityUid) && TryComp<StorageComponent>(entityUid, out var storageComponent))
-        {
+        if (TryGetSlotEntity(uid, ev.Slot, out var entityUid) &&
+            TryComp<StorageComponent>(entityUid, out var storageComponent))
             _storageSystem.OpenStorageUI(entityUid.Value, uid, storageComponent, false);
-        }
     }
 
-    public bool TryGetSlotContainer(EntityUid uid, string slot, [NotNullWhen(true)] out ContainerSlot? containerSlot, [NotNullWhen(true)] out SlotDefinition? slotDefinition,
-        InventoryComponent? inventory = null, ContainerManagerComponent? containerComp = null)
+    public bool TryGetSlotContainer(EntityUid uid,
+        string slot,
+        [NotNullWhen(true)] out ContainerSlot? containerSlot,
+        [NotNullWhen(true)] out SlotDefinition? slotDefinition,
+        InventoryComponent? inventory = null,
+        ContainerManagerComponent? containerComp = null)
     {
         containerSlot = null;
         slotDefinition = null;
         if (!Resolve(uid, ref inventory, ref containerComp, false))
             return false;
 
-        if (!TryGetSlot(uid, slot, out slotDefinition, inventory: inventory))
+        if (!TryGetSlot(uid, slot, out slotDefinition, inventory))
             return false;
 
         if (!_containerSystem.TryGetContainer(uid, slotDefinition.Name, out var container, containerComp))
@@ -223,7 +219,10 @@ public partial class InventorySystem : EntitySystem
     public bool HasSlot(EntityUid uid, string slot, InventoryComponent? component = null) =>
         TryGetSlot(uid, slot, out _, component);
 
-    public bool TryGetSlot(EntityUid uid, string slot, [NotNullWhen(true)] out SlotDefinition? slotDefinition, InventoryComponent? inventory = null)
+    public bool TryGetSlot(EntityUid uid,
+        string slot,
+        [NotNullWhen(true)] out SlotDefinition? slotDefinition,
+        InventoryComponent? inventory = null)
     {
         slotDefinition = null;
         if (!Resolve(uid, ref inventory, false))
@@ -240,7 +239,9 @@ public partial class InventorySystem : EntitySystem
         return false;
     }
 
-    public bool TryGetContainerSlotEnumerator(Entity<InventoryComponent?> entity, out InventorySlotEnumerator containerSlotEnumerator, SlotFlags flags = SlotFlags.All)
+    public bool TryGetContainerSlotEnumerator(Entity<InventoryComponent?> entity,
+        out InventorySlotEnumerator containerSlotEnumerator,
+        SlotFlags flags = SlotFlags.All)
     {
         if (!Resolve(entity.Owner, ref entity.Comp, false))
         {
@@ -252,7 +253,8 @@ public partial class InventorySystem : EntitySystem
         return true;
     }
 
-    public InventorySlotEnumerator GetSlotEnumerator(Entity<InventoryComponent?> entity, SlotFlags flags = SlotFlags.All)
+    public InventorySlotEnumerator GetSlotEnumerator(Entity<InventoryComponent?> entity,
+        SlotFlags flags = SlotFlags.All)
     {
         if (!Resolve(entity.Owner, ref entity.Comp, false))
             return InventorySlotEnumerator.Empty;
@@ -267,16 +269,15 @@ public partial class InventorySystem : EntitySystem
             slotDefinitions = null;
             return false;
         }
+
         slotDefinitions = inv.Slots;
         return true;
     }
 
-    private ViewVariablesPath? HandleViewVariablesSlots(EntityUid uid, InventoryComponent comp, string relativePath)
-    {
-        return TryGetSlotEntity(uid, relativePath, out var entity, comp)
+    private ViewVariablesPath? HandleViewVariablesSlots(EntityUid uid, InventoryComponent comp, string relativePath) =>
+        TryGetSlotEntity(uid, relativePath, out var entity, comp)
             ? ViewVariablesPath.FromObject(entity)
             : null;
-    }
 
     private IEnumerable<string> ListViewVariablesSlots(EntityUid uid, InventoryComponent comp)
     {
@@ -305,6 +306,33 @@ public partial class InventorySystem : EntitySystem
         Dirty(ent);
     }
 
+    // Shitmed Change Start
+    public void DropSlotContents(EntityUid uid, string slotName, InventoryComponent? inventory = null)
+    {
+        if (!Resolve(uid, ref inventory))
+            return;
+
+        foreach (var slot in inventory.Slots)
+        {
+            if (slot.Name != slotName)
+                continue;
+
+            if (!TryGetSlotContainer(uid, slotName, out var container, out _, inventory))
+                break;
+
+            if (container.ContainedEntity is { } entityUid && TryComp(entityUid, out TransformComponent? transform) &&
+                _gameTiming.IsFirstTimePredicted)
+            {
+                _transform.AttachToGridOrMap(entityUid, transform);
+                _randomHelper.RandomOffset(entityUid, 0.5f);
+            }
+
+            break;
+        }
+
+        Dirty(uid, inventory);
+    }
+
     /// <summary>
     /// Enumerator for iterating over an inventory's slot containers. Also has methods that skip empty containers.
     /// It should be safe to add or remove items while enumerating.
@@ -322,7 +350,9 @@ public partial class InventorySystem : EntitySystem
         {
         }
 
-        public InventorySlotEnumerator(SlotDefinition[] slots, ContainerSlot[] containers, SlotFlags flags = SlotFlags.All)
+        public InventorySlotEnumerator(SlotDefinition[] slots,
+            ContainerSlot[] containers,
+            SlotFlags flags = SlotFlags.All)
         {
             DebugTools.Assert(flags != SlotFlags.NONE);
             DebugTools.AssertEqual(slots.Length, containers.Length);
@@ -393,32 +423,6 @@ public partial class InventorySystem : EntitySystem
             slot = null;
             return false;
         }
-    }
-
-    // Shitmed Change Start
-    public void DropSlotContents(EntityUid uid, string slotName, InventoryComponent? inventory = null)
-    {
-        if (!Resolve(uid, ref inventory))
-            return;
-
-        foreach (var slot in inventory.Slots)
-        {
-            if (slot.Name != slotName)
-                continue;
-
-            if (!TryGetSlotContainer(uid, slotName, out var container, out _, inventory))
-                break;
-
-            if (container.ContainedEntity is { } entityUid && TryComp(entityUid, out TransformComponent? transform) && _gameTiming.IsFirstTimePredicted)
-            {
-                _transform.AttachToGridOrMap(entityUid, transform);
-                _randomHelper.RandomOffset(entityUid, 0.5f);
-            }
-
-            break;
-        }
-
-        Dirty(uid, inventory);
     }
     // Shitmed Change End
 }

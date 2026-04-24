@@ -29,9 +29,7 @@ public sealed partial class PointsCostLoadoutEffect : LoadoutEffect
         var protoManager = collection.Resolve<IPrototypeManager>();
 
         if (!protoManager.TryIndex(loadout.Role, out var roleProto) || roleProto.Points == null)
-        {
             return true;
-        }
 
         if (loadout.Points <= Cost)
         {
@@ -42,8 +40,5 @@ public sealed partial class PointsCostLoadoutEffect : LoadoutEffect
         return true;
     }
 
-    public override void Apply(RoleLoadout loadout)
-    {
-        loadout.Points -= Cost;
-    }
+    public override void Apply(RoleLoadout loadout) => loadout.Points -= Cost;
 }

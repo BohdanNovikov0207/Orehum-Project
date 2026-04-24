@@ -12,12 +12,12 @@ namespace Content.Shared._Shitmed.GoliathTentacle;
 /// <summary>
 /// Component that grants the entity the ability to use goliath tentacles.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class GoliathTentacleComponent : Component
 {
     [DataField(customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
     public string? Action = "ActionGoliathTentacleCrew";
 
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public EntityUid? ActionEntity;
 }

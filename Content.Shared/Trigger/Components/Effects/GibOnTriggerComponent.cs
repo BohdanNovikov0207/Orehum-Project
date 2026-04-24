@@ -6,12 +6,12 @@ namespace Content.Shared.Trigger.Components.Effects;
 /// Will gib the entity when triggered.
 /// If TargetUser is true the user will be gibbed instead.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class GibOnTriggerComponent : BaseXOnTriggerComponent
 {
     /// <summary>
     /// Should gibbing also delete the owners items?
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public bool DeleteItems = false;
 }

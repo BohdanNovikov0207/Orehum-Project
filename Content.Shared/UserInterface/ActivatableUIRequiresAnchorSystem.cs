@@ -8,7 +8,7 @@ using Content.Shared.Popups;
 namespace Content.Shared.UserInterface;
 
 /// <summary>
-/// <see cref="ActivatableUIRequiresAnchorComponent"/>
+///     <see cref="ActivatableUIRequiresAnchorComponent" />
 /// </summary>
 public sealed class ActivatableUIRequiresAnchorSystem : EntitySystem
 {
@@ -17,7 +17,8 @@ public sealed class ActivatableUIRequiresAnchorSystem : EntitySystem
     public override void Initialize()
     {
         base.Initialize();
-        SubscribeLocalEvent<ActivatableUIRequiresAnchorComponent, ActivatableUIOpenAttemptEvent>(OnActivatableUIOpenAttempt);
+        SubscribeLocalEvent<ActivatableUIRequiresAnchorComponent, ActivatableUIOpenAttemptEvent>(
+            OnActivatableUIOpenAttempt);
         SubscribeLocalEvent<ActivatableUIRequiresAnchorComponent, BoundUserInterfaceCheckRangeEvent>(OnUICheck);
     }
 
@@ -27,12 +28,11 @@ public sealed class ActivatableUIRequiresAnchorSystem : EntitySystem
             return;
 
         if (!Transform(ent.Owner).Anchored)
-        {
             args.Result = BoundUserInterfaceRangeResult.Fail;
-        }
     }
 
-    private void OnActivatableUIOpenAttempt(Entity<ActivatableUIRequiresAnchorComponent> ent, ref ActivatableUIOpenAttemptEvent args)
+    private void OnActivatableUIOpenAttempt(Entity<ActivatableUIRequiresAnchorComponent> ent,
+        ref ActivatableUIOpenAttemptEvent args)
     {
         if (args.Cancelled)
             return;
@@ -40,9 +40,7 @@ public sealed class ActivatableUIRequiresAnchorSystem : EntitySystem
         if (!Transform(ent.Owner).Anchored)
         {
             if (ent.Comp.Popup != null)
-            {
                 _popup.PopupClient(Loc.GetString(ent.Comp.Popup), args.User);
-            }
 
             args.Cancel();
         }

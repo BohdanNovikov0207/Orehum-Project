@@ -18,24 +18,24 @@ using Robust.Shared.Serialization;
 namespace Content.Shared.Labels;
 
 /// <summary>
-/// Key representing which <see cref="PlayerBoundUserInterface"/> is currently open.
+/// Key representing which <see cref="PlayerBoundUserInterface" /> is currently open.
 /// Useful when there are multiple UI for an object. Here it's future-proofing only.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum HandLabelerUiKey
 {
     Key,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum PaperLabelVisuals : byte
 {
     Layer,
     HasLabel,
-    LabelType
+    LabelType,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class HandLabelerLabelChangedMessage(string label) : BoundUserInterfaceMessage
 {
     public string Label { get; } = label;

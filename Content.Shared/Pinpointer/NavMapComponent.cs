@@ -19,9 +19,14 @@ namespace Content.Shared.Pinpointer;
 /// <summary>
 /// Used to store grid data to be used for UIs.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class NavMapComponent : Component
 {
+    /// <summary>
+    /// List of station beacons.
+    /// </summary>
+    [ViewVariables]
+    public Dictionary<NetEntity, SharedNavMapSystem.NavMapBeacon> Beacons = new();
     /*
      * Don't need DataFields as this can be reconstructed
      */
@@ -33,17 +38,22 @@ public sealed partial class NavMapComponent : Component
     public Dictionary<Vector2i, NavMapChunk> Chunks = new();
 
     /// <summary>
-    /// List of station beacons.
+    /// A look up table to get a list of region owners associated with a flood filled chunk.
     /// </summary>
-    [ViewVariables]
-    public Dictionary<NetEntity, SharedNavMapSystem.NavMapBeacon> Beacons = new();
+    /// <remarks>
+    /// For client use only
+    /// </remarks>
+    [ViewVariables(VVAccess.ReadOnly)]
+    public Dictionary<Vector2i, HashSet<NetEntity>> ChunkToRegionOwnerTable = new();
 
     /// <summary>
-    /// Describes the properties of a region on the station.
-    /// It is indexed by the entity assigned as the region owner.
+    /// A queue of all region owners that are waiting their associated regions to be floodfilled.
     /// </summary>
+    /// <remarks>
+    /// For client use only
+    /// </remarks>
     [ViewVariables(VVAccess.ReadOnly)]
-    public Dictionary<NetEntity, SharedNavMapSystem.NavMapRegionProperties> RegionProperties = new();
+    public Queue<NetEntity> QueuedRegionsToFlood = new();
 
     /// <summary>
     /// All flood filled regions, ready for display on a NavMapControl.
@@ -56,34 +66,23 @@ public sealed partial class NavMapComponent : Component
     public Dictionary<NetEntity, NavMapRegionOverlay> RegionOverlays = new();
 
     /// <summary>
-    /// A queue of all region owners that are waiting their associated regions to be floodfilled.
-    /// </summary>
-    /// <remarks>
-    /// For client use only
-    /// </remarks>
-    [ViewVariables(VVAccess.ReadOnly)]
-    public Queue<NetEntity> QueuedRegionsToFlood = new();
-
-    /// <summary>
-    /// A look up table to get a list of region owners associated with a flood filled chunk.
-    /// </summary>
-    /// <remarks>
-    /// For client use only
-    /// </remarks>
-    [ViewVariables(VVAccess.ReadOnly)]
-    public Dictionary<Vector2i, HashSet<NetEntity>> ChunkToRegionOwnerTable = new();
-
-    /// <summary>
-    ///  A look up table to find flood filled chunks associated with a given region owner.
+    /// A look up table to find flood filled chunks associated with a given region owner.
     /// </summary>
     /// <remarks>
     /// For client use only
     /// </remarks>
     [ViewVariables(VVAccess.ReadOnly)]
     public Dictionary<NetEntity, HashSet<Vector2i>> RegionOwnerToChunkTable = new();
+
+    /// <summary>
+    /// Describes the properties of a region on the station.
+    /// It is indexed by the entity assigned as the region owner.
+    /// </summary>
+    [ViewVariables(VVAccess.ReadOnly)]
+    public Dictionary<NetEntity, SharedNavMapSystem.NavMapRegionProperties> RegionProperties = new();
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class NavMapChunk(Vector2i origin)
 {
     /// <summary>
@@ -93,25 +92,25 @@ public sealed class NavMapChunk(Vector2i origin)
     public readonly Vector2i Origin = origin;
 
     /// <summary>
-    /// Array containing the chunk's data. The
-    /// </summary>
-    [ViewVariables]
-    public int[] TileData = new int[SharedNavMapSystem.ArraySize];
-
-    /// <summary>
     /// The last game tick that the chunk was updated
     /// </summary>
     [NonSerialized]
     public GameTick LastUpdate;
+
+    /// <summary>
+    /// Array containing the chunk's data. The
+    /// </summary>
+    [ViewVariables]
+    public int[] TileData = new int[SharedNavMapSystem.ArraySize];
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class NavMapRegionOverlay(Enum uiKey, List<(Vector2i, Vector2i)> gridCoords)
 {
     /// <summary>
-    /// The key to the UI that will be displaying this region on its navmap
+    /// Color of the region
     /// </summary>
-    public Enum UiKey = uiKey;
+    public Color Color = Color.White;
 
     /// <summary>
     /// The local grid coordinates of the rectangles that make up the region
@@ -120,9 +119,9 @@ public sealed class NavMapRegionOverlay(Enum uiKey, List<(Vector2i, Vector2i)> g
     public List<(Vector2i, Vector2i)> GridCoords = gridCoords;
 
     /// <summary>
-    /// Color of the region
+    /// The key to the UI that will be displaying this region on its navmap
     /// </summary>
-    public Color Color = Color.White;
+    public Enum UiKey = uiKey;
 }
 
 public enum NavMapChunkType : byte

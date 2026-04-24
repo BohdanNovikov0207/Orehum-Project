@@ -15,8 +15,8 @@ namespace Content.Shared._White.Animations;
 
 public abstract class SharedFlipOnHitSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly StandingStateSystem _standingState = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -45,7 +45,7 @@ public abstract class SharedFlipOnHitSystem : EntitySystem
     protected abstract void PlayAnimation(EntityUid user);
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class FlipOnHitEvent(NetEntity user) : EntityEventArgs
 {
     public NetEntity User = user;

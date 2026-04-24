@@ -8,21 +8,16 @@
 // SPDX-License-Identifier: MIT
 
 using Robust.Shared.Prototypes;
-using Robust.Shared.Serialization;
 
 namespace Content.Shared.Store;
 
 /// <summary>
-///     Used to define different categories for a store.
+/// Used to define different categories for a store.
 /// </summary>
 [Prototype]
-public sealed partial class StoreCategoryPrototype : IPrototype
+public sealed class StoreCategoryPrototype : IPrototype
 {
     private string _name = string.Empty;
-
-    [ViewVariables]
-    [IdDataField]
-    public string ID { get; private set; } = default!;
 
     [DataField("name")]
     public string Name { get; private set; } = "";
@@ -32,5 +27,8 @@ public sealed partial class StoreCategoryPrototype : IPrototype
 
     [DataField]
     public bool Evil { get; private set; } = false; // Goobstation
-}
 
+    [ViewVariables]
+    [IdDataField]
+    public string ID { get; } = default!;
+}

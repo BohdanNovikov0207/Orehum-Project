@@ -112,8 +112,11 @@ public abstract partial class SharedVendingMachineSystem
     {
         if (!component.CanRestock.Contains(machineComponent.PackPrototypeId))
         {
-            Popup.PopupPredictedCursor(Loc.GetString("vending-machine-restock-invalid-inventory", ("this", uid), ("user", user),
-                ("target", target)), user);
+            Popup.PopupPredictedCursor(Loc.GetString("vending-machine-restock-invalid-inventory",
+                    ("this", uid),
+                    ("user", user),
+                    ("target", target)),
+                user);
 
             return false;
         }
@@ -137,8 +140,13 @@ public abstract partial class SharedVendingMachineSystem
 
         args.Handled = true;
 
-        var doAfterArgs = new DoAfterArgs(EntityManager, args.User, (float)component.RestockDelay.TotalSeconds, new RestockDoAfterEvent(), target,
-            target: target, used: uid)
+        var doAfterArgs = new DoAfterArgs(EntityManager,
+            args.User,
+            (float) component.RestockDelay.TotalSeconds,
+            new RestockDoAfterEvent(),
+            target,
+            target,
+            uid)
         {
             BreakOnMove = true,
             BreakOnDamage = true,
@@ -149,7 +157,9 @@ public abstract partial class SharedVendingMachineSystem
             return;
 
         var selfMessage = Loc.GetString("vending-machine-restock-start-self", ("target", target));
-        var othersMessage = Loc.GetString("vending-machine-restock-start-others", ("user", Identity.Entity(args.User, EntityManager)), ("target", target));
+        var othersMessage = Loc.GetString("vending-machine-restock-start-others",
+            ("user", Identity.Entity(args.User, EntityManager)),
+            ("target", target));
         Popup.PopupPredicted(selfMessage,
             othersMessage,
             uid,

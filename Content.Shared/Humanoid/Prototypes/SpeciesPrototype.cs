@@ -39,13 +39,89 @@ using Robust.Shared.Prototypes;
 namespace Content.Shared.Humanoid.Prototypes;
 
 [Prototype]
-public sealed partial class SpeciesPrototype : IPrototype
+public sealed class SpeciesPrototype : IPrototype
 {
     /// <summary>
-    /// Prototype ID of the species.
+    /// The average height in centimeters for this species, used to calculate player facing height values in UI elements
     /// </summary>
-    [IdDataField]
-    public string ID { get; private set; } = default!;
+    [DataField]
+    public float AverageHeight = 176.1f;
+
+    /// <summary>
+    /// The average shoulder-to-shoulder width in cm for this species, used to calculate player facing width values in UI
+    /// elements
+    /// </summary>
+    [DataField]
+    public float AverageWidth = 40f;
+
+    /// <summary>
+    /// The default height for this species
+    /// </summary>
+    [DataField]
+    public float DefaultHeight = 1f;
+
+    /// <summary>
+    /// The default width for this species
+    /// </summary>
+    [DataField]
+    public float DefaultWidth = 1f;
+
+    /// <summary>
+    /// Characters cannot be older than this. Only used for restrictions...
+    /// although imagine if ghosts could age people WYCI...
+    /// </summary>
+    [DataField]
+    public int MaxAge = 120;
+
+    /// <summary>
+    /// The maximum height for this species
+    /// </summary>
+    [DataField]
+    public float MaxHeight = 1.20f;
+
+    /// <summary>
+    /// The maximum width for this species
+    /// </summary>
+    [DataField]
+    public float MaxWidth = 1.15f;
+
+    /// <summary>
+    /// Characters younger than this are too young to be hired by Nanotrasen.
+    /// </summary>
+    [DataField]
+    public int MinAge = 18;
+
+    /// <summary>
+    /// The minimum height for this species
+    /// </summary>
+    [DataField]
+    public float MinHeight = 0.80f;
+
+    /// <summary>
+    /// The minimum width for this species
+    /// </summary>
+    [DataField]
+    public float MinWidth = 0.85f;
+
+    /// <summary>
+    /// Characters older than this appear old. Characters in between young and old age appear middle aged.
+    /// </summary>
+    [DataField]
+    public int OldAge = 60;
+
+    // begin Goobstation: port EE height/width sliders
+
+    /// <summary>
+    /// The minimum height and width ratio for this species
+    /// </summary>
+    [DataField]
+    public float SizeRatio = 1.2f;
+
+    /// <summary>
+    /// Characters younger than this appear young.
+    /// </summary>
+    [DataField]
+    public int YoungAge = 30;
 
     /// <summary>
     /// User visible name of the species.
@@ -54,9 +130,9 @@ public sealed partial class SpeciesPrototype : IPrototype
     public string Name { get; private set; } = default!;
 
     /// <summary>
-    ///     Descriptor. Unused...? This is intended
-    ///     for an eventual integration into IdentitySystem
-    ///     (i.e., young human person, young lizard person, etc.)
+    /// Descriptor. Unused...? This is intended
+    /// for an eventual integration into IdentitySystem
+    /// (i.e., young human person, young lizard person, etc.)
     /// </summary>
     [DataField]
     public string Descriptor { get; private set; } = "humanoid";
@@ -80,26 +156,26 @@ public sealed partial class SpeciesPrototype : IPrototype
     public ProtoId<HumanoidSpeciesBaseSpritesPrototype> SpriteSet { get; private set; } = default!;
 
     /// <summary>
-    ///     Default skin tone for this species. This applies for non-human skin tones.
+    /// Default skin tone for this species. This applies for non-human skin tones.
     /// </summary>
     [DataField]
     public Color DefaultSkinTone { get; private set; } = Color.White;
 
     /// <summary>
-    ///     Default human skin tone for this species. This applies for human skin tones.
-    ///     See <see cref="SkinColor.HumanSkinTone"/> for the valid range of skin tones.
+    /// Default human skin tone for this species. This applies for human skin tones.
+    /// See <see cref="SkinColor.HumanSkinTone" /> for the valid range of skin tones.
     /// </summary>
     [DataField]
     public int DefaultHumanSkinTone { get; private set; } = 20;
 
     /// <summary>
-    ///     The limit of body markings that you can place on this species.
+    /// The limit of body markings that you can place on this species.
     /// </summary>
     [DataField("markingLimits")]
     public ProtoId<MarkingPointsPrototype> MarkingPoints { get; private set; } = default!;
 
     /// <summary>
-    ///     Humanoid species variant used by this entity.
+    /// Humanoid species variant used by this entity.
     /// </summary>
     [DataField(required: true)]
     public EntProtoId Prototype { get; private set; } = default!;
@@ -131,87 +207,6 @@ public sealed partial class SpeciesPrototype : IPrototype
     [DataField]
     public List<Sex> Sexes { get; private set; } = new() { Sex.Male, Sex.Female };
 
-    /// <summary>
-    ///     Characters younger than this are too young to be hired by Nanotrasen.
-    /// </summary>
-    [DataField]
-    public int MinAge = 18;
-
-    /// <summary>
-    ///     Characters younger than this appear young.
-    /// </summary>
-    [DataField]
-    public int YoungAge = 30;
-
-    /// <summary>
-    ///     Characters older than this appear old. Characters in between young and old age appear middle aged.
-    /// </summary>
-    [DataField]
-    public int OldAge = 60;
-
-    /// <summary>
-    ///     Characters cannot be older than this. Only used for restrictions...
-    ///     although imagine if ghosts could age people WYCI...
-    /// </summary>
-    [DataField]
-    public int MaxAge = 120;
-
-    // begin Goobstation: port EE height/width sliders
-
-    /// <summary>
-    ///     The minimum height and width ratio for this species
-    /// </summary>
-    [DataField]
-    public float SizeRatio = 1.2f;
-
-    /// <summary>
-    ///     The minimum height for this species
-    /// </summary>
-    [DataField]
-    public float MinHeight = 0.80f;
-
-    /// <summary>
-    ///     The default height for this species
-    /// </summary>
-    [DataField]
-    public float DefaultHeight = 1f;
-
-    /// <summary>
-    ///     The maximum height for this species
-    /// </summary>
-    [DataField]
-    public float MaxHeight = 1.20f;
-
-    /// <summary>
-    ///     The minimum width for this species
-    /// </summary>
-    [DataField]
-    public float MinWidth = 0.85f;
-
-    /// <summary>
-    ///     The default width for this species
-    /// </summary>
-    [DataField]
-    public float DefaultWidth = 1f;
-
-    /// <summary>
-    ///     The maximum width for this species
-    /// </summary>
-    [DataField]
-    public float MaxWidth = 1.15f;
-
-    /// <summary>
-    ///     The average height in centimeters for this species, used to calculate player facing height values in UI elements
-    /// </summary>
-    [DataField]
-    public float AverageHeight = 176.1f;
-
-    /// <summary>
-    ///     The average shoulder-to-shoulder width in cm for this species, used to calculate player facing width values in UI elements
-    /// </summary>
-    [DataField]
-    public float AverageWidth = 40f;
-
     // end Goobstation: port EE height/width sliders
 
     // Corvax-Sponsors-Start
@@ -220,8 +215,13 @@ public sealed partial class SpeciesPrototype : IPrototype
     /// </summary>
     [DataField]
     public bool SponsorOnly { get; private set; } = false;
-    // Corvax-Sponsors-End
 
+    /// <summary>
+    /// Prototype ID of the species.
+    /// </summary>
+    [IdDataField]
+    public string ID { get; } = default!;
+    // Corvax-Sponsors-End
 }
 
 public enum SpeciesNaming : byte
@@ -233,5 +233,5 @@ public enum SpeciesNaming : byte
     LastFirst, // DeltaV
     LastNoFirst, // DeltaV
     FirstDashLast, // Goobstation
-    FirstRoman // EE Plasmeme Change
+    FirstRoman, // EE Plasmeme Change
 }

@@ -23,7 +23,6 @@ using Content.Shared.Charges.Components;
 using Content.Shared.Examine;
 using JetBrains.Annotations;
 using Robust.Shared.Timing;
-using Content.Goobstation.Maths.FixedPoint;
 
 namespace Content.Shared.Charges.Systems;
 
@@ -58,16 +57,15 @@ public abstract class SharedChargesSystem : EntitySystem
 
         args.PushMarkup(Loc.GetString("limited-charges-charges-remaining", ("charges", charges)));
         if (charges == comp.MaxCharges)
-        {
             args.PushMarkup(Loc.GetString("limited-charges-max-charges"));
-        }
 
         // only show the recharging info if it's not full
         if (charges == comp.MaxCharges || !Resolve(uid, ref rechargeEnt.Comp2, false))
             return;
 
         var timeRemaining = GetNextRechargeTime(rechargeEnt);
-        args.PushMarkup(Loc.GetString("limited-charges-recharging", ("seconds", timeRemaining.TotalSeconds.ToString("F1"))));
+        args.PushMarkup(Loc.GetString("limited-charges-recharging",
+            ("seconds", timeRemaining.TotalSeconds.ToString("F1"))));
     }
 
     private void OnChargesAttempt(Entity<LimitedChargesComponent> ent, ref ActionAttemptEvent args)
@@ -78,28 +76,20 @@ public abstract class SharedChargesSystem : EntitySystem
         var charges = GetCurrentCharges((ent.Owner, ent.Comp, null));
 
         if (charges <= 0)
-        {
             args.Cancelled = true;
-        }
     }
 
-    private void OnChargesPerformed(Entity<LimitedChargesComponent> ent, ref ActionPerformedEvent args)
-    {
+    private void OnChargesPerformed(Entity<LimitedChargesComponent> ent, ref ActionPerformedEvent args) =>
         AddCharges((ent.Owner, ent.Comp), -1);
-    }
 
     private void OnChargesMapInit(Entity<LimitedChargesComponent> ent, ref MapInitEvent args)
     {
         // If nothing specified use max.
         if (ent.Comp.LastCharges == 0)
-        {
             ent.Comp.LastCharges = ent.Comp.MaxCharges;
-        }
         // If -1 used then we don't want any.
         else if (ent.Comp.LastCharges < 0)
-        {
             ent.Comp.LastCharges = 0;
-        }
 
         ent.Comp.LastUpdate = _timing.CurTime;
         Dirty(ent);
@@ -139,11 +129,11 @@ public abstract class SharedChargesSystem : EntitySystem
         else if (Resolve(action.Owner, ref action.Comp2, false))
         {
             var duration = action.Comp2.RechargeDuration;
-            var diff = (_timing.CurTime - action.Comp1.LastUpdate);
+            var diff = _timing.CurTime - action.Comp1.LastUpdate;
             var remainder = (int) (diff / duration);
 
             action.Comp1.LastCharges += remainder;
-            action.Comp1.LastUpdate += (remainder * duration);
+            action.Comp1.LastUpdate += remainder * duration;
         }
 
         action.Comp1.LastCharges = Math.Clamp(action.Comp1.LastCharges + addCharges, 0, action.Comp1.MaxCharges);
@@ -152,29 +142,21 @@ public abstract class SharedChargesSystem : EntitySystem
         _appearance.SetData(action.Owner, ChargesVisuals.Charges, !IsEmpty(action)); // TraumaStation
     }
 
-    public bool TryUseCharge(Entity<LimitedChargesComponent?> entity)
-    {
-        return TryUseCharges(entity, 1);
-    }
+    public bool TryUseCharge(Entity<LimitedChargesComponent?> entity) => TryUseCharges(entity, 1);
 
     public bool TryUseCharges(Entity<LimitedChargesComponent?> entity, int amount)
     {
         var current = GetCurrentCharges(entity);
 
         if (current < amount)
-        {
             return false;
-        }
 
         AddCharges(entity, -amount);
         return true;
     }
 
     [Pure]
-    public bool IsEmpty(Entity<LimitedChargesComponent?> entity)
-    {
-        return GetCurrentCharges(entity) == 0;
-    }
+    public bool IsEmpty(Entity<LimitedChargesComponent?> entity) => GetCurrentCharges(entity) == 0;
 
     /// <summary>
     /// Resets action charges to MaxCharges.
@@ -203,9 +185,7 @@ public abstract class SharedChargesSystem : EntitySystem
         var adjusted = Math.Clamp(value, 0, action.Comp.MaxCharges);
 
         if (action.Comp.LastCharges == adjusted)
-        {
             return;
-        }
 
         action.Comp.LastCharges = adjusted;
         action.Comp.LastUpdate = _timing.CurTime;
@@ -222,18 +202,15 @@ public abstract class SharedChargesSystem : EntitySystem
     public TimeSpan GetNextRechargeTime(Entity<LimitedChargesComponent?, AutoRechargeComponent?> entity)
     {
         if (!Resolve(entity.Owner, ref entity.Comp1, ref entity.Comp2, false))
-        {
             return TimeSpan.Zero;
-        }
 
         // Okay so essentially we need to get recharge time to full, then modulus that by the recharge timer which should be the next tick.
-        var fullTime = ((entity.Comp1.MaxCharges - entity.Comp1.LastCharges) * entity.Comp2.RechargeDuration) + entity.Comp1.LastUpdate;
+        var fullTime = (entity.Comp1.MaxCharges - entity.Comp1.LastCharges) * entity.Comp2.RechargeDuration +
+                       entity.Comp1.LastUpdate;
         var timeRemaining = fullTime - _timing.CurTime;
 
         if (timeRemaining < TimeSpan.Zero)
-        {
             return TimeSpan.Zero;
-        }
 
         var nextChargeTime = timeRemaining.TotalSeconds % entity.Comp2.RechargeDuration.TotalSeconds;
         return TimeSpan.FromSeconds(nextChargeTime);
@@ -255,9 +232,8 @@ public abstract class SharedChargesSystem : EntitySystem
         var calculated = 0;
 
         if (Resolve(entity.Owner, ref entity.Comp2, false) && entity.Comp2.RechargeDuration.TotalSeconds != 0.0)
-        {
-            calculated = (int)((_timing.CurTime - entity.Comp1.LastUpdate).TotalSeconds / entity.Comp2.RechargeDuration.TotalSeconds);
-        }
+            calculated = (int) ((_timing.CurTime - entity.Comp1.LastUpdate).TotalSeconds /
+                                entity.Comp2.RechargeDuration.TotalSeconds);
 
         return Math.Clamp(entity.Comp1.LastCharges + calculated,
             0,
@@ -266,9 +242,9 @@ public abstract class SharedChargesSystem : EntitySystem
 
     // Goob Change: I LOVE SET ACCESSORS.
     public void SetMaxCharges(
-      EntityUid uid,
-      int charges,
-      LimitedChargesComponent? component = null)
+        EntityUid uid,
+        int charges,
+        LimitedChargesComponent? component = null)
     {
         if (!Resolve(uid, ref component))
             return;

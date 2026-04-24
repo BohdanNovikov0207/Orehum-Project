@@ -21,20 +21,20 @@ using Robust.Shared.Random;
 namespace Content.Shared.Storage;
 
 /// <summary>
-/// Prototype wrapper around <see cref="EntitySpawnEntry"/>
+/// Prototype wrapper around <see cref="EntitySpawnEntry" />
 /// </summary>
 [Prototype]
-public sealed partial class EntitySpawnEntryPrototype : IPrototype
+public sealed class EntitySpawnEntryPrototype : IPrototype
 {
-    [IdDataField]
-    public string ID { get; private set; } = string.Empty;
-
     [DataField]
     public List<EntitySpawnEntry> Entries = new();
+
+    [IdDataField]
+    public string ID { get; } = string.Empty;
 }
 
 /// <summary>
-///     Dictates a list of items that can be spawned.
+/// Dictates a list of items that can be spawned.
 /// </summary>
 [Serializable]
 [DataDefinition]
@@ -44,20 +44,20 @@ public partial struct EntitySpawnEntry
     public EntProtoId? PrototypeId = null;
 
     /// <summary>
-    ///     The probability that an item will spawn. Takes decimal form so 0.05 is 5%, 0.50 is 50% etc.
+    /// The probability that an item will spawn. Takes decimal form so 0.05 is 5%, 0.50 is 50% etc.
     /// </summary>
     [DataField("prob")] public float SpawnProbability = 1;
 
     /// <summary>
-    ///     orGroup signifies to pick between entities designated with an ID.
-    ///     <example>
-    ///         <para>
-    ///             To define an orGroup in a StorageFill component you
-    ///             need to add it to the entities you want to choose between and
-    ///             add a prob field. In this example there is a 50% chance the storage
-    ///             spawns with Y or Z.
-    ///         </para>
-    ///         <code>
+    /// orGroup signifies to pick between entities designated with an ID.
+    /// <example>
+    ///     <para>
+    ///     To define an orGroup in a StorageFill component you
+    ///     need to add it to the entities you want to choose between and
+    ///     add a prob field. In this example there is a 50% chance the storage
+    ///     spawns with Y or Z.
+    ///     </para>
+    ///     <code>
     /// - type: StorageFill
     ///   contents:
     ///     - name: X
@@ -67,16 +67,16 @@ public partial struct EntitySpawnEntry
     ///     - name: Z
     ///       orGroup: YOrZ
     /// </code>
-    ///     </example>
+    /// </example>
     /// </summary>
     [DataField("orGroup")] public string? GroupId = null;
 
     [DataField] public int Amount = 1;
 
     /// <summary>
-    ///     How many of this can be spawned, in total.
-    ///     If this is lesser or equal to <see cref="Amount"/>, it will spawn <see cref="Amount"/> exactly.
-    ///     Otherwise, it chooses a random value between <see cref="Amount"/> and <see cref="MaxAmount"/> on spawn.
+    /// How many of this can be spawned, in total.
+    /// If this is lesser or equal to <see cref="Amount" />, it will spawn <see cref="Amount" /> exactly.
+    /// Otherwise, it chooses a random value between <see cref="Amount" /> and <see cref="MaxAmount" /> on spawn.
     /// </summary>
     [DataField] public int MaxAmount = 1;
 
@@ -85,30 +85,28 @@ public partial struct EntitySpawnEntry
 
 public static class EntitySpawnCollection
 {
-    public sealed class OrGroup
-    {
-        public List<EntitySpawnEntry> Entries { get; set; } = new();
-        public float CumulativeProbability { get; set; } = 0f;
-    }
-
-    public static List<string> GetSpawns(ProtoId<EntitySpawnEntryPrototype> proto, IPrototypeManager? protoManager = null, IRobustRandom? random = null)
+    public static List<string> GetSpawns(ProtoId<EntitySpawnEntryPrototype> proto,
+        IPrototypeManager? protoManager = null,
+        IRobustRandom? random = null)
     {
         IoCManager.Resolve(ref protoManager, ref random);
         return GetSpawns(protoManager.Index(proto).Entries, random);
     }
 
-    public static List<string?> GetSpawns(ProtoId<EntitySpawnEntryPrototype> proto, System.Random random, IPrototypeManager? protoManager = null)
+    public static List<string?> GetSpawns(ProtoId<EntitySpawnEntryPrototype> proto,
+        System.Random random,
+        IPrototypeManager? protoManager = null)
     {
         IoCManager.Resolve(ref protoManager);
         return GetSpawns(protoManager.Index(proto).Entries, random);
     }
 
     /// <summary>
-    ///     Using a collection of entity spawn entries, picks a random list of entity prototypes to spawn from that collection.
+    /// Using a collection of entity spawn entries, picks a random list of entity prototypes to spawn from that collection.
     /// </summary>
     /// <remarks>
-    ///     This does not spawn the entities. The caller is responsible for doing so, since it may want to do something
-    ///     special to those entities (offset them, insert them into storage, etc)
+    /// This does not spawn the entities. The caller is responsible for doing so, since it may want to do something
+    /// special to those entities (offset them, insert them into storage, etc)
     /// </remarks>
     /// <param name="entries">The entity spawn entries.</param>
     /// <param name="random">Resolve param.</param>
@@ -243,7 +241,8 @@ public static class EntitySpawnCollection
     /// <param name="entries">A list of entries that will be collected into OrGroups.</param>
     /// <param name="orGroups">A list of entries collected into OrGroups.</param>
     /// <returns>A list of entries that are not in an OrGroup.</returns>
-    public static List<EntitySpawnEntry> CollectOrGroups(IEnumerable<EntitySpawnEntry> entries, out List<OrGroup> orGroups)
+    public static List<EntitySpawnEntry> CollectOrGroups(IEnumerable<EntitySpawnEntry> entries,
+        out List<OrGroup> orGroups)
     {
         var ungrouped = new List<EntitySpawnEntry>();
         var orGroupsDict = new Dictionary<string, OrGroup>();
@@ -265,9 +264,7 @@ public static class EntitySpawnCollection
                 orGroup.CumulativeProbability += entry.SpawnProbability;
             }
             else
-            {
                 ungrouped.Add(entry);
-            }
         }
 
         // We don't really need the group IDs anymore, so just return the values as a list
@@ -289,5 +286,11 @@ public static class EntitySpawnCollection
         // Otherwise get a random value in between
         IoCManager.Resolve(ref random);
         return random.Next(entry.Amount, entry.MaxAmount);
+    }
+
+    public sealed class OrGroup
+    {
+        public List<EntitySpawnEntry> Entries { get; set; } = new();
+        public float CumulativeProbability { get; set; }
     }
 }

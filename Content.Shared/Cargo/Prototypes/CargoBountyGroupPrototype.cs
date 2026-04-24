@@ -6,9 +6,9 @@ namespace Content.Shared.Cargo.Prototypes;
 /// Used to categorize bounties for different purposes
 /// </summary>
 [Prototype]
-public sealed partial class CargoBountyGroupPrototype : IPrototype
+public sealed class CargoBountyGroupPrototype : IPrototype
 {
-    /// <inheritdoc/>
+    /// <inheritdoc />
     [IdDataField]
-    public string ID { get; private set; } = default!;
+    public string ID { get; } = default!;
 }

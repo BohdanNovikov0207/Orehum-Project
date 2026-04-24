@@ -22,21 +22,9 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Shared.Construction.Components;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class MachineBoardComponent : Component
 {
-    /// <summary>
-    /// The stacks needed to construct this machine
-    /// </summary>
-    [DataField]
-    public Dictionary<ProtoId<StackPrototype>, int> StackRequirements = new();
-
-    /// <summary>
-    /// Entities needed to construct this machine, discriminated by tag.
-    /// </summary>
-    [DataField]
-    public Dictionary<ProtoId<TagPrototype>, GenericPartInfo> TagRequirements = new();
-
     /// <summary>
     /// Entities needed to construct this machine, discriminated by component.
     /// </summary>
@@ -48,9 +36,21 @@ public sealed partial class MachineBoardComponent : Component
     /// </summary>
     [DataField(required: true)]
     public EntProtoId Prototype;
+
+    /// <summary>
+    /// The stacks needed to construct this machine
+    /// </summary>
+    [DataField]
+    public Dictionary<ProtoId<StackPrototype>, int> StackRequirements = new();
+
+    /// <summary>
+    /// Entities needed to construct this machine, discriminated by tag.
+    /// </summary>
+    [DataField]
+    public Dictionary<ProtoId<TagPrototype>, GenericPartInfo> TagRequirements = new();
 }
 
-[DataDefinition, Serializable]
+[DataDefinition] [Serializable]
 public partial struct GenericPartInfo
 {
     [DataField(required: true)]

@@ -16,15 +16,15 @@ using Content.Shared.Teleportation.Components;
 namespace Content.Shared.Teleportation.Systems;
 
 /// <summary>
-///     Handles symmetrically linking two entities together, and removing links properly.
-///     This does not do anything on its own (outside of deleting entities that have 0 links, if that option is true)
-///     Systems can do whatever they please with the linked entities, such as <see cref="SharedPortalSystem"/>.
+/// Handles symmetrically linking two entities together, and removing links properly.
+/// This does not do anything on its own (outside of deleting entities that have 0 links, if that option is true)
+/// Systems can do whatever they please with the linked entities, such as <see cref="SharedPortalSystem" />.
 /// </summary>
 public sealed class LinkedEntitySystem : EntitySystem
 {
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
@@ -37,24 +37,23 @@ public sealed class LinkedEntitySystem : EntitySystem
         // Remove any links to this entity when deleted.
         foreach (var ent in component.LinkedEntities.ToArray())
         {
-            if (!Deleted(ent) && LifeStage(ent) < EntityLifeStage.Terminating && TryComp<LinkedEntityComponent>(ent, out var link))
-            {
+            if (!Deleted(ent) && LifeStage(ent) < EntityLifeStage.Terminating &&
+                TryComp<LinkedEntityComponent>(ent, out var link))
                 TryUnlink(uid, ent, component, link);
-            }
         }
     }
 
     #region Public API
 
     /// <summary>
-    ///     Links two entities together. Does not require the existence of <see cref="LinkedEntityComponent"/> on either
-    ///     already. Linking is symmetrical, so order doesn't matter.
+    /// Links two entities together. Does not require the existence of <see cref="LinkedEntityComponent" /> on either
+    /// already. Linking is symmetrical, so order doesn't matter.
     /// </summary>
     /// <param name="first">The first entity to link</param>
     /// <param name="second">The second entity to link</param>
     /// <param name="deleteOnEmptyLinks">Whether both entities should now delete once their links are removed</param>
     /// <returns>Whether linking was successful (e.g. they weren't already linked)</returns>
-    public bool TryLink(EntityUid first, EntityUid second, bool deleteOnEmptyLinks=false)
+    public bool TryLink(EntityUid first, EntityUid second, bool deleteOnEmptyLinks = false)
     {
         var firstLink = EnsureComp<LinkedEntityComponent>(first);
         var secondLink = EnsureComp<LinkedEntityComponent>(second);
@@ -69,14 +68,14 @@ public sealed class LinkedEntitySystem : EntitySystem
         Dirty(second, secondLink);
 
         return firstLink.LinkedEntities.Add(second)
-            && secondLink.LinkedEntities.Add(first);
+               && secondLink.LinkedEntities.Add(first);
     }
 
     /// <summary>
     /// Does a one-way link from source to target.
     /// </summary>
     /// <param name="deleteOnEmptyLinks">Whether both entities should now delete once their links are removed</param>
-    public bool OneWayLink(EntityUid source, EntityUid target, bool deleteOnEmptyLinks=false)
+    public bool OneWayLink(EntityUid source, EntityUid target, bool deleteOnEmptyLinks = false)
     {
         var firstLink = EnsureComp<LinkedEntityComponent>(source);
         firstLink.DeleteOnEmptyLinks = deleteOnEmptyLinks;
@@ -89,16 +88,18 @@ public sealed class LinkedEntitySystem : EntitySystem
     }
 
     /// <summary>
-    ///     Unlinks two entities. Deletes either entity if <see cref="LinkedEntityComponent.DeleteOnEmptyLinks"/>
-    ///     was true and its links are now empty. Symmetrical, so order doesn't matter.
+    /// Unlinks two entities. Deletes either entity if <see cref="LinkedEntityComponent.DeleteOnEmptyLinks" />
+    /// was true and its links are now empty. Symmetrical, so order doesn't matter.
     /// </summary>
     /// <param name="first">The first entity to unlink</param>
     /// <param name="second">The second entity to unlink</param>
     /// <param name="firstLink">Resolve comp</param>
     /// <param name="secondLink">Resolve comp</param>
     /// <returns>Whether unlinking was successful (e.g. they both were actually linked to one another)</returns>
-    public bool TryUnlink(EntityUid first, EntityUid second,
-        LinkedEntityComponent? firstLink = null, LinkedEntityComponent? secondLink = null)
+    public bool TryUnlink(EntityUid first,
+        EntityUid second,
+        LinkedEntityComponent? firstLink = null,
+        LinkedEntityComponent? secondLink = null)
     {
         if (!Resolve(first, ref firstLink))
             return false;

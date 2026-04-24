@@ -14,14 +14,13 @@
 //
 // SPDX-License-Identifier: MIT
 
-namespace Content.Shared.Roles
+namespace Content.Shared.Roles;
+
+/// <summary>
+/// Provides special hooks for when jobs get spawned in/equipped.
+/// </summary>
+[ImplicitDataDefinitionForInheritors]
+public abstract partial class JobSpecial
 {
-    /// <summary>
-    ///     Provides special hooks for when jobs get spawned in/equipped.
-    /// </summary>
-    [ImplicitDataDefinitionForInheritors]
-    public abstract partial class JobSpecial
-    {
-        public abstract void AfterEquip(EntityUid mob);
-    }
+    public abstract void AfterEquip(EntityUid mob);
 }

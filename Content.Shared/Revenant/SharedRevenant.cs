@@ -12,7 +12,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Revenant;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class SoulEvent : SimpleDoAfterEvent
 {
 }
@@ -31,7 +31,7 @@ public sealed class SoulSearchDoAfterCancelled : EntityEventArgs
 {
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class HarvestEvent : SimpleDoAfterEvent
 {
 }
@@ -70,8 +70,7 @@ public sealed partial class RevenantMalfunctionActionEvent : InstantActionEvent
 {
 }
 
-
-[NetSerializable, Serializable]
+[NetSerializable] [Serializable]
 public enum RevenantVisuals : byte
 {
     Corporeal,

@@ -5,7 +5,6 @@ namespace Content.Shared.Trigger.Systems;
 
 public sealed partial class TriggerSystem
 {
-
     private void InitializeSpawn()
     {
         SubscribeLocalEvent<TriggerOnSpawnComponent, MapInitEvent>(OnSpawnInit);
@@ -14,10 +13,8 @@ public sealed partial class TriggerSystem
         SubscribeLocalEvent<DeleteOnTriggerComponent, TriggerEvent>(HandleDeleteOnTrigger);
     }
 
-    private void OnSpawnInit(Entity<TriggerOnSpawnComponent> ent, ref MapInitEvent args)
-    {
+    private void OnSpawnInit(Entity<TriggerOnSpawnComponent> ent, ref MapInitEvent args) =>
         Trigger(ent.Owner, null, ent.Comp.KeyOut);
-    }
 
     private void HandleSpawnOnTrigger(Entity<SpawnOnTriggerComponent> ent, ref TriggerEvent args)
     {
@@ -38,7 +35,6 @@ public sealed partial class TriggerSystem
                 EntityManager.PredictedSpawn(ent.Comp.Proto, mapCoords);
             else if (_net.IsServer)
                 Spawn(ent.Comp.Proto, mapCoords);
-
         }
         else
         {
@@ -50,7 +46,6 @@ public sealed partial class TriggerSystem
                 PredictedSpawnAttachedTo(ent.Comp.Proto, coords);
             else if (_net.IsServer)
                 SpawnAttachedTo(ent.Comp.Proto, coords);
-
         }
     }
 

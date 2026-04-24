@@ -14,12 +14,12 @@ namespace Content.Shared.Random.Rules;
 /// e.g. "choose maintenance audio if 90% of tiles nearby are maintenance tiles"
 /// </summary>
 [Prototype]
-public sealed partial class RulesPrototype : IPrototype
+public sealed class RulesPrototype : IPrototype
 {
-    [IdDataField] public string ID { get; private set; } = string.Empty;
-
     [DataField("rules", required: true)]
     public List<RulesRule> Rules = new();
+
+    [IdDataField] public string ID { get; } = string.Empty;
 }
 
 [ImplicitDataDefinitionForInheritors]
@@ -27,6 +27,7 @@ public abstract partial class RulesRule
 {
     [DataField]
     public bool Inverted;
+
     public abstract bool Check(EntityManager entManager, EntityUid uid);
 }
 

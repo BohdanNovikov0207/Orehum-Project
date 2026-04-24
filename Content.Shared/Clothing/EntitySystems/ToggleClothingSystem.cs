@@ -14,7 +14,7 @@ using Content.Shared.Toggleable;
 namespace Content.Shared.Clothing.EntitySystems;
 
 /// <summary>
-/// Handles adding and using a toggle action for <see cref="ToggleClothingComponent"/>.
+/// Handles adding and using a toggle action for <see cref="ToggleClothingComponent" />.
 /// </summary>
 public sealed class ToggleClothingSystem : EntitySystem
 {
@@ -55,10 +55,8 @@ public sealed class ToggleClothingSystem : EntitySystem
             args.AddAction(ent.Comp.ActionEntity);
     }
 
-    private void OnToggleAction(Entity<ToggleClothingComponent> ent, ref ToggleActionEvent args)
-    {
+    private void OnToggleAction(Entity<ToggleClothingComponent> ent, ref ToggleActionEvent args) =>
         args.Handled = _toggle.Toggle(ent.Owner, args.Performer);
-    }
 
     private void OnUnequipped(Entity<ToggleClothingComponent> ent, ref ClothingGotUnequippedEvent args)
     {

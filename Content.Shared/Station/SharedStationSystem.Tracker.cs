@@ -20,23 +20,17 @@ public abstract partial class SharedStationSystem
         UpdateStationTracker(ent.AsNullable());
     }
 
-    private void OnTrackerRemove(Entity<StationTrackerComponent> ent, ref ComponentRemove args)
-    {
+    private void OnTrackerRemove(Entity<StationTrackerComponent> ent, ref ComponentRemove args) =>
         _meta.RemoveFlag(ent, MetaDataFlags.ExtraTransformEvents);
-    }
 
-    private void OnTrackerGridChanged(Entity<StationTrackerComponent> ent, ref GridUidChangedEvent args)
-    {
+    private void OnTrackerGridChanged(Entity<StationTrackerComponent> ent, ref GridUidChangedEvent args) =>
         UpdateStationTracker((ent, ent.Comp, args.Transform));
-    }
 
     private void OnMetaFlagRemoveAttempt(Entity<StationTrackerComponent> ent, ref MetaFlagRemoveAttemptEvent args)
     {
         if ((args.ToRemove & MetaDataFlags.ExtraTransformEvents) != 0 &&
             ent.Comp.LifeStage <= ComponentLifeStage.Running)
-        {
             args.ToRemove &= ~MetaDataFlags.ExtraTransformEvents;
-        }
     }
 
     /// <summary>

@@ -3,11 +3,10 @@ using System.Text.Json.Serialization;
 using Lidgren.Network;
 using Robust.Shared.Network;
 using Robust.Shared.Serialization;
-using Robust.Shared.Utility;
 
 namespace Content.Shared.Backmen.Sponsors;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class SponsorInfo
 {
     [JsonPropertyName("tier")]
@@ -40,9 +39,8 @@ public sealed class SponsorInfo
 /// </summary>
 public sealed class MsgSponsorInfo : NetMessage
 {
-    public override MsgGroups MsgGroup => MsgGroups.Command;
-
     public SponsorInfo? Info;
+    public override MsgGroups MsgGroup => MsgGroups.Command;
 
     public override void ReadFromBuffer(NetIncomingMessage buffer, IRobustSerializer serializer)
     {

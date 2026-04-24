@@ -10,11 +10,11 @@ public abstract partial class SharedStationSystem : EntitySystem
 {
     [Dependency] private readonly SharedMapSystem _map = default!;
     [Dependency] private readonly MetaDataSystem _meta = default!;
-
-    private EntityQuery<TransformComponent> _xformQuery;
     private EntityQuery<StationMemberComponent> _stationMemberQuery;
 
-    /// <inheritdoc/>
+    private EntityQuery<TransformComponent> _xformQuery;
+
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
@@ -34,7 +34,7 @@ public abstract partial class SharedStationSystem : EntitySystem
             return null;
 
         EntityUid? largestGrid = null;
-        Box2 largestBounds = new Box2();
+        var largestBounds = new Box2();
 
         foreach (var gridUid in ent.Comp.Grids)
         {
@@ -171,9 +171,7 @@ public abstract partial class SharedStationSystem : EntitySystem
             foreach (var gridUid in data.Grids)
             {
                 if (Transform(gridUid).MapID == map)
-                {
                     return uid;
-                }
             }
         }
 

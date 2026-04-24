@@ -18,8 +18,8 @@ namespace Content.Shared.Polymorph;
 public sealed partial class PolymorphActionEvent : InstantActionEvent
 {
     /// <summary>
-    ///     The polymorph proto id, containing all the information about
-    ///     the specific polymorph.
+    /// The polymorph proto id, containing all the information about
+    /// the specific polymorph.
     /// </summary>
     [DataField]
     public ProtoId<PolymorphPrototype>? ProtoId;
@@ -32,5 +32,4 @@ public sealed partial class PolymorphActionEvent : InstantActionEvent
 
 public sealed partial class RevertPolymorphActionEvent : InstantActionEvent
 {
-
 }

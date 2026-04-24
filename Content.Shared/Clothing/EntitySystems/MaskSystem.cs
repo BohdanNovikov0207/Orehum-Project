@@ -88,10 +88,10 @@ namespace Content.Shared.Clothing.EntitySystems;
 public sealed class MaskSystem : EntitySystem
 {
     [Dependency] private readonly SharedActionsSystem _actionSystem = default!;
+    [Dependency] private readonly ClothingSystem _clothing = default!;
     [Dependency] private readonly InventorySystem _inventorySystem = default!;
     [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly ClothingSystem _clothing = default!;
 
     public override void Initialize()
     {
@@ -126,9 +126,7 @@ public sealed class MaskSystem : EntitySystem
         if (!TryComp(ent, out ClothingComponent? clothing)
             || clothing.InSlotFlag is not { } slotFlag
             || !clothing.Slots.HasFlag(slotFlag))
-        {
             return;
-        }
 
         SetToggled((uid, mask), !mask.IsToggled);
 
@@ -149,7 +147,11 @@ public sealed class MaskSystem : EntitySystem
     /// <summary>
     /// Called after setting IsToggled, raises events and dirties.
     /// </summary>
-    private void ToggleMaskComponents(EntityUid uid, MaskComponent mask, EntityUid wearer, string? equippedPrefix = null, bool isEquip = false)
+    private void ToggleMaskComponents(EntityUid uid,
+        MaskComponent mask,
+        EntityUid wearer,
+        string? equippedPrefix = null,
+        bool isEquip = false)
     {
         Dirty(uid, mask);
         if (mask.ToggleActionEntity is { } action)
@@ -173,7 +175,7 @@ public sealed class MaskSystem : EntitySystem
         // and we also prevent it from being un-toggled. We also automatically untoggle it when it gets unfolded, so it
         // fully returns to its previous state when folded & unfolded.
 
-        SetToggled(ent!, args.IsFolded, force: true);
+        SetToggled(ent!, args.IsFolded, true);
         SetToggleable(ent!, !args.IsFolded);
     }
 
@@ -204,11 +206,9 @@ public sealed class MaskSystem : EntitySystem
         // Add an easier way to get the entity that is wearing clothing in a valid slot.
         EntityUid? wearer = null;
         if (TryComp(mask, out ClothingComponent? clothing)
-            && clothing.InSlotFlag is {} slotFlag
+            && clothing.InSlotFlag is { } slotFlag
             && clothing.Slots.HasFlag(slotFlag))
-        {
             wearer = Transform(mask).ParentUid;
-        }
 
         var maskEv = new ItemMaskToggledEvent(mask!, wearer);
         RaiseLocalEvent(mask, ref maskEv);

@@ -9,12 +9,12 @@ namespace Content.Shared.Trigger.Components.Conditions;
 /// <remarks>
 /// TODO: Support specific UseDelay IDs for each trigger key.
 /// </remarks>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class UseDelayTriggerConditionComponent : BaseTriggerConditionComponent
 {
     /// <summary>
     /// Checks if the triggered entity has an active UseDelay.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public string UseDelayId = UseDelaySystem.DefaultId;
 }

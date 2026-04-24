@@ -25,17 +25,17 @@ public sealed partial class JobCondition : EntityEffectCondition
     {
         args.EntityManager.TryGetComponent<MindContainerComponent>(args.TargetEntity, out var mindContainer);
 
-        if ( mindContainer is null
-             || !args.EntityManager.TryGetComponent<MindComponent>(mindContainer.Mind, out var mind))
+        if (mindContainer is null
+            || !args.EntityManager.TryGetComponent<MindComponent>(mindContainer.Mind, out var mind))
             return false;
 
         foreach (var roleId in mind.MindRoles)
         {
-            if(!args.EntityManager.HasComponent<JobRoleComponent>(roleId))
+            if (!args.EntityManager.HasComponent<JobRoleComponent>(roleId))
                 continue;
 
-            if(!args.EntityManager.TryGetComponent<MindRoleComponent>(roleId, out var mindRole)
-               || mindRole.JobPrototype is null)
+            if (!args.EntityManager.TryGetComponent<MindRoleComponent>(roleId, out var mindRole)
+                || mindRole.JobPrototype is null)
                 continue;
 
             if (Job.Contains(mindRole.JobPrototype.Value))
@@ -48,6 +48,7 @@ public sealed partial class JobCondition : EntityEffectCondition
     public override string GuidebookExplanation(IPrototypeManager prototype)
     {
         var localizedNames = Job.Select(jobId => prototype.Index(jobId).LocalizedName).ToList();
-        return Loc.GetString("reagent-effect-condition-guidebook-job-condition", ("job", ContentLocalizationManager.FormatListToOr(localizedNames)));
+        return Loc.GetString("reagent-effect-condition-guidebook-job-condition",
+            ("job", ContentLocalizationManager.FormatListToOr(localizedNames)));
     }
 }

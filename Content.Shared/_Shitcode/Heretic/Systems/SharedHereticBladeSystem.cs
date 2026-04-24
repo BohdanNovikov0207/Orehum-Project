@@ -15,7 +15,6 @@
 
 using System.Linq;
 using System.Numerics;
-using System.Text;
 using Content.Goobstation.Common.BlockTeleport;
 using Content.Goobstation.Common.Physics;
 using Content.Goobstation.Common.SecondSkin;
@@ -36,6 +35,7 @@ using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Mobs.Systems;
 using Content.Shared.Physics;
+using Content.Shared.Popups;
 using Content.Shared.Teleportation;
 using Content.Shared.Weapons.Melee;
 using Content.Shared.Weapons.Melee.Events;
@@ -43,7 +43,6 @@ using Robust.Shared.Audio.Systems;
 using Robust.Shared.Network;
 using Robust.Shared.Physics;
 using Robust.Shared.Physics.Systems;
-using Content.Shared.Popups;
 using Robust.Shared.Timing;
 using Robust.Shared.Utility;
 
@@ -52,22 +51,22 @@ namespace Content.Shared._Shitcode.Heretic.Systems;
 public abstract class SharedHereticBladeSystem : EntitySystem
 {
     [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedTransformSystem _xform = default!;
-    [Dependency] private readonly SharedHereticCombatMarkSystem _combatMark = default!;
-    [Dependency] private readonly SharedRottingSystem _rotting = default!;
-    [Dependency] private readonly MobStateSystem _mobState = default!;
-    [Dependency] private readonly SharedSanguineStrikeSystem _sanguine = default!;
-    [Dependency] private readonly CosmosComboSystem _combo = default!;
-    [Dependency] private readonly SharedStarMarkSystem _starMark = default!;
-    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
-    [Dependency] private readonly SharedMeleeWeaponSystem _melee = default!;
     [Dependency] private readonly SharedCombatModeSystem _combat = default!;
-    [Dependency] private readonly SharedVoidCurseSystem _voidCurse = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly SharedHereticCombatMarkSystem _combatMark = default!;
+    [Dependency] private readonly CosmosComboSystem _combo = default!;
     [Dependency] private readonly SharedHereticSystem _heretic = default!;
+    [Dependency] private readonly SharedMeleeWeaponSystem _melee = default!;
+    [Dependency] private readonly MobStateSystem _mobState = default!;
+    [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly SharedRottingSystem _rotting = default!;
+    [Dependency] private readonly SharedSanguineStrikeSystem _sanguine = default!;
+    [Dependency] private readonly SharedStarMarkSystem _starMark = default!;
 
     [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly SharedVoidCurseSystem _voidCurse = default!;
+    [Dependency] private readonly SharedTransformSystem _xform = default!;
 
     public override void Initialize()
     {
@@ -239,6 +238,7 @@ public abstract class SharedHereticBladeSystem : EntitySystem
                     var ev = new ModifyDisgustEvent(20f);
                     RaiseLocalEvent(target, ref ev);
                 }
+
                 break;
 
             default:
@@ -292,7 +292,8 @@ public abstract class SharedHereticBladeSystem : EntitySystem
         if (TryComp(args.User, out HereticBladeUserBonusDamageComponent? bonus) &&
             (bonus.Path == null || bonus.Path == ent.Comp.Path))
         {
-            args.BonusDamage += args.BaseDamage * bonus.BonusMultiplier; // "ghouls can use bloody blades effectively... so real..."
+            args.BonusDamage +=
+                args.BaseDamage * bonus.BonusMultiplier; // "ghouls can use bloody blades effectively... so real..."
             if (hereticComp == null)
             {
                 foreach (var hit in args.HitEntities)
@@ -350,6 +351,7 @@ public abstract class SharedHereticBladeSystem : EntitySystem
                     {
                         _starMark.TryApplyStarMark(uid);
                     }
+
                     break;
             }
         }

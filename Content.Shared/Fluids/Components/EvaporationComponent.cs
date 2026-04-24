@@ -23,16 +23,10 @@ namespace Content.Shared.Fluids.Components;
 /// <summary>
 /// Added to puddles that contain water so it may evaporate over time.
 /// </summary>
-[NetworkedComponent, AutoGenerateComponentPause]
-[RegisterComponent, Access(typeof(SharedPuddleSystem))]
+[NetworkedComponent] [AutoGenerateComponentPause]
+[RegisterComponent] [Access(typeof(SharedPuddleSystem))]
 public sealed partial class EvaporationComponent : Component
 {
-    /// <summary>
-    /// The next time we remove the EvaporationSystem reagent amount from this entity.
-    /// </summary>
-    [AutoPausedField, DataField(customTypeSerializer: typeof(TimeOffsetSerializer))]
-    public TimeSpan NextTick;
-
     /// <summary>
     /// Evaporation factor. Multiplied by the evaporating speed of the reagent.
     /// </summary>
@@ -44,4 +38,10 @@ public sealed partial class EvaporationComponent : Component
     /// </summary>
     [DataField]
     public EntProtoId EvaporationEffect = "PuddleSparkle";
+
+    /// <summary>
+    /// The next time we remove the EvaporationSystem reagent amount from this entity.
+    /// </summary>
+    [AutoPausedField] [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))]
+    public TimeSpan NextTick;
 }

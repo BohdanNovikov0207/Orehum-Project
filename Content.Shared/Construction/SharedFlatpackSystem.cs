@@ -9,8 +9,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Construction.Components;
 using Content.Shared.Administration.Logs;
+using Content.Shared.Construction.Components;
 using Content.Shared.Containers.ItemSlots;
 using Content.Shared.Database;
 using Content.Shared.Examine;
@@ -29,20 +29,20 @@ namespace Content.Shared.Construction;
 public abstract class SharedFlatpackSystem : EntitySystem
 {
     [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
-    [Dependency] private readonly INetManager _net = default!;
-    [Dependency] protected readonly IPrototypeManager PrototypeManager = default!;
-    [Dependency] protected readonly SharedAppearanceSystem Appearance = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedContainerSystem _container = default!;
     [Dependency] private readonly EntityLookupSystem _entityLookup = default!;
     [Dependency] private readonly SharedMapSystem _map = default!;
-    [Dependency] protected readonly MachinePartSystem MachinePart = default!;
-    [Dependency] protected readonly SharedMaterialStorageSystem MaterialStorage = default!;
     [Dependency] private readonly MetaDataSystem _metaData = default!;
+    [Dependency] private readonly INetManager _net = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly SharedToolSystem _tool = default!;
+    [Dependency] protected readonly SharedAppearanceSystem Appearance = default!;
+    [Dependency] protected readonly MachinePartSystem MachinePart = default!;
+    [Dependency] protected readonly SharedMaterialStorageSystem MaterialStorage = default!;
+    [Dependency] protected readonly IPrototypeManager PrototypeManager = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         SubscribeLocalEvent<FlatpackComponent, InteractUsingEvent>(OnFlatpackInteractUsing);
@@ -130,14 +130,17 @@ public abstract class SharedFlatpackSystem : EntitySystem
 
         var meta = MetaData(ent);
         _metaData.SetEntityName(ent, Loc.GetString("flatpack-entity-name", ("name", machinePrototype.Name)), meta);
-        _metaData.SetEntityDescription(ent, Loc.GetString("flatpack-entity-description", ("name", machinePrototype.Name)), meta);
+        _metaData.SetEntityDescription(ent,
+            Loc.GetString("flatpack-entity-description", ("name", machinePrototype.Name)),
+            meta);
 
         Dirty(ent, meta);
         Appearance.SetData(ent, FlatpackVisuals.Machine, MetaData(board).EntityPrototype?.ID ?? string.Empty);
     }
 
     /// <param name="machineBoard">The machine board to pack. If null, this implies we are packing a computer board</param>
-    public Dictionary<string, int> GetFlatpackCreationCost(Entity<FlatpackCreatorComponent> entity, Entity<MachineBoardComponent>? machineBoard)
+    public Dictionary<string, int> GetFlatpackCreationCost(Entity<FlatpackCreatorComponent> entity,
+        Entity<MachineBoardComponent>? machineBoard)
     {
         Dictionary<string, int> cost = new();
         Dictionary<ProtoId<MaterialPrototype>, int> baseCost;

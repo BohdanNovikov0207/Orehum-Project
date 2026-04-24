@@ -14,8 +14,8 @@ using Robust.Shared.Serialization;
 namespace Content.Shared.Radiation.Systems;
 
 /// <summary>
-///     Ray emitted by radiation source towards radiation receiver.
-///     Contains all information about encountered radiation blockers.
+/// Ray emitted by radiation source towards radiation receiver.
+/// Contains all information about encountered radiation blockers.
 /// </summary>
 public struct RadiationRay(
     MapId mapId,
@@ -26,49 +26,53 @@ public struct RadiationRay(
     float rads)
 {
     /// <summary>
-    ///     Map on which source and receiver are placed.
+    /// Map on which source and receiver are placed.
     /// </summary>
     public MapId MapId = mapId;
+
     /// <summary>
-    ///     Uid of entity with <see cref="RadiationSourceComponent"/>.
+    /// Uid of entity with <see cref="RadiationSourceComponent" />.
     /// </summary>
     public EntityUid SourceUid = sourceUid;
+
     /// <summary>
-    ///     World coordinates of radiation source.
+    /// World coordinates of radiation source.
     /// </summary>
     public Vector2 Source = source;
+
     /// <summary>
-    ///     Uid of entity with radiation receiver component.
+    /// Uid of entity with radiation receiver component.
     /// </summary>
     public EntityUid DestinationUid = destinationUid;
+
     /// <summary>
-    ///     World coordinates of radiation receiver.
+    /// World coordinates of radiation receiver.
     /// </summary>
     public Vector2 Destination = destination;
+
     /// <summary>
-    ///     How many rads intensity reached radiation receiver.
+    /// How many rads intensity reached radiation receiver.
     /// </summary>
     public float Rads = rads;
 
     /// <summary>
-    ///     Has rad ray reached destination or lost all intensity after blockers?
+    /// Has rad ray reached destination or lost all intensity after blockers?
     /// </summary>
     public bool ReachedDestination => Rads > 0;
 
     /// <summary>
-    ///     All blockers visited by gridcast, used for debug overlays. Key is uid of grid. Values are pairs
-    ///     of tile indices and floats with updated radiation value.
+    /// All blockers visited by gridcast, used for debug overlays. Key is uid of grid. Values are pairs
+    /// of tile indices and floats with updated radiation value.
     /// </summary>
     /// <remarks>
-    ///     Last tile may have negative value if ray has lost all intensity.
-    ///     Grid traversal order isn't guaranteed.
+    /// Last tile may have negative value if ray has lost all intensity.
+    /// Grid traversal order isn't guaranteed.
     /// </remarks>
     public Dictionary<NetEntity, List<(Vector2i, float)>>? Blockers;
-
 }
 
 // Variant of RadiationRay that uses NetEntities.
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public readonly record struct DebugRadiationRay(
     MapId MapId,
     NetEntity SourceUid,

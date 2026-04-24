@@ -9,9 +9,9 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Shared.InteractionVerbs;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class InteractionVerbsComponent : Component
 {
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public List<ProtoId<InteractionVerbPrototype>> AllowedVerbs = new();
 }

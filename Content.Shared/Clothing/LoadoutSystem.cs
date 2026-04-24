@@ -131,9 +131,9 @@ public sealed class LoadoutSystem : EntitySystem
     // Shared so we can predict it for placement manager.
 
     [Dependency] private readonly ActorSystem _actors = default!;
-    [Dependency] private readonly SharedStationSpawningSystem _station = default!;
     [Dependency] private readonly IPrototypeManager _protoMan = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly SharedStationSpawningSystem _station = default!;
 
     public override void Initialize()
     {
@@ -166,11 +166,9 @@ public sealed class LoadoutSystem : EntitySystem
         EntProtoId? proto = null;
 
         if (_protoMan.TryIndex(loadout.StartingGear, out var gear))
-        {
             proto = GetFirstOrNull(gear);
-        }
 
-        proto ??= GetFirstOrNull((IEquipmentLoadout)loadout);
+        proto ??= GetFirstOrNull((IEquipmentLoadout) loadout);
         return proto;
     }
 
@@ -186,15 +184,12 @@ public sealed class LoadoutSystem : EntitySystem
 
         if (count == 1)
         {
-            if (gear.Equipment.Count == 1 && _protoMan.TryIndex<EntityPrototype>(gear.Equipment.Values.First(), out var proto))
-            {
+            if (gear.Equipment.Count == 1 &&
+                _protoMan.TryIndex<EntityPrototype>(gear.Equipment.Values.First(), out var proto))
                 return proto.ID;
-            }
 
             if (gear.Inhand.Count == 1 && _protoMan.TryIndex<EntityPrototype>(gear.Inhand[0], out proto))
-            {
                 return proto.ID;
-            }
 
             // Storage moment
             foreach (var ents in gear.Storage.Values)
@@ -215,9 +210,7 @@ public sealed class LoadoutSystem : EntitySystem
             return proto.Name;
 
         if (_protoMan.TryIndex(loadout.StartingGear, out var gear))
-        {
             return GetName(gear);
-        }
 
         return GetName((IEquipmentLoadout) loadout);
     }
@@ -234,15 +227,12 @@ public sealed class LoadoutSystem : EntitySystem
 
         if (count == 1)
         {
-            if (gear.Equipment.Count == 1 && _protoMan.TryIndex<EntityPrototype>(gear.Equipment.Values.First(), out var proto))
-            {
+            if (gear.Equipment.Count == 1 &&
+                _protoMan.TryIndex<EntityPrototype>(gear.Equipment.Values.First(), out var proto))
                 return proto.Name;
-            }
 
             if (gear.Inhand.Count == 1 && _protoMan.TryIndex<EntityPrototype>(gear.Inhand[0], out proto))
-            {
                 return proto.Name;
-            }
 
             foreach (var values in gear.Storage.Values)
             {
@@ -250,23 +240,20 @@ public sealed class LoadoutSystem : EntitySystem
                     continue;
 
                 if (_protoMan.TryIndex<EntityPrototype>(values[0], out proto))
-                {
                     return proto.Name;
-                }
 
                 break;
             }
         }
 
-        return Loc.GetString($"unknown");
+        return Loc.GetString("unknown");
     }
 
-    private void OnMapInit(EntityUid uid, LoadoutComponent component, MapInitEvent args)
-    {
+    private void OnMapInit(EntityUid uid, LoadoutComponent component, MapInitEvent args) =>
         Equip(uid, component.StartingGear, component.RoleLoadout);
-    }
 
-    public void Equip(EntityUid uid, List<ProtoId<StartingGearPrototype>>? startingGear,
+    public void Equip(EntityUid uid,
+        List<ProtoId<StartingGearPrototype>>? startingGear,
         List<ProtoId<RoleLoadoutPrototype>>? loadoutGroups)
     {
         // First, randomly pick a startingGear profile from those specified, and equip it.
@@ -299,9 +286,7 @@ public sealed class LoadoutSystem : EntitySystem
     public HumanoidCharacterProfile GetProfile(EntityUid? uid)
     {
         if (TryComp(uid, out HumanoidAppearanceComponent? appearance))
-        {
             return HumanoidCharacterProfile.DefaultWithSpecies(appearance.Species);
-        }
 
         return HumanoidCharacterProfile.Random();
     }

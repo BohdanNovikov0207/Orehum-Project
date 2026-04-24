@@ -9,7 +9,7 @@ namespace Content.Shared._Lavaland.Megafauna.Selectors;
 
 /// <summary>
 /// Uses AggressiveComponent to pick a new target to attack.
-/// Stores the result in a <see cref="MegafaunaAiTargetingComponent"/>
+/// Stores the result in a <see cref="MegafaunaAiTargetingComponent" />
 /// as EntityUid and EntityCoordinates of the entity.
 /// </summary>
 public sealed partial class AggressivePickTargetSelector : MegafaunaSelector
@@ -34,13 +34,15 @@ public sealed partial class AggressivePickTargetSelector : MegafaunaSelector
 
         if (!entMan.TryGetComponent<AggressiveComponent>(args.Entity, out var aggressiveComp))
         {
-            DebugTools.Assert($"Megafauna AI doesn't have {nameof(AggressiveComponent)}, but tried to pick a target using it's data!");
+            DebugTools.Assert(
+                $"Megafauna AI doesn't have {nameof(AggressiveComponent)}, but tried to pick a target using it's data!");
             return FailDelay;
         }
 
         if (aggressiveComp.Aggressors.Count == 0)
         {
-            DebugTools.Assert($"Megafauna AI failed to pick a target from {nameof(AggressiveComponent)}, it doesn't have any targets to pick from.");
+            DebugTools.Assert(
+                $"Megafauna AI failed to pick a target from {nameof(AggressiveComponent)}, it doesn't have any targets to pick from.");
             return FailDelay;
         }
 
@@ -72,7 +74,8 @@ public sealed partial class AggressivePickTargetSelector : MegafaunaSelector
                 }
             }
 
-            DebugTools.Assert(picked != null, nameof(picked) + " != null"); // It's impossible at that point, but better to check.
+            DebugTools.Assert(picked != null,
+                nameof(picked) + " != null"); // It's impossible at that point, but better to check.
         }
 
         var comp = args.EntityManager.EnsureComponent<MegafaunaAiTargetingComponent>(args.Entity);

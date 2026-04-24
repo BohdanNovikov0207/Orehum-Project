@@ -14,10 +14,10 @@ using Robust.Shared.Input.Binding;
 
 namespace Content.Shared._Orion.Posing;
 
-public abstract partial class SharedPosingSystem : EntitySystem
+public abstract class SharedPosingSystem : EntitySystem
 {
-    [Dependency] private readonly StandingStateSystem _standing = default!;
     [Dependency] private readonly ActionBlockerSystem _actionBlocker = default!;
+    [Dependency] private readonly StandingStateSystem _standing = default!;
 
     public override void Initialize()
     {
@@ -39,28 +39,28 @@ public abstract partial class SharedPosingSystem : EntitySystem
                 InputCmdHandler.FromDelegate(session =>
                     {
                         if (session?.AttachedEntity is { } userUid)
-                            TryAdjustPosingOffset(userUid, new(0.05f, 0f));
+                            TryAdjustPosingOffset(userUid, new Vector2(0.05f, 0f));
                     },
                     handle: false))
             .Bind(ContentKeyFunctions.PosingOffsetLeft,
                 InputCmdHandler.FromDelegate(session =>
                     {
                         if (session?.AttachedEntity is { } userUid)
-                            TryAdjustPosingOffset(userUid, new(-0.05f, 0f));
+                            TryAdjustPosingOffset(userUid, new Vector2(-0.05f, 0f));
                     },
                     handle: false))
             .Bind(ContentKeyFunctions.PosingOffsetUp,
                 InputCmdHandler.FromDelegate(session =>
                     {
                         if (session?.AttachedEntity is { } userUid)
-                            TryAdjustPosingOffset(userUid, new(0f, 0.05f));
+                            TryAdjustPosingOffset(userUid, new Vector2(0f, 0.05f));
                     },
                     handle: false))
             .Bind(ContentKeyFunctions.PosingOffsetDown,
                 InputCmdHandler.FromDelegate(session =>
                     {
                         if (session?.AttachedEntity is { } userUid)
-                            TryAdjustPosingOffset(userUid, new(0f, -0.05f));
+                            TryAdjustPosingOffset(userUid, new Vector2(0f, -0.05f));
                     },
                     handle: false))
             .Bind(ContentKeyFunctions.PosingRotatePositive,
@@ -127,7 +127,8 @@ public abstract partial class SharedPosingSystem : EntitySystem
         var previousOffset = posingComp.CurrentOffset;
 
         posingComp.CurrentOffset += offset;
-        posingComp.CurrentOffset = Vector2.Clamp(posingComp.CurrentOffset, -posingComp.OffsetLimits, posingComp.OffsetLimits);
+        posingComp.CurrentOffset =
+            Vector2.Clamp(posingComp.CurrentOffset, -posingComp.OffsetLimits, posingComp.OffsetLimits);
 
         if (posingComp.CurrentOffset.Equals(previousOffset))
             return;
@@ -143,7 +144,8 @@ public abstract partial class SharedPosingSystem : EntitySystem
         var previousAngle = posingComp.CurrentAngle;
 
         var newAngle = posingComp.CurrentAngle.Degrees + angle;
-        posingComp.CurrentAngle = Angle.FromDegrees(Math.Clamp(newAngle, -posingComp.AngleLimits, posingComp.AngleLimits));
+        posingComp.CurrentAngle =
+            Angle.FromDegrees(Math.Clamp(newAngle, -posingComp.AngleLimits, posingComp.AngleLimits));
 
         if (posingComp.CurrentAngle.Equals(previousAngle))
             return;

@@ -18,9 +18,9 @@ namespace Content.Shared._Goobstation.Weapons.FoldingWeapon;
 
 public sealed class FoldingWeaponSystem : EntitySystem
 {
-    [Dependency] private readonly SharedWieldableSystem _wieldable = default!;
     [Dependency] private readonly ClothingSystem _clothing = default!;
     [Dependency] private readonly SharedItemSystem _item = default!;
+    [Dependency] private readonly SharedWieldableSystem _wieldable = default!;
 
     public override void Initialize()
     {
@@ -57,8 +57,5 @@ public sealed class FoldingWeaponSystem : EntitySystem
             args.Cancel();
     }
 
-    private bool CanShoot(EntityUid ent)
-    {
-        return !TryComp(ent, out ItemToggleComponent? toggle) || toggle.Activated;
-    }
+    private bool CanShoot(EntityUid ent) => !TryComp(ent, out ItemToggleComponent? toggle) || toggle.Activated;
 }

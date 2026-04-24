@@ -14,10 +14,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Charges.Components;
-using Content.Shared.Charges.Systems;
-using Content.Shared.Examine;
-using Content.Shared.Eye.Blinding.Components;
+using System.Linq;
+using Content.Goobstation.Common.Flash;
 using Content.Shared.Charges.Components;
 using Content.Shared.Charges.Systems;
 using Content.Shared.Examine;
@@ -27,6 +25,8 @@ using Content.Shared.IdentityManagement;
 using Content.Shared.Interaction.Events;
 using Content.Shared.Inventory;
 using Content.Shared.Light;
+using Content.Shared.Mobs.Components;
+using Content.Shared.Movement.Systems;
 using Content.Shared.Popups;
 using Content.Shared.StatusEffect;
 using Content.Shared.Stunnable;
@@ -39,42 +39,36 @@ using Robust.Shared.Audio.Systems;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Timing;
-using System.Linq;
-using Content.Goobstation.Common.Flash;
-using Content.Shared.Mobs.Components; // Goobstation
-using Content.Shared.Movement.Systems;
-using Robust.Shared.Random;
-using Robust.Shared.Timing;
-using System.Linq;
+// Goobstation
 
 namespace Content.Shared.Flash;
 
 public abstract class SharedFlashSystem : EntitySystem
 {
-    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedChargesSystem _sharedCharges = default!;
-    [Dependency] private readonly EntityLookupSystem _entityLookup = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly ExamineSystemShared _examine = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly SharedStunSystem _stun = default!;
-    [Dependency] private readonly MovementModStatusSystem _movementMod = default!;
-    [Dependency] private readonly TagSystem _tag = default!;
-    [Dependency] private readonly StatusEffectsSystem _statusEffectsSystem = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly UseDelaySystem _useDelay = default!;
-
-    private EntityQuery<StatusEffectsComponent> _statusEffectsQuery;
-    private EntityQuery<DamagedByFlashingComponent> _damagedByFlashingQuery;
-    private HashSet<EntityUid> _entSet = new();
-
     // The tag to add when a flash has no charges left.
     private static readonly ProtoId<TagPrototype> TrashTag = "Trash";
-    // The key string for the status effect.
-    public ProtoId<StatusEffectPrototype> FlashedKey = "Flashed";
 
     public static readonly ProtoId<TagPrototype> IgnoreResistancesTag = "FlashIgnoreResistances"; // Goobstation
+    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly EntityLookupSystem _entityLookup = default!;
+    private readonly HashSet<EntityUid> _entSet = new();
+    [Dependency] private readonly ExamineSystemShared _examine = default!;
+    [Dependency] private readonly MovementModStatusSystem _movementMod = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly SharedChargesSystem _sharedCharges = default!;
+    [Dependency] private readonly StatusEffectsSystem _statusEffectsSystem = default!;
+    [Dependency] private readonly SharedStunSystem _stun = default!;
+    [Dependency] private readonly TagSystem _tag = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
+    [Dependency] private readonly UseDelaySystem _useDelay = default!;
+    private EntityQuery<DamagedByFlashingComponent> _damagedByFlashingQuery;
+
+    private EntityQuery<StatusEffectsComponent> _statusEffectsQuery;
+
+    // The key string for the status effect.
+    public ProtoId<StatusEffectPrototype> FlashedKey = "Flashed";
 
     public override void Initialize()
     {
@@ -98,14 +92,18 @@ public abstract class SharedFlashSystem : EntitySystem
             !args.IsHit ||
             !args.HitEntities.Any() ||
             !UseFlash(ent, args.User))
-        {
             return;
-        }
 
         args.Handled = true;
         foreach (var target in args.HitEntities)
         {
-            Flash(target, args.User, ent.Owner, ent.Comp.MeleeDuration, ent.Comp.SlowTo, melee: true, stunDuration: ent.Comp.MeleeStunDuration);
+            Flash(target,
+                args.User,
+                ent.Owner,
+                ent.Comp.MeleeDuration,
+                ent.Comp.SlowTo,
+                melee: true,
+                stunDuration: ent.Comp.MeleeStunDuration);
         }
     }
 
@@ -115,7 +113,13 @@ public abstract class SharedFlashSystem : EntitySystem
             return;
 
         args.Handled = true;
-        FlashArea(ent.Owner, args.User, ent.Comp.Range, ent.Comp.AoeFlashDuration, ent.Comp.SlowTo, true, ent.Comp.Probability);
+        FlashArea(ent.Owner,
+            args.User,
+            ent.Comp.Range,
+            ent.Comp.AoeFlashDuration,
+            ent.Comp.SlowTo,
+            true,
+            ent.Comp.Probability);
     }
 
     // needed for the flash lantern and interrogator lamp
@@ -125,7 +129,13 @@ public abstract class SharedFlashSystem : EntitySystem
         if (!args.IsOn || !UseFlash(ent, null))
             return;
 
-        FlashArea(ent.Owner, null, ent.Comp.Range, ent.Comp.AoeFlashDuration, ent.Comp.SlowTo, true, ent.Comp.Probability);
+        FlashArea(ent.Owner,
+            null,
+            ent.Comp.Range,
+            ent.Comp.AoeFlashDuration,
+            ent.Comp.SlowTo,
+            true,
+            ent.Comp.Probability);
     }
 
     /// <summary>
@@ -211,12 +221,17 @@ public abstract class SharedFlashSystem : EntitySystem
         if (stunDuration != null)
             _stun.TryUpdateParalyzeDuration(target, stunDuration.Value * multiplier);
         else
-            _movementMod.TryUpdateMovementSpeedModDuration(target, MovementModStatusSystem.FlashSlowdown, flashDuration * multiplier, slowTo);
+            _movementMod.TryUpdateMovementSpeedModDuration(target,
+                MovementModStatusSystem.FlashSlowdown,
+                flashDuration * multiplier,
+                slowTo);
 
         if (displayPopup && user != null && target != user && Exists(user.Value))
         {
             _popup.PopupEntity(Loc.GetString("flash-component-user-blinds-you",
-                ("user", Identity.Entity(user.Value, EntityManager))), target, target);
+                    ("user", Identity.Entity(user.Value, EntityManager))),
+                target,
+                target);
         }
 
         var ev = new AfterFlashedEvent(target, user, used, melee);
@@ -238,7 +253,14 @@ public abstract class SharedFlashSystem : EntitySystem
     /// <param name="displayPopup">Whether or not to show a popup to the target player.</param>
     /// <param name="probability">Chance to be flashed. Rolled separately for each target in range.</param>
     /// <param name="sound">Additional sound to play at the source.</param>
-    public void FlashArea(EntityUid source, EntityUid? user, float range, TimeSpan flashDuration, float slowTo = 0.8f, bool displayPopup = false, float probability = 1f, SoundSpecifier? sound = null)
+    public void FlashArea(EntityUid source,
+        EntityUid? user,
+        float range,
+        TimeSpan flashDuration,
+        float slowTo = 0.8f,
+        bool displayPopup = false,
+        float probability = 1f,
+        SoundSpecifier? sound = null)
     {
         var transform = Transform(source);
         var mapPosition = _transform.GetMapCoordinates(transform);
@@ -248,7 +270,7 @@ public abstract class SharedFlashSystem : EntitySystem
         foreach (var entity in _entSet)
         {
             // TODO: Use RandomPredicted https://github.com/space-wizards/RobustToolbox/pull/5849
-            var rand = new System.Random((int)_timing.CurTick.Value + GetNetEntity(entity).Id);
+            var rand = new System.Random((int) _timing.CurTick.Value + GetNetEntity(entity).Id);
             if (!rand.Prob(probability))
                 continue;
 
@@ -258,7 +280,7 @@ public abstract class SharedFlashSystem : EntitySystem
 
             // Check for entites in view.
             // Put DamagedByFlashingComponent in the predicate because shadow anomalies block vision.
-            if (!_examine.InRangeUnOccluded(entity, mapPosition, range, predicate: (e) => _damagedByFlashingQuery.HasComponent(e)))
+            if (!_examine.InRangeUnOccluded(entity, mapPosition, range, e => _damagedByFlashingQuery.HasComponent(e)))
                 continue;
 
             Flash(entity, user, source, flashDuration, slowTo, displayPopup);
@@ -296,10 +318,9 @@ public abstract class SharedFlashSystem : EntitySystem
             args.Cancelled = true;
     }
 
-    private void OnTemporaryBlindnessFlashAttempt(Entity<TemporaryBlindnessComponent> ent, ref FlashAttemptEvent args)
-    {
+    private void
+        OnTemporaryBlindnessFlashAttempt(Entity<TemporaryBlindnessComponent> ent, ref FlashAttemptEvent args) =>
         args.Cancelled = true;
-    }
 
     private void OnFlashImmunityFlashAttempt(Entity<FlashImmunityComponent> ent, ref FlashAttemptEvent args)
     {
@@ -309,7 +330,8 @@ public abstract class SharedFlashSystem : EntitySystem
 
     private void OnExamine(Entity<FlashImmunityComponent> ent, ref ExaminedEvent args)
     {
-        if (HasComp<MobStateComponent>(args.Examined)) // Goobstation - dont add exmained value to mobs whit flash protection
+        if (HasComp<MobStateComponent>(args
+                .Examined)) // Goobstation - dont add exmained value to mobs whit flash protection
             return;
 
         args.PushMarkup(Loc.GetString("flash-protection"));

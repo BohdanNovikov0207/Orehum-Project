@@ -4,26 +4,19 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Chemistry.Reagent;
 using Content.Goobstation.Maths.FixedPoint;
+using Content.Shared.Chemistry.Reagent;
 using Robust.Shared.Prototypes;
 
 namespace Content.Shared.ReagentSpeed;
 
 /// <summary>
 /// Makes a device work faster by consuming reagents on each use.
-/// Other systems must use <see cref="ReagentSpeedSystem.ApplySpeed"/> for this to do anything.
+/// Other systems must use <see cref="ReagentSpeedSystem.ApplySpeed" /> for this to do anything.
 /// </summary>
-[RegisterComponent, Access(typeof(ReagentSpeedSystem))]
+[RegisterComponent] [Access(typeof(ReagentSpeedSystem))]
 public sealed partial class ReagentSpeedComponent : Component
 {
-    /// <summary>
-    /// Solution that will be checked.
-    /// Anything that isn't in <c>Modifiers</c> is left alone.
-    /// </summary>
-    [DataField(required: true)]
-    public string Solution = string.Empty;
-
     /// <summary>
     /// How much reagent from the solution to use up for each use.
     /// This is per-modifier-reagent and not shared between them.
@@ -37,4 +30,11 @@ public sealed partial class ReagentSpeedComponent : Component
     /// </summary>
     [DataField(required: true)]
     public Dictionary<ProtoId<ReagentPrototype>, float> Modifiers = new();
+
+    /// <summary>
+    /// Solution that will be checked.
+    /// Anything that isn't in <c>Modifiers</c> is left alone.
+    /// </summary>
+    [DataField(required: true)]
+    public string Solution = string.Empty;
 }

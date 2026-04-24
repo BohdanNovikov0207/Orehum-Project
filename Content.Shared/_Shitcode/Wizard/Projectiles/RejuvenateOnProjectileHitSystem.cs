@@ -17,10 +17,10 @@ namespace Content.Shared._Goobstation.Wizard.Projectiles;
 
 public sealed class RejuvenateOnProjectileHitSystem : EntitySystem
 {
-    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
     [Dependency] private readonly DamageableSystem _damageable = default!;
     [Dependency] private readonly MobStateSystem _mobState = default!;
     [Dependency] private readonly TagSystem _tag = default!;
+    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
 
     public override void Initialize()
     {

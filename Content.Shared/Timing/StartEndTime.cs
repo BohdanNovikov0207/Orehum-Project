@@ -11,8 +11,8 @@ namespace Content.Shared.Timing;
 /// Represents a range of an "action" in time, as start/end times.
 /// </summary>
 /// <remarks>
-/// Positions in time are represented as <see cref="TimeSpan"/>s, usually from <see cref="IGameTiming.CurTime"/>
-/// or <see cref="IGameTiming.RealTime"/>.
+/// Positions in time are represented as <see cref="TimeSpan" />s, usually from <see cref="IGameTiming.CurTime" />
+/// or <see cref="IGameTiming.RealTime" />.
 /// </remarks>
 /// <param name="Start">The time the action starts.</param>
 /// <param name="End">The time action ends.</param>
@@ -30,13 +30,13 @@ public record struct StartEndTime(TimeSpan Start, TimeSpan End)
     /// <param name="time">The time to get the current progress value for.</param>
     /// <param name="clamp">If true, clamp values outside the time range to 0 through 1.</param>
     /// <returns>
-    /// <para>
-    /// A progress value. Zero means <paramref name="time"/> is at <see cref="Start"/>,
-    /// one means <paramref name="time"/> is at <see cref="End"/>.
-    /// </para>
-    /// <para>
-    /// This function returns <see cref="float.NaN"/> if <see cref="Start"/> and <see cref="End"/> are identical.
-    /// </para>
+    ///     <para>
+    ///     A progress value. Zero means <paramref name="time" /> is at <see cref="Start" />,
+    ///     one means <paramref name="time" /> is at <see cref="End" />.
+    ///     </para>
+    ///     <para>
+    ///     This function returns <see cref="float.NaN" /> if <see cref="Start" /> and <see cref="End" /> are identical.
+    ///     </para>
     /// </returns>
     public float ProgressAt(TimeSpan time, bool clamp = true)
     {
@@ -51,23 +51,14 @@ public record struct StartEndTime(TimeSpan Start, TimeSpan End)
         return progress;
     }
 
-    public static StartEndTime FromStartDuration(TimeSpan start, TimeSpan duration)
-    {
-        return new StartEndTime(start, start + duration);
-    }
+    public static StartEndTime FromStartDuration(TimeSpan start, TimeSpan duration) => new(start, start + duration);
 
-    public static StartEndTime FromStartDuration(TimeSpan start, float durationSeconds)
-    {
-        return new StartEndTime(start, start + TimeSpan.FromSeconds(durationSeconds));
-    }
+    public static StartEndTime FromStartDuration(TimeSpan start, float durationSeconds) =>
+        new(start, start + TimeSpan.FromSeconds(durationSeconds));
 
-    public static StartEndTime FromCurTime(IGameTiming gameTiming, TimeSpan duration)
-    {
-        return FromStartDuration(gameTiming.CurTime, duration);
-    }
+    public static StartEndTime FromCurTime(IGameTiming gameTiming, TimeSpan duration) =>
+        FromStartDuration(gameTiming.CurTime, duration);
 
-    public static StartEndTime FromCurTime(IGameTiming gameTiming, float durationSeconds)
-    {
-        return FromStartDuration(gameTiming.CurTime, durationSeconds);
-    }
+    public static StartEndTime FromCurTime(IGameTiming gameTiming, float durationSeconds) =>
+        FromStartDuration(gameTiming.CurTime, durationSeconds);
 }

@@ -27,7 +27,7 @@ public sealed partial class GhostRoleRaffleSettings
 
     /// <summary>
     /// The maximum duration in seconds for the ghost role raffle. A raffle cannot run for longer than this
-    /// duration, even if extended by joiners. Must be greater than or equal to <see cref="InitialDuration"/>.
+    /// duration, even if extended by joiners. Must be greater than or equal to <see cref="InitialDuration" />.
     /// </summary>
     [ViewVariables(VVAccess.ReadWrite)]
     [DataField(required: true)]

@@ -7,13 +7,13 @@ namespace Content.Shared.Charges.Components;
 /// Something with limited charges that can be recharged automatically.
 /// Requires LimitedChargesComponent to function.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 [Access(typeof(SharedChargesSystem))]
 public sealed partial class AutoRechargeComponent : Component
 {
     /// <summary>
     /// The time it takes to regain a single charge
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public TimeSpan RechargeDuration = TimeSpan.FromSeconds(90);
 }

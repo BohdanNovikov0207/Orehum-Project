@@ -10,11 +10,10 @@
 
 using Robust.Shared.Serialization;
 
-namespace Content.Shared.Singularity
+namespace Content.Shared.Singularity;
+
+[Serializable] [NetSerializable]
+public enum SingularityAppearanceKeys
 {
-    [Serializable, NetSerializable]
-    public enum SingularityAppearanceKeys
-    {
-        Singularity
-    }
+    Singularity,
 }

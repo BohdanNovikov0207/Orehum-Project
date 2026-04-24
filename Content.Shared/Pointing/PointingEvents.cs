@@ -12,9 +12,9 @@ namespace Content.Shared.Pointing;
 // TODO just make pointing properly predicted?
 // So true
 /// <summary>
-///     Event raised when someone runs the client-side pointing verb.
+/// Event raised when someone runs the client-side pointing verb.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class PointingAttemptEvent : EntityEventArgs
 {
     public NetEntity Target;

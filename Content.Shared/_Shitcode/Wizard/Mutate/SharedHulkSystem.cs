@@ -8,10 +8,8 @@
 using Content.Shared.Damage;
 using Content.Shared.Damage.Events;
 using Content.Shared.Damage.Prototypes;
-using Content.Shared.Damage.Systems;
 using Content.Shared.Slippery;
 using Content.Shared.StatusEffect;
-using Content.Shared.StatusEffectNew;
 using Content.Shared.Weapons.Melee.Events;
 using Robust.Shared.Prototypes;
 
@@ -52,10 +50,7 @@ public abstract class SharedHulkSystem : EntitySystem
             Roar(ent, 0.2f);
     }
 
-    private void OnSlipAttempt(Entity<HulkComponent> ent, ref SlipAttemptEvent args)
-    {
-        args.NoSlip = true;
-    }
+    private void OnSlipAttempt(Entity<HulkComponent> ent, ref SlipAttemptEvent args) => args.NoSlip = true;
 
     private void OnBeforeStatusEffect(Entity<HulkComponent> ent, ref BeforeOldStatusEffectAddedEvent args)
     {
@@ -66,10 +61,8 @@ public abstract class SharedHulkSystem : EntitySystem
         args.Cancelled = true;
     }
 
-    private void OnBeforeStaminaDamage(Entity<HulkComponent> ent, ref BeforeStaminaDamageEvent args)
-    {
+    private void OnBeforeStaminaDamage(Entity<HulkComponent> ent, ref BeforeStaminaDamageEvent args) =>
         args.Cancelled = true;
-    }
 
     protected virtual void UpdateColorStartup(Entity<HulkComponent> hulk)
     {

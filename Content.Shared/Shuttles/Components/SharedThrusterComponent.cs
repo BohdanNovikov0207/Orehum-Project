@@ -6,12 +6,11 @@
 
 using Robust.Shared.Serialization;
 
-namespace Content.Shared.Shuttles.Components
+namespace Content.Shared.Shuttles.Components;
+
+[Serializable] [NetSerializable]
+public enum ThrusterVisualState : byte
 {
-    [Serializable, NetSerializable]
-    public enum ThrusterVisualState : byte
-    {
-        State,
-        Thrusting,
-    }
+    State,
+    Thrusting,
 }

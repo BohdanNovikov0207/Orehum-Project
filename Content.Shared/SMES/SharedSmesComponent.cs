@@ -16,7 +16,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.SMES;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum SmesVisuals
 {
     LastChargeState,

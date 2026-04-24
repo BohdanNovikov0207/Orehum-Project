@@ -4,7 +4,6 @@ using Content.Goobstation.Common.Physics;
 using Content.Shared._Shitcode.Heretic.Components;
 using Content.Shared._Shitcode.Heretic.Systems.Abilities;
 using Content.Shared.Bed.Sleep;
-using Content.Shared.Heretic;
 using Content.Shared.Interaction;
 using Content.Shared.Interaction.Events;
 using Content.Shared.Magic;
@@ -12,7 +11,6 @@ using Content.Shared.Mobs.Components;
 using Content.Shared.Movement.Pulling.Systems;
 using Content.Shared.StatusEffectNew;
 using Content.Shared.StatusEffectNew.Components;
-using Robust.Shared.Audio.Systems;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
 
@@ -20,20 +18,20 @@ namespace Content.Shared._Shitcode.Heretic.Systems;
 
 public sealed class SharedStarTouchSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly SharedMagicSystem _magic = default!;
-    [Dependency] private readonly SharedStarMarkSystem _starMark = default!;
-    [Dependency] private readonly StatusEffectsSystem _status = default!;
-    [Dependency] private readonly PullingSystem _pulling = default!;
-    [Dependency] private readonly SharedStarGazerSystem _starGazer = default!;
-    [Dependency] private readonly SharedHereticAbilitySystem _hereticAbility = default!;
-    [Dependency] private readonly SharedHereticSystem _heretic = default!;
+    public const string StarTouchBeamDataId = "startouch";
 
     public static readonly EntProtoId StarTouchStatusEffect = "StatusEffectStarTouched";
     public static readonly EntProtoId DrowsinessStatusEffect = "StatusEffectDrowsiness";
-    public const string StarTouchBeamDataId = "startouch";
+    [Dependency] private readonly SharedHereticSystem _heretic = default!;
+    [Dependency] private readonly SharedHereticAbilitySystem _hereticAbility = default!;
+    [Dependency] private readonly SharedMagicSystem _magic = default!;
+    [Dependency] private readonly PullingSystem _pulling = default!;
+    [Dependency] private readonly SharedStarGazerSystem _starGazer = default!;
+    [Dependency] private readonly SharedStarMarkSystem _starMark = default!;
+    [Dependency] private readonly StatusEffectsSystem _status = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     public override void Initialize()
     {

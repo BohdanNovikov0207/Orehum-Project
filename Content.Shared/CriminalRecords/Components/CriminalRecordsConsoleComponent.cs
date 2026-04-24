@@ -7,12 +7,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Shared.CriminalRecords.Systems;
-using Content.Shared.CriminalRecords.Components;
-using Content.Shared.CriminalRecords;
 using Content.Shared.Radio;
+using Content.Shared.Security;
 using Content.Shared.StationRecords;
 using Robust.Shared.Prototypes;
-using Content.Shared.Security;
 
 namespace Content.Shared.CriminalRecords.Components;
 
@@ -49,14 +47,14 @@ public sealed partial class CriminalRecordsConsoleComponent : Component
     public SecurityStatus FilterStatus;
 
     /// <summary>
-    /// Channel to send messages to when someone's status gets changed.
-    /// </summary>
-    [DataField]
-    public ProtoId<RadioChannelPrototype> SecurityChannel = "Security";
-
-    /// <summary>
     /// Max length of arrest and crime history strings.
     /// </summary>
     [DataField]
     public uint MaxStringLength = 256;
+
+    /// <summary>
+    /// Channel to send messages to when someone's status gets changed.
+    /// </summary>
+    [DataField]
+    public ProtoId<RadioChannelPrototype> SecurityChannel = "Security";
 }

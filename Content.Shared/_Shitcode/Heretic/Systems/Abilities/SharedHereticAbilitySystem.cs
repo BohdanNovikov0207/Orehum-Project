@@ -31,7 +31,6 @@ using Content.Shared.Mobs.Systems;
 using Content.Shared.Movement.Pulling.Systems;
 using Content.Shared.Popups;
 using Content.Shared.Projectiles;
-using Content.Shared.Roles;
 using Content.Shared.Standing;
 using Content.Shared.StatusEffect;
 using Content.Shared.Stunnable;
@@ -49,65 +48,65 @@ namespace Content.Shared._Shitcode.Heretic.Systems.Abilities;
 
 public abstract partial class SharedHereticAbilitySystem : EntitySystem
 {
-    [Dependency] private readonly IMapManager _mapMan = default!;
-    [Dependency] private readonly ITileDefinitionManager _tileDefinitionManager = default!;
-    [Dependency] private readonly INetManager _net = default!;
-
-    [Dependency] protected readonly IGameTiming Timing = default!;
-    [Dependency] protected readonly SharedDoAfterSystem DoAfter = default!;
-    [Dependency] protected readonly EntityLookupSystem Lookup = default!;
-    [Dependency] protected readonly StatusEffectsSystem Status = default!;
-    [Dependency] protected readonly SharedVoidCurseSystem Voidcurse = default!;
-    [Dependency] protected readonly SharedHereticSystem Heretic = default!;
-
-    [Dependency] private readonly StatusEffectNew.StatusEffectsSystem _statusNew = default!;
-    [Dependency] private readonly SharedProjectileSystem _projectile = default!;
-    [Dependency] private readonly SharedHandsSystem _hands = default!;
-    [Dependency] private readonly StandingStateSystem _standing = default!;
-    [Dependency] private readonly SharedMapSystem _map = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly ThrowingSystem _throw = default!;
-    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
-    [Dependency] private readonly SharedGunSystem _gun = default!;
-    [Dependency] private readonly SharedStarMarkSystem _starMark = default!;
-    [Dependency] private readonly SharedActionsSystem _actions = default!;
-    [Dependency] private readonly PullingSystem _pulling = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedStunSystem _stun = default!;
-    [Dependency] private readonly SharedEyeSystem _eye = default!;
-    [Dependency] private readonly DamageableSystem _dmg = default!;
-    [Dependency] private readonly WoundSystem _wound = default!;
-    [Dependency] private readonly TraumaSystem _trauma = default!;
-    [Dependency] private readonly PainSystem _pain = default!;
-    [Dependency] private readonly ConsciousnessSystem _consciousness = default!;
-    [Dependency] private readonly ExamineSystemShared _examine = default!;
-    [Dependency] private readonly MobThresholdSystem _mobThreshold = default!;
-    [Dependency] private readonly SharedBodySystem _body = default!;
-    [Dependency] private readonly SharedBloodstreamSystem _blood = default!;
-    [Dependency] private readonly SharedSolutionContainerSystem _solution = default!;
-    [Dependency] private readonly SharedMindSystem _mind = default!;
-
-    [Dependency] protected readonly SharedPopupSystem Popup = default!;
-
     public static readonly DamageSpecifier AllDamage = new()
     {
         DamageDict =
         {
-            {"Blunt", 1},
-            {"Slash", 1},
-            {"Piercing", 1},
-            {"Heat", 1},
-            {"Cold", 1},
-            {"Shock", 1},
-            {"Asphyxiation", 1},
-            {"Bloodloss", 1},
-            {"Caustic", 1},
-            {"Poison", 1},
-            {"Radiation", 1},
-            {"Cellular", 1},
-            {"Holy", 1},
+            { "Blunt", 1 },
+            { "Slash", 1 },
+            { "Piercing", 1 },
+            { "Heat", 1 },
+            { "Cold", 1 },
+            { "Shock", 1 },
+            { "Asphyxiation", 1 },
+            { "Bloodloss", 1 },
+            { "Caustic", 1 },
+            { "Poison", 1 },
+            { "Radiation", 1 },
+            { "Cellular", 1 },
+            { "Holy", 1 },
         },
     };
+
+    [Dependency] private readonly SharedActionsSystem _actions = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly SharedBloodstreamSystem _blood = default!;
+    [Dependency] private readonly SharedBodySystem _body = default!;
+    [Dependency] private readonly ConsciousnessSystem _consciousness = default!;
+    [Dependency] private readonly DamageableSystem _dmg = default!;
+    [Dependency] private readonly ExamineSystemShared _examine = default!;
+    [Dependency] private readonly SharedEyeSystem _eye = default!;
+    [Dependency] private readonly SharedGunSystem _gun = default!;
+    [Dependency] private readonly SharedHandsSystem _hands = default!;
+    [Dependency] private readonly SharedMapSystem _map = default!;
+    [Dependency] private readonly IMapManager _mapMan = default!;
+    [Dependency] private readonly SharedMindSystem _mind = default!;
+    [Dependency] private readonly MobThresholdSystem _mobThreshold = default!;
+    [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly PainSystem _pain = default!;
+    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
+    [Dependency] private readonly SharedProjectileSystem _projectile = default!;
+    [Dependency] private readonly PullingSystem _pulling = default!;
+    [Dependency] private readonly SharedSolutionContainerSystem _solution = default!;
+    [Dependency] private readonly StandingStateSystem _standing = default!;
+    [Dependency] private readonly SharedStarMarkSystem _starMark = default!;
+
+    [Dependency] private readonly StatusEffectNew.StatusEffectsSystem _statusNew = default!;
+    [Dependency] private readonly SharedStunSystem _stun = default!;
+    [Dependency] private readonly ThrowingSystem _throw = default!;
+    [Dependency] private readonly ITileDefinitionManager _tileDefinitionManager = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
+    [Dependency] private readonly TraumaSystem _trauma = default!;
+    [Dependency] private readonly WoundSystem _wound = default!;
+    [Dependency] protected readonly SharedDoAfterSystem DoAfter = default!;
+    [Dependency] protected readonly SharedHereticSystem Heretic = default!;
+    [Dependency] protected readonly EntityLookupSystem Lookup = default!;
+
+    [Dependency] protected readonly SharedPopupSystem Popup = default!;
+    [Dependency] protected readonly StatusEffect.StatusEffectsSystem Status = default!;
+
+    [Dependency] protected readonly IGameTiming Timing = default!;
+    [Dependency] protected readonly SharedVoidCurseSystem Voidcurse = default!;
 
     public override void Initialize()
     {
@@ -276,7 +275,7 @@ public abstract partial class SharedHereticAbilitySystem : EntitySystem
         var fromMap = _transform.ToMapCoordinates(fromCoords);
         var spawnCoords = _mapMan.TryFindGridAt(fromMap, out var gridUid, out _)
             ? _transform.WithEntityId(fromCoords, gridUid)
-            : new(_map.GetMap(fromMap.MapId), fromMap.Position);
+            : new EntityCoordinates(_map.GetMap(fromMap.MapId), fromMap.Position);
 
         var userVelocity = _physics.GetMapLinearVelocity(spawnCoords);
 
@@ -331,7 +330,8 @@ public abstract partial class SharedHereticAbilitySystem : EntitySystem
             _mobThreshold.SetAllowRevives(uid, false, thresholds);
         }
 
-        if (Resolve(uid, ref uid.Comp2, false) && uid.Comp2.BodyType == BodyType.Complex && (boneHeal != FixedPoint2.Zero || woundHeal != FixedPoint2.Zero))
+        if (Resolve(uid, ref uid.Comp2, false) && uid.Comp2.BodyType == BodyType.Complex &&
+            (boneHeal != FixedPoint2.Zero || woundHeal != FixedPoint2.Zero))
         {
             if (_body.TryGetRootPart(uid, out var rootPart, uid.Comp2))
             {
@@ -343,7 +343,13 @@ public abstract partial class SharedHereticAbilitySystem : EntitySystem
                         if (woundHeal == null)
                             _wound.ForceHealWoundsOnWoundable(woundable.Owner, out _, null, woundable.Comp);
                         else
-                            _wound.TryHealWoundsOnWoundable(woundable.Owner, -woundHeal.Value, out _, woundable.Comp, null, true, true);
+                            _wound.TryHealWoundsOnWoundable(woundable.Owner,
+                                -woundHeal.Value,
+                                out _,
+                                woundable.Comp,
+                                null,
+                                true,
+                                true);
                     }
 
                     if (boneHeal == FixedPoint2.Zero)
@@ -453,10 +459,8 @@ public abstract partial class SharedHereticAbilitySystem : EntitySystem
         }
     }
 
-    public virtual void InvokeTouchSpell<T>(Entity<T> ent, EntityUid user) where T : Component, ITouchSpell
-    {
+    public virtual void InvokeTouchSpell<T>(Entity<T> ent, EntityUid user) where T : Component, ITouchSpell =>
         _audio.PlayPredicted(ent.Comp.Sound, user, user);
-    }
 
     protected virtual void SpeakAbility(EntityUid ent, HereticActionComponent args) { }
 }

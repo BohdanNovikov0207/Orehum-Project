@@ -25,120 +25,124 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Text;
 using Content.Shared.Cargo.Prototypes;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
-using System.Text;
-namespace Content.Shared.Cargo
+
+namespace Content.Shared.Cargo;
+
+[DataDefinition] [NetSerializable] [Serializable]
+public sealed partial class CargoOrderData
 {
-    [DataDefinition, NetSerializable, Serializable]
-    public sealed partial class CargoOrderData
+    /// <summary>
+    /// Which account to deduct funds from when ordering
+    /// </summary>
+    [DataField]
+    public ProtoId<CargoAccountPrototype> Account;
+
+    // public String RequesterRank; // TODO Figure out how to get Character ID card data
+    // public int RequesterId;
+    public bool Approved;
+    // CorvaxGoob-CargoFeatures-End
+
+    [DataField]
+    public string? Approver;
+
+    /// <summary>
+    /// How many instances of this order that we've already dispatched
+    /// </summary>
+    [DataField]
+    public int NumDispatched = 0;
+
+    /// <summary>
+    /// The number of items in the order. Not readonly, as it might change
+    /// due to caps on the amount of orders that can be placed.
+    /// </summary>
+    [DataField]
+    public int OrderQuantity;
+
+    /// <summary>
+    /// Price when the order was added.
+    /// </summary>
+    [DataField]
+    public int Price;
+
+    public bool SecuredDelivery;
+
+    // GoobStation - (cooldown parameter) cooldown on Cargo Orders (specifically gamba)
+    // CorvaxGoob-CargoFeatures : Добавлен параметр доставки, заметки и защиты груза.
+    public CargoOrderData(int orderId,
+        string productId,
+        string productName,
+        int price,
+        int amount,
+        string requester,
+        string? deliveryDestination,
+        string? note,
+        ProtoId<CargoAccountPrototype> account,
+        int cooldown,
+        bool securedDelivery = false)
     {
-        /// <summary>
-        /// Price when the order was added.
-        /// </summary>
-        [DataField]
-        public int Price;
-
-        /// <summary>
-        /// A unique (arbitrary) ID which identifies this order.
-        /// </summary>
-        [DataField]
-        public int OrderId { get; private set; }
-
-        /// <summary>
-        /// Prototype Id for the item to be created
-        /// </summary>
-        [DataField]
-        public string ProductId { get; private set; }
-
-        /// <summary>
-        /// Prototype Name
-        /// </summary>
-        [DataField]
-        public string ProductName { get; private set; }
-
-        /// <summary>
-        ///     GoobStation - The cooldown in seconds before this product can be bought again.
-        /// </summary>
-        [DataField]
-        public int Cooldown { get; private set; }
-
-        /// <summary>
-        /// The number of items in the order. Not readonly, as it might change
-        /// due to caps on the amount of orders that can be placed.
-        /// </summary>
-        [DataField]
-        public int OrderQuantity;
-
-        /// <summary>
-        /// How many instances of this order that we've already dispatched
-        /// </summary>
-        [DataField]
-        public int NumDispatched = 0;
-
-        [DataField]
-        public string Requester { get; private set; }
-        // public String RequesterRank; // TODO Figure out how to get Character ID card data
-        // public int RequesterId;
-        public  bool Approved;
-
+        OrderId = orderId;
+        ProductId = productId;
+        ProductName = productName;
+        Price = price;
+        OrderQuantity = amount;
+        Requester = requester;
         // CorvaxGoob-CargoFeatures-Start
-        [DataField]
-        public string? DeliveryDestination { get; private set; }
-
-        [DataField]
-        public string? Note { get; private set; }
-
-        public bool SecuredDelivery;
+        DeliveryDestination = deliveryDestination;
+        SecuredDelivery = securedDelivery;
+        Note = note;
         // CorvaxGoob-CargoFeatures-End
+        Account = account;
+        // GoobStation - (cooldown assignment) cooldown on Cargo Orders (specifically gamba)
+        Cooldown = cooldown;
+    }
 
-        [DataField]
-        public string? Approver;
+    /// <summary>
+    /// A unique (arbitrary) ID which identifies this order.
+    /// </summary>
+    [DataField]
+    public int OrderId { get; private set; }
 
-        /// <summary>
-        /// Which account to deduct funds from when ordering
-        /// </summary>
-        [DataField]
-        public ProtoId<CargoAccountPrototype> Account;
+    /// <summary>
+    /// Prototype Id for the item to be created
+    /// </summary>
+    [DataField]
+    public string ProductId { get; private set; }
 
-        // GoobStation - (cooldown parameter) cooldown on Cargo Orders (specifically gamba)
-        // CorvaxGoob-CargoFeatures : Добавлен параметр доставки, заметки и защиты груза.
-        public CargoOrderData(int orderId, string productId, string productName, int price, int amount, string requester, string? deliveryDestination, string? note, ProtoId<CargoAccountPrototype> account, int cooldown, bool securedDelivery = false)
-        {
-            OrderId = orderId;
-            ProductId = productId;
-            ProductName = productName;
-            Price = price;
-            OrderQuantity = amount;
-            Requester = requester;
-            // CorvaxGoob-CargoFeatures-Start
-            DeliveryDestination = deliveryDestination;
-            SecuredDelivery = securedDelivery;
-            Note = note;
-            // CorvaxGoob-CargoFeatures-End
-            Account = account;
-            // GoobStation - (cooldown assignment) cooldown on Cargo Orders (specifically gamba)
-            Cooldown = cooldown;
-        }
+    /// <summary>
+    /// Prototype Name
+    /// </summary>
+    [DataField]
+    public string ProductName { get; private set; }
 
-        public void SetApproverData(string? approver)
-        {
-            Approver = approver;
-        }
+    /// <summary>
+    /// GoobStation - The cooldown in seconds before this product can be bought again.
+    /// </summary>
+    [DataField]
+    public int Cooldown { get; private set; }
 
-        public void SetApproverData(string? fullName, string? jobTitle)
-        {
-            var sb = new StringBuilder();
-            if (!string.IsNullOrWhiteSpace(fullName))
-            {
-                sb.Append($"{fullName} ");
-            }
-            if (!string.IsNullOrWhiteSpace(jobTitle))
-            {
-                sb.Append($"({jobTitle})");
-            }
-            Approver = sb.ToString();
-        }
+    [DataField]
+    public string Requester { get; private set; }
+
+    // CorvaxGoob-CargoFeatures-Start
+    [DataField]
+    public string? DeliveryDestination { get; private set; }
+
+    [DataField]
+    public string? Note { get; private set; }
+
+    public void SetApproverData(string? approver) => Approver = approver;
+
+    public void SetApproverData(string? fullName, string? jobTitle)
+    {
+        var sb = new StringBuilder();
+        if (!string.IsNullOrWhiteSpace(fullName))
+            sb.Append($"{fullName} ");
+        if (!string.IsNullOrWhiteSpace(jobTitle))
+            sb.Append($"({jobTitle})");
+        Approver = sb.ToString();
     }
 }

@@ -1,12 +1,12 @@
 using System.Diagnostics.CodeAnalysis;
-using Content.Shared.StatusIcon; // GabyStation radio icons
+using Content.Shared.StatusIcon;
 using Robust.Shared.Player;
+// GabyStation radio icons
 
 namespace Content.Shared.Roles.Jobs;
 
 public abstract partial class SharedJobSystem
 {
-
     // Goobstation Change: Returns the amount of Goobcoins a player will receive when they finish a round as this job.
     public int GetJobGoobcoins(ICommonSession player)
     {
@@ -34,4 +34,3 @@ public abstract partial class SharedJobSystem
     }
     // GabyStation end
 }
-

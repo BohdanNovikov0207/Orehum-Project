@@ -1,6 +1,6 @@
-using Content.Shared.Trigger.Components.Triggers;
-using Content.Shared.Trigger.Components.Effects;
 using Content.Shared.DeviceLinking.Events;
+using Content.Shared.Trigger.Components.Effects;
+using Content.Shared.Trigger.Components.Triggers;
 
 namespace Content.Shared.Trigger.Systems;
 
@@ -15,15 +15,11 @@ public sealed partial class TriggerSystem
         SubscribeLocalEvent<TriggerOnSignalComponent, SignalReceivedEvent>(OnSignalReceived);
     }
 
-    private void SignalOnTriggerInit(Entity<SignalOnTriggerComponent> ent, ref ComponentInit args)
-    {
+    private void SignalOnTriggerInit(Entity<SignalOnTriggerComponent> ent, ref ComponentInit args) =>
         _deviceLink.EnsureSourcePorts(ent.Owner, ent.Comp.Port);
-    }
 
-    private void TriggerOnSignalInit(Entity<TriggerOnSignalComponent> ent, ref ComponentInit args)
-    {
+    private void TriggerOnSignalInit(Entity<TriggerOnSignalComponent> ent, ref ComponentInit args) =>
         _deviceLink.EnsureSinkPorts(ent.Owner, ent.Comp.Port);
-    }
 
     private void HandleSignalOnTrigger(Entity<SignalOnTriggerComponent> ent, ref TriggerEvent args)
     {

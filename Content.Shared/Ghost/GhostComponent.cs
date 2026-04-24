@@ -23,40 +23,66 @@ namespace Content.Shared.Ghost;
 /// Represents an observer ghost.
 /// Handles limiting interactions, using ghost abilities, ghost visibility, and ghost warping.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(SharedGhostSystem))]
-[AutoGenerateComponentState(true), AutoGenerateComponentPause]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(SharedGhostSystem))]
+[AutoGenerateComponentState(true)] [AutoGenerateComponentPause]
 public sealed partial class GhostComponent : Component
 {
-    // Actions
-    [DataField]
-    public EntProtoId ToggleLightingAction = "ActionToggleLighting";
-
-    [DataField, AutoNetworkedField]
-    public EntityUid? ToggleLightingActionEntity;
-
-    [DataField]
-    public EntProtoId ToggleFoVAction = "ActionToggleFov";
-
-    [DataField, AutoNetworkedField]
-    public EntityUid? ToggleFoVActionEntity;
-
-    [DataField]
-    public EntProtoId ToggleGhostsAction = "ActionToggleGhosts";
-
-    [DataField, AutoNetworkedField]
-    public EntityUid? ToggleGhostsActionEntity;
-
-    [DataField]
-    public EntProtoId ToggleGhostHearingAction = "ActionToggleGhostHearing";
-
-    [DataField]
-    public EntityUid? ToggleGhostHearingActionEntity;
-
     [DataField]
     public EntProtoId BooAction = "ActionGhostBoo";
 
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public EntityUid? BooActionEntity;
+
+    /// <summary>
+    /// Maximum number of entities that can affected by the Boo action.
+    /// </summary>
+    [DataField]
+    public int BooMaxTargets = 3;
+
+    /// <summary>
+    /// Range of the Boo action.
+    /// </summary>
+    [DataField]
+    public float BooRadius = 3;
+
+    /// <summary>
+    /// Is this ghost allowed to interact with entities?
+    /// </summary>
+    /// <remarks>
+    /// Used to allow admins ghosts to interact with the world.
+    /// Changed by <see cref="SharedGhostSystem.SetCanGhostInteract" />.
+    /// </remarks>
+    [DataField("canInteract")] [AutoNetworkedField]
+    public bool CanGhostInteract;
+
+    // CorvaxGoob-GhostUIViewing
+    /// <summary>
+    /// Позволяет гостам открывать интерфейсы без прямого взаимодействия с ними.
+    /// </summary>
+    [DataField("canGhostUIGuest")] [AutoNetworkedField]
+    public bool CanGhostOpenUI = true;
+
+    /// <summary>
+    /// Is this ghost player allowed to return to their original body?
+    /// </summary>
+    /// <remarks>
+    /// Changed by <see cref="SharedGhostSystem.SetCanReturnToBody" />.
+    /// </remarks>
+    [DataField] [AutoNetworkedField]
+    public bool CanReturnToBody;
+
+    [DataField]
+    public bool CanTakeGhostRoles = true;
+
+    /// <summary>
+    /// Ghost color
+    /// </summary>
+    /// <remarks>
+    /// Used to allow admins to change ghost colors. Should be removed if the capability to edit existing sprite
+    /// colors is ever added back.
+    /// </remarks>
+    [DataField] [AutoNetworkedField]
+    public Color Color = Color.White;
 
     // End actions
 
@@ -68,67 +94,56 @@ public sealed partial class GhostComponent : Component
     /// May not reflect actual time of death if this entity has been paused,
     /// but will give an accurate length of time <i>since</i> death.
     /// </remarks>
-    [DataField, AutoPausedField]
+    [DataField] [AutoPausedField]
     public TimeSpan TimeOfDeath = TimeSpan.Zero;
 
-    /// <summary>
-    /// Range of the Boo action.
-    /// </summary>
     [DataField]
-    public float BooRadius = 3;
+    public EntProtoId ToggleFoVAction = "ActionToggleFov";
 
-    /// <summary>
-    /// Maximum number of entities that can affected by the Boo action.
-    /// </summary>
-    [DataField]
-    public int BooMaxTargets = 3;
-
-    /// <summary>
-    /// Is this ghost allowed to interact with entities?
-    /// </summary>
-    /// <remarks>
-    /// Used to allow admins ghosts to interact with the world.
-    /// Changed by <see cref="SharedGhostSystem.SetCanGhostInteract"/>.
-    /// </remarks>
-    [DataField("canInteract"), AutoNetworkedField]
-    public bool CanGhostInteract;
-
-    // CorvaxGoob-GhostUIViewing
-    /// <summary>
-    /// Позволяет гостам открывать интерфейсы без прямого взаимодействия с ними.
-    /// </summary>
-    [DataField("canGhostUIGuest"), AutoNetworkedField]
-    public bool CanGhostOpenUI = true;
-
-    /// <summary>
-    /// Is this ghost player allowed to return to their original body?
-    /// </summary>
-    /// <remarks>
-    /// Changed by <see cref="SharedGhostSystem.SetCanReturnToBody"/>.
-    /// </remarks>
-    [DataField, AutoNetworkedField]
-    public bool CanReturnToBody;
-
-    /// <summary>
-    /// Ghost color
-    /// </summary>
-    /// <remarks>Used to allow admins to change ghost colors. Should be removed if the capability to edit existing sprite colors is ever added back.</remarks>
-    [DataField, AutoNetworkedField]
-    public Color Color = Color.White;
+    [DataField] [AutoNetworkedField]
+    public EntityUid? ToggleFoVActionEntity;
 
     [DataField]
-    public bool CanTakeGhostRoles = true;
+    public EntProtoId ToggleGhostHearingAction = "ActionToggleGhostHearing";
+
+    [DataField]
+    public EntityUid? ToggleGhostHearingActionEntity;
+
+    [DataField]
+    public EntProtoId ToggleGhostsAction = "ActionToggleGhosts";
+
+    [DataField] [AutoNetworkedField]
+    public EntityUid? ToggleGhostsActionEntity;
+
+    // Actions
+    [DataField]
+    public EntProtoId ToggleLightingAction = "ActionToggleLighting";
+
+    [DataField] [AutoNetworkedField]
+    public EntityUid? ToggleLightingActionEntity;
     // Goobstation end
 }
 
-public sealed partial class ToggleFoVActionEvent : InstantActionEvent { }
+public sealed partial class ToggleFoVActionEvent : InstantActionEvent
+{
+}
 
-public sealed partial class ToggleGhostsActionEvent : InstantActionEvent { }
+public sealed partial class ToggleGhostsActionEvent : InstantActionEvent
+{
+}
 
-public sealed partial class ToggleLightingActionEvent : InstantActionEvent { }
+public sealed partial class ToggleLightingActionEvent : InstantActionEvent
+{
+}
 
-public sealed partial class ToggleGhostHearingActionEvent : InstantActionEvent { }
+public sealed partial class ToggleGhostHearingActionEvent : InstantActionEvent
+{
+}
 
-public sealed partial class ToggleGhostVisibilityToAllEvent : InstantActionEvent { }
+public sealed partial class ToggleGhostVisibilityToAllEvent : InstantActionEvent
+{
+}
 
-public sealed partial class BooActionEvent : InstantActionEvent { }
+public sealed partial class BooActionEvent : InstantActionEvent
+{
+}

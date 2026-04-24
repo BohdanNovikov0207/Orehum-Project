@@ -11,18 +11,21 @@ using Robust.Shared.Utility;
 
 namespace Content.Shared._Goobstation.Wizard.Spellblade;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class ShieldedComponent : Component
 {
-    [DataField]
-    public float Lifetime = 5f;
-
     [DataField]
     public bool AntiStun = true;
 
     [DataField]
+    public float Lifetime = 5f;
+
+    [DataField]
     public DamageModifierSet Resistances = new()
-        { Coefficients = new() { ["Blunt"] = 0.5f, ["Slash"] = 0.5f, ["Piercing"] = 0.5f, ["Heat"] = 0.5f } };
+    {
+        Coefficients = new Dictionary<string, float>
+            { ["Blunt"] = 0.5f, ["Slash"] = 0.5f, ["Piercing"] = 0.5f, ["Heat"] = 0.5f },
+    };
 
     [DataField]
     public SpriteSpecifier Sprite =

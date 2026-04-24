@@ -80,7 +80,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Administration;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class PlayerPanelEuiState(
     NetUserId guid,
     string username,
@@ -95,21 +95,20 @@ public sealed class PlayerPanelEuiState(
     bool canAhelp)
     : EuiStateBase
 {
-    public readonly NetUserId Guid = guid;
-    public readonly string Username = username;
-    public readonly TimeSpan Playtime = playtime;
-    public readonly int? TotalNotes = totalNotes;
-    public readonly int? TotalBans = totalBans;
-    public readonly int? TotalRoleBans = totalRoleBans;
-    public readonly int SharedConnections = sharedConnections;
-    public readonly bool? Whitelisted = whitelisted;
+    public readonly bool CanAhelp = canAhelp;
     public readonly bool CanFreeze = canFreeze;
     public readonly bool Frozen = frozen;
-    public readonly bool CanAhelp = canAhelp;
+    public readonly NetUserId Guid = guid;
+    public readonly TimeSpan Playtime = playtime;
+    public readonly int SharedConnections = sharedConnections;
+    public readonly int? TotalBans = totalBans;
+    public readonly int? TotalNotes = totalNotes;
+    public readonly int? TotalRoleBans = totalRoleBans;
+    public readonly string Username = username;
+    public readonly bool? Whitelisted = whitelisted;
 }
 
-
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class PlayerPanelFreezeMessage : EuiMessageBase
 {
     public readonly bool Mute;
@@ -120,14 +119,14 @@ public sealed class PlayerPanelFreezeMessage : EuiMessageBase
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class PlayerPanelLogsMessage : EuiMessageBase;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class PlayerPanelDeleteMessage : EuiMessageBase;
 
-[Serializable, NetSerializable]
-public sealed class PlayerPanelRejuvenationMessage: EuiMessageBase;
+[Serializable] [NetSerializable]
+public sealed class PlayerPanelRejuvenationMessage : EuiMessageBase;
 
-[Serializable, NetSerializable]
-public sealed class PlayerPanelFollowMessage: EuiMessageBase;
+[Serializable] [NetSerializable]
+public sealed class PlayerPanelFollowMessage : EuiMessageBase;

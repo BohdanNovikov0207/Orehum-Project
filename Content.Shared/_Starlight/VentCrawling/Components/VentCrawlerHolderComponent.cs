@@ -7,7 +7,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared._Starlight.VentCrawling.Components;
 using Robust.Shared.Audio;
 using Robust.Shared.Containers;
 
@@ -16,7 +15,16 @@ namespace Content.Shared._Starlight.VentCrawling.Components;
 [RegisterComponent]
 public sealed partial class VentCrawlerHolderComponent : Component
 {
+    public static readonly TimeSpan CrawlDelay = TimeSpan.FromSeconds(0.5);
     private Container? _container;
+
+    public bool IsMoving = false;
+
+    public TimeSpan LastCrawl;
+
+    [DataField("speed")]
+    public float Speed = 0.15f;
+
     public Container Container
     {
         get => _container ?? throw new InvalidOperationException("Container not initialized");
@@ -28,8 +36,6 @@ public sealed partial class VentCrawlerHolderComponent : Component
 
     [ViewVariables]
     public float TimeLeft { get; set; }
-
-    public bool IsMoving = false;
 
     [ViewVariables]
     public EntityUid? PreviousTube { get; set; }
@@ -52,15 +58,9 @@ public sealed partial class VentCrawlerHolderComponent : Component
     [ViewVariables]
     public bool IsExitingVentCraws { get; set; }
 
-    public static readonly TimeSpan CrawlDelay = TimeSpan.FromSeconds(0.5);
-
-    public TimeSpan LastCrawl;
-
     [DataField("crawlSound")]
-    public SoundCollectionSpecifier CrawlSound { get; set; } = new ("VentCrawlingSounds", AudioParams.Default.WithVolume(5f));
-
-    [DataField("speed")]
-    public float Speed = 0.15f;
+    public SoundCollectionSpecifier CrawlSound { get; set; } =
+        new("VentCrawlingSounds", AudioParams.Default.WithVolume(5f));
 }
 
 [ByRefEvent]

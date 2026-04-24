@@ -85,9 +85,37 @@ namespace Content.Shared.Weapons.Reflect;
 /// Entities with this component have a chance to reflect projectiles and hitscan shots
 /// Uses <c>ItemToggleComponent</c> to control reflection.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class ReflectComponent : Component
 {
+    // WD START
+    [DataField] [AutoNetworkedField]
+    public float DamageOnReflectModifier;
+
+    /// <summary>
+    /// Goobstation - Lets you prevent the reflect examine from showing.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public bool Examinable = true;
+
+    /// <summary>
+    /// Can only reflect when placed correctly.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public bool InRightPlace = true;
+
+    /// <summary>
+    /// Is it allowed to reflect while being in hands.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public bool ReflectingInHands = true;
+
+    /// <summary>
+    /// Probability for a projectile to be reflected.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public float ReflectProb = 0.25f;
+
     /// <summary>
     /// What we reflect.
     /// </summary>
@@ -102,48 +130,21 @@ public sealed partial class ReflectComponent : Component
     public SlotFlags SlotFlags = SlotFlags.WITHOUT_POCKET;
 
     /// <summary>
-    /// Is it allowed to reflect while being in hands.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public bool ReflectingInHands = true;
-
-    /// <summary>
-    /// Can only reflect when placed correctly.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public bool InRightPlace = true;
-
-    /// <summary>
-    /// Probability for a projectile to be reflected.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public float ReflectProb = 0.25f;
-
-    /// <summary>
-    /// Probability for a projectile to be reflected.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public Angle Spread = Angle.FromDegrees(45);
-
-    /// <summary>
     /// The sound to play when reflecting.
     /// </summary>
     [DataField]
-    public SoundSpecifier? SoundOnReflect = new SoundPathSpecifier("/Audio/Weapons/Guns/Hits/laser_sear_wall.ogg", AudioParams.Default.WithVariation(0.05f));
+    public SoundSpecifier? SoundOnReflect = new SoundPathSpecifier("/Audio/Weapons/Guns/Hits/laser_sear_wall.ogg",
+        AudioParams.Default.WithVariation(0.05f));
 
     /// <summary>
-    /// Goobstation - Lets you prevent the reflect examine from showing.
+    /// Probability for a projectile to be reflected.
     /// </summary>
-    [DataField, AutoNetworkedField]
-    public bool Examinable = true;
-
-    // WD START
-    [DataField, AutoNetworkedField]
-    public float DamageOnReflectModifier;
+    [DataField] [AutoNetworkedField]
+    public Angle Spread = Angle.FromDegrees(45);
     // WD END
 }
 
-[Flags, Serializable, NetSerializable]
+[Flags] [Serializable] [NetSerializable]
 public enum ReflectType : byte
 {
     None = 0,

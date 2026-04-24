@@ -7,9 +7,8 @@ namespace Content.Shared._Orehum.Summonable;
 public sealed partial class ContainerSummonActionEvent : EntityTargetActionEvent
 {
     [DataField]
-    public EntityTableSelector Table = default!;
-
-    [DataField]
     public SoundSpecifier? SummonSound = new SoundPathSpecifier("/Audio/Items/toolbox_drop.ogg");
 
+    [DataField]
+    public EntityTableSelector Table = default!;
 }

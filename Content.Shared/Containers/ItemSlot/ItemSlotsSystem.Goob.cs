@@ -15,7 +15,11 @@ public sealed partial class ItemSlotsSystem
         SubscribeLocalEvent<ItemSlotsComponent, ItemSlotInteractionDoAfterEvent>(HandleDoAfter);
     }
 
-    public bool TryInsertWithConditions(EntityUid uid, ItemSlotsComponent itemSlots, EntityUid user, EntityUid toInsert, bool doAfter = true)
+    public bool TryInsertWithConditions(EntityUid uid,
+        ItemSlotsComponent itemSlots,
+        EntityUid user,
+        EntityUid toInsert,
+        bool doAfter = true)
     {
         if (!TryComp(user, out HandsComponent? hands))
             return false;
@@ -42,15 +46,13 @@ public sealed partial class ItemSlotsSystem
                 slots.Add(slot);
                 break; //Goobstation: If an item has multiple ItemSlots, stick with the highest priority and stop looking.
             }
-            else
-            {
-                var allowed = CanInsertWhitelist(toInsert, slot);
-                if (lockedFailPopup == null && slot.LockedFailPopup != null && allowed && slot.Locked)
-                    lockedFailPopup = slot.LockedFailPopup;
 
-                if (whitelistFailPopup == null && slot.WhitelistFailPopup != null)
-                    whitelistFailPopup = slot.WhitelistFailPopup;
-            }
+            var allowed = CanInsertWhitelist(toInsert, slot);
+            if (lockedFailPopup == null && slot.LockedFailPopup != null && allowed && slot.Locked)
+                lockedFailPopup = slot.LockedFailPopup;
+
+            if (whitelistFailPopup == null && slot.WhitelistFailPopup != null)
+                whitelistFailPopup = slot.WhitelistFailPopup;
         }
 
         if (slots.Count == 0)
@@ -65,6 +67,7 @@ public sealed partial class ItemSlotsSystem
                 _popupSystem.PopupClient(Loc.GetString(whitelistFailPopup), uid, user);
             return false;
         }
+
         slots.Sort(SortEmpty);
 
         foreach (var slot in slots)
@@ -78,20 +81,25 @@ public sealed partial class ItemSlotsSystem
     /// <summary>
     /// Tries to start a do-after if it can, otherwise
     /// </summary>
-    public bool TryInsertOrDoAfter(EntityUid uid, Entity<HandsComponent?> user, EntityUid toInsert, ItemSlot slot, bool doAfter = true)
+    public bool TryInsertOrDoAfter(EntityUid uid,
+        Entity<HandsComponent?> user,
+        EntityUid toInsert,
+        ItemSlot slot,
+        bool doAfter = true)
     {
         // Handle do-after insert
         if (doAfter && TryStartInsertDoAfter(slot, toInsert, user))
             return true; // We are delaying it to some time
 
         // Drop the held item onto the floor. Return if the user cannot drop.
-        if (_handsSystem.IsHolding(user, toInsert) && !_handsSystem.TryDrop(user, toInsert)) // Goobstation - don't try to drop if not holding
+        if (_handsSystem.IsHolding(user, toInsert) &&
+            !_handsSystem.TryDrop(user, toInsert)) // Goobstation - don't try to drop if not holding
             return false;
 
         if (slot.Item != null)
             _handsSystem.TryPickupAnyHand(user, slot.Item.Value, handsComp: user.Comp);
 
-        Insert(uid, slot, toInsert, user, excludeUserAudio: true);
+        Insert(uid, slot, toInsert, user, true);
 
         if (slot.InsertSuccessPopup.HasValue)
             _popupSystem.PopupClient(Loc.GetString(slot.InsertSuccessPopup), uid, user);
@@ -105,7 +113,7 @@ public sealed partial class ItemSlotsSystem
             return _doAfter.TryStartDoAfter(new DoAfterArgs(EntityManager,
                 user.Value,
                 slot.InsertDelay.Value,
-                new ItemSlotInteractionDoAfterEvent(slot.ID!, false, true),
+                new ItemSlotInteractionDoAfterEvent(slot.ID!, false),
                 slot.ContainerSlot?.Owner,
                 item,
                 item)

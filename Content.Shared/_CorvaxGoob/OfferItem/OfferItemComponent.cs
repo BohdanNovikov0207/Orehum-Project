@@ -2,25 +2,25 @@
 
 namespace Content.Shared._CorvaxGoob.OfferItem;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState(true)]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState(true)]
 [Access(typeof(SharedOfferItemSystem))]
 public sealed partial class OfferItemComponent : Component
 {
-    [ViewVariables(VVAccess.ReadWrite), DataField, AutoNetworkedField]
-    public bool IsInOfferMode;
-
-    [DataField, AutoNetworkedField]
-    public bool IsInReceiveMode;
-
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public string? Hand;
 
-    [DataField, AutoNetworkedField]
-    public EntityUid? Item;
+    [ViewVariables(VVAccess.ReadWrite)] [DataField] [AutoNetworkedField]
+    public bool IsInOfferMode;
 
-    [DataField, AutoNetworkedField]
-    public EntityUid? Target;
+    [DataField] [AutoNetworkedField]
+    public bool IsInReceiveMode;
+
+    [DataField] [AutoNetworkedField]
+    public EntityUid? Item;
 
     [DataField]
     public float MaxOfferDistance = 2f;
+
+    [DataField] [AutoNetworkedField]
+    public EntityUid? Target;
 }

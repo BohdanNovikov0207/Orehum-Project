@@ -4,16 +4,16 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Shared._White.Xenomorphs.Infection;
 
-[RegisterComponent, NetworkedComponent]
-[AutoGenerateComponentState(true, fieldDeltas: true)]
+[RegisterComponent] [NetworkedComponent]
+[AutoGenerateComponentState(true, true)]
 public sealed partial class XenomorphInfectedComponent : Component
 {
-    [AutoNetworkedField, ViewVariables]
+    [AutoNetworkedField] [ViewVariables]
+    public int GrowthStage;
+
+    [AutoNetworkedField] [ViewVariables]
     public Dictionary<int, ProtoId<InfectionIconPrototype>> InfectedIcons = new();
 
     [ViewVariables]
     public EntityUid Infection;
-
-    [AutoNetworkedField, ViewVariables]
-    public int GrowthStage;
 }

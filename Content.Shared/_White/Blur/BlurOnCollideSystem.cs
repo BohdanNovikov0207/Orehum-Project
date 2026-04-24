@@ -22,15 +22,11 @@ public sealed class BlurOnCollideSystem : EntitySystem
         SubscribeLocalEvent<BlurOnCollideComponent, ThrowDoHitEvent>(OnEntityHit);
     }
 
-    private void OnEntityHit(Entity<BlurOnCollideComponent> ent, ref ThrowDoHitEvent args)
-    {
+    private void OnEntityHit(Entity<BlurOnCollideComponent> ent, ref ThrowDoHitEvent args) =>
         ApplyEffects(args.Target, ent.Comp);
-    }
 
-    private void OnProjectileHit(Entity<BlurOnCollideComponent> ent, ref ProjectileHitEvent args)
-    {
+    private void OnProjectileHit(Entity<BlurOnCollideComponent> ent, ref ProjectileHitEvent args) =>
         ApplyEffects(args.Target, ent.Comp);
-    }
 
     private void ApplyEffects(EntityUid target, BlurOnCollideComponent component)
     {

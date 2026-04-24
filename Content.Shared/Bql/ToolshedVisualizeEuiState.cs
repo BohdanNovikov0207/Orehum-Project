@@ -11,7 +11,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Bql;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class ToolshedVisualizeEuiState : EuiStateBase
 {
     public readonly (string name, NetEntity entity)[] Entities;

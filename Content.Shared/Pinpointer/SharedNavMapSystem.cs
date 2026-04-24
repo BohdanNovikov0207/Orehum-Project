@@ -37,10 +37,10 @@ public abstract class SharedNavMapSystem : EntitySystem
     public const int WallMask = AllDirMask << (int) NavMapChunkType.Wall;
     public const int FloorMask = AllDirMask << (int) NavMapChunkType.Floor;
 
-    [Robust.Shared.IoC.Dependency] private readonly TagSystem _tagSystem = default!;
+    private static readonly ProtoId<TagPrototype>[] WallTags = { "Wall", "Window" };
     [Robust.Shared.IoC.Dependency] private readonly INetManager _net = default!;
 
-    private static readonly ProtoId<TagPrototype>[] WallTags = {"Wall", "Window"};
+    [Robust.Shared.IoC.Dependency] private readonly TagSystem _tagSystem = default!;
     private EntityQuery<NavMapDoorComponent> _doorQuery;
 
     public override void Initialize()
@@ -55,13 +55,10 @@ public abstract class SharedNavMapSystem : EntitySystem
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int GetTileIndex(Vector2i relativeTile)
-    {
-        return relativeTile.X * ChunkSize + relativeTile.Y;
-    }
+    public static int GetTileIndex(Vector2i relativeTile) => relativeTile.X * ChunkSize + relativeTile.Y;
 
     /// <summary>
-    /// Inverse of <see cref="GetTileIndex"/>
+    /// Inverse of <see cref="GetTileIndex" />
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector2i GetTileFromIndex(int index)
@@ -82,7 +79,11 @@ public abstract class SharedNavMapSystem : EntitySystem
         return NavMapChunkType.Invalid;
     }
 
-    protected bool TryCreateNavMapBeaconData(EntityUid uid, NavMapBeaconComponent component, TransformComponent xform, MetaDataComponent meta, [NotNullWhen(true)] out NavMapBeacon? beaconData)
+    protected bool TryCreateNavMapBeaconData(EntityUid uid,
+        NavMapBeaconComponent component,
+        TransformComponent xform,
+        MetaDataComponent meta,
+        [NotNullWhen(true)] out NavMapBeacon? beaconData)
     {
         beaconData = null;
 
@@ -98,10 +99,14 @@ public abstract class SharedNavMapSystem : EntitySystem
         return true;
     }
 
-    public void AddOrUpdateNavMapRegion(EntityUid uid, NavMapComponent component, NetEntity regionOwner, NavMapRegionProperties regionProperties)
+    public void AddOrUpdateNavMapRegion(EntityUid uid,
+        NavMapComponent component,
+        NetEntity regionOwner,
+        NavMapRegionProperties regionProperties)
     {
         // Check if a new region has been added or an existing one has been altered
-        var isDirty = !component.RegionProperties.TryGetValue(regionOwner, out var oldProperties) || oldProperties != regionProperties;
+        var isDirty = !component.RegionProperties.TryGetValue(regionOwner, out var oldProperties) ||
+                      oldProperties != regionProperties;
 
         if (isDirty)
         {
@@ -114,7 +119,8 @@ public abstract class SharedNavMapSystem : EntitySystem
 
     public void RemoveNavMapRegion(EntityUid uid, NavMapComponent component, NetEntity regionOwner)
     {
-        bool regionOwnerRemoved = component.RegionProperties.Remove(regionOwner) | component.RegionOverlays.Remove(regionOwner);
+        var regionOwnerRemoved = component.RegionProperties.Remove(regionOwner) |
+                                 component.RegionOverlays.Remove(regionOwner);
 
         if (regionOwnerRemoved)
         {
@@ -134,7 +140,9 @@ public abstract class SharedNavMapSystem : EntitySystem
         }
     }
 
-    public Dictionary<NetEntity, NavMapRegionOverlay> GetNavMapRegionOverlays(EntityUid uid, NavMapComponent component, Enum uiKey)
+    public Dictionary<NetEntity, NavMapRegionOverlay> GetNavMapRegionOverlays(EntityUid uid,
+        NavMapComponent component,
+        Enum uiKey)
     {
         var regionOverlays = new Dictionary<NetEntity, NavMapRegionOverlay>();
 
@@ -159,7 +167,7 @@ public abstract class SharedNavMapSystem : EntitySystem
         if (args.FromTick <= component.CreationTick)
         {
             // Full state
-            chunks = new(component.Chunks.Count);
+            chunks = new Dictionary<Vector2i, int[]>(component.Chunks.Count);
             foreach (var (origin, chunk) in component.Chunks)
             {
                 chunks.Add(origin, chunk.TileData);
@@ -169,7 +177,7 @@ public abstract class SharedNavMapSystem : EntitySystem
             return;
         }
 
-        chunks = new();
+        chunks = new Dictionary<Vector2i, int[]>();
         foreach (var (origin, chunk) in component.Chunks)
         {
             if (chunk.LastUpdate < args.FromTick)
@@ -178,7 +186,10 @@ public abstract class SharedNavMapSystem : EntitySystem
             chunks.Add(origin, chunk.TileData);
         }
 
-        args.State = new NavMapDeltaState(chunks, component.Beacons, component.RegionProperties, new(component.Chunks.Keys));
+        args.State = new NavMapDeltaState(chunks,
+            component.Beacons,
+            component.RegionProperties,
+            new HashSet<Vector2i>(component.Chunks.Keys));
     }
 
     private void OnConfigurableExamined(Entity<ConfigurableNavMapBeaconComponent> ent, ref ExaminedEvent args)
@@ -196,19 +207,19 @@ public abstract class SharedNavMapSystem : EntitySystem
 
     #region: System messages
 
-    [Serializable, NetSerializable]
+    [Serializable] [NetSerializable]
     protected sealed class NavMapState(
         Dictionary<Vector2i, int[]> chunks,
         Dictionary<NetEntity, NavMapBeacon> beacons,
         Dictionary<NetEntity, NavMapRegionProperties> regions)
         : ComponentState
     {
-        public Dictionary<Vector2i, int[]> Chunks = chunks;
         public Dictionary<NetEntity, NavMapBeacon> Beacons = beacons;
+        public Dictionary<Vector2i, int[]> Chunks = chunks;
         public Dictionary<NetEntity, NavMapRegionProperties> Regions = regions;
     }
 
-    [Serializable, NetSerializable]
+    [Serializable] [NetSerializable]
     protected sealed class NavMapDeltaState(
         Dictionary<Vector2i, int[]> modifiedChunks,
         Dictionary<NetEntity, NavMapBeacon> beacons,
@@ -216,10 +227,10 @@ public abstract class SharedNavMapSystem : EntitySystem
         HashSet<Vector2i> allChunks)
         : ComponentState, IComponentDeltaState<NavMapState>
     {
-        public Dictionary<Vector2i, int[]> ModifiedChunks = modifiedChunks;
-        public Dictionary<NetEntity, NavMapBeacon> Beacons = beacons;
-        public Dictionary<NetEntity, NavMapRegionProperties> Regions = regions;
         public HashSet<Vector2i> AllChunks = allChunks;
+        public Dictionary<NetEntity, NavMapBeacon> Beacons = beacons;
+        public Dictionary<Vector2i, int[]> ModifiedChunks = modifiedChunks;
+        public Dictionary<NetEntity, NavMapRegionProperties> Regions = regions;
 
         public void ApplyToFullState(NavMapState state)
         {
@@ -267,14 +278,16 @@ public abstract class SharedNavMapSystem : EntitySystem
                     Array.Copy(newData, data, ArraySize);
             }
 
-            return new NavMapState(chunks, new(Beacons), new(Regions));
+            return new NavMapState(chunks,
+                new Dictionary<NetEntity, NavMapBeacon>(Beacons),
+                new Dictionary<NetEntity, NavMapRegionProperties>(Regions));
         }
     }
 
-    [Serializable, NetSerializable]
+    [Serializable] [NetSerializable]
     public record struct NavMapBeacon(NetEntity NetEnt, Color Color, string Text, Vector2 Position);
 
-    [Serializable, NetSerializable]
+    [Serializable] [NetSerializable]
     public record struct NavMapRegionProperties(NetEntity Owner, Enum UiKey, HashSet<Vector2i> Seeds)
     {
         // Server defined color for the region

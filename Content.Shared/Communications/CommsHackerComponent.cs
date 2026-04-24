@@ -16,13 +16,13 @@ namespace Content.Shared.Communications;
 /// Component for hacking a communications console to call in a threat.
 /// Can only be done once, the component is remove afterwards.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(SharedCommsHackerSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(SharedCommsHackerSystem))]
 public sealed partial class CommsHackerComponent : Component
 {
     /// <summary>
     /// Time taken to hack the console
     /// </summary>
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    [DataField] [ViewVariables(VVAccess.ReadWrite)]
     public TimeSpan Delay = TimeSpan.FromSeconds(20);
 
     /// <summary>
@@ -38,11 +38,8 @@ public sealed partial class CommsHackerComponent : Component
 /// You wouldn't do that, right?
 /// </summary>
 [Prototype]
-public sealed partial class NinjaHackingThreatPrototype : IPrototype
+public sealed class NinjaHackingThreatPrototype : IPrototype
 {
-    [IdDataField]
-    public string ID { get; private set; } = default!;
-
     /// <summary>
     /// Locale id for the announcement to be made from CentCom.
     /// </summary>
@@ -50,8 +47,12 @@ public sealed partial class NinjaHackingThreatPrototype : IPrototype
     public LocId Announcement;
 
     /// <summary>
-    /// The game rule for the threat to be added, it should be able to work when added mid-round otherwise this will do nothing.
+    /// The game rule for the threat to be added, it should be able to work when added mid-round otherwise this will do
+    /// nothing.
     /// </summary>
     [DataField(required: true)]
     public EntProtoId Rule;
+
+    [IdDataField]
+    public string ID { get; } = default!;
 }

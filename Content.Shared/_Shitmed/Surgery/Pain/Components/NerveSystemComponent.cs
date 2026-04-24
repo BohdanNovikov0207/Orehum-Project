@@ -13,97 +13,9 @@ using Robust.Shared.GameStates;
 
 namespace Content.Shared._Shitmed.Medical.Surgery.Pain.Components;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class NerveSystemComponent : Component
 {
-    /// <summary>
-    /// Pain.
-    /// </summary>
-    [DataField, AutoNetworkedField, ViewVariables(VVAccess.ReadWrite)]
-    public FixedPoint2 Pain = 0f;
-
-    /// <summary>
-    /// How much of typical wound pain can this nerve system hold?
-    /// </summary>
-    [DataField, AutoNetworkedField, ViewVariables(VVAccess.ReadOnly)]
-    public FixedPoint2 SoftPainCap = 120f;
-
-    /// <summary>
-    /// How much Pain can this nerve system hold.
-    /// </summary>
-    [DataField, AutoNetworkedField, ViewVariables(VVAccess.ReadOnly)]
-    public FixedPoint2 PainCap = 200f;
-
-    // Don't change, OR I will break your knees, filled up upon initialization.
-    [ViewVariables(VVAccess.ReadOnly)]
-    public Dictionary<EntityUid, NerveComponent> Nerves = new();
-
-    // Don't add manually!! Use built-in functions.
-    [ViewVariables(VVAccess.ReadOnly)]
-    public Dictionary<string, PainMultiplier> Multipliers = new();
-
-    [ViewVariables(VVAccess.ReadOnly)]
-    public Dictionary<(EntityUid, string), PainModifier> Modifiers = new();
-
-    public Dictionary<EntityUid, AudioComponent> PlayedPainSounds = new();
-    public Dictionary<EntityUid, (SoundSpecifier, AudioParams?, TimeSpan)> PainSoundsToPlay = new();
-
-    [DataField("lastThreshold"), ViewVariables(VVAccess.ReadOnly)]
-    public FixedPoint2 LastPainThreshold = 0;
-
-    [ViewVariables(VVAccess.ReadOnly)]
-    public PainThresholdTypes LastThresholdType = PainThresholdTypes.None;
-
-    [DataField("thresholdUpdate")]
-    public TimeSpan ThresholdUpdateTime = TimeSpan.FromSeconds(1.6f);
-
-    [DataField("reactionTime")]
-    public TimeSpan PainReactionTime = TimeSpan.FromSeconds(0.07f);
-
-    [DataField("adrenalineTime")]
-    public TimeSpan PainShockAdrenalineTime = TimeSpan.FromSeconds(30f);
-
-    [DataField]
-    public TimeSpan CritScreamsIntervalMin = TimeSpan.FromSeconds(13f);
-
-    [DataField]
-    public TimeSpan CritScreamsIntervalMax = TimeSpan.FromSeconds(32f);
-    public TimeSpan UpdateTime;
-    public TimeSpan ReactionUpdateTime;
-    public TimeSpan NextCritScream;
-
-    [DataField("painShockStun")]
-    public TimeSpan PainShockStunTime = TimeSpan.FromSeconds(2f);
-
-    [DataField("organDamageStun")]
-    public TimeSpan OrganDamageStunTime = TimeSpan.FromSeconds(12f);
-
-    [DataField]
-    public SoundSpecifier PainRattles = new SoundCollectionSpecifier("PainRattles");
-
-    [DataField]
-    public Dictionary<Sex, SoundSpecifier> PainScreams = new()
-    {
-        {
-            Sex.Male, new SoundCollectionSpecifier("PainScreamsShortMale")
-            {
-                Params = AudioParams.Default.WithVariation(0.04f),
-            }
-        },
-        {
-            Sex.Female, new SoundCollectionSpecifier("PainScreamsShortFemale")
-            {
-                Params = AudioParams.Default.WithVariation(0.04f),
-            }
-        },
-        {
-            Sex.Unsexed, new SoundCollectionSpecifier("PainScreamsShortMale") // yeah
-            {
-                Params = AudioParams.Default.WithVariation(0.2f),
-            }
-        },
-    };
-
     [DataField]
     public Dictionary<Sex, SoundSpecifier> AgonyScreams = new()
     {
@@ -128,27 +40,10 @@ public sealed partial class NerveSystemComponent : Component
     };
 
     [DataField]
-    public Dictionary<Sex, SoundSpecifier> PainShockScreams = new()
-    {
-        {
-            Sex.Male, new SoundCollectionSpecifier("PainShockScreamsMale")
-            {
-                Params = AudioParams.Default.WithVariation(0.05f),
-            }
-        },
-        {
-            Sex.Female, new SoundCollectionSpecifier("PainShockScreamsFemale")
-            {
-                Params = AudioParams.Default.WithVariation(0.05f),
-            }
-        },
-        {
-            Sex.Unsexed, new SoundCollectionSpecifier("PainShockScreamsMale") // yeah
-            {
-                Params = AudioParams.Default.WithVariation(0.2f),
-            }
-        },
-    };
+    public TimeSpan CritScreamsIntervalMax = TimeSpan.FromSeconds(32f);
+
+    [DataField]
+    public TimeSpan CritScreamsIntervalMin = TimeSpan.FromSeconds(13f);
 
     [DataField]
     public Dictionary<Sex, SoundSpecifier> CritWhimpers = new()
@@ -173,51 +68,27 @@ public sealed partial class NerveSystemComponent : Component
         },
     };
 
-    [DataField]
-    public Dictionary<Sex, SoundSpecifier> PainShockWhimpers = new()
-    {
-        {
-            Sex.Male, new SoundCollectionSpecifier("PainShockWhimpersMale")
-            {
-                Params = AudioParams.Default,
-            }
-        },
-        {
-            Sex.Female, new SoundCollectionSpecifier("PainShockWhimpersFemale")
-            {
-                Params = AudioParams.Default,
-            }
-        },
-        {
-            Sex.Unsexed, new SoundCollectionSpecifier("PainShockWhimpersMale") // yeah
-            {
-                Params = AudioParams.Default,
-            }
-        },
-    };
+    [DataField("lastThreshold")] [ViewVariables(VVAccess.ReadOnly)]
+    public FixedPoint2 LastPainThreshold = 0;
 
-    [DataField]
-    public Dictionary<Sex, SoundSpecifier> OrganDestructionReflexSounds = new()
-    {
-        {
-            Sex.Male, new SoundCollectionSpecifier("OrganDamagePainedMale")
-            {
-                Params = AudioParams.Default,
-            }
-       },
-       {
-            Sex.Female, new SoundCollectionSpecifier("OrganDamagePainedFemale")
-            {
-                Params = AudioParams.Default,
-            }
-        },
-        {
-            Sex.Unsexed, new SoundCollectionSpecifier("OrganDamagePainedMale")
-            {
-                Params = AudioParams.Default,
-            }
-        },
-    };
+    [ViewVariables(VVAccess.ReadOnly)]
+    public PainThresholdTypes LastThresholdType = PainThresholdTypes.None;
+
+    [ViewVariables(VVAccess.ReadOnly)]
+    public Dictionary<(EntityUid, string), PainModifier> Modifiers = new();
+
+    // Don't add manually!! Use built-in functions.
+    [ViewVariables(VVAccess.ReadOnly)]
+    public Dictionary<string, PainMultiplier> Multipliers = new();
+
+    // Don't change, OR I will break your knees, filled up upon initialization.
+    [ViewVariables(VVAccess.ReadOnly)]
+    public Dictionary<EntityUid, NerveComponent> Nerves = new();
+
+    public TimeSpan NextCritScream;
+
+    [DataField("organDamageStun")]
+    public TimeSpan OrganDamageStunTime = TimeSpan.FromSeconds(12f);
 
     [DataField]
     public Dictionary<Sex, SoundSpecifier> OrganDamageWhimpersSounds = new()
@@ -242,7 +113,125 @@ public sealed partial class NerveSystemComponent : Component
         },
     };
 
-    [DataField("reflexThresholds"), ViewVariables(VVAccess.ReadOnly)]
+    [DataField]
+    public Dictionary<Sex, SoundSpecifier> OrganDestructionReflexSounds = new()
+    {
+        {
+            Sex.Male, new SoundCollectionSpecifier("OrganDamagePainedMale")
+            {
+                Params = AudioParams.Default,
+            }
+        },
+        {
+            Sex.Female, new SoundCollectionSpecifier("OrganDamagePainedFemale")
+            {
+                Params = AudioParams.Default,
+            }
+        },
+        {
+            Sex.Unsexed, new SoundCollectionSpecifier("OrganDamagePainedMale")
+            {
+                Params = AudioParams.Default,
+            }
+        },
+    };
+
+    /// <summary>
+    /// Pain.
+    /// </summary>
+    [DataField] [AutoNetworkedField] [ViewVariables(VVAccess.ReadWrite)]
+    public FixedPoint2 Pain = 0f;
+
+    /// <summary>
+    /// How much Pain can this nerve system hold.
+    /// </summary>
+    [DataField] [AutoNetworkedField] [ViewVariables(VVAccess.ReadOnly)]
+    public FixedPoint2 PainCap = 200f;
+
+    [DataField]
+    public SoundSpecifier PainRattles = new SoundCollectionSpecifier("PainRattles");
+
+    [DataField("reactionTime")]
+    public TimeSpan PainReactionTime = TimeSpan.FromSeconds(0.07f);
+
+    [DataField]
+    public Dictionary<Sex, SoundSpecifier> PainScreams = new()
+    {
+        {
+            Sex.Male, new SoundCollectionSpecifier("PainScreamsShortMale")
+            {
+                Params = AudioParams.Default.WithVariation(0.04f),
+            }
+        },
+        {
+            Sex.Female, new SoundCollectionSpecifier("PainScreamsShortFemale")
+            {
+                Params = AudioParams.Default.WithVariation(0.04f),
+            }
+        },
+        {
+            Sex.Unsexed, new SoundCollectionSpecifier("PainScreamsShortMale") // yeah
+            {
+                Params = AudioParams.Default.WithVariation(0.2f),
+            }
+        },
+    };
+
+    [DataField("adrenalineTime")]
+    public TimeSpan PainShockAdrenalineTime = TimeSpan.FromSeconds(30f);
+
+    [DataField]
+    public Dictionary<Sex, SoundSpecifier> PainShockScreams = new()
+    {
+        {
+            Sex.Male, new SoundCollectionSpecifier("PainShockScreamsMale")
+            {
+                Params = AudioParams.Default.WithVariation(0.05f),
+            }
+        },
+        {
+            Sex.Female, new SoundCollectionSpecifier("PainShockScreamsFemale")
+            {
+                Params = AudioParams.Default.WithVariation(0.05f),
+            }
+        },
+        {
+            Sex.Unsexed, new SoundCollectionSpecifier("PainShockScreamsMale") // yeah
+            {
+                Params = AudioParams.Default.WithVariation(0.2f),
+            }
+        },
+    };
+
+    [DataField("painShockStun")]
+    public TimeSpan PainShockStunTime = TimeSpan.FromSeconds(2f);
+
+    [DataField]
+    public Dictionary<Sex, SoundSpecifier> PainShockWhimpers = new()
+    {
+        {
+            Sex.Male, new SoundCollectionSpecifier("PainShockWhimpersMale")
+            {
+                Params = AudioParams.Default,
+            }
+        },
+        {
+            Sex.Female, new SoundCollectionSpecifier("PainShockWhimpersFemale")
+            {
+                Params = AudioParams.Default,
+            }
+        },
+        {
+            Sex.Unsexed, new SoundCollectionSpecifier("PainShockWhimpersMale") // yeah
+            {
+                Params = AudioParams.Default,
+            }
+        },
+    };
+
+    public Dictionary<EntityUid, (SoundSpecifier, AudioParams?, TimeSpan)> PainSoundsToPlay = new();
+
+    [DataField("reflexThresholds")] [ViewVariables(VVAccess.ReadOnly)]
     public Dictionary<PainThresholdTypes, FixedPoint2> PainThresholds = new()
     {
         { PainThresholdTypes.PainFlinch, 10 },
@@ -254,4 +243,18 @@ public sealed partial class NerveSystemComponent : Component
         // :troll:
         { PainThresholdTypes.PainShockAndAgony, 85 },
     };
+
+    public Dictionary<EntityUid, AudioComponent> PlayedPainSounds = new();
+    public TimeSpan ReactionUpdateTime;
+
+    /// <summary>
+    /// How much of typical wound pain can this nerve system hold?
+    /// </summary>
+    [DataField] [AutoNetworkedField] [ViewVariables(VVAccess.ReadOnly)]
+    public FixedPoint2 SoftPainCap = 120f;
+
+    [DataField("thresholdUpdate")]
+    public TimeSpan ThresholdUpdateTime = TimeSpan.FromSeconds(1.6f);
+
+    public TimeSpan UpdateTime;
 }

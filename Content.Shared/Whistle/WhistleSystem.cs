@@ -27,10 +27,8 @@ public sealed class WhistleSystem : EntitySystem
         SubscribeLocalEvent<WhistleComponent, UseInHandEvent>(OnUseInHand);
     }
 
-    private void ExclamateTarget(EntityUid target, WhistleComponent component)
-    {
+    private void ExclamateTarget(EntityUid target, WhistleComponent component) =>
         SpawnAttachedTo(component.Effect, target.ToCoordinates());
-    }
 
     public void OnUseInHand(EntityUid uid, WhistleComponent component, UseInHandEvent args)
     {
@@ -54,7 +52,8 @@ public sealed class WhistleSystem : EntitySystem
         StealthComponent? stealth = null;
 
         foreach (var iterator in
-            _entityLookup.GetEntitiesInRange<HumanoidAppearanceComponent>(_transform.GetMapCoordinates(uid), component.Distance))
+                 _entityLookup.GetEntitiesInRange<HumanoidAppearanceComponent>(_transform.GetMapCoordinates(uid),
+                     component.Distance))
         {
             //Avoid pinging invisible entities
             if (TryComp(iterator, out stealth) && stealth.Enabled)

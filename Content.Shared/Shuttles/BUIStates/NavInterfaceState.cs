@@ -4,16 +4,19 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Shared._NF.Shuttles.Events;
 using Robust.Shared.Map;
 using Robust.Shared.Serialization;
-using Content.Shared._NF.Shuttles.Events;
 
 namespace Content.Shared.Shuttles.BUIStates;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class NavInterfaceState
 {
-    public float MaxRange;
+    /// <summary>
+    /// The relevant rotation to rotate the angle around.
+    /// </summary>
+    public Angle? Angle;
 
     /// <summary>
     /// The relevant coordinates to base the radar around.
@@ -21,13 +24,23 @@ public sealed class NavInterfaceState
     public NetCoordinates? Coordinates;
 
     /// <summary>
-    /// The relevant rotation to rotate the angle around.
+    /// Frontier - the state of the shuttle's inertial dampeners
     /// </summary>
-    public Angle? Angle;
+    public InertiaDampeningMode DampeningMode;
 
     public Dictionary<NetEntity, List<DockingPortState>> Docks;
 
-    public bool RotateWithEntity = true;
+    /// <summary>
+    /// Frontier: settable coordinate visibility
+    /// </summary>
+    public bool HideCoords = false;
+
+    /// <summary>
+    /// Frontier: settable maximum IFF range
+    /// </summary>
+    public float? MaxIffRange = null;
+
+    public float MaxRange;
 
     // Frontier fields
 
@@ -37,20 +50,7 @@ public sealed class NavInterfaceState
     /// </summary>
     public Dictionary<string, string> NetworkPortNames;
 
-    /// <summary>
-    /// Frontier - the state of the shuttle's inertial dampeners
-    /// </summary>
-    public InertiaDampeningMode DampeningMode;
-
-    /// <summary>
-    /// Frontier: settable maximum IFF range
-    /// </summary>
-    public float? MaxIffRange = null;
-
-    /// <summary>
-    /// Frontier: settable coordinate visibility
-    /// </summary>
-    public bool HideCoords = false;
+    public bool RotateWithEntity = true;
 
     // End Frontier fields
     public NavInterfaceState(
@@ -70,8 +70,8 @@ public sealed class NavInterfaceState
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum RadarConsoleUiKey : byte
 {
-    Key
+    Key,
 }

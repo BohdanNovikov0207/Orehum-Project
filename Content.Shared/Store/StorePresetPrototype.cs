@@ -8,22 +8,20 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Robust.Shared.Prototypes;
-using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype.Set;
-using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype.Dictionary;
 using Content.Goobstation.Maths.FixedPoint;
+using Robust.Shared.Prototypes;
+using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype.Dictionary;
+using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype.Set;
 
 namespace Content.Shared.Store;
 
 /// <summary>
-///     Specifies generic info for initializing a store.
+/// Specifies generic info for initializing a store.
 /// </summary>
 [Prototype]
 [DataDefinition]
 public sealed partial class StorePresetPrototype : IPrototype
 {
-    [ViewVariables] [IdDataField] public string ID { get; private set; } = default!;
-
     /// <summary>
     /// The name displayed at the top of the store window
     /// </summary>
@@ -48,4 +46,6 @@ public sealed partial class StorePresetPrototype : IPrototype
     /// </summary>
     [DataField("currencyWhitelist", customTypeSerializer: typeof(PrototypeIdHashSetSerializer<CurrencyPrototype>))]
     public HashSet<string> CurrencyWhitelist { get; private set; } = new();
+
+    [ViewVariables] [IdDataField] public string ID { get; private set; } = default!;
 }

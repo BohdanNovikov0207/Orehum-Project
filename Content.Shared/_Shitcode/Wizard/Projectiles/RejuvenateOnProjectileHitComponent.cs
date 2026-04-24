@@ -13,12 +13,9 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Shared._Goobstation.Wizard.Projectiles;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class RejuvenateOnProjectileHitComponent : Component
 {
-    [DataField]
-    public EntityWhitelist UndeadList = new();
-
     [DataField]
     public DamageSpecifier Damage = new();
 
@@ -27,4 +24,7 @@ public sealed partial class RejuvenateOnProjectileHitComponent : Component
 
     [DataField]
     public ProtoId<TagPrototype> SoulTappedTag = "SoulTapped";
+
+    [DataField]
+    public EntityWhitelist UndeadList = new();
 }

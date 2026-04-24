@@ -19,7 +19,7 @@ using Robust.Shared.GameStates;
 
 namespace Content.Shared.Roles;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class HereticRoleComponent : BaseMindRoleComponent
 {
 }

@@ -14,17 +14,17 @@ public partial class SharedAmeShieldComponent : Component
 {
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum AmeShieldVisuals
 {
     Core,
-    CoreState
+    CoreState,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum AmeCoreState
 {
     Off,
     Weak,
-    Strong
+    Strong,
 }

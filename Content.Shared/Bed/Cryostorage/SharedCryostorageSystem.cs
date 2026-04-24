@@ -89,25 +89,25 @@ using Robust.Shared.Timing;
 namespace Content.Shared.Bed.Cryostorage;
 
 /// <summary>
-/// This handles <see cref="CryostorageComponent"/>
+/// This handles <see cref="CryostorageComponent" />
 /// </summary>
 public abstract class SharedCryostorageSystem : EntitySystem
 {
-    [Dependency] private   readonly IConfigurationManager _configuration = default!;
-    [Dependency] private   readonly ISharedPlayerManager _player = default!;
-    [Dependency] private   readonly SharedMapSystem _map = default!;
-    [Dependency] private   readonly MobStateSystem _mobState = default!;
-    [Dependency] private   readonly SharedAppearanceSystem _appearance = default!;
-    [Dependency] protected readonly IGameTiming Timing = default!;
+    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly IConfigurationManager _configuration = default!;
+    [Dependency] private readonly SharedMapSystem _map = default!;
+    [Dependency] private readonly MetaDataSystem _meta = default!;
+    [Dependency] private readonly MobStateSystem _mobState = default!;
+    [Dependency] private readonly ISharedPlayerManager _player = default!;
     [Dependency] protected readonly ISharedAdminLogManager AdminLog = default!;
     [Dependency] protected readonly SharedMindSystem Mind = default!;
-    [Dependency] private readonly MetaDataSystem _meta = default!;
-
-    protected EntityUid? PausedMap { get; private set; }
+    [Dependency] protected readonly IGameTiming Timing = default!;
 
     protected bool CryoSleepRejoiningEnabled;
 
-    /// <inheritdoc/>
+    protected EntityUid? PausedMap { get; private set; }
+
+    /// <inheritdoc />
     public override void Initialize()
     {
         SubscribeLocalEvent<CryostorageComponent, EntInsertedIntoContainerMessage>(OnInsertedContainer);
@@ -124,12 +124,10 @@ public abstract class SharedCryostorageSystem : EntitySystem
         Subs.CVar(_configuration, CCVars.GameCryoSleepRejoining, OnCvarChanged, true);
     }
 
-    private void OnCvarChanged(bool value)
-    {
-        CryoSleepRejoiningEnabled = value;
-    }
+    private void OnCvarChanged(bool value) => CryoSleepRejoiningEnabled = value;
 
-    protected virtual void OnInsertedContainer(Entity<CryostorageComponent> ent, ref EntInsertedIntoContainerMessage args)
+    protected virtual void OnInsertedContainer(Entity<CryostorageComponent> ent,
+        ref EntInsertedIntoContainerMessage args)
     {
         var (_, comp) = ent;
         if (args.Container.ID != comp.ContainerId)
@@ -167,7 +165,8 @@ public abstract class SharedCryostorageSystem : EntitySystem
             return;
         }
 
-        if (!HasComp<CanEnterCryostorageComponent>(args.EntityUid) || !TryComp<MindContainerComponent>(args.EntityUid, out var mindContainer))
+        if (!HasComp<CanEnterCryostorageComponent>(args.EntityUid) ||
+            !TryComp<MindContainerComponent>(args.EntityUid, out var mindContainer))
         {
             args.Cancel();
             return;
@@ -175,9 +174,7 @@ public abstract class SharedCryostorageSystem : EntitySystem
 
         if (Mind.TryGetMind(args.EntityUid, out _, out var mindComp, mindContainer) &&
             (mindComp.PreventSuicide || mindComp.PreventGhosting))
-        {
             args.Cancel();
-        }
     }
 
     private void OnShutdownContainer(Entity<CryostorageComponent> ent, ref ComponentShutdown args)
@@ -209,7 +206,8 @@ public abstract class SharedCryostorageSystem : EntitySystem
         args.Handled = true;
     }
 
-    private void OnRemovedContained(Entity<CryostorageContainedComponent> ent, ref EntGotRemovedFromContainerMessage args)
+    private void OnRemovedContained(Entity<CryostorageContainedComponent> ent,
+        ref EntGotRemovedFromContainerMessage args)
     {
         var (uid, comp) = ent;
         if (!IsInPausedMap(uid))
@@ -225,10 +223,7 @@ public abstract class SharedCryostorageSystem : EntitySystem
         Dirty(ent, comp);
     }
 
-    private void OnRoundRestart(RoundRestartCleanupEvent _)
-    {
-        DeletePausedMap();
-    }
+    private void OnRoundRestart(RoundRestartCleanupEvent _) => DeletePausedMap();
 
     private void DeletePausedMap()
     {

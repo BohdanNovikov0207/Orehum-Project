@@ -11,13 +11,13 @@ namespace Content.Shared._CorvaxGoob.OfferItem;
 
 public abstract partial class SharedOfferItemSystem : EntitySystem
 {
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
+    [ValidatePrototypeId<AlertPrototype>]
+    protected const string OfferAlert = "Offer";
+
     [Dependency] private readonly SharedHandsSystem _hands = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
-
-    [ValidatePrototypeId<AlertPrototype>]
-    protected const string OfferAlert = "Offer";
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     public override void Initialize()
     {
@@ -41,6 +41,7 @@ public abstract partial class SharedOfferItemSystem : EntitySystem
 
         Receive(ent!);
     }
+
     /// <summary>
     /// Accepting the offer and receive item
     /// </summary>
@@ -73,8 +74,10 @@ public abstract partial class SharedOfferItemSystem : EntitySystem
             }
 
             _popup.PopupClient(Loc.GetString("offer-item-give",
-                ("item", Identity.Entity(offerItem.Item.Value, EntityManager)),
-                ("target", Identity.Entity(ent, EntityManager))), ent.Comp.Target.Value, ent.Comp.Target.Value);
+                    ("item", Identity.Entity(offerItem.Item.Value, EntityManager)),
+                    ("target", Identity.Entity(ent, EntityManager))),
+                ent.Comp.Target.Value,
+                ent.Comp.Target.Value);
 
             _popup.PopupPredicted(Loc.GetString("offer-item-give-other",
                     ("user", Identity.Entity(ent.Comp.Target.Value, EntityManager)),
@@ -94,7 +97,8 @@ public abstract partial class SharedOfferItemSystem : EntitySystem
         if (!TryComp<OfferItemComponent>(args.User, out var offerItem))
             return;
 
-        if (args.User == uid || component.IsInReceiveMode || !offerItem.IsInOfferMode || offerItem.IsInReceiveMode && offerItem.Target != uid)
+        if (args.User == uid || component.IsInReceiveMode || !offerItem.IsInOfferMode ||
+            offerItem.IsInReceiveMode && offerItem.Target != uid)
             return;
 
         component.IsInReceiveMode = true;
@@ -111,11 +115,15 @@ public abstract partial class SharedOfferItemSystem : EntitySystem
             return;
 
         _popup.PopupPredicted(Loc.GetString("offer-item-try-give",
-            ("item", Identity.Entity(offerItem.Item.Value, EntityManager)),
-            ("target", Identity.Entity(uid, EntityManager))), component.Target.Value, component.Target.Value);
+                ("item", Identity.Entity(offerItem.Item.Value, EntityManager)),
+                ("target", Identity.Entity(uid, EntityManager))),
+            component.Target.Value,
+            component.Target.Value);
         _popup.PopupClient(Loc.GetString("offer-item-try-give-target",
-            ("user", Identity.Entity(component.Target.Value, EntityManager)),
-            ("item", Identity.Entity(offerItem.Item.Value, EntityManager))), component.Target.Value, uid);
+                ("user", Identity.Entity(component.Target.Value, EntityManager)),
+                ("item", Identity.Entity(offerItem.Item.Value, EntityManager))),
+            component.Target.Value,
+            uid);
 
         args.Handled = true;
     }
@@ -126,14 +134,14 @@ public abstract partial class SharedOfferItemSystem : EntitySystem
             _transform.InRange(args.NewPosition,
                 Transform(component.Target.Value).Coordinates,
                 component.MaxOfferDistance)
-            )
+           )
             return;
 
         UnOffer(uid, component);
     }
 
     /// <summary>
-    /// Resets the <see cref="OfferItemComponent"/> of the user and the target
+    /// Resets the <see cref="OfferItemComponent" /> of the user and the target
     /// </summary>
     protected void UnOffer(EntityUid uid, OfferItemComponent component)
     {
@@ -147,24 +155,31 @@ public abstract partial class SharedOfferItemSystem : EntitySystem
                 if (!_timing.IsFirstTimePredicted)
                 {
                     _popup.PopupClient(Loc.GetString("offer-item-no-give",
-                        ("item", Identity.Entity(component.Item.Value, EntityManager)),
-                        ("target", Identity.Entity(component.Target.Value, EntityManager))), uid, uid);
+                            ("item", Identity.Entity(component.Item.Value, EntityManager)),
+                            ("target", Identity.Entity(component.Target.Value, EntityManager))),
+                        uid,
+                        uid);
                     _popup.PopupEntity(Loc.GetString("offer-item-no-give-target",
-                        ("user", Identity.Entity(uid, EntityManager)),
-                        ("item", Identity.Entity(component.Item.Value, EntityManager))), uid, component.Target.Value);
+                            ("user", Identity.Entity(uid, EntityManager)),
+                            ("item", Identity.Entity(component.Item.Value, EntityManager))),
+                        uid,
+                        component.Target.Value);
                 }
-
             }
             else if (offerItem.Item is not null)
             {
                 if (!_timing.IsFirstTimePredicted)
                 {
                     _popup.PopupClient(Loc.GetString("offer-item-no-give",
-                        ("item", Identity.Entity(offerItem.Item.Value, EntityManager)),
-                        ("target", Identity.Entity(uid, EntityManager))), component.Target.Value, component.Target.Value);
+                            ("item", Identity.Entity(offerItem.Item.Value, EntityManager)),
+                            ("target", Identity.Entity(uid, EntityManager))),
+                        component.Target.Value,
+                        component.Target.Value);
                     _popup.PopupEntity(Loc.GetString("offer-item-no-give-target",
-                        ("user", Identity.Entity(component.Target.Value, EntityManager)),
-                        ("item", Identity.Entity(offerItem.Item.Value, EntityManager))), component.Target.Value, uid);
+                            ("user", Identity.Entity(component.Target.Value, EntityManager)),
+                            ("item", Identity.Entity(offerItem.Item.Value, EntityManager))),
+                        component.Target.Value,
+                        uid);
                 }
             }
 
@@ -205,11 +220,15 @@ public abstract partial class SharedOfferItemSystem : EntitySystem
         if (offerItem.Item is not null)
         {
             _popup.PopupClient(Loc.GetString("offer-item-no-give",
-                ("item", Identity.Entity(offerItem.Item.Value, EntityManager)),
-                ("target", Identity.Entity(uid, EntityManager))), component.Target.Value, component.Target.Value);
+                    ("item", Identity.Entity(offerItem.Item.Value, EntityManager)),
+                    ("target", Identity.Entity(uid, EntityManager))),
+                component.Target.Value,
+                component.Target.Value);
             _popup.PopupEntity(Loc.GetString("offer-item-no-give-target",
-                ("user", Identity.Entity(component.Target.Value, EntityManager)),
-                ("item", Identity.Entity(offerItem.Item.Value, EntityManager))), component.Target.Value, uid);
+                    ("user", Identity.Entity(component.Target.Value, EntityManager)),
+                    ("item", Identity.Entity(offerItem.Item.Value, EntityManager))),
+                component.Target.Value,
+                uid);
         }
 
         if (!offerItem.IsInReceiveMode)
@@ -226,10 +245,8 @@ public abstract partial class SharedOfferItemSystem : EntitySystem
     }
 
     /// <summary>
-    /// Returns true if <see cref="OfferItemComponent.IsInOfferMode"/> = true
+    /// Returns true if <see cref="OfferItemComponent.IsInOfferMode" /> = true
     /// </summary>
-    protected bool IsInOfferMode(EntityUid? entity, OfferItemComponent? component = null)
-    {
-        return entity is not null && Resolve(entity.Value, ref component, false) && component.IsInOfferMode;
-    }
+    protected bool IsInOfferMode(EntityUid? entity, OfferItemComponent? component = null) => entity is not null &&
+                                                                                             Resolve(entity.Value, ref component, false) && component.IsInOfferMode;
 }

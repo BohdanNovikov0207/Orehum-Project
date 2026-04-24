@@ -62,10 +62,9 @@ public abstract partial class SharedToolSystem
         SubscribeLocalEvent<MultipleToolComponent, AfterAutoHandleStateEvent>(OnMultipleToolHandleState);
     }
 
-    private void OnMultipleToolHandleState(EntityUid uid, MultipleToolComponent component, ref AfterAutoHandleStateEvent args)
-    {
-        SetMultipleTool(uid, component);
-    }
+    private void OnMultipleToolHandleState(EntityUid uid,
+        MultipleToolComponent component,
+        ref AfterAutoHandleStateEvent args) => SetMultipleTool(uid, component);
 
     private void OnMultipleToolStartup(EntityUid uid, MultipleToolComponent multiple, ComponentStartup args)
     {
@@ -90,7 +89,7 @@ public abstract partial class SharedToolSystem
         if (multiple.Entries.Length == 0)
             return false;
 
-        multiple.CurrentEntry = (uint)((multiple.CurrentEntry + 1) % multiple.Entries.Length);
+        multiple.CurrentEntry = (uint) ((multiple.CurrentEntry + 1) % multiple.Entries.Length);
         SetMultipleTool(uid, multiple, playSound: true, user: user);
 
         return true;
@@ -119,9 +118,7 @@ public abstract partial class SharedToolSystem
 
         // TODO: Replace this with a better solution later
         if (TryComp<PryingComponent>(uid, out var pryComp))
-        {
             pryComp.Enabled = current.Behavior.Contains("Prying");
-        }
 
         if (playSound && current.ChangeSound != null)
             _audioSystem.PlayPredicted(current.ChangeSound, uid, user);

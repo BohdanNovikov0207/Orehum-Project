@@ -1,4 +1,3 @@
-using System.Linq;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Map.Enumerators;
 
@@ -8,7 +7,7 @@ public sealed class ProtectedGridSystem : EntitySystem
 {
     [Dependency] private readonly SharedMapSystem _map = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         SubscribeLocalEvent<ProtectedGridComponent, MapInitEvent>(OnMapInit);
@@ -63,8 +62,6 @@ public sealed class ProtectedGridSystem : EntitySystem
         }
 
         if (!SharedMapSystem.FromBitmask(args.GridIndices, data))
-        {
             args.Cancelled = true;
-        }
     }
 }

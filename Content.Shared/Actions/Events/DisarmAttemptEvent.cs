@@ -11,9 +11,9 @@ namespace Content.Shared.Actions.Events;
 [ByRefEvent]
 public record struct DisarmAttemptEvent
 {
-    public readonly EntityUid TargetUid;
     public readonly EntityUid DisarmerUid;
     public readonly EntityUid? TargetItemInHandUid;
+    public readonly EntityUid TargetUid;
 
     public bool Cancelled;
 

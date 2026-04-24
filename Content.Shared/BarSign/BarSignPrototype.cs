@@ -19,11 +19,8 @@ using Robust.Shared.Utility;
 namespace Content.Shared.BarSign;
 
 [Prototype]
-public sealed partial class BarSignPrototype : IPrototype
+public sealed class BarSignPrototype : IPrototype
 {
-    [IdDataField, ViewVariables]
-    public string ID { get; private set; } = default!;
-
     [DataField(required: true)]
     public SpriteSpecifier Icon { get; private set; } = default!;
 
@@ -35,4 +32,7 @@ public sealed partial class BarSignPrototype : IPrototype
 
     [DataField]
     public bool Hidden { get; private set; }
+
+    [IdDataField] [ViewVariables]
+    public string ID { get; } = default!;
 }

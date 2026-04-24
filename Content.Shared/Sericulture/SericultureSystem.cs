@@ -10,27 +10,28 @@
 using Content.Shared.Actions;
 using Content.Shared.Cloning.Events;
 using Content.Shared.DoAfter;
-using Content.Shared.Nutrition.EntitySystems;
-using Robust.Shared.Serialization;
-using Content.Shared.Popups;
-using Robust.Shared.Network;
 using Content.Shared.Nutrition.Components;
+using Content.Shared.Nutrition.EntitySystems;
+using Content.Shared.Popups;
 using Content.Shared.Stacks;
+using Robust.Shared.Network;
+using Robust.Shared.Serialization;
 
 namespace Content.Shared.Sericulture;
 
 /// <summary>
-/// Allows mobs to produce materials with <see cref="SericultureComponent"/>.
+/// Allows mobs to produce materials with <see cref="SericultureComponent" />.
 /// </summary>
-public abstract partial class SharedSericultureSystem : EntitySystem
+public abstract class SharedSericultureSystem : EntitySystem
 {
-    // Managers
-    [Dependency] private readonly INetManager _netManager = default!;
-
     // Systems
     [Dependency] private readonly SharedActionsSystem _actionsSystem = default!;
     [Dependency] private readonly SharedDoAfterSystem _doAfterSystem = default!;
+
     [Dependency] private readonly HungerSystem _hungerSystem = default!;
+
+    // Managers
+    [Dependency] private readonly INetManager _netManager = default!;
     [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
     [Dependency] private readonly SharedStackSystem _stackSystem = default!;
 
@@ -47,7 +48,7 @@ public abstract partial class SharedSericultureSystem : EntitySystem
 
     private void OnClone(Entity<SericultureComponent> ent, ref CloningEvent args)
     {
-        if(!args.Settings.EventComponents.Contains(Factory.GetRegistration(ent.Comp.GetType()).Name))
+        if (!args.Settings.EventComponents.Contains(Factory.GetRegistration(ent.Comp.GetType()).Name))
             return;
 
         var comp = EnsureComp<SericultureComponent>(args.CloneUid);
@@ -62,18 +63,14 @@ public abstract partial class SharedSericultureSystem : EntitySystem
     /// <summary>
     /// Giveths the action to preform sericulture on the entity
     /// </summary>
-    private void OnMapInit(EntityUid uid, SericultureComponent comp, MapInitEvent args)
-    {
+    private void OnMapInit(EntityUid uid, SericultureComponent comp, MapInitEvent args) =>
         _actionsSystem.AddAction(uid, ref comp.ActionEntity, comp.Action);
-    }
 
     /// <summary>
     /// Takeths away the action to preform sericulture from the entity.
     /// </summary>
-    private void OnCompRemove(EntityUid uid, SericultureComponent comp, ComponentShutdown args)
-    {
+    private void OnCompRemove(EntityUid uid, SericultureComponent comp, ComponentShutdown args) =>
         _actionsSystem.RemoveAction(uid, comp.ActionEntity);
-    }
 
     private void OnSericultureStart(EntityUid uid, SericultureComponent comp, SericultureActionEvent args)
     {
@@ -88,7 +85,8 @@ public abstract partial class SharedSericultureSystem : EntitySystem
         }
 
         var doAfter = new DoAfterArgs(EntityManager, uid, comp.ProductionLength, new SericultureDoAfterEvent(), uid)
-        { // I'm not sure if more things should be put here, but imo ideally it should probably be set in the component/YAML. Not sure if this is currently possible.
+        {
+            // I'm not sure if more things should be put here, but imo ideally it should probably be set in the component/YAML. Not sure if this is currently possible.
             BreakOnMove = true,
             BlockDuplicate = true,
             BreakOnDamage = true,
@@ -132,10 +130,14 @@ public abstract partial class SharedSericultureSystem : EntitySystem
 /// <summary>
 /// Should be relayed upon using the action.
 /// </summary>
-public sealed partial class SericultureActionEvent : InstantActionEvent { }
+public sealed partial class SericultureActionEvent : InstantActionEvent
+{
+}
 
 /// <summary>
 /// Is relayed at the end of the sericulturing doafter.
 /// </summary>
-[Serializable, NetSerializable]
-public sealed partial class SericultureDoAfterEvent : SimpleDoAfterEvent { }
+[Serializable] [NetSerializable]
+public sealed partial class SericultureDoAfterEvent : SimpleDoAfterEvent
+{
+}

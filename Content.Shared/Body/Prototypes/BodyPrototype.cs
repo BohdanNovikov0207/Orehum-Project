@@ -17,17 +17,8 @@ using Robust.Shared.Prototypes;
 namespace Content.Shared.Body.Prototypes;
 
 [Prototype]
-public sealed partial class BodyPrototype : IPrototype
+public sealed class BodyPrototype : IPrototype
 {
-    [IdDataField] public string ID { get; private set; } = default!;
-
-    [DataField("name")]
-    public string Name { get; private set; } = "";
-
-    [DataField("root")] public string Root { get; private set; } = string.Empty;
-
-    [DataField("slots")] public Dictionary<string, BodyPrototypeSlot> Slots { get; private set; } = new();
-
     private BodyPrototype() { }
 
     public BodyPrototype(string id, string name, string root, Dictionary<string, BodyPrototypeSlot> slots)
@@ -37,7 +28,18 @@ public sealed partial class BodyPrototype : IPrototype
         Root = root;
         Slots = slots;
     }
+
+    [DataField("name")]
+    public string Name { get; private set; } = "";
+
+    [DataField("root")] public string Root { get; private set; } = string.Empty;
+
+    [DataField("slots")] public Dictionary<string, BodyPrototypeSlot> Slots { get; private set; } = new();
+    [IdDataField] public string ID { get; } = default!;
 }
 
 [DataRecord]
-public sealed partial record BodyPrototypeSlot(EntProtoId? Part, HashSet<string> Connections, Dictionary<string, string> Organs);
+public sealed record BodyPrototypeSlot(
+    EntProtoId? Part,
+    HashSet<string> Connections,
+    Dictionary<string, string> Organs);

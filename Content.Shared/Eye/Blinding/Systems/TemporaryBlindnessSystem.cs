@@ -26,15 +26,11 @@ public sealed class TemporaryBlindnessSystem : EntitySystem
         SubscribeLocalEvent<TemporaryBlindnessComponent, CanSeeAttemptEvent>(OnBlindTrySee);
     }
 
-    private void OnStartup(EntityUid uid, TemporaryBlindnessComponent component, ComponentStartup args)
-    {
+    private void OnStartup(EntityUid uid, TemporaryBlindnessComponent component, ComponentStartup args) =>
         _blindableSystem.UpdateIsBlind(uid);
-    }
 
-    private void OnShutdown(EntityUid uid, TemporaryBlindnessComponent component, ComponentShutdown args)
-    {
+    private void OnShutdown(EntityUid uid, TemporaryBlindnessComponent component, ComponentShutdown args) =>
         _blindableSystem.UpdateIsBlind(uid);
-    }
 
     private void OnBlindTrySee(EntityUid uid, TemporaryBlindnessComponent component, CanSeeAttemptEvent args)
     {

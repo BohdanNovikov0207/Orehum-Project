@@ -16,8 +16,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Numerics;
+using Content.Shared._EinsteinEngines.Flight.Events;
 using Robust.Shared.Map;
-using Content.Shared._EinsteinEngines.Flight.Events; // Goobstation
+
+// Goobstation
 
 namespace Content.Shared.Gravity;
 
@@ -41,7 +43,13 @@ public abstract class SharedFloatingVisualizerSystem : EntitySystem
     /// <summary>
     /// Offsets a sprite with a linear interpolation animation
     /// </summary>
-    public virtual void FloatAnimation(EntityUid uid, Vector2 offset, string animationKey, float animationTime, bool stop = false) { }
+    public virtual void FloatAnimation(EntityUid uid,
+        Vector2 offset,
+        string animationKey,
+        float animationTime,
+        bool stop = false)
+    {
+    }
 
     protected bool CanFloat(EntityUid uid, FloatingVisualsComponent component, TransformComponent? transform = null)
     {

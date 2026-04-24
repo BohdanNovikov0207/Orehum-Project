@@ -81,10 +81,10 @@ namespace Content.Shared.Doors.Systems;
 public abstract class SharedFirelockSystem : EntitySystem
 {
     [Dependency] private readonly AccessReaderSystem _accessReaderSystem = default!;
-    [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
     [Dependency] private readonly SharedDoorSystem _doorSystem = default!;
     [Dependency] private readonly IGameTiming _gameTiming = default!;
+    [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
 
     public override void Initialize()
     {
@@ -119,14 +119,25 @@ public abstract class SharedFirelockSystem : EntitySystem
         return _doorSystem.OnPartialClose(uid, door);
     }
 
+    private void OnExamined(Entity<FirelockComponent> ent, ref ExaminedEvent args)
+    {
+        using (args.PushGroup(nameof(FirelockComponent)))
+        {
+            if (ent.Comp.Pressure)
+                args.PushMarkup(Loc.GetString("firelock-component-examine-pressure-warning"));
+            if (ent.Comp.Temperature)
+                args.PushMarkup(Loc.GetString("firelock-component-examine-temperature-warning"));
+        }
+    }
+
     #region Access/Prying
 
     private void OnBeforeDoorOpened(EntityUid uid, FirelockComponent component, BeforeDoorOpenedEvent args)
     {
         // Give the Door remote the ability to force a firelock open even if it is holding back dangerous gas
-        var overrideAccess = (args.User != null) && _accessReaderSystem.IsAllowed(args.User.Value, uid);
+        var overrideAccess = args.User != null && _accessReaderSystem.IsAllowed(args.User.Value, uid);
 
-        if (!component.Powered || (!overrideAccess && component.IsLocked))
+        if (!component.Powered || !overrideAccess && component.IsLocked)
             args.Cancel();
         else if (args.User != null)
             WarnPlayer((uid, component), args.User.Value);
@@ -172,21 +183,18 @@ public abstract class SharedFirelockSystem : EntitySystem
         }
     }
 
-    private void OnAfterPried(EntityUid uid, FirelockComponent component, ref PriedEvent args)
-    {
+    private void OnAfterPried(EntityUid uid, FirelockComponent component, ref PriedEvent args) =>
         component.EmergencyCloseCooldown = _gameTiming.CurTime + component.EmergencyCloseCooldownDuration;
-    }
 
     #endregion
 
     #region Visuals
 
-    protected virtual void OnComponentStartup(Entity<FirelockComponent> ent, ref ComponentStartup args)
-    {
-        UpdateVisuals(ent.Owner,ent.Comp, args);
-    }
+    protected virtual void OnComponentStartup(Entity<FirelockComponent> ent, ref ComponentStartup args) =>
+        UpdateVisuals(ent.Owner, ent.Comp, args);
 
-    private void UpdateVisuals(EntityUid uid, FirelockComponent component, EntityEventArgs args) => UpdateVisuals(uid, component);
+    private void UpdateVisuals(EntityUid uid, FirelockComponent component, EntityEventArgs args) =>
+        UpdateVisuals(uid, component);
 
     private void UpdateVisuals(EntityUid uid,
         FirelockComponent? firelock = null,
@@ -212,34 +220,23 @@ public abstract class SharedFirelockSystem : EntitySystem
     }
 
     #endregion
-
-    private void OnExamined(Entity<FirelockComponent> ent, ref ExaminedEvent args)
-    {
-        using (args.PushGroup(nameof(FirelockComponent)))
-        {
-            if (ent.Comp.Pressure)
-                args.PushMarkup(Loc.GetString("firelock-component-examine-pressure-warning"));
-            if (ent.Comp.Temperature)
-                args.PushMarkup(Loc.GetString("firelock-component-examine-temperature-warning"));
-        }
-    }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum FirelockVisuals : byte
 {
     PressureWarning,
     TemperatureWarning,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum FirelockVisualLayersPressure : byte
 {
-    Base
+    Base,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum FirelockVisualLayersTemperature : byte
 {
-    Base
+    Base,
 }

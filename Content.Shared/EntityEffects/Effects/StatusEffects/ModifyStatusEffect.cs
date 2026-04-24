@@ -1,4 +1,3 @@
-using Content.Shared.EntityEffects;
 using Content.Shared.StatusEffectNew;
 using JetBrains.Annotations;
 using Robust.Shared.Prototypes;
@@ -14,17 +13,17 @@ public sealed partial class ModifyStatusEffect : EntityEffect // TODO Goobstatio
     [DataField(required: true)]
     public EntProtoId EffectProto;
 
-    /// <summary>
-    /// Time for which status effect should be applied. Behaviour changes according to <see cref="Refresh" />.
-    /// </summary>
-    [DataField]
-    public float Time = 2.0f;
-
     /// <remarks>
     /// true - refresh status effect time (update to greater value), false - accumulate status effect time.
     /// </remarks>
     [DataField]
     public bool Refresh = true;
+
+    /// <summary>
+    /// Time for which status effect should be applied. Behaviour changes according to <see cref="Refresh" />.
+    /// </summary>
+    [DataField]
+    public float Time = 2.0f;
 
     /// <summary>
     /// Should this effect add the status effect, remove time from it, or set its cooldown?

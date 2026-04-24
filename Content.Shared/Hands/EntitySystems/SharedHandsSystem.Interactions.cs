@@ -50,15 +50,136 @@ public abstract partial class SharedHandsSystem : EntitySystem
         SubscribeLocalEvent<HandsComponent, ExaminedEvent>(HandleExamined);
 
         CommandBinds.Builder
-            .Bind(ContentKeyFunctions.UseItemInHand, InputCmdHandler.FromDelegate(HandleUseItem, handle: false, outsidePrediction: false))
-            .Bind(ContentKeyFunctions.AltUseItemInHand, InputCmdHandler.FromDelegate(HandleAltUseInHand, handle: false, outsidePrediction: false))
-            .Bind(ContentKeyFunctions.SwapHands, InputCmdHandler.FromDelegate(SwapHandsPressed, handle: false, outsidePrediction: false))
-            .Bind(ContentKeyFunctions.SwapHandsReverse, InputCmdHandler.FromDelegate(SwapHandsReversePressed, handle: false, outsidePrediction: false))
+            .Bind(ContentKeyFunctions.UseItemInHand,
+                InputCmdHandler.FromDelegate(HandleUseItem, handle: false, outsidePrediction: false))
+            .Bind(ContentKeyFunctions.AltUseItemInHand,
+                InputCmdHandler.FromDelegate(HandleAltUseInHand, handle: false, outsidePrediction: false))
+            .Bind(ContentKeyFunctions.SwapHands,
+                InputCmdHandler.FromDelegate(SwapHandsPressed, handle: false, outsidePrediction: false))
+            .Bind(ContentKeyFunctions.SwapHandsReverse,
+                InputCmdHandler.FromDelegate(SwapHandsReversePressed, handle: false, outsidePrediction: false))
             .Bind(ContentKeyFunctions.Drop, new PointerInputCmdHandler(DropPressed))
             .Register<SharedHandsSystem>();
     }
 
+    public bool TryActivateItemInHand(EntityUid uid, HandsComponent? handsComp = null, string? handName = null)
+    {
+        if (!Resolve(uid, ref handsComp, false))
+            return false;
+
+        var hand = handName;
+        if (!TryGetHand(uid, hand, out _))
+            hand = handsComp.ActiveHandId;
+
+        if (!TryGetHeldItem((uid, handsComp), hand, out var held))
+            return false;
+
+        return _interactionSystem.InteractionActivate(uid, held.Value);
+    }
+
+    public bool TryInteractHandWithActiveHand(EntityUid uid, string handName, HandsComponent? handsComp = null)
+    {
+        if (!Resolve(uid, ref handsComp, false))
+            return false;
+
+        if (!TryGetActiveItem((uid, handsComp), out var activeHeldItem))
+            return false;
+
+        if (!TryGetHeldItem((uid, handsComp), handName, out var held))
+            return false;
+
+        _interactionSystem.InteractUsing(uid, activeHeldItem.Value, held.Value, Transform(held.Value).Coordinates);
+        return true;
+    }
+
+    public bool TryUseItemInHand(EntityUid uid,
+        bool altInteract = false,
+        HandsComponent? handsComp = null,
+        string? handName = null)
+    {
+        if (!Resolve(uid, ref handsComp, false))
+            return false;
+
+        var hand = handName;
+        if (!TryGetHand(uid, hand, out _))
+            hand = handsComp.ActiveHandId;
+
+        if (!TryGetHeldItem((uid, handsComp), hand, out var held))
+            return false;
+
+        if (altInteract)
+            return _interactionSystem.AltInteract(uid, held.Value);
+        return _interactionSystem.UseInHandInteraction(uid, held.Value);
+    }
+
+    /// <summary>
+    /// Moves an entity from one hand to the active hand.
+    /// </summary>
+    public bool TryMoveHeldEntityToActiveHand(EntityUid uid,
+        string handName,
+        bool checkActionBlocker = true,
+        HandsComponent? handsComp = null)
+    {
+        if (!Resolve(uid, ref handsComp))
+            return false;
+
+        if (handsComp.ActiveHandId == null || !HandIsEmpty((uid, handsComp), handsComp.ActiveHandId))
+            return false;
+
+        if (!TryGetHeldItem((uid, handsComp), handName, out var entity))
+            return false;
+
+        if (!CanDropHeld(uid, handName, checkActionBlocker))
+            return false;
+
+        if (!CanPickupToHand(uid, entity.Value, handsComp.ActiveHandId, checkActionBlocker, handsComp))
+            return false;
+
+        DoDrop(uid, handName, false, false);
+        DoPickup(uid, handsComp.ActiveHandId, entity.Value, handsComp, false);
+        return true;
+    }
+
+    private void OnGetUsedEntity(EntityUid uid, HandsComponent component, ref GetUsedEntityEvent args)
+    {
+        if (args.Handled)
+            return;
+
+        if (TryGetActiveItem((uid, component), out var activeHeldItem))
+        {
+            // allow for the item to return a different entity, e.g. virtual items
+            RaiseLocalEvent(activeHeldItem.Value, ref args);
+        }
+
+        args.Used ??= activeHeldItem;
+    }
+
+    //TODO: Actually shows all items/clothing/etc.
+    private void HandleExamined(EntityUid examinedUid, HandsComponent handsComp, ExaminedEvent args)
+    {
+        var heldItemNames = EnumerateHeld((examinedUid, handsComp))
+            .Where(entity => !HasComp<VirtualItemComponent>(entity))
+            .Select(item => FormattedMessage.EscapeText(Identity.Name(item, EntityManager)))
+            .Select(itemName => Loc.GetString("comp-hands-examine-wrapper", ("item", itemName)))
+            .ToList();
+
+        var locKey = heldItemNames.Count != 0 ? "comp-hands-examine" : "comp-hands-examine-empty";
+        var locUser = ("user", Identity.Entity(examinedUid, EntityManager));
+        var locItems = ("items", ContentLocalizationManager.FormatList(heldItemNames));
+
+        // WWDP examine
+        if (args.Examiner == args.Examined) // Use the selfaware locale when inspecting yourself
+            locKey += "-selfaware";
+
+        using (args.PushGroup(nameof(HandsComponent), 99)) //  priority for examine
+        {
+            args.PushMarkup("- " + Loc.GetString(locKey, locUser, locItems)); // "-" for better formatting
+        }
+        // WWDP edit end
+    }
+
     #region Event and Key-binding Handlers
+
     private void HandleAltUseInHand(ICommonSession? session)
     {
         if (session?.AttachedEntity != null)
@@ -101,15 +222,9 @@ public abstract partial class SharedHandsSystem : EntitySystem
             TryUseItemInHand(args.SenderSession.AttachedEntity.Value, true, handName: msg.HandName);
     }
 
-    private void SwapHandsPressed(ICommonSession? session)
-    {
-        SwapHands(session, false);
-    }
+    private void SwapHandsPressed(ICommonSession? session) => SwapHands(session, false);
 
-    private void SwapHandsReversePressed(ICommonSession? session)
-    {
-        SwapHands(session, true);
-    }
+    private void SwapHandsReversePressed(ICommonSession? session) => SwapHands(session, true);
 
     private void SwapHands(ICommonSession? session, bool reverse)
     {
@@ -168,6 +283,7 @@ public abstract partial class SharedHandsSystem : EntitySystem
                 if (userEv.Cancelled || targEv.Cancelled)
                     return false;
             }
+
             var activeHand = GetActiveHand(session.AttachedEntity.Value);
             TryDrop(ent, activeHand!, coords); // Supress nullable, because if active hand has something, it exists.
             // Goobstation end
@@ -176,115 +292,6 @@ public abstract partial class SharedHandsSystem : EntitySystem
         // always send to server.
         return false;
     }
+
     #endregion
-
-    public bool TryActivateItemInHand(EntityUid uid, HandsComponent? handsComp = null, string? handName = null)
-    {
-        if (!Resolve(uid, ref handsComp, false))
-            return false;
-
-        var hand = handName;
-        if (!TryGetHand(uid, hand, out _))
-            hand = handsComp.ActiveHandId;
-
-        if (!TryGetHeldItem((uid, handsComp), hand, out var held))
-            return false;
-
-        return _interactionSystem.InteractionActivate(uid, held.Value);
-    }
-
-    public bool TryInteractHandWithActiveHand(EntityUid uid, string handName, HandsComponent? handsComp = null)
-    {
-        if (!Resolve(uid, ref handsComp, false))
-            return false;
-
-        if (!TryGetActiveItem((uid, handsComp), out var activeHeldItem))
-            return false;
-
-        if (!TryGetHeldItem((uid, handsComp), handName, out var held))
-            return false;
-
-        _interactionSystem.InteractUsing(uid, activeHeldItem.Value, held.Value, Transform(held.Value).Coordinates);
-        return true;
-    }
-
-    public bool TryUseItemInHand(EntityUid uid, bool altInteract = false, HandsComponent? handsComp = null, string? handName = null)
-    {
-        if (!Resolve(uid, ref handsComp, false))
-            return false;
-
-        var hand = handName;
-        if (!TryGetHand(uid, hand, out _))
-            hand = handsComp.ActiveHandId;
-
-        if (!TryGetHeldItem((uid, handsComp), hand, out var held))
-            return false;
-
-        if (altInteract)
-            return _interactionSystem.AltInteract(uid, held.Value);
-        return _interactionSystem.UseInHandInteraction(uid, held.Value);
-    }
-
-    /// <summary>
-    ///     Moves an entity from one hand to the active hand.
-    /// </summary>
-    public bool TryMoveHeldEntityToActiveHand(EntityUid uid, string handName, bool checkActionBlocker = true, HandsComponent? handsComp = null)
-    {
-        if (!Resolve(uid, ref handsComp))
-            return false;
-
-        if (handsComp.ActiveHandId == null || !HandIsEmpty((uid, handsComp), handsComp.ActiveHandId))
-            return false;
-
-        if (!TryGetHeldItem((uid, handsComp), handName, out var entity))
-            return false;
-
-        if (!CanDropHeld(uid, handName, checkActionBlocker))
-            return false;
-
-        if (!CanPickupToHand(uid, entity.Value, handsComp.ActiveHandId, checkActionBlocker, handsComp))
-            return false;
-
-        DoDrop(uid, handName, false, log: false);
-        DoPickup(uid, handsComp.ActiveHandId, entity.Value, handsComp, log: false);
-        return true;
-    }
-
-    private void OnGetUsedEntity(EntityUid uid, HandsComponent component, ref GetUsedEntityEvent args)
-    {
-        if (args.Handled)
-            return;
-
-        if (TryGetActiveItem((uid, component), out var activeHeldItem))
-        {
-            // allow for the item to return a different entity, e.g. virtual items
-            RaiseLocalEvent(activeHeldItem.Value, ref args);
-        }
-
-        args.Used ??= activeHeldItem;
-    }
-
-    //TODO: Actually shows all items/clothing/etc.
-    private void HandleExamined(EntityUid examinedUid, HandsComponent handsComp, ExaminedEvent args)
-    {
-        var heldItemNames = EnumerateHeld((examinedUid, handsComp))
-            .Where(entity => !HasComp<VirtualItemComponent>(entity))
-            .Select(item => FormattedMessage.EscapeText(Identity.Name(item, EntityManager)))
-            .Select(itemName => Loc.GetString("comp-hands-examine-wrapper", ("item", itemName)))
-            .ToList();
-
-        var locKey = heldItemNames.Count != 0 ? "comp-hands-examine" : "comp-hands-examine-empty";
-        var locUser = ("user", Identity.Entity(examinedUid, EntityManager));
-        var locItems = ("items", ContentLocalizationManager.FormatList(heldItemNames));
-
-        // WWDP examine
-        if (args.Examiner == args.Examined) // Use the selfaware locale when inspecting yourself
-            locKey += "-selfaware";
-
-        using (args.PushGroup(nameof(HandsComponent), 99)) //  priority for examine
-        {
-            args.PushMarkup("- " + Loc.GetString(locKey, locUser, locItems)); // "-" for better formatting
-        }
-        // WWDP edit end
-    }
 }

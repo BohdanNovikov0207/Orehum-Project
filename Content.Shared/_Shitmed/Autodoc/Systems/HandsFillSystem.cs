@@ -31,7 +31,7 @@ public sealed class HandsFillSystem : EntitySystem
         {
             _hands.AddHand((ent, hands), name, HandLocation.Middle);
 
-            if (fill is not {} id)
+            if (fill is not { } id)
                 continue;
 
             var uid = Spawn(id, coords);

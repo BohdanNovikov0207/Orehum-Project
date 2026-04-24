@@ -18,9 +18,8 @@ namespace Content.Shared.Players.PlayTimeTracking;
 /// </summary>
 public sealed class MsgPlayTime : NetMessage
 {
-    public override MsgGroups MsgGroup => MsgGroups.EntityEvent;
-
     public Dictionary<string, TimeSpan> Trackers = new();
+    public override MsgGroups MsgGroup => MsgGroups.EntityEvent;
 
     public override void ReadFromBuffer(NetIncomingMessage buffer, IRobustSerializer serializer)
     {

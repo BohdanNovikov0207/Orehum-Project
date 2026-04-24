@@ -15,4 +15,6 @@ public readonly record struct ConsumingFoodEvent(EntityUid Food, FixedPoint2 Vol
 public record struct ImmuneToPoisonDamageEvent(bool Immune = false);
 
 [ByRefEvent]
-public record struct ExcludeMetabolismGroupsEvent(EntityUid Metabolizer, List<ProtoId<MetabolismGroupPrototype>>? Groups = null);
+public record struct ExcludeMetabolismGroupsEvent(
+    EntityUid Metabolizer,
+    List<ProtoId<MetabolismGroupPrototype>>? Groups = null);

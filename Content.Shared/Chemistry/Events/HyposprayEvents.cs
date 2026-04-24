@@ -8,13 +8,12 @@ using Content.Shared.Inventory;
 
 namespace Content.Shared.Chemistry.Hypospray.Events;
 
-public abstract partial class BeforeHyposprayInjectsTargetEvent : CancellableEntityEventArgs, IInventoryRelayEvent
+public abstract class BeforeHyposprayInjectsTargetEvent : CancellableEntityEventArgs, IInventoryRelayEvent
 {
-    public SlotFlags TargetSlots { get; } = SlotFlags.WITHOUT_POCKET;
-    public EntityUid EntityUsingHypospray;
     public readonly EntityUid Hypospray;
-    public EntityUid TargetGettingInjected;
+    public EntityUid EntityUsingHypospray;
     public string? InjectMessageOverride;
+    public EntityUid TargetGettingInjected;
 
     public BeforeHyposprayInjectsTargetEvent(EntityUid user, EntityUid hypospray, EntityUid target)
     {
@@ -23,22 +22,32 @@ public abstract partial class BeforeHyposprayInjectsTargetEvent : CancellableEnt
         TargetGettingInjected = target;
         InjectMessageOverride = null;
     }
+
+    public SlotFlags TargetSlots { get; } = SlotFlags.WITHOUT_POCKET;
 }
 
 /// <summary>
-///     This event is raised on the user using the hypospray before the hypospray is injected.
-///     The event is triggered on the user and all their clothing.
+/// This event is raised on the user using the hypospray before the hypospray is injected.
+/// The event is triggered on the user and all their clothing.
 /// </summary>
 public sealed class SelfBeforeHyposprayInjectsEvent : BeforeHyposprayInjectsTargetEvent
 {
-    public SelfBeforeHyposprayInjectsEvent(EntityUid user, EntityUid hypospray, EntityUid target) : base(user, hypospray, target) { }
+    public SelfBeforeHyposprayInjectsEvent(EntityUid user, EntityUid hypospray, EntityUid target) : base(user,
+        hypospray,
+        target)
+    {
+    }
 }
 
 /// <summary>
-///     This event is raised on the target before the hypospray is injected.
-///     The event is triggered on the target itself and all its clothing.
+/// This event is raised on the target before the hypospray is injected.
+/// The event is triggered on the target itself and all its clothing.
 /// </summary>
 public sealed class TargetBeforeHyposprayInjectsEvent : BeforeHyposprayInjectsTargetEvent
 {
-    public TargetBeforeHyposprayInjectsEvent(EntityUid user, EntityUid hypospray, EntityUid target) : base(user, hypospray, target) { }
+    public TargetBeforeHyposprayInjectsEvent(EntityUid user, EntityUid hypospray, EntityUid target) : base(user,
+        hypospray,
+        target)
+    {
+    }
 }

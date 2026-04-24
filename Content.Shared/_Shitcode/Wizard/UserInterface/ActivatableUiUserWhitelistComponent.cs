@@ -10,12 +10,12 @@ using Robust.Shared.GameStates;
 
 namespace Content.Shared._Goobstation.Wizard.UserInterface;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class ActivatableUiUserWhitelistComponent : Component
 {
-    [DataField(required: true)]
-    public EntityWhitelist Whitelist;
-
     [DataField]
     public bool CheckMind;
+
+    [DataField(required: true)]
+    public EntityWhitelist Whitelist;
 }

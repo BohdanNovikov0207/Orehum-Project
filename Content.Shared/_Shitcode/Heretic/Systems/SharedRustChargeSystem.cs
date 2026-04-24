@@ -21,10 +21,10 @@ namespace Content.Shared._Shitcode.Heretic.Systems;
 
 public abstract class SharedRustChargeSystem : EntitySystem
 {
-    [Dependency] private readonly TagSystem _tag = default!;
-    [Dependency] private readonly SharedStunSystem _stun = default!;
-    [Dependency] private readonly DamageableSystem _damageable = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly DamageableSystem _damageable = default!;
+    [Dependency] private readonly SharedStunSystem _stun = default!;
+    [Dependency] private readonly TagSystem _tag = default!;
 
     public override void Initialize()
     {
@@ -48,21 +48,17 @@ public abstract class SharedRustChargeSystem : EntitySystem
         RemCompDeferred<RustObjectsInRadiusComponent>(ent);
     }
 
-    private void OnBeforeRustChargeStatusEffect(Entity<RustChargeComponent> ent, ref BeforeOldStatusEffectAddedEvent args)
+    private void OnBeforeRustChargeStatusEffect(Entity<RustChargeComponent> ent,
+        ref BeforeOldStatusEffectAddedEvent args)
     {
         if (args.EffectKey == "KnockedDown")
             args.Cancelled = true;
     }
 
-    private void OnInteractAttempt(Entity<RustChargeComponent> ent, ref InteractionAttemptEvent args)
-    {
+    private void OnInteractAttempt(Entity<RustChargeComponent> ent, ref InteractionAttemptEvent args) =>
         args.Cancelled = true;
-    }
 
-    private void OnDownAttempt(Entity<RustChargeComponent> ent, ref DownAttemptEvent args)
-    {
-        args.Cancel();
-    }
+    private void OnDownAttempt(Entity<RustChargeComponent> ent, ref DownAttemptEvent args) => args.Cancel();
 
     private void OnPreventCollide(Entity<RustChargeComponent> ent, ref PreventCollideEvent args)
     {
@@ -76,15 +72,10 @@ public abstract class SharedRustChargeSystem : EntitySystem
             args.Cancelled = true;
     }
 
-    private void OnStopThrow(Entity<RustChargeComponent> ent, ref StopThrowEvent args)
-    {
+    private void OnStopThrow(Entity<RustChargeComponent> ent, ref StopThrowEvent args) =>
         RemCompDeferred(ent.Owner, ent.Comp);
-    }
 
-    private void OnLand(Entity<RustChargeComponent> ent, ref LandEvent args)
-    {
-        RemCompDeferred(ent.Owner, ent.Comp);
-    }
+    private void OnLand(Entity<RustChargeComponent> ent, ref LandEvent args) => RemCompDeferred(ent.Owner, ent.Comp);
 
     private void OnCollide(Entity<RustChargeComponent> ent, ref StartCollideEvent args)
     {
@@ -106,7 +97,7 @@ public abstract class SharedRustChargeSystem : EntitySystem
         // Damage mobs
         if (HasComp<MobStateComponent>(other))
         {
-            _stun.KnockdownOrStun(other, ent.Comp.KnockdownTime, true);
+            _stun.KnockdownOrStun(other, ent.Comp.KnockdownTime);
 
             _damageable.TryChangeDamage(other,
                 ent.Comp.Damage,

@@ -3,8 +3,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Alert;
 using Content.Goobstation.Maths.FixedPoint;
+using Content.Shared.Alert;
 using Robust.Shared.Audio;
 using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
@@ -15,7 +15,7 @@ namespace Content.Shared.Rootable;
 /// <summary>
 /// A rooting action, for Diona.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState, AutoGenerateComponentPause]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState] [AutoGenerateComponentPause]
 public sealed partial class RootableComponent : Component
 {
     /// <summary>
@@ -27,8 +27,27 @@ public sealed partial class RootableComponent : Component
     /// <summary>
     /// Entity to hold the action prototype.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public EntityUid? ActionEntity;
+
+    /// <summary>
+    /// The time at which the next absorption metabolism will occur.
+    /// </summary>
+    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))] [AutoNetworkedField]
+    [AutoPausedField]
+    public TimeSpan NextUpdate;
+
+    /// <summary>
+    /// The puddle that is currently affecting this entity.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public EntityUid? PuddleEntity;
+
+    /// <summary>
+    /// Is the entity currently rooted?
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public bool Rooted;
 
     /// <summary>
     /// The prototype for the "rooted" alert, indicating the user that they are rooted.
@@ -37,35 +56,10 @@ public sealed partial class RootableComponent : Component
     public ProtoId<AlertPrototype> RootedAlert = "Rooted";
 
     /// <summary>
-    /// Is the entity currently rooted?
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public bool Rooted;
-
-    /// <summary>
-    /// The puddle that is currently affecting this entity.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public EntityUid? PuddleEntity;
-
-    /// <summary>
-    /// The time at which the next absorption metabolism will occur.
-    /// </summary>
-    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer)), AutoNetworkedField]
-    [AutoPausedField]
-    public TimeSpan NextUpdate;
-
-    /// <summary>
-    /// The max rate (in reagent units per transfer) at which chemicals are transferred from the puddle to the rooted entity.
+    /// Sound that plays when rooting is toggled.
     /// </summary>
     [DataField]
-    public FixedPoint2 TransferRate = 0.75;
-
-    /// <summary>
-    /// The frequency of which chemicals are transferred from the puddle to the rooted entity.
-    /// </summary>
-    [DataField]
-    public TimeSpan TransferFrequency = TimeSpan.FromSeconds(1);
+    public SoundSpecifier RootSound = new SoundPathSpecifier("/Audio/Voice/Diona/diona_salute.ogg");
 
     /// <summary>
     /// The movement speed modifier for when rooting is active.
@@ -74,8 +68,14 @@ public sealed partial class RootableComponent : Component
     public float SpeedModifier = 0.8f;
 
     /// <summary>
-    /// Sound that plays when rooting is toggled.
+    /// The frequency of which chemicals are transferred from the puddle to the rooted entity.
     /// </summary>
     [DataField]
-    public SoundSpecifier RootSound = new SoundPathSpecifier("/Audio/Voice/Diona/diona_salute.ogg");
+    public TimeSpan TransferFrequency = TimeSpan.FromSeconds(1);
+
+    /// <summary>
+    /// The max rate (in reagent units per transfer) at which chemicals are transferred from the puddle to the rooted entity.
+    /// </summary>
+    [DataField]
+    public FixedPoint2 TransferRate = 0.75;
 }

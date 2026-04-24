@@ -16,19 +16,15 @@ public abstract partial class SharedShuttleSystem
      * Handles the label visibility on radar controls. This can be hiding the label or applying other effects.
      */
 
-    protected virtual void UpdateIFFInterfaces(EntityUid gridUid, IFFComponent component) {}
+    protected virtual void UpdateIFFInterfaces(EntityUid gridUid, IFFComponent component) { }
 
     public Color GetIFFColor(EntityUid gridUid, bool self = false, IFFComponent? component = null)
     {
         if (self)
-        {
             return IFFComponent.SelfColor;
-        }
 
         if (!Resolve(gridUid, ref component, false))
-        {
             return IFFComponent.IFFColor;
-        }
 
         return component.Color;
     }
@@ -38,14 +34,10 @@ public abstract partial class SharedShuttleSystem
         var entName = MetaData(gridUid).EntityName;
 
         if (self)
-        {
             return entName;
-        }
 
         if (Resolve(gridUid, ref component, false) && (component.Flags & (IFFFlags.HideLabel | IFFFlags.Hide)) != 0x0)
-        {
             return null;
-        }
 
         return string.IsNullOrEmpty(entName) ? Loc.GetString("shuttle-console-unknown") : entName;
     }

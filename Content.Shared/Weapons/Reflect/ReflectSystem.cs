@@ -85,13 +85,14 @@ using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using Content.Shared._Goobstation.Wizard.Projectiles;
 using Content.Shared.Administration.Logs;
-using Content.Shared.Audio;
 using Content.Shared.Damage;
 using Content.Shared.Database;
+using Content.Shared.Examine;
 using Content.Shared.Hands;
 using Content.Shared.Inventory;
 using Content.Shared.Inventory.Events;
 using Content.Shared.Item.ItemToggle;
+using Content.Shared.Localizations;
 using Content.Shared.Popups;
 using Content.Shared.Projectiles;
 using Content.Shared.Weapons.Ranged.Components;
@@ -101,8 +102,6 @@ using Robust.Shared.Network;
 using Robust.Shared.Physics.Components;
 using Robust.Shared.Physics.Systems;
 using Robust.Shared.Random;
-using Content.Shared.Examine;
-using Content.Shared.Localizations;
 
 namespace Content.Shared.Weapons.Reflect;
 
@@ -111,23 +110,23 @@ namespace Content.Shared.Weapons.Reflect;
 /// </summary>
 public sealed class ReflectSystem : EntitySystem
 {
-    [Dependency] private readonly INetManager _netManager = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
-    [Dependency] private readonly ItemToggleSystem _toggle = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly InventorySystem _inventorySystem = default!;
     [Dependency] private readonly DamageableSystem _damageable = default!; // WD EDIT
+    [Dependency] private readonly InventorySystem _inventorySystem = default!;
+    [Dependency] private readonly INetManager _netManager = default!;
+    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly ItemToggleSystem _toggle = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     public override void Initialize()
     {
         base.Initialize();
 
-        Subs.SubscribeWithRelay<ReflectComponent, ProjectileReflectAttemptEvent>(OnReflectUserCollide, baseEvent: false);
-        Subs.SubscribeWithRelay<ReflectComponent, HitScanReflectAttemptEvent>(OnReflectUserHitscan, baseEvent: false);
+        Subs.SubscribeWithRelay<ReflectComponent, ProjectileReflectAttemptEvent>(OnReflectUserCollide, false);
+        Subs.SubscribeWithRelay<ReflectComponent, HitScanReflectAttemptEvent>(OnReflectUserHitscan, false);
         SubscribeLocalEvent<ReflectComponent, ProjectileReflectAttemptEvent>(OnReflectCollide);
         SubscribeLocalEvent<ReflectComponent, HitScanReflectAttemptEvent>(OnReflectHitscan);
 
@@ -158,7 +157,14 @@ public sealed class ReflectSystem : EntitySystem
         if (!ent.Comp.InRightPlace)
             return; // only reflect when equipped correctly
 
-        if (TryReflectHitscan(ent, ent.Owner, args.Shooter, args.SourceItem, args.Direction, args.Reflective, args.Damage, out var dir)) // Goob edit
+        if (TryReflectHitscan(ent,
+                ent.Owner,
+                args.Shooter,
+                args.SourceItem,
+                args.Direction,
+                args.Reflective,
+                args.Damage,
+                out var dir)) // Goob edit
         {
             args.Direction = dir.Value;
             args.Reflected = true;
@@ -179,26 +185,33 @@ public sealed class ReflectSystem : EntitySystem
         if (args.Reflected)
             return;
 
-        if (TryReflectHitscan(ent, ent.Owner, args.Shooter, args.SourceItem, args.Direction, args.Reflective, args.Damage, out var dir))
+        if (TryReflectHitscan(ent,
+                ent.Owner,
+                args.Shooter,
+                args.SourceItem,
+                args.Direction,
+                args.Reflective,
+                args.Damage,
+                out var dir))
         {
             args.Direction = dir.Value;
             args.Reflected = true;
         }
     }
 
-    public bool TryReflectProjectile(Entity<ReflectComponent> reflector, EntityUid user, Entity<ProjectileComponent?> projectile)
+    public bool TryReflectProjectile(Entity<ReflectComponent> reflector,
+        EntityUid user,
+        Entity<ProjectileComponent?> projectile)
     {
         if (!TryComp<ReflectiveComponent>(projectile, out var reflective) ||
             (reflector.Comp.Reflects & reflective.Reflective) == 0x0 ||
             !_toggle.IsActivated(reflector.Owner) ||
             !_random.Prob(reflector.Comp.ReflectProb) ||
             !TryComp<PhysicsComponent>(projectile, out var physics))
-        {
             return false;
-        }
 
         var rotation = _random.NextAngle(-reflector.Comp.Spread / 2, reflector.Comp.Spread / 2).Opposite();
-        var existingVelocity = _physics.GetMapLinearVelocity(projectile, component: physics);
+        var existingVelocity = _physics.GetMapLinearVelocity(projectile, physics);
         var relativeVelocity = existingVelocity - _physics.GetMapLinearVelocity(user);
         var newVelocity = rotation.RotateVec(relativeVelocity);
 
@@ -221,21 +234,25 @@ public sealed class ReflectSystem : EntitySystem
             // WD EDIT START
             if (reflector.Comp.DamageOnReflectModifier != 0)
             {
-                _damageable.TryChangeDamage(reflector, projectile.Comp.Damage * reflector.Comp.DamageOnReflectModifier,
-                    projectile.Comp.IgnoreResistances, origin: projectile.Comp.Shooter);
+                _damageable.TryChangeDamage(reflector,
+                    projectile.Comp.Damage * reflector.Comp.DamageOnReflectModifier,
+                    projectile.Comp.IgnoreResistances,
+                    origin: projectile.Comp.Shooter);
             }
             // WD EDIT END
 
-            _adminLogger.Add(LogType.BulletHit, LogImpact.Medium, $"{ToPrettyString(user)} reflected {ToPrettyString(projectile)} from {ToPrettyString(projectile.Comp.Weapon)} shot by {projectile.Comp.Shooter}");
+            _adminLogger.Add(LogType.BulletHit,
+                LogImpact.Medium,
+                $"{ToPrettyString(user)} reflected {ToPrettyString(projectile)} from {ToPrettyString(projectile.Comp.Weapon)} shot by {projectile.Comp.Shooter}");
 
             projectile.Comp.Shooter = user;
             projectile.Comp.Weapon = user;
             Dirty(projectile, projectile.Comp);
         }
         else
-        {
-            _adminLogger.Add(LogType.BulletHit, LogImpact.Medium, $"{ToPrettyString(user)} reflected {ToPrettyString(projectile)}");
-        }
+            _adminLogger.Add(LogType.BulletHit,
+                LogImpact.Medium,
+                $"{ToPrettyString(user)} reflected {ToPrettyString(projectile)}");
 
         return true;
     }
@@ -271,9 +288,13 @@ public sealed class ReflectSystem : EntitySystem
         newDirection = -spread.RotateVec(direction);
 
         if (shooter != null)
-            _adminLogger.Add(LogType.HitScanHit, LogImpact.Medium, $"{ToPrettyString(user)} reflected hitscan from {ToPrettyString(shotSource)} shot by {ToPrettyString(shooter.Value)}");
+            _adminLogger.Add(LogType.HitScanHit,
+                LogImpact.Medium,
+                $"{ToPrettyString(user)} reflected hitscan from {ToPrettyString(shotSource)} shot by {ToPrettyString(shooter.Value)}");
         else
-            _adminLogger.Add(LogType.HitScanHit, LogImpact.Medium, $"{ToPrettyString(user)} reflected hitscan from {ToPrettyString(shotSource)}");
+            _adminLogger.Add(LogType.HitScanHit,
+                LogImpact.Medium,
+                $"{ToPrettyString(user)} reflected hitscan from {ToPrettyString(shotSource)}");
 
         return true;
     }
@@ -288,10 +309,8 @@ public sealed class ReflectSystem : EntitySystem
         }
     }
 
-    private void OnReflectEquipped(Entity<ReflectComponent> ent, ref GotEquippedEvent args)
-    {
+    private void OnReflectEquipped(Entity<ReflectComponent> ent, ref GotEquippedEvent args) =>
         ent.Comp.InRightPlace = (ent.Comp.SlotFlags & args.SlotFlags) == args.SlotFlags;
-    }
 
     private void OnReflectUnequipped(Entity<ReflectComponent> ent, ref GotUnequippedEvent args)
     {
@@ -305,15 +324,15 @@ public sealed class ReflectSystem : EntitySystem
         Dirty(ent);
     }
 
-    private void OnReflectHandUnequipped(Entity<ReflectComponent> ent, ref GotUnequippedHandEvent args)
-    {
+    private void OnReflectHandUnequipped(Entity<ReflectComponent> ent, ref GotUnequippedHandEvent args) =>
         ent.Comp.InRightPlace = false;
-    }
 
     #region Examine
+
     private void OnExamine(Entity<ReflectComponent> ent, ref ExaminedEvent args)
     {
-        if (!ent.Comp.Examinable) return; // Goobstation
+        if (!ent.Comp.Examinable)
+            return; // Goobstation
         // This isn't examine verb or something just because it looks too much bad.
         // Trust me, universal verb for the potential weapons, armor and walls looks awful.
         var value = MathF.Round(ent.Comp.ReflectProb * 100, 1);
@@ -335,5 +354,6 @@ public sealed class ReflectSystem : EntitySystem
 
         args.PushMarkup(Loc.GetString("reflect-component-examine", ("value", value), ("type", msg)));
     }
+
     #endregion
 }

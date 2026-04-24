@@ -35,7 +35,7 @@ using Content.Shared.DeviceNetwork.Components;
 
 namespace Content.Shared.DeviceNetwork.Systems;
 
-/// <inheritdoc cref="DeviceNetworkJammerComponent"/>
+/// <inheritdoc cref="DeviceNetworkJammerComponent" />
 public abstract class SharedDeviceNetworkJammerSystem : EntitySystem
 {
     /// <summary>
@@ -47,10 +47,10 @@ public abstract class SharedDeviceNetworkJammerSystem : EntitySystem
         Dirty(ent);
     }
 
-    /// <inheritdoc cref="SetRange"/>
+    /// <inheritdoc cref="SetRange" />
     public bool TrySetRange(Entity<DeviceNetworkJammerComponent?> ent, float value)
     {
-        if (!Resolve(ent, ref ent.Comp, logMissing: false))
+        if (!Resolve(ent, ref ent.Comp, false))
             return false;
 
         SetRange((ent, ent.Comp), value);
@@ -59,10 +59,8 @@ public abstract class SharedDeviceNetworkJammerSystem : EntitySystem
 
     /// <summary>
     /// Returns the set of networks that this entity can jam.
-    public IReadOnlySet<string> GetJammableNetworks(Entity<DeviceNetworkJammerComponent> ent)
-    {
-        return ent.Comp.JammableNetworks;
-    }
+    public IReadOnlySet<string> GetJammableNetworks(Entity<DeviceNetworkJammerComponent> ent) =>
+        ent.Comp.JammableNetworks;
 
     /// <summary>
     /// Enables this entity to jam packets on the specified network.

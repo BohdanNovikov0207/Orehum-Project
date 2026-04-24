@@ -19,16 +19,15 @@ namespace Content.Shared.Defusable;
 /// </remarks>
 public abstract class SharedDefusableSystem : EntitySystem
 {
-
 }
 
-[NetSerializable, Serializable]
+[NetSerializable] [Serializable]
 public enum DefusableVisuals
 {
-    Active
+    Active,
 }
 
-[NetSerializable, Serializable]
+[NetSerializable] [Serializable]
 public enum DefusableWireStatus
 {
     LiveIndicator,

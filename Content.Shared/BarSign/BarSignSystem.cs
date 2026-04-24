@@ -11,18 +11,18 @@ namespace Content.Shared.BarSign;
 
 public sealed class BarSignSystem : EntitySystem
 {
+    [Dependency] private readonly MetaDataSystem _metaData = default!;
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly MetaDataSystem _metaData = default!;
 
     public override void Initialize()
     {
         SubscribeLocalEvent<BarSignComponent, MapInitEvent>(OnMapInit);
         Subs.BuiEvents<BarSignComponent>(BarSignUiKey.Key,
             subs =>
-        {
-            subs.Event<SetBarSignMessage>(OnSetBarSignMessage);
-        });
+            {
+                subs.Event<SetBarSignMessage>(OnSetBarSignMessage);
+            });
     }
 
     private void OnMapInit(Entity<BarSignComponent> ent, ref MapInitEvent args)
@@ -53,11 +53,9 @@ public sealed class BarSignSystem : EntitySystem
         Dirty(ent);
     }
 
-    public static List<BarSignPrototype> GetAllBarSigns(IPrototypeManager prototypeManager)
-    {
-        return prototypeManager
+    public static List<BarSignPrototype> GetAllBarSigns(IPrototypeManager prototypeManager) =>
+        prototypeManager
             .EnumeratePrototypes<BarSignPrototype>()
             .Where(p => !p.Hidden)
             .ToList();
-    }
 }

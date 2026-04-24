@@ -18,9 +18,8 @@ namespace Content.Shared.Players;
 /// </summary>
 public sealed class MsgRoleBans : NetMessage
 {
-    public override MsgGroups MsgGroup => MsgGroups.EntityEvent;
-
     public List<string> Bans = new();
+    public override MsgGroups MsgGroup => MsgGroups.EntityEvent;
 
     public override void ReadFromBuffer(NetIncomingMessage buffer, IRobustSerializer serializer)
     {

@@ -18,19 +18,18 @@ namespace Content.Shared.NPC;
 /// <summary>
 /// A path poly to be used for networked debug purposes.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class DebugPathPoly
 {
-    public NetEntity GraphUid;
-    public Vector2i ChunkOrigin;
-    public byte TileIndex;
-
     public Box2 Box;
+    public Vector2i ChunkOrigin;
     public PathfindingData Data;
+    public NetEntity GraphUid;
     public List<NetCoordinates> Neighbors = default!;
+    public byte TileIndex;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class DebugPathPolyNeighbor
 {
     public NetCoordinates Coordinates;

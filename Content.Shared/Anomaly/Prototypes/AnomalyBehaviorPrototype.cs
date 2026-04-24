@@ -9,9 +9,13 @@ using Robust.Shared.Prototypes;
 namespace Content.Shared.Anomaly.Prototypes;
 
 [Prototype]
-public sealed partial class AnomalyBehaviorPrototype : IPrototype
+public sealed class AnomalyBehaviorPrototype : IPrototype
 {
-    [IdDataField] public string ID { get; private set; } = default!;
+    /// <summary>
+    /// Components that are added to the anomaly when this behavior is selected, and removed when another behavior is selected.
+    /// </summary>
+    [DataField(serverOnly: true)]
+    public ComponentRegistry Components = new();
 
     /// <summary>
     /// Description for anomaly scanner
@@ -26,6 +30,12 @@ public sealed partial class AnomalyBehaviorPrototype : IPrototype
     public float EarnPointModifier = 1f;
 
     /// <summary>
+    /// how much the particles will affect the anomaly
+    /// </summary>
+    [DataField]
+    public float ParticleSensivity = 1f;
+
+    /// <summary>
     /// deceleration or acceleration of the pulsation frequency of the anomaly
     /// </summary>
     [DataField]
@@ -37,15 +47,5 @@ public sealed partial class AnomalyBehaviorPrototype : IPrototype
     [DataField]
     public float PulsePowerModifier = 1f;
 
-    /// <summary>
-    /// how much the particles will affect the anomaly
-    /// </summary>
-    [DataField]
-    public float ParticleSensivity = 1f;
-
-    /// <summary>
-    /// Components that are added to the anomaly when this behavior is selected, and removed when another behavior is selected.
-    /// </summary>
-    [DataField(serverOnly: true)]
-    public ComponentRegistry Components = new();
+    [IdDataField] public string ID { get; } = default!;
 }

@@ -29,10 +29,10 @@ using Robust.Shared.Timing;
 
 namespace Content.Shared._Lavaland.Weapons.Block;
 
-public abstract partial class SharedBlockChargeSystem : EntitySystem
+public abstract class SharedBlockChargeSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -52,10 +52,8 @@ public abstract partial class SharedBlockChargeSystem : EntitySystem
         Dirty(uid, component);
     }
 
-    private void OnExamine(EntityUid uid, BlockChargeComponent component, ref ExaminedEvent args)
-    {
-        args.PushMarkup(Loc.GetString(component.HasCharge ? "block-charge-status-charged" : "block-charge-status-recharging"));
-    }
+    private void OnExamine(EntityUid uid, BlockChargeComponent component, ref ExaminedEvent args) => args.PushMarkup(
+        Loc.GetString(component.HasCharge ? "block-charge-status-charged" : "block-charge-status-recharging"));
 
 
     private void OnMarkerBonus(EntityUid uid, BlockChargeComponent component, ref ApplyMarkerBonusEvent args)

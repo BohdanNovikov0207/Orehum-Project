@@ -14,10 +14,10 @@ namespace Content.Shared.StatusEffectNew;
 /// </summary>
 public sealed partial class StatusEffectsSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SharedContainerSystem _container = default!;
-    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
     [Dependency] private readonly IPrototypeManager _proto = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
 
     private EntityQuery<StatusEffectContainerComponent> _containerQuery;
     private EntityQuery<StatusEffectComponent> _effectQuery;
@@ -33,7 +33,8 @@ public sealed partial class StatusEffectsSystem : EntitySystem
         SubscribeLocalEvent<StatusEffectContainerComponent, EntInsertedIntoContainerMessage>(OnEntityInserted);
         SubscribeLocalEvent<StatusEffectContainerComponent, EntRemovedFromContainerMessage>(OnEntityRemoved);
 
-        SubscribeLocalEvent<RejuvenateRemovedStatusEffectComponent, StatusEffectRelayedEvent<RejuvenateEvent>>(OnRejuvenate);
+        SubscribeLocalEvent<RejuvenateRemovedStatusEffectComponent, StatusEffectRelayedEvent<RejuvenateEvent>>(
+            OnRejuvenate);
 
         _containerQuery = GetEntityQuery<StatusEffectContainerComponent>();
         _effectQuery = GetEntityQuery<StatusEffectComponent>();
@@ -120,10 +121,8 @@ public sealed partial class StatusEffectsSystem : EntitySystem
     }
 
     private void OnRejuvenate(Entity<RejuvenateRemovedStatusEffectComponent> ent,
-        ref StatusEffectRelayedEvent<RejuvenateEvent> args)
-    {
+        ref StatusEffectRelayedEvent<RejuvenateEvent> args) =>
         PredictedQueueDel(ent.Owner);
-    }
 
     private void SetStatusEffectTime(EntityUid effect, TimeSpan? duration)
     {
@@ -132,7 +131,7 @@ public sealed partial class StatusEffectsSystem : EntitySystem
 
         if (duration is null)
         {
-            if(effectComp.EndEffectTime is null)
+            if (effectComp.EndEffectTime is null)
                 return;
 
             effectComp.EndEffectTime = null;
@@ -192,7 +191,10 @@ public sealed partial class StatusEffectsSystem : EntitySystem
     /// </summary>
     /// <param name="target">The target entity to which the effect should be added.</param>
     /// <param name="effectProto">ProtoId of the status effect entity. Make sure it has StatusEffectComponent on it.</param>
-    /// <param name="duration">Duration of status effect. Leave null and the effect will be permanent until it is removed using <c>TryRemoveStatusEffect</c>.</param>
+    /// <param name="duration">
+    /// Duration of status effect. Leave null and the effect will be permanent until it is removed using
+    /// <c>TryRemoveStatusEffect</c>.
+    /// </param>
     /// <param name="statusEffect">The EntityUid of the status effect we have just created or null if we couldn't create one.</param>
     public bool TryAddStatusEffect(
         EntityUid target,
@@ -275,7 +277,7 @@ public readonly record struct StatusEffectRemovedEvent(EntityUid Target);
 public record struct BeforeStatusEffectAddedEvent(EntProtoId Effect, bool Cancelled = false);
 
 /// <summary>
-/// Raised on an effect entity when its <see cref="StatusEffectComponent.EndEffectTime"/> is updated in any way.
+/// Raised on an effect entity when its <see cref="StatusEffectComponent.EndEffectTime" /> is updated in any way.
 /// </summary>
 /// <param name="Target">The entity the effect is attached to.</param>
 /// <param name="EndTime">The new end time of the status effect, included for convenience.</param>

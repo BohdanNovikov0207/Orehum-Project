@@ -18,10 +18,10 @@ namespace Content.Shared.Procedural.DungeonLayers;
 public partial class OreDunGen : IDunGenLayer
 {
     /// <summary>
-    /// If the vein generation should occur on top of existing entities what are we replacing.
+    /// Maximum amount of group spawns
     /// </summary>
     [DataField]
-    public EntProtoId? Replacement;
+    public int Count = 10;
 
     /// <summary>
     /// Entity to spawn.
@@ -30,10 +30,10 @@ public partial class OreDunGen : IDunGenLayer
     public EntProtoId Entity;
 
     /// <summary>
-    /// Maximum amount of group spawns
+    /// Maximum entities to spawn in one group.
     /// </summary>
     [DataField]
-    public int Count = 10;
+    public int MaxGroupSize = 1;
 
     /// <summary>
     /// Minimum entities to spawn in one group.
@@ -42,8 +42,8 @@ public partial class OreDunGen : IDunGenLayer
     public int MinGroupSize = 1;
 
     /// <summary>
-    /// Maximum entities to spawn in one group.
+    /// If the vein generation should occur on top of existing entities what are we replacing.
     /// </summary>
     [DataField]
-    public int MaxGroupSize = 1;
+    public EntProtoId? Replacement;
 }

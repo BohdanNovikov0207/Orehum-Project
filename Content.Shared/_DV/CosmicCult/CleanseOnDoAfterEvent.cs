@@ -3,5 +3,5 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared._DV.CosmicCult;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class CleanseOnDoAfterEvent : SimpleDoAfterEvent;

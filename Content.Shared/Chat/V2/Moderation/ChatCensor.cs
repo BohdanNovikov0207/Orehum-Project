@@ -8,7 +8,7 @@ namespace Content.Shared.Chat.V2.Moderation;
 
 public interface IChatCensor
 {
-    public bool Censor(string input, out string output, char replaceWith = '*');
+    bool Censor(string input, out string output, char replaceWith = '*');
 }
 
 public sealed class CompoundChatCensor(IEnumerable<IChatCensor> censors) : IChatCensor
@@ -20,9 +20,7 @@ public sealed class CompoundChatCensor(IEnumerable<IChatCensor> censors) : IChat
         foreach (var censor in censors)
         {
             if (censor.Censor(input, out output, replaceWith))
-            {
                 censored = true;
-            }
         }
 
         output = input;
@@ -35,18 +33,12 @@ public sealed class ChatCensorFactory
 {
     private List<IChatCensor> _censors = new();
 
-    public void With(IChatCensor censor)
-    {
-        _censors.Add(censor);
-    }
+    public void With(IChatCensor censor) => _censors.Add(censor);
 
     /// <summary>
     /// Builds a ChatCensor that combines all the censors that have been added to this.
     /// </summary>
-    public IChatCensor Build()
-    {
-        return new CompoundChatCensor(_censors.ToArray());
-    }
+    public IChatCensor Build() => new CompoundChatCensor(_censors.ToArray());
 
     /// <summary>
     /// Resets the build state to zero, allowing for different rules to be provided to the next censor(s) built.

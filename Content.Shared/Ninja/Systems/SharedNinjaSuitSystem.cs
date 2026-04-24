@@ -10,7 +10,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Goobstation.Common.Effects;
 using Content.Shared.Actions;
 using Content.Shared.Clothing;
 using Content.Shared.Clothing.Components;
@@ -31,10 +30,10 @@ public abstract class SharedNinjaSuitSystem : EntitySystem
 {
     [Dependency] private readonly ActionContainerSystem _actionContainer = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly ItemToggleSystem _toggle = default!;
-    [Dependency] protected readonly SharedPopupSystem Popup = default!;
     [Dependency] private readonly SharedSpaceNinjaSystem _ninja = default!;
+    [Dependency] private readonly ItemToggleSystem _toggle = default!;
     [Dependency] private readonly UseDelaySystem _useDelay = default!;
+    [Dependency] protected readonly SharedPopupSystem Popup = default!;
 
     public override void Initialize()
     {
@@ -57,11 +56,9 @@ public abstract class SharedNinjaSuitSystem : EntitySystem
             NinjaEquipped(ent, (user, ninja));
     }
 
-    protected virtual void NinjaEquipped(Entity<NinjaSuitComponent> ent, Entity<SpaceNinjaComponent> user)
-    {
+    protected virtual void NinjaEquipped(Entity<NinjaSuitComponent> ent, Entity<SpaceNinjaComponent> user) =>
         // mark the user as wearing this suit, used when being attacked among other things
         _ninja.AssignSuit(user, ent);
-    }
 
     private void OnMapInit(Entity<NinjaSuitComponent> ent, ref MapInitEvent args)
     {
@@ -181,7 +178,7 @@ public abstract class SharedNinjaSuitSystem : EntitySystem
         // mark the user as not wearing a suit
         _ninja.AssignSuit(user, null);
         // disable glove abilities
-        if (user.Comp.Gloves is {} uid)
-            _toggle.TryDeactivate(uid, user: user);
+        if (user.Comp.Gloves is { } uid)
+            _toggle.TryDeactivate(uid, user);
     }
 }

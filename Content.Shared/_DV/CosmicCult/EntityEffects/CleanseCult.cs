@@ -6,10 +6,8 @@ namespace Content.Shared._DV.CosmicCult.EntityEffects;
 
 public sealed partial class CleanseCult : EntityEffect
 {
-    protected override string? ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys)
-    {
-        return Loc.GetString("reagent-effect-guidebook-cleanse-cultist", ("chance", Probability));
-    }
+    protected override string? ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys) =>
+        Loc.GetString("reagent-effect-guidebook-cleanse-cultist", ("chance", Probability));
 
     public override void Effect(EntityEffectBaseArgs args)
     {
@@ -17,6 +15,9 @@ public sealed partial class CleanseCult : EntityEffect
         var uid = args.TargetEntity;
         if (entityManager.HasComponent<CosmicCultComponent>(uid)
             || entityManager.HasComponent<RogueAscendedInfectionComponent>(uid))
-            entityManager.EnsureComponent<CleanseCultComponent>(uid); // We just slap them with the component and let the Deconversion system handle the rest.
+            entityManager
+                .EnsureComponent<
+                    CleanseCultComponent>(
+                    uid); // We just slap them with the component and let the Deconversion system handle the rest.
     }
 }

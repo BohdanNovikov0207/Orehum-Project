@@ -3,7 +3,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.EntityEffects;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
 using Robust.Shared.Prototypes;
@@ -26,8 +25,6 @@ public sealed partial class MobStateCondition : EntityEffectCondition
         return false;
     }
 
-    public override string GuidebookExplanation(IPrototypeManager prototype)
-    {
-        return Loc.GetString("reagent-effect-condition-guidebook-mob-state-condition", ("state", Mobstate));
-    }
+    public override string GuidebookExplanation(IPrototypeManager prototype) =>
+        Loc.GetString("reagent-effect-condition-guidebook-mob-state-condition", ("state", Mobstate));
 }

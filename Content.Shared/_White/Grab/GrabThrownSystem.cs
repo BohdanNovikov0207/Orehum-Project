@@ -6,29 +6,27 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Damage.Systems;
+using System.Numerics;
 using Content.Shared.Damage;
+using Content.Shared.Damage.Systems;
 using Content.Shared.Effects;
+using Content.Shared.Stunnable;
 using Content.Shared.Throwing;
 using Robust.Shared.Network;
+using Robust.Shared.Physics.Components;
 using Robust.Shared.Physics.Events;
 using Robust.Shared.Player;
-using System.Numerics;
-using Content.Shared._White.Standing;
-using Content.Shared.Standing;
-using Content.Shared.Stunnable;
-using Robust.Shared.Physics.Components;
 
 namespace Content.Shared._White.Grab;
 
 public sealed class GrabThrownSystem : EntitySystem
 {
-    [Dependency] private readonly DamageableSystem _damageable = default!;
     [Dependency] private readonly SharedColorFlashEffectSystem _color = default!;
-    [Dependency] private readonly SharedStaminaSystem _stamina = default!;
-    [Dependency] private readonly ThrowingSystem _throwing = default!;
+    [Dependency] private readonly DamageableSystem _damageable = default!;
     [Dependency] private readonly INetManager _netMan = default!;
+    [Dependency] private readonly SharedStaminaSystem _stamina = default!;
     [Dependency] private readonly SharedStunSystem _stun = default!;
+    [Dependency] private readonly ThrowingSystem _throwing = default!;
 
     public override void Initialize()
     {
@@ -55,7 +53,7 @@ public sealed class GrabThrownSystem : EntitySystem
         if (!HasComp<DamageableComponent>(ent))
             RemComp<GrabThrownComponent>(ent);
 
-        if(!TryComp<PhysicsComponent>(ent, out var physicsComponent))
+        if (!TryComp<PhysicsComponent>(ent, out var physicsComponent))
             return;
 
         ent.Comp.IgnoreEntity.Add(args.OtherEntity);
@@ -72,7 +70,7 @@ public sealed class GrabThrownSystem : EntitySystem
 
         _stun.TryCrawling(args.OtherEntity);
 
-        _color.RaiseEffect(Color.Red, new List<EntityUid>() { ent }, Filter.Pvs(ent, entityManager: EntityManager));
+        _color.RaiseEffect(Color.Red, new List<EntityUid> { ent }, Filter.Pvs(ent, entityManager: EntityManager));
     }
 
     private void OnStopThrow(EntityUid uid, GrabThrownComponent comp, StopThrowEvent args)

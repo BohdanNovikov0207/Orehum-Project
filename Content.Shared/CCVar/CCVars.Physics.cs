@@ -14,7 +14,7 @@ namespace Content.Shared.CCVar;
 public sealed partial class CCVars
 {
     /// <summary>
-    ///     When a mob is walking should its X / Y movement be relative to its parent (true) or the map (false).
+    /// When a mob is walking should its X / Y movement be relative to its parent (true) or the map (false).
     /// </summary>
     public static readonly CVarDef<bool> RelativeMovement =
         CVarDef.Create("physics.relative_movement", true, CVar.ARCHIVE | CVar.REPLICATED | CVar.SERVER);

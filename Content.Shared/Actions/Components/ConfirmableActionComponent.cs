@@ -10,7 +10,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Shared.Popups;
-using Content.Shared.Actions;
 using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
@@ -21,15 +20,37 @@ namespace Content.Shared.Actions.Components;
 /// An action that must be confirmed before using it.
 /// Using it for the first time primes it, after a delay you can then confirm it.
 /// Used for dangerous actions that cannot be undone (unlike screaming).
-/// Requires <see cref="ActionComponent"/>.
+/// Requires <see cref="ActionComponent" />.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(ConfirmableActionSystem))]
-[AutoGenerateComponentState, AutoGenerateComponentPause]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(ConfirmableActionSystem))]
+[AutoGenerateComponentState] [AutoGenerateComponentPause]
 [EntityCategory("Actions")]
 public sealed partial class ConfirmableActionComponent : Component
 {
     /// <summary>
-    /// Warning popup shown when priming the action. 
+    /// Forced delay between priming and confirming to prevent accidents.
+    /// </summary>
+    [DataField]
+    public TimeSpan ConfirmDelay = TimeSpan.FromSeconds(1);
+
+    /// <summary>
+    /// If not null, this is when the action can be confirmed at.
+    /// This is the time of priming plus the delay.
+    /// </summary>
+    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))]
+    [AutoNetworkedField] [AutoPausedField]
+    public TimeSpan? NextConfirm;
+
+    /// <summary>
+    /// If not null, this is when the action will unprime at.
+    /// This is <c>NextConfirm> plus <c>PrimeTime</c>
+    /// </summary>
+    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))]
+    [AutoNetworkedField] [AutoPausedField]
+    public TimeSpan? NextUnprime;
+
+    /// <summary>
+    /// Warning popup shown when priming the action.
     /// </summary>
     // Goobstation - Modsuits - Removed required string
     [DataField]
@@ -40,28 +61,6 @@ public sealed partial class ConfirmableActionComponent : Component
     /// </summary>
     [DataField("popupType")]
     public PopupType PopupFontType = PopupType.LargeCaution;
-
-    /// <summary>
-    /// If not null, this is when the action can be confirmed at.
-    /// This is the time of priming plus the delay.
-    /// </summary>
-    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))]
-    [AutoNetworkedField, AutoPausedField]
-    public TimeSpan? NextConfirm;
-
-    /// <summary>
-    /// If not null, this is when the action will unprime at.
-    /// This is <c>NextConfirm> plus <c>PrimeTime</c>
-    /// </summary>
-    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))]
-    [AutoNetworkedField, AutoPausedField]
-    public TimeSpan? NextUnprime;
-
-    /// <summary>
-    /// Forced delay between priming and confirming to prevent accidents.
-    /// </summary>
-    [DataField]
-    public TimeSpan ConfirmDelay = TimeSpan.FromSeconds(1);
 
     /// <summary>
     /// Once you prime the action it will unprime after this length of time.

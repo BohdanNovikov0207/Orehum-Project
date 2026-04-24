@@ -17,9 +17,8 @@ namespace Content.Shared.Players.JobWhitelist;
 
 public sealed class MsgJobWhitelist : NetMessage
 {
-    public override MsgGroups MsgGroup => MsgGroups.EntityEvent;
-
     public HashSet<string> Whitelist = new();
+    public override MsgGroups MsgGroup => MsgGroups.EntityEvent;
 
     public override void ReadFromBuffer(NetIncomingMessage buffer, IRobustSerializer serializer)
     {

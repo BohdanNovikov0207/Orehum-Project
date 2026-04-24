@@ -11,7 +11,7 @@ public abstract class SharedReadyManifestSystem : EntitySystem;
 /// <summary>
 /// Keeps the data related to a single job for the ready manifest.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public struct ReadyManifestJobData
 {
     /// <summary>
@@ -33,5 +33,5 @@ public struct ReadyManifestJobData
 /// <summary>
 /// Sent from the client when it wants to open a ready manifest eui.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class RequestReadyManifestMessage : EntityEventArgs;

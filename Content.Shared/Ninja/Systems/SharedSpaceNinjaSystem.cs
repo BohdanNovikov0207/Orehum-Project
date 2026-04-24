@@ -7,11 +7,11 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Diagnostics.CodeAnalysis;
 using Content.Shared.Ninja.Components;
+using Content.Shared.Popups;
 using Content.Shared.Weapons.Melee.Events;
 using Content.Shared.Weapons.Ranged.Events;
-using Content.Shared.Popups;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Content.Shared.Ninja.Systems;
 
@@ -20,8 +20,8 @@ namespace Content.Shared.Ninja.Systems;
 /// </summary>
 public abstract class SharedSpaceNinjaSystem : EntitySystem
 {
-    [Dependency] protected readonly SharedNinjaSuitSystem Suit = default!;
     [Dependency] protected readonly SharedPopupSystem Popup = default!;
+    [Dependency] protected readonly SharedNinjaSuitSystem Suit = default!;
 
     public EntityQuery<SpaceNinjaComponent> NinjaQuery;
 
@@ -36,10 +36,7 @@ public abstract class SharedSpaceNinjaSystem : EntitySystem
         SubscribeLocalEvent<SpaceNinjaComponent, ShotAttemptedEvent>(OnShotAttempted);
     }
 
-    public bool IsNinja([NotNullWhen(true)] EntityUid? uid)
-    {
-        return NinjaQuery.HasComp(uid);
-    }
+    public bool IsNinja([NotNullWhen(true)] EntityUid? uid) => NinjaQuery.HasComp(uid);
 
     /// <summary>
     /// Set the ninja's worn suit entity
@@ -82,32 +79,24 @@ public abstract class SharedSpaceNinjaSystem : EntitySystem
     /// Gets the user's battery and tries to use some charge from it, returning true if successful.
     /// Serverside only.
     /// </summary>
-    public virtual bool TryUseCharge(EntityUid user, float charge)
-    {
-        return false;
-    }
+    public virtual bool TryUseCharge(EntityUid user, float charge) => false;
 
     /// <summary>
     /// Handle revealing ninja if cloaked when attacked.
     /// </summary>
-    private void OnNinjaAttacked(Entity<SpaceNinjaComponent> ent, ref AttackedEvent args)
-    {
-        TryRevealNinja(ent, disable: true);
-    }
+    private void OnNinjaAttacked(Entity<SpaceNinjaComponent> ent, ref AttackedEvent args) => TryRevealNinja(ent, true);
 
     /// <summary>
     /// Handle revealing ninja if cloaked when attacking.
     /// Only reveals, there is no cooldown.
     /// </summary>
-    private void OnNinjaAttack(Entity<SpaceNinjaComponent> ent, ref MeleeAttackEvent args)
-    {
-        TryRevealNinja(ent, disable: true); // Goob edit
-    }
+    private void OnNinjaAttack(Entity<SpaceNinjaComponent> ent, ref MeleeAttackEvent args) =>
+        TryRevealNinja(ent, true); // Goob edit
 
     private void TryRevealNinja(Entity<SpaceNinjaComponent> ent, bool disable)
     {
-        if (ent.Comp.Suit is {} uid && TryComp<NinjaSuitComponent>(ent.Comp.Suit, out var suit))
-            Suit.RevealNinja((uid, suit), ent, disable: disable);
+        if (ent.Comp.Suit is { } uid && TryComp<NinjaSuitComponent>(ent.Comp.Suit, out var suit))
+            Suit.RevealNinja((uid, suit), ent, disable);
     }
 
     /// <summary>

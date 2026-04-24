@@ -7,7 +7,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.NPC;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class PathPolysRefreshMessage : EntityEventArgs
 {
     public NetEntity GridUid;

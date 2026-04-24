@@ -3,14 +3,14 @@ using Robust.Shared.GameStates;
 namespace Content.Shared.Traits.Assorted;
 
 /// <summary>
-///     This is used for any trait that modifies DeadThreshold
+/// This is used for any trait that modifies DeadThreshold
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class DeadModifierComponent : Component
 {
     /// <summary>
-    ///     The amount that an entity's DeadThreshold will be incremented by.
+    /// The amount that an entity's DeadThreshold will be incremented by.
     /// </summary>
     [DataField]
-    public int DeadThresholdModifier { get; private set; } = 0;
+    public int DeadThresholdModifier { get; private set; }
 }

@@ -3,23 +3,16 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.EntityEffects;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 
 namespace Content.Shared.EntityEffects.Effects;
 
 /// <summary>
-///     Makes a mob glow.
+/// Makes a mob glow.
 /// </summary>
 public sealed partial class Glow : EntityEffect
 {
-    [DataField]
-    public float Radius = 2f;
-
-    [DataField]
-    public Color Color = Color.Black;
-
     private static readonly List<Color> Colors = new()
     {
         Color.White,
@@ -28,8 +21,14 @@ public sealed partial class Glow : EntityEffect
         Color.Green,
         Color.Blue,
         Color.Purple,
-        Color.Pink
+        Color.Pink,
     };
+
+    [DataField]
+    public Color Color = Color.Black;
+
+    [DataField]
+    public float Radius = 2f;
 
     public override void Effect(EntityEffectBaseArgs args)
     {
@@ -43,11 +42,11 @@ public sealed partial class Glow : EntityEffect
         var light = lightSystem.EnsureLight(args.TargetEntity);
         lightSystem.SetRadius(args.TargetEntity, Radius, light);
         lightSystem.SetColor(args.TargetEntity, Color, light);
-        lightSystem.SetCastShadows(args.TargetEntity, false, light); // this is expensive, and botanists make lots of plants
+        lightSystem.SetCastShadows(args.TargetEntity,
+            false,
+            light); // this is expensive, and botanists make lots of plants
     }
 
-    protected override string? ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys)
-    {
-        return "TODO";
-    }
+    protected override string? ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys) =>
+        "TODO";
 }

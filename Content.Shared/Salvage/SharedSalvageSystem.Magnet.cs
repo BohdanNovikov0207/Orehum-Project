@@ -19,7 +19,22 @@ namespace Content.Shared.Salvage;
 
 public abstract partial class SharedSalvageSystem
 {
-    private readonly List<SalvageMapPrototype> _salvageMaps = new();
+    private readonly List<ProtoId<DungeonConfigPrototype>> _asteroidConfigs = new()
+    {
+        "BlobAsteroid",
+        "ClusterAsteroid",
+        "SpindlyAsteroid",
+        "SwissCheeseAsteroid",
+    };
+
+    private readonly MinMax _asteroidOreCount = new(5, 7);
+
+    private readonly ProtoId<WeightedRandomPrototype> _asteroidOreWeights = "AsteroidOre";
+
+    private readonly List<ProtoId<DungeonConfigPrototype>> _debrisConfigs = new()
+    {
+        "ChunkDebris",
+    };
 
     private readonly Dictionary<ISalvageMagnetOffering, float> _offeringWeights = new()
     {
@@ -28,22 +43,7 @@ public abstract partial class SharedSalvageSystem
         { new SalvageOffering(), 2.0f },
     };
 
-    private readonly List<ProtoId<DungeonConfigPrototype>> _asteroidConfigs = new()
-    {
-        "BlobAsteroid",
-        "ClusterAsteroid",
-        "SpindlyAsteroid",
-        "SwissCheeseAsteroid"
-    };
-
-    private readonly ProtoId<WeightedRandomPrototype> _asteroidOreWeights = "AsteroidOre";
-
-    private readonly MinMax _asteroidOreCount = new(5, 7);
-
-    private readonly List<ProtoId<DungeonConfigPrototype>> _debrisConfigs = new()
-    {
-        "ChunkDebris"
-    };
+    private readonly List<SalvageMapPrototype> _salvageMaps = new();
 
     public ISalvageMagnetOffering GetSalvageOffering(int seed)
     {
@@ -54,17 +54,17 @@ public abstract partial class SharedSalvageSystem
         {
             case AsteroidOffering:
                 var configId = _asteroidConfigs[rand.Next(_asteroidConfigs.Count)];
-                var configProto =_proto.Index(configId);
+                var configProto = _proto.Index(configId);
                 var layers = new Dictionary<string, int>();
 
                 var config = new DungeonConfig
                 {
-                    Layers = new(configProto.Layers),
+                    Layers = new List<IDunGenLayer>(configProto.Layers),
                     MaxCount = configProto.MaxCount,
                     MaxOffset = configProto.MaxOffset,
                     MinCount = configProto.MinCount,
                     MinOffset = configProto.MinOffset,
-                    ReserveTiles = configProto.ReserveTiles
+                    ReserveTiles = configProto.ReserveTiles,
                 };
 
                 var count = _asteroidOreCount.Next(rand);
@@ -89,7 +89,7 @@ public abstract partial class SharedSalvageSystem
                 var id = rand.Pick(_debrisConfigs);
                 return new DebrisOffering
                 {
-                    Id = id
+                    Id = id,
                 };
             case SalvageOffering:
                 // Salvage map seed

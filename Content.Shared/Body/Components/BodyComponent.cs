@@ -15,26 +15,54 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Shared._Shitmed.Body;
 using Content.Shared.Body.Prototypes;
 using Content.Shared.Body.Systems;
-using Content.Shared._Shitmed.Body;
 using Robust.Shared.Audio;
 using Robust.Shared.Containers;
 using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
-using System; // Goobstation
+
+// Goobstation
 
 namespace Content.Shared.Body.Components;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 [Access(typeof(SharedBodySystem))]
 public sealed partial class BodyComponent : Component
 {
+    // WD EDIT END
+
+    // Shitmed Change - Fuck borgs.
+    [DataField]
+    public BodyType BodyType = BodyType.Complex;
+
+    [DataField] [AutoNetworkedField]
+    public SoundSpecifier GibSound = new SoundCollectionSpecifier("gib");
+
+    // Goobstation
+    /// <summary>
+    /// When should  wounds on this be healed.
+    /// </summary>
+    [ViewVariables] [AutoNetworkedField] [Access(Other = AccessPermissions.ReadWrite)]
+    public TimeSpan HealAt;
+
+    [ViewVariables]
+    [DataField] [AutoNetworkedField]
+    public HashSet<EntityUid> LegEntities = new();
+
     /// <summary>
     /// Relevant template to spawn for this body.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public ProtoId<BodyPrototype>? Prototype;
+
+    /// <summary>
+    /// The amount of legs required to move at full speed.
+    /// If 0, then legs do not impact speed.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public int RequiredLegs;
 
     /// <summary>
     /// Container that holds the root body part.
@@ -44,36 +72,10 @@ public sealed partial class BodyComponent : Component
     /// </remarks>
     [ViewVariables] public ContainerSlot RootContainer = default!;
 
+    // WD EDIT START
+    [DataField] [AutoNetworkedField]
+    public bool ThermalVisibility = true;
+
     [ViewVariables]
     public string RootPartSlot => RootContainer.ID;
-
-    [DataField, AutoNetworkedField]
-    public SoundSpecifier GibSound = new SoundCollectionSpecifier("gib");
-
-    /// <summary>
-    /// The amount of legs required to move at full speed.
-    /// If 0, then legs do not impact speed.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public int RequiredLegs;
-
-    [ViewVariables]
-    [DataField, AutoNetworkedField]
-    public HashSet<EntityUid> LegEntities = new();
-
-    // WD EDIT START
-    [DataField, AutoNetworkedField]
-    public bool ThermalVisibility = true;
-    // WD EDIT END
-
-    // Shitmed Change - Fuck borgs.
-    [DataField]
-    public BodyType BodyType = BodyType.Complex;
-
-    // Goobstation
-    /// <summary>
-    /// When should  wounds on this be healed.
-    /// </summary>
-    [ViewVariables, AutoNetworkedField, Access(Other = AccessPermissions.ReadWrite)]
-    public TimeSpan HealAt;
 }

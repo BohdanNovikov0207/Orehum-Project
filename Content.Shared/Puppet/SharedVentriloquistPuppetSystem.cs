@@ -32,10 +32,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Shared.ActionBlocker;
+using Content.Shared.Emoting;
 using Content.Shared.Hands;
 using Content.Shared.Interaction.Events;
 using Content.Shared.Item;
-using Content.Shared.Emoting;
 using Content.Shared.Movement.Events;
 
 namespace Content.Shared.Puppet;
@@ -58,18 +58,12 @@ public abstract class SharedVentriloquistPuppetSystem : EntitySystem
         SubscribeLocalEvent<VentriloquistPuppetComponent, ComponentStartup>(OnStartup);
     }
 
-    private void CancelInteract(Entity<VentriloquistPuppetComponent> ent, ref InteractionAttemptEvent args)
-    {
+    private void CancelInteract(Entity<VentriloquistPuppetComponent> ent, ref InteractionAttemptEvent args) =>
         args.Cancelled = true;
-    }
 
-    private void OnStartup(EntityUid uid, VentriloquistPuppetComponent component, ComponentStartup args)
-    {
+    private void OnStartup(EntityUid uid, VentriloquistPuppetComponent component, ComponentStartup args) =>
         _blocker.UpdateCanMove(uid);
-    }
 
-    private void Cancel<T>(EntityUid uid, VentriloquistPuppetComponent component, T args) where T : CancellableEntityEventArgs
-    {
-        args.Cancel();
-    }
+    private void Cancel<T>(EntityUid uid, VentriloquistPuppetComponent component, T args)
+        where T : CancellableEntityEventArgs => args.Cancel();
 }

@@ -1,23 +1,23 @@
-﻿using Content.Shared._Shitmed.Medical.Surgery.Pain.Components;
+﻿using Content.Goobstation.Maths.FixedPoint;
+using Content.Shared._Shitmed.Medical.Surgery.Pain.Components;
 using Content.Shared._Shitmed.Medical.Surgery.Wounds;
 using Content.Shared.Body.Components;
 using Content.Shared.Body.Part;
-using Content.Goobstation.Maths.FixedPoint;
 
 namespace Content.Shared._Shitmed.Medical.Surgery.Pain.Systems;
 
 public partial class PainSystem
 {
+    private const string PainModifierIdentifier = "WoundPain";
+    private const string PainTraumaticModifierIdentifier = "TraumaticPain";
+    private const string PainAdrenalineIdentifier = "PainAdrenaline";
+
     private void InitAffliction()
     {
         // Pain management hooks.
         SubscribeLocalEvent<PainInflicterComponent, WoundRemovedEvent>(OnPainRemoved);
         SubscribeLocalEvent<PainInflicterComponent, WoundSeverityPointChangedEvent>(OnPainChanged);
     }
-
-    private const string PainModifierIdentifier = "WoundPain";
-    private const string PainTraumaticModifierIdentifier = "TraumaticPain";
-    private const string PainAdrenalineIdentifier = "PainAdrenaline";
 
     #region Event Handling
 
@@ -118,7 +118,10 @@ public partial class PainSystem
         if (traumaticPain <= 0)
             TryRemovePainModifier(nerveSys.Value, args.Component.HoldingWoundable, PainTraumaticModifierIdentifier);
         else
-            TryChangePainModifier(nerveSys.Value, args.Component.HoldingWoundable, PainTraumaticModifierIdentifier, traumaticPain);
+            TryChangePainModifier(nerveSys.Value,
+                args.Component.HoldingWoundable,
+                PainTraumaticModifierIdentifier,
+                traumaticPain);
     }
 
     #endregion

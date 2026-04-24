@@ -25,5 +25,5 @@ public abstract partial class LoadoutEffect
         IDependencyCollection collection,
         [NotNullWhen(false)] out FormattedMessage? reason);
 
-    public virtual void Apply(RoleLoadout loadout) {}
+    public virtual void Apply(RoleLoadout loadout) { }
 }

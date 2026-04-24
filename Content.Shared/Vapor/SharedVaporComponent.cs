@@ -15,7 +15,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Vapor;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum VaporVisuals
 {
     Color,

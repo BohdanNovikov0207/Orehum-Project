@@ -21,10 +21,11 @@
 
 using System.Linq;
 using Content.Goobstation.Maths.FixedPoint;
-using Content.Shared.Heretic.Prototypes; // Goob
+using Content.Shared.Heretic.Prototypes;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
 using Robust.Shared.Utility;
+// Goob
 
 namespace Content.Shared.Store;
 
@@ -36,35 +37,36 @@ namespace Content.Shared.Store;
 // regards. :heart:
 
 /// <summary>
-///     This is the data object for a store listing which is passed around in code.
-///     this allows for prices and features of listings to be dynamically changed in code
-///     without having to modify the prototypes.
+/// This is the data object for a store listing which is passed around in code.
+/// this allows for prices and features of listings to be dynamically changed in code
+/// without having to modify the prototypes.
 /// </summary>
-[Serializable, NetSerializable]
-[Virtual, DataDefinition]
+[Serializable] [NetSerializable]
+[Virtual] [DataDefinition]
 public partial class ListingData : IEquatable<ListingData>, ICloneable
 {
-    [ViewVariables]
-    [IdDataField]
-    public string ID { get; private set; } = default!;
-
     /// <summary>
-    /// The name of the listing. If empty, uses the entity's name (if present)
+    /// Goobstation.
+    /// When purchased, it will block refunds of these listings.
     /// </summary>
     [DataField]
-    public string? Name;
-
-    /// <summary>
-    /// The description of the listing. If empty, uses the entity's description (if present)
-    /// </summary>
-    [DataField]
-    public string? Description;
+    public HashSet<ProtoId<ListingPrototype>> BlockRefundListings = new();
 
     /// <summary>
     /// The categories that this listing applies to. Used for filtering a listing for a store.
     /// </summary>
     [DataField]
     public List<ProtoId<StoreCategoryPrototype>> Categories = new();
+
+    [DataField]
+    public List<string> Components = new();
+
+    /// <summary>
+    /// Specific customizable conditions that determine whether or not the listing can be purchased.
+    /// </summary>
+    [NonSerialized]
+    [DataField(serverOnly: true)]
+    public List<ListingCondition>? Conditions;
 
     /// <summary>
     /// The original cost of the listing. FixedPoint2 represents the amount of that currency.
@@ -75,11 +77,20 @@ public partial class ListingData : IEquatable<ListingData>, ICloneable
     public Dictionary<ProtoId<CurrencyPrototype>, FixedPoint2> Cost = new();
 
     /// <summary>
-    /// Specific customizable conditions that determine whether or not the listing can be purchased.
+    /// The description of the listing. If empty, uses the entity's description (if present)
     /// </summary>
-    [NonSerialized]
-    [DataField(serverOnly: true)]
-    public List<ListingCondition>? Conditions;
+    [DataField]
+    public string? Description;
+    // WD END
+
+    /// <summary>
+    /// Whether or not to disable refunding for the store when the listing is purchased from it.
+    /// Goob edit: This won't disable refund, but instead you won't be able to refund this listing.
+    /// </summary>
+    [DataField]
+    public bool DisableRefund;
+
+    public int DiscountValue;
 
     /// <summary>
     /// The icon for the listing. If null, uses the icon for the entity or action.
@@ -88,29 +99,24 @@ public partial class ListingData : IEquatable<ListingData>, ICloneable
     public SpriteSpecifier? Icon;
 
     /// <summary>
+    /// The name of the listing. If empty, uses the entity's name (if present)
+    /// </summary>
+    [DataField]
+    public string? Name;
+
+    public Dictionary<ProtoId<CurrencyPrototype>, FixedPoint2> OldCost = new();
+
+    /// <summary>
     /// The priority for what order the listings will show up in on the menu.
     /// </summary>
     [DataField]
     public int Priority;
 
     /// <summary>
-    /// The entity that is given when the listing is purchased.
-    /// </summary>
-    [DataField]
-    public EntProtoId? ProductEntity;
-
-    /// <summary>
     /// The action that is given when the listing is purchased.
     /// </summary>
     [DataField]
     public EntProtoId? ProductAction;
-
-    /// <summary>
-    /// The listing ID of the related upgrade listing. Can be used to link a <see cref="ProductAction"/> to an
-    /// upgrade or to use standalone as an upgrade
-    /// </summary>
-    [DataField]
-    public ProtoId<ListingPrototype>? ProductUpgradeId;
 
     /// <summary>
     /// Keeps track of the current action entity this is tied to, for action upgrades
@@ -120,9 +126,15 @@ public partial class ListingData : IEquatable<ListingData>, ICloneable
     public EntityUid? ProductActionEntity;
 
     /// <summary>
+    /// The entity that is given when the listing is purchased.
+    /// </summary>
+    [DataField]
+    public EntProtoId? ProductEntity;
+
+    /// <summary>
     /// The event that is broadcast when the listing is purchased.
     /// </summary>
-    [DataField(serverOnly: true), NonSerialized] // Goob edit
+    [DataField(serverOnly: true)] [NonSerialized] // Goob edit
     public object? ProductEvent;
 
     // goobstation - heretics
@@ -132,8 +144,12 @@ public partial class ListingData : IEquatable<ListingData>, ICloneable
     [DataField]
     public ProtoId<HereticKnowledgePrototype>? ProductHereticKnowledge;
 
+    /// <summary>
+    /// The listing ID of the related upgrade listing. Can be used to link a <see cref="ProductAction" /> to an
+    /// upgrade or to use standalone as an upgrade
+    /// </summary>
     [DataField]
-    public bool RaiseProductEventOnUser;
+    public ProtoId<ListingPrototype>? ProductUpgradeId;
 
     /// <summary>
     /// used internally for tracking how many times an item was purchased.
@@ -141,102 +157,43 @@ public partial class ListingData : IEquatable<ListingData>, ICloneable
     [DataField]
     public int PurchaseAmount;
 
+    [DataField]
+    public bool RaiseProductEventOnUser;
+
+    [DataField]
+    public bool ResetRestockOnPurchase; // goob edit
+
+    [DataField]
+    public TimeSpan RestockDuration = TimeSpan.FromMinutes(10); // goob edit
+
     /// <summary>
     /// Used to delay purchase of some items.
     /// </summary>
     [DataField]
     public TimeSpan RestockTime = TimeSpan.Zero;
 
-    // WD START
-    [DataField] public int SaleLimit = 1;
-
     [DataField] public bool SaleBlacklist;
-
-    public int DiscountValue;
-
-    public Dictionary<ProtoId<CurrencyPrototype>, FixedPoint2> OldCost = new();
 
     // Goobstation
     public Dictionary<ProtoId<CurrencyPrototype>, FixedPoint2>? SaleCost;
 
-    [DataField]
-    public List<string> Components = new();
-    // WD END
+    // WD START
+    [DataField] public int SaleLimit = 1;
 
-    /// <summary>
-    /// Whether or not to disable refunding for the store when the listing is purchased from it.
-    /// Goob edit: This won't disable refund, but instead you won't be able to refund this listing.
-    /// </summary>
-    [DataField]
-    public bool DisableRefund = false;
-
-    /// <summary>
-    /// Goobstation.
-    /// When purchased, it will block refunds of these listings.
-    /// </summary>
-    [DataField]
-    public HashSet<ProtoId<ListingPrototype>> BlockRefundListings = new();
-
-    [DataField]
-    public bool ResetRestockOnPurchase = false; // goob edit
-
-    [DataField]
-    public TimeSpan RestockDuration = TimeSpan.FromMinutes(10); // goob edit
+    [ViewVariables]
+    [IdDataField]
+    public string ID { get; private set; } = default!;
 
     [DataField]
     public TimeSpan? RestockAfterPurchase { get; private set; } // goob edit
-
-    public bool Equals(ListingData? listing)
-    {
-        if (listing == null)
-            return false;
-
-        //simple conditions
-        if (Priority != listing.Priority ||
-            Name != listing.Name ||
-            Description != listing.Description ||
-            ProductEntity != listing.ProductEntity ||
-            ProductAction != listing.ProductAction ||
-            RaiseProductEventOnUser != listing.RaiseProductEventOnUser || // Goobstation
-            DisableRefund != listing.DisableRefund || // Goobstation
-            ResetRestockOnPurchase != listing.ResetRestockOnPurchase || // Goobstation
-            RestockAfterPurchase != listing.RestockAfterPurchase || // Goobstation
-            RestockTime != listing.RestockTime)
-            return false;
-
-        if (ProductEvent != null && listing.ProductEvent != null && ProductEvent.GetType() != listing.ProductEvent.GetType()) // Goobstation
-            return false;
-
-        if (Icon != null && !Icon.Equals(listing.Icon))
-            return false;
-
-        // Goobstation
-        if (!BlockRefundListings.OrderBy(x => x).SequenceEqual(listing.BlockRefundListings.OrderBy(x => x)))
-            return false;
-
-        // more complicated conditions that eat perf. these don't really matter
-        // as much because you will very rarely have to check these.
-        if (!Categories.OrderBy(x => x).SequenceEqual(listing.Categories.OrderBy(x => x)))
-            return false;
-
-        if (!Cost.OrderBy(x => x).SequenceEqual(listing.Cost.OrderBy(x => x)))
-            return false;
-
-        if ((Conditions != null && listing.Conditions != null) &&
-            !Conditions.OrderBy(x => x).SequenceEqual(listing.Conditions.OrderBy(x => x)))
-            return false;
-
-        return true;
-    }
 
     /// <summary>
     /// Creates a unique instance of a listing. ALWAWYS USE THIS WHEN ENUMERATING LISTING PROTOTYPES
     /// DON'T BE DUMB AND MODIFY THE PROTOTYPES
     /// </summary>
     /// <returns>A unique copy of the listing data.</returns>
-    public object Clone()
-    {
-        return new ListingData
+    public object Clone() =>
+        new ListingData
         {
             ID = ID,
             Name = Name,
@@ -268,11 +225,54 @@ public partial class ListingData : IEquatable<ListingData>, ICloneable
             Components = Components,
             // WD END
         };
+
+    public bool Equals(ListingData? listing)
+    {
+        if (listing == null)
+            return false;
+
+        //simple conditions
+        if (Priority != listing.Priority ||
+            Name != listing.Name ||
+            Description != listing.Description ||
+            ProductEntity != listing.ProductEntity ||
+            ProductAction != listing.ProductAction ||
+            RaiseProductEventOnUser != listing.RaiseProductEventOnUser || // Goobstation
+            DisableRefund != listing.DisableRefund || // Goobstation
+            ResetRestockOnPurchase != listing.ResetRestockOnPurchase || // Goobstation
+            RestockAfterPurchase != listing.RestockAfterPurchase || // Goobstation
+            RestockTime != listing.RestockTime)
+            return false;
+
+        if (ProductEvent != null && listing.ProductEvent != null &&
+            ProductEvent.GetType() != listing.ProductEvent.GetType()) // Goobstation
+            return false;
+
+        if (Icon != null && !Icon.Equals(listing.Icon))
+            return false;
+
+        // Goobstation
+        if (!BlockRefundListings.OrderBy(x => x).SequenceEqual(listing.BlockRefundListings.OrderBy(x => x)))
+            return false;
+
+        // more complicated conditions that eat perf. these don't really matter
+        // as much because you will very rarely have to check these.
+        if (!Categories.OrderBy(x => x).SequenceEqual(listing.Categories.OrderBy(x => x)))
+            return false;
+
+        if (!Cost.OrderBy(x => x).SequenceEqual(listing.Cost.OrderBy(x => x)))
+            return false;
+
+        if (Conditions != null && listing.Conditions != null &&
+            !Conditions.OrderBy(x => x).SequenceEqual(listing.Conditions.OrderBy(x => x)))
+            return false;
+
+        return true;
     }
 }
 
 /// <summary>
-///     Defines a set item listing that is available in a store
+/// Defines a set item listing that is available in a store
 /// </summary>
 [Prototype("listing")]
 [DataDefinition]

@@ -4,7 +4,7 @@ using Robust.Shared.GameStates;
 namespace Content.Shared.Bed.Sleep;
 
 /// <summary>
-/// Prevents waking up. Use only in conjunction with <see cref="StatusEffectComponent"/>, on the status effect entity.
+/// Prevents waking up. Use only in conjunction with <see cref="StatusEffectComponent" />, on the status effect entity.
 /// </summary>
-[NetworkedComponent, RegisterComponent]
+[NetworkedComponent] [RegisterComponent]
 public sealed partial class ForcedSleepingStatusEffectComponent : Component;

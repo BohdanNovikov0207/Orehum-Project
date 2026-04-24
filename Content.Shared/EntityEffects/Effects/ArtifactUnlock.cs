@@ -1,6 +1,5 @@
-using Content.Shared.Xenoarchaeology.Artifact;
-using Content.Shared.EntityEffects;
 using Content.Shared.Popups;
+using Content.Shared.Xenoarchaeology.Artifact;
 using Content.Shared.Xenoarchaeology.Artifact.Components;
 using Robust.Shared.Prototypes;
 
@@ -23,13 +22,11 @@ public sealed partial class ArtifactUnlock : EntityEffect
 
         if (!entMan.TryGetComponent<XenoArtifactUnlockingComponent>(args.TargetEntity, out var unlocking))
         {
-            xenoArtifactSys.TriggerXenoArtifact((args.TargetEntity, xenoArtifact), null, force: true);
+            xenoArtifactSys.TriggerXenoArtifact((args.TargetEntity, xenoArtifact), null, true);
             unlocking = entMan.EnsureComponent<XenoArtifactUnlockingComponent>(args.TargetEntity);
         }
         else if (!unlocking.ArtifexiumApplied)
-        {
             popupSys.PopupEntity(Loc.GetString("artifact-activation-artifexium"), args.TargetEntity, PopupType.Medium);
-        }
 
         if (unlocking.ArtifexiumApplied)
             return;
@@ -37,8 +34,6 @@ public sealed partial class ArtifactUnlock : EntityEffect
         xenoArtifactSys.SetArtifexiumApplied((args.TargetEntity, unlocking), true);
     }
 
-    protected override string ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys)
-    {
-        return Loc.GetString("reagent-effect-guidebook-artifact-unlock", ("chance", Probability));
-    }
+    protected override string ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys) =>
+        Loc.GetString("reagent-effect-guidebook-artifact-unlock", ("chance", Probability));
 }

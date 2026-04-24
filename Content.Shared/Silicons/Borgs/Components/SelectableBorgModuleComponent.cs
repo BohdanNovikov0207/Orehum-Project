@@ -12,18 +12,18 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototy
 namespace Content.Shared.Silicons.Borgs.Components;
 
 /// <summary>
-/// This is used for <see cref="BorgModuleComponent"/>s that can be "swapped" to, as opposed to having passive effects.
+/// This is used for <see cref="BorgModuleComponent" />s that can be "swapped" to, as opposed to having passive effects.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(SharedBorgSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(SharedBorgSystem))]
 public sealed partial class SelectableBorgModuleComponent : Component
 {
-    [DataField("moduleSwapAction", customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
-    public string? ModuleSwapActionId = "ActionBorgSwapModule";
-
     /// <summary>
     /// The sidebar action for swapping to this module.
     /// </summary>
     [DataField("moduleSwapActionEntity")] public EntityUid? ModuleSwapActionEntity;
+
+    [DataField("moduleSwapAction", customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
+    public string? ModuleSwapActionId = "ActionBorgSwapModule";
 }
 
 public sealed partial class BorgModuleActionSelectedEvent : InstantActionEvent

@@ -10,36 +10,35 @@
 //
 // SPDX-License-Identifier: MIT
 
-namespace Content.Shared.Speech
+namespace Content.Shared.Speech;
+
+public sealed class SpeechSystem : EntitySystem
 {
-    public sealed class SpeechSystem : EntitySystem
+    public override void Initialize()
     {
-        public override void Initialize()
-        {
-            base.Initialize();
+        base.Initialize();
 
-            SubscribeLocalEvent<SpeakAttemptEvent>(OnSpeakAttempt);
-        }
+        SubscribeLocalEvent<SpeakAttemptEvent>(OnSpeakAttempt);
+    }
 
-        public void SetSpeech(EntityUid uid, bool value, SpeechComponent? component = null)
-        {
-            if (value && !Resolve(uid, ref component))
-                return;
+    public void SetSpeech(EntityUid uid, bool value, SpeechComponent? component = null)
+    {
+        if (value && !Resolve(uid, ref component))
+            return;
 
-            component = EnsureComp<SpeechComponent>(uid);
+        component = EnsureComp<SpeechComponent>(uid);
 
-            if (component.Enabled == value)
-                return;
+        if (component.Enabled == value)
+            return;
 
-            component.Enabled = value;
+        component.Enabled = value;
 
-            Dirty(uid, component);
-        }
+        Dirty(uid, component);
+    }
 
-        private void OnSpeakAttempt(SpeakAttemptEvent args)
-        {
-            if (!TryComp(args.Uid, out SpeechComponent? speech) || !speech.Enabled)
-                args.Cancel();
-        }
+    private void OnSpeakAttempt(SpeakAttemptEvent args)
+    {
+        if (!TryComp(args.Uid, out SpeechComponent? speech) || !speech.Enabled)
+            args.Cancel();
     }
 }

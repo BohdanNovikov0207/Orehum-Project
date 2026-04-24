@@ -7,19 +7,19 @@ namespace Content.Shared.Trigger.Components.Effects;
 /// Will damage an entity when triggered.
 /// If TargetUser is true it the user will take damage instead.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class DamageOnTriggerComponent : BaseXOnTriggerComponent
 {
     /// <summary>
-    /// Should the damage ignore resistances?
+    /// The base damage amount that is dealt.
+    /// May be further modified by <see cref="Systems.BeforeDamageOnTriggerEvent" /> subscriptions.
     /// </summary>
-    [DataField, AutoNetworkedField]
-    public bool IgnoreResistances;
+    [DataField(required: true)] [AutoNetworkedField]
+    public DamageSpecifier Damage = default!;
 
     /// <summary>
-    /// The base damage amount that is dealt.
-    /// May be further modified by <see cref="Systems.BeforeDamageOnTriggerEvent"/> subscriptions.
+    /// Should the damage ignore resistances?
     /// </summary>
-    [DataField(required: true), AutoNetworkedField]
-    public DamageSpecifier Damage = default!;
+    [DataField] [AutoNetworkedField]
+    public bool IgnoreResistances;
 }

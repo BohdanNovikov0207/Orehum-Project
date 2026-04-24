@@ -28,8 +28,8 @@ namespace Content.Shared.Light.EntitySystems;
 
 public sealed class LightCollideSystem : EntitySystem
 {
-    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
     [Dependency] private readonly SlimPoweredLightSystem _lights = default!;
+    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
 
     private EntityQuery<LightOnCollideComponent> _lightQuery;
 
@@ -63,9 +63,7 @@ public sealed class LightCollideSystem : EntitySystem
             var other = contact.OtherEnt(ent.Owner);
 
             if (_lightQuery.HasComp(other))
-            {
                 _physics.RegenerateContacts(other);
-            }
         }
     }
 
@@ -74,9 +72,7 @@ public sealed class LightCollideSystem : EntitySystem
     private void OnPreventCollide(Entity<LightOnCollideColliderComponent> ent, ref PreventCollideEvent args)
     {
         if (!_lightQuery.HasComp(args.OtherEntity))
-        {
             args.Cancelled = true;
-        }
     }
 
     private void OnEnd(Entity<LightOnCollideColliderComponent> ent, ref EndCollideEvent args)

@@ -60,15 +60,15 @@ namespace Content.Shared.Anomaly;
 /// <summary>
 /// A device that allows you to translate anomaly activity into multitool signals.
 /// </summary>
-public sealed partial class AnomalySynchronizerSystem : EntitySystem
+public sealed class AnomalySynchronizerSystem : EntitySystem
 {
-    [Dependency] private readonly EntityLookupSystem _entityLookup = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SharedAnomalySystem _anomaly = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedDeviceLinkSystem _deviceLink = default!;
+    [Dependency] private readonly EntityLookupSystem _entityLookup = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly SharedPowerReceiverSystem _power = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     public override void Initialize()
@@ -119,7 +119,9 @@ public sealed partial class AnomalySynchronizerSystem : EntitySystem
                 continue;
             }
 
-            if (!synchronizerTransform.Coordinates.TryDistance(EntityManager, anomalyTransform.Coordinates, out var distance))
+            if (!synchronizerTransform.Coordinates.TryDistance(EntityManager,
+                    anomalyTransform.Coordinates,
+                    out var distance))
                 continue;
 
             if (distance > sync.AttachRange)
@@ -162,12 +164,13 @@ public sealed partial class AnomalySynchronizerSystem : EntitySystem
         DisconnectFromAnomaly(ent);
     }
 
-    private void OnExamined(Entity<AnomalySynchronizerComponent> ent, ref ExaminedEvent args)
-    {
-        args.PushMarkup(Loc.GetString(ent.Comp.ConnectedAnomaly.HasValue ? "anomaly-sync-examine-connected" : "anomaly-sync-examine-not-connected"));
-    }
+    private void OnExamined(Entity<AnomalySynchronizerComponent> ent, ref ExaminedEvent args) => args.PushMarkup(
+        Loc.GetString(ent.Comp.ConnectedAnomaly.HasValue
+            ? "anomaly-sync-examine-connected"
+            : "anomaly-sync-examine-not-connected"));
 
-    private void OnGetInteractionVerbs(Entity<AnomalySynchronizerComponent> ent, ref GetVerbsEvent<InteractionVerb> args)
+    private void OnGetInteractionVerbs(Entity<AnomalySynchronizerComponent> ent,
+        ref GetVerbsEvent<InteractionVerb> args)
     {
         if (!args.CanAccess || !args.CanInteract || args.Hands == null)
             return;
@@ -176,7 +179,7 @@ public sealed partial class AnomalySynchronizerSystem : EntitySystem
 
         if (ent.Comp.ConnectedAnomaly == null)
         {
-            args.Verbs.Add(new()
+            args.Verbs.Add(new InteractionVerb
             {
                 Act = () => TryAttachNearbyAnomaly(ent, user),
                 Message = Loc.GetString("anomaly-sync-connect-verb-message", ("machine", ent)),
@@ -185,7 +188,7 @@ public sealed partial class AnomalySynchronizerSystem : EntitySystem
         }
         else
         {
-            args.Verbs.Add(new()
+            args.Verbs.Add(new InteractionVerb
             {
                 Act = () => DisconnectFromAnomaly(ent, user),
                 Message = Loc.GetString("anomaly-sync-disconnect-verb-message", ("machine", ent)),
@@ -194,12 +197,12 @@ public sealed partial class AnomalySynchronizerSystem : EntitySystem
         }
     }
 
-    private void OnInteractHand(Entity<AnomalySynchronizerComponent> ent, ref InteractHandEvent args)
-    {
+    private void OnInteractHand(Entity<AnomalySynchronizerComponent> ent, ref InteractHandEvent args) =>
         TryAttachNearbyAnomaly(ent, args.User);
-    }
 
-    private void ConnectToAnomaly(Entity<AnomalySynchronizerComponent> ent, Entity<AnomalyComponent> anomaly, EntityUid? user = null)
+    private void ConnectToAnomaly(Entity<AnomalySynchronizerComponent> ent,
+        Entity<AnomalyComponent> anomaly,
+        EntityUid? user = null)
     {
         if (ent.Comp.ConnectedAnomaly == anomaly)
             return;
@@ -225,9 +228,7 @@ public sealed partial class AnomalySynchronizerSystem : EntitySystem
             return;
 
         if (ent.Comp.PulseOnDisconnect && TryComp<AnomalyComponent>(ent.Comp.ConnectedAnomaly, out var anomaly))
-        {
             _anomaly.DoAnomalyPulse(ent.Comp.ConnectedAnomaly.Value, anomaly);
-        }
 
         _popup.PopupPredicted(Loc.GetString("anomaly-sync-disconnected"), ent, user, PopupType.Large);
         _audio.PlayPredicted(ent.Comp.DisconnectedSound, ent, user);
@@ -285,17 +286,11 @@ public sealed partial class AnomalySynchronizerSystem : EntitySystem
                 continue;
 
             if (args.Stability < anomaly.DecayThreshold)
-            {
                 _deviceLink.InvokePort(uid, sync.DecayingPort);
-            }
             else if (args.Stability > anomaly.GrowthThreshold)
-            {
                 _deviceLink.InvokePort(uid, sync.GrowingPort);
-            }
             else
-            {
                 _deviceLink.InvokePort(uid, sync.StabilizePort);
-            }
         }
     }
 }

@@ -9,20 +9,21 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.SurveillanceCamera;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum SurveillanceCameraVisualsKey : byte
 {
     Key,
-    Layer
+    Layer,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum SurveillanceCameraVisuals : byte
 {
     Active,
     InUse,
     Disabled,
+
     // Reserved for future use
     Xray,
-    Emp
+    Emp,
 }

@@ -5,7 +5,7 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototy
 namespace Content.Shared._White.StatusIcon;
 
 [Prototype]
-public sealed partial class InfectionIconPrototype : StatusIconPrototype, IInheritingPrototype
+public sealed class InfectionIconPrototype : StatusIconPrototype, IInheritingPrototype
 {
     /// <inheritdoc />
     [ParentDataField(typeof(AbstractPrototypeIdArraySerializer<InfectionIconPrototype>))]

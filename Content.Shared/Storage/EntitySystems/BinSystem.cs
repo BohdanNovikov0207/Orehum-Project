@@ -26,38 +26,34 @@ using Robust.Shared.Network;
 namespace Content.Shared.Storage.EntitySystems;
 
 /// <summary>
-/// This handles <see cref="BinComponent"/>
+/// This handles <see cref="BinComponent" />
 /// </summary>
 public sealed class BinSystem : EntitySystem
 {
-    [Dependency] private readonly INetManager _net = default!;
     [Dependency] private readonly ISharedAdminLogManager _admin = default!;
     [Dependency] private readonly SharedContainerSystem _container = default!;
     [Dependency] private readonly SharedHandsSystem _hands = default!;
+    [Dependency] private readonly INetManager _net = default!;
     [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         SubscribeLocalEvent<BinComponent, ComponentStartup>(OnStartup);
         SubscribeLocalEvent<BinComponent, MapInitEvent>(OnMapInit);
         SubscribeLocalEvent<BinComponent, EntInsertedIntoContainerMessage>(OnEntInserted);
         SubscribeLocalEvent<BinComponent, EntRemovedFromContainerMessage>(OnEntRemoved);
-        SubscribeLocalEvent<BinComponent, InteractHandEvent>(OnInteractHand, before: new[] { typeof(SharedItemSystem) });
+        SubscribeLocalEvent<BinComponent, InteractHandEvent>(OnInteractHand, new[] { typeof(SharedItemSystem) });
         SubscribeLocalEvent<BinComponent, AfterInteractUsingEvent>(OnAfterInteractUsing);
         SubscribeLocalEvent<BinComponent, GetVerbsEvent<AlternativeVerb>>(OnAltInteractHand);
         SubscribeLocalEvent<BinComponent, ExaminedEvent>(OnExamined);
     }
 
-    private void OnExamined(EntityUid uid, BinComponent component, ExaminedEvent args)
-    {
+    private void OnExamined(EntityUid uid, BinComponent component, ExaminedEvent args) =>
         args.PushText(Loc.GetString("bin-component-on-examine-text", ("count", component.Items.Count)));
-    }
 
-    private void OnStartup(EntityUid uid, BinComponent component, ComponentStartup args)
-    {
-        component.ItemContainer = _container.EnsureContainer<Container>(uid, component.ContainerId);
-    }
+    private void OnStartup(EntityUid uid, BinComponent component, ComponentStartup args) => component.ItemContainer =
+        _container.EnsureContainer<Container>(uid, component.ContainerId);
 
     private void OnMapInit(EntityUid uid, BinComponent component, MapInitEvent args)
     {
@@ -103,7 +99,8 @@ public sealed class BinSystem : EntitySystem
             return;
 
         _hands.TryPickupAnyHand(args.User, toGrab.Value);
-        _admin.Add(LogType.Pickup, LogImpact.Low,
+        _admin.Add(LogType.Pickup,
+            LogImpact.Low,
             $"{ToPrettyString(uid):player} removed {ToPrettyString(toGrab.Value)} from bin {ToPrettyString(uid)}.");
         args.Handled = true;
     }
@@ -118,7 +115,7 @@ public sealed class BinSystem : EntitySystem
         if (args.Using != null)
         {
             var canReach = args.CanAccess && args.CanInteract;
-            InsertIntoBin(args.User, args.Target, (EntityUid)args.Using, component, false, canReach);
+            InsertIntoBin(args.User, args.Target, (EntityUid) args.Using, component, false, canReach);
         }
     }
 
@@ -128,7 +125,12 @@ public sealed class BinSystem : EntitySystem
         args.Handled = true;
     }
 
-    private void InsertIntoBin(EntityUid user, EntityUid target, EntityUid itemInHand, BinComponent component, bool handled, bool canReach)
+    private void InsertIntoBin(EntityUid user,
+        EntityUid target,
+        EntityUid itemInHand,
+        BinComponent component,
+        bool handled,
+        bool canReach)
     {
         if (handled || !canReach)
             return;
@@ -136,7 +138,9 @@ public sealed class BinSystem : EntitySystem
         if (!TryInsertIntoBin(target, itemInHand, component))
             return;
 
-        _admin.Add(LogType.Pickup, LogImpact.Low, $"{ToPrettyString(target):player} inserted {ToPrettyString(user)} into bin {ToPrettyString(target)}.");
+        _admin.Add(LogType.Pickup,
+            LogImpact.Low,
+            $"{ToPrettyString(target):player} inserted {ToPrettyString(user)} into bin {ToPrettyString(target)}.");
     }
 
     /// <summary>

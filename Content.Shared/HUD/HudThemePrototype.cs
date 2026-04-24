@@ -12,29 +12,25 @@
 
 using Robust.Shared.Prototypes;
 
-namespace Content.Shared.HUD
+namespace Content.Shared.HUD;
+
+[Prototype]
+public sealed class HudThemePrototype : IPrototype, IComparable<HudThemePrototype>
 {
-    [Prototype]
-    public sealed partial class HudThemePrototype : IPrototype, IComparable<HudThemePrototype>
-    {
-        [DataField("name", required: true)]
-        public string Name { get; private set; } = string.Empty;
+    /// <summary>
+    /// An order for the themes to be displayed in the UI
+    /// </summary>
+    [DataField]
+    public int Order = 0;
 
-        [IdDataField]
-        public string ID { get; private set; } = string.Empty;
+    [DataField("name", required: true)]
+    public string Name { get; private set; } = string.Empty;
 
-        [DataField("path", required: true)]
-        public string Path { get; private set; } = string.Empty;
+    [DataField("path", required: true)]
+    public string Path { get; private set; } = string.Empty;
 
-        /// <summary>
-        /// An order for the themes to be displayed in the UI
-        /// </summary>
-        [DataField]
-        public int Order = 0;
+    public int CompareTo(HudThemePrototype? other) => Order.CompareTo(other?.Order);
 
-        public int CompareTo(HudThemePrototype? other)
-        {
-            return Order.CompareTo(other?.Order);
-        }
-    }
+    [IdDataField]
+    public string ID { get; } = string.Empty;
 }

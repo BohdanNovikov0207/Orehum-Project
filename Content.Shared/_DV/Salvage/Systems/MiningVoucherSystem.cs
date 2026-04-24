@@ -30,34 +30,36 @@ using Robust.Shared.Audio.Systems;
 using Robust.Shared.Network;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
+
 namespace Content.Shared._DV.Salvage.Systems;
 
 public sealed class MiningVoucherSystem : EntitySystem
 {
-    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly INetManager _net = default!;
-    [Dependency] private readonly SharedHandsSystem _hands = default!;
-    [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly SharedHandsSystem _hands = default!;
+    [Dependency] private readonly INetManager _net = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly SharedPowerReceiverSystem _power = default!;
+    [Dependency] private readonly IPrototypeManager _proto = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SharedUserInterfaceSystem _ui = default!;
+    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
 
     public override void Initialize()
     {
         base.Initialize();
 
         SubscribeLocalEvent<MiningVoucherComponent, AfterInteractEvent>(OnAfterInteract);
-        Subs.BuiEvents<MiningVendorComponent>(MiningVoucherUiKey.Key, subs =>
-        {
-            subs.Event<MiningVoucherSelectMessage>(OnSelect);
-        });
+        Subs.BuiEvents<MiningVendorComponent>(MiningVoucherUiKey.Key,
+            subs =>
+            {
+                subs.Event<MiningVoucherSelectMessage>(OnSelect);
+            });
     }
 
     private void OnAfterInteract(Entity<MiningVoucherComponent> ent, ref AfterInteractEvent args)
     {
-        if (args.Target is not {} target || !args.CanReach)
+        if (args.Target is not { } target || !args.CanReach)
             return;
 
         if (_whitelist.IsWhitelistFail(ent.Comp.VendorWhitelist, target))
@@ -102,7 +104,10 @@ public sealed class MiningVoucherSystem : EntitySystem
         }
     }
 
-    public void Redeem(Entity<MiningVendorComponent> ent, Entity<MiningVoucherComponent> voucher, int index, EntityUid user)
+    public void Redeem(Entity<MiningVendorComponent> ent,
+        Entity<MiningVoucherComponent> voucher,
+        int index,
+        EntityUid user)
     {
         if (_net.IsClient) // wut da hell
             return;

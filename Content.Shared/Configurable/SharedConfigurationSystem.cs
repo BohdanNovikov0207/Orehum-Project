@@ -6,12 +6,12 @@ using static Content.Shared.Configurable.ConfigurationComponent;
 namespace Content.Shared.Configurable;
 
 /// <summary>
-/// <see cref="ConfigurationComponent"/>
+///     <see cref="ConfigurationComponent" />
 /// </summary>
 public abstract class SharedConfigurationSystem : EntitySystem
 {
-    [Dependency] private readonly SharedUserInterfaceSystem _uiSystem = default!;
     [Dependency] private readonly SharedToolSystem _toolSystem = default!;
+    [Dependency] private readonly SharedUserInterfaceSystem _uiSystem = default!;
 
     public override void Initialize()
     {
@@ -40,7 +40,8 @@ public abstract class SharedConfigurationSystem : EntitySystem
         {
             var value = args.Config.GetValueOrDefault(key);
 
-            if (string.IsNullOrWhiteSpace(value) || component.Validation != null && !component.Validation.IsMatch(value))
+            if (string.IsNullOrWhiteSpace(value) ||
+                component.Validation != null && !component.Validation.IsMatch(value))
                 continue;
 
             component.Config[key] = value;

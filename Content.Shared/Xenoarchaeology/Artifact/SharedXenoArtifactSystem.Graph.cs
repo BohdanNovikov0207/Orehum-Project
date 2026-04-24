@@ -16,9 +16,7 @@ public abstract partial class SharedXenoArtifactSystem
     public int GetIndex(Entity<XenoArtifactComponent> ent, EntityUid node)
     {
         if (TryGetIndex((ent, ent), node, out var index))
-        {
             return index.Value;
-        }
 
         throw new ArgumentException($"node {ToPrettyString(node)} is not present in {ToPrettyString(ent)}");
     }
@@ -62,7 +60,9 @@ public abstract partial class SharedXenoArtifactSystem
     /// <summary>
     /// Tries to get node entity with node component from artifact by index of node inside artifact nodes collection.
     /// </summary>
-    public bool TryGetNode(Entity<XenoArtifactComponent?> ent, int index, [NotNullWhen(true)] out Entity<XenoArtifactNodeComponent>? node)
+    public bool TryGetNode(Entity<XenoArtifactComponent?> ent,
+        int index,
+        [NotNullWhen(true)] out Entity<XenoArtifactNodeComponent>? node)
     {
         node = null;
         if (!Resolve(ent, ref ent.Comp))
@@ -96,7 +96,7 @@ public abstract partial class SharedXenoArtifactSystem
 
     /// <summary>
     /// Extracts node entities from artifact container
-    /// (uses pre-cached <see cref="XenoArtifactComponent.NodeVertices"/> and mapping from NetEntity).
+    /// (uses pre-cached <see cref="XenoArtifactComponent.NodeVertices" /> and mapping from NetEntity).
     /// </summary>
     public IEnumerable<Entity<XenoArtifactNodeComponent>> GetAllNodes(Entity<XenoArtifactComponent> ent)
     {
@@ -120,7 +120,7 @@ public abstract partial class SharedXenoArtifactSystem
     }
 
     /// <summary>
-    /// Adds edge between artifact nodes - <see cref="from"/> and <see cref="to"/>
+    /// Adds edge between artifact nodes - <see cref="from" /> and <see cref="to" />
     /// </summary>
     /// <param name="ent">Artifact entity that contains 'from' and 'to' node entities.</param>
     /// <param name="from">Node from which we need to draw edge. </param>
@@ -139,11 +139,11 @@ public abstract partial class SharedXenoArtifactSystem
             !TryGetIndex(ent, to, out var toIdx))
             return false;
 
-        return AddEdge(ent, fromIdx.Value, toIdx.Value, dirty: dirty);
+        return AddEdge(ent, fromIdx.Value, toIdx.Value, dirty);
     }
 
     /// <summary>
-    /// Adds edge between artifact nodes by indices inside node container - <see cref="fromIdx"/> and <see cref="toIdx"/>
+    /// Adds edge between artifact nodes by indices inside node container - <see cref="fromIdx" /> and <see cref="toIdx" />
     /// </summary>
     /// <param name="ent">Artifact entity that contains 'from' and 'to' node entities.</param>
     /// <param name="fromIdx">Node index inside artifact node container, from which we need to draw edge. </param>
@@ -158,8 +158,10 @@ public abstract partial class SharedXenoArtifactSystem
         if (!Resolve(ent, ref ent.Comp))
             return false;
 
-        DebugTools.Assert(fromIdx >= 0 && fromIdx < ent.Comp.NodeVertices.Length, $"fromIdx is out of bounds for fromIdx {fromIdx}");
-        DebugTools.Assert(toIdx >= 0 && toIdx < ent.Comp.NodeVertices.Length, $"toIdx is out of bounds for toIdx {toIdx}");
+        DebugTools.Assert(fromIdx >= 0 && fromIdx < ent.Comp.NodeVertices.Length,
+            $"fromIdx is out of bounds for fromIdx {fromIdx}");
+        DebugTools.Assert(toIdx >= 0 && toIdx < ent.Comp.NodeVertices.Length,
+            $"toIdx is out of bounds for toIdx {toIdx}");
 
         if (ent.Comp.NodeAdjacencyMatrix[fromIdx][toIdx])
             return false; //Edge already exists
@@ -168,9 +170,7 @@ public abstract partial class SharedXenoArtifactSystem
 
         ent.Comp.NodeAdjacencyMatrix[fromIdx][toIdx] = true;
         if (dirty)
-        {
             RebuildXenoArtifactMetaData(ent);
-        }
 
         return true;
     }
@@ -214,8 +214,10 @@ public abstract partial class SharedXenoArtifactSystem
         if (!Resolve(ent, ref ent.Comp))
             return false;
 
-        DebugTools.Assert(fromIdx >= 0 && fromIdx < ent.Comp.NodeVertices.Length, $"fromIdx is out of bounds for fromIdx {fromIdx}");
-        DebugTools.Assert(toIdx >= 0 && toIdx < ent.Comp.NodeVertices.Length, $"toIdx is out of bounds for toIdx {toIdx}");
+        DebugTools.Assert(fromIdx >= 0 && fromIdx < ent.Comp.NodeVertices.Length,
+            $"fromIdx is out of bounds for fromIdx {fromIdx}");
+        DebugTools.Assert(toIdx >= 0 && toIdx < ent.Comp.NodeVertices.Length,
+            $"toIdx is out of bounds for toIdx {toIdx}");
 
         if (!ent.Comp.NodeAdjacencyMatrix[fromIdx][toIdx])
             return false; //Edge doesn't exist
@@ -223,9 +225,7 @@ public abstract partial class SharedXenoArtifactSystem
         ent.Comp.NodeAdjacencyMatrix[fromIdx][toIdx] = false;
 
         if (dirty)
-        {
             RebuildXenoArtifactMetaData(ent);
-        }
 
         return true;
     }
@@ -254,7 +254,7 @@ public abstract partial class SharedXenoArtifactSystem
 
         var uid = Spawn(entProtoId);
         node = (uid, XenoArtifactNode(uid));
-        return AddNode(ent, (node.Value, node.Value.Comp), dirty: dirty);
+        return AddNode(ent, (node.Value, node.Value.Comp), dirty);
     }
 
     /// <summary>
@@ -281,9 +281,7 @@ public abstract partial class SharedXenoArtifactSystem
 
         Dirty(node);
         if (dirty)
-        {
             RebuildXenoArtifactMetaData(ent);
-        }
 
         return true;
     }
@@ -298,7 +296,9 @@ public abstract partial class SharedXenoArtifactSystem
     /// Should be disabled for initial graph creation to not recalculate cache on each node/edge.
     /// </param>
     /// <returns>True if node was removed successfully, false otherwise.</returns>
-    public bool RemoveNode(Entity<XenoArtifactComponent?> ent, Entity<XenoArtifactNodeComponent?> node, bool dirty = true)
+    public bool RemoveNode(Entity<XenoArtifactComponent?> ent,
+        Entity<XenoArtifactNodeComponent?> node,
+        bool dirty = true)
     {
         if (!Resolve(ent, ref ent.Comp))
             return false;
@@ -308,15 +308,13 @@ public abstract partial class SharedXenoArtifactSystem
         if (!TryGetIndex(ent, node, out var idx))
             return false; // node isn't attached to this entity.
 
-        RemoveAllNodeEdges(ent, idx.Value, dirty: false);
+        RemoveAllNodeEdges(ent, idx.Value, false);
 
         _container.Remove(node.Owner, ent.Comp.NodeContainer);
         node.Comp.Attached = null;
         ent.Comp.NodeVertices[idx.Value] = null;
         if (dirty)
-        {
             RebuildXenoArtifactMetaData(ent);
-        }
 
         Dirty(node);
 
@@ -340,19 +338,17 @@ public abstract partial class SharedXenoArtifactSystem
         var predecessors = GetDirectPredecessorNodes(ent, nodeIdx);
         foreach (var p in predecessors)
         {
-            RemoveEdge(ent, p, nodeIdx, dirty: false);
+            RemoveEdge(ent, p, nodeIdx, false);
         }
 
         var successors = GetDirectSuccessorNodes(ent, nodeIdx);
         foreach (var s in successors)
         {
-            RemoveEdge(ent, nodeIdx, s, dirty: false);
+            RemoveEdge(ent, nodeIdx, s, false);
         }
 
         if (dirty)
-        {
             RebuildXenoArtifactMetaData(ent);
-        }
     }
 
     /// <summary>
@@ -362,13 +358,14 @@ public abstract partial class SharedXenoArtifactSystem
     /// Direct predecessors are nodes, which are connected by edges directly to target node,
     /// and are on outgoing ('FROM') side of edge connection.
     /// </remarks>
-    public HashSet<Entity<XenoArtifactNodeComponent>> GetDirectPredecessorNodes(Entity<XenoArtifactComponent?> ent, EntityUid node)
+    public HashSet<Entity<XenoArtifactNodeComponent>> GetDirectPredecessorNodes(Entity<XenoArtifactComponent?> ent,
+        EntityUid node)
     {
         if (!Resolve(ent, ref ent.Comp))
-            return new();
+            return new HashSet<Entity<XenoArtifactNodeComponent>>();
 
         if (!TryGetIndex(ent, node, out var index))
-            return new();
+            return new HashSet<Entity<XenoArtifactNodeComponent>>();
 
         var indices = GetDirectPredecessorNodes(ent, index.Value);
         var output = new HashSet<Entity<XenoArtifactNodeComponent>>();
@@ -391,9 +388,10 @@ public abstract partial class SharedXenoArtifactSystem
     public HashSet<int> GetDirectPredecessorNodes(Entity<XenoArtifactComponent?> ent, int nodeIdx)
     {
         if (!Resolve(ent, ref ent.Comp))
-            return new();
+            return new HashSet<int>();
 
-        DebugTools.Assert(nodeIdx >= 0 && nodeIdx < ent.Comp.NodeVertices.Length, $"node index {nodeIdx} is out of bounds!");
+        DebugTools.Assert(nodeIdx >= 0 && nodeIdx < ent.Comp.NodeVertices.Length,
+            $"node index {nodeIdx} is out of bounds!");
 
         var indices = new HashSet<int>();
         for (var i = 0; i < ent.Comp.NodeAdjacencyMatrixRows; i++)
@@ -412,13 +410,14 @@ public abstract partial class SharedXenoArtifactSystem
     /// Direct successors are nodes, which are connected by edges
     /// directly to target node, and are on incoming ('TO') side of edge connection.
     /// </remarks>
-    public HashSet<Entity<XenoArtifactNodeComponent>> GetDirectSuccessorNodes(Entity<XenoArtifactComponent?> ent, EntityUid node)
+    public HashSet<Entity<XenoArtifactNodeComponent>> GetDirectSuccessorNodes(Entity<XenoArtifactComponent?> ent,
+        EntityUid node)
     {
         if (!Resolve(ent, ref ent.Comp))
-            return new();
+            return new HashSet<Entity<XenoArtifactNodeComponent>>();
 
         if (!TryGetIndex(ent, node, out var index))
-            return new();
+            return new HashSet<Entity<XenoArtifactNodeComponent>>();
 
         var indices = GetDirectSuccessorNodes(ent, index.Value);
         var output = new HashSet<Entity<XenoArtifactNodeComponent>>();
@@ -441,7 +440,7 @@ public abstract partial class SharedXenoArtifactSystem
     public HashSet<int> GetDirectSuccessorNodes(Entity<XenoArtifactComponent?> ent, int nodeIdx)
     {
         if (!Resolve(ent, ref ent.Comp))
-            return new();
+            return new HashSet<int>();
         DebugTools.Assert(nodeIdx >= 0 && nodeIdx < ent.Comp.NodeVertices.Length, "node index is out of bounds!");
 
         var indices = new HashSet<int>();
@@ -461,10 +460,11 @@ public abstract partial class SharedXenoArtifactSystem
     /// Predecessors are nodes, which are connected by edges directly to target node on 'FROM' side of edge,
     /// or connected to such node on 'FROM' side of edge, etc recursively.
     /// </remarks>
-    public HashSet<Entity<XenoArtifactNodeComponent>> GetPredecessorNodes(Entity<XenoArtifactComponent?> ent, Entity<XenoArtifactNodeComponent> node)
+    public HashSet<Entity<XenoArtifactNodeComponent>> GetPredecessorNodes(Entity<XenoArtifactComponent?> ent,
+        Entity<XenoArtifactNodeComponent> node)
     {
         if (!Resolve(ent, ref ent.Comp))
-            return new();
+            return new HashSet<Entity<XenoArtifactNodeComponent>>();
 
         var predecessors = GetPredecessorNodes(ent, GetIndex((ent, ent.Comp), node));
         var output = new HashSet<Entity<XenoArtifactNodeComponent>>();
@@ -486,11 +486,11 @@ public abstract partial class SharedXenoArtifactSystem
     public HashSet<int> GetPredecessorNodes(Entity<XenoArtifactComponent?> ent, int nodeIdx)
     {
         if (!Resolve(ent, ref ent.Comp))
-            return new();
+            return new HashSet<int>();
 
         var predecessors = GetDirectPredecessorNodes(ent, nodeIdx);
         if (predecessors.Count == 0)
-            return new();
+            return new HashSet<int>();
 
         var output = new HashSet<int>();
         foreach (var p in predecessors)
@@ -513,10 +513,11 @@ public abstract partial class SharedXenoArtifactSystem
     /// Successors are nodes, which are connected by edges directly to target node on 'TO' side of edge,
     /// or connected to such node on 'TO' side of edge, etc recursively.
     /// </remarks>
-    public HashSet<Entity<XenoArtifactNodeComponent>> GetSuccessorNodes(Entity<XenoArtifactComponent?> ent, Entity<XenoArtifactNodeComponent> node)
+    public HashSet<Entity<XenoArtifactNodeComponent>> GetSuccessorNodes(Entity<XenoArtifactComponent?> ent,
+        Entity<XenoArtifactNodeComponent> node)
     {
         if (!Resolve(ent, ref ent.Comp))
-            return new();
+            return new HashSet<Entity<XenoArtifactNodeComponent>>();
 
         var successors = GetSuccessorNodes(ent, GetIndex((ent, ent.Comp), node));
         var output = new HashSet<Entity<XenoArtifactNodeComponent>>();
@@ -538,11 +539,11 @@ public abstract partial class SharedXenoArtifactSystem
     public HashSet<int> GetSuccessorNodes(Entity<XenoArtifactComponent?> ent, int nodeIdx)
     {
         if (!Resolve(ent, ref ent.Comp))
-            return new();
+            return new HashSet<int>();
 
         var successors = GetDirectSuccessorNodes(ent, nodeIdx);
         if (successors.Count == 0)
-            return new();
+            return new HashSet<int>();
 
         var output = new HashSet<int>();
         foreach (var s in successors)
@@ -571,7 +572,7 @@ public abstract partial class SharedXenoArtifactSystem
     )
     {
         if (!Resolve(ent, ref ent.Comp))
-            return new();
+            return new bool();
 
         var fromIdx = GetIndex((ent, ent.Comp), from);
         var toIdx = GetIndex((ent, ent.Comp), to);
@@ -580,7 +581,7 @@ public abstract partial class SharedXenoArtifactSystem
     }
 
     /// <summary>
-    /// Resizes the adjacency matrix and vertices array to <paramref name="newSize"/>,
+    /// Resizes the adjacency matrix and vertices array to <paramref name="newSize" />,
     /// or at least what it WOULD do if i wasn't forced to use shitty lists.
     /// </summary>
     protected void ResizeNodeGraph(Entity<XenoArtifactComponent> ent, int newSize)
@@ -589,7 +590,7 @@ public abstract partial class SharedXenoArtifactSystem
 
         while (ent.Comp.NodeAdjacencyMatrix.Count < newSize)
         {
-            ent.Comp.NodeAdjacencyMatrix.Add(new());
+            ent.Comp.NodeAdjacencyMatrix.Add(new List<bool>());
         }
 
         foreach (var row in ent.Comp.NodeAdjacencyMatrix)

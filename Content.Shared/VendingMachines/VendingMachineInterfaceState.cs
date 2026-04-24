@@ -6,23 +6,23 @@
 
 using Robust.Shared.Serialization;
 
-namespace Content.Shared.VendingMachines
-{
-    [Serializable, NetSerializable]
-    public sealed class VendingMachineEjectMessage : BoundUserInterfaceMessage
-    {
-        public readonly InventoryType Type;
-        public readonly string ID;
-        public VendingMachineEjectMessage(InventoryType type, string id)
-        {
-            Type = type;
-            ID = id;
-        }
-    }
+namespace Content.Shared.VendingMachines;
 
-    [Serializable, NetSerializable]
-    public enum VendingMachineUiKey
+[Serializable] [NetSerializable]
+public sealed class VendingMachineEjectMessage : BoundUserInterfaceMessage
+{
+    public readonly string ID;
+    public readonly InventoryType Type;
+
+    public VendingMachineEjectMessage(InventoryType type, string id)
     {
-        Key,
+        Type = type;
+        ID = id;
     }
+}
+
+[Serializable] [NetSerializable]
+public enum VendingMachineUiKey
+{
+    Key,
 }

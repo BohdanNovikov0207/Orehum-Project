@@ -17,7 +17,7 @@ using Robust.Shared.Timing;
 namespace Content.Shared._DV.NanoChat;
 
 /// <summary>
-///     Base system for NanoChat functionality shared between client and server.
+/// Base system for NanoChat functionality shared between client and server.
 /// </summary>
 public abstract class SharedNanoChatSystem : EntitySystem
 {
@@ -46,7 +46,7 @@ public abstract class SharedNanoChatSystem : EntitySystem
     #region Public API Methods
 
     /// <summary>
-    ///     Gets the NanoChat number for a card.
+    /// Gets the NanoChat number for a card.
     /// </summary>
     public uint? GetNumber(Entity<NanoChatCardComponent?> card)
     {
@@ -57,7 +57,7 @@ public abstract class SharedNanoChatSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Sets the NanoChat number for a card.
+    /// Sets the NanoChat number for a card.
     /// </summary>
     public void SetNumber(Entity<NanoChatCardComponent?> card, uint number)
     {
@@ -69,7 +69,7 @@ public abstract class SharedNanoChatSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Sets IsClosed for a card.
+    /// Sets IsClosed for a card.
     /// </summary>
     public void SetClosed(Entity<NanoChatCardComponent?> card, bool closed)
     {
@@ -80,7 +80,7 @@ public abstract class SharedNanoChatSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Gets the recipients dictionary from a card.
+    /// Gets the recipients dictionary from a card.
     /// </summary>
     public IReadOnlyDictionary<uint, NanoChatRecipient> GetRecipients(Entity<NanoChatCardComponent?> card)
     {
@@ -91,7 +91,7 @@ public abstract class SharedNanoChatSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Gets the messages dictionary from a card.
+    /// Gets the messages dictionary from a card.
     /// </summary>
     public IReadOnlyDictionary<uint, List<NanoChatMessage>> GetMessages(Entity<NanoChatCardComponent?> card)
     {
@@ -102,7 +102,7 @@ public abstract class SharedNanoChatSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Sets a specific recipient in the card.
+    /// Sets a specific recipient in the card.
     /// </summary>
     public void SetRecipient(Entity<NanoChatCardComponent?> card, uint number, NanoChatRecipient recipient)
     {
@@ -114,7 +114,7 @@ public abstract class SharedNanoChatSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Gets a specific recipient from the card.
+    /// Gets a specific recipient from the card.
     /// </summary>
     public NanoChatRecipient? GetRecipient(Entity<NanoChatCardComponent?> card, uint number)
     {
@@ -125,7 +125,7 @@ public abstract class SharedNanoChatSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Gets all messages for a specific recipient.
+    /// Gets all messages for a specific recipient.
     /// </summary>
     public List<NanoChatMessage>? GetMessagesForRecipient(Entity<NanoChatCardComponent?> card, uint recipientNumber)
     {
@@ -136,7 +136,7 @@ public abstract class SharedNanoChatSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Adds a message to a recipient's conversation.
+    /// Adds a message to a recipient's conversation.
     /// </summary>
     public void AddMessage(Entity<NanoChatCardComponent?> card, uint recipientNumber, NanoChatMessage message)
     {
@@ -155,7 +155,7 @@ public abstract class SharedNanoChatSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Gets the currently selected chat recipient.
+    /// Gets the currently selected chat recipient.
     /// </summary>
     public uint? GetCurrentChat(Entity<NanoChatCardComponent?> card)
     {
@@ -166,7 +166,7 @@ public abstract class SharedNanoChatSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Sets the currently selected chat recipient.
+    /// Sets the currently selected chat recipient.
     /// </summary>
     public void SetCurrentChat(Entity<NanoChatCardComponent?> card, uint? recipient)
     {
@@ -178,7 +178,7 @@ public abstract class SharedNanoChatSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Gets whether notifications are muted.
+    /// Gets whether notifications are muted.
     /// </summary>
     public bool GetNotificationsMuted(Entity<NanoChatCardComponent?> card)
     {
@@ -189,7 +189,7 @@ public abstract class SharedNanoChatSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Sets whether notifications are muted.
+    /// Sets whether notifications are muted.
     /// </summary>
     public void SetNotificationsMuted(Entity<NanoChatCardComponent?> card, bool muted)
     {
@@ -201,7 +201,7 @@ public abstract class SharedNanoChatSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Gets whether NanoChat number is listed.
+    /// Gets whether NanoChat number is listed.
     /// </summary>
     public bool GetListNumber(Entity<NanoChatCardComponent?> card)
     {
@@ -212,7 +212,7 @@ public abstract class SharedNanoChatSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Sets whether NanoChat number is listed.
+    /// Sets whether NanoChat number is listed.
     /// </summary>
     public void SetListNumber(Entity<NanoChatCardComponent?> card, bool listNumber)
     {
@@ -224,7 +224,7 @@ public abstract class SharedNanoChatSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Gets the time of the last message.
+    /// Gets the time of the last message.
     /// </summary>
     public TimeSpan? GetLastMessageTime(Entity<NanoChatCardComponent?> card)
     {
@@ -235,7 +235,7 @@ public abstract class SharedNanoChatSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Gets if there are unread messages from a recipient.
+    /// Gets if there are unread messages from a recipient.
     /// </summary>
     public bool HasUnreadMessages(Entity<NanoChatCardComponent?> card, uint recipientNumber)
     {
@@ -246,7 +246,7 @@ public abstract class SharedNanoChatSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Clears all messages and recipients from the card.
+    /// Clears all messages and recipients from the card.
     /// </summary>
     public void Clear(Entity<NanoChatCardComponent?> card)
     {
@@ -260,8 +260,8 @@ public abstract class SharedNanoChatSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Deletes a chat conversation with a recipient from the card.
-    ///     Optionally keeps message history while removing from active chats.
+    /// Deletes a chat conversation with a recipient from the card.
+    /// Optionally keeps message history while removing from active chats.
     /// </summary>
     /// <returns>True if the chat was deleted successfully</returns>
     public bool TryDeleteChat(Entity<NanoChatCardComponent?> card, uint recipientNumber, bool keepMessages = false)
@@ -287,8 +287,8 @@ public abstract class SharedNanoChatSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Ensures a recipient exists in the card's contacts and message lists.
-    ///     If the recipient doesn't exist, they will be added with the provided info.
+    /// Ensures a recipient exists in the card's contacts and message lists.
+    /// If the recipient doesn't exist, they will be added with the provided info.
     /// </summary>
     /// <returns>True if the recipient was added or already existed</returns>
     public bool EnsureRecipientExists(Entity<NanoChatCardComponent?> card,

@@ -17,6 +17,12 @@ public sealed partial class GoliathSummonTentacleAction : WorldTargetActionEvent
     public EntProtoId EntityId = "EffectGoliathTentacleSpawn";
 
     /// <summary>
+    /// How many entities will spawn beyond the original one at the target location?
+    /// </summary>
+    [DataField]
+    public int ExtraSpawns = 3;
+
+    /// <summary>
     /// Directions determining where the entities will spawn.
     /// </summary>
     [DataField]
@@ -27,10 +33,4 @@ public sealed partial class GoliathSummonTentacleAction : WorldTargetActionEvent
         Direction.East,
         Direction.West,
     };
-
-    /// <summary>
-    /// How many entities will spawn beyond the original one at the target location?
-    /// </summary>
-    [DataField]
-    public int ExtraSpawns = 3;
-};
+}

@@ -1,12 +1,15 @@
-﻿using Content.Shared.Trigger.Components;
+﻿using Content.Shared.Examine;
+using Content.Shared.Trigger.Components;
 using Content.Shared.Trigger.Components.Triggers;
-using Content.Shared.Examine;
 using Content.Shared.Verbs;
 
 namespace Content.Shared.Trigger.Systems;
 
 public sealed partial class TriggerSystem
 {
+    public static readonly VerbCategory TimerOptions =
+        new("verb-categories-timer", "/Textures/Interface/VerbIcons/clock.svg.192dpi.png");
+
     private void InitializeTimer()
     {
         SubscribeLocalEvent<RepeatingTriggerComponent, MapInitEvent>(OnRepeatInit);
@@ -36,10 +39,8 @@ public sealed partial class TriggerSystem
         Dirty(ent.Owner, timerTriggerComp);
     }
 
-    private void OnTimerShutdown(Entity<TimerTriggerComponent> ent, ref ComponentShutdown args)
-    {
+    private void OnTimerShutdown(Entity<TimerTriggerComponent> ent, ref ComponentShutdown args) =>
         RemComp<ActiveTimerTriggerComponent>(ent);
-    }
 
     private void OnTimerExamined(Entity<TimerTriggerComponent> ent, ref ExaminedEvent args)
     {
@@ -73,7 +74,7 @@ public sealed partial class TriggerSystem
             Category = TimerOptions,
             Text = Loc.GetString("timer-trigger-verb-cycle"),
             Act = () => CycleDelay(ent, user),
-            Priority = 1
+            Priority = 1,
         });
 
         foreach (var option in ent.Comp.DelayOptions)
@@ -85,7 +86,7 @@ public sealed partial class TriggerSystem
                     Category = TimerOptions,
                     Text = Loc.GetString("timer-trigger-verb-set-current", ("time", option.TotalSeconds)),
                     Disabled = true,
-                    Priority = -100 * (int)option.TotalSeconds
+                    Priority = -100 * (int) option.TotalSeconds,
                 });
             }
             else
@@ -94,19 +95,19 @@ public sealed partial class TriggerSystem
                 {
                     Category = TimerOptions,
                     Text = Loc.GetString("timer-trigger-verb-set", ("time", option.TotalSeconds)),
-                    Priority = -100 * (int)option.TotalSeconds,
+                    Priority = -100 * (int) option.TotalSeconds,
                     Act = () =>
                     {
                         ent.Comp.Delay = option;
                         Dirty(ent);
-                        _popup.PopupClient(Loc.GetString("timer-trigger-popup-set", ("time", option.TotalSeconds)), user, user);
-                    }
+                        _popup.PopupClient(Loc.GetString("timer-trigger-popup-set", ("time", option.TotalSeconds)),
+                            user,
+                            user);
+                    },
                 });
             }
         }
     }
-
-    public static readonly VerbCategory TimerOptions = new("verb-categories-timer", "/Textures/Interface/VerbIcons/clock.svg.192dpi.png");
 
     /// <summary>
     /// Select the next entry from the DelayOptions.

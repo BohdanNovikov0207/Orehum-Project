@@ -37,7 +37,9 @@ public sealed class XATTimerSystem : BaseQueryUpdateXATSystem<XATTimerComponent>
     }
 
     /// <inheritdoc />
-    protected override void UpdateXAT(Entity<XenoArtifactComponent> artifact, Entity<XATTimerComponent, XenoArtifactNodeComponent> node, float frameTime)
+    protected override void UpdateXAT(Entity<XenoArtifactComponent> artifact,
+        Entity<XATTimerComponent, XenoArtifactNodeComponent> node,
+        float frameTime)
     {
         if (Timing.CurTime > node.Comp1.NextActivation)
             Trigger(artifact, node);
@@ -50,19 +52,19 @@ public sealed class XATTimerSystem : BaseQueryUpdateXATSystem<XATTimerComponent>
         Dirty(ent);
     }
 
-    private void OnExamine(Entity<XenoArtifactComponent> artifact, Entity<XATTimerComponent, XenoArtifactNodeComponent> node, ref ExaminedEvent args)
+    private void OnExamine(Entity<XenoArtifactComponent> artifact,
+        Entity<XATTimerComponent, XenoArtifactNodeComponent> node,
+        ref ExaminedEvent args)
     {
         if (!args.IsInDetailsRange)
             return;
 
         args.PushMarkup(
             Loc.GetString("xenoarch-trigger-examine-timer",
-            ("time", MathF.Ceiling((float) (node.Comp1.NextActivation - Timing.CurTime).TotalSeconds)))
+                ("time", MathF.Ceiling((float) (node.Comp1.NextActivation - Timing.CurTime).TotalSeconds)))
         );
     }
 
-    private TimeSpan GetNextDelay(XATTimerComponent comp)
-    {
-        return TimeSpan.FromSeconds(comp.PossibleDelayInSeconds.Next(_robustRandom));
-    }
+    private TimeSpan GetNextDelay(XATTimerComponent comp) =>
+        TimeSpan.FromSeconds(comp.PossibleDelayInSeconds.Next(_robustRandom));
 }

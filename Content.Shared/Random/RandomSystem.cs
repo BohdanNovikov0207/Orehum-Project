@@ -10,7 +10,10 @@ namespace Content.Shared.Random;
 
 public sealed class RandomSystem : EntitySystem
 {
-    public IBudgetEntry? GetBudgetEntry(ref float budget, ref float probSum, IList<IBudgetEntry> entries, System.Random random)
+    public IBudgetEntry? GetBudgetEntry(ref float budget,
+        ref float probSum,
+        IList<IBudgetEntry> entries,
+        System.Random random)
     {
         DebugTools.Assert(budget > 0f);
 
@@ -53,9 +56,7 @@ public sealed class RandomSystem : EntitySystem
             value -= entry.Prob;
 
             if (value < 0f)
-            {
                 return entry;
-            }
         }
 
         throw new InvalidOperationException();

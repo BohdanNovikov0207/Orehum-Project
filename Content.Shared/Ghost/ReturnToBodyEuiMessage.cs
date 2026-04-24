@@ -9,7 +9,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Ghost;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class ReturnToBodyMessage : EuiMessageBase
 {
     public readonly bool Accepted;

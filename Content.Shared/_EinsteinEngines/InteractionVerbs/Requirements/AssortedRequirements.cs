@@ -15,29 +15,31 @@ using Robust.Shared.Serialization;
 namespace Content.Shared.InteractionVerbs.Requirements;
 
 /// <summary>
-///     Requires the target to meet a certain whitelist and not meet a blacklist.
+/// Requires the target to meet a certain whitelist and not meet a blacklist.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class EntityWhitelistRequirement : InteractionRequirement
 {
     [DataField] public EntityWhitelist Whitelist = new(), Blacklist = new();
 
-    public override bool IsMet(InteractionArgs args, InteractionVerbPrototype proto, InteractionAction.VerbDependencies deps)
-    {
-        return deps.WhitelistSystem.IsValid(Whitelist, args.Target) &&
-               !deps.WhitelistSystem.IsValid(Blacklist, args.Target);
-    }
+    public override bool IsMet(InteractionArgs args,
+        InteractionVerbPrototype proto,
+        InteractionAction.VerbDependencies deps) =>
+        deps.WhitelistSystem.IsValid(Whitelist, args.Target) &&
+        !deps.WhitelistSystem.IsValid(Blacklist, args.Target);
 }
 
 /// <summary>
-///     Requires the mob to be a mob in a certain state. If inverted, requires the mob to not be in that state.
+/// Requires the mob to be a mob in a certain state. If inverted, requires the mob to not be in that state.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class MobStateRequirement : InvertableInteractionRequirement
 {
     [DataField] public List<MobState> AllowedStates = new();
 
-    public override bool IsMet(InteractionArgs args, InteractionVerbPrototype proto, InteractionAction.VerbDependencies deps)
+    public override bool IsMet(InteractionArgs args,
+        InteractionVerbPrototype proto,
+        InteractionAction.VerbDependencies deps)
     {
         if (!deps.EntMan.TryGetComponent<MobStateComponent>(args.Target, out var state))
             return false;
@@ -47,14 +49,16 @@ public sealed partial class MobStateRequirement : InvertableInteractionRequireme
 }
 
 /// <summary>
-///     Requires the target to be in a specific standing state.
+/// Requires the target to be in a specific standing state.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class StandingStateRequirement : InteractionRequirement
 {
     [DataField] public bool AllowStanding, AllowLaying, AllowKnockedDown, AllowSleep;
 
-    public override bool IsMet(InteractionArgs args, InteractionVerbPrototype proto, InteractionAction.VerbDependencies deps)
+    public override bool IsMet(InteractionArgs args,
+        InteractionVerbPrototype proto,
+        InteractionAction.VerbDependencies deps)
     {
         if (deps.EntMan.HasComponent<SleepingComponent>(args.Target) && !AllowSleep)
             return false;
@@ -70,13 +74,12 @@ public sealed partial class StandingStateRequirement : InteractionRequirement
 }
 
 /// <summary>
-///     Requires the target to be the user itself.
+/// Requires the target to be the user itself.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class SelfTargetRequirement : InvertableInteractionRequirement
 {
-    public override bool IsMet(InteractionArgs args, InteractionVerbPrototype proto, InteractionAction.VerbDependencies deps)
-    {
-        return (args.Target == args.User) ^ Inverted;
-    }
+    public override bool IsMet(InteractionArgs args,
+        InteractionVerbPrototype proto,
+        InteractionAction.VerbDependencies deps) => (args.Target == args.User) ^ Inverted;
 }

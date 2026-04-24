@@ -17,20 +17,20 @@ using Content.Shared.Inventory;
 namespace Content.Shared.Explosion;
 
 /// <summary>
-///     Raised directed at an entity to determine its explosion resistance, probably right before it is about to be
-///     damaged by one.
+/// Raised directed at an entity to determine its explosion resistance, probably right before it is about to be
+/// damaged by one.
 /// </summary>
 [ByRefEvent]
 public record struct GetExplosionResistanceEvent(string ExplosionPrototype) : IInventoryRelayEvent
 {
+    public readonly string ExplosionPrototype = ExplosionPrototype;
+
     /// <summary>
-    ///     A coefficient applied to overall explosive damage.
+    /// A coefficient applied to overall explosive damage.
     /// </summary>
     public float DamageCoefficient = 1;
 
-    public readonly string ExplosionPrototype = ExplosionPrototype;
-
-    SlotFlags IInventoryRelayEvent.TargetSlots =>  ~SlotFlags.POCKET;
+    SlotFlags IInventoryRelayEvent.TargetSlots => ~SlotFlags.POCKET;
 }
 
 /// <summary>
@@ -42,6 +42,11 @@ public record struct GetExplosionResistanceEvent(string ExplosionPrototype) : II
 [ByRefEvent]
 public record struct BeforeExplodeEvent(DamageSpecifier Damage, string Id, List<EntityUid> Contents)
 {
+    /// <summary>
+    /// Contained/child entities that should receive recursive explosion damage.
+    /// </summary>
+    public readonly List<EntityUid> Contents = Contents;
+
     /// <summary>
     /// The damage that will be received by this entity. Note that the entity's explosion resistance has already been
     /// used to modify this damage.
@@ -57,9 +62,4 @@ public record struct BeforeExplodeEvent(DamageSpecifier Damage, string Id, List<
     /// Damage multiplier for modifying the damage that will get dealt to contained entities.
     /// </summary>
     public float DamageCoefficient = 1;
-
-    /// <summary>
-    /// Contained/child entities that should receive recursive explosion damage.
-    /// </summary>
-    public readonly List<EntityUid> Contents = Contents;
 }

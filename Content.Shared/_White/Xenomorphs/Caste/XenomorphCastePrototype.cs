@@ -3,10 +3,10 @@ using Robust.Shared.Prototypes;
 namespace Content.Shared._White.Xenomorphs.Caste;
 
 [Prototype("xenomorphCaste")]
-public sealed partial class XenomorphCastePrototype : IPrototype
+public sealed class XenomorphCastePrototype : IPrototype
 {
-    [IdDataField]
-    public string ID { get; } = default!;
+    [DataField]
+    public int MaxCount;
 
     [DataField]
     public string Name = string.Empty;
@@ -14,6 +14,6 @@ public sealed partial class XenomorphCastePrototype : IPrototype
     [DataField]
     public ProtoId<XenomorphCastePrototype>? NeedCasteDeath;
 
-    [DataField]
-    public int MaxCount;
+    [IdDataField]
+    public string ID { get; } = default!;
 }

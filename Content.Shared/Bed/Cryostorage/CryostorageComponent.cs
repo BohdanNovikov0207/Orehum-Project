@@ -13,26 +13,32 @@ namespace Content.Shared.Bed.Cryostorage;
 /// This is used for a container which, when a player logs out while inside of,
 /// will delete their body and redistribute their items.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 [AutoGenerateComponentState]
 public sealed partial class CryostorageComponent : Component
 {
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    [DataField] [ViewVariables(VVAccess.ReadWrite)]
     public string ContainerId = "storage";
-
-    /// <summary>
-    /// How long a player can remain inside Cryostorage before automatically being taken care of, given that they have no mind.
-    /// </summary>
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
-    [AutoNetworkedField]
-    public TimeSpan NoMindGracePeriod = TimeSpan.FromSeconds(30f);
 
     /// <summary>
     /// How long a player can remain inside Cryostorage before automatically being taken care of.
     /// </summary>
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    [DataField] [ViewVariables(VVAccess.ReadWrite)]
     [AutoNetworkedField]
     public TimeSpan GracePeriod = TimeSpan.FromMinutes(5f);
+
+    /// <summary>
+    /// How long a player can remain inside Cryostorage before automatically being taken care of, given that they have no mind.
+    /// </summary>
+    [DataField] [ViewVariables(VVAccess.ReadWrite)]
+    [AutoNetworkedField]
+    public TimeSpan NoMindGracePeriod = TimeSpan.FromSeconds(30f);
+
+    /// <summary>
+    /// Sound that is played when a player is removed by a cryostorage.
+    /// </summary>
+    [DataField]
+    public SoundSpecifier? RemoveSound = new SoundPathSpecifier("/Audio/Effects/teleport_departure.ogg");
 
     /// <summary>
     /// A list of players who have actively entered cryostorage.
@@ -40,32 +46,21 @@ public sealed partial class CryostorageComponent : Component
     [DataField]
     [AutoNetworkedField]
     public List<EntityUid> StoredPlayers = new();
-
-    /// <summary>
-    /// Sound that is played when a player is removed by a cryostorage.
-    /// </summary>
-    [DataField]
-    public SoundSpecifier? RemoveSound = new SoundPathSpecifier("/Audio/Effects/teleport_departure.ogg");
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum CryostorageVisuals : byte
 {
-    Full
+    Full,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public record struct CryostorageContainedPlayerData()
 {
     /// <summary>
-    /// The player's IC name
+    /// A dictionary relating a hand ID to the hand name and the name of the item being held.
     /// </summary>
-    public string PlayerName = string.Empty;
-
-    /// <summary>
-    /// The player's entity
-    /// </summary>
-    public NetEntity PlayerEnt = NetEntity.Invalid;
+    public Dictionary<string, string> HeldItems = new();
 
     /// <summary>
     /// A dictionary relating a slot definition name to the name of the item inside of it.
@@ -73,12 +68,17 @@ public record struct CryostorageContainedPlayerData()
     public Dictionary<string, string> ItemSlots = new();
 
     /// <summary>
-    /// A dictionary relating a hand ID to the hand name and the name of the item being held.
+    /// The player's entity
     /// </summary>
-    public Dictionary<string, string> HeldItems = new();
+    public NetEntity PlayerEnt = NetEntity.Invalid;
+
+    /// <summary>
+    /// The player's IC name
+    /// </summary>
+    public string PlayerName = string.Empty;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class CryostorageBuiState : BoundUserInterfaceState
 {
     public List<CryostorageContainedPlayerData> PlayerData;
@@ -89,20 +89,19 @@ public sealed class CryostorageBuiState : BoundUserInterfaceState
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class CryostorageRemoveItemBuiMessage : BoundUserInterfaceMessage
 {
-    public NetEntity StoredEntity;
-
-    public string Key;
-
-    public RemovalType Type;
-
     public enum RemovalType : byte
     {
         Hand,
-        Inventory
+        Inventory,
     }
+
+    public string Key;
+    public NetEntity StoredEntity;
+
+    public RemovalType Type;
 
     public CryostorageRemoveItemBuiMessage(NetEntity storedEntity, string key, RemovalType type)
     {
@@ -112,8 +111,8 @@ public sealed class CryostorageRemoveItemBuiMessage : BoundUserInterfaceMessage
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum CryostorageUIKey : byte
 {
-    Key
+    Key,
 }

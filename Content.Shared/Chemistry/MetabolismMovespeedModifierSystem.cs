@@ -17,60 +17,57 @@ using Content.Shared.Chemistry.Components;
 using Content.Shared.Movement.Systems;
 using Robust.Shared.Timing;
 
-namespace Content.Shared.Chemistry
+namespace Content.Shared.Chemistry;
+
+// TODO CONVERT THIS TO A STATUS EFFECT!!!!!!!!!!!!!!!!!!!!!!!!
+public sealed class MetabolismMovespeedModifierSystem : EntitySystem
 {
-    // TODO CONVERT THIS TO A STATUS EFFECT!!!!!!!!!!!!!!!!!!!!!!!!
-    public sealed class MetabolismMovespeedModifierSystem : EntitySystem
+    private readonly List<Entity<MovespeedModifierMetabolismComponent>> _components = new();
+    [Dependency] private readonly IGameTiming _gameTiming = default!;
+    [Dependency] private readonly MovementSpeedModifierSystem _movespeed = default!;
+
+    public override void Initialize()
     {
-        [Dependency] private readonly IGameTiming _gameTiming = default!;
-        [Dependency] private readonly MovementSpeedModifierSystem _movespeed = default!;
+        base.Initialize();
 
-        private readonly List<Entity<MovespeedModifierMetabolismComponent>> _components = new();
+        UpdatesOutsidePrediction = true;
 
-        public override void Initialize()
+        SubscribeLocalEvent<MovespeedModifierMetabolismComponent, ComponentStartup>(AddComponent);
+        SubscribeLocalEvent<MovespeedModifierMetabolismComponent, RefreshMovementSpeedModifiersEvent>(
+            OnRefreshMovespeed);
+    }
+
+    private void OnRefreshMovespeed(EntityUid uid,
+        MovespeedModifierMetabolismComponent component,
+        RefreshMovementSpeedModifiersEvent args) =>
+        args.ModifySpeed(component.WalkSpeedModifier, component.SprintSpeedModifier);
+
+    private void AddComponent(Entity<MovespeedModifierMetabolismComponent> metabolism, ref ComponentStartup args) =>
+        _components.Add(metabolism);
+
+    public override void Update(float frameTime)
+    {
+        base.Update(frameTime);
+
+        var currentTime = _gameTiming.CurTime;
+
+        for (var i = _components.Count - 1; i >= 0; i--)
         {
-            base.Initialize();
+            var metabolism = _components[i];
 
-            UpdatesOutsidePrediction = true;
-
-            SubscribeLocalEvent<MovespeedModifierMetabolismComponent, ComponentStartup>(AddComponent);
-            SubscribeLocalEvent<MovespeedModifierMetabolismComponent, RefreshMovementSpeedModifiersEvent>(OnRefreshMovespeed);
-        }
-
-        private void OnRefreshMovespeed(EntityUid uid, MovespeedModifierMetabolismComponent component, RefreshMovementSpeedModifiersEvent args)
-        {
-            args.ModifySpeed(component.WalkSpeedModifier, component.SprintSpeedModifier);
-        }
-
-        private void AddComponent(Entity<MovespeedModifierMetabolismComponent> metabolism, ref ComponentStartup args)
-        {
-            _components.Add(metabolism);
-        }
-
-        public override void Update(float frameTime)
-        {
-            base.Update(frameTime);
-
-            var currentTime = _gameTiming.CurTime;
-
-            for (var i = _components.Count - 1; i >= 0; i--)
+            if (metabolism.Comp.Deleted)
             {
-                var metabolism = _components[i];
-
-                if (metabolism.Comp.Deleted)
-                {
-                    _components.RemoveAt(i);
-                    continue;
-                }
-
-                if (metabolism.Comp.ModifierTimer > currentTime)
-                    continue;
-
                 _components.RemoveAt(i);
-                RemComp<MovespeedModifierMetabolismComponent>(metabolism);
-
-                _movespeed.RefreshMovementSpeedModifiers(metabolism);
+                continue;
             }
+
+            if (metabolism.Comp.ModifierTimer > currentTime)
+                continue;
+
+            _components.RemoveAt(i);
+            RemComp<MovespeedModifierMetabolismComponent>(metabolism);
+
+            _movespeed.RefreshMovementSpeedModifiers(metabolism);
         }
     }
 }

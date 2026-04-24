@@ -13,15 +13,9 @@ namespace Content.Shared._DV.Abilities;
 /// Adds an action to cough up an item.
 /// Other systems can enable this action when their conditions are met.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(ItemCougherSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(ItemCougherSystem))]
 public sealed partial class ItemCougherComponent : Component
 {
-    /// <summary>
-    /// The item to spawn after the coughing sound plays.
-    /// </summary>
-    [DataField(required: true)]
-    public EntProtoId Item;
-
     /// <summary>
     /// The action to give the player.
     /// </summary>
@@ -39,6 +33,12 @@ public sealed partial class ItemCougherComponent : Component
     public LocId CoughPopup;
 
     /// <summary>
+    /// The item to spawn after the coughing sound plays.
+    /// </summary>
+    [DataField(required: true)]
+    public EntProtoId Item;
+
+    /// <summary>
     /// Sound played
     /// The sound length controls how long it takes for the item to spawn.
     /// </summary>
@@ -47,7 +47,7 @@ public sealed partial class ItemCougherComponent : Component
     {
         Params = new AudioParams
         {
-            Variation = 0.15f
-        }
+            Variation = 0.15f,
+        },
     };
 }

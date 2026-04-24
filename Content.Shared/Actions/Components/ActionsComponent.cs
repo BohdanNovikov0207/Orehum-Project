@@ -8,7 +8,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-using Content.Shared.Actions;
 using Robust.Shared.GameStates;
 using Robust.Shared.Serialization;
 
@@ -17,7 +16,7 @@ namespace Content.Shared.Actions.Components;
 /// <summary>
 /// Lets the player controlling this entity use actions.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(SharedActionsSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(SharedActionsSystem))]
 public sealed partial class ActionsComponent : Component
 {
     /// <summary>
@@ -28,7 +27,7 @@ public sealed partial class ActionsComponent : Component
     public HashSet<EntityUid> Actions = new();
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class ActionsComponentState : ComponentState
 {
     public readonly HashSet<NetEntity> Actions;
@@ -40,7 +39,7 @@ public sealed class ActionsComponentState : ComponentState
 }
 
 /// <summary>
-///     Determines how the action icon appears in the hotbar for item actions.
+/// Determines how the action icon appears in the hotbar for item actions.
 /// </summary>
 public enum ItemActionIconStyle : byte
 {
@@ -57,5 +56,5 @@ public enum ItemActionIconStyle : byte
     /// <summary>
     /// BigAction but no item icon will be shown in the corner.
     /// </summary>
-    NoItem
+    NoItem,
 }

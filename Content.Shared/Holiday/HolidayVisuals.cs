@@ -7,8 +7,8 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Holiday;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum HolidayVisuals : byte
 {
-    Holiday
+    Holiday,
 }

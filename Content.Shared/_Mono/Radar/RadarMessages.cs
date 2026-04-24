@@ -4,7 +4,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared._Mono.Radar;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum RadarBlipShape
 {
     Circle,
@@ -14,10 +14,10 @@ public enum RadarBlipShape
     Diamond,
     Hexagon,
     Arrow,
-    Ring
+    Ring,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class GiveBlipsEvent : EntityEventArgs
 {
     /// <summary>
@@ -37,11 +37,12 @@ public sealed class GiveBlipsEvent : EntityEventArgs
     // Constructor for back-compatibility
     public GiveBlipsEvent(List<(Vector2, float, Color)> blips)
     {
-        Blips = blips.Select(b => ((NetEntity?)null, b.Item1, b.Item2, b.Item3, RadarBlipShape.Circle)).ToList();
+        Blips = blips.Select(b => ((NetEntity?) null, b.Item1, b.Item2, b.Item3, RadarBlipShape.Circle)).ToList();
         HitscanLines = new List<(NetEntity? Grid, Vector2 Start, Vector2 End, float Thickness, Color Color)>();
     }
 
-    public GiveBlipsEvent(List<(NetEntity? Grid, Vector2 Position, float Scale, Color Color, RadarBlipShape Shape)> blips)
+    public GiveBlipsEvent(
+        List<(NetEntity? Grid, Vector2 Position, float Scale, Color Color, RadarBlipShape Shape)> blips)
     {
         Blips = blips;
         HitscanLines = new List<(NetEntity? Grid, Vector2 Start, Vector2 End, float Thickness, Color Color)>();
@@ -56,10 +57,11 @@ public sealed class GiveBlipsEvent : EntityEventArgs
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class RequestBlipsEvent : EntityEventArgs
 {
     public NetEntity Radar;
+
     public RequestBlipsEvent(NetEntity radar)
     {
         Radar = radar;

@@ -52,8 +52,8 @@ namespace Content.Shared.Light.EntitySystems;
 
 public sealed class SlimPoweredLightSystem : EntitySystem
 {
-    [Dependency] private readonly SharedPowerReceiverSystem _receiver = default!;
     [Dependency] private readonly SharedPointLightSystem _lights = default!;
+    [Dependency] private readonly SharedPowerReceiverSystem _receiver = default!;
 
     private bool _setting;
 

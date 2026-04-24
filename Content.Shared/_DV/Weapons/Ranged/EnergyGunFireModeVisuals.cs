@@ -13,18 +13,18 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared._DV.Weapons.Ranged;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum EnergyGunFireModeVisuals : byte
 {
-    State
+    State,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum EnergyGunFireModeState : byte
 {
     Disabler,
     Lethal,
     Special,
     Cooling,
-    Heating
+    Heating,
 }

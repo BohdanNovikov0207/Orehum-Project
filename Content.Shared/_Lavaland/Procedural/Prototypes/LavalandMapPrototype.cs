@@ -33,35 +33,22 @@ namespace Content.Shared._Lavaland.Procedural.Prototypes;
 /// Contains information about Lavaland planet configuration.
 /// </summary>
 [Prototype]
-public sealed partial class LavalandPlanetPrototype : IPrototype, IInheritingPrototype
+public sealed class LavalandPlanetPrototype : IPrototype, IInheritingPrototype
 {
-    [IdDataField]
-    public string ID { get; } = default!;
-
-    [ParentDataField(typeof(AbstractPrototypeIdArraySerializer<LavalandPlanetPrototype>))]
-    public string[]? Parents { get; private set; }
-
-    [NeverPushInheritance]
-    [AbstractDataField]
-    public bool Abstract { get; private set; }
-
-    [DataField(required: true)]
-    public LocId Name = "lavaland-planet-name-unknown";
-
     [DataField]
-    public float RestrictedRange = 512f;
+    public ComponentRegistry? AddComponents;
 
     [DataField(required: true)]
     public GasMixture Atmosphere = GasMixture.SpaceGas;
 
-    [DataField]
-    public float Temperature = Atmospherics.T20C;
+    [DataField("biome", required: true)]
+    public ProtoId<BiomeTemplatePrototype> BiomePrototype;
 
     [DataField]
     public Color MapLight = Color.FromHex("#D8B059");
 
-    [DataField("biome", required: true)]
-    public ProtoId<BiomeTemplatePrototype> BiomePrototype;
+    [DataField(required: true)]
+    public LocId Name = "lavaland-planet-name-unknown";
 
     [DataField("markers")]
     public List<ProtoId<BiomeMarkerLayerPrototype>> OreLayers = new()
@@ -80,5 +67,18 @@ public sealed partial class LavalandPlanetPrototype : IPrototype, IInheritingPro
     };
 
     [DataField]
-    public ComponentRegistry? AddComponents;
+    public float RestrictedRange = 512f;
+
+    [DataField]
+    public float Temperature = Atmospherics.T20C;
+
+    [ParentDataField(typeof(AbstractPrototypeIdArraySerializer<LavalandPlanetPrototype>))]
+    public string[]? Parents { get; private set; }
+
+    [NeverPushInheritance]
+    [AbstractDataField]
+    public bool Abstract { get; private set; }
+
+    [IdDataField]
+    public string ID { get; } = default!;
 }

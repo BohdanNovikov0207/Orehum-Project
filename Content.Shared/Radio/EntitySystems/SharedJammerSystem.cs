@@ -32,11 +32,11 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Popups;
-using Content.Shared.Verbs;
-using Content.Shared.Examine;
-using Content.Shared.Radio.Components;
 using Content.Shared.DeviceNetwork.Systems;
+using Content.Shared.Examine;
+using Content.Shared.Popups;
+using Content.Shared.Radio.Components;
+using Content.Shared.Verbs;
 
 namespace Content.Shared.Radio.EntitySystems;
 
@@ -105,24 +105,15 @@ public abstract class SharedJammerSystem : EntitySystem
         }
     }
 
-    public float GetCurrentWattage(Entity<RadioJammerComponent> jammer)
-    {
-        return jammer.Comp.Settings[jammer.Comp.SelectedPowerLevel].Wattage;
-    }
+    public float GetCurrentWattage(Entity<RadioJammerComponent> jammer) =>
+        jammer.Comp.Settings[jammer.Comp.SelectedPowerLevel].Wattage;
 
-    public float GetCurrentRange(Entity<RadioJammerComponent> jammer)
-    {
-        return jammer.Comp.Settings[jammer.Comp.SelectedPowerLevel].Range;
-    }
+    public float GetCurrentRange(Entity<RadioJammerComponent> jammer) =>
+        jammer.Comp.Settings[jammer.Comp.SelectedPowerLevel].Range;
 
-    protected void ChangeLEDState(Entity<AppearanceComponent?> ent, bool isLEDOn)
-    {
+    protected void ChangeLEDState(Entity<AppearanceComponent?> ent, bool isLEDOn) =>
         _appearance.SetData(ent, RadioJammerVisuals.LEDOn, isLEDOn, ent.Comp);
-    }
 
-    protected void ChangeChargeLevel(Entity<AppearanceComponent?> ent, RadioJammerChargeLevel chargeLevel)
-    {
+    protected void ChangeChargeLevel(Entity<AppearanceComponent?> ent, RadioJammerChargeLevel chargeLevel) =>
         _appearance.SetData(ent, RadioJammerVisuals.ChargeLevel, chargeLevel, ent.Comp);
-    }
-
 }

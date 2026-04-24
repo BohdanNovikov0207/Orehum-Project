@@ -8,9 +8,9 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.UserInterface;
 using Content.Shared.Eye.Blinding.Components;
 using Content.Shared.Popups;
+using Content.Shared.UserInterface;
 using Robust.Shared.Collections;
 
 namespace Content.Shared.Eye.Blinding.Systems;
@@ -27,14 +27,16 @@ public sealed class ActivatableUIRequiresVisionSystem : EntitySystem
         SubscribeLocalEvent<BlindableComponent, BlindnessChangedEvent>(OnBlindnessChanged);
     }
 
-    private void OnOpenAttempt(EntityUid uid, ActivatableUIRequiresVisionComponent component, ActivatableUIOpenAttemptEvent args)
+    private void OnOpenAttempt(EntityUid uid,
+        ActivatableUIRequiresVisionComponent component,
+        ActivatableUIOpenAttemptEvent args)
     {
         if (args.Cancelled)
             return;
 
         if (TryComp<BlindableComponent>(args.User, out var blindable) && blindable.IsBlind)
         {
-            _popupSystem.PopupClient(Loc.GetString("blindness-fail-attempt"), args.User, Shared.Popups.PopupType.MediumCaution);
+            _popupSystem.PopupClient(Loc.GetString("blindness-fail-attempt"), args.User, PopupType.MediumCaution);
             args.Cancel();
         }
     }
@@ -49,9 +51,7 @@ public sealed class ActivatableUIRequiresVisionSystem : EntitySystem
         foreach (var bui in _userInterfaceSystem.GetActorUis(uid))
         {
             if (HasComp<ActivatableUIRequiresVisionComponent>(bui.Entity))
-            {
                 toClose.Add(bui);
-            }
         }
 
         foreach (var bui in toClose)

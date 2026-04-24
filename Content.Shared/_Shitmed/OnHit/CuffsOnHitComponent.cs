@@ -15,11 +15,11 @@ namespace Content.Shared._Shitmed.OnHit;
 [RegisterComponent]
 public sealed partial class CuffsOnHitComponent : Component
 {
-    [DataField("proto")]
-    public EntProtoId? HandcuffPrototype;
-
     [DataField]
     public TimeSpan Duration = TimeSpan.FromSeconds(1);
+
+    [DataField("proto")]
+    public EntProtoId? HandcuffPrototype;
 
     [DataField("sound")]
     public SoundSpecifier? Sound;
@@ -28,5 +28,7 @@ public sealed partial class CuffsOnHitComponent : Component
 [ByRefEvent]
 public record struct CuffsOnHitAttemptEvent(bool Cancelled);
 
-[Serializable, NetSerializable]
-public sealed partial class CuffsOnHitDoAfter : SimpleDoAfterEvent { }
+[Serializable] [NetSerializable]
+public sealed partial class CuffsOnHitDoAfter : SimpleDoAfterEvent
+{
+}

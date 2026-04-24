@@ -14,12 +14,11 @@ namespace Content.Shared.Thief;
 /// A prototype that defines a set of items and visuals in a specific starter set for the antagonist thief
 /// </summary>
 [Prototype]
-public sealed partial class ThiefBackpackSetPrototype : IPrototype
+public sealed class ThiefBackpackSetPrototype : IPrototype
 {
-    [IdDataField] public string ID { get; private set; } = default!;
+    [DataField] public List<EntProtoId> Content = new();
     [DataField] public string Name { get; private set; } = string.Empty;
     [DataField] public string Description { get; private set; } = string.Empty;
     [DataField] public SpriteSpecifier Sprite { get; private set; } = SpriteSpecifier.Invalid;
-
-    [DataField] public List<EntProtoId> Content = new();
+    [IdDataField] public string ID { get; } = default!;
 }

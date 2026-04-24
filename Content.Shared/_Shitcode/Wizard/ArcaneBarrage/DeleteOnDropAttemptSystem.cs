@@ -18,8 +18,6 @@ public sealed class DeleteOnDropAttemptSystem : EntitySystem
         SubscribeLocalEvent<DeleteOnDropAttemptComponent, ExaminedEvent>(OnExamine);
     }
 
-    private void OnExamine(Entity<DeleteOnDropAttemptComponent> ent, ref ExaminedEvent args)
-    {
+    private void OnExamine(Entity<DeleteOnDropAttemptComponent> ent, ref ExaminedEvent args) =>
         args.PushMarkup(Loc.GetString("delete-on-drop-attempt-comp-examine"));
-    }
 }

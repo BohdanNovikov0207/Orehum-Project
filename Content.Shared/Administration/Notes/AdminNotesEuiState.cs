@@ -13,10 +13,14 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Administration.Notes;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class AdminNotesEuiState : EuiStateBase
 {
-    public AdminNotesEuiState(string notedPlayerName, Dictionary<(int, NoteType), SharedAdminNote> notes, bool canCreate, bool canDelete, bool canEdit)
+    public AdminNotesEuiState(string notedPlayerName,
+        Dictionary<(int, NoteType), SharedAdminNote> notes,
+        bool canCreate,
+        bool canDelete,
+        bool canEdit)
     {
         NotedPlayerName = notedPlayerName;
         Notes = notes;
@@ -34,10 +38,14 @@ public sealed class AdminNotesEuiState : EuiStateBase
 
 public static class AdminNoteEuiMsg
 {
-    [Serializable, NetSerializable]
+    [Serializable] [NetSerializable]
     public sealed class CreateNoteRequest : EuiMessageBase
     {
-        public CreateNoteRequest(NoteType type, string message, NoteSeverity? severity, bool secret, DateTime? expiryTime)
+        public CreateNoteRequest(NoteType type,
+            string message,
+            NoteSeverity? severity,
+            bool secret,
+            DateTime? expiryTime)
         {
             NoteType = type;
             Message = message;
@@ -53,7 +61,7 @@ public static class AdminNoteEuiMsg
         public DateTime? ExpiryTime { get; set; }
     }
 
-    [Serializable, NetSerializable]
+    [Serializable] [NetSerializable]
     public sealed class DeleteNoteRequest : EuiMessageBase
     {
         public DeleteNoteRequest(int id, NoteType type)
@@ -66,10 +74,15 @@ public static class AdminNoteEuiMsg
         public NoteType Type { get; set; }
     }
 
-    [Serializable, NetSerializable]
+    [Serializable] [NetSerializable]
     public sealed class EditNoteRequest : EuiMessageBase
     {
-        public EditNoteRequest(int id, NoteType type, string message, NoteSeverity? severity, bool secret, DateTime? expiryTime)
+        public EditNoteRequest(int id,
+            NoteType type,
+            string message,
+            NoteSeverity? severity,
+            bool secret,
+            DateTime? expiryTime)
         {
             Id = id;
             Type = type;

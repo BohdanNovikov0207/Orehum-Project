@@ -9,17 +9,18 @@ using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
 
 namespace Content.Shared._Shitmed.Restrict;
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class RestrictGunshotsByUserTagComponent : Component
 {
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public List<ProtoId<TagPrototype>> Contains = [];
 
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public List<ProtoId<TagPrototype>> DoesntContain = [];
 
-    [DataField, AutoNetworkedField]
-    public List<string> Messages = [];
-
     public TimeSpan LastPopup;
+
+    [DataField] [AutoNetworkedField]
+    public List<string> Messages = [];
 }

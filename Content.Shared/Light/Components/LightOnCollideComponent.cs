@@ -51,7 +51,7 @@ namespace Content.Shared.Light.Components;
 /// <summary>
 /// Enables / disables pointlight whenever entities are contacting with it
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class LightOnCollideComponent : Component
 {
 }

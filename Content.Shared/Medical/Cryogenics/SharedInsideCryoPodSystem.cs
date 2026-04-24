@@ -17,17 +17,14 @@ public abstract partial class SharedCryoPodSystem
     }
 
     // Must stand in the cryo pod
-    private void HandleDown(EntityUid uid, InsideCryoPodComponent component, DownAttemptEvent args)
-    {
-        args.Cancel();
-    }
+    private void HandleDown(EntityUid uid, InsideCryoPodComponent component, DownAttemptEvent args) => args.Cancel();
 
-    private void OnEntGotRemovedFromContainer(EntityUid uid, InsideCryoPodComponent component, EntGotRemovedFromContainerMessage args)
+    private void OnEntGotRemovedFromContainer(EntityUid uid,
+        InsideCryoPodComponent component,
+        EntGotRemovedFromContainerMessage args)
     {
         if (Terminating(uid))
-        {
             return;
-        }
 
         RemComp<InsideCryoPodComponent>(uid);
     }

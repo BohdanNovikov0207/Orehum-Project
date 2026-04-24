@@ -5,15 +5,15 @@ namespace Content.Shared._White.Xenomorphs.Acid.Components;
 [RegisterComponent]
 public sealed partial class AcidCorrodingComponent : Component
 {
-    [DataField]
-    public DamageSpecifier DamagePerSecond;
+    [ViewVariables]
+    public EntityUid Acid;
 
     [ViewVariables]
     public TimeSpan AcidExpiresAt;
 
-    [ViewVariables]
-    public TimeSpan NextDamageAt;
+    [DataField]
+    public DamageSpecifier DamagePerSecond;
 
     [ViewVariables]
-    public EntityUid Acid;
+    public TimeSpan NextDamageAt;
 }

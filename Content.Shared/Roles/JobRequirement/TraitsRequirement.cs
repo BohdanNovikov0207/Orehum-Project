@@ -89,7 +89,7 @@ namespace Content.Shared.Roles;
 /// Requires a character to have, or not have, certain traits
 /// </summary>
 [UsedImplicitly]
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class TraitsRequirement : JobRequirement
 {
     [DataField(required: true)]
@@ -124,17 +124,16 @@ public sealed partial class TraitsRequirement : JobRequirement
                 if (profile.TraitPreferences.Contains(trait))
                     return true;
             }
+
             return false;
         }
-        else
-        {
-            reason = FormattedMessage.FromMarkupPermissive($"{Loc.GetString("role-timer-blacklisted-traits")}\n{sb}");
 
-            foreach (var trait in Traits)
-            {
-                if (profile.TraitPreferences.Contains(trait))
-                    return false;
-            }
+        reason = FormattedMessage.FromMarkupPermissive($"{Loc.GetString("role-timer-blacklisted-traits")}\n{sb}");
+
+        foreach (var trait in Traits)
+        {
+            if (profile.TraitPreferences.Contains(trait))
+                return false;
         }
 
         return true;

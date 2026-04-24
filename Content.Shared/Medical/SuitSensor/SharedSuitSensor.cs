@@ -23,10 +23,29 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Medical.SuitSensor;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class SuitSensorStatus
 {
-    public SuitSensorStatus(NetEntity ownerUid, NetEntity suitSensorUid, string name, string job, string jobIcon, List<string> jobDepartments)
+    public NetCoordinates? Coordinates;
+    public bool IsAlive;
+    public bool IsCommandTracker = false; ///Goob station
+    public string Job;
+    public List<string> JobDepartments;
+    public string JobIcon;
+    public string Name;
+    public NetEntity OwnerUid;
+    public NetEntity SuitSensorUid;
+
+    public TimeSpan Timestamp;
+    public int? TotalDamage;
+    public int? TotalDamageThreshold;
+
+    public SuitSensorStatus(NetEntity ownerUid,
+        NetEntity suitSensorUid,
+        string name,
+        string job,
+        string jobIcon,
+        List<string> jobDepartments)
     {
         OwnerUid = ownerUid;
         SuitSensorUid = suitSensorUid;
@@ -36,22 +55,12 @@ public sealed class SuitSensorStatus
         JobDepartments = jobDepartments;
     }
 
-    public TimeSpan Timestamp;
-    public NetEntity SuitSensorUid;
-    public NetEntity OwnerUid;
-    public string Name;
-    public string Job;
-    public string JobIcon;
-    public List<string> JobDepartments;
-    public bool IsAlive;
-    public int? TotalDamage;
-    public int? TotalDamageThreshold;
-    public float? DamagePercentage => TotalDamageThreshold == null || TotalDamage == null ? null : TotalDamage / (float) TotalDamageThreshold;
-    public NetCoordinates? Coordinates;
-    public bool IsCommandTracker = false; ///Goob station
+    public float? DamagePercentage => TotalDamageThreshold == null || TotalDamage == null
+        ? null
+        : TotalDamage / (float) TotalDamageThreshold;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum SuitSensorMode : byte
 {
     /// <summary>
@@ -72,7 +81,7 @@ public enum SuitSensorMode : byte
     /// <summary>
     /// Sensor sends vitals status and GPS position
     /// </summary>
-    SensorCords = 3
+    SensorCords = 3,
 }
 
 public static class SuitSensorConstants
@@ -88,21 +97,22 @@ public static class SuitSensorConstants
     public const string NET_COORDINATES = "coords";
     public const string NET_SUIT_SENSOR_UID = "uid";
 
-    public const string NET_IS_COMMAND = "iscommand"; ///Goob Sation
+    public const string NET_IS_COMMAND = "iscommand";
 
+    ///Goob Sation
     ///Used by the CrewMonitoringServerSystem to send the status of all connected suit sensors to each crew monitor
     public const string NET_STATUS_COLLECTION = "suit-status-collection";
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class SuitSensorChangeDoAfterEvent : DoAfterEvent
 {
-    public SuitSensorMode Mode { get; private set; } = SuitSensorMode.SensorOff;
-
     public SuitSensorChangeDoAfterEvent(SuitSensorMode mode)
     {
         Mode = mode;
     }
+
+    public SuitSensorMode Mode { get; private set; } = SuitSensorMode.SensorOff;
 
     public override DoAfterEvent Clone() => this;
 }

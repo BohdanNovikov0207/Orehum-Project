@@ -4,17 +4,16 @@
 
 using Robust.Shared.Serialization;
 
-namespace Content.Shared._NF.Shuttles.Events
+namespace Content.Shared._NF.Shuttles.Events;
+
+/// <summary>
+/// Sent when a network port button is pressed on the shuttle console.
+/// </summary>
+[Serializable] [NetSerializable]
+public sealed class ShuttlePortButtonPressedMessage : BoundUserInterfaceMessage
 {
     /// <summary>
-    /// Sent when a network port button is pressed on the shuttle console.
+    /// The source port identifier from the shuttle console.
     /// </summary>
-    [Serializable, NetSerializable]
-    public sealed class ShuttlePortButtonPressedMessage : BoundUserInterfaceMessage
-    {
-        /// <summary>
-        /// The source port identifier from the shuttle console.
-        /// </summary>
-        public string SourcePort { get; set; } = string.Empty;
-    }
+    public string SourcePort { get; set; } = string.Empty;
 }

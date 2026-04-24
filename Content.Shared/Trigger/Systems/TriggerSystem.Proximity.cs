@@ -22,14 +22,10 @@ public sealed partial class TriggerSystem
         SetProximityAppearance(ent);
 
         if (!ent.Comp.Enabled)
-        {
             ent.Comp.Colliding.Clear();
-        }
         // Re-check for contacts as we cleared them.
         else if (TryComp<PhysicsComponent>(ent, out var body))
-        {
             _physics.RegenerateContacts((ent.Owner, body));
-        }
 
         Dirty(ent);
     }
@@ -54,7 +50,9 @@ public sealed partial class TriggerSystem
         Dirty(ent);
     }
 
-    private void OnProximityStartCollide(EntityUid uid, TriggerOnProximityComponent component, ref StartCollideEvent args)
+    private void OnProximityStartCollide(EntityUid uid,
+        TriggerOnProximityComponent component,
+        ref StartCollideEvent args)
     {
         if (args.OurFixtureId != TriggerOnProximityComponent.FixtureID)
             return;
@@ -62,7 +60,9 @@ public sealed partial class TriggerSystem
         component.Colliding[args.OtherEntity] = args.OtherBody;
     }
 
-    private static void OnProximityEndCollide(EntityUid uid, TriggerOnProximityComponent component, ref EndCollideEvent args)
+    private static void OnProximityEndCollide(EntityUid uid,
+        TriggerOnProximityComponent component,
+        ref EndCollideEvent args)
     {
         if (args.OurFixtureId != TriggerOnProximityComponent.FixtureID)
             return;
@@ -70,10 +70,9 @@ public sealed partial class TriggerSystem
         component.Colliding.Remove(args.OtherEntity);
     }
 
-    private void SetProximityAppearance(Entity<TriggerOnProximityComponent> ent)
-    {
-        _appearance.SetData(ent.Owner, ProximityTriggerVisualState.State, ent.Comp.Enabled ? ProximityTriggerVisuals.Inactive : ProximityTriggerVisuals.Off);
-    }
+    private void SetProximityAppearance(Entity<TriggerOnProximityComponent> ent) => _appearance.SetData(ent.Owner,
+        ProximityTriggerVisualState.State,
+        ent.Comp.Enabled ? ProximityTriggerVisuals.Inactive : ProximityTriggerVisuals.Off);
 
     private void Activate(Entity<TriggerOnProximityComponent> ent, EntityUid user)
     {
@@ -85,9 +84,7 @@ public sealed partial class TriggerSystem
             ent.Comp.Colliding.Clear();
         }
         else
-        {
             ent.Comp.NextTrigger = curTime + ent.Comp.Cooldown;
-        }
 
         // Queue a visual update for when the animation is complete.
         ent.Comp.NextVisualUpdate = curTime + ent.Comp.AnimationDuration;

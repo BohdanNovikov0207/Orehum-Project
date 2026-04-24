@@ -28,8 +28,8 @@ namespace Content.Shared.Blocking;
 
 public sealed partial class BlockingSystem
 {
-    [Dependency] private readonly DamageableSystem _damageable = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly DamageableSystem _damageable = default!;
 
     private void InitializeUser()
     {
@@ -42,15 +42,12 @@ public sealed partial class BlockingSystem
         SubscribeLocalEvent<BlockingUserComponent, EntityTerminatingEvent>(OnEntityTerminating);
     }
 
-    private void OnParentChanged(EntityUid uid, BlockingUserComponent component, ref EntParentChangedMessage args)
-    {
+    private void OnParentChanged(EntityUid uid, BlockingUserComponent component, ref EntParentChangedMessage args) =>
         UserStopBlocking(uid, component);
-    }
 
-    private void OnInsertAttempt(EntityUid uid, BlockingUserComponent component, ContainerGettingInsertedAttemptEvent args)
-    {
-        UserStopBlocking(uid, component);
-    }
+    private void OnInsertAttempt(EntityUid uid,
+        BlockingUserComponent component,
+        ContainerGettingInsertedAttemptEvent args) => UserStopBlocking(uid, component);
 
     private void OnAnchorChanged(EntityUid uid, BlockingUserComponent component, ref AnchorStateChangedEvent args)
     {
@@ -88,9 +85,7 @@ public sealed partial class BlockingSystem
             args.Damage = DamageSpecifier.ApplyModifierSet(args.Damage, modify);
 
             if (blocking.IsBlocking && !args.Damage.Equals(args.OriginalDamage))
-            {
                 _audio.PlayPvs(blocking.BlockSound, uid);
-            }
         }
     }
 
@@ -98,9 +93,7 @@ public sealed partial class BlockingSystem
     {
         var modifier = component.IsBlocking ? component.ActiveBlockDamageModifier : component.PassiveBlockDamageModifer;
         if (modifier == null)
-        {
             return;
-        }
 
         args.Damage = DamageSpecifier.ApplyModifierSet(args.Damage,
             DamageSpecifier.PenetrateArmor(modifier, args.Damage.ArmorPenetration)); // Goob edit
@@ -112,15 +105,14 @@ public sealed partial class BlockingSystem
             return;
 
         StopBlockingHelper(component.BlockingItem.Value, blockingComponent, uid);
-
     }
 
     /// <summary>
     /// Check for the shield and has the user stop blocking
-    /// Used where you'd like the user to stop blocking, but also don't want to remove the <see cref="BlockingUserComponent"/>
+    /// Used where you'd like the user to stop blocking, but also don't want to remove the <see cref="BlockingUserComponent" />
     /// </summary>
     /// <param name="uid">The user blocking</param>
-    /// <param name="component">The <see cref="BlockingUserComponent"/></param>
+    /// <param name="component">The <see cref="BlockingUserComponent" /></param>
     private void UserStopBlocking(EntityUid uid, BlockingUserComponent component)
     {
         if (TryComp<BlockingComponent>(component.BlockingItem, out var blockComp) && blockComp.IsBlocking)

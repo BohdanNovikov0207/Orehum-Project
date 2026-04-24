@@ -17,21 +17,21 @@ namespace Content.Shared.Clothing;
 /// Modifies speed when worn and activated.
 /// Supports <c>ItemToggleComponent</c>.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(ClothingSpeedModifierSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(ClothingSpeedModifierSystem))]
 public sealed partial class ClothingSpeedModifierComponent : Component
 {
     [DataField]
-    public float WalkModifier = 1.0f;
+    public float SprintModifier = 1.0f;
 
     [DataField]
-    public float SprintModifier = 1.0f;
+    public float WalkModifier = 1.0f;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class ClothingSpeedModifierComponentState : ComponentState
 {
-    public float WalkModifier;
     public float SprintModifier;
+    public float WalkModifier;
 
     public ClothingSpeedModifierComponentState(float walkModifier, float sprintModifier)
     {

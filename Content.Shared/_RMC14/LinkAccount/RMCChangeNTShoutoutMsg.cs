@@ -39,9 +39,8 @@ namespace Content.Shared._RMC14.LinkAccount;
 
 public sealed class RMCChangeNTShoutoutMsg : NetMessage
 {
-    public override MsgGroups MsgGroup => MsgGroups.Command;
-
     public string? Name;
+    public override MsgGroups MsgGroup => MsgGroups.Command;
 
     public override void ReadFromBuffer(NetIncomingMessage buffer, IRobustSerializer serializer)
     {
@@ -51,8 +50,5 @@ public sealed class RMCChangeNTShoutoutMsg : NetMessage
         Name = buffer.ReadString();
     }
 
-    public override void WriteToBuffer(NetOutgoingMessage buffer, IRobustSerializer serializer)
-    {
-        buffer.Write(Name);
-    }
+    public override void WriteToBuffer(NetOutgoingMessage buffer, IRobustSerializer serializer) => buffer.Write(Name);
 }

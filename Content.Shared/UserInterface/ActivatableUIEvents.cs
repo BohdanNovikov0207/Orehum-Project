@@ -7,29 +7,32 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 namespace Content.Shared.UserInterface;
+
 public sealed class ActivatableUIOpenAttemptEvent : CancellableEntityEventArgs
 {
-    public EntityUid User { get; }
     public ActivatableUIOpenAttemptEvent(EntityUid who)
     {
         User = who;
     }
+
+    public EntityUid User { get; }
 }
 
-public sealed class UserOpenActivatableUIAttemptEvent : CancellableEntityEventArgs //have to one-up the already stroke-inducing name
+public sealed class
+    UserOpenActivatableUIAttemptEvent : CancellableEntityEventArgs //have to one-up the already stroke-inducing name
 {
-    public EntityUid User { get; }
-    public EntityUid Target { get; }
     public UserOpenActivatableUIAttemptEvent(EntityUid who, EntityUid target)
     {
         User = who;
         Target = target;
     }
+
+    public EntityUid User { get; }
+    public EntityUid Target { get; }
 }
 
 public sealed class AfterActivatableUIOpenEvent : EntityEventArgs
 {
-    public EntityUid User { get; }
     public readonly EntityUid Actor;
 
     public AfterActivatableUIOpenEvent(EntityUid who, EntityUid actor)
@@ -37,6 +40,8 @@ public sealed class AfterActivatableUIOpenEvent : EntityEventArgs
         User = who;
         Actor = actor;
     }
+
+    public EntityUid User { get; }
 }
 
 /// <summary>
@@ -46,11 +51,12 @@ public sealed class AfterActivatableUIOpenEvent : EntityEventArgs
 /// </summary>
 public sealed class BeforeActivatableUIOpenEvent : EntityEventArgs
 {
-    public EntityUid User { get; }
     public BeforeActivatableUIOpenEvent(EntityUid who)
     {
         User = who;
     }
+
+    public EntityUid User { get; }
 }
 
 public sealed class ActivatableUIPlayerChangedEvent : EntityEventArgs

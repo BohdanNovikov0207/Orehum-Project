@@ -11,7 +11,7 @@ namespace Content.Shared.Xenoarchaeology.Artifact.XAT;
 /// </summary>
 public sealed class XATInteractionSystem : BaseXATSystem<XATInteractionComponent>
 {
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
@@ -21,17 +21,17 @@ public sealed class XATInteractionSystem : BaseXATSystem<XATInteractionComponent
         XATSubscribeDirectEvent<InteractHandEvent>(OnInteractHand);
     }
 
-    private void OnPullStart(Entity<XenoArtifactComponent> artifact, Entity<XATInteractionComponent, XenoArtifactNodeComponent> node, ref PullStartedMessage args)
-    {
-        Trigger(artifact, node);
-    }
+    private void OnPullStart(Entity<XenoArtifactComponent> artifact,
+        Entity<XATInteractionComponent, XenoArtifactNodeComponent> node,
+        ref PullStartedMessage args) => Trigger(artifact, node);
 
-    private void OnAttacked(Entity<XenoArtifactComponent> artifact, Entity<XATInteractionComponent, XenoArtifactNodeComponent> node, ref AttackedEvent args)
-    {
-        Trigger(artifact, node);
-    }
+    private void OnAttacked(Entity<XenoArtifactComponent> artifact,
+        Entity<XATInteractionComponent, XenoArtifactNodeComponent> node,
+        ref AttackedEvent args) => Trigger(artifact, node);
 
-    private void OnInteractHand(Entity<XenoArtifactComponent> artifact, Entity<XATInteractionComponent, XenoArtifactNodeComponent> node, ref InteractHandEvent args)
+    private void OnInteractHand(Entity<XenoArtifactComponent> artifact,
+        Entity<XATInteractionComponent, XenoArtifactNodeComponent> node,
+        ref InteractHandEvent args)
     {
         if (args.Handled)
             return;

@@ -9,76 +9,77 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Damage;
 using Content.Goobstation.Maths.FixedPoint;
+using Content.Shared.Damage;
 using Robust.Shared.Audio;
 using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
 
-namespace Content.Goobstation.Shared.Bible // Death to serverside components. Glory to Goobistan
+namespace Content.Goobstation.Shared.Bible; // Death to serverside components. Glory to Goobistan
+
+[RegisterComponent] [NetworkedComponent]
+public sealed partial class BibleComponent : Component
 {
-    [RegisterComponent, NetworkedComponent]
-    public sealed partial class BibleComponent : Component
-    {
-        /// <summary>
-        /// Default sound when bible hits somebody.
-        /// </summary>
-        private static readonly ProtoId<SoundCollectionPrototype> DefaultBibleHit = new("BibleHit");
+    /// <summary>
+    /// Default sound when bible hits somebody.
+    /// </summary>
+    private static readonly ProtoId<SoundCollectionPrototype> DefaultBibleHit = new("BibleHit");
 
-        /// <summary>
-        /// Sound to play when bible hits somebody.
-        /// </summary>
-        [DataField]
-        public SoundSpecifier BibleHitSound = new SoundCollectionSpecifier(DefaultBibleHit, AudioParams.Default.WithVolume(-4f));
+    /// <summary>
+    /// Sound to play when bible hits somebody.
+    /// </summary>
+    [DataField]
+    public SoundSpecifier BibleHitSound =
+        new SoundCollectionSpecifier(DefaultBibleHit, AudioParams.Default.WithVolume(-4f));
 
-        /// <summary>
-        /// Damage that will be healed on a success
-        /// </summary>
-        [DataField(required: true)]
-        public DamageSpecifier Damage = default!;
+    /// <summary>
+    /// Damage that will be healed on a success
+    /// </summary>
+    [DataField(required: true)]
+    public DamageSpecifier Damage = default!;
 
-        /// <summary>
-        /// Damage that will be dealt on a failure
-        /// </summary>
-        [DataField(required: true)]
-        public DamageSpecifier DamageOnFail = default!;
+    /// <summary>
+    /// Damage that will be dealt on a failure
+    /// </summary>
+    [DataField(required: true)]
+    public DamageSpecifier DamageOnFail = default!;
 
-        /// <summary>
-        /// Damage that will be dealt when a non-chaplain attempts to heal
-        /// </summary>
-        [DataField(required: true)]
-        public DamageSpecifier DamageOnUntrainedUse = default!;
+    /// <summary>
+    /// Damage that will be dealt when a non-chaplain attempts to heal
+    /// </summary>
+    [DataField(required: true)]
+    public DamageSpecifier DamageOnUntrainedUse = default!;
 
-        /// <summary>
-        /// Chance the bible will fail to heal someone with no helmet
-        /// </summary>
-        [DataField]
-        public float FailChance = 0.34f;
+    /// <summary>
+    /// Chance the bible will fail to heal someone with no helmet
+    /// </summary>
+    [DataField]
+    public float FailChance = 0.34f;
 
-        [DataField("sizzleSound")]
-        public SoundSpecifier SizzleSoundPath = new SoundPathSpecifier("/Audio/Effects/lightburn.ogg");
+    /// A short light effect to display when successfully healing someone
+    /// </summary>
+    [DataField]
+    public EntProtoId? HealingLightEffect = "HolyLightEffect";
 
-        [DataField("healSound")]
-        public SoundSpecifier HealSoundPath = new  SoundPathSpecifier("/Audio/Effects/holy.ogg");
+    [DataField("healSound")]
+    public SoundSpecifier HealSoundPath = new SoundPathSpecifier("/Audio/Effects/holy.ogg");
 
-        [DataField]
-        public string LocPrefix = "bible";
+    [DataField]
+    public string LocPrefix = "bible";
 
-        /// <summary>
-        /// How much damage to deal to the entity being smitten - Goob
-        /// </summary>
-        [DataField]
-        public DamageSpecifier SmiteDamage = new() {DamageDict = new Dictionary<string, FixedPoint2>() {{ "Holy", 25 }}}; // Ungodly
+    [DataField("sizzleSound")]
+    public SoundSpecifier SizzleSoundPath = new SoundPathSpecifier("/Audio/Effects/lightburn.ogg");
 
-        /// <summary>
-        /// How long to stun the entity being smitten - Goob
-        /// </summary>
-        [DataField]
-        public TimeSpan SmiteStunDuration = TimeSpan.FromSeconds(8);
+    /// <summary>
+    /// How much damage to deal to the entity being smitten - Goob
+    /// </summary>
+    [DataField]
+    public DamageSpecifier SmiteDamage = new()
+        { DamageDict = new Dictionary<string, FixedPoint2> { { "Holy", 25 } } }; // Ungodly
 
-        /// A short light effect to display when successfully healing someone
-        /// </summary>
-        [DataField]
-        public EntProtoId? HealingLightEffect = "HolyLightEffect";
-    }
+    /// <summary>
+    /// How long to stun the entity being smitten - Goob
+    /// </summary>
+    [DataField]
+    public TimeSpan SmiteStunDuration = TimeSpan.FromSeconds(8);
 }

@@ -16,7 +16,7 @@ public interface IBudgetEntry : IProbEntry
 }
 
 /// <summary>
-/// Random entry that has a prob. See <see cref="RandomSystem"/>
+/// Random entry that has a prob. See <see cref="RandomSystem" />
 /// </summary>
 public interface IProbEntry
 {

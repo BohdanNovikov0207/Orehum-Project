@@ -9,9 +9,9 @@ using Robust.Shared.GameStates;
 namespace Content.Shared._Shitmed.StatusEffects;
 
 /// <summary>
-///     For use as a status effect. Spawns EMPs.
+/// For use as a status effect. Spawns EMPs.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class SpawnEmpComponent : SpawnEntityEffectComponent
 {
     public override string EntityPrototype { get; set; } = "AdminInstantEffectEMP7";

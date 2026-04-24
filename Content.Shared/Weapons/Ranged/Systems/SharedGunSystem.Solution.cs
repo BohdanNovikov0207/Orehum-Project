@@ -43,12 +43,15 @@ public partial class SharedGunSystem
         args.Capacity = component.MaxShots;
     }
 
-    protected virtual void UpdateSolutionShots(EntityUid uid, SolutionAmmoProviderComponent component, Solution? solution = null)
+    protected virtual void UpdateSolutionShots(EntityUid uid,
+        SolutionAmmoProviderComponent component,
+        Solution? solution = null)
     {
-
     }
 
-    protected virtual (EntityUid Entity, IShootable) GetSolutionShot(EntityUid uid, SolutionAmmoProviderComponent component, EntityCoordinates position)
+    protected virtual (EntityUid Entity, IShootable) GetSolutionShot(EntityUid uid,
+        SolutionAmmoProviderComponent component,
+        EntityCoordinates position)
     {
         var ent = Spawn(component.Prototype, position);
         return (ent, EnsureShootable(ent));

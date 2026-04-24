@@ -25,16 +25,16 @@ namespace Content.Shared.Fluids;
 /// </summary>
 public abstract class SharedAbsorbentSystem : EntitySystem
 {
-    [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedPopupSystem _popups = default!;
-    [Dependency] protected readonly SharedPuddleSystem Puddle = default!;
-    [Dependency] private readonly SharedMeleeWeaponSystem _melee = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] protected readonly SharedSolutionContainerSystem SolutionContainer = default!;
-    [Dependency] private readonly UseDelaySystem _useDelay = default!;
-    [Dependency] private readonly SharedMapSystem _mapSystem = default!;
     [Dependency] private readonly SharedItemSystem _item = default!;
+    [Dependency] private readonly SharedMapSystem _mapSystem = default!;
+    [Dependency] private readonly SharedMeleeWeaponSystem _melee = default!;
+    [Dependency] private readonly SharedPopupSystem _popups = default!;
+    [Dependency] private readonly IPrototypeManager _proto = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
+    [Dependency] private readonly UseDelaySystem _useDelay = default!;
+    [Dependency] protected readonly SharedPuddleSystem Puddle = default!;
+    [Dependency] protected readonly SharedSolutionContainerSystem SolutionContainer = default!;
 
     public override void Initialize()
     {
@@ -88,10 +88,8 @@ public abstract class SharedAbsorbentSystem : EntitySystem
     }
 
     [Obsolete("Use Entity<T> variant")]
-    public void Mop(EntityUid user, EntityUid target, EntityUid used, AbsorbentComponent component)
-    {
+    public void Mop(EntityUid user, EntityUid target, EntityUid used, AbsorbentComponent component) =>
         Mop((used, component), user, target);
-    }
 
     public void Mop(Entity<AbsorbentComponent> absorbEnt, EntityUid user, EntityUid target)
     {
@@ -114,7 +112,7 @@ public abstract class SharedAbsorbentSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Logic for an absorbing entity interacting with a refillable.
+    /// Logic for an absorbing entity interacting with a refillable.
     /// </summary>
     private bool TryRefillableInteract(Entity<AbsorbentComponent, UseDelayComponent?> absorbEnt,
         Entity<SolutionComponent> absorbentSoln,
@@ -152,7 +150,7 @@ public abstract class SharedAbsorbentSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Logic for an transferring solution from absorber to an empty refillable.
+    /// Logic for an transferring solution from absorber to an empty refillable.
     /// </summary>
     private bool TryTransferFromAbsorbentToRefillable(Entity<AbsorbentComponent> absorbEnt,
         Entity<SolutionComponent> absorbentSoln,
@@ -192,7 +190,7 @@ public abstract class SharedAbsorbentSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Logic for an transferring contaminants to a non-empty refillable & reabsorbing water if any available.
+    /// Logic for an transferring contaminants to a non-empty refillable & reabsorbing water if any available.
     /// </summary>
     private bool TryTwoWayAbsorbentRefillableTransfer(Entity<AbsorbentComponent> absorbEnt,
         Entity<SolutionComponent> absorbentSoln,
@@ -249,9 +247,7 @@ public abstract class SharedAbsorbentSystem : EntitySystem
             return anyTransferOccurred;
 
         if (refillableSolution.AvailableVolume <= 0)
-        {
             _popups.PopupClient(Loc.GetString("mopping-system-full", ("used", target)), user, user);
-        }
         else
         {
             // transfer as much contaminants to refillable as will fit
@@ -267,7 +263,7 @@ public abstract class SharedAbsorbentSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Logic for an absorbing entity interacting with a puddle.
+    /// Logic for an absorbing entity interacting with a puddle.
     /// </summary>
     private bool TryPuddleInteract(Entity<AbsorbentComponent, UseDelayComponent?> absorbEnt,
         Entity<SolutionComponent> absorberSoln,
@@ -327,12 +323,14 @@ public abstract class SharedAbsorbentSystem : EntitySystem
                 var tileRef = _mapSystem.GetTileRef(gridUid.Value, mapGrid, targetXform.Coordinates);
                 Puddle.DoTileReactions(tileRef, absorberSplit);
             }
+
             SolutionContainer.AddSolution(puddle.Solution.Value, absorberSplit);
         }
         else
         {
             // Note: arguably shouldn't this get all solutions?
-            puddleSplit = puddleSolution.SplitSolutionWithout(absorber.PickupAmount, Puddle.GetAbsorbentReagents(puddleSolution));
+            puddleSplit =
+                puddleSolution.SplitSolutionWithout(absorber.PickupAmount, Puddle.GetAbsorbentReagents(puddleSolution));
             // Despawn if we're done
             if (puddleSolution.Volume == FixedPoint2.Zero)
             {

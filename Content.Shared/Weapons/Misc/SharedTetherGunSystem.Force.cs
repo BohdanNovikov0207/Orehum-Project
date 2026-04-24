@@ -30,12 +30,12 @@ public abstract partial class SharedTetherGunSystem
     {
         if (IsTethered(component))
         {
-            if (!args.ClickLocation.TryDistance(EntityManager, TransformSystem, Transform(uid).Coordinates,
+            if (!args.ClickLocation.TryDistance(EntityManager,
+                    TransformSystem,
+                    Transform(uid).Coordinates,
                     out var distance) ||
                 distance > component.ThrowDistance)
-            {
                 return;
-            }
 
             // URGH, soon
             // Need auto states to be nicer + powercelldraw to be nicer
@@ -44,7 +44,7 @@ public abstract partial class SharedTetherGunSystem
 
             // Launch
             var tethered = component.Tethered;
-            StopTether(uid, component, land: false);
+            StopTether(uid, component, false);
             _throwing.TryThrow(tethered!.Value, args.ClickLocation, component.ThrowForce, playSound: false);
 
             _audio.PlayPredicted(component.LaunchSound, uid, null);
@@ -53,12 +53,10 @@ public abstract partial class SharedTetherGunSystem
         {
             // Pickup
             if (TryTether(uid, args.Target.Value, args.User, component))
-                TransformSystem.SetCoordinates(component.TetherEntity!.Value, new EntityCoordinates(uid, new Vector2(0f, 0f)));
+                TransformSystem.SetCoordinates(component.TetherEntity!.Value,
+                    new EntityCoordinates(uid, new Vector2(0f, 0f)));
         }
     }
 
-    private bool IsTethered(ForceGunComponent component)
-    {
-        return component.Tethered != null;
-    }
+    private bool IsTethered(ForceGunComponent component) => component.Tethered != null;
 }

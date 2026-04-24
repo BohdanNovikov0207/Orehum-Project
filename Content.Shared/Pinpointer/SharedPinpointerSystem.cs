@@ -30,8 +30,8 @@ public abstract class SharedPinpointerSystem : EntitySystem
 {
     [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
     [Dependency] private readonly EmagSystem _emag = default!;
-    [Dependency] protected readonly EntityWhitelistSystem Whitelist = default!; // Goob edit
     [Dependency] private readonly SharedPopupSystem _popup = default!; // Goob edit
+    [Dependency] protected readonly EntityWhitelistSystem Whitelist = default!; // Goob edit
 
     public override void Initialize()
     {
@@ -42,7 +42,7 @@ public abstract class SharedPinpointerSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Set the target if capable
+    /// Set the target if capable
     /// </summary>
     private void OnAfterInteract(EntityUid uid, PinpointerComponent component, AfterInteractEvent args)
     {
@@ -57,15 +57,15 @@ public abstract class SharedPinpointerSystem : EntitySystem
 
         if (Whitelist.IsWhitelistFail(component.RetargetingWhitelist, target) ||
             Whitelist.IsBlacklistPass(component.RetargetingBlacklist, target))
-        {
             return;
-        }
 
         // TODO add doafter once the freeze is lifted
         // ignore can target multiple, because too hard to support
         component.Targets.Clear();
         component.Targets.Add(target);
-        _adminLogger.Add(LogType.Action, LogImpact.Low, $"{ToPrettyString(args.User):player} set target of {ToPrettyString(uid):pinpointer} to {ToPrettyString(target):target}");
+        _adminLogger.Add(LogType.Action,
+            LogImpact.Low,
+            $"{ToPrettyString(args.User):player} set target of {ToPrettyString(uid):pinpointer} to {ToPrettyString(target):target}");
         if (component.UpdateTargetName)
             component.TargetName = Identity.Name(target, EntityManager);
 
@@ -74,8 +74,8 @@ public abstract class SharedPinpointerSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Set pinpointers target to track
-    ///     Goob edit: If CanTargetMultiple is true in Pinpointer component, then it will be ADDED, not set
+    /// Set pinpointers target to track
+    /// Goob edit: If CanTargetMultiple is true in Pinpointer component, then it will be ADDED, not set
     /// </summary>
     public virtual void SetTarget(EntityUid uid, EntityUid? target, PinpointerComponent? pinpointer = null)
     {
@@ -83,14 +83,10 @@ public abstract class SharedPinpointerSystem : EntitySystem
             return;
 
         if (target == null || pinpointer.Targets.Contains(target.Value))
-        {
             return;
-        }
 
         if (!pinpointer.CanTargetMultiple)
-        {
             pinpointer.Targets.Clear();
-        }
 
         if (TerminatingOrDeleted(target.Value))
         {
@@ -117,9 +113,7 @@ public abstract class SharedPinpointerSystem : EntitySystem
             return;
 
         if (!pinpointer.CanTargetMultiple)
-        {
             return; // No.
-        }
 
         var targetsList = targets.Where(Exists).ToList();
 
@@ -132,11 +126,10 @@ public abstract class SharedPinpointerSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Update direction from pinpointer to selected target (if it was set)
+    /// Update direction from pinpointer to selected target (if it was set)
     /// </summary>
     protected virtual void UpdateDirectionToTarget(EntityUid uid, PinpointerComponent? pinpointer = null)
     {
-
     }
 
     private void OnExamined(EntityUid uid, PinpointerComponent component, ExaminedEvent args)
@@ -148,7 +141,7 @@ public abstract class SharedPinpointerSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Manually set distance from pinpointer to target
+    /// Manually set distance from pinpointer to target
     /// </summary>
     public void SetDistance(EntityUid uid, Distance distance, PinpointerComponent? pinpointer = null)
     {
@@ -163,9 +156,9 @@ public abstract class SharedPinpointerSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Try to manually set pinpointer arrow direction.
-    ///     If difference between current angle and new angle is smaller than
-    ///     pinpointer precision, new value will be ignored and it will return false.
+    /// Try to manually set pinpointer arrow direction.
+    /// If difference between current angle and new angle is smaller than
+    /// pinpointer precision, new value will be ignored and it will return false.
     /// </summary>
     public bool TrySetArrowAngle(EntityUid uid, Angle arrowAngle, PinpointerComponent? pinpointer = null)
     {
@@ -182,7 +175,7 @@ public abstract class SharedPinpointerSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Activate/deactivate pinpointer screen. If it has target it will start tracking it.
+    /// Activate/deactivate pinpointer screen. If it has target it will start tracking it.
     /// </summary>
     public void SetActive(EntityUid uid, bool isActive, PinpointerComponent? pinpointer = null)
     {
@@ -197,7 +190,7 @@ public abstract class SharedPinpointerSystem : EntitySystem
 
 
     /// <summary>
-    ///     Toggle Pinpointer screen. If it has target it will start tracking it.
+    /// Toggle Pinpointer screen. If it has target it will start tracking it.
     /// </summary>
     /// <returns>True if pinpointer was activated, false otherwise</returns>
     public virtual bool TogglePinpointer(EntityUid uid, PinpointerComponent? pinpointer = null)

@@ -15,17 +15,17 @@ namespace Content.Shared._EinsteinEngines.Silicon.EmitBuzzWhileDamaged;
 [RegisterComponent]
 public sealed partial class EmitBuzzWhileDamagedComponent : Component
 {
-    [DataField("buzzPopupCooldown")]
-    public TimeSpan BuzzPopupCooldown { get; private set; } = TimeSpan.FromSeconds(8);
-
-    [ViewVariables]
-    public TimeSpan LastBuzzPopupTime;
+    public float AccumulatedFrametime;
 
     [DataField("cycleDelay")]
     public float CycleDelay = 2.0f;
 
-    public float AccumulatedFrametime;
+    [ViewVariables]
+    public TimeSpan LastBuzzPopupTime;
 
     [DataField("sound")]
     public SoundSpecifier Sound = new SoundCollectionSpecifier("buzzes");
+
+    [DataField("buzzPopupCooldown")]
+    public TimeSpan BuzzPopupCooldown { get; private set; } = TimeSpan.FromSeconds(8);
 }

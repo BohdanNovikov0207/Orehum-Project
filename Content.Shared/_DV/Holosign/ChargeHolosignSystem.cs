@@ -4,6 +4,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Linq;
 using Content.Shared.Charges.Components;
 using Content.Shared.Charges.Systems;
 using Content.Shared.Coordinates.Helpers;
@@ -16,21 +17,20 @@ using Robust.Shared.Containers;
 using Robust.Shared.Map;
 using Robust.Shared.Network;
 using Robust.Shared.Timing;
-using System.Linq;
 
 namespace Content.Shared._DV.Holosign;
 
 public sealed class ChargeHolosignSystem : EntitySystem
 {
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly INetManager _net = default!;
     [Dependency] private readonly SharedChargesSystem _charges = default!;
     [Dependency] private readonly SharedContainerSystem _container = default!;
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
+    [Dependency] private readonly INetManager _net = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
 
-    private HashSet<Entity<IComponent>> _signs = new();
+    private readonly HashSet<Entity<IComponent>> _signs = new();
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     public override void Initialize()
     {
@@ -76,7 +76,8 @@ public sealed class ChargeHolosignSystem : EntitySystem
     {
         if (!_timing.IsFirstTimePredicted ||
             args.Handled || !args.CanReach ||
-            HasComp<StorageComponent>(args.Target) || // if it's a storage component like a bag, we ignore usage so it can be stored
+            HasComp<StorageComponent>(args
+                .Target) || // if it's a storage component like a bag, we ignore usage so it can be stored
             !TryComp<LimitedChargesComponent>(ent, out var charges))
             return;
 
@@ -111,10 +112,9 @@ public sealed class ChargeHolosignSystem : EntitySystem
                 continue;
             }
 
-            if (ent.Comp.Container.Contains(signUid) || TryRemoveSign((ent, ent.Comp, charges), signUid, args.User, false))
-            {
+            if (ent.Comp.Container.Contains(signUid) ||
+                TryRemoveSign((ent, ent.Comp, charges), signUid, args.User, false))
                 count++;
-            }
             else
             {
                 // delete it if we can't recall it
@@ -125,7 +125,9 @@ public sealed class ChargeHolosignSystem : EntitySystem
         }
 
         foreach (var signUid in remQueue)
+        {
             ent.Comp.Signs.Remove(signUid);
+        }
 
         // spawn replacements for holosigns we couldn't recall
         for (var i = count; i < charges.MaxCharges; i++)
@@ -143,7 +145,9 @@ public sealed class ChargeHolosignSystem : EntitySystem
         DirtyField(ent, ent.Comp, nameof(ChargeHolosignProjectorComponent.Signs));
     }
 
-    public bool TryPlaceSign(Entity<ChargeHolosignProjectorComponent?, LimitedChargesComponent?> ent, EntityCoordinates coords, EntityUid user)
+    public bool TryPlaceSign(Entity<ChargeHolosignProjectorComponent?, LimitedChargesComponent?> ent,
+        EntityCoordinates coords,
+        EntityUid user)
     {
         if (!Resolve(ent, ref ent.Comp1, ref ent.Comp2))
             return false;
@@ -161,7 +165,10 @@ public sealed class ChargeHolosignSystem : EntitySystem
         return true;
     }
 
-    public bool TryRemoveSign(Entity<ChargeHolosignProjectorComponent?, LimitedChargesComponent?> ent, EntityUid sign, EntityUid user, bool showIdentity = true)
+    public bool TryRemoveSign(Entity<ChargeHolosignProjectorComponent?, LimitedChargesComponent?> ent,
+        EntityUid sign,
+        EntityUid user,
+        bool showIdentity = true)
     {
         if (!Resolve(ent, ref ent.Comp1, ref ent.Comp2))
             return false;
@@ -181,8 +188,11 @@ public sealed class ChargeHolosignSystem : EntitySystem
 
         _charges.AddCharges((ent, ent.Comp2), 1);
 
-        var othersStr = showIdentity ? Loc.GetString("charge-holoprojector-reclaim-others", ("sign", sign), ("user", Identity.Name(user, EntityManager)))
-                                     : Loc.GetString("charge-holoprojector-recall-others", ("sign", sign));
+        var othersStr = showIdentity
+            ? Loc.GetString("charge-holoprojector-reclaim-others",
+                ("sign", sign),
+                ("user", Identity.Name(user, EntityManager)))
+            : Loc.GetString("charge-holoprojector-recall-others", ("sign", sign));
         _popup.PopupPredicted(
             Loc.GetString("charge-holoprojector-reclaim", ("sign", sign)),
             othersStr,

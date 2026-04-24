@@ -14,13 +14,12 @@ public sealed class SolutionScannerSystem : EntitySystem
     public override void Initialize()
     {
         SubscribeLocalEvent<SolutionScannerComponent, SolutionScanEvent>(OnSolutionScanAttempt);
-        SubscribeLocalEvent<SolutionScannerComponent, InventoryRelayedEvent<SolutionScanEvent>>((e, c, ev) => OnSolutionScanAttempt(e, c, ev.Args));
+        SubscribeLocalEvent<SolutionScannerComponent, InventoryRelayedEvent<SolutionScanEvent>>((e, c, ev) =>
+            OnSolutionScanAttempt(e, c, ev.Args));
     }
 
-    private void OnSolutionScanAttempt(EntityUid eid, SolutionScannerComponent component, SolutionScanEvent args)
-    {
+    private void OnSolutionScanAttempt(EntityUid eid, SolutionScannerComponent component, SolutionScanEvent args) =>
         args.CanScan = true;
-    }
 }
 
 public sealed class SolutionScanEvent : EntityEventArgs, IInventoryRelayEvent

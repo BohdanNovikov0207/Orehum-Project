@@ -47,12 +47,12 @@ namespace Content.Shared.Light.Components;
 /// <summary>
 /// Handles turning a pointlight on / off based on power. Nothing else
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class SlimPoweredLightComponent : Component
 {
     /// <summary>
     /// Used to make this as being lit. If unpowered then the light will still be off.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public bool Enabled = true;
 }

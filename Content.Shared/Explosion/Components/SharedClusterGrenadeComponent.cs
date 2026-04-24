@@ -13,11 +13,10 @@
 
 using Robust.Shared.Serialization;
 
-namespace Content.Shared.Explosion.Components
+namespace Content.Shared.Explosion.Components;
+
+[Serializable] [NetSerializable]
+public enum ClusterGrenadeVisuals : byte
 {
-    [Serializable, NetSerializable]
-    public enum ClusterGrenadeVisuals : byte
-    {
-        GrenadesCounter
-    }
+    GrenadesCounter,
 }

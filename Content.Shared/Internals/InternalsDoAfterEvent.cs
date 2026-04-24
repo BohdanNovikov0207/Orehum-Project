@@ -84,10 +84,10 @@ public enum ToggleMode
 {
     Toggle,
     On,
-    Off
+    Off,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class InternalsDoAfterEvent : DoAfterEvent
 {
     public ToggleMode ToggleMode = ToggleMode.Toggle;

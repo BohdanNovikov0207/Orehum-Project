@@ -9,7 +9,7 @@ namespace Content.Shared.Xenoarchaeology.Artifact.XAT;
 /// </summary>
 public sealed class XATItemLandSystem : BaseXATSystem<XATItemLandComponent>
 {
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
@@ -17,8 +17,7 @@ public sealed class XATItemLandSystem : BaseXATSystem<XATItemLandComponent>
         XATSubscribeDirectEvent<LandEvent>(OnLand);
     }
 
-    private void OnLand(Entity<XenoArtifactComponent> artifact, Entity<XATItemLandComponent, XenoArtifactNodeComponent> node, ref LandEvent args)
-    {
-        Trigger(artifact, node);
-    }
+    private void OnLand(Entity<XenoArtifactComponent> artifact,
+        Entity<XATItemLandComponent, XenoArtifactNodeComponent> node,
+        ref LandEvent args) => Trigger(artifact, node);
 }

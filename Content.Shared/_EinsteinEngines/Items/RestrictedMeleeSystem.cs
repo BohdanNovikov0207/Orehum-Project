@@ -17,12 +17,12 @@ namespace Content.Shared._EinsteinEngines.Items;
 
 public sealed class RestrictedMeleeSystem : EntitySystem
 {
-    [Dependency] private readonly SharedStunSystem _stun = default!;
-    [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
-    [Dependency] private readonly SharedHandsSystem _hands = default!;
-    [Dependency] private readonly StatusEffectsSystem _statusEffects = default!;
     [Dependency] private readonly SharedAudioSystem _audioSystem = default!;
     [Dependency] private readonly EntityWhitelistSystem _entityWhitelist = default!;
+    [Dependency] private readonly SharedHandsSystem _hands = default!;
+    [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
+    [Dependency] private readonly StatusEffectsSystem _statusEffects = default!;
+    [Dependency] private readonly SharedStunSystem _stun = default!;
 
     public override void Initialize()
     {
@@ -30,7 +30,8 @@ public sealed class RestrictedMeleeSystem : EntitySystem
         SubscribeLocalEvent<RestrictedMeleeComponent, AttemptMeleeEvent>(OnMeleeAttempt);
     }
 
-    private bool CanUse(EntityUid uid, RestrictedMeleeComponent comp) => comp.Whitelist != null && _entityWhitelist.IsValid(comp.Whitelist, uid);
+    private bool CanUse(EntityUid uid, RestrictedMeleeComponent comp) =>
+        comp.Whitelist != null && _entityWhitelist.IsValid(comp.Whitelist, uid);
 
     private void OnMeleeAttempt(EntityUid uid, RestrictedMeleeComponent comp, ref AttemptMeleeEvent args)
     {
@@ -41,7 +42,7 @@ public sealed class RestrictedMeleeSystem : EntitySystem
         args.Message = Loc.GetString(comp.FailText, ("item", uid));
 
         if (comp.DoKnockdown)
-            _stun.TryKnockdown(args.User, comp.KnockdownDuration, true);
+            _stun.TryKnockdown(args.User, comp.KnockdownDuration);
 
         if (comp.ForceDrop)
             _hands.TryDrop(args.User);

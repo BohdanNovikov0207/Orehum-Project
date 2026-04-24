@@ -15,7 +15,10 @@ public sealed class ESHoldToFaceSystem : EntitySystem
 
         CommandBinds.Builder
             .Bind(ContentKeyFunctions.ESHoldToFace,
-                InputCmdHandler.FromDelegate(args => ToggleRotator(args, true), args => ToggleRotator(args, false), false, false))
+                InputCmdHandler.FromDelegate(args => ToggleRotator(args, true),
+                    args => ToggleRotator(args, false),
+                    false,
+                    false))
             .Register<ESHoldToFaceSystem>();
     }
 
@@ -25,7 +28,8 @@ public sealed class ESHoldToFaceSystem : EntitySystem
             return;
 
         // Don't try and override combat mode doing the same thing
-        if (TryComp<CombatModeComponent>(ent, out var combat) && combat is { ToggleMouseRotator: true, IsInCombatMode: true })
+        if (TryComp<CombatModeComponent>(ent, out var combat) &&
+            combat is { ToggleMouseRotator: true, IsInCombatMode: true })
             return;
 
         _combat.SetMouseRotatorComponents(ent, value);

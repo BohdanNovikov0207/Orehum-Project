@@ -18,8 +18,5 @@ public sealed class AlwaysHotSystem : EntitySystem
         SubscribeLocalEvent<AlwaysHotComponent, IsHotEvent>(OnIsHot);
     }
 
-    private void OnIsHot(Entity<AlwaysHotComponent> ent, ref IsHotEvent args)
-    {
-        args.IsHot = true;
-    }
+    private void OnIsHot(Entity<AlwaysHotComponent> ent, ref IsHotEvent args) => args.IsHot = true;
 }

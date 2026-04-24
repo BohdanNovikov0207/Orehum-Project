@@ -24,7 +24,9 @@ public sealed class SuppressArtifactContainerSystem : EntitySystem
         SubscribeLocalEvent<SuppressArtifactContainerComponent, EntRemovedFromContainerMessage>(OnRemoved);
     }
 
-    private void OnInserted(EntityUid uid, SuppressArtifactContainerComponent component, EntInsertedIntoContainerMessage args)
+    private void OnInserted(EntityUid uid,
+        SuppressArtifactContainerComponent component,
+        EntInsertedIntoContainerMessage args)
     {
         if (!TryComp<XenoArtifactComponent>(args.Entity, out var artifact))
             return;
@@ -32,7 +34,9 @@ public sealed class SuppressArtifactContainerSystem : EntitySystem
         _xenoArtifact.SetSuppressed((args.Entity, artifact), true);
     }
 
-    private void OnRemoved(EntityUid uid, SuppressArtifactContainerComponent component, EntRemovedFromContainerMessage args)
+    private void OnRemoved(EntityUid uid,
+        SuppressArtifactContainerComponent component,
+        EntRemovedFromContainerMessage args)
     {
         if (!TryComp<XenoArtifactComponent>(args.Entity, out var artifact))
             return;

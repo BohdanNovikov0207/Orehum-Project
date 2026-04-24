@@ -13,11 +13,11 @@ namespace Content.Shared.Administration;
 
 public sealed class AdminCommandPermissions
 {
-    // Commands executable by anybody.
-    public readonly HashSet<string> AnyCommands = new();
-
     // Commands only executable by admins with one of the given flag masks.
     public readonly Dictionary<string, AdminFlags[]> AdminCommands = new();
+
+    // Commands executable by anybody.
+    public readonly HashSet<string> AnyCommands = new();
 
     public void LoadPermissionsFromStream(Stream fs)
     {
@@ -37,9 +37,7 @@ public sealed class AdminCommandPermissions
                 foreach (var cmd in commands)
                 {
                     if (!AdminCommands.TryGetValue(cmd, out var exFlags))
-                    {
-                        AdminCommands.Add(cmd, new[] {flags});
-                    }
+                        AdminCommands.Add(cmd, new[] { flags });
                     else
                     {
                         var newArr = new AdminFlags[exFlags.Length + 1];
@@ -50,9 +48,7 @@ public sealed class AdminCommandPermissions
                 }
             }
             else
-            {
                 AnyCommands.UnionWith(commands);
-            }
         }
     }
 
@@ -79,9 +75,7 @@ public sealed class AdminCommandPermissions
         foreach (var flagReq in flagsReq)
         {
             if (admin.HasFlag(flagReq))
-            {
                 return true;
-            }
         }
 
         return false;

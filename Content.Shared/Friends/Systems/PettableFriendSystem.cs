@@ -7,6 +7,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Shared._Shitmed.Spawners.EntitySystems;
 using Content.Shared.Chemistry.Components;
 using Content.Shared.Friends.Components;
 using Content.Shared.Interaction.Events;
@@ -14,7 +15,8 @@ using Content.Shared.NPC.Components;
 using Content.Shared.NPC.Systems;
 using Content.Shared.Popups;
 using Content.Shared.Timing;
-using Content.Shared._Shitmed.Spawners.EntitySystems; // Shitmed Change
+
+// Shitmed Change
 
 namespace Content.Shared.Friends.Systems;
 

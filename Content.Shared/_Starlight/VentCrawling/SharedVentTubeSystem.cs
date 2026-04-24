@@ -9,7 +9,6 @@
 
 using System.Linq;
 using Content.Shared.VentCrawler.Tube.Components;
-using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
 
 namespace Content.Shared._Starlight.VentCrawling;
@@ -18,7 +17,9 @@ public sealed class SharedVentTubeSystem : EntitySystem
 {
     [Dependency] private readonly SharedMapSystem _mapSystem = default!;
 
-    public EntityUid? NextTubeFor(EntityUid target, Direction nextDirection, VentCrawlerTubeComponent? targetTube = null)
+    public EntityUid? NextTubeFor(EntityUid target,
+        Direction nextDirection,
+        VentCrawlerTubeComponent? targetTube = null)
     {
         if (!Resolve(target, ref targetTube))
             return null;
@@ -32,9 +33,8 @@ public sealed class SharedVentTubeSystem : EntitySystem
             return null;
 
         var position = xform.Coordinates;
-        foreach (EntityUid entity in _mapSystem.GetInDir(xform.GridUid.Value, grid ,position, nextDirection))
+        foreach (var entity in _mapSystem.GetInDir(xform.GridUid.Value, grid, position, nextDirection))
         {
-
             if (!TryComp(entity, out VentCrawlerTubeComponent? tube)
                 || !CanConnect(target, targetTube, nextDirection)
                 || !CanConnect(entity, tube, oppositeDirection))

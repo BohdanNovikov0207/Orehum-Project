@@ -83,7 +83,7 @@ public sealed class SelfEquipOnlySystem : EntitySystem
 {
     [Dependency] private readonly ActionBlockerSystem _actionBlocker = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         SubscribeLocalEvent<SelfEquipOnlyComponent, BeingEquippedAttemptEvent>(OnBeingEquipped);

@@ -30,15 +30,17 @@ public sealed class ShockOnTriggerSystem : EntitySystem
             target = container.Owner;
         }
         else
-        {
             target = ent.Comp.TargetUser ? args.User : ent.Owner;
-        }
 
         if (target == null)
             return;
 
-        _electrocution.TryDoElectrocution(target.Value, null, ent.Comp.Damage, ent.Comp.Duration, true, ignoreInsulation: true);
+        _electrocution.TryDoElectrocution(target.Value,
+            null,
+            ent.Comp.Damage,
+            ent.Comp.Duration,
+            true,
+            ignoreInsulation: true);
         args.Handled = true;
     }
-
 }

@@ -59,7 +59,7 @@
 using Content.Shared.Armor;
 using Content.Shared.Atmos;
 using Content.Shared.Chat;
-using Content.Shared.Chat.RadioIconsEvents; // Goobstation
+using Content.Shared.Chat.RadioIconsEvents;
 using Content.Shared.Chemistry;
 using Content.Shared.Chemistry.Hypospray.Events;
 using Content.Shared.Climbing.Events;
@@ -89,6 +89,7 @@ using Content.Shared.Verbs;
 using Content.Shared.Weapons.Ranged.Events;
 using Content.Shared.Wieldable;
 using Content.Shared.Zombies;
+// Goobstation
 
 namespace Content.Shared.Inventory;
 
@@ -107,7 +108,8 @@ public partial class InventorySystem
         SubscribeLocalEvent<InventoryComponent, RefreshNameModifiersEvent>(RelayInventoryEvent);
 
         SubscribeLocalEvent<InventoryComponent, TransformSpeakerNameEvent>(RelayInventoryEvent);
-        SubscribeLocalEvent<InventoryComponent, TransformSpeakerJobIconEvent>(RelayInventoryEvent); // GabyStation -> Radio icons
+        SubscribeLocalEvent<InventoryComponent, TransformSpeakerJobIconEvent>(
+            RelayInventoryEvent); // GabyStation -> Radio icons
         SubscribeLocalEvent<InventoryComponent, SelfBeforeHyposprayInjectsEvent>(RelayInventoryEvent);
         SubscribeLocalEvent<InventoryComponent, TargetBeforeHyposprayInjectsEvent>(RelayInventoryEvent);
         SubscribeLocalEvent<InventoryComponent, SelfBeforeGunShotEvent>(RelayInventoryEvent);
@@ -143,33 +145,38 @@ public partial class InventorySystem
         SubscribeLocalEvent<InventoryComponent, SolutionScanEvent>(RelayInventoryEvent);
 
         // ComponentActivatedClientSystems
-        SubscribeLocalEvent<InventoryComponent, RefreshEquipmentHudEvent<ShowJobIconsComponent>>(RefRelayInventoryEvent);
-        SubscribeLocalEvent<InventoryComponent, RefreshEquipmentHudEvent<ShowSquadIconsComponent>>(RefRelayInventoryEvent); // Corvax-SecApartment
-        SubscribeLocalEvent<InventoryComponent, RefreshEquipmentHudEvent<ShowHealthBarsComponent>>(RefRelayInventoryEvent);
-        SubscribeLocalEvent<InventoryComponent, RefreshEquipmentHudEvent<ShowHealthIconsComponent>>(RefRelayInventoryEvent);
-        SubscribeLocalEvent<InventoryComponent, RefreshEquipmentHudEvent<ShowHungerIconsComponent>>(RefRelayInventoryEvent);
-        SubscribeLocalEvent<InventoryComponent, RefreshEquipmentHudEvent<ShowThirstIconsComponent>>(RefRelayInventoryEvent);
-        SubscribeLocalEvent<InventoryComponent, RefreshEquipmentHudEvent<ShowMindShieldIconsComponent>>(RefRelayInventoryEvent);
-        SubscribeLocalEvent<InventoryComponent, RefreshEquipmentHudEvent<ShowSyndicateIconsComponent>>(RefRelayInventoryEvent);
-        SubscribeLocalEvent<InventoryComponent, RefreshEquipmentHudEvent<ShowCriminalRecordIconsComponent>>(RefRelayInventoryEvent);
-        SubscribeLocalEvent<InventoryComponent, RefreshEquipmentHudEvent<BlackAndWhiteOverlayComponent>>(RefRelayInventoryEvent);
+        SubscribeLocalEvent<InventoryComponent, RefreshEquipmentHudEvent<ShowJobIconsComponent>>(
+            RefRelayInventoryEvent);
+        SubscribeLocalEvent<InventoryComponent, RefreshEquipmentHudEvent<ShowSquadIconsComponent>>(
+            RefRelayInventoryEvent); // Corvax-SecApartment
+        SubscribeLocalEvent<InventoryComponent, RefreshEquipmentHudEvent<ShowHealthBarsComponent>>(
+            RefRelayInventoryEvent);
+        SubscribeLocalEvent<InventoryComponent, RefreshEquipmentHudEvent<ShowHealthIconsComponent>>(
+            RefRelayInventoryEvent);
+        SubscribeLocalEvent<InventoryComponent, RefreshEquipmentHudEvent<ShowHungerIconsComponent>>(
+            RefRelayInventoryEvent);
+        SubscribeLocalEvent<InventoryComponent, RefreshEquipmentHudEvent<ShowThirstIconsComponent>>(
+            RefRelayInventoryEvent);
+        SubscribeLocalEvent<InventoryComponent, RefreshEquipmentHudEvent<ShowMindShieldIconsComponent>>(
+            RefRelayInventoryEvent);
+        SubscribeLocalEvent<InventoryComponent, RefreshEquipmentHudEvent<ShowSyndicateIconsComponent>>(
+            RefRelayInventoryEvent);
+        SubscribeLocalEvent<InventoryComponent, RefreshEquipmentHudEvent<ShowCriminalRecordIconsComponent>>(
+            RefRelayInventoryEvent);
+        SubscribeLocalEvent<InventoryComponent, RefreshEquipmentHudEvent<BlackAndWhiteOverlayComponent>>(
+            RefRelayInventoryEvent);
         SubscribeLocalEvent<InventoryComponent, RefreshEquipmentHudEvent<NoirOverlayComponent>>(RefRelayInventoryEvent);
 
 
         SubscribeLocalEvent<InventoryComponent, GetVerbsEvent<EquipmentVerb>>(OnGetEquipmentVerbs);
         SubscribeLocalEvent<InventoryComponent, GetVerbsEvent<InnateVerb>>(OnGetInnateVerbs);
-
     }
 
-    protected void RefRelayInventoryEvent<T>(EntityUid uid, InventoryComponent component, ref T args) where T : IInventoryRelayEvent
-    {
-        RelayEvent((uid, component), ref args);
-    }
+    protected void RefRelayInventoryEvent<T>(EntityUid uid, InventoryComponent component, ref T args)
+        where T : IInventoryRelayEvent => RelayEvent((uid, component), ref args);
 
-    protected void RelayInventoryEvent<T>(EntityUid uid, InventoryComponent component, T args) where T : IInventoryRelayEvent
-    {
-        RelayEvent((uid, component), args);
-    }
+    protected void RelayInventoryEvent<T>(EntityUid uid, InventoryComponent component, T args)
+        where T : IInventoryRelayEvent => RelayEvent((uid, component), args);
 
     public void RelayEvent<T>(Entity<InventoryComponent> inventory, ref T args) where T : IInventoryRelayEvent
     {
@@ -223,17 +230,16 @@ public partial class InventorySystem
             RaiseLocalEvent(item, ev);
         }
     }
-
 }
 
 /// <summary>
-///     Event wrapper for relayed events.
+/// Event wrapper for relayed events.
 /// </summary>
 /// <remarks>
-///      This avoids nested inventory relays, and makes it easy to have certain events only handled by the initial
-///      target entity. E.g. health based movement speed modifiers should not be handled by a hat, even if that hat
-///      happens to be a dead mouse. Clothing that wishes to modify movement speed must subscribe to
-///      InventoryRelayedEvent&lt;RefreshMovementSpeedModifiersEvent&gt;
+/// This avoids nested inventory relays, and makes it easy to have certain events only handled by the initial
+/// target entity. E.g. health based movement speed modifiers should not be handled by a hat, even if that hat
+/// happens to be a dead mouse. Clothing that wishes to modify movement speed must subscribe to
+/// InventoryRelayedEvent&lt;RefreshMovementSpeedModifiersEvent&gt;
 /// </remarks>
 public sealed class InventoryRelayedEvent<TEvent> : EntityEventArgs
 {
@@ -251,16 +257,16 @@ public interface IClothingSlots
 }
 
 /// <summary>
-///     Events that should be relayed to inventory slots should implement this interface.
+/// Events that should be relayed to inventory slots should implement this interface.
 /// </summary>
 public interface IInventoryRelayEvent // this needs to get moved to common...
 {
     /// <summary>
-    ///     What inventory slots should this event be relayed to, if any?
+    /// What inventory slots should this event be relayed to, if any?
     /// </summary>
     /// <remarks>
-    ///     In general you may want to exclude <see cref="SlotFlags.POCKET"/>, given that those items are not truly
-    ///     "equipped" by the user.
+    /// In general you may want to exclude <see cref="SlotFlags.POCKET" />, given that those items are not truly
+    /// "equipped" by the user.
     /// </remarks>
-    public SlotFlags TargetSlots { get; }
+    SlotFlags TargetSlots { get; }
 }

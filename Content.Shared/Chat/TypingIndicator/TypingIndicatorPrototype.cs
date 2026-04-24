@@ -16,20 +16,11 @@ using Robust.Shared.Utility;
 namespace Content.Shared.Chat.TypingIndicator;
 
 /// <summary>
-///     Prototype to store chat typing indicator visuals.
+/// Prototype to store chat typing indicator visuals.
 /// </summary>
 [Prototype]
-public sealed partial class TypingIndicatorPrototype : IPrototype
+public sealed class TypingIndicatorPrototype : IPrototype
 {
-    [IdDataField]
-    public string ID { get; private set; } = default!;
-
-    [DataField("spritePath")]
-    public ResPath SpritePath = new("/Textures/Effects/speech.rsi");
-
-    [DataField("typingState", required: true)]
-    public string TypingState = default!;
-
     [DataField("idleState", required: true)]
     public string IdleState = default!;
 
@@ -39,4 +30,12 @@ public sealed partial class TypingIndicatorPrototype : IPrototype
     [DataField("shader")]
     public string Shader = "shaded";
 
+    [DataField("spritePath")]
+    public ResPath SpritePath = new("/Textures/Effects/speech.rsi");
+
+    [DataField("typingState", required: true)]
+    public string TypingState = default!;
+
+    [IdDataField]
+    public string ID { get; } = default!;
 }

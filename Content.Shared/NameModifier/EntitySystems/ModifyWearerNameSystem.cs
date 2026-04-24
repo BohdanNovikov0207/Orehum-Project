@@ -9,7 +9,7 @@ using Content.Shared.NameModifier.Components;
 
 namespace Content.Shared.NameModifier.EntitySystems;
 
-public sealed partial class ModifyWearerNameSystem : EntitySystem
+public sealed class ModifyWearerNameSystem : EntitySystem
 {
     [Dependency] private readonly NameModifierSystem _nameMod = default!;
 
@@ -17,23 +17,19 @@ public sealed partial class ModifyWearerNameSystem : EntitySystem
     {
         base.Initialize();
 
-        SubscribeLocalEvent<ModifyWearerNameComponent, InventoryRelayedEvent<RefreshNameModifiersEvent>>(OnRefreshNameModifiers);
+        SubscribeLocalEvent<ModifyWearerNameComponent, InventoryRelayedEvent<RefreshNameModifiersEvent>>(
+            OnRefreshNameModifiers);
         SubscribeLocalEvent<ModifyWearerNameComponent, ClothingGotEquippedEvent>(OnGotEquipped);
         SubscribeLocalEvent<ModifyWearerNameComponent, ClothingGotUnequippedEvent>(OnGotUnequipped);
     }
 
-    private void OnGotEquipped(Entity<ModifyWearerNameComponent> entity, ref ClothingGotEquippedEvent args)
-    {
+    private void OnGotEquipped(Entity<ModifyWearerNameComponent> entity, ref ClothingGotEquippedEvent args) =>
         _nameMod.RefreshNameModifiers(args.Wearer);
-    }
 
-    private void OnGotUnequipped(Entity<ModifyWearerNameComponent> entity, ref ClothingGotUnequippedEvent args)
-    {
+    private void OnGotUnequipped(Entity<ModifyWearerNameComponent> entity, ref ClothingGotUnequippedEvent args) =>
         _nameMod.RefreshNameModifiers(args.Wearer);
-    }
 
-    private void OnRefreshNameModifiers(Entity<ModifyWearerNameComponent> entity, ref InventoryRelayedEvent<RefreshNameModifiersEvent> args)
-    {
+    private void OnRefreshNameModifiers(Entity<ModifyWearerNameComponent> entity,
+        ref InventoryRelayedEvent<RefreshNameModifiersEvent> args) =>
         args.Args.AddModifier(entity.Comp.LocId, entity.Comp.Priority);
-    }
 }

@@ -9,18 +9,15 @@ namespace Content.Shared.Xenoarchaeology.Equipment.Components;
 /// <summary>
 /// The console that is used for artifact analysis
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState(true)]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState(true)]
 public sealed partial class AnalysisConsoleComponent : Component
 {
     /// <summary>
     /// The analyzer entity the console is linked.
     /// Can be null if not linked.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public NetEntity? AnalyzerEntity;
-
-    [DataField]
-    public SoundSpecifier? ScanFinishedSound = new SoundPathSpecifier("/Audio/Machines/scan_finish.ogg");
 
     /// <summary>
     /// The sound played when an artifact has points extracted.
@@ -31,7 +28,7 @@ public sealed partial class AnalysisConsoleComponent : Component
         Params = new AudioParams
         {
             Volume = 4,
-        }
+        },
     };
 
     /// <summary>
@@ -39,14 +36,16 @@ public sealed partial class AnalysisConsoleComponent : Component
     /// </summary>
     [DataField]
     public ProtoId<SourcePortPrototype> LinkingPort = "ArtifactAnalyzerSender";
+
+    [DataField]
+    public SoundSpecifier? ScanFinishedSound = new SoundPathSpecifier("/Audio/Machines/scan_finish.ogg");
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum ArtifactAnalyzerUiKey : byte
 {
-    Key
+    Key,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class AnalysisConsoleExtractButtonPressedMessage : BoundUserInterfaceMessage;
-

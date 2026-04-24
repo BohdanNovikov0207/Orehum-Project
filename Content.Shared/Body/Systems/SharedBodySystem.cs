@@ -20,17 +20,16 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Goobstation.Common.Body;
 using Content.Shared.Damage;
+using Content.Shared.Inventory;
 using Content.Shared.Movement.Systems;
 using Content.Shared.Standing;
 using Robust.Shared.Containers;
 using Robust.Shared.Prototypes;
-using Robust.Shared.Timing;
-
-// Shitmed Change
-using Content.Goobstation.Common.Body;
-using Content.Shared.Inventory;
 using Robust.Shared.Random;
+using Robust.Shared.Timing;
+// Shitmed Change
 
 namespace Content.Shared.Body.Systems;
 
@@ -55,17 +54,19 @@ public abstract partial class SharedBodySystem : EntitySystem
     /// </summary>
     public const string OrganSlotContainerIdPrefix = "body_organ_slot_";
 
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] protected readonly IPrototypeManager Prototypes = default!;
-    [Dependency] protected readonly DamageableSystem Damageable = default!;
-    [Dependency] protected readonly MovementSpeedModifierSystem Movement = default!;
-    [Dependency] protected readonly SharedContainerSystem Containers = default!;
-    [Dependency] protected readonly SharedTransformSystem SharedTransform = default!;
-    [Dependency] protected readonly StandingStateSystem Standing = default!;
     // <Shitmed>
     [Dependency] private readonly CommonInsideBodyPartSystem _insideBodyPart = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly InventorySystem _inventory = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] protected readonly SharedContainerSystem Containers = default!;
+    [Dependency] protected readonly DamageableSystem Damageable = default!;
+    [Dependency] protected readonly MovementSpeedModifierSystem Movement = default!;
+    [Dependency] protected readonly IPrototypeManager Prototypes = default!;
+    [Dependency] protected readonly SharedTransformSystem SharedTransform = default!;
+
+    [Dependency] protected readonly StandingStateSystem Standing = default!;
     // </Shitmed>
 
     public override void Initialize()
@@ -82,7 +83,7 @@ public abstract partial class SharedBodySystem : EntitySystem
     }
 
     /// <summary>
-    /// Inverse of <see cref="GetPartSlotContainerId"/>
+    /// Inverse of <see cref="GetPartSlotContainerId" />
     /// </summary>
     protected static string? GetPartSlotContainerIdFromContainer(string containerSlotId)
     {
@@ -99,16 +100,10 @@ public abstract partial class SharedBodySystem : EntitySystem
     /// <summary>
     /// Gets the container Id for the specified slotId.
     /// </summary>
-    public static string GetPartSlotContainerId(string slotId)
-    {
-        return PartSlotContainerIdPrefix + slotId;
-    }
+    public static string GetPartSlotContainerId(string slotId) => PartSlotContainerIdPrefix + slotId;
 
     /// <summary>
     /// Gets the container Id for the specified slotId.
     /// </summary>
-    public static string GetOrganContainerId(string slotId)
-    {
-        return OrganSlotContainerIdPrefix + slotId;
-    }
+    public static string GetOrganContainerId(string slotId) => OrganSlotContainerIdPrefix + slotId;
 }

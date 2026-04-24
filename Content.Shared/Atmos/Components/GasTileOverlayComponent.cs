@@ -12,39 +12,39 @@ using Robust.Shared.Timing;
 
 namespace Content.Shared.Atmos.Components;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class GasTileOverlayComponent : Component
 {
     /// <summary>
-    ///     The tiles that have had their atmos data updated since last tick
-    /// </summary>
-    public readonly HashSet<Vector2i> InvalidTiles = new();
-
-    /// <summary>
-    ///     Gas data stored in chunks to make PVS / bubbling easier.
+    /// Gas data stored in chunks to make PVS / bubbling easier.
     /// </summary>
     public readonly Dictionary<Vector2i, GasOverlayChunk> Chunks = new();
 
     /// <summary>
-    ///     Tick at which PVS was last toggled. Ensures that all players receive a full update when toggling PVS.
+    /// The tiles that have had their atmos data updated since last tick
+    /// </summary>
+    public readonly HashSet<Vector2i> InvalidTiles = new();
+
+    /// <summary>
+    /// Tick at which PVS was last toggled. Ensures that all players receive a full update when toggling PVS.
     /// </summary>
     public GameTick ForceTick { get; set; }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class GasTileOverlayState(Dictionary<Vector2i, GasOverlayChunk> chunks) : ComponentState
 {
     public readonly Dictionary<Vector2i, GasOverlayChunk> Chunks = chunks;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class GasTileOverlayDeltaState(
     Dictionary<Vector2i, GasOverlayChunk> modifiedChunks,
     HashSet<Vector2i> allChunks)
     : ComponentState, IComponentDeltaState<GasTileOverlayState>
 {
-    public readonly Dictionary<Vector2i, GasOverlayChunk> ModifiedChunks = modifiedChunks;
     public readonly HashSet<Vector2i> AllChunks = allChunks;
+    public readonly Dictionary<Vector2i, GasOverlayChunk> ModifiedChunks = modifiedChunks;
 
     public void ApplyToFullState(GasTileOverlayState state)
     {
@@ -56,7 +56,7 @@ public sealed class GasTileOverlayDeltaState(
 
         foreach (var (chunk, data) in ModifiedChunks)
         {
-            state.Chunks[chunk] = new(data);
+            state.Chunks[chunk] = new GasOverlayChunk(data);
         }
     }
 
@@ -66,13 +66,13 @@ public sealed class GasTileOverlayDeltaState(
 
         foreach (var (chunk, data) in ModifiedChunks)
         {
-            chunks[chunk] = new(data);
+            chunks[chunk] = new GasOverlayChunk(data);
         }
 
         foreach (var (chunk, data) in state.Chunks)
         {
             if (AllChunks.Contains(chunk))
-                chunks.TryAdd(chunk, new(data));
+                chunks.TryAdd(chunk, new GasOverlayChunk(data));
         }
 
         return new GasTileOverlayState(chunks);

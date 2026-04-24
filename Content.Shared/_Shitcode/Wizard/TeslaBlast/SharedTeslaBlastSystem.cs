@@ -18,12 +18,12 @@ namespace Content.Shared._Goobstation.Wizard.TeslaBlast;
 
 public abstract class SharedTeslaBlastSystem : EntitySystem
 {
-    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly SharedActionsSystem _actions = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
     [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     public override void Initialize()
     {
@@ -140,7 +140,7 @@ public abstract class SharedTeslaBlastSystem : EntitySystem
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class TeslaBlastDoAfterEvent(
     TimeSpan delay,
     float range,
@@ -151,28 +151,27 @@ public sealed partial class TeslaBlastDoAfterEvent(
     string lightningPrototype,
     NetEntity action) : DoAfterEvent
 {
-    public TimeSpan Delay = delay;
-
-    public float Range = range;
-
-    public int BoltCount = boltCount;
+    public NetEntity Action = action;
 
     public int ArcDepth = arcDepth;
+
+    public int BoltCount = boltCount;
+    public TimeSpan Delay = delay;
+
+    public string LightningPrototype = lightningPrototype;
 
     public Vector2 MinMaxDamage = damage;
 
     public Vector2 MinMaxStunTime = stunTime;
 
-    public string LightningPrototype = lightningPrototype;
-
-    public NetEntity Action = action;
+    public float Range = range;
 
     public TeslaBlastDoAfterEvent() : this(TimeSpan.FromSeconds(10),
         7f,
         1,
         5,
-        new(15f, 50f),
-        new(1f, 8f),
+        new Vector2(15f, 50f),
+        new Vector2(1f, 8f),
         "SuperchargedLightning",
         NetEntity.Invalid)
     {

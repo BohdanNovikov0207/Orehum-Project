@@ -22,24 +22,26 @@ namespace Content.Shared.Store;
 // goob edit - fuck newstore
 // do not touch unless you want to shoot yourself in the leg
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum StoreUiKey : byte
 {
-    Key
+    Key,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class StoreUpdateState : BoundUserInterfaceState
 {
-    public readonly HashSet<ListingData> Listings;
+    public readonly bool AllowRefund;
 
     public readonly Dictionary<ProtoId<CurrencyPrototype>, FixedPoint2> Balance;
+    public readonly HashSet<ListingData> Listings;
 
     public readonly bool ShowFooter;
 
-    public readonly bool AllowRefund;
-
-    public StoreUpdateState(HashSet<ListingData> listings, Dictionary<ProtoId<CurrencyPrototype>, FixedPoint2> balance, bool showFooter, bool allowRefund)
+    public StoreUpdateState(HashSet<ListingData> listings,
+        Dictionary<ProtoId<CurrencyPrototype>, FixedPoint2> balance,
+        bool showFooter,
+        bool allowRefund)
     {
         Listings = listings;
         Balance = balance;
@@ -48,13 +50,12 @@ public sealed class StoreUpdateState : BoundUserInterfaceState
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class StoreRequestUpdateInterfaceMessage : BoundUserInterfaceMessage
 {
-
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class StoreBuyListingMessage : BoundUserInterfaceMessage
 {
     public ListingData Listing;
@@ -65,12 +66,11 @@ public sealed class StoreBuyListingMessage : BoundUserInterfaceMessage
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class StoreRequestWithdrawMessage : BoundUserInterfaceMessage
 {
-    public string Currency;
-
     public int Amount;
+    public string Currency;
 
     public StoreRequestWithdrawMessage(string currency, int amount)
     {
@@ -80,10 +80,9 @@ public sealed class StoreRequestWithdrawMessage : BoundUserInterfaceMessage
 }
 
 /// <summary>
-///     Used when the refund button is pressed
+/// Used when the refund button is pressed
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class StoreRequestRefundMessage : BoundUserInterfaceMessage
 {
-
 }

@@ -8,12 +8,12 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Linq;
+using Content.Shared._Starlight.VentCrawling.Components;
 using Content.Shared.Body.Components;
-using Content.Shared.Tools.Components;
 using Content.Shared.Item;
 using Content.Shared.Movement.Events;
+using Content.Shared.Tools.Components;
 using Content.Shared.VentCrawler.Tube.Components;
-using Content.Shared._Starlight.VentCrawling.Components;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Containers;
 using Robust.Shared.Physics.Components;
@@ -27,12 +27,12 @@ namespace Content.Shared._Starlight.VentCrawling;
 /// </summary>
 public sealed class SharedVentCrawableSystem : EntitySystem
 {
-    [Dependency] private readonly SharedVentTubeSystem _VentCrawlerTubeSystem = default!;
-    [Dependency] private readonly SharedPhysicsSystem _physicsSystem = default!;
-    [Dependency] private readonly SharedContainerSystem _containerSystem = default!;
-    [Dependency] private readonly SharedTransformSystem _xformSystem = default!;
-    [Dependency] private readonly IGameTiming _gameTiming = default!;
     [Dependency] private readonly SharedAudioSystem _audioSystem = default!;
+    [Dependency] private readonly SharedContainerSystem _containerSystem = default!;
+    [Dependency] private readonly IGameTiming _gameTiming = default!;
+    [Dependency] private readonly SharedPhysicsSystem _physicsSystem = default!;
+    [Dependency] private readonly SharedVentTubeSystem _VentCrawlerTubeSystem = default!;
+    [Dependency] private readonly SharedTransformSystem _xformSystem = default!;
 
     public override void Initialize()
     {
@@ -50,7 +50,6 @@ public sealed class SharedVentCrawableSystem : EntitySystem
     /// <param name="args">The MoveInputEvent arguments.</param>
     private void OnMoveInput(EntityUid uid, VentCrawlerHolderComponent holder, ref MoveInputEvent args)
     {
-
         if (!EntityManager.EntityExists(holder.CurrentTube))
         {
             var ev = new VentCrawlingExitEvent();
@@ -110,7 +109,7 @@ public sealed class SharedVentCrawableSystem : EntitySystem
             return false;
 
         return HasComp<ItemComponent>(toInsert) ||
-            HasComp<BodyComponent>(toInsert);
+               HasComp<BodyComponent>(toInsert);
     }
 
     /// <summary>
@@ -123,7 +122,12 @@ public sealed class SharedVentCrawableSystem : EntitySystem
     /// <param name="to">The VentCrawlerTubeComponent instance to enter.</param>
     /// <param name="toTransform">The TransformComponent instance for the VentCrawlerTubeComponent.</param>
     /// <returns>True if the VentCrawlerHolderComponent successfully enters the VentCrawlerTubeComponent; otherwise, False.</returns>
-    public bool EnterTube(EntityUid holderUid, EntityUid toUid, VentCrawlerHolderComponent? holder = null, TransformComponent? holderTransform = null, VentCrawlerTubeComponent? to = null, TransformComponent? toTransform = null)
+    public bool EnterTube(EntityUid holderUid,
+        EntityUid toUid,
+        VentCrawlerHolderComponent? holder = null,
+        TransformComponent? holderTransform = null,
+        VentCrawlerTubeComponent? to = null,
+        TransformComponent? toTransform = null)
     {
         if (!Resolve(holderUid, ref holder, ref holderTransform))
             return false;
@@ -169,7 +173,7 @@ public sealed class SharedVentCrawableSystem : EntitySystem
     }
 
     /// <summary>
-    ///  Magic...
+    /// Magic...
     /// </summary>
     public override void Update(float frameTime)
     {
@@ -241,7 +245,7 @@ public sealed class SharedVentCrawableSystem : EntitySystem
                 }
                 else
                 {
-                    _containerSystem.Remove(uid, Comp<VentCrawlerTubeComponent>(currentTube).Contents ,reparent: false, force: true);
+                    _containerSystem.Remove(uid, Comp<VentCrawlerTubeComponent>(currentTube).Contents, false, true);
 
                     if (holder.FirstEntry)
                         holder.FirstEntry = false;

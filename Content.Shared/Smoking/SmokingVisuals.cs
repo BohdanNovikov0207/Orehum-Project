@@ -13,11 +13,10 @@
 
 using Robust.Shared.Serialization;
 
-namespace Content.Shared.Smoking
+namespace Content.Shared.Smoking;
+
+[Serializable] [NetSerializable]
+public enum SmokingVisuals : byte
 {
-    [Serializable, NetSerializable]
-    public enum SmokingVisuals : byte
-    {
-        Smoking,
-    }
+    Smoking,
 }

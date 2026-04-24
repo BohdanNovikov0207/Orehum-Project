@@ -15,20 +15,14 @@ namespace Content.Shared.Strip.Components;
 /// <summary>
 /// Give this to an entity when you want to decrease stripping times
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 [AutoGenerateComponentState(fieldDeltas: true)]
 public sealed partial class ThievingComponent : Component
 {
     /// <summary>
-    /// How much the strip time should be shortened by
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public TimeSpan StripTimeReduction = TimeSpan.FromSeconds(0.5f);
-
-    /// <summary>
     /// Should it notify the user if they're stripping a pocket?
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public bool Stealthy;
 
     /// <summary>
@@ -36,6 +30,12 @@ public sealed partial class ThievingComponent : Component
     /// </summary>
     [DataField]
     public ProtoId<AlertPrototype> StealthyAlertProtoId = "Stealthy";
+
+    /// <summary>
+    /// How much the strip time should be shortened by
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public TimeSpan StripTimeReduction = TimeSpan.FromSeconds(0.5f);
 
     /// <summary>
     /// Prevent component replication to clients other than the owner,
@@ -49,4 +49,3 @@ public sealed partial class ThievingComponent : Component
 /// Event raised to toggle the thieving component.
 /// </summary>
 public sealed partial class ToggleThievingEvent : BaseAlertEvent;
-

@@ -15,11 +15,8 @@ namespace Content.Shared.Audio.Jukebox;
 /// Soundtrack that's visible on the jukebox list.
 /// </summary>
 [Prototype]
-public sealed partial class JukeboxPrototype : IPrototype
+public sealed class JukeboxPrototype : IPrototype
 {
-    [IdDataField]
-    public string ID { get; private set; } = string.Empty;
-
     /// <summary>
     /// User friendly name to use in UI.
     /// </summary>
@@ -28,4 +25,7 @@ public sealed partial class JukeboxPrototype : IPrototype
 
     [DataField(required: true)]
     public SoundPathSpecifier Path = default!;
+
+    [IdDataField]
+    public string ID { get; } = string.Empty;
 }

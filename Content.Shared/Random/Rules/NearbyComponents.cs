@@ -15,11 +15,11 @@ public sealed partial class NearbyComponentsRule : RulesRule
     [DataField]
     public bool Anchored;
 
-    [DataField]
-    public int Count;
-
     [DataField(required: true)]
     public ComponentRegistry Components = default!;
+
+    [DataField]
+    public int Count;
 
     [DataField]
     public float Range = 10f;
@@ -31,9 +31,7 @@ public sealed partial class NearbyComponentsRule : RulesRule
 
         if (!xformQuery.TryGetComponent(uid, out var xform) ||
             xform.MapUid == null)
-        {
             return false;
-        }
 
         var transform = entManager.System<SharedTransformSystem>();
         var lookup = entManager.System<EntityLookupSystem>();
@@ -51,9 +49,7 @@ public sealed partial class NearbyComponentsRule : RulesRule
                 if (Anchored &&
                     (!xformQuery.TryGetComponent(comp, out var compXform) ||
                      !compXform.Anchored))
-                {
                     continue;
-                }
 
                 count++;
 

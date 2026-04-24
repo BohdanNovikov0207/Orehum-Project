@@ -16,7 +16,7 @@ using Content.Shared.Inventory;
 namespace Content.Shared.Clothing.EntitySystems;
 
 /// <summary>
-/// Handles reducing fire damage when wearing clothing with <see cref="FireProtectionComponent"/>.
+/// Handles reducing fire damage when wearing clothing with <see cref="FireProtectionComponent" />.
 /// </summary>
 public sealed class FireProtectionSystem : EntitySystem
 {
@@ -28,7 +28,8 @@ public sealed class FireProtectionSystem : EntitySystem
         SubscribeLocalEvent<FireProtectionComponent, ArmorExamineEvent>(OnArmorExamine);
     }
 
-    private void OnGetProtection(Entity<FireProtectionComponent> ent, ref InventoryRelayedEvent<GetFireProtectionEvent> args)
+    private void OnGetProtection(Entity<FireProtectionComponent> ent,
+        ref InventoryRelayedEvent<GetFireProtectionEvent> args)
     {
         // goob edit - VERY flammable component (trademark)
         if (HasComp<VeryFlammableComponent>(ent))

@@ -10,24 +10,25 @@
 //
 // SPDX-License-Identifier: MIT
 
-using Content.Shared.StatusIcon; // GabyStation radio icons
-using Robust.Shared.Prototypes; // GabyStation radio icons
+using Content.Shared.StatusIcon;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
+// GabyStation radio icons
+// GabyStation radio icons
 
 namespace Content.Shared.VoiceMask;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum VoiceMaskUIKey : byte
 {
-    Key
+    Key,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class VoiceMaskBuiState : BoundUserInterfaceState
 {
     public readonly string Name;
     public readonly string? Verb;
-    public ProtoId<JobIconPrototype>? JobIcon { get; } // GabyStation -> Radio icons
 
     public VoiceMaskBuiState(string name, string? verb, ProtoId<JobIconPrototype>? jobIcon) // GabyStation radio icons
     {
@@ -35,9 +36,11 @@ public sealed class VoiceMaskBuiState : BoundUserInterfaceState
         Verb = verb;
         JobIcon = jobIcon; // GabyStation -> Radio icons
     }
+
+    public ProtoId<JobIconPrototype>? JobIcon { get; } // GabyStation -> Radio icons
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class VoiceMaskChangeNameMessage : BoundUserInterfaceMessage
 {
     public readonly string Name;
@@ -51,7 +54,7 @@ public sealed class VoiceMaskChangeNameMessage : BoundUserInterfaceMessage
 /// <summary>
 /// Change the speech verb prototype to override, or null to use the user's verb.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class VoiceMaskChangeVerbMessage : BoundUserInterfaceMessage
 {
     public readonly string? Verb;

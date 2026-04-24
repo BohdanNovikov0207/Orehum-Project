@@ -18,65 +18,40 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
 
 namespace Content.Shared.DoAfter;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 [DataDefinition]
 [Access(typeof(SharedDoAfterSystem))]
 public sealed partial class DoAfter
 {
-    [DataField("index", required:true)]
-    public ushort Index;
-
-    public DoAfterId Id => new(Args.User, Index);
-
     [IncludeDataField]
     public DoAfterArgs Args = default!;
 
-    /// <summary>
-    ///     Time at which this do after was started.
-    /// </summary>
-    [DataField("startTime", customTypeSerializer: typeof(TimeOffsetSerializer), required:true)]
-    public TimeSpan StartTime;
+    // cached attempt event for the sake of avoiding unnecessary reflection every time this needs to be raised.
+    [NonSerialized] public object? AttemptEvent;
 
     /// <summary>
-    ///     The time at which this do after was canceled
+    /// The time at which this do after was canceled
     /// </summary>
-    [DataField("cancelledTime", customTypeSerializer: typeof(TimeOffsetSerializer), required:true)]
+    [DataField("cancelledTime", customTypeSerializer: typeof(TimeOffsetSerializer), required: true)]
     public TimeSpan? CancelledTime;
 
     /// <summary>
-    ///     If true, this do after has finished, passed the final checks, and has raised its events.
+    /// If true, this do after has finished, passed the final checks, and has raised its events.
     /// </summary>
     [DataField("completed")]
     public bool Completed;
 
-    /// <summary>
-    ///     Whether the do after has been canceled.
-    /// </summary>
-    public bool Cancelled => CancelledTime != null;
+    [DataField("index", required: true)]
+    public ushort Index;
 
     /// <summary>
-    ///     Position of the user relative to their parent when the do after was started.
-    /// </summary>
-    [NonSerialized]
-    [DataField("userPosition")]
-    public EntityCoordinates UserPosition;
-
-    public NetCoordinates NetUserPosition;
-
-    /// <summary>
-    ///     Distance from the user to the target when the do after was started.
-    /// </summary>
-    [DataField("targetDistance")]
-    public float TargetDistance;
-
-    /// <summary>
-    ///     If <see cref="DoAfterArgs.NeedHand"/> is true, this is the hand that was selected when the doafter started.
+    /// If <see cref="DoAfterArgs.NeedHand" /> is true, this is the hand that was selected when the doafter started.
     /// </summary>
     [DataField("activeHand")]
     public string? InitialHand;
 
     /// <summary>
-    ///     If <see cref="NeedHand"/> is true, this is the entity that was in the active hand when the doafter started.
+    /// If <see cref="NeedHand" /> is true, this is the entity that was in the active hand when the doafter started.
     /// </summary>
     [NonSerialized]
     [DataField("activeItem")]
@@ -84,8 +59,26 @@ public sealed partial class DoAfter
 
     public NetEntity? NetInitialItem;
 
-    // cached attempt event for the sake of avoiding unnecessary reflection every time this needs to be raised.
-    [NonSerialized] public object? AttemptEvent;
+    public NetCoordinates NetUserPosition;
+
+    /// <summary>
+    /// Time at which this do after was started.
+    /// </summary>
+    [DataField("startTime", customTypeSerializer: typeof(TimeOffsetSerializer), required: true)]
+    public TimeSpan StartTime;
+
+    /// <summary>
+    /// Distance from the user to the target when the do after was started.
+    /// </summary>
+    [DataField("targetDistance")]
+    public float TargetDistance;
+
+    /// <summary>
+    /// Position of the user relative to their parent when the do after was started.
+    /// </summary>
+    [NonSerialized]
+    [DataField("userPosition")]
+    public EntityCoordinates UserPosition;
 
     private DoAfter()
     {
@@ -102,7 +95,7 @@ public sealed partial class DoAfter
     public DoAfter(IEntityManager entManager, DoAfter other)
     {
         Index = other.Index;
-        Args = new(other.Args);
+        Args = new DoAfterArgs(other.Args);
         StartTime = other.StartTime;
         CancelledTime = other.CancelledTime;
         Completed = other.Completed;
@@ -114,12 +107,19 @@ public sealed partial class DoAfter
         NetUserPosition = other.NetUserPosition;
         NetInitialItem = other.NetInitialItem;
     }
+
+    public DoAfterId Id => new(Args.User, Index);
+
+    /// <summary>
+    /// Whether the do after has been canceled.
+    /// </summary>
+    public bool Cancelled => CancelledTime != null;
 }
 
 /// <summary>
-///     Simple struct that contains data required to uniquely identify a doAfter.
+/// Simple struct that contains data required to uniquely identify a doAfter.
 /// </summary>
 /// <remarks>
-///     Can be used to track currently active do-afters to prevent simultaneous do-afters.
+/// Can be used to track currently active do-afters to prevent simultaneous do-afters.
 /// </remarks>
 public record struct DoAfterId(EntityUid Uid, ushort Index);

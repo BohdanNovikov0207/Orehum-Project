@@ -11,9 +11,9 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Power;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum TeslaCoilVisuals : byte
 {
     Enabled,
-    Lightning
+    Lightning,
 }

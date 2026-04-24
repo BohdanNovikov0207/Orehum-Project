@@ -14,20 +14,11 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared._Goobstation.Wizard.Chuuni;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class ChuuniEyepatchComponent : Component
 {
-    [DataField]
-    public FixedPoint2 HealAmount = 10;
-
-    [DataField]
-    public string FlippedPrefix = "flipped";
-
-    [DataField]
-    public Color Color = Color.HotPink;
-
-    [DataField, AutoNetworkedField]
-    public bool IsFliped;
+    [DataField] [AutoNetworkedField]
+    public float Accumulator;
 
     [DataField]
     public List<LocId> Backstories = new()
@@ -37,6 +28,18 @@ public sealed partial class ChuuniEyepatchComponent : Component
         "chuuni-eyepatch-backstory-3",
         "chuuni-eyepatch-backstory-4",
     };
+
+    [DataField]
+    public Color Color = Color.HotPink;
+
+    [DataField]
+    public float Delay = 5f;
+
+    [DataField]
+    public string FlippedPrefix = "flipped";
+
+    [DataField]
+    public FixedPoint2 HealAmount = 10;
 
     [DataField]
     public Dictionary<MagicSchool, LocId> Invocations = new()
@@ -57,20 +60,17 @@ public sealed partial class ChuuniEyepatchComponent : Component
         { MagicSchool.Chuuni, "chuuni-invocation-chuuni" },
     };
 
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
+    public bool IsFliped;
+
+    [DataField] [AutoNetworkedField]
     public LocId? SelectedBackstory;
-
-    [DataField]
-    public float Delay = 5f;
-
-    [DataField, AutoNetworkedField]
-    public float Accumulator;
 
     [ViewVariables(VVAccess.ReadOnly)]
     public bool CanHeal => Accumulator >= Delay;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum FlippedVisuals : byte
 {
     Flipped,

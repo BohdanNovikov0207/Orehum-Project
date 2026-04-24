@@ -89,6 +89,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Linq;
+using Content.Shared._EinsteinEngines.Silicon.IPC;
 using Content.Shared.Hands.Components;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Inventory;
@@ -96,24 +97,26 @@ using Content.Shared.Preferences.Loadouts;
 using Content.Shared.Roles;
 using Content.Shared.Storage;
 using Content.Shared.Storage.EntitySystems;
+using Content.Shared.Whitelist;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
-using Content.Shared._EinsteinEngines.Silicon.IPC; // DeltaV
-using Content.Shared.Whitelist; // Goobstation
+// DeltaV
+
+// Goobstation
 
 namespace Content.Shared.Station;
 
 public abstract class SharedStationSpawningSystem : EntitySystem
 {
-    [Dependency] protected readonly IPrototypeManager PrototypeManager = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] protected readonly InventorySystem InventorySystem = default!;
     [Dependency] private readonly SharedHandsSystem _handsSystem = default!;
-    [Dependency] private readonly MetaDataSystem _metadata = default!;
-    [Dependency] private readonly SharedStorageSystem _storage = default!;
-    [Dependency] private readonly SharedTransformSystem _xformSystem = default!;
     [Dependency] private readonly InternalEncryptionKeySpawner _internalEncryption = default!; // DeltaV
+    [Dependency] private readonly MetaDataSystem _metadata = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly SharedStorageSystem _storage = default!;
     [Dependency] private readonly EntityWhitelistSystem _whitelist = default!; // Goobstation
+    [Dependency] private readonly SharedTransformSystem _xformSystem = default!;
+    [Dependency] protected readonly InventorySystem InventorySystem = default!;
+    [Dependency] protected readonly IPrototypeManager PrototypeManager = default!;
     private EntityQuery<HandsComponent> _handsQuery;
     private EntityQuery<InventoryComponent> _inventoryQuery;
     private EntityQuery<StorageComponent> _storageQuery;
@@ -129,7 +132,7 @@ public abstract class SharedStationSpawningSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Equips the data from a `RoleLoadout` onto an entity.
+    /// Equips the data from a `RoleLoadout` onto an entity.
     /// </summary>
     public void EquipRoleLoadout(EntityUid entity, RoleLoadout loadout, RoleLoadoutPrototype roleProto)
     {
@@ -144,7 +147,7 @@ public abstract class SharedStationSpawningSystem : EntitySystem
                     continue;
                 }
 
-                EquipStartingGear(entity, loadoutProto, raiseEvent: false);
+                EquipStartingGear(entity, loadoutProto, false);
             }
         }
 
@@ -159,19 +162,13 @@ public abstract class SharedStationSpawningSystem : EntitySystem
         string? name = null;
 
         if (roleProto.CanCustomizeName)
-        {
             name = loadout.EntityName;
-        }
 
         if (string.IsNullOrEmpty(name) && PrototypeManager.TryIndex(roleProto.NameDataset, out var nameData))
-        {
             name = Loc.GetString(_random.Pick(nameData.Values));
-        }
 
         if (!string.IsNullOrEmpty(name))
-        {
             _metadata.SetEntityName(entity, name);
-        }
     }
 
     public void EquipStartingGear(EntityUid entity, LoadoutPrototype loadout, bool raiseEvent = true)
@@ -181,21 +178,25 @@ public abstract class SharedStationSpawningSystem : EntitySystem
     }
 
     /// <summary>
-    /// <see cref="EquipStartingGear(Robust.Shared.GameObjects.EntityUid,System.Nullable{Robust.Shared.Prototypes.ProtoId{Content.Shared.Roles.StartingGearPrototype}},bool)"/>
+    ///     <see
+    ///         cref="EquipStartingGear(Robust.Shared.GameObjects.EntityUid,System.Nullable{Robust.Shared.Prototypes.ProtoId{Content.Shared.Roles.StartingGearPrototype}},bool)" />
     /// </summary>
-    public void EquipStartingGear(EntityUid entity, ProtoId<StartingGearPrototype>? startingGear, bool raiseEvent = true)
+    public void EquipStartingGear(EntityUid entity,
+        ProtoId<StartingGearPrototype>? startingGear,
+        bool raiseEvent = true)
     {
         PrototypeManager.TryIndex(startingGear, out var gearProto);
         EquipStartingGear(entity, gearProto, raiseEvent);
     }
 
     /// <summary>
-    /// <see cref="EquipStartingGear(Robust.Shared.GameObjects.EntityUid,System.Nullable{Robust.Shared.Prototypes.ProtoId{Content.Shared.Roles.StartingGearPrototype}},bool)"/>
+    ///     <see
+    ///         cref="EquipStartingGear(Robust.Shared.GameObjects.EntityUid,System.Nullable{Robust.Shared.Prototypes.ProtoId{Content.Shared.Roles.StartingGearPrototype}},bool)" />
     /// </summary>
     public void EquipStartingGear(EntityUid entity, StartingGearPrototype? startingGear, bool raiseEvent = true)
     {
         // Begin DeltaV Additions: Fix nukie IPCs not having comms
-        if (startingGear is not {} proto)
+        if (startingGear is not { } proto)
             return;
 
         _internalEncryption.TryInsertEncryptionKey(entity, proto);
@@ -224,12 +225,14 @@ public abstract class SharedStationSpawningSystem : EntitySystem
                 if (!string.IsNullOrEmpty(equipmentStr))
                 {
                     var equipmentEntity = Spawn(equipmentStr, xform.Coordinates);
-                    if (slot.Whitelist != null && !_whitelist.IsWhitelistPass(slot.Whitelist, equipmentEntity)) // Goob Change - Plasmamen
+                    if (slot.Whitelist != null &&
+                        !_whitelist.IsWhitelistPass(slot.Whitelist, equipmentEntity)) // Goob Change - Plasmamen
                     {
                         QueueDel(equipmentEntity);
                         continue;
                     }
-                    InventorySystem.TryEquip(entity, equipmentEntity, slot.Name, silent: true, force: true);
+
+                    InventorySystem.TryEquip(entity, equipmentEntity, slot.Name, true, true);
                 }
             }
         }
@@ -243,9 +246,7 @@ public abstract class SharedStationSpawningSystem : EntitySystem
                 var inhandEntity = Spawn(prototype, coords);
 
                 if (_handsSystem.TryGetEmptyHand((entity, handsComponent), out var emptyHand))
-                {
-                    _handsSystem.TryPickup(entity, inhandEntity, emptyHand, checkActionBlocker: false, handsComp: handsComponent);
-                }
+                    _handsSystem.TryPickup(entity, inhandEntity, emptyHand, false, handsComp: handsComponent);
             }
         }
 
@@ -260,10 +261,9 @@ public abstract class SharedStationSpawningSystem : EntitySystem
                     continue;
 
                 if (inventoryComp != null &&
-                    InventorySystem.TryGetSlotEntity(entity, slotName, out var slotEnt, inventoryComponent: inventoryComp) &&
+                    InventorySystem.TryGetSlotEntity(entity, slotName, out var slotEnt, inventoryComp) &&
                     _storageQuery.TryComp(slotEnt, out var storage))
                 {
-
                     foreach (var entProto in entProtos)
                     {
                         var spawnedEntity = Spawn(entProto, coords);
@@ -282,13 +282,13 @@ public abstract class SharedStationSpawningSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Gets all the gear for a given slot when passed a loadout.
+    /// Gets all the gear for a given slot when passed a loadout.
     /// </summary>
     /// <param name="loadout">The loadout to look through.</param>
     /// <param name="slot">The slot that you want the clothing for.</param>
     /// <returns>
-    ///     If there is a value for the given slot, it will return the proto id for that slot.
-    ///     If nothing was found, will return null
+    /// If there is a value for the given slot, it will return the proto id for that slot.
+    /// If nothing was found, will return null
     /// </returns>
     public string? GetGearForSlot(RoleLoadout? loadout, string slot)
     {

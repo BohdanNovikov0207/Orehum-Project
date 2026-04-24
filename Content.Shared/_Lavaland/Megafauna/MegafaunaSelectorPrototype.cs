@@ -7,12 +7,12 @@ namespace Content.Shared._Lavaland.Megafauna;
 /// Contains one or multiple EntityShapes to create a pattern.
 /// </summary>
 [Prototype]
-public sealed partial class MegafaunaSelectorPrototype : IPrototype
+public sealed class MegafaunaSelectorPrototype : IPrototype
 {
-    /// <inheritdoc/>
-    [IdDataField]
-    public string ID { get; } = default!;
-
     [DataField(required: true)]
     public MegafaunaSelector Selector = default!;
+
+    /// <inheritdoc />
+    [IdDataField]
+    public string ID { get; } = default!;
 }

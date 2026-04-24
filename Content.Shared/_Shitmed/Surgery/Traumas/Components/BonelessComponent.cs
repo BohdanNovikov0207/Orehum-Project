@@ -3,7 +3,7 @@ using Robust.Shared.GameStates;
 
 namespace Content.Shared._Shitmed.Medical.Surgery.Traumas.Components;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class BonelessComponent : Component
 {
     /// <summary>
@@ -12,6 +12,6 @@ public sealed partial class BonelessComponent : Component
     /// A destroyed bone is 0.
     /// See TraumaSystem.Process.cs RandomDismembermentTraumaChance method
     /// </summary>
-    [ViewVariables, DataField]
+    [ViewVariables] [DataField]
     public FixedPoint2 BonePenalty = 1;
 }

@@ -6,8 +6,6 @@
 
 using System.Diagnostics.Contracts;
 using Content.Shared.Light.Components;
-using Content.Shared.Maps;
-using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
 
 namespace Content.Shared.Light.EntitySystems;
@@ -19,7 +17,7 @@ public abstract class SharedRoofSystem : EntitySystem
 {
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
 
-    private HashSet<Entity<IsRoofComponent>> _roofSet = new();
+    private readonly HashSet<Entity<IsRoofComponent>> _roofSet = new();
 
     /// <summary>
     /// Returns whether the specified tile is roof-occupied.
@@ -72,9 +70,7 @@ public abstract class SharedRoofSystem : EntitySystem
 
             // Early out, otherwise check for components on tile.
             if (isRoof)
-            {
                 return roof.Color;
-            }
         }
 
         _roofSet.Clear();
@@ -103,9 +99,7 @@ public abstract class SharedRoofSystem : EntitySystem
         {
             // No value to remove so leave it.
             if (!value)
-            {
                 return;
-            }
 
             chunkData = 0;
         }

@@ -14,13 +14,13 @@ namespace Content.Shared.Bed;
 
 public abstract class SharedBedSystem : EntitySystem
 {
-    [Dependency] protected readonly IGameTiming Timing = default!;
     [Dependency] private readonly ActionContainerSystem _actConts = default!;
     [Dependency] private readonly SharedActionsSystem _actionsSystem = default!;
     [Dependency] private readonly EmagSystem _emag = default!;
     [Dependency] private readonly SharedMetabolizerSystem _metabolizer = default!;
     [Dependency] private readonly SharedPowerReceiverSystem _powerReceiver = default!;
     [Dependency] private readonly SleepingSystem _sleepingSystem = default!;
+    [Dependency] protected readonly IGameTiming Timing = default!;
 
     public override void Initialize()
     {
@@ -62,7 +62,7 @@ public abstract class SharedBedSystem : EntitySystem
             _actionsSystem.RemoveAction(args.Buckle.Owner, bed.Comp.SleepAction);
             _sleepingSystem.TryWaking(args.Buckle.Owner);
         }
-        
+
         RemComp<HealOnBuckleHealingComponent>(bed);
     }
 
@@ -94,12 +94,11 @@ public abstract class SharedBedSystem : EntitySystem
         args.Handled = true;
     }
 
-    private void OnPowerChanged(Entity<StasisBedComponent> ent, ref PowerChangedEvent args)
-    {
+    private void OnPowerChanged(Entity<StasisBedComponent> ent, ref PowerChangedEvent args) =>
         UpdateMetabolisms(ent.Owner);
-    }
 
-    private void OnStasisGetMetabolicMultiplier(Entity<StasisBedBuckledComponent> ent, ref GetMetabolicMultiplierEvent args)
+    private void OnStasisGetMetabolicMultiplier(Entity<StasisBedBuckledComponent> ent,
+        ref GetMetabolicMultiplierEvent args)
     {
         if (!TryComp<BuckleComponent>(ent, out var buckle) || buckle.BuckledTo is not { } buckledTo)
             return;

@@ -5,7 +5,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Construction;
 using Content.Shared.Construction.Components;
 using JetBrains.Annotations;
 using Robust.Shared.Containers;
@@ -13,8 +12,8 @@ using Robust.Shared.Containers;
 namespace Content.Shared.Construction.NodeEntities;
 
 /// <summary>
-///     Works for both <see cref="ComputerBoardComponent"/> and <see cref="MachineBoardComponent"/>
-///     because duplicating code just for this is really stinky.
+/// Works for both <see cref="ComputerBoardComponent" /> and <see cref="MachineBoardComponent" />
+/// because duplicating code just for this is really stinky.
 /// </summary>
 [UsedImplicitly]
 [DataDefinition]

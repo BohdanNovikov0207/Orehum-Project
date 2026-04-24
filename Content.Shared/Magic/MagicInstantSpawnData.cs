@@ -24,7 +24,6 @@ public sealed partial class TargetInFront : MagicInstantSpawnData
     public int Width = 3;
 }
 
-
 /// <summary>
 /// Spawns 1 tile in front of caster
 /// </summary>

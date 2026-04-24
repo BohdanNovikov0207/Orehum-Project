@@ -29,23 +29,23 @@ using Robust.Shared.Timing;
 namespace Content.Shared.Teleportation.Systems;
 
 /// <summary>
-/// This handles <see cref="SwapTeleporterComponent"/>
+/// This handles <see cref="SwapTeleporterComponent" />
 /// </summary>
 public sealed class SwapTeleporterSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly INetManager _net = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedContainerSystem _container = default!;
+    [Dependency] private readonly INetManager _net = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly SparksSystem _sparks = default!; // goob edit - sparks everywhere
+    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
-    [Dependency] private readonly SparksSystem _sparks = default!; // goob edit - sparks everywhere
 
     private EntityQuery<TransformComponent> _xformQuery;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         SubscribeLocalEvent<SwapTeleporterComponent, AfterInteractEvent>(OnInteract);
@@ -78,9 +78,7 @@ public sealed class SwapTeleporterSystem : EntitySystem
 
         if (_whitelistSystem.IsWhitelistFail(comp.TeleporterWhitelist, target) ||
             _whitelistSystem.IsWhitelistFail(targetComp.TeleporterWhitelist, uid))
-        {
             return;
-        }
 
         if (comp.LinkedEnt != null)
         {
@@ -120,7 +118,7 @@ public sealed class SwapTeleporterSystem : EntitySystem
             Act = () =>
             {
                 DestroyLink((uid, comp), user);
-            }
+            },
         });
     }
 
@@ -150,9 +148,7 @@ public sealed class SwapTeleporterSystem : EntitySystem
         // don't allow teleporting to happen if the linked one is already teleporting
         if (!TryComp<SwapTeleporterComponent>(comp.LinkedEnt, out var otherComp)
             || otherComp.TeleportTime != null)
-        {
             return;
-        }
 
         if (_timing.CurTime < comp.NextTeleportUse)
         {
@@ -187,7 +183,7 @@ public sealed class SwapTeleporterSystem : EntitySystem
         if (!CanSwapTeleport((teleEnt, teleXform), (otherTeleEnt, otherTeleXform)))
         {
             _popup.PopupEntity(Loc.GetString("swap-teleporter-popup-teleport-fail",
-                ("entity", Identity.Entity(linkedEnt, EntityManager))),
+                    ("entity", Identity.Entity(linkedEnt, EntityManager))),
                 teleEnt,
                 teleEnt,
                 PopupType.MediumCaution);
@@ -195,7 +191,7 @@ public sealed class SwapTeleporterSystem : EntitySystem
         }
 
         _popup.PopupClient(Loc.GetString("swap-teleporter-popup-teleport-other",
-            ("entity", Identity.Entity(linkedEnt, EntityManager))),
+                ("entity", Identity.Entity(linkedEnt, EntityManager))),
             teleEnt,
             otherTeleEnt,
             PopupType.MediumCaution);
@@ -251,7 +247,7 @@ public sealed class SwapTeleporterSystem : EntitySystem
         else
             _popup.PopupEntity(Loc.GetString("swap-teleporter-popup-link-destroyed"), ent);
 
-        if (linkedNullable is {} linked)
+        if (linkedNullable is { } linked)
             DestroyLink(linked, user); // the linked one is shown globally
     }
 
@@ -289,10 +285,8 @@ public sealed class SwapTeleporterSystem : EntitySystem
         }
     }
 
-    private void OnShutdown(Entity<SwapTeleporterComponent> ent, ref ComponentShutdown args)
-    {
+    private void OnShutdown(Entity<SwapTeleporterComponent> ent, ref ComponentShutdown args) =>
         DestroyLink((ent, ent), null);
-    }
 
     public override void Update(float frameTime)
     {

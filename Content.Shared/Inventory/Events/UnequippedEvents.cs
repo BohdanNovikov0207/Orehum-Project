@@ -33,14 +33,14 @@ public abstract class UnequippedEventBase : EntityEventArgs
     public readonly string Slot;
 
     /// <summary>
-    /// The slot group the entity got unequipped from.
-    /// </summary>
-    public readonly string SlotGroup;
-
-    /// <summary>
     /// Slotflags of the slot the entity just got unequipped from.
     /// </summary>
     public readonly SlotFlags SlotFlags;
+
+    /// <summary>
+    /// The slot group the entity got unequipped from.
+    /// </summary>
+    public readonly string SlotGroup;
 
     public UnequippedEventBase(EntityUid equipee, EntityUid equipment, SlotDefinition slotDefinition)
     {
@@ -54,14 +54,18 @@ public abstract class UnequippedEventBase : EntityEventArgs
 
 public sealed class DidUnequipEvent : UnequippedEventBase
 {
-    public DidUnequipEvent(EntityUid equipee, EntityUid equipment, SlotDefinition slotDefinition) : base(equipee, equipment, slotDefinition)
+    public DidUnequipEvent(EntityUid equipee, EntityUid equipment, SlotDefinition slotDefinition) : base(equipee,
+        equipment,
+        slotDefinition)
     {
     }
 }
 
 public sealed class GotUnequippedEvent : UnequippedEventBase
 {
-    public GotUnequippedEvent(EntityUid equipee, EntityUid equipment, SlotDefinition slotDefinition) : base(equipee, equipment, slotDefinition)
+    public GotUnequippedEvent(EntityUid equipee, EntityUid equipment, SlotDefinition slotDefinition) : base(equipee,
+        equipment,
+        slotDefinition)
     {
     }
 }

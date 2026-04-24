@@ -9,9 +9,6 @@ namespace Content.Shared.Procedural.PostGeneration;
 /// </summary>
 public sealed partial class WormCorridorDunGen : IDunGenLayer
 {
-    [DataField]
-    public int PathLimit = 2048;
-
     /// <summary>
     /// How many times to run the worm
     /// </summary>
@@ -30,12 +27,15 @@ public sealed partial class WormCorridorDunGen : IDunGenLayer
     [DataField]
     public Angle MaxAngleChange = Angle.FromDegrees(45);
 
+    [DataField]
+    public int PathLimit = 2048;
+
+    [DataField(required: true)]
+    public ProtoId<ContentTileDefinition> Tile;
+
     /// <summary>
     /// How wide to make the corridor.
     /// </summary>
     [DataField]
     public float Width = 3f;
-
-    [DataField(required: true)]
-    public ProtoId<ContentTileDefinition> Tile;
 }

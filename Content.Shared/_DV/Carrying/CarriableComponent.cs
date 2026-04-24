@@ -10,7 +10,7 @@ using Robust.Shared.GameStates;
 
 namespace Content.Shared._DV.Carrying;
 
-[RegisterComponent, NetworkedComponent, Access(typeof(CarryingSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(CarryingSystem))]
 public sealed partial class CarriableComponent : Component
 {
     /// <summary>

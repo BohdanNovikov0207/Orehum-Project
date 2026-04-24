@@ -4,8 +4,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Flash.Components;
 using Content.Shared.Damage;
+using Content.Shared.Flash.Components;
 
 namespace Content.Shared.Flash;
 
@@ -22,11 +22,8 @@ public sealed class DamagedByFlashingSystem : EntitySystem
 
     // TODO: Attempt events should not be doing state changes. But using AfterFlashedEvent does not work because this entity cannot get the status effect.
     // Best wait for Ed's status effect system rewrite.
-    private void OnFlashAttempt(Entity<DamagedByFlashingComponent> ent, ref FlashAttemptEvent args)
-    {
+    private void OnFlashAttempt(Entity<DamagedByFlashingComponent> ent, ref FlashAttemptEvent args) =>
         _damageable.TryChangeDamage(ent, ent.Comp.FlashDamage);
-
-        // TODO: It would be more logical if different flashes had different power,
-        // and the damage would be inflicted depending on the strength of the flash.
-    }
+    // TODO: It would be more logical if different flashes had different power,
+    // and the damage would be inflicted depending on the strength of the flash.
 }

@@ -78,11 +78,12 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Linq;
-using Content.Goobstation.Common.Temperature; // goob
+using Content.Goobstation.Common.Temperature;
 using Content.Shared.Movement.Components;
 using Content.Shared.Movement.Systems;
 using Content.Shared.Temperature.Components;
 using Robust.Shared.Timing;
+// goob
 
 namespace Content.Shared.Temperature.Systems;
 
@@ -91,22 +92,25 @@ namespace Content.Shared.Temperature.Systems;
 /// </summary>
 public sealed class SharedTemperatureSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly MovementSpeedModifierSystem _movementSpeedModifier = default!;
-
     /// <summary>
-    /// Band-aid for unpredicted atmos. Delays the application for a short period so that laggy clients can get the replicated temperature.
+    /// Band-aid for unpredicted atmos. Delays the application for a short period so that laggy clients can get the replicated
+    /// temperature.
     /// </summary>
     private static readonly TimeSpan SlowdownApplicationDelay = TimeSpan.FromSeconds(1f);
+
+    [Dependency] private readonly MovementSpeedModifierSystem _movementSpeedModifier = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
         base.Initialize();
 
         SubscribeLocalEvent<TemperatureSpeedComponent, OnTemperatureChangeEvent>(OnTemperatureChanged);
-        SubscribeLocalEvent<TemperatureSpeedComponent, RefreshMovementSpeedModifiersEvent>(OnRefreshMovementSpeedModifiers);
+        SubscribeLocalEvent<TemperatureSpeedComponent, RefreshMovementSpeedModifiersEvent>(
+            OnRefreshMovementSpeedModifiers);
 
-        SubscribeLocalEvent<TemperatureSpeedComponent, GetTemperatureThresholdsEvent>(OnGetTemperatureThresholds); // goob edit
+        SubscribeLocalEvent<TemperatureSpeedComponent, GetTemperatureThresholdsEvent>(
+            OnGetTemperatureThresholds); // goob edit
     }
 
     private void OnTemperatureChanged(Entity<TemperatureSpeedComponent> ent, ref OnTemperatureChangeEvent args)
@@ -132,7 +136,8 @@ public sealed class SharedTemperatureSystem : EntitySystem
         }
     }
 
-    private void OnRefreshMovementSpeedModifiers(Entity<TemperatureSpeedComponent> ent, ref RefreshMovementSpeedModifiersEvent args)
+    private void OnRefreshMovementSpeedModifiers(Entity<TemperatureSpeedComponent> ent,
+        ref RefreshMovementSpeedModifiersEvent args)
     {
         // Don't update speed and mispredict while we're compensating for lag.
         if (ent.Comp.NextSlowdownUpdate != null || ent.Comp.CurrentSpeedModifier == null)
@@ -142,10 +147,8 @@ public sealed class SharedTemperatureSystem : EntitySystem
     }
 
     // goob start
-    private void OnGetTemperatureThresholds(Entity<TemperatureSpeedComponent> ent, ref GetTemperatureThresholdsEvent args)
-    {
-        args.SpeedThresholds = ent.Comp.Thresholds;
-    }
+    private void OnGetTemperatureThresholds(Entity<TemperatureSpeedComponent> ent,
+        ref GetTemperatureThresholdsEvent args) => args.SpeedThresholds = ent.Comp.Thresholds;
     // goob end
 
     public override void Update(float frameTime)

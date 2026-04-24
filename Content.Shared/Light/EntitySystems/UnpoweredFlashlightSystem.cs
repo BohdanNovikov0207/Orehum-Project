@@ -45,7 +45,6 @@ using Content.Shared.Actions;
 using Content.Shared.Emag.Systems;
 using Content.Shared.Light.Components;
 using Content.Shared.Mind.Components;
-using Content.Shared.Storage.Components;
 using Content.Shared.Toggleable;
 using Content.Shared.Verbs;
 using Robust.Shared.Audio.Systems;
@@ -57,16 +56,17 @@ namespace Content.Shared.Light.EntitySystems;
 
 public sealed class UnpoweredFlashlightSystem : EntitySystem
 {
+    [Dependency] private readonly ActionContainerSystem _actionContainer = default!;
+    [Dependency] private readonly SharedActionsSystem _actionsSystem = default!;
+    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly SharedAudioSystem _audioSystem = default!;
+    [Dependency] private readonly EmagSystem _emag = default!;
+
+    [Dependency] private readonly SharedPointLightSystem _light = default!;
     // TODO: Split some of this to ItemTogglePointLight
 
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly SharedActionsSystem _actionsSystem = default!;
-    [Dependency] private readonly ActionContainerSystem _actionContainer = default!;
-    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
-    [Dependency] private readonly SharedAudioSystem _audioSystem = default!;
-    [Dependency] private readonly SharedPointLightSystem _light = default!;
-    [Dependency] private readonly EmagSystem _emag = default!;
 
     public override void Initialize()
     {
@@ -95,12 +95,12 @@ public sealed class UnpoweredFlashlightSystem : EntitySystem
         args.Handled = true;
     }
 
-    private void OnGetActions(EntityUid uid, UnpoweredFlashlightComponent component, GetItemActionsEvent args)
-    {
+    private void OnGetActions(EntityUid uid, UnpoweredFlashlightComponent component, GetItemActionsEvent args) =>
         args.AddAction(component.ToggleActionEntity);
-    }
 
-    private void AddToggleLightVerbs(EntityUid uid, UnpoweredFlashlightComponent component, GetVerbsEvent<ActivationVerb> args)
+    private void AddToggleLightVerbs(EntityUid uid,
+        UnpoweredFlashlightComponent component,
+        GetVerbsEvent<ActivationVerb> args)
     {
         if (!args.CanAccess || !args.CanInteract)
             return;
@@ -108,18 +108,16 @@ public sealed class UnpoweredFlashlightSystem : EntitySystem
         ActivationVerb verb = new()
         {
             Text = Loc.GetString("toggle-flashlight-verb-get-data-text"),
-            Icon = new SpriteSpecifier.Texture(new ("/Textures/Interface/VerbIcons/light.svg.192dpi.png")),
+            Icon = new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/VerbIcons/light.svg.192dpi.png")),
             Act = () => TryToggleLight((uid, component), args.User),
-            Priority = -1 // For things like PDA's, Open-UI and other verbs that should be higher priority.
+            Priority = -1, // For things like PDA's, Open-UI and other verbs that should be higher priority.
         };
 
         args.Verbs.Add(verb);
     }
 
-    private void OnMindAdded(EntityUid uid, UnpoweredFlashlightComponent component, MindAddedMessage args)
-    {
+    private void OnMindAdded(EntityUid uid, UnpoweredFlashlightComponent component, MindAddedMessage args) =>
         _actionsSystem.AddAction(uid, ref component.ToggleActionEntity, component.ToggleAction);
-    }
 
     private void OnGotEmagged(EntityUid uid, UnpoweredFlashlightComponent component, ref GotEmaggedEvent args)
     {
@@ -147,7 +145,10 @@ public sealed class UnpoweredFlashlightSystem : EntitySystem
         SetLight(ent, !ent.Comp.LightOn, user, quiet);
     }
 
-    public void SetLight(Entity<UnpoweredFlashlightComponent?> ent, bool value, EntityUid? user = null, bool quiet = false)
+    public void SetLight(Entity<UnpoweredFlashlightComponent?> ent,
+        bool value,
+        EntityUid? user = null,
+        bool quiet = false)
     {
         if (!Resolve(ent, ref ent.Comp))
             return;

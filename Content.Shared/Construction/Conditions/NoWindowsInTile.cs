@@ -24,42 +24,38 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Maps;
 using Content.Shared.Tag;
 using JetBrains.Annotations;
 using Robust.Shared.Map;
 using Robust.Shared.Prototypes;
 
-namespace Content.Shared.Construction.Conditions
+namespace Content.Shared.Construction.Conditions;
+
+[UsedImplicitly]
+[DataDefinition]
+public sealed partial class NoWindowsInTile : IConstructionCondition
 {
-    [UsedImplicitly]
-    [DataDefinition]
-    public sealed partial class NoWindowsInTile : IConstructionCondition
+    private static readonly ProtoId<TagPrototype> WindowTag = "Window";
+
+    public bool Condition(EntityUid user, EntityCoordinates location, Direction direction)
     {
-        private static readonly ProtoId<TagPrototype> WindowTag = "Window";
+        var entManager = IoCManager.Resolve<IEntityManager>();
+        var sysMan = entManager.EntitySysManager;
+        var tagSystem = sysMan.GetEntitySystem<TagSystem>();
+        var lookupSys = sysMan.GetEntitySystem<EntityLookupSystem>();
 
-        public bool Condition(EntityUid user, EntityCoordinates location, Direction direction)
+        foreach (var entity in lookupSys.GetEntitiesIntersecting(location, LookupFlags.Static))
         {
-            var entManager = IoCManager.Resolve<IEntityManager>();
-            var sysMan = entManager.EntitySysManager;
-            var tagSystem = sysMan.GetEntitySystem<TagSystem>();
-            var lookupSys = sysMan.GetEntitySystem<EntityLookupSystem>();
-
-            foreach (var entity in lookupSys.GetEntitiesIntersecting(location, LookupFlags.Static))
-            {
-                if (tagSystem.HasTag(entity, WindowTag))
-                    return false;
-            }
-
-            return true;
+            if (tagSystem.HasTag(entity, WindowTag))
+                return false;
         }
 
-        public ConstructionGuideEntry GenerateGuideEntry()
-        {
-            return new ConstructionGuideEntry
-            {
-                Localization = "construction-step-condition-no-windows-in-tile"
-            };
-        }
+        return true;
     }
+
+    public ConstructionGuideEntry GenerateGuideEntry() =>
+        new()
+        {
+            Localization = "construction-step-condition-no-windows-in-tile",
+        };
 }

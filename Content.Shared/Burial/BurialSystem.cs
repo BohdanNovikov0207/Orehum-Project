@@ -89,11 +89,11 @@ namespace Content.Shared.Burial;
 
 public sealed class BurialSystem : EntitySystem
 {
-    [Dependency] private readonly SharedDoAfterSystem _doAfterSystem = default!;
-    [Dependency] private readonly SharedEntityStorageSystem _storageSystem = default!;
-    [Dependency] private readonly SharedAudioSystem _audioSystem = default!;
-    [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
     [Dependency] private readonly ActionBlockerSystem _actionBlocker = default!;
+    [Dependency] private readonly SharedAudioSystem _audioSystem = default!;
+    [Dependency] private readonly SharedDoAfterSystem _doAfterSystem = default!;
+    [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
+    [Dependency] private readonly SharedEntityStorageSystem _storageSystem = default!;
 
     public override void Initialize()
     {
@@ -101,7 +101,8 @@ public sealed class BurialSystem : EntitySystem
 
         SubscribeLocalEvent<GraveComponent, InteractUsingEvent>(OnInteractUsing);
         SubscribeLocalEvent<GraveComponent, ActivateInWorldEvent>(OnActivate);
-        SubscribeLocalEvent<GraveComponent, AfterInteractUsingEvent>(OnAfterInteractUsing, before: new[] { typeof(PlaceableSurfaceSystem) });
+        SubscribeLocalEvent<GraveComponent, AfterInteractUsingEvent>(OnAfterInteractUsing,
+            new[] { typeof(PlaceableSurfaceSystem) });
         SubscribeLocalEvent<GraveComponent, GraveDiggingDoAfterEvent>(OnGraveDigging);
 
         SubscribeLocalEvent<GraveComponent, StorageOpenAttemptEvent>(OnOpenAttempt);
@@ -119,7 +120,13 @@ public sealed class BurialSystem : EntitySystem
 
         if (TryComp<ShovelComponent>(args.Used, out var shovel))
         {
-            var doAfterEventArgs = new DoAfterArgs(EntityManager, args.User, component.DigDelay / shovel.SpeedModifier, new GraveDiggingDoAfterEvent(), uid, target: args.Target, used: uid)
+            var doAfterEventArgs = new DoAfterArgs(EntityManager,
+                args.User,
+                component.DigDelay / shovel.SpeedModifier,
+                new GraveDiggingDoAfterEvent(),
+                uid,
+                args.Target,
+                uid)
             {
                 BreakOnMove = true,
                 BreakOnDamage = true,
@@ -139,9 +146,9 @@ public sealed class BurialSystem : EntitySystem
             StartDigging(uid, args.User, args.Used, component);
         }
         else
-        {
-            _popupSystem.PopupClient(Loc.GetString("grave-digging-requires-tool", ("grave", args.Target)), uid, args.User);
-        }
+            _popupSystem.PopupClient(Loc.GetString("grave-digging-requires-tool", ("grave", args.Target)),
+                uid,
+                args.User);
 
         args.Handled = true;
     }
@@ -173,9 +180,7 @@ public sealed class BurialSystem : EntitySystem
             component.Stream = _audioSystem.Stop(component.Stream);
         }
         else
-        {
             component.HandDiggingDoAfter = null;
-        }
 
         if (args.Cancelled || args.Handled)
             return;
@@ -193,15 +198,17 @@ public sealed class BurialSystem : EntitySystem
         if (used != null)
         {
             var selfMessage = Loc.GetString("grave-start-digging-user", ("grave", uid), ("tool", used));
-            var othersMessage = Loc.GetString("grave-start-digging-others", ("user", user), ("grave", uid), ("tool", used));
+            var othersMessage =
+                Loc.GetString("grave-start-digging-others", ("user", user), ("grave", uid), ("tool", used));
             _popupSystem.PopupPredicted(selfMessage, othersMessage, user, user);
             component.ActiveShovelDigging = true;
             Dirty(uid, component);
         }
         else
-        {
-            _popupSystem.PopupClient(Loc.GetString("grave-start-digging-user-trapped", ("grave", uid)), user, user, PopupType.Medium);
-        }
+            _popupSystem.PopupClient(Loc.GetString("grave-start-digging-user-trapped", ("grave", uid)),
+                user,
+                user,
+                PopupType.Medium);
     }
 
     private void OnOpenAttempt(EntityUid uid, GraveComponent component, ref StorageOpenAttemptEvent args)
@@ -220,15 +227,11 @@ public sealed class BurialSystem : EntitySystem
         args.Cancelled = true;
     }
 
-    private void OnAfterOpen(EntityUid uid, GraveComponent component, ref StorageAfterOpenEvent args)
-    {
+    private void OnAfterOpen(EntityUid uid, GraveComponent component, ref StorageAfterOpenEvent args) =>
         component.DiggingComplete = false;
-    }
 
-    private void OnAfterClose(EntityUid uid, GraveComponent component, ref StorageAfterCloseEvent args)
-    {
+    private void OnAfterClose(EntityUid uid, GraveComponent component, ref StorageAfterCloseEvent args) =>
         component.DiggingComplete = false;
-    }
 
     private void OnRelayMovement(EntityUid uid, GraveComponent component, ref ContainerRelayMovementEntityEvent args)
     {
@@ -240,12 +243,17 @@ public sealed class BurialSystem : EntitySystem
         if (!_actionBlocker.CanMove(args.Entity))
             return;
 
-        var doAfterEventArgs = new DoAfterArgs(EntityManager, args.Entity, component.DigDelay / component.DigOutByHandModifier, new GraveDiggingDoAfterEvent(), uid, target: uid)
+        var doAfterEventArgs = new DoAfterArgs(EntityManager,
+            args.Entity,
+            component.DigDelay / component.DigOutByHandModifier,
+            new GraveDiggingDoAfterEvent(),
+            uid,
+            uid)
         {
             NeedHand = false,
             BreakOnMove = true,
             BreakOnHandChange = false,
-            BreakOnDamage = false
+            BreakOnDamage = false,
         };
 
 

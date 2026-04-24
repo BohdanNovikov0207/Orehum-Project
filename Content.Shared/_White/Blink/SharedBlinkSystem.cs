@@ -22,13 +22,13 @@ namespace Content.Shared._White.Blink;
 
 public abstract class SharedBlinkSystem : EntitySystem
 {
-    [Dependency] private readonly INetManager _net = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
+    [Dependency] private readonly INetManager _net = default!;
     [Dependency] private readonly SharedPhysicsSystem _physics = default!;
-    [Dependency] private readonly TelefragSystem _telefrag = default!;
-    [Dependency] private readonly UseDelaySystem _useDelay = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly TelefragSystem _telefrag = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
+    [Dependency] private readonly UseDelaySystem _useDelay = default!;
 
     public override void Initialize()
     {
@@ -91,6 +91,10 @@ public abstract class SharedBlinkSystem : EntitySystem
         _transform.SetWorldPosition(user, targetPos);
         _audio.PlayPredicted(blink.BlinkSound, user, user);
         if (_net.IsServer) // Prediction issues
-            _telefrag.DoTelefrag(user, xform.Coordinates, blink.KnockdownTime, blink.KnockdownRadius, autoStandUp: true);
+            _telefrag.DoTelefrag(user,
+                xform.Coordinates,
+                blink.KnockdownTime,
+                blink.KnockdownRadius,
+                autoStandUp: true);
     }
 }

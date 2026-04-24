@@ -13,6 +13,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // using Content.Shared._Goobstation.Boomerang; NO!!
+
 using Robust.Shared.GameStates;
 
 namespace Content.Shared.Weapons.Melee.Components;
@@ -21,70 +22,74 @@ namespace Content.Shared.Weapons.Melee.Components;
 /// This is used for a melee weapon that throws whatever gets hit by it in a line
 /// until it hits a wall or a time limit is exhausted.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState(fieldDeltas: true)]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState(fieldDeltas: true)]
 // [Access(typeof(MeleeThrowOnHitSystem))] // Goobstation Edit - No implicit access
 public sealed partial class MeleeThrowOnHitComponent : Component
 {
     /// <summary>
-    /// The speed at which hit entities should be thrown.
+    /// Should this also work on a throw-hit?
     /// </summary>
-    [DataField, AutoNetworkedField]
-    public float Speed = 10f;
+    [DataField] [AutoNetworkedField]
+    public bool ActivateOnThrown;
 
     /// <summary>
     /// The maximum distance the hit entity should be thrown.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public float Distance = 20f;
-
-    /// <summary>
-    /// Whether or not anchorable entities should be unanchored when hit.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public bool UnanchorOnHit;
-
-    /// <summary>
-    /// How long should this stun the target, if applicable?
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public TimeSpan? StunTime;
-
-    /// <summary>
-    /// Should this also work on a throw-hit?
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public bool ActivateOnThrown;
-
-    /// <summary>
-    /// Goobstation - should it throw while being on delay?
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public bool ThrowWhileOnDelay;
-    /// </summary>
-
-    /// Whether the entity can apply knockback this instance of being thrown.
-    /// If true, the entity cannot apply knockback.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    [ViewVariables(VVAccess.ReadOnly)]
-    public bool ThrowOnCooldown;
 
     /// <summary>
     /// Whether this item has hit anyone while it was thrown.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     [ViewVariables(VVAccess.ReadOnly)]
     public bool HitWhileThrown;
+
+    /// <summary>
+    /// The speed at which hit entities should be thrown.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public float Speed = 10f;
+
+    /// <summary>
+    /// How long should this stun the target, if applicable?
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public TimeSpan? StunTime;
+
+    /// </summary>
+    /// Whether the entity can apply knockback this instance of being thrown.
+    /// If true, the entity cannot apply knockback.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    [ViewVariables(VVAccess.ReadOnly)]
+    public bool ThrowOnCooldown;
+
+    /// <summary>
+    /// Goobstation - should it throw while being on delay?
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public bool ThrowWhileOnDelay;
+
+    /// <summary>
+    /// Whether or not anchorable entities should be unanchored when hit.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public bool UnanchorOnHit;
 }
 
 /// <summary>
-/// Raised a weapon entity with <see cref="MeleeThrowOnHitComponent"/> to see if a throw is allowed.
+/// Raised a weapon entity with <see cref="MeleeThrowOnHitComponent" /> to see if a throw is allowed.
 /// </summary>
 [ByRefEvent]
-public record struct AttemptMeleeThrowOnHitEvent(EntityUid Target, EntityUid? User, bool Cancelled = false, bool Handled = false);
+public record struct AttemptMeleeThrowOnHitEvent(
+    EntityUid Target,
+    EntityUid? User,
+    bool Cancelled = false,
+    bool Handled = false);
 
 /// <summary>
-/// Raised a target entity before it is thrown by <see cref="MeleeThrowOnHitComponent"/>.
+/// Raised a target entity before it is thrown by <see cref="MeleeThrowOnHitComponent" />.
 /// </summary>
 [ByRefEvent]
 public record struct MeleeThrowOnHitStartEvent(EntityUid Weapon, EntityUid? User);

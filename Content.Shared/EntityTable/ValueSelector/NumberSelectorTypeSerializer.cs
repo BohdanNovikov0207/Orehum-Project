@@ -23,9 +23,7 @@ public sealed class NumberSelectorTypeSerializer :
 
         // RangeNumberSelector validation
         if (VectorSerializerUtility.TryParseArgs(node.Value, 2, out _))
-        {
             return new ValidatedValueNode(node);
-        }
 
         return new ErrorNode(node, "Custom validation not supported! Please specify the type manually!");
     }

@@ -14,10 +14,6 @@ namespace Content.Shared.Disposal.Mailing;
 
 public abstract class SharedMailingUnitSystem : EntitySystem
 {
-    [Dependency] private readonly SharedDeviceNetworkSystem _deviceNetworkSystem = default!;
-    [Dependency] private readonly SharedPowerReceiverSystem _power = default!;
-    [Dependency] protected readonly SharedUserInterfaceSystem UserInterfaceSystem = default!;
-
     private const string MailTag = "mail";
 
     private const string TagConfigurationKey = "tag";
@@ -28,6 +24,9 @@ public abstract class SharedMailingUnitSystem : EntitySystem
     private const string NetCmdSent = "mail_sent";
     private const string NetCmdRequest = "get_mailer_tag";
     private const string NetCmdResponse = "mailer_tag";
+    [Dependency] private readonly SharedDeviceNetworkSystem _deviceNetworkSystem = default!;
+    [Dependency] private readonly SharedPowerReceiverSystem _power = default!;
+    [Dependency] protected readonly SharedUserInterfaceSystem UserInterfaceSystem = default!;
 
     public override void Initialize()
     {
@@ -37,14 +36,13 @@ public abstract class SharedMailingUnitSystem : EntitySystem
         SubscribeLocalEvent<MailingUnitComponent, DeviceNetworkPacketEvent>(OnPacketReceived);
         SubscribeLocalEvent<MailingUnitComponent, BeforeDisposalFlushEvent>(OnBeforeFlush);
         SubscribeLocalEvent<MailingUnitComponent, ConfigurationUpdatedEvent>(OnConfigurationUpdated);
-        SubscribeLocalEvent<MailingUnitComponent, ActivateInWorldEvent>(HandleActivate, before: new[] { typeof(SharedDisposalUnitSystem) });
+        SubscribeLocalEvent<MailingUnitComponent, ActivateInWorldEvent>(HandleActivate,
+            new[] { typeof(SharedDisposalUnitSystem) });
         SubscribeLocalEvent<MailingUnitComponent, TargetSelectedMessage>(OnTargetSelected);
     }
 
-    private void OnComponentInit(EntityUid uid, MailingUnitComponent component, ComponentInit args)
-    {
+    private void OnComponentInit(EntityUid uid, MailingUnitComponent component, ComponentInit args) =>
         UpdateTargetList(uid, component);
-    }
 
     private void OnPacketReceived(EntityUid uid, MailingUnitComponent component, DeviceNetworkPacketEvent args)
     {
@@ -65,7 +63,7 @@ public abstract class SharedMailingUnitSystem : EntitySystem
     }
 
     /// <summary>
-    /// Sends the given tag as a response to a <see cref="NetCmdRequest"/> if it's not null
+    /// Sends the given tag as a response to a <see cref="NetCmdRequest" /> if it's not null
     /// </summary>
     private void SendTagRequestResponse(EntityUid uid, DeviceNetworkPacketEvent args, string? tag)
     {
@@ -75,7 +73,7 @@ public abstract class SharedMailingUnitSystem : EntitySystem
         var payload = new NetworkPayload
         {
             [DeviceNetworkConstants.Command] = NetCmdResponse,
-            [NetTag] = tag
+            [NetTag] = tag,
         };
 
         _deviceNetworkSystem.QueuePacket(uid, args.Address, payload, args.Frequency);
@@ -102,7 +100,9 @@ public abstract class SharedMailingUnitSystem : EntitySystem
     /// <summary>
     /// Broadcast that a mail was sent including the src and target tags
     /// </summary>
-    private void BroadcastSentMessage(EntityUid uid, MailingUnitComponent component, DeviceNetworkComponent? device = null)
+    private void BroadcastSentMessage(EntityUid uid,
+        MailingUnitComponent component,
+        DeviceNetworkComponent? device = null)
     {
         if (string.IsNullOrEmpty(component.Tag) || string.IsNullOrEmpty(component.Target) || !Resolve(uid, ref device))
             return;
@@ -111,15 +111,16 @@ public abstract class SharedMailingUnitSystem : EntitySystem
         {
             [DeviceNetworkConstants.Command] = NetCmdSent,
             [NetSrc] = component.Tag,
-            [NetTarget] = component.Target
+            [NetTarget] = component.Target,
         };
 
         _deviceNetworkSystem.QueuePacket(uid, null, payload, null, null, device);
     }
 
     /// <summary>
-    /// Clears the units target list and broadcasts a <see cref="NetCmdRequest"/>.
-    /// The target list will then get populated with <see cref="NetCmdResponse"/> responses from all active mailing units on the same grid
+    /// Clears the units target list and broadcasts a <see cref="NetCmdRequest" />.
+    /// The target list will then get populated with <see cref="NetCmdResponse" /> responses from all active mailing units on
+    /// the same grid
     /// </summary>
     private void UpdateTargetList(EntityUid uid, MailingUnitComponent component, DeviceNetworkComponent? device = null)
     {
@@ -128,7 +129,7 @@ public abstract class SharedMailingUnitSystem : EntitySystem
 
         var payload = new NetworkPayload
         {
-            [DeviceNetworkConstants.Command] = NetCmdRequest
+            [DeviceNetworkConstants.Command] = NetCmdRequest,
         };
 
         component.TargetList.Clear();
@@ -157,9 +158,7 @@ public abstract class SharedMailingUnitSystem : EntitySystem
             return;
 
         if (!TryComp(args.User, out ActorComponent? actor))
-        {
             return;
-        }
 
         args.Handled = true;
         UpdateTargetList(uid, component);

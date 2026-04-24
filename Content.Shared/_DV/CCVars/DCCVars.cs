@@ -24,10 +24,11 @@ namespace Content.Shared._DV.CCVars;
 /// </summary>
 [CVarDefs]
 // ReSharper disable once InconsistentNaming - Shush you
-public sealed partial class DCCVars
+public sealed class DCCVars
 {
     /// <summary>
-    /// Disables all vision filters for species like Vulpkanin or Harpies. There are good reasons someone might want to disable these.
+    /// Disables all vision filters for species like Vulpkanin or Harpies. There are good reasons someone might want to disable
+    /// these.
     /// </summary>
     public static readonly CVarDef<bool> NoVisionFilters =
         CVarDef.Create("accessibility.no_vision_filters", false, CVar.CLIENTONLY | CVar.ARCHIVE);
@@ -61,13 +62,15 @@ public sealed partial class DCCVars
         CVarDef.Create("cosmiccult.steward_vote_timer", 120, CVar.SERVER);
 
     /// <summary>
-    /// The delay between the monument getting upgraded to tier 2 and the crew learning of that fact. the monument cannot be upgraded again in this time.
+    /// The delay between the monument getting upgraded to tier 2 and the crew learning of that fact. the monument cannot be
+    /// upgraded again in this time.
     /// </summary>
     public static readonly CVarDef<int> CosmicCultT2RevealDelaySeconds =
         CVarDef.Create("cosmiccult.t2_reveal_delay_seconds", 120, CVar.SERVER);
 
     /// <summary>
-    /// The delay between the monument getting upgraded to tier 3 and the crew learning of that fact. the monument cannot be upgraded again in this time.
+    /// The delay between the monument getting upgraded to tier 3 and the crew learning of that fact. the monument cannot be
+    /// upgraded again in this time.
     /// </summary>
     public static readonly CVarDef<int> CosmicCultT3RevealDelaySeconds =
         CVarDef.Create("cosmiccult.t3_reveal_delay_seconds", 60, CVar.SERVER);
@@ -79,7 +82,7 @@ public sealed partial class DCCVars
         CVarDef.Create("cosmiccult.extra_entropy_for_finale", 150, CVar.SERVER);
 
     /// <summary>
-    ///    Maximum number of characters in objective summaries.
+    /// Maximum number of characters in objective summaries.
     /// </summary>
     public static readonly CVarDef<int> MaxObjectiveSummaryLength =
         CVarDef.Create("game.max_objective_summary_length", 256, CVar.SERVER | CVar.REPLICATED);

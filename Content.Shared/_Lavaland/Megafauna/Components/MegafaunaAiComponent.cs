@@ -9,31 +9,31 @@ using Robust.Shared.GameStates;
 
 namespace Content.Shared._Lavaland.Megafauna.Components;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class MegafaunaAiComponent : Component
 {
-    /// <summary>
-    /// Selector that is added to the main thread
-    /// </summary>
-    [DataField(required: true), ViewVariables(VVAccess.ReadOnly)]
-    public MegafaunaSelector Selector;
-
     /// <summary>
     /// Delay between picking new action selectors.
     /// Added to the delay that Selector returned after invocation.
     /// It's recommended to be always bigger than 0 to prevent errors.
     /// </summary>
-    [DataField("actionDelay"), ViewVariables(VVAccess.ReadOnly)]
+    [DataField("actionDelay")] [ViewVariables(VVAccess.ReadOnly)]
     public MegafaunaNumberSelector ActionDelaySelector = new MegafaunaConstantNumberSelector(0.5f);
 
     /// <summary>
     /// True if this megafauna can execute any attacks now.
     /// </summary>
-    [ViewVariables, AutoNetworkedField]
+    [ViewVariables] [AutoNetworkedField]
     public bool Active;
 
     [ViewVariables(VVAccess.ReadOnly)]
     public Dictionary<TimeSpan, MegafaunaSelector> Schedule = new();
+
+    /// <summary>
+    /// Selector that is added to the main thread
+    /// </summary>
+    [DataField(required: true)] [ViewVariables(VVAccess.ReadOnly)]
+    public MegafaunaSelector Selector;
 
     /// <summary>
     /// Defines delay for the first megafauna's attack.

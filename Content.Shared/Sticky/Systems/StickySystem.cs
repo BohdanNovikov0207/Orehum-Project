@@ -81,28 +81,27 @@
 using Content.Shared.DoAfter;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Interaction;
+using Content.Shared.Interaction.Components;
 using Content.Shared.Popups;
 using Content.Shared.Sticky.Components;
 using Content.Shared.Verbs;
 using Content.Shared.Whitelist;
 using Robust.Shared.Containers;
-using Content.Shared.Interaction.Components;
 using Robust.Shared.Network;
 
 namespace Content.Shared.Sticky.Systems;
 
 public sealed class StickySystem : EntitySystem
 {
-    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
+    private const string StickerSlotId = "stickers_container";
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
     [Dependency] private readonly SharedContainerSystem _container = default!;
     [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
     [Dependency] private readonly SharedHandsSystem _hands = default!;
     [Dependency] private readonly SharedInteractionSystem _interaction = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly INetManager _net = default!;
-
-    private const string StickerSlotId = "stickers_container";
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
 
     public override void Initialize()
     {
@@ -115,7 +114,7 @@ public sealed class StickySystem : EntitySystem
 
     private void OnAfterInteract(Entity<StickyComponent> ent, ref AfterInteractEvent args)
     {
-        if (args.Handled || !args.CanReach || args.Target is not {} target)
+        if (args.Handled || !args.CanReach || args.Target is not { } target)
             return;
 
         // try stick object to a clicked target entity
@@ -131,7 +130,8 @@ public sealed class StickySystem : EntitySystem
         // we can't use args.CanAccess, because it stuck in another container
         // we also need to ignore entity that it stuck to
         var user = args.User;
-        var inRange = _interaction.InRangeUnobstructed(uid, user,
+        var inRange = _interaction.InRangeUnobstructed(uid,
+            user,
             predicate: entity => comp.StuckTo == entity);
         if (!inRange)
             return;
@@ -141,7 +141,7 @@ public sealed class StickySystem : EntitySystem
             DoContactInteraction = true,
             Text = Loc.GetString(comp.VerbText),
             Icon = comp.VerbIcon,
-            Act = () => StartUnsticking(ent, user)
+            Act = () => StartUnsticking(ent, user),
         });
     }
 
@@ -181,11 +181,12 @@ public sealed class StickySystem : EntitySystem
         }
 
         // start sticking object to target
-        _doAfter.TryStartDoAfter(new DoAfterArgs(EntityManager, user, stickDelay, new StickyDoAfterEvent(), uid, target: target, used: uid) // Goob edit
-        {
-            BreakOnMove = !IsUser || comp.SelfStickBreakOnMove, // Goob edit
-            NeedHand = true,
-        });
+        _doAfter.TryStartDoAfter(
+            new DoAfterArgs(EntityManager, user, stickDelay, new StickyDoAfterEvent(), uid, target, uid) // Goob edit
+            {
+                BreakOnMove = !IsUser || comp.SelfStickBreakOnMove, // Goob edit
+                NeedHand = true,
+            });
 
         return true;
     }
@@ -193,7 +194,7 @@ public sealed class StickySystem : EntitySystem
     private void OnStickyDoAfter(Entity<StickyComponent> ent, ref StickyDoAfterEvent args)
     {
         // target is the sticky item when unsticking and the surface when sticking, it will never be null
-        if (args.Handled || args.Cancelled || args.Args.Target is not {} target)
+        if (args.Handled || args.Cancelled || args.Args.Target is not { } target)
             return;
 
         var user = args.User;
@@ -208,7 +209,7 @@ public sealed class StickySystem : EntitySystem
     private void StartUnsticking(Entity<StickyComponent> ent, EntityUid user)
     {
         var (uid, comp) = ent;
-        if (comp.StuckTo is not {} stuckTo)
+        if (comp.StuckTo is not { } stuckTo)
             return;
 
         var attemptEv = new AttemptEntityUnstickEvent(stuckTo, user);
@@ -238,11 +239,12 @@ public sealed class StickySystem : EntitySystem
         }
 
         // start unsticking object
-        _doAfter.TryStartDoAfter(new DoAfterArgs(EntityManager, user, unstickDelay, new StickyDoAfterEvent(), uid, target: uid) // Goob edit
-        {
-            BreakOnMove = !IsUser || comp.SelfUnstickBreakOnMove, // Goob edit
-            NeedHand = true,
-        });
+        _doAfter.TryStartDoAfter(
+            new DoAfterArgs(EntityManager, user, unstickDelay, new StickyDoAfterEvent(), uid, uid) // Goob edit
+            {
+                BreakOnMove = !IsUser || comp.SelfUnstickBreakOnMove, // Goob edit
+                NeedHand = true,
+            });
     }
 
     public void StickToEntity(Entity<StickyComponent> ent, EntityUid target, EntityUid user)
@@ -280,7 +282,7 @@ public sealed class StickySystem : EntitySystem
     public void UnstickFromEntity(Entity<StickyComponent> ent, EntityUid user)
     {
         var (uid, comp) = ent;
-        if (comp.StuckTo is not {} stuckTo)
+        if (comp.StuckTo is not { } stuckTo)
             return;
 
         var attemptEv = new AttemptEntityUnstickEvent(stuckTo, user);
@@ -290,7 +292,8 @@ public sealed class StickySystem : EntitySystem
 
         RemComp<UnremoveableComponent>(uid); //Goobstation - MedicalPatch
         // try to remove sticky item from target container
-        if (!_container.TryGetContainer(stuckTo, StickerSlotId, out var container) || !_container.Remove(uid, container))
+        if (!_container.TryGetContainer(stuckTo, StickerSlotId, out var container) ||
+            !_container.Remove(uid, container))
             return;
 
         // delete container if it's now empty

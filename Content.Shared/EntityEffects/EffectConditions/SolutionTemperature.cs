@@ -8,16 +8,16 @@ using Robust.Shared.Prototypes;
 namespace Content.Shared.EntityEffects.EffectConditions;
 
 /// <summary>
-///     Requires the solution to be above or below a certain temperature.
-///     Used for things like explosives.
+/// Requires the solution to be above or below a certain temperature.
+/// Used for things like explosives.
 /// </summary>
 public sealed partial class SolutionTemperature : EntityEffectCondition
 {
     [DataField]
-    public float Min = 0.0f;
+    public float Max = float.PositiveInfinity;
 
     [DataField]
-    public float Max = float.PositiveInfinity;
+    public float Min = 0.0f;
 
     public override bool Condition(EntityEffectBaseArgs args)
     {
@@ -32,10 +32,8 @@ public sealed partial class SolutionTemperature : EntityEffectCondition
         throw new NotImplementedException();
     }
 
-    public override string GuidebookExplanation(IPrototypeManager prototype)
-    {
-        return Loc.GetString("reagent-effect-condition-guidebook-solution-temperature",
-            ("max", float.IsPositiveInfinity(Max) ? (float) int.MaxValue : Max),
+    public override string GuidebookExplanation(IPrototypeManager prototype) =>
+        Loc.GetString("reagent-effect-condition-guidebook-solution-temperature",
+            ("max", float.IsPositiveInfinity(Max) ? int.MaxValue : Max),
             ("min", Min));
-    }
 }

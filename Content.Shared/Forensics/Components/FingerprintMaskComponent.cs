@@ -11,5 +11,5 @@ namespace Content.Shared.Forensics.Components;
 /// This component stops the entity from leaving fingerprints,
 /// usually so fibres can be left instead.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class FingerprintMaskComponent : Component;

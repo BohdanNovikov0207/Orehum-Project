@@ -3,10 +3,11 @@
 //
 // SPDX-License-Identifier: MIT
 
-namespace Content.Shared.Wall;
 using Robust.Shared.Serialization;
 
-[Serializable, NetSerializable]
+namespace Content.Shared.Wall;
+
+[Serializable] [NetSerializable]
 public enum ShuttleWallVisuals
 {
     DeconstructionStage,

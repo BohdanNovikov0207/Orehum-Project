@@ -88,33 +88,25 @@ namespace Content.Shared.Alert;
 
 public abstract class AlertsSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     private FrozenDictionary<ProtoId<AlertPrototype>, AlertPrototype> _typeToAlert = default!;
 
-    public IReadOnlyDictionary<AlertKey, AlertState>? GetActiveAlerts(EntityUid euid)
-    {
-        return TryComp(euid, out AlertsComponent? comp)
+    public IReadOnlyDictionary<AlertKey, AlertState>? GetActiveAlerts(EntityUid euid) =>
+        TryComp(euid, out AlertsComponent? comp)
             ? comp.Alerts
             : null;
-    }
 
     public short GetSeverityRange(ProtoId<AlertPrototype> alertType)
     {
         var minSeverity = _typeToAlert[alertType].MinSeverity;
-        return (short)MathF.Max(minSeverity,_typeToAlert[alertType].MaxSeverity - minSeverity);
+        return (short) MathF.Max(minSeverity, _typeToAlert[alertType].MaxSeverity - minSeverity);
     }
 
-    public short GetMaxSeverity(ProtoId<AlertPrototype> alertType)
-    {
-        return _typeToAlert[alertType].MaxSeverity;
-    }
+    public short GetMaxSeverity(ProtoId<AlertPrototype> alertType) => _typeToAlert[alertType].MaxSeverity;
 
-    public short GetMinSeverity(ProtoId<AlertPrototype> alertType)
-    {
-        return _typeToAlert[alertType].MinSeverity;
-    }
+    public short GetMinSeverity(ProtoId<AlertPrototype> alertType) => _typeToAlert[alertType].MinSeverity;
 
     public bool IsShowingAlert(EntityUid euid, ProtoId<AlertPrototype> alertType)
     {
@@ -122,20 +114,16 @@ public abstract class AlertsSystem : EntitySystem
             return false;
 
         if (TryGet(alertType, out var alert))
-        {
             return alertsComponent.Alerts.ContainsKey(alert.AlertKey);
-        }
 
         Log.Debug("Unknown alert type {0}", alertType);
         return false;
     }
 
     /// <returns>true iff an alert of the indicated alert category is currently showing</returns>
-    public bool IsShowingAlertCategory(EntityUid euid, ProtoId<AlertCategoryPrototype> alertCategory)
-    {
-        return TryComp(euid, out AlertsComponent? alertsComponent)
-               && alertsComponent.Alerts.ContainsKey(AlertKey.ForCategory(alertCategory));
-    }
+    public bool IsShowingAlertCategory(EntityUid euid, ProtoId<AlertCategoryPrototype> alertCategory) =>
+        TryComp(euid, out AlertsComponent? alertsComponent)
+        && alertsComponent.Alerts.ContainsKey(AlertKey.ForCategory(alertCategory));
 
     public bool TryGetAlertState(EntityUid euid, AlertKey key, out AlertState alertState)
     {
@@ -144,7 +132,6 @@ public abstract class AlertsSystem : EntitySystem
 
         alertState = default;
         return false;
-
     }
 
     /// <summary>
@@ -154,11 +141,18 @@ public abstract class AlertsSystem : EntitySystem
     /// <param name="euid"></param>
     /// <param name="alertType">type of the alert to set</param>
     /// <param name="severity">severity, if supported by the alert</param>
-    /// <param name="cooldown">cooldown start and end, if null there will be no cooldown (and it will
-    ///     be erased if there is currently a cooldown for the alert)</param>
+    /// <param name="cooldown">
+    /// cooldown start and end, if null there will be no cooldown (and it will
+    /// be erased if there is currently a cooldown for the alert)
+    /// </param>
     /// <param name="autoRemove">if true, the alert will be removed at the end of the cooldown</param>
     /// <param name="showCooldown">if true, the cooldown will be visibly shown over the alert icon</param>
-    public void ShowAlert(EntityUid euid, ProtoId<AlertPrototype> alertType, short? severity = null, (TimeSpan, TimeSpan)? cooldown = null, bool autoRemove = false, bool showCooldown = true )
+    public void ShowAlert(EntityUid euid,
+        ProtoId<AlertPrototype> alertType,
+        short? severity = null,
+        (TimeSpan, TimeSpan)? cooldown = null,
+        bool autoRemove = false,
+        bool showCooldown = true)
     {
         // This should be handled as part of networking.
         if (_timing.ApplyingState)
@@ -177,15 +171,16 @@ public abstract class AlertsSystem : EntitySystem
                 alertStateCallback.Cooldown == cooldown &&
                 alertStateCallback.AutoRemove == autoRemove &&
                 alertStateCallback.ShowCooldown == showCooldown)
-            {
                 return;
-            }
 
             // In the case we're changing the alert type but not the category, we need to remove it first.
             alertsComponent.Alerts.Remove(alert.AlertKey);
 
             var state = new AlertState
-                { Cooldown = cooldown, Severity = severity, Type = alertType, AutoRemove = autoRemove, ShowCooldown = showCooldown};
+            {
+                Cooldown = cooldown, Severity = severity, Type = alertType, AutoRemove = autoRemove,
+                ShowCooldown = showCooldown,
+            };
             alertsComponent.Alerts[alert.AlertKey] = state;
 
             // Keeping a list of AutoRemove alerts, so Update() doesn't need to check every alert
@@ -203,7 +198,7 @@ public abstract class AlertsSystem : EntitySystem
         else
         {
             Log.Error("Unable to show alert {0}, please ensure this alertType has" +
-                                   " a corresponding YML alert prototype",
+                      " a corresponding YML alert prototype",
                 alertType);
         }
     }
@@ -213,14 +208,12 @@ public abstract class AlertsSystem : EntitySystem
     /// </summary>
     public void ClearAlertCategory(EntityUid euid, ProtoId<AlertCategoryPrototype> category)
     {
-        if(!TryComp(euid, out AlertsComponent? alertsComponent))
+        if (!TryComp(euid, out AlertsComponent? alertsComponent))
             return;
 
         var key = AlertKey.ForCategory(category);
         if (!alertsComponent.Alerts.Remove(key))
-        {
             return;
-        }
 
         AfterClearAlert((euid, alertsComponent));
 
@@ -241,18 +234,14 @@ public abstract class AlertsSystem : EntitySystem
         if (TryGet(alertType, out var alert))
         {
             if (!alertsComponent.Alerts.Remove(alert.AlertKey))
-            {
                 return;
-            }
 
             AfterClearAlert((euid, alertsComponent));
 
             Dirty(euid, alertsComponent);
         }
         else
-        {
             Log.Error("Unable to clear alert, unknown alertType {0}", alertType);
-        }
     }
 
     /// <summary>
@@ -283,9 +272,7 @@ public abstract class AlertsSystem : EntitySystem
     private void OnAutoRemoveUnPaused(EntityUid uid, AlertAutoRemoveComponent comp, EntityUnpausedEvent args)
     {
         if (!TryComp<AlertsComponent>(uid, out var alertComp))
-        {
             return;
-        }
 
         var dirty = false;
 
@@ -302,7 +289,7 @@ public abstract class AlertsSystem : EntitySystem
                 Cooldown = cooldown,
                 ShowCooldown = alert.Value.ShowCooldown,
                 AutoRemove = alert.Value.AutoRemove,
-                Type = alert.Value.Type
+                Type = alert.Value.Type,
             };
             alertComp.Alerts[alert.Key] = state;
             dirty = true;
@@ -348,15 +335,11 @@ public abstract class AlertsSystem : EntitySystem
         }
     }
 
-    protected virtual void HandleComponentShutdown(EntityUid uid, AlertsComponent component, ComponentShutdown args)
-    {
+    protected virtual void HandleComponentShutdown(EntityUid uid, AlertsComponent component, ComponentShutdown args) =>
         RaiseLocalEvent(uid, new AlertSyncEvent(uid), true);
-    }
 
-    private void HandleComponentStartup(EntityUid uid, AlertsComponent component, ComponentStartup args)
-    {
+    private void HandleComponentStartup(EntityUid uid, AlertsComponent component, ComponentStartup args) =>
         RaiseLocalEvent(uid, new AlertSyncEvent(uid), true);
-    }
 
     private void HandlePrototypesReloaded(PrototypesReloadedEventArgs obj)
     {
@@ -372,7 +355,8 @@ public abstract class AlertsSystem : EntitySystem
             if (!dict.TryAdd(alert.ID, alert))
             {
                 Log.Error("Found alert with duplicate alertType {0} - all alerts must have" +
-                          " a unique alertType, this one will be skipped", alert.ID);
+                          " a unique alertType, this one will be skipped",
+                    alert.ID);
             }
         }
 
@@ -383,10 +367,8 @@ public abstract class AlertsSystem : EntitySystem
     /// Tries to get the alert of the indicated type
     /// </summary>
     /// <returns>true if found</returns>
-    public bool TryGet(ProtoId<AlertPrototype> alertType, [NotNullWhen(true)] out AlertPrototype? alert)
-    {
-        return _typeToAlert.TryGetValue(alertType, out alert);
-    }
+    public bool TryGet(ProtoId<AlertPrototype> alertType, [NotNullWhen(true)] out AlertPrototype? alert) =>
+        _typeToAlert.TryGetValue(alertType, out alert);
 
     private void HandleClickAlert(ClickAlertEvent msg, EntitySessionEventArgs args)
     {
@@ -397,8 +379,9 @@ public abstract class AlertsSystem : EntitySystem
         if (!IsShowingAlert(player.Value, msg.Type))
         {
             Log.Debug("User {0} attempted to" +
-                                   " click alert {1} which is not currently showing for them",
-                Comp<MetaDataComponent>(player.Value).EntityName, msg.Type);
+                      " click alert {1} which is not currently showing for them",
+                Comp<MetaDataComponent>(player.Value).EntityName,
+                msg.Type);
             return;
         }
 
@@ -409,14 +392,11 @@ public abstract class AlertsSystem : EntitySystem
         }
 
         if (ActivateAlert(player.Value, alert) && _timing.IsFirstTimePredicted)
-        {
             HandledAlert();
-        }
     }
 
     protected virtual void HandledAlert()
     {
-
     }
 
     public bool ActivateAlert(EntityUid user, AlertPrototype alert)
@@ -432,8 +412,6 @@ public abstract class AlertsSystem : EntitySystem
         return clickEvent.Handled;
     }
 
-    private void OnPlayerAttached(EntityUid uid, AlertsComponent component, PlayerAttachedEvent args)
-    {
+    private void OnPlayerAttached(EntityUid uid, AlertsComponent component, PlayerAttachedEvent args) =>
         Dirty(uid, component);
-    }
 }

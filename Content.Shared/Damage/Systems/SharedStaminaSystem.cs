@@ -57,22 +57,24 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Linq;
+using Content.Goobstation.Common.Damage.Events;
+using Content.Goobstation.Common.MartialArts;
+using Content.Goobstation.Common.Stunnable;
+using Content.Goobstation.Maths.FixedPoint;
+using Content.Shared._Shitcode.Weapons.Misc;
 using Content.Shared.Administration.Logs;
 using Content.Shared.Alert;
 using Content.Shared.CCVar;
 using Content.Shared.CombatMode;
 using Content.Shared.Damage.Components;
+using Content.Shared.Damage.Events;
 using Content.Shared.Database;
 using Content.Shared.Effects;
-using Content.Goobstation.Maths.FixedPoint;
-using Content.Shared.Jittering;
 using Content.Shared.Movement.Components;
 using Content.Shared.Movement.Systems;
 using Content.Shared.Projectiles;
 using Content.Shared.Rejuvenate;
 using Content.Shared.Rounding;
-using Content.Shared.Speech.EntitySystems;
-using Content.Shared.StatusEffect;
 using Content.Shared.StatusEffectNew;
 using Content.Shared.Stunnable;
 using Content.Shared.Throwing;
@@ -86,15 +88,9 @@ using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
 using Robust.Shared.Timing;
-using Content.Goobstation.Common.Damage.Events;
-
 // Goobstation usings
-using Robust.Shared.Random; // Shove
-using Content.Shared._Shitcode.Weapons.Misc;
-using Content.Goobstation.Common.Stunnable; // Martial Arts
-using Content.Goobstation.Common.MartialArts;
-using Content.Shared.Damage.Events;
-using Robust.Shared.Utility;
+// Shove
+// Martial Arts
 
 
 namespace Content.Shared.Damage.Systems;
@@ -103,23 +99,24 @@ public abstract partial class SharedStaminaSystem : EntitySystem
 {
     public static readonly EntProtoId StaminaLow = "StatusEffectStaminaLow";
 
-    [Dependency] private readonly IConfigurationManager _config = default!;
-    [Dependency] protected readonly IGameTiming Timing = default!;
-    [Dependency] private readonly INetManager _net = default!;
-    [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
-    [Dependency] private readonly AlertsSystem _alerts = default!;
-    [Dependency] private readonly MetaDataSystem _metadata = default!;
-    [Dependency] private readonly MovementModStatusSystem _movementMod = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedColorFlashEffectSystem _color = default!;
-    [Dependency] private readonly StatusEffectNew.StatusEffectsSystem _status = default!;
-    [Dependency] protected readonly SharedStunSystem StunSystem = default!;
-
 
     /// <summary>
     /// How much of a buffer is there between the stun duration and when stuns can be re-applied.
     /// </summary>
     protected static readonly TimeSpan StamCritBufferTime = TimeSpan.FromSeconds(3f);
+
+    [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
+    [Dependency] private readonly AlertsSystem _alerts = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly SharedColorFlashEffectSystem _color = default!;
+
+    [Dependency] private readonly IConfigurationManager _config = default!;
+    [Dependency] private readonly MetaDataSystem _metadata = default!;
+    [Dependency] private readonly MovementModStatusSystem _movementMod = default!;
+    [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly StatusEffectsSystem _status = default!;
+    [Dependency] protected readonly SharedStunSystem StunSystem = default!;
+    [Dependency] protected readonly IGameTiming Timing = default!;
 
     public float UniversalStaminaDamageModifier { get; private set; } = 1f;
 
@@ -162,9 +159,7 @@ public abstract partial class SharedStaminaSystem : EntitySystem
     protected virtual void OnShutdown(Entity<StaminaComponent> entity, ref ComponentShutdown args)
     {
         if (MetaData(entity).EntityLifeStage < EntityLifeStage.Terminating)
-        {
             RemCompDeferred<ActiveStaminaComponent>(entity);
-        }
         _alerts.ClearAlert(entity, entity.Comp.StaminaAlert);
     }
 
@@ -172,7 +167,8 @@ public abstract partial class SharedStaminaSystem : EntitySystem
     {
         // Goobstation edit start - prevent a server crash from YAMLmaxxing
         if (entity.Comp.CritThreshold <= entity.Comp.AnimationThreshold)
-            Log.Error($"Entity {ToPrettyString(entity)} failed to initialize StaminaComponent properly: {nameof(StaminaComponent.CritThreshold)} is lower or equal to {nameof(StaminaComponent.AnimationThreshold)}. Please fix its YAML prototype!");
+            Log.Error(
+                $"Entity {ToPrettyString(entity)} failed to initialize StaminaComponent properly: {nameof(StaminaComponent.CritThreshold)} is lower or equal to {nameof(StaminaComponent.AnimationThreshold)}. Please fix its YAML prototype!");
         // Goobstation edit end
         UpdateStaminaVisuals(entity);
     }
@@ -185,15 +181,15 @@ public abstract partial class SharedStaminaSystem : EntitySystem
 
         var curTime = Timing.CurTime;
         var pauseTime = _metadata.GetPauseTime(uid);
-        return MathF.Max(0f, component.StaminaDamage - MathF.Max(0f, (float) (curTime - (component.NextUpdate + pauseTime)).TotalSeconds * component.Decay));
+        return MathF.Max(0f,
+            component.StaminaDamage - MathF.Max(0f,
+                (float) (curTime - (component.NextUpdate + pauseTime)).TotalSeconds * component.Decay));
     }
 
     private void OnRejuvenate(Entity<StaminaComponent> entity, ref RejuvenateEvent args)
     {
         if (entity.Comp.StaminaDamage >= entity.Comp.CritThreshold)
-        {
             ExitStamCrit(entity, entity.Comp);
-        }
 
         entity.Comp.StaminaDamage = 0;
         AdjustStatus(entity.Owner);
@@ -212,7 +208,7 @@ public abstract partial class SharedStaminaSystem : EntitySystem
         if (component.Critical)
             return;
 
-        TakeStaminaDamage(uid, args.StaminaDamage, component, source: args.Source, applyResistances: true);
+        TakeStaminaDamage(uid, args.StaminaDamage, component, args.Source, applyResistances: true);
 
         args.PopupPrefix = "disarm-action-shove-";
         args.IsStunned = component.Critical;
@@ -225,9 +221,7 @@ public abstract partial class SharedStaminaSystem : EntitySystem
         if (!args.IsHit ||
             !args.HitEntities.Any() ||
             component.Damage <= 0f)
-        {
             return;
-        }
 
         // Goobstation - Martial Arts
         if (TryComp<MartialArtsKnowledgeComponent>(args.User, out var knowledgeComp)
@@ -279,28 +273,31 @@ public abstract partial class SharedStaminaSystem : EntitySystem
                 damageOvertime *= component.LightAttackOvertimeDamageMultiplier;
             }
 
-            TakeStaminaDamage(ent, damageImmediate / toHit.Count, comp, source: args.User, with: args.Weapon, sound: component.Sound, immediate: true);
+            TakeStaminaDamage(ent,
+                damageImmediate / toHit.Count,
+                comp,
+                args.User,
+                args.Weapon,
+                sound: component.Sound,
+                immediate: true);
             TakeOvertimeStaminaDamage(ent, damageOvertime);
         }
     }
 
-    private void OnProjectileHit(EntityUid uid, StaminaDamageOnCollideComponent component, ref ProjectileHitEvent args)
-    {
+    private void
+        OnProjectileHit(EntityUid uid, StaminaDamageOnCollideComponent component, ref ProjectileHitEvent args) =>
         OnCollide(uid, component, args.Target);
-    }
 
     private void OnProjectileEmbed(EntityUid uid, StaminaDamageOnEmbedComponent component, ref EmbedEvent args)
     {
         if (!TryComp<StaminaComponent>(args.Embedded, out var stamina))
             return;
 
-        TakeStaminaDamage(args.Embedded, component.Damage, stamina, source: uid, applyResistances: true);
+        TakeStaminaDamage(args.Embedded, component.Damage, stamina, uid, applyResistances: true);
     }
 
-    private void OnThrowHit(EntityUid uid, StaminaDamageOnCollideComponent component, ThrowDoHitEvent args)
-    {
+    private void OnThrowHit(EntityUid uid, StaminaDamageOnCollideComponent component, ThrowDoHitEvent args) =>
         OnCollide(uid, component, args.Target);
-    }
 
     private void OnCollide(EntityUid uid, StaminaDamageOnCollideComponent component, EntityUid target)
     {
@@ -335,21 +332,28 @@ public abstract partial class SharedStaminaSystem : EntitySystem
     }
 
     // Here so server can properly tell all clients in PVS range to start the animation
-    protected virtual void SetStaminaAnimation(Entity<StaminaComponent> entity){}
+    protected virtual void SetStaminaAnimation(Entity<StaminaComponent> entity) { }
 
     private void SetStaminaAlert(EntityUid uid, StaminaComponent? component = null)
     {
         if (!Resolve(uid, ref component, false) || component.Deleted)
             return;
 
-        var severity = ContentHelpers.RoundToLevels(MathF.Max(0f, component.CritThreshold - component.StaminaDamage), component.CritThreshold, 7);
+        var severity = ContentHelpers.RoundToLevels(MathF.Max(0f, component.CritThreshold - component.StaminaDamage),
+            component.CritThreshold,
+            7);
         _alerts.ShowAlert(uid, component.StaminaAlert, (short) severity);
     }
 
     /// <summary>
     /// Tries to take stamina damage without raising the entity over the crit threshold.
     /// </summary>
-    public bool TryTakeStamina(EntityUid uid, float value, StaminaComponent? component = null, EntityUid? source = null, EntityUid? with = null, bool visual = false)
+    public bool TryTakeStamina(EntityUid uid,
+        float value,
+        StaminaComponent? component = null,
+        EntityUid? source = null,
+        EntityUid? with = null,
+        bool visual = false)
     {
         // Something that has no Stamina component automatically passes stamina checks
         if (!Resolve(uid, ref component, false))
@@ -360,7 +364,7 @@ public abstract partial class SharedStaminaSystem : EntitySystem
         if (oldStam + value >= component.CritThreshold || component.Critical)
             return false;
 
-        TakeStaminaDamage(uid, value, component, source, with, visual: visual);
+        TakeStaminaDamage(uid, value, component, source, with, visual);
         return true;
     }
 
@@ -381,11 +385,19 @@ public abstract partial class SharedStaminaSystem : EntitySystem
     }
 
     // goob edit - stunmeta
-    public void TakeStaminaDamage(EntityUid uid, float value, StaminaComponent? component = null,
-        EntityUid? source = null, EntityUid? with = null, bool visual = true, SoundSpecifier? sound = null, bool immediate = true, bool applyResistances = false, bool logDamage = true)
+    public void TakeStaminaDamage(EntityUid uid,
+        float value,
+        StaminaComponent? component = null,
+        EntityUid? source = null,
+        EntityUid? with = null,
+        bool visual = true,
+        SoundSpecifier? sound = null,
+        bool immediate = true,
+        bool applyResistances = false,
+        bool logDamage = true)
     {
         if (!Resolve(uid, ref component, false)
-        || value == 0) // no damage???
+            || value == 0) // no damage???
             return;
 
         var ev = new BeforeStaminaDamageEvent(value, source); // Goob change: Added source param.
@@ -421,23 +433,20 @@ public abstract partial class SharedStaminaSystem : EntitySystem
         // Checking if the stamina damage has decreased to zero after exiting the stamcrit
         if (component.AfterCritical && oldDamage > component.StaminaDamage && component.StaminaDamage <= 0f)
         {
-            component.AfterCritical = false; // Since the recovery from the crit has been completed, we are no longer 'after crit'
+            component.AfterCritical =
+                false; // Since the recovery from the crit has been completed, we are no longer 'after crit'
             _status.TryRemoveStatusEffect(uid, StaminaLow);
         }
 
         if (!component.Critical)
         {
             if (component.StaminaDamage >= component.CritThreshold && value > 0) // goob edit
-            {
                 EnterStamCrit(uid, component, immediate);
-            }
         }
         else
         {
             if (component.StaminaDamage < component.CritThreshold)
-            {
                 ExitStamCrit(uid, component);
-            }
         }
 
         EnsureComp<ActiveStaminaComponent>(uid);
@@ -450,24 +459,27 @@ public abstract partial class SharedStaminaSystem : EntitySystem
         if (logDamage && source != uid)
         {
             if (source != null)
-                _adminLogger.Add(LogType.Stamina, $"{ToPrettyString(source.Value):user} caused {value} stamina damage to {ToPrettyString(uid):target}{(with != null ? $" using {ToPrettyString(with.Value):using}" : "")}");
+                _adminLogger.Add(LogType.Stamina,
+                    $"{ToPrettyString(source.Value):user} caused {value} stamina damage to {ToPrettyString(uid):target}{(with != null ? $" using {ToPrettyString(with.Value):using}" : "")}");
             else
                 _adminLogger.Add(LogType.Stamina, $"{ToPrettyString(uid):target} took {value} stamina damage");
         }
 
         if (visual)
-        {
-            _color.RaiseEffect(Color.Aqua, new List<EntityUid>() { uid }, Filter.Pvs(uid, entityManager: EntityManager));
-        }
+            _color.RaiseEffect(Color.Aqua, new List<EntityUid> { uid }, Filter.Pvs(uid, entityManager: EntityManager));
 
         if (_net.IsServer)
-        {
             _audio.PlayPvs(sound, uid);
-        }
     }
 
     // Goob edit - stamina drains
-    public void ToggleStaminaDrain(EntityUid target, float drainRate, bool enabled, bool modifiesSpeed, string key, EntityUid? source = null, bool applyResistances = false)
+    public void ToggleStaminaDrain(EntityUid target,
+        float drainRate,
+        bool enabled,
+        bool modifiesSpeed,
+        string key,
+        EntityUid? source = null,
+        bool applyResistances = false)
     {
         if (!TryComp<StaminaComponent>(target, out var stamina))
             return;
@@ -495,7 +507,8 @@ public abstract partial class SharedStaminaSystem : EntitySystem
             return;
 
         if (component.ActiveDrains.ContainsKey(key))
-            component.ActiveDrains[key] = (newValue, component.ActiveDrains[key].Item2, component.ActiveDrains[key].Item3, component.ActiveDrains[key].Item4);
+            component.ActiveDrains[key] = (newValue, component.ActiveDrains[key].Item2,
+                component.ActiveDrains[key].Item3, component.ActiveDrains[key].Item4);
 
         Dirty(target, component);
     }
@@ -517,14 +530,19 @@ public abstract partial class SharedStaminaSystem : EntitySystem
                 RemComp<ActiveStaminaComponent>(uid);
                 continue;
             }
+
             if (comp.ActiveDrains.Count > 0)
+            {
                 foreach (var (drainRate, _, source, applyResistances) in comp.ActiveDrains.Values)
+                {
                     TakeStaminaDamage(uid,
-                    drainRate * frameTime,
-                    comp,
-                    source: GetEntity(source),
-                    visual: false,
-                    applyResistances: applyResistances);
+                        drainRate * frameTime,
+                        comp,
+                        GetEntity(source),
+                        visual: false,
+                        applyResistances: applyResistances);
+                }
+            }
 
             // Shouldn't need to consider paused time as we're only iterating non-paused stamina components.
             var nextUpdate = comp.NextUpdate;
@@ -537,10 +555,14 @@ public abstract partial class SharedStaminaSystem : EntitySystem
                 ExitStamCrit(uid, comp);
             // Goob - If theres no active drains, recover stamina.
             if (!comp.ActiveDrains.Values.Any(x => x.DrainRate > 0))
+            {
                 TakeStaminaDamage(
                     uid,
-                    comp.AfterCritical ? -comp.Decay * comp.AfterCritDecayMultiplier : -comp.Decay, // Recover faster after crit
+                    comp.AfterCritical
+                        ? -comp.Decay * comp.AfterCritDecayMultiplier
+                        : -comp.Decay, // Recover faster after crit
                     comp);
+            }
 
             Dirty(uid, comp);
         }
@@ -550,9 +572,7 @@ public abstract partial class SharedStaminaSystem : EntitySystem
     private void EnterStamCrit(EntityUid uid, StaminaComponent? component = null, bool hardStun = false)
     {
         if (!Resolve(uid, ref component) || component.Critical)
-        {
             return;
-        }
 
         // if our entity is under stims make threshold bigger
         if (TryComp<StamcritResistComponent>(uid, out var stamres)
@@ -562,7 +582,7 @@ public abstract partial class SharedStaminaSystem : EntitySystem
         if (!hardStun)
         {
             if (!_status.HasStatusEffect(uid, "KnockedDown"))
-                StunSystem.TryKnockdown(uid, component.StunTime, true);
+                StunSystem.TryKnockdown(uid, component.StunTime);
             return;
         }
 
@@ -575,11 +595,12 @@ public abstract partial class SharedStaminaSystem : EntitySystem
         // Goobstation - Modularization
         var modifierEv = new GetClothingStunModifierEvent(uid);
         RaiseLocalEvent(modifierEv);
-        var clothingModifier= modifierEv.Modifier;
+        var clothingModifier = modifierEv.Modifier;
         // Goobstation - Modularization
 
         // Give them buffer before being able to be re-stunned
-        component.NextUpdate = Timing.CurTime + component.StunTime * clothingModifier + StamCritBufferTime; // Goobstation - Modularization
+        component.NextUpdate =
+            Timing.CurTime + component.StunTime * clothingModifier + StamCritBufferTime; // Goobstation - Modularization
         EnsureComp<ActiveStaminaComponent>(uid);
         Dirty(uid, component);
 
@@ -594,12 +615,10 @@ public abstract partial class SharedStaminaSystem : EntitySystem
     {
         if (!Resolve(uid, ref component) ||
             !component.Critical)
-        {
             return;
-        }
 
         component.Critical = false;
-        component.AfterCritical = true;  // Set to true to indicate that stamina will be restored after exiting stamcrit
+        component.AfterCritical = true; // Set to true to indicate that stamina will be restored after exiting stamcrit
         component.NextUpdate = Timing.CurTime;
 
         UpdateStaminaVisuals((uid, component));
@@ -608,9 +627,9 @@ public abstract partial class SharedStaminaSystem : EntitySystem
     }
 
     /// <summary>
-    /// Adjusts the modifiers of the <see cref="StaminaLow"/> status effect entity and applies relevant statuses.
-    /// System iterates through the <see cref="StaminaComponent.StunModifierThresholds"/> to find correct movement modifer.
-    /// This modifier is saved to the Stamina Low Status Effect entity's <see cref="MovementModStatusEffectComponent"/>.
+    /// Adjusts the modifiers of the <see cref="StaminaLow" /> status effect entity and applies relevant statuses.
+    /// System iterates through the <see cref="StaminaComponent.StunModifierThresholds" /> to find correct movement modifer.
+    /// This modifier is saved to the Stamina Low Status Effect entity's <see cref="MovementModStatusEffectComponent" />.
     /// </summary>
     /// <param name="ent">Entity to update</param>
     private void AdjustStatus(Entity<StaminaComponent?> ent)
@@ -635,7 +654,7 @@ public abstract partial class SharedStaminaSystem : EntitySystem
         _movementMod.TryUpdateMovementStatus(ent.Owner, status.Value, ent.Comp.StunModifierThresholds[closest]);
     }
 
-    [Serializable, NetSerializable]
+    [Serializable] [NetSerializable]
     public sealed class StaminaAnimationEvent(NetEntity entity) : EntityEventArgs
     {
         public NetEntity Entity = entity;

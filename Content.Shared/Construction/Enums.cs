@@ -7,7 +7,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Construction;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum ConstructionVisuals : byte
 {
     Key,

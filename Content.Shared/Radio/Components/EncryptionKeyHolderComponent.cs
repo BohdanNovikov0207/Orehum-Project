@@ -16,28 +16,35 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototy
 namespace Content.Shared.Radio.Components;
 
 /// <summary>
-///     This component is by entities that can contain encryption keys
+/// This component is by entities that can contain encryption keys
 /// </summary>
 [RegisterComponent]
 public sealed partial class EncryptionKeyHolderComponent : Component
 {
-    /// <summary>
-    ///     Whether or not encryption keys can be removed from the headset.
-    /// </summary>
-    [ViewVariables(VVAccess.ReadWrite)]
-    [DataField("keysUnlocked")]
-    public bool KeysUnlocked = true;
+    public const string KeyContainerName = "key_slots";
 
     /// <summary>
-    ///     The tool required to extract the encryption keys from the headset.
+    /// Combined set of radio channels provided by all contained keys.
+    /// </summary>
+    [ViewVariables]
+    public HashSet<string> Channels = new();
+
+    /// <summary>
+    /// This is the channel that will be used when using the default/department prefix (
+    /// <see cref="SharedChatSystem.DefaultChannelKey" />).
+    /// </summary>
+    [ViewVariables]
+    public string? DefaultChannel;
+
+    /// <summary>
+    /// Goobstation: Whether or not the headset can be examined to see the encryption keys while the keys aren't accessible.
     /// </summary>
     [ViewVariables(VVAccess.ReadWrite)]
-    [DataField("keysExtractionMethod", customTypeSerializer: typeof(PrototypeIdSerializer<ToolQualityPrototype>))]
-    public string KeysExtractionMethod = "Screwing";
+    [DataField("examineWhileLocked")]
+    public bool ExamineWhileLocked = true;
 
-    [ViewVariables(VVAccess.ReadWrite)]
-    [DataField("keySlots")]
-    public int KeySlots = 2;
+    [ViewVariables]
+    public Container KeyContainer = default!;
 
     [ViewVariables(VVAccess.ReadWrite)]
     [DataField("keyExtractionSound")]
@@ -47,26 +54,21 @@ public sealed partial class EncryptionKeyHolderComponent : Component
     [DataField("keyInsertionSound")]
     public SoundSpecifier KeyInsertionSound = new SoundPathSpecifier("/Audio/Items/pistol_magin.ogg");
 
-    [ViewVariables]
-    public Container KeyContainer = default!;
-    public const string KeyContainerName = "key_slots";
-
     /// <summary>
-    ///     Combined set of radio channels provided by all contained keys.
-    /// </summary>
-    [ViewVariables]
-    public HashSet<string> Channels = new();
-
-    /// <summary>
-    ///     This is the channel that will be used when using the default/department prefix (<see cref="SharedChatSystem.DefaultChannelKey"/>).
-    /// </summary>
-    [ViewVariables]
-    public string? DefaultChannel;
-
-    /// <summary>
-    ///     Goobstation: Whether or not the headset can be examined to see the encryption keys while the keys aren't accessible.
+    /// The tool required to extract the encryption keys from the headset.
     /// </summary>
     [ViewVariables(VVAccess.ReadWrite)]
-    [DataField("examineWhileLocked")]
-    public bool ExamineWhileLocked = true;
+    [DataField("keysExtractionMethod", customTypeSerializer: typeof(PrototypeIdSerializer<ToolQualityPrototype>))]
+    public string KeysExtractionMethod = "Screwing";
+
+    [ViewVariables(VVAccess.ReadWrite)]
+    [DataField("keySlots")]
+    public int KeySlots = 2;
+
+    /// <summary>
+    /// Whether or not encryption keys can be removed from the headset.
+    /// </summary>
+    [ViewVariables(VVAccess.ReadWrite)]
+    [DataField("keysUnlocked")]
+    public bool KeysUnlocked = true;
 }

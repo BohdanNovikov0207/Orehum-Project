@@ -3,15 +3,15 @@ using Robust.Shared.GameStates;
 
 namespace Content.Shared._Shitcode.Heretic.Components;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class CosmicFieldComponent : Component
 {
-    [DataField, AutoNetworkedField]
-    public int Strength;
+    [DataField]
+    public LocId BombDefusePopup = "cosmic-field-component-bomb-defused-message";
 
     [DataField]
     public SoundSpecifier BombDefuseSound = new SoundPathSpecifier("/Audio/Effects/lightburn.ogg");
 
-    [DataField]
-    public LocId BombDefusePopup = "cosmic-field-component-bomb-defused-message";
+    [DataField] [AutoNetworkedField]
+    public int Strength;
 }

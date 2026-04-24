@@ -8,41 +8,41 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Rotation;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class RotationVisualsComponent : Component
 {
+    [DataField]
+    public float AnimationTime = 0.125f;
+
     /// <summary>
-    /// Default value of <see cref="HorizontalRotation"/>
+    /// Default value of <see cref="HorizontalRotation" />
     /// </summary>
     [DataField]
     public Angle DefaultRotation = Angle.FromDegrees(90);
 
-    [DataField]
-    public Angle VerticalRotation = 0;
-
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public Angle HorizontalRotation = Angle.FromDegrees(90);
 
     [DataField]
-    public float AnimationTime = 0.125f;
+    public Angle VerticalRotation = 0;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum RotationVisuals
 {
-    RotationState
+    RotationState,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum RotationState
 {
     /// <summary>
-    ///     Standing up. This is the default value.
+    /// Standing up. This is the default value.
     /// </summary>
     Vertical = 0,
 
     /// <summary>
-    ///     Laying down
+    /// Laying down
     /// </summary>
     Horizontal,
 }

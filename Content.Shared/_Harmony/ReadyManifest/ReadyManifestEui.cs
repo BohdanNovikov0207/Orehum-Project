@@ -9,13 +9,13 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared._Harmony.ReadyManifest;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class ReadyManifestEuiState : EuiStateBase
 {
-    public Dictionary<ProtoId<JobPrototype>, ReadyManifestJobData> JobCounts { get; }
-
     public ReadyManifestEuiState(Dictionary<ProtoId<JobPrototype>, ReadyManifestJobData> jobCounts)
     {
         JobCounts = jobCounts;
     }
+
+    public Dictionary<ProtoId<JobPrototype>, ReadyManifestJobData> JobCounts { get; }
 }

@@ -52,8 +52,14 @@ namespace Content.Shared.Objectives;
 /// </summary>
 /// <remarks>
 /// All of these fields must eventually be set by condition event handlers.
-/// Everything but progress can be set to static data in yaml on the entity and <see cref="ObjectiveComponent"/>.
+/// Everything but progress can be set to static data in yaml on the entity and <see cref="ObjectiveComponent" />.
 /// If anything is null it will be logged and return null.
 /// </remarks>
-[Serializable, NetSerializable]
-public record struct ObjectiveInfo(string Title, string Description, SpriteSpecifier Icon, float Progress, int ServerCurrency, bool PartialCurrency); //Goobstation
+[Serializable] [NetSerializable]
+public record struct ObjectiveInfo(
+    string Title,
+    string Description,
+    SpriteSpecifier Icon,
+    float Progress,
+    int ServerCurrency,
+    bool PartialCurrency); //Goobstation

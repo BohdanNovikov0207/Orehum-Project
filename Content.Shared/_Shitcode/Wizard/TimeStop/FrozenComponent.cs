@@ -7,22 +7,21 @@
 
 using System.Numerics;
 using Robust.Shared.GameStates;
-using Robust.Shared.Physics.Components;
 
 namespace Content.Shared._Goobstation.Wizard.TimeStop;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class FrozenComponent : Component
 {
     [ViewVariables(VVAccess.ReadOnly)]
     public float FreezeTime = 10f;
 
     [ViewVariables(VVAccess.ReadOnly)]
-    public Vector2 OldLinearVelocity = Vector2.Zero;
+    public bool HadCollisionWake;
 
     [ViewVariables(VVAccess.ReadOnly)]
     public float OldAngularVelocity;
 
     [ViewVariables(VVAccess.ReadOnly)]
-    public bool HadCollisionWake;
+    public Vector2 OldLinearVelocity = Vector2.Zero;
 }

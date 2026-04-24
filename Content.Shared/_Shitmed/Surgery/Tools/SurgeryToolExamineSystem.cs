@@ -21,7 +21,7 @@ using Robust.Shared.Utility;
 namespace Content.Shared._Shitmed.Medical.Surgery.Tools;
 
 /// <summary>
-///     Examining a surgical or ghetto tool shows everything it can be used for.
+/// Examining a surgical or ghetto tool shows everything it can be used for.
 /// </summary>
 public sealed class SurgeryToolExamineSystem : EntitySystem
 {
@@ -56,8 +56,11 @@ public sealed class SurgeryToolExamineSystem : EntitySystem
         var ev = new SurgeryToolExaminedEvent(msg);
         RaiseLocalEvent(ent, ref ev);
 
-        _examine.AddDetailedExamineVerb(args, ent.Comp, ev.Message,
-            Loc.GetString("surgery-tool-examinable-verb-text"), "/Textures/_Shitmed/Interface/Examine/scalpel.png",
+        _examine.AddDetailedExamineVerb(args,
+            ent.Comp,
+            ev.Message,
+            Loc.GetString("surgery-tool-examinable-verb-text"),
+            "/Textures/_Shitmed/Interface/Examine/scalpel.png",
             Loc.GetString("surgery-tool-examinable-verb-message"));
     }
 
@@ -68,7 +71,7 @@ public sealed class SurgeryToolExamineSystem : EntitySystem
         {
             < 1f => "red",
             > 1f => "green",
-            _ => "white"
+            _ => "white",
         };
         var key = "surgery-tool-" + (comp.Used == true ? "used" : "unlimited");
         var speed = comp.Speed.ToString("N2"); // 2 decimal places to not get trolled by float

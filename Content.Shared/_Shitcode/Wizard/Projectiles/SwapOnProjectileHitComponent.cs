@@ -12,18 +12,18 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Shared._Goobstation.Wizard.Projectiles;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class SwapOnProjectileHitComponent : Component
 {
     [DataField]
-    public SoundSpecifier? Sound;
+    public bool DeleteProjectileOnSwap;
 
     [DataField]
     public EntProtoId Effect = "SwapSpellEffect";
 
     [DataField]
-    public EntityWhitelist Whitelist;
+    public SoundSpecifier? Sound;
 
     [DataField]
-    public bool DeleteProjectileOnSwap;
+    public EntityWhitelist Whitelist;
 }

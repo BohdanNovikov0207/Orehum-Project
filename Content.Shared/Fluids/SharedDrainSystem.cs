@@ -13,7 +13,7 @@ namespace Content.Shared.Fluids;
 
 public abstract partial class SharedDrainSystem : EntitySystem
 {
-    [Serializable, NetSerializable]
+    [Serializable] [NetSerializable]
     public sealed partial class DrainDoAfterEvent : SimpleDoAfterEvent
     {
     }

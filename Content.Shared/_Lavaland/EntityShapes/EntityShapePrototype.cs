@@ -7,12 +7,12 @@ namespace Content.Shared._Lavaland.EntityShapes;
 /// Contains one or multiple EntityShapes to create a pattern.
 /// </summary>
 [Prototype]
-public sealed partial class EntityShapePrototype : IPrototype
+public sealed class EntityShapePrototype : IPrototype
 {
-    /// <inheritdoc/>
-    [IdDataField]
-    public string ID { get; } = default!;
-
     [DataField(required: true)]
     public EntityShape Shape = default!;
+
+    /// <inheritdoc />
+    [IdDataField]
+    public string ID { get; } = default!;
 }

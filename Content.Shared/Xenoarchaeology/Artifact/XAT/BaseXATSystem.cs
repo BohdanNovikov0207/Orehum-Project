@@ -14,7 +14,7 @@ public abstract class BaseXATSystem<T> : EntitySystem where T : Component
 
     private EntityQuery<XenoArtifactUnlockingComponent> _unlockingQuery;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
@@ -27,8 +27,7 @@ public abstract class BaseXATSystem<T> : EntitySystem where T : Component
     /// </summary>
     /// <typeparam name="TEvent">Type of event to sub for.</typeparam>
     /// <param name="eventHandler">Delegate that handles event.</param>
-    protected void XATSubscribeDirectEvent<TEvent>(XATEventHandler<TEvent> eventHandler) where TEvent : notnull
-    {
+    protected void XATSubscribeDirectEvent<TEvent>(XATEventHandler<TEvent> eventHandler) where TEvent : notnull =>
         SubscribeLocalEvent<T, XenoArchNodeRelayedEvent<TEvent>>((uid, component, args) =>
         {
             var nodeComp = Comp<XenoArtifactNodeComponent>(uid);
@@ -39,13 +38,12 @@ public abstract class BaseXATSystem<T> : EntitySystem where T : Component
             var node = new Entity<T, XenoArtifactNodeComponent>(uid, component, nodeComp);
             eventHandler.Invoke(args.Artifact, node, ref args.Args);
         });
-    }
 
     /// <summary>
     /// Checks if node can be triggered.
     /// </summary>
     /// <param name="artifact">Artifact entity.</param>
-    /// <param name="node">Node from <see cref="artifact"/>.</param>
+    /// <param name="node">Node from <see cref="artifact" />.</param>
     protected bool CanTrigger(Entity<XenoArtifactComponent> artifact, Entity<XenoArtifactNodeComponent> node)
     {
         if (Timing.CurTime < artifact.Comp.NextUnlockTime)

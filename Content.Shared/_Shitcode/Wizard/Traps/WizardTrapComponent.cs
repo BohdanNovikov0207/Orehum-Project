@@ -14,62 +14,62 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared._Goobstation.Wizard.Traps;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class WizardTrapComponent : Component
 {
-    [ViewVariables(VVAccess.ReadOnly), AutoNetworkedField]
-    public HashSet<EntityUid> IgnoredMinds = new();
-
-    [ViewVariables(VVAccess.ReadOnly), AutoNetworkedField]
-    public bool Triggered;
-
     [DataField]
-    public EntityWhitelist? TargetedEntityWhitelist;
+    public bool CanReveal = true;
 
-    [DataField]
-    public EntityWhitelist IgnoredEntityWhitelist = new();
-
-    [DataField]
-    public TimeSpan TimeBetweenTriggers = TimeSpan.FromSeconds(5);
-
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public int Charges = 1;
 
     [DataField]
     public EntProtoId? Effect;
 
     [DataField]
-    public SoundSpecifier? TriggerSound;
-
-    [DataField]
-    public bool CanReveal = true;
-
-    [DataField]
-    public bool Silent;
-
-    [DataField]
-    public TimeSpan StunTime = TimeSpan.FromSeconds(2);
-
-    [DataField]
-    public bool Sparks = true;
-
-    [DataField]
     public float ExamineRange = 1.2f;
 
     [DataField]
-    public int MinSparks = 3;
+    public EntityWhitelist IgnoredEntityWhitelist = new();
+
+    [ViewVariables(VVAccess.ReadOnly)] [AutoNetworkedField]
+    public HashSet<EntityUid> IgnoredMinds = new();
 
     [DataField]
     public int MaxSparks = 6;
 
     [DataField]
+    public float MaxVelocity = 4f;
+
+    [DataField]
+    public int MinSparks = 3;
+
+    [DataField]
     public float MinVelocity = 1f;
 
     [DataField]
-    public float MaxVelocity = 4f;
+    public bool Silent;
+
+    [DataField]
+    public bool Sparks = true;
+
+    [DataField]
+    public TimeSpan StunTime = TimeSpan.FromSeconds(2);
+
+    [DataField]
+    public EntityWhitelist? TargetedEntityWhitelist;
+
+    [DataField]
+    public TimeSpan TimeBetweenTriggers = TimeSpan.FromSeconds(5);
+
+    [ViewVariables(VVAccess.ReadOnly)] [AutoNetworkedField]
+    public bool Triggered;
+
+    [DataField]
+    public SoundSpecifier? TriggerSound;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum TrapVisuals : byte
 {
     Alpha,

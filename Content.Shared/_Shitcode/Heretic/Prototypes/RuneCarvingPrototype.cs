@@ -12,17 +12,17 @@ using Robust.Shared.Utility;
 namespace Content.Shared.Heretic.Prototypes;
 
 [Prototype("runeCarving")]
-public sealed partial class RuneCarvingPrototype : IPrototype
+public sealed class RuneCarvingPrototype : IPrototype
 {
-    [IdDataField]
-    public string ID { get; private set; } = default!;
+    [DataField(required: true)]
+    public string Desc = default!;
 
     [DataField(required: true)]
     public SpriteSpecifier Icon = default!;
 
     [DataField(required: true)]
-    public string Desc = default!;
-
-    [DataField(required: true)]
     public EntProtoId ProtoId;
+
+    [IdDataField]
+    public string ID { get; } = default!;
 }

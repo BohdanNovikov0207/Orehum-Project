@@ -12,14 +12,14 @@ namespace Content.Shared.Fluids;
 public abstract class SharedPuddleDebugOverlaySystem : EntitySystem
 {
     protected const float LocalViewRange = 16;
-    protected TimeSpan? NextTick = null;
     protected TimeSpan Cooldown = TimeSpan.FromSeconds(0.5f);
+    protected TimeSpan? NextTick = null;
 }
 
 /// <summary>
 /// Message for disable puddle overlay
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class PuddleOverlayDisableMessage : EntityEventArgs
 {
 }
@@ -27,22 +27,21 @@ public sealed class PuddleOverlayDisableMessage : EntityEventArgs
 /// <summary>
 /// Message for puddle overlay display data
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class PuddleOverlayDebugMessage : EntityEventArgs
 {
-    public PuddleDebugOverlayData[] OverlayData { get; }
-
-    public NetEntity GridUid { get; }
-
-
     public PuddleOverlayDebugMessage(NetEntity gridUid, PuddleDebugOverlayData[] overlayData)
     {
         GridUid = gridUid;
         OverlayData = overlayData;
     }
+
+    public PuddleDebugOverlayData[] OverlayData { get; }
+
+    public NetEntity GridUid { get; }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public readonly struct PuddleDebugOverlayData
 {
     public readonly Vector2i Pos;

@@ -1,16 +1,17 @@
-using Content.Shared.Popups;
 using Content.Shared.DoAfter;
-using Content.Shared.Forensics.Components;
-using Content.Shared.Verbs;
 using Content.Shared.Examine;
+using Content.Shared.Forensics.Components;
 using Content.Shared.IdentityManagement;
+using Content.Shared.Popups;
+using Content.Shared.Verbs;
 
 namespace Content.Shared._EinsteinEngines.Forensics.Systems;
 
 public abstract class SharedScentTrackerSystem : EntitySystem
 {
-    [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
     [Dependency] private readonly SharedDoAfterSystem _doAfterSystem = default!;
+    [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
+
     public override void Initialize()
     {
         SubscribeLocalEvent<ScentTrackerComponent, GetVerbsEvent<InnateVerb>>(AddVerbs);
@@ -35,7 +36,7 @@ public abstract class SharedScentTrackerSystem : EntitySystem
         {
             Act = () => AttemptTrackScent(uid, args.Target, component),
             Text = Loc.GetString("track-scent"),
-            Priority = 1
+            Priority = 1,
         };
         args.Verbs.Add(verbTrackScent);
     }
@@ -45,13 +46,22 @@ public abstract class SharedScentTrackerSystem : EntitySystem
         if (!HasComp<ScentTrackerComponent>(user))
             return;
 
-        var doAfterEventArgs = new DoAfterArgs(EntityManager, user, component.SniffDelay, new ScentTrackerDoAfterEvent(), user, target: target)
+        var doAfterEventArgs = new DoAfterArgs(EntityManager,
+            user,
+            component.SniffDelay,
+            new ScentTrackerDoAfterEvent(),
+            user,
+            target)
         {
             BreakOnMove = true,
             BreakOnDamage = true,
         };
 
-        _popupSystem.PopupPredicted(Loc.GetString("start-tracking-scent", ("user", Identity.Name(user, EntityManager)), ("target", Identity.Name(target, EntityManager))), user, user);
+        _popupSystem.PopupPredicted(Loc.GetString("start-tracking-scent",
+                ("user", Identity.Name(user, EntityManager)),
+                ("target", Identity.Name(target, EntityManager))),
+            user,
+            user);
         _doAfterSystem.TryStartDoAfter(doAfterEventArgs);
     }
 
@@ -77,7 +87,7 @@ public abstract class SharedScentTrackerSystem : EntitySystem
         {
             Act = () => StopTrackScent(uid, component),
             Text = Loc.GetString("stop-track-scent"),
-            Priority = 2
+            Priority = 2,
         };
         args.Verbs.Add(verbStopTrackScent);
     }
@@ -93,6 +103,7 @@ public abstract class SharedScentTrackerSystem : EntitySystem
     }
 
     #region Utilities
+
     public void TrackScent(EntityUid uid, EntityUid target)
     {
         if (!TryComp<ScentTrackerComponent>(uid, out var component)
@@ -102,7 +113,10 @@ public abstract class SharedScentTrackerSystem : EntitySystem
         if (forcomp.Scent != string.Empty)
         {
             component.Scent = forcomp.Scent;
-            _popupSystem.PopupPredicted(Loc.GetString("tracking-scent", ("target", Identity.Name(target, EntityManager))), uid, uid);
+            _popupSystem.PopupPredicted(
+                Loc.GetString("tracking-scent", ("target", Identity.Name(target, EntityManager))),
+                uid,
+                uid);
         }
         else
             _popupSystem.PopupPredicted(Loc.GetString("no-scent"), uid, uid);

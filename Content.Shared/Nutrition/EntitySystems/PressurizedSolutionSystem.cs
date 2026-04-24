@@ -5,34 +5,35 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Chemistry.Reagent;
 using Content.Shared.Chemistry.EntitySystems;
+using Content.Shared.Chemistry.Reagent;
+using Content.Shared.Fluids;
 using Content.Shared.Hands.EntitySystems;
-using Content.Shared.Nutrition.Components;
-using Content.Shared.Throwing;
 using Content.Shared.IdentityManagement;
+using Content.Shared.Nutrition.Components;
+using Content.Shared.Popups;
+using Content.Shared.Throwing;
 using Robust.Shared.Audio.Systems;
+using Robust.Shared.Network;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Timing;
-using Robust.Shared.Prototypes;
-using Robust.Shared.Network;
-using Content.Shared.Fluids;
-using Content.Shared.Popups;
 
 namespace Content.Shared.Nutrition.EntitySystems;
 
-public sealed partial class PressurizedSolutionSystem : EntitySystem
+public sealed class PressurizedSolutionSystem : EntitySystem
 {
-    [Dependency] private readonly SharedSolutionContainerSystem _solutionContainer = default!;
-    [Dependency] private readonly OpenableSystem _openable = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedHandsSystem _hands = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly SharedPuddleSystem _puddle = default!;
     [Dependency] private readonly INetManager _net = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly OpenableSystem _openable = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    [Dependency] private readonly SharedPuddleSystem _puddle = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly SharedSolutionContainerSystem _solutionContainer = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+
     public override void Initialize()
     {
         base.Initialize();
@@ -46,19 +47,17 @@ public sealed partial class PressurizedSolutionSystem : EntitySystem
 
     /// <summary>
     /// Helper method for checking if the solution's fizziness is high enough to spray.
-    /// <paramref name="chanceMod"/> is added to the actual fizziness for the comparison.
+    /// <paramref name="chanceMod" /> is added to the actual fizziness for the comparison.
     /// </summary>
-    private bool SprayCheck(Entity<PressurizedSolutionComponent> entity, float chanceMod = 0)
-    {
-        return Fizziness((entity, entity.Comp)) + chanceMod > entity.Comp.SprayFizzinessThresholdRoll;
-    }
+    private bool SprayCheck(Entity<PressurizedSolutionComponent> entity, float chanceMod = 0) =>
+        Fizziness((entity, entity.Comp)) + chanceMod > entity.Comp.SprayFizzinessThresholdRoll;
 
     /// <summary>
     /// Calculates how readily the contained solution becomes fizzy.
     /// </summary>
     private float SolutionFizzability(Entity<PressurizedSolutionComponent> entity)
     {
-        if (!_solutionContainer.TryGetSolution(entity.Owner, entity.Comp.Solution, out var _, out var solution))
+        if (!_solutionContainer.TryGetSolution(entity.Owner, entity.Comp.Solution, out _, out var solution))
             return 0;
 
         // An empty solution can't be fizzy
@@ -70,7 +69,8 @@ public sealed partial class PressurizedSolutionSystem : EntitySystem
         // Check each reagent in the solution
         foreach (var reagent in solution.Contents)
         {
-            if (_prototypeManager.TryIndex(reagent.Reagent.Prototype, out ReagentPrototype? reagentProto) && reagentProto != null)
+            if (_prototypeManager.TryIndex(reagent.Reagent.Prototype, out ReagentPrototype? reagentProto) &&
+                reagentProto != null)
             {
                 // What portion of the solution is this reagent?
                 var proportion = (float) (reagent.Quantity / solution.Volume);
@@ -123,9 +123,13 @@ public sealed partial class PressurizedSolutionSystem : EntitySystem
     }
 
     /// <summary>
-    /// Helper method. Performs a <see cref="SprayCheck"/>. If it passes, calls <see cref="TrySpray"/>. If it fails, <see cref="AddFizziness"/>.
+    /// Helper method. Performs a <see cref="SprayCheck" />. If it passes, calls <see cref="TrySpray" />. If it fails,
+    /// <see cref="AddFizziness" />.
     /// </summary>
-    private void SprayOrAddFizziness(Entity<PressurizedSolutionComponent> entity, float chanceMod = 0, float fizzinessToAdd = 0, EntityUid? user = null)
+    private void SprayOrAddFizziness(Entity<PressurizedSolutionComponent> entity,
+        float chanceMod = 0,
+        float fizzinessToAdd = 0,
+        EntityUid? user = null)
     {
         if (SprayCheck(entity, chanceMod))
             TrySpray((entity, entity.Comp), user);
@@ -135,10 +139,10 @@ public sealed partial class PressurizedSolutionSystem : EntitySystem
 
     /// <summary>
     /// Randomly generates a new spray threshold.
-    /// This is the value used to compare fizziness against when doing <see cref="SprayCheck"/>.
+    /// This is the value used to compare fizziness against when doing <see cref="SprayCheck" />.
     /// Since RNG will give different results between client and server, this is run on the server
     /// and synced to the client by marking the component dirty.
-    /// We roll this in advance, rather than during <see cref="SprayCheck"/>, so that the value (hopefully)
+    /// We roll this in advance, rather than during <see cref="SprayCheck" />, so that the value (hopefully)
     /// has time to get synced to the client, so we can try be accurate with prediction.
     /// </summary>
     private void RollSprayThreshold(Entity<PressurizedSolutionComponent> entity)
@@ -180,14 +184,14 @@ public sealed partial class PressurizedSolutionSystem : EntitySystem
             return false;
 
         // If the container is openable, open it
-        _openable.SetOpen(entity, true);
+        _openable.SetOpen(entity);
 
         // Get the spray solution from the container
         var solution = _solutionContainer.SplitSolution(soln.Value, interactions.Volume);
 
         // Spray the solution onto the ground and anyone nearby
         if (TryComp(entity, out TransformComponent? transform))
-            _puddle.TrySplashSpillAt(entity, transform.Coordinates, solution, out _, sound: false);
+            _puddle.TrySplashSpillAt(entity, transform.Coordinates, solution, out _, false);
 
         var drinkName = Identity.Entity(entity, EntityManager);
 
@@ -195,8 +199,12 @@ public sealed partial class PressurizedSolutionSystem : EntitySystem
         {
             var victimName = Identity.Entity(target.Value, EntityManager);
 
-            var selfMessage = Loc.GetString(entity.Comp.SprayHolderMessageSelf, ("victim", victimName), ("drink", drinkName));
-            var othersMessage = Loc.GetString(entity.Comp.SprayHolderMessageOthers, ("victim", victimName), ("drink", drinkName));
+            var selfMessage = Loc.GetString(entity.Comp.SprayHolderMessageSelf,
+                ("victim", victimName),
+                ("drink", drinkName));
+            var othersMessage = Loc.GetString(entity.Comp.SprayHolderMessageOthers,
+                ("victim", victimName),
+                ("drink", drinkName));
             _popup.PopupPredicted(selfMessage, othersMessage, target.Value, target.Value);
         }
         else
@@ -249,10 +257,9 @@ public sealed partial class PressurizedSolutionSystem : EntitySystem
     #endregion
 
     #region Event Handlers
-    private void OnMapInit(Entity<PressurizedSolutionComponent> entity, ref MapInitEvent args)
-    {
+
+    private void OnMapInit(Entity<PressurizedSolutionComponent> entity, ref MapInitEvent args) =>
         RollSprayThreshold(entity);
-    }
 
     private void OnOpened(Entity<PressurizedSolutionComponent> entity, ref OpenableOpenedEvent args)
     {
@@ -262,15 +269,11 @@ public sealed partial class PressurizedSolutionSystem : EntitySystem
         SprayOrAddFizziness(entity, entity.Comp.SprayChanceModOnOpened, -1, held ? args.User : null);
     }
 
-    private void OnShake(Entity<PressurizedSolutionComponent> entity, ref ShakeEvent args)
-    {
+    private void OnShake(Entity<PressurizedSolutionComponent> entity, ref ShakeEvent args) =>
         SprayOrAddFizziness(entity, entity.Comp.SprayChanceModOnShake, entity.Comp.FizzinessAddedOnShake, args.Shaker);
-    }
 
-    private void OnLand(Entity<PressurizedSolutionComponent> entity, ref LandEvent args)
-    {
+    private void OnLand(Entity<PressurizedSolutionComponent> entity, ref LandEvent args) =>
         SprayOrAddFizziness(entity, entity.Comp.SprayChanceModOnLand, entity.Comp.FizzinessAddedOnLand);
-    }
 
     private void OnSolutionUpdate(Entity<PressurizedSolutionComponent> entity, ref SolutionContainerChangedEvent args)
     {

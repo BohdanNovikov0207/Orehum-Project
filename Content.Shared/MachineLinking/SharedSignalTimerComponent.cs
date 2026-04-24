@@ -9,24 +9,24 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.MachineLinking;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum SignalTimerUiKey : byte
 {
-    Key
+    Key,
 }
 
 /// <summary>
 /// Represents a SignalTimerComponent state that can be sent to the client
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class SignalTimerBoundUserInterfaceState : BoundUserInterfaceState
 {
-    public string CurrentText;
     public TimeSpan CurrentDelay; // Mono
-    public bool ShowText;
-    public TimeSpan TriggerTime;
-    public bool TimerStarted;
+    public string CurrentText;
     public bool HasAccess;
+    public bool ShowText;
+    public bool TimerStarted;
+    public TimeSpan TriggerTime;
 
     public SignalTimerBoundUserInterfaceState(string currentText,
         TimeSpan currentDelay, // Mono
@@ -44,29 +44,29 @@ public sealed class SignalTimerBoundUserInterfaceState : BoundUserInterfaceState
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class SignalTimerTextChangedMessage : BoundUserInterfaceMessage
 {
-    public string Text { get; }
-
     public SignalTimerTextChangedMessage(string text)
     {
         Text = text;
     }
+
+    public string Text { get; }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class SignalTimerDelayChangedMessage : BoundUserInterfaceMessage
 {
-    public TimeSpan Delay { get; }
     public SignalTimerDelayChangedMessage(TimeSpan delay)
     {
         Delay = delay;
     }
+
+    public TimeSpan Delay { get; }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class SignalTimerStartMessage : BoundUserInterfaceMessage
 {
-
 }

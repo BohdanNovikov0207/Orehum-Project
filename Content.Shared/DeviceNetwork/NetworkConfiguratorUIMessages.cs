@@ -13,15 +13,15 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.DeviceNetwork;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum NetworkConfiguratorUiKey
 {
     List,
     Configure,
-    Link
+    Link,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum NetworkConfiguratorButtonKey
 {
     Set,
@@ -29,13 +29,13 @@ public enum NetworkConfiguratorButtonKey
     Edit,
     Clear,
     Copy,
-    Show
+    Show,
 }
 
 /// <summary>
 /// Message sent when the remove button for one device on the list was pressed
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class NetworkConfiguratorRemoveDeviceMessage : BoundUserInterfaceMessage
 {
     public readonly string Address;
@@ -49,12 +49,12 @@ public sealed class NetworkConfiguratorRemoveDeviceMessage : BoundUserInterfaceM
 /// <summary>
 /// Message sent when the clear button was pressed
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class NetworkConfiguratorClearDevicesMessage : BoundUserInterfaceMessage
 {
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class NetworkConfiguratorButtonPressedMessage : BoundUserInterfaceMessage
 {
     public readonly NetworkConfiguratorButtonKey ButtonKey;
@@ -65,17 +65,16 @@ public sealed class NetworkConfiguratorButtonPressedMessage : BoundUserInterface
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class NetworkConfiguratorClearLinksMessage : BoundUserInterfaceMessage
 {
-
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class NetworkConfiguratorToggleLinkMessage : BoundUserInterfaceMessage
 {
-    public readonly string Source;
     public readonly string Sink;
+    public readonly string Source;
 
     public NetworkConfiguratorToggleLinkMessage(string source, string sink)
     {
@@ -84,7 +83,7 @@ public sealed class NetworkConfiguratorToggleLinkMessage : BoundUserInterfaceMes
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class NetworkConfiguratorLinksSaveMessage : BoundUserInterfaceMessage
 {
     public readonly List<(string source, string sink)> Links;

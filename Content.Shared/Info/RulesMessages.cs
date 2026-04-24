@@ -16,7 +16,7 @@ using Robust.Shared.Serialization;
 namespace Content.Shared.Info;
 
 /// <summary>
-///  Sent by the server when the client connects to sync the client rules and displaying a popup with them if necessitated.
+/// Sent by the server when the client connects to sync the client rules and displaying a popup with them if necessitated.
 /// </summary>
 public sealed class SendRulesInformationMessage : NetMessage
 {
@@ -42,7 +42,7 @@ public sealed class SendRulesInformationMessage : NetMessage
 }
 
 /// <summary>
-///     Sent by the client when it has accepted the rules.
+/// Sent by the client when it has accepted the rules.
 /// </summary>
 public sealed class RulesAcceptedMessage : NetMessage
 {

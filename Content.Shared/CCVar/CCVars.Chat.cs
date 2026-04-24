@@ -11,27 +11,27 @@ namespace Content.Shared.CCVar;
 public sealed partial class CCVars
 {
     /// <summary>
-    ///     Chat rate limit values are accounted in periods of this size (seconds).
-    ///     After the period has passed, the count resets.
+    /// Chat rate limit values are accounted in periods of this size (seconds).
+    /// After the period has passed, the count resets.
     /// </summary>
-    /// <seealso cref="ChatRateLimitCount"/>
+    /// <seealso cref="ChatRateLimitCount" />
     public static readonly CVarDef<float> ChatRateLimitPeriod =
         CVarDef.Create("chat.rate_limit_period", 2f, CVar.SERVERONLY);
 
     /// <summary>
-    ///     How many chat messages are allowed in a single rate limit period.
+    /// How many chat messages are allowed in a single rate limit period.
     /// </summary>
     /// <remarks>
-    ///     The total rate limit throughput per second is effectively
-    ///     <see cref="ChatRateLimitCount"/> divided by <see cref="ChatRateLimitCount"/>.
+    /// The total rate limit throughput per second is effectively
+    /// <see cref="ChatRateLimitCount" /> divided by <see cref="ChatRateLimitCount" />.
     /// </remarks>
-    /// <seealso cref="ChatRateLimitPeriod"/>
+    /// <seealso cref="ChatRateLimitPeriod" />
     public static readonly CVarDef<int> ChatRateLimitCount =
         CVarDef.Create("chat.rate_limit_count", 10, CVar.SERVERONLY);
 
     /// <summary>
-    ///     Minimum delay (in seconds) between notifying admins about chat message rate limit violations.
-    ///     A negative value disables admin announcements.
+    /// Minimum delay (in seconds) between notifying admins about chat message rate limit violations.
+    /// A negative value disables admin announcements.
     /// </summary>
     public static readonly CVarDef<int> ChatRateLimitAnnounceAdminsDelay =
         CVarDef.Create("chat.rate_limit_announce_admins_delay", 15, CVar.SERVERONLY);
@@ -61,10 +61,10 @@ public sealed partial class CCVars
             "Toggles displaying a background under the speaking character's name.");
 
     /// <summary>
-    ///     A message broadcast to each player that joins the lobby.
-    ///     May be changed by admins ingame through use of the "set-motd" command.
-    ///     In this case the new value, if not empty, is broadcast to all connected players and saved between rounds.
-    ///     May be requested by any player through use of the "get-motd" command.
+    /// A message broadcast to each player that joins the lobby.
+    /// May be changed by admins ingame through use of the "set-motd" command.
+    /// In this case the new value, if not empty, is broadcast to all connected players and saved between rounds.
+    /// May be requested by any player through use of the "get-motd" command.
     /// </summary>
     public static readonly CVarDef<string> MOTD =
         CVarDef.Create("chat.motd",
@@ -76,34 +76,45 @@ public sealed partial class CCVars
     /// A string containing a list of newline-separated words to be highlighted in the chat.
     /// </summary>
     public static readonly CVarDef<string> ChatHighlights =
-        CVarDef.Create("chat.highlights", "", CVar.CLIENTONLY | CVar.ARCHIVE, "A list of newline-separated words to be highlighted in the chat.");
+        CVarDef.Create("chat.highlights",
+            "",
+            CVar.CLIENTONLY | CVar.ARCHIVE,
+            "A list of newline-separated words to be highlighted in the chat.");
 
     /// <summary>
     /// An option to toggle the automatic filling of the highlights with the character's info, if available.
     /// </summary>
     public static readonly CVarDef<bool> ChatAutoFillHighlights =
-        CVarDef.Create("chat.auto_fill_highlights", false, CVar.CLIENTONLY | CVar.ARCHIVE, "Toggles automatically filling the highlights with the character's information.");
+        CVarDef.Create("chat.auto_fill_highlights",
+            false,
+            CVar.CLIENTONLY | CVar.ARCHIVE,
+            "Toggles automatically filling the highlights with the character's information.");
 
     /// <summary>
     /// The color in which the highlights will be displayed.
     /// </summary>
     public static readonly CVarDef<string> ChatHighlightsColor =
-        CVarDef.Create("chat.highlights_color", "#17FFC1FF", CVar.CLIENTONLY | CVar.ARCHIVE, "The color in which the highlights will be displayed.");
+        CVarDef.Create("chat.highlights_color",
+            "#17FFC1FF",
+            CVar.CLIENTONLY | CVar.ARCHIVE,
+            "The color in which the highlights will be displayed.");
 
     #region Goobstation - Chat Highlight sounds!
+
     // Goobstation - Chat Highlight sounds!
     /// <summary>
-    ///     Whether to play a sound when a highlighted message is received.
+    /// Whether to play a sound when a highlighted message is received.
     /// </summary>
     public static readonly CVarDef<bool> ChatHighlightSound =
         CVarDef.Create("chat.highlight_sound", true, CVar.ARCHIVE | CVar.CLIENTONLY);
 
     /// <summary>
-    ///     Volume of the highlight sound when a highlighted message is received.
+    /// Volume of the highlight sound when a highlighted message is received.
     /// </summary>
     public static readonly CVarDef<float> ChatHighlightVolume =
         CVarDef.Create("chat.highlight_volume", 1.0f, CVar.ARCHIVE | CVar.CLIENTONLY);
-    // Goobstation - end
-    #endregion
 
+    // Goobstation - end
+
+    #endregion
 }

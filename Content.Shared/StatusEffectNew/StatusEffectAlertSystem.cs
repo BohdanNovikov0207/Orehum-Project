@@ -9,8 +9,8 @@ namespace Content.Shared.StatusEffectNew;
 /// </summary>
 public sealed class StatusEffectAlertSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly AlertsSystem _alerts = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     private EntityQuery<StatusEffectComponent> _effectQuery;
 
@@ -33,15 +33,11 @@ public sealed class StatusEffectAlertSystem : EntitySystem
         RefreshAlert(ent, args.Target, effectComp.EndEffectTime);
     }
 
-    private void OnStatusEffectRemoved(Entity<StatusEffectAlertComponent> ent, ref StatusEffectRemovedEvent args)
-    {
+    private void OnStatusEffectRemoved(Entity<StatusEffectAlertComponent> ent, ref StatusEffectRemovedEvent args) =>
         _alerts.ClearAlert(args.Target, ent.Comp.Alert);
-    }
 
-    private void OnEndTimeUpdated(Entity<StatusEffectAlertComponent> ent, ref StatusEffectEndTimeUpdatedEvent args)
-    {
+    private void OnEndTimeUpdated(Entity<StatusEffectAlertComponent> ent, ref StatusEffectEndTimeUpdatedEvent args) =>
         RefreshAlert(ent, args.Target, args.EndTime);
-    }
 
     private void RefreshAlert(Entity<StatusEffectAlertComponent> ent, EntityUid target, TimeSpan? endTime)
     {

@@ -34,32 +34,33 @@ namespace Content.Shared.Weapons.Marker;
 /// <summary>
 /// Marks an entity to take additional damage
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState(true), Access(typeof(SharedDamageMarkerSystem))]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState(true)] [Access(typeof(SharedDamageMarkerSystem))]
 [AutoGenerateComponentPause]
 public sealed partial class DamageMarkerComponent : Component
 {
+    [ViewVariables(VVAccess.ReadWrite)] [DataField("damage")]
+    public DamageSpecifier Damage = new();
+
     /// <summary>
     /// Sprite to apply to the entity while damagemarker is applied.
     /// </summary>
-    [ViewVariables(VVAccess.ReadWrite), DataField("effect"), AutoNetworkedField]
+    [ViewVariables(VVAccess.ReadWrite)] [DataField("effect")] [AutoNetworkedField]
     public SpriteSpecifier.Rsi? Effect = default!;
 
-    /// <summary>
-    /// Sound to play when the damage marker is procced.
-    /// </summary>
-    [ViewVariables(VVAccess.ReadWrite), DataField("sound"), AutoNetworkedField]
-    public SoundSpecifier? Sound;
-
-    [ViewVariables(VVAccess.ReadWrite), DataField("damage")]
-    public DamageSpecifier Damage = new();
+    [ViewVariables(VVAccess.ReadWrite)] [DataField("endTime", customTypeSerializer: typeof(TimeOffsetSerializer))]
+    [AutoNetworkedField]
+    [AutoPausedField]
+    public TimeSpan EndTime;
 
     /// <summary>
     /// Entity that marked this entity for a damage surplus.
     /// </summary>
-    [ViewVariables(VVAccess.ReadWrite), DataField("marker"), AutoNetworkedField]
+    [ViewVariables(VVAccess.ReadWrite)] [DataField("marker")] [AutoNetworkedField]
     public EntityUid Marker;
 
-    [ViewVariables(VVAccess.ReadWrite), DataField("endTime", customTypeSerializer:typeof(TimeOffsetSerializer)), AutoNetworkedField]
-    [AutoPausedField]
-    public TimeSpan EndTime;
+    /// <summary>
+    /// Sound to play when the damage marker is procced.
+    /// </summary>
+    [ViewVariables(VVAccess.ReadWrite)] [DataField("sound")] [AutoNetworkedField]
+    public SoundSpecifier? Sound;
 }

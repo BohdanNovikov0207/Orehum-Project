@@ -47,5 +47,5 @@ namespace Content.Shared.PowerCell.Components;
 /// Integrate PowerCellDraw and ItemToggle.
 /// Make toggling this item require power, and deactivates the item when power runs out.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class ToggleCellDrawComponent : Component;

@@ -7,7 +7,7 @@ namespace Content.Shared.SprayPainter.Components;
 /// <summary>
 /// Marks objects that can be painted with the spray painter.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class PaintableComponent : Component
 {
     /// <summary>

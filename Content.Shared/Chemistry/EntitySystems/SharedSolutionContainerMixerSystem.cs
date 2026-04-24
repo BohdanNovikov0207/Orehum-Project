@@ -18,19 +18,19 @@ using Robust.Shared.Timing;
 namespace Content.Shared.Chemistry.EntitySystems;
 
 /// <summary>
-/// This handles <see cref="SolutionContainerMixerComponent"/>
+/// This handles <see cref="SolutionContainerMixerComponent" />
 /// </summary>
 public abstract class SharedSolutionContainerMixerSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly INetManager _net = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedContainerSystem _container = default!;
+    [Dependency] private readonly INetManager _net = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly SharedSolutionContainerSystem _solution = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         SubscribeLocalEvent<SolutionContainerMixerComponent, ActivateInWorldEvent>(OnActivateInWorld);
@@ -52,10 +52,7 @@ public abstract class SharedSolutionContainerMixerSystem : EntitySystem
             args.Cancel();
     }
 
-    protected virtual bool HasPower(Entity<SolutionContainerMixerComponent> entity)
-    {
-        return true;
-    }
+    protected virtual bool HasPower(Entity<SolutionContainerMixerComponent> entity) => true;
 
     public void TryStartMix(Entity<SolutionContainerMixerComponent> entity, EntityUid? user)
     {

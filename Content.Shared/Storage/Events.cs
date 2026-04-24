@@ -11,7 +11,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Storage;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class AreaPickupDoAfterEvent : DoAfterEvent
 {
     [DataField("entities", required: true)]

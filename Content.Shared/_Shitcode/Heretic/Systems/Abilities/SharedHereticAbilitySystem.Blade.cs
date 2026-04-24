@@ -32,7 +32,7 @@ public abstract partial class SharedHereticAbilitySystem
         SubscribeLocalEvent<SilverMaelstromComponent, SlipAttemptEvent>(OnBladeSlipAttempt);
         SubscribeLocalEvent<SilverMaelstromComponent, GetClothingStunModifierEvent>(OnBladeStunModify);
         SubscribeLocalEvent<SilverMaelstromComponent, DropHandItemsEvent>(OnBladeDropItems,
-            before: new[] { typeof(SharedHandsSystem) });
+            new[] { typeof(SharedHandsSystem) });
         // Protective blades do that
         // SubscribeLocalEvent<SilverMaelstromComponent, BeforeHarmfulActionEvent>(OnBladeHarmfulAction);
 
@@ -44,10 +44,8 @@ public abstract partial class SharedHereticAbilitySystem
         SubscribeLocalEvent<RealignmentComponent, ComponentRemove>(OnComponentRemove);
     }
 
-    private void OnBladeDropItems(Entity<SilverMaelstromComponent> ent, ref DropHandItemsEvent args)
-    {
+    private void OnBladeDropItems(Entity<SilverMaelstromComponent> ent, ref DropHandItemsEvent args) =>
         args.Handled = true;
-    }
 
     private void OnComponentRemove(Entity<RealignmentComponent> ent, ref ComponentRemove args) =>
         _stam.ToggleStaminaDrain(ent, 0, false, true, ent.Comp.StaminaRegenKey);
@@ -69,15 +67,10 @@ public abstract partial class SharedHereticAbilitySystem
         args.Cancel();
     }
 
-    private void OnBladeStunModify(Entity<SilverMaelstromComponent> ent, ref GetClothingStunModifierEvent args)
-    {
+    private void OnBladeStunModify(Entity<SilverMaelstromComponent> ent, ref GetClothingStunModifierEvent args) =>
         args.Modifier *= 0.5f;
-    }
 
-    private void OnBladeSlipAttempt(EntityUid uid, Component component, SlipAttemptEvent args)
-    {
-        args.NoSlip = true;
-    }
+    private void OnBladeSlipAttempt(EntityUid uid, Component component, SlipAttemptEvent args) => args.NoSlip = true;
 
     private void OnBeforeBladeStatusEffect(EntityUid uid, Component component, ref BeforeOldStatusEffectAddedEvent args)
     {

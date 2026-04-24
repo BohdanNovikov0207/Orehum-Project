@@ -13,8 +13,6 @@
 
 
 using System.Numerics;
-using System.Security.Cryptography;
-using Microsoft.VisualBasic.CompilerServices;
 
 namespace Content.Shared.Humanoid;
 
@@ -38,23 +36,21 @@ public static class SkinColor
     public const float MinAnimalFurSaturation = 0f / 100;
     public const float MaxAnimalFurSaturation = 100f / 100;
     public const float MinAnimalFurValue = 0f / 100;
+
     public const float MaxAnimalFurValue = 100f / 100;
     // Goobstation Section End - Tajaran
 
     public static Color ValidHumanSkinTone => Color.FromHsv(new Vector4(0.07f, 0.2f, 1f, 1f));
 
     /// <summary>
-    ///     Turn a color into a valid tinted hue skin tone.
+    /// Turn a color into a valid tinted hue skin tone.
     /// </summary>
     /// <param name="color">The color to validate</param>
     /// <returns>Validated tinted hue skin tone</returns>
-    public static Color ValidTintedHuesSkinTone(Color color)
-    {
-        return TintedHues(color);
-    }
+    public static Color ValidTintedHuesSkinTone(Color color) => TintedHues(color);
 
     /// <summary>
-    ///     Get a human skin tone based on a scale of 0 to 100. The value is clamped between 0 and 100.
+    /// Get a human skin tone based on a scale of 0 to 100. The value is clamped between 0 and 100.
     /// </summary>
     /// <param name="tone">Skin tone. Valid range is 0 to 100, inclusive. 0 is gold/yellowish, 100 is dark brown.</param>
     /// <returns>A human skin tone.</returns>
@@ -78,9 +74,7 @@ public static class SkinColor
         float val = 100;
 
         if (rangeOffset <= 0)
-        {
             hue += Math.Abs(rangeOffset);
-        }
         else
         {
             sat += rangeOffset;
@@ -93,13 +87,13 @@ public static class SkinColor
     }
 
     /// <summary>
-    ///     Gets a human skin tone from a given color.
+    /// Gets a human skin tone from a given color.
     /// </summary>
     /// <param name="color"></param>
     /// <returns></returns>
     /// <remarks>
-    ///     Does not cause an exception if the color is not originally from the human color range.
-    ///     Instead, it will return the approximation of the skin tone value.
+    /// Does not cause an exception if the color is not originally from the human color range.
+    /// Instead, it will return the approximation of the skin tone value.
     /// </remarks>
     public static float HumanSkinToneFromColor(Color color)
     {
@@ -109,18 +103,13 @@ public static class SkinColor
         // then it'll be hue
         if (Math.Clamp(hsv.X, 25f / 360f, 1) > 25f / 360f
             && hsv.Z == 1.0)
-        {
-            return Math.Abs(45 - (hsv.X * 360));
-        }
+            return Math.Abs(45 - hsv.X * 360);
         // otherwise it'll directly be the saturation
-        else
-        {
-            return hsv.Y * 100;
-        }
+        return hsv.Y * 100;
     }
 
     /// <summary>
-    ///     Verify if a color is in the human skin tone range.
+    /// Verify if a color is in the human skin tone range.
     /// </summary>
     /// <param name="color">The color to verify</param>
     /// <returns>True if valid, false otherwise.</returns>
@@ -134,23 +123,19 @@ public static class SkinColor
         // rangeOffset makes it so that this value
         // is 25 <= hue <= 45
         if (hue < 25 || hue > 45)
-        {
             return false;
-        }
 
         // rangeOffset makes it so that these two values
         // are 20 <= sat <= 100 and 20 <= val <= 100
         // where saturation increases to 100 and value decreases to 20
         if (sat < 20 || val < 20)
-        {
             return false;
-        }
 
         return true;
     }
 
     /// <summary>
-    ///     Convert a color to the 'tinted hues' skin tone type.
+    /// Convert a color to the 'tinted hues' skin tone type.
     /// </summary>
     /// <param name="color">Color to convert</param>
     /// <returns>Tinted hue color</returns>
@@ -164,19 +149,17 @@ public static class SkinColor
     }
 
     /// <summary>
-    ///     Verify if this color is a valid tinted hue color type, or not.
+    /// Verify if this color is a valid tinted hue color type, or not.
     /// </summary>
     /// <param name="color">The color to verify</param>
     /// <returns>True if valid, false otherwise</returns>
-    public static bool VerifyTintedHues(Color color)
-    {
+    public static bool VerifyTintedHues(Color color) =>
         // tinted hues just ensures saturation is always .1, or 10% saturation at all times
-        return Color.ToHsl(color).Y <= MaxTintedHuesSaturation && Color.ToHsl(color).Z >= MinTintedHuesLightness;
-    }
+        Color.ToHsl(color).Y <= MaxTintedHuesSaturation && Color.ToHsl(color).Z >= MinTintedHuesLightness;
 
     /// <summary>
-    ///     Converts a Color proportionally to the allowed vox color range.
-    ///     Will NOT preserve the specific input color even if it is within the allowed vox color range.
+    /// Converts a Color proportionally to the allowed vox color range.
+    /// Will NOT preserve the specific input color even if it is within the allowed vox color range.
     /// </summary>
     /// <param name="color">Color to convert</param>
     /// <returns>Vox feather coloration</returns>
@@ -208,7 +191,7 @@ public static class SkinColor
     }
 
     /// <summary>
-    ///     Verify if this color is a valid vox feather coloration, or not.
+    /// Verify if this color is a valid vox feather coloration, or not.
     /// </summary>
     /// <param name="color">The color to verify</param>
     /// <returns>True if valid, false otherwise</returns>
@@ -230,8 +213,8 @@ public static class SkinColor
 
     /// Goobstation Section Start - Tajaran
     /// <summary>
-    ///     Converts a Color proportionally to the allowed animal fur color range.
-    ///     Will NOT preserve the specific input color even if it is within the allowed animal fur color range.
+    /// Converts a Color proportionally to the allowed animal fur color range.
+    /// Will NOT preserve the specific input color even if it is within the allowed animal fur color range.
     /// </summary>
     /// <param name="color">Color to convert</param>
     /// <returns>Animal fur coloration</returns>
@@ -263,7 +246,7 @@ public static class SkinColor
     }
 
     /// <summary>
-    ///     Verify if this color is a valid animal fur coloration, or not.
+    /// Verify if this color is a valid animal fur coloration, or not.
     /// </summary>
     /// <param name="color">The color to verify</param>
     /// <returns>True if valid, false otherwise</returns>
@@ -282,13 +265,16 @@ public static class SkinColor
 
         return true;
     }
-    /// Goobstation Section End - Tajaran
 
+    /// Goobstation Section End - Tajaran
     /// <summary>
-    ///     This takes in a color, and returns a color guaranteed to be above MinHuesLightness
+    /// This takes in a color, and returns a color guaranteed to be above MinHuesLightness
     /// </summary>
     /// <param name="color"></param>
-    /// <returns>Either the color as-is if it's above MinHuesLightness, or the color with luminosity increased above MinHuesLightness</returns>
+    /// <returns>
+    /// Either the color as-is if it's above MinHuesLightness, or the color with luminosity increased above
+    /// MinHuesLightness
+    /// </returns>
     public static Color MakeHueValid(Color color)
     {
         var manipulatedColor = Color.ToHsv(color);
@@ -297,18 +283,14 @@ public static class SkinColor
     }
 
     /// <summary>
-    ///     Verify if this color is above a minimum luminosity
+    /// Verify if this color is above a minimum luminosity
     /// </summary>
     /// <param name="color"></param>
     /// <returns>True if valid, false if not</returns>
-    public static bool VerifyHues(Color color)
-    {
-        return Color.ToHsv(color).Z >= MinHuesLightness;
-    }
+    public static bool VerifyHues(Color color) => Color.ToHsv(color).Z >= MinHuesLightness;
 
-    public static bool VerifySkinColor(HumanoidSkinColor type, Color color)
-    {
-        return type switch
+    public static bool VerifySkinColor(HumanoidSkinColor type, Color color) =>
+        type switch
         {
             HumanoidSkinColor.HumanToned => VerifyHumanSkinTone(color),
             HumanoidSkinColor.TintedHues => VerifyTintedHues(color),
@@ -317,20 +299,17 @@ public static class SkinColor
             HumanoidSkinColor.AnimalFur => VerifyAnimalFur(color),
             _ => false,
         };
-    }
 
-    public static Color ValidSkinTone(HumanoidSkinColor type, Color color)
-    {
-        return type switch
+    public static Color ValidSkinTone(HumanoidSkinColor type, Color color) =>
+        type switch
         {
             HumanoidSkinColor.HumanToned => ValidHumanSkinTone,
             HumanoidSkinColor.TintedHues => ValidTintedHuesSkinTone(color),
             HumanoidSkinColor.Hues => MakeHueValid(color),
             HumanoidSkinColor.VoxFeathers => ClosestVoxColor(color),
             HumanoidSkinColor.AnimalFur => ClosestAnimalFurColor(color),
-            _ => color
+            _ => color,
         };
-    }
 }
 
 public enum HumanoidSkinColor : byte

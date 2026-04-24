@@ -81,7 +81,7 @@ using Content.Shared.Weapons.Ranged.Systems;
 namespace Content.Shared.Weapons.Ranged.Components;
 
 /// <summary>
-///     Handles pulling entities from the given container to use as ammunition.
+/// Handles pulling entities from the given container to use as ammunition.
 /// </summary>
 [RegisterComponent]
 [Access(typeof(SharedGunSystem))]

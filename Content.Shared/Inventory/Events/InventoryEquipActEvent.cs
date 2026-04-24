@@ -14,16 +14,20 @@ namespace Content.Shared.Inventory.Events;
 /// <summary>
 /// This event is used to tell the server-inventorysystem someone wants to equip something
 /// </summary>
-[NetSerializable, Serializable]
+[NetSerializable] [Serializable]
 public sealed class InventoryEquipActEvent : EntityEventArgs
 {
-    public readonly NetEntity Uid;
-    public readonly NetEntity ItemUid;
-    public readonly string Slot;
-    public readonly bool Silent;
     public readonly bool Force;
+    public readonly NetEntity ItemUid;
+    public readonly bool Silent;
+    public readonly string Slot;
+    public readonly NetEntity Uid;
 
-    public InventoryEquipActEvent(NetEntity uid, NetEntity itemUid, string slot, bool silent = false, bool force = false)
+    public InventoryEquipActEvent(NetEntity uid,
+        NetEntity itemUid,
+        string slot,
+        bool silent = false,
+        bool force = false)
     {
         Uid = uid;
         ItemUid = itemUid;

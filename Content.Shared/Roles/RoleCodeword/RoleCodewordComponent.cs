@@ -12,18 +12,19 @@ namespace Content.Shared.Roles.RoleCodeword;
 /// <summary>
 /// Used to display and highlight codewords in chat messages on the client.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState, Access(typeof(SharedRoleCodewordSystem), Other = AccessPermissions.Read)]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
+[Access(typeof(SharedRoleCodewordSystem), Other = AccessPermissions.Read)]
 public sealed partial class RoleCodewordComponent : Component
 {
     /// <summary>
     /// Contains the codewords tied to a role.
     /// Key string should be unique for the role.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public Dictionary<string, CodewordsData> RoleCodewords = new();
 }
 
-[DataDefinition, Serializable, NetSerializable]
+[DataDefinition] [Serializable] [NetSerializable]
 public partial struct CodewordsData
 {
     [DataField]

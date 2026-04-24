@@ -18,50 +18,30 @@ namespace Content.Shared.Nutrition.Components;
 /// A drink or food that can be opened.
 /// Starts closed, open it with Z or E.
 /// </summary>
-[NetworkedComponent, AutoGenerateComponentState]
-[RegisterComponent, Access(typeof(OpenableSystem))]
+[NetworkedComponent] [AutoGenerateComponentState]
+[RegisterComponent] [Access(typeof(OpenableSystem))]
 public sealed partial class OpenableComponent : Component
 {
     /// <summary>
-    /// Whether this drink or food is opened or not.
-    /// Drinks can only be drunk or poured from/into when open, and food can only be eaten when open.
+    /// Can this item be closed again after opening?
     /// </summary>
-    [DataField, AutoNetworkedField]
-    public bool Opened;
-
-    /// <summary>
-    /// If this is false you cant press Z to open it.
-    /// Requires an OpenBehavior damage threshold or other logic to open.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public bool OpenableByHand = true;
-
-    /// <summary>
-    /// If true, tries to open when activated in world.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public bool OpenOnActivate;
-
-    /// <summary>
-    /// Text shown when examining and its open.
-    /// </summary>
-    [DataField]
-    public LocId ExamineText = "openable-component-on-examine-is-opened";
+    [DataField] [AutoNetworkedField]
+    public bool Closeable;
 
     /// <summary>
     /// The locale id for the popup shown when IsClosed is called and closed. Needs a "owner" entity argument passed to it.
     /// Defaults to the popup drink uses since its "correct".
-    /// It's still generic enough that you should change it if you make openable non-drinks, i.e. unwrap it first, peel it first.
+    /// It's still generic enough that you should change it if you make openable non-drinks, i.e. unwrap it first, peel it
+    /// first.
     /// </summary>
     [DataField]
     public LocId ClosedPopup = "openable-component-try-use-closed";
 
     /// <summary>
-    /// Text to show in the verb menu for the "Open" action.
-    /// You may want to change this for non-drinks, i.e. "Peel", "Unwrap"
+    /// Sound played when closing.
     /// </summary>
     [DataField]
-    public LocId OpenVerbText = "openable-component-verb-open";
+    public SoundSpecifier? CloseSound;
 
     /// <summary>
     /// Text to show in the verb menu for the "Close" action.
@@ -71,20 +51,41 @@ public sealed partial class OpenableComponent : Component
     public LocId CloseVerbText = "openable-component-verb-close";
 
     /// <summary>
+    /// Text shown when examining and its open.
+    /// </summary>
+    [DataField]
+    public LocId ExamineText = "openable-component-on-examine-is-opened";
+
+    /// <summary>
+    /// If this is false you cant press Z to open it.
+    /// Requires an OpenBehavior damage threshold or other logic to open.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public bool OpenableByHand = true;
+
+    /// <summary>
+    /// Whether this drink or food is opened or not.
+    /// Drinks can only be drunk or poured from/into when open, and food can only be eaten when open.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public bool Opened;
+
+    /// <summary>
+    /// If true, tries to open when activated in world.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public bool OpenOnActivate;
+
+    /// <summary>
+    /// Text to show in the verb menu for the "Open" action.
+    /// You may want to change this for non-drinks, i.e. "Peel", "Unwrap"
+    /// </summary>
+    [DataField]
+    public LocId OpenVerbText = "openable-component-verb-open";
+
+    /// <summary>
     /// Sound played when opening.
     /// </summary>
     [DataField]
     public SoundSpecifier? Sound = new SoundCollectionSpecifier("canOpenSounds");
-
-    /// <summary>
-    /// Can this item be closed again after opening?
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public bool Closeable;
-
-    /// <summary>
-    /// Sound played when closing.
-    /// </summary>
-    [DataField]
-    public SoundSpecifier? CloseSound;
 }

@@ -1,5 +1,4 @@
 using Content.Shared.EntityTable;
-using Content.Shared.Storage;
 using Robust.Shared.Prototypes;
 
 namespace Content.Shared.Procedural.PostGeneration;
@@ -12,6 +11,6 @@ public sealed partial class CornerClutterDunGen : IDunGenLayer
     [DataField]
     public float Chance = 0.50f;
 
-    [DataField(required:true)]
+    [DataField(required: true)]
     public ProtoId<EntityTablePrototype> Contents = new();
 }

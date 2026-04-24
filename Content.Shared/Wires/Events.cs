@@ -10,7 +10,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Wires;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class WireDoAfterEvent : DoAfterEvent
 {
     [DataField("action", required: true)]

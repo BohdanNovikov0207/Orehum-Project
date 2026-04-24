@@ -7,8 +7,8 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.MedicalScanner;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum HealthAnalyzerUiKey : byte
 {
-    Key
+    Key,
 }

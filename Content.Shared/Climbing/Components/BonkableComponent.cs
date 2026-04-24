@@ -14,21 +14,21 @@ using Robust.Shared.GameStates;
 namespace Content.Shared.Climbing.Components;
 
 /// <summary>
-///     Makes entity do damage and stun entities with ClumsyComponent
-///     upon DragDrop or Climb interactions.
+/// Makes entity do damage and stun entities with ClumsyComponent
+/// upon DragDrop or Climb interactions.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class BonkableComponent : Component
 {
     /// <summary>
-    ///     How long to stun players on bonk, in seconds.
-    /// </summary>
-    [DataField]
-    public TimeSpan BonkTime = TimeSpan.FromSeconds(2);
-
-    /// <summary>
-    ///     How much damage to apply on bonk.
+    /// How much damage to apply on bonk.
     /// </summary>
     [DataField]
     public DamageSpecifier? BonkDamage;
+
+    /// <summary>
+    /// How long to stun players on bonk, in seconds.
+    /// </summary>
+    [DataField]
+    public TimeSpan BonkTime = TimeSpan.FromSeconds(2);
 }

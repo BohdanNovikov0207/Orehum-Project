@@ -10,7 +10,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.CartridgeLoader;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class CartridgeUiMessage : BoundUserInterfaceMessage
 {
     public CartridgeMessageEvent MessageEvent;
@@ -21,13 +21,14 @@ public sealed class CartridgeUiMessage : BoundUserInterfaceMessage
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public abstract class CartridgeMessageEvent : EntityEventArgs
 {
     [NonSerialized]
-    public EntityUid User;
+    public EntityUid Actor;
+
     public NetEntity LoaderUid;
 
     [NonSerialized]
-    public EntityUid Actor;
+    public EntityUid User;
 }

@@ -3,8 +3,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Weapons.Ranged.Events;
 using Content.Shared._DV.Weapons.Ranged.Components;
+using Content.Shared.Weapons.Ranged.Events;
 using Content.Shared.Whitelist;
 
 namespace Content.Shared._DV.Weapons.Ranged.Systems;

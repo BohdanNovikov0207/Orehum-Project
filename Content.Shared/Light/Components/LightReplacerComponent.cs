@@ -30,32 +30,24 @@ using Robust.Shared.Prototypes;
 namespace Content.Shared.Light.Components;
 
 /// <summary>
-///     Device that allows user to quikly change bulbs in <see cref="PoweredLightComponent"/>
-///     Can be reloaded by new light tubes or light bulbs
+/// Device that allows user to quikly change bulbs in <see cref="PoweredLightComponent" />
+/// Can be reloaded by new light tubes or light bulbs
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(SharedLightReplacerSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(SharedLightReplacerSystem))]
 public sealed partial class LightReplacerComponent : Component
 {
-    [DataField("sound")]
-    public SoundSpecifier Sound = new SoundPathSpecifier("/Audio/Weapons/click.ogg")
-    {
-        Params = new()
-        {
-            Volume = -4f
-        }
-    };
-
-    /// <summary>
-    /// Bulbs that were inserted inside light replacer
-    /// </summary>
-    [ViewVariables]
-    public Container InsertedBulbs = default!;
-
     /// <summary>
     /// The default starting bulbs
     /// </summary>
     [DataField("contents")]
     public List<EntitySpawnEntry> Contents = new();
+
+    /// <summary>
+    /// Goobstation
+    /// How much glass given per bulb recycled.
+    /// </summary>
+    [DataField]
+    public float GlassPerBulb = 0.25f;
 
     /// <summary>
     /// Goobstation
@@ -73,11 +65,10 @@ public sealed partial class LightReplacerComponent : Component
     public float GlassRequired = 1f;
 
     /// <summary>
-    /// Goobstation
-    /// How much glass given per bulb recycled.
+    /// Bulbs that were inserted inside light replacer
     /// </summary>
-    [DataField]
-    public float GlassPerBulb = 0.25f;
+    [ViewVariables]
+    public Container InsertedBulbs = default!;
 
     /// <summary>
     /// Goobstation
@@ -85,4 +76,13 @@ public sealed partial class LightReplacerComponent : Component
     /// </summary>
     [DataField]
     public EntProtoId LightBulbProto = "LedLightTube";
+
+    [DataField("sound")]
+    public SoundSpecifier Sound = new SoundPathSpecifier("/Audio/Weapons/click.ogg")
+    {
+        Params = new AudioParams
+        {
+            Volume = -4f,
+        },
+    };
 }

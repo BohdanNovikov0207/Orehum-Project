@@ -13,16 +13,10 @@ namespace Content.Shared.Guidebook;
 /// Used by GuidebookDataSystem to hold data extracted from prototype values,
 /// both for storage and for network transmission.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 [DataDefinition]
 public sealed partial class GuidebookData
 {
-    /// <summary>
-    /// Total number of data values stored.
-    /// </summary>
-    [DataField]
-    public int Count { get; private set; }
-
     /// <summary>
     /// The data extracted by the system.
     /// </summary>
@@ -42,6 +36,12 @@ public sealed partial class GuidebookData
     /// This should only be done on clients, as FrozenDictionary isn't serializable.
     /// </summary>
     public bool IsFrozen;
+
+    /// <summary>
+    /// Total number of data values stored.
+    /// </summary>
+    [DataField]
+    public int Count { get; private set; }
 
     /// <summary>
     /// Adds a new value using the given identifiers.
@@ -67,9 +67,7 @@ public sealed partial class GuidebookData
         if (FrozenData.TryGetValue(prototype, out var p)
             && p.TryGetValue(component, out var c)
             && c.TryGetValue(field, out value))
-        {
             return true;
-        }
 
         value = null;
         return false;
@@ -93,11 +91,13 @@ public sealed partial class GuidebookData
             var comps = new Dictionary<string, FrozenDictionary<string, object?>>();
             foreach (var (compId, compData) in protoData)
             {
-                comps.Add(compId, FrozenDictionary.ToFrozenDictionary(compData));
+                comps.Add(compId, compData.ToFrozenDictionary());
             }
-            protos.Add(protoId, FrozenDictionary.ToFrozenDictionary(comps));
+
+            protos.Add(protoId, comps.ToFrozenDictionary());
         }
-        FrozenData = FrozenDictionary.ToFrozenDictionary(protos);
+
+        FrozenData = protos.ToFrozenDictionary();
         Data.Clear();
         IsFrozen = true;
     }

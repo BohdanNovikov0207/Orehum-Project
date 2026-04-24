@@ -11,27 +11,27 @@ using Robust.Shared.Serialization;
 namespace Content.Shared.Dataset;
 
 /// <summary>
-/// A variant of <see cref="DatasetPrototype"/> intended to specify a sequence of LocId strings
+/// A variant of <see cref="DatasetPrototype" /> intended to specify a sequence of LocId strings
 /// without having to copy-paste a ton of LocId strings into the YAML.
 /// </summary>
 [Prototype]
-public sealed partial class LocalizedDatasetPrototype : IPrototype
+public sealed class LocalizedDatasetPrototype : IPrototype
 {
-    /// <summary>
-    /// Identifier for this prototype.
-    /// </summary>
-    [ViewVariables]
-    [IdDataField]
-    public string ID { get; private set; } = default!;
-
     /// <summary>
     /// Collection of LocId strings.
     /// </summary>
     [DataField]
     public LocalizedDatasetValues Values { get; private set; } = [];
+
+    /// <summary>
+    /// Identifier for this prototype.
+    /// </summary>
+    [ViewVariables]
+    [IdDataField]
+    public string ID { get; } = default!;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 [DataDefinition]
 public sealed partial class LocalizedDatasetValues : IReadOnlyList<string>
 {
@@ -59,21 +59,14 @@ public sealed partial class LocalizedDatasetValues : IReadOnlyList<string>
         }
     }
 
-    public IEnumerator<string> GetEnumerator()
-    {
-        return new Enumerator(this);
-    }
+    public IEnumerator<string> GetEnumerator() => new Enumerator(this);
 
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        return GetEnumerator();
-    }
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     public sealed class Enumerator : IEnumerator<string>
     {
-        private int _index = 0; // Whee, 1-indexing
-
         private readonly LocalizedDatasetValues _values;
+        private int _index; // Whee, 1-indexing
 
         public Enumerator(LocalizedDatasetValues values)
         {
@@ -92,9 +85,6 @@ public sealed partial class LocalizedDatasetValues : IReadOnlyList<string>
             return _index <= _values.Count;
         }
 
-        public void Reset()
-        {
-            _index = 0;
-        }
+        public void Reset() => _index = 0;
     }
 }

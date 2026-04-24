@@ -78,7 +78,8 @@ public abstract class SharedObjectivesSystem : EntitySystem
 
         if (!CanBeAssigned(uid, mindId, mind, comp))
         {
-            Log.Warning($"Objective {proto} did not match the requirements for {_mind.MindOwnerLoggingString(mind)}, deleted it");
+            Log.Warning(
+                $"Objective {proto} did not match the requirements for {_mind.MindOwnerLoggingString(mind)}, deleted it");
             return null;
         }
 
@@ -104,25 +105,33 @@ public abstract class SharedObjectivesSystem : EntitySystem
     /// The objective is not added to the mind's objectives, mind system does that in TryAddObjective.
     /// If the objective could not be assigned the objective is deleted and false is returned.
     /// </summary>
-    public bool TryCreateObjective(Entity<MindComponent> mind, EntProtoId proto, [NotNullWhen(true)] out EntityUid? objective)
+    public bool TryCreateObjective(Entity<MindComponent> mind,
+        EntProtoId proto,
+        [NotNullWhen(true)] out EntityUid? objective)
     {
         objective = TryCreateObjective(mind.Owner, mind.Comp, proto);
         return objective != null;
     }
 
     /// <summary>
-    /// Get the title, description, icon and progress of an objective using <see cref="ObjectiveGetInfoEvent"/>.
+    /// Get the title, description, icon and progress of an objective using <see cref="ObjectiveGetInfoEvent" />.
     /// If any of them are null it is logged and null is returned.
     /// </summary>
-    /// <param name="uid"/>ID of the condition entity</param>
-    /// <param name="mindId"/>ID of the player's mind entity</param>
-    /// <param name="mind"/>Mind component of the player's mind</param>
+    /// <param name="uid" />
+    /// ID of the condition entity
+    /// </param>
+    /// <param name="mindId" />
+    /// ID of the player's mind entity
+    /// </param>
+    /// <param name="mind" />
+    /// Mind component of the player's mind
+    /// </param>
     public ObjectiveInfo? GetInfo(EntityUid uid, EntityUid mindId, MindComponent? mind = null)
     {
         if (!Resolve(mindId, ref mind))
             return null;
 
-        if (GetProgress(uid, (mindId, mind)) is not {} progress)
+        if (GetProgress(uid, (mindId, mind)) is not { } progress)
             return null;
 
         var comp = Comp<ObjectiveComponent>(uid);
@@ -131,15 +140,21 @@ public abstract class SharedObjectivesSystem : EntitySystem
         var description = meta.EntityDescription;
         if (comp.Icon == null)
         {
-            Log.Error($"An objective {ToPrettyString(uid):objective} of {_mind.MindOwnerLoggingString(mind)} is missing an icon!");
+            Log.Error(
+                $"An objective {ToPrettyString(uid):objective} of {_mind.MindOwnerLoggingString(mind)} is missing an icon!");
             return null;
         }
 
-        return new ObjectiveInfo(title, description, comp.Icon, progress,comp.ServerCurrency, comp.ServerCurrencyRewardPartial); //goobstation
+        return new ObjectiveInfo(title,
+            description,
+            comp.Icon,
+            progress,
+            comp.ServerCurrency,
+            comp.ServerCurrencyRewardPartial); //goobstation
     }
 
     /// <summary>
-    /// Gets the progress of an objective using <see cref="ObjectiveGetProgressEvent"/>.
+    /// Gets the progress of an objective using <see cref="ObjectiveGetProgressEvent" />.
     /// Returning null is a programmer error.
     /// </summary>
     public float? GetProgress(EntityUid uid, Entity<MindComponent> mind)
@@ -149,21 +164,19 @@ public abstract class SharedObjectivesSystem : EntitySystem
         if (ev.Progress != null)
             return ev.Progress;
 
-        Log.Error($"Objective {ToPrettyString(uid):objective} of {_mind.MindOwnerLoggingString(mind.Comp)} didn't set a progress value!");
+        Log.Error(
+            $"Objective {ToPrettyString(uid):objective} of {_mind.MindOwnerLoggingString(mind.Comp)} didn't set a progress value!");
         return null;
     }
 
     /// <summary>
     /// Returns true if an objective is completed.
     /// </summary>
-    public bool IsCompleted(EntityUid uid, Entity<MindComponent> mind)
-    {
-        return (GetProgress(uid, mind) ?? 0f) >= 0.999f;
-    }
+    public bool IsCompleted(EntityUid uid, Entity<MindComponent> mind) => (GetProgress(uid, mind) ?? 0f) >= 0.999f;
 
     /// <summary>
     /// Sets the objective's icon to the one specified.
-    /// Intended for <see cref="ObjectiveAfterAssignEvent"/> handlers to set an icon.
+    /// Intended for <see cref="ObjectiveAfterAssignEvent" /> handlers to set an icon.
     /// </summary>
     public void SetIcon(EntityUid uid, SpriteSpecifier icon, ObjectiveComponent? comp = null)
     {

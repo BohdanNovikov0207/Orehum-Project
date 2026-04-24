@@ -8,6 +8,7 @@
 using Content.Shared.Actions;
 
 namespace Content.Shared.Jaunt;
+
 public sealed class JauntSystem : EntitySystem
 {
     [Dependency] private readonly SharedActionsSystem _actions = default!;
@@ -19,14 +20,9 @@ public sealed class JauntSystem : EntitySystem
         SubscribeLocalEvent<JauntComponent, ComponentShutdown>(OnShutdown);
     }
 
-    private void OnInit(Entity<JauntComponent> ent, ref MapInitEvent args)
-    {
+    private void OnInit(Entity<JauntComponent> ent, ref MapInitEvent args) =>
         _actions.AddAction(ent.Owner, ref ent.Comp.Action, ent.Comp.JauntAction);
-    }
 
-    private void OnShutdown(Entity<JauntComponent> ent, ref ComponentShutdown args)
-    {
+    private void OnShutdown(Entity<JauntComponent> ent, ref ComponentShutdown args) =>
         _actions.RemoveAction(ent.Owner, ent.Comp.Action);
-    }
-
 }

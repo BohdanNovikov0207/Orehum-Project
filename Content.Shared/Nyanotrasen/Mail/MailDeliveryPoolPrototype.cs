@@ -13,7 +13,11 @@ namespace Content.Shared.Mail;
 [Prototype("mailDeliveryPool")]
 public sealed class MailDeliveryPoolPrototype : IPrototype
 {
-    [IdDataFieldAttribute] public string ID { get; } = default!;
+    /// <summary>
+    /// Mail that can be sent only to specific departments.
+    /// </summary>
+    [DataField("departments")]
+    public Dictionary<string, Dictionary<string, float>> Departments = new();
 
     /// <summary>
     /// Mail that can be sent to everyone.
@@ -27,9 +31,5 @@ public sealed class MailDeliveryPoolPrototype : IPrototype
     [DataField("jobs")]
     public Dictionary<string, Dictionary<string, float>> Jobs = new();
 
-    /// <summary>
-    /// Mail that can be sent only to specific departments.
-    /// </summary>
-    [DataField("departments")]
-    public Dictionary<string, Dictionary<string, float>> Departments = new();
+    [IdDataFieldAttribute] public string ID { get; } = default!;
 }

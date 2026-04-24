@@ -30,8 +30,8 @@ namespace Content.Shared._Lavaland.Shelter;
 public abstract class SharedShelterCapsuleSystem : EntitySystem
 {
     [Dependency] private readonly SharedDoAfterSystem _doAfterSystem = default!;
-    [Dependency] private readonly SharedMapSystem _mapSystem = default!;
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
+    [Dependency] private readonly SharedMapSystem _mapSystem = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
 
@@ -47,7 +47,12 @@ public abstract class SharedShelterCapsuleSystem : EntitySystem
         if (args.Handled)
             return;
 
-        var doAfterEventArgs = new DoAfterArgs(EntityManager, args.User, component.DeployTime, new ShelterCapsuleDeployDoAfterEvent(), uid, used: uid)
+        var doAfterEventArgs = new DoAfterArgs(EntityManager,
+            args.User,
+            component.DeployTime,
+            new ShelterCapsuleDeployDoAfterEvent(),
+            uid,
+            used: uid)
         {
             BreakOnMove = true,
             NeedHand = true,
@@ -69,7 +74,8 @@ public abstract class SharedShelterCapsuleSystem : EntitySystem
         var comp = ent.Comp;
 
         // Works only on planets!
-        if (xform.GridUid == null || xform.MapUid == null || xform.GridUid != xform.MapUid || !TryComp<MapGridComponent>(xform.GridUid.Value, out var gridComp))
+        if (xform.GridUid == null || xform.MapUid == null || xform.GridUid != xform.MapUid ||
+            !TryComp<MapGridComponent>(xform.GridUid.Value, out var gridComp))
         {
             _popup.PopupCoordinates(Loc.GetString("shelter-capsule-fail-no-planet"), xform.Coordinates);
             return false;

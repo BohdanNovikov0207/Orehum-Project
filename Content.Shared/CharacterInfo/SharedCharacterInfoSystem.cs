@@ -14,7 +14,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.CharacterInfo;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class RequestCharacterInfoEvent : EntityEventArgs
 {
     public readonly NetEntity NetEntity;
@@ -25,15 +25,18 @@ public sealed class RequestCharacterInfoEvent : EntityEventArgs
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class CharacterInfoEvent : EntityEventArgs
 {
-    public readonly NetEntity NetEntity;
-    public readonly string JobTitle;
-    public readonly Dictionary<string, List<ObjectiveInfo>> Objectives;
     public readonly string? Briefing;
+    public readonly string JobTitle;
+    public readonly NetEntity NetEntity;
+    public readonly Dictionary<string, List<ObjectiveInfo>> Objectives;
 
-    public CharacterInfoEvent(NetEntity netEntity, string jobTitle, Dictionary<string, List<ObjectiveInfo>> objectives, string? briefing)
+    public CharacterInfoEvent(NetEntity netEntity,
+        string jobTitle,
+        Dictionary<string, List<ObjectiveInfo>> objectives,
+        string? briefing)
     {
         NetEntity = netEntity;
         JobTitle = jobTitle;

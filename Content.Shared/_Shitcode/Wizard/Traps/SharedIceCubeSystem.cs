@@ -32,15 +32,14 @@ namespace Content.Shared._Goobstation.Wizard.Traps;
 
 public abstract class SharedIceCubeSystem : EntitySystem
 {
-    [Dependency] private readonly FixtureSystem _fixtures = default!;
-    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
+    private const string IceCubeFixture = "ice-cube-fixture";
     [Dependency] private readonly ActionBlockerSystem _blocker = default!;
     [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly FixtureSystem _fixtures = default!;
     [Dependency] private readonly INetManager _net = default!;
-
-    private const string IceCubeFixture = "ice-cube-fixture";
+    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     public override void Initialize()
     {
@@ -68,15 +67,14 @@ public abstract class SharedIceCubeSystem : EntitySystem
         SubscribeLocalEvent<IceCubeComponent, DamageModifyEvent>(OnModify);
     }
 
-    private void OnModify(Entity<IceCubeComponent> ent, ref DamageModifyEvent args)
-    {
+    private void OnModify(Entity<IceCubeComponent> ent, ref DamageModifyEvent args) =>
         args.Damage = DamageSpecifier.ApplyModifierSet(args.Damage, ent.Comp.DamageReduction);
-    }
 
     private void OnStartCollide(Entity<IceCubeComponent> ent, ref StartCollideEvent args)
     {
         var lenSquared = args.OtherBody.LinearVelocity.LengthSquared();
-        if (lenSquared < 0.01f || !lenSquared.IsValid()) // Tests heisenfail without this since an engine issue causes it to return NaN randomly
+        if (lenSquared < 0.01f ||
+            !lenSquared.IsValid()) // Tests heisenfail without this since an engine issue causes it to return NaN randomly
             return;
 
         var xform = Transform(args.OtherEntity);
@@ -93,15 +91,11 @@ public abstract class SharedIceCubeSystem : EntitySystem
             body: args.OurBody);
     }
 
-    private void OnMobStateChanged(Entity<IceCubeComponent> ent, ref MobStateChangedEvent args)
-    {
+    private void OnMobStateChanged(Entity<IceCubeComponent> ent, ref MobStateChangedEvent args) =>
         RemCompDeferred(ent.Owner, ent.Comp);
-    }
 
-    private void OnTileFriction(Entity<IceCubeComponent> ent, ref TileFrictionEvent args)
-    {
+    private void OnTileFriction(Entity<IceCubeComponent> ent, ref TileFrictionEvent args) =>
         args.Modifier *= ent.Comp.TileFriction;
-    }
 
     private void OnBreakFree(Entity<IceCubeComponent> ent, ref BreakFreeDoAfterEvent args)
     {
@@ -129,15 +123,10 @@ public abstract class SharedIceCubeSystem : EntitySystem
             _popup.PopupEntity(Loc.GetString("ice-cube-break-free-start"), uid, uid);
     }
 
-    private void OnInteractAttempt(Entity<IceCubeComponent> ent, ref InteractionAttemptEvent args)
-    {
+    private void OnInteractAttempt(Entity<IceCubeComponent> ent, ref InteractionAttemptEvent args) =>
         args.Cancelled = true;
-    }
 
-    private void OnAttempt(EntityUid uid, IceCubeComponent component, CancellableEntityEventArgs args)
-    {
-        args.Cancel();
-    }
+    private void OnAttempt(EntityUid uid, IceCubeComponent component, CancellableEntityEventArgs args) => args.Cancel();
 
     private void OnPullAttempt(EntityUid uid, IceCubeComponent component, PullAttemptEvent args)
     {
@@ -230,5 +219,5 @@ public abstract class SharedIceCubeSystem : EntitySystem
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class BreakFreeDoAfterEvent : SimpleDoAfterEvent;

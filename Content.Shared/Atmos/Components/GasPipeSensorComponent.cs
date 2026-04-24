@@ -11,5 +11,5 @@ namespace Content.Shared.Atmos.Components;
 /// Entities with component will be queried against for their
 /// atmos monitoring data on atmos monitoring consoles
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class GasPipeSensorComponent : Component;

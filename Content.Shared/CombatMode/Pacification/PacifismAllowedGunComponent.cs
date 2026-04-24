@@ -10,7 +10,7 @@ namespace Content.Shared.CombatMode.Pacification;
 /// <summary>
 /// Guns with this component can be fired by pacifists
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class PacifismAllowedGunComponent : Component
 {
 }

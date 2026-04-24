@@ -18,9 +18,9 @@ namespace Content.Shared.Atmos.EntitySystems;
 
 public abstract class SharedGasPressurePumpSystem : EntitySystem
 {
-    [Dependency] private   readonly ISharedAdminLogManager _adminLogger = default!;
-    [Dependency] private   readonly SharedAppearanceSystem _appearance = default!;
-    [Dependency] private   readonly SharedPowerReceiverSystem _receiver = default!;
+    [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
+    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly SharedPowerReceiverSystem _receiver = default!;
     [Dependency] protected readonly SharedUserInterfaceSystem UserInterfaceSystem = default!;
 
     // TODO: Check enabled for activatableUI
@@ -32,7 +32,8 @@ public abstract class SharedGasPressurePumpSystem : EntitySystem
         SubscribeLocalEvent<GasPressurePumpComponent, ComponentInit>(OnInit);
         SubscribeLocalEvent<GasPressurePumpComponent, PowerChangedEvent>(OnPowerChanged);
 
-        SubscribeLocalEvent<GasPressurePumpComponent, GasPressurePumpChangeOutputPressureMessage>(OnOutputPressureChangeMessage);
+        SubscribeLocalEvent<GasPressurePumpComponent, GasPressurePumpChangeOutputPressureMessage>(
+            OnOutputPressureChangeMessage);
         SubscribeLocalEvent<GasPressurePumpComponent, GasPressurePumpToggleStatusMessage>(OnToggleStatusMessage);
 
         SubscribeLocalEvent<GasPressurePumpComponent, AtmosDeviceDisabledEvent>(OnPumpLeaveAtmosphere);
@@ -49,20 +50,13 @@ public abstract class SharedGasPressurePumpSystem : EntitySystem
                 ("statusColor", "lightblue"), // TODO: change with pressure?
                 ("pressure", ent.Comp.TargetPressure)
             ))
-        {
             args.PushMarkup(str);
-        }
     }
 
-    private void OnInit(Entity<GasPressurePumpComponent> ent, ref ComponentInit args)
-    {
-        UpdateAppearance(ent);
-    }
+    private void OnInit(Entity<GasPressurePumpComponent> ent, ref ComponentInit args) => UpdateAppearance(ent);
 
-    private void OnPowerChanged(Entity<GasPressurePumpComponent> ent, ref PowerChangedEvent args)
-    {
+    private void OnPowerChanged(Entity<GasPressurePumpComponent> ent, ref PowerChangedEvent args) =>
         UpdateAppearance(ent);
-    }
 
     private void UpdateAppearance(Entity<GasPressurePumpComponent, AppearanceComponent?> ent)
     {
@@ -73,7 +67,8 @@ public abstract class SharedGasPressurePumpSystem : EntitySystem
         _appearance.SetData(ent, PumpVisuals.Enabled, pumpOn, ent.Comp2);
     }
 
-    private void OnToggleStatusMessage(Entity<GasPressurePumpComponent> ent, ref GasPressurePumpToggleStatusMessage args)
+    private void OnToggleStatusMessage(Entity<GasPressurePumpComponent> ent,
+        ref GasPressurePumpToggleStatusMessage args)
     {
         ent.Comp.Enabled = args.Enabled;
         _adminLogger.Add(LogType.AtmosPowerChanged,
@@ -84,7 +79,8 @@ public abstract class SharedGasPressurePumpSystem : EntitySystem
         UpdateUi(ent);
     }
 
-    private void OnOutputPressureChangeMessage(Entity<GasPressurePumpComponent> ent, ref GasPressurePumpChangeOutputPressureMessage args)
+    private void OnOutputPressureChangeMessage(Entity<GasPressurePumpComponent> ent,
+        ref GasPressurePumpChangeOutputPressureMessage args)
     {
         ent.Comp.TargetPressure = Math.Clamp(args.Pressure, 0f, Atmospherics.MaxOutputPressure);
         _adminLogger.Add(LogType.AtmosPressureChanged,

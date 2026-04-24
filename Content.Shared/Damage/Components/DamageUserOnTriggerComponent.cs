@@ -6,18 +6,19 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Damage;
-using Content.Shared._Shitmed.Targeting; // Shitmed
+using Content.Shared._Shitmed.Targeting;
+
+// Shitmed
 
 namespace Content.Shared.Damage.Components;
 
 [RegisterComponent]
 public sealed partial class DamageUserOnTriggerComponent : Component
 {
-    [DataField("ignoreResistances")] public bool IgnoreResistances;
-
     [DataField("damage", required: true)]
     public DamageSpecifier Damage = default!;
+
+    [DataField("ignoreResistances")] public bool IgnoreResistances;
 
     /// <summary>
     /// Shitmed Change: Lets mousetraps, etc. target the feet.

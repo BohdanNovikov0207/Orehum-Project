@@ -38,7 +38,7 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Shared.Research.TechnologyDisk.Components;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 [AutoGenerateComponentState]
 public sealed partial class TechnologyDiskComponent : Component
 {

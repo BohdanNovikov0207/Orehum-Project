@@ -4,6 +4,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Linq;
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared._Shitmed.DoAfter;
 using Content.Shared._Shitmed.Medical.Surgery.Traumas.Components;
 using Content.Shared._Shitmed.Medical.Surgery.Wounds.Components;
@@ -11,14 +13,12 @@ using Content.Shared._Shitmed.Weapons.Melee.Events;
 using Content.Shared._Shitmed.Weapons.Ranged.Events;
 using Content.Shared.Body.Components;
 using Content.Shared.Body.Part;
-using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Movement.Components;
 using Content.Shared.Popups;
 using Content.Shared.Standing;
 using Robust.Shared.Audio;
-using Robust.Shared.Utility;
 using Robust.Shared.Random;
-using System.Linq;
+using Robust.Shared.Utility;
 
 namespace Content.Shared._Shitmed.Medical.Surgery.Traumas.Systems;
 
@@ -80,8 +80,12 @@ public partial class TraumaSystem
                 _virtual.DeleteInHandsMatching(bodyComp.Body.Value, bone);
 
             if (TryGetWoundableTrauma(bone.Comp.BoneWoundable.Value, out var traumas, TraumaType.BoneDamage))
+            {
                 foreach (var trauma in traumas.Where(trauma => trauma.Comp.TraumaTarget == bone))
+                {
                     RemoveTrauma(trauma);
+                }
+            }
         }
 
         switch (bodyComp.PartType)
@@ -94,8 +98,7 @@ public partial class TraumaSystem
         }
     }
 
-    private void OnGetDoAfterDelayMultiplier(Entity<BoneComponent> bone, ref GetDoAfterDelayMultiplierEvent args)
-    {
+    private void OnGetDoAfterDelayMultiplier(Entity<BoneComponent> bone, ref GetDoAfterDelayMultiplierEvent args) =>
         args.Multiplier *= bone.Comp.BoneSeverity switch
         {
             BoneSeverity.Damaged => 0.92f,
@@ -103,7 +106,6 @@ public partial class TraumaSystem
             BoneSeverity.Broken => 0.75f,
             _ => 1f,
         };
-    }
 
     private void OnAttemptHandsMelee(Entity<BoneComponent> bone, ref AttemptHandsMeleeEvent args)
     {
@@ -217,7 +219,7 @@ public partial class TraumaSystem
         if (!Resolve(body, ref bodyComp))
             return;
 
-        bool hasBrokenBones = false;
+        var hasBrokenBones = false;
 
         var rootPart = bodyComp.RootContainer.ContainedEntity;
         if (rootPart.HasValue)
@@ -381,10 +383,11 @@ public partial class TraumaSystem
         {
             _popup.PopupClient(Loc.GetString(message), body, PopupType.Medium);
             var ev = new DropHandItemsEvent();
-            RaiseLocalEvent(body, ref ev, false);
+            RaiseLocalEvent(body, ref ev);
             _audio.PlayPredicted(sound, body, body);
             return true;
         }
+
         return false;
     }
 

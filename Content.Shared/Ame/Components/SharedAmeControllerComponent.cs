@@ -17,20 +17,28 @@ public partial class SharedAmeControllerComponent : Component
     public const string FuelSlotId = "fuelSlot";
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class AmeControllerBoundUserInterfaceState : BoundUserInterfaceState
 {
-    public readonly bool HasPower;
-    public readonly bool IsMaster;
-    public readonly bool Injecting;
-    public readonly bool HasFuelJar;
-    public readonly int FuelAmount;
-    public readonly int InjectionAmount;
     public readonly int CoreCount;
     public readonly float CurrentPowerSupply;
+    public readonly int FuelAmount;
+    public readonly bool HasFuelJar;
+    public readonly bool HasPower;
+    public readonly bool Injecting;
+    public readonly int InjectionAmount;
+    public readonly bool IsMaster;
     public readonly float TargetedPowerSupply;
 
-    public AmeControllerBoundUserInterfaceState(bool hasPower, bool isMaster, bool injecting, bool hasFuelJar, int fuelAmount, int injectionAmount, int coreCount, float currentPowerSupply, float targetedPowerSupply)
+    public AmeControllerBoundUserInterfaceState(bool hasPower,
+        bool isMaster,
+        bool injecting,
+        bool hasFuelJar,
+        int fuelAmount,
+        int injectionAmount,
+        int coreCount,
+        float currentPowerSupply,
+        float targetedPowerSupply)
     {
         HasPower = hasPower;
         IsMaster = isMaster;
@@ -44,7 +52,7 @@ public sealed class AmeControllerBoundUserInterfaceState : BoundUserInterfaceSta
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class UiButtonPressedMessage : BoundUserInterfaceMessage
 {
     public readonly UiButton Button;
@@ -55,10 +63,10 @@ public sealed class UiButtonPressedMessage : BoundUserInterfaceMessage
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum AmeControllerUiKey
 {
-    Key
+    Key,
 }
 
 public enum UiButton
@@ -69,13 +77,13 @@ public enum UiButton
     DecreaseFuel,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum AmeControllerVisuals
 {
     DisplayState,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum AmeControllerState
 {
     On,

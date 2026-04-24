@@ -18,90 +18,89 @@
 using Content.Shared.Atmos.Monitor.Components;
 using Robust.Shared.Serialization;
 
-namespace Content.Shared.Atmos.Piping.Unary.Components
+namespace Content.Shared.Atmos.Piping.Unary.Components;
+
+[Serializable] [NetSerializable]
+public sealed class GasVentScrubberData : IAtmosDeviceData
 {
-    [Serializable, NetSerializable]
-    public sealed class GasVentScrubberData : IAtmosDeviceData
+    public static HashSet<Gas> DefaultFilterGases = new()
     {
-        public bool Enabled { get; set; }
-        public bool Dirty { get; set; }
-        public bool IgnoreAlarms { get; set; } = false;
-        public HashSet<Gas> FilterGases { get; set; } = new(DefaultFilterGases);
-        public ScrubberPumpDirection PumpDirection { get; set; } = ScrubberPumpDirection.Scrubbing;
-        public float VolumeRate { get; set; } = 200f;
-        public bool WideNet { get; set; } = false;
-        public bool AirAlarmPanicWireCut { get; set; }
+        Gas.CarbonDioxide,
+        Gas.Plasma,
+        Gas.Tritium,
+        Gas.WaterVapor,
+        Gas.Ammonia,
+        Gas.NitrousOxide,
+        Gas.Frezon,
+        Gas.BZ, // Assmos - /tg/ gases
+        Gas.Healium, // Assmos - /tg/ gases
+        Gas.Nitrium, // Assmos - /tg/ gases
+    };
 
-        public static HashSet<Gas> DefaultFilterGases = new()
-        {
-            Gas.CarbonDioxide,
-            Gas.Plasma,
-            Gas.Tritium,
-            Gas.WaterVapor,
-            Gas.Ammonia,
-            Gas.NitrousOxide,
-            Gas.Frezon,
-            Gas.BZ, // Assmos - /tg/ gases
-            Gas.Healium, // Assmos - /tg/ gases
-            Gas.Nitrium, // Assmos - /tg/ gases
-        };
+    // Presets for 'dumb' air alarm modes
 
-        // Presets for 'dumb' air alarm modes
-
-        public static GasVentScrubberData FilterModePreset = new GasVentScrubberData
-        {
-            Enabled = true,
-            FilterGases = new(GasVentScrubberData.DefaultFilterGases),
-            PumpDirection = ScrubberPumpDirection.Scrubbing,
-            VolumeRate = 200f,
-            WideNet = false
-        };
-
-        public static GasVentScrubberData WideFilterModePreset = new GasVentScrubberData
-        {
-            Enabled = true,
-            FilterGases = new(GasVentScrubberData.DefaultFilterGases),
-            PumpDirection = ScrubberPumpDirection.Scrubbing,
-            VolumeRate = 200f,
-            WideNet = true
-        };
-
-        public static GasVentScrubberData FillModePreset = new GasVentScrubberData
-        {
-            Enabled = false,
-            Dirty = true,
-            FilterGases = new(GasVentScrubberData.DefaultFilterGases),
-            PumpDirection = ScrubberPumpDirection.Scrubbing,
-            VolumeRate = 200f,
-            WideNet = false
-        };
-
-        public static GasVentScrubberData PanicModePreset = new GasVentScrubberData
-        {
-            Enabled = true,
-            Dirty = true,
-            FilterGases = new(GasVentScrubberData.DefaultFilterGases),
-            PumpDirection = ScrubberPumpDirection.Siphoning,
-            VolumeRate = 200f,
-            WideNet = true
-        };
-
-        public static GasVentScrubberData ReplaceModePreset = new GasVentScrubberData
-        {
-            Enabled = true,
-            IgnoreAlarms = true,
-            Dirty = true,
-            FilterGases = new(GasVentScrubberData.DefaultFilterGases),
-            PumpDirection = ScrubberPumpDirection.Siphoning,
-            VolumeRate = 200f,
-            WideNet = false
-        };
-    }
-
-    [Serializable, NetSerializable]
-    public enum ScrubberPumpDirection : sbyte
+    public static GasVentScrubberData FilterModePreset = new()
     {
-        Siphoning = 0,
-        Scrubbing = 1,
-    }
+        Enabled = true,
+        FilterGases = new HashSet<Gas>(DefaultFilterGases),
+        PumpDirection = ScrubberPumpDirection.Scrubbing,
+        VolumeRate = 200f,
+        WideNet = false,
+    };
+
+    public static GasVentScrubberData WideFilterModePreset = new()
+    {
+        Enabled = true,
+        FilterGases = new HashSet<Gas>(DefaultFilterGases),
+        PumpDirection = ScrubberPumpDirection.Scrubbing,
+        VolumeRate = 200f,
+        WideNet = true,
+    };
+
+    public static GasVentScrubberData FillModePreset = new()
+    {
+        Enabled = false,
+        Dirty = true,
+        FilterGases = new HashSet<Gas>(DefaultFilterGases),
+        PumpDirection = ScrubberPumpDirection.Scrubbing,
+        VolumeRate = 200f,
+        WideNet = false,
+    };
+
+    public static GasVentScrubberData PanicModePreset = new()
+    {
+        Enabled = true,
+        Dirty = true,
+        FilterGases = new HashSet<Gas>(DefaultFilterGases),
+        PumpDirection = ScrubberPumpDirection.Siphoning,
+        VolumeRate = 200f,
+        WideNet = true,
+    };
+
+    public static GasVentScrubberData ReplaceModePreset = new()
+    {
+        Enabled = true,
+        IgnoreAlarms = true,
+        Dirty = true,
+        FilterGases = new HashSet<Gas>(DefaultFilterGases),
+        PumpDirection = ScrubberPumpDirection.Siphoning,
+        VolumeRate = 200f,
+        WideNet = false,
+    };
+
+    public HashSet<Gas> FilterGases { get; set; } = new(DefaultFilterGases);
+    public ScrubberPumpDirection PumpDirection { get; set; } = ScrubberPumpDirection.Scrubbing;
+    public float VolumeRate { get; set; } = 200f;
+    public bool WideNet { get; set; }
+    public bool AirAlarmPanicWireCut { get; set; }
+    public bool Enabled { get; set; }
+    public bool Dirty { get; set; }
+    public bool IgnoreAlarms { get; set; }
+}
+
+[Serializable] [NetSerializable]
+public enum ScrubberPumpDirection : sbyte
+{
+    Siphoning = 0,
+    Scrubbing = 1,
 }

@@ -15,6 +15,9 @@ namespace Content.Shared._Goobstation.Wizard.Chemistry;
 [UsedImplicitly]
 public sealed partial class HasComponentCondition : EntityEffectCondition
 {
+    [DataField]
+    public bool CheckMind;
+
     [DataField(required: true)]
     public HashSet<string> Components = new();
 
@@ -24,13 +27,11 @@ public sealed partial class HasComponentCondition : EntityEffectCondition
     [DataField]
     public bool Invert;
 
-    [DataField]
-    public bool CheckMind;
-
     public override bool Condition(EntityEffectBaseArgs args)
     {
         EntityUid? mind = null;
-        if (CheckMind && args.EntityManager.System<SharedMindSystem>().TryGetMind(args.TargetEntity, out var mindId, out _))
+        if (CheckMind && args.EntityManager.System<SharedMindSystem>()
+                .TryGetMind(args.TargetEntity, out var mindId, out _))
             mind = mindId;
 
         var hasComp = false;

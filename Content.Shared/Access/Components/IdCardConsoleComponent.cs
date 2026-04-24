@@ -19,39 +19,22 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Access.Components;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 [Access(typeof(SharedIdCardConsoleSystem))]
 public sealed partial class IdCardConsoleComponent : Component
 {
+    [Serializable] [NetSerializable]
+    public enum IdCardConsoleUiKey : byte
+    {
+        Key,
+    }
+
     public static string PrivilegedIdCardSlotId = "IdCardConsole-privilegedId";
     public static string TargetIdCardSlotId = "IdCardConsole-targetId";
 
-    [DataField]
-    public ItemSlot PrivilegedIdSlot = new();
-
-    [DataField]
-    public ItemSlot TargetIdSlot = new();
-
-    [Serializable, NetSerializable]
-    public sealed class WriteToTargetIdMessage : BoundUserInterfaceMessage
-    {
-        public readonly string FullName;
-        public readonly string JobTitle;
-        public readonly List<ProtoId<AccessLevelPrototype>> AccessList;
-        public readonly ProtoId<AccessLevelPrototype> JobPrototype;
-
-        public WriteToTargetIdMessage(string fullName, string jobTitle, List<ProtoId<AccessLevelPrototype>> accessList, ProtoId<AccessLevelPrototype> jobPrototype)
-        {
-            FullName = fullName;
-            JobTitle = jobTitle;
-            AccessList = accessList;
-            JobPrototype = jobPrototype;
-        }
-    }
-
     // Put this on shared so we just send the state once in PVS range rather than every time the UI updates.
 
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public List<ProtoId<AccessLevelPrototype>> AccessLevels = new()
     {
         "Armory",
@@ -85,22 +68,48 @@ public sealed partial class IdCardConsoleComponent : Component
         "Service",
         "Theatre",
         "Robotics", //Goob
-        "Journalism" //Goob
+        "Journalism", //Goob
     };
 
-    [Serializable, NetSerializable]
+    [DataField]
+    public ItemSlot PrivilegedIdSlot = new();
+
+    [DataField]
+    public ItemSlot TargetIdSlot = new();
+
+    [Serializable] [NetSerializable]
+    public sealed class WriteToTargetIdMessage : BoundUserInterfaceMessage
+    {
+        public readonly List<ProtoId<AccessLevelPrototype>> AccessList;
+        public readonly string FullName;
+        public readonly ProtoId<AccessLevelPrototype> JobPrototype;
+        public readonly string JobTitle;
+
+        public WriteToTargetIdMessage(string fullName,
+            string jobTitle,
+            List<ProtoId<AccessLevelPrototype>> accessList,
+            ProtoId<AccessLevelPrototype> jobPrototype)
+        {
+            FullName = fullName;
+            JobTitle = jobTitle;
+            AccessList = accessList;
+            JobPrototype = jobPrototype;
+        }
+    }
+
+    [Serializable] [NetSerializable]
     public sealed class IdCardConsoleBoundUserInterfaceState : BoundUserInterfaceState
     {
-        public readonly string PrivilegedIdName;
-        public readonly bool IsPrivilegedIdPresent;
-        public readonly bool IsPrivilegedIdAuthorized;
-        public readonly bool IsTargetIdPresent;
-        public readonly string TargetIdName;
-        public readonly string? TargetIdFullName;
-        public readonly string? TargetIdJobTitle;
-        public readonly List<ProtoId<AccessLevelPrototype>>? TargetIdAccessList;
         public readonly List<ProtoId<AccessLevelPrototype>>? AllowedModifyAccessList;
+        public readonly bool IsPrivilegedIdAuthorized;
+        public readonly bool IsPrivilegedIdPresent;
+        public readonly bool IsTargetIdPresent;
+        public readonly string PrivilegedIdName;
+        public readonly List<ProtoId<AccessLevelPrototype>>? TargetIdAccessList;
+        public readonly string? TargetIdFullName;
         public readonly ProtoId<AccessLevelPrototype> TargetIdJobPrototype;
+        public readonly string? TargetIdJobTitle;
+        public readonly string TargetIdName;
 
         public IdCardConsoleBoundUserInterfaceState(bool isPrivilegedIdPresent,
             bool isPrivilegedIdAuthorized,
@@ -124,11 +133,5 @@ public sealed partial class IdCardConsoleComponent : Component
             PrivilegedIdName = privilegedIdName;
             TargetIdName = targetIdName;
         }
-    }
-
-    [Serializable, NetSerializable]
-    public enum IdCardConsoleUiKey : byte
-    {
-        Key,
     }
 }

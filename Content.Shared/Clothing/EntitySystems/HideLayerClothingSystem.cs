@@ -21,18 +21,14 @@ public sealed class HideLayerClothingSystem : EntitySystem
     private void OnHideToggled(Entity<HideLayerClothingComponent> ent, ref ItemMaskToggledEvent args)
     {
         if (args.Wearer != null)
-            SetLayerVisibility(ent!, args.Wearer.Value, hideLayers: true);
+            SetLayerVisibility(ent!, args.Wearer.Value, true);
     }
 
-    private void OnHideGotEquipped(Entity<HideLayerClothingComponent> ent, ref ClothingGotEquippedEvent args)
-    {
-        SetLayerVisibility(ent!, args.Wearer, hideLayers: true);
-    }
+    private void OnHideGotEquipped(Entity<HideLayerClothingComponent> ent, ref ClothingGotEquippedEvent args) =>
+        SetLayerVisibility(ent!, args.Wearer, true);
 
-    private void OnHideGotUnequipped(Entity<HideLayerClothingComponent> ent, ref ClothingGotUnequippedEvent args)
-    {
-        SetLayerVisibility(ent!, args.Wearer, hideLayers: false);
-    }
+    private void OnHideGotUnequipped(Entity<HideLayerClothingComponent> ent, ref ClothingGotUnequippedEvent args) =>
+        SetLayerVisibility(ent!, args.Wearer, false);
 
     private void SetLayerVisibility(
         Entity<HideLayerClothingComponent?, ClothingComponent?> clothing,

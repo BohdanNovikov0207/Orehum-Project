@@ -17,36 +17,23 @@ using Robust.Shared.Audio;
 using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype;
-using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype.Dictionary;
 
 namespace Content.Shared.Speech.Components;
 
 /// <summary>
-///     Component required for entities to be able to do vocal emotions.
+/// Component required for entities to be able to do vocal emotions.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 [AutoGenerateComponentState]
 public sealed partial class VocalComponent : Component
 {
     /// <summary>
-    ///     Emote sounds prototype id for each sex (not gender).
-    ///     Entities without <see cref="HumanoidComponent"/> considered to be <see cref="Sex.Unsexed"/>.
+    /// Currently loaded emote sounds prototype, based on entity sex.
+    /// Null if no valid prototype for entity sex was found.
     /// </summary>
-    [DataField]
+    [ViewVariables]
     [AutoNetworkedField]
-    public Dictionary<Sex, ProtoId<EmoteSoundsPrototype>>? Sounds;
-
-    [DataField("screamId", customTypeSerializer: typeof(PrototypeIdSerializer<EmotePrototype>))]
-    [AutoNetworkedField]
-    public string ScreamId = "Scream";
-
-    [DataField("wilhelm")]
-    [AutoNetworkedField]
-    public SoundSpecifier Wilhelm = new SoundPathSpecifier("/Audio/Voice/Human/wilhelm_scream.ogg");
-
-    [DataField("wilhelmProbability")]
-    [AutoNetworkedField]
-    public float WilhelmProbability = 0.0002f;
+    public ProtoId<EmoteSoundsPrototype>? EmoteSounds = null;
 
     [DataField("screamAction", customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
     [AutoNetworkedField]
@@ -56,11 +43,23 @@ public sealed partial class VocalComponent : Component
     [AutoNetworkedField]
     public EntityUid? ScreamActionEntity;
 
-    /// <summary>
-    ///     Currently loaded emote sounds prototype, based on entity sex.
-    ///     Null if no valid prototype for entity sex was found.
-    /// </summary>
-    [ViewVariables]
+    [DataField("screamId", customTypeSerializer: typeof(PrototypeIdSerializer<EmotePrototype>))]
     [AutoNetworkedField]
-    public ProtoId<EmoteSoundsPrototype>? EmoteSounds = null;
+    public string ScreamId = "Scream";
+
+    /// <summary>
+    /// Emote sounds prototype id for each sex (not gender).
+    /// Entities without <see cref="HumanoidComponent" /> considered to be <see cref="Sex.Unsexed" />.
+    /// </summary>
+    [DataField]
+    [AutoNetworkedField]
+    public Dictionary<Sex, ProtoId<EmoteSoundsPrototype>>? Sounds;
+
+    [DataField("wilhelm")]
+    [AutoNetworkedField]
+    public SoundSpecifier Wilhelm = new SoundPathSpecifier("/Audio/Voice/Human/wilhelm_scream.ogg");
+
+    [DataField("wilhelmProbability")]
+    [AutoNetworkedField]
+    public float WilhelmProbability = 0.0002f;
 }

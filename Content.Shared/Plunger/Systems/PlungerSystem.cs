@@ -7,13 +7,13 @@
 
 using Content.Shared.DoAfter;
 using Content.Shared.Interaction;
-using Content.Shared.Popups;
 using Content.Shared.Plunger.Components;
-using Robust.Shared.Audio.Systems;
+using Content.Shared.Popups;
+using Content.Shared.Random;
 using Content.Shared.Random.Helpers;
+using Robust.Shared.Audio.Systems;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
-using Content.Shared.Random;
 
 namespace Content.Shared.Plunger.Systems;
 
@@ -22,11 +22,11 @@ namespace Content.Shared.Plunger.Systems;
 /// </summary>
 public sealed class PlungerSystem : EntitySystem
 {
-    [Dependency] private readonly IPrototypeManager _proto = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly IPrototypeManager _proto = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
 
     public override void Initialize()
     {
@@ -48,7 +48,13 @@ public sealed class PlungerSystem : EntitySystem
         if (plunger.NeedsPlunger)
             return;
 
-        _doAfter.TryStartDoAfter(new DoAfterArgs(EntityManager, args.User, component.PlungeDuration, new PlungerDoAfterEvent(), uid, target, uid)
+        _doAfter.TryStartDoAfter(new DoAfterArgs(EntityManager,
+            args.User,
+            component.PlungeDuration,
+            new PlungerDoAfterEvent(),
+            uid,
+            target,
+            uid)
         {
             BreakOnMove = true,
             BreakOnDamage = true,
@@ -68,7 +74,10 @@ public sealed class PlungerSystem : EntitySystem
         if (!TryComp(target, out PlungerUseComponent? plunge))
             return;
 
-        _popup.PopupClient(Loc.GetString("plunger-unblock", ("target", target)), args.User, args.User, PopupType.Medium);
+        _popup.PopupClient(Loc.GetString("plunger-unblock", ("target", target)),
+            args.User,
+            args.User,
+            PopupType.Medium);
         plunge.Plunged = true;
 
         var spawn = _proto.Index<WeightedRandomEntityPrototype>(plunge.PlungerLoot).Pick(_random);

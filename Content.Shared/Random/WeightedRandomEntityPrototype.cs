@@ -14,11 +14,11 @@ namespace Content.Shared.Random;
 /// Linter-friendly version of weightedRandom for Entity prototypes.
 /// </summary>
 [Prototype]
-public sealed partial class WeightedRandomEntityPrototype : IWeightedRandomPrototype
+public sealed class WeightedRandomEntityPrototype : IWeightedRandomPrototype
 {
     [IdDataField]
-    public string ID { get; private set; } = default!;
+    public string ID { get; } = default!;
 
     [DataField("weights", customTypeSerializer: typeof(PrototypeIdDictionarySerializer<float, EntityPrototype>))]
-    public Dictionary<string, float> Weights { get; private set; } = new();
+    public Dictionary<string, float> Weights { get; } = new();
 }

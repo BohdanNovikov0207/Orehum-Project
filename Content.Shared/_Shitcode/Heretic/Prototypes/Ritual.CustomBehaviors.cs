@@ -19,7 +19,7 @@ public abstract partial class RitualCustomBehavior
     public abstract bool Execute(RitualData args, out string? outstr);
 
     /// <summary>
-    ///     If the ritual is successful do *this*.
+    /// If the ritual is successful do *this*.
     /// </summary>
     /// <param name="args"></param>
     public abstract void Finalize(RitualData args);

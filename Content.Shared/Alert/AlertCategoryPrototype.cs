@@ -13,9 +13,9 @@ namespace Content.Shared.Alert;
 /// This is a prototype for a category for marking alerts as mutually exclusive.
 /// </summary>
 [Prototype]
-public sealed partial class AlertCategoryPrototype : IPrototype
+public sealed class AlertCategoryPrototype : IPrototype
 {
-    /// <inheritdoc/>
+    /// <inheritdoc />
     [IdDataField]
-    public string ID { get; private set; } = default!;
+    public string ID { get; } = default!;
 }

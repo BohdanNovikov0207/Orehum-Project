@@ -7,16 +7,15 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Salvage.Magnet;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class SalvageMagnetBoundUserInterfaceState : BoundUserInterfaceState
 {
-    public TimeSpan? EndTime;
-    public TimeSpan NextOffer;
+    public int ActiveSeed;
 
     public TimeSpan Cooldown;
     public TimeSpan Duration;
-
-    public int ActiveSeed;
+    public TimeSpan? EndTime;
+    public TimeSpan NextOffer;
 
     public List<int> Offers;
 

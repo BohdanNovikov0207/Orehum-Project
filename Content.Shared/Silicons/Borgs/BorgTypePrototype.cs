@@ -11,24 +11,33 @@ using Content.Shared.Interaction.Components;
 using Content.Shared.Inventory;
 using Content.Shared.Radio;
 using Content.Shared.Silicons.Borgs.Components;
+using Content.Shared.Silicons.Laws;
 using Content.Shared.Whitelist;
 using Robust.Shared.Audio;
 using Robust.Shared.Prototypes;
-using Content.Shared.Silicons.Laws; // DeltaV
+
+// DeltaV
 
 namespace Content.Shared.Silicons.Borgs;
 
 /// <summary>
-/// Information for a borg type that can be selected by <see cref="BorgSwitchableTypeComponent"/>.
+/// Information for a borg type that can be selected by <see cref="BorgSwitchableTypeComponent" />.
 /// </summary>
-/// <seealso cref="SharedBorgSwitchableTypeSystem"/>
+/// <seealso cref="SharedBorgSwitchableTypeSystem" />
 [Prototype]
-public sealed partial class BorgTypePrototype : IPrototype
+public sealed class BorgTypePrototype : IPrototype
 {
     private static readonly ProtoId<SoundCollectionPrototype> DefaultFootsteps = new("FootstepBorg");
 
-    [IdDataField]
-    public required string ID { get; set; }
+    /// <summary>
+    /// Borg module types that are always available to borgs of this type.
+    /// </summary>
+    /// <remarks>
+    /// These modules still work like modules, although they cannot be removed from the borg.
+    /// </remarks>
+    /// <seealso cref="BorgModuleComponent.DefaultModule" />
+    [DataField]
+    public EntProtoId[] DefaultModules = [];
 
     //
     // Description info (name/desc) is configured via localization strings directly.
@@ -40,6 +49,23 @@ public sealed partial class BorgTypePrototype : IPrototype
     [DataField]
     public required EntProtoId DummyPrototype;
 
+    /// <summary>
+    /// DeltaV: Lawset to use instead of crewsimov.
+    /// If the chassis is emagged or ion stormed this is ignored.
+    /// </summary>
+    [DataField]
+    public ProtoId<SiliconLawsetPrototype>? Lawset;
+
+    /// <summary>
+    /// Radio channels that this borg will gain access to from this module.
+    /// </summary>
+    /// <remarks>
+    /// These channels are provided on top of the ones specified in
+    /// <see cref="BorgSwitchableTypeComponent.InherentRadioChannels" />.
+    /// </remarks>
+    [DataField]
+    public ProtoId<RadioChannelPrototype>[] RadioChannels = [];
+
     //
     // Functional information
     //
@@ -48,16 +74,16 @@ public sealed partial class BorgTypePrototype : IPrototype
     /// The amount of free module slots this borg type has.
     /// </summary>
     /// <remarks>
-    /// This count is on top of the modules specified in <see cref="DefaultModules"/>.
+    /// This count is on top of the modules specified in <see cref="DefaultModules" />.
     /// </remarks>
-    /// <seealso cref="BorgChassisComponent.ModuleCount"/>
+    /// <seealso cref="BorgChassisComponent.ModuleCount" />
     [DataField]
     public int ExtraModuleCount { get; set; } = 0;
 
     /// <summary>
     /// The whitelist for borg modules that can be inserted into this borg type.
     /// </summary>
-    /// <seealso cref="BorgChassisComponent.ModuleWhitelist"/>
+    /// <seealso cref="BorgChassisComponent.ModuleWhitelist" />
     [DataField]
     public EntityWhitelist? ModuleWhitelist { get; set; }
 
@@ -68,29 +94,9 @@ public sealed partial class BorgTypePrototype : IPrototype
     /// This template must be compatible with the normal borg templates,
     /// so in practice it can only be used to differentiate the visual position of the slots on the character sprites.
     /// </remarks>
-    /// <seealso cref="InventorySystem.SetTemplateId"/>
+    /// <seealso cref="InventorySystem.SetTemplateId" />
     [DataField]
     public ProtoId<InventoryTemplatePrototype> InventoryTemplateId { get; set; } = "borgShort";
-
-    /// <summary>
-    /// Radio channels that this borg will gain access to from this module.
-    /// </summary>
-    /// <remarks>
-    /// These channels are provided on top of the ones specified in
-    /// <see cref="BorgSwitchableTypeComponent.InherentRadioChannels"/>.
-    /// </remarks>
-    [DataField]
-    public ProtoId<RadioChannelPrototype>[] RadioChannels = [];
-
-    /// <summary>
-    /// Borg module types that are always available to borgs of this type.
-    /// </summary>
-    /// <remarks>
-    /// These modules still work like modules, although they cannot be removed from the borg.
-    /// </remarks>
-    /// <seealso cref="BorgModuleComponent.DefaultModule"/>
-    [DataField]
-    public EntProtoId[] DefaultModules = [];
 
     /// <summary>
     /// Additional components to add to the borg entity when this type is selected.
@@ -117,14 +123,14 @@ public sealed partial class BorgTypePrototype : IPrototype
     /// <summary>
     /// Sprite state used to indicate that the borg has a mind in it.
     /// </summary>
-    /// <seealso cref="BorgChassisComponent.HasMindState"/>
+    /// <seealso cref="BorgChassisComponent.HasMindState" />
     [DataField]
     public string SpriteHasMindState { get; set; } = "robot_e";
 
     /// <summary>
     /// Sprite state used to indicate that the borg has no mind in it.
     /// </summary>
-    /// <seealso cref="BorgChassisComponent.NoMindState"/>
+    /// <seealso cref="BorgChassisComponent.NoMindState" />
     [DataField]
     public string SpriteNoMindState { get; set; } = "robot_e_r";
 
@@ -141,14 +147,14 @@ public sealed partial class BorgTypePrototype : IPrototype
     /// <summary>
     /// String to use on petting success.
     /// </summary>
-    /// <seealso cref="InteractionPopupComponent"/>
+    /// <seealso cref="InteractionPopupComponent" />
     [DataField]
     public string PetSuccessString { get; set; } = "petting-success-generic-cyborg";
 
     /// <summary>
     /// String to use on petting failure.
     /// </summary>
-    /// <seealso cref="InteractionPopupComponent"/>
+    /// <seealso cref="InteractionPopupComponent" />
     [DataField]
     public string PetFailureString { get; set; } = "petting-failure-generic-cyborg";
 
@@ -162,10 +168,6 @@ public sealed partial class BorgTypePrototype : IPrototype
     [DataField]
     public SoundSpecifier FootstepCollection { get; set; } = new SoundCollectionSpecifier(DefaultFootsteps);
 
-    /// <summary>
-    /// DeltaV: Lawset to use instead of crewsimov.
-    /// If the chassis is emagged or ion stormed this is ignored.
-    /// </summary>
-    [DataField]
-    public ProtoId<SiliconLawsetPrototype>? Lawset;
+    [IdDataField]
+    public required string ID { get; set; }
 }

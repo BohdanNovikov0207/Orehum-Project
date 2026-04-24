@@ -8,11 +8,11 @@ namespace Content.Shared._EinsteinEngines.Silicon.Death;
 
 // Goobstation - Energycrit: Split SiliconChargeDeathSystem into shared.
 /// <summary>
-///     Blocks discharged silicons from interacting with their environments
-///     until they recharge.
+/// Blocks discharged silicons from interacting with their environments
+/// until they recharge.
 /// </summary>
 /// <remarks>
-///     This is horrible.
+/// This is horrible.
 /// </remarks>
 public abstract class SharedSiliconDeathSystem : EntitySystem
 {

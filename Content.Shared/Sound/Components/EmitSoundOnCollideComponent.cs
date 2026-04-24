@@ -11,7 +11,7 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
 
 namespace Content.Shared.Sound.Components;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentPause, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentPause] [AutoGenerateComponentState]
 public sealed partial class EmitSoundOnCollideComponent : BaseEmitSoundComponent
 {
     public static readonly TimeSpan CollideCooldown = TimeSpan.FromSeconds(0.2);
@@ -25,6 +25,6 @@ public sealed partial class EmitSoundOnCollideComponent : BaseEmitSoundComponent
     /// <summary>
     /// To avoid sound spam add a cooldown to it.
     /// </summary>
-    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer)), AutoPausedField]
+    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))] [AutoPausedField]
     public TimeSpan NextSound;
 }

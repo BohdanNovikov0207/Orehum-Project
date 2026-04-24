@@ -25,29 +25,27 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Damage;
-using Content.Shared.Examine;
-using Content.Shared.Inventory;
-using Content.Shared.Silicons.Borgs;
-using Content.Shared.Verbs;
-using Robust.Shared.GameStates;
-using Robust.Shared.Utility;
-
-// Shitmed Change
 using System.Linq;
 using Content.Shared.Body.Part;
 using Content.Shared.Body.Systems;
+using Content.Shared.Damage;
+using Content.Shared.Examine;
+using Content.Shared.Inventory;
 using Content.Shared.Localizations;
+using Content.Shared.Silicons.Borgs;
+using Content.Shared.Verbs;
+using Robust.Shared.Utility;
+// Shitmed Change
 
 namespace Content.Shared.Armor;
 
 /// <summary>
-///     This handles logic relating to <see cref="ArmorComponent" />
+/// This handles logic relating to <see cref="ArmorComponent" />
 /// </summary>
 public abstract class SharedArmorSystem : EntitySystem
 {
-    [Dependency] private readonly ExamineSystemShared _examine = default!;
     [Dependency] private readonly SharedBodySystem _body = default!;
+    [Dependency] private readonly ExamineSystemShared _examine = default!;
 
     /// <inheritdoc />
     public override void Initialize()
@@ -68,8 +66,10 @@ public abstract class SharedArmorSystem : EntitySystem
         var (partType, _) = _body.ConvertTargetBodyPart(args.TargetPart);
 
         if (component.ArmorCoverage.Contains(partType))
+        {
             args.Damage = DamageSpecifier.ApplyModifierSet(args.Damage,
-            DamageSpecifier.PenetrateArmor(component.Modifiers, args.Damage.ArmorPenetration));
+                DamageSpecifier.PenetrateArmor(component.Modifiers, args.Damage.ArmorPenetration));
+        }
     }
 
     /// <summary>
@@ -81,11 +81,16 @@ public abstract class SharedArmorSystem : EntitySystem
     {
         foreach (var armorCoefficient in ent.Comp.Modifiers.Coefficients)
         {
-            args.Args.DamageModifiers.Coefficients[armorCoefficient.Key] = args.Args.DamageModifiers.Coefficients.TryGetValue(armorCoefficient.Key, out var coefficient) ? coefficient * armorCoefficient.Value : armorCoefficient.Value;
+            args.Args.DamageModifiers.Coefficients[armorCoefficient.Key] =
+                args.Args.DamageModifiers.Coefficients.TryGetValue(armorCoefficient.Key, out var coefficient)
+                    ? coefficient * armorCoefficient.Value
+                    : armorCoefficient.Value;
         }
     }
 
-    private void OnRelayDamageModify(EntityUid uid, ArmorComponent component, InventoryRelayedEvent<DamageModifyEvent> args)
+    private void OnRelayDamageModify(EntityUid uid,
+        ArmorComponent component,
+        InventoryRelayedEvent<DamageModifyEvent> args)
     {
         if (args.Args.TargetPart == null)
             return;
@@ -93,16 +98,17 @@ public abstract class SharedArmorSystem : EntitySystem
         var (partType, _) = _body.ConvertTargetBodyPart(args.Args.TargetPart);
 
         if (component.ArmorCoverage.Contains(partType))
+        {
             args.Args.Damage = DamageSpecifier.ApplyModifierSet(args.Args.Damage,
-            DamageSpecifier.PenetrateArmor(component.Modifiers, args.Args.Damage.ArmorPenetration));
+                DamageSpecifier.PenetrateArmor(component.Modifiers, args.Args.Damage.ArmorPenetration));
+        }
     }
 
-    private void OnBorgDamageModify(EntityUid uid, ArmorComponent component,
-        ref BorgModuleRelayedEvent<DamageModifyEvent> args)
-    {
+    private void OnBorgDamageModify(EntityUid uid,
+        ArmorComponent component,
+        ref BorgModuleRelayedEvent<DamageModifyEvent> args) =>
         args.Args.Damage = DamageSpecifier.ApplyModifierSet(args.Args.Damage,
             DamageSpecifier.PenetrateArmor(component.Modifiers, args.Args.Damage.ArmorPenetration)); // Goob edit
-    }
 
     private void OnArmorVerbExamine(EntityUid uid, ArmorComponent component, GetVerbsEvent<ExamineVerb> args)
     {
@@ -121,8 +127,11 @@ public abstract class SharedArmorSystem : EntitySystem
         var ev = new ArmorExamineEvent(examineMarkup);
         RaiseLocalEvent(uid, ref ev);
 
-        _examine.AddDetailedExamineVerb(args, component, examineMarkup,
-            Loc.GetString("armor-examinable-verb-text"), "/Textures/Interface/VerbIcons/dot.svg.192dpi.png",
+        _examine.AddDetailedExamineVerb(args,
+            component,
+            examineMarkup,
+            Loc.GetString("armor-examinable-verb-text"),
+            "/Textures/Interface/VerbIcons/dot.svg.192dpi.png",
             Loc.GetString("armor-examinable-verb-message"));
     }
 
@@ -141,10 +150,13 @@ public abstract class SharedArmorSystem : EntitySystem
             var coveredParts = coverage.Where(coveragePart => coveragePart != BodyPartType.Other).ToList();
             List<string> coverageText = [];
             foreach (var part in coveredParts)
+            {
                 coverageText.Add(Loc.GetString("armor-coverage-type-" + part.ToString().ToLower()));
+            }
 
             msg.PushNewline();
-            msg.AddMarkupOrThrow(Loc.GetString("armor-coverage-value", ("type", ContentLocalizationManager.FormatList(coverageText))));
+            msg.AddMarkupOrThrow(Loc.GetString("armor-coverage-value",
+                ("type", ContentLocalizationManager.FormatList(coverageText))));
             // </Trauma>
         }
 

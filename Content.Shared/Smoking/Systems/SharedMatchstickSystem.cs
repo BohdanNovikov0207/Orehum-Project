@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Shitmed Change Start
+
 using Content.Shared.Smoking.Components;
 
 namespace Content.Shared.Smoking.Systems;
@@ -21,5 +22,5 @@ public abstract class SharedMatchstickSystem : EntitySystem
         Dirty(ent);
         return true;
     }
-} 
+}
 // Shitmed Change End

@@ -3,7 +3,7 @@
 namespace Content.Shared.Atmos.EntitySystems;
 
 /// <summary>
-/// Implements <see cref="ExtinguishableSetCollisionWakeComponent"/>.
+/// Implements <see cref="ExtinguishableSetCollisionWakeComponent" />.
 /// </summary>
 public sealed class ExtinguishableSetCollisionWakeSystem : EntitySystem
 {
@@ -18,13 +18,9 @@ public sealed class ExtinguishableSetCollisionWakeSystem : EntitySystem
         SubscribeLocalEvent<ExtinguishableSetCollisionWakeComponent, IgnitedEvent>(HandleIgnited);
     }
 
-    private void HandleExtinguished(Entity<ExtinguishableSetCollisionWakeComponent> ent, ref ExtinguishedEvent args)
-    {
+    private void HandleExtinguished(Entity<ExtinguishableSetCollisionWakeComponent> ent, ref ExtinguishedEvent args) =>
         _collisionWake.SetEnabled(ent, true);
-    }
 
-    private void HandleIgnited(Entity<ExtinguishableSetCollisionWakeComponent> ent, ref IgnitedEvent args)
-    {
+    private void HandleIgnited(Entity<ExtinguishableSetCollisionWakeComponent> ent, ref IgnitedEvent args) =>
         _collisionWake.SetEnabled(ent, false);
-    }
 }

@@ -9,6 +9,6 @@ namespace Content.Shared.StatusEffectNew.Components;
 /// and should not be applied on targets with <see cref="GodmodeComponent" />.
 /// Only applies to effects using the new <see cref="StatusEffectsSystem" />.
 /// </summary>
-/// <seealso cref="RejuvenateEvent"/>
-[RegisterComponent, NetworkedComponent]
+/// <seealso cref="RejuvenateEvent" />
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class RejuvenateRemovedStatusEffectComponent : Component;

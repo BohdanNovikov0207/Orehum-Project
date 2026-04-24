@@ -4,6 +4,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Damage;
 using Content.Shared.Ninja.Systems;
 using Content.Shared.Whitelist;
@@ -16,7 +17,7 @@ namespace Content.Shared.Ninja.Components;
 /// Component for stunning mobs on click outside of harm mode.
 /// Knocks them down for a bit and deals shock damage.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 [Access(typeof(SharedStunProviderSystem))]
 public sealed partial class StunProviderComponent : Component
 {
@@ -24,8 +25,26 @@ public sealed partial class StunProviderComponent : Component
     /// The powercell entity to take power from.
     /// Determines whether stunning is possible.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public EntityUid? BatteryUid;
+
+    /// <summary>
+    /// How long stunning is disabled after stunning something.
+    /// </summary>
+    [DataField]
+    public TimeSpan Cooldown = TimeSpan.FromSeconds(2);
+
+    /// <summary>
+    /// ID of the cooldown use delay.
+    /// </summary>
+    [DataField]
+    public string DelayId = "stun_cooldown";
+
+    /// <summary>
+    /// Locale string to popup when there is no power
+    /// </summary>
+    [DataField(required: true)]
+    public LocId NoPowerPopup = string.Empty;
 
     /// <summary>
     /// Sound played when stunning someone.
@@ -45,10 +64,10 @@ public sealed partial class StunProviderComponent : Component
     [DataField]
     public DamageSpecifier StunDamage = new()
     {
-        DamageDict = new()
+        DamageDict = new Dictionary<string, FixedPoint2>
         {
-            { "Shock", 5 }
-        }
+            { "Shock", 5 },
+        },
     };
 
     /// <summary>
@@ -56,24 +75,6 @@ public sealed partial class StunProviderComponent : Component
     /// </summary>
     [DataField]
     public TimeSpan StunTime = TimeSpan.FromSeconds(5);
-
-    /// <summary>
-    /// How long stunning is disabled after stunning something.
-    /// </summary>
-    [DataField]
-    public TimeSpan Cooldown = TimeSpan.FromSeconds(2);
-
-    /// <summary>
-    /// ID of the cooldown use delay.
-    /// </summary>
-    [DataField]
-    public string DelayId = "stun_cooldown";
-
-    /// <summary>
-    /// Locale string to popup when there is no power
-    /// </summary>
-    [DataField(required: true)]
-    public LocId NoPowerPopup = string.Empty;
 
     /// <summary>
     /// Whitelist for what counts as a mob.

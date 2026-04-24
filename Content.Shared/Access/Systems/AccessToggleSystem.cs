@@ -20,8 +20,6 @@ public sealed class AccessToggleSystem : EntitySystem
         SubscribeLocalEvent<AccessToggleComponent, ItemToggledEvent>(OnToggled);
     }
 
-    private void OnToggled(Entity<AccessToggleComponent> ent, ref ItemToggledEvent args)
-    {
+    private void OnToggled(Entity<AccessToggleComponent> ent, ref ItemToggledEvent args) =>
         _access.SetAccessEnabled(ent, args.Activated);
-    }
 }

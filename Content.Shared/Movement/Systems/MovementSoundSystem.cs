@@ -16,8 +16,8 @@ namespace Content.Shared.Movement.Systems;
 /// </summary>
 public sealed class MovementSoundSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -30,8 +30,11 @@ public sealed class MovementSoundSystem : EntitySystem
         if (!_timing.IsFirstTimePredicted)
             return;
 
-        var oldMoving = (SharedMoverController.GetNormalizedMovement(args.OldMovement) & MoveButtons.AnyDirection) != MoveButtons.None;
-        var moving = (SharedMoverController.GetNormalizedMovement(args.Entity.Comp.HeldMoveButtons) & MoveButtons.AnyDirection) != MoveButtons.None;
+        var oldMoving = (SharedMoverController.GetNormalizedMovement(args.OldMovement) & MoveButtons.AnyDirection) !=
+                        MoveButtons.None;
+        var moving =
+            (SharedMoverController.GetNormalizedMovement(args.Entity.Comp.HeldMoveButtons) &
+             MoveButtons.AnyDirection) != MoveButtons.None;
 
         if (oldMoving == moving)
             return;
@@ -42,8 +45,6 @@ public sealed class MovementSoundSystem : EntitySystem
             ent.Comp.SoundEntity = _audio.PlayPredicted(ent.Comp.Sound, ent.Owner, ent.Owner)?.Entity;
         }
         else
-        {
             ent.Comp.SoundEntity = _audio.Stop(ent.Comp.SoundEntity);
-        }
     }
 }

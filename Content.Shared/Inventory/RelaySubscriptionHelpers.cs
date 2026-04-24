@@ -13,9 +13,10 @@ public static class RelaySubscriptionHelpers
     /// <param name="subs">Subscriptions for the entity system we're subscribing on.</param>
     /// <param name="handler">The event handler to be called for the event.</param>
     /// <param name="baseEvent">Whether to subscribe the base event type.</param>
-    /// <param name="inventory">Whether to subscribe for <see cref="T:Content.Shared.Inventory.InventoryRelayedEvent`1"/>.</param>
-    /// <param name="held">Whether to subscribe for <see cref="T:Content.Shared.Hands.HeldRelayedEvent`1"/>.</param>
-    /// <seealso cref="M:Robust.Shared.GameObjects.EntitySystem.SubscribeLocalEvent``2(Robust.Shared.GameObjects.EntityEventRefHandler{``0,``1},System.Type[],System.Type[])"/>
+    /// <param name="inventory">Whether to subscribe for <see cref="T:Content.Shared.Inventory.InventoryRelayedEvent`1" />.</param>
+    /// <param name="held">Whether to subscribe for <see cref="T:Content.Shared.Hands.HeldRelayedEvent`1" />.</param>
+    /// <seealso
+    ///     cref="M:Robust.Shared.GameObjects.EntitySystem.SubscribeLocalEvent``2(Robust.Shared.GameObjects.EntityEventRefHandler{``0,``1},System.Type[],System.Type[])" />
     public static void SubscribeWithRelay<TComp, TEvent>(
         this EntitySystem.Subscriptions subs,
         EntityEventRefHandler<TComp, TEvent> handler,
@@ -51,9 +52,10 @@ public static class RelaySubscriptionHelpers
     /// <param name="subs">Subscriptions for the entity system we're subscribing on.</param>
     /// <param name="handler">The event handler to be called for the event.</param>
     /// <param name="baseEvent">Whether to subscribe the base event type.</param>
-    /// <param name="inventory">Whether to subscribe for <see cref="T:Content.Shared.Inventory.InventoryRelayedEvent`1"/>.</param>
-    /// <param name="held">Whether to subscribe for <see cref="T:Content.Shared.Hands.HeldRelayedEvent`1"/>.</param>
-    /// <seealso cref="M:Robust.Shared.GameObjects.EntitySystem.SubscribeLocalEvent``2(Robust.Shared.GameObjects.ComponentEventHandler{``0,``1},System.Type[],System.Type[])"/>
+    /// <param name="inventory">Whether to subscribe for <see cref="T:Content.Shared.Inventory.InventoryRelayedEvent`1" />.</param>
+    /// <param name="held">Whether to subscribe for <see cref="T:Content.Shared.Hands.HeldRelayedEvent`1" />.</param>
+    /// <seealso
+    ///     cref="M:Robust.Shared.GameObjects.EntitySystem.SubscribeLocalEvent``2(Robust.Shared.GameObjects.ComponentEventHandler{``0,``1},System.Type[],System.Type[])" />
     public static void SubscribeWithRelay<TComp, TEvent>(
         this EntitySystem.Subscriptions subs,
         ComponentEventHandler<TComp, TEvent> handler,
@@ -89,9 +91,10 @@ public static class RelaySubscriptionHelpers
     /// <param name="subs">Subscriptions for the entity system we're subscribing on.</param>
     /// <param name="handler">The event handler to be called for the event.</param>
     /// <param name="baseEvent">Whether to subscribe the base event type.</param>
-    /// <param name="inventory">Whether to subscribe for <see cref="T:Content.Shared.Inventory.InventoryRelayedEvent`1"/>.</param>
-    /// <param name="held">Whether to subscribe for <see cref="T:Content.Shared.Hands.HeldRelayedEvent`1"/>.</param>
-    /// <seealso cref="M:Robust.Shared.GameObjects.EntitySystem.SubscribeLocalEvent``2(Robust.Shared.GameObjects.ComponentEventRefHandler{``0,``1},System.Type[],System.Type[])"/>
+    /// <param name="inventory">Whether to subscribe for <see cref="T:Content.Shared.Inventory.InventoryRelayedEvent`1" />.</param>
+    /// <param name="held">Whether to subscribe for <see cref="T:Content.Shared.Hands.HeldRelayedEvent`1" />.</param>
+    /// <seealso
+    ///     cref="M:Robust.Shared.GameObjects.EntitySystem.SubscribeLocalEvent``2(Robust.Shared.GameObjects.ComponentEventRefHandler{``0,``1},System.Type[],System.Type[])" />
     public static void SubscribeWithRelay<TComp, TEvent>(
         this EntitySystem.Subscriptions subs,
         ComponentEventRefHandler<TComp, TEvent> handler,

@@ -19,25 +19,10 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototy
 
 namespace Content.Shared.Weapons.Ranged.Components;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class RevolverAmmoProviderComponent : AmmoProviderComponent
 {
-    /*
-     * Revolver has an array of its slots of which we can fire from any index.
-     * We also keep a separate array of slots we haven't spawned entities for, Chambers. This means that rather than creating
-     * for example 7 entities when revolver spawns (1 for the revolver and 6 cylinders) we can instead defer it.
-     */
-
-    [DataField("whitelist")]
-    public EntityWhitelist? Whitelist;
-
     public Container AmmoContainer = default!;
-
-    [DataField("currentSlot")]
-    public int CurrentIndex;
-
-    [DataField("capacity")]
-    public int Capacity = 6;
 
     // Like BallisticAmmoProvider we defer spawning until necessary
     // AmmoSlots is the instantiated ammo and Chambers is the unspawned ammo (that may or may not have been shot).
@@ -46,10 +31,16 @@ public sealed partial class RevolverAmmoProviderComponent : AmmoProviderComponen
     [DataField("ammoSlots")]
     public List<EntityUid?> AmmoSlots = new();
 
+    [DataField("capacity")]
+    public int Capacity = 6;
+
     [DataField("chambers")]
     public bool?[] Chambers = Array.Empty<bool?>();
 
-    [DataField("proto", customTypeSerializer:typeof(PrototypeIdSerializer<EntityPrototype>))]
+    [DataField("currentSlot")]
+    public int CurrentIndex;
+
+    [DataField("proto", customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
     public string? FillPrototype = "CartridgeMagnum";
 
     [DataField("soundEject")]
@@ -60,4 +51,12 @@ public sealed partial class RevolverAmmoProviderComponent : AmmoProviderComponen
 
     [DataField("soundSpin")]
     public SoundSpecifier? SoundSpin = new SoundPathSpecifier("/Audio/Weapons/Guns/Misc/revolver_spin.ogg");
+    /*
+     * Revolver has an array of its slots of which we can fire from any index.
+     * We also keep a separate array of slots we haven't spawned entities for, Chambers. This means that rather than creating
+     * for example 7 entities when revolver spawns (1 for the revolver and 6 cylinders) we can instead defer it.
+     */
+
+    [DataField("whitelist")]
+    public EntityWhitelist? Whitelist;
 }

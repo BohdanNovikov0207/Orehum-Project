@@ -27,28 +27,29 @@ namespace Content.Shared._ES.Viewcone;
 /// ⢠⡾⣽⣻⡽⣯⣟⡾⣽⢯⣟⡾⣽⣻⢾⣽⣻⢾⣽⣻⢾⡽⣯⣟⡷⣯⢿⡽⣯⣟⡾⣽⣻⣞⡷⣯⢿⣽⣻⣞⣷
 /// ⠀⠻⣷⣯⣟⡷⣯⢿⣽⣻⢾⣽⣳⢯⣟⡾⣽⣻⢾⡽⣯⣟⡷⣯⢿⡽⣯⣟⡷⣯⣟⣷⣻⢾⡽⣯⣟⣾⣳⢿⡞
 /// ⠀⠀⠈⠓⠛⠙⠋⠛⠚⠙⠛⠚⠋⠛⠚⠛⠓⠛⠋⠛⠓⠋⠛⠙⠋⠛⠓⠋⠛⠓⠛⠚⠙⠋⠛⠓⠛⠚⠛⠉⠀
-///           THE CONE MAN APPROACHES
+/// THE CONE MAN APPROACHES
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class ESViewconeComponent : Component
 {
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public float ConeAngle = 270f;
 
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public float ConeFeather = 10f;
 
-    [DataField, AutoNetworkedField]
-    public float ConeIgnoreRadius = 0.85f;
-
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public float ConeIgnoreFeather = 0.25f;
 
-    // Clientside, used for lerping view angle
-    // and keeping it consistent across all overlays
-    public Angle ViewAngle;
+    [DataField] [AutoNetworkedField]
+    public float ConeIgnoreRadius = 0.85f;
+
     public Angle? DesiredViewAngle = null;
     public Angle LastMouseRotationAngle;
     public Vector2 LastWorldPos;
     public Angle LastWorldRotationAngle;
+
+    // Clientside, used for lerping view angle
+    // and keeping it consistent across all overlays
+    public Angle ViewAngle;
 }

@@ -6,28 +6,30 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Linq;
+using Content.Goobstation.Maths.FixedPoint;
+using Content.Shared._Shitmed.Damage;
+using Content.Shared._Shitmed.Medical.Surgery.Consciousness;
+using Content.Shared._Shitmed.Medical.Surgery.Consciousness.Components;
+using Content.Shared._Shitmed.Medical.Surgery.Consciousness.Systems;
+using Content.Shared._Shitmed.Medical.Surgery.Pain.Systems;
 using Content.Shared._Shitmed.Targeting;
 using Content.Shared.Damage;
 using Content.Shared.Examine;
-using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Weapons.Melee.Events;
 using Robust.Shared.Map;
 using Robust.Shared.Prototypes;
-using Content.Shared._Shitmed.Damage;
-using Content.Shared._Shitmed.Medical.Surgery.Consciousness;
-using Content.Shared._Shitmed.Medical.Surgery.Consciousness.Components;
-using Content.Shared._Shitmed.Medical.Surgery.Consciousness.Systems;
-using Content.Shared._Shitmed.Medical.Surgery.Pain.Systems; // Shitmed Change
+
+// Shitmed Change
 
 namespace Content.Shared._Goobstation.Wizard.SanguineStrike;
 
 public abstract class SharedSanguineStrikeSystem : EntitySystem
 {
+    [Dependency] private readonly ConsciousnessSystem _consciousness = default!;
     [Dependency] private readonly DamageableSystem _damageable = default!;
     [Dependency] private readonly PainSystem _pain = default!;
-    [Dependency] private readonly ConsciousnessSystem _consciousness = default!;
 
     public override void Initialize()
     {
@@ -37,10 +39,8 @@ public abstract class SharedSanguineStrikeSystem : EntitySystem
         SubscribeLocalEvent<SanguineStrikeComponent, ExaminedEvent>(OnExamine);
     }
 
-    private void OnExamine(Entity<SanguineStrikeComponent> ent, ref ExaminedEvent args)
-    {
+    private void OnExamine(Entity<SanguineStrikeComponent> ent, ref ExaminedEvent args) =>
         args.PushMarkup(Loc.GetString("sanguine-strike-examine"));
-    }
 
     private void OnHit(Entity<SanguineStrikeComponent> ent, ref MeleeHitEvent args)
     {
@@ -98,7 +98,10 @@ public abstract class SharedSanguineStrikeSystem : EntitySystem
     {
     }
 
-    public void LifeSteal(EntityUid uid, FixedPoint2 amount, DamageableComponent? damageable = null, ConsciousnessComponent? consciousness = null)
+    public void LifeSteal(EntityUid uid,
+        FixedPoint2 amount,
+        DamageableComponent? damageable = null,
+        ConsciousnessComponent? consciousness = null)
     {
         if (!Resolve(uid, ref damageable, false))
             return;
@@ -138,7 +141,10 @@ public abstract class SharedSanguineStrikeSystem : EntitySystem
             foreach (var multiplier in
                      consciousness.Multipliers.Where(multiplier => multiplier.Value.Type == ConsciousnessModType.Pain))
             {
-                _consciousness.RemoveConsciousnessMultiplier(uid, multiplier.Key.Item1, multiplier.Key.Item2, consciousness);
+                _consciousness.RemoveConsciousnessMultiplier(uid,
+                    multiplier.Key.Item1,
+                    multiplier.Key.Item2,
+                    consciousness);
             }
 
             foreach (var modifier in
@@ -163,8 +169,6 @@ public abstract class SharedSanguineStrikeSystem : EntitySystem
             true,
             false,
             damageable,
-            null,
-            false,
             targetPart: TargetBodyPart.All,
             splitDamage: SplitDamageBehavior.SplitEnsureAll);
     }

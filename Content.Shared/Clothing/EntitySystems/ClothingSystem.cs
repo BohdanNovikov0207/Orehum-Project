@@ -97,15 +97,14 @@ using Content.Shared.Inventory;
 using Content.Shared.Inventory.Events;
 using Content.Shared.Item;
 using Content.Shared.Strip.Components;
-using Robust.Shared.GameStates;
 
 namespace Content.Shared.Clothing.EntitySystems;
 
 public abstract class ClothingSystem : EntitySystem
 {
-    [Dependency] private readonly SharedItemSystem _itemSys = default!;
-    [Dependency] private readonly InventorySystem _invSystem = default!;
     [Dependency] private readonly SharedHandsSystem _handsSystem = default!;
+    [Dependency] private readonly InventorySystem _invSystem = default!;
+    [Dependency] private readonly SharedItemSystem _itemSys = default!;
 
     public override void Initialize()
     {
@@ -155,14 +154,26 @@ public abstract class ClothingSystem : EntitySystem
                 if (!_invSystem.TryUnequip(userEnt, slotDef.Name, true, inventory: userEnt, checkDoafter: true))
                     continue;
 
-                if (!_invSystem.TryEquip(userEnt, toEquipEnt, slotDef.Name, inventory: userEnt, clothing: toEquipEnt, checkDoafter: true, triggerHandContact: true))
+                if (!_invSystem.TryEquip(userEnt,
+                        toEquipEnt,
+                        slotDef.Name,
+                        inventory: userEnt,
+                        clothing: toEquipEnt,
+                        checkDoafter: true,
+                        triggerHandContact: true))
                     continue;
 
                 _handsSystem.PickupOrDrop(userEnt, slotEntity.Value, handsComp: userEnt);
             }
             else
             {
-                if (!_invSystem.TryEquip(userEnt, toEquipEnt, slotDef.Name, inventory: userEnt, clothing: toEquipEnt, checkDoafter: true, triggerHandContact: true))
+                if (!_invSystem.TryEquip(userEnt,
+                        toEquipEnt,
+                        slotDef.Name,
+                        inventory: userEnt,
+                        clothing: toEquipEnt,
+                        checkDoafter: true,
+                        triggerHandContact: true))
                     continue;
             }
 
@@ -202,31 +213,39 @@ public abstract class ClothingSystem : EntitySystem
         Dirty(uid, component);
     }
 
-    private void AfterAutoHandleState(Entity<ClothingComponent> ent, ref AfterAutoHandleStateEvent args)
-    {
+    private void AfterAutoHandleState(Entity<ClothingComponent> ent, ref AfterAutoHandleStateEvent args) =>
         _itemSys.VisualsChanged(ent.Owner);
-    }
 
     private void OnEquipDoAfter(Entity<ClothingComponent> ent, ref ClothingEquipDoAfterEvent args)
     {
         if (args.Handled || args.Cancelled || args.Target is not { } target)
             return;
-        args.Handled = _invSystem.TryEquip(args.User, target, ent, args.Slot, clothing: ent.Comp, predicted: true, checkDoafter: false);
+        args.Handled = _invSystem.TryEquip(args.User,
+            target,
+            ent,
+            args.Slot,
+            clothing: ent.Comp,
+            predicted: true,
+            checkDoafter: false);
     }
 
     private void OnUnequipDoAfter(Entity<ClothingComponent> ent, ref ClothingUnequipDoAfterEvent args)
     {
         if (args.Handled || args.Cancelled || args.Target is not { } target)
             return;
-        args.Handled = _invSystem.TryUnequip(args.User, target, args.Slot, clothing: ent.Comp, predicted: true, checkDoafter: false, triggerHandContact: true);
+        args.Handled = _invSystem.TryUnequip(args.User,
+            target,
+            args.Slot,
+            clothing: ent.Comp,
+            predicted: true,
+            checkDoafter: false,
+            triggerHandContact: true);
         if (args.Handled)
             _handsSystem.TryPickup(args.User, ent);
     }
 
-    private void OnItemStripped(Entity<ClothingComponent> ent, ref BeforeItemStrippedEvent args)
-    {
+    private void OnItemStripped(Entity<ClothingComponent> ent, ref BeforeItemStrippedEvent args) =>
         args.Additive += ent.Comp.StripDelay;
-    }
 
     #region Public API
 
@@ -253,7 +272,7 @@ public abstract class ClothingSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Copy all clothing specific visuals from another item.
+    /// Copy all clothing specific visuals from another item.
     /// </summary>
     public void CopyVisuals(EntityUid uid, ClothingComponent otherClothing, ClothingComponent? clothing = null)
     {
@@ -281,6 +300,7 @@ public abstract class ClothingSystem : EntitySystem
             layer.Color = color;
         }
     }
+
     public void SetLayerState(ClothingComponent clothing, string slot, string mapKey, string state)
     {
         foreach (var layer in clothing.ClothingVisuals[slot])

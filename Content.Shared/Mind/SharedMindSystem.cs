@@ -61,12 +61,10 @@
 
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using Content.Goobstation.Common.Changeling;
+using Content.Goobstation.Common.Mind;
 using Content.Shared._EinsteinEngines.Language.Components;
 using Content.Shared._EinsteinEngines.Language.Events;
-using Content.Shared._EinsteinEngines.Language.Systems; // Goobstation
-using Content.Goobstation.Common.Mind;
-using Content.Shared._EinsteinEngines.Silicon.Components; // Goobstation
+using Content.Shared._EinsteinEngines.Language.Systems;
 using Content.Shared.Administration.Logs;
 using Content.Shared.Database;
 using Content.Shared.Emoting;
@@ -74,43 +72,44 @@ using Content.Shared.Examine;
 using Content.Shared.GameTicking;
 using Content.Shared.Humanoid;
 using Content.Shared.Interaction.Events;
-using Content.Shared.Movement.Components;
 using Content.Shared.Mind.Components;
 using Content.Shared.Mind.Filters;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Mobs.Systems;
+using Content.Shared.Movement.Components;
 using Content.Shared.Objectives.Systems;
 using Content.Shared.Players;
 using Content.Shared.Speech;
-
 using Content.Shared.Whitelist;
 using Robust.Shared.Map;
 using Robust.Shared.Network;
 using Robust.Shared.Player;
-using Robust.Shared.Random;
 using Robust.Shared.Prototypes;
+using Robust.Shared.Random;
 using Robust.Shared.Utility;
+// Goobstation
+// Goobstation
 
 namespace Content.Shared.Mind;
 
 public abstract partial class SharedMindSystem : EntitySystem
 {
     [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
-    [Dependency] private readonly INetManager _net = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly MetaDataSystem _metadata = default!;
+
+    private readonly EntProtoId _mindProto = "MindBase";
     [Dependency] private readonly MobStateSystem _mobState = default!;
+    [Dependency] private readonly INetManager _net = default!;
     [Dependency] private readonly SharedObjectivesSystem _objectives = default!;
+
+    private readonly HashSet<Entity<MindComponent>> _pickingMinds = new();
     [Dependency] private readonly SharedPlayerSystem _player = default!;
     [Dependency] private readonly ISharedPlayerManager _playerManager = default!;
-    [Dependency] private readonly MetaDataSystem _metadata = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
 
     [ViewVariables]
     protected readonly Dictionary<NetUserId, EntityUid> UserMinds = new();
-
-    private HashSet<Entity<MindComponent>> _pickingMinds = new();
-
-    private readonly EntProtoId _mindProto = "MindBase";
 
     public override void Initialize()
     {
@@ -151,18 +150,16 @@ public abstract partial class SharedMindSystem : EntitySystem
             return;
         }
 
-        Log.Error($"Encountered a user {component.UserId} that is already assigned to a mind while initializing mind {ToPrettyString(uid)}. Ignoring user field.");
+        Log.Error(
+            $"Encountered a user {component.UserId} that is already assigned to a mind while initializing mind {ToPrettyString(uid)}. Ignoring user field.");
         component.UserId = null;
     }
 
-    private void OnReset(RoundRestartCleanupEvent ev)
-    {
-        WipeAllMinds();
-    }
+    private void OnReset(RoundRestartCleanupEvent ev) => WipeAllMinds();
 
     public virtual void WipeAllMinds()
     {
-        Log.Info($"Wiping all minds");
+        Log.Info("Wiping all minds");
         foreach (var mind in UserMinds.Values.ToArray())
         {
             WipeMind(mind);
@@ -186,7 +183,9 @@ public abstract partial class SharedMindSystem : EntitySystem
         return mind;
     }
 
-    public virtual bool TryGetMind(NetUserId user, [NotNullWhen(true)] out EntityUid? mindId, [NotNullWhen(true)] out MindComponent? mind)
+    public virtual bool TryGetMind(NetUserId user,
+        [NotNullWhen(true)] out EntityUid? mindId,
+        [NotNullWhen(true)] out MindComponent? mind)
     {
         if (UserMinds.TryGetValue(user, out var mindIdValue) &&
             TryComp(mindIdValue, out mind))
@@ -258,13 +257,15 @@ public abstract partial class SharedMindSystem : EntitySystem
         // 5. Alive + No Session: Player disconnected while alive (SSD)
 
         if (dead && hasUserId == null)
-            args.PushMarkup($"[color=mediumpurple]{Loc.GetString("comp-mind-examined-dead-and-irrecoverable", ("ent", uid))}[/color]");
+            args.PushMarkup(
+                $"[color=mediumpurple]{Loc.GetString("comp-mind-examined-dead-and-irrecoverable", ("ent", uid))}[/color]");
         else if (dead && !hasActiveSession)
             args.PushMarkup($"[color=yellow]{Loc.GetString("comp-mind-examined-dead-and-ssd", ("ent", uid))}[/color]");
         else if (dead)
             args.PushMarkup($"[color=red]{Loc.GetString("comp-mind-examined-dead", ("ent", uid))}[/color]");
         else if (hasUserId == null)
-            args.PushMarkup($"[color=mediumpurple]{Loc.GetString("comp-mind-examined-catatonic", ("ent", uid))}[/color]");
+            args.PushMarkup(
+                $"[color=mediumpurple]{Loc.GetString("comp-mind-examined-catatonic", ("ent", uid))}[/color]");
         else if (!hasActiveSession)
             args.PushMarkup($"[color=yellow]{Loc.GetString("comp-mind-examined-ssd", ("ent", uid))}[/color]");
     }
@@ -322,8 +323,8 @@ public abstract partial class SharedMindSystem : EntitySystem
     }
 
     /// <summary>
-    ///     True if the OwnedEntity of this mind is physically dead.
-    ///     This specific definition, as opposed to CharacterDeadIC, is used to determine if ghosting should allow return.
+    /// True if the OwnedEntity of this mind is physically dead.
+    /// This specific definition, as opposed to CharacterDeadIC, is used to determine if ghosting should allow return.
     /// </summary>
     public bool IsCharacterDeadPhysically(MindComponent mind)
     {
@@ -352,9 +353,10 @@ public abstract partial class SharedMindSystem : EntitySystem
     }
 
     /// <summary>
-    ///     True if the OwnedEntity of this mind is physically unrevivable.
-    ///     This is mainly to check whether a mind is able to inherit their "original" character again without the need for creating a new one.
-    ///     In cases of being a brain, being borged or a zombie they are "unrevivable"
+    /// True if the OwnedEntity of this mind is physically unrevivable.
+    /// This is mainly to check whether a mind is able to inherit their "original" character again without the need for
+    /// creating a new one.
+    /// In cases of being a brain, being borged or a zombie they are "unrevivable"
     /// </summary>
     public bool IsCharacterUnrevivablePhysically(MindComponent mind)
     {
@@ -429,31 +431,35 @@ public abstract partial class SharedMindSystem : EntitySystem
         if (mindId == null || !Resolve(mindId.Value, ref mind, false))
             return;
 
-        TransferTo(mindId.Value, null, createGhost:false, mind: mind);
-        SetUserId(mindId.Value, null, mind: mind);
+        TransferTo(mindId.Value, null, createGhost: false, mind: mind);
+        SetUserId(mindId.Value, null, mind);
     }
 
     /// <summary>
-    ///     Transfer this mind's control over to a new entity.
+    /// Transfer this mind's control over to a new entity.
     /// </summary>
     /// <param name="mindId">The mind to transfer</param>
     /// <param name="entity">
-    ///     The entity to control.
-    ///     Can be null, in which case it will simply detach the mind from any entity.
+    /// The entity to control.
+    /// Can be null, in which case it will simply detach the mind from any entity.
     /// </param>
     /// <param name="ghostCheckOverride">
-    ///     If true, skips ghost check for Visiting Entity
+    /// If true, skips ghost check for Visiting Entity
     /// </param>
     /// <exception cref="ArgumentException">
-    ///     Thrown if <paramref name="entity"/> is already controlled by another player.
+    /// Thrown if <paramref name="entity" /> is already controlled by another player.
     /// </exception>
-    public virtual void TransferTo(EntityUid mindId, EntityUid? entity, bool ghostCheckOverride = false, bool createGhost = true, MindComponent? mind = null)
+    public virtual void TransferTo(EntityUid mindId,
+        EntityUid? entity,
+        bool ghostCheckOverride = false,
+        bool createGhost = true,
+        MindComponent? mind = null)
     {
     }
 
-    public virtual void ControlMob(EntityUid user, EntityUid target) {}
+    public virtual void ControlMob(EntityUid user, EntityUid target) { }
 
-    public virtual void ControlMob(NetUserId user, EntityUid target) {}
+    public virtual void ControlMob(NetUserId user, EntityUid target) { }
 
     /// <summary>
     /// Tries to create and add an objective from its prototype id.
@@ -475,7 +481,9 @@ public abstract partial class SharedMindSystem : EntitySystem
     public void AddObjective(EntityUid mindId, MindComponent mind, EntityUid objective)
     {
         var title = Name(objective);
-        _adminLogger.Add(LogType.Mind, LogImpact.Low, $"Objective {objective} ({title}) added to mind of {MindOwnerLoggingString(mind)}");
+        _adminLogger.Add(LogType.Mind,
+            LogImpact.Low,
+            $"Objective {objective} ({title}) added to mind of {MindOwnerLoggingString(mind)}");
         mind.Objectives.Add(objective);
         // Shitmed Change - Raise an event on the mind ent with the objective.
         var ev = new ObjectiveAddedEvent(objective);
@@ -494,7 +502,9 @@ public abstract partial class SharedMindSystem : EntitySystem
         var objective = mind.Objectives[index];
 
         var title = Name(objective);
-        _adminLogger.Add(LogType.Mind, LogImpact.Low, $"Objective {objective} ({title}) removed from the mind of {MindOwnerLoggingString(mind)}");
+        _adminLogger.Add(LogType.Mind,
+            LogImpact.Low,
+            $"Objective {objective} ({title}) removed from the mind of {MindOwnerLoggingString(mind)}");
         mind.Objectives.Remove(objective);
 
         // garbage collection - only delete the objective entity if no mind uses it anymore
@@ -513,14 +523,14 @@ public abstract partial class SharedMindSystem : EntitySystem
     public bool TryGetObjectiveComp<T>(EntityUid uid, [NotNullWhen(true)] out T? objective) where T : IComponent
     {
         if (TryGetMind(uid, out var mindId, out var mind) && TryGetObjectiveComp(mindId, out objective, mind))
-        {
             return true;
-        }
         objective = default;
         return false;
     }
 
-    public bool TryGetObjectiveComp<T>(EntityUid mindId, [NotNullWhen(true)] out T? objective, MindComponent? mind = null) where T : IComponent
+    public bool TryGetObjectiveComp<T>(EntityUid mindId,
+        [NotNullWhen(true)] out T? objective,
+        MindComponent? mind = null) where T : IComponent
     {
         if (Resolve(mindId, ref mind))
         {
@@ -528,11 +538,10 @@ public abstract partial class SharedMindSystem : EntitySystem
             foreach (var uid in mind.Objectives)
             {
                 if (query.TryGetComponent(uid, out objective))
-                {
                     return true;
-                }
             }
         }
+
         objective = default;
         return false;
     }
@@ -547,6 +556,7 @@ public abstract partial class SharedMindSystem : EntitySystem
         {
             QueueDel(obj);
         }
+
         comp.Objectives.Clear();
         Dirty(mind, comp);
     }
@@ -564,7 +574,10 @@ public abstract partial class SharedMindSystem : EntitySystem
     /// <param name="target"> mind entity of the player to copy to </param>
     /// <param name="except"> whitelist for objectives that should be copied </param>
     /// <param name="except"> blacklist for objectives that should not be copied </param>
-    public void CopyObjectives(Entity<MindComponent?> source, Entity<MindComponent?> target, EntityWhitelist? whitelist = null, EntityWhitelist? blacklist = null)
+    public void CopyObjectives(Entity<MindComponent?> source,
+        Entity<MindComponent?> target,
+        EntityWhitelist? whitelist = null,
+        EntityWhitelist? blacklist = null)
     {
         if (!Resolve(source, ref source.Comp) || !Resolve(target, ref target.Comp))
             return;
@@ -585,7 +598,9 @@ public abstract partial class SharedMindSystem : EntitySystem
     /// <remarks>
     /// Will not work for objectives that have no prototype, or duplicate objectives with the same prototype.
     /// <//remarks>
-    public bool TryFindObjective(Entity<MindComponent?> mind, string prototype, [NotNullWhen(true)] out EntityUid? objective)
+    public bool TryFindObjective(Entity<MindComponent?> mind,
+        string prototype,
+        [NotNullWhen(true)] out EntityUid? objective)
     {
         objective = null;
         if (!Resolve(mind, ref mind.Comp))
@@ -609,7 +624,7 @@ public abstract partial class SharedMindSystem : EntitySystem
     /// <param name="uid">Entity UID that owns the mind.</param>
     /// <param name="mindId">The mind id.</param>
     /// <param name="mind">The returned mind.</param>
-    /// <param name="container">Mind component on <paramref name="uid"/> to get the mind from.</param>
+    /// <param name="container">Mind component on <paramref name="uid" /> to get the mind from.</param>
     /// <returns>True if mind found. False if not.</returns>
     public bool TryGetMind(
         EntityUid uid,
@@ -671,10 +686,10 @@ public abstract partial class SharedMindSystem : EntitySystem
     }
 
     /// <summary>
-    ///     True if this Mind is 'sufficiently dead' IC (Objectives, EndText).
-    ///     Note that this is *IC logic*, it's not necessarily tied to any specific truth.
-    ///     "If administrators decide that zombies are dead, this returns true for zombies."
-    ///     (Maybe you were looking for the action blocker system?)
+    /// True if this Mind is 'sufficiently dead' IC (Objectives, EndText).
+    /// Note that this is *IC logic*, it's not necessarily tied to any specific truth.
+    /// "If administrators decide that zombies are dead, this returns true for zombies."
+    /// (Maybe you were looking for the action blocker system?)
     /// </summary>
     public bool IsCharacterDeadIc(MindComponent mind)
     {
@@ -691,11 +706,11 @@ public abstract partial class SharedMindSystem : EntitySystem
     }
 
     /// <summary>
-    ///     True if this Mind is 'sufficiently unrevivable' IC (Objectives, EndText).
-    ///     Note that this is *IC logic*, it's not necessarily tied to any specific truth.
-    ///     "If administrators decide that zombies are unrevivable, this returns true for zombies."
-    ///     Alternative IsCharacterDeadIC that checks for whether they will be able to inherit their body again.
-    ///     State in which they must be given a new body to "live" (borging, being a brain, etc) should count as "unrevivable".
+    /// True if this Mind is 'sufficiently unrevivable' IC (Objectives, EndText).
+    /// Note that this is *IC logic*, it's not necessarily tied to any specific truth.
+    /// "If administrators decide that zombies are unrevivable, this returns true for zombies."
+    /// Alternative IsCharacterDeadIC that checks for whether they will be able to inherit their body again.
+    /// State in which they must be given a new body to "live" (borging, being a brain, etc) should count as "unrevivable".
     /// </summary>
     public bool IsCharacterUnrevivableIc(MindComponent mind)
     {
@@ -712,7 +727,7 @@ public abstract partial class SharedMindSystem : EntitySystem
     }
 
     /// <summary>
-    ///     A string to represent the mind for logging
+    /// A string to represent the mind for logging
     /// </summary>
     public string MindOwnerLoggingString(MindComponent mind)
     {
@@ -723,14 +738,12 @@ public abstract partial class SharedMindSystem : EntitySystem
         return "(originally " + mind.OriginalOwnerUserId + ")";
     }
 
-    public string? GetCharacterName(NetUserId userId)
-    {
-        return TryGetMind(userId, out _, out var mind) ? mind.CharacterName : null;
-    }
+    public string? GetCharacterName(NetUserId userId) =>
+        TryGetMind(userId, out _, out var mind) ? mind.CharacterName : null;
 
     /// <summary>
     /// Returns a list of every living humanoid player's minds, except for a single one which is exluded.
-    /// A new hashset is allocated for every call, consider using <see cref="AddAliveHumans"/> instead.
+    /// A new hashset is allocated for every call, consider using <see cref="AddAliveHumans" /> instead.
     /// </summary>
     public HashSet<Entity<MindComponent>> GetAliveHumans(EntityUid? exclude = null)
     {
@@ -750,7 +763,8 @@ public abstract partial class SharedMindSystem : EntitySystem
         {
             // the player needs to have a mind and not be the excluded one +
             // the player has to be alive
-            if (!TryGetMind(uid, out var mind, out var mindComp) || mind == exclude || !_mobState.IsAlive(uid, mobState))
+            if (!TryGetMind(uid, out var mind, out var mindComp) || mind == exclude ||
+                !_mobState.IsAlive(uid, mobState))
                 continue;
 
             // Goobstation - selection blocker event
@@ -781,15 +795,13 @@ public abstract partial class SharedMindSystem : EntitySystem
     }
 
     /// <summary>
-    /// Filters minds from a hashset using a single <see cref="MindFilter"/>.
+    /// Filters minds from a hashset using a single <see cref="MindFilter" />.
     /// </summary>
-    public void FilterMinds(HashSet<Entity<MindComponent>> minds, MindFilter filter, EntityUid? exclude = null)
-    {
+    public void FilterMinds(HashSet<Entity<MindComponent>> minds, MindFilter filter, EntityUid? exclude = null) =>
         minds.RemoveWhere(mind => filter.Filter(mind, exclude, EntityManager, this));
-    }
 
     /// <summary>
-    /// Filters minds from a hashset using a list of <see cref="MindFilter"/>s to apply sequentially.
+    /// Filters minds from a hashset using a list of <see cref="MindFilter" />s to apply sequentially.
     /// </summary>
     public void FilterMinds(HashSet<Entity<MindComponent>> minds, List<MindFilter> filters, EntityUid? exclude = null)
     {
@@ -855,7 +867,7 @@ public abstract partial class SharedMindSystem : EntitySystem
 public record struct GetCharactedDeadIcEvent(bool? Dead);
 
 /// <summary>
-///     Shitmed Change: Raised on an entity to notify that an objective has been added to the mind.
+/// Shitmed Change: Raised on an entity to notify that an objective has been added to the mind.
 /// </summary>
 /// <param name="Objective"></param>
 public record struct ObjectiveAddedEvent(EntityUid Objective);

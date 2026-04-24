@@ -17,6 +17,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Linq;
 using Content.Shared.Access.Components;
 using Content.Shared.Clothing.Components;
 using Content.Shared.Contraband;
@@ -28,35 +29,34 @@ using Content.Shared.Verbs;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
 using Robust.Shared.Utility;
-using System.Linq;
 
 namespace Content.Shared.Clothing.EntitySystems;
 
 public abstract class SharedChameleonClothingSystem : EntitySystem
 {
-    [Dependency] private readonly IPrototypeManager _proto = default!;
-    [Dependency] private readonly ClothingSystem _clothingSystem = default!;
-    [Dependency] private readonly ContrabandSystem _contraband = default!;
-    [Dependency] private readonly MetaDataSystem _metaData = default!;
-    [Dependency] private readonly SharedItemSystem _itemSystem = default!;
-    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
-    [Dependency] private readonly TagSystem _tag = default!;
-    [Dependency] protected readonly IGameTiming _timing = default!;
-
     private static readonly SlotFlags[] IgnoredSlots =
     {
         SlotFlags.All,
         SlotFlags.PREVENTEQUIP,
-        SlotFlags.NONE
+        SlotFlags.NONE,
     };
+
     private static readonly SlotFlags[] Slots = Enum.GetValues<SlotFlags>().Except(IgnoredSlots).ToArray();
 
-    private readonly Dictionary<SlotFlags, List<EntProtoId>> _data = new();
+    private static readonly ProtoId<TagPrototype> WhitelistChameleonTag = "WhitelistChameleon";
+    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly ClothingSystem _clothingSystem = default!;
+    [Dependency] private readonly ContrabandSystem _contraband = default!;
 
-    public readonly Dictionary<SlotFlags, List<string>> ValidVariants = new();
+    private readonly Dictionary<SlotFlags, List<EntProtoId>> _data = new();
+    [Dependency] private readonly SharedItemSystem _itemSystem = default!;
+    [Dependency] private readonly MetaDataSystem _metaData = default!;
+    [Dependency] private readonly IPrototypeManager _proto = default!;
+    [Dependency] private readonly TagSystem _tag = default!;
+    [Dependency] protected readonly IGameTiming _timing = default!;
     [Dependency] protected readonly SharedUserInterfaceSystem UI = default!;
 
-    private static readonly ProtoId<TagPrototype> WhitelistChameleonTag = "WhitelistChameleon";
+    public readonly Dictionary<SlotFlags, List<string>> ValidVariants = new();
 
     public override void Initialize()
     {
@@ -69,20 +69,15 @@ public abstract class SharedChameleonClothingSystem : EntitySystem
         PrepareAllVariants();
     }
 
-    private void OnPrototypeReload(EntityUid uid, ChameleonClothingComponent component, PrototypesReloadedEventArgs args)
-    {
-        PrepareAllVariants();
-    }
+    private void OnPrototypeReload(EntityUid uid,
+        ChameleonClothingComponent component,
+        PrototypesReloadedEventArgs args) => PrepareAllVariants();
 
-    private void OnGotEquipped(EntityUid uid, ChameleonClothingComponent component, GotEquippedEvent args)
-    {
+    private void OnGotEquipped(EntityUid uid, ChameleonClothingComponent component, GotEquippedEvent args) =>
         component.User = args.Equipee;
-    }
 
-    private void OnGotUnequipped(EntityUid uid, ChameleonClothingComponent component, GotUnequippedEvent args)
-    {
+    private void OnGotUnequipped(EntityUid uid, ChameleonClothingComponent component, GotUnequippedEvent args) =>
         component.User = null;
-    }
 
     // Updates chameleon visuals and meta information.
     // This function is called on a server after user selected new outfit.
@@ -91,7 +86,7 @@ public abstract class SharedChameleonClothingSystem : EntitySystem
     protected void UpdateVisuals(EntityUid uid, ChameleonClothingComponent component)
     {
         if (string.IsNullOrEmpty(component.Default) ||
-            !_proto.TryIndex(component.Default, out EntityPrototype? proto))
+            !_proto.TryIndex(component.Default, out var proto))
             return;
 
         // world sprite icon
@@ -108,16 +103,12 @@ public abstract class SharedChameleonClothingSystem : EntitySystem
         // item sprite logic
         if (TryComp(uid, out ItemComponent? item) &&
             proto.TryGetComponent(out ItemComponent? otherItem, Factory))
-        {
             _itemSystem.CopyVisuals(uid, otherItem, item);
-        }
 
         // clothing sprite logic
         if (TryComp(uid, out ClothingComponent? clothing) &&
             proto.TryGetComponent("Clothing", out ClothingComponent? otherClothing))
-        {
             _clothingSystem.CopyVisuals(uid, otherClothing, clothing);
-        }
 
         // appearance data logic
         if (TryComp(uid, out AppearanceComponent? appearance) &&
@@ -134,9 +125,7 @@ public abstract class SharedChameleonClothingSystem : EntitySystem
             _contraband.CopyDetails(uid, contra, current);
         }
         else
-        {
             RemComp<ContrabandComponent>(uid);
-        }
     }
 
     private void OnVerb(Entity<ChameleonClothingComponent> ent, ref GetVerbsEvent<InteractionVerb> args)
@@ -147,20 +136,22 @@ public abstract class SharedChameleonClothingSystem : EntitySystem
         // Can't pass args from a ref event inside of lambdas
         var user = args.User;
 
-        args.Verbs.Add(new InteractionVerb()
+        args.Verbs.Add(new InteractionVerb
         {
             Text = Loc.GetString("chameleon-component-verb-text"),
-            Icon = new SpriteSpecifier.Texture(new("/Textures/Interface/VerbIcons/settings.svg.192dpi.png")),
-            Act = () => UI.TryToggleUi(ent.Owner, ChameleonUiKey.Key, user)
+            Icon = new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/VerbIcons/settings.svg.192dpi.png")),
+            Act = () => UI.TryToggleUi(ent.Owner, ChameleonUiKey.Key, user),
         });
     }
 
     protected virtual void UpdateSprite(EntityUid uid, EntityPrototype proto) { }
 
     /// <summary>
-    ///     Check if this entity prototype is valid target for chameleon item.
+    /// Check if this entity prototype is valid target for chameleon item.
     /// </summary>
-    public bool IsValidTarget(EntityPrototype proto, SlotFlags chameleonSlot = SlotFlags.NONE, string? requiredTag = null)
+    public bool IsValidTarget(EntityPrototype proto,
+        SlotFlags chameleonSlot = SlotFlags.NONE,
+        string? requiredTag = null)
     {
         // check if entity is valid
         if (proto.Abstract || proto.HideSpawnMenu)
@@ -183,7 +174,7 @@ public abstract class SharedChameleonClothingSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Get a list of valid chameleon targets for these slots.
+    /// Get a list of valid chameleon targets for these slots.
     /// </summary>
     public IEnumerable<EntProtoId> GetValidTargets(SlotFlags slot, string? tag = null)
     {
@@ -197,9 +188,7 @@ public abstract class SharedChameleonClothingSystem : EntitySystem
             }
         }
         else
-        {
             validTargets = _data[slot];
-        }
 
         return validTargets;
     }
@@ -225,9 +214,7 @@ public abstract class SharedChameleonClothingSystem : EntitySystem
                     continue;
 
                 if (!_data.ContainsKey(slot))
-                {
                     _data.Add(slot, new List<EntProtoId>());
-                }
                 _data[slot].Add(proto.ID);
             }
         }

@@ -4,27 +4,28 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared._Shitmed.Medical.Surgery.Traumas;
-using Content.Shared._Shitmed.Targeting;
-using Content.Shared._Shitmed.Medical.Surgery.Wounds;
-using Content.Shared.Body.Part;
 using Content.Goobstation.Maths.FixedPoint;
-using Robust.Shared.Serialization;
+using Content.Shared._Shitmed.Medical.Surgery.Traumas;
+using Content.Shared._Shitmed.Medical.Surgery.Wounds;
+using Content.Shared._Shitmed.Targeting;
+using Content.Shared.Body.Part;
 using Content.Shared.Chemistry.Components;
+using Robust.Shared.Serialization;
+
 namespace Content.Shared._Shitmed.Medical.HealthAnalyzer;
 
 // Base message that contains common data for all Modes
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public abstract class HealthAnalyzerBaseMessage : BoundUserInterfaceMessage
 {
-    public readonly NetEntity? TargetEntity;
-    public readonly float Temperature;
+    public readonly HealthAnalyzerMode ActiveMode;
     public readonly float BloodLevel;
     public readonly bool? ScanMode;
-    public readonly HealthAnalyzerMode ActiveMode;
-    public Dictionary<TargetBodyPart, WoundableSeverity>? Body;
-    public Dictionary<TargetBodyPart, bool> Bleeding;
+    public readonly NetEntity? TargetEntity;
+    public readonly float Temperature;
     public readonly FixedPoint2 VitalDamage; // Goobstation
+    public Dictionary<TargetBodyPart, bool> Bleeding;
+    public Dictionary<TargetBodyPart, WoundableSeverity>? Body;
 
     public HealthAnalyzerBaseMessage(
         NetEntity? targetEntity,
@@ -34,7 +35,7 @@ public abstract class HealthAnalyzerBaseMessage : BoundUserInterfaceMessage
         HealthAnalyzerMode activeMode,
         Dictionary<TargetBodyPart, WoundableSeverity>? body,
         Dictionary<TargetBodyPart, bool> bleeding,
-        FixedPoint2 vitalDamage)  // Goobstation
+        FixedPoint2 vitalDamage) // Goobstation
     {
         TargetEntity = targetEntity;
         Temperature = temperature;
@@ -43,18 +44,18 @@ public abstract class HealthAnalyzerBaseMessage : BoundUserInterfaceMessage
         ActiveMode = activeMode;
         Body = body;
         Bleeding = bleeding;
-        VitalDamage = vitalDamage;  // Goobstation
+        VitalDamage = vitalDamage; // Goobstation
     }
 }
 
 // Body Mode message
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class HealthAnalyzerBodyMessage : HealthAnalyzerBaseMessage
 {
-    public readonly bool? Unrevivable;
+    public readonly Dictionary<NetEntity, FixedPoint2> NervePainFeels;
     public readonly NetEntity? SelectedPart;
     public readonly Dictionary<NetEntity, List<WoundableTraumaData>> Traumas;
-    public readonly Dictionary<NetEntity, FixedPoint2> NervePainFeels;
+    public readonly bool? Unrevivable;
 
     public HealthAnalyzerBodyMessage(
         NetEntity? targetEntity,
@@ -64,11 +65,18 @@ public sealed class HealthAnalyzerBodyMessage : HealthAnalyzerBaseMessage
         bool? unrevivable,
         Dictionary<TargetBodyPart, WoundableSeverity>? body,
         Dictionary<TargetBodyPart, bool> bleeding,
-        FixedPoint2 vitalDamage,  // Goobstation
+        FixedPoint2 vitalDamage, // Goobstation
         Dictionary<NetEntity, List<WoundableTraumaData>> traumas,
         Dictionary<NetEntity, FixedPoint2> nervePainFeels,
         NetEntity? selectedPart = null)
-        : base(targetEntity, temperature, bloodLevel, scanMode, HealthAnalyzerMode.Body, body, bleeding, vitalDamage)  // Goobstation
+        : base(targetEntity,
+            temperature,
+            bloodLevel,
+            scanMode,
+            HealthAnalyzerMode.Body,
+            body,
+            bleeding,
+            vitalDamage) // Goobstation
     {
         Unrevivable = unrevivable;
         SelectedPart = selectedPart;
@@ -78,7 +86,7 @@ public sealed class HealthAnalyzerBodyMessage : HealthAnalyzerBaseMessage
 }
 
 // Organs Mode message
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class HealthAnalyzerOrgansMessage : HealthAnalyzerBaseMessage
 {
     public readonly Dictionary<NetEntity, OrganTraumaData> Organs;
@@ -92,14 +100,21 @@ public sealed class HealthAnalyzerOrgansMessage : HealthAnalyzerBaseMessage
         FixedPoint2 vitalDamage, // Goobstation
         Dictionary<TargetBodyPart, WoundableSeverity>? body,
         Dictionary<NetEntity, OrganTraumaData> organs)
-        : base(targetEntity, temperature, bloodLevel, scanMode, HealthAnalyzerMode.Organs, body, bleeding, vitalDamage) // Goobstation
+        : base(targetEntity,
+            temperature,
+            bloodLevel,
+            scanMode,
+            HealthAnalyzerMode.Organs,
+            body,
+            bleeding,
+            vitalDamage) // Goobstation
     {
         Organs = organs;
     }
 }
 
 // Chemicals Mode message
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class HealthAnalyzerChemicalsMessage : HealthAnalyzerBaseMessage
 {
     public readonly Dictionary<NetEntity, Solution> Solutions;
@@ -113,18 +128,25 @@ public sealed class HealthAnalyzerChemicalsMessage : HealthAnalyzerBaseMessage
         FixedPoint2 vitalDamage, // Goobstation
         Dictionary<TargetBodyPart, WoundableSeverity>? body,
         Dictionary<NetEntity, Solution> solutions)
-        : base(targetEntity, temperature, bloodLevel, scanMode, HealthAnalyzerMode.Chemicals, body, bleeding, vitalDamage) // Goobstation
+        : base(targetEntity,
+            temperature,
+            bloodLevel,
+            scanMode,
+            HealthAnalyzerMode.Chemicals,
+            body,
+            bleeding,
+            vitalDamage) // Goobstation
     {
         Solutions = solutions;
     }
 }
 
 // Mode selection message (from client to server)
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class HealthAnalyzerModeSelectedMessage : BoundUserInterfaceMessage
 {
-    public readonly NetEntity? Owner;
     public readonly HealthAnalyzerMode Mode;
+    public readonly NetEntity? Owner;
 
     public HealthAnalyzerModeSelectedMessage(NetEntity owner, HealthAnalyzerMode mode)
     {
@@ -134,11 +156,11 @@ public sealed class HealthAnalyzerModeSelectedMessage : BoundUserInterfaceMessag
 }
 
 // Part selection message (from client to server)
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class HealthAnalyzerPartSelectedMessage : BoundUserInterfaceMessage
 {
-    public readonly NetEntity? Owner;
     public readonly TargetBodyPart? BodyPart;
+    public readonly NetEntity? Owner;
 
     public HealthAnalyzerPartSelectedMessage(NetEntity? owner, TargetBodyPart? bodyPart)
     {
@@ -147,7 +169,7 @@ public sealed class HealthAnalyzerPartSelectedMessage : BoundUserInterfaceMessag
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public struct WoundableTraumaData
 {
     public string Name;
@@ -171,7 +193,7 @@ public struct WoundableTraumaData
 }
 
 // Supporting data structures
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public struct OrganTraumaData
 {
     public FixedPoint2 Integrity;
@@ -191,10 +213,10 @@ public struct OrganTraumaData
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum HealthAnalyzerMode
 {
     Body,
     Organs,
-    Chemicals
+    Chemicals,
 }

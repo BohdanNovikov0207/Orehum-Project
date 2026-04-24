@@ -36,9 +36,9 @@ namespace Content.Shared._DV.Salvage.Systems;
 
 public sealed class MiningPointsSystem : EntitySystem
 {
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedIdCardSystem _idCard = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
 
     private EntityQuery<MiningPointsComponent> _query;
 
@@ -49,10 +49,11 @@ public sealed class MiningPointsSystem : EntitySystem
         _query = GetEntityQuery<MiningPointsComponent>();
 
         SubscribeLocalEvent<MiningPointsLatheComponent, MaterialEntityInsertedEvent>(OnMaterialEntityInserted);
-        Subs.BuiEvents<MiningPointsLatheComponent>(LatheUiKey.Key, subs =>
-        {
-            subs.Event<LatheClaimMiningPointsMessage>(OnClaimMiningPoints);
-        });
+        Subs.BuiEvents<MiningPointsLatheComponent>(LatheUiKey.Key,
+            subs =>
+            {
+                subs.Event<LatheClaimMiningPointsMessage>(OnClaimMiningPoints);
+            });
     }
 
     #region Event Handlers
@@ -74,14 +75,16 @@ public sealed class MiningPointsSystem : EntitySystem
     private void OnClaimMiningPoints(Entity<MiningPointsLatheComponent> ent, ref LatheClaimMiningPointsMessage args)
     {
         var user = args.Actor;
-        if (GetPointComp(user) is {} dest) // Goobstation - borg Miningpoints
+        if (GetPointComp(user) is { } dest) // Goobstation - borg Miningpoints
             TransferAll(ent.Owner, dest);
     }
 
     #endregion
+
     #region Public API
+
     /// <summary>
-    /// if user can claim mining points 
+    /// if user can claim mining points
     /// <summary>
     public bool CanClaimPoints(EntityUid user) // Goobstation - borg Miningpoints
     {
@@ -99,15 +102,16 @@ public sealed class MiningPointsSystem : EntitySystem
     public Entity<MiningPointsComponent?>? GetPointComp(EntityUid user) // Goobstation - borg Miningpoints
     {
         if (TryComp<MiningPointsComponent>(user, out var comp))
-            return  (user,comp);
+            return (user, comp);
         return TryFindIdCard(user);
     }
 
     /// <summary>
-    /// Tries to find the user's id card and gets its <see cref="MiningPointsComponent"/>.
+    /// Tries to find the user's id card and gets its <see cref="MiningPointsComponent" />.
     /// </summary>
     /// <remarks>
-    /// Component is nullable for easy usage with the API due to Entity&lt;T&gt; not being usable for Entity&lt;T?&gt; arguments.
+    /// Component is nullable for easy usage with the API due to Entity&lt;T&gt; not being usable for Entity&lt;T?&gt;
+    /// arguments.
     /// </remarks>
     public Entity<MiningPointsComponent?>? TryFindIdCard(EntityUid user)
     {
@@ -125,7 +129,7 @@ public sealed class MiningPointsSystem : EntitySystem
     /// </summary>
     public bool UserHasPoints(EntityUid user, uint points)
     {
-        if (GetPointComp(user)?.Comp is not {} comp) // Goobstation - borg Miningpoints
+        if (GetPointComp(user)?.Comp is not { } comp) // Goobstation - borg Miningpoints
             return false;
 
         return comp.Points >= points;
@@ -182,10 +186,8 @@ public sealed class MiningPointsSystem : EntitySystem
     /// Transfers all points from source to destination.
     /// Returns true if the transfer succeeded.
     /// </summary>
-    public bool TransferAll(Entity<MiningPointsComponent?> src, Entity<MiningPointsComponent?> dest)
-    {
-        return _query.Resolve(src, ref src.Comp) && Transfer(src, dest, src.Comp.Points);
-    }
+    public bool TransferAll(Entity<MiningPointsComponent?> src, Entity<MiningPointsComponent?> dest) =>
+        _query.Resolve(src, ref src.Comp) && Transfer(src, dest, src.Comp.Points);
 
     #endregion
 }

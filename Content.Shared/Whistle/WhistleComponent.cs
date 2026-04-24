@@ -5,27 +5,27 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Robust.Shared.GameStates;
 using Content.Shared.Humanoid;
+using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
 
 namespace Content.Shared.Whistle;
 
 /// <summary>
-/// Spawn attached entity for entities in range with <see cref="HumanoidAppearanceComponent"/>.
+/// Spawn attached entity for entities in range with <see cref="HumanoidAppearanceComponent" />.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class WhistleComponent : Component
 {
-    /// <summary>
-    /// Entity prototype to spawn
-    /// </summary>
-    [DataField]
-    public EntProtoId Effect = "WhistleExclamation";
-
     /// <summary>
     /// Range value.
     /// </summary>
     [DataField]
     public float Distance = 0;
+
+    /// <summary>
+    /// Entity prototype to spawn
+    /// </summary>
+    [DataField]
+    public EntProtoId Effect = "WhistleExclamation";
 }

@@ -4,20 +4,20 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared._Shitmed.CCVar;
+using Content.Shared._Shitmed.Medical.Surgery.Consciousness.Systems;
 using Content.Shared._Shitmed.Medical.Surgery.Traumas.Components;
 using Content.Shared._Shitmed.Medical.Surgery.Wounds;
 using Content.Shared._Shitmed.Medical.Surgery.Wounds.Components;
 using Content.Shared._Shitmed.Medical.Surgery.Wounds.Systems;
+using Content.Shared.Body.Components;
 using Content.Shared.Body.Part;
-using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Popups;
 using JetBrains.Annotations;
+using Robust.Shared.Audio;
 using Robust.Shared.Configuration;
 using Robust.Shared.Utility;
-using Robust.Shared.Audio;
-using Content.Shared._Shitmed.Medical.Surgery.Consciousness.Systems;
-using Content.Shared.Body.Components;
 
 // ReSharper disable once CheckNamespace
 namespace Content.Shared.Body.Systems;
@@ -25,10 +25,10 @@ namespace Content.Shared.Body.Systems;
 [UsedImplicitly]
 public abstract partial class SharedBloodstreamSystem
 {
-    [Dependency] private readonly IConfigurationManager _cfg = default!;
-    [Dependency] private readonly WoundSystem _wound = default!;
-    [Dependency] private readonly ConsciousnessSystem _consciousness = default!;
     [Dependency] private readonly SharedBodySystem _body = default!;
+    [Dependency] private readonly IConfigurationManager _cfg = default!;
+    [Dependency] private readonly ConsciousnessSystem _consciousness = default!;
+    [Dependency] private readonly WoundSystem _wound = default!;
 
     private void InitializeWounds()
     {
@@ -63,7 +63,7 @@ public abstract partial class SharedBloodstreamSystem
                 continue;
 
             var newBleeds = FixedPoint2.Clamp(
-                (totalTime / currentTime) / (bleeds.ScalingLimit - bleeds.Scaling),
+                totalTime / currentTime / (bleeds.ScalingLimit - bleeds.Scaling),
                 0,
                 bleeds.ScalingLimit);
 
@@ -277,9 +277,11 @@ public abstract partial class SharedBloodstreamSystem
             return;
 
         // wounds that BLEED will not HEAL.
-        component.BleedingAmountRaw = args.Component.WoundSeverityPoint * _cfg.GetCVar(SurgeryCVars.BleedingSeverityTrade);
+        component.BleedingAmountRaw =
+            args.Component.WoundSeverityPoint * _cfg.GetCVar(SurgeryCVars.BleedingSeverityTrade);
 
-        var formula = (float) (args.Component.WoundSeverityPoint / _cfg.GetCVar(SurgeryCVars.BleedsScalingTime) * component.ScalingSpeed);
+        var formula = (float) (args.Component.WoundSeverityPoint / _cfg.GetCVar(SurgeryCVars.BleedsScalingTime) *
+                               component.ScalingSpeed);
         component.ScalingFinishesAt = _timing.CurTime + TimeSpan.FromSeconds(formula);
         component.ScalingStartsAt = _timing.CurTime;
         component.IsBleeding = true;
@@ -312,10 +314,12 @@ public abstract partial class SharedBloodstreamSystem
         var oldBleedsAmount = args.OldSeverity * _cfg.GetCVar(SurgeryCVars.BleedingSeverityTrade);
         component.BleedingAmountRaw = args.NewSeverity * _cfg.GetCVar(SurgeryCVars.BleedingSeverityTrade);
 
-        var severityPenalty = component.BleedingAmountRaw - oldBleedsAmount / _cfg.GetCVar(SurgeryCVars.BleedsScalingTime);
+        var severityPenalty =
+            component.BleedingAmountRaw - oldBleedsAmount / _cfg.GetCVar(SurgeryCVars.BleedsScalingTime);
         component.SeverityPenalty += severityPenalty;
 
-        var formula = (float) (args.NewSeverity / _cfg.GetCVar(SurgeryCVars.BleedsScalingTime) * component.ScalingSpeed);
+        var formula =
+            (float) (args.NewSeverity / _cfg.GetCVar(SurgeryCVars.BleedsScalingTime) * component.ScalingSpeed);
         component.ScalingFinishesAt = _timing.CurTime + TimeSpan.FromSeconds(formula);
         component.ScalingStartsAt = _timing.CurTime;
 
@@ -329,14 +333,14 @@ public abstract partial class SharedBloodstreamSystem
         // dummy fix as me and pretty much nobody else currently knows HOW EXACTLY was is supposed to work, womp womp
         // seems to work fine though so why not
         if (component.BleedingAmountRaw > 0) // Goobstation
-        {
             component.Scaling = 1;
-        }
 
         Dirty(uid, component);
     }
 
-    public void OnBleedRemoverSeverityUpdate(EntityUid uid, BleedRemoverComponent component, ref WoundSeverityPointChangedEvent args)
+    public void OnBleedRemoverSeverityUpdate(EntityUid uid,
+        BleedRemoverComponent component,
+        ref WoundSeverityPointChangedEvent args)
     {
         var delta = args.NewSeverity - args.OldSeverity;
         if (delta < component.SeverityThreshold
@@ -349,7 +353,7 @@ public abstract partial class SharedBloodstreamSystem
 
         var result = _wound.TryHealBleedingWounds(wound.HoldingWoundable,
             (-delta * component.BleedingRemovalMultiplier).Float(),
-            out var _,
+            out _,
             woundable);
 
         if (!result)

@@ -12,9 +12,9 @@ namespace Content.Shared.Parallax;
 /// <summary>
 /// Handles per-map parallax in sim. Out of sim parallax is handled by ParallaxManager.
 /// </summary>
-public abstract class SharedParallaxSystem: EntitySystem
+public abstract class SharedParallaxSystem : EntitySystem
 {
-    [Serializable, NetSerializable]
+    [Serializable] [NetSerializable]
     protected sealed class ParallaxComponentState : ComponentState
     {
         public string Parallax = string.Empty;

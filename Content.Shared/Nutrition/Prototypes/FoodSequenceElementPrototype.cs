@@ -9,10 +9,8 @@ namespace Content.Shared.Nutrition.Prototypes;
 /// Unique data storage block for different FoodSequence layers
 /// </summary>
 [Prototype("foodSequenceElement")]
-public sealed partial class FoodSequenceElementPrototype : IPrototype
+public sealed class FoodSequenceElementPrototype : IPrototype
 {
-    [IdDataField] public string ID { get; private set; } = default!;
-
     /// <summary>
     /// sprite options. A random one will be selected and used to display the layer.
     /// </summary>
@@ -42,5 +40,7 @@ public sealed partial class FoodSequenceElementPrototype : IPrototype
     /// Tag list of this layer. Used for recipes for food metamorphosis.
     /// </summary>
     [DataField]
-    public List<ProtoId<TagPrototype>> Tags { get; set; }  = new();
+    public List<ProtoId<TagPrototype>> Tags { get; set; } = new();
+
+    [IdDataField] public string ID { get; } = default!;
 }

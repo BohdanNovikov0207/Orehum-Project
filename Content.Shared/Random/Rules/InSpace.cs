@@ -14,9 +14,7 @@ public sealed partial class InSpaceRule : RulesRule
     {
         if (!entManager.TryGetComponent(uid, out TransformComponent? xform) ||
             xform.GridUid != null)
-        {
             return Inverted;
-        }
 
         return !Inverted;
     }

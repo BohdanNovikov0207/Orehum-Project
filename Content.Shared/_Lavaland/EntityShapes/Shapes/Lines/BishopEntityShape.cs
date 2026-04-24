@@ -10,8 +10,6 @@ namespace Content.Shared._Lavaland.EntityShapes.Shapes;
 /// </summary>
 public sealed partial class BishopEntityShape : EntityShape
 {
-    protected override List<Vector2> GetShapeImplementation(System.Random rand, IPrototypeManager proto)
-    {
-        return ShapeHelpers.MakeCrossDiagonal(Offset, Size, StepSize).ToList();
-    }
+    protected override List<Vector2> GetShapeImplementation(System.Random rand, IPrototypeManager proto) =>
+        ShapeHelpers.MakeCrossDiagonal(Offset, Size, StepSize).ToList();
 }

@@ -1,12 +1,10 @@
 ﻿using Content.Corvax.Interfaces.Shared;
 using Content.Shared.Customization.Systems;
 using Content.Shared.Mind;
-using Content.Shared.Mind.Components;
 using Content.Shared.Roles;
 using JetBrains.Annotations;
 using Robust.Shared.Configuration;
 using Robust.Shared.Network;
-using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
 
 namespace Content.Shared.Preferences.Loadouts.Effects;
@@ -48,7 +46,8 @@ public sealed partial class SponsorRequirement : CharacterRequirement
     public List<string> GetPrototypes(MindComponent mind, IEntityManager entManager)
     {
         var ioc = IoCManager.Instance;
-        if (ioc == null) return [];
+        if (ioc == null)
+            return [];
 
         var mindSystem = entManager.System<SharedMindSystem>();
         if (mind.UserId == null)

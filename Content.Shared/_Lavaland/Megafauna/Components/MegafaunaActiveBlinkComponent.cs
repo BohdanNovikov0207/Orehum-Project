@@ -9,17 +9,17 @@ namespace Content.Shared._Lavaland.Megafauna.Components;
 /// Signifies that this entity is being blink-teleported to some spot.
 /// TODO: cool shader for this fella
 /// </summary>
-[RegisterComponent, NetworkedComponent]
-[AutoGenerateComponentState, AutoGenerateComponentPause]
+[RegisterComponent] [NetworkedComponent]
+[AutoGenerateComponentState] [AutoGenerateComponentPause]
 public sealed partial class MegafaunaActiveBlinkComponent : Component
 {
     [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))]
-    [AutoNetworkedField, AutoPausedField]
+    [AutoNetworkedField] [AutoPausedField]
     public TimeSpan? BlinkTime;
 
-    [ViewVariables, AutoNetworkedField]
+    [ViewVariables] [AutoNetworkedField]
     public EntityCoordinates Coordinates;
 
-    [ViewVariables, AutoNetworkedField] // AutoNetworked intended here because it's spawning with a delay
+    [ViewVariables] [AutoNetworkedField] // AutoNetworked intended here because it's spawning with a delay
     public SoundSpecifier? Sound;
 }

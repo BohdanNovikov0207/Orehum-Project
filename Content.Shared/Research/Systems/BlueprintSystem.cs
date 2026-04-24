@@ -57,7 +57,7 @@ public sealed class BlueprintSystem : EntitySystem
     [Dependency] private readonly EntityWhitelistSystem _entityWhitelist = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         SubscribeLocalEvent<BlueprintReceiverComponent, ComponentStartup>(OnStartup);
@@ -65,10 +65,8 @@ public sealed class BlueprintSystem : EntitySystem
         SubscribeLocalEvent<BlueprintReceiverComponent, LatheGetRecipesEvent>(OnGetRecipes);
     }
 
-    private void OnStartup(Entity<BlueprintReceiverComponent> ent, ref ComponentStartup args)
-    {
+    private void OnStartup(Entity<BlueprintReceiverComponent> ent, ref ComponentStartup args) =>
         _container.EnsureContainer<Container>(ent, ent.Comp.ContainerId);
-    }
 
     private void OnAfterInteract(Entity<BlueprintReceiverComponent> ent, ref AfterInteractUsingEvent args)
     {
@@ -86,7 +84,9 @@ public sealed class BlueprintSystem : EntitySystem
         }
     }
 
-    public bool TryInsertBlueprint(Entity<BlueprintReceiverComponent> ent, Entity<BlueprintComponent> blueprint, EntityUid? user)
+    public bool TryInsertBlueprint(Entity<BlueprintReceiverComponent> ent,
+        Entity<BlueprintComponent> blueprint,
+        EntityUid? user)
     {
         if (!CanInsertBlueprint(ent, blueprint, user))
             return false;
@@ -110,12 +110,12 @@ public sealed class BlueprintSystem : EntitySystem
         return true;
     }
 
-    public bool CanInsertBlueprint(Entity<BlueprintReceiverComponent> ent, Entity<BlueprintComponent> blueprint, EntityUid? user)
+    public bool CanInsertBlueprint(Entity<BlueprintReceiverComponent> ent,
+        Entity<BlueprintComponent> blueprint,
+        EntityUid? user)
     {
         if (_entityWhitelist.IsWhitelistFail(ent.Comp.Whitelist, blueprint))
-        {
             return false;
-        }
 
         if (blueprint.Comp.ProvidedRecipes.Count == 0)
         {

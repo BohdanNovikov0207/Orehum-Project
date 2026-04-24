@@ -34,30 +34,25 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Materials;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 [Access(typeof(SharedMaterialStorageSystem))]
 public sealed partial class MaterialStorageComponent : Component
 {
-    [DataField, AutoNetworkedField]
-    public Dictionary<ProtoId<MaterialPrototype>, int> Storage { get; set; } = new();
-
     /// <summary>
-    /// Whether or not interacting with the materialstorage inserts the material in hand.
+    /// Whether the storage can eject the materials stored within it
     /// </summary>
     [DataField]
-    public bool InsertOnInteract = true;
+    public bool CanEjectStoredMaterials = true;
 
-    /// <summary>
-    ///     How much material the storage can store in total.
-    /// </summary>
-    [ViewVariables(VVAccess.ReadWrite), DataField]
-    public int? StorageLimit;
+    // Goobstation Change Start
+    [DataField] [ViewVariables(VVAccess.ReadWrite)] [AutoNetworkedField]
+    public bool ConnectToSilo;
 
-    /// <summary>
-    /// Whitelist for specifying the kind of items that can be insert into this entity.
-    /// </summary>
-    [DataField]
-    public EntityWhitelist? Whitelist;
+    [DataField] [AutoNetworkedField]
+    public bool DisallowOreEjection = true;
+
+    [DataField] [AutoNetworkedField]
+    public bool DisconnectSiloOffMap;
 
     /// <summary>
     /// Whether or not to drop contained materials when deconstructed.
@@ -66,17 +61,16 @@ public sealed partial class MaterialStorageComponent : Component
     public bool DropOnDeconstruct = true;
 
     /// <summary>
-    /// Whitelist generated on runtime for what specific materials can be inserted into this entity.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public List<ProtoId<MaterialPrototype>>? MaterialWhiteList;
-
-    /// <summary>
     /// Whether or not the visualization for the insertion animation
     /// should ignore the color of the material being inserted.
     /// </summary>
     [DataField]
     public bool IgnoreColor;
+
+    // WHY THE FUCK DID WIZDEN THINK IT WOULD BE A GOOD IDEA TO INTRODUCE A WHITELIST, AND IMMEDIATELY INVALIDATING IT BY DYNAMICALLY GENERATING
+    // ANOTHER BASED ON RECIPES. ON TWO FUCKING COMPONENTS THAT ARE ALMOST ALWAYS USED TOGETHER, AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    [DataField] [AutoNetworkedField]
+    public bool IgnoreMaterialWhiteList;
 
     /// <summary>
     /// The sound that plays when inserting an item into the storage
@@ -91,44 +85,54 @@ public sealed partial class MaterialStorageComponent : Component
     public TimeSpan InsertionTime = TimeSpan.FromSeconds(0.79f); // 0.01 off for animation timing
 
     /// <summary>
-    /// Whether the storage can eject the materials stored within it
+    /// Whether or not interacting with the materialstorage inserts the material in hand.
     /// </summary>
     [DataField]
-    public bool CanEjectStoredMaterials = true;
+    public bool InsertOnInteract = true;
 
-    // Goobstation Change Start
-    [DataField, ViewVariables(VVAccess.ReadWrite), AutoNetworkedField]
-    public bool ConnectToSilo;
+    /// <summary>
+    /// Whitelist generated on runtime for what specific materials can be inserted into this entity.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public List<ProtoId<MaterialPrototype>>? MaterialWhiteList;
 
-    [DataField, AutoNetworkedField]
-    public bool DisconnectSiloOffMap;
+    /// <summary>
+    /// How much material the storage can store in total.
+    /// </summary>
+    [ViewVariables(VVAccess.ReadWrite)] [DataField]
+    public int? StorageLimit;
 
-    [DataField, AutoNetworkedField]
-    public bool DisallowOreEjection = true;
+    /// <summary>
+    /// Whitelist for specifying the kind of items that can be insert into this entity.
+    /// </summary>
+    [DataField]
+    public EntityWhitelist? Whitelist;
 
-    // WHY THE FUCK DID WIZDEN THINK IT WOULD BE A GOOD IDEA TO INTRODUCE A WHITELIST, AND IMMEDIATELY INVALIDATING IT BY DYNAMICALLY GENERATING
-    // ANOTHER BASED ON RECIPES. ON TWO FUCKING COMPONENTS THAT ARE ALMOST ALWAYS USED TOGETHER, AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-    [DataField, AutoNetworkedField]
-    public bool IgnoreMaterialWhiteList;
+    [DataField] [AutoNetworkedField]
+    public Dictionary<ProtoId<MaterialPrototype>, int> Storage { get; set; } = new();
     // Goobstation Change End
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum MaterialStorageVisuals : byte
 {
-    Inserting
+    Inserting,
 }
 
 /// <summary>
 /// Lavaland Change: Event raised on the materialStorage when a material entity is inserted into it.
 /// </summary>
 [ByRefEvent]
-public readonly record struct MaterialEntityInsertedEvent(EntityUid User, EntityUid Inserted, MaterialComponent MaterialComp, int Count)
+public readonly record struct MaterialEntityInsertedEvent(
+    EntityUid User,
+    EntityUid Inserted,
+    MaterialComponent MaterialComp,
+    int Count)
 {
-    public readonly EntityUid User = User;
+    public readonly int Count = Count;
     public readonly EntityUid Inserted = Inserted;
     public readonly MaterialComponent MaterialComp = MaterialComp;
-    public readonly int Count = Count;
+    public readonly EntityUid User = User;
 }
 
 /// <summary>
@@ -151,7 +155,7 @@ public record struct GetMaterialWhitelistEvent(EntityUid Storage)
 /// <summary>
 /// Message sent to try and eject a material from a storage
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class EjectMaterialMessage : EntityEventArgs
 {
     public NetEntity Entity;

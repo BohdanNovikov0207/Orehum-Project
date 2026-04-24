@@ -18,22 +18,9 @@ namespace Content.Shared.Clothing.Components;
 /// This is used for a clothing item that hides an appearance layer.
 /// The entity's HumanoidAppearance component must have the corresponding hideLayerOnEquip value.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class HideLayerClothingComponent : Component
 {
-    /// <summary>
-    /// The appearance layer(s) to hide. Use <see cref='Layers'>Layers</see> instead.
-    /// </summary>
-    [DataField]
-    [Obsolete("This attribute is deprecated, please use Layers instead.")]
-    public HashSet<HumanoidVisualLayers>? Slots;
-
-    /// <summary>
-    /// A map of the appearance layer(s) to hide, and the equipment slot that should hide them.
-    /// </summary>
-    [DataField]
-    public Dictionary<HumanoidVisualLayers, SlotFlags> Layers = new();
-
     /// <summary>
     /// EE Plasmeme Change: The clothing layers to hide.
     /// </summary>
@@ -45,4 +32,17 @@ public sealed partial class HideLayerClothingComponent : Component
     /// </summary>
     [DataField]
     public bool HideOnToggle = false;
+
+    /// <summary>
+    /// A map of the appearance layer(s) to hide, and the equipment slot that should hide them.
+    /// </summary>
+    [DataField]
+    public Dictionary<HumanoidVisualLayers, SlotFlags> Layers = new();
+
+    /// <summary>
+    /// The appearance layer(s) to hide. Use <see cref='Layers'>Layers</see> instead.
+    /// </summary>
+    [DataField]
+    [Obsolete("This attribute is deprecated, please use Layers instead.")]
+    public HashSet<HumanoidVisualLayers>? Slots;
 }

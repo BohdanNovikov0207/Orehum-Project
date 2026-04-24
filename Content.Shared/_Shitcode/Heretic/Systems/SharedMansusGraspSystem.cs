@@ -37,25 +37,25 @@ namespace Content.Shared._Shitcode.Heretic.Systems;
 
 public abstract class SharedMansusGraspSystem : EntitySystem
 {
-    [Dependency] private readonly IPrototypeManager _proto = default!;
-    [Dependency] private readonly IComponentFactory _compFactory = default!;
-    [Dependency] private readonly INetManager _net = default!;
-    [Dependency] private readonly IMapManager _mapMan = default!;
-
-    [Dependency] private readonly SharedDoorSystem _door = default!;
-    [Dependency] private readonly DamageableSystem _damage = default!;
-    [Dependency] private readonly StatusEffectsSystem _statusEffect = default!;
-    [Dependency] private readonly StatusEffectNew.StatusEffectsSystem _statusNew = default!;
-    [Dependency] private readonly TagSystem _tag = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly BackStabSystem _backstab = default!;
-    [Dependency] private readonly SharedStunSystem _stun = default!;
-    [Dependency] private readonly SharedVoidCurseSystem _voidCurse = default!;
-    [Dependency] private readonly SharedMindSystem _mind = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly SharedStarMarkSystem _starMark = default!;
+    [Dependency] private readonly IComponentFactory _compFactory = default!;
+    [Dependency] private readonly DamageableSystem _damage = default!;
+
+    [Dependency] private readonly SharedDoorSystem _door = default!;
     [Dependency] private readonly NpcFactionSystem _faction = default!;
+    [Dependency] private readonly IMapManager _mapMan = default!;
+    [Dependency] private readonly SharedMindSystem _mind = default!;
+    [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly IPrototypeManager _proto = default!;
+    [Dependency] private readonly SharedStarMarkSystem _starMark = default!;
+    [Dependency] private readonly StatusEffectsSystem _statusEffect = default!;
+    [Dependency] private readonly StatusEffectNew.StatusEffectsSystem _statusNew = default!;
+    [Dependency] private readonly SharedStunSystem _stun = default!;
+    [Dependency] private readonly TagSystem _tag = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
+    [Dependency] private readonly SharedVoidCurseSystem _voidCurse = default!;
 
     public bool TryApplyGraspEffectAndMark(EntityUid user,
         HereticComponent hereticComp,
@@ -135,7 +135,7 @@ public abstract class SharedMansusGraspSystem : EntitySystem
                     _stun.TryUpdateParalyzeDuration(target, TimeSpan.FromSeconds(1.5f));
                     _damage.TryChangeDamage(target,
                         new DamageSpecifier(_proto.Index<DamageTypePrototype>("Slash"), 10),
-                        ignoreResistances: true,
+                        true,
                         origin: performer,
                         targetPart: TargetBodyPart.Chest);
                 }
@@ -166,14 +166,18 @@ public abstract class SharedMansusGraspSystem : EntitySystem
                     if (HasComp<GhoulComponent>(target))
                     {
                         if (_net.IsServer)
-                            _popup.PopupEntity(Loc.GetString("heretic-ability-fail-target-ghoul"), performer, performer);
+                            _popup.PopupEntity(Loc.GetString("heretic-ability-fail-target-ghoul"),
+                                performer,
+                                performer);
                         break;
                     }
 
                     if (!_mind.TryGetMind(target, out _, out _))
                     {
                         if (_net.IsServer)
-                            _popup.PopupEntity(Loc.GetString("heretic-ability-fail-target-no-mind"), performer, performer);
+                            _popup.PopupEntity(Loc.GetString("heretic-ability-fail-target-no-mind"),
+                                performer,
+                                performer);
                         break;
                     }
 
@@ -213,7 +217,7 @@ public abstract class SharedMansusGraspSystem : EntitySystem
                 {
                     _damage.TryChangeDamage(target,
                         new DamageSpecifier(_proto.Index<DamageGroupPrototype>("Brute"), 500),
-                        ignoreResistances: true,
+                        true,
                         damageable: damageable,
                         origin: performer,
                         targetPart: TargetBodyPart.Chest);

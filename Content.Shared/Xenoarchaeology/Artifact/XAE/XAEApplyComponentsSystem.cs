@@ -11,7 +11,8 @@ public sealed class XAEApplyComponentsSystem : BaseXAESystem<XAEApplyComponentsC
     [Dependency] private readonly IGameTiming _timing = default!;
 
     /// <inheritdoc />
-    protected override void OnActivated(Entity<XAEApplyComponentsComponent> ent, ref XenoArtifactNodeActivatedEvent args)
+    protected override void OnActivated(Entity<XAEApplyComponentsComponent> ent,
+        ref XenoArtifactNodeActivatedEvent args)
     {
         if (!_timing.IsFirstTimePredicted)
             return;
@@ -22,14 +23,10 @@ public sealed class XAEApplyComponentsSystem : BaseXAESystem<XAEApplyComponentsC
         {
             var componentType = registry.Value.Component.GetType();
             if (!ent.Comp.ApplyIfAlreadyHave && HasComp(artifact, componentType))
-            {
                 continue;
-            }
 
             if (ent.Comp.RefreshOnReactivate)
-            {
                 RemComp(artifact, componentType);
-            }
 
             var clone = EntityManager.ComponentFactory.GetComponent(registry.Value);
             AddComp(artifact, clone);

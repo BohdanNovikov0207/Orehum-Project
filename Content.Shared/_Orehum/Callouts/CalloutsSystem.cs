@@ -1,6 +1,5 @@
-using Content.Shared.Radio;
 using Content.Shared.Inventory;
-using Content.Shared.Radio.Components;
+using Content.Shared.Radio;
 using Robust.Shared.Prototypes;
 
 namespace Content.Shared._Orehum.Callouts;

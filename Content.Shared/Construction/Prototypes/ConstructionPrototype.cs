@@ -38,52 +38,67 @@ using Robust.Shared.Prototypes;
 namespace Content.Shared.Construction.Prototypes;
 
 [Prototype]
-public sealed partial class ConstructionPrototype : IPrototype
+public sealed class ConstructionPrototype : IPrototype
 {
-    [DataField("conditions")] private List<IConstructionCondition> _conditions = new();
+    [DataField("conditions")] private readonly List<IConstructionCondition> _conditions = new();
 
     /// <summary>
-    ///     Hide from the construction list
+    /// Possible constructions to replace this one with as determined by the placement mode
     /// </summary>
     [DataField]
-    public bool Hide = false;
+    public ProtoId<ConstructionPrototype>[] AlternativePrototypes = [];
 
     /// <summary>
-    ///     Friendly name displayed in the construction GUI.
+    /// Whether this construction can be constructed rotated or not.
     /// </summary>
-    [DataField("name")]
-    public LocId? SetName;
-
-    public string? Name;
-
-    /// <summary>
-    ///     "Useful" description displayed in the construction GUI.
-    /// </summary>
-    [DataField("description")]
-    public LocId? SetDescription;
+    [DataField]
+    public bool CanRotate = true;
 
     public string? Description;
 
     /// <summary>
-    ///     The <see cref="ConstructionGraphPrototype"/> this construction will be using.
+    /// Hide from the construction list
+    /// </summary>
+    [DataField]
+    public bool Hide = false;
+
+    public string? Name;
+
+    [DataField]
+    public string PlacementMode = "PlaceFree";
+
+    /// <summary>
+    /// "Useful" description displayed in the construction GUI.
+    /// </summary>
+    [DataField("description")]
+    public LocId? SetDescription;
+
+    /// <summary>
+    /// Friendly name displayed in the construction GUI.
+    /// </summary>
+    [DataField("name")]
+    public LocId? SetName;
+
+    /// <summary>
+    /// The <see cref="ConstructionGraphPrototype" /> this construction will be using.
     /// </summary>
     [DataField(required: true)]
     public ProtoId<ConstructionGraphPrototype> Graph { get; private set; } = string.Empty;
 
     /// <summary>
-    ///     The target <see cref="ConstructionGraphNode"/> this construction will guide the user to.
+    /// The target <see cref="ConstructionGraphNode" /> this construction will guide the user to.
     /// </summary>
     [DataField(required: true)]
     public string TargetNode { get; private set; } = default!;
 
     /// <summary>
-    ///     The starting <see cref="ConstructionGraphNode"/> this construction will start at.
+    /// The starting <see cref="ConstructionGraphNode" /> this construction will start at.
     /// </summary>
     [DataField] // Goobstation - not required
     public string StartNode { get; private set; } = "start"; // Goobstation - default to start
 
     /// <summary>
-    ///     If you can start building or complete steps on impassable terrain.
+    /// If you can start building or complete steps on impassable terrain.
     /// </summary>
     [DataField]
     public bool CanBuildInImpassable { get; private set; }
@@ -99,32 +114,17 @@ public sealed partial class ConstructionPrototype : IPrototype
 
     [DataField("objectType")] public ConstructionType Type { get; private set; } = ConstructionType.Structure;
 
-    [ViewVariables]
-    [IdDataField]
-    public string ID { get; private set; } = default!;
-
-    [DataField]
-    public string PlacementMode = "PlaceFree";
-
     /// <summary>
-    ///     Whether this construction can be constructed rotated or not.
-    /// </summary>
-    [DataField]
-    public bool CanRotate = true;
-
-    /// <summary>
-    ///     Construction to replace this construction with when the current one is 'flipped'
+    /// Construction to replace this construction with when the current one is 'flipped'
     /// </summary>
     [DataField]
     public ProtoId<ConstructionPrototype>? Mirror { get; private set; }
 
-    /// <summary>
-    ///     Possible constructions to replace this one with as determined by the placement mode
-    /// </summary>
-    [DataField]
-    public ProtoId<ConstructionPrototype>[] AlternativePrototypes = [];
-
     public IReadOnlyList<IConstructionCondition> Conditions => _conditions;
+
+    [ViewVariables]
+    [IdDataField]
+    public string ID { get; } = default!;
 }
 
 public enum ConstructionType

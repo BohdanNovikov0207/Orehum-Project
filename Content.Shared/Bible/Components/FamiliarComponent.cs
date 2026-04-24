@@ -3,20 +3,20 @@
 // SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
 //
 // SPDX-License-Identifier: MIT
-namespace Content.Shared.Bible.Components
+
+namespace Content.Shared.Bible.Components;
+
+/// <summary>
+/// This component is for the chaplain's familiars, and mostly
+/// used to track their current state and to give a component to check for
+/// if any special behavior is needed.
+/// </summary>
+[RegisterComponent]
+public sealed partial class FamiliarComponent : Component
 {
     /// <summary>
-    /// This component is for the chaplain's familiars, and mostly
-    /// used to track their current state and to give a component to check for
-    /// if any special behavior is needed.
+    /// The entity this familiar was summoned from.
     /// </summary>
-    [RegisterComponent]
-    public sealed partial class FamiliarComponent : Component
-    {
-        /// <summary>
-        /// The entity this familiar was summoned from.
-        /// </summary>
-        [ViewVariables]
-        public EntityUid? Source = null;
-    }
+    [ViewVariables]
+    public EntityUid? Source = null;
 }

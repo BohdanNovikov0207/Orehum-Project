@@ -20,9 +20,9 @@ namespace Content.Shared._Goobstation.Wizard.ArcaneBarrage;
 
 public sealed class ArcaneBarrageSystem : EntitySystem
 {
+    [Dependency] private readonly SharedHandsSystem _hands = default!;
     [Dependency] private readonly INetManager _net = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly SharedHandsSystem _hands = default!;
     [Dependency] private readonly UseDelaySystem _useDelay = default!;
 
     public override void Initialize()
@@ -110,6 +110,7 @@ public sealed class ArcaneBarrageSystem : EntitySystem
             ResetDelays(ent);
             return;
         }
+
         if (!_hands.TryPickup(user, ent, otherHand, false) && _net.IsServer)
             QueueDel(ent);
         ent.Comp.Unremoveable = true;

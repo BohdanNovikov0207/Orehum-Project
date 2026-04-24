@@ -85,16 +85,9 @@ using Robust.Shared.GameStates;
 
 namespace Content.Shared.Singularity.Components;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class ContainmentFieldComponent : Component
 {
-    /// <summary>
-    /// The throw force for the field if an entity collides with it
-    /// The lighter the mass the further it will throw. 5 mass will go about 4 tiles out, 70 mass goes only a couple tiles.
-    /// </summary>
-    [DataField("throwForce")]
-    public float ThrowForce = 100f;
-
     // Goobstation - replaced with ContainmentFieldIgnoreComponent; if you think this is causing issues, ping @Ilya246 to fix
     /*
     /// <summary>
@@ -110,4 +103,11 @@ public sealed partial class ContainmentFieldComponent : Component
     /// </summary>
     [DataField]
     public bool DestroyGarbage = true;
+
+    /// <summary>
+    /// The throw force for the field if an entity collides with it
+    /// The lighter the mass the further it will throw. 5 mass will go about 4 tiles out, 70 mass goes only a couple tiles.
+    /// </summary>
+    [DataField("throwForce")]
+    public float ThrowForce = 100f;
 }

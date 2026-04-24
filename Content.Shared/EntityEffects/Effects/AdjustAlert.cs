@@ -47,7 +47,8 @@ public sealed partial class AdjustAlert : EntityEffect
     public float Time;
 
     //JUSTIFICATION: This just changes some visuals, doesn't need to be documented.
-    protected override string? ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys) => null;
+    protected override string? ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys) =>
+        null;
 
     public override void Effect(EntityEffectBaseArgs args)
     {
@@ -56,9 +57,7 @@ public sealed partial class AdjustAlert : EntityEffect
             return;
 
         if (Clear && Time <= 0)
-        {
             alertSys.ClearAlert(args.TargetEntity, AlertType);
-        }
         else
         {
             var timing = IoCManager.Resolve<IGameTiming>();
@@ -67,8 +66,11 @@ public sealed partial class AdjustAlert : EntityEffect
             if ((ShowCooldown || Clear) && Time > 0)
                 cooldown = (timing.CurTime, timing.CurTime + TimeSpan.FromSeconds(Time));
 
-            alertSys.ShowAlert(args.TargetEntity, AlertType, cooldown: cooldown, autoRemove: Clear, showCooldown: ShowCooldown);
+            alertSys.ShowAlert(args.TargetEntity,
+                AlertType,
+                cooldown: cooldown,
+                autoRemove: Clear,
+                showCooldown: ShowCooldown);
         }
-
     }
 }

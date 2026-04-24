@@ -14,12 +14,12 @@ namespace Content.Shared._DV.Lathe;
 /// <remarks>
 /// Only exists because ComponentRegistry / AddComponent bulldozes existing fields unlike prototype composition.
 /// </remarks>
-[RegisterComponent, NetworkedComponent, Access(typeof(LatheUpgradeSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(LatheUpgradeSystem))]
 public sealed partial class LatheUpgradeComponent : Component
 {
     [DataField]
-    public float? TimeMultiplier;
+    public float? MaterialUseMultiplier;
 
     [DataField]
-    public float? MaterialUseMultiplier;
+    public float? TimeMultiplier;
 }

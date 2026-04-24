@@ -8,8 +8,8 @@ namespace Content.Shared.Trigger.Components.Effects;
 /// <summary>
 /// Contains a GasMixture that will release its contents to the atmosphere when triggered.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
-[AutoGenerateComponentState, AutoGenerateComponentPause]
+[RegisterComponent] [NetworkedComponent]
+[AutoGenerateComponentState] [AutoGenerateComponentPause]
 public sealed partial class ReleaseGasOnTriggerComponent : BaseXOnTriggerComponent
 {
     /// <summary>
@@ -37,8 +37,10 @@ public sealed partial class ReleaseGasOnTriggerComponent : BaseXOnTriggerCompone
     /// The cap at which this grenade can fill the exposed atmosphere to.
     /// This component automatically removes itself when the pressure limit is reached.
     /// </summary>
-    /// <example>If set to 101.325, the grenade will only fill the exposed
-    /// atmosphere up to 101.325 kPa.</example>
+    /// <example>
+    /// If set to 101.325, the grenade will only fill the exposed
+    /// atmosphere up to 101.325 kPa.
+    /// </example>
     /// <remarks>If zero, this limit won't be respected.</remarks>
     [DataField]
     public float PressureLimit;
@@ -71,7 +73,7 @@ public sealed partial class ReleaseGasOnTriggerComponent : BaseXOnTriggerCompone
 /// Represents visual states for whatever visuals that need to be applied
 /// on state changes.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum ReleaseGasOnTriggerVisuals : byte
 {
     Key,

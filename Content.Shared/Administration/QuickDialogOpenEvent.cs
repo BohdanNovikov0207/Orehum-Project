@@ -13,13 +13,13 @@ namespace Content.Shared.Administration;
 /// <summary>
 /// A networked event raised when the server wants to open a quick dialog.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class QuickDialogOpenEvent : EntityEventArgs
 {
     /// <summary>
-    /// The title of the dialog.
+    /// The buttons presented for the user.
     /// </summary>
-    public string Title;
+    public QuickDialogButtonFlag Buttons = QuickDialogButtonFlag.OkButton | QuickDialogButtonFlag.CancelButton;
 
     /// <summary>
     /// The internal dialog ID.
@@ -32,11 +32,14 @@ public sealed class QuickDialogOpenEvent : EntityEventArgs
     public List<QuickDialogEntry> Prompts;
 
     /// <summary>
-    /// The buttons presented for the user.
+    /// The title of the dialog.
     /// </summary>
-    public QuickDialogButtonFlag Buttons = QuickDialogButtonFlag.OkButton | QuickDialogButtonFlag.CancelButton;
+    public string Title;
 
-    public QuickDialogOpenEvent(string title, List<QuickDialogEntry> prompts, int dialogId, QuickDialogButtonFlag buttons)
+    public QuickDialogOpenEvent(string title,
+        List<QuickDialogEntry> prompts,
+        int dialogId,
+        QuickDialogButtonFlag buttons)
     {
         Title = title;
         Prompts = prompts;
@@ -48,9 +51,14 @@ public sealed class QuickDialogOpenEvent : EntityEventArgs
 /// <summary>
 /// A networked event raised when the client replies to a quick dialog.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class QuickDialogResponseEvent : EntityEventArgs
 {
+    /// <summary>
+    /// The button pressed when responding.
+    /// </summary>
+    public QuickDialogButtonFlag ButtonPressed;
+
     /// <summary>
     /// The internal dialog ID.
     /// </summary>
@@ -61,12 +69,9 @@ public sealed class QuickDialogResponseEvent : EntityEventArgs
     /// </summary>
     public Dictionary<string, string> Responses;
 
-    /// <summary>
-    /// The button pressed when responding.
-    /// </summary>
-    public QuickDialogButtonFlag ButtonPressed;
-
-    public QuickDialogResponseEvent(int dialogId, Dictionary<string, string> responses, QuickDialogButtonFlag buttonPressed)
+    public QuickDialogResponseEvent(int dialogId,
+        Dictionary<string, string> responses,
+        QuickDialogButtonFlag buttonPressed)
     {
         DialogId = dialogId;
         Responses = responses;
@@ -77,7 +82,7 @@ public sealed class QuickDialogResponseEvent : EntityEventArgs
 /// <summary>
 /// An entry in a quick dialog.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class QuickDialogEntry
 {
     /// <summary>
@@ -86,9 +91,9 @@ public sealed class QuickDialogEntry
     public string FieldId;
 
     /// <summary>
-    /// Type of the field, for checks.
+    /// String to replace the type-specific placeholder with.
     /// </summary>
-    public QuickDialogEntryType Type;
+    public string? Placeholder;
 
     /// <summary>
     /// The prompt to show the user.
@@ -96,9 +101,9 @@ public sealed class QuickDialogEntry
     public string Prompt;
 
     /// <summary>
-    /// String to replace the type-specific placeholder with.
+    /// Type of the field, for checks.
     /// </summary>
-    public string? Placeholder;
+    public QuickDialogEntryType Type;
 
     public QuickDialogEntry(string fieldId, QuickDialogEntryType type, string prompt, string? placeholder = null)
     {
@@ -128,14 +133,17 @@ public enum QuickDialogEntryType
     /// Any integer.
     /// </summary>
     Integer,
+
     /// <summary>
     /// Any floating point value.
     /// </summary>
     Float,
+
     /// <summary>
     /// Maximum of 100 characters string.
     /// </summary>
     ShortText,
+
     /// <summary>
     /// Maximum of 2,000 characters string.
     /// </summary>

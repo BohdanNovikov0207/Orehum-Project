@@ -28,7 +28,8 @@ public abstract class SharedAtmosMonitoringConsoleSystem : EntitySystem
             component.ForceFullUpdate = false;
 
             // Full state
-            chunks = new(component.AtmosPipeChunks.Count);
+            chunks = new Dictionary<Vector2i, Dictionary<AtmosMonitoringConsoleSubnet, ulong>>(component.AtmosPipeChunks
+                .Count);
 
             foreach (var (origin, chunk) in component.AtmosPipeChunks)
             {
@@ -40,7 +41,7 @@ public abstract class SharedAtmosMonitoringConsoleSystem : EntitySystem
             return;
         }
 
-        chunks = new();
+        chunks = new Dictionary<Vector2i, Dictionary<AtmosMonitoringConsoleSubnet, ulong>>();
 
         foreach (var (origin, chunk) in component.AtmosPipeChunks)
         {
@@ -50,31 +51,33 @@ public abstract class SharedAtmosMonitoringConsoleSystem : EntitySystem
             chunks.Add(origin, chunk.AtmosPipeData);
         }
 
-        args.State = new AtmosMonitoringConsoleDeltaState(chunks, component.AtmosDevices, new(component.AtmosPipeChunks.Keys));
+        args.State = new AtmosMonitoringConsoleDeltaState(chunks,
+            component.AtmosDevices,
+            new HashSet<Vector2i>(component.AtmosPipeChunks.Keys));
     }
 
     #region: System messages
 
-    [Serializable, NetSerializable]
+    [Serializable] [NetSerializable]
     protected sealed class AtmosMonitoringConsoleState(
         Dictionary<Vector2i, Dictionary<AtmosMonitoringConsoleSubnet, ulong>> chunks,
         Dictionary<NetEntity, AtmosDeviceNavMapData> atmosDevices)
         : ComponentState
     {
-        public Dictionary<Vector2i, Dictionary<AtmosMonitoringConsoleSubnet, ulong>> Chunks = chunks;
         public Dictionary<NetEntity, AtmosDeviceNavMapData> AtmosDevices = atmosDevices;
+        public Dictionary<Vector2i, Dictionary<AtmosMonitoringConsoleSubnet, ulong>> Chunks = chunks;
     }
 
-    [Serializable, NetSerializable]
+    [Serializable] [NetSerializable]
     protected sealed class AtmosMonitoringConsoleDeltaState(
         Dictionary<Vector2i, Dictionary<AtmosMonitoringConsoleSubnet, ulong>> modifiedChunks,
         Dictionary<NetEntity, AtmosDeviceNavMapData> atmosDevices,
         HashSet<Vector2i> allChunks)
         : ComponentState, IComponentDeltaState<AtmosMonitoringConsoleState>
     {
-        public Dictionary<Vector2i, Dictionary<AtmosMonitoringConsoleSubnet, ulong>> ModifiedChunks = modifiedChunks;
-        public Dictionary<NetEntity, AtmosDeviceNavMapData> AtmosDevices = atmosDevices;
         public HashSet<Vector2i> AllChunks = allChunks;
+        public Dictionary<NetEntity, AtmosDeviceNavMapData> AtmosDevices = atmosDevices;
+        public Dictionary<Vector2i, Dictionary<AtmosMonitoringConsoleSubnet, ulong>> ModifiedChunks = modifiedChunks;
 
         public void ApplyToFullState(AtmosMonitoringConsoleState state)
         {
@@ -112,7 +115,8 @@ public abstract class SharedAtmosMonitoringConsoleSystem : EntitySystem
                     chunks[index] = new Dictionary<AtmosMonitoringConsoleSubnet, ulong>(state.Chunks[index]);
             }
 
-            return new AtmosMonitoringConsoleState(chunks, new(AtmosDevices));
+            return new AtmosMonitoringConsoleState(chunks,
+                new Dictionary<NetEntity, AtmosDeviceNavMapData>(AtmosDevices));
         }
     }
 

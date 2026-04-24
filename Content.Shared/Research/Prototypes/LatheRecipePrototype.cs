@@ -68,82 +68,82 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Chemistry.Reagent;
 using Content.Goobstation.Maths.FixedPoint;
+using Content.Shared.Chemistry.Reagent;
 using Content.Shared.Lathe.Prototypes;
 using Content.Shared.Materials;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype.Array;
 using Robust.Shared.Utility;
 
-namespace Content.Shared.Research.Prototypes
+namespace Content.Shared.Research.Prototypes;
+
+[Prototype]
+public sealed class LatheRecipePrototype : IPrototype, IInheritingPrototype
 {
-    [Prototype]
-    public sealed partial class LatheRecipePrototype : IPrototype, IInheritingPrototype
-    {
-        [ViewVariables]
-        [IdDataField]
-        public string ID { get; private set; } = default!;
+    [DataField]
+    public bool ApplyMaterialDiscount = true;
 
-        /// <inheritdoc/>
-        [ParentDataField(typeof(AbstractPrototypeIdArraySerializer<LatheRecipePrototype>))]
-        public string[]? Parents { get; private set; }
+    /// <summary>
+    /// List of categories used for visually sorting lathe recipes in the UI.
+    /// </summary>
+    [DataField]
+    public List<ProtoId<LatheCategoryPrototype>> Categories = new();
 
-        /// <inheritdoc />
-        [NeverPushInheritance]
-        [AbstractDataField]
-        public bool Abstract { get; private set; }
+    [DataField("completetime")]
+    public TimeSpan CompleteTime = TimeSpan.FromSeconds(5);
 
-        /// <summary>
-        ///     Name displayed in the lathe GUI.
-        /// </summary>
-        [DataField]
-        public LocId? Name;
+    /// <summary>
+    /// Short description displayed in the lathe GUI.
+    /// </summary>
+    [DataField]
+    public LocId? Description;
 
-        /// <summary>
-        ///     Goobstation - Subname displayed in brackets near name. Used for recipes that should have same name, but have some difference.
-        /// </summary>
-        [DataField("subname")]
-        public LocId? SubName;
+    /// <summary>
+    /// An entity whose sprite is displayed in the ui in place of the actual recipe result.
+    /// </summary>
+    [DataField]
+    public SpriteSpecifier? Icon;
 
-        /// <summary>
-        ///     Short description displayed in the lathe GUI.
-        /// </summary>
-        [DataField]
-        public LocId? Description;
+    /// <summary>
+    /// The materials required to produce this recipe.
+    /// Takes a material ID as string.
+    /// </summary>
+    [DataField]
+    public Dictionary<ProtoId<MaterialPrototype>, int> Materials = new();
 
-        /// <summary>
-        ///     The prototype name of the resulting entity when the recipe is printed.
-        /// </summary>
-        [DataField]
-        public EntProtoId? Result;
+    /// <summary>
+    /// Name displayed in the lathe GUI.
+    /// </summary>
+    [DataField]
+    public LocId? Name;
 
-        [DataField]
-        public Dictionary<ProtoId<ReagentPrototype>, FixedPoint2>? ResultReagents;
+    /// <summary>
+    /// The prototype name of the resulting entity when the recipe is printed.
+    /// </summary>
+    [DataField]
+    public EntProtoId? Result;
 
-        /// <summary>
-        ///     An entity whose sprite is displayed in the ui in place of the actual recipe result.
-        /// </summary>
-        [DataField]
-        public SpriteSpecifier? Icon;
+    [DataField]
+    public Dictionary<ProtoId<ReagentPrototype>, FixedPoint2>? ResultReagents;
 
-        [DataField("completetime")]
-        public TimeSpan CompleteTime = TimeSpan.FromSeconds(5);
+    /// <summary>
+    /// Goobstation - Subname displayed in brackets near name. Used for recipes that should have same name, but have some
+    /// difference.
+    /// </summary>
+    [DataField("subname")]
+    public LocId? SubName;
 
-        /// <summary>
-        ///     The materials required to produce this recipe.
-        ///     Takes a material ID as string.
-        /// </summary>
-        [DataField]
-        public Dictionary<ProtoId<MaterialPrototype>, int> Materials = new();
+    /// <inheritdoc />
+    [ParentDataField(typeof(AbstractPrototypeIdArraySerializer<LatheRecipePrototype>))]
+    public string[]? Parents { get; private set; }
 
-        [DataField]
-        public bool ApplyMaterialDiscount = true;
+    /// <inheritdoc />
+    [NeverPushInheritance]
+    [AbstractDataField]
+    public bool Abstract { get; private set; }
 
-        /// <summary>
-        /// List of categories used for visually sorting lathe recipes in the UI.
-        /// </summary>
-        [DataField]
-        public List<ProtoId<LatheCategoryPrototype>> Categories = new();
-    }
+    [ViewVariables]
+    [IdDataField]
+    public string ID { get; } = default!;
 }

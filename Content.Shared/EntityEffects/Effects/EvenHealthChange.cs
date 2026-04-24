@@ -1,17 +1,15 @@
+using Content.Goobstation.Maths.FixedPoint;
+using Content.Shared._Shitmed.Damage;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Prototypes;
-using Content.Shared.EntityEffects;
-using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Localizations;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
-using Content.Shared._Shitmed.Damage;
-using System.Text.Json.Serialization;
 
 namespace Content.Shared.EntityEffects.Effects;
 
 /// <summary>
-/// Version of <see cref="HealthChange"/> that distributes the healing to groups
+/// Version of <see cref="HealthChange" /> that distributes the healing to groups
 /// </summary>
 public sealed partial class EvenHealthChange : EntityEffect
 {
@@ -22,18 +20,18 @@ public sealed partial class EvenHealthChange : EntityEffect
     public Dictionary<ProtoId<DamageGroupPrototype>, FixedPoint2> Damage = new();
 
     /// <summary>
+    /// Should this effect ignore damage modifiers?
+    /// </summary>
+    [DataField]
+    public bool IgnoreResistances = true;
+
+    /// <summary>
     /// Should this effect scale the damage by the amount of chemical in the solution?
     /// Useful for touch reactions, like styptic powder or acid.
     /// Only usable if the EntityEffectBaseArgs is an EntityEffectReagentArgs.
     /// </summary>
     [DataField]
     public bool ScaleByQuantity;
-
-    /// <summary>
-    /// Should this effect ignore damage modifiers?
-    /// </summary>
-    [DataField]
-    public bool IgnoreResistances = true;
 
     [DataField]
     public SplitDamageBehavior SplitDamage = SplitDamageBehavior.SplitEnsureAllOrganic;
@@ -74,7 +72,7 @@ public sealed partial class EvenHealthChange : EntityEffect
                 ));
         }
 
-        var healsordeals = heals ? (deals ? "both" : "heals") : (deals ? "deals" : "none");
+        var healsordeals = heals ? deals ? "both" : "heals" : deals ? "deals" : "none";
         return Loc.GetString("reagent-effect-guidebook-even-health-change",
             ("chance", Probability),
             ("changes", ContentLocalizationManager.FormatList(damages)),
@@ -91,9 +89,7 @@ public sealed partial class EvenHealthChange : EntityEffect
         var scale = FixedPoint2.New(1);
 
         if (args is EntityEffectReagentArgs reagentArgs)
-        {
             scale = ScaleByQuantity ? reagentArgs.Quantity * reagentArgs.Scale : reagentArgs.Scale;
-        }
 
         var damagableSystem = args.EntityManager.System<DamageableSystem>();
         var universalReagentDamageModifier = damagableSystem.UniversalReagentDamageModifier;
@@ -125,13 +121,9 @@ public sealed partial class EvenHealthChange : EntityEffect
             foreach (var (type, val) in dspec.DamageDict)
             {
                 if (val < 0f)
-                {
                     dspec.DamageDict[type] = val * universalReagentHealModifier;
-                }
                 if (val > 0f)
-                {
                     dspec.DamageDict[type] = val * universalReagentDamageModifier;
-                }
             }
         }
 
@@ -139,7 +131,7 @@ public sealed partial class EvenHealthChange : EntityEffect
             args.TargetEntity,
             dspec * scale,
             IgnoreResistances,
-            interruptsDoAfters: false,
+            false,
             splitDamage: SplitDamage); // Shitmed Change
     }
 }

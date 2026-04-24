@@ -5,9 +5,9 @@ using Robust.Shared.Prototypes;
 namespace Content.Shared.StatusEffectNew.Components;
 
 /// <summary>
-/// Used in conjunction with <see cref="StatusEffectComponent"/> to display an alert when the status effect is present.
+/// Used in conjunction with <see cref="StatusEffectComponent" /> to display an alert when the status effect is present.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 [EntityCategory("StatusEffects")]
 public sealed partial class StatusEffectAlertComponent : Component
 {

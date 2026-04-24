@@ -13,14 +13,14 @@ namespace Content.Shared.Xenoarchaeology.XenoArtifacts;
 [RegisterComponent]
 public sealed partial class RandomArtifactSpriteComponent : Component
 {
-    [DataField("minSprite")]
-    public int MinSprite = 1;
-
-    [DataField("maxSprite")]
-    public int MaxSprite = 14;
+    public TimeSpan? ActivationStart;
 
     [DataField("activationTime")]
     public double ActivationTime = 0.4;
 
-    public TimeSpan? ActivationStart;
+    [DataField("maxSprite")]
+    public int MaxSprite = 14;
+
+    [DataField("minSprite")]
+    public int MinSprite = 1;
 }

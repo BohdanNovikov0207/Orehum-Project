@@ -19,8 +19,8 @@ namespace Content.Shared.Security.Systems;
 public sealed class DeployableBarrierSystem : EntitySystem
 {
     [Dependency] private readonly FixtureSystem _fixtures = default!;
-    [Dependency] private readonly SharedPointLightSystem _pointLight = default!;
     [Dependency] private readonly SharedPhysicsSystem _physics = default!;
+    [Dependency] private readonly SharedPointLightSystem _pointLight = default!;
     [Dependency] private readonly PullingSystem _pulling = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
 
@@ -38,10 +38,8 @@ public sealed class DeployableBarrierSystem : EntitySystem
         ToggleBarrierDeploy(uid, lockComponent.Locked, component);
     }
 
-    private void OnLockToggled(EntityUid uid, DeployableBarrierComponent component, ref LockToggledEvent args)
-    {
+    private void OnLockToggled(EntityUid uid, DeployableBarrierComponent component, ref LockToggledEvent args) =>
         ToggleBarrierDeploy(uid, args.Locked, component);
-    }
 
     private void ToggleBarrierDeploy(EntityUid uid, bool isDeployed, DeployableBarrierComponent? component)
     {
@@ -69,8 +67,6 @@ public sealed class DeployableBarrierSystem : EntitySystem
 
         SharedPointLightComponent? pointLight = null;
         if (_pointLight.ResolveLight(uid, ref pointLight))
-        {
             _pointLight.SetEnabled(uid, isDeployed, pointLight);
-        }
     }
 }

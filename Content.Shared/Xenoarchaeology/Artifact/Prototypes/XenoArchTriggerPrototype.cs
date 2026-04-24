@@ -7,11 +7,13 @@ namespace Content.Shared.Xenoarchaeology.Artifact.Prototypes;
 
 /// <summary> Proto for xeno artifact triggers - markers, which event could trigger node to unlock it. </summary>
 [Prototype]
-public sealed partial class XenoArchTriggerPrototype : IPrototype
+public sealed class XenoArchTriggerPrototype : IPrototype
 {
-    /// <inheritdoc/>
-    [IdDataField]
-    public string ID { get; private set; } = default!;
+    /// <summary>
+    /// List of components that represent ways to trigger node.
+    /// </summary>
+    [DataField]
+    public ComponentRegistry Components = new();
 
     /// <summary>
     /// Tip for user on how to activate this trigger.
@@ -25,22 +27,21 @@ public sealed partial class XenoArchTriggerPrototype : IPrototype
     [DataField]
     public EntityWhitelist? Whitelist;
 
-    /// <summary>
-    /// List of components that represent ways to trigger node.
-    /// </summary>
-    [DataField]
-    public ComponentRegistry Components = new();
+    /// <inheritdoc />
+    [IdDataField]
+    public string ID { get; } = default!;
 }
 
 /// <summary>
-/// Container for list of xeno artifact triggers and their respective weights to be used in case randomly rolling trigger is required.
+/// Container for list of xeno artifact triggers and their respective weights to be used in case randomly rolling trigger
+/// is required.
 /// </summary>
 [Prototype]
-public sealed partial class WeightedRandomXenoArchTriggerPrototype : IWeightedRandomPrototype
+public sealed class WeightedRandomXenoArchTriggerPrototype : IWeightedRandomPrototype
 {
     [IdDataField]
-    public string ID { get; private set; } = default!;
+    public string ID { get; } = default!;
 
     [DataField(customTypeSerializer: typeof(PrototypeIdDictionarySerializer<float, XenoArchTriggerPrototype>))]
-    public Dictionary<string, float> Weights { get; private set; } = new();
+    public Dictionary<string, float> Weights { get; } = new();
 }

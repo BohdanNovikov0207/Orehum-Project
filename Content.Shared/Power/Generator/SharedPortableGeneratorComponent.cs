@@ -12,9 +12,10 @@ namespace Content.Shared.Power.Generator;
 /// Responsible for power output switching &amp; UI logic on portable generators.
 /// </summary>
 /// <remarks>
-/// A portable generator is expected to have the following components: <c>SolidFuelGeneratorAdapterComponent</c> <see cref="FuelGeneratorComponent"/>.
+/// A portable generator is expected to have the following components: <c>SolidFuelGeneratorAdapterComponent</c>
+/// <see cref="FuelGeneratorComponent" />.
 /// </remarks>
-/// <seealso cref="SharedPortableGeneratorSystem"/>
+/// <seealso cref="SharedPortableGeneratorSystem" />
 [RegisterComponent]
 [Access(typeof(SharedPortableGeneratorSystem))]
 public sealed partial class PortableGeneratorComponent : Component
@@ -42,7 +43,7 @@ public sealed partial class PortableGeneratorComponent : Component
 
     /// <summary>
     /// Sound that plays when attempting to start this generator.
-    /// Plays instead of <see cref="StartSound"/> if the generator has no fuel (dumbass).
+    /// Plays instead of <see cref="StartSound" /> if the generator has no fuel (dumbass).
     /// </summary>
     [DataField("startSoundEmpty")]
     [ViewVariables(VVAccess.ReadWrite)]
@@ -52,7 +53,7 @@ public sealed partial class PortableGeneratorComponent : Component
 /// <summary>
 /// Sent to the server to adjust the targeted power level of a portable generator.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class PortableGeneratorSetTargetPowerMessage : BoundUserInterfaceMessage
 {
     public int TargetPower;
@@ -66,7 +67,7 @@ public sealed class PortableGeneratorSetTargetPowerMessage : BoundUserInterfaceM
 /// <summary>
 /// Sent to the server to try to start a portable generator.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class PortableGeneratorStartMessage : BoundUserInterfaceMessage
 {
 }
@@ -74,7 +75,7 @@ public sealed class PortableGeneratorStartMessage : BoundUserInterfaceMessage
 /// <summary>
 /// Sent to the server to try to stop a portable generator.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class PortableGeneratorStopMessage : BoundUserInterfaceMessage
 {
 }
@@ -82,7 +83,7 @@ public sealed class PortableGeneratorStopMessage : BoundUserInterfaceMessage
 /// <summary>
 /// Sent to the server to try to change the power output of a power-switchable portable generator.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class PortableGeneratorSwitchOutputMessage : BoundUserInterfaceMessage
 {
 }
@@ -90,7 +91,7 @@ public sealed class PortableGeneratorSwitchOutputMessage : BoundUserInterfaceMes
 /// <summary>
 /// Sent to the server to try to eject all fuel stored in a portable generator.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class PortableGeneratorEjectFuelMessage : BoundUserInterfaceMessage
 {
 }
@@ -98,16 +99,16 @@ public sealed class PortableGeneratorEjectFuelMessage : BoundUserInterfaceMessag
 /// <summary>
 /// Contains network state for the portable generator.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class PortableGeneratorComponentBuiState : BoundUserInterfaceState
 {
-    public float RemainingFuel;
     public bool Clogged;
-    public (float Load, float Supply)? NetworkStats;
-    public float TargetPower;
     public float MaximumPower;
-    public float OptimalPower;
+    public (float Load, float Supply)? NetworkStats;
     public bool On;
+    public float OptimalPower;
+    public float RemainingFuel;
+    public float TargetPower;
 
     public PortableGeneratorComponentBuiState(
         FuelGeneratorComponent component,
@@ -125,26 +126,26 @@ public sealed class PortableGeneratorComponentBuiState : BoundUserInterfaceState
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum GeneratorComponentUiKey
 {
-    Key
+    Key,
 }
 
 /// <summary>
 /// Sprite layers for generator prototypes.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum GeneratorVisualLayers : byte
 {
     Body,
-    Unlit
+    Unlit,
 }
 
 /// <summary>
 /// Appearance keys for generators.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum GeneratorVisuals : byte
 {
     /// <summary>

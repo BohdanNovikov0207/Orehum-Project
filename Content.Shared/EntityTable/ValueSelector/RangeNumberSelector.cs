@@ -73,10 +73,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using System.Numerics;
-using Robust.Shared.Prototypes;
-using Robust.Shared.Random;
-
 namespace Content.Shared.EntityTable.ValueSelector;
 
 /// <summary>
@@ -92,10 +88,8 @@ public sealed partial class RangeNumberSelector : NumberSelector
         Range = range;
     }
 
-    public override int Get(System.Random rand)
-    {
+    public override int Get(System.Random rand) =>
         // rand.Next() is inclusive on the first number and exclusive on the second number,
         // so we add 1 to the second number.
-        return rand.Next(Range.X, Range.Y + 1);
-    }
+        rand.Next(Range.X, Range.Y + 1);
 }

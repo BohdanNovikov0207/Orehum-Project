@@ -14,9 +14,8 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Speech.Components;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 [AutoGenerateComponentState]
-
 public sealed partial class MeleeSpeechComponent : Component
 {
     /// <summary>
@@ -27,6 +26,13 @@ public sealed partial class MeleeSpeechComponent : Component
     [AutoNetworkedField]
     public string? Battlecry;
 
+    [DataField] public EntProtoId ConfigureAction = "ActionConfigureMeleeSpeech";
+
+    /// <summary>
+    /// The action to open the battlecry UI
+    /// </summary>
+    [DataField("configureActionEntity")] public EntityUid? ConfigureActionEntity;
+
     /// <summary>
     /// The maximum amount of characters allowed in a battlecry
     /// </summary>
@@ -34,46 +40,43 @@ public sealed partial class MeleeSpeechComponent : Component
     [DataField("MaxBattlecryLength")]
     [AutoNetworkedField]
     public int MaxBattlecryLength = 24;
-
-    [DataField] public EntProtoId  ConfigureAction = "ActionConfigureMeleeSpeech";
-
-    /// <summary>
-    /// The action to open the battlecry UI
-    /// </summary>
-    [DataField("configureActionEntity")] public EntityUid? ConfigureActionEntity;
 }
 
 /// <summary>
-/// Key representing which <see cref="PlayerBoundUserInterface"/> is currently open.
+/// Key representing which <see cref="PlayerBoundUserInterface" /> is currently open.
 /// Useful when there are multiple UI for an object. Here it's future-proofing only.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum MeleeSpeechUiKey : byte
 {
     Key,
 }
 
 /// <summary>
-/// Represents an <see cref="MeleeSpeechComponent"/> state that can be sent to the client
+/// Represents an <see cref="MeleeSpeechComponent" /> state that can be sent to the client
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class MeleeSpeechBoundUserInterfaceState : BoundUserInterfaceState
 {
-    public string CurrentBattlecry { get; }
     public MeleeSpeechBoundUserInterfaceState(string currentBattlecry)
     {
         CurrentBattlecry = currentBattlecry;
     }
+
+    public string CurrentBattlecry { get; }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class MeleeSpeechBattlecryChangedMessage : BoundUserInterfaceMessage
 {
-    public string Battlecry { get; }
     public MeleeSpeechBattlecryChangedMessage(string battlecry)
     {
         Battlecry = battlecry;
     }
+
+    public string Battlecry { get; }
 }
 
-public sealed partial class MeleeSpeechConfigureActionEvent : InstantActionEvent { }
+public sealed partial class MeleeSpeechConfigureActionEvent : InstantActionEvent
+{
+}

@@ -10,7 +10,7 @@ namespace Content.Shared.Salvage.JobBoard;
 /// <summary>
 /// Used to view the job board ui
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class SalvageJobBoardConsoleComponent : Component
 {
     /// <summary>
@@ -18,12 +18,6 @@ public sealed partial class SalvageJobBoardConsoleComponent : Component
     /// </summary>
     [DataField]
     public EntProtoId LabelEntity = "PaperSalvageJobLabel";
-
-    /// <summary>
-    /// The sound made when printing occurs
-    /// </summary>
-    [DataField]
-    public SoundSpecifier PrintSound = new SoundPathSpecifier("/Audio/Machines/printer.ogg");
 
     /// <summary>
     /// The time at which the console will be able to print a label again.
@@ -36,17 +30,24 @@ public sealed partial class SalvageJobBoardConsoleComponent : Component
     /// </summary>
     [DataField]
     public TimeSpan PrintDelay = TimeSpan.FromSeconds(5);
+
+    /// <summary>
+    /// The sound made when printing occurs
+    /// </summary>
+    [DataField]
+    public SoundSpecifier PrintSound = new SoundPathSpecifier("/Audio/Machines/printer.ogg");
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class SalvageJobBoardConsoleState : BoundUserInterfaceState
 {
-    public string Title;
-    public float Progression;
-
     public List<ProtoId<CargoBountyPrototype>> AvailableJobs;
+    public float Progression;
+    public string Title;
 
-    public SalvageJobBoardConsoleState(string title, float progression, List<ProtoId<CargoBountyPrototype>> availableJobs)
+    public SalvageJobBoardConsoleState(string title,
+        float progression,
+        List<ProtoId<CargoBountyPrototype>> availableJobs)
     {
         Title = title;
         Progression = progression;
@@ -54,7 +55,7 @@ public sealed class SalvageJobBoardConsoleState : BoundUserInterfaceState
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class JobBoardPrintLabelMessage : BoundUserInterfaceMessage
 {
     public string JobId;
@@ -65,8 +66,8 @@ public sealed class JobBoardPrintLabelMessage : BoundUserInterfaceMessage
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum SalvageJobBoardUiKey : byte
 {
-    Key
+    Key,
 }

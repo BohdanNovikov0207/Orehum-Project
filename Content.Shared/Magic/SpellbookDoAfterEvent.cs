@@ -10,7 +10,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Magic;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class SpellbookDoAfterEvent : SimpleDoAfterEvent
 {
 }

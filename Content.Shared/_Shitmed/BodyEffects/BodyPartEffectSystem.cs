@@ -3,19 +3,20 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared._Shitmed.Body.Events;
+using System.Linq;
 using Content.Shared.Body.Part;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization.Manager;
 using Robust.Shared.Timing;
-using System.Linq;
 
 namespace Content.Shared._Shitmed.BodyEffects;
-public sealed partial class BodyPartEffectSystem : EntitySystem
+
+public sealed class BodyPartEffectSystem : EntitySystem
 {
     [Dependency] private readonly IComponentFactory _compFactory = default!;
-    [Dependency] private readonly ISerializationManager _serManager = default!;
     [Dependency] private readonly IGameTiming _gameTiming = default!;
+    [Dependency] private readonly ISerializationManager _serManager = default!;
+
     public override void Initialize()
     {
         base.Initialize();
@@ -73,7 +74,7 @@ public sealed partial class BodyPartEffectSystem : EntitySystem
         ComponentRegistry reg,
         BodyPartEffectComponent? effectComp = null)
     {
-        if (!Resolve(part, ref effectComp, logMissing: false))
+        if (!Resolve(part, ref effectComp, false))
             return;
 
         foreach (var (key, comp) in reg)
@@ -94,7 +95,7 @@ public sealed partial class BodyPartEffectSystem : EntitySystem
         ComponentRegistry reg,
         BodyPartEffectComponent? effectComp = null)
     {
-        if (!Resolve(part, ref effectComp, logMissing: false))
+        if (!Resolve(part, ref effectComp, false))
             return;
 
         foreach (var (key, comp) in reg)

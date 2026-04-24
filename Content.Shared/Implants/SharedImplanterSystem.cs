@@ -45,16 +45,16 @@ namespace Content.Shared.Implants;
 
 public abstract class SharedImplanterSystem : EntitySystem
 {
-    [Dependency] private readonly SharedContainerSystem _container = default!;
-    [Dependency] private readonly ItemSlotsSystem _itemSlots = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
+    [Dependency] private readonly SharedContainerSystem _container = default!;
     [Dependency] private readonly DamageableSystem _damageableSystem = default!;
-    [Dependency] private readonly SharedUserInterfaceSystem _uiSystem = default!;
-    [Dependency] private readonly IPrototypeManager _proto = default!;
-    [Dependency] private readonly INetManager _netMan = default!; // Goobstation - Labeled implants
+    [Dependency] private readonly ItemSlotsSystem _itemSlots = default!;
     [Dependency] private readonly LabelSystem _label = default!; // Goobstation - Labeled implants
+    [Dependency] private readonly INetManager _netMan = default!; // Goobstation - Labeled implants
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly IPrototypeManager _proto = default!;
+    [Dependency] private readonly SharedUserInterfaceSystem _uiSystem = default!;
+    [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
 
     public override void Initialize()
     {
@@ -106,6 +106,7 @@ public abstract class SharedImplanterSystem : EntitySystem
 
         args.PushMarkup(Loc.GetString("implanter-contained-implant-text", ("desc", component.ImplantData.Item2)));
     }
+
     public bool CheckSameImplant(EntityUid target, EntityUid implant)
     {
         if (!TryComp<ImplantedComponent>(target, out var implanted))
@@ -121,10 +122,10 @@ public abstract class SharedImplanterSystem : EntitySystem
 
         if (component.CurrentMode == ImplanterToggleMode.Draw)
         {
-            args.Verbs.Add(new InteractionVerb()
+            args.Verbs.Add(new InteractionVerb
             {
                 Text = Loc.GetString("implanter-set-draw-verb"),
-                Act = () => TryOpenUi(uid, args.User, component)
+                Act = () => TryOpenUi(uid, args.User, component),
             });
         }
     }
@@ -141,7 +142,7 @@ public abstract class SharedImplanterSystem : EntitySystem
     private void OnSelected(EntityUid uid, ImplanterComponent component, DeimplantChangeVerbMessage args)
     {
         component.DeimplantChosen = args.Implant;
-        SetSelectedDeimplant(uid, args.Implant, component: component);
+        SetSelectedDeimplant(uid, args.Implant, component);
     }
 
     private void TryOpenUi(EntityUid uid, EntityUid user, ImplanterComponent? component = null)
@@ -205,13 +206,11 @@ public abstract class SharedImplanterSystem : EntitySystem
 
         if (!CheckTarget(target, component.Whitelist, component.Blacklist) ||
             !CheckTarget(target, implantComp.Whitelist, implantComp.Blacklist))
-        {
             return false;
-        }
 
         // Goobstation - allow traitors to buy suicide implants (fields for self-/other-implantability)
         var implantingSelf = user == target;
-        if ((implantingSelf && !implantComp.CanImplantSelf) || (!implantingSelf && !implantComp.CanImplantOther))
+        if (implantingSelf && !implantComp.CanImplantSelf || !implantingSelf && !implantComp.CanImplantOther)
             return false;
 
         var ev = new AddImplantAttemptEvent(user, target, implant.Value, implanter);
@@ -219,11 +218,9 @@ public abstract class SharedImplanterSystem : EntitySystem
         return !ev.Cancelled;
     }
 
-    protected bool CheckTarget(EntityUid target, EntityWhitelist? whitelist, EntityWhitelist? blacklist)
-    {
-        return _whitelistSystem.IsWhitelistPassOrNull(whitelist, target) &&
-            _whitelistSystem.IsBlacklistFailOrNull(blacklist, target);
-    }
+    protected bool CheckTarget(EntityUid target, EntityWhitelist? whitelist, EntityWhitelist? blacklist) =>
+        _whitelistSystem.IsWhitelistPassOrNull(whitelist, target) &&
+        _whitelistSystem.IsBlacklistFailOrNull(blacklist, target);
 
     //Draw the implant out of the target
     //TODO: Rework when surgery is in so implant cases can be a thing
@@ -255,7 +252,12 @@ public abstract class SharedImplanterSystem : EntitySystem
                         continue;
                     }
 
-                    DrawImplantIntoImplanter(implanter, target, implant, implantContainer, implanterContainer, implantComp);
+                    DrawImplantIntoImplanter(implanter,
+                        target,
+                        implant,
+                        implantContainer,
+                        implanterContainer,
+                        implantComp);
                     permanentFound = implantComp.Permanent;
 
                     //Break so only one implant is drawn
@@ -274,7 +276,7 @@ public abstract class SharedImplanterSystem : EntitySystem
                     if (TryComp<SubdermalImplantComponent>(implantEntity, out var subdermalComp))
                     {
                         if (component.DeimplantChosen == subdermalComp.DrawableProtoIdOverride ||
-                            (Prototype(implantEntity) != null && component.DeimplantChosen == Prototype(implantEntity)!))
+                            Prototype(implantEntity) != null && component.DeimplantChosen == Prototype(implantEntity)!)
                             implant = implantEntity;
                     }
                 }
@@ -286,11 +288,15 @@ public abstract class SharedImplanterSystem : EntitySystem
                     {
                         DrawPermanentFailurePopup(implant.Value, target, user);
                         permanentFound = implantComp.Permanent;
-
                     }
                     else
                     {
-                        DrawImplantIntoImplanter(implanter, target, implant.Value, implantContainer, implanterContainer, implantComp);
+                        DrawImplantIntoImplanter(implanter,
+                            target,
+                            implant.Value,
+                            implantContainer,
+                            implanterContainer,
+                            implantComp);
                         permanentFound = implantComp.Permanent;
                     }
 
@@ -298,18 +304,13 @@ public abstract class SharedImplanterSystem : EntitySystem
                         ImplantMode(implanter, component);
                 }
                 else
-                {
                     DrawCatastrophicFailure(implanter, component, user);
-                }
             }
 
             Dirty(implanter, component);
-
         }
         else
-        {
             DrawCatastrophicFailure(implanter, component, user);
-        }
     }
 
     private void DrawPermanentFailurePopup(EntityUid implant, EntityUid target, EntityUid user)
@@ -317,11 +318,17 @@ public abstract class SharedImplanterSystem : EntitySystem
         var implantName = Identity.Entity(implant, EntityManager);
         var targetName = Identity.Entity(target, EntityManager);
         var failedPermanentMessage = Loc.GetString("implanter-draw-failed-permanent",
-            ("implant", implantName), ("target", targetName));
+            ("implant", implantName),
+            ("target", targetName));
         _popup.PopupEntity(failedPermanentMessage, target, user);
     }
 
-    private void DrawImplantIntoImplanter(EntityUid implanter, EntityUid target, EntityUid implant, BaseContainer implantContainer, ContainerSlot implanterContainer, SubdermalImplantComponent implantComp)
+    private void DrawImplantIntoImplanter(EntityUid implanter,
+        EntityUid target,
+        EntityUid implant,
+        BaseContainer implantContainer,
+        ContainerSlot implanterContainer,
+        SubdermalImplantComponent implantComp)
     {
         _container.Remove(implant, implantContainer);
         implantComp.ImplantedEntity = null;
@@ -333,7 +340,7 @@ public abstract class SharedImplanterSystem : EntitySystem
 
     private void DrawCatastrophicFailure(EntityUid implanter, ImplanterComponent component, EntityUid user)
     {
-        _damageableSystem.TryChangeDamage(user, component.DeimplantFailureDamage, ignoreResistances: true, origin: implanter);
+        _damageableSystem.TryChangeDamage(user, component.DeimplantFailureDamage, true, origin: implanter);
         var userName = Identity.Entity(user, EntityManager);
         var failedCatastrophicallyMessage = Loc.GetString("implanter-draw-failed-catastrophically", ("user", userName));
         _popup.PopupEntity(failedCatastrophicallyMessage, user, PopupType.MediumCaution);
@@ -370,7 +377,9 @@ public abstract class SharedImplanterSystem : EntitySystem
         else if (component.CurrentMode == ImplanterToggleMode.Inject && component.ImplantOnly)
         {
             _appearance.SetData(uid, ImplanterVisuals.Full, implantFound, appearance);
-            _appearance.SetData(uid, ImplanterImplantOnlyVisuals.ImplantOnly, component.ImplantOnly,
+            _appearance.SetData(uid,
+                ImplanterImplantOnlyVisuals.ImplantOnly,
+                component.ImplantOnly,
                 appearance);
         }
 
@@ -390,22 +399,22 @@ public abstract class SharedImplanterSystem : EntitySystem
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class ImplantEvent : SimpleDoAfterEvent
 {
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class DrawEvent : SimpleDoAfterEvent
 {
 }
 
 public sealed class AddImplantAttemptEvent : CancellableEntityEventArgs
 {
-    public readonly EntityUid User;
-    public readonly EntityUid Target;
     public readonly EntityUid Implant;
     public readonly EntityUid Implanter;
+    public readonly EntityUid Target;
+    public readonly EntityUid User;
 
     public AddImplantAttemptEvent(EntityUid user, EntityUid target, EntityUid implant, EntityUid implanter)
     {
@@ -419,7 +428,7 @@ public sealed class AddImplantAttemptEvent : CancellableEntityEventArgs
 /// <summary>
 /// Change the chosen implanter in the UI.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class DeimplantChangeVerbMessage : BoundUserInterfaceMessage
 {
     public readonly string? Implant;
@@ -430,8 +439,8 @@ public sealed class DeimplantChangeVerbMessage : BoundUserInterfaceMessage
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum DeimplantUiKey : byte
 {
-    Key
+    Key,
 }

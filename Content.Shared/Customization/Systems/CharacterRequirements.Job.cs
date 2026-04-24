@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using Content.Corvax.Interfaces.Shared;
 using Content.Shared.CCVar;
@@ -15,12 +14,11 @@ using Robust.Shared.Utility;
 
 namespace Content.Shared.Customization.Systems;
 
-
 /// <summary>
-///     Requires the selected job to be one of the specified jobs
+/// Requires the selected job to be one of the specified jobs
 /// </summary>
 [UsedImplicitly]
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class CharacterJobRequirement : CharacterRequirement
 {
     [DataField(required: true)]
@@ -61,7 +59,8 @@ public sealed partial class CharacterJobRequirement : CharacterRequirement
 
         // Join the job names
         var jobsString = Loc.GetString("character-job-requirement",
-            ("inverted", Inverted), ("jobs", string.Join(", ", jobs)));
+            ("inverted", Inverted),
+            ("jobs", string.Join(", ", jobs)));
 
         reason = jobsString;
         return Jobs.Contains(job.ID);
@@ -69,10 +68,10 @@ public sealed partial class CharacterJobRequirement : CharacterRequirement
 }
 
 /// <summary>
-///     Requires the selected job to be in one of the specified departments
+/// Requires the selected job to be in one of the specified departments
 /// </summary>
 [UsedImplicitly]
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class CharacterDepartmentRequirement : CharacterRequirement
 {
     [DataField(required: true)]
@@ -103,7 +102,8 @@ public sealed partial class CharacterDepartmentRequirement : CharacterRequiremen
 
         // Join the department names
         var departmentsString = Loc.GetString("character-department-requirement",
-            ("inverted", Inverted), ("departments", string.Join(", ", departments)));
+            ("inverted", Inverted),
+            ("departments", string.Join(", ", departments)));
 
         reason = departmentsString;
         return Departments.Any(d => prototypeManager.Index(d).Roles.Contains(job.ID));
@@ -111,20 +111,20 @@ public sealed partial class CharacterDepartmentRequirement : CharacterRequiremen
 }
 
 /// <summary>
-///     Requires the playtime for a department to be within a certain range
+/// Requires the playtime for a department to be within a certain range
 /// </summary>
 [UsedImplicitly]
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class CharacterDepartmentTimeRequirement : CharacterRequirement
 {
-    [DataField]
-    public TimeSpan Min = TimeSpan.MinValue;
+    [DataField(required: true)]
+    public ProtoId<DepartmentPrototype> Department;
 
     [DataField]
     public TimeSpan Max = TimeSpan.MaxValue;
 
-    [DataField(required: true)]
-    public ProtoId<DepartmentPrototype> Department;
+    [DataField]
+    public TimeSpan Min = TimeSpan.MinValue;
 
     public override bool IsValid(JobPrototype job,
         HumanoidCharacterProfile profile,
@@ -187,17 +187,17 @@ public sealed partial class CharacterDepartmentTimeRequirement : CharacterRequir
 }
 
 /// <summary>
-///     Requires the player to have a certain amount of overall job time
+/// Requires the player to have a certain amount of overall job time
 /// </summary>
 [UsedImplicitly]
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class CharacterOverallTimeRequirement : CharacterRequirement
 {
     [DataField]
-    public TimeSpan Min = TimeSpan.MinValue;
+    public TimeSpan Max = TimeSpan.MaxValue;
 
     [DataField]
-    public TimeSpan Max = TimeSpan.MaxValue;
+    public TimeSpan Min = TimeSpan.MinValue;
 
     public override bool IsValid(JobPrototype job,
         HumanoidCharacterProfile profile,
@@ -247,17 +247,17 @@ public sealed partial class CharacterOverallTimeRequirement : CharacterRequireme
 }
 
 /// <summary>
-///     Requires the playtime for a tracker to be within a certain range
+/// Requires the playtime for a tracker to be within a certain range
 /// </summary>
 [UsedImplicitly]
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class CharacterPlaytimeRequirement : CharacterRequirement
 {
     [DataField]
-    public TimeSpan Min = TimeSpan.MinValue;
+    public TimeSpan Max = TimeSpan.MaxValue;
 
     [DataField]
-    public TimeSpan Max = TimeSpan.MaxValue;
+    public TimeSpan Min = TimeSpan.MinValue;
 
     [DataField(required: true)]
     public ProtoId<PlayTimeTrackerPrototype> Tracker;

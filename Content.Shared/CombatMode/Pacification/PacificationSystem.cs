@@ -59,9 +59,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Diagnostics.CodeAnalysis;
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Actions;
 using Content.Shared.Alert;
-using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.IdentityManagement;
 using Content.Shared.Interaction.Events;
 using Content.Shared.Popups;
@@ -73,8 +73,8 @@ namespace Content.Shared.CombatMode.Pacification;
 
 public sealed class PacificationSystem : EntitySystem
 {
-    [Dependency] private readonly AlertsSystem _alertsSystem = default!;
     [Dependency] private readonly SharedActionsSystem _actionsSystem = default!;
+    [Dependency] private readonly AlertsSystem _alertsSystem = default!;
     [Dependency] private readonly SharedCombatModeSystem _combatSystem = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
@@ -213,13 +213,13 @@ public sealed class PacificationSystem : EntitySystem
         _popup.PopupEntity(Loc.GetString(cannotThrowMessage, ("projectile", itemName)), ent, ent);
     }
 
-    private void OnPacifiedDangerousAttack(Entity<PacifismDangerousAttackComponent> ent, ref AttemptPacifiedAttackEvent args)
+    private void OnPacifiedDangerousAttack(Entity<PacifismDangerousAttackComponent> ent,
+        ref AttemptPacifiedAttackEvent args)
     {
         args.Cancelled = true;
         args.Reason = "pacified-cannot-harm-indirect";
     }
 }
-
 
 /// <summary>
 /// Raised when a Pacified entity attempts to throw something.
@@ -231,7 +231,7 @@ public struct AttemptPacifiedThrowEvent
     public EntityUid ItemUid;
     public EntityUid PlayerUid;
 
-    public AttemptPacifiedThrowEvent(EntityUid itemUid,  EntityUid playerUid)
+    public AttemptPacifiedThrowEvent(EntityUid itemUid, EntityUid playerUid)
     {
         ItemUid = itemUid;
         PlayerUid = playerUid;
@@ -254,9 +254,13 @@ public struct AttemptPacifiedThrowEvent
 }
 
 /// <summary>
-///     Raised ref directed on an entity when a pacified user is attempting to attack it.
-///     If <see cref="Cancelled"/> is true, don't allow attacking.
-///     <see cref="Reason"/> should be a loc string, if there needs to be special text for why the user isn't able to attack this.
+/// Raised ref directed on an entity when a pacified user is attempting to attack it.
+/// If <see cref="Cancelled" /> is true, don't allow attacking.
+/// <see cref="Reason" /> should be a loc string, if there needs to be special text for why the user isn't able to attack
+/// this.
 /// </summary>
 [ByRefEvent]
-public record struct AttemptPacifiedAttackEvent(EntityUid User, bool Cancelled = false, string Reason = "pacified-cannot-harm-directly");
+public record struct AttemptPacifiedAttackEvent(
+    EntityUid User,
+    bool Cancelled = false,
+    string Reason = "pacified-cannot-harm-directly");

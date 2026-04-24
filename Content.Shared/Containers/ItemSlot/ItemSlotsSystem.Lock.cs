@@ -59,10 +59,8 @@ public sealed partial class ItemSlotsSystem
         UpdateLocks(ent, lockComp.Locked);
     }
 
-    private void OnLockToggled(Entity<ItemSlotsLockComponent> ent, ref LockToggledEvent args)
-    {
+    private void OnLockToggled(Entity<ItemSlotsLockComponent> ent, ref LockToggledEvent args) =>
         UpdateLocks(ent, args.Locked);
-    }
 
     private void UpdateLocks(Entity<ItemSlotsLockComponent> ent, bool value)
     {

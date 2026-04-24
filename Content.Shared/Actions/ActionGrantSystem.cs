@@ -39,12 +39,11 @@
 // SPDX-FileCopyrightText: 2025 Aviu00 <93730715+Aviu00@users.noreply.github.com>
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
-using  Content.Shared.Inventory;
 
 namespace Content.Shared.Actions;
 
 /// <summary>
-/// <see cref="ActionGrantComponent"/>
+///     <see cref="ActionGrantComponent" />
 /// </summary>
 public sealed class ActionGrantSystem : EntitySystem
 {
@@ -60,7 +59,6 @@ public sealed class ActionGrantSystem : EntitySystem
 
     private void OnItemGet(Entity<ItemActionGrantComponent> ent, ref GetItemActionsEvent args)
     {
-
         if (!TryComp(ent.Owner, out ActionGrantComponent? grant))
             return;
 

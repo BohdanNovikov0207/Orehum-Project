@@ -19,10 +19,10 @@ namespace Content.Shared.HotPotato;
 
 public abstract class SharedHotPotatoSystem : EntitySystem
 {
-    [Dependency] private readonly SharedHandsSystem _hands = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly SharedAmbientSoundSystem _ambientSound = default!;
     [Dependency] private readonly DamageOnHoldingSystem _damageOnHolding = default!;
+    [Dependency] private readonly SharedHandsSystem _hands = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
 
 
@@ -61,10 +61,13 @@ public abstract class SharedHotPotatoSystem : EntitySystem
             if (!TryComp<HandsComponent>(hitEntity, out var hands))
                 continue;
 
-            if (!_hands.IsHolding((hitEntity, hands), ent.Owner, out _) && _hands.TryForcePickupAnyHand(hitEntity, ent.Owner, handsComp: hands))
+            if (!_hands.IsHolding((hitEntity, hands), ent.Owner, out _) &&
+                _hands.TryForcePickupAnyHand(hitEntity, ent.Owner, handsComp: hands))
             {
                 _popup.PopupPredicted(
-                    Loc.GetString("hot-potato-passed", ("from", Identity.Entity(args.User, EntityManager)), ("to", Identity.Entity(hitEntity, EntityManager))),
+                    Loc.GetString("hot-potato-passed",
+                        ("from", Identity.Entity(args.User, EntityManager)),
+                        ("to", Identity.Entity(hitEntity, EntityManager))),
                     ent.Owner,
                     args.User,
                     PopupType.Medium);

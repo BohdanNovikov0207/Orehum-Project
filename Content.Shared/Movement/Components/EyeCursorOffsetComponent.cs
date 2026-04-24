@@ -3,8 +3,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using System.Numerics;
-using Content.Shared.Movement.Systems;
 using Robust.Shared.GameStates;
 
 namespace Content.Shared.Movement.Components;
@@ -12,7 +10,7 @@ namespace Content.Shared.Movement.Components;
 /// <summary>
 /// Displaces SS14 eye data when given to an entity.
 /// </summary>
-[ComponentProtoName("EyeCursorOffset"), NetworkedComponent]
+[ComponentProtoName("EyeCursorOffset")] [NetworkedComponent]
 public abstract partial class SharedEyeCursorOffsetComponent : Component
 {
     /// <summary>
@@ -23,7 +21,8 @@ public abstract partial class SharedEyeCursorOffsetComponent : Component
     public float MaxOffset = 3f;
 
     /// <summary>
-    /// The speed which the camera adjusts to new positions. 0.5f seems like a good value, but can be changed if you want very slow/instant adjustments.
+    /// The speed which the camera adjusts to new positions. 0.5f seems like a good value, but can be changed if you want very
+    /// slow/instant adjustments.
     /// </summary>
     [DataField]
     public float OffsetSpeed = 0.5f;

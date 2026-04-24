@@ -12,7 +12,7 @@ namespace Content.Shared.CCVar;
 public sealed partial class CCVars
 {
     /// <summary>
-    ///     Controls if the game should run station events
+    /// Controls if the game should run station events
     /// </summary>
     [CVarControl(AdminFlags.Server | AdminFlags.Mapping)]
     public static readonly CVarDef<bool>

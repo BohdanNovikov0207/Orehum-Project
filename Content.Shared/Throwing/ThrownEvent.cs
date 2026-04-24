@@ -9,7 +9,7 @@ using JetBrains.Annotations;
 namespace Content.Shared.Throwing;
 
 /// <summary>
-///     Raised on thrown entity.
+/// Raised on thrown entity.
 /// </summary>
 [PublicAPI]
 [ByRefEvent]

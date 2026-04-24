@@ -13,10 +13,8 @@ namespace Content.Shared.Procedural.Loot;
 /// Spawned inside of a salvage mission.
 /// </summary>
 [Prototype]
-public sealed partial class SalvageLootPrototype : IPrototype
+public sealed class SalvageLootPrototype : IPrototype
 {
-    [IdDataField] public string ID { get; private set; } = default!;
-
     /// <summary>
     /// Should this loot always spawn if possible. Used for stuff such as ore.
     /// </summary>
@@ -27,4 +25,6 @@ public sealed partial class SalvageLootPrototype : IPrototype
     /// </summary>
     [DataField("loots")]
     public List<IDungeonLoot> LootRules = new();
+
+    [IdDataField] public string ID { get; } = default!;
 }

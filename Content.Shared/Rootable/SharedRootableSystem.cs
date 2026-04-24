@@ -3,7 +3,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Damage.Components;
 using Content.Shared.Actions;
 using Content.Shared.Actions.Components;
 using Content.Shared.Alert;
@@ -25,20 +24,21 @@ namespace Content.Shared.Rootable;
 
 /// <summary>
 /// Adds an action to toggle rooting to the ground, primarily for the Diona species.
-/// Being rooted prevents weighlessness and slipping, but causes any floor contents to transfer its reagents to the bloodstream.
+/// Being rooted prevents weighlessness and slipping, but causes any floor contents to transfer its reagents to the
+/// bloodstream.
 /// </summary>
 public abstract class SharedRootableSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SharedActionsSystem _actions = default!;
-    [Dependency] private readonly SharedGravitySystem _gravity = default!;
-    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
-    [Dependency] private readonly MovementSpeedModifierSystem _movementSpeedModifier = default!;
     [Dependency] private readonly AlertsSystem _alerts = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly SharedGravitySystem _gravity = default!;
+    [Dependency] private readonly MovementSpeedModifierSystem _movementSpeedModifier = default!;
+    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    protected EntityQuery<PhysicsComponent> PhysicsQuery;
 
     protected EntityQuery<PuddleComponent> PuddleQuery;
-    protected EntityQuery<PhysicsComponent> PhysicsQuery;
 
     public override void Initialize()
     {
@@ -76,10 +76,8 @@ public abstract class SharedRootableSystem : EntitySystem
         _actions.RemoveAction(actions, entity.Comp.ActionEntity);
     }
 
-    private void OnRootableToggle(Entity<RootableComponent> entity, ref ToggleActionEvent args)
-    {
+    private void OnRootableToggle(Entity<RootableComponent> entity, ref ToggleActionEvent args) =>
         args.Handled = TryToggleRooting((entity, entity));
-    }
 
     private void OnMobStateChanged(Entity<RootableComponent> entity, ref MobStateChangedEvent args)
     {
@@ -101,14 +99,10 @@ public abstract class SharedRootableSystem : EntitySystem
             _alerts.ShowAlert(entity, entity.Comp.RootedAlert);
             var curTime = _timing.CurTime;
             if (curTime > entity.Comp.NextUpdate)
-            {
                 entity.Comp.NextUpdate = curTime;
-            }
         }
         else
-        {
             _alerts.ClearAlert(entity, entity.Comp.RootedAlert);
-        }
 
         _audio.PlayPredicted(entity.Comp.RootSound, entity.Owner.ToCoordinates(), entity);
 
@@ -178,6 +172,6 @@ public abstract class SharedRootableSystem : EntitySystem
     private void OnRefreshMovementSpeed(Entity<RootableComponent> entity, ref RefreshMovementSpeedModifiersEvent args)
     {
         if (entity.Comp.Rooted)
-            args.ModifySpeed(entity.Comp.SpeedModifier, bypassImmunity: true);
+            args.ModifySpeed(entity.Comp.SpeedModifier, true);
     }
 }

@@ -41,13 +41,13 @@ namespace Content.Shared.Interaction;
 
 public sealed class InteractionPopupSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _gameTiming = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly MobStateSystem _mobStateSystem = default!;
-    [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
+    [Dependency] private readonly IGameTiming _gameTiming = default!;
+    [Dependency] private readonly MobStateSystem _mobStateSystem = default!;
     [Dependency] private readonly INetManager _netMan = default!;
+    [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     public override void Initialize()
     {
@@ -67,10 +67,8 @@ public sealed class InteractionPopupSystem : EntitySystem
         SharedInteract(uid, component, args, args.Target, args.User);
     }
 
-    private void OnInteractHand(EntityUid uid, InteractionPopupComponent component, InteractHandEvent args)
-    {
+    private void OnInteractHand(EntityUid uid, InteractionPopupComponent component, InteractHandEvent args) =>
         SharedInteract(uid, component, args, args.Target, args.User);
-    }
 
     private void SharedInteract(
         EntityUid uid,
@@ -90,9 +88,7 @@ public sealed class InteractionPopupSystem : EntitySystem
 
         if (TryComp<MobStateComponent>(uid, out var state)
             && !_mobStateSystem.IsAlive(uid, state))
-        {
             return;
-        }
 
         args.Handled = true;
 
@@ -119,7 +115,8 @@ public sealed class InteractionPopupSystem : EntitySystem
         if (_random.Prob(component.SuccessChance))
         {
             if (component.InteractSuccessString != null)
-                msg = Loc.GetString(component.InteractSuccessString, ("target", Identity.Entity(uid, EntityManager))); // Success message (localized).
+                msg = Loc.GetString(component.InteractSuccessString,
+                    ("target", Identity.Entity(uid, EntityManager))); // Success message (localized).
 
             if (component.InteractSuccessSound != null)
                 sfx = component.InteractSuccessSound;
@@ -133,7 +130,8 @@ public sealed class InteractionPopupSystem : EntitySystem
         else
         {
             if (component.InteractFailureString != null)
-                msg = Loc.GetString(component.InteractFailureString, ("target", Identity.Entity(uid, EntityManager))); // Failure message (localized).
+                msg = Loc.GetString(component.InteractFailureString,
+                    ("target", Identity.Entity(uid, EntityManager))); // Failure message (localized).
 
             if (component.InteractFailureSound != null)
                 sfx = component.InteractFailureSound;
@@ -148,7 +146,8 @@ public sealed class InteractionPopupSystem : EntitySystem
         if (!string.IsNullOrEmpty(component.MessagePerceivedByOthers))
         {
             var msgOthers = Loc.GetString(component.MessagePerceivedByOthers,
-                ("user", Identity.Entity(user, EntityManager)), ("target", Identity.Entity(uid, EntityManager)));
+                ("user", Identity.Entity(user, EntityManager)),
+                ("target", Identity.Entity(uid, EntityManager)));
             _popupSystem.PopupEntity(msgOthers, uid, Filter.PvsExcept(user, entityManager: EntityManager), true);
         }
 
@@ -180,30 +179,24 @@ public sealed class InteractionPopupSystem : EntitySystem
                 _audio.PlayEntity(sfx, Filter.Local(), target, true);
         }
         else
-        {
             _audio.PlayEntity(sfx, Filter.Empty().FromEntities(target), target, false);
-        }
     }
 
     /// <summary>
-    /// Sets <see cref="InteractionPopupComponent.InteractSuccessString"/>.
+    /// Sets <see cref="InteractionPopupComponent.InteractSuccessString" />.
     /// </summary>
     /// <para>
     /// This field is not networked automatically, so this method must be called on both sides of the network.
     /// </para>
-    public void SetInteractSuccessString(Entity<InteractionPopupComponent> ent, string str)
-    {
+    public void SetInteractSuccessString(Entity<InteractionPopupComponent> ent, string str) =>
         ent.Comp.InteractSuccessString = str;
-    }
 
     /// <summary>
-    /// Sets <see cref="InteractionPopupComponent.InteractFailureString"/>.
+    /// Sets <see cref="InteractionPopupComponent.InteractFailureString" />.
     /// </summary>
     /// <para>
     /// This field is not networked automatically, so this method must be called on both sides of the network.
     /// </para>
-    public void SetInteractFailureString(Entity<InteractionPopupComponent> ent, string str)
-    {
+    public void SetInteractFailureString(Entity<InteractionPopupComponent> ent, string str) =>
         ent.Comp.InteractFailureString = str;
-    }
 }

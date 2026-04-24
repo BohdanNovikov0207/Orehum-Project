@@ -13,7 +13,7 @@ namespace Content.Shared.Zombies;
 
 public abstract class SharedZombieSystem : EntitySystem
 {
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
@@ -21,13 +21,13 @@ public abstract class SharedZombieSystem : EntitySystem
         SubscribeLocalEvent<ZombieComponent, RefreshMovementSpeedModifiersEvent>(OnRefreshSpeed);
         SubscribeLocalEvent<ZombieComponent, RefreshNameModifiersEvent>(OnRefreshNameModifiers);
         SubscribeLocalEvent<ZombificationResistanceComponent, ArmorExamineEvent>(OnArmorExamine);
-        SubscribeLocalEvent<ZombificationResistanceComponent, InventoryRelayedEvent<ZombificationResistanceQueryEvent>>(OnResistanceQuery);
+        SubscribeLocalEvent<ZombificationResistanceComponent, InventoryRelayedEvent<ZombificationResistanceQueryEvent>>(
+            OnResistanceQuery);
     }
 
-    private void OnResistanceQuery(Entity<ZombificationResistanceComponent> ent, ref InventoryRelayedEvent<ZombificationResistanceQueryEvent> query)
-    {
+    private void OnResistanceQuery(Entity<ZombificationResistanceComponent> ent,
+        ref InventoryRelayedEvent<ZombificationResistanceQueryEvent> query) =>
         query.Args.TotalCoefficient *= ent.Comp.ZombificationResistanceCoefficient;
-    }
 
     private void OnArmorExamine(Entity<ZombificationResistanceComponent> ent, ref ArmorExamineEvent args)
     {
@@ -46,8 +46,6 @@ public abstract class SharedZombieSystem : EntitySystem
         args.ModifySpeed(mod, mod);
     }
 
-    private void OnRefreshNameModifiers(Entity<ZombieComponent> entity, ref RefreshNameModifiersEvent args)
-    {
+    private void OnRefreshNameModifiers(Entity<ZombieComponent> entity, ref RefreshNameModifiersEvent args) =>
         args.AddModifier("zombie-name-prefix");
-    }
 }

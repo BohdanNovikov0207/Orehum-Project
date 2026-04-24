@@ -16,9 +16,9 @@ namespace Content.Shared.Ninja.Components;
 
 /// <summary>
 /// Adds an action to dash, teleport to clicked position, when this item is held.
-/// Cancel <see cref="CheckDashEvent"/> to prevent using it.
+/// Cancel <see cref="CheckDashEvent" /> to prevent using it.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(DashAbilitySystem)), AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(DashAbilitySystem))] [AutoGenerateComponentState]
 public sealed partial class DashAbilityComponent : Component
 {
     /// <summary>
@@ -27,7 +27,7 @@ public sealed partial class DashAbilityComponent : Component
     [DataField]
     public EntProtoId<WorldTargetActionComponent> DashAction = "ActionEnergyKatanaDash";
 
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public EntityUid? DashActionEntity;
 }
 

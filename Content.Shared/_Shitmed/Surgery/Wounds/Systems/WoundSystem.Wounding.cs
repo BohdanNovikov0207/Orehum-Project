@@ -8,32 +8,32 @@
 
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using Content.Goobstation.Common.Medical;
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared._Shitmed.CCVar;
 using Content.Shared._Shitmed.DoAfter;
 using Content.Shared._Shitmed.Medical.Surgery.Pain.Components;
 using Content.Shared._Shitmed.Medical.Surgery.Traumas;
 using Content.Shared._Shitmed.Medical.Surgery.Traumas.Components;
+using Content.Shared._Shitmed.Medical.Surgery.Traumas.Systems;
 using Content.Shared._Shitmed.Medical.Surgery.Wounds.Components;
-using Content.Shared._Shitmed.Weapons.Melee.Events;
-using Content.Shared._Shitmed.Weapons.Ranged.Events;
 using Content.Shared._Shitmed.Targeting;
 using Content.Shared._Shitmed.Targeting.Events;
+using Content.Shared._Shitmed.Weapons.Melee.Events;
+using Content.Shared._Shitmed.Weapons.Ranged.Events;
 using Content.Shared.Body.Components;
 using Content.Shared.Body.Part;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Prototypes;
-using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Gibbing.Events;
 using Content.Shared.Humanoid;
 using Content.Shared.Inventory;
-using Content.Shared.Standing;
 using Content.Shared.Popups;
+using Content.Shared.Standing;
 using Robust.Shared.Audio;
 using Robust.Shared.Containers;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
-using Robust.Shared.Utility;
-using Content.Goobstation.Common.Medical;
 
 namespace Content.Shared._Shitmed.Medical.Surgery.Wounds.Systems;
 
@@ -41,6 +41,7 @@ public sealed partial class WoundSystem
 {
     private const string WoundContainerId = "Wounds";
     private const string BoneContainerId = "Bone";
+
     private void InitWounding()
     {
         SubscribeLocalEvent<WoundableComponent, ComponentInit>(OnWoundableInit);
@@ -127,7 +128,9 @@ public sealed partial class WoundSystem
             QueueDel(woundableEntity);
     }
 
-    private void OnWoundableInserted(EntityUid parentEntity, WoundableComponent parentWoundable, EntInsertedIntoContainerMessage args)
+    private void OnWoundableInserted(EntityUid parentEntity,
+        WoundableComponent parentWoundable,
+        EntInsertedIntoContainerMessage args)
     {
         if (!TryComp<WoundableComponent>(args.Entity, out var childWoundable)
             || !_net.IsServer)
@@ -140,7 +143,9 @@ public sealed partial class WoundSystem
             _trauma.UpdateBodyBoneAlert(body);
     }
 
-    private void OnWoundableRemoved(EntityUid parentEntity, WoundableComponent parentWoundable, EntRemovedFromContainerMessage args)
+    private void OnWoundableRemoved(EntityUid parentEntity,
+        WoundableComponent parentWoundable,
+        EntRemovedFromContainerMessage args)
     {
         if (!TryComp<WoundableComponent>(args.Entity, out var childWoundable)
             || !_net.IsServer)
@@ -153,7 +158,9 @@ public sealed partial class WoundSystem
             _trauma.UpdateBodyBoneAlert(body);
     }
 
-    private void OnWoundableContentsGibAttempt(EntityUid uid, WoundableComponent comp, ref AttemptEntityContentsGibEvent args)
+    private void OnWoundableContentsGibAttempt(EntityUid uid,
+        WoundableComponent comp,
+        ref AttemptEntityContentsGibEvent args)
     {
         if (args.ExcludedContainers == null)
             args.ExcludedContainers = new List<string> { WoundContainerId, BoneContainerId };
@@ -163,7 +170,6 @@ public sealed partial class WoundSystem
 
     private void DudeItsJustLikeMatrix(EntityUid uid, WoundableComponent comp, ref BeforeDamageChangedEvent args)
     {
-        return;
         /* The world is not ready for you yet...
 
         if (!args.CanBeCancelled
@@ -211,7 +217,8 @@ public sealed partial class WoundSystem
         args.Cancelled = true;*/
     }
 
-    private void HealWoundsOnWoundableAttempt(Entity<WoundableComponent> woundable, ref WoundHealAttemptOnWoundableEvent args)
+    private void HealWoundsOnWoundableAttempt(Entity<WoundableComponent> woundable,
+        ref WoundHealAttemptOnWoundableEvent args)
     {
         if (woundable.Comp.WoundableSeverity == WoundableSeverity.Severed)
             args.Cancelled = true;
@@ -226,7 +233,9 @@ public sealed partial class WoundSystem
         RemoveWound(wound, woundComponent);
     }
 
-    private void OnWoundSeverityPointChanged(EntityUid uid, WoundComponent component, WoundSeverityPointChangedEvent args)
+    private void OnWoundSeverityPointChanged(EntityUid uid,
+        WoundComponent component,
+        WoundSeverityPointChangedEvent args)
     {
         var delta = args.Overflow ?? args.NewSeverity - args.OldSeverity;
 
@@ -274,13 +283,16 @@ public sealed partial class WoundSystem
                 continue; // Only create wounds for damage or healing
 
             if (TryComp<DamageableComponent>(uid, out var damageable)
-                    && !damageable.Damage.DamageDict.ContainsKey(damageType))
+                && !damageable.Damage.DamageDict.ContainsKey(damageType))
                 continue;
 
             if (damageValue < 0)
-            {
-                TryHealWoundsOnWoundable(uid, -damageValue, damageType, out var healed, component, ignoreBlockers: args.IgnoreBlockers);
-            }
+                TryHealWoundsOnWoundable(uid,
+                    -damageValue,
+                    damageType,
+                    out var healed,
+                    component,
+                    ignoreBlockers: args.IgnoreBlockers);
             else
             {
                 // Only create wound if it's a valid damage type for wounds
@@ -301,7 +313,9 @@ public sealed partial class WoundSystem
         CheckWoundableSeverityThresholds(uid, component);
     }
 
-    private void OnGetDoAfterDelayMultiplier(EntityUid uid, WoundableComponent component, ref GetDoAfterDelayMultiplierEvent args)
+    private void OnGetDoAfterDelayMultiplier(EntityUid uid,
+        WoundableComponent component,
+        ref GetDoAfterDelayMultiplierEvent args)
     {
         if (component.WoundableIntegrity > 50)
             return;
@@ -340,12 +354,10 @@ public sealed partial class WoundSystem
 
     #region Public API
 
-    public DamageGroupPrototype? GetDamageGroupByType(string id)
-    {
-        return (from @group in _prototype.EnumeratePrototypes<DamageGroupPrototype>()
-                where @group.DamageTypes.Contains(id)
-                select @group).FirstOrDefault();
-    }
+    public DamageGroupPrototype? GetDamageGroupByType(string id) =>
+        (from @group in _prototype.EnumeratePrototypes<DamageGroupPrototype>()
+            where @group.DamageTypes.Contains(id)
+            select @group).FirstOrDefault();
 
     public bool TryInduceWounds(
         EntityUid uid,
@@ -359,8 +371,12 @@ public sealed partial class WoundSystem
 
         foreach (var woundToInduce in damage.DamageDict)
         {
-            if (!TryInduceWound(uid, woundToInduce.Key, woundToInduce.Value *
-                damage.WoundSeverityMultipliers.GetValueOrDefault(woundToInduce.Key, 1), out var woundInduced, woundable))
+            if (!TryInduceWound(uid,
+                    woundToInduce.Key,
+                    woundToInduce.Value *
+                    damage.WoundSeverityMultipliers.GetValueOrDefault(woundToInduce.Key, 1),
+                    out var woundInduced,
+                    woundable))
                 return false;
 
             woundsInduced.Add(woundInduced.Value);
@@ -391,7 +407,7 @@ public sealed partial class WoundSystem
             (from @group in _prototype.EnumeratePrototypes<DamageGroupPrototype>()
                 where @group.DamageTypes.Contains(woundId)
                 select @group).FirstOrDefault()
-                ?.ID,
+            ?.ID,
             woundable);
         return wound;
     }
@@ -421,9 +437,7 @@ public sealed partial class WoundSystem
 
         var wound = Spawn(woundProtoId);
         if (AddWound(uid, wound, severity, damageGroup))
-        {
             woundCreated = (wound, Comp<WoundComponent>(wound));
-        }
         else
         {
             // The wound failed some important checks, and we cannot let an invalid wound to be spawned!
@@ -524,7 +538,7 @@ public sealed partial class WoundSystem
 
         var upperLimit = wound.WoundSeverityPoint + woundable.WoundableIntegrity;
         wound.WoundSeverityPoint =
-        FixedPoint2.Clamp(ApplySeverityModifiers(wound.HoldingWoundable, severity), 0, upperLimit);
+            FixedPoint2.Clamp(ApplySeverityModifiers(wound.HoldingWoundable, severity), 0, upperLimit);
 
         if (wound.WoundSeverityPoint != old)
         {
@@ -540,7 +554,8 @@ public sealed partial class WoundSystem
                 {
                     bodySeverity =
                         GetAllWoundableChildren(rootPart.Value)
-                            .Aggregate(bodySeverity, (current, woundable) => current + GetWoundableSeverityPoint(woundable, woundable));
+                            .Aggregate(bodySeverity,
+                                (current, woundable) => current + GetWoundableSeverityPoint(woundable, woundable));
                 }
 
                 var ev1 = new WoundSeverityPointChangedOnBodyEvent(
@@ -564,7 +579,10 @@ public sealed partial class WoundSystem
     /// <param name="uid">UID of the wound.</param>
     /// <param name="severity">Severity to add.</param>
     /// <param name="wound">Wound to which severity is applied.</param>
-    /// <param name="traumaList">Traumas to apply when applying severity.. Please use _trauma.RandomTraumaChance if you expect your thing to apply traumas.</param>
+    /// <param name="traumaList">
+    /// Traumas to apply when applying severity.. Please use _trauma.RandomTraumaChance if you expect
+    /// your thing to apply traumas.
+    /// </param>
     public void ApplyWoundSeverity(
         EntityUid uid,
         FixedPoint2 severity,
@@ -637,7 +655,8 @@ public sealed partial class WoundSystem
             return severity;
 
         var toMultiply =
-            component.SeverityMultipliers.Sum(multiplier => (float) multiplier.Value.Change) / component.SeverityMultipliers.Count;
+            component.SeverityMultipliers.Sum(multiplier => (float) multiplier.Value.Change) /
+            component.SeverityMultipliers.Count;
         return severity * toMultiply;
     }
 
@@ -665,7 +684,9 @@ public sealed partial class WoundSystem
             return false;
 
         foreach (var wound in component.Wounds.ContainedEntities)
+        {
             CheckSeverityThresholds(wound, uid, woundableComp: component);
+        }
 
         UpdateWoundableIntegrity(uid, component);
         CheckWoundableSeverityThresholds(uid, component);
@@ -689,13 +710,16 @@ public sealed partial class WoundSystem
             || !_net.IsServer)
             return false;
 
-        foreach (var multiplier in component.SeverityMultipliers.Where(multiplier => multiplier.Value.Identifier == identifier))
+        foreach (var multiplier in component.SeverityMultipliers.Where(multiplier =>
+                     multiplier.Value.Identifier == identifier))
         {
             if (!component.SeverityMultipliers.Remove(multiplier.Key, out _))
                 return false;
 
             foreach (var wound in component.Wounds.ContainedEntities)
+            {
                 CheckSeverityThresholds(wound, uid, woundableComp: component);
+            }
 
             UpdateWoundableIntegrity(uid, component);
             CheckWoundableSeverityThresholds(uid, component);
@@ -724,7 +748,8 @@ public sealed partial class WoundSystem
             || !_net.IsServer)
             return false;
 
-        foreach (var multiplier in component.SeverityMultipliers.Where(multiplier => multiplier.Value.Identifier == identifier))
+        foreach (var multiplier in component.SeverityMultipliers.Where(multiplier =>
+                     multiplier.Value.Identifier == identifier))
         {
             component.SeverityMultipliers.Remove(multiplier.Key, out var value);
 
@@ -732,7 +757,9 @@ public sealed partial class WoundSystem
             component.SeverityMultipliers.Add(multiplier.Key, value);
 
             foreach (var wound in component.Wounds.ContainedEntities.ToList())
+            {
                 CheckSeverityThresholds(wound, uid, woundableComp: component);
+            }
 
             UpdateWoundableIntegrity(uid, component);
             CheckWoundableSeverityThresholds(uid, component);
@@ -748,7 +775,9 @@ public sealed partial class WoundSystem
     /// <param name="parentWoundableEntity">Parent of the woundable entity. Yes.</param>
     /// <param name="woundableEntity">The entity containing the vulnerable body part</param>
     /// <param name="woundableComp">Woundable component of woundableEntity.</param>
-    public void DestroyWoundable(EntityUid parentWoundableEntity, EntityUid woundableEntity, WoundableComponent woundableComp)
+    public void DestroyWoundable(EntityUid parentWoundableEntity,
+        EntityUid woundableEntity,
+        WoundableComponent woundableComp)
     {
         if (!TryComp<BodyPartComponent>(woundableEntity, out var bodyPart))
             return;
@@ -781,7 +810,9 @@ public sealed partial class WoundSystem
             _audio.PlayPvs(woundableComp.WoundableDestroyedSound, body);
             _appearance.SetData(woundableEntity,
                 WoundableVisualizerKeys.Wounds,
-                new WoundVisualizerGroupData(GetWoundableWounds(woundableEntity).Select(ent => GetNetEntity(ent)).ToList()));
+                new WoundVisualizerGroupData(GetWoundableWounds(woundableEntity)
+                    .Select(ent => GetNetEntity(ent))
+                    .ToList()));
 
             if (TryInduceWound(parentWoundableEntity, "Blunt", 0f, out var woundInduced))
             {
@@ -835,6 +866,7 @@ public sealed partial class WoundSystem
                         _inventory.DropSlotContents(body, containerName, inventory);
                     }
                 }
+
                 var bodyPartId = container.ID;
 
                 // Prevent anomalous behaviour
@@ -878,7 +910,9 @@ public sealed partial class WoundSystem
 
 
                 foreach (var wound in GetWoundableWounds(woundableEntity, woundableComp))
+                {
                     TransferWoundDamage(parentWoundableEntity, woundableEntity, wound, body);
+                }
 
                 if (_net.IsServer && !IsClientSide(woundableEntity))
                     QueueDel(woundableEntity);
@@ -892,7 +926,9 @@ public sealed partial class WoundSystem
     /// <param name="parentWoundableEntity">Parent of the woundable entity. Yes.</param>
     /// <param name="woundableEntity">The entity containing the vulnerable body part</param>
     /// <param name="woundableComp">Woundable component of woundableEntity.</param>
-    public void AmputateWoundable(EntityUid parentWoundableEntity, EntityUid woundableEntity, WoundableComponent? woundableComp = null)
+    public void AmputateWoundable(EntityUid parentWoundableEntity,
+        EntityUid woundableEntity,
+        WoundableComponent? woundableComp = null)
     {
         if (!Resolve(woundableEntity, ref woundableComp)
             || _timing.ApplyingState)
@@ -913,14 +949,18 @@ public sealed partial class WoundSystem
         if (woundableComp.DamageOnAmputate != null
             && _body.TryGetRootPart(bodyPart.Body.Value, out var rootPart)
             && !ampEv.Cancelled) // goob edit
+        {
             _damageable.TryChangeDamage(bodyPart.Body.Value,
                 woundableComp.DamageOnAmputate,
                 targetPart: _body.GetTargetBodyPart(rootPart));
+        }
 
         AmputateWoundableSafely(parentWoundableEntity, woundableEntity);
 
         foreach (var wound in GetWoundableWounds(woundableEntity, woundableComp))
+        {
             TransferWoundDamage(parentWoundableEntity, woundableEntity, wound, body);
+        }
 
         foreach (var wound in GetWoundableWounds(parentWoundableEntity))
         {
@@ -994,7 +1034,9 @@ public sealed partial class WoundSystem
             && _body.TryGetPartSlotContainerName(childBodyPart.PartType, out var containerNames))
         {
             foreach (var containerName in containerNames)
+            {
                 _inventory.DropSlotContents(body, containerName, inventory);
+            }
         }
 
         if (childBodyPart.PartType is BodyPartType.Hand or BodyPartType.Arm)
@@ -1003,7 +1045,9 @@ public sealed partial class WoundSystem
         Dirty(woundableEntity, woundableComp);
         _appearance.SetData(woundableEntity,
             WoundableVisualizerKeys.Wounds,
-            new WoundVisualizerGroupData(GetWoundableWounds(woundableEntity).Select(ent => GetNetEntity(ent)).ToList()));
+            new WoundVisualizerGroupData(GetWoundableWounds(woundableEntity)
+                .Select(ent => GetNetEntity(ent))
+                .ToList()));
 
         // Still does the funny popping, if the children are critted. for the funny :3
         DestroyWoundableChildren(woundableEntity, woundableComp, amputateChildrenSafely);
@@ -1093,7 +1137,9 @@ public sealed partial class WoundSystem
     /// <summary>
     /// Updates the woundable integrity based on the current damage
     /// </summary>
-    public void UpdateWoundableIntegrity(EntityUid uid, WoundableComponent? component = null, DamageableComponent? damageable = null)
+    public void UpdateWoundableIntegrity(EntityUid uid,
+        WoundableComponent? component = null,
+        DamageableComponent? damageable = null)
     {
         if (!Resolve(uid, ref component, false)
             || !Resolve(uid, ref damageable, false)
@@ -1103,8 +1149,8 @@ public sealed partial class WoundSystem
         // Calculate total damage on this part
         var damage =
             component.Wounds.ContainedEntities.Select(Comp<WoundComponent>)
-            .Where(wound => !wound.IsScar)
-            .Aggregate(FixedPoint2.Zero, (current, wound) => current + wound.WoundIntegrityDamage);
+                .Where(wound => !wound.IsScar)
+                .Aggregate(FixedPoint2.Zero, (current, wound) => current + wound.WoundIntegrityDamage);
 
         var newIntegrity = FixedPoint2.Clamp(component.IntegrityCap - damage, 0, component.IntegrityCap);
         if (newIntegrity == component.WoundableIntegrity)
@@ -1122,7 +1168,8 @@ public sealed partial class WoundSystem
             {
                 bodySeverity =
                     GetAllWoundableChildren(rootPart.Value)
-                        .Aggregate(bodySeverity, (current, woundable) => current + GetWoundableIntegrityDamage(woundable, woundable));
+                        .Aggregate(bodySeverity,
+                            (current, woundable) => current + GetWoundableIntegrityDamage(woundable, woundable));
             }
 
             var ev1 = new WoundableIntegrityChangedOnBodyEvent(
@@ -1131,6 +1178,7 @@ public sealed partial class WoundSystem
                 bodySeverity);
             RaiseLocalEvent(bodyPart.Body.Value, ref ev1);
         }
+
         component.WoundableIntegrity = newIntegrity;
         Dirty(uid, component);
     }
@@ -1187,8 +1235,10 @@ public sealed partial class WoundSystem
 
         // We prevent removal if theres at least one wound holding traumas left.
         foreach (var trauma in _trauma.GetAllWoundTraumas(woundEntity))
-            if (Traumas.Systems.TraumaSystem.TraumasBlockingHealing.Contains(trauma.Comp.TraumaType))
+        {
+            if (TraumaSystem.TraumasBlockingHealing.Contains(trauma.Comp.TraumaType))
                 return false;
+        }
 
         _container.Remove(woundEntity, woundable.Wounds!, false, true);
 
@@ -1318,13 +1368,16 @@ public sealed partial class WoundSystem
             var ev = new WoundSeverityChangedEvent(component.WoundSeverity, nearestSeverity);
             RaiseLocalEvent(wound, ref ev);
         }
+
         component.WoundSeverity = nearestSeverity;
 
         if (!TerminatingOrDeleted(component.HoldingWoundable))
         {
             _appearance.SetData(component.HoldingWoundable,
                 WoundableVisualizerKeys.Wounds,
-                new WoundVisualizerGroupData(GetWoundableWounds(component.HoldingWoundable).Select(ent => GetNetEntity(ent)).ToList()));
+                new WoundVisualizerGroupData(GetWoundableWounds(component.HoldingWoundable)
+                    .Select(ent => GetNetEntity(ent))
+                    .ToList()));
         }
     }
 
@@ -1357,6 +1410,7 @@ public sealed partial class WoundSystem
             var ev = new WoundableSeverityChangedEvent(component.WoundableSeverity, nearestSeverity);
             RaiseLocalEvent(woundable, ref ev);
         }
+
         component.WoundableSeverity = nearestSeverity;
 
         Dirty(woundable, component);
@@ -1386,10 +1440,11 @@ public sealed partial class WoundSystem
         {
             _popup.PopupClient(Loc.GetString(message), body, PopupType.Medium);
             var ev = new DropHandItemsEvent();
-            RaiseLocalEvent(body, ref ev, false);
+            RaiseLocalEvent(body, ref ev);
             _audio.PlayPredicted(sound, body, body);
             return true;
         }
+
         return false;
     }
 
@@ -1404,11 +1459,9 @@ public sealed partial class WoundSystem
     /// </summary>
     /// <param name="protoId">The prototype ID to be validated.</param>
     /// <returns>True if the wound prototype is valid, otherwise false.</returns>
-    private bool IsWoundPrototypeValid(string protoId)
-    {
-        return _prototype.TryIndex<EntityPrototype>(protoId, out var woundPrototype)
-               && woundPrototype.TryGetComponent<WoundComponent>(out _, _factory);
-    }
+    private bool IsWoundPrototypeValid(string protoId) =>
+        _prototype.TryIndex<EntityPrototype>(protoId, out var woundPrototype)
+        && woundPrototype.TryGetComponent<WoundComponent>(out _, _factory);
 
     private void DestroyWoundableChildren(EntityUid woundableEntity,
         WoundableComponent? woundableComp = null,
@@ -1554,11 +1607,9 @@ public sealed partial class WoundSystem
     /// <param name="woundableEntity">Owner of the woundable</param>
     /// <param name="woundable">woundable component</param>
     /// <returns>true if the woundable is the root of the hierarchy</returns>
-    public bool IsWoundableRoot(EntityUid woundableEntity, WoundableComponent? woundable = null)
-    {
-        return Resolve(woundableEntity, ref woundable, false)
-            && woundable.RootWoundable == woundableEntity;
-    }
+    public bool IsWoundableRoot(EntityUid woundableEntity, WoundableComponent? woundable = null) =>
+        Resolve(woundableEntity, ref woundable, false)
+        && woundable.RootWoundable == woundableEntity;
 
     /// <summary>
     /// Retrieves all wounds associated with a specified entity.
@@ -1578,8 +1629,9 @@ public sealed partial class WoundSystem
                 continue;
 
             foreach (var woundEntity in childWoundable.Wounds.ContainedEntities)
+            {
                 yield return (woundEntity, Comp<WoundComponent>(woundEntity));
-
+            }
         }
     }
 
@@ -1663,7 +1715,7 @@ public sealed partial class WoundSystem
     /// <typeparam name="T">the type of the component we want to find</typeparam>
     /// <returns>Enumerable to the found children</returns>
     public IEnumerable<Entity<WoundableComponent, T>> GetAllWoundableChildrenWithComp<T>(EntityUid targetEntity,
-        WoundableComponent? targetWoundable = null) where T: Component, new()
+        WoundableComponent? targetWoundable = null) where T : Component, new()
     {
         if (!Resolve(targetEntity, ref targetWoundable, false))
             yield break;

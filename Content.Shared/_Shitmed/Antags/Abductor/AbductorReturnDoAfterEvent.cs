@@ -10,17 +10,17 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared._Shitmed.Antags.Abductor;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class AbductorReturnDoAfterEvent : SimpleDoAfterEvent
 {
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class AbductorGizmoMarkDoAfterEvent : SimpleDoAfterEvent
 {
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class AbductorSendYourselfDoAfterEvent : SimpleDoAfterEvent
 {
     [DataField("coordinates", required: true)]
@@ -30,10 +30,15 @@ public sealed partial class AbductorSendYourselfDoAfterEvent : SimpleDoAfterEven
     {
     }
 
-    public AbductorSendYourselfDoAfterEvent(NetCoordinates coords) => TargetCoordinates = coords;
+    public AbductorSendYourselfDoAfterEvent(NetCoordinates coords)
+    {
+        TargetCoordinates = coords;
+    }
+
     public override DoAfterEvent Clone() => this;
 }
-[Serializable, NetSerializable]
+
+[Serializable] [NetSerializable]
 public sealed partial class AbductorAttractDoAfterEvent : SimpleDoAfterEvent
 {
     [DataField("coordinates", required: true)]
@@ -41,6 +46,7 @@ public sealed partial class AbductorAttractDoAfterEvent : SimpleDoAfterEvent
 
     [DataField("victim", required: true)]
     public NetEntity Victim;
+
     private AbductorAttractDoAfterEvent()
     {
     }

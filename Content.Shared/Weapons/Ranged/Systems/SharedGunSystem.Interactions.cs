@@ -31,21 +31,21 @@ public abstract partial class SharedGunSystem
 
         using (args.PushGroup(nameof(GunComponent)))
         {
-            args.PushMarkup(Loc.GetString("gun-selected-mode-examine", ("color", ModeExamineColor),
+            args.PushMarkup(Loc.GetString("gun-selected-mode-examine",
+                ("color", ModeExamineColor),
                 ("mode", GetLocSelector(component.SelectedMode))));
-            args.PushMarkup(Loc.GetString("gun-fire-rate-examine", ("color", FireRateExamineColor),
+            args.PushMarkup(Loc.GetString("gun-fire-rate-examine",
+                ("color", FireRateExamineColor),
                 ("fireRate", $"{component.FireRateModified:0.0}")));
         }
     }
 
-    private string GetLocSelector(SelectiveFire mode)
-    {
-        return Loc.GetString($"gun-{mode.ToString()}");
-    }
+    private string GetLocSelector(SelectiveFire mode) => Loc.GetString($"gun-{mode.ToString()}");
 
     private void OnAltVerb(EntityUid uid, GunComponent component, GetVerbsEvent<AlternativeVerb> args)
     {
-        if (!args.CanAccess || !args.CanInteract || !args.CanComplexInteract || args.Hands == null || component.SelectedMode == component.AvailableModes)
+        if (!args.CanAccess || !args.CanInteract || !args.CanComplexInteract || args.Hands == null ||
+            component.SelectedMode == component.AvailableModes)
             return;
 
         var nextMode = GetNextMode(component);
@@ -54,7 +54,7 @@ public abstract partial class SharedGunSystem
         {
             Act = () => SelectFire(uid, component, nextMode, args.User),
             Text = Loc.GetString("gun-selector-verb", ("mode", GetLocSelector(nextMode))),
-            Icon = new SpriteSpecifier.Texture(new("/Textures/Interface/VerbIcons/fold.svg.192dpi.png")),
+            Icon = new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/VerbIcons/fold.svg.192dpi.png")),
         };
 
         args.Verbs.Add(verb);
@@ -81,7 +81,7 @@ public abstract partial class SharedGunSystem
         if (component.SelectedMode == fire)
             return;
 
-        DebugTools.Assert((component.AvailableModes  & fire) != 0x0);
+        DebugTools.Assert((component.AvailableModes & fire) != 0x0);
         component.SelectedMode = fire;
 
         if (!Paused(uid))
@@ -101,7 +101,7 @@ public abstract partial class SharedGunSystem
     }
 
     /// <summary>
-    /// Cycles the gun's <see cref="SelectiveFire"/> to the next available one.
+    /// Cycles the gun's <see cref="SelectiveFire" /> to the next available one.
     /// </summary>
     public void CycleFire(EntityUid uid, GunComponent component, EntityUid? user = null)
     {
@@ -114,21 +114,13 @@ public abstract partial class SharedGunSystem
         SelectFire(uid, component, nextMode, user);
     }
 
-    // TODO: Actions need doing for guns anyway.
-    private sealed partial class CycleModeEvent : InstantActionEvent
-    {
-        public SelectiveFire Mode = default;
-    }
-
-    private void OnCycleMode(EntityUid uid, GunComponent component, CycleModeEvent args)
-    {
+    private void OnCycleMode(EntityUid uid, GunComponent component, CycleModeEvent args) =>
         SelectFire(uid, component, args.Mode, args.Performer);
-    }
 
     private void OnGunSelected(EntityUid uid, GunComponent component, HandSelectedEvent args)
     {
         if (Timing.ApplyingState)
-             return;
+            return;
 
         if (component.FireRateModified <= 0)
             return;
@@ -152,5 +144,11 @@ public abstract partial class SharedGunSystem
 
         component.NextFire = minimum;
         Dirty(uid, component);
+    }
+
+    // TODO: Actions need doing for guns anyway.
+    private sealed partial class CycleModeEvent : InstantActionEvent
+    {
+        public readonly SelectiveFire Mode = default;
     }
 }

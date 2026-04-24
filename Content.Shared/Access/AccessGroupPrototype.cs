@@ -16,14 +16,17 @@ using Robust.Shared.Prototypes;
 namespace Content.Shared.Access;
 
 /// <summary>
-///     Contains a list of access tags that are part of this group.
-///     Used by <see cref="AccessComponent"/> to avoid boilerplate.
+/// Contains a list of access tags that are part of this group.
+/// Used by <see cref="AccessComponent" /> to avoid boilerplate.
 /// </summary>
 [Prototype]
-public sealed partial class AccessGroupPrototype : IPrototype
+public sealed class AccessGroupPrototype : IPrototype
 {
-    [IdDataField]
-    public string ID { get; private set; } = default!;
+    /// <summary>
+    /// The access levels associated with this group
+    /// </summary>
+    [DataField(required: true)]
+    public HashSet<ProtoId<AccessLevelPrototype>> Tags = default!;
 
     /// <summary>
     /// The player-visible name of the access level group
@@ -31,11 +34,8 @@ public sealed partial class AccessGroupPrototype : IPrototype
     [DataField]
     public string? Name { get; set; }
 
-    /// <summary>
-    /// The access levels associated with this group
-    /// </summary>
-    [DataField(required: true)]
-    public HashSet<ProtoId<AccessLevelPrototype>> Tags = default!;
+    [IdDataField]
+    public string ID { get; } = default!;
 
     public string GetAccessGroupName()
     {

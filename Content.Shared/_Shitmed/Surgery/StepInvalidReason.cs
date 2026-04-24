@@ -16,5 +16,5 @@ public enum StepInvalidReason
     MissingPreviousSteps,
     StepCompleted,
     ToolInvalid,
-    DoAfterFailed
+    DoAfterFailed,
 }

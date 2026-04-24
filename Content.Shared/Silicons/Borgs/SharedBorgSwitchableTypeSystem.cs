@@ -19,17 +19,16 @@ namespace Content.Shared.Silicons.Borgs;
 /// <summary>
 /// Implements borg type switching.
 /// </summary>
-/// <seealso cref="BorgSwitchableTypeComponent"/>
+/// <seealso cref="BorgSwitchableTypeComponent" />
 public abstract class SharedBorgSwitchableTypeSystem : EntitySystem
 {
+    public static readonly EntProtoId ActionId = "ActionSelectBorgType";
     // TODO: Allow borgs to be reset to default configuration.
 
     [Dependency] private readonly SharedActionsSystem _actionsSystem = default!;
+    [Dependency] private readonly InteractionPopupSystem _interactionPopup = default!;
     [Dependency] private readonly SharedUserInterfaceSystem _userInterface = default!;
     [Dependency] protected readonly IPrototypeManager Prototypes = default!;
-    [Dependency] private readonly InteractionPopupSystem _interactionPopup = default!;
-
-    public static readonly EntProtoId ActionId = "ActionSelectBorgType";
 
     public override void Initialize()
     {
@@ -58,15 +57,11 @@ public abstract class SharedBorgSwitchableTypeSystem : EntitySystem
         if (ent.Comp.SelectedBorgType != null &&
             TryComp(ent, out BorgSwitchableSubtypeComponent? subtype) &&
             subtype.BorgSubtype != null)
-        {
             SelectBorgModule(ent, ent.Comp.SelectedBorgType.Value, subtype.BorgSubtype.Value);
-        }
     }
 
-    private void OnShutdown(Entity<BorgSwitchableTypeComponent> ent, ref ComponentShutdown args)
-    {
+    private void OnShutdown(Entity<BorgSwitchableTypeComponent> ent, ref ComponentShutdown args) =>
         _actionsSystem.RemoveAction(ent.Owner, ent.Comp.SelectTypeAction);
-    }
 
     private void OnSelectBorgTypeAction(Entity<BorgSwitchableTypeComponent> ent, ref BorgToggleSelectTypeEvent args)
     {
@@ -134,8 +129,6 @@ public abstract class SharedBorgSwitchableTypeSystem : EntitySystem
         }
 
         if (TryComp(entity, out FootstepModifierComponent? footstepModifier))
-        {
             footstepModifier.FootstepSoundCollection = prototype.FootstepCollection;
-        }
     }
 }

@@ -12,9 +12,18 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Shared._Goobstation.Heretic.Components;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class RustbringerComponent : Component
 {
+    [ViewVariables(VVAccess.ReadWrite)]
+    public float Accumulator;
+
+    [DataField]
+    public float Delay = 0.2f;
+
+    [DataField]
+    public EntProtoId Effect = "TileHereticRustRune";
+
     [DataField]
     public DamageModifierSet ModifierSet = new()
     {
@@ -29,13 +38,4 @@ public sealed partial class RustbringerComponent : Component
 
     [DataField]
     public EntityUid RustSpreader;
-
-    [DataField]
-    public EntProtoId Effect = "TileHereticRustRune";
-
-    [ViewVariables(VVAccess.ReadWrite)]
-    public float Accumulator;
-
-    [DataField]
-    public float Delay = 0.2f;
 }

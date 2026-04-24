@@ -16,19 +16,18 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-namespace Content.Shared.Humanoid
-{
-    // You need to update profile, profile editor, maybe voices and names if you want to expand this further.
-    public enum Sex : byte
-    {
-        Male,
-        Female,
-        Unsexed,
-    }
+namespace Content.Shared.Humanoid;
 
-    /// <summary>
-    ///     Raised when entity has changed their sex.
-    ///     This doesn't handle gender changes.
-    /// </summary>
-    public record struct SexChangedEvent(Sex OldSex, Sex NewSex);
+// You need to update profile, profile editor, maybe voices and names if you want to expand this further.
+public enum Sex : byte
+{
+    Male,
+    Female,
+    Unsexed,
 }
+
+/// <summary>
+/// Raised when entity has changed their sex.
+/// This doesn't handle gender changes.
+/// </summary>
+public record struct SexChangedEvent(Sex OldSex, Sex NewSex);

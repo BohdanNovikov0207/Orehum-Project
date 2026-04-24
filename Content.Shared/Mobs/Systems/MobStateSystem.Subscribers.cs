@@ -265,7 +265,9 @@ public partial class MobStateSystem
             CheckAct(target, component, args);
     }
 
-    private void OnCombatModeShouldHandInteract(EntityUid uid, MobStateComponent component, ref CombatModeShouldHandInteractEvent args)
+    private void OnCombatModeShouldHandInteract(EntityUid uid,
+        MobStateComponent component,
+        ref CombatModeShouldHandInteractEvent args)
     {
         // Disallow empty-hand-interacting in combat mode
         // for non-dead mobs
@@ -273,15 +275,11 @@ public partial class MobStateSystem
             args.Cancelled = true;
     }
 
-    private void OnAttemptPacifiedAttack(Entity<MobStateComponent> ent, ref AttemptPacifiedAttackEvent args)
-    {
+    private void OnAttemptPacifiedAttack(Entity<MobStateComponent> ent, ref AttemptPacifiedAttackEvent args) =>
         args.Cancelled = true;
-    }
 
-    private void OnDamageModify(Entity<MobStateComponent> ent, ref DamageModifyEvent args)
-    {
+    private void OnDamageModify(Entity<MobStateComponent> ent, ref DamageModifyEvent args) =>
         args.Damage *= _damageable.UniversalMobDamageModifier;
-    }
 
     #endregion
 }

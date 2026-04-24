@@ -2,9 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Chat.Prototypes;
 using Content.Shared.Damage;
-using Content.Goobstation.Maths.FixedPoint;
 using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
@@ -12,58 +12,58 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
 
 namespace Content.Shared._RMC14.Medical.IV;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState(true), AutoGenerateComponentPause]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState(true)] [AutoGenerateComponentPause]
 public sealed partial class BloodPackComponent : Component
 {
-    [DataField, AutoNetworkedField]
-    public string Solution = "pack";
-
-    [DataField, AutoNetworkedField]
-    public FixedPoint2 FillPercentage;
-
-    [DataField, AutoNetworkedField]
-    public Color FillColor;
-
-    [DataField, AutoNetworkedField]
-    public int MaxFillLevels = 7;
-
-    [DataField, AutoNetworkedField]
-    public string FillBaseName = "bloodpack";
-
-    [DataField, AutoNetworkedField]
-    public FixedPoint2 TransferAmount = FixedPoint2.New(5);
-
-    [DataField, AutoNetworkedField]
-    public TimeSpan TransferDelay = TimeSpan.FromSeconds(3);
-
-    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer)), AutoNetworkedField, AutoPausedField]
-    public TimeSpan TransferAt;
-
-    [DataField, AutoNetworkedField]
-    public EntityUid? AttachedTo;
-
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public TimeSpan AttachDelay = TimeSpan.FromSeconds(1);
 
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
+    public EntityUid? AttachedTo;
+
+    [DataField] [AutoNetworkedField]
+    public string FillBaseName = "bloodpack";
+
+    [DataField] [AutoNetworkedField]
+    public Color FillColor;
+
+    [DataField] [AutoNetworkedField]
+    public FixedPoint2 FillPercentage;
+
+    [DataField] [AutoNetworkedField]
+    public bool Injecting = true;
+
+    [DataField] [AutoNetworkedField]
+    public int MaxFillLevels = 7;
+
+    [DataField] [AutoNetworkedField]
     public int Range = 2;
 
     [DataField]
     public DamageSpecifier? RipDamage;
 
-    [DataField, AutoNetworkedField]
-    public bool Injecting = true;
-
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public ProtoId<EmotePrototype> RipEmote = "Scream";
 
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
+    public string Solution = "pack";
+
+    [DataField] [AutoNetworkedField]
     public string[] TransferableReagents = ["Blood"];
+
+    [DataField] [AutoNetworkedField]
+    public FixedPoint2 TransferAmount = FixedPoint2.New(5);
+
+    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))] [AutoNetworkedField] [AutoPausedField]
+    public TimeSpan TransferAt;
+
+    [DataField] [AutoNetworkedField]
+    public TimeSpan TransferDelay = TimeSpan.FromSeconds(3);
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum BloodPackVisuals
 {
     Label,
-    Fill
+    Fill,
 }

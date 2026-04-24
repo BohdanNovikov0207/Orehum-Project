@@ -17,6 +17,7 @@ using Content.Shared._Shitmed.Medical.Surgery.Wounds.Components;
 using Content.Shared._Shitmed.Weapons.Melee.Events;
 using Content.Shared.Body.Components;
 using Content.Shared.Body.Part;
+
 namespace Content.Shared.Body.Systems;
 
 public partial class SharedBodySystem
@@ -27,28 +28,19 @@ public partial class SharedBodySystem
         SubscribeLocalEvent<BodyPartComponent, GetDoAfterDelayMultiplierEvent>(RelayBoneEvent);
         SubscribeLocalEvent<BodyComponent, AttemptHandsMeleeEvent>(RelayBodyPartEvent);
         SubscribeLocalEvent<BodyPartComponent, AttemptHandsMeleeEvent>(RelayBoneEvent);
-
     }
 
-    protected void RefRelayBodyPartEvent<T>(EntityUid uid, BodyComponent component, ref T args) where T : IBodyPartRelayEvent
-    {
-        RelayEvent((uid, component), ref args);
-    }
+    protected void RefRelayBodyPartEvent<T>(EntityUid uid, BodyComponent component, ref T args)
+        where T : IBodyPartRelayEvent => RelayEvent((uid, component), ref args);
 
-    protected void RelayBodyPartEvent<T>(EntityUid uid, BodyComponent component, T args) where T : IBodyPartRelayEvent
-    {
+    protected void RelayBodyPartEvent<T>(EntityUid uid, BodyComponent component, T args)
+        where T : IBodyPartRelayEvent => RelayEvent((uid, component), args);
+
+    protected void RefRelayBoneEvent<T>(EntityUid uid, BodyPartComponent component, ref T args)
+        where T : IBoneRelayEvent => RelayEvent((uid, component), ref args);
+
+    protected void RelayBoneEvent<T>(EntityUid uid, BodyPartComponent component, T args) where T : IBoneRelayEvent =>
         RelayEvent((uid, component), args);
-    }
-
-    protected void RefRelayBoneEvent<T>(EntityUid uid, BodyPartComponent component, ref T args) where T : IBoneRelayEvent
-    {
-        RelayEvent((uid, component), ref args);
-    }
-
-    protected void RelayBoneEvent<T>(EntityUid uid, BodyPartComponent component, T args) where T : IBoneRelayEvent
-    {
-        RelayEvent((uid, component), args);
-    }
 
     public void RelayEvent<T>(Entity<BodyComponent> body, ref T args) where T : IBodyPartRelayEvent
     {
@@ -59,7 +51,7 @@ public partial class SharedBodySystem
             RaiseLocalEvent(part.Id, ev);
 
             if (args.RaiseOnParent
-                && TryGetParentBodyPart(part.Id, out var parentUid, out var _)
+                && TryGetParentBodyPart(part.Id, out var parentUid, out _)
                 && parentUid.HasValue)
                 RaiseLocalEvent(parentUid.Value, ev);
         }
@@ -77,7 +69,7 @@ public partial class SharedBodySystem
             RaiseLocalEvent(part.Id, ev);
 
             if (args.RaiseOnParent
-                && TryGetParentBodyPart(part.Id, out var parentUid, out var _)
+                && TryGetParentBodyPart(part.Id, out var parentUid, out _)
                 && parentUid.HasValue)
                 RaiseLocalEvent(parentUid.Value, ev);
         }
@@ -91,16 +83,24 @@ public partial class SharedBodySystem
             return;
 
         if (woundable.Bone.ContainedEntities.Count > 0)
+        {
             foreach (var bone in woundable.Bone.ContainedEntities)
+            {
                 RaiseLocalEvent(bone, ev);
+            }
+        }
 
         // Now we run it on the parent (i.e. Arm or Leg)
         if (args.RaiseOnParent
             && woundable.ParentWoundable != null
             && TryComp<WoundableComponent>(woundable.ParentWoundable, out var parentWoundable)
             && parentWoundable.Bone.ContainedEntities.Count > 0)
+        {
             foreach (var bone in parentWoundable.Bone.ContainedEntities)
+            {
                 RaiseLocalEvent(bone, ev);
+            }
+        }
 
         args = ev.Args;
     }
@@ -113,19 +113,25 @@ public partial class SharedBodySystem
             return;
 
         if (woundable.Bone.ContainedEntities.Count > 0)
+        {
             foreach (var bone in woundable.Bone.ContainedEntities)
+            {
                 RaiseLocalEvent(bone, ev);
+            }
+        }
 
         // Now we run it on the parent (i.e. Arm or Leg)
         if (args.RaiseOnParent
             && woundable.ParentWoundable != null
             && TryComp<WoundableComponent>(woundable.ParentWoundable, out var parentWoundable)
             && parentWoundable.Bone.ContainedEntities.Count > 0)
+        {
             foreach (var bone in parentWoundable.Bone.ContainedEntities)
+            {
                 RaiseLocalEvent(bone, ev);
-
+            }
+        }
     }
-
 }
 
 public sealed class BodyPartRelayedEvent<TEvent> : EntityEventArgs
@@ -149,27 +155,27 @@ public sealed class BoneRelayedEvent<TEvent> : EntityEventArgs
 }
 
 /// <summary>
-///     Events that should be relayed to body parts should implement this interface.
+/// Events that should be relayed to body parts should implement this interface.
 /// </summary>
 public interface IBodyPartRelayEvent
 {
     /// <summary>
-    ///     What body part should this event be relayed to, if any?
+    /// What body part should this event be relayed to, if any?
     /// </summary>
-    public BodyPartType TargetBodyPart { get; }
+    BodyPartType TargetBodyPart { get; }
 
-    public BodyPartSymmetry? TargetBodyPartSymmetry { get; }
+    BodyPartSymmetry? TargetBodyPartSymmetry { get; }
 
-    public bool RaiseOnParent { get; }
+    bool RaiseOnParent { get; }
 }
 
 /// <summary>
-///     Events that should be relayed to bones should implement this interface.
+/// Events that should be relayed to bones should implement this interface.
 /// </summary>
 public interface IBoneRelayEvent
 {
     /// <summary>
-    ///     Whether to raise the event on the parent body part as well.
+    /// Whether to raise the event on the parent body part as well.
     /// </summary>
-    public bool RaiseOnParent { get; }
+    bool RaiseOnParent { get; }
 }

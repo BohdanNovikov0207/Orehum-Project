@@ -11,21 +11,21 @@ namespace Content.Shared.Movement.Components;
 /// <summary>
 /// Added to someone using a jetpack for movement purposes
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class JetpackUserComponent : Component
 {
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public EntityUid Jetpack;
 
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public float WeightlessAcceleration;
 
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public float WeightlessFriction;
 
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public float WeightlessFrictionNoInput;
 
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public float WeightlessModifier;
 }

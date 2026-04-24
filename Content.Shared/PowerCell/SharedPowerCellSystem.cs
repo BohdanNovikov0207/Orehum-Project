@@ -55,9 +55,9 @@ namespace Content.Shared.PowerCell;
 
 public abstract class SharedPowerCellSystem : EntitySystem
 {
-    [Dependency] protected readonly IGameTiming Timing = default!;
-    [Dependency] private readonly ItemSlotsSystem _itemSlots = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly ItemSlotsSystem _itemSlots = default!;
+    [Dependency] protected readonly IGameTiming Timing = default!;
 
     public override void Initialize()
     {
@@ -71,10 +71,8 @@ public abstract class SharedPowerCellSystem : EntitySystem
         SubscribeLocalEvent<PowerCellSlotComponent, ContainerIsInsertingAttemptEvent>(OnCellInsertAttempt);
     }
 
-    private void OnMapInit(Entity<PowerCellDrawComponent> ent, ref MapInitEvent args)
-    {
+    private void OnMapInit(Entity<PowerCellDrawComponent> ent, ref MapInitEvent args) =>
         ent.Comp.NextUpdateTime = Timing.CurTime + ent.Comp.Delay;
-    }
 
     private void OnRejuvenate(EntityUid uid, PowerCellSlotComponent component, RejuvenateEvent args)
     {
@@ -85,7 +83,9 @@ public abstract class SharedPowerCellSystem : EntitySystem
         RaiseLocalEvent(itemSlot.Item.Value, args);
     }
 
-    private void OnCellInsertAttempt(EntityUid uid, PowerCellSlotComponent component, ContainerIsInsertingAttemptEvent args)
+    private void OnCellInsertAttempt(EntityUid uid,
+        PowerCellSlotComponent component,
+        ContainerIsInsertingAttemptEvent args)
     {
         if (!component.Initialized)
             return;
@@ -94,9 +94,7 @@ public abstract class SharedPowerCellSystem : EntitySystem
             return;
 
         if (!HasComp<PowerCellComponent>(args.EntityUid))
-        {
             args.Cancel();
-        }
     }
 
     private void OnCellInserted(EntityUid uid, PowerCellSlotComponent component, EntInsertedIntoContainerMessage args)
@@ -107,15 +105,17 @@ public abstract class SharedPowerCellSystem : EntitySystem
         if (args.Container.ID != component.CellSlotId)
             return;
         _appearance.SetData(uid, PowerCellSlotVisuals.Enabled, true);
-        RaiseLocalEvent(uid, new PowerCellChangedEvent(false), false);
+        RaiseLocalEvent(uid, new PowerCellChangedEvent(false));
     }
 
-    protected virtual void OnCellRemoved(EntityUid uid, PowerCellSlotComponent component, EntRemovedFromContainerMessage args)
+    protected virtual void OnCellRemoved(EntityUid uid,
+        PowerCellSlotComponent component,
+        EntRemovedFromContainerMessage args)
     {
         if (args.Container.ID != component.CellSlotId)
             return;
         _appearance.SetData(uid, PowerCellSlotVisuals.Enabled, false);
-        RaiseLocalEvent(uid, new PowerCellChangedEvent(true), false);
+        RaiseLocalEvent(uid, new PowerCellChangedEvent(true));
     }
 
     public void SetDrawEnabled(Entity<PowerCellDrawComponent?> ent, bool enabled)
@@ -131,7 +131,7 @@ public abstract class SharedPowerCellSystem : EntitySystem
     }
 
     /// <summary>
-    /// Returns whether the entity has a slotted battery and <see cref="PowerCellDrawComponent.UseRate"/> charge.
+    /// Returns whether the entity has a slotted battery and <see cref="PowerCellDrawComponent.UseRate" /> charge.
     /// </summary>
     /// <param name="uid"></param>
     /// <param name="battery"></param>

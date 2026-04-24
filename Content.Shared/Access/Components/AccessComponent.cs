@@ -28,9 +28,9 @@ using Robust.Shared.Prototypes;
 namespace Content.Shared.Access.Components;
 
 /// <summary>
-///     Simple mutable access provider found on ID cards and such.
+/// Simple mutable access provider found on ID cards and such.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 [Access(typeof(SharedAccessSystem))]
 [AutoGenerateComponentState]
 public sealed partial class AccessComponent : Component
@@ -38,14 +38,9 @@ public sealed partial class AccessComponent : Component
     /// <summary>
     /// True if the access provider is enabled and can grant access.
     /// </summary>
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    [DataField] [ViewVariables(VVAccess.ReadWrite)]
     [AutoNetworkedField]
     public bool Enabled = true;
-
-    [DataField]
-    [Access(typeof(SharedAccessSystem), Other = AccessPermissions.ReadExecute)] // FIXME Friends
-    [AutoNetworkedField]
-    public HashSet<ProtoId<AccessLevelPrototype>> Tags = new();
 
     /// <summary>
     /// Access Groups. These are added to the tags during map init. After map init this will have no effect.
@@ -53,6 +48,11 @@ public sealed partial class AccessComponent : Component
     [DataField(readOnly: true)]
     [AutoNetworkedField]
     public HashSet<ProtoId<AccessGroupPrototype>> Groups = new();
+
+    [DataField]
+    [Access(typeof(SharedAccessSystem), Other = AccessPermissions.ReadExecute)] // FIXME Friends
+    [AutoNetworkedField]
+    public HashSet<ProtoId<AccessLevelPrototype>> Tags = new();
 }
 
 /// <summary>

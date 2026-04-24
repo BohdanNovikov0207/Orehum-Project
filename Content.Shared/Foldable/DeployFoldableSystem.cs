@@ -85,9 +85,9 @@ namespace Content.Shared.Foldable;
 
 public sealed class DeployFoldableSystem : EntitySystem
 {
-    [Dependency] private readonly SharedHandsSystem _hands = default!;
-    [Dependency] private readonly FoldableSystem _foldable = default!;
     [Dependency] private readonly AnchorableSystem _anchorable = default!;
+    [Dependency] private readonly FoldableSystem _foldable = default!;
+    [Dependency] private readonly SharedHandsSystem _hands = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
 
     public override void Initialize()
@@ -149,7 +149,7 @@ public sealed class DeployFoldableSystem : EntitySystem
         }
 
         if (!TryComp(args.User, out HandsComponent? hands)
-            || !_hands.TryDrop((args.User, hands), args.Used, targetDropLocation: args.ClickLocation))
+            || !_hands.TryDrop((args.User, hands), args.Used, args.ClickLocation))
             return;
 
         if (!_foldable.TrySetFolded(ent, foldable, false))

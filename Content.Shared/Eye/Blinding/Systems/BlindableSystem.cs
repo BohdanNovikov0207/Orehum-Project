@@ -15,25 +15,24 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Shared._Shitmed.Body.Organ;
+using Content.Shared._Shitmed.Medical.Surgery.Traumas.Systems;
+using Content.Shared.Body.Components;
+using Content.Shared.Body.Systems;
 using Content.Shared.Camera;
 using Content.Shared.Eye.Blinding.Components;
 using Content.Shared.Inventory;
 using Content.Shared.Rejuvenate;
 using JetBrains.Annotations;
-
 // Shitmed Change
-using Content.Shared.Body.Systems;
-using Content.Shared.Body.Components;
-using Content.Shared._Shitmed.Body.Organ;
-using Content.Shared._Shitmed.Medical.Surgery.Traumas.Systems;
 
 namespace Content.Shared.Eye.Blinding.Systems;
 
 public sealed class BlindableSystem : EntitySystem
 {
     [Dependency] private readonly BlurryVisionSystem _blurriness = default!;
-    [Dependency] private readonly EyeClosingSystem _eyelids = default!;
     [Dependency] private readonly SharedBodySystem _body = default!; // Shitmed Change
+    [Dependency] private readonly EyeClosingSystem _eyelids = default!;
     [Dependency] private readonly TraumaSystem _trauma = default!; // Shitmed Change
 
     public override void Initialize()
@@ -46,10 +45,8 @@ public sealed class BlindableSystem : EntitySystem
     }
 
     // Might need to keep this one because of slimes since their eyes arent an organ, so they wouldnt get rejuvenated.
-    private void OnRejuvenate(Entity<BlindableComponent> ent, ref RejuvenateEvent args)
-    {
+    private void OnRejuvenate(Entity<BlindableComponent> ent, ref RejuvenateEvent args) =>
         AdjustEyeDamage((ent.Owner, ent.Comp), -ent.Comp.EyeDamage);
-    }
 
     private void OnDamageChanged(Entity<BlindableComponent> ent, ref EyeDamageChangedEvent args)
     {
@@ -79,9 +76,7 @@ public sealed class BlindableSystem : EntitySystem
 
         // Don't bother raising an event if the eye is too damaged.
         if (blindable.Comp.EyeDamage >= blindable.Comp.MaxDamage)
-        {
             blindable.Comp.IsBlind = true;
-        }
         else
         {
             var ev = new CanSeeAttemptEvent();
@@ -112,7 +107,9 @@ public sealed class BlindableSystem : EntitySystem
 
         // for now
         foreach (var eye in eyes)
+        {
             _trauma.TryCreateOrganDamageModifier(eye.Owner, amount, blindable.Owner, "BlindableDamage", eye.Comp2);
+        }
     }
 
     // Alternative version of the method intended to be used with Eye Organs, so that you can just pass in
@@ -132,7 +129,8 @@ public sealed class BlindableSystem : EntitySystem
             return;
 
         var previousDamage = blindable.Comp.EyeDamage;
-        blindable.Comp.EyeDamage = Math.Clamp(blindable.Comp.EyeDamage, blindable.Comp.MinDamage, blindable.Comp.MaxDamage);
+        blindable.Comp.EyeDamage =
+            Math.Clamp(blindable.Comp.EyeDamage, blindable.Comp.MinDamage, blindable.Comp.MaxDamage);
         Dirty(blindable);
         if (!isDamageChanged && previousDamage == blindable.Comp.EyeDamage)
             return;
@@ -141,6 +139,7 @@ public sealed class BlindableSystem : EntitySystem
         var ev = new EyeDamageChangedEvent(blindable.Comp.EyeDamage);
         RaiseLocalEvent(blindable.Owner, ref ev);
     }
+
     public void SetMinDamage(Entity<BlindableComponent?> blindable, int amount)
     {
         if (!Resolve(blindable, ref blindable.Comp, false))
@@ -152,19 +151,19 @@ public sealed class BlindableSystem : EntitySystem
 }
 
 /// <summary>
-///     This event is raised when an entity's blindness changes
+/// This event is raised when an entity's blindness changes
 /// </summary>
 [ByRefEvent]
 public record struct BlindnessChangedEvent(bool Blind);
 
 /// <summary>
-///     This event is raised when an entity's eye damage changes
+/// This event is raised when an entity's eye damage changes
 /// </summary>
 [ByRefEvent]
 public record struct EyeDamageChangedEvent(int Damage);
 
 /// <summary>
-///     Raised directed at an entity to see whether the entity is currently blind or not.
+/// Raised directed at an entity to see whether the entity is currently blind or not.
 /// </summary>
 public sealed class CanSeeAttemptEvent : CancellableEntityEventArgs, IInventoryRelayEvent
 {
@@ -175,7 +174,7 @@ public sealed class CanSeeAttemptEvent : CancellableEntityEventArgs, IInventoryR
 public sealed class GetEyeProtectionEvent : EntityEventArgs, IInventoryRelayEvent
 {
     /// <summary>
-    ///     Time to subtract from any temporary blindness sources.
+    /// Time to subtract from any temporary blindness sources.
     /// </summary>
     public TimeSpan Protection;
 

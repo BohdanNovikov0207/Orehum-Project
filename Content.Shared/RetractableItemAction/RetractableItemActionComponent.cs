@@ -7,9 +7,26 @@ namespace Content.Shared.RetractableItemAction;
 /// <summary>
 /// Used for storing an unremovable item within an action and summoning it into your hand on use.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState, Access(typeof(RetractableItemActionSystem))]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState] [Access(typeof(RetractableItemActionSystem))]
 public sealed partial class RetractableItemActionComponent : Component
 {
+    /// <summary>
+    /// The container ID used to store the item.
+    /// </summary>
+    public const string ContainerId = "item-action-item-container";
+
+    /// <summary>
+    /// The item managed by the action. Will be summoned and hidden as the action is used.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public EntityUid? ActionItemUid;
+
+    /// <summary>
+    /// Sound collection to play when the summoned item is retracted back into the action.
+    /// </summary>
+    [DataField]
+    public SoundCollectionSpecifier? RetractSounds;
+
     /// <summary>
     /// The item that will appear be spawned by the action.
     /// </summary>
@@ -21,21 +38,4 @@ public sealed partial class RetractableItemActionComponent : Component
     /// </summary>
     [DataField]
     public SoundCollectionSpecifier? SummonSounds;
-
-    /// <summary>
-    /// Sound collection to play when the summoned item is retracted back into the action.
-    /// </summary>
-    [DataField]
-    public SoundCollectionSpecifier? RetractSounds;
-
-    /// <summary>
-    /// The item managed by the action. Will be summoned and hidden as the action is used.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public EntityUid? ActionItemUid;
-
-    /// <summary>
-    /// The container ID used to store the item.
-    /// </summary>
-    public const string ContainerId = "item-action-item-container";
 }

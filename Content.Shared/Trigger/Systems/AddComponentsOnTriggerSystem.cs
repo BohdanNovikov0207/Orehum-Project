@@ -2,7 +2,7 @@ using Content.Shared.Trigger.Components.Effects;
 
 namespace Content.Shared.Trigger.Systems;
 
-public sealed partial class AddComponentsOnTriggerSystem : EntitySystem
+public sealed class AddComponentsOnTriggerSystem : EntitySystem
 {
     public override void Initialize()
     {

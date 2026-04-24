@@ -6,7 +6,7 @@ namespace Content.Shared.Nutrition.Components;
 /// <summary>
 /// Attempts to metamorphose a modular food when a new ingredient is added.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(SharedFoodSequenceSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(SharedFoodSequenceSystem))]
 public sealed partial class FoodMetamorphableByAddingComponent : Component
 {
     /// <summary>

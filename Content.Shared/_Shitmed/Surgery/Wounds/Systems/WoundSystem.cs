@@ -8,6 +8,9 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared._Shitmed.Body;
 using Content.Shared._Shitmed.CCVar;
@@ -17,84 +20,54 @@ using Content.Shared.Body.Components;
 using Content.Shared.Body.Part;
 using Content.Shared.Body.Systems;
 using Content.Shared.Damage;
-using Content.Shared.Mobs.Systems;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Inventory;
+using Content.Shared.Mobs.Systems;
 using Content.Shared.Popups;
 using Content.Shared.Throwing;
 using Robust.Shared.Audio.Systems;
-using Robust.Shared.CPUJob.JobQueues;
-using Robust.Shared.CPUJob.JobQueues.Queues;
 using Robust.Shared.Configuration;
 using Robust.Shared.Containers;
+using Robust.Shared.CPUJob.JobQueues;
+using Robust.Shared.CPUJob.JobQueues.Queues;
 using Robust.Shared.GameStates;
 using Robust.Shared.Network;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Timing;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Content.Shared._Shitmed.Medical.Surgery.Wounds.Systems;
 
 public sealed partial class WoundSystem : EntitySystem
 {
-    [Dependency] private readonly IPrototypeManager _prototype = default!;
+    private const double WoundJobTime = 0.005;
+    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+
+    [Dependency] private readonly SharedBodySystem _body = default!;
+    [Dependency] private readonly IConfigurationManager _cfg = default!;
+    [Dependency] private readonly SharedContainerSystem _container = default!;
+
+    [Dependency] private readonly DamageableSystem _damageable = default!;
     [Dependency] private readonly IComponentFactory _factory = default!;
+    [Dependency] private readonly SharedHandsSystem _hands = default!;
+    [Dependency] private readonly InventorySystem _inventory = default!;
+    [Dependency] private readonly MobStateSystem _mobState = default!;
+
+    [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly IPrototypeManager _prototype = default!;
 
     [Dependency] private readonly IRobustRandom _random = default!;
 
-    [Dependency] private readonly INetManager _net = default!;
-    [Dependency] private readonly IConfigurationManager _cfg = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-
-    [Dependency] private readonly SharedBodySystem _body = default!;
-    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
-    [Dependency] private readonly SharedContainerSystem _container = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly SharedHandsSystem _hands = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-
-    [Dependency] private readonly DamageableSystem _damageable = default!;
-    [Dependency] private readonly MobStateSystem _mobState = default!;
-
     // I'm the one.... who throws........
     [Dependency] private readonly ThrowingSystem _throwing = default!;
-    [Dependency] private readonly InventorySystem _inventory = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly TraumaSystem _trauma = default!;
+    private readonly JobQueue _woundJobQueue = new(WoundJobTime);
     private float _medicalHealingTickrate = 0.5f;
     private TimeSpan _minimumTimeBeforeHeal = TimeSpan.FromSeconds(2f);
-
-    private const double WoundJobTime = 0.005;
-    private readonly JobQueue _woundJobQueue = new(WoundJobTime);
-    public sealed class WoundJob : Job<object>
-    {
-        private readonly WoundSystem _self;
-        private readonly Entity<WoundableComponent> _ent;
-        private readonly EntityUid _bodyEnt;
-        public WoundJob(WoundSystem self, Entity<WoundableComponent> ent, EntityUid bodyEnt, double maxTime, CancellationToken cancellation = default) : base(maxTime, cancellation)
-        {
-            _self = self;
-            _ent = ent;
-            _bodyEnt = bodyEnt;
-        }
-
-        public WoundJob(WoundSystem self, Entity<WoundableComponent> ent, EntityUid bodyEnt, double maxTime, IStopwatch stopwatch, CancellationToken cancellation = default) : base(maxTime, stopwatch, cancellation)
-        {
-            _self = self;
-            _ent = ent;
-            _bodyEnt = bodyEnt;
-        }
-
-        protected override Task<object?> Process()
-        {
-            _self.ProcessHealing(_ent, _bodyEnt);
-
-            return Task.FromResult<object?>(null);
-        }
-    }
 
     public override void Initialize()
     {
@@ -105,7 +78,10 @@ public sealed partial class WoundSystem : EntitySystem
         SubscribeLocalEvent<WoundableComponent, ComponentHandleState>(OnWoundableComponentHandleState);
         InitWounding();
         Subs.CVar(_cfg, SurgeryCVars.MedicalHealingTickrate, val => _medicalHealingTickrate = val, true);
-        Subs.CVar(_cfg, SurgeryCVars.MinimumTimeBeforeHeal, val => _minimumTimeBeforeHeal = TimeSpan.FromSeconds(val), true);
+        Subs.CVar(_cfg,
+            SurgeryCVars.MinimumTimeBeforeHeal,
+            val => _minimumTimeBeforeHeal = TimeSpan.FromSeconds(val),
+            true);
     }
 
     public override void Update(float frameTime)
@@ -126,13 +102,15 @@ public sealed partial class WoundSystem : EntitySystem
                 || _timing.CurTime - damageable.LastModifiedTime < _minimumTimeBeforeHeal
                 || _timing.CurTime < body.HealAt
                 || _mobState.IsIncapacitated(ent)
-                || !_body.TryGetRootPart(ent, out var rootPart, body: body))
+                || !_body.TryGetRootPart(ent, out var rootPart, body))
                 continue;
 
             body.HealAt += TimeSpan.FromSeconds(1f / _medicalHealingTickrate);
             foreach (var woundable in GetAllWoundableChildren(rootPart.Value))
+            {
                 if (woundable.Comp.CanHealDamage || woundable.Comp.CanHealBleeds)
                     _woundJobQueue.EnqueueJob(new WoundJob(this, woundable, ent, WoundJobTime));
+            }
         }
     }
 
@@ -173,7 +151,7 @@ public sealed partial class WoundSystem : EntitySystem
 
         _damageable.TryChangeDamage(bodyEnt,
             damageSpecifier,
-            ignoreResistances: false,
+            false,
             targetPart: _body.GetTargetBodyPart(woundable));
     }
 
@@ -202,7 +180,7 @@ public sealed partial class WoundSystem : EntitySystem
             WoundVisibility = comp.WoundVisibility,
 
             CanBeHealed = comp.CanBeHealed,
-            SelfHealMultiplier = comp.SelfHealMultiplier
+            SelfHealMultiplier = comp.SelfHealMultiplier,
         };
 
         args.State = state;
@@ -334,7 +312,9 @@ public sealed partial class WoundSystem : EntitySystem
         args.State = state;
     }
 
-    private void OnWoundableComponentHandleState(EntityUid uid, WoundableComponent component, ref ComponentHandleState args)
+    private void OnWoundableComponentHandleState(EntityUid uid,
+        WoundableComponent component,
+        ref ComponentHandleState args)
     {
         if (args.Current is not WoundableComponentState state)
             return;
@@ -411,6 +391,44 @@ public sealed partial class WoundSystem : EntitySystem
             var ev = new WoundableSeverityChangedEvent(component.WoundableSeverity, state.WoundableSeverity);
             RaiseLocalEvent(uid, ref ev);
         }
+
         component.WoundableSeverity = state.WoundableSeverity;
+    }
+
+    public sealed class WoundJob : Job<object>
+    {
+        private readonly EntityUid _bodyEnt;
+        private readonly Entity<WoundableComponent> _ent;
+        private readonly WoundSystem _self;
+
+        public WoundJob(WoundSystem self,
+            Entity<WoundableComponent> ent,
+            EntityUid bodyEnt,
+            double maxTime,
+            CancellationToken cancellation = default) : base(maxTime, cancellation)
+        {
+            _self = self;
+            _ent = ent;
+            _bodyEnt = bodyEnt;
+        }
+
+        public WoundJob(WoundSystem self,
+            Entity<WoundableComponent> ent,
+            EntityUid bodyEnt,
+            double maxTime,
+            IStopwatch stopwatch,
+            CancellationToken cancellation = default) : base(maxTime, stopwatch, cancellation)
+        {
+            _self = self;
+            _ent = ent;
+            _bodyEnt = bodyEnt;
+        }
+
+        protected override Task<object?> Process()
+        {
+            _self.ProcessHealing(_ent, _bodyEnt);
+
+            return Task.FromResult<object?>(null);
+        }
     }
 }

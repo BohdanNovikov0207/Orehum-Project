@@ -9,26 +9,29 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Goobstation.Common.CCVar; //Goobstation - Crawling
+using Content.Goobstation.Common.CCVar;
 using Content.Goobstation.Common.Projectiles;
 using Content.Shared._DV.Abilities;
 using Content.Shared.Projectiles;
-using Content.Shared.Weapons.Ranged.Components;
 using Content.Shared.Standing;
-using Robust.Shared.Physics.Events;
+using Content.Shared.Weapons.Ranged.Components;
+using Robust.Shared.Configuration;
 using Robust.Shared.Containers;
 using Robust.Shared.Physics.Components;
-using Robust.Shared.Configuration; //Goobstation - Crawling
+using Robust.Shared.Physics.Events;
+//Goobstation - Crawling
+
+//Goobstation - Crawling
 
 namespace Content.Shared.Damage.Components;
 
 public sealed class RequireProjectileTargetSystem : EntitySystem
 {
+    [Dependency] private readonly IConfigurationManager _cfg = default!;
     [Dependency] private readonly SharedContainerSystem _container = default!;
 
     // Goobstation
     [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly IConfigurationManager _cfg = default!;
 
     private float _crawlHitzoneSize; //Goobstation
 
@@ -37,7 +40,9 @@ public sealed class RequireProjectileTargetSystem : EntitySystem
         SubscribeLocalEvent<RequireProjectileTargetComponent, PreventCollideEvent>(PreventCollide);
         SubscribeLocalEvent<RequireProjectileTargetComponent, StoodEvent>(StandingBulletHit);
         SubscribeLocalEvent<RequireProjectileTargetComponent, DownedEvent>(LayingBulletPass);
-        _cfg.OnValueChanged(GoobCVars.CrawlHitzoneSize, value => _crawlHitzoneSize = value, true); //Goobstation - Crawling
+        _cfg.OnValueChanged(GoobCVars.CrawlHitzoneSize,
+            value => _crawlHitzoneSize = value,
+            true); //Goobstation - Crawling
     }
 
     private void PreventCollide(Entity<RequireProjectileTargetComponent> ent, ref PreventCollideEvent args)
@@ -82,7 +87,8 @@ public sealed class RequireProjectileTargetSystem : EntitySystem
             if (TerminatingOrDeleted(shooter.Value))
                 return;
 
-            if ((_transform.GetMapCoordinates(ent).Position - projectile.TargetCoordinates).Length() <= _crawlHitzoneSize) //Goobstation
+            if ((_transform.GetMapCoordinates(ent).Position - projectile.TargetCoordinates).Length() <=
+                _crawlHitzoneSize) //Goobstation
                 return;
 
             if (!_container.IsEntityOrParentInContainer(shooter.Value))
@@ -99,13 +105,9 @@ public sealed class RequireProjectileTargetSystem : EntitySystem
         Dirty(ent);
     }
 
-    private void StandingBulletHit(Entity<RequireProjectileTargetComponent> ent, ref StoodEvent args)
-    {
+    private void StandingBulletHit(Entity<RequireProjectileTargetComponent> ent, ref StoodEvent args) =>
         SetActive(ent, false);
-    }
 
-    private void LayingBulletPass(Entity<RequireProjectileTargetComponent> ent, ref DownedEvent args)
-    {
+    private void LayingBulletPass(Entity<RequireProjectileTargetComponent> ent, ref DownedEvent args) =>
         SetActive(ent, true);
-    }
 }

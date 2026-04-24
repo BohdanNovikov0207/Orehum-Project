@@ -92,7 +92,6 @@ using Content.Shared.Interaction;
 using Content.Shared.Item;
 using Content.Shared.Storage.Components;
 using Content.Shared.Verbs;
-using JetBrains.Annotations;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
@@ -102,10 +101,10 @@ namespace Content.Shared.Storage.EntitySystems;
 
 public sealed class DumpableSystem : EntitySystem
 {
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedDoAfterSystem _doAfterSystem = default!;
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly SharedTransformSystem _transformSystem = default!;
 
     private EntityQuery<ItemComponent> _itemQuery;
@@ -114,7 +113,8 @@ public sealed class DumpableSystem : EntitySystem
     {
         base.Initialize();
         _itemQuery = GetEntityQuery<ItemComponent>();
-        SubscribeLocalEvent<DumpableComponent, AfterInteractEvent>(OnAfterInteract, after: new[]{ typeof(SharedEntityStorageSystem) });
+        SubscribeLocalEvent<DumpableComponent, AfterInteractEvent>(OnAfterInteract,
+            after: new[] { typeof(SharedEntityStorageSystem) });
         SubscribeLocalEvent<DumpableComponent, GetVerbsEvent<AlternativeVerb>>(AddDumpVerb);
         SubscribeLocalEvent<DumpableComponent, GetVerbsEvent<UtilityVerb>>(AddUtilityVerbs);
         SubscribeLocalEvent<DumpableComponent, DumpableDoAfterEvent>(OnDoAfter);
@@ -152,10 +152,10 @@ public sealed class DumpableSystem : EntitySystem
         {
             Act = () =>
             {
-                StartDoAfter(uid, args.Target, args.User, dumpable);//Had multiplier of 0.6f
+                StartDoAfter(uid, args.Target, args.User, dumpable); //Had multiplier of 0.6f
             },
             Text = Loc.GetString("dump-verb-name"),
-            Icon = new SpriteSpecifier.Texture(new ("/Textures/Interface/VerbIcons/drop.svg.192dpi.png")),
+            Icon = new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/VerbIcons/drop.svg.192dpi.png")),
         };
         args.Verbs.Add(verb);
     }
@@ -181,7 +181,7 @@ public sealed class DumpableSystem : EntitySystem
                 StartDoAfter(uid, args.Target, args.User, dumpable);
             },
             Text = verbText,
-            IconEntity = GetNetEntity(uid)
+            IconEntity = GetNetEntity(uid),
         };
         args.Verbs.Add(verb);
     }
@@ -197,16 +197,20 @@ public sealed class DumpableSystem : EntitySystem
         {
             if (!_itemQuery.TryGetComponent(entity, out var itemComp) ||
                 !_prototypeManager.TryIndex(itemComp.Size, out var itemSize))
-            {
                 continue;
-            }
 
             delay += itemSize.Weight;
         }
 
         delay *= (float) dumpable.DelayPerItem.TotalSeconds * dumpable.Multiplier;
 
-        _doAfterSystem.TryStartDoAfter(new DoAfterArgs(EntityManager, userUid, delay, new DumpableDoAfterEvent(), storageUid, target: targetUid, used: storageUid)
+        _doAfterSystem.TryStartDoAfter(new DoAfterArgs(EntityManager,
+            userUid,
+            delay,
+            new DumpableDoAfterEvent(),
+            storageUid,
+            targetUid,
+            storageUid)
         {
             BreakOnMove = true,
             NeedHand = true,
@@ -219,7 +223,7 @@ public sealed class DumpableSystem : EntitySystem
             storage.Container.ContainedEntities.Count == 0 || args.Args.Target is not { } target)
             return;
 
-        DumpContents(uid, target, args.Args.User, component);// Goobchange
+        DumpContents(uid, target, args.Args.User, component); // Goobchange
     }
 
     // Goob
@@ -237,7 +241,7 @@ public sealed class DumpableSystem : EntitySystem
 
         var dumpQueue = new Queue<EntityUid>(storage.Container.ContainedEntities);
 
-        var evt = new DumpEvent(dumpQueue, user, false, false);//goob edit
+        var evt = new DumpEvent(dumpQueue, user, false, false); //goob edit
         RaiseLocalEvent(target, ref evt);
 
         if (!evt.Handled)
@@ -247,15 +251,16 @@ public sealed class DumpableSystem : EntitySystem
             foreach (var entity in dumpQueue)
             {
                 var transform = Transform(entity);
-                _transformSystem.SetWorldPositionRotation(entity, targetPos + _random.NextVector2Box() / 4, _random.NextAngle(), transform);
+                _transformSystem.SetWorldPositionRotation(entity,
+                    targetPos + _random.NextVector2Box() / 4,
+                    _random.NextAngle(),
+                    transform);
             }
 
             return;
         }
 
         if (evt.PlaySound)
-        {
             _audio.PlayPredicted(component.DumpSound, uid, user); //goob edit
-        }
     }
 }

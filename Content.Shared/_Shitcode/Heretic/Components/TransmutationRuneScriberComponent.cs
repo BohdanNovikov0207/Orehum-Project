@@ -10,12 +10,12 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Shared._Goobstation.Heretic.Components;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class TransmutationRuneScriberComponent : Component
 {
     [DataField]
-    public float Time = 5f;
+    public EntProtoId RuneDrawingEntity = "HereticRuneRitualDrawAnimationCicatrix";
 
     [DataField]
-    public EntProtoId RuneDrawingEntity = "HereticRuneRitualDrawAnimationCicatrix";
+    public float Time = 5f;
 }

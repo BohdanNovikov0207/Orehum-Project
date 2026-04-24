@@ -10,9 +10,9 @@ using Robust.Shared.Serialization;
 namespace Content.Shared.Power;
 
 /// <summary>
-///     Sent to the server to set whether the machine should be on or off
+/// Sent to the server to set whether the machine should be on or off
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class SwitchChargingMachineMessage : BoundUserInterfaceMessage
 {
     public bool On;
@@ -23,16 +23,16 @@ public sealed class SwitchChargingMachineMessage : BoundUserInterfaceMessage
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class PowerChargeState : BoundUserInterfaceState
 {
-    public bool On;
     // 0 -> 255
     public byte Charge;
-    public PowerChargePowerStatus PowerStatus;
+    public short EtaSeconds;
+    public bool On;
     public short PowerDraw;
     public short PowerDrawMax;
-    public short EtaSeconds;
+    public PowerChargePowerStatus PowerStatus;
 
     public PowerChargeState(
         bool on,
@@ -51,34 +51,34 @@ public sealed class PowerChargeState : BoundUserInterfaceState
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum PowerChargeUiKey
 {
-    Key
+    Key,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum PowerChargeVisuals
 {
     State,
     Charge,
-    Active
+    Active,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum PowerChargeStatus
 {
     Broken,
     Unpowered,
     Off,
-    On
+    On,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum PowerChargePowerStatus : byte
 {
     Off,
     Discharging,
     Charging,
-    FullyCharged
+    FullyCharged,
 }

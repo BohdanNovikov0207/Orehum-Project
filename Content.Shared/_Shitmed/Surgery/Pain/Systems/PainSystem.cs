@@ -5,6 +5,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Linq;
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared._Shitmed.CCVar;
 using Content.Shared._Shitmed.Medical.Surgery.Consciousness.Systems;
 using Content.Shared._Shitmed.Medical.Surgery.Pain.Components;
@@ -24,37 +26,36 @@ using Robust.Shared.Audio.Systems;
 using Robust.Shared.Configuration;
 using Robust.Shared.GameStates;
 using Robust.Shared.Network;
-using Robust.Shared.Timing;
 using Robust.Shared.Random;
-using System.Linq;
-using Content.Goobstation.Maths.FixedPoint;
+using Robust.Shared.Timing;
 
 namespace Content.Shared._Shitmed.Medical.Surgery.Pain.Systems;
 
 [Virtual]
 public sealed partial class PainSystem : EntitySystem
 {
-    [Dependency] private readonly INetManager _net = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly IConfigurationManager _cfg = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly SharedBodySystem _body = default!;
+    [Dependency] private readonly IConfigurationManager _cfg = default!;
+    [Dependency] private readonly ConsciousnessSystem _consciousness = default!;
 
     [Dependency] private readonly SharedAudioSystem _IHaveNoMouthAndIMustScream = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly SharedJitteringSystem _jitter = default!;
-    [Dependency] private readonly SharedStunSystem _stun = default!;
 
     [Dependency] private readonly MobStateSystem _mobState = default!;
+    [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
 
     [Dependency] private readonly StandingStateSystem _standing = default!;
-
-    [Dependency] private readonly WoundSystem _wound = default!;
-    [Dependency] private readonly ConsciousnessSystem _consciousness = default!;
+    [Dependency] private readonly SharedStunSystem _stun = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly TraumaSystem _trauma = default!;
 
-    private bool _screamsEnabled = false;
+    [Dependency] private readonly WoundSystem _wound = default!;
     private float _screamChance = 0.20f;
+
+    private bool _screamsEnabled;
+
     public override void Initialize()
     {
         base.Initialize();
@@ -143,7 +144,8 @@ public sealed partial class PainSystem : EntitySystem
         if (!bodyPart.Body.HasValue)
             return;
 
-        if (!_consciousness.TryGetNerveSystem(bodyPart.Body.Value, out var brainUid) || TerminatingOrDeleted(brainUid.Value))
+        if (!_consciousness.TryGetNerveSystem(bodyPart.Body.Value, out var brainUid) ||
+            TerminatingOrDeleted(brainUid.Value))
             return;
 
         UpdateNerveSystemNerves(brainUid.Value, bodyPart.Body.Value, Comp<NerveSystemComponent>(brainUid.Value));
@@ -155,12 +157,15 @@ public sealed partial class PainSystem : EntitySystem
         if (!bodyPart.Body.HasValue)
             return;
 
-        if (!_consciousness.TryGetNerveSystem(bodyPart.Body.Value, out var brainUid) || TerminatingOrDeleted(brainUid.Value))
+        if (!_consciousness.TryGetNerveSystem(bodyPart.Body.Value, out var brainUid) ||
+            TerminatingOrDeleted(brainUid.Value))
             return;
 
         foreach (var modifier in brainUid.Value.Comp.Modifiers
                      .Where(modifier => modifier.Key.Item1 == uid))
+        {
             brainUid.Value.Comp.Modifiers.Remove((modifier.Key.Item1, modifier.Key.Item2));
+        }
 
         UpdateNerveSystemNerves(brainUid.Value, bodyPart.Body.Value, Comp<NerveSystemComponent>(brainUid.Value));
     }
@@ -174,8 +179,13 @@ public sealed partial class PainSystem : EntitySystem
                 if (TryComp<HumanoidAppearanceComponent>(args.Target, out var humanoid))
                     sex = humanoid.Sex;
 
-                PlayPainSoundWithCleanup(args.Target, nerveSys, nerveSys.CritWhimpers[sex], AudioParams.Default.WithVolume(-12f));
-                nerveSys.NextCritScream = _timing.CurTime + _random.Next(nerveSys.CritScreamsIntervalMin, nerveSys.CritScreamsIntervalMax);
+                PlayPainSoundWithCleanup(args.Target,
+                    nerveSys,
+                    nerveSys.CritWhimpers[sex],
+                    AudioParams.Default.WithVolume(-12f));
+                nerveSys.NextCritScream = _timing.CurTime +
+                                          _random.Next(nerveSys.CritScreamsIntervalMin,
+                                              nerveSys.CritScreamsIntervalMax);
                 break;
 
             case MobState.Dead:
@@ -205,8 +215,10 @@ public sealed partial class PainSystem : EntitySystem
     /// <summary>
     /// Starts pain decay for a nerve system
     /// </summary>
-
-    public void StartPainDecay(EntityUid uid, FixedPoint2 initialPain, TimeSpan decayDuration, NerveSystemComponent? nerveSystem = null)
+    public void StartPainDecay(EntityUid uid,
+        FixedPoint2 initialPain,
+        TimeSpan decayDuration,
+        NerveSystemComponent? nerveSystem = null)
     {
         if (!Resolve(uid, ref nerveSystem, false))
             return;
@@ -215,7 +227,7 @@ public sealed partial class PainSystem : EntitySystem
         if (TryComp<PainDecayComponent>(uid, out var existingDecay))
         {
             // If the new decay would be longer than remaining time, keep the existing one
-            var remainingTime = (existingDecay.StartTime + existingDecay.DecayDuration) - _timing.CurTime;
+            var remainingTime = existingDecay.StartTime + existingDecay.DecayDuration - _timing.CurTime;
             if (remainingTime > decayDuration)
                 return;
 
@@ -252,7 +264,7 @@ public sealed partial class PainSystem : EntitySystem
         }
 
         // Calculate current pain based on decay progress
-        var progress = (float)(elapsed.TotalSeconds / decay.DecayDuration.TotalSeconds);
+        var progress = (float) (elapsed.TotalSeconds / decay.DecayDuration.TotalSeconds);
         var currentPain = decay.InitialPain * (1 - progress);
 
         // Only update if pain would decrease

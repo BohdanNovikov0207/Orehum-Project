@@ -5,6 +5,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Damage;
 using Content.Shared.DeviceLinking;
 using Content.Shared.Materials;
@@ -18,11 +19,20 @@ namespace Content.Shared.Cloning;
 [RegisterComponent]
 public sealed partial class CloningPodComponent : Component
 {
-    [DataField]
-    public ProtoId<SinkPortPrototype> PodPort = "CloningPodReceiver";
-
     [ViewVariables]
     public ContainerSlot BodyContainer = default!;
+
+    /// <summary>
+    /// Goobstation - How much damage a successful clone can receive
+    /// </summary>
+    [DataField]
+    public DamageSpecifier CloneDamage = new()
+    {
+        DamageDict = new Dictionary<string, FixedPoint2>
+        {
+            { "Cellular", 20 },
+        },
+    };
 
     /// <summary>
     /// How long the cloning has been going on for.
@@ -30,29 +40,32 @@ public sealed partial class CloningPodComponent : Component
     [ViewVariables]
     public float CloningProgress = 0;
 
-    [ViewVariables]
-    public int UsedBiomass = 70;
-
-    [ViewVariables]
-    public bool FailedClone = false;
-
-    /// <summary>
-    /// The material that is used to clone entities.
-    /// </summary>
-    [DataField]
-    public ProtoId<MaterialPrototype> RequiredMaterial = "Biomass";
-
     /// <summary>
     /// The current amount of time it takes to clone a body.
     /// </summary>
     [DataField]
     public float CloningTime = 30f;
 
+    [ViewVariables]
+    public EntityUid? ConnectedConsole;
+
+    [ViewVariables]
+    public bool FailedClone = false;
+
     /// <summary>
     /// The mob to spawn on emag.
     /// </summary>
     [DataField]
     public EntProtoId MobSpawnId = "MobAbomination";
+
+    [DataField]
+    public ProtoId<SinkPortPrototype> PodPort = "CloningPodReceiver";
+
+    /// <summary>
+    /// The material that is used to clone entities.
+    /// </summary>
+    [DataField]
+    public ProtoId<MaterialPrototype> RequiredMaterial = "Biomass";
 
     /// <summary>
     /// The sound played when a mob is spawned from an emagged cloning pod.
@@ -67,32 +80,20 @@ public sealed partial class CloningPodComponent : Component
     public CloningPodStatus Status;
 
     [ViewVariables]
-    public EntityUid? ConnectedConsole;
-
-    /// <summary>
-    /// Goobstation - How much damage a successful clone can receive
-    /// </summary>
-    [DataField]
-    public DamageSpecifier CloneDamage = new()
-    {
-        DamageDict = new()
-        {
-            { "Cellular", 20},
-        }
-    };
+    public int UsedBiomass = 70;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum CloningPodVisuals : byte
 {
-    Status
+    Status,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum CloningPodStatus : byte
 {
     Idle,
     Cloning,
     Gore,
-    NoMind
+    NoMind,
 }

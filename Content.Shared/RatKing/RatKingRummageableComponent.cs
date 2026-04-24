@@ -20,17 +20,10 @@ namespace Content.Shared.RatKing;
 /// This is used for entities that can be
 /// rummaged through by the rat king to get loot.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(SharedRatKingSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(SharedRatKingSystem))]
 [AutoGenerateComponentState]
 public sealed partial class RatKingRummageableComponent : Component
 {
-    /// <summary>
-    /// Whether or not this entity has been rummaged through already.
-    /// </summary>
-    [DataField("looted"), ViewVariables(VVAccess.ReadWrite)]
-    [AutoNetworkedField]
-    public bool Looted;
-
     /// <summary>
     /// DeltaV: Last time the object was looted, used to check if cooldown has expired
     /// </summary>
@@ -38,23 +31,31 @@ public sealed partial class RatKingRummageableComponent : Component
     public TimeSpan? LastLooted;
 
     /// <summary>
+    /// Whether or not this entity has been rummaged through already.
+    /// </summary>
+    [DataField("looted")] [ViewVariables(VVAccess.ReadWrite)]
+    [AutoNetworkedField]
+    public bool Looted;
+
+    /// <summary>
     /// DeltaV: Minimum time between rummage attempts
     /// </summary>
-    [DataField("rummageCooldown"), ViewVariables(VVAccess.ReadWrite)]
+    [DataField("rummageCooldown")] [ViewVariables(VVAccess.ReadWrite)]
     [AutoNetworkedField]
     public TimeSpan RummageCooldown = TimeSpan.FromMinutes(1);
 
     /// <summary>
     /// How long it takes to rummage through a rummageable container.
     /// </summary>
-    [DataField("rummageDuration"), ViewVariables(VVAccess.ReadWrite)]
+    [DataField("rummageDuration")] [ViewVariables(VVAccess.ReadWrite)]
     [AutoNetworkedField]
     public float RummageDuration = 2f;
 
     /// <summary>
     /// A weighted random entity prototype containing the different loot that rummaging can provide.
     /// </summary>
-    [DataField("rummageLoot", customTypeSerializer: typeof(PrototypeIdSerializer<WeightedRandomEntityPrototype>)), ViewVariables(VVAccess.ReadWrite)]
+    [DataField("rummageLoot", customTypeSerializer: typeof(PrototypeIdSerializer<WeightedRandomEntityPrototype>))]
+    [ViewVariables(VVAccess.ReadWrite)]
     [AutoNetworkedField]
     public string RummageLoot = "RatKingLoot";
 

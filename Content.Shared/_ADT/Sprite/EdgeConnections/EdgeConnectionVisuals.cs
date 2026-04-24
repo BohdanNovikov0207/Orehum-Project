@@ -6,14 +6,14 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared._ADT.Sprite.EdgeConnections;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum EdgeConnectionVisuals : byte
 {
     ConnectionMask,
 }
 
 [Flags]
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum EdgeConnectionDirections : byte
 {
     None = 0,

@@ -12,9 +12,15 @@ namespace Content.Shared.Tiles;
 /// <summary>
 /// Replaces floor tiles around this entity when it spawns
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(ReplaceFloorOnSpawnSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(ReplaceFloorOnSpawnSystem))]
 public sealed partial class ReplaceFloorOnSpawnComponent : Component
 {
+    /// <summary>
+    /// List of offsets from the base tile, used to determine which tiles will be replaced.
+    /// </summary>
+    [DataField]
+    public List<Vector2i> Offsets = new() { Vector2i.Up, Vector2i.Down, Vector2i.Left, Vector2i.Right, Vector2i.Zero };
+
     /// <summary>
     /// The floor tiles that will be replaced. If null, will replace all.
     /// </summary>
@@ -32,10 +38,4 @@ public sealed partial class ReplaceFloorOnSpawnComponent : Component
     /// </summary>
     [DataField]
     public bool ReplaceSpace = true;
-
-    /// <summary>
-    /// List of offsets from the base tile, used to determine which tiles will be replaced.
-    /// </summary>
-    [DataField]
-    public List<Vector2i> Offsets = new() { Vector2i.Up, Vector2i.Down, Vector2i.Left, Vector2i.Right, Vector2i.Zero };
 }

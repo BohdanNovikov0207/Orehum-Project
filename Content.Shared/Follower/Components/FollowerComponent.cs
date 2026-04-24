@@ -16,9 +16,9 @@ namespace Content.Shared.Follower.Components;
 
 [RegisterComponent]
 [Access(typeof(FollowerSystem))]
-[NetworkedComponent, AutoGenerateComponentState]
+[NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class FollowerComponent : Component
 {
-    [AutoNetworkedField, DataField("following")]
+    [AutoNetworkedField] [DataField("following")]
     public EntityUid Following;
 }

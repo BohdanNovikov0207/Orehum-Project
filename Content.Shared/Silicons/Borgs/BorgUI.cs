@@ -8,13 +8,13 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Silicons.Borgs;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum BorgUiKey : byte
 {
-    Key
+    Key,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class BorgBuiState : BoundUserInterfaceState
 {
     public float ChargePercent;
@@ -28,19 +28,17 @@ public sealed class BorgBuiState : BoundUserInterfaceState
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class BorgEjectBrainBuiMessage : BoundUserInterfaceMessage
 {
-
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class BorgEjectBatteryBuiMessage : BoundUserInterfaceMessage
 {
-
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class BorgSetNameBuiMessage : BoundUserInterfaceMessage
 {
     public string Name;
@@ -51,7 +49,7 @@ public sealed class BorgSetNameBuiMessage : BoundUserInterfaceMessage
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class BorgRemoveModuleBuiMessage : BoundUserInterfaceMessage
 {
     public NetEntity Module;

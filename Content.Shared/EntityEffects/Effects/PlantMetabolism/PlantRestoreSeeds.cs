@@ -3,7 +3,7 @@
 namespace Content.Shared.EntityEffects.Effects.PlantMetabolism;
 
 /// <summary>
-///     Handles restoral of seeds on a plant.
+/// Handles restoral of seeds on a plant.
 /// </summary>
 public sealed partial class PlantRestoreSeeds : EventEntityEffect<PlantRestoreSeeds>
 {

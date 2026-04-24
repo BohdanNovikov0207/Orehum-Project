@@ -37,7 +37,7 @@ public sealed class MechSoundboardSystem : EntitySystem
         var sounds = comp.Sounds.Select(sound => sound.Collection!);
         var state = new MechSoundboardUiState
         {
-            Sounds = sounds.ToList()
+            Sounds = sounds.ToList(),
         };
         args.States.Add(GetNetEntity(uid), state);
     }

@@ -14,10 +14,35 @@ namespace Content.Shared._Shitmed.Targeting;
 /// <summary>
 /// Controls entity limb targeting for actions.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class TargetingComponent : Component
 {
-    [ViewVariables, AutoNetworkedField]
+    /// <summary>
+    /// What is the current integrity of each body part?
+    /// </summary>
+    [ViewVariables] [AutoNetworkedField]
+    public Dictionary<TargetBodyPart, WoundableSeverity> BodyStatus = new()
+    {
+        { TargetBodyPart.Head, WoundableSeverity.Healthy },
+        { TargetBodyPart.Chest, WoundableSeverity.Healthy },
+        { TargetBodyPart.Groin, WoundableSeverity.Healthy },
+        { TargetBodyPart.LeftArm, WoundableSeverity.Healthy },
+        { TargetBodyPart.LeftHand, WoundableSeverity.Healthy },
+        { TargetBodyPart.RightArm, WoundableSeverity.Healthy },
+        { TargetBodyPart.RightHand, WoundableSeverity.Healthy },
+        { TargetBodyPart.LeftLeg, WoundableSeverity.Healthy },
+        { TargetBodyPart.LeftFoot, WoundableSeverity.Healthy },
+        { TargetBodyPart.RightLeg, WoundableSeverity.Healthy },
+        { TargetBodyPart.RightFoot, WoundableSeverity.Healthy },
+    };
+
+    /// <summary>
+    /// What noise does the entity play when swapping targets?
+    /// </summary>
+    [DataField]
+    public string SwapSound = "/Audio/Effects/toggleoncombat.ogg";
+
+    [ViewVariables] [AutoNetworkedField]
     public TargetBodyPart Target = TargetBodyPart.Chest;
 
     /// <summary>
@@ -36,7 +61,9 @@ public sealed partial class TargetingComponent : Component
         {
             TargetBodyPart.Chest, new Dictionary<TargetBodyPart, float>
             {
-                { TargetBodyPart.Chest, 1f }, // If you change this, suicide system won't work properly. So I won't even be able to ask you to kill yourself for doing this.
+                {
+                    TargetBodyPart.Chest, 1f
+                }, // If you change this, suicide system won't work properly. So I won't even be able to ask you to kill yourself for doing this.
             }
         },
         {
@@ -119,29 +146,4 @@ public sealed partial class TargetingComponent : Component
             }
         },
     };
-
-    /// <summary>
-    /// What is the current integrity of each body part?
-    /// </summary>
-    [ViewVariables, AutoNetworkedField]
-    public Dictionary<TargetBodyPart, WoundableSeverity> BodyStatus = new()
-    {
-        { TargetBodyPart.Head, WoundableSeverity.Healthy },
-        { TargetBodyPart.Chest, WoundableSeverity.Healthy },
-        { TargetBodyPart.Groin, WoundableSeverity.Healthy },
-        { TargetBodyPart.LeftArm, WoundableSeverity.Healthy },
-        { TargetBodyPart.LeftHand, WoundableSeverity.Healthy },
-        { TargetBodyPart.RightArm, WoundableSeverity.Healthy },
-        { TargetBodyPart.RightHand, WoundableSeverity.Healthy },
-        { TargetBodyPart.LeftLeg, WoundableSeverity.Healthy },
-        { TargetBodyPart.LeftFoot, WoundableSeverity.Healthy },
-        { TargetBodyPart.RightLeg, WoundableSeverity.Healthy },
-        { TargetBodyPart.RightFoot, WoundableSeverity.Healthy },
-    };
-
-    /// <summary>
-    /// What noise does the entity play when swapping targets?
-    /// </summary>
-    [DataField]
-    public string SwapSound = "/Audio/Effects/toggleoncombat.ogg";
 }

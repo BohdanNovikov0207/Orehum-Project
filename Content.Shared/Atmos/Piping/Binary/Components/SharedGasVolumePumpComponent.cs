@@ -9,35 +9,34 @@
 
 using Robust.Shared.Serialization;
 
-namespace Content.Shared.Atmos.Piping.Binary.Components
+namespace Content.Shared.Atmos.Piping.Binary.Components;
+
+public sealed record GasVolumePumpData(float LastMolesTransferred);
+
+[Serializable] [NetSerializable]
+public enum GasVolumePumpUiKey : byte
 {
-    public sealed record GasVolumePumpData(float LastMolesTransferred);
+    Key,
+}
 
-    [Serializable, NetSerializable]
-    public enum GasVolumePumpUiKey : byte
+[Serializable] [NetSerializable]
+public sealed class GasVolumePumpToggleStatusMessage : BoundUserInterfaceMessage
+{
+    public GasVolumePumpToggleStatusMessage(bool enabled)
     {
-        Key,
+        Enabled = enabled;
     }
 
-    [Serializable, NetSerializable]
-    public sealed class GasVolumePumpToggleStatusMessage : BoundUserInterfaceMessage
-    {
-        public bool Enabled { get; }
+    public bool Enabled { get; }
+}
 
-        public GasVolumePumpToggleStatusMessage(bool enabled)
-        {
-            Enabled = enabled;
-        }
+[Serializable] [NetSerializable]
+public sealed class GasVolumePumpChangeTransferRateMessage : BoundUserInterfaceMessage
+{
+    public GasVolumePumpChangeTransferRateMessage(float transferRate)
+    {
+        TransferRate = transferRate;
     }
 
-    [Serializable, NetSerializable]
-    public sealed class GasVolumePumpChangeTransferRateMessage : BoundUserInterfaceMessage
-    {
-        public float TransferRate { get; }
-
-        public GasVolumePumpChangeTransferRateMessage(float transferRate)
-        {
-            TransferRate = transferRate;
-        }
-    }
+    public float TransferRate { get; }
 }

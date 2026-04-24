@@ -22,11 +22,11 @@ namespace Content.Shared.EntityEffects.EffectConditions;
 
 public sealed partial class HasTag : EntityEffectCondition
 {
-    [DataField(customTypeSerializer: typeof(PrototypeIdSerializer<TagPrototype>))]
-    public string Tag = default!;
-
     [DataField]
     public bool Invert = false;
+
+    [DataField(customTypeSerializer: typeof(PrototypeIdSerializer<TagPrototype>))]
+    public string Tag = default!;
 
     public override bool Condition(EntityEffectBaseArgs args)
     {
@@ -36,9 +36,7 @@ public sealed partial class HasTag : EntityEffectCondition
         return false;
     }
 
-    public override string GuidebookExplanation(IPrototypeManager prototype)
-    {
+    public override string GuidebookExplanation(IPrototypeManager prototype) =>
         // this should somehow be made (much) nicer.
-        return Loc.GetString("reagent-effect-condition-guidebook-has-tag", ("tag", Tag), ("invert", Invert));
-    }
+        Loc.GetString("reagent-effect-condition-guidebook-has-tag", ("tag", Tag), ("invert", Invert));
 }

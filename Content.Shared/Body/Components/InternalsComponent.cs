@@ -7,13 +7,10 @@ namespace Content.Shared.Body.Components;
 /// <summary>
 /// Handles hooking up a mask (breathing tool) / gas tank together and allowing the Owner to breathe through it.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState(true)]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState(true)]
 public sealed partial class InternalsComponent : Component
 {
-    [DataField, AutoNetworkedField]
-    public EntityUid? GasTankEntity;
-
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public HashSet<EntityUid> BreathTools = new();
 
     /// <summary>
@@ -21,6 +18,9 @@ public sealed partial class InternalsComponent : Component
     /// </summary>
     [DataField]
     public TimeSpan Delay = TimeSpan.FromSeconds(3);
+
+    [DataField] [AutoNetworkedField]
+    public EntityUid? GasTankEntity;
 
     [DataField]
     public ProtoId<AlertPrototype> InternalsAlert = "Internals";

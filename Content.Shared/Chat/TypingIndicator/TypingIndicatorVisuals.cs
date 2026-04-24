@@ -7,14 +7,14 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Chat.TypingIndicator;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum TypingIndicatorVisuals : byte
 {
-    State
+    State,
 }
 
 [Serializable]
 public enum TypingIndicatorLayers : byte
 {
-    Base
+    Base,
 }

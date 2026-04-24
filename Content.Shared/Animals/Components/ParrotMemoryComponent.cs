@@ -1,4 +1,3 @@
-using Content.Shared.Animals.Systems;
 using Robust.Shared.GameStates;
 using Robust.Shared.Network;
 using Robust.Shared.Serialization;
@@ -9,16 +8,10 @@ namespace Content.Shared.Animals.Components;
 /// <summary>
 /// Makes an entity able to memorize chat/radio messages.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 [AutoGenerateComponentPause]
 public sealed partial class ParrotMemoryComponent : Component
 {
-    /// <summary>
-    /// List of SpeechMemory records this entity has learned.
-    /// </summary>
-    [DataField]
-    public List<SpeechMemory> SpeechMemories = new();
-
     /// <summary>
     /// The % chance an entity with this component learns a phrase when learning is off cooldown.
     /// </summary>
@@ -32,11 +25,10 @@ public sealed partial class ParrotMemoryComponent : Component
     public TimeSpan LearnCooldown = TimeSpan.FromMinutes(1);
 
     /// <summary>
-    /// Next time at which the parrot can attempt to learn something.
+    /// Maximum length of a speech entry.
     /// </summary>
-    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))]
-    [AutoPausedField]
-    public TimeSpan NextLearnInterval = TimeSpan.Zero;
+    [DataField]
+    public int MaxEntryLength = 50;
 
     /// <summary>
     /// The number of speech entries that are remembered.
@@ -51,11 +43,18 @@ public sealed partial class ParrotMemoryComponent : Component
     public int MinEntryLength = 4;
 
     /// <summary>
-    /// Maximum length of a speech entry.
+    /// Next time at which the parrot can attempt to learn something.
+    /// </summary>
+    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))]
+    [AutoPausedField]
+    public TimeSpan NextLearnInterval = TimeSpan.Zero;
+
+    /// <summary>
+    /// List of SpeechMemory records this entity has learned.
     /// </summary>
     [DataField]
-    public int MaxEntryLength = 50;
+    public List<SpeechMemory> SpeechMemories = new();
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public record struct SpeechMemory(NetUserId? NetUserId, string Message);

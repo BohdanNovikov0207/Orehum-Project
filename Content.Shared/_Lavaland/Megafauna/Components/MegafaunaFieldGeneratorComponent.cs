@@ -28,18 +28,18 @@ namespace Content.Shared._Lavaland.Megafauna.Components;
 /// <summary>
 /// Generates a square field  around the megafauna then it starts attacking.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class MegafaunaFieldGeneratorComponent : Component
 {
-    [ViewVariables, AutoNetworkedField]
+    [ViewVariables] [AutoNetworkedField]
     public bool Enabled;
 
-    [ViewVariables, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
+    public EntProtoId WallId;
+
+    [ViewVariables] [AutoNetworkedField]
     public List<EntityUid> Walls = new();
 
     [DataField(required: true)]
     public EntityShape WallShape;
-
-    [DataField, AutoNetworkedField]
-    public EntProtoId WallId;
 }

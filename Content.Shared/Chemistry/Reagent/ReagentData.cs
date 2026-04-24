@@ -8,28 +8,23 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Chemistry.Reagent;
 
-[ImplicitDataDefinitionForInheritors, Serializable, NetSerializable]
+[ImplicitDataDefinitionForInheritors] [Serializable] [NetSerializable]
 public abstract partial class ReagentData : IEquatable<ReagentData>
 {
-    /// <summary>
-    /// Convert to a string representation. This if for logging & debugging. This is not localized and should not be
-    /// shown to players.
-    /// </summary>
-    public virtual string ToString(string prototype, FixedPoint2 quantity)
-    {
-        return $"{prototype}:{GetType().Name}:{quantity}";
-    }
-
-    /// <summary>
-    /// Convert to a string representation. This if for logging & debugging. This is not localized and should not be
-    /// shown to players.
-    /// </summary>
-    public virtual string ToString(string prototype)
-    {
-        return $"{prototype}:{GetType().Name}";
-    }
-
     public abstract bool Equals(ReagentData? other);
+
+    /// <summary>
+    /// Convert to a string representation. This if for logging & debugging. This is not localized and should not be
+    /// shown to players.
+    /// </summary>
+    public virtual string ToString(string prototype, FixedPoint2 quantity) =>
+        $"{prototype}:{GetType().Name}:{quantity}";
+
+    /// <summary>
+    /// Convert to a string representation. This if for logging & debugging. This is not localized and should not be
+    /// shown to players.
+    /// </summary>
+    public virtual string ToString(string prototype) => $"{prototype}:{GetType().Name}";
 
     public override bool Equals(object? obj)
     {

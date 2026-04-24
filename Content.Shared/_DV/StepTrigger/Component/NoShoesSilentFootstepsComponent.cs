@@ -11,8 +11,7 @@ using Robust.Shared.GameStates;
 
 namespace Content.Shared._DV.StepTrigger.Components;
 
-
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class NoShoesSilentFootstepsComponent : Component
 {
 }

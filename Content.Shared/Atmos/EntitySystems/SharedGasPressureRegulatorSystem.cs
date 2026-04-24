@@ -1,5 +1,4 @@
 ﻿using Content.Shared.Administration.Logs;
-using Content.Shared.Atmos.Components;
 using Content.Shared.Atmos.Piping.Binary.Components;
 using Content.Shared.Database;
 using Content.Shared.Examine;
@@ -26,7 +25,7 @@ public abstract class SharedGasPressureRegulatorSystem : EntitySystem
     /// <summary>
     /// Presents predicted examine information to the person examining the valve.
     /// </summary>
-    /// <param name="ent"> <see cref="Entity{T}"/> of the valve</param>
+    /// <param name="ent"> <see cref="Entity{T}" /> of the valve</param>
     /// <param name="args">Event arguments for examination</param>
     private void OnExamined(Entity<GasPressureRegulatorComponent> ent, ref ExaminedEvent args)
     {
@@ -50,8 +49,8 @@ public abstract class SharedGasPressureRegulatorSystem : EntitySystem
     /// <summary>
     /// Validates, logs, and updates the pressure threshold of the valve.
     /// </summary>
-    /// <param name="ent">The <see cref="Entity{T}"/> of the valve.</param>
-    /// <param name="args">The received pressure from the <see cref="GasPressurePumpChangeOutputPressureMessage"/>message.</param>
+    /// <param name="ent">The <see cref="Entity{T}" /> of the valve.</param>
+    /// <param name="args">The received pressure from the <see cref="GasPressurePumpChangeOutputPressureMessage" />message.</param>
     private void OnThresholdChangeMessage(Entity<GasPressureRegulatorComponent> ent,
         ref GasPressureRegulatorChangeThresholdMessage args)
     {

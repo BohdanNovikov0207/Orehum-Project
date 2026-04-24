@@ -15,12 +15,36 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototy
 namespace Content.Shared.Humanoid.Prototypes;
 
 /// <summary>
-///     This is what is used to change a humanoid spawned by RandomHumanoidSystem in Content.Server.
+/// This is what is used to change a humanoid spawned by RandomHumanoidSystem in Content.Server.
 /// </summary>
 [Prototype]
-public sealed partial class RandomHumanoidSettingsPrototype : IPrototype, IInheritingPrototype
+public sealed class RandomHumanoidSettingsPrototype : IPrototype, IInheritingPrototype
 {
-    [IdDataField] public string ID { get; private set; } = default!;
+    /// <summary>
+    /// Whether the humanoid's name should take from the randomized profile or not.
+    /// </summary>
+    [DataField]
+    public bool RandomizeName { get; private set; } = true;
+
+    /// <summary>
+    /// Species that will be ignored by the randomizer.
+    /// </summary>
+    [DataField("speciesBlacklist")]
+    public HashSet<string> SpeciesBlacklist { get; private set; } = new();
+
+    /// <summary>
+    /// Goobstation
+    /// Specie that will be used.
+    /// </summary>
+    [DataField]
+    public string? SpeciesWhitelist { get; private set; }
+
+    /// <summary>
+    /// Extra components to add to this entity.
+    /// </summary>
+    [DataField]
+    [AlwaysPushInheritance]
+    public ComponentRegistry? Components { get; private set; }
 
     [ParentDataField(typeof(PrototypeIdArraySerializer<RandomHumanoidSettingsPrototype>))]
     public string[]? Parents { get; private set; }
@@ -29,29 +53,5 @@ public sealed partial class RandomHumanoidSettingsPrototype : IPrototype, IInher
     [NeverPushInheritance]
     public bool Abstract { get; private set; }
 
-    /// <summary>
-    ///     Whether the humanoid's name should take from the randomized profile or not.
-    /// </summary>
-    [DataField]
-    public bool RandomizeName { get; private set; } = true;
-
-    /// <summary>
-    ///     Species that will be ignored by the randomizer.
-    /// </summary>
-    [DataField("speciesBlacklist")]
-    public HashSet<string> SpeciesBlacklist { get; private set; } = new();
-
-    /// <summary>
-    ///     Goobstation
-    ///     Specie that will be used.
-    /// </summary>
-    [DataField]
-    public string? SpeciesWhitelist { get; private set; }
-
-    /// <summary>
-    ///     Extra components to add to this entity.
-    /// </summary>
-    [DataField]
-    [AlwaysPushInheritance]
-    public ComponentRegistry? Components { get; private set; }
+    [IdDataField] public string ID { get; } = default!;
 }

@@ -12,7 +12,7 @@ namespace Content.Shared._Shitmed.Autodoc.Components;
 /// <summary>
 /// Creates a list of hands and spawns items to fill them.
 /// </summary>
-[RegisterComponent, Access(typeof(HandsFillSystem))]
+[RegisterComponent] [Access(typeof(HandsFillSystem))]
 public sealed partial class HandsFillComponent : Component
 {
     /// <summary>

@@ -26,7 +26,7 @@ public abstract class SharedChemistryGuideDataSystem : EntitySystem
     public abstract void ReloadAllReagentPrototypes();
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class ReagentGuideRegistryChangedEvent : EntityEventArgs
 {
     public ReagentGuideChangeset Changeset;
@@ -37,10 +37,10 @@ public sealed class ReagentGuideRegistryChangedEvent : EntityEventArgs
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class ReagentGuideChangeset
 {
-    public Dictionary<string,ReagentGuideEntry> GuideEntries;
+    public Dictionary<string, ReagentGuideEntry> GuideEntries;
 
     public HashSet<string> Removed;
 

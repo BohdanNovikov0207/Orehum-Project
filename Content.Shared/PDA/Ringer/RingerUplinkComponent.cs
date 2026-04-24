@@ -6,7 +6,7 @@ namespace Content.Shared.PDA.Ringer;
 /// Opens the store UI when the ringstone is set to the secret code.
 /// Traitors are told the code when greeted.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(SharedRingerSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(SharedRingerSystem))]
 public sealed partial class RingerUplinkComponent : Component
 {
     /// <summary>

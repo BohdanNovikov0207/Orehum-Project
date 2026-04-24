@@ -26,7 +26,8 @@ public sealed class ArmableSystem : EntitySystem
     /// </summary>
     private void OnExamine(EntityUid uid, ArmableComponent comp, ExaminedEvent args)
     {
-        if (!args.IsInDetailsRange || !comp.ShowStatusOnExamination || !TryComp<ItemToggleComponent>(uid, out var itemToggle))
+        if (!args.IsInDetailsRange || !comp.ShowStatusOnExamination ||
+            !TryComp<ItemToggleComponent>(uid, out var itemToggle))
             return;
 
         if (itemToggle.Activated)
@@ -37,7 +38,7 @@ public sealed class ArmableSystem : EntitySystem
         else
         {
             if (!string.IsNullOrEmpty(comp.ExamineTextNotArmed))
-                args.PushMarkup(Loc.GetString(comp.ExamineTextNotArmed,("name", uid)));
+                args.PushMarkup(Loc.GetString(comp.ExamineTextNotArmed, ("name", uid)));
         }
     }
 

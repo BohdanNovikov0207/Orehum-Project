@@ -16,11 +16,10 @@ public abstract class SharedGridDraggingSystem : EntitySystem
     public const string CommandName = "griddrag";
 }
 
-
 /// <summary>
 /// Sent from server to client if grid dragging is toggled on.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class GridDragToggleMessage : EntityEventArgs
 {
     public bool Enabled;
@@ -29,14 +28,14 @@ public sealed class GridDragToggleMessage : EntityEventArgs
 /// <summary>
 /// Raised on the client to request a grid move to a specific position.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class GridDragRequestPosition : EntityEventArgs
 {
     public NetEntity Grid;
     public Vector2 WorldPosition;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class GridDragVelocityRequest : EntityEventArgs
 {
     public NetEntity Grid;

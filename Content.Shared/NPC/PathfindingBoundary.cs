@@ -10,7 +10,7 @@ namespace Content.Shared.NPC;
 /// <summary>
 /// Boundary around a navigation region.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public struct PathfindingBoundary
 {
     public List<PathfindingBreadcrumb> Breadcrumbs;

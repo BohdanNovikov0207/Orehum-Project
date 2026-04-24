@@ -84,7 +84,7 @@ namespace Content.Shared.Clothing.Components;
 /// <summary>
 /// This is used for a mask that takes over the host when worn.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(SharedCursedMaskSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(SharedCursedMaskSystem))]
 public sealed partial class CursedMaskComponent : Component
 {
     /// <summary>
@@ -93,11 +93,8 @@ public sealed partial class CursedMaskComponent : Component
     [DataField]
     public CursedMaskExpression CurrentState = CursedMaskExpression.Neutral;
 
-    /// <summary>
-    /// Speed modifier applied when the "Joy" expression is present.
-    /// </summary>
     [DataField]
-    public float JoySpeedModifier = 1.15f;
+    public ProtoId<NpcFactionPrototype> CursedMaskFaction = "SimpleHostile";
 
     /// <summary>
     /// Damage modifier applied when the "Despair" expression is present.
@@ -112,29 +109,32 @@ public sealed partial class CursedMaskComponent : Component
     public bool HasNpc;
 
     /// <summary>
+    /// Speed modifier applied when the "Joy" expression is present.
+    /// </summary>
+    [DataField]
+    public float JoySpeedModifier = 1.15f;
+
+    [DataField]
+    public HashSet<ProtoId<NpcFactionPrototype>> OldFactions = new();
+
+    /// <summary>
     /// The mind that was booted from the wearer when the mask took over.
     /// </summary>
     [DataField]
     public EntityUid? StolenMind;
-
-    [DataField]
-    public ProtoId<NpcFactionPrototype> CursedMaskFaction = "SimpleHostile";
-
-    [DataField]
-    public HashSet<ProtoId<NpcFactionPrototype>> OldFactions = new();
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum CursedMaskVisuals : byte
 {
-     State
+    State,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum CursedMaskExpression : byte
 {
     Neutral,
     Joy,
     Despair,
-    Anger
+    Anger,
 }

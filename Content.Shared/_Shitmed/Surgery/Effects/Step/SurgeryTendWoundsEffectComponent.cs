@@ -11,18 +11,18 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Shared._Shitmed.Medical.Surgery.Effects.Step;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class SurgeryTendWoundsEffectComponent : Component
 {
-    [DataField, AutoNetworkedField]
-    public ProtoId<DamageGroupPrototype> MainGroup = "Brute";
-
-    [DataField, AutoNetworkedField]
-    public bool IsAutoRepeatable = true;
-
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public DamageSpecifier Damage = default!;
 
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public float HealMultiplier = 0.07f;
+
+    [DataField] [AutoNetworkedField]
+    public bool IsAutoRepeatable = true;
+
+    [DataField] [AutoNetworkedField]
+    public ProtoId<DamageGroupPrototype> MainGroup = "Brute";
 }

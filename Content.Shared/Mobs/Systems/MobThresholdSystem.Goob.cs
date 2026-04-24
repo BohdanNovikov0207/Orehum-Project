@@ -1,9 +1,9 @@
 using System.Linq;
-using Content.Shared.Damage;
 using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared._Shitmed.Body;
 using Content.Shared.Body.Components;
 using Content.Shared.Body.Part;
+using Content.Shared.Damage;
 
 namespace Content.Shared.Mobs.Systems;
 
@@ -27,13 +27,13 @@ public sealed partial class MobThresholdSystem
         if (body.RootContainer?.ContainedEntity is not { } rootPart)
             return damage;
 
-        FixedPoint2 result = FixedPoint2.Zero;
+        var result = FixedPoint2.Zero;
 
         var criticalParts = new[]
         {
             BodyPartType.Head,
             BodyPartType.Chest,
-            BodyPartType.Groin
+            BodyPartType.Groin,
         };
 
         foreach (var (woundable, _) in _wound.GetAllWoundableChildren(rootPart))
@@ -48,5 +48,4 @@ public sealed partial class MobThresholdSystem
 
         return result;
     }
-
 }

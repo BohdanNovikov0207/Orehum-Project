@@ -13,18 +13,18 @@ using Robust.Shared.Utility;
 
 namespace Content.Shared.Anomaly;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum AnomalyVisuals : byte
 {
     IsPulsing,
-    Supercritical
+    Supercritical,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum AnomalyVisualLayers : byte
 {
     Base,
-    Animated
+    Animated,
 }
 
 /// <summary>
@@ -37,48 +37,48 @@ public enum AnomalyVisualLayers : byte
 /// Yes i know detla+ waves exist, but they're not
 /// common enough for me to care.
 /// </remarks>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum AnomalousParticleType : byte
 {
     Delta,
     Epsilon,
     Zeta,
     Sigma,
-    Default
+    Default,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum AnomalyVesselVisuals : byte
 {
     HasAnomaly,
-    AnomalyState
+    AnomalyState,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum AnomalyVesselVisualLayers : byte
 {
-    Base
+    Base,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum AnomalyGeneratorVisuals : byte
 {
-    Generating
+    Generating,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum AnomalyGeneratorVisualLayers : byte
 {
-    Base
+    Base,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum AnomalyScannerUiKey : byte
 {
-    Key
+    Key,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class AnomalyScannerUserInterfaceState : BoundUserInterfaceState
 {
     public FormattedMessage Message;
@@ -92,13 +92,13 @@ public sealed class AnomalyScannerUserInterfaceState : BoundUserInterfaceState
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum AnomalyGeneratorUiKey : byte
 {
-    Key
+    Key,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class AnomalyGeneratorUserInterfaceState : BoundUserInterfaceState
 {
     public TimeSpan CooldownEndTime;
@@ -115,8 +115,7 @@ public sealed class AnomalyGeneratorUserInterfaceState : BoundUserInterfaceState
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class AnomalyGeneratorGenerateButtonPressedEvent : BoundUserInterfaceMessage
 {
-
 }

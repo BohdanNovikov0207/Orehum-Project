@@ -15,7 +15,7 @@ namespace Content.Shared.Players.PlayTimeTracking;
 /// Given to a role to specify its ID for role-timer tracking purposes. That's it.
 /// </summary>
 [Prototype]
-public sealed partial class PlayTimeTrackerPrototype : IPrototype
+public sealed class PlayTimeTrackerPrototype : IPrototype
 {
-    [IdDataField] public string ID { get; private set; } = default!;
+    [IdDataField] public string ID { get; } = default!;
 }

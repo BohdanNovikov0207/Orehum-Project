@@ -4,21 +4,21 @@ using Robust.Shared.GameStates;
 namespace Content.Shared._Lavaland.EntityShapes.Components;
 
 /// <summary>
-/// Scales <see cref="ShapeSpawnerCounterComponent"/> with anger
+/// Scales <see cref="ShapeSpawnerCounterComponent" /> with anger
 /// of an owner that spawned this EntityShapeSpawner.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class AngerShapeSpawnerComponent : Component
 {
-    [DataField("counterRange"), AutoNetworkedField]
-    public Vector2i? MaxCounterRange;
-
-    [DataField("inverseCounter"), AutoNetworkedField]
+    [DataField("inverseCounter")] [AutoNetworkedField]
     public bool InverseCounter;
 
-    [DataField("periodRange"), AutoNetworkedField]
-    public Vector2? SpawnPeriodRange;
-
-    [DataField("inversePeriod"), AutoNetworkedField]
+    [DataField("inversePeriod")] [AutoNetworkedField]
     public bool InverseSpawnPeriod;
+
+    [DataField("counterRange")] [AutoNetworkedField]
+    public Vector2i? MaxCounterRange;
+
+    [DataField("periodRange")] [AutoNetworkedField]
+    public Vector2? SpawnPeriodRange;
 }

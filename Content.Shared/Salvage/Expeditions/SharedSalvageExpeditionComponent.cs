@@ -12,11 +12,11 @@ namespace Content.Shared.Salvage.Expeditions;
 [NetworkedComponent]
 public abstract partial class SharedSalvageExpeditionComponent : Component
 {
-    [ViewVariables(VVAccess.ReadWrite), DataField("stage")]
+    [ViewVariables(VVAccess.ReadWrite)] [DataField("stage")]
     public ExpeditionStage Stage = ExpeditionStage.Added;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class SalvageExpeditionComponentState : ComponentState
 {
     public ExpeditionStage Stage;

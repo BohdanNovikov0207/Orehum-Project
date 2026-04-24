@@ -6,8 +6,8 @@ using Robust.Shared.Spawners;
 namespace Content.Shared._ES.Viewcone;
 
 /// <summary>
-///     API for spawning viewcone effects and making sure source gets set correctly +
-///     it spawns in the correct pos and shit
+/// API for spawning viewcone effects and making sure source gets set correctly +
+/// it spawns in the correct pos and shit
 /// </summary>
 [PublicAPI]
 public sealed class ESViewconeEffectSystem : EntitySystem
@@ -16,9 +16,12 @@ public sealed class ESViewconeEffectSystem : EntitySystem
     [Dependency] private readonly SharedTransformSystem _xform = default!;
 
     /// <summary>
-    ///     Spawns the given effect entity at the player source, and sets relevant variables
+    /// Spawns the given effect entity at the player source, and sets relevant variables
     /// </summary>
-    /// <param name="source">The player that originated the effect, or the entity to spawn next to if a relevant player doesn't exist</param>
+    /// <param name="source">
+    /// The player that originated the effect, or the entity to spawn next to if a relevant player doesn't
+    /// exist
+    /// </param>
     /// <param name="effect">The prototype ID of an effect entity to spawn (see viewcone_effects.yml)</param>
     /// <param name="angleOverride">The local rotation to set the effect to, instead of the parent rotation.</param>
     public void SpawnEffect(EntityUid source, EntProtoId effect, Angle? angleOverride = null)

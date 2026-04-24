@@ -83,12 +83,12 @@ namespace Content.Shared.EntityTable;
 /// This is a prototype for...
 /// </summary>
 [Prototype]
-public sealed partial class EntityTablePrototype : IPrototype
+public sealed class EntityTablePrototype : IPrototype
 {
-    /// <inheritdoc/>
-    [IdDataField]
-    public string ID { get; private set; } = default!;
-
     [DataField(required: true)]
     public EntityTableSelector Table = default!;
+
+    /// <inheritdoc />
+    [IdDataField]
+    public string ID { get; } = default!;
 }

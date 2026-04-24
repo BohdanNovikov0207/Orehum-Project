@@ -12,10 +12,10 @@ public sealed partial class CorridorDecalSkirtingDunGen : IDunGenLayer
     public Dictionary<DirectionFlag, string> CardinalDecals = new();
 
     /// <summary>
-    /// Decal where 1 corner edge is found.
+    /// Optional color to apply to the decals.
     /// </summary>
     [DataField]
-    public Dictionary<Direction, string> PocketDecals = new();
+    public Color? Color;
 
     /// <summary>
     /// Decal where 2 or 3 edges are found.
@@ -24,8 +24,8 @@ public sealed partial class CorridorDecalSkirtingDunGen : IDunGenLayer
     public Dictionary<DirectionFlag, string> CornerDecals = new();
 
     /// <summary>
-    /// Optional color to apply to the decals.
+    /// Decal where 1 corner edge is found.
     /// </summary>
     [DataField]
-    public Color? Color;
+    public Dictionary<Direction, string> PocketDecals = new();
 }

@@ -24,5 +24,5 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared._Lavaland.Shelter;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class ShelterCapsuleDeployDoAfterEvent : SimpleDoAfterEvent;

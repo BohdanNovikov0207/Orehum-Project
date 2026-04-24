@@ -54,7 +54,8 @@ public abstract partial class SharedBuckleSystem
         SubscribeLocalEvent<StrapComponent, EntityTerminatingEvent>(OnStrapTerminating);
         SubscribeLocalEvent<StrapComponent, ComponentRemove>((e, c, _) => StrapRemoveAll(e, c));
 
-        SubscribeLocalEvent<StrapComponent, ContainerGettingInsertedAttemptEvent>(OnStrapContainerGettingInsertedAttempt);
+        SubscribeLocalEvent<StrapComponent, ContainerGettingInsertedAttemptEvent>(
+            OnStrapContainerGettingInsertedAttempt);
         SubscribeLocalEvent<StrapComponent, DestructionEventArgs>((e, c, _) => StrapRemoveAll(e, c));
         SubscribeLocalEvent<StrapComponent, BreakageEventArgs>((e, c, _) => StrapRemoveAll(e, c));
 
@@ -62,10 +63,8 @@ public abstract partial class SharedBuckleSystem
         SubscribeLocalEvent<StrapComponent, MachineDeconstructedEvent>((e, c, _) => StrapRemoveAll(e, c));
     }
 
-    private void OnStrapStartup(EntityUid uid, StrapComponent component, ComponentStartup args)
-    {
+    private void OnStrapStartup(EntityUid uid, StrapComponent component, ComponentStartup args) =>
         Appearance.SetData(uid, StrapVisuals.State, component.BuckledEntities.Count != 0);
-    }
 
     private void OnStrapShutdown(EntityUid uid, StrapComponent component, ComponentShutdown args)
     {
@@ -73,12 +72,12 @@ public abstract partial class SharedBuckleSystem
             StrapRemoveAll(uid, component);
     }
 
-    private void OnStrapTerminating(Entity<StrapComponent> entity, ref EntityTerminatingEvent args)
-    {
+    private void OnStrapTerminating(Entity<StrapComponent> entity, ref EntityTerminatingEvent args) =>
         StrapRemoveAll(entity, entity.Comp);
-    }
 
-    private void OnStrapContainerGettingInsertedAttempt(EntityUid uid, StrapComponent component, ContainerGettingInsertedAttemptEvent args)
+    private void OnStrapContainerGettingInsertedAttempt(EntityUid uid,
+        StrapComponent component,
+        ContainerGettingInsertedAttemptEvent args)
     {
         // If someone is attempting to put this item inside of a backpack, ensure that it has no entities strapped to it.
         if (args.Container.ID == StorageComponent.ContainerId && component.BuckledEntities.Count != 0)

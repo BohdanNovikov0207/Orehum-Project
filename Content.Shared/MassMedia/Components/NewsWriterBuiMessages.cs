@@ -9,22 +9,26 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.MassMedia.Components;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum NewsWriterUiKey : byte
 {
-    Key
+    Key,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class NewsWriterBoundUserInterfaceState : BoundUserInterfaceState
 {
     public readonly NewsArticle[] Articles;
-    public readonly bool PublishEnabled;
-    public readonly TimeSpan NextPublish;
-    public readonly string DraftTitle;
     public readonly string DraftContent;
+    public readonly string DraftTitle;
+    public readonly TimeSpan NextPublish;
+    public readonly bool PublishEnabled;
 
-    public NewsWriterBoundUserInterfaceState(NewsArticle[] articles, bool publishEnabled, TimeSpan nextPublish, string draftTitle, string draftContent)
+    public NewsWriterBoundUserInterfaceState(NewsArticle[] articles,
+        bool publishEnabled,
+        TimeSpan nextPublish,
+        string draftTitle,
+        string draftContent)
     {
         Articles = articles;
         PublishEnabled = publishEnabled;
@@ -34,11 +38,11 @@ public sealed class NewsWriterBoundUserInterfaceState : BoundUserInterfaceState
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class NewsWriterPublishMessage : BoundUserInterfaceMessage
 {
-    public readonly string Title;
     public readonly string Content;
+    public readonly string Title;
 
 
     public NewsWriterPublishMessage(string title, string content)
@@ -48,7 +52,7 @@ public sealed class NewsWriterPublishMessage : BoundUserInterfaceMessage
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class NewsWriterDeleteMessage : BoundUserInterfaceMessage
 {
     public readonly int ArticleNum;
@@ -59,16 +63,16 @@ public sealed class NewsWriterDeleteMessage : BoundUserInterfaceMessage
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class NewsWriterArticlesRequestMessage : BoundUserInterfaceMessage
 {
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class NewsWriterSaveDraftMessage : BoundUserInterfaceMessage
 {
-    public readonly string DraftTitle;
     public readonly string DraftContent;
+    public readonly string DraftTitle;
 
     public NewsWriterSaveDraftMessage(string draftTitle, string draftContent)
     {
@@ -77,7 +81,7 @@ public sealed class NewsWriterSaveDraftMessage : BoundUserInterfaceMessage
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class NewsWriterRequestDraftMessage : BoundUserInterfaceMessage
 {
 }

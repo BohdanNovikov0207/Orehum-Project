@@ -8,18 +8,18 @@ namespace Content.Shared.Trigger.Components.Effects;
 /// If TargetUser is true the user will be teleported instead.
 /// Used for scram implants.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class ScramOnTriggerComponent : BaseXOnTriggerComponent
 {
     /// <summary>
     /// Up to how far to teleport the entity.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public float TeleportRadius = 1000f; // goob edit
 
     /// <summary>
     /// the sound to play when teleporting.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public SoundSpecifier TeleportSound = new SoundPathSpecifier("/Audio/Effects/teleport_arrival.ogg");
 }

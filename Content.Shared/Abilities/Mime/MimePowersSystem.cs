@@ -1,4 +1,3 @@
-using Content.Shared.Popups;
 using Content.Shared.Actions;
 using Content.Shared.Actions.Events;
 using Content.Shared.Alert;
@@ -7,6 +6,7 @@ using Content.Shared.IdentityManagement;
 using Content.Shared.Maps;
 using Content.Shared.Paper;
 using Content.Shared.Physics;
+using Content.Shared.Popups;
 using Content.Shared.Speech.Muting;
 using Robust.Shared.Containers;
 using Robust.Shared.Map;
@@ -16,13 +16,13 @@ namespace Content.Shared.Abilities.Mime;
 
 public sealed class MimePowersSystem : EntitySystem
 {
-    [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
     [Dependency] private readonly SharedActionsSystem _actionsSystem = default!;
     [Dependency] private readonly AlertsSystem _alertsSystem = default!;
-    [Dependency] private readonly TurfSystem _turf = default!;
-    [Dependency] private readonly IMapManager _mapMan = default!;
     [Dependency] private readonly SharedContainerSystem _container = default!;
+    [Dependency] private readonly IMapManager _mapMan = default!;
+    [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly TurfSystem _turf = default!;
 
     public override void Initialize()
     {
@@ -71,10 +71,8 @@ public sealed class MimePowersSystem : EntitySystem
         _actionsSystem.AddAction(ent, ref ent.Comp.InvisibleWallActionEntity, ent.Comp.InvisibleWallAction);
     }
 
-    private void OnComponentShutdown(Entity<MimePowersComponent> ent, ref ComponentShutdown args)
-    {
+    private void OnComponentShutdown(Entity<MimePowersComponent> ent, ref ComponentShutdown args) =>
         _actionsSystem.RemoveAction(ent.Owner, ent.Comp.InvisibleWallActionEntity);
-    }
 
     /// <summary>
     /// Creates an invisible wall in a free space after some checks.
@@ -102,8 +100,10 @@ public sealed class MimePowersSystem : EntitySystem
             return;
         }
 
-        var messageSelf = Loc.GetString("mime-invisible-wall-popup-self", ("mime", Identity.Entity(ent.Owner, EntityManager)));
-        var messageOthers = Loc.GetString("mime-invisible-wall-popup-others", ("mime", Identity.Entity(ent.Owner, EntityManager)));
+        var messageSelf = Loc.GetString("mime-invisible-wall-popup-self",
+            ("mime", Identity.Entity(ent.Owner, EntityManager)));
+        var messageOthers = Loc.GetString("mime-invisible-wall-popup-others",
+            ("mime", Identity.Entity(ent.Owner, EntityManager)));
         _popupSystem.PopupPredicted(messageSelf, messageOthers, ent, ent);
 
         // Make sure we set the invisible wall to despawn properly

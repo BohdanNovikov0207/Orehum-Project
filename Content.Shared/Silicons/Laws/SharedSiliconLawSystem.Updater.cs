@@ -27,12 +27,11 @@ namespace Content.Shared.Silicons.Laws;
 
 public abstract partial class SharedSiliconLawSystem
 {
-    private void InitializeUpdater()
-    {
+    private void InitializeUpdater() =>
         SubscribeLocalEvent<SiliconLawUpdaterComponent, EntInsertedIntoContainerMessage>(OnUpdaterInsert);
-    }
 
-    protected virtual void OnUpdaterInsert(Entity<SiliconLawUpdaterComponent> ent, ref EntInsertedIntoContainerMessage args)
+    protected virtual void OnUpdaterInsert(Entity<SiliconLawUpdaterComponent> ent,
+        ref EntInsertedIntoContainerMessage args)
     {
         // TODO: Prediction
     }

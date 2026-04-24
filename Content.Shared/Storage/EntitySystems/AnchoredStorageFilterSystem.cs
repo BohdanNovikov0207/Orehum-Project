@@ -10,15 +10,15 @@ using Robust.Shared.Containers;
 namespace Content.Shared.Storage.EntitySystems;
 
 /// <summary>
-/// Ejects items that do not match a <see cref="EntityWhitelist"/> from a storage when it is anchored.
-/// <seealso cref="AnchoredStorageFilterComponent"/>
+/// Ejects items that do not match a <see cref="EntityWhitelist" /> from a storage when it is anchored.
+/// <seealso cref="AnchoredStorageFilterComponent" />
 /// </summary>
 public sealed class AnchoredStorageFilterSystem : EntitySystem
 {
-    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
     [Dependency] private readonly SharedContainerSystem _container = default!;
+    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();
@@ -28,7 +28,7 @@ public sealed class AnchoredStorageFilterSystem : EntitySystem
     }
 
     /// <summary>
-    /// Handles the <see cref="AnchorStateChangedEvent"/>.
+    /// Handles the <see cref="AnchorStateChangedEvent" />.
     /// </summary>
     private void OnAnchorStateChanged(Entity<AnchoredStorageFilterComponent> ent, ref AnchorStateChangedEvent args)
     {
@@ -46,7 +46,7 @@ public sealed class AnchoredStorageFilterSystem : EntitySystem
     }
 
     /// <summary>
-    /// Handles the <see cref="ContainerIsInsertingAttemptEvent"/>.
+    /// Handles the <see cref="ContainerIsInsertingAttemptEvent" />.
     /// </summary>
     private void OnInsertAttempt(Entity<AnchoredStorageFilterComponent> ent, ref ContainerIsInsertingAttemptEvent args)
     {

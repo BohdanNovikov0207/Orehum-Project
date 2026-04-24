@@ -13,28 +13,28 @@ using Robust.Shared.Utility;
 
 namespace Content.Shared.Heretic;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState(true)]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState(true)]
 public sealed partial class HereticCombatMarkComponent : Component
 {
-    [DataField, AutoNetworkedField]
-    public string Path = "Blade";
-
-    [DataField]
-    public float MaxDisappearTime = 15f;
-
     [DataField]
     public float DisappearTime = 15f;
 
     [DataField]
+    public float MaxDisappearTime = 15f;
+
+    [DataField] [AutoNetworkedField]
+    public string Path = "Blade";
+
+    [DataField]
     public int Repetitions = 1;
+
+    [DataField]
+    public ResPath ResPath = new("_Goobstation/Heretic/combat_marks.rsi");
 
     public TimeSpan Timer = TimeSpan.Zero;
 
     [DataField]
     public SoundSpecifier? TriggerSound = new SoundPathSpecifier("/Audio/_Goobstation/Heretic/repulse.ogg");
-
-    [DataField]
-    public ResPath ResPath = new("_Goobstation/Heretic/combat_marks.rsi");
 }
 
 public enum HereticCombatMarkKey : byte

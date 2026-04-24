@@ -13,23 +13,10 @@ namespace Content.Shared.MapText;
 /// <summary>
 /// This is used for displaying text in world space
 /// </summary>
-
-[NetworkedComponent, Access(typeof(SharedMapTextSystem))]
+[NetworkedComponent] [Access(typeof(SharedMapTextSystem))]
 public abstract partial class SharedMapTextComponent : Component
 {
     public const string DefaultFont = "Default";
-
-    /// <summary>
-    /// The text to display. This will override <see cref="LocText"/>.
-    /// </summary>
-    [DataField]
-    public string? Text;
-
-    /// <summary>
-    /// The localized-id of the text that should be displayed.
-    /// </summary>
-    [DataField]
-    public LocId LocText = "map-text-default";
     // TODO VV: LocId editing
 
     [DataField]
@@ -41,17 +28,29 @@ public abstract partial class SharedMapTextComponent : Component
     [DataField]
     public int FontSize = 12;
 
+    /// <summary>
+    /// The localized-id of the text that should be displayed.
+    /// </summary>
+    [DataField]
+    public LocId LocText = "map-text-default";
+
     [DataField]
     public Vector2 Offset = Vector2.Zero;
+
+    /// <summary>
+    /// The text to display. This will override <see cref="LocText" />.
+    /// </summary>
+    [DataField]
+    public string? Text;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class MapTextComponentState : ComponentState
 {
-    public string? Text { get; init;}
-    public LocId LocText { get; init;}
-    public Color Color { get; init;}
+    public string? Text { get; init; }
+    public LocId LocText { get; init; }
+    public Color Color { get; init; }
     public string FontId { get; init; } = default!;
-    public int FontSize { get; init;}
-    public Vector2 Offset { get; init;}
+    public int FontSize { get; init; }
+    public Vector2 Offset { get; init; }
 }

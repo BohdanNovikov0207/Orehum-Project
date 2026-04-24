@@ -3,20 +3,20 @@ using Robust.Shared.Serialization;
 namespace Content.Shared.CartridgeLoader.Cartridges;
 
 /// <summary>
-///     Base UI message for NanoTask interactions
+/// Base UI message for NanoTask interactions
 /// </summary>
 public interface INanoTaskUiMessagePayload
 {
 }
 
 /// <summary>
-///     Dispatched when a new task is created
+/// Dispatched when a new task is created
 /// </summary>
-[Serializable, NetSerializable, DataRecord]
-public sealed partial class NanoTaskAddTask : INanoTaskUiMessagePayload
+[Serializable] [NetSerializable] [DataRecord]
+public sealed class NanoTaskAddTask : INanoTaskUiMessagePayload
 {
     /// <summary>
-    ///     The newly created task
+    /// The newly created task
     /// </summary>
     public readonly NanoTaskItem Item;
 
@@ -27,13 +27,13 @@ public sealed partial class NanoTaskAddTask : INanoTaskUiMessagePayload
 }
 
 /// <summary>
-///     Dispatched when an existing task is modified
+/// Dispatched when an existing task is modified
 /// </summary>
-[Serializable, NetSerializable, DataRecord]
-public sealed partial class NanoTaskUpdateTask : INanoTaskUiMessagePayload
+[Serializable] [NetSerializable] [DataRecord]
+public sealed class NanoTaskUpdateTask : INanoTaskUiMessagePayload
 {
     /// <summary>
-    ///     The task that was updated and its ID
+    /// The task that was updated and its ID
     /// </summary>
     public readonly NanoTaskItemAndId Item;
 
@@ -44,13 +44,13 @@ public sealed partial class NanoTaskUpdateTask : INanoTaskUiMessagePayload
 }
 
 /// <summary>
-///     Dispatched when an existing task is deleted
+/// Dispatched when an existing task is deleted
 /// </summary>
-[Serializable, NetSerializable, DataRecord]
-public sealed partial class NanoTaskDeleteTask : INanoTaskUiMessagePayload
+[Serializable] [NetSerializable] [DataRecord]
+public sealed class NanoTaskDeleteTask : INanoTaskUiMessagePayload
 {
     /// <summary>
-    ///     The ID of the task to delete
+    /// The ID of the task to delete
     /// </summary>
     public readonly int Id;
 
@@ -61,13 +61,13 @@ public sealed partial class NanoTaskDeleteTask : INanoTaskUiMessagePayload
 }
 
 /// <summary>
-///     Dispatched when a task is requested to be printed
+/// Dispatched when a task is requested to be printed
 /// </summary>
-[Serializable, NetSerializable, DataRecord]
-public sealed partial class NanoTaskPrintTask : INanoTaskUiMessagePayload
+[Serializable] [NetSerializable] [DataRecord]
+public sealed class NanoTaskPrintTask : INanoTaskUiMessagePayload
 {
     /// <summary>
-    ///     The NanoTask to print
+    /// The NanoTask to print
     /// </summary>
     public readonly NanoTaskItem Item;
 
@@ -78,12 +78,13 @@ public sealed partial class NanoTaskPrintTask : INanoTaskUiMessagePayload
 }
 
 /// <summary>
-///     Cartridge message event carrying the NanoTask UI messages
+/// Cartridge message event carrying the NanoTask UI messages
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class NanoTaskUiMessageEvent : CartridgeMessageEvent
 {
     public readonly INanoTaskUiMessagePayload Payload;
+
     public NanoTaskUiMessageEvent(INanoTaskUiMessagePayload payload)
     {
         Payload = payload;

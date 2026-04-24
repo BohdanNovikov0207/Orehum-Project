@@ -28,7 +28,9 @@ public sealed class DamageOnTriggerSystem : EntitySystem
         var ev = new BeforeDamageOnTriggerEvent(damage, target.Value);
         RaiseLocalEvent(ent.Owner, ref ev);
 
-        args.Handled |= _damageableSystem.TryChangeDamage(target, ev.Damage, ent.Comp.IgnoreResistances, origin: ent.Owner) is not null;
+        args.Handled |=
+            _damageableSystem.TryChangeDamage(target, ev.Damage, ent.Comp.IgnoreResistances, origin: ent.Owner) is not
+                null;
     }
 }
 

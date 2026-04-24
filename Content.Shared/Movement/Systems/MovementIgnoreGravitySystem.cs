@@ -20,10 +20,9 @@ public sealed class MovementIgnoreGravitySystem : EntitySystem
         SubscribeLocalEvent<MovementAlwaysTouchingComponent, CanWeightlessMoveEvent>(OnWeightless);
     }
 
-    private void OnWeightless(EntityUid uid, MovementAlwaysTouchingComponent component, ref CanWeightlessMoveEvent args)
-    {
+    private void
+        OnWeightless(EntityUid uid, MovementAlwaysTouchingComponent component, ref CanWeightlessMoveEvent args) =>
         args.CanMove = true;
-    }
 
     private void HandleState(EntityUid uid, MovementIgnoreGravityComponent component, ref ComponentHandleState args)
     {
@@ -33,8 +32,6 @@ public sealed class MovementIgnoreGravitySystem : EntitySystem
         component.Weightless = ((MovementIgnoreGravityComponentState) args.Next).Weightless;
     }
 
-    private void GetState(EntityUid uid, MovementIgnoreGravityComponent component, ref ComponentGetState args)
-    {
+    private void GetState(EntityUid uid, MovementIgnoreGravityComponent component, ref ComponentGetState args) =>
         args.State = new MovementIgnoreGravityComponentState(component);
-    }
 }

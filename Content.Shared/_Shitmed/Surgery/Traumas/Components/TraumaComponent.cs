@@ -1,14 +1,14 @@
 using Content.Goobstation.Maths.FixedPoint;
+using Content.Shared.Body.Part;
 using Robust.Shared.GameStates;
 using Robust.Shared.Serialization;
-using Content.Shared.Body.Part;
 
 namespace Content.Shared._Shitmed.Medical.Surgery.Traumas.Components;
 
 /// <summary>
 /// This is used for...
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class TraumaComponent : Component
 {
     /// <summary>
@@ -16,6 +16,19 @@ public sealed partial class TraumaComponent : Component
     /// </summary>
     [ViewVariables(VVAccess.ReadOnly)]
     public EntityUid? HoldingWoundable;
+
+    /// <summary>
+    /// SHITCODE ALERT!!!!! This PURELY EXISTS FOR DELIMB TRAUMAS. I hate myself.
+    /// </summary>
+    [ViewVariables(VVAccess.ReadOnly)]
+    public (BodyPartType, BodyPartSymmetry)? TargetType;
+
+    /// <summary>
+    /// The severity the wound had when trauma got induced; Gets updated to the new one if the trauma gets worsened by the same
+    /// wound
+    /// </summary>
+    [ViewVariables(VVAccess.ReadOnly)]
+    public FixedPoint2 TraumaSeverity;
 
     /// <summary>
     /// Self-explanatory
@@ -28,31 +41,19 @@ public sealed partial class TraumaComponent : Component
     public EntityUid? TraumaTarget;
 
     /// <summary>
-    /// SHITCODE ALERT!!!!! This PURELY EXISTS FOR DELIMB TRAUMAS. I hate myself.
-    /// </summary>
-    [ViewVariables(VVAccess.ReadOnly)]
-    public (BodyPartType, BodyPartSymmetry)? TargetType;
-
-    /// <summary>
-    /// The severity the wound had when trauma got induced; Gets updated to the new one if the trauma gets worsened by the same wound
-    /// </summary>
-    [ViewVariables(VVAccess.ReadOnly)]
-    public FixedPoint2 TraumaSeverity;
-
-    /// <summary>
     /// Self-explanatory
     /// </summary>
-    [DataField, ViewVariables(VVAccess.ReadOnly)]
+    [DataField] [ViewVariables(VVAccess.ReadOnly)]
     public TraumaType TraumaType;
 }
 
 // The networking on consciousness is rather silly.
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class TraumaComponentState : ComponentState
 {
     public NetEntity? HoldingWoundable;
-    public NetEntity? TraumaTarget;
     public (BodyPartType, BodyPartSymmetry)? TargetType;
     public FixedPoint2 TraumaSeverity;
+    public NetEntity? TraumaTarget;
     public TraumaType TraumaType;
 }

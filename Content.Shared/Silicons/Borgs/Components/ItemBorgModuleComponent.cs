@@ -15,23 +15,11 @@ using Robust.Shared.Prototypes;
 namespace Content.Shared.Silicons.Borgs.Components;
 
 /// <summary>
-/// This is used for a <see cref="BorgModuleComponent"/> that provides items to the entity it's installed into.
+/// This is used for a <see cref="BorgModuleComponent" /> that provides items to the entity it's installed into.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(SharedBorgSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(SharedBorgSystem))]
 public sealed partial class ItemBorgModuleComponent : Component
 {
-    /// <summary>
-    /// The items that are provided.
-    /// </summary>
-    [DataField(required: true)]
-    public List<EntProtoId> Items = new();
-
-    /// <summary>
-    /// The entities from <see cref="Items"/> that were spawned.
-    /// </summary>
-    [DataField("providedItems")]
-    public SortedDictionary<string, EntityUid> ProvidedItems = new();
-
     /// <summary>
     /// A counter that ensures a unique
     /// </summary>
@@ -39,10 +27,23 @@ public sealed partial class ItemBorgModuleComponent : Component
     public int HandCounter;
 
     /// <summary>
-    /// Whether or not the items have been created and stored in <see cref="ProvidedContainer"/>
+    /// The items that are provided.
+    /// </summary>
+    [DataField(required: true)]
+    public List<EntProtoId> Items = new();
+
+    /// <summary>
+    /// Whether or not the items have been created and stored in <see cref="ProvidedContainer" />
     /// </summary>
     [DataField("itemsCrated")]
     public bool ItemsCreated;
+
+    /// <summary>
+    /// Frontier: a module ID to check for equivalence // TODO: why not to make it automatically set itself to the prototype of
+    /// the component's owner?
+    /// </summary>
+    [DataField(required: true)]
+    public string ModuleId = default!;
 
     /// <summary>
     /// A container where provided items are stored when not being used.
@@ -58,8 +59,8 @@ public sealed partial class ItemBorgModuleComponent : Component
     public string ProvidedContainerId = "provided_container";
 
     /// <summary>
-    /// Frontier: a module ID to check for equivalence // TODO: why not to make it automatically set itself to the prototype of the component's owner?
+    /// The entities from <see cref="Items" /> that were spawned.
     /// </summary>
-    [DataField(required: true)]
-    public string ModuleId = default!;
+    [DataField("providedItems")]
+    public SortedDictionary<string, EntityUid> ProvidedItems = new();
 }

@@ -14,19 +14,17 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototy
 
 namespace Content.Shared.Spider;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 [Access(typeof(SharedSpiderSystem))]
 public sealed partial class SpiderComponent : Component
 {
-    [ViewVariables(VVAccess.ReadWrite)]
-    [DataField("webPrototype", customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
-    public string WebPrototype = "SpiderWeb";
-
-    [ViewVariables(VVAccess.ReadWrite)]
-    [DataField("webAction", customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
-    public string WebAction = "ActionSpiderWeb";
-
     [DataField] public EntityUid? Action;
+
+    /// <summary>
+    /// The next time the spider can spawn a web when not controlled by a player.
+    /// </summary>
+    [DataField]
+    public TimeSpan? NextWebSpawn;
 
     /// <summary>
     /// Whether the spider will spawn webs when not controlled by a player.
@@ -34,17 +32,21 @@ public sealed partial class SpiderComponent : Component
     [DataField]
     public bool SpawnsWebsAsNonPlayer = true;
 
+    [ViewVariables(VVAccess.ReadWrite)]
+    [DataField("webAction", customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
+    public string WebAction = "ActionSpiderWeb";
+
+    [ViewVariables(VVAccess.ReadWrite)]
+    [DataField("webPrototype", customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
+    public string WebPrototype = "SpiderWeb";
+
     /// <summary>
     /// The cooldown in seconds between web spawns when not controlled by a player.
     /// </summary>
     [DataField]
     public TimeSpan WebSpawnCooldown = TimeSpan.FromSeconds(45f);
-
-    /// <summary>
-    /// The next time the spider can spawn a web when not controlled by a player.
-    /// </summary>
-    [DataField]
-    public TimeSpan? NextWebSpawn;
 }
 
-public sealed partial class SpiderWebActionEvent : InstantActionEvent { }
+public sealed partial class SpiderWebActionEvent : InstantActionEvent
+{
+}

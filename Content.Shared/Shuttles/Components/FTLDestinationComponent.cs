@@ -11,30 +11,30 @@ using Robust.Shared.GameStates;
 
 namespace Content.Shared.Shuttles.Components;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class FTLDestinationComponent : Component
 {
     /// <summary>
-    /// Should this destination be restricted in some form from console visibility.
+    /// Can we only FTL to beacons on this map.
     /// </summary>
-    [ViewVariables(VVAccess.ReadWrite), DataField, AutoNetworkedField]
-    public EntityWhitelist? Whitelist;
+    [DataField] [AutoNetworkedField]
+    public bool BeaconsOnly;
 
     /// <summary>
     /// Is this destination visible but available to be warped to?
     /// </summary>
-    [ViewVariables(VVAccess.ReadWrite), DataField, AutoNetworkedField]
+    [ViewVariables(VVAccess.ReadWrite)] [DataField] [AutoNetworkedField]
     public bool Enabled = true;
-
-    /// <summary>
-    /// Can we only FTL to beacons on this map.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public bool BeaconsOnly;
 
     /// <summary>
     /// Shuttles must use a corresponding CD to travel to this location.
     /// </summary>
-    [ViewVariables(VVAccess.ReadWrite), DataField, AutoNetworkedField]
+    [ViewVariables(VVAccess.ReadWrite)] [DataField] [AutoNetworkedField]
     public bool RequireCoordinateDisk = false;
+
+    /// <summary>
+    /// Should this destination be restricted in some form from console visibility.
+    /// </summary>
+    [ViewVariables(VVAccess.ReadWrite)] [DataField] [AutoNetworkedField]
+    public EntityWhitelist? Whitelist;
 }

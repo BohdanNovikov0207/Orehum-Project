@@ -9,13 +9,13 @@ using Robust.Shared.Prototypes;
 namespace Content.Shared._Starlight.CollectiveMind;
 
 [Prototype("collectiveMind")]
-public sealed partial class CollectiveMindPrototype : IPrototype
+public sealed class CollectiveMindPrototype : IPrototype
 {
-    [IdDataField, ViewVariables]
-    public string ID { get; } = default!;
+    [DataField]
+    public bool ShowNames = true;
 
     [DataField("name")]
-    public string Name { get; private set; } = string.Empty;
+    public string Name { get; } = string.Empty;
 
     [ViewVariables(VVAccess.ReadOnly)]
     public string LocalizedName => Loc.GetString(Name);
@@ -32,6 +32,6 @@ public sealed partial class CollectiveMindPrototype : IPrototype
     [DataField("requiredTags")]
     public List<string> RequiredTags { get; set; } = new();
 
-    [DataField]
-    public bool ShowNames = true;
+    [IdDataField] [ViewVariables]
+    public string ID { get; } = default!;
 }

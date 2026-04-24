@@ -11,10 +11,10 @@ namespace Content.Shared.Chat;
 
 public sealed class MsgDeleteChatMessagesBy : NetMessage
 {
-    public override MsgGroups MsgGroup => MsgGroups.Command;
+    public HashSet<NetEntity> Entities = default!;
 
     public int Key;
-    public HashSet<NetEntity> Entities = default!;
+    public override MsgGroups MsgGroup => MsgGroups.Command;
 
     public override void ReadFromBuffer(NetIncomingMessage buffer, IRobustSerializer serializer)
     {

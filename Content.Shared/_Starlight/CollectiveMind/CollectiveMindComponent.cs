@@ -10,34 +10,33 @@
 using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
 
-namespace Content.Shared._Starlight.CollectiveMind
+namespace Content.Shared._Starlight.CollectiveMind;
+
+[RegisterComponent] [NetworkedComponent]
+public sealed partial class CollectiveMindComponent : Component
 {
-    [RegisterComponent, NetworkedComponent]
-    public sealed partial class CollectiveMindComponent : Component
-    {
-        [DataField("minds")]
-        public Dictionary<string, int> Minds = new();
+    // Goobstation
+    /// <summary>
+    /// Whether the collective mind can be used while in critical condition
+    /// </summary>
+    [DataField]
+    public bool CanUseInCrit = false;
 
-        [DataField]
-        public ProtoId<CollectiveMindPrototype>? DefaultChannel = null;
+    [DataField]
+    public HashSet<ProtoId<CollectiveMindPrototype>> Channels = new();
 
-        [DataField]
-        public HashSet<ProtoId<CollectiveMindPrototype>> Channels = new();
+    [DataField]
+    public ProtoId<CollectiveMindPrototype>? DefaultChannel = null;
 
-        [DataField]
-        public bool HearAll = false;
+    [DataField]
+    public bool HearAll = false;
 
-        [DataField]
-        public bool SeeAllNames = false;
+    [DataField("minds")]
+    public Dictionary<string, int> Minds = new();
 
-        [DataField]
-        public bool RespectAccents = false;
+    [DataField]
+    public bool RespectAccents = false;
 
-        // Goobstation
-        /// <summary>
-        /// Whether the collective mind can be used while in critical condition
-        /// </summary>
-        [DataField]
-        public bool CanUseInCrit = false;
-    }
+    [DataField]
+    public bool SeeAllNames = false;
 }

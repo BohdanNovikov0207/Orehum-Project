@@ -3,14 +3,14 @@ using Robust.Shared.GameStates;
 
 namespace Content.Shared._Shitmed.Medical.Surgery.Wounds.Components;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class TourniquetableComponent : Component
 {
     public EntityUid? CurrentTourniquetEntity;
 
     [AutoNetworkedField]
-    public BodyPartSymmetry SeveredSymmetry = BodyPartSymmetry.None;
+    public BodyPartType SeveredPartType = BodyPartType.Head;
 
     [AutoNetworkedField]
-    public BodyPartType SeveredPartType = BodyPartType.Head;
+    public BodyPartSymmetry SeveredSymmetry = BodyPartSymmetry.None;
 }

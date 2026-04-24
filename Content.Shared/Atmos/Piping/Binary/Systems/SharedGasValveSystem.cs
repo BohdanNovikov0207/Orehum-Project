@@ -20,11 +20,9 @@ public abstract class SharedGasValveSystem : EntitySystem
         SubscribeLocalEvent<GasValveComponent, ExaminedEvent>(OnExamined);
     }
 
-    private void OnStartup(Entity<GasValveComponent> ent, ref ComponentStartup args)
-    {
+    private void OnStartup(Entity<GasValveComponent> ent, ref ComponentStartup args) =>
         // We call set in startup so it sets the appearance, node state, etc.
         Set(ent.Owner, ent.Comp, ent.Comp.Open);
-    }
 
     public virtual void Set(EntityUid uid, GasValveComponent component, bool value)
     {
@@ -32,15 +30,10 @@ public abstract class SharedGasValveSystem : EntitySystem
         Dirty(uid, component);
 
         if (TryComp<AppearanceComponent>(uid, out var appearance))
-        {
             _appearance.SetData(uid, FilterVisuals.Enabled, component.Open, appearance);
-        }
     }
 
-    public void Toggle(EntityUid uid, GasValveComponent component)
-    {
-        Set(uid, component, !component.Open);
-    }
+    public void Toggle(EntityUid uid, GasValveComponent component) => Set(uid, component, !component.Open);
 
     private void OnActivate(Entity<GasValveComponent> ent, ref ActivateInWorldEvent args)
     {
@@ -58,11 +51,10 @@ public abstract class SharedGasValveSystem : EntitySystem
         if (!Transform(ent).Anchored)
             return;
 
-        if (Loc.TryGetString("gas-valve-system-examined", out var str,
+        if (Loc.TryGetString("gas-valve-system-examined",
+                out var str,
                 ("statusColor", valve.Open ? "green" : "orange"),
                 ("open", valve.Open)))
-        {
             args.PushMarkup(str);
-        }
     }
 }

@@ -10,20 +10,20 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Access;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum AccessWireActionKey : byte
 {
     Key,
     Status,
     Pulsed,
-    PulseCancel
+    PulseCancel,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum LogWireActionKey : byte
 {
     Key,
     Status,
     Pulsed,
-    PulseCancel
+    PulseCancel,
 }

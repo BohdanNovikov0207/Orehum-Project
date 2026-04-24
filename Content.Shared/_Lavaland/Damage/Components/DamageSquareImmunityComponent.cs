@@ -32,11 +32,11 @@ namespace Content.Shared._Lavaland.Damage.Components;
 /// TODO: cool shader for this fella
 /// Also, maybe we should move this thing to DamageableSystem if it ever gets predictions
 /// </remarks>
-[RegisterComponent, NetworkedComponent]
-[AutoGenerateComponentState, AutoGenerateComponentPause]
+[RegisterComponent] [NetworkedComponent]
+[AutoGenerateComponentState] [AutoGenerateComponentPause]
 public sealed partial class DamageSquareImmunityComponent : Component
 {
     [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))]
-    [AutoPausedField, AutoNetworkedField]
+    [AutoPausedField] [AutoNetworkedField]
     public TimeSpan? ImmunityEndTime;
 }

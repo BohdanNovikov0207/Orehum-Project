@@ -100,6 +100,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Diagnostics.CodeAnalysis;
 using Content.Shared.Alert;
 using Content.Shared.Movement.Components;
 using Content.Shared.Movement.Systems;
@@ -110,23 +111,21 @@ using JetBrains.Annotations;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Timing;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Content.Shared.Nutrition.EntitySystems;
 
 [UsedImplicitly]
 public sealed class ThirstSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly IPrototypeManager _prototype = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly AlertsSystem _alerts = default!;
-    [Dependency] private readonly MovementSpeedModifierSystem _movement = default!;
-    [Dependency] private readonly SharedJetpackSystem _jetpack = default!;
-
     private static readonly ProtoId<SatiationIconPrototype> ThirstIconOverhydratedId = "ThirstIconOverhydrated";
     private static readonly ProtoId<SatiationIconPrototype> ThirstIconThirstyId = "ThirstIconThirsty";
     private static readonly ProtoId<SatiationIconPrototype> ThirstIconParchedId = "ThirstIconParched";
+    [Dependency] private readonly AlertsSystem _alerts = default!;
+    [Dependency] private readonly SharedJetpackSystem _jetpack = default!;
+    [Dependency] private readonly MovementSpeedModifierSystem _movement = default!;
+    [Dependency] private readonly IPrototypeManager _prototype = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -148,16 +147,23 @@ public sealed class ThirstSystem : EntitySystem
 
             DirtyField(uid, component, nameof(ThirstComponent.CurrentThirst));
         }
+
         component.NextUpdateTime = _timing.CurTime + component.NextUpdateTime;
         component.CurrentThirstThreshold = GetThirstThreshold(component, component.CurrentThirst);
-        component.LastThirstThreshold = ThirstThreshold.Okay; // TODO: Potentially change this -> Used Okay because no effects.
+        component.LastThirstThreshold =
+            ThirstThreshold.Okay; // TODO: Potentially change this -> Used Okay because no effects.
         // TODO: Check all thresholds make sense and throw if they don't.
         UpdateEffects(uid, component);
 
-        DirtyFields(uid, component, null, nameof(ThirstComponent.NextUpdateTime), nameof(ThirstComponent.CurrentThirstThreshold), nameof(ThirstComponent.LastThirstThreshold));
+        DirtyFields(uid,
+            component,
+            null,
+            nameof(ThirstComponent.NextUpdateTime),
+            nameof(ThirstComponent.CurrentThirstThreshold),
+            nameof(ThirstComponent.LastThirstThreshold));
 
         TryComp(uid, out MovementSpeedModifierComponent? moveMod);
-            _movement.RefreshMovementSpeedModifiers(uid, moveMod);
+        _movement.RefreshMovementSpeedModifiers(uid, moveMod);
     }
 
     private void OnRefreshMovespeed(EntityUid uid, ThirstComponent component, RefreshMovementSpeedModifiersEvent args)
@@ -170,14 +176,12 @@ public sealed class ThirstSystem : EntitySystem
         args.ModifySpeed(mod, mod);
     }
 
-    private void OnRejuvenate(EntityUid uid, ThirstComponent component, RejuvenateEvent args)
-    {
+    private void OnRejuvenate(EntityUid uid, ThirstComponent component, RejuvenateEvent args) =>
         SetThirst(uid, component, component.ThirstThresholds[ThirstThreshold.Okay]);
-    }
 
     private ThirstThreshold GetThirstThreshold(ThirstComponent component, float amount)
     {
-        ThirstThreshold result = ThirstThreshold.Dead;
+        var result = ThirstThreshold.Dead;
         var value = component.ThirstThresholds[ThirstThreshold.OverHydrated];
         foreach (var threshold in component.ThirstThresholds)
         {
@@ -191,10 +195,8 @@ public sealed class ThirstSystem : EntitySystem
         return result;
     }
 
-    public void ModifyThirst(EntityUid uid, ThirstComponent component, float amount)
-    {
+    public void ModifyThirst(EntityUid uid, ThirstComponent component, float amount) =>
         SetThirst(uid, component, component.CurrentThirst + amount);
-    }
 
     public void SetThirst(EntityUid uid, ThirstComponent component, float amount)
     {
@@ -222,7 +224,8 @@ public sealed class ThirstSystem : EntitySystem
         }
     }
 
-    public bool TryGetStatusIconPrototype(ThirstComponent component, [NotNullWhen(true)] out SatiationIconPrototype? prototype)
+    public bool TryGetStatusIconPrototype(ThirstComponent component,
+        [NotNullWhen(true)] out SatiationIconPrototype? prototype)
     {
         switch (component.CurrentThirstThreshold)
         {
@@ -248,21 +251,16 @@ public sealed class ThirstSystem : EntitySystem
 
     private void UpdateEffects(EntityUid uid, ThirstComponent component)
     {
-        if (IsMovementThreshold(component.LastThirstThreshold) != IsMovementThreshold(component.CurrentThirstThreshold) &&
-                TryComp(uid, out MovementSpeedModifierComponent? movementSlowdownComponent))
-        {
+        if (IsMovementThreshold(component.LastThirstThreshold) !=
+            IsMovementThreshold(component.CurrentThirstThreshold) &&
+            TryComp(uid, out MovementSpeedModifierComponent? movementSlowdownComponent))
             _movement.RefreshMovementSpeedModifiers(uid, movementSlowdownComponent);
-        }
 
         // Update UI
         if (ThirstComponent.ThirstThresholdAlertTypes.TryGetValue(component.CurrentThirstThreshold, out var alertId))
-        {
             _alerts.ShowAlert(uid, alertId);
-        }
         else
-        {
             _alerts.ClearAlertCategory(uid, component.ThirstyCategory);
-        }
 
         DirtyField(uid, component, nameof(ThirstComponent.LastThirstThreshold));
         DirtyField(uid, component, nameof(ThirstComponent.ActualDecayRate));
@@ -295,7 +293,8 @@ public sealed class ThirstSystem : EntitySystem
 
             default:
                 Log.Error($"No thirst threshold found for {component.CurrentThirstThreshold}");
-                throw new ArgumentOutOfRangeException($"No thirst threshold found for {component.CurrentThirstThreshold}");
+                throw new ArgumentOutOfRangeException(
+                    $"No thirst threshold found for {component.CurrentThirstThreshold}");
         }
     }
 

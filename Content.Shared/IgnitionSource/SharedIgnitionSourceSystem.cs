@@ -7,7 +7,7 @@ namespace Content.Shared.IgnitionSource;
 /// Ignites flammable gases when the ignition source is toggled on.
 /// Also makes the entity hot so that it can be used to ignite matchsticks, cigarettes ect.
 /// </summary>
-public abstract partial class SharedIgnitionSourceSystem : EntitySystem
+public abstract class SharedIgnitionSourceSystem : EntitySystem
 {
     public override void Initialize()
     {
@@ -18,20 +18,13 @@ public abstract partial class SharedIgnitionSourceSystem : EntitySystem
         SubscribeLocalEvent<IgnitionSourceComponent, IgnitionEvent>(OnIgnitionEvent);
     }
 
-    private void OnIsHot(Entity<IgnitionSourceComponent> ent, ref IsHotEvent args)
-    {
-        args.IsHot |= ent.Comp.Ignited;
-    }
+    private void OnIsHot(Entity<IgnitionSourceComponent> ent, ref IsHotEvent args) => args.IsHot |= ent.Comp.Ignited;
 
-    private void OnItemToggle(Entity<ItemToggleHotComponent> ent, ref ItemToggledEvent args)
-    {
+    private void OnItemToggle(Entity<ItemToggleHotComponent> ent, ref ItemToggledEvent args) =>
         SetIgnited(ent.Owner, args.Activated);
-    }
 
-    private void OnIgnitionEvent(Entity<IgnitionSourceComponent> ent, ref IgnitionEvent args)
-    {
+    private void OnIgnitionEvent(Entity<IgnitionSourceComponent> ent, ref IgnitionEvent args) =>
         SetIgnited((ent.Owner, ent.Comp), args.Ignite);
-    }
 
     /// <summary>
     /// Simply sets the ignited field to the ignited param.

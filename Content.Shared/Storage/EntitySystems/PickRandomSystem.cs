@@ -23,11 +23,11 @@ namespace Content.Shared.Storage.EntitySystems;
 
 public sealed class PickRandomSystem : EntitySystem
 {
-    [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
-    [Dependency] private readonly INetManager _net = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly SharedContainerSystem _container = default!;
     [Dependency] private readonly SharedHandsSystem _hands = default!;
+    [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
 
     public override void Initialize()
     {
@@ -43,7 +43,9 @@ public sealed class PickRandomSystem : EntitySystem
 
         var user = args.User;
 
-        var enabled = storage.Container.ContainedEntities.Any(item => _whitelistSystem.IsWhitelistPassOrNull(comp.Whitelist, item));
+        var enabled =
+            storage.Container.ContainedEntities.Any(item =>
+                _whitelistSystem.IsWhitelistPassOrNull(comp.Whitelist, item));
 
         // alt-click / alt-z to pick an item
         args.Verbs.Add(new AlternativeVerb
@@ -55,7 +57,7 @@ public sealed class PickRandomSystem : EntitySystem
             Impact = LogImpact.Low,
             Text = Loc.GetString(comp.VerbText),
             Disabled = !enabled,
-            Message = enabled ? null : Loc.GetString(comp.EmptyText, ("storage", uid))
+            Message = enabled ? null : Loc.GetString(comp.EmptyText, ("storage", uid)),
         });
     }
 
@@ -67,7 +69,9 @@ public sealed class PickRandomSystem : EntitySystem
         if (_net.IsClient)
             return;
 
-        var entities = storage.Container.ContainedEntities.Where(item => _whitelistSystem.IsWhitelistPassOrNull(comp.Whitelist, item)).ToArray();
+        var entities = storage.Container.ContainedEntities
+            .Where(item => _whitelistSystem.IsWhitelistPassOrNull(comp.Whitelist, item))
+            .ToArray();
 
         if (entities.Length == 0)
             return;

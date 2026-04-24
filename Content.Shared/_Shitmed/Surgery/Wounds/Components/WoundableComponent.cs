@@ -6,10 +6,10 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared._Shitmed.Medical.Surgery.Traumas;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Prototypes;
-using Content.Goobstation.Maths.FixedPoint;
 using Robust.Shared.Audio;
 using Robust.Shared.Containers;
 using Robust.Shared.GameStates;
@@ -18,9 +18,108 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared._Shitmed.Medical.Surgery.Wounds.Components;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class WoundableComponent : Component
 {
+    /// <summary>
+    /// Indicates whether wounds are allowed.
+    /// </summary>
+    [DataField]
+    public bool AllowWounds = true;
+
+    /// <summary>
+    /// How much bleeds will the woundable treat per tick
+    /// </summary>
+    [ViewVariables] [DataField]
+    public FixedPoint2 BleedingTreatmentAbility = 0.01f;
+
+    /// <summary>
+    /// How much the woundable is bleeding.
+    /// </summary>
+    [ViewVariables]
+    public FixedPoint2 Bleeds = FixedPoint2.Zero;
+
+    /// <summary>
+    /// At which amount of bleeds the woundable will stop healing.
+    /// </summary>
+    [ViewVariables] [DataField]
+    public FixedPoint2 BleedsThreshold = 3.5f;
+
+    /// <summary>
+    /// Container holding this woundables bone.
+    /// </summary>
+    [ViewVariables]
+    public Container Bone = new();
+
+    [DataField]
+    public EntProtoId BoneEntity = "Bone";
+
+    /// <summary>
+    /// Whether this woundable can bleed or not..
+    /// </summary>
+    [DataField]
+    public bool CanBleed = true;
+
+    /// <summary>
+    /// Whether this woundable can be removed from a body..
+    /// </summary>
+    [DataField]
+    public bool CanRemove = true;
+
+    /// <summary>
+    /// Set of UIDs representing child woundable entities.
+    /// </summary>
+    [ViewVariables]
+    public HashSet<EntityUid> ChildWoundables = [];
+
+    /// <summary>
+    /// The same as DamageableComponent's one
+    /// </summary>
+    [DataField("damageContainer")]
+    public ProtoId<DamageContainerPrototype>? DamageContainerID;
+
+    /// <summary>
+    /// Damage to inflict on the root when the woundable is amputated.
+    /// </summary>
+    [DataField]
+    public DamageSpecifier? DamageOnAmputate;
+
+    /// <summary>
+    /// At which amount of damage the woundable will stop healing.
+    /// </summary>
+    [DataField]
+    public FixedPoint2 DamageThreshold = 45;
+
+    /// <summary>
+    /// How big is the Woundable Entity, mostly used for trauma calculation, dodging and targeting
+    /// </summary>
+    [DataField]
+    public FixedPoint2 DodgeChance = 0.1;
+
+    /// <summary>
+    /// How much damage will be healed ACROSS all limb, for example if there are 2 wounds,
+    /// Healing will be shared across those 2 wounds.
+    /// </summary>
+    [DataField]
+    public FixedPoint2 HealAbility = 0.03;
+
+    /// <summary>
+    /// Multipliers applied to healing rate.
+    /// </summary>
+    public Dictionary<EntityUid, WoundableHealingMultiplier> HealingMultipliers = new();
+
+    /// <summary>
+    /// Integrity points of this woundable.
+    /// </summary>
+    [DataField]
+    public FixedPoint2 IntegrityCap;
+
+    /// <summary>
+    /// Whether this woundable's bone is exposed
+    /// </summary>
+    [DataField]
+    public bool IsBoneExposed = false;
+
     /// <summary>
     /// UID of the parent woundable entity. Can be null.
     /// </summary>
@@ -34,43 +133,9 @@ public sealed partial class WoundableComponent : Component
     public EntityUid RootWoundable;
 
     /// <summary>
-    /// Set of UIDs representing child woundable entities.
+    /// Multipliers of severity applied to this wound.
     /// </summary>
-    [ViewVariables]
-    public HashSet<EntityUid> ChildWoundables = [];
-
-    /// <summary>
-    /// Indicates whether wounds are allowed.
-    /// </summary>
-    [DataField]
-    public bool AllowWounds = true;
-
-    /// <summary>
-    /// The same as DamageableComponent's one
-    /// </summary>
-    [DataField("damageContainer")]
-    public ProtoId<DamageContainerPrototype>? DamageContainerID;
-
-    [DataField]
-    public EntProtoId BoneEntity = "Bone";
-
-    /// <summary>
-    /// Integrity points of this woundable.
-    /// </summary>
-    [DataField]
-    public FixedPoint2 IntegrityCap;
-
-    /// <summary>
-    /// How big is the Woundable Entity, mostly used for trauma calculation, dodging and targeting
-    /// </summary>
-    [DataField]
-    public FixedPoint2 DodgeChance = 0.1;
-
-    /// <summary>
-    /// Integrity points of this woundable.
-    /// </summary>
-    [DataField("integrity")]
-    public FixedPoint2 WoundableIntegrity;
+    public Dictionary<EntityUid, WoundableSeverityMultiplier> SeverityMultipliers = new();
 
     /// <summary>
     /// yeah
@@ -78,64 +143,23 @@ public sealed partial class WoundableComponent : Component
     [DataField(required: true)]
     public Dictionary<WoundableSeverity, FixedPoint2> Thresholds = new();
 
-    /// <summary>
-    /// How much damage will be healed ACROSS all limb, for example if there are 2 wounds,
-    /// Healing will be shared across those 2 wounds.
-    /// </summary>
     [DataField]
-    public FixedPoint2 HealAbility = 0.03;
+    public Dictionary<TraumaType, FixedPoint2> TraumaDeductions = new()
+    {
+        { TraumaType.Dismemberment, 0.3f },
+    };
 
-    /// <summary>
-    /// How much the woundable is bleeding.
-    /// </summary>
-    [ViewVariables]
-    public FixedPoint2 Bleeds = FixedPoint2.Zero;
-
-    /// <summary>
-    /// How much bleeds will the woundable treat per tick
-    /// </summary>
-    [ViewVariables, DataField]
-    public FixedPoint2 BleedingTreatmentAbility = 0.01f;
-
-    /// <summary>
-    /// At which amount of bleeds the woundable will stop healing.
-    /// </summary>
-    [ViewVariables, DataField]
-    public FixedPoint2 BleedsThreshold = 3.5f;
-
-    /// <summary>
-    /// At which amount of damage the woundable will stop healing.
-    /// </summary>
     [DataField]
-    public FixedPoint2 DamageThreshold = 45;
-
-    /// <summary>
-    /// Can the woundable heal damage?
-    /// </summary>
-    [ViewVariables]
-    public bool CanHealDamage => WoundableIntegrity > DamageThreshold && WoundableIntegrity < IntegrityCap;
-
-    /// <summary>
-    /// Can the woundable heal bleeds?
-    /// </summary>
-    [ViewVariables]
-    public bool CanHealBleeds => Bleeds > 0 && Bleeds < BleedsThreshold;
-
-    /// <summary>
-    /// Multipliers of severity applied to this wound.
-    /// </summary>
-    public Dictionary<EntityUid, WoundableSeverityMultiplier> SeverityMultipliers = new();
-
-    /// <summary>
-    /// Multipliers applied to healing rate.
-    /// </summary>
-    public Dictionary<EntityUid, WoundableHealingMultiplier> HealingMultipliers = new();
+    public SoundSpecifier WoundableDelimbedSound = new SoundCollectionSpecifier("WoundableDelimbed");
 
     [DataField]
     public SoundSpecifier WoundableDestroyedSound = new SoundCollectionSpecifier("WoundableDestroyed");
 
-    [DataField]
-    public SoundSpecifier WoundableDelimbedSound = new SoundCollectionSpecifier("WoundableDelimbed");
+    /// <summary>
+    /// Integrity points of this woundable.
+    /// </summary>
+    [DataField("integrity")]
+    public FixedPoint2 WoundableIntegrity;
 
     /// <summary>
     /// State of the woundable. Severity basically.
@@ -150,64 +174,39 @@ public sealed partial class WoundableComponent : Component
     public Container Wounds = new();
 
     /// <summary>
-    /// Container holding this woundables bone.
+    /// Can the woundable heal damage?
     /// </summary>
     [ViewVariables]
-    public Container Bone = new();
+    public bool CanHealDamage => WoundableIntegrity > DamageThreshold && WoundableIntegrity < IntegrityCap;
 
     /// <summary>
-    /// Whether this woundable can be removed from a body..
+    /// Can the woundable heal bleeds?
     /// </summary>
-    [DataField]
-    public bool CanRemove = true;
-
-    /// <summary>
-    /// Whether this woundable can bleed or not..
-    /// </summary>
-    [DataField]
-    public bool CanBleed = true;
-
-    /// <summary>
-    /// Whether this woundable's bone is exposed
-    /// </summary>
-    [DataField]
-    public bool IsBoneExposed = false;
-
-    /// <summary>
-    /// Damage to inflict on the root when the woundable is amputated.
-    /// </summary>
-    [DataField]
-    public DamageSpecifier? DamageOnAmputate;
-
-    [DataField]
-    public Dictionary<TraumaType, FixedPoint2> TraumaDeductions = new()
-    {
-        {TraumaType.Dismemberment, 0.3f},
-    };
+    [ViewVariables]
+    public bool CanHealBleeds => Bleeds > 0 && Bleeds < BleedsThreshold;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class WoundableComponentState : ComponentState
 {
-    public NetEntity? ParentWoundable;
-    public NetEntity RootWoundable;
+    public bool AllowWounds = true;
+    public FixedPoint2 Bleeds;
 
     public HashSet<NetEntity> ChildWoundables = [];
-
-    public bool AllowWounds = true;
 
     public ProtoId<DamageContainerPrototype>? DamageContainerID;
 
     public FixedPoint2 DodgeChance;
-
-    public FixedPoint2 WoundableIntegrity;
     public FixedPoint2 HealAbility;
-    public FixedPoint2 Bleeds;
-
-    public Dictionary<NetEntity, WoundableSeverityMultiplier> SeverityMultipliers = new();
     public Dictionary<NetEntity, WoundableHealingMultiplier> HealingMultipliers = new();
 
-    public WoundableSeverity WoundableSeverity;
-
     public float HealingRateAccumulated;
+    public NetEntity? ParentWoundable;
+    public NetEntity RootWoundable;
+
+    public Dictionary<NetEntity, WoundableSeverityMultiplier> SeverityMultipliers = new();
+
+    public FixedPoint2 WoundableIntegrity;
+
+    public WoundableSeverity WoundableSeverity;
 }

@@ -12,10 +12,10 @@ using Robust.Shared.GameStates;
 namespace Content.Shared.Temperature.Components;
 
 /// <summary>
-/// Adds thermal energy to entities with <see cref="TemperatureComponent"/> placed on it.
+/// Adds thermal energy to entities with <see cref="TemperatureComponent" /> placed on it.
 /// </summary>
-[RegisterComponent, Access(typeof(SharedEntityHeaterSystem))]
-[NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [Access(typeof(SharedEntityHeaterSystem))]
+[NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class EntityHeaterComponent : Component
 {
     /// <summary>
@@ -28,7 +28,7 @@ public sealed partial class EntityHeaterComponent : Component
     /// <summary>
     /// Current setting of the heater. If it is off or unpowered it won't heat anything.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public EntityHeaterSetting Setting = EntityHeaterSetting.Off;
 
     /// <summary>

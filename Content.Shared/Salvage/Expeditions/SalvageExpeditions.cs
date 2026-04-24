@@ -19,16 +19,20 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
 
 namespace Content.Shared.Salvage.Expeditions;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class SalvageExpeditionConsoleState : BoundUserInterfaceState
 {
-    public TimeSpan NextOffer;
+    public ushort ActiveMission;
     public bool Claimed;
     public bool Cooldown;
-    public ushort ActiveMission;
     public List<SalvageMissionParams> Missions;
+    public TimeSpan NextOffer;
 
-    public SalvageExpeditionConsoleState(TimeSpan nextOffer, bool claimed, bool cooldown, ushort activeMission, List<SalvageMissionParams> missions)
+    public SalvageExpeditionConsoleState(TimeSpan nextOffer,
+        bool claimed,
+        bool cooldown,
+        ushort activeMission,
+        List<SalvageMissionParams> missions)
     {
         NextOffer = nextOffer;
         Claimed = claimed;
@@ -41,7 +45,7 @@ public sealed class SalvageExpeditionConsoleState : BoundUserInterfaceState
 /// <summary>
 /// Used to interact with salvage expeditions and claim them.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class SalvageExpeditionConsoleComponent : Component
 {
     /// <summary>
@@ -51,7 +55,7 @@ public sealed partial class SalvageExpeditionConsoleComponent : Component
     public SoundSpecifier PrintSound = new SoundPathSpecifier("/Audio/Machines/terminal_insert_disc.ogg");
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class ClaimSalvageMessage : BoundUserInterfaceMessage
 {
     public ushort Index;
@@ -60,49 +64,49 @@ public sealed class ClaimSalvageMessage : BoundUserInterfaceMessage
 /// <summary>
 /// Added per station to store data on their available salvage missions.
 /// </summary>
-[RegisterComponent, AutoGenerateComponentPause]
+[RegisterComponent] [AutoGenerateComponentPause]
 public sealed partial class SalvageExpeditionDataComponent : Component
 {
-    /// <summary>
-    /// Is there an active salvage expedition.
-    /// </summary>
-    [ViewVariables]
-    public bool Claimed => ActiveMission != 0;
-
-    /// <summary>
-    /// Are we actively cooling down from the last salvage mission.
-    /// </summary>
-    [ViewVariables(VVAccess.ReadWrite), DataField("cooldown")]
-    public bool Cooldown = false;
-
-    /// <summary>
-    /// Nexy time salvage missions are offered.
-    /// </summary>
-    [ViewVariables(VVAccess.ReadWrite), DataField("nextOffer", customTypeSerializer:typeof(TimeOffsetSerializer))]
-    [AutoPausedField]
-    public TimeSpan NextOffer;
-
     [ViewVariables]
     public readonly Dictionary<ushort, SalvageMissionParams> Missions = new();
 
     [ViewVariables] public ushort ActiveMission;
 
+    /// <summary>
+    /// Are we actively cooling down from the last salvage mission.
+    /// </summary>
+    [ViewVariables(VVAccess.ReadWrite)] [DataField("cooldown")]
+    public bool Cooldown = false;
+
     public ushort NextIndex = 1;
+
+    /// <summary>
+    /// Nexy time salvage missions are offered.
+    /// </summary>
+    [ViewVariables(VVAccess.ReadWrite)] [DataField("nextOffer", customTypeSerializer: typeof(TimeOffsetSerializer))]
+    [AutoPausedField]
+    public TimeSpan NextOffer;
+
+    /// <summary>
+    /// Is there an active salvage expedition.
+    /// </summary>
+    [ViewVariables]
+    public bool Claimed => ActiveMission != 0;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed record SalvageMissionParams
 {
+    public string Difficulty = string.Empty;
+
     [ViewVariables]
     public ushort Index;
 
     [ViewVariables(VVAccess.ReadWrite)] public int Seed;
-
-    public string Difficulty = string.Empty;
 }
 
 /// <summary>
-/// Created from <see cref="SalvageMissionParams"/>. Only needed for data the client also needs for mission
+/// Created from <see cref="SalvageMissionParams" />. Only needed for data the client also needs for mission
 /// display.
 /// </summary>
 public sealed record SalvageMission(
@@ -117,19 +121,9 @@ public sealed record SalvageMission(
     List<string> Modifiers)
 {
     /// <summary>
-    /// Seed used for the mission.
+    /// Air mixture to be used for the mission's planet.
     /// </summary>
-    public readonly int Seed = Seed;
-
-    /// <summary>
-    /// <see cref="SalvageDungeonModPrototype"/> to be used.
-    /// </summary>
-    public readonly string Dungeon = Dungeon;
-
-    /// <summary>
-    /// <see cref="SalvageFactionPrototype"/> to be used.
-    /// </summary>
-    public readonly string Faction = Faction;
+    public readonly string Air = Air;
 
     /// <summary>
     /// Biome to be used for the mission.
@@ -137,19 +131,29 @@ public sealed record SalvageMission(
     public readonly string Biome = Biome;
 
     /// <summary>
-    /// Air mixture to be used for the mission's planet.
+    /// Lighting color to be used (AKA outdoor lighting).
     /// </summary>
-    public readonly string Air = Air;
+    public readonly Color? Color = Color;
+
+    /// <summary>
+    /// <see cref="SalvageDungeonModPrototype" /> to be used.
+    /// </summary>
+    public readonly string Dungeon = Dungeon;
+
+    /// <summary>
+    /// <see cref="SalvageFactionPrototype" /> to be used.
+    /// </summary>
+    public readonly string Faction = Faction;
+
+    /// <summary>
+    /// Seed used for the mission.
+    /// </summary>
+    public readonly int Seed = Seed;
 
     /// <summary>
     /// Temperature of the planet's atmosphere.
     /// </summary>
     public readonly float Temperature = Temperature;
-
-    /// <summary>
-    /// Lighting color to be used (AKA outdoor lighting).
-    /// </summary>
-    public readonly Color? Color = Color;
 
     /// <summary>
     /// Mission duration.
@@ -162,7 +166,7 @@ public sealed record SalvageMission(
     public List<string> Modifiers = Modifiers;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum SalvageConsoleUiKey : byte
 {
     Expedition,

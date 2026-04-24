@@ -8,8 +8,6 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Gibbing.Events;
 
-
-
 /// <summary>
 /// Called just before we actually gib the target entity
 /// </summary>
@@ -22,8 +20,7 @@ namespace Content.Shared.Gibbing.Events;
     GibContentsOption GibType,
     List<string>? AllowedContainers,
     List<string>? ExcludedContainers
-    );
-
+);
 
 /// <summary>
 /// Called just before we actually gib the target entity
@@ -40,7 +37,7 @@ namespace Content.Shared.Gibbing.Events;
 /// <param name="DroppedEntities">Any entities that are spilled out (if any)</param>
 [ByRefEvent] public record struct EntityGibbedEvent(EntityUid Target, List<EntityUid> DroppedEntities);
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum GibType : byte
 {
     Skip,
@@ -52,5 +49,5 @@ public enum GibContentsOption : byte
 {
     Skip,
     Drop,
-    Gib
+    Gib,
 }

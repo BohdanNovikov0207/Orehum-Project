@@ -49,9 +49,7 @@ public abstract partial class SharedGunSystem
                 return;
 
             if (component.Count != null)
-            {
                 component.Count--;
-            }
 
             // Goob edit start
             var proto = component.Proto ?? prototypes!.Pick(Random);
@@ -65,7 +63,9 @@ public abstract partial class SharedGunSystem
         Dirty(uid, component);
     }
 
-    private void OnBasicEntityAmmoCount(EntityUid uid, BasicEntityAmmoProviderComponent component, ref GetAmmoCountEvent args)
+    private void OnBasicEntityAmmoCount(EntityUid uid,
+        BasicEntityAmmoProviderComponent component,
+        ref GetAmmoCountEvent args)
     {
         args.Capacity = component.Capacity ?? int.MaxValue;
         args.Count = component.Count ?? int.MaxValue;
@@ -84,6 +84,7 @@ public abstract partial class SharedGunSystem
     }
 
     #region Public API
+
     public bool ChangeBasicEntityAmmoCount(EntityUid uid, int delta, BasicEntityAmmoProviderComponent? component = null)
     {
         if (!Resolve(uid, ref component, false) || component.Count == null)

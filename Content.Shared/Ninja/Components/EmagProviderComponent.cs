@@ -19,7 +19,7 @@ namespace Content.Shared.Ninja.Components;
 /// Component for emagging things on click.
 /// No charges but checks against a whitelist.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(EmagProviderSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(EmagProviderSystem))]
 public sealed partial class EmagProviderComponent : Component
 {
     /// <summary>
@@ -29,10 +29,10 @@ public sealed partial class EmagProviderComponent : Component
     public ProtoId<TagPrototype> AccessBreakerImmuneTag = "AccessBreakerImmune";
 
     /// <summary>
-    /// Whitelist that entities must be on to work.
+    /// What sound should the emag play when used
     /// </summary>
     [DataField]
-    public EntityWhitelist? Whitelist;
+    public SoundSpecifier EmagSound = new SoundCollectionSpecifier("sparks");
 
     /// <summary>
     /// What type of emag this will provide.
@@ -41,8 +41,8 @@ public sealed partial class EmagProviderComponent : Component
     public EmagType EmagType = EmagType.Access;
 
     /// <summary>
-    /// What sound should the emag play when used
+    /// Whitelist that entities must be on to work.
     /// </summary>
     [DataField]
-    public SoundSpecifier EmagSound = new SoundCollectionSpecifier("sparks");
+    public EntityWhitelist? Whitelist;
 }

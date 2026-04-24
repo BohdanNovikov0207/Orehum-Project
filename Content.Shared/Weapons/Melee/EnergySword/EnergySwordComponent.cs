@@ -11,18 +11,18 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Weapons.Melee.EnergySword;
 
-[RegisterComponent, NetworkedComponent, Access(typeof(EnergySwordSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(EnergySwordSystem))]
 [AutoGenerateComponentState]
 public sealed partial class EnergySwordComponent : Component
 {
     /// <summary>
     /// What color the blade will be when activated.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public Color ActivatedColor = Color.DodgerBlue;
 
     /// <summary>
-    ///     A color option list for the random color picker.
+    /// A color option list for the random color picker.
     /// </summary>
     [DataField]
     public List<Color> ColorOptions = new()
@@ -31,38 +31,37 @@ public sealed partial class EnergySwordComponent : Component
         Color.DodgerBlue,
         Color.Aqua,
         Color.MediumSpringGreen,
-        Color.MediumOrchid
+        Color.MediumOrchid,
     };
+
+    /// <summary>
+    /// RGB cycle rate for hacked e-swords.
+    /// </summary>
+    [DataField]
+    public float CycleRate = 1f;
 
     /// <summary>
     /// Whether the energy sword has been pulsed by a multitool,
     /// causing the blade to cycle RGB colors.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public bool Hacked;
-
-    /// <summary>
-    ///     RGB cycle rate for hacked e-swords.
-    /// </summary>
-    [DataField]
-    public float CycleRate = 1f;
 }
 
-
 // Goobstation-EsColorPicker-Start
-[NetSerializable, Serializable]
+[NetSerializable] [Serializable]
 public enum EsColorPickerMenu : byte
 {
     Key,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class EsColorChangedMessage(Color color) : BoundUserInterfaceMessage
 {
     public Color Color = color;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class EsHackedStateChangedMessage(bool state) : BoundUserInterfaceMessage
 {
     public bool State = state;

@@ -25,11 +25,11 @@ namespace Content.Shared._Goobstation.Weapons.SmartGun;
 
 public abstract class SharedLaserPointerSystem : EntitySystem
 {
-    [Dependency] protected readonly IGameTiming Timing = default!;
-    [Dependency] private readonly INetManager _net = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
+    [Dependency] private readonly INetManager _net = default!;
     [Dependency] private readonly SharedPhysicsSystem _physics = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
+    [Dependency] protected readonly IGameTiming Timing = default!;
 
     public override void Initialize()
     {
@@ -131,7 +131,7 @@ public abstract class SharedLaserPointerSystem : EntitySystem
         var rayLength = 15f;
 
         // People crawling under objects hit every object even if they are not aiming at it.
-        var crawling = (TryComp<CrawlUnderObjectsComponent>(xform.ParentUid, out var crawl) && crawl.Enabled);
+        var crawling = TryComp<CrawlUnderObjectsComponent>(xform.ParentUid, out var crawl) && crawl.Enabled;
 
         var (pos, rot) = _transform.GetWorldPositionRotation(parentXform);
         var dir = direction ?? rot.ToWorldVec();
@@ -160,31 +160,24 @@ public abstract class SharedLaserPointerSystem : EntitySystem
         AddLine(laserPointer, targetedEntity == null ? comp.DefaultColor : comp.TargetedColor, pos, end);
     }
 
-    private void OnTerminating(Entity<LaserPointerComponent> ent, ref EntityTerminatingEvent args)
-    {
+    private void OnTerminating(Entity<LaserPointerComponent> ent, ref EntityTerminatingEvent args) =>
         RemoveLine(GetNetEntity(ent.Owner));
-    }
 
-    private void OnUnwield(Entity<LaserPointerComponent> ent, ref ItemUnwieldedEvent args)
-    {
+    private void OnUnwield(Entity<LaserPointerComponent> ent, ref ItemUnwieldedEvent args) =>
         RemoveLine(GetNetEntity(ent.Owner));
-    }
 
-    private void OnWield(Entity<LaserPointerComponent> ent, ref ItemWieldedEvent args)
-    {
+    private void OnWield(Entity<LaserPointerComponent> ent, ref ItemWieldedEvent args) =>
         _audio.PlayPredicted(ent.Comp.Sound, ent, args.User);
-    }
 
     protected virtual void PvsOverride(EntityUid entity) { }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class LaserPointerEntityHoveredEvent(NetEntity? hovered, Vector2? dir, NetEntity pointer)
     : EntityEventArgs
 {
-    public NetEntity? Hovered = hovered;
-
     public Vector2? Dir = dir;
+    public NetEntity? Hovered = hovered;
 
     public NetEntity LaserPointerEntity = pointer;
 }

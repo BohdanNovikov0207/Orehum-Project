@@ -9,11 +9,7 @@ namespace Content.Shared.EntityTable.Conditions;
 /// </summary>
 public sealed partial class PlayerCountCondition : EntityTableCondition
 {
-    /// <summary>
-    /// Minimum players of needed for this condition to succeed. Inclusive.
-    /// </summary>
-    [DataField]
-    public int Min = int.MinValue;
+    private static ISharedPlayerManager? _playerManager;
 
     /// <summary>
     /// Maximum numbers of players there can be for this condition to succeed. Inclusive.
@@ -21,9 +17,16 @@ public sealed partial class PlayerCountCondition : EntityTableCondition
     [DataField]
     public int Max = int.MaxValue;
 
-    private static ISharedPlayerManager? _playerManager;
+    /// <summary>
+    /// Minimum players of needed for this condition to succeed. Inclusive.
+    /// </summary>
+    [DataField]
+    public int Min = int.MinValue;
 
-    protected override bool EvaluateImplementation(EntityTableSelector root, IEntityManager entMan, IPrototypeManager proto, EntityTableContext ctx)
+    protected override bool EvaluateImplementation(EntityTableSelector root,
+        IEntityManager entMan,
+        IPrototypeManager proto,
+        EntityTableContext ctx)
     {
         // Don't resolve this repeatedly
         _playerManager ??= IoCManager.Resolve<ISharedPlayerManager>();

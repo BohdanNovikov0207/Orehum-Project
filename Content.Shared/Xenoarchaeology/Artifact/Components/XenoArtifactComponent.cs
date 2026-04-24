@@ -15,10 +15,37 @@ namespace Content.Shared.Xenoarchaeology.Artifact.Components;
 /// This is used for handling interactions with artifacts as well as
 /// storing data about artifact node graphs.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(SharedXenoArtifactSystem)), AutoGenerateComponentState, AutoGenerateComponentPause]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(SharedXenoArtifactSystem))] [AutoGenerateComponentState]
+[AutoGenerateComponentPause]
 public sealed partial class XenoArtifactComponent : Component
 {
     public static string NodeContainerId = "node-container";
+
+    /// <summary>
+    /// The nodes in this artifact that are currently "active."
+    /// This is cached and updated when nodes are removed, added, or unlocked.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public List<NetEntity> CachedActiveNodes = new();
+
+    /// <summary>
+    /// Cache of interconnected node chunks - segments.
+    /// This is cached and updated when nodes are removed, added, or unlocked.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public List<List<NetEntity>> CachedSegments = new();
+
+    /// <summary>
+    /// Sound effect to be played when artifact node is force-activated.
+    /// </summary>
+    [DataField]
+    public SoundSpecifier? ForceActivationSoundSpecifier = new SoundCollectionSpecifier("ArtifactForceActivation")
+    {
+        Params = new AudioParams
+        {
+            Variation = 0.1f,
+        },
+    };
 
     /// <summary>
     /// Marker, if nodes graph should be generated for artifact.
@@ -33,33 +60,26 @@ public sealed partial class XenoArtifactComponent : Component
     public Container NodeContainer = default!;
 
     /// <summary>
-    /// The nodes in this artifact that are currently "active."
-    /// This is cached and updated when nodes are removed, added, or unlocked.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public List<NetEntity> CachedActiveNodes = new();
-
-    /// <summary>
-    /// Cache of interconnected node chunks - segments.
-    /// This is cached and updated when nodes are removed, added, or unlocked.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public List<List<NetEntity>> CachedSegments = new();
-
-    /// <summary>
-    /// Marker, if true - node activations should not happen.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public bool Suppressed;
-
-    /// <summary>
     /// A multiplier applied to the calculated point value
     /// to determine the monetary value of the artifact.
     /// </summary>
     [DataField]
     public float PriceMultiplier = 0.10f;
 
+    /// <summary>
+    /// Action that allows the artifact to self activate.
+    /// </summary>
+    [DataField]
+    public EntProtoId<InstantActionComponent> SelfActivateAction = "ActionArtifactActivate";
+
+    /// <summary>
+    /// Marker, if true - node activations should not happen.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public bool Suppressed;
+
     #region Unlocking
+
     /// <summary>
     /// How long does the unlocking state last by default.
     /// </summary>
@@ -81,17 +101,20 @@ public sealed partial class XenoArtifactComponent : Component
     /// <summary>
     /// When next unlock session can be triggered.
     /// </summary>
-    [DataField, AutoPausedField]
+    [DataField] [AutoPausedField]
     public TimeSpan NextUnlockTime;
+
     #endregion
 
     // NOTE: you should not be accessing any of these values directly. Use the methods in SharedXenoArtifactSystem.Graph
+
     #region Graph
+
     /// <summary>
     /// List of all nodes currently on this artifact.
-    /// Indexes are used as a lookup table for <see cref="NodeAdjacencyMatrix"/>.
+    /// Indexes are used as a lookup table for <see cref="NodeAdjacencyMatrix" />.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public NetEntity?[] NodeVertices = [];
 
     /// <summary>
@@ -99,11 +122,12 @@ public sealed partial class XenoArtifactComponent : Component
     /// A value of "true" denotes an directed edge from node1 to node2, where the location of the vertex is (node1, node2)
     /// A value of "false" denotes no edge.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public List<List<bool>> NodeAdjacencyMatrix = new();
 
     public int NodeAdjacencyMatrixRows => NodeAdjacencyMatrix.Count;
     public int NodeAdjacencyMatrixColumns => NodeAdjacencyMatrix.TryGetValue(0, out var value) ? value.Count : 0;
+
     #endregion
 
     #region GenerationInfo
@@ -139,7 +163,7 @@ public sealed partial class XenoArtifactComponent : Component
     [DataField]
     public EntityTableSelector EffectsTable = new NestedSelector
     {
-        TableId = "XenoArtifactEffectsDefaultTable"
+        TableId = "XenoArtifactEffectsDefaultTable",
     };
 
     /// <summary>
@@ -147,25 +171,8 @@ public sealed partial class XenoArtifactComponent : Component
     /// </summary>
     [DataField]
     public ProtoId<WeightedRandomXenoArchTriggerPrototype> TriggerWeights = "DefaultTriggers";
+
     #endregion
-
-    /// <summary>
-    /// Sound effect to be played when artifact node is force-activated.
-    /// </summary>
-    [DataField]
-    public SoundSpecifier? ForceActivationSoundSpecifier = new SoundCollectionSpecifier("ArtifactForceActivation")
-    {
-        Params = new()
-        {
-            Variation = 0.1f
-        }
-    };
-
-    /// <summary>
-    /// Action that allows the artifact to self activate.
-    /// </summary>
-    [DataField]
-    public EntProtoId<InstantActionComponent> SelfActivateAction = "ActionArtifactActivate";
 }
 
 /// <summary>

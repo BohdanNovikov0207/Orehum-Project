@@ -3,12 +3,12 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared._Shitmed.Tourniquet;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class TourniquetDoAfterEvent : SimpleDoAfterEvent
 {
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class RemoveTourniquetDoAfterEvent : SimpleDoAfterEvent
 {
 }

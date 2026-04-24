@@ -14,17 +14,26 @@ using Robust.Shared.Utility;
 
 namespace Content.Shared._Shitmed.ItemSwitch.Components;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState(true)]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState(true)]
 public sealed partial class ItemSwitchComponent : Component
 {
     /// <summary>
-    ///     The item's toggle state.
+    /// The default state of an item, which is also the state it reverts to when out of power.
     /// </summary>
-    [DataField, AutoNetworkedField]
-    public string State;
+    [DataField]
+    public string? DefaultState;
 
-    [DataField(readOnly: true)]
-    public Dictionary<string, ItemSwitchState> States = [];
+    /// <summary>
+    /// Whether the item currently has enough power to sustain a state.
+    /// </summary>
+    [DataField]
+    public bool IsPowered = true;
+
+    /// <summary>
+    /// Whether the item requires power to sustain a state.
+    /// </summary>
+    [DataField]
+    public bool NeedsPower;
 
     /// <summary>
     /// Can the entity be activated in the world.
@@ -40,72 +49,65 @@ public sealed partial class ItemSwitchComponent : Component
     public bool OnUse = true;
 
     /// <summary>
-    ///     Whether the item's toggle can be predicted by the client.
+    /// Whether the item's toggle can be predicted by the client.
     /// </summary>
-    /// /// <remarks>
+    /// ///
+    /// <remarks>
     /// If server-side systems affect the item's toggle, like charge/fuel systems, then the item is not predictable.
     /// </remarks>
     [DataField]
     public bool Predictable = true;
 
     /// <summary>
-    ///     Whether the item's currently toggled state should be shown in the UI.
+    /// Whether the item's currently toggled state should be shown in the UI.
     /// </summary>
     [DataField]
     public bool ShowLabel;
 
     /// <summary>
-    ///     Whether the item requires power to sustain a state.
+    /// The item's toggle state.
     /// </summary>
-    [DataField]
-    public bool NeedsPower;
+    [DataField] [AutoNetworkedField]
+    public string State;
 
-    /// <summary>
-    ///     Whether the item currently has enough power to sustain a state.
-    /// </summary>
-    [DataField]
-    public bool IsPowered = true;
-
-    /// <summary>
-    ///     The default state of an item, which is also the state it reverts to when out of power.
-    /// </summary>
-    [DataField]
-    public string? DefaultState;
+    [DataField(readOnly: true)]
+    public Dictionary<string, ItemSwitchState> States = [];
 
     public ItemSwitchComponent(string state)
     {
         State = state;
     }
 }
+
 [DataDefinition]
 public sealed partial class ItemSwitchState : BoundUserInterfaceMessage
 {
     [DataField]
-    public string? Verb;
-
-    [DataField]
-    public SoundSpecifier? SoundStateActivate;
-
-    [DataField]
-    public SoundSpecifier? SoundFailToActivate;
-
-    [DataField]
     public ComponentRegistry? Components;
+
+    /// <summary>
+    /// Amount of energy consumed per swing
+    /// </summary>
+    [DataField]
+    public int EnergyPerUse;
+
+    [DataField]
+    public bool Hidden;
 
     [DataField]
     public bool RemoveComponents = true;
 
     [DataField]
+    public SoundSpecifier? SoundFailToActivate;
+
+    [DataField]
+    public SoundSpecifier? SoundStateActivate;
+
+    [DataField]
     public SpriteSpecifier? Sprite;
 
     [DataField]
-    public bool Hidden;
-
-    /// <summary>
-    ///     Amount of energy consumed per swing
-    /// </summary>
-    [DataField]
-    public int EnergyPerUse;
+    public string? Verb;
 
     public ItemSwitchState(string verb)
     {
@@ -121,7 +123,8 @@ public record struct ItemSwitchAttemptEvent()
 {
     public bool Cancelled = false;
     public required EntityUid? User { get; init; }
-    public required  string State { get; init; }
+    public required string State { get; init; }
+
     /// <summary>
     /// Pop-up that gets shown to users explaining why the attempt was cancelled.
     /// </summary>

@@ -6,9 +6,9 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Damage;
 using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Chemistry.Reagent;
+using Content.Shared.Damage;
 using Robust.Shared.Prototypes;
 
 namespace Content.Shared._Goobstation.Heretic.Components;
@@ -16,34 +16,11 @@ namespace Content.Shared._Goobstation.Heretic.Components;
 [RegisterComponent]
 public sealed partial class LeechingWalkComponent : Component
 {
-    public override bool SessionSpecific => true;
+    [DataField]
+    public FixedPoint2 BloodHeal = 5f;
 
     [DataField]
     public FixedPoint2 BoneHeal = -5;
-
-    [DataField]
-    public DamageSpecifier ToHeal = new()
-    {
-        DamageDict =
-        {
-            {"Blunt", -1},
-            {"Slash", -1},
-            {"Piercing", -1},
-            {"Heat", -1},
-            {"Cold", -1},
-            {"Shock", -1},
-            {"Asphyxiation", -1},
-            {"Bloodloss", -1},
-            {"Caustic", -1},
-            {"Poison", -1},
-            {"Radiation", -1},
-            {"Cellular", -1},
-            {"Holy", -1},
-        },
-    };
-
-    [DataField]
-    public float StaminaHeal = 5f;
 
     [DataField]
     public float ChemPurgeRate = 3f;
@@ -52,11 +29,34 @@ public sealed partial class LeechingWalkComponent : Component
     public ProtoId<ReagentPrototype> ExcludedReagent = "EldritchEssence";
 
     [DataField]
-    public FixedPoint2 BloodHeal = 5f;
+    public float StaminaHeal = 5f;
 
     [DataField]
     public TimeSpan StunReduction = TimeSpan.FromSeconds(0.5f);
 
     [DataField]
     public float TargetTemperature = 310f;
+
+    [DataField]
+    public DamageSpecifier ToHeal = new()
+    {
+        DamageDict =
+        {
+            { "Blunt", -1 },
+            { "Slash", -1 },
+            { "Piercing", -1 },
+            { "Heat", -1 },
+            { "Cold", -1 },
+            { "Shock", -1 },
+            { "Asphyxiation", -1 },
+            { "Bloodloss", -1 },
+            { "Caustic", -1 },
+            { "Poison", -1 },
+            { "Radiation", -1 },
+            { "Cellular", -1 },
+            { "Holy", -1 },
+        },
+    };
+
+    public override bool SessionSpecific => true;
 }

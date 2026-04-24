@@ -8,7 +8,7 @@ using Content.Shared.Prying.Components;
 
 namespace Content.Shared._DV.Prying.Systems;
 
-public sealed partial class PlayerToolModifierSystem : EntitySystem
+public sealed class PlayerToolModifierSystem : EntitySystem
 {
     public override void Initialize()
     {
@@ -17,8 +17,6 @@ public sealed partial class PlayerToolModifierSystem : EntitySystem
         SubscribeLocalEvent<PlayerToolModifierComponent, GetPryTimeModifierEvent>(OnPry);
     }
 
-    private void OnPry(Entity<PlayerToolModifierComponent> ent, ref GetPryTimeModifierEvent args)
-    {
+    private void OnPry(Entity<PlayerToolModifierComponent> ent, ref GetPryTimeModifierEvent args) =>
         args.PryTimeModifier *= ent.Comp.PryTimeMultiplier;
-    }
 }

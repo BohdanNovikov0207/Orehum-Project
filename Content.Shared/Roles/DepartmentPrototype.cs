@@ -85,16 +85,13 @@ using Robust.Shared.Prototypes;
 namespace Content.Shared.Roles;
 
 [Prototype]
-public sealed partial class DepartmentPrototype : IPrototype
+public sealed class DepartmentPrototype : IPrototype
 {
-    [IdDataField]
-    public string ID { get; private set; } = string.Empty;
-
     /// <summary>
-    /// The name LocId of the department that will be displayed in the various menus.
+    /// A color representing this department to use for text.
     /// </summary>
     [DataField(required: true)]
-    public LocId Name = string.Empty;
+    public Color Color;
 
     /// <summary>
     /// A description LocId to display in the character menu as an explanation of the department's function.
@@ -103,20 +100,26 @@ public sealed partial class DepartmentPrototype : IPrototype
     public LocId Description = string.Empty;
 
     /// <summary>
-    /// A color representing this department to use for text.
+    /// Toggles the display of the department in the priority setting menu in the character editor.
+    /// </summary>
+    [DataField]
+    public bool EditorHidden;
+
+    /// <summary>
+    /// The name LocId of the department that will be displayed in the various menus.
     /// </summary>
     [DataField(required: true)]
-    public Color Color;
-
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
-    public List<ProtoId<JobPrototype>> Roles = new();
+    public LocId Name = string.Empty;
 
     /// <summary>
     /// Whether this is a primary department or not.
     /// For example, CE's primary department is engineering since Command has primary: false.
     /// </summary>
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    [DataField] [ViewVariables(VVAccess.ReadWrite)]
     public bool Primary = true;
+
+    [DataField] [ViewVariables(VVAccess.ReadWrite)]
+    public List<ProtoId<JobPrototype>> Roles = new();
 
     /// <summary>
     /// Departments with a higher weight sorted before other departments in UI.
@@ -124,16 +127,13 @@ public sealed partial class DepartmentPrototype : IPrototype
     [DataField]
     public int Weight { get; private set; }
 
-    /// <summary>
-    /// Toggles the display of the department in the priority setting menu in the character editor.
-    /// </summary>
-    [DataField]
-    public bool EditorHidden;
+    [IdDataField]
+    public string ID { get; } = string.Empty;
 }
 
 /// <summary>
-/// Sorts <see cref="DepartmentPrototype"/> appropriately for display in the UI,
-/// respecting their <see cref="DepartmentPrototype.Weight"/>.
+/// Sorts <see cref="DepartmentPrototype" /> appropriately for display in the UI,
+/// respecting their <see cref="DepartmentPrototype.Weight" />.
 /// </summary>
 public sealed class DepartmentUIComparer : IComparer<DepartmentPrototype>
 {

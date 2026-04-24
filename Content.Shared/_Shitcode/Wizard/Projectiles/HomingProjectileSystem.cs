@@ -16,13 +16,13 @@ namespace Content.Shared._Goobstation.Wizard.Projectiles;
 
 public sealed class HomingProjectileSystem : EntitySystem
 {
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly RotateToFaceSystem _rotate = default!;
-    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
     [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
+    [Dependency] private readonly RotateToFaceSystem _rotate = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
+    private EntityQuery<FrozenComponent> _frozenQuery;
 
     private EntityQuery<TransformComponent> _xformQuery;
-    private EntityQuery<FrozenComponent> _frozenQuery;
 
     public override void Initialize()
     {

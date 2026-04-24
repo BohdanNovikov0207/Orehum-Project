@@ -73,8 +73,6 @@ using Content.Shared.Whitelist;
 using JetBrains.Annotations;
 using Robust.Shared.Audio;
 using Robust.Shared.Audio.Systems;
-using Robust.Shared.GameStates;
-using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Network;
 using Robust.Shared.Physics.Components;
@@ -90,15 +88,15 @@ namespace Content.Shared.Sound;
 [UsedImplicitly]
 public abstract class SharedEmitSoundSystem : EntitySystem
 {
-    [Dependency] protected readonly IGameTiming Timing = default!;
-    [Dependency] private readonly INetManager _netMan = default!;
-    [Dependency] protected readonly IRobustRandom Random = default!;
-    [Dependency] private   readonly SharedAmbientSoundSystem _ambient = default!;
-    [Dependency] private   readonly SharedAudioSystem _audioSystem = default!;
-    [Dependency] protected readonly SharedPopupSystem Popup = default!;
+    [Dependency] private readonly SharedAmbientSoundSystem _ambient = default!;
+    [Dependency] private readonly SharedAudioSystem _audioSystem = default!;
     [Dependency] private readonly SharedMapSystem _map = default!;
-    [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
+    [Dependency] private readonly INetManager _netMan = default!;
     [Dependency] private readonly TurfSystem _turf = default!;
+    [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
+    [Dependency] protected readonly SharedPopupSystem Popup = default!;
+    [Dependency] protected readonly IRobustRandom Random = default!;
+    [Dependency] protected readonly IGameTiming Timing = default!;
 
     public override void Initialize()
     {
@@ -118,12 +116,12 @@ public abstract class SharedEmitSoundSystem : EntitySystem
         SubscribeLocalEvent<SoundWhileAliveComponent, MobStateChangedEvent>(OnMobState);
     }
 
-    private void HandleEmitSoundOnUIOpen(EntityUid uid, EmitSoundOnUIOpenComponent component, AfterActivatableUIOpenEvent args)
+    private void HandleEmitSoundOnUIOpen(EntityUid uid,
+        EmitSoundOnUIOpenComponent component,
+        AfterActivatableUIOpenEvent args)
     {
         if (_whitelistSystem.IsBlacklistFail(component.Blacklist, args.User))
-        {
             TryEmitSound(uid, component, args.User);
-        }
     }
 
     private void OnMobState(Entity<SoundWhileAliveComponent> entity, ref MobStateChangedEvent args)
@@ -138,19 +136,15 @@ public abstract class SharedEmitSoundSystem : EntitySystem
         _ambient.SetAmbience(entity.Owner, args.NewMobState != MobState.Dead);
     }
 
-    private void OnEmitSpawnOnInit(EntityUid uid, EmitSoundOnSpawnComponent component, MapInitEvent args)
-    {
+    private void OnEmitSpawnOnInit(EntityUid uid, EmitSoundOnSpawnComponent component, MapInitEvent args) =>
         TryEmitSound(uid, component, predict: false);
-    }
 
     private void OnEmitSoundOnLand(EntityUid uid, BaseEmitSoundComponent component, ref LandEvent args)
     {
         if (!args.PlaySound ||
             !TryComp(uid, out TransformComponent? xform) ||
             !TryComp<MapGridComponent>(xform.GridUid, out var grid))
-        {
             return;
-        }
 
         var tile = _map.GetTileRef(xform.GridUid.Value, grid, xform.Coordinates);
 
@@ -171,12 +165,12 @@ public abstract class SharedEmitSoundSystem : EntitySystem
             args.Handled = true;
     }
 
-    private void OnEmitSoundOnThrown(EntityUid uid, BaseEmitSoundComponent component, ref ThrownEvent args)
-    {
+    private void OnEmitSoundOnThrown(EntityUid uid, BaseEmitSoundComponent component, ref ThrownEvent args) =>
         TryEmitSound(uid, component, args.User, false);
-    }
 
-    private void OnEmitSoundOnActivateInWorld(EntityUid uid, EmitSoundOnActivateComponent component, ActivateInWorldEvent args)
+    private void OnEmitSoundOnActivateInWorld(EntityUid uid,
+        EmitSoundOnActivateComponent component,
+        ActivateInWorldEvent args)
     {
         // Intentionally not checking whether the interaction has already been handled.
         TryEmitSound(uid, component, args.User);
@@ -185,24 +179,22 @@ public abstract class SharedEmitSoundSystem : EntitySystem
             args.Handled = true;
     }
 
-    private void OnEmitSoundOnPickup(EntityUid uid, EmitSoundOnPickupComponent component, GotEquippedHandEvent args)
-    {
+    private void OnEmitSoundOnPickup(EntityUid uid, EmitSoundOnPickupComponent component, GotEquippedHandEvent args) =>
         TryEmitSound(uid, component, args.User);
-    }
 
-    private void OnEmitSoundOnDrop(EntityUid uid, EmitSoundOnDropComponent component, DroppedEvent args)
-    {
+    private void OnEmitSoundOnDrop(EntityUid uid, EmitSoundOnDropComponent component, DroppedEvent args) =>
         TryEmitSound(uid, component, args.User);
-    }
 
     private void OnEmitSoundOnInteractUsing(Entity<EmitSoundOnInteractUsingComponent> ent, ref InteractUsingEvent args)
     {
         if (_whitelistSystem.IsWhitelistPass(ent.Comp.Whitelist, args.Used))
-        {
             TryEmitSound(ent, ent.Comp, args.User);
-        }
     }
-    protected void TryEmitSound(EntityUid uid, BaseEmitSoundComponent component, EntityUid? user=null, bool predict=true)
+
+    protected void TryEmitSound(EntityUid uid,
+        BaseEmitSoundComponent component,
+        EntityUid? user = null,
+        bool predict = true)
     {
         if (component.Sound == null)
             return;
@@ -234,9 +226,7 @@ public abstract class SharedEmitSoundSystem : EntitySystem
             physics.LinearVelocity.Length() < component.MinimumVelocity ||
             Timing.CurTime < component.NextSound ||
             MetaData(uid).EntityPaused)
-        {
             return;
-        }
 
         const float MaxVolumeVelocity = 10f;
         const float MinVolume = -10f;
@@ -248,9 +238,7 @@ public abstract class SharedEmitSoundSystem : EntitySystem
         var sound = component.Sound;
 
         if (_netMan.IsServer && sound != null)
-        {
             _audioSystem.PlayPvs(_audioSystem.ResolveSound(sound), uid, AudioParams.Default.WithVolume(volume));
-        }
     }
 
     public virtual void SetEnabled(Entity<SpamEmitSoundComponent?> entity, bool enabled)

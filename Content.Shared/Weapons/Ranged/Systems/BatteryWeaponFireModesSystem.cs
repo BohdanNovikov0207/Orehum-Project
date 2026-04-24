@@ -9,7 +9,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Access.Components;
 using Content.Shared.Access.Systems;
 using Content.Shared.Database;
 using Content.Shared.Examine;
@@ -24,10 +23,10 @@ namespace Content.Shared.Weapons.Ranged.Systems;
 
 public sealed class BatteryWeaponFireModesSystem : EntitySystem
 {
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-    [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
     [Dependency] private readonly AccessReaderSystem _accessReaderSystem = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearanceSystem = default!;
+    [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
 
     public override void Initialize()
     {
@@ -51,10 +50,8 @@ public sealed class BatteryWeaponFireModesSystem : EntitySystem
         args.PushMarkup(Loc.GetString("gun-set-fire-mode", ("mode", proto.Name)));
     }
 
-    private BatteryWeaponFireMode GetMode(BatteryWeaponFireModesComponent component)
-    {
-        return component.FireModes[component.CurrentFireMode];
-    }
+    private BatteryWeaponFireMode GetMode(BatteryWeaponFireModesComponent component) =>
+        component.FireModes[component.CurrentFireMode];
 
     private void OnGetVerb(EntityUid uid, BatteryWeaponFireModesComponent component, GetVerbsEvent<Verb> args)
     {
@@ -84,7 +81,7 @@ public sealed class BatteryWeaponFireModesSystem : EntitySystem
                 Act = () =>
                 {
                     TrySetFireMode(uid, component, index, args.User);
-                }
+                },
             };
 
             args.Verbs.Add(v);
@@ -93,7 +90,7 @@ public sealed class BatteryWeaponFireModesSystem : EntitySystem
 
     private void OnUseInHandEvent(EntityUid uid, BatteryWeaponFireModesComponent component, UseInHandEvent args)
     {
-        if(args.Handled)
+        if (args.Handled)
             return;
 
         args.Handled = true;
@@ -109,7 +106,10 @@ public sealed class BatteryWeaponFireModesSystem : EntitySystem
         TrySetFireMode(uid, component, index, user);
     }
 
-    public bool TrySetFireMode(EntityUid uid, BatteryWeaponFireModesComponent component, int index, EntityUid? user = null)
+    public bool TrySetFireMode(EntityUid uid,
+        BatteryWeaponFireModesComponent component,
+        int index,
+        EntityUid? user = null)
     {
         if (index < 0 || index >= component.FireModes.Count)
             return false;
@@ -122,7 +122,10 @@ public sealed class BatteryWeaponFireModesSystem : EntitySystem
         return true;
     }
 
-    private void SetFireMode(EntityUid uid, BatteryWeaponFireModesComponent component, int index, EntityUid? user = null)
+    private void SetFireMode(EntityUid uid,
+        BatteryWeaponFireModesComponent component,
+        int index,
+        EntityUid? user = null)
     {
         var fireMode = component.FireModes[index];
         component.CurrentFireMode = index;
@@ -144,9 +147,11 @@ public sealed class BatteryWeaponFireModesSystem : EntitySystem
             projectileBatteryAmmoProviderComponent.Prototype = fireMode.Prototype;
             projectileBatteryAmmoProviderComponent.FireCost = fireMode.FireCost;
 
-            float FireCostDiff = (float)fireMode.FireCost / (float)OldFireCost;
-            projectileBatteryAmmoProviderComponent.Shots = (int)Math.Round(projectileBatteryAmmoProviderComponent.Shots / FireCostDiff);
-            projectileBatteryAmmoProviderComponent.Capacity = (int)Math.Round(projectileBatteryAmmoProviderComponent.Capacity / FireCostDiff);
+            var FireCostDiff = fireMode.FireCost / OldFireCost;
+            projectileBatteryAmmoProviderComponent.Shots =
+                (int) Math.Round(projectileBatteryAmmoProviderComponent.Shots / FireCostDiff);
+            projectileBatteryAmmoProviderComponent.Capacity =
+                (int) Math.Round(projectileBatteryAmmoProviderComponent.Capacity / FireCostDiff);
 
             Dirty(uid, projectileBatteryAmmoProviderComponent);
 

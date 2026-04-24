@@ -14,15 +14,15 @@ namespace Content.Shared.Xenoarchaeology.Artifact;
 /// </summary>
 public abstract partial class SharedXenoArtifactSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly INetManager _net = default!;
-    [Dependency] protected readonly IPrototypeManager PrototypeManager = default!;
-    [Dependency] protected readonly IRobustRandom RobustRandom = default!;
     [Dependency] private readonly SharedActionsSystem _actions = default!;
     [Dependency] private readonly SharedContainerSystem _container = default!;
+    [Dependency] private readonly INetManager _net = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] protected readonly IPrototypeManager PrototypeManager = default!;
+    [Dependency] protected readonly IRobustRandom RobustRandom = default!;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         SubscribeLocalEvent<XenoArtifactComponent, ComponentStartup>(OnStartup);
@@ -49,10 +49,8 @@ public abstract partial class SharedXenoArtifactSystem : EntitySystem
         ent.Comp.NodeContainer = _container.EnsureContainer<Container>(ent, XenoArtifactComponent.NodeContainerId);
     }
 
-    private void OnSelfActivate(Entity<XenoArtifactComponent> ent, ref ArtifactSelfActivateEvent args)
-    {
+    private void OnSelfActivate(Entity<XenoArtifactComponent> ent, ref ArtifactSelfActivateEvent args) =>
         args.Handled = TryActivateXenoArtifact(ent, ent, null, Transform(ent).Coordinates, false);
-    }
 
     public void SetSuppressed(Entity<XenoArtifactComponent> ent, bool val)
     {

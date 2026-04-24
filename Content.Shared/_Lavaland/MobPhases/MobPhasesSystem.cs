@@ -94,6 +94,7 @@ public sealed class MobPhasesSystem : EntitySystem
                 continue;
             ent.Comp.PhaseThresholds.Remove(damageThreshold);
         }
+
         ent.Comp.PhaseThresholds[damage] = phase;
     }
 }

@@ -57,15 +57,15 @@ namespace Content.Shared.Hands.EntitySystems;
 
 public abstract partial class SharedHandsSystem
 {
-    [Dependency] private readonly INetManager _net = default!; // Goobstation
-    [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
     [Dependency] private readonly ActionBlockerSystem _actionBlocker = default!;
-    [Dependency] protected readonly SharedContainerSystem ContainerSystem = default!;
+    [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
     [Dependency] private readonly SharedInteractionSystem _interactionSystem = default!;
     [Dependency] private readonly InventorySystem _inventory = default!;
+    [Dependency] private readonly INetManager _net = default!; // Goobstation
     [Dependency] private readonly SharedStorageSystem _storage = default!;
-    [Dependency] protected readonly SharedTransformSystem TransformSystem = default!;
     [Dependency] private readonly SharedVirtualItemSystem _virtualSystem = default!;
+    [Dependency] protected readonly SharedContainerSystem ContainerSystem = default!;
+    [Dependency] protected readonly SharedTransformSystem TransformSystem = default!;
 
     public event Action<Entity<HandsComponent>, string, HandLocation>? OnPlayerAddHand;
     public event Action<Entity<HandsComponent>, string>? OnPlayerRemoveHand;
@@ -109,10 +109,8 @@ public abstract partial class SharedHandsSystem
     /// <summary>
     /// Adds a hand with the given container id and supplied location to the specified entity.
     /// </summary>
-    public void AddHand(Entity<HandsComponent?> ent, string handName, HandLocation handLocation)
-    {
+    public void AddHand(Entity<HandsComponent?> ent, string handName, HandLocation handLocation) =>
         AddHand(ent, handName, new Hand(handLocation));
-    }
 
     /// <summary>
     /// Adds a hand with the given container id and supplied hand definition to the given entity.
@@ -190,7 +188,7 @@ public abstract partial class SharedHandsSystem
     }
 
     /// <summary>
-    ///     Get any empty hand. Prioritizes the currently active hand.
+    /// Get any empty hand. Prioritizes the currently active hand.
     /// </summary>
     public bool TryGetEmptyHand(Entity<HandsComponent?> ent, [NotNullWhen(true)] out string? emptyHand)
     {
@@ -211,7 +209,7 @@ public abstract partial class SharedHandsSystem
     }
 
     /// <summary>
-    ///     Does this entity have any empty hands, and how many?
+    /// Does this entity have any empty hands, and how many?
     /// </summary>
     public int GetEmptyHandCount(Entity<HandsComponent?> entity)
     {
@@ -252,9 +250,7 @@ public abstract partial class SharedHandsSystem
     public EntityUid GetActiveItemOrSelf(Entity<HandsComponent?> entity)
     {
         if (!TryGetActiveItem(entity, out var item))
-        {
             return entity.Owner;
-        }
 
         return item.Value;
     }
@@ -285,13 +281,10 @@ public abstract partial class SharedHandsSystem
         return GetHeldItem(entity, entity.Comp.ActiveHandId);
     }
 
-    public bool ActiveHandIsEmpty(Entity<HandsComponent?> entity)
-    {
-        return GetActiveItem(entity) == null;
-    }
+    public bool ActiveHandIsEmpty(Entity<HandsComponent?> entity) => GetActiveItem(entity) == null;
 
     /// <summary>
-    ///     Enumerate over hands, starting with the currently active hand.
+    /// Enumerate over hands, starting with the currently active hand.
     /// </summary>
     public IEnumerable<string> EnumerateHands(Entity<HandsComponent?> ent)
     {
@@ -309,7 +302,7 @@ public abstract partial class SharedHandsSystem
     }
 
     /// <summary>
-    ///     Enumerate over held items, starting with the item in the currently active hand (if there is one).
+    /// Enumerate over held items, starting with the item in the currently active hand (if there is one).
     /// </summary>
     public IEnumerable<EntityUid> EnumerateHeld(Entity<HandsComponent?> ent)
     {
@@ -330,10 +323,12 @@ public abstract partial class SharedHandsSystem
     }
 
     /// <summary>
-    ///     Set the currently active hand and raise hand (de)selection events directed at the held entities.
+    /// Set the currently active hand and raise hand (de)selection events directed at the held entities.
     /// </summary>
-    /// <returns>True if the active hand was set to a NEW value. Setting it to the same value returns false and does
-    /// not trigger interactions.</returns>
+    /// <returns>
+    /// True if the active hand was set to a NEW value. Setting it to the same value returns false and does
+    /// not trigger interactions.
+    /// </returns>
     public bool TrySetActiveHand(Entity<HandsComponent?> ent, string? name)
     {
         if (!Resolve(ent, ref ent.Comp, false))
@@ -348,10 +343,12 @@ public abstract partial class SharedHandsSystem
     }
 
     /// <summary>
-    ///     Set the currently active hand and raise hand (de)selection events directed at the held entities.
+    /// Set the currently active hand and raise hand (de)selection events directed at the held entities.
     /// </summary>
-    /// <returns>True if the active hand was set to a NEW value. Setting it to the same value returns false and does
-    /// not trigger interactions.</returns>
+    /// <returns>
+    /// True if the active hand was set to a NEW value. Setting it to the same value returns false and does
+    /// not trigger interactions.
+    /// </returns>
     public bool SetActiveHand(Entity<HandsComponent?> ent, string? handId)
     {
         if (!Resolve(ent, ref ent.Comp))
@@ -379,12 +376,12 @@ public abstract partial class SharedHandsSystem
         return true;
     }
 
-    public bool IsHolding(Entity<HandsComponent?> entity, [NotNullWhen(true)] EntityUid? item)
-    {
-        return IsHolding(entity, item, out _);
-    }
+    public bool IsHolding(Entity<HandsComponent?> entity, [NotNullWhen(true)] EntityUid? item) =>
+        IsHolding(entity, item, out _);
 
-    public bool IsHolding(Entity<HandsComponent?> ent, [NotNullWhen(true)] EntityUid? entity, [NotNullWhen(true)] out string? inHand)
+    public bool IsHolding(Entity<HandsComponent?> ent,
+        [NotNullWhen(true)] EntityUid? entity,
+        [NotNullWhen(true)] out string? inHand)
     {
         inHand = null;
         if (entity == null)
@@ -408,7 +405,9 @@ public abstract partial class SharedHandsSystem
     /// <summary>
     /// Attempts to retrieve the associated hand struct corresponding to a hand ID on a given entity.
     /// </summary>
-    public bool TryGetHand(Entity<HandsComponent?> ent, [NotNullWhen(true)] string? handId, [NotNullWhen(true)] out Hand? hand)
+    public bool TryGetHand(Entity<HandsComponent?> ent,
+        [NotNullWhen(true)] string? handId,
+        [NotNullWhen(true)] out Hand? hand)
     {
         hand = null;
 
@@ -454,10 +453,7 @@ public abstract partial class SharedHandsSystem
         return held != null;
     }
 
-    public bool HandIsEmpty(Entity<HandsComponent?> ent, string handId)
-    {
-        return GetHeldItem(ent, handId) == null;
-    }
+    public bool HandIsEmpty(Entity<HandsComponent?> ent, string handId) => GetHeldItem(ent, handId) == null;
 
     public int GetHandCount(Entity<HandsComponent?> ent)
     {
@@ -498,7 +494,8 @@ public abstract partial class SharedHandsSystem
     }
 
     /// <summary>
-    /// Shitmed Change: This function checks when adding a hand for symmetries to determine where to add it in the sorted hands array.
+    /// Shitmed Change: This function checks when adding a hand for symmetries to determine where to add it in the sorted hands
+    /// array.
     /// </summary>
     /// <param name="handsComp">The hands component that we're modifying.</param>
     /// <param name="handName">The name of the hand we're adding.</param>

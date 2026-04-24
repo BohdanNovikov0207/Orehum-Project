@@ -14,7 +14,7 @@ namespace Content.Shared.Ninja.Components;
 /// Component for draining power from APCs/substations/SMESes, when ProviderUid is set to a battery cell.
 /// Does not rely on relay, simply being on the user and having BatteryUid set is enough.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 [Access(typeof(SharedBatteryDrainerSystem))]
 public sealed partial class BatteryDrainerComponent : Component
 {
@@ -22,7 +22,7 @@ public sealed partial class BatteryDrainerComponent : Component
     /// The powercell entity to drain power into.
     /// Determines whether draining is possible.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public EntityUid? BatteryUid;
 
     /// <summary>

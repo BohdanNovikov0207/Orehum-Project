@@ -96,13 +96,28 @@ namespace Content.Shared.Alert;
 /// An alert popup with associated icon, tooltip, and other data.
 /// </summary>
 [Prototype]
-public sealed partial class AlertPrototype : IPrototype
+public sealed class AlertPrototype : IPrototype
 {
+    [DataField("minSeverity")] private readonly short _minSeverity = 1;
+
     /// <summary>
-    /// Type of alert, no 2 alert prototypes should have the same one.
+    /// An entity used for displaying the <see cref="Icons" /> in the UI control.
     /// </summary>
-    [IdDataField]
-    public string ID { get; private set; } = default!;
+    [DataField]
+    public EntProtoId AlertViewEntity = "AlertSpriteView";
+
+    /// <summary>
+    /// Event raised on the user when they click on this alert.
+    /// Can be null.
+    /// </summary>
+    [DataField]
+    public BaseAlertEvent? ClickEvent;
+
+    /// <summary>
+    /// If true, this alert is being handled by the client and will not be overwritten when handling server -> client states.
+    /// </summary>
+    [DataField]
+    public bool ClientHandled = false;
 
     /// <summary>
     /// List of icons to use for this alert. Each entry corresponds to a different severity level, starting from the
@@ -112,10 +127,11 @@ public sealed partial class AlertPrototype : IPrototype
     public List<SpriteSpecifier> Icons = new();
 
     /// <summary>
-    /// An entity used for displaying the <see cref="Icons"/> in the UI control.
+    /// Maximum severity level supported by this state. -1 (default) indicates
+    /// no severity levels are supported by the state.
     /// </summary>
     [DataField]
-    public EntProtoId AlertViewEntity = "AlertSpriteView";
+    public short MaxSeverity = -1;
 
     /// <summary>
     /// Name to show in tooltip window. Accepts formatting.
@@ -150,32 +166,16 @@ public sealed partial class AlertPrototype : IPrototype
     /// </summary>
     public short MinSeverity => MaxSeverity == -1 ? (short) -1 : _minSeverity;
 
-    [DataField("minSeverity")] private short _minSeverity = 1;
-
-    /// <summary>
-    /// Maximum severity level supported by this state. -1 (default) indicates
-    /// no severity levels are supported by the state.
-    /// </summary>
-    [DataField]
-    public short MaxSeverity = -1;
-
     /// <summary>
     /// Indicates whether this state support severity levels
     /// </summary>
     public bool SupportsSeverity => MaxSeverity != -1;
 
     /// <summary>
-    /// If true, this alert is being handled by the client and will not be overwritten when handling server -> client states.
+    /// Type of alert, no 2 alert prototypes should have the same one.
     /// </summary>
-    [DataField]
-    public bool ClientHandled = false;
-
-    /// <summary>
-    /// Event raised on the user when they click on this alert.
-    /// Can be null.
-    /// </summary>
-    [DataField]
-    public BaseAlertEvent? ClickEvent;
+    [IdDataField]
+    public string ID { get; } = default!;
 
     /// <param name="severity">severity level, if supported by this alert</param>
     /// <returns>the icon path to the texture for the provided severity level</returns>
@@ -192,19 +192,14 @@ public sealed partial class AlertPrototype : IPrototype
             return Icons[0];
 
         if (severity == null)
-        {
-            throw new ArgumentException($"No severity specified but this alert ({AlertKey}) has severity.", nameof(severity));
-        }
+            throw new ArgumentException($"No severity specified but this alert ({AlertKey}) has severity.",
+                nameof(severity));
 
         if (severity < MinSeverity)
-        {
             throw new ArgumentOutOfRangeException(nameof(severity), $"Severity below minimum severity in {AlertKey}.");
-        }
 
         if (severity > MaxSeverity)
-        {
             throw new ArgumentOutOfRangeException(nameof(severity), $"Severity above maximum severity in {AlertKey}.");
-        }
 
         return Icons[severity.Value - _minSeverity];
     }
@@ -213,9 +208,8 @@ public sealed partial class AlertPrototype : IPrototype
 [ImplicitDataDefinitionForInheritors]
 public abstract partial class BaseAlertEvent : HandledEntityEventArgs
 {
-    public EntityUid User;
-
     public ProtoId<AlertPrototype> AlertId;
+    public EntityUid User;
 
     protected BaseAlertEvent(EntityUid user, ProtoId<AlertPrototype> alertId)
     {

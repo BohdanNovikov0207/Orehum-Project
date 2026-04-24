@@ -8,65 +8,66 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.SensorMonitoring;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class SensorMonitoringConsoleBoundInterfaceState : BoundUserInterfaceState
 {
     public TimeSpan RetentionTime;
     public SensorData[] Sensors = Array.Empty<SensorData>();
 
-    [Serializable, NetSerializable]
+    [Serializable] [NetSerializable]
     public sealed class SensorData
     {
-        public int NetId;
-        public string Name = "";
         public string Address = "";
         public SensorDeviceType DeviceType;
+        public string Name = "";
+        public int NetId;
 
         public SensorStream[] Streams = Array.Empty<SensorStream>();
     }
 
-    [Serializable, NetSerializable]
+    [Serializable] [NetSerializable]
     public sealed class SensorStream
     {
-        public int NetId;
         public string Name = "";
-        public SensorUnit Unit;
+        public int NetId;
         public SensorSample[] Samples = Array.Empty<SensorSample>();
+        public SensorUnit Unit;
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class SensorMonitoringIncrementalUpdate : BoundUserInterfaceMessage
 {
     public TimeSpan RelTime;
-    public SensorData[] Sensors = Array.Empty<SensorData>();
     public int[] RemovedSensors = Array.Empty<int>();
+    public SensorData[] Sensors = Array.Empty<SensorData>();
 
-    [Serializable, NetSerializable]
+    [Serializable] [NetSerializable]
     public sealed class SensorData
     {
         public int NetId;
         public SensorStream[] Streams = Array.Empty<SensorStream>();
     }
 
-    [Serializable, NetSerializable]
+    [Serializable] [NetSerializable]
     public sealed class SensorStream
     {
         public int NetId;
-        public SensorUnit Unit;
+
         // Note: these samples have their time values relative to RelTime.
         // This improves effectiveness of integer compression in NetSerializer.
         public SensorSample[] Samples = Array.Empty<SensorSample>();
+        public SensorUnit Unit;
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum SensorMonitoringConsoleUiKey
 {
-    Key
+    Key,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum SensorUnit : byte
 {
     Undetermined = 0,
@@ -99,10 +100,10 @@ public enum SensorUnit : byte
     /// <summary>
     /// Energy in Joules (J).
     /// </summary>
-    EnergyJ
+    EnergyJ,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum SensorDeviceType
 {
     Unknown = 0,
@@ -113,5 +114,5 @@ public enum SensorDeviceType
     Battery,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public record struct SensorSample(TimeSpan Time, float Value);

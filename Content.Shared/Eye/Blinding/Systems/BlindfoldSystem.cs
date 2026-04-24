@@ -6,8 +6,8 @@
 // SPDX-License-Identifier: MIT
 
 using Content.Shared.Eye.Blinding.Components;
-using Content.Shared.Inventory.Events;
 using Content.Shared.Inventory;
+using Content.Shared.Inventory.Events;
 
 namespace Content.Shared.Eye.Blinding.Systems;
 
@@ -24,18 +24,12 @@ public sealed class BlindfoldSystem : EntitySystem
         SubscribeLocalEvent<BlindfoldComponent, InventoryRelayedEvent<CanSeeAttemptEvent>>(OnBlindfoldTrySee);
     }
 
-    private void OnBlindfoldTrySee(Entity<BlindfoldComponent> blindfold, ref InventoryRelayedEvent<CanSeeAttemptEvent> args)
-    {
-        args.Args.Cancel();
-    }
+    private void OnBlindfoldTrySee(Entity<BlindfoldComponent> blindfold,
+        ref InventoryRelayedEvent<CanSeeAttemptEvent> args) => args.Args.Cancel();
 
-    private void OnEquipped(Entity<BlindfoldComponent> blindfold, ref GotEquippedEvent args)
-    {
+    private void OnEquipped(Entity<BlindfoldComponent> blindfold, ref GotEquippedEvent args) =>
         _blindableSystem.UpdateIsBlind(args.Equipee);
-    }
 
-    private void OnUnequipped(Entity<BlindfoldComponent> blindfold, ref GotUnequippedEvent args)
-    {
+    private void OnUnequipped(Entity<BlindfoldComponent> blindfold, ref GotUnequippedEvent args) =>
         _blindableSystem.UpdateIsBlind(args.Equipee);
-    }
 }

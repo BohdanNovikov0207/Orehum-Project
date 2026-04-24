@@ -29,7 +29,7 @@ public sealed partial class MegafaunaSystem
     }
 
     /// <summary>
-    /// Helper method that constructs new <see cref="RequestPerformActionEvent"/> for megafauna AI to use an action.
+    /// Helper method that constructs new <see cref="RequestPerformActionEvent" /> for megafauna AI to use an action.
     /// </summary>
     public RequestPerformActionEvent GetPerformEvent(EntityUid boss, EntityUid action)
     {
@@ -37,7 +37,9 @@ public sealed partial class MegafaunaSystem
 
         var netAction = GetNetEntity(action);
         var netTarget = HasComp<EntityTargetActionComponent>(action) ? GetNetEntity(targetingComp?.TargetEnt) : null;
-        var netCoords = HasComp<WorldTargetActionComponent>(action) ? GetNetCoordinates(targetingComp?.TargetCoords) : null;
+        var netCoords = HasComp<WorldTargetActionComponent>(action)
+            ? GetNetCoordinates(targetingComp?.TargetCoords)
+            : null;
 
         return new RequestPerformActionEvent(netAction, netTarget, netCoords);
     }

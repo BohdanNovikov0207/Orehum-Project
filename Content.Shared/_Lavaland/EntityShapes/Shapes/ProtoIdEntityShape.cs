@@ -14,8 +14,6 @@ public sealed partial class ProtoIdEntityShape : EntityShape
     [DataField(IdDataFieldTag, required: true)]
     public ProtoId<EntityShapePrototype> Id;
 
-    protected override List<Vector2> GetShapeImplementation(System.Random rand, IPrototypeManager proto)
-    {
-        return proto.Index(Id).Shape.GetShape(rand, proto, Offset, Size, StepSize);
-    }
+    protected override List<Vector2> GetShapeImplementation(System.Random rand, IPrototypeManager proto) =>
+        proto.Index(Id).Shape.GetShape(rand, proto, Offset, Size, StepSize);
 }

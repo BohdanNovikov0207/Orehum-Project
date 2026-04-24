@@ -1,10 +1,9 @@
 using System.Text.Json.Serialization;
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared._Shitmed.Medical.Surgery.Consciousness.Systems;
 using Content.Shared._Shitmed.Medical.Surgery.Pain.Systems;
 using Content.Shared.Body.Part;
 using Content.Shared.Body.Systems;
-using Content.Shared.EntityEffects;
-using Content.Goobstation.Maths.FixedPoint;
 using JetBrains.Annotations;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
@@ -18,13 +17,13 @@ public sealed partial class SuppressPain : EntityEffect
     [JsonPropertyName("amount")]
     public FixedPoint2 Amount = default!;
 
-    [DataField(required: true)]
-    [JsonPropertyName("time")]
-    public TimeSpan Time = default!;
-
     [DataField]
     [JsonPropertyName("identifier")]
     public string ModifierIdentifier = "PainSuppressant";
+
+    [DataField(required: true)]
+    [JsonPropertyName("time")]
+    public TimeSpan Time = default!;
 
     protected override string? ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys)
         => Loc.GetString("reagent-effect-guidebook-suppress-pain");
@@ -34,9 +33,7 @@ public sealed partial class SuppressPain : EntityEffect
         var scale = FixedPoint2.New(1);
 
         if (args is EntityEffectReagentArgs reagentArgs)
-        {
             scale = reagentArgs.Quantity * reagentArgs.Scale;
-        }
 
         if (!args.EntityManager.System<ConsciousnessSystem>().TryGetNerveSystem(args.TargetEntity, out var nerveSys))
             return;
@@ -57,7 +54,11 @@ public sealed partial class SuppressPain : EntityEffect
         else
         {
             args.EntityManager.System<PainSystem>()
-                .TryChangePainModifier(nerveSys.Value, bodyPart.Value.Id, ModifierIdentifier, modifier.Value.Change - Amount * scale, time: Time);
+                .TryChangePainModifier(nerveSys.Value,
+                    bodyPart.Value.Id,
+                    ModifierIdentifier,
+                    modifier.Value.Change - Amount * scale,
+                    time: Time);
         }
     }
 }

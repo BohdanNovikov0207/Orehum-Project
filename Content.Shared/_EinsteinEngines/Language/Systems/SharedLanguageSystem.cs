@@ -1,47 +1,48 @@
+using System.Text;
 using Content.Shared._EinsteinEngines.Language.Components;
 using Content.Shared.GameTicking;
 using Robust.Shared.Prototypes;
-using System.Text;
 
 namespace Content.Shared._EinsteinEngines.Language.Systems;
 
 public abstract class SharedLanguageSystem : EntitySystem
 {
     /// <summary>
-    ///     The language used as a fallback in cases where an entity suddenly becomes a Language Speaker (e.g. the usage of make-sentient).
+    /// The language used as a fallback in cases where an entity suddenly becomes a Language Speaker (e.g. the usage of
+    /// make-sentient).
     /// </summary>
     [ValidatePrototypeId<LanguagePrototype>]
     public static readonly string FallbackLanguagePrototype = "TauCetiBasic";
 
     /// <summary>
-    ///     The language whose speakers are assumed to understand and speak every language. Should never be added directly.
+    /// The language whose speakers are assumed to understand and speak every language. Should never be added directly.
     /// </summary>
     [ValidatePrototypeId<LanguagePrototype>]
     public static readonly string UniversalPrototype = "Universal";
 
     /// <summary>
-    ///     Language used for Xenoglossy, should have same effects as Universal but with different language prototype.
+    /// Language used for Xenoglossy, should have same effects as Universal but with different language prototype.
     /// </summary>
     [ValidatePrototypeId<LanguagePrototype>]
     public static readonly string PsychomanticPrototype = "Psychomantic";
 
+    [Dependency] protected readonly IPrototypeManager _prototype = default!;
+    [Dependency] protected readonly SharedGameTicker _ticker = default!;
+
     /// <summary>
-    /// A cached instance of <see cref="PsychomanticPrototype"/>.
+    /// A cached instance of <see cref="PsychomanticPrototype" />.
     /// </summary>
     public static LanguagePrototype Psychomantic { get; private set; } = default!;
 
     /// <summary>
-    ///     A cached instance of <see cref="UniversalPrototype"/>
+    /// A cached instance of <see cref="UniversalPrototype" />
     /// </summary>
     public static LanguagePrototype Universal { get; private set; } = default!;
-
-    [Dependency] protected readonly IPrototypeManager _prototype = default!;
-    [Dependency] protected readonly SharedGameTicker _ticker = default!;
 
     public override void Initialize()
     {
         Universal = _prototype.Index<LanguagePrototype>("Universal");
-         // Initialize the Psychomantic prototype
+        // Initialize the Psychomantic prototype
         Psychomantic = _prototype.Index<LanguagePrototype>(PsychomanticPrototype);
     }
 
@@ -52,7 +53,7 @@ public abstract class SharedLanguageSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Obfuscate a message using the given language.
+    /// Obfuscate a message using the given language.
     /// </summary>
     public string ObfuscateSpeech(string message, LanguagePrototype language)
     {
@@ -63,9 +64,9 @@ public abstract class SharedLanguageSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Generates a stable pseudo-random number in the range (min, max) (inclusively) for the given seed.
-    ///     One seed always corresponds to one number, however the resulting number also depends on the current round number.
-    ///     This method is meant to be used in <see cref="ObfuscationMethod"/> to provide stable obfuscation.
+    /// Generates a stable pseudo-random number in the range (min, max) (inclusively) for the given seed.
+    /// One seed always corresponds to one number, however the resulting number also depends on the current round number.
+    /// This method is meant to be used in <see cref="ObfuscationMethod" /> to provide stable obfuscation.
     /// </summary>
     internal int PseudoRandomNumber(int seed, int min, int max)
     {
@@ -80,15 +81,16 @@ public abstract class SharedLanguageSystem : EntitySystem
 
     public virtual bool CanUnderstand(Entity<LanguageSpeakerComponent?> ent, ProtoId<LanguagePrototype> language)
     {
-        if (language == PsychomanticPrototype || language == UniversalPrototype || TryComp<UniversalLanguageSpeakerComponent>(ent, out var uni) && uni.Enabled)
+        if (language == PsychomanticPrototype || language == UniversalPrototype ||
+            TryComp<UniversalLanguageSpeakerComponent>(ent, out var uni) && uni.Enabled)
             return true;
 
-        return Resolve(ent, ref ent.Comp, logMissing: false) && ent.Comp.UnderstoodLanguages.Contains(language);
+        return Resolve(ent, ref ent.Comp, false) && ent.Comp.UnderstoodLanguages.Contains(language);
     }
 
     public virtual bool CanSpeak(Entity<LanguageSpeakerComponent?> ent, ProtoId<LanguagePrototype> language)
     {
-        if (!Resolve(ent, ref ent.Comp, logMissing: false))
+        if (!Resolve(ent, ref ent.Comp, false))
             return false;
 
         return ent.Comp.SpokenLanguages.Contains(language);

@@ -11,17 +11,17 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Chemistry.EntitySystems;
 using Content.Shared.Chemistry.Reagent;
 using Content.Shared.DoAfter;
-using Content.Goobstation.Maths.FixedPoint;
 using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
 
 namespace Content.Shared.Chemistry.Components;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class InjectorDoAfterEvent : SimpleDoAfterEvent
 {
 }
@@ -34,59 +34,11 @@ public sealed partial class InjectorDoAfterEvent : SimpleDoAfterEvent
 /// injection and drawing or just injection. Can inject/draw reagents from solution
 /// containers, and can directly inject into a mobs bloodstream.
 /// </remarks>
-/// <seealso cref="SharedInjectorSystem"/>
-/// <seealso cref="InjectorToggleMode"/>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+/// <seealso cref="SharedInjectorSystem" />
+/// <seealso cref="InjectorToggleMode" />
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class InjectorComponent : Component
 {
-    [DataField]
-    public string SolutionName = "injector";
-
-    /// <summary>
-    /// Whether or not the injector is able to draw from containers or if it's a single use
-    /// device that can only inject.
-    /// </summary>
-    [DataField]
-    public bool InjectOnly;
-
-    /// <summary>
-    /// Whether or not the injector is able to draw from or inject from mobs
-    /// </summary>
-    /// <remarks>
-    ///     for example: droppers would ignore mobs
-    /// </remarks>
-    [DataField]
-    public bool IgnoreMobs;
-
-    /// <summary>
-    /// Whether or not the injector is able to draw from or inject into containers that are closed/sealed
-    /// </summary>
-    /// <remarks>
-    ///     for example: droppers can not inject into cans, but syringes can
-    /// </remarks>
-    [DataField]
-    public bool IgnoreClosed = true;
-
-    /// <summary>
-    ///     The minimum amount of solution that can be transferred at once from this solution.
-    /// </summary>
-    [DataField("minTransferAmount")]
-    public FixedPoint2 MinimumTransferAmount = FixedPoint2.New(5);
-
-    /// <summary>
-    ///     The maximum amount of solution that can be transferred at once from this solution.
-    /// </summary>
-    [DataField("maxTransferAmount")]
-    public FixedPoint2 MaximumTransferAmount = FixedPoint2.New(15);
-
-    /// <summary>
-    /// Amount to inject or draw on each usage. If the injector is inject only, it will
-    /// attempt to inject it's entire contents upon use.
-    /// </summary>
-    [DataField]
-    [AutoNetworkedField]
-    public FixedPoint2 TransferAmount = FixedPoint2.New(5);
-
     /// <summary>
     /// Injection delay (seconds) when the target is a mob.
     /// </summary>
@@ -104,13 +56,41 @@ public sealed partial class InjectorComponent : Component
     public TimeSpan DelayPerVolume = TimeSpan.FromSeconds(0.1);
 
     /// <summary>
-    /// The state of the injector. Determines it's attack behavior. Containers must have the
-    /// right SolutionCaps to support injection/drawing. For InjectOnly injectors this should
-    /// only ever be set to Inject
+    /// Whether or not the injector is able to draw from or inject into containers that are closed/sealed
     /// </summary>
-    [AutoNetworkedField]
+    /// <remarks>
+    /// for example: droppers can not inject into cans, but syringes can
+    /// </remarks>
     [DataField]
-    public InjectorToggleMode ToggleState = InjectorToggleMode.Draw;
+    public bool IgnoreClosed = true;
+
+    /// <summary>
+    /// Whether or not the injector is able to draw from or inject from mobs
+    /// </summary>
+    /// <remarks>
+    /// for example: droppers would ignore mobs
+    /// </remarks>
+    [DataField]
+    public bool IgnoreMobs;
+
+    /// <summary>
+    /// Whether or not the injector is able to draw from containers or if it's a single use
+    /// device that can only inject.
+    /// </summary>
+    [DataField]
+    public bool InjectOnly;
+
+    /// <summary>
+    /// The maximum amount of solution that can be transferred at once from this solution.
+    /// </summary>
+    [DataField("maxTransferAmount")]
+    public FixedPoint2 MaximumTransferAmount = FixedPoint2.New(15);
+
+    /// <summary>
+    /// The minimum amount of solution that can be transferred at once from this solution.
+    /// </summary>
+    [DataField("minTransferAmount")]
+    public FixedPoint2 MinimumTransferAmount = FixedPoint2.New(5);
 
     /// <summary>
     /// Reagents that are allowed to be within this injector.
@@ -120,17 +100,37 @@ public sealed partial class InjectorComponent : Component
     [DataField]
     public List<ProtoId<ReagentPrototype>>? ReagentWhitelist = null;
 
+    [DataField]
+    public string SolutionName = "injector";
+
+    /// <summary>
+    /// The state of the injector. Determines it's attack behavior. Containers must have the
+    /// right SolutionCaps to support injection/drawing. For InjectOnly injectors this should
+    /// only ever be set to Inject
+    /// </summary>
+    [AutoNetworkedField]
+    [DataField]
+    public InjectorToggleMode ToggleState = InjectorToggleMode.Draw;
+
+    /// <summary>
+    /// Amount to inject or draw on each usage. If the injector is inject only, it will
+    /// attempt to inject it's entire contents upon use.
+    /// </summary>
+    [DataField]
+    [AutoNetworkedField]
+    public FixedPoint2 TransferAmount = FixedPoint2.New(5);
+
     #region Arguments for injection doafter
 
-    /// <inheritdoc cref=DoAfterArgs.NeedHand>
+    /// <inheritdoc cref= DoAfterArgs.NeedHand>
     [DataField]
     public bool NeedHand = true;
 
-    /// <inheritdoc cref=DoAfterArgs.BreakOnHandChange>
+    /// <inheritdoc cref= DoAfterArgs.BreakOnHandChange>
     [DataField]
     public bool BreakOnHandChange = true;
 
-    /// <inheritdoc cref=DoAfterArgs.MovementThreshold>
+    /// <inheritdoc cref= DoAfterArgs.MovementThreshold>
     [DataField]
     public float MovementThreshold = 0.1f;
 
@@ -138,7 +138,7 @@ public sealed partial class InjectorComponent : Component
 }
 
 /// <summary>
-/// Possible modes for an <see cref="InjectorComponent"/>.
+/// Possible modes for an <see cref="InjectorComponent" />.
 /// </summary>
 public enum InjectorToggleMode : byte
 {
@@ -150,5 +150,5 @@ public enum InjectorToggleMode : byte
     /// <summary>
     /// The injector will try to draw reagent from things.
     /// </summary>
-    Draw
+    Draw,
 }

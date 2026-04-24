@@ -1,11 +1,11 @@
-﻿using Content.Shared._Shitmed.Medical.Surgery.Traumas.Components;
+﻿using Content.Goobstation.Maths.FixedPoint;
+using Content.Shared._Shitmed.Medical.Surgery.Traumas.Components;
 using Content.Shared.Body.Organ;
-using Content.Goobstation.Maths.FixedPoint;
 using Robust.Shared.Serialization;
 
 namespace Content.Shared._Shitmed.Medical.Surgery.Traumas;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum TraumaType
 {
     BoneDamage,
@@ -17,7 +17,7 @@ public enum TraumaType
 
 #region Organs
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum OrganSeverity
 {
     Normal = 0,
@@ -32,27 +32,49 @@ public record struct OrganIntegrityChangedEvent(FixedPoint2 OldIntegrity, FixedP
 public record struct OrganDamageSeverityChanged(OrganSeverity OldSeverity, OrganSeverity NewSeverity);
 
 [ByRefEvent]
-public record struct OrganIntegrityChangedEventOnWoundable(Entity<OrganComponent> Organ, FixedPoint2 OldIntegrity, FixedPoint2 NewIntegrity);
+public record struct OrganIntegrityChangedEventOnWoundable(
+    Entity<OrganComponent> Organ,
+    FixedPoint2 OldIntegrity,
+    FixedPoint2 NewIntegrity);
 
 [ByRefEvent]
-public record struct OrganDamageSeverityChangedOnWoundable(Entity<OrganComponent> Organ, OrganSeverity OldSeverity, OrganSeverity NewSeverity);
-[ByRefEvent]
-public record struct TraumaChanceDeductionEvent(FixedPoint2 TraumaSeverity, TraumaType TraumaType, FixedPoint2 ChanceDeduction);
+public record struct OrganDamageSeverityChangedOnWoundable(
+    Entity<OrganComponent> Organ,
+    OrganSeverity OldSeverity,
+    OrganSeverity NewSeverity);
 
 [ByRefEvent]
-public record struct BeforeTraumaInducedEvent(FixedPoint2 TraumaSeverity, EntityUid TraumaTarget, TraumaType TraumaType, bool Cancelled = false);
+public record struct TraumaChanceDeductionEvent(
+    FixedPoint2 TraumaSeverity,
+    TraumaType TraumaType,
+    FixedPoint2 ChanceDeduction);
 
 [ByRefEvent]
-public record struct TraumaInducedEvent(Entity<TraumaComponent> Trauma, EntityUid TraumaTarget, FixedPoint2 TraumaSeverity, TraumaType TraumaType);
+public record struct BeforeTraumaInducedEvent(
+    FixedPoint2 TraumaSeverity,
+    EntityUid TraumaTarget,
+    TraumaType TraumaType,
+    bool Cancelled = false);
 
 [ByRefEvent]
-public record struct TraumaBeingRemovedEvent(Entity<TraumaComponent> Trauma, EntityUid TraumaTarget, FixedPoint2 TraumaSeverity, TraumaType TraumaType);
+public record struct TraumaInducedEvent(
+    Entity<TraumaComponent> Trauma,
+    EntityUid TraumaTarget,
+    FixedPoint2 TraumaSeverity,
+    TraumaType TraumaType);
+
+[ByRefEvent]
+public record struct TraumaBeingRemovedEvent(
+    Entity<TraumaComponent> Trauma,
+    EntityUid TraumaTarget,
+    FixedPoint2 TraumaSeverity,
+    TraumaType TraumaType);
 
 #endregion
 
 #region Bones
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum BoneSeverity
 {
     Normal = 0,
@@ -62,9 +84,15 @@ public enum BoneSeverity
 }
 
 [ByRefEvent]
-public record struct BoneIntegrityChangedEvent(Entity<BoneComponent> Bone, FixedPoint2 OldIntegrity, FixedPoint2 NewIntegrity);
+public record struct BoneIntegrityChangedEvent(
+    Entity<BoneComponent> Bone,
+    FixedPoint2 OldIntegrity,
+    FixedPoint2 NewIntegrity);
 
 [ByRefEvent]
-public record struct BoneSeverityChangedEvent(Entity<BoneComponent> Bone, BoneSeverity OldSeverity, BoneSeverity NewSeverity);
+public record struct BoneSeverityChangedEvent(
+    Entity<BoneComponent> Bone,
+    BoneSeverity OldSeverity,
+    BoneSeverity NewSeverity);
 
 #endregion

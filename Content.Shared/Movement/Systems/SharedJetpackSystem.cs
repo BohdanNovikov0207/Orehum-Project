@@ -96,13 +96,13 @@ namespace Content.Shared.Movement.Systems;
 
 public abstract class SharedJetpackSystem : EntitySystem
 {
+    [Dependency] private readonly ActionContainerSystem _actionContainer = default!;
     [Dependency] private readonly MovementSpeedModifierSystem _movementSpeedModifier = default!;
+    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly StandingStateSystem _standing = default!; // Goobstation
     [Dependency] protected readonly SharedAppearanceSystem Appearance = default!;
     [Dependency] protected readonly SharedContainerSystem Container = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
-    [Dependency] private readonly ActionContainerSystem _actionContainer = default!;
-    [Dependency] private readonly StandingStateSystem _standing = default!; // Goobstation
 
     public override void Initialize()
     {
@@ -132,7 +132,8 @@ public abstract class SharedJetpackSystem : EntitySystem
         _popup.PopupClient(Loc.GetString("jetpack-downed"), ent, ent);
     }
 
-    private void OnJetpackUserWeightlessMovement(Entity<JetpackUserComponent> ent, ref RefreshWeightlessModifiersEvent args)
+    private void OnJetpackUserWeightlessMovement(Entity<JetpackUserComponent> ent,
+        ref RefreshWeightlessModifiersEvent args)
     {
         // Yes this bulldozes the values but primarily for backwards compat atm.
         args.WeightlessAcceleration = ent.Comp.WeightlessAcceleration;
@@ -165,10 +166,8 @@ public abstract class SharedJetpackSystem : EntitySystem
         }
     }
 
-    private void OnJetpackDropped(EntityUid uid, JetpackComponent component, DroppedEvent args)
-    {
+    private void OnJetpackDropped(EntityUid uid, JetpackComponent component, DroppedEvent args) =>
         SetEnabled(uid, component, false, args.User);
-    }
 
     private void OnJetpackMoved(Entity<JetpackComponent> ent, ref EntGotInsertedIntoContainerMessage args)
     {
@@ -176,12 +175,13 @@ public abstract class SharedJetpackSystem : EntitySystem
             SetEnabled(ent, ent.Comp, false, ent.Comp.JetpackUser);
     }
 
-    private void OnJetpackUserCanWeightless(EntityUid uid, JetpackUserComponent component, ref CanWeightlessMoveEvent args)
-    {
-        args.CanMove = true;
-    }
+    private void OnJetpackUserCanWeightless(EntityUid uid,
+        JetpackUserComponent component,
+        ref CanWeightlessMoveEvent args) => args.CanMove = true;
 
-    private void OnJetpackUserEntParentChanged(EntityUid uid, JetpackUserComponent component, ref EntParentChangedMessage args)
+    private void OnJetpackUserEntParentChanged(EntityUid uid,
+        JetpackUserComponent component,
+        ref EntParentChangedMessage args)
     {
         if (TryComp<JetpackComponent>(component.Jetpack, out var jetpack) &&
             !CanEnableOnGrid(args.Transform.GridUid))
@@ -243,23 +243,16 @@ public abstract class SharedJetpackSystem : EntitySystem
         SetEnabled(uid, component, !IsEnabled(uid));
     }
 
-    private bool CanEnableOnGrid(EntityUid? gridUid)
-    {
+    private bool CanEnableOnGrid(EntityUid? gridUid) =>
         // No and no again! Do not attempt to activate the jetpack on a grid with gravity disabled. You will not be the first or the last to try this.
         // https://discord.com/channels/310555209753690112/310555209753690112/1270067921682694234
-        return gridUid == null ||
-               (!HasComp<GravityComponent>(gridUid));
-    }
+        gridUid == null ||
+        !HasComp<GravityComponent>(gridUid);
 
-    private void OnJetpackGetAction(EntityUid uid, JetpackComponent component, GetItemActionsEvent args)
-    {
+    private void OnJetpackGetAction(EntityUid uid, JetpackComponent component, GetItemActionsEvent args) =>
         args.AddAction(ref component.ToggleActionEntity, component.ToggleAction);
-    }
 
-    private bool IsEnabled(EntityUid uid)
-    {
-        return HasComp<ActiveJetpackComponent>(uid);
-    }
+    private bool IsEnabled(EntityUid uid) => HasComp<ActiveJetpackComponent>(uid);
 
     public void SetEnabled(EntityUid uid, JetpackComponent component, bool enabled, EntityUid? user = null)
     {
@@ -291,20 +284,14 @@ public abstract class SharedJetpackSystem : EntitySystem
         Dirty(uid, component);
     }
 
-    public bool IsUserFlying(EntityUid uid)
-    {
-        return HasComp<JetpackUserComponent>(uid);
-    }
+    public bool IsUserFlying(EntityUid uid) => HasComp<JetpackUserComponent>(uid);
 
-    protected virtual bool CanEnable(EntityUid uid, JetpackComponent component)
-    {
-        return true;
-    }
+    protected virtual bool CanEnable(EntityUid uid, JetpackComponent component) => true;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum JetpackVisuals : byte
 {
     Enabled,
-    Layer
+    Layer,
 }

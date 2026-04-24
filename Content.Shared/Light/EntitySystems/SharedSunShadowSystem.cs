@@ -30,9 +30,7 @@ public abstract class SharedSunShadowSystem : EntitySystem
             ent.Comp.Offset = lightCycle.Offset;
         }
         else
-        {
             ent.Comp.Offset = _random.Next(ent.Comp.Duration);
-        }
 
         Dirty(ent);
     }

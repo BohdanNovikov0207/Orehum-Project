@@ -9,7 +9,7 @@ namespace Content.Shared._ADT.Geras;
 [Access(typeof(SharedGerasSystem))]
 public abstract partial class SharedGerasComponent : Component;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum GeraColor
 {
     Color,

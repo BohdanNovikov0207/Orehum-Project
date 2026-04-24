@@ -7,8 +7,8 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.CartridgeLoader;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum CartridgeLoaderVisuals
 {
-    CartridgeInserted
+    CartridgeInserted,
 }

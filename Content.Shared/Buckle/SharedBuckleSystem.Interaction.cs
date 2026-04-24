@@ -126,11 +126,11 @@ public abstract partial class SharedBuckleSystem
     private void InitializeInteraction()
     {
         SubscribeLocalEvent<StrapComponent, GetVerbsEvent<InteractionVerb>>(AddStrapVerbs);
-        SubscribeLocalEvent<StrapComponent, InteractHandEvent>(OnStrapInteractHand, before: [typeof(InteractionPopupSystem)]);
+        SubscribeLocalEvent<StrapComponent, InteractHandEvent>(OnStrapInteractHand, [typeof(InteractionPopupSystem)]);
         SubscribeLocalEvent<StrapComponent, DragDropTargetEvent>(OnStrapDragDropTarget);
         SubscribeLocalEvent<StrapComponent, CanDropTargetEvent>(OnCanDropTarget);
 
-        SubscribeLocalEvent<BuckleComponent, InteractHandEvent>(OnBuckleInteractHand, before: [typeof(InteractionPopupSystem)]);
+        SubscribeLocalEvent<BuckleComponent, InteractHandEvent>(OnBuckleInteractHand, [typeof(InteractionPopupSystem)]);
         SubscribeLocalEvent<BuckleComponent, GetVerbsEvent<InteractionVerb>>(AddUnbuckleVerb);
     }
 
@@ -148,7 +148,7 @@ public abstract partial class SharedBuckleSystem
         if (!TryComp(args.Dragged, out BuckleComponent? buckle))
             return;
 
-        if (!CanBuckle(args.Dragged, args.User, uid, false, out var _, buckle))
+        if (!CanBuckle(args.Dragged, args.User, uid, false, out _, buckle))
             return;
         // Goobstation end
         if (args.Dragged == args.User)
@@ -160,14 +160,20 @@ public abstract partial class SharedBuckleSystem
         }
         else
         {
-            if (!CanBuckle(args.Dragged, args.User, uid, true, out var _, buckle))
+            if (!CanBuckle(args.Dragged, args.User, uid, true, out _, buckle))
                 return;
 
-            var doAfterArgs = new DoAfterArgs(EntityManager, args.User, component.BuckleDoafterTime, new BuckleDoAfterEvent(), args.Dragged, args.Dragged, uid)
+            var doAfterArgs = new DoAfterArgs(EntityManager,
+                args.User,
+                component.BuckleDoafterTime,
+                new BuckleDoAfterEvent(),
+                args.Dragged,
+                args.Dragged,
+                uid)
             {
                 BreakOnMove = true,
                 BreakOnDamage = component.BuckleBreakOnDamage, // Goobstation true to component
-                AttemptFrequency = AttemptFrequency.EveryTick
+                AttemptFrequency = AttemptFrequency.EveryTick,
             };
 
             _doAfter.TryStartDoAfter(doAfterArgs);
@@ -184,11 +190,12 @@ public abstract partial class SharedBuckleSystem
     {
         if (!Resolve(strapUid, ref strapComp, false) ||
             !Resolve(buckleUid, ref buckleComp, false))
-        {
             return false;
-        }
 
-        bool Ignored(EntityUid entity) => entity == userUid || entity == buckleUid || entity == targetUid;
+        bool Ignored(EntityUid entity)
+        {
+            return entity == userUid || entity == buckleUid || entity == targetUid;
+        }
 
         return _interaction.InRangeUnobstructed(targetUid, buckleUid, buckleComp.Range, predicate: Ignored);
     }
@@ -207,13 +214,13 @@ public abstract partial class SharedBuckleSystem
         // Buckle self
         if (buckle.BuckledTo == null && component.BuckleOnInteractHand && StrapHasSpace(uid, buckle, component))
         {
-            TryBuckle(args.User, args.User, uid, buckle, popup: true);
+            TryBuckle(args.User, args.User, uid, buckle);
             args.Handled = true;
             return;
         }
 
         // Unbuckle self
-        if (buckle.BuckledTo == uid && TryUnbuckle(args.User, args.User, buckle, popup: true))
+        if (buckle.BuckledTo == uid && TryUnbuckle(args.User, args.User, buckle))
         {
             args.Handled = true;
             return;
@@ -221,12 +228,9 @@ public abstract partial class SharedBuckleSystem
 
         // Unbuckle others
         if (component.BuckledEntities.TryFirstOrNull(out var buckled) &&
-            component.AllowOthersToUnbuckle &&  // Goobstation
+            component.AllowOthersToUnbuckle && // Goobstation
             TryUnbuckle(buckled.Value, args.User))
-        {
             args.Handled = true;
-            return;
-        }
 
         // TODO BUCKLE add out bool for whether a pop-up was generated or not.
     }
@@ -236,12 +240,13 @@ public abstract partial class SharedBuckleSystem
         if (args.Handled)
             return;
 
-        if (ent.Comp.BuckledTo != null && TryComp<StrapComponent>(ent.Comp.BuckledTo.Value, out var strapcomp) && //Goobstation - Clowncar
-            (!strapcomp.AllowOthersToUnbuckle && args.User != args.Target))
+        if (ent.Comp.BuckledTo != null &&
+            TryComp<StrapComponent>(ent.Comp.BuckledTo.Value, out var strapcomp) && //Goobstation - Clowncar
+            !strapcomp.AllowOthersToUnbuckle && args.User != args.Target)
             return;
 
         if (ent.Comp.BuckledTo != null)
-            args.Handled = TryUnbuckle(ent!, args.User, popup: true);
+            args.Handled = TryUnbuckle(ent!, args.User, true);
 
         // TODO BUCKLE add out bool for whether a pop-up was generated or not.
     }
@@ -259,16 +264,16 @@ public abstract partial class SharedBuckleSystem
         {
             var buckledComp = Comp<BuckleComponent>(entity);
 
-            if (!_interaction.InRangeUnobstructed(args.User, args.Target, range: buckledComp.Range))
+            if (!_interaction.InRangeUnobstructed(args.User, args.Target, buckledComp.Range))
                 continue;
 
-            var verb = new InteractionVerb()
+            var verb = new InteractionVerb
             {
-                Act = () => TryUnbuckle(entity, args.User, buckleComp: buckledComp),
+                Act = () => TryUnbuckle(entity, args.User, buckledComp),
                 Category = VerbCategory.Unbuckle,
                 Text = entity == args.User
                     ? Loc.GetString("verb-self-target-pronoun")
-                    : Identity.Name(entity, EntityManager)
+                    : Identity.Name(entity, EntityManager),
             };
 
             // In the event that you have more than once entity with the same name strapped to the same object,
@@ -284,14 +289,14 @@ public abstract partial class SharedBuckleSystem
             buckle.BuckledTo != uid &&
             args.User != uid &&
             StrapHasSpace(uid, buckle, component) &&
-            _interaction.InRangeUnobstructed(args.User, args.Target, range: buckle.Range) &&
+            _interaction.InRangeUnobstructed(args.User, args.Target, buckle.Range) &&
             component.AddBuckleverb) //Goobstation - Clowncar
         {
             InteractionVerb verb = new()
             {
                 Act = () => TryBuckle(args.User, args.User, args.Target, buckle),
                 Category = VerbCategory.Buckle,
-                Text = Loc.GetString("verb-self-target-pronoun")
+                Text = Loc.GetString("verb-self-target-pronoun"),
             };
             args.Verbs.Add(verb);
         }
@@ -300,15 +305,19 @@ public abstract partial class SharedBuckleSystem
         if (args.Using is { Valid: true } @using &&
             TryComp<BuckleComponent>(@using, out var usingBuckle) &&
             StrapHasSpace(uid, usingBuckle, component) &&
-            _interaction.InRangeUnobstructed(@using, args.Target, range: usingBuckle.Range) &&
+            _interaction.InRangeUnobstructed(@using, args.Target, usingBuckle.Range) &&
             component.AddBuckleverb) //Goobstation - Clowncar
         {
             // Check that the entity is unobstructed from the target (ignoring the user).
-            bool Ignored(EntityUid entity) => entity == args.User || entity == args.Target || entity == @using;
+            bool Ignored(EntityUid entity)
+            {
+                return entity == args.User || entity == args.Target || entity == @using;
+            }
+
             if (!_interaction.InRangeUnobstructed(@using, args.Target, usingBuckle.Range, predicate: Ignored))
                 return;
 
-            var isPlayer = _playerManager.TryGetSessionByEntity(@using, out var _);
+            var isPlayer = _playerManager.TryGetSessionByEntity(@using, out _);
             InteractionVerb verb = new()
             {
                 Act = () => TryBuckle(@using, args.User, args.Target, usingBuckle),
@@ -316,7 +325,7 @@ public abstract partial class SharedBuckleSystem
                 Text = Identity.Name(@using, EntityManager),
                 // just a held object, the user is probably just trying to sit down.
                 // If the used entity is a person being pulled, prioritize this verb. Conversely, if it is
-                Priority = isPlayer ? 1 : -1
+                Priority = isPlayer ? 1 : -1,
             };
 
             args.Verbs.Add(verb);
@@ -333,9 +342,9 @@ public abstract partial class SharedBuckleSystem
 
         InteractionVerb verb = new()
         {
-            Act = () => TryUnbuckle(uid, args.User, buckleComp: component),
+            Act = () => TryUnbuckle(uid, args.User, component),
             Text = Loc.GetString("verb-categories-unbuckle"),
-            Icon = new SpriteSpecifier.Texture(new("/Textures/Interface/VerbIcons/unbuckle.svg.192dpi.png"))
+            Icon = new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/VerbIcons/unbuckle.svg.192dpi.png")),
         };
 
         if (args.Target == args.User && args.Using == null)
@@ -347,5 +356,4 @@ public abstract partial class SharedBuckleSystem
 
         args.Verbs.Add(verb);
     }
-
 }

@@ -18,16 +18,19 @@ namespace Content.Shared.EntityEffects.Effects;
 public sealed partial class Polymorph : EventEntityEffect<Polymorph>
 {
     /// <summary>
-    ///     What polymorph prototype is used on effect
+    /// What polymorph prototype is used on effect
     /// </summary>
-    [DataField("prototype", customTypeSerializer:typeof(PrototypeIdSerializer<PolymorphPrototype>))]
+    [DataField("prototype", customTypeSerializer: typeof(PrototypeIdSerializer<PolymorphPrototype>))]
     public string PolymorphPrototype { get; set; }
 
-    protected override string? ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys) // Goob edit
+    protected override string?
+        ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys) // Goob edit
     {
         var entProto = prototype.Index<PolymorphPrototype>(PolymorphPrototype).Configuration.Entity;
         if (entProto == null)
             return null;
-        return Loc.GetString("reagent-effect-guidebook-make-polymorph", ("chance", Probability), ("entityname", prototype.Index<EntityPrototype>(entProto.Value).Name));
+        return Loc.GetString("reagent-effect-guidebook-make-polymorph",
+            ("chance", Probability),
+            ("entityname", prototype.Index<EntityPrototype>(entProto.Value).Name));
     }
 }

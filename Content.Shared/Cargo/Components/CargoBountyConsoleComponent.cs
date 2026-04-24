@@ -15,7 +15,7 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototy
 
 namespace Content.Shared.Cargo.Components;
 
-[RegisterComponent, AutoGenerateComponentPause]
+[RegisterComponent] [AutoGenerateComponentPause]
 public sealed partial class CargoBountyConsoleComponent : Component
 {
     /// <summary>
@@ -23,6 +23,24 @@ public sealed partial class CargoBountyConsoleComponent : Component
     /// </summary>
     [DataField("bountyLabelId", customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
     public string BountyLabelId = "PaperCargoBountyManifest";
+
+    /// <summary>
+    /// The sound made when bounty skipping is denied due to lacking access.
+    /// </summary>
+    [DataField("denySound")]
+    public SoundSpecifier DenySound = new SoundPathSpecifier("/Audio/Effects/Cargo/buzz_two.ogg");
+
+    /// <summary>
+    /// The time between playing a denial sound.
+    /// </summary>
+    [DataField]
+    public TimeSpan DenySoundDelay = TimeSpan.FromSeconds(2);
+
+    /// <summary>
+    /// The time at which the console will be able to make the denial sound again.
+    /// </summary>
+    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))] [AutoPausedField]
+    public TimeSpan NextDenySoundTime = TimeSpan.Zero;
 
     /// <summary>
     /// The time at which the console will be able to print a label again.
@@ -47,34 +65,18 @@ public sealed partial class CargoBountyConsoleComponent : Component
     /// </summary>
     [DataField("skipSound")]
     public SoundSpecifier SkipSound = new SoundPathSpecifier("/Audio/Effects/Cargo/ping.ogg");
-
-    /// <summary>
-    /// The sound made when bounty skipping is denied due to lacking access.
-    /// </summary>
-    [DataField("denySound")]
-    public SoundSpecifier DenySound = new SoundPathSpecifier("/Audio/Effects/Cargo/buzz_two.ogg");
-
-    /// <summary>
-    /// The time at which the console will be able to make the denial sound again.
-    /// </summary>
-    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer)), AutoPausedField]
-    public TimeSpan NextDenySoundTime = TimeSpan.Zero;
-
-    /// <summary>
-    /// The time between playing a denial sound.
-    /// </summary>
-    [DataField]
-    public TimeSpan DenySoundDelay = TimeSpan.FromSeconds(2);
 }
 
-[NetSerializable, Serializable]
+[NetSerializable] [Serializable]
 public sealed class CargoBountyConsoleState : BoundUserInterfaceState
 {
     public List<CargoBountyData> Bounties;
     public List<CargoBountyHistoryData> History;
     public TimeSpan UntilNextSkip;
 
-    public CargoBountyConsoleState(List<CargoBountyData> bounties, List<CargoBountyHistoryData> history, TimeSpan untilNextSkip)
+    public CargoBountyConsoleState(List<CargoBountyData> bounties,
+        List<CargoBountyHistoryData> history,
+        TimeSpan untilNextSkip)
     {
         Bounties = bounties;
         History = history;
@@ -82,7 +84,7 @@ public sealed class CargoBountyConsoleState : BoundUserInterfaceState
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class BountyPrintLabelMessage : BoundUserInterfaceMessage
 {
     public string BountyId;
@@ -93,7 +95,7 @@ public sealed class BountyPrintLabelMessage : BoundUserInterfaceMessage
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class BountySkipMessage : BoundUserInterfaceMessage
 {
     public string BountyId;

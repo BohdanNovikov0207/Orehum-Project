@@ -9,15 +9,15 @@ using Robust.Shared.GameStates;
 
 namespace Content.Shared._Goobstation.Heretic.Components;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class EldritchInfluenceDrainerComponent : Component
 {
     [DataField]
-    public float Time = 8f;
+    public bool Hidden;
 
     [DataField]
     public float KnowledgePerInfluence = 2f;
 
     [DataField]
-    public bool Hidden;
+    public float Time = 8f;
 }

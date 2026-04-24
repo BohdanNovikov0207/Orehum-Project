@@ -3,7 +3,7 @@ using Robust.Shared.Utility;
 
 namespace Content.Shared._Shitcode.Heretic.Components;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class StarMarkComponent : Component
 {
     [DataField]

@@ -12,9 +12,34 @@ namespace Content.Shared.Cargo;
 /// <summary>
 /// A data structure for storing historical information about bounties.
 /// </summary>
-[DataDefinition, NetSerializable, Serializable]
+[DataDefinition] [NetSerializable] [Serializable]
 public readonly partial record struct CargoBountyHistoryData
 {
+    /// <summary>
+    /// Covers how a bounty was actually finished.
+    /// </summary>
+    public enum BountyResult
+    {
+        /// <summary>
+        /// Bounty was actually fulfilled and the goods sold
+        /// </summary>
+        Completed = 0,
+
+        /// <summary>
+        /// Bounty was explicitly skipped by some actor
+        /// </summary>
+        Skipped = 1,
+    }
+
+    public CargoBountyHistoryData(CargoBountyData bounty, BountyResult result, TimeSpan timestamp, string? actorName)
+    {
+        Bounty = bounty.Bounty;
+        Result = result;
+        Id = bounty.Id;
+        ActorName = actorName;
+        Timestamp = timestamp;
+    }
+
     /// <summary>
     /// A unique id used to identify the bounty
     /// </summary>
@@ -44,29 +69,4 @@ public readonly partial record struct CargoBountyHistoryData
     /// </summary>
     [DataField(required: true)]
     public ProtoId<CargoBountyPrototype> Bounty { get; init; } = string.Empty;
-
-    public CargoBountyHistoryData(CargoBountyData bounty, BountyResult result, TimeSpan timestamp, string? actorName)
-    {
-        Bounty = bounty.Bounty;
-        Result = result;
-        Id = bounty.Id;
-        ActorName = actorName;
-        Timestamp = timestamp;
-    }
-
-    /// <summary>
-    /// Covers how a bounty was actually finished.
-    /// </summary>
-    public enum BountyResult
-    {
-        /// <summary>
-        /// Bounty was actually fulfilled and the goods sold
-        /// </summary>
-        Completed = 0,
-
-        /// <summary>
-        /// Bounty was explicitly skipped by some actor
-        /// </summary>
-        Skipped = 1,
-    }
 }

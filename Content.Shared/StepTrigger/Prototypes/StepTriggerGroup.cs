@@ -14,10 +14,11 @@ using Robust.Shared.Serialization;
 namespace Content.Shared.StepTrigger.Prototypes;
 
 /// <summary>
-///     Goobstation: A group of <see cref="StepTriggerTypePrototype">
-///     Used to determine StepTriggerTypes like Tags.
-///     Used for better work with Immunity.
-///     StepTriggerTypes in StepTriggerTypes.yml
+/// Goobstation: A group of
+/// <see cref="StepTriggerTypePrototype">
+/// Used to determine StepTriggerTypes like Tags.
+/// Used for better work with Immunity.
+/// StepTriggerTypes in StepTriggerTypes.yml
 /// </summary>
 /// <code>
 /// stepTriggerGroups:
@@ -31,14 +32,14 @@ namespace Content.Shared.StepTrigger.Prototypes;
 ///   - SlipEntity
 /// </code>
 [DataDefinition]
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class StepTriggerGroup
 {
     [DataField]
     public List<ProtoId<StepTriggerTypePrototype>>? Types = null;
 
     /// <summary>
-    ///     Checks if types of this StepTriggerGroup is similar to types of AnotherGroup
+    /// Checks if types of this StepTriggerGroup is similar to types of AnotherGroup
     /// </summary>
     public bool IsValid(StepTriggerGroup? anotherGroup)
     {
@@ -52,12 +53,13 @@ public sealed partial class StepTriggerGroup
                 && anotherGroup.Types.Contains(type))
                 return true;
         }
+
         return false;
     }
 
     /// <summary>
-    ///     Checks validation (if types of this StepTriggerGroup are similar to types of
-    ///     another StepTriggerComponent.
+    /// Checks validation (if types of this StepTriggerGroup are similar to types of
+    /// another StepTriggerComponent.
     /// </summary>
     public bool IsValid(StepTriggerComponent component)
     {
@@ -68,8 +70,8 @@ public sealed partial class StepTriggerGroup
     }
 
     /// <summary>
-    ///     Checks validation (if types of this StepTriggerGroup are similar to types of
-    ///     another StepTriggerImmuneComponent.
+    /// Checks validation (if types of this StepTriggerGroup are similar to types of
+    /// another StepTriggerImmuneComponent.
     /// </summary>
     public bool IsValid(StepTriggerImmuneComponent component)
     {

@@ -6,40 +6,38 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Linq;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
-using System.Linq;
 
 namespace Content.Shared.Silicons.Laws;
 
 /// <summary>
 /// Lawset data used internally.
 /// </summary>
-[DataDefinition, Serializable, NetSerializable]
+[DataDefinition] [Serializable] [NetSerializable]
 public sealed partial class SiliconLawset
 {
     /// <summary>
     /// List of laws in this lawset.
     /// </summary>
-    [DataField(required: true), ViewVariables(VVAccess.ReadWrite)]
+    [DataField(required: true)] [ViewVariables(VVAccess.ReadWrite)]
     public List<SiliconLaw> Laws = new();
 
     /// <summary>
     /// What entity the lawset considers as a figure of authority.
     /// </summary>
-    [DataField(required: true), ViewVariables(VVAccess.ReadWrite)]
+    [DataField(required: true)] [ViewVariables(VVAccess.ReadWrite)]
     public string ObeysTo = string.Empty;
 
     /// <summary>
     /// A single line used in logging laws.
     /// Now using linq why? because I felt like it and it's free perf.
     /// </summary>
-    public string LoggingString()
-    {
-        return string.Join(" / ", 
-            from law in Laws 
+    public string LoggingString() =>
+        string.Join(" / ",
+            from law in Laws
             select $"{law.Order}: {Loc.GetString(law.LawString)}");
-    }
 
     /// <summary>
     /// Do a clone of this lawset.
@@ -53,25 +51,21 @@ public sealed partial class SiliconLawset
             laws.Add(law.ShallowClone());
         }
 
-        return new SiliconLawset()
+        return new SiliconLawset
         {
             Laws = laws,
-            ObeysTo = ObeysTo
+            ObeysTo = ObeysTo,
         };
     }
 }
 
 /// <summary>
-/// This is a prototype for a <see cref="SiliconLawPrototype"/> list.
+/// This is a prototype for a <see cref="SiliconLawPrototype" /> list.
 /// Cannot be used directly since it is a list of prototype ids rather than List<Siliconlaw>.
 /// </summary>
 [Prototype]
-public sealed partial class SiliconLawsetPrototype : IPrototype
+public sealed class SiliconLawsetPrototype : IPrototype
 {
-    /// <inheritdoc/>
-    [IdDataField]
-    public string ID { get; private set; } = default!;
-
     /// <summary>
     /// List of law prototype ids in this lawset.
     /// </summary>
@@ -81,6 +75,10 @@ public sealed partial class SiliconLawsetPrototype : IPrototype
     /// <summary>
     /// What entity the lawset considers as a figure of authority.
     /// </summary>
-    [DataField(required: true), ViewVariables(VVAccess.ReadWrite)]
+    [DataField(required: true)] [ViewVariables(VVAccess.ReadWrite)]
     public string ObeysTo = string.Empty;
+
+    /// <inheritdoc />
+    [IdDataField]
+    public string ID { get; } = default!;
 }

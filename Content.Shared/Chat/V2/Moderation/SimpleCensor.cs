@@ -15,23 +15,24 @@ namespace Content.Shared.Chat.V2.Moderation;
 /// </summary>
 public sealed class SimpleCensor : IChatCensor
 {
+    // What unicode ranges are allowed? If this array is empty, don't filter by range.
+    private UnicodeRange[] _allowedUnicodeRanges = Array.Empty<UnicodeRange>();
+
+    // Censored words are removed unless they're a false positive (e.g. Scunthorpe)
+    private string[] _censoredWords = Array.Empty<string>();
+
+    // False negatives are censored words that contain a false positives.
+    private string[] _falseNegatives = Array.Empty<string>();
+    private string[] _falsePositives = Array.Empty<string>();
+
+    private FrozenDictionary<char, char> _leetspeakReplacements = FrozenDictionary<char, char>.Empty;
+
     // Common substitution symbols are replaced with one of the characters they commonly substitute.
     private bool _shouldSanitizeLeetspeak;
-    private FrozenDictionary<char, char> _leetspeakReplacements = FrozenDictionary<char, char>.Empty;
 
     // Special characters are replaced with spaces.
     private bool _shouldSanitizeSpecialCharacters;
     private HashSet<char> _specialCharacterReplacements = [];
-
-    // Censored words are removed unless they're a false positive (e.g. Scunthorpe)
-    private string[] _censoredWords = Array.Empty<string>();
-    private string[] _falsePositives = Array.Empty<string>();
-
-    // False negatives are censored words that contain a false positives.
-    private string[] _falseNegatives = Array.Empty<string>();
-
-    // What unicode ranges are allowed? If this array is empty, don't filter by range.
-    private UnicodeRange[] _allowedUnicodeRanges= Array.Empty<UnicodeRange>();
 
     /// <summary>
     /// Censors the input string.
@@ -72,9 +73,7 @@ public sealed class SimpleCensor : IChatCensor
         for (var i = 0; i < falsePositives.Length; i++)
         {
             if (falsePositives[i] != replaceWith)
-            {
                 censored[i] = falsePositives[i];
-            }
         }
 
         for (var i = 0; i < originalInput.Length; i++)
@@ -96,17 +95,15 @@ public sealed class SimpleCensor : IChatCensor
             if (_shouldSanitizeLeetspeak || _shouldSanitizeSpecialCharacters)
             {
                 // detect "()"
-                if (originalInput[i] == '(' && i != originalInput.Length - 1 && originalInput[i+1] == ')')
+                if (originalInput[i] == '(' && i != originalInput.Length - 1 && originalInput[i + 1] == ')')
                 {
                     // censored has now had "o" replaced with "o) so both strings line up again..."
-                    censored.Insert(i+1, censored[i] != replaceWith ? ')' : replaceWith);
+                    censored.Insert(i + 1, censored[i] != replaceWith ? ')' : replaceWith);
                 }
             }
 
             if (censored[i] != replaceWith)
-            {
                 censored[i] = originalInput[i];
-            }
         }
 
         // SO says this is fast...
@@ -185,13 +182,13 @@ public sealed class SimpleCensor : IChatCensor
             var endOfFoundWord = 0;
             var foundIndex = input.IndexOf(word, endOfFoundWord, StringComparison.OrdinalIgnoreCase);
 
-            while(foundIndex > -1)
+            while (foundIndex > -1)
             {
                 endOfFoundWord = foundIndex + wordLength;
 
                 for (var i = 0; i < wordLength; i++)
                 {
-                    censored[foundIndex+i] = replaceWith;
+                    censored[foundIndex + i] = replaceWith;
                 }
 
                 foundIndex = input.IndexOf(word, endOfFoundWord, StringComparison.OrdinalIgnoreCase);
@@ -214,7 +211,7 @@ public sealed class SimpleCensor : IChatCensor
             var endOfFoundWord = 0;
             var foundIndex = input.IndexOf(word, endOfFoundWord, StringComparison.OrdinalIgnoreCase);
 
-            while(foundIndex > -1)
+            while (foundIndex > -1)
             {
                 endOfFoundWord = foundIndex + wordLength;
 
@@ -234,19 +231,16 @@ public sealed class SimpleCensor : IChatCensor
     {
         // "()" is a broad enough trick to beat censors that we we should check for it broadly.
         if (_shouldSanitizeLeetspeak || _shouldSanitizeSpecialCharacters)
-        {
             input = input.Replace("()", "o");
-        }
 
         var sb = new StringBuilder();
 
         // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
         foreach (var character in input)
         {
-            if (character == ' ' || _shouldSanitizeSpecialCharacters && _specialCharacterReplacements.Contains(character))
-            {
+            if (character == ' ' ||
+                _shouldSanitizeSpecialCharacters && _specialCharacterReplacements.Contains(character))
                 continue;
-            }
 
             if (_shouldSanitizeLeetspeak && _leetspeakReplacements.TryGetValue(character, out var leetRepl))
             {
@@ -267,9 +261,7 @@ public sealed class SimpleCensor : IChatCensor
     private string SanitizeOutBlockedUnicode(string input)
     {
         if (_allowedUnicodeRanges.Length <= 0)
-        {
             return input;
-        }
 
         var sb = new StringBuilder();
 
@@ -316,7 +308,7 @@ public sealed class SimpleCensor : IChatCensor
                 '@',
                 '!',
                 '?',
-                '+'
+                '+',
             ];
         }
 
@@ -336,7 +328,7 @@ public sealed class SimpleCensor : IChatCensor
                 ['3'] = 'e',
                 ['5'] = 's',
                 ['9'] = 'g',
-                ['<'] = 'c'
+                ['<'] = 'c',
             }.ToFrozenDictionary();
         }
 

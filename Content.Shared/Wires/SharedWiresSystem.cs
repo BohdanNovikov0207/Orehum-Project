@@ -39,8 +39,8 @@ namespace Content.Shared.Wires;
 
 public abstract class SharedWiresSystem : EntitySystem
 {
-    [Dependency] protected readonly ISharedAdminLogManager AdminLogger = default!;
     [Dependency] private readonly ActivatableUISystem _activatableUI = default!;
+    [Dependency] protected readonly ISharedAdminLogManager AdminLogger = default!;
     [Dependency] protected readonly SharedAppearanceSystem Appearance = default!;
     [Dependency] protected readonly SharedAudioSystem Audio = default!;
     [Dependency] protected readonly SharedToolSystem Tool = default!;
@@ -54,14 +54,12 @@ public abstract class SharedWiresSystem : EntitySystem
         SubscribeLocalEvent<WiresPanelComponent, InteractUsingEvent>(OnInteractUsing);
         SubscribeLocalEvent<WiresPanelComponent, ExaminedEvent>(OnExamine);
 
-        SubscribeLocalEvent<ActivatableUIRequiresPanelComponent, ActivatableUIOpenAttemptEvent>(OnAttemptOpenActivatableUI);
+        SubscribeLocalEvent<ActivatableUIRequiresPanelComponent, ActivatableUIOpenAttemptEvent>(
+            OnAttemptOpenActivatableUI);
         SubscribeLocalEvent<ActivatableUIRequiresPanelComponent, PanelChangedEvent>(OnActivatableUIPanelChanged);
     }
 
-    private void OnStartup(Entity<WiresPanelComponent> ent, ref ComponentStartup args)
-    {
-        UpdateAppearance(ent, ent);
-    }
+    private void OnStartup(Entity<WiresPanelComponent> ent, ref ComponentStartup args) => UpdateAppearance(ent, ent);
 
     private void OnPanelDoAfter(EntityUid uid, WiresPanelComponent panel, WirePanelDoAfterEvent args)
     {
@@ -71,7 +69,9 @@ public abstract class SharedWiresSystem : EntitySystem
         if (!TogglePanel(uid, panel, !panel.Open, args.User))
             return;
 
-        AdminLogger.Add(LogType.Action, LogImpact.Low, $"{ToPrettyString(args.User):user} screwed {ToPrettyString(uid):target}'s maintenance panel {(panel.Open ? "open" : "closed")}");
+        AdminLogger.Add(LogType.Action,
+            LogImpact.Low,
+            $"{ToPrettyString(args.User):user} screwed {ToPrettyString(uid):target}'s maintenance panel {(panel.Open ? "open" : "closed")}");
 
         var sound = panel.Open ? panel.ScrewdriverOpenSound : panel.ScrewdriverCloseSound;
         Audio.PlayPredicted(sound, uid, args.User);
@@ -93,11 +93,10 @@ public abstract class SharedWiresSystem : EntitySystem
                 (float) ent.Comp.OpenDelay.TotalSeconds,
                 ent.Comp.OpeningTool,
                 new WirePanelDoAfterEvent()))
-        {
             return;
-        }
 
-        AdminLogger.Add(LogType.Action, LogImpact.Low,
+        AdminLogger.Add(LogType.Action,
+            LogImpact.Low,
             $"{ToPrettyString(args.User):user} is screwing {ToPrettyString(ent):target}'s {(ent.Comp.Open ? "open" : "closed")} maintenance panel at {Transform(ent).Coordinates:targetlocation}");
         args.Handled = true;
     }
@@ -118,9 +117,7 @@ public abstract class SharedWiresSystem : EntitySystem
 
                 if (TryComp<WiresPanelSecurityComponent>(uid, out var wiresPanelSecurity) &&
                     wiresPanelSecurity.Examine != null)
-                {
                     args.PushMarkup(Loc.GetString(wiresPanelSecurity.Examine));
-                }
             }
         }
     }
@@ -182,7 +179,9 @@ public abstract class SharedWiresSystem : EntitySystem
         return entity.Comp.Open;
     }
 
-    private void OnAttemptOpenActivatableUI(EntityUid uid, ActivatableUIRequiresPanelComponent component, ActivatableUIOpenAttemptEvent args)
+    private void OnAttemptOpenActivatableUI(EntityUid uid,
+        ActivatableUIRequiresPanelComponent component,
+        ActivatableUIOpenAttemptEvent args)
     {
         if (args.Cancelled || !TryComp<WiresPanelComponent>(uid, out var wires))
             return;
@@ -191,7 +190,9 @@ public abstract class SharedWiresSystem : EntitySystem
             args.Cancel();
     }
 
-    private void OnActivatableUIPanelChanged(EntityUid uid, ActivatableUIRequiresPanelComponent component, ref PanelChangedEvent args)
+    private void OnActivatableUIPanelChanged(EntityUid uid,
+        ActivatableUIRequiresPanelComponent component,
+        ref PanelChangedEvent args)
     {
         if (args.Open == component.RequireOpen)
             return;

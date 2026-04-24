@@ -11,7 +11,7 @@ namespace Content.Shared.Traits.Assorted;
 /// </summary>
 public sealed class AccentlessSystem : EntitySystem
 {
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         base.Initialize();

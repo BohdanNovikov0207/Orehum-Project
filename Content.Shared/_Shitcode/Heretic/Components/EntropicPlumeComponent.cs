@@ -11,9 +11,12 @@ using Robust.Shared.GameStates;
 
 namespace Content.Shared._Goobstation.Heretic.Components;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class EntropicPlumeComponent : Component
 {
+    [DataField]
+    public List<EntityUid> AffectedEntities = new();
+
     [DataField]
     public float Duration = 10f;
 
@@ -22,7 +25,4 @@ public sealed partial class EntropicPlumeComponent : Component
     {
         { "Mold", 5f },
     };
-
-    [DataField]
-    public List<EntityUid> AffectedEntities = new();
 }

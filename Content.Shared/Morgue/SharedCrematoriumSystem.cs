@@ -18,15 +18,15 @@ namespace Content.Shared.Morgue;
 
 public abstract class SharedCrematoriumSystem : EntitySystem
 {
+    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly SharedContainerSystem _container = default!;
+    [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] protected readonly SharedEntityStorageSystem EntityStorage = default!;
+    [Dependency] protected readonly SharedMindSystem Mind = default!;
     [Dependency] protected readonly SharedPopupSystem Popup = default!;
     [Dependency] protected readonly StandingStateSystem Standing = default!;
-    [Dependency] protected readonly SharedMindSystem Mind = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly INetManager _net = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
-    [Dependency] private readonly SharedContainerSystem _container = default!;
 
     public override void Initialize()
     {
@@ -53,20 +53,14 @@ public abstract class SharedCrematoriumSystem : EntitySystem
 
             if (_appearance.TryGetData<bool>(ent.Owner, StorageVisuals.HasContents, out var hasContents, appearance) &&
                 hasContents)
-            {
                 args.PushMarkup(Loc.GetString("crematorium-entity-storage-component-on-examine-details-has-contents"));
-            }
             else
-            {
                 args.PushMarkup(Loc.GetString("crematorium-entity-storage-component-on-examine-details-empty"));
-            }
         }
     }
 
-    private void OnAttemptOpen(Entity<ActiveCrematoriumComponent> ent, ref StorageOpenAttemptEvent args)
-    {
+    private void OnAttemptOpen(Entity<ActiveCrematoriumComponent> ent, ref StorageOpenAttemptEvent args) =>
         args.Cancelled = true;
-    }
 
     private void AddCremateVerb(EntityUid uid, CrematoriumComponent component, GetVerbsEvent<AlternativeVerb> args)
     {
@@ -84,7 +78,7 @@ public abstract class SharedCrematoriumSystem : EntitySystem
             Text = Loc.GetString("cremate-verb-get-data-text"),
             // TODO VERB ICON add flame/burn symbol?
             Act = () => TryCremate((uid, component, storage), args.User),
-            Impact = LogImpact.High // could be a body? or evidence? I dunno.
+            Impact = LogImpact.High, // could be a body? or evidence? I dunno.
         };
         args.Verbs.Add(verb);
     }
@@ -148,6 +142,7 @@ public abstract class SharedCrematoriumSystem : EntitySystem
                 _container.Remove(item, ent.Comp2.Contents);
                 PredictedDel(item);
             }
+
             PredictedTrySpawnInContainer(ent.Comp1.LeftOverProtoId, ent.Owner, ent.Comp2.Contents.ID, out _);
         }
 

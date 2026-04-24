@@ -16,13 +16,16 @@ namespace Content.Shared.Explosion.Components;
 /// Use this component if the grenade splits into entities that make use of Timers
 /// or if you just want it to throw entities out in the world
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState, Access(typeof(SharedScatteringGrenadeSystem))]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState] [Access(typeof(SharedScatteringGrenadeSystem))]
 public sealed partial class ScatteringGrenadeComponent : Component
 {
-    public Container Container = default!;
-
+    /// <summary>
+    /// Max amount of entities inside the container
+    /// </summary>
     [DataField]
-    public EntityWhitelist? Whitelist;
+    public int Capacity = 3;
+
+    public Container Container = default!;
 
     /// <summary>
     /// What we fill our prototype with if we want to pre-spawn with entities.
@@ -31,22 +34,11 @@ public sealed partial class ScatteringGrenadeComponent : Component
     public EntProtoId? FillPrototype;
 
     /// <summary>
-    /// If we have a pre-fill how many more can we spawn.
+    /// Whether the main grenade has been triggered or not
+    /// We need to store this because we are only allowed to spawn and trigger timed entities on the next available frame
+    /// update
     /// </summary>
-    [ViewVariables(VVAccess.ReadOnly), AutoNetworkedField]
-    public int UnspawnedCount;
-
-    /// <summary>
-    /// Max amount of entities inside the container
-    /// </summary>
-    [DataField]
-    public int Capacity = 3;
-
-    /// <summary>
-    /// Number of grenades currently contained in the cluster (both spawned and unspawned)
-    /// </summary>
-    [ViewVariables(VVAccess.ReadOnly)]
-    public int Count => UnspawnedCount + Container.ContainedEntities.Count;
+    public bool IsTriggered = false;
 
     /// <summary>
     /// Decides if contained entities trigger after getting launched
@@ -54,9 +46,31 @@ public sealed partial class ScatteringGrenadeComponent : Component
     [DataField]
     public bool TriggerContents = true;
 
-    #region Trigger time parameters for scattered entities
     /// <summary>
-    ///  Minimum delay in seconds before any entities start to be triggered.
+    /// The trigger key that will activate the grenade.
+    /// </summary>
+    [DataField]
+    public string TriggerKey = "timer";
+
+    /// <summary>
+    /// If we have a pre-fill how many more can we spawn.
+    /// </summary>
+    [ViewVariables(VVAccess.ReadOnly)] [AutoNetworkedField]
+    public int UnspawnedCount;
+
+    [DataField]
+    public EntityWhitelist? Whitelist;
+
+    /// <summary>
+    /// Number of grenades currently contained in the cluster (both spawned and unspawned)
+    /// </summary>
+    [ViewVariables(VVAccess.ReadOnly)]
+    public int Count => UnspawnedCount + Container.ContainedEntities.Count;
+
+    #region Trigger time parameters for scattered entities
+
+    /// <summary>
+    /// Minimum delay in seconds before any entities start to be triggered.
     /// </summary>
     [DataField]
     public float DelayBeforeTriggerContents = 1.0f;
@@ -72,9 +86,11 @@ public sealed partial class ScatteringGrenadeComponent : Component
     /// </summary>
     [DataField]
     public float IntervalBetweenTriggersMin;
+
     #endregion
 
     #region Throwing parameters for the scattered entities
+
     /// <summary>
     /// Should the angle the entities get thrown at be random
     /// instead of uniformly distributed
@@ -111,17 +127,6 @@ public sealed partial class ScatteringGrenadeComponent : Component
     /// </summary>
     [DataField]
     public float RandomThrowDistanceMin;
+
     #endregion
-
-    /// <summary>
-    /// Whether the main grenade has been triggered or not
-    /// We need to store this because we are only allowed to spawn and trigger timed entities on the next available frame update
-    /// </summary>
-    public bool IsTriggered = false;
-
-    /// <summary>
-    /// The trigger key that will activate the grenade.
-    /// </summary>
-    [DataField]
-    public string TriggerKey = "timer";
 }

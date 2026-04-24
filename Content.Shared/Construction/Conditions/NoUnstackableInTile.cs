@@ -16,14 +16,15 @@ using Robust.Shared.Map;
 namespace Content.Shared.Construction.Conditions;
 
 /// <summary>
-///   Check for "Unstackable" condition commonly used by atmos devices and others which otherwise don't check on
-///   collisions with other items.
+/// Check for "Unstackable" condition commonly used by atmos devices and others which otherwise don't check on
+/// collisions with other items.
 /// </summary>
 [UsedImplicitly]
 [DataDefinition]
 public sealed partial class NoUnstackableInTile : IConstructionCondition
 {
     public const string GuidebookString = "construction-step-condition-no-unstackable-in-tile";
+
     public bool Condition(EntityUid user, EntityCoordinates location, Direction direction)
     {
         var sysMan = IoCManager.Resolve<IEntitySystemManager>();
@@ -32,11 +33,9 @@ public sealed partial class NoUnstackableInTile : IConstructionCondition
         return !anchorable.AnyUnstackablesAnchoredAt(location);
     }
 
-    public ConstructionGuideEntry GenerateGuideEntry()
-    {
-        return new ConstructionGuideEntry
+    public ConstructionGuideEntry GenerateGuideEntry() =>
+        new()
         {
-            Localization = GuidebookString
+            Localization = GuidebookString,
         };
-    }
 }

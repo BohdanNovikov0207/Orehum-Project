@@ -1,5 +1,4 @@
 using Content.Shared.Examine;
-using Content.Shared.Hands.Components;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Heretic;
 using Content.Shared.Heretic.Components;
@@ -18,16 +17,16 @@ namespace Content.Shared._Shitcode.Heretic.Systems;
 
 public sealed class InfusedItemSystem : EntitySystem
 {
+    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly SharedMansusGraspSystem _grasp = default!;
+    [Dependency] private readonly SharedHandsSystem _hands = default!;
+    [Dependency] private readonly SharedHereticSystem _heretic = default!;
+    [Dependency] private readonly SharedItemSystem _item = default!;
+    [Dependency] private readonly SharedRatvarianLanguageSystem _language = default!;
     [Dependency] private readonly INetManager _net = default!;
 
     [Dependency] private readonly SharedStunSystem _stun = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedRatvarianLanguageSystem _language = default!;
-    [Dependency] private readonly SharedHandsSystem _hands = default!;
-    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
-    [Dependency] private readonly SharedItemSystem _item = default!;
-    [Dependency] private readonly SharedMansusGraspSystem _grasp = default!;
-    [Dependency] private readonly SharedHereticSystem _heretic = default!;
 
 
     public override void Initialize()
@@ -42,10 +41,8 @@ public sealed class InfusedItemSystem : EntitySystem
         SubscribeLocalEvent<MansusInfusedComponent, ComponentShutdown>(OnInfusedShutdown);
     }
 
-    private void OnInfusedExamine(Entity<MansusInfusedComponent> ent, ref ExaminedEvent args)
-    {
+    private void OnInfusedExamine(Entity<MansusInfusedComponent> ent, ref ExaminedEvent args) =>
         args.PushMarkup(Loc.GetString("mansus-infused-item-examine"));
-    }
 
     private void OnInfusedInteract(Entity<MansusInfusedComponent> ent, ref InteractHandEvent args)
     {

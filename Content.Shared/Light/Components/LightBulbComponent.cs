@@ -17,28 +17,15 @@ namespace Content.Shared.Light.Components;
 /// Component that represents a light bulb. Can be broken, or burned, which turns them mostly useless.
 /// TODO: Breaking and burning should probably be moved to another component eventually.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class LightBulbComponent : Component
 {
     /// <summary>
-    /// The color of the lightbulb and the light it produces.
+    /// The sound produced when the lightbulb breaks.
     /// </summary>
-    [DataField("color")]
+    [DataField("breakSound")]
     [ViewVariables(VVAccess.ReadWrite)]
-    public Color Color = Color.White;
-
-    /// <summary>
-    /// The type of lightbulb. Tube/bulb/etc...
-    /// </summary>
-    [DataField("bulb")]
-    [ViewVariables(VVAccess.ReadWrite)]
-    public LightBulbType Type = LightBulbType.Tube;
-
-    /// <summary>
-    /// The initial state of the lightbulb.
-    /// </summary>
-    [DataField("startingState")]
-    public LightBulbState State = LightBulbState.Normal;
+    public SoundSpecifier BreakSound = new SoundCollectionSpecifier("GlassBreak", AudioParams.Default.WithVolume(-6f));
 
     /// <summary>
     /// The temperature the air around the lightbulb is exposed to when the lightbulb burns out.
@@ -46,6 +33,13 @@ public sealed partial class LightBulbComponent : Component
     [DataField("BurningTemperature")]
     [ViewVariables(VVAccess.ReadWrite)]
     public int BurningTemperature = 1400;
+
+    /// <summary>
+    /// The color of the lightbulb and the light it produces.
+    /// </summary>
+    [DataField("color")]
+    [ViewVariables(VVAccess.ReadWrite)]
+    public Color Color = Color.White;
 
     /// <summary>
     /// Relates to how bright the light produced by the lightbulb is.
@@ -76,11 +70,17 @@ public sealed partial class LightBulbComponent : Component
     public int PowerUse = 60;
 
     /// <summary>
-    /// The sound produced when the lightbulb breaks.
+    /// The initial state of the lightbulb.
     /// </summary>
-    [DataField("breakSound")]
+    [DataField("startingState")]
+    public LightBulbState State = LightBulbState.Normal;
+
+    /// <summary>
+    /// The type of lightbulb. Tube/bulb/etc...
+    /// </summary>
+    [DataField("bulb")]
     [ViewVariables(VVAccess.ReadWrite)]
-    public SoundSpecifier BreakSound = new SoundCollectionSpecifier("GlassBreak", AudioParams.Default.WithVolume(-6f));
+    public LightBulbType Type = LightBulbType.Tube;
 
     #region Appearance
 
@@ -108,7 +108,7 @@ public sealed partial class LightBulbComponent : Component
     #endregion Appearance
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum LightBulbState : byte
 {
     Normal,
@@ -116,21 +116,21 @@ public enum LightBulbState : byte
     Burned,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum LightBulbVisuals : byte
 {
     State,
-    Color
+    Color,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum LightBulbType : byte
 {
     Bulb,
     Tube,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum LightBulbVisualLayers : byte
 {
     Base,

@@ -16,21 +16,10 @@ using Robust.Shared.Utility;
 namespace Content.Shared.Weather;
 
 [Prototype]
-public sealed partial class WeatherPrototype : IPrototype
+public sealed class WeatherPrototype : IPrototype
 {
-    [IdDataField] public string ID { get; private set; } = default!;
-
-    [ViewVariables(VVAccess.ReadWrite), DataField("sprite", required: true)]
-    public SpriteSpecifier Sprite = default!;
-
-    [ViewVariables(VVAccess.ReadWrite), DataField("color")]
+    [ViewVariables(VVAccess.ReadWrite)] [DataField("color")]
     public Color? Color;
-
-    /// <summary>
-    /// Sound to play on the affected areas.
-    /// </summary>
-    [ViewVariables(VVAccess.ReadWrite), DataField("sound")]
-    public SoundSpecifier? Sound;
 
     /// <summary>
     /// DeltaV: Damage you can take from being in this weather.
@@ -44,4 +33,15 @@ public sealed partial class WeatherPrototype : IPrototype
     /// </summary>
     [DataField]
     public EntityWhitelist? DamageBlacklist;
+
+    /// <summary>
+    /// Sound to play on the affected areas.
+    /// </summary>
+    [ViewVariables(VVAccess.ReadWrite)] [DataField("sound")]
+    public SoundSpecifier? Sound;
+
+    [ViewVariables(VVAccess.ReadWrite)] [DataField("sprite", required: true)]
+    public SpriteSpecifier Sprite = default!;
+
+    [IdDataField] public string ID { get; } = default!;
 }

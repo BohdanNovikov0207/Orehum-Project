@@ -11,28 +11,28 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.RCD;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class RCDSystemMessage(ProtoId<RCDPrototype> protoId) : BoundUserInterfaceMessage
 {
     public ProtoId<RCDPrototype> ProtoId = protoId;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class RCDConstructionGhostRotationEvent(NetEntity netEntity, Direction direction) : EntityEventArgs
 {
-    public readonly NetEntity NetEntity = netEntity;
     public readonly Direction Direction = direction;
+    public readonly NetEntity NetEntity = netEntity;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class RCDConstructionGhostFlipEvent(NetEntity netEntity, bool useMirrorPrototype) : EntityEventArgs
 {
     public readonly NetEntity NetEntity = netEntity;
     public readonly bool UseMirrorPrototype = useMirrorPrototype;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum RcdUiKey : byte
 {
-    Key
+    Key,
 }

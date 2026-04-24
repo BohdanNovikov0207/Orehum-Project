@@ -16,26 +16,14 @@ using Robust.Shared.Serialization;
 namespace Content.Shared.Construction;
 
 /// <summary>
-///     Sent client -> server to to tell the server that we started building
-///     a structure-construction.
+/// Sent client -> server to to tell the server that we started building
+/// a structure-construction.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class TryStartStructureConstructionMessage : EntityEventArgs
 {
     /// <summary>
-    ///     Position to start building.
-    /// </summary>
-    public readonly NetCoordinates Location;
-
-    /// <summary>
-    ///     The construction prototype to start building.
-    /// </summary>
-    public readonly string PrototypeName;
-
-    public readonly Angle Angle;
-
-    /// <summary>
-    ///     Identifier to be sent back in the acknowledgement so that the client can clean up its ghost.
+    /// Identifier to be sent back in the acknowledgement so that the client can clean up its ghost.
     /// </summary>
     /// <remarks>
     /// So essentially the client is sending its own entity to the server so it knows to delete it when it gets server
@@ -43,10 +31,26 @@ public sealed class TryStartStructureConstructionMessage : EntityEventArgs
     /// </remarks>
     public readonly int Ack;
 
-    // Goobstation
-    public readonly NetEntity? With = null;
+    public readonly Angle Angle;
 
-    public TryStartStructureConstructionMessage(NetCoordinates loc, string prototypeName, Angle angle, int ack, NetEntity? with = null) // Goobstation
+    /// <summary>
+    /// Position to start building.
+    /// </summary>
+    public readonly NetCoordinates Location;
+
+    /// <summary>
+    /// The construction prototype to start building.
+    /// </summary>
+    public readonly string PrototypeName;
+
+    // Goobstation
+    public readonly NetEntity? With;
+
+    public TryStartStructureConstructionMessage(NetCoordinates loc,
+        string prototypeName,
+        Angle angle,
+        int ack,
+        NetEntity? with = null) // Goobstation
     {
         Location = loc;
         PrototypeName = prototypeName;
@@ -57,14 +61,14 @@ public sealed class TryStartStructureConstructionMessage : EntityEventArgs
 }
 
 /// <summary>
-///     Sent client -> server to to tell the server that we started building
-///     an item-construction.
+/// Sent client -> server to to tell the server that we started building
+/// an item-construction.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class TryStartItemConstructionMessage : EntityEventArgs
 {
     /// <summary>
-    ///     The construction prototype to start building.
+    /// The construction prototype to start building.
     /// </summary>
     public readonly string PrototypeName;
 
@@ -77,13 +81,13 @@ public sealed class TryStartItemConstructionMessage : EntityEventArgs
 /// <summary>
 /// Sent server -> client to tell the client that a ghost has started to be constructed.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class AckStructureConstructionMessage : EntityEventArgs
 {
     public readonly int GhostId;
 
     /// <summary>
-    ///     The entity that is now being constructed, if any.
+    /// The entity that is now being constructed, if any.
     /// </summary>
     public readonly NetEntity? Uid;
 
@@ -97,7 +101,7 @@ public sealed class AckStructureConstructionMessage : EntityEventArgs
 /// <summary>
 /// Sent client -> server to request a specific construction guide.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class RequestConstructionGuide : EntityEventArgs
 {
     public readonly string ConstructionId;
@@ -109,9 +113,9 @@ public sealed class RequestConstructionGuide : EntityEventArgs
 }
 
 /// <summary>
-/// Sent server -> client as a response to a <see cref="RequestConstructionGuide"/> net message.
+/// Sent server -> client as a response to a <see cref="RequestConstructionGuide" /> net message.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class ResponseConstructionGuide : EntityEventArgs
 {
     public readonly string ConstructionId;
@@ -124,7 +128,7 @@ public sealed class ResponseConstructionGuide : EntityEventArgs
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class ConstructionInteractDoAfterEvent : DoAfterEvent
 {
     [DataField("clickLocation")]
@@ -142,7 +146,7 @@ public sealed partial class ConstructionInteractDoAfterEvent : DoAfterEvent
     public override DoAfterEvent Clone() => this;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class WelderRefineDoAfterEvent : SimpleDoAfterEvent
 {
 }

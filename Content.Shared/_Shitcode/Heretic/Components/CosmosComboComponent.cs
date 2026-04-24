@@ -5,11 +5,11 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Shared._Shitcode.Heretic.Components;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class CosmosComboComponent : Component
 {
     [DataField]
-    public Dictionary<EntityUid, int> HitEntities = new();
+    public int ComboCounter;
 
     [DataField]
     public float ComboDuration = 3f;
@@ -18,16 +18,7 @@ public sealed partial class CosmosComboComponent : Component
     public float ComboIncreaseTime = 0.5f;
 
     [DataField]
-    public float MaxComboDuration = 10f;
-
-    [DataField]
     public float ComboTimer = 3f;
-
-    [DataField]
-    public int ComboCounter;
-
-    [DataField]
-    public SoundSpecifier? Sound = new SoundPathSpecifier("/Audio/_Goobstation/Heretic/cosmic_energy.ogg");
 
     [DataField]
     public DamageSpecifier DamageToSecondTargets = new()
@@ -48,7 +39,16 @@ public sealed partial class CosmosComboComponent : Component
     };
 
     [DataField]
+    public Dictionary<EntityUid, int> HitEntities = new();
+
+    [DataField]
+    public float MaxComboDuration = 10f;
+
+    [DataField]
     public EntProtoId SecondTargetEffect = "EffectCosmicExplosion";
+
+    [DataField]
+    public SoundSpecifier? Sound = new SoundPathSpecifier("/Audio/_Goobstation/Heretic/cosmic_energy.ogg");
 
     [DataField]
     public EntProtoId ThirdTargetEffect = "EffectCosmicDomain";

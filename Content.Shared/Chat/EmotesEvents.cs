@@ -10,7 +10,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Chat;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class PlayEmoteMessage(ProtoId<EmotePrototype> protoId) : EntityEventArgs
 {
     public readonly ProtoId<EmotePrototype> ProtoId = protoId;

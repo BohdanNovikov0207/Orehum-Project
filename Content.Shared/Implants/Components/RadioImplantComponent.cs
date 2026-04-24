@@ -16,12 +16,6 @@ namespace Content.Shared.Implants.Components;
 public sealed partial class RadioImplantComponent : Component
 {
     /// <summary>
-    /// The radio channel(s) to grant access to.
-    /// </summary>
-    [DataField(required: true)]
-    public HashSet<ProtoId<RadioChannelPrototype>> RadioChannels = new();
-
-    /// <summary>
     /// The radio channels that have been added by the implant to a user's ActiveRadioComponent.
     /// Used to track which channels were successfully added (not already in user)
     /// </summary>
@@ -30,6 +24,12 @@ public sealed partial class RadioImplantComponent : Component
     /// </remarks>
     [DataField]
     public HashSet<ProtoId<RadioChannelPrototype>> ActiveAddedChannels = new();
+
+    /// <summary>
+    /// The radio channel(s) to grant access to.
+    /// </summary>
+    [DataField(required: true)]
+    public HashSet<ProtoId<RadioChannelPrototype>> RadioChannels = new();
 
     /// <summary>
     /// The radio channels that have been added by the implant to a user's IntrinsicRadioTransmitterComponent.

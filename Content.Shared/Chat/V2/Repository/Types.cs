@@ -26,7 +26,7 @@ public struct ChatRecord(string userName, NetUserId userId, IChatEvent storedEve
 /// Notifies that a chat message has been created.
 /// </summary>
 /// <param name="ev"></param>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class MessageCreatedEvent(IChatEvent ev) : EntityEventArgs
 {
     public IChatEvent Event = ev;
@@ -37,7 +37,7 @@ public sealed class MessageCreatedEvent(IChatEvent ev) : EntityEventArgs
 /// </summary>
 /// <param name="id"></param>
 /// <param name="newMessage"></param>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class MessagePatchedEvent(uint id, string newMessage) : EntityEventArgs
 {
     public uint MessageId = id;
@@ -48,7 +48,7 @@ public sealed class MessagePatchedEvent(uint id, string newMessage) : EntityEven
 /// Notifies that a chat message has been deleted.
 /// </summary>
 /// <param name="id"></param>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class MessageDeletedEvent(uint id) : EntityEventArgs
 {
     public uint MessageId = id;
@@ -58,7 +58,7 @@ public sealed class MessageDeletedEvent(uint id) : EntityEventArgs
 /// Notifies that a player's messages have been nuked.
 /// </summary>
 /// <param name="set"></param>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class MessagesNukedEvent(List<uint> set) : EntityEventArgs
 {
     public uint[] MessageIds = CollectionsMarshal.AsSpan(set).ToArray();

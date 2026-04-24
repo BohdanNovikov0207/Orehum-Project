@@ -6,11 +6,17 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Shared._White.Xenomorphs.Xenomorph;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class XenomorphComponent : Component
 {
     [DataField(required: true)]
     public ProtoId<XenomorphCastePrototype> Caste;
+
+    [ViewVariables]
+    public TimeSpan NextPointsAt;
+
+    [ViewVariables]
+    public bool OnWeed;
 
     /// <summary>
     /// Healing provided by the weed.
@@ -26,10 +32,4 @@ public sealed partial class XenomorphComponent : Component
     /// </summary>
     [DataField]
     public ProtoId<LanguagePrototype> XenoLanguageId { get; set; } = "XenoHivemind";
-
-    [ViewVariables]
-    public bool OnWeed;
-
-    [ViewVariables]
-    public TimeSpan NextPointsAt;
 }

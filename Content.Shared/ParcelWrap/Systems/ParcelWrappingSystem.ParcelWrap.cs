@@ -57,9 +57,8 @@ public sealed partial class ParcelWrappingSystem
         }
     }
 
-    private bool TryStartWrapDoAfter(EntityUid user, Entity<ParcelWrapComponent> wrapper, EntityUid target)
-    {
-        return _doAfter.TryStartDoAfter(new DoAfterArgs(EntityManager,
+    private bool TryStartWrapDoAfter(EntityUid user, Entity<ParcelWrapComponent> wrapper, EntityUid target) =>
+        _doAfter.TryStartDoAfter(new DoAfterArgs(EntityManager,
             user,
             wrapper.Comp.WrapDelay,
             new ParcelWrapItemDoAfterEvent(),
@@ -71,12 +70,11 @@ public sealed partial class ParcelWrappingSystem
             BreakOnMove = true,
             BreakOnDamage = true,
         });
-    }
 
     /// <summary>
-    /// Spawns a WrappedParcel containing <paramref name="target"/>.
+    /// Spawns a WrappedParcel containing <paramref name="target" />.
     /// </summary>
-    /// <param name="user">The entity using <paramref name="wrapper"/> to wrap <paramref name="target"/>.</param>
+    /// <param name="user">The entity using <paramref name="wrapper" /> to wrap <paramref name="target" />.</param>
     /// <param name="wrapper">The wrapping being used. Determines appearance of the spawned parcel.</param>
     /// <param name="target">The entity being wrapped.</param>
     private void WrapInternal(EntityUid user, Entity<ParcelWrapComponent> wrapper, EntityUid target)
@@ -90,9 +88,7 @@ public sealed partial class ParcelWrappingSystem
             TryComp(target, out ItemComponent? targetItemComp);
             var size = wrapper.Comp.FallbackItemSize;
             if (wrapper.Comp.WrappedItemsMaintainSize && targetItemComp is not null)
-            {
                 size = targetItemComp.Size;
-            }
 
             // ParcelWrap's spawned entity should always have an `ItemComp`. As of writing, the only use has it hardcoded on
             // its prototype.
@@ -103,9 +99,7 @@ public sealed partial class ParcelWrappingSystem
             // If this wrap maintains the shape when wrapping and the item has a shape override, copy the shape override to
             // the parcel.
             if (wrapper.Comp.WrappedItemsMaintainShape && targetItemComp is { Shape: { } shape })
-            {
                 _item.SetShape(spawned, shape, item);
-            }
 
             // If the target's in a container, try to put the parcel in its place in the container.
             if (_container.TryGetContainingContainer((target, null, null), out var containerOfTarget))

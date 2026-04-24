@@ -17,11 +17,10 @@ namespace Content.Shared.GameTicking.Prototypes;
 /// Prototype for a lobby background the game can choose.
 /// </summary>
 [Prototype("lobbyBackground")]
-public sealed partial class LobbyBackgroundPrototype : IPrototype
+public sealed class LobbyBackgroundPrototype : IPrototype
 {
-    /// <inheritdoc/>
-    [IdDataField]
-    public string ID { get; set; } = default!;
+    [DataField("artist")]
+    public string? Artist;
 
     /// <summary>
     /// The sprite to use as the background. This should ideally be 1920x1080.
@@ -32,6 +31,7 @@ public sealed partial class LobbyBackgroundPrototype : IPrototype
     [DataField("name")]
     public string? Name;
 
-    [DataField("artist")]
-    public string? Artist;
+    /// <inheritdoc />
+    [IdDataField]
+    public string ID { get; set; } = default!;
 }

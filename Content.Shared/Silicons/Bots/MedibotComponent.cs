@@ -6,8 +6,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-using Content.Shared.Chemistry.Reagent;
 using Content.Goobstation.Maths.FixedPoint;
+using Content.Shared.Chemistry.Reagent;
 using Content.Shared.Mobs;
 using Robust.Shared.Audio;
 using Robust.Shared.Prototypes;
@@ -23,16 +23,16 @@ namespace Content.Shared.Silicons.Bots;
 public sealed partial class MedibotComponent : Component
 {
     /// <summary>
-    /// Treatments the bot will apply for each mob state.
-    /// </summary>
-    [DataField(required: true)]
-    public Dictionary<MobState, MedibotTreatment> Treatments = new();
-
-    /// <summary>
     /// Sound played after injecting a patient.
     /// </summary>
     [DataField("injectSound")]
     public SoundSpecifier InjectSound = new SoundPathSpecifier("/Audio/Items/hypospray.ogg");
+
+    /// <summary>
+    /// Treatments the bot will apply for each mob state.
+    /// </summary>
+    [DataField(required: true)]
+    public Dictionary<MobState, MedibotTreatment> Treatments = new();
 }
 
 /// <summary>
@@ -42,16 +42,11 @@ public sealed partial class MedibotComponent : Component
 public sealed partial class MedibotTreatment
 {
     /// <summary>
-    /// Reagent to inject into the patient.
+    /// Do nothing when the patient is at or above this total damage.
+    /// Useful for tricordrazine which does nothing above 50 damage.
     /// </summary>
-    [DataField(required: true)]
-    public ProtoId<ReagentPrototype> Reagent = string.Empty;
-
-    /// <summary>
-    /// How much of the reagent to inject.
-    /// </summary>
-    [DataField(required: true)]
-    public FixedPoint2 Quantity;
+    [DataField]
+    public FixedPoint2? MaxDamage;
 
     /// <summary>
     /// Do nothing when the patient is at or below this total damage.
@@ -61,18 +56,21 @@ public sealed partial class MedibotTreatment
     public FixedPoint2? MinDamage;
 
     /// <summary>
-    /// Do nothing when the patient is at or above this total damage.
-    /// Useful for tricordrazine which does nothing above 50 damage.
+    /// How much of the reagent to inject.
     /// </summary>
-    [DataField]
-    public FixedPoint2? MaxDamage;
+    [DataField(required: true)]
+    public FixedPoint2 Quantity;
+
+    /// <summary>
+    /// Reagent to inject into the patient.
+    /// </summary>
+    [DataField(required: true)]
+    public ProtoId<ReagentPrototype> Reagent = string.Empty;
 
     /// <summary>
     /// Returns whether the treatment will probably work for an amount of damage.
     /// Doesn't account for specific damage types only total amount.
     /// </summary>
-    public bool IsValid(FixedPoint2 damage)
-    {
-        return (MaxDamage == null || damage < MaxDamage) && (MinDamage == null || damage > MinDamage);
-    }
+    public bool IsValid(FixedPoint2 damage) =>
+        (MaxDamage == null || damage < MaxDamage) && (MinDamage == null || damage > MinDamage);
 }

@@ -26,21 +26,14 @@ using Robust.Shared.Prototypes;
 namespace Content.Shared._Lavaland.Procedural.Prototypes;
 
 [Prototype]
-public sealed partial class LavalandRuinPoolPrototype : IPrototype
+public sealed class LavalandRuinPoolPrototype : IPrototype
 {
-    [IdDataField] public string ID { get; } = default!;
-
     /// <summary>
-    /// Distance in-between ruins.
+    /// List of all dungeon ruins and their count.
+    /// Used for ruins that are generated with Dungeon markers.
     /// </summary>
     [DataField]
-    public int RuinDistance = 16;
-
-    /// <summary>
-    /// Max distance that Ruins can generate.
-    /// </summary>
-    [DataField]
-    public int MaxDistance = 256; // TODO make this value higher after proper GPS UI is added
+    public Dictionary<ProtoId<LavalandDungeonRuinPrototype>, ushort> DungeonRuins = new();
 
     /// <summary>
     /// List of all grid ruins and their count.
@@ -50,9 +43,16 @@ public sealed partial class LavalandRuinPoolPrototype : IPrototype
     public Dictionary<ProtoId<LavalandGridRuinPrototype>, ushort> GridRuins = new();
 
     /// <summary>
-    /// List of all dungeon ruins and their count.
-    /// Used for ruins that are generated with Dungeon markers.
+    /// Max distance that Ruins can generate.
     /// </summary>
     [DataField]
-    public Dictionary<ProtoId<LavalandDungeonRuinPrototype>, ushort> DungeonRuins = new();
+    public int MaxDistance = 256; // TODO make this value higher after proper GPS UI is added
+
+    /// <summary>
+    /// Distance in-between ruins.
+    /// </summary>
+    [DataField]
+    public int RuinDistance = 16;
+
+    [IdDataField] public string ID { get; } = default!;
 }

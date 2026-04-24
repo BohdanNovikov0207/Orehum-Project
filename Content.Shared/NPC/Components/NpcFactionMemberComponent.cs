@@ -13,15 +13,9 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Shared.NPC.Components;
 
-[RegisterComponent, NetworkedComponent, Access(typeof(NpcFactionSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(NpcFactionSystem))]
 public sealed partial class NpcFactionMemberComponent : Component
 {
-    /// <summary>
-    /// Factions this entity is a part of.
-    /// </summary>
-    [DataField]
-    public HashSet<ProtoId<NpcFactionPrototype>> Factions = new();
-
     /// <summary>
     /// Cached friendly factions.
     /// </summary>
@@ -37,12 +31,18 @@ public sealed partial class NpcFactionMemberComponent : Component
     /// <summary>
     /// Used to add friendly factions in prototypes.
     /// </summary>
-    [DataField, ViewVariables]
+    [DataField] [ViewVariables]
     public HashSet<ProtoId<NpcFactionPrototype>>? AddFriendlyFactions;
 
     /// <summary>
     /// Used to add hostile factions in prototypes.
     /// </summary>
-    [DataField, ViewVariables]
+    [DataField] [ViewVariables]
     public HashSet<ProtoId<NpcFactionPrototype>>? AddHostileFactions;
+
+    /// <summary>
+    /// Factions this entity is a part of.
+    /// </summary>
+    [DataField]
+    public HashSet<ProtoId<NpcFactionPrototype>> Factions = new();
 }

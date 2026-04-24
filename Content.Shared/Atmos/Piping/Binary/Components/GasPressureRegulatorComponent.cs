@@ -8,8 +8,8 @@ namespace Content.Shared.Atmos.Piping.Binary.Components;
 /// Defines a gas pressure regulator,
 /// which releases gas depending on a set pressure threshold between two pipe nodes.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
-[AutoGenerateComponentState(true, true), AutoGenerateComponentPause]
+[RegisterComponent] [NetworkedComponent]
+[AutoGenerateComponentState(true, true)] [AutoGenerateComponentPause]
 public sealed partial class GasPressureRegulatorComponent : Component
 {
     /// <summary>
@@ -17,7 +17,7 @@ public sealed partial class GasPressureRegulatorComponent : Component
     /// Used for showing the valve animation, the UI,
     /// and on examine.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public bool Enabled;
 
     /// <summary>
@@ -25,12 +25,6 @@ public sealed partial class GasPressureRegulatorComponent : Component
     /// </summary>
     [DataField]
     public string InletName = "inlet";
-
-    /// <summary>
-    /// Specifies the pipe node name to be treated as the outlet.
-    /// </summary>
-    [DataField]
-    public string OutletName = "outlet";
 
     /// <summary>
     /// The max transfer rate of the pressure regulator.
@@ -47,12 +41,20 @@ public sealed partial class GasPressureRegulatorComponent : Component
     public TimeSpan NextUiUpdate = TimeSpan.Zero;
 
     /// <summary>
+    /// Specifies the pipe node name to be treated as the outlet.
+    /// </summary>
+    [DataField]
+    public string OutletName = "outlet";
+
+    /// <summary>
     /// Sets the opening threshold of the pressure regulator.
     /// </summary>
-    /// <example> If set to 500 kPa, the regulator will only
+    /// <example>
+    /// If set to 500 kPa, the regulator will only
     /// open if the pressure in the inlet side is above
-    /// 500 kPa. </example>
-    [DataField, AutoNetworkedField]
+    /// 500 kPa.
+    /// </example>
+    [DataField] [AutoNetworkedField]
     public float Threshold;
 
     /// <summary>
@@ -67,21 +69,21 @@ public sealed partial class GasPressureRegulatorComponent : Component
     /// The current flow rate of the pressure regulator.
     /// </summary>
     [ViewVariables(VVAccess.ReadOnly)]
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public float FlowRate;
 
     /// <summary>
     /// Current inlet pressure the pressure regulator.
     /// </summary>
     [ViewVariables(VVAccess.ReadOnly)]
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public float InletPressure;
 
     /// <summary>
     /// Current outlet pressure of the pressure regulator.
     /// </summary>
     [ViewVariables(VVAccess.ReadOnly)]
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public float OutletPressure;
 
     #endregion

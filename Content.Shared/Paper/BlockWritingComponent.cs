@@ -11,7 +11,7 @@ namespace Content.Shared.Paper;
 /// <summary>
 /// An entity with this component cannot write on paper.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class BlockWritingComponent : Component
 {
     /// <summary>

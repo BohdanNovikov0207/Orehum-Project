@@ -14,12 +14,12 @@ namespace Content.Shared.Lock;
 /// Adds whitelist and blacklist for this mob to lock things.
 /// The whitelist and blacklist are checked against the object being locked, not the mob.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(LockingWhitelistSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(LockingWhitelistSystem))]
 public sealed partial class LockingWhitelistComponent : Component
 {
     [DataField]
-    public EntityWhitelist? Whitelist;
+    public EntityWhitelist? Blacklist;
 
     [DataField]
-    public EntityWhitelist? Blacklist;
+    public EntityWhitelist? Whitelist;
 }

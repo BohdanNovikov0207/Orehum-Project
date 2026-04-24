@@ -35,27 +35,28 @@ using Content.Shared.Whitelist;
 using Content.Shared.Wires;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Containers;
-using Robust.Shared.Network;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
-using Robust.Shared.Timing;
 using SharedToolSystem = Content.Shared.Tools.Systems.SharedToolSystem;
 
 namespace Content.Shared.Radio.EntitySystems;
 
 /// <summary>
-///     This system manages encryption keys & key holders for use with radio channels.
+/// This system manages encryption keys & key holders for use with radio channels.
 /// </summary>
 public sealed partial class EncryptionKeySystem : EntitySystem
 {
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly SharedContainerSystem _container = default!;
+    [Dependency] private readonly SharedHandsSystem _hands = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly IPrototypeManager _protoManager = default!;
     [Dependency] private readonly SharedToolSystem _tool = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly SharedContainerSystem _container = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedHandsSystem _hands = default!;
+
+    [Dependency]
+    private readonly EntityWhitelistSystem _whitelist = default!; // Goobstation - Whitelisted radio channels
+
     [Dependency] private readonly SharedWiresSystem _wires = default!;
-    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!; // Goobstation - Whitelisted radio channels
 
     public override void Initialize()
     {
@@ -70,7 +71,9 @@ public sealed partial class EncryptionKeySystem : EntitySystem
         SubscribeLocalEvent<EncryptionKeyHolderComponent, EncryptionRemovalFinishedEvent>(OnKeyRemoval);
     }
 
-    private void OnKeyRemoval(EntityUid uid, EncryptionKeyHolderComponent component, EncryptionRemovalFinishedEvent args)
+    private void OnKeyRemoval(EntityUid uid,
+        EncryptionKeyHolderComponent component,
+        EncryptionRemovalFinishedEvent args)
     {
         if (args.Cancelled)
             return;
@@ -106,7 +109,9 @@ public sealed partial class EncryptionKeySystem : EntitySystem
         RaiseLocalEvent(uid, new EncryptionChannelsChangedEvent(component));
     }
 
-    private void OnContainerModified(EntityUid uid, EncryptionKeyHolderComponent component, ContainerModifiedMessage args)
+    private void OnContainerModified(EntityUid uid,
+        EncryptionKeyHolderComponent component,
+        ContainerModifiedMessage args)
     {
         if (args.Container.ID == EncryptionKeyHolderComponent.KeyContainerName)
             UpdateChannels(uid, component);
@@ -156,11 +161,12 @@ public sealed partial class EncryptionKeySystem : EntitySystem
             _popup.PopupClient(Loc.GetString("encryption-key-successfully-installed"), uid, args.User);
             _audio.PlayPredicted(component.KeyInsertionSound, args.Target, args.User);
             args.Handled = true;
-            return;
         }
     }
 
-    private void TryRemoveKey(EntityUid uid, EncryptionKeyHolderComponent component, InteractUsingEvent args,
+    private void TryRemoveKey(EntityUid uid,
+        EncryptionKeyHolderComponent component,
+        InteractUsingEvent args,
         ToolComponent? tool)
     {
         if (!component.KeysUnlocked)
@@ -181,12 +187,19 @@ public sealed partial class EncryptionKeySystem : EntitySystem
             return;
         }
 
-        _tool.UseTool(args.Used, args.User, uid, 1f, component.KeysExtractionMethod, new EncryptionRemovalFinishedEvent(), toolComponent: tool);
+        _tool.UseTool(args.Used,
+            args.User,
+            uid,
+            1f,
+            component.KeysExtractionMethod,
+            new EncryptionRemovalFinishedEvent(),
+            toolComponent: tool);
     }
 
     private void OnStartup(EntityUid uid, EncryptionKeyHolderComponent component, ComponentStartup args)
     {
-        component.KeyContainer = _container.EnsureContainer<Container>(uid, EncryptionKeyHolderComponent.KeyContainerName);
+        component.KeyContainer =
+            _container.EnsureContainer<Container>(uid, EncryptionKeyHolderComponent.KeyContainerName);
         UpdateChannels(uid, component);
     }
 
@@ -194,7 +207,8 @@ public sealed partial class EncryptionKeySystem : EntitySystem
     {
         if (!args.IsInDetailsRange
             || !component.ExamineWhileLocked && !component.KeysUnlocked // Goobstation
-            || !component.ExamineWhileLocked && TryComp<WiresPanelComponent>(uid, out var panel) && !panel.Open) // Goobstation
+            || !component.ExamineWhileLocked && TryComp<WiresPanelComponent>(uid, out var panel) &&
+            !panel.Open) // Goobstation
             return;
 
         if (component.KeyContainer.ContainedEntities.Count == 0)
@@ -222,20 +236,28 @@ public sealed partial class EncryptionKeySystem : EntitySystem
         if (!args.IsInDetailsRange)
             return;
 
-        if(component.Channels.Count > 0)
+        if (component.Channels.Count > 0)
         {
             args.PushMarkup(Loc.GetString("examine-encryption-channels-prefix"));
-            AddChannelsExamine(component.Channels, component.DefaultChannel, args, _protoManager, "examine-encryption-channel");
+            AddChannelsExamine(component.Channels,
+                component.DefaultChannel,
+                args,
+                _protoManager,
+                "examine-encryption-channel");
         }
     }
 
     /// <summary>
-    ///     A method for formating list of radio channels for examine events.
+    /// A method for formating list of radio channels for examine events.
     /// </summary>
     /// <param name="channels">HashSet of channels in headset, encryptionkey or etc.</param>
     /// <param name="protoManager">IPrototypeManager for getting prototypes of channels with their variables.</param>
     /// <param name="channelFTLPattern">String that provide id of pattern in .ftl files to format channel with variables of it.</param>
-    public void AddChannelsExamine(HashSet<string> channels, string? defaultChannel, ExaminedEvent examineEvent, IPrototypeManager protoManager, string channelFTLPattern)
+    public void AddChannelsExamine(HashSet<string> channels,
+        string? defaultChannel,
+        ExaminedEvent examineEvent,
+        IPrototypeManager protoManager,
+        string channelFTLPattern)
     {
         RadioChannelPrototype? proto;
         foreach (var id in channels)
@@ -258,7 +280,7 @@ public sealed partial class EncryptionKeySystem : EntitySystem
                     (true, true) => Loc.GetString("examine-headset-not-compatible"),
                     (true, false) => Loc.GetString("examine-headset-send-only"),
                     (false, true) => Loc.GetString("examine-headset-receive-only"),
-                    _ => restictionText
+                    _ => restictionText,
                 };
             }
             // Goobstation - End
@@ -276,22 +298,23 @@ public sealed partial class EncryptionKeySystem : EntitySystem
             if (HasComp<HeadsetComponent>(examineEvent.Examined))
             {
                 var msg = Loc.GetString("examine-headset-default-channel",
-                ("prefix", SharedChatSystem.DefaultChannelPrefix),
-                ("channel", proto.LocalizedName),
-                ("color", proto.Color));
+                    ("prefix", SharedChatSystem.DefaultChannelPrefix),
+                    ("channel", proto.LocalizedName),
+                    ("color", proto.Color));
                 examineEvent.PushMarkup(msg);
             }
+
             if (HasComp<EncryptionKeyComponent>(examineEvent.Examined))
             {
                 var msg = Loc.GetString("examine-encryption-default-channel",
-                ("channel", proto.LocalizedName),
-                ("color", proto.Color));
+                    ("channel", proto.LocalizedName),
+                    ("color", proto.Color));
                 examineEvent.PushMarkup(msg);
             }
         }
     }
 
-    [Serializable, NetSerializable]
+    [Serializable] [NetSerializable]
     public sealed partial class EncryptionRemovalFinishedEvent : SimpleDoAfterEvent
     {
     }

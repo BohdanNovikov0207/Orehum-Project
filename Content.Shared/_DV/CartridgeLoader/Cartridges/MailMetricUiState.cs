@@ -11,13 +11,10 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.CartridgeLoader.Cartridges;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class MailMetricUiState : BoundUserInterfaceState
 {
     public readonly MailStats Metrics;
-    public int UnopenedMailCount { get; }
-    public int TotalMail { get; }
-    public double SuccessRate { get; }
 
     public MailMetricUiState(MailStats metrics, int unopenedMailCount)
     {
@@ -26,10 +23,14 @@ public sealed class MailMetricUiState : BoundUserInterfaceState
         TotalMail = metrics.TotalMail(unopenedMailCount);
         SuccessRate = metrics.SuccessRate(unopenedMailCount);
     }
+
+    public int UnopenedMailCount { get; }
+    public int TotalMail { get; }
+    public double SuccessRate { get; }
 }
 
 [DataDefinition]
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public partial record struct MailStats
 {
     public int Earnings { get; init; }
@@ -41,18 +42,15 @@ public partial record struct MailStats
     public int ExpiredCount { get; init; }
     public int TamperedCount { get; init; }
 
-    public readonly int TotalMail(int unopenedCount)
-    {
-        return OpenedCount + unopenedCount;
-    }
-
     public readonly int TotalIncome => Earnings + DamagedLosses + ExpiredLosses + TamperedLosses;
+
+    public readonly int TotalMail(int unopenedCount) => OpenedCount + unopenedCount;
 
     public readonly double SuccessRate(int unopenedCount)
     {
         var totalMail = TotalMail(unopenedCount);
-        return (totalMail > 0)
-            ? Math.Round((double)OpenedCount / totalMail * 100, 2)
+        return totalMail > 0
+            ? Math.Round((double) OpenedCount / totalMail * 100, 2)
             : 0;
     }
 }

@@ -12,15 +12,9 @@ namespace Content.Shared.Nutrition.Components;
 /// <summary>
 /// A starting point for the creation of procedural food.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState(true), Access(typeof(SharedFoodSequenceSystem))]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState(true)] [Access(typeof(SharedFoodSequenceSystem))]
 public sealed partial class FoodSequenceStartPointComponent : Component
 {
-    /// <summary>
-    /// A key that determines which types of food elements can be attached to a food.
-    /// </summary>
-    [DataField(required: true)]
-    public ProtoId<TagPrototype> Key = string.Empty;
-
     /// <summary>
     /// Goob - Can we put anything on the food?
     /// </summary>
@@ -28,16 +22,22 @@ public sealed partial class FoodSequenceStartPointComponent : Component
     public bool AcceptAll;
 
     /// <summary>
-    /// The maximum number of layers of food that can be placed on this item.
-    /// </summary>
-    [DataField]
-    public int MaxLayers = 10;
-
-    /// <summary>
     /// Can we put more layers?
     /// </summary>
     [DataField]
     public bool Finished;
+
+    /// <summary>
+    /// A key that determines which types of food elements can be attached to a food.
+    /// </summary>
+    [DataField(required: true)]
+    public ProtoId<TagPrototype> Key = string.Empty;
+
+    /// <summary>
+    /// The maximum number of layers of food that can be placed on this item.
+    /// </summary>
+    [DataField]
+    public int MaxLayers = 10;
 
     /// <summary>
     /// solution where reagents will be added from newly added ingredients
@@ -78,7 +78,7 @@ public sealed partial class FoodSequenceStartPointComponent : Component
     /// <summary>
     /// list of sprite states to be displayed on this object.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public List<FoodSequenceVisualLayer> FoodLayers = new();
 
     /// <summary>
@@ -88,7 +88,8 @@ public sealed partial class FoodSequenceStartPointComponent : Component
     public bool InverseLayers;
 
     /// <summary>
-    /// target layer, where new layers will be added. This allows you to control the order of generative layers and static layers.
+    /// target layer, where new layers will be added. This allows you to control the order of generative layers and static
+    /// layers.
     /// </summary>
     [DataField]
     public string TargetLayerMap = "foodSequenceLayers";
@@ -129,13 +130,29 @@ public sealed partial class FoodSequenceStartPointComponent : Component
 /// class that synchronizes with the client
 /// Stores all the necessary information for rendering the FoodSequence element
 /// </summary>
-[DataRecord, Serializable, NetSerializable]
-public partial record struct FoodSequenceVisualLayer
+[DataRecord] [Serializable] [NetSerializable]
+public record struct FoodSequenceVisualLayer
 {
+    /// <summary>
+    /// Goob - The original entity prototype this layer was made from, if any.
+    /// </summary>
+    public EntProtoId? EntProto;
+
     /// <summary>
     /// reference to the original prototype of the layer. Used to edit visual layers.
     /// </summary>
     public ProtoId<FoodSequenceElementPrototype> Proto;
+
+    public FoodSequenceVisualLayer(ProtoId<FoodSequenceElementPrototype> proto,
+        SpriteSpecifier? sprite,
+        Vector2 scale,
+        Vector2 offset)
+    {
+        Proto = proto;
+        Sprite = sprite;
+        Scale = scale;
+        LocalOffset = offset;
+    }
 
     /// <summary>
     /// Sprite rendered in sequence
@@ -151,20 +168,4 @@ public partial record struct FoodSequenceVisualLayer
     /// The offset of a particular layer. Allows a little position randomization of each layer.
     /// </summary>
     public Vector2 LocalOffset { get; set; } = Vector2.Zero;
-
-    /// <summary>
-    /// Goob - The original entity prototype this layer was made from, if any.
-    /// </summary>
-    public EntProtoId? EntProto;
-
-    public FoodSequenceVisualLayer(ProtoId<FoodSequenceElementPrototype> proto,
-        SpriteSpecifier? sprite,
-        Vector2 scale,
-        Vector2 offset)
-    {
-        Proto = proto;
-        Sprite = sprite;
-        Scale = scale;
-        LocalOffset = offset;
-    }
 }

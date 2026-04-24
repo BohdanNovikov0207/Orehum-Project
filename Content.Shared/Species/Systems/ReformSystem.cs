@@ -9,12 +9,12 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Shared.Species.Components;
 using Content.Shared.Actions;
 using Content.Shared.DoAfter;
-using Content.Shared.Popups;
-using Content.Shared.Stunnable;
 using Content.Shared.Mind;
+using Content.Shared.Popups;
+using Content.Shared.Species.Components;
+using Content.Shared.Stunnable;
 using Content.Shared.Zombies;
 using Robust.Shared.Containers;
 using Robust.Shared.Network;
@@ -27,14 +27,14 @@ namespace Content.Shared.Species.Systems;
 public sealed partial class ReformSystem : EntitySystem
 {
     [Dependency] private readonly SharedActionsSystem _actionsSystem = default!;
-    [Dependency] private readonly INetManager _netMan = default!;
+    [Dependency] private readonly SharedContainerSystem _container = default!;
     [Dependency] private readonly SharedDoAfterSystem _doAfterSystem = default!;
+    [Dependency] private readonly IGameTiming _gameTiming = default!;
+    [Dependency] private readonly SharedMindSystem _mindSystem = default!;
+    [Dependency] private readonly INetManager _netMan = default!;
     [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
     [Dependency] private readonly IPrototypeManager _protoManager = default!;
     [Dependency] private readonly SharedStunSystem _stunSystem = default!;
-    [Dependency] private readonly IGameTiming _gameTiming = default!;
-    [Dependency] private readonly SharedMindSystem _mindSystem = default!;
-    [Dependency] private readonly SharedContainerSystem _container = default!;
 
     public override void Initialize()
     {
@@ -52,7 +52,8 @@ public sealed partial class ReformSystem : EntitySystem
     private void OnMapInit(EntityUid uid, ReformComponent comp, MapInitEvent args)
     {
         // When the map is initialized, give them the action
-        if (comp.ActionPrototype != default && !_protoManager.TryIndex<EntityPrototype>(comp.ActionPrototype, out var actionProto))
+        if (comp.ActionPrototype != default &&
+            !_protoManager.TryIndex<EntityPrototype>(comp.ActionPrototype, out var actionProto))
             return;
 
         _actionsSystem.AddAction(uid, ref comp.ActionEntity, out var reformAction, comp.ActionPrototype);
@@ -67,10 +68,8 @@ public sealed partial class ReformSystem : EntitySystem
         }
     }
 
-    private void OnCompRemove(EntityUid uid, ReformComponent comp, ComponentShutdown args)
-    {
+    private void OnCompRemove(EntityUid uid, ReformComponent comp, ComponentShutdown args) =>
         _actionsSystem.RemoveAction(uid, comp.ActionEntity);
-    }
 
     private void OnReform(EntityUid uid, ReformComponent comp, ReformEvent args)
     {
@@ -127,13 +126,15 @@ public sealed partial class ReformSystem : EntitySystem
         QueueDel(uid);
     }
 
-    private void OnZombified(EntityUid uid, ReformComponent comp, ref EntityZombifiedEvent args)
-    {
+    private void OnZombified(EntityUid uid, ReformComponent comp, ref EntityZombifiedEvent args) =>
         _actionsSystem.RemoveAction(uid, comp.ActionEntity); // Zombies can't reform
+
+    public sealed partial class ReformEvent : InstantActionEvent
+    {
     }
 
-    public sealed partial class ReformEvent : InstantActionEvent { }
-
-    [Serializable, NetSerializable]
-    public sealed partial class ReformDoAfterEvent : SimpleDoAfterEvent { }
+    [Serializable] [NetSerializable]
+    public sealed partial class ReformDoAfterEvent : SimpleDoAfterEvent
+    {
+    }
 }

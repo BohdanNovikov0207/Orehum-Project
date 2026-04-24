@@ -6,23 +6,23 @@ using Robust.Shared.Serialization;
 namespace Content.Shared.Engineering.Components;
 
 /// <summary>
-///     Add a verb to entities that will disassemble them after an optional doafter to a specified prototype.
+/// Add a verb to entities that will disassemble them after an optional doafter to a specified prototype.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class DisassembleOnAltVerbComponent : Component
 {
     /// <summary>
-    ///     The prototype that is spawned after disassembly. If null, nothing will spawn.
+    /// The time it takes to disassemble the entity.
     /// </summary>
-    [DataField, AutoNetworkedField]
-    public EntProtoId? PrototypeToSpawn;
+    [DataField] [AutoNetworkedField]
+    public TimeSpan DisassembleTime = TimeSpan.FromSeconds(0);
 
     /// <summary>
-    ///     The time it takes to disassemble the entity.
+    /// The prototype that is spawned after disassembly. If null, nothing will spawn.
     /// </summary>
-    [DataField, AutoNetworkedField]
-    public TimeSpan DisassembleTime = TimeSpan.FromSeconds(0);
+    [DataField] [AutoNetworkedField]
+    public EntProtoId? PrototypeToSpawn;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class DisassembleDoAfterEvent : SimpleDoAfterEvent;

@@ -9,14 +9,14 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Shared._Shitmed.Medical.Surgery.Conditions;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class SurgeryOrganConditionComponent : Component
 {
     [DataField]
-    public ComponentRegistry? Organ;
+    public bool Inverse;
 
     [DataField]
-    public bool Inverse;
+    public ComponentRegistry? Organ;
 
     [DataField]
     public bool Reattaching;

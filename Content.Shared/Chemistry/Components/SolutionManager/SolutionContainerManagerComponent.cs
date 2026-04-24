@@ -14,10 +14,13 @@ using Robust.Shared.GameStates;
 namespace Content.Shared.Chemistry.Components.SolutionManager;
 
 /// <summary>
-/// <para>A map of the solution entities contained within this entity.</para>
-/// <para>Every solution entity this maps should have a <see cref="SolutionComponent"/> to track its state and a <see cref="ContainedSolutionComponent"/> to track its container.</para>
+///     <para>A map of the solution entities contained within this entity.</para>
+///     <para>
+///     Every solution entity this maps should have a <see cref="SolutionComponent" /> to track its state and a
+///     <see cref="ContainedSolutionComponent" /> to track its container.
+///     </para>
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 [Access(typeof(SharedSolutionContainerSystem))]
 public sealed partial class SolutionContainerManagerComponent : Component
 {
@@ -29,9 +32,9 @@ public sealed partial class SolutionContainerManagerComponent : Component
 
     /// <summary>
     /// The names of each solution container attached to this entity.
-    /// Actually accessing them must be done via <see cref="ContainerManagerComponent"/>.
+    /// Actually accessing them must be done via <see cref="ContainerManagerComponent" />.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public HashSet<string> Containers = new(DefaultCapacity);
 
     /// <summary>
@@ -40,6 +43,6 @@ public sealed partial class SolutionContainerManagerComponent : Component
     /// <remarks>
     /// Should be null after mapinit.
     /// </remarks>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public Dictionary<string, Solution>? Solutions = null;
 }

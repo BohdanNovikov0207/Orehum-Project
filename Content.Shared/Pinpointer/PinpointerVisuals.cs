@@ -7,19 +7,18 @@
 
 using Robust.Shared.Serialization;
 
-namespace Content.Shared.Pinpointer
-{
-    [Serializable, NetSerializable]
-    public enum PinpointerVisuals : byte
-    {
-        IsActive,
-        ArrowAngle,
-        TargetDistance
-    }
+namespace Content.Shared.Pinpointer;
 
-    public enum PinpointerLayers : byte
-    {
-        Base,
-        Screen
-    }
+[Serializable] [NetSerializable]
+public enum PinpointerVisuals : byte
+{
+    IsActive,
+    ArrowAngle,
+    TargetDistance,
+}
+
+public enum PinpointerLayers : byte
+{
+    Base,
+    Screen,
 }

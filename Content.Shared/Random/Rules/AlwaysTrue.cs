@@ -10,8 +10,5 @@ namespace Content.Shared.Random.Rules;
 /// </summary>
 public sealed partial class AlwaysTrueRule : RulesRule
 {
-    public override bool Check(EntityManager entManager, EntityUid uid)
-    {
-        return !Inverted;
-    }
+    public override bool Check(EntityManager entManager, EntityUid uid) => !Inverted;
 }

@@ -19,13 +19,31 @@ using Robust.Shared.Prototypes;
 namespace Content.Shared.Radio;
 
 [Prototype]
-public sealed partial class RadioChannelPrototype : IPrototype
+public sealed class RadioChannelPrototype : IPrototype
 {
+    // CorvaxGoob-Anonymous-Radio-End
+
+    /// <summary>
+    /// If channel is long range it doesn't require telecommunication server
+    /// and messages can be sent across different stations
+    /// </summary>
+    [DataField("longRange")] [ViewVariables]
+    public bool LongRange = false;
+
+    [DataField]
+    public EntityWhitelist? ReceiveWhitelist = null;
+
+    /// <summary>
+    /// Whitelist for entities that can send or receive this radio channel messages
+    /// </summary>
+    [DataField]
+    public EntityWhitelist? SendWhitelist = null;
+
     /// <summary>
     /// Human-readable name for the channel.
     /// </summary>
     [DataField("name")]
-    public LocId Name { get; private set; } = string.Empty;
+    public LocId Name { get; } = string.Empty;
 
     [ViewVariables(VVAccess.ReadOnly)]
     public string LocalizedName => Loc.GetString(Name);
@@ -42,30 +60,13 @@ public sealed partial class RadioChannelPrototype : IPrototype
     [DataField("color")]
     public Color Color { get; private set; } = Color.Lime;
 
-    [IdDataField, ViewVariables]
-    public string ID { get; private set; } = default!;
-
     // CorvaxGoob-Anonymous-Radio-Start
     /// <summary>
     /// If channel is anonymous - anyone who'll talk on this channel will have "encrypted" name
     /// </summary>
     [DataField("anonymous")]
     public bool Anonymous { get; private set; } = false;
-    // CorvaxGoob-Anonymous-Radio-End
 
-    /// <summary>
-    /// If channel is long range it doesn't require telecommunication server
-    /// and messages can be sent across different stations
-    /// </summary>
-    [DataField("longRange"), ViewVariables]
-    public bool LongRange = false;
-
-    /// <summary>
-    /// Whitelist for entities that can send or receive this radio channel messages
-    /// </summary>
-    [DataField]
-    public EntityWhitelist? SendWhitelist = null;
-
-    [DataField]
-    public EntityWhitelist? ReceiveWhitelist = null;
+    [IdDataField] [ViewVariables]
+    public string ID { get; } = default!;
 }

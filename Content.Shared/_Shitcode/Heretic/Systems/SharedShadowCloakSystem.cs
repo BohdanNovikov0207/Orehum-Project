@@ -24,24 +24,23 @@ namespace Content.Shared._Shitcode.Heretic.Systems;
 
 public abstract class SharedShadowCloakSystem : EntitySystem
 {
+    private static readonly ProtoId<TagPrototype> ActionTag = "ShadowCloakAction";
+    public static readonly EntProtoId ShadowCloakSlowdown = "ShadowCloakSlowdownEffect";
+    [Dependency] private readonly SharedActionsSystem _actions = default!;
+    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly DamageableSystem _damageable = default!;
+    [Dependency] private readonly MovementSpeedModifierSystem _modifier = default!;
+    [Dependency] private readonly MovementModStatusSystem _movementMod = default!;
     [Dependency] private readonly INetManager _net = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
 
     [Dependency] private readonly StandingStateSystem _standing = default!;
     [Dependency] private readonly StatusEffectsSystem _status = default!; // todo goob migrate
-    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly TagSystem _tag = default!;
-    [Dependency] private readonly SharedActionsSystem _actions = default!;
     [Dependency] private readonly SharedStunSystem _stun = default!;
+    [Dependency] private readonly TagSystem _tag = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly MovementSpeedModifierSystem _modifier = default!;
-    [Dependency] private readonly DamageableSystem _damageable = default!;
-    [Dependency] private readonly MovementModStatusSystem _movementMod = default!;
-
-    private static readonly ProtoId<TagPrototype> ActionTag = "ShadowCloakAction";
-    public static readonly EntProtoId ShadowCloakSlowdown = "ShadowCloakSlowdownEffect";
 
     public override void Initialize()
     {
@@ -141,9 +140,13 @@ public abstract class SharedShadowCloakSystem : EntitySystem
 
         if (ent.Comp.DebuffOnEarlyReveal)
         {
-            _stun.KnockdownOrStun(ent, ent.Comp.KnockdownTime, true);
+            _stun.KnockdownOrStun(ent, ent.Comp.KnockdownTime);
             var (walk, sprint) = ent.Comp.EarlyRemoveMoveSpeedModifiers;
-            _movementMod.TryUpdateMovementSpeedModDuration(ent, ShadowCloakSlowdown, ent.Comp.SlowdownTime, walk, sprint);
+            _movementMod.TryUpdateMovementSpeedModDuration(ent,
+                ShadowCloakSlowdown,
+                ent.Comp.SlowdownTime,
+                walk,
+                sprint);
         }
 
         ResetAbilityCooldown(ent, ent.Comp.ForceRevealCooldown);
@@ -160,10 +163,8 @@ public abstract class SharedShadowCloakSystem : EntitySystem
             QueueDel(ent);
     }
 
-    private void OnGetDoAfterSpeed(Entity<ShadowCloakedComponent> ent, ref GetDoAfterDelayMultiplierEvent args)
-    {
+    private void OnGetDoAfterSpeed(Entity<ShadowCloakedComponent> ent, ref GetDoAfterDelayMultiplierEvent args) =>
         args.Multiplier *= ent.Comp.DoAfterSlowdown;
-    }
 
     private void OnRefreshMoveSpeed(Entity<ShadowCloakedComponent> ent, ref RefreshMovementSpeedModifiersEvent args)
     {

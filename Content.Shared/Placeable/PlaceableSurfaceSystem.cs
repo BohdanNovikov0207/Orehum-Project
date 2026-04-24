@@ -27,8 +27,8 @@ namespace Content.Shared.Placeable;
 
 public sealed class PlaceableSurfaceSystem : EntitySystem
 {
-    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly SharedHandsSystem _handsSystem = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly SharedTransformSystem _transformSystem = default!;
 
     public override void Initialize()
@@ -95,25 +95,17 @@ public sealed class PlaceableSurfaceSystem : EntitySystem
         args.Handled = true;
     }
 
-    private void OnStorageInteractUsingAttempt(Entity<PlaceableSurfaceComponent> ent, ref StorageInteractUsingAttemptEvent args)
-    {
-        args.Cancelled = true;
-    }
+    private void OnStorageInteractUsingAttempt(Entity<PlaceableSurfaceComponent> ent,
+        ref StorageInteractUsingAttemptEvent args) => args.Cancelled = true;
 
-    private void OnStorageAfterOpen(Entity<PlaceableSurfaceComponent> ent, ref StorageAfterOpenEvent args)
-    {
+    private void OnStorageAfterOpen(Entity<PlaceableSurfaceComponent> ent, ref StorageAfterOpenEvent args) =>
         SetPlaceable(ent.Owner, true, ent.Comp);
-    }
 
-    private void OnStorageAfterClose(Entity<PlaceableSurfaceComponent> ent, ref StorageAfterCloseEvent args)
-    {
+    private void OnStorageAfterClose(Entity<PlaceableSurfaceComponent> ent, ref StorageAfterCloseEvent args) =>
         SetPlaceable(ent.Owner, false, ent.Comp);
-    }
 
-    private void OnGetDumpableVerb(Entity<PlaceableSurfaceComponent> ent, ref GetDumpableVerbEvent args)
-    {
+    private void OnGetDumpableVerb(Entity<PlaceableSurfaceComponent> ent, ref GetDumpableVerbEvent args) =>
         args.Verb = Loc.GetString("dump-placeable-verb-name", ("surface", ent));
-    }
 
     private void OnDump(Entity<PlaceableSurfaceComponent> ent, ref DumpEvent args)
     {

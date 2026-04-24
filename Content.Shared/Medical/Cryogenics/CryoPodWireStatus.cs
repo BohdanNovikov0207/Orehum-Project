@@ -13,11 +13,10 @@
 
 using Robust.Shared.Serialization;
 
-namespace Content.Shared.Medical.Cryogenics
+namespace Content.Shared.Medical.Cryogenics;
+
+[Serializable] [NetSerializable]
+public enum CryoPodWireActionKey : byte
 {
-    [Serializable, NetSerializable]
-    public enum CryoPodWireActionKey: byte
-    {
-        Key
-    }
+    Key,
 }

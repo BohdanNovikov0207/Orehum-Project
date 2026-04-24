@@ -11,14 +11,14 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Dragon;
 
-[NetworkedComponent, EntityCategory("Spawner")]
+[NetworkedComponent] [EntityCategory("Spawner")]
 public abstract partial class SharedDragonRiftComponent : Component
 {
     [DataField("state")]
     public DragonRiftState State = DragonRiftState.Charging;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum DragonRiftState : byte
 {
     Charging,

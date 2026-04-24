@@ -8,7 +8,7 @@ using Content.Shared.Lathe;
 namespace Content.Shared._DV.Lathe;
 
 /// <summary>
-/// Applies <see cref="LatheUpgradeComponent"/> modifiers when added to a lathe and removes it.
+/// Applies <see cref="LatheUpgradeComponent" /> modifiers when added to a lathe and removes it.
 /// </summary>
 public sealed class LatheUpgradeSystem : EntitySystem
 {
@@ -26,9 +26,9 @@ public sealed class LatheUpgradeSystem : EntitySystem
         if (!TryComp<LatheComponent>(ent, out var lathe))
             return;
 
-        if (ent.Comp.MaterialUseMultiplier is {} matMul)
+        if (ent.Comp.MaterialUseMultiplier is { } matMul)
             lathe.MaterialUseMultiplier = matMul;
-        if (ent.Comp.TimeMultiplier is {} timeMul)
+        if (ent.Comp.TimeMultiplier is { } timeMul)
             lathe.TimeMultiplier = timeMul;
 
         Dirty(ent, lathe);

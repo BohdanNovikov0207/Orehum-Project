@@ -12,31 +12,31 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared._White.Blink;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class BlinkComponent : Component
 {
-    [DataField, AutoNetworkedField]
-    public float Distance = 5f;
-
-    [DataField, AutoNetworkedField]
-    public bool IsActive = true;
-
     [DataField]
     public string BlinkDelay = "blink";
 
-    [DataField, AutoNetworkedField]
-    public TimeSpan KnockdownTime = TimeSpan.Zero;
-
-    [DataField, AutoNetworkedField]
-    public float KnockdownRadius = 0.3f;
-
     [DataField]
     public SoundSpecifier BlinkSound = new SoundPathSpecifier("/Audio/Magic/blink.ogg");
+
+    [DataField] [AutoNetworkedField]
+    public float Distance = 5f;
+
+    [DataField] [AutoNetworkedField]
+    public bool IsActive = true;
+
+    [DataField] [AutoNetworkedField]
+    public float KnockdownRadius = 0.3f;
+
+    [DataField] [AutoNetworkedField]
+    public TimeSpan KnockdownTime = TimeSpan.Zero;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class BlinkEvent(NetEntity weapon, Vector2 direction) : EntityEventArgs
 {
-    public readonly NetEntity Weapon = weapon;
     public readonly Vector2 Direction = direction;
+    public readonly NetEntity Weapon = weapon;
 }

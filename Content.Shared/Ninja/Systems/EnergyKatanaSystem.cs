@@ -30,10 +30,8 @@ public sealed class EnergyKatanaSystem : EntitySystem
     /// <summary>
     /// When equipped by a ninja, try to bind it.
     /// </summary>
-    private void OnEquipped(Entity<EnergyKatanaComponent> ent, ref GotEquippedEvent args)
-    {
+    private void OnEquipped(Entity<EnergyKatanaComponent> ent, ref GotEquippedEvent args) =>
         _ninja.BindKatana(args.Equipee, ent);
-    }
 
     private void OnCheckDash(Entity<EnergyKatanaComponent> ent, ref CheckDashEvent args)
     {

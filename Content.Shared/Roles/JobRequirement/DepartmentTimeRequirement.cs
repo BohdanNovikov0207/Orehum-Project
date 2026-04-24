@@ -85,14 +85,14 @@ using Robust.Shared.Utility;
 namespace Content.Shared.Roles;
 
 [UsedImplicitly]
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class DepartmentTimeRequirement : JobRequirement
 {
     /// <summary>
     /// Which department needs the required amount of time.
     /// </summary>
     [DataField(required: true)]
-    public ProtoId<DepartmentPrototype> Department;
+    public Robust.Shared.Prototypes.ProtoId<DepartmentPrototype> Department;
 
     /// <summary>
     /// How long (in seconds) this requirement is.
@@ -130,9 +130,7 @@ public sealed partial class DepartmentTimeRequirement : JobRequirement
         var nameDepartment = "role-timer-department-unknown";
 
         if (protoManager.TryIndex(Department, out var departmentIndexed))
-        {
             nameDepartment = departmentIndexed.Name;
-        }
 
         if (!Inverted)
         {

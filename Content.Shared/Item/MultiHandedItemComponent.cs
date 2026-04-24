@@ -12,7 +12,7 @@ namespace Content.Shared.Item;
 /// This is used for items that need
 /// multiple hands to be able to be picked up
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class MultiHandedItemComponent : Component
 {
     [DataField]

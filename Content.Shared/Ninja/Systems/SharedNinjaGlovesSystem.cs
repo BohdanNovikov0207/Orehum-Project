@@ -10,7 +10,6 @@
 using Content.Shared.Clothing.Components;
 using Content.Shared.CombatMode;
 using Content.Shared.Examine;
-using Content.Shared.Hands.Components;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Interaction;
 using Content.Shared.Item.ItemToggle;
@@ -26,13 +25,13 @@ namespace Content.Shared.Ninja.Systems;
 /// </summary>
 public abstract class SharedNinjaGlovesSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SharedCombatModeSystem _combatMode = default!;
     [Dependency] private readonly SharedHandsSystem _hands = default!;
     [Dependency] private readonly SharedInteractionSystem _interaction = default!;
-    [Dependency] private readonly ItemToggleSystem _toggle = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly SharedSpaceNinjaSystem _ninja = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly ItemToggleSystem _toggle = default!;
 
     public override void Initialize()
     {
@@ -52,7 +51,7 @@ public abstract class SharedNinjaGlovesSystem : EntitySystem
         var (uid, comp) = ent;
 
         // already disabled?
-        if (comp.User is not {} user)
+        if (comp.User is not { } user)
             return;
 
         comp.User = null;
@@ -87,20 +86,19 @@ public abstract class SharedNinjaGlovesSystem : EntitySystem
 
     private void OnActivateAttempt(Entity<NinjaGlovesComponent> ent, ref ItemToggleActivateAttemptEvent args)
     {
-        if (args.User is not {} user
+        if (args.User is not { } user
             || !_ninja.NinjaQuery.TryComp(user, out var ninja)
             // need to wear suit to enable gloves
             || !HasComp<NinjaSuitComponent>(ninja.Suit))
         {
             args.Cancelled = true;
             args.Popup = Loc.GetString("ninja-gloves-not-wearing-suit");
-            return;
         }
     }
 
     private void OnToggled(Entity<NinjaGlovesComponent> ent, ref ItemToggledEvent args)
     {
-        if ((args.User ?? ent.Comp.User) is not {} user)
+        if ((args.User ?? ent.Comp.User) is not { } user)
             return;
 
         var message = Loc.GetString(args.Activated ? "ninja-gloves-on" : "ninja-gloves-off");
@@ -137,8 +135,8 @@ public abstract class SharedNinjaGlovesSystem : EntitySystem
     {
         target = args.Target;
         return _timing.IsFirstTimePredicted
-            && !_combatMode.IsInCombatMode(uid)
-            && _hands.GetActiveItem(uid) == null
-            && _interaction.InRangeUnobstructed(uid, target);
+               && !_combatMode.IsInCombatMode(uid)
+               && _hands.GetActiveItem(uid) == null
+               && _interaction.InRangeUnobstructed(uid, target);
     }
 }

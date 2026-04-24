@@ -43,7 +43,9 @@ public abstract partial class SharedGunSystem
         SubscribeLocalEvent<ProjectileBatteryAmmoProviderComponent, ExaminedEvent>(OnBatteryExamine);
     }
 
-    private void OnBatteryHandleState(EntityUid uid, BatteryAmmoProviderComponent component, ref ComponentHandleState args)
+    private void OnBatteryHandleState(EntityUid uid,
+        BatteryAmmoProviderComponent component,
+        ref ComponentHandleState args)
     {
         if (args.Current is not BatteryAmmoProviderComponentState state)
             return;
@@ -55,7 +57,7 @@ public abstract partial class SharedGunSystem
         if (component is HitscanBatteryAmmoProviderComponent hitscan && state.Prototype != null) // Shitmed Change
             hitscan.Prototype = state.Prototype;
 
-        UpdateAmmoCount(uid, prediction: false);
+        UpdateAmmoCount(uid, false);
     }
 
     private void OnBatteryGetState(EntityUid uid, BatteryAmmoProviderComponent component, ref ComponentGetState args)
@@ -68,7 +70,7 @@ public abstract partial class SharedGunSystem
         };
 
         if (TryComp<HitscanBatteryAmmoProviderComponent>(uid, out var hitscan)) // Shitmed Change
-           state.Prototype = hitscan.Prototype;
+            state.Prototype = hitscan.Prototype;
 
         args.State = state; // Shitmed Change
     }
@@ -76,7 +78,9 @@ public abstract partial class SharedGunSystem
     private void OnBatteryExamine(EntityUid uid, BatteryAmmoProviderComponent component, ExaminedEvent args)
     {
         if (component.Examinable) // goob edit
-            args.PushMarkup(Loc.GetString("gun-battery-examine", ("color", AmmoExamineColor), ("count", component.Shots)));
+            args.PushMarkup(Loc.GetString("gun-battery-examine",
+                ("color", AmmoExamineColor),
+                ("count", component.Shots)));
     }
 
     private void OnBatteryTakeAmmo(EntityUid uid, BatteryAmmoProviderComponent component, TakeAmmoEvent args)
@@ -107,10 +111,7 @@ public abstract partial class SharedGunSystem
     /// <summary>
     /// Update the battery (server-only) whenever fired.
     /// </summary>
-    protected virtual void TakeCharge(Entity<BatteryAmmoProviderComponent> entity)
-    {
-        UpdateAmmoCount(entity, prediction: false);
-    }
+    protected virtual void TakeCharge(Entity<BatteryAmmoProviderComponent> entity) => UpdateAmmoCount(entity, false);
 
     protected void UpdateBatteryAppearance(EntityUid uid, BatteryAmmoProviderComponent component)
     {
@@ -122,7 +123,8 @@ public abstract partial class SharedGunSystem
         Appearance.SetData(uid, AmmoVisuals.AmmoMax, component.Capacity, appearance);
     }
 
-    private (EntityUid? Entity, IShootable) GetShootable(BatteryAmmoProviderComponent component, EntityCoordinates coordinates)
+    private (EntityUid? Entity, IShootable) GetShootable(BatteryAmmoProviderComponent component,
+        EntityCoordinates coordinates)
     {
         switch (component)
         {
@@ -136,12 +138,12 @@ public abstract partial class SharedGunSystem
         }
     }
 
-    [Serializable, NetSerializable]
+    [Serializable] [NetSerializable]
     private sealed class BatteryAmmoProviderComponentState : ComponentState
     {
-        public int Shots;
-        public int MaxShots;
         public float FireCost;
+        public int MaxShots;
         public string? Prototype; // Shitmed Change
+        public int Shots;
     }
 }

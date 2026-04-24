@@ -8,7 +8,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Administration.BanList;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed record SharedServerRoleBan(
     int? Id,
     NetUserId? UserId,

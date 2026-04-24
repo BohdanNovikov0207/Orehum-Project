@@ -41,7 +41,6 @@ using Content.Shared.Research.Components;
 using Content.Shared.Research.Prototypes;
 using Content.Shared.Research.Systems;
 using Content.Shared.Research.TechnologyDisk.Components;
-using Robust.Shared.Network;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 
@@ -49,12 +48,12 @@ namespace Content.Shared.Research.TechnologyDisk.Systems;
 
 public sealed class TechnologyDiskSystem : EntitySystem
 {
-    [Dependency] private readonly IPrototypeManager _protoMan = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly SharedResearchSystem _research = default!;
     [Dependency] private readonly SharedLatheSystem _lathe = default!;
     [Dependency] private readonly NameModifierSystem _nameModifier = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly IPrototypeManager _protoMan = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly SharedResearchSystem _research = default!;
 
     public override void Initialize()
     {
@@ -99,7 +98,8 @@ public sealed class TechnologyDiskSystem : EntitySystem
         if (args.Handled || !args.CanReach || args.Target is not { } target)
             return;
 
-        if (!HasComp<ResearchServerComponent>(target) || !TryComp<TechnologyDatabaseComponent>(target, out var database))
+        if (!HasComp<ResearchServerComponent>(target) ||
+            !TryComp<TechnologyDatabaseComponent>(target, out var database))
             return;
 
         if (ent.Comp.Recipes != null)
@@ -109,6 +109,7 @@ public sealed class TechnologyDiskSystem : EntitySystem
                 _research.AddLatheRecipe(target, recipe, database);
             }
         }
+
         _popup.PopupClient(Loc.GetString("tech-disk-inserted"), target, args.User);
         PredictedQueueDel(ent.Owner);
         args.Handled = true;
@@ -125,6 +126,7 @@ public sealed class TechnologyDiskSystem : EntitySystem
             if (ent.Comp.Recipes.Count > 1) //idk how to do this well. sue me.
                 message += " " + Loc.GetString("tech-disk-examine-more");
         }
+
         args.PushMarkup(message);
     }
 

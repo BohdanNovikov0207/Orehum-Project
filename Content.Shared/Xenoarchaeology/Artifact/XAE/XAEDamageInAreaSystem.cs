@@ -11,14 +11,15 @@ namespace Content.Shared.Xenoarchaeology.Artifact.XAE;
 /// </summary>
 public sealed class XAEDamageInAreaSystem : BaseXAESystem<XAEDamageInAreaComponent>
 {
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly DamageableSystem _damageable = default!;
-    [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
 
     /// <summary> Pre-allocated and re-used collection.</summary>
     private readonly HashSet<EntityUid> _entitiesInRange = new();
+
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
 
     /// <inheritdoc />
     protected override void OnActivated(Entity<XAEDamageInAreaComponent> ent, ref XenoArtifactNodeActivatedEvent args)
@@ -37,7 +38,9 @@ public sealed class XAEDamageInAreaSystem : BaseXAESystem<XAEDamageInAreaCompone
             if (_whitelistSystem.IsWhitelistFail(damageInAreaComponent.Whitelist, entityInRange))
                 continue;
 
-            _damageable.TryChangeDamage(entityInRange, damageInAreaComponent.Damage, damageInAreaComponent.IgnoreResistances);
+            _damageable.TryChangeDamage(entityInRange,
+                damageInAreaComponent.Damage,
+                damageInAreaComponent.IgnoreResistances);
         }
     }
 }

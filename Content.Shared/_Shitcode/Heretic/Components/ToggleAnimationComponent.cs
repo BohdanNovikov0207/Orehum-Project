@@ -11,25 +11,25 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared._Goobstation.Heretic.Components;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class ToggleAnimationComponent : Component
 {
     [DataField]
-    public TimeSpan ToggleOnTime = TimeSpan.FromSeconds(2);
+    public TimeSpan ToggleOffTime = TimeSpan.FromSeconds(1.6);
 
     [DataField]
-    public TimeSpan ToggleOffTime = TimeSpan.FromSeconds(1.6);
+    public TimeSpan ToggleOnTime = TimeSpan.FromSeconds(2);
 
     public CancellationTokenSource? TokenSource;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum ToggleAnimationVisuals : byte
 {
     ToggleState,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum ToggleAnimationState : byte
 {
     Off,

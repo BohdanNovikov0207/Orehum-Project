@@ -15,31 +15,31 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared._DV.CartridgeLoader.Cartridges;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class NanoChatUiMessageEvent : CartridgeMessageEvent
 {
     /// <summary>
-    ///     The type of UI message being sent.
-    /// </summary>
-    public readonly NanoChatUiMessageType Type;
-
-    /// <summary>
-    ///     The recipient's NanoChat number, if applicable.
-    /// </summary>
-    public readonly uint? RecipientNumber;
-
-    /// <summary>
-    ///     The content of the message or name for new chats.
+    /// The content of the message or name for new chats.
     /// </summary>
     public readonly string? Content;
 
     /// <summary>
-    ///     The recipient's job title when creating a new chat.
+    /// The recipient's job title when creating a new chat.
     /// </summary>
     public readonly string? RecipientJob;
 
     /// <summary>
-    ///     Creates a new NanoChat UI message event.
+    /// The recipient's NanoChat number, if applicable.
+    /// </summary>
+    public readonly uint? RecipientNumber;
+
+    /// <summary>
+    /// The type of UI message being sent.
+    /// </summary>
+    public readonly NanoChatUiMessageType Type;
+
+    /// <summary>
+    /// Creates a new NanoChat UI message event.
     /// </summary>
     /// <param name="type">The type of message being sent</param>
     /// <param name="recipientNumber">Optional recipient number for the message</param>
@@ -57,7 +57,7 @@ public sealed class NanoChatUiMessageEvent : CartridgeMessageEvent
     }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum NanoChatUiMessageType : byte
 {
     NewChat,
@@ -70,31 +70,31 @@ public enum NanoChatUiMessageType : byte
 }
 
 // putting this here because i can
-[Serializable, NetSerializable, DataRecord]
+[Serializable] [NetSerializable] [DataRecord]
 public struct NanoChatRecipient
 {
     /// <summary>
-    ///     The recipient's unique NanoChat number.
+    /// The recipient's unique NanoChat number.
     /// </summary>
     public uint Number;
 
     /// <summary>
-    ///     The recipient's display name, typically from their ID card.
+    /// The recipient's display name, typically from their ID card.
     /// </summary>
     public string Name;
 
     /// <summary>
-    ///     The recipient's job title, if available.
+    /// The recipient's job title, if available.
     /// </summary>
     public string? JobTitle;
 
     /// <summary>
-    ///     Whether this recipient has unread messages.
+    /// Whether this recipient has unread messages.
     /// </summary>
     public bool HasUnread;
 
     /// <summary>
-    ///     Creates a new NanoChat recipient.
+    /// Creates a new NanoChat recipient.
     /// </summary>
     /// <param name="number">The recipient's NanoChat number</param>
     /// <param name="name">The recipient's display name</param>
@@ -109,34 +109,34 @@ public struct NanoChatRecipient
     }
 }
 
-[Serializable, NetSerializable, DataRecord]
+[Serializable] [NetSerializable] [DataRecord]
 public struct NanoChatMessage
 {
     public const int MaxContentLength = 256;
 
     /// <summary>
-    ///     When the message was sent.
+    /// When the message was sent.
     /// </summary>
     public TimeSpan Timestamp;
 
     /// <summary>
-    ///     The content of the message.
+    /// The content of the message.
     /// </summary>
     public string Content;
 
     /// <summary>
-    ///     The NanoChat number of the sender.
+    /// The NanoChat number of the sender.
     /// </summary>
     public uint SenderId;
 
     /// <summary>
-    ///     Whether the message failed to deliver to the recipient.
-    ///     This can happen if the recipient is out of range or if there's no active telecomms server.
+    /// Whether the message failed to deliver to the recipient.
+    /// This can happen if the recipient is out of range or if there's no active telecomms server.
     /// </summary>
     public bool DeliveryFailed;
 
     /// <summary>
-    ///     Creates a new NanoChat message.
+    /// Creates a new NanoChat message.
     /// </summary>
     /// <param name="timestamp">When the message was sent</param>
     /// <param name="content">The content of the message</param>
@@ -152,10 +152,10 @@ public struct NanoChatMessage
 }
 
 /// <summary>
-///     NanoChat log data struct
+/// NanoChat log data struct
 /// </summary>
 /// <remarks>Used by the LogProbe</remarks>
-[Serializable, NetSerializable, DataRecord]
+[Serializable] [NetSerializable] [DataRecord]
 public readonly struct NanoChatData(
     Dictionary<uint, NanoChatRecipient> recipients,
     Dictionary<uint, List<NanoChatMessage>> messages,
@@ -169,13 +169,13 @@ public readonly struct NanoChatData(
 }
 
 /// <summary>
-///     Raised on the NanoChat card whenever a recipient gets added
+/// Raised on the NanoChat card whenever a recipient gets added
 /// </summary>
 [ByRefEvent]
 public readonly record struct NanoChatRecipientUpdatedEvent(EntityUid CardUid);
 
 /// <summary>
-///     Raised on the NanoChat card whenever it receives or tries sending a messsage
+/// Raised on the NanoChat card whenever it receives or tries sending a messsage
 /// </summary>
 [ByRefEvent]
 public readonly record struct NanoChatMessageReceivedEvent(EntityUid CardUid);

@@ -5,11 +5,11 @@ using Robust.Shared.Audio.Systems;
 
 namespace Content.Shared.Movement.Systems;
 
-public sealed partial class SharedJumpAbilitySystem : EntitySystem
+public sealed class SharedJumpAbilitySystem : EntitySystem
 {
-    [Dependency] private readonly ThrowingSystem _throwing = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedGravitySystem _gravity = default!;
+    [Dependency] private readonly ThrowingSystem _throwing = default!;
 
     public override void Initialize()
     {

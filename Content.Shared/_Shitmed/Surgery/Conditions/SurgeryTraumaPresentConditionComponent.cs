@@ -3,12 +3,12 @@ using Robust.Shared.GameStates;
 
 namespace Content.Shared._Shitmed.Medical.Surgery.Conditions;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class SurgeryTraumaPresentConditionComponent : Component
 {
-    [DataField("trauma")]
-    public TraumaType TraumaType = TraumaType.BoneDamage;
-
     [DataField]
     public bool Inverted = false;
+
+    [DataField("trauma")]
+    public TraumaType TraumaType = TraumaType.BoneDamage;
 }

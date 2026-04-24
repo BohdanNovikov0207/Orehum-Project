@@ -38,21 +38,21 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Robust.Shared.Serialization;
 using Robust.Shared.Audio;
+using Robust.Shared.Serialization;
 
 namespace Content.Shared.Paper;
 
 /// <summary>
-///     Set of required information to draw a stamp in UIs, where
-///     representing the state of the stamp at the point in time
-///     when it was applied to a paper. These fields mirror the
-///     equivalent in the component.
+/// Set of required information to draw a stamp in UIs, where
+/// representing the state of the stamp at the point in time
+/// when it was applied to a paper. These fields mirror the
+/// equivalent in the component.
 /// </summary>
-[DataDefinition, Serializable, NetSerializable]
+[DataDefinition] [Serializable] [NetSerializable]
 public partial struct StampDisplayInfo
 {
-    StampDisplayInfo(string s)
+    private StampDisplayInfo(string s)
     {
         StampedName = s;
     }
@@ -71,22 +71,16 @@ public partial struct StampDisplayInfo
 
     [DataField]
     public bool HasIcon = true; // goob
-};
+}
 
 [RegisterComponent]
 public sealed partial class StampComponent : Component
 {
     /// <summary>
-    ///     The loc string name that will be stamped to the piece of paper on examine.
+    /// The sound when stamp stamped
     /// </summary>
-    [DataField("stampedName")]
-    public string StampedName { get; set; } = "stamp-component-stamped-name-default";
-
-    /// <summary>
-    ///     The sprite state of the stamp to display on the paper from paper Sprite path.
-    /// </summary>
-    [DataField("stampState")]
-    public string StampState { get; set; } = "paper_stamp-generic";
+    [DataField("sound")]
+    public SoundSpecifier? Sound = null;
 
     /// <summary>
     /// The color of the ink used by the stamp in UIs
@@ -95,15 +89,20 @@ public sealed partial class StampComponent : Component
     public Color StampedColor = Color.FromHex("#BB3232"); // StyleNano.DangerousRedFore
 
     /// <summary>
-    /// The sound when stamp stamped
-    /// </summary>
-    [DataField("sound")]
-    public SoundSpecifier? Sound = null;
-
-    /// <summary>
-    ///     The sprite state of the stamp to display on the paper when read from stamp Sprite path.
+    /// The sprite state of the stamp to display on the paper when read from stamp Sprite path.
     /// </summary>
     [DataField]
     public string? StampLargeIcon = null; // Goob Stamp
 
+    /// <summary>
+    /// The loc string name that will be stamped to the piece of paper on examine.
+    /// </summary>
+    [DataField("stampedName")]
+    public string StampedName { get; set; } = "stamp-component-stamped-name-default";
+
+    /// <summary>
+    /// The sprite state of the stamp to display on the paper from paper Sprite path.
+    /// </summary>
+    [DataField("stampState")]
+    public string StampState { get; set; } = "paper_stamp-generic";
 }

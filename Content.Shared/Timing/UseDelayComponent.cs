@@ -29,42 +29,44 @@ namespace Content.Shared.Timing;
 [Access(typeof(UseDelaySystem))]
 public sealed partial class UseDelayComponent : Component
 {
-    [DataField]
-    public Dictionary<string, UseDelayInfo> Delays = [];
-
     /// <summary>
     /// Default delay time.
     /// </summary>
     /// <remarks>
     /// This is only used at MapInit and should not be expected
     /// to reflect the length of the default delay after that.
-    /// Use <see cref="UseDelaySystem.TryGetDelayInfo"/> instead.
+    /// Use <see cref="UseDelaySystem.TryGetDelayInfo" /> instead.
     /// </remarks>
     [DataField]
     public TimeSpan Delay = TimeSpan.FromSeconds(1);
+
+    [DataField]
+    public Dictionary<string, UseDelayInfo> Delays = [];
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class UseDelayComponentState : IComponentState
 {
     public Dictionary<string, UseDelayInfo> Delays = new();
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 [DataDefinition]
 public sealed partial class UseDelayInfo
 {
-    [DataField]
-    public TimeSpan Length { get; set; }
-    [DataField]
-    public TimeSpan StartTime { get; set; }
-    [DataField]
-    public TimeSpan EndTime { get; set; }
-
     public UseDelayInfo(TimeSpan length, TimeSpan startTime = default, TimeSpan endTime = default)
     {
         Length = length;
         StartTime = startTime;
         EndTime = endTime;
     }
+
+    [DataField]
+    public TimeSpan Length { get; set; }
+
+    [DataField]
+    public TimeSpan StartTime { get; set; }
+
+    [DataField]
+    public TimeSpan EndTime { get; set; }
 }

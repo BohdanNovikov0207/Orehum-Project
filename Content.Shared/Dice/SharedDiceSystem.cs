@@ -21,9 +21,9 @@ namespace Content.Shared.Dice;
 
 public abstract class SharedDiceSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -43,17 +43,15 @@ public abstract class SharedDiceSystem : EntitySystem
         args.Handled = true;
     }
 
-    private void OnLand(Entity<DiceComponent> entity, ref LandEvent args)
-    {
-        Roll(entity);
-    }
+    private void OnLand(Entity<DiceComponent> entity, ref LandEvent args) => Roll(entity);
 
     private void OnExamined(Entity<DiceComponent> entity, ref ExaminedEvent args)
     {
         //No details check, since the sprite updates to show the side.
         using (args.PushGroup(nameof(DiceComponent)))
         {
-            args.PushMarkup(Loc.GetString("dice-component-on-examine-message-part-1", ("sidesAmount", entity.Comp.Sides)));
+            args.PushMarkup(Loc.GetString("dice-component-on-examine-message-part-1",
+                ("sidesAmount", entity.Comp.Sides)));
             args.PushMarkup(Loc.GetString("dice-component-on-examine-message-part-2",
                 ("currentSide", entity.Comp.CurrentValue)));
         }
@@ -84,7 +82,7 @@ public abstract class SharedDiceSystem : EntitySystem
 
     private void Roll(Entity<DiceComponent> entity, EntityUid? user = null)
     {
-        var rand = new System.Random((int)_timing.CurTick.Value);
+        var rand = new System.Random((int) _timing.CurTick.Value);
 
         var roll = rand.Next(1, entity.Comp.Sides + 1);
         SetCurrentSide(entity, roll);

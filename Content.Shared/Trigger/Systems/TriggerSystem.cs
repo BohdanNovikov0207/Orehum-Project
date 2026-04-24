@@ -6,12 +6,11 @@ using Content.Shared.Popups;
 using Content.Shared.Timing;
 using Content.Shared.Trigger.Components;
 using Content.Shared.Whitelist;
+using Robust.Shared.Audio.Systems;
 using Robust.Shared.Network;
 using Robust.Shared.Physics.Systems;
-using Robust.Shared.Timing;
 using Robust.Shared.Random;
-using Robust.Shared.Audio.Systems;
-
+using Robust.Shared.Timing;
 
 namespace Content.Shared.Trigger.Systems;
 
@@ -24,22 +23,21 @@ namespace Content.Shared.Trigger.Systems;
 /// </remarks>
 public sealed partial class TriggerSystem : EntitySystem
 {
+    public const string DefaultTriggerKey = "trigger";
+    [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
+    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly SharedDeviceLinkSystem _deviceLink = default!;
+    [Dependency] private readonly FixtureSystem _fixture = default!;
+    [Dependency] private readonly ItemToggleSystem _itemToggle = default!;
+    [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
-    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
-    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
-    [Dependency] private readonly FixtureSystem _fixture = default!;
-    [Dependency] private readonly INetManager _net = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly UseDelaySystem _useDelay = default!;
     [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
-    [Dependency] private readonly ItemToggleSystem _itemToggle = default!;
-    [Dependency] private readonly SharedDeviceLinkSystem _deviceLink = default!;
-
-    public const string DefaultTriggerKey = "trigger";
 
     public override void Initialize()
     {
@@ -60,7 +58,10 @@ public sealed partial class TriggerSystem : EntitySystem
     /// </summary>
     /// <param name="trigger">The entity that has the components that should be triggered.</param>
     /// <param name="user">The user of the trigger. Some effects may target the user instead of the trigger entity.</param>
-    /// <param name="key">A key string to allow multiple, independent triggers on the same entity. If null then all triggers will activate.</param>
+    /// <param name="key">
+    /// A key string to allow multiple, independent triggers on the same entity. If null then all triggers
+    /// will activate.
+    /// </param>
     /// <returns>Whether or not the trigger has sucessfully activated an effect.</returns>
     public bool Trigger(EntityUid trigger, EntityUid? user = null, string? key = null)
     {
@@ -75,7 +76,7 @@ public sealed partial class TriggerSystem : EntitySystem
     }
 
     /// <summary>
-    /// Activate a timer trigger on an entity with <see cref="TimerTriggerComponent"/>.
+    /// Activate a timer trigger on an entity with <see cref="TimerTriggerComponent" />.
     /// </summary>
     /// <returns>Whether or not a timer was activated.</returns>
     public bool ActivateTimerTrigger(Entity<TimerTriggerComponent?> ent, EntityUid? user = null)
@@ -117,7 +118,7 @@ public sealed partial class TriggerSystem : EntitySystem
     }
 
     /// <summary>
-    /// Stop a timer trigger on an entity with <see cref="TimerTriggerComponent"/>.
+    /// Stop a timer trigger on an entity with <see cref="TimerTriggerComponent" />.
     /// </summary>
     /// <returns>Whether or not a timer was stopped.</returns>
     public bool StopTimerTrigger(Entity<TimerTriggerComponent?> ent)
@@ -132,7 +133,8 @@ public sealed partial class TriggerSystem : EntitySystem
         if (TryComp<AppearanceComponent>(ent.Owner, out var appearance))
             _appearance.SetData(ent.Owner, TriggerVisuals.VisualState, TriggerVisualState.Unprimed, appearance);
 
-        _adminLogger.Add(LogType.Trigger, $"A timer trigger was stopped before triggering on entity {ToPrettyString(ent.Owner):timer}");
+        _adminLogger.Add(LogType.Trigger,
+            $"A timer trigger was stopped before triggering on entity {ToPrettyString(ent.Owner):timer}");
         return true;
     }
 
@@ -174,6 +176,7 @@ public sealed partial class TriggerSystem : EntitySystem
 
         return ent.Comp.NextTrigger - _timing.CurTime;
     }
+
     public override void Update(float frameTime)
     {
         base.Update(frameTime);

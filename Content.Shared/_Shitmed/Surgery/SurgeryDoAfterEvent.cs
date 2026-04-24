@@ -9,11 +9,11 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared._Shitmed.Medical.Surgery;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed partial class SurgeryDoAfterEvent : SimpleDoAfterEvent
 {
-    public readonly EntProtoId Surgery;
     public readonly EntProtoId Step;
+    public readonly EntProtoId Surgery;
     public readonly bool ToolUsed;
 
     public SurgeryDoAfterEvent(EntProtoId surgery, EntProtoId step, bool toolUsed)

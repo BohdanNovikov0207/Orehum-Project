@@ -75,15 +75,15 @@ public abstract class SharedAmbientSoundSystem : EntitySystem
 
     private void HandleCompState(EntityUid uid, AmbientSoundComponent component, ref ComponentHandleState args)
     {
-        if (args.Current is not AmbientSoundComponentState state) return;
+        if (args.Current is not AmbientSoundComponentState state)
+            return;
         SetAmbience(uid, state.Enabled, component);
         SetRange(uid, state.Range, component);
         SetVolume(uid, state.Volume, component);
         SetSound(uid, state.Sound, component);
     }
 
-    private void GetCompState(EntityUid uid, AmbientSoundComponent component, ref ComponentGetState args)
-    {
+    private void GetCompState(EntityUid uid, AmbientSoundComponent component, ref ComponentGetState args) =>
         args.State = new AmbientSoundComponentState
         {
             Enabled = component.Enabled,
@@ -91,5 +91,4 @@ public abstract class SharedAmbientSoundSystem : EntitySystem
             Volume = component.Volume,
             Sound = component.Sound,
         };
-    }
 }

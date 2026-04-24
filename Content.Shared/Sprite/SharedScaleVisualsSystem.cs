@@ -15,15 +15,10 @@ public abstract class SharedScaleVisualsSystem : EntitySystem
         SubscribeLocalEvent<ScaleVisualsComponent, ComponentShutdown>(OnComponentShutdown);
     }
 
-    private void OnMapInit(Entity<ScaleVisualsComponent> ent, ref MapInitEvent args)
-    {
+    private void OnMapInit(Entity<ScaleVisualsComponent> ent, ref MapInitEvent args) =>
         SetSpriteScale(ent.Owner, ent.Comp.Scale);
-    }
 
-    private void OnComponentShutdown(Entity<ScaleVisualsComponent> ent, ref ComponentShutdown args)
-    {
-        ResetScale(ent);
-    }
+    private void OnComponentShutdown(Entity<ScaleVisualsComponent> ent, ref ComponentShutdown args) => ResetScale(ent);
 
     protected virtual void ResetScale(Entity<ScaleVisualsComponent> ent)
     {
@@ -33,7 +28,8 @@ public abstract class SharedScaleVisualsSystem : EntitySystem
     }
 
     /// <summary>
-    /// Used to set the <see cref="Robust.Client.GameObjects.SpriteComponent.Scale"/> datafield to a certain value from the server.
+    /// Used to set the <see cref="Robust.Client.GameObjects.SpriteComponent.Scale" /> datafield to a certain value from the
+    /// server.
     /// </summary>
     public void SetSpriteScale(EntityUid uid, Vector2 scale)
     {
@@ -50,7 +46,7 @@ public abstract class SharedScaleVisualsSystem : EntitySystem
     }
 
     /// <summary>
-    /// Gets the current scale set by <see cref="SetSpriteScale"/>.
+    /// Gets the current scale set by <see cref="SetSpriteScale" />.
     /// This does not include any direct changes made to the SpriteComponent.
     /// </summary>
     public Vector2 GetSpriteScale(EntityUid uid)
@@ -71,7 +67,7 @@ public abstract class SharedScaleVisualsSystem : EntitySystem
 [ByRefEvent]
 public readonly record struct ScaleEntityEvent(EntityUid Uid, Vector2 Scale);
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum ScaleVisuals : byte
 {
     Scale,

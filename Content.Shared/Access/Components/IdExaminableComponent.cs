@@ -13,17 +13,17 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Access.Components;
 
-[RegisterComponent, NetworkedComponent, Access(typeof(IdExaminableSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(IdExaminableSystem))]
 public sealed partial class IdExaminableComponent : Component
 {
     [DataField]
-    public ProtoId<RadioChannelPrototype> SecurityChannel = "Security";
+    public uint MaxStringLength = 256;
 
     [DataField]
-    public uint MaxStringLength = 256;
+    public ProtoId<RadioChannelPrototype> SecurityChannel = "Security";
 }
 
-[NetSerializable, Serializable]
+[NetSerializable] [Serializable]
 public enum SetWantedVerbMenu : byte
 {
     Key,

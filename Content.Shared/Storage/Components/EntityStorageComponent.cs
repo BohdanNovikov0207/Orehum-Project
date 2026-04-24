@@ -73,28 +73,17 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.Storage.Components;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class EntityStorageComponent : Component, IGasMixtureHolder
 {
+    public static readonly TimeSpan InternalOpenAttemptDelay = TimeSpan.FromSeconds(0.5);
     public readonly float MaxSize = 1.0f; // maximum width or height of an entity allowed inside the storage.
 
-    public static readonly TimeSpan InternalOpenAttemptDelay = TimeSpan.FromSeconds(0.5);
-    public TimeSpan NextInternalOpenAttempt;
-
     /// <summary>
-    ///     Collision masks that get removed when the storage gets opened.
-    /// </summary>
-    [DataField] // Goob edit: allow changing collisionmasks to remove when opening containers. Added datafield, removed readonly.
-    public /* readonly */ int MasksToRemove = (int) (
-        CollisionGroup.MidImpassable |
-        CollisionGroup.HighImpassable |
-        CollisionGroup.LowImpassable);
-
-    /// <summary>
-    ///     Collision masks that were removed from ANY layer when the storage was opened;
+    /// Whether or not the container is sealed and traps air inside of it
     /// </summary>
     [DataField]
-    public int RemovedMasks;
+    public bool Airtight = true;
 
     /// <summary>
     /// The total amount of items that can fit in one entitystorage
@@ -103,18 +92,22 @@ public sealed partial class EntityStorageComponent : Component, IGasMixtureHolde
     public int Capacity = 30;
 
     /// <summary>
-    /// Whether or not the entity still has collision when open
+    /// The sound made when closed
     /// </summary>
     [DataField]
-    public bool IsCollidableWhenOpen;
+    public SoundSpecifier CloseSound = new SoundPathSpecifier("/Audio/Effects/closetclose.ogg");
 
     /// <summary>
-    /// If true, it opens the storage when the entity inside of it moves
-    /// If false, it prevents the storage from opening when the entity inside of it moves.
-    /// This is for objects that you want the player to move while inside, like large cardboard boxes, without opening the storage.
+    /// The contents of the storage
+    /// </summary>
+    [ViewVariables]
+    public Container Contents = default!;
+
+    /// <summary>
+    /// Whether or not all the contents stored should be deleted with the entitystorage
     /// </summary>
     [DataField]
-    public bool OpenOnMove = true;
+    public bool DeleteContentsOnDestruction;
 
     //The offset for where items are emptied/vacuumed for the EntityStorage.
     [DataField]
@@ -131,10 +124,21 @@ public sealed partial class EntityStorageComponent : Component, IGasMixtureHolde
     public float EnteringRange = 0.18f;
 
     /// <summary>
-    /// Whether or not to show the contents when the storage is closed
+    /// Whether or not the entity still has collision when open
     /// </summary>
     [DataField]
-    public bool ShowContents;
+    public bool IsCollidableWhenOpen;
+
+    /// <summary>
+    /// Collision masks that get removed when the storage gets opened.
+    /// </summary>
+    [DataField] // Goob edit: allow changing collisionmasks to remove when opening containers. Added datafield, removed readonly.
+    public /* readonly */ int MasksToRemove = (int) (
+        CollisionGroup.MidImpassable |
+        CollisionGroup.HighImpassable |
+        CollisionGroup.LowImpassable);
+
+    public TimeSpan NextInternalOpenAttempt;
 
     /// <summary>
     /// Whether or not light is occluded by the storage
@@ -143,28 +147,19 @@ public sealed partial class EntityStorageComponent : Component, IGasMixtureHolde
     public bool OccludesLight = true;
 
     /// <summary>
-    /// Whether or not all the contents stored should be deleted with the entitystorage
-    /// </summary>
-    [DataField]
-    public bool DeleteContentsOnDestruction;
-
-    /// <summary>
-    /// Whether or not the container is sealed and traps air inside of it
-    /// </summary>
-    [DataField]
-    public bool Airtight = true;
-
-    /// <summary>
     /// Whether or not the entitystorage is open or closed
     /// </summary>
     [DataField]
     public bool Open;
 
     /// <summary>
-    /// The sound made when closed
+    /// If true, it opens the storage when the entity inside of it moves
+    /// If false, it prevents the storage from opening when the entity inside of it moves.
+    /// This is for objects that you want the player to move while inside, like large cardboard boxes, without opening the
+    /// storage.
     /// </summary>
     [DataField]
-    public SoundSpecifier CloseSound = new SoundPathSpecifier("/Audio/Effects/closetclose.ogg");
+    public bool OpenOnMove = true;
 
     /// <summary>
     /// The sound made when open
@@ -173,17 +168,23 @@ public sealed partial class EntityStorageComponent : Component, IGasMixtureHolde
     public SoundSpecifier OpenSound = new SoundPathSpecifier("/Audio/Effects/closetopen.ogg");
 
     /// <summary>
-    ///     Whitelist for what entities are allowed to be inserted into this container. If this is not null, the
-    ///     standard requirement that the entity must be an item or mob is waived.
+    /// Collision masks that were removed from ANY layer when the storage was opened;
+    /// </summary>
+    [DataField]
+    public int RemovedMasks;
+
+    /// <summary>
+    /// Whether or not to show the contents when the storage is closed
+    /// </summary>
+    [DataField]
+    public bool ShowContents;
+
+    /// <summary>
+    /// Whitelist for what entities are allowed to be inserted into this container. If this is not null, the
+    /// standard requirement that the entity must be an item or mob is waived.
     /// </summary>
     [DataField]
     public EntityWhitelist? Whitelist;
-
-    /// <summary>
-    /// The contents of the storage
-    /// </summary>
-    [ViewVariables]
-    public Container Contents = default!;
 
     /// <summary>
     /// Gas currently contained in this entity storage.
@@ -193,22 +194,26 @@ public sealed partial class EntityStorageComponent : Component, IGasMixtureHolde
     public GasMixture Air { get; set; } = new(200);
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class EntityStorageComponentState : ComponentState
 {
-    public bool Open;
-
     public int Capacity;
-
-    public bool IsCollidableWhenOpen;
-
-    public bool OpenOnMove;
 
     public float EnteringRange;
 
-    public TimeSpan NextInternalOpenAttempt;
+    public bool IsCollidableWhenOpen;
 
-    public EntityStorageComponentState(bool open, int capacity, bool isCollidableWhenOpen, bool openOnMove, float enteringRange, TimeSpan nextInternalOpenAttempt)
+    public TimeSpan NextInternalOpenAttempt;
+    public bool Open;
+
+    public bool OpenOnMove;
+
+    public EntityStorageComponentState(bool open,
+        int capacity,
+        bool isCollidableWhenOpen,
+        bool openOnMove,
+        float enteringRange,
+        TimeSpan nextInternalOpenAttempt)
     {
         Open = open;
         Capacity = capacity;

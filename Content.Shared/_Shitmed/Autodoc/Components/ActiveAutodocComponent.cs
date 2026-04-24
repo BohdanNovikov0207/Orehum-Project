@@ -15,7 +15,7 @@ namespace Content.Shared._Shitmed.Autodoc.Components;
 /// Component added while operating on a patient.
 /// Only usable serverside, only thing that can be predicted is a surgery being active.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(SharedAutodocSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(SharedAutodocSystem))]
 [AutoGenerateComponentPause]
 public sealed partial class ActiveAutodocComponent : Component
 {
@@ -25,6 +25,16 @@ public sealed partial class ActiveAutodocComponent : Component
     /// </summary>
     [DataField]
     public int CurrentProgram;
+
+    /// <summary>
+    /// The current body, part and surgery being done, if any.
+    /// </summary>
+    [DataField]
+    public (EntityUid, EntityUid, EntProtoId)? CurrentSurgery;
+
+    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))]
+    [AutoPausedField]
+    public TimeSpan NextUpdate = TimeSpan.Zero;
 
     /// <summary>
     /// Index of the current program's step it is trying to do.
@@ -37,14 +47,4 @@ public sealed partial class ActiveAutodocComponent : Component
     /// </summary>
     [DataField]
     public bool Waiting;
-
-    /// <summary>
-    /// The current body, part and surgery being done, if any.
-    /// </summary>
-    [DataField]
-    public (EntityUid, EntityUid, EntProtoId)? CurrentSurgery;
-
-    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))]
-    [AutoPausedField]
-    public TimeSpan NextUpdate = TimeSpan.Zero;
 }

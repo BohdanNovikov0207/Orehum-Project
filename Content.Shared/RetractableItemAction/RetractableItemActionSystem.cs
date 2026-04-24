@@ -15,10 +15,10 @@ namespace Content.Shared.RetractableItemAction;
 /// </summary>
 public sealed class RetractableItemActionSystem : EntitySystem
 {
-    [Dependency] private readonly SharedHandsSystem _hands = default!;
-    [Dependency] private readonly SharedContainerSystem _containers = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedActionsSystem _actions = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly SharedContainerSystem _containers = default!;
+    [Dependency] private readonly SharedHandsSystem _hands = default!;
     [Dependency] private readonly SharedPopupSystem _popups = default!;
 
     public override void Initialize()
@@ -29,7 +29,9 @@ public sealed class RetractableItemActionSystem : EntitySystem
         SubscribeLocalEvent<RetractableItemActionComponent, OnRetractableItemActionEvent>(OnRetractableItemAction);
 
         SubscribeLocalEvent<ActionRetractableItemComponent, ComponentShutdown>(OnActionSummonedShutdown);
-        Subs.SubscribeWithRelay<ActionRetractableItemComponent, HeldRelayedEvent<TargetHandcuffedEvent>>(OnItemHandcuffed, inventory: false);
+        Subs.SubscribeWithRelay<ActionRetractableItemComponent, HeldRelayedEvent<TargetHandcuffedEvent>>(
+            OnItemHandcuffed,
+            inventory: false);
     }
 
     private void OnActionInit(Entity<RetractableItemActionComponent> ent, ref MapInitEvent args)
@@ -39,7 +41,8 @@ public sealed class RetractableItemActionSystem : EntitySystem
         PopulateActionItem(ent.Owner);
     }
 
-    private void OnRetractableItemAction(Entity<RetractableItemActionComponent> ent, ref OnRetractableItemActionEvent args)
+    private void OnRetractableItemAction(Entity<RetractableItemActionComponent> ent,
+        ref OnRetractableItemActionEvent args)
     {
         if (_hands.GetActiveHand(args.Performer) is not { } activeHand)
             return;
@@ -63,13 +66,9 @@ public sealed class RetractableItemActionSystem : EntitySystem
         }
 
         if (_hands.IsHolding(args.Performer, ent.Comp.ActionItemUid))
-        {
             RetractRetractableItem(args.Performer, ent.Comp.ActionItemUid.Value, ent.Owner);
-        }
         else
-        {
             SummonRetractableItem(args.Performer, ent.Comp.ActionItemUid.Value, activeHand, ent.Owner);
-        }
 
         args.Handled = true;
     }
@@ -86,7 +85,8 @@ public sealed class RetractableItemActionSystem : EntitySystem
         PopulateActionItem(action.Owner);
     }
 
-    private void OnItemHandcuffed(Entity<ActionRetractableItemComponent> ent, ref HeldRelayedEvent<TargetHandcuffedEvent> args)
+    private void OnItemHandcuffed(Entity<ActionRetractableItemComponent> ent,
+        ref HeldRelayedEvent<TargetHandcuffedEvent> args)
     {
         if (_actions.GetAction(ent.Comp.SummoningAction) is not { } action)
             return;
@@ -94,7 +94,7 @@ public sealed class RetractableItemActionSystem : EntitySystem
         if (action.Comp.AttachedEntity == null)
             return;
 
-        if (_hands.GetActiveHand(action.Comp.AttachedEntity.Value) is not { })
+        if (_hands.GetActiveHand(action.Comp.AttachedEntity.Value) is null)
             return;
 
         RetractRetractableItem(action.Comp.AttachedEntity.Value, ent, action.Owner);
@@ -105,7 +105,10 @@ public sealed class RetractableItemActionSystem : EntitySystem
         if (!Resolve(ent.Owner, ref ent.Comp, false) || TerminatingOrDeleted(ent))
             return;
 
-        if (!PredictedTrySpawnInContainer(ent.Comp.SpawnedPrototype, ent.Owner, RetractableItemActionComponent.ContainerId, out var summoned))
+        if (!PredictedTrySpawnInContainer(ent.Comp.SpawnedPrototype,
+                ent.Owner,
+                RetractableItemActionComponent.ContainerId,
+                out var summoned))
             return;
 
         ent.Comp.ActionItemUid = summoned.Value;
@@ -118,7 +121,9 @@ public sealed class RetractableItemActionSystem : EntitySystem
         Dirty(ent);
     }
 
-    private void RetractRetractableItem(EntityUid holder, EntityUid item, Entity<RetractableItemActionComponent?> action)
+    private void RetractRetractableItem(EntityUid holder,
+        EntityUid item,
+        Entity<RetractableItemActionComponent?> action)
     {
         if (!Resolve(action, ref action.Comp, false))
             return;
@@ -129,12 +134,15 @@ public sealed class RetractableItemActionSystem : EntitySystem
         _audio.PlayPredicted(action.Comp.RetractSounds, holder, holder);
     }
 
-    private void SummonRetractableItem(EntityUid holder, EntityUid item, string hand, Entity<RetractableItemActionComponent?> action)
+    private void SummonRetractableItem(EntityUid holder,
+        EntityUid item,
+        string hand,
+        Entity<RetractableItemActionComponent?> action)
     {
         if (!Resolve(action, ref action.Comp, false))
             return;
 
-        _hands.TryForcePickup(holder, item, hand, checkActionBlocker: false);
+        _hands.TryForcePickup(holder, item, hand, false);
         _audio.PlayPredicted(action.Comp.SummonSounds, holder, holder);
         EnsureComp<UnremoveableComponent>(item);
     }

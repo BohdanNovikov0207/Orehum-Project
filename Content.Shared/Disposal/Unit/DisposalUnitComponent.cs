@@ -29,8 +29,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Shared.Atmos;
-using Robust.Shared.Audio;
 using Content.Shared.Whitelist;
+using Robust.Shared.Audio;
 using Robust.Shared.Containers;
 using Robust.Shared.GameStates;
 using Robust.Shared.Serialization;
@@ -41,9 +41,57 @@ namespace Content.Shared.Disposal.Components;
 /// <summary>
 /// Takes in entities and flushes them out to attached disposals tubes after a timer.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState(true)]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState(true)]
 public sealed partial class DisposalUnitComponent : Component
 {
+    [Serializable] [NetSerializable]
+    public enum DisposalUnitUiKey : byte
+    {
+        Key,
+    }
+
+    [Serializable] [NetSerializable]
+    public enum HandleState : byte
+    {
+        Normal,
+        Engaged,
+    }
+
+    [Serializable] [NetSerializable]
+    [Flags]
+    public enum LightStates : byte
+    {
+        Off = 0,
+        Charging = 1 << 0,
+        Full = 1 << 1,
+        Ready = 1 << 2,
+    }
+
+    [Serializable] [NetSerializable]
+    public enum UiButton : byte
+    {
+        Eject,
+        Engage,
+        Power,
+    }
+
+    [Serializable] [NetSerializable]
+    public enum Visuals : byte
+    {
+        VisualState,
+        Handle,
+        Light,
+    }
+
+    [Serializable] [NetSerializable]
+    public enum VisualState : byte
+    {
+        UnAnchored,
+        Anchored,
+        OverlayFlushing,
+        OverlayCharging,
+    }
+
     public const string ContainerId = "disposals";
 
     /// <summary>
@@ -52,11 +100,11 @@ public sealed partial class DisposalUnitComponent : Component
     [DataField]
     public GasMixture Air = new(Atmospherics.CellVolume);
 
-    /// <summary>
-    /// Sounds played upon the unit flushing.
-    /// </summary>
-    [DataField("soundFlush"), AutoNetworkedField]
-    public SoundSpecifier? FlushSound = new SoundPathSpecifier("/Audio/Machines/disposalflush.ogg");
+    [DataField]
+    public bool AutomaticEngage = true;
+
+    [DataField] [AutoNetworkedField]
+    public TimeSpan AutomaticEngageTime = TimeSpan.FromSeconds(30);
 
     /// <summary>
     /// Blacklists (prevents) entities listed from being placed inside.
@@ -65,40 +113,9 @@ public sealed partial class DisposalUnitComponent : Component
     public EntityWhitelist? Blacklist;
 
     /// <summary>
-    /// Whitelists (allows) entities listed from being placed inside.
+    /// Container of entities inside this disposal unit.
     /// </summary>
-    [DataField]
-    public EntityWhitelist? Whitelist;
-
-    /// <summary>
-    /// Sound played when an object is inserted into the disposal unit.
-    /// </summary>
-    [ViewVariables(VVAccess.ReadWrite), DataField("soundInsert")]
-    public SoundSpecifier? InsertSound = new SoundPathSpecifier("/Audio/Effects/trashbag1.ogg");
-
-    /// <summary>
-    /// State for this disposals unit.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public DisposalsPressureState State;
-
-    /// <summary>
-    /// Next time the disposal unit will be pressurized.
-    /// </summary>
-    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer)), AutoNetworkedField]
-    public TimeSpan NextPressurized = TimeSpan.Zero;
-
-    /// <summary>
-    /// How long it takes to flush a disposals unit manually.
-    /// </summary>
-    [DataField("flushTime")]
-    public TimeSpan ManualFlushTime = TimeSpan.FromSeconds(2);
-
-    /// <summary>
-    /// How long it takes from the start of a flush animation to return the sprite to normal.
-    /// </summary>
-    [DataField]
-    public TimeSpan FlushDelay = TimeSpan.FromSeconds(3);
+    [ViewVariables] public Container Container = default!;
 
     /// <summary>
     /// Removes the pressure requirement for flushing.
@@ -107,16 +124,16 @@ public sealed partial class DisposalUnitComponent : Component
     public bool DisablePressure;
 
     /// <summary>
-    /// Last time that an entity tried to exit this disposal unit.
+    /// Delay from trying to shove someone else into disposals.
     /// </summary>
-    [DataField, AutoNetworkedField]
-    public TimeSpan LastExitAttempt;
+    [ViewVariables(VVAccess.ReadWrite)]
+    public float DraggedEntryDelay = 2.0f;
 
-    [DataField]
-    public bool AutomaticEngage = true;
-
-    [DataField, AutoNetworkedField]
-    public TimeSpan AutomaticEngageTime = TimeSpan.FromSeconds(30);
+    /// <summary>
+    /// Was the disposals unit engaged for a manual flush.
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public bool Engaged;
 
     /// <summary>
     /// Delay from trying to enter disposals ourselves.
@@ -125,74 +142,63 @@ public sealed partial class DisposalUnitComponent : Component
     public float EntryDelay = 0.5f;
 
     /// <summary>
-    /// Delay from trying to shove someone else into disposals.
+    /// How long it takes from the start of a flush animation to return the sprite to normal.
     /// </summary>
-    [ViewVariables(VVAccess.ReadWrite)]
-    public float DraggedEntryDelay = 2.0f;
+    [DataField]
+    public TimeSpan FlushDelay = TimeSpan.FromSeconds(3);
 
     /// <summary>
-    /// Container of entities inside this disposal unit.
+    /// Sounds played upon the unit flushing.
     /// </summary>
-    [ViewVariables] public Container Container = default!;
+    [DataField("soundFlush")] [AutoNetworkedField]
+    public SoundSpecifier? FlushSound = new SoundPathSpecifier("/Audio/Machines/disposalflush.ogg");
 
     /// <summary>
-    /// Was the disposals unit engaged for a manual flush.
+    /// Sound played when an object is inserted into the disposal unit.
     /// </summary>
-    [DataField, AutoNetworkedField]
-    public bool Engaged;
+    [ViewVariables(VVAccess.ReadWrite)] [DataField("soundInsert")]
+    public SoundSpecifier? InsertSound = new SoundPathSpecifier("/Audio/Effects/trashbag1.ogg");
 
     /// <summary>
-    /// Next time this unit will flush. Is the lesser of <see cref="FlushDelay"/> and <see cref="AutomaticEngageTime"/>
+    /// Last time that an entity tried to exit this disposal unit.
     /// </summary>
-    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer)), AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
+    public TimeSpan LastExitAttempt;
+
+    /// <summary>
+    /// How long it takes to flush a disposals unit manually.
+    /// </summary>
+    [DataField("flushTime")]
+    public TimeSpan ManualFlushTime = TimeSpan.FromSeconds(2);
+
+    /// <summary>
+    /// Next time this unit will flush. Is the lesser of <see cref="FlushDelay" /> and <see cref="AutomaticEngageTime" />
+    /// </summary>
+    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))] [AutoNetworkedField]
     public TimeSpan? NextFlush;
 
-    [Serializable, NetSerializable]
-    public enum Visuals : byte
-    {
-        VisualState,
-        Handle,
-        Light
-    }
-
-    [Serializable, NetSerializable]
-    public enum VisualState : byte
-    {
-        UnAnchored,
-        Anchored,
-        OverlayFlushing,
-        OverlayCharging
-    }
-
-    [Serializable, NetSerializable]
-    public enum HandleState : byte
-    {
-        Normal,
-        Engaged
-    }
-
-    [Serializable, NetSerializable]
-    [Flags]
-    public enum LightStates : byte
-    {
-        Off = 0,
-        Charging = 1 << 0,
-        Full = 1 << 1,
-        Ready = 1 << 2
-    }
-
-    [Serializable, NetSerializable]
-    public enum UiButton : byte
-    {
-        Eject,
-        Engage,
-        Power
-    }
+    /// <summary>
+    /// Next time the disposal unit will be pressurized.
+    /// </summary>
+    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))] [AutoNetworkedField]
+    public TimeSpan NextPressurized = TimeSpan.Zero;
 
     /// <summary>
-    ///     Message data sent from client to server when a disposal unit ui button is pressed.
+    /// State for this disposals unit.
     /// </summary>
-    [Serializable, NetSerializable]
+    [DataField] [AutoNetworkedField]
+    public DisposalsPressureState State;
+
+    /// <summary>
+    /// Whitelists (allows) entities listed from being placed inside.
+    /// </summary>
+    [DataField]
+    public EntityWhitelist? Whitelist;
+
+    /// <summary>
+    /// Message data sent from client to server when a disposal unit ui button is pressed.
+    /// </summary>
+    [Serializable] [NetSerializable]
     public sealed class UiButtonPressedMessage : BoundUserInterfaceMessage
     {
         public readonly UiButton Button;
@@ -202,15 +208,9 @@ public sealed partial class DisposalUnitComponent : Component
             Button = button;
         }
     }
-
-    [Serializable, NetSerializable]
-    public enum DisposalUnitUiKey : byte
-    {
-        Key
-    }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum DisposalsPressureState : byte
 {
     Ready,
@@ -223,5 +223,5 @@ public enum DisposalsPressureState : byte
     /// <summary>
     /// FlushDelay has elapsed and now we're transitioning back to Ready.
     /// </summary>
-    Pressurizing
+    Pressurizing,
 }

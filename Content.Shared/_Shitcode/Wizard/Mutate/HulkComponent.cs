@@ -14,41 +14,20 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Shared._Goobstation.Wizard.Mutate;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class HulkComponent : Component
 {
+    [DataField]
+    public string BaseLayerExternal = "MobHumanoidMarkingMatchSkin";
+
     /// <summary>
     /// If it's null, hulk is permanent
     /// </summary>
     [DataField]
     public float? Duration;
 
-    [DataField, AutoNetworkedField]
-    public float OldScale;
-
-    [DataField, AutoNetworkedField]
-    public bool LaserEyes = true;
-
     [DataField]
-    public SoundSpecifier? SoundGunshot = new SoundPathSpecifier("/Audio/Weapons/Guns/Gunshots/laser_cannon.ogg");
-
-    [DataField]
-    public ProtoId<HitscanPrototype> ShotProto = "RedHeavyLaser";
-
-    [ViewVariables(VVAccess.ReadOnly)]
-    public Dictionary<HumanoidVisualLayers, CustomBaseLayerInfo> OldCustomBaseLayers = new();
-
-    [ViewVariables(VVAccess.ReadOnly)]
-    public Color OldSkinColor;
-
-    [ViewVariables(VVAccess.ReadOnly)]
-    public Color OldEyeColor;
-
-    [ViewVariables(VVAccess.ReadOnly)]
-    public TimeSpan NextRoar = TimeSpan.Zero;
-
-    [ViewVariables(VVAccess.ReadOnly)]
-    public List<Color> NonHumanoidOldLayerData = new();
+    public Color EyeColor = Color.FromHex("#910C17");
 
     /// <summary>
     /// Multiplier is actually this value + 1
@@ -56,20 +35,29 @@ public sealed partial class HulkComponent : Component
     [DataField]
     public float FistDamageMultiplier = 7f;
 
+    [DataField] [AutoNetworkedField]
+    public bool LaserEyes = true;
+
     [DataField]
     public float MaxBonusFistDamage = 50f;
 
-    [DataField]
-    public DamageSpecifier? StructuralDamage;
+    [ViewVariables(VVAccess.ReadOnly)]
+    public TimeSpan NextRoar = TimeSpan.Zero;
 
-    [DataField]
-    public Color SkinColor = Color.FromHex("#4EDB53");
+    [ViewVariables(VVAccess.ReadOnly)]
+    public List<Color> NonHumanoidOldLayerData = new();
 
-    [DataField]
-    public Color EyeColor = Color.FromHex("#910C17");
+    [ViewVariables(VVAccess.ReadOnly)]
+    public Dictionary<HumanoidVisualLayers, CustomBaseLayerInfo> OldCustomBaseLayers = new();
 
-    [DataField]
-    public string BaseLayerExternal = "MobHumanoidMarkingMatchSkin";
+    [ViewVariables(VVAccess.ReadOnly)]
+    public Color OldEyeColor;
+
+    [DataField] [AutoNetworkedField]
+    public float OldScale;
+
+    [ViewVariables(VVAccess.ReadOnly)]
+    public Color OldSkinColor;
 
     [DataField]
     public TimeSpan RoarDelay = TimeSpan.FromSeconds(0.5);
@@ -83,4 +71,16 @@ public sealed partial class HulkComponent : Component
         "hulk-roar-4",
         "hulk-roar-5",
     };
+
+    [DataField]
+    public ProtoId<HitscanPrototype> ShotProto = "RedHeavyLaser";
+
+    [DataField]
+    public Color SkinColor = Color.FromHex("#4EDB53");
+
+    [DataField]
+    public SoundSpecifier? SoundGunshot = new SoundPathSpecifier("/Audio/Weapons/Guns/Gunshots/laser_cannon.ogg");
+
+    [DataField]
+    public DamageSpecifier? StructuralDamage;
 }

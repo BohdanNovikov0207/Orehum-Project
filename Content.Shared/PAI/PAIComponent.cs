@@ -18,8 +18,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Goobstation.Maths.FixedPoint;
-using Content.Shared.Store;
 using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
 
@@ -30,27 +28,14 @@ namespace Content.Shared.PAI;
 /// In their current implementation in SS14, they create a ghost role anyone can access,
 /// and that a player can also "wipe" (reset/kick out player).
 /// Theoretically speaking pAIs are supposed to use a dedicated "offer and select" system,
-///  with the player holding the pAI being able to choose one of the ghosts in the round.
+/// with the player holding the pAI being able to choose one of the ghosts in the round.
 /// This seems too complicated for an initial implementation, though,
-///  and there's not always enough players and ghost roles to justify it.
+/// and there's not always enough players and ghost roles to justify it.
 /// All logic in PAISystem.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class PAIComponent : Component
 {
-    /// <summary>
-    /// The last person who activated this PAI.
-    /// Used for assigning the name.
-    /// </summary>
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
-    public EntityUid? LastUser;
-
-    [DataField]
-    public EntProtoId ShopActionId = "ActionPAIOpenShop";
-
-    [DataField, AutoNetworkedField]
-    public EntityUid? ShopAction;
-
     /// <summary>
     /// When microwaved there is this chance to brick the pai, kicking out its player and preventing it from being used again.
     /// </summary>
@@ -64,8 +49,21 @@ public sealed partial class PAIComponent : Component
     public string BrickPopup = "pai-system-brick-popup";
 
     /// <summary>
+    /// The last person who activated this PAI.
+    /// Used for assigning the name.
+    /// </summary>
+    [DataField] [ViewVariables(VVAccess.ReadWrite)]
+    public EntityUid? LastUser;
+
+    /// <summary>
     /// Locale id for the popup shown when the pai is microwaved but does not get bricked.
     /// </summary>
     [DataField]
     public string ScramblePopup = "pai-system-scramble-popup";
+
+    [DataField] [AutoNetworkedField]
+    public EntityUid? ShopAction;
+
+    [DataField]
+    public EntProtoId ShopActionId = "ActionPAIOpenShop";
 }

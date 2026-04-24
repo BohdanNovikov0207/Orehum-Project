@@ -1,8 +1,8 @@
-using Content.Shared.Body.Systems;
-using Content.Shared.Body.Part;
-using Content.Shared.Hands.Components;
 using Content.Shared._Shitmed.Weapons.Melee.Events;
 using Content.Shared._Shitmed.Weapons.Ranged.Events;
+using Content.Shared.Body.Part;
+using Content.Shared.Body.Systems;
+using Content.Shared.Hands.Components;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Weapons.Melee.Events;
 using Content.Shared.Wieldable.Components;
@@ -24,17 +24,15 @@ public sealed class FumbleOnDamageSystem : EntitySystem
 
     private void OnAttemptMeleeEvent(EntityUid uid, HandsComponent hands, ref AttemptMeleeEvent ev)
     {
-        bool raiseOnAll = ev.WeaponComponent.MustBeEquippedToUse
-                          || TryComp(ev.Weapon, out WieldableComponent? wieldable)
-                          && wieldable.Wielded;
+        var raiseOnAll = ev.WeaponComponent.MustBeEquippedToUse
+                         || TryComp(ev.Weapon, out WieldableComponent? wieldable)
+                         && wieldable.Wielded;
         // This might get messy with furry species that have more than two hands, but who cares.
 
         var hand = _hands.GetActiveHand((uid, hands));
         var ev2 = new AttemptHandsMeleeEvent();
         if (raiseOnAll)
-        {
             RaiseLocalEvent(uid, ev2);
-        }
         else if (hand != null) // I dont think its possible for it to be null???
         {
             foreach (var part in _body.GetBodyChildrenOfType(uid, BodyPartType.Hand))
@@ -49,10 +47,7 @@ public sealed class FumbleOnDamageSystem : EntitySystem
         }
 
         if (ev2.Cancelled)
-        {
             ev.Cancelled = true;
-            return;
-        }
     }
 
     private void OnAttemptShootEvent(EntityUid uid, HandsComponent hands, GunShotBodyEvent ev)
@@ -60,15 +55,13 @@ public sealed class FumbleOnDamageSystem : EntitySystem
         if (ev.GunUid == uid) // If the gun is the same user with a component e.g. laser eyes, dont bother.
             return;
 
-        bool raiseOnAll = TryComp(ev.GunUid, out WieldableComponent? wieldable)
-                          && wieldable.Wielded;
+        var raiseOnAll = TryComp(ev.GunUid, out WieldableComponent? wieldable)
+                         && wieldable.Wielded;
 
         var hand = _hands.GetActiveHand((uid, hands));
         var ev2 = new AttemptHandsShootEvent();
         if (raiseOnAll)
-        {
             RaiseLocalEvent(uid, ev2);
-        }
         else if (hand != null)
         {
             foreach (var part in _body.GetBodyChildrenOfType(uid, BodyPartType.Hand))
@@ -82,4 +75,3 @@ public sealed class FumbleOnDamageSystem : EntitySystem
         }
     }
 }
-

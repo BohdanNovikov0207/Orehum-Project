@@ -10,10 +10,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-namespace Content.Shared.Construction
+namespace Content.Shared.Construction;
+
+[RegisterComponent]
+public sealed partial class SharedCanBuildWindowOnTopComponent : Component
 {
-    [RegisterComponent]
-    public sealed partial class SharedCanBuildWindowOnTopComponent : Component
-    {
-    }
 }

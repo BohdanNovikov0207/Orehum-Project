@@ -12,16 +12,16 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared._Goobstation.Wizard.Spellblade;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class SpellbladeComponent : Component
 {
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public string? EnchantmentName;
 
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public SoundSpecifier? EnchantSound = new SoundPathSpecifier("/Audio/Magic/forcewall.ogg");
 
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public HashSet<ProtoId<SpellbladeEnchantmentPrototype>> Prototypes = new();
 }
 
@@ -29,7 +29,19 @@ public sealed partial class SpellbladeComponent : Component
 public sealed partial class LightningSpellbladeEnchantmentEvent : EntityEventArgs
 {
     [DataField]
+    public int ArcDepth = 1;
+
+    [DataField]
+    public int BoltCount = 3;
+
+    [DataField]
     public TimeSpan Delay = TimeSpan.FromSeconds(3);
+
+    [DataField]
+    public EntProtoId LightningPrototype = "HyperchargedLightning";
+
+    [DataField]
+    public float Range = 4f;
 
     [DataField]
     public float ShockDamage = 30f;
@@ -38,35 +50,23 @@ public sealed partial class LightningSpellbladeEnchantmentEvent : EntityEventArg
     public float ShockTime = 0.5f;
 
     [DataField]
-    public float Range = 4f;
-
-    [DataField]
-    public int BoltCount = 3;
-
-    [DataField]
-    public int ArcDepth = 1;
-
-    [DataField]
     public float Siemens = 1f;
-
-    [DataField]
-    public EntProtoId LightningPrototype = "HyperchargedLightning";
 }
 
 [DataDefinition]
 public sealed partial class BluespaceSpellbladeEnchantmentEvent : EntityEventArgs
 {
     [DataField]
-    public float Distance = 10f;
+    public TimeSpan BlinkDelay = TimeSpan.FromSeconds(2.5);
 
     [DataField]
-    public TimeSpan KnockdownTime = TimeSpan.FromSeconds(1);
+    public float Distance = 10f;
 
     [DataField]
     public float KnockdownRadius = 0.5f;
 
     [DataField]
-    public TimeSpan BlinkDelay = TimeSpan.FromSeconds(2.5);
+    public TimeSpan KnockdownTime = TimeSpan.FromSeconds(1);
 
     [DataField]
     public TimeSpan ToggleDelay = TimeSpan.FromSeconds(0.2);
@@ -76,7 +76,7 @@ public sealed partial class BluespaceSpellbladeEnchantmentEvent : EntityEventArg
 public sealed partial class FireSpellbladeEnchantmentEvent : EntityEventArgs
 {
     [DataField]
-    public float Range = 4f;
+    public TimeSpan Delay = TimeSpan.FromSeconds(8);
 
     [DataField]
     public float FireStacks = 10f;
@@ -85,7 +85,7 @@ public sealed partial class FireSpellbladeEnchantmentEvent : EntityEventArgs
     public float FireStacksOnHit = 2f;
 
     [DataField]
-    public TimeSpan Delay = TimeSpan.FromSeconds(8);
+    public float Range = 4f;
 }
 
 [DataDefinition]
@@ -102,15 +102,15 @@ public sealed partial class ForceshieldSpellbladeEnchantmentEvent : EntityEventA
     public float ShieldLifetime = 5f;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class SpellbladeEnchantMessage(ProtoId<SpellbladeEnchantmentPrototype> protoId)
     : BoundUserInterfaceMessage
 {
     public ProtoId<SpellbladeEnchantmentPrototype> ProtoId { get; } = protoId;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum SpellbladeUiKey : byte
 {
-    Key
+    Key,
 }

@@ -43,7 +43,7 @@ namespace Content.Shared.Interaction;
 
 // TODO deduplicate with AdminFrozenComponent
 /// <summary>
-/// Handles <see cref="BlockMovementComponent"/>, which prevents various
+/// Handles <see cref="BlockMovementComponent" />, which prevents various
 /// kinds of movement and interactions when attached to an entity.
 /// </summary>
 public partial class SharedInteractionSystem
@@ -76,18 +76,12 @@ public partial class SharedInteractionSystem
         args.Cancel(); // no more scurrying around
     }
 
-    private void CancelEvent(EntityUid uid, BlockMovementComponent component, CancellableEntityEventArgs args)
-    {
+    private void CancelEvent(EntityUid uid, BlockMovementComponent component, CancellableEntityEventArgs args) =>
         args.Cancel();
-    }
 
-    private void OnBlockingStartup(EntityUid uid, BlockMovementComponent component, ComponentStartup args)
-    {
+    private void OnBlockingStartup(EntityUid uid, BlockMovementComponent component, ComponentStartup args) =>
         _actionBlockerSystem.UpdateCanMove(uid);
-    }
 
-    private void OnBlockingShutdown(EntityUid uid, BlockMovementComponent component, ComponentShutdown args)
-    {
+    private void OnBlockingShutdown(EntityUid uid, BlockMovementComponent component, ComponentShutdown args) =>
         _actionBlockerSystem.UpdateCanMove(uid);
-    }
 }

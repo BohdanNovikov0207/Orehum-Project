@@ -23,13 +23,6 @@ namespace Content.Shared.Audio;
 [Access(typeof(SharedAmbientSoundSystem))]
 public sealed partial class AmbientSoundComponent : Component, IComponentTreeEntry<AmbientSoundComponent>
 {
-    [DataField("enabled", readOnly: true)]
-    [ViewVariables(VVAccess.ReadWrite)] // only for map editing
-    public bool Enabled { get; set; } = true;
-
-    [DataField("sound", required: true), ViewVariables(VVAccess.ReadWrite)] // only for map editing
-    public SoundSpecifier Sound = default!;
-
     /// <summary>
     /// How far away this ambient sound can potentially be heard.
     /// </summary>
@@ -37,7 +30,8 @@ public sealed partial class AmbientSoundComponent : Component, IComponentTreeEnt
     [DataField("range")]
     public float Range = 2f;
 
-    public Vector2 RangeVector => new Vector2(Range, Range);
+    [DataField("sound", required: true)] [ViewVariables(VVAccess.ReadWrite)] // only for map editing
+    public SoundSpecifier Sound = default!;
 
     /// <summary>
     /// Applies this volume to the sound being played.
@@ -45,6 +39,12 @@ public sealed partial class AmbientSoundComponent : Component, IComponentTreeEnt
     [ViewVariables(VVAccess.ReadWrite)] // only for map editing
     [DataField("volume")]
     public float Volume = -10f;
+
+    [DataField("enabled", true)]
+    [ViewVariables(VVAccess.ReadWrite)] // only for map editing
+    public bool Enabled { get; set; } = true;
+
+    public Vector2 RangeVector => new(Range, Range);
 
     public EntityUid? TreeUid { get; set; }
 
@@ -55,7 +55,7 @@ public sealed partial class AmbientSoundComponent : Component, IComponentTreeEnt
     public bool TreeUpdateQueued { get; set; }
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class AmbientSoundComponentState : ComponentState
 {
     public bool Enabled { get; init; }

@@ -32,7 +32,6 @@ using Content.Shared.Movement.Events;
 using Content.Shared.Movement.Systems;
 using Content.Shared.Physics;
 using Content.Shared.Rotation;
-using Robust.Shared.Audio;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Physics;
 using Robust.Shared.Physics.Systems;
@@ -41,12 +40,11 @@ namespace Content.Shared.Standing;
 
 public sealed class StandingStateSystem : EntitySystem
 {
+    // If StandingCollisionLayer value is ever changed to more than one layer, the logic needs to be edited.
+    public const int StandingCollisionLayer = (int) CollisionGroup.MidImpassable;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedPhysicsSystem _physics = default!;
-
-    // If StandingCollisionLayer value is ever changed to more than one layer, the logic needs to be edited.
-    public const int StandingCollisionLayer = (int) CollisionGroup.MidImpassable;
 
     public override void Initialize()
     {
@@ -60,20 +58,17 @@ public sealed class StandingStateSystem : EntitySystem
     private void OnMobTargetCollide(Entity<StandingStateComponent> ent, ref AttemptMobTargetCollideEvent args)
     {
         if (!ent.Comp.Standing)
-        {
             args.Cancelled = true;
-        }
     }
 
     private void OnMobCollide(Entity<StandingStateComponent> ent, ref AttemptMobCollideEvent args)
     {
         if (!ent.Comp.Standing)
-        {
             args.Cancelled = true;
-        }
     }
 
-    private void OnRefreshFrictionModifiers(Entity<StandingStateComponent> entity, ref RefreshFrictionModifiersEvent args)
+    private void OnRefreshFrictionModifiers(Entity<StandingStateComponent> entity,
+        ref RefreshFrictionModifiersEvent args)
     {
         if (entity.Comp.Standing)
             return;
@@ -121,13 +116,13 @@ public sealed class StandingStateSystem : EntitySystem
         if (dropHeldItems && hands != null)
         {
             var ev = new DropHandItemsEvent();
-            RaiseLocalEvent(uid, ref ev, false);
+            RaiseLocalEvent(uid, ref ev);
         }
 
         if (!force)
         {
             var msg = new DownAttemptEvent();
-            RaiseLocalEvent(uid, msg, false);
+            RaiseLocalEvent(uid, msg);
 
             if (msg.Cancelled)
                 return false;
@@ -135,7 +130,7 @@ public sealed class StandingStateSystem : EntitySystem
 
         standingState.Standing = false;
         Dirty(uid, standingState);
-        RaiseLocalEvent(uid, new DownedEvent(), false);
+        RaiseLocalEvent(uid, new DownedEvent());
 
         // Seemed like the best place to put it
         _appearance.SetData(uid, RotationVisuals.RotationState, RotationState.Horizontal, appearance);
@@ -149,7 +144,11 @@ public sealed class StandingStateSystem : EntitySystem
                     continue;
 
                 standingState.ChangedFixtures.Add(key);
-                _physics.SetCollisionMask(uid, key, fixture, fixture.CollisionMask & ~StandingCollisionLayer, manager: fixtureComponent);
+                _physics.SetCollisionMask(uid,
+                    key,
+                    fixture,
+                    fixture.CollisionMask & ~StandingCollisionLayer,
+                    fixtureComponent);
             }
         }
 
@@ -159,9 +158,7 @@ public sealed class StandingStateSystem : EntitySystem
             return true;
 
         if (playSound)
-        {
             _audio.PlayPredicted(standingState.DownSound, uid, uid);
-        }
 
         return true;
     }
@@ -184,7 +181,7 @@ public sealed class StandingStateSystem : EntitySystem
         if (!force)
         {
             var msg = new StandAttemptEvent();
-            RaiseLocalEvent(uid, msg, false);
+            RaiseLocalEvent(uid, msg);
 
             if (msg.Cancelled)
                 return false;
@@ -192,7 +189,7 @@ public sealed class StandingStateSystem : EntitySystem
 
         standingState.Standing = true;
         Dirty(uid, standingState);
-        RaiseLocalEvent(uid, new StoodEvent(), false);
+        RaiseLocalEvent(uid, new StoodEvent());
 
         _appearance.SetData(uid, RotationVisuals.RotationState, RotationState.Vertical, appearance);
 
@@ -201,9 +198,14 @@ public sealed class StandingStateSystem : EntitySystem
             foreach (var key in standingState.ChangedFixtures)
             {
                 if (fixtureComponent.Fixtures.TryGetValue(key, out var fixture))
-                    _physics.SetCollisionMask(uid, key, fixture, fixture.CollisionMask | StandingCollisionLayer, fixtureComponent);
+                    _physics.SetCollisionMask(uid,
+                        key,
+                        fixture,
+                        fixture.CollisionMask | StandingCollisionLayer,
+                        fixtureComponent);
             }
         }
+
         standingState.ChangedFixtures.Clear();
 
         return true;
@@ -246,12 +248,12 @@ public sealed class DownedEvent : EntityEventArgs
 /// </summary>
 public sealed class FellDownEvent : EntityEventArgs
 {
-    public EntityUid Uid { get; }
-
     public FellDownEvent(EntityUid uid)
     {
         Uid = uid;
     }
+
+    public EntityUid Uid { get; }
 }
 
 /// <summary>
@@ -259,5 +261,3 @@ public sealed class FellDownEvent : EntityEventArgs
 /// </summary>
 [ByRefEvent]
 public record struct FellDownThrowAttemptEvent(EntityUid Thrower, bool Cancelled = false);
-
-

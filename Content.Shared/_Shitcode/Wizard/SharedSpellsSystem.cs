@@ -16,6 +16,7 @@ using System.Linq;
 using System.Numerics;
 using Content.Goobstation.Common.Bingle;
 using Content.Goobstation.Common.Religion;
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared._DV.Carrying;
 using Content.Shared._EinsteinEngines.Silicon.Components;
 using Content.Shared._Goobstation.Wizard.BindSoul;
@@ -29,21 +30,23 @@ using Content.Shared._Goobstation.Wizard.SpellCards;
 using Content.Shared._Goobstation.Wizard.Teleport;
 using Content.Shared._Goobstation.Wizard.TeslaBlast;
 using Content.Shared._Goobstation.Wizard.Traps;
+using Content.Shared._Lavaland.Movement;
 using Content.Shared._Shitmed.Targeting;
 using Content.Shared.Abilities.Mime;
 using Content.Shared.Access.Components;
 using Content.Shared.Actions;
+using Content.Shared.Actions.Components;
 using Content.Shared.Body.Components;
 using Content.Shared.Body.Part;
 using Content.Shared.Body.Systems;
+using Content.Shared.Charges.Components;
+using Content.Shared.Charges.Systems;
 using Content.Shared.Clothing.Components;
 using Content.Shared.Clumsy;
 using Content.Shared.Cluwne;
 using Content.Shared.Damage;
 using Content.Shared.Examine;
 using Content.Shared.Eye.Blinding.Components;
-using Content.Goobstation.Maths.FixedPoint;
-using Content.Shared._Lavaland.Movement;
 using Content.Shared.Ghost;
 using Content.Shared.Gibbing.Events;
 using Content.Shared.Hands.Components;
@@ -57,7 +60,6 @@ using Content.Shared.Item;
 using Content.Shared.Jittering;
 using Content.Shared.Magic;
 using Content.Shared.Magic.Components;
-using Content.Shared.Magic.Events;
 using Content.Shared.Maps;
 using Content.Shared.Mind;
 using Content.Shared.Mobs;
@@ -95,61 +97,11 @@ using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Serialization;
 using Robust.Shared.Timing;
-using Content.Shared.Actions.Components;
-using Content.Shared.Charges.Components;
-using Content.Shared.Charges.Systems;
 
 namespace Content.Shared._Goobstation.Wizard;
 
 public abstract class SharedSpellsSystem : EntitySystem
 {
-    #region Dependencies
-
-    [Dependency] protected readonly IGameTiming Timing = default!;
-    [Dependency] protected readonly IRobustRandom Random = default!;
-    [Dependency] protected readonly IMapManager MapManager = default!;
-    [Dependency] protected readonly IPrototypeManager ProtoMan = default!;
-    [Dependency] protected readonly SharedTransformSystem TransformSystem = default!;
-    [Dependency] protected readonly EntityLookupSystem Lookup = default!;
-    [Dependency] protected readonly SharedMapSystem Map = default!;
-    [Dependency] protected readonly SharedStunSystem Stun = default!;
-    [Dependency] protected readonly SharedPhysicsSystem Physics = default!;
-    [Dependency] protected readonly SharedMindSystem Mind = default!;
-    [Dependency] protected readonly SharedContainerSystem Container = default!;
-    [Dependency] protected readonly SharedHandsSystem Hands = default!;
-    [Dependency] protected readonly MetaDataSystem Meta = default!;
-    [Dependency] protected readonly SharedBodySystem Body = default!;
-    [Dependency] protected readonly NpcFactionSystem Faction = default!;
-    [Dependency] protected readonly SharedRoleSystem Role = default!;
-    [Dependency] protected readonly DamageableSystem Damageable = default!;
-    [Dependency] protected readonly GrammarSystem Grammar = default!;
-    [Dependency] protected readonly SharedAudioSystem Audio = default!;
-    [Dependency] protected readonly ActionContainerSystem ActionContainer = default!;
-    [Dependency] protected readonly TagSystem Tag = default!;
-    [Dependency] protected readonly SharedActionsSystem Actions = default!;
-    [Dependency] private   readonly INetManager _net = default!;
-    [Dependency] private   readonly StatusEffectsSystem _statusEffects = default!;
-    [Dependency] private   readonly InventorySystem _inventory = default!;
-    [Dependency] private   readonly SharedJitteringSystem _jitter = default!;
-    [Dependency] private   readonly SharedStutteringSystem _stutter = default!;
-    [Dependency] private   readonly SharedMagicSystem _magic = default!;
-    [Dependency] private   readonly SharedPopupSystem _popup = default!;
-    [Dependency] private   readonly SharedGunSystem _gunSystem = default!;
-    [Dependency] private   readonly MobStateSystem _mobState = default!;
-    [Dependency] private   readonly EntityWhitelistSystem _whitelist = default!;
-    [Dependency] private   readonly SharedBindSoulSystem _bindSoul = default!;
-    [Dependency] private   readonly SharedTeslaBlastSystem _teslaBlast = default!;
-    [Dependency] private   readonly ExamineSystemShared _examine = default!;
-    [Dependency] private   readonly ConfirmableActionSystem _confirmableAction = default!;
-    [Dependency] private   readonly SharedWizardTeleportSystem _teleport = default!;
-    [Dependency] private   readonly PullingSystem _pulling = default!;
-    [Dependency] private   readonly MobThresholdSystem _threshold = default!;
-    [Dependency] private   readonly TurfSystem _turf = default!;
-    [Dependency] private   readonly SharedProjectileSystem _projectile = default!;
-    [Dependency] private   readonly SharedChargesSystem _charges = default!;
-
-    #endregion
-
     public override void Initialize()
     {
         base.Initialize();
@@ -207,6 +159,53 @@ public abstract class SharedSpellsSystem : EntitySystem
         swap.SecondaryTarget = target;
         Dirty(action, swap);
     }
+
+    #region Dependencies
+
+    [Dependency] protected readonly IGameTiming Timing = default!;
+    [Dependency] protected readonly IRobustRandom Random = default!;
+    [Dependency] protected readonly IMapManager MapManager = default!;
+    [Dependency] protected readonly IPrototypeManager ProtoMan = default!;
+    [Dependency] protected readonly SharedTransformSystem TransformSystem = default!;
+    [Dependency] protected readonly EntityLookupSystem Lookup = default!;
+    [Dependency] protected readonly SharedMapSystem Map = default!;
+    [Dependency] protected readonly SharedStunSystem Stun = default!;
+    [Dependency] protected readonly SharedPhysicsSystem Physics = default!;
+    [Dependency] protected readonly SharedMindSystem Mind = default!;
+    [Dependency] protected readonly SharedContainerSystem Container = default!;
+    [Dependency] protected readonly SharedHandsSystem Hands = default!;
+    [Dependency] protected readonly MetaDataSystem Meta = default!;
+    [Dependency] protected readonly SharedBodySystem Body = default!;
+    [Dependency] protected readonly NpcFactionSystem Faction = default!;
+    [Dependency] protected readonly SharedRoleSystem Role = default!;
+    [Dependency] protected readonly DamageableSystem Damageable = default!;
+    [Dependency] protected readonly GrammarSystem Grammar = default!;
+    [Dependency] protected readonly SharedAudioSystem Audio = default!;
+    [Dependency] protected readonly ActionContainerSystem ActionContainer = default!;
+    [Dependency] protected readonly TagSystem Tag = default!;
+    [Dependency] protected readonly SharedActionsSystem Actions = default!;
+    [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly StatusEffectsSystem _statusEffects = default!;
+    [Dependency] private readonly InventorySystem _inventory = default!;
+    [Dependency] private readonly SharedJitteringSystem _jitter = default!;
+    [Dependency] private readonly SharedStutteringSystem _stutter = default!;
+    [Dependency] private readonly SharedMagicSystem _magic = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly SharedGunSystem _gunSystem = default!;
+    [Dependency] private readonly MobStateSystem _mobState = default!;
+    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
+    [Dependency] private readonly SharedBindSoulSystem _bindSoul = default!;
+    [Dependency] private readonly SharedTeslaBlastSystem _teslaBlast = default!;
+    [Dependency] private readonly ExamineSystemShared _examine = default!;
+    [Dependency] private readonly ConfirmableActionSystem _confirmableAction = default!;
+    [Dependency] private readonly SharedWizardTeleportSystem _teleport = default!;
+    [Dependency] private readonly PullingSystem _pulling = default!;
+    [Dependency] private readonly MobThresholdSystem _threshold = default!;
+    [Dependency] private readonly TurfSystem _turf = default!;
+    [Dependency] private readonly SharedProjectileSystem _projectile = default!;
+    [Dependency] private readonly SharedChargesSystem _charges = default!;
+
+    #endregion
 
     #region Spells
 
@@ -427,7 +426,7 @@ public abstract class SharedSpellsSystem : EntitySystem
             if (HasComp<SiliconComponent>(target) || HasComp<BorgChassisComponent>(target))
                 Stun.TryUpdateParalyzeDuration(target, ev.SiliconStunTime / range);
             else
-                Stun.KnockdownOrStun(target, ev.KnockdownTime / range, true);
+                Stun.KnockdownOrStun(target, ev.KnockdownTime / range);
         }
 
         ev.Handled = true;
@@ -1244,6 +1243,7 @@ public abstract class SharedSpellsSystem : EntitySystem
 
         ev.Handled = true;
     }
+
     private void OnRathen(RathenEvent ev)
     {
         if (ev.Handled || !_magic.PassesSpellPrerequisites(ev.Action, ev.Performer))
@@ -1345,12 +1345,10 @@ public abstract class SharedSpellsSystem : EntitySystem
         while (parent.IsValid() && !bodyQuery.HasComp(parent) && !bodyPartQuery.HasComp(parent) &&
                !inventoryQuery.HasComp(parent) && !handsQuery.HasComp(parent) && !binglePitQuery.HasComp(parent))
         {
-            if (((EntityManager.MetaQuery.GetComponent(child).Flags & MetaDataFlags.InContainer) ==
-                 MetaDataFlags.InContainer) && managerQuery.TryGetComponent(parent, out var conManager) &&
+            if ((EntityManager.MetaQuery.GetComponent(child).Flags & MetaDataFlags.InContainer) ==
+                MetaDataFlags.InContainer && managerQuery.TryGetComponent(parent, out var conManager) &&
                 Container.TryGetContainingContainer(parent, child, out var parentContainer, conManager))
-            {
                 container = parentContainer;
-            }
 
             var parentXform = xformQuery.GetComponent(parent);
             child = parent;
@@ -1394,15 +1392,11 @@ public abstract class SharedSpellsSystem : EntitySystem
         return TransformSystem.InRange(ev.Target, xform.Coordinates, lockOnMark.LockOnRadius + 1f);
     }
 
-    private void Popup(EntityUid uid, string message, PopupType type = PopupType.Small)
-    {
+    private void Popup(EntityUid uid, string message, PopupType type = PopupType.Small) =>
         _popup.PopupClient(Loc.GetString(message), uid, uid, type);
-    }
 
-    private void PopupLoc(EntityUid uid, string locMessage, PopupType type = PopupType.Small)
-    {
+    private void PopupLoc(EntityUid uid, string locMessage, PopupType type = PopupType.Small) =>
         _popup.PopupClient(locMessage, uid, uid, type);
-    }
 
     private bool IsTouchSpellDenied(EntityUid target)
     {
@@ -1457,7 +1451,7 @@ public abstract class SharedSpellsSystem : EntitySystem
         // If applicable, this ensures the projectile is parented to grid on spawn, instead of the map.
         var spawnCoords = MapManager.TryFindGridAt(mapCoords, out var gridUid, out _)
             ? TransformSystem.WithEntityId(coords, gridUid)
-            : new(Map.GetMapOrInvalid(mapCoords.MapId), mapCoords.Position);
+            : new EntityCoordinates(Map.GetMapOrInvalid(mapCoords.MapId), mapCoords.Position);
 
         var velocity = Physics.GetMapLinearVelocity(spawnCoords);
 
@@ -1522,28 +1516,19 @@ public abstract class SharedSpellsSystem : EntitySystem
 
     protected virtual void BindSoul(BindSoulEvent ev, EntityUid item, EntityUid mind, MindComponent mindComponent) { }
 
-    protected virtual bool Polymorph(PolymorphSpellEvent ev)
-    {
-        return true;
-    }
+    protected virtual bool Polymorph(PolymorphSpellEvent ev) => true;
 
-    protected virtual void ShootSpellCards(SpellCardsEvent ev, EntProtoId proto) {}
+    protected virtual void ShootSpellCards(SpellCardsEvent ev, EntProtoId proto) { }
 
     protected virtual void Speak(EntityUid uid, string message) { }
 
-    protected virtual bool ScreamForMe(ScreamForMeEvent ev)
-    {
-        return true;
-    }
+    protected virtual bool ScreamForMe(ScreamForMeEvent ev) => true;
 
     protected virtual void SpawnMobs(SummonMobsEvent ev) { }
 
     protected virtual void SpawnMonkeys(SummonSimiansEvent ev) { }
 
-    protected virtual bool ChargeItem(EntityUid uid, ChargeMagicEvent ev)
-    {
-        return true;
-    }
+    protected virtual bool ChargeItem(EntityUid uid, ChargeMagicEvent ev) => true;
 
     protected virtual void Blink(BlinkSpellEvent ev) { }
 
@@ -1552,16 +1537,16 @@ public abstract class SharedSpellsSystem : EntitySystem
     #endregion
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class StopTargetingEvent : EntityEventArgs;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class ChargeSpellRaysEffectEvent(NetEntity uid) : EntityEventArgs
 {
     public NetEntity Uid = uid;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class SetSwapSecondaryTarget(NetEntity action, NetEntity? target) : EntityEventArgs
 {
     public NetEntity Action = action;

@@ -38,56 +38,56 @@ using Robust.Shared.Serialization;
 namespace Content.Shared.Wieldable.Components;
 
 /// <summary>
-///     Used for objects that can be wielded in two or more hands,
+/// Used for objects that can be wielded in two or more hands,
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState] // Goobstation edit
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState] // Goobstation edit
 public sealed partial class WieldableComponent : Component
 {
-    [DataField("wieldSound")]
-    public SoundSpecifier? WieldSound = new SoundPathSpecifier("/Audio/Effects/thudswoosh.ogg");
+    // Goobstation
+    [DataField]
+    public bool ApplyNewPrefixOnShutdown;
+
+    /// <summary>
+    /// Number of free hands required (excluding the item itself) required
+    /// to wield it
+    /// </summary>
+    [DataField("freeHandsRequired")]
+    public int FreeHandsRequired = 1;
+
+    // Goobstation
+    [DataField]
+    public string? NewPrefixOnShutdown;
+
+    public string? OldInhandPrefix = null;
+
+    /// <summary>
+    /// Whether using the item inhand while wielding causes the item to unwield.
+    /// Unwielding can conflict with other inhand actions.
+    /// </summary>
+    [DataField] [AutoNetworkedField] // Goobstation edit
+    public bool UnwieldOnUse = true;
 
     [DataField("unwieldSound")]
     public SoundSpecifier? UnwieldSound;
 
     /// <summary>
-    ///     Number of free hands required (excluding the item itself) required
-    ///     to wield it
-    /// </summary>
-    [DataField("freeHandsRequired")]
-    public int FreeHandsRequired = 1;
-
-    [AutoNetworkedField, DataField("wielded")]
-    public bool Wielded = false;
-
-    /// <summary>
-    ///     Whether using the item inhand while wielding causes the item to unwield.
-    ///     Unwielding can conflict with other inhand actions.
-    /// </summary>
-    [DataField, AutoNetworkedField] // Goobstation edit
-    public bool UnwieldOnUse = true;
-
-    /// <summary>
-    ///     Should use delay trigger after the wield/unwield?
+    /// Should use delay trigger after the wield/unwield?
     /// </summary>
     [DataField]
     public bool UseDelayOnWield = true;
 
-    [DataField("wieldedInhandPrefix"), AutoNetworkedField] // Goobstation edit
+    [AutoNetworkedField] [DataField("wielded")]
+    public bool Wielded = false;
+
+    [DataField("wieldedInhandPrefix")] [AutoNetworkedField] // Goobstation edit
     public string? WieldedInhandPrefix = "wielded";
 
-    public string? OldInhandPrefix = null;
-
-    // Goobstation
-    [DataField]
-    public bool ApplyNewPrefixOnShutdown;
-
-    // Goobstation
-    [DataField]
-    public string? NewPrefixOnShutdown;
+    [DataField("wieldSound")]
+    public SoundSpecifier? WieldSound = new SoundPathSpecifier("/Audio/Effects/thudswoosh.ogg");
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum WieldableVisuals : byte
 {
-    Wielded
+    Wielded,
 }

@@ -30,11 +30,9 @@ public sealed class EntityWhitelistSystem : EntitySystem
         _itemQuery = GetEntityQuery<ItemComponent>();
     }
 
-    /// <inheritdoc cref="IsValid(Content.Shared.Whitelist.EntityWhitelist,Robust.Shared.GameObjects.EntityUid)"/>
-    public bool IsValid(EntityWhitelist list, [NotNullWhen(true)] EntityUid? uid)
-    {
-        return uid != null && IsValid(list, uid.Value);
-    }
+    /// <inheritdoc cref="IsValid(Content.Shared.Whitelist.EntityWhitelist,Robust.Shared.GameObjects.EntityUid)" />
+    public bool IsValid(EntityWhitelist list, [NotNullWhen(true)] EntityUid? uid) =>
+        uid != null && IsValid(list, uid.Value);
 
     /// <summary>
     /// Checks whether a given entity is allowed by a whitelist and not blocked by a blacklist.
@@ -42,7 +40,9 @@ public sealed class EntityWhitelistSystem : EntitySystem
     /// If a whitelist is provided and it does not match then this returns false.
     /// If either list is null it does not get checked.
     /// </summary>
-    public bool CheckBoth([NotNullWhen(true)] EntityUid? uid, EntityWhitelist? blacklist = null, EntityWhitelist? whitelist = null)
+    public bool CheckBoth([NotNullWhen(true)] EntityUid? uid,
+        EntityWhitelist? blacklist = null,
+        EntityWhitelist? whitelist = null)
     {
         if (uid == null)
             return false;
@@ -97,11 +97,11 @@ public sealed class EntityWhitelistSystem : EntitySystem
 
         return list.RequireAll;
     }
+
     /// The following are a list of "helper functions" that are basically the same as each other
     /// to help make code that uses EntityWhitelist a bit more readable because at the moment
     /// it is quite clunky having to write out component.Whitelist == null ? true : _whitelist.IsValid(component.Whitelist, uid)
     /// several times in a row and makes comparisons easier to read
-
     /// <summary>
     /// Helper function to determine if Whitelist is not null and entity is on list
     /// </summary>
@@ -150,37 +150,27 @@ public sealed class EntityWhitelistSystem : EntitySystem
     /// Helper function to determine if Blacklist is not null and entity is on list
     /// Duplicate of equivalent Whitelist function
     /// </summary>
-    public bool IsBlacklistPass(EntityWhitelist? blacklist, EntityUid uid)
-    {
-        return IsWhitelistPass(blacklist, uid);
-    }
+    public bool IsBlacklistPass(EntityWhitelist? blacklist, EntityUid uid) => IsWhitelistPass(blacklist, uid);
 
     /// <summary>
     /// Helper function to determine if Blacklist is not null and entity is not on the list
     /// Duplicate of equivalent Whitelist function
     /// </summary>
-    public bool IsBlacklistFail(EntityWhitelist? blacklist, EntityUid uid)
-    {
-        return IsWhitelistFail(blacklist, uid);
-    }
+    public bool IsBlacklistFail(EntityWhitelist? blacklist, EntityUid uid) => IsWhitelistFail(blacklist, uid);
 
     /// <summary>
     /// Helper function to determine if Blacklist is either null or the entity is on the list
     /// Duplicate of equivalent Whitelist function
     /// </summary>
-    public bool IsBlacklistPassOrNull(EntityWhitelist? blacklist, EntityUid uid)
-    {
-        return IsWhitelistPassOrNull(blacklist, uid);
-    }
+    public bool IsBlacklistPassOrNull(EntityWhitelist? blacklist, EntityUid uid) =>
+        IsWhitelistPassOrNull(blacklist, uid);
 
     /// <summary>
     /// Helper function to determine if Blacklist is either null or the entity is not on the list
     /// Duplicate of equivalent Whitelist function
     /// </summary>
-    public bool IsBlacklistFailOrNull(EntityWhitelist? blacklist, EntityUid uid)
-    {
-        return IsWhitelistFailOrNull(blacklist, uid);
-    }
+    public bool IsBlacklistFailOrNull(EntityWhitelist? blacklist, EntityUid uid) =>
+        IsWhitelistFailOrNull(blacklist, uid);
 
     private List<ComponentRegistration> StringsToRegs(string[]? input)
     {
@@ -194,13 +184,9 @@ public sealed class EntityWhitelistSystem : EntitySystem
             var availability = Factory.GetComponentAvailability(name);
             if (Factory.TryGetRegistration(name, out var registration)
                 && availability == ComponentAvailability.Available)
-            {
                 list.Add(registration);
-            }
             else if (availability == ComponentAvailability.Unknown)
-            {
                 Log.Error($"StringsToRegs failed: Unknown component name {name} passed to EntityWhitelist!");
-            }
         }
 
         return list;

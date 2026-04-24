@@ -11,8 +11,7 @@ namespace Content.Shared.Weapons.Ranged.Components;
 /// <summary>
 /// Recharges ammo upon the gun being cycled.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class RechargeCycleAmmoComponent : Component
 {
-
 }

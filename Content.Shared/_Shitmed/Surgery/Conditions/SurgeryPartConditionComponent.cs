@@ -8,15 +8,15 @@ using Robust.Shared.GameStates;
 
 namespace Content.Shared._Shitmed.Medical.Surgery.Conditions;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class SurgeryPartConditionComponent : Component
 {
+    [DataField]
+    public bool Inverse;
+
     [DataField]
     public HashSet<BodyPartType> Parts;
 
     [DataField]
     public BodyPartSymmetry? Symmetry;
-
-    [DataField]
-    public bool Inverse;
 }

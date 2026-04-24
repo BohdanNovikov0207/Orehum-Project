@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Content.Shared.Atmos.Components;
 using Content.Shared.Database;
 using Content.Shared.Examine;
@@ -11,20 +12,19 @@ using Content.Shared.Tools.Components;
 using Content.Shared.Tools.Systems;
 using Content.Shared.Verbs;
 using Robust.Shared.Prototypes;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Content.Shared.Atmos.EntitySystems;
 
 /// <summary>
 /// The system responsible for checking and adjusting the connection layering of gas pipes
 /// </summary>
-public abstract partial class SharedAtmosPipeLayersSystem : EntitySystem
+public abstract class SharedAtmosPipeLayersSystem : EntitySystem
 {
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
-    [Dependency] private readonly IPrototypeManager _protoManager = default!;
-    [Dependency] private readonly SharedToolSystem _tool = default!;
     [Dependency] private readonly SharedHandsSystem _hands = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly IPrototypeManager _protoManager = default!;
+    [Dependency] private readonly SharedToolSystem _tool = default!;
 
     public override void Initialize()
     {
@@ -78,7 +78,8 @@ public abstract partial class SharedAtmosPipeLayersSystem : EntitySystem
             {
                 Priority = 1,
                 Category = VerbCategory.Adjust,
-                Text = Loc.GetString("atmos-pipe-layers-component-tool-missing", ("toolName", Loc.GetString(toolProto.ToolName).ToLower())),
+                Text = Loc.GetString("atmos-pipe-layers-component-tool-missing",
+                    ("toolName", Loc.GetString(toolProto.ToolName).ToLower())),
                 Disabled = true,
                 Impact = LogImpact.Low,
                 DoContactInteraction = true,
@@ -92,7 +93,7 @@ public abstract partial class SharedAtmosPipeLayersSystem : EntitySystem
             for (var i = 0; i < ent.Comp.NumberOfPipeLayers; i++)
             {
                 var index = i;
-                var layerName = GetPipeLayerName((AtmosPipeLayer)index);
+                var layerName = GetPipeLayerName((AtmosPipeLayer) index);
                 var label = Loc.GetString("atmos-pipe-layers-component-select-layer", ("layerName", layerName));
 
                 var v = new Verb
@@ -100,13 +101,18 @@ public abstract partial class SharedAtmosPipeLayersSystem : EntitySystem
                     Priority = 1,
                     Category = VerbCategory.Adjust,
                     Text = label,
-                    Disabled = index == (int)ent.Comp.CurrentPipeLayer,
+                    Disabled = index == (int) ent.Comp.CurrentPipeLayer,
                     Impact = LogImpact.Low,
                     DoContactInteraction = true,
                     Act = () =>
                     {
-                        _tool.UseTool(tool.Value, user, ent, ent.Comp.Delay, tool.Value.Comp.Qualities, new TrySettingPipeLayerCompletedEvent((AtmosPipeLayer)index));
-                    }
+                        _tool.UseTool(tool.Value,
+                            user,
+                            ent,
+                            ent.Comp.Delay,
+                            tool.Value.Comp.Qualities,
+                            new TrySettingPipeLayerCompletedEvent((AtmosPipeLayer) index));
+                    },
                 };
 
                 args.Verbs.Add(v);
@@ -128,7 +134,12 @@ public abstract partial class SharedAtmosPipeLayersSystem : EntitySystem
             return;
         }
 
-        _tool.UseTool(args.Used, args.User, ent, ent.Comp.Delay, tool.Qualities, new TrySetNextPipeLayerCompletedEvent());
+        _tool.UseTool(args.Used,
+            args.User,
+            ent,
+            ent.Comp.Delay,
+            tool.Qualities,
+            new TrySetNextPipeLayerCompletedEvent());
     }
 
     private void OnUseInHandEvent(Entity<AtmosPipeLayersComponent> ent, ref UseInHandEvent args)
@@ -149,10 +160,16 @@ public abstract partial class SharedAtmosPipeLayersSystem : EntitySystem
             return;
         }
 
-        _tool.UseTool(tool.Value, args.User, ent, ent.Comp.Delay, tool.Value.Comp.Qualities, new TrySetNextPipeLayerCompletedEvent());
+        _tool.UseTool(tool.Value,
+            args.User,
+            ent,
+            ent.Comp.Delay,
+            tool.Value.Comp.Qualities,
+            new TrySetNextPipeLayerCompletedEvent());
     }
 
-    private void OnSetNextPipeLayerCompleted(Entity<AtmosPipeLayersComponent> ent, ref TrySetNextPipeLayerCompletedEvent args)
+    private void OnSetNextPipeLayerCompleted(Entity<AtmosPipeLayersComponent> ent,
+        ref TrySetNextPipeLayerCompletedEvent args)
     {
         if (args.Cancelled)
             return;
@@ -160,7 +177,8 @@ public abstract partial class SharedAtmosPipeLayersSystem : EntitySystem
         SetNextPipeLayer(ent, args.User, args.Used);
     }
 
-    private void OnSettingPipeLayerCompleted(Entity<AtmosPipeLayersComponent> ent, ref TrySettingPipeLayerCompletedEvent args)
+    private void OnSettingPipeLayerCompleted(Entity<AtmosPipeLayersComponent> ent,
+        ref TrySettingPipeLayerCompletedEvent args)
     {
         if (args.Cancelled)
             return;
@@ -176,8 +194,8 @@ public abstract partial class SharedAtmosPipeLayersSystem : EntitySystem
     /// <param name="used">The tool used to adjust the pipe layer</param>
     public void SetNextPipeLayer(Entity<AtmosPipeLayersComponent> ent, EntityUid? user = null, EntityUid? used = null)
     {
-        var newLayer = ((int)ent.Comp.CurrentPipeLayer + 1) % ent.Comp.NumberOfPipeLayers;
-        SetPipeLayer(ent, (AtmosPipeLayer)newLayer, user, used);
+        var newLayer = ((int) ent.Comp.CurrentPipeLayer + 1) % ent.Comp.NumberOfPipeLayers;
+        SetPipeLayer(ent, (AtmosPipeLayer) newLayer, user, used);
     }
 
     /// <summary>
@@ -187,12 +205,15 @@ public abstract partial class SharedAtmosPipeLayersSystem : EntitySystem
     /// <param name="layer">The new layer value</param>
     /// <param name="user">The player entity who adjusting the pipe layer</param>
     /// <param name="used">The tool used to adjust the pipe layer</param>
-    public virtual void SetPipeLayer(Entity<AtmosPipeLayersComponent> ent, AtmosPipeLayer layer, EntityUid? user = null, EntityUid? used = null)
+    public virtual void SetPipeLayer(Entity<AtmosPipeLayersComponent> ent,
+        AtmosPipeLayer layer,
+        EntityUid? user = null,
+        EntityUid? used = null)
     {
         if (ent.Comp.PipeLayersLocked)
             return;
 
-        ent.Comp.CurrentPipeLayer = (AtmosPipeLayer)Math.Clamp((int)layer, 0, ent.Comp.NumberOfPipeLayers - 1);
+        ent.Comp.CurrentPipeLayer = (AtmosPipeLayer) Math.Clamp((int) layer, 0, ent.Comp.NumberOfPipeLayers - 1);
         Dirty(ent);
 
         if (TryComp<AppearanceComponent>(ent, out var appearance))
@@ -224,16 +245,15 @@ public abstract partial class SharedAtmosPipeLayersSystem : EntitySystem
     }
 
     /// <summary>
-    /// Try to find an entity prototype associated with a specified <see cref="AtmosPipeLayer"/>.
+    /// Try to find an entity prototype associated with a specified <see cref="AtmosPipeLayer" />.
     /// </summary>
-    /// <param name="component">The <see cref="AtmosPipeLayersComponent"/> with the alternative prototypes data.</param>
+    /// <param name="component">The <see cref="AtmosPipeLayersComponent" /> with the alternative prototypes data.</param>
     /// <param name="layer">The atmos pipe layer associated with the entity prototype.</param>
     /// <param name="proto">The returned entity prototype.</param>
     /// <returns>True if there was an entity prototype associated with the layer.</returns>
-    public bool TryGetAlternativePrototype(AtmosPipeLayersComponent component, AtmosPipeLayer layer, out EntProtoId proto)
-    {
-        return component.AlternativePrototypes.TryGetValue(layer, out proto);
-    }
+    public bool TryGetAlternativePrototype(AtmosPipeLayersComponent component,
+        AtmosPipeLayer layer,
+        out EntProtoId proto) => component.AlternativePrototypes.TryGetValue(layer, out proto);
 
     /// <summary>
     /// Checks a player entity's hands to see if they are holding a tool with a specified quality
@@ -242,7 +262,9 @@ public abstract partial class SharedAtmosPipeLayersSystem : EntitySystem
     /// <param name="toolQuality">The tool quality being checked for</param>
     /// <param name="heldTool">A tool with the specified tool quality</param>
     /// <returns>True if an appropriate tool was found</returns>
-    private bool TryGetHeldTool(EntityUid user, ProtoId<ToolQualityPrototype> toolQuality, [NotNullWhen(true)] out Entity<ToolComponent>? heldTool)
+    private bool TryGetHeldTool(EntityUid user,
+        ProtoId<ToolQualityPrototype> toolQuality,
+        [NotNullWhen(true)] out Entity<ToolComponent>? heldTool)
     {
         heldTool = null;
 
@@ -259,8 +281,6 @@ public abstract partial class SharedAtmosPipeLayersSystem : EntitySystem
         return false;
     }
 
-    private string GetPipeLayerName(AtmosPipeLayer layer)
-    {
-        return Loc.GetString("atmos-pipe-layers-component-layer-" + layer.ToString().ToLower());
-    }
+    private string GetPipeLayerName(AtmosPipeLayer layer) =>
+        Loc.GetString("atmos-pipe-layers-component-layer-" + layer.ToString().ToLower());
 }

@@ -16,13 +16,13 @@ using Robust.Shared.Utility;
 
 namespace Content.Shared.Robotics;
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum RoboticsConsoleUiKey : byte
 {
-    Key
+    Key,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class RoboticsConsoleState : BoundUserInterfaceState
 {
     /// <summary>
@@ -39,7 +39,7 @@ public sealed class RoboticsConsoleState : BoundUserInterfaceState
 /// <summary>
 /// Message to disable the selected cyborg.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class RoboticsConsoleDisableMessage : BoundUserInterfaceMessage
 {
     public readonly string Address;
@@ -53,7 +53,7 @@ public sealed class RoboticsConsoleDisableMessage : BoundUserInterfaceMessage
 /// <summary>
 /// Message to destroy the selected cyborg.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class RoboticsConsoleDestroyMessage : BoundUserInterfaceMessage
 {
     public readonly string Address;
@@ -68,14 +68,21 @@ public sealed class RoboticsConsoleDestroyMessage : BoundUserInterfaceMessage
 /// All data a client needs to render the console UI for a single cyborg.
 /// Created by <c>BorgTransponderComponent</c> and sent to clients by <c>RoboticsConsoleComponent</c>.
 /// </summary>
-[DataRecord, Serializable, NetSerializable]
-public partial record struct CyborgControlData
+[DataRecord] [Serializable] [NetSerializable]
+public record struct CyborgControlData
 {
     /// <summary>
-    /// Texture of the borg chassis.
+    /// Whether the borg can currently be disabled if the brain is installed,
+    /// if on cooldown then can't queue up multiple disables.
     /// </summary>
-    [DataField(required: true)]
-    public SpriteSpecifier? ChassisSprite;
+    [DataField]
+    public bool CanDisable;
+
+    /// <summary>
+    /// Battery charge from 0 to 1.
+    /// </summary>
+    [DataField]
+    public float Charge;
 
     /// <summary>
     /// Name of the borg chassis.
@@ -84,16 +91,20 @@ public partial record struct CyborgControlData
     public string ChassisName = string.Empty;
 
     /// <summary>
-    /// Name of the borg's entity, including its silicon id.
+    /// Texture of the borg chassis.
     /// </summary>
     [DataField(required: true)]
-    public string Name = string.Empty;
+    public SpriteSpecifier? ChassisSprite;
 
     /// <summary>
-    /// Battery charge from 0 to 1.
+    /// Whether the borg has a brain installed or not.
     /// </summary>
     [DataField]
-    public float Charge;
+    public bool HasBrain;
+
+    // Corvax-Next-AiRemoteControl-Start
+    [DataField]
+    public bool IsAiControllable;
 
     /// <summary>
     /// How many modules this borg has, just useful information for roboticists.
@@ -103,17 +114,10 @@ public partial record struct CyborgControlData
     public int ModuleCount;
 
     /// <summary>
-    /// Whether the borg has a brain installed or not.
+    /// Name of the borg's entity, including its silicon id.
     /// </summary>
-    [DataField]
-    public bool HasBrain;
-
-    /// <summary>
-    /// Whether the borg can currently be disabled if the brain is installed,
-    /// if on cooldown then can't queue up multiple disables.
-    /// </summary>
-    [DataField]
-    public bool CanDisable;
+    [DataField(required: true)]
+    public string Name = string.Empty;
 
     /// <summary>
     /// When this cyborg's data will be deleted.
@@ -121,13 +125,16 @@ public partial record struct CyborgControlData
     /// </summary>
     [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))]
     public TimeSpan Timeout = TimeSpan.Zero;
-
-    // Corvax-Next-AiRemoteControl-Start
-    [DataField]
-    public bool IsAiControllable;
     // Corvax-Next-AiRemoteControl-End
 
-    public CyborgControlData(SpriteSpecifier? chassisSprite, string chassisName, string name, float charge, int moduleCount, bool hasBrain, bool canDisable, bool isAiControllable) // Corvax-Next-AiRemoteControl
+    public CyborgControlData(SpriteSpecifier? chassisSprite,
+        string chassisName,
+        string name,
+        float charge,
+        int moduleCount,
+        bool hasBrain,
+        bool canDisable,
+        bool isAiControllable) // Corvax-Next-AiRemoteControl
     {
         ChassisSprite = chassisSprite;
         ChassisName = chassisName;

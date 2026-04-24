@@ -8,7 +8,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Shared.Chemistry.Components;
-using Content.Shared.EntityEffects;
 using Content.Shared.Movement.Systems;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
@@ -22,6 +21,13 @@ namespace Content.Shared.EntityEffects.Effects;
 public sealed partial class NitriumMovespeedModifier : EntityEffect
 {
     /// <summary>
+    /// How long the modifier applies (in seconds).
+    /// Is scaled by reagent amount if used with an EntityEffectReagentArgs.
+    /// </summary>
+    [DataField]
+    public float StatusLifetime = 6f;
+
+    /// <summary>
     /// How much the entities' walk speed is multiplied by.
     /// </summary>
     [DataField]
@@ -33,24 +39,16 @@ public sealed partial class NitriumMovespeedModifier : EntityEffect
     [DataField]
     public float SprintSpeedModifier { get; set; } = 1;
 
-    /// <summary>
-    /// How long the modifier applies (in seconds).
-    /// Is scaled by reagent amount if used with an EntityEffectReagentArgs.
-    /// </summary>
-    [DataField]
-    public float StatusLifetime = 6f;
-
-    protected override string? ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys)
-    {
-        return Loc.GetString("reagent-effect-guidebook-movespeed-modifier",
+    protected override string? ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys) =>
+        Loc.GetString("reagent-effect-guidebook-movespeed-modifier",
             ("chance", Probability),
             ("walkspeed", WalkSpeedModifier),
             ("sprintspeed", SprintSpeedModifier),
             ("time", StatusLifetime));
-    }
 
     /// <summary>
-    /// Remove reagent at set rate, changes the movespeed modifiers and adds a MovespeedModifierMetabolismComponent if not already there.
+    /// Remove reagent at set rate, changes the movespeed modifiers and adds a MovespeedModifierMetabolismComponent if not
+    /// already there.
     /// </summary>
     public override void Effect(EntityEffectBaseArgs args)
     {
@@ -68,6 +66,7 @@ public sealed partial class NitriumMovespeedModifier : EntityEffect
         if (modified)
             args.EntityManager.System<MovementSpeedModifierSystem>().RefreshMovementSpeedModifiers(args.TargetEntity);
     }
+
     public void SetTimer(MovespeedModifierMetabolismComponent status, float time)
     {
         var gameTiming = IoCManager.Resolve<IGameTiming>();

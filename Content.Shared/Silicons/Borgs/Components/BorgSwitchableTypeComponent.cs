@@ -18,26 +18,26 @@ namespace Content.Shared.Silicons.Borgs.Components;
 /// Component for borgs that can switch their "type" after being created.
 /// </summary>
 /// <remarks>
-/// <para>
-/// This is used by all NT borgs, on construction and round-start spawn.
-/// Borgs are effectively useless until they have made their choice of type.
-/// Borg type selections are currently irreversible.
-/// </para>
-/// <para>
-/// Available types are specified in <see cref="BorgTypePrototype"/>s.
-/// </para>
+///     <para>
+///     This is used by all NT borgs, on construction and round-start spawn.
+///     Borgs are effectively useless until they have made their choice of type.
+///     Borg type selections are currently irreversible.
+///     </para>
+///     <para>
+///     Available types are specified in <see cref="BorgTypePrototype" />s.
+///     </para>
 /// </remarks>
-/// <seealso cref="SharedBorgSwitchableTypeSystem"/>
-[RegisterComponent, NetworkedComponent]
-[AutoGenerateComponentState(raiseAfterAutoHandleState: true)]
+/// <seealso cref="SharedBorgSwitchableTypeSystem" />
+[RegisterComponent] [NetworkedComponent]
+[AutoGenerateComponentState(true)]
 [Access(typeof(SharedBorgSwitchableTypeSystem))]
 public sealed partial class BorgSwitchableTypeComponent : Component
 {
     /// <summary>
-    /// Action entity used by players to select their type.
+    /// Radio channels that the borg will always have. These are added on top of the selected type's radio channels.
     /// </summary>
-    [DataField, AutoNetworkedField]
-    public EntityUid? SelectTypeAction;
+    [DataField]
+    public ProtoId<RadioChannelPrototype>[] InherentRadioChannels = [];
 
     /// <summary>
     /// The currently selected borg type, if any.
@@ -45,37 +45,39 @@ public sealed partial class BorgSwitchableTypeComponent : Component
     /// <remarks>
     /// This can be set in a prototype to immediately apply a borg type, and not have switching support.
     /// </remarks>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public ProtoId<BorgTypePrototype>? SelectedBorgType;
 
     /// <summary>
-    /// Radio channels that the borg will always have. These are added on top of the selected type's radio channels.
+    /// Action entity used by players to select their type.
     /// </summary>
-    [DataField]
-    public ProtoId<RadioChannelPrototype>[] InherentRadioChannels = [];
+    [DataField] [AutoNetworkedField]
+    public EntityUid? SelectTypeAction;
 }
 
 /// <summary>
-/// Action event used to open the selection menu of a <see cref="BorgSwitchableTypeComponent"/>.
+/// Action event used to open the selection menu of a <see cref="BorgSwitchableTypeComponent" />.
 /// </summary>
 public sealed partial class BorgToggleSelectTypeEvent : InstantActionEvent;
 
 /// <summary>
-/// UI message used by a borg to select their type with <see cref="BorgSwitchableTypeComponent"/>.
+/// UI message used by a borg to select their type with <see cref="BorgSwitchableTypeComponent" />.
 /// </summary>
 /// <param name="prototype">The borg type prototype that the user selected.</param>
-[Serializable, NetSerializable]
-public sealed class BorgSelectTypeMessage(ProtoId<BorgTypePrototype> prototype, ProtoId<BorgSubtypePrototype> subtype) : BoundUserInterfaceMessage
+[Serializable] [NetSerializable]
+public sealed class BorgSelectTypeMessage(ProtoId<BorgTypePrototype> prototype, ProtoId<BorgSubtypePrototype> subtype)
+    : BoundUserInterfaceMessage
 {
     public ProtoId<BorgTypePrototype> Prototype = prototype;
+
     // Goobstation: Customizable borgs sprites
     public ProtoId<BorgSubtypePrototype> Subtype = subtype;
 }
 
 /// <summary>
-/// UI key used by the selection menu for <see cref="BorgSwitchableTypeComponent"/>.
+/// UI key used by the selection menu for <see cref="BorgSwitchableTypeComponent" />.
 /// </summary>
-[NetSerializable, Serializable]
+[NetSerializable] [Serializable]
 public enum BorgSwitchableTypeUiKey : byte
 {
     SelectBorgType,

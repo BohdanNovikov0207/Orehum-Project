@@ -11,7 +11,7 @@ using Robust.Shared.GameStates;
 
 namespace Content.Shared.Tools.Components;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 [Access(typeof(WeldableSystem))]
 public sealed partial class LayerChangeOnWeldComponent : Component
 {

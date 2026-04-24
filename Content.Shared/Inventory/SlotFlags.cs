@@ -16,9 +16,9 @@ using Robust.Shared.Serialization;
 namespace Content.Shared.Inventory;
 
 /// <summary>
-///     Defines what slot types an item can fit into.
+/// Defines what slot types an item can fit into.
 /// </summary>
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 [Flags]
 public enum SlotFlags
 {
@@ -41,5 +41,5 @@ public enum SlotFlags
     SUITSTORAGE = 1 << 15,
     All = ~NONE,
 
-    WITHOUT_POCKET = All & ~POCKET
+    WITHOUT_POCKET = All & ~POCKET,
 }

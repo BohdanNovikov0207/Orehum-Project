@@ -10,7 +10,7 @@
 namespace Content.Shared.Item;
 
 /// <summary>
-///     Raised on a *mob* when it tries to pickup something
+/// Raised on a *mob* when it tries to pickup something
 /// </summary>
 public sealed class PickupAttemptEvent : BasePickupAttemptEvent
 {
@@ -18,7 +18,7 @@ public sealed class PickupAttemptEvent : BasePickupAttemptEvent
 }
 
 /// <summary>
-///     Raised directed at entity being picked up when someone tries to pick it up
+/// Raised directed at entity being picked up when someone tries to pick it up
 /// </summary>
 public sealed class GettingPickedUpAttemptEvent : BasePickupAttemptEvent
 {
@@ -28,8 +28,8 @@ public sealed class GettingPickedUpAttemptEvent : BasePickupAttemptEvent
 [Virtual]
 public class BasePickupAttemptEvent : CancellableEntityEventArgs
 {
-    public readonly EntityUid User;
     public readonly EntityUid Item;
+    public readonly EntityUid User;
 
     public BasePickupAttemptEvent(EntityUid user, EntityUid item)
     {

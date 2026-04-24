@@ -89,13 +89,9 @@ public sealed class MegafaunaFieldSystem : EntitySystem
 
     private record struct MegafaunaSpawnFieldJob : IRobustJob
     {
-        public required MegafaunaFieldSystem System;
         public Entity<MegafaunaFieldGeneratorComponent> Entity;
+        public required MegafaunaFieldSystem System;
 
-        public void Execute()
-        {
-            System.SpawnField(Entity);
-        }
+        public void Execute() => System.SpawnField(Entity);
     }
 }
-

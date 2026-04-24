@@ -11,13 +11,10 @@ namespace Content.Shared.Power.Generator;
 /// <summary>
 /// Shared logic for power-switchable devices.
 /// </summary>
-/// <seealso cref="PowerSwitchableComponent"/>
+/// <seealso cref="PowerSwitchableComponent" />
 public abstract class SharedPowerSwitchableSystem : EntitySystem
 {
-    public override void Initialize()
-    {
-        SubscribeLocalEvent<PowerSwitchableComponent, ExaminedEvent>(OnExamined);
-    }
+    public override void Initialize() => SubscribeLocalEvent<PowerSwitchableComponent, ExaminedEvent>(OnExamined);
 
     private void OnExamined(EntityUid uid, PowerSwitchableComponent comp, ExaminedEvent args)
     {
@@ -29,18 +26,13 @@ public abstract class SharedPowerSwitchableSystem : EntitySystem
     /// <summary>
     /// Helper to get the colored markup string for a voltage type.
     /// </summary>
-    public string VoltageColor(SwitchableVoltage voltage)
-    {
-        return Loc.GetString("power-switchable-voltage", ("voltage", VoltageString(voltage)));
-    }
+    public string VoltageColor(SwitchableVoltage voltage) =>
+        Loc.GetString("power-switchable-voltage", ("voltage", VoltageString(voltage)));
 
     /// <summary>
     /// Converts from "hv" to "HV" since for some reason the enum gets made lowercase???
     /// </summary>
-    public string VoltageString(SwitchableVoltage voltage)
-    {
-        return voltage.ToString().ToUpper();
-    }
+    public string VoltageString(SwitchableVoltage voltage) => voltage.ToString().ToUpper();
 
     /// <summary>
     /// Returns index of the next cable type index to cycle to.

@@ -13,8 +13,8 @@ namespace Content.Shared.Movement.Systems;
 public sealed class AutoOrientSystem : EntitySystem
 {
     [Dependency] private readonly IConfigurationManager _cfgManager = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SharedMoverController _mover = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     private TimeSpan _delay = TimeSpan.Zero;
 
@@ -26,10 +26,7 @@ public sealed class AutoOrientSystem : EntitySystem
         Subs.CVar(_cfgManager, CCVars.AutoOrientDelay, OnAutoOrient, true);
     }
 
-    private void OnAutoOrient(double obj)
-    {
-        _delay = TimeSpan.FromSeconds(obj);
-    }
+    private void OnAutoOrient(double obj) => _delay = TimeSpan.FromSeconds(obj);
 
     private void OnEntParentChanged(Entity<AutoOrientComponent> ent, ref EntParentChangedMessage args)
     {

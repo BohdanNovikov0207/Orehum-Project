@@ -10,11 +10,11 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Chemistry.Components;
 using Content.Shared.Database;
 using Content.Shared.DoAfter;
 using Content.Shared.Examine;
-using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Fluids.Components;
 using Content.Shared.Nutrition.EntitySystems;
 using Content.Shared.Spillable;
@@ -49,7 +49,10 @@ public abstract partial class SharedPuddleSystem
         if (!args.CanAccess || !args.CanInteract || args.Hands == null)
             return;
 
-        if (!_solutionContainerSystem.TryGetSolution(args.Target, entity.Comp.SolutionName, out var soln, out var solution))
+        if (!_solutionContainerSystem.TryGetSolution(args.Target,
+                entity.Comp.SolutionName,
+                out var soln,
+                out var solution))
             return;
 
         if (Openable.IsClosed(args.Target))
@@ -60,7 +63,7 @@ public abstract partial class SharedPuddleSystem
 
         Verb verb = new()
         {
-            Text = Loc.GetString("spill-target-verb-get-data-text")
+            Text = Loc.GetString("spill-target-verb-get-data-text"),
         };
 
         // TODO VERB ICONS spill icon? pouring out a glass/beaker?
@@ -84,7 +87,12 @@ public abstract partial class SharedPuddleSystem
             var user = args.User;
             verb.Act = () =>
             {
-                _doAfterSystem.TryStartDoAfter(new DoAfterArgs(EntityManager, user, entity.Comp.SpillDelay ?? 0, new SpillDoAfterEvent(), entity.Owner, target: entity.Owner)
+                _doAfterSystem.TryStartDoAfter(new DoAfterArgs(EntityManager,
+                    user,
+                    entity.Comp.SpillDelay ?? 0,
+                    new SpillDoAfterEvent(),
+                    entity.Owner,
+                    entity.Owner)
                 {
                     BreakOnDamage = true,
                     BreakOnMove = true,
@@ -92,6 +100,7 @@ public abstract partial class SharedPuddleSystem
                 });
             };
         }
+
         verb.Impact = LogImpact.Medium; // dangerous reagent reaction are logged separately.
         verb.DoContactInteraction = true;
         args.Verbs.Add(verb);

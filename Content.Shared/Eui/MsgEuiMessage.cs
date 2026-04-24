@@ -16,35 +16,33 @@ using Lidgren.Network;
 using Robust.Shared.Network;
 using Robust.Shared.Serialization;
 
-namespace Content.Shared.Eui
+namespace Content.Shared.Eui;
+
+public sealed class MsgEuiMessage : NetMessage
 {
-    public sealed class MsgEuiMessage : NetMessage
+    public uint Id;
+    public EuiMessageBase Message = default!;
+    public override MsgGroups MsgGroup => MsgGroups.Command;
+    public override NetDeliveryMethod DeliveryMethod => NetDeliveryMethod.ReliableOrdered;
+
+    public override void ReadFromBuffer(NetIncomingMessage buffer, IRobustSerializer ser)
     {
-        public override MsgGroups MsgGroup => MsgGroups.Command;
-        public override NetDeliveryMethod DeliveryMethod => NetDeliveryMethod.ReliableOrdered;
+        Id = buffer.ReadUInt32();
 
-        public uint Id;
-        public EuiMessageBase Message = default!;
+        var length = buffer.ReadVariableInt32();
+        using var stream = new MemoryStream(length);
+        buffer.ReadAlignedMemory(stream, length);
+        Message = ser.Deserialize<EuiMessageBase>(stream);
+    }
 
-        public override void ReadFromBuffer(NetIncomingMessage buffer, IRobustSerializer ser)
-        {
-            Id = buffer.ReadUInt32();
+    public override void WriteToBuffer(NetOutgoingMessage buffer, IRobustSerializer ser)
+    {
+        buffer.Write(Id);
+        var stream = new MemoryStream();
 
-            var length = buffer.ReadVariableInt32();
-            using var stream = new MemoryStream(length);
-            buffer.ReadAlignedMemory(stream, length);
-            Message = ser.Deserialize<EuiMessageBase>(stream);
-        }
-
-        public override void WriteToBuffer(NetOutgoingMessage buffer, IRobustSerializer ser)
-        {
-            buffer.Write(Id);
-            var stream = new MemoryStream();
-
-            ser.Serialize(stream, Message);
-            var length = (int)stream.Length;
-            buffer.WriteVariableInt32(length);
-            buffer.Write(stream.GetBuffer().AsSpan(0, length));
-        }
+        ser.Serialize(stream, Message);
+        var length = (int) stream.Length;
+        buffer.WriteVariableInt32(length);
+        buffer.Write(stream.GetBuffer().AsSpan(0, length));
     }
 }

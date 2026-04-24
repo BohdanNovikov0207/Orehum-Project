@@ -25,68 +25,79 @@ namespace Content.Shared.Pinpointer;
 /// <summary>
 /// Displays a sprite on the item that points towards the target component.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 [AutoGenerateComponentState]
 [Access(typeof(SharedPinpointerSystem))]
 public sealed partial class PinpointerComponent : Component
 {
-    /// <summary>
-    /// Goob edit: pinpointer now works on EntityWhitelist (actually only on components but nvm)
-    /// </summary>
+    // WD EDIT START
     [DataField]
-    public EntityWhitelist? Whitelist;
+    public ProtoId<AlertPrototype>? Alert;
+
+    [ViewVariables] [AutoNetworkedField]
+    public Angle ArrowAngle;
 
     [DataField]
     public EntityWhitelist? Blacklist;
 
-    [DataField("mediumDistance"), ViewVariables(VVAccess.ReadWrite)]
-    public float MediumDistance = 16f;
+    [DataField]
+    public bool CanEmag = true;
 
-    [DataField("closeDistance"), ViewVariables(VVAccess.ReadWrite)]
-    public float CloseDistance = 8f;
-
-    [DataField("reachedDistance"), ViewVariables(VVAccess.ReadWrite)]
-    public float ReachedDistance = 1f;
+    [DataField]
+    public bool CanExamine = true;
 
     /// <summary>
-    ///     Pinpointer arrow precision in radians.
+    /// Whether or not the target can be reassigned.
     /// </summary>
-    [DataField("precision"), ViewVariables(VVAccess.ReadWrite)]
-    public double Precision = 0.09;
+    [DataField("canRetarget")] [ViewVariables(VVAccess.ReadWrite)]
+    public bool CanRetarget;
 
     /// <summary>
-    ///     Name to display of the target being tracked.
-    /// </summary>
-    [DataField("targetName"), ViewVariables(VVAccess.ReadWrite)]
-    public string? TargetName;
-
-    /// <summary>
-    ///     Whether or not the target name should be updated when the target is updated.
-    /// </summary>
-    [DataField("updateTargetName"), ViewVariables(VVAccess.ReadWrite)]
-    public bool UpdateTargetName;
-
-    /// <summary>
-    ///     Goob edit: pinpointer can retarget only whitelisted entities if specified.
+    /// Goob edit: if true, this pinpointer will automatically track ANY nearest entity of a specified type.
+    /// Doesn't work with retargeting, it will always left only one entity in target list.
     /// </summary>
     [DataField]
-    public EntityWhitelist? RetargetingWhitelist;
+    public bool CanTargetMultiple = true;
+
+    [DataField]
+    public bool CanToggle = true;
+
+    [DataField("closeDistance")] [ViewVariables(VVAccess.ReadWrite)]
+    public float CloseDistance = 8f;
+
+    [ViewVariables] [AutoNetworkedField]
+    public Distance DistanceToTarget = Distance.Unknown;
+    // WD EDIT END
+
+    [DataField] [AutoNetworkedField] // WD EDIT: ViewVariables -> DataField
+    public bool IsActive = false;
+
+    [DataField("mediumDistance")] [ViewVariables(VVAccess.ReadWrite)]
+    public float MediumDistance = 16f;
+
+    /// <summary>
+    /// Pinpointer arrow precision in radians.
+    /// </summary>
+    [DataField("precision")] [ViewVariables(VVAccess.ReadWrite)]
+    public double Precision = 0.09;
+
+    [DataField("reachedDistance")] [ViewVariables(VVAccess.ReadWrite)]
+    public float ReachedDistance = 1f;
 
     [DataField]
     public EntityWhitelist? RetargetingBlacklist;
 
     /// <summary>
-    ///     Whether or not the target can be reassigned.
-    /// </summary>
-    [DataField("canRetarget"), ViewVariables(VVAccess.ReadWrite)]
-    public bool CanRetarget;
-
-    /// <summary>
-    ///     Goob edit: if true, this pinpointer will automatically track ANY nearest entity of a specified type.
-    ///     Doesn't work with retargeting, it will always left only one entity in target list.
+    /// Goob edit: pinpointer can retarget only whitelisted entities if specified.
     /// </summary>
     [DataField]
-    public bool CanTargetMultiple = true;
+    public EntityWhitelist? RetargetingWhitelist;
+
+    /// <summary>
+    /// Name to display of the target being tracked.
+    /// </summary>
+    [DataField("targetName")] [ViewVariables(VVAccess.ReadWrite)]
+    public string? TargetName;
 
     /// <summary>
     /// Goob edit: many targets instead of just one
@@ -94,39 +105,28 @@ public sealed partial class PinpointerComponent : Component
     [ViewVariables]
     public List<EntityUid> Targets = new();
 
-    // WD EDIT START
+    /// <summary>
+    /// Whether or not the target name should be updated when the target is updated.
+    /// </summary>
+    [DataField("updateTargetName")] [ViewVariables(VVAccess.ReadWrite)]
+    public bool UpdateTargetName;
+
+    /// <summary>
+    /// Goob edit: pinpointer now works on EntityWhitelist (actually only on components but nvm)
+    /// </summary>
     [DataField]
-    public ProtoId<AlertPrototype>? Alert;
-
-    [DataField]
-    public bool CanToggle = true;
-
-    [DataField]
-    public bool CanEmag = true;
-
-    [DataField]
-    public bool CanExamine = true;
-    // WD EDIT END
-
-    [DataField, AutoNetworkedField] // WD EDIT: ViewVariables -> DataField
-    public bool IsActive = false;
-
-    [ViewVariables, AutoNetworkedField]
-    public Angle ArrowAngle;
-
-    [ViewVariables, AutoNetworkedField]
-    public Distance DistanceToTarget = Distance.Unknown;
+    public EntityWhitelist? Whitelist;
 
     [ViewVariables]
     public bool HasTarget => DistanceToTarget != Distance.Unknown;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum Distance : byte
 {
     Unknown,
     Reached,
     Close,
     Medium,
-    Far
+    Far,
 }

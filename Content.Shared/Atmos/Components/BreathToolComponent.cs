@@ -5,9 +5,9 @@ using Robust.Shared.GameStates;
 namespace Content.Shared.Atmos.Components;
 
 /// <summary>
-/// Gas masks or the likes; used by <see cref="InternalsComponent"/> for breathing.
+/// Gas masks or the likes; used by <see cref="InternalsComponent" /> for breathing.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 [ComponentProtoName("BreathMask")]
 public sealed partial class BreathToolComponent : Component
 {
@@ -17,12 +17,12 @@ public sealed partial class BreathToolComponent : Component
     [DataField]
     public SlotFlags AllowedSlots = SlotFlags.MASK | SlotFlags.HEAD;
 
-    [ViewVariables]
-    public bool IsFunctional => ConnectedInternalsEntity != null;
-
     /// <summary>
     /// Entity that the breath tool is currently connected to.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public EntityUid? ConnectedInternalsEntity;
+
+    [ViewVariables]
+    public bool IsFunctional => ConnectedInternalsEntity != null;
 }

@@ -15,11 +15,14 @@ namespace Content.Shared.Lathe.Prototypes;
 /// Packs will inherit the parents recipes when using inheritance, so you don't need to copy paste them.
 /// </summary>
 [Prototype]
-public sealed partial class LatheRecipePackPrototype : IPrototype, IInheritingPrototype
+public sealed class LatheRecipePackPrototype : IPrototype, IInheritingPrototype
 {
-    [ViewVariables]
-    [IdDataField]
-    public string ID { get; private set; } = default!;
+    /// <summary>
+    /// The lathe recipes contained by this pack.
+    /// </summary>
+    [DataField(required: true)]
+    [AlwaysPushInheritance]
+    public HashSet<ProtoId<LatheRecipePrototype>> Recipes = new();
 
     [ParentDataField(typeof(AbstractPrototypeIdArraySerializer<LatheRecipePackPrototype>))]
     public string[]? Parents { get; private set; }
@@ -28,10 +31,7 @@ public sealed partial class LatheRecipePackPrototype : IPrototype, IInheritingPr
     [AbstractDataField]
     public bool Abstract { get; private set; }
 
-    /// <summary>
-    /// The lathe recipes contained by this pack.
-    /// </summary>
-    [DataField(required: true)]
-    [AlwaysPushInheritance]
-    public HashSet<ProtoId<LatheRecipePrototype>> Recipes = new();
+    [ViewVariables]
+    [IdDataField]
+    public string ID { get; } = default!;
 }

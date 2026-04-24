@@ -13,8 +13,8 @@ namespace Content.Shared.Bed.Cryostorage;
 /// <summary>
 /// This is used to track an entity that is currently being held in Cryostorage.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
-[AutoGenerateComponentState, AutoGenerateComponentPause]
+[RegisterComponent] [NetworkedComponent]
+[AutoGenerateComponentState] [AutoGenerateComponentPause]
 public sealed partial class CryostorageContainedComponent : Component
 {
     /// <summary>
@@ -25,17 +25,18 @@ public sealed partial class CryostorageContainedComponent : Component
     public bool AllowReEnteringBody;
 
     /// <summary>
-    /// The time at which the cryostorage grace period ends.
-    /// </summary>
-    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer)), ViewVariables(VVAccess.ReadWrite), AutoNetworkedField]
-    [AutoPausedField]
-    public TimeSpan? GracePeriodEndTime;
-
-    /// <summary>
     /// The cryostorage this entity is 'stored' in.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public EntityUid? Cryostorage;
+
+    /// <summary>
+    /// The time at which the cryostorage grace period ends.
+    /// </summary>
+    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))] [ViewVariables(VVAccess.ReadWrite)]
+    [AutoNetworkedField]
+    [AutoPausedField]
+    public TimeSpan? GracePeriodEndTime;
 
     [DataField]
     public NetUserId? UserId;

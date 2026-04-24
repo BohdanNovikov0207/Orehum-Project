@@ -5,12 +5,12 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Robust.Shared.GameStates;
 using Content.Shared.Damage;
+using Robust.Shared.GameStates;
 
 namespace Content.Shared._White.Grab;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class GrabThrownComponent : Component
 {
     public DamageSpecifier? DamageOnCollide;

@@ -1,34 +1,34 @@
+using Content.Shared.StatusIcon;
 using Robust.Shared.Audio;
 using Robust.Shared.GameStates;
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
-using Content.Shared.StatusIcon;
 
 namespace Content.Shared._Shitcode.Heretic.Components;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent] [NetworkedComponent]
 public sealed partial class StarGazerComponent : Component
 {
+    [ViewVariables(VVAccess.ReadWrite)]
+    public float GhostRoleAccumulator;
+
+    [DataField]
+    public float GhostRoleTimer = 20f;
+
     [DataField]
     public ProtoId<FactionIconPrototype> MasterIcon = "GhoulHereticMaster";
 
     [DataField]
     public float MaxDistance = 20f;
 
-    [ViewVariables, NonSerialized]
-    public ICommonSession? ResettingMindSession;
-
-    [DataField]
-    public float GhostRoleTimer = 20f;
-
     [ViewVariables(VVAccess.ReadWrite)]
-    public float GhostRoleAccumulator;
+    public float ResetDistanceAccumulator;
 
     [DataField]
     public float ResetDistanceTimer = 5f;
 
-    [ViewVariables(VVAccess.ReadWrite)]
-    public float ResetDistanceAccumulator;
+    [ViewVariables] [NonSerialized]
+    public ICommonSession? ResettingMindSession;
 
     [DataField]
     public EntProtoId TeleportEffect = "EffectCosmicCloud";

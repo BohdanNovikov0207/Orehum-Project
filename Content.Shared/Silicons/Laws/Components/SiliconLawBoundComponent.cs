@@ -32,7 +32,7 @@ namespace Content.Shared.Silicons.Laws.Components;
 /// <summary>
 /// This is used for entities which are bound to silicon laws and can view them.
 /// </summary>
-[RegisterComponent, NetworkedComponent, Access(typeof(SharedSiliconLawSystem))]
+[RegisterComponent] [NetworkedComponent] [Access(typeof(SharedSiliconLawSystem))]
 public sealed partial class SiliconLawBoundComponent : Component
 {
     /// <summary>
@@ -44,7 +44,6 @@ public sealed partial class SiliconLawBoundComponent : Component
 
 /// <summary>
 /// Event raised to get the laws that a law-bound entity has.
-///
 /// Is first raised on the entity itself, then on the
 /// entity's station, then on the entity's grid,
 /// before being broadcast.
@@ -55,23 +54,22 @@ public record struct GetSiliconLawsEvent(EntityUid Entity)
 {
     public EntityUid Entity = Entity;
 
-    public SiliconLawset Laws = new();
-
     public bool Handled = false;
+
+    public SiliconLawset Laws = new();
 }
 
 public sealed partial class ToggleLawsScreenEvent : InstantActionEvent
 {
-
 }
 
-[NetSerializable, Serializable]
+[NetSerializable] [Serializable]
 public enum SiliconLawsUiKey : byte
 {
-    Key
+    Key,
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class SiliconLawBuiState : BoundUserInterfaceState
 {
     public List<SiliconLaw> Laws;

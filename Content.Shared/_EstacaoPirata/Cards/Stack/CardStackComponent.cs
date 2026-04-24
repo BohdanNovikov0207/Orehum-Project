@@ -16,21 +16,17 @@ namespace Content.Shared._EstacaoPirata.Cards.Stack;
 /// <summary>
 /// This is used for holding the prototype ids of the cards in the stack or hand.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
-
+[RegisterComponent] [NetworkedComponent] [AutoGenerateComponentState]
 public sealed partial class CardStackComponent : Component
 {
+    /// <summary>
+    /// The list EntityUIds of Cards
+    /// </summary>
+    [DataField] [AutoNetworkedField]
+    public List<EntityUid> Cards = [];
+
     [DataField("content")]
     public List<EntProtoId> InitialContent = [];
-
-    [DataField("shuffleSound")]
-    public SoundSpecifier ShuffleSound = new SoundCollectionSpecifier("cardFan");
-
-    [DataField("pickUpSound")]
-    public SoundSpecifier PickUpSound = new SoundCollectionSpecifier("cardSlide");
-
-    [DataField("placeDownSound")]
-    public SoundSpecifier PlaceDownSound = new SoundCollectionSpecifier("cardShove");
 
 
     /// <summary>
@@ -39,14 +35,17 @@ public sealed partial class CardStackComponent : Component
     [ViewVariables]
     public Container ItemContainer = default!;
 
-    /// <summary>
-    /// The list EntityUIds of Cards
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public List<EntityUid> Cards = [];
+    [DataField("pickUpSound")]
+    public SoundSpecifier PickUpSound = new SoundCollectionSpecifier("cardSlide");
+
+    [DataField("placeDownSound")]
+    public SoundSpecifier PlaceDownSound = new SoundCollectionSpecifier("cardShove");
+
+    [DataField("shuffleSound")]
+    public SoundSpecifier ShuffleSound = new SoundCollectionSpecifier("cardFan");
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class CardStackInitiatedEvent(NetEntity cardStack) : EntityEventArgs
 {
     public NetEntity CardStack = cardStack;
@@ -55,35 +54,32 @@ public sealed class CardStackInitiatedEvent(NetEntity cardStack) : EntityEventAr
 /// <summary>
 /// This gets Updated when new cards are added or removed from the stack
 /// </summary>
-[Serializable, NetSerializable]
-public sealed class CardStackQuantityChangeEvent(NetEntity stack, NetEntity? card, StackQuantityChangeType type) : EntityEventArgs
+[Serializable] [NetSerializable]
+public sealed class CardStackQuantityChangeEvent(NetEntity stack, NetEntity? card, StackQuantityChangeType type)
+    : EntityEventArgs
 {
-    public NetEntity Stack = stack;
     public NetEntity? Card = card;
+    public NetEntity Stack = stack;
     public StackQuantityChangeType Type = type;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public enum StackQuantityChangeType : sbyte
 {
     Added,
     Removed,
     Joined,
-    Split
+    Split,
 }
 
-
-
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class CardStackReorderedEvent(NetEntity stack) : EntityEventArgs
 {
     public NetEntity Stack = stack;
 }
 
-[Serializable, NetSerializable]
+[Serializable] [NetSerializable]
 public sealed class CardStackFlippedEvent(NetEntity cardStack) : EntityEventArgs
 {
     public NetEntity CardStack = cardStack;
 }
-
-

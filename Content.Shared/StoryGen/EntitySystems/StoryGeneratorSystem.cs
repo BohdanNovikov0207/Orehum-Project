@@ -11,9 +11,9 @@ using Robust.Shared.Random;
 namespace Content.Shared.StoryGen;
 
 /// <summary>
-/// Provides functionality to generate a story from a <see cref="StoryTemplatePrototype"/>.
+/// Provides functionality to generate a story from a <see cref="StoryTemplatePrototype" />.
 /// </summary>
-public sealed partial class StoryGeneratorSystem : EntitySystem
+public sealed class StoryGeneratorSystem : EntitySystem
 {
     [Dependency] private readonly IPrototypeManager _protoMan = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
@@ -21,12 +21,14 @@ public sealed partial class StoryGeneratorSystem : EntitySystem
     /// <summary>
     /// Tries to generate a random story using the given template, picking a random word from the referenced
     /// datasets for each variable and passing them into the localization system with template.
-    /// If <paramref name="seed"/> is specified, the randomizer will be seeded with it for consistent story generation;
+    /// If <paramref name="seed" /> is specified, the randomizer will be seeded with it for consistent story generation;
     /// otherwise the variables will be randomized.
     /// Fails if the template prototype cannot be loaded.
     /// </summary>
     /// <returns>true if the template was loaded, otherwise false.</returns>
-    public bool TryGenerateStoryFromTemplate(ProtoId<StoryTemplatePrototype> template, [NotNullWhen(true)] out string? story, int? seed = null)
+    public bool TryGenerateStoryFromTemplate(ProtoId<StoryTemplatePrototype> template,
+        [NotNullWhen(true)] out string? story,
+        int? seed = null)
     {
         // Get the story template prototype from the ID
         if (!_protoMan.TryIndex(template, out var templateProto))
